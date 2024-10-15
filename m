@@ -1,29 +1,29 @@
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2041.outbound.protection.outlook.com [40.107.21.41])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2076.outbound.protection.outlook.com [40.107.21.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0651C07E0;
-	Tue, 15 Oct 2024 12:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F34E1AF0B3;
+	Tue, 15 Oct 2024 13:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.76
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728996532; cv=fail; b=JGflAgSM8O7r1GJyoH4AyfwFZXJm7gzeUrDdhYoTkZGPAX+2Rb2ZRv2cAMKufPXo81gcn02+FkX+zWl5gCr+0MMgYeHs+JTalzwrWZ8X+NYuwR6Ja9SUc//nrs3G1fkL0D75ErzdZF5j805eM6Fv5+K8SS2v7UEVKSBdScw2E+4=
+	t=1728997406; cv=fail; b=fCZerS9NgprATjwHBkuz269Wpy3cEK78sjaMUUdVyfybYAI6LBDuAgbQeKGai7Uiw5o+gL2Kbc5KBcep+kqaGkzYwJEcJJZyHjVVIwnG/vZ08Io1lIAVJADrEgQJjefK6yNUgStTRXqOfILp8EI1jlZXroJeGwHbNDQrF+yn0ec=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728996532; c=relaxed/simple;
-	bh=YedFrnokZGHr9b8fM1HXcTUAphz9+uzXnLoe7CervNU=;
+	s=arc-20240116; t=1728997406; c=relaxed/simple;
+	bh=THkUA39DFpz2N0HbXudSmExhgHKOGwClTMeCp8YPbgs=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LDkvMk/UKNzQXGCiBl3AOf3dWmgiIxq05hJlrse5d7790M3AYO9NGQXAdCQffL47/PJoDFbV39qpEBQJQ7qS1Rw2XfgIrdZriCkCgkzwEKWYAXoHfMSLntDmAW3vxOYNcMWbnynqiKjZVKcOqYht3jOondUnF8/4bw0w02nJSIQ=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mgJvhdys; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mgJvhdys; arc=fail smtp.client-ip=40.107.21.41
+	 Content-Type:MIME-Version; b=Mm8f3WSyxHvxDGB9MLaPOV+WUA1Xd5JbFIWy++tX6MTTENicSfRedxQsnSifA7xR8R/flNf4Gxmdn/KN692wutbQmtWZDeoJv0W7cNddHq6L0CZA9jHv81yH4R7/Mbfp75Mlv/S3HdveK8P3v6QmAsP/1TSUfsrdCKueYS4dvVQ=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rXOIwxlw; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rXOIwxlw; arc=fail smtp.client-ip=40.107.21.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mgJvhdys";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mgJvhdys"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rXOIwxlw";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rXOIwxlw"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=Vh78l6u7o/YwIDpBdZi2hrD5k4PbA+46CIUHc5RSXq6hZPnLfSvACCuCsx4Ta0vR846ZYBypip4BQMHAFAy/SehCVw3EUuUQRPOZfDOpaj8wsYsRsYekHCYZK5u1UCLHIQUcSd8wvE1mxCmHKgIWKn9x0Nib7N0kmVA0jKDJ6drwdCCz65QBNH2g+Npvtt7aq1+OihyiCZJ0en6zeeeSOfrFd8dh5TaVM9+6CAK4d1P7TU8/PWQQ50vkHeZvV/983QVCis8m56gzoVodFnKWF0BhcK0k9P6hXQoKsa0JTrsgEyIe8t7tBTXi4M5SZzArQJarJdju1Y4uoY3PRaktdw==
+ b=JMJtVVdW6pa2ua2bMjqyaXkQokGPuBraTNtHzvWTwPBlWPGEI+jSbeE46aSPJ6+j/1obwxPt0DprhdUguuxDYyXQ0Y1Uxmw8s6WpMavR8Af9wbekCKRWaWLZPqNUR3mXxYaHHIEGBbhb2WLRugL0O0L5H12/cG+ZJZUZiQiY/Coqmu81ll6Ml3STj1m+vAhyiZfoy3bmESz94f2SycL+fnUGIpLpGiHl1CEXGuFZhqlV4510XTB1tmIAy7mgjK8bx3J49mYNbWo12BN8eql0e8CexrILBe7gnsZ/in+3CjaC/nqYiVkVAS/HyawxxdT+1NC57Liq5lxK11/7kEk1oQ==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eB9609zvMbchdkyfXpNxyPlh67FSvA4uhUlZQUoyCyA=;
- b=Lo0FuQG0ofPgs0oJvng8bWczYaatC7zn43T1kH/A4UGrU6BKoDoL9RNqc42Ud/NtP3KsCFGiUf0Ijqm7W5a04IgHaVO+g6QKp9vOgb1crsTuB3ykwPZMQi3ZBpvE8g/JSCmAt0i83qNumIZg/qlhoO/booGrhuXAdRMGItz/bY0EsfmDBd5if8jjT/FYbmCTYtn6RV91LnHUsps/Qx9+wkz1lv2dLC8VaX5uRyiu8SCH4fb9vbQ8iflrste8JSi8PswWuVLbA+cLP5yC1s84HzyXiYdI24RtSj/kmj31F78PhLgp5ATJfNfZXyhXpnHGWtaZpyTQVWw9l6Q0ZR5xhw==
+ bh=v+569R6Jmva7fy0j0x2UmHQefmx67PZdI5hWhVGvwgw=;
+ b=Vq5LEPZ+U3rSYTkDsUnMDHV8/2Moye52jxUIZpSIvWi2Fa1yzNaYQnABKdUfUVPtmhycE6MhzODJa4ErUlVBP0eeCrnZTtpMOBTCyZiSp5+cQ5znbUqKsjGpm8BY06RQhvCc+ZFkRMdazxT60hQK86ZYKwP5W7d34RlWw0ZlPN8xjbGnRvwzlC10YNJtFhglr1SUirs+WopPjcqW8cgKXVVF2DiWqmE9cvRoytHA+Q3lVL/0D+K5r1G9O5G6iJN74G0yVjwjMMvnVpKi3a4ZR95U1HzjMSyBQX6undB5rkuAlstZJ+rWCxy9ZqWTDM+xPTgGOLEF0Xl9DfmvJvZVUA==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  63.35.35.123) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eB9609zvMbchdkyfXpNxyPlh67FSvA4uhUlZQUoyCyA=;
- b=mgJvhdys1B4JxRPmNgP4OEmdcwxLs7kXCS9a/ZBQzFdpdwvSCnpA+ZdZKp+uxnzh3YDRZcjF9/1bIYMaTjB7676vzmhLY0lIKSd6ziMlAvGPQTuc/xsm+ewSigaXQFmHAtuhg4QTOZqKHW/sm24I+ynMn3yfCK9DZ6HXQg2ONlg=
-Received: from PR1P264CA0196.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:34d::7)
- by AS8PR08MB10172.eurprd08.prod.outlook.com (2603:10a6:20b:628::19) with
+ bh=v+569R6Jmva7fy0j0x2UmHQefmx67PZdI5hWhVGvwgw=;
+ b=rXOIwxlwk9Ob0LC/Xk+ibVJr8Zwe65oBxk1qrIJwfaKbXOj/jbJmn4gzPDb7ZkGxcnafCcrg8d6XLHCo0/TamitIDRQR8nrlVzeTsR2oQ6acLFcFTRTfFapBQnnukkKubo2cJsD55Pv+7nRlT7i0wZh5WEHKSIlGMDX615ku4o0=
+Received: from AM0PR04CA0094.eurprd04.prod.outlook.com (2603:10a6:208:be::35)
+ by AS8PR08MB8275.eurprd08.prod.outlook.com (2603:10a6:20b:56f::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.22; Tue, 15 Oct
- 2024 12:48:42 +0000
-Received: from AM4PEPF00025F96.EURPRD83.prod.outlook.com
- (2603:10a6:102:34d:cafe::5d) by PR1P264CA0196.outlook.office365.com
- (2603:10a6:102:34d::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.26 via Frontend
- Transport; Tue, 15 Oct 2024 12:48:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.21; Tue, 15 Oct
+ 2024 13:03:15 +0000
+Received: from AMS1EPF00000044.eurprd04.prod.outlook.com
+ (2603:10a6:208:be:cafe::f0) by AM0PR04CA0094.outlook.office365.com
+ (2603:10a6:208:be::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.17 via Frontend
+ Transport; Tue, 15 Oct 2024 13:03:15 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -52,50 +52,50 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
  pr=C
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM4PEPF00025F96.mail.protection.outlook.com (10.167.16.5) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8093.1 via
- Frontend Transport; Tue, 15 Oct 2024 12:48:41 +0000
-Received: ("Tessian outbound cd6aa7fa963a:v473"); Tue, 15 Oct 2024 12:48:41 +0000
+ AMS1EPF00000044.mail.protection.outlook.com (10.167.16.41) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8069.17
+ via Frontend Transport; Tue, 15 Oct 2024 13:03:15 +0000
+Received: ("Tessian outbound de6fe3af73ff:v473"); Tue, 15 Oct 2024 13:03:14 +0000
 X-CheckRecipientChecked: true
-X-CR-MTA-CID: 6a48062eedcba61c
-X-TessianGatewayMetadata: Icjp+1A2slBswNVIPftU0NbZtdh5cTiAeKo+ZIqcxcUTjNxh649ZGqxRekc6u2HaZpKWp0x0m5AccMCh0OvPhYTsPnQZZ+Q7lcQ9yyjZcS3nKjIH7NAHXtnOdSrfmqcxeJjAZle/mc86eWftTlpo0q+1cGZQkg0OSnB4wOvqMFY=
+X-CR-MTA-CID: 3fc22c22d7c35add
+X-TessianGatewayMetadata: vqU1OiIRKLLMuHHJPbZ/uHBBabNK4k6lz6PuwhoHVT+W4/YaezqEIra9ufM/OXAUiXeOIDJUj1segXJeUpIqP+wicc8z3TbP94/ZiNQmJF1YhVAgXTB0vdxoGpwD+KNDTsZ0Zr4OP5uwgyCvn+WStbm7ML8mZIk0/4AMtYxLlbY=
 X-CR-MTA-TID: 64aa7808
-Received: from Lcab9e31480f5.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id B5177B8E-12AC-4ECF-9565-3B8854197832.1;
-	Tue, 15 Oct 2024 12:48:30 +0000
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id Lcab9e31480f5.2
+Received: from Lb11795a18fa5.2
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 2FF9EFF4-2A81-48C9-88D6-FF13E8F5C77A.1;
+	Tue, 15 Oct 2024 13:03:04 +0000
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id Lb11795a18fa5.2
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Tue, 15 Oct 2024 12:48:30 +0000
+    Tue, 15 Oct 2024 13:03:04 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DIH6Hc06chxTsu0y6Vle3RuhkJtVTT/03GxALnZ0gUCr6KW8Zrtf1pLaP85zxvM4jX8r5xGSewDTS8nC/Nw2DtKYlhN43ocVp2hwYyZw+3Tx4dW88gGJwLGQJSnKlCs7x8prCjEgczv0tCLB6Uyg3XqqRGA85nWbwWWXOb1t5lI0vVYxsi+/wzrE3U5TEfjRPD8QmQFXPpn7kv/vkhe1c3++eTQdy8RnTRAWv3tlhqg0aBvWX8u5jHeGkuucTRpCcDlw82JCNepTVzGr26AEc2WtPlPuoTfF76rx3pS7R9SVCv4ts7d4tiwbc+elhqNg/24J+XUkxcrh4YbGafG+gQ==
+ b=AOfwdlvy7NM87LMdapTH0DOsIVtsLpFUbu62pZptDpdI1GHhpfkboX2BgJCifxWds8nKPQRtXomKtOZqOFdHGd/ug7R4gOVABFunuIVyPhO16Ja4mvwFXSbElLwTOKo9mYOyw8RQxyzFJfryekPsjQomQD46iAPfExJmTS26CfMzNkY1ndao0fkZr9PAy/sFIWploJOykO4ZIfXAEENbWQuepjNoU95SGYYmu8EkHzk5IxTndAUnRlJQ09d1doYCW9Vv8aHUzShyqQBYRkH/w/jRoyeql2oapsU6I5UG/w7eDBm/0Uf/6NyEpZaL/y+giUFaTEiN09U/wBRxcb5SZw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eB9609zvMbchdkyfXpNxyPlh67FSvA4uhUlZQUoyCyA=;
- b=LHhzBqWWXXoZl2nF1GaNzLINj53wtj1imWoyXJ8VD39n3DrWxXoY3QlH/vjRUXt5YJA6mMR9aisfKN6tA1aRt3tD5DPbub/oFosATr8A6z6JfoGN3aKqNgZtJQTet7JX19/AR/AKWVlNAaSLl0JI9Ls9M5wdRQl8Zf9XFkp0zx27iQq4s0ufnXDYqFnEhkPzvGqHDwbp/Q8k3rQU5m+gkduHIWQXJ2U+f+DgCGbm59cZnrSpiESq5uocYeLfQCDCvRYH1V9OiQRRP/r4j2tWNpMc7cKNl044EiZ8ygbLXcIxvhyg2Bq8KqjXlfe/cg9ZT5xSMRq7pOHvXOhEB77mpg==
+ bh=v+569R6Jmva7fy0j0x2UmHQefmx67PZdI5hWhVGvwgw=;
+ b=oWSbkWfax9Z2LUm1QhtqR0+NhdtgjD/ifOeFJ2lIaBVMKiNtEq15/KcSLFtmdkdF/YImJk4USFoa+rVSA3zdWfHlmcWxvUO+xY/iUePaeobogTbFg7y+EpZhtSFyFCExCaCnxhB76/q+xSghzPj/2TOebTVwzje51WjD1azxEOj52R+IaJ7RaNXk9IIiEt3+umT/08Il9AoWzJlzQVHDZNAz01zo5E58leHz4rXqszJRwJ5W6hmGbDxHdw4FMAxO+gHg5Fgfzx4iAJjGUMzd3n4rwyAV7Ss78MqX40DbRmZIhlJNIrSxcPuUYKu/xxnX41yAxoVmy4J6tfN19ftWDg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eB9609zvMbchdkyfXpNxyPlh67FSvA4uhUlZQUoyCyA=;
- b=mgJvhdys1B4JxRPmNgP4OEmdcwxLs7kXCS9a/ZBQzFdpdwvSCnpA+ZdZKp+uxnzh3YDRZcjF9/1bIYMaTjB7676vzmhLY0lIKSd6ziMlAvGPQTuc/xsm+ewSigaXQFmHAtuhg4QTOZqKHW/sm24I+ynMn3yfCK9DZ6HXQg2ONlg=
+ bh=v+569R6Jmva7fy0j0x2UmHQefmx67PZdI5hWhVGvwgw=;
+ b=rXOIwxlwk9Ob0LC/Xk+ibVJr8Zwe65oBxk1qrIJwfaKbXOj/jbJmn4gzPDb7ZkGxcnafCcrg8d6XLHCo0/TamitIDRQR8nrlVzeTsR2oQ6acLFcFTRTfFapBQnnukkKubo2cJsD55Pv+7nRlT7i0wZh5WEHKSIlGMDX615ku4o0=
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 Received: from GVXPR08MB7727.eurprd08.prod.outlook.com (2603:10a6:150:6b::6)
- by GV1PR08MB8081.eurprd08.prod.outlook.com (2603:10a6:150:97::19) with
+ by VI0PR08MB11134.eurprd08.prod.outlook.com (2603:10a6:800:250::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.26; Tue, 15 Oct
- 2024 12:48:20 +0000
+ 2024 13:03:01 +0000
 Received: from GVXPR08MB7727.eurprd08.prod.outlook.com
  ([fe80::9672:63f7:61b8:5469]) by GVXPR08MB7727.eurprd08.prod.outlook.com
  ([fe80::9672:63f7:61b8:5469%7]) with mapi id 15.20.8048.020; Tue, 15 Oct 2024
- 12:48:20 +0000
-Message-ID: <6d4bf0cc-7060-4843-9e15-e4ed23c74839@arm.com>
-Date: Tue, 15 Oct 2024 13:48:17 +0100
+ 13:03:01 +0000
+Message-ID: <ee899720-7b13-4609-a00b-86af868a0b1d@arm.com>
+Date: Tue, 15 Oct 2024 14:02:58 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 14/43] arm64: RME: Allocate/free RECs to match vCPUs
+Subject: Re: [PATCH v5 15/43] arm64: RME: Support for the VGIC in realms
 Content-Language: en-GB
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
@@ -111,13 +111,13 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
  <aneesh.kumar@kernel.org>
 References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-15-steven.price@arm.com>
+ <20241004152804.72508-16-steven.price@arm.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20241004152804.72508-15-steven.price@arm.com>
+In-Reply-To: <20241004152804.72508-16-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0169.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18a::12) To GVXPR08MB7727.eurprd08.prod.outlook.com
+X-ClientProxiedBy: LO4P265CA0192.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:311::20) To GVXPR08MB7727.eurprd08.prod.outlook.com
  (2603:10a6:150:6b::6)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -126,434 +126,307 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-TrafficTypeDiagnostic:
-	GVXPR08MB7727:EE_|GV1PR08MB8081:EE_|AM4PEPF00025F96:EE_|AS8PR08MB10172:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2793768c-fd60-4205-3f8e-08dced17b2cb
+	GVXPR08MB7727:EE_|VI0PR08MB11134:EE_|AMS1EPF00000044:EE_|AS8PR08MB8275:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe67d9c0-a207-45e7-40f9-08dced19bb5f
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?SXNuNnVza0JKSkZnWEFKa0YyWGx1OUd0K252RVRCM2I2bUNNYzExVFJxTTlN?=
- =?utf-8?B?cG1JdjM5SGs0SHc5US8yaXhvSkJCSFo3d1BtdUdDWjg3R3RBVTBiSkVXU3ZX?=
- =?utf-8?B?R21rNGJVSFVHYStXeDN1SGpXZnovUkJsV2NUeFdPemVVbWxNQUthQ0YzYmRm?=
- =?utf-8?B?SGRTbUpMNkVGcUVMaFVSNmVicmxFcStUMXlxemNHK3lwUlJaVEdacjhPMnpS?=
- =?utf-8?B?OWRTTmp0ZW1nUW9LQU9ZS3g1c0o2anpGd1FqOUVYb29DdG5WeThHclMvbE9J?=
- =?utf-8?B?ZTVHZmZaY3owMHFUVVkwQTB4RURpUWJaaXoyS0FLU3l4ZXZQbFVpU25WdGpi?=
- =?utf-8?B?dy8zQ2xBSHdWYmhrVTM3VDRBUWlVbGlma081Ukk2U3FpaW1wWmNzd0ZHVFdC?=
- =?utf-8?B?dkwzK2VFS1JsM0JFWi9YazIvclRJN25TcXJ3cy9uTm9kV2ltSmhRbXczMnY1?=
- =?utf-8?B?TE11YURGWmZ2T1d5OXdwbjQrM3FBaVZ4SnloNW00Y2QraDZydmUvY3ZhNmJx?=
- =?utf-8?B?bGxWUTF4UVRkaDFBYjNPVHhDNjJnYVk2VGFtVjAxOG1zN002S0RMYTZaTjVm?=
- =?utf-8?B?VGRxNHVPMWdhVmlPb1FVY053b3VNR1E4TDVKN3ovZlkxVkdJV0dpNllwWTg0?=
- =?utf-8?B?SlVZVi9kVWRJZWNmeGZrMys1dEJVL2k2RGZNazF4aWNycDc4eG5vRGE1RlIw?=
- =?utf-8?B?NmwzQUY1VU9WWUZlNzQ2ZWdPQk9QeXh0aFo5VkJmbVFpMStsU25qOXBDUCt4?=
- =?utf-8?B?VW9zSnVBaXpDVWE0OTQzaXhlbFNFVENuS1NEY3pFTUJEdC9xcE9YK3g3S1Bk?=
- =?utf-8?B?c2UxWEhxZXdVY2dWUXZINWJjWnJGd0dCU2ZPUS9LTUJBODBGRFZ6WURtWnc1?=
- =?utf-8?B?N1RJelVmd0VqRGtQRXVzR1N1RzhpdzcvdzkrYUVobC9XTFF4RnRCNDFPVTh0?=
- =?utf-8?B?SGtYMlRvOG01ZWtkdVBlNnhTODZHbVFvVnpGUDdhM0JGUmdxdjBFd204S2dp?=
- =?utf-8?B?MSs3QmZaRGZhU1JabHhISUMvcmw4WkR6UFdBYjdLYWViN29zeTl1KzY3YjlE?=
- =?utf-8?B?eVE2Y3NDWktMak9aYmdYOVdzYWZOdXMzWmNNOGNUK1E5cGhzaGY5OWNNOS9K?=
- =?utf-8?B?T3M2VFNKL2JuU3FKdU1KZTJDczIxSDJValZ1SzRiQVJkcHRSb1hYbHJXQmhw?=
- =?utf-8?B?MXNBeDRUb08rWlcyTzFKL05TMEVPU2pXWEpUcFBQQTNJdnpERk5ocmVnVER0?=
- =?utf-8?B?WTRzZnZKS0Vmc3NMNWwvem1hSXIyVmkrR3FLSDRBRHVTY3Bud3NiOGxlVXlo?=
- =?utf-8?B?QjNlOWVMWjQwU1lITXlhYTNpOFVwdjh1Tk41RWFGQWJSVGZjMzhHcUd3TGpF?=
- =?utf-8?B?RmhNVXM5akN5a2FCeHBVdTFTOUNWNjlUd0VrakVLWklmblFoc2Jlcnh5NXVQ?=
- =?utf-8?B?WUIyTlNvT1hoSTdzZDAxd2VQelREK2s3bnk3ZzUxbjRscWpldmNJMVBtam5t?=
- =?utf-8?B?Y0Z5dnRjeVlNWHBHY3ljNS94bW5ma1Zicy9FNDhYSllZT0RzSG53QmVlYXBG?=
- =?utf-8?B?Mk0yVVhZZmF1ZWNpMDE1TVFaRWJvcnBVT0Irb3JYVWQrQU1NLzB2M056NmpJ?=
- =?utf-8?B?ampveHF6RnRiY0x0bmxleUx2OW0wVkFCelBzNzBKdUk5VWJHNzdzbUZkSXRV?=
- =?utf-8?B?YnVHQWtTSE8zN2dkeVZJK2FodVplSC9CbUpYMGNlVjVkajczcmFIWnlRPT0=?=
+ =?utf-8?B?aEZDV2lFQ0FZYXhReUJyRGNyK2dLdVI4d0c3QThsSDQzZHdsYmlwNjhkNlo4?=
+ =?utf-8?B?YVdiQXYrWWVNY1RjSktKdjFsYUhRNGpRdHZHWWZDUTByTGZ0NlZ1UUlMQUFo?=
+ =?utf-8?B?bVZVRmY0Wi85bFFZUTZEZjFSRnF0RHdFZ3Q2SSsxb0I1WWxsWEZoYVBVeE1V?=
+ =?utf-8?B?cDNHSHllNnUrMXdmVVVPUnMvS21uMXJPQVV2czZhcXJVaUVhbm5lVG5XOHRk?=
+ =?utf-8?B?Z2ZxalFBNW54SVNubUs0QmVaaG5YZUpUZ0x3ejUrNnFlN1FtQ2M4RGtFOGE4?=
+ =?utf-8?B?d2pIZUlDRDV0YXQyS0NYT3hNNWY2Tzl1L3hIYWs5V2JUMDZHUmFEUjU4eDJE?=
+ =?utf-8?B?cmxzU1VoQTF6a0g0cWZ0MzRNQVpJa0pFamtrVVpXenZJQzN4VXoySkdBMmhp?=
+ =?utf-8?B?R3VEdG5PMnB5MjVTOEJsOG9Rd2NDaGpIV3FSaDVOdFVWOHZKQzlqNXQxL1Zl?=
+ =?utf-8?B?SVJWdXJ6dkhEb1JTZDh5eXA5SUdEbys4NmxzdXRFNElja3YzVllrUWJwa1E0?=
+ =?utf-8?B?WUxNZXRpNU5nM0lyMlovVHpDSGFON3gzL3N1d2JRUXpBNFNUcGJNcEU4Vkdw?=
+ =?utf-8?B?OG1rcUU0bnI2M3A4THZQMnVPeFZlMjBuL3MzTUkydG9sWXdYUFo0YytOQ0lk?=
+ =?utf-8?B?ZDR6eUV5OXhydGNiQnE1TWo2TlVMOVJZQ1pBY2Ntb2psWjRDRmlISUhibm5C?=
+ =?utf-8?B?MTI5YkR3RGVCSEphYzliT2NNYzVQUFM4Wi9DSWZudTVTd0t5N1BiNTNrSjRE?=
+ =?utf-8?B?YmhrZzUzd3l3TmpYM0FaOEtUVmNrNGVwQVRtWlRXWHF1YXN6QTd0d1hsTXhW?=
+ =?utf-8?B?d3FMWk82L2RJTWVGK0p3N0dJaS9lTVpCOFFIRmFseGFENy9TMmZpcWdBK1RK?=
+ =?utf-8?B?WHBSa2NpMW03SnBxVE14aUVHamljWi9MN0hWQTRlQkFob3BlN1lzQ0F4MHd5?=
+ =?utf-8?B?aEcwZFNYdS9ENVhMUW1OL001VUNyVmZ2YUtvWG45NW1nRE5zcGw1UHhGRWov?=
+ =?utf-8?B?Ui9DaGEySm1LVElRdDlFWGJrbHkvSjQ0Nm8xYTFFL3AzQjRTRTNXbGVlUDVt?=
+ =?utf-8?B?WG0vaTFwUDJlVGp2c2NpV2hNME5KdlZZY0RVQXlHaURZZ1FLakdka3Ayd1B6?=
+ =?utf-8?B?eE5iRDNTL0VJMXg4bEgxWGZsV2dlbVFGOE9wdU1ZL0pJeXh6OGhLYzgrQVVL?=
+ =?utf-8?B?SFBHOTFRV1h0dDZtM1lxc3VqMjI2eCsrQnltTldQU3ZCNDhmbm5OTmNWell4?=
+ =?utf-8?B?SWdGQXNJMENicUM5d3lTMU81aVNQY1lXeUROTUJYUW5ySFFjci9oVW90UDhD?=
+ =?utf-8?B?TkF3OEJHbjUwSE1uK1hOaTNrUmRHejZ4enpjbm00YjFwQVNWWXo1bTR5VkVs?=
+ =?utf-8?B?eC9NeTZnVjQ0VnVSeUd3VzBtb2paQ2tJSVI2QnI2WDhaTzJJOU54NkxhNFY0?=
+ =?utf-8?B?aG1aYndjTmZqZHNaa245TnBmKy92dkdFVUFLRXZNSTN4b3V6bTlXd1F1ektF?=
+ =?utf-8?B?VHNaN3JqQ2NvRkFoc09Xa0p5LzhwWTR4WmZFbFF2RFVRV0VmRkVmcEVEdE85?=
+ =?utf-8?B?alo1WHFVQUNpOEJ3alFFeU5hR2pkZ05WU1JraGtRNnd0Tk5mMDY2dG9yQjVo?=
+ =?utf-8?B?R1pxSnk3OHMxd3h3UEkySFBvbjBOSXJmWjMyOWQxYmU3SENzZFZpcGNVcmto?=
+ =?utf-8?B?enNJZjF5S3BVV0Vwa0U2UEVIdE8yMTUrMDQzelRRakFiSWdZUE9QUzBRPT0=?=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR08MB7727.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR08MB8081
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR08MB7727.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB11134
 Original-Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 X-EOPAttributedMessage: 0
 X-MS-Exchange-SkipListedInternetSender:
  ip=[2603:10a6:150:6b::6];domain=GVXPR08MB7727.eurprd08.prod.outlook.com
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00025F96.EURPRD83.prod.outlook.com
+ AMS1EPF00000044.eurprd04.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	931615dc-6203-4304-d1f9-08dced17a5c4
+	8a430732-3145-4c75-7264-08dced19b2d5
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026|35042699022;
+	BCL:0;ARA:13230040|82310400026|1800799024|35042699022|36860700013|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NkxDWTRtMUZtZ280ci85VTZFVkJ1SGhNVDFJQmxMVVBNY252SlVmU2hISGR6?=
- =?utf-8?B?bVliaEl2dXNNNFJXR2NmRGVtU3FmbS9mb3J5KzZXdWxxZ2JMTm9UN3VZbkdH?=
- =?utf-8?B?Wjd3OXd5ajlZK1JCKzROWjBFMGJJd2dZdE5ET2pDN3pDenU4QjlkZk9qY056?=
- =?utf-8?B?YjZRelJsODdzWUgrTVJPb21vYXdxS1BuTm5CZGU2TkJ4T1pBdHRXVmVGT21y?=
- =?utf-8?B?REFuR3FVYlJKV0xqSFNLUjc5VnZ1bXJWS216Y0ZyYkUxdFFZODFEOThHZlZx?=
- =?utf-8?B?NVZpOEc3SWduNExwWG5mWktEV0ZQQW5ydkJkVmxVQ3ZETFJyK25JaGVZalZZ?=
- =?utf-8?B?cUF4M29tUlloVjkwTHRKaVF5ZzhoblErcHZ0azBWUTFQWXJMdWtGT0hSc0lF?=
- =?utf-8?B?SGRoSjBUOHMwVzMxUm5OQkZGUHNDNlM3UGFhY0RzRjFwOHA0SGpObmhHZHkv?=
- =?utf-8?B?TVpEeHN6akpQdUVqVlE0bTZFeXcwQW81YzZyUHdZcVc4MUVZcWw4WTVZcTBi?=
- =?utf-8?B?c0FDK3p3ejc1TjJMQ1ZKaXd1ZkEzTG1Kd2V1ckhadlYxQTh4QkVPZE1LQmJj?=
- =?utf-8?B?aG9ZTDlvdXlodzVwYk1ENEFtUTVzK2l4KzQ1L095YlFKd3ZrY01xZnNlUjZk?=
- =?utf-8?B?UHhLcVRNT0ZTRS8wZXN0d2tsU0JFdXB5a0l1cWVLOGYxT3lYQXB0djc2RXQ5?=
- =?utf-8?B?aXZyaTFHV1JmaG9SQmx0RXpMM2pVNlExOEFOcXFFUXF6dElTQkNVTHNKTlJS?=
- =?utf-8?B?K1k3N0hMaEVDMEhKRUFXbWk4Nyt5RmRqY0Z1UW5BN201VnRTU3paamt5NUpR?=
- =?utf-8?B?MDJmQk0xLytoQ1JLdk5TZzNmbmVHQUYwbks5M05FUzJXQUpqVzBoREp4TTlS?=
- =?utf-8?B?YmxwWUl2a0VsMnJoWkpRbEFSVGlWN0IrTFJPcFhpWVFjL2hhaXJJNzkzeTJC?=
- =?utf-8?B?VThkQ3dBQXVyTTVGL0VmTFhZU1RuSFBjS25tdDdNNXU5UXU5cmZ5ZGZTY1po?=
- =?utf-8?B?LzJSYUZVd1BFd3VselZVQkdXSVFUV1dWekZuWGdHYncwOHBuYWlwRjBwSkRy?=
- =?utf-8?B?ZFNYK3JOYnYwTzlOdk5nUVJIZHdaYTc5VG9iUDl0NzZWclg5VWMwMlBVUUJU?=
- =?utf-8?B?TDZ0MlRleXVoZU5jS3l2cWRieTdUQytDZEVZeDFvUXh4YmFjbGN6MFp4RWV4?=
- =?utf-8?B?dmFmWFpwTDYxeHJ3TUtweGFKMmtDMGlvbmJ2MkFzdm9QbFFWV091dHpMNmMv?=
- =?utf-8?B?cVpxakNPbjh3cHFiNEMydE9tMmxrbklLQ0tSQkJ2dExtRURWQVh1cm1jOXl2?=
- =?utf-8?B?NnY3ek1XVjVsT0FSNXYxb2dTSmpON3hZcFM0Z3BMMkgrMDBZQjRQRGY2TEND?=
- =?utf-8?B?UW0rU0FWNVozOUI2N3J4SVZwOUJYL1NDVlZPeHl2R2pPY3BQUnlySG1VSFJh?=
- =?utf-8?B?eFE0SkE4MjE1L0NxbFlQVDRxaFV2N0NXenN4ZWZWSjdIUERncDJJRlJYTDlu?=
- =?utf-8?B?eVYvNTFMN0VrTGFFUVFZNmtZOVFBekZ2RFBmUWRBMS82NXdxTTdTeWNXcEps?=
- =?utf-8?B?Rk9waUlJaXFrTEkwMExJbCtGK0NDQldTdHp5ZmVKdTRnb0ZJOS9NeW1UUndW?=
- =?utf-8?B?V3l5STl3YmkrUVdTUEpzeGtiYWJRRFFMN2k2Qy9vUHliM2xWQUk4L2laRENU?=
- =?utf-8?B?RktxZ3BZOG5NOEU1eU5wMEgzME5qTy9Tamo3Q0ZiTWV1TDd2SDBsUnVIUWI0?=
- =?utf-8?B?c1lkZktweSsxV3ZBS0RBc2N6R005emNxSGxoK0o1dFVPUlVnL0xGRlREd1Qv?=
- =?utf-8?B?Y0hOckYzamVjZjlGMjBjYlBiTmYvM1JzVFg0RGt4a0JsMnR6QUJjUXFnTFEy?=
- =?utf-8?Q?p4IYHc582Eqpf?=
+	=?utf-8?B?N0hLZjQ5eHliSDBQbmxoY2ZlanZKYnpXeUxvOWVGdXViNGxKbTZ1MWtqQU84?=
+ =?utf-8?B?YTBxL3hkNG5mWmZ0YUlHZjVlaDFuSTdoaE5GRXh5dG9TRHYxTlNiTnNtQ3kv?=
+ =?utf-8?B?SHkwQlAvbkh2YUlPTXJ4M2kveUZ3RnoxckMxenNtRWlaTmVEYkZCaEV2ZGFQ?=
+ =?utf-8?B?ay9UdmtCQXNtck4xVlprYTNvSVJvNjVlY3p0M09HY2pLMG1lYTBkK3Fic2hR?=
+ =?utf-8?B?UVlqR0xzNkY0U2o1OFdMRnFMSkxoa3JLVW5yajk3UCszeEhRVWZCcW92RUdE?=
+ =?utf-8?B?ZFRpa0o5cUNYZ1pkTS9GU1VoMlg1N1FDNS94S2tjZzIvaGFtckwrSUU4TW50?=
+ =?utf-8?B?UURnZlhHT1pqVDE2QzdIT3k5dDE5cGlHbUd2L3hxQ1lCb0tzNTNjV096bkpX?=
+ =?utf-8?B?K1hLZjFmUEtRQUNBNHdGeENkOTN3b1NLYWc4VEdXTURVWDk3ZkdKK1NPNDEv?=
+ =?utf-8?B?VzQ4QmZQSzFBbHJyc2lORHN4bFh4MkVmR3ZnVlkrM0p4MWtpNCs4UmxGZW5p?=
+ =?utf-8?B?blVVMlByV1gxREtmblQ2MS81RDMzM2dFMXlLQ3VPSUVVODJObyt2QXRuNUxs?=
+ =?utf-8?B?d2lHcDlKT0pzb3RzU3dJS2EyVFlUcnQzL3FaUVJNWHNYNm9yZ2FhSmV6T2w3?=
+ =?utf-8?B?MXljMEpPWndjUnBBTk1XY285cGhabjlGbk5ibzdyY1pnTjdVWmFuelZYdHFX?=
+ =?utf-8?B?MUhZYzFXQjVNZjhJOUI0YnlqL1BTWndnY25WYWJlYXA3cWhyZEVKSUJ2THBJ?=
+ =?utf-8?B?SW5oNDhYa2J4b0xxYmpzVWtuWTBmUHExbHVMYXZtQVQ3UlpvOEhITTJ4OHYx?=
+ =?utf-8?B?Q0F0UHIwS09IdHFMOWlFWWtySVRxUUc0YU1TYUppNklraDNOMjhhaWwrYlFV?=
+ =?utf-8?B?ZFZiV1U5VDROVHZndFc3ZVdMbU9yODRFcC9OV1V5YlRrTTNKSkVSQndXT04v?=
+ =?utf-8?B?VkV4bS9hVFA0TlhyOVllalJ1dS9HNUkwWVQ2NVMxSTROSW1zd0NuU2RIZ0R6?=
+ =?utf-8?B?SStsbW5SN2drWnhWRkdFbWNGd2wwekVYbHZsY0d0MVpZckxreE44OXUwaEpK?=
+ =?utf-8?B?ZGpXcjZ3RUZ4U2ZpNkp2M2lmZ25tYmVxNGNJKzBublprNzlheEZJcGRTNStW?=
+ =?utf-8?B?L2pTaVAzMElwUktIaUZtMlZpcGNaYjJ0Qi8vZkI2THhqRzJ4SnluT2tqbitX?=
+ =?utf-8?B?eEF4eTZRM2FLalRsdkI3NDFUSFpLNzFXbEhhL0d2UUJCR05sam9JdUNZakZx?=
+ =?utf-8?B?bE5jL05BZWZBYlFNRVEvTFNvZzFkNlZybVJzamF3U044MFo3L3lXTW5zMVdH?=
+ =?utf-8?B?QTBUT2RiaFhJakxrUGRZN3JkOWJaSlJTYmlhd0oxYTBicklud0V1NEVldWFn?=
+ =?utf-8?B?ZjNLKzBzcUJkaGJoVGNsank0Mmo5MUpPclRkbzg2MXdBVW9zVGQwRFROdGph?=
+ =?utf-8?B?ZCs0YnVJd2lNVWtWM0c2aWo4L2pRVEJIaEprTSt0MG9yU0NTRkpFUGFSWjhQ?=
+ =?utf-8?B?MDNtNkFiZnU1QTNvSmdCamhRb1QyOXRuOHBOa05CdEw4Y2xVYTdZeHZxMG56?=
+ =?utf-8?B?c2Y2RXlORW0rUnNuNE9rNUJMV01odjRiKzg1RUc4WDdONWo0N2V0cnVDUFRK?=
+ =?utf-8?B?ZXRkaHluaVoxeEJVYXZGclRCOU9XempRQmdaVXN6cCticnRNaU82NUNEVEFT?=
+ =?utf-8?B?K1FVNWdsMUJ6SXFBYUtDOXdIVmc1T1VGa3RJR3ZCdy9lQktVL3V2MHBKcWtl?=
+ =?utf-8?B?TFcyQ21DSHh3eUNkR3loUSt3bWVtL3U5a0x2SkN6clJjRnBFOEFRc2NoZ2Zl?=
+ =?utf-8?B?SCtpOWx2dlZCcVR4K3V4cGhCZUsrRXFsdCszaFIxZHQxem9yNHlhdzVXUEJs?=
+ =?utf-8?Q?/q0iERqU20yZz?=
 X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026)(35042699022);DIR:OUT;SFP:1101;
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(35042699022)(36860700013)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 12:48:41.8681
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 13:03:15.2377
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2793768c-fd60-4205-3f8e-08dced17b2cb
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe67d9c0-a207-45e7-40f9-08dced19bb5f
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F96.EURPRD83.prod.outlook.com
+	AMS1EPF00000044.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB10172
-
-Hi Steven
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8275
 
 On 04/10/2024 16:27, Steven Price wrote:
-> The RMM maintains a data structure known as the Realm Execution Context
-> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
-> virtual CPUs. KVM must delegate memory and request the structures are
-> created when vCPUs are created, and suitably tear down on destruction.
+> The RMM provides emulation of a VGIC to the realm guest but delegates
+> much of the handling to the host. Implement support in KVM for
+> saving/restoring state to/from the REC structure.
 > 
-> RECs must also be supplied with addition pages - auxiliary (or AUX)
-> granules - for storing the larger registers state (e.g. for SVE). The
-> number of AUX granules for a REC depends on the parameters with which
-> the Realm was created - the RMM makes this information available via the
-> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor (RD).
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> v5: More changes to adapt to rebasing.
+> v3: Changes to adapt to rebasing only.
+> ---
+>   arch/arm64/kvm/arm.c          | 15 ++++++++++---
+>   arch/arm64/kvm/vgic/vgic-v3.c |  8 ++++++-
+>   arch/arm64/kvm/vgic/vgic.c    | 41 +++++++++++++++++++++++++++++++++--
+>   3 files changed, 58 insertions(+), 6 deletions(-)
 > 
-> Note that only some of register state for the REC can be set by KVM, the
-> rest is defined by the RMM (zeroed). The register state then cannot be
-> changed by KVM after the REC is created (except when the guest
-> explicitly requests this e.g. by performing a PSCI call).
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 87aa3f07fae2..ecce40a35cd0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -687,19 +687,24 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>   
+>   void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>   {
+> +	kvm_timer_vcpu_put(vcpu);
+> +	kvm_vgic_put(vcpu);
+> +
+> +	vcpu->cpu = -1;
+> +
+> +	if (vcpu_is_rec(vcpu))
+> +		return;
+> +
+>   	kvm_arch_vcpu_put_debug_state_flags(vcpu);
+>   	kvm_arch_vcpu_put_fp(vcpu);
+>   	if (has_vhe())
+>   		kvm_vcpu_put_vhe(vcpu);
+> -	kvm_timer_vcpu_put(vcpu);
+> -	kvm_vgic_put(vcpu);
+>   	kvm_vcpu_pmu_restore_host(vcpu);
+>   	if (vcpu_has_nv(vcpu))
+>   		kvm_vcpu_put_hw_mmu(vcpu);
+>   	kvm_arm_vmid_clear_active();
+>   
+>   	vcpu_clear_on_unsupported_cpu(vcpu);
+> -	vcpu->cpu = -1;
+>   }
+>   
+>   static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+> @@ -907,6 +912,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	if (!irqchip_in_kernel(kvm)) {
+> +		/* Userspace irqchip not yet supported with Realms */
+> +		if (kvm_is_realm(vcpu->kvm))
+> +			return -EOPNOTSUPP;
+> +
+>   		/*
+>   		 * Tell the rest of the code that there are userspace irqchip
+>   		 * VMs in the wild.
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index b217b256853c..ce782f8524cf 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -7,9 +7,11 @@
+>   #include <linux/kvm.h>
+>   #include <linux/kvm_host.h>
+>   #include <kvm/arm_vgic.h>
+> +#include <asm/kvm_emulate.h>
+>   #include <asm/kvm_hyp.h>
+>   #include <asm/kvm_mmu.h>
+>   #include <asm/kvm_asm.h>
+> +#include <asm/rmi_smc.h>
+>   
+>   #include "vgic.h"
+>   
+> @@ -679,7 +681,8 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+>   			(unsigned long long)info->vcpu.start);
+>   	} else if (kvm_get_mode() != KVM_MODE_PROTECTED) {
+>   		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
+> -		kvm_vgic_global_state.can_emulate_gicv2 = true;
+> +		if (!static_branch_unlikely(&kvm_rme_is_available))
+> +			kvm_vgic_global_state.can_emulate_gicv2 = true;
 
-The patch looks good to me. It may be a good idea to mention the strict
-ordering of REC creation (i.e., in the ascending order of the mpidr)
-mandated by the RMM and how we leave it to the VMM to do it in order.
+We could avoid this restriction for normal VMs by adding a check in
+kvm_vgic_create() ?
 
+>   		ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
+>   		if (ret) {
+>   			kvm_err("Cannot register GICv2 KVM device.\n");
+> @@ -746,6 +749,9 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>   
+> +	if (vcpu_is_rec(vcpu))
+> +		cpu_if->vgic_vmcr = vcpu->arch.rec.run->exit.gicv3_vmcr;
+> +
+>   	kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
+>   	WARN_ON(vgic_v4_put(vcpu));
+>   
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index f50274fd5581..78bf9840a557 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -10,7 +10,9 @@
+>   #include <linux/list_sort.h>
+>   #include <linux/nospec.h>
+>   
+> +#include <asm/kvm_emulate.h>
+>   #include <asm/kvm_hyp.h>
+> +#include <asm/rmi_smc.h>
+>   
+>   #include "vgic.h"
+>   
+> @@ -848,10 +850,23 @@ static inline bool can_access_vgic_from_kernel(void)
+>   	return !static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
+>   }
+>   
+> +static inline void vgic_rmm_save_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+> +	int i;
+> +
+> +	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
+
+I believe we should limit the number of LRs that KVM processes for a 
+given REC VCPU to that of the limit imposed by RMM 
+(RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS).
+
+Otherwise, theoretically we could loose interrupts for a Realm VM.
+
+e.g., KVM populates the maximum vgic_nr_lrs to rec_run. But RMM
+on rec exit, populates only the "number" of LRs from above and thus
+KVM could loose the remaining LRs and thus never injected into the Realm.
+
+The rest looks good to me.
 
 Suzuki
 
 
-
-> 
-> See Realm Management Monitor specification (DEN0137) for more information:
-> https://developer.arm.com/documentation/den0137/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v2:
->   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
-> ---
->   arch/arm64/include/asm/kvm_emulate.h |   2 +
->   arch/arm64/include/asm/kvm_host.h    |   3 +
->   arch/arm64/include/asm/kvm_rme.h     |  18 ++++
->   arch/arm64/kvm/arm.c                 |   2 +
->   arch/arm64/kvm/reset.c               |  11 ++
->   arch/arm64/kvm/rme.c                 | 155 +++++++++++++++++++++++++++
->   6 files changed, 191 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5edcfb1b6c68..7430c77574e3 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -712,6 +712,8 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
->   
->   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+> +		cpu_if->vgic_lr[i] = vcpu->arch.rec.run->exit.gicv3_lrs[i];
+> +		vcpu->arch.rec.run->enter.gicv3_lrs[i] = 0;
+> +	}
+> +}
+> +
+>   static inline void vgic_save_state(struct kvm_vcpu *vcpu)
 >   {
-> +	if (static_branch_unlikely(&kvm_rme_is_available))
-> +		return vcpu->arch.rec.mpidr != INVALID_HWID;
->   	return false;
+>   	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>   		vgic_v2_save_state(vcpu);
+> +	else if (vcpu_is_rec(vcpu))
+> +		vgic_rmm_save_state(vcpu);
+>   	else
+>   		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>   }
+> @@ -878,10 +893,28 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>   	vgic_prune_ap_list(vcpu);
 >   }
 >   
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7a77eed52c7d..122954187424 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -773,6 +773,9 @@ struct kvm_vcpu_arch {
->   
->   	/* Per-vcpu CCSIDR override or NULL */
->   	u32 *ccsidr;
-> +
-> +	/* Realm meta data */
-> +	struct realm_rec rec;
->   };
->   
->   /*
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index e5704859a6e5..3a3aaf5d591c 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -6,6 +6,7 @@
->   #ifndef __ASM_KVM_RME_H
->   #define __ASM_KVM_RME_H
->   
-> +#include <asm/rmi_smc.h>
->   #include <uapi/linux/kvm.h>
->   
->   /**
-> @@ -70,6 +71,21 @@ struct realm {
->   	unsigned int ia_bits;
->   };
->   
-> +/**
-> + * struct realm_rec - Additional per VCPU data for a Realm
-> + *
-> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
-> + * @rec_page: Kernel VA of the RMM's private page for this REC
-> + * @aux_pages: Additional pages private to the RMM for this REC
-> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
-> + */
-> +struct realm_rec {
-> +	unsigned long mpidr;
-> +	void *rec_page;
-> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
-> +	struct rec_run *run;
-> +};
-> +
->   void kvm_init_rme(void);
->   u32 kvm_realm_ipa_limit(void);
->   
-> @@ -77,6 +93,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->   int kvm_init_realm_vm(struct kvm *kvm);
->   void kvm_destroy_realm(struct kvm *kvm);
->   void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
-> +int kvm_create_rec(struct kvm_vcpu *vcpu);
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->   
->   #define RME_RTT_BLOCK_LEVEL	2
->   #define RME_RTT_MAX_LEVEL	3
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index d16ba8d8bc44..87aa3f07fae2 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -526,6 +526,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   	/* Force users to call KVM_ARM_VCPU_INIT */
->   	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->   
-> +	vcpu->arch.rec.mpidr = INVALID_HWID;
-> +
->   	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->   
->   	/* Set up the timer */
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 0b0ae5ae7bc2..845b1ece47d4 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -137,6 +137,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
->   			return -EPERM;
->   
->   		return kvm_vcpu_finalize_sve(vcpu);
-> +	case KVM_ARM_VCPU_REC:
-> +		if (!kvm_is_realm(vcpu->kvm))
-> +			return -EINVAL;
-> +
-> +		return kvm_create_rec(vcpu);
->   	}
->   
->   	return -EINVAL;
-> @@ -147,6 +152,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->   	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
->   		return false;
->   
-> +	if (kvm_is_realm(vcpu->kvm) &&
-> +	    !(vcpu_is_rec(vcpu) &&
-> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
-> +		return false;
-> +
->   	return true;
->   }
->   
-> @@ -159,6 +169,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->   		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
->   	kfree(sve_state);
->   	kfree(vcpu->arch.ccsidr);
-> +	kvm_destroy_rec(vcpu);
->   }
->   
->   static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 7db405d2b2b2..6f0ced6e0cc1 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -422,6 +422,161 @@ void kvm_destroy_realm(struct kvm *kvm)
->   	kvm_free_stage2_pgd(&kvm->arch.mmu);
->   }
->   
-> +static void free_rec_aux(struct page **aux_pages,
-> +			 unsigned int num_aux)
+> +static inline void vgic_rmm_restore_state(struct kvm_vcpu *vcpu)
 > +{
-> +	unsigned int i;
+> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+> +	int i;
 > +
-> +	for (i = 0; i < num_aux; i++) {
-> +		phys_addr_t aux_page_phys = page_to_phys(aux_pages[i]);
-> +
-> +		/* If the undelegate fails then leak the page */
-> +		if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
-> +			continue;
-> +
-> +		__free_page(aux_pages[i]);
+> +	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
+> +		vcpu->arch.rec.run->enter.gicv3_lrs[i] = cpu_if->vgic_lr[i];
+> +		/*
+> +		 * Also populate the rec.run->exit copies so that a late
+> +		 * decision to back out from entering the realm doesn't cause
+> +		 * the state to be lost
+> +		 */
+> +		vcpu->arch.rec.run->exit.gicv3_lrs[i] = cpu_if->vgic_lr[i];
 > +	}
 > +}
 > +
-> +static int alloc_rec_aux(struct page **aux_pages,
-> +			 u64 *aux_phys_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	int ret;
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < num_aux; i++) {
-> +		struct page *aux_page;
-> +		phys_addr_t aux_page_phys;
-> +
-> +		aux_page = alloc_page(GFP_KERNEL);
-> +		if (!aux_page) {
-> +			ret = -ENOMEM;
-> +			goto out_err;
-> +		}
-> +		aux_page_phys = page_to_phys(aux_page);
-> +		if (rmi_granule_delegate(aux_page_phys)) {
-> +			__free_page(aux_page);
-> +			ret = -ENXIO;
-> +			goto out_err;
-> +		}
-> +		aux_pages[i] = aux_page;
-> +		aux_phys_pages[i] = aux_page_phys;
-> +	}
-> +
-> +	return 0;
-> +out_err:
-> +	free_rec_aux(aux_pages, i);
-> +	return ret;
-> +}
-> +
-> +int kvm_create_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
-> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +	struct rec_params *params;
-> +	int r, i;
-> +
-> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
-> +		return -ENOENT;
-> +
-> +	/*
-> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
-> +	 * flag covers v0.2 and onwards.
-> +	 */
-> +	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
-> +		return -EINVAL;
-> +
-> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
-> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
-> +
-> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
-> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
-> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
-> +	if (!params || !rec->rec_page || !rec->run) {
-> +		r = -ENOMEM;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
-> +		params->gprs[i] = vcpu_regs->regs[i];
-> +
-> +	params->pc = vcpu_regs->pc;
-> +
-> +	if (vcpu->vcpu_id == 0)
-> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	if (rmi_granule_delegate(rec_page_phys)) {
-> +		r = -ENXIO;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
-> +	if (r)
-> +		goto out_undelegate_rmm_rec;
-> +
-> +	params->num_rec_aux = realm->num_aux;
-> +	params->mpidr = mpidr;
-> +
-> +	if (rmi_rec_create(virt_to_phys(realm->rd),
-> +			   rec_page_phys,
-> +			   virt_to_phys(params))) {
-> +		r = -ENXIO;
-> +		goto out_free_rec_aux;
-> +	}
-> +
-> +	rec->mpidr = mpidr;
-> +
-> +	free_page((unsigned long)params);
-> +	return 0;
-> +
-> +out_free_rec_aux:
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +out_undelegate_rmm_rec:
-> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> +		rec->rec_page = NULL;
-> +out_free_pages:
-> +	free_page((unsigned long)rec->run);
-> +	free_page((unsigned long)rec->rec_page);
-> +	free_page((unsigned long)params);
-> +	return r;
-> +}
-> +
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +
-> +	if (!vcpu_is_rec(vcpu))
-> +		return;
-> +
-> +	free_page((unsigned long)rec->run);
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	/*
-> +	 * The REC and any AUX pages cannot be reclaimed until the REC is
-> +	 * destroyed. So if the REC destroy fails then the REC page and any AUX
-> +	 * pages will be leaked.
-> +	 */
-> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-> +		return;
-> +
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +
-> +	/* If the undelegate fails then leak the REC page */
-> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> +		return;
-> +
-> +	free_page((unsigned long)rec->rec_page);
-> +}
-> +
->   int kvm_init_realm_vm(struct kvm *kvm)
+>   static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
 >   {
->   	struct realm_params *params;
+>   	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>   		vgic_v2_restore_state(vcpu);
+> +	else if (vcpu_is_rec(vcpu))
+> +		vgic_rmm_restore_state(vcpu);
+>   	else
+>   		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>   }
+> @@ -922,7 +955,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>   
+>   void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>   {
+> -	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
+> +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
+> +		     !vgic_initialized(vcpu->kvm)) ||
+> +	    vcpu_is_rec(vcpu)) {
+>   		if (has_vhe() && static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>   			__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+>   		return;
+> @@ -936,7 +971,9 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>   
+>   void kvm_vgic_put(struct kvm_vcpu *vcpu)
+>   {
+> -	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
+> +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
+> +		     !vgic_initialized(vcpu->kvm)) ||
+> +	    vcpu_is_rec(vcpu)) {
+>   		if (has_vhe() && static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>   			__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+>   		return;
 
