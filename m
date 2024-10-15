@@ -1,82 +1,117 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4691C18A6B7
-	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 08:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3034C1C8787;
+	Tue, 15 Oct 2024 09:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728981058; cv=none; b=rGql4HPsoLs5IkPaRdBPLuXIhOdj7Mok9ApsrJW6CwksQV6jH44EuuDN1smY575ttPvKsWU+UdgAMUjEv/7aXAtfaet3GPFZ8+zOexuGB5FnmLwpDhhhaxUHseUswFeudBduCZuikqFUbAM6UtqHiVUJvCq1GlYnEWVnn8FD8sI=
+	t=1728983313; cv=none; b=B8oukx2wFzkQjizgdBLhaDnmASgSRxY2R/1uZH1SS7DlqfPgu4FCLUYRXpE5sxEisveROHQ5I14HjMigXICMpYpVmbCJORcNrAeYn2HaUJAGxcC/UbFTfVqKqSY+25g3QFXpDS/BskqCPNtEhzJ7cAkaE4O9R/rD9RMWZ5VHFkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728981058; c=relaxed/simple;
-	bh=xjW+Dbg4SbbPjLiIb+obMlAVbTKZxWFh/MzGbBC+oG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lFpxZfsvcFxH9nGi6CYyIdx/nxV7VzNLOuWlTAIZbIXpi3vB01+/G+NH4TfJMTtkVkGiik15rjZ96UM43xfnJ2eXNLtEmTbS90YgQskVBOIKXXJz3xehUNgkZBPHHzfA8wHK1FNFmLwuUbUTgsuJGsPf0anWtXMEG8+o7k2Q+mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZCYbrbTY; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZCYbrbTY"
-Date: Tue, 15 Oct 2024 01:30:48 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728981053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0USN5MN6OnhhWV6JOtX0BGlRiPuogXbfPrbEhA7OD0w=;
-	b=ZCYbrbTYaqPfN4Zdt0aIFeWzhr+v2wVnbL0KAQQw8+rpzbq6xSFpTFDf1n87KCtzyP/Qyq
-	KJAfsyeQuA25AED/j3dzEWnlm9ut+3TBaby5+waIMYCqNvLIXvQEs0t9yCXK+9i33U8PRd
-	MwsMI+Fd0Tuh96YDzuBp4GZPGVuK60w=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, catalin.marinas@arm.com,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	will@kernel.org
-Subject: Re: [PATCH v1 1/4] KVM: arm64: Move pkvm_vcpu_init_traps() to
- init_pkvm_hyp_vcpu()
-Message-ID: <Zw4oOI7GzHnGjImP@linux.dev>
-References: <20241014102413.4092725-1-tabba@google.com>
- <20241014102413.4092725-2-tabba@google.com>
- <Zw4byVfZngXV19ni@linux.dev>
- <CA+EHjTwLE+zpSKMMaRDNbuuBmvMJZZAFoha7hpiRuNhwgP60Ww@mail.gmail.com>
+	s=arc-20240116; t=1728983313; c=relaxed/simple;
+	bh=283QZq5IAbGhv0OVut1nalndoywJzzjatqkhXYC1l9I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bbh8/BUJxugYHdhwuAxCk3+WITOHUKDWqEuVWyDa1l7peKbUhp28fv33RiUD3zhGA0EoqUr3gvC6w9T+hD62B7FXG8QjGlwo6YDDlExBoZiqO9nsFIYBtcqiy1djoQZiZAmb6KVQmnUDSOAQ7WJChh+HjkQfHibtYn50c3ZPoE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CBFCF1007;
+	Tue, 15 Oct 2024 02:08:59 -0700 (PDT)
+Received: from [10.1.30.47] (e122027.cambridge.arm.com [10.1.30.47])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 076173F51B;
+	Tue, 15 Oct 2024 02:08:25 -0700 (PDT)
+Message-ID: <e69536dd-aab2-49de-a026-506e09359207@arm.com>
+Date: Tue, 15 Oct 2024 10:08:24 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTwLE+zpSKMMaRDNbuuBmvMJZZAFoha7hpiRuNhwgP60Ww@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 03/11] arm64: realm: Query IPA size from the RMM
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241004144307.66199-1-steven.price@arm.com>
+ <20241004144307.66199-4-steven.price@arm.com>
+ <2352629a-3742-45e9-a38f-196989918c9b@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <2352629a-3742-45e9-a38f-196989918c9b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 15, 2024 at 09:22:47AM +0100, Fuad Tabba wrote:
-> Hi Oliver,
+On 15/10/2024 04:55, Gavin Shan wrote:
+> On 10/5/24 12:42 AM, Steven Price wrote:
+>> The top bit of the configured IPA size is used as an attribute to
+>> control whether the address is protected or shared. Query the
+>> configuration from the RMM to assertain which bit this is.
+>>
+>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v4:
+>>   * Make PROT_NS_SHARED check is_realm_world() to reduce impact on
+>>     non-CCA systems.
+>> Changes since v2:
+>>   * Drop unneeded extra brackets from PROT_NS_SHARED.
+>>   * Drop the explicit alignment from 'config' as struct realm_config now
+>>     specifies the alignment.
+>> ---
+>>   arch/arm64/include/asm/pgtable-prot.h | 4 ++++
+>>   arch/arm64/include/asm/rsi.h          | 2 +-
+>>   arch/arm64/kernel/rsi.c               | 8 ++++++++
+>>   3 files changed, 13 insertions(+), 1 deletion(-)
+>>
 > 
-> On Tue, 15 Oct 2024 at 08:37, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > Can we instead get rid of this hypercall by implementing the one-time
-> > late initialization as the comment suggests?
+> [...]
 > 
-> I'm not sure I understand. I thought this is what I'm doing in this patch...
-
-You're more than welcome to say when I'm being a damn idiot, such as
-right now :)
-
-I've been staring at too much initialization code and forgot that the
-hypervisor's view of the VM is created late and not at 'vCPU
-initialization' i.e. KVM_ARM_VCPU_INIT.
-
-> > It'd be great if the feature configuration for non-protected and
-> > protected VMs is done in a similar way, and that is userspace changes to
-> > the ID registers before KVM_RUN.
-> >
-> > So we need this sort of 'late' initialization for that behavior to work.
+>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>> index 9bf757b4b00c..a6495a64d9bb 100644
+>> --- a/arch/arm64/kernel/rsi.c
+>> +++ b/arch/arm64/kernel/rsi.c
+>> @@ -8,6 +8,11 @@
+>>   #include <linux/psci.h>
+>>   #include <asm/rsi.h>
+>>   +struct realm_config config;
+>> +
 > 
-> I think this is related to me now quite understanding the first
-> comment, and by extension not sure I quite get this one.
+> Nit: I think this variable is file-scoped since it has a generic name.
+> In this case, 'static' is needed to match with the scope.
 
-Sorry for the noise.
+Good spot - it should definitely be static.
 
--- 
 Thanks,
-Oliver
+Steve
+
+>> +unsigned long prot_ns_shared;
+>> +EXPORT_SYMBOL(prot_ns_shared);
+>> +
+>>   DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
+>>   EXPORT_SYMBOL(rsi_present);
+>>   @@ -67,6 +72,9 @@ void __init arm64_rsi_init(void)
+>>           return;
+>>       if (!rsi_version_matches())
+>>           return;
+>> +    if (WARN_ON(rsi_get_realm_config(&config)))
+>> +        return;
+>> +    prot_ns_shared = BIT(config.ipa_bits - 1);
+>>         arm64_rsi_setup_memory();
+>>   
+> 
+> Thanks,
+> Gavin
+> 
+
