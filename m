@@ -1,65 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88ACC231C85
-	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 00:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E243D46B8
+	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 03:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728950515; cv=none; b=X+uEOSXcJac6Fu67wri2Zi1mVhblekB8LWBoB0zG9P0tqgzL0MqRsJBMEsEPqjKMobhIwhqs2QINITuKuCj/cFCO/ifpd2ZOsUlhR/3LQAn4QGXWHgqNVOv1XBMx1ZNYdP/yTC/CU7bD4yPf0IGjU29scxrAetemWuqbYbsdr9E=
+	t=1728964228; cv=none; b=PtbiIf387FshO1wrm48fVj42u2BQU9by4aWdlY16KnomBB5hgfLNu2gVSLnWQllelaCMf86/XIs5VcG0R0TAIBs5tX6puKOaCoLfORPUKS81UIFnzWN+u92cuhcZ4gCtw3/9kbv9daYVgCiWJheCFhJZaq6mRMQ9OMWbfiyoGDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728950515; c=relaxed/simple;
-	bh=Q8iS8IxHSVGTjbc9AGbpjOQg0EWYXS/kKQdTlWSiROE=;
+	s=arc-20240116; t=1728964228; c=relaxed/simple;
+	bh=IFq29kHKXchdrmcm1ZIHSlghjV7EwcpUl348m0hF+v8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lHYig4GTSdNsh/DgON+tEdxZJAhy0jhG3gmXpfptd8VaRw/tqXSKfDCq+xGU2S+XFZpukupANBe9r76q98jJhcRe6UBqUh899g0nigsCwh0gi/Az3zRdUpPBnw6vW0Oh/gcalaezlxLpPhdiOd9A4L9LPzCo6Ut2kAjRNfQHT4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iiUNX+m5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iiUNX+m5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728950512;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3fVXTa8XIsbgoiuVpOKk+BswyA+FGg23RGxfcTSTItE=;
-	b=iiUNX+m5BUlI/1pYSJPhf4J4Wf+3/Av1K5o5nmIYP7yGUtYOQLKPF5LV3/q0/l6NQQs0TH
-	gk1Zv+N56ebv6rg8yyV6vbfZYSxkwGUsxG3S6z5jYJEwExhiOy2bSdpWmY82XOtiyROmBc
-	R4QqK/YkMjJvpI2n7e3WCQZmYThWfgY=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-649-KqAZQ4feMGiB9Lp8FhG4Vw-1; Mon, 14 Oct 2024 20:01:51 -0400
-X-MC-Unique: KqAZQ4feMGiB9Lp8FhG4Vw-1
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-7ea6d5e76c3so1725340a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 17:01:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728950510; x=1729555310;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3fVXTa8XIsbgoiuVpOKk+BswyA+FGg23RGxfcTSTItE=;
-        b=WXJRM6H1hOzan6UhpUUxujTx4t1BAbOFmQEKgJwUlXqPUZJt/XW9hCtKwF/AWz2KRK
-         +mlKDAsZsTrFk209CmHxcd8KW1uONO1XVLPbnzu8L0rIDHFDSDq8MUBYEHEHZQmh4Whj
-         u013fHmnzOcX9wvkArQuWqW8Jy283uIyI21GLmGDlE0APk6xbFUl/3HRZEcE2QX4jLEX
-         UJ1DyXtjAKRE/CaLOO7c/HB3bGLB1DOMJvrLKC+VF8V79WHE6l2Uf4a6wSJEgJzhzpfQ
-         fx11Oa/uhXbaA1DFkhTPYqsqr04EN6wPh1ivVP8LnEaLKvNHeHMq1PLOmwXnDuFtrD9K
-         ppQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXj2CXKThKW+aywHxFKVt2OBrARHWynPN8z73/kb2a99HMd+FoHJsUBqcxyrrn7KQsCsajd5iY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxq8E+R+xK0p01G/4bZwR5OryHWjFgpAJwpFh+6sWygrJH9PZrR
-	vw4xTsI6FlXfS3KZwOdVpRQr0Tzc5gahUwymO/4x7ne8VCKHupduFTBfFwIuAXb+DjkrYZCPh7/
-	+A+J/CL6ynGHBXkw275l/ANfg4+L3bVekJcW2C/07fgE3dRGXM6sV2Q==
-X-Received: by 2002:a05:6a20:d501:b0:1d2:ea38:39bc with SMTP id adf61e73a8af0-1d8c9594e7dmr14937915637.11.1728950510192;
-        Mon, 14 Oct 2024 17:01:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJcAFjePFn8mOJXk/8VHRUXLze+FJupfXBRL7K3VuUoXPsbgGUDvbOUz+Vrv3oSTsD9DVmWw==
-X-Received: by 2002:a05:6a20:d501:b0:1d2:ea38:39bc with SMTP id adf61e73a8af0-1d8c9594e7dmr14937869637.11.1728950509802;
-        Mon, 14 Oct 2024 17:01:49 -0700 (PDT)
-Received: from [192.168.68.54] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea9c71a8aesm114810a12.81.2024.10.14.17.01.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 17:01:49 -0700 (PDT)
-Message-ID: <6d6253a6-c113-44af-856e-118d02e1e409@redhat.com>
-Date: Tue, 15 Oct 2024 10:01:39 +1000
+	 In-Reply-To:Content-Type; b=UZfJaYtCYHqMXCqbtXZYcuwPhYsjkccJNRRJkftwMDw67n1FLWNRYcGV8gRQbHkdR50T3bj2euS0DkJZz3zkgDJW/PtVZhXsATFEZGGE4MZESN4b1QU5uiTaWYT0JrdBUXgGPvOcOaD7tslPVEaFjbGO39bci/riWrbSk3JVfEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 749D51007;
+	Mon, 14 Oct 2024 20:50:47 -0700 (PDT)
+Received: from [10.162.16.109] (a077893.blr.arm.com [10.162.16.109])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC2D13F71E;
+	Mon, 14 Oct 2024 20:50:14 -0700 (PDT)
+Message-ID: <ee960f42-d41c-4c61-b3a1-74ddb3a41001@arm.com>
+Date: Tue, 15 Oct 2024 09:20:12 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,221 +27,231 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for
- realms
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Dan Williams <dan.j.williams@intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-11-steven.price@arm.com>
- <5a3432d1-6a79-434c-bc93-6317c8c6435c@redhat.com>
- <6c306817-fbd7-402c-8425-a4523ed43114@arm.com>
- <7a83461d-40fd-4e61-8833-5dae2abaf82b@arm.com>
- <5999b021-0ae3-4d90-ae29-f18f187fd115@redhat.com>
- <11cff100-3406-4608-9993-c29caf3d086d@arm.com>
- <f3ce0718-064d-48e4-a681-7058157127b0@arm.com>
- <56d9edcb-2574-43fe-8ebb-65cc4fdbc3d0@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <56d9edcb-2574-43fe-8ebb-65cc4fdbc3d0@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH 2/5] arm64/mm: Replace PXD_TABLE_BIT with
+ PXD_TYPE_[MASK|SECT]
+To: Ryan Roberts <ryan.roberts@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
+ <20241005123824.1366397-3-anshuman.khandual@arm.com>
+ <bb1dcfcf-302a-4932-a0d5-3abf5ed958c5@arm.com>
+ <61203419-014e-4815-823c-62079aea93c9@arm.com>
+ <38469540-2759-4a65-8e7f-e2b309d58614@arm.com>
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <38469540-2759-4a65-8e7f-e2b309d58614@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/15/24 12:46 AM, Suzuki K Poulose wrote:
-> On 14/10/2024 15:41, Steven Price wrote:
->> On 14/10/2024 09:56, Suzuki K Poulose wrote:
->>> On 12/10/2024 07:06, Gavin Shan wrote:
->>>> On 10/12/24 2:22 AM, Suzuki K Poulose wrote:
->>>>> On 11/10/2024 15:14, Steven Price wrote:
->>>>>> On 08/10/2024 05:12, Gavin Shan wrote:
->>>>>>> On 10/5/24 12:43 AM, Steven Price wrote:
->>>>>>>> From: Sami Mujawar <sami.mujawar@arm.com>
->>>>>>>>
->>>>>>>> Introduce an arm-cca-guest driver that registers with
->>>>>>>> the configfs-tsm module to provide user interfaces for
->>>>>>>> retrieving an attestation token.
->>>>>>>>
->>>>>>>> When a new report is requested the arm-cca-guest driver
->>>>>>>> invokes the appropriate RSI interfaces to query an
->>>>>>>> attestation token.
->>>>>>>>
->>>>>>>> The steps to retrieve an attestation token are as follows:
->>>>>>>>      1. Mount the configfs filesystem if not already mounted
->>>>>>>>         mount -t configfs none /sys/kernel/config
->>>>>>>>      2. Generate an attestation token
->>>>>>>>         report=/sys/kernel/config/tsm/report/report0
->>>>>>>>         mkdir $report
->>>>>>>>         dd if=/dev/urandom bs=64 count=1 > $report/inblob
->>>>>>>>         hexdump -C $report/outblob
->>>>>>>>         rmdir $report
->>>>>>>>
->>>>>>>> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
->>>>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>>>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>>>>>> ---
->>>>>>>> v3: Minor improvements to comments and adapt to the renaming of
->>>>>>>> GRANULE_SIZE to RSI_GRANULE_SIZE.
->>>>>>>> ---
->>>>>>>>     drivers/virt/coco/Kconfig                     |   2 +
->>>>>>>>     drivers/virt/coco/Makefile                    |   1 +
->>>>>>>>     drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
->>>>>>>>     drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
->>>>>>>>     .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211
->>>>>>>> ++++++++++++ ++++++
->>>>>>>>     5 files changed, 227 insertions(+)
->>>>>>>>     create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
->>>>>>>>     create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
->>>>>>>>     create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+
+
+On 10/14/24 17:03, Ryan Roberts wrote:
+> On 14/10/2024 11:48, Anshuman Khandual wrote:
+>>
+>>
+>> On 10/9/24 18:58, Ryan Roberts wrote:
+>>> On 05/10/2024 13:38, Anshuman Khandual wrote:
+>>>> This modifies existing block mapping related helpers e.g [pmd|pud]_mkhuge()
+>>>> , mk_[pmd|pud]_sect_prot() and pmd_trans_huge() to use PXD_TYPE_[MASK|SECT]
+>>>> instead of corresponding PXD_TABLE_BIT. This also moves pmd_sect() earlier
+>>>> for the symbol's availability preventing a build warning.
 >>>>
->>>> [...]
+>>>> While here this also drops pmd_val() check from pmd_trans_huge() helper, as
+>>>> pmd_present() returning true already ensures that pmd_val() cannot be false
 >>>>
->>>>>>>> +/**
->>>>>>>> + * arm_cca_report_new - Generate a new attestation token.
->>>>>>>> + *
->>>>>>>> + * @report: pointer to the TSM report context information.
->>>>>>>> + * @data:  pointer to the context specific data for this module.
->>>>>>>> + *
->>>>>>>> + * Initialise the attestation token generation using the
->>>>>>>> challenge data
->>>>>>>> + * passed in the TSM descriptor. Allocate memory for the attestation
->>>>>>>> token
->>>>>>>> + * and schedule calls to retrieve the attestation token on the
->>>>>>>> same CPU
->>>>>>>> + * on which the attestation token generation was initialised.
->>>>>>>> + *
->>>>>>>> + * The challenge data must be at least 32 bytes and no more than 64
->>>>>>>> bytes. If
->>>>>>>> + * less than 64 bytes are provided it will be zero padded to 64
->>>>>>>> bytes.
->>>>>>>> + *
->>>>>>>> + * Return:
->>>>>>>> + * * %0        - Attestation token generated successfully.
->>>>>>>> + * * %-EINVAL  - A parameter was not valid.
->>>>>>>> + * * %-ENOMEM  - Out of memory.
->>>>>>>> + * * %-EFAULT  - Failed to get IPA for memory page(s).
->>>>>>>> + * * A negative status code as returned by
->>>>>>>> smp_call_function_single().
->>>>>>>> + */
->>>>>>>> +static int arm_cca_report_new(struct tsm_report *report, void *data)
->>>>>>>> +{
->>>>>>>> +    int ret;
->>>>>>>> +    int cpu;
->>>>>>>> +    long max_size;
->>>>>>>> +    unsigned long token_size;
->>>>>>>> +    struct arm_cca_token_info info;
->>>>>>>> +    void *buf;
->>>>>>>> +    u8 *token __free(kvfree) = NULL;
->>>>>>>> +    struct tsm_desc *desc = &report->desc;
->>>>>>>> +
->>>>>>>> +    if (!report)
->>>>>>>> +        return -EINVAL;
->>>>>>>> +
->>>>>>>
->>>>>>> This check seems unnecessary and can be dropped.
->>>>>>
->>>>>> Ack
->>>>>>
->>>>>>>> +    if (desc->inblob_len < 32 || desc->inblob_len > 64)
->>>>>>>> +        return -EINVAL;
->>>>>>>> +
->>>>>>>> +    /*
->>>>>>>> +     * Get a CPU on which the attestation token generation will be
->>>>>>>> +     * scheduled and initialise the attestation token generation.
->>>>>>>> +     */
->>>>>>>> +    cpu = get_cpu();
->>>>>>>> +    max_size = rsi_attestation_token_init(desc->inblob,
->>>>>>>> desc->inblob_len);
->>>>>>>> +    put_cpu();
->>>>>>>> +
->>>>>>>
->>>>>>> It seems that put_cpu() is called early, meaning the CPU can go
->>>>>>> away before
->>>>>>> the subsequent call to arm_cca_attestation_continue() ?
->>>>>>
->>>>>> Indeed, good spot. I'll move it to the end of the function and update
->>>>>> the error paths below.
->>>>>
->>>>> Actually this was on purpose, not to block the CPU hotplug. The
->>>>> attestation must be completed on the same CPU.
->>>>>
->>>>> We can detect the failure from "smp_call" further down and make sure
->>>>> we can safely complete the operation or restart it.
->>>>>
+>>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>>> Cc: Will Deacon <will@kernel.org>
+>>>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>>>> Cc: Ryan Roberts <ryan.roberts@arm.com>
+>>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>>> Cc: linux-arm-kernel@lists.infradead.org
+>>>> Cc: linux-kernel@vger.kernel.org
+>>>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/pgtable.h | 15 ++++++++-------
+>>>>  1 file changed, 8 insertions(+), 7 deletions(-)
 >>>>
->>>> Yes, It's fine to call put_cpu() early since we're tolerant to error
->>>> introduced
->>>> by CPU unplug. It's a bit confused that rsi_attestation_token_init()
->>>> is called
->>>> on the local CPU while arm_cca_attestation_continue() is called on
->>>> same CPU
->>>> with help of smp_call_function_single(). Does it make sense to unify
->>>> so that
->>>> both will be invoked with the help of smp_call_function_single() ?
->>>>
->>>>       int cpu = smp_processor_id();
->>>>
->>>>       /*
->>>>        * The calling and target CPU can be different after the calling
->>>> process
->>>>        * is migrated to another different CPU. It's guaranteed the
->>>> attestatation
->>>>        * always happen on the target CPU with smp_call_function_single().
->>>>        */
->>>>       ret = smp_call_function_single(cpu,
->>>> rsi_attestation_token_init_wrapper,
->>>>                                      (void *)&info, true);
+>>>> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+>>>> index fa4c32a9f572..45c49c5ace80 100644
+>>>> --- a/arch/arm64/include/asm/pgtable.h
+>>>> +++ b/arch/arm64/include/asm/pgtable.h
+>>>> @@ -484,12 +484,12 @@ static inline pmd_t pte_pmd(pte_t pte)
+>>>>  
+>>>>  static inline pgprot_t mk_pud_sect_prot(pgprot_t prot)
+>>>>  {
+>>>> -	return __pgprot((pgprot_val(prot) & ~PUD_TABLE_BIT) | PUD_TYPE_SECT);
+>>>> +	return __pgprot((pgprot_val(prot) & ~PUD_TYPE_MASK) | PUD_TYPE_SECT);
+>>>>  }
+>>>>  
+>>>>  static inline pgprot_t mk_pmd_sect_prot(pgprot_t prot)
+>>>>  {
+>>>> -	return __pgprot((pgprot_val(prot) & ~PMD_TABLE_BIT) | PMD_TYPE_SECT);
+>>>> +	return __pgprot((pgprot_val(prot) & ~PMD_TYPE_MASK) | PMD_TYPE_SECT);
+>>>>  }
+>>>>  
+>>>>  static inline pte_t pte_swp_mkexclusive(pte_t pte)
+>>>> @@ -554,10 +554,13 @@ static inline int pmd_protnone(pmd_t pmd)
+>>>>   * THP definitions.
+>>>>   */
+>>>>  
+>>>> +#define pmd_sect(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>>> +				 PMD_TYPE_SECT)
+>>>> +
+>>>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>>>  static inline int pmd_trans_huge(pmd_t pmd)
+>>>>  {
+>>>> -	return pmd_val(pmd) && pmd_present(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT);
+>>>> +	return pmd_present(pmd) && pmd_sect(pmd);
 >>>
->>> Well, we want to allocate sufficient size buffer (size returned from
->>> token_init())  outside an atomic context (thus not in smp_call_function()).
+>>> Bug? Prevously we would have returned true for a "present-invalid" PMD block
+>>> mapping - that's one which is formatted as a PMD block mapping except the
+>>> PTE_VALID bit is clear and PTE_PRESENT_INVALID is set. But now, due to
+>>> pmd_sect() testing VALID is set (via PMD_TYPE_SECT), we no longer return true in
+>>> this case.
+>>
+>> Agreed, that will be problematic but the situation can be rectified by decoupling
+>> pmd_present_invalid() from pte_present_invalid() by checking for both last bits
+>> instead of just the valid bit against PTE_PRESENT_INVALID.
+>>
+>> #define pmd_sect(pmd)          ((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>                                 PMD_TYPE_SECT)
+> 
+> I know this is pre-existing, but the fact that this depends on PMD_VALID being
+> set feels like something waiting to bite us. From the SW's PoV, we should get
+> the same answer regardless of whether PMD_VALID xor PTE_PRESENT_INVALID is set.
+
+I guess you are talking about pmd_sect() above, right ? pmd_sect() is just a HW
+level check about the entry being a block mapping, which is not aware about the
+PTE_PRESENT_INVALID based mechanism used for pmd_present().
+
+> I know there is nobody depending on that right now, but it feels like a bug
+> waiting to happen. I'm not sure how you would fix that without having the SW
+> explcitly know about the table bit's existance though.
+> 
+>>
+>> #define pmd_present_invalid(pmd) \
+>>        ((pmd_val(pmd) & (PMD_TYPE_MASK | PTE_PRESENT_INVALID)) == PTE_PRESENT_INVALID)
+> 
+> I read this as "if the type field is 0 and PTE_PRESENT_INVALID is 1 then it's
+> present-invalid". That doesn't really feel any better to me than the code
+> knowing there is a table bit. What's the benefit of doing this vs what the code
+> already does? It all feels quite hacky to me.
+
+Table bit does not need to be known explicitly, which is the point of dropping
+it off completely. 
+
+#define pmd_mkinvalid()	pte_pmd(pte_mkinvalid(pmd_pte(pmd)))
+
+static inline pte_t pte_mkinvalid(pte_t pte)
+{
+        pte = set_pte_bit(pte, __pgprot(PTE_PRESENT_INVALID));
+        pte = clear_pte_bit(pte, __pgprot(PTE_VALID));
+        return pte;
+}
+
+Instead pmd_mkinvalid() should be redefined as the following, asserting the fact
+that PMD_TYPE_MASK bits as a block field which is being cleared and replaced with
+PTE_PRESENT_INVALID, not only the table bit.
+
+static inline pmd_t pmd_mkinvalid(pmd_t pmd)
+{
+        pmd = set_pmd_bit(pmd, __pgprot(PTE_PRESENT_INVALID));
+        pmd = clear_pte_bit(pte, __pgprot(PMD_TYPE_MASK));
+        return pte;
+}
+
+In fact currently PMD_TABLE_BIT check is required here only because pmd_present()
+does not check against pmd_sect().
+
+i.e pmd_present(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT); 
+
+pmd_present() should return true when
+
+- pmd_sect() returns true
+- pmd_present_invalid() returns true because PMD_TYPE_MASK bits field has been
+  cleared and instead PTE_PRESENT_INVALID has been set.
+
+In both the cases PMD_TABLE_BIT is not required.
+
+> 
+>>
+>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>  static inline int pmd_trans_huge(pmd_t pmd)
+>>  {
+>> 	return pmd_sect(pmd) || pmd_present_invalid(pmd);
+>>  }
+>>  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+>>>>
+>>>>  }
+>>>>  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+>>>>  
+>>>> @@ -586,7 +589,7 @@ static inline int pmd_trans_huge(pmd_t pmd)
+>>>>  
+>>>>  #define pmd_write(pmd)		pte_write(pmd_pte(pmd))
+>>>>  
+>>>> -#define pmd_mkhuge(pmd)		(__pmd(pmd_val(pmd) & ~PMD_TABLE_BIT))
+>>>> +#define pmd_mkhuge(pmd)		(__pmd((pmd_val(pmd) & ~PMD_TYPE_MASK) | PMD_TYPE_SECT))
 >>>
->>> May be we could make this "allocation" restriction in a comment to
->>> make it clear, why we do it this way.
+>>> I'm not sure if this also suffers from a similar problem? Is it possible that a
+>>> present-invalid pmd would be passed to pmd_mkhuge()? If so, then we are now
+>>> incorrectly setting the PTE_VALID bit.
+>> pmd_mkhuge() converts a regular pmd into a huge page and on arm64
+>> creating a huge page also involves setting PTE_VALID. Why would a
+>> present-invalid pmd is passed into pmd_mkhuge() without intending
+>> to make a huge entry ?
 >>
->> So if I've followed this correctly the get_cpu() route doesn't work
->> because of the need to allocate outblob. So using
->> smp_call_function_single() for all calls seems to be the best approach,
->> along with a comment explaining what's going on. So how about:
+>> There just two generic use cases for pmd_mkhuge().
 >>
->>     /*
->>      * The attestation token 'init' and 'continue' calls must be
->>      * performed on the same CPU. smp_call_function_single() is used
->>      * instead of simply calling get_cpu() because of the need to
->>      * allocate outblob based on the returned value from the 'init'
->>      * call and that cannot be done in an atomic context.
->>      */
->>     cpu = smp_processor_id();
+>> insert_pfn_pmd
+>> 	   entry = pmd_mkhuge(pfn_t_pmd(pfn, prot));
 >>
->>     info.challenge = desc->inblob;
->>     info.challenge_size = desc->inblob_len;
+>> set_huge_zero_folio
+>>         entry = mk_pmd(&zero_folio->page, vma->vm_page_prot);
+>>         entry = pmd_mkhuge(entry);
 >>
->>     ret = smp_call_function_single(cpu, arm_cca_attestation_init,
->>                        &info, true);
->>     if (ret)
->>         return ret;
->>     max_size = info.result;
->>
->> (with appropriate updates to the 'info' struct and a new
->> arm_cca_attestation_init() wrapper for rsi_attestation_token_init()).
+>> As instances in mm/debug_vm_pgtable.c, pmd_mkinvalid() should be
+>> called on a PMD entry after pmd_mkhuge() not the other way around.
 > 
-> That sounds good to me.
+> I guess it depends on your perspective. I agree there is no issue today. But
+> from the core-mm's PoV, a present-invalid PMD should be indistinguishable from a
+> present (-valid) one.
+
+That's ideally is the case when huge page is achieved with a dedicated single HW
+PTE bit apart from the valid HW PTE bit (which is not the case on arm64). So when
+valid bit is cleared it still has the huge bit to test against for being "present"
+with all other information on the entry, just that it's not mapped.
+
+That's the reason PTE_PRESENT_INVALID is there to hold the fort while clearing out
+PMD_VALID bit. But it actually rather clears entire PMD_TYPE_MASK completely and
+depending on just PMD_TABLE_BIT being clear is not really prudent.
+
 > 
-
-+1, it looks good to me as well.
-
-Thanks,
-Gavin
-
+> 
+>>
+>>>
+>>>>  
+>>>>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>>>>  #define pmd_devmap(pmd)		pte_devmap(pmd_pte(pmd))
+>>>> @@ -614,7 +617,7 @@ static inline pmd_t pmd_mkspecial(pmd_t pmd)
+>>>>  #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
+>>>>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>>>>  
+>>>> -#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
+>>>> +#define pud_mkhuge(pud)		(__pud((pud_val(pud) & ~PUD_TYPE_MASK) | PUD_TYPE_SECT))
+>>>>  
+>>>>  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
+>>>>  #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
+>>>> @@ -712,8 +715,6 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
+>>>>  
+>>>>  #define pmd_table(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>>>  				 PMD_TYPE_TABLE)
+>>>> -#define pmd_sect(pmd)		((pmd_val(pmd) & PMD_TYPE_MASK) == \
+>>>> -				 PMD_TYPE_SECT)
+>>>>  #define pmd_leaf(pmd)		(pmd_present(pmd) && !pmd_table(pmd))
+>>>>  #define pmd_bad(pmd)		(!pmd_table(pmd))
+>>>>  
+>>>
+> 
