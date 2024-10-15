@@ -1,106 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1783C1FC7CA;
-	Tue, 15 Oct 2024 13:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB6A28691
+	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 13:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728998778; cv=none; b=g1U5SHNls26M+pZF4dMWAzFrvIP0vR1U3RG8BqEH7oxNcELRevSzZGP4pSwdIAu6ZyE2LccBMff+5jhsOK50vs+0qdB0V5ceOQR9BNDWAv3rXS3aaH2OogyCJg00HGuAsQxkS7STUtDsV2K+dWipieBneVgry+mFEIq3dmHVNNw=
+	t=1728999574; cv=none; b=InQ5+c/bFKmTTThQFHPaLtk6+3n9KnatXGkQw55RmDle/+CgUv0NZ7oSYD4wSRbowWMR0FClYN/5DtR10WYlHrmRIkU3qK++0EmtwFOeI3jFNhL0yBTqcDbGhMV7pKxIXLmdjcWMzKzXHaLUUpOUb0cuVM00fbEuk372+AT5NuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728998778; c=relaxed/simple;
-	bh=oFFPT5mvvt/DlJJSCGR58VuLSdcKbAv5xgnJpcGR0tY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uv4ZWx8A83md4DDfKqrCr7P06qAgT2ZY7tbohlgHW1+aQsLXrkgey/G32+Wg6M5PbNAI3o/PtM9dUPJVCUPsT6WgftROGTeTquVfW3MNvdYem4TIIoncrCbuAThF8nH0sDl28J/W7hGsG2+Ui70Pg8MDFZ96n0ocXXzdDVZ/UGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FrKsNHUr; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FrKsNHUr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B3CCC4CECE;
-	Tue, 15 Oct 2024 13:26:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728998777;
-	bh=oFFPT5mvvt/DlJJSCGR58VuLSdcKbAv5xgnJpcGR0tY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FrKsNHUrBSbtPVikj1FML7vlz2mzC3ZXIoGIfrjrUd5GNlvj7byXhK69OID1comZ3
-	 ERsc0zdXy2HK9A2Z7G99T+h/RV2RmGFRkCXOSx8aShAqDswaIjUsafckOOSl1skiEU
-	 I2tf+OBx0u4OvVcY4HsF2UpTQUhJbpZzsK31x/FIIThfUQgmq8SNCnsUS81S2+rnJn
-	 JbezWxhO8+rA32VdG2XOwewpI/bX783q2XyJgeqNS477KHazRAG5kVkrecFNa/Tgu6
-	 T9M85n1LAvOk5DzGVWzOFVwwmW+vDtjPlBvN5IHs9Pu+Y+jgPolGy/RrDmde4Rw9M3
-	 Bn4LSqGCTRfig==
-Date: Tue, 15 Oct 2024 14:26:09 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Will Deacon <will@kernel.org>, Kevin Brodsky <kevin.brodsky@arm.com>,
-	linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
-	dave.hansen@linux.intel.com, hpa@zytor.com,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 19/30] arm64: add POE signal support
-Message-ID: <e9eb6cf1-1ed4-45b0-85c1-39028728f952@sirena.org.uk>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-20-joey.gouly@arm.com>
- <47e1537f-5b60-4541-aed1-a20e804c137d@arm.com>
- <20241009144301.GA12453@willie-the-truck>
- <20241014171023.GA18295@willie-the-truck>
- <20241015095911.GA3777204@e124191.cambridge.arm.com>
- <20241015114116.GA19334@willie-the-truck>
- <20241015122529.GA3820764@e124191.cambridge.arm.com>
+	s=arc-20240116; t=1728999574; c=relaxed/simple;
+	bh=LMXtO0n1tPoebIUIl3KEllcVFHRWF6FapiRxBw1p7H8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=llipO1xC9CNIU50UKickiwKgE1TSQcaQPNp+Y0bMAIfOGFpkR0PmZOsgqAoGl1slJMb5T6Rwszq4VbgmVhjo0fgJwOzqGt7j7WSArFB9pu7m706M8K1S8IeP+bd7fSxZXSxsK4Y6EOlBtAl9hyv7NG501hoEq3K45CNn0oyXVnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C0323FEC;
+	Tue, 15 Oct 2024 06:40:00 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 428EA3F51B;
+	Tue, 15 Oct 2024 06:39:29 -0700 (PDT)
+From: Joey Gouly <joey.gouly@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: anshuman.khandual@arm.com,
+	james.morse@arm.com,
+	joey.gouly@arm.com,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v5 0/7] KVM: arm64: Hide unsupported MPAM from the guest
+Date: Tue, 15 Oct 2024 14:39:16 +0100
+Message-Id: <20241015133923.3910916-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="VY579BsplRjShns6"
-Content-Disposition: inline
-In-Reply-To: <20241015122529.GA3820764@e124191.cambridge.arm.com>
-X-Cookie: New customers only.
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
---VY579BsplRjShns6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks Gavin and Marc for the feedback, hopefully incorporated it all here.
 
-On Tue, Oct 15, 2024 at 01:25:29PM +0100, Joey Gouly wrote:
-> On Tue, Oct 15, 2024 at 12:41:16PM +0100, Will Deacon wrote:
+changes since v4 [1]:
+	- Swap order of patches, to be able to use MPAMIDR_EL1_HAS_HCR_SHIFT from
+	  el2_setup.h
+	- Remove trap_mpam() and use undef_acccess() directly
+	- Stopped using ID_FILTERED() for the 32-bit ID register
+	- Fix ID_AA64PFR1_EL1 sanitisation
+	- Fix MPAM_EL1 encoding
+	- Fix bug that set everything apart from MPAM_frac as writable in
+	  ID_AA64PFR1_EL1. Match the current behaviour, so nothing is writable.
 
-> > 	if (system_supports_poe() && err == 0 && user->poe_offset) {
-> > 		...
+James wrote:
+	This series fixes up a long standing bug where MPAM was accidentally exposed
+	to a guest, but the feature was not otherwise trapped or context switched.
+	This could result in KVM warning about unexpected traps, and injecting an
+	undef into the guest contradicting the ID registers.
+	This would prevent an MPAM aware kernel from booting - fortunately, there
+	aren't any of those.
 
-> > which gives the wrong impression that the POR is somehow optional, even
-> > if the CPU supports POE. So we should drop that check of
-> > 'user->poe_offset' as it cannot be NULL here.
+	Ideally, we'd take the MPAM feature away from the ID registers, but that
+	would leave existing guests unable to migrate to a newer kernel. Instead,
+	just ignore that field when it matches the hardware. KVM wasn't going to
+	expose MPAM anyway. The guest will not see MPAM in the id registers.
 
-> That was cargo culted (by me) from the rest of the function (apart from TPIDR2
-> and FPMR). I think Kevin is planning on sending his signal changes still, but
-> is on holiday, maybe he can remove the last part of the condition as part of
-> his series.
+	This series includes the head.S and KVM changes to enable/disable traps. If
+	MPAM is neither enabled nor emulated by EL3 firmware, these system register
+	accesses will trap to EL3.
+	If your kernel doesn't boot, and the problem bisects here - please update
+	your firmware. MPAM has been supported by trusted firmware since v1.6 in
+	2018. (also noted on patch 3).
 
-That's there because the decisions about "should we save this thing" are
-taken in setup_sigframe_layout() and for a bunch of the extensions we
-suppress the saving if they're in some sort of default state (eg, when
-we don't have TIF_SVE set we don't output the SVE sigframe).
+Thanks,
+Joey
 
---VY579BsplRjShns6
-Content-Type: application/pgp-signature; name="signature.asc"
+[1] https://lore.kernel.org/linux-arm-kernel/20241004110714.2051604-1-joey.gouly@arm.com/
 
------BEGIN PGP SIGNATURE-----
+James Morse (7):
+  arm64/sysreg: Convert existing MPAM sysregs and add the remaining
+    entries
+  arm64: head.S: Initialise MPAM EL2 registers and disable traps
+  arm64: cpufeature: discover CPU support for MPAM
+  KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+  KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+  KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+  KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcObXAACgkQJNaLcl1U
-h9Buxgf7B6JxtnaQV7bcQdxU3W/45vjVnsJAj4oq+mBBFjqBV2314SqKcMSBrcJ1
-xE3cGR9A04qVmbrPzOkCkiHLXWFD6I/JAZP9eAZGwJXU0Jr8fJWBnXFqDEUdWstw
-XRJtiGFQkpdq/e0ijRt5DymHm18i/lEE/eg6Zi2o621Abzx9QNS+LMKkn9WpTOk8
-W/xOE+DMhh2zpccEJ8VU2HgFJxZ/EcqC/fgkBlJTTApUuvHNdhue2DyBAgzIIsoq
-2UYiKeiDTIkN07oUwJ7pRlftHSrLAZyM6WfK8+SZ2rQ1QzhTX8KUz5WzBw3BBpz5
-7nn2tj3oFNHFeCRd88yFJnu0JH0lIw==
-=yrSH
------END PGP SIGNATURE-----
+ .../arch/arm64/cpu-feature-registers.rst      |   2 +
+ arch/arm64/Kconfig                            |  20 +++
+ arch/arm64/include/asm/cpu.h                  |   1 +
+ arch/arm64/include/asm/cpucaps.h              |   2 +
+ arch/arm64/include/asm/cpufeature.h           |  12 ++
+ arch/arm64/include/asm/el2_setup.h            |  16 ++
+ arch/arm64/include/asm/kvm_arm.h              |   1 +
+ arch/arm64/include/asm/mpam.h                 |  32 ++++
+ arch/arm64/include/asm/sysreg.h               |  12 --
+ arch/arm64/kernel/Makefile                    |   2 +
+ arch/arm64/kernel/cpufeature.c                |  97 +++++++++++
+ arch/arm64/kernel/cpuinfo.c                   |   4 +
+ arch/arm64/kernel/image-vars.h                |   5 +
+ arch/arm64/kernel/mpam.c                      |   6 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  32 ++++
+ arch/arm64/kvm/sys_regs.c                     | 105 +++++++++---
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/sysreg                       | 161 ++++++++++++++++++
+ .../selftests/kvm/aarch64/set_id_regs.c       | 100 ++++++++++-
+ 19 files changed, 571 insertions(+), 40 deletions(-)
+ create mode 100644 arch/arm64/include/asm/mpam.h
+ create mode 100644 arch/arm64/kernel/mpam.c
 
---VY579BsplRjShns6--
+-- 
+2.25.1
+
