@@ -1,65 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A131346B8
-	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 03:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5130933EA
+	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 04:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728964569; cv=none; b=X9gd56prfeteMCJyWeQnfzamNc4HjKomaEa5bQv0ER3+kTOD551p6q2Q0Tn9PM07NTxGMMFmAeq6HfG57DxzRrILpcnaznAn9YGJnCX7blc5ysj8iKhB57yKJiOqKRhoY7/xGiMhRQvp1jNVuFBycgcU1O5LMCXP18M3a54iW+w=
+	t=1728966190; cv=none; b=eWXfpFP4RiQlVbbAf94WpnEhjS7Spvidl2mVx0Z0BCCGRqkO7XIXBeHkctEGABeXTsdxEvJEMECAIK83fxTbDMFq2b4oLJYYMsqQ0pMlCEU/DlvJ7ISiIIr8caCmrY9FzvbD2Z2kx+hIydnKd93U+rB89PGOayzcwp5+g0MQJ8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728964569; c=relaxed/simple;
-	bh=MgtyB/AAROrtxH1XraK2lYAW3vbCsCYiprQHNQSY0ag=;
+	s=arc-20240116; t=1728966190; c=relaxed/simple;
+	bh=2MlNuKshvKT+hFZs8Xag3DHDJFhz1k8JQft+YDebBAc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g+Wodly19y8TF7nHFK84fpsXqzYrmsIxDiG5ENInUjIkUicmSOyfe0xyt6rJ5pfnno736EwdUV/IvY7xuJZ2BZLoL5I5qD4zrwic5t1cXvFNk9UqTuWYGgjV9eBYUd0eJDJ/74Zoz/92Z8ZUKRTi5p5i41TiRnz0ZwxWsEGMtHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sg2VmH3s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sg2VmH3s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728964565;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/gQj7yhKGwHX3tay3bEUPL2aqsF2Bb60CY1YisKDKbg=;
-	b=Sg2VmH3srXdzxjPr1P5SpmaxF4U72H+kzlOrICxip4aD+ubId/45O8/A/19eglCE/4iunD
-	qqe5es/KuNw09IYmjyUOOnM+sd/zRpCTQtsh9BupZMbj4gD4zp6PxXnyYGRAzHG2U5rs1O
-	G4sitf8IcyhDeajG6UaSvoXrJcCwoUs=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-381-iAMwCvWnOzGQelkNh1EAhg-1; Mon, 14 Oct 2024 23:56:04 -0400
-X-MC-Unique: iAMwCvWnOzGQelkNh1EAhg-1
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-7ea999a79a2so717905a12.2
-        for <kvmarm@lists.linux.dev>; Mon, 14 Oct 2024 20:56:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728964563; x=1729569363;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/gQj7yhKGwHX3tay3bEUPL2aqsF2Bb60CY1YisKDKbg=;
-        b=O+sdybujJvmFnMqFRpXag0iWxrD+mZ9WjsVa74/2p+SWBt18gINFEfhryrJPf14otx
-         PrKqrcOHahA/Ixo9sYuoYa6Ay1EnOnYMXm5TlkKfxRARFZxkBvmSM634dIUq43HEoxdt
-         wI+2M64VDbVWXFH+IEgLEJ9e+EVGg9+0zab00YNAeU71TpsYX84rC/bcXvlCPkkCkh0U
-         2sH9HSCzPKGxG/Pp4v+e3wUs9jy57+ixSoROAmMmXELzoN/mB7klEp6Zd3XLZ+69W23o
-         C0ilGBr7/Y+EadGmonIfRQxGShpv7H0plZfauOK+1IK7JEJCDz/88jB1TFvAztLmlfCA
-         C45w==
-X-Forwarded-Encrypted: i=1; AJvYcCXIAN4LG0zD5jUdq5xoV2d33We27SURKwGn6hFvZnRWSEDcdCPISvYfPXG5kZzvfzOLwCkY8FY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwWvLtePSSPH6w2+PCATw8hRGV9SURCvUkVWZJOGJfMxVzZyVBw
-	lL5ZQwmBb3AMN4qeiXYDM8xetuokbz6hr/1x+8pEvO2Phx+sMTWWC7u1PI87Arn2kll5FacqnCl
-	VnP5EIwC2p6Z+2pSOp3SuzvkuDYU9nex2RZq1DCspYxy5vIckg0sgjw==
-X-Received: by 2002:a05:6a21:4d8c:b0:1d8:f894:43f9 with SMTP id adf61e73a8af0-1d8f89445eamr681077637.11.1728964563164;
-        Mon, 14 Oct 2024 20:56:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGybMblrnhP5WbRv8pGItZKUwHcNnS++KdeQ7wfVC+XkNBJwpsFwHEmwrwG693wjo55GOXWsQ==
-X-Received: by 2002:a05:6a21:4d8c:b0:1d8:f894:43f9 with SMTP id adf61e73a8af0-1d8f89445eamr681045637.11.1728964562725;
-        Mon, 14 Oct 2024 20:56:02 -0700 (PDT)
-Received: from [192.168.68.54] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea9c6ba2d4sm339896a12.11.2024.10.14.20.55.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 20:56:02 -0700 (PDT)
-Message-ID: <2352629a-3742-45e9-a38f-196989918c9b@redhat.com>
-Date: Tue, 15 Oct 2024 13:55:53 +1000
+	 In-Reply-To:Content-Type; b=I/qn0/MKY97mbG3zWz6FiqnZnBcjaVZFv7Ype/SkTl4SlX36tnebpJvAK+LlT8A6eoz2cqLeb5X/5Ir8p17DPEwhopPkVzgTTgDrcXPuCJRF56sVZQ44yLa3EG0Wkbo8b2WhRbhJuKGv/RqsN8Oqp7SzQYeIXJDYaNvEn0NSX/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 370BE1007;
+	Mon, 14 Oct 2024 21:23:37 -0700 (PDT)
+Received: from [10.162.16.109] (a077893.blr.arm.com [10.162.16.109])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA08A3F71E;
+	Mon, 14 Oct 2024 21:23:04 -0700 (PDT)
+Message-ID: <8bd9481d-9579-4da3-9781-98ceb97ce838@arm.com>
+Date: Tue, 15 Oct 2024 09:53:02 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,89 +27,139 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 03/11] arm64: realm: Query IPA size from the RMM
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-4-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241004144307.66199-4-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH 1/5] arm64/mm: Drop pte_mkhuge()
+To: Ryan Roberts <ryan.roberts@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241005123824.1366397-1-anshuman.khandual@arm.com>
+ <20241005123824.1366397-2-anshuman.khandual@arm.com>
+ <a4372d54-34bb-4a32-8742-ea6aacc0848c@arm.com>
+ <a91df2f6-e0d6-4902-ae22-5df132f00737@arm.com>
+ <e8f8f9e8-b042-4df8-92ea-1439a5e1ffb4@arm.com>
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <e8f8f9e8-b042-4df8-92ea-1439a5e1ffb4@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/5/24 12:42 AM, Steven Price wrote:
-> The top bit of the configured IPA size is used as an attribute to
-> control whether the address is protected or shared. Query the
-> configuration from the RMM to assertain which bit this is.
+
+
+On 10/14/24 16:38, Ryan Roberts wrote:
+> On 14/10/2024 09:59, Anshuman Khandual wrote:
+>>
+>>
+>> On 10/9/24 18:50, Ryan Roberts wrote:
+>>> On 05/10/2024 13:38, Anshuman Khandual wrote:
+>>>> Core HugeTLB defines arch_make_huge_pte() fallback definition, which calls
+>>>> platform provided pte_mkhuge(). But if any platform already provides custom
+>>>> arch_make_huge_pte(), then it does not need to provide pte_mkhuge(). arm64
+>>>> defines arch_make_huge_pte(), but then also calls pte_mkhuge() internally.
+>>>> This creates confusion as if both of these callbacks are being used in core
+>>>> HugeTLB and required to be defined in the platform.
+>>>>
+>>>> This changes arch_make_huge_pte() to create block mapping directly and also
+>>>> drops off now redundant helper pte_mkhuge(), making things clear. Also this
+>>>> changes HugeTLB page creation from just clearing the PTE_TABLE_BIT (bit[1])
+>>>> to actually setting bits[1:0] via PTE_TYPE_[MASK|SECT] instead.
+>>>>
+>>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>>> Cc: Will Deacon <will@kernel.org>
+>>>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>>>> Cc: Ryan Roberts <ryan.roberts@arm.com>
+>>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>>> Cc: linux-arm-kernel@lists.infradead.org
+>>>> Cc: linux-kernel@vger.kernel.org
+>>>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/pgtable-hwdef.h | 1 +
+>>>>  arch/arm64/include/asm/pgtable.h       | 5 -----
+>>>>  arch/arm64/mm/hugetlbpage.c            | 2 +-
+>>>>  3 files changed, 2 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+>>>> index fd330c1db289..956a702cb532 100644
+>>>> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+>>>> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+>>>> @@ -158,6 +158,7 @@
+>>>>  #define PTE_VALID		(_AT(pteval_t, 1) << 0)
+>>>>  #define PTE_TYPE_MASK		(_AT(pteval_t, 3) << 0)
+>>>>  #define PTE_TYPE_PAGE		(_AT(pteval_t, 3) << 0)
+>>>> +#define PTE_TYPE_SECT		(_AT(pteval_t, 1) << 0)
+>>>>  #define PTE_TABLE_BIT		(_AT(pteval_t, 1) << 1)
+>>>>  #define PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
+>>>>  #define PTE_RDONLY		(_AT(pteval_t, 1) << 7)		/* AP[2] */
+>>>> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+>>>> index c329ea061dc9..fa4c32a9f572 100644
+>>>> --- a/arch/arm64/include/asm/pgtable.h
+>>>> +++ b/arch/arm64/include/asm/pgtable.h
+>>>> @@ -438,11 +438,6 @@ static inline void __set_ptes(struct mm_struct *mm,
+>>>>  	}
+>>>>  }
+>>>>  
+>>>> -/*
+>>>> - * Huge pte definitions.
+>>>> - */
+>>>> -#define pte_mkhuge(pte)		(__pte(pte_val(pte) & ~PTE_TABLE_BIT))
+>>>> -
+>>>>  /*
+>>>>   * Hugetlb definitions.
+>>>>   */
+>>>> diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
+>>>> index 5f1e2103888b..5922c95630ad 100644
+>>>> --- a/arch/arm64/mm/hugetlbpage.c
+>>>> +++ b/arch/arm64/mm/hugetlbpage.c
+>>>> @@ -361,7 +361,7 @@ pte_t arch_make_huge_pte(pte_t entry, unsigned int shift, vm_flags_t flags)
+>>>>  {
+>>>>  	size_t pagesize = 1UL << shift;
+>>>>  
+>>>> -	entry = pte_mkhuge(entry);
+>>>> +	entry = __pte((pte_val(entry) & ~PTE_TYPE_MASK) | PTE_TYPE_SECT);
+>>>
+>>> I think there may be an existing bug here; if pagesize == CONT_PTE_SIZE, then
+>>> entry will be placed in the level 3 table. In this case, shouldn't bit 1 remain
+>>> set, because at level 3, a page mapping is denoted by bits[1:0] = 3 ? Currently
+>>> its being unconditionally cleared.
+>>
+>> That's not a problem, pte_mkcont() brings back both the bits
+>> via PTE_TYPE_PAGE along with PTE_CONT.
+>>
+>>         if (pagesize == CONT_PTE_SIZE) {
+>>                 entry = pte_mkcont(entry);
+>>         } else if (pagesize == CONT_PMD_SIZE) {
+>>                 entry = pmd_pte(pmd_mkcont(pte_pmd(entry)));
+>>         } else if (pagesize != PUD_SIZE && pagesize != PMD_SIZE) {
+>>                 pr_warn("%s: unrecognized huge page size 0x%lx\n",
+>>                         __func__, pagesize);
+>>         }
+>>
+>> static inline pte_t pte_mkcont(pte_t pte)
+>> {
+>> 	pte = set_pte_bit(pte, __pgprot(PTE_CONT));
+>>       	return set_pte_bit(pte, __pgprot(PTE_TYPE_PAGE));
 > 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v4:
->   * Make PROT_NS_SHARED check is_realm_world() to reduce impact on
->     non-CCA systems.
-> Changes since v2:
->   * Drop unneeded extra brackets from PROT_NS_SHARED.
->   * Drop the explicit alignment from 'config' as struct realm_config now
->     specifies the alignment.
-> ---
->   arch/arm64/include/asm/pgtable-prot.h | 4 ++++
->   arch/arm64/include/asm/rsi.h          | 2 +-
->   arch/arm64/kernel/rsi.c               | 8 ++++++++
->   3 files changed, 13 insertions(+), 1 deletion(-)
+> Oh wow, that's pretty hacky. Good job we never call pte_mkcont() on a
+> PTE_PRESENT_INVALID PTE. This would turn it valid again.
+
+Ideally each individual HW page table helper should not do more than one thing
+at a time. Here pte_mkcont() should just take a pte which is already a valid
+one with PTE_TYPE_PAGE and just set PTE_CONT.
+
 > 
-
-[...]
-
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> index 9bf757b4b00c..a6495a64d9bb 100644
-> --- a/arch/arm64/kernel/rsi.c
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -8,6 +8,11 @@
->   #include <linux/psci.h>
->   #include <asm/rsi.h>
->   
-> +struct realm_config config;
-> +
-
-Nit: I think this variable is file-scoped since it has a generic name.
-In this case, 'static' is needed to match with the scope.
-
-> +unsigned long prot_ns_shared;
-> +EXPORT_SYMBOL(prot_ns_shared);
-> +
->   DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->   EXPORT_SYMBOL(rsi_present);
->   
-> @@ -67,6 +72,9 @@ void __init arm64_rsi_init(void)
->   		return;
->   	if (!rsi_version_matches())
->   		return;
-> +	if (WARN_ON(rsi_get_realm_config(&config)))
-> +		return;
-> +	prot_ns_shared = BIT(config.ipa_bits - 1);
->   
->   	arm64_rsi_setup_memory();
->   
-
-Thanks,
-Gavin
-
+>> }
+>>
+>> Although the same is not required for CONT_PMD_SIZE size huge
+>> pages where only PTE_CONT is enough.
+>>
+>> static inline pmd_t pmd_mkcont(pmd_t pmd)
+>> {
+>>         return __pmd(pmd_val(pmd) | PMD_SECT_CONT);
+>> }
+>>  
+>>>>  	if (pagesize == CONT_PTE_SIZE) {
+>>>>  		entry = pte_mkcont(entry);
+>>>>  	} else if (pagesize == CONT_PMD_SIZE) {
+>>>
+> 
