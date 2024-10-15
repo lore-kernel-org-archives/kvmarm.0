@@ -1,119 +1,107 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EFF1AB534
-	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 09:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1874C66
+	for <kvmarm@lists.linux.dev>; Tue, 15 Oct 2024 10:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728986363; cv=none; b=CwkHRpfFNF8MBtwr6W8Wi5AnY2dDmAe+KwZe6G3TCoWsVoTcjOfQzW5pWcTcUyaMJV0LfSPak/PQiaN6yN9x26ajM39G2DZ0zdqrRK541QpGVsQTYvxuZgJa4hKoUKJFu4+GKEB4XfGBjpwKpGNeoL63UpGBaZOcuY7VmuUjV2g=
+	t=1728987331; cv=none; b=FORF5btrrgSWoQpPkID50VIldVdSEVQWnKZABW0c4rb3RBkJV5JiFg7NwykY4P1XUeD4+5rm/hplrsTKkvS++BL+IdQN1o3Ml5P7dB0ncLJn2nDOmoPC5dYWRQEyE7hW2EbbF7D0u81V78H+RfjneiMS8IX0wAx3W4Wqp+qk1mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728986363; c=relaxed/simple;
-	bh=1RaCQuWH5s4AT7QPJwA17NMrH/oRCvf9JK37eD4b5S4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RyBo85PFjUi7x2lHLTdvc7YbK5rey9D0+CrVvbKOYrIFlL7+t+x3isfudBkciYQOILwSx+C8mvJOziOHom8ofX2WRHNDaiR9QcjFc9AabuNNxeVj+X7eGdnAmy5QbihJnl7ugV3zWWQwjwxt2JZhdThywFqZNBok3w5JX8NsLjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 577591007;
-	Tue, 15 Oct 2024 02:59:50 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A909B3F71E;
-	Tue, 15 Oct 2024 02:59:16 -0700 (PDT)
-Date: Tue, 15 Oct 2024 10:59:11 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Kevin Brodsky <kevin.brodsky@arm.com>,
-	linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org,
-	aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
-	broonie@kernel.org, catalin.marinas@arm.com,
-	christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com,
-	hpa@zytor.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mingo@redhat.com,
-	mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com, npiggin@gmail.com,
-	oliver.upton@linux.dev, shuah@kernel.org, skhan@linuxfoundation.org,
-	szabolcs.nagy@arm.com, tglx@linutronix.de, x86@kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 19/30] arm64: add POE signal support
-Message-ID: <20241015095911.GA3777204@e124191.cambridge.arm.com>
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-20-joey.gouly@arm.com>
- <47e1537f-5b60-4541-aed1-a20e804c137d@arm.com>
- <20241009144301.GA12453@willie-the-truck>
- <20241014171023.GA18295@willie-the-truck>
+	s=arc-20240116; t=1728987331; c=relaxed/simple;
+	bh=kP4Rt0LwgM3lUXvoZlBxu96gt02191EsWBoPeIDUUgU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q3Zy7e4LECMHRQKMitmwJzMtKmOtbKllG/CFk8oLK0NHsLTph3FnraVDuKmqVQh20YkNpeaTU0dCJI4u7g21oJdkH4il9YKczpqV6GDHNFkfqzFusq8o4ndLooyMWY2gWpzdWOdflWZG6I3X/GcyGPj2h5O8UuzG7o6KGhXiw2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppwwFkDW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppwwFkDW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA78C4CEC6;
+	Tue, 15 Oct 2024 10:15:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728987331;
+	bh=kP4Rt0LwgM3lUXvoZlBxu96gt02191EsWBoPeIDUUgU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ppwwFkDWLNrRauOGg2sc4WJingY2UfcsB1/UGXQyls3UAp/KA4dpkOPeSOyU+eWFf
+	 1vTRyb5yEYyfOumD2mFXarAXrb7bCyEnSl1WJAcVijb15vBqHCCJ6OtsuKZws8548m
+	 ECULauiVpiXRCTuiOlXlc0++4Y+fJn4quR4HH4kncQPOprVxmtV07fUTFf1jJ6+azz
+	 13NhQKdiyvEzFGiWHhik+tS2w6FpO2noPLLGL3u7+FzVfc425P0ABZioGZK1CyQcug
+	 dCY8uLfWf1CI4luN8ysYvXjTy4ecoHvVQu9hxIDcwbbInF/x0euF0QVj6iBc4SsPwj
+	 7ALkXiDh7OjKA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t0eaO-003fik-P9;
+	Tue, 15 Oct 2024 11:15:28 +0100
+Date: Tue, 15 Oct 2024 11:15:28 +0100
+Message-ID: <864j5d65a7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org,
+	christoffer.dall@arm.com
+Subject: Re: [PATCH v1 0/4] KVM: arm64: Update KVM_VCPU_MAX_FEATURES and refactor to avoid same issue
+In-Reply-To: <CA+EHjTx--swGhnNMm1m-8wCA0HUKojv9R7R-UNCs67fCfVrDog@mail.gmail.com>
+References: <20241014165809.984883-1-tabba@google.com>
+	<865xpu61v4.wl-maz@kernel.org>
+	<CA+EHjTx--swGhnNMm1m-8wCA0HUKojv9R7R-UNCs67fCfVrDog@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241014171023.GA18295@willie-the-truck>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Oct 14, 2024 at 06:10:23PM +0100, Will Deacon wrote:
-> Kevin, Joey,
+On Mon, 14 Oct 2024 19:17:19 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> On Wed, Oct 09, 2024 at 03:43:01PM +0100, Will Deacon wrote:
-> > On Tue, Sep 24, 2024 at 01:27:58PM +0200, Kevin Brodsky wrote:
-> > > On 22/08/2024 17:11, Joey Gouly wrote:
-> > > > @@ -1178,6 +1237,9 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
-> > > >  		sme_smstop();
-> > > >  	}
-> > > >  
-> > > > +	if (system_supports_poe())
-> > > > +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
-> > > 
-> > > At the point where setup_return() is called, the signal frame has
-> > > already been written to the user stack. In other words, we write to the
-> > > user stack first, and then reset POR_EL0. This may be problematic,
-> > > especially if we are using the alternate signal stack, which the
-> > > interrupted POR_EL0 may not grant access to. In that situation uaccess
-> > > will fail and we'll end up with a SIGSEGV.
-> > > 
-> > > This issue has already been discussed on the x86 side, and as it happens
-> > > patches to reset PKRU early [1] have just landed. I don't think this is
-> > > a blocker for getting this series landed, but we should try and align
-> > > with x86. If there's no objection, I'm planning to work on a counterpart
-> > > to the x86 series (resetting POR_EL0 early during signal delivery).
-> > 
-> > Did you get a chance to work on that? It would be great to land the
-> > fixes for 6.12, if possible, so that the first kernel release with POE
-> > support doesn't land with known issues.
+> Hi Marc,
 > 
-> Looking a little more at this, I think we have quite a weird behaviour
-> on arm64 as it stands. It looks like we rely on the signal frame to hold
-> the original POR_EL0 so, if for some reason we fail to allocate space
-> for the POR context, I think we'll return back from the signal with
-> POR_EL0_INIT. That seems bad?
+> On Mon, 14 Oct 2024 at 18:17, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Mon, 14 Oct 2024 17:58:05 +0100,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > The value of KVM_VCPU_MAX_FEATURES has not been updated since
+> > > adding new features in commit 89b0e7de3451 ("KVM: arm64: nv:
+> > > Introduce nested virtualization VCPU feature").
+> >
+> > Could you please expand on what is broken? 89b0e7de3451 makes a point
+> > in *not* exposing this to userspace, as outlined in the commit
+> > message -- this is done on purpose, because NV is not functional yet.
+> 
+> I understand. I was wondering how you would test NV when this feature
 
-If we don't allocate space for POR_EL0, I think the program recieves SIGSGEV?
+Testing????? Fool!!! KVM is a *write-only* code base.
 
-setup_sigframe_layout()
-        if (system_supports_poe()) {
-                err = sigframe_alloc(user, &user->poe_offset,
-                                     sizeof(struct poe_context));
-                if (err)
-                        return err;
-        }
+More seriously, we have zillions of out-of-tree patches that actually
+enable the thing, just like for pKVM.
 
-Through get_sigframe() and setup_rt_frame(), that eventually hets here:
+> isn't settable, which is why I thought it was broken. That said, maybe
+> a comment by the definition of KVM_VCPU_MAX_FEATURES to that effect
+> might make things less confusing for people like me :)
+> 
+> With that, is it worth repinning this patch, or is it not worth the
+> complexity of trying to hide NV as long as it's not supported?
 
-handle_signal()
-	ret = setup_rt_frame(usig, ksig, oldset, regs);
+Maybe that's the sort of kick up the bum I need to actually enable
+*some* NV support upstream.
 
-	[..]
+Let me see if I can extract something from the current mess.
 
-        signal_setup_done(ret, ksig, test_thread_flag(TIF_SINGLESTEP));
+	M.
 
-void signal_setup_done(int failed, struct ksignal *ksig, int stepping)                                                                                                                         
-{                                                                                                                                                                                              
-        if (failed)                                                                                                                                                                            
-                force_sigsegv(ksig->sig);                                                                                                                                                      
-        else                                                                                                                                                                                   
-                signal_delivered(ksig, stepping);                                                                                                                                              
-}  
-
-So I think it's "fine"?
-
-Thanks,
-Joey
+-- 
+Without deviation from the norm, progress is not possible.
