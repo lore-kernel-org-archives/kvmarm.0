@@ -1,77 +1,68 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2053.outbound.protection.outlook.com [40.107.93.53])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2124.outbound.protection.outlook.com [40.107.243.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA1320C492
-	for <kvmarm@lists.linux.dev>; Wed, 16 Oct 2024 14:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35502144D9
+	for <kvmarm@lists.linux.dev>; Wed, 16 Oct 2024 19:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729089309; cv=fail; b=mfS2rTBuJOBZCK3LJTabcSRBC6lfdeiNLbbVtKxw3ulXr0MZwFQex21KGyVfkOSA2Sl3n+D7sf83/7wnsZsKYhCqVeDKhJznXet4tDgaFcJlbIt4pI4rIgw7fvhdPCs5rEFN8fYytAoDzk9fNrbFfi+mxNBzkTefdoJPXc9+bxs=
+	t=1729108704; cv=fail; b=CRzcc3p5M96aWLdMQFf2yt/w+zdy2WtH57l9pfQ+OOrDk4SqbjQMRbeOx4BrLk5cKRx+iRXkr7madpYLqc+ziqduuMaTFGY/mlU83SxciWmAbfi8XTHOU0mFoyB86MCjKhJuYLyJ7PC+zcPxfrj79vL7SQ7IcUI46hifRMySerU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729089309; c=relaxed/simple;
-	bh=dm5hOiVGF8yBJj+wVePPMT0PLtPrtPyyX8+cygiBduw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oYQhy3vPahyWMWKuZsT0UpRPMWxonRLtcRc7LRlGIxZo+MaUR6A+JlxiFteRNASoDui82W0rkFSvROrk+7GZu7QOFBdtCvLX4aoSvgWkBObtdk4Uhg2X94XuzMsKynfwR5mEpaB/EuNOATwvFyxReLESbA1iiSu42yDxxddoPD0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G9jd2LaT; arc=fail smtp.client-ip=40.107.93.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1729108704; c=relaxed/simple;
+	bh=AGyqDZ8FM+ZR5fYr+ElNTTT+yhF2s7+/Bq9cje014dM=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=uR73b241RF1XGEAfMJCo7vKjJvcG6SeWt/AQGQlhei/+rz9a8LyUTeAlC97Fghy9tpOSbGFXxXY1PewZKbLTlhi6HjxFyo24kinrToRiYPLRawpgKa11ad3cs7exylzS7f2iiLVGQDsCOopbU6nFBxtJHqjDu7CNY5kCte8EAfI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=vwQXbj2A; arc=fail smtp.client-ip=40.107.243.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G9jd2LaT"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="vwQXbj2A"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q7JrxbrkmJT72aRpBRhU3riVWBeRtqARQHd7Om8YTk/wRaWYmTKocoTLvjKL9cw+XcEz9hM9+m6ONDczylziuXKB8U0tQmvy7Vy5XgWFmCllb0tozveE9ila0PFDF2XEZ5udNdl2BXbJ3fpYiH9R8YecFkD8KkCmfErth/cZWmFn+IX0VETGwt6W1/JDEAhfHJAYuztB4AfwPtNyFOs8Po68vb1411YKx2PNCLnyKDuEq5/NkptZP3BR27ecmUGWCM9QpfpStTcGa4u9BV5QBd3SHFTRjW7We+sj7OAf5E1bFcozS5F0l2V0rqUcFsBV02rRl0jNCWLVvcMNIyBuOQ==
+ b=ZzVnRdKya+PBYyEBxqfNk4U9yU7AbKYHG6Ui3SVDlQATIvQN8JUFsQv72BzeFUwfho5qmj8LCCXsT2Idd7i1FYfO8yV7XoxqQRhyv8GpyO/0P9aiApYHkp/tn6RftccwpcRLVDJOXHJkHuC7tow3ednIVrK7Zn2mkw103XWxyKLNfFsQWZsW1cdfwkD8aNZpAqZ+J9HXgShPooOjh/xofgnb0t8D3IPcIzB62Y85aGHMCd2R1ztzpxDxwS/LGb3C9GzjbcPoIICVLoexPTNcy9N5Gj9D+m1Xj8aLMVN+JjZDc3NmMIR6rbKhZIPuEfFXCpD95RtZU10p0R4JkFCkYA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jBQB2GQDmSUSMZwfrZvQNxYyToZ9zHinVenhMKXMM1w=;
- b=WpqqvekGS0a0FNn8QvC7GHd1YuWOQ5HqheRPlZ3cFpah/QSavQN4QbIS5xyCYrvnMXZfQaNBjQ9xJQA1rjkCd/FCs54Uls3fRjFwd4tC9EiCoo4j0asIoGCQzvRsKW7SjSMO0fmrU6Zs+MYs6dPgPS2AFBayMAAxySxNJuLGU9/3/YPDAhJpanvDjEO3MNtDDnWB6rDv6JvBJ2+xpPf+i3LsAWmdeqwx6UdEhYQbXOTzd4dDVpjdx/p2SbLCAz8oI5B/ZMzDseUw5bTnUh3BSfuOC9WdfH+8vGVgjt66LZE2262B1b3SimmfC1QxSjQAqrW3qgJdv8G6jtfcaB4uAA==
+ bh=S41wHjcTCIAk1TLxhGlH6wA7VNHrMPT43qwSHHS9sr8=;
+ b=Dt1f/5r41DBTA4VVMQB2EyZs7iB85BttpMcXuF5v88Gw1s28BdObrgExc/WakTE3W6+dY2+NkcPFchEcdOJ5aqU31h6jBlgm7lhij6mLMuG+X5YaZgF1rLZBBNgxXOh1hDOfLbsM26ICgFiQg1Sond/PvJpx175jbt5ZY8SMP/tis4nMQRd8diRjJAMgDP7A2nP5SBvlY0KQoF77mBhg2q36qwbA51zwReNcv98M8E0rdTBsaSo0VZ4A7TFFNDUcs0GuD55/ZT8lLtzzu1V1Z9jcYqnd+pvmaZevdpfbnG5aL3e/qhgBLWFp0WQn/Px9RfBkgnz49FbewFW2iVXtVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jBQB2GQDmSUSMZwfrZvQNxYyToZ9zHinVenhMKXMM1w=;
- b=G9jd2LaTmeeW5sIeOt5/CBQlu6DYK/HEs4N5Jh5aTpLam4v1kj+PlYFOlnnGwA93+LoYz6o0YO2HuHwu2Tw5Mkp3UUq3R1B5hWtlOOaUT5Wq0Vc7l4uoNeQmwWGp77lhQwGv9I0mMnCbJsgltxx+TNj8pLMSB1wm+PnJaSwCyBuTi42rlZ6UabdmVjstp80vwr900dQifjIBKMgfwK4II4mkU0BKwKSKK1zh1SdyXrb6YaNHxJQ7KDZRz6iMsa9om99aRCfnWtnpP+Jz4/E803EKxrqEeurr2tH22AD07W4htdy8DkoWdN6aCoW0j+f//zOLQX8dcvfHaKn8ifrkyw==
+ bh=S41wHjcTCIAk1TLxhGlH6wA7VNHrMPT43qwSHHS9sr8=;
+ b=vwQXbj2AxNAdYxey1/KMV0o+huzME83qM0pKiSXBUqV08upasP184eIMrGDHHNz8Th2npJYvkoM+KEcDTCeOZsreTfapaSB2BIFU/l8q1hfTB/KC/cfIXr79oxDiABEw5xb8e4DAYCHpQnxWjbrcNivbAgbmr0VVNcS7beFoEU0=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- CY8PR12MB8244.namprd12.prod.outlook.com (2603:10b6:930:72::7) with Microsoft
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from MW4PR01MB6228.prod.exchangelabs.com (2603:10b6:303:76::7) by
+ LV8PR01MB8551.prod.exchangelabs.com (2603:10b6:408:193::6) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8048.26; Wed, 16 Oct 2024 14:35:04 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%7]) with mapi id 15.20.8048.020; Wed, 16 Oct 2024
- 14:35:04 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: David Hildenbrand <david@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Greg Marsden <greg.marsden@oracle.com>, Ivan Ivanov <ivan.ivanov@suse.com>,
- Kalesh Singh <kaleshsingh@google.com>, Marc Zyngier <maz@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Matthias Brugger <mbrugger@suse.com>,
- Miroslav Benes <mbenes@suse.cz>, Oliver Upton <oliver.upton@linux.dev>,
- Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 57/57] arm64: Enable boot-time page size selection
-Date: Wed, 16 Oct 2024 10:35:01 -0400
-X-Mailer: MailMate (1.14r6065)
-Message-ID: <8B1AC3A8-514F-48C1-9F9C-A4A29E129788@nvidia.com>
-In-Reply-To: <401175cf-e205-4e5c-939f-60b7ab948355@arm.com>
-References: <20241014105514.3206191-1-ryan.roberts@arm.com>
- <20241014105912.3207374-1-ryan.roberts@arm.com>
- <20241014105912.3207374-57-ryan.roberts@arm.com>
- <CD2DC486-F4B1-4043-82BC-0CB2AA513A99@nvidia.com>
- <daecf1d1-04c7-4513-86db-397c2ef6f768@arm.com>
- <6C0A53C0-C332-46B3-A84A-3232E9D71003@nvidia.com>
- <401175cf-e205-4e5c-939f-60b7ab948355@arm.com>
-Content-Type: multipart/signed;
- boundary="=_MailMate_3B303FDF-2AEE-4550-9D2F-014729012A86_=";
- micalg=pgp-sha512; protocol="application/pgp-signature"
-X-ClientProxiedBy: BL1PR13CA0392.namprd13.prod.outlook.com
- (2603:10b6:208:2c2::7) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+ 15.20.7982.27; Wed, 16 Oct 2024 19:58:19 +0000
+Received: from MW4PR01MB6228.prod.exchangelabs.com
+ ([fe80::13ba:df5b:8558:8bba]) by MW4PR01MB6228.prod.exchangelabs.com
+ ([fe80::13ba:df5b:8558:8bba%7]) with mapi id 15.20.7982.033; Wed, 16 Oct 2024
+ 19:58:19 +0000
+From: Ilkka Koskinen <ilkka@os.amperecomputing.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Ilkka Koskinen <ilkka@os.amperecomputing.com>
+Subject: [PATCH] KVM: arm64: Fix shift-out-of-bounds bug
+Date: Wed, 16 Oct 2024 12:57:55 -0700
+Message-Id: <20241016195755.65011-1-ilkka@os.amperecomputing.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CH0PR03CA0413.namprd03.prod.outlook.com
+ (2603:10b6:610:11b::11) To MW4PR01MB6228.prod.exchangelabs.com
+ (2603:10b6:303:76::7)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -79,213 +70,129 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|CY8PR12MB8244:EE_
-X-MS-Office365-Filtering-Correlation-Id: 19523878-35c5-4ed6-a54f-08dcedefb92f
+X-MS-TrafficTypeDiagnostic: MW4PR01MB6228:EE_|LV8PR01MB8551:EE_
+X-MS-Office365-Filtering-Correlation-Id: 36b9d30e-3ad5-49bb-f109-08dcee1ce197
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|52116014|376014|7416014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?qvwuXk1r4ae60Xn8rtT07wy/CDaLxHDXKVTTzJXhp5lR45e/nEj65MXe2bZN?=
- =?us-ascii?Q?8TO+56CDSbQfkmeZLOOSHXtcpjjbHBRSpni8FtsCfhTVyvPdMefQ6JNTRE0k?=
- =?us-ascii?Q?K8XxiS363Dl9Bnazjqofz0dYgvL5CM9U54Z/eu/UUQ2Jpk2/bLZyLsk09Eot?=
- =?us-ascii?Q?O8Sn96ieN0kzH1bBiMknGrOp//3AQfdX0VoqERCR6eKyy2v6B90X/7qE3rR3?=
- =?us-ascii?Q?F4APb5fg0K0lQe/Kbi0HEm9zvZ4nfRQqQW6H8d5/kW10VklPEr0XcuyORK9v?=
- =?us-ascii?Q?hwiv+2koUukhuwaOaxbSRmBftVz7QiI7n/bzy7jV8Bx1fnV8GQ4IgHWyrjc+?=
- =?us-ascii?Q?oFa3oY5H2ExMaYZ2oZrbsRrbvjv/GlJviIUXQ3o/7iZJxv5nlwKlq0F+mfUj?=
- =?us-ascii?Q?sbATw7Zw8B1Yc5XXOlKBbx/BxtzI/I+XXl8h3E4mvAa0jYT2dz0XC33ta42Z?=
- =?us-ascii?Q?CU1r+DL1fptqzjCI32EIztmhb+0LyASBk8uaODCG+3l35aJzdN2Bf6hZoLBv?=
- =?us-ascii?Q?O4n284YTTqOBRsZLIzQURWhlwue9Z9FH8skZx1zdojbP7ltpO36uCXmwKPUu?=
- =?us-ascii?Q?H0GWRhyhO/yBiyePC5Zl2DJgQWbX1LhmYkbgGRhoULy6YxoAtNLasc8dYKGy?=
- =?us-ascii?Q?oWOpwunIkhiGwXpashmAUJhJFTTLaeUZHIY5EGAqQtrN7pv+wOaM7jMfjsKj?=
- =?us-ascii?Q?ekUvgDsdPzV2AGl2GKp9+wDGjAyaejFkNbzgk5GqyTuEhWP0fUCbvS/6RmD9?=
- =?us-ascii?Q?VlzclSzWQgwnkgmkdfRGB2rKAk3zoY0+0TOhiiGqYMNoDsUBKNXQl+rvfNYl?=
- =?us-ascii?Q?uyUYaKccXmR/wrJb3QWu0GkmE7tUiNUPK8htX31qxRcbIhN5KN7+lPVkcC+U?=
- =?us-ascii?Q?1o/MCTm1+zBUIeZzvrZYiKGo+RA5w3NT5D71mlgzvOFCCad0928dNM8TY9Gz?=
- =?us-ascii?Q?4qxT+LFybX95gJOrXjcQCDFWygEWXFlTaJAVVVUYt/3XyHAofAwuGAqUGvuc?=
- =?us-ascii?Q?DX4ysHjX3CY6R1iv6asL+6lqONTSN+0F7AlgWXaZ5kHE2BfRv/ZWmef35Tca?=
- =?us-ascii?Q?VOUJdsL4kn17syV3nyWerswEbatAcCHaVwJ8mAA9LJj8L9Z+tzDhH6etEJr8?=
- =?us-ascii?Q?7nZrH1oO2wPTRvlkpOZUih+b6fL+o39ITfnS96xmcskyAKbPo+Mlw4N9HZsN?=
- =?us-ascii?Q?yoYCjLb3oFnKMZtQ9mFivvTUAiE+yFMiIfhYIPg6hgEyCRidZQVeqWqogHE/?=
- =?us-ascii?Q?zFarzlJ8dmeyFBh/M7UqvHg9Dvgq8vdd2slhZNvVfA=3D=3D?=
+	=?us-ascii?Q?svK/Gb5H6l/sR7wGSgXZeOW40wJsfPMm1PilPtk8Mutwxeyt1FOtoqsHb9VS?=
+ =?us-ascii?Q?/M3/xH3g3KZM3DPCZFGFppA1QqFGSTo8jsQYTKh+vxVH9OtItMkW/CFD+6Sz?=
+ =?us-ascii?Q?uJnGU/CC3yPsDz4BKAEh+sOa13UJG9lo2I6YyDG6OdyZl5CsWy0oZDO0b6zX?=
+ =?us-ascii?Q?+ORnJB/eGqazB3Kagzl4X+xLWjw/WvqwpPPyJttCgp+U8Ew6UEgFAstW2yRg?=
+ =?us-ascii?Q?PxdEqP/OzIaFNQOpYq6uwl5+j/7WQivdEub8vbfBrCQ5E2sGYR9wfmKrjlt0?=
+ =?us-ascii?Q?O8tvGYa4xal8tE5F+uEiPKdvmBHjpunuS9TEn1TdgVMb/5q5x2CU6gMc6zCL?=
+ =?us-ascii?Q?lmzXrseWf6QUipeXLH1LFeB/cR4PufgWa3mgfcseTDmIrpd9NMPwPUzwJmSq?=
+ =?us-ascii?Q?U4hnVC/zeOsnXTPAHraQw/KqnavYjlTyV/wCFuGQpgiYmBPUNZdaEADkl/hY?=
+ =?us-ascii?Q?zCaO3cl6V5Mzkl2ActAvhjfGwlE07e5iiuoMFjN7U3FpvTvTYgwUB3ZHsGCM?=
+ =?us-ascii?Q?5lz0gvFA9EL8GRcitBE+UmVV3pf2Idm+V/uGG+tWA4hyLDC/PgB8xrcdLKc/?=
+ =?us-ascii?Q?kUxSKQfHcDO5uy29ccSAumfJ3nXwXu2sAg373ZiN/SoqMW4Xm+agwLodIB5d?=
+ =?us-ascii?Q?BYir2qBgGEgTBaM7BZgX4Owkt8WNOX2S5WGgTqu/6+OK9qhhIXf2EpXKiz0G?=
+ =?us-ascii?Q?im1QYluFL7ih08CovzwA7yluMP24eJehWjhE3lMwkOjoi7ujVCJWHd7nJaUh?=
+ =?us-ascii?Q?l3CNFOfuUP47MvtqHwlyD2YeRr5a+bNH6yfNMIX8TGWWZLFDINEHThH6PoJO?=
+ =?us-ascii?Q?03BdQf0pZcUsmSKx0RzDzzQSoBL+sHDNf6tHhF0P9jQGp4J0lngoR/L0NWXP?=
+ =?us-ascii?Q?uqiC8dNaL7twRRa6/QSDAoAaFWLZ6xn7T/M0tg+4ENJ6bWIEszatYJOcf2me?=
+ =?us-ascii?Q?3IYfEZrAiA541qXr1gzEFYVxosuRyvWyZ+TfJkirflHhnFsTBiaMZm/QFpwa?=
+ =?us-ascii?Q?eBHEMXhFNxxlwB9KMUuSNuIa6ad8sVVh4vndiAxCihhlvBsDMTONf0NoBXdU?=
+ =?us-ascii?Q?vVcijXAOZuTwbESjaEXGZW+6VFQeoeSFyq4+7r26BastOtdKL/rGkTzc/0wk?=
+ =?us-ascii?Q?6WmXo5fN3gHqFYd0oT4mslL/j/BTEz92bOZmmEWt34kEB3Gq9xjiE6XSjwKv?=
+ =?us-ascii?Q?J1FMq7qeja3KWAv3LTn3BwKaNlT/xUsDCgurftU9mNNziT9Ov0iJZDWjccYR?=
+ =?us-ascii?Q?eeHKGViFvaipc8Onn2AiNDpCZzGaelnyDkr1AXxcqOdQXUaH+gYkVrRNB94F?=
+ =?us-ascii?Q?mztUT8u/DC3/OKnoWoxeM2Pm511zxNerTRHzxtTCeUVOhQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR01MB6228.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(52116014)(376014)(7416014)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?kaO70DfQImsW4PET/UmAHL0WVNnqqZ5NLYv1arJK9JDzcFX5aqpY7YARn1UG?=
- =?us-ascii?Q?CMle9gjGUUypoQ0m4UZYxSUZcz7XFV2SyPktstSkpZXTbALITRqpZ2eDxSak?=
- =?us-ascii?Q?CLv+tEazpbTtb+df7v9qLMiSaqFOI9B9eqN681dVHzRJ/bbOGW5WR63TuJnD?=
- =?us-ascii?Q?BEGPbKT+9IIy05GkaQ3FVR8k0cMNs+qiuqXq5o8EpFzZHhERnNC6Y37tiqA/?=
- =?us-ascii?Q?GkFhQ6fi5k8a2S3DcCf4qmILS9+jkhqCMO3o5UZBjm8gQz55nxhVH6K3SZtL?=
- =?us-ascii?Q?B/e02DrjJi25JKP+J9MrdWUEqbq5ODZUCgWcwACayDlVjqTmnGs/0I1/CoE+?=
- =?us-ascii?Q?uSGKUL5X6kB5eeoRPfkpURAPtFEZQNKXA9KcGMLzC+BmUhxqfkuWo1HPdHqU?=
- =?us-ascii?Q?fTb0Le3L0OjTQI9Xur61EEtYy+iYP8bXORP20zC1E768xzW0JkHy5OqYDogm?=
- =?us-ascii?Q?NcdxCr7yvtdxOOd7kDJZmDWWZSrVOgQz2EBb2Kq3BpSZttiiBxYrioK5EKP0?=
- =?us-ascii?Q?s3e6/KnZ7C6uzVO8d7u0k2pKZEmKfSFWRGm3tAVvdU3xCJxMus5a+6buOLAN?=
- =?us-ascii?Q?cVY3OOlUGMLCUo5xTQbE9OK/yfv8UkzTgWvFQuy7fksLhVE1m+qvlIzYrFBa?=
- =?us-ascii?Q?9/u2O7lSEd3JrlypOI50tSG9lYopfqr6X+qOq1tj0UVvtJGGvz/GBR4zpHPi?=
- =?us-ascii?Q?Azdpv3KKRMMjNDrdOLVWMboSFuAbSaIABXoS9PaQY0uB0a0Ev61//DsnzRYZ?=
- =?us-ascii?Q?gXQW7CUUGTUs4zJWhIJxHJVy7RpQrzNyVj7aPCEomr36PreBo9xxl24J06O9?=
- =?us-ascii?Q?9ThkLND+UEWiEAKC5ZHRmktBhgxxYqOt5JU7mXWIEcHwixcQKMwPTnD6EdOe?=
- =?us-ascii?Q?QjBOBkk4Umw4lYegq92sdpqEbI2vtSIyHT9E5S78w4O9crp3sMR2Vy7W3xZQ?=
- =?us-ascii?Q?SFNUrj5DIKRwiCwKIYR56D9s7+Q0f27SDoxq4ZraKwEtcrLwiqFCYZ8k1trT?=
- =?us-ascii?Q?Id40NPymRBDKZQGuZ/iz9Cr7MFsoiIcMD6uFyDg15aaKVsZWbTVxuW5aBx3L?=
- =?us-ascii?Q?OMXMTTQOu/O8mO0tKhTJ3nlVnzUOwjvP7kLgXWIG95Zr7tfopoOXqutkCGL1?=
- =?us-ascii?Q?Q0N8EXCYuy6++6P9tCCis6kdDT1H3Gxm4Jj6vGVbBK5SQgZBK5VPAHDcTgkg?=
- =?us-ascii?Q?Nf1VWKduvlrnzI5YGt05ANiKX3oilcDXtf6PSu8ZIbg6sDo28lBqMqOO+Ane?=
- =?us-ascii?Q?sEtxDtnPGXUqhkHKzex+Req7HDFYwg3HUNYEMLnfK6k8ckFgnfEsOODmyLFp?=
- =?us-ascii?Q?p7Ly6fBw4lGgP7yc0Owd27ZwWxkj7TAFX+YrqZOpSTXfmqEperuaFSv2Q6av?=
- =?us-ascii?Q?uIyRj8z3xWTLUxgQEAqbU12VGV4Z5jPk+l3rlfJS/4q1CPY4yVV93PpioBcE?=
- =?us-ascii?Q?B9x1mwlJ2ZY9Tc8Vlq3ulhQZ9DOVsGbSBxpqhw7UA6297yjIMqanmifRHsS9?=
- =?us-ascii?Q?GFIdsCsdT7XbYq5eBV5hKyQRDV153r7IQtGVYBk7aJfrfRtAvw2yBAvZopkX?=
- =?us-ascii?Q?cK+Tx1L4pqucG5B/+PClxpvL5jzTxJm14oJT/5vY?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19523878-35c5-4ed6-a54f-08dcedefb92f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+	=?us-ascii?Q?iBoi9KrIVP+30P9CvLrTTqz+ypoCw+11+TZaHWYhrMLRb7VjKapCcuNZgvF+?=
+ =?us-ascii?Q?xjB2+Jor/CY96lsV6VDebOfGDSWJO5Nd33/ahR2ub6yZPhjmP7diaChFH/jr?=
+ =?us-ascii?Q?UKYp0eMedOIwQXH5u3CxETm7HxbW4NsDuvDP+r330lX4QUA4ZeUJ/1G9Rsxw?=
+ =?us-ascii?Q?MqBSQ6phb2Y+S0dUxGy2Gm8nam6GPxkJlEiZlD2NSUKfaRHGOUwEjytAbUFY?=
+ =?us-ascii?Q?ZhpLyWwmdOyDyX1HT3DIRu/q8zZxxcB+TxI0+LERuuDzmtSw8zAe8BbVzCEv?=
+ =?us-ascii?Q?za2P2dQLd9eXE8MFYFsceOw22xs2QC8chI4/Z/6h5pb1AUx3OijbOFL1x1Vr?=
+ =?us-ascii?Q?HFOqLqvndcM0EBLJrQ9q40dITd5ru6Pt89drL3QL7PzYC9FFI7tsa6Fr3mOf?=
+ =?us-ascii?Q?ZvU92QRfrAk48Ba5e0BPCCQEuOww5PSxpooog1odxStRTDBcNd51rP/Q3Pvk?=
+ =?us-ascii?Q?qpjN/IqwK4FDMreIJIU6wCoNhLCwSaZ2mvgz9s4sXd6+ADrx6kRZZWD2+vbd?=
+ =?us-ascii?Q?UNXddnRZTNngW5BUmbTiDnOoQdeOGNk6ucGR9zPBgDuQZREQuw0WGg3wlbhz?=
+ =?us-ascii?Q?3P2S9fVPCJQ0g9kxaz0ztpDaCv6edo5Kt4Qj3+3fvsAm3XKwnbNgNfp3mlaa?=
+ =?us-ascii?Q?cg25pO4VCB444gT7toMM+sNFCDK5dpBBam6X4Go6kgixbljSOykwQx7CCVJw?=
+ =?us-ascii?Q?IIHAJ48O7JK8oLPglDXaLL7szAkY/Xs25SiDiRi2hzXC30U1rOePRXLx1ZxW?=
+ =?us-ascii?Q?sikozlPSoR3vAjRBIvOqPCv67e3fXShFptET98LFfU+l6UkhOiOLbbfRY/5h?=
+ =?us-ascii?Q?5APO+p3UwjI9phDDdUeQNqMjGKLAcYR3yk/9FchDhPYD17Xg5y3XawftEgiC?=
+ =?us-ascii?Q?0Dl8Dig/3pdFcbSnFqkDNqW5IfaBR/Eqm/ZmQvNOKd0THdtzxMak9mhUm2uq?=
+ =?us-ascii?Q?LqcUtj+pdEvTyyh9B/jqhClvzyvK416pfgYX0znIO/P1HiRO68phU71CH56d?=
+ =?us-ascii?Q?2/D/J0GGhqUNd7LvC3PCeJyvPcUtrvI5AB+6JITXo5Z2br8KIfwnKHqnTXjP?=
+ =?us-ascii?Q?BBF5UqmT1rZ3bj1phGPVJ44Q0HPCIsEtJcu3bnAqbFa3Rn2bibr+XvXiy2pj?=
+ =?us-ascii?Q?/hLLvb1crM9DC6QxjFBXWJNFsJTsrE2IPOqVcH/HhIZeg3H/9E45poog46qp?=
+ =?us-ascii?Q?i020NE0YX3iaPmycx30GlX3dceibmJ7ZSZU95qCRj3oaSaTY4xg3EVB82jjb?=
+ =?us-ascii?Q?RyUPDGPpeaS3ue6XsDp5Ped4B40sBlDbEhPRZl3/bNuKmRjtrHzqmFer8Z59?=
+ =?us-ascii?Q?4KI0bMmLLItj4GyyuWPgS2LK6HxFIMcYH08XMRt5tR6Cv1l2kkAhyZkErdml?=
+ =?us-ascii?Q?f+zx08t3pkFT6Cf+YU2itEQwMVX3zednRXd9u1aeDUxe0TqXKTx8ereZE2Aq?=
+ =?us-ascii?Q?hpQZe4KHQ60b7qpfHnmJPm2uObz9JPXGtDlf0Lr9cl07d870i7WANvgYPx47?=
+ =?us-ascii?Q?eamUwV/DK1lHecGMkWq0XAj2UbPx1NcsTZo5RmkIKtWOVz2rILewB76jc5eQ?=
+ =?us-ascii?Q?X9o3P1oOLXD7ST03XZ7sYwRqdb1qiLwfXGFDjb1T8nkRTLa31hR9Zay470tV?=
+ =?us-ascii?Q?NhyYntKMUG3PHaS61Cnvz7Y=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36b9d30e-3ad5-49bb-f109-08dcee1ce197
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR01MB6228.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 14:35:04.0581
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 19:58:19.2604
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L1nsgeUEr/mWtTnmENm2P3Sl/0rXbKHL6ixrLXidQFpwS4nplwNBjLggH4ygMjjQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8244
+X-MS-Exchange-CrossTenant-UserPrincipalName: xkbpZurQ2jaxq0ArM53iME24JXbIwI4AN5e1bam+r8wL6zuIeFWqa1RPGKz4bOcqEKPYRXo2pw88V1yrY+OJtg9emDtwWziyqlKgpD62EHCnpF0YQqueXtDK9UIoaEed
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR01MB8551
 
---=_MailMate_3B303FDF-2AEE-4550-9D2F-014729012A86_=
-Content-Type: text/plain
+Fix a shift-out-of-bounds bug reported by UBSAN when running
+VM with MTE enabled host kernel.
 
-On 16 Oct 2024, at 10:31, Ryan Roberts wrote:
+UBSAN: shift-out-of-bounds in arch/arm64/kvm/sys_regs.c:1988:14
+shift exponent 33 is too large for 32-bit type 'int'
+CPU: 26 UID: 0 PID: 7629 Comm: qemu-kvm Not tainted 6.12.0-rc2 #34
+Hardware name: IEI NF5280R7/Mitchell MB, BIOS 00.00. 2024-10-12 09:28:54 10/14/2024
+Call trace:
+ dump_backtrace+0xa0/0x128
+ show_stack+0x20/0x38
+ dump_stack_lvl+0x74/0x90
+ dump_stack+0x18/0x28
+ __ubsan_handle_shift_out_of_bounds+0xf8/0x1e0
+ reset_clidr+0x10c/0x1c8
+ kvm_reset_sys_regs+0x50/0x1c8
+ kvm_reset_vcpu+0xec/0x2b0
+ __kvm_vcpu_set_target+0x84/0x158
+ kvm_vcpu_set_target+0x138/0x168
+ kvm_arch_vcpu_ioctl_vcpu_init+0x40/0x2b0
+ kvm_arch_vcpu_ioctl+0x28c/0x4b8
+ kvm_vcpu_ioctl+0x4bc/0x7a8
+ __arm64_sys_ioctl+0xb4/0x100
+ invoke_syscall+0x70/0x100
+ el0_svc_common.constprop.0+0x48/0xf0
+ do_el0_svc+0x24/0x38
+ el0_svc+0x3c/0x158
+ el0t_64_sync_handler+0x120/0x130
+ el0t_64_sync+0x194/0x198
 
-> On 16/10/2024 15:21, Zi Yan wrote:
->> On 16 Oct 2024, at 4:14, Ryan Roberts wrote:
->>
->>> On 15/10/2024 18:42, Zi Yan wrote:
->>>> On 14 Oct 2024, at 6:59, Ryan Roberts wrote:
->>>>
->>>>> Introduce a new Kconfig, ARM64_BOOT_TIME_PAGE_SIZE, which can be
->>>>> selected instead of a page size. When selected, the resulting kernel's
->>>>> page size can be configured at boot via the command line.
->>>>>
->>>>> For now, boot-time page size kernels are limited to 48-bit VA, since
->>>>> more work is required to support LPA2. Additionally MMAP_RND_BITS and
->>>>> SECTION_SIZE_BITS are configured for the worst case (64K pages). Future
->>>>> work could be implemented to be able to configure these at boot time for
->>>>> optimial page size-specific values.
->>>>>
->>>>> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
->>>>> ---
->>>>
->>>> <snip>
->>>>
->>>>>
->>>>> @@ -1588,9 +1601,10 @@ config XEN
->>>>>  # 4K  |       27          |      12      |       15             |         10              |
->>>>>  # 16K |       27          |      14      |       13             |         11              |
->>>>>  # 64K |       29          |      16      |       13             |         13              |
->>>>> +# BOOT|       29          |    16 (max)  |       13             |         13              |
->>>>>  config ARCH_FORCE_MAX_ORDER
->>>>>  	int
->>>>> -	default "13" if ARM64_64K_PAGES
->>>>> +	default "13" if ARM64_64K_PAGES || ARM64_BOOT_TIME_PAGE_SIZE
->>>>>  	default "11" if ARM64_16K_PAGES
->>>>>  	default "10"
->>>>>  	help
->>>>
->>>> So boot-time page size kernel always has the highest MAX_PAGE_ORDER, which
->>>> means the section size increases for 4KB and 16KB page sizes. Any downside
->>>> for this?
->>>
->>> I guess there is some cost to the buddy when MAX_PAGE_ORDER is larger than it
->>> needs to be - I expect you can explain those details much better than I can. I'm
->>> just setting it to the worst case for now as it was the easiest solution for the
->>> initial series.
->>
->> From my past experience (around 5.19), the perf impact (using vm-scalability)
->> seems very small due to MAX_PAGE_ORDER increases [1] (I made MAX_PAGE_ORDER
->> a boot time variable and increased it to 20 for my 1GB THP experiments).
->>
->> Larger MAX_PAGE_ORDER means larger section size and larger mem_block size,
->> so the granularity of memory hotplug also increases. In this case:
->> 1. ARM64 4KB: mem_block size increases from 4MB to 32MB,
->> 2. ARM64 16KB: mem_block size increases from 32MB to 128MB,
->> 3. ARM64 64KB: mem_block size keeps the same, 512MB.
->>
->> DavidH was concerned about large mem_block size before. He might have some
->> opinion on this.
->>
->>
->>>
->>>>
->>>> Is there any plan (not in this patchset) to support boot-time MAX_PAGE_ORDER
->>>> to keep section size the same?
->>>
->>> Yes absolutely. I should have documented MAX_PAGE_ORDER in the commit log along
->>> with the comments for MMAP_RND_BITS and SECTION_SIZE_BITS - that was an
->>> oversight and I'll fix it in the next version. I plan to look at making all 3
->>> values boot-time configurable in future (although I have no idea at this point
->>> how involved that will be).
->>
->> In [1], I tried to make MAX_PAGE_ORDER a boot time variable,
->> but for a different purpose, allocating 1GB THP. I needed some additional
->> changes in my patchset, since I assumed MAX_PAGE_ORDER can go beyond
->> section size, which makes things a little bit complicated. For your case,
->> I assume you are not planning to make MAX_PAGE_ORDER bigger than section
->> size, then I should be able to revive my patchset with fewer changes.
->
-> Yes correct; no need to make it bigger than section size. Thanks for the patch,
-> I'll certainly use it as a base when I get there or if you're interested in
-> doing it then even better ;-)
->
-> But I don't think this is urgent. For now, boot-time page size is a new Kconfig
-> for arm64. It still supports the compile-time page size options. So having a
-> larger MAX_PAGE_ORDER than strictly necessary doesn't represent a regression,
-> just a limitation of boot-time page size config - something we can optimize later.
+Fixes: 7af0c2534f4c ("KVM: arm64: Normalize cache configuration")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ilkka Koskinen <ilkka@os.amperecomputing.com>
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sure. I will revisit my boot time MAX_PAGE_ORDER patchset when this patchset
-settles. Glad to help. :)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 375052d8cd22..665c576faba3 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1994,7 +1994,7 @@ static u64 reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	 * one cache line.
+ 	 */
+ 	if (kvm_has_mte(vcpu->kvm))
+-		clidr |= 2 << CLIDR_TTYPE_SHIFT(loc);
++		clidr |= 2UL << CLIDR_TTYPE_SHIFT(loc);
+ 
+ 	__vcpu_sys_reg(vcpu, r->reg) = clidr;
+ 
+-- 
+2.40.1
 
->
->>
->> In terms of SECTION_SIZE_BITS, why do you want to make it a boot time variable?
->> Since it decides the minimum memory hotplug size, I assume we should keep
->> it unchanged or as small as possible to make virtual machine memory usage
->> efficient.
->
-> When I say "boot-time variable" I just mean something that the arch can
-> configure at boot based on the selected page size. I'm not proposing to allow
-> the user to set it via the command line. That means we need to rid the code of
-> any assumptions that it is compile time constant (e.g. c preprocessor usage of
-> the value, etc). The same goes for MAX_PAGE_ORDER and the MMAP_RND_BITS stuff.
->
-
-Got it.
-
->> [1] https://lore.kernel.org/linux-mm/20220811231643.1012912-1-zi.yan@sent.com/
-
-
-Best Regards,
-Yan, Zi
-
---=_MailMate_3B303FDF-2AEE-4550-9D2F-014729012A86_=
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename=signature.asc
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQJDBAEBCgAtFiEEh7yFAW3gwjwQ4C9anbJR82th+ooFAmcPzxUPHHppeUBudmlk
-aWEuY29tAAoJEJ2yUfNrYfqKDcsP/0FwZafyBDetn+/HtBMm63Vi2W+LZ0OOM0Tx
-wOhIy79WDEsDstv7N3ePwLUKSjR4aL3mxVxMpPHyZwjBV9lRravBXqvyevkMOmgS
-OlY0Lhj6hGDAx3lwp8buRImXnwhnkb+kyyaYhYi+4KnjLLvswIjZ1puAwzIvllnz
-pq0Loz2g9FkVLtohE4gAoQt6XBgolsuqb9nfDRL/erAfp3wkMC3RsrbigxjZ2Bdd
-vRvyIizup0DLFhJa1sBxNdLy6Rl+kZ6JSYNaYFSW+im3zKYKnl/Gp+bKfLqM2Chj
-1mGrntGETpZawzRc/xfUfmiLSkkni7uK5wjnpXoKH9HuOIDMj4PA/Zd6lhZMtKj0
-GKxElckfvGAP10jbAFQc8zHgDfLgL0IZSppzG5Zg6AND+2JZwmLxsduSrIUcXMfW
-EHIL6vhunUq9ScW0MDGQeN4FFHiLoy4AiydV8LbVY1RlNZvQaK2OAAzQEnYD+Y1x
-5qmXTf1iw0TirU5+95awoogYnvktNzheKfLBXzuIHjpaKbVQ6sR22UZgsWkI+r2I
-godwyL7mzgg9KWFUUIUrpUlnF0oEa2aBaMOTqFw8JdFTYAeKcq8dKmmhhRZaQ4zk
-0pWH53yW54Gm+h8zveIsAYXTz/fGwWQqAVn/Xec85e2DZTj/KfHeTd1qnyjIk+cz
-wQa95b/P
-=5CIG
------END PGP SIGNATURE-----
-
---=_MailMate_3B303FDF-2AEE-4550-9D2F-014729012A86_=--
