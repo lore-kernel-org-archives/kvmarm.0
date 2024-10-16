@@ -1,247 +1,264 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21963207206;
-	Wed, 16 Oct 2024 13:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729087044; cv=none; b=No7hWMHsFWE84+idrgzYhx344RhSYt2JDZ19mgh5NX2whgeCThmkR6hX2vYRDUk7I+6HLV1HDLJgOziPzwgJpgPIheeTPWtNlMh2N5e+IQ5PSqklNHRF1oBaN5rCpCb6g1Et0oeFcEr/Lo3nXG27+Tc13UHbD5JiPiNeys+2Q/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729087044; c=relaxed/simple;
-	bh=MUBcKDVt3aHS2SRtCQBy5K4t6BpEf4pxDonW1rOFcDU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c9WIvJf4JP6PCDFhjZY64jkF+hCTJUzdDYCI19rQAmRWd6XDWbFInperHAVybsmGWAsvPdJZnwLtLziFUgfAeWF+w+bq3FhPB4McZKRN1NlHboHeMqIBiWJMMOpzx0Qlw9YP08zdkKmB3cEG8nMH8DhaEDF6LevJkeaMctZZpLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Omqo1uja; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1009B13E40F
+	for <kvmarm@lists.linux.dev>; Wed, 16 Oct 2024 14:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729088490; cv=fail; b=QecuuFzr+B+WFk2D69Cm9kk2YcpwjG+PYcr/cZfBys9bgo6YGeRBXGXQAL6UdBvEfal5x0S08pRT4rQMIQYnwPJUtZ+cI9mmU99YXah/Diy2/HixPWNksQNXBM/V1EK7xsDppbsmoV3H58UGmYabm5TnVZI0AwTe+znS5G0+cUg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729088490; c=relaxed/simple;
+	bh=GBMtQ3Fdh6sp79slgX5cBNZ8JpvCuoP69/jH4ptIq7I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=B+X9EY+kOw8c3tJk7lmumY9y37lQ5lJ7doFNVCe9+sUpRdDmmN4FeEq8343gluBwlXzigc70WOavBxaS8+cxWae0FLyMbnpWc5B56SgM9bYUIKW4Ebpz8M7nZANvw2UKMGtlINXWcMJNWIsrpcu1IXtZEeFR+DTFcIyGw8nx/bk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZklIxHf/; arc=fail smtp.client-ip=40.107.94.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Omqo1uja"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC71C4CEC5;
-	Wed, 16 Oct 2024 13:57:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729087043;
-	bh=MUBcKDVt3aHS2SRtCQBy5K4t6BpEf4pxDonW1rOFcDU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Omqo1ujaHy/2qjgDGnZDc+DxU04r1CETNcFK739Rb4vc7E0r7pq2bAxelzoH5BbVD
-	 kxSmoVyx3n8HQZopglcR++ElI4x/AibhXh3154ydktYzaBJElStg3EsRgIYrxjTKWX
-	 yfyxClgJbISs9X16MEQ0hg1X2ftRqsoebpMxM9oSP7TewHdG5bikcB38BbxfOHXLnh
-	 p/eWwqwTJ4OmMUy/h7CMVvbkJ6jbRMo3U8RUT8uMYcEqm1vcoxOzZ9xAlQmgbZ/jQt
-	 IJPxNz8SRnZuK4fmZge3Cek8z5OlYte+SDLPwtMBThbLy28YmDvceO73UsYZEUmeQ+
-	 WDIite5EO4aAw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t14Wf-0046X6-8M;
-	Wed, 16 Oct 2024 14:57:21 +0100
-Date: Wed, 16 Oct 2024 14:57:20 +0100
-Message-ID: <86y12o40cf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 07/36] KVM: arm64: nv: Save/Restore vEL2 sysregs
-In-Reply-To: <Zw-70Uocs5JvXz7e@raptor>
-References: <20241009190019.3222687-1-maz@kernel.org>
-	<20241009190019.3222687-8-maz@kernel.org>
-	<Zw-70Uocs5JvXz7e@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZklIxHf/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h29IE96nul1VhrRW79v32whG4F5C6FS1G1v2C5E0eOvuktCNnwFKkNss6arMSb0e6zhVNiHvGV965KDlc6VBgM72djMJrGoGOYamoq+7uuDzZjQBIDfTWy+3UM8fY5TptgjnVpATfakpydTnKblcZCBG0q5RYCCTvEUc4SpoXK/PCY6xzK+q6jyJzxUr2USj939sJMoa9cyxjoPDvLqhNB29hh72JMcDzHtc/VMj8mvgGBlpzl514c99IaF4R9OoadgqPG353vLVsGvNL2eIQ+ieaP3TZDZS8cI3Ku5H0iwRgBH0jxoB4H/e8SbWZpChlmvotRoQJf5cGfpQ7ML49g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zk0BP6yrSFYB3xtvTxZUcxiHOjcjKmeh2pNLtLMzCPU=;
+ b=tRgtvW2YQEwr+0wqnHW9+k7870npd8Bo5BlQnhtK3DjKQAYiSKPeu/pUe6Kyg7e+4xsmK54lWjOKYt4o/zKvn1hOs5PQmbSkiiesGE2ysAFkb0z66+NBXcO7w/iCTRkxtDCuyu7ubQDzq6wd0J4oDznC7u9yBE6rVGHaPsfBy9kjxz3fZoKwE7B/GcT9m9U5vhGONfU2ycu8Gt3+6zLqDWYzjECT6TlEM/KTpFCDztmwU/NM62sGToNAdNj+bSiZSlmx53oVzhJEJRodd5jjBs6d9VmRITSyF/XvAPJ6B5pL8ivO+ec6Xsx6+wEX5YJT3cig8hsmeQD+Mn3CAx/f8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zk0BP6yrSFYB3xtvTxZUcxiHOjcjKmeh2pNLtLMzCPU=;
+ b=ZklIxHf/AgaY/Q1xfXeyqqx59WSR6gGlJQfF5WaCNy/8BatrvbYf0xaDEl8U+ePHPcrvFbSD7B93xRoqWBTmxazlrAUW0Zq0S6VujU8Pt8b+r5Q2bxfh7qfA+IrsGJtAzuKpfWTV8NY1dy/bKluovdvQgSd5egjNJJD6+2PQ7WnUJgzriqCH+kTsZfIqjez3ejSv3j+0QjH1CZwcQPwFRe8u7J06tmBk8OzKnhrZ3KodbUGNZmaSpqEbqOFkjTAFVwDVYXACVhblsljW4yNKZ7dxRNiaQ48pjgp2PCrK6UjDqdV3uoEaJU8ggPp2N3MqFG0kjd2f96MIZQX9jRJuxA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
+ IA1PR12MB8237.namprd12.prod.outlook.com (2603:10b6:208:3f3::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.26; Wed, 16 Oct
+ 2024 14:21:23 +0000
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a%7]) with mapi id 15.20.8048.020; Wed, 16 Oct 2024
+ 14:21:23 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: Ryan Roberts <ryan.roberts@arm.com>, David Hildenbrand <david@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Greg Marsden <greg.marsden@oracle.com>, Ivan Ivanov <ivan.ivanov@suse.com>,
+ Kalesh Singh <kaleshsingh@google.com>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Matthias Brugger <mbrugger@suse.com>,
+ Miroslav Benes <mbenes@suse.cz>, Oliver Upton <oliver.upton@linux.dev>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 57/57] arm64: Enable boot-time page size selection
+Date: Wed, 16 Oct 2024 10:21:18 -0400
+X-Mailer: MailMate (1.14r6065)
+Message-ID: <6C0A53C0-C332-46B3-A84A-3232E9D71003@nvidia.com>
+In-Reply-To: <daecf1d1-04c7-4513-86db-397c2ef6f768@arm.com>
+References: <20241014105514.3206191-1-ryan.roberts@arm.com>
+ <20241014105912.3207374-1-ryan.roberts@arm.com>
+ <20241014105912.3207374-57-ryan.roberts@arm.com>
+ <CD2DC486-F4B1-4043-82BC-0CB2AA513A99@nvidia.com>
+ <daecf1d1-04c7-4513-86db-397c2ef6f768@arm.com>
+Content-Type: multipart/signed;
+ boundary="=_MailMate_8B77AFF2-B39C-4BA1-B5FB-D7051CA6DD16_=";
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+X-ClientProxiedBy: MN2PR22CA0005.namprd22.prod.outlook.com
+ (2603:10b6:208:238::10) To DS7PR12MB9473.namprd12.prod.outlook.com
+ (2603:10b6:8:252::5)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|IA1PR12MB8237:EE_
+X-MS-Office365-Filtering-Correlation-Id: 066f0854-90db-4b43-f1c8-08dcededcfdb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?GdykYoxz5oaPLPE4XoEdEjd+IRFedQHgXPHDTIjRZIBjF5CnCtxSX1Yjkv8M?=
+ =?us-ascii?Q?Mmdz5yi7XspPv9KiKRnztmRjJNeL7I9yzX9xNP9eS2ovy33epcBRrPEtuRzl?=
+ =?us-ascii?Q?Ez4XTKf0RoJ82PRCz3WR/ycFR1SJ9hkMH9mR+PcVgvcElhUC+1O7qni8W6ql?=
+ =?us-ascii?Q?++cAVefzzh1mIW+jHD+VQyLGjAdJo785bdcKVS7S0kd2Uka+lY4pRCDNHJhH?=
+ =?us-ascii?Q?ODH4Re2ihnLiZUpAqfXCdLNMJR04osRH0KmdPpDpqkx0lVGI2cmI2/vjFS+X?=
+ =?us-ascii?Q?v9yp6Xd3gqi8PS/Ugzwz4IWXQsxbEKl2F6cVp08tAcGcg/FdU3DrfedmM3XS?=
+ =?us-ascii?Q?2CuVK8zSVMWC3+JfB75X8Fyh5WF9fL2zEAv7igv683PXWhQ3qsfo5VIxOCtO?=
+ =?us-ascii?Q?sHD9iXfpSiFErzJruCxZ2j6ylOqe0EnHLsQv6VJcoNnFwR78PHoYWzqvrRrT?=
+ =?us-ascii?Q?uT1Vf7tQnRpSSllaCc5DdO/tbLKRUuPa8bl+Xljafy9FEREU55sWiV1oLdMI?=
+ =?us-ascii?Q?SfaMfp/x10St34xwF1s3iOVrCPPrjRuCPDr8pwKlo3YnI0KD3oY8yRBLw6LH?=
+ =?us-ascii?Q?Rp5kaYLj2yGLa4H0TnPlqVav5WJq80aJcxgqn9Blgjg5MbHzWwIe2fdWOc20?=
+ =?us-ascii?Q?UIXzfT0/Z1BfdnGwj43gMfSNYupVx39THfhGfcyJH3k+Qrm7Vd9FP0m7voCn?=
+ =?us-ascii?Q?Qhj/V5zGY3vWjFM9riQ1LaJkLCD1NN2zf7fIM5epRW3xdEIaLEQ7mgumhK7r?=
+ =?us-ascii?Q?+JZiOQxY36yvg9OgOdRG8q1TxfAHTg6e9WCKji+UI4w7rez1nr48fdsFMQ/V?=
+ =?us-ascii?Q?CUSS1fDXLvUkUwPhWLZCLfEhUP2oa79zLdyesbkWmSsCwaGbfhUTU4/mdHgx?=
+ =?us-ascii?Q?JxjHl9Z97UY45/2+5HYzFk1KKYmP3+yeSZgv5BNLTRFBFScbHd0c7Pa0tPKd?=
+ =?us-ascii?Q?3eH1zRZPAgPgkqu8NKxFhoALRatINHVVbzuzbmDHrvmsA0qEPplUFwkyh4nB?=
+ =?us-ascii?Q?Hq3XOVBeBWro9QpUM+x9Wj4whIFk4QlJBQbsfwzxD85nC8ZNvdRAbXvpCJZA?=
+ =?us-ascii?Q?Npe8TWn10gPuD/f4LViMlc3DEfZKtBcDJEkPs1co/9VLIHkzqZTOp8HjykgI?=
+ =?us-ascii?Q?9TT8yK7USQJXzX/6+7aTVbrwIRDt/enct1QvHjlErrOVhBIMNVusTwpGMKvc?=
+ =?us-ascii?Q?48B/a5V2xvHufP7IQrxsml+9m8WuIrs8MhP+Nv95cmWPwyvpL60kFvgBwclX?=
+ =?us-ascii?Q?Emr0JvYrstnO9vIloRWDFt9e3bnfjUu5YbLPOjikPg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?jEiZIm9nlElmczEEwRdX4J7e1/xjZ9vTlMgMOQ1h5cC8VTHihyGsLaM/Edq2?=
+ =?us-ascii?Q?5LfkPb2mBx21DvdVHxGzPbeZPEbkrfNisuBRKMgraxHWkEUmjL2eky2SIgE1?=
+ =?us-ascii?Q?M1+bxu5AgVjmlDm1pTWWAhujs6NQ6tF4NKYMCkcvwtIfSjah10frQPnpj985?=
+ =?us-ascii?Q?mit2Xdo2tFUXUF74o2d5E0BLtB7rmkxUq8NAONiWwI4DMHudmWmR8P/t+yg0?=
+ =?us-ascii?Q?bxA6MnnvdGHiQj5PLUSIdL6DTFIdxSKShx+aRh2fKQuYEnfayCjMLmGmCgcE?=
+ =?us-ascii?Q?K1D2dO73GEA4jsJRlD3I8zzEPtxWM8uANFFN+FiA4CxQqAR1FtJa9bxB6wO0?=
+ =?us-ascii?Q?Xc7waySrvkb0pr20uk1UG7K2OsjqE9JrwNcflhJ4jC5gyo9YSZ9Wp4izfs/H?=
+ =?us-ascii?Q?k4DtVl+NbM89n6DxY8AnJQGR4ts8TvjKiljqe6LVWGscbcsytYgyprh9ygiG?=
+ =?us-ascii?Q?5sWAV10CTyHWkkblzXvYX8dZYJcf9FVM2bYPH/H/hPmQtqZCEOPWQtZdaIwp?=
+ =?us-ascii?Q?ZgDIX5jhM1OOvlwXZibGghbtzeKih7DnDJ9h0gksE4PbtNhEh1+X4Ewwqcl4?=
+ =?us-ascii?Q?D8FgqgSSlrIv6WQLgn6VsHJI9m7oZKxK3k0fGDo59i1vaeXPThDll91I6bFO?=
+ =?us-ascii?Q?Mu3x/b0w8OsZ7f3uSIrCAEeP+dLhDu3duz7wfzeUI9bJA7/bh69taITRj0pH?=
+ =?us-ascii?Q?LnI7Ifi0TKj0EnBDBgKQn6lLoYs+Bq3lTGgEgfRVJPSBfIUvvpaY+ofpdW9v?=
+ =?us-ascii?Q?SfnY6CnwJDDBChdVpeJ85zvRm3uv0YOOOcrZjD6i/QiUfYC9SISzmCG3qmnn?=
+ =?us-ascii?Q?Q6xjd+csWUiEx0lI8R81Oyy93lGV5u7DGYczClvLCqNOj/hHSVblS3hgR+WM?=
+ =?us-ascii?Q?USvt9sLt72jFxy0qeiGEC05DGTb8YwsWDJzk/ru/LovkMCuOFBO3Tf/10WQe?=
+ =?us-ascii?Q?d5iimEk+99aM3hFU0/hOMEe/IsmFYnskTjoqfWaSlf36ab//lnjTyAHxtcGG?=
+ =?us-ascii?Q?qYHk4a0t/Cb/csk84yiODowm5UtGvMlualo0MgHKAofs8Efg4zhvfDPkwn4F?=
+ =?us-ascii?Q?RaC+uviabSc2p+0/WGM6LyXk1CDyRyl+dATsWBor4ubXb6o1Bmh7WJo0DhwW?=
+ =?us-ascii?Q?nG9tWDVBNTvhAr6eXxCmIUy/ekGP2P25ztpsmPRcHeJFvlM03iL/e4Ge/wLC?=
+ =?us-ascii?Q?+o+RgSVc00rdRzjEiVznwx+60r6E1gWRXxuXk6MB1lK//bGRosysk2WQZDYf?=
+ =?us-ascii?Q?yM7N7ozs8MHDqnzvfdQ4XtULmgjWuVlbJbO3UG1Er6Q63YI8jy11FPrqzk+n?=
+ =?us-ascii?Q?BIqdjU8/zSxudQN9hhZXx/hCAQEPYSSZB+VdlU31E0T+ILOrJGpuRH62J1+x?=
+ =?us-ascii?Q?ZMy0xqd+qML/8gFo4oLrkV5hoPcV55VRtNm5SkN+f/jO/L7wCzog0wBq/XNq?=
+ =?us-ascii?Q?TsDBgQZK2mW9C0kmnL+94ZWTHoFBh9D+T/FgJKnM/6VuFp0irnCVtiNBbHT3?=
+ =?us-ascii?Q?PwC/58kZi8bxblMcxbwQLJikcGmMdd2KMQjgDjAr7OmQWWxNNRZeHqkLQRKx?=
+ =?us-ascii?Q?8rB48bGHZX+SjRNulW1P3TGqhlpdsFdlBNIrnphQ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 066f0854-90db-4b43-f1c8-08dcededcfdb
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 14:21:23.1214
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rMsyJViJEG2XLx2kxjhdhHHeN7pZdIA9lHAGZFqy0l2dj7/82/p35yJ1cC/B0qlZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8237
 
-On Wed, 16 Oct 2024 14:12:49 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Wed, Oct 09, 2024 at 07:59:50PM +0100, Marc Zyngier wrote:
-> > Whenever we need to restore the guest's system registers to the CPU, we
-> > now need to take care of the EL2 system registers as well. Most of them
-> > are accessed via traps only, but some have an immediate effect and also
-> > a guest running in VHE mode would expect them to be accessible via their
-> > EL1 encoding, which we do not trap.
-> > 
-> > For vEL2 we write the virtual EL2 registers with an identical format directly
-> > into their EL1 counterpart, and translate the few registers that have a
-> > different format for the same effect on the execution when running a
-> > non-VHE guest guest hypervisor.
-> > 
-> > Based on an initial patch from Andre Przywara, rewritten many times
-> > since.
-> > 
-> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
-> >  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
-> >  arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 137 ++++++++++++++++++++-
-> >  3 files changed, 139 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > index 1579a3c08a36b..d67628d01bf5e 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > @@ -152,9 +152,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> >  	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-> >  }
-> >  
-> > -static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-> > +static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-> > +					      u64 mpidr)
-> >  {
-> > -	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-> > +	write_sysreg(mpidr,				vmpidr_el2);
-> >  
-> >  	if (has_vhe() ||
-> >  	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> > index 29305022bc048..dba101565de36 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> > @@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
-> >  
-> >  void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
-> >  {
-> > -	__sysreg_restore_el1_state(ctxt);
-> > +	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
-> >  	__sysreg_restore_common_state(ctxt);
-> >  	__sysreg_restore_user_state(ctxt);
-> >  	__sysreg_restore_el2_return_state(ctxt);
-> > diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > index e12bd7d6d2dce..e0df14ead2657 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > @@ -15,6 +15,108 @@
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_nested.h>
-> >  
-> > +static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/* These registers are common with EL1 */
-> > +	__vcpu_sys_reg(vcpu, PAR_EL1)	= read_sysreg(par_el1);
-> > +	__vcpu_sys_reg(vcpu, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-> > +
-> > +	__vcpu_sys_reg(vcpu, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
-> > +	__vcpu_sys_reg(vcpu, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
-> > +	__vcpu_sys_reg(vcpu, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
-> > +	__vcpu_sys_reg(vcpu, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
-> > +	__vcpu_sys_reg(vcpu, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
-> > +	__vcpu_sys_reg(vcpu, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
-> > +	__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
-> > +	__vcpu_sys_reg(vcpu, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
-> > +
-> > +	/*
-> > +	 * In VHE mode those registers are compatible between EL1 and EL2,
-> > +	 * and the guest uses the _EL1 versions on the CPU naturally.
-> > +	 * So we save them into their _EL2 versions here.
-> > +	 * For nVHE mode we trap accesses to those registers, so our
-> > +	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
-> > +	 * to save anything here.
-> > +	 */
-> > +	if (vcpu_el2_e2h_is_set(vcpu)) {
-> > +		u64 val;
-> > +
-> > +		/*
-> > +		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
-> > +		 * are always trapped, ensuring that the in-memory
-> > +		 * copy is always up-to-date. A small blessing...
-> > +		 */
-> > +		__vcpu_sys_reg(vcpu, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
-> > +		__vcpu_sys_reg(vcpu, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
-> > +		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
-> > +		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
-> > +
-> > +		/*
-> > +		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
-> > +		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-> > +		 * bits when reading back the guest-visible value.
-> > +		 */
-> > +		val = read_sysreg_el1(SYS_CNTKCTL);
-> > +		val &= CNTKCTL_VALID_BITS;
-> > +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) &= ~CNTKCTL_VALID_BITS;
-> > +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) |= val;
-> > +	}
-> > +
-> > +	__vcpu_sys_reg(vcpu, SP_EL2)	= read_sysreg(sp_el1);
-> > +	__vcpu_sys_reg(vcpu, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
-> > +	__vcpu_sys_reg(vcpu, SPSR_EL2)	= read_sysreg_el1(SYS_SPSR);
-> > +}
-> > +
-> > +static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
-> > +{
-> > +	u64 val;
-> > +
-> > +	/* These registers are common with EL1 */
-> > +	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
-> > +	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
-> > +
-> > +	write_sysreg(read_cpuid_id(),				vpidr_el2);
-> > +	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
-> > +
-> > +	if (vcpu_el2_e2h_is_set(vcpu)) {
-> > +		/*
-> > +		 * In VHE mode those registers are compatible between
-> > +		 * EL1 and EL2.
-> > +		 */
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2),   SYS_SCTLR);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CPTR_EL2),    SYS_CPACR);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2),   SYS_TTBR0);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR1_EL2),   SYS_TTBR1);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR_EL2),	    SYS_TCR);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CNTHCTL_EL2), SYS_CNTKCTL);
-> > +	} else {
-> > +		/*
-> > +		 * CNTHCTL_EL2 only affects EL1 when running nVHE, so
-> > +		 * no need to restore it.
-> > +		 */
-> 
-> I'm having such a hard time parsing the comment - might be just me coming back to
-> this code after such a long time.
-> 
-> If CNTHCTL_EL2 only affects EL1 when running nVHE, and the else branch deals
-> with the nVHE case, why isn't CNTHCTL_EL2 restored?
+--=_MailMate_8B77AFF2-B39C-4BA1-B5FB-D7051CA6DD16_=
+Content-Type: text/plain
 
-Because it has no impact at all? As in nothing? Niente? Rien? Zilch?
-We enter the guest's EL2, so why would we bother with restoring a
-guest register that has no influence on what we run?
+On 16 Oct 2024, at 4:14, Ryan Roberts wrote:
 
-> 
-> As for the 'only' part of the comment: when E2H=1, bits 10 and 11, EL1PCTEN and
-> EL1PTEN (why isn't this named EL1PCEN if it does the same thing as bit 1 when
-> E2H=0?), trap EL1 and EL0 accesses to physical counter and timer registers.
-> 
-> Or 'only' in this context means only EL1, and not EL2 also?
+> On 15/10/2024 18:42, Zi Yan wrote:
+>> On 14 Oct 2024, at 6:59, Ryan Roberts wrote:
+>>
+>>> Introduce a new Kconfig, ARM64_BOOT_TIME_PAGE_SIZE, which can be
+>>> selected instead of a page size. When selected, the resulting kernel's
+>>> page size can be configured at boot via the command line.
+>>>
+>>> For now, boot-time page size kernels are limited to 48-bit VA, since
+>>> more work is required to support LPA2. Additionally MMAP_RND_BITS and
+>>> SECTION_SIZE_BITS are configured for the worst case (64K pages). Future
+>>> work could be implemented to be able to configure these at boot time for
+>>> optimial page size-specific values.
+>>>
+>>> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+>>> ---
+>>
+>> <snip>
+>>
+>>>
+>>> @@ -1588,9 +1601,10 @@ config XEN
+>>>  # 4K  |       27          |      12      |       15             |         10              |
+>>>  # 16K |       27          |      14      |       13             |         11              |
+>>>  # 64K |       29          |      16      |       13             |         13              |
+>>> +# BOOT|       29          |    16 (max)  |       13             |         13              |
+>>>  config ARCH_FORCE_MAX_ORDER
+>>>  	int
+>>> -	default "13" if ARM64_64K_PAGES
+>>> +	default "13" if ARM64_64K_PAGES || ARM64_BOOT_TIME_PAGE_SIZE
+>>>  	default "11" if ARM64_16K_PAGES
+>>>  	default "10"
+>>>  	help
+>>
+>> So boot-time page size kernel always has the highest MAX_PAGE_ORDER, which
+>> means the section size increases for 4KB and 16KB page sizes. Any downside
+>> for this?
+>
+> I guess there is some cost to the buddy when MAX_PAGE_ORDER is larger than it
+> needs to be - I expect you can explain those details much better than I can. I'm
+> just setting it to the worst case for now as it was the easiest solution for the
+> initial series.
 
-None of this makes any sense to me. I don't understand your E2H
-consideration, nor your digression on the meaning of the word 'only'.
+From my past experience (around 5.19), the perf impact (using vm-scalability)
+seems very small due to MAX_PAGE_ORDER increases [1] (I made MAX_PAGE_ORDER
+a boot time variable and increased it to 20 for my 1GB THP experiments).
 
-Look at the architecture. Do you see *ANY* bit in CNTHCTL_EL2 having
-*ANY* influence on EL2 when HCR_EL2.E2H=0? Don't you then come to the
-conclusion that CNTHCTL_EL2 only affects EL1?
+Larger MAX_PAGE_ORDER means larger section size and larger mem_block size,
+so the granularity of memory hotplug also increases. In this case:
+1. ARM64 4KB: mem_block size increases from 4MB to 32MB,
+2. ARM64 16KB: mem_block size increases from 32MB to 128MB,
+3. ARM64 64KB: mem_block size keeps the same, 512MB.
 
-But surely you've spotted something I can't see, and I must be
-specially thick today... Please enlighten me.
+DavidH was concerned about large mem_block size before. He might have some
+opinion on this.
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+>
+>>
+>> Is there any plan (not in this patchset) to support boot-time MAX_PAGE_ORDER
+>> to keep section size the same?
+>
+> Yes absolutely. I should have documented MAX_PAGE_ORDER in the commit log along
+> with the comments for MMAP_RND_BITS and SECTION_SIZE_BITS - that was an
+> oversight and I'll fix it in the next version. I plan to look at making all 3
+> values boot-time configurable in future (although I have no idea at this point
+> how involved that will be).
+
+In [1], I tried to make MAX_PAGE_ORDER a boot time variable,
+but for a different purpose, allocating 1GB THP. I needed some additional
+changes in my patchset, since I assumed MAX_PAGE_ORDER can go beyond
+section size, which makes things a little bit complicated. For your case,
+I assume you are not planning to make MAX_PAGE_ORDER bigger than section
+size, then I should be able to revive my patchset with fewer changes.
+
+In terms of SECTION_SIZE_BITS, why do you want to make it a boot time variable?
+Since it decides the minimum memory hotplug size, I assume we should keep
+it unchanged or as small as possible to make virtual machine memory usage
+efficient.
+
+
+[1] https://lore.kernel.org/linux-mm/20220811231643.1012912-1-zi.yan@sent.com/
+
+
+Best Regards,
+Yan, Zi
+
+--=_MailMate_8B77AFF2-B39C-4BA1-B5FB-D7051CA6DD16_=
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename=signature.asc
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJDBAEBCgAtFiEEh7yFAW3gwjwQ4C9anbJR82th+ooFAmcPy98PHHppeUBudmlk
+aWEuY29tAAoJEJ2yUfNrYfqKrW8QAJ2uBRtl+yXCwoBAaqxvhEeK7DB+wQzwCrQf
+rPFdb4WCXunE2bn5FNAOPqzNGV4BJhM/zkUgbcdeE5hQZ/16aVZbzbVI8lMhG+SL
+RYdRKcT7+MzEH0JqbalpW4BqTr4uqQNcTiiSCyiS+gtNqP0+g0dVWrIdd6tcbdK4
+E7Lfu7hnQFD754/Ej6nvT4nMHfOViNauFVyh7wLEtw7XJu9cSEbvQWv0awM6kLQD
+GoSUQBOInFu8otVpQ5T7rlltLVP35tWJVEV1iSVwnNpumVnwYGC6ajq/7ulanqyZ
+nd0FZ/Qo+4m0aw5QWLFqKFxXP7hqH9F35rI5cbXdl+8z/2egK7PK6Hqt2SFDdJbV
+loU4T6HAiMmK54hg/ssT4h96YIumUR9dzwixFJPUmlTlewZtTEvx7Z9TpCs2Q5Oi
+EylqTG3H1W9yJEFSoW7V2ONkmqGiSamJcBZ1qDIUn9nOT4FMIRaYRfvkXk1mPjuI
+okyAcs4erYl41OBCOEDz+6ZjbDECYd6piWUzv/f2v43LjBuZJreI324H5w3kLtlA
+nCAxMjbdmmLeKh/uL7d7nLX1H4lcEcWJObiQEbXl0OOY5ePp9wn61LoK5kMA8k3f
+urOorSjfIqbe0vkmWX389dIiIqxTvXxdT60pUwQLTF5AVdi/xCBn1P3RSLnlpHtq
+zyJz9smB
+=N6Et
+-----END PGP SIGNATURE-----
+
+--=_MailMate_8B77AFF2-B39C-4BA1-B5FB-D7051CA6DD16_=--
