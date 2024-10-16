@@ -1,149 +1,135 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A348017A92F
-	for <kvmarm@lists.linux.dev>; Wed, 16 Oct 2024 13:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5F0125B9;
+	Wed, 16 Oct 2024 13:41:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729084761; cv=none; b=bO9aSikbBGm7gjK4gqAZKe/MgW2l097PJcNxp3GHG5yk2t2j2PXmHqx2riBrjhHOJnVpoUpBSPejq7VvFpEPMiZo9uMypD4WyefxH7Xhl2n4CNUItEWwwpVrIuIBqvR6KqT/w7nNz8TamIhg8KRFQITiDE6DQAEqAkxYMyDTy1I=
+	t=1729086096; cv=none; b=d78aVLPkt4NJBYX2DxQRfBriNMJ8fdr92ByFAMSSBVScpQr5Tm3Tdsn7fttqblgEGY7cbSWXMloUuVuzWM275tkSqNPMuGqCugXaMAt9l2+KtyVefcGFcZtiLM83qorESOszQpOLBZWQyX4/G9JyErWwujOtWFsoyoC+BMES7GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729084761; c=relaxed/simple;
-	bh=eQ3XQ5xCOVKHVO6j6DURkih8E8ejH6kHPbFeXY+gs6g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E+YbJDfJrZjdNa4QydxbBJ6QKuVQhX3kLWZiiqUzzjngb+vWMfnmqdr6qwEQ/SFW/Ebv1j0gyyuJO49b+IQkeYE4UVbz8fDig76YnWJ3sfRyd0EBmJRHK+x7JQBhxGjp/ej3973GzEXTzYKfByAk1METrmV85Tk8ve1S6Ovmwn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD363FEC;
-	Wed, 16 Oct 2024 06:19:48 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62A063F528;
-	Wed, 16 Oct 2024 06:19:17 -0700 (PDT)
-Date: Wed, 16 Oct 2024 14:19:14 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1729086096; c=relaxed/simple;
+	bh=tmglpRF6ockTWwBT1N80CsCLOq6CQEoYvcNiTLS5Vrc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pvy/4Yh0Hw+lVI17PwbFdEExYUuv1Mlv2cCyckFNT2+kY22qk7lYZ6vn01/4PbLE5VVSmWnqP2WjGKAG1rtgK+qFiJ3ouM8R6scc+EDy0IfFzb99J10QyJGP5a15XwtIDjTwek/ojbQ0RcU68xqhymQda1TsMVpLKsIbdj2iz7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OVFfD8PT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OVFfD8PT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFE09C4CEC5;
+	Wed, 16 Oct 2024 13:41:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729086095;
+	bh=tmglpRF6ockTWwBT1N80CsCLOq6CQEoYvcNiTLS5Vrc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OVFfD8PTrs+KPUz1TPjkkG41G8USdYp01IruRF/M/oBB0xCdeP6HX1gK5helfob1T
+	 ft4DHyJfkR1rmP3cVc5ENjt1YuwKSwqAlJgpfyPxLcFWC3LvsGCieZuYBxtr0TZitJ
+	 l3dgNZWSQxPonXrQ+qJJopq+yOeioBNS/01RhhUXDbuC00mBfiRFN3L/hT0kXHIKiY
+	 ngNOoIe9v7VOyOl+gueGpVzyowxH+PRrn8tJdq1QZdyAZuBaK9zZiGAQICPSZUB3l2
+	 FJwSABVE6o8G/uyd6LQ2qp0pYFsfxTUagtTDZRQw5P4qzCT3+jnottDW/BlnGlY4uX
+	 ApLh4AlY83A7w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t14HN-0046Ou-IS;
+	Wed, 16 Oct 2024 14:41:33 +0100
+Date: Wed, 16 Oct 2024 14:41:33 +0100
+Message-ID: <86zfn4412q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Brown <broonie@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Brown <broonie@kernel.org>
 Subject: Re: [PATCH v4 06/36] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-Message-ID: <Zw-9UvkO6eJkAaYQ@raptor>
+In-Reply-To: <Zw-9UvkO6eJkAaYQ@raptor>
 References: <20241009190019.3222687-1-maz@kernel.org>
- <20241009190019.3222687-7-maz@kernel.org>
- <Zw-JTojEW5ZXa8R-@raptor>
- <861q0g5ls1.wl-maz@kernel.org>
+	<20241009190019.3222687-7-maz@kernel.org>
+	<Zw-JTojEW5ZXa8R-@raptor>
+	<861q0g5ls1.wl-maz@kernel.org>
+	<Zw-9UvkO6eJkAaYQ@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <861q0g5ls1.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On Wed, Oct 16, 2024 at 12:29:02PM +0100, Marc Zyngier wrote:
-> On Wed, 16 Oct 2024 10:37:18 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > I'm planning to have a look at (some) of the patches, do you have a
-> > timeline for merging the series? Just so I know what to prioritise.
+On Wed, 16 Oct 2024 14:19:14 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> I want it merged yesterday. All of it.
-> 
+> > > > @@ -207,6 +222,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+> > > >  		 */
+> > > >  		__vcpu_sys_reg(vcpu, reg) = val;
+> > > >  
+> > > > +		switch (reg) {
+> > > > +		case CNTHCTL_EL2:
+> > > > +			/*
+> > > > +			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
+> > > > +			 * Otherwise, some of the bits are backed by
+> > > > +			 * CNTKCTL_EL1, while the rest is kept in memory.
+> > > > +			 * Yes, this is fun stuff.
+> > > > +			 */
+> > > > +			if (vcpu_el2_e2h_is_set(vcpu))
+> > > > +				write_sysreg_el1(val, SYS_CNTKCTL);
+> > > 
+> > > Sorry, but I just can't seem to get my head around why the RES0 bits aren't
+> > > cleared. Is KVM relying on the guest to implement Should-Be-Zero-or-Preserved,
+> > > as per the RES0 definition?
 > > 
-> > On Wed, Oct 09, 2024 at 07:59:49PM +0100, Marc Zyngier wrote:
-> > > Accessing CNTHCTL_EL2 is fraught with danger if running with
-> > > HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
-> > > thus can be changed behind our back, while the rest lives
-> > > in the CNTHCTL_EL2 shadow copy that is memory-based.
-> > > 
-> > > Yes, this is a lot of fun!
-> > > 
-> > > Make sure that we merge the two on read access, while we can
-> > > write to CNTKCTL_EL1 in a more straightforward manner.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
-> > >  include/kvm/arm_arch_timer.h |  3 +++
-> > >  2 files changed, 31 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 3cd54656a8e2f..932d2fb7a52a0 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -157,6 +157,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
-> > >  		if (!is_hyp_ctxt(vcpu))
-> > >  			goto memory_read;
-> > >  
-> > > +		/*
-> > > +		 * CNTHCTL_EL2 requires some special treatment to
-> > > +		 * account for the bits that can be set via CNTKCTL_EL1.
-> > > +		 */
-> > > +		switch (reg) {
-> > > +		case CNTHCTL_EL2:
-> > > +			if (vcpu_el2_e2h_is_set(vcpu)) {
-> > > +				val = read_sysreg_el1(SYS_CNTKCTL);
-> > > +				val &= CNTKCTL_VALID_BITS;
-> > > +				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> > > +				return val;
-> > > +			}
-> > > +			break;
-> > > +		}
-> > > +
-> > >  		/*
-> > >  		 * If this register does not have an EL1 counterpart,
-> > >  		 * then read the stored EL2 version.
-> > > @@ -207,6 +222,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
-> > >  		 */
-> > >  		__vcpu_sys_reg(vcpu, reg) = val;
-> > >  
-> > > +		switch (reg) {
-> > > +		case CNTHCTL_EL2:
-> > > +			/*
-> > > +			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
-> > > +			 * Otherwise, some of the bits are backed by
-> > > +			 * CNTKCTL_EL1, while the rest is kept in memory.
-> > > +			 * Yes, this is fun stuff.
-> > > +			 */
-> > > +			if (vcpu_el2_e2h_is_set(vcpu))
-> > > +				write_sysreg_el1(val, SYS_CNTKCTL);
+> > KVM isn't relying on anything. And it isn't about the RES0 bits not
+> > being cleared. It is about the HW not providing storage for some of
+> > the CNTHCTL_EL2 bits when the guest is using CNTKCTL_EL1 as a proxy
+> > for its own view of CNTHCTL_EL2.
 > > 
-> > Sorry, but I just can't seem to get my head around why the RES0 bits aren't
-> > cleared. Is KVM relying on the guest to implement Should-Be-Zero-or-Preserved,
-> > as per the RES0 definition?
+> > Namely, bits outside of CNTKCTL_VALID_BITS are not guaranteed to be
+> > stored until (IIRC) FEAT_NV2p1, which retrospectively fixes the
+> > architecture by mandating that the relevant bits have dedicated
+> > storage.
 > 
-> KVM isn't relying on anything. And it isn't about the RES0 bits not
-> being cleared. It is about the HW not providing storage for some of
-> the CNTHCTL_EL2 bits when the guest is using CNTKCTL_EL1 as a proxy
-> for its own view of CNTHCTL_EL2.
+> The definition for RES0 says:
 > 
-> Namely, bits outside of CNTKCTL_VALID_BITS are not guaranteed to be
-> stored until (IIRC) FEAT_NV2p1, which retrospectively fixes the
-> architecture by mandating that the relevant bits have dedicated
-> storage.
+> 'A bit that is RES0 in a context is reserved for possible future use in that
+> context. To preserve forward compatibility, software:
+>  * Must not rely on the bit reading as 0.
+>  * Must use an SBZP policy to write to the bit.'
+> 
+> where Should-Be-Zero-of-Preserved (SBZP):
+> 
+> 'When writing this field, software must either write all 0s to this field or, if
+> the register is being restored from a previously read state, write the
+> previously read value to this field. If this is not done, then the result is
+> unpredictable.'
 
-The definition for RES0 says:
+And? I can quote the ARM ARM too, but that's not going to lead us
+anywhere if you don't explain why what you quote is related to the
+problem at hand (hint, I don't think it is).
 
-'A bit that is RES0 in a context is reserved for possible future use in that
-context. To preserve forward compatibility, software:
- * Must not rely on the bit reading as 0.
- * Must use an SBZP policy to write to the bit.'
+> And what about the rest of the RES0 bits from CNTKCTL_EL1, those that are RES0
+> in both registers?
 
-where Should-Be-Zero-of-Preserved (SBZP):
+What about them *what*?
 
-'When writing this field, software must either write all 0s to this field or, if
-the register is being restored from a previously read state, write the
-previously read value to this field. If this is not done, then the result is
-unpredictable.'
+It would definitely help if you didn't write in riddles and actually
+spell out what you mean. If you think this code is wrong, please
+explain why you think it is wrong, and maybe we'll be able to make
+some progress.
 
-And what about the rest of the RES0 bits from CNTKCTL_EL1, those that are RES0
-in both registers?
 
 Thanks,
-Alex
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
