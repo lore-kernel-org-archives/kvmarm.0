@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9D01DD0F2;
-	Thu, 17 Oct 2024 13:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE0E1DE8B2;
+	Thu, 17 Oct 2024 13:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729170912; cv=none; b=VlYUl/RIm2EVdwu/mSwUlsgYT0hgB9pBxnebFn1h0ffi3ei5HaZYfpnbjN71kbS1KIX0PBHaJSorHW7pwcvCCFWVTU+DGc+MlEU+DptXvKZU2X3WxgO2YwdUh2CXtseuDPY3vAagpC5F+t0Rmo1pR7QYutga8qMLUWMohkL2jPY=
+	t=1729170915; cv=none; b=mNUhHwzgm7UsQrMAvxojkEaGq7XdWIfpTZIaJysxFmUnn9m41PFCsO9Ij3A4tlY58tRbMfgSKgV8K5evJ5iiOjpyJlINSGZf4GQTHjajWhDmvav/rTvjNd0t2ljXehKugr/EQ5mTbVkiWHUyNpZ4IG8ye4n2x1pbLUg9KBjnr0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729170912; c=relaxed/simple;
-	bh=kZLwVomqbK0hBV9ZamsUxiHnMd33ArnnjFoi6uwYL3k=;
+	s=arc-20240116; t=1729170915; c=relaxed/simple;
+	bh=t5I3iUHobSE1SI4nN11vGqGPdsKJnhAaIhIVN96Ss/0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PyiGiN3M0tvFwQnTXLPE2VZLjoJD91N7JU28iLUliMYAtYpWZB+JVEdfex7des5mq0OBwoF1fBP6+pnFJvH38a4Z6j67ydHaGwqdqzPWOTQyvMk+qX7ZlWZaoDA384eOpJ5wjEtAoG6Uzy/2eqEsInj8D12dyJ/X03eQPCANBKg=
+	 MIME-Version; b=t4jaeFFlBHsoPE4DbXRPdynYllyfZg5U3L9/nojc3MIj+zrtwcsE8Ji2kpjDxCQWcvr/NSRKHKAPgNuQ7x+VB/Pa1t5el+i6FOo8NKuCCwyyDpGWm5JQLtxYE/m4FX/p+ilgEaxwBL+2GGvf1ELN8aXwLCv5PI4ckmOqF45hJGk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7050BDA7;
-	Thu, 17 Oct 2024 06:15:37 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9145FFEC;
+	Thu, 17 Oct 2024 06:15:41 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34E923F71E;
-	Thu, 17 Oct 2024 06:15:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 163C93F71E;
+	Thu, 17 Oct 2024 06:15:07 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v7 05/11] arm64: rsi: Map unprotected MMIO as decrypted
-Date: Thu, 17 Oct 2024 14:14:28 +0100
-Message-Id: <20241017131434.40935-6-steven.price@arm.com>
+Subject: [PATCH v7 06/11] efi: arm64: Map Device with Prot Shared
+Date: Thu, 17 Oct 2024 14:14:29 +0100
+Message-Id: <20241017131434.40935-7-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241017131434.40935-1-steven.price@arm.com>
 References: <20241017131434.40935-1-steven.price@arm.com>
@@ -57,59 +57,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Instead of marking every MMIO as shared, check if the given region is
-"Protected" and apply the permissions accordingly.
+Device mappings need to be emulated by the VMM so must be mapped shared
+with the host.
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-New patch for v5
+Changes since v4:
+ * Reworked to use arm64_is_iomem_private() to decide whether the memory
+   needs to be decrypted or not.
 ---
- arch/arm64/kernel/rsi.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ arch/arm64/kernel/efi.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index 7e7934c4fca0..3e0c83e2296f 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -6,6 +6,8 @@
- #include <linux/jump_label.h>
- #include <linux/memblock.h>
- #include <linux/psci.h>
-+
-+#include <asm/io.h>
- #include <asm/rsi.h>
+diff --git a/arch/arm64/kernel/efi.c b/arch/arm64/kernel/efi.c
+index 712718aed5dd..1d25d8899dbf 100644
+--- a/arch/arm64/kernel/efi.c
++++ b/arch/arm64/kernel/efi.c
+@@ -34,8 +34,16 @@ static __init pteval_t create_mapping_protection(efi_memory_desc_t *md)
+ 	u64 attr = md->attribute;
+ 	u32 type = md->type;
  
- static struct realm_config config;
-@@ -93,6 +95,16 @@ bool __arm64_is_protected_mmio(phys_addr_t base, size_t size)
- }
- EXPORT_SYMBOL(__arm64_is_protected_mmio);
- 
-+static int realm_ioremap_hook(phys_addr_t phys, size_t size, pgprot_t *prot)
-+{
-+	if (__arm64_is_protected_mmio(phys, size))
-+		*prot = pgprot_encrypted(*prot);
-+	else
-+		*prot = pgprot_decrypted(*prot);
+-	if (type == EFI_MEMORY_MAPPED_IO)
+-		return PROT_DEVICE_nGnRE;
++	if (type == EFI_MEMORY_MAPPED_IO) {
++		pgprot_t prot = __pgprot(PROT_DEVICE_nGnRE);
 +
-+	return 0;
-+}
-+
- void __init arm64_rsi_init(void)
- {
- 	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
-@@ -103,6 +115,9 @@ void __init arm64_rsi_init(void)
- 		return;
- 	prot_ns_shared = BIT(config.ipa_bits - 1);
++		if (arm64_is_protected_mmio(md->phys_addr,
++					    md->num_pages << EFI_PAGE_SHIFT))
++			prot = pgprot_encrypted(prot);
++		else
++			prot = pgprot_decrypted(prot);
++		return pgprot_val(prot);
++	}
  
-+	if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
-+		return;
-+
- 	arm64_rsi_setup_memory();
- 
- 	static_branch_enable(&rsi_present);
+ 	if (region_is_misaligned(md)) {
+ 		static bool __initdata code_is_misaligned;
 -- 
 2.34.1
 
