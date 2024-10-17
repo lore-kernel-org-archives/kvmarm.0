@@ -1,91 +1,102 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82D318E04E
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 06:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA86E1CFED8
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 07:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729147196; cv=none; b=BMPmqgsMx5fmr+OkyZwVReUhuPOg8ZjzbJuQalRWhFPoo02pqHXxijfvmN6U9HjMFx1MOUV8gr/V+lG6APIa6dOZKPMRZvF1h6lGlqKVVuU/v+erYUVvDIp16uC1iR9Sbt4WvnNEhbPZbY+1XFgLKwL1d/HWBJNGjc/Y0Xlb8mo=
+	t=1729150780; cv=none; b=iplp8rZWIy4/YTyHucEenKrHks4u2JSqKhaxEs3S6c8u9qpbGrTGQeEHLqAJtw8yuaHWRmKaD34bwqX2Nnyr2W/VPfzZ/+iDJX0YrfKskxUqlJpJAdSaUz3lQLoN+AXQioG3DkrLmOwTbcvqvBBzKA7OMmtJX8dAW4VKqNm3A1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729147196; c=relaxed/simple;
-	bh=Ahi5x0yhZX83vXZdi7Z3WjWyhYboIUJJkm8mE/jznK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A5KN4v3z8Lvz0ajbc+/mt+uPFgbJVLXvkijW0UyvOdm6ZzSKiwkH8lea6L1o3uAVpClcRRPZ80EhXaUK+UBCTILycVQCog1NjimVZENRElvT8WtcBVgeHttHqkrQEizQizuM8am6enPovIGyD6/hKX1iDPzeLafGWyH/QIi1R20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n1UHIbAM; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n1UHIbAM"
-Date: Wed, 16 Oct 2024 23:39:43 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729147191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UvnCZ0YB/sgOauIYIlHpcBslfSA4W1kgb4ISSzXCTyM=;
-	b=n1UHIbAM2iSsVxc/71vlBp2vXVI3u1K2EyG+ExAbupv690Hvy4Tfbp6ZEmyPppuhkH78sB
-	ALWnQ6PQLTHWp39vDpr8hviJjQpRWimvdY+AioeiwPrZv8HB7z3d1/+PAaoJL0Ar0GLmMQ
-	tv9a5jAJx/zAWWODJMwzxuV5dAlro7o=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	rdunlap@infradead.org, sebott@redhat.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, guanwentao@uniontech.com,
-	zhanjun@uniontech.com, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Do not call vgic_put_irq() within
- vgic_its_inject_cached_translation()
-Message-ID: <ZxCxL8ZCHRm7RTCA@linux.dev>
-References: <FEBA39FEBDA1C9D7+20241017061334.222103-1-wangyuli@uniontech.com>
+	s=arc-20240116; t=1729150780; c=relaxed/simple;
+	bh=L+C4Bds5aLEIoEIqYhxfeIvi49PTsh/+yEo1O4hrRw4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aL4wHXlfyyIs0YWFjdHR8CTyRrcDY6l11SYJ0/qnCYLoSWG5g/tOOJu+7FH9b3DQoLqc/O+JAkqy3N81pzyq+ZTEKzsQiVhJnTnz49Tzcicl6D5yPEn+TMa7M51qQBQ32DS+oUUiGPnhJfu01LNLF4BPqqFIKH7E8/OWK0kdJdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B25BBFEC;
+	Thu, 17 Oct 2024 00:40:04 -0700 (PDT)
+Received: from [10.163.39.37] (unknown [10.163.39.37])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A0773F528;
+	Thu, 17 Oct 2024 00:39:31 -0700 (PDT)
+Message-ID: <3bf1390c-3823-43cd-8b5c-9b0848450628@arm.com>
+Date: Thu, 17 Oct 2024 13:09:29 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <FEBA39FEBDA1C9D7+20241017061334.222103-1-wangyuli@uniontech.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] KVM: arm64: Fix shift-out-of-bounds bug
+To: Ilkka Koskinen <ilkka@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20241017025701.67936-1-ilkka@os.amperecomputing.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20241017025701.67936-1-ilkka@os.amperecomputing.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
 
-On Thu, Oct 17, 2024 at 02:13:34PM +0800, WangYuli wrote:
-> There is a probability that the host machine will also restart
-> when the virtual machine is restarting.
 
-This is a start, but can you please describe in detail what the flow is
-you're seeing that leads to the refcount bug / UAF?
-
-> Commit ad362fe07fec ("KVM: arm64: vgic-its: Avoid potential UAF
-> in LPI translation cache") released the reference count of an IRQ
-> when it shouldn't have. This led to a situation where, when the
-> system finally released the IRQ, it found that the structure had
-> already been freed, triggering a
-> 'refcount_t: underflow; use-after-free' error.
+On 10/17/24 08:27, Ilkka Koskinen wrote:
+> Fix a shift-out-of-bounds bug reported by UBSAN when running
+> VM with MTE enabled host kernel.
 > 
-> In fact, the function "vgic_put_irq" should be called by
-> "vgic_its_inject_cached_translation" instead of
-> "vgic_its_trigger_msi".
+> UBSAN: shift-out-of-bounds in arch/arm64/kvm/sys_regs.c:1988:14
+> shift exponent 33 is too large for 32-bit type 'int'
+> CPU: 26 UID: 0 PID: 7629 Comm: qemu-kvm Not tainted 6.12.0-rc2 #34
+> Hardware name: IEI NF5280R7/Mitchell MB, BIOS 00.00. 2024-10-12 09:28:54 10/14/2024
+> Call trace:
+>  dump_backtrace+0xa0/0x128
+>  show_stack+0x20/0x38
+>  dump_stack_lvl+0x74/0x90
+>  dump_stack+0x18/0x28
+>  __ubsan_handle_shift_out_of_bounds+0xf8/0x1e0
+>  reset_clidr+0x10c/0x1c8
+>  kvm_reset_sys_regs+0x50/0x1c8
+>  kvm_reset_vcpu+0xec/0x2b0
+>  __kvm_vcpu_set_target+0x84/0x158
+>  kvm_vcpu_set_target+0x138/0x168
+>  kvm_arch_vcpu_ioctl_vcpu_init+0x40/0x2b0
+>  kvm_arch_vcpu_ioctl+0x28c/0x4b8
+>  kvm_vcpu_ioctl+0x4bc/0x7a8
+>  __arm64_sys_ioctl+0xb4/0x100
+>  invoke_syscall+0x70/0x100
+>  el0_svc_common.constprop.0+0x48/0xf0
+>  do_el0_svc+0x24/0x38
+>  el0_svc+0x3c/0x158
+>  el0t_64_sync_handler+0x120/0x130
+>  el0t_64_sync+0x194/0x198
+> 
+> Fixes: 7af0c2534f4c ("KVM: arm64: Normalize cache configuration")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Ilkka Koskinen <ilkka@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 375052d8cd22..ff8c4e1b847e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1994,7 +1994,7 @@ static u64 reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	 * one cache line.
+>  	 */
+>  	if (kvm_has_mte(vcpu->kvm))
+> -		clidr |= 2 << CLIDR_TTYPE_SHIFT(loc);
+> +		clidr |= 2ULL << CLIDR_TTYPE_SHIFT(loc);
+>  
+>  	__vcpu_sys_reg(vcpu, r->reg) = clidr;
+>  
 
-This line doesn't match your patch, and instead aligns with the upstream
-behavior.
+clidr being u64, 2ULL is preferred over 2UL.
 
-The put in vgic_its_inject_cached_translation() pairs with the get in
-vgic_its_check_cache(). We need to do this because the LPI injection
-fast path happens outside of the its_lock.
-
-The slow path for LPI injection takes the its_lock and is safe because
-the ITE holds a reference on the descriptor as well. Because of that,
-vgic_its_trigger_msi() doesn't touch the refcount on the resolved IRQ.
-
-So I'm not following how any of this leads to the underflow you observe.
-Even if the put in vgic_its_inject_cached_translation() causes the
-refcount to drop to 0, it is likely that an unbalanced put happened
-somewhere else in the ITS emulation.
-
--- 
-Thanks,
-Oliver
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
