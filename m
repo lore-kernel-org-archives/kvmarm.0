@@ -1,128 +1,117 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538641D6DA8
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 09:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5E41D88B4;
+	Thu, 17 Oct 2024 09:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729155606; cv=none; b=odbPk2GfhEW3U754eylthb4bDjfz7h/uIya16ROjwmgmOWYTDnsVhuu9tZO7HL/OwMgqFlzEtEpbpoEnVx/kpiUMtN4bj3Cc76Vfu4yEUjqzVPhvMv5bAa+tf+M2EMws9sLfQhdTrfLKDmpHAl7TjDdhDEi8F2UMyNWJNabzVlU=
+	t=1729156216; cv=none; b=CZaH86k7vYr5Tzk1oMhdqTu7wesdFXIdUyM2D96Ck4sTQ1lI6VK2itfLSoEh7qfVMqAMcNR0366/dOm2moMpRDLOLOF+0FCbKWEDicohvDAuLCqbS5SPCUno7EYoBpYph3IL9czPquIfSCt41Zq5y5FKN8DmEl0Kl7pFYWP89i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729155606; c=relaxed/simple;
-	bh=zHNKQUYs3rfK8SE3u86OQf3l9WxgQIJBTt3vuvriDA0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gvIadbpPL4hvk1iqmd+DYkpdNzorxqIYZoOu8/e2CY/x3P88C5JxAKOJmnUPM6jf/8kqaJ7bvc8DtqUIrKUfUjcMos271YPxCm14eK+fuTbawwQNVcyb6wOvrkzspCad52z4Acb4G8HC2d1ZHWoCeVQGcFCw/pIjnSjdAjTIQrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XThbX0FFSz6JBH1;
-	Thu, 17 Oct 2024 16:59:20 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id D0BE41400DB;
-	Thu, 17 Oct 2024 16:59:59 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.203.177.241) by
- frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 17 Oct 2024 10:59:54 +0200
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <oliver.upton@linux.dev>
-CC: <james.morse@arm.com>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linuxarm@huawei.com>
-Subject: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from userspace
-Date: Thu, 17 Oct 2024 09:59:25 +0100
-Message-ID: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
+	s=arc-20240116; t=1729156216; c=relaxed/simple;
+	bh=gStZKPspN8Fxoe/I4rGMFgtoAkrG2i+KdpQDR/2Cc94=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fouWsZ3H4KBmWrbAdmo727WW3Snhc5aE9JGazFjFNACq0s9+wLhEnMLbCLxSy4ZoShAuzxvopHdXenPBrMIy5vkbrwPnIxT07jaME/NGBpaSPoi3JCQb0xT8SCGYxK3/Mp2h0ODboz8hg3cCa1WCIyDxUxKg5fSxcIxRPN72vF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFL2iYUw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFL2iYUw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3379EC4CEC3;
+	Thu, 17 Oct 2024 09:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729156216;
+	bh=gStZKPspN8Fxoe/I4rGMFgtoAkrG2i+KdpQDR/2Cc94=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jFL2iYUw8wTAe8KGzTbJNvjVT9muBruubr2l0pvkK3IQbhlz4kXwFL9lqp9wbsTtX
+	 /5Yim3fYLHp8HTV5gGF2I4303DMO7Q+yJqxPKhVEbdQmn55qA2LnBoPY5Gp/UFBifQ
+	 NBaP8bktTbFUelSSAuFo3qJ06nwpwEgn3QaxiA1qygLMqs8tml8xODmc/DUarzs/tg
+	 cdbPplIH4sglD5GvuM0U4GsHAA+BDlscqdFkptG495cRHGU9uFnUbcFVRL4iXtsjs4
+	 TV174P3QfYE4fU+S8KNZyhtEDKG0TkpXYpioUPlkJ/LjP5odkvzFlJAIkik0uD0Evn
+	 MRp3tDXGltYzw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t1MWM-004O9M-4g;
+	Thu, 17 Oct 2024 10:10:14 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Ilkka Koskinen <ilkka@os.amperecomputing.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.12, take #3
+Date: Thu, 17 Oct 2024 10:09:56 +0100
+Message-Id: <20241017090956.954040-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, anshuman.khandual@arm.com, gshan@redhat.com, ilkka@os.amperecomputing.com, nathan@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Only allow userspace to set VIPT(0b10) or PIPT(0b11) for L1Ip based on
-what hardware reports as both AIVIVT (0b01) and VPIPT (0b00) are
-documented as reserved.
+Paolo,
 
-Using a VIPT for Guest where hardware reports PIPT may lead to over
-invalidation, but is still correct. Hence, we can allow downgrading
-PIPT to VIPT, but not the other way around.
+Here's another set of fixes for KVM/arm64, addressing another vgic
+init race as well as a build error (full details in the tag below).
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
-This is based on the dicsussion here[0].
-https://lore.kernel.org/kvmarm/0db19a081d9e41f08b0043baeef16f16@huawei.com/
+I notice that you haven't pulled [1] yet, so hopefully this will also
+serve as a gentle reminder.
 
-Also depends on Joey's series[1] as it make use of the ID_FILTERED macro.
+Please pull,
 
-I am not sure we need to explicitly make the ftr type as FTR_LOWER_SAFE
-in kvm_arm64_ftr_safe_value() or as mentioned below can depend on
-arm64_ftr_safe_value() for this ftr bits.
+	M.
 
-Please take a look and let me know.
+[1] https://lore.kernel.org/r/20241011132756.3793137-1-maz@kernel.org
 
-Thanks,
-Shameer
+The following changes since commit df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1:
 
-[0] https://lore.kernel.org/kvmarm/0db19a081d9e41f08b0043baeef16f16@huawei.com/
-[1] https://lore.kernel.org/kvmarm/20241015133923.3910916-1-joey.gouly@arm.com/
----
- arch/arm64/kvm/sys_regs.c | 32 ++++++++++++++++++++++++++++----
- 1 file changed, 28 insertions(+), 4 deletions(-)
+  KVM: arm64: Don't eagerly teardown the vgic on init error (2024-10-11 13:40:25 +0100)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d97ccf1c1558..819dcb63febd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1872,6 +1872,28 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
- 	return set_id_reg(vcpu, rd, user_val);
- }
- 
-+static int set_ctr_el0(struct kvm_vcpu *vcpu,
-+		       const struct sys_reg_desc *rd, u64 user_val)
-+{
-+	u8 user_L1Ip = SYS_FIELD_GET(CTR_EL0, L1Ip, user_val);
-+
-+	/*
-+	 * Both AIVIVT (0b01) and VPIPT (0b00) are documented as reserved.
-+	 * Hence only allow to set VIPT(0b10) or PIPT(0b11) for L1Ip based
-+	 * on what hardware reports.
-+	 *
-+	 * Using a VIPT software model on PIPT will lead to over invalidation,
-+	 * but still correct. Hence, we can allow downgrading PIPT to VIPT,
-+	 * but not the other way around. This is handled via arm64_ftr_safe_value()
-+	 * as CTR_EL0 ftr_bits has L1Ip field type FTR_EXACT with safe value
-+	 * set as VIPT)
-+	 */
-+	if (user_L1Ip < CTR_EL0_L1Ip_VIPT)
-+		return -EINVAL;
-+
-+	return set_id_reg(vcpu, rd, user_val);
-+}
-+
- /*
-  * cpufeature ID register user accessors
-  *
-@@ -2614,10 +2636,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
- 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
--	ID_WRITABLE(CTR_EL0, CTR_EL0_DIC_MASK |
--			     CTR_EL0_IDC_MASK |
--			     CTR_EL0_DminLine_MASK |
--			     CTR_EL0_IminLine_MASK),
-+	ID_FILTERED(CTR_EL0, ctr_el0,
-+			CTR_EL0_DIC_MASK |
-+			CTR_EL0_IDC_MASK |
-+			CTR_EL0_DminLine_MASK |
-+			CTR_EL0_L1Ip_MASK |
-+			CTR_EL0_IminLine_MASK),
- 	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
- 	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
- 
--- 
-2.45.2
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.12-3
+
+for you to fetch changes up to 78a00555550042ed77b33ace7423aced228b3b4e:
+
+  KVM: arm64: Ensure vgic_ready() is ordered against MMIO registration (2024-10-17 09:20:48 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.12, take #3
+
+- Stop wasting space in the HYP idmap, as we are dangerously close
+  to the 4kB limit, and this has already exploded in -next
+
+- Fix another race in vgic_init()
+
+- Fix a UBSAN error when faking the cache topology with MTE
+  enabled
+
+----------------------------------------------------------------
+Ilkka Koskinen (1):
+      KVM: arm64: Fix shift-out-of-bounds bug
+
+Marc Zyngier (1):
+      KVM: arm64: Shave a few bytes from the EL2 idmap code
+
+Oliver Upton (2):
+      KVM: arm64: vgic: Don't check for vgic_ready() when setting NR_IRQS
+      KVM: arm64: Ensure vgic_ready() is ordered against MMIO registration
+
+ arch/arm64/include/asm/kvm_asm.h      |  1 +
+ arch/arm64/kernel/asm-offsets.c       |  1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S    | 52 +++++++++++++++++++----------------
+ arch/arm64/kvm/sys_regs.c             |  2 +-
+ arch/arm64/kvm/vgic/vgic-init.c       | 13 +++++++--
+ arch/arm64/kvm/vgic/vgic-kvm-device.c |  7 ++++-
+ 6 files changed, 49 insertions(+), 27 deletions(-)
