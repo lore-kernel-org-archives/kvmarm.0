@@ -1,119 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42CE1D47AC;
-	Thu, 17 Oct 2024 15:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CCB1DED4F
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 15:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729179141; cv=none; b=BvR9AI/2tHxeMO5/oVs91bTxv3wbQXAwNQZEAa0zHTtgi5y4WcgxEohGiJsFG2OtnRKfGjMYHsqWeezHw1SXz+xRsE8T+hsQIRg7QOoxjdV8kYdxaeobY/ugLKIOB7UXkckK+lPja9BS+lcxZJnrpa87paV0PJqL8JMjgWD1RE0=
+	t=1729180213; cv=none; b=M2y1ykcvAipcCy2Uf9M0S+0Wj9jJiiWGnzZkjp7o3BlFYSqvNxrQXoTTiyNEWdIDaUgzsr3vrGl2aCr1cVTKF8QvB9M+k2udZh5lQzTWB/F5nkTcoaZFSHuvzT+wDkk7gl572iDL9oM2oIwUN9O+7JtHgpfe9ChAd9DXdQUWROI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729179141; c=relaxed/simple;
-	bh=SXtzKMYQw4YGoZMy9cziDnMey+ubUZZhAaoTGjWv/zI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JuNnf41Ldq7gqn8Idsn/9yc29oqX/WyvpaBLm+HZzLMHALFbbHXaK3IFy/LApdU17KAqcKD+eBzANv3zrRC2oC4UYhz04V7uMeSW1wm35tcFU7kQnshIIhojI44R5tw5a4czOK99oPV5UyoiZis5DPMpQH+AacUXfRB3HHUhAbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4AEFFEC;
-	Thu, 17 Oct 2024 08:32:45 -0700 (PDT)
-Received: from [10.57.22.188] (unknown [10.57.22.188])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F30583F528;
-	Thu, 17 Oct 2024 08:32:12 -0700 (PDT)
-Message-ID: <de0ebef7-8be3-444f-99ee-5e9b6f9140f7@arm.com>
-Date: Thu, 17 Oct 2024 16:32:12 +0100
+	s=arc-20240116; t=1729180213; c=relaxed/simple;
+	bh=g776Yee/+LxdoaGv+CjSjTiSnqa/SMcgSTdt3Sdu+24=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=gB21GrToM4KGM06gNis/E+rMYrsZPABdRqdiesLerxnAvUi/jb6pjVqN09kwVCpo5aI3YHi9W+uxGG/HDbUFBqCsQdQOmW2MNNWJiopDL9sSOKycpNy5yO2Adg3Q1H2Gwx0I+Umdv7U9CHXIkr5CdfxvqCHzl0AOIplijZdfrYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chPK1yJu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chPK1yJu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729180207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6hNvVkE15DnCxqx2pKiUWEQ26XlDg4qXsXTpA0aX9UY=;
+	b=chPK1yJu8Ip3AxTcP5LLbq09aqmNS2/k2Sk8rixpefnWFA85iPCKwEXL/4Lls5LyKK3zMT
+	t1cw0VVTo2V7Lmk8pL3tt3rXxfPkZZsXBWSVvDgB2r99ma96md0dHusQw8/SNCnvCZX2sb
+	3IwoGBE9icSayB61V7GSNKzv8THHZYI=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-d0yVcna0N36ImNywZgYbxg-1; Thu,
+ 17 Oct 2024 11:50:02 -0400
+X-MC-Unique: d0yVcna0N36ImNywZgYbxg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F38219560B6;
+	Thu, 17 Oct 2024 15:49:59 +0000 (UTC)
+Received: from localhost (dhcp-192-244.str.redhat.com [10.33.192.244])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3BFF219560A2;
+	Thu, 17 Oct 2024 15:49:55 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Oliver
+ Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
+ <will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>, yuzenghui
+ <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+ jiangkunkun <jiangkunkun@huawei.com>, Jonathan
+ Cameron <jonathan.cameron@huawei.com>, Anthony Jebson
+ <anthony.jebson@huawei.com>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
+ migration
+In-Reply-To: <08261a41b9644f5ab49063824e4060c3@huawei.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
+ <86jzef53iz.wl-maz@kernel.org>
+ <3f4469c49625413f9ab2c224d0d3fbea@huawei.com>
+ <86ikty6f1b.wl-maz@kernel.org> <ZwlADbp-HjkijElX@linux.dev>
+ <08261a41b9644f5ab49063824e4060c3@huawei.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Thu, 17 Oct 2024 17:49:53 +0200
+Message-ID: <87bjziraou.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 23/43] KVM: arm64: Validate register access for a Realm
- VM
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-24-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20241004152804.72508-24-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 
-Hi Steven
+On Fri, Oct 11 2024, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-On 04/10/2024 16:27, Steven Price wrote:
-> The RMM only allows setting the lower GPRS (x0-x7) and PC for a realm
-> guest. Check this in kvm_arm_set_reg() so that the VMM can receive a
-> suitable error return if other registers are accessed.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->   arch/arm64/kvm/guest.c | 26 ++++++++++++++++++++++++++
->   1 file changed, 26 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 962f985977c2..c23b9480ceb0 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -783,12 +783,38 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->   	return kvm_arm_sys_reg_get_reg(vcpu, reg);
->   }
->   
-> +/*
-> + * The RMI ABI only enables setting the lower GPRs (x0-x7) and PC.
+>> -----Original Message-----
+>> From: Oliver Upton <oliver.upton@linux.dev>
+>> Sent: Friday, October 11, 2024 4:11 PM
+>> To: Marc Zyngier <maz@kernel.org>
+>> Cc: Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
+>> catalin.marinas@arm.com; will@kernel.org; mark.rutland@arm.com;
+>> cohuck@redhat.com; eric.auger@redhat.com; yuzenghui
+>> <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
+>> jiangkunkun <jiangkunkun@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>; Anthony Jebson
+>> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
+>> Linuxarm <linuxarm@huawei.com>
+>> Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
+>> migration
+>> 
+>> On Fri, Oct 11, 2024 at 12:43:28PM +0100, Marc Zyngier wrote:
+>> > On Fri, 11 Oct 2024 11:57:10 +0100, Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com> wrote:
+>> > > > >
+>> > > > > Please take a look and let me know your thoughts.
+>> > > >
+>> > > > Having eyeballed this very superficially, I think we can do something
+>> > > > simpler, and maybe more future-proof:
+>> > >
+>> > > Thanks Marc for taking a look and the quick feedback.
+>> >
+>> > No worries, that's the least I could do given that you put the effort
+>> > implementing my silly ideas! ;-)
+>> >
+>> > > > - I don't think KVM should be concerned about the description of the
+>> > > >   target CPUs. The hypercall you defined is the right thing to do,
+>> > > >   but the VMM should completely handle it. That's an implementation
+>> > > >   detail, but it would make things much simpler.
+>> > >
+>> > > Ok. So does that mean the hypercall will use some sort of shared
+>> memory
+>> > > to retrieve the list of target CPUs from VMM?
+>> >
+>> > Two possibilities:
+>> >
+>> > - either shared memory, in which case the hypercall would require the
+>> >   guest to give an IPA and size for the VMM to write its stuff into
+>> >   the guest memory,
+>> >
+>> > - or more simply return the data as an MIDR/REVIDR pair in registers,
+>> >   the guest requesting an index, and getting an error when out of
+>> >   range, leaving it with the freedom to organise the storage.
+>> >
+>> > The second option is a bit slower, but way simpler, and it only
+>> > happens once per guest boot, so it would probably be my preferred
+>> > option unless this is proved to be impractical.
+>> 
+>> Also worth noting there's existing UAPI [*] for allowing userspace to
+>> register range(s) of hypercalls that it services directly. It's a bit
+>> weird that we'd allow userspace to do stuff in KVM's own hypercall
+>> range, but I don't think it really matters at this point since this is
+>> all prototyping.
+>> 
+>> [*]: https://docs.kernel.org/virt/kvm/devices/vm.html#attribute-kvm-arm-
+>> vm-smccc-filter-w-o
+>
+> Thanks. Yes and there are attempts to add that handling in Qemu[*] in the context
+> of vCPU hotplug support(PSCI related ones though).  Will take a look.
+>
+> Thanks,
+> Shameer
+> [1] https://lore.kernel.org/qemu-devel/20241009033704.250287-1-salil.mehta@huawei.com/
 
-This is true only for REC_CREATE ? But when we handle SMCCC calls in the
-userspace, we may need to allow setting x0-x17 and we should accommodate
-for that here ?
-
-Otherwise looks good to me.
-
-Suzuki
-
-
-> + * All other registers are reset to architectural or otherwise defined reset
-> + * values by the RMM, except for a few configuration fields that correspond to
-> + * Realm parameters.
-> + */
-> +static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
-> +				   const struct kvm_one_reg *reg)
-> +{
-> +	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
-> +		u64 off = core_reg_offset_from_id(reg->id);
-> +
-> +		switch (off) {
-> +		case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-> +		     KVM_REG_ARM_CORE_REG(regs.regs[7]):
-
-> +		case KVM_REG_ARM_CORE_REG(regs.pc):
-> +			return true;
-> +		}
-> +	}
-> +
-> +	return false;
-> +}
-> +
->   int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->   {
->   	/* We currently use nothing arch-specific in upper 32 bits */
->   	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
->   		return -EINVAL;
->   
-> +	if (kvm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
-> +		return -EINVAL;
-> +
->   	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
->   	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
->   	case KVM_REG_ARM_FW:
+Speaking of QEMU: Do you maybe already have some prototype code that
+tries to do something with the setup here? (I don't think QEMU currently
+mucks around with MIDR and friends when running with KVM; I wonder what
+it should provide to the guest and if it should care to set something as
+a base level that gives guests not using the hypercall a chance to work
+properly.)
 
