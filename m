@@ -1,30 +1,32 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421CC184D
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 00:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D1D23A6
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 00:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729124402; cv=none; b=pbcqDJo+WgEydURf5q4DwGdr/NxcGWAdAmo8cTRW4OyGeDtLv8Coi/gH3hc8cYkm8zA2UKbPdHC1LkFoEHSCiIe1DxW9Pno2AXXj7QAHbQpWVQrmGPO43L2zVBcNF5lmowoPYwofse8PVI/8gCh+UDwh75ZsvIER8JtVvRketzU=
+	t=1729124402; cv=none; b=IpuHxtCpu6CrSksC/ydAwDighcK7oYsCRO6/2Edk7XHL20dhBzTN9eg0CJKFR3BsCtJy+IopLYPpSMMewAan3DIXjsLviYJH7s7ExLwI8PGQ5u4IYpePKncO7GkrY+KWBnbMFJWgL3b4JpD8xrN1kQhp1wwBrqm7Ky3KyKNMd/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729124402; c=relaxed/simple;
-	bh=W9S3aEBQs4Xe/c31t3KPNF9p+Nn9Q5unM2gPYPXOE8s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gXxMFv/dFsGyzuFBHwi7OraeG7b+qwDk88nmDgk+BvLXzz/ie3aBocXJIO3lXTxbpT57tHrX+wY3YY5NKJuTIhD2THV805FCWpoyzvghh1JQKHLuhJYoO4bSFmaFBTgoTEhdxskCk1iV9e/RQRPG7udQcIM1IRmM/OgIILm8WEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HC/9fEaJ; arc=none smtp.client-ip=95.215.58.175
+	bh=Rwgh83VbrrB8XtIJsFmQ0uwK+g4e/VmwzNp5TI+Ir4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Uf1htbxFdFZ0dI+cpgmfvp81fVs36nr+n5C8U/xBxyh27a48k0b5bwi4/ryhtxMejrY+/I80r4aZyqlZ/LFNdXQ/r1/vJQSbcyxOXsmXDEIg4ZhvPxp/T9e3Qj7oQiw4V0e55DF1jMSsFAcg8DHd8a+eOCz3W/ptTD7wEMuFJEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bMD9418w; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HC/9fEaJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bMD9418w"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729124397;
+	t=1729124398;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1KS/vTVuDnN8DucUm3NvFtoqZzs2aHUgHiSr9crl+7I=;
-	b=HC/9fEaJHaXDO+7jHipmsZWWMi6IwI6hT62yY4omEEqnDUdsjrm2g25yF63Bm6YGWw4b2T
-	cla042mWGqGS6E+uKnT45Aq2BXxoqXwvuZvkJrKXnTKxJqxviJ3CIRjr1TJ3hIwIKavicu
-	s7cm4Zhzqjh1gIqt28G7Hdivmm1NDFY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+JT14a+z9Hy+WbUOzEZ9JfUBH4VfY+TZHfRTt4KCQLU=;
+	b=bMD9418w94xSZDs7c7uHeybFWj1bHYMVkNo4w/wjsFQIXh8GUehMhy9AfuIPxxhGGT8H/U
+	Q2ueMegj/Da5ndtQy2e8mbQzsDNqxhmgvzfSL+092y/zkYz2HV09JkXqZlbKxJQyBXoHQv
+	tJCLr1XLesKZ6w6D1oxMVI8S4RAQL4g=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -32,9 +34,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 0/2] KVM: arm64: Ensure VGIC is fully initialized before entering guest
-Date: Thu, 17 Oct 2024 00:19:45 +0000
-Message-ID: <20241017001947.2707312-1-oliver.upton@linux.dev>
+Subject: [PATCH 1/2] KVM: arm64: vgic: Don't check for vgic_ready() when setting NR_IRQS
+Date: Thu, 17 Oct 2024 00:19:46 +0000
+Message-ID: <20241017001947.2707312-2-oliver.upton@linux.dev>
+In-Reply-To: <20241017001947.2707312-1-oliver.upton@linux.dev>
+References: <20241017001947.2707312-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,23 +48,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Fix for the race [*] that I had mentioned last week. The first patch
-isn't entirely necessary, but it gets rid of a bogus check that could've
-potentially raced with kvm_vgic_map_resources() as vgic_dist::ready is
-no longer protected with the config_lock.
+KVM commits to a particular sizing of SPIs when the vgic is initialized,
+which is before the point a vgic becomes ready. On top of that, KVM
+supplies a default amount of SPIs should userspace not explicitly
+configure this.
 
-Applies to kvmarm/fixes.
+As such, the check for vgic_ready() in the handling of
+KVM_DEV_ARM_VGIC_GRP_NR_IRQS is completely wrong, and testing if nr_spis
+is nonzero is sufficient for preventing userspace from playing games
+with us.
 
-Oliver Upton (2):
-  KVM: arm64: vgic: Don't check for vgic_ready() when setting NR_IRQS
-  KVM: arm64: Ensure vgic_ready() is ordered against MMIO registration
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- arch/arm64/kvm/vgic/vgic-init.c       | 13 +++++++++++--
- arch/arm64/kvm/vgic/vgic-kvm-device.c |  7 ++++++-
- 2 files changed, 17 insertions(+), 3 deletions(-)
-
-
-base-commit: df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 1d26bb5b02f4..5f4f57aaa23e 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -236,7 +236,12 @@ static int vgic_set_common_attr(struct kvm_device *dev,
+ 
+ 		mutex_lock(&dev->kvm->arch.config_lock);
+ 
+-		if (vgic_ready(dev->kvm) || dev->kvm->arch.vgic.nr_spis)
++		/*
++		 * Either userspace has already configured NR_IRQS or
++		 * the vgic has already been initialized and vgic_init()
++		 * supplied a default amount of SPIs.
++		 */
++		if (dev->kvm->arch.vgic.nr_spis)
+ 			ret = -EBUSY;
+ 		else
+ 			dev->kvm->arch.vgic.nr_spis =
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
