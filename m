@@ -1,118 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE62E1D3647
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 11:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C451D4609;
+	Thu, 17 Oct 2024 11:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729166053; cv=none; b=fieW927QBNdg2VvrLqvjnamiOrlFvPPnhdkX8C36/Jlp1tyzL14Ey4xrs8e0z1qjmyQ3aqSauJQtC6RtoodU8y6TFKogM7g7gTu9t33bliuuexwKBTA6FECw1yh68w5PpdEwE2GL248Qoflyt42n1dNM3cr44GOLD3sgdnNKiXo=
+	t=1729166355; cv=none; b=eSaVHB4aXLOe454pSMufAouHpB0WoElfW1FFxv38p5jstUpxgkr4j5afryUpiknbTt63O7DUwDHB1XrRTSMxoceMvIBTmh0Oq7DZhqTkUNNdEt7PTf5ywz+zk4A5tQznezJAwpfU8hdP3IHXDbG4hV7pLjcFrPwr8xk8JeA7TEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729166053; c=relaxed/simple;
-	bh=Evp4cTCK7TCIkJdXtHnK1Q2ldTg3i60l7fhYKYaQeyE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=awS0i3ePFbRuCURL5OS049UmRfoQ4Gn43I9h2IFNq3c3hQql7OMKLld4Uxsmr+Dh0zh1SFzMqetQHA+kWgzEhyccvulpa8ES7c8qbAevpdWaJLp3DfdP5eff/wpYlMzwZMDgEXktldXmLv9LZs+mezSDMj9rKPIoFJYvUSEkRtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1e/mEo2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1e/mEo2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88AFBC4CEC3;
-	Thu, 17 Oct 2024 11:54:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729166052;
-	bh=Evp4cTCK7TCIkJdXtHnK1Q2ldTg3i60l7fhYKYaQeyE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l1e/mEo2Sa+2131tg0be3wTylopPkeqdsxpbM49r8SgDdokE7RFLEP6bi2iXhrmk5
-	 hAQTs5aToRgBmsO8bu9/I2ANJq8kXjdDoUlb5VVN+5SKarTuPQzWs5jwz7LMg/WwLp
-	 FQzTT2ZXSkPGBvrQ3MsJTdtZaPYzobANDMjADqcvHOOASV6rE4+VOTVeSsAxie1NfN
-	 pnsyj1rStL2xF11VVGWpBvjqye0JExWziVoXsYvDm9dgPR0Dt+rh2L7mBLTCtNlXb4
-	 hCNN3+SvxtrFMt6AtZPJRq5EnA6XgMo2IaLZRI8RuoepgToZJti0/nUXoALfnEkWCK
-	 LI8i6oU/CNkmQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t1P50-004Qtm-CW;
-	Thu, 17 Oct 2024 12:54:10 +0100
-Date: Thu, 17 Oct 2024 12:54:09 +0100
-Message-ID: <86msj33py6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	anshuman.khandual@arm.com,
-	james.morse@arm.com,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
-In-Reply-To: <20241015133923.3910916-5-joey.gouly@arm.com>
-References: <20241015133923.3910916-1-joey.gouly@arm.com>
-	<20241015133923.3910916-5-joey.gouly@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1729166355; c=relaxed/simple;
+	bh=KVx90sJAya4fJeJB1T9VQH8syX+5Y2Dms8kUeU21dyw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G4lvZS5vqBjrjtYmpGwDVknhSgDst2ZDREDvIFsruGlFPfLNYmrU8f0HQksVakTnSXY5kuHZ+k1SVF5ADjEcALL2vQfdCjrK9+Kt4AVkF8GoZVmcz8JCl71IUrv5OiVpUkXbIHOV/VNUgaVlbNWAdOBppbTEaooI0yW/06Mg6lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1DF1FEC;
+	Thu, 17 Oct 2024 04:59:39 -0700 (PDT)
+Received: from [10.57.22.188] (unknown [10.57.22.188])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5CE593F71E;
+	Thu, 17 Oct 2024 04:59:07 -0700 (PDT)
+Message-ID: <710c066e-75fa-4f12-b27a-c8948d02bb4b@arm.com>
+Date: Thu, 17 Oct 2024 12:59:06 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, anshuman.khandual@arm.com, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, shameerali.kolothum.thodi@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 19/43] KVM: arm64: Handle realm MMIO emulation
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-20-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20241004152804.72508-20-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Oct 2024 14:39:20 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On 04/10/2024 16:27, Steven Price wrote:
+> MMIO emulation for a realm cannot be done directly with the VM's
+> registers as they are protected from the host. However, for emulatable
+> data aborts, the RMM uses GPRS[0] to provide the read/written value.
+> We can transfer this from/to the equivalent VCPU's register entry and
+> then depend on the generic MMIO handling code in KVM.
 > 
-> @@ -204,6 +205,35 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
->  }
->  
-> +static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> For a MMIO read, the value is placed in the shared RecExit structure
+> during kvm_handle_mmio_return() rather than in the VCPU's register
+> entry.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> v3: Adapt to previous patch changes
+> ---
+>   arch/arm64/kvm/mmio.c     | 10 +++++++++-
+>   arch/arm64/kvm/rme-exit.c |  6 ++++++
+>   2 files changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index cd6b7b83e2c3..66a838b3776a 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -6,6 +6,7 @@
+>   
+>   #include <linux/kvm_host.h>
+>   #include <asm/kvm_emulate.h>
+> +#include <asm/rmi_smc.h>
+>   #include <trace/events/kvm.h>
+>   
+>   #include "trace.h"
+> @@ -90,6 +91,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>   
+>   	vcpu->mmio_needed = 0;
+>   
+> +	if (vcpu_is_rec(vcpu))
+> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_EMULATED_MMIO;
 > +
-> +	if (!cpus_support_mpam())
-> +		return;
+>   	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
+>   		struct kvm_run *run = vcpu->run;
+
+Should we additionally handle injecting an abort if there was no valid
+syndrome information ? Like we do for protected VMs and normal VMs when
+userspace doesn't offer to help ?
+
+>   
+> @@ -108,7 +112,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>   		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+>   			       &data);
+>   		data = vcpu_data_host_to_guest(vcpu, data, len);
+> -		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
 > +
-> +	/* trap guest access to MPAMIDR_EL1 */
-> +	if (mpam_cpus_have_mpam_hcr()) {
-> +		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
-> +	} else {
-> +		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
-> +		r |= MPAM2_EL2_TIDR;
-> +	}
+> +		if (vcpu_is_rec(vcpu))
+> +			vcpu->arch.rec.run->enter.gprs[0] = data;
+
+I wonder if we can skip this here and we can sync the "enter.gprs[]"
+from vcpu state at rec_enter, similar to what we do for PSCI/HOST call
+exits. Also the ESR_ELx_SRT is always x0 for a Realm exit. So, we should
+always find the enter.gpr[0] in vcpu.regs[0] at rec_enter.
+
+
+Suzuki
+
+
+> +		else
+> +			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+>   	}
+>   
+>   	/*
+> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
+> index e96ea308212c..1ddbff123149 100644
+> --- a/arch/arm64/kvm/rme-exit.c
+> +++ b/arch/arm64/kvm/rme-exit.c
+> @@ -25,6 +25,12 @@ static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
+>   
+>   static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
+>   {
+> +	struct realm_rec *rec = &vcpu->arch.rec;
 > +
-> +	write_sysreg_s(r, SYS_MPAM2_EL2);
-
-Please use the write_sysreg_el2() accessor, so that VHE under NV has
-an easier time, should we ever get there.
-
-> +}
+> +	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
+> +		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
+> +			     rec->run->exit.gprs[0]);
 > +
-> +static inline void __deactivate_traps_mpam(void)
-> +{
-> +	if (!cpus_support_mpam())
-> +		return;
-> +
-> +	write_sysreg_s(0, SYS_MPAM2_EL2);
+>   	return kvm_handle_guest_abort(vcpu);
+>   }
+>   
 
-Same thing.
-
-> +
-> +	if (mpam_cpus_have_mpam_hcr())
-> +		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
-> +}
-> +
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
