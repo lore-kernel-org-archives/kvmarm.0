@@ -1,65 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378C13C30
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 00:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05478101F2
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 02:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729125690; cv=none; b=ioZO76miIYt2pwtcPNoxtTTbQ03/0f9Dk2TVTqaf/wBNqx7vB2GXBze9zgrIzw6pr6ODa0h1GwYsSqUIlgJyRyrv9amFznnxXlzUO/4Nn8ud9ZLKPFF9DOVaHbv3OQ5QLU6Csz6ojjyLr/OHld/zjSBJeTHGLCYnYwmQjAoLY/Y=
+	t=1729132601; cv=none; b=MtP8NUC8t7gHB7PxvSeUXwzMM+sd2yVwfl4R+gU/czUtQa/XUk18hUxbujfU65BiAGy2L4MCw72T3PC2/3MqTAC1X61jg9NAIJV3bv3qQ8JNUGQmkrI31V1ZGS+0+6i0hEWAPiSGpSnpF+7DgaXzcY4pcszccMVdhgzOYuC5aME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729125690; c=relaxed/simple;
-	bh=O8zEwYc6dkvIVdbvr69Jpl3zP9gtHA3FcjA2rxf99uE=;
+	s=arc-20240116; t=1729132601; c=relaxed/simple;
+	bh=9ZXrXeqMwvZL5DdagWZkZG4WvZsDR0XyAZxofYV7NS8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T8uTMCynSWyHBum1HCyluXHlEDXbbDVHYG6d03bnXMfC9BSQQVyIxQLCyAo6io5HjIjE3kl1KXUnC/ISpH3BdrHpisqoaA+x9dS2JaJm2xcJD4/0ia+tcwqBLKCyCQfSfZTuK5r6OLJCgJY5TwQekAStEKTX6OrCFaSHXgd3gf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ROB2Ym+b; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=p6Ao0pMS/zVL30CzEE7N15+UiwPQ70bh1KDtL0xUZ310pJLYtg9bfYDKGhwmzwaXsEfw18h1hIvIstYGiN+CkLvcjhKtvTKZTwkCnpu1mZxQC+4R+oL8s4fASJg+9LZ6i6fA1aD26InYLqfeT0xdLy4GtZUYg4/OqPaUIcpQUuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hSVQVeNP; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ROB2Ym+b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSVQVeNP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729125687;
+	s=mimecast20190719; t=1729132596;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=niTNkW+OclggLNNlY2+mg3vY9pQhEh6midy5UkQuFK4=;
-	b=ROB2Ym+b/CTAbFojs06TlMJPowIxI++nZ/9oJ68hDrZh/cAdJhX7tas9fLJL2ibkyHPoNQ
-	t2ova89Z7Y6jmfAqR/tLX+0UhoehTET9syvVJodJMiBoFumYACVURWSDYn3R1KeRNkVVXQ
-	AWBG98mv+j3zUdwTBV0QaSoXL6yj2sI=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wEBlr2uGalE2BxWMEhI3053v9X7bzgdwMmj1cpGN1JQ=;
+	b=hSVQVeNPRPQcwt2THSxhsGO0VYGoM61ws/3UNeYZwJQnNTtVqiCZTYHj2Xmuvub8xKIGe5
+	8ILDN1Ly9UKhJiG2hLBwu7ZFY+3At9hxbR0kjZRQ48KHcIZwWkS+/XlPw9dxQEi5MNZajl
+	5uLSwf3BJVXn7n5JZgo519zrlJNFEvI=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-228-OxpKrUH8OgyX3RwPO0YM7w-1; Wed, 16 Oct 2024 20:41:23 -0400
-X-MC-Unique: OxpKrUH8OgyX3RwPO0YM7w-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-20c70cc9d27so3335065ad.2
-        for <kvmarm@lists.linux.dev>; Wed, 16 Oct 2024 17:41:23 -0700 (PDT)
+ us-mta-423-evtNWTiVPP2LI3ZVhiTrfw-1; Wed, 16 Oct 2024 22:36:35 -0400
+X-MC-Unique: evtNWTiVPP2LI3ZVhiTrfw-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2e295559c37so405936a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 16 Oct 2024 19:36:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729125683; x=1729730483;
+        d=1e100.net; s=20230601; t=1729132594; x=1729737394;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=niTNkW+OclggLNNlY2+mg3vY9pQhEh6midy5UkQuFK4=;
-        b=p+QFLuD6yRjvKmcD5/GNOMtFtXR2MhYxTzU643osFPf1BxlaR0OkxHY92OGHPusobC
-         Mrq+QlS3mfaCmihFzr3ZU33hmSEyfvBc5kOjc4yBR1Q4GuUYvS0gWuCxfG1Ms6a8RoZo
-         ukN8ZW/1CbXUFAOjnzwaDhGn1RtjwB5SCqKp+2KUsgJ2vTCWg0X6rXp6EFWKqzWJoh0/
-         Uo2t9NWupMRBXq536hl+8SeukmD8rmWZ0fvAnVA44S62Vh3tXftFDGDP+shGVUcuf3oA
-         UplEWr31inaAYI394gYaE87HDBKHIlWJIigpwyTvPzw2wcfQZDeBpgzYtBoJ79oCx4zy
-         vNFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUiwHUFq3S/DXnNADHC8T+CLwTytGKbY+D7t30rFogJkULN+P27UkDJIFTKxmJ0jyhGkyll8D0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzXNBX+OfaPbZnEOLBHCA5l7UfQr727ppVeO2dL9d9Jy8k8Br52
-	7Tv/hxQVsTPj7lsMTz2T2MuxNLLYgVfPgmy1cJUT2c2mbH27ong4AA6vTCffycGyFYcSMtT6Avf
-	Qwh+sWNnTzoDZIeG8jqaop0mdfBsrV4luJmXbcUlY658N6HWdDNGQtg==
-X-Received: by 2002:a17:903:18b:b0:20c:5e86:9b5e with SMTP id d9443c01a7336-20d27e7eb06mr83879645ad.3.1729125682799;
-        Wed, 16 Oct 2024 17:41:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHawaEYV2O1eOxLrSm7MRPeaSYPxuZsNHFnRzCDycCmp1JJCAqkT9Li5rOzDL1eOM6hlm8bvQ==
-X-Received: by 2002:a17:903:18b:b0:20c:5e86:9b5e with SMTP id d9443c01a7336-20d27e7eb06mr83879435ad.3.1729125682400;
-        Wed, 16 Oct 2024 17:41:22 -0700 (PDT)
+        bh=wEBlr2uGalE2BxWMEhI3053v9X7bzgdwMmj1cpGN1JQ=;
+        b=RIbB+Zi2PeZH1+1O9BFE5sutW0v0l2fbo6al0zaWr/egELFVtVytVaV2gOnf3OLCRS
+         NzJsrWvOlQCj9NB+MgaJf5NA/CvDnnNaXnsrzatTBLi6h3bhZ7F//rdOJFfs3UISqVRQ
+         1oxKYvQaUTIWZJnl2QP0MPfI1SeoXC71z5y1SGAp/QS59hpeosmkiA/P24WSIq3wpAu3
+         x0TJNk0Le83B7DBgVZF4+tGVuAbSkLK8uCAJMqj5xNkKHarpSKFuNOYa+ZqeLWCAaZXH
+         kJi184hoHRBz6FDV6cqlGyc3muTHTEMfgCFqNm68DCKtHy2qdjDBNdLtP+MruVw999fm
+         k7aw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDSB9im5rk02u8sem72S7HnHa4cxHRyNacovnZbDVKizaX0tajtJ46A5AwHRY7K/ESAKUMMUQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzG8+egKFGkMKPwTRTUrjaHBi8hOoW3V5gBv24b6sep5Nsi2xf4
+	MORfMdzrxMvdKEVsXI6K6Z6xbBJuMyMxEyUDzx73MDQadI0yHmN9/LdL+7vNHv2Nbhb41LPoSjU
+	3BUvLcT4rEeTgVFj1Z1uoxTvTzvq8aRsZulSPq0GoKio9Xmg+HI8OCw==
+X-Received: by 2002:a17:903:40c6:b0:20b:5351:f69a with SMTP id d9443c01a7336-20d27f3fae7mr85434785ad.58.1729132594633;
+        Wed, 16 Oct 2024 19:36:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFbve1cFT+3/T9aIoiBUg75NmznGBWFLY7XVK/82tI9cQx42+1B5lOQ/CKFQ5WmsEJ1LXDSpQ==
+X-Received: by 2002:a17:903:40c6:b0:20b:5351:f69a with SMTP id d9443c01a7336-20d27f3fae7mr85434555ad.58.1729132594305;
+        Wed, 16 Oct 2024 19:36:34 -0700 (PDT)
 Received: from [192.168.68.54] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d17fa5f2fsm34291385ad.119.2024.10.16.17.41.17
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d1805b0afsm35119205ad.246.2024.10.16.19.36.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 17:41:21 -0700 (PDT)
-Message-ID: <f6475ddb-c583-4ad0-8511-1e7b76b8f716@redhat.com>
-Date: Thu, 17 Oct 2024 10:41:14 +1000
+        Wed, 16 Oct 2024 19:36:33 -0700 (PDT)
+Message-ID: <f0de708f-674d-48ad-a3e8-9d3a06a72081@redhat.com>
+Date: Thu, 17 Oct 2024 12:36:27 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't
- completely ignored
+Subject: Re: [PATCH v5 3/7] arm64: cpufeature: discover CPU support for MPAM
 To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.linux.dev
 Cc: anshuman.khandual@arm.com, james.morse@arm.com,
@@ -78,9 +77,9 @@ Cc: anshuman.khandual@arm.com, james.morse@arm.com,
  Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 References: <20241015133923.3910916-1-joey.gouly@arm.com>
- <20241015133923.3910916-8-joey.gouly@arm.com>
+ <20241015133923.3910916-4-joey.gouly@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241015133923.3910916-8-joey.gouly@arm.com>
+In-Reply-To: <20241015133923.3910916-4-joey.gouly@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -90,170 +89,49 @@ Content-Transfer-Encoding: 7bit
 On 10/15/24 11:39 PM, Joey Gouly wrote:
 > From: James Morse <james.morse@arm.com>
 > 
-> The ID_AA64PFR0.MPAM bit was previously accidentally exposed to guests,
-> and is ignored by KVM. KVM will always present the guest with 0 here,
-> and trap the MPAM system registers to inject an undef.
+> ARMv8.4 adds support for 'Memory Partitioning And Monitoring' (MPAM)
+> which describes an interface to cache and bandwidth controls wherever
+> they appear in the system.
 > 
-> But, this value is still needed to prevent migration when the value
-> is incompatible with the target hardware. Add a kvm unit test to try
-> and write multiple values to ID_AA64PFR0.MPAM. Only the hardware value
-> previously exposed should be ignored, all other values should be
-> rejected.
+> Add support to detect MPAM. Like SVE, MPAM has an extra id register that
+> describes some more properties, including the virtualisation support,
+> which is optional. Detect this separately so we can detect
+> mismatched/insane systems, but still use MPAM on the host even if the
+> virtualisation support is missing.
+> 
+> MPAM needs enabling at the highest implemented exception level, otherwise
+> the register accesses trap. The 'enabled' flag is accessible to lower
+> exception levels, but its in a register that traps when MPAM isn't enabled.
+> The cpufeature 'matches' hook is extended to test this on one of the
+> CPUs, so that firmware can emulate MPAM as disabled if it is reserved
+> for use by secure world.
+> 
+> Secondary CPUs that appear late could trip cpufeature's 'lower safe'
+> behaviour after the MPAM properties have been advertised to user-space.
+> Add a verify call to ensure late secondaries match the existing CPUs.
+> 
+> (If you have a boot failure that bisects here its likely your CPUs
+> advertise MPAM in the id registers, but firmware failed to either enable
+> or MPAM, or emulate the trap as if it were disabled)
 > 
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > ---
->   .../selftests/kvm/aarch64/set_id_regs.c       | 100 +++++++++++++++++-
->   1 file changed, 99 insertions(+), 1 deletion(-)
+>   .../arch/arm64/cpu-feature-registers.rst      |  2 +
+>   arch/arm64/Kconfig                            | 20 ++++
+>   arch/arm64/include/asm/cpu.h                  |  1 +
+>   arch/arm64/include/asm/cpucaps.h              |  2 +
+>   arch/arm64/include/asm/cpufeature.h           | 12 +++
+>   arch/arm64/include/asm/mpam.h                 | 32 ++++++
+>   arch/arm64/kernel/Makefile                    |  2 +
+>   arch/arm64/kernel/cpufeature.c                | 97 +++++++++++++++++++
+>   arch/arm64/kernel/cpuinfo.c                   |  4 +
+>   arch/arm64/kernel/mpam.c                      |  6 ++
+>   arch/arm64/tools/cpucaps                      |  1 +
+>   11 files changed, 179 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/mpam.h
+>   create mode 100644 arch/arm64/kernel/mpam.c
 > 
-> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> index 2a3fe7914b72..d985ead2cc45 100644
-> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> @@ -433,6 +433,103 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
->   	}
->   }
->   
-> +#define MPAM_IDREG_TEST	6
-> +static void test_user_set_mpam_reg(struct kvm_vcpu *vcpu)
-> +{
-> +	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-> +	struct reg_mask_range range = {
-> +		.addr = (__u64)masks,
-> +	};
-> +	uint64_t val, ftr_mask;
-> +	int idx, err;
-> +
-> +	/*
-> +	 * If ID_AA64PFR0.MPAM is _not_ officially modifiable and is zero,
-> +	 * check that if it can be set to 1, (i.e. it is supported by the
-> +	 * hardware), that it can't be set to other values.
-> +	 */
-> +
-> +	/* Get writable masks for feature ID registers */
-> +	memset(range.reserved, 0, sizeof(range.reserved));
-> +	vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-> +
-> +	/* Writeable? Nothing to test! */
-> +	idx = encoding_to_range_idx(SYS_ID_AA64PFR0_EL1);
-> +	ftr_mask = ID_AA64PFR0_EL1_MPAM_MASK;
-> +	if ((masks[idx] & ftr_mask) == ftr_mask) {
-> +		ksft_test_result_skip("ID_AA64PFR0_EL1.MPAM is officially writable, nothing to test\n");
-> +		return;
-> +	}
-> +
 
-The question is shall we proceed to test ID_AA64PFR1_EL1.MPAM_frac instead of
-bailing when ID_AA64PFR0_EL1.MPAM accepts arbitrary values? To me, it doesn't
-mean ID_AA64PFR1_EL1.MPAM_frac can accept arbitrary values when ID_AA64PFR0_EL1.MPAM
-does.
-
-@ftr_mask can be dropped since it's initialized to a fixed mask and used for
-only for once.
-
-     if (mask[idx] & ID_AA64PFR0_EL1_MPAM_MASK] == ID_AA64PFR0_EL1_MPAM_MASK) {
-         :
-     }
-
-> +	/* Get the id register value */
-> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-> +
-> +	/* Try to set MPAM=0. This should always be possible. */
-> +	val &= ~GENMASK_ULL(44, 40);
-> +	val |= FIELD_PREP(GENMASK_ULL(44, 40), 0);
-> +	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-> +	if (err)
-> +		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM=0 was not accepted\n");
-> +	else
-> +		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM=0 worked\n");
-> +
-> +	/* Try to set MPAM=1 */
-> +	val &= ~GENMASK_ULL(44, 40);
-> +	val |= FIELD_PREP(GENMASK_ULL(44, 40), 1);
-> +	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-> +	if (err)
-> +		ksft_test_result_skip("ID_AA64PFR0_EL1.MPAM is not writable, nothing to test\n");
-> +	else
-> +		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM=1 was writable\n");
-> +
-> +	/* Try to set MPAM=2 */
-> +	val &= ~GENMASK_ULL(43, 40);
-> +	val |= FIELD_PREP(GENMASK_ULL(43, 40), 2);
-> +	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-> +	if (err)
-> +		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM not arbitrarily modifiable\n");
-> +	else
-> +		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM value should not be ignored\n");
-> +
-
-GENMASK_ULL(44, 40) looks wrong to me. According to the spec, GENMASK_ULL(43, 40)
-is the correct mask. Besides, I think it would be nice to use ID_AA64PFR0_EL1_MPAM_MASK
-here, for example:
-
-     val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
-     val |= FIELD_PREP(ID_AA64PFR0_EL1_MPAM_MASK, 2);
-
-> +	/* And again for ID_AA64PFR1_EL1.MPAM_frac */
-> +	idx = encoding_to_range_idx(SYS_ID_AA64PFR1_EL1);
-> +	ftr_mask = ID_AA64PFR1_EL1_MPAM_frac_MASK;
-> +	if ((masks[idx] & ftr_mask) == ftr_mask) {
-> +		ksft_test_result_skip("ID_AA64PFR1_EL1.MPAM_frac is officially writable, nothing to test\n");
-> +		return;
-> +	}
-> +
-> +	/* Get the id register value */
-> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), &val);
-> +
-> +	/* Try to set MPAM_frac=0. This should always be possible. */
-> +	val &= ~GENMASK_ULL(19, 16);
-> +	val |= FIELD_PREP(GENMASK_ULL(19, 16), 0);
-> +	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-> +	if (err)
-> +		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM_frac=0 was not accepted\n");
-> +	else
-> +		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM_frac=0 worked\n");
-> +
-> +	/* Try to set MPAM_frac=1 */
-> +	val &= ~GENMASK_ULL(19, 16);
-> +	val |= FIELD_PREP(GENMASK_ULL(19, 16), 1);
-> +	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-> +	if (err)
-> +		ksft_test_result_skip("ID_AA64PFR1_EL1.MPAM_frac is not writable, nothing to test\n");
-> +	else
-> +		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM_frac=1 was writable\n");
-> +
-> +	/* Try to set MPAM_frac=2 */
-> +	val &= ~GENMASK_ULL(19, 16);
-> +	val |= FIELD_PREP(GENMASK_ULL(19, 16), 2);
-> +	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-> +	if (err)
-> +		ksft_test_result_pass("ID_AA64PFR1_EL1.MPAM_frac not arbitrarily modifiable\n");
-> +	else
-> +		ksft_test_result_fail("ID_AA64PFR1_EL1.MPAM_frac value should not be ignored\n");
-> +}
-> +
-
-Similarly, ID_AA64PFR1_EL1_MPAM_frac_MASK can be used?
-
->   static void test_guest_reg_read(struct kvm_vcpu *vcpu)
->   {
->   	bool done = false;
-> @@ -571,12 +668,13 @@ int main(void)
->   		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
->   		   ARRAY_SIZE(ftr_id_aa64mmfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) +
->   		   ARRAY_SIZE(ftr_id_aa64mmfr2_el1) + ARRAY_SIZE(ftr_id_aa64zfr0_el1) -
-> -		   ARRAY_SIZE(test_regs) + 2;
-> +		   ARRAY_SIZE(test_regs) + 2 + MPAM_IDREG_TEST;
->   
->   	ksft_set_plan(test_cnt);
->   
->   	test_vm_ftr_id_regs(vcpu, aarch64_only);
->   	test_vcpu_ftr_id_regs(vcpu);
-> +	test_user_set_mpam_reg(vcpu);
->   
->   	test_guest_reg_read(vcpu);
->   
-
-Thanks,
-Gavin
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
