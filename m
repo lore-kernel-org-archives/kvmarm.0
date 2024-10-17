@@ -1,160 +1,76 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CCB1DED4F
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 15:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1EC1DED4F
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 15:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729180213; cv=none; b=M2y1ykcvAipcCy2Uf9M0S+0Wj9jJiiWGnzZkjp7o3BlFYSqvNxrQXoTTiyNEWdIDaUgzsr3vrGl2aCr1cVTKF8QvB9M+k2udZh5lQzTWB/F5nkTcoaZFSHuvzT+wDkk7gl572iDL9oM2oIwUN9O+7JtHgpfe9ChAd9DXdQUWROI=
+	t=1729180428; cv=none; b=swRJ6lNNn7gOIsS9iPB7tSBKzHpb6X80AiSVJE+hQJa7JE/s6iWk2+4QcRu1FwM/h8dAgTy97aB7ji0vBXPem79Nm+eKmToGu/zDFclSdlQuJhrSTZ4doZVS525MwVAuZN/BQOR1AZ+JqstK3xGdh8wwRGBR9blFcpf+CKQ1SxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729180213; c=relaxed/simple;
-	bh=g776Yee/+LxdoaGv+CjSjTiSnqa/SMcgSTdt3Sdu+24=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gB21GrToM4KGM06gNis/E+rMYrsZPABdRqdiesLerxnAvUi/jb6pjVqN09kwVCpo5aI3YHi9W+uxGG/HDbUFBqCsQdQOmW2MNNWJiopDL9sSOKycpNy5yO2Adg3Q1H2Gwx0I+Umdv7U9CHXIkr5CdfxvqCHzl0AOIplijZdfrYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chPK1yJu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729180428; c=relaxed/simple;
+	bh=hn1fO+qEPRtGcwMf/lrb5AntTEPnC/brJ08VovW7eK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GRbAQ+uRBTySEgE7MewU1B3sGKJtT7munGS48IKysBYatwOmRdI3y5//rIFZHHEeb6P7/2qZZjsh/KvFz8UoUYgnMmiQnbN9x5/KILwebYDibCdA81FabIE2V9XaY51tid04IJjpXkKQ/Fi+A0cb2t8M3EdTenscxaeZuPsCm0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J2Sojln7; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chPK1yJu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729180207;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J2Sojln7"
+Date: Thu, 17 Oct 2024 08:53:30 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729180421;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6hNvVkE15DnCxqx2pKiUWEQ26XlDg4qXsXTpA0aX9UY=;
-	b=chPK1yJu8Ip3AxTcP5LLbq09aqmNS2/k2Sk8rixpefnWFA85iPCKwEXL/4Lls5LyKK3zMT
-	t1cw0VVTo2V7Lmk8pL3tt3rXxfPkZZsXBWSVvDgB2r99ma96md0dHusQw8/SNCnvCZX2sb
-	3IwoGBE9icSayB61V7GSNKzv8THHZYI=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-d0yVcna0N36ImNywZgYbxg-1; Thu,
- 17 Oct 2024 11:50:02 -0400
-X-MC-Unique: d0yVcna0N36ImNywZgYbxg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F38219560B6;
-	Thu, 17 Oct 2024 15:49:59 +0000 (UTC)
-Received: from localhost (dhcp-192-244.str.redhat.com [10.33.192.244])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3BFF219560A2;
-	Thu, 17 Oct 2024 15:49:55 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Oliver
- Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
- <will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>, yuzenghui
- <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
- jiangkunkun <jiangkunkun@huawei.com>, Jonathan
- Cameron <jonathan.cameron@huawei.com>, Anthony Jebson
- <anthony.jebson@huawei.com>, "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
- migration
-In-Reply-To: <08261a41b9644f5ab49063824e4060c3@huawei.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
- <86jzef53iz.wl-maz@kernel.org>
- <3f4469c49625413f9ab2c224d0d3fbea@huawei.com>
- <86ikty6f1b.wl-maz@kernel.org> <ZwlADbp-HjkijElX@linux.dev>
- <08261a41b9644f5ab49063824e4060c3@huawei.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Thu, 17 Oct 2024 17:49:53 +0200
-Message-ID: <87bjziraou.fsf@redhat.com>
+	bh=v9/em7t+BBBQsHmvv6MKondUh0J9hRfQLQ0pF3UTvMI=;
+	b=J2Sojln739VF7hD2MvZ3MKU0+SJfrp0UYqokah9/tb2c6CtvDCPhz7i2fW6xTukTyP7HyQ
+	aKUwMqcBgQQLAQjAK8TCIdDIUbg4/i5PXM15ZDkx/UHvtSO1FvQJHfUT0nVEs84uqS2mDi
+	6FmAT32wY2wzI45UquhuBMQEMVYDEsc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Ensure vgic_ready() is ordered against
+ MMIO registration
+Message-ID: <ZxEy-swdecozHK7z@linux.dev>
+References: <20241017001947.2707312-1-oliver.upton@linux.dev>
+ <20241017001947.2707312-3-oliver.upton@linux.dev>
+ <86ttdb40ux.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ttdb40ux.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Oct 11 2024, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Thu, Oct 17, 2024 at 08:58:30AM +0100, Marc Zyngier wrote:
+> On Thu, 17 Oct 2024 01:19:47 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> I thought we would benefit from the removal of the early-out at the
+> beginning of the function, specially given that this is only called on
+> the first run of any vcpu -- and we can probably afford to take the
+> locks on such a rare event. My impression is that we'd gain in
+> robustness and maintainability.
+> 
+> This can come as a later patch if we agree that this is valuable.
 
->> -----Original Message-----
->> From: Oliver Upton <oliver.upton@linux.dev>
->> Sent: Friday, October 11, 2024 4:11 PM
->> To: Marc Zyngier <maz@kernel.org>
->> Cc: Shameerali Kolothum Thodi
->> <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
->> catalin.marinas@arm.com; will@kernel.org; mark.rutland@arm.com;
->> cohuck@redhat.com; eric.auger@redhat.com; yuzenghui
->> <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
->> jiangkunkun <jiangkunkun@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>; Anthony Jebson
->> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
->> Linuxarm <linuxarm@huawei.com>
->> Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
->> migration
->> 
->> On Fri, Oct 11, 2024 at 12:43:28PM +0100, Marc Zyngier wrote:
->> > On Fri, 11 Oct 2024 11:57:10 +0100, Shameerali Kolothum Thodi
->> <shameerali.kolothum.thodi@huawei.com> wrote:
->> > > > >
->> > > > > Please take a look and let me know your thoughts.
->> > > >
->> > > > Having eyeballed this very superficially, I think we can do something
->> > > > simpler, and maybe more future-proof:
->> > >
->> > > Thanks Marc for taking a look and the quick feedback.
->> >
->> > No worries, that's the least I could do given that you put the effort
->> > implementing my silly ideas! ;-)
->> >
->> > > > - I don't think KVM should be concerned about the description of the
->> > > >   target CPUs. The hypercall you defined is the right thing to do,
->> > > >   but the VMM should completely handle it. That's an implementation
->> > > >   detail, but it would make things much simpler.
->> > >
->> > > Ok. So does that mean the hypercall will use some sort of shared
->> memory
->> > > to retrieve the list of target CPUs from VMM?
->> >
->> > Two possibilities:
->> >
->> > - either shared memory, in which case the hypercall would require the
->> >   guest to give an IPA and size for the VMM to write its stuff into
->> >   the guest memory,
->> >
->> > - or more simply return the data as an MIDR/REVIDR pair in registers,
->> >   the guest requesting an index, and getting an error when out of
->> >   range, leaving it with the freedom to organise the storage.
->> >
->> > The second option is a bit slower, but way simpler, and it only
->> > happens once per guest boot, so it would probably be my preferred
->> > option unless this is proved to be impractical.
->> 
->> Also worth noting there's existing UAPI [*] for allowing userspace to
->> register range(s) of hypercalls that it services directly. It's a bit
->> weird that we'd allow userspace to do stuff in KVM's own hypercall
->> range, but I don't think it really matters at this point since this is
->> all prototyping.
->> 
->> [*]: https://docs.kernel.org/virt/kvm/devices/vm.html#attribute-kvm-arm-
->> vm-smccc-filter-w-o
->
-> Thanks. Yes and there are attempts to add that handling in Qemu[*] in the context
-> of vCPU hotplug support(PSCI related ones though).  Will take a look.
->
-> Thanks,
-> Shameer
-> [1] https://lore.kernel.org/qemu-devel/20241009033704.250287-1-salil.mehta@huawei.com/
+I should've mentioned my rationale a bit more here, thanks for queuing
+the patch anyway. Prolonged blackout for live migration is a problem for
+larger VMs, and I was too chicken to have all vCPUs pile up on slots_lock
+and config_lock.
 
-Speaking of QEMU: Do you maybe already have some prototype code that
-tries to do something with the setup here? (I don't think QEMU currently
-mucks around with MIDR and friends when running with KVM; I wonder what
-it should provide to the guest and if it should care to set something as
-a base level that gives guests not using the hypercall a chance to work
-properly.)
+Too lazy to prove this is/isn't an issue, so I figured I'd preserve the
+existing flow as much as possible. If we get this wrong again (which
+wouldn't be surprising) then let's drop the early out and just take the
+locks.
 
+Seem reasonable?
+
+-- 
+Thanks,
+Oliver
