@@ -1,139 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A601C1AB1
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 07:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B851B6CF2
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 07:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729151065; cv=none; b=K14PHroouGEy4FwVGpc9cr9v5y2W77Pt0Etqudr/XHS1ALBW2V14CSOQzJ566TdqkdwHTJct+BAA9VkibQfjnZ+oJ26pY/GOCTNY874AShxF4zsBfkg5NXczyMuQJD8b0jNb0woswZJ+vHToADInc6xdCcGO0psJcoNPOxHxjDk=
+	t=1729151913; cv=none; b=vGHBPaXF6yB5fkpxaufMSyZs0XXMpdmt0mbWDClbZbcqwfk9+aCB8jj0RfjaULYlbqY4IkV0JG3KarNsC8Lqqu/QTs2bzRjhboKgjJkm4bGHFsEekLheEICgT0hQK9f55eYXvlKcL0vXhfWAkmy++1IE156grrmGxTjfo25NC+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729151065; c=relaxed/simple;
-	bh=cnyVrXHUSLxpqT3tVAOcGrT5O5nt2KFsJZpwLWNWkWo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A/vhDaE2eMRk4Rzu036baXpmzonxpSU061PFxIEPqn/jV6+Pfe2D5z8L4tZc/y0jLI63W4OZoxXDJ2WHMWWPWLsGz93sTJcSVMlLWGMLK09zsamZyow4bSxU/EUToRJn4e3+Voda2UhZqhImT7bwHPEv4l6ErBZt7q9Rje6WKS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6602DFEC;
-	Thu, 17 Oct 2024 00:44:52 -0700 (PDT)
-Received: from [10.57.66.61] (unknown [10.57.66.61])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EACE83F528;
-	Thu, 17 Oct 2024 00:44:15 -0700 (PDT)
-Message-ID: <c629869a-0cbf-4f0a-b361-cfb962177aeb@arm.com>
-Date: Thu, 17 Oct 2024 09:44:13 +0200
+	s=arc-20240116; t=1729151913; c=relaxed/simple;
+	bh=zdF+B+r4Pu8Z2Tj6FzkV+Yd/5SsrHQvwfNXuYPWCjrc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PdrldevUmOgBVWC5cG0KDHtDYKkZXd3iRKb3X/IZMTlAd3cufeZGOefqQ1IhshGXX+lFpxU/XzJG5jO9zxksbsDFh3+R4xtO246W4e5GNDoUlKp8Lgo8EGHs9zQ9qnft1pvmdtS23Kopp+puWPRgzRok/hfOCSQCSzy7o1tasPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZcYIfyGW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZcYIfyGW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ABE4C4CEC3;
+	Thu, 17 Oct 2024 07:58:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729151913;
+	bh=zdF+B+r4Pu8Z2Tj6FzkV+Yd/5SsrHQvwfNXuYPWCjrc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZcYIfyGWbBAgpW1FRbfPtCGCN+apRgxxAr3/7NudeqFy/FY4qV/I1fytVguzfGK0j
+	 f2mrDVHew7pJfgNw9iRxfysrP/VB16QG7Jgw7f1O7OwPMDgZTj5XHprM3ai3fY4pli
+	 usuMPPhowD1LyWVX8uwQDddp+QXwg6ed1bapR4XzjRVeuCXt+seBFKv4usJdGrfUyX
+	 8NEQPZzxomroMkgQoFcZrlMDqKYu9TR+iRkgt36NC4KFIzSgpxalpzIOlDN8G3V9em
+	 ElLHV0N968ICPocwAo40sj7GMNIoR+1AT5Z/RSHWVnZj0aVAVnQfe/AMFxMJPn/lyY
+	 gi/KO9wOTvVew==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t1LOw-004KlD-Rw;
+	Thu, 17 Oct 2024 08:58:30 +0100
+Date: Thu, 17 Oct 2024 08:58:30 +0100
+Message-ID: <86ttdb40ux.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Ensure vgic_ready() is ordered against MMIO registration
+In-Reply-To: <20241017001947.2707312-3-oliver.upton@linux.dev>
+References: <20241017001947.2707312-1-oliver.upton@linux.dev>
+	<20241017001947.2707312-3-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 19/30] arm64: add POE signal support
-To: Joey Gouly <joey.gouly@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
- akpm@linux-foundation.org, aneesh.kumar@kernel.org,
- aneesh.kumar@linux.ibm.com, anshuman.khandual@arm.com, bp@alien8.de,
- broonie@kernel.org, catalin.marinas@arm.com, christophe.leroy@csgroup.eu,
- dave.hansen@linux.intel.com, hpa@zytor.com, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, maz@kernel.org,
- mingo@redhat.com, mpe@ellerman.id.au, naveen.n.rao@linux.ibm.com,
- npiggin@gmail.com, oliver.upton@linux.dev, shuah@kernel.org,
- skhan@linuxfoundation.org, szabolcs.nagy@arm.com, tglx@linutronix.de,
- x86@kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-References: <20240822151113.1479789-1-joey.gouly@arm.com>
- <20240822151113.1479789-20-joey.gouly@arm.com>
- <47e1537f-5b60-4541-aed1-a20e804c137d@arm.com>
- <20241009144301.GA12453@willie-the-truck>
- <20241014171023.GA18295@willie-the-truck>
- <20241015095911.GA3777204@e124191.cambridge.arm.com>
- <20241015114116.GA19334@willie-the-truck>
- <20241015122529.GA3820764@e124191.cambridge.arm.com>
-Content-Language: en-GB
-From: Kevin Brodsky <kevin.brodsky@arm.com>
-In-Reply-To: <20241015122529.GA3820764@e124191.cambridge.arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 15/10/2024 14:25, Joey Gouly wrote:
-> On Tue, Oct 15, 2024 at 12:41:16PM +0100, Will Deacon wrote:
->> On Tue, Oct 15, 2024 at 10:59:11AM +0100, Joey Gouly wrote:
->>> On Mon, Oct 14, 2024 at 06:10:23PM +0100, Will Deacon wrote:
->>>> Kevin, Joey,
->>>>
->>>> On Wed, Oct 09, 2024 at 03:43:01PM +0100, Will Deacon wrote:
->>>>> On Tue, Sep 24, 2024 at 01:27:58PM +0200, Kevin Brodsky wrote:
->>>>>> On 22/08/2024 17:11, Joey Gouly wrote:
->>>>>>> @@ -1178,6 +1237,9 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
->>>>>>>  		sme_smstop();
->>>>>>>  	}
->>>>>>>  
->>>>>>> +	if (system_supports_poe())
->>>>>>> +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
->>>>>> At the point where setup_return() is called, the signal frame has
->>>>>> already been written to the user stack. In other words, we write to the
->>>>>> user stack first, and then reset POR_EL0. This may be problematic,
->>>>>> especially if we are using the alternate signal stack, which the
->>>>>> interrupted POR_EL0 may not grant access to. In that situation uaccess
->>>>>> will fail and we'll end up with a SIGSEGV.
->>>>>>
->>>>>> This issue has already been discussed on the x86 side, and as it happens
->>>>>> patches to reset PKRU early [1] have just landed. I don't think this is
->>>>>> a blocker for getting this series landed, but we should try and align
->>>>>> with x86. If there's no objection, I'm planning to work on a counterpart
->>>>>> to the x86 series (resetting POR_EL0 early during signal delivery).
->>>>> Did you get a chance to work on that? It would be great to land the
->>>>> fixes for 6.12, if possible, so that the first kernel release with POE
->>>>> support doesn't land with known issues.
->>>> Looking a little more at this, I think we have quite a weird behaviour
->>>> on arm64 as it stands. It looks like we rely on the signal frame to hold
->>>> the original POR_EL0 so, if for some reason we fail to allocate space
->>>> for the POR context, I think we'll return back from the signal with
->>>> POR_EL0_INIT. That seems bad?
->>> If we don't allocate space for POR_EL0, I think the program recieves SIGSGEV?
->>>
->>> setup_sigframe_layout()
->>>         if (system_supports_poe()) {
->>>                 err = sigframe_alloc(user, &user->poe_offset,
->>>                                      sizeof(struct poe_context));
->>>                 if (err)
->>>                         return err;
->>>         }
->>>
->>> Through get_sigframe() and setup_rt_frame(), that eventually hets here:
->>>
->>> handle_signal()
->>> 	ret = setup_rt_frame(usig, ksig, oldset, regs);
->>>
->>> 	[..]
->>>
->>>         signal_setup_done(ret, ksig, test_thread_flag(TIF_SINGLESTEP));
->>>
->>> void signal_setup_done(int failed, struct ksignal *ksig, int stepping)                                                                                                                         
->>> {                                                                                                                                                                                              
->>>         if (failed)                                                                                                                                                                            
->>>                 force_sigsegv(ksig->sig);                                                                                                                                                      
->>>         else                                                                                                                                                                                   
->>>                 signal_delivered(ksig, stepping);                                                                                                                                              
->>> }  
->>>
->>> So I think it's "fine"?
->> Ah, yes, sorry about that. I got confused by the conditional push in
->> setup_sigframe():
->>
->> 	if (system_supports_poe() && err == 0 && user->poe_offset) {
->> 		...
->>
->> which gives the wrong impression that the POR is somehow optional, even
->> if the CPU supports POE. So we should drop that check of
->> 'user->poe_offset' as it cannot be NULL here.
->>
->> We also still need to resolve Kevin's concern, which probably means
->> keeping the thread's original POR around someplace.
-> That was cargo culted (by me) from the rest of the function (apart from TPIDR2
-> and FPMR). I think Kevin is planning on sending his signal changes still, but
-> is on holiday, maybe he can remove the last part of the condition as part of
-> his series.
+On Thu, 17 Oct 2024 01:19:47 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> kvm_vgic_map_resources() prematurely marks the distributor as 'ready',
+> potentially allowing vCPUs to enter the guest before the distributor's
+> MMIO registration has been made visible.
+> 
+> Plug the race by marking the distributor as ready only after MMIO
+> registration is completed. Rely on the implied ordering of
+> synchronize_srcu() to ensure the MMIO registration is visible before
+> vgic_dist::ready. This also means that writers to vgic_dist::ready are
+> now serialized by the slots_lock, which was effectively the case already
+> as all writers held the slots_lock in addition to the config_lock.
+> 
+> Fixes: 59112e9c390b ("KVM: arm64: vgic: Fix a circular locking issue")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index d88fdeaf6144..48c952563e85 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -544,14 +544,23 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+>  	if (ret)
+>  		goto out;
+>  
+> -	dist->ready = true;
+>  	dist_base = dist->vgic_dist_base;
+>  	mutex_unlock(&kvm->arch.config_lock);
+>  
+>  	ret = vgic_register_dist_iodev(kvm, dist_base, type);
+> -	if (ret)
+> +	if (ret) {
+>  		kvm_err("Unable to register VGIC dist MMIO regions\n");
+> +		goto out_slots;
+> +	}
+>  
+> +	/*
+> +	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
+> +	 * registration before returning through synchronize_srcu(), which also
+> +	 * implies a full memory barrier. As such, marking the distributor as
+> +	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
+> +	 * a completely configured distributor.
+> +	 */
+> +	dist->ready = true;
+>  	goto out_slots;
+>  out:
+>  	mutex_unlock(&kvm->arch.config_lock);
 
-Indeed just got back from holiday. I've got the series ready, about to
-send it. I will add a clean-up patch removing this check on poe_offset.
+I thought we would benefit from the removal of the early-out at the
+beginning of the function, specially given that this is only called on
+the first run of any vcpu -- and we can probably afford to take the
+locks on such a rare event. My impression is that we'd gain in
+robustness and maintainability.
 
-Kevin
+This can come as a later patch if we agree that this is valuable.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
