@@ -1,179 +1,134 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F73F1DE2A3;
-	Thu, 17 Oct 2024 13:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F381DE2B6
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 13:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729170934; cv=none; b=YsMgibFr6h4EEseQiC0IBbmzso66M6eAShXkXuDzqia0sfuviuxwKeSwjxVQTw4Ay6dOWAyG7jevK7WxTI0GSleSBzZamtmHE2mLSBt5auDfUVaHHPgzEiMkdFFHrC37eA9vksTqNZ+JoDDPgXnhxNtIFroRYHj86DEoV+effVo=
+	t=1729172332; cv=none; b=jfRZJuFZAFP8z62boZwY0MNiNovBkM+i38qIlZuUz0Vfamx7foRGBJg1289M5dmfMzlbOU+jP9O4m9d5HcEM/B6kBN8JnnUQJ4n1wgztBRzR/nic0wd8rq2+8h2L7NSV2Zn55NQuin+qOBD7vyYh8j8s89xRNftegFKZFsNpH18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729170934; c=relaxed/simple;
-	bh=3wJdoA5dNS1r3ppezqAL/BFb4BKcXFOJCt4L4sf/Qt4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SyWj/79HyRIkk1H+JuofpEgVjeQvuZGCLKIVEA5oeTPEMlt6mOOhx3WpEuM+P7SPbYsF2Nilk5v9GsWs5Sgy8K9bLlhJjhNMTFkYC0/5g1yOkOc4J37XUQzkzSC56W+5+ps3YcZxzNh0tQqptL6TdU8uMO0qdo41AWBVuOT7iD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8652DA7;
-	Thu, 17 Oct 2024 06:16:00 -0700 (PDT)
-Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 705B53F71E;
-	Thu, 17 Oct 2024 06:15:27 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1729172332; c=relaxed/simple;
+	bh=RdyZ0ZrCOYPugG2NlUcTxnZuhG9u9UEX/RSwZ8q4PXc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lm5uTwrKDCz9zTCxXfzhhgkRZ3WYQBSSD7jidvM7DqkFPwHXgt7EvgPKsc8OmNmim4T5ncxSLX1O5UCvgNsLEn9O9+uAsqwZZmjgyHmg8JYXKqD3u4uGZF1X7L7CVFZsACdJM6flUarb1YazWlXs9JKYmT8xqxcSKqRfT9qZ4ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYHOZvOw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYHOZvOw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA20C4CEC3;
+	Thu, 17 Oct 2024 13:38:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729172331;
+	bh=RdyZ0ZrCOYPugG2NlUcTxnZuhG9u9UEX/RSwZ8q4PXc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YYHOZvOwM8MaDqYU9QCbiPCI07tU9xTHq4vVOpd+Cm54ShcFC6KFLqlG7b4Yfa5bX
+	 ggqelNp3FqGf5XWE3zUt3mlxvX/X8kbOtUCm/ipw00EPZ7BhW1hqzuYzDBGnH9c1eT
+	 DAWGJ17mmz6qPxqfi16Ey0+UrvJCpJJie9REp69IYpFJV00LbR95fT7EhTYzOBhDl2
+	 EfEKbPuztwoDwmDaEBblsG+EEYzdZaLwXr3y0sIuhOF8oRqmSHIrVk3CdQfEAK3z1z
+	 ISn4oALQnZBAgKTZHt74n+JsssQ5D76FcJE3+fG5lRfHa46hmMtIHGF57f9MvF335C
+	 QqDSj+krggWTA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t1QiH-004Ssv-Ev;
+	Thu, 17 Oct 2024 14:38:49 +0100
+Date: Thu, 17 Oct 2024 14:38:49 +0100
+Message-ID: <86ldym4zo6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	anshuman.khandual@arm.com,
+	james.morse@arm.com,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: [PATCH v7 11/11] arm64: Document Arm Confidential Compute
-Date: Thu, 17 Oct 2024 14:14:34 +0100
-Message-Id: <20241017131434.40935-12-steven.price@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241017131434.40935-1-steven.price@arm.com>
-References: <20241017131434.40935-1-steven.price@arm.com>
+	Jing Zhang <jingzhangos@google.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+In-Reply-To: <20241017130638.GA139029@e124191.cambridge.arm.com>
+References: <20241015133923.3910916-1-joey.gouly@arm.com>
+	<20241015133923.3910916-5-joey.gouly@arm.com>
+	<86msj33py6.wl-maz@kernel.org>
+	<20241017130638.GA139029@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, anshuman.khandual@arm.com, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, shameerali.kolothum.thodi@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add some documentation on Arm CCA and the requirements for running Linux
-as a Realm guest. Also update booting.rst to describe the requirement
-for RIPAS RAM.
+On Thu, 17 Oct 2024 14:06:38 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> Thanks for looking!
+> 
+> On Thu, Oct 17, 2024 at 12:54:09PM +0100, Marc Zyngier wrote:
+> > On Tue, 15 Oct 2024 14:39:20 +0100,
+> > Joey Gouly <joey.gouly@arm.com> wrote:
+> > > 
+> > > @@ -204,6 +205,35 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+> > >  		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
+> > >  }
+> > >  
+> > > +static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> > > +
+> > > +	if (!cpus_support_mpam())
+> > > +		return;
+> > > +
+> > > +	/* trap guest access to MPAMIDR_EL1 */
+> > > +	if (mpam_cpus_have_mpam_hcr()) {
+> > > +		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
+> > > +	} else {
+> > > +		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
+> > > +		r |= MPAM2_EL2_TIDR;
+> > > +	}
+> > > +
+> > > +	write_sysreg_s(r, SYS_MPAM2_EL2);
+> > 
+> > Please use the write_sysreg_el2() accessor, so that VHE under NV has
+> > an easier time, should we ever get there.
+> 
+> Are you suggesting this, to avoid a trap (and instead get the register-memory
+> redirection)?
+> 
+> The two reasons I could see to keep it as-is:
+> 	- The name changes from MPAM2_EL2 to MPAM1_EL1 (1 and 2 suffixes after
+> 	  MPAM)
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
----
-Changes since v6:
- * Mention "Realm Services Interface (RSI)" by name.
- * Add a brief explanation of the example earlycon line.
----
- Documentation/arch/arm64/arm-cca.rst | 69 ++++++++++++++++++++++++++++
- Documentation/arch/arm64/booting.rst |  3 ++
- Documentation/arch/arm64/index.rst   |  1 +
- 3 files changed, 73 insertions(+)
- create mode 100644 Documentation/arch/arm64/arm-cca.rst
+Arghhh.
 
-diff --git a/Documentation/arch/arm64/arm-cca.rst b/Documentation/arch/arm64/arm-cca.rst
-new file mode 100644
-index 000000000000..c48b7d4ab6bd
---- /dev/null
-+++ b/Documentation/arch/arm64/arm-cca.rst
-@@ -0,0 +1,69 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=====================================
-+Arm Confidential Compute Architecture
-+=====================================
-+
-+Arm systems that support the Realm Management Extension (RME) contain
-+hardware to allow a VM guest to be run in a way which protects the code
-+and data of the guest from the hypervisor. It extends the older "two
-+world" model (Normal and Secure World) into four worlds: Normal, Secure,
-+Root and Realm. Linux can then also be run as a guest to a monitor
-+running in the Realm world.
-+
-+The monitor running in the Realm world is known as the Realm Management
-+Monitor (RMM) and implements the Realm Management Monitor
-+specification[1]. The monitor acts a bit like a hypervisor (e.g. it runs
-+in EL2 and manages the stage 2 page tables etc of the guests running in
-+Realm world), however much of the control is handled by a hypervisor
-+running in the Normal World. The Normal World hypervisor uses the Realm
-+Management Interface (RMI) defined by the RMM specification to request
-+the RMM to perform operations (e.g. mapping memory or executing a vCPU).
-+
-+The RMM defines an environment for guests where the address space (IPA)
-+is split into two. The lower half is protected - any memory that is
-+mapped in this half cannot be seen by the Normal World and the RMM
-+restricts what operations the Normal World can perform on this memory
-+(e.g. the Normal World cannot replace pages in this region without the
-+guest's cooperation). The upper half is shared, the Normal World is free
-+to make changes to the pages in this region, and is able to emulate MMIO
-+devices in this region too.
-+
-+A guest running in a Realm may also communicate with the RMM using the
-+Realm Services Interface (RSI) to request changes in its environment or
-+to perform attestation about its environment. In particular it may
-+request that areas of the protected address space are transitioned
-+between 'RAM' and 'EMPTY' (in either direction). This allows a Realm
-+guest to give up memory to be returned to the Normal World, or to
-+request new memory from the Normal World.  Without an explicit request
-+from the Realm guest the RMM will otherwise prevent the Normal World
-+from making these changes.
-+
-+Linux as a Realm Guest
-+----------------------
-+
-+To run Linux as a guest within a Realm, the following must be provided
-+either by the VMM or by a `boot loader` run in the Realm before Linux:
-+
-+ * All protected RAM described to Linux (by DT or ACPI) must be marked
-+   RIPAS RAM before handing control over to Linux.
-+
-+ * MMIO devices must be either unprotected (e.g. emulated by the Normal
-+   World) or marked RIPAS DEV.
-+
-+ * MMIO devices emulated by the Normal World and used very early in boot
-+   (specifically earlycon) must be specified in the upper half of IPA.
-+   For earlycon this can be done by specifying the address on the
-+   command line, e.g. with an IPA size of 33 bits and the base address
-+   of the emulated UART at 0x1000000: ``earlycon=uart,mmio,0x101000000``
-+
-+ * Linux will use bounce buffers for communicating with unprotected
-+   devices. It will transition some protected memory to RIPAS EMPTY and
-+   expect to be able to access unprotected pages at the same IPA address
-+   but with the highest valid IPA bit set. The expectation is that the
-+   VMM will remove the physical pages from the protected mapping and
-+   provide those pages as unprotected pages.
-+
-+References
-+----------
-+[1] https://developer.arm.com/documentation/den0137/
-diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-index b57776a68f15..30164fb24a24 100644
---- a/Documentation/arch/arm64/booting.rst
-+++ b/Documentation/arch/arm64/booting.rst
-@@ -41,6 +41,9 @@ to automatically locate and size all RAM, or it may use knowledge of
- the RAM in the machine, or any other method the boot loader designer
- sees fit.)
- 
-+For Arm Confidential Compute Realms this includes ensuring that all
-+protected RAM has a Realm IPA state (RIPAS) of "RAM".
-+
- 
- 2. Setup the device tree
- -------------------------
-diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
-index 78544de0a8a9..12c243c3af20 100644
---- a/Documentation/arch/arm64/index.rst
-+++ b/Documentation/arch/arm64/index.rst
-@@ -10,6 +10,7 @@ ARM64 Architecture
-     acpi_object_usage
-     amu
-     arm-acpi
-+    arm-cca
-     asymmetric-32bit
-     booting
-     cpu-feature-registers
+> 	- It's setting trap behaviour, which is an EL2 concept (and are RES0
+> 	  bits in the MPAM1_EL1 reg). Other trap registers such as HCRX_EL2 use
+> 	  that register directly, however they don't have an _EL1 counterpart so have to.
+
+Arghhh again.
+
+So this is yet another register that doesn't match FEAT_NV2p1, by
+having RES0 fields in its EL2-equivalent-EL1 register, and we can't
+even use MPAM1_EL1 for NV.
+
+> I'm fine to change it, just want to clarify before I do.
+
+Nah, don't bother. This thing can't be rescued.
+
+Thanks for the gory details!
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
