@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A7F1DED5D;
-	Thu, 17 Oct 2024 13:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725CC1DED75;
+	Thu, 17 Oct 2024 13:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729170920; cv=none; b=rf5wi6EmAoxKoWN4+FhDzao6wash/0RpuWNKgxi+NjbjF354xkyyJ90Eu5pcMdJ7uV4OowX7zf+HEuWXMMHkibvCH2uxnm7XPrDtwS25Kwj3pPTk2JvIXzszVTx08n91gFJZcUZutExgao/kQNulu6rlnyFhYX5hsYJn2H11z3s=
+	t=1729170923; cv=none; b=rqpXnYT+taYLzOqo0A9ubmrktJW/AgQF9uxhudMW7JpgP1e5ahoGdA0FLpPiS+scTyESenttu7JA5P+2xJaYFDruCDrUGs/GX0UuEgpxl97qVbuDQPPl9J3WwVWgx99OuhOdUybUQN9AyAXe30BPyxH4EIoKaanprosAGq1wh5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729170920; c=relaxed/simple;
-	bh=YCDwYlF/ESxK0pk7bzv3GjtnsbtXQunn8pRpwWc/sbA=;
+	s=arc-20240116; t=1729170923; c=relaxed/simple;
+	bh=BAwPOAmOIzEQJ4SLugo9T4c57oNNMmBoAWU3VeT+tA0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sAxxhi8Uxh8QqcOq84UymAXnkXNMJBvEl8sFdUAirtEu/jnb8HIdlLnT3tTKuGwapHeUdqoMXyF7HlUTc1zVF6Jl+kNTmTJ+7rFjHI/IvZxEVCePxzJ8GybmOSrjEbvnqkkMgNhJi1hnkEVYc6anz4TJxZnn8Xh+1U1m6fQcG0I=
+	 MIME-Version; b=YxKHEU7+rG3cFa86CpyqN5YUlbYdJ2LB/skXJPaTeRjheVzkI4E96N/M4XAi92RkoejyyKl5GrT2+UaGBvR5loYBRUlOVPA8/AYyprS76HyPagHP+pOQIrj4aPu702OFQHM5o2v7Cqq+3u0Utb7xls+S5znVL6P6mI3f71yPmRU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 89C6ADA7;
-	Thu, 17 Oct 2024 06:15:45 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8814D1570;
+	Thu, 17 Oct 2024 06:15:49 -0700 (PDT)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 380EF3F71E;
-	Thu, 17 Oct 2024 06:15:12 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44C813F71E;
+	Thu, 17 Oct 2024 06:15:16 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: [PATCH v7 07/11] arm64: Enforce bounce buffers for realm DMA
-Date: Thu, 17 Oct 2024 14:14:30 +0100
-Message-Id: <20241017131434.40935-8-steven.price@arm.com>
+Subject: [PATCH v7 08/11] arm64: mm: Avoid TLBI when marking pages as valid
+Date: Thu, 17 Oct 2024 14:14:31 +0100
+Message-Id: <20241017131434.40935-9-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241017131434.40935-1-steven.price@arm.com>
 References: <20241017131434.40935-1-steven.price@arm.com>
@@ -55,76 +55,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Within a realm guest it's not possible for a device emulated by the VMM
-to access arbitrary guest memory. So force the use of bounce buffers to
-ensure that the memory the emulated devices are accessing is in memory
-which is explicitly shared with the host.
-
-This adds a call to swiotlb_update_mem_attributes() which calls
-set_memory_decrypted() to ensure the bounce buffer memory is shared with
-the host. For non-realm guests or hosts this is a no-op.
+When __change_memory_common() is purely setting the valid bit on a PTE
+(e.g. via the set_memory_valid() call) there is no need for a TLBI as
+either the entry isn't changing (the valid bit was already set) or the
+entry was invalid and so should not have been cached in the TLB.
 
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-v3: Simplify mem_init() by using a 'flags' variable.
+v4: New patch
 ---
- arch/arm64/kernel/rsi.c |  1 +
- arch/arm64/mm/init.c    | 10 +++++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/mm/pageattr.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index 3e0c83e2296f..a23c0a7154d2 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -6,6 +6,7 @@
- #include <linux/jump_label.h>
- #include <linux/memblock.h>
- #include <linux/psci.h>
-+#include <linux/swiotlb.h>
+diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
+index 0e270a1c51e6..547a9e0b46c2 100644
+--- a/arch/arm64/mm/pageattr.c
++++ b/arch/arm64/mm/pageattr.c
+@@ -60,7 +60,13 @@ static int __change_memory_common(unsigned long start, unsigned long size,
+ 	ret = apply_to_page_range(&init_mm, start, size, change_page_range,
+ 					&data);
  
- #include <asm/io.h>
- #include <asm/rsi.h>
-diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-index 27a32ff15412..d21f67d67cf5 100644
---- a/arch/arm64/mm/init.c
-+++ b/arch/arm64/mm/init.c
-@@ -41,6 +41,7 @@
- #include <asm/kvm_host.h>
- #include <asm/memory.h>
- #include <asm/numa.h>
-+#include <asm/rsi.h>
- #include <asm/sections.h>
- #include <asm/setup.h>
- #include <linux/sizes.h>
-@@ -366,8 +367,14 @@ void __init bootmem_init(void)
-  */
- void __init mem_init(void)
- {
-+	unsigned int flags = SWIOTLB_VERBOSE;
- 	bool swiotlb = max_pfn > PFN_DOWN(arm64_dma_phys_limit);
+-	flush_tlb_kernel_range(start, start + size);
++	/*
++	 * If the memory is being made valid without changing any other bits
++	 * then a TLBI isn't required as a non-valid entry cannot be cached in
++	 * the TLB.
++	 */
++	if (pgprot_val(set_mask) != PTE_VALID || pgprot_val(clear_mask))
++		flush_tlb_kernel_range(start, start + size);
+ 	return ret;
+ }
  
-+	if (is_realm_world()) {
-+		swiotlb = true;
-+		flags |= SWIOTLB_FORCE;
-+	}
-+
- 	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
- 		/*
- 		 * If no bouncing needed for ZONE_DMA, reduce the swiotlb
-@@ -379,7 +386,8 @@ void __init mem_init(void)
- 		swiotlb = true;
- 	}
- 
--	swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
-+	swiotlb_init(swiotlb, flags);
-+	swiotlb_update_mem_attributes();
- 
- 	/* this will put all unused low memory onto the freelists */
- 	memblock_free_all();
 -- 
 2.34.1
 
