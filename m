@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F381DE2B6
-	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 13:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2986F1DE2C8
+	for <kvmarm@lists.linux.dev>; Thu, 17 Oct 2024 13:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729172332; cv=none; b=jfRZJuFZAFP8z62boZwY0MNiNovBkM+i38qIlZuUz0Vfamx7foRGBJg1289M5dmfMzlbOU+jP9O4m9d5HcEM/B6kBN8JnnUQJ4n1wgztBRzR/nic0wd8rq2+8h2L7NSV2Zn55NQuin+qOBD7vyYh8j8s89xRNftegFKZFsNpH18=
+	t=1729172601; cv=none; b=fWXU/VRImBRI+Hantstm7tBDLEyaV6eL0fvX/7MIxzn88kusQ+cXIB7SGTf0hiWJ2RfEHXiZwPj8GAKOoz8mYBhVgN/9VSx1ejGy77HHqLE+Oi6rfMO0Vte+4d70/8WtQlI7tmfZouQQMNSxxqUJX49pKKefDD7M9z+8cuH6L00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729172332; c=relaxed/simple;
-	bh=RdyZ0ZrCOYPugG2NlUcTxnZuhG9u9UEX/RSwZ8q4PXc=;
+	s=arc-20240116; t=1729172601; c=relaxed/simple;
+	bh=vGy/MFH2kmcnIumhn7RSlmUxkNblJEGrePq4xBLoSY0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lm5uTwrKDCz9zTCxXfzhhgkRZ3WYQBSSD7jidvM7DqkFPwHXgt7EvgPKsc8OmNmim4T5ncxSLX1O5UCvgNsLEn9O9+uAsqwZZmjgyHmg8JYXKqD3u4uGZF1X7L7CVFZsACdJM6flUarb1YazWlXs9JKYmT8xqxcSKqRfT9qZ4ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYHOZvOw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Q1pfS6hCoRAPZHRyatCSpyDp3KCBKanbkuLsEjHkcUx24kHF6P5UP20Ih0U+ats+AoZMKO6Ukj29CAnxnyXzOOikis6sSOvjOr6PxV8GkM9Uus+H3vO+p1+me9zb5gugGKmufgUfu64Ij4irWcwiCvf155tv3khvCORDko1fH3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VlrZjrjS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYHOZvOw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA20C4CEC3;
-	Thu, 17 Oct 2024 13:38:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VlrZjrjS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD304C4CEC3;
+	Thu, 17 Oct 2024 13:43:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729172331;
-	bh=RdyZ0ZrCOYPugG2NlUcTxnZuhG9u9UEX/RSwZ8q4PXc=;
+	s=k20201202; t=1729172600;
+	bh=vGy/MFH2kmcnIumhn7RSlmUxkNblJEGrePq4xBLoSY0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YYHOZvOwM8MaDqYU9QCbiPCI07tU9xTHq4vVOpd+Cm54ShcFC6KFLqlG7b4Yfa5bX
-	 ggqelNp3FqGf5XWE3zUt3mlxvX/X8kbOtUCm/ipw00EPZ7BhW1hqzuYzDBGnH9c1eT
-	 DAWGJ17mmz6qPxqfi16Ey0+UrvJCpJJie9REp69IYpFJV00LbR95fT7EhTYzOBhDl2
-	 EfEKbPuztwoDwmDaEBblsG+EEYzdZaLwXr3y0sIuhOF8oRqmSHIrVk3CdQfEAK3z1z
-	 ISn4oALQnZBAgKTZHt74n+JsssQ5D76FcJE3+fG5lRfHa46hmMtIHGF57f9MvF335C
-	 QqDSj+krggWTA==
+	b=VlrZjrjS1LPbSZ2Lsn2bzxOTwZpdshi9x6/3osNAeH1g9Y5gs3KBjrE8V4rZtyUVx
+	 DwHi3nTLpC/HTdQKXGR7f2fKSKERzHLtUnjaq20bCYLDDzseRthRw5IyTPKaWVgbsT
+	 nVsDMGURZ+LY+CzoRtbJVgP+dVuY0CJF7Q8hLNgV5wp16bhqe3cp38mD2gpgUyG8v1
+	 OI6vSZQ/uJb8ScsU10APVSx0dK5Uv4bmmy6ERCHBylXMIbMc52SbFf0jW8k4iIRcfq
+	 vtQbhL5sx+LR18FcEjWPV8Ois6KT9rDNnMYPNcq/sBHoC80OqkolXROSWnvdgGhW3i
+	 tdtTuRsPMWYFQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t1QiH-004Ssv-Ev;
-	Thu, 17 Oct 2024 14:38:49 +0100
-Date: Thu, 17 Oct 2024 14:38:49 +0100
-Message-ID: <86ldym4zo6.wl-maz@kernel.org>
+	id 1t1Qmc-004T0Z-HC;
+	Thu, 17 Oct 2024 14:43:18 +0100
+Date: Thu, 17 Oct 2024 14:43:17 +0100
+Message-ID: <86jze64zgq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -48,11 +48,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
 Subject: Re: [PATCH v5 4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
-In-Reply-To: <20241017130638.GA139029@e124191.cambridge.arm.com>
+In-Reply-To: <20241015133923.3910916-5-joey.gouly@arm.com>
 References: <20241015133923.3910916-1-joey.gouly@arm.com>
 	<20241015133923.3910916-5-joey.gouly@arm.com>
-	<86msj33py6.wl-maz@kernel.org>
-	<20241017130638.GA139029@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,65 +66,29 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 17 Oct 2024 14:06:38 +0100,
+On Tue, 15 Oct 2024 14:39:20 +0100,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Hi Marc,
-> 
-> Thanks for looking!
-> 
-> On Thu, Oct 17, 2024 at 12:54:09PM +0100, Marc Zyngier wrote:
-> > On Tue, 15 Oct 2024 14:39:20 +0100,
-> > Joey Gouly <joey.gouly@arm.com> wrote:
-> > > 
-> > > @@ -204,6 +205,35 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
-> > >  		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
-> > >  }
-> > >  
-> > > +static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
-> > > +
-> > > +	if (!cpus_support_mpam())
-> > > +		return;
-> > > +
-> > > +	/* trap guest access to MPAMIDR_EL1 */
-> > > +	if (mpam_cpus_have_mpam_hcr()) {
-> > > +		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
-> > > +	} else {
-> > > +		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
-> > > +		r |= MPAM2_EL2_TIDR;
-> > > +	}
-> > > +
-> > > +	write_sysreg_s(r, SYS_MPAM2_EL2);
-> > 
-> > Please use the write_sysreg_el2() accessor, so that VHE under NV has
-> > an easier time, should we ever get there.
-> 
-> Are you suggesting this, to avoid a trap (and instead get the register-memory
-> redirection)?
-> 
-> The two reasons I could see to keep it as-is:
-> 	- The name changes from MPAM2_EL2 to MPAM1_EL1 (1 and 2 suffixes after
-> 	  MPAM)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dad88e31f953..c21840042785 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2517,8 +2517,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
+>  	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
+>  	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+> +	{ SYS_DESC(SYS_MPAMIDR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+>  
+> +	{ SYS_DESC(SYS_MPAM1_EL1), undef_access },
+> +	{ SYS_DESC(SYS_MPAM0_EL1), undef_access },
+>  	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+>  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
 
-Arghhh.
+For completeness, can you please add the EL2 MPAM registers to that
+list, making them equally UNDEF?
 
-> 	- It's setting trap behaviour, which is an EL2 concept (and are RES0
-> 	  bits in the MPAM1_EL1 reg). Other trap registers such as HCRX_EL2 use
-> 	  that register directly, however they don't have an _EL1 counterpart so have to.
-
-Arghhh again.
-
-So this is yet another register that doesn't match FEAT_NV2p1, by
-having RES0 fields in its EL2-equivalent-EL1 register, and we can't
-even use MPAM1_EL1 for NV.
-
-> I'm fine to change it, just want to clarify before I do.
-
-Nah, don't bother. This thing can't be rescued.
-
-Thanks for the gory details!
+Thanks,
 
 	M.
 
