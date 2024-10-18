@@ -1,111 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717E43207
-	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 13:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A361D545;
+	Fri, 18 Oct 2024 13:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729257440; cv=none; b=abaewkxamCmSCyxvyVXgFxtqzVQcenuJsqBRybToticKd9wNPsWMuAOAQ7qV2rFTch7jGUkSXW/XQ5BqYo6DZ5Iub1F/iNCfnATP0tO523wyFVXUya6A0MD5ipUVzNyZwLWj6FKXm1EPaRgWrVR31CYDAyAZmdpc484Ax9JRzYs=
+	t=1729258220; cv=none; b=YwV8dmHcH0wakD8S9HDWHoV0tJUgFGWOEwB+ulw0BYSkwc8OWmU0woo4dsA3CG3FS0f5rr4Cq4pef4o1SZsXYSsYu76WCQIp6Lds1bSmHljP5te/tt4leTatOL5liFbxul6GMvRFLZWplvKRs9V2rYlrIE7GFvC3oQgmB/Zc6xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729257440; c=relaxed/simple;
-	bh=L5rawYHNcZfm3YbcBMmna12iVHaxrHfAG7LJCWDc6cQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BG5J/QRLhSoc8OM4kvR2KgJsJmC723TnXcKInJ966qAoRk4Rf89H4G97g2yTqSNIwGxqKPBkXC/4rW+axS9lcorCHmySyyJglEelVubB62X6/bJudqf1zak9VDYcgB3PPVkc8kaQPFZCG05j283UHmSYl1EXSzQnIzU9ZjHTHJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fv8jKNkX; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fv8jKNkX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEB7FC4CEC3;
-	Fri, 18 Oct 2024 13:17:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729257440;
-	bh=L5rawYHNcZfm3YbcBMmna12iVHaxrHfAG7LJCWDc6cQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fv8jKNkXK2ebXxMUI1BhJYegQV/SBzMvzO6mN5slJUvv2zDSyvdNtqK6iClymVi04
-	 vrgyIWwJqDOMA/92ltJPrG7UpnxLOBgvEcli91r1J4aCdUbCVVX1TUmkhykXIyHPxo
-	 vtrX5CIvce0tLFx0nYu3XLy7oPA92/+MDkF7onqVLFZOFH3NV4DBGb91KY95ylbS4e
-	 tmXvMEvdFoU3WqRYBwj/6U5yN1xQweiuAcUfpP3B7++k371U3r0/gzyBq88GYlpksh
-	 HtEuysFESVt3Nca5GUGCq5wWVcvGWnfkQolLsBNsZmy7B2Kp71CB17vk9p41nU87gd
-	 PFsbYoMb01ZpA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t1mqz-004miX-PS;
-	Fri, 18 Oct 2024 14:17:17 +0100
-Date: Fri, 18 Oct 2024 14:17:17 +0100
-Message-ID: <86frot4kki.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: eric.auger@redhat.com
-Cc: Cornelia Huck <cohuck@redhat.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	jiangkunkun <jiangkunkun@huawei.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Linuxarm <linuxarm@huawei.com>
-Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live migration
-In-Reply-To: <7df21c56-0b07-4112-839e-ef90c5999fcd@redhat.com>
-References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
-	<86jzef53iz.wl-maz@kernel.org>
-	<3f4469c49625413f9ab2c224d0d3fbea@huawei.com>
-	<86ikty6f1b.wl-maz@kernel.org>
-	<ZwlADbp-HjkijElX@linux.dev>
-	<08261a41b9644f5ab49063824e4060c3@huawei.com>
-	<87bjziraou.fsf@redhat.com>
-	<7df21c56-0b07-4112-839e-ef90c5999fcd@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1729258220; c=relaxed/simple;
+	bh=4cb3B3QHewrPYGrjaGWu1ULVYo4OSiASJENbHyPgKyc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vF18A2+TNcxu8t99dV2FwtcnWGUlgGhjNCxrVF65wt1NXufvtbaMx9Yucpp7ARfG2ASnCEfdXpZr5Lnayv6AupXBO1smnHIWt8/EwPrIGPTT+82tWzu/BPbWd2b5QHV4MI6LI1A5uEGXIlZOW4Ki7VS/Z09lJU7j2Q4DiZMieRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 332DFFEC;
+	Fri, 18 Oct 2024 06:30:47 -0700 (PDT)
+Received: from [10.57.64.219] (unknown [10.57.64.219])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AAD373F528;
+	Fri, 18 Oct 2024 06:30:14 -0700 (PDT)
+Message-ID: <7ca207aa-4433-4e9b-8cd2-e025bb265796@arm.com>
+Date: Fri, 18 Oct 2024 14:30:13 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, cohuck@redhat.com, shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 31/43] arm64: rme: Prevent Device mappings for Realms
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-32-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20241004152804.72508-32-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 17 Oct 2024 18:16:04 +0100,
-Eric Auger <eric.auger@redhat.com> wrote:
+On 04/10/2024 16:27, Steven Price wrote:
+> Physical device assignment is not yet supported by the RMM, so it
+> doesn't make much sense to allow device mappings within the realm.
+> Prevent them when the guest is a realm.
 > 
-> Hi Shameer,
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   arch/arm64/kvm/mmu.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> On 10/17/24 17:49, Cornelia Huck wrote:
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 4f0403059c91..602c49eae90d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1142,6 +1142,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>   	if (is_protected_kvm_enabled())
+>   		return -EPERM;
+>   
+> +	/* We don't support mapping special pages into a Realm */
+> +	if (kvm_is_realm(kvm))
+> +		return -EINVAL;
+> +
 
-> > Speaking of QEMU: Do you maybe already have some prototype code that
-> > tries to do something with the setup here? (I don't think QEMU currently
-> > mucks around with MIDR and friends when running with KVM; I wonder what
-> > it should provide to the guest and if it should care to set something as
-> > a base level that gives guests not using the hypercall a chance to work
-> > properly.)
-> >
-> As discussed during the KVM forum we are working on a qemu integration
-> for writable ID regs. The first goal is to be able to specialize the
-> host passthrough model (custom host model). Maybe this will trigger more
-> discussions on named models too. This is complementary to the
-> MIDR/REVIDR problematic and I hope we will be able to consolidate our
-> works at some point.
+I believe this is not sufficient. This is only called for GICv2 today.
+But we also need to check in  user_mem_abort() and only allow the
+mapping if it targeting an unprotected IPA.
 
-Complementary to the MIDR/REVIDR work, I would also like to make
-MIDR/REVIDR writable when this scheme is available. Ideally reporting
-a synthetic CPU description (with MIDR_EL1.Implementer returning 0,
-and the rest being VMM-specific, but with a clear definition for the
-IMPDEF fields so that we can version the ABI).
+Something like:
 
-Thoughts?
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 26d550ad8393..e433bf8376f2 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1710,6 +1710,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, 
+phys_addr_t fault_ipa,
+         if (exec_fault && device)
+                 return -ENOEXEC;
 
-	M.
++       if (device && kvm_gpa_from_fault(fault_ipa) != fault_ipa)
++               return -EINVAL;
++
+         /*
+          * Potentially reduce shadow S2 permissions to match the 
+guest's own
+          * S2. For exec faults, we'd only reach this point if the guest
 
--- 
-Without deviation from the norm, progress is not possible.
+
+
+Suzuki
+
+
+>   	size += offset_in_page(guest_ipa);
+>   	guest_ipa &= PAGE_MASK;
+>   
+
