@@ -1,99 +1,153 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B654D2EB1F
-	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 08:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A38A201106
+	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 10:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729240726; cv=none; b=sY5hzrkLWqDVNkCBU0MiB79CcyCvf2vYpBspLMZfiO1cuqpTG6BKc2nZxxf6Frge094dap8qKiin3Tyvy5GB4wktpOhFxAaZL6NBjI4dmxm1uaxSk3G9m8SVYb+jNx32a1ZFTjt9QFIbWDjj1CzlAVmY64lDJISWtipmoJZ/ghI=
+	t=1729247005; cv=none; b=Gf4RDZP85u5Ad+xjtTffQmVidpMXDH9v+m9J3MqryKLxKWBk3d2lF9SY6haFs607zPKfn0YxuPhMO3nNqM6wILcTFcmmBI2Kbz1aijY2ieoQu5Z2MAoxyDIHbumYITscqPTiKET4EspvE23ZGZn+B/y/CKOn7Ns81kYsx+HwbfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729240726; c=relaxed/simple;
-	bh=hL8UuHqCpojMaxpGJbQTNKSaEQSLBzU0jdkgH5Zu2h4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=rvbqjtaQucc5DILPfeRmQrFWlWfU4DKZY98RjA14HIr14Ba0SM2PQIb68Tsns2AEqrTYDKunsE2Fe/N3c53qluXW7jxsBJp0Cn5/uA5Z+NpIDrvpwSTzJl83FZDBvdHwsh77FkPy+4qWjBnOkduOcW38y3Z1rS27ci7BWOAweiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z75K0ll/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729247005; c=relaxed/simple;
+	bh=/66c9/H7Fi/NiRoqzhE7bvDtC0JZ26GedV/t2crh9Hw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YIhWtIL5SpxxC0eOsjpfB/X6jRMEDj46NepuUwe/D25AZkZP06oCDP9GUS8IIYWf9aAH1rntzvUICcxjuCQV9ZtgWEX2uQGRpfF5Nweo8RM1zWsHal6HSUHSVzHXXDb8JnZWXdtz4myZh5p3hJAs3q/Abyrkroi8l2JaSYf0cpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WzCsJLht; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z75K0ll/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729240723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LJzH1gSOEl11wR3YSK4ZKedRTlS0Fmi69LaWvUhmAr8=;
-	b=Z75K0ll/+gKg0wS7GSCWDAyZh1dusjWXoGvDQzSRI3Gt4f7h5rLXNcY8st1JzFhEyPyGZ3
-	g/Ko/9gpHJ+eVeJWyXTD336kQLBxa4RAo0q/SLg/q0b2bJr6w8pDWR01/iNMVGkWi+dkt9
-	8mi+NBWhj8JcUJWlfexTjPeUYTajedM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-2gNnmzaNNz-rHbdbHcZRWA-1; Fri, 18 Oct 2024 04:38:42 -0400
-X-MC-Unique: 2gNnmzaNNz-rHbdbHcZRWA-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a7fa073718so290761685a.3
-        for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 01:38:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729240722; x=1729845522;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uqhXnCT4fCKlCTVuHx3dAlyeKQVM4rIUCf2AtXG9+c0=;
-        b=XX8gCW5hn3jSzHF+PHqlo++YK5RJByLapARdWe2jXX1IH4TWi9zrOpIm9M5DtrLzc8
-         LtCIDjXFlCxwC4yrq7n6kAYTrewDYoHaQIErIlVYQXK7slKL0KLu9J8RvLaJPsLwfn2Q
-         +cCWZXZct5ZzRTPdFjQMTrG1a3aRn5jVJnP04cljG1aItb+RxLsGIiakLpeCF7EsOTBM
-         m+Tgb/EtrmCTD4Fc1Tmx682Tmz0MKVEgE70EZIC/8kexYFit59Oo3z/nXv0up06LrZYl
-         6q9UnEbPz7MGSHWjCRCZTrmjqCAP3ZKpMlJi/1C1vT78h9OclUIeU21hfcgyUg2p8CsH
-         dTKA==
-X-Gm-Message-State: AOJu0YzNrTsGpTISC9VDANyCNtVALg8jhRbHMtjWNa97tf2dUEJnYyMd
-	OBZVNUnoF10RTGVNZbWG+x/RljT7ZShoP0jHCsYR6I3/Ei7YmLwu/Pk4ri5xKoxPRVNSba3vuDW
-	CPaZincqNsaRVV5wrx9gxorTlobLQOrQxogAiK2xDMCX8Ob0Fy12chA==
-X-Received: by 2002:a05:6214:3386:b0:6cb:c798:3103 with SMTP id 6a1803df08f44-6cde159f1bcmr14536776d6.39.1729240721810;
-        Fri, 18 Oct 2024 01:38:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGmZcOYlqsHk2v9hqL7U4vCWowWz33zFjEP+dFo4/G3ZcIL6X0y8NNJAKQTIjk1MRHdiDSrjw==
-X-Received: by 2002:a05:6214:3386:b0:6cb:c798:3103 with SMTP id 6a1803df08f44-6cde159f1bcmr14536706d6.39.1729240721472;
-        Fri, 18 Oct 2024 01:38:41 -0700 (PDT)
-Received: from rh-2.fritz.box (p200300f6af01c000f92aec4042337510.dip0.t-ipconnect.de. [2003:f6:af01:c000:f92a:ec40:4233:7510])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cde114e6d7sm4966706d6.52.2024.10.18.01.38.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Oct 2024 01:38:40 -0700 (PDT)
-Date: Fri, 18 Oct 2024 10:38:35 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WzCsJLht"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0CEAC4CEC3;
+	Fri, 18 Oct 2024 10:23:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729247004;
+	bh=/66c9/H7Fi/NiRoqzhE7bvDtC0JZ26GedV/t2crh9Hw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WzCsJLhtsMzfPKjje3WJITjpl786xJYBrMLrjuBXAt/daIhP4/Vp4K6igJqRbfVB/
+	 5lnzqEOLxeJ96J73R6LpLAp/lRI8XUoldrT67apa0XXiRmBHnEiFscsIlogHLxVLbI
+	 CBsSJMYISNxPzzdeckl8d7/gxSzx3iin8j5Hfc20DxyzWhv8ZHP/GnlXwOw3ftnyN5
+	 yquzrj/3SFqhrv5SplzpQ2R8rJcL+vWwNsj0RxiwoLRmNZvlEGCMYJHGpbLdn+PM+P
+	 OIYg6pBbWhJMqGxBTz+Vny9W0c7IGcbOhVwm2oAFOaK4DJMeNMhs/VnAguInLRE2N3
+	 J2OP96qNpZ4EA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t1k8g-004kD1-8X;
+	Fri, 18 Oct 2024 11:23:22 +0100
+Date: Fri, 18 Oct 2024 11:23:20 +0100
+Message-ID: <86h6994smf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
-    james.morse@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-    yuzenghui@huawei.com, wangzhou1@hisilicon.com, 
-    linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
-Subject: Re: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
- userspace
+Cc: <kvmarm@lists.linux.dev>,
+	<oliver.upton@linux.dev>,
+	<james.morse@arm.com>,
+	<joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<wangzhou1@hisilicon.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linuxarm@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from userspace
 In-Reply-To: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
-Message-ID: <6d7c3d96-d1e9-d1b8-db3d-83ff2da00458@redhat.com>
 References: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed; boundary="-1463806798-552817351-1729240720=:8254"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463806798-552817351-1729240720=:8254
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
-
-On Thu, 17 Oct 2024, Shameer Kolothum wrote:
+On Thu, 17 Oct 2024 09:59:25 +0100,
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+>=20
 > Only allow userspace to set VIPT(0b10) or PIPT(0b11) for L1Ip based on
-> what hardware reports as both AIVIVT (0b01) and VPIPT (0b00) are
+> what hardware reports as both=C2=A0AIVIVT (0b01) and VPIPT (0b00) are
 > documented as reserved.
->
+>=20
 > Using a VIPT for Guest where hardware reports PIPT may lead to over
 > invalidation, but is still correct. Hence, we can allow downgrading
 > PIPT to VIPT, but not the other way around.
->
+>=20
 > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+> This is based on the dicsussion here[0].
+> https://lore.kernel.org/kvmarm/0db19a081d9e41f08b0043baeef16f16@huawei.co=
+m/
+>=20
+> Also depends on Joey's series[1] as it make use of the ID_FILTERED macro.
+>=20
+> I am not sure we need to explicitly make the ftr type as FTR_LOWER_SAFE
+> in kvm_arm64_ftr_safe_value() or as mentioned below can depend on
+> arm64_ftr_safe_value() for this ftr bits.
 
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
----1463806798-552817351-1729240720=:8254--
+I think relying on the arch code for this is the right thing to
+do. This was designed to cope with heterogeneous systems where you
+could have both PIPT and VIPT caches in the system, and we don't allow
+a late comer to be VIPT if we're decided on PIPT (hence the
+FTR_EXACT).
 
+>=20
+> Please take a look and let me know.
+>=20
+> Thanks,
+> Shameer
+>=20
+> [0] https://lore.kernel.org/kvmarm/0db19a081d9e41f08b0043baeef16f16@huawe=
+i.com/
+> [1] https://lore.kernel.org/kvmarm/20241015133923.3910916-1-joey.gouly@ar=
+m.com/
+> ---
+>  arch/arm64/kvm/sys_regs.c | 32 ++++++++++++++++++++++++++++----
+>  1 file changed, 28 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index d97ccf1c1558..819dcb63febd 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1872,6 +1872,28 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vc=
+pu,
+>  	return set_id_reg(vcpu, rd, user_val);
+>  }
+> =20
+> +static int set_ctr_el0(struct kvm_vcpu *vcpu,
+> +		       const struct sys_reg_desc *rd, u64 user_val)
+> +{
+> +	u8 user_L1Ip =3D SYS_FIELD_GET(CTR_EL0, L1Ip, user_val);
+> +
+> +	/*
+> +	 * Both AIVIVT (0b01) and VPIPT (0b00) are documented as reserved.
+> +	 * Hence only allow to set VIPT(0b10) or PIPT(0b11) for L1Ip based
+> +	 * on what hardware reports.
+> +	 *
+> +	 * Using a VIPT software model on PIPT will lead to over invalidation,
+> +	 * but still correct. Hence, we can allow downgrading PIPT to VIPT,
+> +	 * but not the other way around. This is handled via arm64_ftr_safe_val=
+ue()
+> +	 * as CTR_EL0 ftr_bits has L1Ip field type FTR_EXACT with safe value
+> +	 * set as VIPT)
+> +	 */
+> +	if (user_L1Ip < CTR_EL0_L1Ip_VIPT)
+> +		return -EINVAL;
+
+I'm not overly fond of this, because the ordering of cache types is
+arbitrary (it really is an enumeration). I would rather see the
+allowed cache types explicitly listed. It doesn't change a thing, but
+makes it all much more readable.
+
+With this fixed:
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
