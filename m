@@ -1,168 +1,99 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DE918EFDC
-	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 08:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B654D2EB1F
+	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 08:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729240435; cv=none; b=r+jQgAPeG94MMC8MYB9oqQ8lWCB6D/SmE9o+zpDdR9sf6ke0SidIUzIGNkOzqaYlBlQBw+6G+kXRQs7JAyL4gH8qZ7n63Ebo1aU7kVO7UuP7hIN3cMLh1VBbUN2kGt3YiQWlBYA577a49RFFZ79el5a3qzMuOUHz/2RA7WCyRjw=
+	t=1729240726; cv=none; b=sY5hzrkLWqDVNkCBU0MiB79CcyCvf2vYpBspLMZfiO1cuqpTG6BKc2nZxxf6Frge094dap8qKiin3Tyvy5GB4wktpOhFxAaZL6NBjI4dmxm1uaxSk3G9m8SVYb+jNx32a1ZFTjt9QFIbWDjj1CzlAVmY64lDJISWtipmoJZ/ghI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729240435; c=relaxed/simple;
-	bh=JGbbkwtpyOi22lHAqJeycwvJCe0A8V4bfHMkA2ZDeT4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=c+BwMxJUUAc+0pPU29lluwVk8JOBtbZZtQqBz8RTk8TQwltWrroBaESDzXr+ET9BddSrUs+kxL2mPSB7GvhU0Xprq6w82nL6G9Ojrcg+Muuc6HgSdXvNaN3eo0XZYWxAj4XxzwFMMDlKM+CJX8lNPTZ88pJufZxxj9T0PKPoOk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XVHyp74F6z6JB5Q;
-	Fri, 18 Oct 2024 16:33:06 +0800 (CST)
-Received: from frapeml100005.china.huawei.com (unknown [7.182.85.132])
-	by mail.maildlp.com (Postfix) with ESMTPS id 78C7F140B3C;
-	Fri, 18 Oct 2024 16:33:49 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100005.china.huawei.com (7.182.85.132) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 18 Oct 2024 10:33:49 +0200
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Fri, 18 Oct 2024 10:33:49 +0200
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: "eric.auger@redhat.com" <eric.auger@redhat.com>, Cornelia Huck
-	<cohuck@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier
-	<maz@kernel.org>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
-	<will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, jiangkunkun
-	<jiangkunkun@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
- migration
-Thread-Topic: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live
- migration
-Thread-Index: AQHbG7LLpfYBbF3MrkilC6zl/kSmBLKBOjEAgAAlJID//+1RAIAAOgeAgAArJECACU2rgIAAGBUAgAEeRcA=
-Date: Fri, 18 Oct 2024 08:33:49 +0000
-Message-ID: <432569c372284ddba8ed29f09595390e@huawei.com>
-References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
-	<86jzef53iz.wl-maz@kernel.org> <3f4469c49625413f9ab2c224d0d3fbea@huawei.com>
-	<86ikty6f1b.wl-maz@kernel.org> <ZwlADbp-HjkijElX@linux.dev>
-	<08261a41b9644f5ab49063824e4060c3@huawei.com> <87bjziraou.fsf@redhat.com>
- <7df21c56-0b07-4112-839e-ef90c5999fcd@redhat.com>
-In-Reply-To: <7df21c56-0b07-4112-839e-ef90c5999fcd@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1729240726; c=relaxed/simple;
+	bh=hL8UuHqCpojMaxpGJbQTNKSaEQSLBzU0jdkgH5Zu2h4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=rvbqjtaQucc5DILPfeRmQrFWlWfU4DKZY98RjA14HIr14Ba0SM2PQIb68Tsns2AEqrTYDKunsE2Fe/N3c53qluXW7jxsBJp0Cn5/uA5Z+NpIDrvpwSTzJl83FZDBvdHwsh77FkPy+4qWjBnOkduOcW38y3Z1rS27ci7BWOAweiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z75K0ll/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z75K0ll/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729240723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LJzH1gSOEl11wR3YSK4ZKedRTlS0Fmi69LaWvUhmAr8=;
+	b=Z75K0ll/+gKg0wS7GSCWDAyZh1dusjWXoGvDQzSRI3Gt4f7h5rLXNcY8st1JzFhEyPyGZ3
+	g/Ko/9gpHJ+eVeJWyXTD336kQLBxa4RAo0q/SLg/q0b2bJr6w8pDWR01/iNMVGkWi+dkt9
+	8mi+NBWhj8JcUJWlfexTjPeUYTajedM=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-2gNnmzaNNz-rHbdbHcZRWA-1; Fri, 18 Oct 2024 04:38:42 -0400
+X-MC-Unique: 2gNnmzaNNz-rHbdbHcZRWA-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a7fa073718so290761685a.3
+        for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 01:38:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729240722; x=1729845522;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uqhXnCT4fCKlCTVuHx3dAlyeKQVM4rIUCf2AtXG9+c0=;
+        b=XX8gCW5hn3jSzHF+PHqlo++YK5RJByLapARdWe2jXX1IH4TWi9zrOpIm9M5DtrLzc8
+         LtCIDjXFlCxwC4yrq7n6kAYTrewDYoHaQIErIlVYQXK7slKL0KLu9J8RvLaJPsLwfn2Q
+         +cCWZXZct5ZzRTPdFjQMTrG1a3aRn5jVJnP04cljG1aItb+RxLsGIiakLpeCF7EsOTBM
+         m+Tgb/EtrmCTD4Fc1Tmx682Tmz0MKVEgE70EZIC/8kexYFit59Oo3z/nXv0up06LrZYl
+         6q9UnEbPz7MGSHWjCRCZTrmjqCAP3ZKpMlJi/1C1vT78h9OclUIeU21hfcgyUg2p8CsH
+         dTKA==
+X-Gm-Message-State: AOJu0YzNrTsGpTISC9VDANyCNtVALg8jhRbHMtjWNa97tf2dUEJnYyMd
+	OBZVNUnoF10RTGVNZbWG+x/RljT7ZShoP0jHCsYR6I3/Ei7YmLwu/Pk4ri5xKoxPRVNSba3vuDW
+	CPaZincqNsaRVV5wrx9gxorTlobLQOrQxogAiK2xDMCX8Ob0Fy12chA==
+X-Received: by 2002:a05:6214:3386:b0:6cb:c798:3103 with SMTP id 6a1803df08f44-6cde159f1bcmr14536776d6.39.1729240721810;
+        Fri, 18 Oct 2024 01:38:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGmZcOYlqsHk2v9hqL7U4vCWowWz33zFjEP+dFo4/G3ZcIL6X0y8NNJAKQTIjk1MRHdiDSrjw==
+X-Received: by 2002:a05:6214:3386:b0:6cb:c798:3103 with SMTP id 6a1803df08f44-6cde159f1bcmr14536706d6.39.1729240721472;
+        Fri, 18 Oct 2024 01:38:41 -0700 (PDT)
+Received: from rh-2.fritz.box (p200300f6af01c000f92aec4042337510.dip0.t-ipconnect.de. [2003:f6:af01:c000:f92a:ec40:4233:7510])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cde114e6d7sm4966706d6.52.2024.10.18.01.38.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 01:38:40 -0700 (PDT)
+Date: Fri, 18 Oct 2024 10:38:35 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
+    james.morse@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+    yuzenghui@huawei.com, wangzhou1@hisilicon.com, 
+    linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+Subject: Re: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
+ userspace
+In-Reply-To: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
+Message-ID: <6d7c3d96-d1e9-d1b8-db3d-83ff2da00458@redhat.com>
+References: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed; boundary="-1463806798-552817351-1729240720=:8254"
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBBdWdlciA8ZXJp
-Yy5hdWdlckByZWRoYXQuY29tPg0KPiBTZW50OiBUaHVyc2RheSwgT2N0b2JlciAxNywgMjAyNCA2
-OjE2IFBNDQo+IFRvOiBDb3JuZWxpYSBIdWNrIDxjb2h1Y2tAcmVkaGF0LmNvbT47IFNoYW1lZXJh
-bGkgS29sb3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNv
-bT47IE9saXZlciBVcHRvbg0KPiA8b2xpdmVyLnVwdG9uQGxpbnV4LmRldj47IE1hcmMgWnluZ2ll
-ciA8bWF6QGtlcm5lbC5vcmc+DQo+IENjOiBrdm1hcm1AbGlzdHMubGludXguZGV2OyBjYXRhbGlu
-Lm1hcmluYXNAYXJtLmNvbTsgd2lsbEBrZXJuZWwub3JnOw0KPiBtYXJrLnJ1dGxhbmRAYXJtLmNv
-bTsgeXV6ZW5naHVpIDx5dXplbmdodWlAaHVhd2VpLmNvbT47IFdhbmd6aG91DQo+IChCKSA8d2Fu
-Z3pob3UxQGhpc2lsaWNvbi5jb20+OyBqaWFuZ2t1bmt1bg0KPiA8amlhbmdrdW5rdW5AaHVhd2Vp
-LmNvbT47IEpvbmF0aGFuIENhbWVyb24NCj4gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2VpLmNvbT47
-IEFudGhvbnkgSmVic29uDQo+IDxhbnRob255LmplYnNvbkBodWF3ZWkuY29tPjsgbGludXgtYXJt
-LWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOw0KPiBMaW51eGFybSA8bGludXhhcm1AaHVhd2Vp
-LmNvbT4NCj4gU3ViamVjdDogUmU6IFtSRkMgUEFUQ0ggMC82XSBLVk06IGFybTY0OiBFcnJhdGEg
-bWFuYWdlbWVudCBmb3IgVk0gTGl2ZQ0KPiBtaWdyYXRpb24NCj4gDQo+IEhpIFNoYW1lZXIsDQo+
-IA0KPiBPbiAxMC8xNy8yNCAxNzo0OSwgQ29ybmVsaWEgSHVjayB3cm90ZToNCj4gPiBPbiBGcmks
-IE9jdCAxMSAyMDI0LCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpDQo+IDxzaGFtZWVyYWxpLmtv
-bG90aHVtLnRob2RpQGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+DQo+ID4+PiAtLS0tLU9yaWdpbmFs
-IE1lc3NhZ2UtLS0tLQ0KPiA+Pj4gRnJvbTogT2xpdmVyIFVwdG9uIDxvbGl2ZXIudXB0b25AbGlu
-dXguZGV2Pg0KPiA+Pj4gU2VudDogRnJpZGF5LCBPY3RvYmVyIDExLCAyMDI0IDQ6MTEgUE0NCj4g
-Pj4+IFRvOiBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPg0KPiA+Pj4gQ2M6IFNoYW1lZXJh
-bGkgS29sb3RodW0gVGhvZGkNCj4gPj4+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdl
-aS5jb20+OyBrdm1hcm1AbGlzdHMubGludXguZGV2Ow0KPiA+Pj4gY2F0YWxpbi5tYXJpbmFzQGFy
-bS5jb207IHdpbGxAa2VybmVsLm9yZzsgbWFyay5ydXRsYW5kQGFybS5jb207DQo+ID4+PiBjb2h1
-Y2tAcmVkaGF0LmNvbTsgZXJpYy5hdWdlckByZWRoYXQuY29tOyB5dXplbmdodWkNCj4gPj4+IDx5
-dXplbmdodWlAaHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0KPiA8d2FuZ3pob3UxQGhpc2lsaWNv
-bi5jb20+Ow0KPiA+Pj4gamlhbmdrdW5rdW4gPGppYW5na3Vua3VuQGh1YXdlaS5jb20+OyBKb25h
-dGhhbiBDYW1lcm9uDQo+ID4+PiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29tPjsgQW50aG9u
-eSBKZWJzb24NCj4gPj4+IDxhbnRob255LmplYnNvbkBodWF3ZWkuY29tPjsgbGludXgtYXJtLWtl
-cm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOw0KPiA+Pj4gTGludXhhcm0gPGxpbnV4YXJtQGh1YXdl
-aS5jb20+DQo+ID4+PiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSCAwLzZdIEtWTTogYXJtNjQ6IEVy
-cmF0YSBtYW5hZ2VtZW50IGZvciBWTQ0KPiBMaXZlDQo+ID4+PiBtaWdyYXRpb24NCj4gPj4+DQo+
-ID4+PiBPbiBGcmksIE9jdCAxMSwgMjAyNCBhdCAxMjo0MzoyOFBNICswMTAwLCBNYXJjIFp5bmdp
-ZXIgd3JvdGU6DQo+ID4+Pj4gT24gRnJpLCAxMSBPY3QgMjAyNCAxMTo1NzoxMCArMDEwMCwgU2hh
-bWVlcmFsaSBLb2xvdGh1bSBUaG9kaQ0KPiA+Pj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlA
-aHVhd2VpLmNvbT4gd3JvdGU6DQo+ID4+Pj4+Pj4gUGxlYXNlIHRha2UgYSBsb29rIGFuZCBsZXQg
-bWUga25vdyB5b3VyIHRob3VnaHRzLg0KPiA+Pj4+Pj4gSGF2aW5nIGV5ZWJhbGxlZCB0aGlzIHZl
-cnkgc3VwZXJmaWNpYWxseSwgSSB0aGluayB3ZSBjYW4gZG8NCj4gc29tZXRoaW5nDQo+ID4+Pj4+
-PiBzaW1wbGVyLCBhbmQgbWF5YmUgbW9yZSBmdXR1cmUtcHJvb2Y6DQo+ID4+Pj4+IFRoYW5rcyBN
-YXJjIGZvciB0YWtpbmcgYSBsb29rIGFuZCB0aGUgcXVpY2sgZmVlZGJhY2suDQo+ID4+Pj4gTm8g
-d29ycmllcywgdGhhdCdzIHRoZSBsZWFzdCBJIGNvdWxkIGRvIGdpdmVuIHRoYXQgeW91IHB1dCB0
-aGUgZWZmb3J0DQo+ID4+Pj4gaW1wbGVtZW50aW5nIG15IHNpbGx5IGlkZWFzISA7LSkNCj4gPj4+
-Pg0KPiA+Pj4+Pj4gLSBJIGRvbid0IHRoaW5rIEtWTSBzaG91bGQgYmUgY29uY2VybmVkIGFib3V0
-IHRoZSBkZXNjcmlwdGlvbiBvZg0KPiB0aGUNCj4gPj4+Pj4+ICAgdGFyZ2V0IENQVXMuIFRoZSBo
-eXBlcmNhbGwgeW91IGRlZmluZWQgaXMgdGhlIHJpZ2h0IHRoaW5nIHRvIGRvLA0KPiA+Pj4+Pj4g
-ICBidXQgdGhlIFZNTSBzaG91bGQgY29tcGxldGVseSBoYW5kbGUgaXQuIFRoYXQncyBhbg0KPiBp
-bXBsZW1lbnRhdGlvbg0KPiA+Pj4+Pj4gICBkZXRhaWwsIGJ1dCBpdCB3b3VsZCBtYWtlIHRoaW5n
-cyBtdWNoIHNpbXBsZXIuDQo+ID4+Pj4+IE9rLiBTbyBkb2VzIHRoYXQgbWVhbiB0aGUgaHlwZXJj
-YWxsIHdpbGwgdXNlIHNvbWUgc29ydCBvZiBzaGFyZWQNCj4gPj4+IG1lbW9yeQ0KPiA+Pj4+PiB0
-byByZXRyaWV2ZSB0aGUgbGlzdCBvZiB0YXJnZXQgQ1BVcyBmcm9tIFZNTT8NCj4gPj4+PiBUd28g
-cG9zc2liaWxpdGllczoNCj4gPj4+Pg0KPiA+Pj4+IC0gZWl0aGVyIHNoYXJlZCBtZW1vcnksIGlu
-IHdoaWNoIGNhc2UgdGhlIGh5cGVyY2FsbCB3b3VsZCByZXF1aXJlIHRoZQ0KPiA+Pj4+ICAgZ3Vl
-c3QgdG8gZ2l2ZSBhbiBJUEEgYW5kIHNpemUgZm9yIHRoZSBWTU0gdG8gd3JpdGUgaXRzIHN0dWZm
-IGludG8NCj4gPj4+PiAgIHRoZSBndWVzdCBtZW1vcnksDQo+ID4+Pj4NCj4gPj4+PiAtIG9yIG1v
-cmUgc2ltcGx5IHJldHVybiB0aGUgZGF0YSBhcyBhbiBNSURSL1JFVklEUiBwYWlyIGluIHJlZ2lz
-dGVycywNCj4gPj4+PiAgIHRoZSBndWVzdCByZXF1ZXN0aW5nIGFuIGluZGV4LCBhbmQgZ2V0dGlu
-ZyBhbiBlcnJvciB3aGVuIG91dCBvZg0KPiA+Pj4+ICAgcmFuZ2UsIGxlYXZpbmcgaXQgd2l0aCB0
-aGUgZnJlZWRvbSB0byBvcmdhbmlzZSB0aGUgc3RvcmFnZS4NCj4gPj4+Pg0KPiA+Pj4+IFRoZSBz
-ZWNvbmQgb3B0aW9uIGlzIGEgYml0IHNsb3dlciwgYnV0IHdheSBzaW1wbGVyLCBhbmQgaXQgb25s
-eQ0KPiA+Pj4+IGhhcHBlbnMgb25jZSBwZXIgZ3Vlc3QgYm9vdCwgc28gaXQgd291bGQgcHJvYmFi
-bHkgYmUgbXkgcHJlZmVycmVkDQo+ID4+Pj4gb3B0aW9uIHVubGVzcyB0aGlzIGlzIHByb3ZlZCB0
-byBiZSBpbXByYWN0aWNhbC4NCj4gPj4+IEFsc28gd29ydGggbm90aW5nIHRoZXJlJ3MgZXhpc3Rp
-bmcgVUFQSSBbKl0gZm9yIGFsbG93aW5nIHVzZXJzcGFjZSB0bw0KPiA+Pj4gcmVnaXN0ZXIgcmFu
-Z2Uocykgb2YgaHlwZXJjYWxscyB0aGF0IGl0IHNlcnZpY2VzIGRpcmVjdGx5LiBJdCdzIGEgYml0
-DQo+ID4+PiB3ZWlyZCB0aGF0IHdlJ2QgYWxsb3cgdXNlcnNwYWNlIHRvIGRvIHN0dWZmIGluIEtW
-TSdzIG93biBoeXBlcmNhbGwNCj4gPj4+IHJhbmdlLCBidXQgSSBkb24ndCB0aGluayBpdCByZWFs
-bHkgbWF0dGVycyBhdCB0aGlzIHBvaW50IHNpbmNlIHRoaXMgaXMNCj4gPj4+IGFsbCBwcm90b3R5
-cGluZy4NCj4gPj4+DQo+ID4+PiBbKl06IGh0dHBzOi8vZG9jcy5rZXJuZWwub3JnL3ZpcnQva3Zt
-L2RldmljZXMvdm0uaHRtbCNhdHRyaWJ1dGUta3ZtLQ0KPiBhcm0tDQo+ID4+PiB2bS1zbWNjYy1m
-aWx0ZXItdy1vDQo+ID4+IFRoYW5rcy4gWWVzIGFuZCB0aGVyZSBhcmUgYXR0ZW1wdHMgdG8gYWRk
-IHRoYXQgaGFuZGxpbmcgaW4gUWVtdVsqXSBpbg0KPiB0aGUgY29udGV4dA0KPiA+PiBvZiB2Q1BV
-IGhvdHBsdWcgc3VwcG9ydChQU0NJIHJlbGF0ZWQgb25lcyB0aG91Z2gpLiAgV2lsbCB0YWtlIGEg
-bG9vay4NCj4gPj4NCj4gPj4gVGhhbmtzLA0KPiA+PiBTaGFtZWVyDQo+ID4+IFsxXSBodHRwczov
-L2xvcmUua2VybmVsLm9yZy9xZW11LWRldmVsLzIwMjQxMDA5MDMzNzA0LjI1MDI4Ny0xLQ0KPiBz
-YWxpbC5tZWh0YUBodWF3ZWkuY29tLw0KPiA+IFNwZWFraW5nIG9mIFFFTVU6IERvIHlvdSBtYXli
-ZSBhbHJlYWR5IGhhdmUgc29tZSBwcm90b3R5cGUgY29kZSB0aGF0DQo+ID4gdHJpZXMgdG8gZG8g
-c29tZXRoaW5nIHdpdGggdGhlIHNldHVwIGhlcmU/IChJIGRvbid0IHRoaW5rIFFFTVUgY3VycmVu
-dGx5DQo+ID4gbXVja3MgYXJvdW5kIHdpdGggTUlEUiBhbmQgZnJpZW5kcyB3aGVuIHJ1bm5pbmcg
-d2l0aCBLVk07IEkgd29uZGVyDQo+IHdoYXQNCj4gPiBpdCBzaG91bGQgcHJvdmlkZSB0byB0aGUg
-Z3Vlc3QgYW5kIGlmIGl0IHNob3VsZCBjYXJlIHRvIHNldCBzb21ldGhpbmcgYXMNCj4gPiBhIGJh
-c2UgbGV2ZWwgdGhhdCBnaXZlcyBndWVzdHMgbm90IHVzaW5nIHRoZSBoeXBlcmNhbGwgYSBjaGFu
-Y2UgdG8gd29yaw0KPiA+IHByb3Blcmx5LikNCg0KSSBoYWQgYSBoYWNrZWQgUWVtdSB0byB0ZXN0
-IHRoaXMgUkZDLiBOb3RoaW5nIGZhbmN5IGJ1dCBqdXN0IHRvIHZlcmlmeSB0aGUgIFJGQy4NCkl0
-IGJhc2ljYWxseSBhZGRzIGEgbmFtZWQgQ1BVIHRvIHZpcnQgYXMgYmVsb3csDQoNCjEuIENoZWNr
-cyB0aGUgaG9zdCBNSURSIGFuZCBSRVZJRFIgYW5kIGlmIGl0IGlzIG9uZSBvZiB0aGUgc3VwcG9y
-dGVkIHBsYXRmb3JtcywNCiAgIHVzZSB0aGUgd3JpdGFibGUgcmVnaXN0ZXIgaW50ZXJmYWNlIHRv
-IHVwZGF0ZSB0aGUgSUQgcmVnaXN0ZXJzIHdpdGggYSBjb21tb24NCiAgIG1pbmltdW0gICAgZmVh
-dHVyZSBsaXN0Lg0KMi4gVXNlIHRoZSBJT0NUTCBpbiB0aGlzIFJGQyB0byB1cGRhdGUgdGhlIHRh
-cmdldCBDUFUgbGlzdCBpbmZvLg0KMy4gSWdub3JlIHRoZSBpbnZhcmlhbnQgcmVnaXN0ZXIgU0VU
-IGVycm9ycy4NCg0KPiA+DQo+IEFzIGRpc2N1c3NlZCBkdXJpbmcgdGhlIEtWTSBmb3J1bSB3ZSBh
-cmUgd29ya2luZyBvbiBhIHFlbXUgaW50ZWdyYXRpb24NCj4gZm9yIHdyaXRhYmxlIElEIHJlZ3Mu
-IFRoZSBmaXJzdCBnb2FsIGlzIHRvIGJlIGFibGUgdG8gc3BlY2lhbGl6ZSB0aGUNCj4gaG9zdCBw
-YXNzdGhyb3VnaCBtb2RlbCAoY3VzdG9tIGhvc3QgbW9kZWwpLiBNYXliZSB0aGlzIHdpbGwgdHJp
-Z2dlciBtb3JlDQo+IGRpc2N1c3Npb25zIG9uIG5hbWVkIG1vZGVscyB0b28uIFRoaXMgaXMgY29t
-cGxlbWVudGFyeSB0byB0aGUNCj4gTUlEUi9SRVZJRFIgcHJvYmxlbWF0aWMgYW5kIEkgaG9wZSB3
-ZSB3aWxsIGJlIGFibGUgdG8gY29uc29saWRhdGUgb3VyDQo+IHdvcmtzIGF0IHNvbWUgcG9pbnQu
-DQoNCkNvb2whLiBIYXBweSB0byBrbm93IHRoYXQgaXQgaXMgbWFraW5nIHByb2dyZXNzLiBPbmNl
-IEkgcmV3b3JrIHRoaXMgUkZDIGJhc2VkIG9uIHRoZQ0Kc3VnZ2VzdGlvbnMsIEkgd2lsbCByZXdv
-cmsgdGhlIFFlbXUgdG8gaGF2ZSBhIGhhY2tlZCBwcm90b3R5cGUgdG8gdGVzdCBpdCBhcyB3ZWxs
-IGFuZA0KcHJvYmFibHkgY2FuIHNoYXJlIHRoYXQuDQoNClBsZWFzZSBrZWVwIG1lIGluIGxvb3Ag
-aWYgeW91IGhhdmUgcGxhbnMgdG8gc2hhcmUgeW91ciBRZW11IHdvcmsgc29vbi4gVGhhdCB3aWxs
-DQpiZSB2ZXJ5IGhlbHBmdWwuDQoNClRoYW5rcywNClNoYW1lZXINCg==
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463806798-552817351-1729240720=:8254
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Thu, 17 Oct 2024, Shameer Kolothum wrote:
+> Only allow userspace to set VIPT(0b10) or PIPT(0b11) for L1Ip based on
+> what hardware reports as both AIVIVT (0b01) and VPIPT (0b00) are
+> documented as reserved.
+>
+> Using a VIPT for Guest where hardware reports PIPT may lead to over
+> invalidation, but is still correct. Hence, we can allow downgrading
+> PIPT to VIPT, but not the other way around.
+>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+Reviewed-by: Sebastian Ott <sebott@redhat.com>
+---1463806798-552817351-1729240720=:8254--
+
