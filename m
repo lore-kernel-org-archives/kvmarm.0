@@ -1,55 +1,55 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7605118BBAE
-	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 07:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0E018BC3B
+	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 07:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729237721; cv=none; b=lmKs+ald13aiEdg844DZYKTJ+/Yd77SaEkzQcicTmwLqLJFvMJ/M2PL21e4WV3Yp/U4Ni2ioUG2oKcsj6SowxFeFOywJpUYo2QylGmnR81VKofKC20V3v4rTLN5/Nf+svGDMhAchmnnfeMPgD/1miqNeFJdXB3BhGQiWQJInoM0=
+	t=1729237722; cv=none; b=mTBvnptgdZrtKeOVEpjzqBl+R/+O+HUPhrtqM7pRnHeCuKYoSYMJ97CHbrvnus7Lm+WCGN2Po1sMFly1/wEs5jCcz5C+wgoztGKas36PPAA+hVT0cE5ecITYkzVojYMzkmvA2k1bVdIP8x9VXFdg+pS67eJFIg5nITo7pz07eKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729237721; c=relaxed/simple;
-	bh=xHzrQ6Ei63uHqB6mawAXDVEupKgRqThCAAkQgkwpmR4=;
+	s=arc-20240116; t=1729237722; c=relaxed/simple;
+	bh=Vck8cq3zCt7pXIKRoJLT7kwecGWLBED0RBJGOMQKGPo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GlHBEnTOM9fnPr8ESC6xmhK6YcLTAYoaFisPs1P1X6AYm8M7p/vgyi6e1PeuAHx6SPAjYwEAX0YvrUg6zU/4kY5r20MFncOyhpODuDH2nfmy1OzCBIA89PvL736EqwfPv3l5lsL1YTZbT8PJX98MdFuXXvrbrcfiwQZkY5GXeqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oMQBj626; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=RQx/seMUd+UaLSiVwwCKqVfP7VJvz5k/hB+TxU8HqQM6H8Dj/iGzNvpEcnjMCG6pj3OAjXSrcwq2SDOlK9Wz64xJaoup5FcIY6ZPph4Do6fVccdBUnCTzHjfth0bhXDwB0lIQGXqcnxNCvrbFUye7EAyDTiPIfz5TcVFaj5REsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UcqOQ27J; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oMQBj626"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-37d52ccc50eso896863f8f.3
-        for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 00:48:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UcqOQ27J"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e1fbe2a6b1so32267547b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 00:48:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729237718; x=1729842518; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1729237720; x=1729842520; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lfP2Wkaa1K6/7fTY6d/L/bOSBL8Udspd9Tr/mEaw9/o=;
-        b=oMQBj626Fazwfm4upXe8er8nPmixnry1l+pNxSjxJoEajSCEge9/NK0DaR6Kkr3Wzf
-         23Sf6G8BgF/2CvizwxrMTDWZ1T2a6LjL4L91YTdXwZr7F5k+LdTMBkCt2I+Dm4Jnq7Rc
-         MmNcgtpNn6Av1aTRHUma3ZgKFzaDzGunNWpk9b6suKjjuRLFuFbZNx1f+5yGHboLQxe4
-         V4scj8ZYRkP5Fu+cGMHogIou74k7SL54RyJzFCiL/qye9aqfBY2HcQuWWLDC0zB3I+Sn
-         4AVvGp0aNoPKnNeb3hk7ZnGZUDlg3NP/DycaX56wx84KLJL6rfWXtelzigl5yG61EWTp
-         AyWA==
+        bh=i87FExk+Kcaf4e4cjmhuQVj4Z5srtO4tuZ/PkrXIF4w=;
+        b=UcqOQ27JBHSjIPeG7PvblDwxw4c269ZiJSJwsqf/cRB+8Qihw+5i1Ufpb7l2Gtiv+d
+         rMsvjTH6mHZWJfKmqOkszgBV0AZzOJvDbufLsiYfuEeGjQTvMVAjboBTVjUke2IAYomA
+         Qr0fjwwFMn2v06pPS7n6iBJV1m1oeCM/RY88RgSOPHyJFzK+J8NGg1lzLG2Iy70gkkXU
+         62QBBdwCo5ZY40rM6CyQ/gSbNywWY0lpI/GBIicPS6inBgdbtQP5Nb0QPKeEgP2Akq5z
+         g0uujr9eF/5J1V8ia7/m14TQdjUCXpupS6vjLF7zObSMScguhY5Ps6z6cv5V4BFY4hBV
+         Sr2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729237718; x=1729842518;
+        d=1e100.net; s=20230601; t=1729237720; x=1729842520;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lfP2Wkaa1K6/7fTY6d/L/bOSBL8Udspd9Tr/mEaw9/o=;
-        b=KOGp8+/26IWlzjKRtDujgyHORPIWliVw2hzlnFKz5TqLiinvdvwRHcU7BN+lIXQFM7
-         u37Yh9gOdXWw1idsP0lggqdSl+CbojpKFW4hmaA/1fTyfDoqmXbO0zfgE82Hlqh70XLM
-         48hrrpYi5LqfMP9w+b876YiX6W05GGVC+Uta8dihUQmikN8EPYAt7YWBCU7DaCfgPP3Q
-         ks7Z396FKpwClopWUV9G6rhxI7E1R/NdMYTyqfjTkQumZPt55GFDpT11cJzqwar/SEko
-         CmLB2uEH8uT2Gp0LRgC85j61Wt9syToDcrew4H/PdyWuUsy99bL2ZHVsfSdE5Xj84y6D
-         7FJQ==
-X-Gm-Message-State: AOJu0YyXWD38X1lDs9+YWohD5IelCDWFB+yJluYctSei6bTaqjSLGN7w
-	i2jOIUe6oxgEncOPvetyKRKjwFrI4oV3fdUfvNO2IVwdIPdIFDAFBHDVyAopMiIWERmvZuskb9u
-	u03NJnfNVQdjE91+3A8bz0A095Qwsb6h0iJHBgxnpkTpiIo03oVw6t3uxI4gzWmLRyioO6gcah/
-	9Gb+t6oafKYaB6x1k6YoHSjefHR80=
-X-Google-Smtp-Source: AGHT+IFDyWpi4pFzZWphNKyCbblDR7+5yZRi7fi7pg8St07rDladBuNIGEYKfXylkdL3KpcfX8NwzlLIhA==
+        bh=i87FExk+Kcaf4e4cjmhuQVj4Z5srtO4tuZ/PkrXIF4w=;
+        b=os3eQ/scw1PAM9/WWLyFEH9OBE7gapwuADo9pLMMqcRuTLMieUuqqvcxdvw6VRaNzK
+         awDGtXeBkkvVH2kH8gKlHL5moIqimHFPxO76+uvEmo9AHQzf2hs0vn9DhE6UYYNnXftd
+         TRAk2XluiYxP99K9V4q1XfE4mVeAHm/gtdy73m1MpFREeu9JpAGeuIuMNdesC7Jk0oi8
+         n7ADGaMiiQpifRgxTMLynCIzJJFp9egglo3Pmijyq29Cqmsrbd30oEyg/oZtHd7xa/8F
+         e4ilCoEOWD7J+DbnSuowXw+QYwHKkCl/z6t3pdM/nU6wK9i6CksOuL9dpfoiHbOXm+l7
+         EHMQ==
+X-Gm-Message-State: AOJu0Yy3+dYXGKVVf1kLOt3KfJP0B3h5aZ+df9cgtJmnHF/VSO9j83Hu
+	uKOhf3jFNUkG6yYy8KnC2m+KZ6SQ6q8uHKsrB3mX8EAHcDDoCPAXpgvHyqURQZ4Go8T09FNitA6
+	cXCCGMqxbY1Z4vikZxMJz5o76aQSR0gpKU05/6J0tOdmAa9ASUWtTP61JBqrkgE92OQy21nrUIt
+	6cIQNJkdoA5UytrIVfUCwX+rkIT4o=
+X-Google-Smtp-Source: AGHT+IHwCFzZczJClzNjk8bfTA9dTHFtmashTXFjLYR+q6pZgJlnPEffBk/6Axr/zYxo8BuIo1iMjGeDqA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:ef92:0:b0:37d:5042:794f with SMTP id
- ffacd0b85a97d-37eab727631mr934f8f.11.1729237717408; Fri, 18 Oct 2024 00:48:37
- -0700 (PDT)
-Date: Fri, 18 Oct 2024 08:48:29 +0100
+ (user=tabba job=sendgmr) by 2002:a05:690c:fc2:b0:6e2:70e:e82e with SMTP id
+ 00721157ae682-6e5bfc0c757mr247577b3.6.1729237719910; Fri, 18 Oct 2024
+ 00:48:39 -0700 (PDT)
+Date: Fri, 18 Oct 2024 08:48:30 +0100
 In-Reply-To: <20241018074833.2563674-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241018074833.2563674-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241018074833.2563674-2-tabba@google.com>
-Subject: [PATCH v2 1/4] KVM: arm64: Move pkvm_vcpu_init_traps() to init_pkvm_hyp_vcpu()
+Message-ID: <20241018074833.2563674-3-tabba@google.com>
+Subject: [PATCH v2 2/4] KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, 
@@ -68,113 +68,46 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com,
 	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Move pkvm_vcpu_init_traps() to the initialization of the
-hypervisor's vcpu state in init_pkvm_hyp_vcpu(), and remove the
-associated hypercall.
+Move kvm_vcpu_enable_ptrauth() to a shared header to be used by
+hypervisor code in protected mode.
 
-In protected mode, traps need to be initialized whenever a VCPU
-is initialized anyway, and not only for protected VMs. This also
-saves an unnecessary hypercall.
+No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h               | 1 -
- arch/arm64/kvm/arm.c                           | 8 --------
- arch/arm64/kvm/hyp/include/nvhe/trap_handler.h | 2 --
- arch/arm64/kvm/hyp/nvhe/hyp-main.c             | 8 --------
- arch/arm64/kvm/hyp/nvhe/pkvm.c                 | 4 +++-
- 5 files changed, 3 insertions(+), 20 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 4 ++++
+ arch/arm64/kvm/reset.c               | 5 -----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index b36a3b6cc011..7f7866d2bfc2 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -76,7 +76,6 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_vmcr_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
--	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_init_traps,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a0d01c46e408..ece934bb4531 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -856,14 +856,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 		static_branch_inc(&userspace_irqchip_in_use);
- 	}
- 
--	/*
--	 * Initialize traps for protected VMs.
--	 * NOTE: Move to run in EL2 directly, rather than via a hypercall, once
--	 * the code is in place for first run initialization at EL2.
--	 */
--	if (kvm_vm_is_protected(kvm))
--		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
--
- 	mutex_lock(&kvm->arch.config_lock);
- 	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
- 	mutex_unlock(&kvm->arch.config_lock);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h b/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
-index 45a84f0ade04..1e6d995968a1 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
-@@ -15,6 +15,4 @@
- #define DECLARE_REG(type, name, ctxt, reg)	\
- 				type name = (type)cpu_reg(ctxt, (reg))
- 
--void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu);
--
- #endif /* __ARM64_KVM_NVHE_TRAP_HANDLER_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index fefc89209f9e..1a224d5df207 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -349,13 +349,6 @@ static void handle___pkvm_prot_finalize(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __pkvm_prot_finalize();
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index a601a9305b10..9a68befbeecf 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -693,4 +693,8 @@ static inline bool guest_hyp_sve_traps_enabled(const struct kvm_vcpu *vcpu)
+ 	return __guest_hyp_cptr_xen_trap_enabled(vcpu, ZEN);
  }
  
--static void handle___pkvm_vcpu_init_traps(struct kvm_cpu_context *host_ctxt)
++static inline void kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
++{
++	vcpu_set_flag(vcpu, GUEST_HAS_PTRAUTH);
++}
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 0b0ae5ae7bc2..470524b31951 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -167,11 +167,6 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+ 		memset(vcpu->arch.sve_state, 0, vcpu_sve_state_size(vcpu));
+ }
+ 
+-static void kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
 -{
--	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
--
--	__pkvm_vcpu_init_traps(kern_hyp_va(vcpu));
+-	vcpu_set_flag(vcpu, GUEST_HAS_PTRAUTH);
 -}
 -
- static void handle___pkvm_init_vm(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm *, host_kvm, host_ctxt, 1);
-@@ -411,7 +404,6 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
- 	HANDLE_FUNC(__vgic_v3_save_vmcr_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
--	HANDLE_FUNC(__pkvm_vcpu_init_traps),
- 	HANDLE_FUNC(__pkvm_init_vm),
- 	HANDLE_FUNC(__pkvm_init_vcpu),
- 	HANDLE_FUNC(__pkvm_teardown_vm),
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 077d4098548d..869955e551a0 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -204,7 +204,7 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
- /*
-  * Initialize trap register values in protected mode.
-  */
--void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
-+static void pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
- {
- 	pvm_init_trap_regs(vcpu);
- 	pvm_init_traps_aa64pfr0(vcpu);
-@@ -335,6 +335,8 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
- 	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
-+
-+	pkvm_vcpu_init_traps(&hyp_vcpu->vcpu);
- done:
- 	if (ret)
- 		unpin_host_vcpu(host_vcpu);
+ /**
+  * kvm_reset_vcpu - sets core registers and sys_regs to reset value
+  * @vcpu: The VCPU pointer
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
