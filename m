@@ -1,111 +1,178 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C682C18E350
-	for <kvmarm@lists.linux.dev>; Fri, 18 Oct 2024 21:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF02918DF6F;
+	Sat, 19 Oct 2024 09:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729285393; cv=none; b=Xv5/ljceRIgVDguaM6BWmHvTh/jkyUt4pqRi5tNk0TjARj1mi1AcJtcML9APSxp4c6/AUSKI+C11d7IytAxhANKou/ko5Ue751Bkbmm6vs+1c6LSle2pJXYOFOnXIoFm9dzXl+B4BsqtodksJqk84Vmmf5Y45k19Vwdk93+0GRE=
+	t=1729329007; cv=none; b=oB+GoOzf29hoO/IgrQkWg9HE4j0DM/qroso4gSyFD02LVoxxoEKmL136auuDARkurKT15CmLU+6twUqZ0Eq8ZABs/DT4qkBPPrRYUYjRHWhv55HdrXYVkT5NQfD2j5ZmAY7LTZiI36AQwQLTx6Ja9cgmYonHD2STr0IqfCv32XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729285393; c=relaxed/simple;
-	bh=lD+xgZ9PJuiAIBrLQfFdjsMYP4KvqFSc8lPY4NjCwWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cEPZYbdrhkvowmw2syi24TSq2Rj9bUU2DjxCKDqw8Q1IFlzBMXLotGe930qc5cs2TowFHE8xkutMpaKR5+oruAUTflPHuhRcBTgDBRRljRciHCGqKqh47I62xacdkdgPXR6fEirUTjgLcjae2txuHOj2PyYoOacZEEwCBHZAxFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DuKgRci3; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1729329007; c=relaxed/simple;
+	bh=IZ2pH0/q1s32xpIKI3v25LXBOHgeQc9PYVEhOR1YKbs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ONNCaSJ8UQduzyhL+4XPssGJBJZpY8agv2njcOJbvq7gl3fErAicTJo4WC7A2nK/dEcME6iAGOhJMcnTdZP6gPSPpDj+8GfrIE2CXo1x9N1BIHvVlpt/g5pY/jAS5Pwa2Yij34XsuYYmX+o/bE+jCV0xkMwUPOj0xe99Sqvu9rA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k+Yd59vY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DuKgRci3"
-Date: Fri, 18 Oct 2024 21:03:02 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729285388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XNvuLASMj292AxqyahadmF64JemIStQYFSkvBYcRWwY=;
-	b=DuKgRci3aTMt5dmKzlR0TedEQOb1IFvzme1b5Er/S54koUQMVym6/+s+fvRHSLTjyl+dzM
-	G0/scqzfKEevZL0/i+kBlGdxaLhcj7K38kqzSNMy0dzGNcWczAu7YB5ITrRoJ6mfmjqOMo
-	qQQbZNTr9hTMqO52/P6MY2kA8P/TPCo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k+Yd59vY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AF03C4CEC5;
+	Sat, 19 Oct 2024 09:10:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729329007;
+	bh=IZ2pH0/q1s32xpIKI3v25LXBOHgeQc9PYVEhOR1YKbs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k+Yd59vYbcWW+Cc8PG3UPELv4PPzh/oxT/JGhH0OrSA9aqA66goIQYsiWBfW9x4X/
+	 aCVG8eoPLPl7Lr4Pmgw6jyLQCaCnfo38olXVWXXeqVLMHbKyJh5HwQdEXxNlDXMoVL
+	 LXYOMm3P3MecfSIU55Xm0cl3U4SbDBIMa0jajNSMCf1eaAnJNVHf913+b48X/v08lD
+	 fidpzhP0t8jWx7MbVeFYSSiXXtqoaEDADxYp8NoIso1CTdkyjpVEi8zmziMjNtmeOU
+	 vhC1cXWLIWk1DLcpFerueLMyG46cvJg22YTN37epHM3KBIqqGT7K7cHQTpMpfWYWEA
+	 w+iaGnTukvtgQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t25TI-004zRw-Jc;
+	Sat, 19 Oct 2024 10:10:04 +0100
+Date: Sat, 19 Oct 2024 10:10:04 +0100
+Message-ID: <87zfn0tq4z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Add tests for MMIO external
- abort injection
-Message-ID: <ZxLNBh6h0Nb9QR0t@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Don't retire aborted MMIO instruction
+In-Reply-To: <20241018194757.3685856-2-oliver.upton@linux.dev>
 References: <20241018194757.3685856-1-oliver.upton@linux.dev>
- <20241018194757.3685856-3-oliver.upton@linux.dev>
+	<20241018194757.3685856-2-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241018194757.3685856-3-oliver.upton@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Oct 18, 2024 at 07:47:57PM +0000, Oliver Upton wrote:
-> Test that the plumbing exposed to userspace for injecting aborts in
-> response to unexpected MMIO works as intended in two different flavors:
+On Fri, 18 Oct 2024 20:47:56 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
->  - A 'normal' MMIO instruction (i.e. ESR_ELx.ISV=1)
+> Returning an abort to the guest for an unsupported MMIO access is a
+> documented feature of the KVM UAPI. Nevertheless, it's clear that this
+> plumbing has seen limited testing, since userspace can trivially cause a
+> WARN in the MMIO return:
 > 
->  - An ISV=0 MMIO instruction with/without KVM_CAP_ARM_NISV_TO_USER
->    enabled
+>   WARNING: CPU: 0 PID: 30558 at arch/arm64/include/asm/kvm_emulate.h:536 kvm_handle_mmio_return+0x46c/0x5c4 arch/arm64/include/asm/kvm_emulate.h:536
+>   Call trace:
+>    kvm_handle_mmio_return+0x46c/0x5c4 arch/arm64/include/asm/kvm_emulate.h:536
+>    kvm_arch_vcpu_ioctl_run+0x98/0x15b4 arch/arm64/kvm/arm.c:1133
+>    kvm_vcpu_ioctl+0x75c/0xa78 virt/kvm/kvm_main.c:4487
+>    __do_sys_ioctl fs/ioctl.c:51 [inline]
+>    __se_sys_ioctl fs/ioctl.c:893 [inline]
+>    __arm64_sys_ioctl+0x14c/0x1c8 fs/ioctl.c:893
+>    __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>    invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+>    el0_svc_common+0x1e0/0x23c arch/arm64/kernel/syscall.c:132
+>    do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+>    el0_svc+0x38/0x68 arch/arm64/kernel/entry-common.c:712
+>    el0t_64_sync_handler+0x90/0xfc arch/arm64/kernel/entry-common.c:730
+>    el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
 > 
+> The splat is complaining that KVM is advancing PC while an exception is
+> pending, i.e. that KVM is retiring the MMIO instruction despite a
+> pending external abort. Womp womp.
+
+nit: *synchronous* external abort.
+
+> 
+> Fix the glaring UAPI bug by skipping over all the MMIO emulation in
+> case there is a pending synchronous exception. Note that while userspace
+> is capable of pending an asynchronous exception (SError, IRQ, or FIQ),
+> it is still safe to retire the MMIO instruction in this case as (1) they
+> are by definition asynchronous, and (2) KVM relies on hardware support
+> for pending/delivering these exceptions instead of the software state
+> machine for advancing PC.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: da345174ceca ("KVM: arm/arm64: Allow user injection of external data aborts")
+> Reported-by: Alexander Potapenko <glider@google.com>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/mmio_abort.c        | 158 ++++++++++++++++++
->  2 files changed, 159 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/mmio_abort.c
+>  arch/arm64/include/asm/kvm_emulate.h | 25 +++++++++++++++++++++++++
+>  arch/arm64/kvm/mmio.c                |  7 +++++--
+>  2 files changed, 30 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 960cf6a77198..98957a99ead6 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -156,6 +156,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
->  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer_edge_cases
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
-> +TEST_GEN_PROGS_aarch64 += aarch64/mmio_abort
->  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
->  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->  TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
-> diff --git a/tools/testing/selftests/kvm/aarch64/mmio_abort.c b/tools/testing/selftests/kvm/aarch64/mmio_abort.c
-> new file mode 100644
-> index 000000000000..08c4afec1f28
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/mmio_abort.c
-> @@ -0,0 +1,158 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * mmio_abort - Tests for userspace MMIO abort injection
-> + *
-> + * Copyright (c) 2024 Google LLC
-> + */
-> +#include "processor.h"
-> +#include "test_util.h"
-> +
-> +#define MMIO_ADDR	0x8000000ULL
-> +
-> +#define ESR_ELx_FSC_EXTABT	(0x10)
-> +
-> +static u64 expected_abort_pc;
-> +
-> +static void expect_sea_handler(struct ex_regs *regs)
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index a601a9305b10..1b229099f684 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -544,6 +544,31 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+>  		vcpu_set_flag((v), e);					\
+>  	} while (0)
+>  
+> +static inline bool kvm_pending_sync_exception(struct kvm_vcpu *vcpu)
 > +{
-> +	GUEST_ASSERT_EQ(regs->pc, expected_abort_pc);
-> +	GUEST_ASSERT(read_sysreg(esr_el1) & ESR_ELx_FSC_EXTABT);
+> +	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
+> +		return false;
+> +
+> +	if (vcpu_el1_is_32bit(vcpu)) {
+> +		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
+> +		case unpack_vcpu_flag(EXCEPT_AA32_UND):
+> +		case unpack_vcpu_flag(EXCEPT_AA32_IABT):
+> +		case unpack_vcpu_flag(EXCEPT_AA32_DABT):
+> +			return true;
+> +		default:
+> +			return false;
+> +		}
+> +	} else {
+> +		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
+> +		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC):
+> +		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SYNC):
+> +			return true;
+> +		default:
+> +			return false;
+> +		}
+> +	}
+> +}
 > +
 
-This needs to extract and compare the entire FSC field, I'll fix it the
-next time around.
+Is there any advantage in adding this to an otherwise unsuspecting
+include file, given that this is only used in a single spot?
+
+>  #define __build_check_all_or_none(r, bits)				\
+>  	BUILD_BUG_ON(((r) & (bits)) && ((r) & (bits)) != (bits))
+>  
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index cd6b7b83e2c3..0155ba665717 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -84,8 +84,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  	unsigned int len;
+>  	int mask;
+>  
+> -	/* Detect an already handled MMIO return */
+> -	if (unlikely(!vcpu->mmio_needed))
+> +	/*
+> +	 * Detect if the MMIO return was already handled or if userspace aborted
+> +	 * the MMIO access.
+> +	 */
+> +	if (unlikely(!vcpu->mmio_needed || kvm_pending_sync_exception(vcpu)))
+>  		return 1;
+>  
+>  	vcpu->mmio_needed = 0;
+
+Otherwise looks good to me!
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
