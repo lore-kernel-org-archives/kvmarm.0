@@ -1,37 +1,36 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3011917E6;
-	Sat, 19 Oct 2024 17:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B77C193071;
+	Sat, 19 Oct 2024 17:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729358718; cv=none; b=Nyj+fFX5rqgMdSbd44wnqr4fGli56antfK0IbL7byuXCJm7wjQIYzu0f9LO9YgZbVB1NuN9Y4K3nMKepQzyn34VfcYNjoyt0dfCLthsdgaIOjzT4SRzqwoJOJmtkN4lOqui9Q7z3ne+f157bUp7LISZjQSI7Xtc/SsZpd3IlH/s=
+	t=1729358730; cv=none; b=lgbcs0ODTsQpX3MsoQmvvTWQEVR8nh+SYd9IQQx8OhlERIMxHWiveQsbEpuXsDj/h/Zs7XKUxAYk0NGpPxfTzTstn4ji2cShZ7lO8YBp+g3kS///bTFgro8NQ9aUIzDAsupLUD0s2A1W5D92pY6HB1GVcQPhwmJgP96tY9qOLgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729358718; c=relaxed/simple;
-	bh=K2m8obFhWuwPQuikGUdYpspkIHuhwoUO0TZOETINH7I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hlQYFIk3KVTck5f0rCeCAhufN/+fiWco35JUyL98adgJxXZf1GKax9x36k3pin2+gW3OqqPESYrzyudICGHlSc7z05Krc8nJeivwM8HN6tH/nW7bIbsQ/XSbR4Kq+rqa7K4kOo6ChpZ6Usy8xB4OAm/hgZI3qAgkl0jpfVsZUbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aJMdKFy7; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1729358730; c=relaxed/simple;
+	bh=fOHobdQzoSXyBwD3dsB+RBry+eqWCyXtH1gUwcrrAiI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u9PYCEXbyJtNSSMLOkmcRkXtqgGuoj84TMPL5upxnCUHfeAFV+KVFEHoq5R7uXIYvAFetrZ01Gc4460iaJhBGmp3BVCYMbDnUhFppsZDdEQaXG2Z7QGd485c+MjHk1/mvnOsRlkhHsOSN4Fg9oTKWrKIXLvdiap8oU1hCpfDm/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BnL39VAo; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aJMdKFy7"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BnL39VAo"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
-	Cc:Content-Type:Content-ID:Content-Description;
-	bh=T/6p2P3AuQICDZdTmCqeIRHYUbD9P11W996yxXSWcPU=; b=aJMdKFy7DJvlTP1XnRcUjL6xbY
-	Q5EoK5K3U51yRlgxxEb40YRiBgw/w7hBzAWytf0A1aXUXARRqTR8mw4PqxNKx+HwUEscYrVaMJ6UG
-	liArW3tl3xOmGMt4Dpt5nfhKf9vp8d8pBn8fEF0P4V48jTe19emOfLUMSKevdrre9oaVr0tzxPX68
-	KfkJ/EsRHkgLLB5dH7lDB4jVFjJfjpSy7Y5Mw2LDmiGnt1LIQ4CxfZRhtcrH3zNvWAd2AAUQHcieH
-	OM3tssMkLM/axWzt9O7aiyFjtlV312lwVSI0HPBT/9ylp6SB+/poGIBPaux2rtzL8LJBP7GtVHMPr
-	/yWn6Ahw==;
+	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:To:From:Reply-To:Cc:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=5YLutNzESNkxMmo97oZ/EbstfXGBSrHKF7ypmg9VFCI=; b=BnL39VAobe3LZZiasMKWHfLfbV
+	zyMhUD3txQILUYDLEVbBB/02u0evfbEIbO+818gzUUDs8Iz0zYpQG+W63gC9fJ+DrJDymD68pWBh1
+	sWRCoABQFLB4+QwJTB8WAleNbygxnSsgjMf9v3eDJelskkYguREgwjFzK6bREvzJz0Celhnkhz/AM
+	4NTZO4AcuSKA1rPjq/iYEFZ5Mj5mBSNGn9VH7aOlvlJFoDXJcNmLZpN7Hh9j06TgDJ47g2U5aK//z
+	07JzNhzlgZPlUuN0lC4oXqW9b0iMwhIeWcnEjxpxw9VXI63DyZIx+54VItxgTfZPXwcsXOuVcKnuB
+	ys8uo5kA==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t2DCK-0000000EUiq-3cTV;
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t2DCM-00000007ZXe-2yNP;
 	Sat, 19 Oct 2024 17:25:07 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1t2DCI-00000009TKv-3xjU;
+	id 1t2DCI-00000009TKV-2teL;
 	Sat, 19 Oct 2024 18:25:02 +0100
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,12 +58,10 @@ To: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-kselftest@vger.kernel.org,
 	Francesco Lavra <francescolavra.fl@gmail.com>,
 	Miguel Luis <miguel.luis@oracle.com>
-Subject: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
-Date: Sat, 19 Oct 2024 18:15:47 +0100
-Message-ID: <20241019172459.2241939-7-dwmw2@infradead.org>
+Subject: [PATCH v6 0/6] Add PSCI v1.3 SYSTEM_OFF2 support for hibernation
+Date: Sat, 19 Oct 2024 18:15:41 +0100
+Message-ID: <20241019172459.2241939-1-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241019172459.2241939-1-dwmw2@infradead.org>
-References: <20241019172459.2241939-1-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,146 +70,80 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+The PSCI v1.3 spec (https://developer.arm.com/documentation/den0022)
+adds support for a SYSTEM_OFF2 function enabling a HIBERNATE_OFF state
+which is analogous to ACPI S4. This will allow hosting environments to
+determine that a guest is hibernated rather than just powered off, and
+ensure that they preserve the virtual environment appropriately to
+allow the guest to resume safely (or bump the hardware_signature in the
+FACS to trigger a clean reboot instead).
 
-The PSCI v1.3 specification adds support for a SYSTEM_OFF2 function
-which is analogous to ACPI S4 state. This will allow hosting
-environments to determine that a guest is hibernated rather than just
-powered off, and handle that state appropriately on subsequent launches.
+This updates KVM to support advertising PSCI v1.3, and unconditionally
+enables the SYSTEM_OFF2 support when PSCI v1.3 is enabled.
 
-Since commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and
-poweroff") the EFI shutdown method is deliberately preferred over PSCI
-or other methods. So register a SYS_OFF_MODE_POWER_OFF handler which
-*only* handles the hibernation, leaving the original PSCI SYSTEM_OFF as
-a last resort via the legacy pm_power_off function pointer.
+For the guest side, add a new SYS_OFF_MODE_POWER_OFF handler with higher
+priority than the EFI one, but which *only* triggers when there's a
+hibernation in progress. There are other ways to do this (see the commit
+message for more details) but this seemed like the simplest.
 
-The hibernation code already exports a system_entering_hibernation()
-function which is be used by the higher-priority handler to check for
-hibernation. That existing function just returns the value of a static
-boolean variable from hibernate.c, which was previously only set in the
-hibernation_platform_enter() code path. Set the same flag in the simpler
-code path around the call to kernel_power_off() too.
+Version 2 of the patch series splits out the psci.h definitions into a
+separate commit (a dependency for both the guest and KVM side), and adds
+definitions for the other new functions added in v1.3. It also moves the
+pKVM psci-relay support to a separate commit; although in arch/arm64/kvm
+that's actually about the *guest* side of SYSTEM_OFF2 (i.e. using it
+from the host kernel, relayed through nVHE).
 
-An alternative way to hook SYSTEM_OFF2 into the hibernation code would
-be to register a platform_hibernation_ops structure with an ->enter()
-method which makes the new SYSTEM_OFF2 call. But that would have the
-unwanted side-effect of making hibernation take a completely different
-code path in hibernation_platform_enter(), invoking a lot of special dpm
-callbacks.
+Version 3 dropped the KVM_CAP which allowed userspace to explicitly opt
+in to the new feature like with SYSTEM_SUSPEND, and makes it depend only
+on PSCI v1.3 being exposed to the guest.
 
-Another option might be to add a new SYS_OFF_MODE_HIBERNATE mode, with
-fallback to SYS_OFF_MODE_POWER_OFF. Or to use the sys_off_data to
-indicate whether the power off is for hibernation.
+Version 4 is no longer RFC, as the PSCI v1.3 spec is finally published.
+Minor fixes from the last round of review, and an added KVM self test.
 
-But this version works and is relatively simple.
+Version 5 drops some of the changes which didn't make it to the final
+v1.3 spec, and cleans up a couple of places which still referred to it
+as 'alpha' or 'beta'. It also temporarily drops the guest-side patch to
+invoke SYSTEM_OFF2 for hibernation, pending confirmation that the final
+PSCI v1.3 spec just has a typo where it changed to saying that 0x1
+should be passed to mean HIBERNATE_OFF, even though it's advertised as
+bit 0. That can be sent under separate cover, and perhaps should have
+been anyway. The change in question doesn't matter for any of the KVM
+patches, because we just treat SYSTEM_OFF2 like the existing
+SYSTEM_RESET2, setting a flag to indicate that it was a SYSTEM_OFF2
+call, but not actually caring about the argument; that's for userspace
+to worry about.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Acked-by: Rafael J. Wysocki <rafael@kernel.org>
----
- drivers/firmware/psci/psci.c | 42 ++++++++++++++++++++++++++++++++++++
- kernel/power/hibernate.c     |  5 ++++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
+Version 6 is updated to revision F.b of the specification, allowing both 
+0x0 and 0x1 to indicate HIBERNATE_OFF in the SYSTEM_OFF2 call, as well 
+as disallowing anything but zero in the second argument. The test is 
+expanded to cover those variants, and to require PSCI v1.3 instead of 
+skipping on older kernels. The final guest-side patch in the series is 
+reinstated, using zero as the argument for compatibility with existing 
+hypervisors in the field as permitted by revision F.b. allows for zero 
+as well as 0x1 for HIBERNATE_OFF to accommodate the change in the final 
+version of the spec, and expands the test to cover both forms as well as 
+checking that a non-zero second argument is correctly rejected.
 
-diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index 2328ca58bba6..8809455a61a6 100644
---- a/drivers/firmware/psci/psci.c
-+++ b/drivers/firmware/psci/psci.c
-@@ -78,6 +78,7 @@ struct psci_0_1_function_ids get_psci_0_1_function_ids(void)
- 
- static u32 psci_cpu_suspend_feature;
- static bool psci_system_reset2_supported;
-+static bool psci_system_off2_hibernate_supported;
- 
- static inline bool psci_has_ext_power_state(void)
- {
-@@ -333,6 +334,33 @@ static void psci_sys_poweroff(void)
- 	invoke_psci_fn(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
- }
- 
-+#ifdef CONFIG_HIBERNATION
-+static int psci_sys_hibernate(struct sys_off_data *data)
-+{
-+	/*
-+	 * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
-+	 * and is supported by hypervisors implementing an earlier version
-+	 * of the pSCI v1.3 spec.
-+	 */
-+	if (system_entering_hibernation())
-+		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2),
-+			       0 /*PSCI_1_3_OFF_TYPE_HIBERNATE_OFF*/, 0, 0);
-+	return NOTIFY_DONE;
-+}
-+
-+static int __init psci_hibernate_init(void)
-+{
-+	if (psci_system_off2_hibernate_supported) {
-+		/* Higher priority than EFI shutdown, but only for hibernate */
-+		register_sys_off_handler(SYS_OFF_MODE_POWER_OFF,
-+					 SYS_OFF_PRIO_FIRMWARE + 2,
-+					 psci_sys_hibernate, NULL);
-+	}
-+	return 0;
-+}
-+subsys_initcall(psci_hibernate_init);
-+#endif
-+
- static int psci_features(u32 psci_func_id)
- {
- 	return invoke_psci_fn(PSCI_1_0_FN_PSCI_FEATURES,
-@@ -364,6 +392,7 @@ static const struct {
- 	PSCI_ID_NATIVE(1_1, SYSTEM_RESET2),
- 	PSCI_ID(1_1, MEM_PROTECT),
- 	PSCI_ID_NATIVE(1_1, MEM_PROTECT_CHECK_RANGE),
-+	PSCI_ID_NATIVE(1_3, SYSTEM_OFF2),
- };
- 
- static int psci_debugfs_read(struct seq_file *s, void *data)
-@@ -525,6 +554,18 @@ static void __init psci_init_system_reset2(void)
- 		psci_system_reset2_supported = true;
- }
- 
-+static void __init psci_init_system_off2(void)
-+{
-+	int ret;
-+
-+	ret = psci_features(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2));
-+	if (ret < 0)
-+		return;
-+
-+	if (ret & PSCI_1_3_OFF_TYPE_HIBERNATE_OFF)
-+		psci_system_off2_hibernate_supported = true;
-+}
-+
- static void __init psci_init_system_suspend(void)
- {
- 	int ret;
-@@ -655,6 +696,7 @@ static int __init psci_probe(void)
- 		psci_init_cpu_suspend();
- 		psci_init_system_suspend();
- 		psci_init_system_reset2();
-+		psci_init_system_off2();
- 		kvm_init_hyp_services();
- 	}
- 
-diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index e35829d36039..1f87aa01ba44 100644
---- a/kernel/power/hibernate.c
-+++ b/kernel/power/hibernate.c
-@@ -685,8 +685,11 @@ static void power_down(void)
- 		}
- 		fallthrough;
- 	case HIBERNATION_SHUTDOWN:
--		if (kernel_can_power_off())
-+		if (kernel_can_power_off()) {
-+			entering_platform_hibernation = true;
- 			kernel_power_off();
-+			entering_platform_hibernation = false;
-+		}
- 		break;
- 	}
- 	kernel_halt();
--- 
-2.44.0
+David Woodhouse (6):
+      firmware/psci: Add definitions for PSCI v1.3 specification
+      KVM: arm64: Add PSCI v1.3 SYSTEM_OFF2 function for hibernation
+      KVM: arm64: Add support for PSCI v1.2 and v1.3
+      KVM: selftests: Add test for PSCI SYSTEM_OFF2
+      KVM: arm64: nvhe: Pass through PSCI v1.3 SYSTEM_OFF2 call
+      arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
+
+ Documentation/virt/kvm/api.rst                  | 11 +++
+ arch/arm64/include/uapi/asm/kvm.h               |  6 ++
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c            |  2 +
+ arch/arm64/kvm/hypercalls.c                     |  2 +
+ arch/arm64/kvm/psci.c                           | 50 ++++++++++++-
+ drivers/firmware/psci/psci.c                    | 42 +++++++++++
+ include/kvm/arm_psci.h                          |  4 +-
+ include/uapi/linux/psci.h                       |  5 ++
+ kernel/power/hibernate.c                        |  5 +-
+ tools/testing/selftests/kvm/aarch64/psci_test.c | 93 +++++++++++++++++++++++++
+ 10 files changed, 217 insertions(+), 3 deletions(-)
+
 
