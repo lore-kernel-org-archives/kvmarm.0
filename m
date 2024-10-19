@@ -1,37 +1,37 @@
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF68418BB8E;
-	Sat, 19 Oct 2024 17:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3011917E6;
+	Sat, 19 Oct 2024 17:25:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729358716; cv=none; b=NGy5EkIjfOFr2UI5TB2YZzqcOPXxIK0cQXJQ3UD3H2vfuznbqMbQzihRSoEjoXnZCBybcN0lNV3IGzoyByk9fkufn9GqgMHLq2jLcpsBzC9DUTXhFheL6l7LmXQ7Zp/86EMOHXjbVuCxikjldCMpmvmSB9UxTTPZWZG64xSAk6I=
+	t=1729358718; cv=none; b=Nyj+fFX5rqgMdSbd44wnqr4fGli56antfK0IbL7byuXCJm7wjQIYzu0f9LO9YgZbVB1NuN9Y4K3nMKepQzyn34VfcYNjoyt0dfCLthsdgaIOjzT4SRzqwoJOJmtkN4lOqui9Q7z3ne+f157bUp7LISZjQSI7Xtc/SsZpd3IlH/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729358716; c=relaxed/simple;
-	bh=r4RL8cn9WemWhyivniea2n7ppkgxNY66wDKl84ODVHc=;
+	s=arc-20240116; t=1729358718; c=relaxed/simple;
+	bh=K2m8obFhWuwPQuikGUdYpspkIHuhwoUO0TZOETINH7I=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XlsJ7WZXLhg3yJ1tWfiu5eupijuBwWgSd/G2tdmTBvcDQZT0Y5i3atWz2l15/xoGqyBVMEtZCSoMStRFi0T3TI+ACyEDtYCLT0anvoHZ0OICExur5R8VCwstXkPx/r/bLF5mp/B0eRTSuFpVYSWa83pGvbmdQrc7Y+u0difhWh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CH+NZnNY; arc=none smtp.client-ip=90.155.50.34
+	 MIME-Version; b=hlQYFIk3KVTck5f0rCeCAhufN/+fiWco35JUyL98adgJxXZf1GKax9x36k3pin2+gW3OqqPESYrzyudICGHlSc7z05Krc8nJeivwM8HN6tH/nW7bIbsQ/XSbR4Kq+rqa7K4kOo6ChpZ6Usy8xB4OAm/hgZI3qAgkl0jpfVsZUbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aJMdKFy7; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CH+NZnNY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aJMdKFy7"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
 	Cc:Content-Type:Content-ID:Content-Description;
-	bh=iaMlZJo+eXwUqDzfRXJziZaxpMoCZLPD8C5d6tjZWFk=; b=CH+NZnNYAQ54NZVIE3umTYEiEX
-	NXXB3tS+lMs3eO9Jk0jeaHSb7WH33+WfDeJIgepQ3+vztApPVh1h5XGx4Sre3RMJ5QXLnmBugr+92
-	PczbR6Gk7uVQ6y1X7VEHuAZ2UAxytGvs1Rrcjj3w6ogfvdz8TWZtp9T/i8eBaZDExdWAyBTCd8BJG
-	SndYZvfGSXXQLKLgd5J/RjCqdHN2mJLZgwQnZ341KCoT6TmYs52/Xl7uGK7U3UX1eh9HfSpW+lUCB
-	oC+fzBqeB2F+cmLby/7Exch3rjepy/tdyqqoxAm7dYNw+2id9p0JXnYoSp5og6Zv2PzGt0l77tYbi
-	WiZgkH+A==;
+	bh=T/6p2P3AuQICDZdTmCqeIRHYUbD9P11W996yxXSWcPU=; b=aJMdKFy7DJvlTP1XnRcUjL6xbY
+	Q5EoK5K3U51yRlgxxEb40YRiBgw/w7hBzAWytf0A1aXUXARRqTR8mw4PqxNKx+HwUEscYrVaMJ6UG
+	liArW3tl3xOmGMt4Dpt5nfhKf9vp8d8pBn8fEF0P4V48jTe19emOfLUMSKevdrre9oaVr0tzxPX68
+	KfkJ/EsRHkgLLB5dH7lDB4jVFjJfjpSy7Y5Mw2LDmiGnt1LIQ4CxfZRhtcrH3zNvWAd2AAUQHcieH
+	OM3tssMkLM/axWzt9O7aiyFjtlV312lwVSI0HPBT/9ylp6SB+/poGIBPaux2rtzL8LJBP7GtVHMPr
+	/yWn6Ahw==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t2DCK-0000000EUir-3cG9;
+	id 1t2DCK-0000000EUiq-3cTV;
 	Sat, 19 Oct 2024 17:25:07 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1t2DCI-00000009TKo-3btd;
+	id 1t2DCI-00000009TKv-3xjU;
 	Sat, 19 Oct 2024 18:25:02 +0100
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,9 +59,9 @@ To: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-kselftest@vger.kernel.org,
 	Francesco Lavra <francescolavra.fl@gmail.com>,
 	Miguel Luis <miguel.luis@oracle.com>
-Subject: [PATCH v6 4/6] KVM: selftests: Add test for PSCI SYSTEM_OFF2
-Date: Sat, 19 Oct 2024 18:15:45 +0100
-Message-ID: <20241019172459.2241939-5-dwmw2@infradead.org>
+Subject: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
+Date: Sat, 19 Oct 2024 18:15:47 +0100
+Message-ID: <20241019172459.2241939-7-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20241019172459.2241939-1-dwmw2@infradead.org>
 References: <20241019172459.2241939-1-dwmw2@infradead.org>
@@ -77,127 +77,142 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- .../testing/selftests/kvm/aarch64/psci_test.c | 93 +++++++++++++++++++
- 1 file changed, 93 insertions(+)
+The PSCI v1.3 specification adds support for a SYSTEM_OFF2 function
+which is analogous to ACPI S4 state. This will allow hosting
+environments to determine that a guest is hibernated rather than just
+powered off, and handle that state appropriately on subsequent launches.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 61731a950def..1eabbef99dbc 100644
---- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -54,6 +54,15 @@ static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
- 	return res.a0;
- }
+Since commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and
+poweroff") the EFI shutdown method is deliberately preferred over PSCI
+or other methods. So register a SYS_OFF_MODE_POWER_OFF handler which
+*only* handles the hibernation, leaving the original PSCI SYSTEM_OFF as
+a last resort via the legacy pm_power_off function pointer.
+
+The hibernation code already exports a system_entering_hibernation()
+function which is be used by the higher-priority handler to check for
+hibernation. That existing function just returns the value of a static
+boolean variable from hibernate.c, which was previously only set in the
+hibernation_platform_enter() code path. Set the same flag in the simpler
+code path around the call to kernel_power_off() too.
+
+An alternative way to hook SYSTEM_OFF2 into the hibernation code would
+be to register a platform_hibernation_ops structure with an ->enter()
+method which makes the new SYSTEM_OFF2 call. But that would have the
+unwanted side-effect of making hibernation take a completely different
+code path in hibernation_platform_enter(), invoking a lot of special dpm
+callbacks.
+
+Another option might be to add a new SYS_OFF_MODE_HIBERNATE mode, with
+fallback to SYS_OFF_MODE_POWER_OFF. Or to use the sys_off_data to
+indicate whether the power off is for hibernation.
+
+But this version works and is relatively simple.
+
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+---
+ drivers/firmware/psci/psci.c | 42 ++++++++++++++++++++++++++++++++++++
+ kernel/power/hibernate.c     |  5 ++++-
+ 2 files changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+index 2328ca58bba6..8809455a61a6 100644
+--- a/drivers/firmware/psci/psci.c
++++ b/drivers/firmware/psci/psci.c
+@@ -78,6 +78,7 @@ struct psci_0_1_function_ids get_psci_0_1_function_ids(void)
  
-+static uint64_t psci_system_off2(uint64_t type, uint64_t cookie)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_3_FN64_SYSTEM_OFF2, type, cookie, 0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
- static uint64_t psci_features(uint32_t func_id)
+ static u32 psci_cpu_suspend_feature;
+ static bool psci_system_reset2_supported;
++static bool psci_system_off2_hibernate_supported;
+ 
+ static inline bool psci_has_ext_power_state(void)
  {
- 	struct arm_smccc_res res;
-@@ -188,11 +197,95 @@ static void host_test_system_suspend(void)
- 	kvm_vm_free(vm);
+@@ -333,6 +334,33 @@ static void psci_sys_poweroff(void)
+ 	invoke_psci_fn(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
  }
  
-+static void guest_test_system_off2(void)
++#ifdef CONFIG_HIBERNATION
++static int psci_sys_hibernate(struct sys_off_data *data)
 +{
-+	uint64_t ret;
-+
-+	/* assert that SYSTEM_OFF2 is discoverable */
-+	GUEST_ASSERT(psci_features(PSCI_1_3_FN_SYSTEM_OFF2) &
-+		     PSCI_1_3_OFF_TYPE_HIBERNATE_OFF);
-+	GUEST_ASSERT(psci_features(PSCI_1_3_FN64_SYSTEM_OFF2) &
-+		     PSCI_1_3_OFF_TYPE_HIBERNATE_OFF);
-+
-+	/* With non-zero 'cookie' field, it should fail */
-+	ret = psci_system_off2(PSCI_1_3_OFF_TYPE_HIBERNATE_OFF, 1);
-+	GUEST_ASSERT(ret == PSCI_RET_INVALID_PARAMS);
-+
 +	/*
-+	 * This would normally never return, so KVM sets the return value
-+	 * to PSCI_RET_INTERNAL_FAILURE. The test case *does* return, so
-+	 * that it can test both values for HIBERNATE_OFF.
++	 * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
++	 * and is supported by hypervisors implementing an earlier version
++	 * of the pSCI v1.3 spec.
 +	 */
-+	ret = psci_system_off2(PSCI_1_3_OFF_TYPE_HIBERNATE_OFF, 0);
-+	GUEST_ASSERT(ret == PSCI_RET_INTERNAL_FAILURE);
-+
-+	/*
-+	 * Revision F.b of the PSCI v1.3 specification documents zero as an
-+	 * alias for HIBERNATE_OFF, since that's the value used in earlier
-+	 * revisions of the spec and some implementations in the field.
-+	 */
-+	ret = psci_system_off2(0, 1);
-+	GUEST_ASSERT(ret == PSCI_RET_INVALID_PARAMS);
-+
-+	ret = psci_system_off2(0, 0);
-+	/* Unless this test is extended, the guest never gets here. */
-+	GUEST_ASSERT(ret == PSCI_RET_INTERNAL_FAILURE);
-+
-+	GUEST_DONE();
++	if (system_entering_hibernation())
++		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2),
++			       0 /*PSCI_1_3_OFF_TYPE_HIBERNATE_OFF*/, 0, 0);
++	return NOTIFY_DONE;
 +}
 +
-+static void host_test_system_off2(void)
++static int __init psci_hibernate_init(void)
 +{
-+	struct kvm_vcpu *source, *target;
-+	struct kvm_mp_state mps;
-+	uint64_t psci_version = 0;
-+	int nr_shutdowns = 0;
-+	struct kvm_run *run;
-+	struct ucall uc;
-+
-+	setup_vm(guest_test_system_off2, &source, &target);
-+
-+	vcpu_get_reg(target, KVM_REG_ARM_PSCI_VERSION, &psci_version);
-+
-+	TEST_ASSERT(psci_version >= PSCI_VERSION(1, 3),
-+		    "Unexpected PSCI version %lu.%lu",
-+		    PSCI_VERSION_MAJOR(psci_version),
-+		    PSCI_VERSION_MINOR(psci_version));
-+
-+	vcpu_power_off(target);
-+	run = source->run;
-+
-+	enter_guest(source);
-+	while (run->exit_reason == KVM_EXIT_SYSTEM_EVENT) {
-+		TEST_ASSERT(run->system_event.type == KVM_SYSTEM_EVENT_SHUTDOWN,
-+			    "Unhandled system event: %u (expected: %u)",
-+			    run->system_event.type, KVM_SYSTEM_EVENT_SHUTDOWN);
-+		TEST_ASSERT(run->system_event.ndata >= 1,
-+			    "Unexpected amount of system event data: %u (expected, >= 1)",
-+			    run->system_event.ndata);
-+		TEST_ASSERT(run->system_event.data[0] & KVM_SYSTEM_EVENT_SHUTDOWN_FLAG_PSCI_OFF2,
-+			    "PSCI_OFF2 flag not set. Flags %llu (expected %llu)",
-+			    run->system_event.data[0], KVM_SYSTEM_EVENT_SHUTDOWN_FLAG_PSCI_OFF2);
-+
-+		nr_shutdowns++;
-+
-+		/* Restart the vCPU */
-+	        mps.mp_state = KVM_MP_STATE_RUNNABLE;
-+		vcpu_mp_state_set(source, &mps);
-+
-+		enter_guest(source);
++	if (psci_system_off2_hibernate_supported) {
++		/* Higher priority than EFI shutdown, but only for hibernate */
++		register_sys_off_handler(SYS_OFF_MODE_POWER_OFF,
++					 SYS_OFF_PRIO_FIRMWARE + 2,
++					 psci_sys_hibernate, NULL);
 +	}
++	return 0;
++}
++subsys_initcall(psci_hibernate_init);
++#endif
 +
-+	TEST_ASSERT(get_ucall(source, &uc) == UCALL_DONE, "Guest did not exit cleanly");
-+	TEST_ASSERT(nr_shutdowns == 2, "Two shutdown events were expected, but saw %d", nr_shutdowns);
+ static int psci_features(u32 psci_func_id)
+ {
+ 	return invoke_psci_fn(PSCI_1_0_FN_PSCI_FEATURES,
+@@ -364,6 +392,7 @@ static const struct {
+ 	PSCI_ID_NATIVE(1_1, SYSTEM_RESET2),
+ 	PSCI_ID(1_1, MEM_PROTECT),
+ 	PSCI_ID_NATIVE(1_1, MEM_PROTECT_CHECK_RANGE),
++	PSCI_ID_NATIVE(1_3, SYSTEM_OFF2),
+ };
+ 
+ static int psci_debugfs_read(struct seq_file *s, void *data)
+@@ -525,6 +554,18 @@ static void __init psci_init_system_reset2(void)
+ 		psci_system_reset2_supported = true;
+ }
+ 
++static void __init psci_init_system_off2(void)
++{
++	int ret;
++
++	ret = psci_features(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2));
++	if (ret < 0)
++		return;
++
++	if (ret & PSCI_1_3_OFF_TYPE_HIBERNATE_OFF)
++		psci_system_off2_hibernate_supported = true;
 +}
 +
- int main(void)
+ static void __init psci_init_system_suspend(void)
  {
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_SYSTEM_SUSPEND));
+ 	int ret;
+@@ -655,6 +696,7 @@ static int __init psci_probe(void)
+ 		psci_init_cpu_suspend();
+ 		psci_init_system_suspend();
+ 		psci_init_system_reset2();
++		psci_init_system_off2();
+ 		kvm_init_hyp_services();
+ 	}
  
- 	host_test_cpu_on();
- 	host_test_system_suspend();
-+	host_test_system_off2();
- 	return 0;
- }
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index e35829d36039..1f87aa01ba44 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -685,8 +685,11 @@ static void power_down(void)
+ 		}
+ 		fallthrough;
+ 	case HIBERNATION_SHUTDOWN:
+-		if (kernel_can_power_off())
++		if (kernel_can_power_off()) {
++			entering_platform_hibernation = true;
+ 			kernel_power_off();
++			entering_platform_hibernation = false;
++		}
+ 		break;
+ 	}
+ 	kernel_halt();
 -- 
 2.44.0
 
