@@ -1,154 +1,199 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399B210A12
-	for <kvmarm@lists.linux.dev>; Sat, 19 Oct 2024 14:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6D21F937;
+	Sat, 19 Oct 2024 17:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729347418; cv=none; b=XCdBKMyVOFek+TIvweGBof8265NOUirwhhMcsDSK1YvRLTGq028IRfADCDNscJfct4d1f4Ab5ywnzbyUlEII5ijFGqrZIPt8ChjuN20zxR53e+fftELQwfzPv8+y9hdF+rvXzhorf+OAZb1lK7gg8U9cLe1D5wEBSGIr499cB0Y=
+	t=1729358088; cv=none; b=XWqsFJuep3mVTjH5vLFngqU5EZIpMU8Dz7TbJ/56wKCvLGdWFQQkTicb2gMLuh6RDcIc5nChnqVuNsFAuflHZvTjfGnUJTnCRAYL7jKDhgGXQQ6TYg8Sk67QJW6IEdDxvwMmBOL+Dgrw5Y/SPI4g0lCbzdhkCIyP7tCId7mJ9r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729347418; c=relaxed/simple;
-	bh=qfeFyKWSeWg05vNifWelioEjA0kkQ+RAGToocF3RQXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nixHKXvstrAntQQQM27pa6M7qZzEzdD5tn+qcqL0+Zq6dFJMQUwQjohWVexKsBRuSqcJ/93s9BszNcUuyB0pVhgISFuaP+BqCDDCHvjPvWCOed1h82uKVfqfNZOrOiNXRLo0Mioid4ThM3BvJzm6MXyyb/SfWZGEjdq1ZzqWJoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=oiEWqF7s; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1729358088; c=relaxed/simple;
+	bh=rteAWrDx+YChjAvq+kDrfxBNgng9dmVTtFrF02KC67M=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WJ6gso/wWMj+eWgHqw9lXrptko4s3S69VXiMO5QtEei7eI1fuqxuxWUflJSC7AEb4tq1gG719MZVp15Y8C9sk7EsS/corWbcCutvJQOm/hKw5j1yqDfGGn1fjZfHdEPxUnaLoRABPAo1oBaNcKLvUn7SxtzV6lE7DqAzo3/W3Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TQfL/YBt; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="oiEWqF7s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1729347405;
-	bh=qfeFyKWSeWg05vNifWelioEjA0kkQ+RAGToocF3RQXU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oiEWqF7sTLXrz7do2I45MU3h9GnxoASkakIBLXLfO8QPbyFcjud2WS7a4OHr+O/j6
-	 mSZXAZ+gLrbHF+5i8CqYp+heOCBk0HRmg9xEfocwgikxIkEKz10dFDgcvhPeShqBpA
-	 GBeauy9gbC60noyWg48dH5RYqqm+DI5v5PyxTYX4=
-Date: Sat, 19 Oct 2024 14:16:42 +0000
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Hildenbrand <david@redhat.com>, 
-	Greg Marsden <greg.marsden@oracle.com>, Ivan Ivanov <ivan.ivanov@suse.com>, 
-	Kalesh Singh <kaleshsingh@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Matthias Brugger <mbrugger@suse.com>, 
-	Miroslav Benes <mbenes@suse.cz>, Oliver Upton <oliver.upton@linux.dev>, 
-	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 44/57] arm64: Align sections to PAGE_SIZE_MAX
-Message-ID: <69533deb-dc77-49c3-a256-49efee308905@t-8ch.de>
-References: <20241014105514.3206191-1-ryan.roberts@arm.com>
- <20241014105912.3207374-1-ryan.roberts@arm.com>
- <20241014105912.3207374-44-ryan.roberts@arm.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TQfL/YBt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=rteAWrDx+YChjAvq+kDrfxBNgng9dmVTtFrF02KC67M=; b=TQfL/YBtG6SuzZQWdVgiSh+v2z
+	ARHzfI4xfLxI3pGs9DMRe9/xXBsR5Jc/wMNHEFE+/EiHL7q4eEDeLj7HTpO+SpqeohZBbKpROAfFA
+	Rji+2QiEunIKDHcW86HuIv+9h2WT/v539fdU8OhoBJ/wDhVVABtmOF8IzOnCrZ5W1FqmCI9pZbViB
+	HS85aCJARMWuJ4c6UUtA/Ohp8Pf0vi/LH/hjgWw3KTwuBu7cbnFtOch2AGBu60c3lCvMwm20mq94N
+	y3frsWPJwlR2qoOiWNbC7puXoqZbNikBNp8x3Jzp6kn8eW1PCixtQfTk77cM3xBffB5EuzIbh3OUe
+	/OOyEuYw==;
+Received: from [2001:8b0:10b:5:d113:3be8:859d:21d1] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t2D27-0000000EUKb-02V2;
+	Sat, 19 Oct 2024 17:14:31 +0000
+Message-ID: <0fbd9ca12f85d28dcc2eed5f0fe9c49762b83a35.camel@infradead.org>
+Subject: Re: [PATCH v5 4/5] KVM: selftests: Add test for PSCI SYSTEM_OFF2
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>,  Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Lorenzo Pieralisi
+ <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel
+ Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>, Shuah Khan
+ <shuah@kernel.org>,  kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Francesco Lavra
+ <francescolavra.fl@gmail.com>, Miguel Luis <miguel.luis@oracle.com>
+Date: Sat, 19 Oct 2024 18:14:30 +0100
+In-Reply-To: <Zw6jXEWwdW3S5Y6c@linux.dev>
+References: <20240926184546.833516-1-dwmw2@infradead.org>
+	 <20240926184546.833516-5-dwmw2@infradead.org> <ZvwWM7rQd075o6nb@linux.dev>
+	 <408b137dbf60ff4d189cbd98b7cf8cd833579f61.camel@infradead.org>
+	 <Zw6Svts5hqpIoKwN@linux.dev> <Zw6jXEWwdW3S5Y6c@linux.dev>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Z4tEqxCYA8JprReii9RU"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241014105912.3207374-44-ryan.roberts@arm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On 2024-10-14 11:58:51+0100, Ryan Roberts wrote:
-> Increase alignment of sections in nvhe hyp, vdso and final vmlinux image
-> from PAGE_SIZE to PAGE_SIZE_MAX. For compile-time PAGE_SIZE,
-> PAGE_SIZE_MAX == PAGE_SIZE so there is no change. For boot-time
-> PAGE_SIZE, PAGE_SIZE_MAX is the largest selectable page size.
-> 
-> For a boot-time page size build, image size is comparable to a 64K page
-> size compile-time build. In future, it may be desirable to optimize
-> run-time memory consumption by freeing unused padding pages when the
-> boot-time selected page size is less than PAGE_SIZE_MAX.
-> 
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-> ---
-> 
-> ***NOTE***
-> Any confused maintainers may want to read the cover note here for context:
-> https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
-> 
->  arch/arm64/include/asm/memory.h     |  4 +--
->  arch/arm64/kernel/vdso-wrap.S       |  4 +--
->  arch/arm64/kernel/vdso.c            |  7 +++---
->  arch/arm64/kernel/vdso/vdso.lds.S   |  4 +--
->  arch/arm64/kernel/vdso32-wrap.S     |  4 +--
->  arch/arm64/kernel/vdso32/vdso.lds.S |  4 +--
->  arch/arm64/kernel/vmlinux.lds.S     | 38 ++++++++++++++---------------
->  arch/arm64/kvm/hyp/nvhe/hyp.lds.S   |  2 +-
->  8 files changed, 34 insertions(+), 33 deletions(-)
 
-> diff --git a/arch/arm64/kernel/vdso.c b/arch/arm64/kernel/vdso.c
-> index 89b6e78400023..1efe98909a2e0 100644
-> --- a/arch/arm64/kernel/vdso.c
-> +++ b/arch/arm64/kernel/vdso.c
-> @@ -195,7 +195,7 @@ static int __setup_additional_pages(enum vdso_abi abi,
->  
->  	vdso_text_len = vdso_info[abi].vdso_pages << PAGE_SHIFT;
->  	/* Be sure to map the data page */
-> -	vdso_mapping_len = vdso_text_len + VVAR_NR_PAGES * PAGE_SIZE;
-> +	vdso_mapping_len = vdso_text_len + VVAR_NR_PAGES * PAGE_SIZE_MAX;
->  
->  	vdso_base = get_unmapped_area(NULL, 0, vdso_mapping_len, 0, 0);
->  	if (IS_ERR_VALUE(vdso_base)) {
-> @@ -203,7 +203,8 @@ static int __setup_additional_pages(enum vdso_abi abi,
->  		goto up_fail;
->  	}
->  
-> -	ret = _install_special_mapping(mm, vdso_base, VVAR_NR_PAGES * PAGE_SIZE,
-> +	ret = _install_special_mapping(mm, vdso_base,
-> +				       VVAR_NR_PAGES * PAGE_SIZE_MAX,
->  				       VM_READ|VM_MAYREAD|VM_PFNMAP,
->  				       vdso_info[abi].dm);
->  	if (IS_ERR(ret))
-> @@ -212,7 +213,7 @@ static int __setup_additional_pages(enum vdso_abi abi,
->  	if (system_supports_bti_kernel())
->  		gp_flags = VM_ARM64_BTI;
->  
-> -	vdso_base += VVAR_NR_PAGES * PAGE_SIZE;
-> +	vdso_base += VVAR_NR_PAGES * PAGE_SIZE_MAX;
->  	mm->context.vdso = (void *)vdso_base;
->  	ret = _install_special_mapping(mm, vdso_base, vdso_text_len,
->  				       VM_READ|VM_EXEC|gp_flags|
+--=-Z4tEqxCYA8JprReii9RU
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/arch/arm64/kernel/vdso/vdso.lds.S b/arch/arm64/kernel/vdso/vdso.lds.S
-> index 45354f2ddf706..f7d1537a689e8 100644
-> --- a/arch/arm64/kernel/vdso/vdso.lds.S
-> +++ b/arch/arm64/kernel/vdso/vdso.lds.S
-> @@ -18,9 +18,9 @@ OUTPUT_ARCH(aarch64)
->  
->  SECTIONS
->  {
-> -	PROVIDE(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE);
-> +	PROVIDE(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE_MAX);
->  #ifdef CONFIG_TIME_NS
-> -	PROVIDE(_timens_data = _vdso_data + PAGE_SIZE);
-> +	PROVIDE(_timens_data = _vdso_data + PAGE_SIZE_MAX);
+On Tue, 2024-10-15 at 10:16 -0700, Oliver Upton wrote:
+>=20
+> > After looking at this again, I think we should do one of the following:
+> >=20
+> > =C2=A0 - TEST_REQUIRE() that the PSCI version is at least v1.3, making =
+the
+> > =C2=A0=C2=A0=C2=A0 dependency clear on older kernels.
+> >=20
+> > =C2=A0 - TEST_REQUIRE() for v1.3, which would provide better test cover=
+age on
+> > =C2=A0=C2=A0=C2=A0 upstream.
+>=20
+> Sorry, I meant TEST_ASSERT() here.
 
-This looks like it also needs a change to vvar_fault() in vdso.c.
-The symbols are now always PAGE_SIZE_MAX apart, while vvar_fault() works
-in page offsets (vmf->pgoff) that are based on the runtime PAGE_SIZE and
-it expects hardcoded offsets.
+Ack. I'll do the latter.
 
-As test you can use tools/testing/selftests/timens/timens.
+--=-Z4tEqxCYA8JprReii9RU
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-(I can't test this right now, so it's only a suspicion)
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQxMDE5MTcxNDMwWjAvBgkqhkiG9w0BCQQxIgQgiKhOkDFX
+0K//XRSRufPb5ypFMUcQ4oczXuDUjF5JLKIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCzeVupJ+7ZwTt7nBJJuinTdqciEsNdKqbr
+vocyp9sVL0WI0c2FD/RxTiqkAZ79u7UtcNS6nbbSRul0WuoiM4OGYuDhwhMcV1MeLAsljSy8KSCq
+gArXQ49nYPxyx4Fsy2kv2rnyftn1UrgBTq9TuaC2AI8dsuVyeXfPPHehkJK7NcEiU/1W3qHu/Qdf
+K7ch9PmactLlyXAKcz8fx1OValkS3RGvmvr4UjKscjysBQNKR/5XHx5+9bhB0zgU/bufnXbXEXNO
+z10yAnuMDK4UZcDuMW1O/xaye9m72yeV5J9bQOGwhitAY52pxeBIIrMn4OsnsJnbRuapii6FND7E
+MeSPf6cCVbw7KHMa/nmPCOZntpZRKpciqH91GtSSgpUz6lUNiefwuFbI2one6kN6bqmi5tojsg5Z
+XnegNtJBCrrlKqmZwGDf0fFhDGqQZpna/QKbAvDRsDyazrP0VwgVbFmonl+lt5obT36SiEhNPjdo
+OzVmnkOI4M6S/+kRJMsJA4fEHSbmjk+Qfs7bejIkwjzeJDIqZugS8AMJnQe/5GQJXi6P2IzXqQ3w
+T73SC8Ux1N5R50Z9xt2FZeFMsqjfFGRlOe/ARi3Y4Ha2NMpUYLSmu3rIwkRT+BG5BWfEnlPoCii/
+sypR1Jt1Fucz6DIMQZViwmLnnGmCkEapTld7mAVPLQAAAAAAAA==
 
->  #endif
->  	. = VDSO_LBASE + SIZEOF_HEADERS;
 
-> diff --git a/arch/arm64/kernel/vdso32/vdso.lds.S b/arch/arm64/kernel/vdso32/vdso.lds.S
-> index 8d95d7d35057d..c46d18a69d1ce 100644
-> --- a/arch/arm64/kernel/vdso32/vdso.lds.S
-> +++ b/arch/arm64/kernel/vdso32/vdso.lds.S
-> @@ -18,9 +18,9 @@ OUTPUT_ARCH(arm)
->  
->  SECTIONS
->  {
-> -	PROVIDE_HIDDEN(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE);
-> +	PROVIDE_HIDDEN(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE_MAX);
->  #ifdef CONFIG_TIME_NS
-> -	PROVIDE_HIDDEN(_timens_data = _vdso_data + PAGE_SIZE);
-> +	PROVIDE_HIDDEN(_timens_data = _vdso_data + PAGE_SIZE_MAX);
->  #endif
->  	. = VDSO_LBASE + SIZEOF_HEADERS;
+--=-Z4tEqxCYA8JprReii9RU--
