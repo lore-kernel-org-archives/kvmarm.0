@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE55A2C95
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 04:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FECA2BB15
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 04:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729483310; cv=none; b=HCGi0mmC+8MWmVgg4UvmN+zXiwh9yVNNZEPyKYDAS/5j2t5Zse2vTWkA/Eg3AT48mFhio1TGGQZ9jR1SKzizdrJOURDicmejVlQD55WjtQhJAAsCXxRTTIZ/hwq8Qfx5UJ9nzv1qOcHG6GU+8UWsj25FMhs//zAOdI2fwj6453Q=
+	t=1729483774; cv=none; b=Cbn7jgm2KY9x4lG23kGsOgUgAX78adt48WhnML89UMjsDoVVbyzFqS+s0NodPWZnahUgvbCS43Aa3le3jR3hNNLofJ5XHfeeQ2NdCIVY166tg5BqFFiETJ4ulER1MEWnKA5+l2WneRlU89jGfcHJRzLbJSPcH4qxmWFdFMIER7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729483310; c=relaxed/simple;
-	bh=Ts2Vy9YEIjysg0wB78lMVASaMah/0dG6SjxF6FWO1zQ=;
+	s=arc-20240116; t=1729483774; c=relaxed/simple;
+	bh=VXRz3P41kYuI7xSCGibxd7bMyoaHrq0zIRlGRVu8W6o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rfOVDFQ/qQVqTnt1r9dob9LlqvFXVcKVX6+oapgl0P2LgPl8iLNM7wspmfIMc8Kf18FsShc9pxlFYTCwN2Z0iZBOZhTa63JLo3yH5n1tZ0NSWTBRHjVjk3SbAuNw7/xrUtaP1m2Vcf1ChRFauUH7Grm1exDhJSnSZamqejFB3Tw=
+	 In-Reply-To:Content-Type; b=q2x5AxMNLWmia8BB2TXmFvDrgR77V+l8lWpNOIS+oEZ319wMu0Lsf0fd6PPa9yMRDSvHTLs2u4+APgeYHTz1Sdq4dpkFseEWXLTfH2lxF19GEMlkZNKTiwwpwMZVx+NYEWtTrhtl2xRrH048XAX7/0jWed9k39faiz0Op4j/1us=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3853DA7;
-	Sun, 20 Oct 2024 21:02:17 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25495DA7;
+	Sun, 20 Oct 2024 21:10:01 -0700 (PDT)
 Received: from [10.162.16.109] (a077893.blr.arm.com [10.162.16.109])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 798753F73B;
-	Sun, 20 Oct 2024 21:01:45 -0700 (PDT)
-Message-ID: <8c14a3ca-2986-484f-9bc1-c2cf4aa08211@arm.com>
-Date: Mon, 21 Oct 2024 09:31:42 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4FAE13F73B;
+	Sun, 20 Oct 2024 21:09:28 -0700 (PDT)
+Message-ID: <3f1eb97e-0fa6-47d9-96d6-9fedabd969f7@arm.com>
+Date: Mon, 21 Oct 2024 09:39:25 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,86 +27,83 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 47/47] KVM: arm64: nv: Add trap forwarding for FEAT_FGT2
- described registers
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-References: <20241001024356.1096072-1-anshuman.khandual@arm.com>
- <20241001024356.1096072-48-anshuman.khandual@arm.com>
- <ZvwLRWOKpggCvmH4@linux.dev> <cae8c6ca-d999-4b93-a82d-7a1f9924fcee@arm.com>
- <Zv92nsoLxbfI45Ji@linux.dev>
+Subject: Re: [PATCH 0/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev
+References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Zv92nsoLxbfI45Ji@linux.dev>
+In-Reply-To: <20241001043602.1116991-1-anshuman.khandual@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 10/4/24 10:31, Oliver Upton wrote:
-> On Thu, Oct 03, 2024 at 09:46:08AM +0530, Anshuman Khandual wrote:
->>> I have a patch in the nested PMU series that uses a single complex trap
->>> ID to evaluate HPMN, and derives the index from ESR_EL2. I think it
->>> could also be extended to the PMEVCNTSVR<n> range as well.
->>
->> Just for reference - the mentioned complex trap ID function from the
->> given link below.
->>
->> static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
->> {
->> 	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
->> 	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
->> 	unsigned int idx;
->>
->>
->> 	switch (sysreg) {
->> 	case SYS_PMEVTYPERn_EL0(0) ... SYS_PMEVTYPERn_EL0(30):
->> 	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
->>
->> ---------------------------------------------------------------------
->> Just add the new system register range here ?
->>
->> +	case SYS_PMEVCNTSVR_EL1(0)... SYS_PMEVCNTSVR_EL1(31):
->> ---------------------------------------------------------------------
->>
->> 		idx = (sys_reg_CRm(sysreg) & 0x3) << 3 | sys_reg_Op2(sysreg);
->> 		break;
+On 10/1/24 10:05, Anshuman Khandual wrote:
+> This series enables FEAT_Debugv8p9 thus extending breakpoint and watchpoint
+> support upto 64. This series is based on v6.12-rc1 after applying the KVM
+> FEAT_FGT2 FGU series.
 > 
-> Yes, so long as the layout of encodings matches the established pattern
-> for value / type registers (I haven't checked this).
+> https://lore.kernel.org/all/20241001024356.1096072-1-anshuman.khandual@arm.com/
 > 
->>>
->>> Also, keep in mind that the HPMN trap is annoying since it affects Host
->>> EL0 in addition to 'guest' ELs.
->>
->> Does this require any more special handling other than the above complex trap
->> ID function ?
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-kernel@vger.kernel.org
 > 
-> There's another patch in that series I linked that allows EL2 traps to
-> describe behavior that takes effect in host EL0.
+> Changes in V1:
 > 
-> So I don't believe there's anything in particular related to HPMN that
-> you need to evaluate. I wanted to mention it because some of the PMU
-> related traps besides HPMN take effect in Host EL0, so do keep it in
-> mind.
+> - Changed FTR_STRICT to FTR_NONSTRICT for the following ID_AA64DFR1_EL1
+>   register fields - ABL_CMPs, DPFZS, PMICNTR, CTX_CMPs, WRPs and BRPs
 > 
-> With that said, I haven't seen an FGT yet that applies to Host EL0.
+> Changes in RFC V2:
+> 
+> https://lore.kernel.org/linux-arm-kernel/20240620092607.267132-1-anshuman.khandual@arm.com/
+> 
+> - This series has been split from RFC V1 dealing only with arm64 breakpoints
+> - Restored back DBG_MDSCR_MASK definition (unrelated change)
+> - Added preempt_disable()/enable() blocks between selecting banks and registers
+> 
+> Changes in RFC:
+> 
+> https://lore.kernel.org/all/20240405080008.1225223-1-anshuman.khandual@arm.com/
+> 
+> Anshuman Khandual (3):
+>   arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
+>   arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
+>   arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+> 
+>  Documentation/arch/arm64/booting.rst    | 19 ++++++++++
+>  arch/arm64/include/asm/debug-monitors.h |  1 +
+>  arch/arm64/include/asm/el2_setup.h      | 27 +++++++++++++
+>  arch/arm64/include/asm/hw_breakpoint.h  | 50 ++++++++++++++++++++-----
+>  arch/arm64/include/asm/kvm_arm.h        |  1 +
+>  arch/arm64/kernel/cpufeature.c          | 21 ++++++++---
+>  arch/arm64/kernel/debug-monitors.c      | 16 ++++++--
+>  arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++
+>  8 files changed, 149 insertions(+), 19 deletions(-)
 > 
 
-Hello Oliver,
+Hello,
 
-Should I rebase this series on the latest series you have posted earlier this
-month [1] ? Also wondering if you had a chance to look into other KVM patches
-here ? Please do let me know if they too need any modification.
+Gentle ping ! Any updates on this series ? Although I realize that this series is
+dependent on the other FEAT_FGT2 series [1] for MDSELR_EL1 access handling in KVM
+and sysreg definitions, but just wondering if proposed breakpoint and watchpoint
+changes are okay or something needs to be changed. Thank you.
 
-  KVM: arm64: nv: Add FEAT_FGT2 registers access from virtual EL2
-  KVM: arm64: nv: Add FEAT_FGT2 registers based FGU handling
-  KVM: arm64: nv: Add trap forwarding for FEAT_FGT2 described registers
-
-[1] https://lore.kernel.org/kvmarm/20241007174559.1830205-1-oliver.upton@linux.dev/
+[1] https://lore.kernel.org/all/20241001024356.1096072-1-anshuman.khandual@arm.com/
 
 - Anshuman
