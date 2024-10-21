@@ -1,187 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAD61E47B9
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 11:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88611FAC21
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729509613; cv=none; b=MqIhoeK1dNUa6LWWlRf/hyKFJ9AULh9UnkXQlKgxgdXHZkMyrXaGsccD8+3Dr/mBbYd/kWo4wJjN4xaKKCKhwmT85pguWdoMWp2X2R67P6/zLBDRe4eRoFy+96lbt/P1WxQpjPxFCuwlCerD6OXRKJ8Y4SqEPJHjPBIHBankg/o=
+	t=1729534134; cv=none; b=uZZlTpP/RXrNeB6GgqZfKeSs7co6OVW0T8f0XV1uf/54EKEjfSjwBzdlUy3qH4KHa7YDUJw0OxHDs1TgBPqt6/uFBVm44FlnlIbY4V+irauzMa8hkDSWkWfcustv7tbmerTMfGMRfOtqAJGWzz13NdQAvTffjWcCs14s+IIc0GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729509613; c=relaxed/simple;
-	bh=04+++EXzlIsU3O1OYtV8+JrmYNxTV69w0cFqFS1hxl4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DzwkoZ7LF0wbQwvlrn7mzxIaNQX6noN4lwBbEg4gvBs5mC9Eo2erJTZhwoFMM/M4SIGLr7dDfcQIxjnx+9K+SkJI0pgBlYd55B1zJe5G4rurGFmCIYVGK/9MNl8isU3bAKvJSrlYxvoMA54K+38o/ewmfXUNkvcE5nf7GKiOjdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCA96DA7;
-	Mon, 21 Oct 2024 04:20:39 -0700 (PDT)
-Received: from [10.57.87.148] (unknown [10.57.87.148])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B769F3F528;
-	Mon, 21 Oct 2024 04:20:06 -0700 (PDT)
-Message-ID: <cffd8486-63af-4e45-9c4b-57ffda2fc63a@arm.com>
-Date: Mon, 21 Oct 2024 12:20:04 +0100
+	s=arc-20240116; t=1729534134; c=relaxed/simple;
+	bh=lGAahFUJB47Jv0GHevlLPsXzZ4O8VtjPyAFbuGdCp8E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pBXG5WN1NDeNsLQf5mQzRT4j64boIZShNptNoVT3v1klobYBHYXdQWW66R+TVyY9PP7CjNTKQDx/rDckHOxT0aFhkthPsfzQUYR72TbQcVCbSR/mlv+OqhBd3w+Uxvhpb8coLj+7QWz53uDpNX1ypF+6Qy7FnpNUauT2EXeR8rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R36JuzFX; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R36JuzFX"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e5c75bee71so1376763a91.0
+        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 11:08:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729534131; x=1730138931; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4nB5AD8jm9woOflkJu9LaOALYzY3FWUJ+pKW1FSB8o=;
+        b=R36JuzFXePXUZhWzKa/NR0txmpImVhmvaH3EVKvLLBQSln0i+jIJcrqG/QlKLOsrcJ
+         eHPP1cCIckoUMDa7PlJe5b4eVS6b26G00DugV6RhJqpnvaAwbMPvIovysMQiT4uuzsvV
+         G1ugQbsdog9hHTNi/8MavklNIDiVAoKcChDyVhfuHYQIe8Fje8YoH9uvTmUt3aqbSkqJ
+         wawTc1bbnJHonZ8ttDZvKLOpgmAYshbnmqnmQY3UjOWwdHbi2Uv0pyQwT0aHwwTE2rH7
+         0jTpOTI5mCnOO/N2OIN1wGUIHgRA1LrkCCNF0pqis5AW6iv4NPbejKOKQ5im7aSyE5Xe
+         ANAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729534131; x=1730138931;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4nB5AD8jm9woOflkJu9LaOALYzY3FWUJ+pKW1FSB8o=;
+        b=iU1o1MsBRiNRhICHOudetn7J4HpmfD3BvG09r0xH1qLPDTvxd/mdTFOHOJE8OCPlMv
+         y/+9GhKi6QFNpmQ3/xxSwFTzhbsn9ufZUNAVfgA5/J6+44P7CxQ1Az5UtkU4OSsFPkqZ
+         m6BmanMwB6DnMVpyOUfbKcHW5thqG013g/b4YhKnhHi0bC5W3z9tjoiO84lcvwsyDKIo
+         VaOo5rFtxvMYnrd0TIbzvBuFTOFdrWlUytQG7lQyhbywy4cNpkEs2OOy35Tk/b/nM64g
+         Pr9npvjk7glzg76ga5u31GTAeq3kRvGmsbV+4NygZbCDUykL6zfvVECLgGmCq9i2J1Me
+         hg4w==
+X-Forwarded-Encrypted: i=1; AJvYcCW1vvXODIfXZHti0tsw6HvXMVJC8P8sCcCS9NKU95YpfT0E51lG3rfFev9+LHcNKO/mriY+vD8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyGvcH3XzprnbJOACmx40Ef5GjMwtupd/ZT+SykoQuAZ5d6f6+k
+	RnVouCUXg66jwELQZWBaObRJC9rpOTEQbarZZdSs0pvd9PzE7yLkP7ymtUJmejTnpgnIkii8az6
+	Niw==
+X-Google-Smtp-Source: AGHT+IHz/sqxbIaZMzAhwQE+KHAQ50pc4vGOx7OQ/MlEMfrpYKQ16K4ySzEgLcCV5+myw9EmSbX31Z6uvf4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:e147:b0:2d8:a9c2:2f3a with SMTP id
+ 98e67ed59e1d1-2e5616d8f42mr22750a91.3.1729534130899; Mon, 21 Oct 2024
+ 11:08:50 -0700 (PDT)
+Date: Mon, 21 Oct 2024 11:08:49 -0700
+In-Reply-To: <ZxYVnsW9WF1Wp8mx@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 44/57] arm64: Align sections to PAGE_SIZE_MAX
-Content-Language: en-GB
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- David Hildenbrand <david@redhat.com>, Greg Marsden
- <greg.marsden@oracle.com>, Ivan Ivanov <ivan.ivanov@suse.com>,
- Kalesh Singh <kaleshsingh@google.com>, Marc Zyngier <maz@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Matthias Brugger <mbrugger@suse.com>,
- Miroslav Benes <mbenes@suse.cz>, Oliver Upton <oliver.upton@linux.dev>,
- Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <20241014105514.3206191-1-ryan.roberts@arm.com>
- <20241014105912.3207374-1-ryan.roberts@arm.com>
- <20241014105912.3207374-44-ryan.roberts@arm.com>
- <69533deb-dc77-49c3-a256-49efee308905@t-8ch.de>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <69533deb-dc77-49c3-a256-49efee308905@t-8ch.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-20-seanjc@google.com>
+ <ZxYVnsW9WF1Wp8mx@yzhao56-desk.sh.intel.com>
+Message-ID: <ZxaYsfc0m6UHmi10@google.com>
+Subject: Re: [PATCH v13 19/85] KVM: Introduce kvm_follow_pfn() to eventually
+ replace "gfn_to_pfn" APIs
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, David Matlack <dmatlack@google.com>, 
+	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 19/10/2024 15:16, Thomas Weißschuh wrote:
-> On 2024-10-14 11:58:51+0100, Ryan Roberts wrote:
->> Increase alignment of sections in nvhe hyp, vdso and final vmlinux image
->> from PAGE_SIZE to PAGE_SIZE_MAX. For compile-time PAGE_SIZE,
->> PAGE_SIZE_MAX == PAGE_SIZE so there is no change. For boot-time
->> PAGE_SIZE, PAGE_SIZE_MAX is the largest selectable page size.
->>
->> For a boot-time page size build, image size is comparable to a 64K page
->> size compile-time build. In future, it may be desirable to optimize
->> run-time memory consumption by freeing unused padding pages when the
->> boot-time selected page size is less than PAGE_SIZE_MAX.
->>
->> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
->> ---
->>
->> ***NOTE***
->> Any confused maintainers may want to read the cover note here for context:
->> https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
->>
->>  arch/arm64/include/asm/memory.h     |  4 +--
->>  arch/arm64/kernel/vdso-wrap.S       |  4 +--
->>  arch/arm64/kernel/vdso.c            |  7 +++---
->>  arch/arm64/kernel/vdso/vdso.lds.S   |  4 +--
->>  arch/arm64/kernel/vdso32-wrap.S     |  4 +--
->>  arch/arm64/kernel/vdso32/vdso.lds.S |  4 +--
->>  arch/arm64/kernel/vmlinux.lds.S     | 38 ++++++++++++++---------------
->>  arch/arm64/kvm/hyp/nvhe/hyp.lds.S   |  2 +-
->>  8 files changed, 34 insertions(+), 33 deletions(-)
-> 
->> diff --git a/arch/arm64/kernel/vdso.c b/arch/arm64/kernel/vdso.c
->> index 89b6e78400023..1efe98909a2e0 100644
->> --- a/arch/arm64/kernel/vdso.c
->> +++ b/arch/arm64/kernel/vdso.c
->> @@ -195,7 +195,7 @@ static int __setup_additional_pages(enum vdso_abi abi,
->>  
->>  	vdso_text_len = vdso_info[abi].vdso_pages << PAGE_SHIFT;
->>  	/* Be sure to map the data page */
->> -	vdso_mapping_len = vdso_text_len + VVAR_NR_PAGES * PAGE_SIZE;
->> +	vdso_mapping_len = vdso_text_len + VVAR_NR_PAGES * PAGE_SIZE_MAX;
->>  
->>  	vdso_base = get_unmapped_area(NULL, 0, vdso_mapping_len, 0, 0);
->>  	if (IS_ERR_VALUE(vdso_base)) {
->> @@ -203,7 +203,8 @@ static int __setup_additional_pages(enum vdso_abi abi,
->>  		goto up_fail;
->>  	}
->>  
->> -	ret = _install_special_mapping(mm, vdso_base, VVAR_NR_PAGES * PAGE_SIZE,
->> +	ret = _install_special_mapping(mm, vdso_base,
->> +				       VVAR_NR_PAGES * PAGE_SIZE_MAX,
->>  				       VM_READ|VM_MAYREAD|VM_PFNMAP,
->>  				       vdso_info[abi].dm);
->>  	if (IS_ERR(ret))
->> @@ -212,7 +213,7 @@ static int __setup_additional_pages(enum vdso_abi abi,
->>  	if (system_supports_bti_kernel())
->>  		gp_flags = VM_ARM64_BTI;
->>  
->> -	vdso_base += VVAR_NR_PAGES * PAGE_SIZE;
->> +	vdso_base += VVAR_NR_PAGES * PAGE_SIZE_MAX;
->>  	mm->context.vdso = (void *)vdso_base;
->>  	ret = _install_special_mapping(mm, vdso_base, vdso_text_len,
->>  				       VM_READ|VM_EXEC|gp_flags|
-> 
->> diff --git a/arch/arm64/kernel/vdso/vdso.lds.S b/arch/arm64/kernel/vdso/vdso.lds.S
->> index 45354f2ddf706..f7d1537a689e8 100644
->> --- a/arch/arm64/kernel/vdso/vdso.lds.S
->> +++ b/arch/arm64/kernel/vdso/vdso.lds.S
->> @@ -18,9 +18,9 @@ OUTPUT_ARCH(aarch64)
->>  
->>  SECTIONS
->>  {
->> -	PROVIDE(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE);
->> +	PROVIDE(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE_MAX);
->>  #ifdef CONFIG_TIME_NS
->> -	PROVIDE(_timens_data = _vdso_data + PAGE_SIZE);
->> +	PROVIDE(_timens_data = _vdso_data + PAGE_SIZE_MAX);
-> 
-> This looks like it also needs a change to vvar_fault() in vdso.c.
-> The symbols are now always PAGE_SIZE_MAX apart, while vvar_fault() works
-> in page offsets (vmf->pgoff) that are based on the runtime PAGE_SIZE and
-> it expects hardcoded offsets.
-> 
-> As test you can use tools/testing/selftests/timens/timens.
-> 
-> (I can't test this right now, so it's only a suspicion)
+On Mon, Oct 21, 2024, Yan Zhao wrote:
+> On Thu, Oct 10, 2024 at 11:23:21AM -0700, Sean Christopherson wrote:
+> > --- a/virt/kvm/pfncache.c
+> > +++ b/virt/kvm/pfncache.c
+> > @@ -159,6 +159,12 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+> >  	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
+> >  	void *new_khva = NULL;
+> >  	unsigned long mmu_seq;
+> > +	struct kvm_follow_pfn kfp = {
+> > +		.slot = gpc->memslot,
+> > +		.gfn = gpa_to_gfn(gpc->gpa),
+> > +		.flags = FOLL_WRITE,
+> > +		.hva = gpc->uhva,
+> > +	};
+> Is .map_writable uninitialized?
 
-Ahh good spot - that test does infact fail.
-
-This fixes the problem:
-
----8<---
-diff --git a/arch/arm64/kernel/vdso.c b/arch/arm64/kernel/vdso.c
-index 1efe98909a2e0..d2049ba6b19f5 100644
---- a/arch/arm64/kernel/vdso.c
-+++ b/arch/arm64/kernel/vdso.c
-@@ -151,10 +151,11 @@ int vdso_join_timens(struct task_struct *task, struct
-time_namespace *ns)
- static vm_fault_t vvar_fault(const struct vm_special_mapping *sm,
-                             struct vm_area_struct *vma, struct vm_fault *vmf)
- {
-+       pgoff_t pgmaxoff = vmf->pgoff >> (PAGE_SHIFT_MAX - PAGE_SHIFT);
-        struct page *timens_page = find_timens_vvar_page(vma);
-        unsigned long pfn;
-
--       switch (vmf->pgoff) {
-+       switch (pgmaxoff) {
-        case VVAR_DATA_PAGE_OFFSET:
-                if (timens_page)
-                        pfn = page_to_pfn(timens_page);
----8<---
-
-I'll include it in the next version.
-
-Thanks,
-Ryan
-
-> 
->>  #endif
->>  	. = VDSO_LBASE + SIZEOF_HEADERS;
-> 
->> diff --git a/arch/arm64/kernel/vdso32/vdso.lds.S b/arch/arm64/kernel/vdso32/vdso.lds.S
->> index 8d95d7d35057d..c46d18a69d1ce 100644
->> --- a/arch/arm64/kernel/vdso32/vdso.lds.S
->> +++ b/arch/arm64/kernel/vdso32/vdso.lds.S
->> @@ -18,9 +18,9 @@ OUTPUT_ARCH(arm)
->>  
->>  SECTIONS
->>  {
->> -	PROVIDE_HIDDEN(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE);
->> +	PROVIDE_HIDDEN(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE_MAX);
->>  #ifdef CONFIG_TIME_NS
->> -	PROVIDE_HIDDEN(_timens_data = _vdso_data + PAGE_SIZE);
->> +	PROVIDE_HIDDEN(_timens_data = _vdso_data + PAGE_SIZE_MAX);
->>  #endif
->>  	. = VDSO_LBASE + SIZEOF_HEADERS;
-
+Nope, per C99, "subobjects without explicit initializers are initialized to zero",
+i.e. map_writable is initialized to "false".
