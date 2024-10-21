@@ -1,109 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14431F707F
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4654A1FB3D0
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729534481; cv=none; b=c6XuVXiC32lMab1jhvoxO8ixPLO1IuzV/hYu4ppJhh82+8kEGxn3UpUrs/RKalGKAEANTClv+8wN+uL7PzCdIfwHZ5evWbxmOV/5Gjz1isZqfSEI58GqTZjSTw+blZg7zn/Ky3tS/w2lDfbEHvuEJdO2rVl/+WRZkCwT2GHnZN4=
+	t=1729537072; cv=none; b=PnTb+v+KV4LSclOnsHnTkpd8iZ0DhbNpFOUcfprN+dw7HTh8i7mIgeb/Luy97Q7veRZCw+Z8z71VZozw+2Huqa6MCFuZ65uGYG/2WnNRi6i4HSAOKvLjXN1j1bi5JqQftyYYMKXgWynY4CoF4/NCUhH2ickYKzu4/WF5r2x3VB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729534481; c=relaxed/simple;
-	bh=Kl5tVxl8qYANnVpLWO7nEiJyHaPidpv8qU5ilno6mVI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IszQ/cB+fq6CP6J8A/h1kdC0CGEucbQ1zOASgClnupScQOYmcCWHk0TLybxE6EvbUtUTGsaL1PZB0cD0anBkjyDWHrvq70IwWev1ZSsbziZE+yuy7KVnNAqS0il8K1yKhgnXF/I0+WTm/CFpVyYm/DEhizxlke1W5YNWNn6QPkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIl+DF+S; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729537072; c=relaxed/simple;
+	bh=eiuskN0Rqd2YRzqsihlK78NQBES1kITJct33unB+ED8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Lp40YpWjW8FlU/fnsXjrRKkjuf+/+hCzzjpZFqyXfzHX7t5jqxSeCm+/aWAxj5Qezh3F3Nl0BiMySq6+cAmQ+Q1CEDo0uTLTZA4irvKVq0HlDDdB0PUY5kMlB6YW/mLe78pSN/jdFrQ7fqXDTFndUpVreGkp7FY9gRLAQ/zMCt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZvPB1qI8; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIl+DF+S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 708F4C4CEC3;
-	Mon, 21 Oct 2024 18:14:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729534480;
-	bh=Kl5tVxl8qYANnVpLWO7nEiJyHaPidpv8qU5ilno6mVI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gIl+DF+SHiDp336BQrrQVE70piZ2lUrAhYb0JuOYLvCquJx7J+SO1dCJkgFZK2r/q
-	 xZY1TZP5kcCl6JA37Pkpp6JBTnTnDhnD0xoyDGBBB1F5w+HSjigYvs2LZDZKUursTX
-	 1mR8JxXZ2BoQUdkmLzHqLaFTwtpeLAgtku3fR91jyPsH1EslzC062XSEi4femOrVo2
-	 yShzIBATTF4jnLmoCFG4PpOCZdJGVxJUzHDhrI2xfFisdrLcbvmTm+5FexqpQS3X70
-	 x1vnq5Eqmote+qUbCxV35sg1cEjZnmqNbVVjC3CMSy8jbElflsoxN+cjbmKaNCrHk6
-	 Q3Ra3Jk1XvISg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t2wvN-005WM0-Uk;
-	Mon, 21 Oct 2024 19:14:38 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] arm64: Add command-line override for ID_AA64MMFR0_EL1.ECV
-Date: Mon, 21 Oct 2024 19:14:34 +0100
-Message-Id: <20241021181434.1052974-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZvPB1qI8"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7db9418552fso4133873a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 11:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729537065; x=1730141865; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TRc3VGGNkUkUR9ifA4nNeX0hRZiSdlXeerhUJQ+tYBo=;
+        b=ZvPB1qI8j5i6QpdEtv4vSLQ/HUdXc9xYAGQZt6MCvI1whHkNGhefI5q1SU2Vrgl9gn
+         wAze4IqeFCo+ozC/hF6Hi+r7P63sCR2VlW5f7ucdMZ49OibQ9hMkntGXYzre2VKfaVSW
+         amSgQBLTED2PPl6dL1JP2JeEkhLOVGm4hBFVPqzkvhU8JrqIfn/jwxXtJxuulKYOzCvs
+         Sz5xmTm9YWrKVnGx2aWv6nniSa8q2I0RSzHdguaxrCma3WSKBbdmXpYdiKKr3nApZRKx
+         42XKIjqGzT/AWe5PXS+AiXP2TxglLf12FLgm2Bxuzd97wU/GuberGAOC4IVlpFfmIb5i
+         nDUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729537065; x=1730141865;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TRc3VGGNkUkUR9ifA4nNeX0hRZiSdlXeerhUJQ+tYBo=;
+        b=nCE3HXjMfsLC6jWqzm4zY+OMdMrvkdaHR75yi88Ikid5z9f1Ekj4ntd/Mac3sq2ZhX
+         eLjSLHxHp1UrUmoyFKx0hVsHfbhKnDQWPW+U8rWcbdzdDZols5a9tXASTQjPIQnQ+eoU
+         UVxaTmEL3scyN+OcMwcLnyeUWAFVwNHVtcEyw9VUaTtGOPrc7oDHHKQMu0sgMOlNqDZ3
+         rkMLvkhp8aHjnt98Fn/24g5j+8tRkwD9LNa9vZd3+wgoWKJl9KkOESTFG1BMh9UwBFtM
+         9TB+gDrfBUfNg2Ig4oSYXbantNm8qaXjP7FJ5kxEIAWM6l7dzw3/AQECgVmBjGBbSHCB
+         xZzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4vRcEcfT+9KV2BJRL2Ir7x4F/d7rZRQvHDOWjG26S/kFrN2RnTHnTkhvf2uoGuzIfekaZscc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YziZudvQyY340hCYcFy5OxfzvtToFt5p8Q701uqwSMd4biLq7Bg
+	sNaZooL8otoGDY6T3jo/NwS6W24O3fGz5gb1tLOnISHXLBgck99fCwis+PYg8scioYKFYPm4yhK
+	Nag==
+X-Google-Smtp-Source: AGHT+IHRYlBrX6M+NH4TUGVEqm9BFtB7q+VVhXD5EoRBvSsXa42IiMZxJc+hXyxs+ZPnB8HLQQfXC/cdu0E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a63:3858:0:b0:7e9:f93c:22b9 with SMTP id
+ 41be03b00d2f7-7eacc895cf2mr12508a12.10.1729537064143; Mon, 21 Oct 2024
+ 11:57:44 -0700 (PDT)
+Date: Mon, 21 Oct 2024 11:57:42 -0700
+In-Reply-To: <ZxYrYe/WN8XoB+fI@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-52-seanjc@google.com>
+ <ZxYrYe/WN8XoB+fI@yzhao56-desk.sh.intel.com>
+Message-ID: <ZxakJr_jWkU-Y54e@google.com>
+Subject: Re: [PATCH v13 51/85] KVM: VMX: Use __kvm_faultin_page() to get APIC
+ access page/pfn
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, David Matlack <dmatlack@google.com>, 
+	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-It appears that relatively popular hardware out there implements
-the CNTPOFF_EL2 variant of FEAT_ECV, advertises it via ID_AA64MMFR0_EL1,
-but cannot be bothered to set SCR_EL3.ECVEn to 1.
+On Mon, Oct 21, 2024, Yan Zhao wrote:
+> On Thu, Oct 10, 2024 at 11:23:53AM -0700, Sean Christopherson wrote:
+> > Use __kvm_faultin_page() get the APIC access page so that KVM can
+> > precisely release the refcounted page, i.e. to remove yet another user
+> > of kvm_pfn_to_refcounted_page().  While the path isn't handling a guest
+> > page fault, the semantics are effectively the same; KVM just happens to
+> > be mapping the pfn into a VMCS field instead of a secondary MMU.
+> >=20
+> > Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
 
-You would probably think that "this is fine, EL3 will take the
-trap on access to CNTPOFF_EL2 and flip the ECVEn bit", as that's
-what a semi-decent firmware implementation would do.
+...
 
-But no. None of that. This particular implementation takes the trap,
-considers its purpose in life, decides that it has none, and *RESETS*
-the system.
+> > @@ -6838,10 +6840,13 @@ void vmx_set_apic_access_page_addr(struct kvm_v=
+cpu *vcpu)
+> >  		vmcs_write64(APIC_ACCESS_ADDR, pfn_to_hpa(pfn));
+> > =20
+> >  	/*
+> > -	 * Do not pin apic access page in memory, the MMU notifier
+> > -	 * will call us again if it is migrated or swapped out.
+> > +	 * Do not pin the APIC access page in memory so that it can be freely
+> > +	 * migrated, the MMU notifier will call us again if it is migrated or
+> > +	 * swapped out.  KVM backs the memslot with anonymous memory, the pfn
+> > +	 * should always point at a refcounted page (if the pfn is valid).
+> >  	 */
+> > -	kvm_release_pfn_clean(pfn);
+> > +	if (!WARN_ON_ONCE(!refcounted_page))
+> > +		kvm_release_page_clean(refcounted_page);
+> Why it's not
+> if (!WARN_ON_ONCE(!refcounted_page)) {
+> 	if (writable)
+> 		kvm_release_page_dirty(refcounted_page)
+> 	else
+> 		kvm_release_page_clean(refcounted_page)
+> }
+>=20
+> or simply not pass "writable" to __kvm_faultin_pfn() as we know the slot =
+is
+> not read-only and then set dirty ?
 
-Yes, x1e001de, I'm talking about you.
+__kvm_faultin_pfn() requires a non-NULL @writable.  The intent is to help e=
+nsure
+the caller is actually checking whether a readable vs. writable mapping was
+acquired.  For cases that explicitly pass FOLL_WRITE, it's awkward, but tho=
+se
+should be few and far between.
 
-In order to allow this machine to be promoted slightly above the
-level of a glorified door-stop, add a new "id_aa64mmfr0.ecv" override.
-allowing the kernel to pretend this option was never there.
+> if (!WARN_ON_ONCE(!refcounted_page))
+> 	kvm_release_page_dirty(refcounted_page)
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kernel/pi/idreg-override.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
-index 29d4b6244a6f6..fbc37b2733e20 100644
---- a/arch/arm64/kernel/pi/idreg-override.c
-+++ b/arch/arm64/kernel/pi/idreg-override.c
-@@ -38,6 +38,15 @@ struct ftr_set_desc {
- 
- #define FIELD(n, s, f)	{ .name = n, .shift = s, .width = 4, .filter = f }
- 
-+static const struct ftr_set_desc mmfr0 __prel64_initconst = {
-+	.name		= "id_aa64mmfr0",
-+	.override	= &id_aa64mmfr0_override,
-+	.fields		= {
-+		FIELD("ecv", ID_AA64MMFR0_EL1_ECV_SHIFT, NULL),
-+		{}
-+	},
-+};
-+
- static bool __init mmfr1_vh_filter(u64 val)
- {
- 	/*
-@@ -196,6 +205,7 @@ static const struct ftr_set_desc sw_features __prel64_initconst = {
- 
- static const
- PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
-+	{ &mmfr0	},
- 	{ &mmfr1	},
- 	{ &mmfr2	},
- 	{ &pfr0 	},
--- 
-2.39.2
-
+Ya, this is probably more correct?  Though I would strongly prefer to make =
+any
+change in behavior on top of this series.  The use of kvm_release_page_clea=
+n()
+was added by commit 878940b33d76 ("KVM: VMX: Retry APIC-access page reload =
+if
+invalidation is in-progress"), and I suspect the only reason it added the
+kvm_set_page_accessed() call is because there was no "unused" variant.  I.e=
+. there
+was no concious decision to set Accessed but not Dirty.
