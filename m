@@ -1,131 +1,109 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FAC1F9A9C
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14431F707F
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729534394; cv=none; b=evM6zuqaXFKjWFz/IkrB2UfIGY1nYvypnjh9hPaTcnLpxbKPpJ6Bp7eOHC2n+wRAWQhiKHJsD+HQ9zYZ3Q3LFjJWHzdKp3enyz/8Apbd4QD043doWtKqG8DUOWliy4V7hYX9ST0JxqHTlam+V5nXt/VSUTDD2rVNxzNwEbLFVK0=
+	t=1729534481; cv=none; b=c6XuVXiC32lMab1jhvoxO8ixPLO1IuzV/hYu4ppJhh82+8kEGxn3UpUrs/RKalGKAEANTClv+8wN+uL7PzCdIfwHZ5evWbxmOV/5Gjz1isZqfSEI58GqTZjSTw+blZg7zn/Ky3tS/w2lDfbEHvuEJdO2rVl/+WRZkCwT2GHnZN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729534394; c=relaxed/simple;
-	bh=YeXYNnt8ENmKuB15YwhakNFnDdgCdBZF4Bj1D5TS0z8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AUjlCxbXSEawf+JohCk0kveNH+4iAXhPdR1OLgPbGjXCgdmpBJL45FIjy6xW3bZNfiDP1nQMGu8EMPm/vxCXeyotYxXHbPyzRyVAr4EOAVmlcRfw5IUqJTrK+adD6brzlSpNOhNZVzNFmtWx+6ISoigMYG/kJogypuJdvbvjo8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=joBsGhEb; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1729534481; c=relaxed/simple;
+	bh=Kl5tVxl8qYANnVpLWO7nEiJyHaPidpv8qU5ilno6mVI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IszQ/cB+fq6CP6J8A/h1kdC0CGEucbQ1zOASgClnupScQOYmcCWHk0TLybxE6EvbUtUTGsaL1PZB0cD0anBkjyDWHrvq70IwWev1ZSsbziZE+yuy7KVnNAqS0il8K1yKhgnXF/I0+WTm/CFpVyYm/DEhizxlke1W5YNWNn6QPkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIl+DF+S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="joBsGhEb"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e290947f6f8so8215924276.2
-        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 11:13:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729534390; x=1730139190; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/aTJKIPGdXYIQ4z1/mPhLVqGYb++KmSjcoFUbuTd6EE=;
-        b=joBsGhEbso4disLN0jA9bcEDtjn0o39o8CEEVEPU7YP74AP3fzYWsnUytRX2CzOdgo
-         /sfEjcSnbmIS5CgRS9bR0yBpYriNbysNp/z+GbtMfFHCT1pydmyL0CGljaSmPdy0tVR6
-         eR/2pMYS+pZGiVB6npeLtAxr0MlqboQz7cCiTkuKER4dLLa4DOIy6g7o3KGPNdYmj/v9
-         NKNOIQ5nN5nw6zu+wI5jPlUI1z7tw/1yMu7WVwMc/ooW8q5h/qRTxZmvdlvxTTUYPSD8
-         ypMwyqg+BDbadvS8C/o10BQFT9L831CN8AvUiGCwDNgygKfPu/EAvCGUPD2VMpDNhvMX
-         L86g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729534390; x=1730139190;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/aTJKIPGdXYIQ4z1/mPhLVqGYb++KmSjcoFUbuTd6EE=;
-        b=HYzvxpN6/ln9uDAr6vaAPgrPPIMQXfBadYTzYMT9qN/H/kPuNyxBwMwJAUtRUGN4Ik
-         qQzbNm1PBukybsat8oz5l0C6tfWmTMqGLcvlghnvKBOhBlFkSReKlasaE/UcdZNt1ntr
-         6PS34GlDmOydjexQLBipX4WDNCdTGeiL3gRI7v9pzelTSlKhT16WPzNb+YEBBH3aQQ1q
-         kIQCLHJuYcj2rfXHSxiX2UJp7cEvoaLOv5kfI9/GrDHhdo6GSPyq/lC5AwKaiZTJik0T
-         3DjWYc8RzfvxW7Brz04d3dU1r4EjiK+GnqTkQFb5MzVt+I2ME600RBEq8Eu8kL102YYw
-         /1GA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCZVV2zxwmBK/YgwM/p3kl2DV8cdM1F6IKAAcSSYQ4Hr+5ah8qP1d++Z/wXPScA8vKR6iHy2I=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwTBiZIxTF5jBMmY/1Pv1OZklqCZTF8k9ld8mc7xOsseyMHjxk+
-	bSVQnB+d2M3llg8YGhPStBZGXz1fA3bVISprS8p3y/6AkNP4TRCxGe3KmKeGf1nkuIeBdFt7lxt
-	jOA==
-X-Google-Smtp-Source: AGHT+IGB051RPG0qZ1hHpRMmy9gqDX/0GH7so+xa+rGGnhbzxuPrj+6CH4debSRqPENvRC2d7Upq2p/funE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:8389:0:b0:e2b:e955:d58a with SMTP id
- 3f1490d57ef6-e2be955d949mr2592276.7.1729534389536; Mon, 21 Oct 2024 11:13:09
- -0700 (PDT)
-Date: Mon, 21 Oct 2024 11:13:08 -0700
-In-Reply-To: <ZxYeFKl2KbZ3Ila1@yzhao56-desk.sh.intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIl+DF+S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 708F4C4CEC3;
+	Mon, 21 Oct 2024 18:14:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729534480;
+	bh=Kl5tVxl8qYANnVpLWO7nEiJyHaPidpv8qU5ilno6mVI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gIl+DF+SHiDp336BQrrQVE70piZ2lUrAhYb0JuOYLvCquJx7J+SO1dCJkgFZK2r/q
+	 xZY1TZP5kcCl6JA37Pkpp6JBTnTnDhnD0xoyDGBBB1F5w+HSjigYvs2LZDZKUursTX
+	 1mR8JxXZ2BoQUdkmLzHqLaFTwtpeLAgtku3fR91jyPsH1EslzC062XSEi4femOrVo2
+	 yShzIBATTF4jnLmoCFG4PpOCZdJGVxJUzHDhrI2xfFisdrLcbvmTm+5FexqpQS3X70
+	 x1vnq5Eqmote+qUbCxV35sg1cEjZnmqNbVVjC3CMSy8jbElflsoxN+cjbmKaNCrHk6
+	 Q3Ra3Jk1XvISg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t2wvN-005WM0-Uk;
+	Mon, 21 Oct 2024 19:14:38 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] arm64: Add command-line override for ID_AA64MMFR0_EL1.ECV
+Date: Mon, 21 Oct 2024 19:14:34 +0100
+Message-Id: <20241021181434.1052974-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-35-seanjc@google.com>
- <ZxYeFKl2KbZ3Ila1@yzhao56-desk.sh.intel.com>
-Message-ID: <ZxaZtJGfN2_5Db6h@google.com>
-Subject: Re: [PATCH v13 34/85] KVM: Get writable mapping for __kvm_vcpu_map()
- only when necessary
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, David Matlack <dmatlack@google.com>, 
-	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Oct 21, 2024, Yan Zhao wrote:
-> On Thu, Oct 10, 2024 at 11:23:36AM -0700, Sean Christopherson wrote:
-> > When creating a memory map for read, don't request a writable pfn from =
-the
-> > primary MMU.  While creating read-only mappings can be theoretically sl=
-ower,
-> > as they don't play nice with fast GUP due to the need to break CoW befo=
-re
-> > mapping the underlying PFN, practically speaking, creating a mapping is=
-n't
-> > a super hot path, and getting a writable mapping for reading is weird a=
-nd
-> > confusing.
-> >=20
-> > Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 080740f65061..b845e9252633 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3122,7 +3122,7 @@ int __kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t g=
-fn, struct kvm_host_map *map,
-> >  	struct kvm_follow_pfn kfp =3D {
-> >  		.slot =3D gfn_to_memslot(vcpu->kvm, gfn),
-> >  		.gfn =3D gfn,
-> > -		.flags =3D FOLL_WRITE,
-> > +		.flags =3D writable ? FOLL_WRITE : 0,
-> >  		.refcounted_page =3D &map->pinned_page,
-> >  		.pin =3D true,
-> >  	};
-> When writable is false, could we set ".pin =3D false," ?
+It appears that relatively popular hardware out there implements
+the CNTPOFF_EL2 variant of FEAT_ECV, advertises it via ID_AA64MMFR0_EL1,
+but cannot be bothered to set SCR_EL3.ECVEn to 1.
 
-Hmm, maybe?  I can't imagine anything would actually break, but unless FOLL=
-_PIN
-implies writing, my preference would still be to pin the page so that KVM a=
-lways
-pins when accessing the actual data of a page.
+You would probably think that "this is fine, EL3 will take the
+trap on access to CNTPOFF_EL2 and flip the ECVEn bit", as that's
+what a semi-decent firmware implementation would do.
 
-> Also not sure if ".map_writable =3D NULL" is missing.
+But no. None of that. This particular implementation takes the trap,
+considers its purpose in life, decides that it has none, and *RESETS*
+the system.
 
-Doh, my previous response was slightly wrong, it's implicitly initialized t=
-o NULL,
-not false.  I forgot map_writable is a pointer to a bool.
+Yes, x1e001de, I'm talking about you.
+
+In order to allow this machine to be promoted slightly above the
+level of a glorified door-stop, add a new "id_aa64mmfr0.ecv" override.
+allowing the kernel to pretend this option was never there.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/pi/idreg-override.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
+index 29d4b6244a6f6..fbc37b2733e20 100644
+--- a/arch/arm64/kernel/pi/idreg-override.c
++++ b/arch/arm64/kernel/pi/idreg-override.c
+@@ -38,6 +38,15 @@ struct ftr_set_desc {
+ 
+ #define FIELD(n, s, f)	{ .name = n, .shift = s, .width = 4, .filter = f }
+ 
++static const struct ftr_set_desc mmfr0 __prel64_initconst = {
++	.name		= "id_aa64mmfr0",
++	.override	= &id_aa64mmfr0_override,
++	.fields		= {
++		FIELD("ecv", ID_AA64MMFR0_EL1_ECV_SHIFT, NULL),
++		{}
++	},
++};
++
+ static bool __init mmfr1_vh_filter(u64 val)
+ {
+ 	/*
+@@ -196,6 +205,7 @@ static const struct ftr_set_desc sw_features __prel64_initconst = {
+ 
+ static const
+ PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
++	{ &mmfr0	},
+ 	{ &mmfr1	},
+ 	{ &mmfr2	},
+ 	{ &pfr0 	},
+-- 
+2.39.2
+
