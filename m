@@ -1,134 +1,208 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D3A194A73
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 07:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8559E1E2312
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 08:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729495413; cv=none; b=rEgHQfiekJ0ehroDNZSOptAhmufY2F1TtoZl5X29d/w+H3rAH2YDru8g/3J9/wUNM8n7zHUYPmbXSbCrbFjlNqnXHMd2Z6MQ48Z+oWDJHmmSXN+0cgOUp69MMAOgNQImuMxppJv+fzuO/iyGgVuxqgrh7Se3S8rZhUJhTtTcZTs=
+	t=1729498787; cv=none; b=ciWEo2Tu3SU6wbJfzo04zeuvUCS3o8AbrlAEAheswmfqGRTmPJM2ucTM4Irjta6yS0lRQ6e+I//LA4Qk9jzYslQb4iUOX/NxUiYkRWNdWO4fvLjR4ZFHd8uB1cJguw7HdU0fnmEQp4TR2GioawuiAl/QX9KGRko2iXrOtiggUGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729495413; c=relaxed/simple;
-	bh=FLVdoZ6f6dT1jKfwYZxe0KOWwsV7GEx4v2Y763FXmOs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Z+3ZujFIsagHzPoXTLoh0k8TMMkAin+fDtXd0OI4m+Izdt1gmEXb26GfjUC8rK6BIXx9DZXOsWx7y99C1LUqD/YIAW3JDLZcYvNWxBl/l0VwQ6aw+Ql52CZyzWBsXNsDr7gbhoGDSXe3996HxphB5RDBO2r2EMT+38tbvGeHY74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XX6Dn472QzpWG7;
-	Mon, 21 Oct 2024 15:21:29 +0800 (CST)
-Received: from dggems706-chm.china.huawei.com (unknown [10.3.19.183])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0244F1402E2;
-	Mon, 21 Oct 2024 15:23:27 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- dggems706-chm.china.huawei.com (10.3.19.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 21 Oct 2024 15:23:26 +0800
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Mon, 21 Oct 2024 09:23:24 +0200
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "james.morse@arm.com"
-	<james.morse@arm.com>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	s=arc-20240116; t=1729498787; c=relaxed/simple;
+	bh=gTyAd0yjx633ghmaw+FYfk2XUonhNw39hHwdt7kmRZQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ifs6RMolUe0RhCfq4jMC3Rjhxve7ttnj/bw1Q1zWHms+siXz21eXdXczFTTXREmVstxPitNuzRbTSs+pYXF69wPcnL81gNtXFt3T2k4udvsJQw/xaYRdKx7VTEhH2gYABqyxao3L2hoi4reQFt/O0beT3qNKePE6DXZQ+ZQm4ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VvIQR4Q8; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvIQR4Q8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A1BC4CEC3;
+	Mon, 21 Oct 2024 08:19:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729498787;
+	bh=gTyAd0yjx633ghmaw+FYfk2XUonhNw39hHwdt7kmRZQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VvIQR4Q8+QCnt6KrMeTYC/zkirE5gaQ+IVUaO/h+RQh473cgBdpe1FaH7EVYZnBr1
+	 1VUXjdqN5iIHaAkvXAI/TG/+LCZpcWB88QG/+7Xhy/9GfhKGC4tY+lJrwTDOuiG7go
+	 2+XCc/ZwVmkEy2n5YRA83OpXDRGAMfZJcLiS55Qs51Y+AspAO0QMTp3GRNQPelhYiQ
+	 sSLBkKe2M6AyEaJ2FPzRwLiNlP77jP3vh01YJ95t8ctsqJMVD9TAEMKQNlhJEM2ZWz
+	 /NAAOtlC7EKGUcKulLSDoVIsXL5AcNQAS3sjC335aG6nIkx5/Bw+cXuWI/y/UduhSH
+	 FIDngJvlTWpDg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t2ndg-005Kys-R2;
+	Mon, 21 Oct 2024 09:19:44 +0100
+Date: Mon, 21 Oct 2024 09:19:44 +0100
+Message-ID: <86ed4950m7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"james.morse@arm.com"
+	<james.morse@arm.com>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	yuzenghui
+	<yuzenghui@huawei.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
 	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
- userspace
-Thread-Topic: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
- userspace
-Thread-Index: AQHbIHOWPQXDKdHiMkqUxKw+yhwbxbKMLRMAgASjFpA=
-Date: Mon, 21 Oct 2024 07:23:24 +0000
-Message-ID: <ec2aeb95ffb54bd59d81f481ef67fa1f@huawei.com>
+	<linux-arm-kernel@lists.infradead.org>,
+	Linuxarm <linuxarm@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from userspace
+In-Reply-To: <ec2aeb95ffb54bd59d81f481ef67fa1f@huawei.com>
 References: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
- <86h6994smf.wl-maz@kernel.org>
-In-Reply-To: <86h6994smf.wl-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	<86h6994smf.wl-maz@kernel.org>
+	<ec2aeb95ffb54bd59d81f481ef67fa1f@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-SGkgTWFyYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXJjIFp5
-bmdpZXIgPG1hekBrZXJuZWwub3JnPg0KPiBTZW50OiBGcmlkYXksIE9jdG9iZXIgMTgsIDIwMjQg
-MTE6MjMgQU0NCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29s
-b3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gQ2M6IGt2bWFybUBsaXN0cy5saW51eC5kZXY7IG9s
-aXZlci51cHRvbkBsaW51eC5kZXY7DQo+IGphbWVzLm1vcnNlQGFybS5jb207IGpvZXkuZ291bHlA
-YXJtLmNvbTsgc3V6dWtpLnBvdWxvc2VAYXJtLmNvbTsNCj4geXV6ZW5naHVpIDx5dXplbmdodWlA
-aHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0KPiA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+OyBs
-aW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7DQo+IExpbnV4YXJtIDxsaW51eGFy
-bUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBLVk06IGFybTY0OiBNYWtlIEwx
-SXAgZmVhdHVyZSBpbiBDVFJfRUwwIHdyaXRhYmxlDQo+IGZyb20gdXNlcnNwYWNlDQo+IA0KPiBP
-biBUaHUsIDE3IE9jdCAyMDI0IDA5OjU5OjI1ICswMTAwLA0KPiBTaGFtZWVyIEtvbG90aHVtIDxz
-aGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+DQo+ID4gT25s
-eSBhbGxvdyB1c2Vyc3BhY2UgdG8gc2V0IFZJUFQoMGIxMCkgb3IgUElQVCgwYjExKSBmb3IgTDFJ
-cCBiYXNlZCBvbg0KPiA+IHdoYXQgaGFyZHdhcmUgcmVwb3J0cyBhcyBib3RowqBBSVZJVlQgKDBi
-MDEpIGFuZCBWUElQVCAoMGIwMCkgYXJlDQo+ID4gZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4g
-Pg0KPiA+IFVzaW5nIGEgVklQVCBmb3IgR3Vlc3Qgd2hlcmUgaGFyZHdhcmUgcmVwb3J0cyBQSVBU
-IG1heSBsZWFkIHRvIG92ZXINCj4gPiBpbnZhbGlkYXRpb24sIGJ1dCBpcyBzdGlsbCBjb3JyZWN0
-LiBIZW5jZSwgd2UgY2FuIGFsbG93IGRvd25ncmFkaW5nDQo+ID4gUElQVCB0byBWSVBULCBidXQg
-bm90IHRoZSBvdGhlciB3YXkgYXJvdW5kLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogU2hhbWVl
-ciBLb2xvdGh1bQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiA+
-IC0tLQ0KPiA+IFRoaXMgaXMgYmFzZWQgb24gdGhlIGRpY3N1c3Npb24gaGVyZVswXS4NCj4gPg0K
-PiBodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm1hcm0vMGRiMTlhMDgxZDllNDFmMDhiMDA0M2Jh
-ZWVmMTZmMTZAaHVhDQo+IHdlaS5jb20vDQo+ID4NCj4gPiBBbHNvIGRlcGVuZHMgb24gSm9leSdz
-IHNlcmllc1sxXSBhcyBpdCBtYWtlIHVzZSBvZiB0aGUgSURfRklMVEVSRUQgbWFjcm8uDQo+ID4N
-Cj4gPiBJIGFtIG5vdCBzdXJlIHdlIG5lZWQgdG8gZXhwbGljaXRseSBtYWtlIHRoZSBmdHIgdHlw
-ZSBhcyBGVFJfTE9XRVJfU0FGRQ0KPiA+IGluIGt2bV9hcm02NF9mdHJfc2FmZV92YWx1ZSgpIG9y
-IGFzIG1lbnRpb25lZCBiZWxvdyBjYW4gZGVwZW5kIG9uDQo+ID4gYXJtNjRfZnRyX3NhZmVfdmFs
-dWUoKSBmb3IgdGhpcyBmdHIgYml0cy4NCj4gDQo+IEkgdGhpbmsgcmVseWluZyBvbiB0aGUgYXJj
-aCBjb2RlIGZvciB0aGlzIGlzIHRoZSByaWdodCB0aGluZyB0bw0KPiBkby4gVGhpcyB3YXMgZGVz
-aWduZWQgdG8gY29wZSB3aXRoIGhldGVyb2dlbmVvdXMgc3lzdGVtcyB3aGVyZSB5b3UNCj4gY291
-bGQgaGF2ZSBib3RoIFBJUFQgYW5kIFZJUFQgY2FjaGVzIGluIHRoZSBzeXN0ZW0sIGFuZCB3ZSBk
-b24ndCBhbGxvdw0KPiBhIGxhdGUgY29tZXIgdG8gYmUgVklQVCBpZiB3ZSdyZSBkZWNpZGVkIG9u
-IFBJUFQgKGhlbmNlIHRoZQ0KPiBGVFJfRVhBQ1QpLg0KDQpPay4gSSB3aWxsIGtlZXAgaXQgYXMg
-aXQgaXMuDQoNCj4gDQo+ID4NCj4gPiBQbGVhc2UgdGFrZSBhIGxvb2sgYW5kIGxldCBtZSBrbm93
-Lg0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+IFNoYW1lZXINCj4gPg0KPiA+IFswXQ0KPiBodHRwczov
-L2xvcmUua2VybmVsLm9yZy9rdm1hcm0vMGRiMTlhMDgxZDllNDFmMDhiMDA0M2JhZWVmMTZmMTZA
-aHVhDQo+IHdlaS5jb20vDQo+ID4gWzFdIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bWFybS8y
-MDI0MTAxNTEzMzkyMy4zOTEwOTE2LTEtDQo+IGpvZXkuZ291bHlAYXJtLmNvbS8NCj4gPiAtLS0N
-Cj4gPiAgYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDMyICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKystLS0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCA0IGRl
-bGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdz
-LmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQo+ID4gaW5kZXggZDk3Y2NmMWMxNTU4Li44
-MTlkY2I2M2ZlYmQgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYw0K
-PiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCj4gPiBAQCAtMTg3Miw2ICsxODcy
-LDI4IEBAIHN0YXRpYyBpbnQgc2V0X2lkX2FhNjRwZnIxX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUNCj4g
-KnZjcHUsDQo+ID4gIAlyZXR1cm4gc2V0X2lkX3JlZyh2Y3B1LCByZCwgdXNlcl92YWwpOw0KPiA+
-ICB9DQo+ID4NCj4gPiArc3RhdGljIGludCBzZXRfY3RyX2VsMChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsDQo+ID4gKwkJICAgICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLCB1NjQgdXNl
-cl92YWwpDQo+ID4gK3sNCj4gPiArCXU4IHVzZXJfTDFJcCA9IFNZU19GSUVMRF9HRVQoQ1RSX0VM
-MCwgTDFJcCwgdXNlcl92YWwpOw0KPiA+ICsNCj4gPiArCS8qDQo+ID4gKwkgKiBCb3RoIEFJVklW
-VCAoMGIwMSkgYW5kIFZQSVBUICgwYjAwKSBhcmUgZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4g
-PiArCSAqIEhlbmNlIG9ubHkgYWxsb3cgdG8gc2V0IFZJUFQoMGIxMCkgb3IgUElQVCgwYjExKSBm
-b3IgTDFJcCBiYXNlZA0KPiA+ICsJICogb24gd2hhdCBoYXJkd2FyZSByZXBvcnRzLg0KPiA+ICsJ
-ICoNCj4gPiArCSAqIFVzaW5nIGEgVklQVCBzb2Z0d2FyZSBtb2RlbCBvbiBQSVBUIHdpbGwgbGVh
-ZCB0byBvdmVyDQo+IGludmFsaWRhdGlvbiwNCj4gPiArCSAqIGJ1dCBzdGlsbCBjb3JyZWN0LiBI
-ZW5jZSwgd2UgY2FuIGFsbG93IGRvd25ncmFkaW5nIFBJUFQgdG8gVklQVCwNCj4gPiArCSAqIGJ1
-dCBub3QgdGhlIG90aGVyIHdheSBhcm91bmQuIFRoaXMgaXMgaGFuZGxlZCB2aWENCj4gYXJtNjRf
-ZnRyX3NhZmVfdmFsdWUoKQ0KPiA+ICsJICogYXMgQ1RSX0VMMCBmdHJfYml0cyBoYXMgTDFJcCBm
-aWVsZCB0eXBlIEZUUl9FWEFDVCB3aXRoIHNhZmUgdmFsdWUNCj4gPiArCSAqIHNldCBhcyBWSVBU
-KQ0KPiA+ICsJICovDQo+ID4gKwlpZiAodXNlcl9MMUlwIDwgQ1RSX0VMMF9MMUlwX1ZJUFQpDQo+
-ID4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+IA0KPiBJJ20gbm90IG92ZXJseSBmb25kIG9mIHRoaXMs
-IGJlY2F1c2UgdGhlIG9yZGVyaW5nIG9mIGNhY2hlIHR5cGVzIGlzDQo+IGFyYml0cmFyeSAoaXQg
-cmVhbGx5IGlzIGFuIGVudW1lcmF0aW9uKS4gSSB3b3VsZCByYXRoZXIgc2VlIHRoZQ0KPiBhbGxv
-d2VkIGNhY2hlIHR5cGVzIGV4cGxpY2l0bHkgbGlzdGVkLiBJdCBkb2Vzbid0IGNoYW5nZSBhIHRo
-aW5nLCBidXQNCj4gbWFrZXMgaXQgYWxsIG11Y2ggbW9yZSByZWFkYWJsZS4NCg0KRG9lcyB0aGF0
-IG1lYW4sIGp1c3QgY2hlY2sgZXhwbGljaXRseSByYXRoZXIgdGhhbiB1c2VyX0wxSXAgPCBDVFJf
-RUwwX0wxSXBfVklQVCA/DQpzb21ldGhpbmcgbGlrZSwNCg0KSWYgKCh1c2VyX0wxSXAgIT0gIENU
-Ul9FTDBfTDFJcF9WSVBUKSAmJiAgKHVzZXJfTDFJcCAhPSAgQ1RSX0VMMF9MMUlwX1BJUFQpDQoJ
-cmV0dXJuIC1FSU5WQUw7DQoNCkJ1dCBpc24ndCB0aGlzIGNhY2hlIHBvbGljeSB0eXBlIHZhbHVl
-cyBkZXNjcmliZWQgaW4gQVJNIEFSTSA/IFNvIG5vdCBzdXJlDQpob3cgdGhleSBjYW4gZW5kIHVw
-IGhhdmluZyBkaWZmZXJlbnQgZW51bSB2YWx1ZXMuDQoNCk9yIHlvdSBtZWFudCBzb21ldGhpbmcg
-dG90YWxseSBkaWZmZXJlbnQgYW5kIEkgbWlzc2VkIGl0IQ0KDQpUaGFua3MsDQpTaGFtZWVyDQoN
-Cg0K
+On Mon, 21 Oct 2024 08:23:24 +0100,
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> > -----Original Message-----
+> > From: Marc Zyngier <maz@kernel.org>
+> > Sent: Friday, October 18, 2024 11:23 AM
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: kvmarm@lists.linux.dev; oliver.upton@linux.dev;
+> > james.morse@arm.com; joey.gouly@arm.com; suzuki.poulose@arm.com;
+> > yuzenghui <yuzenghui@huawei.com>; Wangzhou (B)
+> > <wangzhou1@hisilicon.com>; linux-arm-kernel@lists.infradead.org;
+> > Linuxarm <linuxarm@huawei.com>
+> > Subject: Re: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable
+> > from userspace
+> >=20
+> > On Thu, 17 Oct 2024 09:59:25 +0100,
+> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> > >
+> > > Only allow userspace to set VIPT(0b10) or PIPT(0b11) for L1Ip based on
+> > > what hardware reports as both=C2=A0AIVIVT (0b01) and VPIPT (0b00) are
+> > > documented as reserved.
+> > >
+> > > Using a VIPT for Guest where hardware reports PIPT may lead to over
+> > > invalidation, but is still correct. Hence, we can allow downgrading
+> > > PIPT to VIPT, but not the other way around.
+> > >
+> > > Signed-off-by: Shameer Kolothum
+> > <shameerali.kolothum.thodi@huawei.com>
+> > > ---
+> > > This is based on the dicsussion here[0].
+> > >
+> > https://lore.kernel.org/kvmarm/0db19a081d9e41f08b0043baeef16f16@hua
+> > wei.com/
+> > >
+> > > Also depends on Joey's series[1] as it make use of the ID_FILTERED ma=
+cro.
+> > >
+> > > I am not sure we need to explicitly make the ftr type as FTR_LOWER_SA=
+FE
+> > > in kvm_arm64_ftr_safe_value() or as mentioned below can depend on
+> > > arm64_ftr_safe_value() for this ftr bits.
+> >=20
+> > I think relying on the arch code for this is the right thing to
+> > do. This was designed to cope with heterogeneous systems where you
+> > could have both PIPT and VIPT caches in the system, and we don't allow
+> > a late comer to be VIPT if we're decided on PIPT (hence the
+> > FTR_EXACT).
+>=20
+> Ok. I will keep it as it is.
+>=20
+> >=20
+> > >
+> > > Please take a look and let me know.
+> > >
+> > > Thanks,
+> > > Shameer
+> > >
+> > > [0]
+> > https://lore.kernel.org/kvmarm/0db19a081d9e41f08b0043baeef16f16@hua
+> > wei.com/
+> > > [1] https://lore.kernel.org/kvmarm/20241015133923.3910916-1-
+> > joey.gouly@arm.com/
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 32 ++++++++++++++++++++++++++++----
+> > >  1 file changed, 28 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index d97ccf1c1558..819dcb63febd 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -1872,6 +1872,28 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu
+> > *vcpu,
+> > >  	return set_id_reg(vcpu, rd, user_val);
+> > >  }
+> > >
+> > > +static int set_ctr_el0(struct kvm_vcpu *vcpu,
+> > > +		       const struct sys_reg_desc *rd, u64 user_val)
+> > > +{
+> > > +	u8 user_L1Ip =3D SYS_FIELD_GET(CTR_EL0, L1Ip, user_val);
+> > > +
+> > > +	/*
+> > > +	 * Both AIVIVT (0b01) and VPIPT (0b00) are documented as reserved.
+> > > +	 * Hence only allow to set VIPT(0b10) or PIPT(0b11) for L1Ip based
+> > > +	 * on what hardware reports.
+> > > +	 *
+> > > +	 * Using a VIPT software model on PIPT will lead to over
+> > invalidation,
+> > > +	 * but still correct. Hence, we can allow downgrading PIPT to VIPT,
+> > > +	 * but not the other way around. This is handled via
+> > arm64_ftr_safe_value()
+> > > +	 * as CTR_EL0 ftr_bits has L1Ip field type FTR_EXACT with safe value
+> > > +	 * set as VIPT)
+> > > +	 */
+> > > +	if (user_L1Ip < CTR_EL0_L1Ip_VIPT)
+> > > +		return -EINVAL;
+> >=20
+> > I'm not overly fond of this, because the ordering of cache types is
+> > arbitrary (it really is an enumeration). I would rather see the
+> > allowed cache types explicitly listed. It doesn't change a thing, but
+> > makes it all much more readable.
+>=20
+> Does that mean, just check explicitly rather than user_L1Ip < CTR_EL0_L1I=
+p_VIPT ?
+> something like,
+>=20
+> If ((user_L1Ip !=3D  CTR_EL0_L1Ip_VIPT) &&  (user_L1Ip !=3D  CTR_EL0_L1Ip=
+_PIPT)
+> 	return -EINVAL;
+>=20
+> But isn't this cache policy type values described in ARM ARM ? So not sure
+> how they can end up having different enum values.
+>=20
+> Or you meant something totally different and I missed it!
+
+These are indeed the architected values, but my point is that the
+architecture doesn't really describe them as an ordered set, which is
+a difference from the other feature regs. Instead, it is defined as an
+enumeration by the architecture (there is no order between the
+possible implementations).  Your code is correct, but implies order
+between the various values.
+
+For example, back when VPIPT was still a thing, it had a value of
+0b00, which is smaller than VIPT (0b10) and yet you can't emulate
+VPIPT on top of VIPT. Same thing for AIVIVT.
+
+So I'm pretty reluctant to give the impression that there is an order
+here, and I'd rather enumerate all the valid values. It's not that we
+have too many anyway.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
