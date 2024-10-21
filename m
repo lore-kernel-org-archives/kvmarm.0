@@ -1,109 +1,134 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FECA2BB15
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 04:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D3A194A73
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 07:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729483774; cv=none; b=Cbn7jgm2KY9x4lG23kGsOgUgAX78adt48WhnML89UMjsDoVVbyzFqS+s0NodPWZnahUgvbCS43Aa3le3jR3hNNLofJ5XHfeeQ2NdCIVY166tg5BqFFiETJ4ulER1MEWnKA5+l2WneRlU89jGfcHJRzLbJSPcH4qxmWFdFMIER7s=
+	t=1729495413; cv=none; b=rEgHQfiekJ0ehroDNZSOptAhmufY2F1TtoZl5X29d/w+H3rAH2YDru8g/3J9/wUNM8n7zHUYPmbXSbCrbFjlNqnXHMd2Z6MQ48Z+oWDJHmmSXN+0cgOUp69MMAOgNQImuMxppJv+fzuO/iyGgVuxqgrh7Se3S8rZhUJhTtTcZTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729483774; c=relaxed/simple;
-	bh=VXRz3P41kYuI7xSCGibxd7bMyoaHrq0zIRlGRVu8W6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q2x5AxMNLWmia8BB2TXmFvDrgR77V+l8lWpNOIS+oEZ319wMu0Lsf0fd6PPa9yMRDSvHTLs2u4+APgeYHTz1Sdq4dpkFseEWXLTfH2lxF19GEMlkZNKTiwwpwMZVx+NYEWtTrhtl2xRrH048XAX7/0jWed9k39faiz0Op4j/1us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25495DA7;
-	Sun, 20 Oct 2024 21:10:01 -0700 (PDT)
-Received: from [10.162.16.109] (a077893.blr.arm.com [10.162.16.109])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4FAE13F73B;
-	Sun, 20 Oct 2024 21:09:28 -0700 (PDT)
-Message-ID: <3f1eb97e-0fa6-47d9-96d6-9fedabd969f7@arm.com>
-Date: Mon, 21 Oct 2024 09:39:25 +0530
+	s=arc-20240116; t=1729495413; c=relaxed/simple;
+	bh=FLVdoZ6f6dT1jKfwYZxe0KOWwsV7GEx4v2Y763FXmOs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z+3ZujFIsagHzPoXTLoh0k8TMMkAin+fDtXd0OI4m+Izdt1gmEXb26GfjUC8rK6BIXx9DZXOsWx7y99C1LUqD/YIAW3JDLZcYvNWxBl/l0VwQ6aw+Ql52CZyzWBsXNsDr7gbhoGDSXe3996HxphB5RDBO2r2EMT+38tbvGeHY74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XX6Dn472QzpWG7;
+	Mon, 21 Oct 2024 15:21:29 +0800 (CST)
+Received: from dggems706-chm.china.huawei.com (unknown [10.3.19.183])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0244F1402E2;
+	Mon, 21 Oct 2024 15:23:27 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ dggems706-chm.china.huawei.com (10.3.19.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 21 Oct 2024 15:23:26 +0800
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Mon, 21 Oct 2024 09:23:24 +0200
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "james.morse@arm.com"
+	<james.morse@arm.com>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, yuzenghui
+	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
+Subject: RE: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
+ userspace
+Thread-Topic: [PATCH] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
+ userspace
+Thread-Index: AQHbIHOWPQXDKdHiMkqUxKw+yhwbxbKMLRMAgASjFpA=
+Date: Mon, 21 Oct 2024 07:23:24 +0000
+Message-ID: <ec2aeb95ffb54bd59d81f481ef67fa1f@huawei.com>
+References: <20241017085925.40532-1-shameerali.kolothum.thodi@huawei.com>
+ <86h6994smf.wl-maz@kernel.org>
+In-Reply-To: <86h6994smf.wl-maz@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- kvmarm@lists.linux.dev
-References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20241001043602.1116991-1-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-
-
-On 10/1/24 10:05, Anshuman Khandual wrote:
-> This series enables FEAT_Debugv8p9 thus extending breakpoint and watchpoint
-> support upto 64. This series is based on v6.12-rc1 after applying the KVM
-> FEAT_FGT2 FGU series.
-> 
-> https://lore.kernel.org/all/20241001024356.1096072-1-anshuman.khandual@arm.com/
-> 
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> 
-> Changes in V1:
-> 
-> - Changed FTR_STRICT to FTR_NONSTRICT for the following ID_AA64DFR1_EL1
->   register fields - ABL_CMPs, DPFZS, PMICNTR, CTX_CMPs, WRPs and BRPs
-> 
-> Changes in RFC V2:
-> 
-> https://lore.kernel.org/linux-arm-kernel/20240620092607.267132-1-anshuman.khandual@arm.com/
-> 
-> - This series has been split from RFC V1 dealing only with arm64 breakpoints
-> - Restored back DBG_MDSCR_MASK definition (unrelated change)
-> - Added preempt_disable()/enable() blocks between selecting banks and registers
-> 
-> Changes in RFC:
-> 
-> https://lore.kernel.org/all/20240405080008.1225223-1-anshuman.khandual@arm.com/
-> 
-> Anshuman Khandual (3):
->   arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
->   arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
->   arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-> 
->  Documentation/arch/arm64/booting.rst    | 19 ++++++++++
->  arch/arm64/include/asm/debug-monitors.h |  1 +
->  arch/arm64/include/asm/el2_setup.h      | 27 +++++++++++++
->  arch/arm64/include/asm/hw_breakpoint.h  | 50 ++++++++++++++++++++-----
->  arch/arm64/include/asm/kvm_arm.h        |  1 +
->  arch/arm64/kernel/cpufeature.c          | 21 ++++++++---
->  arch/arm64/kernel/debug-monitors.c      | 16 ++++++--
->  arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++
->  8 files changed, 149 insertions(+), 19 deletions(-)
-> 
-
-Hello,
-
-Gentle ping ! Any updates on this series ? Although I realize that this series is
-dependent on the other FEAT_FGT2 series [1] for MDSELR_EL1 access handling in KVM
-and sysreg definitions, but just wondering if proposed breakpoint and watchpoint
-changes are okay or something needs to be changed. Thank you.
-
-[1] https://lore.kernel.org/all/20241001024356.1096072-1-anshuman.khandual@arm.com/
-
-- Anshuman
+SGkgTWFyYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXJjIFp5
+bmdpZXIgPG1hekBrZXJuZWwub3JnPg0KPiBTZW50OiBGcmlkYXksIE9jdG9iZXIgMTgsIDIwMjQg
+MTE6MjMgQU0NCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29s
+b3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gQ2M6IGt2bWFybUBsaXN0cy5saW51eC5kZXY7IG9s
+aXZlci51cHRvbkBsaW51eC5kZXY7DQo+IGphbWVzLm1vcnNlQGFybS5jb207IGpvZXkuZ291bHlA
+YXJtLmNvbTsgc3V6dWtpLnBvdWxvc2VAYXJtLmNvbTsNCj4geXV6ZW5naHVpIDx5dXplbmdodWlA
+aHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0KPiA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+OyBs
+aW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7DQo+IExpbnV4YXJtIDxsaW51eGFy
+bUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBLVk06IGFybTY0OiBNYWtlIEwx
+SXAgZmVhdHVyZSBpbiBDVFJfRUwwIHdyaXRhYmxlDQo+IGZyb20gdXNlcnNwYWNlDQo+IA0KPiBP
+biBUaHUsIDE3IE9jdCAyMDI0IDA5OjU5OjI1ICswMTAwLA0KPiBTaGFtZWVyIEtvbG90aHVtIDxz
+aGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+DQo+ID4gT25s
+eSBhbGxvdyB1c2Vyc3BhY2UgdG8gc2V0IFZJUFQoMGIxMCkgb3IgUElQVCgwYjExKSBmb3IgTDFJ
+cCBiYXNlZCBvbg0KPiA+IHdoYXQgaGFyZHdhcmUgcmVwb3J0cyBhcyBib3RowqBBSVZJVlQgKDBi
+MDEpIGFuZCBWUElQVCAoMGIwMCkgYXJlDQo+ID4gZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4g
+Pg0KPiA+IFVzaW5nIGEgVklQVCBmb3IgR3Vlc3Qgd2hlcmUgaGFyZHdhcmUgcmVwb3J0cyBQSVBU
+IG1heSBsZWFkIHRvIG92ZXINCj4gPiBpbnZhbGlkYXRpb24sIGJ1dCBpcyBzdGlsbCBjb3JyZWN0
+LiBIZW5jZSwgd2UgY2FuIGFsbG93IGRvd25ncmFkaW5nDQo+ID4gUElQVCB0byBWSVBULCBidXQg
+bm90IHRoZSBvdGhlciB3YXkgYXJvdW5kLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogU2hhbWVl
+ciBLb2xvdGh1bQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiA+
+IC0tLQ0KPiA+IFRoaXMgaXMgYmFzZWQgb24gdGhlIGRpY3N1c3Npb24gaGVyZVswXS4NCj4gPg0K
+PiBodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm1hcm0vMGRiMTlhMDgxZDllNDFmMDhiMDA0M2Jh
+ZWVmMTZmMTZAaHVhDQo+IHdlaS5jb20vDQo+ID4NCj4gPiBBbHNvIGRlcGVuZHMgb24gSm9leSdz
+IHNlcmllc1sxXSBhcyBpdCBtYWtlIHVzZSBvZiB0aGUgSURfRklMVEVSRUQgbWFjcm8uDQo+ID4N
+Cj4gPiBJIGFtIG5vdCBzdXJlIHdlIG5lZWQgdG8gZXhwbGljaXRseSBtYWtlIHRoZSBmdHIgdHlw
+ZSBhcyBGVFJfTE9XRVJfU0FGRQ0KPiA+IGluIGt2bV9hcm02NF9mdHJfc2FmZV92YWx1ZSgpIG9y
+IGFzIG1lbnRpb25lZCBiZWxvdyBjYW4gZGVwZW5kIG9uDQo+ID4gYXJtNjRfZnRyX3NhZmVfdmFs
+dWUoKSBmb3IgdGhpcyBmdHIgYml0cy4NCj4gDQo+IEkgdGhpbmsgcmVseWluZyBvbiB0aGUgYXJj
+aCBjb2RlIGZvciB0aGlzIGlzIHRoZSByaWdodCB0aGluZyB0bw0KPiBkby4gVGhpcyB3YXMgZGVz
+aWduZWQgdG8gY29wZSB3aXRoIGhldGVyb2dlbmVvdXMgc3lzdGVtcyB3aGVyZSB5b3UNCj4gY291
+bGQgaGF2ZSBib3RoIFBJUFQgYW5kIFZJUFQgY2FjaGVzIGluIHRoZSBzeXN0ZW0sIGFuZCB3ZSBk
+b24ndCBhbGxvdw0KPiBhIGxhdGUgY29tZXIgdG8gYmUgVklQVCBpZiB3ZSdyZSBkZWNpZGVkIG9u
+IFBJUFQgKGhlbmNlIHRoZQ0KPiBGVFJfRVhBQ1QpLg0KDQpPay4gSSB3aWxsIGtlZXAgaXQgYXMg
+aXQgaXMuDQoNCj4gDQo+ID4NCj4gPiBQbGVhc2UgdGFrZSBhIGxvb2sgYW5kIGxldCBtZSBrbm93
+Lg0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+IFNoYW1lZXINCj4gPg0KPiA+IFswXQ0KPiBodHRwczov
+L2xvcmUua2VybmVsLm9yZy9rdm1hcm0vMGRiMTlhMDgxZDllNDFmMDhiMDA0M2JhZWVmMTZmMTZA
+aHVhDQo+IHdlaS5jb20vDQo+ID4gWzFdIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bWFybS8y
+MDI0MTAxNTEzMzkyMy4zOTEwOTE2LTEtDQo+IGpvZXkuZ291bHlAYXJtLmNvbS8NCj4gPiAtLS0N
+Cj4gPiAgYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDMyICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKystLS0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCA0IGRl
+bGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdz
+LmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQo+ID4gaW5kZXggZDk3Y2NmMWMxNTU4Li44
+MTlkY2I2M2ZlYmQgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYw0K
+PiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCj4gPiBAQCAtMTg3Miw2ICsxODcy
+LDI4IEBAIHN0YXRpYyBpbnQgc2V0X2lkX2FhNjRwZnIxX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUNCj4g
+KnZjcHUsDQo+ID4gIAlyZXR1cm4gc2V0X2lkX3JlZyh2Y3B1LCByZCwgdXNlcl92YWwpOw0KPiA+
+ICB9DQo+ID4NCj4gPiArc3RhdGljIGludCBzZXRfY3RyX2VsMChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUsDQo+ID4gKwkJICAgICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLCB1NjQgdXNl
+cl92YWwpDQo+ID4gK3sNCj4gPiArCXU4IHVzZXJfTDFJcCA9IFNZU19GSUVMRF9HRVQoQ1RSX0VM
+MCwgTDFJcCwgdXNlcl92YWwpOw0KPiA+ICsNCj4gPiArCS8qDQo+ID4gKwkgKiBCb3RoIEFJVklW
+VCAoMGIwMSkgYW5kIFZQSVBUICgwYjAwKSBhcmUgZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4g
+PiArCSAqIEhlbmNlIG9ubHkgYWxsb3cgdG8gc2V0IFZJUFQoMGIxMCkgb3IgUElQVCgwYjExKSBm
+b3IgTDFJcCBiYXNlZA0KPiA+ICsJICogb24gd2hhdCBoYXJkd2FyZSByZXBvcnRzLg0KPiA+ICsJ
+ICoNCj4gPiArCSAqIFVzaW5nIGEgVklQVCBzb2Z0d2FyZSBtb2RlbCBvbiBQSVBUIHdpbGwgbGVh
+ZCB0byBvdmVyDQo+IGludmFsaWRhdGlvbiwNCj4gPiArCSAqIGJ1dCBzdGlsbCBjb3JyZWN0LiBI
+ZW5jZSwgd2UgY2FuIGFsbG93IGRvd25ncmFkaW5nIFBJUFQgdG8gVklQVCwNCj4gPiArCSAqIGJ1
+dCBub3QgdGhlIG90aGVyIHdheSBhcm91bmQuIFRoaXMgaXMgaGFuZGxlZCB2aWENCj4gYXJtNjRf
+ZnRyX3NhZmVfdmFsdWUoKQ0KPiA+ICsJICogYXMgQ1RSX0VMMCBmdHJfYml0cyBoYXMgTDFJcCBm
+aWVsZCB0eXBlIEZUUl9FWEFDVCB3aXRoIHNhZmUgdmFsdWUNCj4gPiArCSAqIHNldCBhcyBWSVBU
+KQ0KPiA+ICsJICovDQo+ID4gKwlpZiAodXNlcl9MMUlwIDwgQ1RSX0VMMF9MMUlwX1ZJUFQpDQo+
+ID4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+IA0KPiBJJ20gbm90IG92ZXJseSBmb25kIG9mIHRoaXMs
+IGJlY2F1c2UgdGhlIG9yZGVyaW5nIG9mIGNhY2hlIHR5cGVzIGlzDQo+IGFyYml0cmFyeSAoaXQg
+cmVhbGx5IGlzIGFuIGVudW1lcmF0aW9uKS4gSSB3b3VsZCByYXRoZXIgc2VlIHRoZQ0KPiBhbGxv
+d2VkIGNhY2hlIHR5cGVzIGV4cGxpY2l0bHkgbGlzdGVkLiBJdCBkb2Vzbid0IGNoYW5nZSBhIHRo
+aW5nLCBidXQNCj4gbWFrZXMgaXQgYWxsIG11Y2ggbW9yZSByZWFkYWJsZS4NCg0KRG9lcyB0aGF0
+IG1lYW4sIGp1c3QgY2hlY2sgZXhwbGljaXRseSByYXRoZXIgdGhhbiB1c2VyX0wxSXAgPCBDVFJf
+RUwwX0wxSXBfVklQVCA/DQpzb21ldGhpbmcgbGlrZSwNCg0KSWYgKCh1c2VyX0wxSXAgIT0gIENU
+Ul9FTDBfTDFJcF9WSVBUKSAmJiAgKHVzZXJfTDFJcCAhPSAgQ1RSX0VMMF9MMUlwX1BJUFQpDQoJ
+cmV0dXJuIC1FSU5WQUw7DQoNCkJ1dCBpc24ndCB0aGlzIGNhY2hlIHBvbGljeSB0eXBlIHZhbHVl
+cyBkZXNjcmliZWQgaW4gQVJNIEFSTSA/IFNvIG5vdCBzdXJlDQpob3cgdGhleSBjYW4gZW5kIHVw
+IGhhdmluZyBkaWZmZXJlbnQgZW51bSB2YWx1ZXMuDQoNCk9yIHlvdSBtZWFudCBzb21ldGhpbmcg
+dG90YWxseSBkaWZmZXJlbnQgYW5kIEkgbWlzc2VkIGl0IQ0KDQpUaGFua3MsDQpTaGFtZWVyDQoN
+Cg0K
