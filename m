@@ -1,67 +1,69 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88611FAC21
-	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FAC1F9A9C
+	for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 18:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729534134; cv=none; b=uZZlTpP/RXrNeB6GgqZfKeSs7co6OVW0T8f0XV1uf/54EKEjfSjwBzdlUy3qH4KHa7YDUJw0OxHDs1TgBPqt6/uFBVm44FlnlIbY4V+irauzMa8hkDSWkWfcustv7tbmerTMfGMRfOtqAJGWzz13NdQAvTffjWcCs14s+IIc0GM=
+	t=1729534394; cv=none; b=evM6zuqaXFKjWFz/IkrB2UfIGY1nYvypnjh9hPaTcnLpxbKPpJ6Bp7eOHC2n+wRAWQhiKHJsD+HQ9zYZ3Q3LFjJWHzdKp3enyz/8Apbd4QD043doWtKqG8DUOWliy4V7hYX9ST0JxqHTlam+V5nXt/VSUTDD2rVNxzNwEbLFVK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729534134; c=relaxed/simple;
-	bh=lGAahFUJB47Jv0GHevlLPsXzZ4O8VtjPyAFbuGdCp8E=;
+	s=arc-20240116; t=1729534394; c=relaxed/simple;
+	bh=YeXYNnt8ENmKuB15YwhakNFnDdgCdBZF4Bj1D5TS0z8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pBXG5WN1NDeNsLQf5mQzRT4j64boIZShNptNoVT3v1klobYBHYXdQWW66R+TVyY9PP7CjNTKQDx/rDckHOxT0aFhkthPsfzQUYR72TbQcVCbSR/mlv+OqhBd3w+Uxvhpb8coLj+7QWz53uDpNX1ypF+6Qy7FnpNUauT2EXeR8rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R36JuzFX; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=AUjlCxbXSEawf+JohCk0kveNH+4iAXhPdR1OLgPbGjXCgdmpBJL45FIjy6xW3bZNfiDP1nQMGu8EMPm/vxCXeyotYxXHbPyzRyVAr4EOAVmlcRfw5IUqJTrK+adD6brzlSpNOhNZVzNFmtWx+6ISoigMYG/kJogypuJdvbvjo8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=joBsGhEb; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R36JuzFX"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e5c75bee71so1376763a91.0
-        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 11:08:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="joBsGhEb"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e290947f6f8so8215924276.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 11:13:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729534131; x=1730138931; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4nB5AD8jm9woOflkJu9LaOALYzY3FWUJ+pKW1FSB8o=;
-        b=R36JuzFXePXUZhWzKa/NR0txmpImVhmvaH3EVKvLLBQSln0i+jIJcrqG/QlKLOsrcJ
-         eHPP1cCIckoUMDa7PlJe5b4eVS6b26G00DugV6RhJqpnvaAwbMPvIovysMQiT4uuzsvV
-         G1ugQbsdog9hHTNi/8MavklNIDiVAoKcChDyVhfuHYQIe8Fje8YoH9uvTmUt3aqbSkqJ
-         wawTc1bbnJHonZ8ttDZvKLOpgmAYshbnmqnmQY3UjOWwdHbi2Uv0pyQwT0aHwwTE2rH7
-         0jTpOTI5mCnOO/N2OIN1wGUIHgRA1LrkCCNF0pqis5AW6iv4NPbejKOKQ5im7aSyE5Xe
-         ANAQ==
+        d=google.com; s=20230601; t=1729534390; x=1730139190; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/aTJKIPGdXYIQ4z1/mPhLVqGYb++KmSjcoFUbuTd6EE=;
+        b=joBsGhEbso4disLN0jA9bcEDtjn0o39o8CEEVEPU7YP74AP3fzYWsnUytRX2CzOdgo
+         /sfEjcSnbmIS5CgRS9bR0yBpYriNbysNp/z+GbtMfFHCT1pydmyL0CGljaSmPdy0tVR6
+         eR/2pMYS+pZGiVB6npeLtAxr0MlqboQz7cCiTkuKER4dLLa4DOIy6g7o3KGPNdYmj/v9
+         NKNOIQ5nN5nw6zu+wI5jPlUI1z7tw/1yMu7WVwMc/ooW8q5h/qRTxZmvdlvxTTUYPSD8
+         ypMwyqg+BDbadvS8C/o10BQFT9L831CN8AvUiGCwDNgygKfPu/EAvCGUPD2VMpDNhvMX
+         L86g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729534131; x=1730138931;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4nB5AD8jm9woOflkJu9LaOALYzY3FWUJ+pKW1FSB8o=;
-        b=iU1o1MsBRiNRhICHOudetn7J4HpmfD3BvG09r0xH1qLPDTvxd/mdTFOHOJE8OCPlMv
-         y/+9GhKi6QFNpmQ3/xxSwFTzhbsn9ufZUNAVfgA5/J6+44P7CxQ1Az5UtkU4OSsFPkqZ
-         m6BmanMwB6DnMVpyOUfbKcHW5thqG013g/b4YhKnhHi0bC5W3z9tjoiO84lcvwsyDKIo
-         VaOo5rFtxvMYnrd0TIbzvBuFTOFdrWlUytQG7lQyhbywy4cNpkEs2OOy35Tk/b/nM64g
-         Pr9npvjk7glzg76ga5u31GTAeq3kRvGmsbV+4NygZbCDUykL6zfvVECLgGmCq9i2J1Me
-         hg4w==
-X-Forwarded-Encrypted: i=1; AJvYcCW1vvXODIfXZHti0tsw6HvXMVJC8P8sCcCS9NKU95YpfT0E51lG3rfFev9+LHcNKO/mriY+vD8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyGvcH3XzprnbJOACmx40Ef5GjMwtupd/ZT+SykoQuAZ5d6f6+k
-	RnVouCUXg66jwELQZWBaObRJC9rpOTEQbarZZdSs0pvd9PzE7yLkP7ymtUJmejTnpgnIkii8az6
-	Niw==
-X-Google-Smtp-Source: AGHT+IHz/sqxbIaZMzAhwQE+KHAQ50pc4vGOx7OQ/MlEMfrpYKQ16K4ySzEgLcCV5+myw9EmSbX31Z6uvf4=
+        d=1e100.net; s=20230601; t=1729534390; x=1730139190;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/aTJKIPGdXYIQ4z1/mPhLVqGYb++KmSjcoFUbuTd6EE=;
+        b=HYzvxpN6/ln9uDAr6vaAPgrPPIMQXfBadYTzYMT9qN/H/kPuNyxBwMwJAUtRUGN4Ik
+         qQzbNm1PBukybsat8oz5l0C6tfWmTMqGLcvlghnvKBOhBlFkSReKlasaE/UcdZNt1ntr
+         6PS34GlDmOydjexQLBipX4WDNCdTGeiL3gRI7v9pzelTSlKhT16WPzNb+YEBBH3aQQ1q
+         kIQCLHJuYcj2rfXHSxiX2UJp7cEvoaLOv5kfI9/GrDHhdo6GSPyq/lC5AwKaiZTJik0T
+         3DjWYc8RzfvxW7Brz04d3dU1r4EjiK+GnqTkQFb5MzVt+I2ME600RBEq8Eu8kL102YYw
+         /1GA==
+X-Forwarded-Encrypted: i=1; AJvYcCXCZVV2zxwmBK/YgwM/p3kl2DV8cdM1F6IKAAcSSYQ4Hr+5ah8qP1d++Z/wXPScA8vKR6iHy2I=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwTBiZIxTF5jBMmY/1Pv1OZklqCZTF8k9ld8mc7xOsseyMHjxk+
+	bSVQnB+d2M3llg8YGhPStBZGXz1fA3bVISprS8p3y/6AkNP4TRCxGe3KmKeGf1nkuIeBdFt7lxt
+	jOA==
+X-Google-Smtp-Source: AGHT+IGB051RPG0qZ1hHpRMmy9gqDX/0GH7so+xa+rGGnhbzxuPrj+6CH4debSRqPENvRC2d7Upq2p/funE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e147:b0:2d8:a9c2:2f3a with SMTP id
- 98e67ed59e1d1-2e5616d8f42mr22750a91.3.1729534130899; Mon, 21 Oct 2024
- 11:08:50 -0700 (PDT)
-Date: Mon, 21 Oct 2024 11:08:49 -0700
-In-Reply-To: <ZxYVnsW9WF1Wp8mx@yzhao56-desk.sh.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a25:8389:0:b0:e2b:e955:d58a with SMTP id
+ 3f1490d57ef6-e2be955d949mr2592276.7.1729534389536; Mon, 21 Oct 2024 11:13:09
+ -0700 (PDT)
+Date: Mon, 21 Oct 2024 11:13:08 -0700
+In-Reply-To: <ZxYeFKl2KbZ3Ila1@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-20-seanjc@google.com>
- <ZxYVnsW9WF1Wp8mx@yzhao56-desk.sh.intel.com>
-Message-ID: <ZxaYsfc0m6UHmi10@google.com>
-Subject: Re: [PATCH v13 19/85] KVM: Introduce kvm_follow_pfn() to eventually
- replace "gfn_to_pfn" APIs
+References: <20241010182427.1434605-1-seanjc@google.com> <20241010182427.1434605-35-seanjc@google.com>
+ <ZxYeFKl2KbZ3Ila1@yzhao56-desk.sh.intel.com>
+Message-ID: <ZxaZtJGfN2_5Db6h@google.com>
+Subject: Re: [PATCH v13 34/85] KVM: Get writable mapping for __kvm_vcpu_map()
+ only when necessary
 From: Sean Christopherson <seanjc@google.com>
 To: Yan Zhao <yan.y.zhao@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
@@ -77,23 +79,53 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, David Matlack <dmatlack@google.com>, 
 	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
 On Mon, Oct 21, 2024, Yan Zhao wrote:
-> On Thu, Oct 10, 2024 at 11:23:21AM -0700, Sean Christopherson wrote:
-> > --- a/virt/kvm/pfncache.c
-> > +++ b/virt/kvm/pfncache.c
-> > @@ -159,6 +159,12 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
-> >  	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
-> >  	void *new_khva = NULL;
-> >  	unsigned long mmu_seq;
-> > +	struct kvm_follow_pfn kfp = {
-> > +		.slot = gpc->memslot,
-> > +		.gfn = gpa_to_gfn(gpc->gpa),
-> > +		.flags = FOLL_WRITE,
-> > +		.hva = gpc->uhva,
-> > +	};
-> Is .map_writable uninitialized?
+> On Thu, Oct 10, 2024 at 11:23:36AM -0700, Sean Christopherson wrote:
+> > When creating a memory map for read, don't request a writable pfn from =
+the
+> > primary MMU.  While creating read-only mappings can be theoretically sl=
+ower,
+> > as they don't play nice with fast GUP due to the need to break CoW befo=
+re
+> > mapping the underlying PFN, practically speaking, creating a mapping is=
+n't
+> > a super hot path, and getting a writable mapping for reading is weird a=
+nd
+> > confusing.
+> >=20
+> > Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 080740f65061..b845e9252633 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3122,7 +3122,7 @@ int __kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t g=
+fn, struct kvm_host_map *map,
+> >  	struct kvm_follow_pfn kfp =3D {
+> >  		.slot =3D gfn_to_memslot(vcpu->kvm, gfn),
+> >  		.gfn =3D gfn,
+> > -		.flags =3D FOLL_WRITE,
+> > +		.flags =3D writable ? FOLL_WRITE : 0,
+> >  		.refcounted_page =3D &map->pinned_page,
+> >  		.pin =3D true,
+> >  	};
+> When writable is false, could we set ".pin =3D false," ?
 
-Nope, per C99, "subobjects without explicit initializers are initialized to zero",
-i.e. map_writable is initialized to "false".
+Hmm, maybe?  I can't imagine anything would actually break, but unless FOLL=
+_PIN
+implies writing, my preference would still be to pin the page so that KVM a=
+lways
+pins when accessing the actual data of a page.
+
+> Also not sure if ".map_writable =3D NULL" is missing.
+
+Doh, my previous response was slightly wrong, it's implicitly initialized t=
+o NULL,
+not false.  I forgot map_writable is a pointer to a bool.
