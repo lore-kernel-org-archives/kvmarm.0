@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DE5139CE2
-	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 16:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E717483
+	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 17:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729614472; cv=none; b=OJR7LiGCE+Vb4IUJFNMitHEm/6CvhfyXuklpDO9DaXquSYU6hnUDshbDayXq0ybjx3iU1hBQ7k5fcYigHL0pKMBG4qGOBIM+b16Xl/mIcHAa96F2L+6EXPJcKGqnW38WFWxstdwhkFDHS+wp7Uu+uLYO1AiB7nBHfqBgseyw204=
+	t=1729616480; cv=none; b=fZPmStwwHl8KMYWjZoQzqpylUbjV2ViU9trI1F+5fMOuZhAPE2e21CXuWniLYfFxFmgxw1ZCDhDfi+okjiib/ZVLDMt8Tj2ceSttBihMO/OXKKfkZwy4GfR0EPKIIPBjnFl2SPPWYAlw68roJYPuBynVhvD8JexEa6921QA84dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729614472; c=relaxed/simple;
-	bh=aiaLk0/pYxMe+hy33ylobQlryXbKMQZQZGyeJfR0iyg=;
+	s=arc-20240116; t=1729616480; c=relaxed/simple;
+	bh=Iatc3b/jGBS3/w0k/JE4kf/vo+9y4c4akyAfEBSaE2E=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rFJgOREB06rfhp+NzhJMfXn2Nqbn5QlYrQs7vtn4wMld/1Qi/mwiGxHtErrGGuESyoSyBxd1CpJXNlb0RU7Rkc4/d5l8rvb4rr7NWBmOOys3DIIIsLmE/JuN71VgvJ2elDhiggq1VV0cknpURl77nOsc2mkDoPHry4J7AHtT0vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZRCNFU7; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ipS9WQifc4Sb9gNDfJCBIjxGRx63OXsMSpPWph6tKEH5ut7yzemCxPVCV6ZCxx7RHEvvE8lqnHWAQH+pwaR051pFZjXm77ooOSSBt1ZYww1/Q+IrM6igOGOYVXVTBhHAcBNM2Wbz1jAMGOSIT6+h78+DDBUhQCvSZFlImvhCKkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5OuzqSi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZRCNFU7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 210A6C4CEC3;
-	Tue, 22 Oct 2024 16:27:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5OuzqSi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A254C4CEC3;
+	Tue, 22 Oct 2024 17:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729614472;
-	bh=aiaLk0/pYxMe+hy33ylobQlryXbKMQZQZGyeJfR0iyg=;
+	s=k20201202; t=1729616479;
+	bh=Iatc3b/jGBS3/w0k/JE4kf/vo+9y4c4akyAfEBSaE2E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oZRCNFU76ZfwpBQkEwWhaDAzfYg5xnxZ2uAx/TSukrfUHZhzhW3/hT+59kHqJVEUj
-	 ZunuepgyT2OUz8GaJLMTNByIpY7kcqA1RQtTl6Fzq9vgk45d2DHpmvgYV/NshkZFt6
-	 hSeakjF9lf9RsxIOPK7lIXIKC5n520OtNdVk+uDMFqZS3Lk2fxMwp4MJucuEi0l0yE
-	 Y0E/qWnGtrvDRZbVOhpiyFm1Dp8uxVHJw8RzoYXWQ5EGGcNdw1yvlsTu//YNPkg/VB
-	 4jWaJ8UvtyjiwexBeIifK3xbBihhef3n3hUmRXUlGDvaAGXj3iPRgoK7rw7cWLC+6W
-	 /Ba3XvjNQY5Vg==
+	b=o5OuzqSipgJeNlpuQS8SCxcFINr4edXxEP9QJPxf0ouVOPfwTAYOoxi2pfhnx5NAT
+	 pPw98Pz7CPWen4YX9aQ2VcgaQZ835w8+WS1H9PnHifD6potGRm6AcfJMr79JyIH8dS
+	 2hP0W/cOiTSjmzcfyV3I0lgfFV9U45q9q9p+BppIiM2p0zlpzdeahatEWabKsb7O3+
+	 UL9Z3Bik9T9WcgbEVMwZIe2YXSP1mpHFLdrBxSsfc+kDQfikmowligqVplwCV3DYqD
+	 zbLIg9o/uHHPnMuStO5gE2T4x8CZ2Qq5S/4yps04rNQTi/BkW1c9ABuKrvUyyNPuOc
+	 JMlexzlcS2LeA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t3Hja-005qFN-3F;
-	Tue, 22 Oct 2024 17:27:50 +0100
-Date: Tue, 22 Oct 2024 17:27:48 +0100
-Message-ID: <867ca03xx7.wl-maz@kernel.org>
+	id 1t3IFx-005qr0-G5;
+	Tue, 22 Oct 2024 18:01:17 +0100
+Date: Tue, 22 Oct 2024 18:01:17 +0100
+Message-ID: <865xpk3wde.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,10 +41,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 1/2] KVM: arm64: Just advertise SEIS as 0 when emulating ICC_CTLR_EL1
-In-Reply-To: <20241022144016.27350-2-will@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: Don't map 'kvm_vgic_global_state' at EL2 with pKVM
+In-Reply-To: <20241022144016.27350-3-will@kernel.org>
 References: <20241022144016.27350-1-will@kernel.org>
-	<20241022144016.27350-2-will@kernel.org>
+	<20241022144016.27350-3-will@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,38 +60,57 @@ X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, oliver
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 22 Oct 2024 15:40:15 +0100,
+On Tue, 22 Oct 2024 15:40:16 +0100,
 Will Deacon <will@kernel.org> wrote:
 > 
-> ICC_CTLR_EL1 accesses from a guest are trapped and emulated on systems
-> with broken SEIS support and without FEAT_GICv3_TDIR. On such systems,
-> we mask SEIS support in 'kvm_vgic_global_state.ich_vtr_el2' and so the
-> value of ICC_CTLR_EL1.SEIS visible to the guest is always zero.
->
-> Simplify the ICC_CTLR_EL1 read emulation to return 0 for the SEIS field,
-> rather than reading an always-zero value from the global state.
+> Now that 'kvm_vgic_global_state' is no longer needed for ICC_CTLR_EL1
+> emulation on machines with a broken SEIS implementation, drop the
+> pKVM hypervisor mapping of the page.
 > 
 > Cc: Marc Zyngier <maz@kernel.org>
 > Cc: Oliver Upton <oliver.upton@linux.dev>
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/setup.c | 17 -----------------
+>  1 file changed, 17 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index 18d4677002b1..3f9741e51d41 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -1012,9 +1012,6 @@ static void __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
->  	/* IDbits */
->  	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
-> -	/* SEIS */
-> -	if (kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK)
-> -		val |= BIT(ICC_CTLR_EL1_SEIS_SHIFT);
->  	/* A3V */
->  	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
->  	/* EOImode */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 174007f3fadd..8fec099c2775 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -95,7 +95,6 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  {
+>  	void *start, *end, *virt = hyp_phys_to_virt(phys);
+>  	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
+> -	enum kvm_pgtable_prot prot;
+>  	int ret, i;
+>  
+>  	/* Recreate the hyp page-table using the early page allocator */
+> @@ -148,22 +147,6 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  	}
+>  
+>  	pkvm_create_host_sve_mappings();
+> -
+> -	/*
+> -	 * Map the host sections RO in the hypervisor, but transfer the
+> -	 * ownership from the host to the hypervisor itself to make sure they
+> -	 * can't be donated or shared with another entity.
+> -	 *
+> -	 * The ownership transition requires matching changes in the host
+> -	 * stage-2. This will be done later (see finalize_host_mappings()) once
+> -	 * the hyp_vmemmap is addressable.
+> -	 */
+> -	prot = pkvm_mkstate(PAGE_HYP_RO, PKVM_PAGE_SHARED_OWNED);
+> -	ret = pkvm_create_mappings(&kvm_vgic_global_state,
+> -				   &kvm_vgic_global_state + 1, prot);
+> -	if (ret)
+> -		return ret;
+> -
+>  	return 0;
+>  }
+
+Maybe add a note indicating that nVHE/hVHE still have that particular
+mapping via the rodata section?
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 
