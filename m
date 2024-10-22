@@ -1,55 +1,55 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BE883CC7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACF3C463
 	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 00:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729558040; cv=none; b=IL0MWJ1BCTKx9ES5cJmeBsV9JDriewrlBc3XZwj1IeH4S/B9HhM3ypCsCD1E6Hggyay/1ffEcBdkffzWVlFiSatyn+Qe8qzwBN4DXfRgsOUYrsSDO0GsMxYV2/JCFEa2XsRgiIbSmE+wReWFs7HrmduYUiYrkexyS5bP7DLXr0A=
+	t=1729558040; cv=none; b=A1xzmGnsbmA3kAz9CKbA+XhgKZqHj/5sb3QBrFbDu76itpFf2tullwJyWteYu9blHBGERbG+bXVFtfgH1W9/6SYY+rQSggwFdcK45iqYfE8t5QoDlnLFzi2+qiBimXOsiDYe4QvdsgM7Xr0NKid9meO2GP1T1eNKoYaUEMnc7rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729558040; c=relaxed/simple;
-	bh=3W9iajvimea6YrR9U732pMuKRx3PZLGRnnVS589DTvs=;
+	bh=esQoNZuXsR24jwPl1DfQPAsmfQfBH1AfjOxCgQQxj50=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I+/W1EyFpc2ZFgUVGhZOkZwLmQmG3lNCEcVF0DXFdEDM94b3r47uM0LF+Z1oRRixlCNVGa7FZRoQDiPqc6B9qp40KOCJjXTx9Lit4AMplHxgXfvNi22cRXosYeXJmPEVGrD9Yu5eLroGwIx9CAINAiGR2k4RiunnTgeG0iRwMyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n69I9pLb; arc=none smtp.client-ip=209.85.166.73
+	 To:Cc:Content-Type; b=K9Tmb+vK17WFYVmZ2g7xmUyj8MHd8LyJAnB612qJex1jz7Lp4lEcEvCQzSCuTvHxf8ltRxZcZRPmczvnKo56eGvGzgoWFqFsHXt/Rjua4Ff1J12Y3Pj8s83Mqv99tYhkgq6XC4A79bD9GYTads68dxa2HYS35W4ETxGXsgqvelE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gdOfQnzR; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n69I9pLb"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-832160abde4so385569839f.1
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gdOfQnzR"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2605ce4276so9149126276.3
         for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 17:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729558038; x=1730162838; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1729558037; x=1730162837; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fFBeTk/ypl/mbwDh0gs/JhAq5wRwgc/prGa+mqCvt5o=;
-        b=n69I9pLbB4WtFsqaTavpb+ri0rmmbJlvrJVnazSkdwqxPNvPN3Z6T8RECAH+8+xyWA
-         l06vYoBpo+WUNx/XstAkfr8h4E1YX58O6H3P2WffXI6QsuL+WiOGxUo5kx/2NT1XZ7/4
-         sA6V2vBkZcdSxwexCjl5ZvWwNjYl40TBkL0AOe9M4KVj49QJhAM1TfjcuBMx6+LIRQzr
-         6v1APhMzZXNDEmIqFxS/4gn2JB9XypIPGnlv+pTCkrR76+PrMhlSMdFR+z0E0ROSDqdq
-         6ArEXpXvVsxovw9SKa7jimv5qLTqv6V+SKJMc8Kx6sCjSXUywWsyp8yLGcf7RKDVTNXK
-         zPYw==
+        bh=eTpDcLprhbUi5YHe62ZQ4u0o+/QxbhbJTnRiVU+yROI=;
+        b=gdOfQnzRyc+qIF0l1e8clSNIzaKjBoXvCuKBfzWUavk4amdVCtwZy0ctvMLhGGOBHK
+         3DVhK/ZnYPKb3mpMRP5VhR8RM5Zvllhap7Ln7S5doJpepk9Y+PKi/0h7mzTjXFgS6mpe
+         AnDEjW/f/ZXyttl2kgj+3rtSU8auEOIdGfRLomLAeaoZjzcQOPS/OTeZFJMmbgDcvUMw
+         IXxKF5QjIsHOMf5uwwkL/rDVIRWTagmgfqbgjyCA+CsLw5iSOzn+qIQjHSmG5/qX73yc
+         iVJ+n3PHPw4+UwwZL9YXhgrdc4tmaWU0G++1huADeyhPs3t4cWCRf+rfnQdeG7jGQfy+
+         F1Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729558038; x=1730162838;
+        d=1e100.net; s=20230601; t=1729558037; x=1730162837;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fFBeTk/ypl/mbwDh0gs/JhAq5wRwgc/prGa+mqCvt5o=;
-        b=LICpxHqdexDkPzyBMrq0QicpizQae41ZM+pH4Xo0BeaXOnwMGRaS1yCiFLdofv2cRW
-         lQem8afBU467e1z9gyO3ZDbF3cyeej09FO8rXNeMV4jnbNNILrBnDfBu2pw6FHaoTIEI
-         9YFIgUKYkxnVZXJ6f49K0DYYB2EzkQlUn2x0nh2vuXaypowYhs1JIy+eDNlw5Nqafv5s
-         o2qo9z/rkgaUseN+BOHUNOU0aukKKrMPOQPNpYVsIjfr+GfsO9z0nBkv6x8CoEYQR+mN
-         G7pwrgQCwtNYUaa1S2q+5I+sQa4oKiAwEbghtSPqwZFyS7v12Dgmg+ShcqZkZ5HsQMzU
-         WY1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVTHfj4ZtrQQFgA2DZDPqgH+Cjue6qBwijq7qisB9il6EIwMjiqz3fyWItRuE+8RUo8hMiOEks=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzyunkRO2DzA5vqg4O1qtB/fCsSYBl/sEukpEQdLcrbGxJE3bbg
-	2zzYuVs5T/vNQMnkw+U2iK0s57aQJB2SAqNq7E1iIGivFWR6PxUgubpyKyegwnMlM8K4/1AklBr
-	osIBQPw==
-X-Google-Smtp-Source: AGHT+IGzqRDsg2PzRLzqCFl7gr4a8ftn+I8+zYOg3xTOpEKFCEBYRQxWqZwKNprPXM6RvFGVT+CQWKASwGCx
+        bh=eTpDcLprhbUi5YHe62ZQ4u0o+/QxbhbJTnRiVU+yROI=;
+        b=daqyjqrcgHdWCTrqfWzatFXQrUmdsCGAA+8X70XJLYbhIQUJb8WacY8pCXZlyJkEEf
+         aI+Ix1m32eCyFpao5BGLpl6uii5ZFGGGQ8JwGz44wCrgJXQRAV84c8cqHE7tSVywmW6l
+         bS/t4lhxqMYERFRm/RqMrFOPxR5I/oLQJ/FaPItPCSmUxeHTYuk6F0PIZOjxHGd76Bvm
+         zecq24rfyHzpIC9cxU7G6eDSlF+EDw1JHXGxpu78ahOgxWelOZaznzlK20dBHKPL2VaX
+         /wVzWMcbZh+DPpd0Oz+Fj1XLJjjLKHo9ZnZIvZ90LNfyqfWWeX2ipKW9GSVUbZtnvl6x
+         etkg==
+X-Forwarded-Encrypted: i=1; AJvYcCVgmgb24BcuzfJcbMzV4X/jMVQNCz6/Z/vH+nvUlNT6rixSqBm11nxlrd1SAcR09YqQJ7+49K8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyBaiIlLhwV0I7dAxfGjiH3DmRpu6TOXbzhSXdNN91Ib8Zg62Lp
+	PWcSEkjdsgonI/4wib8TVfb2cGzkStnnR0FzsvLAgrkrpZinYXPaN7qDXBlD6TtruEVbTQkBSju
+	f80ppwQ==
+X-Google-Smtp-Source: AGHT+IFHeu+s/6VJ8LwG/ln9c8VqGvj+9fWSI0sc1LDHdzQR9YS0qXRVl8XWuhvxBjalS3fnwkBU6xUhXVdb
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fac1])
- (user=rananta job=sendgmr) by 2002:a02:a613:0:b0:4db:e3a0:c40e with SMTP id
- 8926c6da1cb9f-4dc44251858mr9721173.0.1729558038062; Mon, 21 Oct 2024 17:47:18
- -0700 (PDT)
-Date: Tue, 22 Oct 2024 00:47:09 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6902:1807:b0:e29:7454:a4da with SMTP
+ id 3f1490d57ef6-e2bb12ed271mr8273276.4.1729558037283; Mon, 21 Oct 2024
+ 17:47:17 -0700 (PDT)
+Date: Tue, 22 Oct 2024 00:47:08 +0000
 In-Reply-To: <20241022004710.1888067-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241022004710.1888067-1-rananta@google.com>
 X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
-Message-ID: <20241022004710.1888067-3-rananta@google.com>
-Subject: [kvm-unit-tests PATCH 2/3] arm: fpu: Convert 'q' registers to 'v' to
- satisfy clang
+Message-ID: <20241022004710.1888067-2-rananta@google.com>
+Subject: [kvm-unit-tests PATCH 1/3] arm: Fix clang error in sve_vl()
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Subhasish Ghosh <subhasish.ghosh@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
 	Andrew Jones <andrew.jones@linux.dev>
@@ -70,89 +69,40 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Clang doesn't seem to support 'q' register notation in the clobbered
-list, and hence throws the following error:
+Fix the following clang error in sve_vl():
 
-arm/fpu.c:235:3: error: unknown register name 'q0' in asm
-                fpu_reg_read(outdata);
-                ^
-arm/fpu.c:59:10: note: expanded from macro 'fpu_reg_read'
-                     : "q0", "q1", "q2", "q3",          \
-                       ^
-arm/fpu.c:281:3: error: unknown register name 'q0' in asm
-                fpu_reg_write(*indata);
-                ^
-arm/fpu.c:92:10: note: expanded from macro 'fpu_reg_write'
-                     : "q0", "q1", "q2", "q3",          \
-                       ^
-2 errors generated.
-
-Hence, replace 'q' with 'v' registers for the clobbered list.
+In file included from arm/selftest.c:16:
+kvm-unit-tests/lib/asm/processor.h:163:16:
+error: value size does not match register size specified by the
+constraint and modifier [-Werror,-Wasm-operand-widths]
+                     : "=r" (vl));
+                             ^
+kvm-unit-tests/lib/asm/processor.h:162:14:
+note: use constraint modifier "w"
+                     "rdvl %0, #8"
+                           ^~
+                           %w0
+1 error generated.
 
 Fixes: d47d370c8f ("arm: Add test for FPU/SIMD context save/restore")
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arm/fpu.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ lib/arm64/asm/processor.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arm/fpu.c b/arm/fpu.c
-index edbd9a94..587b6ea3 100644
---- a/arm/fpu.c
-+++ b/arm/fpu.c
-@@ -56,16 +56,16 @@ static inline bool arch_collect_entropy(uint64_t *random)
- 		     "stp q30, q31, [%0], #32\n\t"	\
- 		     : "=r" (__val)			\
- 		     :					\
--		     : "q0", "q1", "q2", "q3",		\
--			"q4", "q5", "q6", "q7",		\
--			"q8", "q9", "q10", "q11",	\
--			"q12", "q13", "q14",		\
--			"q15", "q16", "q17",		\
--			"q18", "q19", "q20",		\
--			"q21", "q22", "q23",		\
--			"q24", "q25", "q26",		\
--			"q27", "q28", "q29",		\
--			"q30", "q31", "memory");	\
-+		     : "v0", "v1", "v2", "v3",		\
-+			"v4", "v5", "v6", "v7",		\
-+			"v8", "v9", "v10", "v11",	\
-+			"v12", "v13", "v14",		\
-+			"v15", "v16", "v17",		\
-+			"v18", "v19", "v20",		\
-+			"v21", "v22", "v23",		\
-+			"v24", "v25", "v26",		\
-+			"v27", "v28", "v29",		\
-+			"v30", "v31", "memory");	\
- })
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index b28d41fd..e261e74d 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -159,7 +159,7 @@ static inline int sve_vl(void)
+ 	int vl;
  
- #define fpu_reg_write(val)				\
-@@ -89,16 +89,16 @@ do {							\
- 		     "ldp q30, q31, [%0], #32\n\t"	\
- 		     :					\
- 		     : "r" (__val)			\
--		     : "q0", "q1", "q2", "q3",		\
--			"q4", "q5", "q6", "q7",		\
--			"q8", "q9", "q10", "q11",	\
--			"q12", "q13", "q14",		\
--			"q15", "q16", "q17",		\
--			"q18", "q19", "q20",		\
--			"q21", "q22", "q23",		\
--			"q24", "q25", "q26",		\
--			"q27", "q28", "q29",		\
--			"q30", "q31", "memory");	\
-+		     : "v0", "v1", "v2", "v3",		\
-+			"v4", "v5", "v6", "v7",		\
-+			"v8", "v9", "v10", "v11",	\
-+			"v12", "v13", "v14",		\
-+			"v15", "v16", "v17",		\
-+			"v18", "v19", "v20",		\
-+			"v21", "v22", "v23",		\
-+			"v24", "v25", "v26",		\
-+			"v27", "v28", "v29",		\
-+			"v30", "v31", "memory");	\
- } while (0)
+ 	asm volatile(".arch_extension sve\n"
+-		     "rdvl %0, #8"
++		     "rdvl %w0, #8"
+ 		     : "=r" (vl));
  
- #ifdef CC_HAS_SVE
+ 	return vl;
 -- 
 2.47.0.105.g07ac214952-goog
 
