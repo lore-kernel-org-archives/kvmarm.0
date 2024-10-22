@@ -1,41 +1,43 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3572219B3EE
-	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 13:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9807119DF75
+	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 14:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729602642; cv=none; b=NZaQfj1sznNi8oz+xGK1zHOCkLQ9c4ZRZv/2YqcsJ6P/FrFu9jQ16hSjBbyrgaUCHydtwtpMad6dcRZlJF/sUiB/sDUsz4OtEQvgRU1kI40lrDQrnzSyaxUa2QN/iuvOQiJ1KC/qJG+KLSH9SggBTzKpzta+xfZhCL6C91qPrEA=
+	t=1729607499; cv=none; b=RYiwcKMvgVrA8yGnmE6vHB7j0jTK8UEQEEh7As/zwA29NP4i4lOjxaA02zwqi22idxnlhpalcu/lgBQHOUTl7BkJn4TxKER5bRDlrAQSZ0Ye+0mbL3cztFDExtlyxA0HqowUeKLPcxvNdM+b3MwX374S3H3ivtA0UwLogNLubAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729602642; c=relaxed/simple;
-	bh=0Ma2PDD0lwXIcfNLvxy9IIu/pe4Bz/lSz8+5O8rOWuc=;
+	s=arc-20240116; t=1729607499; c=relaxed/simple;
+	bh=YIICbxSBUMBCyGXE2B5ZsX3IzNE/AzP2NdmkDfeRS80=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=takKm+2AOU8EUXFn0aNS30+iPC5kKg1hve9+ZIgmWc4NO9kgVcR1poLQyFX3x1k4V0HXHlA/CvobchpcXYABm66XwKjew+BqRwfIXe/wmzPXl20WXx/6Ob8GAiJMh495UMCtT0KO56BciwlF+GitL1FaFoUyQCG05ZHJKGt0+r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Oa3jcEpp; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Oa3jcEpp"
-Date: Tue, 22 Oct 2024 15:10:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729602637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L819H4TgTpR7m/nNd75LAwuiLs++CdEcR+lmxCWgMZI=;
-	b=Oa3jcEppLsYfNnHi1uKat6MfBfJXbqsxyXPAxQRICu+j36vjI5PNP8UF4XGv39oez+vJbE
-	0I6kM/2WPBi0WvkoqIy4sruOybnk3TzEWGN1CUDrHGdQpys59oYTsryTC0AqwZkWrhDVgQ
-	uoYlB81fDSXflTVwWCDRx/GEbDXzqic=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Subhasish Ghosh <subhasish.ghosh@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 0/3] Fix arm64 clang errors on fpu tests
-Message-ID: <20241022-2c60a0bcbb908435aa91d1ff@orel>
-References: <20241022004710.1888067-1-rananta@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lcK7swTY1o28r8OhD0IkGQEIIkTfSO+tU1Bpa/D7TuaiQkXBpuq3fPWkbj0OmYP0j7zy/eiF5KQ0jLukKHGLjO/p8I5VLuRPmoBQD1K/WZvLFhiRzUPJ6ZZROnt3B/woDfyM3nuHYG2YjcEkxtPtu+nXCL1PcOsfe7TZCeHJqfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C69F497;
+	Tue, 22 Oct 2024 07:32:06 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F0443F71E;
+	Tue, 22 Oct 2024 07:31:34 -0700 (PDT)
+Date: Tue, 22 Oct 2024 15:31:28 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	anshuman.khandual@arm.com, james.morse@arm.com,
+	Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 4/7] KVM: arm64: Fix missing traps of guest accesses
+ to the MPAM registers
+Message-ID: <20241022143128.GA1050981@e124191.cambridge.arm.com>
+References: <20241015133923.3910916-1-joey.gouly@arm.com>
+ <20241015133923.3910916-5-joey.gouly@arm.com>
+ <ZxBV6c4Z_GlyDoBr@linux.dev>
+ <20241017105849.GA122054@e124191.cambridge.arm.com>
+ <ZxE2NUNKSWuzVow2@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,46 +46,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241022004710.1888067-1-rananta@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <ZxE2NUNKSWuzVow2@linux.dev>
 
-On Tue, Oct 22, 2024 at 12:47:07AM +0000, Raghavendra Rao Ananta wrote:
-> When compiled with clang for arm64, some build errors were observed
-> along the fpu code. Moreover, data aborts were seen while running
-> the arm/fpu test due to misconfigured input/output args in the inline
-> assembly.
+On Thu, Oct 17, 2024 at 09:07:17AM -0700, Oliver Upton wrote:
+> On Thu, Oct 17, 2024 at 11:58:49AM +0100, Joey Gouly wrote:
+> > On Wed, Oct 16, 2024 at 05:10:17PM -0700, Oliver Upton wrote:
+> > > Hi Joey,
+> > > 
+> > > On Tue, Oct 15, 2024 at 02:39:20PM +0100, Joey Gouly wrote:
+> > > > +static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> > > > +
+> > > > +	if (!cpus_support_mpam())
+> > > > +		return;
+> > > > +
+> > > > +	/* trap guest access to MPAMIDR_EL1 */
+> > > > +	if (mpam_cpus_have_mpam_hcr()) {
+> > > > +		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
+> > > > +	} else {
+> > > > +		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
+> > > > +		r |= MPAM2_EL2_TIDR;
+> > > > +	}
+> > > > +
+> > > > +	write_sysreg_s(r, SYS_MPAM2_EL2);
+> > > > +}
+> > > > +
+> > > > +static inline void __deactivate_traps_mpam(void)
+> > > > +{
+> > > > +	if (!cpus_support_mpam())
+> > > > +		return;
+> > > > +
+> > > > +	write_sysreg_s(0, SYS_MPAM2_EL2);
+> > > > +
+> > > > +	if (mpam_cpus_have_mpam_hcr())
+> > > > +		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
+> > > > +}
+> > > 
+> > > TBH, I think our trap configuration should *not* be conditioned on
+> > > CONFIG_ARM64_MPAM. Otherwise we're silently allowing the guest to change
+> > > things under the nose of KVM/host kernel, assuming an unkind firmware
+> > > that left the EL2 trap configuration in a permissive state.
+> > > 
+> > > WDYT about detecting the feature && enforcing traps regardless of the Kconfig?
+> > 
+> > I had actually thought about the same thing. I spoke with James and he agrees,
+> > so I will look into removing that.
+> > 
+> > I will probably end up removing the Kconfig entirely, it can be added back in
+> > later, when actual support for MPAM is added.
 > 
-> The series tries to addresses these issues.
+> Sounds good, thanks Joey!
 > 
-> - Raghavendra
+> If we go down this route, I'm guessing we can also skip the boot
+> time EL2 setup portion of it (for now). That'd constrain the fossilized
+> EL3 issue to *just* failures to run KVM VMs as opposed to kernels not
+> booting at all.
 > 
-> Raghavendra Rao Ananta (3):
->   arm: Fix clang error in sve_vl()
->   arm: fpu: Convert 'q' registers to 'v' to satisfy clang
->   arm: fpu: Fix the input/output args for inline asm in fpu.c
-> 
->  arm/fpu.c                 | 46 +++++++++++++++++++--------------------
->  lib/arm64/asm/processor.h |  2 +-
->  2 files changed, 24 insertions(+), 24 deletions(-)
-> 
-> 
-> base-commit: f246b16099478a916eab37b9bd1eb07c743a67d5
-> -- 
-> 2.47.0.105.g07ac214952-goog
->
 
-Hi Raghavendra,
-
-With clang 18.1.8 (Fedora 18.1.8-1.fc40) I get a bunch of errors like
-these
-
-    arm/fpu.c:281:3: error: instruction requires: fp-armv8
-
-I used my cross-clang series[1] and configured with
-
-    ./configure --arch=arm64 --cc=clang --cflags='--target=aarch64' --cross-prefix=aarch64-linux-gnu-
-
-[1] https://lore.kernel.org/all/20240911091406.134240-7-andrew.jones@linux.dev/
+If you run nVHE with a firmware that enabled the traps for some reason (or just
+by default since TRAP_MPAMIDR_EL1 resets to UNKNOWN), you will hang at boot
+without that change.  The cpufeature code that runs at EL1 in that case, reads
+MPAMIDR_EL1 to check for HAS_HCR.
 
 Thanks,
-drew
+Joey
