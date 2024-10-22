@@ -1,92 +1,101 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20331BE858
-	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 16:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DE5139CE2
+	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 16:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729613443; cv=none; b=BJgwTk6ZwvJWVVmWc8aSKYLRZrVn9lXMTGDU2n9Pt3ni4dgdKM1abrMiHPnQ5tKMaePY99h5FPKV2hbfc8xQDklW+qfrcBu4/M6XDMJK926Betb4GTcKJYat4XmfzYwYnSMrc769Ks/uaXSlSYlt3srvAQqQSfIejF9nu+vCSP8=
+	t=1729614472; cv=none; b=OJR7LiGCE+Vb4IUJFNMitHEm/6CvhfyXuklpDO9DaXquSYU6hnUDshbDayXq0ybjx3iU1hBQ7k5fcYigHL0pKMBG4qGOBIM+b16Xl/mIcHAa96F2L+6EXPJcKGqnW38WFWxstdwhkFDHS+wp7Uu+uLYO1AiB7nBHfqBgseyw204=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729613443; c=relaxed/simple;
-	bh=sJlwNI5V9oYYAabgfoaSfOAgFY0ULQEOwfiJkm4D2tw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V9eoLqSQ3fc1U3f9bpPY+otL2wWxGZyPHVzJB5GNCrphqEcLG945vCM6dnKUXd1iUou3UykiaCLxqJV/WpgO5IhTTsQRdlC2TUA0OlP9kpbwc6l30tyDBVq6Ub6PcebOOczznYLMnWB0jM3LYd3ycavazK7yHJa32q26914tq7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 07E99497;
-	Tue, 22 Oct 2024 09:11:10 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CCF923F73B;
-	Tue, 22 Oct 2024 09:10:37 -0700 (PDT)
-Date: Tue, 22 Oct 2024 17:10:34 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1729614472; c=relaxed/simple;
+	bh=aiaLk0/pYxMe+hy33ylobQlryXbKMQZQZGyeJfR0iyg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rFJgOREB06rfhp+NzhJMfXn2Nqbn5QlYrQs7vtn4wMld/1Qi/mwiGxHtErrGGuESyoSyBxd1CpJXNlb0RU7Rkc4/d5l8rvb4rr7NWBmOOys3DIIIsLmE/JuN71VgvJ2elDhiggq1VV0cknpURl77nOsc2mkDoPHry4J7AHtT0vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZRCNFU7; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZRCNFU7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 210A6C4CEC3;
+	Tue, 22 Oct 2024 16:27:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729614472;
+	bh=aiaLk0/pYxMe+hy33ylobQlryXbKMQZQZGyeJfR0iyg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oZRCNFU76ZfwpBQkEwWhaDAzfYg5xnxZ2uAx/TSukrfUHZhzhW3/hT+59kHqJVEUj
+	 ZunuepgyT2OUz8GaJLMTNByIpY7kcqA1RQtTl6Fzq9vgk45d2DHpmvgYV/NshkZFt6
+	 hSeakjF9lf9RsxIOPK7lIXIKC5n520OtNdVk+uDMFqZS3Lk2fxMwp4MJucuEi0l0yE
+	 Y0E/qWnGtrvDRZbVOhpiyFm1Dp8uxVHJw8RzoYXWQ5EGGcNdw1yvlsTu//YNPkg/VB
+	 4jWaJ8UvtyjiwexBeIifK3xbBihhef3n3hUmRXUlGDvaAGXj3iPRgoK7rw7cWLC+6W
+	 /Ba3XvjNQY5Vg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t3Hja-005qFN-3F;
+	Tue, 22 Oct 2024 17:27:50 +0100
+Date: Tue, 22 Oct 2024 17:27:48 +0100
+Message-ID: <867ca03xx7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-	kvmarm@lists.linux.dev, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 2/3] arm64/boot: Enable EL2 requirements for
- FEAT_Debugv8p9
-Message-ID: <ZxfOeqyb3RvsdYbU@J2N7QTR9R3>
-References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
- <20241001043602.1116991-3-anshuman.khandual@arm.com>
+	Joey Gouly <joey.gouly@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 1/2] KVM: arm64: Just advertise SEIS as 0 when emulating ICC_CTLR_EL1
+In-Reply-To: <20241022144016.27350-2-will@kernel.org>
+References: <20241022144016.27350-1-will@kernel.org>
+	<20241022144016.27350-2-will@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001043602.1116991-3-anshuman.khandual@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, tabba@google.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 01, 2024 at 10:06:01AM +0530, Anshuman Khandual wrote:
-> Fine grained trap control for MDSELR_EL1 register needs to be configured in
-> HDFGRTR2_EL2, and HDFGWTR2_EL2 registers when kernel enters at EL1, but EL2
-> is also present. This adds a new helper __init_el2_fgt2() initializing this
-> new FEAT_FGT2 based fine grained registers.
+On Tue, 22 Oct 2024 15:40:15 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> MDCR_EL2.EBWE needs to be enabled for additional (beyond 16) breakpoint and
-> watchpoint exceptions when kernel enters at EL1, but EL2 is also present.
-> This updates __init_el2_debug() as required for FEAT_Debugv8p9.
+> ICC_CTLR_EL1 accesses from a guest are trapped and emulated on systems
+> with broken SEIS support and without FEAT_GICv3_TDIR. On such systems,
+> we mask SEIS support in 'kvm_vgic_global_state.ich_vtr_el2' and so the
+> value of ICC_CTLR_EL1.SEIS visible to the guest is always zero.
+>
+> Simplify the ICC_CTLR_EL1 read emulation to return 0 for the SEIS field,
+> rather than reading an always-zero value from the global state.
 > 
-> While here, also update booting.rst with MDCR_EL3 and SCR_EL3 requirements.
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index 18d4677002b1..3f9741e51d41 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -1012,9 +1012,6 @@ static void __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
+>  	/* IDbits */
+>  	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
+> -	/* SEIS */
+> -	if (kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK)
+> -		val |= BIT(ICC_CTLR_EL1_SEIS_SHIFT);
+>  	/* A3V */
+>  	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
+>  	/* EOImode */
 
-[...]
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-> +  For CPUs with FEAT_Debugv8p9 extension present:
-> +
-> +  - If the kernel is entered at EL1 and EL2 is present:
-> +
-> +    - HDFGRTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
-> +    - HDFGWTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
-> +    - MDCR_EL2.EBWE (bit 43) must be initialized to 0b1
-> +
-> +  - If EL3 is present:
-> +
-> +    - MDCR_EL3.TDA (bit 9) must be initialized to 0b0
+	M.
 
-AFAICT we need TDA==0 this regardless of FEAT_Debugv8p9 (and e.g. we need
-MDCR_EL3.TPM==0 where FEAT_PMUv3 is implemented), so we should probably
-check if there's anything else we haven't yet documented in MDCR_EL3.
-
-[...]
-
->  .Lskip_trace_\@:
-> +	mrs	x1, id_aa64dfr0_el1
-> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
-> +	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
-> +	b.lt	.Lskip_dbg_v8p9_\@
-> +
-> +	mov	x0, #MDCR_EL2_EBWE
-> +	orr	x2, x2, x0
-
-That can be:
-
-	orr	x2, x2, #MDCR_EL2_EBWE
-
-Mark.
+-- 
+Without deviation from the norm, progress is not possible.
