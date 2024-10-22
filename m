@@ -1,55 +1,55 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACF3C463
-	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 00:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49940129E93
+	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 00:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729558040; cv=none; b=A1xzmGnsbmA3kAz9CKbA+XhgKZqHj/5sb3QBrFbDu76itpFf2tullwJyWteYu9blHBGERbG+bXVFtfgH1W9/6SYY+rQSggwFdcK45iqYfE8t5QoDlnLFzi2+qiBimXOsiDYe4QvdsgM7Xr0NKid9meO2GP1T1eNKoYaUEMnc7rM=
+	t=1729558041; cv=none; b=Jhi+PN+tFULBnsenpzeZjibYKNCX8Bvmr2TKKRu5M1Fk2fSoPdET5cWRHPmQwCG/CfXPq3MF6BrZQD+GWgUKe5EyGh/mxmkRpGhAleBhQVVbHjru1t8k7y9dngBl+lhcz6XKJV0mKYgPkJosoo3y1GW0Lv5zBPKes6X2ge+AUg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729558040; c=relaxed/simple;
-	bh=esQoNZuXsR24jwPl1DfQPAsmfQfBH1AfjOxCgQQxj50=;
+	s=arc-20240116; t=1729558041; c=relaxed/simple;
+	bh=/ZZM1+dJhOvu0mr/UtOV9hTqZs4pXxjwQKKx0hCIUpU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=K9Tmb+vK17WFYVmZ2g7xmUyj8MHd8LyJAnB612qJex1jz7Lp4lEcEvCQzSCuTvHxf8ltRxZcZRPmczvnKo56eGvGzgoWFqFsHXt/Rjua4Ff1J12Y3Pj8s83Mqv99tYhkgq6XC4A79bD9GYTads68dxa2HYS35W4ETxGXsgqvelE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gdOfQnzR; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=GLnc6tncoH2qL+DRqlIypu1yi8VSwnscLhdaCrfHou/15MlFjy1v3ce+W6KLFoQnLayvu8O9SkvDlgIn6B+EvUG7oeLXTPAZYj+EO+190Jzdq00PfcUyOWp6W50HR9NkaUnQq0JW7RYdpl74nDvvYpsssPegfdVhc/ATkE8TFIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bl/FLCqq; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gdOfQnzR"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2605ce4276so9149126276.3
-        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 17:47:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bl/FLCqq"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e376aa4586so97128037b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 21 Oct 2024 17:47:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729558037; x=1730162837; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1729558039; x=1730162839; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eTpDcLprhbUi5YHe62ZQ4u0o+/QxbhbJTnRiVU+yROI=;
-        b=gdOfQnzRyc+qIF0l1e8clSNIzaKjBoXvCuKBfzWUavk4amdVCtwZy0ctvMLhGGOBHK
-         3DVhK/ZnYPKb3mpMRP5VhR8RM5Zvllhap7Ln7S5doJpepk9Y+PKi/0h7mzTjXFgS6mpe
-         AnDEjW/f/ZXyttl2kgj+3rtSU8auEOIdGfRLomLAeaoZjzcQOPS/OTeZFJMmbgDcvUMw
-         IXxKF5QjIsHOMf5uwwkL/rDVIRWTagmgfqbgjyCA+CsLw5iSOzn+qIQjHSmG5/qX73yc
-         iVJ+n3PHPw4+UwwZL9YXhgrdc4tmaWU0G++1huADeyhPs3t4cWCRf+rfnQdeG7jGQfy+
-         F1Kg==
+        bh=60wgcSLTXVxTzPUjoeX/E6FIWkDuwYegYI4IrChLCKo=;
+        b=bl/FLCqqaaj7ip2X0AeLV51OOdprhvgCvW1G2EhzHqbFzTxMnKrkaqFGKlDVUbGTqE
+         CEr5Uu/0/goyrraKSDnD1X86ZD9Moyfff2QMGDkUJ4GS0oOyU1XSPC5sXn5+1l7Eh5gm
+         JC/vxoPqIVTP0yb+OElxs9HzP3Nx2+4w3TaxbXAjrNUPRIwfNg+V+u2IWTOdcVGF1FzB
+         YAZLygXUPrZqLfR77sO5syvwbLNZIDuePUOInesiPIL5caDNI8zF3LBZcF/+0WxvpFCa
+         yWEuJ802xAA1ztGgxVzns/WVFt52OCvmdSUvk0zmSxKG5MOTD5Eyj8ajyqzN2SIF+0fw
+         7wjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729558037; x=1730162837;
+        d=1e100.net; s=20230601; t=1729558039; x=1730162839;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eTpDcLprhbUi5YHe62ZQ4u0o+/QxbhbJTnRiVU+yROI=;
-        b=daqyjqrcgHdWCTrqfWzatFXQrUmdsCGAA+8X70XJLYbhIQUJb8WacY8pCXZlyJkEEf
-         aI+Ix1m32eCyFpao5BGLpl6uii5ZFGGGQ8JwGz44wCrgJXQRAV84c8cqHE7tSVywmW6l
-         bS/t4lhxqMYERFRm/RqMrFOPxR5I/oLQJ/FaPItPCSmUxeHTYuk6F0PIZOjxHGd76Bvm
-         zecq24rfyHzpIC9cxU7G6eDSlF+EDw1JHXGxpu78ahOgxWelOZaznzlK20dBHKPL2VaX
-         /wVzWMcbZh+DPpd0Oz+Fj1XLJjjLKHo9ZnZIvZ90LNfyqfWWeX2ipKW9GSVUbZtnvl6x
-         etkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVgmgb24BcuzfJcbMzV4X/jMVQNCz6/Z/vH+nvUlNT6rixSqBm11nxlrd1SAcR09YqQJ7+49K8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyBaiIlLhwV0I7dAxfGjiH3DmRpu6TOXbzhSXdNN91Ib8Zg62Lp
-	PWcSEkjdsgonI/4wib8TVfb2cGzkStnnR0FzsvLAgrkrpZinYXPaN7qDXBlD6TtruEVbTQkBSju
-	f80ppwQ==
-X-Google-Smtp-Source: AGHT+IFHeu+s/6VJ8LwG/ln9c8VqGvj+9fWSI0sc1LDHdzQR9YS0qXRVl8XWuhvxBjalS3fnwkBU6xUhXVdb
+        bh=60wgcSLTXVxTzPUjoeX/E6FIWkDuwYegYI4IrChLCKo=;
+        b=jxm7z+mtjaJ4ho+hPAIsan+hO8tprCwGSZnm1sRA+ysjm08ROpaRPhLRyQ3jMSnwVl
+         GMY6VZ77i+QT+nAiFtjqTVn5gaZJpsYqXnbY0KGRfT87Z79UZY4Zh3zgKXuaufzFZuUa
+         CvzTama0PeMBknJEFmLKiZ+s17ZU1IUWO02kifnTcluw7P0O3yUP7tIqXLKo5vFwXcZP
+         7K+WPcy56d/i0OkflBrwDi5C8DET0lcyIh1xGaU7qZWGS4ZIr9aigRrKEVcBJxYfgWEs
+         1DWdHWxJWZuYJUmNIyi9dCYP8DFC2owYLM57Uun8mAAntBllPqMRhp0l6zS9lI+r3RP8
+         B2oA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeBTFlDJ6NzSTPSzksDK4xjATft7dSpL8Ynij7UV/zW0FYY2AqSwM+ftJzbwJVeBcObMq7YcM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxeGjl3KnW6ySOIa+2lN7ScwgjK7rtKfiGZE/C5AvEr8CUZnfv+
+	M0TwllD3gU3La/y4t36008oFP/PSWmuFx79+71Rg3CTLdY0e6d9ISEyPwffsFUTSoqBt9v+DpAw
+	FPJE40g==
+X-Google-Smtp-Source: AGHT+IFiyt/4iIInAWKLwhqunyPq9QHonJj64kutF9hny1NRpAVPZ5zeWGMGBu5qDtED4tv1AgjC9hWx+3+e
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fac1])
- (user=rananta job=sendgmr) by 2002:a05:6902:1807:b0:e29:7454:a4da with SMTP
- id 3f1490d57ef6-e2bb12ed271mr8273276.4.1729558037283; Mon, 21 Oct 2024
- 17:47:17 -0700 (PDT)
-Date: Tue, 22 Oct 2024 00:47:08 +0000
+ (user=rananta job=sendgmr) by 2002:a05:690c:3582:b0:6e3:2f0b:b595 with SMTP
+ id 00721157ae682-6e5bfd58c16mr738297b3.5.1729558039164; Mon, 21 Oct 2024
+ 17:47:19 -0700 (PDT)
+Date: Tue, 22 Oct 2024 00:47:10 +0000
 In-Reply-To: <20241022004710.1888067-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241022004710.1888067-1-rananta@google.com>
 X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
-Message-ID: <20241022004710.1888067-2-rananta@google.com>
-Subject: [kvm-unit-tests PATCH 1/3] arm: Fix clang error in sve_vl()
+Message-ID: <20241022004710.1888067-4-rananta@google.com>
+Subject: [kvm-unit-tests PATCH 3/3] arm: fpu: Fix the input/output args for
+ inline asm in fpu.c
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Subhasish Ghosh <subhasish.ghosh@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
 	Andrew Jones <andrew.jones@linux.dev>
@@ -69,40 +70,58 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Fix the following clang error in sve_vl():
+The macros fpu_reg_{read,write} post-increment the '__val'
+pointer register as a part of 'stp' and 'ldp' instructions.
+As a result, mark it with "+r" for the compiler to treat it
+as read-write operand.
 
-In file included from arm/selftest.c:16:
-kvm-unit-tests/lib/asm/processor.h:163:16:
-error: value size does not match register size specified by the
-constraint and modifier [-Werror,-Wasm-operand-widths]
-                     : "=r" (vl));
-                             ^
-kvm-unit-tests/lib/asm/processor.h:162:14:
-note: use constraint modifier "w"
-                     "rdvl %0, #8"
-                           ^~
-                           %w0
-1 error generated.
+On the contrary, sve_reg_read() never updates the value of the
+pointer/register. Hence, mark this as "r" for the compiler to
+treat it as read-only operand.
+
+Without these adjustments, the compiler can potentially perform
+optimizations over the registers holding the pointers that could
+lead to data aborts.
 
 Fixes: d47d370c8f ("arm: Add test for FPU/SIMD context save/restore")
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- lib/arm64/asm/processor.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arm/fpu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index b28d41fd..e261e74d 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -159,7 +159,7 @@ static inline int sve_vl(void)
- 	int vl;
- 
- 	asm volatile(".arch_extension sve\n"
--		     "rdvl %0, #8"
-+		     "rdvl %w0, #8"
- 		     : "=r" (vl));
- 
- 	return vl;
+diff --git a/arm/fpu.c b/arm/fpu.c
+index 587b6ea3..6b0411d3 100644
+--- a/arm/fpu.c
++++ b/arm/fpu.c
+@@ -54,7 +54,7 @@ static inline bool arch_collect_entropy(uint64_t *random)
+ 		     "stp q26, q27, [%0], #32\n\t"	\
+ 		     "stp q28, q29, [%0], #32\n\t"	\
+ 		     "stp q30, q31, [%0], #32\n\t"	\
+-		     : "=r" (__val)			\
++		     : "+r" (__val)			\
+ 		     :					\
+ 		     : "v0", "v1", "v2", "v3",		\
+ 			"v4", "v5", "v6", "v7",		\
+@@ -87,8 +87,8 @@ do {							\
+ 		     "ldp q26, q27, [%0], #32\n\t"	\
+ 		     "ldp q28, q29, [%0], #32\n\t"	\
+ 		     "ldp q30, q31, [%0], #32\n\t"	\
++		     : "+r" (__val)			\
+ 		     :					\
+-		     : "r" (__val)			\
+ 		     : "v0", "v1", "v2", "v3",		\
+ 			"v4", "v5", "v6", "v7",		\
+ 			"v8", "v9", "v10", "v11",	\
+@@ -138,8 +138,8 @@ do {							\
+ 		     "str z29, [%0, #29, MUL VL]\n"	\
+ 		     "str z30, [%0, #30, MUL VL]\n"	\
+ 		     "str z31, [%0, #31, MUL VL]\n"	\
+-		     : "=r" (__val)			\
+ 		     :					\
++		     : "r" (__val)			\
+ 		     : "z0", "z1", "z2", "z3",		\
+ 			"z4", "z5", "z6", "z7",		\
+ 			"z8", "z9", "z10", "z11",	\
 -- 
 2.47.0.105.g07ac214952-goog
 
