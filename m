@@ -1,165 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307A619538D
-	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 12:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3572219B3EE
+	for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 13:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729601528; cv=none; b=YAmUzZVkqjcjnRzMdr/9dp5JNjcipCwvxNtLNrouv7QIVz+YLS8wv0mG7Lb2AuC1eIlj3ManUjTVi5YC70Dxeu8bes3oqtJJt8xHYg71KsQ9xzAXD8JETer9tVtTyBcBJcbQwxNTcDaujk+FeQ0reWdJ67t0URv8umjEBtIxaCg=
+	t=1729602642; cv=none; b=NZaQfj1sznNi8oz+xGK1zHOCkLQ9c4ZRZv/2YqcsJ6P/FrFu9jQ16hSjBbyrgaUCHydtwtpMad6dcRZlJF/sUiB/sDUsz4OtEQvgRU1kI40lrDQrnzSyaxUa2QN/iuvOQiJ1KC/qJG+KLSH9SggBTzKpzta+xfZhCL6C91qPrEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729601528; c=relaxed/simple;
-	bh=SrytKomT5rTn2vdNWx7adZOSug/HjdryTVVh7dbDC5w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nSdrV+UBeLTZTA45SZSDapWpYPVvC0+JmfPdn58uQnXvRTVzjpVI16gVbOBWBT/roFKT8g+sBsCpop7zcusCfgU13DveZYNBEFbzTMmIzSB2pfzKzqkbnAfbDo84IcIBh7fQboDgqhSvMegw4TSL4EIfxY51GJS9LMc8E00NRh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyfUpjyy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729602642; c=relaxed/simple;
+	bh=0Ma2PDD0lwXIcfNLvxy9IIu/pe4Bz/lSz8+5O8rOWuc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=takKm+2AOU8EUXFn0aNS30+iPC5kKg1hve9+ZIgmWc4NO9kgVcR1poLQyFX3x1k4V0HXHlA/CvobchpcXYABm66XwKjew+BqRwfIXe/wmzPXl20WXx/6Ob8GAiJMh495UMCtT0KO56BciwlF+GitL1FaFoUyQCG05ZHJKGt0+r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Oa3jcEpp; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyfUpjyy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B478BC4CEC3;
-	Tue, 22 Oct 2024 12:52:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729601527;
-	bh=SrytKomT5rTn2vdNWx7adZOSug/HjdryTVVh7dbDC5w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fyfUpjyyF6S++IvObvuTiKagThQppvB6/9fPT8Wqhksfc7C9zUsrDDz/CvsQkhIbY
-	 luGl2PPROZYXUxCizKX1mYdqGqt2pYytbbWLfP+1/PhaSxiI2tYnT5/QkTO5XktBQt
-	 gSZU2uJi//DCCESQ0uTnUImYPPQxIMINhlTxrfUvfJU4xIkh2rZHdEMhMgGoxc+9ym
-	 HqRstqZRH3GNQZeFqGeTXFNHHjSC5OA6WA1yldRo8zf7mX29sflAkqtj2D/OyxdFMz
-	 HemNcrRSWFoDe/sVOhB2JhLh6vOVAJtMdr3TnTjh+0TWYY1QbJQbZyedkVTNAIr9Si
-	 QwL1m8D2Az12w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t3EMn-005mJC-8A;
-	Tue, 22 Oct 2024 13:52:05 +0100
-Date: Tue, 22 Oct 2024 13:52:04 +0100
-Message-ID: <86bjzc47wr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	eric.auger@redhat.com,
-	Shameerali Kolothum Thodi
- <shameerali.kolothum.thodi@huawei.com>,
-	"kvmarm@lists.linux.dev"
- <kvmarm@lists.linux.dev>,
-	"catalin.marinas@arm.com"
- <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	yuzenghui
- <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	jiangkunkun <jiangkunkun@huawei.com>,
-	Jonathan Cameron
- <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Linuxarm <linuxarm@huawei.com>
-Subject: Re: [RFC PATCH 0/6] KVM: arm64: Errata management for VM Live migration
-In-Reply-To: <87o73cpfph.fsf@redhat.com>
-References: <20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com>
-	<86jzef53iz.wl-maz@kernel.org>
-	<3f4469c49625413f9ab2c224d0d3fbea@huawei.com>
-	<86ikty6f1b.wl-maz@kernel.org>
-	<ZwlADbp-HjkijElX@linux.dev>
-	<08261a41b9644f5ab49063824e4060c3@huawei.com>
-	<87bjziraou.fsf@redhat.com>
-	<7df21c56-0b07-4112-839e-ef90c5999fcd@redhat.com>
-	<86frot4kki.wl-maz@kernel.org>
-	<ZxKudSBRKfM1OkMK@linux.dev>
-	<87o73cpfph.fsf@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Oa3jcEpp"
+Date: Tue, 22 Oct 2024 15:10:31 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729602637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L819H4TgTpR7m/nNd75LAwuiLs++CdEcR+lmxCWgMZI=;
+	b=Oa3jcEppLsYfNnHi1uKat6MfBfJXbqsxyXPAxQRICu+j36vjI5PNP8UF4XGv39oez+vJbE
+	0I6kM/2WPBi0WvkoqIy4sruOybnk3TzEWGN1CUDrHGdQpys59oYTsryTC0AqwZkWrhDVgQ
+	uoYlB81fDSXflTVwWCDRx/GEbDXzqic=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Subhasish Ghosh <subhasish.ghosh@arm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 0/3] Fix arm64 clang errors on fpu tests
+Message-ID: <20241022-2c60a0bcbb908435aa91d1ff@orel>
+References: <20241022004710.1888067-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, oliver.upton@linux.dev, eric.auger@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022004710.1888067-1-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 22 Oct 2024 11:58:02 +0100,
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Tue, Oct 22, 2024 at 12:47:07AM +0000, Raghavendra Rao Ananta wrote:
+> When compiled with clang for arm64, some build errors were observed
+> along the fpu code. Moreover, data aborts were seen while running
+> the arm/fpu test due to misconfigured input/output args in the inline
+> assembly.
 > 
-> On Fri, Oct 18 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
+> The series tries to addresses these issues.
 > 
-> > On Fri, Oct 18, 2024 at 02:17:17PM +0100, Marc Zyngier wrote:
-> >> On Thu, 17 Oct 2024 18:16:04 +0100,
-> >> Eric Auger <eric.auger@redhat.com> wrote:
-> >> > 
-> >> > Hi Shameer,
-> >> > 
-> >> > On 10/17/24 17:49, Cornelia Huck wrote:
-> >> 
-> >> > > Speaking of QEMU: Do you maybe already have some prototype code that
-> >> > > tries to do something with the setup here? (I don't think QEMU currently
-> >> > > mucks around with MIDR and friends when running with KVM; I wonder what
-> >> > > it should provide to the guest and if it should care to set something as
-> >> > > a base level that gives guests not using the hypercall a chance to work
-> >> > > properly.)
-> >> > >
-> >> > As discussed during the KVM forum we are working on a qemu integration
-> >> > for writable ID regs. The first goal is to be able to specialize the
-> >> > host passthrough model (custom host model). Maybe this will trigger more
-> >> > discussions on named models too. This is complementary to the
-> >> > MIDR/REVIDR problematic and I hope we will be able to consolidate our
-> >> > works at some point.
-> >> 
-> >> Complementary to the MIDR/REVIDR work, I would also like to make
-> >> MIDR/REVIDR writable when this scheme is available. Ideally reporting
-> >> a synthetic CPU description (with MIDR_EL1.Implementer returning 0,
-> >> and the rest being VMM-specific, but with a clear definition for the
-> >> IMPDEF fields so that we can version the ABI).
-> >
-> > When the VMM is using the hypercall mechanism to describe
-> > implementations, 100% agree.
-> >
-> >> Thoughts?
-> >
-> > I think we should go a step further and allow userspace full control of
-> > known fields in these registers, even for a nonzero Implementer code.
-> >
-> > We're already affording userspace full control of what implementation(s)
-> > the guest sees anyway via hypercalls, so there isn't much left for KVM
-> > to enforce.
-> >
-> > Ignoring errata, it'd let folks spoof an old implementation on newer
-> > hardware for testing, especially when dealing w/ older software.
+> - Raghavendra
 > 
-> So basically, the VMM would have to make a choice which guests it wants
-> to support? Modern guests, which are aware through the hypercall
-> interface what is going on and are able to parse any information in our
-> synthetic MIDR correctly, or older guests, which should be presented
-> with a MIDR that makes them hopefully act in the way we want it to act?
+> Raghavendra Rao Ananta (3):
+>   arm: Fix clang error in sve_vl()
+>   arm: fpu: Convert 'q' registers to 'v' to satisfy clang
+>   arm: fpu: Fix the input/output args for inline asm in fpu.c
+> 
+>  arm/fpu.c                 | 46 +++++++++++++++++++--------------------
+>  lib/arm64/asm/processor.h |  2 +-
+>  2 files changed, 24 insertions(+), 24 deletions(-)
+> 
+> 
+> base-commit: f246b16099478a916eab37b9bd1eb07c743a67d5
+> -- 
+> 2.47.0.105.g07ac214952-goog
 >
-> I guess that would mean that for full migration support between
-> different hosts, we'd want enlightned guests, and for (some) other
-> cases, we could generate a configuration that will hopefully work?
 
-That's sums it up, I think. The way I think of it is that, at VM
-creation, you decide what you want to support:
+Hi Raghavendra,
 
-- homogeneous migration: that's basically what we have today, with
-  some limited flexibility.
+With clang 18.1.8 (Fedora 18.1.8-1.fc40) I get a bunch of errors like
+these
 
-- heterogeneous migration: synthetic MIDR, discovery hypercall, the
-  works.
+    arm/fpu.c:281:3: error: instruction requires: fp-armv8
 
-> (Spoofing for testing things sounds useful regardless.)
+I used my cross-clang series[1] and configured with
 
-My problem with that is that there is no difference in ABI between "I
-want this for testing" and "I expect this to fully work". The latter
-is obviously not achievable...
+    ./configure --arch=arm64 --cc=clang --cflags='--target=aarch64' --cross-prefix=aarch64-linux-gnu-
+
+[1] https://lore.kernel.org/all/20240911091406.134240-7-andrew.jones@linux.dev/
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+drew
