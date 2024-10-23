@@ -1,67 +1,68 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3947714EC62
-	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 20:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932AA14EC62
+	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 20:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729715099; cv=none; b=FInAy9xj6CfAWe10MknJgTxCtaj6V9sAI6HKSYgO7zkjla7J6YoLiqWHzGe58MltIne/XjNUZ/x8heNTx6GfzyL1cNfDzRJSPPEudmqKA4RDMa+pzs6+XhCFW/cY9bfCMexIG5GmfpzQuUYz2UB1HIYI74GzjjX0PAjQtdgbSWs=
+	t=1729715270; cv=none; b=swqXfPFWbT4ALtgzA0pIXAO5XG+BpC75A0L+jfmKEh+rSDMGD/pr7NIm+xvE73HaEq3pwddsOq9EYKVxax4xOz+EQUV4IlGKxEykhtrYngaw8nZVYSJ0H29adS8e0PNztoicOkCyfUL20B7dT1eBTVjSvgV61kln9f+kW5SYabc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729715099; c=relaxed/simple;
-	bh=EJAfJDQUv69BScwPP7hNV7TwNqik9leF1T6f5RraUUo=;
+	s=arc-20240116; t=1729715270; c=relaxed/simple;
+	bh=Dep7eDGQHxQCN5vkFrILaXybpyuGJYUBlX7I3AmmX7A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kY2NBDuUnAS110WKDlzIIKw+bAd//Bm5WSoYkjoxCDE3VBKDfol7krQ+u4DvZ1QDWOhayR00imfrYJDSYGucGg280NgqaTCaJuDTslka3lzusFJqgJLhETudatuX/+yalBCc646XsjsHM3GMmDRj7rcm2AQiAnbZhm7xUrjeLMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oMrjBwTY; arc=none smtp.client-ip=209.85.167.54
+	 To:Cc:Content-Type; b=qbVJ8cf7wmGQTYbG99RCWAtwveSiD6iUX2iY7IFY2OvElF463EdxfJRX6CLqcf4kCDvG7xjgS/Kyayx1szyMMYcrYuEi5DKrvvCVqfYQvJm7z9m93X9gSaL8aADR8jdqlSwHYWthofqDGYPo+PdHrplUDSP3et7Y9B+bTIx8qpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FgeVmTFI; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oMrjBwTY"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539f4d8ef84so197096e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 13:24:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FgeVmTFI"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539ebb5a20aso168689e87.2
+        for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 13:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729715096; x=1730319896; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1729715267; x=1730320067; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X/J5U+OF3K0AErChj6IORznXj9y2ILqqHHrJf2bXcts=;
-        b=oMrjBwTYr1HTkd2PlcQ1oyDfY8dfV0fcwcPSFkfAH9FnI71XzMkTxSuy2YJVkFKVKE
-         aiVDq5GlvS7i8skbN041yZMJxXEMVH5dq26EMO8uQrohCg9xvGVOy9IEK7ux2YDbABWM
-         rbpKI/ba8D/0JOk8XrU7EjsuCJLsf2ZXbwBDhMEGBCuT+5JNCpNC9j15xuWeIjXiT2xY
-         m0sLuKnD2w4NsKqbB2uyKbLl2cNp0T8/DbRdyfmGUIK5y54PGpm2cUbiIlZJWYQPtkFe
-         Rqu5SrwaB0jOyh98aAStzJhWa6BYUsEYrVX2LIZTrvib78nj35aD/qnRI6F/sownnNZ1
-         JYtg==
+        bh=Q26rjq4zEqIRz8Vcg16r3D/o40rTFfW2jfuSpqI9ulo=;
+        b=FgeVmTFIwtLKzEQE8ReiJf6CDyNa4MXFVfTfrle0R4wS7OS66U5230NkQ2HscFdwsU
+         0g3Gs/f59FAhVd4Tqmfu8B59cWW4UI/KMxfINbhiJ/mCa9tjEsJvSBizGA94x//2DX0s
+         E35PHHwRIZwCSicmVlwFbUrp6zPvjH3SJhTsiO3Bf9BGJoRqgOo1/phQqeFNWiRvQ8b9
+         fiKbMwH7wKX2hXZRIX4JRN5Z04mmooLN+p8AQpt936TFYzPcY+AffRA8btokAbc14Lsf
+         Pe0fgqPZHGR0bjg1ZFrd+64tw/oVBRUT+pYRsJoYrU2D9Rlqj8EA5nb91tNZtPWFK9mw
+         elKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729715096; x=1730319896;
+        d=1e100.net; s=20230601; t=1729715267; x=1730320067;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X/J5U+OF3K0AErChj6IORznXj9y2ILqqHHrJf2bXcts=;
-        b=VEYK/hzQbuQapC9rURQWXCgoDm77HducmQfePLXifE9/iqcbo8xCBLrNOsuAWzd4aM
-         oasfE74Z04HO5LHcZ7Dj1urRqTdhED50pOWNEB/vvfAaGNZ1afGft5cQM2gfuZFW9D1g
-         8KHK4SC73emgRs9SrZMih1WsqQUn0bP1P2ZiM/5x669jXXcRWgmPwujRa2Qi4okZaprk
-         huzNOvSa0o4a7l1uVCIWfM+cvjsk+7sXIfMbBjczDACMuPEiC6431Gl1OWvPGOIkqGJ3
-         d3aPn8GXlOpBV8mUbCjXX9u58TR91TQ0HPG9eX1QmJc/hbpeeMiyxz1gBuV4RGLfwqKg
-         EoYg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8Hqhzx0qZuQCV/f/QKNpPJzwUht3Wg/hRFiN4B7HDBtcmPybV9OexzxPeP580AahrrwKJUaY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVenG5Zgba4fDZk1BlfRAm2NAcwvHwpdzUMojm/PryhNV472rs
-	wIV1S4XewOWT89Mmo5vV83+xLMSjUBNwsGvCgfSKjDpozSCkFazdi2Qlf27P8TkNflTZfxVFYEz
-	QHScG8RqKupo6SYf6xxvPPSd/E4hNdZFspq5t
-X-Google-Smtp-Source: AGHT+IHSCllmfqejwDRgdq9fg0cwSTgDHJ9uCrH0pP5pEKEvOyQTqWtxF24V69vdYn/lXl2ijuB2u9hDFq2MvYh8EMA=
-X-Received: by 2002:a05:6512:1246:b0:536:9f72:c427 with SMTP id
- 2adb3069b0e04-53b1a343cfamr1983190e87.28.1729715096162; Wed, 23 Oct 2024
- 13:24:56 -0700 (PDT)
+        bh=Q26rjq4zEqIRz8Vcg16r3D/o40rTFfW2jfuSpqI9ulo=;
+        b=hw3XRr6YDf7pf2F+dRszLRnGZS6n+Ue8cjxeqXoD75XiXrcCpsqqYp8NA0vQcZ38id
+         bP+o0SFesnxogvQwUkdWjxckIvuPjaGJePuOeRFcXQuG6by67/WyyONQMeyayKkN5GQq
+         8294AmA8lxIStvRlhUvRETwHiug2ydtiOeZ0lb/mz67A9kHSgzBbOGwNxYwxeX+sujbY
+         2bhWOOQAHffWPgnhU8Xpd3+wAN970iTG0D/OguMA56i1GEWX0SQebJIYjPUkxUETlg0E
+         kf4baVJjO1A0rqJd9mh5uZMmtPal6oyoKXJ6mOTEic2oqL25f61LFhSKhzoVPOGomTd6
+         zjwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXR7X9bAQtwzDc9TyOWWpcuTOFrNZT9gPAkHvWgT0nV7QMFa9w02G9DB2huS2Uo9lokbtjA7B8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YznptVCRP88z2N3ztnlR5g6IZN/NFPMjBt3U3q52vqaJYDKAwbW
+	uNKg34QOmzmBWggutmXREIUU6YCLAaHu9Gw0Dt38W3/eLa1rLQCgsbEJid9Zxdz6jJaOwv2Dq8n
+	qX9XjvT01CCKbuojKNuNaHUW7np0hgFMETFTb
+X-Google-Smtp-Source: AGHT+IG+PCsts43OphHvhZhAIxkFG77LQ241b/e0BeNW2BtEwVtREehGvVJqVHr1dr/PkLFD1+MnSMDI9zjrCuj7re8=
+X-Received: by 2002:a05:6512:1250:b0:539:959e:f0e8 with SMTP id
+ 2adb3069b0e04-53b1a3115bcmr2546071e87.21.1729715266559; Wed, 23 Oct 2024
+ 13:27:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240704142319.728-1-jiangkunkun@huawei.com> <20240704142319.728-2-jiangkunkun@huawei.com>
-In-Reply-To: <20240704142319.728-2-jiangkunkun@huawei.com>
+References: <20240704142319.728-1-jiangkunkun@huawei.com> <20240704142319.728-4-jiangkunkun@huawei.com>
+In-Reply-To: <20240704142319.728-4-jiangkunkun@huawei.com>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 23 Oct 2024 13:24:45 -0700
-Message-ID: <CAAdAUtjOMtE-f6L1YZn339MPSUtVHm72cT+F-vDLT2bXJ+HNtQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+Date: Wed, 23 Oct 2024 13:27:35 -0700
+Message-ID: <CAAdAUtioh5DoZd+afryv+K1H4nPCVUoNpdFuu2vKpM92++Qqqw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] KVM: arm64: vgic-its: Clear ite when discard frees
+ an ite
 To: Kunkun Jiang <jiangkunkun@huawei.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -77,92 +78,52 @@ Hi Kunkun,
 On Thu, Jul 4, 2024 at 7:23=E2=80=AFAM Kunkun Jiang <jiangkunkun@huawei.com=
 > wrote:
 >
-> In all the vgic_its_save_*() functinos, it does not check whether
-typo: functions
-> the data length is 8 bytes before calling vgic_write_guest_lock.
-> This patch add the check. To prevent the kernel from being blown up
-typo: adds
-> when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()'s
-> are replaced together.
+> When discard frees an ite, we do not invalidate the
+> corresponding ite. In the scenario of continuous save and
+> restore, there may be a situation where an ite is not saved
+> but is restored. This is unreasonable and may cause restore
+> to fail. This patch clears the corresponding ite when discard
+> frees a ite.
+nit: ite -> ITE
 >
 > Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-its.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
 > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
 s.c
-> index 40bb43f20bf3..344bd8c20f67 100644
+> index 223a5f1d6a3d..cf4a85a29504 100644
 > --- a/arch/arm64/kvm/vgic/vgic-its.c
 > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -2094,6 +2094,10 @@ static int vgic_its_save_ite(struct vgic_its *its,=
- struct its_device *dev,
->                ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
->                 ite->collection->collection_id;
->         val =3D cpu_to_le64(val);
-> +
-> +       if (KVM_BUG_ON(ite_esz !=3D sizeof(val), kvm))
-> +               return -EINVAL;
-> +
->         return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
->  }
+> @@ -782,6 +782,10 @@ static int vgic_its_cmd_handle_discard(struct kvm *k=
+vm, struct vgic_its *its,
 >
-> @@ -2246,6 +2250,10 @@ static int vgic_its_save_dte(struct vgic_its *its,=
- struct its_device *dev,
->                (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
->                 (dev->num_eventid_bits - 1));
->         val =3D cpu_to_le64(val);
-> +
-> +       if (KVM_BUG_ON(dte_esz !=3D sizeof(val), kvm))
-> +               return -EINVAL;
-> +
->         return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
->  }
+>         ite =3D find_ite(its, device_id, event_id);
+>         if (ite && its_is_collection_mapped(ite->collection)) {
+> +               struct its_device *device =3D find_its_device(its, device=
+_id);
+> +               int ite_esz =3D vgic_its_get_abi(its)->ite_esz;
+> +               gpa_t gpa =3D device->itt_addr + ite->event_id * ite_esz;
+> +               u64 val =3D 0;
+>                 /*
+>                  * Though the spec talks about removing the pending state=
+, we
+>                  * don't bother here since we clear the ITTE anyway and t=
+he
+> @@ -790,6 +794,11 @@ static int vgic_its_cmd_handle_discard(struct kvm *k=
+vm, struct vgic_its *its,
+>                 vgic_its_invalidate_cache(its);
 >
-> @@ -2427,12 +2435,17 @@ static int vgic_its_save_cte(struct vgic_its *its=
-,
->                              struct its_collection *collection,
->                              gpa_t gpa, int esz)
->  {
-> +       struct kvm *kvm =3D its->dev->kvm;
->         u64 val;
+>                 its_free_ite(kvm, ite);
+> +
+> +               if (KVM_BUG_ON(ite_esz !=3D sizeof(val), kvm))
+> +                       return -EINVAL;
+> +
+> +               vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
+>                 return 0;
+>         }
 >
->         val =3D (1ULL << KVM_ITS_CTE_VALID_SHIFT |
->                ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT)=
- |
->                collection->collection_id);
->         val =3D cpu_to_le64(val);
-> +
-> +       if (KVM_BUG_ON(esz !=3D sizeof(val), kvm))
-> +               return -EINVAL;
-> +
->         return vgic_write_guest_lock(its->dev->kvm, gpa, &val, esz);
->  }
->
-> @@ -2449,7 +2462,9 @@ static int vgic_its_restore_cte(struct vgic_its *it=
-s, gpa_t gpa, int esz)
->         u64 val;
->         int ret;
->
-> -       BUG_ON(esz > sizeof(val));
-> +       if (KVM_BUG_ON(esz !=3D sizeof(val), kvm))
-> +               return -EINVAL;
-> +
->         ret =3D kvm_read_guest_lock(kvm, gpa, &val, esz);
->         if (ret)
->                 return ret;
-> @@ -2513,7 +2528,9 @@ static int vgic_its_save_collection_table(struct vg=
-ic_its *its)
->          * with valid bit unset
->          */
->         val =3D 0;
-> -       BUG_ON(cte_esz > sizeof(val));
-> +       if (KVM_BUG_ON(cte_esz !=3D sizeof(val), its->dev->kvm))
-> +               return -EINVAL;
-> +
->         ret =3D vgic_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
->         return ret;
->  }
 > --
 > 2.27.0
 >
