@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AC8200CAD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79DD2010EA;
 	Wed, 23 Oct 2024 14:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729695234; cv=none; b=nkbFYCNvzUZV+QtdemU5n4vHMEpB1VEqkhZ8ac0LRZy5UzeyGvuueA3IctVvhv248xBz5JzNfgfD1AivYfwfJTjyyJ5AwFDhPffHE2mEN4vQDEi7slV3zCDSwdCt9iOppPKQpo3nHAI62uObzJSTSXKqC09AF+Ij1vmI2NrHxdU=
+	t=1729695234; cv=none; b=ikLaVioXALIUxDOySQUUiDmxFNJr8nnR/RGJS1JLKZCXfAEQOz/SPvnfZqRrDWytm7xeZuIoa1CwotsXZk4Ez160Jqq82IMTBqq88s7UPoUQ+pQEX3JxrXth9VZn8HCjZoEOGyJTNY+FRHjlOU6q5DGUG1Jw3ZOuIQZY+Jha0+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729695234; c=relaxed/simple;
-	bh=qefyqNxfTd06KWngVuTOytAcncJSMMCvufExwS1FNjQ=;
+	bh=FgQexBaZfsfQzAHeUxw7obYY6WYgogLcfZPAE0mj4tA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GX/MRoJysjSDJ7PHrVC/qgz3nS2dzIG33ecSeqD/OQ9aWcr+TWlaWkm64ctF7h5JwOdr8fRmxIgA4eFlcyuqMKfQq/lj3afUz55I9JN1tpMWuksYRwPGSvBvFwzRp733X09ZEdQJP9oyK9IP1NlVYZfm6CDl980u2bEc+DvNY0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qoO4w8B9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=pHcxUyig4LHfGkeN1ESsSMHzAyt+eTNhVU6CVcEawhU321hRZ9PsrsmG4UE+Ex2z8xPOempeaq+mchAmsoMdy3JGqRnTC/TPqqbE2x6COIxY8Jk7bWLdfZBDgNW5kMvoObxvzFZCGxWgZKbD0iNMZLpPF4lFyWSxroGYMR8E+C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g/4QZ5Ao; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qoO4w8B9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29927C4CEE7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g/4QZ5Ao"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B78D0C4CEE4;
 	Wed, 23 Oct 2024 14:53:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1729695234;
-	bh=qefyqNxfTd06KWngVuTOytAcncJSMMCvufExwS1FNjQ=;
+	bh=FgQexBaZfsfQzAHeUxw7obYY6WYgogLcfZPAE0mj4tA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qoO4w8B93+PB/KuOv09sRusKlqy9JlUyM1POjZX1JEqnsHql3OOfbRZoQxnhADHvo
-	 WG8M4RG/t9jzbPSVG96l8AW4U1fJeJtTxvC495+QoPL2rnwxuDeez+TzDOzsR9XXmS
-	 9XHs8/K67dcZb9YDZzplGaCj0VVeVCY7wvwsZ+S2HAHvX7QZwwATaxJBmAW5AvbnJ+
-	 cBPC6N3HI07L11ImuMBYXahfmns+dFG5uWhHGKm0o+E4Uu8vn/Fj3n9CHQR8sbP5TS
-	 BycVvcISaDBJCyT5POs4zq9qwN/8szOW17XYRJKatwJxY72m6OWllPXSEOt30qiuc1
-	 VER3tpRzemx1g==
+	b=g/4QZ5AojyBtIzSbM+qEhDnkkrndAWGJrZmkJ6fbzM+gaJ4BB39nZqky7sF4ZqqIk
+	 UVenPPvhvOXtk6BXtBZ1UlS0vnPHN28OiYuUpS6HJ/BjUZ2KjkP0d25DfRdSa32PVt
+	 S+TgVYCDmxKwMRcUCf5CSlFVPT6q+v8DX5jL+bcny3SgYD3pHTvlASWf7TY3X8HBvM
+	 KiR+WdL3m02pVH7HRZP1gQSEGX07SipnYT2i0JOtM7pkxjs5u0n8m+NRUSU5N9e+2Z
+	 Kv28BF2GEppN3cb+XzCRUf0eB5z2W1wqLM92rjN15uXK35p/4xX4KpFjGEPlO0nyyl
+	 xCPBF+z0UzzPw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t3ckC-0068vz-Dd;
-	Wed, 23 Oct 2024 15:53:52 +0100
+	id 1t3ckD-0068vz-0d;
+	Wed, 23 Oct 2024 15:53:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 14/37] KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
-Date: Wed, 23 Oct 2024 15:53:22 +0100
-Message-Id: <20241023145345.1613824-15-maz@kernel.org>
+Subject: [PATCH v5 17/37] KVM: arm64: Sanitise ID_AA64MMFR3_EL1
+Date: Wed, 23 Oct 2024 15:53:25 +0100
+Message-Id: <20241023145345.1613824-18-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
 References: <20241023145345.1613824-1-maz@kernel.org>
@@ -60,41 +60,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the FEAT_S1PIE EL2 registers to the per-vcpu sysreg register
-array.
+Add the missing sanitisation of ID_AA64MMFR3_EL1, making sure we
+solely expose S1PIE and TCRX (we currently don't support anything
+else).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 ++
- arch/arm64/kvm/sys_regs.c         | 2 ++
- 2 files changed, 4 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ca064af6cac21..1a5477181447c 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -471,6 +471,8 @@ enum vcpu_sysreg {
- 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
- 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
- 	TCR_EL2,	/* Translation Control Register (EL2) */
-+	PIRE0_EL2,	/* Permission Indirection Register 0 (EL2) */
-+	PIR_EL2,	/* Permission Indirection Register 1 (EL2) */
- 	SPSR_EL2,	/* EL2 saved program status register */
- 	ELR_EL2,	/* EL2 exception link register */
- 	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 514b016d09764..a85f62baebfba 100644
+index c42f09a67a7c9..c9638541c0994 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -135,6 +135,8 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
- 		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
- 		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
- 		MAPPED_EL2_SYSREG(TCR2_EL2,    TCR2_EL1,    NULL	     );
-+		MAPPED_EL2_SYSREG(PIR_EL2,     PIR_EL1,     NULL	     );
-+		MAPPED_EL2_SYSREG(PIRE0_EL2,   PIRE0_EL1,   NULL	     );
- 		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
- 		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
- 		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
+@@ -1617,7 +1617,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+ 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+ 		break;
+ 	case SYS_ID_AA64MMFR3_EL1:
+-		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE;
++
++		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE |
++		       ID_AA64MMFR3_EL1_S1PIE;
+ 		break;
+ 	case SYS_ID_MMFR4_EL1:
+ 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+@@ -2500,7 +2502,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 					ID_AA64MMFR2_EL1_NV |
+ 					ID_AA64MMFR2_EL1_CCIDX)),
+ 	ID_WRITABLE(ID_AA64MMFR3_EL1, (ID_AA64MMFR3_EL1_TCRX	|
+-				       ID_AA64MMFR3_EL1_S1POE)),
++				       ID_AA64MMFR3_EL1_S1POE	|
++				       ID_AA64MMFR3_EL1_S1PIE)),
+ 	ID_SANITISED(ID_AA64MMFR4_EL1),
+ 	ID_UNALLOCATED(7,5),
+ 	ID_UNALLOCATED(7,6),
 -- 
 2.39.2
 
