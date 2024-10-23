@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD426209F39;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B946C209F3E;
 	Wed, 23 Oct 2024 14:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729695238; cv=none; b=H5xkafjdCPtW8VTRrG5Z6tD30k2E2sD+beidQGGaQQRx3c1GehGXvYKf21X7ndf6//YO9F0QDNBYpBud3UqtJCFcoSJteBAh5ZFhxi9ctuEYxjhMIDruk7/Mb8vxilclZPJgGfkWEEHGd3T+pDEHOWFu2Zmn6lY2U5FcjGVEphY=
+	t=1729695238; cv=none; b=Qg25gfAgSN/i9UZ6BKgdLFXKIHiXvZrBao6UsUb2q7d/0NPrX6vr+ZlbhQ5xuGKbsvWrLCFzL5E324ut/cnK0A+eyoGVVf0TRFuht2BYB2Fsn+3/A8w1tlN7hDfmymmrWopratFQ+UqkiPVdVSE49UIuDL8A5c+lWh/3qbVviPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729695238; c=relaxed/simple;
-	bh=n7QHz2ieFv34eW5Zkyhf4MKFxk9bAobNuldVjF/QHxM=;
+	bh=wZ18w5uzFaEd+9v97fcSC0+OL0V2c3KqXQJR4zHPEoY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gZoY+0fmb8O6MEODQO9vVvZCuUxE6jrmbVdddGsIXqFpmAwF8jVT8e+pvyQqPQMfn3u6A7tvU3SWQFmJJD8zF5qDJjT9kS6PLTo6c3rr+jZS11OC/Gny7Qf99rF3B9Rz0KhjvGyqMk3/VzlRsnp46K23y7ZgEa5VbgqSU+UEsLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CY7jxMtE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZeMWZp7egk2PZCzwmJwyEjWY56Fx1gjth4eeIuwE1t6IuZRu95/Zp8Zfo+8UmCReG73vnKTrsewh48BGj4YjPz7U1G+u97n1bCFvYry2b1VACg4jgkHBbCnuWsdMr/Z4Og2h+isLPRUH6KawKpzj6kPFa/V2IcVIbYxO1TcJRXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOPgSy4o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CY7jxMtE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36C3AC4CEC6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOPgSy4o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98EEAC4CEE7;
 	Wed, 23 Oct 2024 14:53:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1729695238;
-	bh=n7QHz2ieFv34eW5Zkyhf4MKFxk9bAobNuldVjF/QHxM=;
+	bh=wZ18w5uzFaEd+9v97fcSC0+OL0V2c3KqXQJR4zHPEoY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CY7jxMtEKVV1lb5zPSYur8W3AKV8nGKk30puGDAo/W6hY9/exsQwg3dQlvWTvfY9r
-	 jHwdkf9xv3XQcfJTDYLFgc+rTxFKrlAPv1fus4Y58ng3yUWAHi2aZbTFO28k4jkHiY
-	 X+bAaJwuyQlVsohUu5o/TAOFi7XD1BelSr3yrWKnoXf4axv5aqoGat4FwCUfIt8CwO
-	 qqrXw0tbZ/3wyYAQZiBd3oxrFM1XXzPLHZ/6gBpR9HbuWppqwh7aPVrld5H0CKitIA
-	 F1J/cdyUfSPnYMKaY6qh9HnfZKnyJ33Kn3P9Fy0kU+XsW/zJVmWsFgviogJWyd5Pvd
-	 L7AoBQ+nanK6Q==
+	b=jOPgSy4oftIXJPtFQ51XQfT6nCXwyWt1potE1fACSFECbVyY40Bga7VI/L9yKf0Tk
+	 wSq1jeN8vXdYnK7asMYbrvED4u5XfoLCgG22/bgb6LQ5pcJRrh9G4waMWnN1pRye79
+	 Pm9ZgF/5WsqcSVMJXkn3RCIQg6Xork2Bb2b+g/DBmiHdR1bLx++bW76l8W7D6A3Z/6
+	 nspY/287qpolZC+CJxY/CvTkW3IeS+B7TQDPQWoHjLlwY6pmQw23wxIEVLhWKU73ii
+	 HYwuCGiCmmdoUoNRRMkuLG3hbYtrLIlwXtU9maZhKz72M45UcnwOytZZAhKRmVTO+1
+	 eHEVg4bQkGKJw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t3ckG-0068vz-Ax;
+	id 1t3ckG-0068vz-SP;
 	Wed, 23 Oct 2024 15:53:56 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 33/37] KVM: arm64: Add POE save/restore for AT emulation fast-path
-Date: Wed, 23 Oct 2024 15:53:41 +0100
-Message-Id: <20241023145345.1613824-34-maz@kernel.org>
+Subject: [PATCH v5 35/37] KVM: arm64: Make PAN conditions part of the S1 walk context
+Date: Wed, 23 Oct 2024 15:53:43 +0100
+Message-Id: <20241023145345.1613824-36-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
 References: <20241023145345.1613824-1-maz@kernel.org>
@@ -60,61 +60,77 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Just like the other extensions affecting address translation,
-we must save/restore POE so that an out-of-context translation
-context can be restored and used with the AT instructions.
+Move the conditions describing PAN as part of the s1_walk_info
+structure, in an effort to declutter the permission processing.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm64/kvm/at.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index de7109111e404..ef1643faedeb4 100644
+index 8d1dc6327ec5b..2ab2c3578c3a0 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -440,6 +440,8 @@ struct mmu_config {
- 	u64	tcr2;
- 	u64	pir;
- 	u64	pire0;
-+	u64	por_el0;
-+	u64	por_el1;
- 	u64	sctlr;
- 	u64	vttbr;
- 	u64	vtcr;
-@@ -458,6 +460,10 @@ static void __mmu_config_save(struct mmu_config *config)
- 			config->pir	= read_sysreg_el1(SYS_PIR);
- 			config->pire0	= read_sysreg_el1(SYS_PIRE0);
- 		}
-+		if (system_supports_poe()) {
-+			config->por_el1	= read_sysreg_el1(SYS_POR);
-+			config->por_el0	= read_sysreg_s(SYS_POR_EL0);
-+		}
+@@ -26,6 +26,7 @@ struct s1_walk_info {
+ 	bool	     		hpd;
+ 	bool			e0poe;
+ 	bool			poe;
++	bool			pan;
+ 	bool	     		be;
+ 	bool	     		s2;
+ };
+@@ -151,6 +152,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+ 
+ 	wi->regime = compute_translation_regime(vcpu, op);
+ 	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
++	wi->pan = (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) &&
++		  (*vcpu_cpsr(vcpu) & PSR_PAN_BIT);
+ 
+ 	va55 = va & BIT(55);
+ 
+@@ -1020,10 +1023,12 @@ static void compute_s1_indirect_permissions(struct kvm_vcpu *vcpu,
  	}
- 	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
- 	config->vttbr	= read_sysreg(vttbr_el2);
-@@ -485,6 +491,10 @@ static void __mmu_config_restore(struct mmu_config *config)
- 			write_sysreg_el1(config->pir, SYS_PIR);
- 			write_sysreg_el1(config->pire0, SYS_PIRE0);
- 		}
-+		if (system_supports_poe()) {
-+			write_sysreg_el1(config->por_el1, SYS_POR);
-+			write_sysreg_s(config->por_el0, SYS_POR_EL0);
-+		}
- 	}
- 	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
- 	write_sysreg(config->vttbr,	vttbr_el2);
-@@ -1105,6 +1115,10 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
- 			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
- 		}
-+		if (kvm_has_s1poe(vcpu->kvm)) {
-+			write_sysreg_el1(vcpu_read_sys_reg(vcpu, POR_EL1), SYS_POR);
-+			write_sysreg_s(vcpu_read_sys_reg(vcpu, POR_EL0), SYS_POR_EL0);
-+		}
- 	}
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
- 	__load_stage2(mmu, mmu->arch);
+ }
+ 
+-static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
++static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+ 				   struct s1_walk_info *wi,
+ 				   struct s1_walk_result *wr)
+ {
++	bool pan;
++
+ 	if (!s1pie_enabled(vcpu, wi->regime))
+ 		compute_s1_direct_permissions(vcpu, wi, wr);
+ 	else
+@@ -1032,14 +1037,10 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+ 	if (!wi->hpd)
+ 		compute_s1_hierarchical_permissions(vcpu, wi, wr);
+ 
+-	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+-		bool pan;
+-
+-		pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+-		pan &= wr->ur || wr->uw || (pan3_enabled(vcpu, wi->regime) && wr->ux);
+-		wr->pw &= !pan;
+-		wr->pr &= !pan;
+-	}
++	pan = wi->pan && (wr->ur || wr->uw ||
++			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
++	wr->pw &= !pan;
++	wr->pr &= !pan;
+ }
+ 
+ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+@@ -1065,7 +1066,7 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	if (ret)
+ 		goto compute_par;
+ 
+-	compute_s1_permissions(vcpu, op, &wi, &wr);
++	compute_s1_permissions(vcpu, &wi, &wr);
+ 
+ 	switch (op) {
+ 	case OP_AT_S1E1RP:
 -- 
 2.39.2
 
