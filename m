@@ -1,65 +1,65 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CCC4F21D
-	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 03:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9894B6CDAF
+	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 04:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729654412; cv=none; b=n1SMfe1EroLTh+mUR6BT6rSLlbKO3pkJgDWXIpftVlH3y0h715/cN02fxN1GET06GeUmcQC7qVMOkkv4AdkY7VciPjNqnTRCZNxKKABmpt0J8YczqdP7FikswSAn/wZxi43/r+Lceu+/2Y1iwxgK1uU1QObCcicBAxlCW8iEwDA=
+	t=1729656199; cv=none; b=cn/QfNA6Q25yCXAtFThKwntIHm/bp/UWsZnkUbQeTIBRjwmSfm5LBgpzah4usVbpqFfth6OTHDkE+Xo8eLQhzsjkvvQZ3jv/PQxeD5/H2R+WNHsfSJJ0M1095bNGcLUDIihGUshFx0y6aBvW/kphWqcq3DxxtZOz8tLvJz0Yq5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729654412; c=relaxed/simple;
-	bh=ho6or0E3n/jVuK9PYenxCW+3VsheSIP0c4OklGmN1BI=;
+	s=arc-20240116; t=1729656199; c=relaxed/simple;
+	bh=60FYQnwEjbn8ia2ijE+rJft1/gH3fGagogxsbRnBaRg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iTtNuzddBJmE9VgdUPO1jlG/wTA/d5fir+3aMGK8pYBP7bjb5cgSw1EDD5Z3MY0TTaKFVYs40Lz3i95OKxiOyAk1Hl90TzU0Vs6yNalcANn5dOlDOrXhsGyH5N7Nu9+G1XaP0dMXZ2hqrGAf7HeAKbE21uMpeSgn7Hq1clDvz70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KqQg6jnp; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=qefGeveKZI/tvazRG8TL/zJvH7y84CGnRJL5lewDRFX9S/Un7FmLE5vtiGFo5XUjnRld5jPqOkj0rSXYBrEnZ05VpI6sTOuwfXEEEkIziVnUqvWWgri7MKPY8W5dGVGK6FyCojOVnVslDh92+QBAaZfWrOCTfzHi9CMLF8l1eA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E35sBhFN; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KqQg6jnp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E35sBhFN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729654409;
+	s=mimecast20190719; t=1729656196;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mRZWBQ8JLM/V4cYvC4juoQOMsBXfCfkszQvB4MEwP7s=;
-	b=KqQg6jnpUDKAWaZFVXB7xGz7BCVu/WuqX7gUUSR7wEcHtS0fLaOp7lYebEpJe8Xj4HIpmN
-	JspYAIHbLsYcLlfhFSSFQllXJiOO0J8DTcmcAR5Us9cQ//hXiAuLn4c7vZYtIjCb1y4ERX
-	bJ9yU1dpXLuhhh3aqRSKoRfhuQh8w2k=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=fE9bH6h+Dp9Cy+4YV9E9TS1/FxNq1rWMOHkDfIVYSY8=;
+	b=E35sBhFNluHaVqqslSsWGZAelY2X4PvAlSJAL4cobvkWeBfxwQHWEkrucZjlJeLDa7KPuE
+	0g7DnLb5qTn1umLEozDDbXHEkYCjCcu2mAPbtz1vY1Hch+JjjaLFQHnUvwElrYmbmYTWh+
+	h1rhDGqs2En71mSU5c0ePNll0A2f2tU=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-486-pz812kQVN5aO0q0h7NTQsw-1; Tue, 22 Oct 2024 23:33:27 -0400
-X-MC-Unique: pz812kQVN5aO0q0h7NTQsw-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e2eba0efc6so6756862a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 20:33:27 -0700 (PDT)
+ us-mta-112-yPsOzgXrP0qg2CbOw88xNg-1; Wed, 23 Oct 2024 00:03:13 -0400
+X-MC-Unique: yPsOzgXrP0qg2CbOw88xNg-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-7cd9ac1fa89so6541648a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 22 Oct 2024 21:03:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729654406; x=1730259206;
+        d=1e100.net; s=20230601; t=1729656193; x=1730260993;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRZWBQ8JLM/V4cYvC4juoQOMsBXfCfkszQvB4MEwP7s=;
-        b=B4BUuaL389H/wieHNdnrgkP26KC9KvixYi0OLgoVgRhv4gbTFmrWvLmA0DqC3REEp+
-         Ohq9R+WU2NpZMjYtFL+hvkU3fdiShekays+Zk5/qyW9bSAspn9YXKjuj7XwA7dNS022c
-         Y/7DSpSA2zXZrRou99R1wX0oIou1efIWHNU87PT297Zez6DR8BdUO5VM6A4FCKLHV8WP
-         JsrIw0o+7OhxaT26kg1ADnVz1MLsJtY7Nt4ALg1emV4AvTYLwbKK0NELR1toKiiisliN
-         iag7RRQbnv1bGx7tmNjhcctOEz03nXfW/kcSqCzwAa/HZMhHEgqzObdxDsCRF/jasTIR
-         shHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWv2ZFTpiAXd0cuV2EmhWQLH4MwMll3yOrJ1X9vgSWdzCDP/BdcxhxKMxmLJvb/g5649YMsY6Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUwTATbHqqToqNAt167UFv+Bmgellq3vPDouip1YsCzEPzhTYy
-	0r9GTeMVBCH+j6Syy7WREyllmft+vUpSP7eZIuinmh6almebJnIXMsFtlNwwPIu3Fq6sMKoZjSX
-	wuteOZ1SdhLbZJKI7Lacc48jTCInW9r+vawbuSjSSQJUVKfrHooSvZg==
-X-Received: by 2002:a17:90a:6284:b0:2e2:b45f:53b4 with SMTP id 98e67ed59e1d1-2e76b6e4998mr1205473a91.25.1729654406468;
-        Tue, 22 Oct 2024 20:33:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEA0P1K9f5Kn6IEIXY9a0xjVIiT7iFfcbST/Ja7UAXbM4WNgnC2BgET2XvmKkP3UopQjPao7w==
-X-Received: by 2002:a17:90a:6284:b0:2e2:b45f:53b4 with SMTP id 98e67ed59e1d1-2e76b6e4998mr1205454a91.25.1729654406070;
-        Tue, 22 Oct 2024 20:33:26 -0700 (PDT)
+        bh=fE9bH6h+Dp9Cy+4YV9E9TS1/FxNq1rWMOHkDfIVYSY8=;
+        b=hgaCrTBMHm3bMlgSrszQ0iu/l+7hGDxHbTtCdNAce/1lDxHYkdidrgLuwNIH0BMvKE
+         WqtcSQVk8dRXeWNsxRzq2h5RaoV9y3jp8I6IqjBj6DucqdUKQu5x6eEk8xaUyajaU7GZ
+         gKc2lgGuN3XzbxShQ0NsZH8h12F64HhaFtvRu3VwyiH8UCv8eFyLSDWnAiVlGWur0R+P
+         hu5da8yivvV+wZpaoUdPq/H5GrD4QHFJS25uc7d1YYFU7vk+JODR//ffCF4Zsi54KdJJ
+         RmJ8s40lIUM3+efWo7j0JSxjba/XVSA7vinF5YHB61gDSmmzrhEqKcjs0osYNSxi29nT
+         MtxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVU4SQ6zBJX0bmAIFdRYU1zhGKCjebo9vMa1u/BgNEn0Fd3USh/RKlxCgkeQYE7FDrSWYvYirM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxO1lt23mUqPhmUyNgNQFtql3Wlp0IAqGqMkKOSRN60lApg9JWZ
+	C3zatzRwqwANVzc7bbtFodKHnk/qAlLUDRdwvi4/CRa8BLPBox2cV49IUQBueYcNfacg5VCAtD3
+	OWECkEcxbziGL82OR2OHbnf4zmU+c7BvJeYogHiFUuqKYVjcGFMNhmA==
+X-Received: by 2002:a17:90b:4c4b:b0:2e2:e148:3d30 with SMTP id 98e67ed59e1d1-2e76b60d401mr1665022a91.23.1729656192757;
+        Tue, 22 Oct 2024 21:03:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7Nzd7b22QkSrSkT2X54oW0FrLiZkrnYmJFDKn3Ga/iSi3gYtHtDYeZYfv+zNxnl5T9y8tvQ==
+X-Received: by 2002:a17:90b:4c4b:b0:2e2:e148:3d30 with SMTP id 98e67ed59e1d1-2e76b60d401mr1664999a91.23.1729656192357;
+        Tue, 22 Oct 2024 21:03:12 -0700 (PDT)
 Received: from [192.168.68.54] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e76dfb9b85sm278871a91.45.2024.10.22.20.33.17
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e76e088f1fsm273930a91.56.2024.10.22.21.03.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 20:33:25 -0700 (PDT)
-Message-ID: <2030d927-2c2d-4bbf-9228-34234ea935c0@redhat.com>
-Date: Wed, 23 Oct 2024 13:33:15 +1000
+        Tue, 22 Oct 2024 21:03:11 -0700 (PDT)
+Message-ID: <032d29e7-b6a3-4493-833b-a9b6d9496a75@redhat.com>
+Date: Wed, 23 Oct 2024 14:03:03 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,72 +67,98 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 10/11] virt: arm-cca-guest: TSM_REPORT support for
- realms
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Sami Mujawar <sami.mujawar@arm.com>, Marc Zyngier <maz@kernel.org>,
+Subject: Re: [PATCH v5 02/43] kvm: arm64: pgtable: Track the number of pages
+ in the entry level
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Dan Williams <dan.j.williams@intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241017131434.40935-1-steven.price@arm.com>
- <20241017131434.40935-11-steven.price@arm.com> <ZxeHSdpxocFA-SrO@arm.com>
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-3-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <ZxeHSdpxocFA-SrO@arm.com>
+In-Reply-To: <20241004152804.72508-3-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/22/24 9:06 PM, Catalin Marinas wrote:
-> On Thu, Oct 17, 2024 at 02:14:33PM +0100, Steven Price wrote:
->> From: Sami Mujawar <sami.mujawar@arm.com>
->>
->> Introduce an arm-cca-guest driver that registers with
->> the configfs-tsm module to provide user interfaces for
->> retrieving an attestation token.
->>
->> When a new report is requested the arm-cca-guest driver
->> invokes the appropriate RSI interfaces to query an
->> attestation token.
->>
->> The steps to retrieve an attestation token are as follows:
->>    1. Mount the configfs filesystem if not already mounted
->>       mount -t configfs none /sys/kernel/config
->>    2. Generate an attestation token
->>       report=/sys/kernel/config/tsm/report/report0
->>       mkdir $report
->>       dd if=/dev/urandom bs=64 count=1 > $report/inblob
->>       hexdump -C $report/outblob
->>       rmdir $report
->>
->> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v6:
->>   * Avoid get_cpu() and instead make the init attestation call using
->>     smp_call_function_single(). Improve comments to explain the logic.
->>   * Minor code reorgnisation and comment cleanup following Gavin's review
->>     (thanks!)
+On 10/5/24 1:27 AM, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> Gavin, since most changes in v7 are based on your feedback, do you have
-> any more comments on this patch? I plan to push this series into -next
-> fairly soon.
+> Keep track of the number of pages allocated for the top level PGD,
+> rather than computing it every time (though we need it only twice now).
+> This will be used later by Arm CCA KVM changes.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   arch/arm64/include/asm/kvm_pgtable.h | 2 ++
+>   arch/arm64/kvm/hyp/pgtable.c         | 5 +++--
+>   2 files changed, 5 insertions(+), 2 deletions(-)
 > 
 
-Catalin, The series looks good to me and I don't have more comments.
+If we really want to have the number of pages for the top level PGDs,
+the existing helpers kvm_pgtable_stage2_pgd_size() for the same purpose
+needs to replaced by (struct kvm_pgtable::pgd_pages << PAGE_SHIFT) and
+then removed.
+
+The alternative would be just to use kvm_pgtable_stage2_pgd_size() instead of
+introducing struct kvm_pgtable::pgd_pages, which will be used in the slow
+paths where realm is created or destroyed.
+
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 03f4c3d7839c..25b512756200 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -404,6 +404,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
+>    * struct kvm_pgtable - KVM page-table.
+>    * @ia_bits:		Maximum input address size, in bits.
+>    * @start_level:	Level at which the page-table walk starts.
+> + * @pgd_pages:		Number of pages in the entry level of the page-table.
+>    * @pgd:		Pointer to the first top-level entry of the page-table.
+>    * @mm_ops:		Memory management callbacks.
+>    * @mmu:		Stage-2 KVM MMU struct. Unused for stage-1 page-tables.
+> @@ -414,6 +415,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
+>   struct kvm_pgtable {
+>   	u32					ia_bits;
+>   	s8					start_level;
+> +	u8					pgd_pages;
+>   	kvm_pteref_t				pgd;
+>   	struct kvm_pgtable_mm_ops		*mm_ops;
+>   
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b11bcebac908..9e1be28c3dc9 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1534,7 +1534,8 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+>   	s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+>   
+> -	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
+> +	pgt->pgd_pages = kvm_pgd_pages(ia_bits, start_level);
+> +	pgd_sz = pgt->pgd_pages * PAGE_SIZE;
+>   	pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_pages_exact(pgd_sz);
+>   	if (!pgt->pgd)
+>   		return -ENOMEM;
+> @@ -1586,7 +1587,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+>   	};
+>   
+>   	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
+> -	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
+> +	pgd_sz = pgt->pgd_pages * PAGE_SIZE;
+>   	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(&walker, pgt->pgd), pgd_sz);
+>   	pgt->pgd = NULL;
+>   }
 
 Thanks,
 Gavin
