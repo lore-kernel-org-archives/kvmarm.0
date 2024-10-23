@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5902209F45;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC107209F4B;
 	Wed, 23 Oct 2024 14:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729695238; cv=none; b=mgLcxHsvIjmWRd9UEhqtU5EySPu7Wno9ccFmRo4K0UkKIcmio5uzxNS30i12a2GgpZUxmNZz40mi7/KxiXnK06ZODNMGZ2nAUi2QjawLqVS51ptdroDpJq6tTXYm+we2gUVJ3k/PYjPewDn+DI6MwVpUCgeqFa/pDMPllE2oF0c=
+	t=1729695238; cv=none; b=c749R4HJAVPG3l+5txKR49rUKDuZ6j1Lub4N6AEzaIyi3Sed8V7+NxmGjuhFLEMOgriM1z52tN0G26cksGMhFIwrkONuPk9cymuWorwKvIDX/pC3kBzHeK/ePCO1mrwvKRTk076Av1g8mLu5p/bLxnw1+rYW9fC8YigD3RGlnNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729695238; c=relaxed/simple;
-	bh=l2iJmram/7F50cBafm2LbS3iBb2YLddO4eliTdm5KZg=;
+	bh=IELrSxwq0YYfqTQ+7AffvzDHFrt+2D5q6aQ08Totfc0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bCoQlK0S4Ypbf4vISSVSWsDMEpLQV7jQBNcAXzq+JGeeNUFXsHRCPV7D3AK58EjX6eJNgufaWDXRVP/92AV9cXgl58bX7RPvNTYT4gTZ7eoVrNv/O122ydpi4lTL0OUcoca5N+Q6IMvSVRsputTWvjIS6AH0+wBF1W7Wb/FwtB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubi+QkmL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KnKXVWykTcL5Ed09rjPyu+fa9FDCmmXecqyZjE2bEcYOYKCsaWOnh8rg/DRyIgmBgancfCTljQfE8xqDMB+4INNOn5NUY4luQLuyo824dLsjIcYJlpsI+KqphZzMSPIgT887RqbdnqJ8yi66IV0hVNkkO6vQzMs6rRQbSb52xAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EH6y4mkg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubi+QkmL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF0AC4CEE5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EH6y4mkg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB3FAC4CECD;
 	Wed, 23 Oct 2024 14:53:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1729695238;
-	bh=l2iJmram/7F50cBafm2LbS3iBb2YLddO4eliTdm5KZg=;
+	bh=IELrSxwq0YYfqTQ+7AffvzDHFrt+2D5q6aQ08Totfc0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ubi+QkmLV6Y2ngbH2kLUsqgJaeH9GtkJsDzRYdyfF0IAIBdpBNfkcSyI6tbsvYxqO
-	 0cMqWx+M41WI0IBm6w+Xt/fAL3nxRIcLehQNIiU9NeeiM/Ddyn9oQyagZfRTeHfwnc
-	 Yjn/3A1KwR0iAvrOxoovj6krGJOJ+20up6l+SQoVuHbdeIaNqvQ6rtS/YIuUodw7T0
-	 77JpjU43a8F/X4w0zryjxn9Nv6w+U9TbNFUfpgKGfuP5m5EqrqzfTb2S53JXAophWJ
-	 pY0iWgjT5ZDlVVj7tZ9YwGdBIrelaceZiy5xjrSDOdfHTl99iUnXxBOEREybOg5OUO
-	 NK7GCiTj2vApQ==
+	b=EH6y4mkgpXVlJPcAaQ66p/3bN7Ex2nMFSEB0BfsKg5FqtlVoi/3Qepd6Y6U5H4eMk
+	 nPG+IqQ4KB7wSdBqo1hztsQqQ9+ZM68AJmu3HvP0WKWKB/6eiRy4msvc6CV/HTourM
+	 5vQGGDm67wLY2Y8Tf12qgPFlCENS7VGWJzQRk+dpswPKhw3Fu00pzsrWRNwc7KlYCp
+	 0MtidjZ0zhCwIC0SCoP3mZQ6X0p/TkIdInWx5DvZvcz3Xa3f5hsbTuGFBQ/qqtwjL6
+	 Phx9htQXejFO2+fscDAmgeHtLCDVREBpETQij5NWWJMzuYvUynHB4jdPtLZS435lhh
+	 GG+EC+TjNiWtw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t3ckG-0068vz-LQ;
-	Wed, 23 Oct 2024 15:53:56 +0100
+	id 1t3ckH-0068vz-2N;
+	Wed, 23 Oct 2024 15:53:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 34/37] KVM: arm64: Disable hierarchical permissions when POE is enabled
-Date: Wed, 23 Oct 2024 15:53:42 +0100
-Message-Id: <20241023145345.1613824-35-maz@kernel.org>
+Subject: [PATCH v5 36/37] KVM: arm64: Handle stage-1 permission overlays
+Date: Wed, 23 Oct 2024 15:53:44 +0100
+Message-Id: <20241023145345.1613824-37-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
 References: <20241023145345.1613824-1-maz@kernel.org>
@@ -60,78 +60,113 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The hierarchical permissions must be disabled when POE is enabled
-in the translation regime used for a given table walk.
+We now have the intrastructure in place to emulate S1POE:
 
-We store the two enable bits in the s1_walk_info structure so that
-they can be retrieved down the line, as they will be useful.
+- direct permissions are always overlay-capable
+- indirect permissions are overlay-capable if the permissions are
+  in the 0b0xxx range
+- the overlays are strictly substractive
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/arm64/kvm/at.c | 53 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index ef1643faedeb4..8d1dc6327ec5b 100644
+index 2ab2c3578c3a0..d300cd1a0d8a7 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -24,6 +24,8 @@ struct s1_walk_info {
- 	unsigned int		txsz;
- 	int 	     		sl;
- 	bool	     		hpd;
-+	bool			e0poe;
-+	bool			poe;
- 	bool	     		be;
- 	bool	     		s2;
- };
-@@ -110,6 +112,34 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+@@ -40,9 +40,11 @@ struct s1_walk_result {
+ 			u8	APTable;
+ 			bool	UXNTable;
+ 			bool	PXNTable;
++			bool	uov;
+ 			bool	ur;
+ 			bool	uw;
+ 			bool	ux;
++			bool	pov;
+ 			bool	pr;
+ 			bool	pw;
+ 			bool	px;
+@@ -881,6 +883,9 @@ static void compute_s1_direct_permissions(struct kvm_vcpu *vcpu,
+ 		/* XN maps to UXN */
+ 		wr->px = !(wr->desc & PTE_UXN);
+ 	}
++
++	wr->pov = wi->poe;
++	wr->uov = wi->e0poe;
+ }
+ 
+ static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+@@ -1016,6 +1021,9 @@ static void compute_s1_indirect_permissions(struct kvm_vcpu *vcpu,
+ 	else
+ 		set_unpriv_perms(wr, false, false, false);
+ 
++	wr->pov = wi->poe && !(pp & BIT(3));
++	wr->uov = wi->e0poe && !(up & BIT(3));
++
+ 	/* R_VFPJF */
+ 	if (wr->px && wr->uw) {
+ 		set_priv_perms(wr, false, false, false);
+@@ -1023,6 +1031,48 @@ static void compute_s1_indirect_permissions(struct kvm_vcpu *vcpu,
  	}
  }
  
-+static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
++static void compute_s1_overlay_permissions(struct kvm_vcpu *vcpu,
++					   struct s1_walk_info *wi,
++					   struct s1_walk_result *wr)
 +{
-+	u64 val;
++	u8 idx, pov_perms, uov_perms;
 +
-+	if (!kvm_has_s1poe(vcpu->kvm)) {
-+		wi->poe = wi->e0poe = false;
-+		return;
-+	}
++	idx = FIELD_GET(PTE_PO_IDX_MASK, wr->desc);
 +
 +	switch (wi->regime) {
-+	case TR_EL2:
-+	case TR_EL20:
-+		val = vcpu_read_sys_reg(vcpu, TCR2_EL2);
-+		wi->poe = val & TCR2_EL2_POE;
-+		wi->e0poe = (wi->regime == TR_EL20) && (val & TCR2_EL2_E0POE);
-+		break;
 +	case TR_EL10:
-+		if (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) {
-+			wi->poe = wi->e0poe = false;
-+			return;
-+		}
++		pov_perms = perm_idx(vcpu, POR_EL1, idx);
++		uov_perms = perm_idx(vcpu, POR_EL0, idx);
++		break;
++	case TR_EL20:
++		pov_perms = perm_idx(vcpu, POR_EL2, idx);
++		uov_perms = perm_idx(vcpu, POR_EL0, idx);
++		break;
++	case TR_EL2:
++		pov_perms = perm_idx(vcpu, POR_EL2, idx);
++		uov_perms = 0;
++		break;
++	}
 +
-+		val = __vcpu_sys_reg(vcpu, TCR2_EL1);
-+		wi->poe = val & TCR2_EL1x_POE;
-+		wi->e0poe = val & TCR2_EL1x_E0POE;
++	if (pov_perms & ~POE_RXW)
++		pov_perms = POE_NONE;
++
++	if (wi->poe && wr->pov) {
++		wr->pr &= pov_perms & POE_R;
++		wr->px &= pov_perms & POE_X;
++		wr->pw &= pov_perms & POE_W;
++	}
++
++	if (uov_perms & ~POE_RXW)
++		uov_perms = POE_NONE;
++
++	if (wi->e0poe && wr->uov) {
++		wr->ur &= uov_perms & POE_R;
++		wr->ux &= uov_perms & POE_X;
++		wr->uw &= uov_perms & POE_W;
 +	}
 +}
 +
- static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 			 struct s1_walk_result *wr, u64 va)
- {
-@@ -206,6 +236,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 	/* R_JHSVW */
- 	wi->hpd |= s1pie_enabled(vcpu, wi->regime);
+ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+ 				   struct s1_walk_info *wi,
+ 				   struct s1_walk_result *wr)
+@@ -1037,6 +1087,9 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+ 	if (!wi->hpd)
+ 		compute_s1_hierarchical_permissions(vcpu, wi, wr);
  
-+	/* Do we have POE? */
-+	compute_s1poe(vcpu, wi);
++	if (wi->poe || wi->e0poe)
++		compute_s1_overlay_permissions(vcpu, wi, wr);
 +
-+	/* R_BVXDG */
-+	wi->hpd |= (wi->poe || wi->e0poe);
-+
- 	/* Someone was silly enough to encode TG0/TG1 differently */
- 	if (va55) {
- 		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
+ 	pan = wi->pan && (wr->ur || wr->uw ||
+ 			  (pan3_enabled(vcpu, wi->regime) && wr->ux));
+ 	wr->pw &= !pan;
 -- 
 2.39.2
 
