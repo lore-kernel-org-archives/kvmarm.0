@@ -1,130 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F382E1D1E72
-	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 16:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0129819DFB5
+	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 20:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729702438; cv=none; b=kw+zRidtS56qMiA6ZcfSb1NwG3/YchZalPEHatlIGDQLpfU/gqec9eASPxy1uP5diQNwmFLcdf2YekoKiQSt3UwGuuCRR4i+pXMPnd6vrIjvYUW4xOz/fqOdMH2tgzaiOA2+5tlxNnGAT6C2Q3O96KtdiPNKd8Y0EcaBmgDWiuk=
+	t=1729714985; cv=none; b=ErurdrJbtKzJoHRCV/DaBdQP0lELSr4x4VYeu615eBpwTQEpYrkCxtWiC5vI9E0H1CTvweqHx0NdOZ8E7yMlToQxnL8OFHCbWM0KNQju/wMqxUAjnbnievhV70qUw/rOvc2C4xrK0xMMHP/weFA1YVDEmw42mdZUVvoY2gefqy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729702438; c=relaxed/simple;
-	bh=jHLJdDp6AeGNoGZXHRp2Mz5fRTwo+HOsHYS1lsR3HYA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QUluBQIDceP0HWlRwKbadmWmJlKU/T//ZlsGd4SPpz/Yar/xRRrOjPfvd9+1TSsIa8oqf2o7ROHqtS5PRlfYhkxrjJ49E7GRt/dvhAUUri2FQn3UV32ptpyU3USP1kneKCIMz3VCBkFwpEh2a1WKL9Fg7/IpkY9PxKlpSt81xVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6FfTadm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729714985; c=relaxed/simple;
+	bh=jbWiAyqBhiEXv3WIAR+95DU4d8rfKWrvkeP/G5neGpA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ab6miqKaxo6XJdsSQzgsY+4GjP4XYJkGI/fvxwdsEejULyxCmH5G9YittAaG26QWlLBQqG+xENdeeMoJgp2nPkoI7MjYx4cSynZAXQMK0IgeCsgo0BWGbrX7xU6fx5O5ccJ0SBBIkB+Q2eTPuom0Ck7HTKX8sY67DggF6GRnK5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kL2lP68C; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6FfTadm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C762C4CEC6;
-	Wed, 23 Oct 2024 16:53:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729702437;
-	bh=jHLJdDp6AeGNoGZXHRp2Mz5fRTwo+HOsHYS1lsR3HYA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a6FfTadmjcr9wKdhYG0klV7Z0lzo73VrNXWYbk+U1tDilcNmPy/+pnX0vp2nn8HMJ
-	 anOgC8WfVnhHac7uz88DKefai0gYObuSd0lC4zMjk+wdM5PK9LCzyWsdhZy/dih15K
-	 adYJAg3vG3PpeOt6bzznN464yM5RFIk+76qbUrX9WqhuVo8xaXvBfCjrsgJ3/Ohnhd
-	 ZAabugxqKUZC/NRC2b0+WG15uZo3JRCbXzjoh3IndJY6JctMILuo/5676dF3N/CWQ8
-	 zOAkK/avvEjUNILLz6DDc9v68b5FLeZDCMP+YqV1eL86I3E+FFkq+QR8CVlFChWUYh
-	 xTpYKMw6gqugQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t3ecN-006BwW-C4;
-	Wed, 23 Oct 2024 17:53:55 +0100
-Date: Wed, 23 Oct 2024 17:53:55 +0100
-Message-ID: <86zfmu3gm4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/2] KVM: arm64: Don't map 'kvm_vgic_global_state' at EL2 with pKVM
-In-Reply-To: <20241023163907.GD29251@willie-the-truck>
-References: <20241022144016.27350-1-will@kernel.org>
-	<20241022144016.27350-3-will@kernel.org>
-	<865xpk3wde.wl-maz@kernel.org>
-	<20241023163907.GD29251@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kL2lP68C"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539f84907caso169542e87.3
+        for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 13:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729714982; x=1730319782; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QZD/0/u7gXlxe9du/g//Uu8khQkQ8pf7JdM6R0YxrK8=;
+        b=kL2lP68CujZY++Z/bXNP77Pr+uSolhShJFokDiKmrO20sRThOPC43Z3nux7jaE3i+o
+         tG0KGuMA0Sy6AFbfaaYgaedBx8mv3/Pqcn2PfZmZi1bB2d0YeuRY6j339M77BkL1HBvx
+         FbLts+vaAuNZgodfXVBG+58ZIHm53j8kArLc8sRqpXL6HNfLiwYjdILxxoSknYW+22BM
+         0eZYjzstzmIfHWQIywuIfE599CYFvMgPZZLhTykJbha4u47XS2E+zDFXGNByFRUuLF3M
+         Tem0zu0KheZ0CctA9VTf42dmmF/aa9Q63uTLLDOkxKdi/UZn8vTQlA3MMWlZDJv9iRjM
+         cLMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729714982; x=1730319782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QZD/0/u7gXlxe9du/g//Uu8khQkQ8pf7JdM6R0YxrK8=;
+        b=WPmCeFGDa1fZgDvagU9hqBsNR+y1WIVuQBFfJyH6XrJxefPoFFYR86j7+ae2EUrMe7
+         GTqq75D+AiIJxaI1BEHf4vUAOBLbGFa/ZdJarZ6oLxxOECP5m0C3WqOd0+2bHDPlSsEJ
+         XkWgQe0L30pfWTyzWTrp6ZUmMWkUb/EHKjw1lPP0jQO0/l5yh/742tsXk6xh8kr6GDuQ
+         xSqOcA7vQBNpj+Xo9AuHB8nGrCznmXJvPiY0WKvGi/tZFPW7z30NPdzrUfVy2+eScwR7
+         jNdoujE4MJPxoWS1tTP2fGOWLTD8Pg2gQ0DxqemJLmfFN29NrAenh5ribMKHSXAd5OtB
+         dx/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUg87TujJ8AczRHX8BRbdbw0egzC5f6AkNTGP0Ik/TTaPUd/QzZNyyX79Lt6zXIwnomvz5AXEo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzw/q+cxtIrQGZe45xkk073kQuQD5ikWPpatI+GdW7XD8r0eAdt
+	gJ/Q5Bm0Moo/1G3/9b76x4i3Opm2iMDxfHryNoukPI1fisHidX/+xmkD2E9zUxlP+WhocauDLp3
+	5IRKsEj1/F73c12oN3eUwdXteTN8z0/1xojYX
+X-Google-Smtp-Source: AGHT+IGlNI9WaWM+QrYiA17yEQjL8bNc+Jh3lkHinNfgg5TW9AlhOnLoOjeid2kRXVqKu2tTh2RpWrDZehi1hSUFULk=
+X-Received: by 2002:a05:6512:12d2:b0:539:f4a6:ef4b with SMTP id
+ 2adb3069b0e04-53b1a3bf229mr2388184e87.55.1729714981802; Wed, 23 Oct 2024
+ 13:23:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, tabba@google.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240704142319.728-1-jiangkunkun@huawei.com>
+In-Reply-To: <20240704142319.728-1-jiangkunkun@huawei.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Wed, 23 Oct 2024 13:22:50 -0700
+Message-ID: <CAAdAUtjnWqDUFfZri10HWk=U+Bsy1_Q8zEe7oucwGzNDJGQYGg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] KVM: arm64: vgic-its: Some fixes about vgic-its
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Eric Auger <eauger@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	wanghaibin.wang@huawei.com, lishusen2@huawei.com, tangnianyao@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 23 Oct 2024 17:39:08 +0100,
-Will Deacon <will@kernel.org> wrote:
-> 
-> On Tue, Oct 22, 2024 at 06:01:17PM +0100, Marc Zyngier wrote:
-> > On Tue, 22 Oct 2024 15:40:16 +0100,
-> > Will Deacon <will@kernel.org> wrote:
-> > > 
-> > > Now that 'kvm_vgic_global_state' is no longer needed for ICC_CTLR_EL1
-> > > emulation on machines with a broken SEIS implementation, drop the
-> > > pKVM hypervisor mapping of the page.
-> > > 
-> > > Cc: Marc Zyngier <maz@kernel.org>
-> > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/setup.c | 17 -----------------
-> > >  1 file changed, 17 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > > index 174007f3fadd..8fec099c2775 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > > @@ -95,7 +95,6 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
-> > >  {
-> > >  	void *start, *end, *virt = hyp_phys_to_virt(phys);
-> > >  	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
-> > > -	enum kvm_pgtable_prot prot;
-> > >  	int ret, i;
-> > >  
-> > >  	/* Recreate the hyp page-table using the early page allocator */
-> > > @@ -148,22 +147,6 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
-> > >  	}
-> > >  
-> > >  	pkvm_create_host_sve_mappings();
-> > > -
-> > > -	/*
-> > > -	 * Map the host sections RO in the hypervisor, but transfer the
-> > > -	 * ownership from the host to the hypervisor itself to make sure they
-> > > -	 * can't be donated or shared with another entity.
-> > > -	 *
-> > > -	 * The ownership transition requires matching changes in the host
-> > > -	 * stage-2. This will be done later (see finalize_host_mappings()) once
-> > > -	 * the hyp_vmemmap is addressable.
-> > > -	 */
-> > > -	prot = pkvm_mkstate(PAGE_HYP_RO, PKVM_PAGE_SHARED_OWNED);
-> > > -	ret = pkvm_create_mappings(&kvm_vgic_global_state,
-> > > -				   &kvm_vgic_global_state + 1, prot);
-> > > -	if (ret)
-> > > -		return ret;
-> > > -
-> > >  	return 0;
-> > >  }
-> > 
-> > Maybe add a note indicating that nVHE/hVHE still have that particular
-> > mapping via the rodata section?
-> 
-> I can add something to the commit message, is that what you had in mind?
+Hi Kunkun,
 
-Yes. But maybe Oliver can add that when applying the series?
+Do you have a plan to respin this patch series?
 
-Thanks,
+We encountered an issue during the VM suspend/resume test that can be
+resolved by this patch series.
+During VM suspending, the ITS table saving is called multiple times.
+Concurrently, device table and ITT table entries are mapped/unmapped
+due to devices' suspend/resume. This leaves some free entries dirty
+(valid bit equals 1).
+The table restore starts from the first entry to find a valid one.
+There is a chance that the entry found is a free one, but with the
+valid bit as 1.
 
-	M.
+Jing
 
--- 
-Without deviation from the norm, progress is not possible.
+On Thu, Jul 4, 2024 at 7:23=E2=80=AFAM Kunkun Jiang <jiangkunkun@huawei.com=
+> wrote:
+>
+> There are three fixes about vgic-its:
+> Patch 1: A data length check is added in vgic_its_save_*
+> Patch 2-3: Fix two bugs in the scenario of continuous save and restore
+>
+> History:
+> v1 -> v2:
+> - Replaced BUG_ON() with KVM_BUG_ON()
+>
+> Kunkun Jiang (3):
+>   KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+>   KVM: arm64: vgic-its: Clear dte when mapd unmaps a device
+>   KVM: arm64: vgic-its: Clear ite when discard frees an ite
+>
+>  arch/arm64/kvm/vgic/vgic-its.c | 44 ++++++++++++++++++++++++++++++----
+>  1 file changed, 40 insertions(+), 4 deletions(-)
+>
+> --
+> 2.27.0
+>
+>
