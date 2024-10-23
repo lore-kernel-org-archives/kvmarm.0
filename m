@@ -1,32 +1,32 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C2C1A76AC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D47A1AC45F
 	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 13:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729689452; cv=none; b=qyxNeBO9DRK4hJfDad8XpfGR0ck8O1699tf96HQQP/aaF91sAu+sulhKYNpLvnyNSK6LqJJxPXSIqRyR+aLzRZS4kHMHNHw83zNknJayUiMe39vZj9NKflYMt3OUNjdxYqQqPzwSGIYknaEH8Lkqc5XyNcp1yTw1XhZijfWj9MI=
+	t=1729689453; cv=none; b=XnWsHnqYNLZxgGoCh21UmUievW69dCuhVxtXhKSBnGj89GMD97sLHbX6wOL+57eYQ1OqtIXBcsE3ncyZKjf5o62g52VLEYLk+wzdoa7B4Or0JushlVw9ye0D1zFM+TDwYp1CyMCr+ji96k3HwPuwWfqH/AQrHEY5hcCJpSt2o+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729689452; c=relaxed/simple;
-	bh=VxEExFJ5cT66ChsR+4TqWR6RdTnzv16Bxu3/mJ5sDTU=;
+	s=arc-20240116; t=1729689453; c=relaxed/simple;
+	bh=jPdbXTwp1wvSiTi8oi6fu6OHZh0zLWkywdVsZHJNOYg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WNNgPTCSPZHhtBOcfidKlrz0YKXkHxX+nh92DtB+g3yb+myZ4Afr3sOaY0wfE8btrLRkkcsNhOmLq/yCSt9NUtfT2hu1sluHw3klx/EnLBk7NKG+sSlTdDCehdT774i7a4XqKN0FCkW3fIxldtDKWtrH82rLtYiDvdwqM7PuD/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R96KKr45; arc=none smtp.client-ip=91.218.175.177
+	 MIME-Version; b=ZzK2fDZqny8gAMFhqw5GwGr6mhpthEvRMsp4v5KQmpLYFY0vTwodAXJzoCyqHz9OoWAcKFdqby2TlFFkMkpma0lEetRQJxkC5TxbVJVV8YaMqaPsgZNGJaj2yVrUVUZFV80hx4vyVLlI1nPsrJnGSFcWVgJiVQLwIVTBMspugOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d8JTL1cG; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R96KKr45"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d8JTL1cG"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729689445;
+	t=1729689448;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QeV4UfkiS7XFzfn3GzKPrb95YL+mJ8EYcU6Ge+O/14M=;
-	b=R96KKr45P98nWNOUWIJnWJDx/9nd3WZG25knN4pFUZzB4fuUvsjoVabJi4z3xcoy/ZHkVV
-	CXySf4GOiO8G7USyOggyGxSnaR+X33cdujPH4+XrRKeS3u8v/fQaJMegQnZ05uEn/uHqqv
-	b4cAIgKHO1E5RwIF5gyzjGNf6N80yJ0=
+	bh=l02EqjoVbZcAjRJYCFnsAiDgQGfpjHtDxV/1hFAAx5k=;
+	b=d8JTL1cGcamsFcXSsTnfwg0zmJhp07O0P+V48OrBInRouEh7PN8TXnTn1jKjXUAEePy9ey
+	oVTKD6TlRbW83tlRrrnXgecnzCz93rvxwxxT8pqvlU5p8FpnTZ7eZlv22XoE015fsq5aTt
+	+4u9hi9mnMnfPByUZPCu4ZlpXNfvBNg=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -35,9 +35,9 @@ Cc: atishp@rivosinc.com,
 	jamestiotio@gmail.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH 1/2] lib/on-cpus: Correct and simplify synchronization
-Date: Wed, 23 Oct 2024 15:17:20 +0200
-Message-ID: <20241023131718.117452-5-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 2/2] lib/on-cpus: Fix on_cpumask
+Date: Wed, 23 Oct 2024 15:17:21 +0200
+Message-ID: <20241023131718.117452-6-andrew.jones@linux.dev>
 In-Reply-To: <20241023131718.117452-4-andrew.jones@linux.dev>
 References: <20241023131718.117452-4-andrew.jones@linux.dev>
 Precedence: bulk
@@ -49,96 +49,77 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-get/put_on_cpu_info() were trying to provide per-cpu locking for
-the per-cpu on_cpu info, but they were flawed since they would
-always set the "lock" since they were treating test_and_set/clear
-as cmpxchg (which they're not). Just revert to a normal spinlock
-to correct it. Also simplify the break case for on_cpu_async() -
-we don't care if func is NULL, we only care that the cpu is idle.
-And, finally, add a missing barrier to on_cpu_async().
+on_cpumask should wait until the cpus in the mask, not including
+the calling cpu, are idle. Checking the weight against nr_cpus
+minus 1 only works when the mask is the same as the present mask.
 
-Fixes: 018550041b38 ("arm/arm64: Remove spinlocks from on_cpu_async")
+Fixes: d012cfd5d309 ("lib/on-cpus: Introduce on_cpumask and on_cpumask_async")
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/on-cpus.c | 36 +++++++++++-------------------------
- 1 file changed, 11 insertions(+), 25 deletions(-)
+ lib/cpumask.h | 14 ++++++++++++++
+ lib/on-cpus.c | 17 ++++++++---------
+ 2 files changed, 22 insertions(+), 9 deletions(-)
 
-diff --git a/lib/on-cpus.c b/lib/on-cpus.c
-index 892149338419..f6072117fa1b 100644
---- a/lib/on-cpus.c
-+++ b/lib/on-cpus.c
-@@ -9,6 +9,7 @@
- #include <on-cpus.h>
- #include <asm/barrier.h>
- #include <asm/smp.h>
-+#include <asm/spinlock.h>
- 
- bool cpu0_calls_idle;
- 
-@@ -18,18 +19,7 @@ struct on_cpu_info {
- 	cpumask_t waiters;
- };
- static struct on_cpu_info on_cpu_info[NR_CPUS];
--static cpumask_t on_cpu_info_lock;
--
--static bool get_on_cpu_info(int cpu)
--{
--	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
--}
--
--static void put_on_cpu_info(int cpu)
--{
--	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
--	assert(ret);
--}
-+static struct spinlock lock;
- 
- static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
- {
-@@ -81,18 +71,14 @@ void do_idle(void)
- 	if (cpu == 0)
- 		cpu0_calls_idle = true;
- 
--	set_cpu_idle(cpu, true);
--	smp_send_event();
--
- 	for (;;) {
-+		set_cpu_idle(cpu, true);
-+		smp_send_event();
-+
- 		while (cpu_idle(cpu))
- 			smp_wait_for_event();
- 		smp_rmb();
- 		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
--		on_cpu_info[cpu].func = NULL;
--		smp_wmb();
--		set_cpu_idle(cpu, true);
--		smp_send_event();
- 	}
+diff --git a/lib/cpumask.h b/lib/cpumask.h
+index e1e92aacd1f1..37d360786573 100644
+--- a/lib/cpumask.h
++++ b/lib/cpumask.h
+@@ -58,6 +58,20 @@ static inline void cpumask_clear(cpumask_t *mask)
+ 	memset(mask, 0, sizeof(*mask));
  }
  
-@@ -110,17 +96,17 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
++/* true if src1 is a subset of src2 */
++static inline bool cpumask_subset(const struct cpumask *src1, const struct cpumask *src2)
++{
++	unsigned long lastmask = BIT_MASK(nr_cpus) - 1;
++	int i;
++
++	for (i = 0; i < BIT_WORD(nr_cpus); ++i) {
++		if (cpumask_bits(src1)[i] & ~cpumask_bits(src2)[i])
++			return false;
++	}
++
++	return !lastmask || !((cpumask_bits(src1)[i] & ~cpumask_bits(src2)[i]) & lastmask);
++}
++
+ static inline bool cpumask_empty(const cpumask_t *mask)
+ {
+ 	unsigned long lastmask = BIT_MASK(nr_cpus) - 1;
+diff --git a/lib/on-cpus.c b/lib/on-cpus.c
+index f6072117fa1b..7ce58be0e7e9 100644
+--- a/lib/on-cpus.c
++++ b/lib/on-cpus.c
+@@ -126,24 +126,23 @@ void on_cpumask_async(const cpumask_t *mask, void (*func)(void *data), void *dat
+ void on_cpumask(const cpumask_t *mask, void (*func)(void *data), void *data)
+ {
+ 	int cpu, me = smp_processor_id();
++	cpumask_t tmp;
  
- 	for (;;) {
- 		cpu_wait(cpu);
--		if (get_on_cpu_info(cpu)) {
--			if ((volatile void *)on_cpu_info[cpu].func == NULL)
--				break;
--			put_on_cpu_info(cpu);
--		}
-+		spin_lock(&lock);
-+		if (cpu_idle(cpu))
-+			break;
-+		spin_unlock(&lock);
+-	for_each_cpu(cpu, mask) {
+-		if (cpu == me)
+-			continue;
++	cpumask_copy(&tmp, mask);
++	cpumask_clear_cpu(me, &tmp);
++
++	for_each_cpu(cpu, &tmp)
+ 		on_cpu_async(cpu, func, data);
+-	}
+ 	if (cpumask_test_cpu(me, mask))
+ 		func(data);
+ 
+-	for_each_cpu(cpu, mask) {
+-		if (cpu == me)
+-			continue;
++	for_each_cpu(cpu, &tmp) {
+ 		cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
+ 		deadlock_check(me, cpu);
  	}
- 
- 	on_cpu_info[cpu].func = func;
- 	on_cpu_info[cpu].data = data;
-+	smp_wmb();
- 	set_cpu_idle(cpu, false);
--	put_on_cpu_info(cpu);
-+	spin_unlock(&lock);
- 	smp_send_event();
+-	while (cpumask_weight(&cpu_idle_mask) < nr_cpus - 1)
++	while (!cpumask_subset(&tmp, &cpu_idle_mask))
+ 		smp_wait_for_event();
+-	for_each_cpu(cpu, mask)
++	for_each_cpu(cpu, &tmp)
+ 		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
  }
  
 -- 
