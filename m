@@ -1,137 +1,91 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E1B1CFEDC;
-	Wed, 23 Oct 2024 14:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6E91ADFE4;
+	Wed, 23 Oct 2024 14:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729694145; cv=none; b=Tkr1nEm2QM4Do9jPv93ntXPKJaC2UGYSPsoC9wPOqz4RGhBUJxHtFWAkxb/zPA8KxRCMkQc7+Qv84jFl9epN/2pUfq01U5cCoWkuh8A5d0uZBB9X8FJ6k/Xq3o4ehQca0EihcenxXczpOCDsrkWgSq/5rCpyaDzNf6tlN4Gbm6A=
+	t=1729695232; cv=none; b=dCVs4IYPtPPvN+8T5tLnuZoq3HTguGmiFFq4ZMRXASXC8LsBR9U8w8dxc+Ojq6MO3TKODxBDjE0p4zKsH/FJs1fXx+H7ZwW7kGbO5889DHyr72dkcoPYiEqFjFZ2v/cc85ldDFo2r1b9YmKlZ7fYvkVyvZ+6EDkmUIWoMZQng/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729694145; c=relaxed/simple;
-	bh=l68G4xs/wglFkcKCnUp2kdZ0MOFIFNVe7VqWRN/gcjE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZFTStzpOEpBDOPc3PCHkOBQyyz3HhzqjfWnZNBWhlvnYdDQu3t1C6v5FEUdrxsbeZe87SE3BV4iWzVu/ubggOluhGj7pd3oONfcl57kEVoptrrKa0dkt2TzGVUSwBRw3KIX9xOrqpUtAAG220ulvfgnV6lvt/rIEtpHpk0mYIN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E145E339;
-	Wed, 23 Oct 2024 07:36:11 -0700 (PDT)
-Received: from [10.57.23.17] (unknown [10.57.23.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 045763F71E;
-	Wed, 23 Oct 2024 07:35:37 -0700 (PDT)
-Message-ID: <7d02ed25-7618-4920-8f35-9e480cdf709f@arm.com>
-Date: Wed, 23 Oct 2024 15:35:35 +0100
+	s=arc-20240116; t=1729695232; c=relaxed/simple;
+	bh=iNfYJ4JXlpAYVqAHGPpB7Ak03akbgaV2OHGu0ciE5wM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=FiqTySwD0Ktd+oLBUorvA3JUa4qZZkmecHpBYpmrmzGP55imjNQq9wc7Lr0zPFvQb27LneNT4ZxVGf4xV0Bpqgo5iulyHP09X4uY3k1CrVHCQwlDKRXqReO3W8DGt3AZxLj54XqKCixv2rVCTmFHOZ0u5/qbFPB8dfgVjFOus8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOa9l1fL; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOa9l1fL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A27FAC4CEE6;
+	Wed, 23 Oct 2024 14:53:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729695231;
+	bh=iNfYJ4JXlpAYVqAHGPpB7Ak03akbgaV2OHGu0ciE5wM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mOa9l1fLqxHoh/XYX8XHW0anBL3x6wpjc4bpwozLdbM2uPVZtcuFmFLvh4I2duAIF
+	 kv2RAx1vnmSjRv14ItIOx/RYeYxHLfDV0Y+R6niwTzgbSyv7UOvMmqzI7xxIGnJ78B
+	 jQCXnee4CQTSuXEXhYmpLkLhrDGJ7ngqQ/88eaGK0KsvAKgif1CevJ+PjhafKHYNuL
+	 avRFIQAMVE+gsyfqxuvvcm+SgCTXnyrzPyRiJzhZ/G+5GZyVJab0zYeLC6GDyuG8Zo
+	 tBHZC5LJdqsMefKpJ+6fJNydVOIx2/sP6I8FyOqRAiR86Dx+1rOHATT7oPRhak+/JE
+	 ZFBIJPJOQTeKw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t3ck9-0068vz-N6;
+	Wed, 23 Oct 2024 15:53:49 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v5 01/37] arm64: Drop SKL0/SKL1 from TCR2_EL2
+Date: Wed, 23 Oct 2024 15:53:09 +0100
+Message-Id: <20241023145345.1613824-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
+References: <20241023145345.1613824-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 02/43] kvm: arm64: pgtable: Track the number of pages
- in the entry level
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-3-steven.price@arm.com>
- <032d29e7-b6a3-4493-833b-a9b6d9496a75@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <032d29e7-b6a3-4493-833b-a9b6d9496a75@redhat.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 23/10/2024 05:03, Gavin Shan wrote:
-> On 10/5/24 1:27 AM, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> Keep track of the number of pages allocated for the top level PGD,
->> rather than computing it every time (though we need it only twice now).
->> This will be used later by Arm CCA KVM changes.
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_pgtable.h | 2 ++
->>   arch/arm64/kvm/hyp/pgtable.c         | 5 +++--
->>   2 files changed, 5 insertions(+), 2 deletions(-)
->>
-> 
-> If we really want to have the number of pages for the top level PGDs,
-> the existing helpers kvm_pgtable_stage2_pgd_size() for the same purpose
-> needs to replaced by (struct kvm_pgtable::pgd_pages << PAGE_SHIFT) and
-> then removed.
-> 
-> The alternative would be just to use kvm_pgtable_stage2_pgd_size()
-> instead of
-> introducing struct kvm_pgtable::pgd_pages, which will be used in the slow
-> paths where realm is created or destroyed.
+Despite what the documentation says, TCR2_EL2.{SKL0,SKL1} do not exist,
+and the corresponding information is in the respective TTBRx_EL2. This
+is a leftover from a development version of the architecture.
 
-I think just dropping this patch and using kvm_pgtable_stage2_pgd_size()
-in the slow paths makes sense. I think originally there had been some
-issue with the value being hard to obtain in the relevant path, but I
-can't see any problem now.
+This change makes TCR2_EL2 similar to TCR2_EL1 in that respect.
 
-Thanks,
-Steve
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/sysreg | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
->> diff --git a/arch/arm64/include/asm/kvm_pgtable.h
->> b/arch/arm64/include/asm/kvm_pgtable.h
->> index 03f4c3d7839c..25b512756200 100644
->> --- a/arch/arm64/include/asm/kvm_pgtable.h
->> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->> @@ -404,6 +404,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
->>    * struct kvm_pgtable - KVM page-table.
->>    * @ia_bits:        Maximum input address size, in bits.
->>    * @start_level:    Level at which the page-table walk starts.
->> + * @pgd_pages:        Number of pages in the entry level of the
->> page-table.
->>    * @pgd:        Pointer to the first top-level entry of the page-table.
->>    * @mm_ops:        Memory management callbacks.
->>    * @mmu:        Stage-2 KVM MMU struct. Unused for stage-1 page-tables.
->> @@ -414,6 +415,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
->>   struct kvm_pgtable {
->>       u32                    ia_bits;
->>       s8                    start_level;
->> +    u8                    pgd_pages;
->>       kvm_pteref_t                pgd;
->>       struct kvm_pgtable_mm_ops        *mm_ops;
->>   diff --git a/arch/arm64/kvm/hyp/pgtable.c
->> b/arch/arm64/kvm/hyp/pgtable.c
->> index b11bcebac908..9e1be28c3dc9 100644
->> --- a/arch/arm64/kvm/hyp/pgtable.c
->> +++ b/arch/arm64/kvm/hyp/pgtable.c
->> @@ -1534,7 +1534,8 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable
->> *pgt, struct kvm_s2_mmu *mmu,
->>       u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
->>       s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
->>   -    pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
->> +    pgt->pgd_pages = kvm_pgd_pages(ia_bits, start_level);
->> +    pgd_sz = pgt->pgd_pages * PAGE_SIZE;
->>       pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_pages_exact(pgd_sz);
->>       if (!pgt->pgd)
->>           return -ENOMEM;
->> @@ -1586,7 +1587,7 @@ void kvm_pgtable_stage2_destroy(struct
->> kvm_pgtable *pgt)
->>       };
->>         WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
->> -    pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
->> +    pgd_sz = pgt->pgd_pages * PAGE_SIZE;
->>       pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(&walker,
->> pgt->pgd), pgd_sz);
->>       pgt->pgd = NULL;
->>   }
-> 
-> Thanks,
-> Gavin
-> 
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 8d637ac4b7c6b..ee3adec6a7c82 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2819,8 +2819,7 @@ Field	13	AMEC1
+ Field	12	AMEC0
+ Field	11	HAFT
+ Field	10	PTTWI
+-Field	9:8	SKL1
+-Field	7:6	SKL0
++Res0	9:6
+ Field	5	D128
+ Field	4	AIE
+ Field	3	POE
+-- 
+2.39.2
 
