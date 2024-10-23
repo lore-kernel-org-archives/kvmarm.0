@@ -1,108 +1,97 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A49115852E
-	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 08:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EE519B5A7;
+	Wed, 23 Oct 2024 10:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729670616; cv=none; b=mvqagK2OO27J9LAyDEFPqdIEcUrRBFNFqwmfTPyNfQffvK16nCJb6njFPqGUuIrUjRTRmel89ljkU9McQNVWP4i9TvkKZJAuCUba8T30fXs6HtBMPsjVl2+z6eyHoKjxCdiXtrCS5VT8f3CUoeTI763G360fO4NpKUnv42/svwY=
+	t=1729677732; cv=none; b=EebaFK9sUAEZeRLjbp4LNoiJ21HCvdLKIYQv6+aSWufD92Gv99TE5H8Pzii8rdZFfLTZa5T65+RIbaSfxDcJXcOAeVykkZ702O0kK69udgvT3FcatnHZSCSKdiZvGpOKIRa/TnbMAEYbXfAEPVnEbJVOj1DIGpLAPB6bD6Mfhgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729670616; c=relaxed/simple;
-	bh=UOb+OJTqgQzQWSLcS+b/dyA76TTbkp+2nr+zRq9bXh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SpsVgynYdK7Kcah8pKKGXENvq6geP98a0ps6FgrJLbwn69VSyAqZWdMVaQX3BWVERxN3473jzfRoE+LcXO0BbvdNO/Mjx4T02Vbuu8esjugzVHi6cGUxlvv5r2L2LyVBL1y5ma3IhMrh35UIYTBO1ejXqySls/fAOlhPZKPY7tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sPDdRRVO; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sPDdRRVO"
-Date: Wed, 23 Oct 2024 10:03:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729670611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=teYggURLbUjXgFRHPCAKbw5hoATyYK9evePO5wWpqTA=;
-	b=sPDdRRVOK/BRFeylVX6pQb8u2pmD+W6zOscYPoChOie42lXP49yfifD6utdrdabfMJD6V4
-	ILpmwG0MzVwevOAjpFVtv/e+tzyt1E4LJ1NH3eQyWpnVns3vSiXEVvScZIGEgqQL0u7J7b
-	ihAFQOXn/oScaioOeSTcMl60DNPP1QY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Subhasish Ghosh <subhasish.ghosh@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 0/3] Fix arm64 clang errors on fpu tests
-Message-ID: <20241023-f6a2a8d9fdea565838175648@orel>
-References: <20241022004710.1888067-1-rananta@google.com>
- <20241022-2c60a0bcbb908435aa91d1ff@orel>
- <CAJHc60wraJEBTAj-MCTA4QC6cEikvxfMcFRX8Ook9EVYKQu_Tw@mail.gmail.com>
+	s=arc-20240116; t=1729677732; c=relaxed/simple;
+	bh=VF72SbQafd1brM4nP5NE7TVxgFoirD5rMKb7ZQh2UMg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ng71s0hBbQqrfkdT0olbSiQogpApppyJwUQOK5G2Wb4dQh7TSI6qeEvPw001by4xj80LJ52ZW7sPLjckuF87mrXwLnTzOSKPHyLBtKZMNOp4cb1YXlpGiHJfi7Yw7V0ofaAZ+enbqcsX3hUPVVRQn5eSrsgGdxBfPbM6+CnSazE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AC1BC4CEC6;
+	Wed, 23 Oct 2024 10:02:08 +0000 (UTC)
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Steven Price <steven.price@arm.com>
+Cc: Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [PATCH v7 00/11] arm64: Support for running as a guest in Arm CCA
+Date: Wed, 23 Oct 2024 11:02:06 +0100
+Message-Id: <172967739783.1412028.8494484908145931121.b4-ty@arm.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20241017131434.40935-1-steven.price@arm.com>
+References: <20241017131434.40935-1-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJHc60wraJEBTAj-MCTA4QC6cEikvxfMcFRX8Ook9EVYKQu_Tw@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 22, 2024 at 01:31:24PM -0700, Raghavendra Rao Ananta wrote:
-> Hi Andrew,
+On Thu, 17 Oct 2024 14:14:23 +0100, Steven Price wrote:
+> This series adds support for running Linux in a protected VM under the
+> Arm Confidential Compute Architecture (CCA). This is a minor update
+> following the feedback from the v6 posting[1]. Thanks for the feedback!
 > 
-> >
-> > With clang 18.1.8 (Fedora 18.1.8-1.fc40) I get a bunch of errors like
-> > these
-> >
-> >     arm/fpu.c:281:3: error: instruction requires: fp-armv8
-> >
-> > I used my cross-clang series[1] and configured with
-> >
-> >     ./configure --arch=arm64 --cc=clang --cflags='--target=aarch64'
-> --cross-prefix=aarch64-linux-gnu-
-> >
-> > [1]
-> https://lore.kernel.org/all/20240911091406.134240-7-andrew.jones@linux.dev/
-> >
-> > Thanks,
-> > drew
+> Individual patches have a change log. The biggest changes are in patch
+> 10 where Gavin gave some great feedback to tidy things up a bit.
 > 
-> I was able to reproduce the errors by pointing to a newer clang (20) and
-> applying your series.
-> I think we see the errors because llvm decided to disable loads and stores
-> on FP registers with "-mgeneral-regs-only" [1]. Explicitly adding
-> ".arch_extension fp" for the fp_reg_{read,write}() helped with the build:
-> 
-> diff --git a/arm/fpu.c b/arm/fpu.c
-> index 6b0411d3..f44ed82a 100644
-> --- a/arm/fpu.c
-> +++ b/arm/fpu.c
-> @@ -38,7 +38,8 @@ static inline bool arch_collect_entropy(uint64_t *random)
->  #define fpu_reg_read(val)                              \
->  ({                                                     \
->         uint64_t *__val = (val);                        \
-> -       asm volatile("stp q0, q1, [%0], #32\n\t"        \
-> +       asm volatile(".arch_extension fp\n"             \
-> +                    "stp q0, q1, [%0], #32\n\t"        \
->                      "stp q2, q3, [%0], #32\n\t"        \
->                      "stp q4, q5, [%0], #32\n\t"        \
->                      "stp q6, q7, [%0], #32\n\t"        \
-> @@ -71,7 +72,8 @@ static inline bool arch_collect_entropy(uint64_t *random)
->  #define fpu_reg_write(val)                             \
->  do {                                                   \
->         uint64_t *__val = (val);                        \
-> -       asm volatile("ldp q0, q1, [%0], #32\n\t"        \
-> +       asm volatile(".arch_extension fp\n"             \
-> +                    "ldp q0, q1, [%0], #32\n\t"        \
->                      "ldp q2, q3, [%0], #32\n\t"        \
->                      "ldp q4, q5, [%0], #32\n\t"        \
->                      "ldp q6, q7, [%0], #32\n\t"        \
-> 
-> If you are fine with this, I can push it as a separate patch in v2.
+> [...]
 
-The fix works for me too. Please post v2.
+Applied to arm64 (for-next/guest-cca), thanks!
 
-Thanks,
-drew
+Note that this branch cannot be tested in isolation as it doesn't have
+the irqchip CCA changes. I pulled tip irq/core into the arm64
+for-kernelci. Please give the latter branch a go (or linux-next when the
+patches turn up).
+
+[01/11] arm64: rsi: Add RSI definitions
+        https://git.kernel.org/arm64/c/b880a80011f5
+[02/11] arm64: Detect if in a realm and set RIPAS RAM
+        https://git.kernel.org/arm64/c/c077711f718b
+[03/11] arm64: realm: Query IPA size from the RMM
+        https://git.kernel.org/arm64/c/399306954996
+[04/11] arm64: rsi: Add support for checking whether an MMIO is protected
+        https://git.kernel.org/arm64/c/371589437616
+[05/11] arm64: rsi: Map unprotected MMIO as decrypted
+        https://git.kernel.org/arm64/c/3c6c70613956
+[06/11] efi: arm64: Map Device with Prot Shared
+        https://git.kernel.org/arm64/c/491db21d8256
+[07/11] arm64: Enforce bounce buffers for realm DMA
+        https://git.kernel.org/arm64/c/fbf979a01375
+[08/11] arm64: mm: Avoid TLBI when marking pages as valid
+        https://git.kernel.org/arm64/c/0e9cb5995b25
+[09/11] arm64: Enable memory encrypt for Realms
+        https://git.kernel.org/arm64/c/42be24a4178f
+[10/11] virt: arm-cca-guest: TSM_REPORT support for realms
+        https://git.kernel.org/arm64/c/7999edc484ca
+[11/11] arm64: Document Arm Confidential Compute
+        https://git.kernel.org/arm64/c/972d755f0195
+
+-- 
+Catalin
+
