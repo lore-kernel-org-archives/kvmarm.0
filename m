@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C01920721E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90406201273;
 	Wed, 23 Oct 2024 14:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729695237; cv=none; b=QicS6SbaGnUzJez+evCpA8K5GWw2PUxIrLqcFe04GHntHxfyQzyku310cQpp+czsdFv/Mq7v/DyZf48kckQvsHW2swvGawtLg0GzU0TI5XqejmL8cNQ4qRbbiRTEcQrXP0hIgPFZ6wZizJxk1IGiTiwssQdj7xcqjXEQOZfspSM=
+	t=1729695237; cv=none; b=Tl59+OQ7RoCf3Kefvo8oxY4kPrjdDB16C0emGiVQ9865fPhxNxxpDDHkuDfg9hllqEN2SXjZ0VU5Iw7DJ7qXVupxK19NPmu7Z1zz4nhpII7Yri1cvXP+5ELF07Stm7BiygzAwyxH0dMt9iIZP5zcXX3eduWd4gdJwUKALNo0q3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729695237; c=relaxed/simple;
-	bh=WLG6aiuNN/mgMCljFrWmlIWIhDcWjA7d1uKxmA7beSk=;
+	bh=DU3dgMf4tNeWjgG0Nf5jlTQ88fuhiFgtrah3HTYYgiY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NAT+n3eow1M3sLJ3XGavkegdBs9rnD+5td2gJ3ghj7Bzfgve1qDPZMMO8hw+rLtFAAddi0Dkh6itaiIcRtsE2RprUSJ+f6/wZvZ/ri3qnQVup4HZrreQqShb3i/xAKxfYzTiuPrGbdytKcRDqHA8EdhmiblTM3teu8fCU47WVNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxSBUsKh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=S/tTpe6kyGatHiUNZo2Jl+sUFvRtsYhKYVNgzQxDgojFPRgGXbEHNlXF7Ryg2ncWnZ1lNoi89O+BkSmzduvafvocH2wxEKkcQi7hNLnUBud2vkBMPqW4mAfZ3Mwa3nEEQ+2bJ7pBRyFmvWBpIPOFpCavGLuDPichBPT4SUDPTtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwzu1iiO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxSBUsKh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19687C4CECD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwzu1iiO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7369CC4CEE6;
 	Wed, 23 Oct 2024 14:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1729695237;
-	bh=WLG6aiuNN/mgMCljFrWmlIWIhDcWjA7d1uKxmA7beSk=;
+	bh=DU3dgMf4tNeWjgG0Nf5jlTQ88fuhiFgtrah3HTYYgiY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jxSBUsKh7hQVSFN64yE9/XErRIOD7J8rX8fQpHiQcTIfzofjYLphnHiHIqFUZkaBK
-	 5teXi/vyU0SNqJYTUh3MTsMhzy0Yxijzt1qU81NDzUvBt0KgUQu4Vh879e9Pj9IldJ
-	 53pxMLK/2uRzAGzINlLJpOX0HohmzkRZAyK8AqC8HM5THbNtXnnGyPLNYLtgg0eDnP
-	 MD4P1cAb88DPyG/lA4Avu0xq7M78m2fnCPAy470YO3WyeLRTY9fnvdoR/wnN7UDdLD
-	 7ek5r+q4xQBODox1Z8nCP+Q8XVkW/8gPpbD3O05+6K7WVWIqK32KJpVt6IT6deQBwg
-	 fUpdVAS3g6bNw==
+	b=dwzu1iiO0ANew1vizSSs9G3Ijh6Qos4m5/AdEqkvpl5CTxjaT0KF/s+27obe0BIos
+	 cgeC08BrktDqn8HPwFPbZWrJq8SuFdRoqOfzbAJfdvfy/6UusOhk2IAqJr07OeDWCQ
+	 c9095/8BxJ8C/UBJU/qBIHzKVag7aL9BKOVoTpJTSrITUSAkrcf19elsjQQmUvp5JD
+	 UBJUzGMt9MKpZHyYBxAT5MYDq7HTJKEeODBMdMo6Pc8IZPW9pXrC5uErftFosUoo8i
+	 JZGytgHCE5xnvFxpZLAINDvmh5klkpNOx1KyMl/lYtz6BItVftwTYTNmFSEax3JEQq
+	 SMq/NJBBQMj7Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t3ckF-0068vz-AJ;
+	id 1t3ckF-0068vz-O3;
 	Wed, 23 Oct 2024 15:53:55 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 28/37] KVM: arm64: Drop bogus CPTR_EL2.E0POE trap routing
-Date: Wed, 23 Oct 2024 15:53:36 +0100
-Message-Id: <20241023145345.1613824-29-maz@kernel.org>
+Subject: [PATCH v5 30/37] KVM: arm64: Add kvm_has_s1poe() helper
+Date: Wed, 23 Oct 2024 15:53:38 +0100
+Message-Id: <20241023145345.1613824-31-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
 References: <20241023145345.1613824-1-maz@kernel.org>
@@ -60,52 +60,86 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-It took me some time to realise it, but CPTR_EL2.E0POE does not
-apply to a guest, only to EL0 when InHost(). And when InHost(),
-CPCR_EL2 is mapped to CPACR_EL1, maning that the E0POE bit naturally
-takes effect without any trap.
-
-To sum it up, this trap bit is better left ignored, we will never
-have to hanedle it.
+Just like we have kvm_has_s1pie(), add its S1POE counterpart,
+making the code slightly more readable.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 8 --------
- 1 file changed, 8 deletions(-)
+ arch/arm64/include/asm/kvm_host.h          | 3 +++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 2 +-
+ arch/arm64/kvm/nested.c                    | 4 ++--
+ arch/arm64/kvm/sys_regs.c                  | 4 ++--
+ 4 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05b6435d02a97..ddcbaa983de36 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -79,7 +79,6 @@ enum cgt_group_id {
- 	CGT_MDCR_E2TB,
- 	CGT_MDCR_TDCC,
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 9a6997827ad49..3c435e88d74b8 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1517,4 +1517,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ #define kvm_has_s1pie(k)				\
+ 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
  
--	CGT_CPACR_E0POE,
- 	CGT_CPTR_TAM,
- 	CGT_CPTR_TCPAC,
++#define kvm_has_s1poe(k)				\
++	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index a306ea70502c4..a651c43ad679f 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -80,7 +80,7 @@ static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt)
+ 		return false;
  
-@@ -362,12 +361,6 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= MDCR_EL2_TDCC,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
--	[CGT_CPACR_E0POE] = {
--		.index		= CPTR_EL2,
--		.value		= CPACR_ELx_E0POE,
--		.mask		= CPACR_ELx_E0POE,
--		.behaviour	= BEHAVE_FORWARD_ANY,
--	},
- 	[CGT_CPTR_TAM] = {
- 		.index		= CPTR_EL2,
- 		.value		= CPTR_EL2_TAM,
-@@ -1141,7 +1134,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_AMEVTYPER1_EL0(13),	CGT_CPTR_TAM),
- 	SR_TRAP(SYS_AMEVTYPER1_EL0(14),	CGT_CPTR_TAM),
- 	SR_TRAP(SYS_AMEVTYPER1_EL0(15),	CGT_CPTR_TAM),
--	SR_TRAP(SYS_POR_EL0,		CGT_CPACR_E0POE),
- 	/* op0=2, op1=1, and CRn<0b1000 */
- 	SR_RANGE_TRAP(sys_reg(2, 1, 0, 0, 0),
- 		      sys_reg(2, 1, 7, 15, 7), CGT_CPTR_TTA),
+ 	vcpu = ctxt_to_vcpu(ctxt);
+-	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1POE, IMP);
++	return kvm_has_s1poe(kern_hyp_va(vcpu->kvm));
+ }
+ 
+ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 47be71279c304..ff047a84d15dc 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1082,7 +1082,7 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+ 		res0 |= HFGxTR_EL2_nRCWMASK_EL1;
+ 	if (!kvm_has_s1pie(kvm))
+ 		res0 |= (HFGxTR_EL2_nPIRE0_EL1 | HFGxTR_EL2_nPIR_EL1);
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
++	if (!kvm_has_s1poe(kvm))
+ 		res0 |= (HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nPOR_EL1);
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
+ 		res0 |= HFGxTR_EL2_nS2POR_EL1;
+@@ -1192,7 +1192,7 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+ 		res0 |= TCR2_EL2_PTTWI | TCR2_EL2_PnCH;
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
+ 		res0 |= TCR2_EL2_AIE;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
++	if (!kvm_has_s1poe(kvm))
+ 		res0 |= TCR2_EL2_POE | TCR2_EL2_E0POE;
+ 	if (!kvm_has_s1pie(kvm))
+ 		res0 |= TCR2_EL2_PIE;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 6c20de8607b2d..c89a165408498 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2316,7 +2316,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ static unsigned int s1poe_visibility(const struct kvm_vcpu *vcpu,
+ 				     const struct sys_reg_desc *rd)
+ {
+-	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
++	if (kvm_has_s1poe(vcpu->kvm))
+ 		return 0;
+ 
+ 	return REG_HIDDEN;
+@@ -4802,7 +4802,7 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
+ 						HFGxTR_EL2_nPIR_EL1);
+ 
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1POE, IMP))
++	if (!kvm_has_s1poe(kvm))
+ 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPOR_EL1 |
+ 						HFGxTR_EL2_nPOR_EL0);
+ 
 -- 
 2.39.2
 
