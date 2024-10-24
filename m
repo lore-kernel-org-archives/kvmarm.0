@@ -1,87 +1,103 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1BE23CB
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 08:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EB51B21A9
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 09:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729759218; cv=none; b=J6S3xr91vN3OUj6I5j5hjyeo/cPJ6CbLgpW+cv7LCzs7zBNjUy2GS56CnXSWOh1J9TF+3umnxm6QqsQ+GZI3cz3VejJ+M9aagFnyJwJa0CYo18ynIvnyOfxLtsBqVPAF4VhhxrsOiOqLP+EoBDtUxT0nFjSr46UgBLkVv3uIQc4=
+	t=1729762179; cv=none; b=fz+69bwjQ+phI9o4Ban+BZCpyKKZdC2rN8UYzoaEDF4kFRFBTpRIuQJZhkXHKfk0XoEAf58yI/PwMDfdzD2WSzDZCDYi6TRAGhpAxScSaL/PstdYwe5j0gRuHerpkKXEgdLYFC0ZZTVLhjffUkERMgScnqZnUGSbe8tLsL8YOH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729759218; c=relaxed/simple;
-	bh=0K+RX95ryHG5fD91kMqo8aa7PSon0llOzyqHXNAUSyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4WDtRyCabKzqEu5ejKEaYcNcPpPMGqsR3npI5PO8HpuC9TpWNCY6XwqgjZcDTWAApUkapdGqr/kLiFt0EQFhtULnyzD/9StXwewIlbfmPFRxdg2NVbx7BJdPC1Brlw++7q3MRSQmsL0M1N45z5Q1n1xBX912cGgx01lKCsXbPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ub1S7pKX; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1729762179; c=relaxed/simple;
+	bh=geudcH7yX/W/ZOpP6E9dcE7viAct/chywpGntfYcIkE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FyJ7LXS9XwwmR3e2bZmG1mWulgJiwb8z78/i9tcNnHCVE4gz8HM6g8OagnbBpkaZ7gzSCwMKjMWexnFIU9Rh/qVKcdJVu1XoRRY7P+qhkaePTyP2KmQas6NwZGo8atpRO4KI64jKxejgxdQbg9LdSBbUCctQbJl8GuXTH13a0bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGgbSkeU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ub1S7pKX"
-Date: Thu, 24 Oct 2024 10:40:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729759214;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ITSlBcmdKUBoR2+a1SNIWkpnRKbgwmB5a0/kaSKYmq8=;
-	b=ub1S7pKXI97oebLi2oaD1dJYspFyor7IlAvysM648Lbyc/mwRaS51w04urtDipyN9PKZiF
-	6ePGROwZ9+V69oJgo/pO1KwazBhNRp5wbeZzztEjk5Sy/a2urhwyA+sHtzl9uoaBXFFXAQ
-	yEwT/kma/4BEgHMPDJ07VFtm2JmRymI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Subhasish Ghosh <subhasish.ghosh@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Fix arm64 clang errors on fpu tests
-Message-ID: <20241024-ab42773f235945c68dd99d68@orel>
-References: <20241023152638.3317648-1-rananta@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGgbSkeU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6144AC4CEC7;
+	Thu, 24 Oct 2024 09:29:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729762178;
+	bh=geudcH7yX/W/ZOpP6E9dcE7viAct/chywpGntfYcIkE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CGgbSkeUrmHIO5OJczLufZwvq7GiFh6rzSjgVFYP3UEcyK3K1uFdJuXE4iVQNu2pT
+	 lYy1QX4XH8QYIfjb74mXh7z8VIjoNNr1k8/dx1cBOnGeueOsenoBTu8UxvJpzzWwmB
+	 fbpks0bjuxUy9zaZD60+t208Gdqusm8P/HjG9A34Bi8/Eiroc0cktp3rnl9I18HqqC
+	 /fmcC71cySbl3DHhze731zTF37KLWmUyrlVevTssaVcoTLApauJAxdGF7R7MLgBrtL
+	 2ZS6x646umBXNdkbH4g7QWI4+e/5hlbnqXbCpqbuGwk9dwzR6VyP29wbQIcuyTWuX1
+	 9OTLgF+qx9VTg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t3u9w-006ODj-74;
+	Thu, 24 Oct 2024 10:29:36 +0100
+Date: Thu, 24 Oct 2024 10:29:35 +0100
+Message-ID: <86wmhx3l34.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Gaosheng Cui <cuigaosheng1@huawei.com>
+Cc: <oliver.upton@linux.dev>,
+	<joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<catalin.marinas@arm.com>,
+	<will@kernel.org>,
+	<sebott@redhat.com>,
+	<wangweiyang2@huawei.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>
+Subject: Re: [PATCH -next] KVM: arm64: Fix possible null-ptr-deref in idregs_debug_show
+In-Reply-To: <20241024083350.2828920-1-cuigaosheng1@huawei.com>
+References: <20241024083350.2828920-1-cuigaosheng1@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241023152638.3317648-1-rananta@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: cuigaosheng1@huawei.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sebott@redhat.com, wangweiyang2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Oct 23, 2024 at 03:26:34PM +0000, Raghavendra Rao Ananta wrote:
-> When compiled with clang for arm64, some build errors were observed
-> along the fpu code. Moreover, data aborts were seen while running
-> the arm/fpu test due to misconfigured input/output args in the inline
-> assembly.
+On Thu, 24 Oct 2024 09:33:50 +0100,
+Gaosheng Cui <cuigaosheng1@huawei.com> wrote:
 > 
-> The series tries to address these issues.
+> The idregs_debug_show() maybe return nullptr, we need to check desc
+> before dereference it to avoid possible null pointer dereferences.
 > 
-> v2:
->  - Fix build errors for newer clang versions that push 'q' registers out
->    of scope under '-mgeneral-regs-only'. (Andrew)
+> Fixes: 410db103f6eb ("KVM: arm64: Make idregs debugfs iterator search sysreg table directly")
+> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> v1:
-> https://lore.kernel.org/all/20241022004710.1888067-1-rananta@google.com/
-> 
-> - Raghavendra
-> 
-> Raghavendra Rao Ananta (4):
->   arm: Fix clang error in sve_vl()
->   arm: fpu: Convert 'q' registers to 'v' to satisfy clang
->   arm: fpu: Add '.arch_extension fp' to fpu macros
->   arm: fpu: Fix the input/output args for inline asm in fpu.c
-> 
->  arm/fpu.c                 | 52 ++++++++++++++++++++-------------------
->  lib/arm64/asm/processor.h |  2 +-
->  2 files changed, 28 insertions(+), 26 deletions(-)
-> 
-> 
-> base-commit: f246b16099478a916eab37b9bd1eb07c743a67d5
-> -- 
-> 2.47.0.105.g07ac214952-goog
->
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index ff8c4e1b847e..b1c59773b9c0 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -4135,7 +4135,7 @@ static int idregs_debug_show(struct seq_file *s, void *v)
+>  
+>  	desc = idregs_debug_find(kvm, kvm->arch.idreg_debugfs_iter);
+>  
+> -	if (!desc->name)
+> +	if (!desc || !desc->name)
+>  		return 0;
+>  
+>  	seq_printf(s, "%20s:\t%016llx\n",
 
-I've merged this along with the cross clang series and the 5/4 patch I
-tacked onto this series which adds aarch64 clang testing to gitlab CI.
+Can you show a case where this happens in practice?
+
+The check for NULL is already in idregs_debug_next(), and I don't see
+how this can actually be triggered.
 
 Thanks,
-drew
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
