@@ -1,26 +1,34 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332211D5AD3
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 12:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885571D319B;
+	Thu, 24 Oct 2024 12:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729774017; cv=none; b=UP2IwBMMYomY2W3s02aT5gK3zmGhJiEskfaonaqcN1TOAi740HuhVTKVV+CSB4AXt44wbZI1A1KgpQLqE0mSVHakOO067SSx8WJ2deOSBX0EjQMiGmcOvMHrZVnEoV7L291S4SnS7va56ZeSzen02wlZIwqJjY5d4pokS+xiW7M=
+	t=1729774558; cv=none; b=iKvnSy0T1IybYyf/HUG080j3JFyxnTBlKxe5zSkPvsKBP8YlIX92gsgSA8C84jFZlpavvh1k08sj9nF6xAjrvOSWOIlinBp+ftqIZ7WxV8XYvi81Du1270GSXKZDjCs+P6yKsSJ6i5AgrDAMO1N2ZnNbgZXx3aRIYLlpcu4rF0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729774017; c=relaxed/simple;
-	bh=faGY8SbMfv5UTZZy1gcaiVc0zWchFCtXcnF1CAIOxjM=;
+	s=arc-20240116; t=1729774558; c=relaxed/simple;
+	bh=klCzLI1Jv7dNAj0tikPJt7sDFVqShxr+T7TfoODWh2I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ufZATMImCoadAbH5l47ZIp2SbTtze8VgEOCbqZ94MlruRwry3UyNuNyyeoMszbgbgcP/7CR+pPXk+XjuoQbz12kRc4brKXj347vu9HUDSvaz8L0G3jRqim8nphZxzwS6eEDDEaIuGbjVHyQgSsDbdVfryUqtycL1juJRph5hrX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D092339;
-	Thu, 24 Oct 2024 05:47:24 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 610E83F71E;
-	Thu, 24 Oct 2024 05:46:53 -0700 (PDT)
-Date: Thu, 24 Oct 2024 13:45:28 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Mark Brown <broonie@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nkTqhHL21crk6jmUUdvNeFjX3ax7f3f49kBChGON2/HTYVaATff0aXIvRL3EU61cK3P6mbp6yT3vMFOS2gOjMJuk5nJ3MhRVDzeRBwfvIv/fig2qgSzq848U/2l2Q5iaBQpkWuGeAIt86zM+KcUiDmiKT18Ypd2F746l/rBiBTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMntBTRg; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMntBTRg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F060C4CEE3;
+	Thu, 24 Oct 2024 12:55:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729774558;
+	bh=klCzLI1Jv7dNAj0tikPJt7sDFVqShxr+T7TfoODWh2I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vMntBTRgMrvJQIzj03H9cRXN7FbzlM44NGal0mcHABZmr33TMMgdTlcBhXnILLFzz
+	 0CQTohxakmLWqWpBddFR8va80U4Nkw5/RG97hWknY9XonTik8fDC2GtP1Rs3pJAx4P
+	 1r50Ei4Z/dslcCWqmhy3Y7UywvWTaDLSRJkYftfRDkwKmF72sT9fBSjYmQtA3xMdwz
+	 w5xKjIxHmC9vEJH9AOKGFBLT194KmzS4H7LPYRBWp/VKz1/sPkNrfBg7mQ6OQQTcW+
+	 s5JchFKTbExCkG9nKHHEAU1bbmmekHbuI/g1Q6WO0fT9imYZMq4XtRm75r+rUCBRk/
+	 ZVyh1apF0SVhw==
+Date: Thu, 24 Oct 2024 13:55:53 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
 Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -28,37 +36,53 @@ Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH v5 17/37] KVM: arm64: Sanitise ID_AA64MMFR3_EL1
-Message-ID: <20241024124528.GA1403933@e124191.cambridge.arm.com>
+Message-ID: <8fcd3716-901d-4fd0-8786-7bf612066f61@sirena.org.uk>
 References: <20241023145345.1613824-1-maz@kernel.org>
  <20241023145345.1613824-18-maz@kernel.org>
  <33681a4d-2ea4-416e-9e2c-81a89a78c4ed@sirena.org.uk>
+ <20241024124528.GA1403933@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tYWgyLjV7ZKA67pB"
+Content-Disposition: inline
+In-Reply-To: <20241024124528.GA1403933@e124191.cambridge.arm.com>
+X-Cookie: Real programs don't eat cache.
+
+
+--tYWgyLjV7ZKA67pB
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <33681a4d-2ea4-416e-9e2c-81a89a78c4ed@sirena.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2024 at 01:32:09PM +0100, Mark Brown wrote:
-> On Wed, Oct 23, 2024 at 03:53:25PM +0100, Marc Zyngier wrote:
-> 
-> > Add the missing sanitisation of ID_AA64MMFR3_EL1, making sure we
-> > solely expose S1PIE and TCRX (we currently don't support anything
-> > else).
-> 
-> >  	case SYS_ID_AA64MMFR3_EL1:
-> > -		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE;
-> > +
-> > +		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1POE |
-> > +		       ID_AA64MMFR3_EL1_S1PIE;
-> 
-> The changelog is now out of date, POE has been added.
+On Thu, Oct 24, 2024 at 01:45:28PM +0100, Joey Gouly wrote:
+> On Thu, Oct 24, 2024 at 01:32:09PM +0100, Mark Brown wrote:
 
-This will disappear with a rebase won't it? Since you made the same change in 
-d4a89e5aee23 ("KVM: arm64: Expose S1PIE to guests"), in Linus' tree.
+> > The changelog is now out of date, POE has been added.
 
-Thanks,
-Joey
+> This will disappear with a rebase won't it? Since you made the same chang=
+e in=20
+> d4a89e5aee23 ("KVM: arm64: Expose S1PIE to guests"), in Linus' tree.
+
+Yeah, it should go away if the code is rebased.
+
+--tYWgyLjV7ZKA67pB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcaQ9gACgkQJNaLcl1U
+h9Akzwf7Bi8xmtq6ivZTHX80fZiWWoXCIXR0kvqvB6/i/hyQEo8tdAJnNswLOzvQ
+38tAqpibOfQ4Qo1ite5uWxbTQWCIWT3d1pF0jzBldQ0tAGxT+4Y7zrkS9rTWFqqD
+GzLBljMIeFWvNgaNpbpZp0DFuQWNh6i3ewHBtpctBSadul7ZJm6RjTlK7ujwe8BD
+y6jB2i6Q8WCwUp7bO7O+43OWFYF71fMpH8JvNXwEp0pKEBH/66kTEKFpRPoYOrkV
+VOax2p83LFwuP8xCMIQbhDxFyuSL2lKncWveYXNHDAmoEfpFWfzk+wPLWtC2srPy
+XLZZi7LrDgwtCzcgHv+J6E8XV/psuw==
+=3TrK
+-----END PGP SIGNATURE-----
+
+--tYWgyLjV7ZKA67pB--
