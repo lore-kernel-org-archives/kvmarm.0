@@ -1,138 +1,157 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555261F7065;
-	Thu, 24 Oct 2024 16:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E94D1F8196;
+	Thu, 24 Oct 2024 18:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729786348; cv=none; b=uWfX6BZ5Ua/RF5z4jWIHCTx67fL5isRtVfJevovsMdLiDqSi+3w5G/B5hCT42sPWmijrzjNTRGbiHdWwtnu66J/4FiaYpNpdaAYiJD2Iu8DYX8psCpjZpUcggNqD8itCADQ4G51o9oxR/6qf/19xFMCFJs3VigkpFwYb8ewvqkQ=
+	t=1729793113; cv=none; b=Lj37eM1T1TEo0NcuKWbRfhOu7RCEU2Lp979zzrO7IPC+7+xML5f5DMsZk5326ElmCzrgregyXfVTjxJ7hBjk02skIe7SxQgv45zy0wIBRNT+OZmK4l1+H4wKSQfB0DlrwoeykztdLaAHNv792s3mM0zwFivIUbgSun5tqr0RcDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729786348; c=relaxed/simple;
-	bh=0pWcFGTWUI42+0oL/sufKdtun9LyhaKE0N8zfH69DyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kfBtMIqIlnOxisDeQMALEqouCeKo4f24TQlDI99sIf7JXUthqCgshYITovIIV72iRNbNnesy8+xDljgOMUMdTDI9QniqCSfA2DUqZa8/VcgF6wMAyjkzUnfUYMdJWQIhTtVH0k1b4jN3r0J5LV9mAOhQoXCboroYScbk8ZSFG94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TjUa+QWI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729793113; c=relaxed/simple;
+	bh=xH/uQd3S3Hw++2BLkxPeBWim+glMB4nzTKks3oUBOqU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OOPn61dlTs/aA+M+RwwvwFDEb7/AbXDiWRPdZfcrZlQqjxLkksWm4gA/yWNlXUhZWWvAOFxg9sPgmGWcBqiFArxR1+DjewKbM0vqLhe8PTCMUtJLEk16mTF9acoyenGqfjhIJyNrdp2F8zNchNQptTOtluaIYF0+IIBUxXl28A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CeBEkrM9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TjUa+QWI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE647C4CEC7;
-	Thu, 24 Oct 2024 16:12:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CeBEkrM9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C52ABC4CEE3;
+	Thu, 24 Oct 2024 18:05:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729786347;
-	bh=0pWcFGTWUI42+0oL/sufKdtun9LyhaKE0N8zfH69DyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TjUa+QWI0wYWVPm8j0H5EV4hvSZaacCpGkhrTBB32AASacSyvkL40+ypLJUwE1Zhw
-	 46pIH0TScLjMczQR/PHzIj/UqZXWmV2WJAhZkkLDpsIBv7FTjR1QuPhSPDOUGrssXs
-	 3ANBV1wxi/rxo6uEeZ9agrYpOxpjbH5KBgBqUaDNrSjah/cJo2f+cbPS14sQwnb2rv
-	 QGfHOBX6HaKrl/RKbPVkSYCnj8d/VA1iZru5oGUBwzL4owFWLh/brIom/LonP+veIG
-	 CRz3sgiWq9wXk4Bf3bUCwEhxlye2Mlam/6anHh6tDAvfZemCig2DEQuZGSO4u9mZ7l
-	 J9aWAu0UchKjw==
-Date: Thu, 24 Oct 2024 17:12:22 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	s=k20201202; t=1729793112;
+	bh=xH/uQd3S3Hw++2BLkxPeBWim+glMB4nzTKks3oUBOqU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CeBEkrM9KwQzs8Sr4H9qvrS+Q+9Yn6jLzch4n283mZAU506Igo5qMKU+VZkFZMKNb
+	 eqxrqg/B5rU0QJZXQFLhmOsDBOuWnLPDFr/VjmRoTJaWahtG8uH8KrR85hZ+u0BZnm
+	 pf8/BnfDVoGb5/qN7GY3juHqm7RTDFdvRCmzfLR1zyBAKRTDBV/TFmZnTwjQE1F3o2
+	 //De9w4roD/DZKGTAtalldRPeTP5XpC/3A/Eth1RDwxMleCYh99S06uE130taSRWVK
+	 eGNmCOUxBcQ3Hs6vaAjKCEJdwY8a/sa7P+Yd3ezC/Tgi2D+Q2Tu3GhJk23Zre+Wmk1
+	 xNpvGBRN/m/9A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t42Cs-006XzS-Pu;
+	Thu, 24 Oct 2024 19:05:10 +0100
+Date: Thu, 24 Oct 2024 19:05:10 +0100
+Message-ID: <86ldyd2x7t.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>, stable@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	stable@vger.kernel.org,
 	Alexander Potapenko <glider@google.com>
 Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-Message-ID: <3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
+In-Reply-To: <3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
 References: <20241009183603.3221824-1-maz@kernel.org>
+	<3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="R3Gd0kDeZDpf0DlW"
-Content-Disposition: inline
-In-Reply-To: <20241009183603.3221824-1-maz@kernel.org>
-X-Cookie: Absinthe makes the tart grow fonder.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 24 Oct 2024 17:12:22 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (7bit)>]
+> On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
+> > As there is very little ordering in the KVM API, userspace can
+> > instanciate a half-baked GIC (missing its memory map, for example)
+> > at almost any time.
+> 
+> The vgic_init selftest has started failing in mainline on multiple
+> platforms, with a bisect pointing at this patch which is present there
+> as commit df5fd75ee305cb5.  The test reports:
+> 
+> # selftests: kvm: vgic_init
+> # Random seed: 0x6b8b4567
+> # Running GIC_v3 tests.
+> # ==== Test Assertion Failure ====
+> #   lib/kvm_util.c:724: false
+> #   pid=1947 tid=1947 errno=5 - Input/output error
+> #      1	0x0000000000404edb: __vm_mem_region_delete at kvm_util.c:724 (discriminator 5)
+> #      2	0x0000000000405d0b: kvm_vm_free at kvm_util.c:762 (discriminator 12)
+> #      3	0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
+> #      4	 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
+> #      5	 (inlined by) run_tests at vgic_init.c:720
+> #      6	0x0000000000401a6f: main at vgic_init.c:748
+> #      7	0x0000ffffa7b37543: ?? ??:0
+> #      8	0x0000ffffa7b37617: ?? ??:0
+> #      9	0x0000000000401b6f: _start at ??:?
+> #   KVM killed/bugged the VM, check the kernel log for clues
+> not ok 10 selftests: kvm: vgic_init # exit=254
+> 
+> which does rather look like a test bug rather than a problem in the
+> change itself.
 
---R3Gd0kDeZDpf0DlW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Well, the test tries to do braindead things, and then the test
+infrastructure seems surprised that KVM tells it to bugger off...
 
-On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
-> As there is very little ordering in the KVM API, userspace can
-> instanciate a half-baked GIC (missing its memory map, for example)
-> at almost any time.
+I can paper over it with this (see below), but frankly, someone who
+actually cares about this crap should take a look (and ownership).
 
-The vgic_init selftest has started failing in mainline on multiple
-platforms, with a bisect pointing at this patch which is present there
-as commit df5fd75ee305cb5.  The test reports:
+	M.
 
-# selftests: kvm: vgic_init
-# Random seed: 0x6b8b4567
-# Running GIC_v3 tests.
-# ==== Test Assertion Failure ====
-#   lib/kvm_util.c:724: false
-#   pid=1947 tid=1947 errno=5 - Input/output error
-#      1	0x0000000000404edb: __vm_mem_region_delete at kvm_util.c:724 (discriminator 5)
-#      2	0x0000000000405d0b: kvm_vm_free at kvm_util.c:762 (discriminator 12)
-#      3	0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
-#      4	 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
-#      5	 (inlined by) run_tests at vgic_init.c:720
-#      6	0x0000000000401a6f: main at vgic_init.c:748
-#      7	0x0000ffffa7b37543: ?? ??:0
-#      8	0x0000ffffa7b37617: ?? ??:0
-#      9	0x0000000000401b6f: _start at ??:?
-#   KVM killed/bugged the VM, check the kernel log for clues
-not ok 10 selftests: kvm: vgic_init # exit=254
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+index b3b5fb0ff0a9..60b076ae85ea 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+@@ -742,6 +742,8 @@ int main(int ac, char **av)
+ 	pa_bits = vm_guest_mode_params[VM_MODE_DEFAULT].pa_bits;
+ 	max_phys_size = 1ULL << pa_bits;
+ 
++	allow_ioctl_returning_eio = true;
++
+ 	ret = test_kvm_device(KVM_DEV_TYPE_ARM_VGIC_V3);
+ 	if (!ret) {
+ 		pr_info("Running GIC_v3 tests.\n");
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index bc7c242480d6..988c68a77ce3 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -298,6 +298,8 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
+ 	kvm_do_ioctl((vm)->fd, cmd, arg);			\
+ })
+ 
++extern bool allow_ioctl_returning_eio;
++
+ /*
+  * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
+  * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
+@@ -313,6 +315,8 @@ do {											\
+ 	static_assert_is_vm(vm);							\
+ 											\
+ 	if (cond)									\
++		break;									\
++	if (errno == EIO && allow_ioctl_returning_eio)					\
+ 		break;									\
+ 											\
+ 	if (errno == EIO &&								\
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index a2b7df5f1d39..d9834421ab12 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -25,6 +25,8 @@ static uint32_t last_guest_seed;
+ 
+ static int vcpu_mmap_sz(void);
+ 
++bool allow_ioctl_returning_eio = false;
++
+ int open_path_or_exit(const char *path, int flags)
+ {
+ 	int fd;
 
-which does rather look like a test bug rather than a problem in the
-change itself.
-
-Full log from one run on synquacer at:
-
-   https://validation.linaro.org/scheduler/job/4108424#L1846
-
-bisect log (using a current mailine build of kselftests rather than one
-matching the tested kernel to avoid the build issues):
-
-git bisect start
-# status: waiting for both good and bad commits
-# bad: [c2ee9f594da826bea183ed14f2cc029c719bf4da] KVM: selftests: Fix build on on non-x86 architectures
-git bisect bad c2ee9f594da826bea183ed14f2cc029c719bf4da
-# status: waiting for good commit(s), bad commit known
-# good: [9852d85ec9d492ebef56dc5f229416c925758edc] Linux 6.12-rc1
-git bisect good 9852d85ec9d492ebef56dc5f229416c925758edc
-# good: [a1029768f3931b31aa52790f1dde0c7d6a6552eb] Merge tag 'rcu.fixes.6.12-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/rcu/linux
-git bisect good a1029768f3931b31aa52790f1dde0c7d6a6552eb
-# good: [b1b46751671be5a426982f037a47ae05f37ff80b] mm: fix follow_pfnmap API lockdep assert
-git bisect good b1b46751671be5a426982f037a47ae05f37ff80b
-# good: [531643fcd98c8d045d72a05cb0aaf49e5a4bdf5c] Merge tag 'scsi-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi
-git bisect good 531643fcd98c8d045d72a05cb0aaf49e5a4bdf5c
-# good: [c55228220dd33e7627ad9736b6fce4df5e7eac98] Merge tag 'char-misc-6.12-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc
-git bisect good c55228220dd33e7627ad9736b6fce4df5e7eac98
-# good: [c1bc09d7bfcbe90c6df3a630ec1fb0fcd4799236] Merge tag 'probes-fixes-v6.12-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace
-git bisect good c1bc09d7bfcbe90c6df3a630ec1fb0fcd4799236
-# bad: [5978d4ec7e82ffc472ac2645601dd10b09e61b0f] KVM: arm64: vgic: Don't check for vgic_ready() when setting NR_IRQS
-git bisect bad 5978d4ec7e82ffc472ac2645601dd10b09e61b0f
-# good: [6ded46b5a4fd7fc9c6104b770627043aaf996abf] KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out
-git bisect good 6ded46b5a4fd7fc9c6104b770627043aaf996abf
-# good: [d4a89e5aee23eaebdc45f63cb3d6d5917ff6acf4] KVM: arm64: Expose S1PIE to guests
-git bisect good d4a89e5aee23eaebdc45f63cb3d6d5917ff6acf4
-# bad: [afa9b48f327c9ef36bfba4c643a29385a633252b] KVM: arm64: Shave a few bytes from the EL2 idmap code
-git bisect bad afa9b48f327c9ef36bfba4c643a29385a633252b
-# bad: [df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1] KVM: arm64: Don't eagerly teardown the vgic on init error
-git bisect bad df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1
-# first bad commit: [df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1] KVM: arm64: Don't eagerly teardown the vgic on init error
-
---R3Gd0kDeZDpf0DlW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcaceYACgkQJNaLcl1U
-h9DxvwgAhRPO3/Xq4JlWVbJBTEKaksaqBrD5n9A/J+0OjI2tN9wWuwm5iY+MrBHe
-A489my53v0OMHNw/cKBcd1dLpTuW/ZBLF0bC2GZr5sArJ5PpMw3G2Dju6vFBNo6w
-M3mwkW2YR6WExTZ39NbNZNL2VrubJNb8jb57ww74hGw8lOoCDBZDX0Yo9lnd/UMf
-Kiqlmo/laa+QNR5JkVket0P4p471WFhFTXr+jzbpFWG6mJoJxNBOFjYGVGtC9Qki
-2C6r4d/4D+hN0iQISQS6CNFFhKScNxomyaUno9Fa4EdWDl0HZkcPWjrPq/cGXNyK
-va9pUOXiVU98+2SGW8/0Ekr4AtlghQ==
-=EFMf
------END PGP SIGNATURE-----
-
---R3Gd0kDeZDpf0DlW--
+-- 
+Without deviation from the norm, progress is not possible.
