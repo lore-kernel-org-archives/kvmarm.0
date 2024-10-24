@@ -1,171 +1,99 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670551714B0
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 09:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2092F1BE86E
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 10:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729762864; cv=none; b=HG8CMrldeSJtjoXbFTOFRHeUe09kfDt6PrYynkpac+igVN80BwX2CLMwImwNDeV0k5xpYUoWhOhbd2rroNBFOjb8lTTa4d72PCmAFpnKTAZ/6lKhzz7EsY9vREsgH3q6hb48/Eh8+eGMEQrQ2LnRaipEXbatHwcfIxQEBiRtHHs=
+	t=1729764225; cv=none; b=SekHZUnd3cEjKOq2stqvG4l2TgIKOE1R/UTHvWAIjPSxjc81TtGcNa46FGy2zU8ue08B0qD2/4zwaIk3pmIkHtJTbOR2hdGNLhbWGKl43CEmpZFGA2NcWB3eiYTfJjPELYh1tM6gL3uvpA8BTj7ThvaPG3VrIgcDeGUC9IJoomg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729762864; c=relaxed/simple;
-	bh=7euuQ3BYnb/j0LpjW6f6Wlb0bHZuiOY6Y2KNVXYbGyE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NFw7X6Vmt9Ru2Sjb4uotKVlKaypDz2dD4HSLdcCb3Hl1s4mDqw+muBSTctrJQqm5am9RuxWsdJ8o34PFS5xMfFn3UkjoeDGuGkjfJC49aCULDCeNo7qLEWQHcuFMBKVbj2okmgpg9ryDc4VMfHlnhy6sKYyiuKLYy9r2rmAKgRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XZ19C1RJFz6K5rC;
-	Thu, 24 Oct 2024 17:39:59 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id A97C9140158;
-	Thu, 24 Oct 2024 17:40:59 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.203.177.241) by
- frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 24 Oct 2024 11:40:52 +0200
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <oliver.upton@linux.dev>
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
-	<cohuck@redhat.com>, <eric.auger@redhat.com>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <jiangkunkun@huawei.com>,
-	<jonathan.cameron@huawei.com>, <anthony.jebson@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linuxarm@huawei.com>
-Subject: [RFC PATCH v2 3/3] KVM: arm64: Enable errata based on migration target CPUs
-Date: Thu, 24 Oct 2024 10:40:12 +0100
-Message-ID: <20241024094012.29452-4-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20241024094012.29452-1-shameerali.kolothum.thodi@huawei.com>
-References: <20241024094012.29452-1-shameerali.kolothum.thodi@huawei.com>
+	s=arc-20240116; t=1729764225; c=relaxed/simple;
+	bh=FgP4I+aVtPPs74kssaZdbl/o/cecaTCT63kyAzjejC4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=satJLBIFEk4dzIAByVkKa01Ev+nkSbnpxxbng4rIk0FTvWgrP4ZbjTS4eaXt5QESBZcdj2QIjBxb+OST7rtQGlK7YLXQgkC5NWg9NFUSA31gF2/zJUZ4OJZs/rylJSrQ7W8a+Nlj3nIuSJ9nKC49ZlKVk2Ogv3XDfQv4/u73TmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41098339;
+	Thu, 24 Oct 2024 03:04:12 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 663FD3F71E;
+	Thu, 24 Oct 2024 03:03:41 -0700 (PDT)
+Date: Thu, 24 Oct 2024 11:03:36 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v5 08/37] KVM: arm64: Correctly access TCR2_EL1, PIR_EL1,
+ PIRE0_EL1 with VHE
+Message-ID: <20241024100336.GA1382116@e124191.cambridge.arm.com>
+References: <20241023145345.1613824-1-maz@kernel.org>
+ <20241023145345.1613824-9-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023145345.1613824-9-maz@kernel.org>
 
-If the Guest has migration target CPUs set, enable all errata
-that are based on target MIDR/REVIDR.
+On Wed, Oct 23, 2024 at 03:53:16PM +0100, Marc Zyngier wrote:
+> For code that accesses any of the guest registers for emulation
+> purposes, it is crucial to know where the most up-to-date data is.
+> 
+> While this is pretty clear for nVHE (memory is the sole repository),
+> things are a lot muddier for VHE, as depending on the SYSREGS_ON_CPU
+> flag, registers can either be loaded on the HW or be in memory.
+> 
+> Even worse with NV, where the loaded state is by definition partial.
+> 
+> For these reasons, KVM offers the vcpu_read_sys_reg() and
+> vcpu_write_sys_reg() primitives that always do the right thing.
+> However, these primitive must know what register to access, and
+> this is the role of the __vcpu_read_sys_reg_from_cpu() and
+> __vcpu_write_sys_reg_to_cpu() helpers.
+> 
+> As it turns out, TCR2_EL1, PIR_EL1, PIRE0_EL1 and not described
+> in the latter helpers, meaning that the AT code cannot use them
+> to emulate S1PIE.
+> 
+> Add the three registers to the (long) list.
+> 
+> Fixes: 86f9de9db178 ("KVM: arm64: Save/restore PIE registers")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: Joey Gouly <joey.gouly@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 329619c6fa961..1adf68971bb17 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1030,6 +1030,9 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+>  	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+>  	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
+>  	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
+> +	case TCR2_EL1:		*val = read_sysreg_s(SYS_TCR2_EL12);	break;
+> +	case PIR_EL1:		*val = read_sysreg_s(SYS_PIR_EL12);	break;
+> +	case PIRE0_EL1:		*val = read_sysreg_s(SYS_PIRE0_EL12);	break;
+>  	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
+>  	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
+>  	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
+> @@ -1076,6 +1079,9 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+>  	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+>  	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
+>  	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
+> +	case TCR2_EL1:		write_sysreg_s(val, SYS_TCR2_EL12);	break;
+> +	case PIR_EL1:		write_sysreg_s(val, SYS_PIR_EL12);	break;
+> +	case PIRE0_EL1:		write_sysreg_s(val, SYS_PIRE0_EL12);	break;
+>  	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
+>  	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
+>  	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
 
-Also make sure we call the paravirt helper to retrieve migration
-targets if any.
-
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- arch/arm64/kernel/cpu_errata.c | 46 ++++++++++++++++++++++++++--------
- arch/arm64/kernel/cpufeature.c |  3 +++
- 2 files changed, 39 insertions(+), 10 deletions(-)
-
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index feaaf2b11f46..df6d32dfd5c0 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -18,17 +18,14 @@ u32 __ro_after_init errata_migrn_target_num;
- struct migrn_target __ro_after_init errata_migrn_target_cpus[MAX_MIGRN_TARGET_CPUS];
- 
- static bool __maybe_unused
--is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
-+__is_affected_midr_range(const struct arm64_cpu_capabilities *entry, u32 midr, u32 revidr)
- {
- 	const struct arm64_midr_revidr *fix;
--	u32 midr = read_cpuid_id(), revidr;
- 
--	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
- 	if (!is_midr_in_range(midr, &entry->midr_range))
- 		return false;
- 
- 	midr &= MIDR_REVISION_MASK | MIDR_VARIANT_MASK;
--	revidr = read_cpuid(REVIDR_EL1);
- 	for (fix = entry->fixed_revs; fix && fix->revidr_mask; fix++)
- 		if (midr == fix->midr_rv && (revidr & fix->revidr_mask))
- 			return false;
-@@ -37,27 +34,56 @@ is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
- }
- 
- static bool __maybe_unused
--is_affected_midr_range_list(const struct arm64_cpu_capabilities *entry,
--			    int scope)
-+is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
- {
-+	int i;
-+
-+	for (i = 0; i < errata_migrn_target_num; i++) {
-+		if (__is_affected_midr_range(entry, errata_migrn_target_cpus[i].midr,
-+					     errata_migrn_target_cpus[i].revidr))
-+			return true;
-+	}
- 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
--	return is_midr_in_range_list(read_cpuid_id(), entry->midr_range_list);
-+	return __is_affected_midr_range(entry, read_cpuid_id(), read_cpuid(REVIDR_EL1));
- }
- 
- static bool __maybe_unused
--is_kryo_midr(const struct arm64_cpu_capabilities *entry, int scope)
-+is_affected_midr_range_list(const struct arm64_cpu_capabilities *entry,
-+			    int scope)
- {
--	u32 model;
-+	int i;
- 
-+	for (i = 0; i < errata_migrn_target_num; i++) {
-+		if (is_midr_in_range_list(errata_migrn_target_cpus[i].midr,
-+					  entry->midr_range_list))
-+			return true;
-+	}
- 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-+	return is_midr_in_range_list(read_cpuid_id(), entry->midr_range_list);
-+}
- 
--	model = read_cpuid_id();
-+static bool __maybe_unused
-+__is_kryo_midr(const struct arm64_cpu_capabilities *entry, u32 model)
-+{
- 	model &= MIDR_IMPLEMENTOR_MASK | (0xf00 << MIDR_PARTNUM_SHIFT) |
- 		 MIDR_ARCHITECTURE_MASK;
- 
- 	return model == entry->midr_range.model;
- }
- 
-+static bool __maybe_unused
-+is_kryo_midr(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	int i;
-+
-+	for (i = 0; i < errata_migrn_target_num; i++) {
-+		if (__is_kryo_midr(entry, errata_migrn_target_cpus[i].midr))
-+			return true;
-+	}
-+	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-+	return __is_kryo_midr(entry, read_cpuid_id());
-+}
-+
- static bool
- has_mismatched_cache_type(const struct arm64_cpu_capabilities *entry,
- 			  int scope)
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index f7fd7e3259e4..390f4ffa773c 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -86,6 +86,7 @@
- #include <asm/mmu_context.h>
- #include <asm/mpam.h>
- #include <asm/mte.h>
-+#include <asm/paravirt.h>
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/sysreg.h>
-@@ -3597,6 +3598,8 @@ unsigned long cpu_get_elf_hwcap2(void)
- 
- static void __init setup_boot_cpu_capabilities(void)
- {
-+	pv_errata_migrn_target_init();
-+
- 	/*
- 	 * The boot CPU's feature register values have been recorded. Detect
- 	 * boot cpucaps and local cpucaps for the boot CPU, then enable and
--- 
-2.45.2
-
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
