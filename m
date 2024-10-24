@@ -1,71 +1,90 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09301B219C
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 08:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1582A18784C
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 08:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729758837; cv=none; b=TkjLNQOrJhd78e1kcpNV4ZMvU+C0M8DXA45QMvUnq1InPkTyoGfkCbVapUHCWHIDtvyIraXZYJHzkIK8kNKfyJkzeH8nedt+rAzT63U8kG97Wbn+vJysOkXHXl1+nLYUC20mU1WCBC0cgITOwIRpK+FTnyrhVNGipsgoRFmEDjw=
+	t=1729759139; cv=none; b=CmdH+qFGeiMOV2I658PZ29tTA+eGZrhKIaha/uX+7wxQJE0zrmpEhEg8U09144VzNdzjoOVHj0zKEnOnk0cYFzrt1RcjHcPSWM4PH8KKSzk9xJair5wKEWF+/ztsGfNKEIuxiOcHOOOy65uRlnERpE8CfekLiYnlz1rRl6Q4cBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729758837; c=relaxed/simple;
-	bh=ORCTv1of3Ib6RzWAYPL7kveKtvX2wmzZwknmTBjQ7V8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IeTgeOhmipNu7YxWdjYlIE8Pkwn7IXaa7Taw4QLelsiRXiM3bxczxpyD71xGhE+q6o1yArjdAyUbeCRP9CpWZ9gQMWFdbU1RtB8UWxJMXZnN1Y22aLAE89dwS/bQ2mO14NM6MUWmFsZx3muwRLGvtNlZ8OoCtBeAESyT1AB2s50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XYzgG6FtPz1SD3Z;
-	Thu, 24 Oct 2024 16:32:26 +0800 (CST)
-Received: from kwepemd200011.china.huawei.com (unknown [7.221.188.251])
-	by mail.maildlp.com (Postfix) with ESMTPS id C39301A016C;
-	Thu, 24 Oct 2024 16:33:51 +0800 (CST)
-Received: from cgs.huawei.com (10.244.148.83) by
- kwepemd200011.china.huawei.com (7.221.188.251) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Thu, 24 Oct 2024 16:33:51 +0800
-From: Gaosheng Cui <cuigaosheng1@huawei.com>
-To: <maz@kernel.org>, <oliver.upton@linux.dev>, <joey.gouly@arm.com>,
-	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <sebott@redhat.com>, <cuigaosheng1@huawei.com>,
-	<wangweiyang2@huawei.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>
-Subject: [PATCH -next] KVM: arm64: Fix possible null-ptr-deref in idregs_debug_show
-Date: Thu, 24 Oct 2024 16:33:50 +0800
-Message-ID: <20241024083350.2828920-1-cuigaosheng1@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1729759139; c=relaxed/simple;
+	bh=Bs8F6cQWqLaLUPQc0y1nFiMC8Oib2Yljxn3OVZs2quI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WQ1PlClxJP2ld4ud8XpTivUy7YQ0VQUL8cU2RdhB7k8mX4GtVoaC3m4WyzUgLZzMT+apP6aZAarVKFuszuI9ftz/ahsV7BYFoKLZz/eNAn3RnIPY6Ep10TOqjpd7sgkrBwBU+bQaRUf6GJS1Tn0nCdAraxOf4S4w9Bnd3+FX3yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LWyQtjaS; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LWyQtjaS"
+Date: Thu, 24 Oct 2024 10:38:51 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729759135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7A7SSI40hPXOoNVasTXPi3W2hqog0qAqPQKBVOcc5W8=;
+	b=LWyQtjaSFN8PSZnIMLn7qxaE4w4YSQZzifoc2B8ZTYKBm73KZn13CBkjYqVIaBDua0YJR3
+	Nw4koRUvJJafhZcS9w8kGN2XeLunS+/uoYmAlsC0JKclJLJs5rbjO+1lHR+oMq6UrvgGKt
+	z1GiV3cOFng4MgccmdxpXjIOl8tNPMU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, atishp@rivosinc.com, 
+	cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/5] Support cross compiling with clang
+Message-ID: <20241024-cecbb361d7e3f21c7053408b@orel>
+References: <20240911091406.134240-7-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemd200011.china.huawei.com (7.221.188.251)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911091406.134240-7-andrew.jones@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-The idregs_debug_show() maybe return nullptr, we need to check desc
-before dereference it to avoid possible null pointer dereferences.
+On Wed, Sep 11, 2024 at 11:14:07AM +0200, Andrew Jones wrote:
+> Modify configure to allow --cc=clang and a cross-prefix to be specified
+> together (as well as --cflags). This allows compiling with clang, but
+> using cross binutils for everything else, including the linker. So far
+> tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
+> to get it to compile - which is why there's no gitlab-ci patch for aarch64
+> in this series). I suspect it should work for other architectures too.
+> 
+> v3:
+>  - Add README patch for cross-compiling, clang, and cross-clang [Nick]
+>  - Add comment to the commenting-out of mstrict-align [Nick]
+>  - Add the reason to ignore warnings vs. fix code to commit message of
+>    patch2
+>  - Picked up Nick's tags
+> v2:
+>  - fix building with clang and --config-efi by suppressing a warning
+>  - added riscv clang efi build to CI
+>  - picked up Thomas's tags
+> 
+> Andrew Jones (5):
+>   riscv: Drop mstrict-align
+>   Makefile: Prepare for clang EFI builds
+>   configure: Support cross compiling with clang
+>   riscv: gitlab-ci: Add clang build tests
+>   README: Add cross and clang recipes
+> 
+>  .gitlab-ci.yml | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  Makefile       |  2 ++
+>  README.md      | 22 ++++++++++++++++++++++
+>  configure      | 11 ++++++++---
+>  riscv/Makefile |  4 +++-
+>  5 files changed, 78 insertions(+), 4 deletions(-)
+> 
+> -- 
+> 2.46.0
+>
 
-Fixes: 410db103f6eb ("KVM: arm64: Make idregs debugfs iterator search sysreg table directly")
-Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
----
- arch/arm64/kvm/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Merged
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ff8c4e1b847e..b1c59773b9c0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4135,7 +4135,7 @@ static int idregs_debug_show(struct seq_file *s, void *v)
- 
- 	desc = idregs_debug_find(kvm, kvm->arch.idreg_debugfs_iter);
- 
--	if (!desc->name)
-+	if (!desc || !desc->name)
- 		return 0;
- 
- 	seq_printf(s, "%20s:\t%016llx\n",
--- 
-2.25.1
-
+Thanks,
+drew
