@@ -1,145 +1,122 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F46B1DEFD8
-	for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 20:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729715468; cv=none; b=lwqohqikH8KeKumTEViz/E4X2GuvwvyQtQA8GCC/OkUZqSvgwfIvhF5CozVi5FlNoJshTThPSV6kZRWYJIv+sADmpGG+GHoxYLtEAeiccob876fzMiDTat9Jb/i6poHy+gmUgOp3Y8hJcfQmHnUL1W4RnHghjVFDx2KWtxxaPQg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729715468; c=relaxed/simple;
-	bh=tB8YjFRBHefXfMHdopyBr+6WJPVSg+zjwX4FEjBwhJA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pqmZByGMTTVNFBgVskjzBCLAN5OhZaikZPwt0EvVryF2HHaZsj3Mn30sjTDL8/9BGZfl3ZQQFgn+Tyt2TNuHCophBZJ/PTDicumLvhHVeFIovUmhG+3RBdD31MUzdcKwRQOg4gt1QQY0LVTpgT6OW6dPOuRyofB8arMzGC5fuR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JBkiWHZT; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B71136E21;
+	Thu, 24 Oct 2024 03:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729741091; cv=pass; b=qcMkIrcPDiUF//G10BoJVmigSY6g1Q2O21rsKj3LyfyNQlCW/i0vf2aGmHIs5VfQP8GLKIoYEGuLNgukmxlDoJTHIOhXGehfXu5rmdZSyc8KMFIFdgGRBw5hBEJ07m2AkGk6qgZGbuIOnfn7Wyl9M1FtnQoEis571mP3E9FAJzc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729741091; c=relaxed/simple;
+	bh=zEQo/QBWu6c6CXzMwktN5QgHMCmbYkc6fV21Y5AEGr0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y02QlIKNpxZU0x7S0vTF6DEjlTE1v9LIawYbwOipN1Kg+bD+CU+EFIJ7g+aJOOawBu5QkrNk0nlvIFJYwkoyNrzCUIkeexRc0bdlJCU7+7QvpTJjz6LbeV9ptOUeTF18VEJKh+mWMIGrcdgplFMcYtWbxWKkKdizQp0Vtfq9IX8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=dmitry.osipenko@collabora.com header.b=cQ8vcj5j; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JBkiWHZT"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-539f76a6f0dso192288e87.1
-        for <kvmarm@lists.linux.dev>; Wed, 23 Oct 2024 13:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729715465; x=1730320265; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ga5iUl1w2BkdYZ5rnWwUX+rnruTQCDzgYbSTQOQPjWI=;
-        b=JBkiWHZT0PO3Faq5DFmittZgGzvmWzsLFSZa6rLZmgapeoZ30loYd3F2Ze9hVLnxeh
-         E6i7ehKS0nyUBY1R9k4tU1LAXjy+R9tzsQRM6BitXM53S8QxGm4FP6vACeWPrm5PYqxF
-         Q2ydIdygaxv+A1hX7Mb0B8Q+YMCCuqtxqQAYwBwzuXjjHXDbCgtrlemW1sVq5z+h4R/B
-         3mp+ibZSggnZV6NLeX9voeFeEV8FHJFAQgXqtqkFlgmiVdlGYp+7ZTYv2q4oJgj1zkUq
-         UezGx/QK/n1jMdZ/hqtTBWIYKRAu3U8G1x1kllbFRpzILtJ46w8mnGjv7FMs+X4hEyWf
-         G83A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729715465; x=1730320265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ga5iUl1w2BkdYZ5rnWwUX+rnruTQCDzgYbSTQOQPjWI=;
-        b=CFTjd3n6WwPiUHwfE7IueF9tF60yMWz/1jTjRusrbNyu8JtXkoycQMl2kJn9FqLhPq
-         iil1spFdhKy5GMA6PK6xq6Hn9PpDSXL7Y0td0cCzEtxgnbAp7zsvhDu5ijVScxdaL81Z
-         +Ykk7rJtzmLtb/eSmadMBAahqt+N8Etko4DZUCnaPUfgF2YeKy2B4jefjXm81ldP5I1d
-         nTqvBEGXLnrGvArilyMafEcB0U/Vyy1KNi/KmyJBDMoRZbVEaK3c9irJzJjJ3fh9Mjap
-         Mo6AD4JrDgI4SZKSCyJynY/LGfrya712aBaEBacbEpZfI4vgHrcs3qEd8Fjlu57Lo/RX
-         1IOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWF+pZWQ2+vH3h1aTmCejVS7I/N5OdDA6wpnlU6lRMfhvZNPranlAquvGX+v1Omqwek33VV2I=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyjPPDAx+qcsKDVXwROTKa14pUJ8zOdKdYHCJCQEJsUbEL5ZWTV
-	PKYRHFN1qClHj8w3OnaB5e0gGUdFNiO55+M8z3Uhc89umld4yFQ0hTH6kB/+b1s452cFEUeh2nd
-	sWhnY/gDnXhSe3VRmiQnSPweyZsXhT2P3X1Fa
-X-Google-Smtp-Source: AGHT+IFOB5hl9xCTQi6KADVj+Ygz/KDWtgtceEAnJGc5F5DcfIsupKdCkMoYXTkWNpc4In12Fan0dWm/m/6oFWaM4OA=
-X-Received: by 2002:a05:6512:308d:b0:539:f23b:59db with SMTP id
- 2adb3069b0e04-53b1a2fb0b9mr2186529e87.5.1729715465274; Wed, 23 Oct 2024
- 13:31:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=dmitry.osipenko@collabora.com header.b="cQ8vcj5j"
+ARC-Seal: i=1; a=rsa-sha256; t=1729741060; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=nX8OPXDW2cthIEqTMyQQblZpQUeRm1tlYext1Oo30sTtYHYcktbP6QkNaRaRkvMdBZhtUx8VMyuOZ1yo+FGGeGS0iCscen2p3GnJ1SyL8u2H85tjngG+AQ708fA/Wbe6xOriUcybgk3FqcZLV5d+YhhpIyUQHTpiQ1V0GZwo2ow=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1729741060; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=4wf2lEGNiKikemuz3JoVmC7ikUs3mn2DyQw2oAk/xb4=; 
+	b=XjLhS44GYUwiRMfeiBLSXehbyRQHvo6kaknTjIG114GAewi+zh78rAsKEHBbblqZNUaD0HYnVdKY6QBZ6HfPRPHw1RR+8ptBY9I6yekRvVWAnJN/gZfNwiXZ1CivAP7+qd4eraONzUwIs+Q/hbulsRZ56dZh8+L2v3nWUBAIzd4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=dmitry.osipenko@collabora.com;
+	dmarc=pass header.from=<dmitry.osipenko@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1729741060;
+	s=zohomail; d=collabora.com; i=dmitry.osipenko@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=4wf2lEGNiKikemuz3JoVmC7ikUs3mn2DyQw2oAk/xb4=;
+	b=cQ8vcj5jczCZFZamwVhgcpKC2ZP4/1MdOILVTF2hjwXwseYRu8QXQXCHBGN8Z7WZ
+	5WRt1sT0vEYnud2HTzfxLFosZXJPwKulFSBtZYX0ZqRX2NJ5tO7GS2OAuoHhYA9KkpX
+	kVPN3Qtgq2O/ILYUE5VKlxxBj81B828bnHdKV/qo=
+Received: by mx.zohomail.com with SMTPS id 1729741058928285.49991825731297;
+	Wed, 23 Oct 2024 20:37:38 -0700 (PDT)
+Message-ID: <03c316c7-5268-40cd-af1c-4c8454506ab2@collabora.com>
+Date: Thu, 24 Oct 2024 06:37:28 +0300
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240704142319.728-1-jiangkunkun@huawei.com> <20240704142319.728-3-jiangkunkun@huawei.com>
-In-Reply-To: <20240704142319.728-3-jiangkunkun@huawei.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 23 Oct 2024 13:30:54 -0700
-Message-ID: <CAAdAUtgYzQe+G7nWuNLpOadGhC9XKQpoXt-He8cTyMHiUDLPVg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: arm64: vgic-its: Clear dte when mapd unmaps a device
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Eric Auger <eauger@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	wanghaibin.wang@huawei.com, lishusen2@huawei.com, tangnianyao@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 00/85] KVM: Stop grabbing references to PFNMAP'd pages
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>,
+ Andrew Jones <ajones@ventanamicro.com>
+References: <20241010182427.1434605-1-seanjc@google.com>
+From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-Hi Kunkun,
+On 10/10/24 21:23, Sean Christopherson wrote:
+> TL;DR: Eliminate KVM's long-standing (and heinous) behavior of essentially
+> guessing which pfns are refcounted pages (see kvm_pfn_to_refcounted_page()).
+> 
+> Getting there requires "fixing" arch code that isn't obviously broken.
+> Specifically, to get rid of kvm_pfn_to_refcounted_page(), KVM needs to
+> stop marking pages/folios dirty/accessed based solely on the pfn that's
+> stored in KVM's stage-2 page tables.
+> 
+> Instead of tracking which SPTEs correspond to refcounted pages, simply
+> remove all of the code that operates on "struct page" based ona the pfn
+> in stage-2 PTEs.  This is the back ~40-50% of the series.
+>  
+> For x86 in particular, which sets accessed/dirty status when that info
+> would be "lost", e.g. when SPTEs are zapped or KVM clears the dirty flag
+> in a SPTE, foregoing the updates provides very measurable performance
+> improvements for related operations.  E.g. when clearing dirty bits as
+> part of dirty logging, and zapping SPTEs to reconstitue huge pages when
+> disabling dirty logging.
+> 
+> The front ~40% of the series is cleanups and prep work, and most of it is
+> x86 focused (purely because x86 added the most special cases, *sigh*).
+> E.g. several of the inputs to hva_to_pfn() (and it's myriad wrappers),
+> can be removed by cleaning up and deduplicating x86 code.
+> 
+> v13:
+>  - Rebased onto v6.12-rc2
+>  - Collect reviews. [Alex and others]
+>  - Fix a transient bug in arm64 and RISC-V where KVM would leak a page
+>    refcount. [Oliver]
+>  - Fix a dangling comment. [Alex]
+>  - Drop kvm_lookup_pfn(), as the x86 that "needed" it was stupid and is (was?)
+>    eliminated in v6.12.
+>  - Drop check_user_page_hwpoison(). [Paolo]
+>  - Drop the arm64 MTE fixes that went into 6.12.
+>  - Slightly redo the guest_memfd interaction to account for 6.12 changes.
 
-On Thu, Jul 4, 2024 at 7:23=E2=80=AFAM Kunkun Jiang <jiangkunkun@huawei.com=
-> wrote:
->
-> vgic_its_save_device_tables will traverse its->device_list to
-> save dte for each device. vgic_its_restore_device_tables will
-> traverse each entry of device table and check if it is valid.
-> Restore if valid.
->
-> But when mapd unmaps a devices, we do not invalidate the
-type: devices -> device
-> corresponding dte. In the scenario of continuous save
-> and restore, there may be a situation where a device's dte
-> is not saved but is restored. This is unreasonable and may
-> cause restore to fail. This patch clears the corresponding
-> dte when mapd unmaps a device.
->
-> Co-developed-by: Shusen Li <lishusen2@huawei.com>
-> Singed-off-by: Shusen Li <lishusen2@huawei.com>
-typo: Signed
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
-s.c
-> index 344bd8c20f67..223a5f1d6a3d 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1140,8 +1140,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm=
-, struct vgic_its *its,
->         u8 num_eventid_bits =3D its_cmd_get_size(its_cmd);
->         gpa_t itt_addr =3D its_cmd_get_ittaddr(its_cmd);
->         struct its_device *device;
-> +       gpa_t gpa;
->
-> -       if (!vgic_its_check_id(its, its->baser_device_table, device_id, N=
-ULL))
-> +       if (!vgic_its_check_id(its, its->baser_device_table, device_id, &=
-gpa))
->                 return E_ITS_MAPD_DEVICE_OOR;
->
->         if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-> @@ -1161,8 +1162,17 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kv=
-m, struct vgic_its *its,
->          * The spec does not say whether unmapping a not-mapped device
->          * is an error, so we are done in any case.
->          */
-> -       if (!valid)
-> +       if (!valid) {
-> +               struct kvm *kvm =3D its->dev->kvm;
-> +               int dte_esz =3D vgic_its_get_abi(its)->dte_esz;
-> +               u64 val =3D 0;
-> +
-> +               if (KVM_BUG_ON(dte_esz !=3D sizeof(val), kvm))
-> +                       return -EINVAL;
-> +
-> +               vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
->                 return 0;
-> +       }
->
->         device =3D vgic_its_alloc_device(its, device_id, itt_addr,
->                                        num_eventid_bits);
-> --
-> 2.27.0
->
->
+Thanks a lot for working on this patchset! I tested it with native
+amdgpu/intel contexts and venus/virgl with dGPU and iGPU, no problems
+spotted. Please merge sooner, this will unblock lots of new virtio-gpu
+features.
 
-Jing
+Tested-by: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+
+-- 
+Best regards,
+Dmitry
+
