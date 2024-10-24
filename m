@@ -1,103 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EB51B21A9
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 09:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA302757FC
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 09:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729762179; cv=none; b=fz+69bwjQ+phI9o4Ban+BZCpyKKZdC2rN8UYzoaEDF4kFRFBTpRIuQJZhkXHKfk0XoEAf58yI/PwMDfdzD2WSzDZCDYi6TRAGhpAxScSaL/PstdYwe5j0gRuHerpkKXEgdLYFC0ZZTVLhjffUkERMgScnqZnUGSbe8tLsL8YOH0=
+	t=1729762837; cv=none; b=OI4Elv46fy9U132YKPVcOWNeiFVgiDoREg4s4/49Pfu1L+xqGC4aI13iHfvXjaLSvCY0WUZVTzVmYI4AM3XU2/wLa3BPdiKocAaodWjfmm10tQ+/MuxV7jw8UOpywqqCHFEs26PvW/Z1z+xFFBFRug3BkCvISil7TtnXS5wOoTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729762179; c=relaxed/simple;
-	bh=geudcH7yX/W/ZOpP6E9dcE7viAct/chywpGntfYcIkE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FyJ7LXS9XwwmR3e2bZmG1mWulgJiwb8z78/i9tcNnHCVE4gz8HM6g8OagnbBpkaZ7gzSCwMKjMWexnFIU9Rh/qVKcdJVu1XoRRY7P+qhkaePTyP2KmQas6NwZGo8atpRO4KI64jKxejgxdQbg9LdSBbUCctQbJl8GuXTH13a0bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGgbSkeU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGgbSkeU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6144AC4CEC7;
-	Thu, 24 Oct 2024 09:29:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729762178;
-	bh=geudcH7yX/W/ZOpP6E9dcE7viAct/chywpGntfYcIkE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CGgbSkeUrmHIO5OJczLufZwvq7GiFh6rzSjgVFYP3UEcyK3K1uFdJuXE4iVQNu2pT
-	 lYy1QX4XH8QYIfjb74mXh7z8VIjoNNr1k8/dx1cBOnGeueOsenoBTu8UxvJpzzWwmB
-	 fbpks0bjuxUy9zaZD60+t208Gdqusm8P/HjG9A34Bi8/Eiroc0cktp3rnl9I18HqqC
-	 /fmcC71cySbl3DHhze731zTF37KLWmUyrlVevTssaVcoTLApauJAxdGF7R7MLgBrtL
-	 2ZS6x646umBXNdkbH4g7QWI4+e/5hlbnqXbCpqbuGwk9dwzR6VyP29wbQIcuyTWuX1
-	 9OTLgF+qx9VTg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t3u9w-006ODj-74;
-	Thu, 24 Oct 2024 10:29:36 +0100
-Date: Thu, 24 Oct 2024 10:29:35 +0100
-Message-ID: <86wmhx3l34.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Gaosheng Cui <cuigaosheng1@huawei.com>
-Cc: <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<sebott@redhat.com>,
-	<wangweiyang2@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH -next] KVM: arm64: Fix possible null-ptr-deref in idregs_debug_show
-In-Reply-To: <20241024083350.2828920-1-cuigaosheng1@huawei.com>
-References: <20241024083350.2828920-1-cuigaosheng1@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1729762837; c=relaxed/simple;
+	bh=ttaRqGo6vaAGjCsstiXRWbO6aKPyLN7lnVTcd3oa+6Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aOEsDJXkrkdLlUi1ZmPPTSWnfhv0K0HvZ4Z4jb/If4rFQH2OGZVg+YlfHJBQVvsAWxF60iXUw0WxnPFn517wlJrFeY4u8LcF7zc/raRT4zdgtNwaJ54q0/7FfvPjjy5prqxapgO6S/N5oTVwuQhtoXmOAIoR3WTxsYCLwpqX8C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XZ14R4V3Cz6LDBr;
+	Thu, 24 Oct 2024 17:35:51 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 46297140B2F;
+	Thu, 24 Oct 2024 17:40:33 +0800 (CST)
+Received: from A2303104131.china.huawei.com (10.203.177.241) by
+ frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Oct 2024 11:40:26 +0200
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
+	<cohuck@redhat.com>, <eric.auger@redhat.com>, <yuzenghui@huawei.com>,
+	<wangzhou1@hisilicon.com>, <jiangkunkun@huawei.com>,
+	<jonathan.cameron@huawei.com>, <anthony.jebson@huawei.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linuxarm@huawei.com>
+Subject: [RFC PATCH v2 0/3] KVM: arm64: Errata management for VM Live migration
+Date: Thu, 24 Oct 2024 10:40:09 +0100
+Message-ID: <20241024094012.29452-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cuigaosheng1@huawei.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sebott@redhat.com, wangweiyang2@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Thu, 24 Oct 2024 09:33:50 +0100,
-Gaosheng Cui <cuigaosheng1@huawei.com> wrote:
-> 
-> The idregs_debug_show() maybe return nullptr, we need to check desc
-> before dereference it to avoid possible null pointer dereferences.
-> 
-> Fixes: 410db103f6eb ("KVM: arm64: Make idregs debugfs iterator search sysreg table directly")
-> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index ff8c4e1b847e..b1c59773b9c0 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -4135,7 +4135,7 @@ static int idregs_debug_show(struct seq_file *s, void *v)
->  
->  	desc = idregs_debug_find(kvm, kvm->arch.idreg_debugfs_iter);
->  
-> -	if (!desc->name)
-> +	if (!desc || !desc->name)
->  		return 0;
->  
->  	seq_printf(s, "%20s:\t%016llx\n",
+This is another attempt on this based on the feedback received
+for RFC v1. Thanks for all the discussions and suggestions.
 
-Can you show a case where this happens in practice?
+Changes from RFC v1[0]:
+ -Introduced hypercalls to retrieve target CPUs info from user space VMM.
+  see patch #1 for details.
+ -Patch #2 uses the hypercall to retrieve the target CPU info if any.
+ -Use the target CPUs MIDR/REVIDR in errata enablement. See patch #3.
 
-The check for NULL is already in idregs_debug_next(), and I don't see
-how this can actually be triggered.
+Sanity tested on a HiSilicon ARM64 platform using a hacked Qemu that can
+handle the above-mentioned hypercalls.
+
+Please take a look and let me know if this is in the right direction or
+not.
+
+Also TBD:
+1. Do we need some way of notifying the userspace VMM in case the Guest
+   fails to update target CPUs?
+2. Usage of synthetic MIDR mentioned in RFC v1 discussion. How do we
+   envision the synthetic MIDR to be used/supported?
+   1. VMM writes synthetic MIDR to KVM(SET_ONE_REG)
+   2. Uses Guest hypercall to update the target CPUs info.
+
+   If this is the case what happens if an old Guest (without hypercall
+   support) is used?  VMM will abort the Guest if no hypercall is 
+   received but a synthetic MIDR is set?
 
 Thanks,
+Shameer
 
-	M.
+[0]https://lore.kernel.org/kvmarm/20241011075053.80540-1-shameerali.kolothum.thodi@huawei.com/
+
+Background from v1:
+
+On ARM64 platforms most of the errata workarounds are based on CPU
+MIDR/REVIDR values and a number of these workarounds need to be
+implemented by the Guest kernel as well. This creates a problem when
+Guest needs to be migrated to a platform that differs in these
+MIDR/REVIDR values even if the VMM can come up with a common minimum
+feature list for the Guest using the recently introduced "Writable
+ID registers" support.
+
+(This is roughly based on a discussion I had with Marc and Oliver
+at KVM forum. Marc outlined his idea for a solution and this is an
+attempt to implement it. Thanks to both and I take all the blame
+if this is nowhere near what is intended/required)
+
+Shameer Kolothum (3):
+  KVM: arm64: Add hypercall support for retrieving migration targets
+  KVM: arm64: Use hypercall to retrieve any migration targets
+  KVM: arm64: Enable errata based on migration target CPUs
+
+ Documentation/virt/kvm/arm/hypercalls.rst | 77 +++++++++++++++++++++++
+ arch/arm64/include/asm/cpufeature.h       |  7 +++
+ arch/arm64/include/asm/paravirt.h         |  3 +
+ arch/arm64/kernel/cpu_errata.c            | 49 ++++++++++++---
+ arch/arm64/kernel/cpufeature.c            |  3 +
+ arch/arm64/kernel/paravirt.c              | 48 ++++++++++++++
+ include/linux/arm-smccc.h                 | 13 ++++
+ 7 files changed, 190 insertions(+), 10 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.45.2
+
