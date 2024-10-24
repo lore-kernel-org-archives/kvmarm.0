@@ -1,63 +1,45 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D44617333D
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 19:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CEB216A1D
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 20:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729799873; cv=none; b=Ui4MAKT70O2YAUaNBSUscH5xPD+ge6NkpFWFr9yEctuQmnfNoZ83soFkJCtGnTCkuFF6yxrPT9DWzx/jpa1WwlsgiE2PfOguhoSElxb/b9djOwN4p/SWCz8uxx3R198LnvAwH4iE1cc0Y01/k3QtQUz2IPIquXAVUohiwjIhfNw=
+	t=1729800904; cv=none; b=KUxTBL8fYRehHMKiH2cNLGu3xL8UouhgbewKTlphmGIeYZgXKLvXbLV7Hd++V5F+kh9/78WzbqhIGwl1SgerxqsgFY53MvGvzQAVVAca2vY34kZYxU1vJEjopzuuOOR0nlib1upM+ry/Djf70GX4aZCn+3K0smbi+7IV7zPsrEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729799873; c=relaxed/simple;
-	bh=bTSZ+AIYW4PtKktAhtWQiw/nwwUpqv9LctwwUYhZcYs=;
+	s=arc-20240116; t=1729800904; c=relaxed/simple;
+	bh=6fj/q8BQSOINphdKPPLUDq7M+GfsWT/xgsFdcpeWwHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o+yvqSwixk5bwMAcLJD5bjbrWx7TBWIffbG1BeaUqSfobvTsCGmKP02HU7L6ncM/XGKaD6RpDYJT4srt61obhgq/RbHPZa8d2D+WyD2h3o64NWxVTbQPoOcNPCxQvdtiCBh5vzoWomSp19syoFcsygbNUcawWvzxUzD8nIrLwsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tPILtAAX; arc=none smtp.client-ip=95.215.58.179
+	 Content-Type:Content-Disposition:In-Reply-To; b=aCkrUNZAms6FZJIcNGXarX6LQDf9dxFrsuq0HTo1Md/TV3w67f63y0vwdKQy1tYFT77blDeFJMUhSYLoB0rfQWmJJ5S2Q5OPFX6aYVbp5k6+XoVmtcNXIXjdIHy6m3e7hRaRJRE4pWtfKKfSmmxKLXiHbuGQu7WlZorTS1OQSr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YfMBqlEu; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tPILtAAX"
-Date: Thu, 24 Oct 2024 12:57:38 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YfMBqlEu"
+Date: Thu, 24 Oct 2024 13:14:53 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729799868;
+	t=1729800899;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8BK0ZcosXDoOXzSbDL6svDcVkcl94/C1ybPNkAKv7is=;
-	b=tPILtAAXE+IgUeUPC4X+luEap2SlsyS17q2HLFknCMik+U8I3s2RvzCZUnSAzQqNJDKt9e
-	M/MTZyMVUnCKCJYUBNzj0u5ZsYLzm6ShCLECXJkxN//oG4dDtOWhz5P9RCDzSDwfta6E2h
-	1b0NgK8VyuKZarNkmkLJPSv4ZjfS/hI=
+	bh=UtFndtJcIL3zsSxbBk4RRQ6rdE2RirToZ3JUO30TCHs=;
+	b=YfMBqlEuY3d4sssErtWX/tyOE6MwT9DGBdAkTCuk3A3qClaZ1jgVMh94ystYpCwzOS3XQ0
+	kA6nAgW6nZsGBkOEUHBGkUp3x8C8S2QFSMgI7b/odoVduDw6c6fJO90OQ6BOTifEgTsS7k
+	fKQmtIPOjE09rsN97IuRq5Y3IxznMxw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Miguel Luis <miguel.luis@oracle.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	Francesco Lavra <francescolavra.fl@gmail.com>
-Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for
- hibernate
-Message-ID: <ZxqmsiXV6ZYTANKY@linux.dev>
-References: <20241019172459.2241939-1-dwmw2@infradead.org>
- <20241019172459.2241939-7-dwmw2@infradead.org>
- <23C91005-7304-4312-A5E0-F5E6C05B3209@oracle.com>
- <ECD0CA58-2C3B-48F3-AF12-95E37CB0FC48@infradead.org>
- <ZxprcWDe2AXuLhD_@linux.dev>
- <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Zhiqiang Ni <nizhiqiang1@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	wanghaibin.wang@huawei.com, tangnianyao@huawei.com,
+	wangzhou1@hisilicon.com, yuzenghui@huawei.com,
+	wangyanan55@huawei.com, jiangkunkun@huawei.com,
+	jiaqingtong@huawei.com
+Subject: Re: [bug report] KVM: arm64: vgic-its: Performance degradation on
+ GICv3 LPI injection
+Message-ID: <ZxqqvcaGFkK4_QHW@linux.dev>
+References: <bb4aeb68-c77b-4071-bca5-d129a1c5f6f3@huawei.com>
+ <86y12e2amf.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,40 +48,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org>
+In-Reply-To: <86y12e2amf.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 24, 2024 at 05:56:09PM +0200, David Woodhouse wrote:
-> On 24 October 2024 17:44:49 CEST, Oliver Upton <oliver.upton@linux.dev> wrote:
-> >IIUC, you're really wanting to 0x0 because there are hypervisors out
-> >there that violate the final spec and *only* accept this value.
+On Thu, Oct 24, 2024 at 09:00:56AM +0100, Marc Zyngier wrote:
+> On Thu, 24 Oct 2024 06:06:58 +0100,
+> Zhiqiang Ni <nizhiqiang1@huawei.com> wrote:
+> > 
+> > Hi all,
+> > 
+> > I found a performance degradation on GICv3 LPI injection after this
+> > commit ad362fe07fecf0aba839ff2cc59a3617bd42c33f(KVM: arm64: vgic-its:
+> > Avoid potential UAF in LPI translation cache).
 > >
-> >That's perfectly fine, but it'd help avoid confusion if the supporting
-> >comment was a bit more direct:
-> >
-> >	/*
-> >	 * If no hibernate type is specified SYSTEM_OFF2 defaults to
-> >	 * selecting HIBERNATE_OFF.
-> >	 *
-> >	 * There are hypervisors in the wild that violate the spec and
-> >	 * reject calls that explicitly provide a hibernate type. For
-> >	 * compatibility with these nonstandard implementations, pass 0
-> >	 * as the type.
-> >	 */
-> >	 if (system_entering_hibernation())
-> >		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2), 0 , 0, 0);
+> > In my testcase, the vm's configuration is 60 VCPU 120G RAM with a
+> > 32-queue NIC and the kernel version is 5.10. The number of new TCP
+> > connections per second changed from 150,000 to 50,000 after this
+> > patch, with the %sys of cpu changed from 15% to 85%.
 > 
-> By the time this makes it into released versions of the guest Linux kernel, that comment won't be true any more.
+> What is the VM running? How is the traffic generated? Without a
+> reproducer, I struggle to see how we are going to analyse this issue.
+> 
+> We can't go back to the previous situation anyway, as it has been
+> shown that what we had before was simply unsafe (the commit message
+> explains why).
+> 
+> > From the ftrace, I found that the duration of vgic_put_irq() is
+> > 13.320 us, which may be the reason for the performance degradation.
+> >
+> > The call stack looks like below:
+> >     kvm_arch_set_irq_inatomic()
+> >       vgic_has_its();
+> >       vgic_its_inject_cached_translation()
+> >         vgic_its_check_cache()
+> >         vgic_queue_irq_unlock()
+> >         vgic_put_irq()
+> 
+> Are you suggesting that it is the combination of vgic_get_irq_kref() +
+> vgic_irq_put() that leads to excessive latency? Both are essentially
+> atomic operations, which should be pretty cheap on a modern CPU
+> (anything with FEAT_LSE).
 
-Then does it even matter? What is the problem you're trying to solve
-with using a particular value for the hibernate type?
+Looks like the bug report is for a 5.10 kernel, and at that point in
+ancient history KVM takes the lpi_list_lock for every vgic_irq_get() / vgic_irq_put()
 
-Either the goal of this is to make the PSCI client code compatible with
-your hypervisor today (and any other implementation based on 'F ALP1') or
-we don't care and go with whatever value we want.
+The series below that we took upstream has the necessary improvements to
+alleviate lock contention, Zhiqiang you may want to consider backporting
+this into your kernel.
 
-Even if the comment eventually becomes stale, there is a ton of value in
-documenting the exact implementation decision being made.
+https://lore.kernel.org/all/20240221054253.3848076-1-oliver.upton@linux.dev/
 
 -- 
 Thanks,
