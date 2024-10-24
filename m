@@ -1,157 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E94D1F8196;
-	Thu, 24 Oct 2024 18:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D44617333D
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 19:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729793113; cv=none; b=Lj37eM1T1TEo0NcuKWbRfhOu7RCEU2Lp979zzrO7IPC+7+xML5f5DMsZk5326ElmCzrgregyXfVTjxJ7hBjk02skIe7SxQgv45zy0wIBRNT+OZmK4l1+H4wKSQfB0DlrwoeykztdLaAHNv792s3mM0zwFivIUbgSun5tqr0RcDo=
+	t=1729799873; cv=none; b=Ui4MAKT70O2YAUaNBSUscH5xPD+ge6NkpFWFr9yEctuQmnfNoZ83soFkJCtGnTCkuFF6yxrPT9DWzx/jpa1WwlsgiE2PfOguhoSElxb/b9djOwN4p/SWCz8uxx3R198LnvAwH4iE1cc0Y01/k3QtQUz2IPIquXAVUohiwjIhfNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729793113; c=relaxed/simple;
-	bh=xH/uQd3S3Hw++2BLkxPeBWim+glMB4nzTKks3oUBOqU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OOPn61dlTs/aA+M+RwwvwFDEb7/AbXDiWRPdZfcrZlQqjxLkksWm4gA/yWNlXUhZWWvAOFxg9sPgmGWcBqiFArxR1+DjewKbM0vqLhe8PTCMUtJLEk16mTF9acoyenGqfjhIJyNrdp2F8zNchNQptTOtluaIYF0+IIBUxXl28A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CeBEkrM9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729799873; c=relaxed/simple;
+	bh=bTSZ+AIYW4PtKktAhtWQiw/nwwUpqv9LctwwUYhZcYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o+yvqSwixk5bwMAcLJD5bjbrWx7TBWIffbG1BeaUqSfobvTsCGmKP02HU7L6ncM/XGKaD6RpDYJT4srt61obhgq/RbHPZa8d2D+WyD2h3o64NWxVTbQPoOcNPCxQvdtiCBh5vzoWomSp19syoFcsygbNUcawWvzxUzD8nIrLwsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tPILtAAX; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CeBEkrM9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C52ABC4CEE3;
-	Thu, 24 Oct 2024 18:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729793112;
-	bh=xH/uQd3S3Hw++2BLkxPeBWim+glMB4nzTKks3oUBOqU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CeBEkrM9KwQzs8Sr4H9qvrS+Q+9Yn6jLzch4n283mZAU506Igo5qMKU+VZkFZMKNb
-	 eqxrqg/B5rU0QJZXQFLhmOsDBOuWnLPDFr/VjmRoTJaWahtG8uH8KrR85hZ+u0BZnm
-	 pf8/BnfDVoGb5/qN7GY3juHqm7RTDFdvRCmzfLR1zyBAKRTDBV/TFmZnTwjQE1F3o2
-	 //De9w4roD/DZKGTAtalldRPeTP5XpC/3A/Eth1RDwxMleCYh99S06uE130taSRWVK
-	 eGNmCOUxBcQ3Hs6vaAjKCEJdwY8a/sa7P+Yd3ezC/Tgi2D+Q2Tu3GhJk23Zre+Wmk1
-	 xNpvGBRN/m/9A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t42Cs-006XzS-Pu;
-	Thu, 24 Oct 2024 19:05:10 +0100
-Date: Thu, 24 Oct 2024 19:05:10 +0100
-Message-ID: <86ldyd2x7t.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tPILtAAX"
+Date: Thu, 24 Oct 2024 12:57:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729799868;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8BK0ZcosXDoOXzSbDL6svDcVkcl94/C1ybPNkAKv7is=;
+	b=tPILtAAXE+IgUeUPC4X+luEap2SlsyS17q2HLFknCMik+U8I3s2RvzCZUnSAzQqNJDKt9e
+	M/MTZyMVUnCKCJYUBNzj0u5ZsYLzm6ShCLECXJkxN//oG4dDtOWhz5P9RCDzSDwfta6E2h
+	1b0NgK8VyuKZarNkmkLJPSv4ZjfS/hI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Miguel Luis <miguel.luis@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	stable@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-In-Reply-To: <3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
-References: <20241009183603.3221824-1-maz@kernel.org>
-	<3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
+	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	Francesco Lavra <francescolavra.fl@gmail.com>
+Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for
+ hibernate
+Message-ID: <ZxqmsiXV6ZYTANKY@linux.dev>
+References: <20241019172459.2241939-1-dwmw2@infradead.org>
+ <20241019172459.2241939-7-dwmw2@infradead.org>
+ <23C91005-7304-4312-A5E0-F5E6C05B3209@oracle.com>
+ <ECD0CA58-2C3B-48F3-AF12-95E37CB0FC48@infradead.org>
+ <ZxprcWDe2AXuLhD_@linux.dev>
+ <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, stable@vger.kernel.org, glider@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 24 Oct 2024 17:12:22 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Thu, Oct 24, 2024 at 05:56:09PM +0200, David Woodhouse wrote:
+> On 24 October 2024 17:44:49 CEST, Oliver Upton <oliver.upton@linux.dev> wrote:
+> >IIUC, you're really wanting to 0x0 because there are hypervisors out
+> >there that violate the final spec and *only* accept this value.
+> >
+> >That's perfectly fine, but it'd help avoid confusion if the supporting
+> >comment was a bit more direct:
+> >
+> >	/*
+> >	 * If no hibernate type is specified SYSTEM_OFF2 defaults to
+> >	 * selecting HIBERNATE_OFF.
+> >	 *
+> >	 * There are hypervisors in the wild that violate the spec and
+> >	 * reject calls that explicitly provide a hibernate type. For
+> >	 * compatibility with these nonstandard implementations, pass 0
+> >	 * as the type.
+> >	 */
+> >	 if (system_entering_hibernation())
+> >		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2), 0 , 0, 0);
 > 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Wed, Oct 09, 2024 at 07:36:03PM +0100, Marc Zyngier wrote:
-> > As there is very little ordering in the KVM API, userspace can
-> > instanciate a half-baked GIC (missing its memory map, for example)
-> > at almost any time.
-> 
-> The vgic_init selftest has started failing in mainline on multiple
-> platforms, with a bisect pointing at this patch which is present there
-> as commit df5fd75ee305cb5.  The test reports:
-> 
-> # selftests: kvm: vgic_init
-> # Random seed: 0x6b8b4567
-> # Running GIC_v3 tests.
-> # ==== Test Assertion Failure ====
-> #   lib/kvm_util.c:724: false
-> #   pid=1947 tid=1947 errno=5 - Input/output error
-> #      1	0x0000000000404edb: __vm_mem_region_delete at kvm_util.c:724 (discriminator 5)
-> #      2	0x0000000000405d0b: kvm_vm_free at kvm_util.c:762 (discriminator 12)
-> #      3	0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
-> #      4	 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
-> #      5	 (inlined by) run_tests at vgic_init.c:720
-> #      6	0x0000000000401a6f: main at vgic_init.c:748
-> #      7	0x0000ffffa7b37543: ?? ??:0
-> #      8	0x0000ffffa7b37617: ?? ??:0
-> #      9	0x0000000000401b6f: _start at ??:?
-> #   KVM killed/bugged the VM, check the kernel log for clues
-> not ok 10 selftests: kvm: vgic_init # exit=254
-> 
-> which does rather look like a test bug rather than a problem in the
-> change itself.
+> By the time this makes it into released versions of the guest Linux kernel, that comment won't be true any more.
 
-Well, the test tries to do braindead things, and then the test
-infrastructure seems surprised that KVM tells it to bugger off...
+Then does it even matter? What is the problem you're trying to solve
+with using a particular value for the hibernate type?
 
-I can paper over it with this (see below), but frankly, someone who
-actually cares about this crap should take a look (and ownership).
+Either the goal of this is to make the PSCI client code compatible with
+your hypervisor today (and any other implementation based on 'F ALP1') or
+we don't care and go with whatever value we want.
 
-	M.
-
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index b3b5fb0ff0a9..60b076ae85ea 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -742,6 +742,8 @@ int main(int ac, char **av)
- 	pa_bits = vm_guest_mode_params[VM_MODE_DEFAULT].pa_bits;
- 	max_phys_size = 1ULL << pa_bits;
- 
-+	allow_ioctl_returning_eio = true;
-+
- 	ret = test_kvm_device(KVM_DEV_TYPE_ARM_VGIC_V3);
- 	if (!ret) {
- 		pr_info("Running GIC_v3 tests.\n");
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index bc7c242480d6..988c68a77ce3 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -298,6 +298,8 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
- 	kvm_do_ioctl((vm)->fd, cmd, arg);			\
- })
- 
-+extern bool allow_ioctl_returning_eio;
-+
- /*
-  * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
-  * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
-@@ -313,6 +315,8 @@ do {											\
- 	static_assert_is_vm(vm);							\
- 											\
- 	if (cond)									\
-+		break;									\
-+	if (errno == EIO && allow_ioctl_returning_eio)					\
- 		break;									\
- 											\
- 	if (errno == EIO &&								\
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index a2b7df5f1d39..d9834421ab12 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -25,6 +25,8 @@ static uint32_t last_guest_seed;
- 
- static int vcpu_mmap_sz(void);
- 
-+bool allow_ioctl_returning_eio = false;
-+
- int open_path_or_exit(const char *path, int flags)
- {
- 	int fd;
+Even if the comment eventually becomes stale, there is a ton of value in
+documenting the exact implementation decision being made.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
