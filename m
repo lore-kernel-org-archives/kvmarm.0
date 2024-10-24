@@ -1,43 +1,30 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B71136E21;
-	Thu, 24 Oct 2024 03:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729741091; cv=pass; b=qcMkIrcPDiUF//G10BoJVmigSY6g1Q2O21rsKj3LyfyNQlCW/i0vf2aGmHIs5VfQP8GLKIoYEGuLNgukmxlDoJTHIOhXGehfXu5rmdZSyc8KMFIFdgGRBw5hBEJ07m2AkGk6qgZGbuIOnfn7Wyl9M1FtnQoEis571mP3E9FAJzc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729741091; c=relaxed/simple;
-	bh=zEQo/QBWu6c6CXzMwktN5QgHMCmbYkc6fV21Y5AEGr0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y02QlIKNpxZU0x7S0vTF6DEjlTE1v9LIawYbwOipN1Kg+bD+CU+EFIJ7g+aJOOawBu5QkrNk0nlvIFJYwkoyNrzCUIkeexRc0bdlJCU7+7QvpTJjz6LbeV9ptOUeTF18VEJKh+mWMIGrcdgplFMcYtWbxWKkKdizQp0Vtfq9IX8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=dmitry.osipenko@collabora.com header.b=cQ8vcj5j; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=dmitry.osipenko@collabora.com header.b="cQ8vcj5j"
-ARC-Seal: i=1; a=rsa-sha256; t=1729741060; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=nX8OPXDW2cthIEqTMyQQblZpQUeRm1tlYext1Oo30sTtYHYcktbP6QkNaRaRkvMdBZhtUx8VMyuOZ1yo+FGGeGS0iCscen2p3GnJ1SyL8u2H85tjngG+AQ708fA/Wbe6xOriUcybgk3FqcZLV5d+YhhpIyUQHTpiQ1V0GZwo2ow=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1729741060; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=4wf2lEGNiKikemuz3JoVmC7ikUs3mn2DyQw2oAk/xb4=; 
-	b=XjLhS44GYUwiRMfeiBLSXehbyRQHvo6kaknTjIG114GAewi+zh78rAsKEHBbblqZNUaD0HYnVdKY6QBZ6HfPRPHw1RR+8ptBY9I6yekRvVWAnJN/gZfNwiXZ1CivAP7+qd4eraONzUwIs+Q/hbulsRZ56dZh8+L2v3nWUBAIzd4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=dmitry.osipenko@collabora.com;
-	dmarc=pass header.from=<dmitry.osipenko@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1729741060;
-	s=zohomail; d=collabora.com; i=dmitry.osipenko@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=4wf2lEGNiKikemuz3JoVmC7ikUs3mn2DyQw2oAk/xb4=;
-	b=cQ8vcj5jczCZFZamwVhgcpKC2ZP4/1MdOILVTF2hjwXwseYRu8QXQXCHBGN8Z7WZ
-	5WRt1sT0vEYnud2HTzfxLFosZXJPwKulFSBtZYX0ZqRX2NJ5tO7GS2OAuoHhYA9KkpX
-	kVPN3Qtgq2O/ILYUE5VKlxxBj81B828bnHdKV/qo=
-Received: by mx.zohomail.com with SMTPS id 1729741058928285.49991825731297;
-	Wed, 23 Oct 2024 20:37:38 -0700 (PDT)
-Message-ID: <03c316c7-5268-40cd-af1c-4c8454506ab2@collabora.com>
-Date: Thu, 24 Oct 2024 06:37:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F7C157A72
+	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 05:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729746425; cv=none; b=m1aXmQotNt6zShf5z8lF6wjOmjnYLZMinF+NcOdOKd1EB2YbRll/BfUy2Nw+AJljPZAxmFSu2X4ZkZNBO+sl4NuA1MnBLXzu4QATqR1ep2RQNm/ctTgE6zVgz6EyJARrhooFNQP2zLsv/gQu2G42yrze/GOgj2xUMt45y7f72iA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729746425; c=relaxed/simple;
+	bh=Y5+wMPPqVQmayEdNdJW6qQEM1DVHG6HDylFxeu+dK9c=;
+	h=Message-ID:Date:MIME-Version:CC:From:Subject:To:Content-Type; b=b/N4aCuk+cgW+WFux0qVJOVreIM3sECkHeh2ghvg2D+hcv8CL9kSoU2HbMhAwJivzGpu52ysSdoEysGjhLQ1z38HJK+1iOf0qY3sB4dIp2wDMI6jUYxw6O0yAPTvT6KvvjI++z6Z6rDe0F3gAIWyoSEeaqL/IRwO5QvpmfnBA1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XYv4b0FcMz1SCyJ;
+	Thu, 24 Oct 2024 13:05:35 +0800 (CST)
+Received: from kwepemf500015.china.huawei.com (unknown [7.202.181.2])
+	by mail.maildlp.com (Postfix) with ESMTPS id BC397180043;
+	Thu, 24 Oct 2024 13:06:59 +0800 (CST)
+Received: from [10.174.178.37] (10.174.178.37) by
+ kwepemf500015.china.huawei.com (7.202.181.2) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 24 Oct 2024 13:06:58 +0800
+Message-ID: <bb4aeb68-c77b-4071-bca5-d129a1c5f6f3@huawei.com>
+Date: Thu, 24 Oct 2024 13:06:58 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,78 +32,115 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 00/85] KVM: Stop grabbing references to PFNMAP'd pages
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>,
- Andrew Jones <ajones@ventanamicro.com>
-References: <20241010182427.1434605-1-seanjc@google.com>
-From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
 Content-Language: en-US
-In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, <tangnianyao@huawei.com>,
+	<wangzhou1@hisilicon.com>, <yuzenghui@huawei.com>, <wangyanan55@huawei.com>,
+	<jiangkunkun@huawei.com>, <jiaqingtong@huawei.com>
+From: Zhiqiang Ni <nizhiqiang1@huawei.com>
+Subject: [bug report] KVM: arm64: vgic-its: Performance degradation on GICv3
+ LPI injection
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemf500015.china.huawei.com (7.202.181.2)
 
-On 10/10/24 21:23, Sean Christopherson wrote:
-> TL;DR: Eliminate KVM's long-standing (and heinous) behavior of essentially
-> guessing which pfns are refcounted pages (see kvm_pfn_to_refcounted_page()).
-> 
-> Getting there requires "fixing" arch code that isn't obviously broken.
-> Specifically, to get rid of kvm_pfn_to_refcounted_page(), KVM needs to
-> stop marking pages/folios dirty/accessed based solely on the pfn that's
-> stored in KVM's stage-2 page tables.
-> 
-> Instead of tracking which SPTEs correspond to refcounted pages, simply
-> remove all of the code that operates on "struct page" based ona the pfn
-> in stage-2 PTEs.  This is the back ~40-50% of the series.
->  
-> For x86 in particular, which sets accessed/dirty status when that info
-> would be "lost", e.g. when SPTEs are zapped or KVM clears the dirty flag
-> in a SPTE, foregoing the updates provides very measurable performance
-> improvements for related operations.  E.g. when clearing dirty bits as
-> part of dirty logging, and zapping SPTEs to reconstitue huge pages when
-> disabling dirty logging.
-> 
-> The front ~40% of the series is cleanups and prep work, and most of it is
-> x86 focused (purely because x86 added the most special cases, *sigh*).
-> E.g. several of the inputs to hva_to_pfn() (and it's myriad wrappers),
-> can be removed by cleaning up and deduplicating x86 code.
-> 
-> v13:
->  - Rebased onto v6.12-rc2
->  - Collect reviews. [Alex and others]
->  - Fix a transient bug in arm64 and RISC-V where KVM would leak a page
->    refcount. [Oliver]
->  - Fix a dangling comment. [Alex]
->  - Drop kvm_lookup_pfn(), as the x86 that "needed" it was stupid and is (was?)
->    eliminated in v6.12.
->  - Drop check_user_page_hwpoison(). [Paolo]
->  - Drop the arm64 MTE fixes that went into 6.12.
->  - Slightly redo the guest_memfd interaction to account for 6.12 changes.
+Hi all,
 
-Thanks a lot for working on this patchset! I tested it with native
-amdgpu/intel contexts and venus/virgl with dGPU and iGPU, no problems
-spotted. Please merge sooner, this will unblock lots of new virtio-gpu
-features.
+I found a performance degradation on GICv3 LPI injection after this
+commit ad362fe07fecf0aba839ff2cc59a3617bd42c33f(KVM: arm64: vgic-its:
+Avoid potential UAF in LPI translation cache).
 
-Tested-by: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+In my testcase, the vm's configuration is 60 VCPU 120G RAM with a
+32-queue NIC and the kernel version is 5.10. The number of new TCP
+connections per second changed from 150,000 to 50,000 after this
+patch, with the %sys of cpu changed from 15% to 85%.
 
+From the ftrace, I found that the duration of vgic_put_irq() is
+13.320 us, which may be the reason for the performance degradation.
+
+The call stack looks like below:
+    kvm_arch_set_irq_inatomic()
+      vgic_has_its();
+      vgic_its_inject_cached_translation()
+        vgic_its_check_cache()
+        vgic_queue_irq_unlock()
+        vgic_put_irq()
+
+So, I tried to modify the code like below and I found the performance
+degradation is gone. Is this a good idea?
+
+From 2bd98f8a2cc02a17423ced36e07f7bb3c7e044af Mon Sep 17 00:00:00 2001
+From: Zhiqiang Ni <nizhiqiang1@huawei.com>
+Date: Thu, 24 Oct 2024 12:29:28 +0800
+Subject: [PATCH] KVM: arm64: vgic-its: Avoid vgic_put_irq in LPI translation
+ cache
+
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 32 ++++++++++----------------------
+ 1 file changed, 10 insertions(+), 22 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 93c0365cd..0efabe555 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -579,24 +579,6 @@ static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+ 	return NULL;
+ }
+
+-static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
+-					     u32 devid, u32 eventid)
+-{
+-	struct vgic_dist *dist = &kvm->arch.vgic;
+-	struct vgic_irq *irq;
+-	unsigned long flags;
+-
+-	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+-
+-	irq = __vgic_its_check_cache(dist, db, devid, eventid);
+-	if (irq)
+-		vgic_get_irq_kref(irq);
+-
+-	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+-
+-	return irq;
+-}
+-
+ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 				       u32 devid, u32 eventid,
+ 				       struct vgic_irq *irq)
+@@ -759,18 +741,24 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+ {
+ 	struct vgic_irq *irq;
+-	unsigned long flags;
++	unsigned long flags, flags2;
+ 	phys_addr_t db;
++	struct vgic_dist *dist = &kvm->arch.vgic;
+
+ 	db = (u64)msi->address_hi << 32 | msi->address_lo;
+-	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
+-	if (!irq)
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags2);
++	irq = __vgic_its_check_cache(dist, db, msi->devid, msi->data);
++
++	if (!irq) {
++		raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags2);
+ 		return -EWOULDBLOCK;
++	}
+
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->pending_latch = true;
+ 	vgic_queue_irq_unlock(kvm, irq, flags);
+-	vgic_put_irq(kvm, irq);
++
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags2);
+
+ 	return 0;
+ }
 -- 
-Best regards,
-Dmitry
+2.33.0
 
+Thanks,
+Zhiqiang Ni
