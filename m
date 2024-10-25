@@ -1,649 +1,264 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFE91B3953
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 07:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CAB1D47D7
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 10:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729839847; cv=none; b=cYwaqhc1+Lf0RxiAek2dLTbbzk0Nbx2hNl4szfGe02/ELAWfnd2BRcYkP+NECCKHf0vn/1SwCiihcDU/pES1XHs9Oecv7PxCsAuQfoZ3Yvv6d//GlZuFhA/61yyXs3Hy8NB57sHtH9u0VH6OKmua5eYspeF/94UUSvCF6szPQzY=
+	t=1729851627; cv=none; b=BqWKsM7vvXLoYEaiLzonT2xpVbAS3P39EzmK4RAClI6C6AgDMpcMElq3zxtKccOCiIo1myqm1cmvFzFa+r2HE/S2Rqm9enZAnxnkcwdYBV/djua369SA2t3Kh6U79HUglHVmGabRAZXXV0hApdpOKcKxRXDEje4Eb9dMCwKcrNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729839847; c=relaxed/simple;
-	bh=DBv6l7GloxbmSNMewON9UjbH4GqdMp2fpBD3pszXpE8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bh85MDJ0T7qAk9uvBHvjAuqVHkyGhMO2JrNbbzbTNudy7ddDM4Ue9K/aVgJDE9vPhZWie1O7qhnYqdoNGY7gu6Yh+RDJCD9cOSTwfMmzQh5EmcgDQNfn2InAUM5bvVSOGXVm+GJKhqjZlJ2NsTCFkISBK7I1nImIxDzubuURHBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i3mG4BVx; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1729851627; c=relaxed/simple;
+	bh=iueurclUvxDopC1KK82SCXxu1sZ0bQSmojQ2+674MPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YM25csUAEJcNgYcC23WuVWsdWlkNgeLbGoH/OvajHfvGmwMQxTZHIYPwBtu9NfDRSYT2zJuXtHdOIcwwyl5q6sakPvk68IZtv4PKlFtbpHX0LDdsB4/JaXUUFUOSbHSvF0EPfM7zmfnTH+uJS0x82SRZOlOEKWriKPOAGMaZcRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MRD1Ag2V; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i3mG4BVx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRD1Ag2V"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729839842;
+	s=mimecast20190719; t=1729851623;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9p12DVJrh2/KaL703mBvE4NfeJ/21HDpgwP+rDFnf/I=;
-	b=i3mG4BVx/BVf4YdwdnRIiFAomiNyHNLg4TKYk4FMUYVWn7A8dWTqPB2alde/qPGWB6aB1X
-	c4vrbUsmhm8ga9N0yd3WnfsQEBypGF20seaQnrWqXljLew2EhbQlQ/LLMUQ5nKEassW23S
-	PgUzWy1PpsA0+GbGBvyo5zMoFF2htoY=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-194-qeIMYvkQNXqBTylKLRUX6Q-1; Fri, 25 Oct 2024 03:04:01 -0400
-X-MC-Unique: qeIMYvkQNXqBTylKLRUX6Q-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2e3912db200so2319035a91.2
-        for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 00:04:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729839840; x=1730444640;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9p12DVJrh2/KaL703mBvE4NfeJ/21HDpgwP+rDFnf/I=;
-        b=ND49nvZHOkbQCQv88C0ppxMd8uHsPGsCvnPtNriIppNzTmanUYWc9nIOxnJ3rTkUOK
-         qSLzrNCHDD65SlZRy9l1WiCmaOAg4liKqcDf85APYzm3q3VLJkis2TB5NAJ3gybmIDca
-         nJImaZ8uVYczTlw1sE9daLPbNurQl8WHaqHfQzaVZmvM/16SS66rceHrmnjlU46Rw1s+
-         uSzCDiggc/7UcECv1oeJzPIDu+zW9Ln9HIUH98r/bc3UcjAVkya3O3xvIWtqI++8ZOyN
-         OQws27o8VhLNVGaHxKYOvn6tiBA5oay/kCXNRgjeiOcwO3LDhikatBhTaX2tVZKneMV/
-         XA4w==
-X-Forwarded-Encrypted: i=1; AJvYcCUT0RlCZ417hypYWqP+tTUmxkIV+JCDh2jv0aTGTTSV5fvU/J8t3e0VHmdJGa3ICyuwrKr67TQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxj4ASRbb6gggEI8/O58D2Rni44NC07CJRRl5c6aa5q7v8Ts0fD
-	OB36m9XjwbyHyOKYo21uqSYtAOKZgwVDnesM/5cRdx83jvk/5v85nqiXvnv7OwefwFTHWzwBOB0
-	o2CUDypBplJ411q83NJgCzlyFurkCIv9X7Z0O0afqOsJDVGhGekwVrQ==
-X-Received: by 2002:a17:903:1cb:b0:20f:c094:b80f with SMTP id d9443c01a7336-20fc094bce6mr29520145ad.49.1729839839650;
-        Fri, 25 Oct 2024 00:03:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHqNkHcZK+wAbGtTfwcXjrQGB/oivx/BdHMIgJdpiz9apxigQic1a/Lr06F1uzOyU4AhBxK1g==
-X-Received: by 2002:a17:903:1cb:b0:20f:c094:b80f with SMTP id d9443c01a7336-20fc094bce6mr29519855ad.49.1729839839211;
-        Fri, 25 Oct 2024 00:03:59 -0700 (PDT)
-Received: from [192.168.68.55] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc02f6f1sm4190065ad.226.2024.10.25.00.03.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2024 00:03:58 -0700 (PDT)
-Message-ID: <d3e0b74a-7c01-487e-ac77-5c8afbd720d4@redhat.com>
-Date: Fri, 25 Oct 2024 17:03:49 +1000
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qYGN8AneHs7Yi2bBHsXC5Dwgmi47r05I0LJR1RgUMiE=;
+	b=MRD1Ag2VEL+VLI6w2fBEOyapSHngR5Ovg19S8TkyhA3bgVqCqyugfTSBVC4N6GQnpESH4t
+	5tM5wscR6xJfI/zByXeSRM7SbkWsWQmd5XltqSHA4gEbzbydJoEYacL2fGL7iaW95xdXlK
+	9C3mfOZWMe3nyIsa+mE3eZLjc+uNB4U=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-172-ptBJYbRdMJyGvdkJnzdOpg-1; Fri,
+ 25 Oct 2024 06:20:20 -0400
+X-MC-Unique: ptBJYbRdMJyGvdkJnzdOpg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A9A0119560AB;
+	Fri, 25 Oct 2024 10:20:17 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.39.194.5])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 433AE196BB7E;
+	Fri, 25 Oct 2024 10:20:08 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	cohuck@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com
+Cc: shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: [RFC 00/21] kvm/arm: Introduce a customizable aarch64 KVM host model
+Date: Fri, 25 Oct 2024 12:17:19 +0200
+Message-ID: <20241025101959.601048-1-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 06/43] arm64: RME: Add wrappers for RMI calls
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-7-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241004152804.72508-7-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 10/5/24 1:27 AM, Steven Price wrote:
-> The wrappers make the call sites easier to read and deal with the
-> boiler plate of handling the error codes from the RMM.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes from v4:
->   * Improve comments
-> Changes from v2:
->   * Make output arguments optional.
->   * Mask RIPAS value rmi_rtt_read_entry()
->   * Drop unused rmi_rtt_get_phys()
-> ---
->   arch/arm64/include/asm/rmi_cmds.h | 510 ++++++++++++++++++++++++++++++
->   1 file changed, 510 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
-> 
-> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-> new file mode 100644
-> index 000000000000..3ed32809a608
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_cmds.h
-> @@ -0,0 +1,510 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RMI_CMDS_H
-> +#define __ASM_RMI_CMDS_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
+This RFC series introduces a KVM host "custom" model.
 
-It can be dropped since the header file has been included by <asm/rmi_smc.h>
+Since v6.7 kernel, KVM/arm allows the userspace to overwrite the values
+of a subset of ID regs. The list of writable fields continues to grow.
+The feature ID range is defined as the AArch64 System register space
+with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
 
-> +#include <asm/rmi_smc.h>
-> +
-> +struct rtt_entry {
-> +	unsigned long walk_level;
-> +	unsigned long desc;
-> +	int state;
-> +	int ripas;
-> +};
-> +
-> +/**
-> + * rmi_data_create() - Create a Data Granule
-> + * @rd: PA of the RD
-> + * @data: PA of the target granule
-> + * @ipa: IPA at which the granule will be mapped in the guest
-> + * @src: PA of the source granule
-> + * @flags: RMI_MEASURE_CONTENT if the contents should be measured
-> + *
-> + * Create a new Data Granule, copying contents from a Non-secure Granule.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_data_create(unsigned long rd, unsigned long data,
-> +				  unsigned long ipa, unsigned long src,
-> +				  unsigned long flags)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE, rd, data, ipa, src,
-> +			     flags, &res);
-> +
-> +	return res.a0;
-> +}
-> +
+The custom model uses this capability and allows to tune the host
+passthrough model by overriding some of the host passthrough ID regs.
 
-Is there a particular reason why the first letter for 'Data Granule' and
-'Granule' has to be upper-case?
+The end goal is to get more flexibility when migrating guests
+between different machines. We would like the upper software layer
+to be able detect how tunable the vpcu is on both source and destination
+and accordingly define a customized KVM host model that can fit
+both ends. With the legacy host passthrough model, this migration
+use case would fail.
 
-> +/**
-> + * rmi_data_create_unknown() - Create a Data Granule with unknown contents
-> + * @rd: PA of the RD
-> + * @data: PA of the target granule
-> + * @ipa: IPA at which the granule will be mapped in the guest
-> + *
-> + * Create a new Data Granule with unknown contents
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+QEMU queries the host kernel to get the list of writable ID reg
+fields and expose all the writable fields as uint64 properties. Those
+are named "SYSREG_<REG>_<FIELD>". REG and FIELD names are those
+described in ARM ARM Reference manual and linux arch/arm64/tools/sysreg.
+Some awk scriptsintroduced in the series help parsing the sysreg file and
+generate some code. those scripts are used in a similar way as
+scripts/update-linux-headers.sh.  In case the ABI gets broken, it is
+still possible to manually edit the generated code. However it is
+globally expected the REG and FIELD names are stable.
 
-This line can be dropped since the same content has been given at the
-beginning.
+The list of SYSREG_ID properties can be retrieved through the qmp
+monitor using query-cpu-model-expansion [2].
 
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_data_create_unknown(unsigned long rd,
-> +					  unsigned long data,
-> +					  unsigned long ipa)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE_UNKNOWN, rd, data, ipa, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_data_destroy() - Destroy a Data Granule
-> + * @rd: PA of the RD
-> + * @ipa: IPA at which the granule is mapped in the guest
-> + * @data_out: PA of the granule which was destroyed
-> + * @top_out: Top IPA of non-live RTT entries
-> + *
-> + * Unmap a protected IPA from stage 2, transitioning it to DESTROYED.
-> + * The IPA cannot be used by the guest unless it is transitioned to RAM again
-> + * by the Realm guest.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_data_destroy(unsigned long rd, unsigned long ipa,
-> +				   unsigned long *data_out,
-> +				   unsigned long *top_out)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_DESTROY, rd, ipa, &res);
-> +
-> +	if (data_out)
-> +		*data_out = res.a1;
-> +	if (top_out)
-> +		*top_out = res.a2;
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_features() - Read feature register
-> + * @index: Feature register index
-> + * @out: Feature register value is written to this pointer
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_features(unsigned long index, unsigned long *out)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_FEATURES, index, &res);
-> +
-> +	if (out)
-> +		*out = res.a1;
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_granule_delegate() - Delegate a Granule
-> + * @phys: PA of the Granule
-> + *
-> + * Delegate a Granule for use by the Realm World.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_granule_delegate(unsigned long phys)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_DELEGATE, phys, &res);
-> +
-> +	return res.a0;
-> +}
-> +
+The first part of the series mostly consists in migrating id reg
+storage from named fields in ARMISARegisters to anonymous index
+ordered storage in an IdRegMap struct array. The goal is to have
+a generic way to store all id registers, also compatible with the
+way we retrieve their writable capability at kernel level through
+the KVM_ARM_GET_REG_WRITABLE_MASKS ioctl. Having named fields
+prevented us from getting this scalability/genericity. Although the
+change is invasive  it is quite straightforward and should be easy
+to be reviewed.
 
-Same as above, why the first letters for 'Realm World' have to be
-in upper-case? :-)
+Then the bulk of the job is to retrieve the writable ID fields and
+match them against a "human readable" description of those fields.
+We use awk scripts, derived from kernel arch/arm64/tools/gen-sysreg.awk
+(so all the credit to Mark Rutland) that populates a data structure
+which describes all the ID regs in sysreg and their fields. We match
+writable ID reg fields with those latter and dynamically create a
+uint64 property.
 
-> +/**
-> + * rmi_granule_undelegate() - Undelegate a Granule
-> + * @phys: PA of the Granule
-> + *
-> + * Undelegate a Granule to allow use by the Normal World. Will fail if the
-> + * Granule is in use.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_granule_undelegate(unsigned long phys)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_UNDELEGATE, phys, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_psci_complete() - Complete pending PSCI command
-> + * @calling_rec: PA of the calling REC
-> + * @target_rec: PA of the target REC
-> + * @status: Status of the PSCI request
-> + *
-> + * Completes a pending PSCI command which was called with an MPIDR argument, by
-> + * providing the corresponding REC.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_psci_complete(unsigned long calling_rec,
-> +				    unsigned long target_rec,
-> +				    unsigned long status)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_PSCI_COMPLETE, calling_rec, target_rec,
-> +			     status, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_realm_activate() - Active a Realm
-> + * @rd: PA of the RD
-> + *
-> + * Mark a Realm as Active signalling that creation is complete and allowing
-> + * execution of the Realm.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_realm_activate(unsigned long rd)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_ACTIVATE, rd, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_realm_create() - Create a Realm
-> + * @rd: PA of the RD
-> + * @params_ptr: PA of Realm parameters
-> + *
-> + * Create a new Realm using the given parameters.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_realm_create(unsigned long rd, unsigned long params_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_CREATE, rd, params_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_realm_destroy() - Destroy a Realm
-> + * @rd: PA of the RD
-> + *
-> + * Destroys a Realm, all objects belonging to the Realm must be destroyed first.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_realm_destroy(unsigned long rd)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_DESTROY, rd, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rec_aux_count() - Get number of auxiliary Granules required
-> + * @rd: PA of the RD
-> + * @aux_count: Number of pages written to this pointer
-> + *
-> + * A REC may require extra auxiliary pages to be delegated for the RMM to
-> + * store metadata (not visible to the normal world) in. This function provides
-> + * the number of pages that are required.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long *aux_count)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
-> +
-> +	if (aux_count)
-> +		*aux_count = res.a1;
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rec_create() - Create a REC
-> + * @rd: PA of the RD
-> + * @rec: PA of the target REC
-> + * @params_ptr: PA of REC parameters
-> + *
-> + * Create a REC using the parameters specified in the struct rec_params pointed
-> + * to by @params_ptr.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rec_create(unsigned long rd, unsigned long rec,
-> +				 unsigned long params_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rd, rec, params_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rec_destroy() - Destroy a REC
-> + * @rec: PA of the target REC
-> + *
-> + * Destroys a REC. The REC must not be running.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rec_destroy(unsigned long rec)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_DESTROY, rec, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rec_enter() - Enter a REC
-> + * @rec: PA of the target REC
-> + * @run_ptr: PA of RecRun structure
-> + *
-> + * Starts (or continues) execution within a REC.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_REC_ENTER, rec, run_ptr, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_create() - Creates an RTT
-> + * @rd: PA of the RD
-> + * @rtt: PA of the target RTT
-> + * @ipa: Base of the IPA range described by the RTT
-> + * @level: Depth of the RTT within the tree
-> + *
-> + * Creates an RTT (Realm Translation Table) at the specified level for the
-> + * translation of the specified address within the Realm.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_create(unsigned long rd, unsigned long rtt,
-> +				 unsigned long ipa, long level)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_CREATE, rd, rtt, ipa, level, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_destroy() - Destroy an RTT
-> + * @rd: PA of the RD
-> + * @ipa: Base of the IPA range described by the RTT
-> + * @level: Depth of the RTT within the tree
-> + * @out_rtt: Pointer to write the PA of the RTT which was destroyed
-> + * @out_top: Pointer to write the top IPA of non-live RTT entries
-> + *
-> + * Destroys an RTT. The RTT must be non-live, i.e. none of the entries in the
-> + * table are in ASSIGNED or TABLE state.
-> + *
-> + * Return: RMI return code.
-> + */
-> +static inline int rmi_rtt_destroy(unsigned long rd,
-> +				  unsigned long ipa,
-> +				  long level,
-> +				  unsigned long *out_rtt,
-> +				  unsigned long *out_top)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_DESTROY, rd, ipa, level, &res);
-> +
-> +	if (out_rtt)
-> +		*out_rtt = res.a1;
-> +	if (out_top)
-> +		*out_top = res.a2;
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_fold() - Fold an RTT
-> + * @rd: PA of the RD
-> + * @ipa: Base of the IPA range described by the RTT
-> + * @level: Depth of the RTT within the tree
-> + * @out_rtt: Pointer to write the PA of the RTT which was destroyed
-> + *
-> + * Folds an RTT. If all entries with the RTT are 'homogeneous' the RTT can be
-> + * folded into the parent and the RTT destroyed.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_fold(unsigned long rd, unsigned long ipa,
-> +			       long level, unsigned long *out_rtt)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_FOLD, rd, ipa, level, &res);
-> +
-> +	if (out_rtt)
-> +		*out_rtt = res.a1;
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_init_ripas() - Set RIPAS for new Realm
-> + * @rd: PA of the RD
-> + * @base: Base of target IPA region
-> + * @top: Top of target IPA region
-> + * @out_top: Top IPA of range whose RIPAS was modified
-> + *
-> + * Sets the RIPAS of a target IPA range to RAM, for a Realm in the NEW state.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_init_ripas(unsigned long rd, unsigned long base,
-> +				     unsigned long top, unsigned long *out_top)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_INIT_RIPAS, rd, base, top, &res);
-> +
-> +	if (out_top)
-> +		*out_top = res.a1;
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_map_unprotected() - Map NS pages into a Realm
-> + * @rd: PA of the RD
-> + * @ipa: Base IPA of the mapping
-> + * @level: Depth within the RTT tree
-> + * @desc: RTTE descriptor
-> + *
-> + * Create a mapping from an Unprotected IPA to a Non-secure PA.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_map_unprotected(unsigned long rd,
-> +					  unsigned long ipa,
-> +					  long level,
-> +					  unsigned long desc)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_MAP_UNPROTECTED, rd, ipa, level,
-> +			     desc, &res);
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_read_entry() - Read an RTTE
-> + * @rd: PA of the RD
-> + * @ipa: IPA for which to read the RTTE
-> + * @level: RTT level at which to read the RTTE
-> + * @rtt: Output structure describing the RTTE
-> + *
-> + * Reads a RTTE (Realm Translation Table Entry).
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_read_entry(unsigned long rd, unsigned long ipa,
-> +				     long level, struct rtt_entry *rtt)
-> +{
-> +	struct arm_smccc_1_2_regs regs = {
-> +		SMC_RMI_RTT_READ_ENTRY,
-> +		rd, ipa, level
-> +	};
-> +
-> +	arm_smccc_1_2_smc(&regs, &regs);
-> +
-> +	rtt->walk_level = regs.a1;
-> +	rtt->state = regs.a2 & 0xFF;
-> +	rtt->desc = regs.a3;
-> +	rtt->ripas = regs.a4 & 0xFF;
-> +
-> +	return regs.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_set_ripas() - Set RIPAS for an running Realm
-> + * @rd: PA of the RD
-> + * @rec: PA of the REC making the request
-> + * @base: Base of target IPA region
-> + * @top: Top of target IPA region
-> + * @out_top: Pointer to write top IPA of range whose RIPAS was modified
-> + *
-> + * Completes a request made by the Realm to change the RIPAS of a target IPA
-> + * range.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
-> +				    unsigned long base, unsigned long top,
-> +				    unsigned long *out_top)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_SET_RIPAS, rd, rec, base, top, &res);
-> +
-> +	if (out_top)
-> +		*out_top = res.a1;
-> +
-> +	return res.a0;
-> +}
-> +
-> +/**
-> + * rmi_rtt_unmap_unprotected() - Remove a NS mapping
-> + * @rd: PA of the RD
-> + * @ipa: Base IPA of the mapping
-> + * @level: Depth within the RTT tree
-> + * @out_top: Pointer to write top IPA of non-live RTT entries
-> + *
-> + * Removes a mapping at an Unprotected IPA.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline int rmi_rtt_unmap_unprotected(unsigned long rd,
-> +					    unsigned long ipa,
-> +					    long level,
-> +					    unsigned long *out_top)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_UNMAP_UNPROTECTED, rd, ipa,
-> +			     level, &res);
-> +
-> +	if (out_top)
-> +		*out_top = res.a1;
-> +
-> +	return res.a0;
-> +}
-> +
-> +#endif
+Then we need to extend the list of id regs read from the host
+so that we get a chance to let their value overriden and write them
+back into KVM .
 
-#endif /* __ASM_RMI_CMDS_H */
+This expectation is that this custom KVM host model can prepare for
+the advent of named models. Introducing named models with reduced
+and explicitly defined features is the next step.
 
-Thanks,
-Gavin
+Obviously this series is not able to cope with non writable ID regs.
+For instance the problematic of MIDR/REVIDR setting is not handled
+at the moment.
+
+Connie & Eric
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/custom-cpu-model-rfc
+
+TESTS:
+- with few IDREG fields that can be easily examined from guest
+  userspace:
+  -cpu custom,SYSREG_ID_AA64ISAR0_EL1_DP=0x0,SYSREG_ID_AA64ISAR1_EL1_DPB=0x0
+- migration between custom models
+- TCG A57 non regressions. Light testing for TCG though. Deep
+  review may detect some mistakes when migrating between named fields
+  and IDRegMap storage
+- light testing of introspection. Testing a given writable ID field
+  value with query-cpu-model-expansion is not supported yet.
+
+TODO/QUESTIONS:
+- Some idreg named fields are not yet migrated to an array storage.
+  some of them are not in isar struct either. Maybe we could have
+  handled TCG and KVM separately and it may turn out that this
+  conversion is unneeded. So as it is quite cumbersome I prefered
+  to keep it for a later stage.
+- the custom model does not come with legacy host properties
+  such as SVE, MTE, expecially those that induce some KVM
+  settings. This needs to be fixed.
+- The custom model and its exposed properties depend on the host
+  capabilities. More and more IDREG become writable meaning that
+  the custom model gains more properties over the time and it is
+  host linux dependent. At the moment there is no versioning in
+  place. By default the custom model is a host passthrough model
+  (besides the legacy functions). So if the end-user tries to set
+  a field that is not writable from a kernel pov, it will fail.
+  Nevertheless a versionned custom model could constrain the props
+  exposed, independently on the host linux capabilities.
+- the QEMU layer does not take care of IDREG field value consistency.
+  The kernel neither. I imagine this could be the role of the upper
+  layer to implement a vcpu profile that makes sure settings are
+  consistent. Here we come to "named" models. What should they look
+  like on ARM?
+- Implementation details:
+  -  it seems there are a lot of duplications in
+  the code. ID regs are described in different manners, with different
+  data structs, for TCG, now for KVM.
+  - The IdRegMap->regs is sparsely populated. Maybe a better data
+  struct could be used, although this is the one chosen for the kernel
+  uapi.
+
+References:
+
+[1] [PATCH v12 00/11] Support writable CPU ID registers from userspace
+https://lore.kernel.org/all/20230609190054.1542113-1-oliver.upton@linux.dev/
+
+[2]
+qemu-system-aarch64 -qmp unix:/home/augere/TEST/QEMU/qmp-sock,server,nowait -M virt --enable-kvm -cpu custom
+scripts/qmp/qmp-shell /home/augere/TEST/QEMU/qmp-sock
+Welcome to the QMP low-level shell!
+Connected to QEMU 9.0.50
+(QEMU) query-cpu-model-expansion type=full model={"name":"custom"}
+
+[3]
+KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES
+KVM_ARM_GET_REG_WRITABLE_MASKS
+Documentation/virt/kvm/api.rst
+
+[4] linux "sysreg" file
+linux/arch/arm64/tools/sysreg and gen-sysreg.awk
+./tools/include/generated/asm/sysreg-defs.h
+
+
+Cornelia Huck (4):
+  kvm: kvm_get_writable_id_regs
+  virt: Allow custom vcpu model in arm virt
+  arm-qmp-cmds: introspection for custom model
+  arm/cpu-features: Document custom vcpu model
+
+Eric Auger (17):
+  arm/cpu: Add sysreg definitions in cpu-sysegs.h
+  arm/cpu: Store aa64isar0 into the idregs arrays
+  arm/cpu: Store aa64isar1/2 into the idregs array
+  arm/cpu: Store aa64drf0/1 into the idregs array
+  arm/cpu: Store aa64mmfr0-3 into the idregs array
+  arm/cpu: Store aa64drf0/1 into the idregs array
+  arm/cpu: Store aa64smfr0 into the idregs array
+  arm/cpu: Store id_isar0-7 into the idregs array
+  arm/cpu: Store id_mfr0/1 into the idregs array
+  arm/cpu: Store id_dfr0/1 into the idregs array
+  arm/cpu: Store id_mmfr0-5 into the idregs array
+  arm/cpu: Add infra to handle generated ID register definitions
+  arm/cpu: Add sysreg generation scripts
+  arm/cpu: Add generated files
+  arm/kvm: Allow reading all the writable ID registers
+  arm/kvm: write back modified ID regs to KVM
+  arm/cpu: Introduce a customizable kvm host cpu model
+
+ docs/system/arm/cpu-features.rst      |  55 ++-
+ target/arm/cpu-custom.h               |  58 +++
+ target/arm/cpu-features.h             | 307 ++++++------
+ target/arm/cpu-sysregs.h              | 152 ++++++
+ target/arm/cpu.h                      | 120 +++--
+ target/arm/internals.h                |   6 +-
+ target/arm/kvm_arm.h                  |  16 +-
+ hw/arm/virt.c                         |   3 +
+ hw/intc/armv7m_nvic.c                 |  27 +-
+ target/arm/arm-qmp-cmds.c             |  56 ++-
+ target/arm/cpu-sysreg-properties.c    | 682 ++++++++++++++++++++++++++
+ target/arm/cpu.c                      | 124 +++--
+ target/arm/cpu64.c                    | 265 +++++++---
+ target/arm/helper.c                   |  68 +--
+ target/arm/kvm.c                      | 253 +++++++---
+ target/arm/ptw.c                      |   6 +-
+ target/arm/tcg/cpu-v7m.c              | 174 +++----
+ target/arm/tcg/cpu32.c                | 320 ++++++------
+ target/arm/tcg/cpu64.c                | 460 ++++++++---------
+ scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++
+ scripts/gen-cpu-sysregs-header.awk    |  47 ++
+ scripts/update-aarch64-sysreg-code.sh |  27 +
+ target/arm/meson.build                |   1 +
+ target/arm/trace-events               |   8 +
+ 24 files changed, 2646 insertions(+), 914 deletions(-)
+ create mode 100644 target/arm/cpu-custom.h
+ create mode 100644 target/arm/cpu-sysregs.h
+ create mode 100644 target/arm/cpu-sysreg-properties.c
+ create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+ create mode 100755 scripts/gen-cpu-sysregs-header.awk
+ create mode 100755 scripts/update-aarch64-sysreg-code.sh
+
+-- 
+2.41.0
 
