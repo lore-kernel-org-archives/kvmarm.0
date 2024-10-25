@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A575A1D1F7B
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 10:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90F518D655
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 10:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729851707; cv=none; b=YJ3TaMtzE5+gW/NaYk6N4dSZ6Dh5gj/6fYyRtJDLUq6xTmrNSt/LQirzNuTlB2+6B9Dz2pUNh5ukfHStrjxKxHspqHoWXQWdOWinClYi+EwvTlWzmOHS4twT4Cid5ugzx/+I5cJL+TweOSeXSPjb0a4FdGjOLbVB4KJfBdzHh4w=
+	t=1729851714; cv=none; b=raFx44ZymQwB0q29Dyy+diDFkHC8JbE9kj7sFh8Hj5V5VD+0rmsO0skE4lbcQb6Dvq0bcfzIAA025s9MjurQGPzIRxDeRzjukJFtfqPDN6U/TlTfiDjwS1FleFhxKWQs1HS6jV/ySS0gDmT2iSuLft8Hy9Pq3weom4BujrO1nS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729851707; c=relaxed/simple;
-	bh=7EDOVbHMZyg92vqQQ+W03i788f9OeIw1iMXn58Qp5uw=;
+	s=arc-20240116; t=1729851714; c=relaxed/simple;
+	bh=i9l9W/iCadZs/jJXs4+fWqwx6AHB9mC0IHF9oTaGg0Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=awO9rxfdW7x6rwrx6eBQEUDRtppPdi7BUwAeZ6cq3RYlntEB6vAhSOpAurZkeI7BKVfGS59QS7y1eqWxTSv/NESlcCZt1Smstkyyc/L7sJh9es/4q4UArpBk2QlW3e+SpWOJrJlID5iVlQK+Ib6CWe9SttaybBRavw0+I2IssU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M9qeN7UO; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=YUfj4BPZD39vjLhl/x26tErSXW9/irv8xSqXKquaPdWYx4Lte6yIlGJBeit3p0r/CIyGMhb7xH5liY20lXBF7E2754W6a+oQHQm48K5vJCdnPzi6Azc7TKwp7s1tazNmtXNMQ/hQc7ZlMdt8biVttczNgxB+07uhMIS8+UkTBl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SN1pchJ5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M9qeN7UO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SN1pchJ5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729851704;
+	s=mimecast20190719; t=1729851711;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MQ5jYKg0eJx5SAN7xHGW4tHNDdpBbV4ElcQD0cCn3/s=;
-	b=M9qeN7UOYb4rIOa6tW2sRf8MG6kVW9DIHuBokomQ+O191RFH2NpXKyzeuvpPfNCOYEBqVC
-	KSYzQNKimkJVNLHl7duMhbqmWjr+LwmjeoSxMR7+82uj7HthdwjVFeUFqva7Dyzx49Phnw
-	leYuc8EN7hHj1xrhIDcWtEoQZXKt3XA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=qvibL5FsKsRjUbXsu0htnvW3wkSS5Q2NsoKUwT3D8Gw=;
+	b=SN1pchJ58S/OB8I7rgMfGokIiq3V9hMNLpnC4UZ1eH8E5v2GpztSFMTmXDhOYdm9w6Spq6
+	AJr5TLPlQiiCvmo7XzCOanJk3DxiDPEfWJsEZvwkdIWE240cwDCSyAtZ7DHDAN197Tr+yU
+	DfcFHcf18UWVJDW7XkCIV9iGnIq/pnY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-683-EiC2fFUHNCueFhCbzFsMZQ-1; Fri,
- 25 Oct 2024 06:21:41 -0400
-X-MC-Unique: EiC2fFUHNCueFhCbzFsMZQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-Yi9TIWwZNQONS9uQhZxKLg-1; Fri,
+ 25 Oct 2024 06:21:47 -0400
+X-MC-Unique: Yi9TIWwZNQONS9uQhZxKLg-1
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C514B195608C;
-	Fri, 25 Oct 2024 10:21:39 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBB3E1956089;
+	Fri, 25 Oct 2024 10:21:45 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.39.194.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6FC5A196BB7D;
-	Fri, 25 Oct 2024 10:21:34 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 396EF196BB7D;
+	Fri, 25 Oct 2024 10:21:40 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -63,9 +63,9 @@ Cc: shahuang@redhat.com,
 	mark.rutland@arm.com,
 	philmd@linaro.org,
 	pbonzini@redhat.com
-Subject: [RFC 13/21] arm/cpu: Add infra to handle generated ID register definitions
-Date: Fri, 25 Oct 2024 12:17:32 +0200
-Message-ID: <20241025101959.601048-14-eric.auger@redhat.com>
+Subject: [RFC 14/21] arm/cpu: Add sysreg generation scripts
+Date: Fri, 25 Oct 2024 12:17:33 +0200
+Message-ID: <20241025101959.601048-15-eric.auger@redhat.com>
 In-Reply-To: <20241025101959.601048-1-eric.auger@redhat.com>
 References: <20241025101959.601048-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -77,168 +77,450 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The known ID regs are described in a new initialization function
-dubbed initialize_cpu_sysreg_properties(). That code will be
-automatically generated from linux arch/arm64/tools/sysreg. For the
-time being let's just describe a single id reg, CTR_EL0. In this
-description we only care about non RES/RAZ fields, ie. named fields.
+Introduce scripts that automate the generation of system register
+definitions from a given linux source tree arch/arm64/tools/sysreg.
 
-The registers are populated in a 3x8x8 array and their fields are
-added in a sorted list.
+Invocation of
+./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
+in scripts directory do generate 2 qemu files:
+- target/arm/cpu-sysreg-properties.c
+- target/arm/cpu-sysregs.h
+
+cpu-sysregs.h creates defined for all system registers.
+However cpu-sysreg-properties.c only cares about feature ID registers.
+
+update-aarch64-sysreg-code.sh calls two awk scripts.
+gen-cpu-sysreg-properties.awk is inherited from kernel
+arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
+the original author of this script.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- target/arm/cpu-custom.h            | 58 ++++++++++++++++++++++++++++++
- target/arm/cpu-sysreg-properties.c | 41 +++++++++++++++++++++
- target/arm/cpu64.c                 |  2 ++
- target/arm/meson.build             |  1 +
- 4 files changed, 102 insertions(+)
- create mode 100644 target/arm/cpu-custom.h
- create mode 100644 target/arm/cpu-sysreg-properties.c
+ scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++++++++++++++++
+ scripts/gen-cpu-sysregs-header.awk    |  47 ++++
+ scripts/update-aarch64-sysreg-code.sh |  27 +++
+ 3 files changed, 399 insertions(+)
+ create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+ create mode 100755 scripts/gen-cpu-sysregs-header.awk
+ create mode 100755 scripts/update-aarch64-sysreg-code.sh
 
-diff --git a/target/arm/cpu-custom.h b/target/arm/cpu-custom.h
-new file mode 100644
-index 0000000000..1952095bf7
+diff --git a/scripts/gen-cpu-sysreg-properties.awk b/scripts/gen-cpu-sysreg-properties.awk
+new file mode 100755
+index 0000000000..b0ed55e059
 --- /dev/null
-+++ b/target/arm/cpu-custom.h
-@@ -0,0 +1,58 @@
-+#ifndef ARM_CPU_CUSTOM_H
-+#define ARM_CPU_CUSTOM_H
++++ b/scripts/gen-cpu-sysreg-properties.awk
+@@ -0,0 +1,325 @@
++#!/bin/awk -f
++# SPDX-License-Identifier: GPL-2.0
++# gen-sysreg.awk: arm64 sysreg header generator
++#
++# Usage: awk -f gen-custom-sysreg.awk $LINUX_PATH/arch/arm64/tools/sysreg
 +
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "cpu.h"
-+#include "cpu-sysregs.h"
-+
-+typedef struct ARM64SysRegField {
-+    const char *name; /* name of the field, for instance CTR_EL0_IDC */
-+    int index;
-+    int lower;
-+    int upper;
-+} ARM64SysRegField;
-+
-+typedef struct ARM64SysReg {
-+    const char *name;   /* name of the sysreg, for instance CTR_EL0 */
-+    ARMSysReg *sysreg;
-+    int index;
-+    GList *fields; /* list of named fields, excluding RES* */
-+} ARM64SysReg;
-+
-+void initialize_cpu_sysreg_properties(void);
-+
-+/*
-+ * List of exposed ID regs (automatically populated from linux
-+ * arch/arm64/tools/sysreg)
-+ */
-+extern ARM64SysReg arm64_id_regs[NR_ID_REGS];
-+
-+/* Allocate a new field and insert it at the head of the @reg list */
-+static inline GList *arm64_sysreg_add_field(ARM64SysReg *reg, const char *name,
-+                                     uint8_t min, uint8_t max) {
-+
-+     ARM64SysRegField *field = g_new0(ARM64SysRegField, 1);
-+
-+     field->name = name;
-+     field->lower = min;
-+     field->upper = max;
-+     field->index = reg->index;
-+
-+     reg->fields = g_list_append(reg->fields, field);
-+     return reg->fields;
++function block_current() {
++	return __current_block[__current_block_depth];
 +}
 +
-+static inline ARM64SysReg *
-+arm64_sysreg_get(int op0, int op1, int crn, int crm, int op2)
++# Log an error and terminate
++function fatal(msg) {
++	print "Error at " NR ": " msg > "/dev/stderr"
++
++	printf "Current block nesting:"
++
++	for (i = 0; i <= __current_block_depth; i++) {
++		printf " " __current_block[i]
++	}
++	printf "\n"
++
++	exit 1
++}
++
++# Enter a new block, setting the active block to @block
++function block_push(block) {
++	__current_block[++__current_block_depth] = block
++}
++
++# Exit a block, setting the active block to the parent block
++function block_pop() {
++	if (__current_block_depth == 0)
++		fatal("error: block_pop() in root block")
++
++	__current_block_depth--;
++}
++
++# Sanity check the number of records for a field makes sense. If not, produce
++# an error and terminate.
++function expect_fields(nf) {
++	if (NF != nf)
++		fatal(NF " fields found where " nf " expected")
++}
++
++# Print a CPP macro definition, padded with spaces so that the macro bodies
++# line up in a column
++function define(name, val) {
++	printf "%-56s%s\n", "#define " name, val
++}
++
++# Print standard BITMASK/SHIFT/WIDTH CPP definitions for a field
++function define_field(reg, field, msb, lsb, idreg) {
++	if (idreg)
++            print "    arm64_sysreg_add_field("reg", \""field"\", "lsb", "msb");"
++}
++
++# Print a field _SIGNED definition for a field
++function define_field_sign(reg, field, sign, idreg) {
++	if (idreg)
++            print "    arm64_sysreg_add_field("reg", \""field"\", "lsb", "msb");"
++}
++
++# Parse a "<msb>[:<lsb>]" string into the global variables @msb and @lsb
++function parse_bitdef(reg, field, bitdef, _bits)
 +{
-+        uint64_t index = ARM_FEATURE_ID_RANGE_IDX(op0, op1, crn, crm, op2);
-+        ARM64SysReg *reg = &arm64_id_regs[index];
++	if (bitdef ~ /^[0-9]+$/) {
++		msb = bitdef
++		lsb = bitdef
++	} else if (split(bitdef, _bits, ":") == 2) {
++		msb = _bits[1]
++		lsb = _bits[2]
++	} else {
++		fatal("invalid bit-range definition '" bitdef "'")
++	}
 +
-+        reg->index = index;
-+        reg->sysreg = g_new(ARMSysReg, 1);
-+        *reg->sysreg = sys_reg(op0, op1, crn, crm, op2);
-+        return reg;
++
++	if (msb != next_bit)
++		fatal(reg "." field " starts at " msb " not " next_bit)
++	if (63 < msb || msb < 0)
++		fatal(reg "." field " invalid high bit in '" bitdef "'")
++	if (63 < lsb || lsb < 0)
++		fatal(reg "." field " invalid low bit in '" bitdef "'")
++	if (msb < lsb)
++		fatal(reg "." field " invalid bit-range '" bitdef "'")
++	if (low > high)
++		fatal(reg "." field " has invalid range " high "-" low)
++
++	next_bit = lsb - 1
 +}
 +
-+#endif
-diff --git a/target/arm/cpu-sysreg-properties.c b/target/arm/cpu-sysreg-properties.c
-new file mode 100644
-index 0000000000..753e7c9127
++BEGIN {
++	print "#include \"cpu-custom.h\""
++	print ""
++	print "ARM64SysReg arm64_id_regs[NR_ID_REGS];"
++	print ""
++	print "void initialize_cpu_sysreg_properties(void)"
++	print "{"
++        print "    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NR_ID_REGS);"
++        print ""
++
++	__current_block_depth = 0
++	__current_block[__current_block_depth] = "Root"
++}
++
++END {
++	if (__current_block_depth != 0)
++		fatal("Missing terminator for " block_current() " block")
++
++	print "}"
++}
++
++# skip blank lines and comment lines
++/^$/ { next }
++/^[\t ]*#/ { next }
++
++/^SysregFields/ && block_current() == "Root" {
++	block_push("SysregFields")
++
++	expect_fields(2)
++
++	reg = $2
++
++	res0 = "UL(0)"
++	res1 = "UL(0)"
++	unkn = "UL(0)"
++
++	next_bit = 63
++
++	next
++}
++
++/^EndSysregFields/ && block_current() == "SysregFields" {
++	if (next_bit > 0)
++		fatal("Unspecified bits in " reg)
++
++	reg = null
++	res0 = null
++	res1 = null
++	unkn = null
++
++	block_pop()
++	next
++}
++
++/^Sysreg/ && block_current() == "Root" {
++	block_push("Sysreg")
++
++	expect_fields(7)
++
++	reg = $2
++	op0 = $3
++	op1 = $4
++	crn = $5
++	crm = $6
++	op2 = $7
++
++	res0 = "UL(0)"
++	res1 = "UL(0)"
++	unkn = "UL(0)"
++
++	if (op0 == 3 && (op1>=0 && op1<=3) && crn==0 && (crm>=0 && crm<=7) && (op2>=0 && op2<=7)) {
++	    idreg = 1
++        } else {
++	    idreg = 0
++	}
++
++	if (idreg == 1) {
++	   print "    /* "reg" */"
++	   print "    ARM64SysReg *"reg" = arm64_sysreg_get("op0", "op1", "crn", "crm", "op2");"
++	   print "    "reg"->name = \""reg"\";"
++	}
++
++	next_bit = 63
++
++	next
++}
++
++/^EndSysreg/ && block_current() == "Sysreg" {
++	if (next_bit > 0)
++		fatal("Unspecified bits in " reg)
++
++	reg = null
++	op0 = null
++	op1 = null
++	crn = null
++	crm = null
++	op2 = null
++	res0 = null
++	res1 = null
++	unkn = null
++
++	if (idreg==1)
++	    print ""
++	block_pop()
++	next
++}
++
++# Currently this is effectivey a comment, in future we may want to emit
++# defines for the fields.
++/^Fields/ && block_current() == "Sysreg" {
++	expect_fields(2)
++
++	if (next_bit != 63)
++		fatal("Some fields already defined for " reg)
++
++	print "/* For " reg " fields see " $2 " */"
++	print ""
++
++        next_bit = 0
++	res0 = null
++	res1 = null
++	unkn = null
++
++	next
++}
++
++
++/^Res0/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	expect_fields(2)
++	parse_bitdef(reg, "RES0", $2)
++	field = "RES0_" msb "_" lsb
++
++	res0 = res0 " | GENMASK_ULL(" msb ", " lsb ")"
++
++	next
++}
++
++/^Res1/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	expect_fields(2)
++	parse_bitdef(reg, "RES1", $2)
++	field = "RES1_" msb "_" lsb
++
++	res1 = res1 " | GENMASK_ULL(" msb ", " lsb ")"
++
++	next
++}
++
++/^Unkn/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	expect_fields(2)
++	parse_bitdef(reg, "UNKN", $2)
++	field = "UNKN_" msb "_" lsb
++
++	unkn = unkn " | GENMASK_ULL(" msb ", " lsb ")"
++
++	next
++}
++
++/^Field/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	expect_fields(3)
++	field = $3
++	parse_bitdef(reg, field, $2)
++
++
++	define_field(reg, field, msb, lsb, idreg)
++
++	next
++}
++
++/^Raz/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	expect_fields(2)
++	parse_bitdef(reg, field, $2)
++
++	next
++}
++
++/^SignedEnum/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	block_push("Enum")
++
++	expect_fields(3)
++	field = $3
++	parse_bitdef(reg, field, $2)
++
++	define_field(reg, field, msb, lsb, idreg)
++	define_field_sign(reg, field, "true", idreg)
++
++	next
++}
++
++/^UnsignedEnum/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	block_push("Enum")
++
++	expect_fields(3)
++	field = $3
++	parse_bitdef(reg, field, $2)
++
++	define_field(reg, field, msb, lsb, idreg)
++	#define_field_sign(reg, field, "false", idreg)
++
++	next
++}
++
++/^Enum/ && (block_current() == "Sysreg" || block_current() == "SysregFields") {
++	block_push("Enum")
++
++	expect_fields(3)
++	field = $3
++	parse_bitdef(reg, field, $2)
++
++	define_field(reg, field, msb, lsb, idreg)
++
++	next
++}
++
++/^EndEnum/ && block_current() == "Enum" {
++
++	field = null
++	msb = null
++	lsb = null
++
++	block_pop()
++	next
++}
++
++/0b[01]+/ && block_current() == "Enum" {
++	expect_fields(2)
++	val = $1
++	name = $2
++
++	next
++}
++
++# Any lines not handled by previous rules are unexpected
++{
++	fatal("unhandled statement")
++}
+diff --git a/scripts/gen-cpu-sysregs-header.awk b/scripts/gen-cpu-sysregs-header.awk
+new file mode 100755
+index 0000000000..cdad686a53
 --- /dev/null
-+++ b/target/arm/cpu-sysreg-properties.c
-@@ -0,0 +1,41 @@
-+/*
-+ * QEMU ARM CPU SYSREG PROPERTIES
-+ * to be generated from linux sysreg
-+ *
-+ * Copyright (c) 2024, Inc. 2024
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see
-+ * <http://www.gnu.org/licenses/gpl-2.0.html>
-+ */
++++ b/scripts/gen-cpu-sysregs-header.awk
+@@ -0,0 +1,47 @@
++#!/bin/awk -f
++# SPDX-License-Identifier: GPL-2.0
++# gen-sysreg.awk: arm64 sysreg header generator
++#
++# Usage: awk -f gen-custom-sysreg.awk $LINUX_PATH/arch/arm64/tools/sysreg
 +
-+#include "cpu-custom.h"
++# Sanity check the number of records for a field makes sense. If not, produce
++# an error and terminate.
 +
-+ARM64SysReg arm64_id_regs[NR_ID_REGS];
-+
-+void initialize_cpu_sysreg_properties(void)
-+{
-+    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NR_ID_REGS);
-+    /* CTR_EL0 */
-+    ARM64SysReg *CTR_EL0 = arm64_sysreg_get(3, 3, 0, 0, 1);
-+    CTR_EL0->name = "CTR_EL0";
-+    arm64_sysreg_add_field(CTR_EL0, "TMinline", 32, 37);
-+    arm64_sysreg_add_field(CTR_EL0, "DIC", 29, 29);
-+    arm64_sysreg_add_field(CTR_EL0, "IDC", 28, 28);
-+    arm64_sysreg_add_field(CTR_EL0, "CWG", 24, 27);
-+    arm64_sysreg_add_field(CTR_EL0, "ERG", 20, 23);
-+    arm64_sysreg_add_field(CTR_EL0, "DMinLine", 16, 19);
-+    arm64_sysreg_add_field(CTR_EL0, "L1Ip", 14, 15);
-+    arm64_sysreg_add_field(CTR_EL0, "IminLine", 0, 3);
++# Print a CPP macro definition, padded with spaces so that the macro bodies
++# line up in a column
++function define(name, val) {
++	printf "%-56s%s\n", "#define " name, val
 +}
 +
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 57e73fdd38..9f20886668 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -34,6 +34,7 @@
- #include "internals.h"
- #include "cpu-features.h"
- #include "cpregs.h"
-+#include "cpu-custom.h"
- 
- void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
- {
-@@ -844,6 +845,7 @@ static void aarch64_cpu_register_types(void)
- {
-     size_t i;
- 
-+    initialize_cpu_sysreg_properties();
-     type_register_static(&aarch64_cpu_type_info);
- 
-     for (i = 0; i < ARRAY_SIZE(aarch64_cpus); ++i) {
-diff --git a/target/arm/meson.build b/target/arm/meson.build
-index 2e10464dbb..9c7a04ee1b 100644
---- a/target/arm/meson.build
-+++ b/target/arm/meson.build
-@@ -14,6 +14,7 @@ arm_ss.add(when: 'CONFIG_HVF', if_true: files('hyp_gdbstub.c'))
- arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
-   'cpu64.c',
-   'gdbstub64.c',
-+  'cpu-sysreg-properties.c',
- ))
- 
- arm_system_ss = ss.source_set()
++BEGIN {
++	print "#ifndef ARM_CPU_SYSREGS_H"
++	print "#define ARM_CPU_SYSREGS_H"
++	print ""
++	print "/* Generated file - do not edit */"
++	print ""
++} END {
++	print ""
++	print "#endif /* ARM_CPU_SYSREGS_H */"
++}
++
++# skip blank lines and comment lines
++/^$/ { next }
++/^[\t ]*#/ { next }
++
++/^Sysreg\t/ || /^Sysreg /{
++
++	reg = $2
++	op0 = $3
++	op1 = $4
++	crn = $5
++	crm = $6
++	op2 = $7
++
++	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 ")")
++	next
++}
++
++{
++	/* skip all other lines */
++	next
++}
+diff --git a/scripts/update-aarch64-sysreg-code.sh b/scripts/update-aarch64-sysreg-code.sh
+new file mode 100755
+index 0000000000..e1fe40308b
+--- /dev/null
++++ b/scripts/update-aarch64-sysreg-code.sh
+@@ -0,0 +1,27 @@
++#!/bin/sh -e
++#
++# Update target/arm/cpu-sysreg-properties.c and target/arm/cpu-sysregs.h
++# from a linux source tree (arch/arm64/tools/sysreg)
++#
++# Copyright Red Hat, Inc. 2024
++#
++# Authors:
++#          Eric Auger <eric.auger@redhat.com>
++#
++
++linux="$1"
++output="$PWD"
++
++if [ -z "$linux" ] || ! [ -d "$linux" ]; then
++    cat << EOF
++usage: update-aarch64-sysreg-code.sh LINUX_PATH
++
++LINUX_PATH      Linux kernel directory to obtain the headers from
++EOF
++    exit 1
++fi
++
++awk -f gen-cpu-sysregs-header.awk \
++       $linux/arch/arm64/tools/sysreg > ../target/arm/cpu-sysregs.h
++awk -f gen-cpu-sysreg-properties.awk \
++       $linux/arch/arm64/tools/sysreg > ../target/arm/cpu-sysreg-properties.c
 -- 
 2.41.0
 
