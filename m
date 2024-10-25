@@ -1,127 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDCB20651E
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 13:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521B81632F6;
+	Fri, 25 Oct 2024 13:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729861522; cv=none; b=iwKiDra8pqPCEsMDbEzwebUDCHSgdLByzw3tbm1Nsxqt4IxSnfloIraqZS7b/j/NeZX/ND1ZxRDjjhVG3DF9TypjnunKwVn0saXgC1oVlTFsrcczIcfrkEAAYsUsPF+X7i3DDEufvAbKr2zrHFG/mxuppa9HfKF0VNYMXYZ+FBA=
+	t=1729861530; cv=none; b=p26ppnjGprdKdvvEfP5cxEAU2hQD6n2f2j69VMWnx04nAnB/y9HVt21bpVMjxnXClt4pIAMxwQVu2eV2YJ8ypFgm473P1lVJGCNFJ786Fl1NWTXCBhXkgJVNdwXfYXHAhMX5uFOEyYfslwzx2u9vtUq0PiNTyJ94dTYfYw1tiG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729861522; c=relaxed/simple;
-	bh=UCLSDO/jm1mAVqY7mkCIBEwU4gXpjBMrnFbP+zDQ02c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZK8r80UL7BPwhvGuobUiAiU3le1/gCsDzO62DG+A3+w7RXYZuEaDdw4O+Lt7RrWsrlRpO70ad/bqfJWwGaw+q1hR6MuLJeqEW/JiYdiwaiPBYJVJTY/8Vbp5sYOb1ZHr7xE5Rp9pr9QvULHZu85EGulYhM/F77ZvpS+//dR6w14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aSBKpYGI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729861530; c=relaxed/simple;
+	bh=JHk7KYb3g3gubZ/UCoHENgcCGyzGa5kzhT1E3wr8230=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PTt/ChX9O5rkGW+7zVVsGxghvJH959gxK2/8Gjo3Haw0wd/s8okcLy7UgqDaUOxumVBShhffXW9c2AXqfUOZEzlieNeoRpEj3sTkfmXEFeb922iN+rtP0tb+aouFpTXgPwQYVwUAvY3/+dL19PsY+1F/b7jJmQA2+4Ltf5bD2as=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8iRUn7M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSBKpYGI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729861519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NN2SUD+OUfJKgPj+21gkXoKJrVd7DZ/UXCkZWnA0qJs=;
-	b=aSBKpYGIKK7D+KGs3+iXX15qBEbA5LceCf5I6B92iBQHVqNikzIxSSFLDfK+6Gtfm7/1qh
-	Xau9Njf4xVxDoK11WT5lKnQwOaNC5bZpkpOn8ySdbcOKgUvF4s382kPS8gq2YsiFyam4mr
-	+j1XP45XVwyEJmyeCnySLFaHuD4Ia7c=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-ajUt4_eCO_iUIK0b6BcmSg-1; Fri, 25 Oct 2024 09:05:17 -0400
-X-MC-Unique: ajUt4_eCO_iUIK0b6BcmSg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d4af408dcso958868f8f.0
-        for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 06:05:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729861516; x=1730466316;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NN2SUD+OUfJKgPj+21gkXoKJrVd7DZ/UXCkZWnA0qJs=;
-        b=l4rK1z6NU6t+eE4Xskjghe+CCUz3t5c8UgsEeR16Rt5ZYHXneSSo1a0XXbTLTPYkBS
-         tFYesNhakr7bQ4A7YA0Q/svgNouf1SUYMitDvj6gBUkgd5k7AwjN8pR9vgwWCyOxZmbW
-         9O/zS5Yr339+DfM9FQ6AuV/Kg8fl7japSd5biHrSU9OTBAznlVva2qvZ71Hfa+MzKDcR
-         nNpP8ubU2WRQy3tzhoRQFJuEeytxVJi1ymvXMD57jL91WJAwPhcHzlnEhBHYlX3GNZ/A
-         +TCyrZpfY5LJhE15pPhv7fF4ebMviIXAAQMJzq5I7deTSJGvdRyTst6DFniachJQajYF
-         9I/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVjQSrcFspXaA9HmFAeQ1zdx7RtqcLWQg3McgKuGIWI5RZQz4w50miQteAhpvWsQwnNKnnlVso=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwIjSG1VTfjD54eSchq15QHITqXnC7uJzys37uIAgThJvA/3xfl
-	xsibel1hmTr4pPuFMVxY2sEHcH/s+lvwVs4X/hYY/ll4DVfyYl8W3OQsvM400nRVRpGEg4ukLHT
-	2OYzE/f9dHnBkNV3j7q3eDYYbjiUnJatlb7FwaeMLGqB64C4kVqURpA==
-X-Received: by 2002:a5d:6189:0:b0:37d:39c1:4d3 with SMTP id ffacd0b85a97d-3803ac84451mr3932492f8f.6.1729861516616;
-        Fri, 25 Oct 2024 06:05:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHZX9EQgHC8n+5rGdSPJEtECAS97R5nQ80Ja/EQnqyzVVLXnGbDJE3YBe+VRN9JY0lWOP/Cw==
-X-Received: by 2002:a5d:6189:0:b0:37d:39c1:4d3 with SMTP id ffacd0b85a97d-3803ac84451mr3932455f8f.6.1729861516074;
-        Fri, 25 Oct 2024 06:05:16 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b9216fsm1459852f8f.100.2024.10.25.06.05.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2024 06:05:15 -0700 (PDT)
-Message-ID: <7c1a7b1c-6fbf-4bd9-80d0-d2c3d951e342@redhat.com>
-Date: Fri, 25 Oct 2024 15:05:13 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8iRUn7M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73F2C4CEC3;
+	Fri, 25 Oct 2024 13:05:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729861529;
+	bh=JHk7KYb3g3gubZ/UCoHENgcCGyzGa5kzhT1E3wr8230=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t8iRUn7MW8+vBX02dVc9yoDre05ZBSkvXiKgdaN3nH3Xfn6kgX0qxhYM6SDdnRTvy
+	 5ZqCUQi9lghoJ8667mBCWv+Ej3lNrl2woZhNmF+0Bh896RrwpHIgVNj2k5AK9uAsUV
+	 lelBoqSj9hn2BFXDKm1CRKKNudW6GdKWXId7pE/GkKK+EX1HJ6bT+WIvnF4mfrmKsx
+	 /2W7ZAVekhd1JVpG515Q0A4fMdpBit5wkiyRc4eiKoAfc8tmdGAn7PtkW++LqPaAyr
+	 qEnnC4/gwWvuoMxYwq0cEFw4nfPJ7BZDlc3ll3+ejzX6giEXRFGjE3U4hXtg1/2f5H
+	 z0DzPv0yC7p6A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t4K0N-006muA-8R;
+	Fri, 25 Oct 2024 14:05:27 +0100
+Date: Fri, 25 Oct 2024 14:05:26 +0100
+Message-ID: <87v7xgtjs9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
+In-Reply-To: <eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
+References: <20241009183603.3221824-1-maz@kernel.org>
+	<3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
+	<86ldyd2x7t.wl-maz@kernel.org>
+	<eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, stable@vger.kernel.org,
- Alexander Potapenko <glider@google.com>
-References: <20241009183603.3221824-1-maz@kernel.org>
- <3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
- <86ldyd2x7t.wl-maz@kernel.org>
- <eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
- <92d755af-e19b-49a5-b4df-a8ed0fb7aece@redhat.com>
- <ZxuWIXFJignbcX1m@finisterre.sirena.org.uk>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <ZxuWIXFJignbcX1m@finisterre.sirena.org.uk>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, stable@vger.kernel.org, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Mark,
-
-On 10/25/24 14:59, Mark Brown wrote:
-> On Fri, Oct 25, 2024 at 02:18:02PM +0200, Eric Auger wrote:
->> On 10/25/24 12:54, Mark Brown wrote:
+On Fri, 25 Oct 2024 11:54:38 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
->>> I'm not even sure that's a terrible fix, looking at the changelog I get
->>> the impression the test is deliberately looking to do problematic things
->>> with the goal of making sure that the kernel handles them appropriately.
->>> That's not interacting well with the KVM selftest framework's general
->>> assert early assert often approach but it's a reasonable thing to want
+> [1  <text/plain; us-ascii (7bit)>]
+> On Thu, Oct 24, 2024 at 07:05:10PM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
 > 
->> Can you elaborate on the "assert early assert often approach". What
->> shall this test rather do according to you?
+> > > # ==== Test Assertion Failure ====
+> > > #   lib/kvm_util.c:724: false
+> > > #   pid=1947 tid=1947 errno=5 - Input/output error
+> > > #      1	0x0000000000404edb: __vm_mem_region_delete at kvm_util.c:724 (discriminator 5)
+> > > #      2	0x0000000000405d0b: kvm_vm_free at kvm_util.c:762 (discriminator 12)
+> > > #      3	0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
+> > > #      4	 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
+> > > #      5	 (inlined by) run_tests at vgic_init.c:720
+> > > #      6	0x0000000000401a6f: main at vgic_init.c:748
+> > > #      7	0x0000ffffa7b37543: ?? ??:0
+> > > #      8	0x0000ffffa7b37617: ?? ??:0
+> > > #      9	0x0000000000401b6f: _start at ??:?
+> > > #   KVM killed/bugged the VM, check the kernel log for clues
+> > > not ok 10 selftests: kvm: vgic_init # exit=254
 > 
-> In general the KVM selftests are filled with asserts which just
-> immediately cause the test to exit with a backtrace.  That's certainly
-> an approach that can be taken with testsuites, but it does make things
-> very fagile.  This means that if the test is deliberately doing
-> something which is liable to cause errors and put the VM in a bad state
-> then it seems relatively likely that some part of a partial cleanup will
-> run into a spurious error caused by the earlier testing putting the VM
-> in an error state.
-OK I better understand now. Thank you for the clarification.
+> > > which does rather look like a test bug rather than a problem in the
+> > > change itself.
 > 
->> I am OoO next week but I can have a look afterwards. On which machine is
->> it failing?
+> > Well, the test tries to do braindead things, and then the test
+> > infrastructure seems surprised that KVM tells it to bugger off...
 > 
-> It was failing on a wide range of arm64 machines, I think every one I
-> test (which would track with the change being very generic).
+> > I can paper over it with this (see below), but frankly, someone who
+> > actually cares about this crap should take a look (and ownership).
+> 
+> I'm not even sure that's a terrible fix, looking at the changelog I get
+> the impression the test is deliberately looking to do problematic things
+> with the goal of making sure that the kernel handles them appropriately.
+> That's not interacting well with the KVM selftest framework's general
+> assert early assert often approach but it's a reasonable thing to want
+> to test so relaxing the asserts like this is one way of squaring the
+> circile.
 
-Yes I can reproduce on my end.
+It *is* a terrible fix, since it makes no effort in finding out
+whether the VM is be dead for a good or a bad reason. In a way, the
+fix is worse than the current error, because it silently hide the
+crap.
 
-Thanks
+So this test will continue to explode until someone fixes it
+*properly*. And if that means rewriting the selftest harness, so be
+it.
 
-Eric
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
