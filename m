@@ -1,191 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776CC1DE3C8
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 10:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B88F1FC7D9;
+	Fri, 25 Oct 2024 10:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729851756; cv=none; b=NSB9pq528nmdM1WiyZu831fdwQoZ462lsBawGsRyywKRxg26gO9g9EArfOZiLamXSkPVH1hv1lYiehTffh3eY/86NveZFQdq6oYvSWcIq+qn4qdXptRLogHWFJELLMzZTNxMyFZANV8uvu8frtNb/s7eVGkNqmlf7LGbL/T2FvE=
+	t=1729853683; cv=none; b=rRMvNIIWHe96H2MhP6AUsCS1iktUoCNAyPgoppzcVXzApJ0NPPKQTMLcleRc2466e/0crQqvNdTIK7Dm3EKj7emQ0c5lwCDGmU/b4bwxm1KDxIJcPROagE5YFShBK65t24lrwz1INUrROPlQOWWNPM5b5xIxfCuL9sHqh5XGNXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729851756; c=relaxed/simple;
-	bh=dNFiLHiyWuscBbCZpQpwGu1fR36iwNRyngMLrY9Jc24=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WWEfNeP+AwIMb474v9QpfaRVl9WKYWIFNKMwEJblj6blXiblyhyiXEvo7CjOeGqMHjQvFDShnLuXLEo+hp0UJiMzPVX5kLrArmQM6CVQVMz5ouLedoOQu459ki9TEmtOOU7AYdkKXklJF1a3QlgOPRhbrOIbaXEkxeTuqP9W6dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LPHQvQ8e; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729853683; c=relaxed/simple;
+	bh=NMrbIE7m12dPqV1Z3n/gS0Txjw3cXnFgI8+kZXLcLB8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pr1o+vQpbOd648NrT/hQAxCP2cLBZuiCDOb1ggXofIZYlT4sMh4gwXhdyGoGbxx1w2OQEdq+G7a5cmI84k/w6B30Esqy6brCcH5zh8MBpcdRWqHPgxEKUlqAX5VXNtn0Pgh+vUXXicebzuD4Tmk88p8mTURDAjTFxXAH7v2nueA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R2whcWvD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LPHQvQ8e"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729851753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=na/5decBOfjXjNm65+tQgO51fwBCM0ftC2cvCUNK2FU=;
-	b=LPHQvQ8edD2ADIqpsFEkOwr0xDC2uR1NVTp9QPyGobUxNrVGWj+jVPu3R9LUKOeo0kMyja
-	D5JIwt0V6F85t9ejdVP95haS6almfkVY2hueDZVMSjmA18w1gBIz4mPRCy+Cug86QrfMV3
-	7yg20o0Hb1Nj0tuS/VehyBGQt/+RsaE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-332-V0zDiV5xMXC1QMg13lrBzg-1; Fri,
- 25 Oct 2024 06:22:30 -0400
-X-MC-Unique: V0zDiV5xMXC1QMg13lrBzg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5872A195608A;
-	Fri, 25 Oct 2024 10:22:28 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.39.194.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CABCE196BB7D;
-	Fri, 25 Oct 2024 10:22:22 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	cohuck@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Cc: shahuang@redhat.com,
-	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: [RFC 21/21] arm/cpu-features: Document custom vcpu model
-Date: Fri, 25 Oct 2024 12:17:40 +0200
-Message-ID: <20241025101959.601048-22-eric.auger@redhat.com>
-In-Reply-To: <20241025101959.601048-1-eric.auger@redhat.com>
-References: <20241025101959.601048-1-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R2whcWvD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 220ACC4CECD;
+	Fri, 25 Oct 2024 10:54:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729853682;
+	bh=NMrbIE7m12dPqV1Z3n/gS0Txjw3cXnFgI8+kZXLcLB8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R2whcWvDR/PCSSP4DjUDcLxYQdy/95WyWAkhc5q3+TQ6tALzqIP6huUkRUJCA0RUi
+	 6T/DCTxM9DKTKhzd6/QegR6t07huOMNYy0cTugylMk9jyowm4Aj6pAwzZnNI9lR9B2
+	 +NT8XthWH++muZKV+CNzrbc5W7b30PlegnbYiFxW5JVl99hyLpSkcxd5S6XnAKJTzt
+	 kch6zq9zjDVBH1PPbUYnhzendmzxaeAr/0IWU7JE8VO0/+s/9AzGCxehHLhRno7N7Q
+	 a3l7QQoCCLSlheLjBrhJPxAG56oRGBoNF+ykK7U7QD2UtHmMVV7fe8Qssn52NpPRgn
+	 ZCkR+vgbEv8UA==
+Date: Fri, 25 Oct 2024 11:54:38 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>, stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
+Message-ID: <eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
+References: <20241009183603.3221824-1-maz@kernel.org>
+ <3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
+ <86ldyd2x7t.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="f1SfmhQ4GPa7UgZL"
+Content-Disposition: inline
+In-Reply-To: <86ldyd2x7t.wl-maz@kernel.org>
+X-Cookie: Often things ARE as bad as they seem!
 
-From: Cornelia Huck <cohuck@redhat.com>
 
-Add some documentation for the custom model.
+--f1SfmhQ4GPa7UgZL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- docs/system/arm/cpu-features.rst | 55 +++++++++++++++++++++++++++-----
- 1 file changed, 47 insertions(+), 8 deletions(-)
+On Thu, Oct 24, 2024 at 07:05:10PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index a5fb929243..962a2c6c26 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -2,7 +2,10 @@ Arm CPU Features
- ================
- 
- CPU features are optional features that a CPU of supporting type may
--choose to implement or not.  In QEMU, optional CPU features have
-+choose to implement or not.  QEMU provides two different mechanisms
-+to configure those features:
-+
-+1. For most CPU models, optional CPU features may have
- corresponding boolean CPU proprieties that, when enabled, indicate
- that the feature is implemented, and, conversely, when disabled,
- indicate that it is not implemented. An example of an Arm CPU feature
-@@ -29,6 +32,16 @@ supports the feature.  While ``aarch64`` currently only works with KVM,
- it could work with TCG.  CPU features that are specific to KVM are
- prefixed with "kvm-" and are described in "KVM VCPU Features".
- 
-+2. Alternatively, the ``custom`` CPU model allows to configure optional
-+CPU features via the corresponding ID registers. The host kernel allows
-+to write a subset of ID register fields. The custom model exposes
-+properties for each write ID register fields. Those options are named
-+SYSREG_<IDREG>_<FIELD>. IDREG and FIELD names are those used in the
-+ARM ARM Reference Manual. They can also be found in the linux
-+arch/arm64/tool/sysreg file which is used to automatically generate the
-+description for those registers and fields. The custom model is currently
-+only implemented for KVM.
-+
- CPU Feature Probing
- ===================
- 
-@@ -106,6 +119,10 @@ As expected they are now all ``false``.
- 
- Only the ``pmu`` CPU feature is available.
- 
-+Probing for the ``custom`` CPU model is working differently. CPU model
-+expansion will return the list of available SYSREG properties (matching
-+writable ID register fields)
-+
- A note about CPU feature dependencies
- -------------------------------------
- 
-@@ -119,18 +136,30 @@ independently without error.  For these reasons callers should always
- attempt to make their desired changes all at once in order to ensure the
- collection is valid.
- 
-+When using the ``custom`` CPU model, the provided set of ID registers
-+is always evaluated as a whole.
-+
- A note about CPU models and KVM
- -------------------------------
- 
- Named CPU models generally do not work with KVM.  There are a few cases
- that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
--seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
--used.  This means the guest is provided all the same CPU features as the
--host CPU type has.  And, for this reason, the ``host`` CPU type should
--enable all CPU features that the host has by default.  Indeed it's even
--a bit strange to allow disabling CPU features that the host has when using
--the ``host`` CPU type, but in the absence of CPU models it's the best we can
--do if we want to launch guests without all the host's CPU features enabled.
-+seattle host, but mostly if KVM is enabled, either the ``host`` or the
-+``custom`` CPU types must be used.
-+
-+Using the ``host`` type means the guest is provided all the same CPU
-+features as the host CPU type has.  And, for this reason, the ``host``
-+CPU type should enable all CPU features that the host has by default.
-+
-+In case some features need to be hidden to the guest, ``custom`` model
-+shall be used instead. This is especially useful for migration purpose.
-+
-+The ``custom`` CPU model generally is the better choice if you want more
-+flexibility or stability across different machines or with different kernel
-+versions. However, even the ``custom`` CPU model will not allow configuring
-+an arbitrary set of features; the ID registers must describe a subset of the
-+host's features, and all differences to the host's configuration must actually
-+be supported by the kernel to be deconfigured.
- 
- Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
- affect is not only limited to specific features, as pointed out in example
-@@ -167,6 +196,16 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
- 
-+The ``custom`` CPU model needs to be configured via individual ID register
-+field properties, for example::
-+
-+  $ qemu-system-aarch64 -M virt -cpu custom,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
-+
-+This forces ID_AA64ISAR0_EL1 DP field to 0.
-+
-+Note that the other CPU feature properties are not supported when using
-+this model.
-+
- KVM VCPU Features
- =================
- 
--- 
-2.41.0
+> > # ==== Test Assertion Failure ====
+> > #   lib/kvm_util.c:724: false
+> > #   pid=1947 tid=1947 errno=5 - Input/output error
+> > #      1	0x0000000000404edb: __vm_mem_region_delete at kvm_util.c:724 (discriminator 5)
+> > #      2	0x0000000000405d0b: kvm_vm_free at kvm_util.c:762 (discriminator 12)
+> > #      3	0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
+> > #      4	 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
+> > #      5	 (inlined by) run_tests at vgic_init.c:720
+> > #      6	0x0000000000401a6f: main at vgic_init.c:748
+> > #      7	0x0000ffffa7b37543: ?? ??:0
+> > #      8	0x0000ffffa7b37617: ?? ??:0
+> > #      9	0x0000000000401b6f: _start at ??:?
+> > #   KVM killed/bugged the VM, check the kernel log for clues
+> > not ok 10 selftests: kvm: vgic_init # exit=254
 
+> > which does rather look like a test bug rather than a problem in the
+> > change itself.
+
+> Well, the test tries to do braindead things, and then the test
+> infrastructure seems surprised that KVM tells it to bugger off...
+
+> I can paper over it with this (see below), but frankly, someone who
+> actually cares about this crap should take a look (and ownership).
+
+I'm not even sure that's a terrible fix, looking at the changelog I get
+the impression the test is deliberately looking to do problematic things
+with the goal of making sure that the kernel handles them appropriately.
+That's not interacting well with the KVM selftest framework's general
+assert early assert often approach but it's a reasonable thing to want
+to test so relaxing the asserts like this is one way of squaring the
+circile.
+
+--f1SfmhQ4GPa7UgZL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcbeO0ACgkQJNaLcl1U
+h9CYWggAhZeL7arTcbfSYjm9iBbxz0wTjV52BOyL0NAmhjGaHipkl/iNLk65tjuu
+Ru0565ygr7xFQCbadPpkVsbn4KKaeHo+3cqtlPR45eShijH8TY81xIw8lp1uNYVh
+4uy9zhIzL0YLuiXrpI+wQ/FW4C1bnXCh3CsBhm2SvPzZpj51nzwnZgEfROJ2BCPc
+i75RPztWPmmce2XDSWLP/j967nI87+fhUdBQbjlRN82B0OHtNrAmXer5b6Qh17U0
+YPKMiyGnUayJ5U/vTHngRy4cJGnaYmb1w/Vvst5SqBjmhwf9pPbZgp4oZf5mL9MT
+8qxWB/NhANiYbf6pilkXli/hSwDhBQ==
+=Bczd
+-----END PGP SIGNATURE-----
+
+--f1SfmhQ4GPa7UgZL--
