@@ -1,45 +1,45 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CEB216A1D
-	for <kvmarm@lists.linux.dev>; Thu, 24 Oct 2024 20:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC57243AA1
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 01:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729800904; cv=none; b=KUxTBL8fYRehHMKiH2cNLGu3xL8UouhgbewKTlphmGIeYZgXKLvXbLV7Hd++V5F+kh9/78WzbqhIGwl1SgerxqsgFY53MvGvzQAVVAca2vY34kZYxU1vJEjopzuuOOR0nlib1upM+ry/Djf70GX4aZCn+3K0smbi+7IV7zPsrEo=
+	t=1729819578; cv=none; b=b5mdycA3xxmLdPncnuDkbd8iNdeEg7dXLSEXk0vKQsnG0/vPkLQkuxOC0pCkMUGrvG7kE+XNwyA4ahA92rHgAIS2gE86aOyzurw0FTJ9n1mlExvrzJ4eqgknyyqh/pkLdb+bPmSVxeEj9YuVtaX9rGuMh/bksfx0jGRhkje2ES4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729800904; c=relaxed/simple;
-	bh=6fj/q8BQSOINphdKPPLUDq7M+GfsWT/xgsFdcpeWwHs=;
+	s=arc-20240116; t=1729819578; c=relaxed/simple;
+	bh=TcVtJv6oUrY/z+KHe26ljIu9/SEu81k+ENS3CDWIuk0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aCkrUNZAms6FZJIcNGXarX6LQDf9dxFrsuq0HTo1Md/TV3w67f63y0vwdKQy1tYFT77blDeFJMUhSYLoB0rfQWmJJ5S2Q5OPFX6aYVbp5k6+XoVmtcNXIXjdIHy6m3e7hRaRJRE4pWtfKKfSmmxKLXiHbuGQu7WlZorTS1OQSr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YfMBqlEu; arc=none smtp.client-ip=91.218.175.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=SSu4ae6iZ1S85JbAJBUEd4vJ7TM1eZgEhTwmqAZJ0t25DGnjOpQQJREV/Z/MegmTvvFm9B83CXVDL2HomvYVuQwpMzZN2ZP7xK6wIDSXdkKzkeYSZBwVVfiQRINiZXVvsO4gl/Vg5phCiSF/S21DOoWdXboypSj3Yhw5aQ/IqnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DcfmS8+V; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YfMBqlEu"
-Date: Thu, 24 Oct 2024 13:14:53 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DcfmS8+V"
+Date: Thu, 24 Oct 2024 18:25:24 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729800899;
+	t=1729819574;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UtFndtJcIL3zsSxbBk4RRQ6rdE2RirToZ3JUO30TCHs=;
-	b=YfMBqlEuY3d4sssErtWX/tyOE6MwT9DGBdAkTCuk3A3qClaZ1jgVMh94ystYpCwzOS3XQ0
-	kA6nAgW6nZsGBkOEUHBGkUp3x8C8S2QFSMgI7b/odoVduDw6c6fJO90OQ6BOTifEgTsS7k
-	fKQmtIPOjE09rsN97IuRq5Y3IxznMxw=
+	bh=LbVgZw7rn3qGcaKG7VGgStY+XOz4C32vFUVkMj/8HwI=;
+	b=DcfmS8+VrSpd0LFYtcWnb7KKcDO7ABI/h87NsY/f60XLm/GpI7R+hGNkifm/2CPH9O0doR
+	YIvzvtnlahSAzLst29DQzaaj/bZQTRsCSvMmLmuhWbviSm01lamoqzF65C3UkYQw3BcbAh
+	FC763oyUU5mnnqz0aKoET/15rUSxF68=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Zhiqiang Ni <nizhiqiang1@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	wanghaibin.wang@huawei.com, tangnianyao@huawei.com,
-	wangzhou1@hisilicon.com, yuzenghui@huawei.com,
-	wangyanan55@huawei.com, jiangkunkun@huawei.com,
-	jiaqingtong@huawei.com
-Subject: Re: [bug report] KVM: arm64: vgic-its: Performance degradation on
- GICv3 LPI injection
-Message-ID: <ZxqqvcaGFkK4_QHW@linux.dev>
-References: <bb4aeb68-c77b-4071-bca5-d129a1c5f6f3@huawei.com>
- <86y12e2amf.wl-maz@kernel.org>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com,
+	eric.auger@redhat.com, yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com, jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com, anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+Subject: Re: [RFC PATCH v2 1/3] KVM: arm64: Add hypercall support for
+ retrieving migration targets
+Message-ID: <ZxrzhAh3qE9hLV-U@linux.dev>
+References: <20241024094012.29452-1-shameerali.kolothum.thodi@huawei.com>
+ <20241024094012.29452-2-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,55 +48,121 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86y12e2amf.wl-maz@kernel.org>
+In-Reply-To: <20241024094012.29452-2-shameerali.kolothum.thodi@huawei.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 24, 2024 at 09:00:56AM +0100, Marc Zyngier wrote:
-> On Thu, 24 Oct 2024 06:06:58 +0100,
-> Zhiqiang Ni <nizhiqiang1@huawei.com> wrote:
-> > 
-> > Hi all,
-> > 
-> > I found a performance degradation on GICv3 LPI injection after this
-> > commit ad362fe07fecf0aba839ff2cc59a3617bd42c33f(KVM: arm64: vgic-its:
-> > Avoid potential UAF in LPI translation cache).
-> >
-> > In my testcase, the vm's configuration is 60 VCPU 120G RAM with a
-> > 32-queue NIC and the kernel version is 5.10. The number of new TCP
-> > connections per second changed from 150,000 to 50,000 after this
-> > patch, with the %sys of cpu changed from 15% to 85%.
-> 
-> What is the VM running? How is the traffic generated? Without a
-> reproducer, I struggle to see how we are going to analyse this issue.
-> 
-> We can't go back to the previous situation anyway, as it has been
-> shown that what we had before was simply unsafe (the commit message
-> explains why).
-> 
-> > From the ftrace, I found that the duration of vgic_put_irq() is
-> > 13.320 us, which may be the reason for the performance degradation.
-> >
-> > The call stack looks like below:
-> >     kvm_arch_set_irq_inatomic()
-> >       vgic_has_its();
-> >       vgic_its_inject_cached_translation()
-> >         vgic_its_check_cache()
-> >         vgic_queue_irq_unlock()
-> >         vgic_put_irq()
-> 
-> Are you suggesting that it is the combination of vgic_get_irq_kref() +
-> vgic_irq_put() that leads to excessive latency? Both are essentially
-> atomic operations, which should be pretty cheap on a modern CPU
-> (anything with FEAT_LSE).
+Hi,
 
-Looks like the bug report is for a 5.10 kernel, and at that point in
-ancient history KVM takes the lpi_list_lock for every vgic_irq_get() / vgic_irq_put()
+On Thu, Oct 24, 2024 at 10:40:10AM +0100, Shameer Kolothum wrote:
+> +``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_NUM_FUNC_ID``
+> +------------------------------------------------------
+> +
+> +Query total number of migration target CPUs the Guest VM will be running during its
+> +lifetime and version information applicable to the data format used for
+> +``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_CPUS_FUNC_ID``. The maximum number of targets
+> +supported is 64. Also the version number supported currently is 1.0. This hypercall
+> +must be handled by the userspace VMM.
+> +
+> ++---------------------+-------------------------------------------------------------+
+> +| Presence:           | Optional; KVM/ARM64 Guests only                             |
+> ++---------------------+-------------------------------------------------------------+
+> +| Calling convention: | HVC64                                                       |
+> ++---------------------+----------+--------------------------------------------------+
+> +| Function ID:        | (uint32) | 0xC600007D                                       |
+> ++---------------------+----------+--------------------------------------------------+
+> +| Arguments:          | None                                                        |
+> ++---------------------+----------+----+---------------------------------------------+
+> +| Return Values:      | (int64)  | R0 | ``NOT_SUPPORTED (-1)`` on error, else       |
+> +|                     |          |    | [0-31] total migration targets              |
+> +|                     |          |    | [32-63] version number                      |
+> ++---------------------+----------+----+---------------------------------------------+
 
-The series below that we took upstream has the necessary improvements to
-alleviate lock contention, Zhiqiang you may want to consider backporting
-this into your kernel.
+We can't treat a single register as both a signed quantity *and* a full
+64 bits of bitfields. Maybe just scrap the version and have this thing
+either return a negative error or positive quantity of implementations.
 
-https://lore.kernel.org/all/20240221054253.3848076-1-oliver.upton@linux.dev/
+> +``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_CPUS_FUNC_ID``
+> +-------------------------------------------------------
+> +
+> +Request migration target CPU information for the Guest VM. The information must be
+> +provided as per the format described by the version info in
+> +``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_NUM_FUNC_ID``. At present, we only support
+> +the below format which corresponds to version 1.0. This hypercall will always be
+> +preceded by ``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_NUM_FUNC_ID`` and may be
+> +invoked multiple times to retrieve the total number of target CPUs information
+> +advertised. This hypercall must be handled by the userspace VMM.
+> +
+> +A typical userspace usage scenario will be like below:
+> +
+> +1. Receives ``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_NUM_FUNC_ID``
+> +
+> +   * Returns total number of migration targets and version number
+> +   * Reset current target index to zero
+> +2. Receives ``ARM_SMCCC_VENDOR_HYP_KVM_MIGRN_TARGET_CPUS_FUNC_ID``
+> +
+> +   * Returns MIDR/REVIDR info in return register fields. Can return up to 4
+> +   * Update current target index based on returned target info
+> +   * If there are remaining register fields, return zero to indicate the end
+> +   * Repeat step 2 until current target index == total number of migration targets
+
+Hmm... I'd rather we make the guest supply the target index of the
+implementation it wants to discover. Otherwise, the VMM implementation
+of this hypercall interface is *stateful* and needs to remember to
+migrate that...
+
+> ++---------------------+-------------------------------------------------------------+
+> +| Presence:           | Optional; KVM/ARM64 Guests only                             |
+> ++---------------------+-------------------------------------------------------------+
+> +| Calling convention: | HVC64                                                       |
+> ++---------------------+----------+--------------------------------------------------+
+> +| Function ID:        | (uint32) | 0xC600007E                                       |
+> ++---------------------+----------+----+---------------------------------------------+
+> +| Arguments:          | None                                                        |
+> ++---------------------+----------+----+---------------------------------------------+
+> +| Return Values:      | (int64)  | R0 | ``NOT_SUPPORTED (-1)`` on error, else       |
+> +|                     |          |    | [0-31] MIDR, [31-63] REVIDR, else           |
+> +|                     |          |    | [0-63] Zero to mark end.                    |
+> ++---------------------+----------+----+---------------------------------------------+
+
+Same deal here, x0 needs to always be treated as a signed quantity.
+
+How about -1 on error, 0 on success?
+
+Then, in the remaining registers:
+
+> +|                     | (uint64) | R1 | [0-31] MIDR, [32-63] REVIDR, else           |
+> +|                     |          |    | [0-63] Zero to mark end.                    |
+> ++---------------------+----------+----+---------------------------------------------+
+
+Both MIDR_EL1 and REVIDR_EL1 are 64 bit registers in AArch64. So we need
+to transfer a full 64 bits, even if the top half is _presently_ RES0 in
+MIDR_EL1.
+
+> +|                     | (uint64) | R2 | [0-31] MIDR, [32-63] REVIDR, else           |
+> +|                     |          |    | [0-63] Zero to mark end.                    |
+> ++---------------------+----------+----+---------------------------------------------+
+> +|                     | (uint64) | R3 | [0-31] MIDR, [32-63] REVIDR, else           |
+> +|                     |          |    | [0-63] Zero to mark end.                    |
+> ++---------------------+----------+----+---------------------------------------------+
+
+I think it's fine to have this hypercall return a single MIDR/REVIDR
+pair at a time. This is not a performance sensitive interface and will
+only be called a few times at boot.
+
+Actually -- what if we crammed everything into a single hypercall?
+
+DISCOVER_IMPLEMENTATION_FUNC_ID
+
+ - Arguments:
+   - arg0: selected implementation index
+
+ - Return value:
+   - r0: -1 on error, otherwise the maximum possible implementation index
+   - r1: MIDR_EL1 of the selected implementation
+   - r2: REVIDR_EL1 of the selected implementation
+
+We're guaranteed at least one CPU implementation of course, so the guest
+can just start w/ index 0 and iterate from there.
 
 -- 
 Thanks,
