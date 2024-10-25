@@ -1,102 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B5814277
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 17:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C028D18C915
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 18:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729878123; cv=none; b=QQwMmz24I6vcPX/NG/csDKn2QBKadGc3SGFVbYOQ9FIvZ94Rhbh2LqhsSrL+MzU7ikQCOeFXZrLCAvKAyiqAQee6EpRAsgCHO9AJBxbGacfbW3qdjJuFEirSIrmSJ+z8qz1cci4Po8GVyQ8MO4gIQl453zVBuNzgTr1AVvjVCYQ=
+	t=1729880650; cv=none; b=GTa0u+6uEJcTDRyoYEqoHNI0qf4Swa4xp0vGy6HbZD7Zbj+nMiaDFh27zHhAF3ZmNDN+Fp0SaboAiYgqa09tcj5hq5O3vmWQ7Sy4moXGayaJjhN2X3/mUWD+a1JA/ca67KKiw4KdCl27HmtCEPa5KM+5OFr9l0djMWZtm76eaA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729878123; c=relaxed/simple;
-	bh=luHPkXcmkzXARAD1k+1siQ/blVliFRMh2F/pQQLu2Pw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b+zsvzckxD0wkVJgxJWJSHH1eKLE+U48GfKDcsBIlqKh6yLzkqppBWySywJ9pRrwYw9gTwhip1qbz5mDCGyTPdaJjXTJoWqSJpXXx0/mDitz1/VOHV0RFqng86uMrjUA1QdITXZdkkqEUY0rXstsSXljzcz2CC7sYvpsCbF3orI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DUR/GHB/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729880650; c=relaxed/simple;
+	bh=OHA5C8GaWmORzTeuKwznR+3k85lIX9wJcOBbPTIId0M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=isDU+0SDlNsZuOWqoUAQrriFwgizwHpVlr/17o6BYFJqWQxnKXFlsfTjhysvK6orpM4gSNACQPVBXrS4kopSUXh/SjGKxLkk0RmHfP5FoJd9c0BnM7L9jcvxwH1vzkDzeIR8OSMm95vndCogXOMNI6WAvoCdPJ2boQlWWidRHV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fJ6IvbC0; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUR/GHB/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729878120;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fJ6IvbC0"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729880646;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=luHPkXcmkzXARAD1k+1siQ/blVliFRMh2F/pQQLu2Pw=;
-	b=DUR/GHB/zU+ENd7g+McH4suIHL5pOTJGuRu8QKQ+h7Un9UEoPuSk+jqrywXWwjDZJhA/no
-	Um3Mj0+A1d7YMQc4ernvQv0RlT4B0xiOSx7Z5Cskx3DQrVpX63ono7Bk7UxENws7HH3N8Q
-	wBz/grDCW1W+wVtmTOOo5d2LS5a1Hio=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-lBAxD4HJOTmZw5Yd41sHhw-1; Fri, 25 Oct 2024 13:41:59 -0400
-X-MC-Unique: lBAxD4HJOTmZw5Yd41sHhw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5606250aso1187805f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 10:41:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729878118; x=1730482918;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=luHPkXcmkzXARAD1k+1siQ/blVliFRMh2F/pQQLu2Pw=;
-        b=Bw+9OoQHpP1BUJEFMYf1woxHg84VAxT5OUWR42ouTYnlJ0QWQpw9lO4xsY6N5oplqG
-         c2BkPA0dp5QiN26WCuyHoKftjoo4T37CmhRtER1Yh5RruS8E7s4OGS2Ugl1sQzv5vGIk
-         JxmV8xZxMQ5tWkAaHPAAQzjOwFh+fjnDc7M4l8H521Oxl70mV8/FaoBfr/BNATuho2yK
-         ZL2GxTHWN2Jl9kWZy6WTorOXlWoaA0L7yH3lZRF51CxXoDRbWUj7kIX+aFgkzPp6HtC+
-         nT5sXKVl/OIUw1a20XSNtK7TuYsme5Xy16iyaRsUfE3f6yiu4TDKNnnD8478+VBWSDi4
-         mCsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWZp/rqZPwzdoIs5iZ07UoLidWUhSiww2YOMWtBBxhHTOw+v1VphAAyI5aZdgF8hv1AAIXxWR4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzOMRXCr0okF8kZ3UTo8a4wr1dHeU0FI9OluLGBIfheJZBHP+6z
-	tsy8D7zEmcTK6WaBH7IECZTjVLiZqAgSH+IVJjqnQ9KfDo5jE4sCyG4gc2iJ6/XSMg7uYPQDNva
-	qFRK7oQTO8UE4vbylIIL6ID/xM+YtVdxFnPag3Krh2lArpblFPIvevJWzCn1J2onW4aww0jJzLK
-	QnAICka1wquEjOy/A69bGwreIllFnw
-X-Received: by 2002:a5d:410d:0:b0:37d:5436:49b with SMTP id ffacd0b85a97d-3806113a07emr163662f8f.13.1729878118148;
-        Fri, 25 Oct 2024 10:41:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJirsSaLOjUEz6kn7HmxOjIyhE9ZfBrB9GAGHgNcgNSBUFOeNbcRoyDDrANp8n6mxM4gCIddwEWDqpYot15qQ=
-X-Received: by 2002:a5d:410d:0:b0:37d:5436:49b with SMTP id
- ffacd0b85a97d-3806113a07emr163639f8f.13.1729878117761; Fri, 25 Oct 2024
- 10:41:57 -0700 (PDT)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Pqtm4O409KQs+qC4qHIqpJ6fPA7Q/9J5YGrNZs6ZYaM=;
+	b=fJ6IvbC0WxjXQzJ+inEGwLweQ63h8mR57RCeZehUSbTWuHuZIv6YbrO7r5pnt003YZdFuh
+	3ycg0wI8sZFg6qmD2W3SEI6M+8Vq1NmJ89A6c44Ssk9ajH6ooZ6X7twqbNoZGvUV3RWt6I
+	hI5U3Tyg6SgvnQYDjM3HQAlFMx+CGAk=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v4 00/18] KVM: arm64: nv: Support for EL2 PMU controls
+Date: Fri, 25 Oct 2024 18:23:35 +0000
+Message-ID: <20241025182354.3364124-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241010182427.1434605-1-seanjc@google.com> <CABgObfbQW-3vp=mNcR4giUGZ_gxhuRykvKj8gzBDY7pOg6xdBQ@mail.gmail.com>
- <Zxbw9XcFCHYR1Ald@google.com>
-In-Reply-To: <Zxbw9XcFCHYR1Ald@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 25 Oct 2024 19:41:45 +0200
-Message-ID: <CABgObfayH1x3qFjOiM=rQjxiui5tXJXObgR_qOGV5Hn_2QLEJQ@mail.gmail.com>
-Subject: Re: [PATCH v13 00/85] KVM: Stop grabbing references to PFNMAP'd pages
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
-	Yan Zhao <yan.y.zhao@intel.com>, David Matlack <dmatlack@google.com>, 
-	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 22, 2024 at 2:25=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
-> > Looks good to me, thanks and congratulations!! Should we merge it in
-> > kvm/next asap?
->
-> That has my vote, though I'm obvious extremely biased :-)
+v3 -> v4:
+ - Align sysreg definitions with DDI0601 2024-09
+ - Fix 'accessible' counter mask construction
+ - Fix MDCR_EL2.MTPME RES0 logic
 
-Your wish is my command... Merged.
+v3: https://lore.kernel.org/kvmarm/20241007174559.1830205-1-oliver.upton@linux.dev/
 
-Paolo
+Marc Zyngier (1):
+  KVM: arm64: Extend masking facility to arbitrary registers
+
+Oliver Upton (17):
+  arm64: sysreg: Describe ID_AA64DFR2_EL1 fields
+  arm64: sysreg: Migrate MDCR_EL2 definition to table
+  arm64: sysreg: Add new definitions for ID_AA64DFR0_EL1
+  KVM: arm64: Describe RES0/RES1 bits of MDCR_EL2
+  KVM: arm64: nv: Allow coarse-grained trap combos to use complex traps
+  KVM: arm64: nv: Rename BEHAVE_FORWARD_ANY
+  KVM: arm64: nv: Reinject traps that take effect in Host EL0
+  KVM: arm64: nv: Honor MDCR_EL2.{TPM, TPMCR} in Host EL0
+  KVM: arm64: nv: Describe trap behaviour of MDCR_EL2.HPMN
+  KVM: arm64: nv: Advertise support for FEAT_HPMN0
+  KVM: arm64: Rename kvm_pmu_valid_counter_mask()
+  KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
+  KVM: arm64: Add helpers to determine if PMC counts at a given EL
+  KVM: arm64: nv: Honor MDCR_EL2.HPME
+  KVM: arm64: nv: Honor MDCR_EL2.HLP
+  KVM: arm64: nv: Apply EL2 event filtering when in hyp context
+  KVM: arm64: nv: Reprogram PMU events affected by nested transition
+
+ arch/arm64/include/asm/kvm_arm.h     |  29 ---
+ arch/arm64/include/asm/kvm_emulate.h |   5 +
+ arch/arm64/include/asm/kvm_host.h    |  21 +-
+ arch/arm64/kvm/emulate-nested.c      | 291 ++++++++++++++++-----------
+ arch/arm64/kvm/nested.c              |  54 ++++-
+ arch/arm64/kvm/pmu-emul.c            | 143 +++++++++++--
+ arch/arm64/kvm/sys_regs.c            |  15 +-
+ arch/arm64/tools/sysreg              |  76 ++++++-
+ include/kvm/arm_pmu.h                |  18 +-
+ 9 files changed, 465 insertions(+), 187 deletions(-)
+
+
+base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
+-- 
+2.47.0.163.g1226f6d8fa-goog
 
