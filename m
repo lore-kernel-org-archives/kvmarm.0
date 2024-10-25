@@ -1,114 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DDA21A4D4
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 17:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B5814277
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 17:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729875906; cv=none; b=NnWI2PHpMuUtzz9I3cnWmEpA30xR6x1PAmcGDuUrJL+NtmAw2H3isE5jreurQ+ueMwfRjTjvTxgBYcYrrEi80Xo/3+kujw+BQ5OtmGQR59xoQZox4saRt+DtVL0eJs7SGTKa6NmSXewUPB5G+cIBZ+DP3N7eJvHR1799ep+DM2c=
+	t=1729878123; cv=none; b=QQwMmz24I6vcPX/NG/csDKn2QBKadGc3SGFVbYOQ9FIvZ94Rhbh2LqhsSrL+MzU7ikQCOeFXZrLCAvKAyiqAQee6EpRAsgCHO9AJBxbGacfbW3qdjJuFEirSIrmSJ+z8qz1cci4Po8GVyQ8MO4gIQl453zVBuNzgTr1AVvjVCYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729875906; c=relaxed/simple;
-	bh=VAh/4/78mDGKWgIG/y/D4fuPPawGrBhwtluopSQMBjE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CCh3I2HXIJVHQz5FC0vVHVtXAs3dYaWIqeY54Hf8WucAqJyLBmDeRpc4D+Ybvt+wXXG1KlXYVlZGy4JcFhVYAMuq+6E16FA/Pmh12K/XH/g2agxpV9xPVbR1HvdWCGYhDjMkNmuJcp5DJ6UT+Ojuxuts45+X1lVyXPIkDHByGbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNy0FXX4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729878123; c=relaxed/simple;
+	bh=luHPkXcmkzXARAD1k+1siQ/blVliFRMh2F/pQQLu2Pw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b+zsvzckxD0wkVJgxJWJSHH1eKLE+U48GfKDcsBIlqKh6yLzkqppBWySywJ9pRrwYw9gTwhip1qbz5mDCGyTPdaJjXTJoWqSJpXXx0/mDitz1/VOHV0RFqng86uMrjUA1QdITXZdkkqEUY0rXstsSXljzcz2CC7sYvpsCbF3orI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DUR/GHB/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNy0FXX4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16391C4CEE3;
-	Fri, 25 Oct 2024 17:05:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729875906;
-	bh=VAh/4/78mDGKWgIG/y/D4fuPPawGrBhwtluopSQMBjE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JNy0FXX4xsONOYlDh5s2CmGeGT+GDA9VoqdO1EcCSbmb6yvktqAly8Cwm+wk7/LET
-	 PYPmNfTCnKP1iNCpMseKsv6qG3l5tfK4lNoHOc3D2ABCZ3+y/72XT5ysRwu45aICdf
-	 izgbH7mHJiMYcf31kQiNlCOFQJsoycMKUBQZQE7WPgHSaxcToQmY1qaomaxL2qshCu
-	 WYYzXNC2csxIfGDGhN/GkbNPwwetYtjAnpJZt0GEfr9hvriYH6mnoZo58CvD6VBNUa
-	 fKzpqwnodvXZRAEF3Ek5kY6AiSlGVSLjErUY+SzvjuasM5WVQSjvDfaH1/XkCpZ48G
-	 rz1cCwjEXmXAA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t4NkF-006riz-RU;
-	Fri, 25 Oct 2024 18:05:04 +0100
-Date: Fri, 25 Oct 2024 18:05:03 +0100
-Message-ID: <86frok2jwg.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com,
-	cohuck@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
-	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com,
-	shahuang@redhat.com,
-	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [RFC 14/21] arm/cpu: Add sysreg generation scripts
-In-Reply-To: <20241025101959.601048-15-eric.auger@redhat.com>
-References: <20241025101959.601048-1-eric.auger@redhat.com>
-	<20241025101959.601048-15-eric.auger@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUR/GHB/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729878120;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=luHPkXcmkzXARAD1k+1siQ/blVliFRMh2F/pQQLu2Pw=;
+	b=DUR/GHB/zU+ENd7g+McH4suIHL5pOTJGuRu8QKQ+h7Un9UEoPuSk+jqrywXWwjDZJhA/no
+	Um3Mj0+A1d7YMQc4ernvQv0RlT4B0xiOSx7Z5Cskx3DQrVpX63ono7Bk7UxENws7HH3N8Q
+	wBz/grDCW1W+wVtmTOOo5d2LS5a1Hio=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-595-lBAxD4HJOTmZw5Yd41sHhw-1; Fri, 25 Oct 2024 13:41:59 -0400
+X-MC-Unique: lBAxD4HJOTmZw5Yd41sHhw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5606250aso1187805f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 10:41:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729878118; x=1730482918;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=luHPkXcmkzXARAD1k+1siQ/blVliFRMh2F/pQQLu2Pw=;
+        b=Bw+9OoQHpP1BUJEFMYf1woxHg84VAxT5OUWR42ouTYnlJ0QWQpw9lO4xsY6N5oplqG
+         c2BkPA0dp5QiN26WCuyHoKftjoo4T37CmhRtER1Yh5RruS8E7s4OGS2Ugl1sQzv5vGIk
+         JxmV8xZxMQ5tWkAaHPAAQzjOwFh+fjnDc7M4l8H521Oxl70mV8/FaoBfr/BNATuho2yK
+         ZL2GxTHWN2Jl9kWZy6WTorOXlWoaA0L7yH3lZRF51CxXoDRbWUj7kIX+aFgkzPp6HtC+
+         nT5sXKVl/OIUw1a20XSNtK7TuYsme5Xy16iyaRsUfE3f6yiu4TDKNnnD8478+VBWSDi4
+         mCsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZp/rqZPwzdoIs5iZ07UoLidWUhSiww2YOMWtBBxhHTOw+v1VphAAyI5aZdgF8hv1AAIXxWR4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzOMRXCr0okF8kZ3UTo8a4wr1dHeU0FI9OluLGBIfheJZBHP+6z
+	tsy8D7zEmcTK6WaBH7IECZTjVLiZqAgSH+IVJjqnQ9KfDo5jE4sCyG4gc2iJ6/XSMg7uYPQDNva
+	qFRK7oQTO8UE4vbylIIL6ID/xM+YtVdxFnPag3Krh2lArpblFPIvevJWzCn1J2onW4aww0jJzLK
+	QnAICka1wquEjOy/A69bGwreIllFnw
+X-Received: by 2002:a5d:410d:0:b0:37d:5436:49b with SMTP id ffacd0b85a97d-3806113a07emr163662f8f.13.1729878118148;
+        Fri, 25 Oct 2024 10:41:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJirsSaLOjUEz6kn7HmxOjIyhE9ZfBrB9GAGHgNcgNSBUFOeNbcRoyDDrANp8n6mxM4gCIddwEWDqpYot15qQ=
+X-Received: by 2002:a5d:410d:0:b0:37d:5436:49b with SMTP id
+ ffacd0b85a97d-3806113a07emr163639f8f.13.1729878117761; Fri, 25 Oct 2024
+ 10:41:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, cohuck@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20241010182427.1434605-1-seanjc@google.com> <CABgObfbQW-3vp=mNcR4giUGZ_gxhuRykvKj8gzBDY7pOg6xdBQ@mail.gmail.com>
+ <Zxbw9XcFCHYR1Ald@google.com>
+In-Reply-To: <Zxbw9XcFCHYR1Ald@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 25 Oct 2024 19:41:45 +0200
+Message-ID: <CABgObfayH1x3qFjOiM=rQjxiui5tXJXObgR_qOGV5Hn_2QLEJQ@mail.gmail.com>
+Subject: Re: [PATCH v13 00/85] KVM: Stop grabbing references to PFNMAP'd pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Yan Zhao <yan.y.zhao@intel.com>, David Matlack <dmatlack@google.com>, 
+	David Stevens <stevensd@chromium.org>, Andrew Jones <ajones@ventanamicro.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 25 Oct 2024 11:17:33 +0100,
-Eric Auger <eric.auger@redhat.com> wrote:
-> 
-> Introduce scripts that automate the generation of system register
-> definitions from a given linux source tree arch/arm64/tools/sysreg.
-> 
-> Invocation of
-> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
-> in scripts directory do generate 2 qemu files:
-> - target/arm/cpu-sysreg-properties.c
-> - target/arm/cpu-sysregs.h
-> 
-> cpu-sysregs.h creates defined for all system registers.
-> However cpu-sysreg-properties.c only cares about feature ID registers.
-> 
-> update-aarch64-sysreg-code.sh calls two awk scripts.
-> gen-cpu-sysreg-properties.awk is inherited from kernel
-> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
-> the original author of this script.
+On Tue, Oct 22, 2024 at 2:25=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+> > Looks good to me, thanks and congratulations!! Should we merge it in
+> > kvm/next asap?
+>
+> That has my vote, though I'm obvious extremely biased :-)
 
-You really want to be careful with this. Both the script and the
-source file describing the registers are submitted to regular outburst
-of churn (I'm currently sitting on such a series). You really have to
-be prepared to see things breaking on each import.
+Your wish is my command... Merged.
 
-That file has also been known to contain annoying mistakes, as it is
-all written by hand.
+Paolo
 
-Ideally, this would be directly generated from the ARM XML, which is a
-public set of files. However, the license attached to this package
-strictly prohibits its use in QEMU (or anywhere else). One day...
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
