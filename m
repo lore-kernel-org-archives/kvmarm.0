@@ -1,105 +1,118 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE2481ADA
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 05:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBDE18BC2A;
+	Fri, 25 Oct 2024 06:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729833481; cv=none; b=dxKbFQT5Re1OL3FgUYrdDXp8b3K5BHG7inIi026pFJEISz9jrQdocujNHIjgbDfl6JemdpjTBiVNvTizFDxRoq2IgotxHqPue1Aq1CSF2UcZ+4LAqZp1JpnfjJWiFZp1D4fj0JhHGWmW6qJSWvRo/5DSImlkkNAUapNIDSzRbhY=
+	t=1729836815; cv=none; b=U+3EA062kKZvP8s4yr8H60fGySs9RLCS+VYu13c/QLMjeeAEDLOry5PrDXyv/9yBP2BRxbpEhiZJrE7m0mCToQOjsH9eVggJvP9N64VmLtGQEni8cnDpqMbqVYQEAMq+uXbSkcZ0WVaES/eYHdXsQNo8JmqS/DzFxDbaLu8vnX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729833481; c=relaxed/simple;
-	bh=I4pmiyUhINIecMcBCwgPTwtCWUpPs5Rbd1ukL/gPB80=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fcS3daULzK4TQvXot0nR+GSiJZ++01svEjUxXqAIXMmhNoHsuNJiVFyjt2z3YbjmR5iVyvb7tvY5WvygNP/+7ULVZI/7jMdVJKd/DfEGtyKOF+nPUahxFfE/zraJO27qDhq1AMnuBo46vj66DbjLGWm5ExCrzwHy6AzyrVlluQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 693D2339;
-	Thu, 24 Oct 2024 22:18:27 -0700 (PDT)
-Received: from [10.162.16.84] (unknown [10.162.16.84])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E4D953F528;
-	Thu, 24 Oct 2024 22:17:55 -0700 (PDT)
-Message-ID: <7e6b683f-5dd0-4e94-9979-3dcca2d04f2c@arm.com>
-Date: Fri, 25 Oct 2024 10:47:53 +0530
+	s=arc-20240116; t=1729836815; c=relaxed/simple;
+	bh=6d0jNOYm8+UX1GI3ORK1fHvZg2kELwsSG52v2C5UXhY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=XpJfaPadzMut+GCOSchaAslbucElZQQfTFyK4Ws50Pfkf9ZYp7OdsNL4R/JlieuFubfLq6QKG7IE8+MGwqEUMMAgNyr4XdpeOONPs+o0SX0Nc6JoOWl3Ze+5OCuESQEElU/ALrGq9f9P/k0n+TczsF9v2ga/W6Xa48V6EvbIbiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=M3Fp92Mp; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="M3Fp92Mp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=Yqhk9X0Hpv5XLgEFxivgetJ23tlmLhIvDHYvaF3/RF0=; b=M3Fp92MpdZcnNiNxDY5LYNlsfQ
+	IkV4ivBXpPQQRb3Ck3yLPwIJm36djIj9TL9qKmD/XDH9tEQtYFPQ5pQ1MBDYjweS5LOEXo45X+W+W
+	XuUcsZlVdUzZxT02yjYXjUP92vURayFIJZyNhHMoDAzZ6PMapzGiqmnRWFEbDEPsXEk/AEAkBDPy/
+	6za1uQZx/Z5J3OQytaJImBEv5X5h7O6XY9Ha1/cI0wSOPo/EHJFlwUuPeKtdO+Z/jhp3n/mSnyi3l
+	VkzFd3rYSufi9c937pkpMPCKAOSGu8PsMbT4Abnk4wjqduo8ISrlISGdJK1tkVdEr86/BQT8CdEvL
+	kbF4CIbA==;
+Received: from [69.6.35.226] (helo=[127.0.0.1])
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t4DZI-00000008qB8-1qL8;
+	Fri, 25 Oct 2024 06:13:06 +0000
+Date: Fri, 25 Oct 2024 08:13:03 +0200
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: Miguel Luis <miguel.luis@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+ Len Brown <len.brown@intel.com>, Shuah Khan <shuah@kernel.org>,
+ David Woodhouse <dwmw@amazon.co.uk>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ Francesco Lavra <francescolavra.fl@gmail.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v6_6/6=5D_arm64=3A_Use_SYSTEM=5FOF?=
+ =?US-ASCII?Q?F2_PSCI_call_to_power_off_for_hibernate?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ZxqmsiXV6ZYTANKY@linux.dev>
+References: <20241019172459.2241939-1-dwmw2@infradead.org> <20241019172459.2241939-7-dwmw2@infradead.org> <23C91005-7304-4312-A5E0-F5E6C05B3209@oracle.com> <ECD0CA58-2C3B-48F3-AF12-95E37CB0FC48@infradead.org> <ZxprcWDe2AXuLhD_@linux.dev> <691447A1-8F3F-4890-B00F-8068A14CA126@infradead.org> <ZxqmsiXV6ZYTANKY@linux.dev>
+Message-ID: <627769A8-AF84-47A1-B4F9-5F44C75A8058@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/17] KVM: arm64: nv: Support for EL2 PMU controls
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20241007174559.1830205-1-oliver.upton@linux.dev>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20241007174559.1830205-1-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
+On 24 October 2024 21:57:38 CEST, Oliver Upton <oliver=2Eupton@linux=2Edev>=
+ wrote:
+>On Thu, Oct 24, 2024 at 05:56:09PM +0200, David Woodhouse wrote:
+>> On 24 October 2024 17:44:49 CEST, Oliver Upton <oliver=2Eupton@linux=2E=
+dev> wrote:
+>> >IIUC, you're really wanting to 0x0 because there are hypervisors out
+>> >there that violate the final spec and *only* accept this value=2E
+>> >
+>> >That's perfectly fine, but it'd help avoid confusion if the supporting
+>> >comment was a bit more direct:
+>> >
+>> >	/*
+>> >	 * If no hibernate type is specified SYSTEM_OFF2 defaults to
+>> >	 * selecting HIBERNATE_OFF=2E
+>> >	 *
+>> >	 * There are hypervisors in the wild that violate the spec and
+>> >	 * reject calls that explicitly provide a hibernate type=2E For
+>> >	 * compatibility with these nonstandard implementations, pass 0
+>> >	 * as the type=2E
+>> >	 */
+>> >	 if (system_entering_hibernation())
+>> >		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2), 0 , 0, 0);
+>>=20
+>> By the time this makes it into released versions of the guest Linux ker=
+nel, that comment won't be true any more=2E
+>
+>Then does it even matter? What is the problem you're trying to solve
+>with using a particular value for the hibernate type?
+>
+>Either the goal of this is to make the PSCI client code compatible with
+>your hypervisor today (and any other implementation based on 'F ALP1') or
+>we don't care and go with whatever value we want=2E
+>
+>Even if the comment eventually becomes stale, there is a ton of value in
+>documenting the exact implementation decision being made=2E
+>
 
+Eventually it won't matter and we can go with whatever value we want=2E Bu=
+t yes, the goal is to be compatible with the hypervisor *today* until it ca=
+tches up the changes to the final versions of the spec=2E I didn't spend mu=
+ch time overthinking the comment=2E What was it=2E=2E=2E=2E
 
-On 10/7/24 23:15, Oliver Upton wrote:
-> Marc, I stole patch 1 from you for the sake of sending out a consistent
-> series. I can sort things out when I apply patches if that patch is a
-> common base for the both of us.
-> 
-> v2 -> v3:
->  - Use the sysreg sanitisation infrastructure to apply RES0/RES1 masks
->    to MDCR_EL2
->  - Drop trap_config bit describing if a trap applies to Host EL0
->  - Honor MDCR_EL2.{HPME,HLP} for the 'hypervisor range' of PMU counters
-> 
-> v2: https://lore.kernel.org/kvmarm/20240827002235.1753237-1-oliver.upton@linux.dev/#r
-> 
-> Marc Zyngier (1):
->   KVM: arm64: Extend masking facility to arbitrary registers
-> 
-> Oliver Upton (16):
->   arm64: sysreg: Migrate MDCR_EL2 definition to table
->   arm64: sysreg: Add missing definitions for ID_AA64DFR0_EL1
->   KVM: arm64: Describe RES0/RES1 bits of MDCR_EL2
->   KVM: arm64: nv: Allow coarse-grained trap combos to use complex traps
->   KVM: arm64: nv: Rename BEHAVE_FORWARD_ANY
->   KVM: arm64: nv: Reinject traps that take effect in Host EL0
->   KVM: arm64: nv: Honor MDCR_EL2.{TPM, TPMCR} in Host EL0
->   KVM: arm64: nv: Describe trap behaviour of MDCR_EL2.HPMN
->   KVM: arm64: nv: Advertise support for FEAT_HPMN0
->   KVM: arm64: Rename kvm_pmu_valid_counter_mask()
->   KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
->   KVM: arm64: Add helpers to determine if PMC counts at a given EL
->   KVM: arm64: nv: Honor MDCR_EL2.HPME
->   KVM: arm64: nv: Honor MDCR_EL2.HLP
->   KVM: arm64: nv: Apply EL2 event filtering when in hyp context
->   KVM: arm64: nv: Reprogram PMU events affected by nested transition
-> 
->  arch/arm64/include/asm/kvm_arm.h     |  29 ---
->  arch/arm64/include/asm/kvm_emulate.h |   5 +
->  arch/arm64/include/asm/kvm_host.h    |  21 +-
->  arch/arm64/kvm/emulate-nested.c      | 298 ++++++++++++++++-----------
->  arch/arm64/kvm/nested.c              |  52 ++++-
->  arch/arm64/kvm/pmu-emul.c            | 136 ++++++++++--
->  arch/arm64/kvm/sys_regs.c            |  15 +-
->  arch/arm64/tools/sysreg              |  45 +++-
->  include/kvm/arm_pmu.h                |  18 +-
->  9 files changed, 432 insertions(+), 187 deletions(-)
-> 
-> 
-> base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+	/*
+	 * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
+	 * and is supported by hypervisors implementing an earlier version
+	 * of the pSCI v1=2E3 spec=2E
+	 */
 
-Hello Marc/Oliver,
-
-I am planning to rebase the KVM FEAT_FGT2 series [1] on this one after accommodating
-the following changes and respin.
-
-- Latest changes to spec (https://developer.arm.com/documentation/ddi0601/2024-09/)
-- Adding nDCCIVAPS and TSBCSYNC handling in HFGITR2_EL2 registers
-- Integrating SYS_PMEVCNTSVR_EL1(N) handling in check_mdcr_hpmn() (proposed here)
-
-OR should I just wait for this series to be merged mainline first. Please do suggest.
-Thank you.
-
-- Anshuman
-
-[1] https://lore.kernel.org/all/20241001024356.1096072-1-anshuman.khandual@arm.com/
+That seems to cover it just fine, I think=2E
