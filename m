@@ -1,32 +1,32 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9D320BB4C
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 18:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CD8216203
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 18:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729880680; cv=none; b=OxT2+lvnRc6L8W7cso56bQwOcMtZJ1akVKgK2g46pKHz/54wCJC241HgLNfdtv/j2ZEsP5BGCTBKsQkmqy3x5JkYXQftI1HfthmfyJF83hIHW7xLPhbrqRAXpApq3GC8rX8W9kFYxmXM50IYClW+azMve1nBw1UpJN2cc+pYZG0=
+	t=1729880682; cv=none; b=E4oBj/SWfrAkDytCuQMWKVXzP/9Gc/d4BfCG86iF8oGIPLaJ+1+ZwCsXOblEmuqrb+LIcCy9HWi0YwlhjsWVtLWwVe6Q+Z2ZOknEcBIFhO7ZoETQr3GZNwT7QvxgtUKZMMirkTX0p5ZchaUotqFlqWgVCbg5Hv9PJ8nK5M/4TYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729880680; c=relaxed/simple;
-	bh=9vzq53PCmu/Y7zjKtU/lX/A81aiQzCSYL3Z1OonDC60=;
+	s=arc-20240116; t=1729880682; c=relaxed/simple;
+	bh=NycnbOmqbmRqcBTORz7kn7nxCumdEciTRup8fIwDwBM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JqCrq8d3iqYvtu7D7xFUPrtWRY9dRX+9h9ymz6/InT8B1LiqoVNn6yuQE7jVAgSK9Le7Cq8hp43hpJLn8BJz7/XolwdMqSqs//23MRGYQq/9NLrx0aL6iySpEVwB21as8vgVHql87tlljx3bv1VUth9I9aMIF8YC/qixu9JbDU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AHPoUC9f; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=ErE1wxd2ZBvwOJKedCsWoYfL1IPc/JZFKaJ/oLYqeJPwZmMCKyWQLJgLwczwthkx5M78zg+1D5Vu2+gfv6lJDsT5jCLKDIIBqhVuajMg8s8/KfGy4hzRL7JWYB3xsfJe8biV8jx0v0IWtRS78ef4hkU7RGkgl6GO0nkJbK/++68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ejB6tZgt; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AHPoUC9f"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ejB6tZgt"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729880675;
+	t=1729880678;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HQbPfXcKqguf2CSntuN0/NMKRu/M0rQKlM/2rK1MGZk=;
-	b=AHPoUC9fdpWn9L1Z6PNl/PyiY2zsU/YeEPLLX12r1jXZ1Pon2gkoHeUmaHyYYpLeys3q1/
-	uVFUNZWFZo0ZyV/3krAe8WdZqr23+kLc8HHxsPY6WNJDKGSbW7d2RsK/oJ6Mj+XSqAqoiE
-	XaxW+2OMkQOMkhtqf7gxZIIVXqWMmLU=
+	bh=lWJEQN56N/CeKfveDMMoJU65zML9g/eXZiwy9Gw5WvI=;
+	b=ejB6tZgterLk/gbHmBLxWNnprsUUwqRnXUpyPbf/SYm1C0qPn8Ks1SwIKU9WW/VEyoim94
+	aWHL5eKiXMOYI7r2KQkQMiicqSsdEFqd6VX9jp6RVhi5O44qT3bKU3KS7jbpcEAB4TrLkw
+	SLgGU+sYMsYhnSYtXBegEs5nN8IENs0=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -39,9 +39,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 13/18] KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
-Date: Fri, 25 Oct 2024 18:23:48 +0000
-Message-ID: <20241025182354.3364124-14-oliver.upton@linux.dev>
+Subject: [PATCH v4 14/18] KVM: arm64: Add helpers to determine if PMC counts at a given EL
+Date: Fri, 25 Oct 2024 18:23:49 +0000
+Message-ID: <20241025182354.3364124-15-oliver.upton@linux.dev>
 In-Reply-To: <20241025182354.3364124-1-oliver.upton@linux.dev>
 References: <20241025182354.3364124-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -53,134 +53,98 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The value of MDCR_EL2.HPMN controls the number of event counters made
-visible to EL0 and EL1. This means it is possible for the guest
-hypervisor to allow direct access to event counters to the L2.
-
-Rework KVM's PMU register emulation to take the effects of HPMN into
-account when handling a trap. For bitmask-style registers, writes only
-affect accessible registers.
+Checking the exception level filters for a PMC is a minor annoyance to
+open code. Add helpers to check if an event counts at EL0 and EL1, which
+will prove useful in a subsequent change.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/pmu-emul.c | 14 +++++++++++++-
- arch/arm64/kvm/sys_regs.c | 12 ++++++------
- include/kvm/arm_pmu.h     |  5 +++++
- 3 files changed, 24 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 40 +++++++++++++++++++++++++++------------
+ 1 file changed, 28 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index fd08c4b53be3..0d669fb84485 100644
+index 0d669fb84485..03cd1ad7a55a 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -283,6 +283,18 @@ bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu, unsigned int idx)
- 	return idx >= hpmn;
+@@ -111,6 +111,11 @@ static u32 counter_index_to_evtreg(u64 idx)
+ 	return (idx == ARMV8_PMU_CYCLE_IDX) ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + idx;
  }
  
-+u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu)
++static u64 kvm_pmc_read_evtreg(const struct kvm_pmc *pmc)
 +{
-+	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
-+	u64 hpmn;
-+
-+	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
-+		return mask;
-+
-+	hpmn = SYS_FIELD_GET(MDCR_EL2, HPMN, __vcpu_sys_reg(vcpu, MDCR_EL2));
-+	return mask & ~GENMASK(vcpu->kvm->arch.pmcr_n - 1, hpmn);
++	return __vcpu_sys_reg(kvm_pmc_to_vcpu(pmc), counter_index_to_evtreg(pmc->idx));
 +}
 +
- u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu)
+ static u64 kvm_pmu_get_pmc_value(struct kvm_pmc *pmc)
  {
- 	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, kvm_vcpu_read_pmcr(vcpu));
-@@ -592,7 +604,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
- 
- 	if (val & ARMV8_PMU_PMCR_P) {
--		unsigned long mask = kvm_pmu_implemented_counter_mask(vcpu);
-+		unsigned long mask = kvm_pmu_accessible_counter_mask(vcpu);
- 		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
- 		for_each_set_bit(i, &mask, 32)
- 			kvm_pmu_set_pmc_value(kvm_vcpu_idx_to_pmc(vcpu, i), 0, true);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index bd0c116f041b..8c226ec8bc25 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1131,7 +1131,7 @@ static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 va
- {
- 	bool set;
- 
--	val &= kvm_pmu_implemented_counter_mask(vcpu);
-+	val &= kvm_pmu_accessible_counter_mask(vcpu);
- 
- 	switch (r->reg) {
- 	case PMOVSSET_EL0:
-@@ -1154,7 +1154,7 @@ static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 va
- 
- static int get_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 *val)
- {
--	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
-+	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
- 
- 	*val = __vcpu_sys_reg(vcpu, r->reg) & mask;
- 	return 0;
-@@ -1168,7 +1168,7 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
- 
--	mask = kvm_pmu_implemented_counter_mask(vcpu);
-+	mask = kvm_pmu_accessible_counter_mask(vcpu);
- 	if (p->is_write) {
- 		val = p->regval & mask;
- 		if (r->Op2 & 0x1) {
-@@ -1191,7 +1191,7 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
--	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
-+	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
- 
- 	if (check_pmu_access_disabled(vcpu, 0))
- 		return false;
-@@ -1215,7 +1215,7 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			 const struct sys_reg_desc *r)
- {
--	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
-+	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
- 
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
-@@ -1245,7 +1245,7 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (pmu_write_swinc_el0_disabled(vcpu))
- 		return false;
- 
--	mask = kvm_pmu_implemented_counter_mask(vcpu);
-+	mask = kvm_pmu_accessible_counter_mask(vcpu);
- 	kvm_pmu_software_increment(vcpu, p->regval & mask);
- 	return true;
+ 	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+@@ -619,6 +624,24 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
+ 	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx));
  }
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index b175b10491f0..b738ffb39bb0 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -48,6 +48,7 @@ static __always_inline bool kvm_arm_support_pmu_v3(void)
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
- u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu);
-+u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu);
- u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1);
- void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-@@ -118,6 +119,10 @@ static inline u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu)
- {
- 	return 0;
- }
-+static inline u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu)
+ 
++static bool kvm_pmc_counts_at_el0(struct kvm_pmc *pmc)
 +{
-+	return 0;
++	u64 evtreg = kvm_pmc_read_evtreg(pmc);
++	bool nsu = evtreg & ARMV8_PMU_EXCLUDE_NS_EL0;
++	bool u = evtreg & ARMV8_PMU_EXCLUDE_EL0;
++
++	return u == nsu;
 +}
- static inline void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
++
++static bool kvm_pmc_counts_at_el1(struct kvm_pmc *pmc)
++{
++	u64 evtreg = kvm_pmc_read_evtreg(pmc);
++	bool nsk = evtreg & ARMV8_PMU_EXCLUDE_NS_EL1;
++	bool p = evtreg & ARMV8_PMU_EXCLUDE_EL1;
++
++	return p == nsk;
++}
++
+ /**
+  * kvm_pmu_create_perf_event - create a perf event for a counter
+  * @pmc: Counter context
+@@ -629,17 +652,15 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+ 	struct arm_pmu *arm_pmu = vcpu->kvm->arch.arm_pmu;
+ 	struct perf_event *event;
+ 	struct perf_event_attr attr;
+-	u64 eventsel, reg, data;
+-	bool p, u, nsk, nsu;
++	u64 eventsel, evtreg;
+ 
+-	reg = counter_index_to_evtreg(pmc->idx);
+-	data = __vcpu_sys_reg(vcpu, reg);
++	evtreg = kvm_pmc_read_evtreg(pmc);
+ 
+ 	kvm_pmu_stop_counter(pmc);
+ 	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+ 		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+ 	else
+-		eventsel = data & kvm_pmu_event_mask(vcpu->kvm);
++		eventsel = evtreg & kvm_pmu_event_mask(vcpu->kvm);
+ 
+ 	/*
+ 	 * Neither SW increment nor chained events need to be backed
+@@ -657,18 +678,13 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+ 	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
+ 		return;
+ 
+-	p = data & ARMV8_PMU_EXCLUDE_EL1;
+-	u = data & ARMV8_PMU_EXCLUDE_EL0;
+-	nsk = data & ARMV8_PMU_EXCLUDE_NS_EL1;
+-	nsu = data & ARMV8_PMU_EXCLUDE_NS_EL0;
+-
+ 	memset(&attr, 0, sizeof(struct perf_event_attr));
+ 	attr.type = arm_pmu->pmu.type;
+ 	attr.size = sizeof(attr);
+ 	attr.pinned = 1;
+ 	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
+-	attr.exclude_user = (u != nsu);
+-	attr.exclude_kernel = (p != nsk);
++	attr.exclude_user = !kvm_pmc_counts_at_el0(pmc);
++	attr.exclude_kernel = !kvm_pmc_counts_at_el1(pmc);
+ 	attr.exclude_hv = 1; /* Don't count EL2 events */
+ 	attr.exclude_host = 1; /* Don't count host events */
+ 	attr.config = eventsel;
 -- 
 2.47.0.163.g1226f6d8fa-goog
 
