@@ -1,32 +1,32 @@
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7939020C334
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 20:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A42D21443E
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 20:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729888286; cv=none; b=oXJ3LICUcmiUFvU5RvGyf5w5Vh5zVmY9P2co8meKF1WR2zE3s/UPV4xuRg6qa8gNETUHI2fpjqp4oC8AUUn1XelHU9SMgHfvqlTGDPzHuWnKIo1FCdwAhCBVUiEYu03+RPTMXEPNrgqOGggNeHF4TXPLgv2ILyZa1R9dw0zIlp4=
+	t=1729888286; cv=none; b=Ky53JbaVaHj404V9B+PDwyXKyupAwWibf9xdNP+EAnhfaHgls2xkta0E2G+GthC8B3OHxkOQV7B1BpQAZL5ig3TQo+xgYBxsrDcpau/P5eXFtvKn/rGQLr2eL1Pg51g4As6m6j8D9QYytp0D2bIi5uo4MIm+5CpdUpaEoNhAeio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729888286; c=relaxed/simple;
-	bh=cpC8ZWvfgWfRp/QtCVY6iUxlIz5IBdDYxgewEX1zkAU=;
+	bh=J1z6BJX+e2Ui0O3aCmEHW5KdDVvfgENDAtxgoh0Lk7Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sybk+JgPRkO3ikmMPMC+6fNLoLerz0Ey04x4JcYjaHKuaerbp9Lr0KDzXRgo1fVJptZth2p+740ohJo9OSn9my5wOEuEtAjdpcVIaA6eJXvGfx7bJhpcY1wjkMHOSkDf0c2KSExwT+JnfdmWOk6F+tV+PdDnAq5utw8ZddOFURk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pO6sIfT2; arc=none smtp.client-ip=91.218.175.176
+	 MIME-Version; b=ZIt2d3d3ly+5CIlDCLIAwQnj2k4dXw7a2XJyNOzc8u5wQsN1ATLf7NT95d3ju4vwiQVo3XfLAiceoioI5lIgHTWCI3PsMCflMp8xivBX/JjbIqobrabYSEWMyJIkCdbWXD9G5kBlY+ojeUhvro4T8Toz5kgBOO1zRs6fC7Zr1d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OHfOsaT9; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pO6sIfT2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OHfOsaT9"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729888280;
+	t=1729888282;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=d2vYAljDsfnlx+RUoXiV1SJX/a3mzGRqW2CI9laQ2i4=;
-	b=pO6sIfT2+VKDt9EwzWnX4W0KL51Z2O878Zgn0Q75RnsA6WNm3MDEIAvdN//lyeXtD8opah
-	R81+ROesnX2M0S1WvjreLTSUy36GodeDq4ofNPvsyuG19t4/ztG1NzF37+B7haOTomTx0J
-	Afuj+sjWFvrFLFmlW71WthOFavUIONs=
+	bh=iuadspXVMOh3Pam3DlhhqVgk1VOTyFtbXJwKvw8+pWY=;
+	b=OHfOsaT9nMN3OtfAUJTHF+WyEu+GGLbfHvvWbnhTUb8ICp2MQbSmrmDw7pAPsS5mntCg6D
+	q7YXSk7fSFUORj5gW89hXoPSnkN+XPueDB4B8OJjhIQ2f0iQAeIQfT70TsdhsR5tezC5TH
+	o0k70wHQ0/dBsMRiJFiRf3fD9er5cb4=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 2/4] tools: arm64: Grab a copy of esr.h from kernel
-Date: Fri, 25 Oct 2024 20:31:04 +0000
-Message-ID: <20241025203106.3529261-3-oliver.upton@linux.dev>
+Subject: [PATCH v2 3/4] KVM: arm64: selftests: Convert to kernel's ESR terminology
+Date: Fri, 25 Oct 2024 20:31:05 +0000
+Message-ID: <20241025203106.3529261-4-oliver.upton@linux.dev>
 In-Reply-To: <20241025203106.3529261-1-oliver.upton@linux.dev>
 References: <20241025203106.3529261-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,525 +48,174 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Grab esr.h and brk-imm.h for subsequent use in KVM selftests.
+Drop the KVM selftests specific flavoring of ESR in favor of the kernel
+header.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/arch/arm64/include/asm/brk-imm.h |  42 +++
- tools/arch/arm64/include/asm/esr.h     | 455 +++++++++++++++++++++++++
- 2 files changed, 497 insertions(+)
- create mode 100644 tools/arch/arm64/include/asm/brk-imm.h
- create mode 100644 tools/arch/arm64/include/asm/esr.h
+ .../selftests/kvm/aarch64/debug-exceptions.c      | 10 +++++-----
+ tools/testing/selftests/kvm/aarch64/no-vgic-v3.c  |  2 +-
+ .../selftests/kvm/aarch64/page_fault_test.c       |  4 ++--
+ .../selftests/kvm/aarch64/vpmu_counter_access.c   | 12 ++++++------
+ .../selftests/kvm/include/aarch64/processor.h     | 15 ++-------------
+ .../testing/selftests/kvm/lib/aarch64/processor.c |  6 +++---
+ 6 files changed, 19 insertions(+), 30 deletions(-)
 
-diff --git a/tools/arch/arm64/include/asm/brk-imm.h b/tools/arch/arm64/include/asm/brk-imm.h
-new file mode 100644
-index 000000000000..beb42c62b6ac
---- /dev/null
-+++ b/tools/arch/arm64/include/asm/brk-imm.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ */
-+
-+#ifndef __ASM_BRK_IMM_H
-+#define __ASM_BRK_IMM_H
-+
-+/*
-+ * #imm16 values used for BRK instruction generation
-+ * 0x004: for installing kprobes
-+ * 0x005: for installing uprobes
-+ * 0x006: for kprobe software single-step
-+ * 0x007: for kretprobe return
-+ * Allowed values for kgdb are 0x400 - 0x7ff
-+ * 0x100: for triggering a fault on purpose (reserved)
-+ * 0x400: for dynamic BRK instruction
-+ * 0x401: for compile time BRK instruction
-+ * 0x800: kernel-mode BUG() and WARN() traps
-+ * 0x9xx: tag-based KASAN trap (allowed values 0x900 - 0x9ff)
-+ * 0x55xx: Undefined Behavior Sanitizer traps ('U' << 8)
-+ * 0x8xxx: Control-Flow Integrity traps
-+ */
-+#define KPROBES_BRK_IMM			0x004
-+#define UPROBES_BRK_IMM			0x005
-+#define KPROBES_BRK_SS_IMM		0x006
-+#define KRETPROBES_BRK_IMM		0x007
-+#define FAULT_BRK_IMM			0x100
-+#define KGDB_DYN_DBG_BRK_IMM		0x400
-+#define KGDB_COMPILED_DBG_BRK_IMM	0x401
-+#define BUG_BRK_IMM			0x800
-+#define KASAN_BRK_IMM			0x900
-+#define KASAN_BRK_MASK			0x0ff
-+#define UBSAN_BRK_IMM			0x5500
-+#define UBSAN_BRK_MASK			0x00ff
-+
-+#define CFI_BRK_IMM_TARGET		GENMASK(4, 0)
-+#define CFI_BRK_IMM_TYPE		GENMASK(9, 5)
-+#define CFI_BRK_IMM_BASE		0x8000
-+#define CFI_BRK_IMM_MASK		(CFI_BRK_IMM_TARGET | CFI_BRK_IMM_TYPE)
-+
-+#endif
-diff --git a/tools/arch/arm64/include/asm/esr.h b/tools/arch/arm64/include/asm/esr.h
-new file mode 100644
-index 000000000000..bd592ca81571
---- /dev/null
-+++ b/tools/arch/arm64/include/asm/esr.h
-@@ -0,0 +1,455 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2013 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ */
-+
-+#ifndef __ASM_ESR_H
-+#define __ASM_ESR_H
-+
-+#include <asm/sysreg.h>
-+
-+#define ESR_ELx_EC_UNKNOWN	UL(0x00)
-+#define ESR_ELx_EC_WFx		UL(0x01)
-+/* Unallocated EC: 0x02 */
-+#define ESR_ELx_EC_CP15_32	UL(0x03)
-+#define ESR_ELx_EC_CP15_64	UL(0x04)
-+#define ESR_ELx_EC_CP14_MR	UL(0x05)
-+#define ESR_ELx_EC_CP14_LS	UL(0x06)
-+#define ESR_ELx_EC_FP_ASIMD	UL(0x07)
-+#define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
-+#define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
-+/* Unallocated EC: 0x0A - 0x0B */
-+#define ESR_ELx_EC_CP14_64	UL(0x0C)
-+#define ESR_ELx_EC_BTI		UL(0x0D)
-+#define ESR_ELx_EC_ILL		UL(0x0E)
-+/* Unallocated EC: 0x0F - 0x10 */
-+#define ESR_ELx_EC_SVC32	UL(0x11)
-+#define ESR_ELx_EC_HVC32	UL(0x12)	/* EL2 only */
-+#define ESR_ELx_EC_SMC32	UL(0x13)	/* EL2 and above */
-+/* Unallocated EC: 0x14 */
-+#define ESR_ELx_EC_SVC64	UL(0x15)
-+#define ESR_ELx_EC_HVC64	UL(0x16)	/* EL2 and above */
-+#define ESR_ELx_EC_SMC64	UL(0x17)	/* EL2 and above */
-+#define ESR_ELx_EC_SYS64	UL(0x18)
-+#define ESR_ELx_EC_SVE		UL(0x19)
-+#define ESR_ELx_EC_ERET		UL(0x1a)	/* EL2 only */
-+/* Unallocated EC: 0x1B */
-+#define ESR_ELx_EC_FPAC		UL(0x1C)	/* EL1 and above */
-+#define ESR_ELx_EC_SME		UL(0x1D)
-+/* Unallocated EC: 0x1E */
-+#define ESR_ELx_EC_IMP_DEF	UL(0x1f)	/* EL3 only */
-+#define ESR_ELx_EC_IABT_LOW	UL(0x20)
-+#define ESR_ELx_EC_IABT_CUR	UL(0x21)
-+#define ESR_ELx_EC_PC_ALIGN	UL(0x22)
-+/* Unallocated EC: 0x23 */
-+#define ESR_ELx_EC_DABT_LOW	UL(0x24)
-+#define ESR_ELx_EC_DABT_CUR	UL(0x25)
-+#define ESR_ELx_EC_SP_ALIGN	UL(0x26)
-+#define ESR_ELx_EC_MOPS		UL(0x27)
-+#define ESR_ELx_EC_FP_EXC32	UL(0x28)
-+/* Unallocated EC: 0x29 - 0x2B */
-+#define ESR_ELx_EC_FP_EXC64	UL(0x2C)
-+/* Unallocated EC: 0x2D - 0x2E */
-+#define ESR_ELx_EC_SERROR	UL(0x2F)
-+#define ESR_ELx_EC_BREAKPT_LOW	UL(0x30)
-+#define ESR_ELx_EC_BREAKPT_CUR	UL(0x31)
-+#define ESR_ELx_EC_SOFTSTP_LOW	UL(0x32)
-+#define ESR_ELx_EC_SOFTSTP_CUR	UL(0x33)
-+#define ESR_ELx_EC_WATCHPT_LOW	UL(0x34)
-+#define ESR_ELx_EC_WATCHPT_CUR	UL(0x35)
-+/* Unallocated EC: 0x36 - 0x37 */
-+#define ESR_ELx_EC_BKPT32	UL(0x38)
-+/* Unallocated EC: 0x39 */
-+#define ESR_ELx_EC_VECTOR32	UL(0x3A)	/* EL2 only */
-+/* Unallocated EC: 0x3B */
-+#define ESR_ELx_EC_BRK64	UL(0x3C)
-+/* Unallocated EC: 0x3D - 0x3F */
-+#define ESR_ELx_EC_MAX		UL(0x3F)
-+
-+#define ESR_ELx_EC_SHIFT	(26)
-+#define ESR_ELx_EC_WIDTH	(6)
-+#define ESR_ELx_EC_MASK		(UL(0x3F) << ESR_ELx_EC_SHIFT)
-+#define ESR_ELx_EC(esr)		(((esr) & ESR_ELx_EC_MASK) >> ESR_ELx_EC_SHIFT)
-+
-+#define ESR_ELx_IL_SHIFT	(25)
-+#define ESR_ELx_IL		(UL(1) << ESR_ELx_IL_SHIFT)
-+#define ESR_ELx_ISS_MASK	(GENMASK(24, 0))
-+#define ESR_ELx_ISS(esr)	((esr) & ESR_ELx_ISS_MASK)
-+#define ESR_ELx_ISS2_SHIFT	(32)
-+#define ESR_ELx_ISS2_MASK	(GENMASK_ULL(55, 32))
-+#define ESR_ELx_ISS2(esr)	(((esr) & ESR_ELx_ISS2_MASK) >> ESR_ELx_ISS2_SHIFT)
-+
-+/* ISS field definitions shared by different classes */
-+#define ESR_ELx_WNR_SHIFT	(6)
-+#define ESR_ELx_WNR		(UL(1) << ESR_ELx_WNR_SHIFT)
-+
-+/* Asynchronous Error Type */
-+#define ESR_ELx_IDS_SHIFT	(24)
-+#define ESR_ELx_IDS		(UL(1) << ESR_ELx_IDS_SHIFT)
-+#define ESR_ELx_AET_SHIFT	(10)
-+#define ESR_ELx_AET		(UL(0x7) << ESR_ELx_AET_SHIFT)
-+
-+#define ESR_ELx_AET_UC		(UL(0) << ESR_ELx_AET_SHIFT)
-+#define ESR_ELx_AET_UEU		(UL(1) << ESR_ELx_AET_SHIFT)
-+#define ESR_ELx_AET_UEO		(UL(2) << ESR_ELx_AET_SHIFT)
-+#define ESR_ELx_AET_UER		(UL(3) << ESR_ELx_AET_SHIFT)
-+#define ESR_ELx_AET_CE		(UL(6) << ESR_ELx_AET_SHIFT)
-+
-+/* Shared ISS field definitions for Data/Instruction aborts */
-+#define ESR_ELx_SET_SHIFT	(11)
-+#define ESR_ELx_SET_MASK	(UL(3) << ESR_ELx_SET_SHIFT)
-+#define ESR_ELx_FnV_SHIFT	(10)
-+#define ESR_ELx_FnV		(UL(1) << ESR_ELx_FnV_SHIFT)
-+#define ESR_ELx_EA_SHIFT	(9)
-+#define ESR_ELx_EA		(UL(1) << ESR_ELx_EA_SHIFT)
-+#define ESR_ELx_S1PTW_SHIFT	(7)
-+#define ESR_ELx_S1PTW		(UL(1) << ESR_ELx_S1PTW_SHIFT)
-+
-+/* Shared ISS fault status code(IFSC/DFSC) for Data/Instruction aborts */
-+#define ESR_ELx_FSC		(0x3F)
-+#define ESR_ELx_FSC_TYPE	(0x3C)
-+#define ESR_ELx_FSC_LEVEL	(0x03)
-+#define ESR_ELx_FSC_EXTABT	(0x10)
-+#define ESR_ELx_FSC_MTE		(0x11)
-+#define ESR_ELx_FSC_SERROR	(0x11)
-+#define ESR_ELx_FSC_ACCESS	(0x08)
-+#define ESR_ELx_FSC_FAULT	(0x04)
-+#define ESR_ELx_FSC_PERM	(0x0C)
-+#define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
-+#define ESR_ELx_FSC_SECC	(0x18)
-+#define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
-+
-+/* Status codes for individual page table levels */
-+#define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
-+#define ESR_ELx_FSC_PERM_L(n)	(ESR_ELx_FSC_PERM + (n))
-+
-+#define ESR_ELx_FSC_FAULT_nL	(0x2C)
-+#define ESR_ELx_FSC_FAULT_L(n)	(((n) < 0 ? ESR_ELx_FSC_FAULT_nL : \
-+					    ESR_ELx_FSC_FAULT) + (n))
-+
-+/* ISS field definitions for Data Aborts */
-+#define ESR_ELx_ISV_SHIFT	(24)
-+#define ESR_ELx_ISV		(UL(1) << ESR_ELx_ISV_SHIFT)
-+#define ESR_ELx_SAS_SHIFT	(22)
-+#define ESR_ELx_SAS		(UL(3) << ESR_ELx_SAS_SHIFT)
-+#define ESR_ELx_SSE_SHIFT	(21)
-+#define ESR_ELx_SSE		(UL(1) << ESR_ELx_SSE_SHIFT)
-+#define ESR_ELx_SRT_SHIFT	(16)
-+#define ESR_ELx_SRT_MASK	(UL(0x1F) << ESR_ELx_SRT_SHIFT)
-+#define ESR_ELx_SF_SHIFT	(15)
-+#define ESR_ELx_SF 		(UL(1) << ESR_ELx_SF_SHIFT)
-+#define ESR_ELx_AR_SHIFT	(14)
-+#define ESR_ELx_AR 		(UL(1) << ESR_ELx_AR_SHIFT)
-+#define ESR_ELx_CM_SHIFT	(8)
-+#define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
-+
-+/* ISS2 field definitions for Data Aborts */
-+#define ESR_ELx_TnD_SHIFT	(10)
-+#define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
-+#define ESR_ELx_TagAccess_SHIFT	(9)
-+#define ESR_ELx_TagAccess	(UL(1) << ESR_ELx_TagAccess_SHIFT)
-+#define ESR_ELx_GCS_SHIFT	(8)
-+#define ESR_ELx_GCS 		(UL(1) << ESR_ELx_GCS_SHIFT)
-+#define ESR_ELx_Overlay_SHIFT	(6)
-+#define ESR_ELx_Overlay		(UL(1) << ESR_ELx_Overlay_SHIFT)
-+#define ESR_ELx_DirtyBit_SHIFT	(5)
-+#define ESR_ELx_DirtyBit	(UL(1) << ESR_ELx_DirtyBit_SHIFT)
-+#define ESR_ELx_Xs_SHIFT	(0)
-+#define ESR_ELx_Xs_MASK		(GENMASK_ULL(4, 0))
-+
-+/* ISS field definitions for exceptions taken in to Hyp */
-+#define ESR_ELx_FSC_ADDRSZ	(0x00)
-+#define ESR_ELx_FSC_ADDRSZ_L(n)	(ESR_ELx_FSC_ADDRSZ + (n))
-+#define ESR_ELx_CV		(UL(1) << 24)
-+#define ESR_ELx_COND_SHIFT	(20)
-+#define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
-+#define ESR_ELx_WFx_ISS_RN	(UL(0x1F) << 5)
-+#define ESR_ELx_WFx_ISS_RV	(UL(1) << 2)
-+#define ESR_ELx_WFx_ISS_TI	(UL(3) << 0)
-+#define ESR_ELx_WFx_ISS_WFxT	(UL(2) << 0)
-+#define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
-+#define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
-+#define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
-+
-+#define DISR_EL1_IDS		(UL(1) << 24)
-+/*
-+ * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
-+ * different things in the future...
-+ */
-+#define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
-+
-+/* ESR value templates for specific events */
-+#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK |			\
-+				 (ESR_ELx_WFx_ISS_TI & ~ESR_ELx_WFx_ISS_WFxT))
-+#define ESR_ELx_WFx_WFI_VAL	((ESR_ELx_EC_WFx << ESR_ELx_EC_SHIFT) |	\
-+				 ESR_ELx_WFx_ISS_WFI)
-+
-+/* BRK instruction trap from AArch64 state */
-+#define ESR_ELx_BRK64_ISS_COMMENT_MASK	0xffff
-+
-+/* ISS field definitions for System instruction traps */
-+#define ESR_ELx_SYS64_ISS_RES0_SHIFT	22
-+#define ESR_ELx_SYS64_ISS_RES0_MASK	(UL(0x7) << ESR_ELx_SYS64_ISS_RES0_SHIFT)
-+#define ESR_ELx_SYS64_ISS_DIR_MASK	0x1
-+#define ESR_ELx_SYS64_ISS_DIR_READ	0x1
-+#define ESR_ELx_SYS64_ISS_DIR_WRITE	0x0
-+
-+#define ESR_ELx_SYS64_ISS_RT_SHIFT	5
-+#define ESR_ELx_SYS64_ISS_RT_MASK	(UL(0x1f) << ESR_ELx_SYS64_ISS_RT_SHIFT)
-+#define ESR_ELx_SYS64_ISS_CRM_SHIFT	1
-+#define ESR_ELx_SYS64_ISS_CRM_MASK	(UL(0xf) << ESR_ELx_SYS64_ISS_CRM_SHIFT)
-+#define ESR_ELx_SYS64_ISS_CRN_SHIFT	10
-+#define ESR_ELx_SYS64_ISS_CRN_MASK	(UL(0xf) << ESR_ELx_SYS64_ISS_CRN_SHIFT)
-+#define ESR_ELx_SYS64_ISS_OP1_SHIFT	14
-+#define ESR_ELx_SYS64_ISS_OP1_MASK	(UL(0x7) << ESR_ELx_SYS64_ISS_OP1_SHIFT)
-+#define ESR_ELx_SYS64_ISS_OP2_SHIFT	17
-+#define ESR_ELx_SYS64_ISS_OP2_MASK	(UL(0x7) << ESR_ELx_SYS64_ISS_OP2_SHIFT)
-+#define ESR_ELx_SYS64_ISS_OP0_SHIFT	20
-+#define ESR_ELx_SYS64_ISS_OP0_MASK	(UL(0x3) << ESR_ELx_SYS64_ISS_OP0_SHIFT)
-+#define ESR_ELx_SYS64_ISS_SYS_MASK	(ESR_ELx_SYS64_ISS_OP0_MASK | \
-+					 ESR_ELx_SYS64_ISS_OP1_MASK | \
-+					 ESR_ELx_SYS64_ISS_OP2_MASK | \
-+					 ESR_ELx_SYS64_ISS_CRN_MASK | \
-+					 ESR_ELx_SYS64_ISS_CRM_MASK)
-+#define ESR_ELx_SYS64_ISS_SYS_VAL(op0, op1, op2, crn, crm) \
-+					(((op0) << ESR_ELx_SYS64_ISS_OP0_SHIFT) | \
-+					 ((op1) << ESR_ELx_SYS64_ISS_OP1_SHIFT) | \
-+					 ((op2) << ESR_ELx_SYS64_ISS_OP2_SHIFT) | \
-+					 ((crn) << ESR_ELx_SYS64_ISS_CRN_SHIFT) | \
-+					 ((crm) << ESR_ELx_SYS64_ISS_CRM_SHIFT))
-+
-+#define ESR_ELx_SYS64_ISS_SYS_OP_MASK	(ESR_ELx_SYS64_ISS_SYS_MASK | \
-+					 ESR_ELx_SYS64_ISS_DIR_MASK)
-+#define ESR_ELx_SYS64_ISS_RT(esr) \
-+	(((esr) & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT)
-+/*
-+ * User space cache operations have the following sysreg encoding
-+ * in System instructions.
-+ * op0=1, op1=3, op2=1, crn=7, crm={ 5, 10, 11, 12, 13, 14 }, WRITE (L=0)
-+ */
-+#define ESR_ELx_SYS64_ISS_CRM_DC_CIVAC	14
-+#define ESR_ELx_SYS64_ISS_CRM_DC_CVADP	13
-+#define ESR_ELx_SYS64_ISS_CRM_DC_CVAP	12
-+#define ESR_ELx_SYS64_ISS_CRM_DC_CVAU	11
-+#define ESR_ELx_SYS64_ISS_CRM_DC_CVAC	10
-+#define ESR_ELx_SYS64_ISS_CRM_IC_IVAU	5
-+
-+#define ESR_ELx_SYS64_ISS_EL0_CACHE_OP_MASK	(ESR_ELx_SYS64_ISS_OP0_MASK | \
-+						 ESR_ELx_SYS64_ISS_OP1_MASK | \
-+						 ESR_ELx_SYS64_ISS_OP2_MASK | \
-+						 ESR_ELx_SYS64_ISS_CRN_MASK | \
-+						 ESR_ELx_SYS64_ISS_DIR_MASK)
-+#define ESR_ELx_SYS64_ISS_EL0_CACHE_OP_VAL \
-+				(ESR_ELx_SYS64_ISS_SYS_VAL(1, 3, 1, 7, 0) | \
-+				 ESR_ELx_SYS64_ISS_DIR_WRITE)
-+/*
-+ * User space MRS operations which are supported for emulation
-+ * have the following sysreg encoding in System instructions.
-+ * op0 = 3, op1= 0, crn = 0, {crm = 0, 4-7}, READ (L = 1)
-+ */
-+#define ESR_ELx_SYS64_ISS_SYS_MRS_OP_MASK	(ESR_ELx_SYS64_ISS_OP0_MASK | \
-+						 ESR_ELx_SYS64_ISS_OP1_MASK | \
-+						 ESR_ELx_SYS64_ISS_CRN_MASK | \
-+						 ESR_ELx_SYS64_ISS_DIR_MASK)
-+#define ESR_ELx_SYS64_ISS_SYS_MRS_OP_VAL \
-+				(ESR_ELx_SYS64_ISS_SYS_VAL(3, 0, 0, 0, 0) | \
-+				 ESR_ELx_SYS64_ISS_DIR_READ)
-+
-+#define ESR_ELx_SYS64_ISS_SYS_CTR	ESR_ELx_SYS64_ISS_SYS_VAL(3, 3, 1, 0, 0)
-+#define ESR_ELx_SYS64_ISS_SYS_CTR_READ	(ESR_ELx_SYS64_ISS_SYS_CTR | \
-+					 ESR_ELx_SYS64_ISS_DIR_READ)
-+
-+#define ESR_ELx_SYS64_ISS_SYS_CNTVCT	(ESR_ELx_SYS64_ISS_SYS_VAL(3, 3, 2, 14, 0) | \
-+					 ESR_ELx_SYS64_ISS_DIR_READ)
-+
-+#define ESR_ELx_SYS64_ISS_SYS_CNTVCTSS	(ESR_ELx_SYS64_ISS_SYS_VAL(3, 3, 6, 14, 0) | \
-+					 ESR_ELx_SYS64_ISS_DIR_READ)
-+
-+#define ESR_ELx_SYS64_ISS_SYS_CNTFRQ	(ESR_ELx_SYS64_ISS_SYS_VAL(3, 3, 0, 14, 0) | \
-+					 ESR_ELx_SYS64_ISS_DIR_READ)
-+
-+#define esr_sys64_to_sysreg(e)					\
-+	sys_reg((((e) & ESR_ELx_SYS64_ISS_OP0_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_OP0_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_OP1_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_OP1_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_CRN_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_CRN_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_CRM_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_CRM_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
-+
-+#define esr_cp15_to_sysreg(e)					\
-+	sys_reg(3,						\
-+		(((e) & ESR_ELx_SYS64_ISS_OP1_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_OP1_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_CRN_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_CRN_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_CRM_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_CRM_SHIFT),			\
-+		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
-+		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
-+
-+/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-+#define ESR_ELx_ERET_ISS_ERET		0x2
-+#define ESR_ELx_ERET_ISS_ERETA		0x1
-+
-+/*
-+ * ISS field definitions for floating-point exception traps
-+ * (FP_EXC_32/FP_EXC_64).
-+ *
-+ * (The FPEXC_* constants are used instead for common bits.)
-+ */
-+
-+#define ESR_ELx_FP_EXC_TFV	(UL(1) << 23)
-+
-+/*
-+ * ISS field definitions for CP15 accesses
-+ */
-+#define ESR_ELx_CP15_32_ISS_DIR_MASK	0x1
-+#define ESR_ELx_CP15_32_ISS_DIR_READ	0x1
-+#define ESR_ELx_CP15_32_ISS_DIR_WRITE	0x0
-+
-+#define ESR_ELx_CP15_32_ISS_RT_SHIFT	5
-+#define ESR_ELx_CP15_32_ISS_RT_MASK	(UL(0x1f) << ESR_ELx_CP15_32_ISS_RT_SHIFT)
-+#define ESR_ELx_CP15_32_ISS_CRM_SHIFT	1
-+#define ESR_ELx_CP15_32_ISS_CRM_MASK	(UL(0xf) << ESR_ELx_CP15_32_ISS_CRM_SHIFT)
-+#define ESR_ELx_CP15_32_ISS_CRN_SHIFT	10
-+#define ESR_ELx_CP15_32_ISS_CRN_MASK	(UL(0xf) << ESR_ELx_CP15_32_ISS_CRN_SHIFT)
-+#define ESR_ELx_CP15_32_ISS_OP1_SHIFT	14
-+#define ESR_ELx_CP15_32_ISS_OP1_MASK	(UL(0x7) << ESR_ELx_CP15_32_ISS_OP1_SHIFT)
-+#define ESR_ELx_CP15_32_ISS_OP2_SHIFT	17
-+#define ESR_ELx_CP15_32_ISS_OP2_MASK	(UL(0x7) << ESR_ELx_CP15_32_ISS_OP2_SHIFT)
-+
-+#define ESR_ELx_CP15_32_ISS_SYS_MASK	(ESR_ELx_CP15_32_ISS_OP1_MASK | \
-+					 ESR_ELx_CP15_32_ISS_OP2_MASK | \
-+					 ESR_ELx_CP15_32_ISS_CRN_MASK | \
-+					 ESR_ELx_CP15_32_ISS_CRM_MASK | \
-+					 ESR_ELx_CP15_32_ISS_DIR_MASK)
-+#define ESR_ELx_CP15_32_ISS_SYS_VAL(op1, op2, crn, crm) \
-+					(((op1) << ESR_ELx_CP15_32_ISS_OP1_SHIFT) | \
-+					 ((op2) << ESR_ELx_CP15_32_ISS_OP2_SHIFT) | \
-+					 ((crn) << ESR_ELx_CP15_32_ISS_CRN_SHIFT) | \
-+					 ((crm) << ESR_ELx_CP15_32_ISS_CRM_SHIFT))
-+
-+#define ESR_ELx_CP15_64_ISS_DIR_MASK	0x1
-+#define ESR_ELx_CP15_64_ISS_DIR_READ	0x1
-+#define ESR_ELx_CP15_64_ISS_DIR_WRITE	0x0
-+
-+#define ESR_ELx_CP15_64_ISS_RT_SHIFT	5
-+#define ESR_ELx_CP15_64_ISS_RT_MASK	(UL(0x1f) << ESR_ELx_CP15_64_ISS_RT_SHIFT)
-+
-+#define ESR_ELx_CP15_64_ISS_RT2_SHIFT	10
-+#define ESR_ELx_CP15_64_ISS_RT2_MASK	(UL(0x1f) << ESR_ELx_CP15_64_ISS_RT2_SHIFT)
-+
-+#define ESR_ELx_CP15_64_ISS_OP1_SHIFT	16
-+#define ESR_ELx_CP15_64_ISS_OP1_MASK	(UL(0xf) << ESR_ELx_CP15_64_ISS_OP1_SHIFT)
-+#define ESR_ELx_CP15_64_ISS_CRM_SHIFT	1
-+#define ESR_ELx_CP15_64_ISS_CRM_MASK	(UL(0xf) << ESR_ELx_CP15_64_ISS_CRM_SHIFT)
-+
-+#define ESR_ELx_CP15_64_ISS_SYS_VAL(op1, crm) \
-+					(((op1) << ESR_ELx_CP15_64_ISS_OP1_SHIFT) | \
-+					 ((crm) << ESR_ELx_CP15_64_ISS_CRM_SHIFT))
-+
-+#define ESR_ELx_CP15_64_ISS_SYS_MASK	(ESR_ELx_CP15_64_ISS_OP1_MASK |	\
-+					 ESR_ELx_CP15_64_ISS_CRM_MASK | \
-+					 ESR_ELx_CP15_64_ISS_DIR_MASK)
-+
-+#define ESR_ELx_CP15_64_ISS_SYS_CNTVCT	(ESR_ELx_CP15_64_ISS_SYS_VAL(1, 14) | \
-+					 ESR_ELx_CP15_64_ISS_DIR_READ)
-+
-+#define ESR_ELx_CP15_64_ISS_SYS_CNTVCTSS (ESR_ELx_CP15_64_ISS_SYS_VAL(9, 14) | \
-+					 ESR_ELx_CP15_64_ISS_DIR_READ)
-+
-+#define ESR_ELx_CP15_32_ISS_SYS_CNTFRQ	(ESR_ELx_CP15_32_ISS_SYS_VAL(0, 0, 14, 0) |\
-+					 ESR_ELx_CP15_32_ISS_DIR_READ)
-+
-+/*
-+ * ISS values for SME traps
-+ */
-+
-+#define ESR_ELx_SME_ISS_SME_DISABLED	0
-+#define ESR_ELx_SME_ISS_ILL		1
-+#define ESR_ELx_SME_ISS_SM_DISABLED	2
-+#define ESR_ELx_SME_ISS_ZA_DISABLED	3
-+#define ESR_ELx_SME_ISS_ZT_DISABLED	4
-+
-+/* ISS field definitions for MOPS exceptions */
-+#define ESR_ELx_MOPS_ISS_MEM_INST	(UL(1) << 24)
-+#define ESR_ELx_MOPS_ISS_FROM_EPILOGUE	(UL(1) << 18)
-+#define ESR_ELx_MOPS_ISS_WRONG_OPTION	(UL(1) << 17)
-+#define ESR_ELx_MOPS_ISS_OPTION_A	(UL(1) << 16)
-+#define ESR_ELx_MOPS_ISS_DESTREG(esr)	(((esr) & (UL(0x1f) << 10)) >> 10)
-+#define ESR_ELx_MOPS_ISS_SRCREG(esr)	(((esr) & (UL(0x1f) << 5)) >> 5)
-+#define ESR_ELx_MOPS_ISS_SIZEREG(esr)	(((esr) & (UL(0x1f) << 0)) >> 0)
-+
-+#ifndef __ASSEMBLY__
-+#include <asm/types.h>
-+
-+static inline unsigned long esr_brk_comment(unsigned long esr)
-+{
-+	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
-+}
-+
-+static inline bool esr_is_data_abort(unsigned long esr)
-+{
-+	const unsigned long ec = ESR_ELx_EC(esr);
-+
-+	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
-+}
-+
-+static inline bool esr_is_cfi_brk(unsigned long esr)
-+{
-+	return ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
-+	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
-+}
-+
-+static inline bool esr_fsc_is_translation_fault(unsigned long esr)
-+{
-+	esr = esr & ESR_ELx_FSC;
-+
-+	return (esr == ESR_ELx_FSC_FAULT_L(3)) ||
-+	       (esr == ESR_ELx_FSC_FAULT_L(2)) ||
-+	       (esr == ESR_ELx_FSC_FAULT_L(1)) ||
-+	       (esr == ESR_ELx_FSC_FAULT_L(0)) ||
-+	       (esr == ESR_ELx_FSC_FAULT_L(-1));
-+}
-+
-+static inline bool esr_fsc_is_permission_fault(unsigned long esr)
-+{
-+	esr = esr & ESR_ELx_FSC;
-+
-+	return (esr == ESR_ELx_FSC_PERM_L(3)) ||
-+	       (esr == ESR_ELx_FSC_PERM_L(2)) ||
-+	       (esr == ESR_ELx_FSC_PERM_L(1)) ||
-+	       (esr == ESR_ELx_FSC_PERM_L(0));
-+}
-+
-+static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
-+{
-+	esr = esr & ESR_ELx_FSC;
-+
-+	return (esr == ESR_ELx_FSC_ACCESS_L(3)) ||
-+	       (esr == ESR_ELx_FSC_ACCESS_L(2)) ||
-+	       (esr == ESR_ELx_FSC_ACCESS_L(1)) ||
-+	       (esr == ESR_ELx_FSC_ACCESS_L(0));
-+}
-+
-+/* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
-+static inline bool esr_iss_is_eretax(unsigned long esr)
-+{
-+	return esr & ESR_ELx_ERET_ISS_ERET;
-+}
-+
-+/* Indicate which key is used for ERETAx (false: A-Key, true: B-Key) */
-+static inline bool esr_iss_is_eretab(unsigned long esr)
-+{
-+	return esr & ESR_ELx_ERET_ISS_ERETA;
-+}
-+
-+const char *esr_get_class_string(unsigned long esr);
-+#endif /* __ASSEMBLY */
-+
-+#endif /* __ASM_ESR_H */
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index 2582c49e525a..ff7a949fc96a 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -433,15 +433,15 @@ static void test_guest_debug_exceptions(uint8_t bpn, uint8_t wpn, uint8_t ctx_bp
+ 	vcpu_init_descriptor_tables(vcpu);
+ 
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_BRK_INS, guest_sw_bp_handler);
++				ESR_ELx_EC_BRK64, guest_sw_bp_handler);
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
++				ESR_ELx_EC_BREAKPT_CUR, guest_hw_bp_handler);
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_WP_CURRENT, guest_wp_handler);
++				ESR_ELx_EC_WATCHPT_CUR, guest_wp_handler);
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_SSTEP_CURRENT, guest_ss_handler);
++				ESR_ELx_EC_SOFTSTP_CUR, guest_ss_handler);
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_SVC64, guest_svc_handler);
++				ESR_ELx_EC_SVC64, guest_svc_handler);
+ 
+ 	/* Specify bpn/wpn/ctx_bpn to be tested */
+ 	vcpu_args_set(vcpu, 3, bpn, wpn, ctx_bpn);
+diff --git a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
+index 943d65fc6b0b..58304bbc2036 100644
+--- a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
++++ b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
+@@ -150,7 +150,7 @@ static void test_guest_no_gicv3(void)
+ 	vcpu_init_descriptor_tables(vcpu);
+ 
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_UNKNOWN, guest_undef_handler);
++				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
+ 
+ 	test_run_vcpu(vcpu);
+ 
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+index d29b08198b42..ec33a8f9c908 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -544,9 +544,9 @@ static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+ 	vcpu_init_descriptor_tables(vcpu);
+ 
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_DABT, no_dabt_handler);
++				ESR_ELx_EC_DABT_CUR, no_dabt_handler);
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+-				ESR_EC_IABT, no_iabt_handler);
++				ESR_ELx_EC_IABT_CUR, no_iabt_handler);
+ }
+ 
+ static void setup_gva_maps(struct kvm_vm *vm)
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+index d31b9f64ba14..f9c0c86d7e85 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+@@ -300,7 +300,7 @@ static void guest_sync_handler(struct ex_regs *regs)
+ 	uint64_t esr, ec;
+ 
+ 	esr = read_sysreg(esr_el1);
+-	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
++	ec = ESR_ELx_EC(esr);
+ 
+ 	__GUEST_ASSERT(expected_ec == ec,
+ 			"PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx; EC expected: 0x%lx",
+@@ -338,10 +338,10 @@ static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+ 	 * Reading/writing the event count/type registers should cause
+ 	 * an UNDEFINED exception.
+ 	 */
+-	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx));
+-	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
+-	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx));
+-	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
++	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
++	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
++	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
++	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
+ 	/*
+ 	 * The bit corresponding to the (unimplemented) counter in
+ 	 * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers should be RAZ.
+@@ -425,7 +425,7 @@ static void create_vpmu_vm(void *guest_code)
+ 
+ 	vpmu_vm.vm = vm_create(1);
+ 	vm_init_descriptor_tables(vpmu_vm.vm);
+-	for (ec = 0; ec < ESR_EC_NUM; ec++) {
++	for (ec = 0; ec < ESR_ELx_EC_MAX + 1; ec++) {
+ 		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
+ 					guest_sync_handler);
+ 	}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index de977d131082..1e8d0d531fbd 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -12,6 +12,8 @@
+ 
+ #include <linux/stringify.h>
+ #include <linux/types.h>
++#include <asm/brk-imm.h>
++#include <asm/esr.h>
+ #include <asm/sysreg.h>
+ 
+ 
+@@ -100,19 +102,6 @@ enum {
+ 			   (v) == VECTOR_SYNC_LOWER_64    || \
+ 			   (v) == VECTOR_SYNC_LOWER_32)
+ 
+-#define ESR_EC_NUM		64
+-#define ESR_EC_SHIFT		26
+-#define ESR_EC_MASK		(ESR_EC_NUM - 1)
+-
+-#define ESR_EC_UNKNOWN		0x0
+-#define ESR_EC_SVC64		0x15
+-#define ESR_EC_IABT		0x21
+-#define ESR_EC_DABT		0x25
+-#define ESR_EC_HW_BP_CURRENT	0x31
+-#define ESR_EC_SSTEP_CURRENT	0x33
+-#define ESR_EC_WP_CURRENT	0x35
+-#define ESR_EC_BRK_INS		0x3c
+-
+ /* Access flag */
+ #define PTE_AF			(1ULL << 10)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index fe4dc3693112..698e34f39241 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -450,7 +450,7 @@ void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+ }
+ 
+ struct handlers {
+-	handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
++	handler_fn exception_handlers[VECTOR_NUM][ESR_ELx_EC_MAX + 1];
+ };
+ 
+ void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+@@ -469,7 +469,7 @@ void route_exception(struct ex_regs *regs, int vector)
+ 	switch (vector) {
+ 	case VECTOR_SYNC_CURRENT:
+ 	case VECTOR_SYNC_LOWER_64:
+-		ec = (read_sysreg(esr_el1) >> ESR_EC_SHIFT) & ESR_EC_MASK;
++		ec = ESR_ELx_EC(read_sysreg(esr_el1));
+ 		valid_ec = true;
+ 		break;
+ 	case VECTOR_IRQ_CURRENT:
+@@ -508,7 +508,7 @@ void vm_install_sync_handler(struct kvm_vm *vm, int vector, int ec,
+ 
+ 	assert(VECTOR_IS_SYNC(vector));
+ 	assert(vector < VECTOR_NUM);
+-	assert(ec < ESR_EC_NUM);
++	assert(ec <= ESR_ELx_EC_MAX);
+ 	handlers->exception_handlers[vector][ec] = handler;
+ }
+ 
 -- 
 2.47.0.163.g1226f6d8fa-goog
 
