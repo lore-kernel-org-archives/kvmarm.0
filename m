@@ -1,118 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521B81632F6;
-	Fri, 25 Oct 2024 13:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA71206500
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 13:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729861530; cv=none; b=p26ppnjGprdKdvvEfP5cxEAU2hQD6n2f2j69VMWnx04nAnB/y9HVt21bpVMjxnXClt4pIAMxwQVu2eV2YJ8ypFgm473P1lVJGCNFJ786Fl1NWTXCBhXkgJVNdwXfYXHAhMX5uFOEyYfslwzx2u9vtUq0PiNTyJ94dTYfYw1tiG4=
+	t=1729861622; cv=none; b=SwYoGVTh/cZgFbXFNHsCFGF5GucLBNW+DVOjDuG6/RuSsNm836zn8rPdIo3TjOVczAIoAzZKuoLskmYjFirj8fdLBsY9+ppBkPzc/AgpxSYdZ2+mQPBp/uaVUuYeEpTcO/Bp1ekeWOzITZIeSG6MO09GgL7yD7jYuorW9zxzETM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729861530; c=relaxed/simple;
-	bh=JHk7KYb3g3gubZ/UCoHENgcCGyzGa5kzhT1E3wr8230=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PTt/ChX9O5rkGW+7zVVsGxghvJH959gxK2/8Gjo3Haw0wd/s8okcLy7UgqDaUOxumVBShhffXW9c2AXqfUOZEzlieNeoRpEj3sTkfmXEFeb922iN+rtP0tb+aouFpTXgPwQYVwUAvY3/+dL19PsY+1F/b7jJmQA2+4Ltf5bD2as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8iRUn7M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729861622; c=relaxed/simple;
+	bh=bf9r11I+KnOzXrNpPkd7UoOsudvx/B/hgrXPOqEooFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XUmVLzsH4Wgwr946X2jsFF7lVUw7SfjWf2pban0Ru7zwa7G0YDhbCaabuplgBwy+DBLuN2Y8BIJkjlO/sNMWpHnn+3bNqRG7W5Rc3PSagIzL7x0lOxRKywN9tecICKPsCC9OyhJOj4n946IxhdXx8+9f8oYFMWNxzWlVIigTUVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JKFRgFvN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8iRUn7M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73F2C4CEC3;
-	Fri, 25 Oct 2024 13:05:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729861529;
-	bh=JHk7KYb3g3gubZ/UCoHENgcCGyzGa5kzhT1E3wr8230=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t8iRUn7MW8+vBX02dVc9yoDre05ZBSkvXiKgdaN3nH3Xfn6kgX0qxhYM6SDdnRTvy
-	 5ZqCUQi9lghoJ8667mBCWv+Ej3lNrl2woZhNmF+0Bh896RrwpHIgVNj2k5AK9uAsUV
-	 lelBoqSj9hn2BFXDKm1CRKKNudW6GdKWXId7pE/GkKK+EX1HJ6bT+WIvnF4mfrmKsx
-	 /2W7ZAVekhd1JVpG515Q0A4fMdpBit5wkiyRc4eiKoAfc8tmdGAn7PtkW++LqPaAyr
-	 qEnnC4/gwWvuoMxYwq0cEFw4nfPJ7BZDlc3ll3+ejzX6giEXRFGjE3U4hXtg1/2f5H
-	 z0DzPv0yC7p6A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t4K0N-006muA-8R;
-	Fri, 25 Oct 2024 14:05:27 +0100
-Date: Fri, 25 Oct 2024 14:05:26 +0100
-Message-ID: <87v7xgtjs9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	stable@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
-In-Reply-To: <eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
-References: <20241009183603.3221824-1-maz@kernel.org>
-	<3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
-	<86ldyd2x7t.wl-maz@kernel.org>
-	<eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKFRgFvN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729861619;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=xsCzoibnSTl/nXMnbdZJ3n//wdWYLvbIDAUZDZZBDm4=;
+	b=JKFRgFvNVrq0f+ACXGIyOP+uOeOpfJCnqzolgVW1UnY1RGuFb7RFRaTAOH4aySLnlGPFOc
+	ICFOo1D6XWrq7yimLZNzMXQkcwujJ+BaBUhyBaD2EqUZmY7yTWtsRbuWJjNy8PrisP/UzL
+	8eVW96Lgfi6i3bWoVSykqwZDvBqiONM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-5XZE1yUWNaW-rEI11PDeNg-1; Fri,
+ 25 Oct 2024 09:06:55 -0400
+X-MC-Unique: 5XZE1yUWNaW-rEI11PDeNg-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9294D1955F06;
+	Fri, 25 Oct 2024 13:06:53 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.164])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A8051956088;
+	Fri, 25 Oct 2024 13:06:44 +0000 (UTC)
+Date: Fri, 25 Oct 2024 14:06:42 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, cohuck@redhat.com, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org, richard.henderson@linaro.org,
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
+Message-ID: <ZxuX4i9NjVRizB72@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20241025101959.601048-1-eric.auger@redhat.com>
+ <20241025101959.601048-19-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, stable@vger.kernel.org, glider@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241025101959.601048-19-eric.auger@redhat.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Fri, 25 Oct 2024 11:54:38 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Fri, Oct 25, 2024 at 12:17:37PM +0200, Eric Auger wrote:
+> This new cpu model takes by default the host cpu values.
+> However it exposes uint64 SYSREG properties for writable ID reg
+> fields exposed by the host kernel. Properties are named
+> SYSREG_<REG>_<FIELD> with REG and FIELD being those used
+> in linux arch/arm64/tools/sysreg. This done by matching the
+> writable fields retrieved from the host kernel against the
+> generated description of sysregs.
 > 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Thu, Oct 24, 2024 at 07:05:10PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > # ==== Test Assertion Failure ====
-> > > #   lib/kvm_util.c:724: false
-> > > #   pid=1947 tid=1947 errno=5 - Input/output error
-> > > #      1	0x0000000000404edb: __vm_mem_region_delete at kvm_util.c:724 (discriminator 5)
-> > > #      2	0x0000000000405d0b: kvm_vm_free at kvm_util.c:762 (discriminator 12)
-> > > #      3	0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
-> > > #      4	 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
-> > > #      5	 (inlined by) run_tests at vgic_init.c:720
-> > > #      6	0x0000000000401a6f: main at vgic_init.c:748
-> > > #      7	0x0000ffffa7b37543: ?? ??:0
-> > > #      8	0x0000ffffa7b37617: ?? ??:0
-> > > #      9	0x0000000000401b6f: _start at ??:?
-> > > #   KVM killed/bugged the VM, check the kernel log for clues
-> > > not ok 10 selftests: kvm: vgic_init # exit=254
-> 
-> > > which does rather look like a test bug rather than a problem in the
-> > > change itself.
-> 
-> > Well, the test tries to do braindead things, and then the test
-> > infrastructure seems surprised that KVM tells it to bugger off...
-> 
-> > I can paper over it with this (see below), but frankly, someone who
-> > actually cares about this crap should take a look (and ownership).
-> 
-> I'm not even sure that's a terrible fix, looking at the changelog I get
-> the impression the test is deliberately looking to do problematic things
-> with the goal of making sure that the kernel handles them appropriately.
-> That's not interacting well with the KVM selftest framework's general
-> assert early assert often approach but it's a reasonable thing to want
-> to test so relaxing the asserts like this is one way of squaring the
-> circile.
+> An example of invocation is:
+> -cpu custom,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
+> which sets DP field of ID_AA64ISAR0_EL1 to 0.
 
-It *is* a terrible fix, since it makes no effort in finding out
-whether the VM is be dead for a good or a bad reason. In a way, the
-fix is worse than the current error, because it silently hide the
-crap.
+"SYSREG_" feels kinda redundant to repeat on every single
+feature. 
 
-So this test will continue to explode until someone fixes it
-*properly*. And if that means rewriting the selftest harness, so be
-it.
+Also, is this naming convention really the same one that users
+will see when they look at /proc/cpuinfo to view features ? It
+feels pretty low level to me ?  Naming after the registers &
+fields, would be like configuring x86 CPU features by asking
+for "SYSREG_EAX_1_ECX_20" instead of saying "vmx" which is the
+human friendly name.
 
-	M.
 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> ---
+> 
+> At the moment, the custom model does not support legacy options
+> of the host cpu model. We need to understand what we do with those
+> latter (SVE, ...). This means that related KVM ioctl are
+> not called yet.
+
+It will be pretty painful to have to use different feature
+terminology for different CPU models. Everything in libvirt
+assuming feature terminology varies per-arch, not per-CPU
+model.
+
+
+With regards,
+Daniel
 -- 
-Without deviation from the norm, progress is not possible.
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
