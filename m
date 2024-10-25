@@ -1,165 +1,104 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08FC2064F5
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 12:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB35B2064F1;
+	Fri, 25 Oct 2024 12:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729860939; cv=none; b=XHRfBhNYLs7airfVSw4x51YusDfb+rvl/NsZrI5Ef88WhTfLttcu5gxBk9SoJ9rkgbccYWjly2bZtkunpigI4N6f7uX/YAQv3RZ9Se3ow8IhSUrdzA5R+z0/2WS1nFFo0/geBDEiDZQUaVNpcH8EMuIvn1Av88stzpkrlC5mFak=
+	t=1729861160; cv=none; b=Ox3K9T2aQ345f9lCJvbQ92T3IjaROHIaSXFiTEwnX6+apBxQMoGpCNiYNWuNtWlE+4dU8RqGgNFk8dniwcoY8Xfa4aAM3wKFlzAjVNoIR31Vis/xBvy9lBtMMUTh9sXkL7WvQ3rUNOg3sDVn4KtcdTwBn8YcAi0CwazdF6YYY74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729860939; c=relaxed/simple;
-	bh=jtbsOCdoGRt1aC/xCgKnqav1xhNs7CdP5Wywc3qmCHY=;
+	s=arc-20240116; t=1729861160; c=relaxed/simple;
+	bh=aAqbBGyjPWgCK55GdUA5PUTQzhfpub6cqpcDphWFA+c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jt8sET1ySWiq2gVrg4DN+QwlDbM1I/5AkLlPh0otqioDTBvQWfpM4w/smSoaTon3ioUEwBIsajoadsBcUHD9Ws1Sj3cC7cjaUfoyXwfAJdG8PL6SwtMOGf/WGSA436olqnAe27f5CelunW+fVtwEPn0IwupolWoU7kMr0gUmPNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BMAdzpqX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=LiSus7R1iDsHhvjxLUxcp0Ji4VgzXF2r2Op6zY+JZiRUdHiq3rz2l4VPEM4e2SmpotxnZC+W1tb4wa47uVw2y4RqhR/fknN1upQAVQhSOmNF3aMqKclv/Jhe3IBUNhP7zf9rTzLoxMZnXJiH9rszmgw59SChWQyhP3h0KgmStCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=baqk3DIE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BMAdzpqX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729860933;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=e77XIlvulyf/f9Y8TZIkfwjukkAPIINCx9VWzDIMND4=;
-	b=BMAdzpqXI2x1ioGA8eNW4mdLzvBD+/35/nlzCCyRFFMrqhaPjXSgIfynuBL+aUPLeO3Gdn
-	coZXmGDoEYruROovNQq4sGiL1aSaVe5YSK0NkwPimXlzOwqafd/UGvd2KoVSbZKQNycPTF
-	lWSkHTOGANmLg0w5Uj8GXi12bwfWhMY=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-134-wj34u_MyPpag_U4is72eEw-1; Fri,
- 25 Oct 2024 08:55:30 -0400
-X-MC-Unique: wj34u_MyPpag_U4is72eEw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 225771956048;
-	Fri, 25 Oct 2024 12:55:28 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.164])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 994B519560A2;
-	Fri, 25 Oct 2024 12:55:22 +0000 (UTC)
-Date: Fri, 25 Oct 2024 13:55:19 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, cohuck@redhat.com, qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org, richard.henderson@linaro.org,
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
-	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [RFC 13/21] arm/cpu: Add infra to handle generated ID register
- definitions
-Message-ID: <ZxuVN905-TnOnHNn@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-14-eric.auger@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baqk3DIE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99498C4CEC3;
+	Fri, 25 Oct 2024 12:59:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729861158;
+	bh=aAqbBGyjPWgCK55GdUA5PUTQzhfpub6cqpcDphWFA+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=baqk3DIE5L8wdmTLARGGkTSnE1Eof9cFR5gHTOuFk2m4SHOyOjPwQK8jFmA5jvcdC
+	 +zDj3uwxB82JTkDFuzGBxxtbcfZgn/HFnHLjdNjYBKWbLemTXh5TDmt8lnFiR2aA3X
+	 9Hj+rPFuJZzCLQX13d7uMzu6iJYp1L0J/DGxK0rZIaHKvLS5w42U8BFp0+EeSZVGR3
+	 M3UfJn4QWiVQtqu/JC8jd7tIdnd51d8veXgc1VARXstESVXz3LroiTnSrmGvwMXjE7
+	 18+tl8zDV/4IUlVRfx29azRk/FAUxGUrkjLljRt71dgCCxduypj7Vnsn7nI2DgH3aT
+	 MVKtmldtiGuew==
+Date: Fri, 25 Oct 2024 13:59:13 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>, stable@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't eagerly teardown the vgic on init error
+Message-ID: <ZxuWIXFJignbcX1m@finisterre.sirena.org.uk>
+References: <20241009183603.3221824-1-maz@kernel.org>
+ <3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk>
+ <86ldyd2x7t.wl-maz@kernel.org>
+ <eb6e7e29-b0a8-47b1-94c4-f01569aa55cb@sirena.org.uk>
+ <92d755af-e19b-49a5-b4df-a8ed0fb7aece@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="StHetKYo+xBy+vjm"
 Content-Disposition: inline
-In-Reply-To: <20241025101959.601048-14-eric.auger@redhat.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-
-On Fri, Oct 25, 2024 at 12:17:32PM +0200, Eric Auger wrote:
-> The known ID regs are described in a new initialization function
-> dubbed initialize_cpu_sysreg_properties(). That code will be
-> automatically generated from linux arch/arm64/tools/sysreg. For the
-> time being let's just describe a single id reg, CTR_EL0. In this
-> description we only care about non RES/RAZ fields, ie. named fields.
-> 
-> The registers are populated in a 3x8x8 array and their fields are
-> added in a sorted list.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  target/arm/cpu-custom.h            | 58 ++++++++++++++++++++++++++++++
->  target/arm/cpu-sysreg-properties.c | 41 +++++++++++++++++++++
->  target/arm/cpu64.c                 |  2 ++
->  target/arm/meson.build             |  1 +
->  4 files changed, 102 insertions(+)
->  create mode 100644 target/arm/cpu-custom.h
->  create mode 100644 target/arm/cpu-sysreg-properties.c
-> 
-> diff --git a/target/arm/cpu-custom.h b/target/arm/cpu-custom.h
-> new file mode 100644
-> index 0000000000..1952095bf7
-> --- /dev/null
-> +++ b/target/arm/cpu-custom.h
-> @@ -0,0 +1,58 @@
-> +#ifndef ARM_CPU_CUSTOM_H
-> +#define ARM_CPU_CUSTOM_H
-
-License header her.
+In-Reply-To: <92d755af-e19b-49a5-b4df-a8ed0fb7aece@redhat.com>
+X-Cookie: Editing is a rewording activity.
 
 
-> diff --git a/target/arm/cpu-sysreg-properties.c b/target/arm/cpu-sysreg-properties.c
-> new file mode 100644
-> index 0000000000..753e7c9127
-> --- /dev/null
-> +++ b/target/arm/cpu-sysreg-properties.c
-> @@ -0,0 +1,41 @@
-> +/*
-> + * QEMU ARM CPU SYSREG PROPERTIES
-> + * to be generated from linux sysreg
-> + *
-> + * Copyright (c) 2024, Inc. 2024
+--StHetKYo+xBy+vjm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-                        ^^^^  missing company name :-)
+On Fri, Oct 25, 2024 at 02:18:02PM +0200, Eric Auger wrote:
+> On 10/25/24 12:54, Mark Brown wrote:
 
+> > I'm not even sure that's a terrible fix, looking at the changelog I get
+> > the impression the test is deliberately looking to do problematic things
+> > with the goal of making sure that the kernel handles them appropriately.
+> > That's not interacting well with the KVM selftest framework's general
+> > assert early assert often approach but it's a reasonable thing to want
 
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version 2
-> + * of the License, or (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see
-> + * <http://www.gnu.org/licenses/gpl-2.0.html>
-> + */
-> +
-> +#include "cpu-custom.h"
-> +
-> +ARM64SysReg arm64_id_regs[NR_ID_REGS];
-> +
-> +void initialize_cpu_sysreg_properties(void)
-> +{
-> +    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NR_ID_REGS);
+> Can you elaborate on the "assert early assert often approach". What
+> shall this test rather do according to you?
 
-                                ^^^ just sizeof(arm64_id_regs)
+In general the KVM selftests are filled with asserts which just
+immediately cause the test to exit with a backtrace.  That's certainly
+an approach that can be taken with testsuites, but it does make things
+very fagile.  This means that if the test is deliberately doing
+something which is liable to cause errors and put the VM in a bad state
+then it seems relatively likely that some part of a partial cleanup will
+run into a spurious error caused by the earlier testing putting the VM
+in an error state.
 
-> +    /* CTR_EL0 */
-> +    ARM64SysReg *CTR_EL0 = arm64_sysreg_get(3, 3, 0, 0, 1);
-> +    CTR_EL0->name = "CTR_EL0";
-> +    arm64_sysreg_add_field(CTR_EL0, "TMinline", 32, 37);
-> +    arm64_sysreg_add_field(CTR_EL0, "DIC", 29, 29);
-> +    arm64_sysreg_add_field(CTR_EL0, "IDC", 28, 28);
-> +    arm64_sysreg_add_field(CTR_EL0, "CWG", 24, 27);
-> +    arm64_sysreg_add_field(CTR_EL0, "ERG", 20, 23);
-> +    arm64_sysreg_add_field(CTR_EL0, "DMinLine", 16, 19);
-> +    arm64_sysreg_add_field(CTR_EL0, "L1Ip", 14, 15);
-> +    arm64_sysreg_add_field(CTR_EL0, "IminLine", 0, 3);
-> +}
-> +
+> I am OoO next week but I can have a look afterwards. On which machine is
+> it failing?
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+It was failing on a wide range of arm64 machines, I think every one I
+test (which would track with the change being very generic).
 
+--StHetKYo+xBy+vjm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcbliAACgkQJNaLcl1U
+h9AvQwf+PLqULPjWApldlDAjSS6Ydf3qKRr2wnzfn3GoYm2LQKpherEM6Br54G4F
+6LGp6HkvVOA4i7vxRmzviXidU30Pg0DkJSUXkFlVcfbT5eW+YbvnZmDKvNC50p50
+MExLjhmzwlA8M9jCqICqUim0nD23AtQZZLeTIVrqCtM2OiwQyg7+LY2KM+T/7aMT
+AltD1XVQkPMVtsQ0wHrUMWJR7mCW0N8RY9RKuoswNJadle0n2yU8OK3SwyMO4kIw
+ucyzQGoP27ckeeNQ2y072gZPDq6xg3O7yNFOzWwl9E+uDQs6GICu4LzIWFVsGFwe
+pzdYascg4iXeDbwmnQGaxdvHXk0NEg==
+=1fHJ
+-----END PGP SIGNATURE-----
+
+--StHetKYo+xBy+vjm--
