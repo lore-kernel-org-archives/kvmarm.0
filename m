@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A42D21443E
-	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 20:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719A217DFEC
+	for <kvmarm@lists.linux.dev>; Fri, 25 Oct 2024 20:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729888286; cv=none; b=Ky53JbaVaHj404V9B+PDwyXKyupAwWibf9xdNP+EAnhfaHgls2xkta0E2G+GthC8B3OHxkOQV7B1BpQAZL5ig3TQo+xgYBxsrDcpau/P5eXFtvKn/rGQLr2eL1Pg51g4As6m6j8D9QYytp0D2bIi5uo4MIm+5CpdUpaEoNhAeio=
+	t=1729888288; cv=none; b=Q2+JUDx76t3MAn6cMDzzfolC3XL0UvXnnnmfJypIQBwp2f+8qvuTFS6biHeB9oik/BcA9DZc6vnKY+dlNyWSv+MuTGV/WjYYfFYGMong8ogEWhmU7cNMAKuHd0gKYZZQ6b4ZReAGdnQ2I4kL+Nxo1z7VyK6ndqA5fygZjvGTdi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729888286; c=relaxed/simple;
-	bh=J1z6BJX+e2Ui0O3aCmEHW5KdDVvfgENDAtxgoh0Lk7Q=;
+	s=arc-20240116; t=1729888288; c=relaxed/simple;
+	bh=MbiGJ0ujJwGcnP9PmS5KJJnlBCbM+3qKJf5Gw0KB7cg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZIt2d3d3ly+5CIlDCLIAwQnj2k4dXw7a2XJyNOzc8u5wQsN1ATLf7NT95d3ju4vwiQVo3XfLAiceoioI5lIgHTWCI3PsMCflMp8xivBX/JjbIqobrabYSEWMyJIkCdbWXD9G5kBlY+ojeUhvro4T8Toz5kgBOO1zRs6fC7Zr1d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OHfOsaT9; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=g7YLjDrQ1Ce+WdEcuJ/mF5O9JIUsTIXFv9hHMyekdfefkvUKcwdba83N9Bl7ypUBu2p8gFoUpoUgrSP8i3MsAPzIkBS6uKkzOtE589BfwU85mkhl4xNKC4LXHeicCVHmjga/TFGH+1IVCBwp55jIABPHm+gSKI+UubuC6WBm9eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fjg830mk; arc=none smtp.client-ip=91.218.175.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OHfOsaT9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fjg830mk"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729888282;
+	t=1729888283;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iuadspXVMOh3Pam3DlhhqVgk1VOTyFtbXJwKvw8+pWY=;
-	b=OHfOsaT9nMN3OtfAUJTHF+WyEu+GGLbfHvvWbnhTUb8ICp2MQbSmrmDw7pAPsS5mntCg6D
-	q7YXSk7fSFUORj5gW89hXoPSnkN+XPueDB4B8OJjhIQ2f0iQAeIQfT70TsdhsR5tezC5TH
-	o0k70wHQ0/dBsMRiJFiRf3fD9er5cb4=
+	bh=DLX9HduVMdOUKtiLy3PdgYWO26sFAp3kbOX0y77xaq0=;
+	b=Fjg830mkPiYmfzGX7TA/ho2SRF1YTUNaA193p2bd4QqFGKMjfqDSh31+YQmMIFz6Xj+pfi
+	UBFogfTrqOB6BuRQV5YP+lxd1I0qtkG4pJanagNvtMXl/4nkgIsNxg19qXP8znBRuByFRy
+	wvZsnBVlZdenBJ5PTo4aGG5NvkD0tcs=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 3/4] KVM: arm64: selftests: Convert to kernel's ESR terminology
-Date: Fri, 25 Oct 2024 20:31:05 +0000
-Message-ID: <20241025203106.3529261-4-oliver.upton@linux.dev>
+Subject: [PATCH v2 4/4] KVM: arm64: selftests: Add tests for MMIO external abort injection
+Date: Fri, 25 Oct 2024 20:31:06 +0000
+Message-ID: <20241025203106.3529261-5-oliver.upton@linux.dev>
 In-Reply-To: <20241025203106.3529261-1-oliver.upton@linux.dev>
 References: <20241025203106.3529261-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,174 +48,198 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Drop the KVM selftests specific flavoring of ESR in favor of the kernel
-header.
+Test that the plumbing exposed to userspace for injecting aborts in
+response to unexpected MMIO works as intended in two different flavors:
+
+ - A 'normal' MMIO instruction (i.e. ESR_ELx.ISV=1)
+
+ - An ISV=0 MMIO instruction with/without KVM_CAP_ARM_NISV_TO_USER
+   enabled
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- .../selftests/kvm/aarch64/debug-exceptions.c      | 10 +++++-----
- tools/testing/selftests/kvm/aarch64/no-vgic-v3.c  |  2 +-
- .../selftests/kvm/aarch64/page_fault_test.c       |  4 ++--
- .../selftests/kvm/aarch64/vpmu_counter_access.c   | 12 ++++++------
- .../selftests/kvm/include/aarch64/processor.h     | 15 ++-------------
- .../testing/selftests/kvm/lib/aarch64/processor.c |  6 +++---
- 6 files changed, 19 insertions(+), 30 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/mmio_abort.c        | 159 ++++++++++++++++++
+ 2 files changed, 160 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/mmio_abort.c
 
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 2582c49e525a..ff7a949fc96a 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -433,15 +433,15 @@ static void test_guest_debug_exceptions(uint8_t bpn, uint8_t wpn, uint8_t ctx_bp
- 	vcpu_init_descriptor_tables(vcpu);
- 
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_BRK_INS, guest_sw_bp_handler);
-+				ESR_ELx_EC_BRK64, guest_sw_bp_handler);
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
-+				ESR_ELx_EC_BREAKPT_CUR, guest_hw_bp_handler);
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_WP_CURRENT, guest_wp_handler);
-+				ESR_ELx_EC_WATCHPT_CUR, guest_wp_handler);
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_SSTEP_CURRENT, guest_ss_handler);
-+				ESR_ELx_EC_SOFTSTP_CUR, guest_ss_handler);
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_SVC64, guest_svc_handler);
-+				ESR_ELx_EC_SVC64, guest_svc_handler);
- 
- 	/* Specify bpn/wpn/ctx_bpn to be tested */
- 	vcpu_args_set(vcpu, 3, bpn, wpn, ctx_bpn);
-diff --git a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-index 943d65fc6b0b..58304bbc2036 100644
---- a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-+++ b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-@@ -150,7 +150,7 @@ static void test_guest_no_gicv3(void)
- 	vcpu_init_descriptor_tables(vcpu);
- 
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_UNKNOWN, guest_undef_handler);
-+				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
- 
- 	test_run_vcpu(vcpu);
- 
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index d29b08198b42..ec33a8f9c908 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -544,9 +544,9 @@ static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
- 	vcpu_init_descriptor_tables(vcpu);
- 
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_DABT, no_dabt_handler);
-+				ESR_ELx_EC_DABT_CUR, no_dabt_handler);
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
--				ESR_EC_IABT, no_iabt_handler);
-+				ESR_ELx_EC_IABT_CUR, no_iabt_handler);
- }
- 
- static void setup_gva_maps(struct kvm_vm *vm)
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index d31b9f64ba14..f9c0c86d7e85 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -300,7 +300,7 @@ static void guest_sync_handler(struct ex_regs *regs)
- 	uint64_t esr, ec;
- 
- 	esr = read_sysreg(esr_el1);
--	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+	ec = ESR_ELx_EC(esr);
- 
- 	__GUEST_ASSERT(expected_ec == ec,
- 			"PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx; EC expected: 0x%lx",
-@@ -338,10 +338,10 @@ static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 	 * Reading/writing the event count/type registers should cause
- 	 * an UNDEFINED exception.
- 	 */
--	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx));
--	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
--	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx));
--	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
-+	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
-+	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
-+	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
-+	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
- 	/*
- 	 * The bit corresponding to the (unimplemented) counter in
- 	 * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers should be RAZ.
-@@ -425,7 +425,7 @@ static void create_vpmu_vm(void *guest_code)
- 
- 	vpmu_vm.vm = vm_create(1);
- 	vm_init_descriptor_tables(vpmu_vm.vm);
--	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-+	for (ec = 0; ec < ESR_ELx_EC_MAX + 1; ec++) {
- 		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
- 					guest_sync_handler);
- 	}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index de977d131082..1e8d0d531fbd 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -12,6 +12,8 @@
- 
- #include <linux/stringify.h>
- #include <linux/types.h>
-+#include <asm/brk-imm.h>
-+#include <asm/esr.h>
- #include <asm/sysreg.h>
- 
- 
-@@ -100,19 +102,6 @@ enum {
- 			   (v) == VECTOR_SYNC_LOWER_64    || \
- 			   (v) == VECTOR_SYNC_LOWER_32)
- 
--#define ESR_EC_NUM		64
--#define ESR_EC_SHIFT		26
--#define ESR_EC_MASK		(ESR_EC_NUM - 1)
--
--#define ESR_EC_UNKNOWN		0x0
--#define ESR_EC_SVC64		0x15
--#define ESR_EC_IABT		0x21
--#define ESR_EC_DABT		0x25
--#define ESR_EC_HW_BP_CURRENT	0x31
--#define ESR_EC_SSTEP_CURRENT	0x33
--#define ESR_EC_WP_CURRENT	0x35
--#define ESR_EC_BRK_INS		0x3c
--
- /* Access flag */
- #define PTE_AF			(1ULL << 10)
- 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index fe4dc3693112..698e34f39241 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -450,7 +450,7 @@ void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
- }
- 
- struct handlers {
--	handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
-+	handler_fn exception_handlers[VECTOR_NUM][ESR_ELx_EC_MAX + 1];
- };
- 
- void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
-@@ -469,7 +469,7 @@ void route_exception(struct ex_regs *regs, int vector)
- 	switch (vector) {
- 	case VECTOR_SYNC_CURRENT:
- 	case VECTOR_SYNC_LOWER_64:
--		ec = (read_sysreg(esr_el1) >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+		ec = ESR_ELx_EC(read_sysreg(esr_el1));
- 		valid_ec = true;
- 		break;
- 	case VECTOR_IRQ_CURRENT:
-@@ -508,7 +508,7 @@ void vm_install_sync_handler(struct kvm_vm *vm, int vector, int ec,
- 
- 	assert(VECTOR_IS_SYNC(vector));
- 	assert(vector < VECTOR_NUM);
--	assert(ec < ESR_EC_NUM);
-+	assert(ec <= ESR_ELx_EC_MAX);
- 	handlers->exception_handlers[vector][ec] = handler;
- }
- 
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 960cf6a77198..98957a99ead6 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -156,6 +156,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
+ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer_edge_cases
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
++TEST_GEN_PROGS_aarch64 += aarch64/mmio_abort
+ TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+ TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
+diff --git a/tools/testing/selftests/kvm/aarch64/mmio_abort.c b/tools/testing/selftests/kvm/aarch64/mmio_abort.c
+new file mode 100644
+index 000000000000..8b7a80a51b1c
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/mmio_abort.c
+@@ -0,0 +1,159 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * mmio_abort - Tests for userspace MMIO abort injection
++ *
++ * Copyright (c) 2024 Google LLC
++ */
++#include "processor.h"
++#include "test_util.h"
++
++#define MMIO_ADDR	0x8000000ULL
++
++static u64 expected_abort_pc;
++
++static void expect_sea_handler(struct ex_regs *regs)
++{
++	u64 esr = read_sysreg(esr_el1);
++
++	GUEST_ASSERT_EQ(regs->pc, expected_abort_pc);
++	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
++	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
++
++	GUEST_DONE();
++}
++
++static void unexpected_dabt_handler(struct ex_regs *regs)
++{
++	GUEST_FAIL("Unexpected data abort at PC: %lx\n", regs->pc);
++}
++
++static struct kvm_vm *vm_create_with_dabt_handler(struct kvm_vcpu **vcpu, void *guest_code,
++						  handler_fn dabt_handler)
++{
++	struct kvm_vm *vm = vm_create_with_one_vcpu(vcpu, guest_code);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(*vcpu);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_DABT_CUR, dabt_handler);
++
++	virt_map(vm, MMIO_ADDR, MMIO_ADDR, 1);
++
++	return vm;
++}
++
++static void vcpu_inject_extabt(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_events events = {};
++
++	events.exception.ext_dabt_pending = true;
++	vcpu_events_set(vcpu, &events);
++}
++
++static void vcpu_run_expect_done(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	vcpu_run(vcpu);
++	switch (get_ucall(vcpu, &uc)) {
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++		break;
++	case UCALL_DONE:
++		break;
++	default:
++		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
++	}
++}
++
++extern char test_mmio_abort_insn;
++
++static void test_mmio_abort_guest(void)
++{
++	WRITE_ONCE(expected_abort_pc, (u64)&test_mmio_abort_insn);
++
++	asm volatile("test_mmio_abort_insn:\n\t"
++		     "ldr x0, [%0]\n\t"
++		     : : "r" (MMIO_ADDR) : "x0", "memory");
++
++	GUEST_FAIL("MMIO instruction should not retire");
++}
++
++/*
++ * Test that KVM doesn't complete MMIO emulation when userspace has made an
++ * external abort pending for the instruction.
++ */
++static void test_mmio_abort(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_mmio_abort_guest,
++							expect_sea_handler);
++	struct kvm_run *run = vcpu->run;
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
++	TEST_ASSERT_EQ(run->mmio.phys_addr, MMIO_ADDR);
++	TEST_ASSERT_EQ(run->mmio.len, sizeof(unsigned long));
++	TEST_ASSERT(!run->mmio.is_write, "Expected MMIO read");
++
++	vcpu_inject_extabt(vcpu);
++	vcpu_run_expect_done(vcpu);
++	kvm_vm_free(vm);
++}
++
++extern char test_mmio_nisv_insn;
++
++static void test_mmio_nisv_guest(void)
++{
++	WRITE_ONCE(expected_abort_pc, (u64)&test_mmio_nisv_insn);
++
++	asm volatile("test_mmio_nisv_insn:\n\t"
++		     "ldr x0, [%0], #8\n\t"
++		     : : "r" (MMIO_ADDR) : "x0", "memory");
++
++	GUEST_FAIL("MMIO instruction should not retire");
++}
++
++/*
++ * Test that the KVM_RUN ioctl fails for ESR_EL2.ISV=0 MMIO aborts if userspace
++ * hasn't enabled KVM_CAP_ARM_NISV_TO_USER.
++ */
++static void test_mmio_nisv(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_mmio_nisv_guest,
++							unexpected_dabt_handler);
++
++	TEST_ASSERT(_vcpu_run(vcpu), "Expected nonzero return code from KVM_RUN");
++	TEST_ASSERT_EQ(errno, ENOSYS);
++
++	kvm_vm_free(vm);
++}
++
++/*
++ * Test that ESR_EL2.ISV=0 MMIO aborts reach userspace and that an injected SEA
++ * reaches the guest.
++ */
++static void test_mmio_nisv_abort(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_mmio_nisv_guest,
++							expect_sea_handler);
++	struct kvm_run *run = vcpu->run;
++
++	vm_enable_cap(vm, KVM_CAP_ARM_NISV_TO_USER, 1);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_NISV);
++	TEST_ASSERT_EQ(run->arm_nisv.fault_ipa, MMIO_ADDR);
++
++	vcpu_inject_extabt(vcpu);
++	vcpu_run_expect_done(vcpu);
++	kvm_vm_free(vm);
++}
++
++int main(void)
++{
++	test_mmio_abort();
++	test_mmio_nisv();
++	test_mmio_nisv_abort();
++}
 -- 
 2.47.0.163.g1226f6d8fa-goog
 
