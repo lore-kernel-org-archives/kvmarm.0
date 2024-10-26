@@ -1,48 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B91217F3F
-	for <kvmarm@lists.linux.dev>; Sat, 26 Oct 2024 07:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53C417D896;
+	Sat, 26 Oct 2024 08:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729929539; cv=none; b=V0yTEE4PHyke9HcOcFujWL8YK601+jfHYFLmCeyegc7xCyVi77KK9MocBkTcuHPOYNqd0tR1jlV7kv8abQAhuwJXy6kZHSuBThwwiY7C1TpGWdHzdVoiQOEbr3672ZnFtnKIoFnmpEQLrxuf/qzFNAGY6tSWnILf3yJqT3TJtWs=
+	t=1729930400; cv=none; b=u3eDS3fFim+UcNYdWDlg9bvpm/eMlM8SAqwHjNvejrUno72r7DWCNCmz1dLYbe7MbT2MDcNVHKXVZ/aAZp7VzcaqZdQ2f5KPUX8T92JfMLd2YdiHRQeYmf5ypLe7QttqbijZx5dTWS3OMhyEX7l+nZwfoWnm+cKw7UjYtnbfpbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729929539; c=relaxed/simple;
-	bh=VmyNYoQ+0fgNHxxWHE7Ict+AcTXlShFZ/vhfuSG8Dlo=;
+	s=arc-20240116; t=1729930400; c=relaxed/simple;
+	bh=iUZr6BDcVRGSUW29ErBwFNHY3AC1kCqFEh1SFFtq9jM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bc1yIHpWQTkz8R0tZwGYqqN+5eIhbR1q4M8GrSDvg0SMbGG3ak0aGPInU1loM9pmXkDbHca/n/5S9iXTyfCxiX9cLKAIcQSCz948yTmpYyBW3/3wlqT0Ev3HHLttxIMWOGyBx2Do3ohFd+g62cBFuu7ODnptnIQp8US8sxZq3u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ME+6zqp6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Z2R7XdyE9cvT1/QMOmtguf7O4YEwG0B7PcKv6ntiKNB0FhoS39wBaHcovGTkgqI4mQxQLoHldgZyLsG9uUu2k0Pz+wzjdjtg1gt9URyZz701M3motbK1/QugIKhouSQB3/ecH+EYZ3m+VcXG3XKxl75ICYlhdRshcN4MMziIMHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jSci9EO/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ME+6zqp6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8981BC4CEC6;
-	Sat, 26 Oct 2024 07:58:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSci9EO/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819AFC4CEC6;
+	Sat, 26 Oct 2024 08:13:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729929538;
-	bh=VmyNYoQ+0fgNHxxWHE7Ict+AcTXlShFZ/vhfuSG8Dlo=;
+	s=k20201202; t=1729930400;
+	bh=iUZr6BDcVRGSUW29ErBwFNHY3AC1kCqFEh1SFFtq9jM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ME+6zqp6edhgzeYug70770LYEIUW/lj1RjjRYgvt5PiO/1NOr/PFymSLr9AL9M/v4
-	 iKo/AghU5mEESLzrXdSxd5OVdADlXUGKG/4iQJMWgPkBsWzAtB40n+iWA/bR40VDOj
-	 j7oF2guuEggb4oPgIqhBifiJfCL24SGK1szqfpVyooAurTLxAtJAUrslKid2gpVzrF
-	 JvBFCgFhr/RbY3b9FjO6gp8ceZDxq0w8Jb5cMVyKoGoBw9/4XOFf1iU3Gk5kvK0rrb
-	 hdIezkg3TX2vQrW1G/bdlY9mYsRvH7wxCwpI4oVcLxxINDkRXR/IxJjjHSTZraO1Uk
-	 lqSw5Cb6oYFwQ==
+	b=jSci9EO/b+wxEhWKDntRJ2jWIDHRMgt3lazq084TshS2r05DjpHShIgJMwZ1YcWgm
+	 T0w/jahRVgXu6RG0eEDA9L0/yBSzRPU+/6Xsgw+mDeB+PmMZ3IlBnoWXHvDRAwGXqF
+	 IeUrNNSZkRngDWWPL2XTd+86W5pRfY5r/w4j7kMy0rjKxirvFWn6Fu14TaofPxhBMM
+	 NrWh7cmE3B4wXhPqa6dlw8IaMATwbahfSU+On00W5yR8aLOi05MOjO7B23qb+5Sv7e
+	 gXZuIZ3FG5ROtXDldAsuB1QSSwZ3YZD90ioOvCRP6S0POSMLp8+yaSn88KpjOXtoYF
+	 //YewaP2IDaDw==
 Received: from [81.145.206.43] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t4bhI-00763p-Fk;
-	Sat, 26 Oct 2024 08:58:56 +0100
-Date: Sat, 26 Oct 2024 08:58:54 +0100
-Message-ID: <87sesjthvl.wl-maz@kernel.org>
+	id 1t4bvC-0076Ee-7z;
+	Sat, 26 Oct 2024 09:13:18 +0100
+Date: Sat, 26 Oct 2024 09:13:17 +0100
+Message-ID: <87r083th7m.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix splat/misbehavior for MMIO SEA injection
-In-Reply-To: <20241025203106.3529261-1-oliver.upton@linux.dev>
-References: <20241025203106.3529261-1-oliver.upton@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 08/18] KVM: arm64: nv: Reinject traps that take effect in Host EL0
+In-Reply-To: <20241025182354.3364124-9-oliver.upton@linux.dev>
+References: <20241025182354.3364124-1-oliver.upton@linux.dev>
+	<20241025182354.3364124-9-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,29 +60,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 81.145.206.43
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 25 Oct 2024 21:31:02 +0100,
+On Fri, 25 Oct 2024 19:23:43 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> v1 -> v2:
->  - Make it clear that the series is referring to synchronous external
->    aborts (i.e. SEAs)
->  - Move helper out of header
->  - Pull esr + friends into tools, for use in KVM selftests
-> 
-> v2: https://lore.kernel.org/kvmarm/20241018194757.3685856-1-oliver.upton@linux.dev/
-> 
-> Oliver Upton (4):
->   KVM: arm64: Don't retire aborted MMIO instruction
->   tools: arm64: Grab a copy of esr.h from kernel
->   KVM: arm64: selftests: Convert to kernel's ESR terminology
->   KVM: arm64: selftests: Add tests for MMIO external abort injection
-> 
+> Wire up the other end of traps that affect host EL0 by actually
+> injecting them into the guest hypervisor. Skip over FGT entirely, as a
+> cursory glance suggests no FGT is effective in host EL0.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Yes, and this (thankfully) is by design! :-)
+
+> 
+> Note that kvm_inject_nested() is already equipped for handling
+> exceptions while the VM is already in a host context.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+>  arch/arm64/kvm/emulate-nested.c      | 29 ++++++++++++++++++++++++----
+>  2 files changed, 30 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index a601a9305b10..bf0c48403f59 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -225,6 +225,11 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+>  	return vcpu_has_nv(vcpu) && __is_hyp_ctxt(&vcpu->arch.ctxt);
+>  }
+>  
+> +static inline bool vcpu_is_host_el0(const struct kvm_vcpu *vcpu)
+> +{
+> +	return is_hyp_ctxt(vcpu) && !vcpu_is_el2(vcpu);
+> +}
+> +
+>  /*
+>   * The layout of SPSR for an AArch32 state is different when observed from an
+>   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index e1a30d1bcd06..db3149379a4d 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -20,6 +20,9 @@ enum trap_behaviour {
+>  	BEHAVE_FORWARD_READ	= BIT(0),
+>  	BEHAVE_FORWARD_WRITE	= BIT(1),
+>  	BEHAVE_FORWARD_RW	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
+> +
+> +	/* Traps that take effect in Host EL0, this is rare! */
+> +	BEHAVE_IN_HOST_EL0	= BIT(2),
+
+nit: BEHAVE_IN_HOST_EL0 lacks an action verb (forward?).
+
+Thanks,
 
 	M.
 
