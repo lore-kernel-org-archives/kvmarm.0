@@ -1,162 +1,76 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D5AAD5B
-	for <kvmarm@lists.linux.dev>; Sat, 26 Oct 2024 14:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F2EF9CF
+	for <kvmarm@lists.linux.dev>; Sat, 26 Oct 2024 21:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729954397; cv=none; b=s69lIyx9oCISCt8n4mEqFSh3gUGA9DBQ5e4x5CtSD/dHtPvWrGx2rw4mhcgC9lMb9+6UfZhePhXCvJDUmFyT01v/4VqOjt3VkVPSEJoOfD9surPIvs4t9TwN3OKOuyYHUCc2ZbbUSx58lGZH3kU46MoyGh26T2g3er6Lo3LEjKE=
+	t=1729978671; cv=none; b=hXbR7DoM9maOmDWHjdO9meiK2VXhj1XDRSLtES422A7jMOVMGNLZ87GVCzlk1bZLyDYtWLiSFVodfYK6kxgLLenvv3xpovHUC1Al6Qc5okGmV+T3EHIsVq9Ow5OQKg6el/tpBe8KpRVxOL9rhzxOC00eRB8Iu6tOg7pYA88UX64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729954397; c=relaxed/simple;
-	bh=0ZAutvhhGaFlmj1XmFap9brpWl2bniA/D2BddoTQ/jM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nQN/Q7T43e+7iMw4ba4IIafjv6Eg96KliAUiWmwdtIpywuq+Z0qgEmuvrVYJw0buIjaJajrPglS7+2RexZt2Bw1QwyVAxNczB3In07ixaG0ATIaSlwXdK0Fz/Q9Dryv2T6/Ga3W6piSBfm6zO8U7aZouOWeNJU5Yd7ZwYsraAEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IDXAYO04; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1729978671; c=relaxed/simple;
+	bh=b7VMtLK5eGU7Ghv1CxreTd4ZnXARI07YyDiFkBYT92g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mQ4KiVlE6j88xksjY5NFAIiMsoozCB/nX6UolnmhmkevOPQL62XswRiym1SG9WV+RrOWdRKApOapfxGk2z61L81YEry1URAlQkmusp68gE7gsCixLo0EOEE0Og6KJQFSX6J0BUjSz/SJoH7T/Px7MTo13m22NNjOKF9QUs8ic18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OqRPrRR5; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IDXAYO04"
-Date: Sat, 26 Oct 2024 07:53:03 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OqRPrRR5"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729954390;
+	t=1729978665;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=f6oEY5I2mn6JavjYEYeWI4XafhLDooXmCGvLmqMJIxw=;
-	b=IDXAYO04odV2PC/0FFjwWPsKKHzqtlkfTZw+5+KuPl8w5Mo++yXHzLsZTEF+ZR0DNjAfqL
-	zSWPUbrqLaREWWiScSQsS5jxMFGdimkChYtRQ3L6M0S4/mZk4JHQiWuyT1ybNlLbsQlnI0
-	vAy0Oz+0NMusUx+JOGzqoh6uH80Rnlw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	bh=vSdjs3cy3XZFXznTm6G5FHJZRTxkxB+FvsmS8vmxRyE=;
+	b=OqRPrRR58CIikyJ2dt07UVTpByHDSaNI944Y9zef6Jt/e5jE/kziYdgvcmu3RPycAvuA8w
+	/VxsUESVdIs6RIPDSAQI9bqc3tihrPC2vhxj3GBw/7ZgOE+bZJGJEXKyADl46WnDMLKGUk
+	rxiIsw3ebHclRh4wWvBz2Gt+g9O7RSE=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	stable@vger.kernel.org, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH] KVM: arm64: Mark the VM as dead for failed
- initializations
-Message-ID: <Zx0CT1gdSWVyKLuD@linux.dev>
-References: <20241025221220.2985227-1-rananta@google.com>
- <Zxx_X9-MdmAFzHUO@linux.dev>
- <87ttcztili.wl-maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix splat/misbehavior for MMIO SEA injection
+Date: Sat, 26 Oct 2024 21:37:28 +0000
+Message-ID: <172997861843.352914.8282320466312561253.b4-ty@linux.dev>
+In-Reply-To: <20241025203106.3529261-1-oliver.upton@linux.dev>
+References: <20241025203106.3529261-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ttcztili.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Sat, Oct 26, 2024 at 08:43:21AM +0100, Marc Zyngier wrote:
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index bf64fed9820e..c315bc1a4e9a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -74,8 +74,6 @@ enum kvm_mode kvm_get_mode(void);
->  static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
->  #endif
->  
-> -DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-> -
->  extern unsigned int __ro_after_init kvm_sve_max_vl;
->  extern unsigned int __ro_after_init kvm_host_sve_max_vl;
->  int __init kvm_arm_init_sve(void);
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 879982b1cc73..1215df590418 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -206,8 +206,7 @@ void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
->  
->  static inline bool userspace_irqchip(struct kvm *kvm)
->  {
-> -	return static_branch_unlikely(&userspace_irqchip_in_use) &&
-> -		unlikely(!irqchip_in_kernel(kvm));
-> +	return unlikely(!irqchip_in_kernel(kvm));
->  }
->  
->  static void soft_timer_start(struct hrtimer *hrt, u64 ns)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 48cafb65d6ac..70ff9a20ef3a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -69,7 +69,6 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  static bool vgic_present, kvm_arm_initialised;
->  
->  static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
-> -DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
->  bool is_kvm_arm_initialised(void)
->  {
-> @@ -503,9 +502,6 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
-> -	if (vcpu_has_run_once(vcpu) && unlikely(!irqchip_in_kernel(vcpu->kvm)))
-> -		static_branch_dec(&userspace_irqchip_in_use);
-> -
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
->  	kvm_timer_vcpu_terminate(vcpu);
->  	kvm_pmu_vcpu_destroy(vcpu);
-> @@ -848,14 +844,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  			return ret;
->  	}
->  
-> -	if (!irqchip_in_kernel(kvm)) {
-> -		/*
-> -		 * Tell the rest of the code that there are userspace irqchip
-> -		 * VMs in the wild.
-> -		 */
-> -		static_branch_inc(&userspace_irqchip_in_use);
-> -	}
-> -
->  	/*
->  	 * Initialize traps for protected VMs.
->  	 * NOTE: Move to run in EL2 directly, rather than via a hypercall, once
-> @@ -1077,7 +1065,7 @@ static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu, int *ret)
->  	 * state gets updated in kvm_timer_update_run and
->  	 * kvm_pmu_update_run below).
->  	 */
-> -	if (static_branch_unlikely(&userspace_irqchip_in_use)) {
-> +	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
->  		if (kvm_timer_should_notify_user(vcpu) ||
->  		    kvm_pmu_should_notify_user(vcpu)) {
->  			*ret = -EINTR;
-> @@ -1199,7 +1187,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  			vcpu->mode = OUTSIDE_GUEST_MODE;
->  			isb(); /* Ensure work in x_flush_hwstate is committed */
->  			kvm_pmu_sync_hwstate(vcpu);
-> -			if (static_branch_unlikely(&userspace_irqchip_in_use))
-> +			if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
->  				kvm_timer_sync_user(vcpu);
->  			kvm_vgic_sync_hwstate(vcpu);
->  			local_irq_enable();
-> @@ -1245,7 +1233,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		 * we don't want vtimer interrupts to race with syncing the
->  		 * timer virtual interrupt state.
->  		 */
-> -		if (static_branch_unlikely(&userspace_irqchip_in_use))
-> +		if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
->  			kvm_timer_sync_user(vcpu);
->  
->  		kvm_arch_vcpu_ctxsync_fp(vcpu);
+On Fri, 25 Oct 2024 20:31:02 +0000, Oliver Upton wrote:
+> v1 -> v2:
+>  - Make it clear that the series is referring to synchronous external
+>    aborts (i.e. SEAs)
+>  - Move helper out of header
+>  - Pull esr + friends into tools, for use in KVM selftests
 > 
-> I think this would fix the problem you're seeing without changing the
-> userspace view of an erroneous configuration. It would also pave the
-> way for the complete removal of the interrupt notification to
-> userspace, which I claim has no user and is just a shit idea.
+> v2: https://lore.kernel.org/kvmarm/20241018194757.3685856-1-oliver.upton@linux.dev/
+> 
+> [...]
 
-Yeah, looks like this ought to get it done.
+Applied to kvmarm/next, thanks!
 
-Even with a fix for this particular issue I do wonder if we should
-categorically harden against late initialization failures and un-init
-the vCPU (or bug VM, where necessary) to avoid dealing with half-baked
-vCPUs/VMs across our UAPI surfaces.
+[1/4] KVM: arm64: Don't retire aborted MMIO instruction
+      https://git.kernel.org/kvmarm/kvmarm/c/e735a5da6442
+[2/4] tools: arm64: Grab a copy of esr.h from kernel
+      https://git.kernel.org/kvmarm/kvmarm/c/9fb8e9178b25
+[3/4] KVM: arm64: selftests: Convert to kernel's ESR terminology
+      https://git.kernel.org/kvmarm/kvmarm/c/c660d334b3a5
+[4/4] KVM: arm64: selftests: Add tests for MMIO external abort injection
+      https://git.kernel.org/kvmarm/kvmarm/c/3eb09a3e028e
 
-A sane userspace will probably crash when KVM_RUN returns EINVAL anyway.
-
--- 
-Thanks,
+--
+Best,
 Oliver
