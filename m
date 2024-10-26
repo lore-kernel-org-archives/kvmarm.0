@@ -1,121 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53C417D896;
-	Sat, 26 Oct 2024 08:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4321632F1;
+	Sat, 26 Oct 2024 10:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729930400; cv=none; b=u3eDS3fFim+UcNYdWDlg9bvpm/eMlM8SAqwHjNvejrUno72r7DWCNCmz1dLYbe7MbT2MDcNVHKXVZ/aAZp7VzcaqZdQ2f5KPUX8T92JfMLd2YdiHRQeYmf5ypLe7QttqbijZx5dTWS3OMhyEX7l+nZwfoWnm+cKw7UjYtnbfpbw=
+	t=1729938123; cv=none; b=c2WkOUUCU/WjYDVjwT09Rvj5FK982xiz2MTq6h/pxKnMlhWh3gm4rF5MISJUBlp3iTv7zVY3Prab/nUf4ZdcUoIi5A0VcQOZuunKUstcSHfFmavYlVKBsIt7v/uqb0jMVEzHT/1I71zftzyaGlq8HXJQqfFmxSTOcivxVZfzRtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729930400; c=relaxed/simple;
-	bh=iUZr6BDcVRGSUW29ErBwFNHY3AC1kCqFEh1SFFtq9jM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z2R7XdyE9cvT1/QMOmtguf7O4YEwG0B7PcKv6ntiKNB0FhoS39wBaHcovGTkgqI4mQxQLoHldgZyLsG9uUu2k0Pz+wzjdjtg1gt9URyZz701M3motbK1/QugIKhouSQB3/ecH+EYZ3m+VcXG3XKxl75ICYlhdRshcN4MMziIMHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jSci9EO/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729938123; c=relaxed/simple;
+	bh=OPKuXPHv05CbANj4GSwIspH+ZPJUtxzHe4p1mP5dGuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rfKU9zaeAsWeFsDyYNC0tK0tYK4tbmbybSt2Gc8RlD05P+O4GABsaA/5HxxHgziYealu2GP1vSaEB9vpgqJNGsFJa3xQM1mhc61uOZMNAwJoFpyByEHmp4cP0PK0daHDzRqCDhOgbaCmfEI+fXXWfMil8O0tpqSkvdkht6TF6fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LyibKHAG; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSci9EO/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819AFC4CEC6;
-	Sat, 26 Oct 2024 08:13:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729930400;
-	bh=iUZr6BDcVRGSUW29ErBwFNHY3AC1kCqFEh1SFFtq9jM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jSci9EO/b+wxEhWKDntRJ2jWIDHRMgt3lazq084TshS2r05DjpHShIgJMwZ1YcWgm
-	 T0w/jahRVgXu6RG0eEDA9L0/yBSzRPU+/6Xsgw+mDeB+PmMZ3IlBnoWXHvDRAwGXqF
-	 IeUrNNSZkRngDWWPL2XTd+86W5pRfY5r/w4j7kMy0rjKxirvFWn6Fu14TaofPxhBMM
-	 NrWh7cmE3B4wXhPqa6dlw8IaMATwbahfSU+On00W5yR8aLOi05MOjO7B23qb+5Sv7e
-	 gXZuIZ3FG5ROtXDldAsuB1QSSwZ3YZD90ioOvCRP6S0POSMLp8+yaSn88KpjOXtoYF
-	 //YewaP2IDaDw==
-Received: from [81.145.206.43] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t4bvC-0076Ee-7z;
-	Sat, 26 Oct 2024 09:13:18 +0100
-Date: Sat, 26 Oct 2024 09:13:17 +0100
-Message-ID: <87r083th7m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LyibKHAG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729938122; x=1761474122;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OPKuXPHv05CbANj4GSwIspH+ZPJUtxzHe4p1mP5dGuY=;
+  b=LyibKHAGWC1A2iJ0YHC5HzKcdU6DJ6mj8ADhr1Ow4B5k+vv34nT1PLd/
+   NRfMWS4JYLwkCAnbU500OIP5AvUpu55T0jJcwl7GBzbiA02dpvPTDxJfg
+   TvzT6JtHCk5l+UqHyPouNOMSgWPW2sO3mCq3jQPqmoWHiMtEaul7ihmzB
+   rpt0wlxK8M4IenGr/wI3NZyhqqXysfBM138wCoCGyymezuaqdGAifmll3
+   VNJtw6cG54xLnq/Ofd16k2VFjg5FX39Q8/iv1Qjt84ulHwA19Xwlsi9Pj
+   ZqT9a6e83GutNhOrD4zwdfWEDJgGn+Ed9wCQIcrk5hrrVorGWqAvzGbQG
+   A==;
+X-CSE-ConnectionGUID: nm9U1umCQbOKuSf3LHymmg==
+X-CSE-MsgGUID: IXfBM/FXRoKREkn3fVZKtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29557738"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="29557738"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2024 03:22:01 -0700
+X-CSE-ConnectionGUID: SK9Ub1PSSvaVlfptiHZJig==
+X-CSE-MsgGUID: ciyX6KyqRYagVEcBlNXZWA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,234,1725346800"; 
+   d="scan'208";a="85720390"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 26 Oct 2024 03:21:56 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t4dve-000ZVW-1T;
+	Sat, 26 Oct 2024 10:21:54 +0000
+Date: Sat, 26 Oct 2024 18:21:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 08/18] KVM: arm64: nv: Reinject traps that take effect in Host EL0
-In-Reply-To: <20241025182354.3364124-9-oliver.upton@linux.dev>
-References: <20241025182354.3364124-1-oliver.upton@linux.dev>
-	<20241025182354.3364124-9-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v4 10/18] KVM: arm64: nv: Describe trap behaviour of
+ MDCR_EL2.HPMN
+Message-ID: <202410261855.fvLOtls9-lkp@intel.com>
+References: <20241025182354.3364124-11-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 81.145.206.43
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025182354.3364124-11-oliver.upton@linux.dev>
 
-On Fri, 25 Oct 2024 19:23:43 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Wire up the other end of traps that affect host EL0 by actually
-> injecting them into the guest hypervisor. Skip over FGT entirely, as a
-> cursory glance suggests no FGT is effective in host EL0.
+Hi Oliver,
 
-Yes, and this (thankfully) is by design! :-)
+kernel test robot noticed the following build errors:
 
-> 
-> Note that kvm_inject_nested() is already equipped for handling
-> exceptions while the VM is already in a host context.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
->  arch/arm64/kvm/emulate-nested.c      | 29 ++++++++++++++++++++++++----
->  2 files changed, 30 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index a601a9305b10..bf0c48403f59 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -225,6 +225,11 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
->  	return vcpu_has_nv(vcpu) && __is_hyp_ctxt(&vcpu->arch.ctxt);
->  }
->  
-> +static inline bool vcpu_is_host_el0(const struct kvm_vcpu *vcpu)
-> +{
-> +	return is_hyp_ctxt(vcpu) && !vcpu_is_el2(vcpu);
-> +}
-> +
->  /*
->   * The layout of SPSR for an AArch32 state is different when observed from an
->   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index e1a30d1bcd06..db3149379a4d 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -20,6 +20,9 @@ enum trap_behaviour {
->  	BEHAVE_FORWARD_READ	= BIT(0),
->  	BEHAVE_FORWARD_WRITE	= BIT(1),
->  	BEHAVE_FORWARD_RW	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
-> +
-> +	/* Traps that take effect in Host EL0, this is rare! */
-> +	BEHAVE_IN_HOST_EL0	= BIT(2),
+[auto build test ERROR on 8e929cb546ee42c9a61d24fae60605e9e3192354]
 
-nit: BEHAVE_IN_HOST_EL0 lacks an action verb (forward?).
+url:    https://github.com/intel-lab-lkp/linux/commits/Oliver-Upton/KVM-arm64-Extend-masking-facility-to-arbitrary-registers/20241026-023055
+base:   8e929cb546ee42c9a61d24fae60605e9e3192354
+patch link:    https://lore.kernel.org/r/20241025182354.3364124-11-oliver.upton%40linux.dev
+patch subject: [PATCH v4 10/18] KVM: arm64: nv: Describe trap behaviour of MDCR_EL2.HPMN
+config: arm64-randconfig-003-20241026 (https://download.01.org/0day-ci/archive/20241026/202410261855.fvLOtls9-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 5886454669c3c9026f7f27eab13509dd0241f2d6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241026/202410261855.fvLOtls9-lkp@intel.com/reproduce)
 
-Thanks,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410261855.fvLOtls9-lkp@intel.com/
 
-	M.
+All errors (new ones prefixed by >>):
+
+   In file included from arch/arm64/kvm/emulate-nested.c:8:
+   In file included from include/linux/kvm_host.h:16:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> arch/arm64/kvm/emulate-nested.c:532:35: error: too many arguments to function call, expected single argument 'vcpu', have 2 arguments
+     532 |         if (kvm_pmu_counter_is_hyp(vcpu, idx))
+         |             ~~~~~~~~~~~~~~~~~~~~~~       ^~~
+   include/kvm/arm_pmu.h:191:20: note: 'kvm_pmu_counter_is_hyp' declared here
+     191 | static inline bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu)
+         |                    ^                      ~~~~~~~~~~~~~~~~~~~~~
+   1 warning and 1 error generated.
+
+
+vim +/vcpu +532 arch/arm64/kvm/emulate-nested.c
+
+   509	
+   510	static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
+   511	{
+   512		u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+   513		unsigned int idx;
+   514	
+   515	
+   516		switch (sysreg) {
+   517		case SYS_PMEVTYPERn_EL0(0) ... SYS_PMEVTYPERn_EL0(30):
+   518		case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
+   519			idx = (sys_reg_CRm(sysreg) & 0x3) << 3 | sys_reg_Op2(sysreg);
+   520			break;
+   521		case SYS_PMXEVTYPER_EL0:
+   522		case SYS_PMXEVCNTR_EL0:
+   523			idx = SYS_FIELD_GET(PMSELR_EL0, SEL,
+   524					    __vcpu_sys_reg(vcpu, PMSELR_EL0));
+   525			break;
+   526		default:
+   527			/* Someone used this trap helper for something else... */
+   528			KVM_BUG_ON(1, vcpu->kvm);
+   529			return BEHAVE_HANDLE_LOCALLY;
+   530		}
+   531	
+ > 532		if (kvm_pmu_counter_is_hyp(vcpu, idx))
+   533			return BEHAVE_FORWARD_RW | BEHAVE_IN_HOST_EL0;
+   534	
+   535		return BEHAVE_HANDLE_LOCALLY;
+   536	}
+   537	
 
 -- 
-Without deviation from the norm, progress is not possible.
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
