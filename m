@@ -1,124 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BDD17A58F;
-	Mon, 28 Oct 2024 10:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69EB204F60
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 10:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730111633; cv=none; b=nrzqwcV/C8RAH4bhadzO2eq/I4KtNxetmsejrcfee9JdZt6bhDoyiuUcdWDRR7krl1sxvuIXraZA55Sf5seMzbVD9HDHQA3Bm4Q3W0tPKZiTfEDSY2bNKRDmQ36mIXmlGzomBW7KDxZTcvaTaHaBfKCoTlc3heFDD563EoaAJcg=
+	t=1730112830; cv=none; b=eesF9cj4aWjsCY60UrvQEi52P4JuGZBRNaOHJcTPGUmlvpTI0c7bAzXGHKD4sXNyS48Q9ZLqvJ6c0Jo0Zs5THeGRk5VTRBi6eft1EQy/SPKns4VUrTSINUgdVZXMAkM9q6yDh6TIjyS8c/lh864ObXuLUKCRl8myVWnGBMpe6SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730111633; c=relaxed/simple;
-	bh=k1UfJG4wUYLjjRSm2i0WqLlzSLWlUdJsJRv0y6jMnQY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iRsBwM+cJ/rMNb+reeh4KYAnMe/qr4cs4hv39F0y+gGVtThIF+Yh2zJc4ebbR6SEctOrd9l69a2fS2kIH/HygxtLkt8fJGGTXXT3KjuOgq/FRKidhyJh8r1e9RRv4NysPht/MiA06gkXOn+bzH8JYUuXY7m0+6MERoJc/bGuL/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgfL0+Yy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730112830; c=relaxed/simple;
+	bh=etuJv7VN1Rzoyh2Pz9FpTtPKX14gyYSQIP4BK59zGFo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZLkymzUvzTgjmyH/NIKiEPjjtyXA2HwBQM9HoAmCUnuuRnx1Aed+K1prlsykElVjGHkLpM39Gr+FvQsll/qRGfJZA3V5pv6ZS5X9KpBTny35mrGpUWRJjyIDPasEzCTO9dDVrVGq/tBZPqTtDWGYsMQkdoNZvJYP2LQ8Gamguvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgzjd9JH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgfL0+Yy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF655C4CEE3;
-	Mon, 28 Oct 2024 10:33:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgzjd9JH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AAE3C4CEC3;
+	Mon, 28 Oct 2024 10:53:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730111632;
-	bh=k1UfJG4wUYLjjRSm2i0WqLlzSLWlUdJsJRv0y6jMnQY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hgfL0+YyNiMIM2h1P8A3oeVeHsBbqnMU3gGTdAz9HE4+pvluUaN/CJ2ePYb4qnDuB
-	 W2fUmn7XuubX4Uodmth6W9y1txzjoT070YiSNLxEiSgBZgBEWL5VICAagn5xknN54L
-	 HNAWzDNtW06zdbs3tKx8Qv2R2OxWt2O+3TgTze3wx4ySpIGYtYn9GNoBg4/Go+5B/B
-	 0R910iLHrk3VvztDn1MKR0UCTrWOEoPPzi8urT26Hr7imjf5mXtUddSyJ6B0ZQSmYM
-	 O55jbnyhBw94KUDtb68XOYgf5ON1jJd2qn+fGQcv02uvkSfT/1kOjn3DAuQAbYdCB8
-	 p1xMKv2Xt+fkA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t5N4I-007Wi1-Eb;
-	Mon, 28 Oct 2024 10:33:50 +0000
-Date: Mon, 28 Oct 2024 10:33:49 +0000
-Message-ID: <87plnktt2q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/4] arm64: mte: update code comments
-In-Reply-To: <20241028094014.2596619-4-aneesh.kumar@kernel.org>
-References: <20241028094014.2596619-1-aneesh.kumar@kernel.org>
-	<20241028094014.2596619-4-aneesh.kumar@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1730112830;
+	bh=etuJv7VN1Rzoyh2Pz9FpTtPKX14gyYSQIP4BK59zGFo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sgzjd9JHnH1rX1/B0TEqBvuW1gcqUTCwY+vitLAdTKQyyCChEmboFJ8huUl8x/qJv
+	 r8U+YRgXJ66+dyH2p4VGekHSs0UaRDjGf+RBc+ZPgVv8mUTmpmWNgejT9389n2+G0c
+	 jrf5e8V3Zsm78rXR0cpFBCwtiJ5fBxaNegQSHt7vq9t5KEO54RX9s/rWWqBXDGAZ/w
+	 +To5M7vkiGGV2w6iK9U315gdUQTGQvIbuU7Fq1ehcwhdl+nWMP/Cq2WbCWMnz3CCEj
+	 L/MnNxIP3yQTr1bgxWJ/GwusbY0J5Ew3dA11sQQe+R+Y9/ZH4CYLaabqxFeFDb2sCd
+	 xXQqX8vhNJuUg==
+From: puranjay@kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>, "Arnd
+ Bergmann" <arnd@kernel.org>, =?utf-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Sumit Garg
+ <sumit.garg@linaro.org>
+Cc: puranjay12@gmail.com
+Subject: Supporting KVM_GUESTDBG_BLOCKIRQ or something similar on ARM64
+Date: Mon, 28 Oct 2024 10:53:34 +0000
+Message-ID: <mb61p4j4wwlap.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, Suzuki.Poulose@arm.com, steven.price@arm.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Mon, 28 Oct 2024 09:40:13 +0000,
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-> 
-> commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag
-> initialisation") updated the locking such the kernel now allows
-> VM_SHARED mapping with MTE. Update the code comment to reflect this.
-> 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+--=-=-=
+Content-Type: text/plain
 
-This is a KVM patch. Please make sure you write the subject
-accordingly, matching the existing conventions (in this case, this
-should read something like: "KVM: arm64: MTE: Update...").
 
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index a509b63bd4dd..b5824e93cee0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1390,11 +1390,8 @@ static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
->   * able to see the page's tags and therefore they must be initialised first. If
->   * PG_mte_tagged is set, tags have already been initialised.
->   *
-> - * The race in the test/set of the PG_mte_tagged flag is handled by:
-> - * - preventing VM_SHARED mappings in a memslot with MTE preventing two VMs
-> - *   racing to santise the same page
-> - * - mmap_lock protects between a VM faulting a page in and the VMM performing
-> - *   an mprotect() to add VM_MTE
-> + * The race in the test/set of the PG_mte_tagged flag is handled by
-> + * using PG_mte_lock and PG_mte_tagged together.
+Hi Everyone,
 
-How? This comment is pretty content-free. TO be useful, you should
-elaborate on *how* these two are used together.
+I work on the BPF JIT for arm64 and regularly use Qemu with gdb for
+debugging by single stepping parts of the code. I realized that whenever
+I enable KVM, single stepping doesn't work as expected and it lands in an
+interrupt handler.
 
->   */
->  static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
->  			      unsigned long size)
-> @@ -1646,7 +1643,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	}
->  
->  	if (!fault_is_perm && !device && kvm_has_mte(kvm)) {
-> -		/* Check the VMM hasn't introduced a new disallowed VMA */
-> +		/*
-> +		 *  not a permission fault implies a translation fault which
-> +		 *  means mapping the page for the first time
+It always worked for me on x86 so I looked in the source code and found
+that x86 supports KVM_GUESTDBG_BLOCKIRQ that blocks IRQs when single
+stepping.
 
-How about an Access fault due to page ageing?
+I assume that arm64 doesn't support KVM_GUESTDBG_BLOCKIRQ because it is
+not trivial to implement this on arm64 due to some architectural
+limitations? There was a patch [1] posted in 2022 to solve this issue
+but it was not merged.
+
+Let's start a discussion about what needs to be done to support this on
+arm64.
 
 Thanks,
+Puranjay
 
-	M.
+[1] https://lore.kernel.org/lkml/20221219102452.2860088-2-sumit.garg@linaro.org/
 
--- 
-Without deviation from the norm, progress is not possible.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iIoEARYKADIWIQQ3wHGvVs/5bdl78BKwwPkjG3B2nQUCZx9tMBQccHVyYW5qYXlA
+a2VybmVsLm9yZwAKCRCwwPkjG3B2nf8pAP0Z4l83ZysYTSxJ+Yx1tDM5p5iqe7sb
+sHTd8cxXSmY7wAEA7XIBZjFQpUNqB4bRQSPm8hHZAQg8Ckd/fVQVdfsSuAA=
+=ZEKp
+-----END PGP SIGNATURE-----
+--=-=-=--
