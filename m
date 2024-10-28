@@ -1,120 +1,109 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF97D189913
-	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 15:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C15188917
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 16:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730130747; cv=none; b=FpID34djUjucApkpjEWsn9MGuEadzl/0kjm08OjvfujeuYxrH9LWGGcmer1Hso93A3xOA21//Cgz1gQ8sNTQgZIFU3gG+bqTIB+ubSH9Ef4MI5ZF9iRNCgp6ti8W1FD8n1B4nIkb06obIEYqGh8xJO0GNDKIOOwbdJ/OkjQtS2k=
+	t=1730131262; cv=none; b=RiT/rWFqh+aebSfzVrhki71kqQ79KHCpDVSoeIeADsFeDvuAVdv+mdFxZ5lo7vmq5blGEk/d65XsUOgeKhJG78KFvODw4HNb+EbyMnQGvF9FdcV0AfAUIyFgHDaHlTPUwtVIvt77CfMlzjshEcgkGUxeDsb5Q5s22sClQCP2KT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730130747; c=relaxed/simple;
-	bh=EJ4j4fxWkmFQMUhVZGVCGTg+4bUfh3rMb1YxJ3ygpnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kz5n2WHyF1gk01c1Lry5TiAGTWPvpMog7Ae2iAuEGtxiNXqM3MGRc+Hoppj/vGM9lEtOoLbwouX2wUwFWfW7fbFUGvj5GmrOrOy+7bd3fuJEzshLEvo05k827caimA7/EPtiiDNn1xJbVKJNoRZzHd6JrCjaYJZLOejaeSE6jqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M4ZQLHX1; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1730131262; c=relaxed/simple;
+	bh=rKMt39/IMn9ntx86rLiJJxC2lha3ViI6YIHGMus7n4k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=slt9oXOjEDKanEj866v735akKGMJjC4MghKFB2pvQuAkD3za7xcLYFKHCIXwfzZscgtwXPpP64udzlGlCg9K7akpt3lxfxfTPWYVtQWoGmffuTepFzCWH6gw1juNTwao0aX00z7dOmV2otV4wGt+zgonOQiv2FDhrmmXdNj2xus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fM+xSrXM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M4ZQLHX1"
-Date: Mon, 28 Oct 2024 08:52:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730130742;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fM+xSrXM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730131258;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4s1VKY0ZwmwCvbsxErbp1i9wD5rVUZihhdeNL1S2sUY=;
-	b=M4ZQLHX1j+hvfMsrWOy4J9QjHlJwmzo2dTgH1rlbT6dFfijLg6vGn7Ej3+cMU8yRL4mCFV
-	DsIjj0gQvL7A3gmem9ThbwPWFa3nfrd187zU/AtApxyx081TEZD18ejJHOLbWF7b0+LakZ
-	ZZwHxWEzhIk3JM2c028xJxO7ZR2Dis8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
-	torvalds@linux-foundation.org, akpm@linux-foundation.org,
-	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
-	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
-	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com,
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org,
-	allen.lkml@gmail.com, broonie@kernel.org,
-	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	Linux ARM <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 6.11 000/261] 6.11.6-rc1 review
-Message-ID: <Zx-zLHBseRoZz4MM@linux.dev>
-References: <20241028062312.001273460@linuxfoundation.org>
- <CA+G9fYu-tpwX=09=VOjniFnBz3MSXpaHb_gir2AqyNpihERT2Q@mail.gmail.com>
+	bh=P9xxfVBBFS3vGf2amIpYTb6y6yA1Jac+htCBbXKyA58=;
+	b=fM+xSrXMwBnMcongAh9DYFPeFLJa8eP0o18grrBad/VoemTwkN0XoDQMHvwH5yJy1R7Amr
+	TtSBgZzRWi8EpTrCRSg8gp8oTZxmDC7VaGXilVjSWeQdvKgmLE2DtakmkU73Fe26cl99Va
+	HlSE5LnQG8qkD/ZQdm6vi5NWfdyDPkI=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-UW8mt4UnNCKclBnsbgKa7A-1; Mon,
+ 28 Oct 2024 12:00:55 -0400
+X-MC-Unique: UW8mt4UnNCKclBnsbgKa7A-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 62DD3195608C;
+	Mon, 28 Oct 2024 16:00:52 +0000 (UTC)
+Received: from localhost (unknown [10.22.88.106])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E70AC19560AA;
+	Mon, 28 Oct 2024 16:00:49 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Eric Auger
+ <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
+ oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com,
+ mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
+In-Reply-To: <Zxub7ol4p8P_sWF8@redhat.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20241025101959.601048-1-eric.auger@redhat.com>
+ <20241025101959.601048-19-eric.auger@redhat.com>
+ <ZxuX4i9NjVRizB72@redhat.com>
+ <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com>
+ <Zxub7ol4p8P_sWF8@redhat.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 28 Oct 2024 17:00:46 +0100
+Message-ID: <871q00p68h.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYu-tpwX=09=VOjniFnBz3MSXpaHb_gir2AqyNpihERT2Q@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi,
+On Fri, Oct 25 2024, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Thanks for the report.
+> On Fri, Oct 25, 2024 at 03:18:25PM +0200, Eric Auger wrote:
+>> Hi Daniel,
+>>=20
+>> On 10/25/24 15:06, Daniel P. Berrang=C3=A9 wrote:
+>> > On Fri, Oct 25, 2024 at 12:17:37PM +0200, Eric Auger wrote:
+>> >> At the moment, the custom model does not support legacy options
+>> >> of the host cpu model. We need to understand what we do with those
+>> >> latter (SVE, ...). This means that related KVM ioctl are
+>> >> not called yet.
+>> > It will be pretty painful to have to use different feature
+>> > terminology for different CPU models. Everything in libvirt
+>> > assuming feature terminology varies per-arch, not per-CPU
+>> > model.
+>> Actually as far as I understand those regids/fields would fit all kind
+>> of aarch64 Cortex-A CPUs. So they wouldn't vary per-CPU (I mean their
+>> terminology. Their availability will).
+>
+> What I mean is can we define  named models for various different
+> vendor's Cortex-A silicon and just use that without needing to
+> toggle features, except in rare cases.
 
-On Mon, Oct 28, 2024 at 09:14:57PM +0530, Naresh Kamboju wrote:
-> On Mon, 28 Oct 2024 at 12:16, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > This is the start of the stable review cycle for the 6.11.6 release.
-> > There are 261 patches in this series, all will be posted as a response
-> > to this one.  If anyone has any issues with these being applied, please
-> > let me know.
-> >
-> > Responses should be made by Wed, 30 Oct 2024 06:22:39 +0000.
-> > Anything received after that time might be too late.
-> >
-> > The whole patch series can be found in one patch at:
-> >         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/patch-6.11.6-rc1.gz
-> > or in the git tree and branch at:
-> >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-6.11.y
-> > and the diffstat can be found below.
-> >
-> > thanks,
-> >
-> > greg k-h
-> 
-> 
-> The selftests: kvm: vgic_init test failed on stable-rc linux-6.11.y,
-> also seen on Linux next-20241023 onwards and Linus v6.12-rc5
-> on the Graviton4 and rk3399-rock-pi.
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> Test log:
-> ---------
-> # selftests: kvm: vgic_init
-> # Random seed: 0x6b8b4567
-> # Running GIC_v3 tests.
-> # ==== Test Assertion Failure ====
-> #   lib/kvm_util.c:727: false
-> #   pid=2680 tid=2680 errno=5 - Input/output error
-> #      1 0x0000000000404eaf: __vm_mem_region_delete at kvm_util.c:727
-> (discriminator 5)
-> #      2 0x0000000000405d0f: kvm_vm_free at kvm_util.c:765 (discriminator 12)
-> #      3 0x0000000000402d5f: vm_gic_destroy at vgic_init.c:101
-> #      4 (inlined by) test_vcpus_then_vgic at vgic_init.c:368
-> #      5 (inlined by) run_tests at vgic_init.c:720
-> #      6 0x0000000000401a6f: main at vgic_init.c:748
-> #      7 0x0000ffff8620773f: ?? ??:0
-> #      8 0x0000ffff86207817: ?? ??:0
-> #      9 0x0000000000401b6f: _start at ??:?
-> #   KVM killed/bugged the VM, check the kernel log for clues
-> not ok 9 selftests: kvm: vgic_init # exit=254
+I'm not sure whether creating named models for various cpus would
+actually scale; what we probably could do is come up with some Armv8.6,
+Armv8.7, ... models and have additional models for some well-known cpus.
+That would also give us some basic sanity checks for feature
+combinations, if we do not want to support completely custom
+frankencpus.
 
-This is a known test issue currently being discussed [*], the KVM change
-responsible for the test failure *is* correct.
-
-[*] https://lore.kernel.org/kvmarm/3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk/
-
--- 
-Thanks,
-Oliver
