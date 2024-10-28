@@ -1,134 +1,128 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D079E1DEFDC
-	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 17:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0C51534E9;
+	Mon, 28 Oct 2024 18:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730136561; cv=none; b=mku8uxJ8hun+onfKKyQIkAH8KBM/ZAJMuYkBS/wTQR9cwrp2d9yVvhCV6HZRrHSxbwyofSdEIJ9/UR7D8KdQw8v0XRKc0M5BmsyRPGXVY0REu2BKDJqtSUanjiGojjA3DFtMzwMhQ6yo+KkYXTK6AZWDbvq1+wnAFjleXkNmM5g=
+	t=1730138949; cv=none; b=Q9fEQF8fHoi7PgCnxgEJKKl2TB0fivHwXqBtCQ4ObkLgGvf2ChOVRFKueqbCaHCsJNhhSvBKhbnz5djY2Ts2WDBasv1SaR7LtcOwT7a5zRCVphV2TETXHa7QiwxpAcPLObfKzN3OqPxjq3I5xFlIbCuiHUjOgw3jxH+2PFyViB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730136561; c=relaxed/simple;
-	bh=cUg6txPRUPxMsei/A2V0Htey6gR92wd7KBs9NQZZqy0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bjGXF6UD3YA3a3KHiMVhzBDnuU6097pVlackLxje1XHEbwyWYnna+/CcVKffKmEVod4xzWsFJLMu5Ihvnzwbj6UrJoPnFIcT2/rzfPcPrekl5HcJCwEJr3tHlDRZlG5HUSC9LQdKoP8UNNAR20n4zhsoU7wJ9CUcWlOGusJj5Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XcgMQ0QfCz6K9Zr;
-	Tue, 29 Oct 2024 01:28:02 +0800 (CST)
-Received: from frapeml100008.china.huawei.com (unknown [7.182.85.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 10925140B30;
-	Tue, 29 Oct 2024 01:29:15 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100008.china.huawei.com (7.182.85.131) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 28 Oct 2024 18:29:14 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Mon, 28 Oct 2024 18:29:14 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
-	<maz@kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "mark.rutland@arm.com"
-	<mark.rutland@arm.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, jiangkunkun
-	<jiangkunkun@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH v2 3/3] KVM: arm64: Enable errata based on migration
- target CPUs
-Thread-Topic: [RFC PATCH v2 3/3] KVM: arm64: Enable errata based on migration
- target CPUs
-Thread-Index: AQHbJfomCZMu0lx0Uky3XpJwm4Q1tLKWjy0AgAXbpRA=
-Date: Mon, 28 Oct 2024 17:29:14 +0000
-Message-ID: <0a23971725644a9bbfe7ec60b5e05033@huawei.com>
-References: <20241024094012.29452-1-shameerali.kolothum.thodi@huawei.com>
- <20241024094012.29452-4-shameerali.kolothum.thodi@huawei.com>
- <Zxr2JMNzOWT3zPWH@linux.dev>
-In-Reply-To: <Zxr2JMNzOWT3zPWH@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1730138949; c=relaxed/simple;
+	bh=CeJEGSCNf1EsllIQYit4ccvKZkgbLPbEtbyLPC5vn2k=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tNqWVIKvu5ib+DH81OoAn5W/mZICcCbwgneu8z+gdaL0Oz/+3rGjUE0WTMdo77rNUBCwrVClA9PIZH6Kb0s+qjwG1hfEVhRKIIcmud4gjCh7lteRzxds+L/y3cz/Q7jKITbJGyvqMJLCi2VKdGS51TVWm71rPS4D+Ceq/UViQQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aAlxneXY; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aAlxneXY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F046C4CEC3;
+	Mon, 28 Oct 2024 18:09:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730138949;
+	bh=CeJEGSCNf1EsllIQYit4ccvKZkgbLPbEtbyLPC5vn2k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aAlxneXYuqZQ7bd+tCz2C3V2pCghZNw8UEOSmUD61Sy3RccoFVjz7gTbNHeA6Pb22
+	 hTsZ4eLxayQy2lmBtQHNnvZgzLF+ktY7YmdT+UbbsVqfEyJ1mWkMbk2CPxgE38SDld
+	 ikUZ7HTCRvLCTWuZXdrwXMw+F4kA9mfoeBSo4121/cq6QuqsOZMirQlpLTpt0nmKDN
+	 ekS2Pi+NkwN+w/ZfHkK80me54SfWsYgSdw1tme8WTd9pa0wa3dR5qEp0mR70wl1T35
+	 iLjuyuOTR/EaaKH0KDSSdf4NMU6pjBTK98p47i2lvvcnRwtvG6VpWSnzpf1dk9H6Gc
+	 xqmhOleLZL9sQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t5UAs-007fYC-Qq;
+	Mon, 28 Oct 2024 18:09:07 +0000
+Date: Mon, 28 Oct 2024 18:09:05 +0000
+Message-ID: <87ldy8t7zy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/4] arm64: mte: update code comments
+In-Reply-To: <yq5attcwcs2l.fsf@kernel.org>
+References: <20241028094014.2596619-1-aneesh.kumar@kernel.org>
+	<20241028094014.2596619-4-aneesh.kumar@kernel.org>
+	<87plnktt2q.wl-maz@kernel.org>
+	<yq5attcwcs2l.fsf@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, Suzuki.Poulose@arm.com, steven.price@arm.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-> -----Original Message-----
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Sent: Friday, October 25, 2024 2:37 AM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; maz@kernel.org; catalin.marinas@arm.com;
-> will@kernel.org; mark.rutland@arm.com; cohuck@redhat.com;
-> eric.auger@redhat.com; yuzenghui <yuzenghui@huawei.com>; Wangzhou
-> (B) <wangzhou1@hisilicon.com>; jiangkunkun <jiangkunkun@huawei.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Anthony Jebson
-> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [RFC PATCH v2 3/3] KVM: arm64: Enable errata based on
-> migration target CPUs
->=20
-> nitpick: shortlog shouldn't use a KVM prefix if the patch isn't touching
-> KVM.
->=20
-> On Thu, Oct 24, 2024 at 10:40:12AM +0100, Shameer Kolothum wrote:
-> > If the Guest has migration target CPUs set, enable all errata
-> > that are based on target MIDR/REVIDR.
+On Mon, 28 Oct 2024 12:47:30 +0000,
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+> 
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index a509b63bd4dd..b5824e93cee0 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -1390,11 +1390,8 @@ static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> >>   * able to see the page's tags and therefore they must be initialised first. If
+> >>   * PG_mte_tagged is set, tags have already been initialised.
+> >>   *
+> >> - * The race in the test/set of the PG_mte_tagged flag is handled by:
+> >> - * - preventing VM_SHARED mappings in a memslot with MTE preventing two VMs
+> >> - *   racing to santise the same page
+> >> - * - mmap_lock protects between a VM faulting a page in and the VMM performing
+> >> - *   an mprotect() to add VM_MTE
+> >> + * The race in the test/set of the PG_mte_tagged flag is handled by
+> >> + * using PG_mte_lock and PG_mte_tagged together.
 > >
-> > Also make sure we call the paravirt helper to retrieve migration
-> > targets if any.
+> > How? This comment is pretty content-free. TO be useful, you should
+> > elaborate on *how* these two are used together.
 > >
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
->=20
-> I don't know if you saw my suggestion on v1 [*], but it'd be great if we
-> can hide the array of implementations from users of is_midr_in_range()
-> and friends.
+> 
+> I will add more details described in commit d77e59a8fccde7fb5dd8c57594ed147b4291c970
+> Should i quote the commit there in the comment?
 
-I did see your suggestion but my bad,  misunderstood it and thought that yo=
-u are
-referring to _midr_range() functions in cpu_errata.c only.
-=20
-> There's other junk keyed off MIDR (e.g. Spectre) that also needs to be
-> aware of all the implementations where the VM might run. The easiest way
-> to do that is to stop using a caller-provided MIDR and have
-> is_midr_in_range() either walk the array of implementations or read
-> MIDR_EL1.
+The commit is not relevant. What is important is an indication of how
+the race is resolved if that's important. A reference to
+try_page_mte_tagging() would probably be the right thing to do.
 
-So the suggestion is to use something like this?
+> 
+> >
+> >>   */
+> >>  static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+> >>  			      unsigned long size)
+> >> @@ -1646,7 +1643,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  	}
+> >>  
+> >>  	if (!fault_is_perm && !device && kvm_has_mte(kvm)) {
+> >> -		/* Check the VMM hasn't introduced a new disallowed VMA */
+> >> +		/*
+> >> +		 *  not a permission fault implies a translation fault which
+> >> +		 *  means mapping the page for the first time
+> >
+> > How about an Access fault due to page ageing?
+> >
+> 
+> IIUC access fault is already handled by the caller kvm_handle_guest_abort?
+> I can add that as part of the updated comments?
 
-bool is_midr_in_range(struct midr_range const *range)
-{
-        int i;
+Maybe. The thing is, you are removing a pretty essential comment for
+no good reason, and now there is no rational left behind the -EFAULT
+that is returned.
 
-        for (i =3D 0; i < errata_migrn_target_num; i++) {
-                if (midr_is_cpu_model_range(errata_migrn_target_cpus[i].mid=
-r,
-                                            range->model,
-                                            range->rv_min, range->rv_max))
-                        return true;
-        }
+	M.
 
-        return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-                                       range->rv_min, range->rv_max);
-}
-
-Or do we need some kind of hint to these functions to specify which=20
-MIDR to use? I think there are at least couple of places where it looks lik=
-e
-it make sense to do the checking against MIDR_EL1 only.
-(eg: has_neoverse_n1_erratum_1542419().
-
-Thanks,
-Shameer
+-- 
+Without deviation from the norm, progress is not possible.
