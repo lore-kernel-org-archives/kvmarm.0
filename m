@@ -1,73 +1,67 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C1418893C
-	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 16:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84AE1DEFC4
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 16:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730132964; cv=none; b=d1DLzdaThkenpKRSlNQ9OZXLke1cz7vpsM/ZQarSRr5o9Fwt1MWc5CYLJPdNOXGMap7qpFRRDPGCYbO23LYodRQJLVdCbD/Pcmj2GmnCRSB8eMndk1n954TXVFt940UjjDfUfTZzcjIGfpYgyO/Kn/sk8AhOaIWAh6qJCRF1tB0=
+	t=1730133358; cv=none; b=F4tENQy5vFizj533Xt2YpeaJtTWzhTifca19OvZQ538TwdMkh7itFwzKGxPqzU5SIzqFctWSvgDSoh0MLmAAnfiiVzeHA2WaxKFCKOphZ4HMBithzOmfjKm8zXRjHLQN0bvy3FGcbmhW94A1B0R61bOBZbywpJ1Hr3u6yI+PJyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730132964; c=relaxed/simple;
-	bh=mWMB9u+W2V6dTh3jud0NeAKsAEjUv+CqtCPFeltEcUI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fyYEGQR/ljX9uDI4IJFzycI1BqclGKPUHQSHHePn4e2je3kHGWpPt2xhIxIUD3zEqSsPcpZ7zEJCjALAykZ+b2iJBEXkImQ6ck5oWbtjIVzjdZyHlcGhv2f4XqjyIRhrJU4UD3mIdwLNdXc5uZ6EezrdvBVfRvxRAKx/9Z6F+Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxnT4oD7; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1730133358; c=relaxed/simple;
+	bh=KerATjdieBekw4nqxhfDRkuljX3jY3gIDC2yLuhzJaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LvqgonKWyP3nyXdcDipxjcV24fCf0WbPFll32DavYm6VAT41CCB5cgGPOBJlrC4aYCT28OnMBUFT+1xT9stquw+93HaKtOkCAxwRjELsLAfXTuJz6JIcrOVJlr2Zi20hZJoJcCAp56+JUn5LkLuxLiz47u4TAf78drQtWv9GbFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTrQWiZI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxnT4oD7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTrQWiZI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730132961;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1730133354;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mkkVElKn3Spk/fVm1hzjR0gsXNh0JNd5hSe/vYQwfCU=;
-	b=UxnT4oD7C2X4Cn7SPrQSEaFpst1tk3nHFqcVG9bg2tv/NVdUmImAb9w1fxIoqUXI4SjMzY
-	xDxcHSbnXwqtELJ2Rh9CMJ+Ulz01cRmS/5xezUotvHfPOsE9+IF4qZ42O0TxMP4ew6+6Ok
-	4s80602c0Fi82TU7kvxllaT7lwo53GA=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Y9b5CzbUSU2n0RZT4h84OA5Z8uF+KezT8fQqdhGRljA=;
+	b=WTrQWiZIWjmXn0POEYDFN2NKGxeXgeNOzObR2jggTr08aJhtYRDKUgls3a9Xdaz5rX1tsQ
+	Ko/jjdFpDO/d1DrqiIFkV2na9vqDw5dLWmC+aEj04T3opxy1eRE6e06zJ/mhZFWGvSqabc
+	Srelamlw1XUaT5AwGSvU1CtIZmxPwbM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-LhHf3dMWMJeGWk7sEJHcIQ-1; Mon,
- 28 Oct 2024 12:29:18 -0400
-X-MC-Unique: LhHf3dMWMJeGWk7sEJHcIQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-120-n8NY9vqZPxSv0Fatb-9iKg-1; Mon,
+ 28 Oct 2024 12:35:53 -0400
+X-MC-Unique: n8NY9vqZPxSv0Fatb-9iKg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1572F1955D4A;
-	Mon, 28 Oct 2024 16:29:16 +0000 (UTC)
-Received: from localhost (unknown [10.22.88.106])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 52E9919560AA;
-	Mon, 28 Oct 2024 16:29:14 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFB2C1955F3C;
+	Mon, 28 Oct 2024 16:35:49 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.86])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9EE719560A2;
+	Mon, 28 Oct 2024 16:35:42 +0000 (UTC)
+Date: Mon, 28 Oct 2024 16:35:39 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
- peter.maydell@linaro.org, richard.henderson@linaro.org,
- alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
- armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
- pbonzini@redhat.com
-Subject: Re: [RFC 21/21] arm/cpu-features: Document custom vcpu model
-In-Reply-To: <Zx-3OUioG1l47hW3@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
+	cohuck@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev, richard.henderson@linaro.org,
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
+Message-ID: <Zx-9WxXkmkMuGIlQ@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-22-eric.auger@redhat.com>
- <ZxuZkUFz_bwAA1pf@redhat.com>
- <0700af51-a1a6-4b11-a4bf-0eaf6e279c6d@redhat.com>
- <Zxudl5-fZV1vIaEL@redhat.com> <87y128nrfr.fsf@redhat.com>
- <Zx-3OUioG1l47hW3@redhat.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Mon, 28 Oct 2024 17:29:11 +0100
-Message-ID: <87plnknqco.fsf@redhat.com>
+ <20241025101959.601048-19-eric.auger@redhat.com>
+ <ZxuX4i9NjVRizB72@redhat.com>
+ <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com>
+ <Zxub7ol4p8P_sWF8@redhat.com>
+ <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,59 +69,96 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Oct 28 2024, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+On Mon, Oct 28, 2024 at 04:16:31PM +0000, Peter Maydell wrote:
+> On Fri, 25 Oct 2024 at 14:24, Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > On Fri, Oct 25, 2024 at 03:18:25PM +0200, Eric Auger wrote:
+> > > On 10/25/24 15:06, Daniel P. Berrangé wrote:
+> > > > Also, is this naming convention really the same one that users
+> > > > will see when they look at /proc/cpuinfo to view features ? It
+> > > No it is not. I do agree that the custom cpu model is very low level. It
+> > > is very well suited to test all series turning ID regs as writable but
+> > > this would require an extra layer that adapts /proc/cpuinfo feature
+> > > level to this regid/field abstraction.
+> > >
+> > > In /cpu/proc you will see somethink like:
+> > >  Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp
+> > > asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+> >
+> > Right, IMHO, this is the terminology that QEMU must use in user
+> > facing APIs.
+> 
+> /proc/cpuinfo's naming is rather weird for historical
+> reasons (for instance there is only one FEAT_FP16 feature
+> but cpuinfo lists "fphp" and "asimdhp" separately).
 
-> On Mon, Oct 28, 2024 at 05:05:44PM +0100, Cornelia Huck wrote:
->> On Fri, Oct 25 2024, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->>=20
->> > On Fri, Oct 25, 2024 at 03:28:35PM +0200, Eric Auger wrote:
->> >> Hi Daniel,
->> >>=20
->> >> On 10/25/24 15:13, Daniel P. Berrang=C3=A9 wrote:
->> >> > On Fri, Oct 25, 2024 at 12:17:40PM +0200, Eric Auger wrote:
->> >> >> From: Cornelia Huck <cohuck@redhat.com>
->> >> >>
->> >> >> Add some documentation for the custom model.
->> >> >>
->> >> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> >> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> >> >> ---
->> >> >>  docs/system/arm/cpu-features.rst | 55 +++++++++++++++++++++++++++=
------
->> >> >>  1 file changed, 47 insertions(+), 8 deletions(-)
->> >> >
->> >> >> @@ -167,6 +196,16 @@ disabling many SVE vector lengths would be qu=
-ite verbose, the ``sve<N>`` CPU
->> >> >>  properties have special semantics (see "SVE CPU Property Parsing
->> >> >>  Semantics").
->> >> >>=20=20
->> >> >> +The ``custom`` CPU model needs to be configured via individual ID=
- register
->> >> >> +field properties, for example::
->> >> >> +
->> >> >> +  $ qemu-system-aarch64 -M virt -cpu custom,SYSREG_ID_AA64ISAR0_E=
-L1_DP=3D0x0
->> >> >> +
->> >> >> +This forces ID_AA64ISAR0_EL1 DP field to 0.
->> >> > What is the "baseline" featureset implied by 'custom' ?
->> >> there is no baseline at the moment. By default this is a host
->> >> passthrough model.
->> >
->> > Why do we need to create "custom" at all, as opposed to just letting
->> > users toggle features on "-cpu host" ?=20
->>=20
->> We could consolidate that to the current "host" model, once we figure
->> out how to handle the currently already existing properties. Models
->> based on the different architecture extensions would probably be more
->> useable in the long run; maybe "custom" has a place for testing.
->
-> If you can set the features against "host", then any testing could
-> be done with "host" surely, making 'custom' pointless ?
+There's plenty of wierd history in x86 too. In this
+case I might suggest just picking one of the two
+common names, and ignoring the other.
 
-We might differentiate between "do some consistency checks" and "allow
-a completely weird wolpertinger"; if we agree that we don't need it,
-then we surely could drop it again.
+If we really wanted to, we could alias the 2nd name
+to the first, but its likely not worth the bother.
+
+> Currently QEMU only has to care about cpuinfo name tags
+> in linux-user/elfload.c where there's a bunch of data
+> structures for "what hwcaps do we need to advertise
+> given what the CPU has?". I would definitely prefer it if
+> we could use architectural feature names...
+> 
+> On other architectures do we do anything to forbid
+> invalid combinations? For Arm there are architectural
+> rules about feature X requiring features Y and Z.
+> Are we going to just let the user create a CPU that
+> the guest OS will barf on if they want to? (The
+> user-experience for that is potentially not very nice,
+> because something like "-cpu cortex-a57,+sve" seems like
+> something you might want to do but isn't actually valid;
+> even listing the direct required dependency of FEAT_SVE
+> like "-cpu cortex-a57,+sve,+fp16" isn't sufficient
+> because SVE is optional-from-v8.2 and so a guest could
+> in theory assume the presence of anything mandatory in
+> v8.1 and v8.2. But even merely diagnosing invalid
+> combinations is a huge pain, and automagically pulling
+> in every mandatory implicit or explicit dependency
+> seems like it might be surprising to users, as well as
+> being annoying to implement. Currently we sidestep
+> all of these problems by (a) only allowing the command
+> line to disable a feature, not to enable it where it
+> didn't previously exist and (b) mostly not providing
+> command line flags for individual features...)
+
+AFAICT, in x86 world, there's no generally documented dependancies
+between features. I imagine there might be deps mentioned in an
+adhoc basis in docs/specs.  There are certainly implicit deps though
+where apps check for X, and blindly assume it means Y+Z also exist.
+
+In the QEMU  & libvirt world though, there's no deps. This is generally
+why we discourage apps/users from trying to enable arbitrarily many
+features. People should stick to the named CPU models, and just use
+feature enablement as an exception.
+
+Enabling individual features *is* certainly a critically important
+benefit though, even with the risks from implicit undocumented
+dependencies.
+
+Most notably, it has been used to turn on fixes for hardware CVEs,
+where microcode introduces a new named feature. Your named CPU
+model may not be updated, but as long as QEMU knows the feature
+name, you can turn it on.
+
+Overall, while it would be desirable to have a way to express
+feature dependencies, I wouldn't call that a blocker for enabling
+the ability to turn features on & off.
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
