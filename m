@@ -1,76 +1,121 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F2EF9CF
-	for <kvmarm@lists.linux.dev>; Sat, 26 Oct 2024 21:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63D918C350
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 05:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729978671; cv=none; b=hXbR7DoM9maOmDWHjdO9meiK2VXhj1XDRSLtES422A7jMOVMGNLZ87GVCzlk1bZLyDYtWLiSFVodfYK6kxgLLenvv3xpovHUC1Al6Qc5okGmV+T3EHIsVq9Ow5OQKg6el/tpBe8KpRVxOL9rhzxOC00eRB8Iu6tOg7pYA88UX64=
+	t=1730093681; cv=none; b=M0mb6kdMDcGrNl8HOdLbDbTn6KAmU/qRVE4mhwn878pqbGugDpf4EnAie9fbDm1Ynh1gCuZaViz+vrDkiDsj+FJS4gMTCZRty9dNm9mzAPyxie1Y5BkKRzViMG/X+s9P6YiVCZIA2ZDplLjIai4SxHja9rg8VvrLGoG+4irJnac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729978671; c=relaxed/simple;
-	bh=b7VMtLK5eGU7Ghv1CxreTd4ZnXARI07YyDiFkBYT92g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mQ4KiVlE6j88xksjY5NFAIiMsoozCB/nX6UolnmhmkevOPQL62XswRiym1SG9WV+RrOWdRKApOapfxGk2z61L81YEry1URAlQkmusp68gE7gsCixLo0EOEE0Og6KJQFSX6J0BUjSz/SJoH7T/Px7MTo13m22NNjOKF9QUs8ic18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OqRPrRR5; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OqRPrRR5"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729978665;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vSdjs3cy3XZFXznTm6G5FHJZRTxkxB+FvsmS8vmxRyE=;
-	b=OqRPrRR58CIikyJ2dt07UVTpByHDSaNI944Y9zef6Jt/e5jE/kziYdgvcmu3RPycAvuA8w
-	/VxsUESVdIs6RIPDSAQI9bqc3tihrPC2vhxj3GBw/7ZgOE+bZJGJEXKyADl46WnDMLKGUk
-	rxiIsw3ebHclRh4wWvBz2Gt+g9O7RSE=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1730093681; c=relaxed/simple;
+	bh=ACtt5kqYmJZO6B2t8rgM/d2p645lg4GTKdOsCXsFcy4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IvphMiRCisBpQe/WRK0kgIyjX/97OPIdwfAleY8wz71VB9sLnj1E+pmGNZ8x4lvEG2qdjgsJvqz6Ay7bsdDq7FF3QSLE7bb5w6GkRTYuYg3jNEJv8NrkyNTpdq4R80k6aUJONXXHNlrGJXEvG11Fii1OlunT7L4vnwRClW6KYGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C16FE497;
+	Sun, 27 Oct 2024 22:35:07 -0700 (PDT)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.84])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7D7D03F66E;
+	Sun, 27 Oct 2024 22:34:34 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix splat/misbehavior for MMIO SEA injection
-Date: Sat, 26 Oct 2024 21:37:28 +0000
-Message-ID: <172997861843.352914.8282320466312561253.b4-ty@linux.dev>
-In-Reply-To: <20241025203106.3529261-1-oliver.upton@linux.dev>
-References: <20241025203106.3529261-1-oliver.upton@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: [PATCH V2 0/7] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+Date: Mon, 28 Oct 2024 11:04:19 +0530
+Message-Id: <20241028053426.2486633-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On Fri, 25 Oct 2024 20:31:02 +0000, Oliver Upton wrote:
-> v1 -> v2:
->  - Make it clear that the series is referring to synchronous external
->    aborts (i.e. SEAs)
->  - Move helper out of header
->  - Pull esr + friends into tools, for use in KVM selftests
-> 
-> v2: https://lore.kernel.org/kvmarm/20241018194757.3685856-1-oliver.upton@linux.dev/
-> 
-> [...]
+This series enables FEAT_Debugv8p9 thus extending breakpoint and watchpoint
+support upto 64. This series is based on v6.12-rc5 although this depends on
+FEAT_FGT2 FGU series posted earlier, for MDSELR_EL1 handling in various KVM
+guest configurations.
 
-Applied to kvmarm/next, thanks!
+https://lore.kernel.org/all/20241001024356.1096072-1-anshuman.khandual@arm.com/
 
-[1/4] KVM: arm64: Don't retire aborted MMIO instruction
-      https://git.kernel.org/kvmarm/kvmarm/c/e735a5da6442
-[2/4] tools: arm64: Grab a copy of esr.h from kernel
-      https://git.kernel.org/kvmarm/kvmarm/c/9fb8e9178b25
-[3/4] KVM: arm64: selftests: Convert to kernel's ESR terminology
-      https://git.kernel.org/kvmarm/kvmarm/c/c660d334b3a5
-[4/4] KVM: arm64: selftests: Add tests for MMIO external abort injection
-      https://git.kernel.org/kvmarm/kvmarm/c/3eb09a3e028e
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
 
---
-Best,
-Oliver
+Changes in V2:
+
+Following changes have been made per review comments from Mark Rutland
+
+- Orr MDCR_EL2_EBWE directly without an intermittent register
+- Alphabetically order header files in debug-monitors.c
+- Dropped embwe_ref_count mechanism
+- Dropped preempt_enable() from AARCH64_DBG_READ
+- Dropped preempt_disable() from AARCH64_DBG_WRITE
+- Dropped set_bank_index()
+- Renamed read/write_wb_reg() as __read/__write_wb_reg()
+- Modified read/write_wb_reg() to have MDSELR_E1 based banked read/write
+- Added required sysreg tools patches from KVM FEAT_FGT2 series for build
+
+Changes in V1:
+
+https://lore.kernel.org/all/20241001043602.1116991-1-anshuman.khandual@arm.com/
+
+- Changed FTR_STRICT to FTR_NONSTRICT for the following ID_AA64DFR1_EL1
+  register fields - ABL_CMPs, DPFZS, PMICNTR, CTX_CMPs, WRPs and BRPs
+
+Changes in RFC V2:
+
+https://lore.kernel.org/linux-arm-kernel/20240620092607.267132-1-anshuman.khandual@arm.com/
+
+- This series has been split from RFC V1 dealing only with arm64 breakpoints
+- Restored back DBG_MDSCR_MASK definition (unrelated change)
+- Added preempt_disable()/enable() blocks between selecting banks and registers
+
+Changes in RFC:
+
+https://lore.kernel.org/all/20240405080008.1225223-1-anshuman.khandual@arm.com/
+
+Anshuman Khandual (7):
+  arm64/sysreg: Update register fields for ID_AA64MMFR0_EL1
+  arm64/sysreg: Add register fields for MDSELR_EL1
+  arm64/sysreg: Add register fields for HDFGRTR2_EL2
+  arm64/sysreg: Add register fields for HDFGWTR2_EL2
+  arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
+  arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
+  arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+
+ Documentation/arch/arm64/booting.rst    | 19 +++++++
+ arch/arm64/include/asm/debug-monitors.h |  1 +
+ arch/arm64/include/asm/el2_setup.h      | 26 +++++++++
+ arch/arm64/include/asm/hw_breakpoint.h  | 46 ++++++++++++----
+ arch/arm64/include/asm/kvm_arm.h        |  1 +
+ arch/arm64/kernel/cpufeature.c          | 21 ++++++--
+ arch/arm64/kernel/debug-monitors.c      | 15 ++++--
+ arch/arm64/kernel/hw_breakpoint.c       | 38 +++++++++++++-
+ arch/arm64/tools/sysreg                 | 70 +++++++++++++++++++++++++
+ 9 files changed, 216 insertions(+), 21 deletions(-)
+
+-- 
+2.25.1
+
