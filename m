@@ -1,487 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9391EF950;
-	Mon, 28 Oct 2024 20:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE9C1E0DCB
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 20:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730147212; cv=none; b=HVWjA0q0C/Z8QdHoEGoxgw3UieNkUjNtW2XKovQAuM+QR47RoSDG2E02mCgTWHGvV0j7ceG+1oodkShf4ZJYSc2uVbTebAZQIkTKWi1cP9o6+5U79D++oCG6+XG7MLEGP8NFa0gznumFsE5XBpC535av5zN0QHVpiSvQaQmHb8w=
+	t=1730148337; cv=none; b=itPaGCBu6bmfUNQKiDyZuVgduxzUErcmEb0h3PZAQdpf67B6Ar91IO/mNnysouTvTFqqWjZqLRnptL3Fd9Synj3I50sybGT5/RWrzzO01DvOPyYFf1pJ6sZKUmNxkwmBX5x/Gcs8H3MdFge/+lJpPZR+nAqSEN2AxmTLeLGO+l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730147212; c=relaxed/simple;
-	bh=h2Wehl87NboyijTuuRSERBYg5ixqNkdqmXD3SKKUYoE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fO/WGpx5oFoq2cRaJ6E+xwmN1ksIATHKJgzhRG7e9pUbngsyB3vF9D+znUSs8aOgg7Qw/yTXs2h/1gsAuF6uaIziCfiv9Z2CHdKsNjAwyXjrol7b8Q6MBPaN2JDvMLKIJq92Ur5J3yRcB45TafXTb2qztEKocdIWuQdMtLdtG3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tspuvubf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730148337; c=relaxed/simple;
+	bh=ZpZwPefGlLKwfRcQr9eo4d8WzScWyn0cUDZORUV6UrE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pAXDyWwA7hjfjPXJMmAEC5tDNs+3Y9yRvOC7psKhGUpXSrKn1JLNNNl0sQyOgFZGkvKNm7EbA3vL4u4eKMYEBVHkY2V5AEeysLbMgoIBCwnfh9tHH3O6BwMUVTLdNu7JPWq8i/OxHeSETSboBnFLNWxQO0x/9xf8bStCEgxriyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OhcKXmtc; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tspuvubf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDC23C4CEE3;
-	Mon, 28 Oct 2024 20:26:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730147211;
-	bh=h2Wehl87NboyijTuuRSERBYg5ixqNkdqmXD3SKKUYoE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Tspuvubf3x10cF+HBMECbXSucjNCcaUq2vMSM+Ymsbw7FHEsOHIyFCtGbCMy0YveM
-	 6vEWnLmCJEKbvkua/vL1GOLDLKJSgnu7GSeSKGpFYLQWAR1EDnYSnl+OZiSPZF5Wk9
-	 ENN0uljhzz3JZt5BY9khATJ/CwZ2NF/jd7BafqbaY6Sfm+2R1+ifcxz9s3HZ30HEen
-	 Zvb7/To34xTgWAtzvA7alyykJxJZiLOlV9mI/kNroZC2gDU1ru4UlSMOWAElXIcEaw
-	 Ixe/iqrYd9avLYbNDyouNUElRy4L6l+OR2oeHler24fJd+Z5GRNs6xQuKdanEemc22
-	 WhTl+EHDNsPNg==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 28 Oct 2024 20:24:18 +0000
-Subject: [PATCH 9/9] kselftest/arm64: Add 2024 dpISA extensions to hwcap
- test
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OhcKXmtc"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e30b8fd4ca1so994660276.3
+        for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 13:45:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730148334; x=1730753134; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xKuNSIYTBR1rDIPTuHwqfwMTGhTV2i8TmyskVsFOfO4=;
+        b=OhcKXmtcJiKhVXjhXCZikoAP9Q0KfJjRJ8fWoF3e1oxID0DizrubQsrIbdZBdqf7Kl
+         UnxVTIjqV/HXxNo3NQKf+gX8ze5Bjw/OPg7Kk9GxlAC6ubJOWPUapuzYc6n8kvTA1HiW
+         fIllNIpkViWIzlfSBFU2k5XxG3wInOaKsEvcrn/JpTCJ1GJDy+OCk0LayYErsKc8Gtwm
+         AtUW7f+7W5ikXvHIUCUEbUns4kzh1aG4Kcw4F2eXd3nBPpZA9qGpEa1CkXvQJktcgyyE
+         DsFXPiafcUGFwV/Iyw3aPnCa/xbzeHVOKL2YHQlY+WX4q2lG404vCFP/4qkHtA/3Muly
+         Yv8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730148334; x=1730753134;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xKuNSIYTBR1rDIPTuHwqfwMTGhTV2i8TmyskVsFOfO4=;
+        b=WBKm5/Ll4e0mkl4BOMR0ZksHTzoctAbDavmXxtRLDXRc24D58G0uyz9x9eFfNslhky
+         m8rw1pC5xv/fek7f8sBcq00yi+xrv0J+7inxMe9HcAkFAFS4kOYRVJavKInWp8LtZueQ
+         lLSzKvKLutJEME56LhVonza2hhn8iNgSiRmawalC4u63dSD/KLpHdQ7XDzDSE9nlqRuM
+         +LC+TBestRKunxt+Ovu12WD5FM6+DjX7LAzPClj9mjgu3YHfbsBDIttBs4YsswBeyiEj
+         HgOLYxjiVEAsZDmB75R/IyeJwnHkwnOpecyvSizPvV7boi8pUU86TjubH9lTHQDygzzP
+         gYGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVFqPBvkTXH7K6udeIM1dxWIho7i4msByZVjSVFVNJnat6s2RhqVgftwaTVphFyd00QIl8No/4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzqRHFq7r0tUbDLJ7gu92bY90SmgPAEksZyk2ga65WasqlW6pdz
+	jVewSW+FpV1PrQqKorv0C5eT9ixb+jD1iz0PMifyrsY7Bn3R94K9r+/TMUtNBsb8vSzcme7INCd
+	T1g==
+X-Google-Smtp-Source: AGHT+IHUv/Dlq02qbqz0gjBFFfL25anLHCsRNYQi4mL1loTc7X5gbHLuxRGm93NhBDNRsTac4zgpo4TCt0s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a5b:d43:0:b0:e29:7454:a4da with SMTP id
+ 3f1490d57ef6-e3087a705fcmr7090276.4.1730148333867; Mon, 28 Oct 2024 13:45:33
+ -0700 (PDT)
+Date: Mon, 28 Oct 2024 20:45:32 +0000
+In-Reply-To: <CADrL8HUEwnP8e700y2XYDgVhhUJuj1UEJmd2NLdtZ1dV845DNw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241028-arm64-2024-dpisa-v1-9-a38d08b008a8@kernel.org>
-References: <20241028-arm64-2024-dpisa-v1-0-a38d08b008a8@kernel.org>
-In-Reply-To: <20241028-arm64-2024-dpisa-v1-0-a38d08b008a8@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-9b746
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9994; i=broonie@kernel.org;
- h=from:subject:message-id; bh=h2Wehl87NboyijTuuRSERBYg5ixqNkdqmXD3SKKUYoE=;
- b=owGbwMvMwMWocq27KDak/QLjabUkhnT5zzlffMJrd59beGZZGRufyGd1YetbuXdbEmZv5gv3E9na
- 0/qzk9GYhYGRi0FWTJFl7bOMVenhElvnP5r/CmYQKxPIFAYuTgGYSOZK9v+umV++5hrl7Opm46ybzt
- tm9eP431cc6xsWJpatNpvNEBT5cYn0gsnpm5XvtpbOXMi7KYdXeWPfpp2J5/RvGm3tZZwQs3WeWdl2
- 8zM9m3+ZerzXzDypc/9hcxWbt/newkXWPdOZAtSnVhsw6/jd5lpe/S9tW4ac109/u/Mu6xRTudl+OT
- efNc4su7eBkUmNRbx5R+LyIB1bxqbPoecZp9YplF34mK7+fIlzqcPOn8YvI2sfsyUcEvfeY9b7WU6+
- YOLx+XIxBoJZf+6faOrJKnIX9M1Ler009JvQJ9UzK2pLWmexxtz/P908JoDbmY05SFKBe6rS5oftMY
- kK4TNt83PFzMqzb0hcKXySZNYEAA==
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Mime-Version: 1.0
+References: <20241009154953.1073471-1-seanjc@google.com> <20241009154953.1073471-10-seanjc@google.com>
+ <CADrL8HUEwnP8e700y2XYDgVhhUJuj1UEJmd2NLdtZ1dV845DNw@mail.gmail.com>
+Message-ID: <Zx_37E9QY_PfBaTB@google.com>
+Subject: Re: [PATCH v3 09/14] KVM: sefltests: Explicitly include
+ ucall_common.h in mmu_stress_test.c
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-We don't actually test SIGILL generation for CMPBR since the need to
-branch makes it a pain to generate and the SIGILL detection would be
-unreliable anyway. Since this should be very unusual we provide a stub
-function rather than supporting a missing function.
++lists
 
-The sigill functions aren't well sorted in the file so the ordering is a
-bit random.
+Unless there is a good reason for off-list communication, please keep the Cc
+list intact when responding, even for trivialities.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 273 +++++++++++++++++++++++++++++-
- 1 file changed, 271 insertions(+), 2 deletions(-)
+On Mon, Oct 28, 2024, James Houghton wrote:
+> BTW, there is a typo in the shortlog: "sefltests". Guessing you've
+> noticed that already.
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index f2d6007a2b983eba77a880ec7e614396a6cb1377..beb380bc09b0d07269a85a60e5d2977367740473 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -46,6 +46,12 @@ static void atomics_sigill(void)
- 	asm volatile(".inst 0xb82003ff" : : : );
- }
- 
-+static void cmpbr_sigill(void)
-+{
-+	/* Not implemented, too complicated and unreliable anyway */
-+}
-+
-+
- static void crc32_sigill(void)
- {
- 	/* CRC32W W0, W0, W1 */
-@@ -82,6 +88,18 @@ static void f8fma_sigill(void)
- 	asm volatile(".inst 0xec0fc00");
- }
- 
-+static void f8mm4_sigill(void)
-+{
-+	/* FMMLA V0.4SH, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e00ec00");
-+}
-+
-+static void f8mm8_sigill(void)
-+{
-+	/* FMMLA V0.4S, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e80ec00");
-+}
-+
- static void faminmax_sigill(void)
- {
- 	/* FAMIN V0.4H, V0.4H, V0.4H */
-@@ -98,6 +116,12 @@ static void fpmr_sigill(void)
- 	asm volatile("mrs x0, S3_3_C4_C4_2" : : : "x0");
- }
- 
-+static void fprcvt_sigill(void)
-+{
-+	/* FCVTAS S0, H0 */
-+	asm volatile(".inst 0x1efa0000");
-+}
-+
- static void ilrcpc_sigill(void)
- {
- 	/* LDAPUR W0, [SP, #8] */
-@@ -215,6 +239,42 @@ static void sme2p1_sigill(void)
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
- }
- 
-+static void sme2p2_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* UXTB Z0.D, P0/Z, Z0.D  */
-+	asm volatile(".inst 0x4c1a000" : : : );
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void sme_aes_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* AESD z0.b, z0.b, z0.b */
-+	asm volatile(".inst 0x4522e400" : : : "z0");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void sme_sbitperm_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* BDEP Z0.B, Z0.B, Z0.B */
-+	asm volatile(".inst 0x4500b400" : : : "z0");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
- static void smei16i32_sigill(void)
- {
- 	/* SMSTART */
-@@ -323,13 +383,73 @@ static void smesf8dp4_sigill(void)
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
- }
- 
-+static void smesf8mm8_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FMMLA V0.4S, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e80ec00");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesf8mm4_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FMMLA V0.4SH, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e00ec00");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
- static void smesf8fma_sigill(void)
- {
- 	/* SMSTART */
- 	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
- 
--	/* FMLALB V0.8H, V0.16B, V0.16B */
--	asm volatile(".inst 0xec0fc00");
-+	/* FMLALB Z0.8H, Z0.B, Z0.B */
-+	asm volatile(".inst 0x64205000");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesfexpa_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FEXPA Z0.D, Z0.D */
-+	asm volatile(".inst 0x04e0b800");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesmop4_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* SMOP4A ZA0.S, Z0.B, { Z0.B - Z1.B } */
-+	asm volatile(".inst 0x80108000");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smestmop_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* STMOPA ZA0.S, { Z0.H - Z1.H }, Z0.H, Z20[0] */
-+	asm volatile(".inst 0x80408008");
- 
- 	/* SMSTOP */
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-@@ -353,18 +473,42 @@ static void sve2p1_sigill(void)
- 	asm volatile(".inst 0x65000000" : : : "z0");
- }
- 
-+static void sve2p2_sigill(void)
-+{
-+	/* NOT Z0.D, P0/Z, Z0.D */
-+	asm volatile(".inst 0x4cea000" : : : "z0");
-+}
-+
- static void sveaes_sigill(void)
- {
- 	/* AESD z0.b, z0.b, z0.b */
- 	asm volatile(".inst 0x4522e400" : : : "z0");
- }
- 
-+static void sveaes2_sigill(void)
-+{
-+	/* AESD {Z0.B - Z1.B }, { Z0.B - Z1.B }, Z0.Q */
-+	asm volatile(".inst 0x4522ec00" : : : "z0");
-+}
-+
- static void sveb16b16_sigill(void)
- {
- 	/* BFADD ZA.H[W0, 0], {Z0.H-Z1.H} */
- 	asm volatile(".inst 0xC1E41C00" : : : );
- }
- 
-+static void svebfscale_sigill(void)
-+{
-+	/* BFSCALE Z0.H, P0/M, Z0.H, Z0.H */
-+	asm volatile(".inst 0x65098000" : : : "z0");
-+}
-+
-+static void svef16mm_sigill(void)
-+{
-+	/* FMMLA Z0.S, Z0.H, Z0.H */
-+	asm volatile(".inst 0x6420e400");
-+}
-+
- static void svepmull_sigill(void)
- {
- 	/* PMULLB Z0.Q, Z0.D, Z0.D */
-@@ -383,6 +527,12 @@ static void svesha3_sigill(void)
- 	asm volatile(".inst 0x4203800" : : : "z0");
- }
- 
-+static void sveeltperm_sigill(void)
-+{
-+	/* COMPACT Z0.B, P0, Z0.B */
-+	asm volatile(".inst 0x5218000" : : : "x0");
-+}
-+
- static void svesm4_sigill(void)
- {
- 	/* SM4E Z0.S, Z0.S, Z0.S */
-@@ -458,6 +608,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "aes",
- 		.sigill_fn = aes_sigill,
- 	},
-+	{
-+		.name = "CMPBR",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_CMPBR,
-+		.cpuinfo = "cmpbr",
-+		.sigill_fn = cmpbr_sigill,
-+	},
- 	{
- 		.name = "CRC32",
- 		.at_hwcap = AT_HWCAP,
-@@ -512,6 +669,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "f8fma",
- 		.sigill_fn = f8fma_sigill,
- 	},
-+	{
-+		.name = "F8MM8",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_F8MM8,
-+		.cpuinfo = "f8mm8",
-+		.sigill_fn = f8mm8_sigill,
-+	},
-+	{
-+		.name = "F8MM4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_F8MM4,
-+		.cpuinfo = "f8mm4",
-+		.sigill_fn = f8mm4_sigill,
-+	},
- 	{
- 		.name = "FAMINMAX",
- 		.at_hwcap = AT_HWCAP2,
-@@ -534,6 +705,13 @@ static const struct hwcap_data {
- 		.sigill_fn = fpmr_sigill,
- 		.sigill_reliable = true,
- 	},
-+	{
-+		.name = "FPRCVT",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_FPRCVT,
-+		.cpuinfo = "fprcvt",
-+		.sigill_fn = fprcvt_sigill,
-+	},
- 	{
- 		.name = "JSCVT",
- 		.at_hwcap = AT_HWCAP,
-@@ -672,6 +850,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "sme2p1",
- 		.sigill_fn = sme2p1_sigill,
- 	},
-+	{
-+		.name = "SME 2.2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME2P2,
-+		.cpuinfo = "sme2p2",
-+		.sigill_fn = sme2p2_sigill,
-+	},
-+	{
-+		.name = "SME AES",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_AES,
-+		.cpuinfo = "smeaes",
-+		.sigill_fn = sme_aes_sigill,
-+	},
- 	{
- 		.name = "SME I16I32",
- 		.at_hwcap = AT_HWCAP2,
-@@ -721,6 +913,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "smelutv2",
- 		.sigill_fn = smelutv2_sigill,
- 	},
-+	{
-+		.name = "SME SBITPERM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SBITPERM,
-+		.cpuinfo = "smesbitperm",
-+		.sigill_fn = sme_sbitperm_sigill,
-+	},
- 	{
- 		.name = "SME SF8FMA",
- 		.at_hwcap = AT_HWCAP2,
-@@ -728,6 +927,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "smesf8fma",
- 		.sigill_fn = smesf8fma_sigill,
- 	},
-+	{
-+		.name = "SME SF8MM8",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SF8MM8,
-+		.cpuinfo = "smesf8mm8",
-+		.sigill_fn = smesf8mm8_sigill,
-+	},
-+	{
-+		.name = "SME SF8MM4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SF8MM8,
-+		.cpuinfo = "smesf8mm4",
-+		.sigill_fn = smesf8mm4_sigill,
-+	},
- 	{
- 		.name = "SME SF8DP2",
- 		.at_hwcap = AT_HWCAP2,
-@@ -742,6 +955,27 @@ static const struct hwcap_data {
- 		.cpuinfo = "smesf8dp4",
- 		.sigill_fn = smesf8dp4_sigill,
- 	},
-+	{
-+		.name = "SME SFEXPA",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SFEXPA,
-+		.cpuinfo = "smesfexpa",
-+		.sigill_fn = smesfexpa_sigill,
-+	},
-+	{
-+		.name = "SME SMOP4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SMOP4,
-+		.cpuinfo = "smesmop4",
-+		.sigill_fn = smesmop4_sigill,
-+	},
-+	{
-+		.name = "SME STMOP",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_STMOP,
-+		.cpuinfo = "smestmop",
-+		.sigill_fn = smestmop_sigill,
-+	},
- 	{
- 		.name = "SVE",
- 		.at_hwcap = AT_HWCAP,
-@@ -764,6 +998,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "sve2p1",
- 		.sigill_fn = sve2p1_sigill,
- 	},
-+	{
-+		.name = "SVE 2.2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE2P2,
-+		.cpuinfo = "sve2p2",
-+		.sigill_fn = sve2p2_sigill,
-+	},
- 	{
- 		.name = "SVE AES",
- 		.at_hwcap = AT_HWCAP2,
-@@ -771,6 +1012,34 @@ static const struct hwcap_data {
- 		.cpuinfo = "sveaes",
- 		.sigill_fn = sveaes_sigill,
- 	},
-+	{
-+		.name = "SVE AES2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_AES2,
-+		.cpuinfo = "sveaes2",
-+		.sigill_fn = sveaes2_sigill,
-+	},
-+	{
-+		.name = "SVE BFSCALE",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_BFSCALE,
-+		.cpuinfo = "svebfscale",
-+		.sigill_fn = svebfscale_sigill,
-+	},
-+	{
-+		.name = "SVE ELTPERM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_ELTPERM,
-+		.cpuinfo = "sveeltperm",
-+		.sigill_fn = sveeltperm_sigill,
-+	},
-+	{
-+		.name = "SVE F16MM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_F16MM,
-+		.cpuinfo = "svef16mm",
-+		.sigill_fn = svef16mm_sigill,
-+	},
- 	{
- 		.name = "SVE2 B16B16",
- 		.at_hwcap = AT_HWCAP2,
-
--- 
-2.39.2
-
+I had not.  Thanks for the eyeballs!
