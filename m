@@ -1,108 +1,86 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C061DC74A
-	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 13:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4921DE2A2
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 14:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730123024; cv=none; b=KyrjQlIXphI+pYYlv21K6RTO1G8Va345VMg5VSntDudjpQLwntEmxvaT+Wwm58UtDLrTkPzAbOB0F+zxBXVOHHI98yEELHtOsb9pYBfoxrnbzyEIta0W7qZGjsBiqxeWLAqZAunS0s0ClRBiPqmZPobu5/c0O7pSzaR8WjiKpLk=
+	t=1730126695; cv=none; b=noJbAhTaX0/DNgYRVHxQBOyMHsm0iiRLCppNqVl/SwXChOR4lViTNedGbbNDu8IHylDapWil9mBwSl/dc1G2/MKpLsvBSC1AMywKruz/QIfoe7PMAeYWlVdwTS/9HzittEsBDf5jKrVxY7FyLjvxZ4J4zKgSQWvtq4qeg+JLyZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730123024; c=relaxed/simple;
-	bh=uMi/PJfX0ne0yB7ZpkaQrwY7lz0yJr3IHebiWoYUnbM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XHPqLllFfiBZxOb5HjKCdOKy9qTCD1cVcmGwwoRQvQ1IK3XRN2nRvZ6p7+YhImFvsH9QWdY3Sd0pa8VQ+T053nHbgsA2XVDw9yogzqBOcddiq/9MY+o6IQqB4ADv0WeS7OXv8RAghpXWwbrEy1IjGMVdsnlQdukp9AP5tmPXUgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02037497;
-	Mon, 28 Oct 2024 06:44:11 -0700 (PDT)
-Received: from [10.163.42.200] (unknown [10.163.42.200])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C4103F66E;
-	Mon, 28 Oct 2024 06:43:36 -0700 (PDT)
-Message-ID: <92124be9-ffa5-4cf9-bec4-e7d3afb91a96@arm.com>
-Date: Mon, 28 Oct 2024 19:13:33 +0530
+	s=arc-20240116; t=1730126695; c=relaxed/simple;
+	bh=TokjYQH8kitD8Y36X7+EU0WzCzQ55HbXZ1jajE86zD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NYcv2bG6lUQotHnLPHFR7ijMVcWUe/lpUscABNjsBs0H/oOmhZfF/qaIlt9LNEHaTsitvarB+aVE/Xnt+ctxnFSZntCw7GA0vEqH2MJHPCh91u53iDjeKRENH4r0aWNGmkYwqF+kOeZEkvGY2nBcGsrRs+oxzK7nRyMunlK1pLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GvrT6mt2; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GvrT6mt2"
+Date: Mon, 28 Oct 2024 14:44:43 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730126689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WrEXEA4endWKL67QJLeMRmZVfFpl2fT0EjCN3vzhm+o=;
+	b=GvrT6mt2Oq66jA6SCmxxtfQp0hhFXZ1rAWfFgIJoObPh5TfPfrtgrHzh/+KVbL2U1BnVlu
+	ioq9c0T+vFDjJfhUM50rwMG5b3X0J3lWaN7dxcZun2+8GXfBN5+F744hOKpKJwEyeTk3y5
+	cIJl6NvKd1xAlMxheWNNXYV2fV0Fz78=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 4/4] arm64: mte: Use stage-2 NoTagAccess memory attribute
+ if supported
+Message-ID: <Zx-jWyF7xvFS-Vs6@linux.dev>
+References: <20241028094014.2596619-1-aneesh.kumar@kernel.org>
+ <20241028094014.2596619-5-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] arm64/boot: Enable EL2 requirements for
- FEAT_Debugv8p9
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
- linux-doc@vger.kernel.org
-References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
- <20241001043602.1116991-3-anshuman.khandual@arm.com>
- <ZxfOeqyb3RvsdYbU@J2N7QTR9R3> <72700154-cbf4-4a0a-b6e2-6f0709dec0ce@arm.com>
- <Zx-E_8SFV74s6xN8@J2N7QTR9R3>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Zx-E_8SFV74s6xN8@J2N7QTR9R3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028094014.2596619-5-aneesh.kumar@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
+On Mon, Oct 28, 2024 at 03:10:14PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 637efc055145..a8268a164c4d 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -178,6 +178,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_NOTIFY           37
+>  #define KVM_EXIT_LOONGARCH_IOCSR  38
+>  #define KVM_EXIT_MEMORY_FAULT     39
+> +#define KVM_EXIT_ARM_NOTAG_ACCESS 40
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -446,6 +447,12 @@ struct kvm_run {
+>  			__u64 gpa;
+>  			__u64 size;
+>  		} memory_fault;
+> +		/* KVM_EXIT_ARM_NOTAG_ACCESS */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 size;
+> +		} notag_access;
 
+Can you please look into reusing the memory fault exit infrastructure?
 
-On 10/28/24 18:05, Mark Rutland wrote:
-> On Wed, Oct 23, 2024 at 11:42:37AM +0530, Anshuman Khandual wrote:
->>
->>
->> On 10/22/24 21:40, Mark Rutland wrote:
->>> On Tue, Oct 01, 2024 at 10:06:01AM +0530, Anshuman Khandual wrote:
->>>> Fine grained trap control for MDSELR_EL1 register needs to be configured in
->>>> HDFGRTR2_EL2, and HDFGWTR2_EL2 registers when kernel enters at EL1, but EL2
->>>> is also present. This adds a new helper __init_el2_fgt2() initializing this
->>>> new FEAT_FGT2 based fine grained registers.
->>>>
->>>> MDCR_EL2.EBWE needs to be enabled for additional (beyond 16) breakpoint and
->>>> watchpoint exceptions when kernel enters at EL1, but EL2 is also present.
->>>> This updates __init_el2_debug() as required for FEAT_Debugv8p9.
->>>>
->>>> While here, also update booting.rst with MDCR_EL3 and SCR_EL3 requirements.
->>>
->>> [...]
->>>
->>>> +  For CPUs with FEAT_Debugv8p9 extension present:
->>>> +
->>>> +  - If the kernel is entered at EL1 and EL2 is present:
->>>> +
->>>> +    - HDFGRTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
->>>> +    - HDFGWTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
->>>> +    - MDCR_EL2.EBWE (bit 43) must be initialized to 0b1
->>>> +
->>>> +  - If EL3 is present:
->>>> +
->>>> +    - MDCR_EL3.TDA (bit 9) must be initialized to 0b0
->>>
->>> AFAICT we need TDA==0 this regardless of FEAT_Debugv8p9 (and e.g. we need
->>
->> That's because MDCR_EL3.TDA=0, enables access to many other debug registers
->> beside FEAT_Debugv8p9, which are currently used and hence this MDCR_EL3.TDA
->> =0 requirement is a not a new one but rather a missing one instead ?
-> 
-> Yes, that's why I said we need it regardless; it's an existing
-> requirement that wasn't documented.
+The entire point of that is for KVM to tell the VMM it cannot make
+forward progress because of ${SOMETHING} unexpected at the specified
+GPA. You can add a new flag that describes tag access.
 
-Alright, got it.
-
-> 
->>
->>> MDCR_EL3.TPM==0 where FEAT_PMUv3 is implemented), so we should probably
->>> check if there's anything else we haven't yet documented in MDCR_EL3.
->>
->> Will scan through MDCR_EL3 register and match it with existing documentation
->> i.e Documentation/arch/arm64/booting.rst. If there are some missing MDCR_EL3
->> fields which should be mentioned, will add them via a separate pre-requisite
->> patch ?
-> 
-> Yes please.
-> 
-> Mark.
-
-Sure, will separate those changes in a pre-requisite patch as suggested.
+-- 
+Thanks,
+Oliver
