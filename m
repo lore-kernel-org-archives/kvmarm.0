@@ -1,164 +1,211 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84AE1DEFC4
-	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 16:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761051DEFC8
+	for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 16:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730133358; cv=none; b=F4tENQy5vFizj533Xt2YpeaJtTWzhTifca19OvZQ538TwdMkh7itFwzKGxPqzU5SIzqFctWSvgDSoh0MLmAAnfiiVzeHA2WaxKFCKOphZ4HMBithzOmfjKm8zXRjHLQN0bvy3FGcbmhW94A1B0R61bOBZbywpJ1Hr3u6yI+PJyY=
+	t=1730133844; cv=none; b=BOkn3G9YiilvrvqXan/gMrvvYLU+n+rdWCJ4y6sfd8lS9I/UO2U6Mno69Ha8mcPorl2ZbO05oHCIltsl6PG2ZpxAzzjiO2cqjB1wzQol1roS2xuTbbICmJtSRNFKhVr4FSwC4LIf6O8eS1bSRbbX8bNjXvgEQgMklk9v0MU1yA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730133358; c=relaxed/simple;
-	bh=KerATjdieBekw4nqxhfDRkuljX3jY3gIDC2yLuhzJaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LvqgonKWyP3nyXdcDipxjcV24fCf0WbPFll32DavYm6VAT41CCB5cgGPOBJlrC4aYCT28OnMBUFT+1xT9stquw+93HaKtOkCAxwRjELsLAfXTuJz6JIcrOVJlr2Zi20hZJoJcCAp56+JUn5LkLuxLiz47u4TAf78drQtWv9GbFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTrQWiZI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730133844; c=relaxed/simple;
+	bh=5U/BlhyWnIq29nL86XXLwJkwzlKQyZzuRLybvzL75FY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GnI0agwqy+Zq0zY+tbHoMxgQa2STrIDRujTiaMfNzqKsSpVAgp+hKxv4E9Hd/vYcTc5bRTgj6NZJ4ZwMJQq71rTIQaXzww3ndMC15TmD7R+JhleqgmRpwuUCFmFiRcumvBvosLmbfkePNByycXJ2VM0ahynBvPA0PDIKSXTx+OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k9pLePzg; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTrQWiZI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730133354;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y9b5CzbUSU2n0RZT4h84OA5Z8uF+KezT8fQqdhGRljA=;
-	b=WTrQWiZIWjmXn0POEYDFN2NKGxeXgeNOzObR2jggTr08aJhtYRDKUgls3a9Xdaz5rX1tsQ
-	Ko/jjdFpDO/d1DrqiIFkV2na9vqDw5dLWmC+aEj04T3opxy1eRE6e06zJ/mhZFWGvSqabc
-	Srelamlw1XUaT5AwGSvU1CtIZmxPwbM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-120-n8NY9vqZPxSv0Fatb-9iKg-1; Mon,
- 28 Oct 2024 12:35:53 -0400
-X-MC-Unique: n8NY9vqZPxSv0Fatb-9iKg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFB2C1955F3C;
-	Mon, 28 Oct 2024 16:35:49 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.86])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9EE719560A2;
-	Mon, 28 Oct 2024 16:35:42 +0000 (UTC)
-Date: Mon, 28 Oct 2024 16:35:39 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-	cohuck@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev, richard.henderson@linaro.org,
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
-	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
-Message-ID: <Zx-9WxXkmkMuGIlQ@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-19-eric.auger@redhat.com>
- <ZxuX4i9NjVRizB72@redhat.com>
- <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com>
- <Zxub7ol4p8P_sWF8@redhat.com>
- <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k9pLePzg"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-460a8d1a9b7so368221cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 28 Oct 2024 09:44:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730133840; x=1730738640; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AdUZtk1fpQmVlMAy2eFWyRES/zFmVCuya2ON3EbDm7k=;
+        b=k9pLePzgFZgg7DMR8sOnrU1yBpyXqGWj1M9jUvxbhjG+iC/Df8A3zpV8AixMP4lZ1u
+         AaDgOANHtOSqM6LRVaOmY/n3MyHrePs5siDVFdliVQdsxAJzAmp1LDnZrmXjR+u39tyJ
+         N9Cadv5mFNNJjP76rbZwd9iQ1IsiHDb+LK6+HZDkY9sqWk+7/KKVqQFYRea0VJSK5BlN
+         VxfFFE4Hq+17fYc6QNCg4szDMD+VUDhjnjzBonuoxBmyrw/2CF6nQA9FGElvvxqesJ6/
+         B1XukiDuT+CPUymQt3mk0CmjSbvcIhQLsmQOC+TluKRewnQgH9K1EeDfU1sO8bmOL5rW
+         FDng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730133840; x=1730738640;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AdUZtk1fpQmVlMAy2eFWyRES/zFmVCuya2ON3EbDm7k=;
+        b=AZ6Zv97VgM4qJLi6ElyL7dhv/JKGar9jXZ5l4zswDoKDAcO+3I9qkHCEs+apBQB08K
+         nBGxMKAmrRWr1AkL8x7UgxmPvcOdf1KHGWRxy1bHINwg5Y6LbU3KQJjMa/w/xFvr3/yz
+         vTpsKuwDCTdRS2/NfN41/jjP+d3zaZiykrT/uITvYtpAYR4YuXt15OKKdDgCLW6qgK+o
+         81QunHnmLW+4I4UkGppBfAlWozKnMKFlhyUk3EcA3U406pRdIylFm7Oh334zOWRzJfMT
+         FlJQ+546rW9EMiZy1nhrJrut4yvzwSGl1BXKJ3RMZLLdaf3H7nZY/W/psx/y5swZaZR0
+         jGuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlPhKhJSUcyXe2Dd27A2i1ayssVyjmpCfkHPJNrzwxd3P5USgmeYv1yX9dX2H26z7gvL210ZU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzp9DKzoLo3eYy8PVEFDYoQPsHtCXxzYoIkymJYmqQfg2H8B7kV
+	k6K7eJcfv3hw9S0ZWrmEsN00mSJgfuY+JoLbh8dGOnX4xvOPnTCk8uMgL7OhHrA1kmk1aeExfdd
+	WqVXAUZC2cDiEULnVZPOjgW5XhX00H1USfa79
+X-Google-Smtp-Source: AGHT+IEghDPlnRG5rp1sejh9aj1o1ldjwh0sg0K+Pts7Qn1e0eo7gyHR2Y3Bk11hNYvDVU4SH68ne++ka9GQaWQoClE=
+X-Received: by 2002:ac8:470f:0:b0:461:4150:b833 with SMTP id
+ d75a77b69052e-4614150b8f8mr3465511cf.22.1730133840204; Mon, 28 Oct 2024
+ 09:44:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20241025221220.2985227-1-rananta@google.com> <Zxx_X9-MdmAFzHUO@linux.dev>
+ <87ttcztili.wl-maz@kernel.org> <Zx0CT1gdSWVyKLuD@linux.dev>
+In-Reply-To: <Zx0CT1gdSWVyKLuD@linux.dev>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 28 Oct 2024 09:43:45 -0700
+Message-ID: <CAJHc60wn=vA9j421FhVkMqYc0w8u2ZYuc-9TJ+rvriSXjseKHw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Mark the VM as dead for failed initializations
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	stable@vger.kernel.org, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 28, 2024 at 04:16:31PM +0000, Peter Maydell wrote:
-> On Fri, 25 Oct 2024 at 14:24, Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > On Fri, Oct 25, 2024 at 03:18:25PM +0200, Eric Auger wrote:
-> > > On 10/25/24 15:06, Daniel P. Berrangé wrote:
-> > > > Also, is this naming convention really the same one that users
-> > > > will see when they look at /proc/cpuinfo to view features ? It
-> > > No it is not. I do agree that the custom cpu model is very low level. It
-> > > is very well suited to test all series turning ID regs as writable but
-> > > this would require an extra layer that adapts /proc/cpuinfo feature
-> > > level to this regid/field abstraction.
-> > >
-> > > In /cpu/proc you will see somethink like:
-> > >  Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp
-> > > asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+Hi Oliver,
+
+
+On Sat, Oct 26, 2024 at 7:53=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Sat, Oct 26, 2024 at 08:43:21AM +0100, Marc Zyngier wrote:
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index bf64fed9820e..c315bc1a4e9a 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -74,8 +74,6 @@ enum kvm_mode kvm_get_mode(void);
+> >  static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE;=
+ };
+> >  #endif
 > >
-> > Right, IMHO, this is the terminology that QEMU must use in user
-> > facing APIs.
-> 
-> /proc/cpuinfo's naming is rather weird for historical
-> reasons (for instance there is only one FEAT_FP16 feature
-> but cpuinfo lists "fphp" and "asimdhp" separately).
+> > -DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> > -
+> >  extern unsigned int __ro_after_init kvm_sve_max_vl;
+> >  extern unsigned int __ro_after_init kvm_host_sve_max_vl;
+> >  int __init kvm_arm_init_sve(void);
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 879982b1cc73..1215df590418 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -206,8 +206,7 @@ void get_timer_map(struct kvm_vcpu *vcpu, struct ti=
+mer_map *map)
+> >
+> >  static inline bool userspace_irqchip(struct kvm *kvm)
+> >  {
+> > -     return static_branch_unlikely(&userspace_irqchip_in_use) &&
+> > -             unlikely(!irqchip_in_kernel(kvm));
+> > +     return unlikely(!irqchip_in_kernel(kvm));
+> >  }
+> >
+> >  static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 48cafb65d6ac..70ff9a20ef3a 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -69,7 +69,6 @@ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_=
+hyp_ctxt);
+> >  static bool vgic_present, kvm_arm_initialised;
+> >
+> >  static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
+> > -DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> >
+> >  bool is_kvm_arm_initialised(void)
+> >  {
+> > @@ -503,9 +502,6 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu=
+)
+> >
+> >  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+> >  {
+> > -     if (vcpu_has_run_once(vcpu) && unlikely(!irqchip_in_kernel(vcpu->=
+kvm)))
+> > -             static_branch_dec(&userspace_irqchip_in_use);
+> > -
+> >       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+> >       kvm_timer_vcpu_terminate(vcpu);
+> >       kvm_pmu_vcpu_destroy(vcpu);
+> > @@ -848,14 +844,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *=
+vcpu)
+> >                       return ret;
+> >       }
+> >
+> > -     if (!irqchip_in_kernel(kvm)) {
+> > -             /*
+> > -              * Tell the rest of the code that there are userspace irq=
+chip
+> > -              * VMs in the wild.
+> > -              */
+> > -             static_branch_inc(&userspace_irqchip_in_use);
+> > -     }
+> > -
+> >       /*
+> >        * Initialize traps for protected VMs.
+> >        * NOTE: Move to run in EL2 directly, rather than via a hypercall=
+, once
+> > @@ -1077,7 +1065,7 @@ static bool kvm_vcpu_exit_request(struct kvm_vcpu=
+ *vcpu, int *ret)
+> >        * state gets updated in kvm_timer_update_run and
+> >        * kvm_pmu_update_run below).
+> >        */
+> > -     if (static_branch_unlikely(&userspace_irqchip_in_use)) {
+> > +     if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
+> >               if (kvm_timer_should_notify_user(vcpu) ||
+> >                   kvm_pmu_should_notify_user(vcpu)) {
+> >                       *ret =3D -EINTR;
+> > @@ -1199,7 +1187,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu=
+)
+> >                       vcpu->mode =3D OUTSIDE_GUEST_MODE;
+> >                       isb(); /* Ensure work in x_flush_hwstate is commi=
+tted */
+> >                       kvm_pmu_sync_hwstate(vcpu);
+> > -                     if (static_branch_unlikely(&userspace_irqchip_in_=
+use))
+> > +                     if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+> >                               kvm_timer_sync_user(vcpu);
+> >                       kvm_vgic_sync_hwstate(vcpu);
+> >                       local_irq_enable();
+> > @@ -1245,7 +1233,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu=
+)
+> >                * we don't want vtimer interrupts to race with syncing t=
+he
+> >                * timer virtual interrupt state.
+> >                */
+> > -             if (static_branch_unlikely(&userspace_irqchip_in_use))
+> > +             if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+> >                       kvm_timer_sync_user(vcpu);
+> >
+> >               kvm_arch_vcpu_ctxsync_fp(vcpu);
+> >
+> > I think this would fix the problem you're seeing without changing the
+> > userspace view of an erroneous configuration. It would also pave the
+> > way for the complete removal of the interrupt notification to
+> > userspace, which I claim has no user and is just a shit idea.
+>
+> Yeah, looks like this ought to get it done.
+>
+> Even with a fix for this particular issue I do wonder if we should
+> categorically harden against late initialization failures and un-init
+> the vCPU (or bug VM, where necessary) to avoid dealing with half-baked
+> vCPUs/VMs across our UAPI surfaces.
+>
+> A sane userspace will probably crash when KVM_RUN returns EINVAL anyway.
 
-There's plenty of wierd history in x86 too. In this
-case I might suggest just picking one of the two
-common names, and ignoring the other.
+Thanks for the suggestion. Sure, I'll take another look at the
+possible things that we can uninitialize and try to re-spin the patch.
 
-If we really wanted to, we could alias the 2nd name
-to the first, but its likely not worth the bother.
+Marc,
 
-> Currently QEMU only has to care about cpuinfo name tags
-> in linux-user/elfload.c where there's a bunch of data
-> structures for "what hwcaps do we need to advertise
-> given what the CPU has?". I would definitely prefer it if
-> we could use architectural feature names...
-> 
-> On other architectures do we do anything to forbid
-> invalid combinations? For Arm there are architectural
-> rules about feature X requiring features Y and Z.
-> Are we going to just let the user create a CPU that
-> the guest OS will barf on if they want to? (The
-> user-experience for that is potentially not very nice,
-> because something like "-cpu cortex-a57,+sve" seems like
-> something you might want to do but isn't actually valid;
-> even listing the direct required dependency of FEAT_SVE
-> like "-cpu cortex-a57,+sve,+fp16" isn't sufficient
-> because SVE is optional-from-v8.2 and so a guest could
-> in theory assume the presence of anything mandatory in
-> v8.1 and v8.2. But even merely diagnosing invalid
-> combinations is a huge pain, and automagically pulling
-> in every mandatory implicit or explicit dependency
-> seems like it might be surprising to users, as well as
-> being annoying to implement. Currently we sidestep
-> all of these problems by (a) only allowing the command
-> line to disable a feature, not to enable it where it
-> didn't previously exist and (b) mostly not providing
-> command line flags for individual features...)
+If you feel userspace_irqchip_in_use is not necessary anymore, and as
+a quick fix to this issue, we can get rid of that independent of the
+un-init effort.
 
-AFAICT, in x86 world, there's no generally documented dependancies
-between features. I imagine there might be deps mentioned in an
-adhoc basis in docs/specs.  There are certainly implicit deps though
-where apps check for X, and blindly assume it means Y+Z also exist.
-
-In the QEMU  & libvirt world though, there's no deps. This is generally
-why we discourage apps/users from trying to enable arbitrarily many
-features. People should stick to the named CPU models, and just use
-feature enablement as an exception.
-
-Enabling individual features *is* certainly a critically important
-benefit though, even with the risks from implicit undocumented
-dependencies.
-
-Most notably, it has been used to turn on fixes for hardware CVEs,
-where microcode introduces a new named feature. Your named CPU
-model may not be updated, but as long as QEMU knows the feature
-name, you can turn it on.
-
-Overall, while it would be desirable to have a way to express
-feature dependencies, I wouldn't call that a blocker for enabling
-the ability to turn features on & off.
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Thank you.
+Raghavendra
