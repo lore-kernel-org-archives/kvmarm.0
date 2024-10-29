@@ -1,51 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798BA2107;
-	Tue, 29 Oct 2024 16:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8976194AD1;
+	Tue, 29 Oct 2024 16:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730219254; cv=none; b=U+tIofre2W1tNIXuKNsC2KRSDY6KlpLwl0sPHfEAKu09UjQbSZzTRf2RawY6zvVT9DI1/uzlWy3nQGqUoeRk0OM9Q2ijr91oxGMjdPYwqLupVQaxYaxj9NCxfsAyxlHKzt8JOsmlpS9tcQpNQhqu+RYT50lbNQGv4F2b5OF4B+0=
+	t=1730220304; cv=none; b=Eb+H46F9liP0nGWKL7BhbY0tr3r/90Nlzp9sTOfwU+gVQyRFLHfKbvGq/5Ew5nFk2natRBiruA0lCZUfipK+abYZX5QCf1Y+WctK2JcMSyCCkpT/yOXcFFfgR9raE+rV9LXl5wwRblviTvw78MRUeTztd0rGPAqA/ljr0t0VFMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730219254; c=relaxed/simple;
-	bh=Z3N4p1dwXhBN00KOleOrbra5ELWKA6izVcLKfEwUA6c=;
+	s=arc-20240116; t=1730220304; c=relaxed/simple;
+	bh=FGhg9/5lJ7zrWIgk9nIXWwVFehhFDTKeJb/zyhiCTVk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EKjWmTXe04/57oc7MPhHZexABGuMichi6i9tdoXuGlJrZQ+GqEUV4lvd2vD/uz1/Whv89HgB5CG+ubl7yHhIz7LVdwVWEnK/wfHoOYMgUZMUyJjc5kIO77BQ+IeEt7mDmiL6zr/T0dFMUzoBgv0QbJQKlNTnW25XPrriWsF3RDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urbEN6hN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=f4tdhzuCUJWYrNgrJKu8RoLc+PXCHJYU1ZnCEfxcUOpfGB9/vgUJFhyGNqU2TCUlLI0GDt9ULK0hKO6QGtOiA2G4ytkFKzwnHPJcx2CWlXcHiLFXuhhcKnBlhRve6Oonza/I8y1FF02oPiVghcKgBWFWe1uOcf4SLt8DGDNoq0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FxnX1Q1S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urbEN6hN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF11EC4CEE4;
-	Tue, 29 Oct 2024 16:27:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FxnX1Q1S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7488BC4CEE4;
+	Tue, 29 Oct 2024 16:45:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730219253;
-	bh=Z3N4p1dwXhBN00KOleOrbra5ELWKA6izVcLKfEwUA6c=;
+	s=k20201202; t=1730220303;
+	bh=FGhg9/5lJ7zrWIgk9nIXWwVFehhFDTKeJb/zyhiCTVk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=urbEN6hNzPqi50TUyCRNw61epjyTQT3YPQmW5yrOe5jO+DwS/+lgpRI2cqFKO9aG6
-	 Tpj1T/xg6ZozpcDEl7bBQMK2X7sOdaEBneyvCIyXryQOP++9U80LeA7l42oOj+pkT8
-	 6cE/IqUz/1R4Ag4cqlzcMruzENyFyNbd7MfJscoCVnAKwYUVB84oKPPa7Ql16tXKUK
-	 z9Y+Bri390dmftkG15PvWU+h0y9tA1SDDv09NpRhzJigMSUi0Lmz8GfSzztArAJAa3
-	 1DhC4k7vUUVWQEbnEA5YIMAoS1pM04G/7l5OlC8meIxRBb4YcnT/VAZUnRNMueaHZ+
-	 GKfjubpSsnUfw==
+	b=FxnX1Q1Sq8u60xmVKPiDvb1bR5ObMLLtpjtql2eFaCWyF2cYDRHJ/fSJY3lSdUaFy
+	 MEnH+pphFFUa1oJDWPSkqa7dEVvCnGGhztH4EQL7tTysnAXVOHJC3g+s28XRU8V68/
+	 qXXH+b4/dUVoCZt6ffCR16sEIB3HVCdh1PEadSn5ccHDexto4Jp2WkY21Wu5/V0WUC
+	 D0l6T7pnR7kG2u0leEQcU2jLfE90yZKPewLrNWbr8E8RePImhm72dwljy4DKqq/bTB
+	 lU3Bmp66fUpjd7HsETGgCYItiQvulIBqFU3B21ppsQY1fXUvyFj/EGZE/53rCWwAmh
+	 Dtg1rtkXdIlNA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t5p47-007z9Y-LO;
-	Tue, 29 Oct 2024 16:27:31 +0000
-Date: Tue, 29 Oct 2024 16:27:31 +0000
-Message-ID: <868qu63mdo.wl-maz@kernel.org>
+	id 1t5pL3-007zVM-8J;
+	Tue, 29 Oct 2024 16:45:01 +0000
+Date: Tue, 29 Oct 2024 16:45:00 +0000
+Message-ID: <867c9q3lkj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	stable@vger.kernel.org,
-	syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
-In-Reply-To: <20241028234533.942542-1-rananta@google.com>
-References: <20241028234533.942542-1-rananta@google.com>
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 8/9] KVM: arm64: Allow control of dpISA extensions in ID_AA64ISAR3_EL1
+In-Reply-To: <20241028-arm64-2024-dpisa-v1-8-a38d08b008a8@kernel.org>
+References: <20241028-arm64-2024-dpisa-v1-0-a38d08b008a8@kernel.org>
+	<20241028-arm64-2024-dpisa-v1-8-a38d08b008a8@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,87 +63,37 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org, syzkaller@googlegroups.com
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 28 Oct 2024 23:45:33 +0000,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
+On Mon, 28 Oct 2024 20:24:17 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Improper use of userspace_irqchip_in_use led to syzbot hitting the
-> following WARN_ON() in kvm_timer_update_irq():
+> ID_AA64ISAR3_EL1 is currently marked as unallocated in KVM but does have a
+> number of bitfields defined in it. Expose FPRCVT and FAMINMAX, two simple
+> instruction only extensions to guests.
 > 
-> WARNING: CPU: 0 PID: 3281 at arch/arm64/kvm/arch_timer.c:459
-> kvm_timer_update_irq+0x21c/0x394
-> Call trace:
->   kvm_timer_update_irq+0x21c/0x394 arch/arm64/kvm/arch_timer.c:459
->   kvm_timer_vcpu_reset+0x158/0x684 arch/arm64/kvm/arch_timer.c:968
->   kvm_reset_vcpu+0x3b4/0x560 arch/arm64/kvm/reset.c:264
->   kvm_vcpu_set_target arch/arm64/kvm/arm.c:1553 [inline]
->   kvm_arch_vcpu_ioctl_vcpu_init arch/arm64/kvm/arm.c:1573 [inline]
->   kvm_arch_vcpu_ioctl+0x112c/0x1b3c arch/arm64/kvm/arm.c:1695
->   kvm_vcpu_ioctl+0x4ec/0xf74 virt/kvm/kvm_main.c:4658
->   vfs_ioctl fs/ioctl.c:51 [inline]
->   __do_sys_ioctl fs/ioctl.c:907 [inline]
->   __se_sys_ioctl fs/ioctl.c:893 [inline]
->   __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
->   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->   invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
->   el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
->   do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
->   el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
->   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
->   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> The following sequence led to the scenario:
->  - Userspace creates a VM and a vCPU.
->  - The vCPU is initialized with KVM_ARM_VCPU_PMU_V3 during
->    KVM_ARM_VCPU_INIT.
->  - Without any other setup, such as vGIC or vPMU, userspace issues
->    KVM_RUN on the vCPU. Since the vPMU is requested, but not setup,
->    kvm_arm_pmu_v3_enable() fails in kvm_arch_vcpu_run_pid_change().
->    As a result, KVM_RUN returns after enabling the timer, but before
->    incrementing 'userspace_irqchip_in_use':
->    kvm_arch_vcpu_run_pid_change()
->        ret = kvm_arm_pmu_v3_enable()
->            if (!vcpu->arch.pmu.created)
->                return -EINVAL;
->        if (ret)
->            return ret;
->        [...]
->        if (!irqchip_in_kernel(kvm))
->            static_branch_inc(&userspace_irqchip_in_use);
->  - Userspace ignores the error and issues KVM_ARM_VCPU_INIT again.
->    Since the timer is already enabled, control moves through the
->    following flow, ultimately hitting the WARN_ON():
->    kvm_timer_vcpu_reset()
->        if (timer->enabled)
->           kvm_timer_update_irq()
->               if (!userspace_irqchip())
->                   ret = kvm_vgic_inject_irq()
->                       ret = vgic_lazy_init()
->                           if (unlikely(!vgic_initialized(kvm)))
->                               if (kvm->arch.vgic.vgic_model !=
->                                   KVM_DEV_TYPE_ARM_VGIC_V2)
->                                       return -EBUSY;
->                   WARN_ON(ret);
-> 
-> Theoretically, since userspace_irqchip_in_use's functionality can be
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dad88e31f9537fe02e28b117d6a740f15572e0ba..ab348c314d7963437e1876d441169f3ef4eff095 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2409,7 +2409,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	ID_WRITABLE(ID_AA64ISAR2_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
+>  					ID_AA64ISAR2_EL1_APA3 |
+>  					ID_AA64ISAR2_EL1_GPA3)),
+> -	ID_UNALLOCATED(6,3),
+> +	ID_WRITABLE(ID_AA64ISAR3_EL1, (ID_AA64ISAR3_EL1_FPRCVT |
+> +				       ID_AA64ISAR3_EL1_FAMINMAX)),
 
-nit: this isn't theoretical at all.
-
-> simply replaced by '!irqchip_in_kernel()', get rid of the static key
-> to avoid the mismanagement, which also helps with the syzbot issue.
-
-Did you have a chance to check whether this had any negative impact on
-actual workloads? Since the entry/exit code is a bit of a hot spot,
-I'd like to make sure we're not penalising the common case (I only
-wrote this patch while waiting in an airport, and didn't test it at
-all).
-
-Any such data about it would be very welcome in the commit message.
-
-Thanks,
+Please add the required sanitisation of the register so that we do not
+get any surprise exposure of unhandled features when someone changes
+ftr_id_aa64isar3[].
 
 	M.
 
