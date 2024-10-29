@@ -1,133 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6127464
-	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 09:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5466E191F8E
+	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 10:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730195585; cv=none; b=fZee4Ho1KOC4Dt+s/EIJ74U8EoRPcRGhOsHQyaDpRjN0558LhgV7kxQPk7+Gq38tLJgGPGEGddRNaa5nVBcW7W0lfCmoH+pumrNpSAq5WONgj5o/02n1z1pMI5yNNcQY8Yu/d7PRDUpu26zEANKEVfZDzgd8lSmRS3fVsOp0eUw=
+	t=1730196038; cv=none; b=BMad/aFsEm92irVN5Y0MPYNAgHnYyBnWE+wc5Xz0b4A/9mIoe1gWHMr+FCT+9Ao9FzxQeWE1zajQ3ed7pGspvt+rE5myo97d8qjG7vq0b0EgCeXqJjko8f3gy+992lEBnsOOEiwU7kqsHZiQ4RNJxL2AkvSMJ9hnxC9P6PSIads=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730195585; c=relaxed/simple;
-	bh=vZu3Y+gm5F+VIBw03jQztcvHM7LiYqKFizTqxU955Xk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I9VclpXl98HexMmUa5PZ3vVMUQk+1as2wWmQ9Y11Ops0ptN2p9R95mSyFdu7/gpLtVEjCe4xqIiLewB6RUCMImqM5O5Z0lbQsdbiXeMbyiK3vqA6eMjryXqt95k4KxkqrGjCZC0t4NTAs3xa9ObItkmIaz5i6sViWf+HHU4wevA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VPxWaef+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730196038; c=relaxed/simple;
+	bh=vIPXjsUqI6HisFaD5e3T1+6vU/Ckcl0BQpGw086P6gw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yb+LqwzELKptv+sysb51nO+KR9/AGh2twkn6uBUQ31vuYvrk/CgZwy2MdsVzyk0bofuFRw/MgLtZS7P881sL3uaNDOFkMppi1dhkQW5jjWgeVdloCLyE/6BkLsXu7j2E1PNSSWzogY4DTyiMe68Tn2oCgitipQdwvJubWhw3e7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5oVdXS2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VPxWaef+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87334C4CEE5;
-	Tue, 29 Oct 2024 09:53:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5oVdXS2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D793CC4CEE9
+	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 10:00:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730195584;
-	bh=vZu3Y+gm5F+VIBw03jQztcvHM7LiYqKFizTqxU955Xk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VPxWaef+pybwWPn7XQV30Ri/u7eMwapwXD7qC3Ef8V+QVWg8hdhf12LXLS9bE/Y20
-	 E5TtYHnDCUDNmANzk5lwU+dP3e/rpuwbZKnH+aSY+kV61blqTKkYmDtiDjOdmn2pTb
-	 v32vHWSFOqjiQaE8XpZcbKm3Mss/SqTHR5LD1LXS1Dze66MxrXqwHQDYpnaSrfEPd9
-	 zTF85rMJ5VY2S6cB1Na4u0GGQvUK7yoTNK1NADrLg2Sf9yK+2duhmp6jlK8pn/1qn0
-	 lGo4KfnuwvQa16Ix8WvHEz6SporVDb0Iou/G9FqGhDIIiqsb4cPlfV6iqVzQR8kBLV
-	 H+ORQ769SXJ2Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t5iuM-007rjq-6S;
-	Tue, 29 Oct 2024 09:53:02 +0000
-Date: Tue, 29 Oct 2024 09:53:01 +0000
-Message-ID: <86bjz32q2q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: puranjay@kernel.org,	Arnd Bergmann <arnd@arndb.de>,	Arnd Bergmann
- <arnd@kernel.org>,	Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
-	kvmarm@lists.linux.dev,	linux-arm-kernel@lists.infradead.org,	Sumit Garg
- <sumit.garg@linaro.org>,	puranjay12@gmail.com,	Oliver Upton
- <oliver.upton@linux.dev>,	Suzuki K Poulose <suzuki.poulose@arm.com>,	Joey
- Gouly <joey.gouly@arm.com>,	Zenghui Yu <zenghui.yu@linux.dev>
-Subject: Re: Supporting KVM_GUESTDBG_BLOCKIRQ or something similar on ARM64
-In-Reply-To: <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
-References: <mb61p4j4wwlap.fsf@kernel.org>
-	<86ed4031zh.wl-maz@kernel.org>
-	<CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1730196037;
+	bh=vIPXjsUqI6HisFaD5e3T1+6vU/Ckcl0BQpGw086P6gw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=r5oVdXS2qDFrk0zGrBIuIYpNIMczvbDpQR4E7MxBwzN1F/CRhI6JoCm2IguLSqewX
+	 I2HROIIK156/2zApIHmud0fsFq1Ug42+7k9/pFYpfTcZK6SuZRSSoYeBU+To10ILyS
+	 8BzmD7rek3bcjC1x9ZxJ2Mo6PvLni3NomvOEnczcTFVvZVmN7IuFxoUN7BBGz8ADCk
+	 o6IpKR1LXwn58foeOdO80SYTmS3Cb9SvJ/lO7HlKTzu3G3FFCevUehd89cDYMKD3gg
+	 HuwbhPpKazec5ljLPd+LvD8Kq4Dbyki866w4gGVrMoyuPFiX2j52WT3JpGvNbpqflq
+	 lGmrC54yI3gUw==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2f7657f9f62so44940271fa.3
+        for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 03:00:37 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXcEaYBpXjOj00TvdVtSm52PP5FtMBNorcm0zGfLfVppOj9MOsieoGSJS1Lwt2S2yokhdKhcSE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzc1r3xoqADWIV2NSyp9knqxRsOA3Q6+OjZmWRm6hHEN2UeVmJS
+	EVA+q74e2U5RudAs6W/8UsmiGXxEIjLn5oDf7qAeUxowOeG7SayU6qGmzkkJ2rbmK7iDzF4CgyC
+	oXC3GLqXXcuX1Upyj8rKEnT77uKo=
+X-Google-Smtp-Source: AGHT+IEv2f7Ljf5pVqXirJwrfDfhMrJaZsnX3FjHVnAe45g6dbvPnMbZ194jmmjiIFlWMdevuzci9mGXdnuc0ENnVSs=
+X-Received: by 2002:a05:651c:2209:b0:2ef:17f7:6e1d with SMTP id
+ 38308e7fff4ca-2fcbdf689acmr49293801fa.4.1730196036055; Tue, 29 Oct 2024
+ 03:00:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ardb@kernel.org, puranjay@kernel.org, arnd@arndb.de, arnd@kernel.org, alex.bennee@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, sumit.garg@linaro.org, puranjay12@gmail.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, joey.gouly@arm.com, zenghui.yu@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <mb61p4j4wwlap.fsf@kernel.org> <86ed4031zh.wl-maz@kernel.org>
+ <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com> <86bjz32q2q.wl-maz@kernel.org>
+In-Reply-To: <86bjz32q2q.wl-maz@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 29 Oct 2024 11:00:24 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFLRruq1gv+oiSz_LrfCt3j5ftv78prkxKV62tCXe0KVg@mail.gmail.com>
+Message-ID: <CAMj1kXFLRruq1gv+oiSz_LrfCt3j5ftv78prkxKV62tCXe0KVg@mail.gmail.com>
+Subject: Re: Supporting KVM_GUESTDBG_BLOCKIRQ or something similar on ARM64
+To: Marc Zyngier <maz@kernel.org>
+Cc: puranjay@kernel.org, Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Sumit Garg <sumit.garg@linaro.org>, 
+	puranjay12@gmail.com, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Zenghui Yu <zenghui.yu@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 29 Oct 2024 08:52:41 +0000,
-Ard Biesheuvel <ardb@kernel.org> wrote:
-> 
-> On Mon, 28 Oct 2024 at 12:23, Marc Zyngier <maz@kernel.org> wrote:
+On Tue, 29 Oct 2024 at 10:53, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Tue, 29 Oct 2024 08:52:41 +0000,
+> Ard Biesheuvel <ardb@kernel.org> wrote:
 > >
-> > > Let's start a discussion about what needs to be done to support this on
-> > > arm64.
+> > On Mon, 28 Oct 2024 at 12:23, Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > > Let's start a discussion about what needs to be done to support this on
+> > > > arm64.
+> > >
+> > > A good start would be to define the semantics of such a flag:
+> > >
+> > > - what should it affect? the vcpu you are single-stepping? all vcpu?
+> > >
+> > > - should userspace to know that interrupts are pending?
+> > >
+> > > - should this result in any effect on the guest's view of time?
+> > >
+> > > - what of interactions on the rest of the system (such as devices)?
+> > >
 > >
-> > A good start would be to define the semantics of such a flag:
+> > Sorry to give a handwavy answer here, but approaching this from a
+> > usability PoV (like what Puranjay is doing), it is really about
+> > adhering to the principle of least surprise for the user.
 > >
-> > - what should it affect? the vcpu you are single-stepping? all vcpu?
-> >
-> > - should userspace to know that interrupts are pending?
-> >
-> > - should this result in any effect on the guest's view of time?
-> >
-> > - what of interactions on the rest of the system (such as devices)?
-> >
-> 
-> Sorry to give a handwavy answer here, but approaching this from a
-> usability PoV (like what Puranjay is doing), it is really about
-> adhering to the principle of least surprise for the user.
-> 
-> So in that sense, it is not really about blocking IRQs at all, as long
-> as we step over them rather than into them. How that is achieved is
-> not that relevant from the user PoV, and maybe KVM_GUESTDBG_BLOCKIRQ
-> is not the right solution for ARM at all.
+> > So in that sense, it is not really about blocking IRQs at all, as long
+> > as we step over them rather than into them. How that is achieved is
+> > not that relevant from the user PoV, and maybe KVM_GUESTDBG_BLOCKIRQ
+> > is not the right solution for ARM at all.
+>
+> I definitely sympathise with the goal, but there is no simple way to
+> let interrupts through while stepping (which is what your "step over"
+> implies):
+>
+> - the hypervisor (in general) doesn't interact with the guest delivery
+>   and handling of interrupts -- this is either very opaque (list
+>   registers) or completely invisible (direct injection)
+>
+> - replacing the step with a breakpoint after the stepped instruction
+>   requires us to decode the guest instructions to handle branching
+>   effects
+>
 
-I definitely sympathise with the goal, but there is no simple way to
-let interrupts through while stepping (which is what your "step over"
-implies):
+Yeah, and we still want to take non-IRQ/FIQ exceptions, so this does
+not seem feasible to me.
 
-- the hypervisor (in general) doesn't interact with the guest delivery
-  and handling of interrupts -- this is either very opaque (list
-  registers) or completely invisible (direct injection)
+> One possible mechanism would be to:
+>
+> - while stepping, add breakpoints to the interrupt vectors for the EL
+>   we are stepping (3 breakpoints for any of the 4 possible exception
+>   groups),
+>
+> - when any interrupt breakpoint hits, clear all 3, place a breakpoint
+>   on the instruction that was about to be single-stepped (pointed to
+>   by SPSR)
+>
+> - run to completion, until the breakpoint hits
+>
+> - disable the breakpoint, reinstall the previous 3 interrupt
+>   breakpoints
+>
+> - single-step, rinse, repeat
+>
+> But then I'm asking myself the question: why is this KVM's job? It
+> seems to me that this is what an external debugger would do when
+> interacting with HW on bare metal.
+>
+> So can we implement this as part of the debugger's state machine?
+>
 
-- replacing the step with a breakpoint after the stepped instruction
-  requires us to decode the guest instructions to handle branching
-  effects
+Which debugger is that? The GDB stub in QEMU?
 
-One possible mechanism would be to:
-
-- while stepping, add breakpoints to the interrupt vectors for the EL
-  we are stepping (3 breakpoints for any of the 4 possible exception
-  groups),
-
-- when any interrupt breakpoint hits, clear all 3, place a breakpoint
-  on the instruction that was about to be single-stepped (pointed to
-  by SPSR)
-
-- run to completion, until the breakpoint hits
-
-- disable the breakpoint, reinstall the previous 3 interrupt
-  breakpoints
-
-- single-step, rinse, repeat
-
-But then I'm asking myself the question: why is this KVM's job? It
-seems to me that this is what an external debugger would do when
-interacting with HW on bare metal.
-
-So can we implement this as part of the debugger's state machine?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Setting a one-shot breakpoint on the address in SPSR when taking an
+IRQ exception seems like a reasonable approach to me.
