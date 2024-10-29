@@ -1,122 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE05E1DFE3C
-	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 08:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10161DED64
+	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 09:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730191975; cv=none; b=oijgwfCXKO4Xh8v6vX2vJRWNFpcsh02aD+wc7fuRmmOn+iD2q2mvY4fnFAjk9u8vsyFwT+8bTrbDXtqYnr1S4VJAg2AYuEj+VfhzGp6+j9L6/IAXfOwAYnap6I28pPeMeHjwMKALZpfrLl3kFNL3rm45XAT93i8uFSw2OHxUdwc=
+	t=1730195166; cv=none; b=GXosZeSn6Eyd0FMpHhFdRrk7OOFUsKUrO1sa3PMNGE3rbnk6Y/utMGDM2kpefMFWiTrhCASV7pxlOYwRS9JMnab7RnZqODSevPxeRtKlNdmNPHzQ0yHqo2a8iiJ9n/MfiQ7nuZatu3NqUps0+GXwZVOhsO9PY3MnqofurIR7KJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730191975; c=relaxed/simple;
-	bh=Eq7yUIT2qNvwteaJ4TiyipPQcxNOXMFMXDaSsi1L3IE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FBF8v9exyS16V8OA+Knf04j+mbvdSdS8qsa+NMEtuloa5mPj8lY0z+phzI2ZfUJ39h8vh/SfZFNsBUj3971RrCWEuHDS7/01Bama1aXXuNJhU/5NIRIS5pQuaiOM57vN/qopH5UY5/QBAwOfeDq6m+kTuirczfLNs+4l2OB3AvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWAG37Q1; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWAG37Q1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71AE6C4CEE8
-	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 08:52:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730191974;
-	bh=Eq7yUIT2qNvwteaJ4TiyipPQcxNOXMFMXDaSsi1L3IE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=EWAG37Q1/jPMEVARQaHwWgoD4IZPOBXva5IpmdjJzocLbSOznobsK4CEPiF6uCV9c
-	 AJmWpDj8tiLB+miJQvdPkhQMsikJ3gbBMBH+wDrTl9zbr4QxPMvqwyt49D5L+0fa3A
-	 /b2r669wDDaCKw2h5Eucs06HTrqOZType/asvgQpnKP9y7YV6DbY0Zc7x1CFtf49tf
-	 gwJqf4oti+Mi6q8QSxE5/tD5R+0GcubBlwFGY0wIUxpdDultVSVoG+6sOu1Yxm3CgR
-	 tuTVHBrAGjHVpWGh7Ip8wrnR9LKFU8BYgU+4GGD/WhgqyQq8TkntmMtdpJxG5kFBxX
-	 kolluovqzMpsw==
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so45446171fa.1
-        for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 01:52:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCURuOfPDSBEppGjcJdcVNMPxrHBh6wcJJUG9IA8l2K++ds32n+IdSqTkoEuAIDPg1yzyXDCkdQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzTaFDiGMNuWOIswjuNNYXhsBjVQ9lWrMuZfhbCSsPaekuro3rI
-	O2ZtmbgayUspt4uAXIdeevWy0XilD0TDpSSpsdwIcYPcRswTfTCaouafeorUBVo9coXyCcAzbcQ
-	/titXfVv+QF6zJr6Z7oiAPOX5RTI=
-X-Google-Smtp-Source: AGHT+IGnI8jKViXA0iWd/TroHubPtwx67QuiNJEQlZ5qzLZZW3IKmHAuzNAhClw5ucQvGTKdiESCRt0pHcHTLmrSk9s=
-X-Received: by 2002:a05:651c:b20:b0:2fb:51e0:951 with SMTP id
- 38308e7fff4ca-2fcbdf6118cmr46645831fa.7.1730191972767; Tue, 29 Oct 2024
- 01:52:52 -0700 (PDT)
+	s=arc-20240116; t=1730195166; c=relaxed/simple;
+	bh=64DtA/PM7AjSGzw76mVUmancwaHgbtYsUk2YRwkbQIo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YLbiAYW3etGYckwfWSMO/+onJlfDpS0lIPCppkIKvgRC7jYaHTpIA+hvK++aJUrLUFXt1R9HxmJQ2hBmX8PKA4YhFJU+fSdW/oYLg1LI7G64OeDK7bX4qDHeBKwVLWhKxDOscm6zLDSb4CljrVp7Hm1KZZqyjudb+L+2uLac+WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1422497;
+	Tue, 29 Oct 2024 02:46:33 -0700 (PDT)
+Received: from [10.163.43.192] (unknown [10.163.43.192])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F8283F528;
+	Tue, 29 Oct 2024 02:46:00 -0700 (PDT)
+Message-ID: <b85dcdc2-d56d-4bf7-9fa9-222a6f057674@arm.com>
+Date: Tue, 29 Oct 2024 15:15:59 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <mb61p4j4wwlap.fsf@kernel.org> <86ed4031zh.wl-maz@kernel.org>
-In-Reply-To: <86ed4031zh.wl-maz@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 29 Oct 2024 09:52:41 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
-Message-ID: <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
-Subject: Re: Supporting KVM_GUESTDBG_BLOCKIRQ or something similar on ARM64
-To: Marc Zyngier <maz@kernel.org>
-Cc: puranjay@kernel.org, Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>, 
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Sumit Garg <sumit.garg@linaro.org>, 
-	puranjay12@gmail.com, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Zenghui Yu <zenghui.yu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 08/18] KVM: arm64: nv: Reinject traps that take effect
+ in Host EL0
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20241025182354.3364124-1-oliver.upton@linux.dev>
+ <20241025182354.3364124-9-oliver.upton@linux.dev>
+ <87r083th7m.wl-maz@kernel.org> <Zxz-LocgUKuzE3t0@linux.dev>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <Zxz-LocgUKuzE3t0@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Oct 2024 at 12:23, Marc Zyngier <maz@kernel.org> wrote:
->
-> [+ArdB, which I assume you really wanted to Cc on this, as well as the
-> KVM/arm64 stakeholders]
->
-> On Mon, 28 Oct 2024 10:53:34 +0000,
-> puranjay@kernel.org wrote:
-> >
-> > Hi Everyone,
-> >
-> > I work on the BPF JIT for arm64 and regularly use Qemu with gdb for
-> > debugging by single stepping parts of the code. I realized that whenever
-> > I enable KVM, single stepping doesn't work as expected and it lands in an
-> > interrupt handler.
->
-> I disagree. Single-stepping works *exactly* as you should expect, by
-> not interfering with the rest of the system.
->
-> > It always worked for me on x86 so I looked in the source code and found
-> > that x86 supports KVM_GUESTDBG_BLOCKIRQ that blocks IRQs when single
-> > stepping.
->
-> Right, and that is not an architectural behaviour, but something that
-> helps the person running the debugger. I'm not saying it is not
-> useful, but that this is an *additional* behaviour that the
-> architecture is not supposed to cover.
->
-> Also, given that KVM_GUESTDBG_BLOCKIRQ has *zero* documentation,
-> nobody felt compelled to implement it. I didn't even know of its
-> existence until you mentioned it.
->
-> > I assume that arm64 doesn't support KVM_GUESTDBG_BLOCKIRQ because it is
-> > not trivial to implement this on arm64 due to some architectural
-> > limitations? There was a patch [1] posted in 2022 to solve this issue
-> > but it was not merged.
->
-> That patch does the wrong thing when it comes to KVM. We are not
-> building a Linux-only hypervisor, and we need a solution that works
-> irrespective of the guest.
->
-> > Let's start a discussion about what needs to be done to support this on
-> > arm64.
->
-> A good start would be to define the semantics of such a flag:
->
-> - what should it affect? the vcpu you are single-stepping? all vcpu?
->
-> - should userspace to know that interrupts are pending?
->
-> - should this result in any effect on the guest's view of time?
->
-> - what of interactions on the rest of the system (such as devices)?
->
 
-Sorry to give a handwavy answer here, but approaching this from a
-usability PoV (like what Puranjay is doing), it is really about
-adhering to the principle of least surprise for the user.
 
-So in that sense, it is not really about blocking IRQs at all, as long
-as we step over them rather than into them. How that is achieved is
-not that relevant from the user PoV, and maybe KVM_GUESTDBG_BLOCKIRQ
-is not the right solution for ARM at all.
+On 10/26/24 20:05, Oliver Upton wrote:
+> Hey,
+> 
+> On Sat, Oct 26, 2024 at 09:13:17AM +0100, Marc Zyngier wrote:
+>> On Fri, 25 Oct 2024 19:23:43 +0100,
+>> Oliver Upton <oliver.upton@linux.dev> wrote:
+>>>
+>>> Wire up the other end of traps that affect host EL0 by actually
+>>> injecting them into the guest hypervisor. Skip over FGT entirely, as a
+>>> cursory glance suggests no FGT is effective in host EL0.
+>>
+>> Yes, and this (thankfully) is by design! :-)
+>>
+>>>
+>>> Note that kvm_inject_nested() is already equipped for handling
+>>> exceptions while the VM is already in a host context.
+>>>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+>>>  arch/arm64/kvm/emulate-nested.c      | 29 ++++++++++++++++++++++++----
+>>>  2 files changed, 30 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>>> index a601a9305b10..bf0c48403f59 100644
+>>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>>> @@ -225,6 +225,11 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+>>>  	return vcpu_has_nv(vcpu) && __is_hyp_ctxt(&vcpu->arch.ctxt);
+>>>  }
+>>>  
+>>> +static inline bool vcpu_is_host_el0(const struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	return is_hyp_ctxt(vcpu) && !vcpu_is_el2(vcpu);
+>>> +}
+>>> +
+>>>  /*
+>>>   * The layout of SPSR for an AArch32 state is different when observed from an
+>>>   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
+>>> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+>>> index e1a30d1bcd06..db3149379a4d 100644
+>>> --- a/arch/arm64/kvm/emulate-nested.c
+>>> +++ b/arch/arm64/kvm/emulate-nested.c
+>>> @@ -20,6 +20,9 @@ enum trap_behaviour {
+>>>  	BEHAVE_FORWARD_READ	= BIT(0),
+>>>  	BEHAVE_FORWARD_WRITE	= BIT(1),
+>>>  	BEHAVE_FORWARD_RW	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
+>>> +
+>>> +	/* Traps that take effect in Host EL0, this is rare! */
+>>> +	BEHAVE_IN_HOST_EL0	= BIT(2),
+>>
+>> nit: BEHAVE_IN_HOST_EL0 lacks an action verb (forward?).
+> 
+> Thinking I'll squash this in (plus renaming in later patches):
+
+Right, the following additional replacements are required for build.
+
+
+@@ -307,14 +307,14 @@ static const struct trap_bits coarse_trap_bits[] = {
+                .value          = MDCR_EL2_TPMCR,
+                .mask           = MDCR_EL2_TPMCR,
+                .behaviour      = BEHAVE_FORWARD_RW |
+-                                 BEHAVE_IN_HOST_EL0,
++                                 BEHAVE_FORWARD_IN_HOST_EL0,
+        },
+        [CGT_MDCR_TPM] = {
+                .index          = MDCR_EL2,
+                .value          = MDCR_EL2_TPM,
+                .mask           = MDCR_EL2_TPM,
+                .behaviour      = BEHAVE_FORWARD_RW |
+-                                 BEHAVE_IN_HOST_EL0,
++                                 BEHAVE_FORWARD_IN_HOST_EL0,
+        },
+        [CGT_MDCR_TDE] = {
+                .index          = MDCR_EL2,
+@@ -530,7 +530,7 @@ static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
+        }
+ 
+        if (kvm_pmu_counter_is_hyp(vcpu, idx))
+-               return BEHAVE_FORWARD_RW | BEHAVE_IN_HOST_EL0;
++               return BEHAVE_FORWARD_RW | BEHAVE_FORWARD_IN_HOST_EL0;
+ 
+        return BEHAVE_HANDLE_LOCALLY;
+ }
+
+> 
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index db3149379a4d..b072098ee44e 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -22,7 +22,7 @@ enum trap_behaviour {
+>  	BEHAVE_FORWARD_RW	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
+>  
+>  	/* Traps that take effect in Host EL0, this is rare! */
+> -	BEHAVE_IN_HOST_EL0	= BIT(2),
+> +	BEHAVE_FORWARD_IN_HOST_EL0	= BIT(2),
+>  };
+>  
+>  struct trap_bits {
+> @@ -2279,7 +2279,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
+>  
+>  	b = compute_trap_behaviour(vcpu, tc);
+>  
+> -	if (!(b & BEHAVE_IN_HOST_EL0) && vcpu_is_host_el0(vcpu))
+> +	if (!(b & BEHAVE_FORWARD_IN_HOST_EL0) && vcpu_is_host_el0(vcpu))
+>  		goto local;
+>  
+>  	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
+> 
