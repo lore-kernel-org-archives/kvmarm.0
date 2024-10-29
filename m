@@ -1,150 +1,145 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB9E196C7C
-	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 16:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798BA2107;
+	Tue, 29 Oct 2024 16:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730218863; cv=none; b=MjZDSzev/UAjJzjE+H4nzsc4jIfQPRWvd5I9H5e/W0EYIsEcR5Pfe9Xjlu3nIzrTKBZJlLPjQsX8FAq6V7Ygo0bR0ZSPNjdghuy81kkHXVA4sLJrkb+OKI41+IC4U/whXz7jwmaM+dMWefNQFJU7IUWbslgyTf7hUGo91Dz5mSw=
+	t=1730219254; cv=none; b=U+tIofre2W1tNIXuKNsC2KRSDY6KlpLwl0sPHfEAKu09UjQbSZzTRf2RawY6zvVT9DI1/uzlWy3nQGqUoeRk0OM9Q2ijr91oxGMjdPYwqLupVQaxYaxj9NCxfsAyxlHKzt8JOsmlpS9tcQpNQhqu+RYT50lbNQGv4F2b5OF4B+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730218863; c=relaxed/simple;
-	bh=3jV2rEUgMPGYapv0b/yGtyQ5aZ5K4B6O4k+IE8ZdX74=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dKytKc9DTskstxF2SZT4htc7dTWOmD7foCR+AtpeAEcfvir/wQdrZ1CEbQYhLdX9wXcWsb+98rhS8YveevFk9NhyQrdjd4UsCW4aOcZxoiZbCg6wAPYhdhAMpdI3brqMrAqFtRxNdS2r06vp1ynD5k8PZjKNMMYka4MDq/tqdPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 515E0497;
-	Tue, 29 Oct 2024 09:21:30 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94C793F73B;
-	Tue, 29 Oct 2024 09:20:58 -0700 (PDT)
-Date: Tue, 29 Oct 2024 16:20:56 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-Message-ID: <ZyELaIMQVRTULKXi@J2N7QTR9R3.cambridge.arm.com>
-References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
- <20241001043602.1116991-4-anshuman.khandual@arm.com>
- <ZxfGAHAn6I41ZLZV@J2N7QTR9R3>
- <2310454a-99c6-4ff9-80f7-8707fbfaf5a6@arm.com>
- <Zx-H8IU2wZmyowGe@J2N7QTR9R3>
- <f65af1fe-b500-499e-84dd-954700583475@arm.com>
+	s=arc-20240116; t=1730219254; c=relaxed/simple;
+	bh=Z3N4p1dwXhBN00KOleOrbra5ELWKA6izVcLKfEwUA6c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EKjWmTXe04/57oc7MPhHZexABGuMichi6i9tdoXuGlJrZQ+GqEUV4lvd2vD/uz1/Whv89HgB5CG+ubl7yHhIz7LVdwVWEnK/wfHoOYMgUZMUyJjc5kIO77BQ+IeEt7mDmiL6zr/T0dFMUzoBgv0QbJQKlNTnW25XPrriWsF3RDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urbEN6hN; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urbEN6hN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF11EC4CEE4;
+	Tue, 29 Oct 2024 16:27:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730219253;
+	bh=Z3N4p1dwXhBN00KOleOrbra5ELWKA6izVcLKfEwUA6c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=urbEN6hNzPqi50TUyCRNw61epjyTQT3YPQmW5yrOe5jO+DwS/+lgpRI2cqFKO9aG6
+	 Tpj1T/xg6ZozpcDEl7bBQMK2X7sOdaEBneyvCIyXryQOP++9U80LeA7l42oOj+pkT8
+	 6cE/IqUz/1R4Ag4cqlzcMruzENyFyNbd7MfJscoCVnAKwYUVB84oKPPa7Ql16tXKUK
+	 z9Y+Bri390dmftkG15PvWU+h0y9tA1SDDv09NpRhzJigMSUi0Lmz8GfSzztArAJAa3
+	 1DhC4k7vUUVWQEbnEA5YIMAoS1pM04G/7l5OlC8meIxRBb4YcnT/VAZUnRNMueaHZ+
+	 GKfjubpSsnUfw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t5p47-007z9Y-LO;
+	Tue, 29 Oct 2024 16:27:31 +0000
+Date: Tue, 29 Oct 2024 16:27:31 +0000
+Message-ID: <868qu63mdo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	stable@vger.kernel.org,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+In-Reply-To: <20241028234533.942542-1-rananta@google.com>
+References: <20241028234533.942542-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f65af1fe-b500-499e-84dd-954700583475@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org, syzkaller@googlegroups.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 29, 2024 at 01:06:38PM +0530, Anshuman Khandual wrote:
-> On 10/28/24 18:17, Mark Rutland wrote:
-> > On Wed, Oct 23, 2024 at 01:01:52PM +0530, Anshuman Khandual wrote:
-> >> On 10/22/24 21:04, Mark Rutland wrote:
-
-> >>> I assume this is intended to protect the bank in sequences like:
-> >>>
-> >>> 	MSR	MDSELR, <...>
-> >>> 	ISB
-> >>> 	MRS	<..._, BANKED_REGISTER
-> >>
-> >> Correct, it is protecting the above sequence.
-> >>
-> >>> ... but is theat suffucient for mutual exclusion against
-> >>> exception handlers, or does that come from somewhere else?
-> >>
-> >> Looking at all existing use cases for breakpoint/watchpoints, it should
-> >> be sufficient to protect against mutual exclusion. But thinking, do you
-> >> have a particular exception handler scenario in mind where this might
-> >> still be problematic ? Will keep looking into it.
-> > 
-> > Where does the mutual exclusion come from for the existing sequences?
+On Mon, 28 Oct 2024 23:45:33 +0000,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Bank selection followed by indexed read/write, inherently requires mutual
-> exclusion (ensuring that both these steps executed together) in order to
-> prevent read/write into wrong registers. That being said, HW breakpoints
-> get used in multiple different places such as perf, ptrace, debug monitor
-> based single stepping etc calling platform functions which operate on the
-> HW breakpoint registers here.
-
-Yes; that's *why* I'm asking. 
-
-> preempt_disable()/enable() sequence in the very last leaf level helpers
-> such as [read|write]_wb_reg(), will ensure required mutual exclusion.
-
-I do not believe that this assertion is correct.
-
-I specifically gave the example of mutual exclusion against exception
-handlers, and preempt_disable() ... preempt_disable() does not prevent
-exceptions being taken, so disabling preemption *cannot* be sufficient
-to provide mutual exclusion against exception handlers.
-
-What prevents a race with an exception handler? e.g. 
-
-* Does the structure of the code prevent that somehow?
-
-* What context(s) does this code execute in?
-  - Are debug exceptions always masked?
-  - Do we disable breakpoints/watchpoints around (some) manipulation of
-    the relevant registers?
-
-> > We should be able to descrive should be able to describe that in the
-> > commit message or in a comment somewhere (or better, with some
-> > assertions that get tested).
+> Improper use of userspace_irqchip_in_use led to syzbot hitting the
+> following WARN_ON() in kvm_timer_update_irq():
 > 
-> Planning to add a comment - something like this both for read and write
-> helpers.
->        /*
->         * Bank selection in MDSELR_EL1, followed by indexed read from
->         * [break|watch]point registers cannot be interrupted, as that
->         * might cause misread from wrong targets. Hence this requires
->         * mutual exclusion via preventing any preemption.
->         */
-
-As above, I do not believe this is correct. At minimum, disabling
-preemption is not the full story here.
-
-> But regarding adding assertions, could you give some more details and
-> it will be great to have some relevant examples as well.
-
-I've given some suggestions above. Please go and read the code and
-figure this out.
-
-> > For example, what prevents watchpoint_handler() from firing in the
-> > middle of arch_install_hw_breakpoint() or
-> > arch_uninstall_hw_breakpoint()?
+> WARNING: CPU: 0 PID: 3281 at arch/arm64/kvm/arch_timer.c:459
+> kvm_timer_update_irq+0x21c/0x394
+> Call trace:
+>   kvm_timer_update_irq+0x21c/0x394 arch/arm64/kvm/arch_timer.c:459
+>   kvm_timer_vcpu_reset+0x158/0x684 arch/arm64/kvm/arch_timer.c:968
+>   kvm_reset_vcpu+0x3b4/0x560 arch/arm64/kvm/reset.c:264
+>   kvm_vcpu_set_target arch/arm64/kvm/arm.c:1553 [inline]
+>   kvm_arch_vcpu_ioctl_vcpu_init arch/arm64/kvm/arm.c:1573 [inline]
+>   kvm_arch_vcpu_ioctl+0x112c/0x1b3c arch/arm64/kvm/arm.c:1695
+>   kvm_vcpu_ioctl+0x4ec/0xf74 virt/kvm/kvm_main.c:4658
+>   vfs_ioctl fs/ioctl.c:51 [inline]
+>   __do_sys_ioctl fs/ioctl.c:907 [inline]
+>   __se_sys_ioctl fs/ioctl.c:893 [inline]
+>   __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
+>   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>   invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
+>   el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
+>   do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
+>   el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
+>   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+>   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
 > 
-> If perf is the only user, watchpoint_handler() will not get triggered
-> without watchpoints being installed via arch_install_hw_breakpoint().
-> Similarly once they get uninstalled via arch_uninstall_hw_breakpoint()
-> there will not be active watchpoints to trigger the handler. Although
-> there are other users (ptrace, debug monitor etc) besides perf which
-> could also be active simultaneously and race with each other ? TBH, I
-> am not sure.
-
-Please go and read the code and figure this out.
-
-> > Is the existing code correct?
+> The following sequence led to the scenario:
+>  - Userspace creates a VM and a vCPU.
+>  - The vCPU is initialized with KVM_ARM_VCPU_PMU_V3 during
+>    KVM_ARM_VCPU_INIT.
+>  - Without any other setup, such as vGIC or vPMU, userspace issues
+>    KVM_RUN on the vCPU. Since the vPMU is requested, but not setup,
+>    kvm_arm_pmu_v3_enable() fails in kvm_arch_vcpu_run_pid_change().
+>    As a result, KVM_RUN returns after enabling the timer, but before
+>    incrementing 'userspace_irqchip_in_use':
+>    kvm_arch_vcpu_run_pid_change()
+>        ret = kvm_arm_pmu_v3_enable()
+>            if (!vcpu->arch.pmu.created)
+>                return -EINVAL;
+>        if (ret)
+>            return ret;
+>        [...]
+>        if (!irqchip_in_kernel(kvm))
+>            static_branch_inc(&userspace_irqchip_in_use);
+>  - Userspace ignores the error and issues KVM_ARM_VCPU_INIT again.
+>    Since the timer is already enabled, control moves through the
+>    following flow, ultimately hitting the WARN_ON():
+>    kvm_timer_vcpu_reset()
+>        if (timer->enabled)
+>           kvm_timer_update_irq()
+>               if (!userspace_irqchip())
+>                   ret = kvm_vgic_inject_irq()
+>                       ret = vgic_lazy_init()
+>                           if (unlikely(!vgic_initialized(kvm)))
+>                               if (kvm->arch.vgic.vgic_model !=
+>                                   KVM_DEV_TYPE_ARM_VGIC_V2)
+>                                       return -EBUSY;
+>                   WARN_ON(ret);
 > 
-> I have not tested the concurrency aspects of the HW breakpoints enough
-> to be able to answer that question. But if there is a particular concern
-> here, happy to look into that.
-> 
-> But wondering how does this new bank indexed read/write mechanism (after
-> taking care of the mutual exclusion in the leaf level helpers such as
-> [read| write]_wb_reg()) still makes the existing concurrency situation
-> worse off than earlier ?
+> Theoretically, since userspace_irqchip_in_use's functionality can be
 
-Please go and read the code and figure this out.
+nit: this isn't theoretical at all.
 
-Mark.
+> simply replaced by '!irqchip_in_kernel()', get rid of the static key
+> to avoid the mismanagement, which also helps with the syzbot issue.
+
+Did you have a chance to check whether this had any negative impact on
+actual workloads? Since the entry/exit code is a bit of a hot spot,
+I'd like to make sure we're not penalising the common case (I only
+wrote this patch while waiting in an airport, and didn't test it at
+all).
+
+Any such data about it would be very welcome in the commit message.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
