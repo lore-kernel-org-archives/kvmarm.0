@@ -1,139 +1,182 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C59720696B
-	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 13:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274D71946BB
+	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 15:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730210287; cv=none; b=dtbbRI4lt8g5cJwyUDSIqgAmBKxqM5BB/PBZgDWC671Sy284OVXnPQjSdcDCIIH1eDXjHEnv1ArAS81CQ+NzFH7ky0HAiuE1pkgmliVEodqN/w5f6AaVyqxfULSOY7XGZptRWurPPCJfhbEEZ5gnpzl++6t7EEV4iT8wOqemdMs=
+	t=1730216165; cv=none; b=ts+3l3r8btnmnX37Wzut/X60TqdKSe6HbLEwjQqNS1lP5Raa9fKjXQwF8gw55nfS8wGgP46IDiEaBFtk33aUCvrRxGTDrE/W4LBEVjlSyUIsbfxc68b1Ql2Duee6HXjdkUg9rY43BNxlpbfD6bRxHY/0E+ujsxsqsemQcIM5UNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730210287; c=relaxed/simple;
-	bh=7l7OAS/gfLeXOoXnCS2Ihlqh5IvcknHDzkD+UUIFsRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHbiHj0C/8M50eEhqoe85Gd29REhHKY9hBiFwYXlQhAfV6pRnGYJXFFx/3GVGBe41YcvthPC9tlV7aq8GluSNXYiSXetNRukIN9r2m/Pjx6Up+8jrpqgEEylsLU6m+uxxGcoQx7Q7dOi/h48HqEYFq5P8ex/bv6mhGrP2b5Su1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AB39113E;
-	Tue, 29 Oct 2024 06:58:34 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A4E13F528;
-	Tue, 29 Oct 2024 06:58:02 -0700 (PDT)
-Date: Tue, 29 Oct 2024 13:57:53 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, puranjay@kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Sumit Garg <sumit.garg@linaro.org>, puranjay12@gmail.com,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <zenghui.yu@linux.dev>
+	s=arc-20240116; t=1730216165; c=relaxed/simple;
+	bh=u4B7caqf4bH9RcgIRvXgFiIuK4JMtpoAxmfZWBghb+A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tqkc/spOKlNEd6SjR593fcrR4fd7qQHtiwMZvk3rU7R3H6mnUUqm7xdh/GD7Qy8XQ5WnJKbXLNp/SRkzC3qxdW9BYp2ex6R3qHsIQBcWWmiEKApfO09vTRzm1svRUI+IeDY9CSkCjL+yoX4DpR1UWQh+UIwlHDQ2c6bxKgshC+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DogrcRgc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DogrcRgc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8EAFC4CEED;
+	Tue, 29 Oct 2024 15:36:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730216164;
+	bh=u4B7caqf4bH9RcgIRvXgFiIuK4JMtpoAxmfZWBghb+A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DogrcRgc+kJY7DLNgDe5WLQ9m8eh1vlx9QExwfy7emgvXbKTnaa7jJ4ERvlwol8ti
+	 gwlblgJu/4t4/BJe3lGwD8UqfN0Ydul+iwcKQ/3zsya3jX/8YkJr3BuVwUvM3f8QiP
+	 y940Gv/y7bMdIi4SO/Bmyms4ctCg845FUL6dElY9PebiNuvCw/Ob1Cpvcuy3Px1iJJ
+	 Ttf/CVc2rUSxKcHy6EyWZNPej1UTUGfJUCQYqm2lPfmAY6WjllSRxAn+VH13SuZaC6
+	 ebd8gTCjcBrrUkB7So3txykL+sTXQTP+lUg9PYhjXA3aJK+WO4HtgR+kbbTZXlxRPr
+	 4ixNh9zfDqXjw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t5oGI-007yET-6C;
+	Tue, 29 Oct 2024 15:36:02 +0000
+Date: Tue, 29 Oct 2024 15:36:01 +0000
+Message-ID: <86a5em3ori.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,	puranjay@kernel.org,	Arnd Bergmann
+ <arnd@arndb.de>,	Arnd Bergmann <arnd@kernel.org>,	Alex =?UTF-8?B?QmVubsOp?=
+ =?UTF-8?B?ZQ==?= <alex.bennee@linaro.org>,	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,	Sumit Garg <sumit.garg@linaro.org>,
+	puranjay12@gmail.com,	Oliver Upton <oliver.upton@linux.dev>,	Suzuki K
+ Poulose <suzuki.poulose@arm.com>,	Joey Gouly <joey.gouly@arm.com>,	Zenghui
+ Yu <zenghui.yu@linux.dev>
 Subject: Re: Supporting KVM_GUESTDBG_BLOCKIRQ or something similar on ARM64
-Message-ID: <ZyDp2VLqjjzm47S3@J2N7QTR9R3.cambridge.arm.com>
+In-Reply-To: <ZyDp2VLqjjzm47S3@J2N7QTR9R3.cambridge.arm.com>
 References: <mb61p4j4wwlap.fsf@kernel.org>
- <86ed4031zh.wl-maz@kernel.org>
- <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
- <86bjz32q2q.wl-maz@kernel.org>
- <CAMj1kXFLRruq1gv+oiSz_LrfCt3j5ftv78prkxKV62tCXe0KVg@mail.gmail.com>
+	<86ed4031zh.wl-maz@kernel.org>
+	<CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
+	<86bjz32q2q.wl-maz@kernel.org>
+	<CAMj1kXFLRruq1gv+oiSz_LrfCt3j5ftv78prkxKV62tCXe0KVg@mail.gmail.com>
+	<ZyDp2VLqjjzm47S3@J2N7QTR9R3.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXFLRruq1gv+oiSz_LrfCt3j5ftv78prkxKV62tCXe0KVg@mail.gmail.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, ardb@kernel.org, puranjay@kernel.org, arnd@arndb.de, arnd@kernel.org, alex.bennee@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, sumit.garg@linaro.org, puranjay12@gmail.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, joey.gouly@arm.com, zenghui.yu@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 29, 2024 at 11:00:24AM +0100, Ard Biesheuvel wrote:
-> On Tue, 29 Oct 2024 at 10:53, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Tue, 29 Oct 2024 08:52:41 +0000,
-> > Ard Biesheuvel <ardb@kernel.org> wrote:
+On Tue, 29 Oct 2024 13:57:53 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
+> 
+> On Tue, Oct 29, 2024 at 11:00:24AM +0100, Ard Biesheuvel wrote:
+> > On Tue, 29 Oct 2024 at 10:53, Marc Zyngier <maz@kernel.org> wrote:
 > > >
-> > > On Mon, 28 Oct 2024 at 12:23, Marc Zyngier <maz@kernel.org> wrote:
+> > > On Tue, 29 Oct 2024 08:52:41 +0000,
+> > > Ard Biesheuvel <ardb@kernel.org> wrote:
 > > > >
-> > > > > Let's start a discussion about what needs to be done to support this on
-> > > > > arm64.
+> > > > On Mon, 28 Oct 2024 at 12:23, Marc Zyngier <maz@kernel.org> wrote:
+> > > > >
+> > > > > > Let's start a discussion about what needs to be done to support this on
+> > > > > > arm64.
+> > > > >
+> > > > > A good start would be to define the semantics of such a flag:
+> > > > >
+> > > > > - what should it affect? the vcpu you are single-stepping? all vcpu?
+> > > > >
+> > > > > - should userspace to know that interrupts are pending?
+> > > > >
+> > > > > - should this result in any effect on the guest's view of time?
+> > > > >
+> > > > > - what of interactions on the rest of the system (such as devices)?
+> > > > >
 > > > >
-> > > > A good start would be to define the semantics of such a flag:
+> > > > Sorry to give a handwavy answer here, but approaching this from a
+> > > > usability PoV (like what Puranjay is doing), it is really about
+> > > > adhering to the principle of least surprise for the user.
 > > > >
-> > > > - what should it affect? the vcpu you are single-stepping? all vcpu?
-> > > >
-> > > > - should userspace to know that interrupts are pending?
-> > > >
-> > > > - should this result in any effect on the guest's view of time?
-> > > >
-> > > > - what of interactions on the rest of the system (such as devices)?
-> > > >
+> > > > So in that sense, it is not really about blocking IRQs at all, as long
+> > > > as we step over them rather than into them. How that is achieved is
+> > > > not that relevant from the user PoV, and maybe KVM_GUESTDBG_BLOCKIRQ
+> > > > is not the right solution for ARM at all.
 > > >
-> > > Sorry to give a handwavy answer here, but approaching this from a
-> > > usability PoV (like what Puranjay is doing), it is really about
-> > > adhering to the principle of least surprise for the user.
+> > > I definitely sympathise with the goal, but there is no simple way to
+> > > let interrupts through while stepping (which is what your "step over"
+> > > implies):
 > > >
-> > > So in that sense, it is not really about blocking IRQs at all, as long
-> > > as we step over them rather than into them. How that is achieved is
-> > > not that relevant from the user PoV, and maybe KVM_GUESTDBG_BLOCKIRQ
-> > > is not the right solution for ARM at all.
-> >
-> > I definitely sympathise with the goal, but there is no simple way to
-> > let interrupts through while stepping (which is what your "step over"
-> > implies):
-> >
-> > - the hypervisor (in general) doesn't interact with the guest delivery
-> >   and handling of interrupts -- this is either very opaque (list
-> >   registers) or completely invisible (direct injection)
-> >
-> > - replacing the step with a breakpoint after the stepped instruction
-> >   requires us to decode the guest instructions to handle branching
-> >   effects
-> >
+> > > - the hypervisor (in general) doesn't interact with the guest delivery
+> > >   and handling of interrupts -- this is either very opaque (list
+> > >   registers) or completely invisible (direct injection)
+> > >
+> > > - replacing the step with a breakpoint after the stepped instruction
+> > >   requires us to decode the guest instructions to handle branching
+> > >   effects
+> > >
+> > 
+> > Yeah, and we still want to take non-IRQ/FIQ exceptions, so this does
+> > not seem feasible to me.
+> > 
+> > > One possible mechanism would be to:
+> > >
+> > > - while stepping, add breakpoints to the interrupt vectors for the EL
+> > >   we are stepping (3 breakpoints for any of the 4 possible exception
+> > >   groups),
+> > >
+> > > - when any interrupt breakpoint hits, clear all 3, place a breakpoint
+> > >   on the instruction that was about to be single-stepped (pointed to
+> > >   by SPSR)
+> > >
+> > > - run to completion, until the breakpoint hits
+> > >
+> > > - disable the breakpoint, reinstall the previous 3 interrupt
+> > >   breakpoints
+> > >
+> > > - single-step, rinse, repeat
+> > >
+> > > But then I'm asking myself the question: why is this KVM's job? It
+> > > seems to me that this is what an external debugger would do when
+> > > interacting with HW on bare metal.
+> > >
+> > > So can we implement this as part of the debugger's state machine?
+> > >
+> > 
+> > Which debugger is that? The GDB stub in QEMU?
+> > 
+> > Setting a one-shot breakpoint on the address in SPSR when taking an
+> > IRQ exception seems like a reasonable approach to me.
 > 
-> Yeah, and we still want to take non-IRQ/FIQ exceptions, so this does
-> not seem feasible to me.
+> That doesn't work; an IRQ could be taken in the middle of a common
+> helper that's also used in IRQ context, so you'd take the breakpoint
+> within the IRQ. You could try to match a bunch of things like the SP and
+> so on, but that boils to do a bunch of heuristics rather than something
+> that's guarnateed to work...
+
+Hmmm. Yes, that's a pretty pathological case.
+
 > 
-> > One possible mechanism would be to:
-> >
-> > - while stepping, add breakpoints to the interrupt vectors for the EL
-> >   we are stepping (3 breakpoints for any of the 4 possible exception
-> >   groups),
-> >
-> > - when any interrupt breakpoint hits, clear all 3, place a breakpoint
-> >   on the instruction that was about to be single-stepped (pointed to
-> >   by SPSR)
-> >
-> > - run to completion, until the breakpoint hits
-> >
-> > - disable the breakpoint, reinstall the previous 3 interrupt
-> >   breakpoints
-> >
-> > - single-step, rinse, repeat
-> >
-> > But then I'm asking myself the question: why is this KVM's job? It
-> > seems to me that this is what an external debugger would do when
-> > interacting with HW on bare metal.
-> >
-> > So can we implement this as part of the debugger's state machine?
-> >
+> More generally, the IRQ can preempt the running thread anyway, so:
 > 
-> Which debugger is that? The GDB stub in QEMU?
+> * The user cannot use this to trace a kernel thread reliabl , since that
+>   can be switched out behind their back.
 > 
-> Setting a one-shot breakpoint on the address in SPSR when taking an
-> IRQ exception seems like a reasonable approach to me.
+> * The user cannot use this to trace a CPU regardless of the running
+>   thread, since they lose anything that happens under an IRQ.
 
-That doesn't work; an IRQ could be taken in the middle of a common
-helper that's also used in IRQ context, so you'd take the breakpoint
-within the IRQ. You could try to match a bunch of things like the SP and
-so on, but that boils to do a bunch of heuristics rather than something
-that's guarnateed to work...
+These are understood limitations, I expect, and would be a part of the
+contract between the debugger and the user when deciding to hide
+asynchronous exceptions.
 
-More generally, the IRQ can preempt the running thread anyway, so:
+But if those limitations are not deemed acceptable (or not easily
+implementable by the debugger), then the only option we have is to
+block IRQ/FIQ the hard way. In a way, this is what the architecture
+provides when entering Debug state, where all asynchronous exceptions
+are ignored (H2.4.1).
 
-* The user cannot use this to trace a kernel thread reliabl , since that
-  can be switched out behind their back.
+And that brings me back to my earlier set of question...
 
-* The user cannot use this to trace a CPU regardless of the running
-  thread, since they lose anything that happens under an IRQ.
+Thanks,
 
-Mark.
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
