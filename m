@@ -1,128 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADC2201265
-	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 07:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE05E1DFE3C
+	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 08:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730187407; cv=none; b=GLFeLcGRJeLVoPvRVvfGtWaDo4QqUjP7hMjI84mUZhxtxBHuVsFAy1zg4XAsaMvurJcTgSJega9jeo41KDS7k3R+soMSnVO5NtdOp8aDTaN0T3F5TswbRxtzRe/oub9PBKUJKvGlkHzeJ/1RAV+OK7eXnLN7/kD22SWo9dhyKEs=
+	t=1730191975; cv=none; b=oijgwfCXKO4Xh8v6vX2vJRWNFpcsh02aD+wc7fuRmmOn+iD2q2mvY4fnFAjk9u8vsyFwT+8bTrbDXtqYnr1S4VJAg2AYuEj+VfhzGp6+j9L6/IAXfOwAYnap6I28pPeMeHjwMKALZpfrLl3kFNL3rm45XAT93i8uFSw2OHxUdwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730187407; c=relaxed/simple;
-	bh=yRzoC+KjUUDkGESUErCpOUivqMftMbTVJnBNhXXmmcE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q+4ooTB9AFuF2Tb6vY1o/LdayVWV1yU8rhfJxm7T9XmPPKX2ni4HlRGa7yYM/lQHd+d0IVsxlAscnKWUGP8q1u8QfYtblgo/GVRlFEhVcMs9Wna7W/7ztkwPWwdsE1jC/oTv8Q+eNNMZs2+ZVowF8EG7LKuEvzLl0wvTf9TQ7VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 124F813D5;
-	Tue, 29 Oct 2024 00:37:14 -0700 (PDT)
-Received: from [10.163.43.192] (unknown [10.163.43.192])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC0EB3F66E;
-	Tue, 29 Oct 2024 00:36:40 -0700 (PDT)
-Message-ID: <f65af1fe-b500-499e-84dd-954700583475@arm.com>
-Date: Tue, 29 Oct 2024 13:06:38 +0530
+	s=arc-20240116; t=1730191975; c=relaxed/simple;
+	bh=Eq7yUIT2qNvwteaJ4TiyipPQcxNOXMFMXDaSsi1L3IE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FBF8v9exyS16V8OA+Knf04j+mbvdSdS8qsa+NMEtuloa5mPj8lY0z+phzI2ZfUJ39h8vh/SfZFNsBUj3971RrCWEuHDS7/01Bama1aXXuNJhU/5NIRIS5pQuaiOM57vN/qopH5UY5/QBAwOfeDq6m+kTuirczfLNs+4l2OB3AvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWAG37Q1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWAG37Q1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71AE6C4CEE8
+	for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 08:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730191974;
+	bh=Eq7yUIT2qNvwteaJ4TiyipPQcxNOXMFMXDaSsi1L3IE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=EWAG37Q1/jPMEVARQaHwWgoD4IZPOBXva5IpmdjJzocLbSOznobsK4CEPiF6uCV9c
+	 AJmWpDj8tiLB+miJQvdPkhQMsikJ3gbBMBH+wDrTl9zbr4QxPMvqwyt49D5L+0fa3A
+	 /b2r669wDDaCKw2h5Eucs06HTrqOZType/asvgQpnKP9y7YV6DbY0Zc7x1CFtf49tf
+	 gwJqf4oti+Mi6q8QSxE5/tD5R+0GcubBlwFGY0wIUxpdDultVSVoG+6sOu1Yxm3CgR
+	 tuTVHBrAGjHVpWGh7Ip8wrnR9LKFU8BYgU+4GGD/WhgqyQq8TkntmMtdpJxG5kFBxX
+	 kolluovqzMpsw==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so45446171fa.1
+        for <kvmarm@lists.linux.dev>; Tue, 29 Oct 2024 01:52:54 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCURuOfPDSBEppGjcJdcVNMPxrHBh6wcJJUG9IA8l2K++ds32n+IdSqTkoEuAIDPg1yzyXDCkdQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzTaFDiGMNuWOIswjuNNYXhsBjVQ9lWrMuZfhbCSsPaekuro3rI
+	O2ZtmbgayUspt4uAXIdeevWy0XilD0TDpSSpsdwIcYPcRswTfTCaouafeorUBVo9coXyCcAzbcQ
+	/titXfVv+QF6zJr6Z7oiAPOX5RTI=
+X-Google-Smtp-Source: AGHT+IGnI8jKViXA0iWd/TroHubPtwx67QuiNJEQlZ5qzLZZW3IKmHAuzNAhClw5ucQvGTKdiESCRt0pHcHTLmrSk9s=
+X-Received: by 2002:a05:651c:b20:b0:2fb:51e0:951 with SMTP id
+ 38308e7fff4ca-2fcbdf6118cmr46645831fa.7.1730191972767; Tue, 29 Oct 2024
+ 01:52:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
-References: <20241001043602.1116991-1-anshuman.khandual@arm.com>
- <20241001043602.1116991-4-anshuman.khandual@arm.com>
- <ZxfGAHAn6I41ZLZV@J2N7QTR9R3> <2310454a-99c6-4ff9-80f7-8707fbfaf5a6@arm.com>
- <Zx-H8IU2wZmyowGe@J2N7QTR9R3>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Zx-H8IU2wZmyowGe@J2N7QTR9R3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <mb61p4j4wwlap.fsf@kernel.org> <86ed4031zh.wl-maz@kernel.org>
+In-Reply-To: <86ed4031zh.wl-maz@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 29 Oct 2024 09:52:41 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
+Message-ID: <CAMj1kXEX2TLdYCn3C-AXhfhjOe6cuzOmd0h5MbgXnzi7Q94T3w@mail.gmail.com>
+Subject: Re: Supporting KVM_GUESTDBG_BLOCKIRQ or something similar on ARM64
+To: Marc Zyngier <maz@kernel.org>
+Cc: puranjay@kernel.org, Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Sumit Garg <sumit.garg@linaro.org>, 
+	puranjay12@gmail.com, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Zenghui Yu <zenghui.yu@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
+On Mon, 28 Oct 2024 at 12:23, Marc Zyngier <maz@kernel.org> wrote:
+>
+> [+ArdB, which I assume you really wanted to Cc on this, as well as the
+> KVM/arm64 stakeholders]
+>
+> On Mon, 28 Oct 2024 10:53:34 +0000,
+> puranjay@kernel.org wrote:
+> >
+> > Hi Everyone,
+> >
+> > I work on the BPF JIT for arm64 and regularly use Qemu with gdb for
+> > debugging by single stepping parts of the code. I realized that whenever
+> > I enable KVM, single stepping doesn't work as expected and it lands in an
+> > interrupt handler.
+>
+> I disagree. Single-stepping works *exactly* as you should expect, by
+> not interfering with the rest of the system.
+>
+> > It always worked for me on x86 so I looked in the source code and found
+> > that x86 supports KVM_GUESTDBG_BLOCKIRQ that blocks IRQs when single
+> > stepping.
+>
+> Right, and that is not an architectural behaviour, but something that
+> helps the person running the debugger. I'm not saying it is not
+> useful, but that this is an *additional* behaviour that the
+> architecture is not supposed to cover.
+>
+> Also, given that KVM_GUESTDBG_BLOCKIRQ has *zero* documentation,
+> nobody felt compelled to implement it. I didn't even know of its
+> existence until you mentioned it.
+>
+> > I assume that arm64 doesn't support KVM_GUESTDBG_BLOCKIRQ because it is
+> > not trivial to implement this on arm64 due to some architectural
+> > limitations? There was a patch [1] posted in 2022 to solve this issue
+> > but it was not merged.
+>
+> That patch does the wrong thing when it comes to KVM. We are not
+> building a Linux-only hypervisor, and we need a solution that works
+> irrespective of the guest.
+>
+> > Let's start a discussion about what needs to be done to support this on
+> > arm64.
+>
+> A good start would be to define the semantics of such a flag:
+>
+> - what should it affect? the vcpu you are single-stepping? all vcpu?
+>
+> - should userspace to know that interrupts are pending?
+>
+> - should this result in any effect on the guest's view of time?
+>
+> - what of interactions on the rest of the system (such as devices)?
+>
 
+Sorry to give a handwavy answer here, but approaching this from a
+usability PoV (like what Puranjay is doing), it is really about
+adhering to the principle of least surprise for the user.
 
-On 10/28/24 18:17, Mark Rutland wrote:
-> On Wed, Oct 23, 2024 at 01:01:52PM +0530, Anshuman Khandual wrote:
->>
->>
->> On 10/22/24 21:04, Mark Rutland wrote:
->>> On Tue, Oct 01, 2024 at 10:06:02AM +0530, Anshuman Khandual wrote:
-> 
-> [...]
-> 
->>> Wherever this lives it needs a comment explaining what it is doing and
->>> why. I assume this is intended to protect the bank in sequences like:
->>>
->>> 	MSR	MDSELR, <...>
->>> 	ISB
->>> 	MRS	<..._, BANKED_REGISTER
->>
->> Correct, it is protecting the above sequence.
->>
->>>
->>> ... but is theat suffucient for mutual exclusion against
->>> exception handlers, or does that come from somewhere else?
->>
->> Looking at all existing use cases for breakpoint/watchpoints, it should
->> be sufficient to protect against mutual exclusion. But thinking, do you
->> have a particular exception handler scenario in mind where this might
->> still be problematic ? Will keep looking into it.
-> 
-> Where does the mutual exclusion come from for the existing sequences?
-
-Bank selection followed by indexed read/write, inherently requires mutual
-exclusion (ensuring that both these steps executed together) in order to
-prevent read/write into wrong registers. That being said, HW breakpoints
-get used in multiple different places such as perf, ptrace, debug monitor
-based single stepping etc calling platform functions which operate on the
-HW breakpoint registers here.
-
-preempt_disable()/enable() sequence in the very last leaf level helpers
-such as [read|write]_wb_reg(), will ensure required mutual exclusion.
-
-> We should be able to descrive should be able to describe that in the
-> commit message or in a comment somewhere (or better, with some
-> assertions that get tested).
-
-Planning to add a comment - something like this both for read and write
-helpers.
-       /*
-        * Bank selection in MDSELR_EL1, followed by indexed read from
-        * [break|watch]point registers cannot be interrupted, as that
-        * might cause misread from wrong targets. Hence this requires
-        * mutual exclusion via preventing any preemption.
-        */
-
-But regarding adding assertions, could you give some more details and
-it will be great to have some relevant examples as well.
-
-> 
-> For example, what prevents watchpoint_handler() from firing in the
-> middle of arch_install_hw_breakpoint() or
-> arch_uninstall_hw_breakpoint()?
-
-If perf is the only user, watchpoint_handler() will not get triggered
-without watchpoints being installed via arch_install_hw_breakpoint().
-Similarly once they get uninstalled via arch_uninstall_hw_breakpoint()
-there will not be active watchpoints to trigger the handler. Although
-there are other users (ptrace, debug monitor etc) besides perf which
-could also be active simultaneously and race with each other ? TBH, I
-am not sure.
-
-> 
-> Is the existing code correct?
-
-I have not tested the concurrency aspects of the HW breakpoints enough
-to be able to answer that question. But if there is a particular concern
-here, happy to look into that.
-
-But wondering how does this new bank indexed read/write mechanism (after
-taking care of the mutual exclusion in the leaf level helpers such as
-[read| write]_wb_reg()) still makes the existing concurrency situation
-worse off than earlier ?
+So in that sense, it is not really about blocking IRQs at all, as long
+as we step over them rather than into them. How that is achieved is
+not that relevant from the user PoV, and maybe KVM_GUESTDBG_BLOCKIRQ
+is not the right solution for ARM at all.
