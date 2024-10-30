@@ -1,320 +1,106 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561DC1E3772
-	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 10:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C114138F91;
+	Wed, 30 Oct 2024 15:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730285342; cv=none; b=GYwCs77DbKngFGxI0dcmOsq/Abh6E/VgqQSxUuXJWyYDgJXZEwzOnbq0CsN5IFlgip/wVQy3pCbz20fS9ilvASTyirqPT6X/279fEmvCy/42IaZeYuFQRFMdFowc2iRN7T3EgT+4AEse2LQmCJd9Z5yQ/aHy3ZNxiY5v4XBymvE=
+	t=1730302828; cv=none; b=tLoM5qF3iWUxLQ2sfN0yT9EMDLn56T470WHOI1/MzFlKQKeacwNqb021PwncOfghPD43wM+5/ZtEC/urKeSxTFTkjs2W0pHHi6mLe7uqEx/eianTtOZQrvNQ7yDAQoAu1MtZ7LJ+NpKWMYb7wjICXZfLkIhaj1zSKCXV8/o0cvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730285342; c=relaxed/simple;
-	bh=q75+5AgRyRwtv1YfXhTN4Dc4tQT8VCLpDYXWMg7vrdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q0ytoSqmZzg1Lz58XGnD0v3NFo0zTM/wjLrvC0fKBDyASWfCTDxxrWmrpbAFySI7rWz9DK0ezI3499aM3cHnqKJn/Whbvtska5PpJBE8E47NKr1sgslMluFLUITJbhd/C8rNcfQjWbW+31nkWgAXBnRqflnLJVkJ+UQeXrC7DaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46BB5113E;
-	Wed, 30 Oct 2024 03:49:28 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BF4B3F73B;
-	Wed, 30 Oct 2024 03:48:56 -0700 (PDT)
-Date: Wed, 30 Oct 2024 10:48:53 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev, atishp@rivosinc.com, jamestiotio@gmail.com,
-	eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 1/2] lib/on-cpus: Correct and simplify
- synchronization
-Message-ID: <ZyIPFb0e39DZXquU@raptor>
-References: <20241023131718.117452-4-andrew.jones@linux.dev>
- <20241023131718.117452-5-andrew.jones@linux.dev>
- <ZxuMzrEMxE/lnwtK@arm.com>
- <20241029-1d35ce0dbbea4d21b56209dc@orel>
+	s=arc-20240116; t=1730302828; c=relaxed/simple;
+	bh=Bl+5Ay3FFAKvbhH35eUMEt83qx9zkSG64B9jfI7uxUM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FVPf673RpJ7Af3aF/WqofAWlxTVaQ0bFqECnYxWbmOAPCejc5haXnygmGNHjItqL5HIq6Me7FVretV/fPL3FUevdwsFUJdcGSo1usjNHbzcLD39oODljUdnMNMjSeCiYA8xp/R75pdAERKweOokQs7J/UFz6f601q3QdMZ/xVaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOW/D+Eb; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOW/D+Eb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F60BC4CECE;
+	Wed, 30 Oct 2024 15:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730302828;
+	bh=Bl+5Ay3FFAKvbhH35eUMEt83qx9zkSG64B9jfI7uxUM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=qOW/D+EbmBVAn7zk80NEXzG8+OmGSsRUnuuO5kc7a373sZbp/9JOtuhn8iwKC9d93
+	 RTNm7dSttbfV/68DueQWTmBZcGyqm5iEJbHT9xqTQiQfMEuFmfeOnDSuYWrlCFu9IG
+	 7oNHtYRDrj4W1QUdwddUEMXKoDJVnOxXcuk/WJxr1LsDFlh3zY6fNfJzt1wZMN9thQ
+	 9MwNkmckzyGdyKPtYsVrXdJXipUMZ2CQzSSOb0J6y68haSxRl97BeL9/D4nXCVlTSU
+	 vDZKc8uvM+x6HqDgA7+6t1WfT2Q9fwvuRYe+MEZxSB4bIAo/9e1G4N0qDUQIl4WtjI
+	 B4+3+0VhYQEnQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v2 0/9] arm64: Support 2024 dpISA extensions
+Date: Wed, 30 Oct 2024 15:34:45 +0000
+Message-Id: <20241030-arm64-2024-dpisa-v2-0-b6601a15d2a5@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029-1d35ce0dbbea4d21b56209dc@orel>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABVSImcC/22NQQ6CMBBFr0Jm7ZhpbaS64h6GRZUBJiolU0M0h
+ LtbiEuX7yf/vRkSq3CCczGD8iRJ4pDB7gq49WHoGKXJDJasM0Qegz6PDlfEZpQU0NPJUOlC2To
+ P+TYqt/LelJc6cy/pFfWzFSazrj+Z/SObDBKGg2/IX3Mt+OrOOvBjH7WDelmWL8HYHB6xAAAA
+X-Change-ID: 20241008-arm64-2024-dpisa-8091074a7f48
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-9b746
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1867; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=Bl+5Ay3FFAKvbhH35eUMEt83qx9zkSG64B9jfI7uxUM=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnIlNhsrSy+xHNERieWXqP1j/YLwVf78bhUbTyAurw
+ QfZkv3WJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZyJTYQAKCRAk1otyXVSH0BrECA
+ CB6c/mPpV22NP6+WBfhlhYwKlwBchS7yWzpSBftwPoSuYGS0t4BoON04mg80CKZZ77jSxS2kBkPehz
+ kyddpgAq8Ox3wQxlE98z5L7tyQZEantMU8PD3ETBZw6aQaXKuBT4YeYFwvl2sKRnzw47NzWA27z1/k
+ dNbgFlS22UXo5xRxEVqY50qFuR95vOWZULgDA5NaLG7Nj0Yg9iQVo44Fbk2GanuB1+P0UB4JVdVdRY
+ rW7AC78fY5NRsevuhLVA7AsNj82qqf4f/3LQGAu5cHIZvTxYqpa780AgZCaAZTqpGBUSJdHbyJhDR8
+ kFD1bJxDlLQyReI4OogHPtyEHlgN96
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Hi Drew,
+The 2024 architecture release includes a number of data processing
+extensions, mostly SVE and SME additions with a few others.  These are
+all very straightforward extensions which add instructions but no
+architectural state so only need hwcaps and exposing of the ID registers
+to KVM guests and userspace.
 
-On Tue, Oct 29, 2024 at 11:56:58AM +0100, Andrew Jones wrote:
-> On Fri, Oct 25, 2024 at 01:19:26PM +0100, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > I've been paging in all the on_cpu* machinery, and it occurred to me that
-> > we have a chance to simplify the code and to remove a duplicate interface
-> > by not exposing smp_boot_secondary() to the tests, as the on_cpu* functions
-> > serve the same purpose. With this change, we can remove the entry argument
-> > to smp_boot_secondary(), and the assembly for secondary_entry can be made
-> > simpler by eliminating the branch to the entry function.
-> 
-> You're right that smp_boot_secondary() doesn't appear to getting use, but
-> a goal for the library code is to be useful and with defaults that will
-> satisfy nearly all unit tests, but to never restrict a unit test to
-> having to use it. Exposing calls like smp_boot_secondary() give unit tests
-> the ability to eliminate as much library code as possible from their paths
-> without having to duplicate the few lines needed to "boot" a secondary.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v2:
+- Filter KVM guest visible bitfields in ID_AA64ISAR3_EL1 to only those
+  we make writeable.
+- Link to v1: https://lore.kernel.org/r/20241028-arm64-2024-dpisa-v1-0-a38d08b008a8@kernel.org
 
-Yep, that makes sense.
+---
+Mark Brown (9):
+      arm64/sysreg: Update ID_AA64PFR2_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64FPFR0_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64ZFR0_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64SMFR0_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64ISAR2_EL1 to DDI0601 2024-09
+      arm64/hwcap: Describe 2024 dpISA extensions to userspace
+      KVM: arm64: Allow control of dpISA extensions in ID_AA64ISAR3_EL1
+      kselftest/arm64: Add 2024 dpISA extensions to hwcap test
 
-> 
-> > 
-> > Do you think that would be something worth pursuing? I can have a look at
-> > it.
-> > 
-> > There are exactly two places where smp_boot_secondary() is used: in
-> > arm/psci.c and arm/gic.c, and from a quick glance it looks to me like those
-> > can be replaced with one of the on_cpu* functions.
-> > 
-> > On Wed, Oct 23, 2024 at 03:17:20PM +0200, Andrew Jones wrote:
-> > > get/put_on_cpu_info() were trying to provide per-cpu locking for
-> > > the per-cpu on_cpu info, but they were flawed since they would
-> > > always set the "lock" since they were treating test_and_set/clear
-> > > as cmpxchg (which they're not). Just revert to a normal spinlock
-> > 
-> > Would you mind expanding on that a bit more?
-> > 
-> > From my understanding of the code, on arm64, this is the call chain that I get
-> > for get_on_cpu_info(cpu):
-> > 
-> >   ->get_on_cpu_info(cpu):
-> >     ->!cpumask_test_and_set(cpu, on_cpu_info_lock)
-> >       ->!test_and_set_bit(cpu, on_cpu_info_lock->bits):
-> >          return (old & mask) != 0;
-> > 
-> > 'mask' always has the CPU bit set, which means that get_on_cpu_info() returns
-> > true if and only if 'old' has the bit clear. I think that prevents a thread
-> > getting the lock if it's already held, so from that point of view it does
-> > function as a per target cpu spinlock. Have I misunderstood something?
-> 
-> No, you're right, and thanks for reminding me of the thought process I
-> used when I wrote get/put_on_cpu_info() in the first place :-) While
-> trying to simplify things, I just got fed up with staring at it and
-> reasoning about it, so I threw my hands up and went back to a good ol'
-> lock. Now that you've convinced me [again] that the test-and-set isn't
-> flawed, we could keep it, but...
-> 
-> > 
-> > Regardless of the above, on_cpu_async() is used like this:
-> > 
-> > on_cpu_async()
-> > wait_for_synchronization()
-> > 
-> > so it doesn't make much sense to optimize for performance for the case were
-> > multiple threads call on_cpu_async() concurrently, as they would need to
-> > have to wait for synchronization anyway.
-> 
-> ...even though on_cpu_async() has a wait part, it only waits (outside the
-> lock) for the target cpu to be idle. If all targets are idle already, and
-> we have more than one "launcher" cpu, then we could launch tests on all
-> the targets more-or-less simultaneously with percpu locks, but...
+ Documentation/arch/arm64/elf_hwcaps.rst   |  51 ++++++
+ arch/arm64/include/asm/hwcap.h            |  17 ++
+ arch/arm64/include/uapi/asm/hwcap.h       |  17 ++
+ arch/arm64/kernel/cpufeature.c            |  35 ++++
+ arch/arm64/kernel/cpuinfo.c               |  17 ++
+ arch/arm64/kvm/sys_regs.c                 |   6 +-
+ arch/arm64/tools/sysreg                   |  87 +++++++++-
+ tools/testing/selftests/arm64/abi/hwcap.c | 273 +++++++++++++++++++++++++++++-
+ 8 files changed, 493 insertions(+), 10 deletions(-)
+---
+base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
+change-id: 20241008-arm64-2024-dpisa-8091074a7f48
 
-Ahah, that's very interesting, hadn't though about it that way.
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
 
-Another interesting thing here is that the glanularity for ATOMIC_TESTOP is
-8 * 8 = 64 bits, because LDXR loads from an 8 byte address, which is then
-marked for exclusive access. I think that means that in the end, if you
-have less than 64 CPUs, then the per-cpu spinlock will end looking similar
-to a spinlock.
-
-> 
-> > 
-> > So yes, I'm totally in favour for replacing the per-cpu spinlock with a global
-> > spinlock, even if the only reason is simplifying the code.
-> 
-> ...simplifying the code is probably the better choice since the critical
-> section is so small that sharing a lock really shouldn't matter much and
-> even some contention test which needs to run simultaneously on several
-> cpus should use looping rather than rely on a simultaneous launch.
-
-Yes, please use a spinlock here.
-
-> 
-> > 
-> > > to correct it. Also simplify the break case for on_cpu_async() -
-> > > we don't care if func is NULL, we only care that the cpu is idle.
-> > 
-> > That makes sense.
-> > 
-> > > And, finally, add a missing barrier to on_cpu_async().
-> > 
-> > Might be worth explaining in the commit message why it was missing. Just in
-> > case someone is looking at the code and isn't exactly sure why it's there.
-> 
-> Sure. I think the reason it's missing is because when 018550041b38 changed
-> from spinlock to put_on_cpu_info(), the release was also moved below the
-> clearing of idle. Prior to that, the spin_unlock() was acting as barrier.
-> With the move of where the release was done a barrier should have been
-> added.
-> 
-> > 
-> > > 
-> > > Fixes: 018550041b38 ("arm/arm64: Remove spinlocks from on_cpu_async")
-> > > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> > > ---
-> > >  lib/on-cpus.c | 36 +++++++++++-------------------------
-> > >  1 file changed, 11 insertions(+), 25 deletions(-)
-> > > 
-> > > diff --git a/lib/on-cpus.c b/lib/on-cpus.c
-> > > index 892149338419..f6072117fa1b 100644
-> > > --- a/lib/on-cpus.c
-> > > +++ b/lib/on-cpus.c
-> > > @@ -9,6 +9,7 @@
-> > >  #include <on-cpus.h>
-> > >  #include <asm/barrier.h>
-> > >  #include <asm/smp.h>
-> > > +#include <asm/spinlock.h>
-> > >  
-> > >  bool cpu0_calls_idle;
-> > >  
-> > > @@ -18,18 +19,7 @@ struct on_cpu_info {
-> > >  	cpumask_t waiters;
-> > >  };
-> > >  static struct on_cpu_info on_cpu_info[NR_CPUS];
-> > > -static cpumask_t on_cpu_info_lock;
-> > > -
-> > > -static bool get_on_cpu_info(int cpu)
-> > > -{
-> > > -	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
-> > > -}
-> > > -
-> > > -static void put_on_cpu_info(int cpu)
-> > > -{
-> > > -	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
-> > > -	assert(ret);
-> > > -}
-> > > +static struct spinlock lock;
-> > >  
-> > >  static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
-> > >  {
-> > > @@ -81,18 +71,14 @@ void do_idle(void)
-> > >  	if (cpu == 0)
-> > >  		cpu0_calls_idle = true;
-> > >  
-> > > -	set_cpu_idle(cpu, true);
-> > > -	smp_send_event();
-> > > -
-> > >  	for (;;) {
-> > > +		set_cpu_idle(cpu, true);
-> > > +		smp_send_event();
-> > > +
-> > >  		while (cpu_idle(cpu))
-> > >  			smp_wait_for_event();
-> > >  		smp_rmb();
-> > >  		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
-> > > -		on_cpu_info[cpu].func = NULL;
-> > > -		smp_wmb();
-> > 
-> > I think the barrier is still needed. The barrier orderered the now removed
-> > write func = NULL before the write set_cpu_idle(), but it also orderered
-> > whatever writes func(data) performed before set_cpu_idle(cpu, true). This
-> > matters for on_cpu(), where I think it's reasonable for the caller to
-> > expect to observe the writes made by 'func' after on_cpu() returns.
-> > 
-> > If you agree that this is the correct approach, I think it's worth adding a
-> > comment explaining it.
-> 
-> I think that's reasonable (along with adding smp_rmb()'s to the bottom of
-> on_cpu() and on_cpumask()). So the idea is we have
-
-I don't think adding smp_rmb() to on_cpu() and on_cpumask() is strictly
-necessary, because cpumask_set_cpu()->set_bit() already has a smp_mb().
-
-> 
->  cpu1                                         cpu2
->  ----                                         ----
->  func() /* store something */                 /* wait for cpu1 to be idle */
->  smp_wmb();                                   smp_rmb();
->  set_cpu_idle(smp_processor_id(), true);      /* load what func() stored */
-> 
-
-Just one small thing here, so it's even more precise what is being ordered:
-the smp_rmb() on cpu2 orders the read from cpu_online_mask() before the
-load from what func() stored.
-
-> > 
-> > > -		set_cpu_idle(cpu, true);
-> > > -		smp_send_event();
-> > >  	}
-> > >  }
-> > >  
-> > > @@ -110,17 +96,17 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
-> > >  
-> > >  	for (;;) {
-> > >  		cpu_wait(cpu);
-> > > -		if (get_on_cpu_info(cpu)) {
-> > > -			if ((volatile void *)on_cpu_info[cpu].func == NULL)
-> > > -				break;
-> > > -			put_on_cpu_info(cpu);
-> > > -		}
-> > > +		spin_lock(&lock);
-> > > +		if (cpu_idle(cpu))
-> > > +			break;
-> > > +		spin_unlock(&lock);
-> > >  	}
-> > >  
-> > >  	on_cpu_info[cpu].func = func;
-> > >  	on_cpu_info[cpu].data = data;
-> > > +	smp_wmb();
-> > 
-> > Without this smp_wmb(), it is possible for the target CPU to read an
-> > outdated on_cpu_info[cpu].data. So adding it is the right thing to do,
-> > since it orders the writes to on_cpu_info before set_cpu_idle().
-> > 
-> > >  	set_cpu_idle(cpu, false);
-> > > -	put_on_cpu_info(cpu);
-> > > +	spin_unlock(&lock);
-> > >  	smp_send_event();
-> > 
-> > I think a DSB is necessary before all the smp_send_event() calls in this
-> > file. The DSB ensures that the stores to cpu_idle_mask will be observed by
-> > the thread that is waiting on the WFE, otherwise it is theoretically
-> > possible to get a deadlock (in practice this will never happen, because KVM
-> > will be generating the events that cause WFE to complete):
-> > 
-> > CPU0: on_cpu_async():		CPU1: do_idle():
-> > 
-> > load CPU1_idle = true
-> > //do stuff
-> > store CPU1_idle=false
-> > SEV
-> > 				1: WFE
-> > 				   load CPU1_idle=true // old value, allowed
-> > 				   b 1b // deadlock
-> 
-> Good catch. Can you send a patch for that? The patch should be for the arm
-> implementations of smp_send_event() (and smp_wait_for_event()?) in
-> lib/arm/asm/smp.h.
-
-Sure, I can do that. Should I wait until this series gets merged?
-
-Also, I don't think smp_wait_for_event() needs a barrier - a wmb() before
-smp_send_event() will make sure that all stores have **completed** before
-smp_send_event() is executed, so on the waiting CPU all the stores will be
-visible.
-
-Using a smp_wmp() (or smp_mb()) will not work, because smp_send_event() is
-not a memory operation, and the smp_* primitives won't order the memory
-accesses against it.
-
-> 
-> > 
-> > Also, it looks unusual to have smp_send_event() unpaired from set_cpu_idle().
-> > Can't really point to anything being wrong about it though.
-> 
-> You mean due to the spin_unlock() separating the set_cpu_idle() and
-> smp_send_event()? We could put the spin_unlock() above the set_cpu_idle()
-> (as it was in 018550041b38, which also removes the need for the wmb), but
-> I think I like it the way it is now better for better readability. I
-> also can't think of why it would matter for them to be unpaired.
-
-Then choose whatever looks best for you :)
-
-Thanks,
-Alex
