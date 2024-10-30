@@ -1,193 +1,155 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4941E36126
-	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49764F201
+	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730304224; cv=none; b=GaedjMINgZQXKO8TmdusYb2NJKVccwuu2MINWYEgdyFPJ79BLRNzIm9tp3XaeclJeXGsa0vPBbLHUbKWHCFwa4Cz4K12WhJ/cV3OCx6VwiIoff462woYO/dMSPNXtC6Rebe4j9mDb2h4mYaKLRnEHjNNv6x3u1zH8LjYR2p5rcI=
+	t=1730304920; cv=none; b=G697zqbTRQLCWE6Pgedz3uKFsDJTTDm7QpvQnrDHiOWOxO4gYR5PNJddbKG/z3hXaDYCDC3hU6EyxZXCRu76a/D3UYolPZV4ec+Hp5lb3FDRiBGYnOSEfWIssv/ghi2XRglccB8w/RXvfGk3ePDyg34AyLnGraF5p1HzZWUUkzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730304224; c=relaxed/simple;
-	bh=fgo0XmpK5S7Ny3K3g7TiDmtrJHEuu8rbUZ2h++yVP4o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aJ4L8QDhF1JwwnCBngnFioRkqoeelaWF61Bf+GCUJaNnocCPTbZ3uCZ4ze/eqP4vQ0fcHB+ep6oLWJuvJhK72slbfwhOjcPzwjG467bj36qxH54mUOsDysoOTiTDreaQrNDEVvX/C2EFQTgIEYYP/ieRuSMyXMHsXdfBkUAo/lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65358176C;
-	Wed, 30 Oct 2024 09:04:11 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 789723F528;
-	Wed, 30 Oct 2024 09:03:39 -0700 (PDT)
-From: Joey Gouly <joey.gouly@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: anshuman.khandual@arm.com,
-	gshan@redhat.com,
-	james.morse@arm.com,
-	joey.gouly@arm.com,
-	shameerali.kolothum.thodi@huawei.com,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v6 7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
-Date: Wed, 30 Oct 2024 16:03:17 +0000
-Message-Id: <20241030160317.2528209-8-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241030160317.2528209-1-joey.gouly@arm.com>
-References: <20241030160317.2528209-1-joey.gouly@arm.com>
+	s=arc-20240116; t=1730304920; c=relaxed/simple;
+	bh=zo3V37l+CQvzJ91zXA3PrQ1QMrraC7OQ+ahcb9HM0o4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=S9OO6h0+vvIq3+YNiHPeeYnSG87HspqKMh40F60SXWxzK1sDyV0NqfrM3NQ5SqMRKQHErRw1FwhCmL/n5RHbsHCNruuZ2PFK8Z5F7Kc0722aKCL02zN6tDmDh7EURMpPaQOpScVtixVijjk7Gveui1f2kxB7IwddVVNkE7Xv0KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VYYqXUE6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYYqXUE6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730304916;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AvTbCW4re1QcMj/f1WpWU26bVLEB6tYD9s0VrjhcL4c=;
+	b=VYYqXUE6WO4imS+CnB1pgIfCRTULrOOAY0yZYAvez7pjqluyr6JR0acqeDBuEMjOazTJ+9
+	23IVpscacWdvbvVCMCmac/APdHDho6+bRPQ+U0NnAJKQiC1zrfZmbDkzHIOPXbvVWKBnbc
+	0vPm6BJRsmeWkpxpVrDmbLb5KQMBTIA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-256-Ma9O6IE1O1W6nofcL3QTew-1; Wed,
+ 30 Oct 2024 12:15:13 -0400
+X-MC-Unique: Ma9O6IE1O1W6nofcL3QTew-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F2E1F19560AF;
+	Wed, 30 Oct 2024 16:15:09 +0000 (UTC)
+Received: from localhost (unknown [10.22.64.152])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F8EC19560A2;
+	Wed, 30 Oct 2024 16:15:07 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>, Peter Maydell
+ <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Eric Auger
+ <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org,
+ alex.bennee@linaro.org, maz@kernel.org, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com,
+ mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
+In-Reply-To: <Zx_CU9eeQByANMRW@linux.dev>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20241025101959.601048-1-eric.auger@redhat.com>
+ <20241025101959.601048-19-eric.auger@redhat.com>
+ <ZxuX4i9NjVRizB72@redhat.com>
+ <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com>
+ <Zxub7ol4p8P_sWF8@redhat.com>
+ <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
+ <Zx-9WxXkmkMuGIlQ@redhat.com>
+ <CAFEAcA9w0mb5bcU8p+fScQony-=oqLmNurGWpnL_sBneQCzxUg@mail.gmail.com>
+ <Zx_CU9eeQByANMRW@linux.dev>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Wed, 30 Oct 2024 17:15:05 +0100
+Message-ID: <87bjz1o9di.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: James Morse <james.morse@arm.com>
+On Mon, Oct 28 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
 
-The ID_AA64PFR0.MPAM bit was previously accidentally exposed to guests,
-and is ignored by KVM. KVM will always present the guest with 0 here,
-and trap the MPAM system registers to inject an undef.
+> On Mon, Oct 28, 2024 at 04:48:18PM +0000, Peter Maydell wrote:
+>> On Mon, 28 Oct 2024 at 16:35, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
+>> >
+>> > On Mon, Oct 28, 2024 at 04:16:31PM +0000, Peter Maydell wrote:
+>> > > On Fri, 25 Oct 2024 at 14:24, Daniel P. Berrang=C3=A9 <berrange@redh=
+at.com> wrote:
+>> > > > On Fri, Oct 25, 2024 at 03:18:25PM +0200, Eric Auger wrote:
+>> > > > > On 10/25/24 15:06, Daniel P. Berrang=C3=A9 wrote:
+>> > > > > > Also, is this naming convention really the same one that users
+>> > > > > > will see when they look at /proc/cpuinfo to view features ? It
+>> > > > > No it is not. I do agree that the custom cpu model is very low l=
+evel. It
+>> > > > > is very well suited to test all series turning ID regs as writab=
+le but
+>> > > > > this would require an extra layer that adapts /proc/cpuinfo feat=
+ure
+>> > > > > level to this regid/field abstraction.
+>> > > > >
+>> > > > > In /cpu/proc you will see somethink like:
+>> > > > >  Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomic=
+s fphp
+>> > > > > asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+>> > > >
+>> > > > Right, IMHO, this is the terminology that QEMU must use in user
+>> > > > facing APIs.
+>> > >
+>> > > /proc/cpuinfo's naming is rather weird for historical
+>> > > reasons (for instance there is only one FEAT_FP16 feature
+>> > > but cpuinfo lists "fphp" and "asimdhp" separately).
+>> >
+>> > There's plenty of wierd history in x86 too. In this
+>> > case I might suggest just picking one of the two
+>> > common names, and ignoring the other.
+>> >
+>> > If we really wanted to, we could alias the 2nd name
+>> > to the first, but its likely not worth the bother.
+>>=20
+>> Or we could use the standard set of architectural
+>> feature names, and not have the problem at all, and not
+>> have to document what we mean by our nonstandard names.
+>
+> +1
+>
+> There's existing documentation [*] for the standard feature names, which
+> provides:
+>
+>  - A short description of what the feature does
+>  - Any dependencies a particular feature has (e.g.FEAT_VHE implies
+>    FEAT_LSE, FEAT_Debugv8p1, and FEAT_AA64EL2)
+>  - The register fields/values that are used to discover the feature.
+>
+> This seems like the most user-friendly option...
+>
+> [*]: https://developer.arm.com/documentation/109697/2024_09
 
-But, this value is still needed to prevent migration when the value
-is incompatible with the target hardware. Add a kvm unit test to try
-and write multiple values to ID_AA64PFR0.MPAM. Only the hardware value
-previously exposed should be ignored, all other values should be
-rejected.
+FEAT_XXX sounds good, would be a different approach than this series
+obviously, since the user resp. upper software layers would operate on a
+per-feature basis, and QEMU would translate to and from registers.
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- .../selftests/kvm/aarch64/set_id_regs.c       | 99 ++++++++++++++++++-
- 1 file changed, 98 insertions(+), 1 deletion(-)
+I'm wondering about the amount of translation that would be needed, and
+what information would be best exposed via QEMU, given that a feature
+may or may not be toggable not only because of what the Arm revision
+specifies, but what registers the host kernel allows to be written.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index b87e53580bfc..a79b7f18452d 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -443,6 +443,101 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 	}
- }
- 
-+#define MPAM_IDREG_TEST	6
-+static void test_user_set_mpam_reg(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-+	struct reg_mask_range range = {
-+		.addr = (__u64)masks,
-+	};
-+	uint64_t val;
-+	int idx, err;
-+
-+	/*
-+	 * If ID_AA64PFR0.MPAM is _not_ officially modifiable and is zero,
-+	 * check that if it can be set to 1, (i.e. it is supported by the
-+	 * hardware), that it can't be set to other values.
-+	 */
-+
-+	/* Get writable masks for feature ID registers */
-+	memset(range.reserved, 0, sizeof(range.reserved));
-+	vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-+
-+	/* Writeable? Nothing to test! */
-+	idx = encoding_to_range_idx(SYS_ID_AA64PFR0_EL1);
-+	if ((masks[idx] & ID_AA64PFR0_EL1_MPAM_MASK) == ID_AA64PFR0_EL1_MPAM_MASK) {
-+		ksft_test_result_skip("ID_AA64PFR0_EL1.MPAM is officially writable, nothing to test\n");
-+		return;
-+	}
-+
-+	/* Get the id register value */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-+
-+	/* Try to set MPAM=0. This should always be possible. */
-+	val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR0_EL1_MPAM_MASK, 0);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-+	if (err)
-+		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM=0 was not accepted\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM=0 worked\n");
-+
-+	/* Try to set MPAM=1 */
-+	val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR0_EL1_MPAM_MASK, 1);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-+	if (err)
-+		ksft_test_result_skip("ID_AA64PFR0_EL1.MPAM is not writable, nothing to test\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM=1 was writable\n");
-+
-+	/* Try to set MPAM=2 */
-+	val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR0_EL1_MPAM_MASK, 2);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), val);
-+	if (err)
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM not arbitrarily modifiable\n");
-+	else
-+		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM value should not be ignored\n");
-+
-+	/* And again for ID_AA64PFR1_EL1.MPAM_frac */
-+	idx = encoding_to_range_idx(SYS_ID_AA64PFR1_EL1);
-+	if ((masks[idx] & ID_AA64PFR1_EL1_MPAM_frac_MASK) == ID_AA64PFR1_EL1_MPAM_frac_MASK) {
-+		ksft_test_result_skip("ID_AA64PFR1_EL1.MPAM_frac is officially writable, nothing to test\n");
-+		return;
-+	}
-+
-+	/* Get the id register value */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), &val);
-+
-+	/* Try to set MPAM_frac=0. This should always be possible. */
-+	val &= ~ID_AA64PFR1_EL1_MPAM_frac_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR1_EL1_MPAM_frac_MASK, 0);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err)
-+		ksft_test_result_fail("ID_AA64PFR0_EL1.MPAM_frac=0 was not accepted\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM_frac=0 worked\n");
-+
-+	/* Try to set MPAM_frac=1 */
-+	val &= ~ID_AA64PFR1_EL1_MPAM_frac_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR1_EL1_MPAM_frac_MASK, 1);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err)
-+		ksft_test_result_skip("ID_AA64PFR1_EL1.MPAM_frac is not writable, nothing to test\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR0_EL1.MPAM_frac=1 was writable\n");
-+
-+	/* Try to set MPAM_frac=2 */
-+	val &= ~ID_AA64PFR1_EL1_MPAM_frac_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR1_EL1_MPAM_frac_MASK, 2);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err)
-+		ksft_test_result_pass("ID_AA64PFR1_EL1.MPAM_frac not arbitrarily modifiable\n");
-+	else
-+		ksft_test_result_fail("ID_AA64PFR1_EL1.MPAM_frac value should not be ignored\n");
-+}
-+
- static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- {
- 	bool done = false;
-@@ -581,12 +676,14 @@ int main(void)
- 		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64pfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1) +
--		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 2;
-+		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 2 +
-+		   MPAM_IDREG_TEST;
- 
- 	ksft_set_plan(test_cnt);
- 
- 	test_vm_ftr_id_regs(vcpu, aarch64_only);
- 	test_vcpu_ftr_id_regs(vcpu);
-+	test_user_set_mpam_reg(vcpu);
- 
- 	test_guest_reg_read(vcpu);
- 
--- 
-2.25.1
+I.e. if we have two cpus that differ in whether FEAT_FOO is provided,
+would it make sense to have an extra QMP command so that you can find
+out whether FEAT_FOO can be switched off, with QEMU translating from the
+set of writable id registers to the set of features that can be changed?
 
