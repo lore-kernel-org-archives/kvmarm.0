@@ -1,55 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94BA1DFE16;
-	Wed, 30 Oct 2024 08:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FA61E1C1B;
+	Wed, 30 Oct 2024 08:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730276570; cv=none; b=cnZtMfaqlQ70GJfz+0rwe2uG5S4d+aYa8SahNuR/+2UtWjfv/jYEdbpfMCZNrqgy9TzMsrnZWots9XqWsqImDiq5AzLTxReols7Jak238y4i7sPi/myA95fUuF4Uo098MP10gSRuqldvzr0QtSmpplKsBe7xMjYk4E3DWUymeBM=
+	t=1730277956; cv=none; b=iKKNYdxK/GcdfCDvlVfeI+G5Q7aBWPyeyTpgTCyRCtb489I27WIRV+Yz7Wa02Rp6oqn1uh1Rm0GOXwphi38Sy8+fHS3FRbb/EyAiQRAT+JazHCxwdj8/AyNct/q1VA0HiZg7PCMtaNI26I7A7XJaRCOBJpKdVHUci31MibyWOoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730276570; c=relaxed/simple;
-	bh=3M44dfapTogOZEkofhgJIny5tBNB1l5zW1bJlM7opcA=;
+	s=arc-20240116; t=1730277956; c=relaxed/simple;
+	bh=CzuTjol1M/5TrcpkB5m8SbtfrpBFFBCk7QxVqElMmys=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hf+y1MIDu4HsJ2e54rOaN8dFnVkr0AELrkjXj6JYZqfX02iBahdvRdNRrZvXZ0pXnP0OW90Bw2DtP5BEBHBuDPx5WBVAQBuSHq/3WAxW+RpkJI0gB1toyb0SgsOc4JtENDxjoqySGbahCD6PJNDehbRn4x4XsV5kqD6AxlikFZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EajETXJv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=P6eBIKpVCGP/Lhp76bsJc8/S5oBYwnBqx2Lw1bRPlVIiU6YxrMd52akfMG1eIB0c/vIO2L419Tu5N0msS/XnE2sXtusL2PsTbWVWRGWMQfYBBCPigO5nkf8jkC5cKqJQx5Tac8/996fUJDbmuOwU3hpJfPX1012bOx6ulSysD2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlt7LfJg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EajETXJv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B242C4CEE4;
-	Wed, 30 Oct 2024 08:22:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlt7LfJg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF328C4CEE4;
+	Wed, 30 Oct 2024 08:45:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730276570;
-	bh=3M44dfapTogOZEkofhgJIny5tBNB1l5zW1bJlM7opcA=;
+	s=k20201202; t=1730277956;
+	bh=CzuTjol1M/5TrcpkB5m8SbtfrpBFFBCk7QxVqElMmys=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EajETXJv8qf83oZumJdFmDKi1YuSTYcVJboRizdPM4kOF08PVYpgHsDuiL2irCxT/
-	 BcSNBlc4YlEGpAEN/+4GoZlrBtwoH0KRLcyBjwsKvfuoaw/xsgo4owrb9KK8q+V/g6
-	 Z45ExAUnwgBqaTjQmEWR2ZhdSAHI7RtsctQYQwGBjmUns1pDAhXykzfVRm8LWniZyI
-	 X626kEDouUsB/m4IuSDkecMChNtbfRLZgDM1vSvW47yIMO4cscfzTXic4mVZysjNXP
-	 5e+zvgw2NDrdleYej6e4LakesMFMiEzkpUQhRvLmoQiGmmCM45+QhMVihPwfxm0t0d
-	 iXSaje5ZYKoFw==
+	b=tlt7LfJgaLJPvhpd1YVkn0jAkECODxD8MsC3Wku64Pm5RufbxQaNvzysMUX9emP+j
+	 rg6NYzhsYGfxCPYwSfquIRCY9W7dFnFjG2D+N2k6mAT+UJIVPSXcvQEvoocehqIJky
+	 tcCkQlBwPUBmfC+Icxg9GVOoE/fg1+e5YTIZAvoWR91n1/gEHaGyVte8D5YKYQ3bD+
+	 xpP16AZEFWK1J9naWH03oRUllEaAKyWry8bVHElO1pIqGa+Uj5A/hCVHoaEUlMTG/h
+	 mUqEIN5RUcJQlUpCOQ72ee9vvkOaJrsmIYbxQ3GKpTdMCF21NPaFB/Esaz17DklXZa
+	 LwseeOx6oEjvQ==
 Received: from 82-132-233-180.dab.02.net ([82.132.233.180] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t63yZ-008Bje-9r;
-	Wed, 30 Oct 2024 08:22:47 +0000
-Date: Wed, 30 Oct 2024 08:22:39 +0000
-Message-ID: <87iktat2y8.wl-maz@kernel.org>
+	id 1t64Kv-008C77-4A;
+	Wed, 30 Oct 2024 08:45:53 +0000
+Date: Wed, 30 Oct 2024 08:45:48 +0000
+Message-ID: <87h68ut1vn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	stable@vger.kernel.org,
-	syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
-In-Reply-To: <CAJHc60xQNeTwSBuPhrKO_JBuikqZ7R=BM5rkWht3YwieVXwkHg@mail.gmail.com>
-References: <20241028234533.942542-1-rananta@google.com>
-	<868qu63mdo.wl-maz@kernel.org>
-	<CAJHc60x3sGdi2_mg_9uxecPYwZMBR11m1oEKPEH4RTYaF8eHdQ@mail.gmail.com>
-	<865xpa3fwe.wl-maz@kernel.org>
-	<CAJHc60xQNeTwSBuPhrKO_JBuikqZ7R=BM5rkWht3YwieVXwkHg@mail.gmail.com>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 00/18] KVM: arm64: nv: Support for EL2 PMU controls
+In-Reply-To: <20241025182354.3364124-1-oliver.upton@linux.dev>
+References: <20241025182354.3364124-1-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,65 +57,64 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 82.132.233.180
-X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org, syzkaller@googlegroups.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 30 Oct 2024 00:16:48 +0000,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
->=20
-> On Tue, Oct 29, 2024 at 11:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
-ote:
-> >
-> > On Tue, 29 Oct 2024 17:06:09 +0000,
-> > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > >
-> > > On Tue, Oct 29, 2024 at 9:27=E2=80=AFAM Marc Zyngier <maz@kernel.org>=
- wrote:
-> > > >
-> > > > On Mon, 28 Oct 2024 23:45:33 +0000,
-> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > > >
-> > > > Did you have a chance to check whether this had any negative impact=
- on
-> > > > actual workloads? Since the entry/exit code is a bit of a hot spot,
-> > > > I'd like to make sure we're not penalising the common case (I only
-> > > > wrote this patch while waiting in an airport, and didn't test it at
-> > > > all).
-> > > >
-> > > I ran the kvm selftests, kvm-unit-tests and booted a linux guest to
-> > > test the change and noticed no failures.
-> > > Any specific test you want to try out?
-> >
-> > My question is not about failures (I didn't expect any), but
-> > specifically about *performance*, and whether checking the flag
-> > without a static key can lead to any performance drop on the hot path.
-> >
-> > Can you please run an exit-heavy workload (such as hackbench, for
-> > example), and report any significant delta you could measure?
->=20
-> Oh, I see. I ran hackbench and micro-bench from kvm-unit-tests (which
-> also causes a lot of entry/exits), on Ampere Altra with kernel at
-> v6.12-rc1, and see no significant difference in perf.
+On Fri, 25 Oct 2024 19:23:35 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> v3 -> v4:
+>  - Align sysreg definitions with DDI0601 2024-09
+>  - Fix 'accessible' counter mask construction
+>  - Fix MDCR_EL2.MTPME RES0 logic
+> 
+> v3: https://lore.kernel.org/kvmarm/20241007174559.1830205-1-oliver.upton@linux.dev/
+> 
+> Marc Zyngier (1):
+>   KVM: arm64: Extend masking facility to arbitrary registers
+> 
+> Oliver Upton (17):
+>   arm64: sysreg: Describe ID_AA64DFR2_EL1 fields
+>   arm64: sysreg: Migrate MDCR_EL2 definition to table
+>   arm64: sysreg: Add new definitions for ID_AA64DFR0_EL1
+>   KVM: arm64: Describe RES0/RES1 bits of MDCR_EL2
+>   KVM: arm64: nv: Allow coarse-grained trap combos to use complex traps
+>   KVM: arm64: nv: Rename BEHAVE_FORWARD_ANY
+>   KVM: arm64: nv: Reinject traps that take effect in Host EL0
+>   KVM: arm64: nv: Honor MDCR_EL2.{TPM, TPMCR} in Host EL0
+>   KVM: arm64: nv: Describe trap behaviour of MDCR_EL2.HPMN
+>   KVM: arm64: nv: Advertise support for FEAT_HPMN0
+>   KVM: arm64: Rename kvm_pmu_valid_counter_mask()
+>   KVM: arm64: nv: Adjust range of accessible PMCs according to HPMN
+>   KVM: arm64: Add helpers to determine if PMC counts at a given EL
+>   KVM: arm64: nv: Honor MDCR_EL2.HPME
+>   KVM: arm64: nv: Honor MDCR_EL2.HLP
+>   KVM: arm64: nv: Apply EL2 event filtering when in hyp context
+>   KVM: arm64: nv: Reprogram PMU events affected by nested transition
+> 
+>  arch/arm64/include/asm/kvm_arm.h     |  29 ---
+>  arch/arm64/include/asm/kvm_emulate.h |   5 +
+>  arch/arm64/include/asm/kvm_host.h    |  21 +-
+>  arch/arm64/kvm/emulate-nested.c      | 291 ++++++++++++++++-----------
+>  arch/arm64/kvm/nested.c              |  54 ++++-
+>  arch/arm64/kvm/pmu-emul.c            | 143 +++++++++++--
+>  arch/arm64/kvm/sys_regs.c            |  15 +-
+>  arch/arm64/tools/sysreg              |  76 ++++++-
+>  include/kvm/arm_pmu.h                |  18 +-
+>  9 files changed, 465 insertions(+), 187 deletions(-)
+> 
+> 
+> base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
 
-Thanks for running this stuff.
+I think this is pretty much good to go, and with the couple of nits
+mentioned before fixed:
 
-> timer_10ms                          231040.0                          902=
-.0
-> timer_10ms                         234120.0                            91=
-4.0
-
-This seems to be the only case were we are adversely affected by this
-change. In the grand scheme of thins, that's noise. But this gives us
-a clear line of sight for the removal of the in-kernel interrupts back
-to userspace.
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
