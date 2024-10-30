@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28C36126
-	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAB4213128
+	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730304209; cv=none; b=f8jQkGojBu6McU0y3rEaRrIu2Wx7tBi2avieeS097PDUnGhXbFI8x1VZQ30UGR/hQfYavS+mGC06aldevpPP5heINXsHR5TjuuQAR1w5lXvayXAKV/0RTlQmpbeFOQsrbOJ0TVH7O8MxHVi7OgfbQ1ECvcPCwwwJXaQeviGAsPk=
+	t=1730304211; cv=none; b=oIExCAEjWCc8S2H2VYg2E1ePdXzl8UOSE46q3VFKcCtVYCO3WNMG1fBzolWl6wBfrTxZkwFpczyLZRPKMmmoLL8Gv2Y2vBo7ScnftPoCWTeo6hsMwaD2QaOPxcUtuytHTIauwvYoUoQtOSYsnr842KmwNlSLGk46yNziJLFJjoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730304209; c=relaxed/simple;
-	bh=yGdrxDbPcyddfHcvr4uDquPG3uJ8P3ZF+2e4cJz1hZ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZufyZ6Gem/kejzt8kNTqgk2H9H47inn9El9C0DhT6HQtg+W/LlKyVa1AgktkXGus1RBToE79ochSCqgH8SBthX3ssLUfEuRnaRk3Kpn8cT5m/OyKZVVrbtrRycdqWvAiXvAh8svXCtq274LZbbTK0dlzgkI3OBtZIUkqbhSw7sA=
+	s=arc-20240116; t=1730304211; c=relaxed/simple;
+	bh=8rDNqn4uk9Qs/Aqdp33qS+QgqmWJfKTkCZzc5D3wKc8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EdHIyQCJZnzEchJsw09A0rSDb0EjKVOxESOqL6gODD0xahkPaSgmsA9EmhGYbaxYR8GekEN3WaXp+NicXo7qWMlA/4z4wm6wqYys3v2PjVtk2tOl4rsHzbyX03/OGK8VZpwK2qQiAd6G0uJ96IBvZBNl383y2i3QIZzRAa+X6AQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10792113E;
-	Wed, 30 Oct 2024 09:03:55 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7949511FB;
+	Wed, 30 Oct 2024 09:03:57 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 478523F528;
-	Wed, 30 Oct 2024 09:03:23 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 907A93F528;
+	Wed, 30 Oct 2024 09:03:25 -0700 (PDT)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -32,10 +33,12 @@ Cc: anshuman.khandual@arm.com,
 	Jing Zhang <jingzhangos@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v6 0/7] KVM: arm64: Hide unsupported MPAM from the guest
-Date: Wed, 30 Oct 2024 16:03:10 +0000
-Message-Id: <20241030160317.2528209-1-joey.gouly@arm.com>
+Subject: [PATCH v6 1/7] arm64/sysreg: Convert existing MPAM sysregs and add the remaining entries
+Date: Wed, 30 Oct 2024 16:03:11 +0000
+Message-Id: <20241030160317.2528209-2-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20241030160317.2528209-1-joey.gouly@arm.com>
+References: <20241030160317.2528209-1-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,68 +47,236 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+From: James Morse <james.morse@arm.com>
 
-changes since v5 [1]:
-	- Removed Kconfig option, the KVM traps shouldn't rely on host kernel support
-	- Renamed cpus_support_* to system_supports_* since that matches other functions
-	- Replace static branch arm64_mpam_has_hcr with a normal cpufeature capability
-	- Add MPAM*_EL2 regs to KVM (undef_access)
-	- Use constants in the test, instead of hardcoded values
-	- Added R-b and T-b tags
-	- Rebased on v6.12-rc5
+Move the existing MPAM system register defines from sysreg.h to
+tools/sysreg and add the remaining system registers.
 
-James wrote:
-	This series fixes up a long standing bug where MPAM was accidentally exposed
-	to a guest, but the feature was not otherwise trapped or context switched.
-	This could result in KVM warning about unexpected traps, and injecting an
-	undef into the guest contradicting the ID registers.
-	This would prevent an MPAM aware kernel from booting - fortunately, there
-	aren't any of those.
+Signed-off-by: James Morse <james.morse@arm.com>
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ arch/arm64/include/asm/sysreg.h |  12 ---
+ arch/arm64/tools/sysreg         | 161 ++++++++++++++++++++++++++++++++
+ 2 files changed, 161 insertions(+), 12 deletions(-)
 
-	Ideally, we'd take the MPAM feature away from the ID registers, but that
-	would leave existing guests unable to migrate to a newer kernel. Instead,
-	just ignore that field when it matches the hardware. KVM wasn't going to
-	expose MPAM anyway. The guest will not see MPAM in the id registers.
-
-	This series includes the head.S and KVM changes to enable/disable traps. If
-	MPAM is neither enabled nor emulated by EL3 firmware, these system register
-	accesses will trap to EL3.
-	If your kernel doesn't boot, and the problem bisects here - please update
-	your firmware. MPAM has been supported by trusted firmware since v1.6 in
-	2018. (also noted on patch 3).
-
-Thanks,
-Joey
-
-[1] https://lore.kernel.org/kvmarm/20241015133923.3910916-1-joey.gouly@arm.com/
-
-James Morse (7):
-  arm64/sysreg: Convert existing MPAM sysregs and add the remaining
-    entries
-  arm64: head.S: Initialise MPAM EL2 registers and disable traps
-  arm64: cpufeature: discover CPU support for MPAM
-  KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
-  KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
-  KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
-  KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
-
- .../arch/arm64/cpu-feature-registers.rst      |   2 +
- arch/arm64/include/asm/cpu.h                  |   1 +
- arch/arm64/include/asm/cpucaps.h              |   5 +
- arch/arm64/include/asm/cpufeature.h           |  17 ++
- arch/arm64/include/asm/el2_setup.h            |  14 ++
- arch/arm64/include/asm/kvm_arm.h              |   1 +
- arch/arm64/include/asm/sysreg.h               |  12 --
- arch/arm64/kernel/cpufeature.c                |  96 +++++++++++
- arch/arm64/kernel/cpuinfo.c                   |   3 +
- arch/arm64/kvm/hyp/include/hyp/switch.h       |  31 ++++
- arch/arm64/kvm/sys_regs.c                     | 121 +++++++++----
- arch/arm64/tools/cpucaps                      |   2 +
- arch/arm64/tools/sysreg                       | 161 ++++++++++++++++++
- .../selftests/kvm/aarch64/set_id_regs.c       |  99 ++++++++++-
- 14 files changed, 523 insertions(+), 42 deletions(-)
-
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 9ea97dddefc4..345e81e0d2b3 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -542,18 +542,6 @@
+ 
+ #define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+ #define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
+-#define SYS_MPAMHCR_EL2			sys_reg(3, 4, 10, 4, 0)
+-#define SYS_MPAMVPMV_EL2		sys_reg(3, 4, 10, 4, 1)
+-#define SYS_MPAM2_EL2			sys_reg(3, 4, 10, 5, 0)
+-#define __SYS__MPAMVPMx_EL2(x)		sys_reg(3, 4, 10, 6, x)
+-#define SYS_MPAMVPM0_EL2		__SYS__MPAMVPMx_EL2(0)
+-#define SYS_MPAMVPM1_EL2		__SYS__MPAMVPMx_EL2(1)
+-#define SYS_MPAMVPM2_EL2		__SYS__MPAMVPMx_EL2(2)
+-#define SYS_MPAMVPM3_EL2		__SYS__MPAMVPMx_EL2(3)
+-#define SYS_MPAMVPM4_EL2		__SYS__MPAMVPMx_EL2(4)
+-#define SYS_MPAMVPM5_EL2		__SYS__MPAMVPMx_EL2(5)
+-#define SYS_MPAMVPM6_EL2		__SYS__MPAMVPMx_EL2(6)
+-#define SYS_MPAMVPM7_EL2		__SYS__MPAMVPMx_EL2(7)
+ 
+ #define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+ #define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 8d637ac4b7c6..05d04a45db65 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2737,6 +2737,126 @@ Field	1	E2SPE
+ Field	0	E0HSPE
+ EndSysreg
+ 
++Sysreg	MPAMHCR_EL2	3	4	10	4	0
++Res0	63:32
++Field	31	TRAP_MPAMIDR_EL1
++Res0	30:9
++Field	8	GSTAPP_PLK
++Res0	7:2
++Field	1	EL1_VPMEN
++Field	0	EL0_VPMEN
++EndSysreg
++
++Sysreg	MPAMVPMV_EL2	3	4	10	4	1
++Res0	63:32
++Field	31	VPM_V31
++Field	30	VPM_V30
++Field	29	VPM_V29
++Field	28	VPM_V28
++Field	27	VPM_V27
++Field	26	VPM_V26
++Field	25	VPM_V25
++Field	24	VPM_V24
++Field	23	VPM_V23
++Field	22	VPM_V22
++Field	21	VPM_V21
++Field	20	VPM_V20
++Field	19	VPM_V19
++Field	18	VPM_V18
++Field	17	VPM_V17
++Field	16	VPM_V16
++Field	15	VPM_V15
++Field	14	VPM_V14
++Field	13	VPM_V13
++Field	12	VPM_V12
++Field	11	VPM_V11
++Field	10	VPM_V10
++Field	9	VPM_V9
++Field	8	VPM_V8
++Field	7	VPM_V7
++Field	6	VPM_V6
++Field	5	VPM_V5
++Field	4	VPM_V4
++Field	3	VPM_V3
++Field	2	VPM_V2
++Field	1	VPM_V1
++Field	0	VPM_V0
++EndSysreg
++
++Sysreg	MPAM2_EL2	3	4	10	5	0
++Field	63	MPAMEN
++Res0	62:59
++Field	58	TIDR
++Res0	57
++Field	56	ALTSP_HFC
++Field	55	ALTSP_EL2
++Field	54	ALTSP_FRCD
++Res0	53:51
++Field	50	EnMPAMSM
++Field	49	TRAPMPAM0EL1
++Field	48	TRAPMPAM1EL1
++Field	47:40	PMG_D
++Field	39:32	PMG_I
++Field	31:16	PARTID_D
++Field	15:0	PARTID_I
++EndSysreg
++
++Sysreg	MPAMVPM0_EL2	3	4	10	6	0
++Field	63:48	PhyPARTID3
++Field	47:32	PhyPARTID2
++Field	31:16	PhyPARTID1
++Field	15:0	PhyPARTID0
++EndSysreg
++
++Sysreg	MPAMVPM1_EL2	3	4	10	6	1
++Field	63:48	PhyPARTID7
++Field	47:32	PhyPARTID6
++Field	31:16	PhyPARTID5
++Field	15:0	PhyPARTID4
++EndSysreg
++
++Sysreg	MPAMVPM2_EL2	3	4	10	6	2
++Field	63:48	PhyPARTID11
++Field	47:32	PhyPARTID10
++Field	31:16	PhyPARTID9
++Field	15:0	PhyPARTID8
++EndSysreg
++
++Sysreg	MPAMVPM3_EL2	3	4	10	6	3
++Field	63:48	PhyPARTID15
++Field	47:32	PhyPARTID14
++Field	31:16	PhyPARTID13
++Field	15:0	PhyPARTID12
++EndSysreg
++
++Sysreg	MPAMVPM4_EL2	3	4	10	6	4
++Field	63:48	PhyPARTID19
++Field	47:32	PhyPARTID18
++Field	31:16	PhyPARTID17
++Field	15:0	PhyPARTID16
++EndSysreg
++
++Sysreg	MPAMVPM5_EL2	3	4	10	6	5
++Field	63:48	PhyPARTID23
++Field	47:32	PhyPARTID22
++Field	31:16	PhyPARTID21
++Field	15:0	PhyPARTID20
++EndSysreg
++
++Sysreg	MPAMVPM6_EL2	3	4	10	6	6
++Field	63:48	PhyPARTID27
++Field	47:32	PhyPARTID26
++Field	31:16	PhyPARTID25
++Field	15:0	PhyPARTID24
++EndSysreg
++
++Sysreg	MPAMVPM7_EL2	3	4	10	6	7
++Field	63:48	PhyPARTID31
++Field	47:32	PhyPARTID30
++Field	31:16	PhyPARTID29
++Field	15:0	PhyPARTID28
++EndSysreg
++
+ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
+@@ -2769,6 +2889,10 @@ Sysreg	FAR_EL12	3	5	6	0	0
+ Field	63:0	ADDR
+ EndSysreg
+ 
++Sysreg	MPAM1_EL12	3	5	10	5	0
++Fields	MPAM1_ELx
++EndSysreg
++
+ Sysreg	CONTEXTIDR_EL12	3	5	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
+@@ -2941,6 +3065,22 @@ Res0	1
+ Field	0	EN
+ EndSysreg
+ 
++Sysreg	MPAMIDR_EL1	3	0	10	4	4
++Res0	63:62
++Field	61	HAS_SDEFLT
++Field	60	HAS_FORCE_NS
++Field	59	SP4
++Field	58	HAS_TIDR
++Field	57	HAS_ALTSP
++Res0	56:40
++Field	39:32	PMG_MAX
++Res0	31:21
++Field	20:18	VPMR_MAX
++Field	17	HAS_HCR
++Res0	16
++Field	15:0	PARTID_MAX
++EndSysreg
++
+ Sysreg	LORID_EL1	3	0	10	4	7
+ Res0	63:24
+ Field	23:16	LD
+@@ -2948,6 +3088,27 @@ Res0	15:8
+ Field	7:0	LR
+ EndSysreg
+ 
++Sysreg	MPAM1_EL1	3	0	10	5	0
++Field	63	MPAMEN
++Res0	62:61
++Field	60 FORCED_NS
++Res0	59:55
++Field	54	ALTSP_FRCD
++Res0	53:48
++Field	47:40	PMG_D
++Field	39:32	PMG_I
++Field	31:16	PARTID_D
++Field	15:0	PARTID_I
++EndSysreg
++
++Sysreg	MPAM0_EL1	3	0	10	5	1
++Res0	63:48
++Field	47:40	PMG_D
++Field	39:32	PMG_I
++Field	31:16	PARTID_D
++Field	15:0	PARTID_I
++EndSysreg
++
+ Sysreg	ISR_EL1	3	0	12	1	0
+ Res0	63:11
+ Field	10	IS
 -- 
 2.25.1
 
