@@ -1,82 +1,125 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF958F58
-	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 04:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFF533E1;
+	Wed, 30 Oct 2024 07:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730263166; cv=none; b=jNPv08iayA0lQ8el38OlaRZrJCEenLNYiU+LaIdk3cXIDjXIPYXVsV4EiQ5oXHiEGV3ACBMEE3Bt1KRbZZnf0wAHYDJkpTf1wbUfGq+GHuA/4Q+lg1E22QMUPwbY+QDrzgm/e6nRCoR4HRLQP7LqC774H3ustDCraZmHC5lvYW8=
+	t=1730274729; cv=none; b=U8mb9Azx10J5smgYGoPA6r+rQdg4dowGLKELwIHZq9JJ54dTJHwhthc7xShNxowBV9/uMIyvSPM7eiyaFkzYAYJOdXDC6sEXCXE7WWYxq+6FXEhe9kyQJK1rqiff5LVCqz3i5rhmYYtOH7R8PA+YX4CpVLs1jMhG0EHOkSr45yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730263166; c=relaxed/simple;
-	bh=cRtjpOFnK3lIH2p96pKrXOJJhMgj+bCnppTJtPLmW/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GfmxO+AFXSJvzY1vO6IBM5+J2G6pZBKsFXmxAPKdaedEXZ3p9vys8ktOdbDlls4s9OtetTB/eCqMEVeLMkP2ixEzjtLgDa/SsAZ458YWmBGOMf/sZHjcR7cSYyQcwGu/VoDnl6cqrhj7s6VEoCCZDG47AKdVmpqSuuIfeIxchn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PoMWjfHl; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1730274729; c=relaxed/simple;
+	bh=vrq3Hj0eASMy2KLVd52CUc8legLz7mDW/VncF6IQKRk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HPTbywzR5PMqGoblaXgzILbqOOsPGjYeMeSN7/vpw3QIJIwJZ7OJZIphyX+uIFGD0BmFI1eALNoV+hz5uRVuoHHOTpToPRP6fMvc6UaZFouo41DoE2pQUIcU1QYBAAR5/oVO5jKHIoH6u5CzrK0GhiPI2cH0w7HWu/qLrsINbKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyf0LMJf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PoMWjfHl"
-Date: Tue, 29 Oct 2024 21:39:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730263162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sp/Joqr6Fg+CbM6kllKhe4k7VezD6hpv2eBeT+NpJcM=;
-	b=PoMWjfHlTy7H6Q3L8P7djXveyvh0HGtnyk/fdVX3t5Pr3Kp2rNPy1w8a5UNt0sUPepSSq4
-	+O8NZl5UbPoxtVfPZnQgBadyXzdKzIDT+f4n2hZ0etV8o24RHVM6WBDO9nAO+MWMhzpAlD
-	+zggZT7wSclLJEi+pg2CAIbdT5Mv0iI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	jiangkunkun <jiangkunkun@huawei.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Linuxarm <linuxarm@huawei.com>
-Subject: Re: [RFC PATCH v2 1/3] KVM: arm64: Add hypercall support for
- retrieving migration targets
-Message-ID: <ZyG4cjIscLqCT7Dx@linux.dev>
-References: <20241024094012.29452-1-shameerali.kolothum.thodi@huawei.com>
- <20241024094012.29452-2-shameerali.kolothum.thodi@huawei.com>
- <ZxrzhAh3qE9hLV-U@linux.dev>
- <d97cd23a1962460990a642ee8a653d2f@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyf0LMJf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CBD3C4CEE4;
+	Wed, 30 Oct 2024 07:52:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730274729;
+	bh=vrq3Hj0eASMy2KLVd52CUc8legLz7mDW/VncF6IQKRk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=fyf0LMJf7Dtu1xwovWtcG6BfS649d4d36jLDwt+BeNQyBUsWZQ/X0tcmIebTw/E9U
+	 aVV6KA+GAnRHC10my9qHaHTRstRTBSD8dW6oLM1GoPMFE2BhLQBO5vyPCezZzQ2dnZ
+	 +oDU45jvPEjKOX5qC77au6BuHcBFxOH7cNEDQIboSQbRKzACVfaJKensFd8+PzY6Z3
+	 bD2+bzGtuFPaTXfmMiJXEtpXafSuwz1KoCLyUgJNkPH7DiwWDFJ9uz/IkGg8gpf4ta
+	 g7Q+Mnthdgki4eFXTeWepnFh4HvsyZ/yYE8EG2Uij/iTGTHjMMoL9qSrfwU2vRA1R0
+	 J6Xt04LlfhfPA==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v5 17/43] arm64: RME: Allow VMM to set RIPAS
+In-Reply-To: <4075a8bc-2f1e-441d-815e-aaf83e88d3d0@arm.com>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-18-steven.price@arm.com>
+ <4075a8bc-2f1e-441d-815e-aaf83e88d3d0@arm.com>
+Date: Wed, 30 Oct 2024 13:22:00 +0530
+Message-ID: <yq5afroec9jz.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d97cd23a1962460990a642ee8a653d2f@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-On Tue, Oct 29, 2024 at 04:00:39PM +0000, Shameerali Kolothum Thodi wrote:
-> > We can't treat a single register as both a signed quantity *and* a full
-> > 64 bits of bitfields. Maybe just scrap the version and have this thing
-> > either return a negative error or positive quantity of implementations.
-> 
-> Ok. I had  a look at PV_TIME_ST/ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
-> and got that idea. Separate registers make sense though.
-> 
-> Do we really need to skip the version number? The idea was to use that as a
-> future proof for data format in case we realize that MIDR/REVIDR is not good
-> enough for errata later.
+Suzuki K Poulose <suzuki.poulose@arm.com> writes:
 
-That is definitely an approach we can take. The alternative I had in
-mind was that we'd allocate a new function ID if we needed to break ABI
-to correct shortcomings of the original interface.
+> Hi Steven
+>
+>
+>> +	if (WARN_ON(rmi_granule_undelegate(phys))) {
+>> +		/* Undelegate failed: leak the page */
+>> +		return;
+>> +	}
+>> +
+>> +	free_page((unsigned long)phys_to_virt(phys));
+>
+> The above pattern of undelegate and reclaim a granule or leak appears 
+> elsewhere in the KVM support code. Is it worth having a common helper to
+> do the same ?
+>
+> something like: reclaim_delegated_granule()
+>
 
--- 
-Thanks,
-Oliver
+free_delegated_page() which should really be renamed to
+free_delegated_granule() essentially does that.
+
+IMHO we should convert all the delgated allocation and free to
+alloc_delegated_granule() and free_delegated_granule(). This will also
+help in switching to a slab for granule allocation. 
+
+>
+>
+>> +}
+>> +
+>> +static int realm_rtt_create(struct realm *realm,
+>> +			    unsigned long addr,
+>> +			    int level,
+>> +			    phys_addr_t phys)
+>> +{
+>> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
+>> +	return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level);
+>> +}
+
+.......
+
+>> +static void realm_unmap_range_private(struct kvm *kvm,
+>> +				      unsigned long start,
+>> +				      unsigned long end)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +	ssize_t map_size = RME_PAGE_SIZE;
+>> +	unsigned long next_addr, addr;
+>> +
+>> +	for (addr = start; addr < end; addr = next_addr) {
+>> +		int ret;
+>> +
+>> +		next_addr = ALIGN(addr + 1, map_size);
+>> +
+
+Is that next_addr update needed? 
+
+
+>> +		ret = realm_destroy_protected(realm, addr, &next_addr);
+>> +
+>> +		if (WARN_ON(ret))
+>> +			break;
+>
