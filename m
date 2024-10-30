@@ -1,487 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D614217451;
-	Wed, 30 Oct 2024 15:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28C36126
+	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730302856; cv=none; b=HRIhksEXKUZU+16Re7lvT+9QiGLGQld3rtjfxul5K6l4WAnp3OC/7liHCBcaYMc/8gQ0ZdV5A2ndScsbwSozCBe09K+9Vnbdn5lQ44A5/3wYlmGkv+QjQ9LCbNYDFvPHPGOmbOospaiD8zIzf35hSpCpZbnWbR38tKzSZrVlkXE=
+	t=1730304209; cv=none; b=f8jQkGojBu6McU0y3rEaRrIu2Wx7tBi2avieeS097PDUnGhXbFI8x1VZQ30UGR/hQfYavS+mGC06aldevpPP5heINXsHR5TjuuQAR1w5lXvayXAKV/0RTlQmpbeFOQsrbOJ0TVH7O8MxHVi7OgfbQ1ECvcPCwwwJXaQeviGAsPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730302856; c=relaxed/simple;
-	bh=h2Wehl87NboyijTuuRSERBYg5ixqNkdqmXD3SKKUYoE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Bs/MLC9OPHggixyhPQB2Yj0kEK2Lr6jM1Yc9YeykHvu4HgTmeFfvugleWa2bzSHh5pQqwuBqmAaP6KZgCepEcb6g3rwaKwMvHKVidmCnWYie+fMMuSXBVuCxeUICngugeeGsuDaiC1Jj4ZpPczXTyNhGqJY/rw0Z8lhENPL1xPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bQ03D0h8; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQ03D0h8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8506EC4CED2;
-	Wed, 30 Oct 2024 15:40:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730302856;
-	bh=h2Wehl87NboyijTuuRSERBYg5ixqNkdqmXD3SKKUYoE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=bQ03D0h8kK7xNuv2AZynEjG4RhfP/dLt6o7804gHljvl+JdaxufJ3IekYHmzRQs1T
-	 CnkjLfd//r5FQUHRkGxjcM+v2wQtrH8RlGfhHOKSjJxzglWL6WtNdErx2nhRobxi04
-	 qOvGUnocORZvF3YflcCAqfFxiP3z0FwhSqYgcN6p6LwrIsSbHstgWAzCQioskYIDh2
-	 uLk1UrYS27Fr/JCqV14hN+uWvz+TfsbiohPlyK/DuwZOC/LVt9hyunG7b+VZ8sN6g5
-	 xEOWmwERiz+EeAU8Gz87xlksQNonXKyoeS/ZaLHtG0yMv2dYRHW75Dzp+xIf438Mtb
-	 p0ndmG60GQP9Q==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 30 Oct 2024 15:34:54 +0000
-Subject: [PATCH v2 9/9] kselftest/arm64: Add 2024 dpISA extensions to hwcap
- test
+	s=arc-20240116; t=1730304209; c=relaxed/simple;
+	bh=yGdrxDbPcyddfHcvr4uDquPG3uJ8P3ZF+2e4cJz1hZ4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZufyZ6Gem/kejzt8kNTqgk2H9H47inn9El9C0DhT6HQtg+W/LlKyVa1AgktkXGus1RBToE79ochSCqgH8SBthX3ssLUfEuRnaRk3Kpn8cT5m/OyKZVVrbtrRycdqWvAiXvAh8svXCtq274LZbbTK0dlzgkI3OBtZIUkqbhSw7sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10792113E;
+	Wed, 30 Oct 2024 09:03:55 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 478523F528;
+	Wed, 30 Oct 2024 09:03:23 -0700 (PDT)
+From: Joey Gouly <joey.gouly@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: anshuman.khandual@arm.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	joey.gouly@arm.com,
+	shameerali.kolothum.thodi@huawei.com,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v6 0/7] KVM: arm64: Hide unsupported MPAM from the guest
+Date: Wed, 30 Oct 2024 16:03:10 +0000
+Message-Id: <20241030160317.2528209-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241030-arm64-2024-dpisa-v2-9-b6601a15d2a5@kernel.org>
-References: <20241030-arm64-2024-dpisa-v2-0-b6601a15d2a5@kernel.org>
-In-Reply-To: <20241030-arm64-2024-dpisa-v2-0-b6601a15d2a5@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-9b746
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9994; i=broonie@kernel.org;
- h=from:subject:message-id; bh=h2Wehl87NboyijTuuRSERBYg5ixqNkdqmXD3SKKUYoE=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnIlNolSpmr2hzm9KJyObikwX7mZZOt19Iu2o9uBl6
- RoyEal6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZyJTaAAKCRAk1otyXVSH0OhDB/
- 9Vjek6vs+JBDwIdQ/waKoEN9gO45OuGkfj3n7AORB3x6dHhCYWPLBErrYCs2ubPPNWR8RKS1SfwAyb
- QGYGUKBrehq925POmjog9xOMkn39l1O9c4kfGkoVubBp1Sy5DBRVp5kpAsUxBFnwEiSgJ/SZAtze/q
- WNzwZlwUddvzruS9dE0pUUc3Rs/nVRVvmV2z38ZokfrdA5MBnOxA6CJBKuXE2XRrxokH5XElm8U34+
- oaKGAzRXGmSLTMMK+EmQHgskGpi2MKhaHrFRNNhf8JUvYZ19x9PA+Zlae4U0n5XolpvaQIu1Az7IH2
- DI8UgBuOiHOx7/UJEbj14dGCyWlYE8
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Transfer-Encoding: 8bit
 
-We don't actually test SIGILL generation for CMPBR since the need to
-branch makes it a pain to generate and the SIGILL detection would be
-unreliable anyway. Since this should be very unusual we provide a stub
-function rather than supporting a missing function.
+Hi,
 
-The sigill functions aren't well sorted in the file so the ordering is a
-bit random.
+changes since v5 [1]:
+	- Removed Kconfig option, the KVM traps shouldn't rely on host kernel support
+	- Renamed cpus_support_* to system_supports_* since that matches other functions
+	- Replace static branch arm64_mpam_has_hcr with a normal cpufeature capability
+	- Add MPAM*_EL2 regs to KVM (undef_access)
+	- Use constants in the test, instead of hardcoded values
+	- Added R-b and T-b tags
+	- Rebased on v6.12-rc5
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 273 +++++++++++++++++++++++++++++-
- 1 file changed, 271 insertions(+), 2 deletions(-)
+James wrote:
+	This series fixes up a long standing bug where MPAM was accidentally exposed
+	to a guest, but the feature was not otherwise trapped or context switched.
+	This could result in KVM warning about unexpected traps, and injecting an
+	undef into the guest contradicting the ID registers.
+	This would prevent an MPAM aware kernel from booting - fortunately, there
+	aren't any of those.
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index f2d6007a2b983eba77a880ec7e614396a6cb1377..beb380bc09b0d07269a85a60e5d2977367740473 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -46,6 +46,12 @@ static void atomics_sigill(void)
- 	asm volatile(".inst 0xb82003ff" : : : );
- }
- 
-+static void cmpbr_sigill(void)
-+{
-+	/* Not implemented, too complicated and unreliable anyway */
-+}
-+
-+
- static void crc32_sigill(void)
- {
- 	/* CRC32W W0, W0, W1 */
-@@ -82,6 +88,18 @@ static void f8fma_sigill(void)
- 	asm volatile(".inst 0xec0fc00");
- }
- 
-+static void f8mm4_sigill(void)
-+{
-+	/* FMMLA V0.4SH, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e00ec00");
-+}
-+
-+static void f8mm8_sigill(void)
-+{
-+	/* FMMLA V0.4S, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e80ec00");
-+}
-+
- static void faminmax_sigill(void)
- {
- 	/* FAMIN V0.4H, V0.4H, V0.4H */
-@@ -98,6 +116,12 @@ static void fpmr_sigill(void)
- 	asm volatile("mrs x0, S3_3_C4_C4_2" : : : "x0");
- }
- 
-+static void fprcvt_sigill(void)
-+{
-+	/* FCVTAS S0, H0 */
-+	asm volatile(".inst 0x1efa0000");
-+}
-+
- static void ilrcpc_sigill(void)
- {
- 	/* LDAPUR W0, [SP, #8] */
-@@ -215,6 +239,42 @@ static void sme2p1_sigill(void)
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
- }
- 
-+static void sme2p2_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* UXTB Z0.D, P0/Z, Z0.D  */
-+	asm volatile(".inst 0x4c1a000" : : : );
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void sme_aes_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* AESD z0.b, z0.b, z0.b */
-+	asm volatile(".inst 0x4522e400" : : : "z0");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void sme_sbitperm_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* BDEP Z0.B, Z0.B, Z0.B */
-+	asm volatile(".inst 0x4500b400" : : : "z0");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
- static void smei16i32_sigill(void)
- {
- 	/* SMSTART */
-@@ -323,13 +383,73 @@ static void smesf8dp4_sigill(void)
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
- }
- 
-+static void smesf8mm8_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FMMLA V0.4S, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e80ec00");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesf8mm4_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FMMLA V0.4SH, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e00ec00");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
- static void smesf8fma_sigill(void)
- {
- 	/* SMSTART */
- 	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
- 
--	/* FMLALB V0.8H, V0.16B, V0.16B */
--	asm volatile(".inst 0xec0fc00");
-+	/* FMLALB Z0.8H, Z0.B, Z0.B */
-+	asm volatile(".inst 0x64205000");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesfexpa_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FEXPA Z0.D, Z0.D */
-+	asm volatile(".inst 0x04e0b800");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesmop4_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* SMOP4A ZA0.S, Z0.B, { Z0.B - Z1.B } */
-+	asm volatile(".inst 0x80108000");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smestmop_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* STMOPA ZA0.S, { Z0.H - Z1.H }, Z0.H, Z20[0] */
-+	asm volatile(".inst 0x80408008");
- 
- 	/* SMSTOP */
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-@@ -353,18 +473,42 @@ static void sve2p1_sigill(void)
- 	asm volatile(".inst 0x65000000" : : : "z0");
- }
- 
-+static void sve2p2_sigill(void)
-+{
-+	/* NOT Z0.D, P0/Z, Z0.D */
-+	asm volatile(".inst 0x4cea000" : : : "z0");
-+}
-+
- static void sveaes_sigill(void)
- {
- 	/* AESD z0.b, z0.b, z0.b */
- 	asm volatile(".inst 0x4522e400" : : : "z0");
- }
- 
-+static void sveaes2_sigill(void)
-+{
-+	/* AESD {Z0.B - Z1.B }, { Z0.B - Z1.B }, Z0.Q */
-+	asm volatile(".inst 0x4522ec00" : : : "z0");
-+}
-+
- static void sveb16b16_sigill(void)
- {
- 	/* BFADD ZA.H[W0, 0], {Z0.H-Z1.H} */
- 	asm volatile(".inst 0xC1E41C00" : : : );
- }
- 
-+static void svebfscale_sigill(void)
-+{
-+	/* BFSCALE Z0.H, P0/M, Z0.H, Z0.H */
-+	asm volatile(".inst 0x65098000" : : : "z0");
-+}
-+
-+static void svef16mm_sigill(void)
-+{
-+	/* FMMLA Z0.S, Z0.H, Z0.H */
-+	asm volatile(".inst 0x6420e400");
-+}
-+
- static void svepmull_sigill(void)
- {
- 	/* PMULLB Z0.Q, Z0.D, Z0.D */
-@@ -383,6 +527,12 @@ static void svesha3_sigill(void)
- 	asm volatile(".inst 0x4203800" : : : "z0");
- }
- 
-+static void sveeltperm_sigill(void)
-+{
-+	/* COMPACT Z0.B, P0, Z0.B */
-+	asm volatile(".inst 0x5218000" : : : "x0");
-+}
-+
- static void svesm4_sigill(void)
- {
- 	/* SM4E Z0.S, Z0.S, Z0.S */
-@@ -458,6 +608,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "aes",
- 		.sigill_fn = aes_sigill,
- 	},
-+	{
-+		.name = "CMPBR",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_CMPBR,
-+		.cpuinfo = "cmpbr",
-+		.sigill_fn = cmpbr_sigill,
-+	},
- 	{
- 		.name = "CRC32",
- 		.at_hwcap = AT_HWCAP,
-@@ -512,6 +669,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "f8fma",
- 		.sigill_fn = f8fma_sigill,
- 	},
-+	{
-+		.name = "F8MM8",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_F8MM8,
-+		.cpuinfo = "f8mm8",
-+		.sigill_fn = f8mm8_sigill,
-+	},
-+	{
-+		.name = "F8MM4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_F8MM4,
-+		.cpuinfo = "f8mm4",
-+		.sigill_fn = f8mm4_sigill,
-+	},
- 	{
- 		.name = "FAMINMAX",
- 		.at_hwcap = AT_HWCAP2,
-@@ -534,6 +705,13 @@ static const struct hwcap_data {
- 		.sigill_fn = fpmr_sigill,
- 		.sigill_reliable = true,
- 	},
-+	{
-+		.name = "FPRCVT",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_FPRCVT,
-+		.cpuinfo = "fprcvt",
-+		.sigill_fn = fprcvt_sigill,
-+	},
- 	{
- 		.name = "JSCVT",
- 		.at_hwcap = AT_HWCAP,
-@@ -672,6 +850,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "sme2p1",
- 		.sigill_fn = sme2p1_sigill,
- 	},
-+	{
-+		.name = "SME 2.2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME2P2,
-+		.cpuinfo = "sme2p2",
-+		.sigill_fn = sme2p2_sigill,
-+	},
-+	{
-+		.name = "SME AES",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_AES,
-+		.cpuinfo = "smeaes",
-+		.sigill_fn = sme_aes_sigill,
-+	},
- 	{
- 		.name = "SME I16I32",
- 		.at_hwcap = AT_HWCAP2,
-@@ -721,6 +913,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "smelutv2",
- 		.sigill_fn = smelutv2_sigill,
- 	},
-+	{
-+		.name = "SME SBITPERM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SBITPERM,
-+		.cpuinfo = "smesbitperm",
-+		.sigill_fn = sme_sbitperm_sigill,
-+	},
- 	{
- 		.name = "SME SF8FMA",
- 		.at_hwcap = AT_HWCAP2,
-@@ -728,6 +927,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "smesf8fma",
- 		.sigill_fn = smesf8fma_sigill,
- 	},
-+	{
-+		.name = "SME SF8MM8",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SF8MM8,
-+		.cpuinfo = "smesf8mm8",
-+		.sigill_fn = smesf8mm8_sigill,
-+	},
-+	{
-+		.name = "SME SF8MM4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SF8MM8,
-+		.cpuinfo = "smesf8mm4",
-+		.sigill_fn = smesf8mm4_sigill,
-+	},
- 	{
- 		.name = "SME SF8DP2",
- 		.at_hwcap = AT_HWCAP2,
-@@ -742,6 +955,27 @@ static const struct hwcap_data {
- 		.cpuinfo = "smesf8dp4",
- 		.sigill_fn = smesf8dp4_sigill,
- 	},
-+	{
-+		.name = "SME SFEXPA",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SFEXPA,
-+		.cpuinfo = "smesfexpa",
-+		.sigill_fn = smesfexpa_sigill,
-+	},
-+	{
-+		.name = "SME SMOP4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SMOP4,
-+		.cpuinfo = "smesmop4",
-+		.sigill_fn = smesmop4_sigill,
-+	},
-+	{
-+		.name = "SME STMOP",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_STMOP,
-+		.cpuinfo = "smestmop",
-+		.sigill_fn = smestmop_sigill,
-+	},
- 	{
- 		.name = "SVE",
- 		.at_hwcap = AT_HWCAP,
-@@ -764,6 +998,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "sve2p1",
- 		.sigill_fn = sve2p1_sigill,
- 	},
-+	{
-+		.name = "SVE 2.2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE2P2,
-+		.cpuinfo = "sve2p2",
-+		.sigill_fn = sve2p2_sigill,
-+	},
- 	{
- 		.name = "SVE AES",
- 		.at_hwcap = AT_HWCAP2,
-@@ -771,6 +1012,34 @@ static const struct hwcap_data {
- 		.cpuinfo = "sveaes",
- 		.sigill_fn = sveaes_sigill,
- 	},
-+	{
-+		.name = "SVE AES2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_AES2,
-+		.cpuinfo = "sveaes2",
-+		.sigill_fn = sveaes2_sigill,
-+	},
-+	{
-+		.name = "SVE BFSCALE",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_BFSCALE,
-+		.cpuinfo = "svebfscale",
-+		.sigill_fn = svebfscale_sigill,
-+	},
-+	{
-+		.name = "SVE ELTPERM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_ELTPERM,
-+		.cpuinfo = "sveeltperm",
-+		.sigill_fn = sveeltperm_sigill,
-+	},
-+	{
-+		.name = "SVE F16MM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_F16MM,
-+		.cpuinfo = "svef16mm",
-+		.sigill_fn = svef16mm_sigill,
-+	},
- 	{
- 		.name = "SVE2 B16B16",
- 		.at_hwcap = AT_HWCAP2,
+	Ideally, we'd take the MPAM feature away from the ID registers, but that
+	would leave existing guests unable to migrate to a newer kernel. Instead,
+	just ignore that field when it matches the hardware. KVM wasn't going to
+	expose MPAM anyway. The guest will not see MPAM in the id registers.
+
+	This series includes the head.S and KVM changes to enable/disable traps. If
+	MPAM is neither enabled nor emulated by EL3 firmware, these system register
+	accesses will trap to EL3.
+	If your kernel doesn't boot, and the problem bisects here - please update
+	your firmware. MPAM has been supported by trusted firmware since v1.6 in
+	2018. (also noted on patch 3).
+
+Thanks,
+Joey
+
+[1] https://lore.kernel.org/kvmarm/20241015133923.3910916-1-joey.gouly@arm.com/
+
+James Morse (7):
+  arm64/sysreg: Convert existing MPAM sysregs and add the remaining
+    entries
+  arm64: head.S: Initialise MPAM EL2 registers and disable traps
+  arm64: cpufeature: discover CPU support for MPAM
+  KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+  KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+  KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+  KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
+
+ .../arch/arm64/cpu-feature-registers.rst      |   2 +
+ arch/arm64/include/asm/cpu.h                  |   1 +
+ arch/arm64/include/asm/cpucaps.h              |   5 +
+ arch/arm64/include/asm/cpufeature.h           |  17 ++
+ arch/arm64/include/asm/el2_setup.h            |  14 ++
+ arch/arm64/include/asm/kvm_arm.h              |   1 +
+ arch/arm64/include/asm/sysreg.h               |  12 --
+ arch/arm64/kernel/cpufeature.c                |  96 +++++++++++
+ arch/arm64/kernel/cpuinfo.c                   |   3 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  31 ++++
+ arch/arm64/kvm/sys_regs.c                     | 121 +++++++++----
+ arch/arm64/tools/cpucaps                      |   2 +
+ arch/arm64/tools/sysreg                       | 161 ++++++++++++++++++
+ .../selftests/kvm/aarch64/set_id_regs.c       |  99 ++++++++++-
+ 14 files changed, 523 insertions(+), 42 deletions(-)
 
 -- 
-2.39.2
+2.25.1
 
