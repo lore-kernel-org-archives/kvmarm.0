@@ -1,160 +1,173 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617642144AA
-	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CC82144C0
+	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730305645; cv=none; b=rDsM43CT8sTTOyPJl7MdczUj53wxOfp/JS6WIKNATkPraFl1FFXRsbtbIOC3X6tnNGWKX3nwwauzAPeUOFiy3evKOXXoHHQzHW7ukw/jJDvGa82d7cv1rmOI2D1iO8XReJ0itZJTT9kUCtHPCqry7h6GySLBA7xJPsZEioT8+q8=
+	t=1730306194; cv=none; b=t6rtfF4XPHIC3nEYg+LHLXUMekPTHl6LSGgEQ8qvJGH6txWFkNeq82wTBg4Mw8+EFi/nGDopCqqA4tBGCmgI+hijwRGXcO7XGWZNwTE//brwzrujzhgjuRjXT96rNkA+nn93D512bXF7XgHuQ+0eSjroJyV8FQxx1AS93D7uIqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730305645; c=relaxed/simple;
-	bh=zAVUGhrZEjov8SHC0NpTM8ycKrzcLvBINw0RQ12ALw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SuxRnLVZSlygKWzzMPoH4Nl9/GYJ+Sq9PVKcK0/khbB1V+7wUj/0RiC4Pj6Kjyd1TtgXgGi/j/iu8JrabVLmMUHeNumYHo52RdoPjSBMVqUJhsJgQObE70HgbxH9sxgfC9x/NTJURYb/JbvB6xOR/qTTUzQJwPp7LpQ776+A504=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iSwLEadD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730306194; c=relaxed/simple;
+	bh=zCHrmiaT0aQkEzgBzKBRTHVHsnCbnwygmYP/jN0u0D8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PtlHaZrceBHfE3W9Z26x6YO8j4uhX/3OJy9VF3hISx60OJNMoZV9Hz7pWa2avUDOiJVBRqn+FPZtCfhR85o6Ks2b0uPaCM8uL0aZyQhQD5cg9ysPCcGHABGGRM6dC8cQYRZM0D8kWIqAAGyMhzDkGI6YUz+BhLVoi9cMA1KA2l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jwOoSRMt; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSwLEadD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730305642;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XvXVF5ChtnVmltzGExYLCTKSbX1wrbGeka/LhaWLXrk=;
-	b=iSwLEadDEfIN8UgkICtNn52MHwPEKdecghRfpMWlvz48NFofPRjMAAYy/Q6dcMBRF4Waae
-	aHH9xV3aDruXptA7RQ/HiGxNh5EVgb3/5IIlV/wcTDfFmOBIkPmuGra5X1MGaTXop668cT
-	/p4ROtliVK1Lmq2S6aOo7FogtrsSr6Q=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-554-RyGJEPBdPLyHId5huFoBcQ-1; Wed,
- 30 Oct 2024 12:27:18 -0400
-X-MC-Unique: RyGJEPBdPLyHId5huFoBcQ-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1668B19560B5;
-	Wed, 30 Oct 2024 16:27:16 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.92])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77B871956086;
-	Wed, 30 Oct 2024 16:27:09 +0000 (UTC)
-Date: Wed, 30 Oct 2024 16:27:06 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-	qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
-	richard.henderson@linaro.org, alex.bennee@linaro.org,
-	maz@kernel.org, sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
-	abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com,
-	mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
-Message-ID: <ZyJeWkxJX-5dcq4Z@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-19-eric.auger@redhat.com>
- <ZxuX4i9NjVRizB72@redhat.com>
- <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com>
- <Zxub7ol4p8P_sWF8@redhat.com>
- <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
- <Zx-9WxXkmkMuGIlQ@redhat.com>
- <CAFEAcA9w0mb5bcU8p+fScQony-=oqLmNurGWpnL_sBneQCzxUg@mail.gmail.com>
- <Zx_CU9eeQByANMRW@linux.dev>
- <87bjz1o9di.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jwOoSRMt"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-460969c49f2so3031cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 09:36:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730306191; x=1730910991; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ohhnavrPr5+YUgso4iG8u5sjXey4qTkemT4mrkrez4=;
+        b=jwOoSRMtt8k/ykjKt2ws4gQ7w56MpJ54KMeRvv0OlTtIUT1W64VERgo8+G9qx95hbh
+         fZs9XdM5PSW1ui0Imn8/I2UAgV12RIDBw3yIBBSax3+Iu+x/8KXhmYj7ucFpYKZ+zIGf
+         6b6rSQdDkBjMXJeAsgTmCrUQFhJhWhScDpIy90PyTXuer8fG7F2OPqsekalK7Ai96Anx
+         Jv4keSBVfkYN8TtfYTXE44cOWELvGBMPCK3RqCRBQ+q5ml1LKxohetgSjmTSn9JpzXT7
+         fkmOCG81DbohheGMoin1IDuWg+jignySz7/YV5Mct6W4FMS6vu081Fh3swipY2Zl0w1x
+         VZ+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730306191; x=1730910991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9ohhnavrPr5+YUgso4iG8u5sjXey4qTkemT4mrkrez4=;
+        b=JhVpY1Q5aPnFfxXEhG0upOcDeOodYgalAjF4thScOxQk6xFd31T3Qp2l7y4h3gAfxj
+         F/Kwu5ZpSKgGVL+qDfVIx6QQzUVJCBOKESQDqIPUgtdLiNMgBepsKdqXK+3H7VEbzDAs
+         biTevYhPNaqUnCFMEo0y8jWDml1yw7O55TD+QrB9/Ob1uZ3XENsa6je2HrMdabiZQCUn
+         m09JLt3yqFhN5paP/htvyXfHInxFZreI0IBfbczLlt927M7ZEdZqr4sqIYwM9ZT0/6P4
+         pr/Eq5mCEJYhlpW4i9YPB4vGAnoCSe2akiYm1UJnUTsCXtA2EyDYSE+7z/GkbyZmbqeG
+         x6hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWdDzLycf5dL8nNkx03piRosLwkD7JeLI9SJoAzP8qjXP0xJdaKupRI4gmCoyg0J+xZzJhn4Ww=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwnAYTt918DtLMlDou/M4iavPtouAR9jrKZ5UJUjEmGPVHcyusD
+	KufqH9Ktsi/ZIPD9WijahoX0yPpq+duGa092d1jqsPrwy4fisZwCVMgZzqplCPDmuYpcPEVNvpe
+	aScIlN5xAxmoeRPq9NwETNIflG+j/l4jxG6hk
+X-Gm-Gg: ASbGncusSh7M76T2meavzgZoRgFHOW/jcXfn9ob6aYw8ZCZ+uWyxGUX/EXBuodq/hKJ
+	BOnmF7ShfUX7uww1cekzbHz6KsnRRQOuJBEUZHdhnl/JmwZh4KqbOSMi8ObKuBA==
+X-Google-Smtp-Source: AGHT+IFBqNAhnZpINWYimOajsOUR5Hu7mWheBmruaCmzYI1pEkwMAvJVmKH+JkRRcQ8aMk7aGSnF9I1hvN2lZQ7/bOk=
+X-Received: by 2002:a05:622a:cb:b0:461:3083:dbac with SMTP id
+ d75a77b69052e-46166cf428fmr8624631cf.5.1730306190820; Wed, 30 Oct 2024
+ 09:36:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87bjz1o9di.fsf@redhat.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20241028234533.942542-1-rananta@google.com> <868qu63mdo.wl-maz@kernel.org>
+ <CAJHc60x3sGdi2_mg_9uxecPYwZMBR11m1oEKPEH4RTYaF8eHdQ@mail.gmail.com>
+ <865xpa3fwe.wl-maz@kernel.org> <CAJHc60xQNeTwSBuPhrKO_JBuikqZ7R=BM5rkWht3YwieVXwkHg@mail.gmail.com>
+ <87iktat2y8.wl-maz@kernel.org>
+In-Reply-To: <87iktat2y8.wl-maz@kernel.org>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Wed, 30 Oct 2024 09:36:19 -0700
+Message-ID: <CAJHc60w7edpTSG2VA52m96BP6Eayg2jEc=9nt_b_kJFnOoQxfw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	stable@vger.kernel.org, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 30, 2024 at 05:15:05PM +0100, Cornelia Huck wrote:
-> On Mon, Oct 28 2024, Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> > On Mon, Oct 28, 2024 at 04:48:18PM +0000, Peter Maydell wrote:
-> >> On Mon, 28 Oct 2024 at 16:35, Daniel P. Berrangé <berrange@redhat.com> wrote:
-> >> >
-> >> > On Mon, Oct 28, 2024 at 04:16:31PM +0000, Peter Maydell wrote:
-> >> > > On Fri, 25 Oct 2024 at 14:24, Daniel P. Berrangé <berrange@redhat.com> wrote:
-> >> > > > On Fri, Oct 25, 2024 at 03:18:25PM +0200, Eric Auger wrote:
-> >> > > > > On 10/25/24 15:06, Daniel P. Berrangé wrote:
-> >> > > > > > Also, is this naming convention really the same one that users
-> >> > > > > > will see when they look at /proc/cpuinfo to view features ? It
-> >> > > > > No it is not. I do agree that the custom cpu model is very low level. It
-> >> > > > > is very well suited to test all series turning ID regs as writable but
-> >> > > > > this would require an extra layer that adapts /proc/cpuinfo feature
-> >> > > > > level to this regid/field abstraction.
-> >> > > > >
-> >> > > > > In /cpu/proc you will see somethink like:
-> >> > > > >  Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp
-> >> > > > > asimdhp cpuid asimdrdm lrcpc dcpop asimddp
-> >> > > >
-> >> > > > Right, IMHO, this is the terminology that QEMU must use in user
-> >> > > > facing APIs.
-> >> > >
-> >> > > /proc/cpuinfo's naming is rather weird for historical
-> >> > > reasons (for instance there is only one FEAT_FP16 feature
-> >> > > but cpuinfo lists "fphp" and "asimdhp" separately).
-> >> >
-> >> > There's plenty of wierd history in x86 too. In this
-> >> > case I might suggest just picking one of the two
-> >> > common names, and ignoring the other.
-> >> >
-> >> > If we really wanted to, we could alias the 2nd name
-> >> > to the first, but its likely not worth the bother.
-> >> 
-> >> Or we could use the standard set of architectural
-> >> feature names, and not have the problem at all, and not
-> >> have to document what we mean by our nonstandard names.
+On Wed, Oct 30, 2024 at 1:22=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Wed, 30 Oct 2024 00:16:48 +0000,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
 > >
-> > +1
+> > On Tue, Oct 29, 2024 at 11:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> =
+wrote:
+> > >
+> > > On Tue, 29 Oct 2024 17:06:09 +0000,
+> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > >
+> > > > On Tue, Oct 29, 2024 at 9:27=E2=80=AFAM Marc Zyngier <maz@kernel.or=
+g> wrote:
+> > > > >
+> > > > > On Mon, 28 Oct 2024 23:45:33 +0000,
+> > > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > > >
+> > > > > Did you have a chance to check whether this had any negative impa=
+ct on
+> > > > > actual workloads? Since the entry/exit code is a bit of a hot spo=
+t,
+> > > > > I'd like to make sure we're not penalising the common case (I onl=
+y
+> > > > > wrote this patch while waiting in an airport, and didn't test it =
+at
+> > > > > all).
+> > > > >
+> > > > I ran the kvm selftests, kvm-unit-tests and booted a linux guest to
+> > > > test the change and noticed no failures.
+> > > > Any specific test you want to try out?
+> > >
+> > > My question is not about failures (I didn't expect any), but
+> > > specifically about *performance*, and whether checking the flag
+> > > without a static key can lead to any performance drop on the hot path=
+.
+> > >
+> > > Can you please run an exit-heavy workload (such as hackbench, for
+> > > example), and report any significant delta you could measure?
 > >
-> > There's existing documentation [*] for the standard feature names, which
-> > provides:
-> >
-> >  - A short description of what the feature does
-> >  - Any dependencies a particular feature has (e.g.FEAT_VHE implies
-> >    FEAT_LSE, FEAT_Debugv8p1, and FEAT_AA64EL2)
-> >  - The register fields/values that are used to discover the feature.
-> >
-> > This seems like the most user-friendly option...
-> >
-> > [*]: https://developer.arm.com/documentation/109697/2024_09
-> 
-> FEAT_XXX sounds good, would be a different approach than this series
-> obviously, since the user resp. upper software layers would operate on a
-> per-feature basis, and QEMU would translate to and from registers.
-> 
-> I'm wondering about the amount of translation that would be needed, and
-> what information would be best exposed via QEMU, given that a feature
-> may or may not be toggable not only because of what the Arm revision
-> specifies, but what registers the host kernel allows to be written.
-> 
-> I.e. if we have two cpus that differ in whether FEAT_FOO is provided,
-> would it make sense to have an extra QMP command so that you can find
-> out whether FEAT_FOO can be switched off, with QEMU translating from the
-> set of writable id registers to the set of features that can be changed?
+> > Oh, I see. I ran hackbench and micro-bench from kvm-unit-tests (which
+> > also causes a lot of entry/exits), on Ampere Altra with kernel at
+> > v6.12-rc1, and see no significant difference in perf.
+>
+> Thanks for running this stuff.
+>
+> > timer_10ms                          231040.0                          9=
+02.0
+> > timer_10ms                         234120.0                            =
+914.0
+>
+> This seems to be the only case were we are adversely affected by this
+> change.
+Hmm, I'm not sure how much we want to trust this comparison. For
+instance, I just ran micro-bench again a few more times and here are
+the outcomes of timer_10ms for each try with the patch:
 
-If there are restrictions on what features can be turned off, then yes,
-we should add that in QMP, as x86 doesn't have such a restriction
-currently.
+Tries                                             total ns
+               avg ns
+---------------------------------------------------------------------------=
+--------
+1_timer_10ms                             231840.0                          =
+905.0
+2_timer_10ms                             234560.0                          =
+916.0
+3_timer_10ms                             227440.0                          =
+888.0
+4_timer_10ms                             236640.0                          =
+924.0
+5_timer_10ms                             231200.0                          =
+903.0
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Here's a few on the baseline:
 
+Tries                                             total ns
+               avg ns
+---------------------------------------------------------------------------=
+--------
+1_timer_10ms                             231080.0                          =
+902.0
+2_timer_10ms                             238040.0                          =
+929.0
+3_timer_10ms                             231680.0                          =
+905.0
+4_timer_10ms                             229280.0                          =
+895.0
+5_timer_10ms                             228520.0                          =
+892.0
+
+
+> In the grand scheme of thins, that's noise. But this gives us
+> a clear line of sight for the removal of the in-kernel interrupts back
+> to userspace.
+Sorry, I didn't follow you completely on this part.
+
+Thank you.
+Raghavendra
