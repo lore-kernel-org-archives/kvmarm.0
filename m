@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E5B36126
-	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281C521313C
+	for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 16:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730304215; cv=none; b=PocSTeSfjEHwIXxatlF5uLjTCCA/0D1stThPclYcy2Mm/kyJoV3tBTfO2WMXyug42TKATe5MCX79o4BXl6d2m3tmJM0mIjdX5tVFZIBTtOC/TMhlt7qUKEqf6tS7A6JLRvBGqzKLMCVSiYK8nVRSpxAsawI7EFJ27aOPRwWjmr4=
+	t=1730304217; cv=none; b=YYrCd8zo+asI280gV/US+JZI4aULsHMZHVXCCYqXU0JNCCZovxPeZGqJoi4GvbZUcScHK4dk1QFeQRmtPo05G+OkTjUzf70tzH+LjOqR5pLuubZuFpAiLy4NGPVIWTi1rttEq0DIu71Y4XbixMh9gA9bh+M5X66cSaxTDecRmEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730304215; c=relaxed/simple;
-	bh=sQVChKqDud5eEKpsFRblOJNJrcfKjBLKZt4LaFxFq6Q=;
+	s=arc-20240116; t=1730304217; c=relaxed/simple;
+	bh=DYCjnA90mrlm52pS11Ffmj/sC7MKGjAcGNY+y1DUr38=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PTDXSJX/VBh1h1lJ0HR+keEjOGEaspzKtUjPu1ZJSN8mjABpHKoa3AA8pzUEbdCICNznlTNVWBY6jmbmX8KNK2fGkabGMdZLh5gnl5ebcFFWcKSajbvZCyQZQf0vaLiGpT/3VDHEyzHB4GD9VuTCXHENb6NELzx+Z18p8mUTK3g=
+	 MIME-Version; b=ooSabxIhR5v8SeOBtQ7CnBVuK0dUl/oyWB+q5vPM7Y0ZyoW3I5a2U/NZqqqa4xLPWsGusocQjrGdTF0epYhGcFpToHffTW2paweiDz1/Bs0N10GDocFCCWAuMF/ec7L9Ore6StCu1S4HD5fxrqLyyo3DFFqaCZa/uDq5BSSNyw8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 131B919F0;
-	Wed, 30 Oct 2024 09:04:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5C47A1A00;
+	Wed, 30 Oct 2024 09:04:04 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2CECE3F528;
-	Wed, 30 Oct 2024 09:03:30 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 952A73F528;
+	Wed, 30 Oct 2024 09:03:32 -0700 (PDT)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -33,9 +33,9 @@ Cc: anshuman.khandual@arm.com,
 	Jing Zhang <jingzhangos@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v6 3/7] arm64: cpufeature: discover CPU support for MPAM
-Date: Wed, 30 Oct 2024 16:03:13 +0000
-Message-Id: <20241030160317.2528209-4-joey.gouly@arm.com>
+Subject: [PATCH v6 4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+Date: Wed, 30 Oct 2024 16:03:14 +0000
+Message-Id: <20241030160317.2528209-5-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241030160317.2528209-1-joey.gouly@arm.com>
 References: <20241030160317.2528209-1-joey.gouly@arm.com>
@@ -49,304 +49,179 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-ARMv8.4 adds support for 'Memory Partitioning And Monitoring' (MPAM)
-which describes an interface to cache and bandwidth controls wherever
-they appear in the system.
+commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
+ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
+but didn't add trap handling.
 
-Add support to detect MPAM. Like SVE, MPAM has an extra id register that
-describes some more properties, including the virtualisation support,
-which is optional. Detect this separately so we can detect
-mismatched/insane systems, but still use MPAM on the host even if the
-virtualisation support is missing.
+If you are unlucky, this results in an MPAM aware guest being delivered
+an undef during boot. The host prints:
+| kvm [97]: Unsupported guest sys_reg access at: ffff800080024c64 [00000005]
+| { Op0( 3), Op1( 0), CRn(10), CRm( 5), Op2( 0), func_read },
 
-MPAM needs enabling at the highest implemented exception level, otherwise
-the register accesses trap. The 'enabled' flag is accessible to lower
-exception levels, but its in a register that traps when MPAM isn't enabled.
-The cpufeature 'matches' hook is extended to test this on one of the
-CPUs, so that firmware can emulate MPAM as disabled if it is reserved
-for use by secure world.
+Which results in:
+| Internal error: Oops - Undefined instruction: 0000000002000000 [#1] PREEMPT SMP
+| Modules linked in:
+| CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.6.0-rc7-00559-gd89c186d50b2 #14616
+| Hardware name: linux,dummy-virt (DT)
+| pstate: 00000005 (nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+| pc : test_has_mpam+0x18/0x30
+| lr : test_has_mpam+0x10/0x30
+| sp : ffff80008000bd90
+...
+| Call trace:
+|  test_has_mpam+0x18/0x30
+|  update_cpu_capabilities+0x7c/0x11c
+|  setup_cpu_features+0x14/0xd8
+|  smp_cpus_done+0x24/0xb8
+|  smp_init+0x7c/0x8c
+|  kernel_init_freeable+0xf8/0x280
+|  kernel_init+0x24/0x1e0
+|  ret_from_fork+0x10/0x20
+| Code: 910003fd 97ffffde 72001c00 54000080 (d538a500)
+| ---[ end trace 0000000000000000 ]---
+| Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+| ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
 
-Secondary CPUs that appear late could trip cpufeature's 'lower safe'
-behaviour after the MPAM properties have been advertised to user-space.
-Add a verify call to ensure late secondaries match the existing CPUs.
+Add the support to enable the traps, and handle the three guest accessible
+registers by injecting an UNDEF. This stops KVM from spamming the host
+log, but doesn't yet hide the feature from the id registers.
 
-(If you have a boot failure that bisects here its likely your CPUs
-advertise MPAM in the id registers, but firmware failed to either enable
-or MPAM, or emulate the trap as if it were disabled)
+With MPAM v1.0 we can trap the MPAMIDR_EL1 register only if
+ARM64_HAS_MPAM_HCR, with v1.1 an additional MPAM2_EL2.TIDR bit traps
+MPAMIDR_EL1 on platforms that don't have MPAMHCR_EL2. Enable one of
+these if either is supported. If neither is supported, the guest can
+discover that the CPU has MPAM support, and how many PARTID etc the
+host has ... but it can't influence anything, so its harmless.
 
+Fixes: 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in ID_AA64PFR0 register")
+CC: Anshuman Khandual <anshuman.khandual@arm.com>
+Link: https://lore.kernel.org/linux-arm-kernel/20200925160102.118858-1-james.morse@arm.com/
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- .../arch/arm64/cpu-feature-registers.rst      |  2 +
- arch/arm64/include/asm/cpu.h                  |  1 +
- arch/arm64/include/asm/cpucaps.h              |  5 +
- arch/arm64/include/asm/cpufeature.h           | 17 ++++
- arch/arm64/kernel/cpufeature.c                | 96 +++++++++++++++++++
- arch/arm64/kernel/cpuinfo.c                   |  3 +
- arch/arm64/tools/cpucaps                      |  2 +
- 7 files changed, 126 insertions(+)
+ arch/arm64/include/asm/cpufeature.h     |  2 +-
+ arch/arm64/include/asm/kvm_arm.h        |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 31 +++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c               | 14 +++++++++++
+ 4 files changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/arch/arm64/cpu-feature-registers.rst b/Documentation/arch/arm64/cpu-feature-registers.rst
-index 44f9bd78539d..253e9743de2f 100644
---- a/Documentation/arch/arm64/cpu-feature-registers.rst
-+++ b/Documentation/arch/arm64/cpu-feature-registers.rst
-@@ -152,6 +152,8 @@ infrastructure:
-      +------------------------------+---------+---------+
-      | DIT                          | [51-48] |    y    |
-      +------------------------------+---------+---------+
-+     | MPAM                         | [43-40] |    n    |
-+     +------------------------------+---------+---------+
-      | SVE                          | [35-32] |    y    |
-      +------------------------------+---------+---------+
-      | GIC                          | [27-24] |    n    |
-diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
-index 9b73fd0cd721..81e4157f92b7 100644
---- a/arch/arm64/include/asm/cpu.h
-+++ b/arch/arm64/include/asm/cpu.h
-@@ -46,6 +46,7 @@ struct cpuinfo_arm64 {
- 	u64		reg_revidr;
- 	u64		reg_gmid;
- 	u64		reg_smidr;
-+	u64		reg_mpamidr;
- 
- 	u64		reg_id_aa64dfr0;
- 	u64		reg_id_aa64dfr1;
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index a6e5b07b64fd..f20e6e4212a7 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -60,6 +60,11 @@ cpucap_is_possible(const unsigned int cap)
- 		return IS_ENABLED(CONFIG_ARM64_WORKAROUND_REPEAT_TLBI);
- 	case ARM64_WORKAROUND_SPECULATIVE_SSBS:
- 		return IS_ENABLED(CONFIG_ARM64_ERRATUM_3194386);
-+	case ARM64_MPAM:
-+		/*
-+		 * KVM MPAM support doesn't rely on the host kernel supporting MPAM.
-+		*/
-+		return true;
- 	}
- 
- 	return true;
 diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 3d261cc123c1..352aa6b93964 100644
+index 352aa6b93964..93fe8e6beb64 100644
 --- a/arch/arm64/include/asm/cpufeature.h
 +++ b/arch/arm64/include/asm/cpufeature.h
-@@ -612,6 +612,13 @@ static inline bool id_aa64pfr1_sme(u64 pfr1)
- 	return val > 0;
- }
- 
-+static inline bool id_aa64pfr0_mpam(u64 pfr0)
-+{
-+	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_MPAM_SHIFT);
-+
-+	return val > 0;
-+}
-+
- static inline bool id_aa64pfr1_mte(u64 pfr1)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr1, ID_AA64PFR1_EL1_MTE_SHIFT);
-@@ -838,6 +845,16 @@ static inline bool system_supports_poe(void)
+@@ -845,7 +845,7 @@ static inline bool system_supports_poe(void)
  		alternative_has_cap_unlikely(ARM64_HAS_S1POE);
  }
  
-+static inline bool system_supports_mpam(void)
+-static inline bool system_supports_mpam(void)
++static __always_inline bool system_supports_mpam(void)
+ {
+ 	return alternative_has_cap_unlikely(ARM64_MPAM);
+ }
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 109a85ee6910..16afb7a79b15 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -103,6 +103,7 @@
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+ 
+ #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
++#define MPAMHCR_HOST_FLAGS	0
+ 
+ /* TCR_EL2 Registers bits */
+ #define TCR_EL2_DS		(1UL << 32)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 5310fe1da616..34f53707892d 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -204,6 +204,35 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ 		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
+ }
+ 
++static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
 +{
-+	return alternative_has_cap_unlikely(ARM64_MPAM);
++	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
++
++	if (!system_supports_mpam())
++		return;
++
++	/* trap guest access to MPAMIDR_EL1 */
++	if (system_supports_mpam_hcr()) {
++		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
++	} else {
++		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
++		r |= MPAM2_EL2_TIDR;
++	}
++
++	write_sysreg_s(r, SYS_MPAM2_EL2);
 +}
 +
-+static __always_inline bool system_supports_mpam_hcr(void)
++static inline void __deactivate_traps_mpam(void)
 +{
-+	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
++	if (!system_supports_mpam())
++		return;
++
++	write_sysreg_s(0, SYS_MPAM2_EL2);
++
++	if (system_supports_mpam_hcr())
++		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
 +}
 +
- int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
- bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 718728a85430..33dce6b9c49b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -684,6 +684,14 @@ static const struct arm64_ftr_bits ftr_id_dfr1[] = {
- 	ARM64_FTR_END,
- };
- 
-+static const struct arm64_ftr_bits ftr_mpamidr[] = {
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, MPAMIDR_EL1_PMG_MAX_SHIFT, MPAMIDR_EL1_PMG_MAX_WIDTH, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, MPAMIDR_EL1_VPMR_MAX_SHIFT, MPAMIDR_EL1_VPMR_MAX_WIDTH, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, MPAMIDR_EL1_HAS_HCR_SHIFT, 1, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, MPAMIDR_EL1_PARTID_MAX_SHIFT, MPAMIDR_EL1_PARTID_MAX_WIDTH, 0),
-+	ARM64_FTR_END,
-+};
-+
- /*
-  * Common ftr bits for a 32bit register with all hidden, strict
-  * attributes, with 4bit feature fields and a default safe value of
-@@ -804,6 +812,9 @@ static const struct __ftr_reg_entry {
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
- 
-+	/* Op1 = 0, CRn = 10, CRm = 4 */
-+	ARM64_FTR_REG(SYS_MPAMIDR_EL1, ftr_mpamidr),
-+
- 	/* Op1 = 1, CRn = 0, CRm = 0 */
- 	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
- 
-@@ -1163,6 +1174,9 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
- 		cpacr_restore(cpacr);
+ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ {
+ 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
+@@ -244,6 +273,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
  	}
  
-+	if (id_aa64pfr0_mpam(info->reg_id_aa64pfr0))
-+		init_cpu_ftr_reg(SYS_MPAMIDR_EL1, info->reg_mpamidr);
-+
- 	if (id_aa64pfr1_mte(info->reg_id_aa64pfr1))
- 		init_cpu_ftr_reg(SYS_GMID_EL1, info->reg_gmid);
- }
-@@ -1419,6 +1433,11 @@ void update_cpu_features(int cpu,
- 		cpacr_restore(cpacr);
- 	}
- 
-+	if (id_aa64pfr0_mpam(info->reg_id_aa64pfr0)) {
-+		taint |= check_update_ftr_reg(SYS_MPAMIDR_EL1, cpu,
-+					info->reg_mpamidr, boot->reg_mpamidr);
-+	}
-+
- 	/*
- 	 * The kernel uses the LDGM/STGM instructions and the number of tags
- 	 * they read/write depends on the GMID_EL1.BS field. Check that the
-@@ -2377,6 +2396,36 @@ cpucap_panic_on_conflict(const struct arm64_cpu_capabilities *cap)
- 	return !!(cap->type & ARM64_CPUCAP_PANIC_ON_CONFLICT);
+ 	__activate_traps_hfgxtr(vcpu);
++	__activate_traps_mpam(vcpu);
  }
  
-+static bool
-+test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	if (!has_cpuid_feature(entry, scope))
-+		return false;
-+
-+	/* Check firmware actually enabled MPAM on this cpu. */
-+	return (read_sysreg_s(SYS_MPAM1_EL1) & MPAM1_EL1_MPAMEN);
-+}
-+
-+static void
-+cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
-+{
-+	/*
-+	 * Access by the kernel (at EL1) should use the reserved PARTID
-+	 * which is configured unrestricted. This avoids priority-inversion
-+	 * where latency sensitive tasks have to wait for a task that has
-+	 * been throttled to release the lock.
-+	 */
-+	write_sysreg_s(0, SYS_MPAM1_EL1);
-+}
-+
-+static bool
-+test_has_mpam_hcr(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	u64 idr = read_sanitised_ftr_reg(SYS_MPAMIDR_EL1);
-+
-+	return idr & MPAMIDR_EL1_HAS_HCR;
-+}
-+
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.capability = ARM64_ALWAYS_BOOT,
-@@ -2873,6 +2922,20 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- #endif
- 	},
- #endif
-+	{
-+		.desc = "Memory Partitioning And Monitoring",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_MPAM,
-+		.matches = test_has_mpam,
-+		.cpu_enable = cpu_enable_mpam,
-+		ARM64_CPUID_FIELDS(ID_AA64PFR0_EL1, MPAM, 1)
-+	},
-+	{
-+		.desc = "Memory Partitioning And Monitoring Virtualisation",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_MPAM_HCR,
-+		.matches = test_has_mpam_hcr,
-+	},
- 	{
- 		.desc = "NV1",
- 		.capability = ARM64_HAS_HCR_NV1,
-@@ -3396,6 +3459,36 @@ static void verify_hyp_capabilities(void)
- 	}
+ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+@@ -263,6 +293,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
+ 
+ 	__deactivate_traps_hfgxtr(vcpu);
++	__deactivate_traps_mpam();
  }
  
-+static void verify_mpam_capabilities(void)
-+{
-+	u64 cpu_idr = read_cpuid(ID_AA64PFR0_EL1);
-+	u64 sys_idr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+	u16 cpu_partid_max, cpu_pmg_max, sys_partid_max, sys_pmg_max;
-+
-+	if (FIELD_GET(ID_AA64PFR0_EL1_MPAM_MASK, cpu_idr) !=
-+	    FIELD_GET(ID_AA64PFR0_EL1_MPAM_MASK, sys_idr)) {
-+		pr_crit("CPU%d: MPAM version mismatch\n", smp_processor_id());
-+		cpu_die_early();
-+	}
-+
-+	cpu_idr = read_cpuid(MPAMIDR_EL1);
-+	sys_idr = read_sanitised_ftr_reg(SYS_MPAMIDR_EL1);
-+	if (FIELD_GET(MPAMIDR_EL1_HAS_HCR, cpu_idr) !=
-+	    FIELD_GET(MPAMIDR_EL1_HAS_HCR, sys_idr)) {
-+		pr_crit("CPU%d: Missing MPAM HCR\n", smp_processor_id());
-+		cpu_die_early();
-+	}
-+
-+	cpu_partid_max = FIELD_GET(MPAMIDR_EL1_PARTID_MAX, cpu_idr);
-+	cpu_pmg_max = FIELD_GET(MPAMIDR_EL1_PMG_MAX, cpu_idr);
-+	sys_partid_max = FIELD_GET(MPAMIDR_EL1_PARTID_MAX, sys_idr);
-+	sys_pmg_max = FIELD_GET(MPAMIDR_EL1_PMG_MAX, sys_idr);
-+	if (cpu_partid_max < sys_partid_max || cpu_pmg_max < sys_pmg_max) {
-+		pr_crit("CPU%d: MPAM PARTID/PMG max values are mismatched\n", smp_processor_id());
-+		cpu_die_early();
-+	}
-+}
-+
- /*
-  * Run through the enabled system capabilities and enable() it on this CPU.
-  * The capabilities were decided based on the available CPUs at the boot time.
-@@ -3422,6 +3515,9 @@ static void verify_local_cpu_capabilities(void)
+ static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index ff8c4e1b847e..66d6af1dbadc 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2553,8 +2553,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
++	{ SYS_DESC(SYS_MPAMIDR_EL1), undef_access },
+ 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
  
- 	if (is_hyp_mode_available())
- 		verify_hyp_capabilities();
-+
-+	if (system_supports_mpam())
-+		verify_mpam_capabilities();
- }
++	{ SYS_DESC(SYS_MPAM1_EL1), undef_access },
++	{ SYS_DESC(SYS_MPAM0_EL1), undef_access },
+ 	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
  
- void check_local_cpu_capabilities(void)
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index 44718d0482b3..46ba30d42b9b 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -478,6 +478,9 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
- 	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0))
- 		__cpuinfo_store_cpu_32bit(&info->aarch32);
+@@ -2854,6 +2857,17 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
-+	if (id_aa64pfr0_mpam(info->reg_id_aa64pfr0))
-+		info->reg_mpamidr = read_cpuid(MPAMIDR_EL1);
-+
- 	cpuinfo_detect_icache_policy(info);
- }
+ 	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
++	{ SYS_DESC(SYS_MPAMHCR_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPMV_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAM2_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM0_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM1_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM2_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM3_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM4_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM5_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM6_EL2), undef_access },
++	{ SYS_DESC(SYS_MPAMVPM7_EL2), undef_access },
  
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index eedb5acc21ed..dfac646430ac 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -60,6 +60,8 @@ HW_DBM
- KVM_HVHE
- KVM_PROTECTED_MODE
- MISMATCHED_CACHE_TYPE
-+MPAM
-+MPAM_HCR
- MTE
- MTE_ASYMM
- SME
+ 	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
 -- 
 2.25.1
 
