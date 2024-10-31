@@ -1,146 +1,112 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DBC33FD
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 03:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DE034CDE
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 03:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730343873; cv=none; b=GK7DhRz78IihQmkHc2M/6jGsXeepfY2hJ9SoxW4dr8QXcijoGyil3Ln8q6NDs7Kf8eQDV687Ds88gao8SLWqkbKNt0+9fGv1jlG4awnZFUWbTXp/FE11u0WPsgP91UDs45UptAAFAFDitYMdzjGSatSKj/4yyG6F5QNUdCDlW7A=
+	t=1730344447; cv=none; b=u6yKX/DHpQuS+kJjkCmvxW04Kci+mYHK/yxHv7z1xdxN39tnz8M5bNwQaDtoatMOe9GCZ5dzYeKV7YdvR7d86UIsapc5MDmYRfaLMYypyR/GWk4KKu02X8IC5XzpHKvWbep0UMGQAUz1qrwIbYWZmUdMzhEyi+cnF7Jkdy4NwaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730343873; c=relaxed/simple;
-	bh=wdCoFEjwa8iGWdAfqKivFQcrwdTRXlT0IoRxu+pRDBw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jZord98qm50sFKxuwyi0cR+m6898wdMNRvJmLYLUVF99+aAbfk1lj6bjyP2EasoqlmfCNX2nzmM6EE27oSNjT2vHsPAlWx4sHdmrSlxgJt28vsvquFBhtKff4KaqGDgeV91jO4QpDREARRap4mobTwV/LqroAr7pHy98M7TrZro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RFgN+t8n; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1730344447; c=relaxed/simple;
+	bh=46nf+9knjoYuzqSmQelp2hgtcQEYzrUzEFvyH4C/XpE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i6lS35uVCzAm1PF6qBuAaFbqVgdTT4E8KYftBJCNfrFgXAsDaW/KXqM+RaBmCcIBA5fp+q6vjFp2kLxSm/99UYW6zauwPDhrosIsB8FmwJSYCW70LxiQKd8lp5FbO4DYsiHqTgZQlAGBifZ+s76yu8GbBpj2xCsSVBovEf3bZbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BKYfvaOh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RFgN+t8n"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730343866;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKYfvaOh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730344443;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JU5mWi+4xOc6kAhkGMfdVmB9NWczUXuOyU69dRDI3rw=;
-	b=RFgN+t8nlHdRDO7Tq3qufprYhgnhMTvP9uJxwNm982IprAiC5GQlbWBWkl4BP25LdZV/iq
-	LNOFM4AAk3zcPkoKmyt5ymCo3aSylAhV2tGm+t1uuouHD+/jpAYrJjP10pV9NUhgpfqSXI
-	tYCMRquzrIudpNJ6x+v9PpPbzwCWJys=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 00/37] KVM: arm64: Add EL2 support to FEAT_S1PIE/S1POE
-Date: Thu, 31 Oct 2024 03:04:14 +0000
-Message-ID: <173034380993.2566795.1591637584460232637.b4-ty@linux.dev>
-In-Reply-To: <20241023145345.1613824-1-maz@kernel.org>
-References: <20241023145345.1613824-1-maz@kernel.org>
+	bh=cTKGoVCMzkDuH8fl/VeiFRqT8A+kvrBX0o55Pxkty9A=;
+	b=BKYfvaOhZtp+EOzDCvNLxXqP0k6Zjoz0gjAXqiBov4xDbvgE+0merfmCEESxbSuf3pcZWO
+	mf45SNVj2VVd0wjomIxJRe4P6iNrEzwgff2Q26jBImVb8KdXqRMSbtTAFMQIQsO4HoCZEb
+	78jUdUk7S6FNB6cSQMiwQbePCvOAcPU=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-1PQhDRiOP4K8UoQBmL1BoQ-1; Wed, 30 Oct 2024 23:14:01 -0400
+X-MC-Unique: 1PQhDRiOP4K8UoQBmL1BoQ-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71e6241c002so477259b3a.1
+        for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 20:14:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730344441; x=1730949241;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cTKGoVCMzkDuH8fl/VeiFRqT8A+kvrBX0o55Pxkty9A=;
+        b=l9sCncrKjNM6+VWJonM9HXtMezeyhDFuIwJA35hfhOcgX8SSfH2iRSPVTp0NXvFu/D
+         /9FtpbRjFSakIOHM1aPZwniX49euWCQhOOtUNPAxd31G819NcFzs0wPFK0xi8Lzk9USh
+         232fkXRMcZ8GPN2dA77iHnmTN8eE52IAYT8GHmOqQgVUpNQ7nCzsn0vhoiVfg6rRMwG9
+         WdiMD/RRyMean1rvdHpus8zMulMvFWfg+fY536jbWuOHvGPevTC7W8ahJZJRePn8F1a7
+         iKO1J2hVhEVvPMicxdaU391LbrxEFDM+gxF3y9PmaPiSsbG7mWkBGlhiudyufQsCI5Lv
+         ls/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXb5zB+paouBqo0zSAAU0+6bVhFMVv4zrjpkHXsUA/THBrUIt9n/2o8gODoel2hsQkMwKMP7GM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzuC2uqfkMlX1XhowiiywWMGzdwl6ilsOxGouJGqJnGfs27PpPG
+	1ozobL3LysTLUUEGDxVqaWkm2cP621Ne9LKyUAA36qDj802jM2ep0pIznhlVryLLtsxat4HtBgY
+	vPgj4bBrAp4NTedKVVYYS7mllHB2F2iyEqz7uFQnwZTv3vgaPkIsKcw==
+X-Received: by 2002:a05:6a00:3cce:b0:71e:6f09:c0a8 with SMTP id d2e1a72fcca58-720bcf7cd87mr1439885b3a.10.1730344440767;
+        Wed, 30 Oct 2024 20:14:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIm6yUfoX4+vV2bezpidPQJuqYiQkZymlRrV7eXlScNtQU40n2VYP2jaFihtlrXexOAiLh+A==
+X-Received: by 2002:a05:6a00:3cce:b0:71e:6f09:c0a8 with SMTP id d2e1a72fcca58-720bcf7cd87mr1439851b3a.10.1730344440367;
+        Wed, 30 Oct 2024 20:14:00 -0700 (PDT)
+Received: from [192.168.68.55] ([180.233.125.129])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee452a7f5bsm315261a12.24.2024.10.30.20.13.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Oct 2024 20:13:59 -0700 (PDT)
+Message-ID: <1d96caa1-db0c-44c1-9f10-e7d94f80ad90@redhat.com>
+Date: Thu, 31 Oct 2024 13:13:53 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't
+ completely ignored
+To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Cc: anshuman.khandual@arm.com, james.morse@arm.com,
+ shameerali.kolothum.thodi@huawei.com, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+References: <20241030160317.2528209-1-joey.gouly@arm.com>
+ <20241030160317.2528209-8-joey.gouly@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241030160317.2528209-8-joey.gouly@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 23 Oct 2024 15:53:08 +0100, Marc Zyngier wrote:
-> This series serves a few purposes:
+On 10/31/24 2:03 AM, Joey Gouly wrote:
+> From: James Morse <james.morse@arm.com>
 > 
-> - Complete the S1PIE/S1POE support to include EL2
-> - Sneak in the EL2 system register world switch
+> The ID_AA64PFR0.MPAM bit was previously accidentally exposed to guests,
+> and is ignored by KVM. KVM will always present the guest with 0 here,
+> and trap the MPAM system registers to inject an undef.
 > 
-> As mentioned in few of the patches, this implementation relies on a
-> very recent fix to the architecture (D22677 in [0]).
+> But, this value is still needed to prevent migration when the value
+> is incompatible with the target hardware. Add a kvm unit test to try
+> and write multiple values to ID_AA64PFR0.MPAM. Only the hardware value
+> previously exposed should be ignored, all other values should be
+> rejected.
 > 
-> [...]
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>   .../selftests/kvm/aarch64/set_id_regs.c       | 99 ++++++++++++++++++-
+>   1 file changed, 98 insertions(+), 1 deletion(-)
+> 
 
-Applied to kvmarm/next, thanks!
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-[01/37] arm64: Drop SKL0/SKL1 from TCR2_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/d41571c7097a
-[02/37] arm64: Remove VNCR definition for PIRE0_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/5792349d0cce
-[03/37] arm64: Add encoding for PIRE0_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/4ecda4c67961
-[04/37] KVM: arm64: Drop useless struct s2_mmu in __kvm_at_s1e2()
-        https://git.kernel.org/kvmarm/kvmarm/c/a5c870d0939b
-[05/37] KVM: arm64: nv: Add missing EL2->EL1 mappings in get_el2_to_el1_mapping()
-        https://git.kernel.org/kvmarm/kvmarm/c/dfeb91686992
-[06/37] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-        https://git.kernel.org/kvmarm/kvmarm/c/164b5e20cdf6
-[07/37] KVM: arm64: nv: Save/Restore vEL2 sysregs
-        https://git.kernel.org/kvmarm/kvmarm/c/b9527b38c667
-[08/37] KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
-        https://git.kernel.org/kvmarm/kvmarm/c/14ca930d828b
-[09/37] KVM: arm64: Extend masking facility to arbitrary registers
-        https://git.kernel.org/kvmarm/kvmarm/c/a0162020095e
-[10/37] arm64: Define ID_AA64MMFR1_EL1.HAFDBS advertising FEAT_HAFT
-        https://git.kernel.org/kvmarm/kvmarm/c/9ae424d2a1ae
-[11/37] KVM: arm64: Add TCR2_EL2 to the sysreg arrays
-        https://git.kernel.org/kvmarm/kvmarm/c/69c19e047dfe
-[12/37] KVM: arm64: Sanitise TCR2_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/ad4f6ef0fa19
-[13/37] KVM: arm64: Add save/restore for TCR2_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/5055938452ed
-[14/37] KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
-        https://git.kernel.org/kvmarm/kvmarm/c/5f8d5a15ef5a
-[15/37] KVM: arm64: Add save/restore for PIR{,E0}_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/b3ad940a0887
-[16/37] KVM: arm64: Handle PIR{,E0}_EL2 traps
-        https://git.kernel.org/kvmarm/kvmarm/c/874ae1d48e60
-[17/37] KVM: arm64: Sanitise ID_AA64MMFR3_EL1
-        (no commit info)
-[18/37] KVM: arm64: Add AT fast-path support for S1PIE
-        https://git.kernel.org/kvmarm/kvmarm/c/23e7a34c8397
-[19/37] KVM: arm64: Split S1 permission evaluation into direct and hierarchical parts
-        https://git.kernel.org/kvmarm/kvmarm/c/4967b87a9ff7
-[20/37] KVM: arm64: Disable hierarchical permissions when S1PIE is enabled
-        https://git.kernel.org/kvmarm/kvmarm/c/5e21b2978722
-[21/37] KVM: arm64: Implement AT S1PIE support
-        https://git.kernel.org/kvmarm/kvmarm/c/364c081029a6
-[22/37] KVM: arm64: Add a composite EL2 visibility helper
-        https://git.kernel.org/kvmarm/kvmarm/c/ee3a9a0643c5
-[23/37] KVM: arm64: Define helper for EL2 registers with custom visibility
-        https://git.kernel.org/kvmarm/kvmarm/c/997eeecafeba
-[24/37] KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
-        https://git.kernel.org/kvmarm/kvmarm/c/0fcb4eea5345
-[25/37] KVM: arm64: Hide S1PIE registers from userspace when disabled for guests
-        https://git.kernel.org/kvmarm/kvmarm/c/a68cddbe47ef
-[26/37] KVM: arm64: Rely on visibility to let PIR*_ELx/TCR2_ELx UNDEF
-        https://git.kernel.org/kvmarm/kvmarm/c/b4824120303f
-[27/37] arm64: Add encoding for POR_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/b9ed7e5dfbe9
-[28/37] KVM: arm64: Drop bogus CPTR_EL2.E0POE trap routing
-        https://git.kernel.org/kvmarm/kvmarm/c/b17d8aa20126
-[29/37] KVM: arm64: Subject S1PIE/S1POE registers to HCR_EL2.{TVM,TRVM}
-        https://git.kernel.org/kvmarm/kvmarm/c/f7575530df43
-[30/37] KVM: arm64: Add kvm_has_s1poe() helper
-        https://git.kernel.org/kvmarm/kvmarm/c/26e89dccdf63
-[31/37] KVM: arm64: Add basic support for POR_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/5970e9903f03
-[32/37] KVM: arm64: Add save/restore support for POR_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/de5c2827fb44
-[33/37] KVM: arm64: Add POE save/restore for AT emulation fast-path
-        https://git.kernel.org/kvmarm/kvmarm/c/846c993df982
-[34/37] KVM: arm64: Disable hierarchical permissions when POE is enabled
-        https://git.kernel.org/kvmarm/kvmarm/c/8a9b304d7e22
-[35/37] KVM: arm64: Make PAN conditions part of the S1 walk context
-        https://git.kernel.org/kvmarm/kvmarm/c/7cd5c2796cb0
-[36/37] KVM: arm64: Handle stage-1 permission overlays
-        https://git.kernel.org/kvmarm/kvmarm/c/e39ce7033c70
-[37/37] KVM: arm64: Handle WXN attribute
-        https://git.kernel.org/kvmarm/kvmarm/c/1c6801d565ec
-
---
-Best,
-Oliver
