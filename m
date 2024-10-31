@@ -1,112 +1,84 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DE034CDE
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 03:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018F6D517
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 08:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730344447; cv=none; b=u6yKX/DHpQuS+kJjkCmvxW04Kci+mYHK/yxHv7z1xdxN39tnz8M5bNwQaDtoatMOe9GCZ5dzYeKV7YdvR7d86UIsapc5MDmYRfaLMYypyR/GWk4KKu02X8IC5XzpHKvWbep0UMGQAUz1qrwIbYWZmUdMzhEyi+cnF7Jkdy4NwaI=
+	t=1730363751; cv=none; b=BBztuoud03HBCb4O3PmHLqbZ6BtwVEyvAaXQrSK66GFdfzZhzBT06LPbx8Azerk4l5s4El/r0NgRXPyOqMlX3lQLiXX2eUFtu0sFZlLBvY70OWT9P/Jc7ZsHu3vnjqzA7LQjGxoPVqXb50zCo6NY3XmbyBx4RzpgtOIoceuzGi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730344447; c=relaxed/simple;
-	bh=46nf+9knjoYuzqSmQelp2hgtcQEYzrUzEFvyH4C/XpE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i6lS35uVCzAm1PF6qBuAaFbqVgdTT4E8KYftBJCNfrFgXAsDaW/KXqM+RaBmCcIBA5fp+q6vjFp2kLxSm/99UYW6zauwPDhrosIsB8FmwJSYCW70LxiQKd8lp5FbO4DYsiHqTgZQlAGBifZ+s76yu8GbBpj2xCsSVBovEf3bZbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BKYfvaOh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730363751; c=relaxed/simple;
+	bh=+FzpCGPLbvdqhl1sCnZuiJbbI6lkLMa9iXpMXwi139o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZS3Fa5Pho/cdG2NoZHGw0nyashTzdS+8R3zwxq35orMh0KEDvGHYv9lAIznx3rKSNJYe6r8/d5zJPcqwFIxI5CDAQp0h777pykatdSn8AgKDz4hIxM4NkxN9+gK06/BLecT/bSyBs2MHugcvAvlnT1C065e6gaMckxDaGDp6ues=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o/Xigo8p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKYfvaOh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730344443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cTKGoVCMzkDuH8fl/VeiFRqT8A+kvrBX0o55Pxkty9A=;
-	b=BKYfvaOhZtp+EOzDCvNLxXqP0k6Zjoz0gjAXqiBov4xDbvgE+0merfmCEESxbSuf3pcZWO
-	mf45SNVj2VVd0wjomIxJRe4P6iNrEzwgff2Q26jBImVb8KdXqRMSbtTAFMQIQsO4HoCZEb
-	78jUdUk7S6FNB6cSQMiwQbePCvOAcPU=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-1PQhDRiOP4K8UoQBmL1BoQ-1; Wed, 30 Oct 2024 23:14:01 -0400
-X-MC-Unique: 1PQhDRiOP4K8UoQBmL1BoQ-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71e6241c002so477259b3a.1
-        for <kvmarm@lists.linux.dev>; Wed, 30 Oct 2024 20:14:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730344441; x=1730949241;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cTKGoVCMzkDuH8fl/VeiFRqT8A+kvrBX0o55Pxkty9A=;
-        b=l9sCncrKjNM6+VWJonM9HXtMezeyhDFuIwJA35hfhOcgX8SSfH2iRSPVTp0NXvFu/D
-         /9FtpbRjFSakIOHM1aPZwniX49euWCQhOOtUNPAxd31G819NcFzs0wPFK0xi8Lzk9USh
-         232fkXRMcZ8GPN2dA77iHnmTN8eE52IAYT8GHmOqQgVUpNQ7nCzsn0vhoiVfg6rRMwG9
-         WdiMD/RRyMean1rvdHpus8zMulMvFWfg+fY536jbWuOHvGPevTC7W8ahJZJRePn8F1a7
-         iKO1J2hVhEVvPMicxdaU391LbrxEFDM+gxF3y9PmaPiSsbG7mWkBGlhiudyufQsCI5Lv
-         ls/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXb5zB+paouBqo0zSAAU0+6bVhFMVv4zrjpkHXsUA/THBrUIt9n/2o8gODoel2hsQkMwKMP7GM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzuC2uqfkMlX1XhowiiywWMGzdwl6ilsOxGouJGqJnGfs27PpPG
-	1ozobL3LysTLUUEGDxVqaWkm2cP621Ne9LKyUAA36qDj802jM2ep0pIznhlVryLLtsxat4HtBgY
-	vPgj4bBrAp4NTedKVVYYS7mllHB2F2iyEqz7uFQnwZTv3vgaPkIsKcw==
-X-Received: by 2002:a05:6a00:3cce:b0:71e:6f09:c0a8 with SMTP id d2e1a72fcca58-720bcf7cd87mr1439885b3a.10.1730344440767;
-        Wed, 30 Oct 2024 20:14:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIm6yUfoX4+vV2bezpidPQJuqYiQkZymlRrV7eXlScNtQU40n2VYP2jaFihtlrXexOAiLh+A==
-X-Received: by 2002:a05:6a00:3cce:b0:71e:6f09:c0a8 with SMTP id d2e1a72fcca58-720bcf7cd87mr1439851b3a.10.1730344440367;
-        Wed, 30 Oct 2024 20:14:00 -0700 (PDT)
-Received: from [192.168.68.55] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee452a7f5bsm315261a12.24.2024.10.30.20.13.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 20:13:59 -0700 (PDT)
-Message-ID: <1d96caa1-db0c-44c1-9f10-e7d94f80ad90@redhat.com>
-Date: Thu, 31 Oct 2024 13:13:53 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o/Xigo8p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 932BDC4CEC3;
+	Thu, 31 Oct 2024 08:35:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730363750;
+	bh=+FzpCGPLbvdqhl1sCnZuiJbbI6lkLMa9iXpMXwi139o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o/Xigo8pno5nttMto3H3k4SyBYHzd2izIgk8zqUjKffgjfTHEXMZ1JdfSF7E1VnQe
+	 Ia8hnvbAY6pGXyWG60M2cx2tW3dshWIZjnmomMCeCtLka34YLpy4BM/5T5tPbDP/rT
+	 tHPbs6AAVEv8POF6WjDVJL6yf3XlGP+AgDf97S0yKZnEFcOkYNO3EaRKxpC2OEyUO1
+	 0+uf2wvhRsQcHFfaL9rgHDsf6yCkyHzHS8kXwU+91Zrdi1GyXqk1mMg9GgGsCuZMv+
+	 LVQVGfCNY8bl6qViSYGR4LSlTuxuXQ9R8x8Q8UoQpqkvq8vzj+sCkNNTSRgi2YU6Zp
+	 Jv/8sj06ri7lg==
+Received: from 82-132-232-68.dab.02.net ([82.132.232.68] helo=localhost.localdomain)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t6Qeh-008VPB-CQ;
+	Thu, 31 Oct 2024 08:35:48 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] arm64: Expose ID_AA64ISAR1_EL1.XS to sanitised feature consumers
+Date: Thu, 31 Oct 2024 08:35:19 +0000
+Message-ID: <20241031083519.364313-1-maz@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't
- completely ignored
-To: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev
-Cc: anshuman.khandual@arm.com, james.morse@arm.com,
- shameerali.kolothum.thodi@huawei.com, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-References: <20241030160317.2528209-1-joey.gouly@arm.com>
- <20241030160317.2528209-8-joey.gouly@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241030160317.2528209-8-joey.gouly@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 82.132.232.68
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 10/31/24 2:03 AM, Joey Gouly wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> The ID_AA64PFR0.MPAM bit was previously accidentally exposed to guests,
-> and is ignored by KVM. KVM will always present the guest with 0 here,
-> and trap the MPAM system registers to inject an undef.
-> 
-> But, this value is still needed to prevent migration when the value
-> is incompatible with the target hardware. Add a kvm unit test to try
-> and write multiple values to ID_AA64PFR0.MPAM. Only the hardware value
-> previously exposed should be ignored, all other values should be
-> rejected.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->   .../selftests/kvm/aarch64/set_id_regs.c       | 99 ++++++++++++++++++-
->   1 file changed, 98 insertions(+), 1 deletion(-)
-> 
+Despite KVM now being able to deal with XS-tagged TLBIs, we still don't
+expose these feature bits to KVM.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Plumb in the feature in ID_AA64ISAR1_EL1.
+
+Fixes: 0feec7769a63 ("KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/cpufeature.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 718728a85430..db994d1fd97e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -228,6 +228,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_XS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_I8MM_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DGH_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_BF16_SHIFT, 4, 0),
+-- 
+2.43.0
 
