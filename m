@@ -1,118 +1,91 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC1819F13B
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 18:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80251C32FD
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 18:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730397805; cv=none; b=i546Q0uddPU3CjpWtpsdr/5tzn5/6byn4S7B+vJfj9TZGSEyDNiL8dDPTlLoyP527our6sLgjk4QwxEViTNTDTY9bcCmldaF9apiaPaZAspNwfo2cn1ORLbnwRi0wR6hEKfkuvYpTio8rnFB29MHsVUTKybixtlelr667dZ/iO4=
+	t=1730400145; cv=none; b=XXVVotOHjvgAX1ZIvT5d9v/qanlJD8HBN1dbehCInNoJ5gZnaUlvSlJOeQZPEFbq2fHhKNv5I9rA0FobXfh6OqCnJZ8sLvMPonNuNnTy3MDQDn8ZR7Re1N6Ostdlfy5wFurtrNWr8/8oK6Abgn1Of2cpdGH0syteZBxZjxInn7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730397805; c=relaxed/simple;
-	bh=G8yAkXEkB7ESX+4dpwShN5jHc+uy2dh0rZ5h9auy8U8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JJnsFTkpZM2N4xyyyhNXqZrMCt3bShpR72DMDOLBm7ayCHJLE8W4qJPe/OiXtZ+djwGWWMvi9N+YdHemhl94ivuLx316/VdZ+kwzbl786tyJzdlF3hqKBa+55skIGLmegzpjeid9thTmjhMM1fGBQFBJ22g9GQKLgw4ZQmgyGY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=N7jUjfu+; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1730400145; c=relaxed/simple;
+	bh=CuCOeh9arMu9ScfPuwzCEzsBGcFXMocySpFaAS0ZaYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=akTVuMzzqBn2BQucUfr3E5PmV/4OdNJk5LQzQLIitixBeS5glcvZaRGZCEjw244CKr47Q7qzXyZrFG1/C+9ADHKQ1SJKxeTwt0Dg+ydFy8zsW5xLcbDmlek2SKKbZ7hsx1/QIZoTkbU6syLLDK56mrVbQDgNVjnb2UIPtsm+5qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mPYHUB4Q; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="N7jUjfu+"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-83a9cd37a11so45617639f.3
-        for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 11:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1730397802; x=1731002602; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AqFVHirLhrZ+YFiVZAcY6QE2WmjZdVsPtC7OHYHxAto=;
-        b=N7jUjfu+6FdHEAKUW7FGq7DzX5n2UGjT72/H5MpcaBtpaVBAY9g0+lGsZXguuLs9Yy
-         V8+ovJhs3V3tErC9XAWZjOS7tmYnpBqm4venVmim7FyEDarEwoYYOf7E5ww/mp0+4hUH
-         LF6X5w6fbWH4grP5VcUMF18cT+jte113LtJI4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730397802; x=1731002602;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AqFVHirLhrZ+YFiVZAcY6QE2WmjZdVsPtC7OHYHxAto=;
-        b=Zg63Swx1hS0sOBZhcbhpKXqI1uOv0TP57CWiiaYRnG92ZXeHdIVlamoBDS2c76K1P+
-         B+XmXu7D5WTh7XSuW06Wb9o5WGdiacQoJYeLRln8kqTrJuIPYpWUvMlCQkXc6CLDrWZ4
-         gurAjJXjAdZbyc27bdk90LechK5ry2kisTCnXudbfiXg2LEOzFk2lOpDqE1DIJxoZ9G+
-         Ey2yAGZRt1nAZPSOfbQ/JdJOz5UTFVW/4bfs2SXR77M85fVl3roM5xjo1xA2FmPdFnla
-         YZo4RrC5ZMfn44GcXQmPVQkpbAZu6sZzAkqenPWcm/rVjY+My0Y2vgY0wpLzPgykhWgA
-         vUWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXaRNOKhnXTrsZYJ4rzATTb0pcRICFVpm23maGjH2uPNxB42i0BEkk5A5YafGtH8QC6SziMCqg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxz+MYw/vbEm/OAGhYcLjO8ojgtj0ZgQw8mtVijgpHKizwzY2wI
-	OgF0rlGz6dsic+JUiu2KOL/cwN4aNh6JYt9nrbchJzwgoOMt2ssv62leIDimgYE=
-X-Google-Smtp-Source: AGHT+IE/2tMHtynRkwFoEe4g15eKesbze+UUZeNHxyrhBMlrKzOpbj1uiD8+ldwsn9EFl+/fSR/Tfw==
-X-Received: by 2002:a05:6602:3fc5:b0:83a:db84:41a8 with SMTP id ca18e2360f4ac-83b1c4b4febmr2360267439f.10.1730397801962;
-        Thu, 31 Oct 2024 11:03:21 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de0497785esm380041173.89.2024.10.31.11.03.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 11:03:21 -0700 (PDT)
-Message-ID: <4703b646-3df4-43d3-ad75-92a38f5574c3@linuxfoundation.org>
-Date: Thu, 31 Oct 2024 12:03:20 -0600
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mPYHUB4Q"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730400140;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o8oZOz6bx3rY3c9b+cY/Dimo4K6xxWzeL+kimqHVrYs=;
+	b=mPYHUB4QG89z5DwHS8z8x4qAbIbEIuMfDaU5MtyVYBfjI5VbB5Kqyz858XZGHqDxCr4rFp
+	asiGVPDAJutg9hBBd7X0WuXgx8zyy29y94qwjwOdUyM32ZSfxkCurDc6uO1uop9Ic/205N
+	wt7R/3PETCOhsSe4IrSUk/0hmcMLVn4=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	james.morse@arm.com,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	shameerali.kolothum.thodi@huawei.com,
+	gshan@redhat.com,
+	anshuman.khandual@arm.com
+Subject: Re: [PATCH v6 0/7] KVM: arm64: Hide unsupported MPAM from the guest
+Date: Thu, 31 Oct 2024 18:42:09 +0000
+Message-ID: <173040012144.3070763.12098907901821115896.b4-ty@linux.dev>
+In-Reply-To: <20241030160317.2528209-1-joey.gouly@arm.com>
+References: <20241030160317.2528209-1-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 9/9] kselftest/arm64: Add 2024 dpISA extensions to
- hwcap test
-To: Mark Brown <broonie@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-kselftest@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20241030-arm64-2024-dpisa-v2-0-b6601a15d2a5@kernel.org>
- <20241030-arm64-2024-dpisa-v2-9-b6601a15d2a5@kernel.org>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20241030-arm64-2024-dpisa-v2-9-b6601a15d2a5@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 10/30/24 09:34, Mark Brown wrote:
-> We don't actually test SIGILL generation for CMPBR since the need to
-> branch makes it a pain to generate and the SIGILL detection would be
-> unreliable anyway. Since this should be very unusual we provide a stub
-> function rather than supporting a missing function.
+On Wed, 30 Oct 2024 16:03:10 +0000, Joey Gouly wrote:
+> changes since v5 [1]:
+> 	- Removed Kconfig option, the KVM traps shouldn't rely on host kernel support
+> 	- Renamed cpus_support_* to system_supports_* since that matches other functions
+> 	- Replace static branch arm64_mpam_has_hcr with a normal cpufeature capability
+> 	- Add MPAM*_EL2 regs to KVM (undef_access)
+> 	- Use constants in the test, instead of hardcoded values
+> 	- Added R-b and T-b tags
+> 	- Rebased on v6.12-rc5
 > 
-> The sigill functions aren't well sorted in the file so the ordering is a
-> bit random.
-This is talking about the one that isn't implemented. Can you add
-a sentence or two about the ones that this patch adds?
+> [...]
 
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->   tools/testing/selftests/arm64/abi/hwcap.c | 273 +++++++++++++++++++++++++++++-
->   1 file changed, 271 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-> index f2d6007a2b983eba77a880ec7e614396a6cb1377..beb380bc09b0d07269a85a60e5d2977367740473 100644
-> --- a/tools/testing/selftests/arm64/abi/hwcap.c
-> +++ b/tools/testing/selftests/arm64/abi/hwcap.c
-> @@ -46,6 +46,12 @@ static void atomics_sigill(void)
->   	asm volatile(".inst 0xb82003ff" : : : );
->   }
->   
-> +static void cmpbr_sigill(void)
-> +{
-> +	/* Not implemented, too complicated and unreliable anyway */
-> +}
-> +
+Applied to kvmarm/next, thanks!
 
-You anticpated "not used" messages looks like. I see that
-this gets called - thanks.
+[1/7] arm64/sysreg: Convert existing MPAM sysregs and add the remaining entries
+      https://git.kernel.org/kvmarm/kvmarm/c/83732ce6a056
+[2/7] arm64: head.S: Initialise MPAM EL2 registers and disable traps
+      https://git.kernel.org/kvmarm/kvmarm/c/23b33d1e168c
+[3/7] arm64: cpufeature: discover CPU support for MPAM
+      https://git.kernel.org/kvmarm/kvmarm/c/09e6b306f3ba
+[4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+      https://git.kernel.org/kvmarm/kvmarm/c/31ff96c38ea3
+[5/7] KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+      https://git.kernel.org/kvmarm/kvmarm/c/7da540e29dea
+[6/7] KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+      https://git.kernel.org/kvmarm/kvmarm/c/6685f5d572c2
+[7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
+      https://git.kernel.org/kvmarm/kvmarm/c/75cd027cbcb1
 
-Looks good to me. With the change to change log
-
-Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
-
-thanks,
--- Shuah
+--
+Best,
+Oliver
