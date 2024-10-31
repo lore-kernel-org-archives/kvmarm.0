@@ -1,97 +1,90 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C0F1BC094
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 19:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F280D1CCEE2
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 19:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730404417; cv=none; b=pbcFVLa7dyHFjpUlMveNZH7ODsSeu9V2K0V0hKzf9y1KBvsgsyAmr0zVoe8GAmLW1y0klu0W8atHi4a/W02BVZtlywkN/ZJlwkdxPUCz0k/JPjVdq6UrBbMGJvKFk6X9ebdLmbgbkGQNWFhAlVenouchk+ds/6J67m3uuiJVjm8=
+	t=1730404606; cv=none; b=Pbd/tfqaFxuvgbCSZegX1r+dCkRv59TX5I4J7YtnmfLo962cqtCu2BvOAprfcaTmhVPszYafORdmKZZrZ3e+zlq03w4Sn3QyWto5eu5Hyo9Qh4T5dQdqz+RYKvAN3VIYw0nE1rw4fjZTs+P7S3DlnxWH21w/q0yj5flxaTgre8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730404417; c=relaxed/simple;
-	bh=FroSOV/uD5rdzEaLIMdl9JXIy+2JWa3hTbW339w1cW4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VjmVMEjr8UeZ3ovDfdu3408KXZTNao+xplUyl2ZEfr5jjk4sfiIHf1EqpVUl1Z0cYqsKyFaRWPK0OF8clo0cmrwm+4VJllER+koE+e8Bnzi11mwtMmHg8VDTFsZOdRYCuGNU5kQRWGvu72jxM3iAETtyT/XVKh9aTI8RBTsi5EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XpjVHDnr; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1730404606; c=relaxed/simple;
+	bh=n42bIm0EJKSGiSdPBDn9xkTrd4XZQCY/ki0lBaAt+Bk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PaJqZFYZC9+aII+6+JHt4uencYbUFidEy8b1/rEE1Id9qW3u0fyqPoAa4PywGD/TB/omFafkghPN2S2J4Y1DuvhzfDpXvJeet6RG9wYbuyuHDiPbryGSTIshXOW/Ndf0xUbwH7pEn61tkUXNCZ8jyfUDIqmmrVYP60Wb/VE6I5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h0t050Bk; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XpjVHDnr"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7eb0a32fc5aso1166418a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 12:53:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730404415; x=1731009215; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HDryuS3JwdKmtkDt/QNqzIISsjjDc6tSvCEk4zlonUE=;
-        b=XpjVHDnr9IPDeD0W+y5idRmyV1H31JkTojqT9tvq5//KH874naK3K7JZYVVWdm8DLf
-         3XNMqk59+5XXLNbLLRJ6InO2HeF1Rijx6nMu6W9dOpsBBrev9/Nv+sy3rSuTUqR7kwR6
-         rAiEjLMog3DqNzDvaR50Fze4DsSlS2cchzGXx23zsKBh12C/juSk08Haq+9fHT15zWWZ
-         56MKl7Jwhx3+tPuoXUSlvLqaevEcpdjj8oO4VskIEyTdYzcZOcuvoA8PbeBue0rsxrM7
-         +2xnxSO9AUrq0j2Ltssc1WxrTAzl22oAHjiPGJ1n3D3e4FqLJPT7JQ/feFAKyCywVp6A
-         w4Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730404415; x=1731009215;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HDryuS3JwdKmtkDt/QNqzIISsjjDc6tSvCEk4zlonUE=;
-        b=M7hbY4aLVeXK/AxzZBHN//Edrw4n7KHSGFZuqyY/jw6SJ16xzRixmdEqZ84PhjR3jA
-         lvLUW6HdI6r9th2MGpJ/+I3YrMHVHRG5UI7jwusBoAUAhqHsPsokcLJFxiDqNE+DjBMN
-         jLB+rcM7xQxTMJMFJptjY06SeIE8YfGm1wtx1mQeb0rNIF8Yr7ez838d+KKlnbEwQdTc
-         75B0xKrIeOCFCZzHaB8YR/exxxN66ahsjZWoiaSKdKFYknvd04+muP9ap2AgmACIzDVV
-         ftHYHEIE9hNZ90TooNElLMxkLZDpF7RiBbKEn20ZVpoj1Ub5hmJizWEt3fDYCazaY/tV
-         BZ6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUQHKAmJmaSnkgwm45T7ytITinnAkoHU4MIrAdnrSJEWKrhcU3K7daz6adlVFQCSSO74OKORMU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy5YvviSR9bOlo5AI1s36qO1vxgGjU8kmJbob6p7Qk18WePMM+V
-	IeTlaznnIPCXnmbEEWWoTOI2PpMywi/pTvfEUInkggybfUQcH+B0sKCNgUKlfGNzBjl9ibpDzZE
-	VEw==
-X-Google-Smtp-Source: AGHT+IEYQskIydQ17rOCvnDIIztIPwEtV42Xo/Yb7l4NrEHNVvMPUaIF0Ogt4/xaQ903hVU90IvPM22EQH4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:385c:0:b0:7ea:999a:7930 with SMTP id
- 41be03b00d2f7-7edd7b6c7e8mr28419a12.1.1730404414918; Thu, 31 Oct 2024
- 12:53:34 -0700 (PDT)
-Date: Thu, 31 Oct 2024 12:51:29 -0700
-In-Reply-To: <20240802200136.329973-1-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h0t050Bk"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730404601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ETPLCcFOzsbm2EUKzHQHpjrgkvcCKJmMREUbmAxMcBE=;
+	b=h0t050BkX3ihCZkm0W74a9hiZ/GkSTBi0EHcfzhpLzK/YJ1qkNFIaHnidJggXPZ2y98CAz
+	+QQQDV/z0K/cRFxB7iB9bC6zDRytorf1X/deRUGQClrGZKcG0MYC3n8M5EgSFI74RzFDRA
+	pJ2n8dZlCe24+bCRU88+I4G0KVC9jJs=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	stable@vger.kernel.org,
+	kvm@vger.kernel.org,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v2] KVM: arm64: Get rid of userspace_irqchip_in_use
+Date: Thu, 31 Oct 2024 19:56:28 +0000
+Message-ID: <173040458509.3411583.4399376120814266828.b4-ty@linux.dev>
+In-Reply-To: <20241028234533.942542-1-rananta@google.com>
+References: <20241028234533.942542-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240802200136.329973-1-seanjc@google.com>
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <173039527102.1510350.14562788857137656763.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: Protect vCPU's PID with a rwlock
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Steve Rutherford <srutherford@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 02 Aug 2024 13:01:34 -0700, Sean Christopherson wrote:
-> Protect vcpu->pid with a rwlock instead of RCU, so that running a vCPU
-> with a different task doesn't require a full RCU synchronization, which
-> can introduce a non-trivial amount of jitter, especially on large systems.
+On Mon, 28 Oct 2024 23:45:33 +0000, Raghavendra Rao Ananta wrote:
+> Improper use of userspace_irqchip_in_use led to syzbot hitting the
+> following WARN_ON() in kvm_timer_update_irq():
 > 
-> I've had this mini-series sitting around for ~2 years, pretty much as-is.
-> I could have sworn past me thought there was a flaw in using a rwlock, and
-> so I never posted it, but for the life of me I can't think of any issues.
+> WARNING: CPU: 0 PID: 3281 at arch/arm64/kvm/arch_timer.c:459
+> kvm_timer_update_irq+0x21c/0x394
+> Call trace:
+>   kvm_timer_update_irq+0x21c/0x394 arch/arm64/kvm/arch_timer.c:459
+>   kvm_timer_vcpu_reset+0x158/0x684 arch/arm64/kvm/arch_timer.c:968
+>   kvm_reset_vcpu+0x3b4/0x560 arch/arm64/kvm/reset.c:264
+>   kvm_vcpu_set_target arch/arm64/kvm/arm.c:1553 [inline]
+>   kvm_arch_vcpu_ioctl_vcpu_init arch/arm64/kvm/arm.c:1573 [inline]
+>   kvm_arch_vcpu_ioctl+0x112c/0x1b3c arch/arm64/kvm/arm.c:1695
+>   kvm_vcpu_ioctl+0x4ec/0xf74 virt/kvm/kvm_main.c:4658
+>   vfs_ioctl fs/ioctl.c:51 [inline]
+>   __do_sys_ioctl fs/ioctl.c:907 [inline]
+>   __se_sys_ioctl fs/ioctl.c:893 [inline]
+>   __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
+>   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>   invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
+>   el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
+>   do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
+>   el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
+>   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+>   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
 > 
 > [...]
 
-Applied to kvm-x86 generic, with a comment explaining the vcpu->mutex is the
-true protector of vcpu->pid.
+Applied to kvmarm/next, thanks!
 
-Oliver, I didn't add the requested lockdep notification, I really want to make
-that a separate discussion:
-
-https://lore.kernel.org/all/20241009150455.1057573-7-seanjc@google.com
-
-[1/2] KVM: Return '0' directly when there's no task to yield to
-      https://github.com/kvm-x86/linux/commit/6cf9ef23d942
-[2/2] KVM: Protect vCPU's "last run PID" with rwlock, not RCU
-      https://github.com/kvm-x86/linux/commit/3e7f43188ee2
+[1/1] KVM: arm64: Get rid of userspace_irqchip_in_use
+      https://git.kernel.org/kvmarm/kvmarm/c/e571ebcff926
 
 --
-https://github.com/kvm-x86/linux/tree/next
+Best,
+Oliver
