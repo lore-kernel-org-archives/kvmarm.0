@@ -1,52 +1,47 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80251C32FD
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 18:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D1B13A865
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 18:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730400145; cv=none; b=XXVVotOHjvgAX1ZIvT5d9v/qanlJD8HBN1dbehCInNoJ5gZnaUlvSlJOeQZPEFbq2fHhKNv5I9rA0FobXfh6OqCnJZ8sLvMPonNuNnTy3MDQDn8ZR7Re1N6Ostdlfy5wFurtrNWr8/8oK6Abgn1Of2cpdGH0syteZBxZjxInn7k=
+	t=1730400806; cv=none; b=GOTcaRRpb+e4o5YrU+pq3Da9ZntYmbT/XJnABh0rdM0w7Fi55L+E3ofFdJF49NnvTEgP+dDCCRYC73xiBopCVE6svM05HZfRh5Bj6SFzxo5ZeQ9VcxwLn44snEiNbTWGssxNJTtCASvaW2ZYVm7itGMl2ATRvJJiis074d0OAsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730400145; c=relaxed/simple;
-	bh=CuCOeh9arMu9ScfPuwzCEzsBGcFXMocySpFaAS0ZaYU=;
+	s=arc-20240116; t=1730400806; c=relaxed/simple;
+	bh=biEynVmphYhoTrB27hClRk4jpvdh3IiZIIdwoP+0NJ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=akTVuMzzqBn2BQucUfr3E5PmV/4OdNJk5LQzQLIitixBeS5glcvZaRGZCEjw244CKr47Q7qzXyZrFG1/C+9ADHKQ1SJKxeTwt0Dg+ydFy8zsW5xLcbDmlek2SKKbZ7hsx1/QIZoTkbU6syLLDK56mrVbQDgNVjnb2UIPtsm+5qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mPYHUB4Q; arc=none smtp.client-ip=95.215.58.181
+	 MIME-Version:Content-Type; b=G19E5BunNE6HRA3EOrPzFcOrzwWYEngcA5ASt+IYlnO22mdw+FABmvCWOGPLw4V6oAWydh5dK3XG9Ew3fxmTHtHsPs+mb4hjfsTtrgEDyMJNyUS0VkRt3zANA7IIuWXFgaaZ9ukWCgyjey4m3hNH97eoGpeucwC+m1cSBeHw7NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T1XnpDPW; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mPYHUB4Q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T1XnpDPW"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730400140;
+	t=1730400799;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=o8oZOz6bx3rY3c9b+cY/Dimo4K6xxWzeL+kimqHVrYs=;
-	b=mPYHUB4QG89z5DwHS8z8x4qAbIbEIuMfDaU5MtyVYBfjI5VbB5Kqyz858XZGHqDxCr4rFp
-	asiGVPDAJutg9hBBd7X0WuXgx8zyy29y94qwjwOdUyM32ZSfxkCurDc6uO1uop9Ic/205N
-	wt7R/3PETCOhsSe4IrSUk/0hmcMLVn4=
+	bh=tK7WwkdMueQwOc7swpJKOs3ICGLkBuJ4lMhvJB1bz4Y=;
+	b=T1XnpDPWLm/xgIlVYAbP20dsT256mN48Wbigm18FvkZ57zI5hLN6ygsmKW0iBz+oHxZ2G5
+	jz5Bd9SRNdpVQAUVnmiVhzn+TuSz4vvwwnfw4pAvYKTNq7QCFCYv/nva8BAViVT9ENAlxi
+	NwW5dbn7ZDpq5GdoYo8RWWKjl2xF7cc=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
+To: Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	james.morse@arm.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Jing Zhang <jingzhangos@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	shameerali.kolothum.thodi@huawei.com,
-	gshan@redhat.com,
-	anshuman.khandual@arm.com
-Subject: Re: [PATCH v6 0/7] KVM: arm64: Hide unsupported MPAM from the guest
-Date: Thu, 31 Oct 2024 18:42:09 +0000
-Message-ID: <173040012144.3070763.12098907901821115896.b4-ty@linux.dev>
-In-Reply-To: <20241030160317.2528209-1-joey.gouly@arm.com>
-References: <20241030160317.2528209-1-joey.gouly@arm.com>
+	joey.gouly@arm.com,
+	maz@kernel.org,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix initialization of trap register values in pKVM
+Date: Thu, 31 Oct 2024 18:53:06 +0000
+Message-ID: <173040077833.3165327.8956831992268078648.b4-ty@linux.dev>
+In-Reply-To: <20241018074833.2563674-1-tabba@google.com>
+References: <20241018074833.2563674-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,34 +52,27 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, 30 Oct 2024 16:03:10 +0000, Joey Gouly wrote:
-> changes since v5 [1]:
-> 	- Removed Kconfig option, the KVM traps shouldn't rely on host kernel support
-> 	- Renamed cpus_support_* to system_supports_* since that matches other functions
-> 	- Replace static branch arm64_mpam_has_hcr with a normal cpufeature capability
-> 	- Add MPAM*_EL2 regs to KVM (undef_access)
-> 	- Use constants in the test, instead of hardcoded values
-> 	- Added R-b and T-b tags
-> 	- Rebased on v6.12-rc5
+On Fri, 18 Oct 2024 08:48:28 +0100, Fuad Tabba wrote:
+> The patch that dropped PAuth instruction/key traps [1] did not
+> apply to non-protected VMs in protected mode, since as noted [2],
+> the hypervisor is supposed to handle trap register values in
+> pKVM. However, in pKVM upstream code the hypervisor does not set
+> all necessary trap register values in protected mode, and running
+> non-protected VMs with PAuth enabled in pKVM has been broken
+> since then [1].
 > 
 > [...]
 
 Applied to kvmarm/next, thanks!
 
-[1/7] arm64/sysreg: Convert existing MPAM sysregs and add the remaining entries
-      https://git.kernel.org/kvmarm/kvmarm/c/83732ce6a056
-[2/7] arm64: head.S: Initialise MPAM EL2 registers and disable traps
-      https://git.kernel.org/kvmarm/kvmarm/c/23b33d1e168c
-[3/7] arm64: cpufeature: discover CPU support for MPAM
-      https://git.kernel.org/kvmarm/kvmarm/c/09e6b306f3ba
-[4/7] KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
-      https://git.kernel.org/kvmarm/kvmarm/c/31ff96c38ea3
-[5/7] KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
-      https://git.kernel.org/kvmarm/kvmarm/c/7da540e29dea
-[6/7] KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
-      https://git.kernel.org/kvmarm/kvmarm/c/6685f5d572c2
-[7/7] KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
-      https://git.kernel.org/kvmarm/kvmarm/c/75cd027cbcb1
+[1/4] KVM: arm64: Move pkvm_vcpu_init_traps() to init_pkvm_hyp_vcpu()
+      https://git.kernel.org/kvmarm/kvmarm/c/0546d4a925a6
+[2/4] KVM: arm64: Refactor kvm_vcpu_enable_ptrauth() for hyp use
+      https://git.kernel.org/kvmarm/kvmarm/c/3663b258f723
+[3/4] KVM: arm64: Initialize the hypervisor's VM state at EL2
+      https://git.kernel.org/kvmarm/kvmarm/c/cb0c272acebd
+[4/4] KVM: arm64: Initialize trap register values in hyp in pKVM
+      https://git.kernel.org/kvmarm/kvmarm/c/b56680de9c64
 
 --
 Best,
