@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACAB19E836
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 13:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA63313A869
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 13:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730380240; cv=none; b=E9tf6daebmVzF3sHvVKKHnIcrVEo/MgaMs7G9V8li+l/IcRW9rTnrIPQqNzzsVv+TZhbyL8rPcLhVG0v4Ay8cwzrwWoB10WGYTITidUBiWMLmOzcpwMutuVwNTSrY7vULM8zpXi7MaMrsfJrXQm1gr+dzSORBLX2nXsuAHjPgUo=
+	t=1730380319; cv=none; b=fj1z49v8x1z9SZaz0Ow+gHeNyOajb7TCpNLGcK7YzA+olrBbDxUEZTZ0WngQvKtruOp2dL0bGSarv/ljI6vHbrs4wOBY+2HwdZm38P7c4wPQUJM6ilLUKYLAi95aonQu8meYpRMgie5g8h+beoXiCcULJJ/NbvbnTy2kL1Jvggc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730380240; c=relaxed/simple;
-	bh=oCQiTJLRfPp/6kPFjAHkgEl5HJsM0xhf/6uOgNP0GPg=;
+	s=arc-20240116; t=1730380319; c=relaxed/simple;
+	bh=iCWUb0yTk/t00TGKYUJLDN0jzPFmg7+JQOY1ZCT+zIQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N4GIeH67EDieqsY2gj7jYC8WhKyIB1zIRYjaaUM0pSwkVllPx80oSnPhGVghQHv300I8B9A2o5rwvznrT2CvE6dmqI8EIeG/0b0EcaJjDifKefXI6TvR7aGIPhjlqOcL+8Zm21c+F/6ojlkKnAQPYTblTQ5Bdk+YMVNaMTIJ9/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Klt25/4f; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=jmzmovrBBXrqKD7hknsC2frgUHQT4ekc/H/siG3CxnFtwKbtbcxGcL0Ny3gUaJfPor6gcU+hXQ4IxkwX9DXpRx7jls+ye/IvojUfERexedYzaJaS0BNmHNXstX/ssOLdOxp4Q/SnkJe2oyXP2NYJDUirjq/nl0DArHWzTOQdzkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ARA9s0gf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Klt25/4f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21AF2C4FEA5;
-	Thu, 31 Oct 2024 13:10:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARA9s0gf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46ABFC4FEBF;
+	Thu, 31 Oct 2024 13:11:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730380240;
-	bh=oCQiTJLRfPp/6kPFjAHkgEl5HJsM0xhf/6uOgNP0GPg=;
+	s=k20201202; t=1730380319;
+	bh=iCWUb0yTk/t00TGKYUJLDN0jzPFmg7+JQOY1ZCT+zIQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Klt25/4fLBa+ebQ48URjP1Bl5DC4C2QXhEVRMI7tAq8dXgtymsVOogxOZU5l3ewjy
-	 jcuN9l+iXIArQK6Qc+2QXaoFOh0iq7hzThGWCCVwsr9JfR0Wfdb9z4lUofCb01WQ4M
-	 KBJN6ivvgEc5SOokNIvFzd/ex3JiM8kBc8XHMLOU1BiYhBSPClB+wHTWKBxcPzs0Ga
-	 FWKw9pabfgD5vkMxCHypLRTpIFN5NfkCcJPLUPELXWaUpQraqiZWvrn/6YOiEiup4U
-	 xR068vDSFN29ktWMKNPUz5MahwG+ue7GXdkMUB4g3C6LaLWtJff9cOc5WqcMn4Zx7w
-	 QZ6SzL1VHDSFQ==
+	b=ARA9s0gfVmCEI+wHwNi7zuLNsoL5njRAFWv9Rm5aiHer/K3KYeyHKza654xfyjzaD
+	 AH/GNRE3FrS+P1DjOkjwaEWoulBDkk5o9b2LmIfpiEOTuO/rC0XDKxWDYWsF4Y1rEg
+	 NPod8GySXU4V9odEYa8+gIOOtIdUFwpRlJHxikZLc7fYwePO8XqSrOLz6S/wL//tRc
+	 joYNCOoDEbTO48n1RvhrufC4q/uIi87nVaKYTb4THgYWjus3wnwsm02aaJPPvV7RsU
+	 PHYc+MzLGBaONzQubspVFQ0p2Bm61lVz2r1w1WJTCS1HZvGgxbd+DRi83YWTCO0eqB
+	 z5rhBhqr+Y+nA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t6Uwf-008ZOj-Sr;
-	Thu, 31 Oct 2024 13:10:37 +0000
-Date: Thu, 31 Oct 2024 13:10:37 +0000
-Message-ID: <86ttcs1kqa.wl-maz@kernel.org>
+	id 1t6Uxx-008ZQh-Ck;
+	Thu, 31 Oct 2024 13:11:57 +0000
+Date: Thu, 31 Oct 2024 13:11:56 +0000
+Message-ID: <86sesc1ko3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -48,10 +48,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Jing Zhang <jingzhangos@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v6 5/7] KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
-In-Reply-To: <20241030160317.2528209-6-joey.gouly@arm.com>
+Subject: Re: [PATCH v6 0/7] KVM: arm64: Hide unsupported MPAM from the guest
+In-Reply-To: <20241030160317.2528209-1-joey.gouly@arm.com>
 References: <20241030160317.2528209-1-joey.gouly@arm.com>
-	<20241030160317.2528209-6-joey.gouly@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,40 +66,74 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 30 Oct 2024 16:03:15 +0000,
+On Wed, 30 Oct 2024 16:03:10 +0000,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> From: James Morse <james.morse@arm.com>
+> Hi,
 > 
-> The sys_reg_descs array holds function pointers and reset value for
-> managing the user-space and guest view of system registers. These
-> are mostly created by a set of macro's as only some combinations
-> of behaviour are needed.
+> changes since v5 [1]:
+> 	- Removed Kconfig option, the KVM traps shouldn't rely on host kernel support
+> 	- Renamed cpus_support_* to system_supports_* since that matches other functions
+> 	- Replace static branch arm64_mpam_has_hcr with a normal cpufeature capability
+> 	- Add MPAM*_EL2 regs to KVM (undef_access)
+> 	- Use constants in the test, instead of hardcoded values
+> 	- Added R-b and T-b tags
+> 	- Rebased on v6.12-rc5
 > 
-> If a register needs special treatment, its sys_reg_descs entry is
-> open-coded. This is true of some id registers where the value provided
-> by user-space is validated by some helpers.
+> James wrote:
+> 	This series fixes up a long standing bug where MPAM was accidentally exposed
+> 	to a guest, but the feature was not otherwise trapped or context switched.
+> 	This could result in KVM warning about unexpected traps, and injecting an
+> 	undef into the guest contradicting the ID registers.
+> 	This would prevent an MPAM aware kernel from booting - fortunately, there
+> 	aren't any of those.
 > 
-> Before adding another one of these, add a helper that covers the
-> existing special cases. 'ID_FILTERED' expects helpers to set the
-> user-space value, and retrieve the modified reset value.
+> 	Ideally, we'd take the MPAM feature away from the ID registers, but that
+> 	would leave existing guests unable to migrate to a newer kernel. Instead,
+> 	just ignore that field when it matches the hardware. KVM wasn't going to
+> 	expose MPAM anyway. The guest will not see MPAM in the id registers.
 > 
-> Like ID_WRITABLE() this uses id_visibility(), which should have no functional
-> change for the registers converted to use ID_FILTERED().
+> 	This series includes the head.S and KVM changes to enable/disable traps. If
+> 	MPAM is neither enabled nor emulated by EL3 firmware, these system register
+> 	accesses will trap to EL3.
+> 	If your kernel doesn't boot, and the problem bisects here - please update
+> 	your firmware. MPAM has been supported by trusted firmware since v1.6 in
+> 	2018. (also noted on patch 3).
 > 
-> read_sanitised_id_aa64dfr0_el1() and read_sanitised_id_aa64pfr0_el1() have been
-> refactored to be called kvm_read_sanitised_id_reg(), to try be consistent with
+> Thanks,
+> Joey
+> 
+> [1] https://lore.kernel.org/kvmarm/20241015133923.3910916-1-joey.gouly@arm.com/
+> 
+> James Morse (7):
+>   arm64/sysreg: Convert existing MPAM sysregs and add the remaining
+>     entries
+>   arm64: head.S: Initialise MPAM EL2 registers and disable traps
+>   arm64: cpufeature: discover CPU support for MPAM
+>   KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
+>   KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+>   KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+>   KVM: arm64: selftests: Test ID_AA64PFR0.MPAM isn't completely ignored
+> 
+>  .../arch/arm64/cpu-feature-registers.rst      |   2 +
+>  arch/arm64/include/asm/cpu.h                  |   1 +
+>  arch/arm64/include/asm/cpucaps.h              |   5 +
+>  arch/arm64/include/asm/cpufeature.h           |  17 ++
+>  arch/arm64/include/asm/el2_setup.h            |  14 ++
+>  arch/arm64/include/asm/kvm_arm.h              |   1 +
+>  arch/arm64/include/asm/sysreg.h               |  12 --
+>  arch/arm64/kernel/cpufeature.c                |  96 +++++++++++
+>  arch/arm64/kernel/cpuinfo.c                   |   3 +
+>  arch/arm64/kvm/hyp/include/hyp/switch.h       |  31 ++++
+>  arch/arm64/kvm/sys_regs.c                     | 121 +++++++++----
+>  arch/arm64/tools/cpucaps                      |   2 +
+>  arch/arm64/tools/sysreg                       | 161 ++++++++++++++++++
+>  .../selftests/kvm/aarch64/set_id_regs.c       |  99 ++++++++++-
+>  14 files changed, 523 insertions(+), 42 deletions(-)
 
-nit: called *from*?
+For the series:
 
-> ID_WRITABLE().
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
