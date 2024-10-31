@@ -1,118 +1,108 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5C01BD9E4
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 12:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACAB19E836
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 13:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730379593; cv=none; b=k7Xv5g1w5Hy4/vN2RNj2NSVsZKbOCLsoub/u/v9DAevnzBZfh0gvhJ1EodcJE/y2Q8bY9BXIEdgPu4qfTbnYLttfUyyhb2tn0Z9mMGFXmNujFmOV8/pvXRdOSP0moBPFyNw96NfKv5LxqFLF3Po55POYQspbgg8CBn8VYSBEigc=
+	t=1730380240; cv=none; b=E9tf6daebmVzF3sHvVKKHnIcrVEo/MgaMs7G9V8li+l/IcRW9rTnrIPQqNzzsVv+TZhbyL8rPcLhVG0v4Ay8cwzrwWoB10WGYTITidUBiWMLmOzcpwMutuVwNTSrY7vULM8zpXi7MaMrsfJrXQm1gr+dzSORBLX2nXsuAHjPgUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730379593; c=relaxed/simple;
-	bh=43jUkYqDFKMbI4yK0l42jQl11d1Z0xbWWL04MIa8CoA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dTjx1oxQBFxRLTPWdsDtJQ1+Y+1YUdljg8tCZ32/9VarUt0tuVvAZv3DdyRp4s+jzIFUMX/Cn6yC4Q7JX1b1kieXirN2f5iUgyje8EveMewDNJ+LIj9xwRaccpaUSfhWfe/NUqeFabqsf/R9DgYz0CuWWESixh2lvUX6liNkz4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iS50YQI0; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1730380240; c=relaxed/simple;
+	bh=oCQiTJLRfPp/6kPFjAHkgEl5HJsM0xhf/6uOgNP0GPg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N4GIeH67EDieqsY2gj7jYC8WhKyIB1zIRYjaaUM0pSwkVllPx80oSnPhGVghQHv300I8B9A2o5rwvznrT2CvE6dmqI8EIeG/0b0EcaJjDifKefXI6TvR7aGIPhjlqOcL+8Zm21c+F/6ojlkKnAQPYTblTQ5Bdk+YMVNaMTIJ9/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Klt25/4f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iS50YQI0"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c9428152c0so1238966a12.1
-        for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 05:59:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1730379590; x=1730984390; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+cjV12eTgGM/W6VxKSYtL5Nw4UUw/HSAOYX1se12Zig=;
-        b=iS50YQI0MDNF7iE5oBeWihJrjVIknuN9FuWzvA2WZYFQwbtYsIf9bj49H/2cHn+JM/
-         SZ0FZskjt+OY6MHUyMT96wzEEJhA2kJhPlo/nbGUt1aF4QdHSvAjcL+ASiFM7lXK/BfO
-         zCFtkTndirXzz11ShEEF/qe524vNWFiOvX4jHBGqHVoMt88pfJ3jpZZ85RdxwFvEXJtc
-         L8xOKYj4kHdhI2/IFVRGusCIYtheEmL5TncVs4sTM+FH6KWx9Fr+cDPg1Z2tjrUcdWvw
-         /1ZCxmPBSbEm8xmg//jjQ8Mn5G1Kr6ZJFowcx2fhBW6Tt/IKCtks69QQyeqKnTok4TEs
-         rW+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730379590; x=1730984390;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+cjV12eTgGM/W6VxKSYtL5Nw4UUw/HSAOYX1se12Zig=;
-        b=wjLIJHHhD8bSFhPdgjj1wxnsPYzUcERoV8RBLNXW67LINq93sbRligv4gxFfptOc6q
-         BLdKMEYcaxRIJ5KBMoMXt4HZSTi+sSV8DVpubOxmC1MmRx6xWyBlLjst6Y5Rlb3fvR9x
-         vF8N51vd4lhRt2iHOByWJTgjIMl5tE6gS+VpGFRI8M8+BpHT4sPJuNWA2oJ+xciwxRi1
-         nCzaxN4zthO/I216YJ+nraFgivz/6O5Fie4Fx4uX5ulKEokBSbtRP9hp3wnlyo+1thr3
-         B1ecvo2ewKECUrVz3UoVg/4EoFZD/s4oI1twhJE2sR7kAt77GhWNoBxgig0bRUcu/AMV
-         sWMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVmp5V8iDc/xo5BeWtewibZvp8HPH4ZJMzqhgQ8rk46+1f+5qPGx3hHUqQ4WqfhDpoG1gReEtw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzgXVjAqUCtlWSw66t3OvlalJGR4tTm5f5OVCMDs4UDpyrl3oy4
-	Sq0RLDPp7V1JxrRXJ09Slyz+ZRBBZbnI3DZ3wl85hzjNnpOdzcsfwO+G+ng2LWVnFzek7X81EiK
-	XxrNZ6yZ91MgGWVdt9P+qxk+XLwNl4YC6LCikUA==
-X-Google-Smtp-Source: AGHT+IERALXckroa9H9wtBfFLwXEcQL525RIETUMpbqoyMAnjF9yZNCHsaFTftdbxaN4KRPpPN9q1vw89+BTyseQZR0=
-X-Received: by 2002:a05:6402:4022:b0:5c9:816e:45d with SMTP id
- 4fb4d7f45d1cf-5cbbf8ca1aamr19516036a12.17.1730379589860; Thu, 31 Oct 2024
- 05:59:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Klt25/4f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21AF2C4FEA5;
+	Thu, 31 Oct 2024 13:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730380240;
+	bh=oCQiTJLRfPp/6kPFjAHkgEl5HJsM0xhf/6uOgNP0GPg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Klt25/4fLBa+ebQ48URjP1Bl5DC4C2QXhEVRMI7tAq8dXgtymsVOogxOZU5l3ewjy
+	 jcuN9l+iXIArQK6Qc+2QXaoFOh0iq7hzThGWCCVwsr9JfR0Wfdb9z4lUofCb01WQ4M
+	 KBJN6ivvgEc5SOokNIvFzd/ex3JiM8kBc8XHMLOU1BiYhBSPClB+wHTWKBxcPzs0Ga
+	 FWKw9pabfgD5vkMxCHypLRTpIFN5NfkCcJPLUPELXWaUpQraqiZWvrn/6YOiEiup4U
+	 xR068vDSFN29ktWMKNPUz5MahwG+ue7GXdkMUB4g3C6LaLWtJff9cOc5WqcMn4Zx7w
+	 QZ6SzL1VHDSFQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t6Uwf-008ZOj-Sr;
+	Thu, 31 Oct 2024 13:10:37 +0000
+Date: Thu, 31 Oct 2024 13:10:37 +0000
+Message-ID: <86ttcs1kqa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	anshuman.khandual@arm.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	shameerali.kolothum.thodi@huawei.com,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v6 5/7] KVM: arm64: Add a macro for creating filtered sys_reg_descs entries
+In-Reply-To: <20241030160317.2528209-6-joey.gouly@arm.com>
+References: <20241030160317.2528209-1-joey.gouly@arm.com>
+	<20241030160317.2528209-6-joey.gouly@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-22-eric.auger@redhat.com> <ZxuZkUFz_bwAA1pf@redhat.com>
- <0700af51-a1a6-4b11-a4bf-0eaf6e279c6d@redhat.com> <Zxudl5-fZV1vIaEL@redhat.com>
- <87y128nrfr.fsf@redhat.com> <Zx-3OUioG1l47hW3@redhat.com> <87plnknqco.fsf@redhat.com>
- <ZyN3A6dAEDkx51yb@pinwheel>
-In-Reply-To: <ZyN3A6dAEDkx51yb@pinwheel>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Oct 2024 12:59:38 +0000
-Message-ID: <CAFEAcA_1R+xf-nBKCM7JDuNj7sLCA4KUjen6kPAng+1yjwHRrw@mail.gmail.com>
-Subject: Re: [RFC 21/21] arm/cpu-features: Document custom vcpu model
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, 
-	qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, 
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev, 
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, 
-	abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, 
-	mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, anshuman.khandual@arm.com, gshan@redhat.com, james.morse@arm.com, shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 31 Oct 2024 at 12:24, Kashyap Chamarthy <kchamart@redhat.com> wrote=
-:
->
-> On Mon, Oct 28, 2024 at 05:29:11PM +0100, Cornelia Huck wrote:
-> > On Mon, Oct 28 2024, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrot=
-e:
->
-> [...]
->
-> > >> We could consolidate that to the current "host" model, once we figur=
-e
-> > >> out how to handle the currently already existing properties. Models
-> > >> based on the different architecture extensions would probably be mor=
-e
-> > >> useable in the long run; maybe "custom" has a place for testing.
-> > >
-> > > If you can set the features against "host", then any testing could
-> > > be done with "host" surely, making 'custom' pointless ?
-> >
-> > We might differentiate between "do some consistency checks" and "allow
-> > a completely weird wolpertinger"; if we agree that we don't need it,
-> > then we surely could drop it again.
->
-> Yeah, FWIW, I agree that it's best to drop "custom" if all the
-> meaningful tests can be handled by being able to add/remove CPU flags
-> from `-cpu host`.
->
->
-> Related: I don't see any mention of `-cpu max` here.  Is it not
-> relevant?  It is currently defined as: "enables all features supported
-> by the accelerator in the current host".  Does it make sense for `max`
-> to allow disabling features?  Or is the idea that, why would you choose
-> `-cpu max` if you want to disable features?
+On Wed, 30 Oct 2024 16:03:15 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> From: James Morse <james.morse@arm.com>
+> 
+> The sys_reg_descs array holds function pointers and reset value for
+> managing the user-space and guest view of system registers. These
+> are mostly created by a set of macro's as only some combinations
+> of behaviour are needed.
+> 
+> If a register needs special treatment, its sys_reg_descs entry is
+> open-coded. This is true of some id registers where the value provided
+> by user-space is validated by some helpers.
+> 
+> Before adding another one of these, add a helper that covers the
+> existing special cases. 'ID_FILTERED' expects helpers to set the
+> user-space value, and retrieve the modified reset value.
+> 
+> Like ID_WRITABLE() this uses id_visibility(), which should have no functional
+> change for the registers converted to use ID_FILTERED().
+> 
+> read_sanitised_id_aa64dfr0_el1() and read_sanitised_id_aa64pfr0_el1() have been
+> refactored to be called kvm_read_sanitised_id_reg(), to try be consistent with
 
-Ideally, disabling features would work with any '-cpu' option
-(including our existing TCG CPUs). (The main reason for 'max'
-is as an option that works whether you're using TCG or KVM.)
+nit: called *from*?
 
--- PMM
+> ID_WRITABLE().
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
