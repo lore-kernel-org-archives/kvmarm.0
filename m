@@ -1,89 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DBF197A98;
-	Thu, 31 Oct 2024 12:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E08F14831D
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 12:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730376983; cv=none; b=PzGWXV/beEuOTSy1Ln3G8q7CXwpaMac45MHV3jxlKZ15VyxyOI90Ij5SHhBMBa5m1pGCrL8Qw1JFEVzH2qj5kWROqnx0eiTWoI4+gEQSS2A9t4da4MBqXX/JsTRgcqQI9QLPQyDJFA68lHTEmtsW0c36HGYz6jer/TW3wmqBDxo=
+	t=1730377499; cv=none; b=HSATQ1yc2au3Zt0Zux6jZHGhnNv3CUnLGAu+81qyzV1RlA1k4on9c+Kr/warsu4J2Zh5S73Yp9yqYMsDKP2wRcHz1FgJagzMHB8ZB8/Y5Byvou4mcquyIckVrZS90QpNEJdTQa3wbP5djpxDHliUuGp68hyeXSWijuWqmjJX1po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730376983; c=relaxed/simple;
-	bh=iQGVGvRF/LkxBjhmqD2B6338yEqS/Vx5HBYv3jadCfI=;
+	s=arc-20240116; t=1730377499; c=relaxed/simple;
+	bh=7pY9J1Iu0lH0K5ZdbZSF+gcGKaKyI6cKR5hTn64G7C8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EUMFBUEgOHoffpMxfkjSsLdZFw9CTwQSwCUHw5RdxOmzBquMo3boyMBC92G4a51u4nMBtUx+vE6KW2SoV9MzvBAch7J/WnqNte07mMnQK9+1cFKHYZ21b7qFFysNM1vQOCp+3F4KRYZw1bBan8So58YBvn42qXAEoz7eQDPJjkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 573A1C4CEF5;
-	Thu, 31 Oct 2024 12:16:18 +0000 (UTC)
-Date: Thu, 31 Oct 2024 12:16:16 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	Miguel Luis <miguel.luis@oracle.com>
-Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for
- hibernate
-Message-ID: <ZyN1EMPCjdX7zZSB@arm.com>
-References: <20241019172459.2241939-1-dwmw2@infradead.org>
- <20241019172459.2241939-7-dwmw2@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1xKkTimWaW7PVefRqwhot3OcRJd0h32v1O5fKfYmK1xTVspM7GU4hZnXL7OgCH/U3R2az5AnSBZ5/VlA8q3FOKP59lcRcNiluvegaRPAynfqVO3XgfvmgKhgnhb5LVn/4xcB8SbxnXcSlgGzmphkY+FXsndQxUPSimTX2nHJnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZGgIgDWh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZGgIgDWh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730377495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KPd7oDcX9eG7TVtE1AQlSacTh7/i7Z+qfMhr0px/qxo=;
+	b=ZGgIgDWhagVF6sp3UOaBpAWT8idhmdTj3LOnb3CwzIshuvk/CJQbo9Nz3puDnEvKiBuQMY
+	nJ4nW2t5ZL5tYYaX9z3B9a5K5LVLCg3zgIT8ivclrhhV6bSLnl1640HTYxf/WbRsTCQLkp
+	oQeKHAkfFWdj8DtpLqs0+RjIymXMQts=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-oLV_MKhvOJit6ANUPC0mtw-1; Thu,
+ 31 Oct 2024 08:24:51 -0400
+X-MC-Unique: oLV_MKhvOJit6ANUPC0mtw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 562F919560BC;
+	Thu, 31 Oct 2024 12:24:48 +0000 (UTC)
+Received: from pinwheel (unknown [10.39.194.127])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB1821956054;
+	Thu, 31 Oct 2024 12:24:40 +0000 (UTC)
+Date: Thu, 31 Oct 2024 13:24:37 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+	qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org, richard.henderson@linaro.org,
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [RFC 21/21] arm/cpu-features: Document custom vcpu model
+Message-ID: <ZyN3A6dAEDkx51yb@pinwheel>
+References: <20241025101959.601048-1-eric.auger@redhat.com>
+ <20241025101959.601048-22-eric.auger@redhat.com>
+ <ZxuZkUFz_bwAA1pf@redhat.com>
+ <0700af51-a1a6-4b11-a4bf-0eaf6e279c6d@redhat.com>
+ <Zxudl5-fZV1vIaEL@redhat.com>
+ <87y128nrfr.fsf@redhat.com>
+ <Zx-3OUioG1l47hW3@redhat.com>
+ <87plnknqco.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241019172459.2241939-7-dwmw2@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87plnknqco.fsf@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Sat, Oct 19, 2024 at 06:15:47PM +0100, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> The PSCI v1.3 specification adds support for a SYSTEM_OFF2 function
-> which is analogous to ACPI S4 state. This will allow hosting
-> environments to determine that a guest is hibernated rather than just
-> powered off, and handle that state appropriately on subsequent launches.
-> 
-> Since commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and
-> poweroff") the EFI shutdown method is deliberately preferred over PSCI
-> or other methods. So register a SYS_OFF_MODE_POWER_OFF handler which
-> *only* handles the hibernation, leaving the original PSCI SYSTEM_OFF as
-> a last resort via the legacy pm_power_off function pointer.
-> 
-> The hibernation code already exports a system_entering_hibernation()
-> function which is be used by the higher-priority handler to check for
-> hibernation. That existing function just returns the value of a static
-> boolean variable from hibernate.c, which was previously only set in the
-> hibernation_platform_enter() code path. Set the same flag in the simpler
-> code path around the call to kernel_power_off() too.
-> 
-> An alternative way to hook SYSTEM_OFF2 into the hibernation code would
-> be to register a platform_hibernation_ops structure with an ->enter()
-> method which makes the new SYSTEM_OFF2 call. But that would have the
-> unwanted side-effect of making hibernation take a completely different
-> code path in hibernation_platform_enter(), invoking a lot of special dpm
-> callbacks.
-> 
-> Another option might be to add a new SYS_OFF_MODE_HIBERNATE mode, with
-> fallback to SYS_OFF_MODE_POWER_OFF. Or to use the sys_off_data to
-> indicate whether the power off is for hibernation.
-> 
-> But this version works and is relatively simple.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+On Mon, Oct 28, 2024 at 05:29:11PM +0100, Cornelia Huck wrote:
+> On Mon, Oct 28 2024, Daniel P. Berrangé <berrange@redhat.com> wrote:
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+[...]
+
+> >> We could consolidate that to the current "host" model, once we figure
+> >> out how to handle the currently already existing properties. Models
+> >> based on the different architecture extensions would probably be more
+> >> useable in the long run; maybe "custom" has a place for testing.
+> >
+> > If you can set the features against "host", then any testing could
+> > be done with "host" surely, making 'custom' pointless ?
+> 
+> We might differentiate between "do some consistency checks" and "allow
+> a completely weird wolpertinger"; if we agree that we don't need it,
+> then we surely could drop it again.
+
+Yeah, FWIW, I agree that it's best to drop "custom" if all the
+meaningful tests can be handled by being able to add/remove CPU flags
+from `-cpu host`.
+
+
+Related: I don't see any mention of `-cpu max` here.  Is it not
+relevant?  It is currently defined as: "enables all features supported
+by the accelerator in the current host".  Does it make sense for `max`
+to allow disabling features?  Or is the idea that, why would you choose
+`-cpu max` if you want to disable features?  In that case, go with
+either:
+
+    -cpu host,feat1=off
+
+Or:
+
+    -cpu some_future_named_model,$feat1=off
+
+?
+
+-- 
+/kashyap
+
