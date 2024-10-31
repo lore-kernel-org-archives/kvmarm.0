@@ -1,117 +1,342 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E08F14831D
-	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 12:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662CD19D06B
+	for <kvmarm@lists.linux.dev>; Thu, 31 Oct 2024 12:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730377499; cv=none; b=HSATQ1yc2au3Zt0Zux6jZHGhnNv3CUnLGAu+81qyzV1RlA1k4on9c+Kr/warsu4J2Zh5S73Yp9yqYMsDKP2wRcHz1FgJagzMHB8ZB8/Y5Byvou4mcquyIckVrZS90QpNEJdTQa3wbP5djpxDHliUuGp68hyeXSWijuWqmjJX1po=
+	t=1730378026; cv=none; b=hqoBiGbgG7TzbHJwtMg8+TlKUHmB6Zg9HwU4ssqGmY2qqciwymr1sL4P5k9drtSb9ECE9EdVBmnwF953SQFyryzeTKRSk+pPrMSuIeOrpNkrTpdwJEHE3WrFIyNjLJn6tEI12XrzpESuvFJGtN7YMT+yVnrvTXcA6grxbYs4s1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730377499; c=relaxed/simple;
-	bh=7pY9J1Iu0lH0K5ZdbZSF+gcGKaKyI6cKR5hTn64G7C8=;
+	s=arc-20240116; t=1730378026; c=relaxed/simple;
+	bh=8CrmcwzpLaLCdcx9blbKDZvhEmp04d7QXZNMO5UaZYQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1xKkTimWaW7PVefRqwhot3OcRJd0h32v1O5fKfYmK1xTVspM7GU4hZnXL7OgCH/U3R2az5AnSBZ5/VlA8q3FOKP59lcRcNiluvegaRPAynfqVO3XgfvmgKhgnhb5LVn/4xcB8SbxnXcSlgGzmphkY+FXsndQxUPSimTX2nHJnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZGgIgDWh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=O1Qfljv3Iwfx3khtOPrr4RJ7xeaBLd3+9u3mZ8QpigDcBxwiEsPuCRPyifBAXnuJZrSV2LIgmCtf5WhLNvybPInyFlH6nrVCFyCIY3GGRyVlMYsdc/FMCtGzsiPSqYqRljqx+TQ0aQytIelWfdOEk4DudkEOb+wxp1fTuZbKKo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TvdXLacr; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZGgIgDWh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730377495;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TvdXLacr"
+Date: Thu, 31 Oct 2024 13:33:36 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730378020;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KPd7oDcX9eG7TVtE1AQlSacTh7/i7Z+qfMhr0px/qxo=;
-	b=ZGgIgDWhagVF6sp3UOaBpAWT8idhmdTj3LOnb3CwzIshuvk/CJQbo9Nz3puDnEvKiBuQMY
-	nJ4nW2t5ZL5tYYaX9z3B9a5K5LVLCg3zgIT8ivclrhhV6bSLnl1640HTYxf/WbRsTCQLkp
-	oQeKHAkfFWdj8DtpLqs0+RjIymXMQts=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-oLV_MKhvOJit6ANUPC0mtw-1; Thu,
- 31 Oct 2024 08:24:51 -0400
-X-MC-Unique: oLV_MKhvOJit6ANUPC0mtw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 562F919560BC;
-	Thu, 31 Oct 2024 12:24:48 +0000 (UTC)
-Received: from pinwheel (unknown [10.39.194.127])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB1821956054;
-	Thu, 31 Oct 2024 12:24:40 +0000 (UTC)
-Date: Thu, 31 Oct 2024 13:24:37 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-	qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org, richard.henderson@linaro.org,
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
-	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [RFC 21/21] arm/cpu-features: Document custom vcpu model
-Message-ID: <ZyN3A6dAEDkx51yb@pinwheel>
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-22-eric.auger@redhat.com>
- <ZxuZkUFz_bwAA1pf@redhat.com>
- <0700af51-a1a6-4b11-a4bf-0eaf6e279c6d@redhat.com>
- <Zxudl5-fZV1vIaEL@redhat.com>
- <87y128nrfr.fsf@redhat.com>
- <Zx-3OUioG1l47hW3@redhat.com>
- <87plnknqco.fsf@redhat.com>
+	bh=p1/kyrg1vsJnmp1WoqLw5/oFjzTz8r5Ey+mYGTnUMKw=;
+	b=TvdXLacryxiQvPIeY3Ccvb0ok6NHcjOxF7/WnAgRByiDVrZp2vC1hcO32QstkPFSunL4xc
+	ERf7Ottny9+s2yxCxw8TMgciCRMTOzLC2tPmHCp54xAcMNgDLWT3l5dwoAu0SeMVKbLjO1
+	TZ+z1LObRm1beBzGQ8gsZqVaGj2JT9E=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, atishp@rivosinc.com, jamestiotio@gmail.com, 
+	eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 1/2] lib/on-cpus: Correct and simplify
+ synchronization
+Message-ID: <20241031-302ceb33f928a3fcd37adf87@orel>
+References: <20241023131718.117452-4-andrew.jones@linux.dev>
+ <20241023131718.117452-5-andrew.jones@linux.dev>
+ <ZxuMzrEMxE/lnwtK@arm.com>
+ <20241029-1d35ce0dbbea4d21b56209dc@orel>
+ <ZyIPFb0e39DZXquU@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87plnknqco.fsf@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <ZyIPFb0e39DZXquU@raptor>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 28, 2024 at 05:29:11PM +0100, Cornelia Huck wrote:
-> On Mon, Oct 28 2024, Daniel P. Berrangé <berrange@redhat.com> wrote:
-
-[...]
-
-> >> We could consolidate that to the current "host" model, once we figure
-> >> out how to handle the currently already existing properties. Models
-> >> based on the different architecture extensions would probably be more
-> >> useable in the long run; maybe "custom" has a place for testing.
-> >
-> > If you can set the features against "host", then any testing could
-> > be done with "host" surely, making 'custom' pointless ?
+On Wed, Oct 30, 2024 at 10:48:53AM +0000, Alexandru Elisei wrote:
+> Hi Drew,
 > 
-> We might differentiate between "do some consistency checks" and "allow
-> a completely weird wolpertinger"; if we agree that we don't need it,
-> then we surely could drop it again.
+> On Tue, Oct 29, 2024 at 11:56:58AM +0100, Andrew Jones wrote:
+> > On Fri, Oct 25, 2024 at 01:19:26PM +0100, Alexandru Elisei wrote:
+> > > Hi Drew,
+> > > 
+> > > I've been paging in all the on_cpu* machinery, and it occurred to me that
+> > > we have a chance to simplify the code and to remove a duplicate interface
+> > > by not exposing smp_boot_secondary() to the tests, as the on_cpu* functions
+> > > serve the same purpose. With this change, we can remove the entry argument
+> > > to smp_boot_secondary(), and the assembly for secondary_entry can be made
+> > > simpler by eliminating the branch to the entry function.
+> > 
+> > You're right that smp_boot_secondary() doesn't appear to getting use, but
+> > a goal for the library code is to be useful and with defaults that will
+> > satisfy nearly all unit tests, but to never restrict a unit test to
+> > having to use it. Exposing calls like smp_boot_secondary() give unit tests
+> > the ability to eliminate as much library code as possible from their paths
+> > without having to duplicate the few lines needed to "boot" a secondary.
+> 
+> Yep, that makes sense.
+> 
+> > 
+> > > 
+> > > Do you think that would be something worth pursuing? I can have a look at
+> > > it.
+> > > 
+> > > There are exactly two places where smp_boot_secondary() is used: in
+> > > arm/psci.c and arm/gic.c, and from a quick glance it looks to me like those
+> > > can be replaced with one of the on_cpu* functions.
+> > > 
+> > > On Wed, Oct 23, 2024 at 03:17:20PM +0200, Andrew Jones wrote:
+> > > > get/put_on_cpu_info() were trying to provide per-cpu locking for
+> > > > the per-cpu on_cpu info, but they were flawed since they would
+> > > > always set the "lock" since they were treating test_and_set/clear
+> > > > as cmpxchg (which they're not). Just revert to a normal spinlock
+> > > 
+> > > Would you mind expanding on that a bit more?
+> > > 
+> > > From my understanding of the code, on arm64, this is the call chain that I get
+> > > for get_on_cpu_info(cpu):
+> > > 
+> > >   ->get_on_cpu_info(cpu):
+> > >     ->!cpumask_test_and_set(cpu, on_cpu_info_lock)
+> > >       ->!test_and_set_bit(cpu, on_cpu_info_lock->bits):
+> > >          return (old & mask) != 0;
+> > > 
+> > > 'mask' always has the CPU bit set, which means that get_on_cpu_info() returns
+> > > true if and only if 'old' has the bit clear. I think that prevents a thread
+> > > getting the lock if it's already held, so from that point of view it does
+> > > function as a per target cpu spinlock. Have I misunderstood something?
+> > 
+> > No, you're right, and thanks for reminding me of the thought process I
+> > used when I wrote get/put_on_cpu_info() in the first place :-) While
+> > trying to simplify things, I just got fed up with staring at it and
+> > reasoning about it, so I threw my hands up and went back to a good ol'
+> > lock. Now that you've convinced me [again] that the test-and-set isn't
+> > flawed, we could keep it, but...
+> > 
+> > > 
+> > > Regardless of the above, on_cpu_async() is used like this:
+> > > 
+> > > on_cpu_async()
+> > > wait_for_synchronization()
+> > > 
+> > > so it doesn't make much sense to optimize for performance for the case were
+> > > multiple threads call on_cpu_async() concurrently, as they would need to
+> > > have to wait for synchronization anyway.
+> > 
+> > ...even though on_cpu_async() has a wait part, it only waits (outside the
+> > lock) for the target cpu to be idle. If all targets are idle already, and
+> > we have more than one "launcher" cpu, then we could launch tests on all
+> > the targets more-or-less simultaneously with percpu locks, but...
+> 
+> Ahah, that's very interesting, hadn't though about it that way.
+> 
+> Another interesting thing here is that the glanularity for ATOMIC_TESTOP is
+> 8 * 8 = 64 bits, because LDXR loads from an 8 byte address, which is then
+> marked for exclusive access. I think that means that in the end, if you
+> have less than 64 CPUs, then the per-cpu spinlock will end looking similar
+> to a spinlock.
+> 
+> > 
+> > > 
+> > > So yes, I'm totally in favour for replacing the per-cpu spinlock with a global
+> > > spinlock, even if the only reason is simplifying the code.
+> > 
+> > ...simplifying the code is probably the better choice since the critical
+> > section is so small that sharing a lock really shouldn't matter much and
+> > even some contention test which needs to run simultaneously on several
+> > cpus should use looping rather than rely on a simultaneous launch.
+> 
+> Yes, please use a spinlock here.
+> 
+> > 
+> > > 
+> > > > to correct it. Also simplify the break case for on_cpu_async() -
+> > > > we don't care if func is NULL, we only care that the cpu is idle.
+> > > 
+> > > That makes sense.
+> > > 
+> > > > And, finally, add a missing barrier to on_cpu_async().
+> > > 
+> > > Might be worth explaining in the commit message why it was missing. Just in
+> > > case someone is looking at the code and isn't exactly sure why it's there.
+> > 
+> > Sure. I think the reason it's missing is because when 018550041b38 changed
+> > from spinlock to put_on_cpu_info(), the release was also moved below the
+> > clearing of idle. Prior to that, the spin_unlock() was acting as barrier.
+> > With the move of where the release was done a barrier should have been
+> > added.
+> > 
+> > > 
+> > > > 
+> > > > Fixes: 018550041b38 ("arm/arm64: Remove spinlocks from on_cpu_async")
+> > > > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> > > > ---
+> > > >  lib/on-cpus.c | 36 +++++++++++-------------------------
+> > > >  1 file changed, 11 insertions(+), 25 deletions(-)
+> > > > 
+> > > > diff --git a/lib/on-cpus.c b/lib/on-cpus.c
+> > > > index 892149338419..f6072117fa1b 100644
+> > > > --- a/lib/on-cpus.c
+> > > > +++ b/lib/on-cpus.c
+> > > > @@ -9,6 +9,7 @@
+> > > >  #include <on-cpus.h>
+> > > >  #include <asm/barrier.h>
+> > > >  #include <asm/smp.h>
+> > > > +#include <asm/spinlock.h>
+> > > >  
+> > > >  bool cpu0_calls_idle;
+> > > >  
+> > > > @@ -18,18 +19,7 @@ struct on_cpu_info {
+> > > >  	cpumask_t waiters;
+> > > >  };
+> > > >  static struct on_cpu_info on_cpu_info[NR_CPUS];
+> > > > -static cpumask_t on_cpu_info_lock;
+> > > > -
+> > > > -static bool get_on_cpu_info(int cpu)
+> > > > -{
+> > > > -	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
+> > > > -}
+> > > > -
+> > > > -static void put_on_cpu_info(int cpu)
+> > > > -{
+> > > > -	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
+> > > > -	assert(ret);
+> > > > -}
+> > > > +static struct spinlock lock;
+> > > >  
+> > > >  static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
+> > > >  {
+> > > > @@ -81,18 +71,14 @@ void do_idle(void)
+> > > >  	if (cpu == 0)
+> > > >  		cpu0_calls_idle = true;
+> > > >  
+> > > > -	set_cpu_idle(cpu, true);
+> > > > -	smp_send_event();
+> > > > -
+> > > >  	for (;;) {
+> > > > +		set_cpu_idle(cpu, true);
+> > > > +		smp_send_event();
+> > > > +
+> > > >  		while (cpu_idle(cpu))
+> > > >  			smp_wait_for_event();
+> > > >  		smp_rmb();
+> > > >  		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
+> > > > -		on_cpu_info[cpu].func = NULL;
+> > > > -		smp_wmb();
+> > > 
+> > > I think the barrier is still needed. The barrier orderered the now removed
+> > > write func = NULL before the write set_cpu_idle(), but it also orderered
+> > > whatever writes func(data) performed before set_cpu_idle(cpu, true). This
+> > > matters for on_cpu(), where I think it's reasonable for the caller to
+> > > expect to observe the writes made by 'func' after on_cpu() returns.
+> > > 
+> > > If you agree that this is the correct approach, I think it's worth adding a
+> > > comment explaining it.
+> > 
+> > I think that's reasonable (along with adding smp_rmb()'s to the bottom of
+> > on_cpu() and on_cpumask()). So the idea is we have
+> 
+> I don't think adding smp_rmb() to on_cpu() and on_cpumask() is strictly
+> necessary, because cpumask_set_cpu()->set_bit() already has a smp_mb().
+> 
+> > 
+> >  cpu1                                         cpu2
+> >  ----                                         ----
+> >  func() /* store something */                 /* wait for cpu1 to be idle */
+> >  smp_wmb();                                   smp_rmb();
+> >  set_cpu_idle(smp_processor_id(), true);      /* load what func() stored */
+> > 
+> 
+> Just one small thing here, so it's even more precise what is being ordered:
+> the smp_rmb() on cpu2 orders the read from cpu_online_mask() before the
+> load from what func() stored.
 
-Yeah, FWIW, I agree that it's best to drop "custom" if all the
-meaningful tests can be handled by being able to add/remove CPU flags
-from `-cpu host`.
+Right (except s/cpu_online_mask/cpu_idle_mask/)
 
+> 
+> > > 
+> > > > -		set_cpu_idle(cpu, true);
+> > > > -		smp_send_event();
+> > > >  	}
+> > > >  }
+> > > >  
+> > > > @@ -110,17 +96,17 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
+> > > >  
+> > > >  	for (;;) {
+> > > >  		cpu_wait(cpu);
+> > > > -		if (get_on_cpu_info(cpu)) {
+> > > > -			if ((volatile void *)on_cpu_info[cpu].func == NULL)
+> > > > -				break;
+> > > > -			put_on_cpu_info(cpu);
+> > > > -		}
+> > > > +		spin_lock(&lock);
+> > > > +		if (cpu_idle(cpu))
+> > > > +			break;
+> > > > +		spin_unlock(&lock);
+> > > >  	}
+> > > >  
+> > > >  	on_cpu_info[cpu].func = func;
+> > > >  	on_cpu_info[cpu].data = data;
+> > > > +	smp_wmb();
+> > > 
+> > > Without this smp_wmb(), it is possible for the target CPU to read an
+> > > outdated on_cpu_info[cpu].data. So adding it is the right thing to do,
+> > > since it orders the writes to on_cpu_info before set_cpu_idle().
+> > > 
+> > > >  	set_cpu_idle(cpu, false);
+> > > > -	put_on_cpu_info(cpu);
+> > > > +	spin_unlock(&lock);
+> > > >  	smp_send_event();
+> > > 
+> > > I think a DSB is necessary before all the smp_send_event() calls in this
+> > > file. The DSB ensures that the stores to cpu_idle_mask will be observed by
+> > > the thread that is waiting on the WFE, otherwise it is theoretically
+> > > possible to get a deadlock (in practice this will never happen, because KVM
+> > > will be generating the events that cause WFE to complete):
+> > > 
+> > > CPU0: on_cpu_async():		CPU1: do_idle():
+> > > 
+> > > load CPU1_idle = true
+> > > //do stuff
+> > > store CPU1_idle=false
+> > > SEV
+> > > 				1: WFE
+> > > 				   load CPU1_idle=true // old value, allowed
+> > > 				   b 1b // deadlock
+> > 
+> > Good catch. Can you send a patch for that? The patch should be for the arm
+> > implementations of smp_send_event() (and smp_wait_for_event()?) in
+> > lib/arm/asm/smp.h.
+> 
+> Sure, I can do that. Should I wait until this series gets merged?
 
-Related: I don't see any mention of `-cpu max` here.  Is it not
-relevant?  It is currently defined as: "enables all features supported
-by the accelerator in the current host".  Does it make sense for `max`
-to allow disabling features?  Or is the idea that, why would you choose
-`-cpu max` if you want to disable features?  In that case, go with
-either:
+You can send now. I'll sort things out when merging.
 
-    -cpu host,feat1=off
+> 
+> Also, I don't think smp_wait_for_event() needs a barrier - a wmb() before
+> smp_send_event() will make sure that all stores have **completed** before
+> smp_send_event() is executed, so on the waiting CPU all the stores will be
+> visible.
+> 
+> Using a smp_wmp() (or smp_mb()) will not work, because smp_send_event() is
+> not a memory operation, and the smp_* primitives won't order the memory
+> accesses against it.
 
-Or:
+Thanks. That's all good stuff for the commit message of the patch.
 
-    -cpu some_future_named_model,$feat1=off
+> 
+> > 
+> > > 
+> > > Also, it looks unusual to have smp_send_event() unpaired from set_cpu_idle().
+> > > Can't really point to anything being wrong about it though.
+> > 
+> > You mean due to the spin_unlock() separating the set_cpu_idle() and
+> > smp_send_event()? We could put the spin_unlock() above the set_cpu_idle()
+> > (as it was in 018550041b38, which also removes the need for the wmb), but
+> > I think I like it the way it is now better for better readability. I
+> > also can't think of why it would matter for them to be unpaired.
+> 
+> Then choose whatever looks best for you :)
+>
 
-?
+Thanks. I'll send v2 shortly.
 
--- 
-/kashyap
-
+drew
