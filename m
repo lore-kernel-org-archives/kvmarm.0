@@ -1,105 +1,89 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764C41C9B71
-	for <kvmarm@lists.linux.dev>; Fri,  1 Nov 2024 16:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0AA1C8FD3
+	for <kvmarm@lists.linux.dev>; Fri,  1 Nov 2024 16:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730477505; cv=none; b=HpDIFM4BTaHrRx53ruDfggjtOjbv2QkScTx2vpxSKfPXhTXYn0+aTrfStpIwGlYuiMoY6//B8xLUrGxmgnDuqlqIKZJ/y7dHTrYzM6Ej/W7w53WnO6aRYfIpwsHftaMXo4s7y6dsoduR988aAPAQyARIRlWhmM+OUe+Q9LnDWmw=
+	t=1730477542; cv=none; b=DMUzPb2JDLXvuQ4tEB+uT/wj4Q7+73E0xuJD5hyP1/ofowsIYJ9gGtF+mQYwXnBaq6qN6RjhYoTg7b8hiBWcjLw+EPmc6BuEKegAhgsI+fn0n+F3+KG/X8z46K0VmILotS9nObgacF32HudgrbukRjGKp7Li3v4gOhM7lqpvhQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730477505; c=relaxed/simple;
-	bh=id8OVgJgAMs247VB55MtiU8AC4vmdW1ZedyeKlhQlFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cMl7yUM/6o0CAPj0dc2rxzpTAhqx+CsWhHZUcNena0ou+yljflBwckTz0KKKRjN0bg/0hNia6yC0Sp/pWcHMl0+M8dJbyqEzeXIMxh5ayUTrnJ4Kwn8/7jkiWVn3ab3h/HRivCDW+uixp+tDdx08yeepXtmVkcZuUeGWOaX8y6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t+7ZZb8Q; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1730477542; c=relaxed/simple;
+	bh=TVuhYAYnXLWMtXGZ18MTvfH6mL7QYNFn42tBocwQErM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lS0bJbW/fv3C1fpJPRukyMYsA9rttuxBooSf06ztj/WFxZY3Jfc2SAF2xi2BArP/GLCTPmDcA1EFrDyOd9AHpT2kNPIly3P4K6LfsdLlY6bo0C2LJ8+JqqqYBxeCVUbcFH6Plw9kaEiVEbyxP4BKFnoVD8beeM0uvj8ksb3oGO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a00E/O/E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t+7ZZb8Q"
-Date: Fri, 1 Nov 2024 09:11:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730477501;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tyTpg0lhlDGimy0ZvEFKhDPpfFFUWK/X72leUPUldo0=;
-	b=t+7ZZb8QkkiZMjWQXqf/2w9UWEZZ80XpBkF5UWSotFyMMCpQvxO+Ol6L1m097f5XvORbXi
-	K4+CWGnk3tCVvjVR5h+fGMU59MESJ99/eJkLZYySXFlBVyIvx6MCcONQ29QfpCQsZtEPzB
-	PjqX2uKrHQb2zbKSykrFjXm9JtGxBbA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Andrew Jones <ajones@ventanamicro.com>,
-	James Houghton <jthoughton@google.com>,
-	David Woodhouse <dwmw@amazon.co.uk>, linux-next@vger.kernel.org
-Subject: Re: [PATCH v3 03/14] KVM: selftests: Return a value from
- vcpu_get_reg() instead of using an out-param
-Message-ID: <ZyT9rSnLcDWkWoL_@linux.dev>
-References: <20241009154953.1073471-1-seanjc@google.com>
- <20241009154953.1073471-4-seanjc@google.com>
- <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
- <ZyTpwwm0s89iU9Pk@google.com>
- <ZyT2CB6zodtbWEI9@linux.dev>
- <ZyT61FF0-g8gKZfc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a00E/O/E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27455C4CECD;
+	Fri,  1 Nov 2024 16:12:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730477542;
+	bh=TVuhYAYnXLWMtXGZ18MTvfH6mL7QYNFn42tBocwQErM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=a00E/O/E9aSQJgH5engtiL0O1dYSYV0bRJAsx4iEjEVTMFIYZrFExz5kbWXk2zuYX
+	 a0huvqQknbX9AAQyR6+ddrb6+Hw3kNSnYHRdfXINYJizmTkrVbvuHCFfMqCbT01LXE
+	 iwHEwfUdlCJjypQGnHXGjLoUpZx0awSdaYRTCYikFQYguIUhJSZRuwfdMcE5PbVo2o
+	 VNAAyykejS26AdqCy0RDj0hthQBLoZi3AaUhD37ciNXEoCjCLU8HoGZHQJW99sxWmF
+	 H6buxtiyHqUBYAJG9UuOi/TzGrqPI/bY1LwGi4LuMu/fiBXZA1RAp4B5pokhw2slCd
+	 vEdlSALGNUj5w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t6uG2-008v73-EX;
+	Fri, 01 Nov 2024 16:12:18 +0000
+Date: Fri, 01 Nov 2024 16:12:18 +0000
+Message-ID: <86msij0w7x.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] arm64: Expose ID_AA64ISAR1_EL1.XS to sanitised feature consumers
+In-Reply-To: <ZyT1Tblp624a79CD@arm.com>
+References: <20241031083519.364313-1-maz@kernel.org>
+	<ZyT1Tblp624a79CD@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZyT61FF0-g8gKZfc@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Nov 01, 2024 at 08:59:16AM -0700, Sean Christopherson wrote:
-> > Can you instead just push out a topic branch and let the affected
-> > maintainers deal with it? This is the usual way we handle conflicts
-> > between trees...
+On Fri, 01 Nov 2024 15:35:41 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> That'd work too, but as you note below, doing that now throws a wrench in things
-> because essentially all arch maintainers would need merge that topic branch,
-> otherwise linux-next would end up in the same state.
-
-TBH, I'm quite happy with that. Recent history has not been particularly
-convinincing to me that folks are actually testing arm64, let alone
-compiling for it when applying selftests patches.
-
-Otherwise, the alternative of respinning the global change for every -next
-breakage adds a decent amount of toil and gives the wrong impression of how
-long our patches have actually been baking in -next.
-
-> > > That would be a good oppurtunity to do the $(ARCH) directory switch[*] too, e.g.
-> > > have a "selftests_late" or whatever topic branch.
+> On Thu, Oct 31, 2024 at 08:35:19AM +0000, Marc Zyngier wrote:
+> > Despite KVM now being able to deal with XS-tagged TLBIs, we still don't
+> > expose these feature bits to KVM.
 > > 
-> > The right time to do KVM-wide changes (even selftests) is *early* in the
-> > development cycle, not last minute. It gives us plenty of time to iron out
-> > the wrinkles.
+> > Plumb in the feature in ID_AA64ISAR1_EL1.
+> > 
+> > Fixes: 0feec7769a63 ("KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> Yeah, that was the original plan, then the stupid strict aliasing bug happened,
-> and I honestly forgot the vcpu_get_reg() changes would need to be consumed by
-> other architectures.
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 > 
-> Other than letting me forget about this mess a few weeks earlier, there's no
-> good reason to force this into 6.13.  So, I'll drop the series from 6.13, post
-> new versions of the this and the $(ARCH) series just before the merge window,
-> and then either send a pull request to Paolo for 6.14 as soon as the 6.13 merge
-> window closes, or ask/bribe Paolo to apply everything directly.
+> Happy for this to go in as a fix via the kvm tree but let me know if I
+> should pick it up instead.
 
-Sounds good, punting to 6.14 seems reasonable.
+No need to merge this urgently, nothing goes badly wrong.
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
