@@ -1,54 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D511B1C2DB2
-	for <kvmarm@lists.linux.dev>; Fri,  1 Nov 2024 15:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CAA25634
+	for <kvmarm@lists.linux.dev>; Fri,  1 Nov 2024 15:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730475345; cv=none; b=n/unbm/xVToWGZOZBWiZxqCdI6B1Wgr2h/xrJQuVFjvbyGa0SoT0MV9Wq6tP1xn5e9eazDtNmoO3QtAKvAPw2Qyidc8mdABriy0SfGybvLb5mFfKg3s0CRZmG+HFx/ubUqBgLzurcf2Tj0yOMdcCiXW8i4z8VlUrAycv85V7AE4=
+	t=1730475542; cv=none; b=NF6TF+fD+he4ISHqQoxue4BB+2vNagocyXm/pNN/XyEt/k8aTKFiEyUhJjfLcFVG7VPcVxAEVKHnq2qMjPOuERzLVbCl9FoimCu4SotuJd5yZuLSt8z8Gjg3wbu9ChJ8e34ktITVlIOCXQ7dJbgNa8ime9EvQw6KuRPleg00Czw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730475345; c=relaxed/simple;
-	bh=BxFgoTUQ6w+Bm6PuyHaApwu6r0DMuljI7mGA08Xiyh0=;
+	s=arc-20240116; t=1730475542; c=relaxed/simple;
+	bh=MGpG9+U1NcrPw89BaqJoGGpatnrkgpDjLgz7qBB/IOc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MYjbdY+v1op4VwcWt0eg23aRZbUClSHWEvt60VBc+5ysRbY5I36lN7S3Jc7OidDB7JA0Fhqpi/u7mJ4gza9R+fdSdBNh58TRq0jMlXyXt8oexuKiq4OLgI5Ec9GZCU8SN2I97ccijdURVV5jJfSM3Lg1Rr6GpAG+IOjjHefoWLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2FA3C4CECD;
-	Fri,  1 Nov 2024 15:35:43 +0000 (UTC)
-Date: Fri, 1 Nov 2024 15:35:41 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] arm64: Expose ID_AA64ISAR1_EL1.XS to sanitised feature
- consumers
-Message-ID: <ZyT1Tblp624a79CD@arm.com>
-References: <20241031083519.364313-1-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HmqBwBTsKlWy8jkVoO4ZgI8VwuLrJ1C5+SkFEDyAdsHrPw4aTXApwOr4JHQyfZ+6Xs45DbnSQk0m2aKEHDHDHyqV8LdJh890voDwxWixRm5ECWNF4XoW7BLJGcOH+5dR9RvfBvcvumS3/p/rgUhsT836VbihgMys3VlaMYYBwmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PClTnFcd; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PClTnFcd"
+Date: Fri, 1 Nov 2024 08:38:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730475537;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MDBDtrud5eJtuuxZyPOJXE2RSRr8v+TyeHi88AUx8RA=;
+	b=PClTnFcdIrcZ78W4jSshcODMfnNiSvNFtWKdgQXgVaJZCwGgQF3dDPomr/MvL2yA9B2Cwx
+	sIxnO1FBfdPS2fhSPK5ZXdGtgALWc9G1JWP6xyny1RXUjNkwgAnqURsd9JAi0B3Jon4w0B
+	kiA/rkElVf8i8EK1b4eQnPfLrgKPky8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Jones <ajones@ventanamicro.com>,
+	James Houghton <jthoughton@google.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, linux-next@vger.kernel.org
+Subject: Re: [PATCH v3 03/14] KVM: selftests: Return a value from
+ vcpu_get_reg() instead of using an out-param
+Message-ID: <ZyT2CB6zodtbWEI9@linux.dev>
+References: <20241009154953.1073471-1-seanjc@google.com>
+ <20241009154953.1073471-4-seanjc@google.com>
+ <39ea24d8-9dae-447a-ae37-e65878c3806f@sirena.org.uk>
+ <ZyTpwwm0s89iU9Pk@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241031083519.364313-1-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZyTpwwm0s89iU9Pk@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 31, 2024 at 08:35:19AM +0000, Marc Zyngier wrote:
-> Despite KVM now being able to deal with XS-tagged TLBIs, we still don't
-> expose these feature bits to KVM.
+Hey,
+
+On Fri, Nov 01, 2024 at 07:48:00AM -0700, Sean Christopherson wrote:
+> On Fri, Nov 01, 2024, Mark Brown wrote:
+> > On Wed, Oct 09, 2024 at 08:49:42AM -0700, Sean Christopherson wrote:
+> > > Return a uint64_t from vcpu_get_reg() instead of having the caller provide
+> > > a pointer to storage, as none of the vcpu_get_reg() usage in KVM selftests
+> > > accesses a register larger than 64 bits, and vcpu_set_reg() only accepts a
+> > > 64-bit value.  If a use case comes along that needs to get a register that
+> > > is larger than 64 bits, then a utility can be added to assert success and
+> > > take a void pointer, but until then, forcing an out param yields ugly code
+> > > and prevents feeding the output of vcpu_get_reg() into vcpu_set_reg().
+> > 
+> > This commit, which is in today's -next as 5c6c7b71a45c9c, breaks the
+> > build on arm64:
+> > 
+> > aarch64/psci_test.c: In function ‘host_test_system_off2’:
+> > aarch64/psci_test.c:247:9: error: too many arguments to function ‘vcpu_get_reg’
+> >   247 |         vcpu_get_reg(target, KVM_REG_ARM_PSCI_VERSION, &psci_version);
+> >       |         ^~~~~~~~~~~~
+> > In file included from aarch64/psci_test.c:18:
+> > include/kvm_util.h:705:24: note: declared here
+> >   705 | static inline uint64_t vcpu_get_reg(struct kvm_vcpu *vcpu, uint64_t id)
+> >       |                        ^~~~~~~~~~~~
+> > At top level:
+> > cc1: note: unrecognized command-line option ‘-Wno-gnu-variable-sized-type-not-at
+> > -end’ may have been intended to silence earlier diagnostics
+> > 
+> > since the updates done to that file did not take account of 72be5aa6be4
+> > ("KVM: selftests: Add test for PSCI SYSTEM_OFF2") which has been merged
+> > in the kvm-arm64 tree.
 > 
-> Plumb in the feature in ID_AA64ISAR1_EL1.
+> Bugger.  In hindsight, it's obvious that of course arch selftests would add usage
+> of vcpu_get_reg().
 > 
-> Fixes: 0feec7769a63 ("KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Unless someone has a better idea, I'll drop the series from kvm-x86, post a new
+> version that applies on linux-next, and then re-apply the series just before the
+> v6.13 merge window (rinse and repeat as needed if more vcpu_get_reg() users come
+> along).
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Can you instead just push out a topic branch and let the affected
+maintainers deal with it? This is the usual way we handle conflicts
+between trees...
 
-Happy for this to go in as a fix via the kvm tree but let me know if I
-should pick it up instead.
+> That would be a good oppurtunity to do the $(ARCH) directory switch[*] too, e.g.
+> have a "selftests_late" or whatever topic branch.
+
+The right time to do KVM-wide changes (even selftests) is *early* in the
+development cycle, not last minute. It gives us plenty of time to iron out
+the wrinkles.
+
+> Sorry for the pain Mark, you've been playing janitor for us too much lately.
+
++1, appreciate your help on this.
 
 -- 
-Catalin
+Thanks,
+Oliver
