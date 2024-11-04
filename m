@@ -1,136 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715E838389
-	for <kvmarm@lists.linux.dev>; Mon,  4 Nov 2024 13:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112B413633F
+	for <kvmarm@lists.linux.dev>; Mon,  4 Nov 2024 13:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730727231; cv=none; b=oWWt4qzrXWuDBClj8wXp4QJoA6SmREjlrmlG9Jjkj0esUMbDrnLn/mLdtvFLCDWaYlOfj+U7vLrmbXmbd/haQDlR4wm1+o2MBOgMzrm2NvzeWH0G1LKnNJg02yoUjgMQ4iO6MrG6W1M3XLoqx6J+7WG69LHtrcYF+MUTStGcmyU=
+	t=1730728467; cv=none; b=RNJGeo+48g5MNp+O+7VYMciM2OchzA1kck9ahzcEo2ZUsLg59vnFuJj/7u+90/FRmgCcAyJrH4SIkSzQTwKZ8wQ/HTQyM3tuZBil+vu5EOzUXION6SOj4QBXEn9pddc5vARB6xO7POJWwlZlkcB4Dmm1UWDNwWglUD0IwTBio0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730727231; c=relaxed/simple;
-	bh=2JqWxmFMiOy9u00xv7jOCwRGCdQcfxvKUiICVSDl4Sw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LBJm2aZAVY0GJs40/A8vdS9jGXfKacFbZWDm+Hd4TRcgpwn4RJNbGtQ3vc6xh5OhzXOGrYWBufJcObmpe8mW/JLw3T8X7i1eG/Q9wAPf8mPZmnn2vyGZDUIIyNKXHqKVaalmlck8DQCX7TMEhRgfiOvo97lFuptBH8ZQeFwU7B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MKPTQjs8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730728467; c=relaxed/simple;
+	bh=sZurbIwzYuS4yLWi6DkfdRraXzSZGcCRAs9+v0qzfrE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KBFyaQzISKaXg6IFeptik/cdyjeCyIz5nhhSJvfdjS9XGDBk+t8ChaCOghTizF7L9Cym88DCrnSIMrMfPyod7IiNLwSotgK6KAgnffQNZ9AUSmmP75LJRWXF02qXUdBD7uTmqIQNDQJrux2+EY/ROLtFxkqKyFJPg23rUGFQNLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5BDM4Xi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKPTQjs8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730727228;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bsKR/ZbSwcHqsurNqiuF+M7XrV5jICI7Kt7LjPLlYkQ=;
-	b=MKPTQjs8fm6Hb38DbWh1PV9DMWfzBNAbWDfpI+QtN5vkjm/CqMIV+HapN4xaV7tEY/mWpp
-	mYsUvnEqNvbudsCDe7fVot98xrs63T+zK7a/UWuiuW+4KefXntXngj9qR1V4IQ5dscTdCM
-	vXgjoNkhXlvtsR7XJEPUFFPWAAEGltM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-97k7VnjjNMerpldIu3vjow-1; Mon, 04 Nov 2024 08:33:45 -0500
-X-MC-Unique: 97k7VnjjNMerpldIu3vjow-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d4d51b4efso1857997f8f.3
-        for <kvmarm@lists.linux.dev>; Mon, 04 Nov 2024 05:33:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730727224; x=1731332024;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bsKR/ZbSwcHqsurNqiuF+M7XrV5jICI7Kt7LjPLlYkQ=;
-        b=ime2iFzyr7HaIfMs3ONe2nGyOPSiMAMy6gvQ2a88qvUeVDFNHIt/sMM5hbp2aZ4eha
-         1UvARXihgIwVC+lU++3CxhgP0hB9j/ghKiFoo4SibgtLamQekQLux2hXHzRcjrVMkJpe
-         U693Km63CzNhfbaDuxO41996JF2omqOgQWh62mHe/Ej5MrjdWCYgIxG1f/oeg/q1jLwh
-         b3zADu0SCcxadDLX08nQX49mNzYzkvOJvlmyBG2qxa0VjlOt/c6hi5wUKN6Kl473Tdvl
-         Y7ZabOEcINeZY8Nf0FVkaaq/lGn1DcDGeqYCrnFAbDl3XeYr++c+c476z6prnqjIyyC9
-         SoYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzxUD+zGSUuqAqZukKlfHUDH664VYOf3xgxJ3HN8jnrU36FWiwAgyzUl97LBsV2qJLRke0k8U=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx5n7Wl7jLj8bvFy+IAUqkkn4RnRhn4VnIHriO7PdqSllYE3m1v
-	GQlzw/6EtZKibaafwGIp7+Iew2EevXPf+l1QOJwGWslx2fvajy9PU3G0ItBGg9XeWhu1KjM+ryU
-	iLBEaxfYVjnamo7ubTIyZ5XGOR2J1rV/WDq1arPUQEwRAHR1cFtOtSA==
-X-Received: by 2002:a5d:4cd0:0:b0:376:37e:2729 with SMTP id ffacd0b85a97d-3806115ae83mr21401268f8f.31.1730727223776;
-        Mon, 04 Nov 2024 05:33:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IELeWTIVJZeus8w+il4ddk4jSY487U1fuv7GwRz3yTa/j/J83SY2mSwYHUBN8IDwnbvY+HJzw==
-X-Received: by 2002:a5d:4cd0:0:b0:376:37e:2729 with SMTP id ffacd0b85a97d-3806115ae83mr21401234f8f.31.1730727223376;
-        Mon, 04 Nov 2024 05:33:43 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d49dfsm13267277f8f.46.2024.11.04.05.33.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 05:33:42 -0800 (PST)
-Message-ID: <f950f884-f5f7-4985-8825-ed5f2a10509b@redhat.com>
-Date: Mon, 4 Nov 2024 14:33:40 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5BDM4Xi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2BDAC4CED2
+	for <kvmarm@lists.linux.dev>; Mon,  4 Nov 2024 13:54:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730728466;
+	bh=sZurbIwzYuS4yLWi6DkfdRraXzSZGcCRAs9+v0qzfrE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Q5BDM4Xi1gOJwvFZTupaLks/gQGYzcECQMKtb1FIfjgKOhTka1GRmJOghSmpApkE0
+	 EFJJrzoY8sI0C2SiN/3TkUZEwWSa0zsJ/fStV4D4BHtp3C+ua1QWa03YjFdQm1W6pr
+	 sjaxAwpqEhYb6xm8YBtIDy/P08x3jYzLbYAV/182HZcvh+G4JXSawt5TIBJpUi3Pdh
+	 ILgi2kqTxQzGA3eqx1VLHy5LdFwJXCOtZX3+cRs4c1/RFB1uaMzobP+6RKn46xIVgC
+	 MmQk1THwQSl8VvLYoEqqbzVyLlX+CYxykHAKFYnqghs7LsRhHe61DGjbbTejdNUJBJ
+	 nQSsKoC141iaw==
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fb4af0b6beso62217371fa.3
+        for <kvmarm@lists.linux.dev>; Mon, 04 Nov 2024 05:54:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWxc9Rh1ncKcHvftVV3EpXZLcHpNg6wjFi6ecJt8l0gSzTxAFIK/wzjd05Cr5gGqZCoNcbj0UQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywy7PIB/FogZAsaeMreV7RwLLTRst+CSGpjdA6mxeh7AieMOo9r
+	v2c4wzpBhkn+Mdk92p9oc02d7+xFqoegDUWqJ6n9BZ0UgCOAhtLWM3X0bPhgqk3SM0XO6sqvGk1
+	kfILCpQlE8vI8lYXXlmsK0ZjLrQE=
+X-Google-Smtp-Source: AGHT+IEDPSajd0Ijul/NTdTCOsnUC5WH3yaxWxO7av85XXQJwq7H6ghrIewBObwz96ILox5H6B1VjAJt6rSncXXA+ys=
+X-Received: by 2002:a05:651c:506:b0:2fc:9869:2e0b with SMTP id
+ 38308e7fff4ca-2fedb7c7dc2mr79712841fa.20.1730728464965; Mon, 04 Nov 2024
+ 05:54:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC 14/21] arm/cpu: Add sysreg generation scripts
-To: Marc Zyngier <maz@kernel.org>
-Cc: eric.auger.pro@gmail.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org,
- oliver.upton@linux.dev, sebott@redhat.com,
- shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
- pbonzini@redhat.com
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-15-eric.auger@redhat.com>
- <86frok2jwg.wl-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <86frok2jwg.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241019172459.2241939-1-dwmw2@infradead.org> <20241019172459.2241939-7-dwmw2@infradead.org>
+ <ZyPEn4qhaYyYqrzk@lpieralisi> <ZyUUh6KawapLkj0z@lpieralisi>
+In-Reply-To: <ZyUUh6KawapLkj0z@lpieralisi>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Mon, 4 Nov 2024 14:54:12 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFma8-GqKuOs5-UAQY9asbq2p9EubSjjbywaURa4T4WnA@mail.gmail.com>
+Message-ID: <CAMj1kXFma8-GqKuOs5-UAQY9asbq2p9EubSjjbywaURa4T4WnA@mail.gmail.com>
+Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, sami.mujawar@arm.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, 
+	Len Brown <len.brown@intel.com>, Shuah Khan <shuah@kernel.org>, 
+	David Woodhouse <dwmw@amazon.co.uk>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, Miguel Luis <miguel.luis@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
-On 10/25/24 19:05, Marc Zyngier wrote:
-> On Fri, 25 Oct 2024 11:17:33 +0100,
-> Eric Auger <eric.auger@redhat.com> wrote:
->> Introduce scripts that automate the generation of system register
->> definitions from a given linux source tree arch/arm64/tools/sysreg.
->>
->> Invocation of
->> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
->> in scripts directory do generate 2 qemu files:
->> - target/arm/cpu-sysreg-properties.c
->> - target/arm/cpu-sysregs.h
->>
->> cpu-sysregs.h creates defined for all system registers.
->> However cpu-sysreg-properties.c only cares about feature ID registers.
->>
->> update-aarch64-sysreg-code.sh calls two awk scripts.
->> gen-cpu-sysreg-properties.awk is inherited from kernel
->> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
->> the original author of this script.
-Sorry for the delay. I was out of the office last week.
-> You really want to be careful with this. Both the script and the
-> source file describing the registers are submitted to regular outburst
-> of churn (I'm currently sitting on such a series). You really have to
-> be prepared to see things breaking on each import.
-OK thank you for the warning. It is now understood we cannot fully rely
-on them and checks should be done on each run.
+On Fri, 1 Nov 2024 at 18:49, Lorenzo Pieralisi <lpieralisi@kernel.org> wrote:
 >
-> That file has also been known to contain annoying mistakes, as it is
-> all written by hand.
+> [+Ard, Sami, for EFI]
 >
-> Ideally, this would be directly generated from the ARM XML, which is a
-> public set of files. However, the license attached to this package
-> strictly prohibits its use in QEMU (or anywhere else). One day...
-;-)
+> On Thu, Oct 31, 2024 at 06:55:43PM +0100, Lorenzo Pieralisi wrote:
+> > On Sat, Oct 19, 2024 at 06:15:47PM +0100, David Woodhouse wrote:
+> >
+> > [...]
+> >
+> > > +#ifdef CONFIG_HIBERNATION
+> > > +static int psci_sys_hibernate(struct sys_off_data *data)
+> > > +{
+> > > +   /*
+> > > +    * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
+> > > +    * and is supported by hypervisors implementing an earlier version
+> > > +    * of the pSCI v1.3 spec.
+> > > +    */
+> >
+> > It is obvious but with this patch applied a host kernel would start executing
+> > SYSTEM_OFF2 too if supported in firmware to hibernate, it is not a hypervisor
+> > only code path.
+> >
+> > Related to that: is it now always safe to override
+> >
+> > commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and poweroff")
+> >
+> > for hibernation ? It is not very clear to me why overriding PSCI for
+> > poweroff was the right thing to do - tried to follow that patch history but
+> > the question remains (it is related to UpdateCapsule() but I don't know
+> > how that applies to the hibernation use case).
+>
+> RFC: It is unclear to me what happens in current mainline if we try to
+> hibernate with EFI runtime services enabled and a capsule update pending (we
+> issue EFI ResetSystem(EFI_RESET_SHUTDOWN,..) which might not be compatible
+> with the reset required by the pending capsule update request) what happens
+> in this case I don't know but at least the choice is all contained in
+> EFI firmware.
+>
+> Then if in the same scenario now we are switching to PSCI SYSTEM_OFF2 for the
+> hibernate reset I suspect that what happens to the in-flight capsule
+> update requests strictly depends on what "reset" PSCI SYSTEM_OFF2 will
+> end up doing ?
+>
+> I think this is just a corner case and it is unlikely it has been ever
+> tested (is it even possible ? Looking at EFI folks) - it would be good
+> to clarify it at least to make sure we understand this code path.
+>
 
-Eric
->
-> Thanks,
->
-> 	M.
->
+I'm not aware of any OS that actually uses capsule update at runtime
+(both Windows and Linux queue up the capsule and call the
+UpdateCapsule() runtime service at boot time after a reboot).
 
+So it is unlikely that this would break anything, and I'd actually be
+inclined to disable capsule update at runtime altogether.
+
+I will also note that hibernation with EFI is flaky in general, given
+that EFI memory regions may move around
