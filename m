@@ -1,131 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3407D4A08;
-	Mon,  4 Nov 2024 15:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02B31BF81B
+	for <kvmarm@lists.linux.dev>; Mon,  4 Nov 2024 15:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730733096; cv=none; b=KEnJpt3f8QHCEV6AttZFYTsAr5voZ5++aWHrEtSmxGw468dfa8lIjKXpr2XlL4zKWZZMVW07fJTtCETZJ4elgnhQTINg+a7OVgdlBF9XB9/zg9onRGhZKyhzGWYhuQF2DfkWMaYINi+o1yyj5SfFZl82Gw6dSg7Th6tn6sipj8w=
+	t=1730733879; cv=none; b=tEpzn/zr5O0LL1uA7c7kplPMKNqAQzJgklwDfRHlddruMjomMxl3SyWWxd2LsiZWH2S6TbB5S5mmgpNdn5FbKyGZrdRyZ2aIeWqEzdB/7GuTAAXkNFrMffieolySTNM5m2XAADf0GBglPcXOhpo6v9jR6DG7mgcDBmZD2TgqwXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730733096; c=relaxed/simple;
-	bh=kTcIvo7yioetmpNQbu0IC5h4s6IrPCBWdMVl5D73t7g=;
+	s=arc-20240116; t=1730733879; c=relaxed/simple;
+	bh=DUkkDJLlDnIyuVrVgvJb0Ji3XjE+XppHR1Mg1usi1Zk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/4MfXs2h+9gsFfPmilwtAYpQkgUwk6S05C5oHqmpFIz0Z9ZYutPwMQ+02wIfwFjKa/SJePEV8nX4ww7DplNcppNQMooYqFZBBLZJrISpYPeYMGfTWodu6hbYc9zeoLV6UvkhQrCFz9FLv94WDE4yj9jV1tO49q6IgZ/Fc1KT4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxceTN5N; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=PLOzLUBy/iCy8/xIna25qXzo7LdbdwoEGKhaeYhSDM6E6aKD4VahjvHraoMllB0V/4ziLBrI5wD4REYX9gzz38JTlnN/et0eXCcQv079WVDMDGoNuTnJa1nQKiRcMCyGK3UPNYl27SRkv3DUCUAriDxOO+j5hAZJlggFmzJoCd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C5uu3UWM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxceTN5N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B3BEC4CECE;
-	Mon,  4 Nov 2024 15:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730733095;
-	bh=kTcIvo7yioetmpNQbu0IC5h4s6IrPCBWdMVl5D73t7g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lxceTN5NoMnOb7R/VPtFgRQBTl8fQIQGc+4Gk8OT4K//G+8yFdf1m763nh4hbSYjQ
-	 Q8L0dM+aIbjCHQBdLLToU6JHIkL0xE1N1MhABdTFa4no5VZJo28LxZQQBoWB/t2irM
-	 h5+K4mIJXpoBeCpFomfpoaJA0yVQ95MKtcPaM1xFuLRiXCcZpu4o9nJ6qlaqTN5121
-	 YfE8P7UqD3VEHAvSGFS2dsG4TFkL6XuDxtv562XTMv3j6/0Cdx0wFHXFycCvk81Ndz
-	 w+K2Nd4Qks64XUx2V2qChbExvIWBEDSFoFlvjbEWoQUHMeDg67rC+qPPhYHGReiBK2
-	 bN5bKB2JDwa6w==
-Date: Mon, 4 Nov 2024 16:11:23 +0100
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: David Woodhouse <dwmw2@infradead.org>, sami.mujawar@arm.com,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-	Shuah Khan <shuah@kernel.org>, David Woodhouse <dwmw@amazon.co.uk>,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	Miguel Luis <miguel.luis@oracle.com>
-Subject: Re: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for
- hibernate
-Message-ID: <ZyjkGwkrQ+R+fI8m@lpieralisi>
-References: <20241019172459.2241939-1-dwmw2@infradead.org>
- <20241019172459.2241939-7-dwmw2@infradead.org>
- <ZyPEn4qhaYyYqrzk@lpieralisi>
- <ZyUUh6KawapLkj0z@lpieralisi>
- <CAMj1kXFma8-GqKuOs5-UAQY9asbq2p9EubSjjbywaURa4T4WnA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5uu3UWM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730733876;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4Rpq/uBr2y2YyfHOuA0rZNYcdp3Fhq0ehdI8m+Y3eq0=;
+	b=C5uu3UWM+uwUFBilZ2YVZizF2nwT0l8R/kDtsZg8TpDuw81iJ7Qq7u65ocDa0CoHx2QdRu
+	QJaz0ABOCKjqYOIJIl+gjhyFyGmx+FLiL7p9SxhgPDNGc+vXdft6+Ljs50zMViq6pbdFJc
+	bDrPbRbNkOOVOkb6QRyaVB0noKegPtM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-372-nFxoB0yaNfuObz_1CF_hXA-1; Mon,
+ 04 Nov 2024 10:24:33 -0500
+X-MC-Unique: nFxoB0yaNfuObz_1CF_hXA-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A90081955BC7;
+	Mon,  4 Nov 2024 15:24:26 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.152])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 33BC219560AA;
+	Mon,  4 Nov 2024 15:24:19 +0000 (UTC)
+Date: Mon, 4 Nov 2024 15:24:16 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+	qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org, richard.henderson@linaro.org,
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [RFC 21/21] arm/cpu-features: Document custom vcpu model
+Message-ID: <ZyjnIMteSuCvpGPW@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20241025101959.601048-1-eric.auger@redhat.com>
+ <20241025101959.601048-22-eric.auger@redhat.com>
+ <ZxuZkUFz_bwAA1pf@redhat.com>
+ <0700af51-a1a6-4b11-a4bf-0eaf6e279c6d@redhat.com>
+ <Zxudl5-fZV1vIaEL@redhat.com>
+ <87y128nrfr.fsf@redhat.com>
+ <Zx-3OUioG1l47hW3@redhat.com>
+ <24ca0278-5018-41e3-a097-ac560a16f8fa@redhat.com>
+ <ZyjgWJ3bZ69sueE2@redhat.com>
+ <875xp3nigb.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXFma8-GqKuOs5-UAQY9asbq2p9EubSjjbywaURa4T4WnA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <875xp3nigb.fsf@redhat.com>
+User-Agent: Mutt/2.2.13 (2024-03-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon, Nov 04, 2024 at 02:54:12PM +0100, Ard Biesheuvel wrote:
-> On Fri, 1 Nov 2024 at 18:49, Lorenzo Pieralisi <lpieralisi@kernel.org> wrote:
-> >
-> > [+Ard, Sami, for EFI]
-> >
-> > On Thu, Oct 31, 2024 at 06:55:43PM +0100, Lorenzo Pieralisi wrote:
-> > > On Sat, Oct 19, 2024 at 06:15:47PM +0100, David Woodhouse wrote:
-> > >
-> > > [...]
-> > >
-> > > > +#ifdef CONFIG_HIBERNATION
-> > > > +static int psci_sys_hibernate(struct sys_off_data *data)
-> > > > +{
-> > > > +   /*
-> > > > +    * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
-> > > > +    * and is supported by hypervisors implementing an earlier version
-> > > > +    * of the pSCI v1.3 spec.
-> > > > +    */
-> > >
-> > > It is obvious but with this patch applied a host kernel would start executing
-> > > SYSTEM_OFF2 too if supported in firmware to hibernate, it is not a hypervisor
-> > > only code path.
-> > >
-> > > Related to that: is it now always safe to override
-> > >
-> > > commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and poweroff")
-> > >
-> > > for hibernation ? It is not very clear to me why overriding PSCI for
-> > > poweroff was the right thing to do - tried to follow that patch history but
-> > > the question remains (it is related to UpdateCapsule() but I don't know
-> > > how that applies to the hibernation use case).
-> >
-> > RFC: It is unclear to me what happens in current mainline if we try to
-> > hibernate with EFI runtime services enabled and a capsule update pending (we
-> > issue EFI ResetSystem(EFI_RESET_SHUTDOWN,..) which might not be compatible
-> > with the reset required by the pending capsule update request) what happens
-> > in this case I don't know but at least the choice is all contained in
-> > EFI firmware.
-> >
-> > Then if in the same scenario now we are switching to PSCI SYSTEM_OFF2 for the
-> > hibernate reset I suspect that what happens to the in-flight capsule
-> > update requests strictly depends on what "reset" PSCI SYSTEM_OFF2 will
-> > end up doing ?
-> >
-> > I think this is just a corner case and it is unlikely it has been ever
-> > tested (is it even possible ? Looking at EFI folks) - it would be good
-> > to clarify it at least to make sure we understand this code path.
-> >
+On Mon, Nov 04, 2024 at 04:10:12PM +0100, Cornelia Huck wrote:
+> On Mon, Nov 04 2024, Daniel P. Berrangé <berrange@redhat.com> wrote:
 > 
-> I'm not aware of any OS that actually uses capsule update at runtime
-> (both Windows and Linux queue up the capsule and call the
-> UpdateCapsule() runtime service at boot time after a reboot).
+> >
+> > FYI, in x86 target the -cpu command has had a "migratable=bool" property
+> > for a long time , which defaults to 'true' for 'host' model. This causes
+> > QEMU to explicitly drop features which would otherwise prevent migration
+> > between two hosts with identical physical CPUs.
+> >
+> > IOW, if there are some bits present in 'host' that cause migration
+> > problems on Ampere hosts, ideally either QEMU (or KVM kmod) would
+> > detect them and turn them off automatically if migratable=true is
+> > set. See commit message in 84f1b92f & 120eee7d1fd for some background
+> > info
 > 
-> So it is unlikely that this would break anything, and I'd actually be
-> inclined to disable capsule update at runtime altogether.
-> 
-> I will also note that hibernation with EFI is flaky in general, given
-> that EFI memory regions may move around
+> How does this work for version-sensitive features -- are they always
+> defaulting to off? How many features are left with that in the end?
 
-Thank you for chiming in, I think we are OK (I don't think this patch
-will create more issues than the ones that are already there for hibernate
-anyway) - the reasoning behind the change is in the commit logs.
+Do you mean QEMU versions here ? The non-migratable feature list is
+just hardcoded in QEMU right now, and there's only 1 of them.
+eg grep for 'unmigratable_flags'
 
-Lorenzo
+Note, that "migratable" property is not defining a general purpose
+migration mask between different hw generations. It was specifically
+blocking just stuff that is known to make migration impossible, even
+if HW is identical on both sides.
+
+> > NB "migratable" is defined in i386 target code today, but conceptually
+> > we should expand/move that to apply to all targets for consistency,
+> > even if it is effectively a no-op some targets (eg if they are
+> > guaranteed migratable out of the box already with '-cpu host').
+> 
+> How does this compare to s390x, which defines some migration-safe cpu
+> models, based upon the different hw generations? If I look at the QEMU
+> code for x86 and s390x, the s390x approach seems cleaner to me (probably
+> because it came later, and therefore could start afresh without having
+> to care for legacy things.) Given that we'll cook up a new model for Arm
+> migration as well, we might as well start with a clean implementation :)
+
+The impression I get (as an distant observer) is that CPUs on s390x in
+general have less complexity to worry about. A combination of not having
+a vendor who creates loads off different SKUs for the same CPU model
+family with slight variations between each, and also not seeming to have
+a situation where CPU flags a known to disappear (or appear) arbitrarily
+in microcode updates.
+
+The s390x idea of a "migratable" and "non migratable" model for each
+HW generation is a nice simplification, but I can't see how it could
+be made to work for x86 when you can't predict ahead of time what
+features are going to be removed from existing HW definition by the
+next microcode update, or by the next CPU SKU that removes a feature
+you had assumed would always be present in a given HW generation.
+
+I don't know much about how ARM world works, but having lots of vendors
+competing with their own custom impls makes me worry complexity will
+be closer to x86 than to s390.
+
+If the ARM specifications define a minimum require featureset for each
+HW generation, maybe you can define a model based on that ? You might
+still want to have vendor specific models though, if there are compelling
+features they expose which are optional, or non-standardized. 
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
