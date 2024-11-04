@@ -1,348 +1,439 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B9A1D07B9
-	for <kvmarm@lists.linux.dev>; Fri,  1 Nov 2024 22:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CE612C484
+	for <kvmarm@lists.linux.dev>; Mon,  4 Nov 2024 05:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730499271; cv=none; b=IPO6jqeG0/LGT33j/ilgLZf+qIr00DpNAyLOIUJ9hU8Sy906DNZnbJUfwea2VcUAW7r02LAqSr5/DZHgozjLpZ1VYUndMsEaDwjakD3aIv8WXbb/agI5r6D3B8vIAKwYP/BjzVJ+L31OM0/+PSBqa7F3FM5Tndf1mblylUZUHyA=
+	t=1730696542; cv=none; b=Qd/7SeNMQYB40TPRWCSXzk4vGmG57sFqW4rluiCSAO3bjaS724/0NzuAkS9j5XrIkemvGvihMDo+YBazIa2xGztPCchj0X8n2XSMWwjOnHPENF57ArWWqeI60DsNkI2w1vF2ttfejv3W12fXAG/6MM0SRtgSCXpSLwDjR9Enojg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730499271; c=relaxed/simple;
-	bh=wLtASQMHq4sgKLG7ICINv/hxvFRTofV3JDrpku5EzC0=;
+	s=arc-20240116; t=1730696542; c=relaxed/simple;
+	bh=HAW046ESpGN8YWxoylIdPESdxozTuq5MgjTqE92R6gk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FjFnHGdTnJVqRnSKpUCE5dEKzs8IBMFD5JMkN7Tr/E9YpMnrPvWzom3kEdGEAl5RRUyPLdBuogCFInskK8il0lFvx43U/pKrmyPEY0e1sWcOPg2/W13jbzjmu8koW4v9J9oChobJLb50Xqmju0dXdMX0RZseYcwX+8kuGx3rBNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HE9NtvNu; arc=none smtp.client-ip=209.85.167.54
+	 To:Cc:Content-Type; b=Mcufk1EFvTq7roKxMFhSthj4Hg8+t8MsX2NoZoWmEe6mhFRbiD+NsbWmnkUsQVNID0zuQYY+5zeYE3+gsc68hx7gn5sKGE3IQRDHANKrUpKY44ihTf9Pc0YcWKE8Yqc9D98R6gCq+WQIK6wyOxqrTAAggtbTgnyq4ERBjNLNZlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zFiVau/+; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HE9NtvNu"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539e66ba398so5831e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 01 Nov 2024 15:14:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zFiVau/+"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43153c6f70aso51245e9.1
+        for <kvmarm@lists.linux.dev>; Sun, 03 Nov 2024 21:02:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730499267; x=1731104067; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1730696538; x=1731301338; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=++IjMUbwkrGj/mHG9oyoX/blJaf9PFISzgC1CVaEouo=;
-        b=HE9NtvNuuIr+z6FWILw005wNTVfoCL8UoLd61ebd5MElEUF4gRYp/S5bvIxQt5Rjeq
-         +Bll1ibj+xZ2Y19ddRKwyQywDVB8LbxuBGD1N38BQiDAL+e2w8WS+Wi4yAA4dgZHE30M
-         xSfT9gqChwbPq4nrFb05ip45yrNyvHKosIfWHGJDDmB4WfP5zPqiCdt19/zpmwWi7yoT
-         ik6xebzo6uE9RIj6BfCIeQ9Wfo0om6esVmkexj4BVHycx9PU5IPjMcERUjRIlLIAQi3/
-         h1LewrfvYOIyQCHHYgVX4hCeBLDZP1SIxooFkRAr4Uht6CMSr78QfYI220+zbyIVLKcx
-         evWw==
+        bh=EsI8QWv4e0MoWQOcIqSB3K6B/286Iaz+JHsS/rVhDho=;
+        b=zFiVau/+OaetPKe6BVHsLIpE1YTq+aFZrLOqBUNUueH4VuEbi8SqPPi3JKx+KYJn0j
+         XknujLmrotHtL8V1DSAMGCK6EEMRgShLSS6sxo4XGg+qyylwduF6u7CdYTZrTczdh+gY
+         RlGtjQgWSb2zUJrYiLE6Shfkm4yHwlPbKJhIZW1xGzpcP3NzcHRWfbuitR7/WONXt4yI
+         1BWXr9DbKrdmfo1FkcFuZcvpsgt25unxThIyXdJ1zW6NHt01U1DmBEfR+ol2EiQiUvz9
+         Au+WMxFEU2Fd012tenjjijCHjRbsBY5dRtROFaCvUX/Njos8YtfYoynpO87VsHxA6W/0
+         Cuvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730499267; x=1731104067;
+        d=1e100.net; s=20230601; t=1730696538; x=1731301338;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=++IjMUbwkrGj/mHG9oyoX/blJaf9PFISzgC1CVaEouo=;
-        b=sne3EL5ZBLzLUFT/zCGtYGiZG3eqG051DQ6bvpNViRbjdwfYLBowSYp0nRvHUEcyMT
-         usqIma4nualejmLxVDJgbYo7LeVRMJ30sAAAvD8w590wrOFNEQ6tDQnxm1r/J8gKUQJv
-         nvZwteNrUlwwtdCJd1VBP/mEWSadZ+vE5th6c2BDwvMd2A724kdo+bDcKVyaq20DDQWp
-         SMZih3oHmB8TOO7u8HJiQd7n30qTc5kw1INmoQjmtEKi6zxxdUAT+tnxIiIFMgJaE3jD
-         amSm7n+IIrBR0D1f4r20A1YBawuP20E0iZ/aVculU4panMdQepxMQLSOn0XVY1U7E3h1
-         pKCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzQNmYZoR9qusfOgpmqPmUxCva+zF2rknRtA9ZEIjIhqH0693qCblZj/D/ELEK3nrkaYXfkv8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxl4XjEfhBvPV+Xz9QrMMYRpzJQVdBk6Gxc8YFt4AmwajdOOSWx
-	qXAo+lktuVU3KIIzYww2qDoJzNE8XJGIZRtpVmph7FeuHnEh2AGJ2oJLpksBba8+IqSIRSXqnDr
-	QSzFtx3WkauKjoMs1CCwpPn+MxI+kxP9FMbxD
-X-Gm-Gg: ASbGnctl7wFgBlKV/xIxGsQaqs/Relof1ynKTCVkuRWLiGXSRfoC8PuCh5BsXBQiGi4
-	e1BoPvXYMoiiRYfp+H8IQZ3zuPwQ4kWFeNm3XaQNVoQLhkKMYvp7uctMpOUIM
-X-Google-Smtp-Source: AGHT+IH2BcX/vmuG7YSwKV0+HLH1Y2RSr4a5KE0L+pbR96qsVezQH73VuaXsrlKiCpYFZijNULMRFs0zTF+aMIiqk0U=
-X-Received: by 2002:a05:6512:31c4:b0:53b:5ae5:a9c8 with SMTP id
- 2adb3069b0e04-53d6b1b3334mr53844e87.7.1730499266896; Fri, 01 Nov 2024
- 15:14:26 -0700 (PDT)
+        bh=EsI8QWv4e0MoWQOcIqSB3K6B/286Iaz+JHsS/rVhDho=;
+        b=qkSy/KHIrynX0wDqgW9QX+1L4IaDRA17hNLW/zpEJslOxMI+Hugq8hr7uERFXYslar
+         ohhAXEyxKesTHEJFnxthHPPcEYQ+CmYFGzq5RrF/kqFrX6NU5yhsXWSrxUei5FmnoYkJ
+         T08oAX/SYtredWh1oGPGUI+ruP14Vjj9Q9yn7ZEGTdIgLPnvpp984T4xqbviGp/UgqJV
+         2kGYI7bmcXTEOFmk3+I83ONwga8y5SLQeTVok6qN3AxzcGsMV7T1rboK22fF7M8Eo1pB
+         PzWcz3CHOhdH2BZLnyu6DkfPpJvXgq9j9Tpkd4xcaL5eHKkd+q/edYj/9kBN9XpvxMN/
+         MhCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+9T6nyzAtBoylfxQ3d+1NT53bBgIt71BlloFEIdmAvhKwqZTRY4bV5rADahAiGBIHzPK8XmU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0qhyFXfvcs+cESVg1pqEnS2oSyglKdjBlq4H5Y/L1LLwKiaMq
+	evEjssDEDhIgSWXnAiuw/ZgjEUilYid1ksBqKf2yYw6tlytAqPP1YxHukb9Ua7oNIP+15c9ne+q
+	MSgy7amKEuO7DsXggR7srXGqUxXt5bVS38asl
+X-Gm-Gg: ASbGncsRVuuROkplojG+XHazkA5WJYvlG1tOtFNUAJacgq8Rge1h04R3aVMCOcq++CP
+	Ukr40yU0LUFH2nqI919gNy16vhxN1YVzf2prCMf6Cj446GkW/FG683ynk9eKpwhY=
+X-Google-Smtp-Source: AGHT+IEjRuwYNFSQ2YIxZvVeAEQHZ04rTPgHjYCyrGK55VxsW50YYmc9HWkP1YWdE3I5kimXvyb1o2IahKOaQPEcCvE=
+X-Received: by 2002:a05:600c:63d9:b0:42b:8ff7:bee2 with SMTP id
+ 5b1f17b1804b1-4328dc076b0mr1470075e9.5.1730696537538; Sun, 03 Nov 2024
+ 21:02:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
-In-Reply-To: <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
-From: Vipin Sharma <vipinsh@google.com>
-Date: Fri, 1 Nov 2024 15:13:49 -0700
-Message-ID: <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Anup Patel <anup@brainfault.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
+References: <20241031212104.1429609-1-jiaqiyan@google.com> <86r07v1g2z.wl-maz@kernel.org>
+In-Reply-To: <86r07v1g2z.wl-maz@kernel.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Sun, 3 Nov 2024 21:02:03 -0800
+Message-ID: <CACw3F51FbzkkX_DcCVCieZ=408oP_Fy3sXYk5AjWRX3RJO2Fzg@mail.gmail.com>
+Subject: Re: [RFC PATCH v1] KVM: arm64: Introduce KVM_CAP_ARM_SIGBUS_ON_SEA
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, duenwen@google.com, 
+	rananta@google.com, James Houghton <jthoughton@google.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 22, 2024 at 1:55=E2=80=AFPM Vipin Sharma <vipinsh@google.com> w=
-rote:
+Hi Marc, thanks for your quick response!
+
+On Fri, Nov 1, 2024 at 6:54=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Oops! Adding archs mailing list and maintainers which have arch folder
-> in tool/testing/selftests/kvm
+> On Thu, 31 Oct 2024 21:21:04 +0000,
+> Jiaqi Yan <jiaqiyan@google.com> wrote:
+> >
+> > Currently KVM handles SEA in guest by injecting async SError into
+> > guest directly, bypassing VMM, usually results in guest kernel panic.
+> >
+> > One major situation of guest SEA is when vCPU consumes uncorrectable
+> > memory error on the physical memory. Although SError and guest kernel
+> > panic effectively stops the propagation of corrupted memory, it is not
+> > easy for VMM and guest to recover from memory error in a more graceful
+> > manner.
+> >
+> > Alternatively KVM can send a SIGBUS BUS_OBJERR to VMM/vCPU, just like
+> > how core kernel signals SIGBUS BUS_OBJERR to the poison consuming
+> > thread.
 >
-> On Wed, Aug 21, 2024 at 3:30=E2=80=AFPM Vipin Sharma <vipinsh@google.com>=
- wrote:
+> Can you elaborate on why the delivery of a signal is preferable to
+> simply exiting back to userspace with a description of the error?
+> Signals are usually not generated by KVM, and are a pretty twisted way
+> to generate an exit.
+
+A couple of reasons. First, my intuition is that KVM and core kernel
+(do_sea) should have aligned behavior when APEI failed to claim the
+SEA. Second, if we only talk about SEA caused by memory poison
+consumption, both arm64 and x86 KVM already send SIGBUS to VMM/vCPU
+thread (kvm_send_hwpoison_signal) to signal hardware memory failure,
+although the situation is slightly different here, where we have a
+hardware event, versus a HWPoison flag check or VM_FAULT_HWPOISON
+returned. But from VMM/vCPU's perspective, hardware event or software
+level VM_FAULT_HWPOISON, it would be nice if it can react to just the
+same event, the SIGBUS signal.
+
+And there is another reason around your comment on arm64_notify_die.
+
+By "exiting back to userspace with a description of the error", are
+you suggesting KVM_EXIT_MEMORY_FAULT? If so, we may need to add a new
+flag to tell VMM the error is hardware memory poison, which could be
+KVM_MEMORY_EXIT_FLAG_USERFAULT[1] if we don't want a specific one (but
+I think a specific flag for hwpoison is probably clearer).
+
+>
+> > In addition to the benifit that KVM's handling for SEA becomes aligned
+> > with core kernel behavior
+> > - The blast radius in VM can be limited to only the consuming thread
+> >   in guest, instead of entire guest kernel, unless the consumption is
+> >   from guest kernel.
+> > - VMM now has the chance to do its duties to stop the VM from repeatedl=
+y
+> >   consuming corrupted data. For example, VMM can unmap the guest page
+> >   from stage-2 table to intercept forseen memory poison consumption,
+>
+> Not quite. The VMM doesn't manage stage-2. It can remove the page from
+> the VMA if it has it mapped, but that's it. The kernel deals with S2.
+
+I should probably not mention the implementation, "unmap from S2".
+What is needed for preventing repeated consuming memory poison is
+simply preventing guest access to certain memory pages. There is a
+work in progress KVM API [1] by my colleague James.
+
+[1] https://lpc.events/event/18/contributions/1757/attachments/1442/3073/LP=
+C_%20KVM%20Userfault.pdf
+
+>
+> Which brings me to the next subject: when the kernel unmaps the page
+> at S2, it is likely to use CMOs. Can these CMOs create RAS error
+> themselves?
+
+I assume CMO here means writing dirty cache lines to memory. Writing
+something new to a poisoned cacheline usually won't cause RAS error.
+Notifying memory poison usually is delayed to a memory load
+transaction.
+
+>
+> >   and for every consumption injects SEA to EL1 with synthetic memory
+> >   error CPER.
+>
+> Why do we need to involve ACPI here? I would expect the production of
+> an architected error record instead. Or at least be given the option.
+
+Sorry, I was just mentioning a specific VMM's implementation. There
+are definitely multiple options (Machine Check MSRs vs CPER for error
+description data, SEA vs SDEI vs SPI for notification mechanisms) for
+how VMM involves the guest to handle memory error. My preference is:
+VMM populates CPER in guest HEST when VMM instructs KVM to inject
+i/dabt to the guest.
+
+And a word about "be given the option": I think when VMM receives
+SIGBUS with si_addr=3Dfaulted/poisoned HVA, it's got all these options,
+like using the si_addr to construct CPER with poisoned guest physical
+address, or mci_address MSR.
+
+>
+> > Introduce a new KVM ARM capability KVM_CAP_ARM_SIGBUS_ON_SEA. VMM
+> > can opt in this new capability if it prefers SIGBUS than SError
+> > injection during VM init. Now SEA handling in KVM works as follows:
+> > 1. Delegate to APEI/GHES to see if SEA can be claimed by them.
+> > 2. If APEI failed to claim the SEA and KVM_CAP_ARM_SIGBUS_ON_SEA is
+> >    enabled for the VM, and the SEA is NOT about translation table,
+> >    send SIGBUS BUS_OBJERR signal with host virtual address.
+>
+> And what if it is? S1 PTs are backed by userspace memory, like
+> anything else. I don't think we should have a different treatment of
+> those, because the HW wouldn't treat them differently either.
+
+You are talking about ESR_ELx_FSC_SEA_TTW(1), or
+ESR_ELx_FSC_SEA_TTW(0), right? I think you are right, S1 is no
+difference.
+
+But I think we want to make an exception for SEA about S2 PTs.
+
+>
+> > 3. Otherwise directly inject async SError to guest.
 > >
-> > This series is introducing a KVM selftests runner to make it easier to
-> > run selftests with some interesting configurations and provide some
-> > enhancement over existing kselftests runner.
+> > Tested on a machine running Siryn AmpereOne processor. A in-house VMM
+> > that opts in KVM_CAP_ARM_SIGBUS_ON_SEA started a VM. A dummy applicatio=
+n
+> > in VM allocated some memory buffer. The test used EINJ to inject an
+> > uncorrectable recoverable memory error at a page in the allocated memor=
+y
+> > buffer. The dummy application then consumed the memory error. Some hack
+> > was done to make core kernel's memory_failure triggered by poison
+> > generation to fail, so KVM had to deal with the SEA guest abort due to
+> > poison consumption. vCPU thread in VMM received SIGBUS BUS_OBJERR with
+> > valid host virtual address of the poisoned page. VMM then injected a SE=
+A
+> > into guest using KVM_SET_VCPU_EVENTS with ext_dabt_pending=3D1. At last
+> > the dummy application in guest was killed by SIGBUS BUS_OBJERR, while t=
+he
+> > guest survived and continued to run.
 > >
-> > I would like to get an early feedback from the community and see if thi=
-s
-> > is something which can be useful for improving KVM selftests coverage
-> > and worthwhile investing time in it. Some specific questions:
+> > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  2 +
+> >  arch/arm64/include/asm/kvm_ras.h  | 20 ++++----
+> >  arch/arm64/kvm/Makefile           |  2 +-
+> >  arch/arm64/kvm/arm.c              |  5 ++
+> >  arch/arm64/kvm/kvm_ras.c          | 77 +++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/mmu.c              |  8 +---
+> >  include/uapi/linux/kvm.h          |  1 +
+> >  7 files changed, 98 insertions(+), 17 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/kvm_ras.c
 > >
-> > 1. Should this be done?
-> > 2. What features are must?
-> > 3. Any other way to write test configuration compared to what is done h=
-ere?
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index bf64fed9820ea..eb37a2489411a 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -334,6 +334,8 @@ struct kvm_arch {
+> >       /* Fine-Grained UNDEF initialised */
+> >  #define KVM_ARCH_FLAG_FGU_INITIALIZED                        8
+> >       unsigned long flags;
+> > +     /* Instead of injecting SError into guest, SIGBUS VMM */
+> > +#define KVM_ARCH_FLAG_SIGBUS_ON_SEA                  9
+>
+> nit: why do you put this definition out of sequence (below 'flags')?
+
+Ah, I will move it on top of flags.
+
+>
 > >
-> > Note, python code written for runner is not optimized but shows how thi=
-s
-> > runner can be useful.
+> >       /* VM-wide vCPU feature set */
+> >       DECLARE_BITMAP(vcpu_features, KVM_VCPU_MAX_FEATURES);
+> > diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/=
+kvm_ras.h
+> > index 87e10d9a635b5..4bb7a424e3f6c 100644
+> > --- a/arch/arm64/include/asm/kvm_ras.h
+> > +++ b/arch/arm64/include/asm/kvm_ras.h
+> > @@ -11,15 +11,17 @@
+> >  #include <asm/acpi.h>
 > >
-> > What are the goals?
-> > - Run tests with more than just the default settings of KVM module
-> >   parameters and test itself.
-> > - Capture issues which only show when certain combination of module
-> >   parameter and tests options are used.
-> > - Provide minimum testing which can be standardised for KVM patches.
-> > - Run tests parallely.
-> > - Dump output in a hierarchical folder structure for easier tracking of
-> >   failures/success output
-> > - Feel free to add yours :)
+> >  /*
+> > - * Was this synchronous external abort a RAS notification?
+> > - * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+> > + * Handle synchronous external abort (SEA) in the following order:
+> > + * 1. Delegate to APEI/GHES to see if SEA can be claimed by them. If s=
+o, we
+> > + *    are all done.
+> > + * 2. If userspace opts in KVM_CAP_ARM_SIGBUS_ON_SEA, and if the SEA i=
+s NOT
+> > + *    about translation table, send SIGBUS
+> > + *    - si_code is BUS_OBJERR.
+> > + *    - si_addr will be 0 when accurate HVA is unavailable.
+> > + * 3. Otherwise, directly inject an async SError to guest.
+> > + *
+> > + * Note this applies to both ESR_ELx_EC_IABT_* and ESR_ELx_EC_DABT_*.
+> >   */
+> > -static inline int kvm_handle_guest_sea(phys_addr_t addr, u64 esr)
+> > -{
+> > -     /* apei_claim_sea(NULL) expects to mask interrupts itself */
+> > -     lockdep_assert_irqs_enabled();
+> > -
+> > -     return apei_claim_sea(NULL);
+> > -}
+> > +void kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
 > >
-> > Why not use/extend kselftests?
-> > - Other submodules goal might not align and its gonna be difficult to
-> >   capture broader set of requirements.
-> > - Instead of test configuration we will need separate shell scripts
-> >   which will act as tests for each test arg and module parameter
-> >   combination. This will easily pollute the KVM selftests directory.
-> > - Easier to enhance features using Python packages than shell scripts.
+> >  #endif /* __ARM64_KVM_RAS_H__ */
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index 3cf7adb2b5038..c4a3a6d4870e6 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -23,7 +23,7 @@ kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvt=
+ime.o \
+> >        vgic/vgic-v3.o vgic/vgic-v4.o \
+> >        vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+> >        vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+> > -      vgic/vgic-its.o vgic/vgic-debug.o
+> > +      vgic/vgic-its.o vgic/vgic-debug.o kvm_ras.o
 > >
-> > What this runner do?
-> > - Reads a test configuration file (tests.json in patch 1).
-> >   Configuration in json are written in hierarchy where multiple suites
-> >   exist and each suite contains multiple tests.
-> > - Provides a way to execute tests inside a suite parallelly.
-> > - Provides a way to dump output to a folder in a hierarchical manner.
-> > - Allows to run selected suites, or tests in a specific suite.
-> > - Allows to do some setup and teardown for test suites and tests.
-> > - Timeout can be provided to limit test execution duration.
-> > - Allows to run test suites or tests on specific architecture only.
-> >
-> > Runner is written in python and goal is to only use standard library
-> > constructs. This runner will work on Python 3.6 and up
-> >
-> > What does a test configuration file looks like?
-> > Test configuration are written in json as it is easier to read and has
-> > inbuilt package support in Python. Root level is a json array denoting
-> > suites and each suite can multiple tests in it using json array.
-> >
-> > [
-> >   {
-> >     "suite": "dirty_log_perf_tests",
-> >     "timeout_s": 300,
-> >     "arch": "x86_64",
-> >     "setup": "echo Setting up suite",
-> >     "teardown": "echo tearing down suite",
-> >     "tests": [
-> >       {
-> >         "name": "dirty_log_perf_test_max_vcpu_no_manual_protect",
-> >         "command": "./dirty_log_perf_test -v $(grep -c ^processor /proc=
-/cpuinfo) -g",
-> >         "arch": "x86_64",
-> >         "setup": "echo Setting up test",
-> >         "teardown": "echo tearing down test",
-> >         "timeout_s": 5
+> >  kvm-$(CONFIG_HW_PERF_EVENTS)  +=3D pmu-emul.o pmu.o
+> >  kvm-$(CONFIG_ARM64_PTR_AUTH)  +=3D pauth.o
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 48cafb65d6acf..bb97ad678dbec 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -151,6 +151,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> >               }
+> >               mutex_unlock(&kvm->slots_lock);
+> >               break;
+> > +     case KVM_CAP_ARM_SIGBUS_ON_SEA:
+> > +             r =3D 0;
+> > +             set_bit(KVM_ARCH_FLAG_SIGBUS_ON_SEA, &kvm->arch.flags);
+>
+> Shouldn't this be somehow gated on the VM being RAS aware?
+
+Do you mean a CAP that VMM can tell KVM the VM guest has RAS ability?
+I don't know if there is one for arm64. On x86 there is
+KVM_X86_SETUP_MCE. KVM_CAP_ARM_INJECT_EXT_DABT maybe a revelant one
+but I don't think it is exactly the one for "RAS ability".
+
+>
+> > +             break;
+> >       default:
+> >               break;
 > >       }
-> >     ]
-> >   }
-> > ]
-> >
-> > Usage:
-> > Runner "runner.py" and test configuration "tests.json" lives in
-> > tool/testing/selftests/kvm directory.
-> >
-> > To run serially:
-> > ./runner.py tests.json
-> >
-> > To run specific test suites:
-> > ./runner.py tests.json dirty_log_perf_tests x86_sanity_tests
-> >
-> > To run specific test in a suite:
-> > ./runner.py tests.json x86_sanity_tests/vmx_msrs_test
-> >
-> > To run everything parallely (runs tests inside a suite parallely):
-> > ./runner.py -j 10 tests.json
-> >
-> > To dump output to disk:
-> > ./runner.py -j 10 tests.json -o sample_run
-> >
-> > Sample output (after removing timestamp, process ID, and logging
-> > level columns):
-> >
-> >   ./runner.py tests.json  -j 10 -o sample_run
-> >   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_no_manual_p=
-rotect
-> >   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_manual_prot=
-ect
-> >   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_manual_prot=
-ect_random_access
-> >   PASSED: dirty_log_perf_tests/dirty_log_perf_test_max_10_vcpu_hugetlb
-> >   PASSED: x86_sanity_tests/vmx_msrs_test
-> >   SKIPPED: x86_sanity_tests/private_mem_conversions_test
-> >   FAILED: x86_sanity_tests/apic_bus_clock_test
-> >   PASSED: x86_sanity_tests/dirty_log_page_splitting_test
-> >   ---------------------------------------------------------------------=
------
-> >   Test runner result:
-> >   1) dirty_log_perf_tests:
-> >      1) PASSED: dirty_log_perf_test_max_vcpu_no_manual_protect
-> >      2) PASSED: dirty_log_perf_test_max_vcpu_manual_protect
-> >      3) PASSED: dirty_log_perf_test_max_vcpu_manual_protect_random_acce=
-ss
-> >      4) PASSED: dirty_log_perf_test_max_10_vcpu_hugetlb
-> >   2) x86_sanity_tests:
-> >      1) PASSED: vmx_msrs_test
-> >      2) SKIPPED: private_mem_conversions_test
-> >      3) FAILED: apic_bus_clock_test
-> >      4) PASSED: dirty_log_page_splitting_test
-> >   ---------------------------------------------------------------------=
------
-> >
-> > Directory structure created:
-> >
-> > sample_run/
-> > |-- dirty_log_perf_tests
-> > |   |-- dirty_log_perf_test_max_10_vcpu_hugetlb
-> > |   |   |-- command.stderr
-> > |   |   |-- command.stdout
-> > |   |   |-- setup.stderr
-> > |   |   |-- setup.stdout
-> > |   |   |-- teardown.stderr
-> > |   |   `-- teardown.stdout
-> > |   |-- dirty_log_perf_test_max_vcpu_manual_protect
-> > |   |   |-- command.stderr
-> > |   |   `-- command.stdout
-> > |   |-- dirty_log_perf_test_max_vcpu_manual_protect_random_access
-> > |   |   |-- command.stderr
-> > |   |   `-- command.stdout
-> > |   `-- dirty_log_perf_test_max_vcpu_no_manual_protect
-> > |       |-- command.stderr
-> > |       `-- command.stdout
-> > `-- x86_sanity_tests
-> >     |-- apic_bus_clock_test
-> >     |   |-- command.stderr
-> >     |   `-- command.stdout
-> >     |-- dirty_log_page_splitting_test
-> >     |   |-- command.stderr
-> >     |   |-- command.stdout
-> >     |   |-- setup.stderr
-> >     |   |-- setup.stdout
-> >     |   |-- teardown.stderr
-> >     |   `-- teardown.stdout
-> >     |-- private_mem_conversions_test
-> >     |   |-- command.stderr
-> >     |   `-- command.stdout
-> >     `-- vmx_msrs_test
-> >         |-- command.stderr
-> >         `-- command.stdout
-> >
-> >
-> > Some other features for future:
-> > - Provide "precheck" command option in json, which can filter/skip test=
-s if
-> >   certain conditions are not met.
-> > - Iteration option in the runner. This will allow the same test suites =
-to
-> >   run again.
-> >
-> > Vipin Sharma (1):
-> >   KVM: selftestsi: Create KVM selftests runnner to run interesting test=
-s
-> >
-> >  tools/testing/selftests/kvm/runner.py  | 282 +++++++++++++++++++++++++
-> >  tools/testing/selftests/kvm/tests.json |  60 ++++++
-> >  2 files changed, 342 insertions(+)
-> >  create mode 100755 tools/testing/selftests/kvm/runner.py
-> >  create mode 100644 tools/testing/selftests/kvm/tests.json
-> >
-> >
-> > base-commit: de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed
-> > --
-> > 2.46.0.184.g6999bdac58-goog
-> >
+> > @@ -339,6 +343,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+> >       case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> >       case KVM_CAP_IRQFD_RESAMPLE:
+> >       case KVM_CAP_COUNTER_OFFSET:
+> > +     case KVM_CAP_ARM_SIGBUS_ON_SEA:
+> >               r =3D 1;
+> >               break;
+> >       case KVM_CAP_SET_GUEST_DEBUG2:
+> > diff --git a/arch/arm64/kvm/kvm_ras.c b/arch/arm64/kvm/kvm_ras.c
+> > new file mode 100644
+> > index 0000000000000..3225462bcbcda
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/kvm_ras.c
+> > @@ -0,0 +1,77 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +
+> > +#include <linux/bitops.h>
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_ras.h>
+> > +#include <asm/system_misc.h>
+> > +
+> > +/*
+> > + * For synchrnous external instruction or data abort, not on translati=
+on
+> > + * table walk or hardware update of translation table, is FAR_EL2 vali=
+d?
+> > + */
+> > +static inline bool kvm_vcpu_sea_far_valid(const struct kvm_vcpu *vcpu)
+> > +{
+> > +     return !(vcpu->arch.fault.esr_el2 & ESR_ELx_FnV);
+> > +}
+> > +
+> > +/*
+> > + * Was this synchronous external abort a RAS notification?
+> > + * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+> > + */
+> > +static int kvm_delegate_guest_sea(phys_addr_t addr, u64 esr)
+> > +{
+> > +     /* apei_claim_sea(NULL) expects to mask interrupts itself */
+> > +     lockdep_assert_irqs_enabled();
+> > +     return apei_claim_sea(NULL);
+> > +}
+> > +
+> > +void kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+> > +{
+> > +     bool sigbus_on_sea;
+> > +     int idx;
+> > +     u64 vcpu_esr =3D kvm_vcpu_get_esr(vcpu);
+> > +     u8 fsc =3D kvm_vcpu_trap_get_fault(vcpu);
+> > +     phys_addr_t fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
+> > +     gfn_t gfn =3D fault_ipa >> PAGE_SHIFT;
+> > +     /* When FnV is set, send 0 as si_addr like what do_sea() does. */
+> > +     unsigned long hva =3D 0UL;
+> > +
+> > +     /*
+> > +      * For RAS the host kernel may handle this abort.
+> > +      * There is no need to SIGBUS VMM, or pass the error into the gue=
+st.
+> > +      */
+> > +     if (kvm_delegate_guest_sea(fault_ipa, vcpu_esr) =3D=3D 0)
+> > +             return;
+> > +
+> > +     sigbus_on_sea =3D test_bit(KVM_ARCH_FLAG_SIGBUS_ON_SEA,
+> > +                              &(vcpu->kvm->arch.flags));
+> > +
+> > +     /*
+> > +      * In addition to userspace opt-in, SIGBUS only makes sense if th=
+e
+> > +      * abort is NOT about translation table walk and NOT about hardwa=
+re
+> > +      * update of translation table.
+> > +      */
+> > +     sigbus_on_sea &=3D (fsc =3D=3D ESR_ELx_FSC_EXTABT || fsc =3D=3D E=
+SR_ELx_FSC_SECC);
+> > +
+> > +     /* Pass the error directly into the guest. */
+> > +     if (!sigbus_on_sea) {
+> > +             kvm_inject_vabt(vcpu);
+> > +             return;
+> > +     }
+> > +
+> > +     if (kvm_vcpu_sea_far_valid(vcpu)) {
+> > +             idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+> > +             hva =3D gfn_to_hva(vcpu->kvm, gfn);
+> > +             srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > +     }
+> > +
+> > +     /*
+> > +      * Send a SIGBUS BUS_OBJERR to vCPU thread (the userspace thread =
+that
+> > +      * runs KVM_RUN) or VMM, which aligns with what host kernel do_se=
+a()
+> > +      * does if apei_claim_sea() fails.
+> > +      */
+> > +     arm64_notify_die("synchronous external abort",
+> > +                      current_pt_regs(), SIGBUS, BUS_OBJERR, hva, vcpu=
+_esr);
+>
+> This is the point where I really think we should simply trigger an
+> exit with all that syndrome information stashed in kvm_run, like any
+> other event requiring userspace help.
 
-Had an offline discussion with Sean, providing a summary on what we
-discussed (Sean, correct me if something is not aligned from our
-discussion):
+Ah, there is another reason SIGBUS is better than kvm exit: "It is a
+programming error to set ext_dabt_pending after an exit which was not
+either KVM_EXIT_MMIO or KVM_EXIT_ARM_NISV", from
+Documentation/virt/kvm/api.rst. So if VMM is allowed to inject data
+abort to guest, at least current documentation doesn't suggest kvm
+exit is feasible.
 
-We need to have a roadmap for the runner in terms of features we support.
+>
+> Also: where is the documentation?
 
+Once I get more positive feedback and send out PATCH instead of RFC, I
+can add to Documentation/virt/kvm/api.rst.
 
-Phase 1: Having a basic selftest runner is useful which can:
-
-- Run tests parallely
-- Provide a summary of what passed and failed, or only in case of failure.
-- Dump output which can be easily accessed and parsed.
-- Allow to run with different command line parameters.
-
-Current patch does more than this and can be simplified.
-
-
-Phase 2: Environment setup via runner
-
-Current patch, allows to write "setup" commands at test suite and test
-level in the json config file to setup the environment needed by a
-test to run. This might not be ideal as some settings are exposed
-differently on different platforms.
-
-For example,
-To enable TDP:
-- Intel needs npt=3DY
-- AMD needs ept=3DY
-- ARM always on.
-
-To enable APIC virtualization
-- Intel needs enable_apicv=3DY
-- AMD needs avic=3DY
-
-To enable/disable nested, they both have the same file name "nested"
-in their module params directory which should be changed.
-
-These kinds of settings become more verbose and unnecessary on other
-platforms. Instead, runners should have some programming constructs
-(API, command line options, default) to enable these options in a
-generic way. For example, enable/disable nested can be exposed as a
-command line --enable_nested, then based on the platform, runner can
-update corresponding module param or ignore.
-
-This will easily extend to providing sane configuration on the
-corresponding platforms without lots of hardcoding in JSON. These
-individual constructs will provide a generic view/option to run a KVM
-feature, and under the hood will do things differently based on the
-platform it is running on like arm, x86-intel, x86-amd, s390, etc.
-
-
-Phase 3: Provide collection of interesting configurations
-
-Specific individual constructs can be combined in a meaningful way to
-provide interesting configurations to run on a platform. For example,
-user doesn't need to specify each individual configuration instead,
-some prebuilt configurations can be exposed like
---stress_test_shadow_mmu, --test_basic_nested
-
-Tests need to handle the environment in which they are running
-gracefully, which many tests already do but not exhaustively. If some
-setting is not provided or set up properly for their execution then
-they should fail/skip accordingly.
-
-Runner will not be responsible to precheck things on tests behalf.
-
-
-Next steps:
-1. Consensus on above phases and features.
-2. Start development.
-
-Thanks,
-Vipin
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
