@@ -1,107 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636131D54D1;
-	Wed,  6 Nov 2024 08:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EF01DF729;
+	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730882666; cv=none; b=Kptd3h0mBsOqYbTfzMQm8a4Sfaa8Bjk0mnSp51+Az0zfrlX5hgHtL9YX+OcVl2iUDeH28MfGBd5qDr6930sqletLdGcJpuLg5dtGShg26WxwQSCpRubQws8keq4qDqT0YaAVqGW3JGv2rROy0LzWyOLGFE/flo/N7tzCN5Mk9Wo=
+	t=1730894617; cv=none; b=mbevG6V/EQgwEA55Jk8+cX6oDpdkCXM/pXm46pOZEVzetU4CenjNAOffnbL2HBKuTRUHBGAuHKXKbhzgquTcBIJCRFxAqELEm5V+RH81phlmSLVfmzb0wNd71T1kaPJbcIwDt75dsr2/tT+KnW4W9SEZJ9nZUkQWZCaaNNocgUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730882666; c=relaxed/simple;
-	bh=epVEU2AYAhlpV2xVETpPhEIE78lqpbGzb/PrPhs7GSM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DlXKkZh5ElPT/0JIv6cP0dICSeTqUzMfn6kbQ/8FHktUIzPhhyZZFnxIb/A6NTIKXDtad82p4DrnMgmi5A8dm1yNE2GstFl4NhyfH79FyV4Vq+veJXR2AQ6v19i8QJWWouGsSRUDWtxS1+F00Jx5UA/jnVnramyrF2Vw9UzYxb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgMe4KmO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730894617; c=relaxed/simple;
+	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YzmD5P7lJ2+KbAxRw3p2yMIzZDdcKc21ww34gA7rbAOvFbN1xN35xhlNv7bjho2y5pH9OBTBKJnrknqo9CLe3RWEfJ8V2Z5TOYvyMROuMonxzJivqb68r/OBuKgLbW9212GLNbQxZ88EvfdA4DumqNUI2oAtvHvS9/orVurpPDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGGGrkyU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgMe4KmO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E91CC4CECD;
-	Wed,  6 Nov 2024 08:44:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGGGrkyU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471E1C4CECD;
+	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730882666;
-	bh=epVEU2AYAhlpV2xVETpPhEIE78lqpbGzb/PrPhs7GSM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sgMe4KmOH7KJ1IcKn+B9Q79s6G9NZe5vOEBlKBzaiZHzZeOK0+NotQ+v2nOORZdpA
-	 46AIMqkYAd2Tmt+NDDGwIgyv++GFm6xhc9geukIkjFPthX+nxH5EtcezUywjY7Wkti
-	 mpq2aRs1pxyUMnJoJNpnM/3B0xt/Fk7FGC4WPflxBD6VVjNQiAa5+ga4GQNChoER6F
-	 mgoIr5qxqLTFZwexUfgLZuvjLAIJ80KrX9GZbHetq6TtgkucijjkI8WN8eMGu91C2f
-	 0KuhZQ6jvGo8Go5MpOzXYlgK09OYNZVczVQDGlBGLE743vpGiPNlSF+QH4ZrRfiBvV
-	 P8mFZzxa+0Zfw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1730894617;
+	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PGGGrkyUUUy0z1Mqcx5xqROA9jQDy6vuGf3cBZFvuzU0aUts8N9/2g/F0F9ssiIVo
+	 ZraIpV02Np+JVSYY+PHiS/v7Vfq1jeNjn+YghIkATbHmbg89oOqE37AaUcipNak0l+
+	 7cLUcOvr5iZo57XfgF3pjY6J8gfIXS67F6WRm/m5OBI+WESXazuYgEwxjrIiYuvG/K
+	 B8pHWJO7LU4uR2dmzxeGfLkZg6RqCTnfdF78+HQHL3hBZ7lfRq4qSZkW+DNSpKD1yw
+	 Yj/8eZXyaP9+wKZqQPvtPCmNa+Zp0l02m8o2jvShxbgtsBrFP8/n2GJe7uPyiylH5z
+	 S4tGuHYqsb1OA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t8beJ-00AHp5-UJ;
-	Wed, 06 Nov 2024 08:44:24 +0000
+	id 1t8el5-00AM93-6N;
+	Wed, 06 Nov 2024 12:03:35 +0000
+Date: Wed, 06 Nov 2024 12:03:34 +0000
+Message-ID: <86cyj81sdl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] irqchip/gic-v3: Force propagation of the active state with a read-back
-Date: Wed,  6 Nov 2024 08:44:18 +0000
-Message-Id: <20241106084418.3794612-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>
+Subject: Re: [PATCH v3 1/4] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+In-Reply-To: <20241106083035.2813799-2-jingzhangos@google.com>
+References: <20241106083035.2813799-1-jingzhangos@google.com>
+	<20241106083035.2813799-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tglx@linutronix.de, christoffer.dall@arm.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Christoffer reports that on some implementations, writing to
-GICR_ISACTIVER0 (and similar GICD registers) can race badly
-with a guest issuing a deactivation of that interrupt via the
-system register interface.
+On Wed, 06 Nov 2024 08:30:32 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> From: Kunkun Jiang <jiangkunkun@huawei.com>
+> 
+> In all the vgic_its_save_*() functinos, they do not check whether
+> the data length is 8 bytes before calling vgic_write_guest_lock.
+> This patch adds the check. To prevent the kernel from being blown up
+> when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
+> are replaced together.
+> 
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index ba945ba78cc7..2381bc5ce544 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2095,6 +2095,10 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>  	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+>  		ite->collection->collection_id;
+>  	val = cpu_to_le64(val);
+> +
+> +	if (KVM_BUG_ON(ite_esz != sizeof(val), kvm))
+> +		return -EINVAL;
+> +
+>  	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
+>  }
+>  
+> @@ -2250,6 +2254,10 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+>  	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+>  		(dev->num_eventid_bits - 1));
+>  	val = cpu_to_le64(val);
+> +
+> +	if (KVM_BUG_ON(dte_esz != sizeof(val), kvm))
+> +		return -EINVAL;
+> +
+>  	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
+>  }
+>  
+> @@ -2431,12 +2439,17 @@ static int vgic_its_save_cte(struct vgic_its *its,
+>  			     struct its_collection *collection,
+>  			     gpa_t gpa, int esz)
+>  {
+> +	struct kvm *kvm = its->dev->kvm;
 
-There are multiple reasons to this:
+nit: just use its->dev->kvm consistently, as this is what we are
+already doing in this function.
 
-- we use an early write-acknoledgement memory type (nGnRE), meaning
-  that the write may only have made it as far as some interconnect
-  by the time the store is considered "done"
+	M.
 
-- the GIC itself is allowed to buffer the write until it decides to
-  take it into account (as long as it is in finite time)
-
-The effects are that the activation may not have taken effect by the
-time we enter the guest, forcing an immediate exit, or that a guest
-deactivation occurs before the interrupt is active, doing nothing.
-
-In order to guarantee that the write to the ISACTIVER register has
-taken effect, read back from it, forcing the interconnect to propagate
-the write, and the GIC to process the write before returning the read.
-
-Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
- drivers/irqchip/irq-gic-v3.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index ce87205e3e823..8b6159f4cdafa 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -524,6 +524,13 @@ static int gic_irq_set_irqchip_state(struct irq_data *d,
- 	}
- 
- 	gic_poke_irq(d, reg);
-+
-+	/*
-+	 * Force read-back to guarantee that the active state has taken
-+	 * effect, and won't race with a guest-driven deactivation.
-+	 */
-+	if (reg == GICD_ISACTIVER)
-+		gic_peek_irq(d, reg);
- 	return 0;
- }
- 
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
