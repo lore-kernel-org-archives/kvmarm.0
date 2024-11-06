@@ -1,87 +1,110 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858C821621B
-	for <kvmarm@lists.linux.dev>; Tue,  5 Nov 2024 21:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF6A18FDCE
+	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 08:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730843896; cv=none; b=PnTokV8iRp+LMI3D4QRMCHQPPb+MFNhZ8PWkU6M7xCNRjjq67dr5JzH0j/YaTEpBeYPTUsxUx2gXWrGi3RgMCsARIrj6T6T6KkM/gvHqCkkhPkH6QlVZNf2FjFjgG8qGabG2AMmT+rtiZTSdUsUFXe/3kfgZqVVX9bd7/iEVgxw=
+	t=1730880945; cv=none; b=EHmgHx2KCNrYt6dsd6TF/twFnSvU5rW27CUL4oGnZuplN6ZP7fhWCbkqflWVkLZmEQbYdJBBebGLlzUr+3Pv+KS/XjgEOBLy+Y37oQaOzky5qxcEcZeNfuu82WJkX06s8oceqwv/ijlivXZJHzPgb1VQCOlOCP63VWiA5qdh7N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730843896; c=relaxed/simple;
-	bh=hVXm/x+Hcry9OdlFuKIcpWUw3L40KjuKcLvxB4+5XzE=;
+	s=arc-20240116; t=1730880945; c=relaxed/simple;
+	bh=8fw7y0ufn8alOZsJQrnBs1sftljzanf/bcsDxnTbGwA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eiEy07vdZ6MnWXw+YWslEG95hApij9on7Wotq2qguko1EcGw1N53S69jWIR4BwnXsyCXNKCAHUIHsDKO0SLkX0Ef7UsqAByJ5c6qJxabUiByKFfIjWSyW7v5naA+qSbb4FGmoTuafdO4bDNLEhhOJO7XxP0R39JHJPJryuN7JKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ofUrlJl3; arc=none smtp.client-ip=91.218.175.185
+	 Content-Type:Content-Disposition:In-Reply-To; b=kUlhvAOlRrCJ+a1cPcBQnRQ8ly0jRqsn7HSOssHWEnav/XQiQHTnoVrxXbld3HwW05y7DIn+LjGXVI4V/ejxOhoCd0r65V2Ev0JKWlo9qeOI/p88kuXxnz4nSc3Q40YWymVNjvLkzqxZ2LzvDJ9Fp5COgdyTI8C0mGL2emKDM84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ELvIzerC; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ofUrlJl3"
-Date: Tue, 5 Nov 2024 13:58:03 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ELvIzerC"
+Date: Wed, 6 Nov 2024 09:15:35 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730843892;
+	t=1730880939;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6UFzjbbeEdMdGk/8zVuKGqEE3W0fzh4S53TXeFLNMes=;
-	b=ofUrlJl3MqEQTDpDzSvG2BfYpHL5QiKe1pqicdzJ4Vs4qAwutZF8JdxwTSaa2Kbi/p8Uum
-	vj92nC7diqkZ1hFMgVHhQ2qwLyJF14ivcp+XdahigfYyvlb+yFaZFFZFGLxCG7Ku1KeMTg
-	AHM2bugexVMwqGBe8qCiRKlJC//v4/Y=
+	bh=hsMaYv3m940tgneEsZ4pQ4oYPa/rPcIiKpYEeNTsRWM=;
+	b=ELvIzerC2NVng7M43243GE/8DSEqmW2a+EAbWgbzN2PQ0HfGxLoY2/IcrqQ7Ra3ps1PH1B
+	vAO6IG/COlXOp9cBqPh/vK61M0FhZAobVaN4Xmnpmpm+La+p56buTAFZb4W86aeOQ7fhoW
+	Suk8jgQTCmqxDYlqKcrQlWi/NemGTE8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH v1 0/4] Fix a bug in VGIC ITS tables' save/restore
-Message-ID: <ZyqU6-uz55xJbm1d@linux.dev>
-References: <20241105193422.1094875-1-jingzhangos@google.com>
- <ZyqPMdH4anLEIq8G@linux.dev>
- <CAAdAUthd+c71BTSEvQvCZoYE2vQPHabofK=947MspU1hUbZd+w@mail.gmail.com>
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: atishp@rivosinc.com, jamestiotio@gmail.com, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] lib/on-cpus: Add barrier after
+ func call
+Message-ID: <20241106-9611aa66dfd52197b3b00e96@orel>
+References: <20241031123948.320652-5-andrew.jones@linux.dev>
+ <20241031123948.320652-7-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAdAUthd+c71BTSEvQvCZoYE2vQPHabofK=947MspU1hUbZd+w@mail.gmail.com>
+In-Reply-To: <20241031123948.320652-7-andrew.jones@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 05, 2024 at 01:56:14PM -0800, Jing Zhang wrote:
-> On Tue, Nov 5, 2024 at 1:33 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > Hi Jing,
-> >
-> > On Tue, Nov 05, 2024 at 11:34:18AM -0800, Jing Zhang wrote:
-> > > The core issue stems from the static linked list implementation of DTEs/ITEs,
-> > > requiring a full table scan to locate the list head during restoration. This
-> > > scan increases the likelihood of encountering orphaned entries.  To rectify
-> > > this, the patch series introduces a dummy head to the list, enabling immediate
-> > > access to the list head and bypassing the scan. This optimization not only
-> > > resolves the bug but also significantly enhances restore performance,
-> > > particularly in edge cases where valid entries reside at the end of the table.
-> >
-> > I think we need a more targeted fix (i.e. Kunkun's patch) to stop the
-> > bleeding + backport it to stable.
-> >
-> > Then we can have a separate discussion about improving the save/restore
-> > performance with your approach.
+On Thu, Oct 31, 2024 at 01:39:51PM +0100, Andrew Jones wrote:
+> It's reasonable for users of on_cpu() and on_cpumask() to assume
+> they can read data that 'func' has written when the call completes.
+> Ensure the caller doesn't observe a completion (target cpus are again
+> idle) without also being able to observe any writes which were made
+> by func(). Do so by adding barriers to implement the following
 > 
-> Yes, I'll respin Kunkun's patch soon. This patch series has the
-> selftest which we can use for verification.
+>  target-cpu                                   calling-cpu
+>  ----------                                   -----------
+>  func() /* store something */                 /* wait for target to be idle */
+>  smp_wmb();                                   smp_rmb();
+>  set_cpu_idle(smp_processor_id(), true);      /* load what func() stored */
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 
-Right -- go ahead and include your selftest as part of that respin, I'd
-definitely like to have some test coverage for this whole save/restore mess.
+I added a
 
--- 
-Thanks,
-Oliver
+Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+to this patch.
+
+> ---
+>  lib/on-cpus.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/lib/on-cpus.c b/lib/on-cpus.c
+> index f6072117fa1b..356f284be61b 100644
+> --- a/lib/on-cpus.c
+> +++ b/lib/on-cpus.c
+> @@ -79,6 +79,7 @@ void do_idle(void)
+>  			smp_wait_for_event();
+>  		smp_rmb();
+>  		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
+> +		smp_wmb(); /* pairs with the smp_rmb() in on_cpu() and on_cpumask() */
+>  	}
+>  }
+>  
+> @@ -145,12 +146,14 @@ void on_cpumask(const cpumask_t *mask, void (*func)(void *data), void *data)
+>  		smp_wait_for_event();
+>  	for_each_cpu(cpu, mask)
+>  		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+> +	smp_rmb(); /* pairs with the smp_wmb() in do_idle() */
+>  }
+>  
+>  void on_cpu(int cpu, void (*func)(void *data), void *data)
+>  {
+>  	on_cpu_async(cpu, func, data);
+>  	cpu_wait(cpu);
+> +	smp_rmb(); /* pairs with the smp_wmb() in do_idle() */
+>  }
+>  
+>  void on_cpus(void (*func)(void *data), void *data)
+> -- 
+> 2.47.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
