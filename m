@@ -1,59 +1,52 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07424191461;
-	Wed,  6 Nov 2024 13:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3351DEFD7
+	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 13:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730899621; cv=none; b=YIQEcLaY65JMQzHTUdRYIFD8e6Z5JXE31N3ly+3xj7H35qC7D9JPUitb+hzv6/YvOWWlSUvVCpmOMfQa8OU+YVepNifIjdbrxdTI1/Wel4fztHxJ7qCzQkI7iGFNn8lrY1Xjy2zSK+NZZg0EwfAhN/PC2aNUz5Wu/AlAUIiuUvI=
+	t=1730901082; cv=none; b=ngIYxB2xWXi8m+EpqhoYpGQspHtk4h9MHPfLbxdd3taCD0kkSQyWuBgYLe1cJWoaIW+gXvNEIJDN3f28az+DjsnVxhpEZyT9b2H8d34QKYtB1akNfXpKyaNcCYOphI8Lif0dLPR1UJ8Ywx22JSvj/nJImEcbS0PAXMyBl9PVLXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730899621; c=relaxed/simple;
-	bh=YsdgsNLn3Pt94qYHQp37MqqUXQnx1YcTHDZKk+avfN0=;
+	s=arc-20240116; t=1730901082; c=relaxed/simple;
+	bh=y/kCWH56lsq8A5L3Dd12k34Q3XqtL+M0Zi9k/4KqAgo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MxSqh1Uz4AC+XP/p8OpcaU9U9fKP2zi2uz+aDhrZEAmXJUnxpSSqmCIuXtmtnnV1QpvwVv8M+31BIyBb3PseZbE8OPmMpz2pkZYrOjvPVtDy2uyBQMuSunMxD9R7Lnxus/GxtQQSs62QYO7ePuIQZM8YZaVYq5Is0coNiwWfbN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=crHz1lLz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=H7os/X/2rhSuCEEH6zpYfz+M0kbrU9k3deH2fHDZx1/QdTYkUj8gyeszXnCxLnxuSu49EcFoyORP6maCnpQTYc7f8fal54mY6+PQr3bQ+EWdCNdXHqdFo63dKynfRd6lh0G4vPvDPkO+3NPnmdP3m8ufGzdCOft6S2TdrU8AOvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7pgdlHe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="crHz1lLz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1B1C4CECD;
-	Wed,  6 Nov 2024 13:27:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7pgdlHe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 390A5C4CECC;
+	Wed,  6 Nov 2024 13:51:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730899620;
-	bh=YsdgsNLn3Pt94qYHQp37MqqUXQnx1YcTHDZKk+avfN0=;
+	s=k20201202; t=1730901082;
+	bh=y/kCWH56lsq8A5L3Dd12k34Q3XqtL+M0Zi9k/4KqAgo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=crHz1lLzZMb7i/uvSwBbyrGkEUN8bOUEZEnF9f8JAwv8cUCLPO+mWcZsYhF7bHFx/
-	 JQGwm2lV7eH7Of+HF0L5wXqRLQamQIITuhJMsiJH6aLlD0FpEJ8IGRAfhBmS5Y0CGC
-	 6lL4zO2okkyEXHXDeXcc2k8qekasXR64FcOHbsTTATUzZN1j9Klhu+2w1AjkUE9LmB
-	 ZJ3spHnXLMLVVIgzAaAepFVtxWcsaysfPq4Wk6O8+t+PKyHSHPkLzAUtnozE/QEtYw
-	 vAN/FkdjSxaCIuOZ5LEaPRMSMKfw52Fr+q58DGdNuieJhtdAlw7NdZI4s/mRAiyNTa
-	 1rVbDV1ANxMkQ==
+	b=U7pgdlHehhSwfyDfGPEb8I13dcH8pTfRtl/c+ZpjCQXklQ5acmNzabphTVbH9D42a
+	 akwUygIy8m1YsuvSrm0Tl5W+HraQ2H5sOjq6dL5Mu6HMBdL8Yhnm5s0H80lwJdwRyT
+	 /q5ZcIDoNQKVF1zGHhTM8ipS44ZUTeojsx1mPHZInLU7QU7KcKyZdEEGaBEGE/RFEq
+	 Eyxu//qVaNXmf2FCWuq9mi4O5esJc+gcrd1G02RxDuHRSLGqu5C7beI7/iK46iTDo7
+	 BW+CqTkGeQKHlPfWIr8ImxsEYcw12uFxL/PCu1fShXrZMbRbyyeoqYMBCstrL0ARw8
+	 yC1tFnb/oIVUw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t8g3m-00ANoh-KU;
-	Wed, 06 Nov 2024 13:26:58 +0000
-Date: Wed, 06 Nov 2024 13:26:57 +0000
-Message-ID: <86a5ec1oim.wl-maz@kernel.org>
+	id 1t8gRM-00AOGG-7G;
+	Wed, 06 Nov 2024 13:51:20 +0000
+Date: Wed, 06 Nov 2024 13:51:19 +0000
+Message-ID: <868qtw1ne0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Shusen Li <lishusen2@huawei.com>,
-	Eric Auger <eauger@redhat.com>
-Subject: Re: [PATCH v3 4/4] KVM: selftests: aarch64: Test VGIC ITS tables save/restore
-In-Reply-To: <20241106083035.2813799-5-jingzhangos@google.com>
-References: <20241106083035.2813799-1-jingzhangos@google.com>
-	<20241106083035.2813799-5-jingzhangos@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: [PATCH] KVM: arm64: VHE: Initialize PMSCR_EL1
+In-Reply-To: <20241106122654.38234-1-alexandru.elisei@arm.com>
+References: <20241106122654.38234-1-alexandru.elisei@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,55 +57,93 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com, eauger@redhat.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-[Adding Eric to the list, since he worked a lot on the save/restore code]
+On Wed, 06 Nov 2024 12:26:54 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> According to the pseudocode for StatisticalProfilingEnabled() from Arm
+> DDI0487K.a, PMSCR_EL1 controls profiling at EL1 and EL0:
+> 
+> - PMSCR_EL1.E1SPE controls profiling at EL1.
+> - PMSCR_EL1.E0SPE controls profiling at EL0 if HCR_EL2.TGE=0. KVM always
+>   clears HCR_EL2.TGE when running a VM.
+> 
+> When profiling is enabled in the host, and the host is running in nVHE mode
+> (HCR_EL2.E2H=0), KVM clears PMSCR_EL1.{E1SPE,E0SPE} before jumping into the
+> guest.
+> 
+> When profiling is enabled in the host, and the host is running at EL2
+> (HCR_EL2.E2H=1), KVM will not touch PMSCR_EL1.{E1SPE,E0SPE} before jumping
+> into the guest. PMSCR_EL1.{E1SPE,E0SPE} reset to an architecturally UNKNOWN
+> value, which means it might be possible that KVM unintentionally profiles
+> the guest when is running in VHE mode.
+> 
+> Clear PMSCR_EL1.{E1SPE,E0SPE} when setting up VHE mode to keep the
+> behaviour consistent and predictable.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> 
+> Tested on the model, by setting the PMSCR_EL1.E1SPE and E0SPE bits in
+> __init_el2_debug to simulate a system where they reset to 1. Without the
+> patch, when the host is running at EL2, and the user is profiling the
+> kvmtool process, I can see records taken at EL1:
+> 
+> # perf record -e arm_spe// -- ./lkvm-static run -c2 -m512 -k Image -d disk -p earlycon
+> 
+> With this patch, those records disappear; and the size of perf.data has
+> been more than halved.
+> 
+>  arch/arm64/kernel/hyp-stub.S | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index 65f76064c86b..df63f329d400 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -117,6 +117,8 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+>  	bic	x0, x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
+>  	bic	x0, x0, #(MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT)
+>  	msr	mdcr_el2, x0
+> +	// Disable profiling when running a virtual machine
+> +	msr_s	SYS_PMSCR_EL12, xzr
 
-On Wed, 06 Nov 2024 08:30:35 +0000,
-Jing Zhang <jingzhangos@google.com> wrote:
->=20
-> Add a selftest to verify the correctness of the VGIC ITS mappings after
-> the save/restore operations (KVM_DEV_ARM_ITS_SAVE_TABLES /
-> KVM_DEV_ARM_ITS_RESTORE_TABLES).
+... resulting in an early crash on anything that doesn't have SPE.
+That's indeed "consistent and predictable" :-).
 
-What are you checking? The saved data? The restored data?
+>  
+>  	// Transfer the MM state from EL1 to EL2
+>  	mrs_s	x0, SYS_TCR_EL12
 
-> Also calculate the time spending on save/restore operations.
+I find it pretty odd to hide something that is squarely guest state in
+the hyp stubs, and I'd rather see something like this (untested):
 
-Is that really relevant? I don't think performance matters at this
-stage, if we can't even have reliable data.
-
-> This test uses some corner cases to capture the save/restore bugs. It
-
-Which corner cases?
-
-> will be used to verify the future incoming changes for the VGIC ITS
-> tables save/restore.
->=20
-> To capture the "Invalid argument (-22)" error, run the test without any
-> option. To capture the wrong/lost mappings, run the test with '-s'
-> option.
-> Since the VGIC ITS save/restore bug is caused by orphaned DTE/ITE
-> entries, if we run the test with '-c' option whih clears the tables
-> before the save operation, the test will complete successfully.
-
-I'm sorry, but this description is meaningless, as you need to know
-what is the bug that has been fixed.
-
-Also, how is someone supposed to run this thing? Without options? With
-options? With any combination of options?
-
-=46rom what I understand, the various options are designed to help
-debugging a broken vgic implementation. So please document what the
-options do rather than an bug that is supposed to be already fixed.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 48cafb65d6acf..806f25a8753ed 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2139,8 +2139,12 @@ static void cpu_hyp_init_features(void)
+ 	cpu_set_hyp_vector();
+ 	kvm_arm_init_debug();
+ 
+-	if (is_kernel_in_hyp_mode())
++	if (is_kernel_in_hyp_mode()) {
++		if (SYS_FIELD_GET(ID_AA64DFR0_EL1, PMSVer,
++				  read_sysreg(id_aa64dfr0_el1)))
++			write_sysreg_el1(0, SYS_PMSCR);
+ 		kvm_timer_init_vhe();
++	}
+ 
+ 	if (vgic_present)
+ 		kvm_vgic_init_cpu_hardware();
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
