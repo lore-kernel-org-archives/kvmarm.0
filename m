@@ -1,55 +1,55 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBB836D
-	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 18:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DDA2076B1
+	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 18:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730917833; cv=none; b=FE82uFadtExB2uFQIO+Ab6ATVgTUa0MBiNH3GzPzKyIH2FRVGbKnXn+ut1JhPmNal88PQl33Jq5Zgaq7hkPgKqmwcOz7oXG6A2lQ40nn+DvetSvYz8L8eu3TJmLu2xw8UUqsR3Bz0ylX12ZkfHPbBRDMyXD0Sms2Gh60GLcPCpY=
+	t=1730918510; cv=none; b=iPmg9n4gtPgs/F7Nb4Uq9OdnnAQqPuxpgJ0Ma602wOMPit8HwL6Z52KxGr0XDm03OVGMn9ijWc7kqR6XxOF+gQZfDlkI8/ScZY/P8kZJVgVxmPzi/a83UO4YQhi1e/1xr4qY4gkMltiyEbz7Vz0KeZGaJ0frLar4j8o7jpK7LKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730917833; c=relaxed/simple;
-	bh=mjoz83CLqaDv8rpTVVqzpgd8HTB+bg+8p56PWi41xqs=;
+	s=arc-20240116; t=1730918510; c=relaxed/simple;
+	bh=O0rXKOxISdp0VOGK36WmzL5LnmhOQY5UyxWhw+AV0sU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GuMpkeExr8x6PWgZCAsnLZ9IobgiEjKPI6ubZwOwl25oPmN7VT0WajPxCB5pCtHSGk6CcvJxaqMCK+L0acvhwz1+C/v/MVjNXrWnyUhY93tEQ058LDCGmHpBwTLTkt9qFu/EaO1A6iOcC5ddkSS+d9sJiYub9JROv935alF0s9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rX6f7pMk; arc=none smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=Vo0CB9JkBlvmZ4anvV6ga4eMuSF1L2awhh5eIa11l++QZes/apvEapJUDzj946sCElYjygp/uOWECHVPR5/UHY8LGe8PYpDQHWqOfPFos7TEF1SBTKJwfm2hTinvIvkT2J+h0z1iuIVx7p7WO7S4qV7PaX6nHuL3ILQSSJFfMmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PAleYMMK; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rX6f7pMk"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53b13ea6b78so16875e87.2
-        for <kvmarm@lists.linux.dev>; Wed, 06 Nov 2024 10:30:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PAleYMMK"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so50364e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 Nov 2024 10:41:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730917830; x=1731522630; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1730918507; x=1731523307; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NbT+MVFmQWldHSwvQIAZqRuAjWXImGGsq+3vijULiGE=;
-        b=rX6f7pMkZ8xaPxhj6ft0pLKLgS4xIXehS89ZT59W6VW7bH7ZTApY/e6PZM6vxAQDJy
-         kAaWJsmGchZHQMY8hRAnYpbhJNVZTiNwJkFyzPGQ0r1+N13CvtXE0TXQybPE9WUGZZyi
-         l9s7zvf0boq1hlbUBB8XKzI0DgkqwTLiixZwB/Faq6d6yK0aFh5CHV4i1g1jYm7iyKyp
-         qCHdrwDt4R0MRv4+V6fSqc7jaq9QxASA2WbZUY7XDDVLK9zFuJ6GWktOszQ1LDdp4FhB
-         vQPER9C/zp0MYPBHUToWEZoEFjCxE3TkJx1/dga8SLBsgEMwYABtOGlehDdgIaecMlQ5
-         mjWQ==
+        bh=yYk4e/Rf0Fwn8rgiKqzmXUTH3/JjwaWMVgfrc3mEkFk=;
+        b=PAleYMMKqqQMDXNVTBhAmluj99eLyItsFx7gno4oIWcAJzcB9ygcSy1r+YxH0HMWXO
+         Hffyd96S+IDRuVlooTjVrtXeInzzRriwFlWF6LzEumKoc2uZ7T8cYyGsleQ5SIM8gX5D
+         LHwTIkGtwega/uTj4ehDZ3yUB6ITstVmf/ZQ3oMf06Fj0KXpVtxk60/k/lB7ZcMCTvUY
+         WIkNDrr20F3IB+RuDBxlv+gu+QVafs+poZzkdMY84iE8WqpxxV/iTn3GIWTiYpdo5X8o
+         sgYKVozBUoNb/LGrdiJWVJsAue5w4V8MbhHj2R07dDHSw9G/i6hFtbn3AYzUglq1E8lP
+         nIvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730917830; x=1731522630;
+        d=1e100.net; s=20230601; t=1730918507; x=1731523307;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NbT+MVFmQWldHSwvQIAZqRuAjWXImGGsq+3vijULiGE=;
-        b=H+ALNFduBkLEwl/EyPRYM/0sMzGRRqWxgrYCXmASOFYeALQXoFZjA5sKwowC9hFiel
-         AojnsbGyJqTj4nkTpLRNgjcZTQ/iHtzCK+tlDhob2y3sk8w5TkgXDVZ1Ngco9oXUaS9k
-         IYfRbAqyD//DJkY1/8fcaRmDd8qZIIhiNjsU+DcyncirefTuBzlrYR+kLQr8mT1Bm4Wj
-         e6yZcV2Mcx5BzhYyC/+3DKzB0OR9ohR91OF10oJz8tP6rxNyMUbZXgActRPq97EN2FCn
-         Pr3/lpoImP0yTWE/t1AztmSumxcL2l5xajNMdPu2YwUrTArL6CGilRtLqvDq5ytuXQQY
-         Y3lA==
-X-Forwarded-Encrypted: i=1; AJvYcCWeQ2YJc75HnThnQAZH3qRZD/MkLCy9ortKS3Y9HpmI5izg3IPfyRAjUfz1Vgz9jHE3TM/4YAs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzRECr+n+awnEXgx+V2MQ6DWBmaMhSop0Klu/7CxUvLqBWrNxCi
-	T39tm4Uv1hUmil8wFEt7n1TaO9Hr/Cdaxj6Vf7F1U1RpxiXuOa+dzs1TDI2LuCjF/3EYZ0BAnfP
-	lqsEGtxvIa1f3kk0XLVyQCycCFqs+96s5+GME
-X-Google-Smtp-Source: AGHT+IGYKAJXEmT25HizfPd98EM7DkJ/wBTM9jTTkKgsvpun+NHaqwmwMvXWcTOmNi+oHO6/SxiZtFDZUwiPL4oYAew=
-X-Received: by 2002:a05:6512:159c:b0:539:8f3c:4586 with SMTP id
- 2adb3069b0e04-53d65e16881mr14669176e87.55.1730917829767; Wed, 06 Nov 2024
- 10:30:29 -0800 (PST)
+        bh=yYk4e/Rf0Fwn8rgiKqzmXUTH3/JjwaWMVgfrc3mEkFk=;
+        b=K9gMWk9Su8lGZXEVWX2eIZpn3Kzud601+cSGCYBnxG+QmNbUKfZ7IkaU6tMjO7nSK0
+         MjbIwa4nSSFC0Nmcs07rvKakD11kE9wCF9uK4HXjJYOOGUU3JRBVIRLbbM34q/YRwWXR
+         0Gcgu1PK4YUDBn4VhFEoqrTSwsWx5T6HaNqwEIQIfx6HCB/dy0DfxVCTPPULCJBCxXTs
+         f96JoHK8eATbvRgiyw4kT2ELk85z8kuy8MwL7nPVn++aZIt1e0KRCHAJ0//DXUOuWSSM
+         JCGS6LO7SW08zLwteVU+/3WPAUQx/0K+YXoBPL1dF/Yg4kL5/BnfACI8hL33WBSzBNfH
+         B6Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3BfqLp0yPR/hsXAlcnyu9N4ZivGpdv5MzncQyPdR8VrzJUDgEJuyTjurGo7d9RFKkvlbm22Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzyB2V+qbfykJMVqGUSIUguGOEAn74gJfaf0XAsL4icy3MA30w5
+	2t2ZqYu2Q0KGXPrmWuHnwBghfv1G5Idro32z+ZQBUcRykFgO/y+8csZsSS+rtFIMkIc/Geq59dH
+	UjrcOJaXqeCNWKYfYkBpW98bZSLvcMVg69+oK
+X-Google-Smtp-Source: AGHT+IHx4X3KPAFGSnjaYKE8NT/XVzFyHeBioH3zapaMHSYPe+KnYq0l63zBuSlt2HLiDpsHUtw8XFGqFcDi10iVlu8=
+X-Received: by 2002:a05:6512:6ce:b0:539:f922:bd4e with SMTP id
+ 2adb3069b0e04-53b7ece11eamr15715877e87.23.1730918507026; Wed, 06 Nov 2024
+ 10:41:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,12 +57,12 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20241106083035.2813799-1-jingzhangos@google.com>
- <20241106083035.2813799-3-jingzhangos@google.com> <86bjys1p45.wl-maz@kernel.org>
-In-Reply-To: <86bjys1p45.wl-maz@kernel.org>
+ <20241106083035.2813799-5-jingzhangos@google.com> <86a5ec1oim.wl-maz@kernel.org>
+In-Reply-To: <86a5ec1oim.wl-maz@kernel.org>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 6 Nov 2024 10:30:17 -0800
-Message-ID: <CAAdAUthN14kLmeH0eLK991soGeZD8qzD+Sp1jR2gZjqLVE771Q@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] KVM: arm64: vgic-its: Clear DTE when MAPD unmaps a device
+Date: Wed, 6 Nov 2024 10:41:35 -0800
+Message-ID: <CAAdAUtjYZ5N4UpaK5Kt8MRyN1zqPD5QqjZzNdp-HPUgA-AtNJg@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] KVM: selftests: aarch64: Test VGIC ITS tables save/restore
 To: Marc Zyngier <maz@kernel.org>
 Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
@@ -70,148 +70,69 @@ Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Kunkun Jiang <jiangkunkun@huawei.com>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
 	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Shusen Li <lishusen2@huawei.com>
+	Shusen Li <lishusen2@huawei.com>, Eric Auger <eauger@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 6, 2024 at 5:14=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+Hi Marc,
+
+
+On Wed, Nov 6, 2024 at 5:27=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Wed, 06 Nov 2024 08:30:33 +0000,
+> [Adding Eric to the list, since he worked a lot on the save/restore code]
+>
+> On Wed, 06 Nov 2024 08:30:35 +0000,
 > Jing Zhang <jingzhangos@google.com> wrote:
 > >
-> > From: Kunkun Jiang <jiangkunkun@huawei.com>
-> >
-> > vgic_its_save_device_tables will traverse its->device_list to
-> > save DTE for each device. vgic_its_restore_device_tables will
-> > traverse each entry of device table and check if it is valid.
-> > Restore if valid.
-> >
-> > But when MAPD unmaps a device, it does not invalidate the
-> > corresponding DTE. In the scenario of continuous saves
-> > and restores, there may be a situation where a device's DTE
-> > is not saved but is restored. This is unreasonable and may
-> > cause restore to fail. This patch clears the corresponding
-> > DTE when MAPD unmaps a device.
-> >
-> > Co-developed-by: Shusen Li <lishusen2@huawei.com>
-> > Signed-off-by: Shusen Li <lishusen2@huawei.com>
-> > Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-its.c | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-=
-its.c
-> > index 2381bc5ce544..7c57c7c6fbff 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > @@ -1140,8 +1140,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *k=
-vm, struct vgic_its *its,
-> >       u8 num_eventid_bits =3D its_cmd_get_size(its_cmd);
-> >       gpa_t itt_addr =3D its_cmd_get_ittaddr(its_cmd);
-> >       struct its_device *device;
-> > +     gpa_t gpa;
-> >
-> > -     if (!vgic_its_check_id(its, its->baser_device_table, device_id, N=
-ULL))
-> > +     if (!vgic_its_check_id(its, its->baser_device_table, device_id, &=
-gpa))
-> >               return E_ITS_MAPD_DEVICE_OOR;
-> >
-> >       if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-> > @@ -1161,8 +1162,17 @@ static int vgic_its_cmd_handle_mapd(struct kvm *=
-kvm, struct vgic_its *its,
-> >        * The spec does not say whether unmapping a not-mapped device
-> >        * is an error, so we are done in any case.
-> >        */
-> > -     if (!valid)
-> > +     if (!valid) {
-> > +             struct kvm *kvm =3D its->dev->kvm;
-> > +             int dte_esz =3D vgic_its_get_abi(its)->dte_esz;
-> > +             u64 val =3D 0;
-> > +
-> > +             if (KVM_BUG_ON(dte_esz !=3D sizeof(val), kvm))
-> > +                     return -EINVAL;
+> > Add a selftest to verify the correctness of the VGIC ITS mappings after
+> > the save/restore operations (KVM_DEV_ARM_ITS_SAVE_TABLES /
+> > KVM_DEV_ARM_ITS_RESTORE_TABLES).
 >
-> I find it pretty odd to bug only in that case, and the sprinkling of
-> these checks all over the place is horrible. I'm starting to wonder if
-> we shouldn't simply wrap vgic_write_guest() and co to do the checking.
+> What are you checking? The saved data? The restored data?
 >
-> > +
-> > +             vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
+> > Also calculate the time spending on save/restore operations.
 >
-> I'm thinking of something like:
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
-s.c
-> index ba945ba78cc7d..d8e57aefcd3a5 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1128,6 +1128,19 @@ static struct its_device *vgic_its_alloc_device(st=
-ruct vgic_its *its,
->         return device;
->  }
->
-> +
-> +#define its_write_entry_lock(i, g, valp, t)                            \
-> +       ({                                                              \
-> +               struct kvm *__k =3D (i)->dev->kvm;                       =
- \
-> +               int __sz =3D vgic_its_get_abi(i)->t;                     =
- \
-> +               int __ret =3D 0;                                         =
- \
-> +               if (KVM_BUG_ON(__sz !=3D sizeof(*(valp)), __k))          =
- \
-> +                       __ret =3D -EINVAL;                               =
- \
-> +               else                                                    \
-> +                       vgic_write_guest_lock(__k, (g), (valp), __sz);  \
-> +               __ret;                                                  \
-> +       })
-> +
->  /*
->   * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs=
-).
->   * Must be called with the its_lock mutex held.
-> @@ -1140,8 +1153,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm=
-, struct vgic_its *its,
->         u8 num_eventid_bits =3D its_cmd_get_size(its_cmd);
->         gpa_t itt_addr =3D its_cmd_get_ittaddr(its_cmd);
->         struct its_device *device;
-> +       gpa_t gpa;
->
-> -       if (!vgic_its_check_id(its, its->baser_device_table, device_id, N=
-ULL))
-> +       if (!vgic_its_check_id(its, its->baser_device_table, device_id, &=
-gpa))
->                 return E_ITS_MAPD_DEVICE_OOR;
->
->         if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-> @@ -1161,8 +1175,10 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kv=
-m, struct vgic_its *its,
->          * The spec does not say whether unmapping a not-mapped device
->          * is an error, so we are done in any case.
->          */
-> -       if (!valid)
-> -               return 0;
-> +       if (!valid) {
-> +               u64 val =3D 0;
-> +               return its_write_entry_lock(its, gpa, &val, dte_esz);
-> +       }
->
->         device =3D vgic_its_alloc_device(its, device_id, itt_addr,
->                                        num_eventid_bits);
->
-> which can be generalised everywhere (you can even extract the check
-> and move it to an out-of-line helper as required).
+> Is that really relevant? I don't think performance matters at this
+> stage, if we can't even have reliable data.
 
-Sounds good. Will do as you suggested.
+Right. It doesn't matter. Will remove this line from the message.
+>
+> > This test uses some corner cases to capture the save/restore bugs. It
+>
+> Which corner cases?
 
-Jing
+Will add details.
+>
+> > will be used to verify the future incoming changes for the VGIC ITS
+> > tables save/restore.
+> >
+> > To capture the "Invalid argument (-22)" error, run the test without any
+> > option. To capture the wrong/lost mappings, run the test with '-s'
+> > option.
+> > Since the VGIC ITS save/restore bug is caused by orphaned DTE/ITE
+> > entries, if we run the test with '-c' option whih clears the tables
+> > before the save operation, the test will complete successfully.
+>
+> I'm sorry, but this description is meaningless, as you need to know
+> what is the bug that has been fixed.
+
+Will add bug description here too as in the cover letter.
+>
+> Also, how is someone supposed to run this thing? Without options? With
+> options? With any combination of options?
+>
+> From what I understand, the various options are designed to help
+> debugging a broken vgic implementation. So please document what the
+> options do rather than an bug that is supposed to be already fixed.
+
+Will do.
+>
+> Thanks,
 >
 >         M.
 >
 > --
 > Without deviation from the norm, progress is not possible.
+
+Thanks,
+Jing
