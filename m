@@ -1,149 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3351DEFD7
-	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 13:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB131201115
+	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 16:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730901082; cv=none; b=ngIYxB2xWXi8m+EpqhoYpGQspHtk4h9MHPfLbxdd3taCD0kkSQyWuBgYLe1cJWoaIW+gXvNEIJDN3f28az+DjsnVxhpEZyT9b2H8d34QKYtB1akNfXpKyaNcCYOphI8Lif0dLPR1UJ8Ywx22JSvj/nJImEcbS0PAXMyBl9PVLXM=
+	t=1730912345; cv=none; b=PWK+p9lQuYXdEoHUnt3KNsmqgtq1zlJN0ZYMy6FfuvS8TWbELMAH1bOtwv9krBAJ+D1TDqw4RNXJ2eX4KhSRrveHDjAfFmYvDJFaz7nPu1g7ZQKwDKoSSdlV1SAMeaFngXuclqxaRk76I+B7+vLfk/NyWvapRk48M8VwSHKAhXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730901082; c=relaxed/simple;
-	bh=y/kCWH56lsq8A5L3Dd12k34Q3XqtL+M0Zi9k/4KqAgo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H7os/X/2rhSuCEEH6zpYfz+M0kbrU9k3deH2fHDZx1/QdTYkUj8gyeszXnCxLnxuSu49EcFoyORP6maCnpQTYc7f8fal54mY6+PQr3bQ+EWdCNdXHqdFo63dKynfRd6lh0G4vPvDPkO+3NPnmdP3m8ufGzdCOft6S2TdrU8AOvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7pgdlHe; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730912345; c=relaxed/simple;
+	bh=zz24KO1Xy7Ea1dfAlSGXrFBY4HRdXzwVaZck1Xoj2hY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ayMSs9ypa80xZFuiPVutOG3M4IeYA61RFV4UD+rIqq8iesCxjBqyftNw8yqKxVhwjjlMXvDnfpMt5VmrSX1hOG8Pdi+7OTyxY/+WXrKBgC7yhemumbI6M3Bjm/lNujsWdn6IYa1jeXFBCcRJn8XmN7gwDQYZ7dYoBwb5DlY1cTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Nx+xBqD; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7pgdlHe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 390A5C4CECC;
-	Wed,  6 Nov 2024 13:51:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730901082;
-	bh=y/kCWH56lsq8A5L3Dd12k34Q3XqtL+M0Zi9k/4KqAgo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U7pgdlHehhSwfyDfGPEb8I13dcH8pTfRtl/c+ZpjCQXklQ5acmNzabphTVbH9D42a
-	 akwUygIy8m1YsuvSrm0Tl5W+HraQ2H5sOjq6dL5Mu6HMBdL8Yhnm5s0H80lwJdwRyT
-	 /q5ZcIDoNQKVF1zGHhTM8ipS44ZUTeojsx1mPHZInLU7QU7KcKyZdEEGaBEGE/RFEq
-	 Eyxu//qVaNXmf2FCWuq9mi4O5esJc+gcrd1G02RxDuHRSLGqu5C7beI7/iK46iTDo7
-	 BW+CqTkGeQKHlPfWIr8ImxsEYcw12uFxL/PCu1fShXrZMbRbyyeoqYMBCstrL0ARw8
-	 yC1tFnb/oIVUw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t8gRM-00AOGG-7G;
-	Wed, 06 Nov 2024 13:51:20 +0000
-Date: Wed, 06 Nov 2024 13:51:19 +0000
-Message-ID: <868qtw1ne0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org
-Subject: Re: [PATCH] KVM: arm64: VHE: Initialize PMSCR_EL1
-In-Reply-To: <20241106122654.38234-1-alexandru.elisei@arm.com>
-References: <20241106122654.38234-1-alexandru.elisei@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Nx+xBqD"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5cec7cde922so7110716a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Nov 2024 08:59:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730912342; x=1731517142; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T2Kg6GaH7gYTnb++jbY4MBBC4c65ettqYa6wLql3FJE=;
+        b=1Nx+xBqDAmTmwH6/9Zjya+q+SSctjIqE21t4Ae/3HamEtpCROmSL5DKYvOw0gnMPfH
+         Nyq6dNG0Gw9Ymj3eep9Vt/pybEznR+z8lHvv1Y5uhet0itttFz4rfseno4LKgP+Ubdc6
+         GgrOn4ejPu74NjoI0kcDXrRC3c4tSXwq1suK6FY++OZ+MiVqy98RQYvh1TRSlmUW2Piu
+         H5RM9fKCFJE5/DLFj7+tdH0o4IB8tMRMdBRGaGXtVKSvKVcIiyspzVWyPrVPsctU4AHz
+         lae9L3DAB0+gMMtYXpU8493CecBBYUgwyP2g+cw6f6Xr4sQw20cH9UEqGIEIWW5SR+xq
+         s/jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730912342; x=1731517142;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T2Kg6GaH7gYTnb++jbY4MBBC4c65ettqYa6wLql3FJE=;
+        b=iejcKT1YpnKVOK+zo69ollD9ujmNtm2GPegMvySUP3ujMaj6gNLXKG72yUN4TUGtKc
+         uCN30hSWC2oUYPCMk5NOY39GvhA0H5ObKex2YMiBYybdPINabamLBkjm7fEEHVF61E0c
+         H36kyLfzmmJ07TdH+0QtC0IDPbFIsZRSDMw8xPagQrX7gLB4flKJtgv2Jvr/nTLNJtAp
+         AlDIFv62BAQxcNEo4veLGX5/VHfnheNzSLDp3zBQFtRtDKkmDMjFnkWI9lIUUjcIoknL
+         jUj6fUM74KUjMpNt1uD8L9sLIW2s39L0KQ+enCDOA+8uLc2YpSwsIZSJkxlJ2/owaW5y
+         gfgg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtITqhR68g0p4JmEjDBWcuYtVRXWaJI1lrckW8c7TdIQnwV+WHmzLvwmp+sDvKYj/jRqwdROE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywi5Lr0V1SMpAeQDQydNFZw7EVkVHLWnuzBbvezl0y+cexONUQN
+	5A+6XWIPm6g1mFGIBz9Z4QM6spdojbUFqN01nQu8R7p4UdgznsbStLenMYmhkw==
+X-Google-Smtp-Source: AGHT+IGvdZ2IaD+BzOBp7O9t8aJG3Fn8CPmHBQZKasjV9H+9x/GBg968m+XOOjPPD2/pEN1skbtRkA==
+X-Received: by 2002:a17:907:7f14:b0:a9a:6855:1820 with SMTP id a640c23a62f3a-a9e3a5a0357mr2809681466b.15.1730912342073;
+        Wed, 06 Nov 2024 08:59:02 -0800 (PST)
+Received: from google.com (40.162.204.35.bc.googleusercontent.com. [35.204.162.40])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16a1440sm304413166b.31.2024.11.06.08.59.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 08:59:01 -0800 (PST)
+Date: Wed, 6 Nov 2024 16:58:58 +0000
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 17/18] KVM: arm64: Introduce the EL1 pKVM MMU
+Message-ID: <ZyugUvS5dMwXU5nW@google.com>
+References: <20241104133204.85208-1-qperret@google.com>
+ <20241104133204.85208-18-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104133204.85208-18-qperret@google.com>
 
-On Wed, 06 Nov 2024 12:26:54 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> According to the pseudocode for StatisticalProfilingEnabled() from Arm
-> DDI0487K.a, PMSCR_EL1 controls profiling at EL1 and EL0:
-> 
-> - PMSCR_EL1.E1SPE controls profiling at EL1.
-> - PMSCR_EL1.E0SPE controls profiling at EL0 if HCR_EL2.TGE=0. KVM always
->   clears HCR_EL2.TGE when running a VM.
-> 
-> When profiling is enabled in the host, and the host is running in nVHE mode
-> (HCR_EL2.E2H=0), KVM clears PMSCR_EL1.{E1SPE,E0SPE} before jumping into the
-> guest.
-> 
-> When profiling is enabled in the host, and the host is running at EL2
-> (HCR_EL2.E2H=1), KVM will not touch PMSCR_EL1.{E1SPE,E0SPE} before jumping
-> into the guest. PMSCR_EL1.{E1SPE,E0SPE} reset to an architecturally UNKNOWN
-> value, which means it might be possible that KVM unintentionally profiles
-> the guest when is running in VHE mode.
-> 
-> Clear PMSCR_EL1.{E1SPE,E0SPE} when setting up VHE mode to keep the
-> behaviour consistent and predictable.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> 
-> Tested on the model, by setting the PMSCR_EL1.E1SPE and E0SPE bits in
-> __init_el2_debug to simulate a system where they reset to 1. Without the
-> patch, when the host is running at EL2, and the user is profiling the
-> kvmtool process, I can see records taken at EL1:
-> 
-> # perf record -e arm_spe// -- ./lkvm-static run -c2 -m512 -k Image -d disk -p earlycon
-> 
-> With this patch, those records disappear; and the size of perf.data has
-> been more than halved.
-> 
->  arch/arm64/kernel/hyp-stub.S | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-> index 65f76064c86b..df63f329d400 100644
-> --- a/arch/arm64/kernel/hyp-stub.S
-> +++ b/arch/arm64/kernel/hyp-stub.S
-> @@ -117,6 +117,8 @@ SYM_CODE_START_LOCAL(__finalise_el2)
->  	bic	x0, x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
->  	bic	x0, x0, #(MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT)
->  	msr	mdcr_el2, x0
-> +	// Disable profiling when running a virtual machine
-> +	msr_s	SYS_PMSCR_EL12, xzr
+On Monday 04 Nov 2024 at 13:32:03 (+0000), Quentin Perret wrote:
+> +bool pkvm_pgtable_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64 size, bool mkold)
+> +{
+> +	pkvm_handle_t handle = pkvm_pgt_to_handle(pgt);
+> +	struct pkvm_mapping *mapping;
+> +	struct rb_node *tmp;
+> +	bool young = false;
+> +
+> +	read_lock(&pgt->pkvm.mappings_lock);
+> +	for_each_mapping_in_range(pgt, addr, addr + size, mapping, tmp)
+> +		young |= kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn, mkold);
+> +	read_unlock(&pgt->pkvm.mappings_lock);
+> +
+> +	return young;
+> +}
 
-... resulting in an early crash on anything that doesn't have SPE.
-That's indeed "consistent and predictable" :-).
-
->  
->  	// Transfer the MM state from EL1 to EL2
->  	mrs_s	x0, SYS_TCR_EL12
-
-I find it pretty odd to hide something that is squarely guest state in
-the hyp stubs, and I'd rather see something like this (untested):
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 48cafb65d6acf..806f25a8753ed 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2139,8 +2139,12 @@ static void cpu_hyp_init_features(void)
- 	cpu_set_hyp_vector();
- 	kvm_arm_init_debug();
- 
--	if (is_kernel_in_hyp_mode())
-+	if (is_kernel_in_hyp_mode()) {
-+		if (SYS_FIELD_GET(ID_AA64DFR0_EL1, PMSVer,
-+				  read_sysreg(id_aa64dfr0_el1)))
-+			write_sysreg_el1(0, SYS_PMSCR);
- 		kvm_timer_init_vhe();
-+	}
- 
- 	if (vgic_present)
- 		kvm_vgic_init_cpu_hardware();
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I just observed a funny behaviour in one of my tests, the above explains
+it ... Can you find the bug? Ahem. I'll fix in v2 obviously.
