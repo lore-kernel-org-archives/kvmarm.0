@@ -1,126 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EF01DF729;
-	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B64B31DED58
+	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 12:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730894617; cv=none; b=mbevG6V/EQgwEA55Jk8+cX6oDpdkCXM/pXm46pOZEVzetU4CenjNAOffnbL2HBKuTRUHBGAuHKXKbhzgquTcBIJCRFxAqELEm5V+RH81phlmSLVfmzb0wNd71T1kaPJbcIwDt75dsr2/tT+KnW4W9SEZJ9nZUkQWZCaaNNocgUU=
+	t=1730896031; cv=none; b=bpTXL9P0B4uYk3WfF9Ch/9A0WmHGEu6pb8BiKtUQ+7hBkTMOo1/Q0OS6HtBxCdeEFJUZ+V6MMNQctjc56dBtNsixksL5LDUTqOkqjoaBrBqd3k+4Sm+4ksXisaoXhtjdiaelXc+YsTt5mKyZha3PVvqjfV4RS1lqJTR39ckA8N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730894617; c=relaxed/simple;
-	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YzmD5P7lJ2+KbAxRw3p2yMIzZDdcKc21ww34gA7rbAOvFbN1xN35xhlNv7bjho2y5pH9OBTBKJnrknqo9CLe3RWEfJ8V2Z5TOYvyMROuMonxzJivqb68r/OBuKgLbW9212GLNbQxZ88EvfdA4DumqNUI2oAtvHvS9/orVurpPDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGGGrkyU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGGGrkyU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471E1C4CECD;
-	Wed,  6 Nov 2024 12:03:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730894617;
-	bh=lCwMBpljskyRCExLi/a8YWjzwY2eIH1YDr8GaeQK/sk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PGGGrkyUUUy0z1Mqcx5xqROA9jQDy6vuGf3cBZFvuzU0aUts8N9/2g/F0F9ssiIVo
-	 ZraIpV02Np+JVSYY+PHiS/v7Vfq1jeNjn+YghIkATbHmbg89oOqE37AaUcipNak0l+
-	 7cLUcOvr5iZo57XfgF3pjY6J8gfIXS67F6WRm/m5OBI+WESXazuYgEwxjrIiYuvG/K
-	 B8pHWJO7LU4uR2dmzxeGfLkZg6RqCTnfdF78+HQHL3hBZ7lfRq4qSZkW+DNSpKD1yw
-	 Yj/8eZXyaP9+wKZqQPvtPCmNa+Zp0l02m8o2jvShxbgtsBrFP8/n2GJe7uPyiylH5z
-	 S4tGuHYqsb1OA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t8el5-00AM93-6N;
-	Wed, 06 Nov 2024 12:03:35 +0000
-Date: Wed, 06 Nov 2024 12:03:34 +0000
-Message-ID: <86cyj81sdl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oupton@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Shusen Li <lishusen2@huawei.com>
-Subject: Re: [PATCH v3 1/4] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
-In-Reply-To: <20241106083035.2813799-2-jingzhangos@google.com>
-References: <20241106083035.2813799-1-jingzhangos@google.com>
-	<20241106083035.2813799-2-jingzhangos@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1730896031; c=relaxed/simple;
+	bh=pLqpYVEEADnR92wsme21lW8E+CKrh98cNjiqTh4UPaE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UzZi2iXruOmIdIEzUIp0XEoulJxnVtDWijotCJPHWnAujCX28zBhewWA8N2SRvmbSUV0wPV5LIPs1Tez+MYhGI/+U/3JcacAeO2wXJAzQl93igBiKvDAdkaxjIMa7JiX/LVzw3HIsh/eNUN95EjVV19BrP5mj+m1P4B0zYzVE3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84EAC339;
+	Wed,  6 Nov 2024 04:27:37 -0800 (PST)
+Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05A653F6A8;
+	Wed,  6 Nov 2024 04:27:05 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: [PATCH] KVM: arm64: VHE: Initialize PMSCR_EL1
+Date: Wed,  6 Nov 2024 12:26:54 +0000
+Message-ID: <20241106122654.38234-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 06 Nov 2024 08:30:32 +0000,
-Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> From: Kunkun Jiang <jiangkunkun@huawei.com>
-> 
-> In all the vgic_its_save_*() functinos, they do not check whether
-> the data length is 8 bytes before calling vgic_write_guest_lock.
-> This patch adds the check. To prevent the kernel from being blown up
-> when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
-> are replaced together.
-> 
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index ba945ba78cc7..2381bc5ce544 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -2095,6 +2095,10 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
->  	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
->  		ite->collection->collection_id;
->  	val = cpu_to_le64(val);
-> +
-> +	if (KVM_BUG_ON(ite_esz != sizeof(val), kvm))
-> +		return -EINVAL;
-> +
->  	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
->  }
->  
-> @@ -2250,6 +2254,10 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
->  	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
->  		(dev->num_eventid_bits - 1));
->  	val = cpu_to_le64(val);
-> +
-> +	if (KVM_BUG_ON(dte_esz != sizeof(val), kvm))
-> +		return -EINVAL;
-> +
->  	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
->  }
->  
-> @@ -2431,12 +2439,17 @@ static int vgic_its_save_cte(struct vgic_its *its,
->  			     struct its_collection *collection,
->  			     gpa_t gpa, int esz)
->  {
-> +	struct kvm *kvm = its->dev->kvm;
+According to the pseudocode for StatisticalProfilingEnabled() from Arm
+DDI0487K.a, PMSCR_EL1 controls profiling at EL1 and EL0:
 
-nit: just use its->dev->kvm consistently, as this is what we are
-already doing in this function.
+- PMSCR_EL1.E1SPE controls profiling at EL1.
+- PMSCR_EL1.E0SPE controls profiling at EL0 if HCR_EL2.TGE=0. KVM always
+  clears HCR_EL2.TGE when running a VM.
 
-	M.
+When profiling is enabled in the host, and the host is running in nVHE mode
+(HCR_EL2.E2H=0), KVM clears PMSCR_EL1.{E1SPE,E0SPE} before jumping into the
+guest.
 
+When profiling is enabled in the host, and the host is running at EL2
+(HCR_EL2.E2H=1), KVM will not touch PMSCR_EL1.{E1SPE,E0SPE} before jumping
+into the guest. PMSCR_EL1.{E1SPE,E0SPE} reset to an architecturally UNKNOWN
+value, which means it might be possible that KVM unintentionally profiles
+the guest when is running in VHE mode.
+
+Clear PMSCR_EL1.{E1SPE,E0SPE} when setting up VHE mode to keep the
+behaviour consistent and predictable.
+
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+
+Tested on the model, by setting the PMSCR_EL1.E1SPE and E0SPE bits in
+__init_el2_debug to simulate a system where they reset to 1. Without the
+patch, when the host is running at EL2, and the user is profiling the
+kvmtool process, I can see records taken at EL1:
+
+# perf record -e arm_spe// -- ./lkvm-static run -c2 -m512 -k Image -d disk -p earlycon
+
+With this patch, those records disappear; and the size of perf.data has
+been more than halved.
+
+ arch/arm64/kernel/hyp-stub.S | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index 65f76064c86b..df63f329d400 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -117,6 +117,8 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+ 	bic	x0, x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
+ 	bic	x0, x0, #(MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT)
+ 	msr	mdcr_el2, x0
++	// Disable profiling when running a virtual machine
++	msr_s	SYS_PMSCR_EL12, xzr
+ 
+ 	// Transfer the MM state from EL1 to EL2
+ 	mrs_s	x0, SYS_TCR_EL12
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.0
+
