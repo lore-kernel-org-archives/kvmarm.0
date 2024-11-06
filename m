@@ -1,263 +1,140 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C23E206509
-	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 17:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E38201104
+	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 18:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730912804; cv=none; b=mFo0vZ93PiZQW1zFs6zS2EZuJioI/Bgqr8bMbPYvBNxKcSq35ugjefWRlSovk4K/68SsO9frwgE0am2ja1a76QIFjA9HmE8tzFslTadxFAE3CTOEjd6oWnNVvQNGPInUJcj4hKKcRAAHeYtyAXXye6wDGTJKzCXwRYlbqscI8/g=
+	t=1730917009; cv=none; b=Cvf1MTojFgxdOTbDCqpksQ9/18zQ2Nh5y1earEkE/I3zxTRPhK3oYKva2LBlCSz2Te/tV37L0MwzSRSiDkB1vsdZKThrDO/06DTTKP+RQ1E6BqutD/+QrzLxZpaLgULEzCc+anNpz+iC/34lT5Ec/ToCztbRwAet44kiX040MC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730912804; c=relaxed/simple;
-	bh=6Rf5zqPa5m3hV7JKPsCSyDllRSudKN5CTQ483bKOox4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=o3SXQl4e0lkZ8N+MDvBEFHWQEp1AjraLfdvAh36PuZB0/NLQYctbcUmOPrCAfnjyTebDZqJsP+55cmjFjBVQo/SADKaSst51m4nymkG14Ve9fYsGCPbb55qeB//lPG9ZPzFZIWQuNwTlYbE+MMiu/z4G67NqcvLzvoHsu2ys3b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bXXISnRw; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1730917009; c=relaxed/simple;
+	bh=akr2pHWvlpxX6Fg1IQ3TT51LBTF7P5k6M3NIk8ktde8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n4Uj1oZOF9/i4MhZIV3dUy1rIlalUYBnPtKPAw/B7wDTRJ+S0oPmaCKv9E74OHB+xaUkHZRt5+GVL33LHITyhmGezqEqktec/MvuNPeD9iI9Et9X4rb5LylRCvVUmQA10W48N38kjOQjUyXz0OAO+uswTD8qRg1MqBMSq/bMhXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OGwcJ4jJ; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bXXISnRw"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e28fea2adb6so9687029276.3
-        for <kvmarm@lists.linux.dev>; Wed, 06 Nov 2024 09:06:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OGwcJ4jJ"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539e8607c2aso4971e87.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Nov 2024 10:16:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730912801; x=1731517601; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5t+pTmBPHbo0E/uwfzEy52VjrmqfqWmgZSSzb34Bz4w=;
-        b=bXXISnRwx5sd5H1qnnobT0evM4bogYPZ/y0dZVk1B2QXDpVVcJChqZR3MmjmMqlYHF
-         0DmMaqn6PJTu/jlUFCf+B9OyAiTUDfJr0/sqqVB+ftvBe9Qht+CTmLYGYN10xzYHCe/d
-         nWa9ikHudsdpFcpXmFEm37Bv7nA9/htE2tJR6+fovzSmSkVtK8ZCmu5NWvt1P1CLHLZs
-         qwTWZFNUkjepHtPuNOzYYYTB9cfczenNEk9tActxS+zj/SlKkzBq5Dj2vwRGQ4Td7Cxk
-         upZHyYMQsjw5TkR/LPkHkdmuv/D56ZJB1zuoqJNWlrAtSSuClsAs9ESU3fo7QqRs4gkJ
-         hUpA==
+        d=google.com; s=20230601; t=1730917005; x=1731521805; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LeWA172BYFuvJUs17jk2BLJpPj+VSqEWSdhQr3Tt5lU=;
+        b=OGwcJ4jJiIW4D8Hr9MHF1LqQaJr8OeNh/VwWDS/1m7o9OLMhWbzNjHDWt7Y/JCCQHn
+         rMnf9yw2JznajbXRjdptoPRGHHg2fTTDmz6nKgTtPRVIu8dLvPudPxa47y+U1fKlxNrt
+         V2TyouqONXXup130j4jJF4N2eODC6dtDji/U6n3CNZ2EIRM1aS30NSGPDHutRDZBkc2C
+         ZMLuv3IRf4kS9bBTntrsYg72E3sUUTaZJxitoVKNdh4hOIgwNkH3N90z+7kZVJSfZC9K
+         DExWgPb1SBsOSrravPcMsiXsxafMhCW+S8njzKo7rx605hgqaZhvJnJis/7JT8FPsy0f
+         uFUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730912801; x=1731517601;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5t+pTmBPHbo0E/uwfzEy52VjrmqfqWmgZSSzb34Bz4w=;
-        b=mM2cOCrZsjgl5G2gX34PvT9s02CmypmjR1iSsaBk6+v1dsi89fjU24Qg1hoTCgnKrS
-         YyS6ILaOY6vgtT2A2MdXSA+q8Z+Mc5bdSwDLp0ZvSAIbjkwegxTlVhj+aw1FfFSAk54/
-         rl4Mhg7m3NUFMdHkquD3bAePS486i0mJw3jjHtSdpRtN4gmjBiadDUKeBqnO5xV67ENk
-         m3PXDc+XnOZSWGaoDT4zPnKo7RGHvdrwdl+v8aO0fLCcRprL0MwRKczQqCF9wgDS1McN
-         pxwqx9oVYb0OACELwkIy3d4/hWJt9wUeKq/Soqw2ezuboBxZaNFk3z0N33wgWLiJOwIL
-         3yJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTlmY+R9hh1BWwD6SjVOS6cK7IBGtzbiWmoazFJcSKXmIku9NkifqmCehto84KZsv0YZh1y0M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyhybzisLsjA98EF3WmBtocd8d4mhGo0b/UI2FLT+qoXFUJYkyz
-	fq1sOhRUjm08aZPwzN737jiBbW04aCwUs2Btt+0SgHibfTwI0FweNM/jkEI+iIf3F5jSAqxwNm+
-	hLA==
-X-Google-Smtp-Source: AGHT+IGtFenR1QTBctdMYFKBTYZG/ZO0INYKhWuvVmpVVCJ3u0Ldd1ciEKyXxUgTterH6MxTNnFNUgE23Nc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:abe9:0:b0:e30:b98d:a33d with SMTP id
- 3f1490d57ef6-e30b98da4f0mr50282276.5.1730912800993; Wed, 06 Nov 2024 09:06:40
- -0800 (PST)
-Date: Wed, 6 Nov 2024 09:06:39 -0800
-In-Reply-To: <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1730917005; x=1731521805;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LeWA172BYFuvJUs17jk2BLJpPj+VSqEWSdhQr3Tt5lU=;
+        b=qAAFqMtx5rc4pHIylUIQlaGXV7eLAEDmaXG/uuHUSbBZSEXS5Fc1kQ0z/ELruGVyY9
+         2wMo3cWQZWPKbR8MsdT0aGH6wjHLEJNB4ZsUXvO3smWhT/TRB//n6SybZnT2Z6ZSE8Vh
+         zvqtaxviYI5hTqvprxztCZnOs0gL/f6UFJcbqUEhhMmuw7Z0S613gEsIvK2Oz6qd5l1q
+         AsKALq3VAyJKawCWR+BV0hp9d9UUJclK+9UMKlmFBiobmPGgNGUIgD2niukZvZtSwVV/
+         VKY6e9f/cWL9ZSV4AOIwlUPG9J6+Z/bnHFlynslowYgj+Odgxws0IHk6qZRvUH92FZL1
+         ovig==
+X-Forwarded-Encrypted: i=1; AJvYcCXOSlPa+ujEStoJIyWOyCrQ242/TytONdfRbgmCR+2R5t/DYcES6ELpClaZX2rHh6qDu/el8IE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzzUw442zN5Gr6mIYIz1P6HlcW8BUNv3MIdaw9R8lubldR7KmMs
+	za9MB95y7SmW1gu/kt+tJyL2COwvnJmqU9VbUs1/zjI5qSQUiqPNlDY2UeLzKkQSxHzIHqPMUgK
+	jqEcRl6G6qnV9SSDAUIc0fac2+6ANcaRZB+Kf
+X-Google-Smtp-Source: AGHT+IH0eyYrDiApka0FCPYt2gCEKlK4/mAq7uw29tSP1xJ7qJxDTSHGX9xhi6kEHhZbsrB00EH2FETbJzZH1P9TZow=
+X-Received: by 2002:a05:6512:12c5:b0:539:e88f:23a1 with SMTP id
+ 2adb3069b0e04-53b3491c80emr21831365e87.44.1730917005120; Wed, 06 Nov 2024
+ 10:16:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
- <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
-Message-ID: <ZyuiH_CVQqJUoSB-@google.com>
-Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
-From: Sean Christopherson <seanjc@google.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Anup Patel <anup@brainfault.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20241106083035.2813799-1-jingzhangos@google.com>
+ <20241106083035.2813799-2-jingzhangos@google.com> <86cyj81sdl.wl-maz@kernel.org>
+In-Reply-To: <86cyj81sdl.wl-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Wed, 6 Nov 2024 10:16:33 -0800
+Message-ID: <CAAdAUtgiWxhY6DQrS_B=6PhL3+V-qfJVSsqWWeVuGqW7DLcotw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Kunkun Jiang <jiangkunkun@huawei.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Shusen Li <lishusen2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 01, 2024, Vipin Sharma wrote:
-> Had an offline discussion with Sean, providing a summary on what we
-> discussed (Sean, correct me if something is not aligned from our
-> discussion):
-> 
-> We need to have a roadmap for the runner in terms of features we support.
-> 
-> Phase 1: Having a basic selftest runner is useful which can:
-> 
-> - Run tests parallely
+On Wed, Nov 6, 2024 at 4:03=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Wed, 06 Nov 2024 08:30:32 +0000,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > From: Kunkun Jiang <jiangkunkun@huawei.com>
+> >
+> > In all the vgic_its_save_*() functinos, they do not check whether
+> > the data length is 8 bytes before calling vgic_write_guest_lock.
+> > This patch adds the check. To prevent the kernel from being blown up
+> > when the fault occurs, KVM_BUG_ON() is used. And the other BUG_ON()s
+> > are replaced together.
+> >
+> > Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-its.c | 21 +++++++++++++++++++--
+> >  1 file changed, 19 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-=
+its.c
+> > index ba945ba78cc7..2381bc5ce544 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > @@ -2095,6 +2095,10 @@ static int vgic_its_save_ite(struct vgic_its *it=
+s, struct its_device *dev,
+> >              ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+> >               ite->collection->collection_id;
+> >       val =3D cpu_to_le64(val);
+> > +
+> > +     if (KVM_BUG_ON(ite_esz !=3D sizeof(val), kvm))
+> > +             return -EINVAL;
+> > +
+> >       return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
+> >  }
+> >
+> > @@ -2250,6 +2254,10 @@ static int vgic_its_save_dte(struct vgic_its *it=
+s, struct its_device *dev,
+> >              (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+> >               (dev->num_eventid_bits - 1));
+> >       val =3D cpu_to_le64(val);
+> > +
+> > +     if (KVM_BUG_ON(dte_esz !=3D sizeof(val), kvm))
+> > +             return -EINVAL;
+> > +
+> >       return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
+> >  }
+> >
+> > @@ -2431,12 +2439,17 @@ static int vgic_its_save_cte(struct vgic_its *i=
+ts,
+> >                            struct its_collection *collection,
+> >                            gpa_t gpa, int esz)
+> >  {
+> > +     struct kvm *kvm =3D its->dev->kvm;
+>
+> nit: just use its->dev->kvm consistently, as this is what we are
+> already doing in this function.
 
-Maybe with a (very conversative) per test timeout?  Selftests generally don't have
-the same problems as KVM-Unit-Tests (KUT), as selftests are a little better at
-guarding against waiting indefinitely, i.e. I don't think we need a configurable
-timeout.  But a 120 second timeout or so would be helpful.
-
-E.g. I recently was testing a patch (of mine) that had a "minor" bug where it
-caused KVM to do a remote TLB flush on *every* SPTE update in the shadow MMU,
-which manifested as hilariously long runtimes for max_guest_memory_test.  I was
-_this_ close to not catching the bug (which would have been quite embarrasing),
-because my hack-a-scripts don't use timeouts (I only noticed because a completely
-unrelated bug was causing failures).
-
-> - Provide a summary of what passed and failed, or only in case of failure.
-
-I think a summary is always warranted.  And for failures, it would be helpful to
-spit out _what_ test failed, versus the annoying KUT runner's behavior of stating
-only the number of passes/failures, which forces the user to go spelunking just
-to find out what (sub)test failed.
-
-I also think the runner should have a "heartbeat" mechanism, i.e. something that
-communicates to the user that forward progress is being made.  And IMO, that
-mechanism should also spit out skips and failures (this could be optional though).
-One of the flaws with the KUT runner is that it's either super noisy and super
-quiet.
-
-E.g. my mess of bash outputs this when running selftests in parallel (trimmed for
-brevity):
-
-        Running selftests with npt_disabled
-        Waiting for 'access_tracking_perf_test', PID '92317'
-        Waiting for 'amx_test', PID '92318'
-        SKIPPED amx_test
-        Waiting for 'apic_bus_clock_test', PID '92319'
-        Waiting for 'coalesced_io_test', PID '92321'
-        Waiting for 'cpuid_test', PID '92324'
-        
-        ...
-        
-        Waiting for 'hyperv_svm_test', PID '92552'
-        SKIPPED hyperv_svm_test
-        Waiting for 'hyperv_tlb_flush', PID '92563'
-        FAILED hyperv_tlb_flush : ret ='254'
-        Random seed: 0x6b8b4567
-        ==== Test Assertion Failure ====
-          x86_64/hyperv_tlb_flush.c:117: val == expected
-          pid=92731 tid=93548 errno=4 - Interrupted system call
-             1	0x0000000000411566: assert_on_unhandled_exception at processor.c:627
-             2	0x000000000040889a: _vcpu_run at kvm_util.c:1649
-             3	 (inlined by) vcpu_run at kvm_util.c:1660
-             4	0x00000000004041a1: vcpu_thread at hyperv_tlb_flush.c:548
-             5	0x000000000043a305: start_thread at pthread_create.o:?
-             6	0x000000000045f857: __clone3 at ??:?
-          val == expected
-        Waiting for 'kvm_binary_stats_test', PID '92579'
-        
-        ...
-        
-        SKIPPED vmx_preemption_timer_test
-        Waiting for 'vmx_set_nested_state_test', PID '93316'
-        SKIPPED vmx_set_nested_state_test
-        Waiting for 'vmx_tsc_adjust_test', PID '93329'
-        SKIPPED vmx_tsc_adjust_test
-        Waiting for 'xapic_ipi_test', PID '93350'
-        Waiting for 'xapic_state_test', PID '93360'
-        Waiting for 'xcr0_cpuid_test', PID '93374'
-        Waiting for 'xen_shinfo_test', PID '93391'
-        Waiting for 'xen_vmcall_test', PID '93405'
-        Waiting for 'xss_msr_test', PID '93420'
-
-It's far from perfect, e.g. just waits in alphabetical order, but it gives me
-easy to read feedback, and signal that tests are indeed running and completing.
-        
-> - Dump output which can be easily accessed and parsed.
-
-And persist the output/logs somewhere, e.g. so that the user can triage failures
-after the fact.
-
-> - Allow to run with different command line parameters.
-
-Command line parameters for tests?  If so, I would put this in phase 3.  I.e. make
-the goal of Phase 1 purely about running tests in parallel.
-
-> Current patch does more than this and can be simplified.
-> 
-> Phase 2: Environment setup via runner
-> 
-> Current patch, allows to write "setup" commands at test suite and test
-> level in the json config file to setup the environment needed by a
-> test to run. This might not be ideal as some settings are exposed
-> differently on different platforms.
-> 
-> For example,
-> To enable TDP:
-> - Intel needs npt=Y
-> - AMD needs ept=Y
-> - ARM always on.
-> 
-> To enable APIC virtualization
-> - Intel needs enable_apicv=Y
-> - AMD needs avic=Y
-> 
-> To enable/disable nested, they both have the same file name "nested"
-> in their module params directory which should be changed.
-> 
-> These kinds of settings become more verbose and unnecessary on other
-> platforms. Instead, runners should have some programming constructs
-> (API, command line options, default) to enable these options in a
-> generic way. For example, enable/disable nested can be exposed as a
-> command line --enable_nested, then based on the platform, runner can
-> update corresponding module param or ignore.
-> 
-> This will easily extend to providing sane configuration on the
-> corresponding platforms without lots of hardcoding in JSON. These
-> individual constructs will provide a generic view/option to run a KVM
-> feature, and under the hood will do things differently based on the
-> platform it is running on like arm, x86-intel, x86-amd, s390, etc.
-
-My main input on this front is that the runner needs to configure module params
-(and other environment settings) _on behalf of the user_, i.e. in response to a
-command line option (to the runner), not in response to per-test configurations.
-
-One of my complaints with our internal infrastructure is that the testcases
-themselves can dictate environment settings.  There are certainly benefits to
-that approach, but it really only makes sense at scale where there are many
-machines available, i.e. where the runner can achieve parallelism by running
-tests on multiple machines, and where the complexity of managing the environment
-on a per-test basis is worth the payout.
-
-For the upstream runner, I want to cater to developers, i.e. to people that are
-running tests on one or two machines.  And I want the runner to rip through tests
-as fast as possible, i.e. I don't want tests to get serialized because each one
-insists on being a special snowflake and doesn't play nice with other children.
-Organizations that the have a fleet of systems can pony up the resources to develop
-their own support (on top?).
-
-Selftests can and do check for module params, and should and do use TEST_REQUIRE()
-to skip when a module param isn't set as needed.  Extending that to arbitrary
-sysfs knobs should be trivial.  I.e. if we get _failures_ because of an incompatible
-environment, then it's a test bug.
-
-> Phase 3: Provide collection of interesting configurations
-> 
-> Specific individual constructs can be combined in a meaningful way to
-> provide interesting configurations to run on a platform. For example,
-> user doesn't need to specify each individual configuration instead,
-> some prebuilt configurations can be exposed like
-> --stress_test_shadow_mmu, --test_basic_nested
-
-IMO, this shouldn't be baked into the runner, i.e. should not surface as dedicated
-command line options.  Users shouldn't need to modify the runner just to bring
-their own configuration.  I also think configurations should be discoverable,
-e.g. not hardcoded like KUT's unittest.cfg.  A very real problem with KUT's
-approach is that testing different combinations is frustratingly difficult,
-because running a testcase with different configuration requires modifying a file
-that is tracked by git.
-
-There are underlying issues with KUT that essentially necessitate that approach,
-e.g. x86 has several testcases that fail if run without the exact right config.
-But that's just another reason to NOT follow KUT's pattern, e.g. to force us to
-write robust tests.
-
-E.g. instead of per-config command line options, let the user specify a file,
-and/or a directory (using a well known filename pattern to detect configs).
-
-> Tests need to handle the environment in which they are running
-> gracefully, which many tests already do but not exhaustively. If some
-> setting is not provided or set up properly for their execution then
-> they should fail/skip accordingly.
-
-This belongs in phase 2.
-
-> Runner will not be responsible to precheck things on tests behalf.
-> 
-> 
-> Next steps:
-> 1. Consensus on above phases and features.
-> 2. Start development.
-> 
-> Thanks,
-> Vipin
+Sure. Will do.
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
