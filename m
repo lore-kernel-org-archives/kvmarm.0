@@ -1,93 +1,188 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B64B31DED58
-	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 12:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B331F5825;
+	Wed,  6 Nov 2024 13:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730896031; cv=none; b=bpTXL9P0B4uYk3WfF9Ch/9A0WmHGEu6pb8BiKtUQ+7hBkTMOo1/Q0OS6HtBxCdeEFJUZ+V6MMNQctjc56dBtNsixksL5LDUTqOkqjoaBrBqd3k+4Sm+4ksXisaoXhtjdiaelXc+YsTt5mKyZha3PVvqjfV4RS1lqJTR39ckA8N8=
+	t=1730898846; cv=none; b=FMlGLowbiOmrw7cXqWI4twhuBBq17TaVM2Kb/3B1zvopjnxQ2Z455hZ2Gj5NUoqLfDeqyTHqa5GvPTmB1w550SFOaHtN5VASFK5NUWP4Mfad2SdlgrqNJ3hZDfY4jsu0b4HpPkCsmlTlXNZlxEic2WNZ3waaR/kGKC24TJTuKwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730896031; c=relaxed/simple;
-	bh=pLqpYVEEADnR92wsme21lW8E+CKrh98cNjiqTh4UPaE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UzZi2iXruOmIdIEzUIp0XEoulJxnVtDWijotCJPHWnAujCX28zBhewWA8N2SRvmbSUV0wPV5LIPs1Tez+MYhGI/+U/3JcacAeO2wXJAzQl93igBiKvDAdkaxjIMa7JiX/LVzw3HIsh/eNUN95EjVV19BrP5mj+m1P4B0zYzVE3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84EAC339;
-	Wed,  6 Nov 2024 04:27:37 -0800 (PST)
-Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05A653F6A8;
-	Wed,  6 Nov 2024 04:27:05 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org
-Subject: [PATCH] KVM: arm64: VHE: Initialize PMSCR_EL1
-Date: Wed,  6 Nov 2024 12:26:54 +0000
-Message-ID: <20241106122654.38234-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1730898846; c=relaxed/simple;
+	bh=MmGh5gnPG4ku4438t9wd6nhTmZITzHrRx9liC5G5jFQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GjNEFRvNraEmndrvhGZLaf7QwBI7UnvzEpLZEO6fywcXYIByJJATrAZDrdRUHn9JRHhI7Y0ywKuU2w2bNBlFAe9W32AktgJNX4ySaucrWXWE5j/ajCu/HFMDo4wacyIELTm+azP1V79JAStXgYu1vLjYL8aYJBaku9B8Z2b2t9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDXVl+LE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDXVl+LE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C02DC4CECD;
+	Wed,  6 Nov 2024 13:14:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730898846;
+	bh=MmGh5gnPG4ku4438t9wd6nhTmZITzHrRx9liC5G5jFQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IDXVl+LEXd/wyx3XOjQDob0T+MiPN1VloT44CWnpCTwy/KdgfZd9pPNPsCNpzbAAW
+	 PD11WODvJst53qsb+lR5TlXq2F1GA3/ITB5zmGykjiO3RxEVxrSWiC2cn8tm+Yvu19
+	 9mzV1vweS2GFOWjJVC4xeL6ULQVrq51jLfLNdtRUDKGl6ZR9rXKrz2Lq1dtm49toQp
+	 sXVcB1ejVB/Mb6qBFRexOmBqRnWckXxCxhmv74Dy1oOz2P6XWpYHN/a8Emif82+Y9L
+	 j7ZLlB9iQpLJGX0vuwWajcZgLa0W4myZOKmxtXmCpKQ9OVuReusJ3br36TSFtN0aZU
+	 uU3pWdb/WjnMQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t8frH-00ANY6-Nt;
+	Wed, 06 Nov 2024 13:14:03 +0000
+Date: Wed, 06 Nov 2024 13:14:02 +0000
+Message-ID: <86bjys1p45.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>
+Subject: Re: [PATCH v3 2/4] KVM: arm64: vgic-its: Clear DTE when MAPD unmaps a device
+In-Reply-To: <20241106083035.2813799-3-jingzhangos@google.com>
+References: <20241106083035.2813799-1-jingzhangos@google.com>
+	<20241106083035.2813799-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-According to the pseudocode for StatisticalProfilingEnabled() from Arm
-DDI0487K.a, PMSCR_EL1 controls profiling at EL1 and EL0:
+On Wed, 06 Nov 2024 08:30:33 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> From: Kunkun Jiang <jiangkunkun@huawei.com>
+> 
+> vgic_its_save_device_tables will traverse its->device_list to
+> save DTE for each device. vgic_its_restore_device_tables will
+> traverse each entry of device table and check if it is valid.
+> Restore if valid.
+> 
+> But when MAPD unmaps a device, it does not invalidate the
+> corresponding DTE. In the scenario of continuous saves
+> and restores, there may be a situation where a device's DTE
+> is not saved but is restored. This is unreasonable and may
+> cause restore to fail. This patch clears the corresponding
+> DTE when MAPD unmaps a device.
+> 
+> Co-developed-by: Shusen Li <lishusen2@huawei.com>
+> Signed-off-by: Shusen Li <lishusen2@huawei.com>
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 2381bc5ce544..7c57c7c6fbff 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -1140,8 +1140,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>  	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
+>  	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+>  	struct its_device *device;
+> +	gpa_t gpa;
+>  
+> -	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
+> +	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
+>  		return E_ITS_MAPD_DEVICE_OOR;
+>  
+>  	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+> @@ -1161,8 +1162,17 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>  	 * The spec does not say whether unmapping a not-mapped device
+>  	 * is an error, so we are done in any case.
+>  	 */
+> -	if (!valid)
+> +	if (!valid) {
+> +		struct kvm *kvm = its->dev->kvm;
+> +		int dte_esz = vgic_its_get_abi(its)->dte_esz;
+> +		u64 val = 0;
+> +
+> +		if (KVM_BUG_ON(dte_esz != sizeof(val), kvm))
+> +			return -EINVAL;
 
-- PMSCR_EL1.E1SPE controls profiling at EL1.
-- PMSCR_EL1.E0SPE controls profiling at EL0 if HCR_EL2.TGE=0. KVM always
-  clears HCR_EL2.TGE when running a VM.
+I find it pretty odd to bug only in that case, and the sprinkling of
+these checks all over the place is horrible. I'm starting to wonder if
+we shouldn't simply wrap vgic_write_guest() and co to do the checking.
 
-When profiling is enabled in the host, and the host is running in nVHE mode
-(HCR_EL2.E2H=0), KVM clears PMSCR_EL1.{E1SPE,E0SPE} before jumping into the
-guest.
+> +
+> +		vgic_write_guest_lock(kvm, gpa, &val, dte_esz);
 
-When profiling is enabled in the host, and the host is running at EL2
-(HCR_EL2.E2H=1), KVM will not touch PMSCR_EL1.{E1SPE,E0SPE} before jumping
-into the guest. PMSCR_EL1.{E1SPE,E0SPE} reset to an architecturally UNKNOWN
-value, which means it might be possible that KVM unintentionally profiles
-the guest when is running in VHE mode.
+I'm thinking of something like:
 
-Clear PMSCR_EL1.{E1SPE,E0SPE} when setting up VHE mode to keep the
-behaviour consistent and predictable.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-
-Tested on the model, by setting the PMSCR_EL1.E1SPE and E0SPE bits in
-__init_el2_debug to simulate a system where they reset to 1. Without the
-patch, when the host is running at EL2, and the user is profiling the
-kvmtool process, I can see records taken at EL1:
-
-# perf record -e arm_spe// -- ./lkvm-static run -c2 -m512 -k Image -d disk -p earlycon
-
-With this patch, those records disappear; and the size of perf.data has
-been more than halved.
-
- arch/arm64/kernel/hyp-stub.S | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 65f76064c86b..df63f329d400 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -117,6 +117,8 @@ SYM_CODE_START_LOCAL(__finalise_el2)
- 	bic	x0, x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
- 	bic	x0, x0, #(MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT)
- 	msr	mdcr_el2, x0
-+	// Disable profiling when running a virtual machine
-+	msr_s	SYS_PMSCR_EL12, xzr
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index ba945ba78cc7d..d8e57aefcd3a5 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -1128,6 +1128,19 @@ static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
+ 	return device;
+ }
  
- 	// Transfer the MM state from EL1 to EL2
- 	mrs_s	x0, SYS_TCR_EL12
--- 
-2.47.0
++
++#define its_write_entry_lock(i, g, valp, t)				\
++	({								\
++		struct kvm *__k = (i)->dev->kvm;			\
++		int __sz = vgic_its_get_abi(i)->t;			\
++		int __ret = 0;						\
++		if (KVM_BUG_ON(__sz != sizeof(*(valp)), __k))		\
++			__ret = -EINVAL;				\
++		else							\
++			vgic_write_guest_lock(__k, (g), (valp), __sz);	\
++		__ret;							\
++	})
++
+ /*
+  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
+  * Must be called with the its_lock mutex held.
+@@ -1140,8 +1153,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
+ 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+ 	struct its_device *device;
++	gpa_t gpa;
+ 
+-	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
++	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
+ 		return E_ITS_MAPD_DEVICE_OOR;
+ 
+ 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+@@ -1161,8 +1175,10 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	 * The spec does not say whether unmapping a not-mapped device
+ 	 * is an error, so we are done in any case.
+ 	 */
+-	if (!valid)
+-		return 0;
++	if (!valid) {
++		u64 val = 0;
++		return its_write_entry_lock(its, gpa, &val, dte_esz);
++	}
+ 
+ 	device = vgic_its_alloc_device(its, device_id, itt_addr,
+ 				       num_eventid_bits);
 
+which can be generalised everywhere (you can even extract the check
+and move it to an out-of-line helper as required).
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
