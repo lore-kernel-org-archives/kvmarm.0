@@ -1,138 +1,131 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DDA2076B1
-	for <kvmarm@lists.linux.dev>; Wed,  6 Nov 2024 18:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E427119CC36
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 09:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730918510; cv=none; b=iPmg9n4gtPgs/F7Nb4Uq9OdnnAQqPuxpgJ0Ma602wOMPit8HwL6Z52KxGr0XDm03OVGMn9ijWc7kqR6XxOF+gQZfDlkI8/ScZY/P8kZJVgVxmPzi/a83UO4YQhi1e/1xr4qY4gkMltiyEbz7Vz0KeZGaJ0frLar4j8o7jpK7LKI=
+	t=1730970365; cv=none; b=DX7t+nHS0rCYrLqi/M5n6+sPhNReNahBzeD5h1XS+tL9sx8UlVebzVbif/l1GBGyh7Hsr3oVCT39bz6+UrkBL3kiFkEooc4pu4+rbr64uElk1lvjjdbZgzb6Z8ekWB4KZX5F5UfnWe+PLmaPcwBJYlpRaj/JCeuB+tXYZvrgT08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730918510; c=relaxed/simple;
-	bh=O0rXKOxISdp0VOGK36WmzL5LnmhOQY5UyxWhw+AV0sU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vo0CB9JkBlvmZ4anvV6ga4eMuSF1L2awhh5eIa11l++QZes/apvEapJUDzj946sCElYjygp/uOWECHVPR5/UHY8LGe8PYpDQHWqOfPFos7TEF1SBTKJwfm2hTinvIvkT2J+h0z1iuIVx7p7WO7S4qV7PaX6nHuL3ILQSSJFfMmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PAleYMMK; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PAleYMMK"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so50364e87.1
-        for <kvmarm@lists.linux.dev>; Wed, 06 Nov 2024 10:41:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730918507; x=1731523307; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yYk4e/Rf0Fwn8rgiKqzmXUTH3/JjwaWMVgfrc3mEkFk=;
-        b=PAleYMMKqqQMDXNVTBhAmluj99eLyItsFx7gno4oIWcAJzcB9ygcSy1r+YxH0HMWXO
-         Hffyd96S+IDRuVlooTjVrtXeInzzRriwFlWF6LzEumKoc2uZ7T8cYyGsleQ5SIM8gX5D
-         LHwTIkGtwega/uTj4ehDZ3yUB6ITstVmf/ZQ3oMf06Fj0KXpVtxk60/k/lB7ZcMCTvUY
-         WIkNDrr20F3IB+RuDBxlv+gu+QVafs+poZzkdMY84iE8WqpxxV/iTn3GIWTiYpdo5X8o
-         sgYKVozBUoNb/LGrdiJWVJsAue5w4V8MbhHj2R07dDHSw9G/i6hFtbn3AYzUglq1E8lP
-         nIvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730918507; x=1731523307;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yYk4e/Rf0Fwn8rgiKqzmXUTH3/JjwaWMVgfrc3mEkFk=;
-        b=K9gMWk9Su8lGZXEVWX2eIZpn3Kzud601+cSGCYBnxG+QmNbUKfZ7IkaU6tMjO7nSK0
-         MjbIwa4nSSFC0Nmcs07rvKakD11kE9wCF9uK4HXjJYOOGUU3JRBVIRLbbM34q/YRwWXR
-         0Gcgu1PK4YUDBn4VhFEoqrTSwsWx5T6HaNqwEIQIfx6HCB/dy0DfxVCTPPULCJBCxXTs
-         f96JoHK8eATbvRgiyw4kT2ELk85z8kuy8MwL7nPVn++aZIt1e0KRCHAJ0//DXUOuWSSM
-         JCGS6LO7SW08zLwteVU+/3WPAUQx/0K+YXoBPL1dF/Yg4kL5/BnfACI8hL33WBSzBNfH
-         B6Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3BfqLp0yPR/hsXAlcnyu9N4ZivGpdv5MzncQyPdR8VrzJUDgEJuyTjurGo7d9RFKkvlbm22Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzyB2V+qbfykJMVqGUSIUguGOEAn74gJfaf0XAsL4icy3MA30w5
-	2t2ZqYu2Q0KGXPrmWuHnwBghfv1G5Idro32z+ZQBUcRykFgO/y+8csZsSS+rtFIMkIc/Geq59dH
-	UjrcOJaXqeCNWKYfYkBpW98bZSLvcMVg69+oK
-X-Google-Smtp-Source: AGHT+IHx4X3KPAFGSnjaYKE8NT/XVzFyHeBioH3zapaMHSYPe+KnYq0l63zBuSlt2HLiDpsHUtw8XFGqFcDi10iVlu8=
-X-Received: by 2002:a05:6512:6ce:b0:539:f922:bd4e with SMTP id
- 2adb3069b0e04-53b7ece11eamr15715877e87.23.1730918507026; Wed, 06 Nov 2024
- 10:41:47 -0800 (PST)
+	s=arc-20240116; t=1730970365; c=relaxed/simple;
+	bh=lZEuVN3mQD2v8GbAx3eCizaC0Y84qZQlZOHowKAkk4I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lN4om/95LHv4UrRaGAZuHl/fdjcbUgBF8KjG9rr6C90Uo38hKWGont6UogqcNoYLim5YpLRSrGUlyYBtYk8q5Z3WzeEd6RrfXRUyBCcxX0/gexkyNynHSczrEwgI4iK3YVi6OkJ0WvJdm2etIx6RamUyKU6vv9s6UV6pHO+VTdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XkbkC0QdTzQsZM;
+	Thu,  7 Nov 2024 17:04:51 +0800 (CST)
+Received: from kwepemk100016.china.huawei.com (unknown [7.202.194.64])
+	by mail.maildlp.com (Postfix) with ESMTPS id 343D018005F;
+	Thu,  7 Nov 2024 17:05:59 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ kwepemk100016.china.huawei.com (7.202.194.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 7 Nov 2024 17:05:58 +0800
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Thu, 7 Nov 2024 10:05:56 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
+	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
+CC: "james.morse@arm.com" <james.morse@arm.com>, "joey.gouly@arm.com"
+	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"sebott@redhat.com" <sebott@redhat.com>, yuzenghui <yuzenghui@huawei.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
+Subject: RE: [PATCH v2] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
+ userspace
+Thread-Topic: [PATCH v2] KVM: arm64: Make L1Ip feature in CTR_EL0 writable
+ from userspace
+Thread-Index: AQHbJFZMOfDGoLDLOEqZY8/BCs2q5rKrnz+w
+Date: Thu, 7 Nov 2024 09:05:55 +0000
+Message-ID: <e7174e103fd94023be1fd5127871540e@huawei.com>
+References: <20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241106083035.2813799-1-jingzhangos@google.com>
- <20241106083035.2813799-5-jingzhangos@google.com> <86a5ec1oim.wl-maz@kernel.org>
-In-Reply-To: <86a5ec1oim.wl-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 6 Nov 2024 10:41:35 -0800
-Message-ID: <CAAdAUtjYZ5N4UpaK5Kt8MRyN1zqPD5QqjZzNdp-HPUgA-AtNJg@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] KVM: selftests: aarch64: Test VGIC ITS tables save/restore
-To: Marc Zyngier <maz@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Oliver Upton <oupton@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Kunkun Jiang <jiangkunkun@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>, 
-	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Shusen Li <lishusen2@huawei.com>, Eric Auger <eauger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
-
-
-On Wed, Nov 6, 2024 at 5:27=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> [Adding Eric to the list, since he worked a lot on the save/restore code]
->
-> On Wed, 06 Nov 2024 08:30:35 +0000,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Add a selftest to verify the correctness of the VGIC ITS mappings after
-> > the save/restore operations (KVM_DEV_ARM_ITS_SAVE_TABLES /
-> > KVM_DEV_ARM_ITS_RESTORE_TABLES).
->
-> What are you checking? The saved data? The restored data?
->
-> > Also calculate the time spending on save/restore operations.
->
-> Is that really relevant? I don't think performance matters at this
-> stage, if we can't even have reliable data.
-
-Right. It doesn't matter. Will remove this line from the message.
->
-> > This test uses some corner cases to capture the save/restore bugs. It
->
-> Which corner cases?
-
-Will add details.
->
-> > will be used to verify the future incoming changes for the VGIC ITS
-> > tables save/restore.
-> >
-> > To capture the "Invalid argument (-22)" error, run the test without any
-> > option. To capture the wrong/lost mappings, run the test with '-s'
-> > option.
-> > Since the VGIC ITS save/restore bug is caused by orphaned DTE/ITE
-> > entries, if we run the test with '-c' option whih clears the tables
-> > before the save operation, the test will complete successfully.
->
-> I'm sorry, but this description is meaningless, as you need to know
-> what is the bug that has been fixed.
-
-Will add bug description here too as in the cover letter.
->
-> Also, how is someone supposed to run this thing? Without options? With
-> options? With any combination of options?
->
-> From what I understand, the various options are designed to help
-> debugging a broken vgic implementation. So please document what the
-> options do rather than an bug that is supposed to be already fixed.
-
-Will do.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
-
-Thanks,
-Jing
+SGkgT2xpdmVyLA0KDQpBIGdlbnRsZSBwaW5nIG9uIHRoaXMuIEkgdGhpbmsgaXQgc3RpbGwgYXBw
+bGllcyBjbGVhbmx5IG9uIHRvcCBvZiBKb2V5J3MgdjYgb2YgTVBBTQ0KSGlkZSBzZXJpZXMuDQoN
+ClRoYW5rcywNClNoYW1lZXINCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9t
+OiBsaW51eC1hcm0ta2VybmVsIDxsaW51eC1hcm0ta2VybmVsLWJvdW5jZXNAbGlzdHMuaW5mcmFk
+ZWFkLm9yZz4gT24NCj4gQmVoYWxmIE9mIFNoYW1lZXIgS29sb3RodW0NCj4gU2VudDogVHVlc2Rh
+eSwgT2N0b2JlciAyMiwgMjAyNCA4OjQwIEFNDQo+IFRvOiBrdm1hcm1AbGlzdHMubGludXguZGV2
+OyBtYXpAa2VybmVsLm9yZzsgb2xpdmVyLnVwdG9uQGxpbnV4LmRldg0KPiBDYzogamFtZXMubW9y
+c2VAYXJtLmNvbTsgam9leS5nb3VseUBhcm0uY29tOw0KPiBzdXp1a2kucG91bG9zZUBhcm0uY29t
+OyBzZWJvdHRAcmVkaGF0LmNvbTsgeXV6ZW5naHVpDQo+IDx5dXplbmdodWlAaHVhd2VpLmNvbT47
+IFdhbmd6aG91IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+Ow0KPiBsaW51eC1hcm0ta2Vy
+bmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPg0K
+PiBTdWJqZWN0OiBbUEFUQ0ggdjJdIEtWTTogYXJtNjQ6IE1ha2UgTDFJcCBmZWF0dXJlIGluIENU
+Ul9FTDAgd3JpdGFibGUNCj4gZnJvbSB1c2Vyc3BhY2UNCj4gDQo+IE9ubHkgYWxsb3cgdXNlcnNw
+YWNlIHRvIHNldCBWSVBUKDBiMTApIG9yIFBJUFQoMGIxMSkgZm9yIEwxSXAgYmFzZWQgb24NCj4g
+d2hhdCBoYXJkd2FyZSByZXBvcnRzIGFzIGJvdGjCoEFJVklWVCAoMGIwMSkgYW5kIFZQSVBUICgw
+YjAwKSBhcmUNCj4gZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4gDQo+IFVzaW5nIGEgVklQVCBm
+b3IgR3Vlc3Qgd2hlcmUgaGFyZHdhcmUgcmVwb3J0cyBQSVBUIG1heSBsZWFkIHRvIG92ZXINCj4g
+aW52YWxpZGF0aW9uLCBidXQgaXMgc3RpbGwgY29ycmVjdC4gSGVuY2UsIHdlIGNhbiBhbGxvdyBk
+b3duZ3JhZGluZw0KPiBQSVBUIHRvIFZJUFQsIGJ1dCBub3QgdGhlIG90aGVyIHdheSBhcm91bmQu
+DQo+IA0KPiBSZXZpZXdlZC1ieTogU2ViYXN0aWFuIE90dCA8c2Vib3R0QHJlZGhhdC5jb20+DQo+
+IFJldmlld2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPg0KPiBTaWduZWQtb2Zm
+LWJ5OiBTaGFtZWVyIEtvbG90aHVtDQo+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdl
+aS5jb20+DQo+IC0tLQ0KPiB2MToNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtYXJtLzIw
+MjQxMDE3MDg1OTI1LjQwNTMyLTEtDQo+IHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2Vp
+LmNvbS8NCj4gDQo+IENoYW5nZXMgZnJvbSB2MToNCj4gwqAtQXMgcGVyIE1hcmMncyBzdWdnZXN0
+aW9uIG1vZGlmaWVkIHRoZSB3YXkgc2V0X2N0cl9lbDAoKSByZXN0cmljdGVkDQo+ICAgdGhlIHdy
+aXRlIHdoaWNoIGltcGxpZWQgb3JkZXJlZCB2YWx1ZXPCoGZvciB0aGUgdHlwZXMuIEluc3RlYWQN
+Cj4gICBleHBsaWNpdGx5IGxpc3RlZMKgIGFsbCBwb3NzaWJsZSBwb2xpY3nCoHR5cGVzLg0KPiAg
+LUFkZGVkIFItYnkgdGFncyhUaGFua3MhKS4NCj4gDQo+IFRoYW5rcywNCj4gU2hhbWVlcg0KPiAt
+LS0NCj4gIGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgfCAzOCArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrLS0tDQo+IC0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAzNCBpbnNlcnRpb25z
+KCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5
+c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQo+IGluZGV4IGQ5N2NjZjFjMTU1
+OC4uMGEwZjMzNmIwZWRkIDEwMDY0NA0KPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5j
+DQo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCj4gQEAgLTE4NzIsNiArMTg3Miwz
+NCBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0cGZyMV9lbDEoc3RydWN0IGt2bV92Y3B1DQo+ICp2
+Y3B1LA0KPiAgCXJldHVybiBzZXRfaWRfcmVnKHZjcHUsIHJkLCB1c2VyX3ZhbCk7DQo+ICB9DQo+
+IA0KPiArc3RhdGljIGludCBzZXRfY3RyX2VsMChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ICsJ
+CSAgICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwgdTY0IHVzZXJfdmFsKQ0KPiAr
+ew0KPiArCXU4IHVzZXJfTDFJcCA9IFNZU19GSUVMRF9HRVQoQ1RSX0VMMCwgTDFJcCwgdXNlcl92
+YWwpOw0KPiArDQo+ICsJLyoNCj4gKwkgKiBCb3RoIEFJVklWVCAoMGIwMSkgYW5kIFZQSVBUICgw
+YjAwKSBhcmUgZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4gKwkgKiBIZW5jZSBvbmx5IGFsbG93
+IHRvIHNldCBWSVBUKDBiMTApIG9yIFBJUFQoMGIxMSkgZm9yIEwxSXAgYmFzZWQNCj4gKwkgKiBv
+biB3aGF0IGhhcmR3YXJlIHJlcG9ydHMuDQo+ICsJICoNCj4gKwkgKiBVc2luZyBhIFZJUFQgc29m
+dHdhcmUgbW9kZWwgb24gUElQVCB3aWxsIGxlYWQgdG8gb3Zlcg0KPiBpbnZhbGlkYXRpb24sDQo+
+ICsJICogYnV0IHN0aWxsIGNvcnJlY3QuIEhlbmNlLCB3ZSBjYW4gYWxsb3cgZG93bmdyYWRpbmcg
+UElQVCB0byBWSVBULA0KPiArCSAqIGJ1dCBub3QgdGhlIG90aGVyIHdheSBhcm91bmQuIFRoaXMg
+aXMgaGFuZGxlZCB2aWENCj4gYXJtNjRfZnRyX3NhZmVfdmFsdWUoKQ0KPiArCSAqIGFzIENUUl9F
+TDAgZnRyX2JpdHMgaGFzIEwxSXAgZmllbGQgd2l0aCB0eXBlIEZUUl9FWEFDVCBhbmQgc2FmZQ0K
+PiB2YWx1ZQ0KPiArCSAqIHNldCBhcyBWSVBULg0KPiArCSAqLw0KPiArCXN3aXRjaCAodXNlcl9M
+MUlwKSB7DQo+ICsJY2FzZSBDVFJfRUwwX0wxSXBfUkVTRVJWRURfVlBJUFQ6DQo+ICsJY2FzZSBD
+VFJfRUwwX0wxSXBfUkVTRVJWRURfQUlWSVZUOg0KPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gKwlj
+YXNlIENUUl9FTDBfTDFJcF9WSVBUOg0KPiArCWNhc2UgQ1RSX0VMMF9MMUlwX1BJUFQ6DQo+ICsJ
+CXJldHVybiBzZXRfaWRfcmVnKHZjcHUsIHJkLCB1c2VyX3ZhbCk7DQo+ICsJZGVmYXVsdDoNCj4g
+KwkJcmV0dXJuIC1FTk9FTlQ7DQo+ICsJfQ0KPiArfQ0KPiArDQo+ICAvKg0KPiAgICogY3B1ZmVh
+dHVyZSBJRCByZWdpc3RlciB1c2VyIGFjY2Vzc29ycw0KPiAgICoNCj4gQEAgLTI2MTQsMTAgKzI2
+NDIsMTIgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2Mgc3lzX3JlZ19kZXNjc1td
+DQo+ID0gew0KPiAgCXsgU1lTX0RFU0MoU1lTX0NDU0lEUjJfRUwxKSwgdW5kZWZfYWNjZXNzIH0s
+DQo+ICAJeyBTWVNfREVTQyhTWVNfU01JRFJfRUwxKSwgdW5kZWZfYWNjZXNzIH0sDQo+ICAJeyBT
+WVNfREVTQyhTWVNfQ1NTRUxSX0VMMSksIGFjY2Vzc19jc3NlbHIsIHJlc2V0X3Vua25vd24sDQo+
+IENTU0VMUl9FTDEgfSwNCj4gLQlJRF9XUklUQUJMRShDVFJfRUwwLCBDVFJfRUwwX0RJQ19NQVNL
+IHwNCj4gLQkJCSAgICAgQ1RSX0VMMF9JRENfTUFTSyB8DQo+IC0JCQkgICAgIENUUl9FTDBfRG1p
+bkxpbmVfTUFTSyB8DQo+IC0JCQkgICAgIENUUl9FTDBfSW1pbkxpbmVfTUFTSyksDQo+ICsJSURf
+RklMVEVSRUQoQ1RSX0VMMCwgY3RyX2VsMCwNCj4gKwkJICAgIENUUl9FTDBfRElDX01BU0sgfA0K
+PiArCQkgICAgQ1RSX0VMMF9JRENfTUFTSyB8DQo+ICsJCSAgICBDVFJfRUwwX0RtaW5MaW5lX01B
+U0sgfA0KPiArCQkgICAgQ1RSX0VMMF9MMUlwX01BU0sgfA0KPiArCQkgICAgQ1RSX0VMMF9JbWlu
+TGluZV9NQVNLKSwNCj4gIAl7IFNZU19ERVNDKFNZU19TVkNSKSwgdW5kZWZfYWNjZXNzLCByZXNl
+dF92YWwsIFNWQ1IsIDAsIC52aXNpYmlsaXR5ID0NCj4gc21lX3Zpc2liaWxpdHkgIH0sDQo+ICAJ
+eyBTWVNfREVTQyhTWVNfRlBNUiksIHVuZGVmX2FjY2VzcywgcmVzZXRfdmFsLCBGUE1SLCAwLCAu
+dmlzaWJpbGl0eSA9DQo+IGZwOF92aXNpYmlsaXR5IH0sDQo+IA0KPiAtLQ0KPiAyLjQ1LjINCj4g
+DQoNCg==
