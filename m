@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A412126C01
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 09:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672F11E1048
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 09:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730972429; cv=none; b=eWYtJ9iZgtNSwJiAv0RP39Vvj9iPqjiN1uBqviNvGLEMhU7eLc7/2yjdQljDmZz1yOeAHWfJJ5RXDbOz4yKKJCtly0XpimqdWNvWrXlibjY+WJZ9PCfbY+poTXNGEbj809Q0c1glyVJAhv9+4+/ap6V+3SxW55xGy0BkNQQFgUo=
+	t=1730972430; cv=none; b=OaD9uBqb5BxIdaqijnJ1VrUu8vXdkSlYZfC40uY5KypJgz8C+KQZAhwRxRN/OOJ3D+HUqkGSDTCD3xydoMRatyqY8XCno4ZTHX043YB9wE8z1BCNFy29l4/DUL37crvquNV7taO4AG8ZOySvMVVDfcElTZU/a8P6lrve670sIOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730972429; c=relaxed/simple;
-	bh=1Eay4UPV/KZ3jq8lAfXy0krU3Az0xu+VTrt0d1rWo1A=;
+	s=arc-20240116; t=1730972430; c=relaxed/simple;
+	bh=PlhPg0AXueM7Kc/Ewa5xRVc0/YVdTi7Iob1yKtIV/5Q=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UqPB91NRkJIOsOZ/dmv/P0xyrSGVV47YBAsSmuEdq8GekMarPsL4s6K5uWFhVK1RMJo4/r+VO3i9j7gZus+jFP3TvJg5e3gURa6wgS5SRoLp8H5kI5qXZreaXr5ZkPezcNpfx+S+1/mGzGBqMH2VtJwjj0kDnpFztZofaR1u8X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uq3jBWzz; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Z1arqpKyZsSrW5Y9pqMdFSV/hhdWcm6iXKbAft8RwWZwuTaIcpCfogQ+LgaHDabVgXMkmqV9As61a++XIow/OkSIPVvZsBkRw7iSfsdEAQm1+a/Tx3XfoVE0K8/IPhp1M6g+cdMbNrkEnSv03KiqIvZOgPMXHTsgsXNXsWqfO7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h6GivDoO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uq3jBWzz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6GivDoO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730972425;
+	s=mimecast20190719; t=1730972426;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Rr3Xjz6SCyD3QOAu7F+cqtkNRB5n403qu15+Enk2bM8=;
-	b=Uq3jBWzz0gN1CfzRQegKl85HK7aREWjIUibj9BaNzGpRxVyRHR5uSdec8v8JzHBscKB0Yu
-	z7bnsDZ9ns+nAh24VEN0lfqLZw3XDt+fZXTYT5TVU6Gsuf483SH9CnDzr/OGqWVvTSiizU
-	TUakSCj7Q5AR24zmbGQFyZIjdZbWyfg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=rDtPe5czZ1kQK4ehAzlJ6MVx6O1Rdl4rUXY/t+F2VLw=;
+	b=h6GivDoOz+YpDqaHR0JCoEE5HUpw/eatv/nBEMuwNZUxv/uOHjhLOZ5+j1Ba4V5yNcdYRi
+	+UfizzAMUOYBcOiLQ/cL9vi+ePhxg9Qej3SeO9Adg+nmwC9XRJWyk3p/hnyw+FQhdl/W+5
+	zFQr4nxKgA22KgPWjPQFgaIarx+8lBs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-484-xu143bFpNKSQHhUOwdW4Iw-1; Thu,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-31-EyieT2sVNsySQmUuh-qIpQ-1; Thu,
  07 Nov 2024 04:40:22 -0500
-X-MC-Unique: xu143bFpNKSQHhUOwdW4Iw-1
-X-Mimecast-MFC-AGG-ID: xu143bFpNKSQHhUOwdW4Iw
+X-MC-Unique: EyieT2sVNsySQmUuh-qIpQ-1
+X-Mimecast-MFC-AGG-ID: EyieT2sVNsySQmUuh-qIpQ
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 03C731955EA1;
-	Thu,  7 Nov 2024 09:40:15 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F1F9A1978CA7;
+	Thu,  7 Nov 2024 09:40:18 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.39.192.86])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5B8481955F40;
-	Thu,  7 Nov 2024 09:40:11 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7EE211956054;
+	Thu,  7 Nov 2024 09:40:15 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -53,9 +53,9 @@ To: eric.auger.pro@gmail.com,
 	oliver.upton@linux.dev,
 	shuah@kernel.org,
 	pbonzini@redhat.com
-Subject: [PATCH  1/3] KVM: selftests: Introduce vm_dead()
-Date: Thu,  7 Nov 2024 10:38:48 +0100
-Message-ID: <20241107094000.70705-2-eric.auger@redhat.com>
+Subject: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
+Date: Thu,  7 Nov 2024 10:38:49 +0100
+Message-ID: <20241107094000.70705-3-eric.auger@redhat.com>
 In-Reply-To: <20241107094000.70705-1-eric.auger@redhat.com>
 References: <20241107094000.70705-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -67,61 +67,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Introduce a new helper that detects whether the VM
-was turned dead by a KVM_REQ_VM_DEAD request.
+In case a KVM_REQ_VM_DEAD request was sent to a VM, subsequent
+KVM ioctls will fail and cause test failure. This now happens
+with an aarch64 vgic test where the kvm_vm_free() fails. Let's
+add a new kvm_vm_dead_free() helper that does all the deallocation
+besides the KVM_SET_USER_MEMORY_REGION2 ioctl.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  | 27 +++++++++++++------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 25 ++++++++++++++-----
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index bc7c242480d6..90424bfe33bd 100644
+index 90424bfe33bd..8be893b2c6a2 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -299,13 +299,26 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
- })
+@@ -437,6 +437,7 @@ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
+ const char *vm_guest_mode_string(uint32_t i);
  
- /*
-- * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
-- * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
-- * probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM since before
-- * selftests existed and (b) should never outright fail, i.e. is supposed to
-- * return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all ioctl()s for the
-+ * To detect a dead VM, probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM
-+ * since before selftests existed and (b) should never outright fail, i.e. is supposed
-+ * to return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all ioctl()s for the
-  * VM and its vCPUs, including KVM_CHECK_EXTENSION.
-  */
-+static inline bool vm_dead(struct kvm_vm *vm)
-+{
-+	int ret = __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY);
-+
-+	if (ret < 1) {
-+		TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");
-+		return true;
+ void kvm_vm_free(struct kvm_vm *vmp);
++void kvm_vm_dead_free(struct kvm_vm *vmp);
+ void kvm_vm_restart(struct kvm_vm *vmp);
+ void kvm_vm_release(struct kvm_vm *vmp);
+ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index a2b7df5f1d39..befbbe989d73 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -712,7 +712,8 @@ void kvm_vm_release(struct kvm_vm *vmp)
+ }
+ 
+ static void __vm_mem_region_delete(struct kvm_vm *vm,
+-				   struct userspace_mem_region *region)
++				   struct userspace_mem_region *region,
++				   bool dead)
+ {
+ 	int ret;
+ 
+@@ -720,8 +721,10 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+ 	rb_erase(&region->hva_node, &vm->regions.hva_tree);
+ 	hash_del(&region->slot_node);
+ 
+-	region->region.memory_size = 0;
+-	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
++	if (!dead) {
++		region->region.memory_size = 0;
++		vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
 +	}
-+	return false;
+ 
+ 	sparsebit_free(&region->unused_phy_pages);
+ 	sparsebit_free(&region->protected_phy_pages);
+@@ -742,7 +745,7 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+ /*
+  * Destroys and frees the VM pointed to by vmp.
+  */
+-void kvm_vm_free(struct kvm_vm *vmp)
++static void __kvm_vm_free(struct kvm_vm *vmp, bool dead)
+ {
+ 	int ctr;
+ 	struct hlist_node *node;
+@@ -759,7 +762,7 @@ void kvm_vm_free(struct kvm_vm *vmp)
+ 
+ 	/* Free userspace_mem_regions. */
+ 	hash_for_each_safe(vmp->regions.slot_hash, ctr, node, region, slot_node)
+-		__vm_mem_region_delete(vmp, region);
++		__vm_mem_region_delete(vmp, region, dead);
+ 
+ 	/* Free sparsebit arrays. */
+ 	sparsebit_free(&vmp->vpages_valid);
+@@ -771,6 +774,16 @@ void kvm_vm_free(struct kvm_vm *vmp)
+ 	free(vmp);
+ }
+ 
++void kvm_vm_free(struct kvm_vm *vmp)
++{
++	__kvm_vm_free(vmp, false);
 +}
 +
-+/*
-+ * Assert that a VM or vCPU ioctl() succeeded, also handling the case when
-+ * the ioctl() failed because KVM killed/bugged the VM.
-+ */
- #define __TEST_ASSERT_VM_VCPU_IOCTL(cond, name, ret, vm)				\
- do {											\
- 	int __errno = errno;								\
-@@ -315,9 +328,7 @@ do {											\
- 	if (cond)									\
- 		break;									\
- 											\
--	if (errno == EIO &&								\
--	    __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY) < 0) {	\
--		TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");	\
-+	if (vm_dead(vm)) {								\
- 		TEST_FAIL("KVM killed/bugged the VM, check the kernel log for clues");	\
- 	}										\
- 	errno = __errno;								\
++void kvm_vm_dead_free(struct kvm_vm *vmp)
++{
++	__kvm_vm_free(vmp, true);
++}
++
+ int kvm_memfd_alloc(size_t size, bool hugepages)
+ {
+ 	int memfd_flags = MFD_CLOEXEC;
+@@ -1197,7 +1210,7 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
+  */
+ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot)
+ {
+-	__vm_mem_region_delete(vm, memslot2region(vm, slot));
++	__vm_mem_region_delete(vm, memslot2region(vm, slot), false);
+ }
+ 
+ void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t size,
 -- 
 2.41.0
 
