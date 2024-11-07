@@ -1,131 +1,172 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EB017BD6
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 19:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2109D217F44
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 19:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731006497; cv=none; b=TjeGvYe1dsIZ+XjZ9B8JrVjhoge4lCZbX63GClW/ORsAlJ4NxORCeajtqHAbm4CLHGUEbNYszCq8kaG1tKbn/PQ6EC4DwJRPdi0FHIcN4LXnSjhEgTYh4k1F2aT3lAsV3Y38IfRWjkAVrKVOO25VGd8tZeNI2ic4+3tPpf4MJ7M=
+	t=1731009397; cv=none; b=oZIhc2hZge3L1+JwramXx7lQIKG/efOR+tFmKo04tNjrbqvAN2CwpNvG2JPNPpNWE+aGrMbALNsHbkGmQS1MnIqAESJ0FA5TgM4Lji7pCEoAAmlT42OQIB+BebDjcp7VIZRShUU0PSzE4ODXbvSRQBfd9SVPwd1o2MnUOvraCB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731006497; c=relaxed/simple;
-	bh=KKlJt26DlBOl+oq4QbshDZTvQ0/YvhN59kXYaeOs3wI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kDZSCClozJyyU6i/tDVRC7qG/yeopf4q99/Eg5gwFIDBqWhy3p0ibyYc1ZR37y4ZO9zvNl8MZdgOHug39zp5rhsw5lim9od86XJEcmWMMPVbInosXRxJFv5cFlxJg7oxcSsuAb0RwzmjWfoJj5nRrTM4fB2+YJje984rEp+NXX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JqA801Ly; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1731009397; c=relaxed/simple;
+	bh=s9PQaqYy7gUAKaokyD0EQQVp3ndmKgWBymJlUQ5NQT4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=urzvTl7iRESKNAvhmbWOom+4z+CzmzMFU9KBQfAq/euJdAjULW7Me+WgOA7FQ6YH/0tXImKpPv1mafAqi/hWBKxgdXnMpSX+Rqdu29dyCoo/ONXXpyL+872SsXQJeH3SO7x4XYWEw0greRPhEhIvL2gtdxn9XARbsY07C+A3GGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N0f/4bNU; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JqA801Ly"
-Date: Thu, 7 Nov 2024 11:08:06 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731006493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iVhaxqbRLOqWKRQjW0eS97SPLltjxLKNHVobfquR6RU=;
-	b=JqA801LyALBLnpPRGUUDsee91B6Lop7Cv0Ok+XE0bFkk5177I+Y1/aT7OHrwbexlpFXv3+
-	c/kDKtsXwmpnWuXUTv1kigZW0sneesxFjVgOmx6F7s3T1uSfytTU+X0HEMxzJWk1pXclX+
-	mjuEF22ox+PporqaDecNBOVzczIcSTE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-	broonie@kernel.org, maz@kernel.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, joey.gouly@arm.com, shuah@kernel.org,
-	pbonzini@redhat.com
-Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
-Message-ID: <Zy0QFhFsICeNt8kF@linux.dev>
-References: <20241107094000.70705-1-eric.auger@redhat.com>
- <20241107094000.70705-3-eric.auger@redhat.com>
- <Zyz_KGtoXt0gnMM8@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N0f/4bNU"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e59dc7df64so17539777b3.1
+        for <kvmarm@lists.linux.dev>; Thu, 07 Nov 2024 11:56:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731009394; x=1731614194; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zBP9cQn+CUeDWqPutci2y0fBryOwyk4gwuh+LOyRfGQ=;
+        b=N0f/4bNUG9KI/jxgWY/WQP8oRa6PBFaRPNjA5Ckg+rgdNqMHp8nRb3BJog4eJVoRoy
+         RyXVBZj14J0rFO7AX1sYCIdOFUdGd4YAw6RUDh0bc+FzOxfjvFYBaOeiWkTTVXPwoxyQ
+         keRxkoTzZV7UPgcq8Z40kh3SjDW5LpeD3KG6x4kBmEEh85MzN8d4kOCP+jloOGF6Box4
+         zoAKizyLjmLf5hzyPOFTD7MPQdNAi5AWWeb5KiJg7Z0K7ncwaxgKyf6bhpWZCsBvuhkg
+         GEkS2UOkZ/9qIhPcwlV7ZQlHFIno5PFMmo765gYv62/MFQTL6FOHFPqndDqcB0hKHY9J
+         NX4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731009394; x=1731614194;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zBP9cQn+CUeDWqPutci2y0fBryOwyk4gwuh+LOyRfGQ=;
+        b=lDF8PMV44KBSwwSqLiqgEvSjdZx7yujxa4G7hGszENFkR/QgY8jEqsaaZeI9vT9HR0
+         ai1j9+qdXv/jA4wx8VJqogm2+NRmFGvKNTFy8fVOuBPN/npRQ/aIT1BV5X+Eut3TRLf3
+         6gGc9FcP+0quPXx/A7dai+R8dD1cGdo4ojCi+cugEPSfFjVp7h8ztjTs4PT7j20zmTDt
+         QkqJR04Z4HU3PcayEclaSqhU3ECoVkjCvIllgXKTNxRK1HI2FrH5C1BKCBDyiR6mlAnI
+         0jd6laP2hCDjIlrU1jnn2RnNQ5hNOrfTOOyY52GsZhq8kyJNYLQl7XBIWJQ55eP8Kf/x
+         gxMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXXoAZC1A0G4ELsNGM5IN41DeP+dCUc+/8pwEWA/mgvXXTvE4UrP3pCUA8jiWNbAJpZ+isimhg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxGSmsY9mErze/opSpcHU8qNKbBWBUHGH3o3Wpp72GQ9cf0sZaC
+	+9spo2ktV0WumJpHHaSiVFMYegpAqTEbVZnyResag4FXb/tT6cBCBNgWZ09BYXEWeFXN2DLXz2G
+	a2Q==
+X-Google-Smtp-Source: AGHT+IHGhu8mNxNsq1le3Y88bQEMRwpMbJOW7Gcai6EHqyvmqmAaHws+50k8OfTLl4697j16Z9tv7t+ZxG8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a0d:ef05:0:b0:6ea:881b:b545 with SMTP id
+ 00721157ae682-6eade535166mr647b3.4.1731009394112; Thu, 07 Nov 2024 11:56:34
+ -0800 (PST)
+Date: Thu, 7 Nov 2024 11:56:32 -0800
+In-Reply-To: <Zy0QFhFsICeNt8kF@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zyz_KGtoXt0gnMM8@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20241107094000.70705-1-eric.auger@redhat.com> <20241107094000.70705-3-eric.auger@redhat.com>
+ <Zyz_KGtoXt0gnMM8@google.com> <Zy0QFhFsICeNt8kF@linux.dev>
+Message-ID: <Zy0bcM0m-N18gAZz@google.com>
+Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, broonie@kernel.org, 
+	maz@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	joey.gouly@arm.com, shuah@kernel.org, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Nov 07, 2024 at 09:55:52AM -0800, Sean Christopherson wrote:
-> On Thu, Nov 07, 2024, Eric Auger wrote:
-> > In case a KVM_REQ_VM_DEAD request was sent to a VM, subsequent
-> > KVM ioctls will fail and cause test failure. This now happens
-> > with an aarch64 vgic test where the kvm_vm_free() fails. Let's
-> > add a new kvm_vm_dead_free() helper that does all the deallocation
-> > besides the KVM_SET_USER_MEMORY_REGION2 ioctl.
+On Thu, Nov 07, 2024, Oliver Upton wrote:
+> On Thu, Nov 07, 2024 at 09:55:52AM -0800, Sean Christopherson wrote:
+> > On Thu, Nov 07, 2024, Eric Auger wrote:
+> > > In case a KVM_REQ_VM_DEAD request was sent to a VM, subsequent
+> > > KVM ioctls will fail and cause test failure. This now happens
+> > > with an aarch64 vgic test where the kvm_vm_free() fails. Let's
+> > > add a new kvm_vm_dead_free() helper that does all the deallocation
+> > > besides the KVM_SET_USER_MEMORY_REGION2 ioctl.
+> > 
+> > Please no.  I don't want to bleed the kvm->vm_dead behavior all over selftests.
+> > The hack in __TEST_ASSERT_VM_VCPU_IOCTL() is there purely to provide users with
+> > a more helpful error message, it is most definitely not intended to be an "official"
+> > way to detect and react to the VM being dead.
+> > 
+> > IMO, tests that intentionally result in a dead VM should assert that subsequent
+> > VM/vCPU ioctls return -EIO, and that's all.  Attempting to gracefully free
+> > resources adds complexity and pollutes the core selftests APIs, with very little
+> > benefit.
 > 
-> Please no.  I don't want to bleed the kvm->vm_dead behavior all over selftests.
-> The hack in __TEST_ASSERT_VM_VCPU_IOCTL() is there purely to provide users with
-> a more helpful error message, it is most definitely not intended to be an "official"
-> way to detect and react to the VM being dead.
-> 
-> IMO, tests that intentionally result in a dead VM should assert that subsequent
-> VM/vCPU ioctls return -EIO, and that's all.  Attempting to gracefully free
-> resources adds complexity and pollutes the core selftests APIs, with very little
-> benefit.
+> Encouraging tests to explicitly leak resources to fudge around assertions
+> in the selftests library seems off to me.
 
-Encouraging tests to explicitly leak resources to fudge around assertions
-in the selftests library seems off to me.
+I don't disagree, but I really, really don't want to add vm_dead().
 
-IMO, the better approach would be to provide a helper that gives the
-impression of freeing the VM but implicitly leaks it, paired with some
-reasoning for it.
+> IMO, the better approach would be to provide a helper that gives the
+> impression of freeing the VM but implicitly leaks it, paired with some
+> reasoning for it.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index bc7c242480d6..75ad05c3c429 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -426,6 +426,7 @@ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
- const char *vm_guest_mode_string(uint32_t i);
- 
- void kvm_vm_free(struct kvm_vm *vmp);
-+void __kvm_vm_free_dead(struct kvm_vm *vmp);
- void kvm_vm_restart(struct kvm_vm *vmp);
- void kvm_vm_release(struct kvm_vm *vmp);
- void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename);
+Actually, duh.  There's no need to manually delete KVM memslots for *any* VM,
+dead or alive.  Just skip that unconditionally when freeing the VM, and then the
+vGIC test just needs to assert on -EIO instead -ENXIO/-EBUSY.
+
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 7 Nov 2024 11:39:59 -0800
+Subject: [PATCH] KVM: selftests: Don't bother deleting memslots in KVM when
+ freeing VMs
+
+When freeing a VM, don't call into KVM to manually remove each memslot,
+simply cleanup and free any userspace assets associated with the memory
+region.  KVM is ultimately responsible for ensuring kernel resources are
+freed when the VM is destroyed, deleting memslots one-by-one is
+unnecessarily slow, and unless a test is already leaking the VM fd, the
+VM will be destroyed when kvm_vm_release() is called.
+
+Not deleting KVM's memslot also allows cleaning up dead VMs without having
+to care whether or not the to-be-freed VM is dead or alive.
+
+Reported-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/lib/kvm_util.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index a2b7df5f1d39..34ed397d7811 100644
+index 6b3161a0990f..33fefeb3ca44 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -771,6 +771,21 @@ void kvm_vm_free(struct kvm_vm *vmp)
- 	free(vmp);
+@@ -720,9 +720,6 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+ 	rb_erase(&region->hva_node, &vm->regions.hva_tree);
+ 	hash_del(&region->slot_node);
+ 
+-	region->region.memory_size = 0;
+-	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
+-
+ 	sparsebit_free(&region->unused_phy_pages);
+ 	sparsebit_free(&region->protected_phy_pages);
+ 	ret = munmap(region->mmap_start, region->mmap_size);
+@@ -1197,7 +1194,12 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
+  */
+ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot)
+ {
+-	__vm_mem_region_delete(vm, memslot2region(vm, slot));
++	struct userspace_mem_region *region = memslot2region(vm, slot);
++
++	region->region.memory_size = 0;
++	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
++
++	__vm_mem_region_delete(vm, region);
  }
  
-+/*
-+ * For use with the *extremely* uncommon case that a test expects a VM to be
-+ * marked as dead.
-+ *
-+ * Deliberately leak the VM to avoid hacking up kvm_vm_free() to cope with a
-+ * dead VM while giving the outward impression of 'doing the right thing'.
-+ */
-+void __kvm_vm_dead_free(struct kvm_vm *vmp)
-+{
-+	if (!vmp)
-+		return;
-+
-+	TEST_ASSERT(vm_dead(vmp));
-+}
-+
- int kvm_memfd_alloc(size_t size, bool hugepages)
- {
- 	int memfd_flags = MFD_CLOEXEC;
+ void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t size,
 
-> Marking a VM dead should be a _very_ rare event; it's not something that I think
-> we should encourage, i.e. we shouldn't make it easier to deal with.  Ideally,
-> use of kvm_vm_dead() should be limited to things like sev_vm_move_enc_context_from(),
-> where KVM needs to prever accessing the source VM to protect the host.  IMO, the
-> vGIC case and x86's enter_smm() are hacks.  E.g. I don't see any reason why the
-> enter_smm() case can't synthesize a triple fault.
-
-The VGIC case is at least better than the alternative of slapping
-bandaids all over the shop to cope with a half-baked VM and ensure we
-tear it down correctly. Userspace is far up shit creek at the point the
-VM is marked as dead, so I don't see any value in hobbling along
-afterwards.
-
+base-commit: c88416ba074a8913cf6d61b789dd834bbca6681c
 -- 
-Thanks,
-Oliver
+
+
+> > Marking a VM dead should be a _very_ rare event; it's not something that I think
+> > we should encourage, i.e. we shouldn't make it easier to deal with.  Ideally,
+> > use of kvm_vm_dead() should be limited to things like sev_vm_move_enc_context_from(),
+> > where KVM needs to prever accessing the source VM to protect the host.  IMO, the
+> > vGIC case and x86's enter_smm() are hacks.  E.g. I don't see any reason why the
+> > enter_smm() case can't synthesize a triple fault.
+> 
+> The VGIC case is at least better than the alternative of slapping
+> bandaids all over the shop to cope with a half-baked VM and ensure we
+> tear it down correctly. Userspace is far up shit creek at the point the
+> VM is marked as dead, so I don't see any value in hobbling along
+> afterwards.
+
+Again, I don't disagree, but I don't want to normalize shooting the VM on errors.
