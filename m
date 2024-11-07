@@ -1,131 +1,96 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E427119CC36
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 09:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0102B1D79BB
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 09:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730970365; cv=none; b=DX7t+nHS0rCYrLqi/M5n6+sPhNReNahBzeD5h1XS+tL9sx8UlVebzVbif/l1GBGyh7Hsr3oVCT39bz6+UrkBL3kiFkEooc4pu4+rbr64uElk1lvjjdbZgzb6Z8ekWB4KZX5F5UfnWe+PLmaPcwBJYlpRaj/JCeuB+tXYZvrgT08=
+	t=1730972425; cv=none; b=miHrXaK5/zdfkLhUuJYbCKwOTcyjbKWygiyC1/kS4+LJxxVJty7PaJocApshQEJYdJ9vQztKLLf7BxXUGSX7hfhuIBzsIN7On9ARaCuoj3UXiUTVJL3ftaRN8LWL6dR79pBD6XuL6uAEacU4K1cIwuPjiVRY31kMHPy/vIlD31o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730970365; c=relaxed/simple;
-	bh=lZEuVN3mQD2v8GbAx3eCizaC0Y84qZQlZOHowKAkk4I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lN4om/95LHv4UrRaGAZuHl/fdjcbUgBF8KjG9rr6C90Uo38hKWGont6UogqcNoYLim5YpLRSrGUlyYBtYk8q5Z3WzeEd6RrfXRUyBCcxX0/gexkyNynHSczrEwgI4iK3YVi6OkJ0WvJdm2etIx6RamUyKU6vv9s6UV6pHO+VTdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XkbkC0QdTzQsZM;
-	Thu,  7 Nov 2024 17:04:51 +0800 (CST)
-Received: from kwepemk100016.china.huawei.com (unknown [7.202.194.64])
-	by mail.maildlp.com (Postfix) with ESMTPS id 343D018005F;
-	Thu,  7 Nov 2024 17:05:59 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- kwepemk100016.china.huawei.com (7.202.194.64) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 7 Nov 2024 17:05:58 +0800
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Thu, 7 Nov 2024 10:05:56 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
-	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
-CC: "james.morse@arm.com" <james.morse@arm.com>, "joey.gouly@arm.com"
-	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"sebott@redhat.com" <sebott@redhat.com>, yuzenghui <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH v2] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from
- userspace
-Thread-Topic: [PATCH v2] KVM: arm64: Make L1Ip feature in CTR_EL0 writable
- from userspace
-Thread-Index: AQHbJFZMOfDGoLDLOEqZY8/BCs2q5rKrnz+w
-Date: Thu, 7 Nov 2024 09:05:55 +0000
-Message-ID: <e7174e103fd94023be1fd5127871540e@huawei.com>
-References: <20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com>
-In-Reply-To: <20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1730972425; c=relaxed/simple;
+	bh=cBg1qqMZy09oDzfSRdllAKvEmmg2QeJtF/7tXt+wK1Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=qGRD34HmU/VwvTg0YhoHjzfDbZ8esED8hreE6F4yFrqxCYMWzef1QF4Rdmkhjz9HZvMmdKdL6sVuqFw4Ih4WERZ5xv6m2X5NshdRuHdJTBgXljuHN+DqF2LER2MuhZ5O1gXqfo7pENjd/W9/vbNfcNC46TwTidbT1yTX1ymIQ7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ocsb9I3y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ocsb9I3y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730972423;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KtsnR0uVveSGf9j1BUUQ1tqA3+oQh/kCsttRmTjgonY=;
+	b=Ocsb9I3y2uw+WVeYyP+R8SG+3Zg+jrtHPdNvoITok9wE9Pgw82VsLbvwcQNKquBx0ek0gI
+	PRUVr4aRoCDTUCRiU00rooAvccbOUOBSLV3w0FK+Rde+mKZI1k+gvU1Nu+rEfO7kulh9DB
+	4lHiGkOcrAxFibp4yDJGvZdTVvjUmHI=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-Sbhb7S26Md2r_BCz682lZg-1; Thu,
+ 07 Nov 2024 04:40:21 -0500
+X-MC-Unique: Sbhb7S26Md2r_BCz682lZg-1
+X-Mimecast-MFC-AGG-ID: Sbhb7S26Md2r_BCz682lZg
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D69C51979043;
+	Thu,  7 Nov 2024 09:40:10 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.39.192.86])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 050EA1956054;
+	Thu,  7 Nov 2024 09:40:05 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	broonie@kernel.org,
+	maz@kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	joey.gouly@arm.com,
+	oliver.upton@linux.dev,
+	shuah@kernel.org,
+	pbonzini@redhat.com
+Subject: [PATCH 0/3] KVM: arm64: Handle KVM_REQ_VM_DEAD in vgic_init test
+Date: Thu,  7 Nov 2024 10:38:47 +0100
+Message-ID: <20241107094000.70705-1-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-SGkgT2xpdmVyLA0KDQpBIGdlbnRsZSBwaW5nIG9uIHRoaXMuIEkgdGhpbmsgaXQgc3RpbGwgYXBw
-bGllcyBjbGVhbmx5IG9uIHRvcCBvZiBKb2V5J3MgdjYgb2YgTVBBTQ0KSGlkZSBzZXJpZXMuDQoN
-ClRoYW5rcywNClNoYW1lZXINCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9t
-OiBsaW51eC1hcm0ta2VybmVsIDxsaW51eC1hcm0ta2VybmVsLWJvdW5jZXNAbGlzdHMuaW5mcmFk
-ZWFkLm9yZz4gT24NCj4gQmVoYWxmIE9mIFNoYW1lZXIgS29sb3RodW0NCj4gU2VudDogVHVlc2Rh
-eSwgT2N0b2JlciAyMiwgMjAyNCA4OjQwIEFNDQo+IFRvOiBrdm1hcm1AbGlzdHMubGludXguZGV2
-OyBtYXpAa2VybmVsLm9yZzsgb2xpdmVyLnVwdG9uQGxpbnV4LmRldg0KPiBDYzogamFtZXMubW9y
-c2VAYXJtLmNvbTsgam9leS5nb3VseUBhcm0uY29tOw0KPiBzdXp1a2kucG91bG9zZUBhcm0uY29t
-OyBzZWJvdHRAcmVkaGF0LmNvbTsgeXV6ZW5naHVpDQo+IDx5dXplbmdodWlAaHVhd2VpLmNvbT47
-IFdhbmd6aG91IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+Ow0KPiBsaW51eC1hcm0ta2Vy
-bmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPg0K
-PiBTdWJqZWN0OiBbUEFUQ0ggdjJdIEtWTTogYXJtNjQ6IE1ha2UgTDFJcCBmZWF0dXJlIGluIENU
-Ul9FTDAgd3JpdGFibGUNCj4gZnJvbSB1c2Vyc3BhY2UNCj4gDQo+IE9ubHkgYWxsb3cgdXNlcnNw
-YWNlIHRvIHNldCBWSVBUKDBiMTApIG9yIFBJUFQoMGIxMSkgZm9yIEwxSXAgYmFzZWQgb24NCj4g
-d2hhdCBoYXJkd2FyZSByZXBvcnRzIGFzIGJvdGjCoEFJVklWVCAoMGIwMSkgYW5kIFZQSVBUICgw
-YjAwKSBhcmUNCj4gZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4gDQo+IFVzaW5nIGEgVklQVCBm
-b3IgR3Vlc3Qgd2hlcmUgaGFyZHdhcmUgcmVwb3J0cyBQSVBUIG1heSBsZWFkIHRvIG92ZXINCj4g
-aW52YWxpZGF0aW9uLCBidXQgaXMgc3RpbGwgY29ycmVjdC4gSGVuY2UsIHdlIGNhbiBhbGxvdyBk
-b3duZ3JhZGluZw0KPiBQSVBUIHRvIFZJUFQsIGJ1dCBub3QgdGhlIG90aGVyIHdheSBhcm91bmQu
-DQo+IA0KPiBSZXZpZXdlZC1ieTogU2ViYXN0aWFuIE90dCA8c2Vib3R0QHJlZGhhdC5jb20+DQo+
-IFJldmlld2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPg0KPiBTaWduZWQtb2Zm
-LWJ5OiBTaGFtZWVyIEtvbG90aHVtDQo+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdl
-aS5jb20+DQo+IC0tLQ0KPiB2MToNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtYXJtLzIw
-MjQxMDE3MDg1OTI1LjQwNTMyLTEtDQo+IHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2Vp
-LmNvbS8NCj4gDQo+IENoYW5nZXMgZnJvbSB2MToNCj4gwqAtQXMgcGVyIE1hcmMncyBzdWdnZXN0
-aW9uIG1vZGlmaWVkIHRoZSB3YXkgc2V0X2N0cl9lbDAoKSByZXN0cmljdGVkDQo+ICAgdGhlIHdy
-aXRlIHdoaWNoIGltcGxpZWQgb3JkZXJlZCB2YWx1ZXPCoGZvciB0aGUgdHlwZXMuIEluc3RlYWQN
-Cj4gICBleHBsaWNpdGx5IGxpc3RlZMKgIGFsbCBwb3NzaWJsZSBwb2xpY3nCoHR5cGVzLg0KPiAg
-LUFkZGVkIFItYnkgdGFncyhUaGFua3MhKS4NCj4gDQo+IFRoYW5rcywNCj4gU2hhbWVlcg0KPiAt
-LS0NCj4gIGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgfCAzOCArKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrLS0tDQo+IC0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAzNCBpbnNlcnRpb25z
-KCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5
-c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQo+IGluZGV4IGQ5N2NjZjFjMTU1
-OC4uMGEwZjMzNmIwZWRkIDEwMDY0NA0KPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5j
-DQo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCj4gQEAgLTE4NzIsNiArMTg3Miwz
-NCBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0cGZyMV9lbDEoc3RydWN0IGt2bV92Y3B1DQo+ICp2
-Y3B1LA0KPiAgCXJldHVybiBzZXRfaWRfcmVnKHZjcHUsIHJkLCB1c2VyX3ZhbCk7DQo+ICB9DQo+
-IA0KPiArc3RhdGljIGludCBzZXRfY3RyX2VsMChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ICsJ
-CSAgICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwgdTY0IHVzZXJfdmFsKQ0KPiAr
-ew0KPiArCXU4IHVzZXJfTDFJcCA9IFNZU19GSUVMRF9HRVQoQ1RSX0VMMCwgTDFJcCwgdXNlcl92
-YWwpOw0KPiArDQo+ICsJLyoNCj4gKwkgKiBCb3RoIEFJVklWVCAoMGIwMSkgYW5kIFZQSVBUICgw
-YjAwKSBhcmUgZG9jdW1lbnRlZCBhcyByZXNlcnZlZC4NCj4gKwkgKiBIZW5jZSBvbmx5IGFsbG93
-IHRvIHNldCBWSVBUKDBiMTApIG9yIFBJUFQoMGIxMSkgZm9yIEwxSXAgYmFzZWQNCj4gKwkgKiBv
-biB3aGF0IGhhcmR3YXJlIHJlcG9ydHMuDQo+ICsJICoNCj4gKwkgKiBVc2luZyBhIFZJUFQgc29m
-dHdhcmUgbW9kZWwgb24gUElQVCB3aWxsIGxlYWQgdG8gb3Zlcg0KPiBpbnZhbGlkYXRpb24sDQo+
-ICsJICogYnV0IHN0aWxsIGNvcnJlY3QuIEhlbmNlLCB3ZSBjYW4gYWxsb3cgZG93bmdyYWRpbmcg
-UElQVCB0byBWSVBULA0KPiArCSAqIGJ1dCBub3QgdGhlIG90aGVyIHdheSBhcm91bmQuIFRoaXMg
-aXMgaGFuZGxlZCB2aWENCj4gYXJtNjRfZnRyX3NhZmVfdmFsdWUoKQ0KPiArCSAqIGFzIENUUl9F
-TDAgZnRyX2JpdHMgaGFzIEwxSXAgZmllbGQgd2l0aCB0eXBlIEZUUl9FWEFDVCBhbmQgc2FmZQ0K
-PiB2YWx1ZQ0KPiArCSAqIHNldCBhcyBWSVBULg0KPiArCSAqLw0KPiArCXN3aXRjaCAodXNlcl9M
-MUlwKSB7DQo+ICsJY2FzZSBDVFJfRUwwX0wxSXBfUkVTRVJWRURfVlBJUFQ6DQo+ICsJY2FzZSBD
-VFJfRUwwX0wxSXBfUkVTRVJWRURfQUlWSVZUOg0KPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gKwlj
-YXNlIENUUl9FTDBfTDFJcF9WSVBUOg0KPiArCWNhc2UgQ1RSX0VMMF9MMUlwX1BJUFQ6DQo+ICsJ
-CXJldHVybiBzZXRfaWRfcmVnKHZjcHUsIHJkLCB1c2VyX3ZhbCk7DQo+ICsJZGVmYXVsdDoNCj4g
-KwkJcmV0dXJuIC1FTk9FTlQ7DQo+ICsJfQ0KPiArfQ0KPiArDQo+ICAvKg0KPiAgICogY3B1ZmVh
-dHVyZSBJRCByZWdpc3RlciB1c2VyIGFjY2Vzc29ycw0KPiAgICoNCj4gQEAgLTI2MTQsMTAgKzI2
-NDIsMTIgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2Mgc3lzX3JlZ19kZXNjc1td
-DQo+ID0gew0KPiAgCXsgU1lTX0RFU0MoU1lTX0NDU0lEUjJfRUwxKSwgdW5kZWZfYWNjZXNzIH0s
-DQo+ICAJeyBTWVNfREVTQyhTWVNfU01JRFJfRUwxKSwgdW5kZWZfYWNjZXNzIH0sDQo+ICAJeyBT
-WVNfREVTQyhTWVNfQ1NTRUxSX0VMMSksIGFjY2Vzc19jc3NlbHIsIHJlc2V0X3Vua25vd24sDQo+
-IENTU0VMUl9FTDEgfSwNCj4gLQlJRF9XUklUQUJMRShDVFJfRUwwLCBDVFJfRUwwX0RJQ19NQVNL
-IHwNCj4gLQkJCSAgICAgQ1RSX0VMMF9JRENfTUFTSyB8DQo+IC0JCQkgICAgIENUUl9FTDBfRG1p
-bkxpbmVfTUFTSyB8DQo+IC0JCQkgICAgIENUUl9FTDBfSW1pbkxpbmVfTUFTSyksDQo+ICsJSURf
-RklMVEVSRUQoQ1RSX0VMMCwgY3RyX2VsMCwNCj4gKwkJICAgIENUUl9FTDBfRElDX01BU0sgfA0K
-PiArCQkgICAgQ1RSX0VMMF9JRENfTUFTSyB8DQo+ICsJCSAgICBDVFJfRUwwX0RtaW5MaW5lX01B
-U0sgfA0KPiArCQkgICAgQ1RSX0VMMF9MMUlwX01BU0sgfA0KPiArCQkgICAgQ1RSX0VMMF9JbWlu
-TGluZV9NQVNLKSwNCj4gIAl7IFNZU19ERVNDKFNZU19TVkNSKSwgdW5kZWZfYWNjZXNzLCByZXNl
-dF92YWwsIFNWQ1IsIDAsIC52aXNpYmlsaXR5ID0NCj4gc21lX3Zpc2liaWxpdHkgIH0sDQo+ICAJ
-eyBTWVNfREVTQyhTWVNfRlBNUiksIHVuZGVmX2FjY2VzcywgcmVzZXRfdmFsLCBGUE1SLCAwLCAu
-dmlzaWJpbGl0eSA9DQo+IGZwOF92aXNpYmlsaXR5IH0sDQo+IA0KPiAtLQ0KPiAyLjQ1LjINCj4g
-DQoNCg==
+Mark reported that df5fd75ee305 ("KVM: arm64: Don't eagerly
+teardown the vgic on init error") causes vgic_init test
+assertion failure. This is due to the fact that now an
+incomplete vgic setup causes a KVM_REQ_VM_DEAD request to
+be sent. vgic_init test checks such kind of incomplete setups.
+As a consequence some KVM IOCTL's fail on the clean up path
+(kvm_vm_free) and cause assertion failures in the test.
+
+This series fixes that by checking the VM state and avoid to
+call KVM IOCTL's after the occcurence of such failure.
+
+Best regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/vgic_init_dead_v1
+
+Eric Auger (3):
+  KVM: selftests: Introduce vm_dead()
+  KVM: selftests: Introduce kvm_vm_dead_free
+  KVM: selftests: Handle dead VM in vgic_init test
+
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 41 +++++++++++--------
+ .../testing/selftests/kvm/include/kvm_util.h  | 28 +++++++++----
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 25 ++++++++---
+ 3 files changed, 62 insertions(+), 32 deletions(-)
+
+-- 
+2.41.0
+
