@@ -1,186 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A04A216E15
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 17:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB2F17C96;
+	Thu,  7 Nov 2024 18:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731002375; cv=none; b=M1yFPemUWrgvl+qnqdfd7feS1DrbNB1Gt0nYtPowPTgkaay0w9sk6xyrffyesxdylB/FIW1NvgrQv5g04LzLfgNTa+0RSqwC0DuP2uh0q+XxW61DuOnNcU6briIF5ekV2Ysu1AoEiANfOe2ophg8YO+PoeEQ9p0ZcRfC1974DIc=
+	t=1731003463; cv=none; b=d2tf/Bk3wulZdNamttHmpkAOkyoNqIvfO+aEMod6zHrV3nSGEiAERsOxjnqc83KQBelL6v1uyX7IhFMlMsIXV2i/JOzNp+E8h+RsiUJRq0DBDxn9sJrWZI0+PmeOHmKYoaq3f4ZzaIlLWI3AHRk7CxDrRQruDgTbqawVGzxJMSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731002375; c=relaxed/simple;
-	bh=26uT7KurOPW5iYsQZJ/D6rBvAlVrSy4xYY7YCR0tOlM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VLogmL9/NtM/X+rOczy5lv2LDpHsaG2Dfc4fipkq6q8/hNXf9/rEW3JQQiFLFssXlrZsYVfbhv1DD+idB3DfMsqytBzzuXJ6/vxZpEGhiUZA/LXOxV2n4Qi4W+YxwYIAKZRBL8OL+VPpBBuIoFvwbepgoL7UP4jERDC2dqKDAHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuNWgRXj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731003463; c=relaxed/simple;
+	bh=fkLbHhGlHgj6qtcMJulagW1UwPzPTWEasY2EBTv33Ag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p+/mZN2Our7Au8idwIgnXSIXvfviZJWxntLitglnUmHmqii8F35yeRDWYZzQboem92sEcPV4Z4mlaeVv/g9AywudKTQwIspVmuzDeWQcgpHQE7AJLHdXeNuPtlmbFPWK3tVZAS8B/1QAxquYS6n65FlAYFcBA3ADQOmq0/PWtM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJpXhk6d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuNWgRXj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2CD8C4CECC;
-	Thu,  7 Nov 2024 17:59:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJpXhk6d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06DD6C4CECC;
+	Thu,  7 Nov 2024 18:17:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731002374;
-	bh=26uT7KurOPW5iYsQZJ/D6rBvAlVrSy4xYY7YCR0tOlM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LuNWgRXj3KRZAjGnRB2oj/2okMzvDdy5hSX0fb2LSXTDfHfkrP6UhXnReCoAL2Bn3
-	 JFnDoH+uI4NOGbBG+68Uo25iMqotzGktmNxxXicZp6UUUN8r9hwi7pEHPuAQjrszON
-	 PzsPwVEJR6MXceUZx3jSSuBG84AGlSdrQ1GOdW/OAohk7306IdxQG7mlIot1XIqLps
-	 bkjPbFrt9si1URZj2CR/ttO0X3RdQvVDrLwxoFUcnitj+IVblADimigG8lRPbHncjL
-	 JvnP7/YLKiOxSVhsYf48vjaCDgUDcIb7kjzGvgKlCzvom19k2+FIsNWBIZxKoPJFWF
-	 nMavep1qfb5Kg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t96n6-00ApIE-RT;
-	Thu, 07 Nov 2024 17:59:32 +0000
-Date: Thu, 07 Nov 2024 17:59:32 +0000
-Message-ID: <865xoy2ad7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org
-Subject: Re: [PATCH] KVM: arm64: VHE: Initialize PMSCR_EL1
-In-Reply-To: <ZyytjB-Hlqw909sq@raptor>
-References: <20241106122654.38234-1-alexandru.elisei@arm.com>
-	<868qtw1ne0.wl-maz@kernel.org>
-	<ZyytjB-Hlqw909sq@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1731003463;
+	bh=fkLbHhGlHgj6qtcMJulagW1UwPzPTWEasY2EBTv33Ag=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NJpXhk6d7fTv2QUn1aMxH1iQfnHWOzfUfrWyMULktSXXfDNcgiISkaw7vvd18/6kl
+	 TyYz1wb+obs+W/WZIwkQ4bjgvk5xJOk6e5r58wdJXh8nZ638nF+cHSdAPeVL4IE0mt
+	 Vtf392DEn5My3djAyvqc66PoraPQUOJgoV7csB9BZm1RHE43eEkg3HpxVQI2U/y2Hu
+	 qlIypCqkd3jZ1zKfkLxaj25AI73tLXgU2KyJkgiZqzCu7KiB6ciWHsxgJNMvOhRh7l
+	 zSsGrRWzXTdubIQK4zAdaaDY3sfajDubsoreWo9qNBzD5O+VHL4TogmTJ6wa3zyGz8
+	 KKmlaYD5kf3uw==
+Date: Thu, 7 Nov 2024 18:17:38 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+	maz@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	joey.gouly@arm.com, oliver.upton@linux.dev, shuah@kernel.org,
+	pbonzini@redhat.com
+Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
+Message-ID: <c5ebf131-5182-4dde-8c21-b364b9e93786@sirena.org.uk>
+References: <20241107094000.70705-1-eric.auger@redhat.com>
+ <20241107094000.70705-3-eric.auger@redhat.com>
+ <Zyz_KGtoXt0gnMM8@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="afSuzDBVqO9u/vk5"
+Content-Disposition: inline
+In-Reply-To: <Zyz_KGtoXt0gnMM8@google.com>
+X-Cookie: Professional driver on closed track.
 
-On Thu, 07 Nov 2024 12:07:40 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Do you think this is an improvement (looks like a pretty big diff, but it's
-> mostly refactoring, the actual change is in kvm_arm_init_debug()):
-> 
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index ce8886122ed3..21b260b02216 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -65,12 +65,30 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
->                 *vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
->  }
->  
-> +static bool cpu_has_spe(void)
-> +{
-> +       return cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> +                                                   ID_AA64DFR0_EL1_PMSVer);
-> +}
-> +
-> +static bool cpu_has_trbe(void)
-> +{
-> +       return cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> +                                                   ID_AA64DFR0_EL1_TraceBuffer);
-> +}
-> +
->  /**
->   * kvm_arm_init_debug - grab what we need for debug
->   *
-> - * Currently the sole task of this function is to retrieve the initial
-> - * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
-> - * presumably been set-up by some knowledgeable bootcode.
-> + * This function does two things:
-> + *
-> + * 1. Retrieve the initial value of mdcr_el2 so we can preserve
-> + * MDCR_EL2.HPMN which has presumably been set-up by some knowledgeable
-> + * bootcode.
-> + *
-> + * 2. Clear PMSCR_EL1.E1SPE and E0SPE when the host is running at EL2. The
-> + * bits reset to an unknown value, and clearing them prevents the host from
-> + * accidently profiling a virtual machine.
->   *
->   * It is called once per-cpu during CPU hyp initialisation.
->   */
-> @@ -78,6 +96,9 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
->  void kvm_arm_init_debug(void)
->  {
->         __this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
-> +
-> +       if (is_kernel_in_hyp_mode() && cpu_has_spe())
-> +               write_sysreg_el1(0, SYS_PMSCR);
->  }
->  
->  /**
-> @@ -317,23 +338,20 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
->  
->  void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
->  {
-> -       u64 dfr0;
-> -
->         /* For VHE, there is nothing to do */
->         if (has_vhe())
->                 return;
->  
-> -       dfr0 = read_sysreg(id_aa64dfr0_el1);
->         /*
->          * If SPE is present on this CPU and is available at current EL,
->          * we may need to check if the host state needs to be saved.
->          */
-> -       if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
-> +       if (cpu_has_spe() &&
->             !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
->                 vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->  
->         /* Check if we have TRBE implemented and available at the host */
-> -       if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
-> +       if (cpu_has_trbe() &&
->             !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->                 vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  }
 
-Sure, that's a reasonable start. Oliver is busy putting a stick of
-dynamite in this code, but I'm sure he could work with something like
-this.
+--afSuzDBVqO9u/vk5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Two questions:
-> 
-> 1. As far as I can tell, KVM uses at least two functions for extracting a
-> field from an ID register: the ones above, which take a _SHIFT argument for
-> the field position, and the SYS_FIELD_GET ones, which take a mask argument.
-> Are they equivalent, is one is preferred over the other, or they have
-> different use cases?
+On Thu, Nov 07, 2024 at 09:55:52AM -0800, Sean Christopherson wrote:
 
-The least verbose, the better. As for their equivalence, you should
-check that.
+> If memory utilization is a concern for the vgic_init test (which seems unlikely),
+> I would much rather solve that problem by expanding KVM selftests support for the
+> selftests harness so that each testcase runs as a child process.
 
-> 2. has_vhe() vs is_kernel_in_hyp_mode(). I couldn't find any documentation
-> when to use one over the other. Looks to me like has_vhe() is faster
-> because uses cpu caps.
+> https://lore.kernel.org/all/ZjUwqEXPA5QVItyX@google.com
 
-They don't mean the same thing. One is a capability, the other tells
-you where you run.
+That would in general be useful, having individual test cases be visible
+is helpful from a UI and triage point of view and having them all run
+even if one of them has failed even more so.
 
-> And one interesting find: when booting v6.12-rc6 (no patches on top) with
-> kvm-arm.mode=protected, and when profiling the kvmtool process, I see
-> unexpected buffer faults:
-> 
-> [    0.762373] kvm [1]: Protected hVHE mode initialized successfully
-> ..
-> [   84.716647] arm_spe_pmu: Unexpected buffer fault on CPU 3 [PMBSR=0x0000000094020007, PMBPTR=0xffff800088804738, PMBLIMITR=0xffff800088a03001]
-> 
-> Same messages with the patches applied.
+--afSuzDBVqO9u/vk5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-No idea. I don't think anyone ever tried SPE with pKVM, and I don't
-have an SPE-capable box at hand.
+-----BEGIN PGP SIGNATURE-----
 
-	M.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmctBEEACgkQJNaLcl1U
+h9A9IQf+LLCb5DkMs9gARSP6zVAeEZ6w6I6e9rSgs4l7VEcWANBRckklvNi4gkI3
+b0yChpooPQlMn5EYFWAm7UTy2gmDhs3BqGSIwL23JX3PjQtJYSqsxinmnDNs9FqS
+K7jUOgG+PRg1JX0gUNUOgvuvKilKALZmS+PE4canZPPlQMIbY5Ira8ojRKHBBbSx
+EyJMETkOVJKmLHimHVDPrmbm7ft8rRdGn6fcJopoCR5k/7kFMU+0kZnq2C3SKTw7
+rOmQv8fNkY9LxTngQ1AlCg5XhKgX2yTm/RThvFHGG5FpM2pJPa4clEW/iTb2MkK6
+Xr4+q6R86vzzissdvHNfIietQx0q+Q==
+=tBft
+-----END PGP SIGNATURE-----
 
--- 
-Without deviation from the norm, progress is not possible.
+--afSuzDBVqO9u/vk5--
