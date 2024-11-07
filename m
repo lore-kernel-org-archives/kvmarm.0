@@ -1,171 +1,186 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251CF215F7A
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 17:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A04A216E15
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 17:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731002167; cv=none; b=kX5EuhHURjpbNqrR7+oFu9fMBcMf3+R1/ceORU5pjIYJCtCJt+O9A+xfmw2AQZ9fyJZQgb0wyxncfeBsB1OF9Akl3DPNBjtumR5BVva31ng+BVQpezvbIiQmaJNPcf/Hl+tJ4jurFRsiEw0x4KaJzUwLgM9Igx8e92y/0EMEYWM=
+	t=1731002375; cv=none; b=M1yFPemUWrgvl+qnqdfd7feS1DrbNB1Gt0nYtPowPTgkaay0w9sk6xyrffyesxdylB/FIW1NvgrQv5g04LzLfgNTa+0RSqwC0DuP2uh0q+XxW61DuOnNcU6briIF5ekV2Ysu1AoEiANfOe2ophg8YO+PoeEQ9p0ZcRfC1974DIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731002167; c=relaxed/simple;
-	bh=Ve+RSaEYMJhnNDsXjuDtqnqP0abDltYBaZlYOWL4ptI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H5aps/3NcJ8LbhqqF1Xdyt0ctzv4hdfoJXznLimHX09Jecnp8li7yxDa92RfEi4MGp3phOqkG9Q4KQVcI7nO+aw344XJN20OPN+W/eFPjNj8fgJbBEoyMmn+Zb/4NdssD3DJZ/0RwoA8i/j5ji5OizwX5LgA5+DP5Xm4kfGvfh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YKG0vwgm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1731002375; c=relaxed/simple;
+	bh=26uT7KurOPW5iYsQZJ/D6rBvAlVrSy4xYY7YCR0tOlM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VLogmL9/NtM/X+rOczy5lv2LDpHsaG2Dfc4fipkq6q8/hNXf9/rEW3JQQiFLFssXlrZsYVfbhv1DD+idB3DfMsqytBzzuXJ6/vxZpEGhiUZA/LXOxV2n4Qi4W+YxwYIAKZRBL8OL+VPpBBuIoFvwbepgoL7UP4jERDC2dqKDAHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuNWgRXj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKG0vwgm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731002165;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nIvkqFWOBnpaxs9X2j4yQ/cA3cQgdm32nOtnZY57FZA=;
-	b=YKG0vwgm7s4rd6/OHIhimy8f9OBI13zZrTp88t0oTPqsPLdSbE1mWlIzGhI5/2dsXFx8Ys
-	6eHz5c6A/bfsdVuZqKDNyf+e8JmuNko/fXD/bV9cEDBnpgDGPbSfpP7+sR8crrMDi6MhHF
-	kXNDOeXflV7OXe/GmLvp1goA+FYBk6g=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-275-A_EwRIQrNi2gFoL2COHMOg-1; Thu, 07 Nov 2024 12:56:03 -0500
-X-MC-Unique: A_EwRIQrNi2gFoL2COHMOg-1
-X-Mimecast-MFC-AGG-ID: A_EwRIQrNi2gFoL2COHMOg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4316e2dde9eso11358855e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 07 Nov 2024 09:56:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731002163; x=1731606963;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nIvkqFWOBnpaxs9X2j4yQ/cA3cQgdm32nOtnZY57FZA=;
-        b=IXJhiuYHGF2IGa8AfC4QLQNulS2Xv/b5jHf3GUQ+Yh2dOCZtgEg0YEWbxVC9gVu7s/
-         15WcE/4jjLF3J8l0RVYTkJRPVcw+WdCR4SCb6YwLkE8oHsO2IdSiZUlGeqVs/zu6rOQy
-         KswH8rxXfQqY7ZxzlJ5QA/CYRI7BqXnFXDNrGUMLrB5Xrm7DaU/bpkegJMboprUA8ujW
-         HnJ6mp52uwGEZkyKEYlL2HsHhq9UvH7PlDYNr5fl6gOMVlJwvOMzZ0dJHJE10Lm90fUH
-         8tq4Te7vABKSHaX9HUruRuGuZAgL0KbKgYlMaRx2zrk66Y+XqUm5Ji9LXYKqKuEe2nc9
-         G0lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZB834xFDAy8ODC1+0DHeV+H7mL/WTrHvdTojrNhD1QxewJCkYI0H/mf/3SARnaX0WGxjNSzc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyWOebQ25eO2ZiBQLJz9ZJaUIe7Lsp8VxBN+1xpmnOLU8fWYiXq
-	Z8R6HnLb/ENzJ2yAYH3v1/KXq+7Dfs9GO8G6E0kIq5LlzcRxtODXFx8fxRfGPZh7tyRSv1CFyko
-	ltBCTaM2cHOMYwYLyU8OdkUvC5AVcvcOCBVcqAdCuvIZIZVl3FYYn2w==
-X-Received: by 2002:a7b:c459:0:b0:431:5f8c:ccb9 with SMTP id 5b1f17b1804b1-43283255a2cmr293641395e9.17.1731002162827;
-        Thu, 07 Nov 2024 09:56:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNl1hiiW0EzosaMDaaHsyEroTn91oZ8mTZl1tDs9onS6Y3lW4fxtG4nWFez6Jkv/e2k7ohsg==
-X-Received: by 2002:a7b:c459:0:b0:431:5f8c:ccb9 with SMTP id 5b1f17b1804b1-43283255a2cmr293641045e9.17.1731002162446;
-        Thu, 07 Nov 2024 09:56:02 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97cab2sm2295737f8f.23.2024.11.07.09.56.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 09:56:01 -0800 (PST)
-Message-ID: <69196410-be02-4957-a871-a599dafe32d6@redhat.com>
-Date: Thu, 7 Nov 2024 18:55:59 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuNWgRXj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2CD8C4CECC;
+	Thu,  7 Nov 2024 17:59:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731002374;
+	bh=26uT7KurOPW5iYsQZJ/D6rBvAlVrSy4xYY7YCR0tOlM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LuNWgRXj3KRZAjGnRB2oj/2okMzvDdy5hSX0fb2LSXTDfHfkrP6UhXnReCoAL2Bn3
+	 JFnDoH+uI4NOGbBG+68Uo25iMqotzGktmNxxXicZp6UUUN8r9hwi7pEHPuAQjrszON
+	 PzsPwVEJR6MXceUZx3jSSuBG84AGlSdrQ1GOdW/OAohk7306IdxQG7mlIot1XIqLps
+	 bkjPbFrt9si1URZj2CR/ttO0X3RdQvVDrLwxoFUcnitj+IVblADimigG8lRPbHncjL
+	 JvnP7/YLKiOxSVhsYf48vjaCDgUDcIb7kjzGvgKlCzvom19k2+FIsNWBIZxKoPJFWF
+	 nMavep1qfb5Kg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1t96n6-00ApIE-RT;
+	Thu, 07 Nov 2024 17:59:32 +0000
+Date: Thu, 07 Nov 2024 17:59:32 +0000
+Message-ID: <865xoy2ad7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: [PATCH] KVM: arm64: VHE: Initialize PMSCR_EL1
+In-Reply-To: <ZyytjB-Hlqw909sq@raptor>
+References: <20241106122654.38234-1-alexandru.elisei@arm.com>
+	<868qtw1ne0.wl-maz@kernel.org>
+	<ZyytjB-Hlqw909sq@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] lib/on-cpus: Fix on_cpumask
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: atishp@rivosinc.com, jamestiotio@gmail.com, alexandru.elisei@arm.com
-References: <20241031123948.320652-5-andrew.jones@linux.dev>
- <20241031123948.320652-8-andrew.jones@linux.dev>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20241031123948.320652-8-andrew.jones@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: Y4h9LbWavIFpxJ6M9iIr79WfotYXC0FcbgXColRLHrg_1731002163
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Drew,
-
-On 10/31/24 13:39, Andrew Jones wrote:
-> on_cpumask should wait until the cpus in the mask, not including
-> the calling cpu, are idle. Checking the weight against nr_cpus
-> minus 1 only works when the mask is the same as the present mask.
->
-> Fixes: d012cfd5d309 ("lib/on-cpus: Introduce on_cpumask and on_cpumask_async")
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-
-looks good to me as well
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  lib/cpumask.h | 14 ++++++++++++++
->  lib/on-cpus.c | 17 ++++++++---------
->  2 files changed, 22 insertions(+), 9 deletions(-)
->
-> diff --git a/lib/cpumask.h b/lib/cpumask.h
-> index e1e92aacd1f1..37d360786573 100644
-> --- a/lib/cpumask.h
-> +++ b/lib/cpumask.h
-> @@ -58,6 +58,20 @@ static inline void cpumask_clear(cpumask_t *mask)
->  	memset(mask, 0, sizeof(*mask));
+On Thu, 07 Nov 2024 12:07:40 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Do you think this is an improvement (looks like a pretty big diff, but it's
+> mostly refactoring, the actual change is in kvm_arm_init_debug()):
+> 
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index ce8886122ed3..21b260b02216 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -65,12 +65,30 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+>                 *vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
 >  }
 >  
-> +/* true if src1 is a subset of src2 */
-> +static inline bool cpumask_subset(const struct cpumask *src1, const struct cpumask *src2)
+> +static bool cpu_has_spe(void)
 > +{
-> +	unsigned long lastmask = BIT_MASK(nr_cpus) - 1;
-> +	int i;
-> +
-> +	for (i = 0; i < BIT_WORD(nr_cpus); ++i) {
-> +		if (cpumask_bits(src1)[i] & ~cpumask_bits(src2)[i])
-> +			return false;
-> +	}
-> +
-> +	return !lastmask || !((cpumask_bits(src1)[i] & ~cpumask_bits(src2)[i]) & lastmask);
+> +       return cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> +                                                   ID_AA64DFR0_EL1_PMSVer);
 > +}
 > +
->  static inline bool cpumask_empty(const cpumask_t *mask)
->  {
->  	unsigned long lastmask = BIT_MASK(nr_cpus) - 1;
-> diff --git a/lib/on-cpus.c b/lib/on-cpus.c
-> index 356f284be61b..889b6bc8a186 100644
-> --- a/lib/on-cpus.c
-> +++ b/lib/on-cpus.c
-> @@ -127,24 +127,23 @@ void on_cpumask_async(const cpumask_t *mask, void (*func)(void *data), void *dat
->  void on_cpumask(const cpumask_t *mask, void (*func)(void *data), void *data)
->  {
->  	int cpu, me = smp_processor_id();
-> +	cpumask_t tmp;
->  
-> -	for_each_cpu(cpu, mask) {
-> -		if (cpu == me)
-> -			continue;
-> +	cpumask_copy(&tmp, mask);
-> +	cpumask_clear_cpu(me, &tmp);
+> +static bool cpu_has_trbe(void)
+> +{
+> +       return cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> +                                                   ID_AA64DFR0_EL1_TraceBuffer);
+> +}
 > +
-> +	for_each_cpu(cpu, &tmp)
->  		on_cpu_async(cpu, func, data);
-> -	}
->  	if (cpumask_test_cpu(me, mask))
->  		func(data);
+>  /**
+>   * kvm_arm_init_debug - grab what we need for debug
+>   *
+> - * Currently the sole task of this function is to retrieve the initial
+> - * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
+> - * presumably been set-up by some knowledgeable bootcode.
+> + * This function does two things:
+> + *
+> + * 1. Retrieve the initial value of mdcr_el2 so we can preserve
+> + * MDCR_EL2.HPMN which has presumably been set-up by some knowledgeable
+> + * bootcode.
+> + *
+> + * 2. Clear PMSCR_EL1.E1SPE and E0SPE when the host is running at EL2. The
+> + * bits reset to an unknown value, and clearing them prevents the host from
+> + * accidently profiling a virtual machine.
+>   *
+>   * It is called once per-cpu during CPU hyp initialisation.
+>   */
+> @@ -78,6 +96,9 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+>  void kvm_arm_init_debug(void)
+>  {
+>         __this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
+> +
+> +       if (is_kernel_in_hyp_mode() && cpu_has_spe())
+> +               write_sysreg_el1(0, SYS_PMSCR);
+>  }
 >  
-> -	for_each_cpu(cpu, mask) {
-> -		if (cpu == me)
-> -			continue;
-> +	for_each_cpu(cpu, &tmp) {
->  		cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
->  		deadlock_check(me, cpu);
->  	}
-> -	while (cpumask_weight(&cpu_idle_mask) < nr_cpus - 1)
-> +	while (!cpumask_subset(&tmp, &cpu_idle_mask))
->  		smp_wait_for_event();
-> -	for_each_cpu(cpu, mask)
-> +	for_each_cpu(cpu, &tmp)
->  		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
->  	smp_rmb(); /* pairs with the smp_wmb() in do_idle() */
+>  /**
+> @@ -317,23 +338,20 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>  {
+> -       u64 dfr0;
+> -
+>         /* For VHE, there is nothing to do */
+>         if (has_vhe())
+>                 return;
+>  
+> -       dfr0 = read_sysreg(id_aa64dfr0_el1);
+>         /*
+>          * If SPE is present on this CPU and is available at current EL,
+>          * we may need to check if the host state needs to be saved.
+>          */
+> -       if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
+> +       if (cpu_has_spe() &&
+>             !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
+>                 vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>  
+>         /* Check if we have TRBE implemented and available at the host */
+> -       if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+> +       if (cpu_has_trbe() &&
+>             !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>                 vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
 >  }
 
+Sure, that's a reasonable start. Oliver is busy putting a stick of
+dynamite in this code, but I'm sure he could work with something like
+this.
+
+> Two questions:
+> 
+> 1. As far as I can tell, KVM uses at least two functions for extracting a
+> field from an ID register: the ones above, which take a _SHIFT argument for
+> the field position, and the SYS_FIELD_GET ones, which take a mask argument.
+> Are they equivalent, is one is preferred over the other, or they have
+> different use cases?
+
+The least verbose, the better. As for their equivalence, you should
+check that.
+
+> 2. has_vhe() vs is_kernel_in_hyp_mode(). I couldn't find any documentation
+> when to use one over the other. Looks to me like has_vhe() is faster
+> because uses cpu caps.
+
+They don't mean the same thing. One is a capability, the other tells
+you where you run.
+
+> And one interesting find: when booting v6.12-rc6 (no patches on top) with
+> kvm-arm.mode=protected, and when profiling the kvmtool process, I see
+> unexpected buffer faults:
+> 
+> [    0.762373] kvm [1]: Protected hVHE mode initialized successfully
+> ..
+> [   84.716647] arm_spe_pmu: Unexpected buffer fault on CPU 3 [PMBSR=0x0000000094020007, PMBPTR=0xffff800088804738, PMBLIMITR=0xffff800088a03001]
+> 
+> Same messages with the patches applied.
+
+No idea. I don't think anyone ever tried SPE with pKVM, and I don't
+have an SPE-capable box at hand.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
