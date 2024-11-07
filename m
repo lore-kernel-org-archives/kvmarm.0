@@ -1,201 +1,191 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34BF1E5714
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 09:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509581D88DD
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 10:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730972433; cv=none; b=L3MvB6fNE+T2EGQQoTB0QctXm8nURrLzwquTW09Ao4liKI7D7CG3JdjQpI8sPEu6U0Qs7XmfsWO6kxL5Erh9s8Q4fCDPtBbnsg+e16pm08yB///iTQSzgLFfb7wQF8O8qndnIW6tUfeJ3utEhx/L9rTgM8d/NSRvL34lOgX1yVs=
+	t=1730973701; cv=none; b=FmF8GLXk97wEeB/ug/s6Q2Ec2qS0Xd2o4B8PlZJ1a4hQ/QIA3HrpcOEaEhRwSXpVD3U3ZACnWaAYIgVmmUGQjiJ7+gyf2TsjIECgNa/Oh/eUD59G6TjB/xHypqBwWo6Isg/EKEF8Uj53NSQ7M77aP2IK5TAhlpnOhjA5Pb5CUsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730972433; c=relaxed/simple;
-	bh=b8QiS4iAgyveI0VnUcGujWpksK44ypQ4/17QHKTahCI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cNiX+XnLNITbo2MQGGWtnw0c9I9C1M0eaUNIyUIOTZivYqrEsFNlhhGfEkaYYSwVtrhfmpkKiFBT2bd9m8CSiulZv1I9HMJOC3zL0negOOMadCE54+Bmix7hIvIQOAr7h8VABet2sXuuxdVQ3WWQHwKlcSoRiE1Pm45/iohkDCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IPV5fYLL; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1730973701; c=relaxed/simple;
+	bh=9+NhR9Xx1+f3gRATsntD+gpT35PbVTys1g6H1FzxVgk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XtdjlXvsEPaA3nvbAYvAL+9EqeDkvmYh3X7DrMgdtsjwssC4tqLLaq9dyci28chypoP0aVxaOKJUlB+/gnEvFdtz7jEEEbQ7diYOstDlifeAR1SJqQmZ61WHkS0kdk1JGT+fQgDUvQns7P+dEYk5qvXAXg4Qu+0jz3CV2kyajBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L66QiljQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IPV5fYLL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L66QiljQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730972430;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
+	s=mimecast20190719; t=1730973697;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8TfljcNBhF9C0Z/2BV2Oaq2DDL+Em2rYM63JxIdUTLQ=;
-	b=IPV5fYLLPa7id/AqtcQyX21+5hnCR+otTcetmo5fA1iJkZoXkJy4Bf+TZIFfnWenlXwJod
-	wL3HBQBUWteOIFKNfwjgdqU9TmDJgSsHvmT8sOBdcwEVsnMeQGuDymjVvRGT1Wwt6mlG7O
-	KeDyKVFJTIcw7YD0+l5qU9xkIYuxXN0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-220-1h42Cmh5OJOPx15S4PD9GA-1; Thu,
- 07 Nov 2024 04:40:24 -0500
-X-MC-Unique: 1h42Cmh5OJOPx15S4PD9GA-1
-X-Mimecast-MFC-AGG-ID: 1h42Cmh5OJOPx15S4PD9GA
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F0801954B0E;
-	Thu,  7 Nov 2024 09:40:22 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.39.192.86])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7765A1955F40;
-	Thu,  7 Nov 2024 09:40:19 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	broonie@kernel.org,
-	maz@kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	joey.gouly@arm.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	pbonzini@redhat.com
-Subject: [PATCH  3/3] KVM: selftests: Handle dead VM in vgic_init test
-Date: Thu,  7 Nov 2024 10:38:50 +0100
-Message-ID: <20241107094000.70705-4-eric.auger@redhat.com>
-In-Reply-To: <20241107094000.70705-1-eric.auger@redhat.com>
-References: <20241107094000.70705-1-eric.auger@redhat.com>
+	bh=mCpCB9JiGuUJDI4bEMY+hAs6rw+MftrWNvH37HOo7LU=;
+	b=L66QiljQbT9jaqr1AtTdAhfZLtE440vkoI+4nDQBEoYhkF1Ropoxc/kX5Y4mBmgd8awCui
+	e9TiU4RZp4gX+tWQny5OnIo/+cVaSanu3MwqJ+aP+m7TLdpX8B477jCqlpn3H2pxtRTkuj
+	VygRPrp3mTmzfa+27W0FV4Lriwb9YPQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-KyGrJgxgNai6vR4CjLHL0Q-1; Thu, 07 Nov 2024 05:01:36 -0500
+X-MC-Unique: KyGrJgxgNai6vR4CjLHL0Q-1
+X-Mimecast-MFC-AGG-ID: KyGrJgxgNai6vR4CjLHL0Q
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-431604a3b47so4937375e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 07 Nov 2024 02:01:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730973694; x=1731578494;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mCpCB9JiGuUJDI4bEMY+hAs6rw+MftrWNvH37HOo7LU=;
+        b=mL3UVcTUb+vxBu6bBuJAH6D4XXEwE+zan7i1FqMccQDt0+x6a5FFHemQEKTaR81pCW
+         dKKu7biADEbBNFHhpECm2d8aFp7dQAW6ZHYzfhMQgihFKqlSutgg4MBBYiynHplaIvJT
+         wPTRBFaLqXDfQn50BPjrzlnGnt19RoimJSr0P8xC+44aO1epZEiOG9ZA6Ed4gjZHoCbC
+         8xLte+q5236suVu3JiNhJFmj9NwjnEMjp8HqU9ba434re5lFSldx2l2rU+J6ivvD34+Q
+         cbFKe3UMo24LdeIlM1qJk1r7t7K9l44dAQY0jrqTkwE6FuGu0LOKiQOX0uAQdHiNuqKr
+         25UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVttdCKC7PFHiftM5gU+b6+m4RDVxgtt987HpUCp5u7hvEioerwYmU/W1u+NfLtpWzVYoScjIw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxy9t3qF5zQ4toDqx2dkL1UB9R8qR8o/RyAC//BILno6sytSlyM
+	W6AXPr6tkcGJ7EfP/IovUHrBPeMkgRDl5S299GymcjzlNtRRNbsCHapjRZ2883llZd4h/aT6eNh
+	9y/gNrhAXIAJykkz4suQWnP7kko/zWSOCyuiOM84PLy9gjdDWlEMUrw==
+X-Received: by 2002:a05:600c:500a:b0:431:561b:b32a with SMTP id 5b1f17b1804b1-4319acb8ce7mr389491745e9.19.1730973694502;
+        Thu, 07 Nov 2024 02:01:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEDbVGMXVLzPtnR/VZFbxL0VkGeLxamN/60E1uP2cgI2kd398S80zrlJSY+AcWQumz9NsWQYw==
+X-Received: by 2002:a05:600c:500a:b0:431:561b:b32a with SMTP id 5b1f17b1804b1-4319acb8ce7mr389491485e9.19.1730973694135;
+        Thu, 07 Nov 2024 02:01:34 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6b3069sm53583895e9.14.2024.11.07.02.01.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Nov 2024 02:01:31 -0800 (PST)
+Message-ID: <fb52d778-79bc-41ca-845c-4d7044c7f0ee@redhat.com>
+Date: Thu, 7 Nov 2024 11:01:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/3] lib/on-cpus: Correct and simplify
+ synchronization
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: atishp@rivosinc.com, jamestiotio@gmail.com, alexandru.elisei@arm.com
+References: <20241031123948.320652-5-andrew.jones@linux.dev>
+ <20241031123948.320652-6-andrew.jones@linux.dev>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20241031123948.320652-6-andrew.jones@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: A0SlEZrKt6vnOTW9I2tjkSwki8jUgKDPNn7eIracppU_1730973695
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Commit df5fd75ee305 ("KVM: arm64: Don't eagerly teardown the vgic on init
-error") changed the way the error is handled in case of incomplete
-vgic setup. Now a KVM_REQ_VM_DEAD request is sent causing subsequent
-KVM ioctl to fail. This now triggers a test assertion failure in
-kvm_vm_free() which calls KVM_SET_USER_MEMORY_REGION2 ioctl.
 
-Update the test so that it checks that after the partial vgic setup
-the KVM_REQ_VM_DEAD has been sent and use the new kvm_vm_dead_free()
-helper to free the resources.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Mark Brown <broonie@kernel.org>
-Closes: https://lore.kernel.org/all/3f0918bf-0265-4714-9660-89b75da49859@sirena.org.uk/
----
- .../testing/selftests/kvm/aarch64/vgic_init.c | 41 +++++++++++--------
- 1 file changed, 23 insertions(+), 18 deletions(-)
+On 10/31/24 13:39, Andrew Jones wrote:
+> get/put_on_cpu_info() were providing per-cpu locking for the per-cpu
+> on_cpu info, but it's difficult to reason that they're correct since
+> they use test_and_set/clear rather than a typical lock. Just revert
+> to a typical spinlock to simplify it. Also simplify the break case
+> for on_cpu_async() - we don't care if func is NULL, we only care
+> that the cpu is idle. And, finally, add a missing barrier to
+> on_cpu_async(). Before commit 018550041b38 ("arm/arm64: Remove
+> spinlocks from on_cpu_async") the spin_unlock() provided an implicit
+> barrier at the correct location, but moving the release to the more
+> logical location, below the setting of idle, lost it.
+>
+> Fixes: 018550041b38 ("arm/arm64: Remove spinlocks from on_cpu_async")
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index b3b5fb0ff0a9..845108afce5e 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -101,6 +101,12 @@ static void vm_gic_destroy(struct vm_gic *v)
- 	kvm_vm_free(v->vm);
- }
- 
-+static void vm_dead_gic_destroy(struct vm_gic *v)
-+{
-+	close(v->gic_fd);
-+	kvm_vm_dead_free(v->vm);
-+}
-+
- struct vgic_region_attr {
- 	uint64_t attr;
- 	uint64_t size;
-@@ -335,7 +341,7 @@ static void test_vgic_then_vcpus(uint32_t gic_dev_type)
- {
- 	struct kvm_vcpu *vcpus[NR_VCPUS];
- 	struct vm_gic v;
--	int ret, i;
-+	int i;
- 
- 	v = vm_gic_create_with_vcpus(gic_dev_type, 1, vcpus);
- 
-@@ -345,10 +351,10 @@ static void test_vgic_then_vcpus(uint32_t gic_dev_type)
- 	for (i = 1; i < NR_VCPUS; ++i)
- 		vcpus[i] = vm_vcpu_add(v.vm, i, guest_code);
- 
--	ret = run_vcpu(vcpus[3]);
--	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
-+	run_vcpu(vcpus[3]);
-+	TEST_ASSERT(vm_dead(v.vm), "dist/rdist overlap detected on 1st vcpu run");
- 
--	vm_gic_destroy(&v);
-+	vm_dead_gic_destroy(&v);
- }
- 
- /* All the VCPUs are created before the VGIC KVM device gets initialized */
-@@ -356,16 +362,15 @@ static void test_vcpus_then_vgic(uint32_t gic_dev_type)
- {
- 	struct kvm_vcpu *vcpus[NR_VCPUS];
- 	struct vm_gic v;
--	int ret;
- 
- 	v = vm_gic_create_with_vcpus(gic_dev_type, NR_VCPUS, vcpus);
- 
- 	subtest_dist_rdist(&v);
- 
--	ret = run_vcpu(vcpus[3]);
--	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
-+	run_vcpu(vcpus[3]);
-+	TEST_ASSERT(vm_dead(v.vm), "dist/rdist overlap detected on 1st vcpu run");
- 
--	vm_gic_destroy(&v);
-+	vm_dead_gic_destroy(&v);
- }
- 
- #define KVM_VGIC_V2_ATTR(offset, cpu) \
-@@ -415,9 +420,9 @@ static void test_v3_new_redist_regions(void)
- 	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
- 			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
- 
--	ret = run_vcpu(vcpus[3]);
--	TEST_ASSERT(ret == -ENXIO, "running without sufficient number of rdists");
--	vm_gic_destroy(&v);
-+	run_vcpu(vcpus[3]);
-+	TEST_ASSERT(vm_dead(v.vm), "running without sufficient number of rdists");
-+	vm_dead_gic_destroy(&v);
- 
- 	/* step2 */
- 
-@@ -428,10 +433,10 @@ static void test_v3_new_redist_regions(void)
- 	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
- 			    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr);
- 
--	ret = run_vcpu(vcpus[3]);
--	TEST_ASSERT(ret == -EBUSY, "running without vgic explicit init");
-+	run_vcpu(vcpus[3]);
-+	TEST_ASSERT(vm_dead(v.vm), "running without vgic explicit init");
- 
--	vm_gic_destroy(&v);
-+	vm_dead_gic_destroy(&v);
- 
- 	/* step 3 */
- 
-@@ -604,8 +609,8 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
- {
- 	struct kvm_vcpu *vcpus[NR_VCPUS];
- 	struct vm_gic v;
--	int ret, i;
- 	uint64_t addr;
-+	int i;
- 
- 	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1, vcpus);
- 
-@@ -626,11 +631,11 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
- 			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
- 
- 	/* Attempt to run a vcpu without enough redist space. */
--	ret = run_vcpu(vcpus[2]);
--	TEST_ASSERT(ret && errno == EINVAL,
-+	run_vcpu(vcpus[2]);
-+	TEST_ASSERT(vm_dead(v.vm),
- 		"redist base+size above PA range detected on 1st vcpu run");
- 
--	vm_gic_destroy(&v);
-+	vm_dead_gic_destroy(&v);
- }
- 
- static void test_v3_its_region(void)
--- 
-2.41.0
+Eric
+> ---
+>  lib/on-cpus.c | 36 +++++++++++-------------------------
+>  1 file changed, 11 insertions(+), 25 deletions(-)
+>
+> diff --git a/lib/on-cpus.c b/lib/on-cpus.c
+> index 892149338419..f6072117fa1b 100644
+> --- a/lib/on-cpus.c
+> +++ b/lib/on-cpus.c
+> @@ -9,6 +9,7 @@
+>  #include <on-cpus.h>
+>  #include <asm/barrier.h>
+>  #include <asm/smp.h>
+> +#include <asm/spinlock.h>
+>  
+>  bool cpu0_calls_idle;
+>  
+> @@ -18,18 +19,7 @@ struct on_cpu_info {
+>  	cpumask_t waiters;
+>  };
+>  static struct on_cpu_info on_cpu_info[NR_CPUS];
+> -static cpumask_t on_cpu_info_lock;
+> -
+> -static bool get_on_cpu_info(int cpu)
+> -{
+> -	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
+> -}
+> -
+> -static void put_on_cpu_info(int cpu)
+> -{
+> -	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
+> -	assert(ret);
+> -}
+> +static struct spinlock lock;
+>  
+>  static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
+>  {
+> @@ -81,18 +71,14 @@ void do_idle(void)
+>  	if (cpu == 0)
+>  		cpu0_calls_idle = true;
+>  
+> -	set_cpu_idle(cpu, true);
+> -	smp_send_event();
+> -
+>  	for (;;) {
+> +		set_cpu_idle(cpu, true);
+> +		smp_send_event();
+> +
+>  		while (cpu_idle(cpu))
+>  			smp_wait_for_event();
+>  		smp_rmb();
+>  		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
+> -		on_cpu_info[cpu].func = NULL;
+> -		smp_wmb();
+> -		set_cpu_idle(cpu, true);
+> -		smp_send_event();
+>  	}
+>  }
+>  
+> @@ -110,17 +96,17 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
+>  
+>  	for (;;) {
+>  		cpu_wait(cpu);
+> -		if (get_on_cpu_info(cpu)) {
+> -			if ((volatile void *)on_cpu_info[cpu].func == NULL)
+> -				break;
+> -			put_on_cpu_info(cpu);
+> -		}
+> +		spin_lock(&lock);
+> +		if (cpu_idle(cpu))
+> +			break;
+> +		spin_unlock(&lock);
+>  	}
+>  
+>  	on_cpu_info[cpu].func = func;
+>  	on_cpu_info[cpu].data = data;
+> +	smp_wmb();
+>  	set_cpu_idle(cpu, false);
+> -	put_on_cpu_info(cpu);
+> +	spin_unlock(&lock);
+>  	smp_send_event();
+>  }
+>  
 
