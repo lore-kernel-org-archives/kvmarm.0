@@ -1,55 +1,55 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F78218D94
-	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 21:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9B2219498
+	for <kvmarm@lists.linux.dev>; Thu,  7 Nov 2024 21:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731015708; cv=none; b=TYKlU/+nmGMcgydg/NeVU64zq/jbfr//OQuQ1tzbkcV3Ur5FwAeHL7nvYa4D1NC7C2oVOhvPz3hat4kknVSMaBvym3yssW7P2X6ikitinWki3Li47GIilmKm4qkffeJwG3OVJx4M+d8FIBVUE0QFslrUjMpwZNp0A1VxBAyqexk=
+	t=1731015712; cv=none; b=CYaa4uUIayi+Q/q8kOoE1Q1LOCuuML/vzAAHf947Z7Zb7VcLe+bKKDrbfD/cD/jfQpSVhUe8vv573Lck53CB6GpvQ3vqqGUUIh1jRIMeu6ND3CKrPyXtrA53IhsOl2TW8KR1tFxF7zZPeR3UD7vID1bkf7VK0ONlipMWGsHjPR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731015708; c=relaxed/simple;
-	bh=r5PBaY2BtyI/IhYtOVfMJDxFChBMs+Kl4IcmdMX9iPM=;
+	s=arc-20240116; t=1731015712; c=relaxed/simple;
+	bh=jOOlJLiPiEa5ClNb9LHsnzMeOqeBRTZ/5JpT4ENcDZM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rrP2c//g8b+6cVqUzOyiN+5SAcmrmDe5KoUQWedrLEQRgU+YnnkrJDoYjLgiOlFTJXtxHxlhCeA5a9GIM1yBNPBY86kV0j4KTiJbfjXWufBHdc1F19PiIO/Dob/QKKe1O7ZBLHsYgvRSylm3YIWd4UIAScfDkv66qBD5Rj0wapg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZN7VnO5c; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=NndPs5SvFcqPcYL1Zzq0gEcgxjmgRLuQGMz0PWtkq3oBxbkdT/go550tAUpnhCYl5Rrrp7S+rAxBCT29s9pt8zC6zqyVfmZcLxLzhnEmBKAxfqKZ2iq0XVS+LS2QdRvklMBouNHA3ZM+e3Xn1O53P5MUzQINh7s1UaMvnFiaCBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lcOSWggT; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZN7VnO5c"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-722531f7806so1717861b3a.0
-        for <kvmarm@lists.linux.dev>; Thu, 07 Nov 2024 13:41:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lcOSWggT"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e2ebab7abfso2090479a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 07 Nov 2024 13:41:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731015707; x=1731620507; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1731015710; x=1731620510; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtpqsepAghjHxA0kDCxZtEi1YPJ/CrW2sXJeZXJ/pOo=;
-        b=ZN7VnO5cYd64uXZbnkavZiSCHcQv0+xL46+M7UbMs3yMGqRU0b8AK1asAYuqRbbdRW
-         ibJOkUgIkgKOMEITPjLOA1x7c2YVN/AY9rqLdmWOOtqqD1boy+Zx79GgntJclNfHtvBN
-         PBgBvveUrkNbZJzJMeVhHU6nfCkqcagHfiYEwTKQniPCXzym89FMD8MSVNts5mZGaOMY
-         3vMjeGKpoBEkY9vb5pcrVZI5+OdUnPiTRj4GKX0FKJ0TPriI7C7WHCq1i1Ul8KPlvTN0
-         7ZWjhUFojm2AKmTkf6kNkrCJZfLkHGAgwY+FaBzCkVbVJIRHsdEopX8rMqrU7g7+wy5b
-         GmeQ==
+        bh=fS4eYbDYlT6ZjxYCs7YFPGo/Zn24dUoWIUuzZbUwo90=;
+        b=lcOSWggTWfEjLaeXt1lSGuDyrFaWuyx+RW2N4f82BDNHwZFYIU6mC4Cv4cpfPP1Oj5
+         3uGd/PIEFiF49Ne75g+9lAXU1tYdprfRy2C2exOmkhVSzK3R5wRzqZsE1Tr+bjrhipUb
+         CN4QR6XShSpI+FmtzDdAcoFYhVmOQB/e9qXxafPeVsuzVLTd2wwLeCDlgd4qk426aKpN
+         47lRIzu2jbHnqUMTXT8cYqJRvI72T90tGcvmaLPq271ij6atRi8X0qlOJCdD8SEYHpUx
+         MvtFi5AjT5AF7Kzp7RBXun03N80AO5teS8FRCt30clIEbipb97Ubgbo/cRqgt3TmtzwT
+         IPDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731015707; x=1731620507;
+        d=1e100.net; s=20230601; t=1731015710; x=1731620510;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtpqsepAghjHxA0kDCxZtEi1YPJ/CrW2sXJeZXJ/pOo=;
-        b=BwAm6yGzINxV1WX4OMrjIt7lE/tRKhTDi/DCHU5fL6z6hpuLnjKdPcAI+FE8rOQdrS
-         nYHKFfb+ERVy8yHBU5qK2iLz6Ma6j/yv+eg7RaGV3Wyyj/a651rl0Wp7654FM9+e2Cgi
-         og+U8BJdcsmHi++nnsLxdN2JejlKjtl8DRIuJ3LwqkRVYlx2OnCc/lioXU7FpWpfdMxJ
-         I/7tzKa6VTEDDZJOsExPPx7d0ccb+ATVKc5FXzFsJBRD0Y8lFJYpU/8soA/YeyJuFOjt
-         nkQ+ra4CljZeNCzcfW+uTDrT/dFC40DIqKzGZdFZe7NbhkFUZxFYPQMGNKNXPaOSlUj9
-         jEQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcdRjQRQbnzu2V6TwQOF1ItrGPIUKSGx1kBMg7xvhTNvQoTxx4W7Xq72tH+eT7POMGVy28gCY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzTnsyAhh1+sOrn51KpGrfZYub5JFP6/zW1a/7KGkt8LL2MdWDW
-	c9gIdrhlQ5e7dKBoERj/GTKok3z5cH1tHMjzCNkReTJm0O6TQ+Br2jlr5oOF8h6BaWdFxrJAHaH
-	cQpRzNKV5Akzk0K0uqb7dsA==
-X-Google-Smtp-Source: AGHT+IHw+xM1HlMo/mm9/jXnKYIrDslMzGRFzsHZqSD7GyTGZbxTc8P6vl53dGA2leVXUp61huR9YQcKulFNDJfrGg==
+        bh=fS4eYbDYlT6ZjxYCs7YFPGo/Zn24dUoWIUuzZbUwo90=;
+        b=kghoLrGSReml+YJLK+9myecUzZJtiB9YCiM9a/GI6oA1z51SYhKg08KeARucVw4zir
+         IrpPrLjEjfJN/9Ny46EqXdXljFv1X4wsNwzmf9VX7Nsd02Dp/+WR3F9cjDSIxvO3Ln0d
+         HurqqiGCDozGV89v2K7EaXbUilNnTONwVrmUy3yyOso44s2RMlhyco8mTOvFkeSdyeCb
+         RfCNlSso9eZNXc/bDGKeGzfOTn3BC1XmEO+EG/60kvppzC7bF0BTobqsx8sluCo6lCTi
+         dHdy4rdJNEOfKoFNk31om3YsvYaCPl7F3SOl0zIm2+vyrq5eS9TPy9asMqPdpDOX6N68
+         nQgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9YIASDP9ODRxly/1AnB8ss5KiB/tMlq2inqanLIGtkQ2TuoN3IBec8gyRpBMoonWbrvlSW1A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzD918VYscyrPK6+RkXzoNf9CN2/uMyBMQg98BllXY3LuCCSdXJ
+	Qse9w6IxCPcYPiTp9Ukow2Oz2V7jt3M2w4nJlGhrl/BJVKOH0jdOstSoFOus7y4CWxobzqlbnnU
+	8RvmrfGcfkLxX1Lvxz3g7bw==
+X-Google-Smtp-Source: AGHT+IHZvcyra0ifDWGBgFJCy/j+FkQf7fYD/6K0phYB7aIm7PHY7A4aDCP/RnuVnWME187Wgbt6jqNTLj0tZimfxw==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c96f])
- (user=jingzhangos job=sendgmr) by 2002:a05:6a00:ccb:b0:71e:591d:cb4f with
- SMTP id d2e1a72fcca58-724133eff5emr22007b3a.6.1731015706680; Thu, 07 Nov 2024
- 13:41:46 -0800 (PST)
-Date: Thu,  7 Nov 2024 13:41:36 -0800
+ (user=jingzhangos job=sendgmr) by 2002:a17:90a:b018:b0:2e2:b41b:8549 with
+ SMTP id 98e67ed59e1d1-2e9b20ab802mr988a91.4.1731015708623; Thu, 07 Nov 2024
+ 13:41:48 -0800 (PST)
+Date: Thu,  7 Nov 2024 13:41:37 -0800
 In-Reply-To: <20241107214137.428439-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241107214137.428439-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241107214137.428439-5-jingzhangos@google.com>
-Subject: [PATCH v4 4/5] KVM: arm64: vgic-its: Clear DTE when MAPD unmaps a device
+Message-ID: <20241107214137.428439-6-jingzhangos@google.com>
+Subject: [PATCH v4 5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
 	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
@@ -75,53 +75,44 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Kunkun Jiang <jiangkunkun@huawei.com>
 
-vgic_its_save_device_tables will traverse its->device_list to
-save DTE for each device. vgic_its_restore_device_tables will
-traverse each entry of device table and check if it is valid.
-Restore if valid.
+When DISCARD frees an ITE, it does not invalidate the
+corresponding ITE. In the scenario of continuous saves and
+restores, there may be a situation where an ITE is not saved
+but is restored. This is unreasonable and may cause restore
+to fail. This patch clears the corresponding ITE when DISCARD
+frees an ITE.
 
-But when MAPD unmaps a device, it does not invalidate the
-corresponding DTE. In the scenario of continuous saves
-and restores, there may be a situation where a device's DTE
-is not saved but is restored. This is unreasonable and may
-cause restore to fail. This patch clears the corresponding
-DTE when MAPD unmaps a device.
-
-Co-developed-by: Shusen Li <lishusen2@huawei.com>
-Signed-off-by: Shusen Li <lishusen2@huawei.com>
 Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 [Jing: Update with entry write helper]
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 9ccf00731ad2..7f931e33a425 100644
+index 7f931e33a425..5d5104af8768 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1139,9 +1139,11 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	bool valid = its_cmd_get_validbit(its_cmd);
- 	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
- 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
-+	int dte_esz = vgic_its_get_abi(its)->dte_esz;
- 	struct its_device *device;
-+	gpa_t gpa;
+@@ -782,6 +782,9 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
  
--	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
-+	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
- 		return E_ITS_MAPD_DEVICE_OOR;
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (ite && its_is_collection_mapped(ite->collection)) {
++		struct its_device *device = find_its_device(its, device_id);
++		int ite_esz = vgic_its_get_abi(its)->ite_esz;
++		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
+ 		/*
+ 		 * Though the spec talks about removing the pending state, we
+ 		 * don't bother here since we clear the ITTE anyway and the
+@@ -790,7 +793,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+ 		vgic_its_invalidate_cache(its);
  
- 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-@@ -1162,7 +1164,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	 * is an error, so we are done in any case.
- 	 */
- 	if (!valid)
+ 		its_free_ite(kvm, ite);
 -		return 0;
-+		return vgic_its_write_entry_lock(its, gpa, 0, dte_esz);
++
++		return vgic_its_write_entry_lock(its, gpa, 0, ite_esz);
+ 	}
  
- 	device = vgic_its_alloc_device(its, device_id, itt_addr,
- 				       num_eventid_bits);
+ 	return E_ITS_DISCARD_UNMAPPED_INTERRUPT;
 -- 
 2.47.0.277.g8800431eea-goog
 
