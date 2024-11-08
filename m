@@ -1,215 +1,149 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C6313AA5D
-	for <kvmarm@lists.linux.dev>; Fri,  8 Nov 2024 04:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91AA194A75;
+	Fri,  8 Nov 2024 05:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731041698; cv=none; b=hROOtuGP2uZRYSWJkYPGRoXGruITdV4zgIxEM5/x6bXBxhSfnJmwwWYllluDzkVnPRRq5nuxXXP9Bjrc9cHUQBzJQZCu1Ch17t3O1X0JGqRXm8kAHYx+9UxAQBLKbK5rbKuJvI2lIzuBsLUUv/Rz/GXQdY4DvfQKlgi1F3PYY6c=
+	t=1731042836; cv=none; b=ecxtOdoEifgOuLmgGkIbFtwJjA+nVhlDCT7SM+pBdDo70XQGWzy4UxmK/I58EtfMmKRWyP8Mzrxc0bFdMBAy+WjqrAwDfNCuHu8mx7zk0+dvVDVJCky2I+wq1ny2oq49oPqxuui6Jepz5mK8/LwuwzawcVTem1Ysu53GA8YflFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731041698; c=relaxed/simple;
-	bh=2xQmX4s0JykS7A/Tc6c/t/SLBjSG0+FumPRaKt9camw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=My/skOIi6imStw/n016GrU2lbJADQTZai/XIhdwQry/5nRAzqx0l7sChXOr6Igj5rrsEeupKgkwu7ElF0eRLAFAxvYnO+ZgMT4aZGwmIEDnDP04l0NNNjhMlmHA8Vm39g/dk5H4Q3HRYQfsERHgVuJ6stmmsWPGdVbJ7Rg46aR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3NcRfLgQ; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1731042836; c=relaxed/simple;
+	bh=pYc9Qbhl30laTpqG2U4WFIYnywiRC9RUCYu1mKTYEf0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KJWrouJzZf1ck6CJlx8bvxVcRIxKaPhvBVphf88XBPKmy5P/Q5l43JutgC2QDcSjLU6WFvp8UddwQfo+F1gj6OFfh44zGo760dE9yrZ8tTwkqA6GfYkD2Ma4IJuyZ5Wo0W09FgU8dTa39GuKUOE/iSwdE9SLDBFE18TXAyVg01A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ect/Yf32; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3NcRfLgQ"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539e617ef81so6457e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 07 Nov 2024 20:54:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731041695; x=1731646495; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bSKJzjh5rurwLh+xIWMq383kU498LySuuCRBu3PfCQM=;
-        b=3NcRfLgQRR04jjnVn6KJe7MywDM05CMJJw1XiFoHudwQia98fpUNPVWRtQIDVQ7XVE
-         VdaLZnOaorOd97XY+uK6br31d5LAbtVPElTsDkAZwTbWQwP+cGgEJxSmJQxfpiQjMbt/
-         YY3z9QzrNI2NQflTP5KwF49SUQ9x48QzWAKvUKOQ0Uel/7cLfcFSYfcm8UvGX5f200H0
-         8X5BuWvmMSv5ZoR2kJvdsy45H0DoadLh1KqNAtgzJFX1QAs6LAspnByDR1wQPWTiSfeN
-         CvyATqTlXODBMmxTi4RsogKICM9wmsGNerEefIG4ULlf5R8Vi+S2krCU+YKamcpM6U6s
-         VXdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731041695; x=1731646495;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bSKJzjh5rurwLh+xIWMq383kU498LySuuCRBu3PfCQM=;
-        b=JFidMmnez7ulPdzMcM57r1F+Xqt5wPiNhAAT2GVEc8AI5SjW6jeilT7gMGcSe1g5SV
-         G5l+b3RRRiT7axf4Ad6/7Pfig1j6VejUrcawrNXJINqxA5u29eSlyjmSmZrv2+M/9fVQ
-         ZZQ4KrHT/7fJAgd1z18+n1fzNI5Ed7pNGBnDkA5bvb0ZUI3HyQBrX6x0SpeHZi6Fmdf1
-         IZ3G6okHNNpiBuc7dPJu1Gf97Gi4BOJa6OPvFXRaVhcWqzKaOsVSEdUVrzAEueNUP5aW
-         F3Nm5QRmpC4NdM8sbQ+iK+U9LhLgTmaUQh+tUlje7kUDexAudgkveA/B2C93fYynu/jv
-         VdVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcHl4Sdsnz+d6blwoqqo2vsR1TofkJDPO5/Glea0ujHDAob0Kp/g3+TXUXrXbRw4rgqokARmk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxJCZ0QMao1HErPyXd7nPSQ3U9R3Lh1OznGrJR+S/PCpIOHVVFr
-	A2ZuEiEI4lD12beK2bu7ojBLZQ8DuHjFcJ7Fbi8pa/9t3Ys3417U+qoCgUAlFu5m9nRaFRW4Dpn
-	MxXTyoTD7R/8cL1iDONP8dKJ6bpPGk5sTMKZH
-X-Gm-Gg: ASbGnct7/+9FO//TuWhuxJaJ+ayPKqziOs2EEKhdQTbvG7anzg9Ti5tStSUodReSmyn
-	yalM1fUsygiRH/5n8GoVJl4uwRf/JQHw+d0A036akWR7Sf/mC/60K9KQFN2scS3iM
-X-Google-Smtp-Source: AGHT+IGKIXIuAP01ZsVM+BlzRdxZ0Zhznc/LCRKvW3Ub125dSvD8M1+JFH8FKnICGQVhmKF54W/LE3eK5eVmHfeVlwM=
-X-Received: by 2002:ac2:4e44:0:b0:53c:7652:6c97 with SMTP id
- 2adb3069b0e04-53d811f1d2cmr527773e87.2.1731041694586; Thu, 07 Nov 2024
- 20:54:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ect/Yf32"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731042835; x=1762578835;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pYc9Qbhl30laTpqG2U4WFIYnywiRC9RUCYu1mKTYEf0=;
+  b=ect/Yf32HSgJ6Ac7i/jFTpKf2wbSVQn+wlIrwVbPZmz6H2tMMkrR2L0Q
+   e5q6wP8521eX7uPDHwhDCwjLBQRzAfJ6x6XS0m3DA3gbXRLp3Jyh+wKZs
+   4JoWT7nrR0D9HYHyjpFunSAg8jTDXd0ZnpPq2sqpSLJQaANXqGcaVnySQ
+   VNBDtbRGKOP9rZBXCoNM9Zr6z4qpdWAepziUB9XAp3KocNC17jBWtQk6f
+   pA/4s0gnmohhBCgesCfAAIC8ylDisNrrkTwabHdDVhMw0YLDTG3BQOjx3
+   w1JOazPzV22ALARl3mAmV+b5A9b0ayfSfmjG/uaSHxRqhyFVWMdu83Twu
+   w==;
+X-CSE-ConnectionGUID: IF5kDn+dS3SAkr647gxcKg==
+X-CSE-MsgGUID: 00QuXcKdQw+TYJNGcabGgw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="34842598"
+X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
+   d="scan'208";a="34842598"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 21:13:54 -0800
+X-CSE-ConnectionGUID: hj1jmGEURHufH/7Z2oU9RA==
+X-CSE-MsgGUID: nD8TOoO9TvCWTbnMnhN+5A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
+   d="scan'208";a="90033772"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 07 Nov 2024 21:13:50 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t9HJc-000r3c-0f;
+	Fri, 08 Nov 2024 05:13:48 +0000
+Date: Fri, 8 Nov 2024 13:13:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: oe-kbuild-all@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>, Eric Auger <eauger@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v4 3/5] KVM: arm64: vgic-its: Add a data length check in
+ vgic_its_save_*
+Message-ID: <202411081338.47eReEKu-lkp@intel.com>
+References: <20241107214137.428439-4-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241031212104.1429609-1-jiaqiyan@google.com> <ZyP6whdv4bmsI13x@linux.dev>
-In-Reply-To: <ZyP6whdv4bmsI13x@linux.dev>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Thu, 7 Nov 2024 20:54:43 -0800
-Message-ID: <CACw3F53Mz_5pqFRyZtQBuF2Qq9314ANnOc360SNM5DtkCNweaw@mail.gmail.com>
-Subject: Re: [RFC PATCH v1] KVM: arm64: Introduce KVM_CAP_ARM_SIGBUS_ON_SEA
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, duenwen@google.com, 
-	rananta@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107214137.428439-4-jingzhangos@google.com>
 
-Hi Oliver,
+Hi Jing,
 
-Sorry for getting back to you late...
+kernel test robot noticed the following build warnings:
 
-On Thu, Oct 31, 2024 at 2:46=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Jiaqi,
->
-> Thank you for sending this out.
->
-> On Thu, Oct 31, 2024 at 09:21:04PM +0000, Jiaqi Yan wrote:
-> > Currently KVM handles SEA in guest by injecting async SError into
-> > guest directly, bypassing VMM, usually results in guest kernel panic.
-> >
-> > One major situation of guest SEA is when vCPU consumes uncorrectable
-> > memory error on the physical memory. Although SError and guest kernel
-> > panic effectively stops the propagation of corrupted memory, it is not
-> > easy for VMM and guest to recover from memory error in a more graceful
-> > manner.
-> >
-> > Alternatively KVM can send a SIGBUS BUS_OBJERR to VMM/vCPU, just like
-> > how core kernel signals SIGBUS BUS_OBJERR to the poison consuming
-> > thread.
-> > In addition to the benifit that KVM's handling for SEA becomes aligned
-> > with core kernel behavior
-> > - The blast radius in VM can be limited to only the consuming thread
-> >   in guest, instead of entire guest kernel, unless the consumption is
-> >   from guest kernel.
-> > - VMM now has the chance to do its duties to stop the VM from repeatedl=
-y
-> >   consuming corrupted data. For example, VMM can unmap the guest page
-> >   from stage-2 table to intercept forseen memory poison consumption,
-> >   and for every consumption injects SEA to EL1 with synthetic memory
-> >   error CPER.
-> >
-> > Introduce a new KVM ARM capability KVM_CAP_ARM_SIGBUS_ON_SEA. VMM
-> > can opt in this new capability if it prefers SIGBUS than SError
-> > injection during VM init. Now SEA handling in KVM works as follows:
->
-> I'm somewhat tempted to force the new behavior on userspace
-> unconditionally. Working back from an unexpected SError in the VM to the
-> KVM SEA handler is a bit of a mess, and can be annoying if the operator
-> can't access console logs of the VM.
+[auto build test WARNING on 59b723cd2adbac2a34fc8e12c74ae26ae45bf230]
 
-Ack, I also think involving VMM is preferable than injecting SError
-directly to guest.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jing-Zhang/KVM-selftests-aarch64-Add-VGIC-selftest-for-save-restore-ITS-table-mappings/20241108-054433
+base:   59b723cd2adbac2a34fc8e12c74ae26ae45bf230
+patch link:    https://lore.kernel.org/r/20241107214137.428439-4-jingzhangos%40google.com
+patch subject: [PATCH v4 3/5] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+config: arm64-randconfig-004-20241108 (https://download.01.org/0day-ci/archive/20241108/202411081338.47eReEKu-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241108/202411081338.47eReEKu-lkp@intel.com/reproduce)
 
->
-> As it stands today, UAPI expectations around SEAs are platform
-> dependent. If APEI claims the SEA and decides to offline a page, the
-> user will get a SIGBUS.
->
-> So sending a SIGBUS for the case that firmware _doesn't_ claim the SEA
-> seems like a good move from a consistency PoV. But it is a decently-sized
-> change to do without explicit buy-in from userspace so let's see what
-> others think.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411081338.47eReEKu-lkp@intel.com/
 
-Sounds good, I will wait for a couple of more days, and if the opt-in
-part isn't necessary to anyone else, I will remove it from the next
-revision.
+All warnings (new ones prefixed by >>):
 
->
-> > 1. Delegate to APEI/GHES to see if SEA can be claimed by them.
-> > 2. If APEI failed to claim the SEA and KVM_CAP_ARM_SIGBUS_ON_SEA is
-> >    enabled for the VM, and the SEA is NOT about translation table,
-> >    send SIGBUS BUS_OBJERR signal with host virtual address.
-> > 3. Otherwise directly inject async SError to guest.
->
-> The other reason I'm a bit lukewarm on user buy in is the UAPI suffers
-> from the same issue we do today: it depends on the platform. If the SEA
-> is claimed by APEI/GHES then the cap does nothing.
+   arch/arm64/kvm/vgic/vgic-its.c: In function 'vgic_its_save_collection_table':
+>> arch/arm64/kvm/vgic/vgic-its.c:2495:13: warning: unused variable 'val' [-Wunused-variable]
+    2495 |         u64 val;
+         |             ^~~
 
-Good point, yeah, the path of KVM handling SEA and sending SIGBUS
-should be treated as fallback code to APEI/GHES.
 
->
-> > +static int kvm_delegate_guest_sea(phys_addr_t addr, u64 esr)
-> > +{
-> > +     /* apei_claim_sea(NULL) expects to mask interrupts itself */
-> > +     lockdep_assert_irqs_enabled();
-> > +     return apei_claim_sea(NULL);
-> > +}
->
-> Consider dropping parameters from this since they're unused.
+vim +/val +2495 arch/arm64/kvm/vgic/vgic-its.c
 
-Ack, will do in the next revision.
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2484  
+0aa34b37a78d06 arch/arm64/kvm/vgic/vgic-its.c Sebastian Ott      2024-07-23  2485  /*
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2486   * vgic_its_save_collection_table - Save the collection table into
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2487   * guest RAM
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2488   */
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2489  static int vgic_its_save_collection_table(struct vgic_its *its)
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2490  {
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2491  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+c2385eaa6c5a87 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-10-26  2492  	u64 baser = its->baser_coll_table;
+8ad50c8985d805 virt/kvm/arm/vgic/vgic-its.c   Kristina Martsenko 2018-09-26  2493  	gpa_t gpa = GITS_BASER_ADDR_48_to_52(baser);
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2494  	struct its_collection *collection;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09 @2495  	u64 val;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2496  	size_t max_size, filled = 0;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2497  	int ret, cte_esz = abi->cte_esz;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2498  
+c2385eaa6c5a87 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-10-26  2499  	if (!(baser & GITS_BASER_VALID))
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2500  		return 0;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2501  
+c2385eaa6c5a87 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-10-26  2502  	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2503  
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2504  	list_for_each_entry(collection, &its->collection_list, coll_list) {
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2505  		ret = vgic_its_save_cte(its, collection, gpa, cte_esz);
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2506  		if (ret)
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2507  			return ret;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2508  		gpa += cte_esz;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2509  		filled += cte_esz;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2510  	}
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2511  
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2512  	if (filled == max_size)
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2513  		return 0;
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2514  
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2515  	/*
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2516  	 * table is not fully filled, add a last dummy element
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2517  	 * with valid bit unset
+ea1ad53e1e31a3 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2017-01-09  2518  	 */
+c4380c338c9607 arch/arm64/kvm/vgic/vgic-its.c Kunkun Jiang       2024-11-07  2519  	return vgic_its_write_entry_lock(its, gpa, 0, cte_esz);
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2520  }
+3b65808f4b2914 virt/kvm/arm/vgic/vgic-its.c   Eric Auger         2016-12-24  2521  
 
->
-> > +void kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
-> > +{
-> > +     bool sigbus_on_sea;
-> > +     int idx;
-> > +     u64 vcpu_esr =3D kvm_vcpu_get_esr(vcpu);
-> > +     u8 fsc =3D kvm_vcpu_trap_get_fault(vcpu);
-> > +     phys_addr_t fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
-> > +     gfn_t gfn =3D fault_ipa >> PAGE_SHIFT;
-> > +     /* When FnV is set, send 0 as si_addr like what do_sea() does. */
-> > +     unsigned long hva =3D 0UL;
-> > +
-> > +     /*
-> > +      * For RAS the host kernel may handle this abort.
-> > +      * There is no need to SIGBUS VMM, or pass the error into the gue=
-st.
-> > +      */
-> > +     if (kvm_delegate_guest_sea(fault_ipa, vcpu_esr) =3D=3D 0)
-> > +             return;
-> > +
-> > +     sigbus_on_sea =3D test_bit(KVM_ARCH_FLAG_SIGBUS_ON_SEA,
-> > +                              &(vcpu->kvm->arch.flags));
-> > +
-> > +     /*
-> > +      * In addition to userspace opt-in, SIGBUS only makes sense if th=
-e
-> > +      * abort is NOT about translation table walk and NOT about hardwa=
-re
-> > +      * update of translation table.
-> > +      */
-> > +     sigbus_on_sea &=3D (fsc =3D=3D ESR_ELx_FSC_EXTABT || fsc =3D=3D E=
-SR_ELx_FSC_SECC);
->
-> Is this because we potentially can't determine a valid HVA for the
-> fault? Maybe these should go out to userspace still with si_addr =3D 0.
-
-No, it is not related to the availability of a valid HVA. In this
-patch, as long as it decides to sigbus_on_sea, si_addr can be 0 if a
-valid HVA isn't available when !kvm_vcpu_sea_far_valid (OR when
-HPFAR_EL2 cannot be translated from a valid FAR_EL2, which I think
-requires some improvement).
-
-The code here wants to limit SIGBUS _BUS_OBJERR_ to only SEA and
-parity+ECC error, similar to the code here (for SEA)
-https://elixir.bootlin.com/linux/v6.11.6/source/arch/arm64/mm/fault.c#L771
-and here (for synchronous parity or ECC error)
-https://elixir.bootlin.com/linux/v6.11.6/source/arch/arm64/mm/fault.c#L779.
-
->
-> --
-> Thanks,
-> Oliver
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
