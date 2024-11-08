@@ -1,361 +1,467 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D90233D80
-	for <kvmarm@lists.linux.dev>; Fri,  8 Nov 2024 21:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6C7233D80
+	for <kvmarm@lists.linux.dev>; Fri,  8 Nov 2024 21:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731100539; cv=none; b=E73bOQaGJ9fLf27AsjSkSVz+g1ptJJdPfPLB2Ajab6fmWR+mag+hOHkRVpppmIhLkO+F6nenxYjBShehhK4BTF/jYEdoknJwZkr41/O+ygyyLSnVNZHB6ruJ89+0+pqEGhc7v5CcuI/62gPwl3EK3TdGDcJA92FBL9yMFdM6K8s=
+	t=1731100749; cv=none; b=tB4fY8VJQG/DG0eexK7DDhtuw6JZzY7RAuIElETnzFyoxFIxPPng7h3tsjAl+mhbLswocupEylt/mYLEyxEDwW7vmFroJvWbwlczGfL+DKCeq99FFpNBzZxDvy1Zk9ul4Ap479/IVhGjL5JXkqICrDW4SlztpyqUM3e2ba9BdK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731100539; c=relaxed/simple;
-	bh=3mnwDE8EcYDJohsTNnQuX49X1JYTz6SUGnbFTkORf0o=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oTojfsw/3XNV0Q7ITfDWVgl8MlR6vc6CNhrruWTVGRKKaARH+/mLGs4/RYryg51Hsn9a8xn98HQa8Wgvhfw9CdFyQPLnmXwq5y98Hmi2h7exMJsalIC1l/CCbNMP7R7dpBDoVbNUXoeOCw8g/S7zMJLTgAGbDlQD1uQ2mZfDQtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kaleshsingh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dB6Tcil6; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1731100749; c=relaxed/simple;
+	bh=tDljzpZuOvX3WTfGD+h82SFhJwpiJd8KBJMVLzbQIJY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h/QF/3FtYwzUAYvVoFud/8UQxlUSWU2SbtZk5KEasTo1YtDspR2uJiB275jmO4deafvQoIUHb60CHMQAxqEvJzlyOGMGVedaNoEKlUSmA4giT3MKTeknmRyVIL/a//p8UvP5Izt3TCeAZex9tcQts+8U/1vt7vfgXr2PtAntxYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B8n4CowK; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kaleshsingh.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dB6Tcil6"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ea8d6fb2ffso50131627b3.2
-        for <kvmarm@lists.linux.dev>; Fri, 08 Nov 2024 13:15:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B8n4CowK"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539e19d8c41so6440e87.0
+        for <kvmarm@lists.linux.dev>; Fri, 08 Nov 2024 13:19:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731100536; x=1731705336; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Xj9B9RMnkmM/PP2fh4BdeD15ANP1xy3HAxUiNCCHfSo=;
-        b=dB6Tcil68IntRpLO68UMfx9u84AD98+pVMdSGYAfDk7UpM8xYaFH4Sn/YCGO0jHooI
-         qzbJHfM4MAvqQmE3AVePxfdSFgmi3abAFWKGD3tXmBIcgS14/WcYYwOjTORyOqAq0Rly
-         wiVJzIG6cb32VnVff0POTUoxgDp3XRAhl/VjE9AbXjKO0q//l9cmps4bO2VnyIZOEhtx
-         rjBwztgsQt+FYXE6VOoh+4Ft69PNXqmNTv6qDMB8bI5NDN6DMt9ieihM0FfUUJeZvhbN
-         AFXZfFuUXDDs6DApAPaWtrhwFPcy8Y2M40djuF/jAZ0iQ8xqwUJHohysqrDADETF8z4F
-         f50g==
+        d=google.com; s=20230601; t=1731100746; x=1731705546; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3pNRoNs94iGgIkHYfrZaBo/v0//dX8R2dfahyIwZUoo=;
+        b=B8n4CowKARcSYkvNfmzd0ejOe+4C1oDPs0gSXZxQogWOM4UC3XPC2B9Ac6T6mMdKSF
+         EQoGHLdBbuMrUw8Qpj2cxSmL6AnBoe7XyZSU9UJWsZuTO7lilfLAOY8qAeADKmdf6Awz
+         m0j9PTnlSH6VYGy2pMG/wk5vtQch3kJ0Ur20VyDbtUccbxTfSOciYnwca/tqZykJzkuP
+         tsEDjTeATgb9SGLjvkHCaibMfzWFzFsc2Rx3Z+mMmiydIU82k5dIrYKZiere+GDgsEjO
+         Hgt/9RuKN7idCDMcoc0bACda4ZMDGjfcyjQP6b5tekZQPLVmxottLX0wHQZA8X3yPb0M
+         W21A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731100536; x=1731705336;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Xj9B9RMnkmM/PP2fh4BdeD15ANP1xy3HAxUiNCCHfSo=;
-        b=N9mM7jd46Z8orCuzauQ4steqrt0iVIe2nR3ewVKJena1MnpJpQ8pzAED/qQcu+OO4D
-         z2AQDJqZxnHFngEPLiy5RnU7RBoxXJEDcFH6EsZ7z6B/hTo44jZAPt1RTRy8O+dK9wpM
-         vbr9xOY482+4lSjNATeYihpFEMEKOPVnPpFQrVXtwiOmTNC6y+HwSVW0Tw0SZgLLmeFY
-         Um8O4tOABN+aN3KxP0PZVlqpyA2fF6x0jpqCPBEJB5NeiryotzaEH0PPrD6qJufkTQaB
-         ryoODMhjHpSSPsPGnP7uWpUrO9idnDOgtr0eoc+m2YG6CJrQYiAzUiTaGzy0P5phQpH5
-         ovkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWTssiyyIYMfMlLZLwXBF34lmDOpJzYMlrVFgpBj8uT17AXEu8tm+uGYsMiIpD7wg5acGUeCiQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzoT0TWJzzcRuO4CvwcyqEng2FQFIGOCK3b4yBO1y5dKOV4Rq/p
-	2Ni6J99Hhgqw9QDcmDZEv2mLctALD/IW4rL6uTIliqnlQySk8rLm2aW6el3J8p9PtYcm8n0Gh3S
-	4Vi9fc4YYsNNU8XW9zj7bCA==
-X-Google-Smtp-Source: AGHT+IEsHFWnlCL6mSsTKptJZufFOreEVWGFRJq416Pbau44wC4RVCznab2s8sBpPto1P5Y2xzKAJABWpyJ20H2TbA==
-X-Received: from kalesh.mtv.corp.google.com ([2a00:79e0:2e3f:8:bf60:92db:a254:85c0])
- (user=kaleshsingh job=sendgmr) by 2002:a05:690c:7307:b0:6ea:3c62:17c1 with
- SMTP id 00721157ae682-6eaddd75f83mr406757b3.1.1731100536154; Fri, 08 Nov 2024
- 13:15:36 -0800 (PST)
-Date: Fri,  8 Nov 2024 13:14:00 -0800
+        d=1e100.net; s=20230601; t=1731100746; x=1731705546;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3pNRoNs94iGgIkHYfrZaBo/v0//dX8R2dfahyIwZUoo=;
+        b=qxIg2EAlQBfGRd53WCv48YWZ6sAHg70k3Se1hAbfcQMGERK+BvUBekSHR2+q3h8EUq
+         wujtM3JgZ8caZB/vaI5PlF3dNrFzf3ml7Z+efeP4YUvWrxXcufD0rDvQMqehb3m0jpNc
+         Uo0Rie7QendQ3k4wxJ3gqzW1gnFcsGHydYMmP02wX0SO4dXy60L1koTrn7mKZ7Bw2AT0
+         Vvh5D2saQ0cTmMuKEsKBtcIfGxZucMyqJFyIYf6SZOr+tR/hrpmzWTj3/RW48Ct8Dg90
+         5DuKtkwlo91uuF2ldVyZLBV+Or4nhJNyuXhE7d3GfNtwstm4QpYDFdmeWnIGbQbi7b0i
+         b7/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXzxabyfM/l7Mpl4IIGNg6xXWADY4lf7m5xpE1XUBIhdVU+Ajj92T7iByCaOIMrOd0NxItI6cw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw954PXx0bSBDcLqwH1NGRxPRjtU5q8CCkKJYDuQ5qEZF0Os2ut
+	XGReGssL4jrjcyZNvLYxum4dsr/UQI3cpd3SOTP1V3JN8dog/2cQRmPmMrgeLbFmtbnDnmfPWEn
+	6Q8h3fj0V47cNdEI6fjmbNXaLeSOZ1r83ljJ5
+X-Gm-Gg: ASbGncsVCewe3cJMvXcad9ZpQcD/cavevjqiXHRyra5RTrU7S5wgSQOaidfpdxlPIfm
+	YSETuLQvYQZj5sTsdvDQkpkEdkbFqD59bDv8ARx5+SgLMxOcOCVd+j1KWlNT1yw==
+X-Google-Smtp-Source: AGHT+IEMi/DABphVzpbJvjQ+ZrB+3B8mPU1lu0pbXGUcU4u7ccgLy0qoPb4tiNbEw0WxtpKAjdVL2oNIQVLlR7I6now=
+X-Received: by 2002:ac2:518e:0:b0:536:88d0:420d with SMTP id
+ 2adb3069b0e04-53d8bdf9fb4mr93710e87.6.1731100741556; Fri, 08 Nov 2024
+ 13:19:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241108211446.3304809-1-kaleshsingh@google.com>
-Subject: [PATCH] arm64: kvm: Make nvhe stack size configurable
-From: Kalesh Singh <kaleshsingh@google.com>
-To: will@kernel.org, qperret@google.com, maz@kernel.org, broonie@kernel.org, 
-	mark.rutland@arm.com
-Cc: keir@google.com, vdonnefort@google.com, kernel-team@android.com, 
-	android-mm@google.com, Kalesh Singh <kaleshsingh@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	D Scott Phillips <scott@os.amperecomputing.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Wang Jinchao <wangjinchao@xfusion.com>, 
-	"Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>, 
-	"=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+MIME-Version: 1.0
+References: <20241031212104.1429609-1-jiaqiyan@google.com> <86r07v1g2z.wl-maz@kernel.org>
+ <CACw3F51FbzkkX_DcCVCieZ=408oP_Fy3sXYk5AjWRX3RJO2Fzg@mail.gmail.com>
+In-Reply-To: <CACw3F51FbzkkX_DcCVCieZ=408oP_Fy3sXYk5AjWRX3RJO2Fzg@mail.gmail.com>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Fri, 8 Nov 2024 13:18:50 -0800
+Message-ID: <CACw3F51B-RKE0OHGZwoQo1LPxygYc77VAbCHNfU25VVrpHc4-g@mail.gmail.com>
+Subject: Re: [RFC PATCH v1] KVM: arm64: Introduce KVM_CAP_ARM_SIGBUS_ON_SEA
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, duenwen@google.com, 
+	rananta@google.com, James Houghton <jthoughton@google.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In order to make the nVHE stack size easily configurable,
-introduce NVHE_STACK_SHIFT which must be >= PAGE_SHIFT.
+On Sun, Nov 3, 2024 at 9:02=E2=80=AFPM Jiaqi Yan <jiaqiyan@google.com> wrot=
+e:
+>
+> Hi Marc, thanks for your quick response!
+>
+> On Fri, Nov 1, 2024 at 6:54=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+> >
+> > On Thu, 31 Oct 2024 21:21:04 +0000,
+> > Jiaqi Yan <jiaqiyan@google.com> wrote:
+> > >
+> > > Currently KVM handles SEA in guest by injecting async SError into
+> > > guest directly, bypassing VMM, usually results in guest kernel panic.
+> > >
+> > > One major situation of guest SEA is when vCPU consumes uncorrectable
+> > > memory error on the physical memory. Although SError and guest kernel
+> > > panic effectively stops the propagation of corrupted memory, it is no=
+t
+> > > easy for VMM and guest to recover from memory error in a more gracefu=
+l
+> > > manner.
+> > >
+> > > Alternatively KVM can send a SIGBUS BUS_OBJERR to VMM/vCPU, just like
+> > > how core kernel signals SIGBUS BUS_OBJERR to the poison consuming
+> > > thread.
+> >
+> > Can you elaborate on why the delivery of a signal is preferable to
+> > simply exiting back to userspace with a description of the error?
+> > Signals are usually not generated by KVM, and are a pretty twisted way
+> > to generate an exit.
+>
+> A couple of reasons. First, my intuition is that KVM and core kernel
+> (do_sea) should have aligned behavior when APEI failed to claim the
+> SEA. Second, if we only talk about SEA caused by memory poison
+> consumption, both arm64 and x86 KVM already send SIGBUS to VMM/vCPU
+> thread (kvm_send_hwpoison_signal) to signal hardware memory failure,
+> although the situation is slightly different here, where we have a
+> hardware event, versus a HWPoison flag check or VM_FAULT_HWPOISON
+> returned. But from VMM/vCPU's perspective, hardware event or software
+> level VM_FAULT_HWPOISON, it would be nice if it can react to just the
+> same event, the SIGBUS signal.
+>
+> And there is another reason around your comment on arm64_notify_die.
+>
+> By "exiting back to userspace with a description of the error", are
+> you suggesting KVM_EXIT_MEMORY_FAULT? If so, we may need to add a new
+> flag to tell VMM the error is hardware memory poison, which could be
+> KVM_MEMORY_EXIT_FLAG_USERFAULT[1] if we don't want a specific one (but
+> I think a specific flag for hwpoison is probably clearer).
+>
+> >
+> > > In addition to the benifit that KVM's handling for SEA becomes aligne=
+d
+> > > with core kernel behavior
+> > > - The blast radius in VM can be limited to only the consuming thread
+> > >   in guest, instead of entire guest kernel, unless the consumption is
+> > >   from guest kernel.
+> > > - VMM now has the chance to do its duties to stop the VM from repeate=
+dly
+> > >   consuming corrupted data. For example, VMM can unmap the guest page
+> > >   from stage-2 table to intercept forseen memory poison consumption,
+> >
+> > Not quite. The VMM doesn't manage stage-2. It can remove the page from
+> > the VMA if it has it mapped, but that's it. The kernel deals with S2.
+>
+> I should probably not mention the implementation, "unmap from S2".
+> What is needed for preventing repeated consuming memory poison is
+> simply preventing guest access to certain memory pages. There is a
+> work in progress KVM API [1] by my colleague James.
+>
+> [1] https://lpc.events/event/18/contributions/1757/attachments/1442/3073/=
+LPC_%20KVM%20Userfault.pdf
+>
+> >
+> > Which brings me to the next subject: when the kernel unmaps the page
+> > at S2, it is likely to use CMOs. Can these CMOs create RAS error
+> > themselves?
+>
+> I assume CMO here means writing dirty cache lines to memory. Writing
+> something new to a poisoned cacheline usually won't cause RAS error.
+> Notifying memory poison usually is delayed to a memory load
+> transaction.
+>
+> >
+> > >   and for every consumption injects SEA to EL1 with synthetic memory
+> > >   error CPER.
+> >
+> > Why do we need to involve ACPI here? I would expect the production of
+> > an architected error record instead. Or at least be given the option.
+>
+> Sorry, I was just mentioning a specific VMM's implementation. There
+> are definitely multiple options (Machine Check MSRs vs CPER for error
+> description data, SEA vs SDEI vs SPI for notification mechanisms) for
+> how VMM involves the guest to handle memory error. My preference is:
+> VMM populates CPER in guest HEST when VMM instructs KVM to inject
+> i/dabt to the guest.
+>
+> And a word about "be given the option": I think when VMM receives
+> SIGBUS with si_addr=3Dfaulted/poisoned HVA, it's got all these options,
+> like using the si_addr to construct CPER with poisoned guest physical
+> address, or mci_address MSR.
+>
+> >
+> > > Introduce a new KVM ARM capability KVM_CAP_ARM_SIGBUS_ON_SEA. VMM
+> > > can opt in this new capability if it prefers SIGBUS than SError
+> > > injection during VM init. Now SEA handling in KVM works as follows:
+> > > 1. Delegate to APEI/GHES to see if SEA can be claimed by them.
+> > > 2. If APEI failed to claim the SEA and KVM_CAP_ARM_SIGBUS_ON_SEA is
+> > >    enabled for the VM, and the SEA is NOT about translation table,
+> > >    send SIGBUS BUS_OBJERR signal with host virtual address.
+> >
+> > And what if it is? S1 PTs are backed by userspace memory, like
+> > anything else. I don't think we should have a different treatment of
+> > those, because the HW wouldn't treat them differently either.
+>
+> You are talking about ESR_ELx_FSC_SEA_TTW(1), or
+> ESR_ELx_FSC_SEA_TTW(0), right? I think you are right, S1 is no
+> difference.
+>
+> But I think we want to make an exception for SEA about S2 PTs.
+>
+> >
+> > > 3. Otherwise directly inject async SError to guest.
+> > >
+> > > Tested on a machine running Siryn AmpereOne processor. A in-house VMM
+> > > that opts in KVM_CAP_ARM_SIGBUS_ON_SEA started a VM. A dummy applicat=
+ion
+> > > in VM allocated some memory buffer. The test used EINJ to inject an
+> > > uncorrectable recoverable memory error at a page in the allocated mem=
+ory
+> > > buffer. The dummy application then consumed the memory error. Some ha=
+ck
+> > > was done to make core kernel's memory_failure triggered by poison
+> > > generation to fail, so KVM had to deal with the SEA guest abort due t=
+o
+> > > poison consumption. vCPU thread in VMM received SIGBUS BUS_OBJERR wit=
+h
+> > > valid host virtual address of the poisoned page. VMM then injected a =
+SEA
+> > > into guest using KVM_SET_VCPU_EVENTS with ext_dabt_pending=3D1. At la=
+st
+> > > the dummy application in guest was killed by SIGBUS BUS_OBJERR, while=
+ the
+> > > guest survived and continued to run.
+> > >
+> > > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  2 +
+> > >  arch/arm64/include/asm/kvm_ras.h  | 20 ++++----
+> > >  arch/arm64/kvm/Makefile           |  2 +-
+> > >  arch/arm64/kvm/arm.c              |  5 ++
+> > >  arch/arm64/kvm/kvm_ras.c          | 77 +++++++++++++++++++++++++++++=
+++
+> > >  arch/arm64/kvm/mmu.c              |  8 +---
+> > >  include/uapi/linux/kvm.h          |  1 +
+> > >  7 files changed, 98 insertions(+), 17 deletions(-)
+> > >  create mode 100644 arch/arm64/kvm/kvm_ras.c
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
+sm/kvm_host.h
+> > > index bf64fed9820ea..eb37a2489411a 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -334,6 +334,8 @@ struct kvm_arch {
+> > >       /* Fine-Grained UNDEF initialised */
+> > >  #define KVM_ARCH_FLAG_FGU_INITIALIZED                        8
+> > >       unsigned long flags;
+> > > +     /* Instead of injecting SError into guest, SIGBUS VMM */
+> > > +#define KVM_ARCH_FLAG_SIGBUS_ON_SEA                  9
+> >
+> > nit: why do you put this definition out of sequence (below 'flags')?
+>
+> Ah, I will move it on top of flags.
+>
+> >
+> > >
+> > >       /* VM-wide vCPU feature set */
+> > >       DECLARE_BITMAP(vcpu_features, KVM_VCPU_MAX_FEATURES);
+> > > diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/as=
+m/kvm_ras.h
+> > > index 87e10d9a635b5..4bb7a424e3f6c 100644
+> > > --- a/arch/arm64/include/asm/kvm_ras.h
+> > > +++ b/arch/arm64/include/asm/kvm_ras.h
+> > > @@ -11,15 +11,17 @@
+> > >  #include <asm/acpi.h>
+> > >
+> > >  /*
+> > > - * Was this synchronous external abort a RAS notification?
+> > > - * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+> > > + * Handle synchronous external abort (SEA) in the following order:
+> > > + * 1. Delegate to APEI/GHES to see if SEA can be claimed by them. If=
+ so, we
+> > > + *    are all done.
+> > > + * 2. If userspace opts in KVM_CAP_ARM_SIGBUS_ON_SEA, and if the SEA=
+ is NOT
+> > > + *    about translation table, send SIGBUS
+> > > + *    - si_code is BUS_OBJERR.
+> > > + *    - si_addr will be 0 when accurate HVA is unavailable.
+> > > + * 3. Otherwise, directly inject an async SError to guest.
+> > > + *
+> > > + * Note this applies to both ESR_ELx_EC_IABT_* and ESR_ELx_EC_DABT_*=
+.
+> > >   */
+> > > -static inline int kvm_handle_guest_sea(phys_addr_t addr, u64 esr)
+> > > -{
+> > > -     /* apei_claim_sea(NULL) expects to mask interrupts itself */
+> > > -     lockdep_assert_irqs_enabled();
+> > > -
+> > > -     return apei_claim_sea(NULL);
+> > > -}
+> > > +void kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+> > >
+> > >  #endif /* __ARM64_KVM_RAS_H__ */
+> > > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > > index 3cf7adb2b5038..c4a3a6d4870e6 100644
+> > > --- a/arch/arm64/kvm/Makefile
+> > > +++ b/arch/arm64/kvm/Makefile
+> > > @@ -23,7 +23,7 @@ kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o p=
+vtime.o \
+> > >        vgic/vgic-v3.o vgic/vgic-v4.o \
+> > >        vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+> > >        vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+> > > -      vgic/vgic-its.o vgic/vgic-debug.o
+> > > +      vgic/vgic-its.o vgic/vgic-debug.o kvm_ras.o
+> > >
+> > >  kvm-$(CONFIG_HW_PERF_EVENTS)  +=3D pmu-emul.o pmu.o
+> > >  kvm-$(CONFIG_ARM64_PTR_AUTH)  +=3D pauth.o
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 48cafb65d6acf..bb97ad678dbec 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -151,6 +151,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >               }
+> > >               mutex_unlock(&kvm->slots_lock);
+> > >               break;
+> > > +     case KVM_CAP_ARM_SIGBUS_ON_SEA:
+> > > +             r =3D 0;
+> > > +             set_bit(KVM_ARCH_FLAG_SIGBUS_ON_SEA, &kvm->arch.flags);
+> >
+> > Shouldn't this be somehow gated on the VM being RAS aware?
+>
+> Do you mean a CAP that VMM can tell KVM the VM guest has RAS ability?
+> I don't know if there is one for arm64. On x86 there is
+> KVM_X86_SETUP_MCE. KVM_CAP_ARM_INJECT_EXT_DABT maybe a revelant one
+> but I don't think it is exactly the one for "RAS ability".
 
-The default stack size remains 1 page (no functional change)
+Hi Marc,
 
-Downstream vendor features which require a larger stack
-can configure it by setting CONFIG_NVHE_STACK_SHIFT.
+There is also a kernel config called ARM64_RAS_EXTN but I believe it
+is for the host CPU, not about VM's RAS.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Quentin Perret <qperret@google.com>
-Cc: Will Deacon <will@kernel.org>
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
----
- arch/arm64/include/asm/memory.h          |  5 ++++-
- arch/arm64/include/asm/stacktrace/nvhe.h |  2 +-
- arch/arm64/kvm/Kconfig                   | 14 ++++++++++++++
- arch/arm64/kvm/arm.c                     | 18 +++++++++---------
- arch/arm64/kvm/hyp/nvhe/host.S           |  4 ++--
- arch/arm64/kvm/hyp/nvhe/mm.c             | 12 ++++++------
- arch/arm64/kvm/hyp/nvhe/stacktrace.c     |  4 ++--
- arch/arm64/kvm/mmu.c                     | 12 ++++++------
- arch/arm64/kvm/stacktrace.c              |  6 +++---
- 9 files changed, 47 insertions(+), 30 deletions(-)
+But taking Oliver's opinion into account, I think we want to remove
+KVM_CAP_ARM_SIGBUS_ON_SEA. Wonder what your thoughts are.
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 0480c61dbb4f..55e592351749 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -145,13 +145,16 @@
- 
- #define OVERFLOW_STACK_SIZE	SZ_4K
- 
-+#define NVHE_STACK_SHIFT       CONFIG_NVHE_STACK_SHIFT
-+#define NVHE_STACK_SIZE        (UL(1) << NVHE_STACK_SHIFT)
-+
- /*
-  * With the minimum frame size of [x29, x30], exactly half the combined
-  * sizes of the hyp and overflow stacks is the maximum size needed to
-  * save the unwinded stacktrace; plus an additional entry to delimit the
-  * end.
-  */
--#define NVHE_STACKTRACE_SIZE	((OVERFLOW_STACK_SIZE + PAGE_SIZE) / 2 + sizeof(long))
-+#define NVHE_STACKTRACE_SIZE	((OVERFLOW_STACK_SIZE + NVHE_STACK_SIZE) / 2 + sizeof(long))
- 
- /*
-  * Alignment of kernel segments (e.g. .text, .data).
-diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
-index 44759281d0d4..171f9edef49f 100644
---- a/arch/arm64/include/asm/stacktrace/nvhe.h
-+++ b/arch/arm64/include/asm/stacktrace/nvhe.h
-@@ -47,7 +47,7 @@ static inline void kvm_nvhe_unwind_init(struct unwind_state *state,
- 
- DECLARE_KVM_NVHE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack);
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_stacktrace_info, kvm_stacktrace_info);
--DECLARE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-+DECLARE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
- 
- void kvm_nvhe_dump_backtrace(unsigned long hyp_offset);
- 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index ead632ad01b4..7aaf0951086c 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -66,6 +66,20 @@ config PROTECTED_NVHE_STACKTRACE
- 
- 	  If unsure, or not using protected nVHE (pKVM), say N.
- 
-+config NVHE_STACK_SHIFT
-+	int "Size of the nVHE stack as a power of 2"
-+	depends on KVM
-+	range 12 13 if ARM64_4K_PAGES
-+	default "12" if ARM64_4K_PAGES
-+	range 14 15 if ARM64_16K_PAGES
-+	default "14" if ARM64_16K_PAGES
-+	range 16 17 if ARM64_64K_PAGES
-+	default "16" if ARM64_64K_PAGES
-+	help
-+	  This option specifies the size of the KVM nVHE stack (for both
-+	  conventional nVHE and pKVM modes) as a power of 2 -- which must
-+	  be at least as large as PAGE_SIZE.
-+
- config PTDUMP_STAGE2_DEBUGFS
- 	bool "Present the stage-2 pagetables to debugfs"
- 	depends on KVM
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 48cafb65d6ac..d19bffbfcb9e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -61,7 +61,7 @@ static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTR
- 
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
- 
--DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-+DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-@@ -2359,7 +2359,7 @@ static void __init teardown_hyp_mode(void)
- 
- 	free_hyp_pgds();
- 	for_each_possible_cpu(cpu) {
--		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
-+		free_pages(per_cpu(kvm_arm_hyp_stack_base, cpu), NVHE_STACK_SHIFT - PAGE_SHIFT);
- 		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
- 
- 		if (free_sve) {
-@@ -2547,15 +2547,15 @@ static int __init init_hyp_mode(void)
- 	 * Allocate stack pages for Hypervisor-mode
- 	 */
- 	for_each_possible_cpu(cpu) {
--		unsigned long stack_page;
-+		unsigned long stack_base;
- 
--		stack_page = __get_free_page(GFP_KERNEL);
--		if (!stack_page) {
-+		stack_base = __get_free_pages(GFP_KERNEL, NVHE_STACK_SHIFT - PAGE_SHIFT);
-+		if (!stack_base) {
- 			err = -ENOMEM;
- 			goto out_err;
- 		}
- 
--		per_cpu(kvm_arm_hyp_stack_page, cpu) = stack_page;
-+		per_cpu(kvm_arm_hyp_stack_base, cpu) = stack_base;
- 	}
- 
- 	/*
-@@ -2624,9 +2624,9 @@ static int __init init_hyp_mode(void)
- 	 */
- 	for_each_possible_cpu(cpu) {
- 		struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
--		char *stack_page = (char *)per_cpu(kvm_arm_hyp_stack_page, cpu);
-+		char *stack_base = (char *)per_cpu(kvm_arm_hyp_stack_base, cpu);
- 
--		err = create_hyp_stack(__pa(stack_page), &params->stack_hyp_va);
-+		err = create_hyp_stack(__pa(stack_base), &params->stack_hyp_va);
- 		if (err) {
- 			kvm_err("Cannot map hyp stack\n");
- 			goto out_err;
-@@ -2638,7 +2638,7 @@ static int __init init_hyp_mode(void)
- 		 * __hyp_pa() won't do the right thing there, since the stack
- 		 * has been mapped in the flexible private VA space.
- 		 */
--		params->stack_pa = __pa(stack_page);
-+		params->stack_pa = __pa(stack_base);
- 	}
- 
- 	for_each_possible_cpu(cpu) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 3d610fc51f4d..58f0cb2298cc 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -188,12 +188,12 @@ SYM_FUNC_END(__host_hvc)
- 
- 	/*
- 	 * Test whether the SP has overflowed, without corrupting a GPR.
--	 * nVHE hypervisor stacks are aligned so that the PAGE_SHIFT bit
-+	 * nVHE hypervisor stacks are aligned so that the NVHE_STACK_SHIFT bit
- 	 * of SP should always be 1.
- 	 */
- 	add	sp, sp, x0			// sp' = sp + x0
- 	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
--	tbz	x0, #PAGE_SHIFT, .L__hyp_sp_overflow\@
-+	tbz	x0, #NVHE_STACK_SHIFT, .L__hyp_sp_overflow\@
- 	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
- 	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 8850b591d775..f41c7440b34b 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -360,10 +360,10 @@ int pkvm_create_stack(phys_addr_t phys, unsigned long *haddr)
- 
- 	prev_base = __io_map_base;
- 	/*
--	 * Efficient stack verification using the PAGE_SHIFT bit implies
-+	 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
- 	 * an alignment of our allocation on the order of the size.
- 	 */
--	size = PAGE_SIZE * 2;
-+	size = NVHE_STACK_SIZE * 2;
- 	addr = ALIGN(__io_map_base, size);
- 
- 	ret = __pkvm_alloc_private_va_range(addr, size);
-@@ -373,12 +373,12 @@ int pkvm_create_stack(phys_addr_t phys, unsigned long *haddr)
- 		 * at the higher address and leave the lower guard page
- 		 * unbacked.
- 		 *
--		 * Any valid stack address now has the PAGE_SHIFT bit as 1
-+		 * Any valid stack address now has the NVHE_STACK_SHIFT bit as 1
- 		 * and addresses corresponding to the guard page have the
--		 * PAGE_SHIFT bit as 0 - this is used for overflow detection.
-+		 * NVHE_STACK_SHIFT bit as 0 - this is used for overflow detection.
- 		 */
--		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr + PAGE_SIZE,
--					  PAGE_SIZE, phys, PAGE_HYP);
-+		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr + NVHE_STACK_SIZE,
-+					  NVHE_STACK_SIZE, phys, PAGE_HYP);
- 		if (ret)
- 			__io_map_base = prev_base;
- 	}
-diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-index ed6b58b19cfa..5b6eeab1a774 100644
---- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-+++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-@@ -28,7 +28,7 @@ static void hyp_prepare_backtrace(unsigned long fp, unsigned long pc)
- 	struct kvm_nvhe_stacktrace_info *stacktrace_info = this_cpu_ptr(&kvm_stacktrace_info);
- 	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
- 
--	stacktrace_info->stack_base = (unsigned long)(params->stack_hyp_va - PAGE_SIZE);
-+	stacktrace_info->stack_base = (unsigned long)(params->stack_hyp_va - NVHE_STACK_SIZE);
- 	stacktrace_info->overflow_stack_base = (unsigned long)this_cpu_ptr(overflow_stack);
- 	stacktrace_info->fp = fp;
- 	stacktrace_info->pc = pc;
-@@ -54,7 +54,7 @@ static struct stack_info stackinfo_get_hyp(void)
- {
- 	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
- 	unsigned long high = params->stack_hyp_va;
--	unsigned long low = high - PAGE_SIZE;
-+	unsigned long low = high - NVHE_STACK_SIZE;
- 
- 	return (struct stack_info) {
- 		.low = low,
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 0f7658aefa1a..e366ed8650fe 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -704,10 +704,10 @@ int create_hyp_stack(phys_addr_t phys_addr, unsigned long *haddr)
- 
- 	mutex_lock(&kvm_hyp_pgd_mutex);
- 	/*
--	 * Efficient stack verification using the PAGE_SHIFT bit implies
-+	 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
- 	 * an alignment of our allocation on the order of the size.
- 	 */
--	size = PAGE_SIZE * 2;
-+	size = NVHE_STACK_SIZE * 2;
- 	base = ALIGN_DOWN(io_map_base - size, size);
- 
- 	ret = __hyp_alloc_private_va_range(base);
-@@ -724,12 +724,12 @@ int create_hyp_stack(phys_addr_t phys_addr, unsigned long *haddr)
- 	 * at the higher address and leave the lower guard page
- 	 * unbacked.
- 	 *
--	 * Any valid stack address now has the PAGE_SHIFT bit as 1
-+	 * Any valid stack address now has the NVHE_STACK_SHIFT bit as 1
- 	 * and addresses corresponding to the guard page have the
--	 * PAGE_SHIFT bit as 0 - this is used for overflow detection.
-+	 * NVHE_STACK_SHIFT bit as 0 - this is used for overflow detection.
- 	 */
--	ret = __create_hyp_mappings(base + PAGE_SIZE, PAGE_SIZE, phys_addr,
--				    PAGE_HYP);
-+	ret = __create_hyp_mappings(base + NVHE_STACK_SIZE, NVHE_STACK_SIZE,
-+				    phys_addr, PAGE_HYP);
- 	if (ret)
- 		kvm_err("Cannot map hyp stack\n");
- 
-diff --git a/arch/arm64/kvm/stacktrace.c b/arch/arm64/kvm/stacktrace.c
-index 3ace5b75813b..b9744a932920 100644
---- a/arch/arm64/kvm/stacktrace.c
-+++ b/arch/arm64/kvm/stacktrace.c
-@@ -50,7 +50,7 @@ static struct stack_info stackinfo_get_hyp(void)
- 	struct kvm_nvhe_stacktrace_info *stacktrace_info
- 				= this_cpu_ptr_nvhe_sym(kvm_stacktrace_info);
- 	unsigned long low = (unsigned long)stacktrace_info->stack_base;
--	unsigned long high = low + PAGE_SIZE;
-+	unsigned long high = low + NVHE_STACK_SIZE;
- 
- 	return (struct stack_info) {
- 		.low = low,
-@@ -60,8 +60,8 @@ static struct stack_info stackinfo_get_hyp(void)
- 
- static struct stack_info stackinfo_get_hyp_kern_va(void)
- {
--	unsigned long low = (unsigned long)*this_cpu_ptr(&kvm_arm_hyp_stack_page);
--	unsigned long high = low + PAGE_SIZE;
-+	unsigned long low = (unsigned long)*this_cpu_ptr(&kvm_arm_hyp_stack_base);
-+	unsigned long high = low + NVHE_STACK_SIZE;
- 
- 	return (struct stack_info) {
- 		.low = low,
--- 
-2.47.0.277.g8800431eea-goog
+Thanks,
+Jiaqi
 
+>
+> >
+> > > +             break;
+> > >       default:
+> > >               break;
+> > >       }
+> > > @@ -339,6 +343,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=
+ long ext)
+> > >       case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> > >       case KVM_CAP_IRQFD_RESAMPLE:
+> > >       case KVM_CAP_COUNTER_OFFSET:
+> > > +     case KVM_CAP_ARM_SIGBUS_ON_SEA:
+> > >               r =3D 1;
+> > >               break;
+> > >       case KVM_CAP_SET_GUEST_DEBUG2:
+> > > diff --git a/arch/arm64/kvm/kvm_ras.c b/arch/arm64/kvm/kvm_ras.c
+> > > new file mode 100644
+> > > index 0000000000000..3225462bcbcda
+> > > --- /dev/null
+> > > +++ b/arch/arm64/kvm/kvm_ras.c
+> > > @@ -0,0 +1,77 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +
+> > > +#include <linux/bitops.h>
+> > > +#include <linux/kvm_host.h>
+> > > +
+> > > +#include <asm/kvm_emulate.h>
+> > > +#include <asm/kvm_ras.h>
+> > > +#include <asm/system_misc.h>
+> > > +
+> > > +/*
+> > > + * For synchrnous external instruction or data abort, not on transla=
+tion
+> > > + * table walk or hardware update of translation table, is FAR_EL2 va=
+lid?
+> > > + */
+> > > +static inline bool kvm_vcpu_sea_far_valid(const struct kvm_vcpu *vcp=
+u)
+> > > +{
+> > > +     return !(vcpu->arch.fault.esr_el2 & ESR_ELx_FnV);
+> > > +}
+> > > +
+> > > +/*
+> > > + * Was this synchronous external abort a RAS notification?
+> > > + * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+> > > + */
+> > > +static int kvm_delegate_guest_sea(phys_addr_t addr, u64 esr)
+> > > +{
+> > > +     /* apei_claim_sea(NULL) expects to mask interrupts itself */
+> > > +     lockdep_assert_irqs_enabled();
+> > > +     return apei_claim_sea(NULL);
+> > > +}
+> > > +
+> > > +void kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +     bool sigbus_on_sea;
+> > > +     int idx;
+> > > +     u64 vcpu_esr =3D kvm_vcpu_get_esr(vcpu);
+> > > +     u8 fsc =3D kvm_vcpu_trap_get_fault(vcpu);
+> > > +     phys_addr_t fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
+> > > +     gfn_t gfn =3D fault_ipa >> PAGE_SHIFT;
+> > > +     /* When FnV is set, send 0 as si_addr like what do_sea() does. =
+*/
+> > > +     unsigned long hva =3D 0UL;
+> > > +
+> > > +     /*
+> > > +      * For RAS the host kernel may handle this abort.
+> > > +      * There is no need to SIGBUS VMM, or pass the error into the g=
+uest.
+> > > +      */
+> > > +     if (kvm_delegate_guest_sea(fault_ipa, vcpu_esr) =3D=3D 0)
+> > > +             return;
+> > > +
+> > > +     sigbus_on_sea =3D test_bit(KVM_ARCH_FLAG_SIGBUS_ON_SEA,
+> > > +                              &(vcpu->kvm->arch.flags));
+> > > +
+> > > +     /*
+> > > +      * In addition to userspace opt-in, SIGBUS only makes sense if =
+the
+> > > +      * abort is NOT about translation table walk and NOT about hard=
+ware
+> > > +      * update of translation table.
+> > > +      */
+> > > +     sigbus_on_sea &=3D (fsc =3D=3D ESR_ELx_FSC_EXTABT || fsc =3D=3D=
+ ESR_ELx_FSC_SECC);
+> > > +
+> > > +     /* Pass the error directly into the guest. */
+> > > +     if (!sigbus_on_sea) {
+> > > +             kvm_inject_vabt(vcpu);
+> > > +             return;
+> > > +     }
+> > > +
+> > > +     if (kvm_vcpu_sea_far_valid(vcpu)) {
+> > > +             idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+> > > +             hva =3D gfn_to_hva(vcpu->kvm, gfn);
+> > > +             srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > > +     }
+> > > +
+> > > +     /*
+> > > +      * Send a SIGBUS BUS_OBJERR to vCPU thread (the userspace threa=
+d that
+> > > +      * runs KVM_RUN) or VMM, which aligns with what host kernel do_=
+sea()
+> > > +      * does if apei_claim_sea() fails.
+> > > +      */
+> > > +     arm64_notify_die("synchronous external abort",
+> > > +                      current_pt_regs(), SIGBUS, BUS_OBJERR, hva, vc=
+pu_esr);
+> >
+> > This is the point where I really think we should simply trigger an
+> > exit with all that syndrome information stashed in kvm_run, like any
+> > other event requiring userspace help.
+>
+> Ah, there is another reason SIGBUS is better than kvm exit: "It is a
+> programming error to set ext_dabt_pending after an exit which was not
+> either KVM_EXIT_MMIO or KVM_EXIT_ARM_NISV", from
+> Documentation/virt/kvm/api.rst. So if VMM is allowed to inject data
+> abort to guest, at least current documentation doesn't suggest kvm
+> exit is feasible.
+>
+> >
+> > Also: where is the documentation?
+>
+> Once I get more positive feedback and send out PATCH instead of RFC, I
+> can add to Documentation/virt/kvm/api.rst.
+>
+> >
+> > Thanks,
+> >
+> >         M.
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
