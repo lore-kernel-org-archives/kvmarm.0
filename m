@@ -1,68 +1,68 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EAA1DFE0D
-	for <kvmarm@lists.linux.dev>; Fri,  8 Nov 2024 08:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9159F1DFE16
+	for <kvmarm@lists.linux.dev>; Fri,  8 Nov 2024 09:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731056161; cv=none; b=LLzWqOuuHetMNqYmcveQ1wvUI6s4lBrH8UlXGV0XDwEZGt7aATV2BWJ4uG3x0uRaOmQ5RCSPr3qXvlRy23fVgK9j2aVK8ZSYvFdbD+NfJ837TvW8AWjbLewJqKZZfzw+7xIvHAMKIUkMi9nqiuH12Xym8/A0FKiIpqqjTlUqgUE=
+	t=1731056418; cv=none; b=VsFxBGYjWTNzuJ8IijGDX6M3ad35eXQsB5xn2ExWsJOZn+a9W+JmlJg7DyO63X1vsBHJZYdkmlJkEvDEdpt93csOJ1Y2y5Nf8j2l9QOfoI0VLWrAWpIBFLWgGPgn6OHSYFXFq3u6Ya441kmXzovEZKxk0NCnhCEWoMBKFbRh8PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731056161; c=relaxed/simple;
-	bh=RvjEnSoS2rKmQa4Vl1T9Yde1sARG3bd+J9ylnj5sE6Q=;
+	s=arc-20240116; t=1731056418; c=relaxed/simple;
+	bh=DiATwo03/8GtzbkcrrG2dwFva/jS1oeBl8PrDGHVMdU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VtI0ROMRk94k3mC2UNVi5wcd0PTAQSXWbqEqeQp+xk5ZAuXRsoihwOrQYXQEecI4y3CsEshsMieJJ6Oq0K2V0WkC3DNUDYKawLXUr2Vsxo7S7TBH+EO/C8qrzZNhqoPQ621n0luwsKyeZ6+jCcJwLivTNBQjGgimhSqgu9ButwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aGi8gbFw; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=tUqWNCAwAjIdH7sLaxLUCXktlGWd7UVj40Hj8F1/qgRsXtIXaYWNtz4vmnLS5gfP2vjDm6wJ/T7Nzh+sgz5E5KvyQ9wMSgrCuDliT4UbnY1inT72dLJpMJtV1xSXcxIbFt1o9OCM6D8ft/z5ehJBCQNuikAkXrSNqqMPK9QiYgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ikaxM/vr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aGi8gbFw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikaxM/vr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731056158;
+	s=mimecast20190719; t=1731056415;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=p7+n19lrgiAJuEoskSWGxrEplWe5QxXbROOP/SEkcpY=;
-	b=aGi8gbFw1HsnhfaJKHkNSPrKaTDjx3iwChbFfGcwoCPlyFfnD1N8/9TpddLTu0EmZPQpNi
-	i0uPJAOGIeUq75sEzMv1hXpoVoq3u+quhDD9Gj0Kz+C0DnRgqoLMAehrhpxPsVv/uAbMnR
-	sJ/d51qhVYVA5QPapzGshXng8w974rM=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZN3IWgvO5K2UzU+TxYiLQK0pb6ZI5Cu0LnpdZy+E0as=;
+	b=ikaxM/vrDkMg7ed0pW1Tt1KyqKhs8de+P2Lvr9xAI2J4U++LpsDl9+pRStdlNVH5ylPH+g
+	DQw7PupgRAtATuIpKkKoD6ok1RXU61Z49/gboi4cAJsFH72uzIHazsP+1bsgawN+vbyvCp
+	UCxfRD2t4ZWpffEcSUG53cTJ7+gmSFg=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-584-UpT9V-NIM56K0quYvsgu1Q-1; Fri, 08 Nov 2024 03:55:57 -0500
-X-MC-Unique: UpT9V-NIM56K0quYvsgu1Q-1
-X-Mimecast-MFC-AGG-ID: UpT9V-NIM56K0quYvsgu1Q
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b15fa44522so211499885a.0
-        for <kvmarm@lists.linux.dev>; Fri, 08 Nov 2024 00:55:57 -0800 (PST)
+ us-mta-350-G3Wo57KYMaOMT576faj11w-1; Fri, 08 Nov 2024 04:00:12 -0500
+X-MC-Unique: G3Wo57KYMaOMT576faj11w-1
+X-Mimecast-MFC-AGG-ID: G3Wo57KYMaOMT576faj11w
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b15d3cd6dcso221889785a.0
+        for <kvmarm@lists.linux.dev>; Fri, 08 Nov 2024 01:00:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731056157; x=1731660957;
+        d=1e100.net; s=20230601; t=1731056412; x=1731661212;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=p7+n19lrgiAJuEoskSWGxrEplWe5QxXbROOP/SEkcpY=;
-        b=rrPMw9wSFEWOJ6FHeUAxjWC2k9h6aYQDkq0e8zKv9uZ7q17/vUvzUsL54hQJFbGMwO
-         19jvcBa6kgOz6Mr+buyNGrzbhxToRGG7ZESMStopYNkMtPpZffF3vO1U/Qd0lU/ZK3f9
-         fXL87ky98yirW2gfHhMwBx7KNHPcZm9zOF18Fe7I5PAYux6wIBwEae27ZJ5ac4XsviyZ
-         YKHd82KmBrE+14Y+m4pSmTFja8ZPH5YxWRkxNibT1WifgCpXWPwl44zL6MN7bMIXcmJ6
-         kCwF/SvmzK6sDYS4hB9aqDTM+8oxTQqY+WtRbBoPl++s8B8FCSfWfXXN5oS4UvZXj87Q
-         eHww==
-X-Forwarded-Encrypted: i=1; AJvYcCXK2oAJauRI2/YzpOypT7dmfn2SBtFgGK0Cie1HQXhnrmFm9c4eRouV84tEwmPyABTUN5/Sb1U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxsJYh0aNGa4hkPJkgbxFwVfkAIWk/0PiZoKmkXyrIsJ5w7ucny
-	KYqA0TTKFzV8dcnx1huu5K6DaqygWdGUPtMcL4NMZqMMZqEd50eM0F8jhsvW09f8RSowGzmp3Aq
-	/sy4z63SvK4BXZp40ChoHKdL8612eqWSglIO+pYgJ3hm/2bvQrocfkQ==
-X-Received: by 2002:a05:6214:588e:b0:6d1:7854:ab49 with SMTP id 6a1803df08f44-6d39e120d01mr23301256d6.11.1731056156713;
-        Fri, 08 Nov 2024 00:55:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwRj/6Dr08Zq/2CalNmB2mzI7xIogqbu3h+dTo6AiUl7OKWmmmDoPSjhOiOzCp+l6bFoIZFg==
-X-Received: by 2002:a05:6214:588e:b0:6d1:7854:ab49 with SMTP id 6a1803df08f44-6d39e120d01mr23301066d6.11.1731056156395;
-        Fri, 08 Nov 2024 00:55:56 -0800 (PST)
+        bh=ZN3IWgvO5K2UzU+TxYiLQK0pb6ZI5Cu0LnpdZy+E0as=;
+        b=OL9Cz/cABzzlKn+3N7gf/DGKCZsmHyK3MHGJq9KjhaLkxnw9UxixEtOJJiNTi1ztl/
+         UxE8hCqh7wnoJbElHnhO9BI+a72JTsMVIWcQI1e0rc77mUyoa8fz8OYyIQIObIyNVfWS
+         IlKXI40+YF3l33G92mcBY79qWV3y4n/7Moj+nr8C+PTJi4oeWp20IDivBYuFY8cKsLPm
+         x857X/l9SaoewcP9oB+ScK9T8LjEYrBuCWBwstzseiml6NrCBRV2sSiXOEvalMFqoO7S
+         JopyPoJo9K6Yl3wtWC45m8/a4nedW1m1EOFGL+H2Oq/8n17z4R0c8k7pPjPusvtW93U3
+         1n8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVxCTrRpDEeZ4GQmu9GLPliBTESwwuZsdMY2BmiMszFg3lbCKed7azsq2d626WTtVegqRrAHRM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz9qm6jDP3kXmCSCjqKTxqOX3d0LfPN4aPqJlZYfhu0isaPsIEI
+	THR6V6jtwuQ79o5icrgV2waswX+CbTTIFeCFR5JZf0XZusN0Q4kniPM8exDuKLCghThbF+4bEx/
+	Hou6pcLEa313Ysf1QfhXItddQ5Hn3cpD0DRthBIOGbzs9DHzRQGb6eg==
+X-Received: by 2002:a05:620a:9342:b0:7b1:56f0:e06f with SMTP id af79cd13be357-7b331e8cc94mr215955685a.15.1731056411871;
+        Fri, 08 Nov 2024 01:00:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGkxg/sJsdiIHyCj/wQKR1CoiDq38NePwxcDPuV2+H6LqXetQIZJsRE5c1XC8s2tutl3zRGAQ==
+X-Received: by 2002:a05:620a:9342:b0:7b1:56f0:e06f with SMTP id af79cd13be357-7b331e8cc94mr215951285a.15.1731056411365;
+        Fri, 08 Nov 2024 01:00:11 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d39643b982sm17009106d6.85.2024.11.08.00.55.53
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac2dd1fsm142265085a.15.2024.11.08.01.00.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 00:55:55 -0800 (PST)
-Message-ID: <f241da92-6888-4171-9604-d72f78eb9829@redhat.com>
-Date: Fri, 8 Nov 2024 09:55:52 +0100
+        Fri, 08 Nov 2024 01:00:10 -0800 (PST)
+Message-ID: <77cc68a6-2d7a-4ef3-bf4d-93fc9987f466@redhat.com>
+Date: Fri, 8 Nov 2024 10:00:06 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,13 +84,13 @@ References: <20241107094000.70705-1-eric.auger@redhat.com>
 From: Eric Auger <eric.auger@redhat.com>
 In-Reply-To: <Zy0fPgwymCdBwLd_@linux.dev>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: OJqJmMA6G0EUsqayTmknGFbsL6RtlvHDVSPuI1wHhhY_1731056157
+X-Mimecast-MFC-PROC-ID: -PQpcRCFcroOxvVjHjs_rUa2L3iL1GCeDYL_6Ncq-hk_1731056412
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Sean, Oliver,
+Hi Oliver,
 
 On 11/7/24 21:12, Oliver Upton wrote:
 > On Thu, Nov 07, 2024 at 11:56:32AM -0800, Sean Christopherson wrote:
@@ -116,6 +116,13 @@ On 11/7/24 21:12, Oliver Upton wrote:
 >> I don't disagree, but I really, really don't want to add vm_dead().
 > It'd still be valuable to test that the VM is properly dead and
 > subsequent ioctls also return EIO, but I understand the hesitation.
+
+Currently the vgic_test does not check that the VM is dead, it just
+checks the first expected errno according to the uapi documentation.
+Besides AFAIK this latter has not been updated according to the new VM
+dead implementation.
+
+Eric
 >
 >>> IMO, the better approach would be to provide a helper that gives the
 >>> impression of freeing the VM but implicitly leaks it, paired with some
@@ -151,12 +158,6 @@ On 11/7/24 21:12, Oliver Upton wrote:
 > I'm assuming you want to take this, happy to grab it otherwise.
 >
 > Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
 >
 >>>> Marking a VM dead should be a _very_ rare event; it's not something that I think
 >>>> we should encourage, i.e. we shouldn't make it easier to deal with.  Ideally,
