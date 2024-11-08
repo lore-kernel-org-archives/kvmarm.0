@@ -1,380 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FB91CF7CE;
-	Fri,  8 Nov 2024 07:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EAA1DFE0D
+	for <kvmarm@lists.linux.dev>; Fri,  8 Nov 2024 08:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731052782; cv=none; b=Lswsq8eBe65qD0cyRo5C5eM0x16mmrzYmZ8fRVVbbzI++RzCtVnr5CyRrgoio+TZGJmdAjQJhj2ESnUnKQme7SI1JXZL3MCi6y9MCUJyJuXG5a9t9NZXn58g1XDojBJuQIB9AnulaZgw9Bl7IFeLyQsWzKdJmVoqquqWW/n7VCo=
+	t=1731056161; cv=none; b=LLzWqOuuHetMNqYmcveQ1wvUI6s4lBrH8UlXGV0XDwEZGt7aATV2BWJ4uG3x0uRaOmQ5RCSPr3qXvlRy23fVgK9j2aVK8ZSYvFdbD+NfJ837TvW8AWjbLewJqKZZfzw+7xIvHAMKIUkMi9nqiuH12Xym8/A0FKiIpqqjTlUqgUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731052782; c=relaxed/simple;
-	bh=EO7Z4zvCk/UsSG14xv8TEfSSfqqJKLfDfoNZA0RtGkI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=I4NqUTtpcddAwHcKP902/HtfGTzN72+rpWFj4tfH/G59lzWd2A3MeIpScjYRaSEtNRTZF/ZsKnGdF0WxmPdghQlGpdOXoy9DORgEJuGNwyQLjfA8vQJZ4QB57uBJ4kEHFhm4AzpJiwcEs6VqPxGX4vdVGodJPgHhKe9lMLq5gL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxQqzu6c; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731056161; c=relaxed/simple;
+	bh=RvjEnSoS2rKmQa4Vl1T9Yde1sARG3bd+J9ylnj5sE6Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VtI0ROMRk94k3mC2UNVi5wcd0PTAQSXWbqEqeQp+xk5ZAuXRsoihwOrQYXQEecI4y3CsEshsMieJJ6Oq0K2V0WkC3DNUDYKawLXUr2Vsxo7S7TBH+EO/C8qrzZNhqoPQ621n0luwsKyeZ6+jCcJwLivTNBQjGgimhSqgu9ButwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aGi8gbFw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxQqzu6c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C6AC4CECE;
-	Fri,  8 Nov 2024 07:59:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731052782;
-	bh=EO7Z4zvCk/UsSG14xv8TEfSSfqqJKLfDfoNZA0RtGkI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=bxQqzu6cUkfia6eaRqGS1gWAo0hY3k7lqFuouonM8f7aPCLIboaPkh/Ie4n/a405c
-	 cYynFFL3ou8C/GDnXLw3EY3JzQuLACMOF0GEqFNDuw80yaCgCInH8vdz0bJmKZO8rU
-	 kTLo2ZoKbYDfQYIQrxG8eI7DRUD+IRJxvAdY95ovYVMBAIUVZRi2SqzC5Qp7QEQ54E
-	 eooY/Bgj29zNV/Yl0QU8XUuC0klgl2A56QpSmj+q3rveyy8NGbdyUooVstW72F/wvL
-	 fXF481geV1tjFEPWDVnSqfo1iwes3+6IbwZG3sDn/Fl+vPreDWrhvGJoxUzChq2aJ7
-	 Tf/O4m+zrGJYw==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 4/4] arm64: mte: Use stage-2 NoTagAccess memory
- attribute if supported
-In-Reply-To: <87jzdst6os.wl-maz@kernel.org>
-References: <20241028094014.2596619-1-aneesh.kumar@kernel.org>
- <20241028094014.2596619-5-aneesh.kumar@kernel.org>
- <87o734ts4m.wl-maz@kernel.org> <yq5ar080cq5x.fsf@kernel.org>
- <87jzdst6os.wl-maz@kernel.org>
-Date: Fri, 08 Nov 2024 13:29:31 +0530
-Message-ID: <yq5a34k2rw9o.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aGi8gbFw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731056158;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p7+n19lrgiAJuEoskSWGxrEplWe5QxXbROOP/SEkcpY=;
+	b=aGi8gbFw1HsnhfaJKHkNSPrKaTDjx3iwChbFfGcwoCPlyFfnD1N8/9TpddLTu0EmZPQpNi
+	i0uPJAOGIeUq75sEzMv1hXpoVoq3u+quhDD9Gj0Kz+C0DnRgqoLMAehrhpxPsVv/uAbMnR
+	sJ/d51qhVYVA5QPapzGshXng8w974rM=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-UpT9V-NIM56K0quYvsgu1Q-1; Fri, 08 Nov 2024 03:55:57 -0500
+X-MC-Unique: UpT9V-NIM56K0quYvsgu1Q-1
+X-Mimecast-MFC-AGG-ID: UpT9V-NIM56K0quYvsgu1Q
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b15fa44522so211499885a.0
+        for <kvmarm@lists.linux.dev>; Fri, 08 Nov 2024 00:55:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731056157; x=1731660957;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p7+n19lrgiAJuEoskSWGxrEplWe5QxXbROOP/SEkcpY=;
+        b=rrPMw9wSFEWOJ6FHeUAxjWC2k9h6aYQDkq0e8zKv9uZ7q17/vUvzUsL54hQJFbGMwO
+         19jvcBa6kgOz6Mr+buyNGrzbhxToRGG7ZESMStopYNkMtPpZffF3vO1U/Qd0lU/ZK3f9
+         fXL87ky98yirW2gfHhMwBx7KNHPcZm9zOF18Fe7I5PAYux6wIBwEae27ZJ5ac4XsviyZ
+         YKHd82KmBrE+14Y+m4pSmTFja8ZPH5YxWRkxNibT1WifgCpXWPwl44zL6MN7bMIXcmJ6
+         kCwF/SvmzK6sDYS4hB9aqDTM+8oxTQqY+WtRbBoPl++s8B8FCSfWfXXN5oS4UvZXj87Q
+         eHww==
+X-Forwarded-Encrypted: i=1; AJvYcCXK2oAJauRI2/YzpOypT7dmfn2SBtFgGK0Cie1HQXhnrmFm9c4eRouV84tEwmPyABTUN5/Sb1U=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxsJYh0aNGa4hkPJkgbxFwVfkAIWk/0PiZoKmkXyrIsJ5w7ucny
+	KYqA0TTKFzV8dcnx1huu5K6DaqygWdGUPtMcL4NMZqMMZqEd50eM0F8jhsvW09f8RSowGzmp3Aq
+	/sy4z63SvK4BXZp40ChoHKdL8612eqWSglIO+pYgJ3hm/2bvQrocfkQ==
+X-Received: by 2002:a05:6214:588e:b0:6d1:7854:ab49 with SMTP id 6a1803df08f44-6d39e120d01mr23301256d6.11.1731056156713;
+        Fri, 08 Nov 2024 00:55:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEwRj/6Dr08Zq/2CalNmB2mzI7xIogqbu3h+dTo6AiUl7OKWmmmDoPSjhOiOzCp+l6bFoIZFg==
+X-Received: by 2002:a05:6214:588e:b0:6d1:7854:ab49 with SMTP id 6a1803df08f44-6d39e120d01mr23301066d6.11.1731056156395;
+        Fri, 08 Nov 2024 00:55:56 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d39643b982sm17009106d6.85.2024.11.08.00.55.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2024 00:55:55 -0800 (PST)
+Message-ID: <f241da92-6888-4171-9604-d72f78eb9829@redhat.com>
+Date: Fri, 8 Nov 2024 09:55:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 2/3] KVM: selftests: Introduce kvm_vm_dead_free
+To: Oliver Upton <oliver.upton@linux.dev>,
+ Sean Christopherson <seanjc@google.com>
+Cc: eric.auger.pro@gmail.com, broonie@kernel.org, maz@kernel.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, joey.gouly@arm.com,
+ shuah@kernel.org, pbonzini@redhat.com
+References: <20241107094000.70705-1-eric.auger@redhat.com>
+ <20241107094000.70705-3-eric.auger@redhat.com> <Zyz_KGtoXt0gnMM8@google.com>
+ <Zy0QFhFsICeNt8kF@linux.dev> <Zy0bcM0m-N18gAZz@google.com>
+ <Zy0fPgwymCdBwLd_@linux.dev>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <Zy0fPgwymCdBwLd_@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: OJqJmMA6G0EUsqayTmknGFbsL6RtlvHDVSPuI1wHhhY_1731056157
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi Sean, Oliver,
 
-Hi Marc,
+On 11/7/24 21:12, Oliver Upton wrote:
+> On Thu, Nov 07, 2024 at 11:56:32AM -0800, Sean Christopherson wrote:
+>> On Thu, Nov 07, 2024, Oliver Upton wrote:
+>>> On Thu, Nov 07, 2024 at 09:55:52AM -0800, Sean Christopherson wrote:
+>>>> On Thu, Nov 07, 2024, Eric Auger wrote:
+>>>>> In case a KVM_REQ_VM_DEAD request was sent to a VM, subsequent
+>>>>> KVM ioctls will fail and cause test failure. This now happens
+>>>>> with an aarch64 vgic test where the kvm_vm_free() fails. Let's
+>>>>> add a new kvm_vm_dead_free() helper that does all the deallocation
+>>>>> besides the KVM_SET_USER_MEMORY_REGION2 ioctl.
+>>>> Please no.  I don't want to bleed the kvm->vm_dead behavior all over selftests.
+>>>> The hack in __TEST_ASSERT_VM_VCPU_IOCTL() is there purely to provide users with
+>>>> a more helpful error message, it is most definitely not intended to be an "official"
+>>>> way to detect and react to the VM being dead.
+>>>>
+>>>> IMO, tests that intentionally result in a dead VM should assert that subsequent
+>>>> VM/vCPU ioctls return -EIO, and that's all.  Attempting to gracefully free
+>>>> resources adds complexity and pollutes the core selftests APIs, with very little
+>>>> benefit.
+>>> Encouraging tests to explicitly leak resources to fudge around assertions
+>>> in the selftests library seems off to me.
+>> I don't disagree, but I really, really don't want to add vm_dead().
+> It'd still be valuable to test that the VM is properly dead and
+> subsequent ioctls also return EIO, but I understand the hesitation.
+>
+>>> IMO, the better approach would be to provide a helper that gives the
+>>> impression of freeing the VM but implicitly leaks it, paired with some
+>>> reasoning for it.
+>> Actually, duh.  There's no need to manually delete KVM memslots for *any* VM,
+>> dead or alive.  Just skip that unconditionally when freeing the VM, and then the
+>> vGIC test just needs to assert on -EIO instead -ENXIO/-EBUSY.
+> Yeah, that'd tighten up the assertions a bit more to the exact ioctl
+> where we expect the VM to go sideways.
+>
+>> ---
+>> From: Sean Christopherson <seanjc@google.com>
+>> Date: Thu, 7 Nov 2024 11:39:59 -0800
+>> Subject: [PATCH] KVM: selftests: Don't bother deleting memslots in KVM when
+>>  freeing VMs
+>>
+>> When freeing a VM, don't call into KVM to manually remove each memslot,
+>> simply cleanup and free any userspace assets associated with the memory
+>> region.  KVM is ultimately responsible for ensuring kernel resources are
+>> freed when the VM is destroyed, deleting memslots one-by-one is
+>> unnecessarily slow, and unless a test is already leaking the VM fd, the
+>> VM will be destroyed when kvm_vm_release() is called.
+>>
+>> Not deleting KVM's memslot also allows cleaning up dead VMs without having
+>> to care whether or not the to-be-freed VM is dead or alive.
+> Can you add a comment to kvm_vm_free() about why we want to avoid ioctls
+> in that helper? It'd help discourage this situation from happening again
+> in the future in the unlikely case someone wants to park an ioctl there.
+>
+>> Reported-by: Eric Auger <eric.auger@redhat.com>
+>> Reported-by: Mark Brown <broonie@kernel.org>
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> I'm assuming you want to take this, happy to grab it otherwise.
+>
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-Sorry for the delay in response, I was looking at nested virt and
-migration changes so that I can get your feedback on those.
+Thanks
 
-Marc Zyngier <maz@kernel.org> writes:
-
-> On Mon, 28 Oct 2024 13:28:42 +0000,
-> Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
->>
->> Marc Zyngier <maz@kernel.org> writes:
->>
->> > On Mon, 28 Oct 2024 09:40:14 +0000,
->> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->> >>
->> >> Currently, the kernel won't start a guest if the MTE feature is enabled
->> >> and the guest RAM is backed by memory which doesn't support access tags.
->> >> Update this such that the kernel uses the NoTagAccess memory attribute
->> >> while mapping pages from VMAs for which MTE is not allowed. The fault
->> >> from accessing the access tags with such pages is forwarded to VMM so
->> >> that VMM can decide to kill the guest or remap the pages so that
->> >> access tag storage is allowed.
->> >
->> > I only have questions here:
->> >
->> > - what is the benefit of such approach? why shouldn't that be the
->> >   kernel's job to fix it?
->>
->>
->> IMHO leaving that policy decision to VMM makes the kernel changes
->> simpler. In most cases, VMM will kill the guest, because these
->> restrictions of MTE_ALLOWED are applied at the memslot/vma.
+Eric
 >
-> Where is that captured? The whole idea behind FEAT_MTE_PERM was that
-> it would be the hypervisor's task to lazily allocate MTE-capable
-> memory as tagged-access would occur.
->
-
-Lazily allocating MTE-capable memory requires changes to different
-kernel subsystems and previous attempts got dropped [1] because it
-was not clear whether the benefit of saving 3% memory overhead was worth
-the complexity we add to the kernel.
-
-This patchset is not looking at that feature. Instead, it can be used to
-enable MTE in configurations that currently won't allow MTE. One such
-example is libkrun which includes linux kernel as firmware in a
-dynamically linked library (libkrunfw). libkrun can insert the kernel
-region which got mmaped as part of the library load, directly into the
-guest memory map instead of copying the kernel. Such a guest config
-can't enable MTE currently even though we will never use the newly
-inserted memory regions as tag access memory.
-
-Similarly, virtiofs dax support can use a page cache region as
-virtio-shm region. We can use MTE_PERM to enable MTE in this config.
-
-[1] https://lore.kernel.org/all/20240125164256.4147-1-alexandru.elisei@arm.com/
-
->>
->> >
->> > - where is the documentation for this new userspace ABI?
->> >
->>
->> I will add the details if we agree that this should be a separate EXIT
->> as outlined in this patch.
->
-> Woooot??? This isn't a *DETAIL*. This is the very first thing you
-> should write. Everything *else* is an implementation detail.
->
->>
->> >
->> > - are you expecting the VMM to create a new memslot for this?
->> >
->>
->> I guess there are examples of configs where some memory regions are
->> backed by page cache where we don't directly use those memory regions as
->> allocatable memory in the guest. This change allows us to enable MTE in such
->> configs.
->
-> This doesn't answer my question. What is expected sequence a VMM
-> should apply to provide tagged memory to the guest?
->
->>
->> > - where is the example of a VMM using this?
->> >
->>
->> I do have changes to kvmtool which won't do any fixup on receiving that
->> VM exit. I expect other VMM to do the same by default when they get a
->> VM exit with an unknown exit_reason. So unless VMM wants to do any
->> special handling, we don't need any change in the VMM.
->
-> OK, so this has never been tested. I'm sorry, but for something of
-> this magnitude, with expected userspace interactions, and requiring
-> VMM handling, I want to see the full end-to-end thing.
->
->>
->>
->> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
->> index 3b95750ecec7..4760bad07476 100644
->> --- a/arm/kvm-cpu.c
->> +++ b/arm/kvm-cpu.c
->> @@ -239,6 +239,17 @@ static bool handle_memoryfault(struct kvm_cpu *vcpu)
->>  	return true;
->>  }
->>
->> +static bool handle_notag_access(struct kvm_cpu *vcpu)
->> +{
->> +	u64 gpa = vcpu->kvm_run->memory_fault.gpa;
->> +	u64 size = vcpu->kvm_run->memory_fault.size;
->> +
->> +	/* For now VMM just panic */
->> +	pr_err("Tag Access to a wrong memory region 0x%lx size 0x%lx\n",
->> +	       (unsigned long)gpa, (unsigned long)size);
->> +	return false;
->> +}
->> +
->>  bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
->>  {
->>  	switch (vcpu->kvm_run->exit_reason) {
->> @@ -246,6 +257,8 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
->>  		return handle_hypercall(vcpu);
->>  	case KVM_EXIT_MEMORY_FAULT:
->>  		return handle_memoryfault(vcpu);
->> +	case KVM_EXIT_ARM_NOTAG_ACCESS:
->> +		return handle_notag_access(vcpu);
->>  	}
->>
->>  	return false;
->> diff --git a/include/linux/kvm.h b/include/linux/kvm.h
->> index 32cff22f0e4d..deef6614f577 100644
->> --- a/include/linux/kvm.h
->> +++ b/include/linux/kvm.h
->> @@ -178,6 +178,7 @@ struct kvm_xen_exit {
->>  #define KVM_EXIT_NOTIFY           37
->>  #define KVM_EXIT_LOONGARCH_IOCSR  38
->>  #define KVM_EXIT_MEMORY_FAULT     39
->> +#define KVM_EXIT_ARM_NOTAG_ACCESS 40
->>
->>  /* For KVM_EXIT_INTERNAL_ERROR */
->>  /* Emulate instruction failed. */
->> @@ -429,10 +430,17 @@ struct kvm_run {
->>  		/* KVM_EXIT_MEMORY_FAULT */
->>  		struct {
->>  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
->> +#define KVM_MEMORY_EXIT_FLAG_NOTAGACCESS (1ULL << 4)
->>  			__u64 flags;
->>  			__u64 gpa;
->>  			__u64 size;
->>  		} memory_fault;
->> +  		/* KVM_EXIT_ARM_NOTAG_ACCESS */
->> +		struct {
->> +			__u64 flags;
->> +			__u64 gpa;
->> +			__u64 size;
->> +		} notag_access;
->>  		/* Fix the size of the union. */
->>  		char padding[256];
->>  	};
->>
->> >>
->> >> NOTE: We could also use KVM_EXIT_MEMORY_FAULT for this. I chose to
->> >> add a new EXIT type because this is arm64 specific exit type.
->> >>
->> >> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
->> >> ---
->> >>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
->> >>  arch/arm64/include/asm/kvm_pgtable.h |  1 +
->> >>  arch/arm64/kvm/hyp/pgtable.c         | 16 +++++++++++++---
->> >>  arch/arm64/kvm/mmu.c                 | 28 ++++++++++++++++++++++------
->> >>  include/uapi/linux/kvm.h             |  7 +++++++
->> >>  5 files changed, 48 insertions(+), 9 deletions(-)
->> >>
->> >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> >> index a601a9305b10..fa0149a0606a 100644
->> >> --- a/arch/arm64/include/asm/kvm_emulate.h
->> >> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> >> @@ -373,6 +373,11 @@ static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
->> >>  	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
->> >>  }
->> >>
->> >> +static inline bool kvm_vcpu_trap_is_tagaccess(const struct kvm_vcpu *vcpu)
->> >> +{
->> >> +	return !!(ESR_ELx_ISS2(kvm_vcpu_get_esr(vcpu)) & ESR_ELx_TagAccess);
->> >> +}
->> >> +
->> >>  static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
->> >>  {
->> >>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
->> >> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->> >> index 03f4c3d7839c..5657ac1998ad 100644
->> >> --- a/arch/arm64/include/asm/kvm_pgtable.h
->> >> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->> >> @@ -252,6 +252,7 @@ enum kvm_pgtable_prot {
->> >>
->> >>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
->> >>  	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
->> >> +	KVM_PGTABLE_PROT_NORMAL_NOTAGACCESS	= BIT(5),
->> >
->> > This seems wrong. NOTAGACCESS is a *permission*, not a memory type.
->> >
->>
->> Are you suggesting the name is wrong? The memory attribute value I
->> wanted to use is
->>
->> MemAttr[3:0] = 0b0100 which is Normal, NoTagAccess, writeback cacheable.
->>
->> I am following the changes similar to KVM_PGTABLE_PROT_NORMAL_NC.
->
-> But that's entirely different. This really isn't a memory type. Quite
-> the opposite, actually. This is a stage-2 permission setting, which
-> you are conflating with the actual memory type.
->
-> Also, I don't see why that should be incompatible with something other
-> than Normal memory.
+>>>> Marking a VM dead should be a _very_ rare event; it's not something that I think
+>>>> we should encourage, i.e. we shouldn't make it easier to deal with.  Ideally,
+>>>> use of kvm_vm_dead() should be limited to things like sev_vm_move_enc_context_from(),
+>>>> where KVM needs to prever accessing the source VM to protect the host.  IMO, the
+>>>> vGIC case and x86's enter_smm() are hacks.  E.g. I don't see any reason why the
+>>>> enter_smm() case can't synthesize a triple fault.
+>>> The VGIC case is at least better than the alternative of slapping
+>>> bandaids all over the shop to cope with a half-baked VM and ensure we
+>>> tear it down correctly. Userspace is far up shit creek at the point the
+>>> VM is marked as dead, so I don't see any value in hobbling along
+>>> afterwards.
+>> Again, I don't disagree, but I don't want to normalize shooting the VM on errors.
+> Definitely not. It is very much a break-glass situation where this is
+> even somewhat OK.
 >
 
-I am sorry that i am not able to follow you here. I am confused whether
-your feedback is related to the use of MemAttr[3:0] values or w.r.t
-the usage of KVM_PGTABLE_PROT_NORMAL_NOTAG_ACCESS. If you can explain
-more on how you would like to see the changes I can incorporate them in
-the next update.
-
->>
->> >
->> >>
->> >>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
->> >>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
->> >> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
->> >> index b11bcebac908..bc0d9f08c49a 100644
->> >> --- a/arch/arm64/kvm/hyp/pgtable.c
->> >> +++ b/arch/arm64/kvm/hyp/pgtable.c
->> >> @@ -677,9 +677,11 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->> >>  {
->> >>  	kvm_pte_t attr;
->> >>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
->> >> +	unsigned long prot_mask = KVM_PGTABLE_PROT_DEVICE |
->> >> +				  KVM_PGTABLE_PROT_NORMAL_NC |
->> >> +				  KVM_PGTABLE_PROT_NORMAL_NOTAGACCESS;
->> >>
->> >> -	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
->> >> -			KVM_PGTABLE_PROT_NORMAL_NC)) {
->> >> +	switch (prot & prot_mask) {
->> >>  	case KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC:
->> >>  		return -EINVAL;
->> >>  	case KVM_PGTABLE_PROT_DEVICE:
->> >> @@ -692,6 +694,12 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->> >>  			return -EINVAL;
->> >>  		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
->> >>  		break;
->> >> +	case KVM_PGTABLE_PROT_NORMAL_NOTAGACCESS:
->> >> +		if (system_supports_notagaccess())
->> >> +			attr = KVM_S2_MEMATTR(pgt, NORMAL_NOTAGACCESS);
->> >> +		else
->> >> +			return -EINVAL;
->> >> +		break;
->> >
->> > How do you see this working when migrating a VM from one host to
->> > another, one that supports FEAT_MTE_PERM and one that doesn't? The
->> > current assumptions are that the VMM will replay the *exact same*
->> > setup on the target host, and this obviously doesn't work.
->> >
->>
->> I missed looking at kvm migration. I guess I will have to expose this as
->> a capability and only allow migration if the target also supports the
->> same capability?
->
-> I don't think so. This doesn't affect the guest at all, as the guest
-> doesn't know anything about S2, unless you decide to expose
-> FEAT_MTE_PERM to NV.
->
-> It affects the VMM though, and that's because you are making a
-> difference in handling between having FEAT_MTE_PERM or not. Given that
-> this is invisible to userspace, that's not a great design.
->
-
-With migration, I guess i can prevent migration to a target that doesn't
-support FEAT_MTE_PERM by updating set_one_reg to check for the feature
-support. Something like this 
-
-modified   arch/arm64/kvm/sys_regs.c
-@@ -1514,7 +1514,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 				       const struct sys_reg_desc *r)
- {
- 	u32 id = reg_to_encoding(r);
--	u64 val;
-+	u64 val, mask;
-
- 	if (sysreg_visible_as_raz(vcpu, r))
- 		return 0;
-@@ -1529,8 +1529,10 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
- 		break;
- 	case SYS_ID_AA64PFR2_EL1:
--		/* We only expose FPMR */
--		val &= ID_AA64PFR2_EL1_FPMR;
-+		mask = ID_AA64PFR2_EL1_FPMR;
-+		if (system_supports_notagaccess())
-+			mask |= ID_AA64PFR2_EL1_MTEPERM;
-+		val &= mask;
- 		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
-@@ -2382,7 +2384,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
--	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
-+	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR |
-+					ID_AA64PFR2_EL1_MTEPERM),
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
-
-
-For nested virtualization, I guess it is useful to support this for
-nested guest. This implies L2 stage2 in L1 will have to support
-Normal,NoTagAccess attribute. ie,
-
-in L0 kvm, if the guest abort is on a nested smmu, then we walk the L2
-stage2 in L1 and see if the memory attribute is NoTagAccess. If yes
-we inject a s2 fault to L1. Do you agree this is a good design?
-
--aneesh
