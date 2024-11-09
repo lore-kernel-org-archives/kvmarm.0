@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C9C15539D
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 13:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A480013D50C
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 13:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731157989; cv=none; b=om9XfiPe28ODNTeC/kDBmxTaQH6r+FAJ47ahAIbzKTfTGGwuqv2SrW1G7ki1ubVQlFzfg5Yc57/VS6yRzllKozEwfbVhL0t9aEaRJMfdHkokepY+SLCeZq/cp+69ou1wpHId/qFyoKjGmLDh7AJ89k2lDeUreFf/tcUUikTYHC0=
+	t=1731158224; cv=none; b=WRcXLRTZSmgGQi32rNlvX2N1rd90px78OnxDrj1oq2T76kV8Gsco0fQHfuXGtMuHEnAIHMEfJw5BjZZuG4GDomY1Y29njQvKXKvYlGMdIcBsRjEw2yVMi3goQYPNtXxDaZsWmtfhK9KjSaQILKNw9e7bBsQ7i3UCrlnOiMhDYN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731157989; c=relaxed/simple;
-	bh=5Qz5v/QHBeOyQg1k0SjRDTG9PTXJnPGf5C5d8zypZeQ=;
+	s=arc-20240116; t=1731158224; c=relaxed/simple;
+	bh=PvsMKKCClU37zgRn+Zj7g/B/71pXYL7VIycTpWHQ2o4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i3okSIJPB+FfHjEXjArxU0U66b2Adk2ejiD7wR7KMZKWPuSNmFlD1KJZkguKELbzbFok8aMknNA9z3XTXovXoAc1vIbePk/+ruuSg9mxcpnJSylVJ6ITZ+ZtZFG5TiRyt3KnUz+b2zuu4Ga9FyMJH+dV0te+g0Pbt0X62XtBnOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3RLC6qX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=IM4m797LiBxskipydENJd1eSEhd+AMuF1NFcEyO+HTj9olLNmUiq0br5xzS9LT8vGwMMpxF6tkS7J9xdulXOkDI4BaidjMcwSkgjHkj4ZSE1aK2/YvPfsBcee231OW89D2BAb6ctEThBZiRQc5ohIIhx2eWeqdDNt0j6K/PlUH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZi1OaoA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3RLC6qX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC21C4CECE;
-	Sat,  9 Nov 2024 13:13:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZi1OaoA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C4CC4CECE;
+	Sat,  9 Nov 2024 13:17:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731157988;
-	bh=5Qz5v/QHBeOyQg1k0SjRDTG9PTXJnPGf5C5d8zypZeQ=;
+	s=k20201202; t=1731158224;
+	bh=PvsMKKCClU37zgRn+Zj7g/B/71pXYL7VIycTpWHQ2o4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b3RLC6qXqlITcHpF4EfA4Plo7tnNIgtufW7PNUdMBZe3oazTlhQEmWyJR1zgkWDU6
-	 d0+828p0Wp8l0nd9DSdhX+6THN4c6pGJTxWX0JeTf8HBwSx51MLinQFTgLihH76SAs
-	 on4f70dW2ZA+8sIOrBbGzMMZawRRHH7pFdJKztr0tcaUBMe9GRBx+W5SwK1oE6+pWC
-	 jRlMmtTO6Y0ynJo7l0E62eND6vyjI2GSAF5DpzNBfbmXljbYYc0oToLWC3bhb3KEUZ
-	 mFBJ4uO9iaodglTQ9YbkeG79ABtAvdjLOYgm/LD0H3dISaJmPqIa1y20LgtevtueoK
-	 Rq5dd06dRtYdg==
+	b=tZi1OaoAWz+hl3oZLGl45A9lNlQwzo/B7E7/imjzYl6z5LP3xSqFKKTlLJNOcBwLy
+	 RizvxYgSWRQLLe1qLYBkNI/Tp67YOD/1XDykgQ6pArI/cmmrmub30jG8/SbzEiI8Je
+	 iHI0HeP2EujIQw09E8KhlV6Ip4PCFiWwf8+iRSNdRFOqoLCe7OjLthmK0g++LGUZS5
+	 X2Xx3/nk25ikNWeMIJalSmT5d4KP9cf/mUJIOHa40L2MeNGbvMmIPokNQMTxifDWKQ
+	 2x7X/5flU+873mnhmMYu8U8wU92iIxhWBXhtcku3wIr3FvNEXX959uflCrlzWg03sP
+	 wXKxeqLJqoNLw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t9lH0-00BQjk-Ui;
-	Sat, 09 Nov 2024 13:13:07 +0000
-Date: Sat, 09 Nov 2024 13:13:06 +0000
-Message-ID: <86ttcgzh25.wl-maz@kernel.org>
+	id 1t9lKn-00BQmL-QW;
+	Sat, 09 Nov 2024 13:17:02 +0000
+Date: Sat, 09 Nov 2024 13:17:00 +0000
+Message-ID: <86ses0zgvn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,9 +43,11 @@ Cc: kvmarm@lists.linux.dev,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 00/15] KVM: arm64: Debug cleanups
-In-Reply-To: <20241108222418.1677420-1-oliver.upton@linux.dev>
+Subject: Re: [PATCH 09/15] KVM: arm64: Remove debug tracepoints
+In-Reply-To: <86zfm8zkbm.wl-maz@kernel.org>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
+	<20241108222418.1677420-10-oliver.upton@linux.dev>
+	<86zfm8zkbm.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,37 +63,47 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Nov 2024 22:24:04 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Sat, 09 Nov 2024 12:02:37 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> The debug code has become a bit difficult to reason about, especially
-> all the hacks and bandaids for state tracking + trap configuration.
+> Whilst you're at it, how about:
 > 
-> This series reworks the entire mess around using a single enumeration to
-> track the state of the debug registers (free, guest-owned, host-owned),
-> using that to drive trap configuration and save/restore.
+> diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
+> index 064a58c19f481..fa1e48a36d3f9 100644
+> --- a/arch/arm64/kvm/trace_handle_exit.h
+> +++ b/arch/arm64/kvm/trace_handle_exit.h
+> @@ -101,26 +101,6 @@ TRACE_EVENT(kvm_arm_set_dreg32,
+>  
+>  TRACE_DEFINE_SIZEOF(__u64);
+>  
+> -TRACE_EVENT(kvm_arm_set_regset,
+> -	TP_PROTO(const char *type, int len, __u64 *control, __u64 *value),
+> -	TP_ARGS(type, len, control, value),
+> -	TP_STRUCT__entry(
+> -		__field(const char *, name)
+> -		__field(int, len)
+> -		__array(u64, ctrls, 16)
+> -		__array(u64, values, 16)
+> -	),
+> -	TP_fast_assign(
+> -		__entry->name = type;
+> -		__entry->len = len;
+> -		memcpy(__entry->ctrls, control, len << 3);
+> -		memcpy(__entry->values, value, len << 3);
+> -	),
+> -	TP_printk("%d %s CTRL:%s VALUE:%s", __entry->len, __entry->name,
+> -		__print_array(__entry->ctrls, __entry->len, sizeof(__u64)),
+> -		__print_array(__entry->values, __entry->len, sizeof(__u64)))
+> -);
+> -
+>  TRACE_EVENT(trap_reg,
+>  	TP_PROTO(const char *fn, int reg, bool is_write, u64 write_value),
+>  	TP_ARGS(fn, reg, is_write, write_value),
 > 
-> On top of that, this series wires most of the implementation into vCPU
-> load/put rather than the main KVM_RUN loop. This has been a long time
-> coming for VHE, as a lot of the trap configuration and EL1 state gets
-> loaded into hardware at that point anyway.
-> 
-> The save/restore of the debug registers is simplified quite a bit as
-> well. KVM will now restore the registers for *any* access rather than
-> just writes, and keep doing so until the next vcpu_put() instead of
-> dropping it on the floor after the next exception.
+> It's not like we're going to miss that.
 
-Overall, I really like the shape of this. It is a great bit a
-refactoring, and while I left a few comments on the bits that I think
-can be improved, it is already a good candidate for 6.14.
-
-My only gripe is that it drops a fair bit of "documentation" without
-replacing it with something more current. Given the more "distributed"
-nature of the new code, having some sort of high-level description of
-the handling flow in debug.c would very much help (even it the outcome
-is a less impressive diffstat ;-).
-
-Thanks,
+Same thing for kvm_arm_set_dreg32(), by the way. Hopefully nobody will
+notice.
 
 	M.
 
