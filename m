@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A319B1547CE
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 12:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853D61925A2
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 12:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731153760; cv=none; b=X5jeA+OWbZMT1QkEMGjTIsDHTi6RsNbqQyujoHSHkxreUszQPj/MA0Z03wf13s0HZhTwYu1QfjrhCI/9asF0GKsyohNX5t9RgtohJt6aODsReVK7NUP7FVW1oIwavP7Ri7bH1BkU9rj/4wTpz0717toOT3mpJHTEzJNPjVt1MlE=
+	t=1731154303; cv=none; b=DfAWtaC6EODFJ/FdjKXzHviGADCFLh+f2tNhEf4cLfWLYHf/rxuZuwLVbtQWvTEr6kEimF/9W/MWauZ+oeB9TfJUAka1fga2zsRFD0QeIN+agsNB+CesU3mQmvLtjzd2Qz1Le2b0sTAtnyLb5/C5V/rwFe5Aqhov4u0PZ7zfTgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731153760; c=relaxed/simple;
-	bh=RrGMGlTTQJBPQObxreSdp9P+8C7T8hnZDUoT0Ig1KWs=;
+	s=arc-20240116; t=1731154303; c=relaxed/simple;
+	bh=XYT6rGZNuehtICp33Vb/mZkjchoOtuMOXfBFAUfXVvw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fDToKjcU9GjDgC0smQtKFTOVJZtEGdOkQUvRQ4mnQFDuXpdlovZKRdQHGqo4ZDEn2N0Y0vm9IfDMLuSl4/nkWtKF5Lub0DMj/Jf1kLQAOR+og8Bz0bYSHJ1n1qPq1eiAS+4JUWsLusISs9atO8kzZygCDVQ5dCA3WkcGxsgFsXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhy4C44n; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=kD8qkS+j+yJpksR3KBa/1lQp3bkj/X2F7/fPJUa2X/gmUx2ANlIugAaP45tTVESLC4RFr2aDw+iGDzEJzujOS8NhKVu+oNTR9GkjWHeF6ix1mimC/6kVKk8aVnD1CHjrw0dm/V9tt5Ec3ZqH3g3dlvu7Tw1TWkty0Mx59P8QZtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGp8AMUn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhy4C44n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B194C4CECE;
-	Sat,  9 Nov 2024 12:02:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGp8AMUn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D24C4CECE;
+	Sat,  9 Nov 2024 12:11:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731153760;
-	bh=RrGMGlTTQJBPQObxreSdp9P+8C7T8hnZDUoT0Ig1KWs=;
+	s=k20201202; t=1731154303;
+	bh=XYT6rGZNuehtICp33Vb/mZkjchoOtuMOXfBFAUfXVvw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fhy4C44nlcmBZR9XtlZtbDjS26fgFAEkYBXv3K4rZaNns65ptLUFPuPAP8wP3fAAs
-	 xm3KSZ5HOp441BV7TO9AvEyf88wya3ZGI1BPEOnNHMseh3oYlCcbF09ZYtTNuZpMnS
-	 QFG8M5Y9CcXfei5hrFJ9XY8eD/KUAOSodGDlHmQoYZjEqvLhECE3e0vm2b2cX0aYnU
-	 5d+WBQ5JIwgq+Q5MZ4jsgmq4MKf+ut8hcT03ITDAhlRyErGSdj2dzxuDd3UqZ0sUdY
-	 YaxyidrsbhHnwkK+F4wNrOfVWsxGJbHEMyzqSO3WNTocf03ImsrDhM60+S52xbXV3/
-	 xGp7Of6ZjN4sA==
+	b=tGp8AMUn3QfflR70UvU0DtZqpeYMHC0qsl4+IbmN2buUIVrtWZKM+ntBoWKGu1UT3
+	 BERBZeIN7t7SOriXXE47DUHHcUaCaFflx0VjPq2nC6ZGMUF7cI/37cjFFlBijbrJKZ
+	 mg0aa4CDzfRL5IkYEq44EWNXWzvY2t13AJHOsuUycyDzW1Sc2kUeE2+MVNzvgiSClY
+	 5F0wycLUh34TpA4BqzFXLl7nW4ovg551u+4EqOCXGwIWk/pbvoNx4N3XHbbUWeYXx2
+	 HRRaeZSBgpId86P6EibFvd+TqIpRjooX68FaspYxgtOBBu+wi3LinhLtTkhi3Djd9l
+	 PYhoWuwzAYQrw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t9kAo-00BPUV-9j;
-	Sat, 09 Nov 2024 12:02:38 +0000
-Date: Sat, 09 Nov 2024 12:02:37 +0000
-Message-ID: <86zfm8zkbm.wl-maz@kernel.org>
+	id 1t9kJX-00BPdW-SH;
+	Sat, 09 Nov 2024 12:11:40 +0000
+Date: Sat, 09 Nov 2024 12:11:39 +0000
+Message-ID: <86y11szjwk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,10 +43,10 @@ Cc: kvmarm@lists.linux.dev,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 09/15] KVM: arm64: Remove debug tracepoints
-In-Reply-To: <20241108222418.1677420-10-oliver.upton@linux.dev>
+Subject: Re: [PATCH 11/15] KVM: arm64: Use debug_owner to track if debug regs need save/restore
+In-Reply-To: <20241108222418.1677420-12-oliver.upton@linux.dev>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
-	<20241108222418.1677420-10-oliver.upton@linux.dev>
+	<20241108222418.1677420-12-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,137 +62,207 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Nov 2024 22:24:13 +0000,
+On Fri, 08 Nov 2024 22:24:15 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> The debug tracepoints are a useless firehose of information that track
-> implementation detail rather than well-defined events. These are going
-> to be rather difficult to uphold now that the implementation is getting
-> redone, so throw them out instead of bending over backwards.
+> Use the debug owner to determine if the debug regs are in use instead of
+> keeping around the DEBUG_DIRTY flag. Debug registers are now
+> saved/restored after the first trap, regardless of whether it was a read
+> or a write. This also shifts the point at which KVM becomes lazy to
+> vcpu_put() rather than the next exception taken from the guest.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/debug.c | 29 -----------------------------
->  1 file changed, 29 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h          |  4 +--
+>  arch/arm64/kvm/debug.c                     | 19 ++-----------
+>  arch/arm64/kvm/hyp/include/hyp/debug-sr.h  |  2 --
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  4 +--
+>  arch/arm64/kvm/sys_regs.c                  | 33 ----------------------
+>  5 files changed, 7 insertions(+), 55 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e0189a78d6e6..bb2bd722af56 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -917,8 +917,6 @@ struct kvm_vcpu_arch {
+>  #define EXCEPT_AA64_EL2_IRQ	__vcpu_except_flags(5)
+>  #define EXCEPT_AA64_EL2_FIQ	__vcpu_except_flags(6)
+>  #define EXCEPT_AA64_EL2_SERR	__vcpu_except_flags(7)
+> -/* Guest debug is live */
+> -#define DEBUG_DIRTY		__vcpu_single_flag(iflags, BIT(4))
+>  
+>  /* Physical CPU not in supported_cpus */
+>  #define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(0))
+> @@ -1356,6 +1354,8 @@ void kvm_handle_debug_access(struct kvm_vcpu *vcpu);
+>  	((vcpu)->arch.debug_owner != VCPU_DEBUG_FREE)
+>  #define kvm_host_owns_debug_regs(vcpu)		\
+>  	((vcpu)->arch.debug_owner == VCPU_DEBUG_HOST_OWNED)
+> +#define kvm_guest_owns_debug_regs(vcpu)		\
+> +	((vcpu)->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED)
+>  
+>  #define vcpu_debug_regs(vcpu)					\
+>  ({								\
 > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index c2bf1b296b14..66cf4e843b47 100644
+> index 075c340fc594..e131327ad01a 100644
 > --- a/arch/arm64/kvm/debug.c
 > +++ b/arch/arm64/kvm/debug.c
-> @@ -35,10 +35,6 @@ static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
->  	u64 val = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> @@ -85,15 +85,9 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+>  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDE;
 >  
->  	vcpu->arch.guest_debug_preserved.mdscr_el1 = val;
-> -
-> -	trace_kvm_arm_set_dreg32("Saved MDSCR_EL1",
-> -				vcpu->arch.guest_debug_preserved.mdscr_el1);
-> -
->  	vcpu->arch.guest_debug_preserved.pstate_ss =
->  					(*vcpu_cpsr(vcpu) & DBG_SPSR_SS);
->  }
-> @@ -49,9 +45,6 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
->  
->  	vcpu_write_sys_reg(vcpu, val, MDSCR_EL1);
->  
-> -	trace_kvm_arm_set_dreg32("Restored MDSCR_EL1",
-> -				vcpu_read_sys_reg(vcpu, MDSCR_EL1));
-> -
->  	if (vcpu->arch.guest_debug_preserved.pstate_ss)
->  		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
->  	else
-> @@ -102,8 +95,6 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->  	    !vcpu_get_flag(vcpu, DEBUG_DIRTY) ||
->  	    kvm_vcpu_os_lock_enabled(vcpu))
+>  	/*
+> -	 * Trap debug register access when one of the following is true:
+> -	 *  - Userspace is using the hardware to debug the guest
+> -	 *  (KVM_GUESTDBG_USE_HW is set).
+> -	 *  - The guest is not using debug (DEBUG_DIRTY clear).
+> -	 *  - The guest has enabled the OS Lock (debug exceptions are blocked).
+> +	 * Trap debug registers if the guest doesn't have ownership of them.
+>  	 */
+> -	if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW) ||
+> -	    !vcpu_get_flag(vcpu, DEBUG_DIRTY) ||
+> -	    kvm_vcpu_os_lock_enabled(vcpu))
+> +	if (!kvm_guest_owns_debug_regs(vcpu))
 >  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
-> -
-> -	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
 >  }
 >  
->  /**
-> @@ -201,8 +192,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> @@ -120,8 +114,7 @@ void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu)
+>   * debug related registers.
+>   *
+>   * Additionally, KVM only traps guest accesses to the debug registers if
+> - * the guest is not actively using them (see the DEBUG_DIRTY
+> - * flag on vcpu->arch.iflags).  Since the guest must not interfere
+> + * the guest is not actively using them. Since the guest must not interfere
+>   * with the hardware state when debugging the guest, we must ensure that
+>   * trapping is enabled whenever we are debugging the guest using the
+>   * debug registers.
+> @@ -190,8 +183,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  			mdscr |= DBG_MDSCR_MDE;
 >  			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
->  		}
 >  
-> -		trace_kvm_arm_set_dreg32("SPSR_EL2", *vcpu_cpsr(vcpu));
-> -
->  		/*
->  		 * HW Breakpoints and watchpoints
->  		 *
-> @@ -220,14 +209,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
->  			vcpu->arch.debug_ptr = &vcpu->arch.external_debug_state;
->  			vcpu_set_flag(vcpu, DEBUG_DIRTY);
->  
-> -			trace_kvm_arm_set_regset("BKPTS", get_num_brps(),
-> -						&vcpu->arch.debug_ptr->dbg_bcr[0],
-> -						&vcpu->arch.debug_ptr->dbg_bvr[0]);
-> -
-> -			trace_kvm_arm_set_regset("WAPTS", get_num_wrps(),
-> -						&vcpu->arch.debug_ptr->dbg_wcr[0],
-> -						&vcpu->arch.debug_ptr->dbg_wvr[0]);
+> -			vcpu_set_flag(vcpu, DEBUG_DIRTY);
 > -
 >  		/*
 >  		 * The OS Lock blocks debug exceptions in all ELs when it is
 >  		 * enabled. If the guest has enabled the OS Lock, constrain its
-> @@ -253,8 +234,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> @@ -207,10 +198,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> -	/* If KDE or MDE are set, perform a full save/restore cycle. */
+> -	if (vcpu_read_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
+> -		vcpu_set_flag(vcpu, DEBUG_DIRTY);
+> -
 >  	/* Write mdcr_el2 changes since vcpu_load on VHE systems */
 >  	if (has_vhe() && orig_mdcr_el2 != vcpu->arch.mdcr_el2)
 >  		write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> index acc47f77b3d0..1460e1923820 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> @@ -161,8 +161,6 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+>  
+>  	__debug_save_state(guest_dbg, guest_ctxt);
+>  	__debug_restore_state(host_dbg, host_ctxt);
 > -
-> -	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_read_sys_reg(vcpu, MDSCR_EL1));
+> -	vcpu_clear_flag(vcpu, DEBUG_DIRTY);
 >  }
 >  
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
-> @@ -282,14 +261,6 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
->  		 */
->  		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
->  			kvm_arm_reset_debug_ptr(vcpu);
-> -
-> -			trace_kvm_arm_set_regset("BKPTS", get_num_brps(),
-> -						&vcpu->arch.debug_ptr->dbg_bcr[0],
-> -						&vcpu->arch.debug_ptr->dbg_bvr[0]);
-> -
-> -			trace_kvm_arm_set_regset("WAPTS", get_num_wrps(),
-> -						&vcpu->arch.debug_ptr->dbg_wcr[0],
-> -						&vcpu->arch.debug_ptr->dbg_wvr[0]);
->  		}
+>  #endif /* __ARM64_KVM_HYP_DEBUG_SR_H__ */
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index a651c43ad679..a998b2f6abcb 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -283,7 +283,7 @@ static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
+>  	__vcpu_sys_reg(vcpu, DACR32_EL2) = read_sysreg(dacr32_el2);
+>  	__vcpu_sys_reg(vcpu, IFSR32_EL2) = read_sysreg(ifsr32_el2);
+>  
+> -	if (has_vhe() || vcpu_get_flag(vcpu, DEBUG_DIRTY))
+> +	if (has_vhe() || kvm_debug_regs_in_use(vcpu))
+>  		__vcpu_sys_reg(vcpu, DBGVCR32_EL2) = read_sysreg(dbgvcr32_el2);
+>  }
+>  
+> @@ -300,7 +300,7 @@ static inline void __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+>  	write_sysreg(__vcpu_sys_reg(vcpu, DACR32_EL2), dacr32_el2);
+>  	write_sysreg(__vcpu_sys_reg(vcpu, IFSR32_EL2), ifsr32_el2);
+>  
+> -	if (has_vhe() || vcpu_get_flag(vcpu, DEBUG_DIRTY))
+> +	if (has_vhe() || kvm_debug_regs_in_use(vcpu))
+>  		write_sysreg(__vcpu_sys_reg(vcpu, DBGVCR32_EL2), dbgvcr32_el2);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 3632a4b52cc7..6b0995754aa8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -621,40 +621,12 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
 >  	}
 >  }
+>  
+> -/*
+> - * We want to avoid world-switching all the DBG registers all the
+> - * time:
+> - *
+> - * - If we've touched any debug register, it is likely that we're
+> - *   going to touch more of them. It then makes sense to disable the
+> - *   traps and start doing the save/restore dance
+> - * - If debug is active (DBG_MDSCR_KDE or DBG_MDSCR_MDE set), it is
+> - *   then mandatory to save/restore the registers, as the guest
+> - *   depends on them.
+> - *
+> - * For this, we use a DIRTY bit, indicating the guest has modified the
+> - * debug registers, used as follow:
+> - *
+> - * On guest entry:
+> - * - If the dirty bit is set (because we're coming back from trapping),
+> - *   disable the traps, save host registers, restore guest registers.
+> - * - If debug is actively in use (DBG_MDSCR_KDE or DBG_MDSCR_MDE set),
+> - *   set the dirty bit, disable the traps, save host registers,
+> - *   restore guest registers.
+> - * - Otherwise, enable the traps
+> - *
+> - * On guest exit:
+> - * - If the dirty bit is set, save guest registers, restore host
+> - *   registers and clear the dirty bit. This ensure that the host can
+> - *   now use the debug registers.
+> - */
 
-Whilst you're at it, how about:
+Could you please write something which replaces this so that people
+can read the expected flow for debug registers? The handling is
+evidently spread across many layers, and having a central location for
+a bit of documentation would help.
 
-diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
-index 064a58c19f481..fa1e48a36d3f9 100644
---- a/arch/arm64/kvm/trace_handle_exit.h
-+++ b/arch/arm64/kvm/trace_handle_exit.h
-@@ -101,26 +101,6 @@ TRACE_EVENT(kvm_arm_set_dreg32,
- 
- TRACE_DEFINE_SIZEOF(__u64);
- 
--TRACE_EVENT(kvm_arm_set_regset,
--	TP_PROTO(const char *type, int len, __u64 *control, __u64 *value),
--	TP_ARGS(type, len, control, value),
--	TP_STRUCT__entry(
--		__field(const char *, name)
--		__field(int, len)
--		__array(u64, ctrls, 16)
--		__array(u64, values, 16)
--	),
--	TP_fast_assign(
--		__entry->name = type;
--		__entry->len = len;
--		memcpy(__entry->ctrls, control, len << 3);
--		memcpy(__entry->values, value, len << 3);
--	),
--	TP_printk("%d %s CTRL:%s VALUE:%s", __entry->len, __entry->name,
--		__print_array(__entry->ctrls, __entry->len, sizeof(__u64)),
--		__print_array(__entry->values, __entry->len, sizeof(__u64)))
--);
--
- TRACE_EVENT(trap_reg,
- 	TP_PROTO(const char *fn, int reg, bool is_write, u64 write_value),
- 	TP_ARGS(fn, reg, is_write, write_value),
+>  static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+>  {
+>  	access_rw(vcpu, p, r);
+>  	if (p->is_write)
+> -		vcpu_set_flag(vcpu, DEBUG_DIRTY);
+>
+>  	kvm_handle_debug_access(vcpu);
 
-It's not like we're going to miss that.
+Something has gone wrong here, and I don't think you wanted to make
+the ownership conditional on the access being only a write.
+
+>  	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
+> @@ -667,9 +639,6 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+>   *
+>   * A 32 bit write to a debug register leave top bits alone
+>   * A 32 bit read from a debug register only returns the bottom bits
+> - *
+> - * All writes will set the DEBUG_DIRTY flag to ensure the hyp code
+> - * switches between host and guest values in future.
+>   */
+>  static void reg_to_dbg(struct kvm_vcpu *vcpu,
+>  		       struct sys_reg_params *p,
+> @@ -684,8 +653,6 @@ static void reg_to_dbg(struct kvm_vcpu *vcpu,
+>  	val &= ~mask;
+>  	val |= (p->regval & (mask >> shift)) << shift;
+>  	*dbg_reg = val;
+> -
+> -	vcpu_set_flag(vcpu, DEBUG_DIRTY);
+>  }
+>  
+>  static void dbg_to_reg(struct kvm_vcpu *vcpu,
 
 Thanks,
 
