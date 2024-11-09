@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1E4433BB
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 11:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C41612F5B1
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 11:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731152828; cv=none; b=og9rOVXmCcXQ7g7Bi42qKy3ONrDkkE4Wvje5UtOs0MU7G/OeSx7CGeG9FTzOTpfm5ydkJduGcXRHTwuZDgm0z58HP1nbkezlC74FN/Ks43rU3MtVTVLc6cvZM+c2w3c0HZw+JufqxwI/FpEYhKuSbK8hB8mSc9SCaqT3j4tqef4=
+	t=1731153469; cv=none; b=tnTw/VniAfnp6EFkB75vUBf285h4ST20pVAKgRgPtmd7HkAxsYYAeHfJWB7dZGZX1wdl5LQWfB4wv8SFhJL9wIbRqbLeVO5q2ppfPd0ZpkkiPFljkYBSRVa7/rkM8qlZqKqsP8iiiVZpUSpWR6nNdBINHPAPBe7/nvuHVphmrJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731152828; c=relaxed/simple;
-	bh=mWpL6bTacBg5qEwCm7HNC2ORnav7P1sXXoUaF9ur11g=;
+	s=arc-20240116; t=1731153469; c=relaxed/simple;
+	bh=/pKqotiNG18b73RV6gOYJNlreafs0VEOHaFFJT4FIY8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gUZ0GTvLiiIHQyuYAcW9z9VwMDRTTENAnzdayS06fiY8oNNO+cDC8zk4qUDVgoKVg/SCB+JOj2Dy3UB6ULtqtYHjUkWD1DdyMp67YP7fQpYJBt6/O1iPcxVAo/+cjRySqcwgA8fPQcsqVBjQpWteY0RBv/xMB5JAd9BgbIKhWIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHwrjnq3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CNKR1uHsDTLHOjB8tOcK9EfD1EVO2TZQGRZJjkM+tTYBE6hwrPDUYNAipCtDy4u6Ttpb+2gxRu87ii3ympE5D9cN1W6EPMkaN0DDrLFRmiLMZ0j2534FKAmQbik5EGZz/O1ve0RsrNqYZetSYILIJeZEm1AGEGddmAm2HEtMZfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqwlAp94; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHwrjnq3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FD0C4CECE;
-	Sat,  9 Nov 2024 11:47:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqwlAp94"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E65D6C4CECE;
+	Sat,  9 Nov 2024 11:57:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731152827;
-	bh=mWpL6bTacBg5qEwCm7HNC2ORnav7P1sXXoUaF9ur11g=;
+	s=k20201202; t=1731153468;
+	bh=/pKqotiNG18b73RV6gOYJNlreafs0VEOHaFFJT4FIY8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QHwrjnq3g0B1rq5gIqSEHUHz+j19JKdkgV0RcdvWLTAt954PbvU1dUjG1c8WVdQ9U
-	 pOsEubRnlEf6IAoxEM3X1mzdybr/othQ1bmpe/0OeFxM92RdPokcbj715PoPMoc6mY
-	 VHh268xMpN3n6ykyFG4w47X2KLcgJ4zqqDTBoPAjlbFlBroHCEBragQsGcHXpKgnyM
-	 JTvwhbiOmCJvrQsFmBlb47sGRkF3kkgf4L1p0My0o3eqHHa4sN4BYxhtr/lte6Qdo2
-	 BpkVeGijBnDOX3BZOLxoMOwGj5ivFV72zLF0Y9a9hKoM0cEsU+1E5ofUv6EBPZYY4/
-	 yjw4n+x0LZQ6w==
+	b=hqwlAp94wJD4Icgofgr8LVAO4L9n7WeMw/o7vjeYioaHVEPCQ5ftAnfn6JYLiTimC
+	 rSyaWs6mqM+rMoSiclTVAu+usiEVN/nF+7cFS9onALSEp5aXw64u8odgr3dwlVPedu
+	 fQEiSRVOVpBtPruC1PFRz/YdxxNMD0E48B7dvhl64TJvCxVWhncjIPElEKweppGzta
+	 0KR1dw/uYnShjXcOtMVqk4mawxTDQrm2lGTcq0/ZUFEhL978CjFDXQzFb/yRtIXzWv
+	 dyh2VSalIYHbhFKhlvBwytnu5jPoL4frjhahiq+3UNvhSyioxO/ZQcKSlAtIrp/jn3
+	 aPxOwAgDeZ2cA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t9jvl-00BPOI-NU;
-	Sat, 09 Nov 2024 11:47:05 +0000
-Date: Sat, 09 Nov 2024 11:47:04 +0000
-Message-ID: <8634k01vev.wl-maz@kernel.org>
+	id 1t9k66-00BPSF-PL;
+	Sat, 09 Nov 2024 11:57:46 +0000
+Date: Sat, 09 Nov 2024 11:57:46 +0000
+Message-ID: <861pzk1ux1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,10 +43,10 @@ Cc: kvmarm@lists.linux.dev,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 06/15] KVM: arm64: Advance debug_owner state machine for sysreg traps
-In-Reply-To: <20241108222418.1677420-7-oliver.upton@linux.dev>
+Subject: Re: [PATCH 08/15] KVM: arm64: Select debug state to save/restore based on debug owner
+In-Reply-To: <20241108222418.1677420-9-oliver.upton@linux.dev>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
-	<20241108222418.1677420-7-oliver.upton@linux.dev>
+	<20241108222418.1677420-9-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,57 +62,99 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Nov 2024 22:24:10 +0000,
+On Fri, 08 Nov 2024 22:24:12 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Preserve lazy restore of the breakpoint/watchpoint registers by updating
-> the debug owner after the first trap, assuming the host isn't using
-> them.
+> Select the set of debug registers to use based on the owner rather than
+> relying on debug_ptr.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 1 +
->  arch/arm64/kvm/debug.c            | 9 +++++++++
->  arch/arm64/kvm/sys_regs.c         | 2 ++
->  3 files changed, 12 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h         | 21 +++++++++++++++++++++
+>  arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  8 ++++----
+>  2 files changed, 25 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f954b082dc4f..d76e4e44b65b 100644
+> index d76e4e44b65b..2d9aee66d5d4 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1352,6 +1352,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
-> +void kvm_handle_debug_access(struct kvm_vcpu *vcpu);
->  
+> @@ -1357,9 +1357,30 @@ void kvm_handle_debug_access(struct kvm_vcpu *vcpu);
 >  #define kvm_vcpu_os_lock_enabled(vcpu)		\
 >  	(!!(__vcpu_sys_reg(vcpu, OSLSR_EL1) & OSLSR_EL1_OSLK))
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index e2798a4eec47..c2bf1b296b14 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -336,3 +336,12 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
->  			vcpu->arch.debug_owner = VCPU_DEBUG_FREE;
->  	}
->  }
-> +
-> +void kvm_handle_debug_access(struct kvm_vcpu *vcpu)
-> +{
-> +	if (kvm_host_owns_debug_regs(vcpu))
-> +		return;
-> +
-> +	WARN_ON_ONCE(vcpu->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED);
-> +	vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
-> +}
+>  
+> +#define kvm_debug_regs_in_use(vcpu)		\
+> +	((vcpu)->arch.debug_owner != VCPU_DEBUG_FREE)
+>  #define kvm_host_owns_debug_regs(vcpu)		\
+>  	((vcpu)->arch.debug_owner == VCPU_DEBUG_HOST_OWNED)
+>  
+> +#define vcpu_debug_regs(vcpu)					\
+> +({								\
+> +	struct kvm_guest_debug_arch *__d;			\
+> +								\
+> +	switch ((vcpu)->arch.debug_owner) {			\
+> +	case VCPU_DEBUG_FREE:					\
+> +		WARN_ON_ONCE(1);				\
+> +		fallthrough;					\
+> +	case VCPU_DEBUG_GUEST_OWNED:				\
+> +		__d = &(vcpu)->arch.vcpu_debug_state;		\
+> +		break;						\
+> +	case VCPU_DEBUG_HOST_OWNED:				\
+> +		__d = &(vcpu)->arch.external_debug_state;	\
+> +		break;						\
+> +	}							\
+> +								\
+> +	__d;							\
+> +})
 
-I think it would make more sense to merge this patch with the previous
-one, so that we get a better idea of the ownership flow before getting
-in the meat of the debug surgery.
+Any particular reason why this can't be an actual function? Or at
+least a function taking a kvm_ vcpu_arch as a parameter, and a
+preprocessor wrapper for the vcpu->arch pointer chasing?
 
-Another thing is that kvm_handle_debug_access() is very generic and
-doesn't quite says what this does. How about something such as
-kvm_debug_set_guest_ownership(), or any variation on the same theme?
+> +
+>  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+>  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> index d00093699aaf..acc47f77b3d0 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> @@ -132,13 +132,13 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
+>  	struct kvm_guest_debug_arch *host_dbg;
+>  	struct kvm_guest_debug_arch *guest_dbg;
+>  
+> -	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
+> +	if (!kvm_debug_regs_in_use(vcpu))
+>  		return;
+>  
+>  	host_ctxt = host_data_ptr(host_ctxt);
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = host_data_ptr(host_debug_state.regs);
+> -	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> +	guest_dbg = vcpu_debug_regs(vcpu);
+
+One thing you may want to note in the commit log is that this also
+allows us to drop a couple of kern_hyp_va() instances, which is always
+a good thing.
+
+>  
+>  	__debug_save_state(host_dbg, host_ctxt);
+>  	__debug_restore_state(guest_dbg, guest_ctxt);
+> @@ -151,13 +151,13 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+>  	struct kvm_guest_debug_arch *host_dbg;
+>  	struct kvm_guest_debug_arch *guest_dbg;
+>  
+> -	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
+> +	if (!kvm_debug_regs_in_use(vcpu))
+>  		return;
+>  
+>  	host_ctxt = host_data_ptr(host_ctxt);
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = host_data_ptr(host_debug_state.regs);
+> -	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> +	guest_dbg = vcpu_debug_regs(vcpu);
+>  
+>  	__debug_save_state(guest_dbg, guest_ctxt);
+>  	__debug_restore_state(host_dbg, host_ctxt);
 
 Thanks,
 
