@@ -1,111 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A480013D50C
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 13:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7227329CF4
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 17:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731158224; cv=none; b=WRcXLRTZSmgGQi32rNlvX2N1rd90px78OnxDrj1oq2T76kV8Gsco0fQHfuXGtMuHEnAIHMEfJw5BjZZuG4GDomY1Y29njQvKXKvYlGMdIcBsRjEw2yVMi3goQYPNtXxDaZsWmtfhK9KjSaQILKNw9e7bBsQ7i3UCrlnOiMhDYN8=
+	t=1731172111; cv=none; b=ndshRRrHR2arTpwtLXbZxpqLWrzmAHZ+ttzljXfWN1m0UMWay7YcJR0BwRDo6FkEccJpyD5VzcOCzW4Us5hi67ehbbGwULSi4/kQcgCafaHzu7udiD452V1D+FDm8yweg2nbq993s83Mmx0yJAC9p4Op7B0+yKV3w5O8pCkOnCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731158224; c=relaxed/simple;
-	bh=PvsMKKCClU37zgRn+Zj7g/B/71pXYL7VIycTpWHQ2o4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IM4m797LiBxskipydENJd1eSEhd+AMuF1NFcEyO+HTj9olLNmUiq0br5xzS9LT8vGwMMpxF6tkS7J9xdulXOkDI4BaidjMcwSkgjHkj4ZSE1aK2/YvPfsBcee231OW89D2BAb6ctEThBZiRQc5ohIIhx2eWeqdDNt0j6K/PlUH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZi1OaoA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731172111; c=relaxed/simple;
+	bh=VFcncVr6m9WORTh/2XCweEC7Cx30pprMlvIkjoGWmbE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MGft5kKOUamQaXBncT8S0i8K7O1OaNHEjxcNHzC2H6IHBETukyYXellWIC8Gf6bqHwKljzZVw5zNKzqjpREWcdA1t65OUjZ4LGoEWojm1YshAHgr2OZzG4ncP62ghVJYnCUaMoSTTQO2+F1Aa97yIBqb+hwew4xRR/TMjo5w3rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xIxgNxqG; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZi1OaoA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C4CC4CECE;
-	Sat,  9 Nov 2024 13:17:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731158224;
-	bh=PvsMKKCClU37zgRn+Zj7g/B/71pXYL7VIycTpWHQ2o4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tZi1OaoAWz+hl3oZLGl45A9lNlQwzo/B7E7/imjzYl6z5LP3xSqFKKTlLJNOcBwLy
-	 RizvxYgSWRQLLe1qLYBkNI/Tp67YOD/1XDykgQ6pArI/cmmrmub30jG8/SbzEiI8Je
-	 iHI0HeP2EujIQw09E8KhlV6Ip4PCFiWwf8+iRSNdRFOqoLCe7OjLthmK0g++LGUZS5
-	 X2Xx3/nk25ikNWeMIJalSmT5d4KP9cf/mUJIOHa40L2MeNGbvMmIPokNQMTxifDWKQ
-	 2x7X/5flU+873mnhmMYu8U8wU92iIxhWBXhtcku3wIr3FvNEXX959uflCrlzWg03sP
-	 wXKxeqLJqoNLw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t9lKn-00BQmL-QW;
-	Sat, 09 Nov 2024 13:17:02 +0000
-Date: Sat, 09 Nov 2024 13:17:00 +0000
-Message-ID: <86ses0zgvn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xIxgNxqG"
+Date: Sat, 9 Nov 2024 09:08:13 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731172106;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uBErlaZH4eLbiT21NRCIM95KdknptBKYu6n86nNj/ow=;
+	b=xIxgNxqGMHOz0Z7bDWpRKwF639Qqt+UaxfWh8U9c7tejHtPUReqfX6dPTLMesZE22d1b48
+	ZKwP+upy1qlQm5pEQ8zvZlWcfHTYTr/+69KZTgaOLjffqVljKh9/inonCMyfoajtr1TwHF
+	iwodFVaiRpwHXSjmv5nPFoJTSTCCdlo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 09/15] KVM: arm64: Remove debug tracepoints
-In-Reply-To: <86zfm8zkbm.wl-maz@kernel.org>
+Subject: Re: [PATCH 00/15] KVM: arm64: Debug cleanups
+Message-ID: <Zy-W_Wpj_ZnFK4C7@linux.dev>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
-	<20241108222418.1677420-10-oliver.upton@linux.dev>
-	<86zfm8zkbm.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <86ttcgzh25.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ttcgzh25.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 09 Nov 2024 12:02:37 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Sat, Nov 09, 2024 at 01:13:06PM +0000, Marc Zyngier wrote:
+> On Fri, 08 Nov 2024 22:24:04 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > The debug code has become a bit difficult to reason about, especially
+> > all the hacks and bandaids for state tracking + trap configuration.
+> > 
+> > This series reworks the entire mess around using a single enumeration to
+> > track the state of the debug registers (free, guest-owned, host-owned),
+> > using that to drive trap configuration and save/restore.
+> > 
+> > On top of that, this series wires most of the implementation into vCPU
+> > load/put rather than the main KVM_RUN loop. This has been a long time
+> > coming for VHE, as a lot of the trap configuration and EL1 state gets
+> > loaded into hardware at that point anyway.
+> > 
+> > The save/restore of the debug registers is simplified quite a bit as
+> > well. KVM will now restore the registers for *any* access rather than
+> > just writes, and keep doing so until the next vcpu_put() instead of
+> > dropping it on the floor after the next exception.
 > 
-> Whilst you're at it, how about:
+> Overall, I really like the shape of this. It is a great bit a
+> refactoring, and while I left a few comments on the bits that I think
+> can be improved, it is already a good candidate for 6.14.
 > 
-> diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
-> index 064a58c19f481..fa1e48a36d3f9 100644
-> --- a/arch/arm64/kvm/trace_handle_exit.h
-> +++ b/arch/arm64/kvm/trace_handle_exit.h
-> @@ -101,26 +101,6 @@ TRACE_EVENT(kvm_arm_set_dreg32,
->  
->  TRACE_DEFINE_SIZEOF(__u64);
->  
-> -TRACE_EVENT(kvm_arm_set_regset,
-> -	TP_PROTO(const char *type, int len, __u64 *control, __u64 *value),
-> -	TP_ARGS(type, len, control, value),
-> -	TP_STRUCT__entry(
-> -		__field(const char *, name)
-> -		__field(int, len)
-> -		__array(u64, ctrls, 16)
-> -		__array(u64, values, 16)
-> -	),
-> -	TP_fast_assign(
-> -		__entry->name = type;
-> -		__entry->len = len;
-> -		memcpy(__entry->ctrls, control, len << 3);
-> -		memcpy(__entry->values, value, len << 3);
-> -	),
-> -	TP_printk("%d %s CTRL:%s VALUE:%s", __entry->len, __entry->name,
-> -		__print_array(__entry->ctrls, __entry->len, sizeof(__u64)),
-> -		__print_array(__entry->values, __entry->len, sizeof(__u64)))
-> -);
-> -
->  TRACE_EVENT(trap_reg,
->  	TP_PROTO(const char *fn, int reg, bool is_write, u64 write_value),
->  	TP_ARGS(fn, reg, is_write, write_value),
-> 
-> It's not like we're going to miss that.
+> My only gripe is that it drops a fair bit of "documentation" without
+> replacing it with something more current. Given the more "distributed"
+> nature of the new code, having some sort of high-level description of
+> the handling flow in debug.c would very much help (even it the outcome
+> is a less impressive diffstat ;-).
 
-Same thing for kvm_arm_set_dreg32(), by the way. Hopefully nobody will
-notice.
+Thanks for reviewing it. I should've made mention about it in the cover
+letter, but I dumped a lot of the existing documentation because I found
+it to be rambly and actually make things _less_ clear.
 
-	M.
+But I agree, a centralized description of what's going on would be
+useful.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
