@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BBE15B99D
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 11:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1E4433BB
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 11:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731152358; cv=none; b=a3Nxs6f+I9SvXv2dxI5Qy58q6qsos5lYB8PhGXGv7e7+v4J9gZRitz6zU4OFCvDAw6k/C3c4QlfPACKuMT2B2JOcyC7/agFQ4wQnh7heKxJ+dzF9mwGnH5SYGVUk0Hi+ZEYBJW6LTKvew0ONd2RDgHX4F9N7QuXTIw1smaA0/6w=
+	t=1731152828; cv=none; b=og9rOVXmCcXQ7g7Bi42qKy3ONrDkkE4Wvje5UtOs0MU7G/OeSx7CGeG9FTzOTpfm5ydkJduGcXRHTwuZDgm0z58HP1nbkezlC74FN/Ks43rU3MtVTVLc6cvZM+c2w3c0HZw+JufqxwI/FpEYhKuSbK8hB8mSc9SCaqT3j4tqef4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731152358; c=relaxed/simple;
-	bh=9C6wmKbdkMEODrhrzMJfQSzA+27ApMwteIoNP5uCXx4=;
+	s=arc-20240116; t=1731152828; c=relaxed/simple;
+	bh=mWpL6bTacBg5qEwCm7HNC2ORnav7P1sXXoUaF9ur11g=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k/U2hmnwKLMa5zWCmKpxfaA33NwLullSU0qEl9tLTFJBySNCOXhvGYDqZyD3oLaA0Zg1FqbN8Zz0xOm2zBwQnQ59T6Rb0SB0S3g4jDGPKQaEx6zHR31zyH4IehLWDry60+ywPfdqjG+skXxLrqGYFKYm3VCfqnFFwVJzQoCQk1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OwwmVnoE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=gUZ0GTvLiiIHQyuYAcW9z9VwMDRTTENAnzdayS06fiY8oNNO+cDC8zk4qUDVgoKVg/SCB+JOj2Dy3UB6ULtqtYHjUkWD1DdyMp67YP7fQpYJBt6/O1iPcxVAo/+cjRySqcwgA8fPQcsqVBjQpWteY0RBv/xMB5JAd9BgbIKhWIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHwrjnq3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OwwmVnoE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF1D4C4CECE;
-	Sat,  9 Nov 2024 11:39:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHwrjnq3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FD0C4CECE;
+	Sat,  9 Nov 2024 11:47:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731152358;
-	bh=9C6wmKbdkMEODrhrzMJfQSzA+27ApMwteIoNP5uCXx4=;
+	s=k20201202; t=1731152827;
+	bh=mWpL6bTacBg5qEwCm7HNC2ORnav7P1sXXoUaF9ur11g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OwwmVnoEUwfT3h0EfQ7z7zViKno8kC7mcUo89ZGsXALT8vUtEt/gJVR1024OuzTxc
-	 8BMnoOdC1Zoqq7TIMfQoN7RO7BS0wWIHPppXAmn9P0jZWIDfdmRf5JjJZiNACnJdlt
-	 0qul4LbdAjpkPYK2BSmmrY2pD60a3e3hsqE2Y5spu1oBmXjr67rXjQN2ENsx2lzAZa
-	 D/koQFuyn2HR363il6ouY4rv4T5B+U6UawwpdnIMO+dzqdcpSUaK12tA2OqVymRC/p
-	 KbwI0QfkCs4sKar3dqjuAMHFl1yLyFkmSgR61FHziY9NMiBeGDVV5o1pbfGCwiHYUa
-	 DMihKZEFmrlQg==
+	b=QHwrjnq3g0B1rq5gIqSEHUHz+j19JKdkgV0RcdvWLTAt954PbvU1dUjG1c8WVdQ9U
+	 pOsEubRnlEf6IAoxEM3X1mzdybr/othQ1bmpe/0OeFxM92RdPokcbj715PoPMoc6mY
+	 VHh268xMpN3n6ykyFG4w47X2KLcgJ4zqqDTBoPAjlbFlBroHCEBragQsGcHXpKgnyM
+	 JTvwhbiOmCJvrQsFmBlb47sGRkF3kkgf4L1p0My0o3eqHHa4sN4BYxhtr/lte6Qdo2
+	 BpkVeGijBnDOX3BZOLxoMOwGj5ivFV72zLF0Y9a9hKoM0cEsU+1E5ofUv6EBPZYY4/
+	 yjw4n+x0LZQ6w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t9joB-00BPMV-N1;
-	Sat, 09 Nov 2024 11:39:15 +0000
-Date: Sat, 09 Nov 2024 11:39:15 +0000
-Message-ID: <864j4g1vrw.wl-maz@kernel.org>
+	id 1t9jvl-00BPOI-NU;
+	Sat, 09 Nov 2024 11:47:05 +0000
+Date: Sat, 09 Nov 2024 11:47:04 +0000
+Message-ID: <8634k01vev.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,10 +43,10 @@ Cc: kvmarm@lists.linux.dev,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 04/15] KVM: arm64: Move host SME/SVE tracking flags to host data
-In-Reply-To: <20241108222418.1677420-5-oliver.upton@linux.dev>
+Subject: Re: [PATCH 06/15] KVM: arm64: Advance debug_owner state machine for sysreg traps
+In-Reply-To: <20241108222418.1677420-7-oliver.upton@linux.dev>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
-	<20241108222418.1677420-5-oliver.upton@linux.dev>
+	<20241108222418.1677420-7-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,77 +62,59 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Nov 2024 22:24:08 +0000,
+On Fri, 08 Nov 2024 22:24:10 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> The SME/SVE state tracking flags have no business in the vCPU. Move them
-> to kvm_host_data.
+> Preserve lazy restore of the breakpoint/watchpoint registers by updating
+> the debug owner after the first trap, assuming the host isn't using
+> them.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 25 ++++++++++++-------------
->  arch/arm64/kvm/fpsimd.c           | 12 ++++++------
->  2 files changed, 18 insertions(+), 19 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 1 +
+>  arch/arm64/kvm/debug.c            | 9 +++++++++
+>  arch/arm64/kvm/sys_regs.c         | 2 ++
+>  3 files changed, 12 insertions(+)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 07da4129f1d1..cf5cdc468aa4 100644
+> index f954b082dc4f..d76e4e44b65b 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -610,8 +610,10 @@ struct cpu_sve_state {
->   * field.
->   */
->  struct kvm_host_data {
-> -#define KVM_HOST_DATA_FLAG_HAS_SPE	0
-> -#define KVM_HOST_DATA_FLAG_HAS_TRBE	1
-> +#define KVM_HOST_DATA_FLAG_HAS_SPE			0
-> +#define KVM_HOST_DATA_FLAG_HAS_TRBE			1
-> +#define KVM_HOST_DATA_FLAG_HOST_SVE_ENABLED		2
-> +#define KVM_HOST_DATA_FLAG_HOST_SME_ENABLED		3
->  	unsigned long flags;
+> @@ -1352,6 +1352,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
+> +void kvm_handle_debug_access(struct kvm_vcpu *vcpu);
 >  
->  	struct kvm_cpu_context host_ctxt;
-> @@ -916,22 +918,18 @@ struct kvm_vcpu_arch {
->  /* Guest debug is live */
->  #define DEBUG_DIRTY		__vcpu_single_flag(iflags, BIT(4))
->  
-> -/* SVE enabled for host EL0 */
-> -#define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-> -/* SME enabled for EL0 */
-> -#define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
->  /* Physical CPU not in supported_cpus */
-> -#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
-> +#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(0))
->  /* WFIT instruction trapped */
-> -#define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
-> +#define IN_WFIT			__vcpu_single_flag(sflags, BIT(1))
->  /* vcpu system registers loaded on physical CPU */
-> -#define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
-> +#define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(2))
->  /* Software step state is Active-pending */
-> -#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
-> +#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(3))
->  /* PMUSERENR for the guest EL0 is on physical CPU */
-> -#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
-> +#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(4))
->  /* WFI instruction trapped */
-> -#define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
-> +#define IN_WFI			__vcpu_single_flag(sflags, BIT(5))
->  
->  
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> @@ -1314,7 +1312,8 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
->  	(test_bit(KVM_HOST_DATA_FLAG_##flag, host_data_ptr(flags)))
->  #define host_data_set_flag(flag)					\
->  	(set_bit(KVM_HOST_DATA_FLAG_##flag, host_data_ptr(flags)))
-> -
-> +#define host_data_clear_flag(flag)					\
-> +	(clear_bit(KVM_HOST_DATA_FLAG_##flag, host_data_ptr(flags)))
+>  #define kvm_vcpu_os_lock_enabled(vcpu)		\
+>  	(!!(__vcpu_sys_reg(vcpu, OSLSR_EL1) & OSLSR_EL1_OSLK))
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index e2798a4eec47..c2bf1b296b14 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -336,3 +336,12 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
+>  			vcpu->arch.debug_owner = VCPU_DEBUG_FREE;
+>  	}
+>  }
+> +
+> +void kvm_handle_debug_access(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_host_owns_debug_regs(vcpu))
+> +		return;
+> +
+> +	WARN_ON_ONCE(vcpu->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED);
+> +	vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
+> +}
 
-nit: move the flag-clearing primitive to the patch that introduces the
-two others for consistency, and drop the brackets surrounding the
-set/clear statements.
+I think it would make more sense to merge this patch with the previous
+one, so that we get a better idea of the ownership flow before getting
+in the meat of the debug surgery.
 
-Otherwise, this is a pretty nice cleanup.
+Another thing is that kvm_handle_debug_access() is very generic and
+doesn't quite says what this does. How about something such as
+kvm_debug_set_guest_ownership(), or any variation on the same theme?
+
+Thanks,
 
 	M.
 
