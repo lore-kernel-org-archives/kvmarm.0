@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FA4126C02
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 12:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AC21448F2
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 12:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731155331; cv=none; b=mm88gqppBZkmtHP3xPT9ApzC0EI/0QMaQnEsizePHcPg1NiQJhY/24JtftfpcFihfHNw0qbg3eIHDVbmuBr+V94qh9t034aEQBMP1ixrLkOppEw1DfEC46oX6h7SdCF7tk/rglrG9iPDxH3n1PSSsakpxyNtzVyYR1ySjBJ47/I=
+	t=1731157150; cv=none; b=l1uy4Z8N8erhqulYBGGY9ONOIPrmMyUWun6u4+sYQ/el7GLI9WMTcwW8++3o3eDFiDeHXV+QvHabcWVsaY7TLpHC5UX3wec3X5xYpxyebXtvb8OflQdOpTY+u/j4cb9v91yhRVX3jasz22QKcWOAurJhmn6XKLMs6NXsaAB4iL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731155331; c=relaxed/simple;
-	bh=EhIT4EPy2Z+pW/7+vA/P37NbId564gsaYC3btH4wjSM=;
+	s=arc-20240116; t=1731157150; c=relaxed/simple;
+	bh=j39cJT1rvPVYdZXhSi53FR60sEU5IXNk1QxkMTsVa5Q=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JSYE46/bTj4P+pQi92/ziLv97+5HeDW04EfBFSO4w6uPTpv8GmRrEXBPlVQkinbyuqgSH2qxILFML/fH5lc7mnwUl4VQi6mx6eY7jpxirbVWTCpTeF4Rz/Ez8bYN1hLMVnQfBslVCQyG8r6TNR2GG7iHQ3S//a7l3wM9IEZrjkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F1QzTAU2; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=pvPFx1g9PIO/OVncZsZOGWzPWaQoqEIsinet7qHb0ws0XkUk564X5MKWs3IC/Ktg4uFTQSkZSpSu6ebrF4U9dOW07jjy6gYnw5On5OkbBrhnkft4byflcbAhnvuLt0yi4kUBKzgTQibZibfFkCZwuVjluqRYPku1J2rqy9vjTpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikC07ZKQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F1QzTAU2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443C9C4CECF;
-	Sat,  9 Nov 2024 12:28:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikC07ZKQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575CCC4CECE;
+	Sat,  9 Nov 2024 12:59:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731155331;
-	bh=EhIT4EPy2Z+pW/7+vA/P37NbId564gsaYC3btH4wjSM=;
+	s=k20201202; t=1731157149;
+	bh=j39cJT1rvPVYdZXhSi53FR60sEU5IXNk1QxkMTsVa5Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F1QzTAU2N1rXkHxHgoWxlNGUNLdyaS7EyVpYpheybSXdRc6/OYPzDynzgRq2AoRiX
-	 q5wapbv3pZDCbu74sbu50FnCuYfpPciEbtd8Ev+QA1c8d/YxLoCoAUoqqkzSuYsZvf
-	 Km9LRf/yqGWdgez6wTIX1Qy0YeBdQ2LFfvTKBacvX+80SWTEML1Mw88ah7VYPUmB7o
-	 JSjxlI66/XBS/yP8sN2mOO+ba11XYhQYwyCXXFIiJ1pGIrpTXipWwNFx4rokiN2LRs
-	 11F0/ocge0EddmsbXadhvr41dK7TghDE3TteGcXxS6adxeUGK2nOFsRpdNK5a/Hq0j
-	 wO5m38sG9Dsxg==
+	b=ikC07ZKQvhat/hrNZP+k/+0zo3MOlqiThfB7CHOX15cmEAu4g2pXWwE//zmJ5GJI1
+	 kxJjsci6F9deK9QQZEgt9JE9Xej6mMNzNNWNOs6YLctLskI40PLdkdxdpkOulAKG0q
+	 +YILNm2CI9llN5xvVcog0Kz2kNhDATJG5GlBExS+xWtUM2hPRxBGc0qapJY1VCsl+q
+	 Z61JjG8As1w8mhfBhY6cVBEtlWpfNu9+q5lo4VX++rQqhS7rqXaBTd2VXRaNPev5Uk
+	 Pjg1OulRR63pmywcdj2nSWBqzfAVt2e1j5c6tsYyL/59YV9iCzv/1ESPjmPMOJs/R7
+	 qsw55OCBzUFpQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t9ka8-00BPuA-8i;
-	Sat, 09 Nov 2024 12:28:49 +0000
-Date: Sat, 09 Nov 2024 12:28:47 +0000
-Message-ID: <86wmhczj40.wl-maz@kernel.org>
+	id 1t9l3T-00BQY2-GJ;
+	Sat, 09 Nov 2024 12:59:07 +0000
+Date: Sat, 09 Nov 2024 12:59:06 +0000
+Message-ID: <86v7wwzhph.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,10 +43,10 @@ Cc: kvmarm@lists.linux.dev,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 13/15] KVM: arm64: Compute MDCR_EL2 at vcpu_load()
-In-Reply-To: <20241108222418.1677420-14-oliver.upton@linux.dev>
+Subject: Re: [PATCH 14/15] KVM: arm64: Don't hijack guest context MDSCR_EL1
+In-Reply-To: <20241108222418.1677420-15-oliver.upton@linux.dev>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
-	<20241108222418.1677420-14-oliver.upton@linux.dev>
+	<20241108222418.1677420-15-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,125 +62,197 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Nov 2024 22:24:17 +0000,
+On Fri, 08 Nov 2024 22:24:18 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> KVM has picked up several hacks to cope with vcpu->arch.mdcr_el2 needing
-> to be prepared before vcpu_load(), which is when it gets programmed
-> into hardware on VHE.
-> 
-> Now that the flows for reprogramming MDCR_EL2 have been simplified, move
-> that computation to vcpu_load().
+> Stealing MDSCR_EL1 in the guest's kvm_cpu_context for external debugging
+> is rather gross. Just add a field for this instead and let the context
+> switch code pick the correct one based on the debug owner.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  1 -
->  arch/arm64/kvm/arm.c              |  2 --
->  arch/arm64/kvm/debug.c            | 28 +++++++---------------------
->  3 files changed, 7 insertions(+), 24 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h          |  2 +-
+>  arch/arm64/kvm/debug.c                     | 45 ++++------------------
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 38 ++++++++++++------
+>  3 files changed, 35 insertions(+), 50 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 91341fb3405d..f8c7e37180ab 100644
+> index f8c7e37180ab..036c6de5819e 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1341,7 +1341,6 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> @@ -751,6 +751,7 @@ struct kvm_vcpu_arch {
+>  	 */
+>  	struct kvm_guest_debug_arch vcpu_debug_state;
+>  	struct kvm_guest_debug_arch external_debug_state;
+> +	u64 external_mdscr_el1;
 >  
->  void kvm_init_host_debug_data(void);
-> -void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 44a6093b0d9e..ec581aeb41f9 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -804,8 +804,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  	enum {
+>  		VCPU_DEBUG_FREE,
+> @@ -771,7 +772,6 @@ struct kvm_vcpu_arch {
+>  	 * are using guest debug.
+>  	 */
+>  	struct {
+> -		u32	mdscr_el1;
+>  		bool	pstate_ss;
+>  	} guest_debug_preserved;
 >  
->  	kvm_init_mpidr_data(kvm);
->  
-> -	kvm_arm_vcpu_init_debug(vcpu);
-> -
->  	if (likely(irqchip_in_kernel(kvm))) {
->  		/*
->  		 * Map the VGIC hardware resources before running a vcpu the
 > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 04a62660ca5b..9ac237c3ae0c 100644
+> index 9ac237c3ae0c..a23d214a0fb0 100644
 > --- a/arch/arm64/kvm/debug.c
 > +++ b/arch/arm64/kvm/debug.c
-> @@ -91,20 +91,6 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+> @@ -32,19 +32,12 @@
+>   */
+>  static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 val = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> -
+> -	vcpu->arch.guest_debug_preserved.mdscr_el1 = val;
+>  	vcpu->arch.guest_debug_preserved.pstate_ss =
+>  					(*vcpu_cpsr(vcpu) & DBG_SPSR_SS);
 >  }
 >  
-> -/**
-> - * kvm_arm_vcpu_init_debug - setup vcpu debug traps
-> - *
-> - * @vcpu:	the vcpu pointer
-> - *
-> - * Set vcpu initial mdcr_el2 value.
-> - */
-> -void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu)
-> -{
-> -	preempt_disable();
-> -	kvm_arm_setup_mdcr_el2(vcpu);
-> -	preempt_enable();
-> -}
-> -
->  /**
->   * kvm_arm_setup_debug - set up debug related stuff
->   *
-> @@ -122,12 +108,10 @@ void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu)
->  
->  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
 >  {
-> -	unsigned long mdscr, orig_mdcr_el2 = vcpu->arch.mdcr_el2;
-> +	unsigned long mdscr;
->  
->  	trace_kvm_arm_setup_debug(vcpu, vcpu->guest_debug);
->  
-> -	kvm_arm_setup_mdcr_el2(vcpu);
+> -	u64 val = vcpu->arch.guest_debug_preserved.mdscr_el1;
 > -
->  	/* Check if we need to use the debug registers. */
->  	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
->  		/* Save guest debug state */
-> @@ -197,10 +181,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
->  			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> -	vcpu_write_sys_reg(vcpu, val, MDSCR_EL1);
+> -
+>  	if (vcpu->arch.guest_debug_preserved.pstate_ss)
+>  		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+>  	else
+> @@ -149,36 +142,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+>  			else
+>  				*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+> -
+> -			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> -			mdscr |= DBG_MDSCR_SS;
+> -			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> -		} else {
+> -			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> -			mdscr &= ~DBG_MDSCR_SS;
+> -			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> -		}
+> -
+> -		/*
+> -		 * Enable breakpoints and watchpoints if userspace wants them.
+> -		 */
+> -		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+> -			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> -			mdscr |= DBG_MDSCR_MDE;
+> -			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> -
+> -		/*
+> -		 * The OS Lock blocks debug exceptions in all ELs when it is
+> -		 * enabled. If the guest has enabled the OS Lock, constrain its
+> -		 * effects to the guest. Emulate the behavior by clearing
+> -		 * MDSCR_EL1.MDE. In so doing, we ensure that host debug
+> -		 * exceptions are unaffected by guest configuration of the OS
+> -		 * Lock.
+> -		 */
+> -		} else if (kvm_vcpu_os_lock_enabled(vcpu)) {
+> -			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> -			mdscr &= ~DBG_MDSCR_MDE;
+> -			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
 >  		}
 >  	}
+>  }
+> @@ -232,6 +195,14 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
+>  	KVM_BUG_ON(vcpu_get_flag(vcpu, SYSREGS_ON_CPU), vcpu->kvm);
+>  
+>  	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
+> +		mdscr = MDSCR_EL1_TDCC;
+
+Eh... this is new. Why?
+
+> +
+> +		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
+> +			mdscr |= MDSCR_EL1_SS;
+> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW)
+> +			mdscr |= MDSCR_EL1_MDE;
+
+I think this would at least deserve a comment that guest_debug
+indicates that *the host* is debugging the guest. It is one of the
+thing that throws me every time I read this code.
+
+The other thing is that I can't completely convince myself that this
+rewrite is strictly equivalent, because we now operate on different
+states. For example, I don't see that we effectively block debug
+exceptions when the OS Lock is enabled. Where is that handled now?
+
+> +
+> +		vcpu->arch.external_mdscr_el1 = mdscr;
+>  		vcpu->arch.debug_owner = VCPU_DEBUG_HOST_OWNED;
+>  	} else {
+>  		mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index a998b2f6abcb..49770963cf84 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -18,9 +18,33 @@
+>  
+>  static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
+>  
+> +static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
+> +
+> +	if (!vcpu)
+> +		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> +
+> +	return vcpu;
+> +}
+> +
+> +static inline bool ctxt_is_guest(struct kvm_cpu_context *ctxt)
+> +{
+> +	return host_data_ptr(host_ctxt) != ctxt;
+> +}
+> +
+> +#define ctxt_mdscr_el1(ctxt)						\
+> +({									\
+> +	u64 *__p = &ctxt_sys_reg(ctxt, MDSCR_EL1);			\
+> +	struct kvm_vcpu *__v = ctxt_to_vcpu(ctxt);			\
+> +	if (ctxt_is_guest(ctxt) && kvm_host_owns_debug_regs(__v))	\
+> +		__p = &(__v)->arch.external_mdscr_el1;			\
+> +	__p;								\
+> +})
+> +
+
+Anything that prevents this helper from being an actual (inline) function?
+
+>  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
+> +	*ctxt_mdscr_el1(ctxt)	= read_sysreg(mdscr_el1);
+>  
+>  	// POR_EL0 can affect uaccess, so must be saved/restored early.
+>  	if (ctxt_has_s1poe(ctxt))
+> @@ -33,16 +57,6 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+>  	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
+>  }
+>  
+> -static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
+> -{
+> -	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
 > -
-> -	/* Write mdcr_el2 changes since vcpu_load on VHE systems */
-> -	if (has_vhe() && orig_mdcr_el2 != vcpu->arch.mdcr_el2)
-> -		write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
->  }
+> -	if (!vcpu)
+> -		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> -
+> -	return vcpu;
+> -}
+> -
+>  static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+>  {
+>  	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
+> @@ -139,7 +153,7 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
 >  
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
-> @@ -265,6 +245,8 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
->  		else
->  			vcpu->arch.debug_owner = VCPU_DEBUG_FREE;
->  	}
-> +
-> +	kvm_arm_setup_mdcr_el2(vcpu);
->  }
+>  static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
+> +	write_sysreg(*ctxt_mdscr_el1(ctxt),  mdscr_el1);
 >  
->  void kvm_handle_debug_access(struct kvm_vcpu *vcpu)
-> @@ -274,6 +256,10 @@ void kvm_handle_debug_access(struct kvm_vcpu *vcpu)
->  
->  	WARN_ON_ONCE(vcpu->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED);
->  	vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
-> +	kvm_arm_setup_mdcr_el2(vcpu);
-> +
-> +	if (has_vhe())
-> +		write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-
-OK, now I see this function does a bit more than just ownership. Oh
-well.
-
-But it now also appears that vcpu->arch.mdcr_el2 isn't part of the
-vcpu state. It really is host state that we manage for the sake of
-emulation.
-
-How about kicking it where it belongs? It would definitely help
-understanding the lifetime of this piece of state.
+>  	// POR_EL0 can affect uaccess, so must be saved/restored early.
+>  	if (ctxt_has_s1poe(ctxt))
 
 Thanks,
 
