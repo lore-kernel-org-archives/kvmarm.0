@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C41612F5B1
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 11:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A319B1547CE
+	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 12:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731153469; cv=none; b=tnTw/VniAfnp6EFkB75vUBf285h4ST20pVAKgRgPtmd7HkAxsYYAeHfJWB7dZGZX1wdl5LQWfB4wv8SFhJL9wIbRqbLeVO5q2ppfPd0ZpkkiPFljkYBSRVa7/rkM8qlZqKqsP8iiiVZpUSpWR6nNdBINHPAPBe7/nvuHVphmrJQ=
+	t=1731153760; cv=none; b=X5jeA+OWbZMT1QkEMGjTIsDHTi6RsNbqQyujoHSHkxreUszQPj/MA0Z03wf13s0HZhTwYu1QfjrhCI/9asF0GKsyohNX5t9RgtohJt6aODsReVK7NUP7FVW1oIwavP7Ri7bH1BkU9rj/4wTpz0717toOT3mpJHTEzJNPjVt1MlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731153469; c=relaxed/simple;
-	bh=/pKqotiNG18b73RV6gOYJNlreafs0VEOHaFFJT4FIY8=;
+	s=arc-20240116; t=1731153760; c=relaxed/simple;
+	bh=RrGMGlTTQJBPQObxreSdp9P+8C7T8hnZDUoT0Ig1KWs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CNKR1uHsDTLHOjB8tOcK9EfD1EVO2TZQGRZJjkM+tTYBE6hwrPDUYNAipCtDy4u6Ttpb+2gxRu87ii3ympE5D9cN1W6EPMkaN0DDrLFRmiLMZ0j2534FKAmQbik5EGZz/O1ve0RsrNqYZetSYILIJeZEm1AGEGddmAm2HEtMZfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqwlAp94; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=fDToKjcU9GjDgC0smQtKFTOVJZtEGdOkQUvRQ4mnQFDuXpdlovZKRdQHGqo4ZDEn2N0Y0vm9IfDMLuSl4/nkWtKF5Lub0DMj/Jf1kLQAOR+og8Bz0bYSHJ1n1qPq1eiAS+4JUWsLusISs9atO8kzZygCDVQ5dCA3WkcGxsgFsXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhy4C44n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqwlAp94"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E65D6C4CECE;
-	Sat,  9 Nov 2024 11:57:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhy4C44n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B194C4CECE;
+	Sat,  9 Nov 2024 12:02:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731153468;
-	bh=/pKqotiNG18b73RV6gOYJNlreafs0VEOHaFFJT4FIY8=;
+	s=k20201202; t=1731153760;
+	bh=RrGMGlTTQJBPQObxreSdp9P+8C7T8hnZDUoT0Ig1KWs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hqwlAp94wJD4Icgofgr8LVAO4L9n7WeMw/o7vjeYioaHVEPCQ5ftAnfn6JYLiTimC
-	 rSyaWs6mqM+rMoSiclTVAu+usiEVN/nF+7cFS9onALSEp5aXw64u8odgr3dwlVPedu
-	 fQEiSRVOVpBtPruC1PFRz/YdxxNMD0E48B7dvhl64TJvCxVWhncjIPElEKweppGzta
-	 0KR1dw/uYnShjXcOtMVqk4mawxTDQrm2lGTcq0/ZUFEhL978CjFDXQzFb/yRtIXzWv
-	 dyh2VSalIYHbhFKhlvBwytnu5jPoL4frjhahiq+3UNvhSyioxO/ZQcKSlAtIrp/jn3
-	 aPxOwAgDeZ2cA==
+	b=fhy4C44nlcmBZR9XtlZtbDjS26fgFAEkYBXv3K4rZaNns65ptLUFPuPAP8wP3fAAs
+	 xm3KSZ5HOp441BV7TO9AvEyf88wya3ZGI1BPEOnNHMseh3oYlCcbF09ZYtTNuZpMnS
+	 QFG8M5Y9CcXfei5hrFJ9XY8eD/KUAOSodGDlHmQoYZjEqvLhECE3e0vm2b2cX0aYnU
+	 5d+WBQ5JIwgq+Q5MZ4jsgmq4MKf+ut8hcT03ITDAhlRyErGSdj2dzxuDd3UqZ0sUdY
+	 YaxyidrsbhHnwkK+F4wNrOfVWsxGJbHEMyzqSO3WNTocf03ImsrDhM60+S52xbXV3/
+	 xGp7Of6ZjN4sA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t9k66-00BPSF-PL;
-	Sat, 09 Nov 2024 11:57:46 +0000
-Date: Sat, 09 Nov 2024 11:57:46 +0000
-Message-ID: <861pzk1ux1.wl-maz@kernel.org>
+	id 1t9kAo-00BPUV-9j;
+	Sat, 09 Nov 2024 12:02:38 +0000
+Date: Sat, 09 Nov 2024 12:02:37 +0000
+Message-ID: <86zfm8zkbm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,10 +43,10 @@ Cc: kvmarm@lists.linux.dev,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 08/15] KVM: arm64: Select debug state to save/restore based on debug owner
-In-Reply-To: <20241108222418.1677420-9-oliver.upton@linux.dev>
+Subject: Re: [PATCH 09/15] KVM: arm64: Remove debug tracepoints
+In-Reply-To: <20241108222418.1677420-10-oliver.upton@linux.dev>
 References: <20241108222418.1677420-1-oliver.upton@linux.dev>
-	<20241108222418.1677420-9-oliver.upton@linux.dev>
+	<20241108222418.1677420-10-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,99 +62,137 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 08 Nov 2024 22:24:12 +0000,
+On Fri, 08 Nov 2024 22:24:13 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Select the set of debug registers to use based on the owner rather than
-> relying on debug_ptr.
+> The debug tracepoints are a useless firehose of information that track
+> implementation detail rather than well-defined events. These are going
+> to be rather difficult to uphold now that the implementation is getting
+> redone, so throw them out instead of bending over backwards.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_host.h         | 21 +++++++++++++++++++++
->  arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  8 ++++----
->  2 files changed, 25 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/debug.c | 29 -----------------------------
+>  1 file changed, 29 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d76e4e44b65b..2d9aee66d5d4 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1357,9 +1357,30 @@ void kvm_handle_debug_access(struct kvm_vcpu *vcpu);
->  #define kvm_vcpu_os_lock_enabled(vcpu)		\
->  	(!!(__vcpu_sys_reg(vcpu, OSLSR_EL1) & OSLSR_EL1_OSLK))
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index c2bf1b296b14..66cf4e843b47 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -35,10 +35,6 @@ static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
+>  	u64 val = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
 >  
-> +#define kvm_debug_regs_in_use(vcpu)		\
-> +	((vcpu)->arch.debug_owner != VCPU_DEBUG_FREE)
->  #define kvm_host_owns_debug_regs(vcpu)		\
->  	((vcpu)->arch.debug_owner == VCPU_DEBUG_HOST_OWNED)
+>  	vcpu->arch.guest_debug_preserved.mdscr_el1 = val;
+> -
+> -	trace_kvm_arm_set_dreg32("Saved MDSCR_EL1",
+> -				vcpu->arch.guest_debug_preserved.mdscr_el1);
+> -
+>  	vcpu->arch.guest_debug_preserved.pstate_ss =
+>  					(*vcpu_cpsr(vcpu) & DBG_SPSR_SS);
+>  }
+> @@ -49,9 +45,6 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
 >  
-> +#define vcpu_debug_regs(vcpu)					\
-> +({								\
-> +	struct kvm_guest_debug_arch *__d;			\
-> +								\
-> +	switch ((vcpu)->arch.debug_owner) {			\
-> +	case VCPU_DEBUG_FREE:					\
-> +		WARN_ON_ONCE(1);				\
-> +		fallthrough;					\
-> +	case VCPU_DEBUG_GUEST_OWNED:				\
-> +		__d = &(vcpu)->arch.vcpu_debug_state;		\
-> +		break;						\
-> +	case VCPU_DEBUG_HOST_OWNED:				\
-> +		__d = &(vcpu)->arch.external_debug_state;	\
-> +		break;						\
-> +	}							\
-> +								\
-> +	__d;							\
-> +})
+>  	vcpu_write_sys_reg(vcpu, val, MDSCR_EL1);
+>  
+> -	trace_kvm_arm_set_dreg32("Restored MDSCR_EL1",
+> -				vcpu_read_sys_reg(vcpu, MDSCR_EL1));
+> -
+>  	if (vcpu->arch.guest_debug_preserved.pstate_ss)
+>  		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+>  	else
+> @@ -102,8 +95,6 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+>  	    !vcpu_get_flag(vcpu, DEBUG_DIRTY) ||
+>  	    kvm_vcpu_os_lock_enabled(vcpu))
+>  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+> -
+> -	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+>  }
+>  
+>  /**
+> @@ -201,8 +192,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+>  		}
+>  
+> -		trace_kvm_arm_set_dreg32("SPSR_EL2", *vcpu_cpsr(vcpu));
+> -
+>  		/*
+>  		 * HW Breakpoints and watchpoints
+>  		 *
+> @@ -220,14 +209,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  			vcpu->arch.debug_ptr = &vcpu->arch.external_debug_state;
+>  			vcpu_set_flag(vcpu, DEBUG_DIRTY);
+>  
+> -			trace_kvm_arm_set_regset("BKPTS", get_num_brps(),
+> -						&vcpu->arch.debug_ptr->dbg_bcr[0],
+> -						&vcpu->arch.debug_ptr->dbg_bvr[0]);
+> -
+> -			trace_kvm_arm_set_regset("WAPTS", get_num_wrps(),
+> -						&vcpu->arch.debug_ptr->dbg_wcr[0],
+> -						&vcpu->arch.debug_ptr->dbg_wvr[0]);
+> -
+>  		/*
+>  		 * The OS Lock blocks debug exceptions in all ELs when it is
+>  		 * enabled. If the guest has enabled the OS Lock, constrain its
+> @@ -253,8 +234,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  	/* Write mdcr_el2 changes since vcpu_load on VHE systems */
+>  	if (has_vhe() && orig_mdcr_el2 != vcpu->arch.mdcr_el2)
+>  		write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> -
+> -	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_read_sys_reg(vcpu, MDSCR_EL1));
+>  }
+>  
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+> @@ -282,14 +261,6 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>  		 */
+>  		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+>  			kvm_arm_reset_debug_ptr(vcpu);
+> -
+> -			trace_kvm_arm_set_regset("BKPTS", get_num_brps(),
+> -						&vcpu->arch.debug_ptr->dbg_bcr[0],
+> -						&vcpu->arch.debug_ptr->dbg_bvr[0]);
+> -
+> -			trace_kvm_arm_set_regset("WAPTS", get_num_wrps(),
+> -						&vcpu->arch.debug_ptr->dbg_wcr[0],
+> -						&vcpu->arch.debug_ptr->dbg_wvr[0]);
+>  		}
+>  	}
+>  }
 
-Any particular reason why this can't be an actual function? Or at
-least a function taking a kvm_ vcpu_arch as a parameter, and a
-preprocessor wrapper for the vcpu->arch pointer chasing?
+Whilst you're at it, how about:
 
-> +
->  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
->  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> index d00093699aaf..acc47f77b3d0 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> @@ -132,13 +132,13 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
->  	struct kvm_guest_debug_arch *host_dbg;
->  	struct kvm_guest_debug_arch *guest_dbg;
->  
-> -	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
-> +	if (!kvm_debug_regs_in_use(vcpu))
->  		return;
->  
->  	host_ctxt = host_data_ptr(host_ctxt);
->  	guest_ctxt = &vcpu->arch.ctxt;
->  	host_dbg = host_data_ptr(host_debug_state.regs);
-> -	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> +	guest_dbg = vcpu_debug_regs(vcpu);
+diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
+index 064a58c19f481..fa1e48a36d3f9 100644
+--- a/arch/arm64/kvm/trace_handle_exit.h
++++ b/arch/arm64/kvm/trace_handle_exit.h
+@@ -101,26 +101,6 @@ TRACE_EVENT(kvm_arm_set_dreg32,
+ 
+ TRACE_DEFINE_SIZEOF(__u64);
+ 
+-TRACE_EVENT(kvm_arm_set_regset,
+-	TP_PROTO(const char *type, int len, __u64 *control, __u64 *value),
+-	TP_ARGS(type, len, control, value),
+-	TP_STRUCT__entry(
+-		__field(const char *, name)
+-		__field(int, len)
+-		__array(u64, ctrls, 16)
+-		__array(u64, values, 16)
+-	),
+-	TP_fast_assign(
+-		__entry->name = type;
+-		__entry->len = len;
+-		memcpy(__entry->ctrls, control, len << 3);
+-		memcpy(__entry->values, value, len << 3);
+-	),
+-	TP_printk("%d %s CTRL:%s VALUE:%s", __entry->len, __entry->name,
+-		__print_array(__entry->ctrls, __entry->len, sizeof(__u64)),
+-		__print_array(__entry->values, __entry->len, sizeof(__u64)))
+-);
+-
+ TRACE_EVENT(trap_reg,
+ 	TP_PROTO(const char *fn, int reg, bool is_write, u64 write_value),
+ 	TP_ARGS(fn, reg, is_write, write_value),
 
-One thing you may want to note in the commit log is that this also
-allows us to drop a couple of kern_hyp_va() instances, which is always
-a good thing.
-
->  
->  	__debug_save_state(host_dbg, host_ctxt);
->  	__debug_restore_state(guest_dbg, guest_ctxt);
-> @@ -151,13 +151,13 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
->  	struct kvm_guest_debug_arch *host_dbg;
->  	struct kvm_guest_debug_arch *guest_dbg;
->  
-> -	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
-> +	if (!kvm_debug_regs_in_use(vcpu))
->  		return;
->  
->  	host_ctxt = host_data_ptr(host_ctxt);
->  	guest_ctxt = &vcpu->arch.ctxt;
->  	host_dbg = host_data_ptr(host_debug_state.regs);
-> -	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> +	guest_dbg = vcpu_debug_regs(vcpu);
->  
->  	__debug_save_state(guest_dbg, guest_ctxt);
->  	__debug_restore_state(host_dbg, host_ctxt);
+It's not like we're going to miss that.
 
 Thanks,
 
