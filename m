@@ -1,87 +1,113 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4D1194AFB
-	for <kvmarm@lists.linux.dev>; Sat,  9 Nov 2024 23:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE20145A07;
+	Sun, 10 Nov 2024 11:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731196000; cv=none; b=IsP9i2uuc5ktlaUeCpnKeDTHtZDv6HRW8wcbjGNccHfOGSUBsjNDNu/n/BK58GoFaaZ43fddsb7bpl9vMTIta3fU9KLz733s9APdvb7x2dM2MnU5R1PaIgUVYynMVLprXUQxRJtL5Yb934/Zx2DWLeByFLJoE3t/VXLwEIt3yig=
+	t=1731236762; cv=none; b=mtE4firzt3byYZeGLXEUAwhGPsW/tWxlG1IaccZZh5d/scHdTyKFPE/u2Wgj0aMd5V+HN4cCF73TeoNJddmqqflIJkQUDrPCIciOJskysiBfAPI8xvEa8ZGgxCh7ZQ78+l258IcwLHLJaeoHXG5UuJl5uVN4CHhnw7HSfT3FRE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731196000; c=relaxed/simple;
-	bh=6/+8NvmCqtk8DnYrU9M5xA9am8brQT05BjwTL4/85cg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cqImXOSSzbkjfmc1Jzf9b17Tg87SIBz79Wv4EuSxLIw9PUDi+teaHMWZE+2AMxS2Ar9Pxcu3Ja9EgRB9S6JPvxEQqM4xe0vmHFzmygB/in1CSTjb2W3zkFIBIqizhXYckiN7jAtJV4AF2UKJlQoWilbhbb7gTGfvaAChxKt8+Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hyZFYf0Q; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1731236762; c=relaxed/simple;
+	bh=JrSQGG15LXh7EHM9jxGHjoA+82yehZX3lpYcI5Ku6v4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O85yk3OlpeVr+lMnes0we4O3+LDmufJZxdk536wuxx2J7KyglaybQuc1PSg3mSqfpK87mD8EdN928kCiSRfWhOxsJ4YmYH53V3dFfRl5EuvY0BlgcnIqLlHE5dPQnyOddmiskDeiHDV6n2Wve5ozzJcCMtROaefOooWxi9LgabM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D1EtzCi/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hyZFYf0Q"
-Date: Sat, 9 Nov 2024 15:46:23 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731195994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZPnxbwiatu+anfTRV+//m+rlFka0SdhYTuAid7SQpGg=;
-	b=hyZFYf0QD5aJ7oGkaN8KpBl8RRVTCWE1OA5zJDduDQCfLgYMA7X/+GJF4G1xowBoVLNMxv
-	i4P9VI6TIq/rzxJGiv+IwFdyBb8L6guJEBYHOTrINyxPe++XcE+MNqi1iQztHiD3bKedQK
-	9znonSFJDzdt+y7UvOaCiefCbO6j7kA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D1EtzCi/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED048C4CECD;
+	Sun, 10 Nov 2024 11:06:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731236762;
+	bh=JrSQGG15LXh7EHM9jxGHjoA+82yehZX3lpYcI5Ku6v4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D1EtzCi/bDRvyIgaRgcAfws07iy4lKS6mN/vD2uwMehNvZwBt1LTmnOP+1msGahjT
+	 43eKrHmUsVXkAUOTqnc2waCweK/vp0m+SBByaJdqjMghe9Xl9Q/aK+VoJqFDLaFxSV
+	 TDZ+UCi1shXr879YkxkUWWl0ZM4Msp0PzpWsU8vg8ltWQ0ZF30xmZ2WgLVfLCMgxK7
+	 e3XZ2q1nAtzH9i+WJwk2lhsXVdvrX/C0w/0r7wLUuYHaUwc6Btqx/OXdEOzcqbn91X
+	 ElmPCvrx2uWNf2Ylheq6TUQpm9mpO/PTSAVkZYTTYFS5uxOYAZWWfkbB6jGIsQCoxv
+	 gdar6IyuncQ7A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tA5lX-00BbDn-AP;
+	Sun, 10 Nov 2024 11:05:59 +0000
+Date: Sun, 10 Nov 2024 11:05:58 +0000
+Message-ID: <86r07jz6uh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Cc: will@kernel.org,
+	qperret@google.com,
+	broonie@kernel.org,
+	mark.rutland@arm.com,
+	keir@google.com,
+	vdonnefort@google.com,
+	kernel-team@android.com,
+	android-mm@google.com,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 11/15] KVM: arm64: Use debug_owner to track if debug regs
- need save/restore
-Message-ID: <Zy_0T00hOjVfmKTz@linux.dev>
-References: <20241108222418.1677420-1-oliver.upton@linux.dev>
- <20241108222418.1677420-12-oliver.upton@linux.dev>
- <86y11szjwk.wl-maz@kernel.org>
- <Zy-Zbj_BYovU5qch@linux.dev>
- <87bjyot4n6.wl-maz@kernel.org>
+	Ard Biesheuvel <ardb@kernel.org>,
+	D Scott Phillips <scott@os.amperecomputing.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Wang Jinchao <wangjinchao@xfusion.com>,
+	"Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+	"=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] arm64: kvm: Make nvhe stack size configurable
+In-Reply-To: <20241108211446.3304809-1-kaleshsingh@google.com>
+References: <20241108211446.3304809-1-kaleshsingh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bjyot4n6.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com, broonie@kernel.org, mark.rutland@arm.com, keir@google.com, vdonnefort@google.com, kernel-team@android.com, android-mm@google.com, catalin.marinas@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ardb@kernel.org, scott@os.amperecomputing.com, andreyknvl@gmail.com, ankita@nvidia.com, wangjinchao@xfusion.com, madvenka@linux.microsoft.com, ptosi@google.com, bhelgaas@google.com, ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Nov 09, 2024 at 10:37:49PM +0000, Marc Zyngier wrote:
-> On Sat, 09 Nov 2024 17:18:38 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Sat, Nov 09, 2024 at 12:11:39PM +0000, Marc Zyngier wrote:
-> > > >  static bool trap_debug_regs(struct kvm_vcpu *vcpu,
-> > > >  			    struct sys_reg_params *p,
-> > > >  			    const struct sys_reg_desc *r)
-> > > >  {
-> > > >  	access_rw(vcpu, p, r);
-> > > >  	if (p->is_write)
-> > > > -		vcpu_set_flag(vcpu, DEBUG_DIRTY);
-> > > >
-> > > >  	kvm_handle_debug_access(vcpu);
-> > > 
-> > > Something has gone wrong here, and I don't think you wanted to make
-> > > the ownership conditional on the access being only a write.
-> > 
-> > That's very much intentional (probably not clear enough in changelog). I
-> > don't think there's any value in special-casing this to writes.
+[that's an impressive Cc list...]
+
+On Fri, 08 Nov 2024 21:14:00 +0000,
+Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> Look again. You *are* special-casing it by only dropping the
-> vcpu_set_flag() call. Hint, the indentation is misleading.
+> In order to make the nVHE stack size easily configurable,
+> introduce NVHE_STACK_SHIFT which must be >= PAGE_SHIFT.
+> 
+> The default stack size remains 1 page (no functional change)
+> 
+> Downstream vendor features which require a larger stack
+> can configure it by setting CONFIG_NVHE_STACK_SHIFT.
 
-/facepalm I clearly can't read... or code.
+We don't let make the stack size configurable for the rest of the
+kernel, do we? Why should a tiny portion be treated differently?
 
-Thanks for spotting that one.
+Making this configurable means that testing is harder, and bugs harder
+to reproduce. It also seems specially designed to allow badly written
+code to run in hypervisor context. And once you allow two pages to be
+used (up to 128kB), what prevents the "downstream vendor" to push this
+to 4 or 8?
+
+If anything, I would prefer to see this (obviously out of tree) code
+isolated with its own stack instead of growing EL2's private stack. At
+least this would make the problems attributable to the guilty party.
+
+Thanks,
+
+	M.
 
 -- 
-Best,
-Oliver
+Without deviation from the norm, progress is not possible.
