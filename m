@@ -1,79 +1,96 @@
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0668468
-	for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 19:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8462D1AA78C
+	for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 19:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731354184; cv=none; b=ibNvPlGuZlNg/YIFtUsyYdEOnDYqDXrLvBiNdzU/lnUyNYH96tlz19UjTJGAC4zYGjz5gHnzQROUExwjF/IuPCmIcMcJNiItkJ0tG/xTzLkjBZqH5CTGzVfXZyVnEc4dXdMKKz0wyE0hHlqAjrw/OXvP42giA9/njyL/vzuHI1Q=
+	t=1731354372; cv=none; b=KQ5OxOzKqlyVn3qSqf9okiF/EryxRrCR8kn94uNJlXnvnjsU1jtGUZoU/mRDrGENY1l/JKpc1+FxVZCd62IXpfhHDzcrMTgmXa3UtqnrS7cP7lLgmOrMwtAnSMxkyoq81AqMsRVZ+xXSCGd4yx3AHH6qljFPZpC0Dq9UtOg78Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731354184; c=relaxed/simple;
-	bh=3ybO6wVjsJ/ytXTR0THKmVHsdkJ/Bqbog762X7DdMSI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pAt9d3OJVOz1Xd/LFpvwT4SpCqS2ehfxITYKEBMx3g8w98veg+xMppV/eh/JJ211l8SHIDAFbjVVpWN0G+Lzja4NGcmzlIFK1PRdnW+f3T51mrFVfhtMrkA/nHSQCxNGQTxhvhkr2zhbnG5TXdYfSnkObSOREyfVOfz/jToVU+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mwkyHDJQ; arc=none smtp.client-ip=91.218.175.175
+	s=arc-20240116; t=1731354372; c=relaxed/simple;
+	bh=zzsh8xbAExzpTl7RmvKZVBJwdrA4bo0aOmm8ecSZV7Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewFHTMTj2AyXnDjX1aD+2mEYVB3w/fA8ZRF/Fp+rcFkJOUsl68w18vympWm6Te/H/mIB4dXqAy7ri4Db+ejzMDSQbJMKypiT5ddtasiEUuN7r2ehFAU52r9O/QtMgLFXHOmhhFHNEvKE5mcBOkwZiV0Q35wbQlXesyZDO5LKB9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XstHiunX; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mwkyHDJQ"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XstHiunX"
+Date: Mon, 11 Nov 2024 19:46:02 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731354179;
+	t=1731354367;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XQw70jFvuXYdTZwcdyKe95m4F0F8qYfh17sqc59kXHQ=;
-	b=mwkyHDJQviuWAcb80iDB3X9aBED1OBejINpKT9VbC03LzYC9O93CXrzIyDsv4a18kw+ZEW
-	kbNHQ+LMHAS4uHmqIQcrSI+AQrBIrVArwIVUpU35VvqfrqDBfA9LokFqNAIPfAYS7K2nqB
-	9aXqo/LRL85pqyrVUGv6E/psTucrhbg=
+	bh=1XUuDuupGQlT2PNCZA4fo4MUNDmEa7x9ZBSyXrNwdB0=;
+	b=XstHiunXfX/kI93pTsClk1nInTezzpFM6T8o+mZVhjfCpTDGcFJFdHq75QEI0mFuCJD1B+
+	Wwu+MleW5ke4SrQD2jrjnyPqusIvqQNX073R3YQBBEh78JVBUtOB+Ch1P21Oolv7IXVa8K
+	j65VM0NX/HbCozPWZJK/Ex/ixldWUws=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: maz@kernel.org,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	kvmarm@lists.linux.dev
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	wangzhou1@hisilicon.com,
-	joey.gouly@arm.com,
-	james.morse@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	linuxarm@huawei.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	sebott@redhat.com
-Subject: Re: [PATCH v2] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from userspace
-Date: Mon, 11 Nov 2024 19:41:56 +0000
-Message-ID: <173135408547.2760967.16338422848283490083.b4-ty@linux.dev>
-In-Reply-To: <20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com>
-References: <20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+	broonie@kernel.org, maz@kernel.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, joey.gouly@arm.com, shuah@kernel.org,
+	pbonzini@redhat.com
+Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
+Message-ID: <ZzJe-ju6pleqTfS8@linux.dev>
+References: <20241107094000.70705-1-eric.auger@redhat.com>
+ <20241107094000.70705-3-eric.auger@redhat.com>
+ <Zyz_KGtoXt0gnMM8@google.com>
+ <Zy0QFhFsICeNt8kF@linux.dev>
+ <Zy0bcM0m-N18gAZz@google.com>
+ <Zy0fPgwymCdBwLd_@linux.dev>
+ <Zy0ihQlkexIWc1fq@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zy0ihQlkexIWc1fq@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, 22 Oct 2024 08:39:43 +0100, Shameer Kolothum wrote:
-> Only allow userspace to set VIPT(0b10) or PIPT(0b11) for L1Ip based on
-> what hardware reports as both AIVIVT (0b01) and VPIPT (0b00) are
-> documented as reserved.
+On Thu, Nov 07, 2024 at 12:26:45PM -0800, Sean Christopherson wrote:
+> On Thu, Nov 07, 2024, Oliver Upton wrote:
+> > On Thu, Nov 07, 2024 at 11:56:32AM -0800, Sean Christopherson wrote:
+> > > ---
+> > > From: Sean Christopherson <seanjc@google.com>
+> > > Date: Thu, 7 Nov 2024 11:39:59 -0800
+> > > Subject: [PATCH] KVM: selftests: Don't bother deleting memslots in KVM when
+> > >  freeing VMs
+> > > 
+> > > When freeing a VM, don't call into KVM to manually remove each memslot,
+> > > simply cleanup and free any userspace assets associated with the memory
+> > > region.  KVM is ultimately responsible for ensuring kernel resources are
+> > > freed when the VM is destroyed, deleting memslots one-by-one is
+> > > unnecessarily slow, and unless a test is already leaking the VM fd, the
+> > > VM will be destroyed when kvm_vm_release() is called.
+> > > 
+> > > Not deleting KVM's memslot also allows cleaning up dead VMs without having
+> > > to care whether or not the to-be-freed VM is dead or alive.
+> > 
+> > Can you add a comment to kvm_vm_free() about why we want to avoid ioctls
+> > in that helper? It'd help discourage this situation from happening again
+> > in the future in the unlikely case someone wants to park an ioctl there.
+> > 
+> > > Reported-by: Eric Auger <eric.auger@redhat.com>
+> > > Reported-by: Mark Brown <broonie@kernel.org>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > 
+> > I'm assuming you want to take this, happy to grab it otherwise.
 > 
-> Using a VIPT for Guest where hardware reports PIPT may lead to over
-> invalidation, but is still correct. Hence, we can allow downgrading
-> PIPT to VIPT, but not the other way around.
-> 
-> [...]
+> You take it.  Unless my git foo is off the rails, this is needs to go into 6.12,
+> along with a fix for the vGIC test.  That, and I already sent Paolo a pull request
+> for rc7; I don't want to overwork myself ;-)
 
-Sorry I didn't grab this earlier, for some reason I'm not getting your mail
-at my linux.dev address.
+Fine -- I _guess_ I'll do it then :) It'll just go in the 6.13 pull
+request.
 
-Applied to kvmarm/next, thanks!
+https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=next&id=5afe18dfa47daead88517b095b6e0ce012f031f8
 
-[1/1] KVM: arm64: Make L1Ip feature in CTR_EL0 writable from userspace
-      https://git.kernel.org/kvmarm/kvmarm/c/e9b57d7f9740
-
---
-Best,
+-- 
+Thanks,
 Oliver
