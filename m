@@ -1,96 +1,92 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8462D1AA78C
-	for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 19:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933191AD5D8
+	for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 20:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731354372; cv=none; b=KQ5OxOzKqlyVn3qSqf9okiF/EryxRrCR8kn94uNJlXnvnjsU1jtGUZoU/mRDrGENY1l/JKpc1+FxVZCd62IXpfhHDzcrMTgmXa3UtqnrS7cP7lLgmOrMwtAnSMxkyoq81AqMsRVZ+xXSCGd4yx3AHH6qljFPZpC0Dq9UtOg78Uo=
+	t=1731357635; cv=none; b=chDNyznTMGhxLY0ymyqvVJPifxWMAubgHMfwaO6Ll4yjfrsKGvVcjF0jOMogo6MzazwiZakxyuepX2QFs5nE2dWRFuGHKE00TNJW7bAjLU39sM5Xx6D+vq3ZkxMLI5biJMoEBmNeT51pEJMdr6N5kftAW35p6IHxY/LzzzxAYTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731354372; c=relaxed/simple;
-	bh=zzsh8xbAExzpTl7RmvKZVBJwdrA4bo0aOmm8ecSZV7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewFHTMTj2AyXnDjX1aD+2mEYVB3w/fA8ZRF/Fp+rcFkJOUsl68w18vympWm6Te/H/mIB4dXqAy7ri4Db+ejzMDSQbJMKypiT5ddtasiEUuN7r2ehFAU52r9O/QtMgLFXHOmhhFHNEvKE5mcBOkwZiV0Q35wbQlXesyZDO5LKB9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XstHiunX; arc=none smtp.client-ip=95.215.58.178
+	s=arc-20240116; t=1731357635; c=relaxed/simple;
+	bh=oERcGQ9LDVehJFUMZyeiUnRg+hZ6+rOpSWGKGuiOaKQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cfCQJVReocl49MS2joRExggpewbcookFvH+2J4FdqQz8neEmNUsPiZTf8qPpyjr5hy6jX2Z1DdkDZOS/EJzPbJ2ThG6188fPr/J3R6WcLwuR97XAcgmn7RGRT9xW0AICI664ZZGaJny6KSmkboKGW3AGVNgyHNDFbRLTtEIyneg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NSky0qXt; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XstHiunX"
-Date: Mon, 11 Nov 2024 19:46:02 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NSky0qXt"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731354367;
+	t=1731357629;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1XUuDuupGQlT2PNCZA4fo4MUNDmEa7x9ZBSyXrNwdB0=;
-	b=XstHiunXfX/kI93pTsClk1nInTezzpFM6T8o+mZVhjfCpTDGcFJFdHq75QEI0mFuCJD1B+
-	Wwu+MleW5ke4SrQD2jrjnyPqusIvqQNX073R3YQBBEh78JVBUtOB+Ch1P21Oolv7IXVa8K
-	j65VM0NX/HbCozPWZJK/Ex/ixldWUws=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	bh=b9CAj9JaGMN0ybNM1og6EH7btRUNarOLzlzuHTkv93s=;
+	b=NSky0qXt3FYZ1uz0lOO9GCgsPfAGi+hlH9gH52cProQINk5600PTWNOFHccqjfU+OaRCfF
+	t6d6uVZ5IEdvMi7EPmtGKg214jQbT/V7GI2CRh3Vur2lw6eVacBlV+8dEWOU6KKMJDnZkQ
+	qVkuJ46lmP6hM9u5vD/+H6Q6xWS0LZE=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-	broonie@kernel.org, maz@kernel.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, joey.gouly@arm.com, shuah@kernel.org,
-	pbonzini@redhat.com
-Subject: Re: [PATCH  2/3] KVM: selftests: Introduce kvm_vm_dead_free
-Message-ID: <ZzJe-ju6pleqTfS8@linux.dev>
-References: <20241107094000.70705-1-eric.auger@redhat.com>
- <20241107094000.70705-3-eric.auger@redhat.com>
- <Zyz_KGtoXt0gnMM8@google.com>
- <Zy0QFhFsICeNt8kF@linux.dev>
- <Zy0bcM0m-N18gAZz@google.com>
- <Zy0fPgwymCdBwLd_@linux.dev>
- <Zy0ihQlkexIWc1fq@google.com>
+To: ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	KVM <kvm@vger.kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Cc: Colton Lewis <coltonlewis@google.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Shusen Li <lishusen2@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH v4 0/5] Some fixes about vgic-its
+Date: Mon, 11 Nov 2024 20:40:03 +0000
+Message-ID: <173135744708.2975582.6187985686343920631.b4-ty@linux.dev>
+In-Reply-To: <20241107214137.428439-1-jingzhangos@google.com>
+References: <20241107214137.428439-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zy0ihQlkexIWc1fq@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 07, 2024 at 12:26:45PM -0800, Sean Christopherson wrote:
-> On Thu, Nov 07, 2024, Oliver Upton wrote:
-> > On Thu, Nov 07, 2024 at 11:56:32AM -0800, Sean Christopherson wrote:
-> > > ---
-> > > From: Sean Christopherson <seanjc@google.com>
-> > > Date: Thu, 7 Nov 2024 11:39:59 -0800
-> > > Subject: [PATCH] KVM: selftests: Don't bother deleting memslots in KVM when
-> > >  freeing VMs
-> > > 
-> > > When freeing a VM, don't call into KVM to manually remove each memslot,
-> > > simply cleanup and free any userspace assets associated with the memory
-> > > region.  KVM is ultimately responsible for ensuring kernel resources are
-> > > freed when the VM is destroyed, deleting memslots one-by-one is
-> > > unnecessarily slow, and unless a test is already leaking the VM fd, the
-> > > VM will be destroyed when kvm_vm_release() is called.
-> > > 
-> > > Not deleting KVM's memslot also allows cleaning up dead VMs without having
-> > > to care whether or not the to-be-freed VM is dead or alive.
-> > 
-> > Can you add a comment to kvm_vm_free() about why we want to avoid ioctls
-> > in that helper? It'd help discourage this situation from happening again
-> > in the future in the unlikely case someone wants to park an ioctl there.
-> > 
-> > > Reported-by: Eric Auger <eric.auger@redhat.com>
-> > > Reported-by: Mark Brown <broonie@kernel.org>
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > 
-> > I'm assuming you want to take this, happy to grab it otherwise.
+On Thu, 7 Nov 2024 13:41:32 -0800, Jing Zhang wrote:
+> This patch series addresses a critical issue in the VGIC ITS tables'
+> save/restore mechanism, accompanied by a comprehensive selftest for bug
+> reproduction and verification.
 > 
-> You take it.  Unless my git foo is off the rails, this is needs to go into 6.12,
-> along with a fix for the vGIC test.  That, and I already sent Paolo a pull request
-> for rc7; I don't want to overwork myself ;-)
+> The fix is originally from Kunkun Jiang at [1].
+> 
+> The identified bug manifests as a failure in VM suspend/resume operations.
+> The root cause lies in the repeated suspend attempts often required for
+> successful VM suspension, coupled with concurrent device interrupt registration
+> and freeing. This concurrency leads to inconsistencies in ITS mappings before
+> the save operation, potentially leaving orphaned Device Translation Entries
+> (DTEs) and Interrupt Translation Entries (ITEs) in the respective tables.
+> 
+> [...]
 
-Fine -- I _guess_ I'll do it then :) It'll just go in the 6.13 pull
-request.
+Taking the immediate fixes for now, selftest might need a bit more work
+(will review soon). Note that I squashed patch 2 + 3 together as well.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=next&id=5afe18dfa47daead88517b095b6e0ce012f031f8
+Applied to kvmarm/next, thanks!
 
--- 
-Thanks,
+[3/5] KVM: arm64: vgic-its: Add a data length check in vgic_its_save_*
+      https://git.kernel.org/kvmarm/kvmarm/c/7fe28d7e68f9
+[4/5] KVM: arm64: vgic-its: Clear DTE when MAPD unmaps a device
+      https://git.kernel.org/kvmarm/kvmarm/c/e9649129d33d
+[5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
+      https://git.kernel.org/kvmarm/kvmarm/c/7602ffd1d5e8
+
+--
+Best,
 Oliver
