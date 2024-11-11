@@ -1,226 +1,194 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F8B1DA53
-	for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 13:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAB31A0721
+	for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 14:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731332827; cv=none; b=GIjdWVq7weCv8z/UWyNf0d7WX9NpdMvvPG+jeIJ0Nqj/kRvN4Rn+A9G/c7yhm8uiK1L+M7uxNT6PsxzTrlhh4fLQWZ0260d0zdiAYxH4quehciay5CrZ4R9pKPi3xmClGfuDFYsi20vrL9U0lf466gAddXyr8T0nqF714QxqLIk=
+	t=1731335379; cv=none; b=GccHKdNVHTzkfWquBlraGkSvwXWqpeQ/0o92V5Q9rSXZy+9Btqxl0e/pNyriC1Iv7OB1iXE6wAClDE6GHBFW2NSXOq42AtsKrFGn9s3iOD9U83PJi4TABByyPjK6jjtQDDuZhNeX72QgmgsyWRa6CZecKZzM6zs++rvT6ZdxFz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731332827; c=relaxed/simple;
-	bh=BzA4qIPEfQN/OBP2Fu7Yp1/3+W2VaxpBuQfamWH+0rE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YQLCSXbiv16J/lUqYH23sQGphVQgrWg013i0+95Xx7k74X+5ei8xgELtUdIlkAZZQa9wu1E+7tnP0oe7RziKmH2QhOnfGbd+M2BlFGDY3Afb3cKmNpDnFfsulDbEbggLA4NtkM46GOlDHqG2ybOGZdnoWahzPcUk02U+HBMjDVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 066111CE0;
-	Mon, 11 Nov 2024 05:47:34 -0800 (PST)
-Received: from [10.57.79.116] (unknown [10.57.79.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 561EB3F66E;
-	Mon, 11 Nov 2024 05:47:02 -0800 (PST)
-Message-ID: <fac9f76d-d7e4-4a1a-844a-85c64af581b6@arm.com>
-Date: Mon, 11 Nov 2024 13:47:01 +0000
+	s=arc-20240116; t=1731335379; c=relaxed/simple;
+	bh=bbLQxC2Zr7EfvOmQ67ulQbVJdAVJ2CMsLkVf6ofALhk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JX1tR/b5Xf2EjCmvpgqNcIE2JHUso4rYR5LmzjvEbZekaTXWHCqM4m8kJ+TBckKrclsf3Tcnqq8l/4mjCfAIWGrNcXsKXbED0+XW+aqbpHURw7qt2RFPsQWQWDfGyXdvp5qM4yXJcM8SQeODw83Vm1RxRO35nSNYwImQqSRrxM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FDoH2Mo/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDoH2Mo/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731335375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pjRAGOxPKBLWWtMTL71YPmNIL38UX8S0tDkwH3bqdKI=;
+	b=FDoH2Mo/Qlk0l+DkFVEkFwTsOrRSEf08xoBxUf0mUSB0WkGiRU9LOKS0TXYAmn2/vho3un
+	n5VBPqMk1A2EahG9671QDR4ZwDW9RnkSb7/PY+y4Oo4dckig0yLo734Yx2cS+5DWf3hDm3
+	rexHvxbAaerU9AHblP9kqBQbgvNSLLQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-138-qAk2hGD9OWOnj-H9L20ntQ-1; Mon,
+ 11 Nov 2024 09:29:32 -0500
+X-MC-Unique: qAk2hGD9OWOnj-H9L20ntQ-1
+X-Mimecast-MFC-AGG-ID: qAk2hGD9OWOnj-H9L20ntQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EA9FA1955DC3;
+	Mon, 11 Nov 2024 14:29:28 +0000 (UTC)
+Received: from localhost (unknown [10.22.80.107])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76976300019E;
+	Mon, 11 Nov 2024 14:29:26 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger@redhat.com, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Peter
+ Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, richard.henderson@linaro.org,
+ alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+ sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+ armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+ shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+ pbonzini@redhat.com
+Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
+In-Reply-To: <63c232c2-a325-48d6-8ed4-753a7c6e3b4e@redhat.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20241025101959.601048-1-eric.auger@redhat.com>
+ <20241025101959.601048-19-eric.auger@redhat.com>
+ <ZxuX4i9NjVRizB72@redhat.com>
+ <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com>
+ <Zxub7ol4p8P_sWF8@redhat.com>
+ <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
+ <Zx-9WxXkmkMuGIlQ@redhat.com>
+ <CAFEAcA9w0mb5bcU8p+fScQony-=oqLmNurGWpnL_sBneQCzxUg@mail.gmail.com>
+ <Zx_EGxj2aqc_2-kY@redhat.com>
+ <63c232c2-a325-48d6-8ed4-753a7c6e3b4e@redhat.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 11 Nov 2024 15:29:23 +0100
+Message-ID: <87ikstn8sc.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/15] KVM: arm64: Track presence of SPE/TRBE in
- kvm_host_data instead of vCPU
-Content-Language: en-GB
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Mingwei Zhang <mizhang@google.com>,
- Colton Lewis <coltonlewis@google.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- James Clark <james.clark@linaro.org>, james.clark2@arm.com
-References: <20241108222418.1677420-1-oliver.upton@linux.dev>
- <20241108222418.1677420-4-oliver.upton@linux.dev>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20241108222418.1677420-4-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Cc: James Clark
+On Mon, Nov 04 2024, Eric Auger <eric.auger@redhat.com> wrote:
 
-Hi Oliver
+> Hi Daniel,
+>
+> On 10/28/24 18:04, Daniel P. Berrang=C3=A9 wrote:
+>> On Mon, Oct 28, 2024 at 04:48:18PM +0000, Peter Maydell wrote:
+>>> On Mon, 28 Oct 2024 at 16:35, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+>>>> On Mon, Oct 28, 2024 at 04:16:31PM +0000, Peter Maydell wrote:
+>>>>> On Fri, 25 Oct 2024 at 14:24, Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote:
+>>>>>> On Fri, Oct 25, 2024 at 03:18:25PM +0200, Eric Auger wrote:
+>>>>>>> On 10/25/24 15:06, Daniel P. Berrang=C3=A9 wrote:
+>>>>>>>> Also, is this naming convention really the same one that users
+>>>>>>>> will see when they look at /proc/cpuinfo to view features ? It
+>>>>>>> No it is not. I do agree that the custom cpu model is very low leve=
+l. It
+>>>>>>> is very well suited to test all series turning ID regs as writable =
+but
+>>>>>>> this would require an extra layer that adapts /proc/cpuinfo feature
+>>>>>>> level to this regid/field abstraction.
+>>>>>>>
+>>>>>>> In /cpu/proc you will see somethink like:
+>>>>>>>  Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics f=
+php
+>>>>>>> asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+>>>>>> Right, IMHO, this is the terminology that QEMU must use in user
+>>>>>> facing APIs.
+>>>>> /proc/cpuinfo's naming is rather weird for historical
+>>>>> reasons (for instance there is only one FEAT_FP16 feature
+>>>>> but cpuinfo lists "fphp" and "asimdhp" separately).
+>>>> There's plenty of wierd history in x86 too. In this
+>>>> case I might suggest just picking one of the two
+>>>> common names, and ignoring the other.
+>>>>
+>>>> If we really wanted to, we could alias the 2nd name
+>>>> to the first, but its likely not worth the bother.
+>>> Or we could use the standard set of architectural
+>>> feature names, and not have the problem at all, and not
+>>> have to document what we mean by our nonstandard names.
+>>> (cpuinfo names do actually mostly line up with the
+>>> standard names, just not 100%. Similarly gcc/clang command
+>>> line options are mostly the architectural feature name.)
+>> Ah, right, yes. Sorry I mis-understood you originally to be suggesting
+>> the same low level names as this patch.
+> If my understanding is correct, Peter suggested to rely on the
+> terminology used in
+>
+> https://developer.arm.com/documentation/109697/2024_09
+>
+> the doc pointed to by Oliver.
+>
+> So I think the next step is to understand how those "high level" features=
+ do map onto low level ID register field values. I think a high level featu=
+re can map onto separate fields in separate ID regs. This may not be the mo=
+st common case though.=20
 
-On 08/11/2024 22:24, Oliver Upton wrote:
-> Add flags to kvm_host_data to track if SPE/TRBE is present +
-> programmable on a per-CPU basis. Set the flags up at init rather than
-> vcpu_load() as the programmability of these buffers is unlikely to
-> change.
-> 
+I went through all the FEAT_xxx features defined so far and tried to
+categorize them (probably with some errors here and there, but the
+general trend should be correct.)
 
-Heads up, there is a similar change from James Clark here :
+There's 335 features defined at the moment.
 
-https://lkml.kernel.org/r/20241101155412.1152709-6-james.clark2@arm.com
+Of these, the majority (295 by my count) map to one or more values in
+one or more id registers. These are what I'd consider the "easy" ones
+(added complexity if we deal with serveral values, but in general, it is
+clear how to handle them, and most of them actually map to a single
+value.) Of course, dependencies may be on top of that.
 
-This change as such looks good to me.
+Then, we have some features (~25 or so) that are actually defined by
+dependencies (i.e. FEAT_FOO and FEAT_BAR mean that we have FEAT_BAZ,
+sometimes with an architecture extension dependency thrown in as well.)
+These features are not really relevant when we compare two cpus since
+they do not map to registers directly, but they are relevant if we allow
+them to be specified (and use them as a kind of shorthand.) IOW, we'd
+need to think about how we'd handle them for comparisons and baselining.
 
-Suzuki
+Next, let's talk about architecture extensions. All features have a
+level where they have been introduced as optional, some have an upper
+limit (e.g. FEAT_AA32EL1 is not allowed from v9.0 onwards), and quite a
+number of them (~65 or so) become mandatory with a certain architecture
+extension. Sometimes, FEAT_FOO + arch ext also implies FEAT_BAR. If we
+introduce Armvx.y named models, we'd need to enforce that some features
+are (not) set for a certain model. Complex, but not a showstopper. (We'd
+also need to deal with that if we worked on the register level.)
 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->   arch/arm64/include/asm/kvm_host.h  | 18 ++++++++-------
->   arch/arm64/kvm/arm.c               |  3 ---
->   arch/arm64/kvm/debug.c             | 36 ++++++++----------------------
->   arch/arm64/kvm/hyp/nvhe/debug-sr.c |  8 +++----
->   4 files changed, 23 insertions(+), 42 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index ad514434f3fe..07da4129f1d1 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -610,6 +610,10 @@ struct cpu_sve_state {
->    * field.
->    */
->   struct kvm_host_data {
-> +#define KVM_HOST_DATA_FLAG_HAS_SPE	0
-> +#define KVM_HOST_DATA_FLAG_HAS_TRBE	1
-> +	unsigned long flags;
-> +
->   	struct kvm_cpu_context host_ctxt;
->   
->   	/*
-> @@ -911,10 +915,6 @@ struct kvm_vcpu_arch {
->   #define EXCEPT_AA64_EL2_SERR	__vcpu_except_flags(7)
->   /* Guest debug is live */
->   #define DEBUG_DIRTY		__vcpu_single_flag(iflags, BIT(4))
-> -/* Save SPE context if active  */
-> -#define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
-> -/* Save TRBE context if active  */
-> -#define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
->   
->   /* SVE enabled for host EL0 */
->   #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-> @@ -1310,6 +1310,12 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
->   	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
->   #endif
->   
-> +#define host_data_test_flag(flag)					\
-> +	(test_bit(KVM_HOST_DATA_FLAG_##flag, host_data_ptr(flags)))
-> +#define host_data_set_flag(flag)					\
-> +	(set_bit(KVM_HOST_DATA_FLAG_##flag, host_data_ptr(flags)))
-> +
-> +
->   /* Check whether the FP regs are owned by the guest */
->   static inline bool guest_owns_fp_regs(void)
->   {
-> @@ -1370,10 +1376,6 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
->   	return (!has_vhe() && attr->exclude_host);
->   }
->   
-> -/* Flags for host debug state */
-> -void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu);
-> -void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
-> -
->   #ifdef CONFIG_KVM
->   void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
->   void kvm_clr_pmu_events(u64 clr);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index ab1bf9ccf385..3822774840e1 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -617,15 +617,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->   
->   	vcpu_set_pauth_traps(vcpu);
->   
-> -	kvm_arch_vcpu_load_debug_state_flags(vcpu);
-> -
->   	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
->   		vcpu_set_on_unsupported_cpu(vcpu);
->   }
->   
->   void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->   {
-> -	kvm_arch_vcpu_put_debug_state_flags(vcpu);
->   	kvm_arch_vcpu_put_fp(vcpu);
->   	if (has_vhe())
->   		kvm_vcpu_put_vhe(vcpu);
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 90ecf1210bd0..97d0c6fd5f61 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -294,40 +294,22 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
->   	}
->   }
->   
-> -void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
-> +void kvm_init_host_debug_data(void)
->   {
-> -	u64 dfr0;
-> +	u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
-> +
-> +	if (cpuid_feature_extract_signed_field(dfr0, ID_AA64DFR0_EL1_PMUVer_SHIFT) > 0)
-> +		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
-> +							      read_sysreg(pmcr_el0));
->   
-> -	/* For VHE, there is nothing to do */
->   	if (has_vhe())
->   		return;
->   
-> -	dfr0 = read_sysreg(id_aa64dfr0_el1);
-> -	/*
-> -	 * If SPE is present on this CPU and is available at current EL,
-> -	 * we may need to check if the host state needs to be saved.
-> -	 */
->   	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
-> -	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
-> -		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
-> +	    !(read_sysreg_s(SYS_PMBIDR_EL1) & PMBIDR_EL1_P))
-> +		host_data_set_flag(HAS_SPE);
->   
-> -	/* Check if we have TRBE implemented and available at the host */
->   	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->   	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
-> -		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-> -}
-> -
-> -void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
-> -{
-> -	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
-> -	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-> -}
-> -
-> -void kvm_init_host_debug_data(void)
-> -{
-> -	u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
-> -
-> -	if (cpuid_feature_extract_signed_field(dfr0, ID_AA64DFR0_EL1_PMUVer_SHIFT) > 0)
-> -		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
-> -							      read_sysreg(pmcr_el0));
-> +		host_data_set_flag(HAS_TRBE);
->   }
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 1e2a26d0196e..858bb38e273f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -82,10 +82,10 @@ static void __debug_restore_trace(u64 trfcr_el1)
->   void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   {
->   	/* Disable and flush SPE data generation */
-> -	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
-> +	if (host_data_test_flag(HAS_SPE))
->   		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
->   	/* Disable and flush Self-Hosted Trace generation */
-> -	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
-> +	if (host_data_test_flag(HAS_TRBE))
->   		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
->   }
->   
-> @@ -96,9 +96,9 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
->   
->   void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   {
-> -	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
-> +	if (host_data_test_flag(HAS_SPE))
->   		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
-> -	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
-> +	if (host_data_test_flag(HAS_TRBE))
->   		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
->   }
->   
+We also have some registers like MIDR/REVIDR that do not correlate with
+any FEAT_xxx, but that we still need to handle; I would suggest to deal
+with them via separate cpu properties (e.g. specify a list of possible
+MIDR/REVIDR pairs.) I hope that there are not too many of them, although
+we do have some impdef registers.
+
+That leaves some headscratchers (at least for me.) E.g. FEAT_UINJ, which
+is optional from v9.5, and mandatory from v9.6, but where I'm unsure how
+we'd discover it, especially as we do not have a way to discover the
+architecture extensions. Maybe this will work for named actual cpus
+only? I'm also not sure if I understand FEAT_CHK, which is listed as
+optional from v8.0 and mandatory from v9.4, but every aarch64 cpu is
+supposed to be compliant, because CHKFEAT might be a NOP (and this is
+only supposed to check for FEAT_GCS? Yes, I'm confused.)
+
+So tl;dr, we cover a lot of the ID register space via FEAT_xxx (with
+varying complexity), but we already know about some exceptions. For some
+FEAT_xxx, I'm not sure if we want to handle them at all.
+
+(I also seem to remember that there some things like perf counters that
+don't map to any on/off features, but no idea about the details here.)
 
