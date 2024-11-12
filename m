@@ -1,57 +1,57 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB633DAC06
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB72C1FB726
+	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731407886; cv=none; b=Ql9OvCB72EieM3W7HJuWpZeQP1z7evr7jtLBrm+/asor4gRG1xVCiKJF5xXHWQYtgv5IZLV7jG09t2apUBrn6zGxqi3rkdIfhgL0ba5/P3/Sl+l7nRsLOXmGPrCGXHXq0eOD8KFkw0tkz5oKKsgRCGpXhrredvUHVyRM9w2fFoM=
+	t=1731407893; cv=none; b=gDtWEBmIUPK5tmtGpt27rAiTtqHKKNW1sULiRotyPeNxWG9hUH4AAS2J4p1tvWIseMoYQxN/HSNZLjtnsxH9uN3bD79lpX1dYAADXH4BM1H35adhJWPZoRHJdizjzzJQDb8ilvj+1soASX/k9yKLH/JjPdEcvG9gzhNBYoWlrgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731407886; c=relaxed/simple;
-	bh=B4UZRCXRV6nk93U+Pyu0fOk1GedmMXLLKFUMPaEPN1I=;
+	s=arc-20240116; t=1731407893; c=relaxed/simple;
+	bh=FIuQLmZ9U5Bjo+xbTCL+G+E/GsoImV728ioC04pcMO0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eMoHYvMYZfvHaWwUJ3RFmtHKHC06OgzHt3qnqB5dKsrBAPFTy0lq0SSPiQZpJz8YtqhzED3oDlVHOc7CU5BITeAzZt0UIBeW63um/p0RNM/Jythb3GblENln2eHUw+hOydbTc+eEB7I+mKtzPtKXKhv6xUkazbCLisWw91yAZvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=P4vAZpw3; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=VD0zbdSElk/WsYiu3gnLWmYiTeuRjjZCoJaguPr+ljnGV7gQHhBpbVfadUNESez3nWIwfo2FIPeGKJVvdJYp+ChX8zG4f8URP11qCKRPQJX8903SG07wEwEEhIWszZkf/Kfyqv5+08YZ5q1jO7Wu+jP3kCZfwsbdjzC/GG1idd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AlLSlodV; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P4vAZpw3"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4314c4cb752so48177745e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:38:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AlLSlodV"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4316f3d3c21so44467125e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:38:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731407882; x=1732012682; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1731407890; x=1732012690; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oGQZgIecdgJFFuz0ar27zElDtqI8/ASy5Gql7KrbLX0=;
-        b=P4vAZpw3bsgisMTk0WE2ch2cDmyQV+sUXiYcBV3FkKeh2Sxrk+Tt3xn15yjUv4mdXj
-         gi76dcDCFPNJPthAy19qVf86xt4X9IuIpfmsFGZmur9wx21OHBJx+nUo9LZGLvRbb5AN
-         9qOkchJ51NV41GKQ+s8NrYMYHAEveBaKflG0+USh+DZWi3X/eEiVPTVNCC71tGPczKek
-         hGTZ2RHhTIgNeaCHaJnKVQSHkD4x4SI6Q+wTCLlaFUXVkKwf4Yl9S41sBT0Ew6Mku8qP
-         UErlNCTZ8YdZSjivadNaIy1xZDVNGzvq78s8scxy3ddRKyp8Qg90vbwKN7tGvc9FT21I
-         1UAw==
+        bh=867c+Xk81TQQxI9AorJDkxlnQKkh21LK8NW2S3F1gcs=;
+        b=AlLSlodV6itAP0g+l6teQDpUB8SkQT6NbBLjoxhZqdhAN5DfEXXw7KOFvyWznyBCs4
+         9PnAA1UnPTZ7YXiVAgiEoe46dD2c21MlGcouLqVBAKOaimjTsTgNsd2BvraD3mqLnFMa
+         Ld2marsJQJT7iv69H0QsJDciOoyKcpR56D2X0RpdRBLUPfpBLy8ALD5RdjsbAswjSFpm
+         oDwRbq+VA5yHTw9lIQQLZZH0OpGMzarKQtkTc4plZgh5Eiv7qkMcVra3N5dzTdW8KQfX
+         QbxUgMEmVLyQWCwJ1+7ayb1ppBILrutalpRm+zxg/uLDAAwlJWU6iYabvgUnSNHzhEcQ
+         ftVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731407882; x=1732012682;
+        d=1e100.net; s=20230601; t=1731407890; x=1732012690;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oGQZgIecdgJFFuz0ar27zElDtqI8/ASy5Gql7KrbLX0=;
-        b=ZI9Rax92hftQd8xRqUO77VS8rmCJr7Lni28i8APRT5oJ64jRiW/MwXtJJBh3QohQCv
-         2KpO75WcHe4BYNI6yUsZv7ySKaTZfFXqOE5gMTav8q9CFAbTpVbXvemxrYOkKwGb+v3n
-         hS5oSY4eA81DMUS/+Csor7ETYc1Jbji24gQvxe5j7lM4xQw6Y/mpsWm5R9pacpM3hzNa
-         HGGcpaPFaj5KV1YZOftx6DqJb1AotPGQqwfhJ+Vc+pHBnGNnTLe804bUgah7MaUm/bPP
-         TNEfB8aDXrGphzQxHUvNcqdYs2tKCnDErGYjfFLk5qy+G6bBmJ688uvtluAnxxJ40QXW
-         dkhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsDJ7NULh+Ia8b+bDPqsHYA6IkwdjWcctsy3poohx54Qt+EImv0pNbZLHGR8y3UIFo+Qao7hw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyitX2AaXDCKechiHY4vXm8k9b5IWbSSCxhMKnYoHlluehk7g5M
-	PUYnZ8xM4fp9TsAhRO0HiJr2u0dKx4Fm4Wan2Qu/NvM3pfsVGmuFFHC+nfjSpHU=
-X-Google-Smtp-Source: AGHT+IHGEHyPFWqoNoYrbeGSGMnOBwTa4lfpM6N5kuAUTD0JGTXynuOGzkoJhiocD1Pug6afrml1XA==
-X-Received: by 2002:a05:600c:354c:b0:42c:acb0:dda5 with SMTP id 5b1f17b1804b1-432b74fdaeemr135858735e9.1.1731407881909;
-        Tue, 12 Nov 2024 02:38:01 -0800 (PST)
+        bh=867c+Xk81TQQxI9AorJDkxlnQKkh21LK8NW2S3F1gcs=;
+        b=qBANUIZmx0UpR5FGrRQSOvDWtwMvhExa7OiZ6SocRTRt3aOyTb+MY4rpikqiGzZ/0W
+         U4VKTSq+B4DvPnRLhmNnEurH/TO7TkJ0shSdm/9lSHrS5zakk5Lgaoo1pSCzME7etHfC
+         8DVvgbocBSsNnKcTO1h6wGefXNCHikvzXFwh1KDzBOSPVVBH89zwAtTO6mdFuu0QrVnQ
+         1lqH2HEleWMEA3/nNFT7C8E4iSB9InHeG0wbgfDSBVlcAxiRphSghAZrimfH/TK1720P
+         MUNZ3n5MRvhdNqY9uhuijape2Da1Gou/+TMKRdoGacl/nPBvGJv+H7voNZSv02ZknuYe
+         o6tA==
+X-Forwarded-Encrypted: i=1; AJvYcCVpHD9dOCIchBICORzDrraxRV5TZ2xJ/O7bgo9FCd1SWFCM3B9Ll/FX+F9ALeNGYYkBpPir06I=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwHaD3zK/fCz5/8kj689QYj6UDMhWuWgt9a0w1/YD6o4112rmCy
+	HNfGjdg/AC4+boxceKctS7REPaKJUuQGQ7z7LmTX+unoHNbx+So6gqh3S7XNrCA=
+X-Google-Smtp-Source: AGHT+IE0xLwD1/ZV0XtAmGGdV4VSBlbGR4egnGHLGmnWqBzEDrOWmm09rA7sjHH5TO65egKKJadivA==
+X-Received: by 2002:a05:600c:1910:b0:431:680e:95ff with SMTP id 5b1f17b1804b1-432cce723d3mr17694385e9.9.1731407890092;
+        Tue, 12 Nov 2024 02:38:10 -0800 (PST)
 Received: from pop-os.. ([145.224.90.214])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432bbf436ffsm142270955e9.44.2024.11.12.02.38.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432bbf436ffsm142270955e9.44.2024.11.12.02.38.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 02:38:01 -0800 (PST)
+        Tue, 12 Nov 2024 02:38:09 -0800 (PST)
 From: James Clark <james.clark@linaro.org>
 To: suzuki.poulose@arm.com,
 	oliver.upton@linux.dev,
@@ -68,15 +68,15 @@ Cc: James Clark <james.clark@linaro.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Mark Brown <broonie@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	James Morse <james.morse@arm.com>,
 	Fuad Tabba <tabba@google.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 04/12] KVM: arm64: Make vcpu flag macros more generic
-Date: Tue, 12 Nov 2024 10:37:03 +0000
-Message-Id: <20241112103717.589952-5-james.clark@linaro.org>
+Subject: [PATCH v7 05/12] KVM: arm64: Move SPE and TRBE flags to host data
+Date: Tue, 12 Nov 2024 10:37:04 +0000
+Message-Id: <20241112103717.589952-6-james.clark@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241112103717.589952-1-james.clark@linaro.org>
 References: <20241112103717.589952-1-james.clark@linaro.org>
@@ -88,289 +88,196 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rename vcpu_* to kvm_* so that the same flags mechanism can be used in
-places other than vcpu without being confusing. Wherever macros are
-still related to vcpu like vcpu_get_flag() with hard coded v->arch, keep
-the vcpu_* name, otherwise change it.
+They don't change, are per-CPU and don't need to be on the vcpu, so
+initialize them one time only. Another benefit is this is done before
+the host is deprivileged so can be trusted by pKVM.
 
-Also move the "v->arch" access one macro higher for the same reason.
-
-This will be used for moving flags to host_data in a later commit.
+Rename SAVE to HAS which is slightly more accurate because saving only
+happens when it exists _and_ is enabled.
 
 Signed-off-by: James Clark <james.clark@linaro.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 88 +++++++++++++++----------------
- arch/arm64/kvm/hyp/exception.c    | 12 ++---
- arch/arm64/kvm/inject_fault.c     |  4 +-
- arch/arm64/kvm/mmio.c             | 10 ++--
- 4 files changed, 57 insertions(+), 57 deletions(-)
+ arch/arm64/include/asm/kvm_host.h  | 21 +++++++-----
+ arch/arm64/kvm/arm.c               |  3 --
+ arch/arm64/kvm/debug.c             | 52 +++++++++++-------------------
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c |  8 ++---
+ 4 files changed, 36 insertions(+), 48 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f333b189fb43..34aa59f498c4 100644
+index 34aa59f498c4..61ff34e1ffef 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -790,22 +790,22 @@ struct kvm_vcpu_arch {
- /*
-  * Each 'flag' is composed of a comma-separated triplet:
-  *
-- * - the flag-set it belongs to in the vcpu->arch structure
-+ * - the flag-set it belongs to in the structure pointed to by 'v'
-  * - the value for that flag
-  * - the mask for that flag
-  *
-- *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
-- * unpack_vcpu_flag() extract the flag value from the triplet for
-+ *  __kvm_single_flag() builds such a triplet for a single-bit flag.
-+ * unpack_kvm_flag() extract the flag value from the triplet for
-  * direct use outside of the flag accessors.
-  */
--#define __vcpu_single_flag(_set, _f)	_set, (_f), (_f)
-+#define __kvm_single_flag(_set, _f)	_set, (_f), (_f)
+@@ -638,6 +638,11 @@ struct kvm_host_data {
+ 		FP_STATE_GUEST_OWNED,
+ 	} fp_owner;
  
- #define __unpack_flag(_set, _f, _m)	_f
--#define unpack_vcpu_flag(...)		__unpack_flag(__VA_ARGS__)
-+#define unpack_kvm_flag(...)		__unpack_flag(__VA_ARGS__)
- 
- #define __build_check_flag(v, flagset, f, m)			\
- 	do {							\
--		typeof(v->arch.flagset) *_fset;			\
-+		typeof(v.flagset) *_fset;			\
- 								\
- 		/* Check that the flags fit in the mask */	\
- 		BUILD_BUG_ON(HWEIGHT(m) != HWEIGHT((f) | (m)));	\
-@@ -813,11 +813,11 @@ struct kvm_vcpu_arch {
- 		BUILD_BUG_ON((sizeof(*_fset) * 8) <= __fls(m));	\
- 	} while (0)
- 
--#define __vcpu_get_flag(v, flagset, f, m)			\
-+#define __kvm_get_flag(v, flagset, f, m)			\
- 	({							\
- 		__build_check_flag(v, flagset, f, m);		\
- 								\
--		READ_ONCE(v->arch.flagset) & (m);		\
-+		READ_ONCE(v.flagset) & (m);		\
- 	})
- 
- /*
-@@ -826,64 +826,64 @@ struct kvm_vcpu_arch {
-  */
- #ifdef __KVM_NVHE_HYPERVISOR__
- /* the nVHE hypervisor is always non-preemptible */
--#define __vcpu_flags_preempt_disable()
--#define __vcpu_flags_preempt_enable()
-+#define __kvm_flags_preempt_disable()
-+#define __kvm_flags_preempt_enable()
- #else
--#define __vcpu_flags_preempt_disable()	preempt_disable()
--#define __vcpu_flags_preempt_enable()	preempt_enable()
-+#define __kvm_flags_preempt_disable()	preempt_disable()
-+#define __kvm_flags_preempt_enable()	preempt_enable()
- #endif
- 
--#define __vcpu_set_flag(v, flagset, f, m)			\
-+#define __kvm_set_flag(v, flagset, f, m)			\
- 	do {							\
--		typeof(v->arch.flagset) *fset;			\
-+		typeof(v.flagset) *fset;			\
- 								\
- 		__build_check_flag(v, flagset, f, m);		\
- 								\
--		fset = &v->arch.flagset;			\
--		__vcpu_flags_preempt_disable();			\
-+		fset = &v.flagset;			\
-+		__kvm_flags_preempt_disable();			\
- 		if (HWEIGHT(m) > 1)				\
- 			*fset &= ~(m);				\
- 		*fset |= (f);					\
--		__vcpu_flags_preempt_enable();			\
-+		__kvm_flags_preempt_enable();			\
- 	} while (0)
- 
--#define __vcpu_clear_flag(v, flagset, f, m)			\
-+#define __kvm_clear_flag(v, flagset, f, m)			\
- 	do {							\
--		typeof(v->arch.flagset) *fset;			\
-+		typeof(v.flagset) *fset;			\
- 								\
- 		__build_check_flag(v, flagset, f, m);		\
- 								\
--		fset = &v->arch.flagset;			\
--		__vcpu_flags_preempt_disable();			\
-+		fset = &v.flagset;			\
-+		__kvm_flags_preempt_disable();			\
- 		*fset &= ~(m);					\
--		__vcpu_flags_preempt_enable();			\
-+		__kvm_flags_preempt_enable();			\
- 	} while (0)
- 
--#define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
--#define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
--#define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
-+#define vcpu_get_flag(v, ...)	__kvm_get_flag(((v)->arch), __VA_ARGS__)
-+#define vcpu_set_flag(v, ...)	__kvm_set_flag(((v)->arch), __VA_ARGS__)
-+#define vcpu_clear_flag(v, ...)	__kvm_clear_flag(((v)->arch), __VA_ARGS__)
- 
- /* SVE exposed to guest */
--#define GUEST_HAS_SVE		__vcpu_single_flag(cflags, BIT(0))
-+#define GUEST_HAS_SVE		__kvm_single_flag(cflags, BIT(0))
- /* SVE config completed */
--#define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
-+#define VCPU_SVE_FINALIZED	__kvm_single_flag(cflags, BIT(1))
- /* PTRAUTH exposed to guest */
--#define GUEST_HAS_PTRAUTH	__vcpu_single_flag(cflags, BIT(2))
-+#define GUEST_HAS_PTRAUTH	__kvm_single_flag(cflags, BIT(2))
- /* KVM_ARM_VCPU_INIT completed */
--#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(3))
-+#define VCPU_INITIALIZED	__kvm_single_flag(cflags, BIT(3))
- 
- /* Exception pending */
--#define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
-+#define PENDING_EXCEPTION	__kvm_single_flag(iflags, BIT(0))
- /*
-  * PC increment. Overlaps with EXCEPT_MASK on purpose so that it can't
-  * be set together with an exception...
-  */
--#define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
-+#define INCREMENT_PC		__kvm_single_flag(iflags, BIT(1))
- /* Target EL/MODE (not a single flag, but let's abuse the macro) */
--#define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
-+#define EXCEPT_MASK		__kvm_single_flag(iflags, GENMASK(3, 1))
- 
- /* Helpers to encode exceptions with minimum fuss */
--#define __EXCEPT_MASK_VAL	unpack_vcpu_flag(EXCEPT_MASK)
-+#define __EXCEPT_MASK_VAL	unpack_kvm_flag(EXCEPT_MASK)
- #define __EXCEPT_SHIFT		__builtin_ctzl(__EXCEPT_MASK_VAL)
- #define __vcpu_except_flags(_f)	iflags, (_f << __EXCEPT_SHIFT), __EXCEPT_MASK_VAL
- 
-@@ -907,28 +907,28 @@ struct kvm_vcpu_arch {
- #define EXCEPT_AA64_EL2_FIQ	__vcpu_except_flags(6)
++	struct {
++		/* Host CPU features, set at init */
++		u8 feats;
++	} flags;
++
+ 	/*
+ 	 * host_debug_state contains the host registers which are
+ 	 * saved and restored during world switches.
+@@ -908,10 +913,6 @@ struct kvm_vcpu_arch {
  #define EXCEPT_AA64_EL2_SERR	__vcpu_except_flags(7)
  /* Guest debug is live */
--#define DEBUG_DIRTY		__vcpu_single_flag(iflags, BIT(4))
-+#define DEBUG_DIRTY		__kvm_single_flag(iflags, BIT(4))
- /* Save SPE context if active  */
--#define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
-+#define DEBUG_STATE_SAVE_SPE	__kvm_single_flag(iflags, BIT(5))
- /* Save TRBE context if active  */
--#define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
-+#define DEBUG_STATE_SAVE_TRBE	__kvm_single_flag(iflags, BIT(6))
+ #define DEBUG_DIRTY		__kvm_single_flag(iflags, BIT(4))
+-/* Save SPE context if active  */
+-#define DEBUG_STATE_SAVE_SPE	__kvm_single_flag(iflags, BIT(5))
+-/* Save TRBE context if active  */
+-#define DEBUG_STATE_SAVE_TRBE	__kvm_single_flag(iflags, BIT(6))
  
  /* SVE enabled for host EL0 */
--#define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-+#define HOST_SVE_ENABLED	__kvm_single_flag(sflags, BIT(0))
- /* SME enabled for EL0 */
--#define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
-+#define HOST_SME_ENABLED	__kvm_single_flag(sflags, BIT(1))
- /* Physical CPU not in supported_cpus */
--#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
-+#define ON_UNSUPPORTED_CPU	__kvm_single_flag(sflags, BIT(2))
- /* WFIT instruction trapped */
--#define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
-+#define IN_WFIT			__kvm_single_flag(sflags, BIT(3))
- /* vcpu system registers loaded on physical CPU */
--#define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
-+#define SYSREGS_ON_CPU		__kvm_single_flag(sflags, BIT(4))
- /* Software step state is Active-pending */
--#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
-+#define DBG_SS_ACTIVE_PENDING	__kvm_single_flag(sflags, BIT(5))
- /* PMUSERENR for the guest EL0 is on physical CPU */
--#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
-+#define PMUSERENR_ON_CPU	__kvm_single_flag(sflags, BIT(6))
+ #define HOST_SVE_ENABLED	__kvm_single_flag(sflags, BIT(0))
+@@ -930,6 +931,14 @@ struct kvm_vcpu_arch {
  /* WFI instruction trapped */
--#define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
-+#define IN_WFI			__kvm_single_flag(sflags, BIT(7))
+ #define IN_WFI			__kvm_single_flag(sflags, BIT(7))
  
++#define host_data_get_flag(...)	__kvm_get_flag((*host_data_ptr(flags)), __VA_ARGS__)
++#define host_data_set_flag(...)	__kvm_set_flag((*host_data_ptr(flags)), __VA_ARGS__)
++#define host_data_clear_flag(...) __kvm_clear_flag((*host_data_ptr(flags)), __VA_ARGS__)
++
++/* Save SPE context if active  */
++#define HOST_FEAT_HAS_SPE	__kvm_single_flag(feats, BIT(0))
++/* Save TRBE context if active  */
++#define HOST_FEAT_HAS_TRBE	__kvm_single_flag(feats, BIT(1))
  
  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 424a5107cddb..6bb61e933644 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -320,13 +320,13 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+ #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+@@ -1367,10 +1376,6 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+ 	return (!has_vhe() && attr->exclude_host);
+ }
+ 
+-/* Flags for host debug state */
+-void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu);
+-void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+-
+ #ifdef CONFIG_KVM
+ void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+ void kvm_clr_pmu_events(u64 clr);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a102c3aebdbc..2a54baca3144 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -617,15 +617,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	vcpu_set_pauth_traps(vcpu);
+ 
+-	kvm_arch_vcpu_load_debug_state_flags(vcpu);
+-
+ 	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
+ 		vcpu_set_on_unsupported_cpu(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
  {
- 	if (vcpu_el1_is_32bit(vcpu)) {
- 		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
--		case unpack_vcpu_flag(EXCEPT_AA32_UND):
-+		case unpack_kvm_flag(EXCEPT_AA32_UND):
- 			enter_exception32(vcpu, PSR_AA32_MODE_UND, 4);
- 			break;
--		case unpack_vcpu_flag(EXCEPT_AA32_IABT):
-+		case unpack_kvm_flag(EXCEPT_AA32_IABT):
- 			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 12);
- 			break;
--		case unpack_vcpu_flag(EXCEPT_AA32_DABT):
-+		case unpack_kvm_flag(EXCEPT_AA32_DABT):
- 			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 16);
- 			break;
- 		default:
-@@ -335,15 +335,15 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+-	kvm_arch_vcpu_put_debug_state_flags(vcpu);
+ 	kvm_arch_vcpu_put_fp(vcpu);
+ 	if (has_vhe())
+ 		kvm_vcpu_put_vhe(vcpu);
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index ce8886122ed3..cf5558806687 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -68,16 +68,31 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+ /**
+  * kvm_arm_init_debug - grab what we need for debug
+  *
+- * Currently the sole task of this function is to retrieve the initial
+- * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
+- * presumably been set-up by some knowledgeable bootcode.
+- *
+  * It is called once per-cpu during CPU hyp initialisation.
+  */
+ 
+ void kvm_arm_init_debug(void)
+ {
++	u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
++
++	/*
++	 * Retrieve the initial value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which
++	 * has presumably been set-up by some knowledgeable bootcode.
++	 */
+ 	__this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
++
++	/*
++	 * If SPE is present on this CPU and is available at current EL,
++	 * we may need to check if the host state needs to be saved.
++	 */
++	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
++	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
++		host_data_set_flag(HOST_FEAT_HAS_SPE);
++
++	/* Check if we have TRBE implemented and available at the host */
++	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
++	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
++		host_data_set_flag(HOST_FEAT_HAS_TRBE);
+ }
+ 
+ /**
+@@ -314,32 +329,3 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
  		}
- 	} else {
- 		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
--		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC):
-+		case unpack_kvm_flag(EXCEPT_AA64_EL1_SYNC):
- 			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
- 			break;
+ 	}
+ }
+-
+-void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+-{
+-	u64 dfr0;
+-
+-	/* For VHE, there is nothing to do */
+-	if (has_vhe())
+-		return;
+-
+-	dfr0 = read_sysreg(id_aa64dfr0_el1);
+-	/*
+-	 * If SPE is present on this CPU and is available at current EL,
+-	 * we may need to check if the host state needs to be saved.
+-	 */
+-	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
+-	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
+-		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+-
+-	/* Check if we have TRBE implemented and available at the host */
+-	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+-	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+-		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+-}
+-
+-void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+-{
+-	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+-	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+-}
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index 53efda0235cf..89f44a51a172 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -82,10 +82,10 @@ static void __debug_restore_trace(u64 trfcr_el1)
+ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	/* Disable and flush SPE data generation */
+-	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
++	if (host_data_get_flag(HOST_FEAT_HAS_SPE))
+ 		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
+ 	/* Disable and flush Self-Hosted Trace generation */
+-	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
++	if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
+ 		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
+ }
  
--		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SYNC):
-+		case unpack_kvm_flag(EXCEPT_AA64_EL2_SYNC):
- 			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_sync);
- 			break;
+@@ -96,9 +96,9 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
  
--		case unpack_vcpu_flag(EXCEPT_AA64_EL2_IRQ):
-+		case unpack_kvm_flag(EXCEPT_AA64_EL2_IRQ):
- 			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_irq);
- 			break;
+ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+-	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
++	if (host_data_get_flag(HOST_FEAT_HAS_SPE))
+ 		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
+-	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
++	if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
+ 		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
+ }
  
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index a640e839848e..a7a2540cc507 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -83,7 +83,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 
- 	esr |= ESR_ELx_FSC_EXTABT;
- 
--	if (match_target_el(vcpu, unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC))) {
-+	if (match_target_el(vcpu, unpack_kvm_flag(EXCEPT_AA64_EL1_SYNC))) {
- 		vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
- 		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
- 	} else {
-@@ -105,7 +105,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	if (kvm_vcpu_trap_il_is32bit(vcpu))
- 		esr |= ESR_ELx_IL;
- 
--	if (match_target_el(vcpu, unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC)))
-+	if (match_target_el(vcpu, unpack_kvm_flag(EXCEPT_AA64_EL1_SYNC)))
- 		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
- 	else
- 		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index ab365e839874..1728e37739fe 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -79,17 +79,17 @@ static bool kvm_pending_sync_exception(struct kvm_vcpu *vcpu)
- 
- 	if (vcpu_el1_is_32bit(vcpu)) {
- 		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
--		case unpack_vcpu_flag(EXCEPT_AA32_UND):
--		case unpack_vcpu_flag(EXCEPT_AA32_IABT):
--		case unpack_vcpu_flag(EXCEPT_AA32_DABT):
-+		case unpack_kvm_flag(EXCEPT_AA32_UND):
-+		case unpack_kvm_flag(EXCEPT_AA32_IABT):
-+		case unpack_kvm_flag(EXCEPT_AA32_DABT):
- 			return true;
- 		default:
- 			return false;
- 		}
- 	} else {
- 		switch (vcpu_get_flag(vcpu, EXCEPT_MASK)) {
--		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC):
--		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SYNC):
-+		case unpack_kvm_flag(EXCEPT_AA64_EL1_SYNC):
-+		case unpack_kvm_flag(EXCEPT_AA64_EL2_SYNC):
- 			return true;
- 		default:
- 			return false;
 -- 
 2.34.1
 
