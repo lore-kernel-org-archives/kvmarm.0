@@ -1,57 +1,57 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB4F22D3A2
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031D322DAAF
+	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731407910; cv=none; b=JPxOg4rGlbFJZZG2tE1xBgbxy3qYVnB0s9GoXpqTWP4C12jKOf33WuloqzkJZNa9993a5jkDfTal/BkPfa3lwDeMWrjnxrn4QiKaKGmIBPUl1JiQBh2JxGIKkxl+dC4PdeFTrH3pxxAAhSaFrweXxOQWCN5Yoe7F7sPfNk8TqPc=
+	t=1731407918; cv=none; b=JXfnd2h9OV4UiLdDu6a3MqyqNbqiR/ZBBOSf+u/ao6bcf2LLlg9UQK/iIhQXyhZoqGXBAgXQQ0ifA9QQcAUSzt9tM2IDWIOw/c3lAT/RzncMQBdSpYYZu/u+6CtmSYzltIthtpxDebNpLYckhUxgjLEJIDbnCAooxXWkEtGHVTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731407910; c=relaxed/simple;
-	bh=zk+4pcQCSjKK/iDPaC2u2wqNDKb9SOs+tEOzLzLMQH0=;
+	s=arc-20240116; t=1731407918; c=relaxed/simple;
+	bh=VnWsmMKnMInILDBhUOtDjYLT82C4LM+EO+fLcBWjlPY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E2ZNqPckiF3CPklBjw09YMmK8sPvSJvK5jCcz7CltVth0aRNPWp3btHKDriDuSdSCzHIlBuUMi+yw24fjgUZjpYJNcVha+Xu9/bJpPEoCt8mDiVFYorJjHgiMXr0NRjG3SsBecEtaeM4DKxMbQYM+4owqvN1k+80gZskjX8C2hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OWs/tzTQ; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=hGREDWABqGCydg+e7JwQLHuP2v0tuHroijuHWwwcTyOcEPOsPA82aZHiGJDifAfPUb9hnHfWJZe9zjNdvg8ga4JOB+h/pxSRKbnp+JHWWRitKjgNbDh209UTsI2GWBE7fGb9V2zozio4D9YOLhZ61+FLN6HIsje7/fN/kKhxvIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gIQbQQVc; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OWs/tzTQ"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4315f24a6bbso43250865e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:38:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gIQbQQVc"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-431695fa98bso43170605e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:38:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731407907; x=1732012707; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1731407915; x=1732012715; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LV3nsyw5404Uo8G1nSnnmKQ1QdbiAR4HgkQNY6sysiA=;
-        b=OWs/tzTQ1LKwnoRf+kkHFFU5wr8q4Eq+pLeLM68PA0xzcIDWZloVZ5ZQQTRE7U95lT
-         KvScm6DQuMpL91fpJ3y28UMP0eAKbtNOkaQ30yrRND5CFAUngzW6pjEzJTK8UVhuqn+K
-         3qvFc8NCsdmfQtf48v+2NVaVxvdWIqJ/0IuKy2cGQvfTI1JOfFfVRQdABJJOgdZNctKi
-         +P5bomdlSLXwb3YIIVCYvHMqy1vAUAohhvvpgRGXz99FWKvebKCqhI8ofKL2P/Neq6bn
-         PJmZqCzb4K3LffKBB90k8xbVaU4Lexoq1XJ0g5DUrVdKBLSFdTHbtCx1fdZd82IBzgmp
-         wuFw==
+        bh=5PUUdanfV8/dMTaROo3OjL1mScK+2ashhKsQ/yXMrNE=;
+        b=gIQbQQVcmdQFl6r+kRshfZj049TR4NtDbzhevRlMapecd8BlfovOJNlXleESjtkAGq
+         HZb7sGUAI6J1a+UbI6LEBAdZWC+4ZlCBCxCFV4xpoSarUkqva4+CCf38l3y4uJJJ//gD
+         zX8VU9TyMat6KqYI1VtshsckIfpvXd4B/Jf/+D+i1GAu3dR1iIgMMl517RmPD0V7qmlq
+         4CtP95QrDIaXNLlVNvO+es/W8WSKs3e3pPr0mB13100OyeqUHZdaGc5VLYzkhPo0eZIJ
+         HZlwnfx9s3xdAuxlGkNPcGr/TM6tb9hWGckQ00k8me74UMvAK1v8ig6L+apvEiPqWbvc
+         exOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731407907; x=1732012707;
+        d=1e100.net; s=20230601; t=1731407915; x=1732012715;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LV3nsyw5404Uo8G1nSnnmKQ1QdbiAR4HgkQNY6sysiA=;
-        b=CLyIE6sTzDJoIis5bfRGQd5bd7pZdbPoYdV3TIKKo5yIbvWiqInHLIcc0ykEmJMsaY
-         DeJUkvd8gcHrswPRp3WbeFtuBmYCoYth7MBk4cJS8aClTu2A94aobcK4dLafBTuMU8jH
-         EiS+hupPuTu+s2dqA6pnwC3wkZJKORYd3iIJkP9tyTEDCg4nBJrEWPsTXKnpRfMCwYkK
-         1X9pBENJ7GflQ3A2Iz0U5xbpiUgz2/7j3KSu2Iz8i3vxCmHdiWtgvb6ZRAJqDhSFL+6v
-         iJ5Hhr58JDw0Hbg0VEz2M9l0ovV1CL9FIrBbJ0HJ6+js302xWArLi98Zn5OrDdApgIIl
-         PkRg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1KiNqT+5FuJLZ8e74c7QKBHGBpjCM9gT3zgUl5cTCKHu9OSauzuqTnP8lmQzBXWi2AS2c7IM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YweeJ/E0glSG3mtc4tT6ozTkDYd/cV5PbubZA9TkZjwQm1idUpl
-	z5YJbCUCsc5qyi8ig40rTv5mch97RfFA8VAkCsQk/bXyY1NYiC+Vnj3VjeHdUL4=
-X-Google-Smtp-Source: AGHT+IE1wDzy/6MnLRWAcMttuy2R6a5vKVFmcLrn5P5890TBsIGhMnK8XJK5ODuYyXhsBnu+l89pAA==
-X-Received: by 2002:a05:600c:5127:b0:431:5ba2:2450 with SMTP id 5b1f17b1804b1-432b751e264mr133161105e9.33.1731407906666;
-        Tue, 12 Nov 2024 02:38:26 -0800 (PST)
+        bh=5PUUdanfV8/dMTaROo3OjL1mScK+2ashhKsQ/yXMrNE=;
+        b=QpzLx4f9zUg7zfJJi2D4wKT2MZFTFaQ6YzLHnr9/YqLISPOkqOoMMFFZ5Hn0sT8DIv
+         +ghUGqc0tpqWf9aKTmcxGd5z2/icmrlfT2nbAJncWldJzAKcxImRcxUORFHHBqqFzUQi
+         HdFJFqoxazLa6cTEvydlGgWcIx/wybVD4kb8deJXp8/lOdfT4ermIJsZHbiuxN1WDrN1
+         F04VncirY4P5z8s3rPOh86S2GBVcRr4bIZ9cpCCeqMpSupUHi7LRIynKjmZISbjcTa0l
+         5tOInHyi329JwmhyFutAPdlzWnbX9CLSFJ7bTLC9M0vCZhg6DQYaH/ktBWIH9MeBDxu6
+         NCJg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6/stWE/EpgGjxL2GXgkSMHAghWC5TRYaUP/OI0hQMpyk4Cn6OoZ7sOrhN+8Y73Cx1gERnJ9k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyabUCmhrHLR++b9LZ28xtOlVul2S0ntfRapOs0FnY5ZPSarhGZ
+	uExbD6EDpbnGwNiTdKKYAE5axoMz67AvwI2MPT4cnp2K6/1SiD/itpmae+qeSEs=
+X-Google-Smtp-Source: AGHT+IGRUXiwIphPDLp8SPINsrbnyjqSeYnthdnyXbEy6DX7IRif2HAVNDMi2ra2ERahPrHHXoqCRw==
+X-Received: by 2002:a05:600c:35d5:b0:431:547e:81d0 with SMTP id 5b1f17b1804b1-432b7503749mr126843845e9.11.1731407915453;
+        Tue, 12 Nov 2024 02:38:35 -0800 (PST)
 Received: from pop-os.. ([145.224.90.214])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432bbf436ffsm142270955e9.44.2024.11.12.02.38.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432bbf436ffsm142270955e9.44.2024.11.12.02.38.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 02:38:26 -0800 (PST)
+        Tue, 12 Nov 2024 02:38:34 -0800 (PST)
 From: James Clark <james.clark@linaro.org>
 To: suzuki.poulose@arm.com,
 	oliver.upton@linux.dev,
@@ -67,16 +67,17 @@ Cc: James Clark <james.clark@linaro.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Fuad Tabba <tabba@google.com>,
 	James Morse <james.morse@arm.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Mark Brown <broonie@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 07/12] KVM: arm64: arm_spe: Give SPE enabled state to KVM
-Date: Tue, 12 Nov 2024 10:37:06 +0000
-Message-Id: <20241112103717.589952-8-james.clark@linaro.org>
+Subject: [PATCH v7 08/12] KVM: arm64: Don't hit sysregs to see if SPE is enabled or not
+Date: Tue, 12 Nov 2024 10:37:07 +0000
+Message-Id: <20241112103717.589952-9-james.clark@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241112103717.589952-1-james.clark@linaro.org>
 References: <20241112103717.589952-1-james.clark@linaro.org>
@@ -88,149 +89,148 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently in nVHE, KVM has to check if SPE is enabled on every guest
-switch even if it was never used. Because it's a debug feature and is
-more likely to not be used than used, give KVM the SPE buffer status to
-allow a much simpler and faster do-nothing path in the hyp.
+Now that the driver tells us whether SPE was used or not we can use
+that. Except in pKVM where the host isn't trusted we keep the existing
+feature + sysreg check.
 
-This is always called with preemption disabled except for probe/hotplug
-which gets wrapped with preempt_disable().
+The unconditional zeroing of pmscr_el1 if nothing is saved can also be
+dropped. Zeroing it after the restore has the same effect, but only
+incurs the write if it was actually enabled.
+
+Now in the normal nVHE case, SPE saving is gated by a single flag read
+on kvm_host_data.
 
 Signed-off-by: James Clark <james.clark@linaro.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  6 ++++++
- arch/arm64/kvm/debug.c            | 29 +++++++++++++++++++++++++++++
- drivers/perf/arm_spe_pmu.c        | 13 +++++++++++--
- 3 files changed, 46 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h   |  2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c | 52 ++++++++++++++++++------------
+ arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
+ 3 files changed, 34 insertions(+), 22 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 5dfc3f4f74b2..7f1e32d40f0c 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -641,6 +641,8 @@ struct kvm_host_data {
- 	struct {
- 		/* Host CPU features, set at init */
- 		u8 feats;
-+		/* Host CPU state */
-+		u8 state;
- 	} flags;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index c838309e4ec4..4039a42ca62a 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -105,7 +105,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
+ void __debug_switch_to_host(struct kvm_vcpu *vcpu);
  
- 	/*
-@@ -941,6 +943,8 @@ struct kvm_vcpu_arch {
- #define HOST_FEAT_HAS_TRBE	__kvm_single_flag(feats, BIT(1))
- /* CPU has Feat_TRF */
- #define HOST_FEAT_HAS_TRF	__kvm_single_flag(feats, BIT(2))
-+/* PMBLIMITR_EL1_E is set (SPE profiling buffer enabled) */
-+#define HOST_STATE_SPE_EN	__kvm_single_flag(state, BIT(0))
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
- #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-@@ -1382,6 +1386,7 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
- void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u64 clr);
- bool kvm_set_pmuserenr(u64 val);
-+void kvm_set_pmblimitr(u64 pmblimitr);
- #else
- static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u64 clr) {}
-@@ -1389,6 +1394,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
- {
- 	return false;
- }
-+static inline void kvm_set_pmblimitr(u64 pmblimitr) {}
+ #ifdef __KVM_NVHE_HYPERVISOR__
+-void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu);
++void __debug_save_host_buffers_nvhe(void);
+ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
  #endif
  
- void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index fb41ef5d9db9..ed3b4d057c52 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -335,3 +335,32 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
- 		}
- 	}
- }
-+
-+static bool kvm_arm_skip_trace_state(void)
-+{
-+	/* pKVM hyp finds out the state for itself */
-+	if (is_protected_kvm_enabled())
-+		return true;
-+
-+	/* Make sure state gets there in one piece */
-+	if (WARN_ON_ONCE(preemptible()))
-+		return true;
-+
-+	return false;
-+}
-+
-+void kvm_set_pmblimitr(u64 pmblimitr)
-+{
-+	/* Only read in nVHE */
-+	if (has_vhe())
-+		return;
-+
-+	if (kvm_arm_skip_trace_state())
-+		return;
-+
-+	if (pmblimitr & PMBLIMITR_EL1_E)
-+		host_data_set_flag(HOST_STATE_SPE_EN);
-+	else
-+		host_data_clear_flag(HOST_STATE_SPE_EN);
-+}
-+EXPORT_SYMBOL_GPL(kvm_set_pmblimitr);
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 3569050f9cf3..6a79df363aa6 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -23,6 +23,7 @@
- #include <linux/interrupt.h>
- #include <linux/irq.h>
- #include <linux/kernel.h>
-+#include <linux/kvm_host.h>
- #include <linux/list.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -496,6 +497,12 @@ static u64 arm_spe_pmu_next_off(struct perf_output_handle *handle)
- 	return limit;
- }
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index 89f44a51a172..578c549af3c6 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -14,24 +14,23 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
  
-+static void arm_spe_write_pmblimitr(u64 val)
-+{
-+	write_sysreg_s(val, SYS_PMBLIMITR_EL1);
-+	kvm_set_pmblimitr(val);
-+}
-+
- static void arm_spe_perf_aux_output_begin(struct perf_output_handle *handle,
- 					  struct perf_event *event)
+-static void __debug_save_spe(u64 *pmscr_el1)
++static bool __debug_spe_enabled(void)
  {
-@@ -524,7 +531,7 @@ static void arm_spe_perf_aux_output_begin(struct perf_output_handle *handle,
- 	write_sysreg_s(base, SYS_PMBPTR_EL1);
- 
- out_write_limit:
--	write_sysreg_s(limit, SYS_PMBLIMITR_EL1);
-+	arm_spe_write_pmblimitr(limit);
- }
- 
- static void arm_spe_perf_aux_output_end(struct perf_output_handle *handle)
-@@ -552,7 +559,7 @@ static void arm_spe_pmu_disable_and_drain_local(void)
- 	dsb(nsh);
- 
- 	/* Disable the profiling buffer */
--	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-+	arm_spe_write_pmblimitr(0);
- 	isb();
- }
- 
-@@ -1095,7 +1102,9 @@ static void __arm_spe_pmu_reset_local(void)
- 	 * This is probably overkill, as we have no idea where we're
- 	 * draining any buffered data to...
+-	u64 reg;
+-
+-	/* Clear pmscr in case of early return */
+-	*pmscr_el1 = 0;
+-
+ 	/*
+-	 * At this point, we know that this CPU implements
+-	 * SPE and is available to the host.
+-	 * Check if the host is actually using it ?
++	 * Check if the host is actually using SPE. In pKVM read the state,
++	 * otherwise just trust that the host told us it was being used.
  	 */
-+	preempt_disable();
- 	arm_spe_pmu_disable_and_drain_local();
-+	preempt_enable();
+-	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+-	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
+-		return;
++	if (unlikely(is_protected_kvm_enabled()))
++		return host_data_get_flag(HOST_FEAT_HAS_SPE) &&
++		       (read_sysreg_s(SYS_PMBLIMITR_EL1) & PMBLIMITR_EL1_E);
++	else
++		return host_data_get_flag(HOST_STATE_SPE_EN);
++}
  
- 	/* Reset the buffer base pointer */
- 	write_sysreg_s(0, SYS_PMBPTR_EL1);
+-	/* Yes; save the control register and disable data generation */
+-	*pmscr_el1 = read_sysreg_el1(SYS_PMSCR);
++static void __debug_save_spe(void)
++{
++	/* Save the control register and disable data generation */
++	*host_data_ptr(host_debug_state.pmscr_el1) = read_sysreg_el1(SYS_PMSCR);
+ 	write_sysreg_el1(0, SYS_PMSCR);
+ 	isb();
+ 
+@@ -39,8 +38,14 @@ static void __debug_save_spe(u64 *pmscr_el1)
+ 	psb_csync();
+ }
+ 
+-static void __debug_restore_spe(u64 pmscr_el1)
++static void __debug_restore_spe(void)
+ {
++	u64 pmscr_el1 = *host_data_ptr(host_debug_state.pmscr_el1);
++
++	/*
++	 * PMSCR was set to 0 to disable so if it's already 0, no restore is
++	 * necessary.
++	 */
+ 	if (!pmscr_el1)
+ 		return;
+ 
+@@ -49,6 +54,13 @@ static void __debug_restore_spe(u64 pmscr_el1)
+ 
+ 	/* Re-enable data generation */
+ 	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
++
++	/*
++	 * Disable future restores until a non zero value is saved again. Since
++	 * this is called unconditionally on exit, future register writes are
++	 * skipped until they are needed again.
++	 */
++	*host_data_ptr(host_debug_state.pmscr_el1) = 0;
+ }
+ 
+ static void __debug_save_trace(u64 *trfcr_el1)
+@@ -79,11 +91,12 @@ static void __debug_restore_trace(u64 trfcr_el1)
+ 	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
+ }
+ 
+-void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
++void __debug_save_host_buffers_nvhe(void)
+ {
+ 	/* Disable and flush SPE data generation */
+-	if (host_data_get_flag(HOST_FEAT_HAS_SPE))
+-		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
++	if (__debug_spe_enabled())
++		__debug_save_spe();
++
+ 	/* Disable and flush Self-Hosted Trace generation */
+ 	if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
+ 		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
+@@ -96,8 +109,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+ 
+ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+-	if (host_data_get_flag(HOST_FEAT_HAS_SPE))
+-		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
++	__debug_restore_spe();
+ 	if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
+ 		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
+ }
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index cc69106734ca..edd657797463 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -300,7 +300,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	 * translation regime to EL2 (via MDCR_EL2_E2PB == 0) and
+ 	 * before we load guest Stage1.
+ 	 */
+-	__debug_save_host_buffers_nvhe(vcpu);
++	__debug_save_host_buffers_nvhe();
+ 
+ 	/*
+ 	 * We're about to restore some new MMU state. Make sure
 -- 
 2.34.1
 
