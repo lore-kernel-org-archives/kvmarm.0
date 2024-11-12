@@ -1,104 +1,415 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41116215C4E
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820151F779C;
+	Tue, 12 Nov 2024 11:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731409002; cv=none; b=uB29DswFewQnwCyUCtAuexvLM7nc+zJJXIdc6eT7qSZT7XyNjZDuhy6q/2izqycg0q64MvVD0Rgxw/+x3/WlOmyIhilIEYfnMs19fzQe5DJxpGx1COPQYHZ8XHFLC982k4Q866O3wF13K+Wr8N6HMken8PsU8S3NrnAqyDELO3A=
+	t=1731412309; cv=none; b=gcCMVI4AfFp3nMFifTtuu5fnlC7U61BRuIzRu8pB6ITmiXxdfEYPTjLmoToG/jW1ESp1fiwKdT7vt5LU9BpAKL3L+wLP/YzJq2qBMKy1+DK3ydeVmdRCm9zh36h8fGRC1Bb6pXOZZPS1VV8PqXFo/W4SsJOz8gA4IGh7faaTEZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731409002; c=relaxed/simple;
-	bh=JZxAEgGxHQWBt6q+QSSE/uiFAiC7QtIJ1zAHsyKz/F8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PrCiFLt5K+6kFQgxuBR7VKATmOhMuj2uGWBQcITLpy4l7KugknKSNblUDDwjzNy8BkjafaP6clju/f0DV+tFUEJRn2hJrFmFZUimxOo3AajlUxdbwLP6tQxUQ2Q7C+pevwUslwiRaKWk2jQG57qRjPc/3uswsySvvz1/jJulQ9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Me2iCtli; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1731412309; c=relaxed/simple;
+	bh=rVaA3ev3+az5uRSNO7YC0hpQX2tlQujZzf1EwZa+A5U=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=moyb6yXubiI6vY2CafsjH+cZX9zJ3z9L+fIo4gGLN5Cd8an0QrCquQQeHiBGrqe9ZVaUNDYUvzcdYEs6VF9slHRnSpM8WiznOQrDD9KsjIW31ii5E9OzUNj+/lecNQN0yCajUyH2eDtxopJNuZ3rkRd6Bz0Xv7tTHTTutu0AI8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CaPvhcgg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Me2iCtli"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37ed7eb07a4so3643180f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:56:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731408999; x=1732013799; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SUZb9Z1/W7ca2STbTF5/tGFSoH8Cx+ksuikIOfGFMUI=;
-        b=Me2iCtliXfkp5bfq/Yq4m3YLazX4eCZ1HfpGJY1AQnOv+grPHdcGE3jIq2EF0oi4cC
-         AmyuADYOunviBz+cDVIJen0gyzdgW69DbiGXCYjiCdGPK7hjjRX7HcrJdve2ZNC//fzg
-         4jgU9GKxV8JPaInlXZNhvybnVyib4BvrwSNH/ONFU5ysm/vVmzxlOr5nGQLlwuLVlNSQ
-         YkyGg+HB7ozzE70+T7vAzf8A6zxW1rPIukdGx0jCPtmhY7yfh4UwOfJ7zsgH8Pmw84yo
-         pLUlWOSaBe2r8PPXkQyFIB9q637dUyocQ9R1qNCaMLxN2s4cT2MQheSzJmxJFIU7ZTqY
-         xaFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731408999; x=1732013799;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SUZb9Z1/W7ca2STbTF5/tGFSoH8Cx+ksuikIOfGFMUI=;
-        b=CpEQjYZwgbcde6tZUolPNhWjK8ZZypNc9BM/znaRFK+nzJusFMg66pKvSdxHd1H91p
-         d9i/miBWsvxtxNsFFaxUlzTcjyqP64JIYQ8ka8jtL4NAx+D/CyxQGA4t7+g+LQGfRMLD
-         Mx2yHHEO4t//hDC5k6kfPYTlJmlBzQDQVovpW576Jg14uIlUobaTgjlgWBllhgqOoDlr
-         Mbny3ZUy9omYZOyDEMROhWWKN9xArineOFOLV3ZcwsbZq+fEql0syXsueUuhZw8NLnIx
-         eUMLGjKgKEMYOXFuYcCXu9vmjcd3MfPZcCC/ST4UJI4f09jQDaoagTCP0rT1oqb9qP0R
-         c3zA==
-X-Forwarded-Encrypted: i=1; AJvYcCXvPI3hGJT4XC3X8PhygADIv5Sv2kP6NvTdfcCzbRa7q49JhZUdS3p4C2vbB5BXp7E42uFF/5g=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxwtQGyB6QXiwk3Zd0o4v8UCwi8iDEAL2EiLacSvdK4Kd5u6bvX
-	Kg0vdoDDTMK4CWyvhWblpu38i/rRzrapnlzByBVEL4HxWsr8Fe7ApI2jqDTyhZI=
-X-Google-Smtp-Source: AGHT+IHvq8za4ODwagi9eMCX58JHSHwa35A0vD53q9ShdqUM3Ry91k3zNmwqMO4C+mOEfDBMTSJnrw==
-X-Received: by 2002:a05:6000:2a88:b0:381:f443:21bf with SMTP id ffacd0b85a97d-381f4432609mr10071022f8f.2.1731408999580;
-        Tue, 12 Nov 2024 02:56:39 -0800 (PST)
-Received: from pop-os.. ([145.224.90.214])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed970fb7sm14943629f8f.21.2024.11.12.02.56.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 02:56:39 -0800 (PST)
-From: James Clark <james.clark@linaro.org>
-To: tabba@google.com,
-	maz@kernel.org,
-	kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev
-Cc: James Clark <james.clark@linaro.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?= <ptosi@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Pass on SVE mapping failures
-Date: Tue, 12 Nov 2024 10:56:03 +0000
-Message-Id: <20241112105604.795809-1-james.clark@linaro.org>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CaPvhcgg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E41F4C4CED0;
+	Tue, 12 Nov 2024 11:51:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731412309;
+	bh=rVaA3ev3+az5uRSNO7YC0hpQX2tlQujZzf1EwZa+A5U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CaPvhcgg8qQ2pwZd+FKZUgqJNy3w6BQHkOtKD9SlsYVF0SHDdAvmaH5UuE65w/5tL
+	 XZXCLpdiMsewU95JX/OKQDZjU3NEbaEZ6emnBGYEhS+vGJpoBd8xlIIv+xDCiJJrZA
+	 8lx7yO1NkdDYDl5dMAb5jzRZ0Xk6ynaycC6SJG4DDOHDFGollG5NI687TWc9wnI1pw
+	 AFUNeNbWO0fbLJxraE4YaVnGdRkZ4txtXiER9YzE9ABvZJGFFCdNv/A+C20hrPzKhM
+	 j/CqOYBJWZYyqYtz92E9r+tgctzk3nUkPbwFmyWnMjdooNOKpPi56X2AXjF2Yt4BFX
+	 wkKVZgU+I4B2w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tApQw-00CAjE-KU;
+	Tue, 12 Nov 2024 11:51:46 +0000
+Date: Tue, 12 Nov 2024 11:51:45 +0000
+Message-ID: <86ldxozn3i.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+ Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 4/4] arm64: mte: Use stage-2 NoTagAccess memory attribute if supported
+In-Reply-To: <yq5a34k2rw9o.fsf@kernel.org>
+References: <20241028094014.2596619-1-aneesh.kumar@kernel.org>	<20241028094014.2596619-5-aneesh.kumar@kernel.org>	<87o734ts4m.wl-maz@kernel.org>	<yq5ar080cq5x.fsf@kernel.org>	<87jzdst6os.wl-maz@kernel.org>	<yq5a34k2rw9o.fsf@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+X-TUID: du/ay7YVY91i
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, Suzuki.Poulose@arm.com, steven.price@arm.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This function can fail but its return value isn't passed onto the
-caller. Presumably this could result in a broken state.
+On Fri, 08 Nov 2024 07:59:31 +0000,
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+> 
+> 
+> Hi Marc,
+> 
+> Sorry for the delay in response, I was looking at nested virt and
+> migration changes so that I can get your feedback on those.
+> 
+> Marc Zyngier <maz@kernel.org> writes:
+> 
+> > On Mon, 28 Oct 2024 13:28:42 +0000,
+> > Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+> >>
+> >> Marc Zyngier <maz@kernel.org> writes:
+> >>
+> >> > On Mon, 28 Oct 2024 09:40:14 +0000,
+> >> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> >> >>
+> >> >> Currently, the kernel won't start a guest if the MTE feature is enabled
+> >> >> and the guest RAM is backed by memory which doesn't support access tags.
+> >> >> Update this such that the kernel uses the NoTagAccess memory attribute
+> >> >> while mapping pages from VMAs for which MTE is not allowed. The fault
+> >> >> from accessing the access tags with such pages is forwarded to VMM so
+> >> >> that VMM can decide to kill the guest or remap the pages so that
+> >> >> access tag storage is allowed.
+> >> >
+> >> > I only have questions here:
+> >> >
+> >> > - what is the benefit of such approach? why shouldn't that be the
+> >> >   kernel's job to fix it?
+> >>
+> >>
+> >> IMHO leaving that policy decision to VMM makes the kernel changes
+> >> simpler. In most cases, VMM will kill the guest, because these
+> >> restrictions of MTE_ALLOWED are applied at the memslot/vma.
+> >
+> > Where is that captured? The whole idea behind FEAT_MTE_PERM was that
+> > it would be the hypervisor's task to lazily allocate MTE-capable
+> > memory as tagged-access would occur.
+> >
+> 
+> Lazily allocating MTE-capable memory requires changes to different
+> kernel subsystems and previous attempts got dropped [1] because it
+> was not clear whether the benefit of saving 3% memory overhead was worth
+> the complexity we add to the kernel.
 
-Fixes: 66d5b53e20a6 ("KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM")
-Signed-off-by: James Clark <james.clark@linaro.org>
----
- arch/arm64/kvm/hyp/nvhe/setup.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+That's not the point. Tagged memory doesn't have to cover the whole of
+physical memory, and it can be statically allocated. The architecture
+doesn't mandate that all of the memory is MTE-capable.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 8fec099c2775..cbdd18cd3f98 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -146,8 +146,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- 			return ret;
- 	}
- 
--	pkvm_create_host_sve_mappings();
--	return 0;
-+	return pkvm_create_host_sve_mappings();
- }
- 
- static void update_nvhe_init_params(void)
+> This patchset is not looking at that feature. Instead, it can be used to
+> enable MTE in configurations that currently won't allow MTE. One such
+> example is libkrun which includes linux kernel as firmware in a
+> dynamically linked library (libkrunfw). libkrun can insert the kernel
+> region which got mmaped as part of the library load, directly into the
+> guest memory map instead of copying the kernel. Such a guest config
+> can't enable MTE currently even though we will never use the newly
+> inserted memory regions as tag access memory.
+> 
+> Similarly, virtiofs dax support can use a page cache region as
+> virtio-shm region. We can use MTE_PERM to enable MTE in this config.
+
+And this use case doesn't contradict what I am stating above. But it
+definitely contradicts what you wrote: "In most cases, VMM will kill
+the guest".
+
+So which one is it?
+
+> 
+> [1] https://lore.kernel.org/all/20240125164256.4147-1-alexandru.elisei@arm.com/
+> 
+> >>
+> >> >
+> >> > - where is the documentation for this new userspace ABI?
+> >> >
+> >>
+> >> I will add the details if we agree that this should be a separate EXIT
+> >> as outlined in this patch.
+> >
+> > Woooot??? This isn't a *DETAIL*. This is the very first thing you
+> > should write. Everything *else* is an implementation detail.
+> >
+> >>
+> >> >
+> >> > - are you expecting the VMM to create a new memslot for this?
+> >> >
+> >>
+> >> I guess there are examples of configs where some memory regions are
+> >> backed by page cache where we don't directly use those memory regions as
+> >> allocatable memory in the guest. This change allows us to enable MTE in such
+> >> configs.
+> >
+> > This doesn't answer my question. What is expected sequence a VMM
+> > should apply to provide tagged memory to the guest?
+> >
+> >>
+> >> > - where is the example of a VMM using this?
+> >> >
+> >>
+> >> I do have changes to kvmtool which won't do any fixup on receiving that
+> >> VM exit. I expect other VMM to do the same by default when they get a
+> >> VM exit with an unknown exit_reason. So unless VMM wants to do any
+> >> special handling, we don't need any change in the VMM.
+> >
+> > OK, so this has never been tested. I'm sorry, but for something of
+> > this magnitude, with expected userspace interactions, and requiring
+> > VMM handling, I want to see the full end-to-end thing.
+> >
+> >>
+> >>
+> >> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> >> index 3b95750ecec7..4760bad07476 100644
+> >> --- a/arm/kvm-cpu.c
+> >> +++ b/arm/kvm-cpu.c
+> >> @@ -239,6 +239,17 @@ static bool handle_memoryfault(struct kvm_cpu *vcpu)
+> >>  	return true;
+> >>  }
+> >>
+> >> +static bool handle_notag_access(struct kvm_cpu *vcpu)
+> >> +{
+> >> +	u64 gpa = vcpu->kvm_run->memory_fault.gpa;
+> >> +	u64 size = vcpu->kvm_run->memory_fault.size;
+> >> +
+> >> +	/* For now VMM just panic */
+> >> +	pr_err("Tag Access to a wrong memory region 0x%lx size 0x%lx\n",
+> >> +	       (unsigned long)gpa, (unsigned long)size);
+> >> +	return false;
+> >> +}
+> >> +
+> >>  bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+> >>  {
+> >>  	switch (vcpu->kvm_run->exit_reason) {
+> >> @@ -246,6 +257,8 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+> >>  		return handle_hypercall(vcpu);
+> >>  	case KVM_EXIT_MEMORY_FAULT:
+> >>  		return handle_memoryfault(vcpu);
+> >> +	case KVM_EXIT_ARM_NOTAG_ACCESS:
+> >> +		return handle_notag_access(vcpu);
+> >>  	}
+> >>
+> >>  	return false;
+> >> diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+> >> index 32cff22f0e4d..deef6614f577 100644
+> >> --- a/include/linux/kvm.h
+> >> +++ b/include/linux/kvm.h
+> >> @@ -178,6 +178,7 @@ struct kvm_xen_exit {
+> >>  #define KVM_EXIT_NOTIFY           37
+> >>  #define KVM_EXIT_LOONGARCH_IOCSR  38
+> >>  #define KVM_EXIT_MEMORY_FAULT     39
+> >> +#define KVM_EXIT_ARM_NOTAG_ACCESS 40
+> >>
+> >>  /* For KVM_EXIT_INTERNAL_ERROR */
+> >>  /* Emulate instruction failed. */
+> >> @@ -429,10 +430,17 @@ struct kvm_run {
+> >>  		/* KVM_EXIT_MEMORY_FAULT */
+> >>  		struct {
+> >>  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
+> >> +#define KVM_MEMORY_EXIT_FLAG_NOTAGACCESS (1ULL << 4)
+> >>  			__u64 flags;
+> >>  			__u64 gpa;
+> >>  			__u64 size;
+> >>  		} memory_fault;
+> >> +  		/* KVM_EXIT_ARM_NOTAG_ACCESS */
+> >> +		struct {
+> >> +			__u64 flags;
+> >> +			__u64 gpa;
+> >> +			__u64 size;
+> >> +		} notag_access;
+> >>  		/* Fix the size of the union. */
+> >>  		char padding[256];
+> >>  	};
+> >>
+> >> >>
+> >> >> NOTE: We could also use KVM_EXIT_MEMORY_FAULT for this. I chose to
+> >> >> add a new EXIT type because this is arm64 specific exit type.
+> >> >>
+> >> >> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> >> >> ---
+> >> >>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+> >> >>  arch/arm64/include/asm/kvm_pgtable.h |  1 +
+> >> >>  arch/arm64/kvm/hyp/pgtable.c         | 16 +++++++++++++---
+> >> >>  arch/arm64/kvm/mmu.c                 | 28 ++++++++++++++++++++++------
+> >> >>  include/uapi/linux/kvm.h             |  7 +++++++
+> >> >>  5 files changed, 48 insertions(+), 9 deletions(-)
+> >> >>
+> >> >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> >> >> index a601a9305b10..fa0149a0606a 100644
+> >> >> --- a/arch/arm64/include/asm/kvm_emulate.h
+> >> >> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> >> >> @@ -373,6 +373,11 @@ static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
+> >> >>  	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
+> >> >>  }
+> >> >>
+> >> >> +static inline bool kvm_vcpu_trap_is_tagaccess(const struct kvm_vcpu *vcpu)
+> >> >> +{
+> >> >> +	return !!(ESR_ELx_ISS2(kvm_vcpu_get_esr(vcpu)) & ESR_ELx_TagAccess);
+> >> >> +}
+> >> >> +
+> >> >>  static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+> >> >>  {
+> >> >>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
+> >> >> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> >> >> index 03f4c3d7839c..5657ac1998ad 100644
+> >> >> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> >> >> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> >> >> @@ -252,6 +252,7 @@ enum kvm_pgtable_prot {
+> >> >>
+> >> >>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> >> >>  	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
+> >> >> +	KVM_PGTABLE_PROT_NORMAL_NOTAGACCESS	= BIT(5),
+> >> >
+> >> > This seems wrong. NOTAGACCESS is a *permission*, not a memory type.
+> >> >
+> >>
+> >> Are you suggesting the name is wrong? The memory attribute value I
+> >> wanted to use is
+> >>
+> >> MemAttr[3:0] = 0b0100 which is Normal, NoTagAccess, writeback cacheable.
+> >>
+> >> I am following the changes similar to KVM_PGTABLE_PROT_NORMAL_NC.
+> >
+> > But that's entirely different. This really isn't a memory type. Quite
+> > the opposite, actually. This is a stage-2 permission setting, which
+> > you are conflating with the actual memory type.
+> >
+> > Also, I don't see why that should be incompatible with something other
+> > than Normal memory.
+> >
+> 
+> I am sorry that i am not able to follow you here. I am confused whether
+> your feedback is related to the use of MemAttr[3:0] values or w.r.t
+> the usage of KVM_PGTABLE_PROT_NORMAL_NOTAG_ACCESS. If you can explain
+> more on how you would like to see the changes I can incorporate them in
+> the next update.
+
+There is a clear difference between permission and memory types. What
+if I want to have non-cacheable memory being tagged?
+
+> 
+> >>
+> >> >
+> >> >>
+> >> >>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+> >> >>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> >> >> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> >> >> index b11bcebac908..bc0d9f08c49a 100644
+> >> >> --- a/arch/arm64/kvm/hyp/pgtable.c
+> >> >> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> >> >> @@ -677,9 +677,11 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+> >> >>  {
+> >> >>  	kvm_pte_t attr;
+> >> >>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+> >> >> +	unsigned long prot_mask = KVM_PGTABLE_PROT_DEVICE |
+> >> >> +				  KVM_PGTABLE_PROT_NORMAL_NC |
+> >> >> +				  KVM_PGTABLE_PROT_NORMAL_NOTAGACCESS;
+> >> >>
+> >> >> -	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+> >> >> -			KVM_PGTABLE_PROT_NORMAL_NC)) {
+> >> >> +	switch (prot & prot_mask) {
+> >> >>  	case KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC:
+> >> >>  		return -EINVAL;
+> >> >>  	case KVM_PGTABLE_PROT_DEVICE:
+> >> >> @@ -692,6 +694,12 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+> >> >>  			return -EINVAL;
+> >> >>  		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> >> >>  		break;
+> >> >> +	case KVM_PGTABLE_PROT_NORMAL_NOTAGACCESS:
+> >> >> +		if (system_supports_notagaccess())
+> >> >> +			attr = KVM_S2_MEMATTR(pgt, NORMAL_NOTAGACCESS);
+> >> >> +		else
+> >> >> +			return -EINVAL;
+> >> >> +		break;
+> >> >
+> >> > How do you see this working when migrating a VM from one host to
+> >> > another, one that supports FEAT_MTE_PERM and one that doesn't? The
+> >> > current assumptions are that the VMM will replay the *exact same*
+> >> > setup on the target host, and this obviously doesn't work.
+> >> >
+> >>
+> >> I missed looking at kvm migration. I guess I will have to expose this as
+> >> a capability and only allow migration if the target also supports the
+> >> same capability?
+> >
+> > I don't think so. This doesn't affect the guest at all, as the guest
+> > doesn't know anything about S2, unless you decide to expose
+> > FEAT_MTE_PERM to NV.
+> >
+> > It affects the VMM though, and that's because you are making a
+> > difference in handling between having FEAT_MTE_PERM or not. Given that
+> > this is invisible to userspace, that's not a great design.
+> >
+> 
+> With migration, I guess i can prevent migration to a target that doesn't
+> support FEAT_MTE_PERM by updating set_one_reg to check for the feature
+> support. Something like this 
+> 
+> modified   arch/arm64/kvm/sys_regs.c
+> @@ -1514,7 +1514,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  				       const struct sys_reg_desc *r)
+>  {
+>  	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> +	u64 val, mask;
+> 
+>  	if (sysreg_visible_as_raz(vcpu, r))
+>  		return 0;
+> @@ -1529,8 +1529,10 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+>  		break;
+>  	case SYS_ID_AA64PFR2_EL1:
+> -		/* We only expose FPMR */
+> -		val &= ID_AA64PFR2_EL1_FPMR;
+> +		mask = ID_AA64PFR2_EL1_FPMR;
+> +		if (system_supports_notagaccess())
+> +			mask |= ID_AA64PFR2_EL1_MTEPERM;
+
+But this doesn't matter for an EL1 guest. Only for an EL2 guest.For an
+EL1 guest you need to validate the support at the API level.
+
+> +		val &= mask;
+>  		break;
+>  	case SYS_ID_AA64ISAR1_EL1:
+>  		if (!vcpu_has_ptrauth(vcpu))
+> @@ -2382,7 +2384,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  		   ID_AA64PFR0_EL1_AdvSIMD |
+>  		   ID_AA64PFR0_EL1_FP), },
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+> -	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
+> +	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR |
+> +					ID_AA64PFR2_EL1_MTEPERM),
+>  	ID_UNALLOCATED(4,3),
+>  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+>  	ID_HIDDEN(ID_AA64SMFR0_EL1),
+> 
+> 
+> For nested virtualization, I guess it is useful to support this for
+> nested guest. This implies L2 stage2 in L1 will have to support
+> Normal,NoTagAccess attribute. ie,
+> 
+> in L0 kvm, if the guest abort is on a nested smmu, then we walk the L2
+> stage2 in L1 and see if the memory attribute is NoTagAccess. If yes
+> we inject a s2 fault to L1. Do you agree this is a good design?
+
+Yes. But you need to add that support.
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
