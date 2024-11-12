@@ -1,117 +1,74 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4212022D5
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 00:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAA91BF58
+	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 07:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731372753; cv=none; b=uMQLUHvncF5x1ZABpsDNwYS+0Y1FgTUjrstiZ2ML2B/cdRKqyGHNZc0Sjw04fpaeAgbUbPJMxyNKf4bDoBqpfdRjI6DixhWG9g80TVjhfxK3vuG2x9h0wpVaa1VRJOZJmD/kOK4/6UcGMhRGdKSi3kdNozL1L34+WKO22GIzt50=
+	t=1731396136; cv=none; b=OMzxWabn1KDpraO59KhEj9BYUit1PpHgc11EI6J5fa9Oyw0ZQ9OTtHI0WXThzHkzCvYWEcPkMMNo6xSSAjo8vGzvWOXzaL7v0GJ4aKlNeE0fH0bbi/oTi0dv1F18EwSzs5tH831UTKVRz+cxS+SO9nWKfzKvuwxvioR99L/LFMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731372753; c=relaxed/simple;
-	bh=Wph0OYiV3ntON+fu+PtnMe16jvUo7k3ccZUDgNqiupQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zsb3OU/3hA3ZE4NxicxNcBWbz+dczEgEL1nkeY/008sSmyiJBMJfB87V4UVYRzJFIZni72ThYgT/OyUGdZExmm5wS+RvUxSrbZ1cUrqy/Q+92De2vrnaUNQ2l2bAOBP/e7VXPI1KeSfmlqe6pWgx/z/yPU0tAxTLUBQaz5syV24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oeM20//c; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1731396136; c=relaxed/simple;
+	bh=yq9hqoEcXrVSJXwF1A9y61Rtiqu1n9W7Izw6dLfVBZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g51FMguNpy2MWcu3ZPSQ2BIdRZaIDFv97CyVX5kYSMSnUH3QkTciiuXcJ5xYmrVFWmyu79GrvNcFPDuz/6NJAN6shjiS69oejqGJAYP8zVLzGKyJLLsmcCg3/GfDxLOf0+D4ijNF95WIoWJHLuBntyFjkh+dS1844Q1w0HMD/Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r6STmOh3; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oeM20//c"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539e19d8c41so7772e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 11 Nov 2024 16:52:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731372749; x=1731977549; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H/3C5QTs7l3Bpik5RV8yY+zOUnmIc6f4W9i+LJl1HIQ=;
-        b=oeM20//cyLpwOZr9cWJyCTiCLmqxAgD9tx37qtZyQqQCmsTumj0PRE5XgLNkXTap8D
-         MKmpWWqnxUjqYZHJpAp0E3BI+maJCe1qc3uinPxw41FS9ikbYoPeDiDpieJ6+5SYbFOy
-         cS2pAGZIxVEOeDFKSSZgX6YfSAJvxTpMispeNB6/ph8aDXwvIASPHG3XEYFe4URbM702
-         BIxK5ZPmDN+jEeAXZoYmM8fGLQ87xRKvZ1bFNZgg2Haul99+MP32wzZSBlCoIQcfPT3W
-         8FafmxYm2jdUmO4IYrg22sluuSOJgQFJjpnM6R4nWWD98ZbcgMatzba9oQ8ngmMqKu1Q
-         +4Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731372749; x=1731977549;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H/3C5QTs7l3Bpik5RV8yY+zOUnmIc6f4W9i+LJl1HIQ=;
-        b=KeuA6NAXY4Jp9rQHgvSdFGwsqrn9zB00BnE53+y8G12lxJDhjKyF/Io1zg3bitHkqU
-         0JDI4/moXZs3rNvz45JL2ksP5tvUOJMzYhxIWdTfnIJ85W3tDXkOoliC17LOdcHdic8M
-         a7T3bC4vbuxf6IY7ZS3AEpOvHIf2TwjnWGJpyLGIaIApEvgNGRFm/f1Gc3Q0Fs0s6LWl
-         ILbO17SXqrKjr4sg5jCm8Z4V5rU5zMP5fx9tlDDNWSN7P39MYqs1Jqq0SqdOg716+lfL
-         ZXxtBpZWeth2qBbToN3Pu/lAHC5OHCy1FID2LwszzcXHrAz7n/JCve5vKkdqx47b28ss
-         RFbw==
-X-Forwarded-Encrypted: i=1; AJvYcCXbnmGF2QwmOfWIpIL8ti2wagl0BSgst24qDJrdnuPvoGwXMtuW8ZOD9mXynpg1xiZ1B+bOngw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxHo7Rpuf12GZokYkOrlmUp29brRv3nMLFJ+wsizh43tZQgAaS1
-	rbKY4pA8MywL6hDl4QhbWMALv7UC8QoYv0fc2O+DrnKkjkGIp7UlxK2gJdQ85rOfw1Jnkvvf6MN
-	kNx5XSrJJ3v/Jdlh7iUgHxY/QN2V7DI5oKQC7
-X-Gm-Gg: ASbGnct01KlB3xAgYHCrNqBsKE9cVMH24fsfZJ8MMOXKCtLZnJQkjLt3JT4VXs9IPm6
-	mo95/yZPFxZjnCJW2e/NqrUXn+yfQMwPk9Ei3tkiukqzBKeD/LBNgvUPa2Fwq/g==
-X-Google-Smtp-Source: AGHT+IHYsqCCOn+C3yPmQ8eRLf6BbWJJRJBSA1CffumGjbn9E9PJBhWGGAwk02oUVBhtLbBpMWoEoOGe5NySvm1wHcw=
-X-Received: by 2002:ac2:4c08:0:b0:52e:8a42:f152 with SMTP id
- 2adb3069b0e04-53d9b8d6dedmr23863e87.5.1731372749138; Mon, 11 Nov 2024
- 16:52:29 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r6STmOh3"
+Date: Mon, 11 Nov 2024 23:22:01 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731396131;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mLQburG1kRS4AzMdaa+yEP0C+6MBGNJdimrkcoTW0G8=;
+	b=r6STmOh3QNzYnCncLYvNeOi6GungavJy3u4wdN4yWaUavCvTypQq7uvk6AaifyiqF29S5/
+	LBOBu+lDNsdNUezDc0tDlhvTAtTcMLN09h3FxRMdNHdP8ktn70HCg6RcAC/+3p+GTinjah
+	syuZAuYTRvWP7ElTetR+yAKYi7r7qwI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 02/15] KVM: arm64: Get rid of __kvm_get_mdcr_el2() and
+ related warts
+Message-ID: <ZzMCGae4WjupjCGe@linux.dev>
+References: <20241108222418.1677420-1-oliver.upton@linux.dev>
+ <20241108222418.1677420-3-oliver.upton@linux.dev>
+ <5e7c19e2-e932-4664-9a9a-232623464a9b@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241108211446.3304809-1-kaleshsingh@google.com>
- <86r07jz6uh.wl-maz@kernel.org> <CAC_TJvd=fNRx2VOcEEgjdkY53MwpR0Xa4dX1KTy=nNew7dg9Mw@mail.gmail.com>
- <86o72lzmi6.wl-maz@kernel.org>
-In-Reply-To: <86o72lzmi6.wl-maz@kernel.org>
-From: Kalesh Singh <kaleshsingh@google.com>
-Date: Mon, 11 Nov 2024 16:52:17 -0800
-Message-ID: <CAC_TJve8tuBpoeTjwg5=PKFhFaD=M5nwxeJsHeYP1ZezMd_Wug@mail.gmail.com>
-Subject: Re: [PATCH] arm64: kvm: Make nvhe stack size configurable
-To: Marc Zyngier <maz@kernel.org>
-Cc: will@kernel.org, qperret@google.com, broonie@kernel.org, 
-	mark.rutland@arm.com, keir@google.com, vdonnefort@google.com, 
-	kernel-team@android.com, android-mm@google.com, 
-	Catalin Marinas <catalin.marinas@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	D Scott Phillips <scott@os.amperecomputing.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Wang Jinchao <wangjinchao@xfusion.com>, 
-	"Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>, =?UTF-8?Q?Pierre=2DCl=C3=A9ment_Tosi?= <ptosi@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e7c19e2-e932-4664-9a9a-232623464a9b@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Nov 11, 2024 at 9:52=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Hi Kalesh,
->
-> On Mon, 11 Nov 2024 17:10:18 +0000,
-> Kalesh Singh <kaleshsingh@google.com> wrote:
-> >
-> > I tried to be conservative with the configuration only allowing only
-> > up to 2 pages. Your points are fair concerns, I can see how this still
-> > may not be ideal for upstream. However, I think introducing
-> > NVHE_STACK_SIZE as a refactor still has value, similar to how
-> > OVERFLOW_STACK_SIZE is handled. If there are no objections, I=E2=80=99l=
-l
-> > resend a v2 of the patch, dropping the configuration parts and
-> > focusing on the refactor to introduce NVHE_STACK_SIZE.
->
-> I'd be OK with the refactoring on its own, which is a nice enough
-> cleanup.
+Hey Suzuki,
 
-Posted v2 at: https://lore.kernel.org/r/20241112003336.1375584-1-kaleshsing=
-h@google.com/
+On Mon, Nov 11, 2024 at 11:00:11AM +0000, Suzuki K Poulose wrote:
+> >   /**
+> >    * kvm_arm_setup_mdcr_el2 - configure vcpu mdcr_el2 value
+> >    *
+> > @@ -94,7 +77,8 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+> >   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
+> >   	 * to disable guest access to the profiling and trace buffers
+> >   	 */
+> > -	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
+> > +	vcpu->arch.mdcr_el2 = FIELD_PREP(ARMV8_PMU_PMCR_N,
+> 
+> Shouldn't this be : MDCR_EL2_HPMN_MASK ?
 
+Yep, I got a few wires crossed in this patch clearly. Thanks for
+spotting them!
+
+-- 
 Thanks,
-Kalesh
-
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Oliver
