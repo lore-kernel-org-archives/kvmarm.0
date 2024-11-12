@@ -1,74 +1,135 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAA91BF58
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 07:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2911AB535;
+	Tue, 12 Nov 2024 08:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731396136; cv=none; b=OMzxWabn1KDpraO59KhEj9BYUit1PpHgc11EI6J5fa9Oyw0ZQ9OTtHI0WXThzHkzCvYWEcPkMMNo6xSSAjo8vGzvWOXzaL7v0GJ4aKlNeE0fH0bbi/oTi0dv1F18EwSzs5tH831UTKVRz+cxS+SO9nWKfzKvuwxvioR99L/LFMQ=
+	t=1731399915; cv=none; b=SXCMky6qvVHhFWAkYbZYBHJ+4RVysF2e/1F9G3M3qp7X84ZqeJW2FkjxE1SrjJxYXBvWgQCFMIowDzcS/vbRWURsxqiIjMyzF7na9VmWZ1DpXfquTc/uK8QbB/MlrAAzC0tdxZDaxod1k3MOpcdXfZyiE45SZRsINn9jGUYmS6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731396136; c=relaxed/simple;
-	bh=yq9hqoEcXrVSJXwF1A9y61Rtiqu1n9W7Izw6dLfVBZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g51FMguNpy2MWcu3ZPSQ2BIdRZaIDFv97CyVX5kYSMSnUH3QkTciiuXcJ5xYmrVFWmyu79GrvNcFPDuz/6NJAN6shjiS69oejqGJAYP8zVLzGKyJLLsmcCg3/GfDxLOf0+D4ijNF95WIoWJHLuBntyFjkh+dS1844Q1w0HMD/Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r6STmOh3; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1731399915; c=relaxed/simple;
+	bh=UQHIGIVA0u7P7NQ/xWz8yr+S0vW04Pvq9teQHjkqPLE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PCxryT9MuNeEzChK/LaLFYfvDvVO4csekGJyL+tBQF3PvdLJ6FJwqJa/j3MnlLrkXyumj7yEgOqeAVGrmsEgbs2tK+52F18xKK5WwmK7lkw2xE94PUyVnBhklRpfwMasUsmc2pJmc8ku12pOR8F48mLVPYer01rlU67b7kPH5jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgwhsehY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r6STmOh3"
-Date: Mon, 11 Nov 2024 23:22:01 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731396131;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mLQburG1kRS4AzMdaa+yEP0C+6MBGNJdimrkcoTW0G8=;
-	b=r6STmOh3QNzYnCncLYvNeOi6GungavJy3u4wdN4yWaUavCvTypQq7uvk6AaifyiqF29S5/
-	LBOBu+lDNsdNUezDc0tDlhvTAtTcMLN09h3FxRMdNHdP8ktn70HCg6RcAC/+3p+GTinjah
-	syuZAuYTRvWP7ElTetR+yAKYi7r7qwI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgwhsehY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14EF0C4CECD;
+	Tue, 12 Nov 2024 08:25:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731399915;
+	bh=UQHIGIVA0u7P7NQ/xWz8yr+S0vW04Pvq9teQHjkqPLE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cgwhsehYLQvL5cAnckoU4Zfc9JYnOYn4Xul3QiWT6nt0NWSIRHqIJuBVhrZ0LC/7X
+	 NNyOObVxaDsROGf2ZsJGLIHZOr9yAnPW7w1NRyerGDqnn8+0r/waFIeGy8c+CdWvnD
+	 SmiNfBaYnLfaNF1FKg7r5+ieARxuS8awCxVcVsd2yW+PP2Cqwh/hskaG4E+TkJ6Y2x
+	 S++Sm8E5xl1KzaxlHBP4r/LwWAr4diGnpHijCrdReJ8GTWSaiHuNgyWAsvIw4g3H63
+	 mP4ZukQpxzuInd9clDb3ICLX+6AoVvTcwhZKxFmFM6QfpIpeFXjX5jd+dqnppQo0th
+	 Rh+7mU1Og7RNA==
+Received: from 82-132-232-70.dab.02.net ([82.132.232.70] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tAmD2-00C6tU-IB;
+	Tue, 12 Nov 2024 08:25:12 +0000
+Date: Tue, 12 Nov 2024 08:25:09 +0000
+Message-ID: <87a5e4uae2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oupton@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
 	Colton Lewis <coltonlewis@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 02/15] KVM: arm64: Get rid of __kvm_get_mdcr_el2() and
- related warts
-Message-ID: <ZzMCGae4WjupjCGe@linux.dev>
-References: <20241108222418.1677420-1-oliver.upton@linux.dev>
- <20241108222418.1677420-3-oliver.upton@linux.dev>
- <5e7c19e2-e932-4664-9a9a-232623464a9b@arm.com>
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Shusen Li <lishusen2@huawei.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH v4 2/5] KVM: arm64: vgic-its: Add read/write helpers on ITS table entries.
+In-Reply-To: <20241107214137.428439-3-jingzhangos@google.com>
+References: <20241107214137.428439-1-jingzhangos@google.com>
+	<20241107214137.428439-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e7c19e2-e932-4664-9a9a-232623464a9b@arm.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.232.70
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, jiangkunkun@huawei.com, pbonzini@redhat.com, andre.przywara@arm.com, coltonlewis@google.com, rananta@google.com, lishusen2@huawei.com, eauger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hey Suzuki,
-
-On Mon, Nov 11, 2024 at 11:00:11AM +0000, Suzuki K Poulose wrote:
-> >   /**
-> >    * kvm_arm_setup_mdcr_el2 - configure vcpu mdcr_el2 value
-> >    *
-> > @@ -94,7 +77,8 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
-> >   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
-> >   	 * to disable guest access to the profiling and trace buffers
-> >   	 */
-> > -	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
-> > +	vcpu->arch.mdcr_el2 = FIELD_PREP(ARMV8_PMU_PMCR_N,
+On Thu, 07 Nov 2024 21:41:34 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> Shouldn't this be : MDCR_EL2_HPMN_MASK ?
+> To simplify read/write operations on ITS table entries, two helper
+> functions have been implemented. These functions incorporate the
+> necessary entry size validation.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index f2486b4d9f95..309295f5e1b0 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -146,6 +146,29 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+>  	return ret;
+>  }
+>  
+> +static inline int vgic_its_read_entry_lock(struct vgic_its *its, gpa_t eaddr,
+> +					   u64 *eval, unsigned long esize)
+> +{
+> +	struct kvm *kvm = its->dev->kvm;
+> +
+> +	if (KVM_BUG_ON(esize != sizeof(*eval), kvm))
+> +		return -EINVAL;
+> +
+> +	return kvm_read_guest_lock(kvm, eaddr, eval, esize);
+> +
+> +}
+> +
+> +static inline int vgic_its_write_entry_lock(struct vgic_its *its, gpa_t eaddr,
+> +					    u64 eval, unsigned long esize)
+> +{
+> +	struct kvm *kvm = its->dev->kvm;
+> +
+> +	if (KVM_BUG_ON(esize != sizeof(eval), kvm))
+> +		return -EINVAL;
+> +
+> +	return vgic_write_guest_lock(kvm, eaddr, &eval, esize);
+> +}
+> +
 
-Yep, I got a few wires crossed in this patch clearly. Thanks for
-spotting them!
+I don't think this is right. Or at least not what I had in mind.
+
+What I wanted was to abstract both the element size and the ABI, and
+check for the type of 'eval'.
+
+Here, you implicitly case the caller's data on a u64, which C will
+happily do without warnings. So this KVM_BUG_ON() checks very little
+on writes.
+
+Also, you force the caller to explicitly extract the element-size from
+the ABI. Yes, it is available most of the time. But this is about
+checking consistency, and you are missing this opportunity.
+
+So while this code isn't wrong, it really doesn't make anything more
+robust. It's just another indirection.
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
