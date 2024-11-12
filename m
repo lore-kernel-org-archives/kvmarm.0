@@ -1,57 +1,57 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B80C1FA832
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7D41FA85F
+	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731407927; cv=none; b=Ox8tOlEc247yQ0p8vbbl2dHHUhdtKZKBha1foucOq1JbBmawD2lIkVGnJKt0mL+HgmL51XsMBR3thojFPl7pbZTo+0QKJGqN1TJwDZhEzF4lC1PQMg8bbbZkCZxT+jK+UJ15b3Maas5BWwjAR9eptgpIb4sIKfVZzYZvnX1uxmM=
+	t=1731407937; cv=none; b=Tlyk/RtX2eN6O5AnzfbG3+iwYFacCp+w6kgVYxbMv/XP7u+cRP6IKeKFjClASDGEvcSTPZ+AK7EBEvo6Sci+Qcz0fRBrBdLAl0QbMjaBQ/R6s6fnnxqGiiQXr66laeCOz1t7IaYOjmSevFHHFNEKJmU5MmAh5x6SKxN4r9/Sn9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731407927; c=relaxed/simple;
-	bh=ASxUvQ1pU95JcK+RGcyCQYZuNH+qYYln30lVCV2AqJc=;
+	s=arc-20240116; t=1731407937; c=relaxed/simple;
+	bh=gJX4fpAnmRlIzwVuBDoaMY8pi4WArGBc4Po0d2y33so=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nQPVh0+UF9vacQiIvbVir4B9mMzE5r6PtktZNDG1LYmZ2nvai3mqhpahZGzstBtVl+oohZTGKaiZdVUVmU3zfvepJFjgNm3r8LLEvFi993WywtV57lmQb2m3d61AmNQOVxEdXMU79P0M/d9svhFXSur0grL8ySipP+kd1saKgBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qCoIvy/6; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=EEYHOe72PZJYW1fNOGCDs4gjhI2e4rCMnTASquPPOg33gFsTy7Z+mUeLgx9Ekc+Mm0AyMpNjGmvsQiCzpoT37rOxWsGzqbBdkSS/opBq3gVl5Si6dn8ZrLYN08h6UPql2cbBYnHZqb/ueCASzj1vkqyaaIIPiUbrAbTRcqmvvOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vqIk2C6N; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qCoIvy/6"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-431688d5127so43359145e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:38:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vqIk2C6N"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d4821e6b4so3887443f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:38:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731407924; x=1732012724; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1731407934; x=1732012734; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sA/W0+Ap46dgMFolE2VZt7mXSZE4H0GHR4Td8I21hdI=;
-        b=qCoIvy/6hopkv9Y0ioQZi4Gb7+Gp8rYDSFThO+RgM0IvZBwl2wkM6Oy8zRWLuYCvEW
-         I9O7ryytFTGE/rQoTSbmuf80mXqNl1/3egzJmiG0sG/AYetRuGH9G1PqlR2VV9Sdz+av
-         H/NR/GW81f2M6CdN5Xwbg8F9QETvdn+IBmSrTIPqw1TBzZo9Hxkn1PR7+mfi01X/+nka
-         CB9Wt7dsJuHgRi1Agu6IYFS8H7d+UN7YvxYpgwU+JBRPEiO2ZzIDJEv91Q0FvkggE+s4
-         wqVex1sY3RydOGjwv7RObwOMQS5wlMeLT6ZZyo1L3ijFbg0husr1H6v3kNs/1zaFnrAS
-         CZPw==
+        bh=w4Y12830R+W7ydXEFfviSLc+JWTSWnSDcOvb7pMp1YA=;
+        b=vqIk2C6NnsxUHc6rjZPKbrq/qzPQkPOlbSHX2xfG7XZ2DQxVsfzdwzgGue5mwTDjx7
+         4h/8gTBgqOD1+zolYDnsiMBVMWT6TUzGCegqfI/HkWbtpsnLAf0/mXWlhtUTvXKZHFKm
+         c3SGjc9FqZVMwRsk21w+v0XvpP6QX0gJ0q7S/QV1uLco5q4RZBEODFupSyAPT76XakBp
+         SagluZAf9KL1eOOdrT+EmTGq7VUEW8PFxfq1FZAvKQgZw22XYQo1mC/rgRVA5GwiGnsI
+         kLfKd/Uc8Y3RU/zMr2pEKQnJ0/HtMU/p+418QrffFswazPWJy7fSAIQIKxfN512rBxeR
+         WJxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731407924; x=1732012724;
+        d=1e100.net; s=20230601; t=1731407934; x=1732012734;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sA/W0+Ap46dgMFolE2VZt7mXSZE4H0GHR4Td8I21hdI=;
-        b=vjUi2BeDpQ3rw4NLplIOwwWwDlQPoQv5doHqrVLDjxNTMB1dz0EfvyoAaZ8k1ZPHxd
-         QXqQ+S8iaKR/7v/E9xYQtT3IXojXlWmHmyfhEG3bMG8CqLqSeBgtxMrkQIxi69f1QFs/
-         G6mq/aXVAkB4VGNmyPSMZn23thnI6Z/IAA6pvppgbGsp5yZ39ZdQBe4F/D8GXf3cPTRZ
-         MCg5PQnkDLPaN1ZvfkDXZ6bJrsy3D6OJC4ruJw4piDQ3fmxO2yuku5JkySCc1LDzzR+B
-         Wu597/N47fYLbwLWWFKLdHNWa10Hy3x1/Pvx4Eo83knh3wNpTmVh9KJTb9gAAn+gJ9ov
-         4H4w==
-X-Forwarded-Encrypted: i=1; AJvYcCVuMZaGl8S3QEf1dGKr/I6zHS5DW2pfKV97aU8iDs/0pi+9FgUYJEf/RG1UO3SMigmVZTbT8to=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzfhdKSQjRNC5doNGCEv3Os1sMEc/xInz5qiNtnN04JXl9e2CjD
-	QRhA9WxugvtGdUTPCB1FkEBA5nJ3ZnSkY6CDhaV90F5iYtGNBo82OdwNpxqtOHA=
-X-Google-Smtp-Source: AGHT+IGTCpYEG2uHYkmh8Yj6DuYaWz+qEgTFVaZXTljNTeTGXpI0pqO9pJabhlxETKSZqiOHdB14Pg==
-X-Received: by 2002:a05:600c:190f:b0:42f:7e87:3438 with SMTP id 5b1f17b1804b1-432b749ee57mr144547575e9.0.1731407923685;
-        Tue, 12 Nov 2024 02:38:43 -0800 (PST)
+        bh=w4Y12830R+W7ydXEFfviSLc+JWTSWnSDcOvb7pMp1YA=;
+        b=QC/QD57rFuxM4JEImU8BxifJWgT13rpiVqdN+TPiZvVxkroxi6PhD85fBJlUgnL35Q
+         XGwB+q8kyizHdf+zWN2BDWSrlsOIXZZ6fwS82g1D3zhPDdZ40vQdPRBjju2gq2G4iVwz
+         plKnN4ig8MR75wAGutHnOvOMhy/fzHgaIaR7e1oIdYyhI4siZukJsUXifc0ipiJvFEpF
+         OjRib+F9Lgnore7O4214GTXCb4Lrtx0+BF7ifZM3P0DgkdGqO23ua932TEFjTyExggaf
+         EHI3pahoUqt7Jjlc36HilHZNsHcAhyNMjUUD++kM89+8qHAY4E6chxXg6i3vUTOHDb2R
+         oC/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUUF/scF8bw1HPcy+YlshJC821f6c/usMecl2gUwXxRiDhzFagxwISK1JwpdKDvdnggkdook+A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwoYpkm4JL7MQt0J6gJo28991UXP7Bf8ckqsgbFpSPDcn4UIy0h
+	JkS05EFNyHslGpCLHCpc+OV+HdPrnmcfSXAhK8wglVLr3aU86He9pzydX3HDZqI=
+X-Google-Smtp-Source: AGHT+IFFrkKNgQSMLjx9o9fyzR37XC2Gr6CvPJDOYVlojhp8ArNiU1b7bN0q0qpEMeG5HrMUFygnww==
+X-Received: by 2002:a5d:6c64:0:b0:37d:4a82:6412 with SMTP id ffacd0b85a97d-381f1885db0mr12627127f8f.46.1731407933761;
+        Tue, 12 Nov 2024 02:38:53 -0800 (PST)
 Received: from pop-os.. ([145.224.90.214])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432bbf436ffsm142270955e9.44.2024.11.12.02.38.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432bbf436ffsm142270955e9.44.2024.11.12.02.38.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 02:38:43 -0800 (PST)
+        Tue, 12 Nov 2024 02:38:53 -0800 (PST)
 From: James Clark <james.clark@linaro.org>
 To: suzuki.poulose@arm.com,
 	oliver.upton@linux.dev,
@@ -66,17 +66,17 @@ Cc: James Clark <james.clark@linaro.org>,
 	Mike Leach <mike.leach@linaro.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 09/12] KVM: arm64: coresight: Give TRBE enabled state to KVM
-Date: Tue, 12 Nov 2024 10:37:08 +0000
-Message-Id: <20241112103717.589952-10-james.clark@linaro.org>
+Subject: [PATCH v7 10/12] KVM: arm64: Don't hit sysregs to see if TRBE is enabled or not
+Date: Tue, 12 Nov 2024 10:37:09 +0000
+Message-Id: <20241112103717.589952-11-james.clark@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241112103717.589952-1-james.clark@linaro.org>
 References: <20241112103717.589952-1-james.clark@linaro.org>
@@ -88,129 +88,131 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently in nVHE, KVM has to check if TRBE is enabled on every guest
-switch even if it was never used. Because it's a debug feature and is
-more likely to not be used than used, give KVM the TRBE buffer status to
-allow a much simpler and faster do-nothing path in the hyp.
+Now that the driver tells us whether TRBE was used or not we can use
+that. Except in pKVM where the host isn't trusted we keep the existing
+feature + sysreg check.
 
-This is always called with preemption disabled except for probe/hotplug
-which gets wrapped with preempt_disable().
+Now in the normal nVHE case, TRBE save and restore are gated by flag
+checks on kvm_host_data.
+
+Instead of using a magic value of host_debug_state.trfcr_el1 to
+determine whether to restore, add a flag. This will also simplify the
+logic in the next commit where restoration but no disabling is required.
 
 Signed-off-by: James Clark <james.clark@linaro.org>
 ---
- arch/arm64/include/asm/kvm_host.h            |  4 ++++
- arch/arm64/kvm/debug.c                       | 16 ++++++++++++++++
- drivers/hwtracing/coresight/coresight-trbe.c | 15 ++++++++++++---
- 3 files changed, 32 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h  |  2 ++
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c | 51 +++++++++++++++++++++++-------
+ 2 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7f1e32d40f0c..b1dccac996a6 100644
+index b1dccac996a6..a8846689512b 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -945,6 +945,8 @@ struct kvm_vcpu_arch {
- #define HOST_FEAT_HAS_TRF	__kvm_single_flag(feats, BIT(2))
- /* PMBLIMITR_EL1_E is set (SPE profiling buffer enabled) */
+@@ -947,6 +947,8 @@ struct kvm_vcpu_arch {
  #define HOST_STATE_SPE_EN	__kvm_single_flag(state, BIT(0))
-+/* TRBLIMITR_EL1_E is set (TRBE trace buffer enabled) */
-+#define HOST_STATE_TRBE_EN	__kvm_single_flag(state, BIT(1))
+ /* TRBLIMITR_EL1_E is set (TRBE trace buffer enabled) */
+ #define HOST_STATE_TRBE_EN	__kvm_single_flag(state, BIT(1))
++/* Hyp modified TRFCR */
++#define HOST_STATE_RESTORE_TRFCR __kvm_single_flag(state, BIT(2))
  
  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-@@ -1387,6 +1389,7 @@ void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u64 clr);
- bool kvm_set_pmuserenr(u64 val);
- void kvm_set_pmblimitr(u64 pmblimitr);
-+void kvm_set_trblimitr(u64 trblimitr);
- #else
- static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u64 clr) {}
-@@ -1395,6 +1398,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
- 	return false;
- }
- static inline void kvm_set_pmblimitr(u64 pmblimitr) {}
-+static inline void kvm_set_trblimitr(u64 trblimitr) {}
- #endif
- 
- void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index ed3b4d057c52..e99df2c3f62a 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -364,3 +364,19 @@ void kvm_set_pmblimitr(u64 pmblimitr)
- 		host_data_clear_flag(HOST_STATE_SPE_EN);
- }
- EXPORT_SYMBOL_GPL(kvm_set_pmblimitr);
-+
-+void kvm_set_trblimitr(u64 trblimitr)
-+{
-+	/* Only read in nVHE */
-+	if (has_vhe())
-+		return;
-+
-+	if (kvm_arm_skip_trace_state())
-+		return;
-+
-+	if (trblimitr & TRBLIMITR_EL1_E)
-+		host_data_set_flag(HOST_STATE_TRBE_EN);
-+	else
-+		host_data_clear_flag(HOST_STATE_TRBE_EN);
-+}
-+EXPORT_SYMBOL_GPL(kvm_set_trblimitr);
-diff --git a/drivers/hwtracing/coresight/coresight-trbe.c b/drivers/hwtracing/coresight/coresight-trbe.c
-index 96a32b213669..ff281b445682 100644
---- a/drivers/hwtracing/coresight/coresight-trbe.c
-+++ b/drivers/hwtracing/coresight/coresight-trbe.c
-@@ -18,6 +18,7 @@
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
- #include <linux/vmalloc.h>
-+#include <linux/kvm_host.h>
- 
- #include "coresight-self-hosted-trace.h"
- #include "coresight-trbe.h"
-@@ -213,6 +214,12 @@ static inline void trbe_drain_buffer(void)
- 	dsb(nsh);
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index 578c549af3c6..17c23e52f5f4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -63,32 +63,55 @@ static void __debug_restore_spe(void)
+ 	*host_data_ptr(host_debug_state.pmscr_el1) = 0;
  }
  
-+static void trbe_write_trblimitr(u64 val)
-+{
-+	write_sysreg_s(val, SYS_TRBLIMITR_EL1);
-+	kvm_set_trblimitr(val);
-+}
-+
- static inline void set_trbe_enabled(struct trbe_cpudata *cpudata, u64 trblimitr)
+-static void __debug_save_trace(u64 *trfcr_el1)
++static bool __debug_should_save_trace(void)
  {
+-	*trfcr_el1 = 0;
++	/* pKVM reads the state for itself rather than trusting the host */
++	if (unlikely(is_protected_kvm_enabled())) {
++		/* Always disable any trace regardless of TRBE */
++		if (read_sysreg_el1(SYS_TRFCR) &
++		    (TRFCR_ELx_E0TRE | TRFCR_ELx_ExTRE))
++			return true;
++
++		/*
++		 * Trace could already be disabled but TRBE buffer
++		 * might still need to be drained if it was in use.
++		 */
++		if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
++			return read_sysreg_s(SYS_TRBLIMITR_EL1) &
++			       TRBLIMITR_EL1_E;
++	}
++
++	return host_data_get_flag(HOST_STATE_TRBE_EN);
++}
+ 
+-	/* Check if the TRBE is enabled */
+-	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
+-		return;
++static void __debug_save_trace(void)
++{
  	/*
-@@ -220,7 +227,7 @@ static inline void set_trbe_enabled(struct trbe_cpudata *cpudata, u64 trblimitr)
- 	 * might be required for fetching the buffer limits.
+ 	 * Prohibit trace generation while we are in guest.
+ 	 * Since access to TRFCR_EL1 is trapped, the guest can't
+ 	 * modify the filtering set by the host.
  	 */
- 	trblimitr |= TRBLIMITR_EL1_E;
--	write_sysreg_s(trblimitr, SYS_TRBLIMITR_EL1);
-+	trbe_write_trblimitr(trblimitr);
- 
- 	/* Synchronize the TRBE enable event */
+-	*trfcr_el1 = read_sysreg_el1(SYS_TRFCR);
++	*host_data_ptr(host_debug_state.trfcr_el1) = read_sysreg_el1(SYS_TRFCR);
+ 	write_sysreg_el1(0, SYS_TRFCR);
  	isb();
-@@ -238,7 +245,7 @@ static inline void set_trbe_disabled(struct trbe_cpudata *cpudata)
- 	 * might be required for fetching the buffer limits.
- 	 */
- 	trblimitr &= ~TRBLIMITR_EL1_E;
--	write_sysreg_s(trblimitr, SYS_TRBLIMITR_EL1);
-+	trbe_write_trblimitr(trblimitr);
+ 	/* Drain the trace buffer to memory */
+ 	tsb_csync();
++
++	host_data_set_flag(HOST_STATE_RESTORE_TRFCR);
+ }
  
- 	if (trbe_needs_drain_after_disable(cpudata))
- 		trbe_drain_buffer();
-@@ -253,8 +260,10 @@ static void trbe_drain_and_disable_local(struct trbe_cpudata *cpudata)
- 
- static void trbe_reset_local(struct trbe_cpudata *cpudata)
+-static void __debug_restore_trace(u64 trfcr_el1)
++static void __debug_restore_trace(void)
  {
-+	preempt_disable();
- 	trbe_drain_and_disable_local(cpudata);
--	write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-+	trbe_write_trblimitr(0);
-+	preempt_enable();
- 	write_sysreg_s(0, SYS_TRBPTR_EL1);
- 	write_sysreg_s(0, SYS_TRBBASER_EL1);
- 	write_sysreg_s(0, SYS_TRBSR_EL1);
+-	if (!trfcr_el1)
++	u64 trfcr_el1;
++
++	if (!host_data_get_flag(HOST_STATE_RESTORE_TRFCR))
+ 		return;
+ 
+ 	/* Restore trace filter controls */
++	trfcr_el1 = *host_data_ptr(host_debug_state.trfcr_el1);
++	*host_data_ptr(host_debug_state.trfcr_el1) = read_sysreg_el1(SYS_TRFCR);
+ 	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
++	host_data_clear_flag(HOST_STATE_RESTORE_TRFCR);
+ }
+ 
+ void __debug_save_host_buffers_nvhe(void)
+@@ -97,9 +120,14 @@ void __debug_save_host_buffers_nvhe(void)
+ 	if (__debug_spe_enabled())
+ 		__debug_save_spe();
+ 
++	/* Any trace filtering requires TRFCR register */
++	if (!host_data_get_flag(HOST_FEAT_HAS_TRF))
++		return;
++
+ 	/* Disable and flush Self-Hosted Trace generation */
+-	if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
+-		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
++	if (__debug_should_save_trace())
++		__debug_save_trace();
++
+ }
+ 
+ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+@@ -110,8 +138,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	__debug_restore_spe();
+-	if (host_data_get_flag(HOST_FEAT_HAS_TRBE))
+-		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
++	__debug_restore_trace();
+ }
+ 
+ void __debug_switch_to_host(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
