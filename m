@@ -1,72 +1,72 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07846221FA6
-	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41116215C4E
+	for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 10:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731408657; cv=none; b=Wu9pTfk6OoSAp6ThBT6sS2sVfUCAk4ItDVFFcuDBLo0eNI/wBXEWu3lbALd+w6Usvm5irpkus/WnY0EzFj6H0LxtUM3ftokahjL26rFHgK4J9WJ4XltSP6zJg95tWMLYjp5inDpZim5N5re+VeO5WG+rVgWZ7nuf0WYnSeGMfH8=
+	t=1731409002; cv=none; b=uB29DswFewQnwCyUCtAuexvLM7nc+zJJXIdc6eT7qSZT7XyNjZDuhy6q/2izqycg0q64MvVD0Rgxw/+x3/WlOmyIhilIEYfnMs19fzQe5DJxpGx1COPQYHZ8XHFLC982k4Q866O3wF13K+Wr8N6HMken8PsU8S3NrnAqyDELO3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731408657; c=relaxed/simple;
-	bh=oWzV/03nYp1x6cwYsHMbk/vrrzEIWX7yUtI5U3uNiSM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pJXNCNFTX4vksr+GyMFfogUEHezQEGdwf5N2QTYY4Ml1sLl9RUrTRRhvsyphJrk7Qhr8JHuGYEWuqQPGxEuR/Ci23f12n2hLpBw8WJEI9jNqn7yUhAygw7Jz111vGwgMVQY/q3PSSZD21EeNPxUwlY1N8Ae3gZWGBOIleP2N4D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Tklnwbfq; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1731409002; c=relaxed/simple;
+	bh=JZxAEgGxHQWBt6q+QSSE/uiFAiC7QtIJ1zAHsyKz/F8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PrCiFLt5K+6kFQgxuBR7VKATmOhMuj2uGWBQcITLpy4l7KugknKSNblUDDwjzNy8BkjafaP6clju/f0DV+tFUEJRn2hJrFmFZUimxOo3AajlUxdbwLP6tQxUQ2Q7C+pevwUslwiRaKWk2jQG57qRjPc/3uswsySvvz1/jJulQ9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Me2iCtli; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tklnwbfq"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43161c0068bso46836755e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:50:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Me2iCtli"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37ed7eb07a4so3643180f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 12 Nov 2024 02:56:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731408654; x=1732013454; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1731408999; x=1732013799; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EsN1AKfVr0DCt3ea+9xEDMwiA7+bJgbMxbEYUcuak9o=;
-        b=TklnwbfqYihYQsMFOQRNRB89pNVl6cQJDkxR0CLtr808ZhiVqC6WKtXc5WHk9SJoUj
-         1vUE77J1XJ8v3DkUtyl+swyRvJg6Ysp/BR9D14CWGmOiuNxnHIXbNslY1F56mxCWzgWh
-         pdiGtqLGzIRZeCB/B1rtWKsihFYZ07VancaFg+pX+jzxC1K6PuKSfGZh44UzlRuFk9mC
-         LBOZPHbfWnWGcLIags9hVy5pCKzTNjve5tQJbvx3UDrzyni5p7uUwdfR6ScfrR609o/g
-         laikweb8uQzhAVvxr9M86w8YLYgFxzSJj2UUjYkzsCVgvI80+yU+bM4nRv0LCvs/yQn8
-         3NCQ==
+        bh=SUZb9Z1/W7ca2STbTF5/tGFSoH8Cx+ksuikIOfGFMUI=;
+        b=Me2iCtliXfkp5bfq/Yq4m3YLazX4eCZ1HfpGJY1AQnOv+grPHdcGE3jIq2EF0oi4cC
+         AmyuADYOunviBz+cDVIJen0gyzdgW69DbiGXCYjiCdGPK7hjjRX7HcrJdve2ZNC//fzg
+         4jgU9GKxV8JPaInlXZNhvybnVyib4BvrwSNH/ONFU5ysm/vVmzxlOr5nGQLlwuLVlNSQ
+         YkyGg+HB7ozzE70+T7vAzf8A6zxW1rPIukdGx0jCPtmhY7yfh4UwOfJ7zsgH8Pmw84yo
+         pLUlWOSaBe2r8PPXkQyFIB9q637dUyocQ9R1qNCaMLxN2s4cT2MQheSzJmxJFIU7ZTqY
+         xaFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731408654; x=1732013454;
+        d=1e100.net; s=20230601; t=1731408999; x=1732013799;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EsN1AKfVr0DCt3ea+9xEDMwiA7+bJgbMxbEYUcuak9o=;
-        b=wPKR8RkrqLNguo2RwX/85jsJC3s3dKnpFgLczaDMfyFMS37Zqvv1bma9cVBZwvqS0f
-         XJFN09oR2wMdST2ExuJCUx5ntB571p+xFl1+6Sje0Yz1fLnZdCqF8O0pxox0xq4ygxlP
-         x/vmKR7GaDKY6hdZ6uXdK+3aobL2k8UDGv46j1XIv34TKqtD2MJZ+oClLvmmyBFnvjHc
-         aL+gPhsxhvrKwe0t5UvLxGVOK6v2UUUDTxG7Xv0+F0lwBLBndulNi7QI18YV3DqgFrK8
-         dJtgPBTIh8Im/ahNX8VUOXiUy13mAOGBbU9l2OaxZzUgqep1VierdZwA6DbCoVGMmEh3
-         I1Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLUuaZ7/+//AaqPyog4oRBERq3Va9M0ZUge4ip90XhtEVio2iHPoevwsg2YxQS+WkA24qegTQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwtW2gvXtpovci5o7S8kWJvjjg47vkQvYgkBqfvPh7F5limJnf3
-	ETDtJM5GeTt2ASF36XU5by5bKwNqn3U9SRtw17CTledGIoz2XMqJMKG3I0ZHVco=
-X-Google-Smtp-Source: AGHT+IEKeBbC4At05ppEunVvuC+fNmBSZ3Q9XWqfiNFLF4QIIvJpGZjKzAWEcxYQGDx0hubsAbMKIw==
-X-Received: by 2002:a05:600c:6987:b0:431:3a6d:b84a with SMTP id 5b1f17b1804b1-432bcafc5a6mr109173125e9.4.1731408654402;
-        Tue, 12 Nov 2024 02:50:54 -0800 (PST)
+        bh=SUZb9Z1/W7ca2STbTF5/tGFSoH8Cx+ksuikIOfGFMUI=;
+        b=CpEQjYZwgbcde6tZUolPNhWjK8ZZypNc9BM/znaRFK+nzJusFMg66pKvSdxHd1H91p
+         d9i/miBWsvxtxNsFFaxUlzTcjyqP64JIYQ8ka8jtL4NAx+D/CyxQGA4t7+g+LQGfRMLD
+         Mx2yHHEO4t//hDC5k6kfPYTlJmlBzQDQVovpW576Jg14uIlUobaTgjlgWBllhgqOoDlr
+         Mbny3ZUy9omYZOyDEMROhWWKN9xArineOFOLV3ZcwsbZq+fEql0syXsueUuhZw8NLnIx
+         eUMLGjKgKEMYOXFuYcCXu9vmjcd3MfPZcCC/ST4UJI4f09jQDaoagTCP0rT1oqb9qP0R
+         c3zA==
+X-Forwarded-Encrypted: i=1; AJvYcCXvPI3hGJT4XC3X8PhygADIv5Sv2kP6NvTdfcCzbRa7q49JhZUdS3p4C2vbB5BXp7E42uFF/5g=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxwtQGyB6QXiwk3Zd0o4v8UCwi8iDEAL2EiLacSvdK4Kd5u6bvX
+	Kg0vdoDDTMK4CWyvhWblpu38i/rRzrapnlzByBVEL4HxWsr8Fe7ApI2jqDTyhZI=
+X-Google-Smtp-Source: AGHT+IHvq8za4ODwagi9eMCX58JHSHwa35A0vD53q9ShdqUM3Ry91k3zNmwqMO4C+mOEfDBMTSJnrw==
+X-Received: by 2002:a05:6000:2a88:b0:381:f443:21bf with SMTP id ffacd0b85a97d-381f4432609mr10071022f8f.2.1731408999580;
+        Tue, 12 Nov 2024 02:56:39 -0800 (PST)
 Received: from pop-os.. ([145.224.90.214])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa70a1f8sm248010955e9.30.2024.11.12.02.50.53
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed970fb7sm14943629f8f.21.2024.11.12.02.56.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 02:50:53 -0800 (PST)
+        Tue, 12 Nov 2024 02:56:39 -0800 (PST)
 From: James Clark <james.clark@linaro.org>
-To: broonie@kernel.org,
+To: tabba@google.com,
 	maz@kernel.org,
-	kvmarm@lists.linux.dev
+	kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev
 Cc: James Clark <james.clark@linaro.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
+	=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?= <ptosi@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Don't save FP traps in default cptr_el2 value
-Date: Tue, 12 Nov 2024 10:50:31 +0000
-Message-Id: <20241112105032.793274-1-james.clark@linaro.org>
+Subject: [PATCH] KVM: arm64: Pass on SVE mapping failures
+Date: Tue, 12 Nov 2024 10:56:03 +0000
+Message-Id: <20241112105604.795809-1-james.clark@linaro.org>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -76,101 +76,29 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm_get_reset_cptr_el2() is called at vcpu init before the vcpu is
-loaded. Since the linked commit, the fp state was moved from the vcpu to
-host data but it shouldn't be accessed at this point.
+This function can fail but its return value isn't passed onto the
+caller. Presumably this could result in a broken state.
 
-Move the bits that require guest_owns_fp_regs() out of the default value
-and into just before they're used in activate and deactivate traps. This
-fixes the following bug when nvhe && vcpu_has_sve() == true:
-
- BUG: using smp_processor_id() in preemptible [00000000] code: lkvm/118
- caller is debug_smp_processor_id+0x20/0x30
- CPU: 0 UID: 0 PID: 118 Comm: lkvm Not tainted 6.12.0-rc1+ #35
- Hardware name: FVP Base RevC (DT)
- Call trace:
-  dump_backtrace+0xfc/0x120
-  show_stack+0x24/0x38
-  dump_stack_lvl+0x3c/0x98
-  dump_stack+0x18/0x28
-  check_preemption_disabled+0xe0/0xe8
-  debug_smp_processor_id+0x20/0x30
-  guest_owns_fp_regs+0x1c/0xb0
-  kvm_arch_vcpu_ioctl+0xcfc/0xe10
-  kvm_vcpu_ioctl+0x6c4/0x8a0
-  __arm64_sys_ioctl+0x9c/0xe0
-  invoke_syscall+0x4c/0x110
-  el0_svc_common+0xb8/0xf0
-  do_el0_svc+0x28/0x40
-  el0_svc+0x4c/0xc0
-  el0t_64_sync_handler+0x84/0x100
-  el0t_64_sync+0x190/0x198
-
-Fixes: 5294afdbf45a ("KVM: arm64: Exclude FP ownership from kvm_vcpu_arch")
+Fixes: 66d5b53e20a6 ("KVM: arm64: Allocate memory mapped at hyp for host sve state in pKVM")
 Signed-off-by: James Clark <james.clark@linaro.org>
 ---
+ arch/arm64/kvm/hyp/nvhe/setup.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-I'm only mildly confident that the logic here is equivalent to before.
-Someone with a bit more context about the FP stuff can say, or if there
-is a neater way to fix this issue altogether.
-
- arch/arm64/include/asm/kvm_emulate.h | 15 +++++++++------
- arch/arm64/kvm/hyp/nvhe/switch.c     |  3 ++-
- 2 files changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index cf811009a33c..0eefb9fb08a0 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -629,16 +629,12 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 			val |= CPACR_EL1_SMEN_EL1EN;
- 	} else if (has_hvhe()) {
- 		val = CPACR_ELx_FPEN;
--
--		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
-+		if (!vcpu_has_sve(vcpu))
- 			val |= CPACR_ELx_ZEN;
- 		if (cpus_have_final_cap(ARM64_SME))
- 			val |= CPACR_ELx_SMEN;
- 	} else {
- 		val = CPTR_NVHE_EL2_RES1;
--
--		if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
--			val |= CPTR_EL2_TZ;
- 		if (cpus_have_final_cap(ARM64_SME))
- 			val &= ~CPTR_EL2_TSM;
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 8fec099c2775..cbdd18cd3f98 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -146,8 +146,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 			return ret;
  	}
-@@ -648,8 +644,15 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
  
- static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
- {
--	u64 val = kvm_get_reset_cptr_el2(vcpu);
-+	u64 val = vcpu->arch.cptr_el2;
- 
-+	if (has_hvhe()) {
-+		if (!guest_owns_fp_regs())
-+			val |= CPACR_ELx_ZEN;
-+	} else if (!has_vhe()) {
-+		if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
-+			val |= CPTR_EL2_TZ;
-+	}
- 	kvm_write_cptr_el2(val);
+-	pkvm_create_host_sve_mappings();
+-	return 0;
++	return pkvm_create_host_sve_mappings();
  }
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index cc69106734ca..296c4155e1fc 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -60,7 +60,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
- 
- 		__activate_traps_fpsimd32(vcpu);
--	}
-+	} else if (!has_hvhe() && vcpu_has_sve(vcpu))
-+		val |= CPTR_EL2_TZ;
- 
- 	kvm_write_cptr_el2(val);
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
+ static void update_nvhe_init_params(void)
 -- 
 2.34.1
 
