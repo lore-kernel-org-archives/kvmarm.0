@@ -1,138 +1,138 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E0A183088
-	for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 17:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D2F18C01A
+	for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 17:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731605731; cv=none; b=V9xLIbtIm1K4Enx+hEqWevs1V2wsrsXQNXI1luRxWTiI77+tgtvwp2ask9dLCxpt1E+zKzLOYVosRaOqeh/6bFHE4fma7UHRlESaX+0rMHrbszW7ybBBcUCRnk523cDXNB/x9MvSPJH96znvZgIau2oYbznoTKfMkVWsjWTzHLg=
+	t=1731606157; cv=none; b=haTm2x5oNd7fuQsKNhhREke/eQmlmE8mW6tva3BbmH2WZB1vk2TKTCK7SZrRVFFr22s2hTXOTPpFO0eXiK/cJiDbdukrUk8JHVnhN+plowR8Ly7pkahGLAUXpHLWNCPts1eJJzT4ICVhXYhKjgx4jDjG16zTQPkb92myT2XMfIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731605731; c=relaxed/simple;
-	bh=Ab+hbDx1HOm+gPbFqo7xK/IqBtFRAEyTfyNj/UbjaXQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EIokJNONb1ea/JXYSTeZVXSJePa5M+sny4/KpFRiZdc/wL00u2qR3x1BLGEIo+y1y9EW5zU7ZV8ET2/bABvvSFCpjpj7v0gs1RMtiqWAtNnU77ytDMh3eANg+mRSu3g/HjIb5FnKy2T2XrIfUIHQVMd+Agj62b5TEeob8cB7uiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83ab4cadf05so90892039f.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 09:35:29 -0800 (PST)
+	s=arc-20240116; t=1731606157; c=relaxed/simple;
+	bh=5uog7s88Vdjn9LrHFqVJ7H6JRAqfaj//EHJnHT0pKe0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=C1ekhy4qT6TxSb1xk1RBB2WJmOHh9CIBIgEzTPW25MmtDAd8qsexZ9aBBMop6mVbE1pqL4NAr2V0siZUt4JeKV/3qHb9HTpyHuJDuCUIcE5TLPgY6h3a8nFfIkxoMqaFtkIpdO9nLPDoS/eDHMhGIMvQ3AiTl2m4utd1I86YHDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LtSWeMt9; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LtSWeMt9"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e6241c002so810852b3a.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 09:42:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731606155; x=1732210955; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jxstw+HdDkmUNCxSNezg+z3DZ+qdKf7DbKMcdrw87E=;
+        b=LtSWeMt9kY1vxYrMJrMBucxIvqJfGtkuOvd7DI5sF/GnWQHSt8wX45qk1VZPjZD0Ys
+         NpsPVzFbFnnRhFvhJRYXmioUfvtYtdzNhU0wkMpq/787TxzDDfinzqbr3VleUEB6NScg
+         P77iFngozyF+Sbp8iIH7TvQPQygV9Kxysu2W/1gR8qFuuINQbTJ3Vd9gx36bsKPNY9XX
+         JAoViKSk/26rAsi7jNhymvlo6ljYoPmp950Uregf9E6p99yBS699250AiS85be5Q3Et+
+         MOdy/eb5P3wDGWeS5VxuJusDtH/dIMQ1Pab5aIzG+qqhUN+UllZtnF8fORKtPUp0VFwO
+         QRxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731605729; x=1732210529;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PyBn26mUePqthY9XrpQhwn7miJxqIZLoeEl6nlPcolo=;
-        b=Pwi3rct34+DG+WYyfkHU5Jz/d6kQ9U6INST3LVKiI6cHiieNWp2OkwN/XkNnUlvKC0
-         DV9WhtiBppVJ6xmVPatTaJN7N5UbG51LNuqPi4i+wgx77qp1JnOVDKuP5HybGrLEg6e/
-         lFCKw7uKkjmc9Eezzy+OvadmVOuC0C7gViE95ctq1DNo3ZUf/WDlr3F5zD+ZIidprYdb
-         RJYlSfTmRKXN0JMFYk50azhD++/WYPy4EbtuhMBwOWybUn9KLlbG292lmjxRc9HTuzAK
-         0FOmI/Kee7ejz4i5i5Ui92Netkbfsh96IX1DV7nM0aLXdPDBb0RXHf8tOwiVCms0w8pT
-         UWHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWA/HDLJ2uC7MdI7Ng6pyGnvJCWONxYI0e1QDO8aZgSqiNLhKUien0BbTyuRww4VEwQEl8TNcc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzUBZjN3LrgU3++qlRO9rl9IJ9aciKF7brIUKJrJALu/tlPXNPh
-	fEkch5CHw06/hzAssTHsOP1z2STmtFbbGQlOLl81lggCwnu9+fEDj53jD28+889NQunG3OGsbxP
-	47DfvfjRnNpgjTnFnx1WL7WVtRExkiF5ahduKhqUnBrJ4WBA4bN5uKu0=
-X-Google-Smtp-Source: AGHT+IGArfQl0h1dH8qLIGSN+m5H0UpJUvpQ7t2lE3lgEmpmzkn62NzkZK3va21oObzriu4b26lvMeqFvzxzKH2wLjKKv0K7GlhR
+        d=1e100.net; s=20230601; t=1731606155; x=1732210955;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jxstw+HdDkmUNCxSNezg+z3DZ+qdKf7DbKMcdrw87E=;
+        b=r9Dghu1ZK2pUyacokCxMuTRptksAcDKlb5oSPLJCzTbBIKdbs/pLNNxPJ78+Qk/12j
+         GxlRswvsp1lgiPKTaKq8WD0Jdg9sUJV67PPrl/NkdvKdpS3qQp7iXMKXIeYRNWNfVOZa
+         49hBjerqKQy33G+fzbZXIGlepSgVy5qy0lPefrAKUF1k1LBM3l2vubwkTvoIfX5/bpM0
+         8P2uPPRTCoJEA4PECrpWtgLSRHYnNTNLaL9U6sGNatSAOuREmDhMxeR9Cw1bwPBmMdm2
+         3bcVxMmYc8p6YKiIIprj9d9arHd3ZR082D2HuT3rXbRzC2djaDpYgNfyzqHSQY5uwx9/
+         9eLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuwN9HV9NWIFef54p2npiAPrUICGodT5KUEHqMVtxg75DRDQyDN8CXkXbMqIZNQYjyGRv6M7Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy/sfyMcmQBCNWmV3COqfdtaGTZDuY43BCZMwLgUZuALaQanUXs
+	NT0EUb8fK2Vh6Okop4J4/yffSnZccqd4r6/pn+A+H5CWtF2pQo5g+qFro/ygEUZS7x6GMRdasjU
+	/nQ==
+X-Google-Smtp-Source: AGHT+IE2t7/BQUDGvQdq1WU4OfDCD4pafvlstYkabCEfeZEIVCwo/4m39wonrcrGj/V1SHEHETmIrMp08OA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2167:b0:724:67d7:17b2 with SMTP id
+ d2e1a72fcca58-72467d71a19mr35667b3a.0.1731606154070; Thu, 14 Nov 2024
+ 09:42:34 -0800 (PST)
+Date: Thu, 14 Nov 2024 09:42:32 -0800
+In-Reply-To: <20241108-eaacad12f1eef31481cf0c6c@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2181:b0:3a6:f349:71e6 with SMTP id
- e9e14a558f8ab-3a71fec44f3mr31321115ab.22.1731605728729; Thu, 14 Nov 2024
- 09:35:28 -0800 (PST)
-Date: Thu, 14 Nov 2024 09:35:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <673634e0.050a0220.1324f8.009d.GAE@google.com>
-Subject: [syzbot] [kvmarm?] WARNING in kvm_handle_mmio_return
-From: syzbot <syzbot+4727d10d6a805738b0f2@syzkaller.appspotmail.com>
-To: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, 
-	syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
+ <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
+ <ZyuiH_CVQqJUoSB-@google.com> <20241108-eaacad12f1eef31481cf0c6c@orel>
+Message-ID: <ZzY2iAqNfeiiIGys@google.com>
+Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Anup Patel <anup@brainfault.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hello,
+On Fri, Nov 08, 2024, Andrew Jones wrote:
+> On Wed, Nov 06, 2024 at 09:06:39AM -0800, Sean Christopherson wrote:
+> > On Fri, Nov 01, 2024, Vipin Sharma wrote:
+> > > Phase 3: Provide collection of interesting configurations
+> > > 
+> > > Specific individual constructs can be combined in a meaningful way to
+> > > provide interesting configurations to run on a platform. For example,
+> > > user doesn't need to specify each individual configuration instead,
+> > > some prebuilt configurations can be exposed like
+> > > --stress_test_shadow_mmu, --test_basic_nested
+> > 
+> > IMO, this shouldn't be baked into the runner, i.e. should not surface as dedicated
+> > command line options.  Users shouldn't need to modify the runner just to bring
+> > their own configuration.  I also think configurations should be discoverable,
+> > e.g. not hardcoded like KUT's unittest.cfg.  A very real problem with KUT's
+> > approach is that testing different combinations is frustratingly difficult,
+> > because running a testcase with different configuration requires modifying a file
+> > that is tracked by git.
+> 
+> We have support in KUT for environment variables (which are stored in an
+> initrd). The feature hasn't been used too much, but x86 applies it to
+> configuration parameters needed to execute tests from grub, arm uses it
+> for an errata framework allowing tests to run on kernels which may not
+> include fixes to host-crashing bugs, and riscv is using them quite a bit
+> for providing test parameters and test expected results in order to allow
+> SBI tests to be run on a variety of SBI implementations. The environment
+> variables are provided in a text file which is not tracked by git. kvm
+> selftests can obviously also use environment variables by simply sourcing
+> them first in wrapper scripts for the tests.
 
-syzbot found the following issue on:
+Oh hell no! :-)
 
-HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1393335f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a0d77fb8077b4744
-dashboard link: https://syzkaller.appspot.com/bug?extid=4727d10d6a805738b0f2
-compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1793335f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=144ff4e8580000
+For reproducibility, transparency, determinism, environment variables are pure
+evil.  I don't want to discover that I wasn't actually testing what I thought I
+was testing because I forgot to set/purge an environment variable.  Ditto for
+trying to reproduce a failure reported by someone.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-2d5404ca.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9fafeb95420d/vmlinux-2d5404ca.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/498f7a357ea2/Image-2d5404ca.gz.xz
+KUT's usage to adjust to the *system* environment is somewhat understandable
+But for KVM selftests, there should be absolutely zero reason to need to fall
+back to environment variables.  Unlike KUT, which can run in a fairly large variety
+of environments, e.g. bare metal vs. virtual, different VMMs, different firmware,
+etc., KVM selftests effectively support exactly one environment.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4727d10d6a805738b0f2@syzkaller.appspotmail.com
+And unlike KUT, KVM selftests are tightly coupled to the kernel.  Yes, it's very
+possible to run selftests against different kernels, but I don't think we should
+go out of our way to support such usage.  And if an environment needs to skip a
+test, it should be super easy to do so if we decouple the test configuration
+inputs from the test runner.
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 3270 at arch/arm64/include/asm/kvm_emulate.h:536 kvm_handle_mmio_return+0x1b4/0x1f4 arch/arm64/kvm/mmio.c:99
-Modules linked in:
-CPU: 0 UID: 0 PID: 3270 Comm: syz-executor447 Not tainted 6.12.0-rc7-syzkaller #0
-Hardware name: linux,dummy-virt (DT)
-pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-pc : kvm_incr_pc arch/arm64/include/asm/kvm_emulate.h:536 [inline]
-pc : kvm_handle_mmio_return+0x1b4/0x1f4 arch/arm64/kvm/mmio.c:118
-lr : kvm_arch_vcpu_ioctl_run+0x1ac/0x854 arch/arm64/kvm/arm.c:1135
-sp : ffff800088e33ab0
-x29: ffff800088e33ab0 x28: f6f0000005b35b40 x27: 0000000000000000
-x26: 0000000000000000 x25: fbf00000073d8048 x24: fbf00000073d8000
-x23: 0000000000000000 x22: 0000000000000000 x21: 0000000000000000
-x20: f3f000000664a000 x19: fbf00000073d8000 x18: ffffffffffffffff
-x17: 0000000000000000 x16: 0000000000000000 x15: ffff800088e33aa0
-x14: ffff800088e33d88 x13: ffff800088e33d4a x12: 6d766b3a65646f6e
-x11: 0000000000000000 x10: 0000000000000078 x9 : 000000000000000c
-x8 : ffff800088e33d98 x7 : 0000000000000000 x6 : 0000000000005452
-x5 : 0000000000000005 x4 : f0f00000060bd300 x3 : f6f0000005b35b40
-x2 : 0000000000000000 x1 : 0000000093c18046 x0 : 0000000000000001
-Call trace:
- kvm_handle_mmio_return+0x1b4/0x1f4 arch/arm64/kvm/mmio.c:99
- kvm_arch_vcpu_ioctl_run+0x1ac/0x854 arch/arm64/kvm/arm.c:1135
- kvm_vcpu_ioctl+0x294/0xa04 virt/kvm/kvm_main.c:4475
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __arm64_sys_ioctl+0xac/0xf0 fs/ioctl.c:893
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
- el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
- el0_svc+0x30/0xdc arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
----[ end trace 0000000000000000 ]---
+> > There are underlying issues with KUT that essentially necessitate that approach,
+> > e.g. x86 has several testcases that fail if run without the exact right config.
+> > But that's just another reason to NOT follow KUT's pattern, e.g. to force us to
+> > write robust tests.
+> > 
+> > E.g. instead of per-config command line options, let the user specify a file,
+> > and/or a directory (using a well known filename pattern to detect configs).
+> 
+> Could also use an environment variable to specify a file which contains
+> a config in a test-specific format if parsing environment variables is
+> insufficient or awkward for configuring a test.
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+There's no reason to use a environment variable for this.  If we want to support
+"advanced" setup via a test configuration, then that can simply go in configuration
+file that's passed to the runner.
