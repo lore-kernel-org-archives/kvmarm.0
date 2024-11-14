@@ -1,120 +1,138 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4FD41C65
-	for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 15:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E0A183088
+	for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 17:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731599096; cv=none; b=OGOt5MCkzJ/Xy9ZBpTaAGGTUcp7UPT++K91LJgfJ5j1SnsHvMcczi7VCjS60j8w+FOlLGVo5+KoEPbsXefcX9GlWthoOWXxOtfrw7kvXnyLINqVVhZBx/RX5lOJDYDSyxr0Q0T/hXjOEPBt10s2X4J+K+syNWyUv1zLhqko57bc=
+	t=1731605731; cv=none; b=V9xLIbtIm1K4Enx+hEqWevs1V2wsrsXQNXI1luRxWTiI77+tgtvwp2ask9dLCxpt1E+zKzLOYVosRaOqeh/6bFHE4fma7UHRlESaX+0rMHrbszW7ybBBcUCRnk523cDXNB/x9MvSPJH96znvZgIau2oYbznoTKfMkVWsjWTzHLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731599096; c=relaxed/simple;
-	bh=GkhNWkpl50ktEuRk+CafywAeOJJnevTAjIQ40ac28BU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pj2wClf1l03vrfBYDg9V6N8J8kcz8u1S6XmV14nCjelOn+hI5L1wMBUe44ge8G9EOcB+yd6yNk/jPgx7jgg24pyNEcizTe0tWfT2wCTQl2/l8sEcFk1X9X3AUdWmEAZxsY6wftEWgn4g+2Zsi89GAugHf707kZs9gQVFN5rDLio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ClLrluld; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ClLrluld"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fb561f273eso7764961fa.2
-        for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 07:44:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731599093; x=1732203893; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GkhNWkpl50ktEuRk+CafywAeOJJnevTAjIQ40ac28BU=;
-        b=ClLrluldDsqoqUFkzGxQb3v6h/H9mdkSV87Me7FemPjx+pYaMMp9KojCQ8CSiLP7pX
-         9G7Uf6vPlg3rFcYYbXnIrJumDwVG1SbYOokSER5bMTvzfYzSQP2dxUht/R9o7DnDJ/8r
-         hmVyMc/BUuICUgK7dM5X+gYBMkAsfWkC2IQnmwiRh+UpmQH4a/c8WnSz4QnxxIVExQuu
-         wqjPLIH0nkoiifz4O7a28ejctA4J2/GOFdRo1x4Hc93xx4WOTbbmJpkKE/GhKwNLUKDc
-         HoPbG1QkmtLpJH+2mU9Pe7h97i/pfoVuByHF9lSb+/yTze7l/IrR1fvHl8DqeDvBUKYe
-         NqlQ==
+	s=arc-20240116; t=1731605731; c=relaxed/simple;
+	bh=Ab+hbDx1HOm+gPbFqo7xK/IqBtFRAEyTfyNj/UbjaXQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EIokJNONb1ea/JXYSTeZVXSJePa5M+sny4/KpFRiZdc/wL00u2qR3x1BLGEIo+y1y9EW5zU7ZV8ET2/bABvvSFCpjpj7v0gs1RMtiqWAtNnU77ytDMh3eANg+mRSu3g/HjIb5FnKy2T2XrIfUIHQVMd+Agj62b5TEeob8cB7uiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83ab4cadf05so90892039f.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 09:35:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731599093; x=1732203893;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GkhNWkpl50ktEuRk+CafywAeOJJnevTAjIQ40ac28BU=;
-        b=rb5FwMStaMZ2CTqORom/fJ0S3SpDzW31BYz+zDUkJrpf3ZL24ykJDvht3dgAXYvtT6
-         klvluvkNg3PmRBulfzeFv7XHvfTcTuHCHDYkqrPJnlFRU2Db6GvpTkxsboO/81ykVo9B
-         PLhUqWAk5KXMso8mCNof79KG+8NVX1lng3b/0TPbFHiaqB8M9JwjGmOWHNiVKqNJLqQW
-         4DSCr/fqn86mnJzAsp2Q7yzinVSWIexA8JZYuvPf1baiV9pfHPdm7m3PS5WkTHSe97g1
-         VjwfAi3Z7FR+PLRNeMV1DIjYWKWipu+P1BVV5lL3oX7hVU2b8ZxETvXzoSxcMhSiXJTO
-         MtyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFxvOWEHiIeISXYesq3SCdOMATQhN59I91ISMqFBQTRnLQEB2vsksfyyvYj/W5IH/+3C9Z8do=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyYIr9yRMLJdgx04RM0UrtlgH6cS34JlHnYZYzlT674GIAVgU2W
-	fvsFxEwf6oE1oIaYi/1QH2TJ3QwpqJM+qfZlPyEYCij8ZACOJJdBGn25LGRZXuILf0Rnisg6PR4
-	OkkvjadarozKsJkmHvE1WwhcoBLxJhHN7qLmV4g==
-X-Google-Smtp-Source: AGHT+IGWg38u++Iun/youHmT7OXtuhqQzvkqvbeU3yLkWOtsRw903njcHqvRRNFmz/mD0O4qwB83QRZpX2F1leaRUbc=
-X-Received: by 2002:a2e:a912:0:b0:2ff:191d:f077 with SMTP id
- 38308e7fff4ca-2ff425b142amr64742961fa.0.1731599093108; Thu, 14 Nov 2024
- 07:44:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731605729; x=1732210529;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PyBn26mUePqthY9XrpQhwn7miJxqIZLoeEl6nlPcolo=;
+        b=Pwi3rct34+DG+WYyfkHU5Jz/d6kQ9U6INST3LVKiI6cHiieNWp2OkwN/XkNnUlvKC0
+         DV9WhtiBppVJ6xmVPatTaJN7N5UbG51LNuqPi4i+wgx77qp1JnOVDKuP5HybGrLEg6e/
+         lFCKw7uKkjmc9Eezzy+OvadmVOuC0C7gViE95ctq1DNo3ZUf/WDlr3F5zD+ZIidprYdb
+         RJYlSfTmRKXN0JMFYk50azhD++/WYPy4EbtuhMBwOWybUn9KLlbG292lmjxRc9HTuzAK
+         0FOmI/Kee7ejz4i5i5Ui92Netkbfsh96IX1DV7nM0aLXdPDBb0RXHf8tOwiVCms0w8pT
+         UWHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWA/HDLJ2uC7MdI7Ng6pyGnvJCWONxYI0e1QDO8aZgSqiNLhKUien0BbTyuRww4VEwQEl8TNcc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzUBZjN3LrgU3++qlRO9rl9IJ9aciKF7brIUKJrJALu/tlPXNPh
+	fEkch5CHw06/hzAssTHsOP1z2STmtFbbGQlOLl81lggCwnu9+fEDj53jD28+889NQunG3OGsbxP
+	47DfvfjRnNpgjTnFnx1WL7WVtRExkiF5ahduKhqUnBrJ4WBA4bN5uKu0=
+X-Google-Smtp-Source: AGHT+IGArfQl0h1dH8qLIGSN+m5H0UpJUvpQ7t2lE3lgEmpmzkn62NzkZK3va21oObzriu4b26lvMeqFvzxzKH2wLjKKv0K7GlhR
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241025101959.601048-1-eric.auger@redhat.com>
- <20241025101959.601048-19-eric.auger@redhat.com> <ZxuX4i9NjVRizB72@redhat.com>
- <cb6c8f62-c5dc-416d-865f-fbdf96164dac@redhat.com> <Zxub7ol4p8P_sWF8@redhat.com>
- <CAFEAcA_wQu17y0PyQwxw0wuf2H5y2VE5aX16nLP2-u7QUP2ggA@mail.gmail.com>
- <Zx-9WxXkmkMuGIlQ@redhat.com> <CAFEAcA9w0mb5bcU8p+fScQony-=oqLmNurGWpnL_sBneQCzxUg@mail.gmail.com>
- <Zx_EGxj2aqc_2-kY@redhat.com> <63c232c2-a325-48d6-8ed4-753a7c6e3b4e@redhat.com>
- <87ikstn8sc.fsf@redhat.com>
-In-Reply-To: <87ikstn8sc.fsf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2024 15:44:42 +0000
-Message-ID: <CAFEAcA_RGWq_ydkKCZGZ8Cn6g3_KSXu_K9bBC2u5g8=uBaJUUg@mail.gmail.com>
-Subject: Re: [RFC 18/21] arm/cpu: Introduce a customizable kvm host cpu model
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: eric.auger@redhat.com, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, 
-	kvmarm@lists.linux.dev, richard.henderson@linaro.org, alex.bennee@linaro.org, 
-	maz@kernel.org, oliver.upton@linux.dev, sebott@redhat.com, 
-	shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, 
-	jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, 
-	philmd@linaro.org, pbonzini@redhat.com
+X-Received: by 2002:a05:6e02:2181:b0:3a6:f349:71e6 with SMTP id
+ e9e14a558f8ab-3a71fec44f3mr31321115ab.22.1731605728729; Thu, 14 Nov 2024
+ 09:35:28 -0800 (PST)
+Date: Thu, 14 Nov 2024 09:35:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <673634e0.050a0220.1324f8.009d.GAE@google.com>
+Subject: [syzbot] [kvmarm?] WARNING in kvm_handle_mmio_return
+From: syzbot <syzbot+4727d10d6a805738b0f2@syzkaller.appspotmail.com>
+To: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, 
+	syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 11 Nov 2024 at 14:29, Cornelia Huck <cohuck@redhat.com> wrote:
-> That leaves some headscratchers (at least for me.) E.g. FEAT_UINJ, which
-> is optional from v9.5, and mandatory from v9.6, but where I'm unsure how
-> we'd discover it, especially as we do not have a way to discover the
-> architecture extensions.
+Hello,
 
-I think that's just an accidental omission from the FEAT_UINJ
-documentation. There's a UINJ field in ID_AA64PFR2_EL1 which
-tells you whether FEAT_UINJ is implemented:
+syzbot found the following issue on:
 
-https://developer.arm.com/documentation/109697/2024_09/Feature-descriptions/The-Armv9-6-architecture-extension
+HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1393335f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a0d77fb8077b4744
+dashboard link: https://syzkaller.appspot.com/bug?extid=4727d10d6a805738b0f2
+compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1793335f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=144ff4e8580000
 
-> I'm also not sure if I understand FEAT_CHK, which is listed as
-> optional from v8.0 and mandatory from v9.4, but every aarch64 cpu is
-> supposed to be compliant, because CHKFEAT might be a NOP (and this is
-> only supposed to check for FEAT_GCS? Yes, I'm confused.)
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-2d5404ca.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9fafeb95420d/vmlinux-2d5404ca.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/498f7a357ea2/Image-2d5404ca.gz.xz
 
-CHKFEAT is there for cases where software (especially EL0 software)
-might need a fast cross-OS-portable way to detect whether a feature
-is present and enabled -- for instance if you want the compiler
-to emit a function prologue sequence that includes "do XYZ if
-GCS is on". CHKFEAT is in the hint area of the encoding space,
-so for any CPU that pre-dates FEAT_CHK it will do nothing (which is
-how "no features detectable with CHKFEAT are present" is indicated:
-if you look at what CHKFEAT actually does it has a definition that
-isn't how you'd naturally implement a feature-detect unless you
-needed to make NOP mean no-features-present.)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4727d10d6a805738b0f2@syzkaller.appspotmail.com
 
-Currently FEAT_GCS is the only feature where it has been deemed
-necessary to provide this kind of is-it-enabled detection, but some
-future features might also use the CHKFEAT mechanism.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 3270 at arch/arm64/include/asm/kvm_emulate.h:536 kvm_handle_mmio_return+0x1b4/0x1f4 arch/arm64/kvm/mmio.c:99
+Modules linked in:
+CPU: 0 UID: 0 PID: 3270 Comm: syz-executor447 Not tainted 6.12.0-rc7-syzkaller #0
+Hardware name: linux,dummy-virt (DT)
+pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+pc : kvm_incr_pc arch/arm64/include/asm/kvm_emulate.h:536 [inline]
+pc : kvm_handle_mmio_return+0x1b4/0x1f4 arch/arm64/kvm/mmio.c:118
+lr : kvm_arch_vcpu_ioctl_run+0x1ac/0x854 arch/arm64/kvm/arm.c:1135
+sp : ffff800088e33ab0
+x29: ffff800088e33ab0 x28: f6f0000005b35b40 x27: 0000000000000000
+x26: 0000000000000000 x25: fbf00000073d8048 x24: fbf00000073d8000
+x23: 0000000000000000 x22: 0000000000000000 x21: 0000000000000000
+x20: f3f000000664a000 x19: fbf00000073d8000 x18: ffffffffffffffff
+x17: 0000000000000000 x16: 0000000000000000 x15: ffff800088e33aa0
+x14: ffff800088e33d88 x13: ffff800088e33d4a x12: 6d766b3a65646f6e
+x11: 0000000000000000 x10: 0000000000000078 x9 : 000000000000000c
+x8 : ffff800088e33d98 x7 : 0000000000000000 x6 : 0000000000005452
+x5 : 0000000000000005 x4 : f0f00000060bd300 x3 : f6f0000005b35b40
+x2 : 0000000000000000 x1 : 0000000093c18046 x0 : 0000000000000001
+Call trace:
+ kvm_handle_mmio_return+0x1b4/0x1f4 arch/arm64/kvm/mmio.c:99
+ kvm_arch_vcpu_ioctl_run+0x1ac/0x854 arch/arm64/kvm/arm.c:1135
+ kvm_vcpu_ioctl+0x294/0xa04 virt/kvm/kvm_main.c:4475
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl fs/ioctl.c:893 [inline]
+ __arm64_sys_ioctl+0xac/0xf0 fs/ioctl.c:893
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
+ el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x30/0xdc arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
+---[ end trace 0000000000000000 ]---
 
-If you're a piece of system software wanting to see if FEAT_GCS
-is present you would use ID_AA64PFR1_EL1.GCS. (In particular, if
-you're an OS then until you have enabled GCS for yourself via
-GCSCR_EL1, CHKFEAT will tell you "not enabled", so you first need
-to look at the ID register to see if the GCSCR_EL1 register is
-there at all...)
 
-thanks
--- PMM
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
