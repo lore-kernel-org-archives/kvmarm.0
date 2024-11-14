@@ -1,138 +1,82 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D2F18C01A
-	for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 17:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0362374CC
+	for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 23:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731606157; cv=none; b=haTm2x5oNd7fuQsKNhhREke/eQmlmE8mW6tva3BbmH2WZB1vk2TKTCK7SZrRVFFr22s2hTXOTPpFO0eXiK/cJiDbdukrUk8JHVnhN+plowR8Ly7pkahGLAUXpHLWNCPts1eJJzT4ICVhXYhKjgx4jDjG16zTQPkb92myT2XMfIk=
+	t=1731627713; cv=none; b=GDSyhr7Q3MCclM3GhQaJz/zM7Eb3+dizC4Eu6odVv5zjUfbw8gcvTac24Y9x9vPp0WVe9zdAdCGTK+R/L3UThWaLq2M4aSolrlz5eIJtXJYrs6eQh4yDqAdIcl8iIe5NfLWZNUpk421QU2PI1UJWPB3bLfyUIg70Btm0InSywXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731606157; c=relaxed/simple;
-	bh=5uog7s88Vdjn9LrHFqVJ7H6JRAqfaj//EHJnHT0pKe0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C1ekhy4qT6TxSb1xk1RBB2WJmOHh9CIBIgEzTPW25MmtDAd8qsexZ9aBBMop6mVbE1pqL4NAr2V0siZUt4JeKV/3qHb9HTpyHuJDuCUIcE5TLPgY6h3a8nFfIkxoMqaFtkIpdO9nLPDoS/eDHMhGIMvQ3AiTl2m4utd1I86YHDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LtSWeMt9; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1731627713; c=relaxed/simple;
+	bh=kZ5epRbgKZ6233Ap65Xnl6vzoB2UfCoHzYBeuVIZIO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GKd4oRke1d9Y0J3EVoXaCh0ebT27WtAQlLZoq8IwD5XI/FtGCHsy8Ue1CMH/9yZGrmJ7e9m99QWzUB2j3LmrDX4rPSWilKvJTSOoQMaTiomO0xBg85Ewu++b9jqJq0LhC7gS30vsvecv0ZbL1fqRm4JgVj+0OTTkpOXuSKPTfmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lxpxzRH7; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LtSWeMt9"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e6241c002so810852b3a.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Nov 2024 09:42:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731606155; x=1732210955; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jxstw+HdDkmUNCxSNezg+z3DZ+qdKf7DbKMcdrw87E=;
-        b=LtSWeMt9kY1vxYrMJrMBucxIvqJfGtkuOvd7DI5sF/GnWQHSt8wX45qk1VZPjZD0Ys
-         NpsPVzFbFnnRhFvhJRYXmioUfvtYtdzNhU0wkMpq/787TxzDDfinzqbr3VleUEB6NScg
-         P77iFngozyF+Sbp8iIH7TvQPQygV9Kxysu2W/1gR8qFuuINQbTJ3Vd9gx36bsKPNY9XX
-         JAoViKSk/26rAsi7jNhymvlo6ljYoPmp950Uregf9E6p99yBS699250AiS85be5Q3Et+
-         MOdy/eb5P3wDGWeS5VxuJusDtH/dIMQ1Pab5aIzG+qqhUN+UllZtnF8fORKtPUp0VFwO
-         QRxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731606155; x=1732210955;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jxstw+HdDkmUNCxSNezg+z3DZ+qdKf7DbKMcdrw87E=;
-        b=r9Dghu1ZK2pUyacokCxMuTRptksAcDKlb5oSPLJCzTbBIKdbs/pLNNxPJ78+Qk/12j
-         GxlRswvsp1lgiPKTaKq8WD0Jdg9sUJV67PPrl/NkdvKdpS3qQp7iXMKXIeYRNWNfVOZa
-         49hBjerqKQy33G+fzbZXIGlepSgVy5qy0lPefrAKUF1k1LBM3l2vubwkTvoIfX5/bpM0
-         8P2uPPRTCoJEA4PECrpWtgLSRHYnNTNLaL9U6sGNatSAOuREmDhMxeR9Cw1bwPBmMdm2
-         3bcVxMmYc8p6YKiIIprj9d9arHd3ZR082D2HuT3rXbRzC2djaDpYgNfyzqHSQY5uwx9/
-         9eLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVuwN9HV9NWIFef54p2npiAPrUICGodT5KUEHqMVtxg75DRDQyDN8CXkXbMqIZNQYjyGRv6M7Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy/sfyMcmQBCNWmV3COqfdtaGTZDuY43BCZMwLgUZuALaQanUXs
-	NT0EUb8fK2Vh6Okop4J4/yffSnZccqd4r6/pn+A+H5CWtF2pQo5g+qFro/ygEUZS7x6GMRdasjU
-	/nQ==
-X-Google-Smtp-Source: AGHT+IE2t7/BQUDGvQdq1WU4OfDCD4pafvlstYkabCEfeZEIVCwo/4m39wonrcrGj/V1SHEHETmIrMp08OA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2167:b0:724:67d7:17b2 with SMTP id
- d2e1a72fcca58-72467d71a19mr35667b3a.0.1731606154070; Thu, 14 Nov 2024
- 09:42:34 -0800 (PST)
-Date: Thu, 14 Nov 2024 09:42:32 -0800
-In-Reply-To: <20241108-eaacad12f1eef31481cf0c6c@orel>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lxpxzRH7"
+Date: Thu, 14 Nov 2024 15:41:37 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731627709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XGno1wzgEqV1HjDJxj9LHzlYSckAa8qAlmfgXnpAYiI=;
+	b=lxpxzRH7YHlU9JZigMCrAD4rc1j+I82rtFNeiX2onDLGHNiW5TctQ/EXB1fi7t0ow3U4mS
+	x6PLEj7hijpjZwIfhJfs8umi4eRva+moQbTrnVflibJa41FzfCGgfkpPSwAoU0TWStkw/8
+	rcMLueG4oVxGpPDL2ZJFbrIcy5hVXWs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: syzbot <syzbot+4727d10d6a805738b0f2@syzkaller.appspotmail.com>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	maz@kernel.org, suzuki.poulose@arm.com,
+	syzkaller-bugs@googlegroups.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [syzbot] [kvmarm?] WARNING in kvm_handle_mmio_return
+Message-ID: <ZzaKsQ7-mqK78BdT@linux.dev>
+References: <673634e0.050a0220.1324f8.009d.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
- <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
- <ZyuiH_CVQqJUoSB-@google.com> <20241108-eaacad12f1eef31481cf0c6c@orel>
-Message-ID: <ZzY2iAqNfeiiIGys@google.com>
-Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
-From: Sean Christopherson <seanjc@google.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Anup Patel <anup@brainfault.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <673634e0.050a0220.1324f8.009d.GAE@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Nov 08, 2024, Andrew Jones wrote:
-> On Wed, Nov 06, 2024 at 09:06:39AM -0800, Sean Christopherson wrote:
-> > On Fri, Nov 01, 2024, Vipin Sharma wrote:
-> > > Phase 3: Provide collection of interesting configurations
-> > > 
-> > > Specific individual constructs can be combined in a meaningful way to
-> > > provide interesting configurations to run on a platform. For example,
-> > > user doesn't need to specify each individual configuration instead,
-> > > some prebuilt configurations can be exposed like
-> > > --stress_test_shadow_mmu, --test_basic_nested
-> > 
-> > IMO, this shouldn't be baked into the runner, i.e. should not surface as dedicated
-> > command line options.  Users shouldn't need to modify the runner just to bring
-> > their own configuration.  I also think configurations should be discoverable,
-> > e.g. not hardcoded like KUT's unittest.cfg.  A very real problem with KUT's
-> > approach is that testing different combinations is frustratingly difficult,
-> > because running a testcase with different configuration requires modifying a file
-> > that is tracked by git.
+On Thu, Nov 14, 2024 at 09:35:28AM -0800, syzbot wrote:
+> Hello,
 > 
-> We have support in KUT for environment variables (which are stored in an
-> initrd). The feature hasn't been used too much, but x86 applies it to
-> configuration parameters needed to execute tests from grub, arm uses it
-> for an errata framework allowing tests to run on kernels which may not
-> include fixes to host-crashing bugs, and riscv is using them quite a bit
-> for providing test parameters and test expected results in order to allow
-> SBI tests to be run on a variety of SBI implementations. The environment
-> variables are provided in a text file which is not tracked by git. kvm
-> selftests can obviously also use environment variables by simply sourcing
-> them first in wrapper scripts for the tests.
-
-Oh hell no! :-)
-
-For reproducibility, transparency, determinism, environment variables are pure
-evil.  I don't want to discover that I wasn't actually testing what I thought I
-was testing because I forgot to set/purge an environment variable.  Ditto for
-trying to reproduce a failure reported by someone.
-
-KUT's usage to adjust to the *system* environment is somewhat understandable
-But for KVM selftests, there should be absolutely zero reason to need to fall
-back to environment variables.  Unlike KUT, which can run in a fairly large variety
-of environments, e.g. bare metal vs. virtual, different VMMs, different firmware,
-etc., KVM selftests effectively support exactly one environment.
-
-And unlike KUT, KVM selftests are tightly coupled to the kernel.  Yes, it's very
-possible to run selftests against different kernels, but I don't think we should
-go out of our way to support such usage.  And if an environment needs to skip a
-test, it should be super easy to do so if we decouple the test configuration
-inputs from the test runner.
-
-> > There are underlying issues with KUT that essentially necessitate that approach,
-> > e.g. x86 has several testcases that fail if run without the exact right config.
-> > But that's just another reason to NOT follow KUT's pattern, e.g. to force us to
-> > write robust tests.
-> > 
-> > E.g. instead of per-config command line options, let the user specify a file,
-> > and/or a directory (using a well known filename pattern to detect configs).
+> syzbot found the following issue on:
 > 
-> Could also use an environment variable to specify a file which contains
-> a config in a test-specific format if parsing environment variables is
-> insufficient or awkward for configuring a test.
+> HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1393335f980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=a0d77fb8077b4744
+> dashboard link: https://syzkaller.appspot.com/bug?extid=4727d10d6a805738b0f2
+> compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: arm64
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1793335f980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=144ff4e8580000
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-2d5404ca.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/9fafeb95420d/vmlinux-2d5404ca.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/498f7a357ea2/Image-2d5404ca.gz.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+4727d10d6a805738b0f2@syzkaller.appspotmail.com
 
-There's no reason to use a environment variable for this.  If we want to support
-"advanced" setup via a test configuration, then that can simply go in configuration
-file that's passed to the runner.
+#syz fix: KVM: arm64: Don't retire aborted MMIO instruction
+
+I sent out the pull request for 6.13 yesterday, which includes this fix [*]
+
+[*]: https://lore.kernel.org/kvmarm/ZzWo7_GSUNXe7Ip_@linux.dev/
+
+-- 
+Thanks,
+Oliver
