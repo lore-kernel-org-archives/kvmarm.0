@@ -1,39 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DA5126C10;
-	Fri, 15 Nov 2024 16:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F265D161320
+	for <kvmarm@lists.linux.dev>; Fri, 15 Nov 2024 20:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731687815; cv=none; b=tkQ93B8qppqR5sKsUMxTh5ApJNZxCJaC24WErY5yWUmK/8/az73oUwSov1E4RXDpqygXyrHXmlFUvpb2+rr40Z4ZuJXZiZZHXxKP2Rf71CXl9G58YKeWhzEmHHl7HHwVN6p0yBjDZEgdwbvdX2MepLnVJkszMzBlfT50QdWWRn4=
+	t=1731701922; cv=none; b=rcPq15D+2G25DqYm8rFKVaba8wgii4v9SGOBajcOqIhaR5dGLof6QBifP/UqRKe4JDNRxcAgiuYeQvnexW5RX/1hR80Fcmwg8hHOZe9DEvfzckuRUn7MqdPMosnnp5FA/Wtd7gfRgiiggvfJSxTgAQmgzL8SxYomOnSwi5Z47cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731687815; c=relaxed/simple;
-	bh=DM27c+y+WOBeLHMhqrwMS7rn3rHMwv1YhipdWe80R8Q=;
+	s=arc-20240116; t=1731701922; c=relaxed/simple;
+	bh=GfooVAynkoOrmm2tbyxHPRV5xwbtTrqQtV3CoOROJV8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KH5Ldu5lfT8eaxJOXguv+w/cqTJPtI2BvPlwaPY3nhl8om9A81A5UIYdRb4CDDj4/kXs+qoIXWwVZHwXSw46AcR6hBTAvYzUmW8W0xeGETULayuzuqKo5UOFoAg/jHPFDUwxu1NPuwbEtDZVWkOfs7H6Q/uECK3iD9Uc9UQbYhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 745ABC4CED5;
-	Fri, 15 Nov 2024 16:23:32 +0000 (UTC)
-Date: Fri, 15 Nov 2024 16:23:30 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 4/4] arm64: mte: Use stage-2 NoTagAccess memory attribute
- if supported
-Message-ID: <Zzd1giMm-bzUiZgA@arm.com>
-References: <20241028094014.2596619-1-aneesh.kumar@kernel.org>
- <20241028094014.2596619-5-aneesh.kumar@kernel.org>
- <87o734ts4m.wl-maz@kernel.org>
- <yq5ar080cq5x.fsf@kernel.org>
- <87jzdst6os.wl-maz@kernel.org>
- <yq5a34k2rw9o.fsf@kernel.org>
- <86ldxozn3i.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b0saC2StYMZsGpUd6ibtDojnrT7oOT08lKcSyiU/105CtQKfEvdBLupFqCnpVrKlRUYZ/aeJWvHQI4/dNsDLtG9SAzS2CR8KXa70SILymvJk6Flnw4w2GKqMEnfhm3QC6RT8XhbgBH3qibnB9yfWGpOMRsRr4jILpNkjSaTVeao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nXLwot6y; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nXLwot6y"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20c8ac50b79so19385ad.0
+        for <kvmarm@lists.linux.dev>; Fri, 15 Nov 2024 12:18:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731701920; x=1732306720; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vOebRQETbZvWS73rKNCR7PLpNcmPn5Rr3U0j+a9cUYI=;
+        b=nXLwot6yapf/hmfNeXLyJe84xI8+fxwKflCR7GIcnCFQw5uvy4JKkCvaqjjgA0WgOv
+         dqv1u2QYJqwYq0OfMOZPbfpGyuhg5zx8P0GLepCkw9gBbYo8qVDxviuNrz3nXLScNXpq
+         I6CDBgELtq2ObAVwBbQRKros4k0Q/QVXUcoG4oRdO4q0LW4Ek5ogBRLrnfrI2QjcMEu5
+         81pPjrntRnmYMc9TwyzqHdM+baA0YWRwdyWp0rb+opaT204CoLnKikOTu041L295W3er
+         TAwC8waVdNaf/z+8epQg7BTW8AHfSKQzvOLQwmyWSwCmWSqzokFdjLS0ONOP2OqDn1tX
+         8LnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731701920; x=1732306720;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vOebRQETbZvWS73rKNCR7PLpNcmPn5Rr3U0j+a9cUYI=;
+        b=RWjU+Q4m8Rj5WBlgxTh38PdMMNG/N+BrYect6hLH4MMph6wMGYyoxa7P9MP5mO897X
+         K3Jr+0kRGqBcO7ZgkYAFfW2JV54LypyVFSQuZLsN2MNwi4Vx4K0kXxheC9ErmlgJ/7vJ
+         i8kScmxAie+n2LbW0MJJJke8zq2aPy1/zFpJ9EN+9cYaEZDz6EqlVhhZJG9fSDtITPTf
+         /PsamD4XjtJDWFiJyd1OOODB03rCS2XYYCGXGj/QF68XFYZHYw9c4ricS578ducPHItf
+         wg8pMddU3tvFfEKxXXyDD0P2dyW8Hm1EiTOLmUHcZCIi0YzwQgTDMnR4Kz/ZBnMPMlS4
+         j5LQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrLA/LXr5amDjfeV3kmz0uQPZZA+y6mynW6aoh6eFq7lSgF+09y+Y0uL393lbkQAO3kpx+UYo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyjn8Zdjg90cAZsMzFDFpqsHRwHa/fpGS3JG1BO0C//CRyIXDJT
+	N9BzJ4Xck4x8deM3HXR+MKBTJpfCs+lzwWmyeyT+mxYW8XZ+gy64yOq4pniyQA==
+X-Gm-Gg: ASbGnctXAgo23rVwDCBKPtGowVUDThOdIxhZiwgWTKrwLcOwlXf26Fz6vCZtIozIq4x
+	jLEhrr38KLHEc7Nzns+TfYDq8snlt1aO0HnLY8kQzboCcJyL8lGAumoFFA8CfiMgK7gIgzJlJjs
+	JdKDtnZb29hE1bdjXaO3dJXSKEd3/DkrtnW4D6lKvSCUJFKJbZ2xsdMtYCijCObZ7mFVOWkA76C
+	WEaxcT11V85sk96kN0/L0acSWhZ/NrJkKNd71EZcawtHNW14aVqXXtw/4f1t6Nq8r05JV4n7abc
+	Yvke7TiG
+X-Google-Smtp-Source: AGHT+IF9YmYViYu4bbu+rcQFvrqm2Ir1zaH/4DN+NJJV5bwFNTi7N4AI+TENAbybYY+gwUtHULYlMQ==
+X-Received: by 2002:a17:902:ea05:b0:205:753e:b49d with SMTP id d9443c01a7336-211ecbe9b05mr288535ad.0.1731701919907;
+        Fri, 15 Nov 2024 12:18:39 -0800 (PST)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0dc2bfbsm16436765ad.50.2024.11.15.12.18.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 12:18:38 -0800 (PST)
+Date: Fri, 15 Nov 2024 12:18:35 -0800
+From: Vipin Sharma <vipinsh@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Anup Patel <anup@brainfault.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just
+ default
+Message-ID: <20241115201835.GA599524.vipinsh@google.com>
+References: <20240821223012.3757828-1-vipinsh@google.com>
+ <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
+ <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
+ <ZyuiH_CVQqJUoSB-@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,122 +83,216 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86ldxozn3i.wl-maz@kernel.org>
+In-Reply-To: <ZyuiH_CVQqJUoSB-@google.com>
 
-(joining the thread as well, though not sure I'm bringing anything new)
-
-On Tue, Nov 12, 2024 at 11:51:45AM +0000, Marc Zyngier wrote:
-> On Fri, 08 Nov 2024 07:59:31 +0000, Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
-> > Marc Zyngier <maz@kernel.org> writes:
-> > > On Mon, 28 Oct 2024 13:28:42 +0000, Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
-> > >> Marc Zyngier <maz@kernel.org> writes:
-> > >> > On Mon, 28 Oct 2024 09:40:14 +0000, "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-> > >> >> Currently, the kernel won't start a guest if the MTE feature is enabled
-> > >> >> and the guest RAM is backed by memory which doesn't support access tags.
-> > >> >> Update this such that the kernel uses the NoTagAccess memory attribute
-> > >> >> while mapping pages from VMAs for which MTE is not allowed. The fault
-> > >> >> from accessing the access tags with such pages is forwarded to VMM so
-> > >> >> that VMM can decide to kill the guest or remap the pages so that
-> > >> >> access tag storage is allowed.
-> > >> >
-> > >> > I only have questions here:
-> > >> >
-> > >> > - what is the benefit of such approach? why shouldn't that be the
-> > >> >   kernel's job to fix it?
-> > >>
-> > >> IMHO leaving that policy decision to VMM makes the kernel changes
-> > >> simpler. In most cases, VMM will kill the guest, because these
-> > >> restrictions of MTE_ALLOWED are applied at the memslot/vma.
-> > >
-> > > Where is that captured? The whole idea behind FEAT_MTE_PERM was that
-> > > it would be the hypervisor's task to lazily allocate MTE-capable
-> > > memory as tagged-access would occur.
+On 2024-11-06 09:06:39, Sean Christopherson wrote:
+> On Fri, Nov 01, 2024, Vipin Sharma wrote:
 > > 
-> > Lazily allocating MTE-capable memory requires changes to different
-> > kernel subsystems and previous attempts got dropped [1] because it
-> > was not clear whether the benefit of saving 3% memory overhead was worth
-> > the complexity we add to the kernel.
-
-I'd say the most complex part in Alex's approach was the need to reuse
-the tag storage for classic data and kick the pages around when some
-other page needs to store tags in there. That approach is pretty much
-dead.
-
-In theory, having MTE and non-MTE memory (heterogeneous) without a
-carveout reuse would be a bit more manageable - not that far from the
-NUMA migration and at least you only migrate the page being accessed
-rather than unrelated ones where the tags need to go. But this was not
-Alex's goal for Android since people were asking for the reuse of the 3%
-carveout rather than a smaller carveout.
-
-Other future deployments, CXL-attached memory etc. may benefit from a
-new scheme but I wouldn't rush in implementing anything in the kernel
-for now.
-
-The VMM may be in a better position to manage such heterogeneous memory
-for the guest if it knows the capabilities of the slots (e.g. some DAX
-mmap() vs anonymous mmap()). This would require the VMM replacing a page
-within a slot from one memory type to another (while preserving the
-data). I don't think we have a concrete use-case yet to be worth the
-hassle.
-
-> That's not the point. Tagged memory doesn't have to cover the whole of
-> physical memory, and it can be statically allocated. The architecture
-> doesn't mandate that all of the memory is MTE-capable.
-
-There's some vague wording that general purpose memory should be MTE
-capable if FEAT_MTE2 or later is advertised. But that's not well defined
-and one can have other types of memory in the physical space (e.g. CXL)
-that don't support tags. Last time I looked we still haven't got a way
-to describe memory capabilities in firmware.
-
-For the time being, I think a real use-case for FEAT_MTE_PERM is in the
-context of cacheable MMIO (there are some patches around from Nvidia to
-do this with VFIO). That memory, if exposed to guest as WB and the guest
-enables MTE, may trigger some SErrors. With FEAT_MTE_PERM KVM could trap
-and inject a fault back into the guest - maybe SEA. Is it easier to do
-this from KVM itself or we would rather exit to the VMM and let it
-handle? The latter allows room for other fancier things in the future
-but the former may be quicker, in the absence of other strong use-cases.
-
-> > This patchset is not looking at that feature. Instead, it can be used to
-> > enable MTE in configurations that currently won't allow MTE. One such
-> > example is libkrun which includes linux kernel as firmware in a
-> > dynamically linked library (libkrunfw). libkrun can insert the kernel
-> > region which got mmaped as part of the library load, directly into the
-> > guest memory map instead of copying the kernel. Such a guest config
-> > can't enable MTE currently even though we will never use the newly
-> > inserted memory regions as tag access memory.
-
-I've never played with libkrunfw. Does it handle inserting a Linux
-kernel? Such approach may not work well with MTE. The kernel frees the
-init text/data sections back into the page allocator. With MTE
-advertised as present, the guest will try to reuse that memory,
-potentially as tagged. However, since the VMM mmap'ed the guest kernel
-from a file, VM_MTE is not supported in the VMM address space. Even if
-the mapping is MAP_PRIVATE and the page copied on write, the vma remains
-the original one associated with the file, so VM_MTE_ALLOWED not set.
-
-We could revisit this and allow mprotect(PROT_MTE) to force the CoW on
-private file mappings but we'd need some strong requirement for this
-(MTE+libkrunfw could be such thing if people need this combination).
-
-> > Similarly, virtiofs dax support can use a page cache region as
-> > virtio-shm region. We can use MTE_PERM to enable MTE in this config.
+> > We need to have a roadmap for the runner in terms of features we support.
+> > 
+> > Phase 1: Having a basic selftest runner is useful which can:
+> > 
+> > - Run tests parallely
 > 
-> And this use case doesn't contradict what I am stating above. But it
-> definitely contradicts what you wrote: "In most cases, VMM will kill
-> the guest".
+> Maybe with a (very conversative) per test timeout?  Selftests generally don't have
+> the same problems as KVM-Unit-Tests (KUT), as selftests are a little better at
+> guarding against waiting indefinitely, i.e. I don't think we need a configurable
+> timeout.  But a 120 second timeout or so would be helpful.
+> 
+> E.g. I recently was testing a patch (of mine) that had a "minor" bug where it
+> caused KVM to do a remote TLB flush on *every* SPTE update in the shadow MMU,
+> which manifested as hilariously long runtimes for max_guest_memory_test.  I was
+> _this_ close to not catching the bug (which would have been quite embarrasing),
+> because my hack-a-scripts don't use timeouts (I only noticed because a completely
+> unrelated bug was causing failures).
 
-To simplify things, I think whatever is presented to the VM as standard
-RAM (typically present at the VM boot) should either support MTE or MTE
-will be disabled for the guest. For other types of memory, whether WB
-MMIO or RAM presented as virtio-(pmem, shm etc.) backed by files in the
-VMM, the VM should be aware it is not standard RAM and should not
-attempt to enable MTE on it. If it does (either by mistake or malice),
-FEAT_MTE_PERM should trap and inject a fault back into the guest (or
-kill it altogether but for debugging, I'd rather inject a fault if
-possible).
+RFC code has the feature to specify timeout for each test. I will change
+it so that a default value of 120 second is applied to all and remove the need
+to write timeout for each individual test in json. It will be simple to
+add a command line option to override this value.
 
--- 
-Catalin
+> 
+> > - Provide a summary of what passed and failed, or only in case of failure.
+> 
+> I think a summary is always warranted.  And for failures, it would be helpful to
+> spit out _what_ test failed, versus the annoying KUT runner's behavior of stating
+> only the number of passes/failures, which forces the user to go spelunking just
+> to find out what (sub)test failed.
+
+Default will be to print all test statuses, one line per test. This is
+what RFC code does.
+
+For summary, I can add one line at the end which shows count of passed,
+skipped, and failed tests.
+
+Having an option to only print failed/skipped test will provide easy
+way to identify them. When we print each test status then user has to
+scroll up the terminal read each status to identify what failed. But with an
+option to override default behavior and print only skipped, failed, or
+both. This doesn't have to be in phase 1, but I think its useful and we
+should add in future version.
+
+> 
+> I also think the runner should have a "heartbeat" mechanism, i.e. something that
+> communicates to the user that forward progress is being made.  And IMO, that
+> mechanism should also spit out skips and failures (this could be optional though).
+> One of the flaws with the KUT runner is that it's either super noisy and super
+> quiet.
+
+A true heartbeat feature would be something like runner is sending and
+receiving messages from individual selftests. That is gonna be difficult
+and not worth the complexity.
+
+To show forward progress, each test's pass/fail status can be printed
+immediately (RFC runner does this). As we are planning to have a
+default timeout then there will always be a forward progress.
+
+RFC runner has output like this:
+
+2024-11-15 09:53:52,124 | 638866 |     INFO | SKIPPED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_no_manual_protect
+2024-11-15 09:53:52,124 | 638866 |     INFO | SKIPPED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_manual_protect
+2024-11-15 09:53:52,124 | 638866 |     INFO | SKIPPED: dirty_log_perf_tests/dirty_log_perf_test_max_vcpu_manual_protect_random_access
+2024-11-15 09:53:52,124 | 638866 |     INFO | SETUP_FAILED: dirty_log_perf_tests/dirty_log_perf_test_max_10_vcpu_hugetlb
+2024-11-15 09:53:52,171 | 638866 |     INFO | SKIPPED: x86_sanity_tests/vmx_msrs_test
+2024-11-15 09:53:52,171 | 638866 |     INFO | SKIPPED: x86_sanity_tests/private_mem_conversions_test
+2024-11-15 09:53:52,171 | 638866 |     INFO | SKIPPED: x86_sanity_tests/apic_bus_clock_test
+2024-11-15 09:53:52,171 | 638866 |     INFO | SETUP_FAILED: x86_sanity_tests/dirty_log_page_splitting_test
+
+> 
+> E.g. my mess of bash outputs this when running selftests in parallel (trimmed for
+> brevity):
+> 
+>         Running selftests with npt_disabled
+>         Waiting for 'access_tracking_perf_test', PID '92317'
+>         Waiting for 'amx_test', PID '92318'
+>         SKIPPED amx_test
+>         Waiting for 'apic_bus_clock_test', PID '92319'
+>         Waiting for 'coalesced_io_test', PID '92321'
+>         Waiting for 'cpuid_test', PID '92324'
+>         
+>         ...
+>         
+>         Waiting for 'hyperv_svm_test', PID '92552'
+>         SKIPPED hyperv_svm_test
+>         Waiting for 'hyperv_tlb_flush', PID '92563'
+>         FAILED hyperv_tlb_flush : ret ='254'
+>         Random seed: 0x6b8b4567
+>         ==== Test Assertion Failure ====
+>           x86_64/hyperv_tlb_flush.c:117: val == expected
+>           pid=92731 tid=93548 errno=4 - Interrupted system call
+>              1	0x0000000000411566: assert_on_unhandled_exception at processor.c:627
+>              2	0x000000000040889a: _vcpu_run at kvm_util.c:1649
+>              3	 (inlined by) vcpu_run at kvm_util.c:1660
+>              4	0x00000000004041a1: vcpu_thread at hyperv_tlb_flush.c:548
+>              5	0x000000000043a305: start_thread at pthread_create.o:?
+>              6	0x000000000045f857: __clone3 at ??:?
+>           val == expected
+
+This is interesting, i.e. printing error message inline for the failed tests.
+I can add this feature.
+
+>         Waiting for 'kvm_binary_stats_test', PID '92579'
+>         
+>         ...
+>         
+>         SKIPPED vmx_preemption_timer_test
+>         Waiting for 'vmx_set_nested_state_test', PID '93316'
+>         SKIPPED vmx_set_nested_state_test
+>         Waiting for 'vmx_tsc_adjust_test', PID '93329'
+>         SKIPPED vmx_tsc_adjust_test
+>         Waiting for 'xapic_ipi_test', PID '93350'
+>         Waiting for 'xapic_state_test', PID '93360'
+>         Waiting for 'xcr0_cpuid_test', PID '93374'
+>         Waiting for 'xen_shinfo_test', PID '93391'
+>         Waiting for 'xen_vmcall_test', PID '93405'
+>         Waiting for 'xss_msr_test', PID '93420'
+> 
+> It's far from perfect, e.g. just waits in alphabetical order, but it gives me
+> easy to read feedback, and signal that tests are indeed running and completing.
+>         
+> > - Dump output which can be easily accessed and parsed.
+> 
+> And persist the output/logs somewhere, e.g. so that the user can triage failures
+> after the fact.
+> 
+
+RFC runner does this but not by default. Its provide an option to pass
+a path to dump output in hierarchical folder structure.
+
+Do you think this should be enabled by default? I prefer not, because
+then it becomes a cleaning chore to delete the directories later.
+
+> > - Allow to run with different command line parameters.
+> 
+> Command line parameters for tests?  If so, I would put this in phase 3.  I.e. make
+> the goal of Phase 1 purely about running tests in parallel.
+
+Okay. Only default execution in phase 1.
+
+> 
+> > Current patch does more than this and can be simplified.
+> > 
+> > Phase 2: Environment setup via runner
+> > 
+> > Current patch, allows to write "setup" commands at test suite and test
+> > level in the json config file to setup the environment needed by a
+> > test to run. This might not be ideal as some settings are exposed
+> > differently on different platforms.
+> > 
+> > For example,
+> > To enable TDP:
+> > - Intel needs npt=Y
+> > - AMD needs ept=Y
+> > - ARM always on.
+> > 
+> > To enable APIC virtualization
+> > - Intel needs enable_apicv=Y
+> > - AMD needs avic=Y
+> > 
+> > To enable/disable nested, they both have the same file name "nested"
+> > in their module params directory which should be changed.
+> > 
+> > These kinds of settings become more verbose and unnecessary on other
+> > platforms. Instead, runners should have some programming constructs
+> > (API, command line options, default) to enable these options in a
+> > generic way. For example, enable/disable nested can be exposed as a
+> > command line --enable_nested, then based on the platform, runner can
+> > update corresponding module param or ignore.
+> > 
+> > This will easily extend to providing sane configuration on the
+> > corresponding platforms without lots of hardcoding in JSON. These
+> > individual constructs will provide a generic view/option to run a KVM
+> > feature, and under the hood will do things differently based on the
+> > platform it is running on like arm, x86-intel, x86-amd, s390, etc.
+> 
+> My main input on this front is that the runner needs to configure module params
+> (and other environment settings) _on behalf of the user_, i.e. in response to a
+> command line option (to the runner), not in response to per-test configurations.
+> 
+> One of my complaints with our internal infrastructure is that the testcases
+> themselves can dictate environment settings.  There are certainly benefits to
+> that approach, but it really only makes sense at scale where there are many
+> machines available, i.e. where the runner can achieve parallelism by running
+> tests on multiple machines, and where the complexity of managing the environment
+> on a per-test basis is worth the payout.
+> 
+> For the upstream runner, I want to cater to developers, i.e. to people that are
+> running tests on one or two machines.  And I want the runner to rip through tests
+> as fast as possible, i.e. I don't want tests to get serialized because each one
+> insists on being a special snowflake and doesn't play nice with other children.
+> Organizations that the have a fleet of systems can pony up the resources to develop
+> their own support (on top?).
+> 
+> Selftests can and do check for module params, and should and do use TEST_REQUIRE()
+> to skip when a module param isn't set as needed.  Extending that to arbitrary
+> sysfs knobs should be trivial.  I.e. if we get _failures_ because of an incompatible
+> environment, then it's a test bug.
+
+I agree, RFC runner approach is not great in this regards, it is very
+verbose and hinders parallel execution.
+
+Just for the record, not all options can be generic, there might be some
+arch specific command line options. We should first strive to have
+generic options or name them in a way they can be applied to other arch
+when (if ever) they add a support. I don't have good playbook for this,
+I think this will be handled case by case.
