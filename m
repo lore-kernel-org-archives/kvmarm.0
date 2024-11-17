@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447B51DA31F
-	for <kvmarm@lists.linux.dev>; Sun, 17 Nov 2024 16:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529071DA617
+	for <kvmarm@lists.linux.dev>; Sun, 17 Nov 2024 16:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731862684; cv=none; b=bDz7yhnQjWzzbXFshpAd8iJgfeWWfdp9W+2CKRt6d/g//aG/IXOe9uSdnQWuosiYYSCwdNoql13zfbG52ZoZ5weENOY6i29rcMcAOf2P9OWpmxzgWyxuude64GDY0ipn6GQw1lbu375e4fVcQhJuEdqVkk6XXKJrX2CTTCgyYi4=
+	t=1731862684; cv=none; b=DJd/2eExhGG1ejNw0qAzD5QRZ5TQRrkiqRHSdQkvch/grULV8CRcLnGz9T+RmR8YFYF3hFuRjoLBvUeofjZbuEKRpNgqyX2gb6I94WJfIMhZaFa7ObBMZSOlm0k0QjFF6GH9clbW+r9TmWbscV1ogTHsrk9Dw7PJW1E5T4KWFa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731862684; c=relaxed/simple;
-	bh=er1apRZxsuOToYSVSNSfMOdot8PRgMxEILxC3gGJczE=;
+	bh=mWhPaomnOXIgrD90VDCLQx2pcsTIDq2vpHhdQxlg0Zg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=O6Uz6GduKNTegcUEI5Kx9gTLQrl71Z6EzRZNrjdEr9trGjiAsgUMJfHJ0iWJWxE3G7zOxeI4c7fPQEtyOvNgRdskLK+yqY7/Ai1HXhca0tuAg8J1hDYfdrvSTMJXsN+eBDqWOgL4DP6XAI70upeFPYViQPiKUqATqKZzPN+/d9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7svWC9/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=f1zXlN9XrbP4dwCmHwwHiad6NaaZqZdFrM4LRivDKRAgCFXmLkIo0alEfuhawiU+an5XxBvnilPq3c6GGxqSOj1ZgPL8l+g72biPGWSdDJ9jq5TRU9RsXFX2/Hfh2EvIIvFZG4BrJmdkS3MvkHY4ZWrjthBRbxxisDaeSOmzxhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nlTyCdwl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7svWC9/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE2AC4CED9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nlTyCdwl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB9FEC4CEDA;
 	Sun, 17 Nov 2024 16:58:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731862683;
-	bh=er1apRZxsuOToYSVSNSfMOdot8PRgMxEILxC3gGJczE=;
+	s=k20201202; t=1731862684;
+	bh=mWhPaomnOXIgrD90VDCLQx2pcsTIDq2vpHhdQxlg0Zg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F7svWC9/QUlByhEh85FqZ1Zoc07eZfE7kZx0LvAlnkvWgpTeCOwhuv4SE2y1gj6rT
-	 3ngHFFJ3CvzeGHGq0EilGn6cQBVWExmjJ3zonT8124eTz5nc9ZbA0jzrepFjHCMEq8
-	 vgZYBhH+Tfa6btqATNrcx//NbEPL9MMrRQHbbYnDeXaCFxeWqepPq4wyCmKAfBEi5U
-	 e7AYwLeQnG+gT/ZXny0o5UjyptT3w4iIjBnM3ePEzANyfqzBeySyP9yU88Pcfp1O/+
-	 sKzbqepbH+bDeyHG3nXFJnX4vAx9qxvq7hZp//L14mF9ugmpeEKsp07YhJPM88sY65
-	 9TE6Wok4M0tww==
+	b=nlTyCdwl+ylkYTUH8o20nA4vPxY0ALVYp064B1P0yx+yBwjubzOAhXsFt4ecy2SbU
+	 zzafKCVIxOOA0PwXKQ/wYnd6LjegtvmZHLyyHuFEnsY7+v73/COOWkL+RZcF3F7OIY
+	 iOLavYDwHHebVldgPMGgw0oqYOjpCewmt5zxTDtzrs1RU8UdG/WxIq5pfXU4Z6O+s5
+	 vzJqT6wKvSWq+5i+g5efICTPJP4umOvenfaAqH7DFPCcCbx3kCZXtlytGeajVFr+8S
+	 /+Ujke0YhGaNq60+ISrrt1pf/CFmxM4yZq+f7zQOlqr1z8TiwXzkK6QX7OXohE2IdF
+	 +vW0x/go0bfiA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tCib3-00DYt6-HD;
+	id 1tCib3-00DYt6-Sl;
 	Sun, 17 Nov 2024 16:58:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -39,9 +39,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/4] KVM: arm64: vgic: Make vgic_get_irq() more robust
-Date: Sun, 17 Nov 2024 16:57:55 +0000
-Message-Id: <20241117165757.247686-3-maz@kernel.org>
+Subject: [PATCH 4/4] KVM: arm64: vgic-its: Add stronger type-checking to the ITS entry sizes
+Date: Sun, 17 Nov 2024 16:57:57 +0000
+Message-Id: <20241117165757.247686-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241117165757.247686-1-maz@kernel.org>
 References: <20241117165757.247686-1-maz@kernel.org>
@@ -57,559 +57,268 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-vgic_get_irq() has an awkward signature, as it takes both a kvm
-*and* a vcpu, where the vcpu is allowed to be NULL if the INTID
-being looked up is a global interrupt (SPI or LPI).
+The ITS ABI infrastructure allows for some pretty lax code, where
+the size of the data doesn't have to match the size of the entry,
+potentially leading to a collection of interesting bugs.
 
-This leads to potentially problematic situations where the INTID
-passed is a private interrupt, but that there is no vcpu.
+Commit 7fe28d7e68f9 ("KVM: arm64: vgic-its: Add a data length check
+in vgic_its_save_*") added some checks, but starts by implicitly
+casting all writes to a 64bit value, hiding some of the issues.
 
-In order to make things less ambiguous, let have *two* helpers
-instead:
+Instead, introduce macros that will check the data type actually used
+for dealing with the table entries. The macros are taking a symbolic
+entry type that is used to fetch the size of the entry type for the
+current ABI. This immediately catches a couple of low-impact gotchas
+(zero values that are implicitly 32bit), easy enough to fix.
 
-- vgic_get_irq(struct kvm *kvm, u32 intid), which is only concerned
-  with *global* interrupts, as indicated by the lack of vcpu.
-
-- vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid), which can
-  return *any* interrupt class, but must have of course a non-NULL
-  vcpu.
-
-Most of the code nicely falls under one or the other situations,
-except for a couple of cases (close to the UABI or in the debug code)
-where we have to distinguish between the two cases.
+Given that we currently only have a single ABI, hardcode a couple of
+BUILD_BUG_ON()s that will fire if we use anything but a 64bit quantity,
+and some (currently unreachable) fallback code that may become useful
+one day.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-debug.c   |  5 +++-
- arch/arm64/kvm/vgic/vgic-init.c    |  2 +-
- arch/arm64/kvm/vgic/vgic-its.c     |  8 +++---
- arch/arm64/kvm/vgic/vgic-mmio-v2.c | 12 ++++-----
- arch/arm64/kvm/vgic/vgic-mmio-v3.c |  8 +++---
- arch/arm64/kvm/vgic/vgic-mmio.c    | 38 +++++++++++++-------------
- arch/arm64/kvm/vgic/vgic-v2.c      |  2 +-
- arch/arm64/kvm/vgic/vgic-v3.c      |  2 +-
- arch/arm64/kvm/vgic/vgic-v4.c      |  4 +--
- arch/arm64/kvm/vgic/vgic.c         | 43 +++++++++++++++++++-----------
- arch/arm64/kvm/vgic/vgic.h         |  4 +--
- 11 files changed, 71 insertions(+), 57 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 69 ++++++++++++++++++++++++----------
+ arch/arm64/kvm/vgic/vgic.h     | 23 ------------
+ 2 files changed, 50 insertions(+), 42 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index e1397ab2072a5..afb018528bc3b 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -287,7 +287,10 @@ static int vgic_debug_show(struct seq_file *s, void *v)
- 	 * Expect this to succeed, as iter_mark_lpis() takes a reference on
- 	 * every LPI to be visited.
- 	 */
--	irq = vgic_get_irq(kvm, vcpu, iter->intid);
-+	if (iter->intid < VGIC_NR_PRIVATE_IRQS)
-+		irq = vgic_get_vcpu_irq(vcpu, iter->intid);
-+	else
-+		irq = vgic_get_irq(kvm, iter->intid);
- 	if (WARN_ON_ONCE(!irq))
- 		return -EINVAL;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 48c952563e85f..bc7e22ab5d812 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -322,7 +322,7 @@ int vgic_init(struct kvm *kvm)
- 			goto out;
- 
- 		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
--			struct vgic_irq *irq = vgic_get_irq(kvm, vcpu, i);
-+			struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, i);
- 
- 			switch (dist->vgic_model) {
- 			case KVM_DEV_TYPE_ARM_VGIC_V3:
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 198296933e7eb..79c40708b6646 100644
+index 79c40708b6646..f4c4494645c34 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -42,7 +42,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 				     struct kvm_vcpu *vcpu)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
--	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
-+	struct vgic_irq *irq = vgic_get_irq(kvm, intid), *oldirq;
- 	unsigned long flags;
- 	int ret;
- 
-@@ -419,7 +419,7 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- 			last_byte_offset = byte_offset;
- 		}
- 
--		irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+		irq = vgic_get_irq(vcpu->kvm, intid);
- 		if (!irq)
- 			continue;
- 
-@@ -1288,7 +1288,7 @@ int vgic_its_invall(struct kvm_vcpu *vcpu)
- 	unsigned long intid;
- 
- 	xa_for_each(&dist->lpi_xa, intid, irq) {
--		irq = vgic_get_irq(kvm, NULL, intid);
-+		irq = vgic_get_irq(kvm, intid);
- 		if (!irq)
- 			continue;
- 
-@@ -1354,7 +1354,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 		return 0;
- 
- 	xa_for_each(&dist->lpi_xa, intid, irq) {
--		irq = vgic_get_irq(kvm, NULL, intid);
-+		irq = vgic_get_irq(kvm, intid);
- 		if (!irq)
- 			continue;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index e070cda86e12f..f25fccb1f8e63 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -148,7 +148,7 @@ static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
- 		if (!(targets & (1U << c)))
- 			continue;
- 
--		irq = vgic_get_irq(source_vcpu->kvm, vcpu, intid);
-+		irq = vgic_get_vcpu_irq(vcpu, intid);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		irq->pending_latch = true;
-@@ -167,7 +167,7 @@ static unsigned long vgic_mmio_read_target(struct kvm_vcpu *vcpu,
- 	u64 val = 0;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		val |= (u64)irq->targets << (i * 8);
- 
-@@ -191,7 +191,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
- 		return;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid + i);
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, intid + i);
- 		int target;
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-@@ -213,7 +213,7 @@ static unsigned long vgic_mmio_read_sgipend(struct kvm_vcpu *vcpu,
- 	u64 val = 0;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		val |= (u64)irq->source << (i * 8);
- 
-@@ -231,7 +231,7 @@ static void vgic_mmio_write_sgipendc(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 
-@@ -253,7 +253,7 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 70a44852cbafe..ae4c0593d1145 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -194,7 +194,7 @@ static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
- {
- 	int intid = VGIC_ADDR_TO_INTID(addr, 64);
--	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, intid);
- 	unsigned long ret = 0;
- 
- 	if (!irq)
-@@ -220,7 +220,7 @@ static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
- 	if (addr & 4)
- 		return;
- 
--	irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+	irq = vgic_get_irq(vcpu->kvm, intid);
- 
- 	if (!irq)
- 		return;
-@@ -548,7 +548,7 @@ static void vgic_mmio_write_invlpi(struct kvm_vcpu *vcpu,
- 
- 	vgic_set_rdist_busy(vcpu, true);
- 
--	irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+	irq = vgic_get_irq(vcpu->kvm, intid);
- 	if (irq) {
- 		vgic_its_inv_lpi(vcpu->kvm, irq);
- 		vgic_put_irq(vcpu->kvm, irq);
-@@ -1025,7 +1025,7 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
- 
- static void vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, u32 sgi, bool allow_group1)
- {
--	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, sgi);
-+	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, sgi);
- 	unsigned long flags;
- 
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index cf76523a21945..e416e433baff3 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -50,7 +50,7 @@ unsigned long vgic_mmio_read_group(struct kvm_vcpu *vcpu,
- 
- 	/* Loop over all IRQs affected by this read */
- 	for (i = 0; i < len * 8; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		if (irq->group)
- 			value |= BIT(i);
-@@ -74,7 +74,7 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
- 	unsigned long flags;
- 
- 	for (i = 0; i < len * 8; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		irq->group = !!(val & BIT(i));
-@@ -102,7 +102,7 @@ unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
- 
- 	/* Loop over all IRQs affected by this read */
- 	for (i = 0; i < len * 8; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		if (irq->enabled)
- 			value |= (1U << i);
-@@ -122,7 +122,7 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-@@ -171,7 +171,7 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		if (irq->hw && vgic_irq_is_sgi(irq->intid) && irq->enabled)
-@@ -193,7 +193,7 @@ int vgic_uaccess_write_senable(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		irq->enabled = true;
-@@ -214,7 +214,7 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		irq->enabled = false;
-@@ -236,7 +236,7 @@ static unsigned long __read_pending(struct kvm_vcpu *vcpu,
- 
- 	/* Loop over all IRQs affected by this read */
- 	for (i = 0; i < len * 8; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 		unsigned long flags;
- 		bool val;
- 
-@@ -309,7 +309,7 @@ static void __set_pending(struct kvm_vcpu *vcpu, gpa_t addr, unsigned int len,
- 	unsigned long flags;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		/* GICD_ISPENDR0 SGI bits are WI when written from the guest. */
- 		if (is_vgic_v2_sgi(vcpu, irq) && !is_user) {
-@@ -395,7 +395,7 @@ static void __clear_pending(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		/* GICD_ICPENDR0 SGI bits are WI when written from the guest. */
- 		if (is_vgic_v2_sgi(vcpu, irq) && !is_user) {
-@@ -494,7 +494,7 @@ static unsigned long __vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- 
- 	/* Loop over all IRQs affected by this read */
- 	for (i = 0; i < len * 8; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		/*
- 		 * Even for HW interrupts, don't evaluate the HW state as
-@@ -598,7 +598,7 @@ static void __vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
- 	int i;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 		vgic_mmio_change_active(vcpu, irq, false);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-@@ -635,7 +635,7 @@ static void __vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
- 	int i;
- 
- 	for_each_set_bit(i, &val, len * 8) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 		vgic_mmio_change_active(vcpu, irq, true);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-@@ -672,7 +672,7 @@ unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
- 	u64 val = 0;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		val |= (u64)irq->priority << (i * 8);
- 
-@@ -698,7 +698,7 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
- 	unsigned long flags;
- 
- 	for (i = 0; i < len; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		/* Narrow the priority range to what we actually support */
-@@ -719,7 +719,7 @@ unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
- 	int i;
- 
- 	for (i = 0; i < len * 4; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		if (irq->config == VGIC_CONFIG_EDGE)
- 			value |= (2U << (i * 2));
-@@ -750,7 +750,7 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
- 		if (intid + i < VGIC_NR_PRIVATE_IRQS)
- 			continue;
- 
--		irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		irq = vgic_get_irq(vcpu->kvm, intid + i);
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 
- 		if (test_bit(i * 2 + 1, &val))
-@@ -775,7 +775,7 @@ u32 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
- 		if ((intid + i) < VGIC_NR_SGIS || (intid + i) >= nr_irqs)
- 			continue;
- 
--		irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 		if (irq->config == VGIC_CONFIG_LEVEL && irq->line_level)
- 			val |= (1U << i);
- 
-@@ -799,7 +799,7 @@ void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
- 		if ((intid + i) < VGIC_NR_SGIS || (intid + i) >= nr_irqs)
- 			continue;
- 
--		irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+		irq = vgic_get_vcpu_irq(vcpu, intid + i);
- 
- 		/*
- 		 * Line level is set irrespective of irq type
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index ae5a44d5702d1..381673f03c395 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -72,7 +72,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 			kvm_notify_acked_irq(vcpu->kvm, 0,
- 					     intid - VGIC_NR_PRIVATE_IRQS);
- 
--		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-+		irq = vgic_get_vcpu_irq(vcpu, intid);
- 
- 		raw_spin_lock(&irq->irq_lock);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index b217b256853c2..f267bc2486a18 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -65,7 +65,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 			kvm_notify_acked_irq(vcpu->kvm, 0,
- 					     intid - VGIC_NR_PRIVATE_IRQS);
- 
--		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-+		irq = vgic_get_vcpu_irq(vcpu, intid);
- 		if (!irq)	/* An LPI could have been unmapped. */
- 			continue;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 74a67ad87f29d..eedecbbbcf31b 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -123,7 +123,7 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
- 	 * IRQ. The SGI code will do its magic.
- 	 */
- 	for (i = 0; i < VGIC_NR_SGIS; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, i);
- 		struct irq_desc *desc;
- 		unsigned long flags;
- 		int ret;
-@@ -160,7 +160,7 @@ static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
- 	int i;
- 
- 	for (i = 0; i < VGIC_NR_SGIS; i++) {
--		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
-+		struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, i);
- 		struct irq_desc *desc;
- 		unsigned long flags;
- 		int ret;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index f50274fd55815..ffaa52448b6f8 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -84,17 +84,11 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
-  * struct vgic_irq. It also increases the refcount, so any caller is expected
-  * to call vgic_put_irq() once it's finished with this IRQ.
-  */
--struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
--			      u32 intid)
-+struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
- {
--	/* SGIs and PPIs */
--	if (intid <= VGIC_MAX_PRIVATE) {
--		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE + 1);
--		return &vcpu->arch.vgic_cpu.private_irqs[intid];
--	}
--
- 	/* SPIs */
--	if (intid < (kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS)) {
-+	if (intid >= VGIC_NR_PRIVATE_IRQS &&
-+	    intid < (kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS)) {
- 		intid = array_index_nospec(intid, kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS);
- 		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
- 	}
-@@ -106,6 +100,20 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	return NULL;
- }
- 
-+struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
-+{
-+	if (WARN_ON(!vcpu))
-+		return NULL;
+@@ -31,6 +31,41 @@ static int vgic_its_commit_v0(struct vgic_its *its);
+ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+ 			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
+ 
++#define vgic_its_read_entry_lock(i, g, valp, t)				\
++	({								\
++		int __sz = vgic_its_get_abi(i)->t##_esz;		\
++		struct kvm *__k = (i)->dev->kvm;			\
++		int __ret;						\
++									\
++		BUILD_BUG_ON(NR_ITS_ABIS == 1 &&			\
++			     sizeof(*(valp)) != ABI_0_ESZ);		\
++		if (NR_ITS_ABIS > 1 &&					\
++		    KVM_BUG_ON(__sz != sizeof(*(valp)), __k))		\
++			__ret = -EINVAL;				\
++		else							\
++			__ret = kvm_read_guest_lock(__k, (g),		\
++						    valp, __sz);	\
++		__ret;							\
++	})
 +
-+	/* SGIs and PPIs */
-+	if (intid <= VGIC_MAX_PRIVATE) {
-+		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE + 1);
-+		return &vcpu->arch.vgic_cpu.private_irqs[intid];
-+	}
-+
-+	return vgic_get_irq(vcpu->kvm, intid);
-+}
++#define vgic_its_write_entry_lock(i, g, val, t)				\
++	({								\
++		int __sz = vgic_its_get_abi(i)->t##_esz;		\
++		struct kvm *__k = (i)->dev->kvm;			\
++		typeof(val) __v = (val);				\
++		int __ret;						\
++									\
++		BUILD_BUG_ON(NR_ITS_ABIS == 1 &&			\
++			     sizeof(__v) != ABI_0_ESZ);			\
++		if (NR_ITS_ABIS > 1 &&					\
++		    KVM_BUG_ON(__sz != sizeof(__v), __k))		\
++			__ret = -EINVAL;				\
++		else							\
++			__ret = vgic_write_guest_lock(__k, (g),		\
++						      &__v, __sz);	\
++		__ret;							\
++	})
 +
  /*
-  * We can't do anything in here, because we lack the kvm pointer to
-  * lock and remove the item from the lpi_list. So we keep this function
-@@ -437,7 +445,10 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+  * Creates a new (reference to a) struct vgic_irq for a given LPI.
+  * If this LPI is already mapped on another ITS, we increase its refcount
+@@ -794,7 +829,7 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
  
- 	trace_vgic_update_irq_pending(vcpu ? vcpu->vcpu_idx : 0, intid, level);
+ 		its_free_ite(kvm, ite);
  
--	irq = vgic_get_irq(kvm, vcpu, intid);
-+	if (intid < VGIC_NR_PRIVATE_IRQS)
-+		irq = vgic_get_vcpu_irq(vcpu, intid);
-+	else
-+		irq = vgic_get_irq(kvm, intid);
- 	if (!irq)
- 		return -EINVAL;
+-		return vgic_its_write_entry_lock(its, gpa, 0, ite_esz);
++		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
+ 	}
  
-@@ -499,7 +510,7 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 			  u32 vintid, struct irq_ops *ops)
+ 	return E_ITS_DISCARD_UNMAPPED_INTERRUPT;
+@@ -1143,7 +1178,6 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	bool valid = its_cmd_get_validbit(its_cmd);
+ 	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
+ 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+-	int dte_esz = vgic_its_get_abi(its)->dte_esz;
+ 	struct its_device *device;
+ 	gpa_t gpa;
+ 
+@@ -1168,7 +1202,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	 * is an error, so we are done in any case.
+ 	 */
+ 	if (!valid)
+-		return vgic_its_write_entry_lock(its, gpa, 0, dte_esz);
++		return vgic_its_write_entry_lock(its, gpa, 0ULL, dte);
+ 
+ 	device = vgic_its_alloc_device(its, device_id, itt_addr,
+ 				       num_eventid_bits);
+@@ -2090,7 +2124,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+  * vgic_its_save_ite - Save an interrupt translation entry at @gpa
+  */
+ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+-			      struct its_ite *ite, gpa_t gpa, int ite_esz)
++			      struct its_ite *ite, gpa_t gpa)
  {
--	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
- 	unsigned long flags;
+ 	u32 next_offset;
+ 	u64 val;
+@@ -2101,7 +2135,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 		ite->collection->collection_id;
+ 	val = cpu_to_le64(val);
+ 
+-	return vgic_its_write_entry_lock(its, gpa, val, ite_esz);
++	return vgic_its_write_entry_lock(its, gpa, val, ite);
+ }
+ 
+ /**
+@@ -2201,7 +2235,7 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+ 		if (ite->irq->hw && !kvm_vgic_global_state.has_gicv4_1)
+ 			return -EACCES;
+ 
+-		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
++		ret = vgic_its_save_ite(its, device, ite, gpa);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -2240,10 +2274,9 @@ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+  * @its: ITS handle
+  * @dev: ITS device
+  * @ptr: GPA
+- * @dte_esz: device table entry size
+  */
+ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+-			     gpa_t ptr, int dte_esz)
++			     gpa_t ptr)
+ {
+ 	u64 val, itt_addr_field;
+ 	u32 next_offset;
+@@ -2256,7 +2289,7 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+ 		(dev->num_eventid_bits - 1));
+ 	val = cpu_to_le64(val);
+ 
+-	return vgic_its_write_entry_lock(its, ptr, val, dte_esz);
++	return vgic_its_write_entry_lock(its, ptr, val, dte);
+ }
+ 
+ /**
+@@ -2332,10 +2365,8 @@ static int vgic_its_device_cmp(void *priv, const struct list_head *a,
+  */
+ static int vgic_its_save_device_tables(struct vgic_its *its)
+ {
+-	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+ 	u64 baser = its->baser_device_table;
+ 	struct its_device *dev;
+-	int dte_esz = abi->dte_esz;
+ 
+ 	if (!(baser & GITS_BASER_VALID))
+ 		return 0;
+@@ -2354,7 +2385,7 @@ static int vgic_its_save_device_tables(struct vgic_its *its)
+ 		if (ret)
+ 			return ret;
+ 
+-		ret = vgic_its_save_dte(its, dev, eaddr, dte_esz);
++		ret = vgic_its_save_dte(its, dev, eaddr);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -2435,7 +2466,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ 
+ static int vgic_its_save_cte(struct vgic_its *its,
+ 			     struct its_collection *collection,
+-			     gpa_t gpa, int esz)
++			     gpa_t gpa)
+ {
+ 	u64 val;
+ 
+@@ -2444,7 +2475,7 @@ static int vgic_its_save_cte(struct vgic_its *its,
+ 	       collection->collection_id);
+ 	val = cpu_to_le64(val);
+ 
+-	return vgic_its_write_entry_lock(its, gpa, val, esz);
++	return vgic_its_write_entry_lock(its, gpa, val, cte);
+ }
+ 
+ /*
+@@ -2452,7 +2483,7 @@ static int vgic_its_save_cte(struct vgic_its *its,
+  * Return +1 on success, 0 if the entry was invalid (which should be
+  * interpreted as end-of-table), and a negative error value for generic errors.
+  */
+-static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
++static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa)
+ {
+ 	struct its_collection *collection;
+ 	struct kvm *kvm = its->dev->kvm;
+@@ -2460,7 +2491,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+ 	u64 val;
  	int ret;
  
-@@ -524,7 +535,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
-  */
- void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid)
- {
--	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
- 	unsigned long flags;
+-	ret = vgic_its_read_entry_lock(its, gpa, &val, esz);
++	ret = vgic_its_read_entry_lock(its, gpa, &val, cte);
+ 	if (ret)
+ 		return ret;
+ 	val = le64_to_cpu(val);
+@@ -2507,7 +2538,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+ 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
  
- 	if (!irq->hw)
-@@ -547,7 +558,7 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
- 	if (!vgic_initialized(vcpu->kvm))
- 		return -EAGAIN;
+ 	list_for_each_entry(collection, &its->collection_list, coll_list) {
+-		ret = vgic_its_save_cte(its, collection, gpa, cte_esz);
++		ret = vgic_its_save_cte(its, collection, gpa);
+ 		if (ret)
+ 			return ret;
+ 		gpa += cte_esz;
+@@ -2521,7 +2552,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+ 	 * table is not fully filled, add a last dummy element
+ 	 * with valid bit unset
+ 	 */
+-	return vgic_its_write_entry_lock(its, gpa, 0, cte_esz);
++	return vgic_its_write_entry_lock(its, gpa, 0ULL, cte);
+ }
  
--	irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	irq = vgic_get_vcpu_irq(vcpu, vintid);
- 	BUG_ON(!irq);
+ /*
+@@ -2546,7 +2577,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
  
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-@@ -560,7 +571,7 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
- 
- int kvm_vgic_get_map(struct kvm_vcpu *vcpu, unsigned int vintid)
- {
--	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
- 	unsigned long flags;
- 	int ret = -1;
- 
-@@ -596,7 +607,7 @@ int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
- 	if (!irq_is_ppi(intid) && !vgic_valid_spi(vcpu->kvm, intid))
- 		return -EINVAL;
- 
--	irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-+	irq = vgic_get_vcpu_irq(vcpu, intid);
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	if (irq->owner && irq->owner != owner)
- 		ret = -EEXIST;
-@@ -1008,7 +1019,7 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
- 	if (!vgic_initialized(vcpu->kvm))
- 		return false;
- 
--	irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	irq = vgic_get_vcpu_irq(vcpu, vintid);
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	map_is_active = irq->hw && irq->active;
- 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 	while (read < max_size) {
+-		ret = vgic_its_restore_cte(its, gpa, cte_esz);
++		ret = vgic_its_restore_cte(its, gpa);
+ 		if (ret <= 0)
+ 			break;
+ 		gpa += cte_esz;
 diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 309295f5e1b07..8290f3276cf07 100644
+index 8290f3276cf07..122d95b4e2845 100644
 --- a/arch/arm64/kvm/vgic/vgic.h
 +++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -202,8 +202,8 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
- const struct vgic_register_region *
- vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- 		     gpa_t addr, int len);
--struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
--			      u32 intid);
-+struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid);
-+struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+@@ -146,29 +146,6 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+ 	return ret;
+ }
+ 
+-static inline int vgic_its_read_entry_lock(struct vgic_its *its, gpa_t eaddr,
+-					   u64 *eval, unsigned long esize)
+-{
+-	struct kvm *kvm = its->dev->kvm;
+-
+-	if (KVM_BUG_ON(esize != sizeof(*eval), kvm))
+-		return -EINVAL;
+-
+-	return kvm_read_guest_lock(kvm, eaddr, eval, esize);
+-
+-}
+-
+-static inline int vgic_its_write_entry_lock(struct vgic_its *its, gpa_t eaddr,
+-					    u64 eval, unsigned long esize)
+-{
+-	struct kvm *kvm = its->dev->kvm;
+-
+-	if (KVM_BUG_ON(esize != sizeof(eval), kvm))
+-		return -EINVAL;
+-
+-	return vgic_write_guest_lock(kvm, eaddr, &eval, esize);
+-}
+-
+ /*
+  * This struct provides an intermediate representation of the fields contained
+  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
 -- 
 2.39.2
 
