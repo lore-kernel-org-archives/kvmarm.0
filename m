@@ -1,97 +1,96 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42930149C7A
-	for <kvmarm@lists.linux.dev>; Tue, 19 Nov 2024 20:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA1213E03E
+	for <kvmarm@lists.linux.dev>; Tue, 19 Nov 2024 21:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732049926; cv=none; b=n/XCJlG+TX7SKQy3lr7lhmVqmV6JegK7Z0f2TG5O8d5Pes5VHOCBfXhNoEiSAilMO+4jY8NrVfOOF/tws0lFEGROg1+DkdmHxt4cP0MXELiFv2Sqzr0N3RGwpl91xwhNSEkIhlHiDRC5pwaCahgVbr+7zNW6oBZc+Mi1z/pnmys=
+	t=1732052128; cv=none; b=t6ZqN8d6eu57lOINqIMW3yofyXVbhHMNwEeciMFmsWSv921v4KdRuMqfYacaGLyfvVvyZ9LTxt/XtQ4UUrRX7331XtEJ2MQWnPDsH3DsMntQN/1IeFmIMlHggu1+CeuAE3JYfOEvNu19r+dlPuAXuhr4Vvtvzoq1gKi6UcpCO68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732049926; c=relaxed/simple;
-	bh=8WEdVpyGErxs99Yh1r9MEMQl5LIFDjaIDidlxrekh0s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=T40oIyfM33Ozvv/lzKJaClsCcN20AtiYXQSJkXY28+tgXGHpYfiGosHeAN2Mf3ZaEg5QxAWwM3VOsUz5u4kR9juIDpd0aMDm6l+/nf3QhzKIWf6NJxmfqFxH3nwcJN94paq/xD2J09g+kvieYm+32wiYqfwLZ1lZMOx9wYuBTw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hmmrSnMh; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+	s=arc-20240116; t=1732052128; c=relaxed/simple;
+	bh=iTE59sMKehdeOyAF9A2SZ+XvVSs3LcZxIciJ4n0Ptt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uH42WFyfNh1g0xrdXjG5UzypgfDJgnLwOayytCrYjGpEohahrWHy4/KFJ+HOMXRa2aNlGqmbgs9+S36TkbdO6QYQuPH80gaYvnFv4tXgh0JJFWcqJ7YLtiuPRqvcgdAz+Fuk2Kc0H/ORk+0YWCV0HYrZbsYeFPqBvmU9d+Id9Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vrzZRZs0; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hmmrSnMh"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e3314237b86so4882636276.1
-        for <kvmarm@lists.linux.dev>; Tue, 19 Nov 2024 12:58:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732049924; x=1732654724; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=r6S4rOH3+OQSdJMr5U+1w/fQ9eAelD/5+HuDvTmNypE=;
-        b=hmmrSnMhXwLP7tpD0EMNMfpbAG7k09uxNd5mUwWERe9HoN3fcrtBNPDM/4fdK6n52V
-         +bnVwcsr7Di9dNBCmyyIXXR/dc5oJHte2KShVYlL9ez4RfWDsaruUTWmqZ10u4Wr1djR
-         KrjpeEzw61oan9lIY/eGAZYgbIQ0DR071WbbHZe057piompZZ0TTlNvnu6csZgdJjubv
-         XirW4ot3VnJhjPa431aQ1A2j5JYNDNXju4K/BKQgZWvulqD+9GNavUdHCwULihHiaw+b
-         okP1LYNAtE/k6qJm8lo+udUWQz2dN9fOZaZkX22mp2XXlL8x1ARSClbYnAUTTUwgpDm+
-         uRLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732049924; x=1732654724;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r6S4rOH3+OQSdJMr5U+1w/fQ9eAelD/5+HuDvTmNypE=;
-        b=iupkAwW6Cg9Ubf8HuA8KeEO0cDLaDLP8qLDaU/0sfEBXMyif3jOXHPHnt4YhQovp+M
-         y+vOIwJkYdODi3mJQrza3u0CjUlRwv7JAIoxcE6w/23lWSM2cEe2SOYh5dTKrhKR+xDL
-         Vf8YidabuswpCzKXfpSngttYHfvqu/0YimwYXOaSYauaUmq24lwkOsVG6I+t8CQd1ohQ
-         Ll7EYTFkLg+EshPvnpXlNwzTzKxCiYENptwptPdShLJCVZ5DQRjAM0EDCt8uHBteoARq
-         hkS5dRrR4BNcS40A41hLL5L5AnEyevBEGu3XSL1PJv3HJkNzWR3YP9WmDSp5vkt33yqX
-         RCpA==
-X-Forwarded-Encrypted: i=1; AJvYcCUUgUYzDMhpL3BX5UIQMR985VojHluWYF6Z9xlDfgUQPp+U2Swv+rNPbP5ZgtXv+PG8w3U54Ik=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy6K2jQqZWKVo/JickjIaF8JmylJ0bv5xChxtm9IEWjgoqCvi3s
-	xaF39plw56xK8Q43fRlYvKPrUlt1FnkADNmkolO6d92uEEoi0yme3scC4B5eiA4+f6u6di3XXcy
-	LtyyObw==
-X-Google-Smtp-Source: AGHT+IHpK5pQqyJ2pkrSLDCOOUklWO2InSnJR1eVoVoMwnsqp16+77q4Yb5PQps1c7yCQOY0bhbxQaG15qmS
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fac1])
- (user=rananta job=sendgmr) by 2002:a25:2d0b:0:b0:e38:c40b:a0a9 with SMTP id
- 3f1490d57ef6-e38cb60bac3mr38276.5.1732049924316; Tue, 19 Nov 2024 12:58:44
- -0800 (PST)
-Date: Tue, 19 Nov 2024 20:58:41 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vrzZRZs0"
+Date: Tue, 19 Nov 2024 13:35:10 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732052122;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=msslIht/iC0IbFIqTr4umsTJ8qtKXXVBD4kyKHKb3yA=;
+	b=vrzZRZs09+uGcg4Qbq52l5KbuKrQjgo/QIvW6pK2oZ8B4GL5xmD1sRQ/qG1Cv2xe9NcDla
+	25S7ZBxSpPEjkOuYVqpiV6m5xlvT3aF4zbfPG/YJYSX2t4lwMo25q5MBzrQiNasVE5FXIC
+	eyc4/0kq/uTazmKRbIA5nxZpM55GWDg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Ignore PMCNTENSET_EL0 while checking for
+ overflow status
+Message-ID: <Zz0EjiFMTiHWeq8h@linux.dev>
+References: <20241119205841.268247-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241119205841.268247-1-rananta@google.com>
-Subject: [PATCH] KVM: arm64: Ignore PMCNTENSET_EL0 while checking for overflow status
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Anata <rananta@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241119205841.268247-1-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-kvm_pmu_overflow_status() currently checks if the PMCs are enabled for
-evaluating the PMU overflow condition. However, ARM ARM D13.1.1 states
-that a global enable control (PMCR.E), PMOVSSET<n>, and PMINTENSET<n>
-are sufficent to consider that the overflow condition is met. Hence,
-ignore the check for PMCNTENSET<n>.
+Hi Raghu,
 
-The bug was discovered while running the SBSA PMU test, which only sets
-PMCR.E, PMOVSSET<0>, PMINTENSET<0>, and expects an overflow interrupt.
+Thanks for finding this!
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- arch/arm64/kvm/pmu-emul.c | 1 -
- 1 file changed, 1 deletion(-)
+On Tue, Nov 19, 2024 at 08:58:41PM +0000, Raghavendra Rao Ananta wrote:
+> kvm_pmu_overflow_status() currently checks if the PMCs are enabled for
+> evaluating the PMU overflow condition. However, ARM ARM D13.1.1 states
+> that a global enable control (PMCR.E), PMOVSSET<n>, and PMINTENSET<n>
+> are sufficent to consider that the overflow condition is met. Hence,
+> ignore the check for PMCNTENSET<n>.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index ac36c438b8c1..3940fe893783 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -342,7 +342,6 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
- 
- 	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
- 		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
--		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
- 		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
- 	}
- 
+It's more than sufficient, evaluating E, PMOVSSET<n>, and PMINTENSET<n>
+is the *only* correct implementation of the architecture.
 
-base-commit: adc218676eef25575469234709c2d87185ca223a
+Also, ARM ARM section numbering is subject to change between revisions,
+so it's always best to use a fully-qualified citation, like 'DDI0487K
+D13.1.1'.
+
+So I may rewrite this as:
+
+  DDI0487K D13.1.1 describes the PMU overflow condition, which evaluates
+  to true if any counter's global enable (PMCR_EL0.E), overflow flag
+  (PMOVSSET_EL0[n]), and interrupt enable (PMINTENSET_EL1[n]) are all 1.
+  Of note, this does not require a counter to be enabled (i.e.
+  PMCNTENSET_EL0[n] = 1) to generate an overflow.
+
+  Align kvm_pmu_overflow_status() with the reality of the architecture
+  and stop using PMCNTENSET_EL0 as part of the overflow condition.
+
+We've got yet another bug lurking here as of 6.13, since the hypervisor
+range of counters isn't observing the correct global enable
+(MDCR_EL2.HPME).
+
+Let me fiddle with this and send out a combined set of fixes.
+
+> The bug was discovered while running the SBSA PMU test, which only sets
+> PMCR.E, PMOVSSET<0>, PMINTENSET<0>, and expects an overflow interrupt.
+> 
+
+We should be sending this to stable too.
+
+Cc: stable@vger.kernel.org
+Fixes: 76d883c4e640 ("arm64: KVM: Add access handler for PMOVSSET and PMOVSCLR register")
+
 -- 
-2.47.0.338.g60cca15819-goog
-
+Thanks,
+Oliver
