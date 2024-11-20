@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5977200CB;
-	Wed, 20 Nov 2024 08:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A760C60DCF
+	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 08:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732090724; cv=none; b=PDO9hXfGF8JkIBZ1X36UP8q+EWzgGmiikx7t+VpDAMspGz0pskynFYH7/Uvfiatus7232l/1q+iYTmtOfEBwck3rGHZfNuyCvtxYmGM7uLcgRPaKTpmn5naKhh3LJt+Bc3FbAoV0eMKLWagkVv8cIo0VuuIMK9queEbVXBgQGX0=
+	t=1732091905; cv=none; b=IKhGg1gZV8Yf7lnNzwUkOW/Ek5agU9odpBiXr7QIICFs7/PEogS3oj4vcb0+zYVy6e4LmvqSTRI9EAKugeJRTe1q3U47LAuCU831nJYUPkefmKhln7nm8lGm8z9Z17TbvYeROvST+038BOqWmj4lTChOfgvXFqnltB02Ax/fWEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732090724; c=relaxed/simple;
-	bh=8b23fimKmndiXTou2v0A2ca4nGlMAUjHBQGaAzvrsO0=;
+	s=arc-20240116; t=1732091905; c=relaxed/simple;
+	bh=MwEURk2eLexxr7t1Oii/UKl/t4hKP+ajhpbApiSzEXE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s1YnsiZ4YpqKq8MzgQV2QJ9EAeQXz6PFWzg84M+DchG80Infb/mmbNx6H5Djq9Qhr3VpOyX1M5pxL1hpTGeCTT8FDKXMS9oz+eIVIi4VdB8skpFoncw+1nHRxBfYjhpbs5r6swAE7eM90TvkQXeH4eQ9q9fETCEXZRwZytGOof8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rn5TAIqp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CG1Z1Au/dAkILJ6uM2gux6BRQlEiKlei+89/I8iUA+GRD35Rhkw/PIIl0PHAU/MTQTrl3Gx2e4bA44tdIc+CQGHdPQK+wPQdO8cgj6tn4/LitEcjbsuDCvL0UqEp45GsoIG9o/P4EX8z/NkaurgAmiWMNuaYXJI8qbVwzf4Af4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsPMnN2Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rn5TAIqp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69AD4C4CED0;
-	Wed, 20 Nov 2024 08:18:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsPMnN2Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43824C4CECD;
+	Wed, 20 Nov 2024 08:38:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732090724;
-	bh=8b23fimKmndiXTou2v0A2ca4nGlMAUjHBQGaAzvrsO0=;
+	s=k20201202; t=1732091905;
+	bh=MwEURk2eLexxr7t1Oii/UKl/t4hKP+ajhpbApiSzEXE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rn5TAIqp1p/IXH31gLKRH4YNtlKqy087CpReAwzPXR3vj96sFQ8X9pu5dOH0r7bOF
-	 v7hJxbnxbTZ4kzEnwLw6ojhX6N/MjoSli/d30xP+WKgMMh9Tx92x2I7Utl/2rf9GPE
-	 PR+b+G8p300LgLnmvymtwSZvLVw6AkVWM+Row6yRcVrKy7lshkjaDXyPwughTd7ghV
-	 2dvWXr7scgXMh5P71oC6mup7DJYXBIch8PsLlJKzQH2uCa8jofR5CBBj/K8Wi48MWh
-	 25lW82QDCwSDCMq6k8TEQmW4sS1NadLa62CVtkfByWiJLKUD2+17D4/wKWy3tzxSV+
-	 1vCvM7cjKWr+w==
+	b=GsPMnN2QYREG1pW+WUKu9tBsMjL+V4yyDkihJOgJeIggkRowppZi4he5UJVtiGT7o
+	 4sgtllCe9wXWZGap1/8g/GuuXtalvNf3X2CdxzqyDafqfIq81eNmSeyIZl9kqDjvET
+	 D1KqiSpk4TxD9Z1r0rlts15ElzOu5wbEuvt05v2j+/cOKto4lYBZHIvVoQmxBaNgip
+	 lJm4/nCnDhtGmNU4oeVRA+eHpEvImZsrnde5oZJfZFiQbhpmnpzV21ese5SArbbW+Z
+	 mfJedP47DrPvi+kpQDHpC88rGHKsAfO7awVW01ysRDABGHH7FFukPJOwbhHUK9f7Ff
+	 jbdhXbaYFIhwQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tDfv6-00EOz6-3T;
-	Wed, 20 Nov 2024 08:18:41 +0000
-Date: Wed, 20 Nov 2024 08:18:39 +0000
-Message-ID: <86v7wiuxls.wl-maz@kernel.org>
+	id 1tDgEA-00EPHp-W1;
+	Wed, 20 Nov 2024 08:38:23 +0000
+Date: Wed, 20 Nov 2024 08:38:22 +0000
+Message-ID: <86ttc2uwox.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -42,12 +42,11 @@ Cc: kvmarm@lists.linux.dev,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mingwei Zhang <mizhang@google.com>,
 	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Ignore PMCNTENSET_EL0 while checking for overflow status
-In-Reply-To: <20241120005230.2335682-2-oliver.upton@linux.dev>
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Use MDCR_EL2.HPME to evaluate overflow of hyp counters
+In-Reply-To: <20241120005230.2335682-3-oliver.upton@linux.dev>
 References: <20241120005230.2335682-1-oliver.upton@linux.dev>
-	<20241120005230.2335682-2-oliver.upton@linux.dev>
+	<20241120005230.2335682-3-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,53 +58,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 Nov 2024 00:52:29 +0000,
+On Wed, 20 Nov 2024 00:52:30 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> From: Raghavendra Rao Ananta <rananta@google.com>
+> The 'global enable control' (as it is termed in the architecture) for
+> counters reserved by EL2 is MDCR_EL2.HPME. Use that instead of
+> PMCR_EL0.E when evaluating the overflow state for hyp counters.
 > 
-> DDI0487K D13.1.1 describes the PMU overflow condition, which evaluates
-
-nit: DDI0487K.a, and D13.3.1.
-
-> to true if any counter's global enable (PMCR_EL0.E), overflow flag
-> (PMOVSSET_EL0[n]), and interrupt enable (PMINTENSET_EL1[n]) are all 1.
-> Of note, this does not require a counter to be enabled
-> (i.e. PMCNTENSET_EL0[n] = 1) to generate an overflow.
-> 
-> Align kvm_pmu_overflow_status() with the reality of the architecture
-> and stop using PMCNTENSET_EL0 as part of the overflow condition. The
-> bug was discovered while running an SBSA PMU test [*], which only sets
-> PMCR.E, PMOVSSET<0>, PMINTENSET<0>, and expects an overflow interrupt.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 76d883c4e640 ("arm64: KVM: Add access handler for PMOVSSET and PMOVSCLR register")
-> Link: https://github.com/ARM-software/sbsa-acs/blob/master/test_pool/pmu/operating_system/test_pmu001.c
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> [ oliver: massaged changelog ]
+> Change the return value to a bool while at it, which better reflects the
+> fact that the overflow state is a shared signal and not a per-counter
+> property.
+>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/pmu-emul.c | 1 -
->  1 file changed, 1 deletion(-)
+>  arch/arm64/kvm/pmu-emul.c | 58 +++++++++++++++++++++++++++++----------
+>  1 file changed, 43 insertions(+), 15 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 8ad62284fa23..3855cc9d0ca5 100644
+> index 3855cc9d0ca5..fb79fa689ae5 100644
 > --- a/arch/arm64/kvm/pmu-emul.c
 > +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -381,7 +381,6 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+> @@ -274,12 +274,21 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	irq_work_sync(&vcpu->arch.pmu.overflow_work);
+>  }
 >  
->  	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
->  		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-> -		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
->  		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
->  	}
+> -bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu, unsigned int idx)
+> +static u64 kvm_pmu_hyp_counter_mask(struct kvm_vcpu *vcpu)
+>  {
+> -	unsigned int hpmn;
+> +	if (!vcpu_has_nv(vcpu))
+> +		return 0;
 >  
+> -	if (!vcpu_has_nv(vcpu) || idx == ARMV8_PMU_CYCLE_IDX)
+> -		return false;
+> +	hpmn = SYS_FIELD_GET(MDCR_EL2, HPMN, __vcpu_sys_reg(vcpu, MDCR_EL2));
+> +	n = vcpu->kvm->arch.pmcr_n;
+> +
+> +	/*
+> +	 * Programming HPMN to a value greater than PMCR_EL0.N is
+> +	 * CONSTRAINED UNPREDICTABLE. Make the implementation choice that an
+> +	 * UNKNOWN number of counters (in our case, zero) are reserved for EL2.
+> +	 */
+> +	if (hpmn >= n)
+> +		return 0;
+>  
+>  	/*
+>  	 * Programming HPMN=0 is CONSTRAINED UNPREDICTABLE if FEAT_HPMN0 isn't
+> @@ -288,8 +297,12 @@ bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu, unsigned int idx)
+>  	 * implementation choice that all counters are included in the second
+>  	 * range reserved for EL2/EL3.
+>  	 */
+> -	hpmn = SYS_FIELD_GET(MDCR_EL2, HPMN, __vcpu_sys_reg(vcpu, MDCR_EL2));
+> -	return idx >= hpmn;
+> +	return GENMASK(n - 1, hpmn);
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+This explicitly excludes the cycle counter (bit 31), and lead to some
+unexpected results below.
+
+> +}
+> +
+> +bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu, unsigned int idx)
+> +{
+> +	return kvm_pmu_hyp_counter_mask(vcpu) & BIT(idx);
+>  }
+>  
+>  u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu)
+> @@ -300,8 +313,7 @@ u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu)
+>  	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
+>  		return mask;
+>  
+> -	hpmn = SYS_FIELD_GET(MDCR_EL2, HPMN, __vcpu_sys_reg(vcpu, MDCR_EL2));
+> -	return mask & ~GENMASK(vcpu->kvm->arch.pmcr_n - 1, hpmn);
+> +	return mask & ~kvm_pmu_hyp_counter_mask(vcpu);
+>  }
+>  
+>  u64 kvm_pmu_implemented_counter_mask(struct kvm_vcpu *vcpu)
+> @@ -375,14 +387,30 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>  	}
+>  }
+>  
+> -static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+> +/*
+> + * Returns the PMU overflow state, which is true if there exists an event
+> + * counter where the values of the global enable control, PMOVSSET_EL0[n], and
+> + * PMINTENSET_EL1[n] are all 1.
+> + */
+> +static bool kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 reg = 0;
+> +	u64 reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+>  
+> -	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
+> -		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+> -		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+> -	}
+> +	reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+> +
+> +	/*
+> +	 * PMCR_EL0.E is the global enable control for event counters available
+> +	 * to EL0 and EL1.
+> +	 */
+> +	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E))
+> +		reg &= kvm_pmu_hyp_counter_mask(vcpu);
+
+So if the PMU is disabled at EL1, we remove the cycle counter from the
+list of counters that are considered for an overflow.
+
+I don't think that's what you really want.
+
+Thanks,
 
 	M.
 
