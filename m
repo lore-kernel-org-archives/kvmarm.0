@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C2033C5
-	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 10:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABF615B135
+	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 10:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732100005; cv=none; b=TKFcXOBjizYq+XDwG5A8SmSjPJTqBj/6mPbcDRPXVTKxJ4VfGO+NO3OLjMzxWrCwALOb7345GVuWoBNH5Pguvduz7HuA0+iPQ/vPZpb7JoR4Ljbby8MMFWyXiS6q3dBqEu/KWASfI5p/y70XjVBX0hCTmYRjznWco8i53ULCyeU=
+	t=1732100009; cv=none; b=RygK4Vz8MUz3Swesum+cgjwOnQoyo5tjJAbl6AAr5s1aDAPezrTQsSdKtYydLsIIROBsvcgjj1S3ocXmUE3gMkjiZJOkrDqBob6Z04iS6sY55kL8ZQGULvSj8a3Nb3pjzTaTFdNkaQB1JLucXKvfpMimJvtAG13/dySBozZEbPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732100005; c=relaxed/simple;
-	bh=oOXl5u7jr+6J/sjzfnKoMq8Idlb8ayeMeSby8soo/b0=;
+	s=arc-20240116; t=1732100009; c=relaxed/simple;
+	bh=9sz6YH/zilodWhOY8qTpE2Gjj7fQpoTypR6OYek1uVs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ra4zPiKgMwaKdKBTeCuD53pjf9sH4qmQ5xk4yjlbgE3LLcFdLYdLL7oJnWdhTB9r9e2QovPzX/70UqIP5Yv7ku95SgAFS6qvd9+0b0qs6K5vFpkN145lv6PZxYcFRXtmbALiGDllAfwURNctna2IxYwJ7l5lo9Uvteu5Qzm1c90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M7xOxInB; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=GDUlgrXfKqCy+c2flpNyaEYfGQ+VMkUZUMyTqbHYAXD/XHTL/H8Uaj3cO5QTaWSZO9Lk/J98oiioqKFSQR4D7qzSPwhRwFdtCuOBD2J5c9dBIwqBzllu4hYdu3MlS6n0wCqHoWo6mwJYKK0xBISdV/Z4DKWlRNfd8SIUjz/aWQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j/4qRSVH; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M7xOxInB"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43154a0886bso30534105e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 02:53:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j/4qRSVH"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38235e99a53so359502f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 02:53:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732100002; x=1732704802; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1732100006; x=1732704806; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f42/EUroZ+Ntky4r0huxue9aybFDac6HgHyBNdqjIFU=;
-        b=M7xOxInBs0o+POgCBFgPytBOjFwadN7d9oNUzHbs0HRsmLHGr3xfUggKU+XBD/5iQp
-         ZuaJkOyBVeEj8+4s3qQwTwFV1xEWOAHmAu7CP3RQFQ1cFF01CNpv7j/GLwJ98UjOOJ3h
-         wBId7k0X8jpTC8g6Ew0TC/y1rzlVN8WwH///B/aky1w9l/wXrDtab6GeWqRjBKOHBH86
-         ieXZBB2ZyV5ASj7ZUcL+5EmwRNahVk4kX9qcEyzDICCfFKpQDc6yJfg4hQifV80sNuov
-         NBjJx8yPOcxFVh9ZTQb1IjUTLCYX9ZXquWrpgEYJ0MPh3LXUwtlrwjy5oaQlwr0or0uk
-         3/aA==
+        bh=otK6F93Vu1cX9TaP11m2Y2QryXuFz9NU0aIFOkiC1D8=;
+        b=j/4qRSVH+dd2SSA8SGDHBprXRQ7pTVzusepoRQSq2E4NrlpmtapcK3zMW7tXFcR4iz
+         f7DyeIcmjWvrNRg+UEmEFWEi7mzwstDwskNyVe+HCz/BLR/NeI2MpgvfXMev4zdm7zQP
+         K//HzZZh8PZxCyF2yGwFDqzJxUehbya+XbFW1HNtNetymc030d6XjBqKC+kq8lM1T334
+         1jcXlNzUKQZUoXbStDVTFwD05h7B10dDQKa68NLS2qs0smjvSw5lapUZ/PEvHy4BM0Cs
+         GWI4/Vxh15XiuV3XPZAmvzEFJ0Qz5meky6bnAl5eH6j0XJy5JQnT5oBtGH+cyvG27B15
+         f9fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732100002; x=1732704802;
+        d=1e100.net; s=20230601; t=1732100006; x=1732704806;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f42/EUroZ+Ntky4r0huxue9aybFDac6HgHyBNdqjIFU=;
-        b=UnAFRtcHjWhkWuwXGLcK0CDDoIKWRBnzKitDN8OoWsLV5FDrKy3z7lUZu45Nl3gY1B
-         5SdTOyQUXlO7/8ypj9g+WrgdOqOtUT87xJxTNsv+jWK2w5dg0uXm+laa1AHImL82FuQw
-         gaK2yGIEmWp5/4QRKd8eYkvdTrhzwuokHzInhAfTXD11xUCrJ2+RUOH7JIxEcNdlxHrN
-         5iMqyvbcSFc+1LsO4/pPdUl22T5ryDQSbk9mgEQ5QAY0DZfSvRlkUM2pY6OlIFdwLlIG
-         yUPf9Ca8yCI5O2uIN/k2CXhSM8+8iuI2hFj3JzLAlWV1HVnl5QhbPfTEYLLTldNHfL6n
-         1puA==
-X-Gm-Message-State: AOJu0Yz98FwSiuWYdjZHQ8h1XLHVx+hs021+6ewGX95hl9JUsQpg36iO
-	AjFgP6gRIY0bF9xQmHzMdt705jkcHWmg+J3tQ2qskr0uHAQU1z6amjlez/Fql3F6cJqFeF498m9
-	ou2wVxAc7CHGtnds3FVXb63yoUbdtEUECr82UDxQRSA5ZJeEjrdDlyX/UZwZl0uTmZMmxdETwW4
-	VhlMFLtWF+fu3HVQxtIEgqVR9td0E=
-X-Google-Smtp-Source: AGHT+IFPX6eRpgufFtGAE+RtbW0UGVjU2hx2f4BR3zFtKKVagI2hwWLt5wnkcg1+LlBATxzL0czObknczQ==
+        bh=otK6F93Vu1cX9TaP11m2Y2QryXuFz9NU0aIFOkiC1D8=;
+        b=cT/vPIICHk6FOeYH3MNcvA2erCc96CKNFrKdyhzM9K4hiTnNcMgUAxQj9L9H38fx6X
+         UY8L36M78EhEoUu5ymNzG7noH2NKKoKyaUJNWOGCGSA10wO8aQI4OKgDS/g6NHt2ZXCd
+         qYUb5QH+BkDLu0keLFA4Xr7l0fl35qCNMUcperseeaC3rAOVvV1katpm3EuFKX+OXu56
+         FiQmmV/2/LsH/IYFgYH+ROh6QRYi+PipVqrD98lyIG6/BSsMJp7ya6V9TmzCivn0WUvF
+         10k9Y0PSLahcGsfOqdeAhKa//fjl4SukNdVkBkcbOquC9+M1oPOEFw+SlyzrrGOP5t2r
+         dNUQ==
+X-Gm-Message-State: AOJu0YwbTB7W8Vh9tF8Y2R49fqmpgHqRyiXhfSVXKJm8UZetb5TNWDKf
+	8iRLtleAcjrOjRIjSbt5/Dot1jCTx7WYmcRWc1QSluPRIbCgq4dTCBZgKZDq3CohYpSWyuthJke
+	uJ46LVrvcqSdAd41uRNiMdS7MDkpUulSbqF7gnUABpsYCuhwpskTsKjcEU5luEfy8lch+IuB+wI
+	DZyuPPjeDpGO2JxIWhvm2jaQTJ8LI=
+X-Google-Smtp-Source: AGHT+IFLMAX/63k03WDt22YQHM6Q6kyUAtxR/WjHVGa/qbz6yho54YcU61tg0uhcrJaQaYFKwiLbQBDAfw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a7b:cc8f:0:b0:42c:ae4e:a983 with SMTP id
- 5b1f17b1804b1-4334f020b66mr8555e9.3.1732100002370; Wed, 20 Nov 2024 02:53:22
+ (user=tabba job=sendgmr) by 2002:adf:f748:0:b0:382:49c2:fb12 with SMTP id
+ ffacd0b85a97d-3824cd4e421mr2898f8f.4.1732100004722; Wed, 20 Nov 2024 02:53:24
  -0800 (PST)
-Date: Wed, 20 Nov 2024 10:52:53 +0000
+Date: Wed, 20 Nov 2024 10:52:54 +0000
 In-Reply-To: <20241120105254.2842020-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241120105254.2842020-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241120105254.2842020-12-tabba@google.com>
-Subject: [PATCH v1 11/12] KVM: arm64: Update vcpu state with live value of
- VBAR_EL1 on injecting an exception
+Message-ID: <20241120105254.2842020-13-tabba@google.com>
+Subject: [PATCH v1 12/12] fixup! KVM: arm64: Initialize feature id registers
+ for protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -69,31 +69,22 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
 	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-If the injection happens early, when VBAR_EL1 has just been set,
-it's value wouldn't be up to date in the vcpu structure,
-resulting in it being clobbered before returning to the guest
-with the injected exception, which the guest wouldn't be able to
-handle properly. Although this probably means that the guest
-cannot properly run, this behavior is unexpected and makes
-debugging harder.
-
-Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 17783c8ddb92..54f23d9fea18 100644
+index 54f23d9fea18..62d06d5f5bca 100644
 --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
 +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -250,6 +250,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
-+	vcpu_write_sys_reg(vcpu, read_sysreg(VBAR_EL1), VBAR_EL1);
- 
- 	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
+@@ -477,7 +477,6 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+  */
+ void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu)
+ {
+-	/* List of feature registers to reset for protected VMs. */
+ 	const u32 pvm_feat_id_regs[] = {
+ 		SYS_ID_AA64PFR0_EL1,
+ 		SYS_ID_AA64PFR1_EL1,
 -- 
 2.47.0.338.g60cca15819-goog
 
