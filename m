@@ -1,98 +1,92 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905DB19CCEC
-	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 11:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F6654728
+	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 11:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732100554; cv=none; b=M2oNlFiH5zdvd8Od/9DUJ9LwHURkQXZEEFM6BPvPWCsubkY+4c8ORtWl56rrfPWeNKAROt3ru+cybIh5rrwLX1vnzFlbivUAY/z39JVMzWQgbh+m0V7oZiAhMOa8O6TSeZOuM17E+vREYZM0JFr0va+eMIdD3XPdJJDBSuiMM94=
+	t=1732101350; cv=none; b=XfDD9j0iXvzdrjF8x38MGnJLpuq7WMipNH6o7oWeJ99Unk2CVNmlOGOZ4wu0zgxLDwcYen1HWiheWZmo+SQOuzHU8G/3SV/wWUfZBRmpPWGC4/UjMkUABuRW1pGmPkkgQATqW4WDgFpR+3APoRc7g4jHOnZA9kpEVM9C1A/Y8HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732100554; c=relaxed/simple;
-	bh=UaIFaPHAN99w9qz7TofjnOcBOs6nN62ynwBUyqP8ERI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KCzQX3jjwwWWMCbnpOEMuhkEkwwzXo38KJPtKZVt/h1DuZ9l8Jgss+ea2vU3UJIMPW2Tz2ZOgvHgnf0RYNyjGxIVDd+ypH/tJeU0+bB0bItzmz+vtMX4QbROBqhFzr6JSmG9WWI0lqa436rWjGMiltXCximLWJnR2tRb74AFPEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vzMQt/Xb; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1732101350; c=relaxed/simple;
+	bh=y91D5lNm6Hn+KYnuzFx7xHJP7wTqgmllPYaNjCLOtWQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TCfYCqckaK62poF14BvUMZBksDvaWkZxRe0ubXaJ1E0Wrnq2lhWY9HT7wZDtS1H3sZk1aY2RiQX2fkl2X1vheBwUs89vKtxl89jUd5b0Nom/+iQRnJz1NiDyLIBc/mCzbHm50/SJUMi0D1Vk2kTwQ9/YngE+ZFIjGt2WOdLSv2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pdgnMg/r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzMQt/Xb"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43150ea2db6so121445e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 03:02:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732100550; x=1732705350; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=noKpNbsu/8J3MQcJ0MB00uooJSIdAZ7N8CsX2/H7nrg=;
-        b=vzMQt/XblwigPf+tHF7hDdjPRttI+o3DWfJExiYRW0PnbZpzmMwGqBBVwu+WvN1BJo
-         da4gsjpR2S/FimyJ8duhvzQpNvKi88cAzJVeiUhd7l+pdDFiBDrBF/J80qWFHOj6Eegm
-         GBkbokrtYTEZtu+QwC8PCvE7vgpjaUSfqh4F/HK2wAKtT2hfKxc01esLpTFDvw3NnSpG
-         L7ZP2QENrK+3pPuBiwDnpxFBbxQIHdIA7ru8U5y393kh1WDhOvUV+QqtPo2a0PmQ823K
-         R0bQnqN6M5L7GZ7qkB/DhOARWFKfjQtKBidyBlk5qO3AUWcUw8Ib5ywsXCbDTcckfq0T
-         McPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732100550; x=1732705350;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=noKpNbsu/8J3MQcJ0MB00uooJSIdAZ7N8CsX2/H7nrg=;
-        b=M+NfLoq2htYHHB1y0dr6JZ2IZK25gTF4fYf6ZP20OcBWrU1OuT/HAxX60twtYKUZat
-         Q6aOtIA5RP5s0gJUo8s4mc2BhWU0lp923o8IysVEH2yKidyooDRW7dDJJ8WwVPBT+oHr
-         aLxGrsuGKdn1X6ycSgYnorAnl/VgxTZljvWirUEXIyC4bL2TVZUkGbRF4Q6SSOyXIR7n
-         +giv5WN6DRGxdiNpu6CB9N5DGeThJU1+WM1CwpFtxH4y4d1LqWVMaHUmOofqDvgbrG8T
-         i42Z+53X+LeLvsK3s0X9uGin05kwTBXqB7StFMWcEQQPvQMZoB86Qml+7kveFZJnJ2JM
-         Ukvg==
-X-Gm-Message-State: AOJu0Ywy7IaTtG/+n1DCgPKJJCcodBh30Eop933ViRKMR2Br93fAM3sv
-	lIhIqB9mdfvpR42dFNhW5T74u0CF9K9GVlpRnGf/PPkZEiRSLDCODlQiULHb0Rju8WSDDYiSQdQ
-	7uc7058qSdQXu4/rBMacv17VMa/bxYldNzmidpZ80M75oRWSQ6Q==
-X-Gm-Gg: ASbGnctjKdpYvyAk+klD542KLhAXTT6NrGxzTYCD8OUT4M+rS5+1pv1K8yRMaN/l5St
-	aNGeJApsDgVJNWNL/edvmzCKaUUpZMZg+Bcg4u4z6vopaQ0PsEwEcT5R8wKIF
-X-Google-Smtp-Source: AGHT+IFWapXmeo6Cj0T9528tM07HHvM3xMoQi/T027qGlMPAxMjPrqnczz9/mYUi1PPvJ9NTm45LmkIXT7oK3OkNXIk=
-X-Received: by 2002:a05:600c:1c0d:b0:42b:a8fc:3937 with SMTP id
- 5b1f17b1804b1-4334899de42mr997515e9.4.1732100550453; Wed, 20 Nov 2024
- 03:02:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pdgnMg/r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ECD2C4CECD;
+	Wed, 20 Nov 2024 11:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732101350;
+	bh=y91D5lNm6Hn+KYnuzFx7xHJP7wTqgmllPYaNjCLOtWQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pdgnMg/rm5GOHulqQkgg7EWKGzUG0G3SImGxkHV7Z7p1+LasS9rmM+rDBXrw4vIYC
+	 5V41yRvcjk7k0rGDdaEDnmUc0lGmBcqNuPRNHWZ82WToo2+E9RxxOa6Y+OHuJzyunH
+	 pgJaLgEkb14OWxndLR8OXc8UhQkqXjVQXtmCRwo3e5Q7i+DsVWRge2BmMnmtO4sl/r
+	 HdamNxnYfVm7BeFyQbd/aLOqcMTs8TR3ALz4DS/BJEBZDoRVBsRiQoq80nZ0h9pn9u
+	 NEs6L6oO1asFsmSg83E+wevVT6fF7HHnXb9wueb15L94Oj9xzKzrkUskwpinn/f1P2
+	 71wUqcuCPQfRg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tDigW-00ES7R-2F;
+	Wed, 20 Nov 2024 11:15:48 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH] KVM: arm64: Mark set_sysreg_masks() as inline to avoid build failure
+Date: Wed, 20 Nov 2024 11:15:16 +0000
+Message-Id: <20241120111516.304250-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241120105254.2842020-1-tabba@google.com> <20241120105254.2842020-13-tabba@google.com>
-In-Reply-To: <20241120105254.2842020-13-tabba@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 20 Nov 2024 11:01:53 +0000
-Message-ID: <CA+EHjTz=i2YAoh=CVG57YtP23JK1VJ=5JuvF1Gm92_wUJKmrzg@mail.gmail.com>
-Subject: Re: [PATCH v1 12/12] fixup! KVM: arm64: Initialize feature id
- registers for protected VMs
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, lkp@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Apologies for this patch. I made a mistake when generating the latest
-set of patches.
+When compiling with CONFIG_CC_OPTIMIZE_FOR_SIZE=y, set_sysreg_masks()
+fails to compile thanks to:
 
-Cheers,
-/fuad
+	BUILD_BUG_ON(!__builtin_constant_p(sr));
 
-On Wed, 20 Nov 2024 at 10:53, Fuad Tabba <tabba@google.com> wrote:
->
-> ---
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 54f23d9fea18..62d06d5f5bca 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -477,7 +477,6 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
->   */
->  void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu)
->  {
-> -       /* List of feature registers to reset for protected VMs. */
->         const u32 pvm_feat_id_regs[] = {
->                 SYS_ID_AA64PFR0_EL1,
->                 SYS_ID_AA64PFR1_EL1,
-> --
-> 2.47.0.338.g60cca15819-goog
->
+as the compiler doesn't identify sr as a constant, despite all the
+callers passing constants.
+
+Fix the issue by always inlining this function, which allows GCC to
+do the right thing.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202411201857.ZNudtGJl-lkp@intel.com/
+Fixes: a0162020095e2 ("KVM: arm64: Extend masking facility to arbitrary registers")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index aeaa6017ffd89..9b36218b48def 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -951,7 +951,7 @@ u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *vcpu,
+ 	return v;
+ }
+ 
+-static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
++static __always_inline void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
+ {
+ 	int i = sr - __SANITISED_REG_START__;
+ 
+-- 
+2.39.2
+
