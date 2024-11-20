@@ -1,64 +1,67 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567A819CC28
-	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 10:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E6419ABD1
+	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 10:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732099979; cv=none; b=hiySDo6/mABjUZSKxMVPfO8Gf0UBKhmimtg3PKKCGqZy1AB5Ezl4NZpMyd4dQnTfuvY0Lv/V9qsmvojWfaOqWBuTd8hONEKqD8MEKqXB1xo87GKgaOPQGUBzgNwoyyw7OPYEHwqLtVrx5KLLdPE045MTZhX8aSf+dxnOaPJo9m4=
+	t=1732099983; cv=none; b=HlfYeFjLstU99oHlC/nMoDUsfkdmVE2luNSF0fH/c5EErV5MqsFLmcX4YvSpDS9dh5jzF/fTuAQthqqW4prb+sYl5Wn8Hw1vteHKAUIlXSm1kcBgAby3RTHHUC0z5pXeHpor/d6A5JVy3WSdlhWGppT21c8s9squhDGh24ChIV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732099979; c=relaxed/simple;
-	bh=91JnzzaWXayBJ4rNdW7zxVXM8B6OCFg+HxtYERfaeZs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kUTP/7MQO768mPFbWYHHlnoK0+oQnoaU7KZ8OqgFKHz6MPTyH7RswaR5QvBdoJxQ80Jag9yMLyuna53RiGt/C2Wy/l86vgyprigir4/FgLlV/pdDg+rq4vZA2DlB3sDjssJzmXlcb5CBB0mHRRB5F05q1APcP/6py7jeJ5K/bkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=swyHIW5j; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1732099983; c=relaxed/simple;
+	bh=BJIevqgeb3sjGdXM0mVLvMb7thXLqpYYJ4cOQOnCi1U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZrsWzzORx1EKX15TZElsgaXWgaxL+X5a67h3/ur92BkV4MUBR1Jv8e1RdeeHpvgSTjxQZpSm0iq5M+leUA6xNuSuLHmNWdsun1Hzr44zFM4zC5lM3wCTptlPw0Kv4q1I4vn5FHduxFLg9Mo9C62qnlbLxa6OFZ+1koZH/K9QjYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s5K0v3F+; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="swyHIW5j"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e35e9d36da3so3496727276.1
-        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 02:52:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s5K0v3F+"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38243a4ba5fso2908635f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 02:53:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732099977; x=1732704777; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FHhbZGchrrZYNelaupOfg6fP9x+BokooGfDZlzPZG5g=;
-        b=swyHIW5jt9i1mnBUVpXLCTqe4laGnU+ROSqdTNsYE4etNiyc4EfT2JAzBPAzK5C4s6
-         aT/8PnLckLZ3fKPhsbjhwBHyD4NSVzu26teK2MD1uRAlPGPHFYSHTRQDbLnQ1E07CRGV
-         FmCAOabMq+CQp3vntq4Tr/WKueCtYfbO9ybL0JFPvjH1SUcuGlt1whNpnPlxy0Ty2vv/
-         IQH/AeD94HJLdp+QWv91W6POZRAWJfxaRY+TaUhEQQ1a9pc4TSCiX570Ffo1+WsuV5L/
-         l7ixm/CS+U5ptyXGjnteVQCsOFSUqyWpngv5kFINpB57S61nOxUIzbh74evbDeclFSor
-         pcJQ==
+        d=google.com; s=20230601; t=1732099979; x=1732704779; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CfcGLmlc13JvysjGXISgn8bnSlCVGLpJesJZSD0Zqoc=;
+        b=s5K0v3F+Fe38gw/qVa5VopAqBtS5hGJbhf2H6WdjJnZ+/CxfYM77Awxwe8Ob1rAVPm
+         TYdp/C8S181iLrzrPep5TMrGVXZujmcE4n8BZL3tGaXzJ3ghTXFwLAtj7VJjNYi7eKSP
+         OQxUUYMecgJYIUkZtk9pdSDXZoILMEi0oKcA/OgNSWB6s5D5L3H59cz6yvH8P5koNTVy
+         40EVar+ln4OAfaOa4RF2gvL7FrLzhzxaivn5x/AtegpSlmv7nGTNnq5fC8uPH5edLHP+
+         o49nL6/tv8IvryN6TEr6POuHQXN/p4NQVhM6eV4HwYZQzBT47HPgZUBaK2kYBB+Q5h34
+         q9vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732099977; x=1732704777;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FHhbZGchrrZYNelaupOfg6fP9x+BokooGfDZlzPZG5g=;
-        b=u9sqZc4y7o4abkczywDn+MCHpZzy9r7cfoakk5xZz1qUgJ2Bcdqn6+QoRBK7nDkVPH
-         NQI4WG1BPuj7LnBkYN8oLduKBVVpypHTD8uvDlDqwmgX0hokuPYcQSBUphuFWBnbAT0D
-         1EmUjg1G0hkiWL8GFnmLHYzqK+6tIoKEAjYtXXW4NiRafVt5L3xtdpBHt7hUL5V/Yu8w
-         blBr1wNHQVqrYCSejJyz8NvG1jJSc6OzOb7HeN+RpQdBknq14b6UstQZxcZMzkQE1qRJ
-         1Fvjtnl3a1Or2X79z9BORw6rvGh5qS1Llic9mJ/zmhKLs7zjYj9v9p8GBOT3YxRueQlu
-         LGwA==
-X-Gm-Message-State: AOJu0YxeNqFCqR9VMeuiOKTFHM8G/cwqxwURWcjsWLQwL8MjwTRcx/hA
-	T5ni04lX7vgJS88sqtAUJeBSBl+/T/zwsLSliVRQDLAi9WkYMzGrg9+mCrNlnKZw/9ROwOInUyv
-	9EeBIbckPcUOabjw4Of5XS0fBU5zYOOhGEMdWFbxfjAPCdSGqsWsm38IlrJLanu4pHI3o8Ar6TZ
-	rycAeatmnsD7zzEzUlZO7OKjg9pis=
-X-Google-Smtp-Source: AGHT+IEHB1YOXijgGLZrRIlmTdc5FO6mh9kPr95x/aAbfNOvWt1pqsH9KS2Zz85273eXR5AYVlwVSiRaew==
+        d=1e100.net; s=20230601; t=1732099979; x=1732704779;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CfcGLmlc13JvysjGXISgn8bnSlCVGLpJesJZSD0Zqoc=;
+        b=mk1iXKmeDTOhDh6DguhTN2Dm77es7/Z6AOrmFozk6m7csmbdVbmpf0ve5oXnpPAfFg
+         OyhF+P94tptRA1Ioo5Pi3/YNvjz95ZbNp0Nmzux9Zk3IRhndjjFg5o6Lt43gcFEXCVsA
+         FdjHrfjgde3eZYfM0ukVth0A0uHAqsMiQaiQEvc01ifvvsIy9fMsrqEhNCIkBdLpIwzO
+         NpjpBmhY6a6Q2v7dqdAfx+qDw+V/MTRc6pKvByqoTE5TVjDqzZCu6RM5fkzYk6MbLPCG
+         miD4HG+IMtqTQaGPzm/0/LMg8OvbqLXwSCAeyXDgZU/bMAkGMoSaJjkIaYrERzSLM1Iu
+         aeOw==
+X-Gm-Message-State: AOJu0YziXA2KDbwg/1907VKmiuPSgsopl93tDMPBugK0VMj3ZHIOMtOo
+	VMk54/hDGOBLJHt4WgPpJ53HbJphhcchr0iT7eXlre0W6RKRZYeEQ0Xh55tPF3MO9UiD34QAmbb
+	cWPQnKB7Uf9zkyQAGtSQSXVo++1NZ50AE7ZsVUHJzO8WesQdjPjOUnOUrjIDQlyeuUKhjQk2iMN
+	DbZ0d5o5A5vewdCcjUIZjSO/L+S5s=
+X-Google-Smtp-Source: AGHT+IG3XVtYX3mu5YGDNp6S8TFxtu6Xl9AkHLwc3jWgqtxKORwcrZl7qo4Mes58pc1WmVEPCFm2PLTG9Q==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:360f:0:b0:e38:10a7:808e with SMTP id
- 3f1490d57ef6-e38cb3de86fmr9039276.0.1732099977073; Wed, 20 Nov 2024 02:52:57
+ (user=tabba job=sendgmr) by 2002:adf:a38c:0:b0:382:3b02:7027 with SMTP id
+ ffacd0b85a97d-38254af6a02mr705f8f.4.1732099979258; Wed, 20 Nov 2024 02:52:59
  -0800 (PST)
-Date: Wed, 20 Nov 2024 10:52:42 +0000
+Date: Wed, 20 Nov 2024 10:52:43 +0000
+In-Reply-To: <20241120105254.2842020-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20241120105254.2842020-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241120105254.2842020-1-tabba@google.com>
-Subject: [PATCH v1 00/12] KVM: arm64: Rework guest VM fixed feature handling
- and trapping in pKVM
+Message-ID: <20241120105254.2842020-2-tabba@google.com>
+Subject: [PATCH v1 01/12] KVM: arm64: Consolidate allowed and restricted VM
+ feature checks
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -66,72 +69,201 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
 	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-This patch series redoes how fixed features for protected guests
-are specified in pKVM, as well as how trapping is handled based
-on the features available for the VM. It also fixes a couple of
-existing bugs in the process.
+The definitions for features allowed and allowed with
+restrictions for protected guests, which are based on feature
+registers, were defined and checked for separately, even though
+they are handled in the same way. This could result in missing
+checks for certain features, e.g., pointer authentication,
+causing traps for allowed features.
 
-For protected VMs, some features should be trapped if the guest
-tries to use them because they are not supported (e.g., SME), or
-if they are not enabled for the particular VM (e.g., SVE).
+Consolidate the definitions into one. Use that new definition to
+construct the guest view of the feature registers for
+consistency.
 
-Initially, pKVM took the approach of specifying these features
-using macros and grouping their handling by feature id register.
-This proved to be difficult to maintain and bug prone. Moreover,
-since the nested virt work there is a framework in KVM for
-storing feature id register values per vm, as well as how to
-handle traps based on these values.
+Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
+Reported-by: Mostafa Saleh <smostafa@google.com>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 
-This patch series uses the vm's feature id registers to track the
-supported features, a framework similar to nested virt to set the
-trap values, and removes the need to store cptr_el2 per vcpu in
-favor of setting its value when traps are activated, as VHE mode
-does.
+---
 
-The changes should not affect the behavior of non-protected VMs
-nor the behavior of VMs outside of protected mode in general.
+Note: This patch ends up being a no-op, since none of the code in
+it survives the patch series. It does however make the flow of
+the remaining patches in this series smoother.
+---
+ .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 55 +++++++------------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  8 +--
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  6 +-
+ 3 files changed, 26 insertions(+), 43 deletions(-)
 
-This patch series is based on kvmarm/next (60ad25e14ab5), since
-it requires the patches from the series that fixes initialization
-of trap register values in pKVM [1].
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20241018074833.2563674-1-tabba@google.com/
-
-Fuad Tabba (12):
-  KVM: arm64: Consolidate allowed and restricted VM feature checks
-  KVM: arm64: Group setting traps for protected VMs by control register
-  KVM: arm64: Move checking protected vcpu features to a separate
-    function
-  KVM: arm64: Use KVM extension checks for allowed protected VM
-    capabilities
-  KVM: arm64: Initialize feature id registers for protected VMs
-  KVM: arm64: Set protected VM traps based on its view of feature
-    registers
-  KVM: arm64: Rework specifying restricted features for protected VMs
-  KVM: arm64: Remove fixed_config.h header
-  KVM: arm64: Remove redundant setting of HCR_EL2 trap bit
-  KVM: arm64: Calculate cptr_el2 traps on activating traps
-  KVM: arm64: Update vcpu state with live value of VBAR_EL1 on injecting
-    an exception
-  fixup! KVM: arm64: Initialize feature id registers for protected VMs
-
- arch/arm64/include/asm/kvm_host.h             |   1 -
- arch/arm64/include/asm/kvm_pkvm.h             |  25 ++
- arch/arm64/kvm/arm.c                          |  30 +-
- .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 223 ----------
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   5 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c                | 313 +++++--------
- arch/arm64/kvm/hyp/nvhe/setup.c               |   1 -
- arch/arm64/kvm/hyp/nvhe/switch.c              |  31 +-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 414 ++++++++++--------
- 9 files changed, 403 insertions(+), 640 deletions(-)
- delete mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-
-
-base-commit: 60ad25e14ab5a4e56c8bf7f7d6846eacb9cd53df
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+index f957890c7e38..d1e59b88ff66 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+@@ -14,11 +14,8 @@
+  * guest virtual machines, depending on the mode KVM is running in and on the
+  * type of guest that is running.
+  *
+- * The ALLOW masks represent a bitmask of feature fields that are allowed
+- * without any restrictions as long as they are supported by the system.
+- *
+- * The RESTRICT_UNSIGNED masks, if present, represent unsigned fields for
+- * features that are restricted to support at most the specified feature.
++ * Each field in the masks represents the highest supported *unsigned* value for
++ * the feature, if supported by the system.
+  *
+  * If a feature field is not present in either, than it is not supported.
+  *
+@@ -34,16 +31,7 @@
+  * - Floating-point and Advanced SIMD
+  * - Data Independent Timing
+  * - Spectre/Meltdown Mitigation
+- */
+-#define PVM_ID_AA64PFR0_ALLOW (\
+-	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_FP) | \
+-	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AdvSIMD) | \
+-	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_DIT) | \
+-	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) | \
+-	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3) \
+-	)
+-
+-/*
++ *
+  * Restrict to the following *unsigned* features for protected VMs:
+  * - AArch64 guests only (no support for AArch32 guests):
+  *	AArch32 adds complexity in trap handling, emulation, condition codes,
+@@ -51,7 +39,12 @@
+  * - RAS (v1)
+  *	Supported by KVM
+  */
+-#define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
++#define PVM_ID_AA64PFR0_ALLOW (\
++	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_FP) | \
++	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AdvSIMD) | \
++	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_DIT) | \
++	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) | \
++	ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3) | \
+ 	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL0, IMP) | \
+ 	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL1, IMP) | \
+ 	SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, EL2, IMP) | \
+@@ -77,20 +70,16 @@
+  * - Distinction between Secure and Non-secure Memory
+  * - Mixed-endian at EL0 only
+  * - Non-context synchronizing exception entry and exit
++ *
++ * Restrict to the following *unsigned* features for protected VMs:
++ * - 40-bit IPA
++ * - 16-bit ASID
+  */
+ #define PVM_ID_AA64MMFR0_ALLOW (\
+ 	ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_BIGEND) | \
+ 	ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_SNSMEM) | \
+ 	ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_BIGENDEL0) | \
+-	ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_EXS) \
+-	)
+-
+-/*
+- * Restrict to the following *unsigned* features for protected VMs:
+- * - 40-bit IPA
+- * - 16-bit ASID
+- */
+-#define PVM_ID_AA64MMFR0_RESTRICT_UNSIGNED (\
++	ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_EXS) | \
+ 	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_PARANGE), ID_AA64MMFR0_EL1_PARANGE_40) | \
+ 	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_ASIDBITS), ID_AA64MMFR0_EL1_ASIDBITS_16) \
+ 	)
+@@ -185,15 +174,6 @@
+ 	)
+ 
+ /* Restrict pointer authentication to the basic version. */
+-#define PVM_ID_AA64ISAR1_RESTRICT_UNSIGNED (\
+-	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA), ID_AA64ISAR1_EL1_APA_PAuth) | \
+-	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API), ID_AA64ISAR1_EL1_API_PAuth) \
+-	)
+-
+-#define PVM_ID_AA64ISAR2_RESTRICT_UNSIGNED (\
+-	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3), ID_AA64ISAR2_EL1_APA3_PAuth) \
+-	)
+-
+ #define PVM_ID_AA64ISAR1_ALLOW (\
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_DPB) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_JSCVT) | \
+@@ -206,13 +186,16 @@
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_SPECRES) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_BF16) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_DGH) | \
+-	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_I8MM) \
++	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_I8MM) | \
++	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA), ID_AA64ISAR1_EL1_APA_PAuth) | \
++	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API), ID_AA64ISAR1_EL1_API_PAuth) \
+ 	)
+ 
+ #define PVM_ID_AA64ISAR2_ALLOW (\
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_ATS1A)| \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3) | \
+-	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_MOPS) \
++	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_MOPS) | \
++	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3), ID_AA64ISAR2_EL1_APA3_PAuth) \
+ 	)
+ 
+ u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 01616c39a810..76a70fee7647 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -36,9 +36,9 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
+ 
+ 	/* Protected KVM does not support AArch32 guests. */
+ 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0),
+-		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) != ID_AA64PFR0_EL1_EL0_IMP);
++		PVM_ID_AA64PFR0_ALLOW) != ID_AA64PFR0_EL1_EL0_IMP);
+ 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1),
+-		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) != ID_AA64PFR0_EL1_EL1_IMP);
++		PVM_ID_AA64PFR0_ALLOW) != ID_AA64PFR0_EL1_EL1_IMP);
+ 
+ 	/*
+ 	 * Linux guests assume support for floating-point and Advanced SIMD. Do
+@@ -362,8 +362,8 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
+ 	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), PVM_ID_AA64PFR0_ALLOW))
+ 		set_bit(KVM_ARM_VCPU_SVE, allowed_features);
+ 
+-	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API), PVM_ID_AA64ISAR1_RESTRICT_UNSIGNED) &&
+-	    FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA), PVM_ID_AA64ISAR1_RESTRICT_UNSIGNED))
++	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API), PVM_ID_AA64ISAR1_ALLOW) &&
++	    FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA), PVM_ID_AA64ISAR1_ALLOW))
+ 		set_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, allowed_features);
+ 
+ 	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPI), PVM_ID_AA64ISAR1_ALLOW) &&
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 2860548d4250..59fb2f056177 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -89,7 +89,7 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
+ 	u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
+ 
+ 	set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
+-		PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
++		PVM_ID_AA64PFR0_ALLOW);
+ 
+ 	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
+ }
+@@ -189,7 +189,7 @@ static u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
+ 	u64 set_mask;
+ 
+ 	set_mask = get_restricted_features_unsigned(id_aa64mmfr0_el1_sys_val,
+-		PVM_ID_AA64MMFR0_RESTRICT_UNSIGNED);
++		PVM_ID_AA64MMFR0_ALLOW);
+ 
+ 	return (id_aa64mmfr0_el1_sys_val & PVM_ID_AA64MMFR0_ALLOW) | set_mask;
+ }
+@@ -276,7 +276,7 @@ static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
+ 	 * of AArch32 feature id registers.
+ 	 */
+ 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1),
+-		     PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) > ID_AA64PFR0_EL1_EL1_IMP);
++		     PVM_ID_AA64PFR0_ALLOW) > ID_AA64PFR0_EL1_EL1_IMP);
+ 
+ 	return pvm_access_raz_wi(vcpu, p, r);
+ }
 -- 
 2.47.0.338.g60cca15819-goog
 
