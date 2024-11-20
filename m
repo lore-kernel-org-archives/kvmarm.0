@@ -1,87 +1,116 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47553A932
-	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 01:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B8117C7BD
+	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 07:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732064427; cv=none; b=ti+efJ6P9xq7EkYV8hnsa09G1MR/2fidyDaVKJT6L+PCKJQR80djUbuW7QuCyFzvzswqg4vKAMaMG9f8EA87lO7dAgrVS83HGLRUj823P2G54iLJHR3qp2T82wIKTm2Cl3g1y25YI5Ra4CA1O9lGOvsBsMc2+jz2x7VOnY4Nm4g=
+	t=1732088791; cv=none; b=MzYdlIRpXKx/Xf7MWqrstmUaPmC8ck6I35z+pu9rSJrpsTIFOs+NPUELNfDCLYaJHmj93gH7OzrkkEFIZIr47xiZLwxIUgkvDh9FFtrbDNWkqqOc8lJ5zI4V/AfLzLG2O3Gv9vMoMvyuj2rN/SqYwm+qdGhWMtjL8ArPwrP+S1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732064427; c=relaxed/simple;
-	bh=i1HmAha5voIxPPHXBAwywrDS2y07je9dBbIp4uwbSmA=;
+	s=arc-20240116; t=1732088791; c=relaxed/simple;
+	bh=7ffXjx0Ik+eVEI0uzKyRX3vMNdwO8ECAiPgVZgcLjRc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k1xE5HyNx25dFJNb2bSQHkvu/hAeDea12G0uCIWiYUsyFedoyH71H2kZYMeWDMEbzNf6cK9gVgetp5n/TIaO4Owbksc0aEt885eKQ6GiShD+R2Wa3EbKYw7ATkLL46ARaeDfG4+BtWmzRm34dn5l4CGADZLsmnWG6bjZBR1RNQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ADfa6zEp; arc=none smtp.client-ip=91.218.175.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=pufXCt76GGRYGCWW+o3QkQV6DXGKFZ1aiv3EweUmPlToVU5hkPymXGVm/blda70g0CgZtG55GyoYoxrR/8XVPLc5CJoPwE+cm/k5vfT6rBVRSIttkWwY1V60UcnuME9M4oqcsi2gahlBRwKNFTR6yaq0DC4f2f0Tm0n4bnTiGI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fDFDC9C2; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ADfa6zEp"
-Date: Tue, 19 Nov 2024 17:00:13 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fDFDC9C2"
+Date: Wed, 20 Nov 2024 07:46:16 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732064423;
+	t=1732088785;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BmY4VqOGQNNjUWhmuGP/BX1u17NfvSpk8rw0PnOTo7I=;
-	b=ADfa6zEpsIoEnrTkcw39l7eM3hZwqRUnEL8JA/LXcIWyJ7mZY7HpGvK1gclbIqSGqH/xHB
-	ByoOHB30rAikR0c6nGasYY2PCP9j39Z/SE+5me11Zvxzb3FSo+J5GXgW8e1dfWjoZ9eL+p
-	fjfZd53iDct7OxhWjybidautvIrbzOQ=
+	bh=KIsoxDDC/xIkUZ9OKR1VL27Mws23rhY0ZxT1YiRdli0=;
+	b=fDFDC9C2DqymuzFllq+n19yMNcf+28i/sHmTgmy6MJfcbpAZ3gwJXnhX0eOxufNpPEs3nA
+	HtdLctFaUhG4K6TSJD15JPDmM6YxJQKMlDDhJRWLgUL/YBFyScQV4/AFQE+VnyJrHd/U8f
+	9iXtXmt2ISTJR7eLTzDqZ3FSrOlfCDs=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Use MDCR_EL2.HPME to evaluate
- overflow of hyp counters
-Message-ID: <Zz00nVBgzOE79J6N@linux.dev>
-References: <20241120005230.2335682-1-oliver.upton@linux.dev>
- <20241120005230.2335682-3-oliver.upton@linux.dev>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, duenwen@google.com, rananta@google.com,
+	James Houghton <jthoughton@google.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v1] KVM: arm64: Introduce KVM_CAP_ARM_SIGBUS_ON_SEA
+Message-ID: <Zz2TyC9-zNQ3D-KB@linux.dev>
+References: <20241031212104.1429609-1-jiaqiyan@google.com>
+ <86r07v1g2z.wl-maz@kernel.org>
+ <CACw3F51FbzkkX_DcCVCieZ=408oP_Fy3sXYk5AjWRX3RJO2Fzg@mail.gmail.com>
+ <878qtou96b.wl-maz@kernel.org>
+ <CACw3F50gB40dqQ4CZ7f4X4aRkxHQhjiYunAhqbmVtcGnd5g3bA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241120005230.2335682-3-oliver.upton@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACw3F50gB40dqQ4CZ7f4X4aRkxHQhjiYunAhqbmVtcGnd5g3bA@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 19, 2024 at 04:52:30PM -0800, Oliver Upton wrote:
-> The 'global enable control' (as it is termed in the architecture) for
-> counters reserved by EL2 is MDCR_EL2.HPME. Use that instead of
-> PMCR_EL0.E when evaluating the overflow state for hyp counters.
+On Tue, Nov 19, 2024 at 03:57:46PM -0800, Jiaqi Yan wrote:
+>
+> While continuing the discussion here, I think it may make sense I sent
+> out a V2 with 2 major updates:
+>   - add documentation for new SIGBUS feature
+>   - remove KVM_CAP_ARM_SIGBUS_ON_SEA
+
+Just wanted to add that QEMU already has a functioning "MCE" injection
+implemenation based on signals that deals with the sloppy mess of
+coordinating w/ vCPU threads [*].
+
+I completely agree with Marc that the UAPI around using signals for this
+sort of thing is a giant pile of crap, but it seems to be a semi-understood
+pile of crap. And from that perspective, wiring unclaimed SEAs into the
+existing infrastructure at least makes the UAPI consistent.
+
+[*]: https://elixir.bootlin.com/qemu/v9.1.1/C/ident/kvm_on_sigbus_vcpu
+
+> On Tue, Nov 12, 2024 at 12:51 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > Do you mean a CAP that VMM can tell KVM the VM guest has RAS ability?
+> > > I don't know if there is one for arm64. On x86 there is
+> > > KVM_X86_SETUP_MCE. KVM_CAP_ARM_INJECT_EXT_DABT maybe a revelant one
+> > > but I don't think it is exactly the one for "RAS ability".
+> >
+> > Having though about this a bit more, I now think this is independent
+> > of the guest supporting RAS. This really is about the VMM asking to be
+> > made aware of RAS errors affecting the guest, and it is the signalling
+> > back to the guest that needs to be gated by ID_AA64PFR0_EL1.RAS.
 > 
-> Change the return value to a bool while at it, which better reflects the
-> fact that the overflow state is a shared signal and not a per-counter
-> property.
+> Just to make sure I fully catch you. I think ID_AA64PFR0_EL1.RAS
+> translates to ARM64_HAS_RAS_EXTN in the kernel. If VMM signals RAS
+> error back to the guest with SEA, are you suggesting
+> __kvm_arm_vcpu_set_events should check
+> cpus_have_final_cap(ARM64_HAS_RAS_EXTN) before it
+> kvm_inject_dabt(vcpu)?
+> 
+> If so, how could __kvm_arm_vcpu_set_events know if the error is about
+> RAS (e.g. memory error) vs about accessing memory not in a memslot
+> (i.e. KVM_EXIT_ARM_NISV)? I guess KVM needs to look at ESR_EL2 again
+> (e.g. kvm_vcpu_abt_issea vs kvm_vcpu_dabt_isvalid)?
 
-... and the untested garbage award goes to:
+Good point. I don't think we can lock down this UAPI after the fact
+given the existing use cases. It is ultimately up to the VMM what to do.
 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+I don't see anything that would stop an implementation without FEAT_RAS
+from generating an SEA in this situation. The lack of FEAT_RAS (to me at
+least) implies:
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index fb79fa689ae5..456102bc0b55 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -276,6 +276,8 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
- 
- static u64 kvm_pmu_hyp_counter_mask(struct kvm_vcpu *vcpu)
- {
-+	unsigned int hpmn, n;
-+
- 	if (!vcpu_has_nv(vcpu))
- 		return 0;
- 
-@@ -308,7 +310,6 @@ bool kvm_pmu_counter_is_hyp(struct kvm_vcpu *vcpu, unsigned int idx)
- u64 kvm_pmu_accessible_counter_mask(struct kvm_vcpu *vcpu)
- {
- 	u64 mask = kvm_pmu_implemented_counter_mask(vcpu);
--	u64 hpmn;
- 
- 	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
- 		return mask;
+ - No ESR injection for vSErrors (already enforced in UAPI)
+ - No deferral of SErrors / ESBs
+ - No error record registers in the PE
+
+Of course, it is very likely you've thought about this more than I have,
+Marc.
+
+-- 
+Thanks,
+Oliver
