@@ -1,132 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E840519D8A8
-	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 09:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567A819CC28
+	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 10:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732096544; cv=none; b=WcxbO67NjLCXVNxijlk/WQJ+PZrAAbf+mVrmUs1NEVsgfCTNK/lysFjYU33T+dbAfOiJTd9CqUiqbA5vKKjpa5phzHNCdQmMy/fnIy+pYyeHcFOE/jQ/quOwMrl0ZTs0L/kFCCELDuit+pELRNrA0RygW0Hd/DvnrA8Mgk8Zi3Y=
+	t=1732099979; cv=none; b=hiySDo6/mABjUZSKxMVPfO8Gf0UBKhmimtg3PKKCGqZy1AB5Ezl4NZpMyd4dQnTfuvY0Lv/V9qsmvojWfaOqWBuTd8hONEKqD8MEKqXB1xo87GKgaOPQGUBzgNwoyyw7OPYEHwqLtVrx5KLLdPE045MTZhX8aSf+dxnOaPJo9m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732096544; c=relaxed/simple;
-	bh=XvOnLhCVctZKly7ydYiiYPd4feK/HQNRGFJJzoe/USc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jmo/gn9wuz8QkCcK6O+z6TAExjFAO9hXBOBm4fqqwheDVppfc5h7o4fYdXe/ueV2DqbxyaP2h/5w5MNIOsJ2XkoTUI6ktvTuxyL2QHeuu2kHJybSrco3wErJDSmfN7Rl/GI526fIzCBw5rFVCUl6xtE0+n1OVCHbeDULrmZGGE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2+95qjv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732099979; c=relaxed/simple;
+	bh=91JnzzaWXayBJ4rNdW7zxVXM8B6OCFg+HxtYERfaeZs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kUTP/7MQO768mPFbWYHHlnoK0+oQnoaU7KZ8OqgFKHz6MPTyH7RswaR5QvBdoJxQ80Jag9yMLyuna53RiGt/C2Wy/l86vgyprigir4/FgLlV/pdDg+rq4vZA2DlB3sDjssJzmXlcb5CBB0mHRRB5F05q1APcP/6py7jeJ5K/bkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=swyHIW5j; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2+95qjv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 824CBC4CECD;
-	Wed, 20 Nov 2024 09:55:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732096543;
-	bh=XvOnLhCVctZKly7ydYiiYPd4feK/HQNRGFJJzoe/USc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i2+95qjvtTuWAA1HJnFK1ZBqPxd7LBwGRNNBx2WCdnCvhO6aO5beVhtPEbs96zX7L
-	 Ie2MWZP0v5tRK7oCFCoJvP8dMekw4L3rNWDNeJPhHjVEwd3F2C1npU+AIx84HfQi3C
-	 khKa3DEOsNc0WpTsA9XErgnwgv0aWsZypcM1t+ODPMYQ9zt6P8EhXjBCHZ9ByalU+U
-	 xX2f6/P5NAtZLPzYwoyIrxY/I0TgDd4rk+rs/nMfhvdK91YpU6Nd3ewsDG2GbKyGQB
-	 ECVEUtKqyEDmaCa0cWnrtRY3H1nJLtGibgzcRdrnQaT3Wrs9/xnOkI9hi1FvfoFcOT
-	 CaMik3JhVPVmQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tDhQz-00EQWI-2o;
-	Wed, 20 Nov 2024 09:55:41 +0000
-Date: Wed, 20 Nov 2024 09:55:40 +0000
-Message-ID: <86sermut43.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Use MDCR_EL2.HPME to evaluate overflow of hyp counters
-In-Reply-To: <Zz2j1SEnH8OSrl5t@linux.dev>
-References: <20241120005230.2335682-1-oliver.upton@linux.dev>
-	<20241120005230.2335682-3-oliver.upton@linux.dev>
-	<86ttc2uwox.wl-maz@kernel.org>
-	<Zz2j1SEnH8OSrl5t@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="swyHIW5j"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e35e9d36da3so3496727276.1
+        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 02:52:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732099977; x=1732704777; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FHhbZGchrrZYNelaupOfg6fP9x+BokooGfDZlzPZG5g=;
+        b=swyHIW5jt9i1mnBUVpXLCTqe4laGnU+ROSqdTNsYE4etNiyc4EfT2JAzBPAzK5C4s6
+         aT/8PnLckLZ3fKPhsbjhwBHyD4NSVzu26teK2MD1uRAlPGPHFYSHTRQDbLnQ1E07CRGV
+         FmCAOabMq+CQp3vntq4Tr/WKueCtYfbO9ybL0JFPvjH1SUcuGlt1whNpnPlxy0Ty2vv/
+         IQH/AeD94HJLdp+QWv91W6POZRAWJfxaRY+TaUhEQQ1a9pc4TSCiX570Ffo1+WsuV5L/
+         l7ixm/CS+U5ptyXGjnteVQCsOFSUqyWpngv5kFINpB57S61nOxUIzbh74evbDeclFSor
+         pcJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732099977; x=1732704777;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FHhbZGchrrZYNelaupOfg6fP9x+BokooGfDZlzPZG5g=;
+        b=u9sqZc4y7o4abkczywDn+MCHpZzy9r7cfoakk5xZz1qUgJ2Bcdqn6+QoRBK7nDkVPH
+         NQI4WG1BPuj7LnBkYN8oLduKBVVpypHTD8uvDlDqwmgX0hokuPYcQSBUphuFWBnbAT0D
+         1EmUjg1G0hkiWL8GFnmLHYzqK+6tIoKEAjYtXXW4NiRafVt5L3xtdpBHt7hUL5V/Yu8w
+         blBr1wNHQVqrYCSejJyz8NvG1jJSc6OzOb7HeN+RpQdBknq14b6UstQZxcZMzkQE1qRJ
+         1Fvjtnl3a1Or2X79z9BORw6rvGh5qS1Llic9mJ/zmhKLs7zjYj9v9p8GBOT3YxRueQlu
+         LGwA==
+X-Gm-Message-State: AOJu0YxeNqFCqR9VMeuiOKTFHM8G/cwqxwURWcjsWLQwL8MjwTRcx/hA
+	T5ni04lX7vgJS88sqtAUJeBSBl+/T/zwsLSliVRQDLAi9WkYMzGrg9+mCrNlnKZw/9ROwOInUyv
+	9EeBIbckPcUOabjw4Of5XS0fBU5zYOOhGEMdWFbxfjAPCdSGqsWsm38IlrJLanu4pHI3o8Ar6TZ
+	rycAeatmnsD7zzEzUlZO7OKjg9pis=
+X-Google-Smtp-Source: AGHT+IEHB1YOXijgGLZrRIlmTdc5FO6mh9kPr95x/aAbfNOvWt1pqsH9KS2Zz85273eXR5AYVlwVSiRaew==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a25:360f:0:b0:e38:10a7:808e with SMTP id
+ 3f1490d57ef6-e38cb3de86fmr9039276.0.1732099977073; Wed, 20 Nov 2024 02:52:57
+ -0800 (PST)
+Date: Wed, 20 Nov 2024 10:52:42 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241120105254.2842020-1-tabba@google.com>
+Subject: [PATCH v1 00/12] KVM: arm64: Rework guest VM fixed feature handling
+ and trapping in pKVM
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 20 Nov 2024 08:54:45 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Nov 20, 2024 at 08:38:22AM +0000, Marc Zyngier wrote:
-> > On Wed, 20 Nov 2024 00:52:30 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > +/*
-> > > + * Returns the PMU overflow state, which is true if there exists an event
-> > > + * counter where the values of the global enable control, PMOVSSET_EL0[n], and
-> > > + * PMINTENSET_EL1[n] are all 1.
-> > > + */
-> > > +static bool kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	u64 reg = 0;
-> > > +	u64 reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-> > >  
-> > > -	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
-> > > -		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-> > > -		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-> > > -	}
-> > > +	reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-> > > +
-> > > +	/*
-> > > +	 * PMCR_EL0.E is the global enable control for event counters available
-> > > +	 * to EL0 and EL1.
-> > > +	 */
-> > > +	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E))
-> > > +		reg &= kvm_pmu_hyp_counter_mask(vcpu);
-> > 
-> > So if the PMU is disabled at EL1, we remove the cycle counter from the
-> > list of counters that are considered for an overflow.
-> > 
-> > I don't think that's what you really want.
-> 
-> That's how it is written though, no? My understanding is that the fixed
-> counters are never reserved by EL2:
-> 
-> """
-> The PE signals a request for:
-> 
-> [...]
-> 
->  - The cycle counter, when the values of PMCR_EL0.E, PMOVSSET[31] and
->    PMINTENSET[31] are all 1
-> """
+This patch series redoes how fixed features for protected guests
+are specified in pKVM, as well as how trapping is handled based
+on the features available for the VM. It also fixes a couple of
+existing bugs in the process.
 
-Ah, fair enough. I had the misguided impression that there would be
-another control for that, but this is actually called out in D13.11.2
-("The PMU does not provide any control that a hypervisor can use to
-reserve the cycle counter for its own use.").
+For protected VMs, some features should be trapped if the guest
+tries to use them because they are not supported (e.g., SME), or
+if they are not enabled for the particular VM (e.g., SVE).
 
-I stand corrected.
+Initially, pKVM took the approach of specifying these features
+using macros and grouping their handling by feature id register.
+This proved to be difficult to maintain and bug prone. Moreover,
+since the nested virt work there is a framework in KVM for
+storing feature id register values per vm, as well as how to
+handle traps based on these values.
 
-> 
-> PMUOverflowCondition() and PMUCounterIsHyp() seem to match this too.
-> Unless I can't read, which happens a lot.
+This patch series uses the vm's feature id registers to track the
+supported features, a framework similar to nested virt to set the
+trap values, and removes the need to store cptr_el2 per vcpu in
+favor of setting its value when traps are activated, as VHE mode
+does.
 
-Nah, that's definitely me.
+The changes should not affect the behavior of non-protected VMs
+nor the behavior of VMs outside of protected mode in general.
 
-FWIW, and with the follow-up fixes:
+This patch series is based on kvmarm/next (60ad25e14ab5), since
+it requires the patches from the series that fixes initialization
+of trap register values in pKVM [1].
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Cheers,
+/fuad
 
-	M.
+[1] https://lore.kernel.org/all/20241018074833.2563674-1-tabba@google.com/
 
+Fuad Tabba (12):
+  KVM: arm64: Consolidate allowed and restricted VM feature checks
+  KVM: arm64: Group setting traps for protected VMs by control register
+  KVM: arm64: Move checking protected vcpu features to a separate
+    function
+  KVM: arm64: Use KVM extension checks for allowed protected VM
+    capabilities
+  KVM: arm64: Initialize feature id registers for protected VMs
+  KVM: arm64: Set protected VM traps based on its view of feature
+    registers
+  KVM: arm64: Rework specifying restricted features for protected VMs
+  KVM: arm64: Remove fixed_config.h header
+  KVM: arm64: Remove redundant setting of HCR_EL2 trap bit
+  KVM: arm64: Calculate cptr_el2 traps on activating traps
+  KVM: arm64: Update vcpu state with live value of VBAR_EL1 on injecting
+    an exception
+  fixup! KVM: arm64: Initialize feature id registers for protected VMs
+
+ arch/arm64/include/asm/kvm_host.h             |   1 -
+ arch/arm64/include/asm/kvm_pkvm.h             |  25 ++
+ arch/arm64/kvm/arm.c                          |  30 +-
+ .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 223 ----------
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   5 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 313 +++++--------
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   1 -
+ arch/arm64/kvm/hyp/nvhe/switch.c              |  31 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 414 ++++++++++--------
+ 9 files changed, 403 insertions(+), 640 deletions(-)
+ delete mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+
+
+base-commit: 60ad25e14ab5a4e56c8bf7f7d6846eacb9cd53df
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.0.338.g60cca15819-goog
+
