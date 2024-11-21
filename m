@@ -1,275 +1,248 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090B212BF02
-	for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 17:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD23361FCE
+	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 00:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732123889; cv=none; b=WDn0uPpsG8SnThyJYrHgvjqletFyczaiaNjvBWqSfyCGaw6fcjDpuy8+LnPmTdZKjEt/0Dhl/bJzyFMQDYiMOxGJi1JtEnDceVc3h+ZHLG/PD9w+GYLa7Vs36ne/bRZ5KUgX/DHl7lyUrhlNk1zSpV0MQegkUVL47Tzd0+zm3jI=
+	t=1732148960; cv=none; b=TOzKEaO9Ggze/6fuyv3CMIxEi1Ac2hfWpuJQfC4bPe9DNeCIWg9NWg2mfDOs5nbPpl3lyFgj/VuNh14v8rSNDhjbvazf/8Pt82Aar1VHQNxJwDhOFHeFF0uLYSOpLs5+jpn7cCwVEEhzGhn1C0DdDvQS1TGFQctJWcNn9JojrwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732123889; c=relaxed/simple;
-	bh=52UlUca83BCJ4bTbpXzo0dcf4hoWvy6v64cKcaFXNeM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qFtQ+xNxiAdaf7mio0b897RKuGboieh9YYE+T13gUyKKsO808FCFEOPzmatC/pxrMG1eA5Qn0/8PYkyGbDs3mG0D0oL/elfA+Izb2hoL+BjnRwuuA0yEQskai3NAcEqMsV14QTDwAh7mazkdqxUDJjEa3cfGT0BJ8l71AlNGqdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=O/wq2KL5; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1732148960; c=relaxed/simple;
+	bh=FWiIcYFpfnIOckfKm46vnv7yodm9kc7vmZ3xSFEEu2A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=H5bUi4yiBZutswtmdkyjfKX+oynAvAYJ8u/OWshxxb2JTGRnSkrBeidCXwVmCV0zO+DQsAfVaPTnNjSRCAwKfDVLjubZXUEc0hmLM8sFDZDpzrP0cV1EwnG8UbIkjBwsZp92/XQiiAeEAarjQoJ5tzrv2LyR3L1DIs0rHfQFjTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u1vdqNG/; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="O/wq2KL5"
-Date: Wed, 20 Nov 2024 17:31:16 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732123885;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tnHduo24AdOoAdI77IZf7s1iLW4IzFa8VA+z+Tg/Y28=;
-	b=O/wq2KL5Z4g46tyl35oMSphCNZCGWzeMbieD+t20CV6A6f2SqjodzFgD/GhtOEJIk3dJk/
-	UKVmbib2LnSuMj/Z2ga8+AMytY/UiXA7lZOwSE88ZuYHRBhzkesDozYmEeBzGudItwH5ST
-	lKzeWILaG+QtwK18R45dAx/ba18969Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@linaro.org>
-Cc: suzuki.poulose@arm.com, coresight@lists.linaro.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>, Fuad Tabba <tabba@google.com>,
-	James Morse <james.morse@arm.com>, Mark Brown <broonie@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 11/12] KVM: arm64: Swap TRFCR on guest switch
-Message-ID: <Zz4c5LmQnK2SD5HO@linux.dev>
-References: <20241112103717.589952-1-james.clark@linaro.org>
- <20241112103717.589952-12-james.clark@linaro.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u1vdqNG/"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-20d15285c87so2909915ad.3
+        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 16:29:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732148958; x=1732753758; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yaq4pkjzDY4CwQXdUFb+TCwYFBRLtW6PERcuUhVZR0I=;
+        b=u1vdqNG/ef5LrDIF5yHcFN9s5TJjQLwDTwH7cPl0z/xJDuMG9cM812dCpk/iXtGqu2
+         38ciLX96DW4R/B//t85ytdUYATVfjlFKHpG1HVhDYOj3CwnJsgLRdMBT7BnWn4xy2Nna
+         KUeusJ/BCrdtJGS1uRsbC2KWaGZmuLogoyrlygsvGQ/9/VlwRTfBCX7yEWjY/T6FuTNC
+         SedAGwbPagdvt8wXgOtyS0uaqzEVXYs5X0gssu3uE7oUD35SijMn3vndq0lzMJj7UtdS
+         iQy9WGmrvR6scxvDne4vwsy+iF0u64IbozWPdKQyv39MUZI7cPp5UHh5c+JCcTfmWRTG
+         MeRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732148958; x=1732753758;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yaq4pkjzDY4CwQXdUFb+TCwYFBRLtW6PERcuUhVZR0I=;
+        b=KulgV9cgeNvZSuGuFn0KNgXu0L2+RVY4AY19JfMp7N0EGHl6wx1w1M5+bAElyOVqxS
+         iu2FfyCa116ezvKb7eGXsLFN5qLA3mkw1vCBW0OEKs+jKdSBQGviAPswoueRLE1c/DtL
+         v3+Mhv1j0vCX8QpFvk8d7DsH2RE3cYCfPc0chiXWBSniA4Jb2XLUCuQ2OxsL4C0eusYA
+         MnVvMrwgilRyU/cts8w5btfq57KytmE6xr+21DAwEialNqto6ITII8008Rl5R6tFkcQC
+         vsVwEOxWASeUFZFVNYjT4esofqmeNQxmFeAZWVhXZQToswJJ5yWR/k/A8gUS4hgn8QbV
+         25vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW9UutNzhrp0SU1wO731eyphqIMUHNKoQPhum+Lbyy1LgX7mtQZlfuz+d9CbPj+a/MfhEHBcAw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyDg3XjneDqUyA/VG9lY8vNAE5HNsPQnR3UutZvZZB1xF4vu9At
+	gYJxBRvG7Et73tlxL0vRlz58Sb0nSGZegmkRVZIWzrYegX7iSaJx+HYjaJ2gPEWP+KYzmhMZMcG
+	6Dg==
+X-Google-Smtp-Source: AGHT+IEo3SsZK3GD4ZcR6dZRBQukGq0A2fKygifFSwayRaQbB5hqp/jWvkHnbijR91Fktwts9Qc8xXjY/nM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a17:902:facb:b0:20b:b7b2:b6ef with SMTP id
+ d9443c01a7336-2126a342d20mr18935ad.4.1732148957811; Wed, 20 Nov 2024 16:29:17
+ -0800 (PST)
+Date: Wed, 20 Nov 2024 16:29:16 -0800
+In-Reply-To: <20241115211523.GB599524.vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241112103717.589952-12-james.clark@linaro.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
+ <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
+ <ZyuiH_CVQqJUoSB-@google.com> <20241108-eaacad12f1eef31481cf0c6c@orel>
+ <ZzY2iAqNfeiiIGys@google.com> <20241115211523.GB599524.vipinsh@google.com>
+Message-ID: <Zz5-3A36cckhYu9K@google.com>
+Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Anup Patel <anup@brainfault.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 12, 2024 at 10:37:10AM +0000, James Clark wrote:
-> +void kvm_set_trfcr(u64 host_trfcr, u64 guest_trfcr)
-> +{
-> +	if (kvm_arm_skip_trace_state())
-> +		return;
-> +
-> +	if (has_vhe())
-> +		write_sysreg_s(guest_trfcr, SYS_TRFCR_EL12);
-> +	else
-> +		if (host_trfcr != guest_trfcr) {
-> +			*host_data_ptr(host_debug_state.trfcr_el1) = guest_trfcr;
+On Fri, Nov 15, 2024, Vipin Sharma wrote:
+> On 2024-11-14 09:42:32, Sean Christopherson wrote:
+> > On Fri, Nov 08, 2024, Andrew Jones wrote:
+> > > On Wed, Nov 06, 2024 at 09:06:39AM -0800, Sean Christopherson wrote:
+> > > > On Fri, Nov 01, 2024, Vipin Sharma wrote:
+> > > > > Phase 3: Provide collection of interesting configurations
+> > > > >=20
+> > > > > Specific individual constructs can be combined in a meaningful wa=
+y to
+> > > > > provide interesting configurations to run on a platform. For exam=
+ple,
+> > > > > user doesn't need to specify each individual configuration instea=
+d,
+> > > > > some prebuilt configurations can be exposed like
+> > > > > --stress_test_shadow_mmu, --test_basic_nested
+> > > >=20
+> > > > IMO, this shouldn't be baked into the runner, i.e. should not surfa=
+ce as dedicated
+> > > > command line options.  Users shouldn't need to modify the runner ju=
+st to bring
+> > > > their own configuration.  I also think configurations should be dis=
+coverable,
+> > > > e.g. not hardcoded like KUT's unittest.cfg.  A very real problem wi=
+th KUT's
+> > > > approach is that testing different combinations is frustratingly di=
+fficult,
+> > > > because running a testcase with different configuration requires mo=
+difying a file
+> > > > that is tracked by git.
+>=20
+> I was thinking of folks who send upstream patches, they might not have
+> interesting configurations to run to test. If we don't provide an option
+> then they might not be able to test different scenarios.
 
-Huh? That's going into host_debug_state, which is the dumping grounds
-for *host* context when entering a guest.
+Yeah, I'm not saying upstream can't provide testcases, just that the existe=
+nce of
+testcases shouldn't be hardcoded into the runner.
 
-Not sure why we'd stick a *guest* value in there...
+> I do agree command line option might not be a great choice here, we
+> should keep them granular.
+>=20
+> What if there is a shell script which has some runner commands with
+> different combinations? There should be a default configuration provided
+> to ease testing of patches for folks who might not be aware of the
+> configurations which maintainers generally use.
+>=20
+> End goal is to provide good confidence to the patch submitter that they h=
+ave
+> done good testing.
 
-> +			host_data_set_flag(HOST_STATE_SWAP_TRFCR);
-> +		} else
-> +			host_data_clear_flag(HOST_STATE_SWAP_TRFCR);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_set_trfcr);
+As discussed off-list, I think having one testcase per file is the way to g=
+o.
 
-I have a rather strong distaste for this interface, both with the
-coresight driver and internally with the hypervisor. It'd be better if
-the driver actually told KVM what the *intent* is rather than throwing a
-pile of bits over the fence and forcing KVM to interpret what that
-configuration means.
+  - Very discoverable (literally files)
+  - The user (or a shell script) can use regexes, globbing, etc., to select=
+ which
+    tests to run
+  - Creating "suites" is similarly easy, e.g. by having a list of files/tes=
+tscase,
+    or maybe by directory layout
 
-> +static void __debug_swap_trace(void)
-> +{
-> +	u64 trfcr = read_sysreg_el1(SYS_TRFCR);
-> +
-> +	write_sysreg_el1(*host_data_ptr(host_debug_state.trfcr_el1), SYS_TRFCR);
-> +	*host_data_ptr(host_debug_state.trfcr_el1) = trfcr;
-> +	host_data_set_flag(HOST_STATE_RESTORE_TRFCR);
-> +}
-> +
+Keeping track of testcases (and their content), e.g. to avoid duplicates, m=
+ight
+be an issue, but I think we can mitigate that by establishing and following
+guidelines for naming, e.g. so that the name of a testcase gives the user a
+decent idea of what it does.
 
-What if trace is disabled in the guest or in the host? Do we need to
-synchronize when transitioning from an enabled -> disabled state like we
-do today?
+> > > Could also use an environment variable to specify a file which contai=
+ns
+> > > a config in a test-specific format if parsing environment variables i=
+s
+> > > insufficient or awkward for configuring a test.
+> >=20
+> > There's no reason to use a environment variable for this.  If we want t=
+o support
+> > "advanced" setup via a test configuration, then that can simply go in c=
+onfiguration
+> > file that's passed to the runner.
+>=20
+> Can you guys specify What does this test configuration file/directory
+> will look like? Also, is it gonna be a one file for one test? This might
+> become ugly soon.
 
-I took a stab at this, completely untested of course && punts on
-protected mode. But this is _generally_ how I'd like to see everything
-fit together.
+As above, I like the idea of one file per testcase.  I'm not anticipating t=
+housands
+of tests.  Regardless of how we organize things, mentally keeping track of =
+that
+many tests would be extremely difficult.  E.g. testcases would likely bitro=
+t and/or
+we'd end up with a lot of overlap.  And if we do get anywhere near that num=
+ber of
+testcases, they'll need to be organzied in some way.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8bc0ec151684..b4714cece5f0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -611,7 +611,7 @@ struct cpu_sve_state {
-  */
- struct kvm_host_data {
- #define KVM_HOST_DATA_FLAG_HAS_SPE			0
--#define KVM_HOST_DATA_FLAG_HAS_TRBE			1
-+#define KVM_HOST_DATA_FLAG_HOST_TRBE_ENABLED		1
- #define KVM_HOST_DATA_FLAG_HOST_SVE_ENABLED		2
- #define KVM_HOST_DATA_FLAG_HOST_SME_ENABLED		3
- 	unsigned long flags;
-@@ -659,6 +659,9 @@ struct kvm_host_data {
- 		u64 mdcr_el2;
- 	} host_debug_state;
- 
-+	/* Guest trace filter value */
-+	u64 guest_trfcr_el1;
-+
- 	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
- 	unsigned int nr_event_counters;
- 
-@@ -1381,6 +1384,8 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
- void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u64 clr);
- bool kvm_set_pmuserenr(u64 val);
-+void kvm_enable_trbe(u64 guest_trfcr);
-+void kvm_disable_trbe(void);
- #else
- static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u64 clr) {}
-@@ -1388,6 +1393,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
- {
- 	return false;
- }
-+void kvm_enable_trbe(u64 guest_trfcr) {}
-+void kvm_disable_trbe(void) {}
- #endif
- 
- void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 46dbeabd6833..6ef8d8f4b452 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -72,10 +72,6 @@ void kvm_init_host_debug_data(void)
- 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
- 	    !(read_sysreg_s(SYS_PMBIDR_EL1) & PMBIDR_EL1_P))
- 		host_data_set_flag(HAS_SPE);
--
--	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
--	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
--		host_data_set_flag(HAS_TRBE);
- }
- 
- /*
-@@ -215,3 +211,27 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val)
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
- 	preempt_enable();
- }
-+
-+void kvm_enable_trbe(u64 guest_trfcr)
-+{
-+	if (WARN_ON_ONCE(preemptible()))
-+		return;
-+
-+	if (has_vhe()) {
-+		write_sysreg_s(guest_trfcr, SYS_TRFCR_EL12);
-+		return;
-+	}
-+
-+	*host_data_ptr(guest_trfcr_el1) = guest_trfcr;
-+	host_data_set_flag(HOST_TRBE_ENABLED);
-+}
-+EXPORT_SYMBOL_GPL(kvm_enable_trbe);
-+
-+void kvm_disable_trbe(void)
-+{
-+	if (has_vhe() || WARN_ON_ONCE(preemptible()))
-+		return;
-+
-+	host_data_clear_flag(HOST_TRBE_ENABLED);
-+}
-+EXPORT_SYMBOL_GPL(kvm_disable_trbe);
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 858bb38e273f..d36cbce75bee 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -51,32 +51,33 @@ static void __debug_restore_spe(u64 pmscr_el1)
- 	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
- }
- 
--static void __debug_save_trace(u64 *trfcr_el1)
-+static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
- {
--	*trfcr_el1 = 0;
-+	*saved_trfcr = read_sysreg_el1(SYS_TRFCR);
-+	write_sysreg_el1(new_trfcr, SYS_TRFCR);
- 
--	/* Check if the TRBE is enabled */
--	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
-+	/* Nothing left to do if going to an enabled state */
-+	if (new_trfcr)
- 		return;
-+
- 	/*
--	 * Prohibit trace generation while we are in guest.
--	 * Since access to TRFCR_EL1 is trapped, the guest can't
--	 * modify the filtering set by the host.
-+	 * Switching to a context with trace generation disabled. Drain the
-+	 * trace buffer to memory.
- 	 */
--	*trfcr_el1 = read_sysreg_el1(SYS_TRFCR);
--	write_sysreg_el1(0, SYS_TRFCR);
- 	isb();
--	/* Drain the trace buffer to memory */
- 	tsb_csync();
- }
- 
--static void __debug_restore_trace(u64 trfcr_el1)
-+static void __trace_switch_to_guest(void)
- {
--	if (!trfcr_el1)
--		return;
-+	__trace_do_switch(host_data_ptr(host_debug_state.trfcr_el1),
-+			  *host_data_ptr(guest_trfcr_el1));
-+}
- 
--	/* Restore trace filter controls */
--	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
-+static void __trace_switch_to_host(void)
-+{
-+	__trace_do_switch(host_data_ptr(guest_trfcr_el1),
-+			  *host_data_ptr(host_debug_state.trfcr_el1));
- }
- 
- void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
-@@ -84,9 +85,13 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 	/* Disable and flush SPE data generation */
- 	if (host_data_test_flag(HAS_SPE))
- 		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
--	/* Disable and flush Self-Hosted Trace generation */
--	if (host_data_test_flag(HAS_TRBE))
--		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
-+
-+	/*
-+	 * Switch the trace filter, potentially disabling and flushing trace
-+	 * data generation
-+	 */
-+	if (host_data_test_flag(HOST_TRBE_ENABLED))
-+		__trace_switch_to_guest();
- }
- 
- void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -98,8 +103,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	if (host_data_test_flag(HAS_SPE))
- 		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
--	if (host_data_test_flag(HAS_TRBE))
--		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
-+	if (host_data_test_flag(HOST_TRBE_ENABLED))
-+		__trace_switch_to_host();
- }
- 
- void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+One idea would be create a directory per KVM selftest, and then put testcas=
+es for
+that test in said directory.  We could even do something clever like fail t=
+he
+build if a test doesn't have a corresponding directory (and a default testc=
+ase?).
 
--- 
-Thanks,
-Oliver
+E.g. tools/testing/selftests/kvm/testcases, with sub-directories following =
+the
+tests themsleves and separated by architecture as appropriate.
+
+That us decent organization.  If each test has a testcase directory, it's e=
+asy to
+get a list of testcases.  At that point, the name of the testcase can be us=
+ed to
+organize and describe, e.g. by tying the name to the (most interesting) par=
+ameters.
+
+Hmm, and for collections of multiple testscases, what if we added a separat=
+e
+"testsuites" directory, with different syntax?  E.g. one file per testuite,=
+ which
+is basically a list of testcases.  Maybe with some magic to allow testsuite=
+s to
+"include" arch specific info?
+
+E.g. something like this
+
+$ tree test*
+testcases
+=E2=94=94=E2=94=80=E2=94=80 max_guest_memory_test
+    =E2=94=94=E2=94=80=E2=94=80 128gib.allvcpus.test
+testsuites
+=E2=94=94=E2=94=80=E2=94=80 mmu.suite
+
+3 directories, 2 files
+$ cat testsuites/mmu.suite=20
+$ARCH/mmu.suite
+max_guest_memory_test/128gib.allvcpus.test
+
+> This brings the question on how to handle the test execution when we are =
+using
+> different command line parameters for individual tests which need some
+> specific environmnet?
+>=20
+> Some parameters will need a very specific module or sysfs setting which
+> might conflict with other tests. This is why I had "test_suite" in my
+> json, which can provide some module, sysfs, or other host settings. But
+> this also added cost of duplicating tests for each/few suites.
+
+IMO, this should be handled by user, or their CI environment, not by the up=
+stream
+runner.  Reconfiguring module params or sysfs knobs is inherently environme=
+nt
+specific.  E.g. not all KVM module params are writable post-load, and so ch=
+anging
+a param might require stopping all VMs on the system, or even a full kernel=
+ reboot
+if KVM is built-in.  There may also be knobs that require root access, that=
+ are
+dependent on hardware and/or kernel config, etc.
+
+I really don't want to build all that into the upstream test runner, certai=
+nly not
+in the first few phases.  I 100% think the runner should be constructed in =
+such a
+way that people/organizations/CI pipeines can build infrastructure on top, =
+I just
+don't think it's a big need or a good fit for upstream.
+
+> I guess the shell script I talked about few paragraphs above, can have
+> some specific runner invocations which will set specific requirements of
+> the test and execute that specific test (RFC runner has the capabilty to =
+execute
+> specific test).
+>=20
+> Open to suggestions on a better approach.
