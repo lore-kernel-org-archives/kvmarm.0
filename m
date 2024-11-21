@@ -1,106 +1,98 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402FC1AE014
-	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 10:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1576F1CB9E1
+	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 11:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732183822; cv=none; b=cPM/NTdeAM8N6d2mwRlAie/PlSjPV1d22C10RFInFcOZjuTdGqn9oSZREFKE7z3WnLWF/bEyf2z1s0dBlllB07wCcNm1EOnOMW4n5zIhcy3MC+7Pe6dDmb66oPQe6OLvXps6tSDIZpmFwwYEn8bcCwlwKGUwLitn/XjH9ovJzPM=
+	t=1732186885; cv=none; b=HosBksCFh8yKF/iOMjFidSfuR9lPuqW75bsty+iC/kCQvwtwLmhZ9/DEDTKbOA6JN5nL7uBARz6OZ+U+bMJUT7W8nfH+Wn5JSn5hGkfCMtdOYG8aWxXj/AC7cLj98tGH/P1pdCgy+A/boCth8W+OQm3AdX+Zih5nsOSLlVStQYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732183822; c=relaxed/simple;
-	bh=rZ9VUFjNND5aBHSZhd6MTMonAu2meqWgJJciHOCMegI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQsOC9+VnF/4xyilvuSewnq3uJCvDhW1dfbZHacXRophykra+BFBfaAdnFw2NG33f9xVzZT/AqpZXDfw+on9HAlCYf4PxaR7X2x/j5VGe/gbkN2PnTSQjskY/hoA3IldjnjCjN6v1PuwwrPfoQtc9U96O/iitigLm6nI3DyJwSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k9+naLJo; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1732186885; c=relaxed/simple;
+	bh=tOuK6PhBFR67sFxNosi3HgKlYBFKqlwSZe2KlQVufCU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N1GqGTZxKiYKyU84PbahiUMGYa7IabM12Q9IxjS4K4VSzif86g4DYpD9F6tUzRJGhLyDB1SCBSFVTxa41MC2eNfLQ7rQIfGDpVPm2E+W+qRnhJZRRc1wdc33uVBi3XV33IgIbWVrDtAaWiX8QXg6+g7tVvJcmWO/86TGQMffSoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ekNH+aE/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k9+naLJo"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539fb49c64aso1106034e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 02:10:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732183819; x=1732788619; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RS5Hs2w0z8GYAD0nMVEYMTgAAwiFwMjKEdDralf7cns=;
-        b=k9+naLJovTRKGIFM23LfmWFD/E7dWdnucWyVvfubUy0bgq0W7vdJAg9vtAiYp1EVig
-         eC/4dqHL9gRM8S5h2XihZzTIQAByDMYchmEihKWC6CeKnemwMqeSqyX5cxkIUfcjxqXo
-         RhkGFYqBnKXsFcYDVPL4uSizGdT3f8P8zKZi4TUHfgtoHtlm87L0vgvR2hxj4nxksPHm
-         sxt+MG5Odsf5wH15sxPNpiOQvmqNd+ACP9pCh6URcz2EVm2qa5uwGa4iaN3roaYfEKBH
-         s6gUq8dd6vGGDQkv71sb56+88wmqOJnLxAIYwHPuA/CkGGL7ILmmHeq126O56IVgg/QQ
-         bQTQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekNH+aE/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732186883;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tOuK6PhBFR67sFxNosi3HgKlYBFKqlwSZe2KlQVufCU=;
+	b=ekNH+aE/1og2DFbn5s82bHazEnYTO8RErtEC2YxKjMvBu4XhM9JjXep3xNFj9NkH4tXwHx
+	B1G9ESwVXo77P+7roAKcYvwQsgLImuSACFzrZ5c4zFzYTUyCYuxvh36dNxVHKVcMcnsPxN
+	+qYYYo+MjnNfFqZPcHSn2idzkwa5grw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-fD9BEiNYMWabDjrwnVGw6A-1; Thu, 21 Nov 2024 06:01:21 -0500
+X-MC-Unique: fD9BEiNYMWabDjrwnVGw6A-1
+X-Mimecast-MFC-AGG-ID: fD9BEiNYMWabDjrwnVGw6A
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4314f023f55so5142265e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 03:01:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732183819; x=1732788619;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RS5Hs2w0z8GYAD0nMVEYMTgAAwiFwMjKEdDralf7cns=;
-        b=ZABdCX0QFfjOUOqJcdc3HzCIj5xXR69TLSWCxJVMGIWx/WpEzoARJCUtU5iaKVKRI9
-         nrArjynB0Sr9XcasN8W+6nW7BIIikOA0fhs48I2cGyOolWtb9ZRsSz6S9Zu56rlMeNwj
-         sh8JlAKJPFTO9StRM/kRkmMTzaMFRR2EiVEk4O7WUabSnH3B1TrlGI6aIT4LsKJysC95
-         RASSnKEDHnC1ZOWeyOrLPzoBVMjQhi4urK0ftZqSFZ6ppcZ359EkPVl4KTew/6KXJjQ8
-         N0yJ7XHOYlF1VEulIEoixJJEIpZwjRHFKfoB2CL7VR8aQO9xD+RSxV1GSUEcaiK5s9Sg
-         y8Fg==
-X-Gm-Message-State: AOJu0YxZejr5QHag3jnMSmxJyJML0zs0NsSHkqJ3y02e7K8jnyGohSFj
-	pbP9jGWTIEW4l9Bo0vxP4gU82JdS9SnWBO5nrApSgSKRKznIeUvy5wEmBDvabA==
-X-Google-Smtp-Source: AGHT+IHkiSNPA+QGDLKCuSwgtQUmmyBPeJbea/alPoOjAHHscS7MrZ/jLyvmJqypRsXk+rlet92klg==
-X-Received: by 2002:a05:6512:2209:b0:53b:1fd1:df34 with SMTP id 2adb3069b0e04-53dc1363785mr5058086e87.45.1732183818934;
-        Thu, 21 Nov 2024 02:10:18 -0800 (PST)
-Received: from google.com (40.162.204.35.bc.googleusercontent.com. [35.204.162.40])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa4f42d49c4sm63280866b.123.2024.11.21.02.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 02:10:18 -0800 (PST)
-Date: Thu, 21 Nov 2024 10:10:15 +0000
-From: Quentin Perret <qperret@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
-Subject: Re: [PATCH v1 10/12] KVM: arm64: Calculate cptr_el2 traps on
- activating traps
-Message-ID: <Zz8HB8KQtUyj8d9O@google.com>
-References: <20241120105254.2842020-1-tabba@google.com>
- <20241120105254.2842020-11-tabba@google.com>
- <Zz7wBU3BHW-XNnbr@google.com>
- <CA+EHjTyGzjOnVnyqfS6LO5=_EhQY3CS18HyrnSmnfNF483yz6w@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1732186880; x=1732791680;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tOuK6PhBFR67sFxNosi3HgKlYBFKqlwSZe2KlQVufCU=;
+        b=mw0LerOKv1hd+SJn4ZXw+gyXEkOgAmyvCYuqY0DS2vVZzhUd0ZFKBzpWe6Kl132ZSW
+         goqOMujTNE362Gdg/2wV3/U/aEgJh2CcxEk75UaX2ZOSWTbyRnueu3+1Rf/dKyRvsnum
+         aEjqmSg2a4IFTYZZsMtwgh4Y4Oeq0DVnX2cjNIPYWEFJHxzp9Q0wOLnLUZb/0hGb2ljY
+         RF+jQNMEBjcnuP0PKTxQ55v004ZJS4d32nTmLowKhuxizB2LG/8yFT80sIngZvUyIyre
+         QQd6wBAxRuOfleoRzK/trX/pJnkufEwsjwsv+ezybYwPRgGoJAazCXswIRwEvdLMryuP
+         4qjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUc/J3JhhgWv1Eoq9ejb4Ltb0N8mzO22TQ/9Dz3zzARKPu9RuDKfGQCZIi7vmbMtcVAg2b0bPo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxGpFnPl1ouEa2rhyRZ+MZXbCgWRo4JDu/fiITRPkhAzMG1DVro
+	I6a8K2Dps/igBrN6PiUCx/6kOZNQ88RPEGHbphzrKK8nf9r3KjPhHqtI8h5lx5bsN8CMmz8PQKj
+	z7TGY947bg3sKJx4McWr6/J8pzO2qFGG8EM0J5PpxGUSlr7/qmB83amZVNqCSALYBdTwZwr+ony
+	skBjANJkPS+qky4jBGii1IGAJaek73
+X-Gm-Gg: ASbGnctbsny+U4yWb30shDlyf76DfTWlvzJb2P4IFTK7SZSeSfLrHVcGzng0CSt/eUs
+	Me2zj9RTMjtjg4+HnnRtTh7WaeyeYXlI=
+X-Received: by 2002:a5d:59a6:0:b0:382:4fa4:e539 with SMTP id ffacd0b85a97d-38254ade561mr5527276f8f.2.1732186880492;
+        Thu, 21 Nov 2024 03:01:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHPsNju8DqEAsbUoBlH5FG7SPCdj1FPMazPqm9+bABcWR+xzSkUZWtpG5IoVakcOu1MFrAUc96srC1chIe7PMs=
+X-Received: by 2002:a5d:59a6:0:b0:382:4fa4:e539 with SMTP id
+ ffacd0b85a97d-38254ade561mr5527245f8f.2.1732186880092; Thu, 21 Nov 2024
+ 03:01:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTyGzjOnVnyqfS6LO5=_EhQY3CS18HyrnSmnfNF483yz6w@mail.gmail.com>
+References: <Zz7vLEbLFXuRSPeo@linux.dev>
+In-Reply-To: <Zz7vLEbLFXuRSPeo@linux.dev>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 21 Nov 2024 12:01:08 +0100
+Message-ID: <CABgObfb+P7xaLqiPBzshMQTfSRg8B7LSYswzipNTk6bzWkbuXA@mail.gmail.com>
+Subject: Re: [GIT PULL] First batch of KVM/arm64 fixes for 6.13
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Anup Patel <anup@brainfault.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: FcYrBmwyTxReVH5a9USybZvz3wSnjPaMsImqIGtGK40_1732186880
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thursday 21 Nov 2024 at 09:41:46 (+0000), Fuad Tabba wrote:
-> Hi Quentin,
-> 
-> On Thu, 21 Nov 2024 at 08:32, Quentin Perret <qperret@google.com> wrote:
-> >
-> > Hi Fuad,
-> >
-> > On Wednesday 20 Nov 2024 at 10:52:52 (+0000), Fuad Tabba wrote:
-> > > -static void pvm_init_traps_cptr(struct kvm_vcpu *vcpu)
-> > > -{
-> > > -     struct kvm *kvm = vcpu->kvm;
-> > > -     u64 val = vcpu->arch.cptr_el2;
-> > > -
-> > > -     if (!has_hvhe()) {
-> > > -             val |= CPTR_NVHE_EL2_RES1;
-> > > -             val &= ~(CPTR_NVHE_EL2_RES0);
-> > > -     }
-> >
-> > To be on the safe side, should keep the RES1 stuff for nVHE?
-> 
-> Sure. My thinking in removing this is that, once consolidated, it
-> would be easy to spot whether we could be clearing the wrong bit. But
-> I could reintroduce this when I respin.
+On Thu, Nov 21, 2024 at 9:28=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Paolo,
+>
+> Had a surprising amount of fixes turn up over the past few days so it is
+> probably best to send the first batch your way. The LPI invalidation and
+> compilation fix are particularly concerning, rest of the details found in
+> the tag.
 
-Actually, my bad, while checking how this worked for nVHE prior to your
-patch I've realised kvm_get_reset_cptr_el2() was already setting those
-bits correctly, which is arguably the right place to do it.
+Sure. Anup, if your second PR is ready please send it already.
 
-Thanks,
-Quentin
+Paolo
+
