@@ -1,101 +1,106 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7231BE84B
-	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 09:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402FC1AE014
+	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 10:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732182148; cv=none; b=IqmksAnnqd329TZEReFqB3sh7THWZyBAk7XLvKqQ3KkaKLrWWqs/DYR0rVuuhw+LFa+to6szDDgDQtXgc39x0Q+hNtBpgLyrQByTPYHr+czfJUqJX2sWBaMyWb2UskDU1IyEjBT8KrF6TkTJAEASdd6g1Lty+oW7OLgqiyqfOoA=
+	t=1732183822; cv=none; b=cPM/NTdeAM8N6d2mwRlAie/PlSjPV1d22C10RFInFcOZjuTdGqn9oSZREFKE7z3WnLWF/bEyf2z1s0dBlllB07wCcNm1EOnOMW4n5zIhcy3MC+7Pe6dDmb66oPQe6OLvXps6tSDIZpmFwwYEn8bcCwlwKGUwLitn/XjH9ovJzPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732182148; c=relaxed/simple;
-	bh=rzBEZf/k85AJWre+PG3JbyGG1C6M67qkOpZieb88lAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WhKdCWIIILaC3Le/PQIWyh7ssztVgmyt+ixKw9MmUntEZ//xVs9cq2a1q5dEt6pM0MWaw3fISJr5DCG7eXdmvFOoA+kyUTXnAyDa1sTweLtYy5dRs48gnOtbJb7yRRMUhggf0b6J5tY/5NxnH5XfxSU6MQYSjnAUoGaK8JA/q+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o6o8cS/T; arc=none smtp.client-ip=209.85.160.176
+	s=arc-20240116; t=1732183822; c=relaxed/simple;
+	bh=rZ9VUFjNND5aBHSZhd6MTMonAu2meqWgJJciHOCMegI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DQsOC9+VnF/4xyilvuSewnq3uJCvDhW1dfbZHacXRophykra+BFBfaAdnFw2NG33f9xVzZT/AqpZXDfw+on9HAlCYf4PxaR7X2x/j5VGe/gbkN2PnTSQjskY/hoA3IldjnjCjN6v1PuwwrPfoQtc9U96O/iitigLm6nI3DyJwSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k9+naLJo; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o6o8cS/T"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-460a8d1a9b7so163241cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 01:42:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k9+naLJo"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539fb49c64aso1106034e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 02:10:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732182145; x=1732786945; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rP8Da8s2wnevMi29j7d8+2oFJbj2lRWCCDSZ4S6BMjE=;
-        b=o6o8cS/To0k7xaOdOmbwpRrn3S4LvomFN8eskaNQWmxaZqBtpkhjrulC/M9vZTEKkn
-         iIO4BNbFpn5rHY7mnK25oKipaLUDb2AYbypJJblSgq7Spj7fIXpOHExa51+caeVZY7C5
-         r3IvC6yPsYsIwgLL9resMz1t0wzDvzQqNGfoapzIhKoMbkKlmMXhLPHLqtqVzdETPT3q
-         95fPn7f2dSH63F+2ACNoh5iFKTYdr/LSKN/nFbn4lP+y9Le8ikUrGtKgD8P49MnlDESb
-         ga6ukClVku8AuU/+JypG2rbwIhSh0zMA6tuIAgxed1lBX6KR6Q7fiz+ooe6kzPO62dKd
-         tFIg==
+        d=google.com; s=20230601; t=1732183819; x=1732788619; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RS5Hs2w0z8GYAD0nMVEYMTgAAwiFwMjKEdDralf7cns=;
+        b=k9+naLJovTRKGIFM23LfmWFD/E7dWdnucWyVvfubUy0bgq0W7vdJAg9vtAiYp1EVig
+         eC/4dqHL9gRM8S5h2XihZzTIQAByDMYchmEihKWC6CeKnemwMqeSqyX5cxkIUfcjxqXo
+         RhkGFYqBnKXsFcYDVPL4uSizGdT3f8P8zKZi4TUHfgtoHtlm87L0vgvR2hxj4nxksPHm
+         sxt+MG5Odsf5wH15sxPNpiOQvmqNd+ACP9pCh6URcz2EVm2qa5uwGa4iaN3roaYfEKBH
+         s6gUq8dd6vGGDQkv71sb56+88wmqOJnLxAIYwHPuA/CkGGL7ILmmHeq126O56IVgg/QQ
+         bQTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732182145; x=1732786945;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rP8Da8s2wnevMi29j7d8+2oFJbj2lRWCCDSZ4S6BMjE=;
-        b=XPstboo9SyL7m3Ib6XKRhVlkjVcacAUC68jQCZs1300KcrrI+0SXbLytJVnJl8fwwz
-         +M/rFIhZOYweWOiczbfWXvJzrP2VFqb1sTdiNfaKqspokyzi8O40AIjGsJVFcL5ZjDR3
-         KbuRPE4/jKqxXhVnB1VMTR62t8ZCkEuEPyHW0cA9GASZ+W6LZoMIVcL30YHwgRjQd9TV
-         wrxk+JKi6fJHhd1+5bOWNxS0LzocxjjQ+TDu6v7XBxMvFM89Juw0IyThQ93cdtFS6VMP
-         XBdug6qpLHthziz3falctJB8J8gNTSh6O2mEsDVNWD1R0dBmP3FShixT+I5QTw6SZMJS
-         F9/Q==
-X-Gm-Message-State: AOJu0YyzsLS4uoeNI+r5BfYWzErOfYVpIIPJcfZ6fi8dQ1JskaH3I95r
-	9bNRR9+kGsVmlTnRNrzD1Ot0FP/RU16k8lOi0fMMtxYj3OGtztYade6Qm6otidZUvLm887cCd9I
-	G/5vl3jLuiUDGZN9qlzF37kAEhFF8pfLnH5ol
-X-Gm-Gg: ASbGncsqYberK09EtU5/PAb1yumxOliipH7WHPQ/WMHs/BL1oEIHB//eeN9/SdO2dDO
-	pI8+y9nOp0kXfGCKLbkk/F5NuuGOznmDtEWufxg41lH49SodjgvyTDa5Nzy68
-X-Google-Smtp-Source: AGHT+IFz6PCHpbrIIj+vbX5fqVx29xCyDAikIqlQtMrrnG5d6xsAZ47MPsinRyCZ06YWTiincJIRrcrRSIzCHKH7CHI=
-X-Received: by 2002:ac8:5989:0:b0:461:6e0a:6a27 with SMTP id
- d75a77b69052e-465300d14cfmr2591491cf.20.1732182144485; Thu, 21 Nov 2024
- 01:42:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732183819; x=1732788619;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RS5Hs2w0z8GYAD0nMVEYMTgAAwiFwMjKEdDralf7cns=;
+        b=ZABdCX0QFfjOUOqJcdc3HzCIj5xXR69TLSWCxJVMGIWx/WpEzoARJCUtU5iaKVKRI9
+         nrArjynB0Sr9XcasN8W+6nW7BIIikOA0fhs48I2cGyOolWtb9ZRsSz6S9Zu56rlMeNwj
+         sh8JlAKJPFTO9StRM/kRkmMTzaMFRR2EiVEk4O7WUabSnH3B1TrlGI6aIT4LsKJysC95
+         RASSnKEDHnC1ZOWeyOrLPzoBVMjQhi4urK0ftZqSFZ6ppcZ359EkPVl4KTew/6KXJjQ8
+         N0yJ7XHOYlF1VEulIEoixJJEIpZwjRHFKfoB2CL7VR8aQO9xD+RSxV1GSUEcaiK5s9Sg
+         y8Fg==
+X-Gm-Message-State: AOJu0YxZejr5QHag3jnMSmxJyJML0zs0NsSHkqJ3y02e7K8jnyGohSFj
+	pbP9jGWTIEW4l9Bo0vxP4gU82JdS9SnWBO5nrApSgSKRKznIeUvy5wEmBDvabA==
+X-Google-Smtp-Source: AGHT+IHkiSNPA+QGDLKCuSwgtQUmmyBPeJbea/alPoOjAHHscS7MrZ/jLyvmJqypRsXk+rlet92klg==
+X-Received: by 2002:a05:6512:2209:b0:53b:1fd1:df34 with SMTP id 2adb3069b0e04-53dc1363785mr5058086e87.45.1732183818934;
+        Thu, 21 Nov 2024 02:10:18 -0800 (PST)
+Received: from google.com (40.162.204.35.bc.googleusercontent.com. [35.204.162.40])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa4f42d49c4sm63280866b.123.2024.11.21.02.10.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 02:10:18 -0800 (PST)
+Date: Thu, 21 Nov 2024 10:10:15 +0000
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
+Subject: Re: [PATCH v1 10/12] KVM: arm64: Calculate cptr_el2 traps on
+ activating traps
+Message-ID: <Zz8HB8KQtUyj8d9O@google.com>
+References: <20241120105254.2842020-1-tabba@google.com>
+ <20241120105254.2842020-11-tabba@google.com>
+ <Zz7wBU3BHW-XNnbr@google.com>
+ <CA+EHjTyGzjOnVnyqfS6LO5=_EhQY3CS18HyrnSmnfNF483yz6w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241120105254.2842020-1-tabba@google.com> <20241120105254.2842020-11-tabba@google.com>
- <Zz7wBU3BHW-XNnbr@google.com>
-In-Reply-To: <Zz7wBU3BHW-XNnbr@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 21 Nov 2024 09:41:46 +0000
-Message-ID: <CA+EHjTyGzjOnVnyqfS6LO5=_EhQY3CS18HyrnSmnfNF483yz6w@mail.gmail.com>
-Subject: Re: [PATCH v1 10/12] KVM: arm64: Calculate cptr_el2 traps on
- activating traps
-To: Quentin Perret <qperret@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTyGzjOnVnyqfS6LO5=_EhQY3CS18HyrnSmnfNF483yz6w@mail.gmail.com>
 
-Hi Quentin,
+On Thursday 21 Nov 2024 at 09:41:46 (+0000), Fuad Tabba wrote:
+> Hi Quentin,
+> 
+> On Thu, 21 Nov 2024 at 08:32, Quentin Perret <qperret@google.com> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Wednesday 20 Nov 2024 at 10:52:52 (+0000), Fuad Tabba wrote:
+> > > -static void pvm_init_traps_cptr(struct kvm_vcpu *vcpu)
+> > > -{
+> > > -     struct kvm *kvm = vcpu->kvm;
+> > > -     u64 val = vcpu->arch.cptr_el2;
+> > > -
+> > > -     if (!has_hvhe()) {
+> > > -             val |= CPTR_NVHE_EL2_RES1;
+> > > -             val &= ~(CPTR_NVHE_EL2_RES0);
+> > > -     }
+> >
+> > To be on the safe side, should keep the RES1 stuff for nVHE?
+> 
+> Sure. My thinking in removing this is that, once consolidated, it
+> would be easy to spot whether we could be clearing the wrong bit. But
+> I could reintroduce this when I respin.
 
-On Thu, 21 Nov 2024 at 08:32, Quentin Perret <qperret@google.com> wrote:
->
-> Hi Fuad,
->
-> On Wednesday 20 Nov 2024 at 10:52:52 (+0000), Fuad Tabba wrote:
-> > -static void pvm_init_traps_cptr(struct kvm_vcpu *vcpu)
-> > -{
-> > -     struct kvm *kvm = vcpu->kvm;
-> > -     u64 val = vcpu->arch.cptr_el2;
-> > -
-> > -     if (!has_hvhe()) {
-> > -             val |= CPTR_NVHE_EL2_RES1;
-> > -             val &= ~(CPTR_NVHE_EL2_RES0);
-> > -     }
->
-> To be on the safe side, should keep the RES1 stuff for nVHE?
+Actually, my bad, while checking how this worked for nVHE prior to your
+patch I've realised kvm_get_reset_cptr_el2() was already setting those
+bits correctly, which is arguably the right place to do it.
 
-Sure. My thinking in removing this is that, once consolidated, it
-would be easy to spot whether we could be clearing the wrong bit. But
-I could reintroduce this when I respin.
-
-Thanks!
-/fuad
-
-> Thanks,
-> Quentin
+Thanks,
+Quentin
