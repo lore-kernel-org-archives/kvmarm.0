@@ -1,248 +1,225 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021120.outbound.protection.outlook.com [52.101.62.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD23361FCE
-	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 00:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732148960; cv=none; b=TOzKEaO9Ggze/6fuyv3CMIxEi1Ac2hfWpuJQfC4bPe9DNeCIWg9NWg2mfDOs5nbPpl3lyFgj/VuNh14v8rSNDhjbvazf/8Pt82Aar1VHQNxJwDhOFHeFF0uLYSOpLs5+jpn7cCwVEEhzGhn1C0DdDvQS1TGFQctJWcNn9JojrwM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732148960; c=relaxed/simple;
-	bh=FWiIcYFpfnIOckfKm46vnv7yodm9kc7vmZ3xSFEEu2A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H5bUi4yiBZutswtmdkyjfKX+oynAvAYJ8u/OWshxxb2JTGRnSkrBeidCXwVmCV0zO+DQsAfVaPTnNjSRCAwKfDVLjubZXUEc0hmLM8sFDZDpzrP0cV1EwnG8UbIkjBwsZp92/XQiiAeEAarjQoJ5tzrv2LyR3L1DIs0rHfQFjTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u1vdqNG/; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1501C9EBB
+	for <kvmarm@lists.linux.dev>; Thu, 21 Nov 2024 08:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.120
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732176683; cv=fail; b=QA7vpug2PnvmUZU2B0sye8vR574KF6seDyN3vwS488pqlfFzq0O3shG1v+Z/EKFYLYeQnSoMzyy9oA8azwEr6rqpaDgCaWx0RzkMQHaaKxfV06nBLl7t+MBehc3YzTaPET4AVL8PuNaU7Ne9cF8ajrs4Ie//X19Aw9Q3h23zDN8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732176683; c=relaxed/simple;
+	bh=E1DkzalBTOzROh2W2SvrGe8QA9WdqGaWd+74IZEkt10=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=MZMjK6HQveH66LtLMHBmlfZLptjUg4srfvGji3c+Ia7AfvWSRwubvKipEn0zk3PAoMwOnyTGbMSF5xW28bDIP+eBLS8iaj0VBNtChH7dpJA5Zwmsts19V+r2t14JhSRBV3yFVz+EJP/ryNT/7i1W/ek3ImpSDiB9oYcVV2s2MC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=vqUR5aw8; arc=fail smtp.client-ip=52.101.62.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u1vdqNG/"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-20d15285c87so2909915ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 20 Nov 2024 16:29:18 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="vqUR5aw8"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=so6szRFrEODvieTSLz+kId2s2+HZslfWs3VWRnqj7u3Yi2vvlJ3ca7r3Di8h5QiCBvXz+gBwDyIK80abP+0r4Iy5yTk4qbNb1Qs8IRJ94FqlUQ4JobQaay6cyUG5RYNOZd3K9IdMDNcD2znnGpwk8VRQlQ8/nBOkKQPYa798Mjah4h6exuLZ0Cl2eklxaSZW3wnJqLQFuq/Oy2gs1em+JkppowMQVOhpiuFNZDvKlLHorNrfsrqAElXN3N1k9whodzgIXmUePIVvJu3amkcix/Hg91bo6kp47Pps2BpXQOdNr2ea7ZtnYFVrt8fRet0Pmx0WxhhVetXbly/T8R6tGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3t/+UQflSFs8dsgctIV0+OLRz3ub8mvxR7E2UsdQW+E=;
+ b=hcHtUZURAlMXeOETGagQphpREzcJSBh/oOLHaP8xlTI7ojWP0YrlAYjMli//lXHuD47cP/qImv2//IrZJuGSTc22LLCndxNef8mLvyPXcROot24JbuD7+HCOncNkWmj15Fqil75Wwdww3vkbKtEgAPAJGIrv43wUrm6v4Lbob63/TFxYoAnz0UrPQ87dG7OizlAtPo+Fj+TMQycKNj/jvJPju+i5jQjnZXHI6mdmfir22TypR7MNcsXwx99Z7PqfH6GkWgjfRzabI12qGbdVqUcQU15SI3bEzw/qH9z6ACWta4FuaFfv5B6QLphoeyWtcUNvt14VY/NIIhidakOLVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732148958; x=1732753758; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yaq4pkjzDY4CwQXdUFb+TCwYFBRLtW6PERcuUhVZR0I=;
-        b=u1vdqNG/ef5LrDIF5yHcFN9s5TJjQLwDTwH7cPl0z/xJDuMG9cM812dCpk/iXtGqu2
-         38ciLX96DW4R/B//t85ytdUYATVfjlFKHpG1HVhDYOj3CwnJsgLRdMBT7BnWn4xy2Nna
-         KUeusJ/BCrdtJGS1uRsbC2KWaGZmuLogoyrlygsvGQ/9/VlwRTfBCX7yEWjY/T6FuTNC
-         SedAGwbPagdvt8wXgOtyS0uaqzEVXYs5X0gssu3uE7oUD35SijMn3vndq0lzMJj7UtdS
-         iQy9WGmrvR6scxvDne4vwsy+iF0u64IbozWPdKQyv39MUZI7cPp5UHh5c+JCcTfmWRTG
-         MeRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732148958; x=1732753758;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yaq4pkjzDY4CwQXdUFb+TCwYFBRLtW6PERcuUhVZR0I=;
-        b=KulgV9cgeNvZSuGuFn0KNgXu0L2+RVY4AY19JfMp7N0EGHl6wx1w1M5+bAElyOVqxS
-         iu2FfyCa116ezvKb7eGXsLFN5qLA3mkw1vCBW0OEKs+jKdSBQGviAPswoueRLE1c/DtL
-         v3+Mhv1j0vCX8QpFvk8d7DsH2RE3cYCfPc0chiXWBSniA4Jb2XLUCuQ2OxsL4C0eusYA
-         MnVvMrwgilRyU/cts8w5btfq57KytmE6xr+21DAwEialNqto6ITII8008Rl5R6tFkcQC
-         vsVwEOxWASeUFZFVNYjT4esofqmeNQxmFeAZWVhXZQToswJJ5yWR/k/A8gUS4hgn8QbV
-         25vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9UutNzhrp0SU1wO731eyphqIMUHNKoQPhum+Lbyy1LgX7mtQZlfuz+d9CbPj+a/MfhEHBcAw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyDg3XjneDqUyA/VG9lY8vNAE5HNsPQnR3UutZvZZB1xF4vu9At
-	gYJxBRvG7Et73tlxL0vRlz58Sb0nSGZegmkRVZIWzrYegX7iSaJx+HYjaJ2gPEWP+KYzmhMZMcG
-	6Dg==
-X-Google-Smtp-Source: AGHT+IEo3SsZK3GD4ZcR6dZRBQukGq0A2fKygifFSwayRaQbB5hqp/jWvkHnbijR91Fktwts9Qc8xXjY/nM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a17:902:facb:b0:20b:b7b2:b6ef with SMTP id
- d9443c01a7336-2126a342d20mr18935ad.4.1732148957811; Wed, 20 Nov 2024 16:29:17
- -0800 (PST)
-Date: Wed, 20 Nov 2024 16:29:16 -0800
-In-Reply-To: <20241115211523.GB599524.vipinsh@google.com>
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3t/+UQflSFs8dsgctIV0+OLRz3ub8mvxR7E2UsdQW+E=;
+ b=vqUR5aw89wryCXi5xjQwdGWGV4OvNlBYmQzyAiOaVl/nVGcYf2VQgiapUzw/Va0/nJaB3Hj0W8tu//+V9ku1Z1ogDA1MA5lWVBJ5O5fPrqg1WQXtjlhyYr5pSMkgzQjY4qpVO/E/na2j/SdBxZZiR53XytqX4QdPXfBj5stK5f0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ BY3PR01MB6612.prod.exchangelabs.com (2603:10b6:a03:355::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8182.14; Thu, 21 Nov 2024 08:11:08 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9%4]) with mapi id 15.20.8182.011; Thu, 21 Nov 2024
+ 08:11:08 +0000
+Message-ID: <46bea470-3a3b-4dcc-b4a8-a74830c66774@os.amperecomputing.com>
+Date: Thu, 21 Nov 2024 13:41:00 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table
+ handling
+To: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ James Morse <james.morse@arm.com>, Joey Gouly <joey.gouly@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20240614144552.2773592-1-maz@kernel.org>
+ <171878647493.242213.9111337124987897859.b4-ty@linux.dev>
+Content-Language: en-US
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <171878647493.242213.9111337124987897859.b4-ty@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2P153CA0011.APCP153.PROD.OUTLOOK.COM (2603:1096::21) To
+ SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240821223012.3757828-1-vipinsh@google.com> <CAHVum0eSxCTAme8=oV9a=cVaJ9Jzu3-W-3vgbubVZ2qAWVjfJA@mail.gmail.com>
- <CAHVum0fWJW7V5ijtPcXQAtPSdoQSKjzYwMJ-XCRH2_sKs=Kg7g@mail.gmail.com>
- <ZyuiH_CVQqJUoSB-@google.com> <20241108-eaacad12f1eef31481cf0c6c@orel>
- <ZzY2iAqNfeiiIGys@google.com> <20241115211523.GB599524.vipinsh@google.com>
-Message-ID: <Zz5-3A36cckhYu9K@google.com>
-Subject: Re: [RFC PATCH 0/1] KVM selftests runner for running more than just default
-From: Sean Christopherson <seanjc@google.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Anup Patel <anup@brainfault.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|BY3PR01MB6612:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0836897-e8a6-485d-e32d-08dd0a040d84
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?a0JYaW10TEt5amlQUTZLTXZyMk9KUlkwaDBLMDFKajVwOHdjUkZFS2dmSDlZ?=
+ =?utf-8?B?bVNmSDQzc3VGcHdrdjNsMEpIZlZKS3dIcVdiU3F5enJ5clVkektrYkRPZWVG?=
+ =?utf-8?B?VjB2K3c3RGlJejhESGNBMUMxSDFRUDYvcjhCSW9KOER1bXU4UWhtOURzcDQ3?=
+ =?utf-8?B?U1ZKblNJOStSVlJaWVpGZzVQYjFvaHk4OVF1emQ1amF3d05ONkNJRTEra081?=
+ =?utf-8?B?ZFp2TS9xNW9UdXZ0aTJ2TUZMSjZCamJOaVBIek1TYXdSMzhCdW9pblBkdWRn?=
+ =?utf-8?B?Mjd3VEprVDJPbC81TjRFRTdlakJrMkZHeUhCSlBGQTlYTGdtdWdHTFpzcWJ6?=
+ =?utf-8?B?Sk9xQnZuRnJ0N1RZbkdUL1BqakVxS0JsNys3YzMzRGg5VkdHRlVMdG1aQ1or?=
+ =?utf-8?B?WWJOOGRHNXFkb29XYUVWMG5lTzB1bXZwYmVRYjdUQXVHa241ZnFpb3NRbVVy?=
+ =?utf-8?B?SmdmeFdWcCs0c2sraWpoc1ZNUWN3a0d1OUhGN21pYU8yQ01qZDQ0VjRyRTM2?=
+ =?utf-8?B?YXlqTUpvNHRmN1pxL0tDOGRwbHhoZmNyaU1UTkl0c0sxanRibVdRZy9xV1hm?=
+ =?utf-8?B?QWIxb09sMGQ5QVIvSmlIbVNNK0NWVE42Z2JLVXdtQzlnWGphandqZjZtN2RC?=
+ =?utf-8?B?SjdubUFOdnY2dGRzZzlNdytSaE81TEJNcUpJYUQ4Uy9WMkZ6K1E1UHFmZEk3?=
+ =?utf-8?B?Q0QyZUt6S3RhSHVDZEErQlFubVdkOTg1OVVWc1NEdVU3SFo2VWtBMjd0TFJk?=
+ =?utf-8?B?bnRRb3h5MVFYekpEREpVQ01SRzdaSXdUVEY2cHdDRXc1Y2NnT2FpUEgzRnZO?=
+ =?utf-8?B?K1NIVHlQaHZsM2Q5NGRoNk5sQko2eU9JS2FhUFc1MUFrcDdmWUxNVTdQR1BP?=
+ =?utf-8?B?bDB4ZHRCWWl4K2Q2N1RhOTdnUWhkSXVSUFVFZU15SEsySlBHYk4vM1pvU1lQ?=
+ =?utf-8?B?YnlYTXNiT0ZkdGsvUzQvaVkvckltaTY3SndSekJIQW9FN0tESjkzN3V2QzdU?=
+ =?utf-8?B?WHduK1EydlZMUHVxZGtkQldxemNIakpjY1FaNnhyS1Y3eHB0ei9wOWtjNlRt?=
+ =?utf-8?B?L0orSDN2S1RXczJtNi9kNkJtUUY2UjExemNmUE9TQlVWMnF2ejV3WDJNZTAv?=
+ =?utf-8?B?Qmg4Ukg0YmdWM0F2T0FIUGRaYXZuV0U5aWU5T0tIc1FEOVFZa2Q1VjdsY2dr?=
+ =?utf-8?B?NWVYbEJ1VWZWL2xId0lVZE5QZ2ovWktGcEQyWCtrNHNMTkxOVUJxcWJtSVdR?=
+ =?utf-8?B?WXRPcmVzdGFhakI0MVlIYWtqb2pYSmtXUVRieFhCaEFLOHJHSG5CYS9uMTZD?=
+ =?utf-8?B?UUxnYUVTZkpOR2tGa0J2WHRzT2pZS2tSV01TT1JKWWJKUXJXSk9pTThadlVU?=
+ =?utf-8?B?OGoxai82RXZZY3FHc1U1OVBHTGFLV1dES3ZhbDVTd01lTW9ONDF6OVhPTDNY?=
+ =?utf-8?B?OEM1Y0M3bHB3U1hEWE1nY1lmMGVINGlXMGxleW1kYXU5Y0pXajQ0NlpZaVFu?=
+ =?utf-8?B?S1RTTWE1cDRxMzl4OUEyMzBtM2V4cHY3Q0FxRFg1SWgvSmhYeUNmdkN5ZkJn?=
+ =?utf-8?B?dllQVTFzWFN4NmQ3QWxzclJSNHJBY3ZuRGErRTNTUU90V1BQNDlycWZIRXdy?=
+ =?utf-8?B?YkZVTjErSndscG9FRlMvbGlOMmhUOVh5T2duRFc1YldKQ0V0Vk9QVTdJdkl1?=
+ =?utf-8?B?bmdaVkY2cVl6RzdhNTJBdGlXbkNzMUxqYW9EQXFtdXhvd0haR0hSWlZrMlhq?=
+ =?utf-8?Q?IZgiJ6EFEuFObB0Wi/Jm1L97lZjTPTnlEWmtKrU?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U0U4VDExR3J3RnFUdlAwTDFjemEwaDc5VENUYWkxalFwbVF2V0hhbjA0TDJW?=
+ =?utf-8?B?U1ozOEtyaUh1L1gyVERRSTg0WWNuczMxc25QNVF6anRhNDRvZWhOUUw0eWps?=
+ =?utf-8?B?dEZNditaNkE3Ukp1UTdjRmhYSkEyYlpoVkdOcXVqVTBheStkNGNhOWZkZ0hv?=
+ =?utf-8?B?SUFIKzhidnQ3ck9hLzJ0b1FQRStYa0VYZXB0L3BIYVArbHVvYkdEZzNwcGVO?=
+ =?utf-8?B?ckRONUVDbmEvcEZubWR5aHBrMHQvakR3MFU5K1FSYzBiQ0p3VDYyQkR5NHRN?=
+ =?utf-8?B?NmpKNDFMTVFjaXowdjQ2ZW5Mcm0rdnhkZ2pNWHQyamg1VFNTazZueU9jUDZ3?=
+ =?utf-8?B?T0wreXFVcGYzaFFOc2lYZmRBd1lDRzdId0hyZmFGOTJXU05vcm1oUVAweTlm?=
+ =?utf-8?B?L3czMDFyQTludEsrVk5FeHRNa0dHbml6UFplYjBYbFRlV3hnNXhxbTNhVDhK?=
+ =?utf-8?B?NytoQk9EdW1idXRtL0EvZHU4cWxObXlCbUdSK05UR1UyNVJPNW0zZVQ2L3JC?=
+ =?utf-8?B?RGZXYW1wb20zWTRUVWJKbkY0am5qRjZVUldmK1QvREZHNitOK1kxaUoxVVFj?=
+ =?utf-8?B?NUZvZ1ZZMEVLVzF3YzRlc3RSWCtHZUJ1SUhpRHJzMXRhcXhBMDZtV1l5Rzli?=
+ =?utf-8?B?SUFWMWtWRFp2SndyclI5UTdBMG90bUJhcXFDZnlvN1cwV0FrSnhGb0EzOGNp?=
+ =?utf-8?B?QWczZjR4WVU4ZHMrTkp6WmkzMktHdXk4S1V5TlFNQUp5SERXU2wyaGtKTXVI?=
+ =?utf-8?B?VkFObnA4ekNLNWxKL3pxYVluL0JCZHRPRm01NHg1REVIVzhyRHpYZlhMYStX?=
+ =?utf-8?B?VWlNUHRnWHp5RTdudEQ4aUFjQklUblVMclE1cUlaR1M3MVhUcytyWUhSSjE4?=
+ =?utf-8?B?YTVtb0VMd3V2aXZxRWlJS2l4dGY4YmlrT0xNdWJ5cEhGbkxzU1M5UkdWQkxL?=
+ =?utf-8?B?WVBmbDBPLzBadDVlcnNmWjBuSzE4Wkt2cWVGN25uNVhyV0NOZkdjWGNIWWxY?=
+ =?utf-8?B?a051VkliZkRib3pIZk1Ib2JRMCs5ZWcvd093UnFGdVl3T3lVeVpycVJUclJM?=
+ =?utf-8?B?TDhuamd2cVB6ME10dHpHdGdxcXZuZXBhWHVBajB0WUZNMEtYNXJrcTM3eS81?=
+ =?utf-8?B?Wi9UYjJ3cEVkQ2o4ckpkMElEQy9QTHMwRm9sVkU1cHpxcll2V25Rak9PaU9Q?=
+ =?utf-8?B?ZmczTGJkY0llaWlCYjdmcmJ4NHlBbzVqYjdtYlJML2gxc1BvSVNsYTlnMnlI?=
+ =?utf-8?B?bzM3U2Jnb1ZIanljR2xpbkxNOWtSdWtQOE14Rk56VzljWERsOVdQZXR0QTlQ?=
+ =?utf-8?B?eFFwanVubDk3d3hway9yM1RqWWZ2VGV6dy80REF6MWh1OUR4MXh4U0VUb1hE?=
+ =?utf-8?B?TDVhcngrQ3hzc2NXNkh2bDhjZEc0blpmTEtuRFYvVWpKUVpPV2pZTTRRZzd4?=
+ =?utf-8?B?SFAxZlNDelVKL082Y1NDeHBvU1lqZ21Nd2dSSDJvMnRDNTJISFNTditMVVZi?=
+ =?utf-8?B?TVA5bGQ5dUIyQTJuM3MxcUduV3VNMjRSR0FjUWd2N0Q0VFgvNWhySzlzNTh2?=
+ =?utf-8?B?cDhxQllNcWhkR3hDRlBrNVNXRUh3bkVrWVFiZnNmREZ5REdNVStYSmFEOWdG?=
+ =?utf-8?B?K3F4UUhaU3dHd1pTQkE1K3daUlJrem9GV01EVlJnWFZ0VldJSXRYS2dLcHpu?=
+ =?utf-8?B?eTNTcWg5ejIxN01IS1kzS1RjRWVGUVBmNjJqZVY2MWk5c29OZ1lXZFBJeG03?=
+ =?utf-8?B?VnllUU9HUVJHdkdLVXpxZG9ZeVRocTc4OGNvVGNEa3FmeW9waW0zRlIyNXFW?=
+ =?utf-8?B?Yi9TSEpXQ21CdXhHZUJNL0lXcEU1RUtqaElWVlVGMzdiUWRSWDZBYVd0TkF6?=
+ =?utf-8?B?TmZBbjk1dGFjaWcvT3J6RHRHVjc3aXo4OFF5NGRUbFQyd3p4bE5NWkt5NWlr?=
+ =?utf-8?B?WnVEb2dQOUtEMVJUK29HdnNsdHJKUHRtSlBIbDBVcUoyWWhhL0p6QjdYYXJP?=
+ =?utf-8?B?NXErbVBvZUtvRW1zMysrNjRnTDdvV2h6ck5XQ1p4Y3gxNldwQTYyNVg1WE5h?=
+ =?utf-8?B?Tmw2aTQzNGlEYTlPZDRUM1k0MW1XUkJJRzNlbzhKTkJHNVZDYjJ1VGNna1pm?=
+ =?utf-8?B?UEJHay90cmg5MGxxNlFuaTlBYXFzdnRJblBIUTRJdmdxam9WbmJscUdsSHh3?=
+ =?utf-8?Q?0MwgqXUEpw1Zxio9t/8F1ok=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0836897-e8a6-485d-e32d-08dd0a040d84
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 08:11:08.0704
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jn8xqHtjuNadYxJMm0fLc3z+1qr85TI+dZk3T3Qzk6EQeZOTKtykq4+7uly3s18LHJD07KueEi8Sp1tm3QEd6jNw1yqe67gi9u2xZt1r+RB9PVZELBptonHCXun12ixe
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR01MB6612
 
-On Fri, Nov 15, 2024, Vipin Sharma wrote:
-> On 2024-11-14 09:42:32, Sean Christopherson wrote:
-> > On Fri, Nov 08, 2024, Andrew Jones wrote:
-> > > On Wed, Nov 06, 2024 at 09:06:39AM -0800, Sean Christopherson wrote:
-> > > > On Fri, Nov 01, 2024, Vipin Sharma wrote:
-> > > > > Phase 3: Provide collection of interesting configurations
-> > > > >=20
-> > > > > Specific individual constructs can be combined in a meaningful wa=
-y to
-> > > > > provide interesting configurations to run on a platform. For exam=
-ple,
-> > > > > user doesn't need to specify each individual configuration instea=
-d,
-> > > > > some prebuilt configurations can be exposed like
-> > > > > --stress_test_shadow_mmu, --test_basic_nested
-> > > >=20
-> > > > IMO, this shouldn't be baked into the runner, i.e. should not surfa=
-ce as dedicated
-> > > > command line options.  Users shouldn't need to modify the runner ju=
-st to bring
-> > > > their own configuration.  I also think configurations should be dis=
-coverable,
-> > > > e.g. not hardcoded like KUT's unittest.cfg.  A very real problem wi=
-th KUT's
-> > > > approach is that testing different combinations is frustratingly di=
-fficult,
-> > > > because running a testcase with different configuration requires mo=
-difying a file
-> > > > that is tracked by git.
->=20
-> I was thinking of folks who send upstream patches, they might not have
-> interesting configurations to run to test. If we don't provide an option
-> then they might not be able to test different scenarios.
 
-Yeah, I'm not saying upstream can't provide testcases, just that the existe=
-nce of
-testcases shouldn't be hardcoded into the runner.
+Hi Marc,
 
-> I do agree command line option might not be a great choice here, we
-> should keep them granular.
->=20
-> What if there is a shell script which has some runner commands with
-> different combinations? There should be a default configuration provided
-> to ease testing of patches for folks who might not be aware of the
-> configurations which maintainers generally use.
->=20
-> End goal is to provide good confidence to the patch submitter that they h=
-ave
-> done good testing.
+On 19-06-2024 02:11 pm, Oliver Upton wrote:
+> On Fri, 14 Jun 2024 15:45:36 +0100, Marc Zyngier wrote:
+>> Here's the thurd version of the shadow stage-2 handling for NV
+>> support on arm64.
+>>
+>> * From v2 [2]
+>>
+>>    - Simplified the S2 walker by dropping a bunch of redundant
+>>      fields from the walker info structure
+>>
+>> [...]
+> 
+> Applied to kvmarm/next, thanks!
+> 
+> [01/16] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+>          https://git.kernel.org/kvmarm/kvmarm/c/4f128f8e1aaa
+> [02/16] KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+>          https://git.kernel.org/kvmarm/kvmarm/c/61e30b9eef7f
+> [03/16] KVM: arm64: nv: Handle shadow stage 2 page faults
+>          https://git.kernel.org/kvmarm/kvmarm/c/fd276e71d1e7
+> [04/16] KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+>          https://git.kernel.org/kvmarm/kvmarm/c/ec14c272408a
+> [05/16] KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+>          https://git.kernel.org/kvmarm/kvmarm/c/82e86326ec58
+> [06/16] KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+>          https://git.kernel.org/kvmarm/kvmarm/c/67fda56e76da
+> [07/16] KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+>          https://git.kernel.org/kvmarm/kvmarm/c/8e236efa4cd2
+> [08/16] KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/e6c9a3015ff2
+> [09/16] KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/5cfb6cec62f2
+> [10/16] KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/70109bcd701e
+> [11/16] KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/d1de1576dc21
+> [12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+>          https://git.kernel.org/kvmarm/kvmarm/c/b1a3a94812b9
+> [13/16] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+>          https://git.kernel.org/kvmarm/kvmarm/c/809b2e6013a5
+> [14/16] KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/0cb8aae22676
+> [15/16] KVM: arm64: nv: Add handling of range-based TLBI operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/5d476ca57d7d
+> [16/16] KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+>          https://git.kernel.org/kvmarm/kvmarm/c/0feec7769a63
+> 
+> --
+> Best,
+> Oliver
 
-As discussed off-list, I think having one testcase per file is the way to g=
-o.
+IIRC, Most of the patches that are specific to NV have been merged 
+upstream. However I do see that, some of the vGIC and Timer related 
+patches are still in your private NV repository. Can these patches be 
+prioritized to upstream, so that we can have have the first working 
+version of NV on mainline.
 
-  - Very discoverable (literally files)
-  - The user (or a shell script) can use regexes, globbing, etc., to select=
- which
-    tests to run
-  - Creating "suites" is similarly easy, e.g. by having a list of files/tes=
-tscase,
-    or maybe by directory layout
-
-Keeping track of testcases (and their content), e.g. to avoid duplicates, m=
-ight
-be an issue, but I think we can mitigate that by establishing and following
-guidelines for naming, e.g. so that the name of a testcase gives the user a
-decent idea of what it does.
-
-> > > Could also use an environment variable to specify a file which contai=
-ns
-> > > a config in a test-specific format if parsing environment variables i=
-s
-> > > insufficient or awkward for configuring a test.
-> >=20
-> > There's no reason to use a environment variable for this.  If we want t=
-o support
-> > "advanced" setup via a test configuration, then that can simply go in c=
-onfiguration
-> > file that's passed to the runner.
->=20
-> Can you guys specify What does this test configuration file/directory
-> will look like? Also, is it gonna be a one file for one test? This might
-> become ugly soon.
-
-As above, I like the idea of one file per testcase.  I'm not anticipating t=
-housands
-of tests.  Regardless of how we organize things, mentally keeping track of =
-that
-many tests would be extremely difficult.  E.g. testcases would likely bitro=
-t and/or
-we'd end up with a lot of overlap.  And if we do get anywhere near that num=
-ber of
-testcases, they'll need to be organzied in some way.
-
-One idea would be create a directory per KVM selftest, and then put testcas=
-es for
-that test in said directory.  We could even do something clever like fail t=
-he
-build if a test doesn't have a corresponding directory (and a default testc=
-ase?).
-
-E.g. tools/testing/selftests/kvm/testcases, with sub-directories following =
-the
-tests themsleves and separated by architecture as appropriate.
-
-That us decent organization.  If each test has a testcase directory, it's e=
-asy to
-get a list of testcases.  At that point, the name of the testcase can be us=
-ed to
-organize and describe, e.g. by tying the name to the (most interesting) par=
-ameters.
-
-Hmm, and for collections of multiple testscases, what if we added a separat=
-e
-"testsuites" directory, with different syntax?  E.g. one file per testuite,=
- which
-is basically a list of testcases.  Maybe with some magic to allow testsuite=
-s to
-"include" arch specific info?
-
-E.g. something like this
-
-$ tree test*
-testcases
-=E2=94=94=E2=94=80=E2=94=80 max_guest_memory_test
-    =E2=94=94=E2=94=80=E2=94=80 128gib.allvcpus.test
-testsuites
-=E2=94=94=E2=94=80=E2=94=80 mmu.suite
-
-3 directories, 2 files
-$ cat testsuites/mmu.suite=20
-$ARCH/mmu.suite
-max_guest_memory_test/128gib.allvcpus.test
-
-> This brings the question on how to handle the test execution when we are =
-using
-> different command line parameters for individual tests which need some
-> specific environmnet?
->=20
-> Some parameters will need a very specific module or sysfs setting which
-> might conflict with other tests. This is why I had "test_suite" in my
-> json, which can provide some module, sysfs, or other host settings. But
-> this also added cost of duplicating tests for each/few suites.
-
-IMO, this should be handled by user, or their CI environment, not by the up=
-stream
-runner.  Reconfiguring module params or sysfs knobs is inherently environme=
-nt
-specific.  E.g. not all KVM module params are writable post-load, and so ch=
-anging
-a param might require stopping all VMs on the system, or even a full kernel=
- reboot
-if KVM is built-in.  There may also be knobs that require root access, that=
- are
-dependent on hardware and/or kernel config, etc.
-
-I really don't want to build all that into the upstream test runner, certai=
-nly not
-in the first few phases.  I 100% think the runner should be constructed in =
-such a
-way that people/organizations/CI pipeines can build infrastructure on top, =
-I just
-don't think it's a big need or a good fit for upstream.
-
-> I guess the shell script I talked about few paragraphs above, can have
-> some specific runner invocations which will set specific requirements of
-> the test and execute that specific test (RFC runner has the capabilty to =
-execute
-> specific test).
->=20
-> Open to suggestions on a better approach.
+-- 
+Thanks,
+Ganapat/GK
