@@ -1,58 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22D3249E5;
-	Fri, 22 Nov 2024 19:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE890249E5;
+	Fri, 22 Nov 2024 19:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732302291; cv=none; b=RRi8elnYTU/qcpycoFhfDUBGaEUlw1up3l03fj/pG5Heuic/eTFd5o88zr+qiQpcmJkCRFK53DgsS6H5Srph3Jxtq5SPATzba8h+zcvHVev/ujwazp7EO8McJuMYc1pIFo2ey1tMRdV8Oq43Cmob5j4NI9am7DN3Ea5dAwovD5E=
+	t=1732302508; cv=none; b=gZpaZ9qdnTNYVupiy8QF25rR4zcCfGwAcoT48hqwDO2+Fs17f68ygOjqLLyPbuQX1JFIgL2NKYDYAAmXTZWaLxFkuiuQfKw9K8JN/m9O6CtdWwtwZJcy35IWC/tsg7BMQ+3BEzl3FI8uJkVcaBBQlD4GFiS/IYwEc4frrzDhL3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732302291; c=relaxed/simple;
-	bh=faYDVHYbCK+LJyST0QsH6L1SLvl+Mr/iKpP9RzjH9Cs=;
+	s=arc-20240116; t=1732302508; c=relaxed/simple;
+	bh=O9mDDediH4K4E/cTbRFrAHnx1KNidjn+4JetK3PhtQY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=StiKNbStaIMrbn9ss5Fb0Bgn2tnLaKoXTo4AQ50pt8m7z4ifQ2A00SdDKwQaDlXwoPMEZcTb2uxHNvZ5XVwhxYndOsT999HHxWqmcSEVFC7CWBpN1x+c1ACs9aJliYaJN1c9WKjbsfZwyqoeIDgugRf6XJEKmGUMYEPnPd/O/+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aq4SPlMw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=DbDr2s1Wg/saoVJYRirdSONDIh2aR0VvWCRsAiNzy8nlDndoGzLlcBeAdmGlLcqInvmXuzqC4b5PoYP8AL1erZ6c9RCxXqi3luwpb6iEcWuOS7JYISLWfBQiMqlj6ldwQgAO0HiXkYvfk5yFGyBrBbeKrMk5BtHCxGrrQr7Ml18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKsZps7S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aq4SPlMw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58CAAC4CECE;
-	Fri, 22 Nov 2024 19:04:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKsZps7S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4731DC4CECE;
+	Fri, 22 Nov 2024 19:08:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732302291;
-	bh=faYDVHYbCK+LJyST0QsH6L1SLvl+Mr/iKpP9RzjH9Cs=;
+	s=k20201202; t=1732302506;
+	bh=O9mDDediH4K4E/cTbRFrAHnx1KNidjn+4JetK3PhtQY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Aq4SPlMwR3x+CoOtEldhYhcd2eO80HxF3dqxNmR/L1MDH/Oqh/gzcQ/yuLuLe0JhX
-	 kQXTPjehi2PiquvCvl0ZejtsOn3/Aoh9ulq3JyWWDCbd4nWyWHl77il48BFcW9SecQ
-	 7x5NSAdeoIddE63SrStnfj2z8WKT2sJqK/pSICURabuW9AU4TJ0+vCGoA56i/ccgxv
-	 jDYDLgIUBzi9h/gozHayptOelvxosvjP5goWhSq6Jx4lQaWxna43yWQspiZAKqUz6x
-	 /jrkZk0YLypYly02ZyIn6blR5uKJHgfsrApwKhXI8c8nqFElKvcQcz3eo278nv4ip7
-	 +rUOH6Iv01+5w==
+	b=bKsZps7SRth7q+3LtAkqruMDSvzvzJUb4Tnh52EWZieYmMSB8PikHHv41+wvwaXt1
+	 cdYffmQMx0nLZqYSPLWmCJqUme3SnSpZirXtgY/2A+AUxfhBbcVIQbSqtIbpROXCaX
+	 kxdRMFiCUztajvOGdVinCVF6NLkNKPoRrwpIHWisNwt6ElS17MfklXMi6CwmxV/yy+
+	 CGIH+KlnAcG9R4areBgr6hKDCa2W5hRMr9FoTtjd+zcnbmqnefVI8/x7cpz8EtS/at
+	 mKV7ATEXv8tIG8suawuDOBgLS/KQPILpDAwzyVN+mfxbravzLqQXRdvQvf9qDaG3L1
+	 bFjy6KdoVnLXA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tEYxU-00F6BI-Mm;
-	Fri, 22 Nov 2024 19:04:48 +0000
-Date: Fri, 22 Nov 2024 19:04:47 +0000
-Message-ID: <86o727um28.wl-maz@kernel.org>
+	id 1tEZ0x-00F6Cs-TH;
+	Fri, 22 Nov 2024 19:08:23 +0000
+Date: Fri, 22 Nov 2024 19:08:23 +0000
+Message-ID: <86mshrulw8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvm@vger.kernel.org,
+To: James Clark <james.clark@linaro.org>
+Cc: will@kernel.org,
 	kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
-In-Reply-To: <38339ef8-6e69-43b5-8d16-b7fd66775c93@os.amperecomputing.com>
-References: <20240614144552.2773592-1-maz@kernel.org>
-	<171878647493.242213.9111337124987897859.b4-ty@linux.dev>
-	<46bea470-3a3b-4dcc-b4a8-a74830c66774@os.amperecomputing.com>
-	<86plmov8n3.wl-maz@kernel.org>
-	<38339ef8-6e69-43b5-8d16-b7fd66775c93@os.amperecomputing.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] arm64: Fix usage of new shifted MDCR_EL2 values
+In-Reply-To: <20241122164636.2944180-1-james.clark@linaro.org>
+References: <20241122164636.2944180-1-james.clark@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,51 +67,26 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, joey.gouly@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, will@kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, yangyicong@hisilicon.com, Dave.Martin@arm.com, tabba@google.com, james.morse@arm.com, mark.rutland@arm.com, anshuman.khandual@arm.com, vdonnefort@google.com, qperret@google.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 22 Nov 2024 16:54:16 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Fri, 22 Nov 2024 16:46:35 +0000,
+James Clark <james.clark@linaro.org> wrote:
 > 
+> Since the linked fixes commit, these masks are already shifted so remove
+> the shifts. One issue that this fixes is SPE and TRBE not being
+> available anymore:
 > 
+>  arm_spe_pmu arm,spe-v1: profiling buffer owned by higher exception level
 > 
-> On 21-11-2024 10:14 pm, Marc Zyngier wrote:
-> > On Thu, 21 Nov 2024 08:11:00 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> > 
-> > Hi Ganapatrao,
-> > 
-> >> IIRC, Most of the patches that are specific to NV have been merged
-> >> upstream. However I do see that, some of the vGIC and Timer related
-> >> patches are still in your private NV repository. Can these patches be
-> >> prioritized to upstream, so that we can have have the first working
-> >> version of NV on mainline.
-> > 
-> > Who is *we*?
-> > 
-> > Things get upstreamed when we (people doing the actual work) decide
-> > they are ready. At the moment, they are not.
-> > 
-> > Also, while I enjoy working on NV, this isn't *my* priority.
-> 
-> Sure, I understand that it's not your priority right now.  I'm happy
-> to spend some time on it, please do let us know in what areas/patches
-> needs attention before the code would be ready to merge?
+> Fixes: 641630313e9c ("arm64: sysreg: Migrate MDCR_EL2 definition to table")
+> Signed-off-by: James Clark <james.clark@linaro.org>
 
-Please understand that NV isn't special, and while there is still a
-bunch of things that need to be merged, it is the whole of KVM/arm64
-that needs attention.
+Huh, well spotted. This is doubleplusungood. Thankfully, the KVM/arm64
+tree hasn't reached Linus yet, but this needs quick fixing.
 
-For example, there is the debug series from Oliver, the feature
-handling from Fuad. They may not have NV written all over them, but
-they do have an impact on the NV behaviour one way or another.
-
-By paying attention to these series, you would help with the
-groundwork that is required before we can actually enable NV. This is
-what matters now, not the next 50 or so NV-specific patches.
-
-Thanks,
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
