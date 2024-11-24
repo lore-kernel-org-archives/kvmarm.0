@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6B23BB24
-	for <kvmarm@lists.linux.dev>; Sun, 24 Nov 2024 12:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9F2309A9
+	for <kvmarm@lists.linux.dev>; Sun, 24 Nov 2024 12:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732450373; cv=none; b=WYaNpn3z5RIWtrql2PopX7yScuZ4SqY+m7kfHyuqOtOSqcsJ4+HUa4y2CilHn0mh7/z4bXxpAP0ljjGES9l7Ji1yduSmgFvUGhUm3M4tQ/1fgat2sHE4qpusGKFe2NylwwtHIB2ws7kkw/CID1phHR2K3PGrf3i56DvKjhzOl/w=
+	t=1732451917; cv=none; b=al04M3SNCF0smEuXvOTbYNtb1EFFUwlUjPqYAGqr8ImNbBrt1WhBrKEOFNQSX8b2ZV8lJod9X2+r2ZOy/Zla8uAJLkDZ7pQ5XPvdd8ZnMgu+6qr+J+A5hFUQfrhF/9F8H1L8+c3JYMsR/YPXj2EhR0I1b0FwRsxTAJFYct+SD54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732450373; c=relaxed/simple;
-	bh=ZlRIlePa6qIOlCJ17wWF4SE2OcB7ifQ3WFcQDR8qU48=;
+	s=arc-20240116; t=1732451917; c=relaxed/simple;
+	bh=c0AWjVGSPIQTrbBVAKWsgeZOeUI/JWBeTCbKYwY10fw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VH9/tquakbFYTel/5P7iXngan+YttEjtiMaQ9++LCoCjpM6vJ2NO1rk2yXdpnBg9QwEZeUJ3N9H9xo+F1E4P9R8pY37ngavk1wXmhnO75vpjMoi6CKfrud/lNL7IstFbFSXs2JaBtwoy5T9nGE7ZEmEWLez2Vx1WyE2fWcy4wPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bkUbBfNr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=oiAoiXHPF2oUYdZBGhFS7pbFT9ZPafN7952L43AjcBvNaqR+taimZnDWMemwf4yx516uxhGWaPGFmInaBT5Q8vCqN0jEkSC5JdJ6EJRQ84du00d8M45QKI8jgPYFPUXk6oPmUx1bg0mOYTJ5jKdqiJG4WnygiI0WAYKCyfcHd9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtQH17Ul; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bkUbBfNr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF004C4CECC;
-	Sun, 24 Nov 2024 12:12:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtQH17Ul"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05FFDC4CECC;
+	Sun, 24 Nov 2024 12:38:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732450372;
-	bh=ZlRIlePa6qIOlCJ17wWF4SE2OcB7ifQ3WFcQDR8qU48=;
+	s=k20201202; t=1732451917;
+	bh=c0AWjVGSPIQTrbBVAKWsgeZOeUI/JWBeTCbKYwY10fw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bkUbBfNrDqzyOq0zdUVVa95IO3Qjb31ayZ6uyojOCHqbn+QyAbMCRJs0kB6Mmdrfx
-	 PJXeWgOpn5bSdLyqw3A4G6f3tmIovDbSj9U9i0vsjORwmIt9Y/CU1K9568WmFmOquo
-	 DJggc27Tni8hI5fvQz43LZJfxaF+zGUVUkfI6NWN0O2hX6xPuVbI1eplCYRY7FWGco
-	 p6aqTIMYKuocrxMr9J+/uFShB1dhIPUkabYyYXl55c9UwAV2QubKCPlQG8O9rXH+SM
-	 4BS7SC9apuWRctsjfHTRWeuowxJBVA3YkKxOse/5Gm3JUFIhN32b2IoEFPB4qpWKwF
-	 xHLjz/umCdBzw==
+	b=JtQH17UljZqsPeXc+7Vn6xhCPElJk9F/3ZZ1D2vy7l93SQovGa9h1fhiTwhdhC6+o
+	 CCa/u7Lv5Y4yqX0akJz8WJ6d+hGxKZq8mAegrYIN3RNP89zjpOnZYGTHUPf0TIr4WX
+	 s6oWVRIhXfOE1VoPZ3ySOKXpM8Iq4E/a8i2DJYkI5E4PTzcjN6lRkMY3O2aUC8tlzC
+	 HJaIr1UY20X/MkbPtm+NtnP5BhWjc2pjc38KGfimOosEfNn/nw+HGm6bAwjOa0TPoZ
+	 x0L21m38iOlxdlwMHRMMDm8cM/nG4UOs5OHMwqV5UHGad13Wu9cjIwyqGpK0ggvHwA
+	 +lTF2+L/0249g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tFBTu-00FMNr-Iw;
-	Sun, 24 Nov 2024 12:12:50 +0000
-Date: Sun, 24 Nov 2024 12:12:50 +0000
-Message-ID: <86ldx8vni5.wl-maz@kernel.org>
+	id 1tFBso-00FMXC-BH;
+	Sun, 24 Nov 2024 12:38:34 +0000
+Date: Sun, 24 Nov 2024 12:38:33 +0000
+Message-ID: <86jzcsvmba.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -47,10 +47,10 @@ Cc: kvmarm@lists.linux.dev,
 	catalin.marinas@arm.com,
 	broonie@kernel.org,
 	qperret@google.com
-Subject: Re: [PATCH v2 05/12] KVM: arm64: Initialize feature id registers for protected VMs
-In-Reply-To: <20241122110622.3010118-6-tabba@google.com>
+Subject: Re: [PATCH v2 07/12] KVM: arm64: Rework specifying restricted features for protected VMs
+In-Reply-To: <20241122110622.3010118-8-tabba@google.com>
 References: <20241122110622.3010118-1-tabba@google.com>
-	<20241122110622.3010118-6-tabba@google.com>
+	<20241122110622.3010118-8-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,154 +66,79 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 22 Nov 2024 11:06:15 +0000,
+On Fri, 22 Nov 2024 11:06:17 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> The hypervisor maintains the state of protected VMs. Initialize
-> the values for feature ID registers for protected VMs, to be used
-> when setting traps and when advertising features to protected
-> VMs.
+> The existing code didn't properly distinguish between signed and
+> unsigned features, and was difficult to read and to maintain.
+> Rework it using the same method used in other parts of KVM when
+> handling vcpu features.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  1 +
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 ++
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 54 +++++++++++++++++--
->  3 files changed, 56 insertions(+), 3 deletions(-)
+>  .../arm64/kvm/hyp/include/nvhe/fixed_config.h |   1 -
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 356 +++++++++---------
+>  2 files changed, 186 insertions(+), 171 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-> index d1e59b88ff66..69e26d1a0ebe 100644
+> index 69e26d1a0ebe..37a6d2434e47 100644
 > --- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
 > +++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-> @@ -201,6 +201,7 @@
->  u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+> @@ -198,7 +198,6 @@
+>  	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3), ID_AA64ISAR2_EL1_APA3_PAuth) \
+>  	)
+>  
+> -u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
 >  bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
 >  bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
-> +void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
->  int kvm_check_pvm_sysreg_table(void);
->  
->  #endif /* __ARM64_KVM_FIXED_CONFIG_H__ */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 59ff6aac514c..4ef03294b2b4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -381,6 +381,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
->  	hyp_vm->kvm.created_vcpus = nr_vcpus;
->  	hyp_vm->kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
->  	hyp_vm->kvm.arch.pkvm.enabled = READ_ONCE(host_kvm->arch.pkvm.enabled);
-> +	hyp_vm->kvm.arch.flags = 0;
->  	pkvm_init_features_from_host(hyp_vm, host_kvm);
->  }
->  
-> @@ -419,6 +420,9 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
->  	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
->  	hyp_vcpu->vcpu.arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
->  
-> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> +		kvm_init_pvm_id_regs(&hyp_vcpu->vcpu);
-> +
->  	ret = pkvm_vcpu_init_traps(hyp_vcpu);
->  	if (ret)
->  		goto done;
+>  void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
 > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 59fb2f056177..7008e9641f41 100644
+> index 3aa76b018f70..cea3b099dc56 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -204,8 +204,7 @@ static u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
->  	return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
->  }
+> @@ -28,221 +28,237 @@ u64 id_aa64mmfr1_el1_sys_val;
+>  u64 id_aa64mmfr2_el1_sys_val;
+>  u64 id_aa64smfr0_el1_sys_val;
 >  
-> -/* Read a sanitized cpufeature ID register by its encoding */
-> -u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> +static u64 pvm_calc_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> @@ -240,10 +239,25 @@ u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  	}
->  }
->  
-> +/* Read a sanitized cpufeature ID register by its encoding */
-> +u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> +{
-> +	return pvm_calc_id_reg(vcpu, id);
-> +}
-> +
+> -/*
+> - * Inject an unknown/undefined exception to an AArch64 guest while most of its
+> - * sysregs are live.
+> - */
+> -static void inject_undef64(struct kvm_vcpu *vcpu)
+> -{
+> -	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+> -
+> -	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+> -	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+> -
+> -	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
+> -
+> -	__kvm_adjust_pc(vcpu);
+> -
+> -	write_sysreg_el1(esr, SYS_ESR);
+> -	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
+> -	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+> -	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+> -}
+> +struct pvm_feature {
+> +	int shift;
+> +	int width;
+> +	u64 mask;
+> +	u64 max_supported;
+> +	bool is_signed;
 
-Whatever reason you have to keep this per-CPU, it really needs to
-change to be VM-scoped. Maybe not immediately, but that should be on
-your list.
+Most of this is very similar to struct arm64_ftr_bits. Can you align
+the types and names with it? And do you really need 'mask', which can
+be derived from shift and width?
 
->  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  		       struct sys_reg_desc const *r)
->  {
-> -	return pvm_read_id_reg(vcpu, reg_to_encoding(r));
-> +	struct kvm *kvm = vcpu->kvm;
-> +	u32 reg = reg_to_encoding(r);
-> +
-> +	if (WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags)))
-> +		return 0;
-> +
-> +	if (reg >= sys_reg(3, 0, 0, 4, 0) && reg <= sys_reg(3, 0, 0, 7, 7))
-> +		return kvm->arch.id_regs[IDREG_IDX(reg)];
+max_supported as an unsigned value is also potentially troublesome for
+signed features. And does it need to be 64bit wide?
 
-Why the limit to the AA64 idregs? Aren't the other shadow sysreg
-values correctly initialised to 0?
+> +	bool (*vcpu_supported)(const struct kvm_vcpu *vcpu);
 
-> +
-> +	return 0;
->  }
->  
->  /* Handler to RAZ/WI sysregs */
-> @@ -448,6 +462,40 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
->  	/* Performance Monitoring Registers are restricted. */
->  };
->  
-> +/*
-> + * Initializes feature registers for protected vms.
-> + */
-> +void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu)
-> +{
-> +	const u32 pvm_feat_id_regs[] = {
-
-static?
-
-> +		SYS_ID_AA64PFR0_EL1,
-> +		SYS_ID_AA64PFR1_EL1,
-> +		SYS_ID_AA64ISAR0_EL1,
-> +		SYS_ID_AA64ISAR1_EL1,
-> +		SYS_ID_AA64ISAR2_EL1,
-> +		SYS_ID_AA64ZFR0_EL1,
-> +		SYS_ID_AA64MMFR0_EL1,
-> +		SYS_ID_AA64MMFR1_EL1,
-> +		SYS_ID_AA64MMFR2_EL1,
-> +		SYS_ID_AA64MMFR4_EL1,
-> +		SYS_ID_AA64DFR0_EL1,
-> +	};
-> +	struct kvm *kvm = vcpu->kvm;
-> +	unsigned long i;
-> +
-> +	if (WARN_ON_ONCE(test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags)))
-> +		return;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(pvm_feat_id_regs); i++) {
-
-But do you really need this array? Can't you just iterate over the
-idreg space and compute the value? Sure, that'd be a bit longer, but
-at least you would define the idregs you care about in a single place.
-
-> +		struct kvm_arch *ka = &kvm->arch;
-> +		u32 reg = pvm_feat_id_regs[i];
-> +
-> +		ka->id_regs[IDREG_IDX(reg)] = pvm_calc_id_reg(vcpu, reg);
-> +	}
-> +
-> +	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
-> +}
-> +
->  /*
->   * Checks that the sysreg table is unique and in-order.
->   *
+We really need to find a way to kill this. The two features that stick
+out badly are SVE and PAuth, and I don't see why we can't eventually
+track them at the VM level instead (despite the userspace API).
 
 Thanks,
 
