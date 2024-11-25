@@ -1,148 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9F2309A9
-	for <kvmarm@lists.linux.dev>; Sun, 24 Nov 2024 12:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EFB1426C
+	for <kvmarm@lists.linux.dev>; Mon, 25 Nov 2024 09:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732451917; cv=none; b=al04M3SNCF0smEuXvOTbYNtb1EFFUwlUjPqYAGqr8ImNbBrt1WhBrKEOFNQSX8b2ZV8lJod9X2+r2ZOy/Zla8uAJLkDZ7pQ5XPvdd8ZnMgu+6qr+J+A5hFUQfrhF/9F8H1L8+c3JYMsR/YPXj2EhR0I1b0FwRsxTAJFYct+SD54=
+	t=1732528082; cv=none; b=Iqj6RoxNggpYoknKZMmnTTIvfgM0dsRd1IIU1TQyVzgXP0O0+Nf3qVDwMpAWZy54ETlzLTQYoSkJYODrb+eut91fFOnA5qwjRTTuBn3kdIYmlrEPvSvs2ELc+x7snaqFgM/kGyz95qGU0ugh167ZtS3ZzcHOwopbz9ZkwQdiqkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732451917; c=relaxed/simple;
-	bh=c0AWjVGSPIQTrbBVAKWsgeZOeUI/JWBeTCbKYwY10fw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oiAoiXHPF2oUYdZBGhFS7pbFT9ZPafN7952L43AjcBvNaqR+taimZnDWMemwf4yx516uxhGWaPGFmInaBT5Q8vCqN0jEkSC5JdJ6EJRQ84du00d8M45QKI8jgPYFPUXk6oPmUx1bg0mOYTJ5jKdqiJG4WnygiI0WAYKCyfcHd9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtQH17Ul; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732528082; c=relaxed/simple;
+	bh=fFDoWawgI33eZaEQEGoUTTZhQQtQ+oC/k8T3cn7uRfM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lx8UOGvV0XfXko6WFcxufgpDhPynQMZ9vP5c01xf+WMNjGHt0wTEpYD0O2C3ekVR4FU+X+Jqu1c2B88URKjhujuxsiltQR8qBGf+AGUvsgLPzV4JT98J+6eO4zdHB7kDTOFyHltPGfBk1HxKgonA+VSKCymiyKWhrefsBKijTj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4Kn6JMk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtQH17Ul"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05FFDC4CECC;
-	Sun, 24 Nov 2024 12:38:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4Kn6JMk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D86AC4CECE;
+	Mon, 25 Nov 2024 09:48:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732451917;
-	bh=c0AWjVGSPIQTrbBVAKWsgeZOeUI/JWBeTCbKYwY10fw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JtQH17UljZqsPeXc+7Vn6xhCPElJk9F/3ZZ1D2vy7l93SQovGa9h1fhiTwhdhC6+o
-	 CCa/u7Lv5Y4yqX0akJz8WJ6d+hGxKZq8mAegrYIN3RNP89zjpOnZYGTHUPf0TIr4WX
-	 s6oWVRIhXfOE1VoPZ3ySOKXpM8Iq4E/a8i2DJYkI5E4PTzcjN6lRkMY3O2aUC8tlzC
-	 HJaIr1UY20X/MkbPtm+NtnP5BhWjc2pjc38KGfimOosEfNn/nw+HGm6bAwjOa0TPoZ
-	 x0L21m38iOlxdlwMHRMMDm8cM/nG4UOs5OHMwqV5UHGad13Wu9cjIwyqGpK0ggvHwA
-	 +lTF2+L/0249g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1732528082;
+	bh=fFDoWawgI33eZaEQEGoUTTZhQQtQ+oC/k8T3cn7uRfM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=K4Kn6JMkTVlXgUG0OA7Uxnxdbb9XjuI1MazRwEcQFVVHRZ7u1QcE2rAzl/TIGR7sQ
+	 ZJxkGA/3qMlLgTFKobIswulSFDS6CT7Bf9oLAmBS90kMPl6HYudXGb1PpURDO/y9M9
+	 UNMaldMtiUkJBBeJYL6d4li66SfOsyUGynw7RCrQnlsNBSdFP8ssp2b/eel9lyq+vJ
+	 Mb/neaAqI1Dzfxfh4VcqHuFfV02OIvsW54iIuUGkZCRpe0zF3bmN7C4bx9z3GAG68t
+	 LkAaV6tsO7t0uxbeVeCzt1MVGVg0YHoEfZrmz6GWdLdjjLkDJgvkWqe9xlN4YJtAPf
+	 VHkTCGigxEdTw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tFBso-00FMXC-BH;
-	Sun, 24 Nov 2024 12:38:34 +0000
-Date: Sun, 24 Nov 2024 12:38:33 +0000
-Message-ID: <86jzcsvmba.wl-maz@kernel.org>
+	id 1tFVhI-00FecR-0e;
+	Mon, 25 Nov 2024 09:48:00 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	james.clark@linaro.org,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	broonie@kernel.org,
-	qperret@google.com
-Subject: Re: [PATCH v2 07/12] KVM: arm64: Rework specifying restricted features for protected VMs
-In-Reply-To: <20241122110622.3010118-8-tabba@google.com>
-References: <20241122110622.3010118-1-tabba@google.com>
-	<20241122110622.3010118-8-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH] KVM: arm64: Fix S1/S2 combination when FWB==1 and S2 has Device memory type
+Date: Mon, 25 Nov 2024 09:47:56 +0000
+Message-Id: <20241125094756.609590-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 22 Nov 2024 11:06:17 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> The existing code didn't properly distinguish between signed and
-> unsigned features, and was difficult to read and to maintain.
-> Rework it using the same method used in other parts of KVM when
-> handling vcpu features.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  .../arm64/kvm/hyp/include/nvhe/fixed_config.h |   1 -
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 356 +++++++++---------
->  2 files changed, 186 insertions(+), 171 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-> index 69e26d1a0ebe..37a6d2434e47 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-> @@ -198,7 +198,6 @@
->  	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3), ID_AA64ISAR2_EL1_APA3_PAuth) \
->  	)
->  
-> -u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
->  bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
->  bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
->  void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 3aa76b018f70..cea3b099dc56 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -28,221 +28,237 @@ u64 id_aa64mmfr1_el1_sys_val;
->  u64 id_aa64mmfr2_el1_sys_val;
->  u64 id_aa64smfr0_el1_sys_val;
->  
-> -/*
-> - * Inject an unknown/undefined exception to an AArch64 guest while most of its
-> - * sysregs are live.
-> - */
-> -static void inject_undef64(struct kvm_vcpu *vcpu)
-> -{
-> -	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-> -
-> -	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
-> -	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
-> -
-> -	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
-> -
-> -	__kvm_adjust_pc(vcpu);
-> -
-> -	write_sysreg_el1(esr, SYS_ESR);
-> -	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-> -	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-> -	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-> -}
-> +struct pvm_feature {
-> +	int shift;
-> +	int width;
-> +	u64 mask;
-> +	u64 max_supported;
-> +	bool is_signed;
+The G.a revision of the ARM ARM had it pretty clear that HCR_EL2.FWB
+had no influence on "The way that stage 1 memory types and attributes
+are combined with stage 2 Device type and attributes." (D5.5.5).
 
-Most of this is very similar to struct arm64_ftr_bits. Can you align
-the types and names with it? And do you really need 'mask', which can
-be derived from shift and width?
+However, this wording was lost in further revisions of the architecture.
 
-max_supported as an unsigned value is also potentially troublesome for
-signed features. And does it need to be 64bit wide?
+Restore the intended behaviour, which is to take the strongest memory
+type of S1 and S2 in this case, as if FWB was 0. The specification is
+being fixed accordingly.
 
-> +	bool (*vcpu_supported)(const struct kvm_vcpu *vcpu);
+Fixes: be04cebf3e788 ("KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/at.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-We really need to find a way to kill this. The two features that stick
-out badly are SVE and PAuth, and I don't see why we can't eventually
-track them at the VM level instead (despite the userspace API).
-
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 8c5d7990e5b31..98cb499fa4b11 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -739,8 +739,15 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 			final_attr = s1_parattr;
+ 			break;
+ 		default:
+-			/* MemAttr[2]=0, Device from S2 */
+-			final_attr = s2_memattr & GENMASK(1,0) << 2;
++			/*
++			 * MemAttr[2]=0, Device from S2.
++			 *
++			 * FWB does not influence the way that stage 1
++ 			 * memory types and attributes are combined
++ 			 * with stage 2 Device type and attributes.
++			 */
++			final_attr = min(s2_memattr_to_attr(s2_memattr),
++					 s1_parattr);
+ 		}
+ 	} else {
+ 		/* Combination of R_HMNDG, R_TNHFM and R_GQFSF */
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
