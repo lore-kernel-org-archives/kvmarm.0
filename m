@@ -1,80 +1,167 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E4C1DA614
-	for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 18:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754501DE4F6
+	for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 19:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732646941; cv=none; b=fXPoloiJ1mpQ0rEYqpD/1AxRum4g7uXCFW29h8skf3vnvlSIemoQS36fiGmLzPDLSyqPcm9rmY1pvRkhapJZfa86zcNw3DkxlTyUzKx4NhHA346TNqvMQjwYfpl/HsLZ8tq3rFPzlKDxsxFEgUBHPo1cOEU3+jK035SaGv852jk=
+	t=1732649388; cv=none; b=PFCpTsXQ4LB3oAIDYAYlj+crPe53JwS4AAAPsvan9JP+qQ5leoWVTNqEs7oqUyLJN69VNtEWTsf4y/GZJFZG717AJhePZ2io/8ffTF7FNGQ8ZYiwRmEP9ubjc6GGRwRdb5Z5Bca7h1Rx7tVMusXSixJTR8xvG964SEFTo58MBjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732646941; c=relaxed/simple;
-	bh=eO7Yjw7pts8z1wlkVCi2gFG4+/XhY9dI85zQzEL0dIg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dt7zV6D+WLkmM+ZKuBMQIZqpVCopwkJNXNh1uuvxG7SAHJWeics6w+7v2nqjPAsgA8bgFmtNVIdjGEztYb/4cIP2abHl+FmgKFQs3XkbesoVFfaGxuhQM+cg+I2na2gLuZeincUPrDM/VdOlv9Z4rmyZW+vKTqr0lNSkFY9sBrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L4/aYIeq; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1732649388; c=relaxed/simple;
+	bh=uOVCsbYiBnSpJPQxIP6NXh62KDe/wDTyX61Cj34eCGs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iZHZnbZNoLHkflrVuUCGC0Pwx3zqloLHymKg0rHuULzkfiFt64hRK2m8muduoMbjeQU67D1dh1Mqx/0wNBzEd64k7fdouIWITlGTHIbUptinEFHPn07+uWiyKZs9s4VlKiT/pQhxf1DQuA2xxZwues58LBL1LsHTgSZSH5Y5U/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CuCclOCU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L4/aYIeq"
-Date: Tue, 26 Nov 2024 10:48:50 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732646936;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ToEmNiBbhN5F/yjkx/YHq03WfxPjrJ7SieRa4FeLMBs=;
-	b=L4/aYIeqWZUgwP8whOq9QGeoy4pNVidemMixAv6nZOlhild0Wre4/bBQIc5VeQigkiArVi
-	8h7bFgbTSzWEIETs5dCZdCyUQMCK9vg9JutUo9YuEIldao2+2rIbEBbJhCB2eqca0kQ5Pb
-	oBLUVmzdt5NDvOO5m9YOWXVTAjpBJ2s=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Fix S1/S2 combination when FWB==1 and S2 has
- Device memory type
-Message-ID: <Z0YYEmeJhpJ2PaWf@linux.dev>
-References: <20241125094756.609590-1-maz@kernel.org>
- <Z0XoxGSWRCjbTFie@linux.dev>
- <86ed2yufdz.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CuCclOCU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0801C4CECF;
+	Tue, 26 Nov 2024 19:29:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732649388;
+	bh=uOVCsbYiBnSpJPQxIP6NXh62KDe/wDTyX61Cj34eCGs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CuCclOCUrvE3wNparwDmJMO5Ii6O/wuTHWu/hJ2bmzBsOfBtOIx7UH80wrI5WSs6C
+	 C0sdggOVCybfADMjsFKt4HtRV668tH9kRX3FDeEU+sFAu0NMj4v/WPh5hQueSNfuMY
+	 Io8c8jdo7BIGoyMSuhgjLNWTwLIZnAejv6Lv8oqwi8YxTFJx38TI7SlBvHVrTdLvNE
+	 Vu6rm4X7OifrfDYPtVLk9mHRoi/V/sz2dYDA2Yomcltnk8z3HKP08OB2UKdVxc4K1A
+	 psTuoz4JsmZgtEAKgIbZArFHKpJjBL1eOenk6uAH4AaEk3KTJlRgMu12LPFMdMFe11
+	 68cfF6SvoeF9A==
+Received: from 82-132-234-204.dab.02.net ([82.132.234.204] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tG1Fj-00G65O-RV;
+	Tue, 26 Nov 2024 19:29:45 +0000
+Date: Tue, 26 Nov 2024 19:29:05 +0000
+Message-ID: <87zfllssji.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	yuzenghui <yuzenghui@huawei.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	Linuxarm <linuxarm@huawei.com>,
+	"reijiw@google.com" <reijiw@google.com>
+Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+In-Reply-To: <4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
+References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
+	<86v804z3lk.wl-maz@kernel.org>
+	<b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+	<4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ed2yufdz.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.234.204
+X-SA-Exim-Rcpt-To: sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Nov 26, 2024 at 04:30:16PM +0000, Marc Zyngier wrote:
-> On Tue, 26 Nov 2024 15:27:00 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Mon, Nov 25, 2024 at 09:47:56AM +0000, Marc Zyngier wrote:
-> > > The G.a revision of the ARM ARM had it pretty clear that HCR_EL2.FWB
-> > > had no influence on "The way that stage 1 memory types and attributes
-> > > are combined with stage 2 Device type and attributes." (D5.5.5).
-> > > 
-> > > However, this wording was lost in further revisions of the architecture.
-> > > 
-> > > Restore the intended behaviour, which is to take the strongest memory
-> > > type of S1 and S2 in this case, as if FWB was 0. The specification is
-> > > being fixed accordingly.
-> > 
-> > Since you're already asking for a spec fix, could you mention that the
-> > column headers in DDI0487K.a Table D8-95 are incorrect? MemAttr[1:0] is
-> > used twice, although I believe the first column is actually MemAttr[3:2].
+On Tue, 26 Nov 2024 17:00:35 +0000,
+Sebastian Ott <sebott@redhat.com> wrote:
 > 
-> That one has already been fixed as D22366, as described in the Known
-> Issues document for version K.a (issue 07) [1].
+> Hi,
+> 
+> On Wed, 14 Aug 2024, Shameerali Kolothum Thodi wrote:
+> >> 
+> >> On Tue, 13 Aug 2024 15:28:35 +0100,
+> >> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> >>> 
+> >>> KVM exposes the OS double lock feature bit to Guests but returns
+> >>> RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
+> >>> systems where this feature support differ. Add support to make this
+> >>> feature writable from userspace by setting the mask bit. While at it,
+> >>> set the mask bits for other exposed features in the AA64DFR0_EL1
+> >>> register as well.
+> >>> 
+> >>> Also update the selftest to cover these fields.
+> >>> 
+> >>> Signed-off-by: Shameer Kolothum
+> >> <shameerali.kolothum.thodi@huawei.com>
+> >>> ---
+> >>>    This is based on the discussion here(Thanks to Oliver),
+> >>>    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
+> >>> ---
+> >>>  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
+> >>>  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
+> >>>  2 files changed, 9 insertions(+), 1 deletion(-)
+> >>> 
+> >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >>> index c90324060436..adb49d681052 100644
+> >>> --- a/arch/arm64/kvm/sys_regs.c
+> >>> +++ b/arch/arm64/kvm/sys_regs.c
+> >>> @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[]
+> >> = {
+> >>>  	  .get_user = get_id_reg,
+> >>>  	  .set_user = set_id_aa64dfr0_el1,
+> >>>  	  .reset = read_sanitised_id_aa64dfr0_el1,
+> >>> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
+> >>> +	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
+> >>> +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
+> >>> +		 ID_AA64DFR0_EL1_WRPs_MASK |
+> >>> +		 ID_AA64DFR0_EL1_BRPs_MASK |
+> >> 
+> >> 
+> >> I think this is going to cause some troubles.
+> >> 
+> >> The issue is that context-aware breakpoints are the highest-numbered
+> >> breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
+> >> types and linking of breakpoints"). So if you reduce the number of
+> >> normal breakpoints, you shift the context-aware ones down, and
+> >> everything breaks.
+> > 
+> > Thanks Marc for explaining this. I was not aware of this one.
+> > 
+> >> I really don't see how you can safely do that without completely
+> >> changing the way we handle the debug registers.
+> > 
+> > Looks like Reji has attempted to do this a while back,
+> > https://lore.kernel.org/kvm/20220419065544.3616948-13-reijiw@google.com/
+> > 
+> 
+> I've got two machines that differ in the number of breakpoints and
+> it would be nice to be able to migrate between these. Is anything
 
-Ah, right on. Thanks!
+Is that the *only* thing that differ? Do the have the same number of
+context-aware breakpoints?
+
+> preventing us from trapping the access and make sure the correct
+> breakpoint is used? Is anyone working on this? If not I'd like to
+> give it a shot.
+
+Not only trapping. You also need to handle some interesting parts of
+the architecture, such as the breakpoint linking fun.
+
+But if we are to go down that road, I really want to restrict that to
+implementations that have FEAT_FGT. Because otherwise we need to trap
+and emulate *everything*, instead of just the breakpoint registers.
+And that would be pretty bad from a performance perspective.
+
+Another thing is that this only works because there is no report of
+the breakpoint number in ESR_ELx. The moment we offering this
+migration "feature", we are painting ourselves in a corner, should the
+architecture ever evolve to something less... bizarre.
+
+Finally, who is going to ensure this keeps working in the foreseeable
+future? Because while this is nice, that's not what gets deployed in
+production, as it leads to unpredictable performances. My take is that
+this thing will eventually bitrot and die.
+
+So, do we *really* want to go down that road?
+
+	M.
 
 -- 
-Best,
-Oliver
+Without deviation from the norm, progress is not possible.
