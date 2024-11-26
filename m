@@ -1,161 +1,179 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9B6C133
-	for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 17:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AC51DA0E3
+	for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 17:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732640449; cv=none; b=XwZPIQuBmuA8rEhbsDM1K3LAAFy1zH+xavi8wf+VgdX4w9GZGMlC/Qr1n7OAyS0LrIJmG397uthyn6WvocGaAeigNcvD0TySAex/BG7cRjI4m6zE6eYORhmlgbCJzdAYZP0aLCNCa7BxBWaBno5Elh9vWvetEL9tnTpiRPKSPCM=
+	t=1732641052; cv=none; b=kpd09mOaP1FdLkaIaOPKn6iQKNcVpz+cON8OvVubMSeeB3QHwULZy8o4kWnmPq4YDlbSn0d4M5EM/ixwWm7imKgBfBDPMewr/2hTxSvbkCyqO1VEbG2PfMD56Hm4SrTT84nCdOgkFXYB/eX5mGB5MXxu+LCmnRE0mYwLIJaOhus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732640449; c=relaxed/simple;
-	bh=Eg1Rv+vSBEGAGZDiocMh75GFR+rL9I8a/POQDXOqEIg=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=kExl8Pp0zUIlnmzHy8rVTGVu4afqtl2doOkYadgQ0CALsTfXflJHcGJCde+FPcoqkp3oYHp4Uwj/uLloFEBqhNoYqUw4/0Ly8TL+m56qNM8U+bcJWzOLoasgEwi93ccOa6d4T4XV6pGTWHeAeP3sNTIHLWELud56J/I/s1Zw/6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H1i67Ngi; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1732641052; c=relaxed/simple;
+	bh=ZyGBNBNeIbh195o6EdpIawljBTKhqraCODqJVGMKWF8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NoPUNN42gF5E1tTDnck4p+2AAyPNrkpinCCeAPmp13CtQusGxuIBOGQ2SgVKoDhDPdlBcKKTHpwWGjuFAp3J5tm9izWnoBNy1+0Re7Bj0CxHYiyUcFQ0+gNwMr24XQC5RMykJ17fv0AjwDAnPnqi1XjMkD1II47RK4ZMY6RO50M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TO64gHFF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H1i67Ngi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TO64gHFF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732640446;
+	s=mimecast20190719; t=1732641049;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ydmtTAzJ7xFTdnZQzRxd9lW2geyaRjzb3DBbsGuXzYg=;
-	b=H1i67NgiUN3A93zqAoIfhVBawspt7iU8/hwq3pEMUVx9MvwIf8f6FXCxfeK2QWCBmKFxxK
-	CMa2uebPaCeQMuvLhGVXrB/3kl29hrI29Qty07Dmh+8DgJ/7VYQLSVaSIkrnCuBuj4kTwO
-	dTcUaOzV0HtHDCIUrpIyS7LtpgmZcs8=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pg1WH4/I0jZVgF7EzjYgTyBHdR/uKOZ3f0DDPVvbwns=;
+	b=TO64gHFFVF3WZ2Hy3LkLojzMAoMVIL7FzKP9qgL2OywrTH9ehwgNqMYUG9pgW8ysJ41nCs
+	tCWMZ+l3W/7HC2N57mO4Iuh+FkOz+r9/FpUQCqqBOa2Gfn4+aIEijZ/BOVfywJcEf0OBOi
+	Ne5nKc7DMj37nFBa5wuHZG9Cgq9hwas=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-294-iZ0hJlO8NJ-YTvXYqh27Ww-1; Tue, 26 Nov 2024 12:00:43 -0500
-X-MC-Unique: iZ0hJlO8NJ-YTvXYqh27Ww-1
-X-Mimecast-MFC-AGG-ID: iZ0hJlO8NJ-YTvXYqh27Ww
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b65d6daa02so396073285a.3
-        for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 09:00:43 -0800 (PST)
+ us-mta-83-LdwEn9fbNnyzbrXfCjrQUw-1; Tue, 26 Nov 2024 12:10:48 -0500
+X-MC-Unique: LdwEn9fbNnyzbrXfCjrQUw-1
+X-Mimecast-MFC-AGG-ID: LdwEn9fbNnyzbrXfCjrQUw
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-843eb4505e7so34739139f.0
+        for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 09:10:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732640443; x=1733245243;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ydmtTAzJ7xFTdnZQzRxd9lW2geyaRjzb3DBbsGuXzYg=;
-        b=dBEDQac4Ap1wXhir8PeNYVaIFNNB+igHV4com/wsM8HCJTx8XAzLsIB9pmIKzZH49n
-         QgtFTstOKIQlOqkRSc79qw9W3o7og06zgJoVoIWNxMT4eUAZXgMfVogwpKXNpkl2Eqt5
-         NbJ68+MF1VzBs02jxsqy3K9z+5eMNaSoWoCRy6mpsmio14IyVuGjZCzv/iForKiMvtam
-         z3APq4gq0uIu6sJI+vrVJH68xKbtL0f4sliljmX3pN5QZTdiecapsvzHWJ7SIvlxXbzM
-         0NIphl1uuIpSVad8rg8P+jvGPsOQKzXIFjHpxz4XXL7/kwKvNlfprVvwa2BjpgntIVc8
-         ZToQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/SHL8WBnCSgvBpn6wUd+5GhN3/ar2D7nfs7Nu8jKMet8ZmUZINkILmY4ZZyvM6Z1vs4RrhTk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw9Xe80hesHst/XenpAm5zsx98J8ge4WtVd3czisC7D4hTtibNY
-	U8btFuwNb2qkEew8Dezmxny5wx0C/u3y70bYYqcpxW6hLF9ZFJWN7YCG4lwMpieeMkTuQNPqQLh
-	asEw987P3wUDNnHklf9w8luO27tnZJ0+1mNcG1N7hOBEaHkidDHJ8Dw==
-X-Gm-Gg: ASbGncsOuJbW0Li1KiW+Oo8fpIKZQ31TFOF/YBiZ5NxJlCTuTx9VKrFQ3grdFFe/x1M
-	LDYoskNxmFGje1RrhTBO+rIZ49WgIAOtCJqhrJ1Uo6ic/PdSOAzFAVU0sBUUbkruYjT3d+QTnOS
-	8jhqG2/fZVv7urc3ONGu6+NH/ERMubYb4f2Z7q7e2QJu1viT5rtr+UYwL7wR6xcqJC81vgRZcDy
-	yhlIm/q23UvnC6Tb+qVG1hTEqNT4wGue7dPKhriOEf3DLsEKaIby+4ouopT6xI0hdW4hWXS73EM
-	sOtitarIJegbaVccUYK6iA==
-X-Received: by 2002:a05:620a:4393:b0:7b6:66d0:5ab6 with SMTP id af79cd13be357-7b666d05b7fmr1177814985a.51.1732640442841;
-        Tue, 26 Nov 2024 09:00:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEk2ACspI3Vw+bJ1uihy2FVtGnZP2FHNgWeUwBtUpzJHCjn+X46VDNrXbQ0bQSxFF1w9gPpfQ==
-X-Received: by 2002:a05:620a:4393:b0:7b6:66d0:5ab6 with SMTP id af79cd13be357-7b666d05b7fmr1177812085a.51.1732640442528;
-        Tue, 26 Nov 2024 09:00:42 -0800 (PST)
-Received: from rh (p200300f6af0bca008282df582fad0b68.dip0.t-ipconnect.de. [2003:f6:af0b:ca00:8282:df58:2fad:b68])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b51416a3a9sm481154685a.113.2024.11.26.09.00.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 09:00:42 -0800 (PST)
-Date: Tue, 26 Nov 2024 18:00:35 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-cc: Marc Zyngier <maz@kernel.org>, 
-    "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-    "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-    "will@kernel.org" <will@kernel.org>, 
-    "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-    "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-    "james.morse@arm.com" <james.morse@arm.com>, 
-    "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-    yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, 
-    Linuxarm <linuxarm@huawei.com>, "reijiw@google.com" <reijiw@google.com>
-Subject: RE: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1
- writable from userspace
-In-Reply-To: <b2dad37ac5464384abe4edf76cb6b546@huawei.com>
-Message-ID: <4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
-References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com> <86v804z3lk.wl-maz@kernel.org> <b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+        d=1e100.net; s=20230601; t=1732641047; x=1733245847;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pg1WH4/I0jZVgF7EzjYgTyBHdR/uKOZ3f0DDPVvbwns=;
+        b=FllKQ6NQUgdM3X7+Eo2hpBvtC9OYBjmXkXQgml6AnvY/RlbAxmNSGtJkonFPJ1FUvG
+         m52acZ+ValNwlD6jXf7QojHbPmN4kAbJbf0AFeJt+1MkxmRVbFzJeZ1TcE1ksGMyipQ1
+         jcEMhEugLh/d43BgcTovYbIL81ZrlcROGLoXSs6c258kBvssu2e4K8UFHJXXN8K3HAW0
+         vUb2VopHcEN31/xVcNKY4C05fXDuEFVm2OPV03aNR3dLhgGsOk0LGm+HnsTAGPKgCcDe
+         D8mZLQ14mptVGdM5CHUpIfz5g/Vwhm5q4N9Y4iRf/LlxepL2rMKznSAL/lAH1KRfIL/E
+         ZyVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFXqtCNa0UTXhqffLUmfZ/qQacItP1GugBnLwZU3jNmNfatWlyJ3C1RL6A2eOBt8MSbycvcQE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzdKCaZznfyQGCaS8vAPtaEvvLKL6AhKg3Xm6A592d7gnPLWpSq
+	d3Qzl7rmGDxi3TQsY6ZGiZa9pE4Hpl67V0fNks4gd3OGLEaiaRTDWgMoGD1sfBz47wJovgtTw9M
+	gMYKt83YpFsVwYsl24IY1PVnL99ERs/NqyhgKHFnbt4FVdGc2glwlQQ==
+X-Gm-Gg: ASbGnctz8M2AriWdLuHyrJkB37KWRCGqURa8lqNCIsDZ3h8r9RVpvFoX887CFlvpp26
+	j/B18a9JhZmk00QnlA4SCyGD1cHlCibI+g8a8ydQlgByTjNRozvvGn/cMK1qQ6+MCYPgh68LWkJ
+	LeJckUKNCqPWVOyBUxMF5hjFx+lfU4XlGZWC7Ogn3LZ8WHRJlfP7aKHJM3RdVgykyy45xGpJpwf
+	maDS/sw+iQqdH786bPrDmE0RqSFgOI+r0x5vx+sgjt2A6sSspw=
+X-Received: by 2002:a05:6e02:16ce:b0:3a7:8a39:269e with SMTP id e9e14a558f8ab-3a79aeea927mr188257485ab.18.1732641047516;
+        Tue, 26 Nov 2024 09:10:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG6K6UNamiK6O/nxV7SHYbjCV/fiYY963jqY0jKdci5faeUGnSMsVF/gMvDkGoJTCkuUhR9iw==
+X-Received: by 2002:a05:6e02:16ce:b0:3a7:8a39:269e with SMTP id e9e14a558f8ab-3a79aeea927mr188256395ab.18.1732641046931;
+        Tue, 26 Nov 2024 09:10:46 -0800 (PST)
+Received: from [192.168.40.164] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e1efbcaa5bsm1792326173.78.2024.11.26.09.10.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Nov 2024 09:10:46 -0800 (PST)
+Message-ID: <07252361-8886-4284-bdba-55c3fe728831@redhat.com>
+Date: Tue, 26 Nov 2024 12:10:24 -0500
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/1] KVM: arm64: Map GPU memory with no struct pages
+To: ankita@nvidia.com, jgg@nvidia.com, maz@kernel.org,
+ oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+ ryan.roberts@arm.com, shahuang@redhat.com, lpieralisi@kernel.org
+Cc: aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+ targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+ apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, zhiw@nvidia.com,
+ mochs@nvidia.com, udhoke@nvidia.com, dnigam@nvidia.com,
+ alex.williamson@redhat.com, sebastianene@google.com, coltonlewis@google.com,
+ kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
+ akpm@linux-foundation.org, gshan@redhat.com, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20241118131958.4609-1-ankita@nvidia.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <20241118131958.4609-1-ankita@nvidia.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: KwuzzbJtWExV4rJ3NJXKbEDSNhFtgNL3_a3j3_s9xF8_1732640443
+X-Mimecast-MFC-PROC-ID: MUzY9Hw9eBcEnMP7lUTQXiDiKSwRrItyeYOr5Rdhnog_1732641048
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+My email client says this patch: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using VMA flags
+   is part of a thread for this titled patchPATCH.  Is it?
 
-On Wed, 14 Aug 2024, Shameerali Kolothum Thodi wrote:
->>
->> On Tue, 13 Aug 2024 15:28:35 +0100,
->> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
->>>
->>> KVM exposes the OS double lock feature bit to Guests but returns
->>> RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
->>> systems where this feature support differ. Add support to make this
->>> feature writable from userspace by setting the mask bit. While at it,
->>> set the mask bits for other exposed features in the AA64DFR0_EL1
->>> register as well.
->>>
->>> Also update the selftest to cover these fields.
->>>
->>> Signed-off-by: Shameer Kolothum
->> <shameerali.kolothum.thodi@huawei.com>
->>> ---
->>>    This is based on the discussion here(Thanks to Oliver),
->>>    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
->>> ---
->>>  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
->>>  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
->>>  2 files changed, 9 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index c90324060436..adb49d681052 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[]
->> = {
->>>  	  .get_user = get_id_reg,
->>>  	  .set_user = set_id_aa64dfr0_el1,
->>>  	  .reset = read_sanitised_id_aa64dfr0_el1,
->>> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
->>> +	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
->>> +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
->>> +		 ID_AA64DFR0_EL1_WRPs_MASK |
->>> +		 ID_AA64DFR0_EL1_BRPs_MASK |
->>
->>
->> I think this is going to cause some troubles.
->>
->> The issue is that context-aware breakpoints are the highest-numbered
->> breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
->> types and linking of breakpoints"). So if you reduce the number of
->> normal breakpoints, you shift the context-aware ones down, and
->> everything breaks.
->
-> Thanks Marc for explaining this. I was not aware of this one.
->
->> I really don't see how you can safely do that without completely
->> changing the way we handle the debug registers.
->
-> Looks like Reji has attempted to do this a while back,
-> https://lore.kernel.org/kvm/20220419065544.3616948-13-reijiw@google.com/
->
+The description has similarities to above description, but some adds, some drops.
 
-I've got two machines that differ in the number of breakpoints and
-it would be nice to be able to migrate between these. Is anything
-preventing us from trapping the access and make sure the correct
-breakpoint is used? Is anyone working on this? If not I'd like to
-give it a shot.
+So, could you clean these two up into (a) a series, or (b) single, separate PATCH's?
 
-Thanks,
-Sebastian
+Thanks.
+
+- Don
+
+On 11/18/24 8:19 AM, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Grace based platforms such as Grace Hopper/Blackwell Superchips have
+> CPU accessible cache coherent GPU memory. The current KVM code
+> prevents such memory to be mapped Normal cacheable and the patch aims
+> to solve this use case.
+> 
+> Today KVM forces the memory to either NORMAL or DEVICE_nGnRE
+> based on pfn_is_map_memory() and ignores the per-VMA flags that
+> indicates the memory attributes. This means there is no way for
+> a VM to get cachable IO memory (like from a CXL or pre-CXL device).
+> In both cases the memory will be forced to be DEVICE_nGnRE and the
+> VM's memory attributes will be ignored.
+> 
+> The pfn_is_map_memory() is thus restrictive and allows only for
+> the memory that is added to the kernel to be marked as cacheable.
+> In most cases the code needs to know if there is a struct page, or
+> if the memory is in the kernel map and pfn_valid() is an appropriate
+> API for this. Extend the umbrella with pfn_valid() to include memory
+> with no struct pages for consideration to be mapped cacheable in
+> stage 2. A !pfn_valid() implies that the memory is unsafe to be mapped
+> as cacheable.
+> 
+> Also take care of the following two cases that are unsafe to be mapped
+> as cacheable:
+> 1. The VMA pgprot may have VM_IO set alongwith MT_NORMAL or MT_NORMAL_TAGGED.
+>     Although unexpected and wrong, presence of such configuration cannot
+>     be ruled out.
+> 2. Configurations where VM_MTE_ALLOWED is not set and KVM_CAP_ARM_MTE
+>     is enabled. Otherwise a malicious guest can enable MTE at stage 1
+>     without the hypervisor being able to tell. This could cause external
+>     aborts.
+> 
+> The GPU memory such as on the Grace Hopper systems is interchangeable
+> with DDR memory and retains its properties. Executable faults should thus
+> be allowed on the memory determined as Normal cacheable.
+> 
+> Note when FWB is not enabled, the kernel expects to trivially do
+> cache management by flushing the memory by linearly converting a
+> kvm_pte to phys_addr to a KVA, see kvm_flush_dcache_to_poc(). This is
+> only possibile for struct page backed memory. Do not allow non-struct
+> page memory to be cachable without FWB.
+> 
+> The changes are heavily influenced by the insightful discussions between
+> Catalin Marinas and Jason Gunthorpe [1] on v1. Many thanks for their
+> valuable suggestions.
+> 
+> Applied over next-20241117 and tested on the Grace Hopper and
+> Grace Blackwell platforms by booting up VM and running several CUDA
+> workloads. This has not been tested on MTE enabled hardware. If
+> someone can give it a try, it will be very helpful.
+> 
+> v1 -> v2
+> 1. Removed kvm_is_device_pfn() as a determiner for device type memory
+>     determination. Instead using pfn_valid()
+> 2. Added handling for MTE.
+> 3. Minor cleanup.
+> 
+> Link: https://lore.kernel.org/lkml/20230907181459.18145-2-ankita@nvidia.com [1]
+> 
+> Ankit Agrawal (1):
+>    KVM: arm64: Allow cacheable stage 2 mapping using VMA flags
+> 
+>   arch/arm64/include/asm/kvm_pgtable.h |   8 +++
+>   arch/arm64/kvm/hyp/pgtable.c         |   2 +-
+>   arch/arm64/kvm/mmu.c                 | 101 +++++++++++++++++++++------
+>   3 files changed, 87 insertions(+), 24 deletions(-)
+> 
 
