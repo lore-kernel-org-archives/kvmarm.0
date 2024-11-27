@@ -1,75 +1,92 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FF11F9A9F
-	for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 14:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CD61FF7D8;
+	Wed, 27 Nov 2024 15:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732719424; cv=none; b=DYS3PyOabbxlHV/lZG/uqMnBTg+1Csh3SK22HVFKjGpKq9soCp2FUL9/Bu5XYcpS6BVUzkupd++JQaUuOg3YrVXN8e8X6NTvII49G61L4MKj4RsjdjyABZGpcl7+Mm2AIahJkFGHx4lIbY90Cs2NNBbyy5lgc8WxeRPYgqix8ys=
+	t=1732720598; cv=none; b=HzRxPNfPRNrL+D0YvuWOoe7J5SVZ1ZuAlyBUOsMdak5swUHE3kFjJcoWJguAGR76YNRGnahCp+3SGdfGBCTx5RjK2HmkO3qXy+8WJC//LzEneFIMWbvbM9tH9mqnMnoMPBCbjDtImOjVdC4rnFzkBneBV/YXIDsjW4r5QjydIlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732719424; c=relaxed/simple;
-	bh=/Ot4oxvlB+fxqPbCQnBzcP18mMeEKhrm2uVJP0I/n70=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QA7MEjgKZl5GAdZD7vQ1cJyrmABz6C5weyMFxFZUngFTTAk1goPBr1JsTLyXq8ZzMdvx3KVT7NotJbQptc65z1lYOHlxQi9anzU3bGClM8TqxN5U/4DCNdQSyy41pSThUQuttBy0pAy+Q0sY/+cOY5H158g9jELH/4ZHIIPmk1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B31C1477;
-	Wed, 27 Nov 2024 06:57:30 -0800 (PST)
-Received: from e122027.arm.com (unknown [10.57.69.41])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B85D3F58B;
-	Wed, 27 Nov 2024 06:56:57 -0800 (PST)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1732720598; c=relaxed/simple;
+	bh=8jnJkKM3PWqGFdZGSMROt5V4Vl8ICBi2XhYnl1VjbiM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X9pd7FHNGYlBghYPwwWc4bKL3aoF/B/vJ8iPBJ60IMvY3ZR4I35V+pYWaoKGwC8prpLTUZoFRZf3EvZ8pXoBxMtjaXNID1jTEBwGbCI9RsK1YL5jVNIRBzRNotUUTqFVfAy5F6fz5aYObxB+Juxel0BfcLHOiXWlI5x1Gu8LZeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTx6qf/0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTx6qf/0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B9E2C4CECC;
+	Wed, 27 Nov 2024 15:16:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732720598;
+	bh=8jnJkKM3PWqGFdZGSMROt5V4Vl8ICBi2XhYnl1VjbiM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hTx6qf/0jaw7idnchniEopk++7ZRKCwqCQwXRZH/FWn0hbimneT7dJNv+yPmEJL3n
+	 PeXzIZzlJlkztMJaP0GSju3OlT8Fo5JZq6vY2wT1BPTKkpD1RkUBQFLrn4FwiaBKuL
+	 jgkOOd0nhJ8hKCF2y97F55WiS1zf0uuKXY0BbAFsyJXtzEpOxBJomPZDdXBL7yF4uJ
+	 QIYDIfXg22DbgRUWvBpgktauIrQHs8vZ9NJRT3dOWp606PI4chHrOa16PaKB8wPOPE
+	 Y5EhPKHgsOHvEzOeLOqJoiAYThL1M1f1Mz2V8/v9CSTRHcGnyT4R7boWSus4m+eKZ4
+	 rmJROb/5CCaOw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tGJmN-00GIa4-QV;
+	Wed, 27 Nov 2024 15:16:35 +0000
+Date: Wed, 27 Nov 2024 15:16:35 +0000
+Message-ID: <86a5dkvh9o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>
-Cc: Steven Price <steven.price@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Bump KVM_VCPU_MAX_FEATURES
-Date: Wed, 27 Nov 2024 14:56:31 +0000
-Message-ID: <20241127145644.421352-1-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
+Subject: Re: [PATCH] KVM: arm64: Bump KVM_VCPU_MAX_FEATURES
+In-Reply-To: <20241127145644.421352-1-steven.price@arm.com>
+References: <20241127145644.421352-1-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When the KVM_ARM_VCPU_HAS_EL2 define was added, the value of
-KVM_VCPU_MAX_FEATURES wasn't incremented, so that feature has never been
-in the KVM_VCPU_VALID_FEATURES bit mask. This means the HAS_EL2 feature
-will never be exposed to user space even if the system supports it.
+On Wed, 27 Nov 2024 14:56:31 +0000,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> When the KVM_ARM_VCPU_HAS_EL2 define was added, the value of
+> KVM_VCPU_MAX_FEATURES wasn't incremented, so that feature has never been
+> in the KVM_VCPU_VALID_FEATURES bit mask. This means the HAS_EL2 feature
+> will never be exposed to user space even if the system supports it.
+> 
+> Fixes: 89b0e7de3451 ("KVM: arm64: nv: Introduce nested virtualization VCPU feature")
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> I might be missing something, and it's possible that
+> KVM_ARM_VCPU_HAS_EL2 is deliberately not exposed yet.
 
-Fixes: 89b0e7de3451 ("KVM: arm64: nv: Introduce nested virtualization VCPU feature")
-Signed-off-by: Steven Price <steven.price@arm.com>
----
-I might be missing something, and it's possible that
-KVM_ARM_VCPU_HAS_EL2 is deliberately not exposed yet. However I'm
-working on v6 of the host CCA series and as part of that want to add a
-new feature but and bump KVM_VCPU_MAX_FEATURES up to 9.
+This is on purpose. I'm not planning to enable EL2 support until it is
+ready.
 
- arch/arm64/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> However I'm
+> working on v6 of the host CCA series and as part of that want to add a
+> new feature but and bump KVM_VCPU_MAX_FEATURES up to 9.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e18e9244d17a..af7c827b216e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -39,7 +39,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_MAX_FEATURES 8
- #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
- 
- #define KVM_REQ_SLEEP \
+Well, I guess that defines some ordering then! :D
+
+	M.
+
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
