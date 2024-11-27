@@ -1,92 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CD61FF7D8;
-	Wed, 27 Nov 2024 15:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F281E51D
+	for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 15:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732720598; cv=none; b=HzRxPNfPRNrL+D0YvuWOoe7J5SVZ1ZuAlyBUOsMdak5swUHE3kFjJcoWJguAGR76YNRGnahCp+3SGdfGBCTx5RjK2HmkO3qXy+8WJC//LzEneFIMWbvbM9tH9mqnMnoMPBCbjDtImOjVdC4rnFzkBneBV/YXIDsjW4r5QjydIlY=
+	t=1732721080; cv=none; b=qKZnXzG9maTZslKp+02d4aXbNQ5914fncmGErCn2OguXUhO5ELLr1orBGBdXgRbURIXeRUYRkmokd9XginmxjP38Jw/Cp0axUOc7RW2ROru2VsBxzp477fH8+zcHsiTbcIo2oQUmO99V2A38O45qfhtoeaUn+hn+opLVyLp2Ptg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732720598; c=relaxed/simple;
-	bh=8jnJkKM3PWqGFdZGSMROt5V4Vl8ICBi2XhYnl1VjbiM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X9pd7FHNGYlBghYPwwWc4bKL3aoF/B/vJ8iPBJ60IMvY3ZR4I35V+pYWaoKGwC8prpLTUZoFRZf3EvZ8pXoBxMtjaXNID1jTEBwGbCI9RsK1YL5jVNIRBzRNotUUTqFVfAy5F6fz5aYObxB+Juxel0BfcLHOiXWlI5x1Gu8LZeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTx6qf/0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTx6qf/0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B9E2C4CECC;
-	Wed, 27 Nov 2024 15:16:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732720598;
-	bh=8jnJkKM3PWqGFdZGSMROt5V4Vl8ICBi2XhYnl1VjbiM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hTx6qf/0jaw7idnchniEopk++7ZRKCwqCQwXRZH/FWn0hbimneT7dJNv+yPmEJL3n
-	 PeXzIZzlJlkztMJaP0GSju3OlT8Fo5JZq6vY2wT1BPTKkpD1RkUBQFLrn4FwiaBKuL
-	 jgkOOd0nhJ8hKCF2y97F55WiS1zf0uuKXY0BbAFsyJXtzEpOxBJomPZDdXBL7yF4uJ
-	 QIYDIfXg22DbgRUWvBpgktauIrQHs8vZ9NJRT3dOWp606PI4chHrOa16PaKB8wPOPE
-	 Y5EhPKHgsOHvEzOeLOqJoiAYThL1M1f1Mz2V8/v9CSTRHcGnyT4R7boWSus4m+eKZ4
-	 rmJROb/5CCaOw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tGJmN-00GIa4-QV;
-	Wed, 27 Nov 2024 15:16:35 +0000
-Date: Wed, 27 Nov 2024 15:16:35 +0000
-Message-ID: <86a5dkvh9o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Bump KVM_VCPU_MAX_FEATURES
-In-Reply-To: <20241127145644.421352-1-steven.price@arm.com>
-References: <20241127145644.421352-1-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1732721080; c=relaxed/simple;
+	bh=k8Y+s9d1Ct44DQbkCmzZQEuJXJRcZKAzfiXcmPvCi0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p1170WF6YCx2dAtcKMEwjN1UIuPG3kr4Hwb6Oij6GJ+s8s8Yg3q0eC9PqYnh43ALSpDh3wF23G8YQAM33ISeBO5HhrriEeFwFlmp/hcHW3mvcRLUcsMC/AvS4flcSM3DTlj06//YSkcruol9enx3Hr3eHmUGxH8KHu7ZB9IryCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F4161477;
+	Wed, 27 Nov 2024 07:25:07 -0800 (PST)
+Received: from [10.57.69.41] (unknown [10.57.69.41])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0519E3F58B;
+	Wed, 27 Nov 2024 07:24:34 -0800 (PST)
+Message-ID: <a7011738-a084-46fa-947f-395d90b37f8b@arm.com>
+Date: Wed, 27 Nov 2024 15:24:32 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Bump KVM_VCPU_MAX_FEATURES
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20241127145644.421352-1-steven.price@arm.com>
+ <86a5dkvh9o.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86a5dkvh9o.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 27 Nov 2024 14:56:31 +0000,
-Steven Price <steven.price@arm.com> wrote:
+On 27/11/2024 15:16, Marc Zyngier wrote:
+> On Wed, 27 Nov 2024 14:56:31 +0000,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> When the KVM_ARM_VCPU_HAS_EL2 define was added, the value of
+>> KVM_VCPU_MAX_FEATURES wasn't incremented, so that feature has never been
+>> in the KVM_VCPU_VALID_FEATURES bit mask. This means the HAS_EL2 feature
+>> will never be exposed to user space even if the system supports it.
+>>
+>> Fixes: 89b0e7de3451 ("KVM: arm64: nv: Introduce nested virtualization VCPU feature")
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> I might be missing something, and it's possible that
+>> KVM_ARM_VCPU_HAS_EL2 is deliberately not exposed yet.
 > 
-> When the KVM_ARM_VCPU_HAS_EL2 define was added, the value of
-> KVM_VCPU_MAX_FEATURES wasn't incremented, so that feature has never been
-> in the KVM_VCPU_VALID_FEATURES bit mask. This means the HAS_EL2 feature
-> will never be exposed to user space even if the system supports it.
+> This is on purpose. I'm not planning to enable EL2 support until it is
+> ready.
+
+I did suspect that's the case - but it might have been better to knobble
+it in system_supported_vcpu_features()/kvm_vcpu_init_check_features()
+rather than 'hiding' it in the MAX_FEATURES. But hindsight is a
+wonderful thing ;)
+
+>> However I'm
+>> working on v6 of the host CCA series and as part of that want to add a
+>> new feature but and bump KVM_VCPU_MAX_FEATURES up to 9.
 > 
-> Fixes: 89b0e7de3451 ("KVM: arm64: nv: Introduce nested virtualization VCPU feature")
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> I might be missing something, and it's possible that
-> KVM_ARM_VCPU_HAS_EL2 is deliberately not exposed yet.
+> Well, I guess that defines some ordering then! :D
 
-This is on purpose. I'm not planning to enable EL2 support until it is
-ready.
+Indeed - I'll try to remember to include note about this "dependency" in
+my cover letter. We're likely to need a few more rounds for CCA to be
+ready, so hopefully NV will naturally be there in time :D
 
-> However I'm
-> working on v6 of the host CCA series and as part of that want to add a
-> new feature but and bump KVM_VCPU_MAX_FEATURES up to 9.
+Thanks,
+Steve
 
-Well, I guess that defines some ordering then! :D
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
