@@ -1,167 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754501DE4F6
-	for <kvmarm@lists.linux.dev>; Tue, 26 Nov 2024 19:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276B914AD02
+	for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 09:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732649388; cv=none; b=PFCpTsXQ4LB3oAIDYAYlj+crPe53JwS4AAAPsvan9JP+qQ5leoWVTNqEs7oqUyLJN69VNtEWTsf4y/GZJFZG717AJhePZ2io/8ffTF7FNGQ8ZYiwRmEP9ubjc6GGRwRdb5Z5Bca7h1Rx7tVMusXSixJTR8xvG964SEFTo58MBjw=
+	t=1732698430; cv=none; b=C0tiIX0m9cuGnRr9IKSrRHPzXvUU43OTqw/0uB78i5hd69sUWYkrj3VMopbAOoAQfAbTP8qWMUGqiwTozp7hoWLZDB26i9e1ux5PaU4B2NTduhCj5T9yY3WYxrKB4UrW5vsJkDsZC1FduRkqcg7k7mmqjR7715FgqhEZ7WvErTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732649388; c=relaxed/simple;
-	bh=uOVCsbYiBnSpJPQxIP6NXh62KDe/wDTyX61Cj34eCGs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iZHZnbZNoLHkflrVuUCGC0Pwx3zqloLHymKg0rHuULzkfiFt64hRK2m8muduoMbjeQU67D1dh1Mqx/0wNBzEd64k7fdouIWITlGTHIbUptinEFHPn07+uWiyKZs9s4VlKiT/pQhxf1DQuA2xxZwues58LBL1LsHTgSZSH5Y5U/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CuCclOCU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732698430; c=relaxed/simple;
+	bh=EYhWuCkWd78rd53gaTGuNCDhMxotWupB+s7j8Vqu+jM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vpq2tNFm0SZe0ieP4jff/jHOu4w3oY7yCraIxix16tQZWJVGqQsPLcIJO7bYIgMMXNQlV/XFKfmkItv3LKX0LTp3B+43CaWTOqlq2YJIwdZOI5XcNtDVRMk++P9bEiRlQ8egCzT7JHbGLlDBSgefizZks5J9V9og4eznwKvbHHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mXOQRpW6; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CuCclOCU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0801C4CECF;
-	Tue, 26 Nov 2024 19:29:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732649388;
-	bh=uOVCsbYiBnSpJPQxIP6NXh62KDe/wDTyX61Cj34eCGs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CuCclOCUrvE3wNparwDmJMO5Ii6O/wuTHWu/hJ2bmzBsOfBtOIx7UH80wrI5WSs6C
-	 C0sdggOVCybfADMjsFKt4HtRV668tH9kRX3FDeEU+sFAu0NMj4v/WPh5hQueSNfuMY
-	 Io8c8jdo7BIGoyMSuhgjLNWTwLIZnAejv6Lv8oqwi8YxTFJx38TI7SlBvHVrTdLvNE
-	 Vu6rm4X7OifrfDYPtVLk9mHRoi/V/sz2dYDA2Yomcltnk8z3HKP08OB2UKdVxc4K1A
-	 psTuoz4JsmZgtEAKgIbZArFHKpJjBL1eOenk6uAH4AaEk3KTJlRgMu12LPFMdMFe11
-	 68cfF6SvoeF9A==
-Received: from 82-132-234-204.dab.02.net ([82.132.234.204] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tG1Fj-00G65O-RV;
-	Tue, 26 Nov 2024 19:29:45 +0000
-Date: Tue, 26 Nov 2024 19:29:05 +0000
-Message-ID: <87zfllssji.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	Linuxarm <linuxarm@huawei.com>,
-	"reijiw@google.com" <reijiw@google.com>
-Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-In-Reply-To: <4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
-References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
-	<86v804z3lk.wl-maz@kernel.org>
-	<b2dad37ac5464384abe4edf76cb6b546@huawei.com>
-	<4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mXOQRpW6"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4349338add3so32145e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 01:07:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732698427; x=1733303227; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mBxxllbmGCNC4M6ZGUi3hTx4gy23i+k4nkuufppIRDc=;
+        b=mXOQRpW6kb062AefwsL8v3p6DSpGqjPaMX+Amo8fSjpt7xX58TxB1VvyphX/V47S1M
+         wc9zj6WsSWPZePJCgGeeEVPwI3uytnIbLljGHJITrlBlZBuJIWRdsCXi/Sl36FME5Dka
+         8Bd6HvED+sRYpDUQ3kxpVfxN+9bU7HqsnYSOI5zFCfK3QICY8lZPyrLIc3bpk9dB7fhV
+         GUaTBkxkZAtqQuLYX65ChRwIt567am6jghk4xfEZQMfOhZidVTAmRq3aknkaScMvrUO3
+         ajsYr7ejSZQqRZMlDXxf3vdFkn0TtV77wEMzCtTQ7S+0xGV54R2f4VGbbKvnBgyjLTNN
+         wmjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732698427; x=1733303227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mBxxllbmGCNC4M6ZGUi3hTx4gy23i+k4nkuufppIRDc=;
+        b=cG9m2TXqKZiMttm1KOIc4sOlw4XFNs2b7OVK2KTiNkSdkk3Wv0ZEHR7pHEWTutuQ/a
+         q0x3h1Rh2a4H7F0c2aGabf9o/oUVWlqk+YQIvAgmAgM9X6/dQwfZOIox7xWmupkD/0uL
+         wW5wecu2sG241vCfUyeCLeIntCOITh1gIUnqmUGIHrzW/WeEhsNdIKfxtKqTn3q/jjxy
+         N6O0fFbUdvb/7cHkpziDCkvaeQ63vg3kKMzGSmfTuaIPmX1Ev0hpi9bPAkL08R5FOgL6
+         78wXagyb6ODsLPBYqevpnYzh87Kp61FQ7Cyu0KDyxTj5WDKB7fHYVUUv/ESyrQhRsf2t
+         aJYQ==
+X-Gm-Message-State: AOJu0YzHcO9fuQllvUw9ptdIc2xBNeKdpFzpM4f7lFgImCYMLdcXM3S1
+	lLyTblm6H168P2RICnxJYgnPIqyb4T0O11fQa6myX9mUhI2efDQ9swSrW1S+YTmXyCcCIYaB4LC
+	DSES6XC38oK78W7Z4LmD9v8OEVWDI1gNAjY2N
+X-Gm-Gg: ASbGncsEttJNPOzcVBC11YZpFyBuMWesfmqKKTf3jQ3dAeHxWpPKMSdfTe1o7qzh3BT
+	O+Xa+zIGISOh1StEaOuTnYJ2tX78I/kWWJZPz0RWpgNMtDTgPZJzfJggQSVDb
+X-Google-Smtp-Source: AGHT+IEUOv+ttrgixa863IXDx4IkyNSORqkbzpzMgsE3AtC5i38dGESn9hxm+cgmL+2iHBzWVZ/gwvQzBFwaHgYd9xU=
+X-Received: by 2002:a05:600c:511f:b0:434:9dce:75da with SMTP id
+ 5b1f17b1804b1-434aa0a508fmr870905e9.0.1732698427321; Wed, 27 Nov 2024
+ 01:07:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.234.204
-X-SA-Exim-Rcpt-To: sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com, reijiw@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20241122110622.3010118-1-tabba@google.com> <20241122110622.3010118-8-tabba@google.com>
+ <100b6b71-22d4-4513-9f8f-849a11c0a809@arm.com>
+In-Reply-To: <100b6b71-22d4-4513-9f8f-849a11c0a809@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 27 Nov 2024 09:06:31 +0000
+Message-ID: <CA+EHjTx4WdCNt=ZHNSMFygGDsy70LnDev4VpdTnhb+-j7QfdQg@mail.gmail.com>
+Subject: Re: [PATCH v2 07/12] KVM: arm64: Rework specifying restricted
+ features for protected VMs
+To: =?UTF-8?Q?Kristina_Mart=C5=A1enko?= <kristina.martsenko@arm.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
+	qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 26 Nov 2024 17:00:35 +0000,
-Sebastian Ott <sebott@redhat.com> wrote:
-> 
-> Hi,
-> 
-> On Wed, 14 Aug 2024, Shameerali Kolothum Thodi wrote:
-> >> 
-> >> On Tue, 13 Aug 2024 15:28:35 +0100,
-> >> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> >>> 
-> >>> KVM exposes the OS double lock feature bit to Guests but returns
-> >>> RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
-> >>> systems where this feature support differ. Add support to make this
-> >>> feature writable from userspace by setting the mask bit. While at it,
-> >>> set the mask bits for other exposed features in the AA64DFR0_EL1
-> >>> register as well.
-> >>> 
-> >>> Also update the selftest to cover these fields.
-> >>> 
-> >>> Signed-off-by: Shameer Kolothum
-> >> <shameerali.kolothum.thodi@huawei.com>
-> >>> ---
-> >>>    This is based on the discussion here(Thanks to Oliver),
-> >>>    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
-> >>> ---
-> >>>  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
-> >>>  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
-> >>>  2 files changed, 9 insertions(+), 1 deletion(-)
-> >>> 
-> >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >>> index c90324060436..adb49d681052 100644
-> >>> --- a/arch/arm64/kvm/sys_regs.c
-> >>> +++ b/arch/arm64/kvm/sys_regs.c
-> >>> @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[]
-> >> = {
-> >>>  	  .get_user = get_id_reg,
-> >>>  	  .set_user = set_id_aa64dfr0_el1,
-> >>>  	  .reset = read_sanitised_id_aa64dfr0_el1,
-> >>> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
-> >>> +	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
-> >>> +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
-> >>> +		 ID_AA64DFR0_EL1_WRPs_MASK |
-> >>> +		 ID_AA64DFR0_EL1_BRPs_MASK |
-> >> 
-> >> 
-> >> I think this is going to cause some troubles.
-> >> 
-> >> The issue is that context-aware breakpoints are the highest-numbered
-> >> breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
-> >> types and linking of breakpoints"). So if you reduce the number of
-> >> normal breakpoints, you shift the context-aware ones down, and
-> >> everything breaks.
-> > 
-> > Thanks Marc for explaining this. I was not aware of this one.
-> > 
-> >> I really don't see how you can safely do that without completely
-> >> changing the way we handle the debug registers.
-> > 
-> > Looks like Reji has attempted to do this a while back,
-> > https://lore.kernel.org/kvm/20220419065544.3616948-13-reijiw@google.com/
-> > 
-> 
-> I've got two machines that differ in the number of breakpoints and
-> it would be nice to be able to migrate between these. Is anything
+Hi Kristina,
 
-Is that the *only* thing that differ? Do the have the same number of
-context-aware breakpoints?
+On Tue, 26 Nov 2024 at 18:28, Kristina Mart=C5=A1enko
+<kristina.martsenko@arm.com> wrote:
+>
+> Hi Fuad,
+>
+> On 22/11/2024 11:06, Fuad Tabba wrote:
+> > The existing code didn't properly distinguish between signed and
+> > unsigned features, and was difficult to read and to maintain.
+> > Rework it using the same method used in other parts of KVM when
+> > handling vcpu features.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+>
+>
+> > +static const struct pvm_feature pvmid_aa64isar2[] =3D {
+> > +     MAX_FEAT_FUNC(ID_AA64ISAR2_EL1, GPA3, IMP, _vcpu_has_ptrauth),
+> > +     MAX_FEAT_FUNC(ID_AA64ISAR2_EL1, APA3, PAuth, _vcpu_has_ptrauth),
+> > +     MAX_FEAT(ID_AA64ISAR2_EL1, ATS1A, IMP),
+> > +     FEAT_END
+> > +};
+>
+> Just wondering - did you intentionally hide the MOPS feature from protect=
+ed
+> guests here? (It was exposed before)
+>
+> I did notice that the HCRX trap setting is currently broken/missing in up=
+stream
+> pKVM, which means MOPS instructions UNDEF in the guest. Is it related to =
+that?
 
-> preventing us from trapping the access and make sure the correct
-> breakpoint is used? Is anyone working on this? If not I'd like to
-> give it a shot.
+You're right on both counts. It was there before, but I removed it in
+this patch series since HCRX trap setting is missing.
 
-Not only trapping. You also need to handle some interesting parts of
-the architecture, such as the breakpoint linking fun.
+I have patches that add support for pKVM, based on the work that
+you've already done, ready to post later.
 
-But if we are to go down that road, I really want to restrict that to
-implementations that have FEAT_FGT. Because otherwise we need to trap
-and emulate *everything*, instead of just the breakpoint registers.
-And that would be pretty bad from a performance perspective.
+I will respin this series again soon, with the comments from Marc.
 
-Another thing is that this only works because there is no report of
-the breakpoint number in ESR_ELx. The moment we offering this
-migration "feature", we are painting ourselves in a corner, should the
-architecture ever evolve to something less... bizarre.
+Thanks,
+/fuad
 
-Finally, who is going to ensure this keeps working in the foreseeable
-future? Because while this is nice, that's not what gets deployed in
-production, as it leads to unpredictable performances. My take is that
-this thing will eventually bitrot and die.
-
-So, do we *really* want to go down that road?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> Thanks,
+> Kristina
+>
