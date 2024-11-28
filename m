@@ -1,161 +1,106 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20A914C5A1
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 08:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC1013D8B0
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 08:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732782376; cv=none; b=erRJ4TDI1uRMu+z6xFjsMaQSfzxj3Ncq+YsYSSAOA6nVwyFFiCqvJ/eDTHyDj9raIBwxZtXh+S9xpjxDAvlGCnjEu/uTaOBFUr+2m28B1udKfCCqR4d6nME8QpnZUrcbJ+8FRDLoikmnuSO7l782YzwnsX+W5k0E67thxdWEz58=
+	t=1732783366; cv=none; b=HR7VYs/W2h9/ZGl35MINorcEdAaY4GLApDFZu5qDl8wfA62o+s5VHLHB5BUhex0oa71DdZdxG7yuW62L5vbrWszpxMxYX7tEKi2TZhTY+2rnzDduT7k20xxU+8YBfiSptoQbexCNk1XLIJID05kyeNN5IKOHgi0I2/Vqb1OhdPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732782376; c=relaxed/simple;
-	bh=SEOf9b59rsVAnvw0F0BMCgnxDQ08vBA2KkFh016Tq2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fd/h/rwkvDaVNNqxROp/I/67j6d5JsZTkGdwDgkrz09Wnle5pwWY8p809jRmk42IzTy1WELYZdUh695Q2ue9BjRwc6omCDlnRWp/5vdysNxXQV3+2sQcX1KTNa8eKhsJ7VeJftVGVVixDocr8xZEb70p+gKzIY8palIxIgv4TtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qfJT/mqS; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1732783366; c=relaxed/simple;
+	bh=7ZZDaAfSE8cvMEwpoEXTL1xwZPoGe7nBEVbFQ7QIRF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TclxctX5SsXBAjMDBr8HmNPaiM8dbX7DE7NY0pH45oIq92ELXbxMEGxjJ7CWnIAMvoWmYr9rcxb0feHhnHbSGoHboF53dvXRkG8La1ezkhobIoXtgQVw7b8P9hUAy3PncN6elU+f5BDqBTXHGQns0F6m/QXZUycnj+js0uOyLfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=c2r04KDI; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qfJT/mqS"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AS7oRRb014074;
-	Thu, 28 Nov 2024 08:25:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=/Bh0GF
-	51mC3o/RxYgNmHcCehmfBpXZNARIu36UpCSGk=; b=qfJT/mqSqclkYS88OL1Z9u
-	OJfo4rI/sKiXoNlnPvAhWRx2co9rtgllLGb/dgYZlAMmeB3k85bbj345AmRSgOuG
-	Jezp8CFT/Ih7OWAGWv1Fc8Iy/z0pWNBsCVFWfYaz/Bn/MEY/mOYgFEBnw2EwYtpQ
-	IykaDWgV66XQVfdWszKxlrde+ThTHf0ISDftG9u+Vt4uSfW7tfT+Z1ZlIpAZTIyZ
-	nES0OtBNwkOiGexGjlKpgwFsJpZ5f6RRgaOd2yBjMiDDs+QX6ex+/tbgIHIDidst
-	9MDXsbcvTDafoRJyBc4XjFr6v6JfFAxox6kzbznGs6NNQgg+BZPduRUrmOA5GZug
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4366yybgx4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Nov 2024 08:25:53 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AS8LGMs028952;
-	Thu, 28 Nov 2024 08:25:53 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4366yybgwx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Nov 2024 08:25:53 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AS8MrcJ009800;
-	Thu, 28 Nov 2024 08:25:52 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43672f7xsm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Nov 2024 08:25:52 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AS8PmOn21233924
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 28 Nov 2024 08:25:48 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E3BA82005A;
-	Thu, 28 Nov 2024 08:25:47 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 937B22004F;
-	Thu, 28 Nov 2024 08:25:47 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 28 Nov 2024 08:25:47 +0000 (GMT)
-Date: Thu, 28 Nov 2024 09:25:46 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="c2r04KDI"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5cfc035649bso671574a12.2
+        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 00:42:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1732783363; x=1733388163; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pqNO4mcpLsB6nl6y5oYnZ+p9PNe/HBxDvPKQfTS22pA=;
+        b=c2r04KDI6Da9+TLZXJQGw+g5rHX/Y3Sh/+8apwrBtFTQJBj5UVtuEoUY+5M2MewvZO
+         ZfIy2lkFnUrlAtHK2DWiMFbv8PbLMUMi1xlY+fSrgoGniTfxHOKbcfXMSXEDeJif/4e1
+         VTd1CwLRheFpVfD8pip4pWMSv+KD7ZHIfwG5ZclP7T5R3LVNwWIDgm/pLBBKVqDh6JE4
+         aW94MCQxdafd0na5XLm/wXEzEjoQQa0dWpuEl/C17xy4V1mXEGo6UAs80REEexFHFkFF
+         09cft55n5fx6amQFsM5S9SkJhHx/JSgV1plbYetcpoySTKXB2xuMrO5i5KJeZIEGskkF
+         2R0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732783363; x=1733388163;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pqNO4mcpLsB6nl6y5oYnZ+p9PNe/HBxDvPKQfTS22pA=;
+        b=Ad+Qhy1jCjgL0o/u2iAwcp20inRY3YkCSvfOTipQkAgdxDWSqB6tZegzDmDhAUhr3L
+         Jlo6aCXobOIRJyUZOKRsSW+V4O9SZ/PlAyWb0R5T3T6MwxPPX65drpA3xS7CB+JAGqkA
+         T9Pazbjy1iQEjnes/ZH/hubRD7ZHc3RRS9Pcxcih8vfR3Hn8TCs/h78RuP59lVnYzZ57
+         jXyAjzh6938DH+lyArqpZneOb7z9LgD38nZBaCMNZExUpE2CxeRqooh1uij/XF6MZ8Nf
+         Nkl8SuortjIpMklAIkIVRfu0wZ9eXaC//aBunC/+GtC42DmU994tFYNBlGu8y9c9nA2r
+         hK8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVImy7/rhRfsQB5mTOuFaK68Ki2zizyDrIqd9MVmbzDyEgSPbJb3312LMGT1o8e7tz9tW7wL0E=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyx5lzYeB/RTEU4VN5Fk7VWgaUS2k0cxf3GpJWBGrn5b9atq8hD
+	PA4gRqPczr7PUZj5Dw/phEpCqO4dAF5t4dPWZyWedMMLzJLFQKcCdM4T1NKZT5U=
+X-Gm-Gg: ASbGncsNOJ90WaWZQb4ID5BWh3zW2b3pMAEU/2IlcaLdRe7U3EBVT/niLAfRJjaJ+8O
+	Mwb79bUkJBXFkJJ/QEv+OfHS20yxwDBgkDz9koyzoMCM3xprEn6Da2RcGzNv0Bs5WzbNfiqLeia
+	Ok3QrpP7m4ZZqFOzLcRD4ixQlGiat1XoIWSAuVc6zxv4jv255jMTcNsYPgwCo2rjY5o2YDlPGFO
+	Ln1/jiWPbKtrZzAYBPx0r66jqoxVxVZ+0SA0C7BvOoxNG4zgA3pyDZRthOHDXQojknXfl+T1EFh
+	Fv8ttUkQ6CYVWDjEITi0x/VV9mxKGG+xUJA=
+X-Google-Smtp-Source: AGHT+IEtMpQZWj4endJlLK3Ilr+mbQxtLK9EL+/Wn1Pn2YYjrHxtBwEvTjmbyjJN4oWe/ENTW6ynRg==
+X-Received: by 2002:a17:907:688f:b0:aa5:d1c:3dac with SMTP id a640c23a62f3a-aa580fdd57emr475064966b.36.1732783362949;
+        Thu, 28 Nov 2024 00:42:42 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa5997ffc1bsm41610466b.83.2024.11.28.00.42.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2024 00:42:42 -0800 (PST)
+Date: Thu, 28 Nov 2024 09:42:41 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Andrew Jones
- <ajones@ventanamicro.com>,
-        James Houghton <jthoughton@google.com>,
-        Muhammad
- Usama Anjum <usama.anjum@collabora.com>
-Subject: Re: [PATCH v4 15/16] KVM: selftests: Use canonical $(ARCH) paths
- for KVM selftests directories
-Message-ID: <20241128092546.7a5b3f30@p-imbrenda>
-In-Reply-To: <20241128005547.4077116-16-seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	James Houghton <jthoughton@google.com>, Muhammad Usama Anjum <usama.anjum@collabora.com>
+Subject: Re: [PATCH v4 14/16] KVM: selftests: Provide empty 'all' and 'clean'
+ targets for unsupported ARCHs
+Message-ID: <20241128-24a975e227dd4b86393f21ed@orel>
 References: <20241128005547.4077116-1-seanjc@google.com>
-	<20241128005547.4077116-16-seanjc@google.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+ <20241128005547.4077116-15-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Q7ii93V04uamfY0V88_h7z7HgwyWCuzA
-X-Proofpoint-ORIG-GUID: HGem8ab_9QMRCJIRWqhAFghUEX4Ggu5a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 clxscore=1015 mlxscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 adultscore=0 impostorscore=0 suspectscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2411280063
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241128005547.4077116-15-seanjc@google.com>
 
-On Wed, 27 Nov 2024 16:55:46 -0800
-Sean Christopherson <seanjc@google.com> wrote:
-
-> Use the kernel's canonical $(ARCH) paths instead of the raw target triple
-> for KVM selftests directories.  KVM selftests are quite nearly the only
-> place in the entire kernel that using the target triple for directories,
-> tools/testing/selftests/drivers/s390x being the lone holdout.
+On Wed, Nov 27, 2024 at 04:55:45PM -0800, Sean Christopherson wrote:
+> Provide empty targets for KVM selftests if the target architecture is
+> unsupported to make it obvious which architectures are supported, and so
+> that various side effects don't fail and/or do weird things, e.g. as is,
+> "mkdir -p $(sort $(dir $(TEST_GEN_PROGS)))" fails due to a missing operand,
+> and conversely, "$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH_DIR) ..." will
+> create an empty, useless directory for the unsupported architecture.
 > 
-> Using the kernel's preferred nomenclature eliminates the minor, but
-> annoying, friction of having to translate to KVM's selftests directories,
-> e.g. for pattern matching, opening files, running selftests, etc.
+> Move the guts of the Makefile to Makefile.kvm so that it's easier to see
+> that the if-statement effectively guards all of KVM selftests.
 > 
-> Opportunsitically delete file comments that reference the full path of the
-> file, as they are obviously prone to becoming stale, and serve no known
-> purpose.
-> 
+> Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
+>  tools/testing/selftests/kvm/.gitignore   |   1 +
+>  tools/testing/selftests/kvm/Makefile     | 336 +----------------------
+>  tools/testing/selftests/kvm/Makefile.kvm | 334 ++++++++++++++++++++++
+>  3 files changed, 340 insertions(+), 331 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/Makefile.kvm
+>
 
-just one minor nit
-
-[...]
-
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86/svm_util.h
-> similarity index 94%
-> rename from tools/testing/selftests/kvm/include/x86_64/svm_util.h
-> rename to tools/testing/selftests/kvm/include/x86/svm_util.h
-> index 044f0f872ba9..b74c6dcddcbd 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-> +++ b/tools/testing/selftests/kvm/include/x86/svm_util.h
-> @@ -1,8 +1,5 @@
->  /* SPDX-License-Identifier: GPL-2.0-only */
->  /*
-> - * tools/testing/selftests/kvm/include/x86_64/svm_utils.h
-
-this line clearly has to go ^
-
-> - * Header for nested SVM testing
-
-but I think this one can stay? ^
-
-
-regardless, for the s390 part:
-
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> - *
->   * Copyright (C) 2020, Red Hat, Inc.
->   */
->  
-
-[...]
+Acked-by: Andrew Jones <ajones@ventanamicro.com>
