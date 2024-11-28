@@ -1,22 +1,22 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE241BD9FF
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8A619D06A
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732806592; cv=none; b=goVOrAK/3KCO1sDNEUsfYcnI30rzDS6gtNe72Xe9cYd1pmWfI1quxkjdLTGhNFu2xZ1tsWlLj9zeidNjje8Ih7leFq/V1S5/4FAQAMX0JtrNUpjCXGeYEyHUYU82s4CaQy8t+3Lj6jEnAr2kxV6R2k95Fb455ymd7+og24+SQGc=
+	t=1732806782; cv=none; b=XKN0i1ZsBwyHChPGhhy6tKI0sSvyzdoYP5yMV6ZPXPiKbRd5f6i9A2zNDkolpcVA/zs11g48EI/0ef5Nt0b+n9nqx14+N9qzRAex8uNAQiapZP/8kwKzE7fNTyEuUOegf1cR/QsOgaNBlC6qixWLOSqFXqOj57GTEbvIIee6Hyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732806592; c=relaxed/simple;
-	bh=XLYYqBbfwK6LRtPg4GRCMfrYpGXdC+J9JPrXltqBRO0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JKEg7DhOyjJvumMf/IkgWFs/IRmwR+hKqbPxZIKAziNXLdZU0YV/Qhbogfv1Y0pwXkrODJzeMgpEQaAUcGUx0UEcYWxeooE5Gwe0Z2FIvqDmlIXkKAqwm/Y2D/26QomgGinDFleXOb1322cZeATK28o9e7cqIoTelQAGSj/Ge7A=
+	s=arc-20240116; t=1732806782; c=relaxed/simple;
+	bh=hc1ZnRwxrRsJoEPhnB++7jxfqcU/o5PGaexYpFYa0FI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SyuV+qHgsjCzBCWc3xCajzOCND8xsc6e+AHkRbJ11gi4jaaamFaAZTAXiQedUPZ3J+64VVM/97QA9P1TgH/afVBwGcWa/X9M7S0goCSHW3+ypdVlGU76/SGmNKelOUQAN6sCIa+iHe+GJxR726hPaN5au4yIZi8N5M4ygotr9k0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 164421474;
-	Thu, 28 Nov 2024 07:10:19 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 756E51474;
+	Thu, 28 Nov 2024 07:13:29 -0800 (PST)
 Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A8B03F66E;
-	Thu, 28 Nov 2024 07:09:47 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5F9E3F66E;
+	Thu, 28 Nov 2024 07:12:57 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com,
@@ -29,9 +29,9 @@ Cc: maz@kernel.org,
 	andre.przywara@arm.com,
 	suzuki.poulose@arm.com,
 	s.abdollahi22@imperial.ac.uk
-Subject: [PATCH kvmtool 0/4] arm: Payload memory layout change
-Date: Thu, 28 Nov 2024 15:09:37 +0000
-Message-ID: <20241128150937.10685-1-alexandru.elisei@arm.com>
+Subject: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
+Date: Thu, 28 Nov 2024 15:12:42 +0000
+Message-ID: <20241128151246.10858-1-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -40,6 +40,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+
+(resending because I accidently only sent the cover letter, sorry for that)
 
 The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
 the riscv maintainer because it looks to me like riscv is similarly
