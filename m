@@ -1,195 +1,474 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD62819
-	for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 17:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22ECC13C
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 00:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732730005; cv=none; b=ny4Pg244JK3BTx5nbGkylkPZudlQoGPEbx5b5WxssdYuD2C5S23zWpBauz9/Z26NKC6LDsP9RVIY0Ik+HCe4L93fNY0afSLhINDu0RFRnHx/i4OuAb4+7N2719hw7sgelUZ/KDJc9OcLrzjV3OYQSIUW4mPkRPaSy6N3E1DY5Lg=
+	t=1732755353; cv=none; b=hUbshvs8I/f1O7dKLa7zhQ+ID6BLpCAAWJHoJJ7x66eI3oifGKjMCPw0LIm6EhzzBGZo4rpX7ay9WRkE0YKw0uvb+cAaqjXbEJAEZwXpHB8kVOxvu8QzIAGfuyGw+FLn96Pg3W4hSZUOK6JW0n+xjJCYBXenDYKZZhYBjSdPRZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732730005; c=relaxed/simple;
-	bh=IG/rpNVIGU08DPyCKXGhXrUYIPdoGrJ85FUEOFJzS28=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=WLtZKbB3uGkIh7hflk3onyls04z/3DKLG11GYuIucUNWF7O+hyVvrE6ZKKUcOXwkDDgVFdJzcT/QThmwAMniktAz0Ru3aJzD03a+/CRK64EyzEEziGn1Qey1tzepb/WH4YAXOa4kXIK/sArjVVEN+lWAqKKQWkr3G9eknNnZ1xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LkhTdqGb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1732755353; c=relaxed/simple;
+	bh=P4grW7gquq8R9VrWF9+MmmfW+pL0Qx8xPOq1de4HzRM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rcI6ALktTLQ23lBMxxhzbzykT4/xIkKt3InuLz6kPy/TSGyJeRn6zSj6aaVge3iR1oJk9pZ1586v91hfVWfrNWKxdsIyNTuzCXTIfjAAPky2a3Q98EdWdkEjt2I/r3OCDv9ieaxMQCfbXGkQWxkR5AvMGqx7EENDEHZaodH7SfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xbi4khH0; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkhTdqGb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732730002;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oXebUtxKx7Yue8TaCMkSObpvA/kHo5Badeg+J8Y9otg=;
-	b=LkhTdqGbuzERLtdGfEsZFuYM/yg7iYJXFvuE4DJdK+eKlME3yuH0gxyfd8VKp8hPvNbH3s
-	4AhubvG2hGK96pQ7CDT9r44WVu6xXwFRi1ThysBnX3qVWgNfezYeCvJY1irOVBW9KjMT4T
-	0CiaCB/OewEixi0haYoslZSV2bFxqms=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-COV_FrtVO1-YIrhmNqBtww-1; Wed, 27 Nov 2024 12:53:20 -0500
-X-MC-Unique: COV_FrtVO1-YIrhmNqBtww-1
-X-Mimecast-MFC-AGG-ID: COV_FrtVO1-YIrhmNqBtww
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-434a73651e2so13971695e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 09:53:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xbi4khH0"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee237d13b4so479573a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 16:55:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732755350; x=1733360150; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e9uOIcefGzB9TJLnf+byngHoM0tW92UJmLMn3MQxItc=;
+        b=Xbi4khH0ABqKnPrjS1GNlEsp5+b7DRCosDiSarxY9xX6XJNJOR4qXe76avPd03UuaU
+         fZpE+PuJHpxvNbGEPLhK8GhILbe4aRgP50LLHGNUjxrdbQ77mTGF9WMVT6/08ppWixhM
+         adnoCCrRNUUug3w3ebmWRNSp51uUkhntfmzpIRMoJFcJv6wDqAStbiVwURJ59OrjWXcQ
+         TsZ3oTcKNtJQkJ4qgZGx7EZaItCviFSb2DuaPJ6f/KreY2k4HMyZRwDZ9aIvqw7qXwYu
+         pBaqgXITBFv/BwWJkHMy0bdolzTyTm6kWuoj/j/BPjhELQtY5A00XW4OVmqgUJvcz8sF
+         t3yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732729999; x=1733334799;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oXebUtxKx7Yue8TaCMkSObpvA/kHo5Badeg+J8Y9otg=;
-        b=cqGTvIMJ1uo6PWqtgU3Kr/H9Au88i2RLJX+hIDiMiIqcM5JlVxjBnke/SQIKmSbnVP
-         c+Ud6EWenDtbxVT6X40gYnffD3e34kyOsfxfUF1tjnHkNippF5Q6ZqNzjzKDOEgFW8eO
-         ICPGzg5aVi+iegoY3d6Lu+mfPzn4pGikVbV839IDysHCKmyZidbqgqz6XPxfibvcPKoB
-         IJhCqEAyQaeSWebhrhw15Cdzij2M65WRRTdvwkoltbX+OyfsP6paNC6GY0Zvu3u/iOOy
-         p5XQLDGGtqzp2FfNSBsJk6NYINAvRHUPDal1u+Lo39y4NxzFnTWOZsXuZEgoij0IZIoa
-         d2sw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJEu05in5PDbMbcAbeKdUOhnlEEyuYBRSQJjnwwwPtSceap26aglV0qRUDahHXPubo99fhAek=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzqaJjP6hbwW6YULrM3GB6eJB4gbUbYOQKKnOezOaWO14Xwrzez
-	Gt9jbinnscGDe/z/4V5+hE6zEuGTgk5ZwE6DwUVMrtjvCPqhA5FTqrfzg2d74hgshqrjPgF9Cf2
-	3csZWz/NDa8DytGtIC8sRVFEItzocW2ctYxRrqDapr8ImN+yjip6rhg==
-X-Gm-Gg: ASbGncsg7M560wpR5zDHpqgjvJIwz/5qUlnX8NRmx3gffK4iKdtNBX7rzjTGx0PQc4s
-	mPcXiF8ZPfkeVYTSsJBLIJbVMGYu+KPxsvrIVF5Qc730lQD9VI3frsh60626Ni9RJ83haYaueLP
-	ztH3yIG6iGEOOGRrJ8U7EjFELBTHrhK0jpLw0pQ7YnwTML0p3Niu8iRGDg0N4OUmwYWR8obCPW3
-	SUZCaW5IGx6jBvkzykUBj9oAQxjk/X6r7W5y5oXgmrQDLLJ5MQE6vAYt59di4RkcEEHw1QkUqBE
-	BKpc+08r/6x/94x52kOUmA==
-X-Received: by 2002:a05:600c:3546:b0:434:9fb5:fddd with SMTP id 5b1f17b1804b1-434a9dec6c1mr31792625e9.23.1732729999674;
-        Wed, 27 Nov 2024 09:53:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE6anDJQjt8ptWxGgz7dhwaMeTQsYcl8C3n27l3PnWHFhWZjEJlpfVjhPH6uqi9gMk12+ahIA==
-X-Received: by 2002:a05:600c:3546:b0:434:9fb5:fddd with SMTP id 5b1f17b1804b1-434a9dec6c1mr31792415e9.23.1732729999273;
-        Wed, 27 Nov 2024 09:53:19 -0800 (PST)
-Received: from rh (p200300f6af0bca008282df582fad0b68.dip0.t-ipconnect.de. [2003:f6:af0b:ca00:8282:df58:2fad:b68])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fafe504sm16773349f8f.25.2024.11.27.09.53.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 09:53:18 -0800 (PST)
-Date: Wed, 27 Nov 2024 18:53:18 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, 
-    "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-    "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-    "will@kernel.org" <will@kernel.org>, 
-    "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-    "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-    "james.morse@arm.com" <james.morse@arm.com>, 
-    "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-    yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, 
-    Linuxarm <linuxarm@huawei.com>, "reijiw@google.com" <reijiw@google.com>
-Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1
- writable from userspace
-In-Reply-To: <87zfllssji.wl-maz@kernel.org>
-Message-ID: <9d8e1bb6-797b-d0c9-6456-eb001271ba0e@redhat.com>
-References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com> <86v804z3lk.wl-maz@kernel.org> <b2dad37ac5464384abe4edf76cb6b546@huawei.com> <4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com> <87zfllssji.wl-maz@kernel.org>
+        d=1e100.net; s=20230601; t=1732755350; x=1733360150;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e9uOIcefGzB9TJLnf+byngHoM0tW92UJmLMn3MQxItc=;
+        b=oV6ONR20gdINwZQ9NekCqZxmobPKeY4l0r+7G6ZE0Kv0OCELk0QEc9kPUwV+nfan0N
+         NxEjYFhdvXXWw4xKP+lJ2+Tq3awyP3ru86fsUZbMBLfowx/HPSbYV0wlv9QDFfz93l7z
+         9H7zptPeHJKziy7YWQiZsNtQtPVIWp0Nfo1x0/WQxj7pw37wG/3idPpX7u5mhUrl49tc
+         zJP8hojcVwwC6KYom9jgbFbK6zpJ1BG6851BQruXfIw5HNlwwWj14tX9iZFpuZTwA/Fb
+         X7ZbGZuO3bRRwPjRMCCgT/MnkpicmGPJTyJaml6mtcsr595v1yVbCdR2gBPLZcO3uwcS
+         3jlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUXocdFoRg8589+EC/QGvFAPU20Jdi3xghUwEdpx/+pv8b51ZqF/rYetjvPE1IwKsEU2Gy3NIQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3ylg19BZcO87b7qnJPMMwXN0HS/WoZus7isV4OQEJPcKWOq56
+	ZQUMwK7Sb5/kijCHqptgPzODnisdfY7KBhuS7ZN7nsGmk6t3aXmGwnexxWJ6ZCgHFzDQWzZ4V/h
+	uug==
+X-Google-Smtp-Source: AGHT+IE23NadWH10rxgZrKIo0Meu75Z9uiIhhXyN7Jgs8FhBFLGmtywZPafifZyrfoOUc59rHUvsRLHBSGY=
+X-Received: from pjbsj13.prod.google.com ([2002:a17:90b:2d8d:b0:2d3:ba90:93e3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2690:b0:2ea:7755:a0fa
+ with SMTP id 98e67ed59e1d1-2ee08e9d433mr6863204a91.7.1732755350346; Wed, 27
+ Nov 2024 16:55:50 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 27 Nov 2024 16:55:31 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: mPw5f1_v4_vLm5sSBtHlCOHEQBg1XRKY1P_J9zw_Cvo_1732730000
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241128005547.4077116-1-seanjc@google.com>
+Subject: [PATCH v4 00/16] KVM: selftests: "tree" wide overhauls
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Andrew Jones <ajones@ventanamicro.com>, James Houghton <jthoughton@google.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 26 Nov 2024, Marc Zyngier wrote:
-> On Tue, 26 Nov 2024 17:00:35 +0000,
-> Sebastian Ott <sebott@redhat.com> wrote:
->> On Wed, 14 Aug 2024, Shameerali Kolothum Thodi wrote:
->>>>
->>>> On Tue, 13 Aug 2024 15:28:35 +0100,
->>>> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
->>>>>
->>>>> KVM exposes the OS double lock feature bit to Guests but returns
->>>>> RAZ/WI on Guest OSDLR_EL1 access. This breaks Guest migration between
->>>>> systems where this feature support differ. Add support to make this
->>>>> feature writable from userspace by setting the mask bit. While at it,
->>>>> set the mask bits for other exposed features in the AA64DFR0_EL1
->>>>> register as well.
->>>>>
->>>>> Also update the selftest to cover these fields.
->>>>>
->>>>> Signed-off-by: Shameer Kolothum
->>>> <shameerali.kolothum.thodi@huawei.com>
->>>>> ---
->>>>>    This is based on the discussion here(Thanks to Oliver),
->>>>>    https://lore.kernel.org/all/ZrVSlbVwnaMDShah@linux.dev/
->>>>> ---
->>>>>  arch/arm64/kvm/sys_regs.c                         | 6 +++++-
->>>>>  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 4 ++++
->>>>>  2 files changed, 9 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>>>> index c90324060436..adb49d681052 100644
->>>>> --- a/arch/arm64/kvm/sys_regs.c
->>>>> +++ b/arch/arm64/kvm/sys_regs.c
->>>>> @@ -2376,7 +2376,11 @@ static const struct sys_reg_desc sys_reg_descs[]
->>>> = {
->>>>>  	  .get_user = get_id_reg,
->>>>>  	  .set_user = set_id_aa64dfr0_el1,
->>>>>  	  .reset = read_sanitised_id_aa64dfr0_el1,
->>>>> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK |
->>>>> +	  .val = ID_AA64DFR0_EL1_DoubleLock_MASK |
->>>>> +		 ID_AA64DFR0_EL1_CTX_CMPs_MASK |
->>>>> +		 ID_AA64DFR0_EL1_WRPs_MASK |
->>>>> +		 ID_AA64DFR0_EL1_BRPs_MASK |
->>>>
->>>>
->>>> I think this is going to cause some troubles.
->>>>
->>>> The issue is that context-aware breakpoints are the highest-numbered
->>>> breakpoints, right after the normal breakpoints (D2.8.3 "Breakpoint
->>>> types and linking of breakpoints"). So if you reduce the number of
->>>> normal breakpoints, you shift the context-aware ones down, and
->>>> everything breaks.
->>>
->>> Thanks Marc for explaining this. I was not aware of this one.
->>>
->>>> I really don't see how you can safely do that without completely
->>>> changing the way we handle the debug registers.
->>>
->>> Looks like Reji has attempted to do this a while back,
->>> https://lore.kernel.org/kvm/20220419065544.3616948-13-reijiw@google.com/
->>>
->>
->> I've got two machines that differ in the number of breakpoints and
->> it would be nice to be able to migrate between these. Is anything
->
-> Is that the *only* thing that differ? Do the have the same number of
-> context-aware breakpoints?
+Two separate series (mmu_stress_test[1] and $ARCH[2]), posted as one to
+avoid unpleasant conflicts, and because I hope to land both in kvm/next
+shortly after 6.12-rc1 since they impact all of KVM selftests.
 
-It's the only diff in DFR0 - CTX_CMPs is the same. There are diffs in
-other ID regs as well but these are already writable.
+mmu_stress_test
+---------------
+Convert the max_guest_memory_test into a more generic mmu_stress_test.
+The basic gist of the "conversion" is to have the test do mprotect() on
+guest memory while vCPUs are accessing said memory, e.g. to verify KVM
+and mmu_notifiers are working as intended.
 
->> preventing us from trapping the access and make sure the correct
->> breakpoint is used? Is anyone working on this? If not I'd like to
->> give it a shot.
->
-> Not only trapping. You also need to handle some interesting parts of
-> the architecture, such as the breakpoint linking fun.
+The original plan was that patch 3 would be a single patch, but things
+snowballed in order to rework vcpu_get_reg() to return a value instead
+of using an out-param.  Having to define a variable just to bump the
+program counter on arm64 annoyed me.
 
-Ugh, and I was thinking this might be straightforward ;-(
+$ARCH
+-----
+Play nice with treewrite builds of unsupported architectures, e.g. arm
+(32-bit), as KVM selftests' Makefile doesn't do anything to ensure the
+target architecture is actually one KVM selftests supports.
 
-> But if we are to go down that road, I really want to restrict that to
-> implementations that have FEAT_FGT. Because otherwise we need to trap
-> and emulate *everything*, instead of just the breakpoint registers.
-> And that would be pretty bad from a performance perspective.
+The last two patches are opportunistic changes (since the above Makefile
+change will generate conflicts everywhere) to switch to using $(ARCH)
+instead of the target triple for arch specific directories, e.g. arm64
+instead of aarch64, mainly so as not to be different from the rest of
+the kernel.
 
-OK, understood.
+Compile tested on all architectures, runtime tested on x86 and arm64.
 
-> Another thing is that this only works because there is no report of
-> the breakpoint number in ESR_ELx. The moment we offering this
-> migration "feature", we are painting ourselves in a corner, should the
-> architecture ever evolve to something less... bizarre.
->
-> Finally, who is going to ensure this keeps working in the foreseeable
-> future? Because while this is nice, that's not what gets deployed in
-> production, as it leads to unpredictable performances. My take is that
-> this thing will eventually bitrot and die.
->
-> So, do we *really* want to go down that road?
+v4:
+ - Rebase and squash the series.
+ - Exclude Makefile.kvm from .gitignore. [kernel test bot]
 
-Thanks a lot for the pointers! I'll do some more digging to figure out
-what needs to be done and if that's actually worth it..
+v3 (of mmu_stress_test):
+ - Rebased onto v6.12-rc2.
+ - Disable strict aliasing to fix the PMCR snafu.
+ - Collect reviews. [Drew]
+ - Minor changelog fixes. [Drew]
+ - Include ucall_common.h to prep for RISC-V. [Drew]
 
-Sebastian
+v2:
+ - Rebase onto kvm/next.
+ - Add the aforementioned vcpu_get_reg() changes/disaster.
+ - Actually add arm64 support for the fancy mprotect() testcase (I did this
+   before v1, but managed to forget to include the changes when posting).
+ - Emit "mov %rax, (%rax)" on x86. [James]
+ - Add a comment to explain the fancy mprotect() vs. vCPUs logic.
+ - Drop the KVM x86 patches (applied and/or will be handled separately).
+
+v1: https://lore.kernel.org/all/20240809194335.1726916-1-seanjc@google.com
+
+[1] https://lore.kernel.org/all/20241009154953.1073471-1-seanjc@google.com
+[2] https://lore.kernel.org/all/20240826190116.145945-1-seanjc@google.com
+
+Sean Christopherson (16):
+  KVM: Move KVM_REG_SIZE() definition to common uAPI header
+  KVM: selftests: Return a value from vcpu_get_reg() instead of using an
+    out-param
+  KVM: selftests: Assert that vcpu_{g,s}et_reg() won't truncate
+  KVM: selftests: Check for a potential unhandled exception iff KVM_RUN
+    succeeded
+  KVM: selftests: Rename max_guest_memory_test to mmu_stress_test
+  KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
+  KVM: selftests: Compute number of extra pages needed in
+    mmu_stress_test
+  KVM: sefltests: Explicitly include ucall_common.h in mmu_stress_test.c
+  KVM: selftests: Enable mmu_stress_test on arm64
+  KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
+  KVM: selftests: Precisely limit the number of guest loops in
+    mmu_stress_test
+  KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
+  KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+  KVM: selftests: Provide empty 'all' and 'clean' targets for
+    unsupported ARCHs
+  KVM: selftests: Use canonical $(ARCH) paths for KVM selftests
+    directories
+  KVM: selftests: Override ARCH for x86_64 instead of using ARCH_DIR
+
+ MAINTAINERS                                   |  12 +-
+ arch/arm64/include/uapi/asm/kvm.h             |   3 -
+ arch/riscv/include/uapi/asm/kvm.h             |   3 -
+ include/uapi/linux/kvm.h                      |   4 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          | 345 +-----------------
+ tools/testing/selftests/kvm/Makefile.kvm      | 330 +++++++++++++++++
+ .../kvm/{aarch64 => arm64}/aarch32_id_regs.c  |  10 +-
+ .../kvm/{aarch64 => arm64}/arch_timer.c       |   0
+ .../arch_timer_edge_cases.c                   |   0
+ .../kvm/{aarch64 => arm64}/debug-exceptions.c |   4 +-
+ .../kvm/{aarch64 => arm64}/get-reg-list.c     |   0
+ .../kvm/{aarch64 => arm64}/hypercalls.c       |   6 +-
+ .../kvm/{aarch64 => arm64}/mmio_abort.c       |   0
+ .../kvm/{aarch64 => arm64}/no-vgic-v3.c       |   2 +-
+ .../kvm/{aarch64 => arm64}/page_fault_test.c  |   0
+ .../kvm/{aarch64 => arm64}/psci_test.c        |   6 +-
+ .../kvm/{aarch64 => arm64}/set_id_regs.c      |  18 +-
+ .../kvm/{aarch64 => arm64}/smccc_filter.c     |   0
+ .../{aarch64 => arm64}/vcpu_width_config.c    |   0
+ .../kvm/{aarch64 => arm64}/vgic_init.c        |   0
+ .../kvm/{aarch64 => arm64}/vgic_irq.c         |   0
+ .../kvm/{aarch64 => arm64}/vgic_lpi_stress.c  |   0
+ .../{aarch64 => arm64}/vpmu_counter_access.c  |  19 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
+ .../include/{aarch64 => arm64}/arch_timer.h   |   0
+ .../kvm/include/{aarch64 => arm64}/delay.h    |   0
+ .../kvm/include/{aarch64 => arm64}/gic.h      |   0
+ .../kvm/include/{aarch64 => arm64}/gic_v3.h   |   0
+ .../include/{aarch64 => arm64}/gic_v3_its.h   |   0
+ .../{aarch64 => arm64}/kvm_util_arch.h        |   0
+ .../include/{aarch64 => arm64}/processor.h    |   0
+ .../kvm/include/{aarch64 => arm64}/spinlock.h |   0
+ .../kvm/include/{aarch64 => arm64}/ucall.h    |   0
+ .../kvm/include/{aarch64 => arm64}/vgic.h     |   0
+ .../testing/selftests/kvm/include/kvm_util.h  |  10 +-
+ .../kvm/include/{s390x => s390}/debug_print.h |   0
+ .../{s390x => s390}/diag318_test_handler.h    |   0
+ .../kvm/include/{s390x => s390}/facility.h    |   0
+ .../include/{s390x => s390}/kvm_util_arch.h   |   0
+ .../kvm/include/{s390x => s390}/processor.h   |   0
+ .../kvm/include/{s390x => s390}/sie.h         |   0
+ .../kvm/include/{s390x => s390}/ucall.h       |   0
+ .../kvm/include/{x86_64 => x86}/apic.h        |   2 -
+ .../kvm/include/{x86_64 => x86}/evmcs.h       |   3 -
+ .../kvm/include/{x86_64 => x86}/hyperv.h      |   3 -
+ .../include/{x86_64 => x86}/kvm_util_arch.h   |   0
+ .../kvm/include/{x86_64 => x86}/mce.h         |   2 -
+ .../kvm/include/{x86_64 => x86}/pmu.h         |   0
+ .../kvm/include/{x86_64 => x86}/processor.h   |   2 -
+ .../kvm/include/{x86_64 => x86}/sev.h         |   0
+ .../kvm/include/{x86_64 => x86}/svm.h         |   6 -
+ .../kvm/include/{x86_64 => x86}/svm_util.h    |   3 -
+ .../kvm/include/{x86_64 => x86}/ucall.h       |   0
+ .../kvm/include/{x86_64 => x86}/vmx.h         |   2 -
+ .../kvm/lib/{aarch64 => arm64}/gic.c          |   0
+ .../kvm/lib/{aarch64 => arm64}/gic_private.h  |   0
+ .../kvm/lib/{aarch64 => arm64}/gic_v3.c       |   0
+ .../kvm/lib/{aarch64 => arm64}/gic_v3_its.c   |   0
+ .../kvm/lib/{aarch64 => arm64}/handlers.S     |   0
+ .../kvm/lib/{aarch64 => arm64}/processor.c    |   8 +-
+ .../kvm/lib/{aarch64 => arm64}/spinlock.c     |   0
+ .../kvm/lib/{aarch64 => arm64}/ucall.c        |   0
+ .../kvm/lib/{aarch64 => arm64}/vgic.c         |   0
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +-
+ .../selftests/kvm/lib/riscv/processor.c       |  66 ++--
+ .../{s390x => s390}/diag318_test_handler.c    |   0
+ .../kvm/lib/{s390x => s390}/facility.c        |   0
+ .../kvm/lib/{s390x => s390}/processor.c       |   0
+ .../selftests/kvm/lib/{s390x => s390}/ucall.c |   0
+ .../selftests/kvm/lib/{x86_64 => x86}/apic.c  |   0
+ .../kvm/lib/{x86_64 => x86}/handlers.S        |   0
+ .../kvm/lib/{x86_64 => x86}/hyperv.c          |   0
+ .../kvm/lib/{x86_64 => x86}/memstress.c       |   2 +-
+ .../selftests/kvm/lib/{x86_64 => x86}/pmu.c   |   0
+ .../kvm/lib/{x86_64 => x86}/processor.c       |   2 -
+ .../selftests/kvm/lib/{x86_64 => x86}/sev.c   |   0
+ .../selftests/kvm/lib/{x86_64 => x86}/svm.c   |   1 -
+ .../selftests/kvm/lib/{x86_64 => x86}/ucall.c |   0
+ .../selftests/kvm/lib/{x86_64 => x86}/vmx.c   |   2 -
+ ..._guest_memory_test.c => mmu_stress_test.c} | 162 +++++++-
+ .../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
+ .../testing/selftests/kvm/riscv/ebreak_test.c |   2 +-
+ .../selftests/kvm/riscv/sbi_pmu_test.c        |   2 +-
+ .../selftests/kvm/{s390x => s390}/cmma_test.c |   0
+ .../selftests/kvm/{s390x => s390}/config      |   0
+ .../{s390x => s390}/cpumodel_subfuncs_test.c  |   0
+ .../kvm/{s390x => s390}/debug_test.c          |   0
+ .../selftests/kvm/{s390x => s390}/memop.c     |   0
+ .../selftests/kvm/{s390x => s390}/resets.c    |   2 +-
+ .../{s390x => s390}/shared_zeropage_test.c    |   0
+ .../kvm/{s390x => s390}/sync_regs_test.c      |   0
+ .../selftests/kvm/{s390x => s390}/tprot.c     |   0
+ .../kvm/{s390x => s390}/ucontrol_test.c       |   0
+ .../selftests/kvm/set_memory_region_test.c    |   6 +-
+ tools/testing/selftests/kvm/steal_time.c      |   3 +-
+ .../selftests/kvm/{x86_64 => x86}/amx_test.c  |   0
+ .../kvm/{x86_64 => x86}/apic_bus_clock_test.c |   0
+ .../kvm/{x86_64 => x86}/cpuid_test.c          |   0
+ .../kvm/{x86_64 => x86}/cr4_cpuid_sync_test.c |   0
+ .../kvm/{x86_64 => x86}/debug_regs.c          |   0
+ .../dirty_log_page_splitting_test.c           |   0
+ .../exit_on_emulation_failure_test.c          |   0
+ .../kvm/{x86_64 => x86}/feature_msrs_test.c   |   0
+ .../kvm/{x86_64 => x86}/fix_hypercall_test.c  |   0
+ .../kvm/{x86_64 => x86}/flds_emulation.h      |   0
+ .../kvm/{x86_64 => x86}/hwcr_msr_test.c       |   0
+ .../kvm/{x86_64 => x86}/hyperv_clock.c        |   0
+ .../kvm/{x86_64 => x86}/hyperv_cpuid.c        |   0
+ .../kvm/{x86_64 => x86}/hyperv_evmcs.c        |   0
+ .../hyperv_extended_hypercalls.c              |   0
+ .../kvm/{x86_64 => x86}/hyperv_features.c     |   0
+ .../kvm/{x86_64 => x86}/hyperv_ipi.c          |   0
+ .../kvm/{x86_64 => x86}/hyperv_svm_test.c     |   0
+ .../kvm/{x86_64 => x86}/hyperv_tlb_flush.c    |   0
+ .../kvm/{x86_64 => x86}/kvm_clock_test.c      |   0
+ .../kvm/{x86_64 => x86}/kvm_pv_test.c         |   0
+ .../kvm/{x86_64 => x86}/max_vcpuid_cap_test.c |   0
+ .../kvm/{x86_64 => x86}/monitor_mwait_test.c  |   0
+ .../{x86_64 => x86}/nested_exceptions_test.c  |   0
+ .../kvm/{x86_64 => x86}/nx_huge_pages_test.c  |   0
+ .../kvm/{x86_64 => x86}/nx_huge_pages_test.sh |   0
+ .../kvm/{x86_64 => x86}/platform_info_test.c  |   0
+ .../kvm/{x86_64 => x86}/pmu_counters_test.c   |   0
+ .../{x86_64 => x86}/pmu_event_filter_test.c   |   0
+ .../private_mem_conversions_test.c            |   0
+ .../private_mem_kvm_exits_test.c              |   0
+ .../{x86_64 => x86}/recalc_apic_map_test.c    |   0
+ .../kvm/{x86_64 => x86}/set_boot_cpu_id.c     |   0
+ .../kvm/{x86_64 => x86}/set_sregs_test.c      |   0
+ .../kvm/{x86_64 => x86}/sev_init2_tests.c     |   0
+ .../kvm/{x86_64 => x86}/sev_migrate_tests.c   |   0
+ .../kvm/{x86_64 => x86}/sev_smoke_test.c      |   0
+ .../smaller_maxphyaddr_emulation_test.c       |   0
+ .../selftests/kvm/{x86_64 => x86}/smm_test.c  |   0
+ .../kvm/{x86_64 => x86}/state_test.c          |   0
+ .../kvm/{x86_64 => x86}/svm_int_ctl_test.c    |   0
+ .../svm_nested_shutdown_test.c                |   0
+ .../svm_nested_soft_inject_test.c             |   0
+ .../kvm/{x86_64 => x86}/svm_vmcall_test.c     |   0
+ .../kvm/{x86_64 => x86}/sync_regs_test.c      |   0
+ .../{x86_64 => x86}/triple_fault_event_test.c |   0
+ .../kvm/{x86_64 => x86}/tsc_msrs_test.c       |   0
+ .../kvm/{x86_64 => x86}/tsc_scaling_sync.c    |   0
+ .../kvm/{x86_64 => x86}/ucna_injection_test.c |   0
+ .../kvm/{x86_64 => x86}/userspace_io_test.c   |   0
+ .../{x86_64 => x86}/userspace_msr_exit_test.c |   0
+ .../{x86_64 => x86}/vmx_apic_access_test.c    |   0
+ .../vmx_close_while_nested_test.c             |   0
+ .../kvm/{x86_64 => x86}/vmx_dirty_log_test.c  |   0
+ .../vmx_exception_with_invalid_guest_state.c  |   0
+ .../vmx_invalid_nested_guest_state.c          |   0
+ .../kvm/{x86_64 => x86}/vmx_msrs_test.c       |   0
+ .../vmx_nested_tsc_scaling_test.c             |   0
+ .../kvm/{x86_64 => x86}/vmx_pmu_caps_test.c   |   0
+ .../vmx_preemption_timer_test.c               |   0
+ .../vmx_set_nested_state_test.c               |   0
+ .../kvm/{x86_64 => x86}/vmx_tsc_adjust_test.c |   0
+ .../kvm/{x86_64 => x86}/xapic_ipi_test.c      |   0
+ .../kvm/{x86_64 => x86}/xapic_state_test.c    |   0
+ .../kvm/{x86_64 => x86}/xcr0_cpuid_test.c     |   0
+ .../kvm/{x86_64 => x86}/xen_shinfo_test.c     |   0
+ .../kvm/{x86_64 => x86}/xen_vmcall_test.c     |   0
+ .../kvm/{x86_64 => x86}/xss_msr_test.c        |   0
+ 164 files changed, 584 insertions(+), 477 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/Makefile.kvm
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/aarch32_id_regs.c (95%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/arch_timer.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/arch_timer_edge_cases.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/debug-exceptions.c (99%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/get-reg-list.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/hypercalls.c (98%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/mmio_abort.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/no-vgic-v3.c (98%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/page_fault_test.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/psci_test.c (97%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/set_id_regs.c (97%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/smccc_filter.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/vcpu_width_config.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/vgic_init.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/vgic_irq.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/vgic_lpi_stress.c (100%)
+ rename tools/testing/selftests/kvm/{aarch64 => arm64}/vpmu_counter_access.c (97%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/arch_timer.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/delay.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/gic.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/gic_v3.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/gic_v3_its.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/kvm_util_arch.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/processor.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/spinlock.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/ucall.h (100%)
+ rename tools/testing/selftests/kvm/include/{aarch64 => arm64}/vgic.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/debug_print.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/diag318_test_handler.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/facility.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/kvm_util_arch.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/processor.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/sie.h (100%)
+ rename tools/testing/selftests/kvm/include/{s390x => s390}/ucall.h (100%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/apic.h (98%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/evmcs.h (99%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/hyperv.h (99%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/kvm_util_arch.h (100%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/mce.h (94%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/pmu.h (100%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/processor.h (99%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/sev.h (100%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/svm.h (98%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/svm_util.h (94%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/ucall.h (100%)
+ rename tools/testing/selftests/kvm/include/{x86_64 => x86}/vmx.h (99%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/gic.c (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/gic_private.h (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/gic_v3.c (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/gic_v3_its.c (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/handlers.S (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/processor.c (98%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/spinlock.c (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/ucall.c (100%)
+ rename tools/testing/selftests/kvm/lib/{aarch64 => arm64}/vgic.c (100%)
+ rename tools/testing/selftests/kvm/lib/{s390x => s390}/diag318_test_handler.c (100%)
+ rename tools/testing/selftests/kvm/lib/{s390x => s390}/facility.c (100%)
+ rename tools/testing/selftests/kvm/lib/{s390x => s390}/processor.c (100%)
+ rename tools/testing/selftests/kvm/lib/{s390x => s390}/ucall.c (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/apic.c (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/handlers.S (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/hyperv.c (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/memstress.c (98%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/pmu.c (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/processor.c (99%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/sev.c (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/svm.c (99%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/ucall.c (100%)
+ rename tools/testing/selftests/kvm/lib/{x86_64 => x86}/vmx.c (99%)
+ rename tools/testing/selftests/kvm/{max_guest_memory_test.c => mmu_stress_test.c} (60%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/cmma_test.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/config (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/cpumodel_subfuncs_test.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/debug_test.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/memop.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/resets.c (99%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/shared_zeropage_test.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/sync_regs_test.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/tprot.c (100%)
+ rename tools/testing/selftests/kvm/{s390x => s390}/ucontrol_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/amx_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/apic_bus_clock_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/cpuid_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/cr4_cpuid_sync_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/debug_regs.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/dirty_log_page_splitting_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/exit_on_emulation_failure_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/feature_msrs_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/fix_hypercall_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/flds_emulation.h (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hwcr_msr_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_clock.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_cpuid.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_evmcs.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_extended_hypercalls.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_features.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_ipi.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_svm_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/hyperv_tlb_flush.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/kvm_clock_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/kvm_pv_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/max_vcpuid_cap_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/monitor_mwait_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/nested_exceptions_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/nx_huge_pages_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/nx_huge_pages_test.sh (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/platform_info_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/pmu_counters_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/pmu_event_filter_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/private_mem_conversions_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/private_mem_kvm_exits_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/recalc_apic_map_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/set_boot_cpu_id.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/set_sregs_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/sev_init2_tests.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/sev_migrate_tests.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/sev_smoke_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/smaller_maxphyaddr_emulation_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/smm_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/state_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/svm_int_ctl_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/svm_nested_shutdown_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/svm_nested_soft_inject_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/svm_vmcall_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/sync_regs_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/triple_fault_event_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/tsc_msrs_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/tsc_scaling_sync.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/ucna_injection_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/userspace_io_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/userspace_msr_exit_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_apic_access_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_close_while_nested_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_dirty_log_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_exception_with_invalid_guest_state.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_invalid_nested_guest_state.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_msrs_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_nested_tsc_scaling_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_pmu_caps_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_preemption_timer_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_set_nested_state_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/vmx_tsc_adjust_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/xapic_ipi_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/xapic_state_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/xcr0_cpuid_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/xen_shinfo_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/xen_vmcall_test.c (100%)
+ rename tools/testing/selftests/kvm/{x86_64 => x86}/xss_msr_test.c (100%)
+
+
+base-commit: 4d911c7abee56771b0219a9fbf0120d06bdc9c14
+-- 
+2.47.0.338.g60cca15819-goog
 
