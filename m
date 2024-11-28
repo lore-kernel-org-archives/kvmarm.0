@@ -1,183 +1,169 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE711B85C2
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 16:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53E2323D
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 16:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732809996; cv=none; b=HRk0CKyasoJRuAlClJfLarCwUEGRuSuUGf6DGN69FOC0KGr0PAdz9LEN7hQ9mKZE5x2WKHD/4k5/F+Jc/MNnPESTZg8BsWnbTwrb0Qrdf7/lL75JK2LH8yfG2Dfe1v2NC5CO1QRz+uv+ml4gdb1dx4vMeM6q5AMxSJ0MAXgJNVk=
+	t=1732811525; cv=none; b=BbbCAyzjLgoCrhBbHtTZ+qpl2U5T/HtBEXFItgWLABc1Ba4MrIRlKr1U9fd1K0YVgWjhGiL8q++I0b2uZNsYdyWaFTcUImn1D9b4ue8j53RgZP+0eWsGCfu+UovuwriPCevnUqAb6kGFYE03VN1QJtit6eV18qaUs+RqiIg37+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732809996; c=relaxed/simple;
-	bh=Ir3JTo7TVjNjbRH3Tk0vjrvyaT/4J1kJDtTnrFc4Z/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOihd7cwXXlD/Nnb09ne1TejWtqCgGJwb2Dmuv5EVKWz/W0Th8xsAN3caYnlmN3gtQf2LQjQsNDrsnXIDw2Ru6NyUbAKVYDZbSWkGnupP5EaUzW5tfvKFyVnvzRTMAABEPIWL+3rfoAnJIIRI6VapqGpSf4zeWmP+t5U6o6Y72o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=H3uEE9o8; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	s=arc-20240116; t=1732811525; c=relaxed/simple;
+	bh=hLx3ioAq+y5EV8cFtM6kcmzjDAMoSETbeBtwaU4oQIc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CO2jK0p9au6+w0hrs0xPzex3RHqjSbO6BCI7vcreICnQ4TLy+7zkOc8OnWWZBRjVcWJp5CJliSGQaUgV5jNn7pNQvxpD1B1JND2zPCzPDAGClVNZtkJVQ+6XowM1cnyxr798p+P8ub+PlAyQ2eceLpsXhOaScYMnE027DxkVEN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dkyHH0qQ; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="H3uEE9o8"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-382423e1f7aso646337f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 08:06:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dkyHH0qQ"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5cfcb7183deso3645807a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 08:32:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732809992; x=1733414792; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SE3hqx8PlRH6oR2vsIt6C8nLef92GwCrM14lVm2xh9k=;
-        b=H3uEE9o8S4zWK5xjG6gFhCDZbkcm5iuTQDZ/lztLzb5WKj+EzcFuNtR//I7AfPQrbC
-         8V0BPHXzsQVOJzFd9LfIqcykkmcgWCWntVrzW4DdpnQKeaA2JPPDOcvRgmTLbbrhxd8n
-         9joEgwS1T4ymHfPo9O3Oos4W9jIfojEW3kd8+WhAVYpu+a2fa1cW9R4Sem8761P/vycU
-         BD+o5FWxwfEoG8gehCy0Wt7g8kmbrXD1C3ge2ZQIiMbtS89WQL+3roISwpdIQkK7u7bx
-         WZVRl3+eCaeSlyMsnCQAU6BLmTwVfZD7W3BiOCHSLtDJuT3mqDUX2Q2451ttIJdMjO+A
-         sLsw==
+        d=linaro.org; s=google; t=1732811522; x=1733416322; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iII7uuf9TZj9VNCNY4gdmMB2ol1JIZlZLSXfQuGrzNY=;
+        b=dkyHH0qQE8quQW4lkQbf6iyxkKoJ2c6xQJ9qv12eyElhKkugQ0I9vdcVB2WUZwEakI
+         Ks6LqGRFWqSYgWndsLtnCC5royiL4CzxN7HvFR0zARfKceTF7blRLSJi9O7dAOdBSk2M
+         9vPAfBpYKl07G/V6Bx1kWJj+lgJWf6VpfGH4qQ7Pmz0ozP9Uoy1ZpJE5auajiHcFN0Ot
+         LfjNdZqTaRF3uCYSCteECbSatbHOHG8OoDwbzChSXNfKd1O0An5gPq216neQwV2yRiX3
+         SaTG/wu8yH37lDuLGjO4vV3FYFN+/jvnlLh+rMD0ZvEB6qqitYIeg/muEgLfm+K+HuFv
+         GjPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732809992; x=1733414792;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SE3hqx8PlRH6oR2vsIt6C8nLef92GwCrM14lVm2xh9k=;
-        b=tYycdtxDjYq5ZIQmp63gqLOdGwb9/h9wgyLAISXeuy+Zjtlv8KOBZmThJJwI9wEPdN
-         B3hbwmR8/zMkkk2ofEknJ+dhSRIFE1M31CTwGG9u+qbJs6um03K26rpQw9vr7Ee3t5Q/
-         tVP3uU+2t+2HAlEP3X2ndt+PDUASVdSV8FgckXNIuBjzsn8OdOaxzONVTjNc/kaV/vG4
-         nwN8osYT6pFO+7lhpHzFsvVEdQ9akBu0+iN10B02OaDbDgu7wCJf0cBEKxrOPlh7utU+
-         TF+ql36mtdjv0sn9zULErCHsHMv+SHTsW6ZC0ojgp0l4NovUiaENXDfSqLcyobcrT+Sr
-         I5jg==
-X-Forwarded-Encrypted: i=1; AJvYcCUk3t+8Sj4o0nK16jASehWLdHzNT/QEq78mQYpb43bLqJpsCJS+aFiJOosSIVeN1NRoL1GhZkY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy3J0nxjtfokU6OTo5d3ze1jvbUkXConDzSVxkTzDGafsRkbt57
-	umm+x+0UDEyEptp9rUkoxgbpcaFptm0LdHcPSl2hpJH1EjvWEDhyzLu80wht+Vg=
-X-Gm-Gg: ASbGncteuXG0HBbUTOw8E+29l2rpbRmCNp5d3+m/eEz1rt2nRks1k+eJMza+qwhE3vd
-	XeLWAJuKi1BokDO253zIP8PjCD4qCpo/1KTcyIeLsBaqvpa6yu7Sphdb1Cc6nVEAI1S7/m94Hvp
-	RgWKnrSzFc9+FWJc+ddaUkN3HkxXn5fkxugjApdJb4hFRXJjQrOUSR9trp1Htoa4btXvenMbuOC
-	Cfvn+iB4lLobopowZKZkSO+Ra06+v81vHxhvLA0GL7XVs74aQKJf2itIWp7ohH1BMsVAvLtLEtK
-	sMe7iaugTyJCkJFN9Gkrc+dJqd7qdAceU8k=
-X-Google-Smtp-Source: AGHT+IFG7K7Tcmhw/SgqiyfLkjWGDpN72liep7NaizvY+BomgXIHH7qnDKDhB0LbxLbY9up/D3Z4OQ==
-X-Received: by 2002:a05:6000:42ca:b0:382:503f:a323 with SMTP id ffacd0b85a97d-385c6ebaa70mr4267236f8f.19.1732809992314;
-        Thu, 28 Nov 2024 08:06:32 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd2dad8sm1975016f8f.18.2024.11.28.08.06.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 08:06:31 -0800 (PST)
-Date: Thu, 28 Nov 2024 17:06:31 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
-	apatel@ventanamicro.com, andre.przywara@arm.com, suzuki.poulose@arm.com, 
-	s.abdollahi22@imperial.ac.uk
-Subject: Re: [PATCH kvmtool 2/4] arm: Check return value for
- host_to_guest_flat()
-Message-ID: <20241128-7f4e0ab75188ff4684785d2b@orel>
-References: <20241128151246.10858-1-alexandru.elisei@arm.com>
- <20241128151246.10858-3-alexandru.elisei@arm.com>
+        d=1e100.net; s=20230601; t=1732811522; x=1733416322;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iII7uuf9TZj9VNCNY4gdmMB2ol1JIZlZLSXfQuGrzNY=;
+        b=MeRbKU77qM49Q3icWdHpHsT5nr5JASh9oLCwJcXin1JoizuI5UE3LdHs2Yc5xr2kfC
+         e+Ao7PPOReXLKx1J8bJLJ6j0IacX1nh5klbqVsRnh2ty/46TZCd0cq6Eb48L6FFoiOQd
+         E4XDCksGU4O/GksMMgmG4O57ps06bYtHeTq+lOrv9C/2sHXXC+FskC2hCDauLG+bhqqZ
+         bqIeGG3QJHbiQw3gXgIkF/+c79ucZzFt6OpTaX0PIII4PZeT98yTqHUAarJdEGfHCj2K
+         FjzrcnhJ8BS/mPldU0fiZRmr0wNDfUQ3pxgztIabXdc3yF7NLRNd/wBFJ182ZThH0gzR
+         VwDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7cPepIBmLYaQEPP9vqLgNCvkIzxi+fpruzT/GHHnwz88Jd6F040n7w3yvYBxTvnnS1oAAU4E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxbJk/jtjMVXP5hnqsr4CuPQEgOeRKxmhJX1dzsox9/5T0RdkG1
+	fKNK1hve38Y0RKQtuCdAARn8HYdJKLZnt8hQVOYcO+F9uet0ii4NnvdP1jjpM9Y=
+X-Gm-Gg: ASbGncvLhz0YEcoQ69vNGxABe11DVvmYgq6L0z4SOU2q2qGuSVuEoVPIdkeh0qsoC2O
+	OE7E6YWoWH3wP/iMWlL0KXc9psTV6th62nLDoycIkogjokx8N8/sbb3Gwc0gJyWx56AKiolZSw8
+	obKxImUvOwBY92RLmZz65AiTHw61DcuoLw6LrUZZW4P7N4XOaskUqlFjv4sF7e2qqj3QgJMoE/V
+	VKeb7ZrCrRhWf1xAKnMWEoopNzYvBfrNVEXjPInutyB+Vv/9Ce4inAAlcbe
+X-Google-Smtp-Source: AGHT+IEueCSQe9pvckxqEsEWD3Nr65/94BTKV5/aVQ9y/9c4r7CKM/zYJ76EPGcECgL3+BEaIzTWmg==
+X-Received: by 2002:a05:6402:401d:b0:5d0:840d:ed02 with SMTP id 4fb4d7f45d1cf-5d0950fb3d9mr4136529a12.4.1732811520883;
+        Thu, 28 Nov 2024 08:32:00 -0800 (PST)
+Received: from [192.168.68.163] ([145.224.90.200])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d097e8dc66sm873841a12.71.2024.11.28.08.31.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Nov 2024 08:31:59 -0800 (PST)
+Message-ID: <910320d4-4c72-4962-8d74-1963a74a0c27@linaro.org>
+Date: Thu, 28 Nov 2024 16:31:58 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241128151246.10858-3-alexandru.elisei@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/15] KVM: arm64: Rework guest VM fixed feature
+ handling and trapping in pKVM
+To: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com,
+ kristina.martsenko@arm.com
+References: <20241128123515.1709777-1-tabba@google.com>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20241128123515.1709777-1-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 28, 2024 at 03:12:44PM +0000, Alexandru Elisei wrote:
-> kvmtool, on arm and arm64, puts the kernel, DTB and initrd (if present) in
-> a 256MB memory region that starts at the bottom of RAM.
-> kvm__arch_load_kernel_image() copies the kernel at the start of RAM, the
-> DTB is placed at the top of the region, and immediately below it the
-> initrd.
-> 
-> When the initrd is specified by the user, kvmtool checks that it doesn't
-> overlap with the kernel by computing the start address in the host's
-> address space:
-> 
-> 	fstat(fd_initrd, &sb);
-> 	pos = pos - (sb.st_size + INITRD_ALIGN);
-> 	guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN); (a)
-> 	pos = guest_flat_to_host(kvm, guest_addr); (b)
-> 
-> If the initrd is large enough to completely overwrite the kernel and start
-> below the guest RAM (pos < kvm->ram_start), then kvmtool will omit the
-> following errors:
-> 
->   Warning: unable to translate host address 0xfffe849ffffc to guest (1)
->   Warning: unable to translate guest address 0x0 to host (2)
->   Fatal: initrd overlaps with kernel image. (3)
-> 
-> (1) is because (a) calls host_to_guest_flat(kvm, pos) with a 'pos'
-> outside any of the memslots.
-> 
-> (2) is because guest_flat_to_host() is called at (b) with guest_addr=0,
-> which is what host_to_guest_flat() returns if the supplied address is not
-> found in any of the memslots. This warning is eliminated by this patch.
-> 
-> And finally, (3) is the most useful message, because it tells the user what
-> the error is.
-> 
-> The issue is a more general pattern in kvm__arch_load_kernel_image():
-> kvmtool doesn't check if host_to_guest_flat() returns 0, which means that
-> the host address is not within any of the memslots. Add a check for that,
-> which will at the very least remove the second warning.
-> 
-> This also fixes the following edge cases:
-> 
-> 1. The same warnings being emitted in a similar scenario with the DTB, when
-> the RAM is smaller than FDT_MAX_SIZE + FDT_ALIGN.
-> 
-> 2. When copying the kernel, if the RAM size is smaller than the kernel
-> offset, the start of the kernel (represented by the variable 'pos') will be
-> outside the VA space allocated for the guest RAM.  limit - pos will wrap
-> around, because gcc 14.1.1 wraps the pointers (void pointer arithmetic is
-> undefined in C99). Then read_file()->..->read() will return -EFAULT because
-> the destination address is unallocated (as per man 2 read, also reproduced
-> during testing).
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/kvm.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index da0430c40c36..4beae69e1fb3 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -113,6 +113,8 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  
->  	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, fd_kernel);
->  	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
-> +	if (!kvm->arch.kern_guest_start)
-> +			die("guest memory too small to contain the kernel");
 
-Just doing a quick drive-by and noticed this indentation issue.
 
-Thanks,
-drew
-
->  	file_size = read_file(fd_kernel, pos, limit - pos);
->  	if (file_size < 0) {
->  		if (errno == ENOMEM)
-> @@ -131,7 +133,10 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  	 */
->  	pos = limit;
->  	pos -= (FDT_MAX_SIZE + FDT_ALIGN);
-> -	guest_addr = ALIGN(host_to_guest_flat(kvm, pos), FDT_ALIGN);
-> +	guest_addr = host_to_guest_flat(kvm, pos);
-> +	if (!guest_addr)
-> +		die("fdt too big to contain in guest memory");
-> +	guest_addr = ALIGN(guest_addr, FDT_ALIGN);
->  	pos = guest_flat_to_host(kvm, guest_addr);
->  	if (pos < kernel_end)
->  		die("fdt overlaps with kernel image.");
-> @@ -151,7 +156,10 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  			die_perror("fstat");
->  
->  		pos -= (sb.st_size + INITRD_ALIGN);
-> -		guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN);
-> +		guest_addr = host_to_guest_flat(kvm, pos);
-> +		if (!guest_addr)
-> +			die("initrd too big to fit in the payload memory region");
-> +		guest_addr = ALIGN(guest_addr, INITRD_ALIGN);
->  		pos = guest_flat_to_host(kvm, guest_addr);
->  		if (pos < kernel_end)
->  			die("initrd overlaps with kernel image.");
-> -- 
-> 2.47.0
+On 28/11/2024 12:35 pm, Fuad Tabba wrote:
+> Changes from v2 (Marc):
+> - Added three patches that remove the per-vcpu flags of PtrAuth
+> and SVE being enabled for guests, in favor of them being per VM
+> - Tidying up
 > 
+> This patch series redoes how fixed features for protected guests
+> are specified in pKVM, as well as how trapping is handled based
+> on the features available for the VM. It also fixes a couple of
+> existing bugs in the process.
+> 
+> For protected VMs, some features should be trapped if the guest
+> tries to use them because they are not supported (e.g., SME), or
+> if they are not enabled for the particular VM (e.g., SVE).
+> 
+> Initially, pKVM took the approach of specifying these features
+> using macros and grouping their handling by feature id register.
+> This proved to be difficult to maintain and bug prone. Moreover,
+> since the nested virt work there is a framework in KVM for
+> storing feature id register values per vm, as well as how to
+> handle traps based on these values.
+> 
+> This patch series uses the vm's feature id registers to track the
+> supported features, a framework similar to nested virt to set the
+> trap values, and removes the need to store cptr_el2 per vcpu in
+> favor of setting its value when traps are activated, as VHE mode
+> does.
+> 
+> The changes should not affect the behavior of non-protected VMs
+> nor the behavior of VMs outside of protected mode in general.
+> 
+> This series is based on kvmarm/next (60ad25e14ab5), since it
+> requires the patches from the series that fixes initialization of
+> trap register values in pKVM [2].
+> 
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/20241122110622.3010118-1-tabba@google.com/
+> [2] https://lore.kernel.org/all/20241018074833.2563674-1-tabba@google.com/
+> 
+> Fuad Tabba (15):
+>    KVM: arm64: Consolidate allowed and restricted VM feature checks
+>    KVM: arm64: Group setting traps for protected VMs by control register
+>    KVM: arm64: Move checking protected vcpu features to a separate
+>      function
+>    KVM: arm64: Use KVM extension checks for allowed protected VM
+>      capabilities
+>    KVM: arm64: Initialize feature id registers for protected VMs
+>    KVM: arm64: Set protected VM traps based on its view of feature
+>      registers
+>    KVM: arm64: Rework specifying restricted features for protected VMs
+>    KVM: arm64: Remove fixed_config.h header
+>    KVM: arm64: Remove redundant setting of HCR_EL2 trap bit
+>    KVM: arm64: Calculate cptr_el2 traps on activating traps
+>    KVM: arm64: Refactor kvm_reset_cptr_el2()
+>    KVM: arm64: Fix the value of the CPTR_EL2 RES1 bitmask for nVHE
+>    KVM: arm64: Remove PtrAuth guest vcpu flag
+>    KVM: arm64: Convert the SVE guest vcpu flag to a vm flag
+>    KVM: arm64: Renumber remaining vcpu guest configuration flags
+> 
+>   arch/arm64/include/asm/kvm_arm.h              |   2 +-
+>   arch/arm64/include/asm/kvm_emulate.h          |  23 +-
+>   arch/arm64/include/asm/kvm_host.h             |  21 +-
+>   arch/arm64/include/asm/kvm_pkvm.h             |  25 ++
+>   arch/arm64/kvm/arm.c                          |  30 +-
+>   arch/arm64/kvm/hyp/include/hyp/switch.h       |   2 +-
+>   .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 223 ----------
+>   arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   5 +
+>   arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   2 +-
+>   arch/arm64/kvm/hyp/nvhe/pkvm.c                | 335 +++++----------
+>   arch/arm64/kvm/hyp/nvhe/setup.c               |   1 -
+>   arch/arm64/kvm/hyp/nvhe/switch.c              |  56 ++-
+>   arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 402 ++++++++++--------
+>   arch/arm64/kvm/hyp/vhe/switch.c               |   2 +-
+>   arch/arm64/kvm/reset.c                        |   6 +-
+>   15 files changed, 430 insertions(+), 705 deletions(-)
+>   delete mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+> 
+> 
+> base-commit: 60ad25e14ab5a4e56c8bf7f7d6846eacb9cd53df
+
+
+Tested-by: James Clark <james.clark@linaro.org>
+
