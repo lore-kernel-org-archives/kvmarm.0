@@ -1,57 +1,57 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E1E17597
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 00:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7270617597
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 00:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732755364; cv=none; b=sEpq1tJW6rHnjk6sLPThFPXryU8eBl9RPKQVPhup4dAoh+H9ALCFct/GklHOOW3HZgAGYV6TT2XBfNZgfToGt2su+5fyNUheQanATBemPGm5I/rb1y/zp87DFqeu3fXuMuzJIScadlzm0ArUG+04KHXgKtt+Y5H31S+qi14xTEk=
+	t=1732755365; cv=none; b=fzgk6lnB3KO7WcgExOqS27DgEufaBYXVBvcXR2de329pIcBC8Hvv4KxurXH4XaJTwzJ8XC3pNU2NxgjqF9i6fp5VatyjsMAZYxT/gXu3XhbmUjNmP2/abtkmII104vjdlCJx/pBBMJOkry6X1txqDw24hB8JgFoFSff3oDHNOvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732755364; c=relaxed/simple;
-	bh=EYB3L6b74MhfJrPzvb7T9WOOU7QX9pbOjbRmtOdicCg=;
+	s=arc-20240116; t=1732755365; c=relaxed/simple;
+	bh=UOHD8P5jAo/tu9DZeP+a1DmnkO+B67XGDTnvDmQDwR8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sPL0eiqUciC5U5phs/cBSTQJJSCwaV/uv/hhP/09WFBz+iBc3NBkFAp2vdtzi5HtFJ7U4ekg4aCnND811sQV5WyYEdLDCVbvyt9Cze+T0i/4cnsu1c2FX7XDdbjHO0BAx0KEz6/YxvVRfspvpkWXsLzmGjbJymGzzDOEi8MCkh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fCOO0X8i; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=AfEw+zb96dbtqrvSPlTrWPbMsaxuMSXWSkK3TYZlAyA08b9VNpXOMsk5JDAAdUWrFGkXFvjUEg39Rav3+wW6Y3zPh2L+fl1Q5B93P3RqMJycmAlzEk90YAyyPVcfEKsEfqeGFQ6yV8FIJoa0W9Ks3bCpYD0c+l8F3uIjwHZ8ZJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RwWAi09C; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fCOO0X8i"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-72524409ab8so327961b3a.2
-        for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 16:56:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RwWAi09C"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2129bf203d9so3543265ad.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Nov 2024 16:56:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732755362; x=1733360162; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1732755364; x=1733360164; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/2VfJdiek5/ConUN3oh8Dq9U963aWvO6yCMgPFkp+8=;
-        b=fCOO0X8i2rtBwYd4PRx+jVwhyr6ulUKhsT//f6CdM+S9E7TyDyTmg7uUKvMJkHBOsC
-         NeZYNDxpZurmqifYYUcctI4LPueiVYEmk2rmeFwck+WxciUWQ/tKTWb69JV+oI4ZqtoS
-         88iDh10kaVoD7d4xl7rqnjufUWJC/Ihrjyx6Vt4gC0ns4wKljokYLufrRBJFUgxCc7wx
-         8WJ07qY3PiQsKGzr78Uyw3oQTSP9aMGOOcwf0jMdbXR0sBlj7P93GzcRMD2FAKVtQcGd
-         I2J3EM5XyC/WL57Eb9s0ejIZtrZKhWaFakJQ11w902DEpc6Y4k3NCYISIEhMF5DZXjta
-         Tdyg==
+        bh=ysvaIdmMpR/VmHKwcGzTb4HtexOKJ4Ghx7ZOeauEtvk=;
+        b=RwWAi09C2ZWOVBdXM3rtI15h13TxRmO9S66akit1yYMEiJVPOS+S/y8DuqaQ6Idlgl
+         4QMTJfLXXJWuHzGY3zP4SBF7UKrX98c/MfCxT+YttWWL7DvxmKclGH30Mq/lxcKNW2J2
+         /iOYjCVm+rgjRMbvGZoj4OHhHUygbR+e0INsDar0EfQTnES+OUoHwFltb6Zia6l34BzI
+         jiMsm2oPKFMEyZmp5hr6osWvghvRJ6Vegu+OIkSYtl4z33IwrNpvVv9OW00ji4iYkA2w
+         ciZBvbqnTjS279VwBvr0xNxCGhIo3RCsVFaZtJBmiWSSLGMOiWM+O7HN16oX2Ys9+Ctb
+         IGkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732755362; x=1733360162;
+        d=1e100.net; s=20230601; t=1732755364; x=1733360164;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7/2VfJdiek5/ConUN3oh8Dq9U963aWvO6yCMgPFkp+8=;
-        b=sLVZhHVyTlNywhTux2QeGxo+RXMIvkqR0Yopu82xmvcCt9iOf8aGkliRvqW15nlBQz
-         QfVaz7YiCsPyS0e+LC6Qj1xhsCDO9yy5qBW+rINLLQP6TxxAk1nwxESnLleTKedeRLsI
-         1NDd97WFHWvXhcy4yoK30xoUsZRCW31LNbkna6Am27wlGcFyjUWgcnKLH1smF47D227B
-         ptLZfPqQWw8M3xZvQGW9lir8SvZCaq8Qe4g8oyszGZkNXjO547kJo2SqH86iQr0oQpDy
-         2+jLhnLogKNT5Wk+NKKwgUZ+wmjhKm/0Ch1/uX/oBo+c9w8cT4Rh/xHVwRNcov06g5aR
-         3l1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWOIRsiUuXf2PopJEr77SMdwhcHC8ESNcjwVVh6ZSP4QfjFYr10ttCpXbioBjtWG4atWupKfg0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzCbU8eft9TzdjsOU4BYrm4PZ7ICbH6czsTLjZtsCrBH0L2LpT1
-	je2lhdaaYDyX/mfX+d4yiiM7sPfdo3po4vJpgp9SUvP2ZTpE9m4zNL63ssRHCxjRunqYje5pZ1S
-	MNw==
-X-Google-Smtp-Source: AGHT+IH/oCUXOezhQ0A565EEmfthxQY0rCc4VbVmqRSwagA0iA03VskT3jIu5Z1zmAcsnP7ZOJe6QkUN4cI=
-X-Received: from pfbeb15.prod.google.com ([2002:a05:6a00:4c8f:b0:724:e5a7:e33d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4654:b0:71e:6c3f:2fb6
- with SMTP id d2e1a72fcca58-7252ffd753emr8477585b3a.8.1732755362168; Wed, 27
- Nov 2024 16:56:02 -0800 (PST)
+        bh=ysvaIdmMpR/VmHKwcGzTb4HtexOKJ4Ghx7ZOeauEtvk=;
+        b=QGmLAFStMlQ9jQw57ylFhfgeAXR+QWPSWF6Mvwm52ZVPB1vu5WMGDxRT2v3JkI1VPk
+         Ha2xfY7XJTOIBD3zfngzQAd3sPX9OBKQKHZvaqXMVeZjHC+auew5QBIn7/Q8WuBRLZNa
+         /YIcwsavr3NckeQxKIM8l/hPFXXJsa8jKUheH75lAACcOVgSOYIP6gOiCcruch3Hrd8n
+         34h6NSd7fVu3z8q1Vy8B5/0kynVD0JtD5/xT9+wvfsebXwsXvj2ccP0GILCMohTZh/Rr
+         klllVkIcPqTVTX+JLl9yvXKM95uT1m+PjT8biY5KMCrQuSWzpr1gj118vIaNNovZPe/P
+         ARig==
+X-Forwarded-Encrypted: i=1; AJvYcCVrLkqGiQxQmxrEDKFUxT3+0/N88fTvBXINMjmIrYeV5wma7HwVicr4dbn0MNkaJSKtsn/xnRo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy/yb86dkBrDqSURI0SpG7Czs+AMTZh9kDEtuuapZYXFl9uBG/a
+	N8RxFAj6y8878NdVyqpM1dz3mG/Xdt/gwtq6j6OMnH8VLvsJCXKtHIMleI8UF83Fg37tmqo5Uuw
+	qAA==
+X-Google-Smtp-Source: AGHT+IE+ChL1KLorT8CIkfmIr19XCryd//IzNWr5z8aQi0CF/Qf3ZQTw4qD7deHM4fsaQ6e/45gZiVf87tA=
+X-Received: from plbmb7.prod.google.com ([2002:a17:903:987:b0:211:b7e:ba7d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e84f:b0:212:618a:461f
+ with SMTP id d9443c01a7336-21501b5aed2mr63134555ad.41.1732755363732; Wed, 27
+ Nov 2024 16:56:03 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Nov 2024 16:55:38 -0800
+Date: Wed, 27 Nov 2024 16:55:39 -0800
 In-Reply-To: <20241128005547.4077116-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241128005547.4077116-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128005547.4077116-8-seanjc@google.com>
-Subject: [PATCH v4 07/16] KVM: selftests: Compute number of extra pages needed
- in mmu_stress_test
+Message-ID: <20241128005547.4077116-9-seanjc@google.com>
+Subject: [PATCH v4 08/16] KVM: sefltests: Explicitly include ucall_common.h in mmu_stress_test.c
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -78,37 +77,28 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Muhammad Usama Anjum <usama.anjum@collabora.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Create mmu_stress_tests's VM with the correct number of extra pages needed
-to map all of memory in the guest.  The bug hasn't been noticed before as
-the test currently runs only on x86, which maps guest memory with 1GiB
-pages, i.e. doesn't need much memory in the guest for page tables.
+Explicitly include ucall_common.h in the MMU stress test, as unlike arm64
+and x86-64, RISC-V doesn't include ucall_common.h in its processor.h, i.e.
+this will allow enabling the test on RISC-V.
 
-Reviewed-by: James Houghton <jthoughton@google.com>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Reported-by: Andrew Jones <ajones@ventanamicro.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/mmu_stress_test.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/mmu_stress_test.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
-index 847da23ec1b1..5467b12f5903 100644
+index 5467b12f5903..fbb693428a82 100644
 --- a/tools/testing/selftests/kvm/mmu_stress_test.c
 +++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-@@ -209,7 +209,13 @@ int main(int argc, char *argv[])
- 	vcpus = malloc(nr_vcpus * sizeof(*vcpus));
- 	TEST_ASSERT(vcpus, "Failed to allocate vCPU array");
+@@ -15,6 +15,7 @@
+ #include "test_util.h"
+ #include "guest_modes.h"
+ #include "processor.h"
++#include "ucall_common.h"
  
--	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-+	vm = __vm_create_with_vcpus(VM_SHAPE_DEFAULT, nr_vcpus,
-+#ifdef __x86_64__
-+				    max_mem / SZ_1G,
-+#else
-+				    max_mem / vm_guest_mode_params[VM_MODE_DEFAULT].page_size,
-+#endif
-+				    guest_code, vcpus);
- 
- 	max_gpa = vm->max_gfn << vm->page_shift;
- 	TEST_ASSERT(max_gpa > (4 * slot_size), "MAXPHYADDR <4gb ");
+ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
+ {
 -- 
 2.47.0.338.g60cca15819-goog
 
