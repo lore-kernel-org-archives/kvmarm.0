@@ -1,128 +1,114 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-lj1-f201.google.com (mail-lj1-f201.google.com [209.85.208.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A7925761
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FEF1BC9EB
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732808194; cv=none; b=ES31ShOWgikTz2g8M2maJdlk7sv9u5/JAn2UwoIk1KUwadpEbtjWmU31A83TwGYwZ0+u9d19cvBBSn417dfUurmzQnX7gBQ9yVohkqdivKn8A3/gl1u6zZ0N0CiA1Bp9IBUYKgUtHYi1UcEY+No9KMvHzBy4G27PzgodCfb8wjs=
+	t=1732808653; cv=none; b=OrMaGd2mYpsM4JPtFiJrQqhqe2T2adzryaQNt1VYmfS+lw0fKNijOkmxXVosvpn+EbjHJu491C/o1d7hs4J9J0LMaPY9cypIhFAahrJSkqMAeNNU79Gy9miXwm90PJUMryF3VqlWHsziY871la0qGNVHSM+6it00IFepzUrugPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732808194; c=relaxed/simple;
-	bh=9cvR0Hdf8jyPtNU6IIOEpOjRr+PSnXveawJRkW9SU+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kH7y9mwLO16Ro/lBLgMWUn71k6E8XcSlmK41iWd3lQH4ymOfY5padoPBVe6IaqdPPfoxluQ4CHAVE1HuNfcBVMvrBij0HuN6lnZyI8p2y8B5skYXX5y5DviUIrvS709Pihxn1G7FDi/zBdelGdjgixig+FcsC7IBYRLuE72IW0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jq3Ju64r; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	s=arc-20240116; t=1732808653; c=relaxed/simple;
+	bh=zefgSlkWiBMEgrarllE+ZW2iPiBzKadDUa8/gGaDrLc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kPPv2A+4HoyYPA+Vua7VoLhrfS9Ch8VM0eMdBxiLF3lSjXedvVx8gbl/wuJRCqADEBQLQd6vy31TIoL8vAPrFpLj1lNndiXY+7qQE3kbGppG1y0GyYJmn3i0fmNlC/QkgQ2E3oTPSf7hoqmHJck/FIlltc6WY1hRkwdVJwtl3+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U0WNYQHp; arc=none smtp.client-ip=209.85.208.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jq3Ju64r"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3824a8a5c56so737166f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 07:36:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U0WNYQHp"
+Received: by mail-lj1-f201.google.com with SMTP id 38308e7fff4ca-2ffc3b6bb58so7122821fa.0
+        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 07:44:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1732808190; x=1733412990; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBJf/895gAZ0pPcmkrD9nFaEZSFBwkUTysldFoBxcWc=;
-        b=jq3Ju64rtFmOZ6fMpt4RECwYSTD0X9PrBE/ijBkp1lSbtBG0FPs9L02r6573XmVA0Y
-         T+E/Hq4ONTBC331CnVyFTCXMbAF0CqC9sPNIuEbpKfSHMJy8ljvsRsEe+zcbdXHPwhD/
-         D02Cf0/sxZK4tJJjp6tnLYeLYzBtEtuzMoU4PjgLGY2YQkXX/q+DVWQdNqDmki/uZt/U
-         dJlfMUR18vZge74fB+s5ouZ3Cj3l0HWzkiEWRZ/oEkF7KQvzXaf3heVbY8IMppyaSMit
-         mFvrBLXTVkL1hvr36q4pCTDKlX74TIpwOU47UPEXU6SmmJZP13t6Vwr7YJT/6USOinco
-         afEw==
+        d=google.com; s=20230601; t=1732808649; x=1733413449; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=khn7hS+L97wWEkf+qZmLW9FxPYu9tRvP0eTp4rFXqec=;
+        b=U0WNYQHpvzK8xAkvq4QxMzD5bs+uEFO6rqfGSmVxvkInxva0N20MJeSXSd1lsevp3P
+         M56umTFDn4bBGfPcVMbmJ0s3zPAmRVOOVvWZ1Oqxvk2aWjkgrYFuuXU96FLGmKuTVYFk
+         mgQZVHUd3N3ZD0Gw5pxDNnRekYT3zaELs6yNyhpZ+rOFeXBOVCspr8s7yGC1anb/zvGl
+         DxJZ4p0ZsuRTOYxDlV5gcZW/LVBRhbbHx+k6WUZv/TVv6rxnlGAsowjKOkYKEj1uhzp+
+         +iDW5pXuSaAZ+5Dgv63+xpd8/QYsoIiaLnUBxkyUGsGW5NHbajh8UjbJE0pXRaXdTOFt
+         PDhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732808190; x=1733412990;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WBJf/895gAZ0pPcmkrD9nFaEZSFBwkUTysldFoBxcWc=;
-        b=WILMTRLNIUV7tSrbwD1BH2h9JzoHywG/nbRD+CGP+xKsRt8e8ZGRB/1ycnaVOGl1hF
-         J1kIuiYkVVhmrN2q8+hY3xruzuISnrrn3ETsODwtUqk/UpeawR1Gcc8BGEzDvGK3ha0E
-         B450aBGU9Af3V5fENer2cVyYfcySrpZfsr0WQfSHNuDKwlEVIVnqnDM2h8uork7zth9X
-         rxT4EgRka6IqEqNLyA8mvUIgwzr32PwaBsW2jdtUXsIM70J4jsvknT/wxnBpaGB04bGy
-         10i1qmBtrFQGhqDvo/CqwheFNCjRwWQWBlL8YNw9BYIrn6VDHdCnvMt8JU430bsStP4l
-         OJ+g==
-X-Gm-Message-State: AOJu0YzZ9Z8PWkIKETmuIjCC1/8LvGu7SGotGylRAcDzj+TqDUHEDKzo
-	/jNMfG5Z8trlykXVxKLfK1DzIa6m6xXdcwt/TqAlrgsm71AV2yVvVUnUxrvgXOw=
-X-Gm-Gg: ASbGncu/4it5CyVP4DlzGp6P/4sB5Xwsum7V9OnRiGCbhootowrANktDGaxXT+/i5vL
-	G3rQBksZ3xdBnCVDR5TXP6mM+H9HzgvVhqOFgwKaJcf38E1huZhcryxHEaJM6Nt+IvNrUofEtUH
-	8MBLxxEBdZqXYyrvNbPJgJ3fiCyIJPa/wcqk+vQB33NP5Zrq9q9MVJR5IwtibQ74VHylMdHmGYz
-	J82+wC8nA2z6tna8H7wI3lbqZw7f2Ussn3YLv2xFPJ2qTMkfxM6CdELqQGn8a4N7Q26/NIkLGJo
-	b3xyCYqrcSyCyOkS20gpg0K2iTrgML9121Q=
-X-Google-Smtp-Source: AGHT+IEDPnwcu7h+ElXTqfyvSsHEYUOyA3lbFZXVCKxjr1xKnSJc9XnED6kHQjXE8ZQpcgdam5tq2Q==
-X-Received: by 2002:a5d:648a:0:b0:385:db39:2cc with SMTP id ffacd0b85a97d-385db3904b7mr224126f8f.1.1732808190484;
-        Thu, 28 Nov 2024 07:36:30 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccce7859sm1996147f8f.0.2024.11.28.07.36.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2024 07:36:29 -0800 (PST)
-Date: Thu, 28 Nov 2024 16:36:28 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Raghavendra Rao Ananta <rananta@google.com>, Andrew Jones <andrew.jones@linux.dev>
-Subject: Re: [PATCH] arm64: Fix sve_vl() for build errors
-Message-ID: <20241128-40f8c0b30bfe9455e1a7d982@orel>
-References: <20241128150002.2424523-1-suzuki.poulose@arm.com>
+        d=1e100.net; s=20230601; t=1732808649; x=1733413449;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=khn7hS+L97wWEkf+qZmLW9FxPYu9tRvP0eTp4rFXqec=;
+        b=VFQLX4vLoTFiWVDPLJu8/J0qL5LevrLJHvHnmH8/kyVqTZYoB/Xy0mcx1fPfXG3/O7
+         qN1kkHul6ENLqhw9b5wogjZbMrCvX/pWt1lFSzHAdyDpofuCYUpP2USCmlVik4LYc6AM
+         kOwzXdAnkR1LrjsuR9bEUK6RfcqyDM31ynQu/bLSD8J2XIwS9Ehdmi6kS1SPHmajmW/c
+         LT4ZL2CzCDos54gPlcQ5dYgOYPrDDoWgZmDczeUuBPS0aRNtIo8WnizIdSeTuoHhq6l8
+         RBHmuOsPYsw394qI2cX6tR2VEXUN9Mpk2AOro/EeqbVr6OuyyGAtSAXUMgw+oZjP9JE2
+         8beg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJMFxkjtPThYQTmb1J1QZ4tSPjvgay0EwXd10b/VQ7ysun4pHGJUnZR0qm1K5eHthldyhdxFY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyMBQcttGPz7/FkmiZoaNah2ifFWtHQ7t3iw9mBYUtrR1oPd1So
+	s3MF0EtqRGnpDgil/N5U8r6cdQBK0HiSMtp9vCSbkabDYQySknCEdoVRE2P37asuES7iwFqDNBi
+	jS8oeAg==
+X-Google-Smtp-Source: AGHT+IEA0vqV24/H61fVxAlPgPYdRuvNXFKWFHK/tbHMkyqpm9uAL9gzQ7g11kF30kEuklavdgUcHm1MkzJh
+X-Received: from edso5.prod.google.com ([2002:aa7:c7c5:0:b0:5cf:e1dc:7d98])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a2e:be0d:0:b0:2fa:d84a:bd8f
+ with SMTP id 38308e7fff4ca-2ffd60cf809mr40534651fa.30.1732808649614; Thu, 28
+ Nov 2024 07:44:09 -0800 (PST)
+Date: Thu, 28 Nov 2024 15:44:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241128150002.2424523-1-suzuki.poulose@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241128154406.602875-1-qperret@google.com>
+Subject: [PATCH] KVM: arm64: Always check the state from hyp_ack_unshare()
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 28, 2024 at 03:00:02PM +0000, Suzuki K Poulose wrote:
-> commit 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()") breaks the build
-> with the following compiler version, as the "rdvl" expects a 64bit register.
-> 
-> /tmp/ccGJYtuC.s: Assembler messages:
-> /tmp/ccGJYtuC.s:2165: Error: operand mismatch -- `rdvl w3,#8'
-> /tmp/ccGJYtuC.s:2165: Info:    did you mean this?
-> /tmp/ccGJYtuC.s:2165: Info:     rdvl x3, #8
-> make: *** [<builtin>: arm/selftest.o] Error 1
-> make: *** Waiting for unfinished jobs....
-> 
-> $ aarch64-none-elf-gcc --version
-> aarch64-none-elf-gcc (GNU Toolchain for the A-profile Architecture 10.2-2020.11 (arm-10.16)) 10.2.1 20201103
-> 
-> Fix this by switching to use "unsigned long" variable and restoring the 64bit
-> register for the instruction
-> 
-> Fixes: 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()")
-> Cc: Raghavendra Rao Ananta <rananta@google.com>
-> Cc: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  lib/arm64/asm/processor.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index e261e74d..e5b0ad10 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -154,12 +154,12 @@ static inline bool system_supports_sve(void)
->  	return ((get_id_aa64pfr0_el1() >> ID_AA64PFR0_EL1_SVE_SHIFT) & 0xf) != 0;
->  }
->  
-> -static inline int sve_vl(void)
-> +static inline unsigned long sve_vl(void)
->  {
-> -	int vl;
-> +	unsigned long vl;
->  
->  	asm volatile(".arch_extension sve\n"
-> -		     "rdvl %w0, #8"
-> +		     "rdvl %x0, #8"
->  		     : "=r" (vl));
->  
->  	return vl;
-> -- 
-> 2.34.1
->
+There are multiple pKVM memory transitions where the state of a page is
+not cross-checked from the completer's PoV for performance reasons.
+For example, if a page is PKVM_PAGE_OWNED from the initiator's PoV,
+we should be guaranteed by construction that it is PKVM_NOPAGE for
+everybody else, hence allowing us to save a page-table lookup.
 
-Pushed to master.
+When it was introduced, hyp_ack_unshare() followed that logic and bailed
+out without checking the PKVM_PAGE_SHARED_BORROWED state in the
+hypervisor's stage-1. This was correct as we could safely assume that
+all host-initiated shares were directed at the hypervisor at the time.
+But with the introduction of other types of shares (e.g. for FF-A or
+non-protected guests), it is now very much required to cross check this
+state to prevent the host from running __pkvm_host_unshare_hyp() on a
+page shared with TZ or a non-protected guest.
 
-Thanks,
-drew
+Thankfully, if an attacker were to try this, the hyp_unmap() call from
+hyp_complete_unshare() would fail, hence causing to WARN() from
+__do_unshare() with the host lock held, which is fatal. But this is
+fragile at best, and can hardly be considered a security measure.
+
+Let's just do the right thing and always check the state from
+hyp_ack_unshare().
+
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index caba3e4bd09e..e75374d682f4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -783,9 +783,6 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
+ 	if (tx->initiator.id == PKVM_ID_HOST && hyp_page_count((void *)addr))
+ 		return -EBUSY;
+ 
+-	if (__hyp_ack_skip_pgtable_check(tx))
+-		return 0;
+-
+ 	return __hyp_check_page_state_range(addr, size,
+ 					    PKVM_PAGE_SHARED_BORROWED);
+ }
+-- 
+2.47.0.338.g60cca15819-goog
+
