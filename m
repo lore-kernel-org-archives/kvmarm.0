@@ -1,32 +1,38 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0DB143C7E
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE241BD9FF
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732806041; cv=none; b=WokfiTWPqpjuGmWbnCWmkjR0BRn7Up9x+KLjIWVQAJJek2eiFr+pAPMJoDEkHd3dWqouo6ypUzS9X6w9Fa6AdOm0rwQ6WxnpzwVI+W7R9hBie6i1xLu3sWp8dgRk2oznxuGGYPlD0pLdj7zEAeT5NBMfZcIdxZFA/3yvorF9IpY=
+	t=1732806592; cv=none; b=goVOrAK/3KCO1sDNEUsfYcnI30rzDS6gtNe72Xe9cYd1pmWfI1quxkjdLTGhNFu2xZ1tsWlLj9zeidNjje8Ih7leFq/V1S5/4FAQAMX0JtrNUpjCXGeYEyHUYU82s4CaQy8t+3Lj6jEnAr2kxV6R2k95Fb455ymd7+og24+SQGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732806041; c=relaxed/simple;
-	bh=FqnB7kgaBCDCr1gJAqYv8s/Q7KLDiI91AqC351tbdGc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FeIzArbPaf8Lz36WmfULiBDGrtBVrteq/3q3bLI8gj4gw/uhAJ7QJS2mN2D17n/zgjckuL9FMe/y2a8sQ5lLX4LTio0qebiE42gP4pCTIfCl/vN7X8NJm0cdeRdejk+ojIvU+0r0EXsCjux1YPjo7/xhqHh6cZ+boCMJ9+t+Dcs=
+	s=arc-20240116; t=1732806592; c=relaxed/simple;
+	bh=XLYYqBbfwK6LRtPg4GRCMfrYpGXdC+J9JPrXltqBRO0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JKEg7DhOyjJvumMf/IkgWFs/IRmwR+hKqbPxZIKAziNXLdZU0YV/Qhbogfv1Y0pwXkrODJzeMgpEQaAUcGUx0UEcYWxeooE5Gwe0Z2FIvqDmlIXkKAqwm/Y2D/26QomgGinDFleXOb1322cZeATK28o9e7cqIoTelQAGSj/Ge7A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E84CC1474;
-	Thu, 28 Nov 2024 07:01:04 -0800 (PST)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1F3CB3F66E;
-	Thu, 28 Nov 2024 07:00:33 -0800 (PST)
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Andrew Jones <andrew.jones@linux.dev>
-Subject: [PATCH] arm64: Fix sve_vl() for build errors
-Date: Thu, 28 Nov 2024 15:00:02 +0000
-Message-Id: <20241128150002.2424523-1-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.34.1
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 164421474;
+	Thu, 28 Nov 2024 07:10:19 -0800 (PST)
+Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A8B03F66E;
+	Thu, 28 Nov 2024 07:09:47 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: will@kernel.org,
+	julien.thierry.kdev@gmail.com,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: maz@kernel.org,
+	oliver.upton@linux.dev,
+	apatel@ventanamicro.com,
+	andre.przywara@arm.com,
+	suzuki.poulose@arm.com,
+	s.abdollahi22@imperial.ac.uk
+Subject: [PATCH kvmtool 0/4] arm: Payload memory layout change
+Date: Thu, 28 Nov 2024 15:09:37 +0000
+Message-ID: <20241128150937.10685-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,50 +41,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-commit 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()") breaks the build
-with the following compiler version, as the "rdvl" expects a 64bit register.
+The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
+the riscv maintainer because it looks to me like riscv is similarly
+affected.
 
-/tmp/ccGJYtuC.s: Assembler messages:
-/tmp/ccGJYtuC.s:2165: Error: operand mismatch -- `rdvl w3,#8'
-/tmp/ccGJYtuC.s:2165: Info:    did you mean this?
-/tmp/ccGJYtuC.s:2165: Info:     rdvl x3, #8
-make: *** [<builtin>: arm/selftest.o] Error 1
-make: *** Waiting for unfinished jobs....
+Patch #4 ("arm64: Increase the payload memory region size to 512MB") might
+be controversial. Follows a bug report I received from Abdollahi Sina in
+private. Details in the commit message, but the gist of the patch is that
+the memory region where kernel + initrd + DTB are copied to are changed
+from 256MB to 512MB.  As a result, the DTB and initrd are moved from below
+ram_start + 256MB to ram_start + 512MB to accomodate a larger initrd.  If
+users rely on finding the DTB and initrd at the current addresses, then I'm
+not sure the patch is justified - after all, if someone really wants to use
+such a large initrd instead of a disk image with virtio, then replacing
+SZ_256M with SZ_512M locally doesn't look like a big ask.
 
-$ aarch64-none-elf-gcc --version
-aarch64-none-elf-gcc (GNU Toolchain for the A-profile Architecture 10.2-2020.11 (arm-10.16)) 10.2.1 20201103
+On the other hand, if there are no users that rely on the current payload
+layout, increasing the memory region size to 512MB to allow for more
+unusual use cases, while still maintaining compatibility with older
+kernels, doesn't seem unreasonable to me.
 
-Fix this by switching to use "unsigned long" variable and restoring the 64bit
-register for the instruction
+Please comment, I don't feel strongly either way - I'll happy drop the last
+patch if there are objections.
 
-Fixes: 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()")
-Cc: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- lib/arm64/asm/processor.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Alexandru Elisei (4):
+  arm: Fix off-by-one errors when computing payload memory layout
+  arm: Check return value for host_to_guest_flat()
+  arm64: Use the kernel header image_size when loading into memory
+  arm64: Increase the payload memory region size to 512MB
 
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index e261e74d..e5b0ad10 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -154,12 +154,12 @@ static inline bool system_supports_sve(void)
- 	return ((get_id_aa64pfr0_el1() >> ID_AA64PFR0_EL1_SVE_SHIFT) & 0xf) != 0;
- }
- 
--static inline int sve_vl(void)
-+static inline unsigned long sve_vl(void)
- {
--	int vl;
-+	unsigned long vl;
- 
- 	asm volatile(".arch_extension sve\n"
--		     "rdvl %w0, #8"
-+		     "rdvl %x0, #8"
- 		     : "=r" (vl));
- 
- 	return vl;
+ arm/aarch32/include/kvm/kvm-arch.h |  5 +-
+ arm/aarch64/include/kvm/kvm-arch.h |  7 ++-
+ arm/aarch64/kvm.c                  | 88 +++++++++++++++++++++++-------
+ arm/kvm.c                          | 35 +++++++++---
+ 4 files changed, 105 insertions(+), 30 deletions(-)
+
 -- 
-2.34.1
+2.47.0
 
