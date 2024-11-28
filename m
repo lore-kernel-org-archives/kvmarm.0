@@ -1,103 +1,122 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C679195385
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 12:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE3E1E4B2
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 13:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732797350; cv=none; b=jUNHCXRBkRszbqmsku+yJgne/RICH+NCfQKTDn25a3FMnNU3cl/JsiklccrC8kvmLWeHlId2IUuEzrkixPP6L0oBoK4hiQ9LhkEAE4+Eds81rjptlvaw9QnKEfKykPyQVdb1osbQiBJIzsDuBd7aRWguTR3OsV1FU6DjELELfug=
+	t=1732801602; cv=none; b=Ed2Y3tncvWo8xvhgqUqlPAeFN95tE8Uzz5r5VLOnaii8XYlLMh6LmhxbbuYl+5dmt99bzcgbabD/mOFPpKN9XPj82es9qZnf2Xrnfd/b5NJ/Xkqw7/Mskl8fKDtM1y/tniUnvvIKPH/sybGs3x3Bf26WZmCUwn0W3kcUhK6+TiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732797350; c=relaxed/simple;
-	bh=/lzy0U4F7XjlWzN4QPFJnQvTI8NpGDbJSAZd+y1nVJU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UjA0K7G2jtBNIfmcNvhfdUTK1P+tB/ERIVoZkhLc2bCQLbRUkoTFse/lEw/auWHzd6otm12mTyLd4e6XXEMM1bgP4TnpyIgyzjflPSsvEC6yzvsbtlgi8L8+HVGhCv3n814n20nXQKAeRACU0zNZeuVlLUpBGxqQ9Gx3UfizhBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r0mCLTLG; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1732801602; c=relaxed/simple;
+	bh=4tIoF6VkaTG0evLWfvk4a7lSD8o4N8RaLyj0BU86NSw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tjl6rnbkZYoMECVF4jL3earARIKbsmeowN+/4FbYgrect15Sr27unNXOqofG39IAgyFbOXmJ+c5ijJ+hYFRxPAolg1X4KyY5RY9F9ujpbaQz4XeYsNUn7WD2zFzgLaB2r1HS8HGpK0bfUxbp8ej62U49ERYsoOz+fSUW2xhkZ2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=jgdJKA1k; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r0mCLTLG"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-434a6483514so5927375e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 04:35:49 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="jgdJKA1k"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732797348; x=1733402148; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CSUc+JlbUkcJTV3hddKcfnf/DVsTc1Y11IkJDKUo+M4=;
-        b=r0mCLTLG8oqOp2uXmXR/aKyirgnSqhMNcvbsWEbzMXoM0bRoZHPTx06UqCuQZa12WO
-         i04SfawP+qq+/qNZiZpmBggI5LbkNY8x3gfPj63dq911qb6E6Ry8s8e5RxnQmUd6CTEk
-         +4Sy3aUH9bXv4reKCTz6dLpxshi4juj8ezRgFh6/cOb/+eLsV4eQ4SevFYWxTYOqAyEG
-         eij1JzWFw/efE8JkRJ54fw800ptLo7BKpDtfD3/oVGYB96W8TT4nN8yU2TBRXYLfWLP8
-         zJOg13wtTnYtKH5r9eT1eol530QFJERl0nI1gFKzE0OLikdut9swxNLLj8DaKZef8MjW
-         I4ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732797348; x=1733402148;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CSUc+JlbUkcJTV3hddKcfnf/DVsTc1Y11IkJDKUo+M4=;
-        b=sUx5DSHKYFp5xQ++ruyu4n+0zrmFjlIHBoUmBC2Y7t8klqG8gQjIB4CpHISnHyjG8E
-         IcLDv4qmEtNxhnV41zcYEgMmH5w0aoNYw6LSyDyp8KGjkHPi1KcKnI3A3zFTEacd7bgH
-         RCw6wUFlVGJYECxjOBjvMfP8fwOgYVPRvqeGMgDKk1lk/DBM6n3eR0Ql7w0ze2dC4xvn
-         mjQ1Usa12US/5GOlhhlcc2ZPdTbwcDyEeul11jUo7kIDd9lG78KgyC5mVFTFgT1xz/Yc
-         exMApdzPRD3DvcQe677tXRz4AQ6/IJGIWHooXyC5w5k4tEYXssESMooVeLoWNjQRhGSo
-         bdmg==
-X-Gm-Message-State: AOJu0Yy4Nxxxj0TpJQmTGLBF+T6Bss7PaXhKrmg88dM4EMgJdyE19IDP
-	lYFNzw/3gbdJkcYodyaRRjndUbxnJmIXOg8m7BKAuKXBBs2+N93ZBkeVyiETR5OCi81AP884SqW
-	rzoJ5XO/YfvlKmUF09WtanK9RQhhZrmuWfkco/dox/zFxEOBZ7z0BUSwu07XFWSB4j0uNlarEfr
-	KoxFT90GaCk3B4DP6b2SsCieKeekQ=
-X-Google-Smtp-Source: AGHT+IHPGUBbpJOX261VZ8WL15DveE3B5R1Hl7n4v9aOK6eYzyyv6fZdkCX1pbszmw51LoEme5rJDfOL2A==
-X-Received: from wmlz4.prod.google.com ([2002:a05:600c:2204:b0:434:a0f9:be9e])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3546:b0:434:a83c:6a39
- with SMTP id 5b1f17b1804b1-434a9db7b5bmr72740785e9.3.1732797347848; Thu, 28
- Nov 2024 04:35:47 -0800 (PST)
-Date: Thu, 28 Nov 2024 12:35:15 +0000
-In-Reply-To: <20241128123515.1709777-1-tabba@google.com>
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iaG1b+JwMIQi3DAhpRd2uui2yB6sNRs4Dsa8pT9Cl5Y=;
+  b=jgdJKA1k4OEhWqv+nL2OKASeAJVraXY4UpfvLPeti47MZStlCeV1UKh/
+   UqqYR70toyScT9uroTm5DRTXkxlL5lFvYVZwRbHAkMpzMwA4RbJnlTtU0
+   A4KdwCwhUGMw24SvucUmlQaB55FKo20ytUHUwtncDXHGwc7xI6b/F1OKi
+   E=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=keisuke.nishimura@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.12,192,1728943200"; 
+   d="scan'208";a="102888059"
+Received: from dt-aponte.paris.inria.fr (HELO keisuke-XPS-13-7390.paris.inria.fr) ([128.93.67.66])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 14:46:31 +0100
+From: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>
+Subject: [PATCH] KVM: arm/arm64: vgic-its: Add error handling in vgic_its_cache_translation
+Date: Thu, 28 Nov 2024 14:45:34 +0100
+Message-Id: <20241128134534.361144-1-keisuke.nishimura@inria.fr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241128123515.1709777-1-tabba@google.com>
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128123515.1709777-16-tabba@google.com>
-Subject: [PATCH v3 15/15] KVM: arm64: Renumber remaining vcpu guest
- configuration flags
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
-	qperret@google.com, kristina.martsenko@arm.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-With the vcpu's SVE and PtrAuth configuration flags removed,
-there are gaps in the numbering of the cflag bits. Renumber
-VCPU_INITIALIZED to bit 0 to remove the gaps.
+The xa_store() may fail because there is no guarantee that the cache_key
+index is already used in its->translation_cache. This fix (1) resolves
+the kref inconsistency on failure and (2) returns the error code.
 
-No functional change intended.
-
-Signed-off-by: Fuad Tabba <tabba@google.com>
+Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
+Signed-off-by: Keisuke Nishimura <keisuke.nishimura@inria.fr>
 ---
- arch/arm64/include/asm/kvm_host.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c5c80c789ad0..2e4afec09728 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -864,10 +864,10 @@ struct kvm_vcpu_arch {
- #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
- #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 198296933e7e..8f423857b7d2 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -555,7 +555,7 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
+ 	return irq;
+ }
  
-+/* KVM_ARM_VCPU_INIT completed */
-+#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
- /* SVE config completed */
- #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
--/* KVM_ARM_VCPU_INIT completed */
--#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(3))
+-static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
++static int vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 				       u32 devid, u32 eventid,
+ 				       struct vgic_irq *irq)
+ {
+@@ -564,7 +564,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
  
- /* Exception pending */
- #define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
+ 	/* Do not cache a directly injected interrupt */
+ 	if (irq->hw)
+-		return;
++		return 0;
++
++	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
++	if (xa_is_err(old))
++		return xa_err(old);
+ 
+ 	/*
+ 	 * The irq refcount is guaranteed to be nonzero while holding the
+@@ -578,9 +582,10 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 	 * translation behind our back, ensure we don't leak a
+ 	 * reference if that is the case.
+ 	 */
+-	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+ 	if (old)
+ 		vgic_put_irq(kvm, old);
++
++	return 0;
+ }
+ 
+ static void vgic_its_invalidate_cache(struct vgic_its *its)
+@@ -618,6 +623,7 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	struct its_ite *ite;
++	int ret;
+ 
+ 	if (!its->enabled)
+ 		return -EBUSY;
+@@ -633,7 +639,9 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 	if (!vgic_lpis_enabled(vcpu))
+ 		return -EBUSY;
+ 
+-	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
++	ret = vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
++	if (ret)
++		return ret;
+ 
+ 	*irq = ite->irq;
+ 	return 0;
 -- 
-2.47.0.338.g60cca15819-goog
+2.34.1
 
