@@ -1,158 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16071BD9CF
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A7925761
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732806790; cv=none; b=L99tfHjR4BVP0mHHBeyGU0purzMcHdZLGjGI9AogwdaNnv6nnQho5GbX6+BGAZL2T2zKFyxWbJ2Uib7tYvgVhhmS99HAvgmu1Au+n+MNj/iIZQuMxYTFX1Pwdm01xXqiz0niJKVF9c5u0SsmdiirMISCTbBF6IFvf41eHMb7bKQ=
+	t=1732808194; cv=none; b=ES31ShOWgikTz2g8M2maJdlk7sv9u5/JAn2UwoIk1KUwadpEbtjWmU31A83TwGYwZ0+u9d19cvBBSn417dfUurmzQnX7gBQ9yVohkqdivKn8A3/gl1u6zZ0N0CiA1Bp9IBUYKgUtHYi1UcEY+No9KMvHzBy4G27PzgodCfb8wjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732806790; c=relaxed/simple;
-	bh=CYN3mvUwBhRwdxWEt1klHIbvh/+u8xOtBoRxCuDzEZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OaYZNLTe5j2EUr4Gwffog1inh0T7OI9Au58xPSL8LS2nhDMI68q0o2+z//6gylczJrksuPk+PMrOotynD4KKS7CkaoyeJyfh0HH3JHlN5Xpbg3sb2xb5ZKtdcPoB+E2ocQWxtg7CKZ7iHErjJ59YxD1bpPzyiJEWavmgdTPyHhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 397BD1474;
-	Thu, 28 Nov 2024 07:13:38 -0800 (PST)
-Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 88DF13F66E;
-	Thu, 28 Nov 2024 07:13:06 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org,
-	julien.thierry.kdev@gmail.com,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	apatel@ventanamicro.com,
-	andre.przywara@arm.com,
-	suzuki.poulose@arm.com,
-	s.abdollahi22@imperial.ac.uk
-Subject: [RFC PATCH kvmtool 4/4] arm64: Increase the payload memory region size to 512MB
-Date: Thu, 28 Nov 2024 15:12:46 +0000
-Message-ID: <20241128151246.10858-5-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241128151246.10858-1-alexandru.elisei@arm.com>
-References: <20241128151246.10858-1-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1732808194; c=relaxed/simple;
+	bh=9cvR0Hdf8jyPtNU6IIOEpOjRr+PSnXveawJRkW9SU+8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kH7y9mwLO16Ro/lBLgMWUn71k6E8XcSlmK41iWd3lQH4ymOfY5padoPBVe6IaqdPPfoxluQ4CHAVE1HuNfcBVMvrBij0HuN6lnZyI8p2y8B5skYXX5y5DviUIrvS709Pihxn1G7FDi/zBdelGdjgixig+FcsC7IBYRLuE72IW0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jq3Ju64r; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jq3Ju64r"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3824a8a5c56so737166f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 07:36:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1732808190; x=1733412990; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WBJf/895gAZ0pPcmkrD9nFaEZSFBwkUTysldFoBxcWc=;
+        b=jq3Ju64rtFmOZ6fMpt4RECwYSTD0X9PrBE/ijBkp1lSbtBG0FPs9L02r6573XmVA0Y
+         T+E/Hq4ONTBC331CnVyFTCXMbAF0CqC9sPNIuEbpKfSHMJy8ljvsRsEe+zcbdXHPwhD/
+         D02Cf0/sxZK4tJJjp6tnLYeLYzBtEtuzMoU4PjgLGY2YQkXX/q+DVWQdNqDmki/uZt/U
+         dJlfMUR18vZge74fB+s5ouZ3Cj3l0HWzkiEWRZ/oEkF7KQvzXaf3heVbY8IMppyaSMit
+         mFvrBLXTVkL1hvr36q4pCTDKlX74TIpwOU47UPEXU6SmmJZP13t6Vwr7YJT/6USOinco
+         afEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732808190; x=1733412990;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WBJf/895gAZ0pPcmkrD9nFaEZSFBwkUTysldFoBxcWc=;
+        b=WILMTRLNIUV7tSrbwD1BH2h9JzoHywG/nbRD+CGP+xKsRt8e8ZGRB/1ycnaVOGl1hF
+         J1kIuiYkVVhmrN2q8+hY3xruzuISnrrn3ETsODwtUqk/UpeawR1Gcc8BGEzDvGK3ha0E
+         B450aBGU9Af3V5fENer2cVyYfcySrpZfsr0WQfSHNuDKwlEVIVnqnDM2h8uork7zth9X
+         rxT4EgRka6IqEqNLyA8mvUIgwzr32PwaBsW2jdtUXsIM70J4jsvknT/wxnBpaGB04bGy
+         10i1qmBtrFQGhqDvo/CqwheFNCjRwWQWBlL8YNw9BYIrn6VDHdCnvMt8JU430bsStP4l
+         OJ+g==
+X-Gm-Message-State: AOJu0YzZ9Z8PWkIKETmuIjCC1/8LvGu7SGotGylRAcDzj+TqDUHEDKzo
+	/jNMfG5Z8trlykXVxKLfK1DzIa6m6xXdcwt/TqAlrgsm71AV2yVvVUnUxrvgXOw=
+X-Gm-Gg: ASbGncu/4it5CyVP4DlzGp6P/4sB5Xwsum7V9OnRiGCbhootowrANktDGaxXT+/i5vL
+	G3rQBksZ3xdBnCVDR5TXP6mM+H9HzgvVhqOFgwKaJcf38E1huZhcryxHEaJM6Nt+IvNrUofEtUH
+	8MBLxxEBdZqXYyrvNbPJgJ3fiCyIJPa/wcqk+vQB33NP5Zrq9q9MVJR5IwtibQ74VHylMdHmGYz
+	J82+wC8nA2z6tna8H7wI3lbqZw7f2Ussn3YLv2xFPJ2qTMkfxM6CdELqQGn8a4N7Q26/NIkLGJo
+	b3xyCYqrcSyCyOkS20gpg0K2iTrgML9121Q=
+X-Google-Smtp-Source: AGHT+IEDPnwcu7h+ElXTqfyvSsHEYUOyA3lbFZXVCKxjr1xKnSJc9XnED6kHQjXE8ZQpcgdam5tq2Q==
+X-Received: by 2002:a5d:648a:0:b0:385:db39:2cc with SMTP id ffacd0b85a97d-385db3904b7mr224126f8f.1.1732808190484;
+        Thu, 28 Nov 2024 07:36:30 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccce7859sm1996147f8f.0.2024.11.28.07.36.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2024 07:36:29 -0800 (PST)
+Date: Thu, 28 Nov 2024 16:36:28 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Raghavendra Rao Ananta <rananta@google.com>, Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [PATCH] arm64: Fix sve_vl() for build errors
+Message-ID: <20241128-40f8c0b30bfe9455e1a7d982@orel>
+References: <20241128150002.2424523-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241128150002.2424523-1-suzuki.poulose@arm.com>
 
-kvmtool uses the same memory map for 64bit and 32bit guests, where it
-copies the kernel, the initrd and DTB in the bottom 256MB.
+On Thu, Nov 28, 2024 at 03:00:02PM +0000, Suzuki K Poulose wrote:
+> commit 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()") breaks the build
+> with the following compiler version, as the "rdvl" expects a 64bit register.
+> 
+> /tmp/ccGJYtuC.s: Assembler messages:
+> /tmp/ccGJYtuC.s:2165: Error: operand mismatch -- `rdvl w3,#8'
+> /tmp/ccGJYtuC.s:2165: Info:    did you mean this?
+> /tmp/ccGJYtuC.s:2165: Info:     rdvl x3, #8
+> make: *** [<builtin>: arm/selftest.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> 
+> $ aarch64-none-elf-gcc --version
+> aarch64-none-elf-gcc (GNU Toolchain for the A-profile Architecture 10.2-2020.11 (arm-10.16)) 10.2.1 20201103
+> 
+> Fix this by switching to use "unsigned long" variable and restoring the 64bit
+> register for the instruction
+> 
+> Fixes: 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()")
+> Cc: Raghavendra Rao Ananta <rananta@google.com>
+> Cc: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  lib/arm64/asm/processor.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index e261e74d..e5b0ad10 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -154,12 +154,12 @@ static inline bool system_supports_sve(void)
+>  	return ((get_id_aa64pfr0_el1() >> ID_AA64PFR0_EL1_SVE_SHIFT) & 0xf) != 0;
+>  }
+>  
+> -static inline int sve_vl(void)
+> +static inline unsigned long sve_vl(void)
+>  {
+> -	int vl;
+> +	unsigned long vl;
+>  
+>  	asm volatile(".arch_extension sve\n"
+> -		     "rdvl %w0, #8"
+> +		     "rdvl %x0, #8"
+>  		     : "=r" (vl));
+>  
+>  	return vl;
+> -- 
+> 2.34.1
+>
 
-The restriction on placing everything in the bottom 256MB comes from the
-aarch32 boot protocol, where the kernel, DTB and initrd must be placed in a
-region covered by the low-memory mapping. The size of the lowmem region
-varies based on the kernel-userspace split, which is a Kconfig option, and
-on the vmalloc area size, which can be specified by the user on the kernel
-command line. Hence kvmtool's choice of using the bottom 256MB as a
-reasonable compromise which has worked well so far.
+Pushed to master.
 
-Sina has reported in private that they were unable to create a 64bit
-virtual machine with a 351MB initrd, and that's due to the 256MB
-restriction placed on the arm64 payload layout.
-
-This restriction is not found in the arm64 boot protocol: booting.rst in
-the Linux v6.12 source tree specifies that the kernel and initrd must be
-placed in the same 32GB window. There is also a mention of kernels prior
-to v4.2 requiring the DTB to be placed within a 512MB region starting at
-the kernel image minus the kernel offset.
-
-Increase the payload region size to 512MB for arm64, which will provide
-maximum compatibility with Linux guests, while allowing for larger initrds
-or kernel images. This means that the gap between the DTB (or initrd, if
-present) and the kernel is larger now.
-
-For 32 bit guests, the payload region size has been kept unchanged, because
-it has proven adequate so far.
-
-Reported-by: Abdollahi Sina <s.abdollahi22@imperial.ac.uk>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/aarch32/include/kvm/kvm-arch.h | 5 +++--
- arm/aarch64/include/kvm/kvm-arch.h | 2 ++
- arm/aarch64/kvm.c                  | 8 ++++++++
- arm/kvm.c                          | 6 ++++--
- 4 files changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-index 07d711e2f4c1..0333cf4355ac 100644
---- a/arm/aarch32/include/kvm/kvm-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-arch.h
-@@ -3,8 +3,9 @@
- 
- #include <linux/sizes.h>
- 
--#define kvm__arch_get_kern_offset(...)	0x8000
--#define kvm__arch_get_kernel_size(...)	0
-+#define kvm__arch_get_kern_offset(...)		0x8000
-+#define kvm__arch_get_kernel_size(...)		0
-+#define kvm__arch_get_payload_region_size(...)	SZ_256M
- 
- struct kvm;
- static inline void kvm__arch_read_kernel_header(struct kvm *kvm, int fd) {}
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index 97ab42485158..2d1a4ed8cea4 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -8,6 +8,8 @@ void kvm__arch_read_kernel_header(struct kvm *kvm, int fd);
- unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm);
- u64 kvm__arch_get_kernel_size(struct kvm *kvm);
- 
-+u64 kvm__arch_get_payload_region_size(struct kvm *kvm);
-+
- int kvm__arch_get_ipa_limit(struct kvm *kvm);
- void kvm__arch_enable_mte(struct kvm *kvm);
- 
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 6fcc828cbe01..98b24375ee98 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -135,6 +135,14 @@ u64 kvm__arch_get_kernel_size(struct kvm *kvm)
- 	return le64_to_cpu(kernel_header->image_size);
- }
- 
-+u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
-+{
-+	if (kvm->cfg.arch.aarch32_guest)
-+		return SZ_256M;
-+
-+	return SZ_512M;
-+}
-+
- int kvm__arch_get_ipa_limit(struct kvm *kvm)
- {
- 	int ret;
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 9013be489aff..7b2b49e21498 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -103,14 +103,16 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
- {
- 	void *pos, *kernel_end, *limit;
- 	unsigned long guest_addr;
-+	u64 payload_region_size;
- 	ssize_t file_size;
- 	u64 kernel_size;
- 
-+	payload_region_size = kvm__arch_get_payload_region_size(kvm);
- 	/*
--	 * Linux requires the initrd and dtb to be mapped inside lowmem,
-+	 * Linux for arm requires the initrd and dtb to be mapped inside lowmem,
- 	 * so we can't just place them at the top of memory.
- 	 */
--	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M);
-+	limit = kvm->ram_start + min(kvm->ram_size, payload_region_size);
- 
- 	kvm__arch_read_kernel_header(kvm, fd_kernel);
- 
--- 
-2.47.0
-
+Thanks,
+drew
