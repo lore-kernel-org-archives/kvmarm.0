@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBB7198A11
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 12:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E92B198A11
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 12:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732797342; cv=none; b=WXSol84jwkXbrY6v6Cr91dwMtGPC1iAo21UxxiVvlqS7cEgLoiZD65hrgX8my0+2L3Fmek5Xtpz5b91ipJm0cww4zQ46zaWd9HVJGkQwD257DPrhZjcGkT7IOip3KCU1ZiUfkzQu1u7tzphtmw7n99ntE/s+IQeB5J8oo6pRKiA=
+	t=1732797345; cv=none; b=Wih04UnNrKpdpz2jrOWnn9vLhZ/wKZr8e9tQcl+ClRv3pIv53d02//rEd4kgjDtTWYdnfWgjiNlTiWfum8gZBcGnHwDeTEyaEbPsYLQ9NG7tOn202sLWSCK6lqOcXgKT0vDEXFWMOUEKH+Z3h3dZL9/ka+uTv4qmmPdEJB23cjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732797342; c=relaxed/simple;
-	bh=XvHH0W/7V1pRBB3ZibOj0QhJUoHjo9dp2MjInUw/Lzs=;
+	s=arc-20240116; t=1732797345; c=relaxed/simple;
+	bh=MTY2H3Auab2VIXlBY0r2PYSSEKu0VmctnjJ6ypbLHwQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NT/kdD946ltTV3J2flP+Pi3xXA39dDRRFrB+T1bClHJnaJW+29TTYpOEgrC0ElWQbwG89bRL8YT2tn78ZMyehCksSkzN/2fxdh2vER4c8JFMUxlFOoQvRGOrrv7s48GMamv+BJMlSXn+4F48uhheOhTZ45BKZLHQdvJ/tSVjTo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HaCsg5za; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=hVeM1lPB2NwRw/LmttzPQKfoMGgFADCInnZu9MC1LMWtqhoXkGbeqF4mmiaFVGkjUG3LkvVZkTRmQXjQDmCHN8M5QEyEEt0+VqkSbwn74d0mpEhKQZSBVK/WL1BqcTC/RRIYvykvo+yW/ZvKyOsk9oObtrI1+HyPS+dYAYgAb64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QX6VOuMv; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HaCsg5za"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4349f32c9a6so5855655e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 04:35:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QX6VOuMv"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3822ecd84b3so399148f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 04:35:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732797340; x=1733402140; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1732797342; x=1733402142; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C3AEmgqEm+cvkyX+Y7gfd4xBQC+JlaYoJMIK/6vkrhU=;
-        b=HaCsg5zaOGcE8Z9iMZsY1yrTVeIV/eWD6v8Sy55kCSZhgrxdippGNvuwjJu0zpiA7x
-         s2m1cy7k89iLgjH5DUahjZLiByAsnMNUDoR9lI1mV5zXreJKdBbIr/Lj3gOYkFDo7WJO
-         hNtWLLSyi0hXJFFCPn+5hff2CH/oUCc4jPNS582lAcQvlWJBgyxeWbDW+ZAdsjSUR4NY
-         JY0kjxngCBdelMuEx/cpKZ87zvU+Gf6JWuwAARRRWXS7gh+p6qaO6oS86DrKA2GGaNyX
-         mFy3RjE0xonaeMPVLve+XilfqTtx3inWonKU033MGTRrlb77AEKVKz1CXoQXWfoH02bu
-         mreQ==
+        bh=rGNx4KryUAWkUrEyK556nEdWmNkAb7CXLB+nZikEwWs=;
+        b=QX6VOuMveoURoCu7zab/cEpMWywLOxsfc31pxx+UvtKmaL2bViwASDvd5hCL70ywC/
+         oKo+3hOC30TYHCkGVeJRKLZT9T04BkXDitM0HhF593kyyX9t+qYAhTNUrkxGj+1EbAox
+         EanbW6Q9a+Mm8PAjuJ+UJVQx8nIWNujzRNf9pi9BBysFmUkADaqV6r8h06RdWqxZOrbg
+         FS8rqIA3Ik2L/6KHkQzdZPS2B58KfwpbKp8dPpvsMy2aj/DJUgE9H4bUMQ0BTGOrzBV+
+         gso1E3NH27qJ2aF4UI2gxyi0U9CrvR7fi0qdCwTNbGbcFNomzT6O3rEdazWJS9CuNhUt
+         wCXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732797340; x=1733402140;
+        d=1e100.net; s=20230601; t=1732797342; x=1733402142;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C3AEmgqEm+cvkyX+Y7gfd4xBQC+JlaYoJMIK/6vkrhU=;
-        b=lfZFH/Sho7dx3brRd94qlAn6NqZpVwZqUpMGuXJME7VcUzR4pD/wHqBzaZrVMDP/3V
-         va/kY0CLX20Nln/fS4c/AUl5TN9V1BzB2G/aJ51LFin1IcUbym2/OlJGzzbqRHITK5xG
-         uIt7nyozEJpqMHI3lX61c9iaaTK4I8s5o+BxNoACOpU3jm2AkKQc5NsEXRq7Mc8SkaKq
-         e8qKH4vzYwVDsrHfbexv8qKuX3H+Sw8pfykXOPlTgyKC3RgtiXzytZMpM0O5AH/Mb7ug
-         awHgvYztUEgYg5+HdFvYQ2crI6uZaFgi+9Xg7cTEOSqt7eu9Ndaw9knP2nNhZHKzLToG
-         ILSw==
-X-Gm-Message-State: AOJu0Yyn5w6IjPUdvyyXm5rNjP+OcM6AN4hHb1dW+lcm0Jfj/ZfpOVVp
-	8dCoSicwU4kwcX8CJRkKMyfN6sXy904d4h2ad6Ynsw26ViWDSwyHj6zgvZdwuNsZ81cjvd/PooX
-	tLC2n4waQbbbmJ0rn9ExXDnHJIMPiJjwFPsNFY7uUXtbrdjnzjBB/2rMTq2lr9aWwOPcBr47Nee
-	e8MXDoOI7MfxZyYU9jPTxziHfkGZI=
-X-Google-Smtp-Source: AGHT+IGowe/R/6RjexkHq81NuzVdHzhVxL86z2B2+36Nlrd3p5Is0CztUoSrf2Y64aRbSlgs+xXTiAvw1Q==
-X-Received: from wmmu24.prod.google.com ([2002:a05:600c:d8:b0:434:a8d7:e59b])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b24:b0:434:a75b:5f59
- with SMTP id 5b1f17b1804b1-434a9dbb06cmr75327445e9.3.1732797340049; Thu, 28
- Nov 2024 04:35:40 -0800 (PST)
-Date: Thu, 28 Nov 2024 12:35:11 +0000
+        bh=rGNx4KryUAWkUrEyK556nEdWmNkAb7CXLB+nZikEwWs=;
+        b=s6TSjNV+NqD0nLtprr1nZTmeQEgdmJNgkCK8ssF3oO+Ajn3GoAG6asPmV5M4bHvGPE
+         icXg8x6UVFJAZDM7B0EP+VY3AYGyvYIvIe1HlDbmGeoAdTRw4KkOi0UP3awlKlOTsV8b
+         R1FSm8TH/6fZDmlDfmQ7A1Ut+AqKMy+52imWbYMsZQP8vu2PVOlXHIw4h4GqJ1ZjCDKO
+         xRFiJaI3WbRdj6l5Ap8Rg+ed3kcZWh1gkYcQqQRDT0+0SW4fGmrihhRVnUdDs95gNiau
+         r93w6pABjE8dR9Odx8q8PhX/mvSuXMd8WKnAoRgj4NRNIDIxNL1Vpgry/UGKdF0m0773
+         REqg==
+X-Gm-Message-State: AOJu0YwRN/tS6DgjDGiKYZWWWDv9jOYOpcFnRiEnOAq03ClkkhdEPhHw
+	lS8ADAJv59CJCwWdCdo8IDXW8uQnqKyRzTrX+ylgpZlwv9013TugTcpz0npFQKysUNZfkFei6z+
+	8KDfRSERuyibCXhrawj4WZhNNXrgPYOysMQtByfCBqpIcnsreNfP3vkVnctzRc02+mtBY8w/kwe
+	zcsHz3IM/pLrq3iQxqhhGQQzZxdVU=
+X-Google-Smtp-Source: AGHT+IFLI3Jh7eWipSkuJnJEhB0CPELVPrf0f9jEJFqCsPBLEldQwio+BPzXSPDF2U9CoUeaJI7R6c0Vvw==
+X-Received: from wrfi10.prod.google.com ([2002:a5d:584a:0:b0:382:5479:b8cf])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:4708:b0:37d:4fe9:b6a4
+ with SMTP id ffacd0b85a97d-385c6edc3f2mr5536291f8f.50.1732797341940; Thu, 28
+ Nov 2024 04:35:41 -0800 (PST)
+Date: Thu, 28 Nov 2024 12:35:12 +0000
 In-Reply-To: <20241128123515.1709777-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241128123515.1709777-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128123515.1709777-12-tabba@google.com>
-Subject: [PATCH v3 11/15] KVM: arm64: Refactor kvm_reset_cptr_el2()
+Message-ID: <20241128123515.1709777-13-tabba@google.com>
+Subject: [PATCH v3 12/15] KVM: arm64: Fix the value of the CPTR_EL2 RES1
+ bitmask for nVHE
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -69,45 +70,47 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
 	qperret@google.com, kristina.martsenko@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Fold kvm_get_reset_cptr_el2() into kvm_reset_cptr_el2(), since it
-is its only caller. Add a comment to clarify that this function
-is meant for the host value of cptr_el2.
+Since the introduction of SME, bit 12 in CPTR_EL2 (nVHE) is TSM
+for trapping SME, instead of RES1, as per ARM ARM DDI 0487K.a,
+section D23.2.34.
 
-No functional change intended.
+Fix the value of CPTR_NVHE_EL2_RES1 to reflect that, and adjust
+the code that relies on it accordingly.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h     | 2 +-
+ arch/arm64/include/asm/kvm_emulate.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3e0f0de1d2da..24e4ac7c50f2 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -300,7 +300,7 @@
+ #define CPTR_EL2_TSM	(1 << 12)
+ #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+ #define CPTR_EL2_TZ	(1 << 8)
+-#define CPTR_NVHE_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
++#define CPTR_NVHE_EL2_RES1	(BIT(13) | BIT(9) | GENMASK(7, 0))
+ #define CPTR_NVHE_EL2_RES0	(GENMASK(63, 32) |	\
+ 				 GENMASK(29, 21) |	\
+ 				 GENMASK(19, 14) |	\
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index cf811009a33c..7b3dc52248ce 100644
+index 7b3dc52248ce..6602a4c091ac 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -619,7 +619,8 @@ static __always_inline void kvm_write_cptr_el2(u64 val)
- 		write_sysreg(val, cptr_el2);
- }
+@@ -640,8 +640,8 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
  
--static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
-+/* Resets the value of cptr_el2 when returning to the host. */
-+static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-@@ -643,13 +644,6 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 			val &= ~CPTR_EL2_TSM;
+ 		if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
+ 			val |= CPTR_EL2_TZ;
+-		if (cpus_have_final_cap(ARM64_SME))
+-			val &= ~CPTR_EL2_TSM;
++		if (!cpus_have_final_cap(ARM64_SME))
++			val |= CPTR_EL2_TSM;
  	}
  
--	return val;
--}
--
--static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
--{
--	u64 val = kvm_get_reset_cptr_el2(vcpu);
--
  	kvm_write_cptr_el2(val);
- }
- 
 -- 
 2.47.0.338.g60cca15819-goog
 
