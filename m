@@ -1,112 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626151917F1
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 16:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4BA537F8
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 17:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732812901; cv=none; b=WUSsDEoOpkTNUU5q/cZjZ/zI1EtGwgfsfeEtdLgpaQssxjMEpIVGOvdDNeMPSPm8cI10PcqBix9W0BhVpkvZPz3h8rDhFN7xYVY4avFYS9rwFyfjyICOfXJiJJfxahPaJclYH/EfjUcWjPCnxDyGXcgj8it5+JttOtfgHfBCv9Q=
+	t=1732815361; cv=none; b=m88Um1+yAYXSckxlfb0+3YJRL3NN8ozTrByFUMqb7iUmL8hOdh1FhBuR1kgaMlrnrMyLxhTiyfOVGCXpMKMSgphTOXFmiZCGSX7ZCQCAfaeUc+vDFnxnOBOfCWQhKJwMliyKVOsmDkq6LiThfrRTJlOXTTLgu4FYQEZp/RQNIcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732812901; c=relaxed/simple;
-	bh=YwzYXQQq3PduI6mkTkLVl7oUIo7981wZ6zepu2PhfMA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aXPP/67sCbzWTsaWSOykCy4PeroBZaSpo4RWYvGNIXOGz4xTwsPaPzbmVZKjluE8zdYkJ+hX/9pI8KEb83Y8jWQ4jh/mbkAtiI6xB3XBHTabmscDIV6kIwRcuOZJO9d4Tplvib2Un1gt2/yE0ma6lAbZm3z0e4NeO6g8Wr7rGDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZQe1dY8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732815361; c=relaxed/simple;
+	bh=26Aq4ZaxkboOkjwursPiJrPZXJhOAiBZuFn+AEls1yQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r97+ry9LchsIoBZ8QBYem1+8/QRCRzTSXT07LBZtACowgeuKiySK/Gvee/Eu53W6iEn3w/t5DkL83mgzCUoj/GuTjxYY2DrT3XN3l0lx7oVkeqwE4/Y1tQouhEtbEBntgTJxFUj/2abg1mAT+DGyt+DFLJlm5q3dW5NzplHyCsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lg2yDZal; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZQe1dY8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32121C4CECE;
-	Thu, 28 Nov 2024 16:55:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lg2yDZal"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874C0C4CECE;
+	Thu, 28 Nov 2024 17:35:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732812901;
-	bh=YwzYXQQq3PduI6mkTkLVl7oUIo7981wZ6zepu2PhfMA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GZQe1dY8Y3NwdsG2P3Wegn7usqacuzQ1eO3+0YEDS721qUuejSYq6sMzGYNxgarre
-	 S8uGnO6a9WO/o1B1hvbbZ2ZfvpA1aO17vhvpqtaOba1Ep9jFfu694p3ndrYFI2igYA
-	 34dzJgzBGskzDzGzewdDNvpfpqrX+9+VOu63C0FaW0b6feI5wsToKdFFy5ab8I8WJI
-	 EWWt8Xw+Pq+80aILoCYFOCR0VOrwzyOvfdvII7B0YWOHAyUpr3gMi6ax6NszXYqT9m
-	 U+ysqWTSmJUEDI3PcYcvf0itnCUfdQ0CooHqyVInJgiWirbZovG5T6UP+wAXZpUkmS
-	 uxLIcnxklrkqw==
-Received: from [37.171.122.54] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tGhn8-00GaG1-Rm;
-	Thu, 28 Nov 2024 16:54:59 +0000
-Date: Thu, 28 Nov 2024 16:54:57 +0000
-Message-ID: <87wmgns3ha.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Keisuke Nishimura <keisuke.nishimura@inria.fr>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm/arm64: vgic-its: Add error handling in vgic_its_cache_translation
-In-Reply-To: <20241128134534.361144-1-keisuke.nishimura@inria.fr>
-References: <20241128134534.361144-1-keisuke.nishimura@inria.fr>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1732815361;
+	bh=26Aq4ZaxkboOkjwursPiJrPZXJhOAiBZuFn+AEls1yQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lg2yDZalnDYUTgDUDfap6cfQPi7A0ApkIxTIZ2nlyYSbS+D7XFE10sGtMzDB6E/mW
+	 X+QK+Lrggc8nZ+pEtKUhZ6+3kRBiUEgC013flKA+/B3MWI7IkkDsTrVaMUk3sSnEIQ
+	 KokgaogtNxIloZiVjP7xNMNMhNLRLqOZOuvUOyf253yUZwD7GQxeZRb31MT0O4AkEo
+	 BtDzpBX+8AERCNvkypyIkimYQATFvi3y6DdEr/7kpQGY7YpTWYPY3zUlOOkWUU9Y3a
+	 75/NCJp2wdXVm4W419QCBxkDAXzkxlLdmlDY9ASlZeS68oPRIQ3eunPqVMkNIq8cRs
+	 0EfvtnlFluezQ==
+Date: Thu, 28 Nov 2024 17:35:55 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, qperret@google.com,
+	kristina.martsenko@arm.com
+Subject: Re: [PATCH v3 00/15] KVM: arm64: Rework guest VM fixed feature
+ handling and trapping in pKVM
+Message-ID: <137ae0f1-32c7-4856-9357-00493995a89f@sirena.org.uk>
+References: <20241128123515.1709777-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 37.171.122.54
-X-SA-Exim-Rcpt-To: keisuke.nishimura@inria.fr, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+UK7DtF2N3FgCqnU"
+Content-Disposition: inline
+In-Reply-To: <20241128123515.1709777-1-tabba@google.com>
+X-Cookie: Close cover before striking.
 
-On Thu, 28 Nov 2024 13:45:34 +0000,
-Keisuke Nishimura <keisuke.nishimura@inria.fr> wrote:
-> 
-> The xa_store() may fail because there is no guarantee that the cache_key
-> index is already used in its->translation_cache. This fix (1) resolves
-> the kref inconsistency on failure and (2) returns the error code.
 
-Please describe the failure mode. Under which circumstances can this
-fail?
+--+UK7DtF2N3FgCqnU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
-> Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
-> Signed-off-by: Keisuke Nishimura <keisuke.nishimura@inria.fr>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 198296933e7e..8f423857b7d2 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -555,7 +555,7 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
->  	return irq;
->  }
->  
-> -static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
-> +static int vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  				       u32 devid, u32 eventid,
->  				       struct vgic_irq *irq)
->  {
-> @@ -564,7 +564,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  
->  	/* Do not cache a directly injected interrupt */
->  	if (irq->hw)
-> -		return;
-> +		return 0;
-> +
-> +	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
-> +	if (xa_is_err(old))
-> +		return xa_err(old);
+On Thu, Nov 28, 2024 at 12:35:00PM +0000, Fuad Tabba wrote:
 
-Accessing the translation cache before the assert that checks the ITS
-lock is on its own pretty dodgy...
+> This patch series redoes how fixed features for protected guests
+> are specified in pKVM, as well as how trapping is handled based
+> on the features available for the VM. It also fixes a couple of
+> existing bugs in the process.
 
-Thanks,
+Tested-by: Mark Brown <broonie@kernel.org>
 
-	M.
+--+UK7DtF2N3FgCqnU
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-Without deviation from the norm, progress is not possible.
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdIqfoACgkQJNaLcl1U
+h9Ahnwf/RXp6E2oXvmFjv+NBfMZiMoVnatZ8caqPgnXg3+GBDJnpTL758vHDQZhy
+nOCeDC06R4dn2ZyFvoWswcl5tBy6vORO88rgWycarzzUUdBoGoSk8tySA5QbKSnk
+GM61J75SiZfrtKt8C7WefoUZb5o+EKN8uulUfqwbG601KtIeqtIeh6XQcYG/0FSQ
+5FnbcH09p8BDtFB/wK171+5HlG2h80CIffO+RdUsI3Bjfz6+xjVPXZHLb1C43uPy
+PV6NzfIc4NNLbIDtdtp7KCJO+5L1DZ2Dqr3WUfEJjEUsSZgEU9ETs4ZRcc44xGGK
+pHjGvk+9pXNvpcr0AbjaJEK8YOnLbA==
+=v6vt
+-----END PGP SIGNATURE-----
+
+--+UK7DtF2N3FgCqnU--
