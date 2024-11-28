@@ -1,46 +1,31 @@
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE3E1E4B2
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 13:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0DB143C7E
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 15:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732801602; cv=none; b=Ed2Y3tncvWo8xvhgqUqlPAeFN95tE8Uzz5r5VLOnaii8XYlLMh6LmhxbbuYl+5dmt99bzcgbabD/mOFPpKN9XPj82es9qZnf2Xrnfd/b5NJ/Xkqw7/Mskl8fKDtM1y/tniUnvvIKPH/sybGs3x3Bf26WZmCUwn0W3kcUhK6+TiA=
+	t=1732806041; cv=none; b=WokfiTWPqpjuGmWbnCWmkjR0BRn7Up9x+KLjIWVQAJJek2eiFr+pAPMJoDEkHd3dWqouo6ypUzS9X6w9Fa6AdOm0rwQ6WxnpzwVI+W7R9hBie6i1xLu3sWp8dgRk2oznxuGGYPlD0pLdj7zEAeT5NBMfZcIdxZFA/3yvorF9IpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732801602; c=relaxed/simple;
-	bh=4tIoF6VkaTG0evLWfvk4a7lSD8o4N8RaLyj0BU86NSw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tjl6rnbkZYoMECVF4jL3earARIKbsmeowN+/4FbYgrect15Sr27unNXOqofG39IAgyFbOXmJ+c5ijJ+hYFRxPAolg1X4KyY5RY9F9ujpbaQz4XeYsNUn7WD2zFzgLaB2r1HS8HGpK0bfUxbp8ej62U49ERYsoOz+fSUW2xhkZ2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=jgdJKA1k; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="jgdJKA1k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=iaG1b+JwMIQi3DAhpRd2uui2yB6sNRs4Dsa8pT9Cl5Y=;
-  b=jgdJKA1k4OEhWqv+nL2OKASeAJVraXY4UpfvLPeti47MZStlCeV1UKh/
-   UqqYR70toyScT9uroTm5DRTXkxlL5lFvYVZwRbHAkMpzMwA4RbJnlTtU0
-   A4KdwCwhUGMw24SvucUmlQaB55FKo20ytUHUwtncDXHGwc7xI6b/F1OKi
-   E=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=keisuke.nishimura@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.12,192,1728943200"; 
-   d="scan'208";a="102888059"
-Received: from dt-aponte.paris.inria.fr (HELO keisuke-XPS-13-7390.paris.inria.fr) ([128.93.67.66])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2024 14:46:31 +0100
-From: Keisuke Nishimura <keisuke.nishimura@inria.fr>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
+	s=arc-20240116; t=1732806041; c=relaxed/simple;
+	bh=FqnB7kgaBCDCr1gJAqYv8s/Q7KLDiI91AqC351tbdGc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FeIzArbPaf8Lz36WmfULiBDGrtBVrteq/3q3bLI8gj4gw/uhAJ7QJS2mN2D17n/zgjckuL9FMe/y2a8sQ5lLX4LTio0qebiE42gP4pCTIfCl/vN7X8NJm0cdeRdejk+ojIvU+0r0EXsCjux1YPjo7/xhqHh6cZ+boCMJ9+t+Dcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E84CC1474;
+	Thu, 28 Nov 2024 07:01:04 -0800 (PST)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1F3CB3F66E;
+	Thu, 28 Nov 2024 07:00:33 -0800 (PST)
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>
-Subject: [PATCH] KVM: arm/arm64: vgic-its: Add error handling in vgic_its_cache_translation
-Date: Thu, 28 Nov 2024 14:45:34 +0100
-Message-Id: <20241128134534.361144-1-keisuke.nishimura@inria.fr>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: [PATCH] arm64: Fix sve_vl() for build errors
+Date: Thu, 28 Nov 2024 15:00:02 +0000
+Message-Id: <20241128150002.2424523-1-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -50,73 +35,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The xa_store() may fail because there is no guarantee that the cache_key
-index is already used in its->translation_cache. This fix (1) resolves
-the kref inconsistency on failure and (2) returns the error code.
+commit 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()") breaks the build
+with the following compiler version, as the "rdvl" expects a 64bit register.
 
-Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
-Signed-off-by: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+/tmp/ccGJYtuC.s: Assembler messages:
+/tmp/ccGJYtuC.s:2165: Error: operand mismatch -- `rdvl w3,#8'
+/tmp/ccGJYtuC.s:2165: Info:    did you mean this?
+/tmp/ccGJYtuC.s:2165: Info:     rdvl x3, #8
+make: *** [<builtin>: arm/selftest.o] Error 1
+make: *** Waiting for unfinished jobs....
+
+$ aarch64-none-elf-gcc --version
+aarch64-none-elf-gcc (GNU Toolchain for the A-profile Architecture 10.2-2020.11 (arm-10.16)) 10.2.1 20201103
+
+Fix this by switching to use "unsigned long" variable and restoring the 64bit
+register for the instruction
+
+Fixes: 5b9895f8a5d9 ("arm: Fix clang error in sve_vl()")
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ lib/arm64/asm/processor.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 198296933e7e..8f423857b7d2 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -555,7 +555,7 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
- 	return irq;
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index e261e74d..e5b0ad10 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -154,12 +154,12 @@ static inline bool system_supports_sve(void)
+ 	return ((get_id_aa64pfr0_el1() >> ID_AA64PFR0_EL1_SVE_SHIFT) & 0xf) != 0;
  }
  
--static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
-+static int vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 				       u32 devid, u32 eventid,
- 				       struct vgic_irq *irq)
+-static inline int sve_vl(void)
++static inline unsigned long sve_vl(void)
  {
-@@ -564,7 +564,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+-	int vl;
++	unsigned long vl;
  
- 	/* Do not cache a directly injected interrupt */
- 	if (irq->hw)
--		return;
-+		return 0;
-+
-+	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
-+	if (xa_is_err(old))
-+		return xa_err(old);
+ 	asm volatile(".arch_extension sve\n"
+-		     "rdvl %w0, #8"
++		     "rdvl %x0, #8"
+ 		     : "=r" (vl));
  
- 	/*
- 	 * The irq refcount is guaranteed to be nonzero while holding the
-@@ -578,9 +582,10 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	 * translation behind our back, ensure we don't leak a
- 	 * reference if that is the case.
- 	 */
--	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
- 	if (old)
- 		vgic_put_irq(kvm, old);
-+
-+	return 0;
- }
- 
- static void vgic_its_invalidate_cache(struct vgic_its *its)
-@@ -618,6 +623,7 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- {
- 	struct kvm_vcpu *vcpu;
- 	struct its_ite *ite;
-+	int ret;
- 
- 	if (!its->enabled)
- 		return -EBUSY;
-@@ -633,7 +639,9 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 	if (!vgic_lpis_enabled(vcpu))
- 		return -EBUSY;
- 
--	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
-+	ret = vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
-+	if (ret)
-+		return ret;
- 
- 	*irq = ite->irq;
- 	return 0;
+ 	return vl;
 -- 
 2.34.1
 
