@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C751198A11
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 12:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBB7198A11
+	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 12:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732797341; cv=none; b=Xe7zHLBnBaOELc+SXgchxIg/A4dhcRNBBiFL1oiM+kjFIl+hfSZ6vx6UTYD+POI3JzQz7qXUe/K++Iuan1ShBKI5kaFZ4JCSivM+UfwqR9llJAmdwy3LvnN5hj35AHEADGb9qYx2O/PLqS0tp5lANQrgu6/jqHImyeezkB09gHI=
+	t=1732797342; cv=none; b=WXSol84jwkXbrY6v6Cr91dwMtGPC1iAo21UxxiVvlqS7cEgLoiZD65hrgX8my0+2L3Fmek5Xtpz5b91ipJm0cww4zQ46zaWd9HVJGkQwD257DPrhZjcGkT7IOip3KCU1ZiUfkzQu1u7tzphtmw7n99ntE/s+IQeB5J8oo6pRKiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732797341; c=relaxed/simple;
-	bh=mkBlhJKSwNQmi0ocDHJo+disZBZFnFwX/uiGo6fkOrI=;
+	s=arc-20240116; t=1732797342; c=relaxed/simple;
+	bh=XvHH0W/7V1pRBB3ZibOj0QhJUoHjo9dp2MjInUw/Lzs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gcOjw+eEaVIy2sjC17i6bFP1Q19+yUhn5wNb+NjMRS0kgThw2gGxhw85CP++DCbhuekAfWmlp048+oJOdE8JSbrwKCUTORWi6ZuE2vGU2fPidoZFcvtsY7+LNUXDn72LVKw8KlIDYON7KgyQ6d69g8TyfxAmn7vE+SirlSozj5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qCbEVnli; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=NT/kdD946ltTV3J2flP+Pi3xXA39dDRRFrB+T1bClHJnaJW+29TTYpOEgrC0ElWQbwG89bRL8YT2tn78ZMyehCksSkzN/2fxdh2vER4c8JFMUxlFOoQvRGOrrv7s48GMamv+BJMlSXn+4F48uhheOhTZ45BKZLHQdvJ/tSVjTo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HaCsg5za; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qCbEVnli"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-434a6483514so5926235e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 04:35:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HaCsg5za"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4349f32c9a6so5855655e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 04:35:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732797338; x=1733402138; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1732797340; x=1733402140; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F/8DKR9VojN+CM/GyAHC15iuTbMv0usRa/8w1XuoQEo=;
-        b=qCbEVnliOQs0arHF/v2mWWR662nhFsgM+OF39kr/G9f4EeWbgxMnlUAwnuOh7Bwzdx
-         3YWpnvlo+eZsxcSspKMUN/ZlLMiM2zpLc7pfPB2wZv6kSZ0t+KW2EEHvZd3vuYVYjNCl
-         F6FWXTN9Jr+AjglD/ha701SA7Uryy1JvIEo+8htU+YEJj5L3nry3HOIuLNYsgpLISK+r
-         wskw+cM7beSEcRtl0IeiQ4aX4sQ5CKnqhRyXR+JSJQVXRkn2uPBl8uj0I5LklMasNLD2
-         8yCKzb6DZmKeHiYjuVgPsdOxcS3zVJSnJS76z4O07anXdLJit1PUH4TS1rmxgPhVJEJI
-         o3MA==
+        bh=C3AEmgqEm+cvkyX+Y7gfd4xBQC+JlaYoJMIK/6vkrhU=;
+        b=HaCsg5zaOGcE8Z9iMZsY1yrTVeIV/eWD6v8Sy55kCSZhgrxdippGNvuwjJu0zpiA7x
+         s2m1cy7k89iLgjH5DUahjZLiByAsnMNUDoR9lI1mV5zXreJKdBbIr/Lj3gOYkFDo7WJO
+         hNtWLLSyi0hXJFFCPn+5hff2CH/oUCc4jPNS582lAcQvlWJBgyxeWbDW+ZAdsjSUR4NY
+         JY0kjxngCBdelMuEx/cpKZ87zvU+Gf6JWuwAARRRWXS7gh+p6qaO6oS86DrKA2GGaNyX
+         mFy3RjE0xonaeMPVLve+XilfqTtx3inWonKU033MGTRrlb77AEKVKz1CXoQXWfoH02bu
+         mreQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732797338; x=1733402138;
+        d=1e100.net; s=20230601; t=1732797340; x=1733402140;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F/8DKR9VojN+CM/GyAHC15iuTbMv0usRa/8w1XuoQEo=;
-        b=nUUd4BonxxvW34NYkws0GFiMQWbWmsLg3i71lccdBkreMr+hXOqU7WHuQQdoWamLhZ
-         EtC95pdfg8UguZ59rZZqHl9DCG6w1EQg3+2HjW4JIYk+Oe8T03FiVXEBY3UNOnfFBxNR
-         LT+v+roMJnS2AXYc1W8nUoOU+/RbxWAFYrsT5sHyZ3HXlQsxX0d1oHgbTgdcT71OX8kj
-         i8FxZvQf5bfTCYXVTf/m12WDv1eONxYBH3nnIP35OxDcTWI9+LRAf/aKhhjN3ynDGX97
-         LNPBafGFl57VI8oDSyk+zbsW4ohHUhLg4pe/HQZoQPqRoli8bpiCfdimCAsD98RoSgeH
-         mUTA==
-X-Gm-Message-State: AOJu0YxwUVge+gbkZ9KRssZww1tTAkxyJ9bWi9u75GDHvfQSLdygmGVw
-	t/66C9n+tNKBWq5rKrbaO7lKyxKXOtsKI4drRLDVolVX+CiC4OGziVAwvxGh9g5arsM7nkDvRwI
-	zbJq/xOiAlV4C2sE7vEgUj+eb5xJTdB3qtD+8SbYDkTaQUZt5nbzd82wSqPrbhYpUmjsQCMAG4d
-	Y6f0pihQCKGeP6CY4woAkwO/Oa2d4=
-X-Google-Smtp-Source: AGHT+IFPcc2J2Eu7ZPevLU68alNQpF7RWG0tNeIALz4NQ3zYV/MYUDazB4YkSCQM3ycygfMGbH5rolouQg==
-X-Received: from wmpk22.prod.google.com ([2002:a05:600c:816:b0:434:a1da:32c5])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:5253:b0:434:9e1d:7629
- with SMTP id 5b1f17b1804b1-434a9e07911mr55116025e9.33.1732797337899; Thu, 28
- Nov 2024 04:35:37 -0800 (PST)
-Date: Thu, 28 Nov 2024 12:35:10 +0000
+        bh=C3AEmgqEm+cvkyX+Y7gfd4xBQC+JlaYoJMIK/6vkrhU=;
+        b=lfZFH/Sho7dx3brRd94qlAn6NqZpVwZqUpMGuXJME7VcUzR4pD/wHqBzaZrVMDP/3V
+         va/kY0CLX20Nln/fS4c/AUl5TN9V1BzB2G/aJ51LFin1IcUbym2/OlJGzzbqRHITK5xG
+         uIt7nyozEJpqMHI3lX61c9iaaTK4I8s5o+BxNoACOpU3jm2AkKQc5NsEXRq7Mc8SkaKq
+         e8qKH4vzYwVDsrHfbexv8qKuX3H+Sw8pfykXOPlTgyKC3RgtiXzytZMpM0O5AH/Mb7ug
+         awHgvYztUEgYg5+HdFvYQ2crI6uZaFgi+9Xg7cTEOSqt7eu9Ndaw9knP2nNhZHKzLToG
+         ILSw==
+X-Gm-Message-State: AOJu0Yyn5w6IjPUdvyyXm5rNjP+OcM6AN4hHb1dW+lcm0Jfj/ZfpOVVp
+	8dCoSicwU4kwcX8CJRkKMyfN6sXy904d4h2ad6Ynsw26ViWDSwyHj6zgvZdwuNsZ81cjvd/PooX
+	tLC2n4waQbbbmJ0rn9ExXDnHJIMPiJjwFPsNFY7uUXtbrdjnzjBB/2rMTq2lr9aWwOPcBr47Nee
+	e8MXDoOI7MfxZyYU9jPTxziHfkGZI=
+X-Google-Smtp-Source: AGHT+IGowe/R/6RjexkHq81NuzVdHzhVxL86z2B2+36Nlrd3p5Is0CztUoSrf2Y64aRbSlgs+xXTiAvw1Q==
+X-Received: from wmmu24.prod.google.com ([2002:a05:600c:d8:b0:434:a8d7:e59b])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b24:b0:434:a75b:5f59
+ with SMTP id 5b1f17b1804b1-434a9dbb06cmr75327445e9.3.1732797340049; Thu, 28
+ Nov 2024 04:35:40 -0800 (PST)
+Date: Thu, 28 Nov 2024 12:35:11 +0000
 In-Reply-To: <20241128123515.1709777-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241128123515.1709777-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241128123515.1709777-11-tabba@google.com>
-Subject: [PATCH v3 10/15] KVM: arm64: Calculate cptr_el2 traps on activating traps
+Message-ID: <20241128123515.1709777-12-tabba@google.com>
+Subject: [PATCH v3 11/15] KVM: arm64: Refactor kvm_reset_cptr_el2()
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -69,189 +69,45 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
 	qperret@google.com, kristina.martsenko@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Similar to VHE, calculate the value of cptr_el2 from scratch on
-activate traps. This removes the need to store cptr_el2 in every
-vcpu structure. Moreover, some traps, such as whether the guest
-owns the fp registers, need to be set on every vcpu run.
+Fold kvm_get_reset_cptr_el2() into kvm_reset_cptr_el2(), since it
+is its only caller. Add a comment to clarify that this function
+is meant for the host value of cptr_el2.
 
-Reported-by: James Clark <james.clark@linaro.org>
-Fixes: 5294afdbf45a ("KVM: arm64: Exclude FP ownership from kvm_vcpu_arch")
+No functional change intended.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 -
- arch/arm64/kvm/arm.c              |  1 -
- arch/arm64/kvm/hyp/nvhe/pkvm.c    | 42 -------------------------
- arch/arm64/kvm/hyp/nvhe/switch.c  | 51 +++++++++++++++++++------------
- 4 files changed, 32 insertions(+), 63 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 230b0638f0c2..69cb88c9ce3e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -708,7 +708,6 @@ struct kvm_vcpu_arch {
- 	u64 hcr_el2;
- 	u64 hcrx_el2;
- 	u64 mdcr_el2;
--	u64 cptr_el2;
- 
- 	/* Exception Information */
- 	struct kvm_vcpu_fault_info fault;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b295218cdc24..8a3d02cf0a7a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1546,7 +1546,6 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	}
- 
- 	vcpu_reset_hcr(vcpu);
--	vcpu->arch.cptr_el2 = kvm_get_reset_cptr_el2(vcpu);
- 
- 	/*
- 	 * Handle the "start in power-off" case.
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index cede527a59d4..c8ab3e59f4b1 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -83,44 +83,6 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr_el2 = val;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index cf811009a33c..7b3dc52248ce 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -619,7 +619,8 @@ static __always_inline void kvm_write_cptr_el2(u64 val)
+ 		write_sysreg(val, cptr_el2);
  }
  
--static void pvm_init_traps_cptr(struct kvm_vcpu *vcpu)
--{
--	struct kvm *kvm = vcpu->kvm;
--	u64 val = vcpu->arch.cptr_el2;
--
--	if (!has_hvhe()) {
--		val |= CPTR_NVHE_EL2_RES1;
--		val &= ~(CPTR_NVHE_EL2_RES0);
--	}
--
--	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
--		val |= CPTR_EL2_TAM;
--
--	/* SVE can be disabled by userspace even if supported. */
--	if (!vcpu_has_sve(vcpu)) {
--		if (has_hvhe())
--			val &= ~(CPACR_ELx_ZEN);
--		else
--			val |= CPTR_EL2_TZ;
--	}
--
--	/* No SME support in KVM. */
--	BUG_ON(kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP));
--	if (has_hvhe())
--		val &= ~(CPACR_ELx_SMEN);
--	else
--		val |= CPTR_EL2_TSM;
--
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceVer, IMP)) {
--		if (has_hvhe())
--			val |= CPACR_EL1_TTA;
--		else
--			val |= CPTR_EL2_TTA;
--	}
--
--	vcpu->arch.cptr_el2 = val;
+-static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
++/* Resets the value of cptr_el2 when returning to the host. */
++static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
+@@ -643,13 +644,6 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 			val &= ~CPTR_EL2_TSM;
+ 	}
+ 
+-	return val;
 -}
 -
- static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -191,7 +153,6 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
- 	int ret;
- 
--	vcpu->arch.cptr_el2 = kvm_get_reset_cptr_el2(vcpu);
- 	vcpu->arch.mdcr_el2 = 0;
- 
- 	pkvm_vcpu_reset_hcr(vcpu);
-@@ -204,7 +165,6 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
- 		return ret;
- 
- 	pvm_init_traps_hcr(vcpu);
--	pvm_init_traps_cptr(vcpu);
- 	pvm_init_traps_mdcr(vcpu);
- 
- 	return 0;
-@@ -644,8 +604,6 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 		return ret;
- 	}
- 
--	hyp_vcpu->vcpu.arch.cptr_el2 = kvm_get_reset_cptr_el2(&hyp_vcpu->vcpu);
+-static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+-{
+-	u64 val = kvm_get_reset_cptr_el2(vcpu);
 -
- 	return 0;
+ 	kvm_write_cptr_el2(val);
  }
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 7786a83d0fa8..0ebf84a9f9e2 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -35,33 +35,46 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
- extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- 
--static void __activate_traps(struct kvm_vcpu *vcpu)
-+static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- {
--	u64 val;
-+	u64 val = CPTR_EL2_TAM;	/* Same bit irrespective of E2H */
- 
--	___activate_traps(vcpu, vcpu->arch.hcr_el2);
--	__activate_traps_common(vcpu);
-+	if (has_hvhe()) {
-+		val |= CPACR_ELx_TTA;
- 
--	val = vcpu->arch.cptr_el2;
--	val |= CPTR_EL2_TAM;	/* Same bit irrespective of E2H */
--	val |= has_hvhe() ? CPACR_EL1_TTA : CPTR_EL2_TTA;
--	if (cpus_have_final_cap(ARM64_SME)) {
--		if (has_hvhe())
--			val &= ~CPACR_ELx_SMEN;
--		else
--			val |= CPTR_EL2_TSM;
--	}
-+		if (guest_owns_fp_regs()) {
-+			val |= CPACR_ELx_FPEN;
-+			if (vcpu_has_sve(vcpu))
-+				val |= CPACR_ELx_ZEN;
-+		}
-+	} else {
-+		val |= CPTR_EL2_TTA | CPTR_NVHE_EL2_RES1;
- 
--	if (!guest_owns_fp_regs()) {
--		if (has_hvhe())
--			val &= ~(CPACR_ELx_FPEN | CPACR_ELx_ZEN);
--		else
--			val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
-+		/*
-+		 * Always trap SME since it's not supported in KVM.
-+		 * TSM is RES1 if SME isn't implemented.
-+		 */
-+		val |= CPTR_EL2_TSM;
- 
--		__activate_traps_fpsimd32(vcpu);
-+		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
-+			val |= CPTR_EL2_TZ;
-+
-+		if (!guest_owns_fp_regs())
-+			val |= CPTR_EL2_TFP;
- 	}
- 
-+	if (!guest_owns_fp_regs())
-+		__activate_traps_fpsimd32(vcpu);
-+
- 	kvm_write_cptr_el2(val);
-+}
-+
-+static void __activate_traps(struct kvm_vcpu *vcpu)
-+{
-+	___activate_traps(vcpu, vcpu->arch.hcr_el2);
-+	__activate_traps_common(vcpu);
-+	__activate_cptr_traps(vcpu);
-+
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 -- 
 2.47.0.338.g60cca15819-goog
 
