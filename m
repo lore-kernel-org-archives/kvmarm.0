@@ -1,100 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE3A18858A;
-	Fri, 29 Nov 2024 09:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1EF189B83
+	for <kvmarm@lists.linux.dev>; Fri, 29 Nov 2024 11:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732874300; cv=none; b=GZPhVCpFvZdKyQECpyeNPH5tTBNMQvbkGo0bm/u9E5yk4wlP+jGjcwqebYWYpy4VMiSy0c36iDrDx5rm43MekfciHwtwUPUH+diLJxVtUbdz1dxg027wWtNBUvoDNJUeDssFMex818dVmn4il4KR49GjsRv8Fdt+gLsuA31VBFQ=
+	t=1732879859; cv=none; b=HHLUYJKaClP9LE7atRBURo37HZsQWi/yrUMGEc4vEgV/otBfdMbsfNL8En/qkpEbcSWAwingj/kK83EmdKY9wX/DyoKcZlWDXIwvTHgknQvMTFhdaEQD3UNXwaCCv8eVAFY3X+z7d7DeJpngRzIPhRfscL8VQPrkuz3T1V9xAWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732874300; c=relaxed/simple;
-	bh=b3I9qr/L+dZimBd48x5jitIlhaZduHneXsbuO2bUb18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nVmObEo1HvErXJM2PEu7Z4tTQt5aCO/2gkUIZHPM9Nviiei/saUYf9n/eePEfRUAYQMk53j7N5ea9R/HkgNhO466k09beQAfrb2VPewuQJr38Sm51tN71cB1BsBTLX0wpS6PzjsjrwwzLGDZT702TRsPlFMwB/VMXaoUejnmEyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iFb6pMjJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732879859; c=relaxed/simple;
+	bh=ugoTjvbf/T2Gt9bHlOx3mUSknD42xX3aOf3aUVASCUA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qfJ8HbofTvEZQkBn5mY1LcZN2O2W+Oj3zVDKujMaKNHA6EWR/FSzCX965xLncDtxzkWMsA2LfUCQa16Nyn0KSpWaRAOGB/2XMM3a3VAMg/15BEAUcohimvcbG/4h+C+sXjF/y113ujCFzmIr5oG8bxs8XbLwcf3t3j4fu8WYARI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=LBVDCAIn; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iFb6pMjJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB079C4CECF;
-	Fri, 29 Nov 2024 09:58:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732874298;
-	bh=b3I9qr/L+dZimBd48x5jitIlhaZduHneXsbuO2bUb18=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iFb6pMjJb/KBhpXJDU4lD2/QSmEZSL9NfXB4ZXJsE2d4Ar20NhTU6SIq1pm/2toNK
-	 SFCVBGfwais5M7ThYzZmGS8nyNZRCRobUPYgY9CXmju+3tj26he6AjSrZPKAWTon7i
-	 0aYPYGVHQ9+y5O/DHVOSWPy+cVgAx7vysrOyCCQY8lHuFCwQkrCoS3mqUrzq9MaJ7k
-	 NWKAU3n4X94fqxBYIQcx/k4xUikiqr7r7fqwgFzmqTBtqHW84/z8dGWJBnUqoyCgay
-	 i2D5Syv4+8LaeCmnhJ29ZJNN10krGaV8ddfNm3jriQ0T7Tpaipn+5npT4YHc1H5e1X
-	 IMW1VI2DLo0Ag==
-Date: Fri, 29 Nov 2024 09:58:13 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Always check the state from hyp_ack_unshare()
-Message-ID: <20241129095812.GA4298@willie-the-truck>
-References: <20241128154406.602875-1-qperret@google.com>
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="LBVDCAIn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/Q3XjPb0Ey2Y1XcJHGYpRebmTpz9c8xwwCA/EQuTE0A=;
+  b=LBVDCAInW9HTBdXVSGmbuq9y9xWtFXiyE7uk36AfLiZc40znbZaiiq6f
+   +OJoP24YFaAdG3BIHqrUlz3SHkb7hFs0CkAyD1VbMQyxYQULhx/R8MolU
+   hQcPxzyyUqJeIySjTrfflcfeOa16EWDt40PwMV+9HCYNj1wEF0/st2mjB
+   Q=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=keisuke.nishimura@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.12,195,1728943200"; 
+   d="scan'208";a="102991282"
+Received: from dt-aponte.paris.inria.fr (HELO [128.93.67.66]) ([128.93.67.66])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2024 12:30:54 +0100
+Message-ID: <e85e92f9-8387-4021-885e-a379a2898c9c@inria.fr>
+Date: Fri, 29 Nov 2024 12:30:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241128154406.602875-1-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm/arm64: vgic-its: Add error handling in
+ vgic_its_cache_translation
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+References: <20241128134534.361144-1-keisuke.nishimura@inria.fr>
+ <Z0iujBMl1ypdwfBu@linux.dev> <a62e682d-c2e8-424d-84c5-4e64468124a9@inria.fr>
+ <Z0lrWynd3O8a1pG_@linux.dev>
+Content-Language: en-US
+From: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+In-Reply-To: <Z0lrWynd3O8a1pG_@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 28, 2024 at 03:44:06PM +0000, Quentin Perret wrote:
-> There are multiple pKVM memory transitions where the state of a page is
-> not cross-checked from the completer's PoV for performance reasons.
-> For example, if a page is PKVM_PAGE_OWNED from the initiator's PoV,
-> we should be guaranteed by construction that it is PKVM_NOPAGE for
-> everybody else, hence allowing us to save a page-table lookup.
-> 
-> When it was introduced, hyp_ack_unshare() followed that logic and bailed
-> out without checking the PKVM_PAGE_SHARED_BORROWED state in the
-> hypervisor's stage-1. This was correct as we could safely assume that
-> all host-initiated shares were directed at the hypervisor at the time.
-> But with the introduction of other types of shares (e.g. for FF-A or
-> non-protected guests), it is now very much required to cross check this
-> state to prevent the host from running __pkvm_host_unshare_hyp() on a
-> page shared with TZ or a non-protected guest.
-> 
-> Thankfully, if an attacker were to try this, the hyp_unmap() call from
-> hyp_complete_unshare() would fail, hence causing to WARN() from
-> __do_unshare() with the host lock held, which is fatal. But this is
-> fragile at best, and can hardly be considered a security measure.
-> 
-> Let's just do the right thing and always check the state from
-> hyp_ack_unshare().
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index caba3e4bd09e..e75374d682f4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -783,9 +783,6 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
->  	if (tx->initiator.id == PKVM_ID_HOST && hyp_page_count((void *)addr))
->  		return -EBUSY;
->  
-> -	if (__hyp_ack_skip_pgtable_check(tx))
-> -		return 0;
-> -
 
-Acked-by: Will Deacon <will@kernel.org>
 
-I suppose __hyp_ack_skip_pgtable_check() is now quite poorly named,
-since we only want to use it in cases where the page is PKVM_PAGE_OWNED
-by the initiator. Hopefully nobody smart tries to add it back here!
+On 29/11/2024 08:20, Oliver Upton wrote:
+> On Thu, Nov 28, 2024 at 08:04:01PM +0100, Keisuke Nishimura wrote:
+>> Hello Marc and Oliver,
+>>
+>> Thank you for the replies.
+>>
+>> On 28/11/2024 18:55, Oliver Upton wrote:
+>>> On Thu, Nov 28, 2024 at 02:45:34PM +0100, Keisuke Nishimura wrote:
+>>>> The xa_store() may fail because there is no guarantee that the cache_key
+>>>> index is already used in its->translation_cache. This fix (1) resolves
+>>>> the kref inconsistency on failure and (2) returns the error code.
+>>>
+>>> xa_store() doesn't fail if an entry is already present at the specified
+>>> index. It returns the old entry, which is why we have a vgic_put_irq()
+>>> on the "error" path.
+>>
+>> Sure. But to my understanding, this could be the first store to
+>> its->translation_cache with cache_key, and that is why old can be NULL? I am
+>> not very familiar with this code, so please correct me if I am wrong.
+> 
+> So we take a reference on @irq to represent the pointer to it that's
+> stored in the translation cache. There are 3 possible outcomes after the
+> store:
+> 
+>   - Store succeeds and no pre-existing entry.
+> 
+>   - Store succeeds and there's a pre-existing entry. put the reference on
+>     @old since it was evicted from the translation cache
+> 
+>   - Store fails because of a failed memory allocation / error in xarray
+>     library.
+> 
+> We don't handle #3, and the correct thing to do in this case is to put
+> @irq since it was never made visible in the translation cache.
+> 
+> So I think we'd want to do something similar to the following.
+> 
 
-Will
+Hello,
+
+Thanks for the comment. xa_reserve() can allocate the memory in advance and 
+ensure the success of the subsequent xa_store(). FYI, the document of 
+xa_reserve() says:
+
+ > Ensures there is somewhere to store an entry at index in the array. If there 
+is already something stored at index, this function does nothing. If there was 
+nothing there, the entry is marked as reserved. Loading from a reserved entry 
+returns a NULL pointer.
+
+
+I am thinking of calling it before the reference in v2. Here is the suggestion:
+
+---
+  arch/arm64/kvm/vgic/vgic-its.c | 9 +++++++++
+  1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 198296933e7e..1422812ad6d7 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -561,11 +561,20 @@ static void vgic_its_cache_translation(struct kvm *kvm, 
+struct vgic_its *its,
+  {
+  	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
+  	struct vgic_irq *old;
++	int ret;
+
+  	/* Do not cache a directly injected interrupt */
+  	if (irq->hw)
+  		return;
+
++	/*
++	 * Ensure the following xa_store() will not fail. Intentionally do
++	 * not return the error as the translation cache is best effort.
++	 */
++	ret = xa_reserve(&its->translation_cache, cache_key, GFP_KERNEL_ACCOUNT);
++	if (ret)
++		return;
++
+  	/*
+  	 * The irq refcount is guaranteed to be nonzero while holding the
+  	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
+-- 
+2.34.1
+
