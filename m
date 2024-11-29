@@ -1,301 +1,120 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56969AD4B
-	for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 19:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04CA45C14
+	for <kvmarm@lists.linux.dev>; Fri, 29 Nov 2024 07:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732822514; cv=none; b=g16uDpBsxQjAt1ftLnbNgKglxOBPumbTvIOqvyKqEt5HPqYgsSgriaeqn0GtWBmdUE88fAueBAljU3pH4SQ+EAoNqQsKJ2T6fAjyh06yD2MB9SIxZH6M6c5Kj6tbHb0xXFxIp5AcbWXlJljueTWXu04yDREe1QooLF2wwtfczFs=
+	t=1732864877; cv=none; b=J14bjnLb/aYFd2KuLTeCsVaUzDwZXyoZ73MDl1RKC05zoTf0W2D24/TQjKfKV2oMYykbiOqaHIR6MKQARdw6C4hc7nsw9/vsoP9xEVlFREV3m3XHd35YHbnje1AVHwJFA8iQ9Uv+XAJjHgUwPlpmw843WR1KmSTmKoz7Sqn9D80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732822514; c=relaxed/simple;
-	bh=OpPeuKnPwPxDTroGPWBlNI1tJ8AYH1pSfyB6hBgd4I4=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=AVT0s5KG9NsNQPY34ilABdEMTjLesiZAMLJBkQVK6KyXI2vB+t4xFqadG8InELGEfy+YX+YEQHN682g6kdN4hj7JtdxRSYroqYQVAUlCP+M6rT9v6L3Z6QSiKbo+0QlNpRshNLtQeSmcKdZHnQ3ByuxWwXJwrUp+PAVArGHphpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t3mINTif; arc=none smtp.client-ip=209.85.166.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1732864877; c=relaxed/simple;
+	bh=lFYKy2bfbVArpmqIR0r5wqIcjalza1sXfVuuGhrCM3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ad12XTJ043F0TCpow0s5QycRt05caEg/8JiKFlE1fbigvY2pL/VOhBvtmxLqCOEUviL0dGM/hDg4nFyOwnIGrPGXgV3X8QkehAW+2crLp15GMZG6KaMSwZ/TEJhg5kT7D2d5ksSU9zZsZbQhUtHSvfTk/TZdEZh2lNREY3nVSEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l8jDcI4i; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t3mINTif"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-841a6e28b52so104032539f.0
-        for <kvmarm@lists.linux.dev>; Thu, 28 Nov 2024 11:35:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732822511; x=1733427311; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pHav4+3FrDV0YxlXaVUKtcvDWZpFWCCuNQlocr5uBVc=;
-        b=t3mINTifgQ0eYP89kJeNF2QC4t5upVtt4DrSk3jScHz1agtdK70qRq/SEmAu06TsZ4
-         c3yF8yqk84A00ZFMK7aQmBQmhzc5rCVfy2F4UG0s3GDcpfAtKbNtlEb2TqqPT6x4M29f
-         Qgbj1/tpYA6AgWGfQ3QzhgY0mgSvquVjVSHOYT4A0wcCoHElh0h7eOmbxzCVVce3oFgV
-         zFg8Q4BoZYUvWV+tsiBUtCDfQm1vprAFNVWd3VrZekPNszpsMkCHJep2xnjfhAPdQ5e/
-         PETS+ONIjZtj2NxnNqApxRzKqgRcG2Knm+1antywtb3Vr+Uwvah8N9eUwoaFEEoFvH6H
-         9Arg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732822511; x=1733427311;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pHav4+3FrDV0YxlXaVUKtcvDWZpFWCCuNQlocr5uBVc=;
-        b=f3JYiyCaF9Jrywraa8Uy95HYCHQMWpIoOc4HkWaNhRFXEF8FmJAiK/CpyzjFHHUc/k
-         fw0HOuHj6NdJEmU8DDIIitvQlwb8K1sjdMu03QifxUvr/z6jOAPEkuwUZ2M1Ujhzbk0G
-         vKh92iXJ/Z62WlhHDF1gH0TX0FJT1XI2drFPIFzHElcwApqONmJY8M2kYG+oa0pbkdsM
-         UkDKQLPH3OBCPspkGIuI7DCzVrIEZzR/jQk8tsP1MY+5WF9+XR/FPhIJzE4B8WBK/mjq
-         J3PCehsdPnOIaMvNVQjqCbJ7hNcwMgCTXROmphHFNG/vwQHzyWQ44+l/uADoDS+TEGs/
-         oJ7Q==
-X-Gm-Message-State: AOJu0YziZsZehQJy1kEv3hmLZYYpzB/fP3Elgd7dcAMu8uBDD+RAYDYb
-	gNAMFb+MZIf6ibk1UEtlVFCuVfc2AXnIlkeuT8V02PDDdaN7NTtlg+Mhkx+LAFu2JoDdcG1MyLK
-	BT9KTa3XVkLhgV1RTHkr8jg==
-X-Google-Smtp-Source: AGHT+IEZ97yIepjU8jU7qhBvHGo+5ylOwR5GRPXbDGnyqrxJsaXH344g7b1rnjcI9YUqe/qgk/LbB7LrEDeAUIKQyA==
-X-Received: from jaqy17.prod.google.com ([2002:a02:ce91:0:b0:4e2:691:b69c])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6602:6d0b:b0:83a:b188:7a4d with SMTP id ca18e2360f4ac-843ecdacaa6mr1065174539f.0.1732822511428;
- Thu, 28 Nov 2024 11:35:11 -0800 (PST)
-Date: Thu, 28 Nov 2024 19:35:10 +0000
-In-Reply-To: <20241115224924.2132364-3-oliver.upton@linux.dev> (message from
- Oliver Upton on Fri, 15 Nov 2024 14:49:10 -0800)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l8jDcI4i"
+Date: Thu, 28 Nov 2024 23:20:59 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732864871;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M4tD95wEzzC7ua/VvyG4y/vO8ctyWBdq2dh2LRB0nY8=;
+	b=l8jDcI4iye34mkZSkKkml7LqVOjXtSRZ9LRvvG6Rhz0dvsP7PTnFZQs5ybXAcUyWNmwt/C
+	l9TqAIceTPIEthXOsJTAz1Qr7fGGi6mmGR4Xd375xgoaxaqyMcomAKj8Df6caOyAwuhxs0
+	lmRyrJaCjs5nK6XhnuGlwzRGuOHFA8I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm/arm64: vgic-its: Add error handling in
+ vgic_its_cache_translation
+Message-ID: <Z0lrWynd3O8a1pG_@linux.dev>
+References: <20241128134534.361144-1-keisuke.nishimura@inria.fr>
+ <Z0iujBMl1ypdwfBu@linux.dev>
+ <a62e682d-c2e8-424d-84c5-4e64468124a9@inria.fr>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntcyif179t.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2 02/16] KVM: arm64: Get rid of __kvm_get_mdcr_el2() and
- related warts
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, 
-	alexandru.elisei@arm.com, oliver.upton@linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a62e682d-c2e8-424d-84c5-4e64468124a9@inria.fr>
+X-Migadu-Flow: FLOW_OUT
 
-Hey Oliver,
+On Thu, Nov 28, 2024 at 08:04:01PM +0100, Keisuke Nishimura wrote:
+> Hello Marc and Oliver,
+> 
+> Thank you for the replies.
+> 
+> On 28/11/2024 18:55, Oliver Upton wrote:
+> > On Thu, Nov 28, 2024 at 02:45:34PM +0100, Keisuke Nishimura wrote:
+> > > The xa_store() may fail because there is no guarantee that the cache_key
+> > > index is already used in its->translation_cache. This fix (1) resolves
+> > > the kref inconsistency on failure and (2) returns the error code.
+> > 
+> > xa_store() doesn't fail if an entry is already present at the specified
+> > index. It returns the old entry, which is why we have a vgic_put_irq()
+> > on the "error" path.
+> 
+> Sure. But to my understanding, this could be the first store to
+> its->translation_cache with cache_key, and that is why old can be NULL? I am
+> not very familiar with this code, so please correct me if I am wrong.
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+So we take a reference on @irq to represent the pointer to it that's
+stored in the translation cache. There are 3 possible outcomes after the
+store:
 
-> KVM caches MDCR_EL2 on a per-CPU basis in order to preserve the
-> configuration of MDCR_EL2.HPMN while running a guest. This is a bit
-> gross, since we're relying on some baked configuration rather than the
-> hardware definition of implemented counters.
+ - Store succeeds and no pre-existing entry.
 
-> Discover the number of implemented counters by reading PMCR_EL0.N
-> instead. This works because:
+ - Store succeeds and there's a pre-existing entry. put the reference on
+   @old since it was evicted from the translation cache
 
->   - In VHE the kernel runs at EL2, and N always returns the number of
->     counters implemented in hardware
+ - Store fails because of a failed memory allocation / error in xarray
+   library.
 
->   - In {n,h}VHE, the EL2 setup code programs MDCR_EL2.HPMN with the EL2
->     view of PMCR_EL0.N for the host
+We don't handle #3, and the correct thing to do in this case is to put
+@irq since it was never made visible in the translation cache.
 
-> Lastly, avoid traps under nested virtualization by saving PMCR_EL0.N in
-> host data.
+So I think we'd want to do something similar to the following.
 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->   arch/arm64/include/asm/kvm_asm.h   |  5 +----
->   arch/arm64/include/asm/kvm_host.h  |  7 +++++--
->   arch/arm64/kvm/arm.c               |  2 +-
->   arch/arm64/kvm/debug.c             | 29 +++++++++++------------------
->   arch/arm64/kvm/hyp/nvhe/debug-sr.c |  5 -----
->   arch/arm64/kvm/hyp/nvhe/hyp-main.c |  6 ------
->   arch/arm64/kvm/hyp/vhe/debug-sr.c  |  5 -----
->   7 files changed, 18 insertions(+), 41 deletions(-)
+-- 
+Thanks,
+Oliver
 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h  
-> b/arch/arm64/include/asm/kvm_asm.h
-> index ca2590344313..063185c202ce 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -53,8 +53,7 @@
->   enum __kvm_host_smccc_func {
->   	/* Hypercalls available only prior to pKVM finalisation */
->   	/* __KVM_HOST_SMCCC_FUNC___kvm_hyp_init */
-> -	__KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2 =  
-> __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
-> -	__KVM_HOST_SMCCC_FUNC___pkvm_init,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_init =  
-> __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
->   	__KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping,
->   	__KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector,
->   	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
-> @@ -247,8 +246,6 @@ extern void __kvm_adjust_pc(struct kvm_vcpu *vcpu);
->   extern u64 __vgic_v3_get_gic_config(void);
->   extern void __vgic_v3_init_lrs(void);
-
-> -extern u64 __kvm_get_mdcr_el2(void);
-> -
->   #define __KVM_EXTABLE(from, to)						\
->   	"	.pushsection	__kvm_ex_table, \"a\"\n"		\
->   	"	.align		3\n"					\
-> diff --git a/arch/arm64/include/asm/kvm_host.h  
-> b/arch/arm64/include/asm/kvm_host.h
-> index f333b189fb43..ad514434f3fe 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -642,7 +642,7 @@ struct kvm_host_data {
->   	 * host_debug_state contains the host registers which are
->   	 * saved and restored during world switches.
->   	 */
-> -	 struct {
-> +	struct {
->   		/* {Break,watch}point registers */
->   		struct kvm_guest_debug_arch regs;
->   		/* Statistical profiling extension */
-> @@ -652,6 +652,9 @@ struct kvm_host_data {
->   		/* Values of trap registers for the host before guest entry. */
->   		u64 mdcr_el2;
->   	} host_debug_state;
-> +
-> +	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
-> +	unsigned int nr_event_counters;
->   };
-
->   struct kvm_host_psci_config {
-> @@ -1332,7 +1335,7 @@ static inline bool  
-> kvm_system_needs_idmapped_vectors(void)
-
->   static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-
-> -void kvm_arm_init_debug(void);
-> +void kvm_init_host_debug_data(void);
->   void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu);
->   void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->   void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a102c3aebdbc..ab1bf9ccf385 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2109,6 +2109,7 @@ static void cpu_set_hyp_vector(void)
->   static void cpu_hyp_init_context(void)
->   {
->   	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
-> +	kvm_init_host_debug_data();
-
->   	if (!is_kernel_in_hyp_mode())
->   		cpu_init_hyp_mode();
-> @@ -2117,7 +2118,6 @@ static void cpu_hyp_init_context(void)
->   static void cpu_hyp_init_features(void)
->   {
->   	cpu_set_hyp_vector();
-> -	kvm_arm_init_debug();
-
->   	if (is_kernel_in_hyp_mode())
->   		kvm_timer_init_vhe();
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 587e9eb4372e..d8ea6fe6a2a2 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -16,8 +16,6 @@
-
->   #include "trace.h"
-
-> -static DEFINE_PER_CPU(u64, mdcr_el2);
-> -
->   /*
->    * save/restore_guest_debug_regs
->    *
-> @@ -60,21 +58,6 @@ static void restore_guest_debug_regs(struct kvm_vcpu  
-> *vcpu)
->   		*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
->   }
-
-> -/**
-> - * kvm_arm_init_debug - grab what we need for debug
-> - *
-> - * Currently the sole task of this function is to retrieve the initial
-> - * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
-> - * presumably been set-up by some knowledgeable bootcode.
-> - *
-> - * It is called once per-cpu during CPU hyp initialisation.
-> - */
-> -
-> -void kvm_arm_init_debug(void)
-> -{
-> -	__this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
-> -}
-> -
->   /**
->    * kvm_arm_setup_mdcr_el2 - configure vcpu mdcr_el2 value
->    *
-> @@ -94,7 +77,8 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu  
-> *vcpu)
->   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
->   	 * to disable guest access to the profiling and trace buffers
->   	 */
-> -	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
-> +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-
-MDCR_EL2_HPMN is not defined
-
-> +					 *host_data_ptr(nr_event_counters));
->   	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
->   				MDCR_EL2_TPMS |
->   				MDCR_EL2_TTRF |
-> @@ -338,3 +322,12 @@ void kvm_arch_vcpu_put_debug_state_flags(struct  
-> kvm_vcpu *vcpu)
->   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->   }
-> +
-> +void kvm_init_host_debug_data(void)
-> +{
-> +	u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
-> +
-> +	if (cpuid_feature_extract_signed_field(dfr0,  
-> ID_AA64DFR0_EL1_PMUVer_SHIFT) > 0)
-> +		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
-> +							      read_sysreg(pmcr_el0));
-> +}
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c  
-> b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 53efda0235cf..1e2a26d0196e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -106,8 +106,3 @@ void __debug_switch_to_host(struct kvm_vcpu *vcpu)
->   {
->   	__debug_switch_to_host_common(vcpu);
->   }
-> -
-> -u64 __kvm_get_mdcr_el2(void)
-> -{
-> -	return read_sysreg(mdcr_el2);
-> -}
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c  
-> b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 6aa0b13d86e5..16f5da3a884a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -264,11 +264,6 @@ static void handle___vgic_v3_init_lrs(struct  
-> kvm_cpu_context *host_ctxt)
->   	__vgic_v3_init_lrs();
->   }
-
-> -static void handle___kvm_get_mdcr_el2(struct kvm_cpu_context *host_ctxt)
-> -{
-> -	cpu_reg(host_ctxt, 1) = __kvm_get_mdcr_el2();
-> -}
-> -
->   static void handle___vgic_v3_save_vmcr_aprs(struct kvm_cpu_context  
-> *host_ctxt)
->   {
->   	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
-> @@ -384,7 +379,6 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
-
->   static const hcall_t host_hcall[] = {
->   	/* ___kvm_hyp_init */
-> -	HANDLE_FUNC(__kvm_get_mdcr_el2),
->   	HANDLE_FUNC(__pkvm_init),
->   	HANDLE_FUNC(__pkvm_create_private_mapping),
->   	HANDLE_FUNC(__pkvm_cpu_set_vector),
-> diff --git a/arch/arm64/kvm/hyp/vhe/debug-sr.c  
-> b/arch/arm64/kvm/hyp/vhe/debug-sr.c
-> index 289689b2682d..0100339b09e0 100644
-> --- a/arch/arm64/kvm/hyp/vhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/debug-sr.c
-> @@ -19,8 +19,3 @@ void __debug_switch_to_host(struct kvm_vcpu *vcpu)
->   {
->   	__debug_switch_to_host_common(vcpu);
->   }
-> -
-> -u64 __kvm_get_mdcr_el2(void)
-> -{
-> -	return read_sysreg(mdcr_el2);
-> -}
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index f4c4494645c3..fb96802799c6 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -608,12 +608,22 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 	lockdep_assert_held(&its->its_lock);
+ 	vgic_get_irq_kref(irq);
+ 
++	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
++
++	/*
++	 * Put the reference taken on @irq if the store fails. Intentionally do
++	 * not return the error as the translation cache is best effort.
++	 */
++	if (xa_is_err(old)) {
++		vgic_put_irq(kvm, irq);
++		return;
++	}
++
+ 	/*
+ 	 * We could have raced with another CPU caching the same
+ 	 * translation behind our back, ensure we don't leak a
+ 	 * reference if that is the case.
+ 	 */
+-	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+ 	if (old)
+ 		vgic_put_irq(kvm, old);
+ }
