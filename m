@@ -1,264 +1,268 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECD319A298;
-	Fri, 29 Nov 2024 12:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B5915C15A
+	for <kvmarm@lists.linux.dev>; Fri, 29 Nov 2024 12:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732882733; cv=none; b=LEwFIoETfGZvPlKAOZD2DyTaQ2yEg/Q7xXLeYIJe13dyY76WrCJfFE+duiVGJpgF0nFgZGnEuwjgINilrnY2FBSdWukawBAFARcMbGtNK6P2nreyp2nCT7EtBrrkyiJClP7VuigosVrIjVIbTtpG4RdIBsDCOly2KedT7hAWTfY=
+	t=1732885086; cv=none; b=jInNUgPlOd+DCuLfeHdnlk4MuDqdJ+iDoIT1y14KCdzmv7iqrU+bo1Cqj5I9mA6UPntNyOMm/mAuuyEhWVzlLa5c5xgkci6ztLgztEe6B+Rsa5/2RPcUJKALcW5PSRlvdGlWIC6MnLQid6u2N5vGKZcoOmexdm2oPm3SqXaOsr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732882733; c=relaxed/simple;
-	bh=S1SlKkreV2kXr/504QUZVWFLWq7GfnQZ0OTPf6lsLW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EcijZUcMar2rqHVRvW0xTdnqA7GqUu4EXV6UM3osIFcOEBfzuLNi/Xlo4RP5CNCbN/LjJx8YRWOrCScgauLI5BfiTKfyz8PSG6whVaoy3CXugupjpJ/B6jMTFV6ywNl/VuG4/WciyuTAJkf1X7ZPnbmvJCOOxk9eNaUivq8WucM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FD6712FC;
-	Fri, 29 Nov 2024 04:19:12 -0800 (PST)
-Received: from [10.57.92.242] (unknown [10.57.92.242])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A0613F5A1;
-	Fri, 29 Nov 2024 04:18:38 -0800 (PST)
-Message-ID: <7d1d4893-f798-4e44-aad0-1d0071e30b05@arm.com>
-Date: Fri, 29 Nov 2024 12:18:36 +0000
+	s=arc-20240116; t=1732885086; c=relaxed/simple;
+	bh=N86aIaspaf9/OWHueYEllRRLdGM2qGulhJQm2YAviaA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mnbTYRm0qHlex1Bpa15Bf9pAG+sB/I9XvpnZQDjv1fJGxhUBJDYavAt67e69gQ+U+HTlBt0kBJ8k5/NwhVynh4BW/KcKQeX/c1OXJo7oG8My6iKI6ckmspTdmGGS+LZNd/16aXHrIsVol0tvfU/3pK+cWg4+mII+NFfNYCJnAzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QwG9SRjp; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QwG9SRjp"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-aa53537b4c6so93595366b.2
+        for <kvmarm@lists.linux.dev>; Fri, 29 Nov 2024 04:58:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732885082; x=1733489882; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iTo7mdsKhhMMv0NQ6W3WdpTpByHz4qODWqGMzHKiw1I=;
+        b=QwG9SRjpYe7oiSVNag0q5CXPVF3Lv8spFO1TotD8stlfAFADX6Gr3CkQjcvos4KJZO
+         uZHOSR0z7LhTxSk3bH7BCIZA8KgBYjQQYKGaf3T7GzYVWgyVORpoqLSu7WMeDkn+UkyK
+         kS+lOsY9D+dzQCttuYidbg4P+Pu8b7lYCWZ3YRdMshTF/R18I9B+VZhZ3/QCmXbEu2C/
+         GJBIp4YyhiTD2X9+T3zro1MG9IIANcoiAp9BTVy7xJcEgVvUwJKwWTz0UKhNKzZBM9QC
+         ahxzk5g0KSqbC0L5DSNGWNGB1dxArgpSTGJ66LhUsxiuj4LKw0mRotOcEqCDGlFracTj
+         ySTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732885082; x=1733489882;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iTo7mdsKhhMMv0NQ6W3WdpTpByHz4qODWqGMzHKiw1I=;
+        b=rvdWZ8Apn0N3ZMip5ym/C/EmOnW0PG4wCkV1E04kf/El2YrIKlDb3awFIZPD07e5u/
+         uXS+52qtcKbO23T/9y+9Of+givOZCcMCTKxMl2iHYW3mEqnCtlWABDumTOtjWb0ip0D4
+         2nSnSXFBtsYA1dNZVBzH7VjEbCD+akDluNT9OqUK+gp06FaEol21mamRPEJ3pE2C8iXZ
+         dHNHZAe8D7owXOkjrvh8VFKXeRdxKG1CYG5DvY3tUQAK6QQo9toBnXF4xnZDLj79KcR5
+         hkaVrZvdL6q1lvsbGbT+tWQoUtn9fqbicoiVLQ3xE7nLdfYaRnP7VP75Wwcd6F5hk9Bi
+         GYBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6hSqJMOvMKIPOnqY107GaDObAq+ZyLUDW2IuFVdLre8mxWYmCSD6P5FW+HFbEoHWgfQeQm64=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzxPJvI6OTUUbmc+kLAWef/DySHeC/3yZzphj0C8PEhZRZZEqM9
+	KspByg2q+LWKXRWxeIIPFOTRj74mB67R7ef0uB+5jjZcTwKb2eUuNSo/lzQ51zR80G3NNfHtzdx
+	w17+LHw==
+X-Google-Smtp-Source: AGHT+IE8LI59tC+qSLoKQ9kpy+7UR4VBfF+klcw+nBIw6XFRR92RWRwAjYNKTrXAmiQZO9b0XnadXq1XxO3S
+X-Received: from edya11.prod.google.com ([2002:aa7:cf0b:0:b0:5cf:ca78:ecdf])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:4402:b0:5cf:f248:7715
+ with SMTP id 4fb4d7f45d1cf-5d080c48680mr9111559a12.23.1732885082703; Fri, 29
+ Nov 2024 04:58:02 -0800 (PST)
+Date: Fri, 29 Nov 2024 12:58:00 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 18/43] arm64: RME: Handle realm enter/exit
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <20241004152804.72508-19-steven.price@arm.com>
- <c44aeac6-4fe1-4199-962d-5fbbc5a591de@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <c44aeac6-4fe1-4199-962d-5fbbc5a591de@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241129125800.992468-1-qperret@google.com>
+Subject: [PATCH] KVM: arm64: Selftest for pKVM transitions
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Suzuki,
+We have recently found a bug [1] in the pKVM memory ownership
+transitions by code inspection, but it could have been caught with a
+test.
 
-Sorry for the very slow response to this. Coming back to this I'm having
-doubts, see below.
+Introduce a boot-time selftest exercising all the known pKVM memory
+transitions and importantly checks the rejection of illegal transitions.
 
-On 17/10/2024 14:00, Suzuki K Poulose wrote:
-> On 04/10/2024 16:27, Steven Price wrote:
->> Entering a realm is done using a SMC call to the RMM. On exit the
->> exit-codes need to be handled slightly differently to the normal KVM
->> path so define our own functions for realm enter/exit and hook them
->> in if the guest is a realm guest.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
-...
->> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
->> new file mode 100644
->> index 000000000000..e96ea308212c
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rme-exit.c
-...
->> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct realm *realm = &kvm->arch.realm;
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    unsigned long base = rec->run->exit.ripas_base;
->> +    unsigned long top = rec->run->exit.ripas_top;
->> +    unsigned long ripas = rec->run->exit.ripas_value;
->> +    unsigned long top_ipa;
->> +    int ret;
->> +
->> +    if (!realm_is_addr_protected(realm, base) ||
->> +        !realm_is_addr_protected(realm, top - 1)) {
->> +        kvm_err("Invalid RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
->> +            base, top, ripas);
->> +        return -EINVAL;
->> +    }
->> +
->> +    kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
->> +                   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-> 
-> I think we also need to filter the request for RIPAS_RAM, by consulting
-> if the "range" is backed by a memslot or not. If they are not, we should
-> reject the request with a response flag set in run.enter.flags.
+The new test is hidden behind a new Kconfig option separate from
+CONFIG_EL2_NVHE_DEBUG on purpose as that has side effects on the
+transition checks ([1] doesn't reproduce with EL2 debug enabled).
 
-It's an interesting API question. At the moment there is no requirement
-to have an active memslot to set the RIPAS - this is true both during
-the setup by the VMM and at run time.
+[1] https://lore.kernel.org/kvmarm/20241128154406.602875-1-qperret@google.com/
 
-In theory a VMM can create/destroy memslots while the guest is running.
-So absense of a memslot doesn't actually imply that the RIPAS change
-should be rejected. Obviously with realms this is tricky because when
-destroying a memslot that's in use KVM would rip those pages out from
-the guest and it would require guest cooperation to restore those pages
-(transition to RIPAS_EMPTY and back to RIPAS_RAM). But it's not
-something that has been prohibited so far.
+Suggested-by: Will Deacon <will@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/Kconfig                        |  10 ++
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   6 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 110 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   2 +
+ 4 files changed, 128 insertions(+)
 
-On the other hand this is a clear way for a (malicious/buggy) guest to
-use a fair bit of RAM by transitioning to RIPAS_RAM (sparse) pages not
-in a memslot and forcing KVM to allocate the RTT pages to delegate to
-the RMM. But we do exit to the VMM, so this is solvable in the VMM (by
-killing a misbehaving guest). The number of pages this would consume per
-exit is also fairly small.
-
-So my instinct is that we shouldn't impose that requirement.
-
-Any thoughts?
-
-> As for EMPTY requests, if the guest wants to explicitly mark any range
-> as EMPTY, it doesn't matter, as long as it is within the protected IPA.
-> (even though they may be EMPTY in the first place).
-> 
->> +    write_lock(&kvm->mmu_lock);
->> +    ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
->> +    write_unlock(&kvm->mmu_lock);
->> +
->> +    WARN(ret && ret != -ENOMEM,
->> +         "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx, ripas:
->> %#lx\n",
->> +         base, top, ripas);
->> +
->> +    /* Exit to VMM to complete the change */
->> +    kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false,
->> false,
->> +                      ripas == RMI_RAM);
-> 
-> Again this may only be need if the range is backed by a memslot ?
-> Otherwise the VMM has nothing to do.
-
-Assuming the above, then the VMM would be the one to kill a misbehaving
-guest, so would need a notification.
-
-Thanks,
-Steve
-
->> +
->> +    return 0;
->> +}
->> +
->> +static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +
->> +    __vcpu_sys_reg(vcpu, CNTV_CTL_EL0) = rec->run->exit.cntv_ctl;
->> +    __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) = rec->run->exit.cntv_cval;
->> +    __vcpu_sys_reg(vcpu, CNTP_CTL_EL0) = rec->run->exit.cntp_ctl;
->> +    __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) = rec->run->exit.cntp_cval;
->> +
->> +    kvm_realm_timers_update(vcpu);
->> +}
->> +
->> +/*
->> + * Return > 0 to return to guest, < 0 on error, 0 (and set
->> exit_reason) on
->> + * proper exit to userspace.
->> + */
->> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
->> +    unsigned long status, index;
->> +
->> +    status = RMI_RETURN_STATUS(rec_run_ret);
->> +    index = RMI_RETURN_INDEX(rec_run_ret);
->> +
->> +    /*
->> +     * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we
->> might
->> +     * see the following status code and index indicating an attempt
->> to run
->> +     * a REC when the RD state is SYSTEM_OFF.  In this case, we just
->> need to
->> +     * return to user space which can deal with the system event or
->> will try
->> +     * to run the KVM VCPU again, at which point we will no longer
->> attempt
->> +     * to enter the Realm because we will have a sleep request
->> pending on
->> +     * the VCPU as a result of KVM's PSCI handling.
->> +     */
->> +    if (status == RMI_ERROR_REALM && index == 1) {
->> +        vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
->> +        return 0;
->> +    }
->> +
->> +    if (rec_run_ret)
->> +        return -ENXIO;
->> +
->> +    vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
->> +    vcpu->arch.fault.far_el2 = rec->run->exit.far;
->> +    vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar;
->> +
->> +    update_arch_timer_irq_lines(vcpu);
->> +
->> +    /* Reset the emulation flags for the next run of the REC */
->> +    rec->run->enter.flags = 0;
->> +
->> +    switch (rec->run->exit.exit_reason) {
->> +    case RMI_EXIT_SYNC:
->> +        return rec_exit_handlers[esr_ec](vcpu);
->> +    case RMI_EXIT_IRQ:
->> +    case RMI_EXIT_FIQ:
->> +        return 1;
->> +    case RMI_EXIT_PSCI:
->> +        return rec_exit_psci(vcpu);
->> +    case RMI_EXIT_RIPAS_CHANGE:
->> +        return rec_exit_ripas_change(vcpu);
->> +    }
->> +
->> +    kvm_pr_unimpl("Unsupported exit reason: %u\n",
->> +              rec->run->exit.exit_reason);
->> +    vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
->> +    return 0;
->> +}
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index 1fa9991d708b..4c0751231810 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -899,6 +899,25 @@ void kvm_destroy_realm(struct kvm *kvm)
->>       kvm_free_stage2_pgd(&kvm->arch.mmu);
->>   }
->>   +int kvm_rec_enter(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +
->> +    switch (rec->run->exit.exit_reason) {
->> +    case RMI_EXIT_HOST_CALL:
->> +    case RMI_EXIT_PSCI:
->> +        for (int i = 0; i < REC_RUN_GPRS; i++)
->> +            rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
->> +        break;
->> +    }
-> 
-> As mentioned in the patch following (MMIO emulation support), we may be
-> able to do this unconditionally for all REC entries, to cover ourselves
-> from missing out other cases. The RMM is in charge of taking the
-> appropriate action anyways to copy the results back.
-> 
-> Suzuki
-> 
->> +
->> +    if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
->> +        return -EINVAL;
->> +
->> +    return rmi_rec_enter(virt_to_phys(rec->rec_page),
->> +                 virt_to_phys(rec->run));
->> +}
->> +
->>   static void free_rec_aux(struct page **aux_pages,
->>                unsigned int num_aux)
->>   {
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index ead632ad01b4..038d7f52232c 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -46,6 +46,7 @@ menuconfig KVM
+ config NVHE_EL2_DEBUG
+ 	bool "Debug mode for non-VHE EL2 object"
+ 	depends on KVM
++	select PKVM_SELFTESTS
+ 	help
+ 	  Say Y here to enable the debug mode for the non-VHE KVM EL2 object.
+ 	  Failure reports will BUG() in the hypervisor. This is intended for
+@@ -53,6 +54,15 @@ config NVHE_EL2_DEBUG
+ 
+ 	  If unsure, say N.
+ 
++config PKVM_SELFTESTS
++	bool "Protected KVM hypervisor selftests"
++	help
++	  Say Y here to enable Protected KVM (pKVM) hypervisor selftests
++	  during boot. Failure reports will panic the hypervisor. This is
++	  intended for EL2 hypervisor development.
++
++	  If unsure, say N.
++
+ config PROTECTED_NVHE_STACKTRACE
+ 	bool "Protected KVM hypervisor stacktraces"
+ 	depends on NVHE_EL2_DEBUG
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 0972faccc2af..a9b2677227cc 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -90,4 +90,10 @@ static __always_inline void __load_host_stage2(void)
+ 	else
+ 		write_sysreg(0, vttbr_el2);
+ }
++
++#ifdef CONFIG_PKVM_SELFTESTS
++void pkvm_ownership_selftest(void);
++#else
++static inline void pkvm_ownership_selftest(void) { }
++#endif
+ #endif /* __KVM_NVHE_MEM_PROTECT__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index e75374d682f4..6a01ffe3d117 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -1306,3 +1306,113 @@ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
+ 
+ 	return ret;
+ }
++
++#ifdef CONFIG_PKVM_SELFTESTS
++struct pkvm_expected_state {
++	enum pkvm_page_state host;
++	enum pkvm_page_state hyp;
++};
++
++static struct pkvm_expected_state selftest_state;
++static struct hyp_page *selftest_page;
++
++static void assert_page_state(void)
++{
++	void *virt = hyp_page_to_virt(selftest_page);
++	u64 size = PAGE_SIZE << selftest_page->order;
++	u64 phys = hyp_virt_to_phys(virt);
++
++	host_lock_component();
++	WARN_ON(__host_check_page_state_range(phys, size, selftest_state.host));
++	host_unlock_component();
++
++	hyp_lock_component();
++	WARN_ON(__hyp_check_page_state_range((u64)virt, size, selftest_state.hyp));
++	hyp_unlock_component();
++}
++
++#define assert_transition_res(res, fn, ...)		\
++	do {						\
++		WARN_ON(fn(__VA_ARGS__) != res);	\
++		assert_page_state();			\
++	} while (0)
++
++void pkvm_ownership_selftest(void)
++{
++	void *virt = hyp_alloc_pages(&host_s2_pool, 0);
++	u64 phys, size, pfn;
++
++	WARN_ON(!virt);
++	selftest_page = hyp_virt_to_page(virt);
++	selftest_page->refcount = 0;
++
++	size = PAGE_SIZE << selftest_page->order;
++	phys = hyp_virt_to_phys(virt);
++	pfn = hyp_phys_to_pfn(phys);
++
++	selftest_state.host = PKVM_NOPAGE;
++	selftest_state.hyp = PKVM_PAGE_OWNED;
++	assert_page_state();
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
++
++	selftest_state.host = PKVM_PAGE_OWNED;
++	selftest_state.hyp = PKVM_NOPAGE;
++	assert_transition_res(0,	__pkvm_hyp_donate_host, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
++	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
++
++	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
++	selftest_state.hyp = PKVM_PAGE_SHARED_BORROWED;
++	assert_transition_res(0,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
++
++	assert_transition_res(0,	hyp_pin_shared_mem, virt, virt + size);
++	WARN_ON(!hyp_page_count(virt));
++	assert_transition_res(-EBUSY,	__pkvm_host_unshare_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
++
++	hyp_unpin_shared_mem(virt, virt + size);
++	assert_page_state();
++	WARN_ON(hyp_page_count(virt));
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
++
++	selftest_state.host = PKVM_PAGE_OWNED;
++	selftest_state.hyp = PKVM_NOPAGE;
++	assert_transition_res(0,	__pkvm_host_unshare_hyp, pfn);
++
++	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
++	selftest_state.hyp = PKVM_NOPAGE;
++	assert_transition_res(0,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
++	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
++	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
++	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
++
++	selftest_state.host = PKVM_PAGE_OWNED;
++	selftest_state.hyp = PKVM_NOPAGE;
++	assert_transition_res(0,	__pkvm_host_unshare_ffa, pfn, 1);
++
++	selftest_state.host = PKVM_NOPAGE;
++	selftest_state.hyp = PKVM_PAGE_OWNED;
++	assert_transition_res(0,	__pkvm_host_donate_hyp, pfn, 1);
++
++	selftest_page->refcount = 1;
++	hyp_put_page(&host_s2_pool, virt);
++}
++#endif
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index cbdd18cd3f98..d154e80fe6b9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -306,6 +306,8 @@ void __noreturn __pkvm_init_finalise(void)
+ 		goto out;
+ 
+ 	pkvm_hyp_vm_table_init(vm_table_base);
++
++	pkvm_ownership_selftest();
+ out:
+ 	/*
+ 	 * We tail-called to here from handle___pkvm_init() and will not return,
+-- 
+2.47.0.338.g60cca15819-goog
 
