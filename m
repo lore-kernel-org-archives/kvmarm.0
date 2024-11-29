@@ -1,42 +1,44 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8305345C14
-	for <kvmarm@lists.linux.dev>; Fri, 29 Nov 2024 07:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE3A18858A;
+	Fri, 29 Nov 2024 09:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732865213; cv=none; b=NdgaKWYHT8OWXa4Ut1Xrjd/LXFO22NmWYkjwV5qTA6KgBPUlH1Pz2gAy2SYdX4ySvPRPhK8WmOdhtIEFC3SwsDV8mS+q8pQbqAkcmK+zbHMXcwp0b/paBEQftd3g4UOaJjopJQhkCRqt9V+vtTaAgA2rPT/Nw4Xv7pBFq9nnRbM=
+	t=1732874300; cv=none; b=GZPhVCpFvZdKyQECpyeNPH5tTBNMQvbkGo0bm/u9E5yk4wlP+jGjcwqebYWYpy4VMiSy0c36iDrDx5rm43MekfciHwtwUPUH+diLJxVtUbdz1dxg027wWtNBUvoDNJUeDssFMex818dVmn4il4KR49GjsRv8Fdt+gLsuA31VBFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732865213; c=relaxed/simple;
-	bh=2sXAxscyFEEY3aNBPrB6zBL9wfwg975eEleczH6muYI=;
+	s=arc-20240116; t=1732874300; c=relaxed/simple;
+	bh=b3I9qr/L+dZimBd48x5jitIlhaZduHneXsbuO2bUb18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkTlDMwHVdR8DfBDLARRSk1p38FLzwLz3c+TmkGFzwytjc+5n+b6EiL7uzaqjPgC+VIb7snzZFyvRCslfTKDF0SS52qgfCGuqgy9GGMDW25mnbgZRuA36/TUIfvaoKoEqF/vCI13Y23/u8TcK7/NJAdVjQB369w/5UzFYljheKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ORfqKRo/; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=nVmObEo1HvErXJM2PEu7Z4tTQt5aCO/2gkUIZHPM9Nviiei/saUYf9n/eePEfRUAYQMk53j7N5ea9R/HkgNhO466k09beQAfrb2VPewuQJr38Sm51tN71cB1BsBTLX0wpS6PzjsjrwwzLGDZT702TRsPlFMwB/VMXaoUejnmEyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iFb6pMjJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ORfqKRo/"
-Date: Thu, 28 Nov 2024 23:26:39 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732865209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=44JcxRae4fQUKGTMGOSQkaQ/3AVkh0KeoIfo8IhfQzk=;
-	b=ORfqKRo/Fz7VA6LoN70t9lJN7KUPidLpcj1opnibycK6j2PCYkR4ny2wV6ac+fGJ0roO2k
-	hFQ6zGpXMy9Xk6yOZ0fcYl90GoUpHweFfycD12Jnh2aKfcul1RcN+QRyGV0f6JXLg7Ntpo
-	2uJwEs/AHZEBsv1toCKNgkgUZYHeCGM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com,
-	alexandru.elisei@arm.com
-Subject: Re: [PATCH v2 02/16] KVM: arm64: Get rid of __kvm_get_mdcr_el2() and
- related warts
-Message-ID: <Z0lsr3PwMULIst14@linux.dev>
-References: <20241115224924.2132364-3-oliver.upton@linux.dev>
- <gsntcyif179t.fsf@coltonlewis-kvm.c.googlers.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iFb6pMjJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB079C4CECF;
+	Fri, 29 Nov 2024 09:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732874298;
+	bh=b3I9qr/L+dZimBd48x5jitIlhaZduHneXsbuO2bUb18=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iFb6pMjJb/KBhpXJDU4lD2/QSmEZSL9NfXB4ZXJsE2d4Ar20NhTU6SIq1pm/2toNK
+	 SFCVBGfwais5M7ThYzZmGS8nyNZRCRobUPYgY9CXmju+3tj26he6AjSrZPKAWTon7i
+	 0aYPYGVHQ9+y5O/DHVOSWPy+cVgAx7vysrOyCCQY8lHuFCwQkrCoS3mqUrzq9MaJ7k
+	 NWKAU3n4X94fqxBYIQcx/k4xUikiqr7r7fqwgFzmqTBtqHW84/z8dGWJBnUqoyCgay
+	 i2D5Syv4+8LaeCmnhJ29ZJNN10krGaV8ddfNm3jriQ0T7Tpaipn+5npT4YHc1H5e1X
+	 IMW1VI2DLo0Ag==
+Date: Fri, 29 Nov 2024 09:58:13 +0000
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Always check the state from hyp_ack_unshare()
+Message-ID: <20241129095812.GA4298@willie-the-truck>
+References: <20241128154406.602875-1-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,47 +47,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <gsntcyif179t.fsf@coltonlewis-kvm.c.googlers.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20241128154406.602875-1-qperret@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi Colton,
-
-On Thu, Nov 28, 2024 at 07:35:10PM +0000, Colton Lewis wrote:
-> Oliver Upton <oliver.upton@linux.dev> writes:
-> > -/**
-> > - * kvm_arm_init_debug - grab what we need for debug
-> > - *
-> > - * Currently the sole task of this function is to retrieve the initial
-> > - * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
-> > - * presumably been set-up by some knowledgeable bootcode.
-> > - *
-> > - * It is called once per-cpu during CPU hyp initialisation.
-> > - */
-> > -
-> > -void kvm_arm_init_debug(void)
-> > -{
-> > -	__this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
-> > -}
-> > -
-> >   /**
-> >    * kvm_arm_setup_mdcr_el2 - configure vcpu mdcr_el2 value
-> >    *
-> > @@ -94,7 +77,8 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu
-> > *vcpu)
-> >   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
-> >   	 * to disable guest access to the profiling and trace buffers
-> >   	 */
-> > -	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
-> > +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
+On Thu, Nov 28, 2024 at 03:44:06PM +0000, Quentin Perret wrote:
+> There are multiple pKVM memory transitions where the state of a page is
+> not cross-checked from the completer's PoV for performance reasons.
+> For example, if a page is PKVM_PAGE_OWNED from the initiator's PoV,
+> we should be guaranteed by construction that it is PKVM_NOPAGE for
+> everybody else, hence allowing us to save a page-table lookup.
 > 
-> MDCR_EL2_HPMN is not defined
+> When it was introduced, hyp_ack_unshare() followed that logic and bailed
+> out without checking the PKVM_PAGE_SHARED_BORROWED state in the
+> hypervisor's stage-1. This was correct as we could safely assume that
+> all host-initiated shares were directed at the hypervisor at the time.
+> But with the introduction of other types of shares (e.g. for FF-A or
+> non-protected guests), it is now very much required to cross check this
+> state to prevent the host from running __pkvm_host_unshare_hyp() on a
+> page shared with TZ or a non-protected guest.
+> 
+> Thankfully, if an attacker were to try this, the hyp_unmap() call from
+> hyp_complete_unshare() would fail, hence causing to WARN() from
+> __do_unshare() with the host lock held, which is fatal. But this is
+> fragile at best, and can hardly be considered a security measure.
+> 
+> Let's just do the right thing and always check the state from
+> hyp_ack_unshare().
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index caba3e4bd09e..e75374d682f4 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -783,9 +783,6 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
+>  	if (tx->initiator.id == PKVM_ID_HOST && hyp_page_count((void *)addr))
+>  		return -EBUSY;
+>  
+> -	if (__hyp_ack_skip_pgtable_check(tx))
+> -		return 0;
+> -
 
-As of commit 641630313e9c ("arm64: sysreg: Migrate MDCR_EL2 definition to
-table") the field definitions for MDCR_EL2 are generated from the sysreg
-table.
+Acked-by: Will Deacon <will@kernel.org>
 
-The generated header defines this macro.
+I suppose __hyp_ack_skip_pgtable_check() is now quite poorly named,
+since we only want to use it in cases where the page is PKVM_PAGE_OWNED
+by the initiator. Hopefully nobody smart tries to add it back here!
 
--- 
-Thanks,
-Oliver
+Will
