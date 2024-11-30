@@ -1,85 +1,94 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829878468
-	for <kvmarm@lists.linux.dev>; Sat, 30 Nov 2024 03:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041B21A00E7
+	for <kvmarm@lists.linux.dev>; Sat, 30 Nov 2024 14:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732936116; cv=none; b=LcpCmCED6Bx9EHEEXttYyzccbQ9tK0nTnOlbp+0CMI3s6OJQDPg1UGznZNLDT10/Z+JlI5Xg3FhGjqdRvRPse2wFTu9j02wtmm2vJM+Eb4Mbr8i3o0MweZ20FRxx2DMmxTx718Ll1625jKizU3F1EbrtaiQN8Zb0unuVaBN7qqI=
+	t=1732978351; cv=none; b=DF328m6RKT3RbtWZKcQcOMqcVQ5ViqIgxBS1hH2ByBWpeSG6ihKcP8HLcWFWlNBSYOxjJMLbDXS1eAtuQWSyajGHkqVxxcft7YIn464ETW9kqhtLl8AxtbLZQ9siN/Y1P3C3ueSoSdHXl1BIbwnhH6nJKjJPiPy0UyaH/e/GvcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732936116; c=relaxed/simple;
-	bh=P62PUULtg2tZ7gwut1t8nu8Sl+WumtgWk/uWg0wKUDY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VUh3nW6XKhMctKnTEy69yrJwGnI3Ed2V14se4DPyUSCb+o2l9wyEkPXDoKCugqpPv2QvorZCO7gnp3l+parh3AWx+7guHLXSU2NYXgxY36nVP1jhDdrh7S8ZwjTJYPVRt+fYIbMxtGUiDYrUnnGYEp3Iqxq4P8OrYxNt2x3dUz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GYgdfe0N; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1732978351; c=relaxed/simple;
+	bh=vWtaSN8rM2LTTGXH10O1fuLhKy3XoxYmtA3uc2UghMo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQC7AAkmm/Xk/pLSBuyNrtBdDxw6krWicRyOXh2p/FjkrOOTSx3ix5738R/kspQCxxjMOBM9P50JoEQPxyRAarvKqskmx4l43WZeZQssuBSqa0+yBomEWYk9965Lm1qs6/rTL04/knrgZgyD4MiGO0zHYGlDAbiHtBH1c60VpGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=gv5W27rd; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GYgdfe0N"
-Date: Fri, 29 Nov 2024 21:08:11 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732936111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K/lAtWcFTD6GkIKKqZ6pvrO58pPk9/bQpGVGvjlQ4EE=;
-	b=GYgdfe0NHKRCfGTDQ+TGiieRIreb5gvT1ozPwimEFY38N+XyKBi+4dPbvbXNSADeVHHU/I
-	GbWfTDTRoziFSC1+Tm3ZOer4EnH42O/sIqu5/Qu/wdzBZl8/WVMqPGxi0jtsQ2Xtrk8uxP
-	JhKpgDsgfCenAe0/NYXRChOQIW28Wxs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@linaro.org>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="gv5W27rd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KVUate8IXpTBbdunUcVuF5j0MQrmSQF2pil6K03dYso=;
+  b=gv5W27rdpCkbRSK7XMVvcHiht2gPVnSfkqIwFyAKLkimob8gepRK/xD2
+   dPQuJk8bbkIdhP+KmJyq8EF5Hegbhn28vix1h3Ve3VYjS717yVpRQrtCE
+   u8O2PCw6ewh0RdQdlnG4JCGthkIID8p1HRu+76N+1BCnDKze8j3BBiaV5
+   k=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=keisuke.nishimura@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.12,198,1728943200"; 
+   d="scan'208";a="103063229"
+Received: from nr-lil-536.grid5000.fr (HELO gros-67.nancy.grid5000.fr) ([194.254.60.35])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2024 15:52:25 +0100
+From: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 00/16] KVM: arm64: Debug cleanups
-Message-ID: <Z0qBau21-XN7NGVZ@linux.dev>
-References: <20241115224924.2132364-1-oliver.upton@linux.dev>
- <5edb7c69-f548-4651-8b63-1643c5b13dac@linaro.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>
+Subject: [PATCH v2] KVM: arm/arm64: vgic-its: Add error handling in vgic_its_cache_translation
+Date: Sat, 30 Nov 2024 15:49:53 +0100
+Message-Id: <20241130144952.23729-1-keisuke.nishimura@inria.fr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5edb7c69-f548-4651-8b63-1643c5b13dac@linaro.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-Hey James,
+The return value of xa_store() needs to be checked. This fix adds an
+error handling path that resolves the kref inconsistency on failure. As
+suggested by Oliver Upton, this function does not return the error code
+intentionally because the translation cache is best effort.
 
-On Fri, Nov 22, 2024 at 11:08:22AM +0000, James Clark wrote:
-> 
-> 
-> On 15/11/2024 10:49 pm, Oliver Upton wrote:
-> > Second pass at cleaning up the mess of debug support / trap
-> > configuration we have.
-> > 
-> > Marc, I haven't yet gotten around to moving the per-CPU value of
-> > mdcr_el2 into kvm_host_data. If you're alright with it, I'd like
-> > to clean up the configuration + storage of all the trap registers
-> > in a separate series, especially the pKVM bits of it.
-> > 
-> > Tested the userspace-facing parts by single-stepping + setting
-> > breakpoints for a guest using QEMU's gdbstub. Tested the guest-facing
-> > side of things with the debug-exceptions selftest.
-> > 
-> 
-> Hi Oliver,
-> 
-> I get this bug when running the selftests, but the tests themselves seem to
-> pass ok:
+Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
+Signed-off-by: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-Thanks for taking the series for a spin!
-
-Yeah, this is a pretty damn obvious one, since kvm_arm_setup_mdcr_el2()
-dereferences per-CPU data. I'll clean that up in v3.
-
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 198296933e7e..a08835d00aba 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -573,12 +573,22 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 	lockdep_assert_held(&its->its_lock);
+ 	vgic_get_irq_kref(irq);
+ 
++	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
++
++	/*
++	 * Put the reference taken on @irq if the store fails. Intentionally do
++	 * not return the error as the translation cache is best effort.
++	 */
++	if (xa_is_err(old)) {
++		vgic_put_irq(kvm, irq);
++		return;
++	}
++
+ 	/*
+ 	 * We could have raced with another CPU caching the same
+ 	 * translation behind our back, ensure we don't leak a
+ 	 * reference if that is the case.
+ 	 */
+-	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+ 	if (old)
+ 		vgic_put_irq(kvm, old);
+ }
 -- 
-Thanks,
-Oliver
+2.34.1
+
