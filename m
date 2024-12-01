@@ -1,63 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B689172777
-	for <kvmarm@lists.linux.dev>; Sun,  1 Dec 2024 12:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A28F18A932
+	for <kvmarm@lists.linux.dev>; Sun,  1 Dec 2024 12:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733055692; cv=none; b=Ao01Aj/t+JN1euwEjRGy0vRmvETR9y2mV8DASs2RoI0h/25jrBSy9RQIHeMN8m05XzUC3QqXf84JYCQtgp/zmZ2KfU13gII93XAOWe5Sq/NY3YxSclHawS/mvlO3yyM/ymf7rOoeLKjSdWkO6zRE2oR0vfgUC6Bzsq5fQ9sP7u8=
+	t=1733057930; cv=none; b=LO4IzyTZhfjIOdXOnKH4GwmmybtNxMoj5IXwxbRrCV2XTNr/XEf7ummNchenKxlMXgx1HEjI1C/aZu//2lj6azdsoVBpRucN7xpGVghx9GgoJn3Ubjq/LC5rHHnCMMs2mB8ftMzEL+kJdZYRRMCpFvyh16I5cuHUvefuF7sl0i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733055692; c=relaxed/simple;
-	bh=4r2/wOFaxgbY5isfxo+Xp/nT3M5E4pY/PU2qBkrj+Do=;
+	s=arc-20240116; t=1733057930; c=relaxed/simple;
+	bh=K5HxLjFhSeqkuLos2FkxO1o76r5WteSqxvKnLCqq5sg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mWOZ5QsAoafcxedWXJSKrhL+JfScd/N5s4G05Lcwscf3DaVOAoqhfaPWJZWr/H5RjxXAAjE6GBcIRKz3KOrHnu6c5p3YaRY5Rz/bErygj4ug/2NWNvOmkGir9cd8GKmMdOjINZpPy6cuWwcXk6IrLGZLIaabgdVRTIGubZhfPD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkgy2Qdj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=EhPqyrqcQMr8EKQDPxSpI5EkfD2FbjEdK9cinmBReXhKpHWMi/tU09gBhKMRlZ5S+Mx8SCFYNC3OhRb4VqWJzyJTq1w3qKu2E8l91F/tg6E4o8BgnbNcUiN+S+Zh9DpOAgOBgwLXb7s7sPGA7OisdJkFeCkui1gqxzMJshBZCGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBdWhTKt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkgy2Qdj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3082CC4CECF;
-	Sun,  1 Dec 2024 12:21:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBdWhTKt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE660C4CED2;
+	Sun,  1 Dec 2024 12:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733055692;
-	bh=4r2/wOFaxgbY5isfxo+Xp/nT3M5E4pY/PU2qBkrj+Do=;
+	s=k20201202; t=1733057929;
+	bh=K5HxLjFhSeqkuLos2FkxO1o76r5WteSqxvKnLCqq5sg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gkgy2QdjrPnkk+E40GxpG6ntwrkv/YO+ZG80dhITkYPHEUoO/1+GPtlyyeuGTo5NJ
-	 wXcJ/aPEa6T7QZpOKGmThGq4kXH4OsDtF/H690qGQz6z3qINb6upuepVByJo5ZCGTJ
-	 t8sZzBJZbKLxFV61Zr0/yO5c/ZdtrKmx4NiKFCOHW5CzED2a6hoZjnYHQuG0uHt8yC
-	 7d7crD+V9kmZs3Yhj4LY9MUeRf3Rf2rCpCeNlmEfrWON2lnWnBONRmT9wh+IRQp+7B
-	 IXqi+y3PO/IyH2uDDKP3KkoTV+cUrZijLikfy2nkb01Zg8J3zUfUyyjwp++c4VjJik
-	 WkebjU0e0XLBw==
+	b=YBdWhTKtrRzSZg7iiPmUQ5mP6g7L6pgnSwZFJmAN3jg5pDRr/T3wSL8Va9snHqycT
+	 mBHFSVjuUPcZUaatdYhje/M6zZySThO/gZZInoUD2HekUl0DlL9JGVTFRzDpS6hmSY
+	 ItgSdw3LeYeu0SAveyPJ2YVryW07CjJGKTFfJkUIl3B4oURUbax88aeBsneWHmsxp8
+	 MkQ8coGeFcCqKcxd4+SMcbrincLUcGd5XrbHMooODI9s8QQ4TLlpm6UaS+g4zYW3Dr
+	 qA1HGqwyT6lLBcRkpglzIHD6QnfP6OPiH+rli1EXbshfT/tKJXrX3ZJSaEYC8P8g4I
+	 OmiZbSEahARoQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tHix7-00H5Lr-Pe;
-	Sun, 01 Dec 2024 12:21:29 +0000
-Date: Sun, 01 Dec 2024 12:21:29 +0000
-Message-ID: <865xo3vbjq.wl-maz@kernel.org>
+	id 1tHjXD-00H5cV-GZ;
+	Sun, 01 Dec 2024 12:58:47 +0000
+Date: Sun, 01 Dec 2024 12:58:47 +0000
+Message-ID: <864j3nv9tk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: Sebastian Ott <sebott@redhat.com>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	yuzenghui <yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	Linuxarm <linuxarm@huawei.com>,
-	"reijiw@google.com" <reijiw@google.com>
-Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-In-Reply-To: <c879fda9-db5a-4743-805d-03c0acba8060@redhat.com>
-References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
-	<86v804z3lk.wl-maz@kernel.org>
-	<b2dad37ac5464384abe4edf76cb6b546@huawei.com>
-	<4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
-	<87zfllssji.wl-maz@kernel.org>
-	<c879fda9-db5a-4743-805d-03c0acba8060@redhat.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	james.clark@linaro.org,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	broonie@kernel.org,
+	qperret@google.com,
+	kristina.martsenko@arm.com
+Subject: Re: [PATCH v3 14/15] KVM: arm64: Convert the SVE guest vcpu flag to a vm flag
+In-Reply-To: <20241128123515.1709777-15-tabba@google.com>
+References: <20241128123515.1709777-1-tabba@google.com>
+	<20241128123515.1709777-15-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,64 +63,118 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com, reijiw@google.com
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, kristina.martsenko@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hey Eric,
-
-On Thu, 28 Nov 2024 09:31:08 +0000,
-Eric Auger <eauger@redhat.com> wrote:
+On Thu, 28 Nov 2024 12:35:14 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Hi Marc,
+> The vcpu flag GUEST_HAS_SVE is per-vcpu, but it is based on what
+> is now a per-vm feature. Make the flag per-vm.
 > 
-> On 11/26/24 20:29, Marc Zyngier wrote:
-> > Finally, who is going to ensure this keeps working in the foreseeable
-> > future? Because while this is nice, that's not what gets deployed in
-> > production, as it leads to unpredictable performances. My take is that
-> > this thing will eventually bitrot and die.
-> In the context of our works to define qemu vcpu models for ARM
-> (https://lore.kernel.org/all/20241025101959.601048-1-eric.auger@redhat.com/)
-> , our current approach is to try migrating between modern HW we have
-> access to. The case above is migration between AmpereOne and Grace which
-> both should be prevalent systems. Do you think this does not make sense
-> at all to try migrating between those, alhough this may be challenging?
-
-I don't mind the challenge. But I'm worried this is something that
-looks like a reasonable idea that doesn't get any traction in
-practice.
-
-And the example you mention is pretty striking: who in their right
-mind would migrate between these two systems? If you deploy a Grace
-system, that's because you are making use of the GPU, and your VM is
-likely to require it. Conversely, if you run on an Ampere system, you
-don't want to use a valuable (read: bloody expensive) slot on a Grace
-machine.
-
-> Other cases we have looked at are migration within Ampere Altra Max
-> system family (which should be hopefully fine now with have CTR_EL0
-> works from Sebastian upstream), mig between Graviton hosts. Wrt Ampere
-> Altra Max to AmpereOne, Oliver pointed out the cntfrq issue which is
-> blocking.
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h    |  6 +++---
+>  arch/arm64/include/asm/kvm_host.h       | 10 ++++++----
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 11 +++++++----
+>  arch/arm64/kvm/hyp/nvhe/switch.c        |  8 ++++----
+>  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+>  arch/arm64/kvm/reset.c                  |  2 +-
+>  8 files changed, 24 insertions(+), 19 deletions(-)
 > 
-> Do you think we should restrict our studies to systems which are
-> "closer" to each other in terms of ARM spec rev. We throught that
-> migration bewteen AmpereOne And Grace would be an interesting POC and
-> not totally irrelevant in terms of industry.
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 406e99a452bf..ae6d0dc0e4ff 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -620,7 +620,7 @@ static __always_inline void kvm_write_cptr_el2(u64 val)
+>  }
+>  
+>  /* Resets the value of cptr_el2 when returning to the host. */
+> -static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+> +static __always_inline void kvm_reset_cptr_el2(struct kvm *kvm)
 
-These two implementations may be close in terms of CPU features. But
-as systems, they are massively different, and I very much doubt they
-have the same deployment story. If they have one at all.
+I'd rather you avoid the resulting churn:
 
-The Graviton story may have more traction, but these folks have their
-own way of doing things, and in my experience do not give upstream
-much consideration.
+static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+{
+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+	[...]
 
-To sum it up, I'm not opposed to this work. But if we are going to
-carry this sort of complex emulation, I want someone to step up and
-promise that they will test it for the next 10 years, at the very
-least. Because I'm very unlikely to ever have access to any of these
-machines, let alone both, and I don't see people using it in practice.
+which does the trick at zero cost. It is also more logical to keep the
+vcpu as a parameter, as the per-VM-ness is only an implementation
+detail.
+
+>  {
+>  	u64 val;
+>  
+> @@ -631,14 +631,14 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+>  	} else if (has_hvhe()) {
+>  		val = CPACR_ELx_FPEN;
+>  
+> -		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
+> +		if (!kvm_has_sve(kvm) || !guest_owns_fp_regs())
+>  			val |= CPACR_ELx_ZEN;
+>  		if (cpus_have_final_cap(ARM64_SME))
+>  			val |= CPACR_ELx_SMEN;
+>  	} else {
+>  		val = CPTR_NVHE_EL2_RES1;
+>  
+> -		if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
+> +		if (kvm_has_sve(kvm) && guest_owns_fp_regs())
+>  			val |= CPTR_EL2_TZ;
+>  		if (!cpus_have_final_cap(ARM64_SME))
+>  			val |= CPTR_EL2_TSM;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 680ecef1d7aa..c5c80c789ad0 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -331,6 +331,8 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
+>  	/* Fine-Grained UNDEF initialised */
+>  #define KVM_ARCH_FLAG_FGU_INITIALIZED			8
+> +	/* SVE exposed to guest */
+> +#define KVM_ARCH_FLAG_GUEST_HAS_SVE			9
+>  	unsigned long flags;
+>  
+>  	/* VM-wide vCPU feature set */
+> @@ -862,8 +864,6 @@ struct kvm_vcpu_arch {
+>  #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
+>  #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
+>  
+> -/* SVE exposed to guest */
+> -#define GUEST_HAS_SVE		__vcpu_single_flag(cflags, BIT(0))
+>  /* SVE config completed */
+>  #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
+>  /* KVM_ARM_VCPU_INIT completed */
+> @@ -956,8 +956,10 @@ struct kvm_vcpu_arch {
+>  				 KVM_GUESTDBG_USE_HW | \
+>  				 KVM_GUESTDBG_SINGLESTEP)
+>  
+> -#define vcpu_has_sve(vcpu) (system_supports_sve() &&			\
+> -			    vcpu_get_flag(vcpu, GUEST_HAS_SVE))
+> +#define kvm_has_sve(kvm)	\
+> +	test_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &(kvm)->arch.flags)
+> +#define vcpu_has_sve(vcpu)	\
+> +	kvm_has_sve((vcpu)->kvm)
+
+Two things:
+
+- it is definitely worth keeping the system_supports_sve() helper, so
+  that we avoid checking flags for nothing
+
+- Since you preserve the vcpu_has_sve(), how about writing it as:
+
+#ifdef __KVM_NVHE_HYPERVISOR__
+#define vcpu_has_sve(v)		kvm_has_sve(kern_hyp_va((v)->kvm))
+#else
+#define vcpu_has_sve(v)		kvm_has_sve((v)->kvm)
+#endif
+
+  which will avoid the churn in this patch, and makes it hard to get
+  it wrong?
 
 Thanks,
 
