@@ -1,94 +1,136 @@
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041B21A00E7
-	for <kvmarm@lists.linux.dev>; Sat, 30 Nov 2024 14:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B689172777
+	for <kvmarm@lists.linux.dev>; Sun,  1 Dec 2024 12:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732978351; cv=none; b=DF328m6RKT3RbtWZKcQcOMqcVQ5ViqIgxBS1hH2ByBWpeSG6ihKcP8HLcWFWlNBSYOxjJMLbDXS1eAtuQWSyajGHkqVxxcft7YIn464ETW9kqhtLl8AxtbLZQ9siN/Y1P3C3ueSoSdHXl1BIbwnhH6nJKjJPiPy0UyaH/e/GvcU=
+	t=1733055692; cv=none; b=Ao01Aj/t+JN1euwEjRGy0vRmvETR9y2mV8DASs2RoI0h/25jrBSy9RQIHeMN8m05XzUC3QqXf84JYCQtgp/zmZ2KfU13gII93XAOWe5Sq/NY3YxSclHawS/mvlO3yyM/ymf7rOoeLKjSdWkO6zRE2oR0vfgUC6Bzsq5fQ9sP7u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732978351; c=relaxed/simple;
-	bh=vWtaSN8rM2LTTGXH10O1fuLhKy3XoxYmtA3uc2UghMo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQC7AAkmm/Xk/pLSBuyNrtBdDxw6krWicRyOXh2p/FjkrOOTSx3ix5738R/kspQCxxjMOBM9P50JoEQPxyRAarvKqskmx4l43WZeZQssuBSqa0+yBomEWYk9965Lm1qs6/rTL04/knrgZgyD4MiGO0zHYGlDAbiHtBH1c60VpGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=gv5W27rd; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+	s=arc-20240116; t=1733055692; c=relaxed/simple;
+	bh=4r2/wOFaxgbY5isfxo+Xp/nT3M5E4pY/PU2qBkrj+Do=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mWOZ5QsAoafcxedWXJSKrhL+JfScd/N5s4G05Lcwscf3DaVOAoqhfaPWJZWr/H5RjxXAAjE6GBcIRKz3KOrHnu6c5p3YaRY5Rz/bErygj4ug/2NWNvOmkGir9cd8GKmMdOjINZpPy6cuWwcXk6IrLGZLIaabgdVRTIGubZhfPD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkgy2Qdj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="gv5W27rd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KVUate8IXpTBbdunUcVuF5j0MQrmSQF2pil6K03dYso=;
-  b=gv5W27rdpCkbRSK7XMVvcHiht2gPVnSfkqIwFyAKLkimob8gepRK/xD2
-   dPQuJk8bbkIdhP+KmJyq8EF5Hegbhn28vix1h3Ve3VYjS717yVpRQrtCE
-   u8O2PCw6ewh0RdQdlnG4JCGthkIID8p1HRu+76N+1BCnDKze8j3BBiaV5
-   k=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=keisuke.nishimura@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.12,198,1728943200"; 
-   d="scan'208";a="103063229"
-Received: from nr-lil-536.grid5000.fr (HELO gros-67.nancy.grid5000.fr) ([194.254.60.35])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2024 15:52:25 +0100
-From: Keisuke Nishimura <keisuke.nishimura@inria.fr>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>
-Subject: [PATCH v2] KVM: arm/arm64: vgic-its: Add error handling in vgic_its_cache_translation
-Date: Sat, 30 Nov 2024 15:49:53 +0100
-Message-Id: <20241130144952.23729-1-keisuke.nishimura@inria.fr>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkgy2Qdj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3082CC4CECF;
+	Sun,  1 Dec 2024 12:21:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733055692;
+	bh=4r2/wOFaxgbY5isfxo+Xp/nT3M5E4pY/PU2qBkrj+Do=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gkgy2QdjrPnkk+E40GxpG6ntwrkv/YO+ZG80dhITkYPHEUoO/1+GPtlyyeuGTo5NJ
+	 wXcJ/aPEa6T7QZpOKGmThGq4kXH4OsDtF/H690qGQz6z3qINb6upuepVByJo5ZCGTJ
+	 t8sZzBJZbKLxFV61Zr0/yO5c/ZdtrKmx4NiKFCOHW5CzED2a6hoZjnYHQuG0uHt8yC
+	 7d7crD+V9kmZs3Yhj4LY9MUeRf3Rf2rCpCeNlmEfrWON2lnWnBONRmT9wh+IRQp+7B
+	 IXqi+y3PO/IyH2uDDKP3KkoTV+cUrZijLikfy2nkb01Zg8J3zUfUyyjwp++c4VjJik
+	 WkebjU0e0XLBw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tHix7-00H5Lr-Pe;
+	Sun, 01 Dec 2024 12:21:29 +0000
+Date: Sun, 01 Dec 2024 12:21:29 +0000
+Message-ID: <865xo3vbjq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: Sebastian Ott <sebott@redhat.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	yuzenghui <yuzenghui@huawei.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	Linuxarm <linuxarm@huawei.com>,
+	"reijiw@google.com" <reijiw@google.com>
+Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+In-Reply-To: <c879fda9-db5a-4743-805d-03c0acba8060@redhat.com>
+References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
+	<86v804z3lk.wl-maz@kernel.org>
+	<b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+	<4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
+	<87zfllssji.wl-maz@kernel.org>
+	<c879fda9-db5a-4743-805d-03c0acba8060@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The return value of xa_store() needs to be checked. This fix adds an
-error handling path that resolves the kref inconsistency on failure. As
-suggested by Oliver Upton, this function does not return the error code
-intentionally because the translation cache is best effort.
+Hey Eric,
 
-Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
-Signed-off-by: Keisuke Nishimura <keisuke.nishimura@inria.fr>
----
- arch/arm64/kvm/vgic/vgic-its.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+On Thu, 28 Nov 2024 09:31:08 +0000,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 11/26/24 20:29, Marc Zyngier wrote:
+> > Finally, who is going to ensure this keeps working in the foreseeable
+> > future? Because while this is nice, that's not what gets deployed in
+> > production, as it leads to unpredictable performances. My take is that
+> > this thing will eventually bitrot and die.
+> In the context of our works to define qemu vcpu models for ARM
+> (https://lore.kernel.org/all/20241025101959.601048-1-eric.auger@redhat.com/)
+> , our current approach is to try migrating between modern HW we have
+> access to. The case above is migration between AmpereOne and Grace which
+> both should be prevalent systems. Do you think this does not make sense
+> at all to try migrating between those, alhough this may be challenging?
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 198296933e7e..a08835d00aba 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -573,12 +573,22 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	lockdep_assert_held(&its->its_lock);
- 	vgic_get_irq_kref(irq);
- 
-+	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
-+
-+	/*
-+	 * Put the reference taken on @irq if the store fails. Intentionally do
-+	 * not return the error as the translation cache is best effort.
-+	 */
-+	if (xa_is_err(old)) {
-+		vgic_put_irq(kvm, irq);
-+		return;
-+	}
-+
- 	/*
- 	 * We could have raced with another CPU caching the same
- 	 * translation behind our back, ensure we don't leak a
- 	 * reference if that is the case.
- 	 */
--	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
- 	if (old)
- 		vgic_put_irq(kvm, old);
- }
+I don't mind the challenge. But I'm worried this is something that
+looks like a reasonable idea that doesn't get any traction in
+practice.
+
+And the example you mention is pretty striking: who in their right
+mind would migrate between these two systems? If you deploy a Grace
+system, that's because you are making use of the GPU, and your VM is
+likely to require it. Conversely, if you run on an Ampere system, you
+don't want to use a valuable (read: bloody expensive) slot on a Grace
+machine.
+
+> Other cases we have looked at are migration within Ampere Altra Max
+> system family (which should be hopefully fine now with have CTR_EL0
+> works from Sebastian upstream), mig between Graviton hosts. Wrt Ampere
+> Altra Max to AmpereOne, Oliver pointed out the cntfrq issue which is
+> blocking.
+> 
+> Do you think we should restrict our studies to systems which are
+> "closer" to each other in terms of ARM spec rev. We throught that
+> migration bewteen AmpereOne And Grace would be an interesting POC and
+> not totally irrelevant in terms of industry.
+
+These two implementations may be close in terms of CPU features. But
+as systems, they are massively different, and I very much doubt they
+have the same deployment story. If they have one at all.
+
+The Graviton story may have more traction, but these folks have their
+own way of doing things, and in my experience do not give upstream
+much consideration.
+
+To sum it up, I'm not opposed to this work. But if we are going to
+carry this sort of complex emulation, I want someone to step up and
+promise that they will test it for the next 10 years, at the very
+least. Because I'm very unlikely to ever have access to any of these
+machines, let alone both, and I don't see people using it in practice.
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
