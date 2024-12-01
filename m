@@ -1,57 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878D11C6F55
-	for <kvmarm@lists.linux.dev>; Sun,  1 Dec 2024 13:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696A41CBA0D
+	for <kvmarm@lists.linux.dev>; Sun,  1 Dec 2024 13:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733058000; cv=none; b=pTOJL27qZBU0vsSeCUMS7eC2fjqQIRSq5aUo3ickGyDCy/uL1hzwIAexPGpC0JktFCk9tEKPIGzXZYf2yPA5XEkcPjEF/mgxcPBra22VZmrPtSZRGroEOm9sZwbK8pE4ZeslCiwUB2ewVtMAcG6saoRHdulUFlMA5mfXUsENxmY=
+	t=1733058997; cv=none; b=Tm7Map4lHLXzOGRWyPX4A+sLHZ1Razdi5VyM7XDoqcPFxo96YXSI0XlkTLLzb7jHTvdy6E+xYGEfIJcVZSRhUK2o/DinGb/yr+srkJRG4lluihojK+c0tfu911FtoIGCle1mMNEek2FVc1cU3uVluF1A64nDPt4cHlUSQbyJTYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733058000; c=relaxed/simple;
-	bh=rJ2QT5zdZCcicZCA5CYn52IYa+shkRrR7BWOCgTczTY=;
+	s=arc-20240116; t=1733058997; c=relaxed/simple;
+	bh=D/tMuGcuiny7dzl2GtTl+VJFpMy2gJYiFwvnFSRHGr0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ua3p6CrZIBRvBKKmaz+mqTWZNc9OuRTZz0axVA87GUZ4vOxqpoUYc+kEsfIPz8Fyt17WjmpeGps7YaxSKR3F//N64045dLY9FNYXduB7bQfPulQFt0agTMwZjuurrdZZHIiyrhwhYpFaLELhB/Bm8hjcWZNjqxkRe1KpJOZgmVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFJqh0oH; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=jeXiLI0AI63QSWgon98QaJwNuiGwvZmf7b8vD+eoVtYxQBe2c3HiNN+NRmwknntiifoP/nuOhOaBSKfLutF5Kc8PI+znJvPSur8R5cqIRxdqc5l8b6JJQq8LAHLQRp5xb9ltpQPzNVLCiTbyjRaVKUUkAeSoPI2iJHa5CV8gL5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DeMbfrle; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFJqh0oH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65B32C4CED2;
-	Sun,  1 Dec 2024 13:00:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DeMbfrle"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46683C4CECF;
+	Sun,  1 Dec 2024 13:16:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733058000;
-	bh=rJ2QT5zdZCcicZCA5CYn52IYa+shkRrR7BWOCgTczTY=;
+	s=k20201202; t=1733058997;
+	bh=D/tMuGcuiny7dzl2GtTl+VJFpMy2gJYiFwvnFSRHGr0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nFJqh0oHiEMQheCx5FclnuhzgfjMYszMeaB2SPW7LQzflxQl7WLGT2nXSeTAhGtXx
-	 BQxKLw4ySy2bAlGUz+oXSmSZu3BMBUaIAGmAKlDJZWuGfj9hejU3oyPzymVSgKnajb
-	 41p2ChcNgp7xZkxdXn8izhOhL7a7im1YTz89EZugRwARud9m01bekz4eZ1bsyflIqh
-	 OPUGQ+LIoyFxXiC19w8bqb3mnKLyM9xzThwI/PZx6mo2AyW6bFFSABlOPJwvAvM+HW
-	 GDfpB2tjT8lANxpxpcej4hOSLvTW84yD1iMJkA+lD4HTWW9z789QjmpvUkTreFgXyQ
-	 sICfzXVO8k09A==
+	b=DeMbfrle9NTkWZ3ejSj0oFeAXRDJo9xeGchHORzDhM8AebCoOHUtdq7+t1e0z1QKb
+	 DBj5JAXwNOSpd8AXR1jJ0jA6DW75dDBa/XuCY/3yTpmP9CQxWE737VD0VOwkNm7r4A
+	 Ha8KIOCCWkIOd2mzbbySTo3eB5bEpboyBEZRTlbdcj+leZ2fQXjwAHE4EZysueMPRQ
+	 EnW3DW0f0+DQhd3EB1UXt61N83MeJVG89n/H0A9yLekNUhuDeWe/VbgOegv/1/LDK5
+	 R3o48Wbv1INHF+6iK/3q4MkzX4UNJ98j0NIljLbl2+dVoSF8iCdgTQ6GOX6ryCzZrF
+	 xG5t++u3vU0Eg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tHjYM-00H5dg-7Y;
-	Sun, 01 Dec 2024 12:59:58 +0000
-Date: Sun, 01 Dec 2024 12:59:57 +0000
-Message-ID: <8634j7v9rm.wl-maz@kernel.org>
+	id 1tHjoR-00H5oO-5g;
+	Sun, 01 Dec 2024 13:16:35 +0000
+Date: Sun, 01 Dec 2024 13:16:34 +0000
+Message-ID: <861pyrv8zx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
+To: Keisuke Nishimura <keisuke.nishimura@inria.fr>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	james.clark@linaro.org,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	broonie@kernel.org,
-	qperret@google.com,
-	kristina.martsenko@arm.com
-Subject: Re: [PATCH v3 15/15] KVM: arm64: Renumber remaining vcpu guest configuration flags
-In-Reply-To: <20241128123515.1709777-16-tabba@google.com>
-References: <20241128123515.1709777-1-tabba@google.com>
-	<20241128123515.1709777-16-tabba@google.com>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM: arm/arm64: vgic-its: Add error handling in vgic_its_cache_translation
+In-Reply-To: <20241130144952.23729-1-keisuke.nishimura@inria.fr>
+References: <20241130144952.23729-1-keisuke.nishimura@inria.fr>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,46 +56,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, kristina.martsenko@arm.com
+X-SA-Exim-Rcpt-To: keisuke.nishimura@inria.fr, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 28 Nov 2024 12:35:15 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Sat, 30 Nov 2024 14:49:53 +0000,
+Keisuke Nishimura <keisuke.nishimura@inria.fr> wrote:
 > 
-> With the vcpu's SVE and PtrAuth configuration flags removed,
-> there are gaps in the numbering of the cflag bits. Renumber
-> VCPU_INITIALIZED to bit 0 to remove the gaps.
+> The return value of xa_store() needs to be checked. This fix adds an
+> error handling path that resolves the kref inconsistency on failure. As
+> suggested by Oliver Upton, this function does not return the error code
+> intentionally because the translation cache is best effort.
 > 
-> No functional change intended.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Fixes: 8201d1028caa ("KVM: arm64: vgic-its: Maintain a translation cache per ITS")
+> Signed-off-by: Keisuke Nishimura <keisuke.nishimura@inria.fr>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-its.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index c5c80c789ad0..2e4afec09728 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -864,10 +864,10 @@ struct kvm_vcpu_arch {
->  #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
->  #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 198296933e7e..a08835d00aba 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -573,12 +573,22 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+>  	lockdep_assert_held(&its->its_lock);
+>  	vgic_get_irq_kref(irq);
 >  
-> +/* KVM_ARM_VCPU_INIT completed */
-> +#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
->  /* SVE config completed */
->  #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
-> -/* KVM_ARM_VCPU_INIT completed */
-> -#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(3))
->  
->  /* Exception pending */
->  #define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
+> +	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+> +
+> +	/*
+> +	 * Put the reference taken on @irq if the store fails. Intentionally do
+> +	 * not return the error as the translation cache is best effort.
+> +	 */
+> +	if (xa_is_err(old)) {
+> +		vgic_put_irq(kvm, irq);
+> +		return;
+> +	}
+> +
+>  	/*
+>  	 * We could have raced with another CPU caching the same
+>  	 * translation behind our back, ensure we don't leak a
+>  	 * reference if that is the case.
+>  	 */
+> -	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+>  	if (old)
+>  		vgic_put_irq(kvm, old);
+>  }
 
-Please fold this with the relevant patches, even if that makes two
-consecutive renumbering patches.
-
-Thanks,
+Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
