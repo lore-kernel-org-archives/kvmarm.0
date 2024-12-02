@@ -1,99 +1,146 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3251F9AB9;
-	Mon,  2 Dec 2024 08:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55CC1D6DB5
+	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 09:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733129661; cv=none; b=jV6j3NfDI3miQj+Zcart0ioaRdoXH3GJ7EUvfpFOEeSbSmdLwBVhFqjm9WI/CtBPW7GyrnkrRw/qAPft7e5zRxn2DpV8PZQfU9uq6hOgRtTKljYAaqL+gTUQePrjpN7ICkIsMlcYPkn8qSu1poKS/snSVRpEAk2qaD8ubgGsDpc=
+	t=1733130700; cv=none; b=B9KYwCaeOcT8IX0c8UiM5pyHW9vMPxQytrYxPpYpmLEud3nM0cYungxiQjDgH8x4yA7tIGhYBn4oq1N/WIZY9wLow+k4d1pw+2WsiUfNPjP0bld+kOmN9cQhn1RxWIr5azS1E5T5XGVkq8scUpSsJad9Qo85dX8dVOdnjxP44To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733129661; c=relaxed/simple;
-	bh=R6Fv08YSF9tjEaXOB/g1hNUtf8CGUiQoNMyz9uhE03s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UE/Q/MQmGOUfWV43U3wyIeHwWmV/ho+6s2KhYyHUwvlPbAVNfDLcAhUc5glvjH2lz6MYolV//8tkZMk4Sjj+2JodqdjWyhp/VM51sjewuKKHV9Yy9EUwoiIqPPVMww4d4rw7nRl67VZP+ltLaePHwoF3aM4nlAJS8VCxjoDcnwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABE041063;
-	Mon,  2 Dec 2024 00:54:46 -0800 (PST)
-Received: from [10.57.90.186] (unknown [10.57.90.186])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A3BA3F71E;
-	Mon,  2 Dec 2024 00:54:13 -0800 (PST)
-Message-ID: <01205247-ffcd-439f-b00f-d8e70720d049@arm.com>
-Date: Mon, 2 Dec 2024 08:54:11 +0000
+	s=arc-20240116; t=1733130700; c=relaxed/simple;
+	bh=d4gO9Jf7xooGuIIZIf9p1ZNAD2kR1agmYNpq7vqvVW4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EPZpu3sb/47qWbfMn8pl+tIsu9cG21Nsth8auCeIVqQi3lA57Gp1SVS9V3MovmAYA0ms6T4wevxlhh2M/Nc2bDOiMVUPNKB+zv4MCvMYLaaI8BtxhAF2BhgGTm1SqK5+dlh/hO0GqyVmFwvlx5hKiJJlvu6hwwacjdPBtKgVDBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P7MiETio; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P7MiETio"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 250F6C4CED2;
+	Mon,  2 Dec 2024 09:11:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733130700;
+	bh=d4gO9Jf7xooGuIIZIf9p1ZNAD2kR1agmYNpq7vqvVW4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P7MiETioPL8TsoCxnTE8srof9HzUBtTQmdPMjaETyF7aEyyLIgMz1cnyZQR6D3tPW
+	 BuN16y8zR7uUYz8HSxC7nsFYLmVMpgjt/9mGpftY+YAqfypju4nS2XZ5gQkMXLktSg
+	 RL5h6jrDu8GvPuGlZvqEXfSgImZi3aFYNE1L518298zUNfxfv+S3D4XL0nNl40drfy
+	 aDW7JQFXfSKPw1fMka3i7OK2RiRw6PjTopfhztFEREFBulSfGYfhS0Cv/ZOlkqv2E4
+	 a/EYgs7IDZ7wwBbqMLKmf1+k3MMzQ2lxV2pJbNtjCRH1fFdgHaqtcHNN57zDY7H5Fu
+	 vJizTP4kgl3vw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tI2Sv-00HH5d-Pa;
+	Mon, 02 Dec 2024 09:11:37 +0000
+Date: Mon, 02 Dec 2024 09:11:37 +0000
+Message-ID: <86y10ytpo6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: Sebastian Ott <sebott@redhat.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	yuzenghui <yuzenghui@huawei.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	Linuxarm <linuxarm@huawei.com>,
+	"reijiw@google.com" <reijiw@google.com>
+Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
+In-Reply-To: <e35612b4-e25b-4846-8fd2-56c2473c140d@redhat.com>
+References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
+	<86v804z3lk.wl-maz@kernel.org>
+	<b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+	<4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
+	<87zfllssji.wl-maz@kernel.org>
+	<c879fda9-db5a-4743-805d-03c0acba8060@redhat.com>
+	<865xo3vbjq.wl-maz@kernel.org>
+	<e35612b4-e25b-4846-8fd2-56c2473c140d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 00/43] arm64: Support for Arm CCA in KVM
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <Z01BYOgsLXV5yULk@vm3>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <Z01BYOgsLXV5yULk@vm3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, linuxarm@huawei.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Itaru,
-
-On 02/12/2024 05:10, Itaru Kitayama wrote:
-> On Fri, Oct 04, 2024 at 04:27:21PM +0100, Steven Price wrote:
->> This series adds support for running protected VMs using KVM under the
->> Arm Confidential Compute Architecture (CCA).
-...
+On Mon, 02 Dec 2024 08:03:26 +0000,
+Eric Auger <eauger@redhat.com> wrote:
 > 
-> On FVP, the v5+v7 kernel is unable to execute virt-manager:
+> Hi Marc,
 > 
-> Starting install...
-> Allocating 'test9.qcow2'                                    |    0 B  00:00 ...
-> Removing disk 'test9.qcow2'                                 |    0 B  00:00
-> ERROR    internal error: process exited while connecting to monitor: 2024-12-04T18:56:11.646168Z qemu-system-aarch64: -accel kvm: ioctl(KVM_CREATE_VM) failed: Invalid argument
-> 2024-12-04T18:56:11.646520Z qemu-system-aarch64: -accel kvm: failed to initialize kvm: Invalid argument
-> Domain installation does not appear to have been successful.
-
-Can you check that the kernel has detected the RMM being available, you
-should have a message like below when the host kernel is booting:
-
-kvm [1]: RMI ABI version 1.0
-
-My guess is that you've got mismatched versions of the RMM and TF-A. The
-interface between those two components isn't stable and there were
-breaking changes fairly recently. And obviously if the RMM hasn't
-initialised successfully then confidential VMs won't be available.
-
-> Below is my virt-manager options:
+> On 12/1/24 13:21, Marc Zyngier wrote:
+> > Hey Eric,
+> > 
+> > On Thu, 28 Nov 2024 09:31:08 +0000,
+> > Eric Auger <eauger@redhat.com> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On 11/26/24 20:29, Marc Zyngier wrote:
+> >>> Finally, who is going to ensure this keeps working in the foreseeable
+> >>> future? Because while this is nice, that's not what gets deployed in
+> >>> production, as it leads to unpredictable performances. My take is that
+> >>> this thing will eventually bitrot and die.
+> >> In the context of our works to define qemu vcpu models for ARM
+> >> (https://lore.kernel.org/all/20241025101959.601048-1-eric.auger@redhat.com/)
+> >> , our current approach is to try migrating between modern HW we have
+> >> access to. The case above is migration between AmpereOne and Grace which
+> >> both should be prevalent systems. Do you think this does not make sense
+> >> at all to try migrating between those, alhough this may be challenging?
+> > 
+> > I don't mind the challenge. But I'm worried this is something that
+> > looks like a reasonable idea that doesn't get any traction in
+> > practice.
+> > 
+> > And the example you mention is pretty striking: who in their right
+> > mind would migrate between these two systems? If you deploy a Grace
+> > system, that's because you are making use of the GPU, and your VM is
+> > likely to require it. Conversely, if you run on an Ampere system, you
+> > don't want to use a valuable (read: bloody expensive) slot on a Grace
+> > machine.
 > 
-> virt-install --machine=virt --arch=aarch64 --name=test9 --memory=2048 --vcpu=1 --nographic --check all=off --features acpi=off --virt-type kvm --boot kernel=Image-cca,initrd=rootfs.cpio,kernel_args='earlycon console=ttyAMA0 rdinit=/sbin/init rw root=/dev/vda acpi=off' --qemu-commandline='-M virt,confidential-guest-support=rme0,gic-version=3 -cpu host -object rme-guest,id=rme0 -nodefaults' --disk size=4 --import --osinfo detect=on,require=off
-> 
-> Userland is Ubuntu 24.10, the VMM is Linaro's cca/2024-11-20:
-> 
-> https://git.codelinaro.org/linaro/dcap/qemu/-/tree/cca/2024-11-20?ref_type=heads
+> Yes I acknowledge it is a total valid point from a use case and cost
+> point of view. I was expecting maybe some interest migrating between
+> AmpereOne and Grace-Grace for farm enhancement but most probably it is
+> marginal.
 
-I don't think this is the latest QEMU tree, Jean-Philippe posted an
-update last week:
+That's my understanding as well. Cloud vendors tend to have
+homogeneous systems, and those who don't are realising that they shot
+themselves in the foot (and in that case, the debug infrastructure is
+the least of their worries).
 
-https://lore.kernel.org/qemu-devel/20241125195626.856992-2-jean-philippe@linaro.org/
+> Definition of [qemu] named vcpu models looks pretty uneasy then because
+> we don't have much relevant and accessible HW to test with, taking into
+> account such non technical considerations. Besides migration within a
+> CPU family I don't see much.
 
-I'm not sure if there were any important updates there, but there are
-detailed instructions that might help.
+That's basically my point.
 
-Regards,
-Steve
+Another thing to consider is that there is an effort on the SBSA
+front to standardise which breakpoint numbers are context-aware, which
+would side-step the need for emulation in the long run (once the
+current crop of HW is gone and forgotten, which should be in the next
+3 months or so ;-).
 
+But if there was a *credible* user coming out and saying that they
+depended on this sort of feature to be supported now and forever, then
+I'd be more supportive.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
