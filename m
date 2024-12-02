@@ -1,165 +1,226 @@
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561581FC7C5
-	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 10:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51971205E28
+	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 12:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733136186; cv=none; b=iAsDh2OBdOjzrkElL+qjJxJqYmOt8zUU4Mavpbc16LHmknHOXVtX0ZWeabCEQFd/0NV4y0h/I8BrfycI6SGKUomzSebn8rOYcSDz6PJ8ZxIzrrXOWRoD4R7rJWrFtZ9Y48ldgc0ep/k9VaTCErIYN6oDUQy99gvxFkuw2mobf8s=
+	t=1733144305; cv=none; b=AL+5NNpMka+6zIp0veA6NGYkcWoRNMcy4+z+PCkjibq5jtuGaB2NUXyJKFe2XG/fdVYq7rWttxEvREoaIPPX9ILC7XzCHrDGhLNQE81Nq5LrXjt8RVA9TUR2XADoyiW6HMD+MseWjJJDdqFkiN56MW+Mg3XNvT0SXGQDZFtOgmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733136186; c=relaxed/simple;
-	bh=o3AswsMzM/79o6tFWYS0sumS3t3POsKEw6EKmmBb4wA=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=IArryq67GBMNV/SFyq/JLng30LUZHPgJqSQK0AGlwsi+0KWEg053RKVThpU0JZBadh77m6hrh+cpAewpqRwv7e5lcD651Rjt2r2XOUZm9PF9GFJr10o5AScj7McVEseuS7GfmFPtH3amy5qPq9xmanE/RkxKvaKc/BddIgqhz88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vhuZPDWq; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1733144305; c=relaxed/simple;
+	bh=KfxeECr/IEoyVbfoxOF+XRuHkALco2nrvvqeg8gvhTA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OQMaF21B7J/maw10gtxllsWXsjK3C3COS/jwu8qjBgjbyucHh7wxmsuyWTMqP+dLyNLFXQifqCl1545c4gdg6QJM46WmqGMSNW/4eP0nWkFKxOF4cfUTWaL3EToAYiAQferCkvn3aZJkZ+kWvSABOluBgLt0M1G9pAZXtNxU2tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VRUDsCKc; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vhuZPDWq"
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733136179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3XDTr/NR5SD4RF/6LFpn9c+Bv/YVG8nMFpd1E2zXJR4=;
-	b=vhuZPDWqgm76+q6ewLyMPCFh8xtFQfXZpnLlBP0GtCbRbGS5yT0vzIKcSESow+4tTUjouB
-	g08a9i5/NwhtOCRQkg+Av6KW+WHzXN8pNNRJsbcJ+Q0GCe/WY+fj+dLLEkg2Ci3n4L8xgO
-	IUyrOUDIcHYs9nOTbaUGL5ln6UQ2oNQ=
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VRUDsCKc"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434a9f9a225so218935e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 02 Dec 2024 04:58:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733144301; x=1733749101; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=oT65BursDv9acFz36h76HkD1KU1Ehu2gLor/dQ9bFwQ=;
+        b=VRUDsCKcownfgD8+d1ndzVdZhVUGqz1+iERoJrso34h83NSxmRu2U4MqSGzWQOYAJB
+         Ff/H+kk5v9xcYlqwVVfA+DxGW1J8Od/l00VUMZ9c+MoQc9lc/oikQMrQzlsM6Pq3lRIl
+         qHKtMYFt2KfuV+mSmxPY80NFQxvKpf/El414KZy0+7+LUBDTm9q1Q8CBNhWnGpBCX/z/
+         ZRC9wvU4ya8pNahjU68hNe9DrJ5YODeYwRWZmargB5IV/0dWDGMG6yNHOiTZlyvg9DEf
+         +7yhlzYJOjEQtZoClkcRF2pBAg0/jq5cswzf2GWWsAWWbEMh+btrejGPWQq/YL/HpkqS
+         04ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733144301; x=1733749101;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oT65BursDv9acFz36h76HkD1KU1Ehu2gLor/dQ9bFwQ=;
+        b=Hha11BCkuSrRAU5DJUGpcSqSF3HIWiM0PzxE75F6QsQx9YpaHxp86fSmg0jKfpCoF8
+         Q1ELjV7tvLYcXWJjIjV7SKUxCBlXciOAbqQ/KqsVGJ63tOtoDfhXJ4QBO6zS/gJJwLDt
+         pvu5e8TYlbp0TCnF0uflRinZGnxyfkqwasyC3G69DPaZuUSozgjICOM50T4juYk82Xkk
+         wa4Sj7NCG7gghl45SCls7lPzhaMcuomRJuEFGBsAaLT0Hr4G+kZQbkIrkhWIk5+x1BXM
+         fVsAvAgy3CuuY5eKybk+MRpaifHtpUEpKMe9emeaTnRMip1M3R9W7GKhuP7JobxR3UxS
+         nd+w==
+X-Gm-Message-State: AOJu0YzPwgDcvcp32k99fYjzmjqEQobSq79CGXQHt2/DJTYPGwlcDX+e
+	jIlrW9e3KzfhcZAEVbeJRkKqdmtF5kTwNgdRof6AD8e7I1C34IVaRxnD9yY2FEi+k6fMi5MUhJO
+	M8CPoWqn0WjfGqHiTWl580HBhAtAPvmsf/mAl
+X-Gm-Gg: ASbGncuJMfLlFKF/cdMjwTu0GZMN8afuOk+6zOaY3vnw+GRpxh2ijRsuIJVugOfny3o
+	2chW+oBoipNQCvk66pO0UKIAFejBq/g==
+X-Google-Smtp-Source: AGHT+IHJJFz6JqADai1NvA0AUirrevbk29ApkBCofFsaGh6xzxfVcudD1jFv6Y77lhY2GY8LObLArRWqB58KKkJnw78=
+X-Received: by 2002:a05:600c:1d0e:b0:42c:9e35:cde6 with SMTP id
+ 5b1f17b1804b1-434b04bfb20mr4739105e9.2.1733144301487; Mon, 02 Dec 2024
+ 04:58:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.200.121\))
-Subject: Re: [PATCH v5 00/43] arm64: Support for Arm CCA in KVM
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-In-Reply-To: <20241202102632.GB1704077@myrica>
-Date: Mon, 2 Dec 2024 19:42:35 +0900
-Cc: kvm@vger.kernel.org,
- kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>,
- Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4313C668-D48C-4443-917E-67A112BE1C37@linux.dev>
-References: <20241004152804.72508-1-steven.price@arm.com>
- <Z01BYOgsLXV5yULk@vm3> <01205247-ffcd-439f-b00f-d8e70720d049@arm.com>
- <20241202102632.GB1704077@myrica>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Steven Price <steven.price@arm.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+References: <20241128123515.1709777-1-tabba@google.com> <20241128123515.1709777-15-tabba@google.com>
+ <864j3nv9tk.wl-maz@kernel.org> <CA+EHjTyXj6NhUcxTfER=zPz3VOtd+HgqpfmyfR88cVyiXoxqwA@mail.gmail.com>
+In-Reply-To: <CA+EHjTyXj6NhUcxTfER=zPz3VOtd+HgqpfmyfR88cVyiXoxqwA@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 2 Dec 2024 12:57:44 +0000
+Message-ID: <CA+EHjTysFaaxGBo212e8kSHi_VkpXx6N6ddxwB0UGC6bSoK0gA@mail.gmail.com>
+Subject: Re: [PATCH v3 14/15] KVM: arm64: Convert the SVE guest vcpu flag to a
+ vm flag
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, 
+	kristina.martsenko@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jean, Steven,
+Hi Marc,
 
-> On Dec 2, 2024, at 19:26, Jean-Philippe Brucker =
-<jean-philippe@linaro.org> wrote:
->=20
-> On Mon, Dec 02, 2024 at 08:54:11AM +0000, Steven Price wrote:
->> Hi Itaru,
->>=20
->> On 02/12/2024 05:10, Itaru Kitayama wrote:
->>> On Fri, Oct 04, 2024 at 04:27:21PM +0100, Steven Price wrote:
->>>> This series adds support for running protected VMs using KVM under =
-the
->>>> Arm Confidential Compute Architecture (CCA).
->> ...
->>>=20
->>> On FVP, the v5+v7 kernel is unable to execute virt-manager:
->>>=20
->>> Starting install...
->>> Allocating 'test9.qcow2'                                    |    0 B =
- 00:00 ...
->>> Removing disk 'test9.qcow2'                                 |    0 B =
- 00:00
->>> ERROR    internal error: process exited while connecting to monitor: =
-2024-12-04T18:56:11.646168Z qemu-system-aarch64: -accel kvm: =
-ioctl(KVM_CREATE_VM) failed: Invalid argument
->>> 2024-12-04T18:56:11.646520Z qemu-system-aarch64: -accel kvm: failed =
-to initialize kvm: Invalid argument
->>> Domain installation does not appear to have been successful.
->>=20
->> Can you check that the kernel has detected the RMM being available, =
-you
->> should have a message like below when the host kernel is booting:
->>=20
->> kvm [1]: RMI ABI version 1.0
->>=20
->> My guess is that you've got mismatched versions of the RMM and TF-A. =
-The
->> interface between those two components isn't stable and there were
->> breaking changes fairly recently. And obviously if the RMM hasn't
->> initialised successfully then confidential VMs won't be available.
->>=20
->>> Below is my virt-manager options:
->>>=20
->>> virt-install --machine=3Dvirt --arch=3Daarch64 --name=3Dtest9 =
---memory=3D2048 --vcpu=3D1 --nographic --check all=3Doff --features =
-acpi=3Doff --virt-type kvm --boot =
-kernel=3DImage-cca,initrd=3Drootfs.cpio,kernel_args=3D'earlycon =
-console=3DttyAMA0 rdinit=3D/sbin/init rw root=3D/dev/vda acpi=3Doff' =
---qemu-commandline=3D'-M =
-virt,confidential-guest-support=3Drme0,gic-version=3D3 -cpu host -object =
-rme-guest,id=3Drme0 -nodefaults' --disk size=3D4 --import --osinfo =
-detect=3Don,require=3Doff
->>>=20
->>> Userland is Ubuntu 24.10, the VMM is Linaro's cca/2024-11-20:
->>>=20
->>> =
-https://git.codelinaro.org/linaro/dcap/qemu/-/tree/cca/2024-11-20?ref_type=
-=3Dheads
->=20
-> Indeed, QEMU branch 2024-11-20 has to be used with an older version of =
-the
-> KVM patch and older RMM. For KVM v5+v7 you need the most recent QEMU
-> branch, confusingly called cca/v3 (because it's the third patch =
-series).
->=20
+On Sun, 1 Dec 2024 at 16:01, Fuad Tabba <tabba@google.com> wrote:
+>
+> Hi Marc,
+>
+>
+> On Sun, 1 Dec 2024 at 12:58, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 28 Nov 2024 12:35:14 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > The vcpu flag GUEST_HAS_SVE is per-vcpu, but it is based on what
+> > > is now a per-vm feature. Make the flag per-vm.
+> > >
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_emulate.h    |  6 +++---
+> > >  arch/arm64/include/asm/kvm_host.h       | 10 ++++++----
+> > >  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  2 +-
+> > >  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 11 +++++++----
+> > >  arch/arm64/kvm/hyp/nvhe/switch.c        |  8 ++++----
+> > >  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+> > >  arch/arm64/kvm/reset.c                  |  2 +-
+> > >  8 files changed, 24 insertions(+), 19 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > > index 406e99a452bf..ae6d0dc0e4ff 100644
+> > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > @@ -620,7 +620,7 @@ static __always_inline void kvm_write_cptr_el2(u64 val)
+> > >  }
+> > >
+> > >  /* Resets the value of cptr_el2 when returning to the host. */
+> > > -static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+> > > +static __always_inline void kvm_reset_cptr_el2(struct kvm *kvm)
+> >
+> > I'd rather you avoid the resulting churn:
+> >
+> > static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+> > {
+> >         struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> >         [...]
+> >
+> > which does the trick at zero cost. It is also more logical to keep the
+> > vcpu as a parameter, as the per-VM-ness is only an implementation
+> > detail.
+>
+> The reason for the churn (here and below for vcpu_has_sve()), which in
+> hindsight I should have mentioned in the commit message or as a note,
+> is that this code is called by the host kernel (e.g., in reset.c), and
+> by the hypervisor). For nvhe, we need kern_hyp_va(), but not for the
+> host. Should I gate the va conversion with is_hyp_nvhe()?
+
+I spoke too soon. Your suggestion results in less churn, and of
+course, solves the issue I had with kern_hyp_va.
+
+I did have to convert kvm_reset_cptr_el2() into a macro, because it
+now needs kern_hyp_va(), defined in kvm_mmu.h, which in turn includes
+kvm_emulate.h. But since it's __always_inline, it shouldn't make any
+difference in practice.
+
+If this conversion to a macro is alright by you, I'll respin this.
+
+Thanks again, and sorry for the noise.
+/fuad
+
+>
+> > >  {
+> > >       u64 val;
+> > >
+> > > @@ -631,14 +631,14 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+> > >       } else if (has_hvhe()) {
+> > >               val = CPACR_ELx_FPEN;
+> > >
+> > > -             if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
+> > > +             if (!kvm_has_sve(kvm) || !guest_owns_fp_regs())
+> > >                       val |= CPACR_ELx_ZEN;
+> > >               if (cpus_have_final_cap(ARM64_SME))
+> > >                       val |= CPACR_ELx_SMEN;
+> > >       } else {
+> > >               val = CPTR_NVHE_EL2_RES1;
+> > >
+> > > -             if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
+> > > +             if (kvm_has_sve(kvm) && guest_owns_fp_regs())
+> > >                       val |= CPTR_EL2_TZ;
+> > >               if (!cpus_have_final_cap(ARM64_SME))
+> > >                       val |= CPTR_EL2_TSM;
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 680ecef1d7aa..c5c80c789ad0 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -331,6 +331,8 @@ struct kvm_arch {
+> > >  #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED            7
+> > >       /* Fine-Grained UNDEF initialised */
+> > >  #define KVM_ARCH_FLAG_FGU_INITIALIZED                        8
+> > > +     /* SVE exposed to guest */
+> > > +#define KVM_ARCH_FLAG_GUEST_HAS_SVE                  9
+> > >       unsigned long flags;
+> > >
+> > >       /* VM-wide vCPU feature set */
+> > > @@ -862,8 +864,6 @@ struct kvm_vcpu_arch {
+> > >  #define vcpu_set_flag(v, ...)        __vcpu_set_flag((v), __VA_ARGS__)
+> > >  #define vcpu_clear_flag(v, ...)      __vcpu_clear_flag((v), __VA_ARGS__)
+> > >
+> > > -/* SVE exposed to guest */
+> > > -#define GUEST_HAS_SVE                __vcpu_single_flag(cflags, BIT(0))
+> > >  /* SVE config completed */
+> > >  #define VCPU_SVE_FINALIZED   __vcpu_single_flag(cflags, BIT(1))
+> > >  /* KVM_ARM_VCPU_INIT completed */
+> > > @@ -956,8 +956,10 @@ struct kvm_vcpu_arch {
+> > >                                KVM_GUESTDBG_USE_HW | \
+> > >                                KVM_GUESTDBG_SINGLESTEP)
+> > >
+> > > -#define vcpu_has_sve(vcpu) (system_supports_sve() &&                 \
+> > > -                         vcpu_get_flag(vcpu, GUEST_HAS_SVE))
+> > > +#define kvm_has_sve(kvm)     \
+> > > +     test_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &(kvm)->arch.flags)
+> > > +#define vcpu_has_sve(vcpu)   \
+> > > +     kvm_has_sve((vcpu)->kvm)
+> >
+> > Two things:
+> >
+> > - it is definitely worth keeping the system_supports_sve() helper, so
+> >   that we avoid checking flags for nothing
+>
+> Ack
+>
+> > - Since you preserve the vcpu_has_sve(), how about writing it as:
+> >
+> > #ifdef __KVM_NVHE_HYPERVISOR__
+> > #define vcpu_has_sve(v)         kvm_has_sve(kern_hyp_va((v)->kvm))
+> > #else
+> > #define vcpu_has_sve(v)         kvm_has_sve((v)->kvm)
+> > #endif
+> >
+> >   which will avoid the churn in this patch, and makes it hard to get
+> >   it wrong?
+>
+> Same as I mentioned above. This macro is even used in more places by
+> the host kernel.
+>
 > Thanks,
-> Jean
-
-I wasn=E2=80=99t applying with the updated Shrinkwrap=E2=80=99s overlay =
-file when building TF-RMM.
-With the correct VMM as you guys mentioned (cca/v3) I was able to start =
-the installation via
-the virt-install interacting with the Ubuntu 24.10=E2=80=99s monolitihc =
-libvirtd.
-
-Thanks,
-Itaru.
-
->=20
->>=20
->> I don't think this is the latest QEMU tree, Jean-Philippe posted an
->> update last week:
->>=20
->> =
-https://lore.kernel.org/qemu-devel/20241125195626.856992-2-jean-philippe@l=
-inaro.org/
->>=20
->> I'm not sure if there were any important updates there, but there are
->> detailed instructions that might help.
->>=20
->> Regards,
->> Steve
-
-
+> /fuad
+>
+> > Thanks,
+> >
+> >         M.
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
