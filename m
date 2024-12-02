@@ -1,229 +1,184 @@
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D123398B
-	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 05:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A21F9E6
+	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 08:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733116279; cv=none; b=ckItfuerxtQ4gOF6UNKQGVqqWjGkzeVhGO7HhOl73lXtRymFrbu4QMBL76Gtp4wfdA6I6DC1ETPYPHocDZFaLIhU+X3KcoGKIofYcdZsAYI7yvSSm+l3Gxi7sb/bcHmpi8fvhtdYduKGHp3GuBikcDTZ90kWXjcIPOppnc9YeTg=
+	t=1733126616; cv=none; b=QTLod2xKo9hAMD6pqCMwZ0Y7Uq6NadX65dQAo0dWh2YuDm6FS6mqCEdH/RJwKPTSPFthC7ZyyqEXBxmzsJwcrhJuGJUWPrNawe+AiGcmx+lMYQdbsLpC5Gp/qxsPnYaTfjGAw9y4jGVSnaBAYgh8UP3E+yyW/QapKGqSf/vLnHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733116279; c=relaxed/simple;
-	bh=DFIvOyxErt7/uLYYSwRb1DFMB1yTP5tXkHatqvHWs78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BDeA/iWlTe/id9XY3ONq6aMDnc1v5mIsKiU/eFDHy0HHr3b3a6ZdrzED4BKD94j5zXODrgxkj4SWldleMRe9jAspj7hW2NdGdcVpTx+0BS/zpuCcJdvjLSoy8uCevDOR0N4we70OS5j+24+2mUw1IMqyn9yNkK2TIUxMHlW/MWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p2tVaeOb; arc=none smtp.client-ip=91.218.175.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1733126616; c=relaxed/simple;
+	bh=ATXqHFDTRwj3ZH4k079DN/kvfKCGcHHa9jl0aMvATIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ar6RFcpLsZZeIVfqXtMmdVAY3wv6Ia6HoDWnLnv4CqxCkW2uqRQPldIDg6cXjiQFedh1TXwtgPyvlfUSQEM3g2PTLCA/awyiUng/6Be/nbrgoI/9DW1dAaz1dH395uCJiuGix/Lyzd3R75hTfu6SY0/uhVVdu3s+9RUMjUCTx9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jLtMkg8b; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p2tVaeOb"
-Date: Mon, 2 Dec 2024 14:10:56 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733116271;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jLtMkg8b"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733126613;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8lbIh+01gXs5AzlZMdAt5ULUvPveI4iGrd6WK21lspQ=;
-	b=p2tVaeObXwvbjHZkVLWmnfVhv5ZIkLgvbKIZcEEey/7fX4rxpHjm3LoLMkPoNK9inZyeJG
-	gHPI6rFQVcyrt5nuLb+ECc0E7pwrOUwmFtTEKk5IFdHoH/WIC8sLU2GcSRuEY+xINt9Lmu
-	Pzp6TGnEP33GV9gqwtH+eqQuLf5BXNw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [PATCH v5 00/43] arm64: Support for Arm CCA in KVM
-Message-ID: <Z01BYOgsLXV5yULk@vm3>
-References: <20241004152804.72508-1-steven.price@arm.com>
+	bh=aN+6aXxjhPFYN+ILtJ8oROYNyiXPAUR4XJGNYkKrR8w=;
+	b=jLtMkg8bSapCM2+Xalq6ceecV5RFUfXxCoKIiBMnXJMNCXf6ysUogycRGqcKZrdbXvWtpm
+	gTW8v8nDDUGeHFLEts7MEa93Q0A5QtM1KAHOM4GGHW7Q0It6Ja9AwTTc3XJ+PD1Rq2vMhR
+	/YQYMwDBjTi20K2mU3rY5Jep9ei8Hto=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-211-VO63GzwVMbCRkEpmgnqOuw-1; Mon, 02 Dec 2024 03:03:30 -0500
+X-MC-Unique: VO63GzwVMbCRkEpmgnqOuw-1
+X-Mimecast-MFC-AGG-ID: VO63GzwVMbCRkEpmgnqOuw
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4349e08ae91so29520335e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 02 Dec 2024 00:03:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733126609; x=1733731409;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aN+6aXxjhPFYN+ILtJ8oROYNyiXPAUR4XJGNYkKrR8w=;
+        b=huvByJk5+njyJ6de3bI5ZQM6myH2TN3vLjjkLJ6iTqpL0gEM/qBZx9jrg/l/ZiBEwV
+         YGX9GeV4vQnOuaGfpErYYXS0cCcZzKF8Wo8xMYLP1RpR09lzXN4wwGvkuvcTjWSJBUI3
+         gfYhsDhWDxfI2votGrhTniLkM2iy5J108UB2ELhhYKWeP2QYUbO8C5cB2oQio/xtpfLS
+         FK9+0DAxh3nzO0EUfDGYJKW5aNX/vluXmK7wXUeAwWFzTe0gFaiq3xFtsD15VDnynbU+
+         zLzCCnQ+BkWlCQtH/D3Wqias5+XLQ2u/ukA9BhXYEPRDdzy5wWC9rjSW4b+u2+RSZlMB
+         YClw==
+X-Forwarded-Encrypted: i=1; AJvYcCUMzgbHy3GoAItYggzXsyhe1/Dp9ph0FKfUrQzOS/90LaNO8HzZR+b/5zW13BbRWY/8Gw+44FQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0WGLsqZO8I+j43TnpEEZfq2z8VNMZdmYOq9HVfPVVvhpJmoxK
+	mOhHhgVZc72oTC1jiuUYpE//obfQ0o43xf0HWOMhk3HDKtbZKhY9hk2Zv66FG3AzAZo1B+e2gr2
+	VLomli+jzMtaGzySTnIpKQAz3R7q8bs9QLcJIo05/FAEahkaz3PvrQw==
+X-Gm-Gg: ASbGnctWLVlW3jArsuluwObnbDma/Pivzse5um0lx/7IY5S4eZy90Kaaou1Bd3Y9b5l
+	7xoGRDsBqoiJwUhQzQsVpz6R9heEBRh67UfQUnjl7G/Ow8++DWTLNCU4EWobHKU4MGkAUTbCzvN
+	HLR49LuF03Y60ctWrP7pvfH0vjSBDlqASWlX2xykvIrSM7VJJtwrNelEWLCbsX53RmOYRAO4D7C
+	/HxlfLIGPv5ynfkVqvEacKPEW2ftbbMA8oWOETcxck6JzpX0+yEfARMOUqN71DmPYkj/YspdOZn
+	iCvgnymGH4kBWKZE
+X-Received: by 2002:a05:600c:588c:b0:434:a7e3:db50 with SMTP id 5b1f17b1804b1-434a9df26cbmr158068075e9.21.1733126609339;
+        Mon, 02 Dec 2024 00:03:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEOoKcy4ZLxYfJuHVBmETBdh3cXi5dFZ/+hCy9umKs5/0947WIDG+W1ZeqLNq9Ru+txGZNWXg==
+X-Received: by 2002:a05:600c:588c:b0:434:a7e3:db50 with SMTP id 5b1f17b1804b1-434a9df26cbmr158067725e9.21.1733126608984;
+        Mon, 02 Dec 2024 00:03:28 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f32837sm145415305e9.33.2024.12.02.00.03.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Dec 2024 00:03:28 -0800 (PST)
+Message-ID: <e35612b4-e25b-4846-8fd2-56c2473c140d@redhat.com>
+Date: Mon, 2 Dec 2024 09:03:26 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004152804.72508-1-steven.price@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1
+ writable from userspace
+To: Marc Zyngier <maz@kernel.org>
+Cc: Sebastian Ott <sebott@redhat.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "will@kernel.org" <will@kernel.org>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "james.morse@arm.com" <james.morse@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+ Linuxarm <linuxarm@huawei.com>, "reijiw@google.com" <reijiw@google.com>
+References: <20240813142835.77180-1-shameerali.kolothum.thodi@huawei.com>
+ <86v804z3lk.wl-maz@kernel.org> <b2dad37ac5464384abe4edf76cb6b546@huawei.com>
+ <4d3a7dde-e085-fa70-8859-ba153c93b615@redhat.com>
+ <87zfllssji.wl-maz@kernel.org>
+ <c879fda9-db5a-4743-805d-03c0acba8060@redhat.com>
+ <865xo3vbjq.wl-maz@kernel.org>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <865xo3vbjq.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Za7aX67OuopvI1RKdg19QYGbMXStU-kDBl7RNhYSM2w_1733126609
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 04:27:21PM +0100, Steven Price wrote:
-> This series adds support for running protected VMs using KVM under the
-> Arm Confidential Compute Architecture (CCA).
-> 
-> The related guest support was posted[1] earlier. As with the guest this
-> series moves to the "v1.0-rel0" version of the specification[2].
-> 
-> Almost all changes since v4[3] are either due to rebasing or minor
-> changes to improve the code following review comments. There are two bug
-> fixes:
-> 
->  * Setting the GPRS on entry after an exit where the host is allowed to
->    change registers is now done in kvm_rec_enter(). This fixes a bug
->    where register updates done by user space were being ignored.
-> 
->  * Drop the PTE_SHARED bit for unprotected page table entries - this bit
->    isn't controlled by the host and the RMM now enforces the bit is
->    zero.
-> 
-> Major limitations:
-> 
->  * Only supports 4k host PAGE_SIZE (if PAGE_SIZE != 4k then the realm
->    extensions are disabled).
-> 
->  * No support for huge pages when mapping the guest's pages. There is
->    some 'dead' code left over from before guest_mem was supported. This
->    is partly a current limitation of guest_memfd.
-> 
-> The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[2].
-> 
-> This series is based on v6.12-rc1. It is also available as a git
-> repository:
-> 
-> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v5
-> 
-> Work in progress changes for kvmtool are available from the git
-> repository below:
-> 
-> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v3
-> 
-> [1] https://lore.kernel.org/r/20241004144307.66199-1-steven.price%40arm.com
-> [2] https://developer.arm.com/documentation/den0137/1-0rel0/
-> [3] https://lore.kernel.org/r/20240821153844.60084-1-steven.price%40arm.com
-> 
-> Jean-Philippe Brucker (7):
->   arm64: RME: Propagate number of breakpoints and watchpoints to
->     userspace
->   arm64: RME: Set breakpoint parameters through SET_ONE_REG
->   arm64: RME: Initialize PMCR.N with number counter supported by RMM
->   arm64: RME: Propagate max SVE vector length from RMM
->   arm64: RME: Configure max SVE vector length for a Realm
->   arm64: RME: Provide register list for unfinalized RME RECs
->   arm64: RME: Provide accurate register list
-> 
-> Joey Gouly (2):
->   arm64: rme: allow userspace to inject aborts
->   arm64: rme: support RSI_HOST_CALL
-> 
-> Sean Christopherson (1):
->   KVM: Prepare for handling only shared mappings in mmu_notifier events
-> 
-> Steven Price (29):
->   arm64: RME: Handle Granule Protection Faults (GPFs)
->   arm64: RME: Add SMC definitions for calling the RMM
->   arm64: RME: Add wrappers for RMI calls
->   arm64: RME: Check for RME support at KVM init
->   arm64: RME: Define the user ABI
->   arm64: RME: ioctls to create and configure realms
->   arm64: kvm: Allow passing machine type in KVM creation
->   arm64: RME: Keep a spare page delegated to the RMM
->   arm64: RME: RTT tear down
->   arm64: RME: Allocate/free RECs to match vCPUs
->   arm64: RME: Support for the VGIC in realms
->   KVM: arm64: Support timers in realm RECs
->   arm64: RME: Allow VMM to set RIPAS
->   arm64: RME: Handle realm enter/exit
->   KVM: arm64: Handle realm MMIO emulation
->   arm64: RME: Allow populating initial contents
->   arm64: RME: Runtime faulting of memory
->   KVM: arm64: Handle realm VCPU load
->   KVM: arm64: Validate register access for a Realm VM
->   KVM: arm64: Handle Realm PSCI requests
->   KVM: arm64: WARN on injected undef exceptions
->   arm64: Don't expose stolen time for realm guests
->   arm64: RME: Always use 4k pages for realms
->   arm64: rme: Prevent Device mappings for Realms
->   arm_pmu: Provide a mechanism for disabling the physical IRQ
->   arm64: rme: Enable PMU support with a realm guest
->   kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
->   arm64: kvm: Expose support for private memory
->   KVM: arm64: Allow activating realms
-> 
-> Suzuki K Poulose (4):
->   kvm: arm64: pgtable: Track the number of pages in the entry level
->   kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
->   kvm: arm64: Expose debug HW register numbers for Realm
->   arm64: rme: Allow checking SVE on VM instance
+Hi Marc,
 
-On FVP, the v5+v7 kernel is unable to execute virt-manager:
-
-Starting install...
-Allocating 'test9.qcow2'                                    |    0 B  00:00 ...
-Removing disk 'test9.qcow2'                                 |    0 B  00:00
-ERROR    internal error: process exited while connecting to monitor: 2024-12-04T18:56:11.646168Z qemu-system-aarch64: -accel kvm: ioctl(KVM_CREATE_VM) failed: Invalid argument
-2024-12-04T18:56:11.646520Z qemu-system-aarch64: -accel kvm: failed to initialize kvm: Invalid argument
-Domain installation does not appear to have been successful.
-
-Below is my virt-manager options:
-
-virt-install --machine=virt --arch=aarch64 --name=test9 --memory=2048 --vcpu=1 --nographic --check all=off --features acpi=off --virt-type kvm --boot kernel=Image-cca,initrd=rootfs.cpio,kernel_args='earlycon console=ttyAMA0 rdinit=/sbin/init rw root=/dev/vda acpi=off' --qemu-commandline='-M virt,confidential-guest-support=rme0,gic-version=3 -cpu host -object rme-guest,id=rme0 -nodefaults' --disk size=4 --import --osinfo detect=on,require=off
-
-Userland is Ubuntu 24.10, the VMM is Linaro's cca/2024-11-20:
-
-https://git.codelinaro.org/linaro/dcap/qemu/-/tree/cca/2024-11-20?ref_type=heads
-
-virt-install doesn't complain if I try to bring up a normal VM.
-
-Thanks,
-Itaru. 
-
+On 12/1/24 13:21, Marc Zyngier wrote:
+> Hey Eric,
 > 
->  Documentation/virt/kvm/api.rst       |    3 +
->  arch/arm64/include/asm/kvm_emulate.h |   34 +
->  arch/arm64/include/asm/kvm_host.h    |   16 +-
->  arch/arm64/include/asm/kvm_pgtable.h |    2 +
->  arch/arm64/include/asm/kvm_rme.h     |  155 +++
->  arch/arm64/include/asm/rmi_cmds.h    |  510 ++++++++
->  arch/arm64/include/asm/rmi_smc.h     |  255 ++++
->  arch/arm64/include/asm/virt.h        |    1 +
->  arch/arm64/include/uapi/asm/kvm.h    |   49 +
->  arch/arm64/kvm/Kconfig               |    1 +
->  arch/arm64/kvm/Makefile              |    3 +-
->  arch/arm64/kvm/arch_timer.c          |   45 +-
->  arch/arm64/kvm/arm.c                 |  166 ++-
->  arch/arm64/kvm/guest.c               |   99 +-
->  arch/arm64/kvm/hyp/pgtable.c         |    5 +-
->  arch/arm64/kvm/hypercalls.c          |    4 +-
->  arch/arm64/kvm/inject_fault.c        |    2 +
->  arch/arm64/kvm/mmio.c                |   10 +-
->  arch/arm64/kvm/mmu.c                 |  185 ++-
->  arch/arm64/kvm/pmu-emul.c            |    7 +-
->  arch/arm64/kvm/psci.c                |   29 +
->  arch/arm64/kvm/reset.c               |   23 +-
->  arch/arm64/kvm/rme-exit.c            |  207 ++++
->  arch/arm64/kvm/rme.c                 | 1628 ++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c            |   83 +-
->  arch/arm64/kvm/vgic/vgic-v3.c        |    8 +-
->  arch/arm64/kvm/vgic/vgic.c           |   41 +-
->  arch/arm64/mm/fault.c                |   31 +-
->  drivers/perf/arm_pmu.c               |   15 +
->  include/kvm/arm_arch_timer.h         |    2 +
->  include/kvm/arm_pmu.h                |    4 +
->  include/kvm/arm_psci.h               |    2 +
->  include/linux/kvm_host.h             |    2 +
->  include/linux/perf/arm_pmu.h         |    5 +
->  include/uapi/linux/kvm.h             |   31 +-
->  virt/kvm/kvm_main.c                  |    7 +
->  36 files changed, 3569 insertions(+), 101 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_rme.h
->  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
->  create mode 100644 arch/arm64/include/asm/rmi_smc.h
->  create mode 100644 arch/arm64/kvm/rme-exit.c
->  create mode 100644 arch/arm64/kvm/rme.c
+> On Thu, 28 Nov 2024 09:31:08 +0000,
+> Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 11/26/24 20:29, Marc Zyngier wrote:
+>>> Finally, who is going to ensure this keeps working in the foreseeable
+>>> future? Because while this is nice, that's not what gets deployed in
+>>> production, as it leads to unpredictable performances. My take is that
+>>> this thing will eventually bitrot and die.
+>> In the context of our works to define qemu vcpu models for ARM
+>> (https://lore.kernel.org/all/20241025101959.601048-1-eric.auger@redhat.com/)
+>> , our current approach is to try migrating between modern HW we have
+>> access to. The case above is migration between AmpereOne and Grace which
+>> both should be prevalent systems. Do you think this does not make sense
+>> at all to try migrating between those, alhough this may be challenging?
 > 
-> -- 
-> 2.34.1
+> I don't mind the challenge. But I'm worried this is something that
+> looks like a reasonable idea that doesn't get any traction in
+> practice.
 > 
+> And the example you mention is pretty striking: who in their right
+> mind would migrate between these two systems? If you deploy a Grace
+> system, that's because you are making use of the GPU, and your VM is
+> likely to require it. Conversely, if you run on an Ampere system, you
+> don't want to use a valuable (read: bloody expensive) slot on a Grace
+> machine.
+
+Yes I acknowledge it is a total valid point from a use case and cost
+point of view. I was expecting maybe some interest migrating between
+AmpereOne and Grace-Grace for farm enhancement but most probably it is
+marginal.
+
+Definition of [qemu] named vcpu models looks pretty uneasy then because
+we don't have much relevant and accessible HW to test with, taking into
+account such non technical considerations. Besides migration within a
+CPU family I don't see much.
+> 
+>> Other cases we have looked at are migration within Ampere Altra Max
+>> system family (which should be hopefully fine now with have CTR_EL0
+>> works from Sebastian upstream), mig between Graviton hosts. Wrt Ampere
+>> Altra Max to AmpereOne, Oliver pointed out the cntfrq issue which is
+>> blocking.
+>>
+>> Do you think we should restrict our studies to systems which are
+>> "closer" to each other in terms of ARM spec rev. We throught that
+>> migration bewteen AmpereOne And Grace would be an interesting POC and
+>> not totally irrelevant in terms of industry.
+> 
+> These two implementations may be close in terms of CPU features. But
+> as systems, they are massively different, and I very much doubt they
+> have the same deployment story. If they have one at all.
+OK thank you for sharing your point of view.
+> 
+> The Graviton story may have more traction, but these folks have their
+> own way of doing things, and in my experience do not give upstream
+> much consideration.
+OK thanks
+> 
+> To sum it up, I'm not opposed to this work. But if we are going to
+> carry this sort of complex emulation, I want someone to step up and
+> promise that they will test it for the next 10 years, at the very
+> least. Because I'm very unlikely to ever have access to any of these
+> machines, let alone both, and I don't see people using it in practice.
+understood!
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
