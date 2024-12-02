@@ -1,29 +1,29 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B02202F99
-	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 13:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DD7202F92
+	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 13:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733147762; cv=none; b=TyGA+k6k1ilV4LxdwI8nhdbF0xWKKo2FYpaqyWhtFi35mR3S52S8yVVuexl7dBGs3/j2Xwfu80bfuGuKDimZNkEm08j80CTrhyighY7cwLCIpNay7aUMjjpFCDwNg88R/E4vCwwwd8/Pm/2lUB4k5kl0aEDPhzHFju6Wc4NZvoA=
+	t=1733147769; cv=none; b=izLRCCoKDX+xx8BZb4uFga7BfQxvOa2xC/Y3eW4RcYc2rxq+NM6hi793GNZv/Ukzall8f3+UxoWEITxH5Y9ebPNJ/o6bz4LEFgwvR/Ly8sTR1dl7ovTSsUmPDOnzORRmrfYs2pvUCbWKaEcdWHyT1xi0aHVA+4JooaoeheMkviE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733147762; c=relaxed/simple;
-	bh=9+YMFUX2I4HdFTp/92kou6lyfn8Jnbq3OTAQBv0F0qM=;
+	s=arc-20240116; t=1733147769; c=relaxed/simple;
+	bh=Bvz2IeHzMsl68VfmjLJI/KFg8vAP4LHqGayDx0XNN2w=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TXiLpnMzGxZlR1tNTA3tuTOkTUgrILvvcnIm0lTkCeKrJvrC8Its4cIGkTeqONCHocm+QNPiXxXob4nCR9aUvbvZc3jUX0leuvcrisw/Uqy4i4eLXUWsbvYdPV6We1u7p5p076kVdl7b3FcWkIF3t5bLGppTfaBaMeoKmJpKnjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+	 MIME-Version:Content-Type; b=YueGMvPb6T0xsyAUkDANSYnSJjJZVrFVOoPWtMuUF5yaDhJJiQl54rE/aSavACmfLfvD/BFHphGcUv4yTS/yHWKk8/Hf9mveCAUCsxI9eKYzAysQ8gZrnbzkDJdi6A3NUe3WoSYl1oQIGUt302RQvgh+Qb+NmaXVAphNZm9IeoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Y24xx2ZZ4z1T65k;
-	Mon,  2 Dec 2024 21:53:41 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Y24xF28Y3z1V5Rk;
+	Mon,  2 Dec 2024 21:53:05 +0800 (CST)
 Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
-	by mail.maildlp.com (Postfix) with ESMTPS id 64E80140135;
-	Mon,  2 Dec 2024 21:55:56 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 59A13180087;
+	Mon,  2 Dec 2024 21:55:59 +0800 (CST)
 Received: from localhost.localdomain (10.50.165.33) by
  kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 2 Dec 2024 21:55:55 +0800
+ 15.2.1258.34; Mon, 2 Dec 2024 21:55:58 +0800
 From: Yicong Yang <yangyicong@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <corbet@lwn.net>,
@@ -33,9 +33,9 @@ CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
 	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>
-Subject: [PATCH 1/5] arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V, LS64_ACCDATA} usage at EL0/1
-Date: Mon, 2 Dec 2024 21:55:00 +0800
-Message-ID: <20241202135504.14252-2-yangyicong@huawei.com>
+Subject: [PATCH 5/5] KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory
+Date: Mon, 2 Dec 2024 21:55:04 +0800
+Message-ID: <20241202135504.14252-6-yangyicong@huawei.com>
 X-Mailer: git-send-email 2.31.0
 In-Reply-To: <20241202135504.14252-1-yangyicong@huawei.com>
 References: <20241202135504.14252-1-yangyicong@huawei.com>
@@ -52,71 +52,50 @@ X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
 
 From: Yicong Yang <yangyicong@hisilicon.com>
 
-Instructions introduced by FEAT_{LS64, LS64_V, LS64_ACCDATA} is
-controlled by HCRX_EL2.{EnALS, EnASR, EnAS0}. Additionally
-access of ACCDATA_EL1 for FEAT_LS64_ACCDATA is also affected by
-FGT. Configure all of these to allow usage at EL0/1.
+FEAT_LS64* instructions only support to access Device/Uncacheable
+memory, otherwise a data abort for unsupported Exclusive or atomic
+access (0x35) is generated per spec. It's implementation defined
+whether the target exception level is routed and is possible to
+implemented as route to EL2 on a VHE VM. Per DDI0487K.a Section
+C3.2.12.2 Single-copy atomic 64-byte load/store:
 
-This doesn't mean these instructions are always available in
-EL0/1 if provided. The hypervisor still have the control at
-runtime.
+  The check is performed against the resulting memory type after all
+  enabled stages of translation. In this case the fault is reported
+  at the final enabled stage of translation.
+
+If it's implemented as generate the DABT to the final enabled stage
+(stage-2), inject a DABT to the guest to handle it.
 
 Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 ---
- arch/arm64/include/asm/el2_setup.h | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/mmu.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 85ef966c08cd..446d3663840b 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -31,9 +31,22 @@
-         /* Enable GCS if supported */
- 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
- 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
--	cbz	x1, .Lset_hcrx_\@
-+	cbz	x1, .Lskip_gcs_hcrx_\@
- 	orr	x0, x0, #HCRX_EL2_GCSEn
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c9d46ad57e52..b7e6f0a27537 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1787,6 +1787,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 	}
  
-+.Lskip_gcs_hcrx_\@:
-+	/* Enable LS64, LS64_V, LS64_ACCDATA if supported */
-+	mrs_s	x1, SYS_ID_AA64ISAR1_EL1
-+	ubfx	x1, x1, #ID_AA64ISAR1_EL1_LS64_SHIFT, #4
-+	cbz	x1, .Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnALS
-+	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_V
-+	b.lt	.Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnASR
-+	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA
-+	b.lt	.Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnAS0
++	/*
++	 * If instructions of FEAT_{LS64, LS64_V, LS64_ACCDATA} operated on
++	 * unsupported memory regions, a DABT for unsupported Exclusive or
++	 * atomic access is generated. It's implementation defined whether
++	 * the exception will be taken to, a stage-1 DABT or the final enabled
++	 * stage of translation (stage-2 in this case as we hit here). Inject
++	 * a DABT to the guest to handle it if it's implemented as a stage-2
++	 * DABT.
++	 */
++	if (esr_fsc_is_excl_atomic_fault(esr)) {
++		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
++		return 1;
++	}
 +
- .Lset_hcrx_\@:
- 	msr_s	SYS_HCRX_EL2, x0
- .Lskip_hcrx_\@:
-@@ -211,12 +224,21 @@
- 	/* GCS depends on PIE so we don't check it if PIE is absent */
- 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
- 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
--	cbz	x1, .Lset_fgt_\@
-+	cbz	x1, .Lskip_gcs_fgt_\@
+ 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+ 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
  
- 	/* Disable traps of access to GCS registers at EL0 and EL1 */
- 	orr	x0, x0, #HFGxTR_EL2_nGCS_EL1_MASK
- 	orr	x0, x0, #HFGxTR_EL2_nGCS_EL0_MASK
- 
-+.Lskip_gcs_fgt_\@:
-+	mrs_s	x1, SYS_ID_AA64ISAR1_EL1
-+	ubfx	x1, x1, #ID_AA64ISAR1_EL1_LS64_SHIFT, #4
-+	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA
-+	b.ne	.Lset_fgt_\@
-+
-+	/* Disable the trapping of ACCDATA_EL1 */
-+	orr	x0, x0, #HFGxTR_EL2_nACCDATA_EL1
-+
- .Lset_fgt_\@:
- 	msr_s	SYS_HFGRTR_EL2, x0
- 	msr_s	SYS_HFGWTR_EL2, x0
 -- 
 2.24.0
 
