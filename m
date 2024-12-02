@@ -1,29 +1,29 @@
 Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DD7202F92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87440202F99
 	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 13:56:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733147769; cv=none; b=izLRCCoKDX+xx8BZb4uFga7BfQxvOa2xC/Y3eW4RcYc2rxq+NM6hi793GNZv/Ukzall8f3+UxoWEITxH5Y9ebPNJ/o6bz4LEFgwvR/Ly8sTR1dl7ovTSsUmPDOnzORRmrfYs2pvUCbWKaEcdWHyT1xi0aHVA+4JooaoeheMkviE=
+	t=1733147769; cv=none; b=TjnSc1KDUCrNX5cwXkHSrpEPHfZN5WoCMkKFPPXODeycWZW9dWXW1xxhC2D3fb/verMseM2vm8iaMQr7u7TMLpaXswTzn2Zu6SS37XXgXCT3Zu+2Y0mU4lL4UgngImLBrS3A+XTbgri1g0rBOjQRlYWhmaxn/oRsR8sAuoDDoPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733147769; c=relaxed/simple;
-	bh=Bvz2IeHzMsl68VfmjLJI/KFg8vAP4LHqGayDx0XNN2w=;
+	bh=KNDVZK7KCOA6VZ8L5pxm9Ig+QQ2tQaE5PCZPyAA5oQY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YueGMvPb6T0xsyAUkDANSYnSJjJZVrFVOoPWtMuUF5yaDhJJiQl54rE/aSavACmfLfvD/BFHphGcUv4yTS/yHWKk8/Hf9mveCAUCsxI9eKYzAysQ8gZrnbzkDJdi6A3NUe3WoSYl1oQIGUt302RQvgh+Qb+NmaXVAphNZm9IeoE=
+	 MIME-Version:Content-Type; b=DTvK8jQVeAFgvP3RNrvK4e/4kGswZbXjFK5BjZUKT5bjt9LV/G7l86OOBgkOkZyrJ/FXCqnzllPKDvfW+QcVxrM+zsSUe/X8kkt7zlaSif5vunGclKbp/8YI0A00HJpu3/gmmfCoCtwmKLKTBTnpMsScVWxD9Xz+iFgotXL8vow=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Y24xF28Y3z1V5Rk;
-	Mon,  2 Dec 2024 21:53:05 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Y24xD3wmrz1V5Rh;
+	Mon,  2 Dec 2024 21:53:04 +0800 (CST)
 Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
-	by mail.maildlp.com (Postfix) with ESMTPS id 59A13180087;
-	Mon,  2 Dec 2024 21:55:59 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 975231800A2;
+	Mon,  2 Dec 2024 21:55:58 +0800 (CST)
 Received: from localhost.localdomain (10.50.165.33) by
  kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 2 Dec 2024 21:55:58 +0800
+ 15.2.1258.34; Mon, 2 Dec 2024 21:55:57 +0800
 From: Yicong Yang <yangyicong@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <corbet@lwn.net>,
@@ -33,9 +33,9 @@ CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
 	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>
-Subject: [PATCH 5/5] KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory
-Date: Mon, 2 Dec 2024 21:55:04 +0800
-Message-ID: <20241202135504.14252-6-yangyicong@huawei.com>
+Subject: [PATCH 4/5] arm64: Add ESR.DFSC definition of unsupported exclusive or atomic access
+Date: Mon, 2 Dec 2024 21:55:03 +0800
+Message-ID: <20241202135504.14252-5-yangyicong@huawei.com>
 X-Mailer: git-send-email 2.31.0
 In-Reply-To: <20241202135504.14252-1-yangyicong@huawei.com>
 References: <20241202135504.14252-1-yangyicong@huawei.com>
@@ -52,50 +52,40 @@ X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
 
 From: Yicong Yang <yangyicong@hisilicon.com>
 
-FEAT_LS64* instructions only support to access Device/Uncacheable
-memory, otherwise a data abort for unsupported Exclusive or atomic
-access (0x35) is generated per spec. It's implementation defined
-whether the target exception level is routed and is possible to
-implemented as route to EL2 on a VHE VM. Per DDI0487K.a Section
-C3.2.12.2 Single-copy atomic 64-byte load/store:
-
-  The check is performed against the resulting memory type after all
-  enabled stages of translation. In this case the fault is reported
-  at the final enabled stage of translation.
-
-If it's implemented as generate the DABT to the final enabled stage
-(stage-2), inject a DABT to the guest to handle it.
+0x35 indicates IMPLEMENTATION DEFINED fault for Unsupported Exclusive or
+Atomic access. Add ESR_ELx_FSC definition and corresponding wrapper.
 
 Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 ---
- arch/arm64/kvm/mmu.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm64/include/asm/esr.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c9d46ad57e52..b7e6f0a27537 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1787,6 +1787,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		return 1;
- 	}
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 94c9d537a7ad..1639e99f2bd6 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -122,6 +122,7 @@
+ #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+ #define ESR_ELx_FSC_SECC	(0x18)
+ #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
++#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
  
-+	/*
-+	 * If instructions of FEAT_{LS64, LS64_V, LS64_ACCDATA} operated on
-+	 * unsupported memory regions, a DABT for unsupported Exclusive or
-+	 * atomic access is generated. It's implementation defined whether
-+	 * the exception will be taken to, a stage-1 DABT or the final enabled
-+	 * stage of translation (stage-2 in this case as we hit here). Inject
-+	 * a DABT to the guest to handle it if it's implemented as a stage-2
-+	 * DABT.
-+	 */
-+	if (esr_fsc_is_excl_atomic_fault(esr)) {
-+		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+		return 1;
-+	}
+ /* Status codes for individual page table levels */
+ #define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
+@@ -470,6 +471,13 @@ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
+ 	       (esr == ESR_ELx_FSC_ACCESS_L(0));
+ }
+ 
++static inline bool esr_fsc_is_excl_atomic_fault(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
 +
- 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
++	return esr == ESR_ELx_FSC_EXCL_ATOMIC;
++}
++
+ /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
+ static inline bool esr_iss_is_eretax(unsigned long esr)
+ {
 -- 
 2.24.0
 
