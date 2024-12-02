@@ -1,153 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6815B1DDC0C;
-	Mon,  2 Dec 2024 17:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2198A1DB365
+	for <kvmarm@lists.linux.dev>; Mon,  2 Dec 2024 18:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733160140; cv=none; b=I3up9angp/aCIfQC6x+VmN4CTmHTaL57SP6x1Uy/XuoWhgIfGWgkhlJM0l+MczzqsMgVxh/RdCe0C2R8mrR8J7g7iy3U45GSTJx/8O2gIY7Ia4vjsTI1yyx8ANy2PXjyN6B+35AEv4ffNAy9b0sg908UYtZWWz7DgeYtUP4jXnc=
+	t=1733164261; cv=none; b=c0RDGbYWn4Yb3uMTDUBP3oIlBtYa1ILnuVlKgpGXPSfJfFsAWxRZY8gMy+u9FUoQLAbbwsMJu72/4hrU1hKmU+bKDa5KfDeTc9tj/KGok0zEi6rLr6Fssbp16/utR5S9HUntI6laCEe7ccE2SkXU87ueIY8pDCG/A6Oy6QOiLCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733160140; c=relaxed/simple;
-	bh=HmEk0RAxHAj5K5OGiepCVArlYvZ8T1KHJ8vERxPf9yQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pv0pahL9o46xU/HTbpUQ4fay9ao9O5eaJZ3rHEJ7FT7A/LR0SACYPAkoVH5ZQNO7Z8MCtp2U+6rF0g7V8xAWTWCKcGgMd9o5elDJ9Z69gR1pS2M6w9/8hjKetp4m4k4qaIMPNx7Oa18FXI5i2pVF+9lbOBwj0Td9vwphw6mdvhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kf0VHJ8i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733164261; c=relaxed/simple;
+	bh=2iScdVCBMpmjjiCXk0OlK00wqChwDzGVlJmeztoW5S8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=CNrLUSJ8oCmqRMzI/7hbo/7JbYk9Xr51eBRDBdstFVTnjGneCuzOVH2C8HN8VMuDwgJPhomZOsn9XQE+telD9pLqY8cFt68G007MhxGFqEa/qGMIP0wb92Av+EOWqREGwcSLy2SSHqo8g8X+CtShuhp0yxbjnmPXn+idfJBINw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r5d351Mj; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kf0VHJ8i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2D15C4CEE1;
-	Mon,  2 Dec 2024 17:22:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733160139;
-	bh=HmEk0RAxHAj5K5OGiepCVArlYvZ8T1KHJ8vERxPf9yQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kf0VHJ8iDQjtz83w10Wm8bbChUEcKiR4XCQQdhTXoK9kNWIUVGhG65cax0AuXfoqa
-	 LPqOz0uqAAAfQOkjPduyGKu06ycbgXWKIgvPZ54XfuTKrwJCC/h+Xdahpzwmtm0bjT
-	 pD2iBlHQfSLD7raP2j/G8MzXJRyFM2clA0KZEKh+yJ27cCMysjvZNSDnVZgMVv7SJE
-	 L9IRb5ZfPu0HJysaRHgbP50jZyPgtSjq9cZaAxpAmDmLYAYT4e7TYDkde887yac8dI
-	 AUkW3r58XWaAzL5Mhj8cuM+ID/gpidhnzrE8Bs6owSApvXbEA70ht9SH8Da96MwBcv
-	 QpzEBgMPFfo2g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tIA7l-00HQcf-5H;
-	Mon, 02 Dec 2024 17:22:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 07/11] KVM: arm64: Handle counter access early in non-HYP context
-Date: Mon,  2 Dec 2024 17:21:30 +0000
-Message-Id: <20241202172134.384923-8-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20241202172134.384923-1-maz@kernel.org>
-References: <20241202172134.384923-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r5d351Mj"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3ea411ef5a9so2167923b6e.0
+        for <kvmarm@lists.linux.dev>; Mon, 02 Dec 2024 10:30:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733164258; x=1733769058; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hr3Gd/LiFtAjtQkwDJjm0PXxkVfJjoGp7ojBnwj5Gag=;
+        b=r5d351MjyADQLDy6mJVjIAzyE16KLkSTNspu8aY8zDdQfJiRj9WtoTH4/UO2pZoV19
+         jOI0NSyknXdjkOf7OGfo3PUyxxU5azRbox1oV7CvgGKWfz6Q9QZfPRX4nItac7MlVh0X
+         GraL9cy/ml5pD/rsFenwzy9NaV147ptXmPKO1W/tDYy0OP4HurQOkin4Bx3lqU25NE6Z
+         wJp6Ji3lz6EwvKtkCposlH8iB97IHVV6QYIu4zFvthld9TJm/UzKSr9v5dABIfi6XxvG
+         yRUSvkoAmOuuyFwBFoo9mrepW6KaCFB5L0fNcdELZ5MjuIDxgpfguK/dcpXBUwjQ5J0U
+         E7OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733164258; x=1733769058;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hr3Gd/LiFtAjtQkwDJjm0PXxkVfJjoGp7ojBnwj5Gag=;
+        b=VYjzbnhcSchntW2wTCnmuAhWXtxYJLWkKgt0gFo4B6RQQmADobYAP0SZmegRcJ7Kyc
+         QG8tmgOCQAIgOSnaDWtz5KgGIibomLRDlStJ/ePGUtVAWAAd1bI97JUSm1eJyrgqzKY7
+         Z9N4/qg8e0O+8670Z/fEEVO6NrV++jrAyFMi1iZTjCU/pF+HTBIdy+SRCflX7SBhXVHN
+         LytdzOgs8k1XZThmK51lnxWrU8qIhmVEJiJMAWzdTS3rBXr2q6gg3fZ87HyIkAH2k4dl
+         nd60K924rmhshlbzb5LlaBeTerTU9B3G39ipostRQxSt1JcToIxSlTpxIVE8Jm7XiwBF
+         sxYw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9wWvvemcDdTiRdUxtzeUmfASKjvjPmD/kWQDmW3XNCwS8JbMqbhuBWlqoShVtYXfuMCfiku8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwZLLjtIqXe1cF+YaS0u/8nU8OF53yLCrkboZ99gL4hP6lEHEqt
+	9AQVAE+kKNs9XtsFDY6rhivc8qC03LQ29/n9nGmL9BKoN1SxK/eiGawKJDszAi9wYgOAcvxCvTa
+	buqbqfoQeqtSU0pSnTSpNWJ7zJrntZp+ljcfAYg==
+X-Gm-Gg: ASbGnculNqsaJQtzXyCBsdkCtnwVpsxOxkTpgvofOX6uCjVMTecpxPOdAYPwjiQdoXj
+	9/vjyiWWEFepT5nOqiwNVyy5TJW4t7KiF
+X-Google-Smtp-Source: AGHT+IHlNZ0c3FgMSDeb4X1ilFXmlXpiLh2UyuryMRixGlP9qIERz81Jb/a0RHj6dZKqNN3qYCgeYR/htw4LOwHnoLA=
+X-Received: by 2002:a05:6358:5d84:b0:1c3:75c6:599a with SMTP id
+ e5c5f4694b2df-1cab16a573bmr895060655d.21.1733164257961; Mon, 02 Dec 2024
+ 10:30:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 3 Dec 2024 00:00:46 +0530
+Message-ID: <CA+G9fYu95a2Dy-R-duaieHVOM9E+zeKu1EF+YJydnaD7nxnhQg@mail.gmail.com>
+Subject: stable-rc: queues: 5.15: arch/arm64/kvm/vgic/vgic-its.c:870:24:
+ error: implicit declaration of function 'vgic_its_write_entry_lock' [-Werror=implicit-function-declaration]
+To: linux-stable <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Sasha Levin <sashal@kernel.org>, kvmarm@lists.linux.dev
+Cc: Kunkun Jiang <jiangkunkun@huawei.com>, Anders Roxell <anders.roxell@linaro.org>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 
-We already deal with CNTPCT_EL0 accesses in non-HYP context.
-Let's add CNTVCT_EL0 as a good measure.
+The arm64 queues build gcc-12 defconfig-lkftconfig failed on the
+Linux stable-rc queue 5.15 for the arm64 architectures.
 
-This is also an opportunity to simplify things and make it
-plain that this code is only for non-HYP context handling.
+arm64
+* arm64, build
+ - build/gcc-12-defconfig-lkftconfig
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+Build errors:
+------
+arch/arm64/kvm/vgic/vgic-its.c:870:24: error: implicit declaration of
+function 'vgic_its_write_entry_lock'
+[-Werror=implicit-function-declaration]
+  870 |                 return vgic_its_write_entry_lock(its, gpa, 0, ite_esz);
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: some warnings being treated as errors
+
+Links:
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 34 +++++++++++++++----------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+- https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_5.15/build/v5.15.173-312-gc83ccef4e8ee/testrun/26166362/suite/build/test/gcc-12-defconfig-lkftconfig/log
+- https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_5.15/build/v5.15.173-312-gc83ccef4e8ee/testrun/26166362/suite/build/test/gcc-12-defconfig-lkftconfig/history/
+- https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_5.15/build/v5.15.173-312-gc83ccef4e8ee/testrun/26166362/suite/build/test/gcc-12-defconfig-lkftconfig/details/
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 30e572de28749..719479b42b329 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -506,7 +506,7 @@ static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
- 	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
- }
- 
--static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
-+static bool kvm_handle_cntxct(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *ctxt;
- 	u32 sysreg;
-@@ -516,18 +516,19 @@ static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
- 	 * We only get here for 64bit guests, 32bit guests will hit
- 	 * the long and winding road all the way to the standard
- 	 * handling. Yes, it sucks to be irrelevant.
-+	 *
-+	 * Also, we only deal with non-hypervisor context here (either
-+	 * an EL1 guest, or a non-HYP context of an EL2 guest).
- 	 */
-+	if (is_hyp_ctxt(vcpu))
-+		return false;
-+
- 	sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
- 
- 	switch (sysreg) {
- 	case SYS_CNTPCT_EL0:
- 	case SYS_CNTPCTSS_EL0:
- 		if (vcpu_has_nv(vcpu)) {
--			if (is_hyp_ctxt(vcpu)) {
--				ctxt = vcpu_hptimer(vcpu);
--				break;
--			}
--
- 			/* Check for guest hypervisor trapping */
- 			val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
- 			if (!vcpu_el2_e2h_is_set(vcpu))
-@@ -539,16 +540,23 @@ static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
- 
- 		ctxt = vcpu_ptimer(vcpu);
- 		break;
-+	case SYS_CNTVCT_EL0:
-+	case SYS_CNTVCTSS_EL0:
-+		if (vcpu_has_nv(vcpu)) {
-+			/* Check for guest hypervisor trapping */
-+			val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
-+
-+			if (val & CNTHCTL_EL1TVCT)
-+				return false;
-+		}
-+
-+		ctxt = vcpu_vtimer(vcpu);
-+		break;
- 	default:
- 		return false;
- 	}
- 
--	val = arch_timer_read_cntpct_el0();
--
--	if (ctxt->offset.vm_offset)
--		val -= *kern_hyp_va(ctxt->offset.vm_offset);
--	if (ctxt->offset.vcpu_offset)
--		val -= *kern_hyp_va(ctxt->offset.vcpu_offset);
-+	val = compute_counter_value(ctxt);
- 
- 	vcpu_set_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu), val);
- 	__kvm_skip_instr(vcpu);
-@@ -593,7 +601,7 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
- 		return true;
- 
--	if (kvm_hyp_handle_cntpct(vcpu))
-+	if (kvm_handle_cntxct(vcpu))
- 		return true;
- 
- 	return false;
--- 
-2.39.2
+Steps to reproduce:
+------------
+- tuxmake \
+        --runtime podman \
+        --target-arch arm64 \
+        --toolchain gcc-12 \
+        --kconfig
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2pfZrGeL0phpW3aHlpr5cjEzz3r/config
 
+metadata:
+----
+  git describe: v5.15.173-312-gc83ccef4e8ee
+  git repo: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
+  git sha: c83ccef4e8ee73e988561f85f18d2d73c7626ad0
+  kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2pfZrGeL0phpW3aHlpr5cjEzz3r/config
+  build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2pfZrGeL0phpW3aHlpr5cjEzz3r/
+  toolchain: gcc-12
+  config: gcc-12-defconfig-lkftconfig
+  arch: arm64
+
+--
+Linaro LKFT
+https://lkft.linaro.org
