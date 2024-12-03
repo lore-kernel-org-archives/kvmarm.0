@@ -1,126 +1,75 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB78D41229
-	for <kvmarm@lists.linux.dev>; Tue,  3 Dec 2024 19:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE294189F3F;
+	Tue,  3 Dec 2024 21:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733254474; cv=none; b=Qg0vDvfbaALrGRBfksOIcAOPgiOgYaYCr4AwDwxrOznxe91pN6d7frq+RtE1DNojm5X+qU6dvi13mELztGwKXm4tAyrSYSJQU4zMvw8yi7bIZg2kr8uJieEd7R8fSO7BUCQTJm1nW8MRxKd7Qj13OZ6ap8wX9xu7ZGByc6Yo2Bw=
+	t=1733260959; cv=none; b=cuZXKaOYbTT9ogwcd9SyQ0jKIiKIjJrtU4PQSuVW8beaflJ2gOkJ89jSQFSvb4Sq0JlvJCGOGKKuFjrUBCGpIH89iARhPjIxW6csdCLDDLBqqMHdCYxuEtEHeowudJMeXcPru0g4XfJnbrI/stY2yiwVXYCBbjlP2U8JDrxcdhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733254474; c=relaxed/simple;
-	bh=nVyu0O7jaOnlHWvZDvzJtM3dvCxDwoBhKEOqCa6puTs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NafJZqiXJWgvWAaQssYHkpblBtn08c599iEz1BB68kANnAdeNO/ljluPGGiGfmyPFhCikj4MzGjKJW4MaMWAt0ZBfdEmWq+k/WTIdzhhQfl50820xaGX7XHD/XcVPEThto8HW8tsnPHvN3Un3pzym8X1G3e2quGMey5/+hjRr2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t/mLdkmf; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t/mLdkmf"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733254470;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6d9dUcTSe5Y6WYDonPie5MfCzdgvBZJtuRSWHader5s=;
-	b=t/mLdkmfsGz7PT1b7e7HBq51k7vnrSjv3Fv5m2HxK1yxOS4PA+P9EVOjaCLoRlZmqY/kiZ
-	ihzPS5A/paa1VAO2eZlPHIt1TiXBUPD5ejxW6W/MHKzjHYhQNcTkwJMtjQ6gV2prTqNGL5
-	voS8qB2TUq/jYfglTPdv/gv5Ip1VFuI=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1733260959; c=relaxed/simple;
+	bh=jbRhQXH5dQ926uDNBhcZ0k8QVZ1XplE+z+0UvN7Mgis=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fDlcT1WH+rlpHU7xML2KL5oBaS015JqABR8U4PCt53/c3rDEgPxjbr54OYnaOBGZ1oWy30Kz8knRRLCreIYL20F+1rf3VImjR37t+IMIW+irnYgU9KMvTgbUY8yqxKa34de1aRSXJVGQvgWYkiWgnUgbr61Ttb4+aGGgiOYcwiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F2EFC4CECF;
+	Tue,  3 Dec 2024 21:22:37 +0000 (UTC)
+Date: Tue, 3 Dec 2024 21:22:35 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [RFC PATCH 14/14] arm64: Enable IMP DEF PMUv3 traps on Apple M2
-Date: Tue,  3 Dec 2024 11:34:15 -0800
-Message-Id: <20241203193415.1070917-1-oliver.upton@linux.dev>
-In-Reply-To: <20241203193220.1070811-1-oliver.upton@linux.dev>
-References: <20241203193220.1070811-1-oliver.upton@linux.dev>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be
+ overridden
+Message-ID: <Z092m3iNQYbKljHN@arm.com>
+References: <20241203190236.505759-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203190236.505759-1-maz@kernel.org>
 
-Apple M2 CPUs support IMPDEF traps of the PMUv3 sysregs, allowing a
-hypervisor to virtualize an architectural PMU for a VM. Flip the
-appropriate bit in HACR_EL2 on supporting hardware.
+On Tue, Dec 03, 2024 at 07:02:36PM +0000, Marc Zyngier wrote:
+> Catalin reports that a hypervisor lying to a guest about the size
+> of the ASID field may result in unexpected issues:
+> 
+> - if the underlying HW does only supports 8 bit ASIDs, the ASID
+>   field in a TLBI VAE1* operation is only 8 bits, and the HW will
+>   ignore the other 8 bits
+> 
+> - if on the contrary the HW is 16 bit capable, the ASID field
+>   in the same TLBI operation is always 16 bits, irrespective of
+>   the value of TCR_ELx.AS.
+> 
+> This could lead to missed invalidations if the guest was lead to
+> assume that the HW had 8 bit ASIDs while they really are 16 bit wide.
+> 
+> In order to avoid any potential disaster that would be hard to debug,
+> prenent the migration between a host with 8 bit ASIDs to one with
+> wider ASIDs (the converse was obviously always forbidden). This is
+> also consistent with what we already do for VMIDs.
+> 
+> If it becomes absolutely mandatory to support such a migration path
+> in the future, we will have to trap and emulate all TLBIs, something
+> that nobody should look forward to.
+> 
+> Fixes: d5a32b60dc18 ("KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1")
+> Reported-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kernel/cpu_errata.c | 38 ++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
-
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index a78f247029ae..441ee4ffc770 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -194,6 +194,37 @@ has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
- 	return is_midr_in_range(midr, &range) && has_dic;
- }
- 
-+static const struct midr_range impdef_pmuv3_cpus[] = {
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
-+	{},
-+};
-+
-+static bool has_impdef_pmuv3(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	unsigned int pmuver;
-+
-+	if (!is_kernel_in_hyp_mode())
-+		return false;
-+
-+	pmuver = cpuid_feature_extract_unsigned_field(dfr0,
-+						      ID_AA64DFR0_EL1_PMUVer_SHIFT);
-+	if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-+		return false;
-+
-+	return is_midr_in_range_list(read_cpuid_id(), impdef_pmuv3_cpus);
-+}
-+
-+static void cpu_enable_impdef_pmuv3_traps(const struct arm64_cpu_capabilities *__unused)
-+{
-+	sysreg_clear_set_s(SYS_HACR_EL2, 0, BIT(56));
-+}
-+
- #ifdef CONFIG_ARM64_WORKAROUND_REPEAT_TLBI
- static const struct arm64_cpu_capabilities arm64_repeat_tlbi_list[] = {
- #ifdef CONFIG_QCOM_FALKOR_ERRATUM_1009
-@@ -786,6 +817,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_38_list),
- 	},
- #endif
-+	{
-+		.desc = "Apple IMPDEF PMUv3 Traps",
-+		.capability = ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
-+		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
-+		.matches = has_impdef_pmuv3,
-+		.cpu_enable = cpu_enable_impdef_pmuv3_traps,
-+	},
- 	{
- 	}
- };
--- 
-2.39.5
-
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
