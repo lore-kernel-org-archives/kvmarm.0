@@ -1,143 +1,114 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503991E5721
-	for <kvmarm@lists.linux.dev>; Tue,  3 Dec 2024 13:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5429D1FC7EF;
+	Tue,  3 Dec 2024 19:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733231442; cv=none; b=k1HLPG0h/dbrzF0prePbqMlDsPLshm868Tt6cADzedi4YqdqxKGCqrA7wEdufLyMAF5fHXYr1R0cLbxLO7eMqTt/yqkcHd7y1AyMyzxXAJaZESvy/gJlHQn678hgQGM/f4FQKWFR+GuHib1+XCci7P5H7J+3/JBbnpnG+3RmogA=
+	t=1733252597; cv=none; b=ul4wu3Vllpvg8PJZAI/qbjh0nSYtspoBDpRctDPmmV/V0JJGdgGZB/PYq10pgb1gkT2edboqBOXzdjZJSOKPiY52LpMdSmPlECZviBgqecENCG9Fk8kcHCZK4vB6YILz4laIgxvfgUh1+YSySP6e4HFcvRofYFHP2TqFKaeLVKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733231442; c=relaxed/simple;
-	bh=E9wjGXkxZXo6et0AHWDrNIJNLH9shVHbKvVG/BUzYXw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vBd9i/RO6RBDaWQcttwRKIm1dwaofxW4a5ZyoLHfq5TZ04kMwLnP5N4xyNBJIiz2xAYkCiYRUgA3Tf7k7QXhpG5/8VVDSNXk9mLLEOYOPQaaAHPDPJieroRGD+uagG3XtCL6FooQVziXv+axn28tkkq8rnO053bVu6Jjhq8oVnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MwCQdVbv; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1733252597; c=relaxed/simple;
+	bh=eijrbAe3pZqlViuINmabDVrHYMVGawiSwmMh9zjp4eU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVfMNCI2QkYeFzubXIQv33J0xX+shouAcRQUdKs+UGxx2KO82nS/NK6qWpENAB4WTFjNcgVhZm9qIYAPGUi3zjHzHWEFCN59aUh9yb1gP9z3NcSMPrKUQ8pHNuZoXkjnJSPIMgAGwGufCfvKRAAD2Ct0hbIozF4D9mtQLZ0qcOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4xOX2qv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MwCQdVbv"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b66ea49407so484417185a.0
-        for <kvmarm@lists.linux.dev>; Tue, 03 Dec 2024 05:10:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733231439; x=1733836239; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9DpOBXLLjyiG+N3LVHSh4lonGnoLSvX4rvZN0nDjDN0=;
-        b=MwCQdVbvpZnAOxQ1ZfAWsNMK1PLXuDkFzn7p/x9BHAI0P80KAOGvqq323sEg2L6UIW
-         R41HQBc/QKokTdnYCx2NTqlIxkwlgd0X89OrxDOlwrf2WnkY8BHcLWcNH+zS+IifAWyM
-         1x/52jM00/vahgyhLJZPHUCqFltsjw7Yx/jV+khN1XpFpwXIaXwiY7Rrq0L+XFANZFii
-         qK/oNy+6rs2xXyIWjk7BbaLkeP799VPqNou8OUFntH/yJE/Ue5EtMPhY9OIlxIJaKC4h
-         7ZpP6RDES2R124LNjDjMKjoWgdS6rTdlmbLRZ6ga02XO7BuvDCbwsbIPgCOg4bJneAMH
-         Nmmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733231439; x=1733836239;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9DpOBXLLjyiG+N3LVHSh4lonGnoLSvX4rvZN0nDjDN0=;
-        b=HH6HbqZRH0Q52Bj7yspvNDVdU3+BhsHJjBe6eYNovHxEpXm6N4Gay0NZXINXB974F4
-         B4PXVLIbJuOtqgql8QFhKftPwCo2vg/1YPocXg+b553+CEULyRNgQoDCd2ycFr016vsW
-         dqkSpI4DhGw246UVFF6tw6THtiRxmKoxvhO4+U/ikOGnYHVtSTVO4aRNSwuNXFNJ/GX1
-         PP27cSXqktvl0juTNf7APJ9rDJhTEiRzdCcFxGLAvrWHrPFnYWwpx+tMXDDOhCfkfN/T
-         Zsbd5lSDloop/OZ234mouuRxjXuLaRYYZM6tW21atYbbf8OGIvhvlb/CFVfHWsqYsjOC
-         thfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVi+/2xpDyKmcF71HXsHYU4PsZZhtygoycWRbIZFY6l0+t+uxlyDVBHRZItxKr9cHjrGlhap54=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywn050ebqhHihO7HrWu6Ge2hciKWyoDP1JdBdmxm2FH9yHjPYeE
-	BIGmoYfz2+JyuhZdDcEj2s3J0tF2yZRsd94K64Q9kUlY5B4QesvZl77Iky9g9YySilu7CBXizur
-	aQB/9CEeeg1chvuJuhUuJwHgj/l8MgRy+/Wwpqw==
-X-Gm-Gg: ASbGncsEzdGuTl/Fs0IXpx00jrPIvYFqIUrLhRPhntC5rO/oAgcPfDyr6t1BRkgzkGO
-	BCno3gAT1W/YN8Dp2S30tGrsld7pT21ou
-X-Google-Smtp-Source: AGHT+IHDdU+9VCqufyt3SzpXC2DAP0G4i5+riHGBhVvX00dwFRQDOUu4q0kbXbYL0xF/WekUeH65LcXOP02DnOppu3U=
-X-Received: by 2002:a05:620a:1729:b0:7ac:e8bf:894a with SMTP id
- af79cd13be357-7b683a2cff9mr3767847985a.20.1733231439209; Tue, 03 Dec 2024
- 05:10:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4xOX2qv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA0B7C4CED6;
+	Tue,  3 Dec 2024 19:03:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733252596;
+	bh=eijrbAe3pZqlViuINmabDVrHYMVGawiSwmMh9zjp4eU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=M4xOX2qvVUnVLmMBciJn/ktir9cYv44PQgN516P1RUy/hPZeRytnnVwufr9xCirtN
+	 L6zCvXUtA0hCxoxiHFGoFlRNuy2LURLASnKomgcf3JbfAYcAit3FgiUPW9KAUKkqVU
+	 OO6GIRcXSxn8trEcptZ09FAOK2BdsqOPLLs4jpjQKpDudO+FnHeNQWlzmc9XtlWZuy
+	 KNrNEq15+0bxzTIJJ9qAyAGvCh+fFTGp6gghmLFLZCtq2Y1Jd9kiYhmkegjDnHQr1f
+	 hZeMLJ7T2GV9snlpAedM7OzOiWRKh0Je1Zj7P+UNLm2YfdGDK10JlY4CPlnwhTemWw
+	 bGAddOoecVgYw==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=localhost.localdomain)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tIYB0-000CK2-FB;
+	Tue, 03 Dec 2024 19:03:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	stable@vger.kernel.org,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	James Morse <james.morse@arm.com>
+Subject: [PATCH] KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be overridden
+Date: Tue,  3 Dec 2024 19:02:36 +0000
+Message-ID: <20241203190236.505759-1-maz@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CA+G9fYu95a2Dy-R-duaieHVOM9E+zeKu1EF+YJydnaD7nxnhQg@mail.gmail.com>
- <2024120306-sniff-labored-f6fa@gregkh>
-In-Reply-To: <2024120306-sniff-labored-f6fa@gregkh>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 3 Dec 2024 18:40:27 +0530
-Message-ID: <CA+G9fYvhOH4iGf597VK61g_LuSU0dtohDObNzOu23H0SLP-CZw@mail.gmail.com>
-Subject: Re: stable-rc: queues: 5.15: arch/arm64/kvm/vgic/vgic-its.c:870:24:
- error: implicit declaration of function 'vgic_its_write_entry_lock' [-Werror=implicit-function-declaration]
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, lkft-triage@lists.linaro.org
-Cc: linux-stable <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.linux.dev, 
-	Kunkun Jiang <jiangkunkun@huawei.com>, Anders Roxell <anders.roxell@linaro.org>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, stable@vger.kernel.org, will@kernel.org, mark.rutland@arm.com, james.morse@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 3 Dec 2024 at 14:23, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Tue, Dec 03, 2024 at 12:00:46AM +0530, Naresh Kamboju wrote:
-> > The arm64 queues build gcc-12 defconfig-lkftconfig failed on the
-> > Linux stable-rc queue 5.15 for the arm64 architectures.
-> >
-> > arm64
-> > * arm64, build
-> >  - build/gcc-12-defconfig-lkftconfig
-> >
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >
-> > Build errors:
-> > ------
-> > arch/arm64/kvm/vgic/vgic-its.c:870:24: error: implicit declaration of
-> > function 'vgic_its_write_entry_lock'
-> > [-Werror=implicit-function-declaration]
-> >   870 |                 return vgic_its_write_entry_lock(its, gpa, 0, ite_esz);
-> >       |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
-> > cc1: some warnings being treated as errors
-> >
-> > Links:
-> > ---
-> > - https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_5.15/build/v5.15.173-312-gc83ccef4e8ee/testrun/26166362/suite/build/test/gcc-12-defconfig-lkftconfig/log
-> > - https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_5.15/build/v5.15.173-312-gc83ccef4e8ee/testrun/26166362/suite/build/test/gcc-12-defconfig-lkftconfig/history/
-> > - https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_5.15/build/v5.15.173-312-gc83ccef4e8ee/testrun/26166362/suite/build/test/gcc-12-defconfig-lkftconfig/details/
-> >
-> > Steps to reproduce:
-> > ------------
-> > - tuxmake \
-> >         --runtime podman \
-> >         --target-arch arm64 \
-> >         --toolchain gcc-12 \
-> >         --kconfig
-> > https://storage.tuxsuite.com/public/linaro/lkft/builds/2pfZrGeL0phpW3aHlpr5cjEzz3r/config
-> >
-> > metadata:
-> > ----
-> >   git describe: v5.15.173-312-gc83ccef4e8ee
-> >   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
-> >   git sha: c83ccef4e8ee73e988561f85f18d2d73c7626ad0
-> >   kernel config:
-> > https://storage.tuxsuite.com/public/linaro/lkft/builds/2pfZrGeL0phpW3aHlpr5cjEzz3r/config
-> >   build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2pfZrGeL0phpW3aHlpr5cjEzz3r/
-> >   toolchain: gcc-12
-> >   config: gcc-12-defconfig-lkftconfig
-> >   arch: arm64
-> >
-> > --
->
-> Conflicting commit now dropped, thanks.
+Catalin reports that a hypervisor lying to a guest about the size
+of the ASID field may result in unexpected issues:
 
-Thank you.
-I see the reported issues on 6.1 branch also.
+- if the underlying HW does only supports 8 bit ASIDs, the ASID
+  field in a TLBI VAE1* operation is only 8 bits, and the HW will
+  ignore the other 8 bits
 
-/arch/arm64/kvm/vgic/vgic-its.c:870:24: error: implicit declaration of
-function 'vgic_its_write_entry_lock'
-[-Werror=implicit-function-declaration]
-  870 |                 return vgic_its_write_entry_lock(its, gpa, 0, ite_esz);
-      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: some warnings being treated as errors
+- if on the contrary the HW is 16 bit capable, the ASID field
+  in the same TLBI operation is always 16 bits, irrespective of
+  the value of TCR_ELx.AS.
 
+This could lead to missed invalidations if the guest was lead to
+assume that the HW had 8 bit ASIDs while they really are 16 bit wide.
 
-Links:
+In order to avoid any potential disaster that would be hard to debug,
+prenent the migration between a host with 8 bit ASIDs to one with
+wider ASIDs (the converse was obviously always forbidden). This is
+also consistent with what we already do for VMIDs.
+
+If it becomes absolutely mandatory to support such a migration path
+in the future, we will have to trap and emulate all TLBIs, something
+that nobody should look forward to.
+
+Fixes: d5a32b60dc18 ("KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1")
+Reported-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
 ---
-- https://storage.tuxsuite.com/public/linaro/lkft/builds/2phryzHX4rmjhKAc2d5Wtq7QijV/
-- https://qa-reports.linaro.org/lkft/linux-stable-rc-queues-queue_6.1/build/v6.1.119-434-g5bbf9d2a0ecf/testrun/26175571/suite/build/test/gcc-13-defconfig-lkftconfig/history/
+ arch/arm64/kvm/sys_regs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-- Naresh
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a26f02ec8748..b1918adbd0aa 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2674,7 +2674,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_WRITABLE(ID_AA64MMFR0_EL1, ~(ID_AA64MMFR0_EL1_RES0 |
+ 					ID_AA64MMFR0_EL1_TGRAN4_2 |
+ 					ID_AA64MMFR0_EL1_TGRAN64_2 |
+-					ID_AA64MMFR0_EL1_TGRAN16_2)),
++					ID_AA64MMFR0_EL1_TGRAN16_2 |
++					ID_AA64MMFR0_EL1_ASIDBITS)),
+ 	ID_WRITABLE(ID_AA64MMFR1_EL1, ~(ID_AA64MMFR1_EL1_RES0 |
+ 					ID_AA64MMFR1_EL1_HCX |
+ 					ID_AA64MMFR1_EL1_TWED |
+-- 
+2.43.0
+
