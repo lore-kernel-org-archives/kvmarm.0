@@ -1,75 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE294189F3F;
-	Tue,  3 Dec 2024 21:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC8A1885A0;
+	Tue,  3 Dec 2024 21:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733260959; cv=none; b=cuZXKaOYbTT9ogwcd9SyQ0jKIiKIjJrtU4PQSuVW8beaflJ2gOkJ89jSQFSvb4Sq0JlvJCGOGKKuFjrUBCGpIH89iARhPjIxW6csdCLDDLBqqMHdCYxuEtEHeowudJMeXcPru0g4XfJnbrI/stY2yiwVXYCBbjlP2U8JDrxcdhg=
+	t=1733261533; cv=none; b=IZy9mcxu75XZIMMWzrQq/bIl7awb9DTpCZ7DuH9TTJ/svDAqHEW42CG5Eg4SftYwhIEPn83I7ChVNTydJQhDlQA5apft2tNPwuha7HzESgkdCeI6Sfooa8nWVb7ZivzqJ+K2Atpou5ks+1zczv8BP5NXgm7PG1cyN90tdQsrGYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733260959; c=relaxed/simple;
-	bh=jbRhQXH5dQ926uDNBhcZ0k8QVZ1XplE+z+0UvN7Mgis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fDlcT1WH+rlpHU7xML2KL5oBaS015JqABR8U4PCt53/c3rDEgPxjbr54OYnaOBGZ1oWy30Kz8knRRLCreIYL20F+1rf3VImjR37t+IMIW+irnYgU9KMvTgbUY8yqxKa34de1aRSXJVGQvgWYkiWgnUgbr61Ttb4+aGGgiOYcwiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F2EFC4CECF;
-	Tue,  3 Dec 2024 21:22:37 +0000 (UTC)
-Date: Tue, 3 Dec 2024 21:22:35 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	s=arc-20240116; t=1733261533; c=relaxed/simple;
+	bh=BOg48Ob9/NVzqkpxLrxQQVqMKoA0kVXfOH8VOSVCmp0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iqDsZW5+WdZ/qxBIWdBLTDTLZlxGeR2rYcKQ/lum2IYZndIXxHdu8X3xVvOBDka/xOrPBVbAbtAkGiCiIL4UiFB8lkt7pvob04ip9IoBTzZY/cOeRCip7ar9G7PYj9qNS2vrMrRXTuLLUKMOSFeiYh7LHqK7wUHrwb4qrzsA6K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQChVggg; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQChVggg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 498E7C4CED8;
+	Tue,  3 Dec 2024 21:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733261533;
+	bh=BOg48Ob9/NVzqkpxLrxQQVqMKoA0kVXfOH8VOSVCmp0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BQChVgggT/bBeKHZ8u8dvoyJoHoBlz9+KD0dYqf7fyD45vOJGfMo0S7WkoUP8Vl8W
+	 ziJNnSxLXVJr/YwOo9BOglDutV4ejT1qz/qCrjysPT8FVGB0njHXQhhtUYqqeQV97a
+	 YX11HDV2c3KepOLCh5LoNsW7yCk/TZ15gxW/5oSZA/ZhSlhz/Va04JD2xEP1vYZHWI
+	 +3hv13473VvVtkKiuBdK8C8Afo167/LLjFPjfgfoGeD297Jc7mNlOn+H6btyGm4D9j
+	 9JSxRiQPjgv92f7BZlzDKxyYk3QGZtYgrxJ7kGToFqQKaJVH9zGTsPrcmBXt7WJ0rU
+	 emXujeUxfEE5Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tIaV8-000EuJ-Rd;
+	Tue, 03 Dec 2024 21:32:10 +0000
+Date: Tue, 03 Dec 2024 21:32:10 +0000
+Message-ID: <87ldwwsbad.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	James Morse <james.morse@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be
- overridden
-Message-ID: <Z092m3iNQYbKljHN@arm.com>
-References: <20241203190236.505759-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 05/14] KVM: arm64: Always allow fixed cycle counter
+In-Reply-To: <20241203193220.1070811-6-oliver.upton@linux.dev>
+References: <20241203193220.1070811-1-oliver.upton@linux.dev>
+	<20241203193220.1070811-6-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241203190236.505759-1-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Dec 03, 2024 at 07:02:36PM +0000, Marc Zyngier wrote:
-> Catalin reports that a hypervisor lying to a guest about the size
-> of the ASID field may result in unexpected issues:
+On Tue, 03 Dec 2024 19:32:11 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> - if the underlying HW does only supports 8 bit ASIDs, the ASID
->   field in a TLBI VAE1* operation is only 8 bits, and the HW will
->   ignore the other 8 bits
-> 
-> - if on the contrary the HW is 16 bit capable, the ASID field
->   in the same TLBI operation is always 16 bits, irrespective of
->   the value of TCR_ELx.AS.
-> 
-> This could lead to missed invalidations if the guest was lead to
-> assume that the HW had 8 bit ASIDs while they really are 16 bit wide.
-> 
-> In order to avoid any potential disaster that would be hard to debug,
-> prenent the migration between a host with 8 bit ASIDs to one with
-> wider ASIDs (the converse was obviously always forbidden). This is
-> also consistent with what we already do for VMIDs.
-> 
-> If it becomes absolutely mandatory to support such a migration path
-> in the future, we will have to trap and emulate all TLBIs, something
-> that nobody should look forward to.
-> 
-> Fixes: d5a32b60dc18 ("KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1")
-> Reported-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
+> The fixed CPU cycle counter is mandatory for PMUv3, so it doesn't make a
+> lot of sense allowing userspace to filter it. Only apply the PMU event
+> filter to *programmed* event counters.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+But that's a change in ABI, isn't it? We explicitly say in the
+documentation that the cycle counter can be filtered by specifying
+event 0x11.
+
+More importantly, the current filtering works in terms of events, and
+not in terms of counters.
+
+Instead of changing the ABI, how about simply not supporting filtering
+on such non-compliant HW? Surely that would simplify a few things.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
