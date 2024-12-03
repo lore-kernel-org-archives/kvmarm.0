@@ -1,172 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905DA1DFD82;
-	Tue,  3 Dec 2024 09:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEB21E25F4
+	for <kvmarm@lists.linux.dev>; Tue,  3 Dec 2024 10:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733218700; cv=none; b=Ze6enQunMdHZ8ws605NE9VCSiXREyEGaxeoYBEXL97/BLPmpUMLqZVR0X/EaNPILdF/CIRpI9sHva1Rn37VNeDiva5L71wacvZ/LF4Fo67FxxHMK0lxv9kbFCGKl0Mqn7s0lwPKcUaTgFBxBOzLSayFHnv/rdyNSO/IpeAUep/0=
+	t=1733222260; cv=none; b=OPCZMvhdTsrXxGqD60LQiIPzUejuyxdoT7rHgryTGp3IbRrG7xdiiEoDg3fQklSU8D0QffRX9pARVkojMQIMiyzkMfG3w0Rx3XaUuXitiUEdW6jVY0HqUyW0pvkLHcHNFvrtDIhWYeRmy8M7W1P86mkafay1gTf/HWi5y5YXwYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733218700; c=relaxed/simple;
-	bh=RTXFdOfvmcVJEudvLjpK3I/u/d16/ZYqKz3aDspgte4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ND0+YS2kUEJbrOAsllzbWQ6pon1lrWlOBLQvj1t0TiSsjNMQLobUFKuvUD/ttYdM7uXtoHx9pEHt/Z/AwaGqiXIjA4taqbu9fAAkOg+n9poJdwqLdyYqkdlJeTM/dfNUCEM1LUsswA027jfhBQaAVf9dhIFVgl+ZwlolbaNW6Zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUogFoHR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733222260; c=relaxed/simple;
+	bh=q3+FxbCcBkiskXSn831XHlgU64Eqo1nUx21JojjeJx4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IFX2CHB0VY5cILyCj1IsTyoxqkpw53zku402NrZos/JmQXiDMVnTucf79idNz/qWSfIaFcYKYbQ7A/Nagu8VeO3MBUxH4eLYl1v5z0ks23Yjjewu+OzmErWNUH47y8oklexdqgCmuQdxV8vwT/Upc7Lf6SIbPlcz80VV2wTC6o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sYcWYEpf; arc=none smtp.client-ip=209.85.208.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUogFoHR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E4BC4CECF;
-	Tue,  3 Dec 2024 09:38:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733218700;
-	bh=RTXFdOfvmcVJEudvLjpK3I/u/d16/ZYqKz3aDspgte4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uUogFoHRb3G4sMDu3dV2XK8agbhd4zna9SiC2u7Utx8yu2MzsTuHrQbx3HRKuhvXK
-	 aXKwhwMrzM8myDdyyJosLOfHvkHj8A+khvy9tEDaeWI+x0BWCXVZPFmkXuBZQIAdng
-	 6o9+iuwjqdj3Vczkx0RSnoXEYxFJ3RQB7mH/uXzROPprOOyuZTmQQa3Tb7R8WqCpUw
-	 xbugPZ3LRpkUNtbWIKTGwLBWhP84osaEBAerCJi5cLN99eMluvjLVhy67iSwQwRjFK
-	 drFAHRRsTGY8m8DwAI/LEOlAfNJyZCEQ7m/bfKmlh4H7iZH6mlncWDn+jK0/t8K2S3
-	 lP03tA8tHkPZg==
-Received: from [104.132.45.111] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tIPMH-0002Ka-J3;
-	Tue, 03 Dec 2024 09:38:17 +0000
-Date: Tue, 03 Dec 2024 09:38:16 +0000
-Message-ID: <87mshdrtrr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yicong Yang <yangyicong@huawei.com>
-Cc: <catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<oliver.upton@linux.dev>,
-	<corbet@lwn.net>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>,
-	<joey.gouly@arm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<shuah@kernel.org>,
-	<jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>,
-	<linuxarm@huawei.com>,
-	<prime.zeng@hisilicon.com>,
-	<xuwei5@huawei.com>,
-	<yangyicong@hisilicon.com>
-Subject: Re: [PATCH 2/5] arm64: Add support for FEAT_{LS64, LS64_V, LS64_ACCDATA}
-In-Reply-To: <20241202135504.14252-3-yangyicong@huawei.com>
-References: <20241202135504.14252-1-yangyicong@huawei.com>
-	<20241202135504.14252-3-yangyicong@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sYcWYEpf"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-5d0d341cc43so1690688a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 03 Dec 2024 02:37:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733222257; x=1733827057; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bhVcEYzfRw8eAXsIDOKtTfeOpA28Wa0JxjqlOgFYMJ0=;
+        b=sYcWYEpfFzphUhoetvQeW/j2KJ2CkD0TixasyXXS51i9NzdGPIvXy2PWWhXuXqLiPb
+         dpBxnDB+KW2kVXyJOFPGwKGzxysGffAZAVUzxZM+gMz+yTAfBL7XiIviTAUeOdtbzcIR
+         yaLFc7qMhL7k3Y36fFOeSwptGA5tOe6Qoqsznp5RqQJEuePon/vUVuyYW6TszXGwZdCz
+         PjsdtFpBj0hkOcSB4jQAfd6JkbPMgcEgbjfhcauARR481MSzmKNAqHe3jxpibsi48C8y
+         MtYnXCYEG99s1HySOkNCaZfIBs73o467JtmI/KTwGqhElPGw/aTOCQWPEY1xdZQ4Wb6V
+         Bf2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733222257; x=1733827057;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bhVcEYzfRw8eAXsIDOKtTfeOpA28Wa0JxjqlOgFYMJ0=;
+        b=udQljCuScaz/918BU+uLNUzd+t/HRNBaOSbfr7fCi+A1XhdNtqvhBG/wafsRK1jg7f
+         N3bwOF1JqExkzqtQW3Co9RekHTpFdm4cQ9UszR+UJ+ZDLUj4bbqMNJLirY9pCr0cxt3M
+         pxd1tW+OL7kaG65zfX8Ng32Pw1CtL8Kcxb2eV5CuDl7VQhoN08awODSyw2He0NuH/1sa
+         deeLcOs8Lo57e3rhwkmS308ZsGqhIbvXvFaTdImnR892qAq5WJYbKHYBq3uEqE8vYg5H
+         5+kDTGQHlS/w585sAV6SLUsZT4fAXcXXn0gPzGTarYtRv2ADbRvsJqdxO4kD0PSTGuC4
+         8a7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUS/MTZ0gU45jhqqbVIZAbERC2g7zYx1c9bQj8IGmDcUP1J5iPpOEQzR6JbM88iRgRkTdzCsuc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy/j4nc1GTHai2ef9dl1jqXSSsFpdKvCmOCMgc20Uqa19FdbNFv
+	fzd9H0PEtU1dsOnRJFmKPL1pXxT24B7WHSksouydyQWpUpPjYUrn1r998VpO794ECWjO8o+k58q
+	xzkveeg==
+X-Google-Smtp-Source: AGHT+IHYV6enzbdprLHZMQD92QaUuZlgGwTGzCSSf0HmxvgO/jp3WQcTuWxTF7EcB+yhrb6mkrn1yXRToanq
+X-Received: from edvi16.prod.google.com ([2002:aa7:dd10:0:b0:5d0:27b6:2cde])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:510e:b0:5d0:8606:9ba1
+ with SMTP id 4fb4d7f45d1cf-5d10cb82718mr1488954a12.24.1733222257469; Tue, 03
+ Dec 2024 02:37:37 -0800 (PST)
+Date: Tue,  3 Dec 2024 10:37:17 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.45.111
-X-SA-Exim-Rcpt-To: yangyicong@huawei.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, corbet@lwn.net, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, shuah@kernel.org, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com, prime.zeng@hisilicon.com, xuwei5@huawei.com, yangyicong@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241203103735.2267589-1-qperret@google.com>
+Subject: [PATCH v2 00/18] KVM: arm64: Non-protected guest stage-2 support for pKVM
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Sebastian Ene <sebastianene@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 02 Dec 2024 13:55:01 +0000,
-Yicong Yang <yangyicong@huawei.com> wrote:
-> 
-> From: Yicong Yang <yangyicong@hisilicon.com>
-> 
-> Armv8.7 introduces single-copy atomic 64-byte loads and stores
-> instructions and its variants named under FEAT_{LS64, LS64_V,
-> LS64_ACCDATA}. These features are identified by ID_AA64ISAR1_EL1.LS64
-> and the use of such instructions in userspace (EL0) can be trapped.
-> In order to support the use of corresponding instructions in userspace:
-> - Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
-> - Add identifying and enabling in the cpufeature list
-> - Expose these support of these features to userspace through HWCAP
->   and cpuinfo
-> 
-> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
-> ---
->  Documentation/arch/arm64/booting.rst    | 28 ++++++++++
->  Documentation/arch/arm64/elf_hwcaps.rst |  9 ++++
->  arch/arm64/include/asm/hwcap.h          |  3 ++
->  arch/arm64/include/uapi/asm/hwcap.h     |  3 ++
->  arch/arm64/kernel/cpufeature.c          | 70 ++++++++++++++++++++++++-
->  arch/arm64/kernel/cpuinfo.c             |  3 ++
->  arch/arm64/tools/cpucaps                |  3 ++
->  7 files changed, 118 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-> index 3278fb4bf219..c35cfe9da501 100644
-> --- a/Documentation/arch/arm64/booting.rst
-> +++ b/Documentation/arch/arm64/booting.rst
-> @@ -449,6 +449,34 @@ Before jumping into the kernel, the following conditions must be met:
->  
->      - HFGWTR_EL2.nGCS_EL0 (bit 52) must be initialised to 0b1.
->  
-> +  For CPUs support for 64-byte loads and stores without status (FEAT_LS64):
-> +
-> +  - If the kernel is entered at EL1 and EL2 is present:
-> +
-> +    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
-> +
-> +  For CPUs support for 64-byte loads and stores with status (FEAT_LS64_V):
-> +
-> +  - If the kernel is entered at EL1 and EL2 is present:
-> +
-> +    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
-> +
-> +  For CPUs support for 64-byte EL0 stores with status (FEAT_LS64_ACCDATA):
-> +
-> +  - If EL3 is present:
-> +
-> +    - SCR_EL3.EnAS0 (bit 36) must be initialised to 0b1.
-> +
-> +    - SCR_EL3.ADEn (bit 37) must be initialised to 0b1.
-> +
-> +  - If the kernel is entered at EL1 and EL2 is present:
-> +
-> +    - HCRX_EL2.EnAS0 (bit 0) must be initialised to 0b1.
-> +
-> +    - HFGRTR_EL2.nACCDATA_EL1 (bit 50) must be initialised to 0b1.
-> +
-> +    - HFGWTR_EL2.nACCDATA_EL1 (bit 50) must be initialised to 0b1.
-> +
->  The requirements described above for CPU mode, caches, MMUs, architected
->  timers, coherency and system registers apply to all CPUs.  All CPUs must
->  enter the kernel in the same exception level.  Where the values documented
-> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
-> index 2ff922a406ad..6cb2594f0803 100644
-> --- a/Documentation/arch/arm64/elf_hwcaps.rst
-> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
-> @@ -372,6 +372,15 @@ HWCAP2_SME_SF8DP4
->  HWCAP2_POE
->      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
->  
-> +HWCAP3_LS64
-> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
-> +
-> +HWCAP3_LS64_V
-> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.
-> +
-> +HWCAP3_LS64_ACCDATA
-> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0011.
-> +
+Hi all,
 
-I don't mind the two others, but I seriously question exposing ST64BV0
-to userspace. How is ACCDATA_EL1 populated? How is it context-switched?
+This is the v2 of the series adding support for non-protected guests to
+pKVM. Please refer to v1 for all the context:
 
-As it stands, this either does the wrong thing by always having the
-low 32bit set to an UNKNOWN value, or actively leaks kernel data.
-TBH, I don't see it being usable in practice (the more I read this
-part of the architecture, the more broken it looks).
+  https://lore.kernel.org/kvmarm/20241104133204.85208-1-qperret@google.com/
+
+The series is organized as follows:
+
+ - Patches 01 to 04 move the host ownership state tracking from the
+   host's stage-2 page-table to the hypervisor's vmemmap. This avoids
+   fragmenting the host stage-2 for shared pages, which is only needed
+   to store an annotation in the SW bits of the corresponding PTE. All
+   pages mapped into non-protected guests are shared from pKVM's PoV,
+   so the cost of stage-2 fragmentation will increase massively as we
+   start tracking that at EL2. Note that these patches also help with
+   the existing sharing for e.g. FF-A, so they could possibly be merged
+   separately from the rest of the series.
+
+ - Patches 05 to 07 implement a minor refactoring of the pgtable code to
+   ease the integration of the pKVM MMU later on.
+
+ - Patches 08 to 16 introduce all the infrastructure needed on the pKVM
+   side for handling guest stage-2 page-tables at EL2.
+
+ - Patches 17 and 18 plumb the newly introduced pKVM support into
+   KVM/arm64.
+
+Patches based on 6.13-rc1, tested on Pixel 6 and Qemu.
+
+Changes in v2:
+ - Rebased on 6.13-rc1 (small conflicts with 2362506f7cff ("KVM: arm64:
+   Don't mark "struct page" accessed when making SPTE young") in
+   particular)
+ - Fixed kerneldoc breakage for __unmap_stage2_range()
+ - Fixed pkvm_pgtable_test_clear_young() to use correct HVC
+ - Folded guest_get_valid_pte() into __check_host_unshare_guest() for
+   clarity
 
 Thanks,
+Quentin
 
-	M.
+Marc Zyngier (1):
+  KVM: arm64: Introduce __pkvm_vcpu_{load,put}()
+
+Quentin Perret (17):
+  KVM: arm64: Change the layout of enum pkvm_page_state
+  KVM: arm64: Move enum pkvm_page_state to memory.h
+  KVM: arm64: Make hyp_page::order a u8
+  KVM: arm64: Move host page ownership tracking to the hyp vmemmap
+  KVM: arm64: Pass walk flags to kvm_pgtable_stage2_mkyoung
+  KVM: arm64: Pass walk flags to kvm_pgtable_stage2_relax_perms
+  KVM: arm64: Make kvm_pgtable_stage2_init() a static inline function
+  KVM: arm64: Add {get,put}_pkvm_hyp_vm() helpers
+  KVM: arm64: Introduce __pkvm_host_share_guest()
+  KVM: arm64: Introduce __pkvm_host_unshare_guest()
+  KVM: arm64: Introduce __pkvm_host_relax_guest_perms()
+  KVM: arm64: Introduce __pkvm_host_wrprotect_guest()
+  KVM: arm64: Introduce __pkvm_host_test_clear_young_guest()
+  KVM: arm64: Introduce __pkvm_host_mkyoung_guest()
+  KVM: arm64: Introduce __pkvm_tlb_flush_vmid()
+  KVM: arm64: Introduce the EL1 pKVM MMU
+  KVM: arm64: Plumb the pKVM MMU in KVM
+
+ arch/arm64/include/asm/kvm_asm.h              |   9 +
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/include/asm/kvm_pgtable.h          |  42 ++-
+ arch/arm64/include/asm/kvm_pkvm.h             |  28 ++
+ arch/arm64/kvm/arm.c                          |  23 +-
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h         |   6 +-
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  38 +--
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  43 ++-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  15 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 210 +++++++++++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 312 ++++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  14 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  56 ++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   7 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  13 +-
+ arch/arm64/kvm/mmu.c                          | 109 ++++--
+ arch/arm64/kvm/pkvm.c                         | 195 +++++++++++
+ arch/arm64/kvm/vgic/vgic-v3.c                 |   6 +-
+ 18 files changed, 987 insertions(+), 143 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.0.338.g60cca15819-goog
+
