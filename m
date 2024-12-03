@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0DE1DFE28;
-	Tue,  3 Dec 2024 09:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905DA1DFD82;
+	Tue,  3 Dec 2024 09:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733218694; cv=none; b=oHsjS6QB2R8bJEWg7ywho2LRLu9wWBveO/Uszz9HTWtTln52o+dk6IazjWH26PkXvgPrBjJQsWLY10tQr/bX4j4fQ4YcBHJ6sCct8VBhyKLBvP+9/ifN5TXCbjhxYrjf5Z9AZn3hSAEGHLvOk/wcLWkp9cLLhLEck0t4RhJK8yY=
+	t=1733218700; cv=none; b=Ze6enQunMdHZ8ws605NE9VCSiXREyEGaxeoYBEXL97/BLPmpUMLqZVR0X/EaNPILdF/CIRpI9sHva1Rn37VNeDiva5L71wacvZ/LF4Fo67FxxHMK0lxv9kbFCGKl0Mqn7s0lwPKcUaTgFBxBOzLSayFHnv/rdyNSO/IpeAUep/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733218694; c=relaxed/simple;
-	bh=rQ5TW4rFrG6qYjejx5fpKqPKvSS6CRZZUK/Q5K0MDv8=;
+	s=arc-20240116; t=1733218700; c=relaxed/simple;
+	bh=RTXFdOfvmcVJEudvLjpK3I/u/d16/ZYqKz3aDspgte4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P1P/Xbi5HKXB/oOTvvCdzrcCNI2WnHoOOuTTdcLz1VZxG2euxkDkjk6/mPRr9HkSBdokq2nGi4leg8WP9lWDIoIiOCow05Qo0/tO3fWxymSLi3N/XZ6RMJqcv2QUj+JJwvICkS0O9n8YpSd2Xc+PP+Nw3pXny2JjCBtzL9Z2mQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhPYIwpx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ND0+YS2kUEJbrOAsllzbWQ6pon1lrWlOBLQvj1t0TiSsjNMQLobUFKuvUD/ttYdM7uXtoHx9pEHt/Z/AwaGqiXIjA4taqbu9fAAkOg+n9poJdwqLdyYqkdlJeTM/dfNUCEM1LUsswA027jfhBQaAVf9dhIFVgl+ZwlolbaNW6Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUogFoHR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhPYIwpx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D89C7C4CECF;
-	Tue,  3 Dec 2024 09:38:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUogFoHR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E4BC4CECF;
+	Tue,  3 Dec 2024 09:38:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733218693;
-	bh=rQ5TW4rFrG6qYjejx5fpKqPKvSS6CRZZUK/Q5K0MDv8=;
+	s=k20201202; t=1733218700;
+	bh=RTXFdOfvmcVJEudvLjpK3I/u/d16/ZYqKz3aDspgte4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QhPYIwpxwd9nqFAUL5d17x0oJaAJ+KTmcr+RxiiZhe3ME0ryYuMY//UynJsU0GB6D
-	 hxLOAvCOnBzjkcD3Mc+UJiDfPpka9fca8mlnhXLtodkl4ED5DLfSip5kdAfIIsrQrR
-	 mvtxRTtAwIw8V/oMNSJKNSwCNB3dmVmwV/TAdeJjmcIOQhv8YD9UxrUsn6XaZaGKqt
-	 B9rPZRV1WG/n+eAhQAg01eLy01SWr0lvFKDtrkakCq717t2Zcs2UP4XLP0M+tbFJq/
-	 U+8Uu3IDFinEXfTbYXzEL+kkOMaJENVi8zKYdSHJqAB5XgLnqJRuNoWTQHmoicG/h6
-	 Hz4/dFHcadjLw==
+	b=uUogFoHRb3G4sMDu3dV2XK8agbhd4zna9SiC2u7Utx8yu2MzsTuHrQbx3HRKuhvXK
+	 aXKwhwMrzM8myDdyyJosLOfHvkHj8A+khvy9tEDaeWI+x0BWCXVZPFmkXuBZQIAdng
+	 6o9+iuwjqdj3Vczkx0RSnoXEYxFJ3RQB7mH/uXzROPprOOyuZTmQQa3Tb7R8WqCpUw
+	 xbugPZ3LRpkUNtbWIKTGwLBWhP84osaEBAerCJi5cLN99eMluvjLVhy67iSwQwRjFK
+	 drFAHRRsTGY8m8DwAI/LEOlAfNJyZCEQ7m/bfKmlh4H7iZH6mlncWDn+jK0/t8K2S3
+	 lP03tA8tHkPZg==
 Received: from [104.132.45.111] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tIPMB-0002K5-Bc;
-	Tue, 03 Dec 2024 09:38:11 +0000
-Date: Tue, 03 Dec 2024 09:38:10 +0000
-Message-ID: <87o71trtrx.wl-maz@kernel.org>
+	id 1tIPMH-0002Ka-J3;
+	Tue, 03 Dec 2024 09:38:17 +0000
+Date: Tue, 03 Dec 2024 09:38:16 +0000
+Message-ID: <87mshdrtrr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Yicong Yang <yangyicong@huawei.com>
 Cc: <catalin.marinas@arm.com>,
@@ -54,10 +54,10 @@ Cc: <catalin.marinas@arm.com>,
 	<prime.zeng@hisilicon.com>,
 	<xuwei5@huawei.com>,
 	<yangyicong@hisilicon.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory
-In-Reply-To: <20241202135504.14252-6-yangyicong@huawei.com>
+Subject: Re: [PATCH 2/5] arm64: Add support for FEAT_{LS64, LS64_V, LS64_ACCDATA}
+In-Reply-To: <20241202135504.14252-3-yangyicong@huawei.com>
 References: <20241202135504.14252-1-yangyicong@huawei.com>
-	<20241202135504.14252-6-yangyicong@huawei.com>
+	<20241202135504.14252-3-yangyicong@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -73,74 +73,96 @@ X-SA-Exim-Rcpt-To: yangyicong@huawei.com, catalin.marinas@arm.com, will@kernel.o
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 02 Dec 2024 13:55:04 +0000,
+On Mon, 02 Dec 2024 13:55:01 +0000,
 Yicong Yang <yangyicong@huawei.com> wrote:
 > 
 > From: Yicong Yang <yangyicong@hisilicon.com>
 > 
-> FEAT_LS64* instructions only support to access Device/Uncacheable
-> memory, otherwise a data abort for unsupported Exclusive or atomic
-
-Not quite. FEAT_LS64WB explicitly supports Write-Back mappings.
-
-> access (0x35) is generated per spec. It's implementation defined
-> whether the target exception level is routed and is possible to
-> implemented as route to EL2 on a VHE VM. Per DDI0487K.a Section
-> C3.2.12.2 Single-copy atomic 64-byte load/store:
-> 
->   The check is performed against the resulting memory type after all
->   enabled stages of translation. In this case the fault is reported
->   at the final enabled stage of translation.
-> 
-> If it's implemented as generate the DABT to the final enabled stage
-> (stage-2), inject a DABT to the guest to handle it.
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V,
+> LS64_ACCDATA}. These features are identified by ID_AA64ISAR1_EL1.LS64
+> and the use of such instructions in userspace (EL0) can be trapped.
+> In order to support the use of corresponding instructions in userspace:
+> - Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
+> - Add identifying and enabling in the cpufeature list
+> - Expose these support of these features to userspace through HWCAP
+>   and cpuinfo
 > 
 > Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 > ---
->  arch/arm64/kvm/mmu.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>  Documentation/arch/arm64/booting.rst    | 28 ++++++++++
+>  Documentation/arch/arm64/elf_hwcaps.rst |  9 ++++
+>  arch/arm64/include/asm/hwcap.h          |  3 ++
+>  arch/arm64/include/uapi/asm/hwcap.h     |  3 ++
+>  arch/arm64/kernel/cpufeature.c          | 70 ++++++++++++++++++++++++-
+>  arch/arm64/kernel/cpuinfo.c             |  3 ++
+>  arch/arm64/tools/cpucaps                |  3 ++
+>  7 files changed, 118 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index c9d46ad57e52..b7e6f0a27537 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1787,6 +1787,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		return 1;
->  	}
+> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+> index 3278fb4bf219..c35cfe9da501 100644
+> --- a/Documentation/arch/arm64/booting.rst
+> +++ b/Documentation/arch/arm64/booting.rst
+> @@ -449,6 +449,34 @@ Before jumping into the kernel, the following conditions must be met:
 >  
-> +	/*
-> +	 * If instructions of FEAT_{LS64, LS64_V, LS64_ACCDATA} operated on
-> +	 * unsupported memory regions, a DABT for unsupported Exclusive or
-> +	 * atomic access is generated. It's implementation defined whether
-> +	 * the exception will be taken to, a stage-1 DABT or the final enabled
-> +	 * stage of translation (stage-2 in this case as we hit here). Inject
-> +	 * a DABT to the guest to handle it if it's implemented as a stage-2
-> +	 * DABT.
-> +	 */
-> +	if (esr_fsc_is_excl_atomic_fault(esr)) {
-> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		return 1;
-> +	}
+>      - HFGWTR_EL2.nGCS_EL0 (bit 52) must be initialised to 0b1.
+>  
+> +  For CPUs support for 64-byte loads and stores without status (FEAT_LS64):
+> +
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
+> +
+> +  For CPUs support for 64-byte loads and stores with status (FEAT_LS64_V):
+> +
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
+> +
+> +  For CPUs support for 64-byte EL0 stores with status (FEAT_LS64_ACCDATA):
+> +
+> +  - If EL3 is present:
+> +
+> +    - SCR_EL3.EnAS0 (bit 36) must be initialised to 0b1.
+> +
+> +    - SCR_EL3.ADEn (bit 37) must be initialised to 0b1.
+> +
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HCRX_EL2.EnAS0 (bit 0) must be initialised to 0b1.
+> +
+> +    - HFGRTR_EL2.nACCDATA_EL1 (bit 50) must be initialised to 0b1.
+> +
+> +    - HFGWTR_EL2.nACCDATA_EL1 (bit 50) must be initialised to 0b1.
+> +
+>  The requirements described above for CPU mode, caches, MMUs, architected
+>  timers, coherency and system registers apply to all CPUs.  All CPUs must
+>  enter the kernel in the same exception level.  Where the values documented
+> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+> index 2ff922a406ad..6cb2594f0803 100644
+> --- a/Documentation/arch/arm64/elf_hwcaps.rst
+> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
+> @@ -372,6 +372,15 @@ HWCAP2_SME_SF8DP4
+>  HWCAP2_POE
+>      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
+>  
+> +HWCAP3_LS64
+> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
+> +
+> +HWCAP3_LS64_V
+> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.
+> +
+> +HWCAP3_LS64_ACCDATA
+> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0011.
+> +
 
-This doesn't seem quite right. This is injecting an *External* Data
-Abort, which is not what the spec says happens, as you are emulating
-the *first* acceptable behaviour:
+I don't mind the two others, but I seriously question exposing ST64BV0
+to userspace. How is ACCDATA_EL1 populated? How is it context-switched?
 
-  "The check is performed at each enabled stage of translation, and
-   the fault is reported for the first stage of translation that
-   provides an inappropriate memory type. In this case, the value of
-   the HCR_EL2.DC bit does not cause accesses generated by the
-   instructions to generate a stage 1 Data abort,"
-
-So while the exception is reported at a different EL, the fault should
-still be an "unsupported Exclusive or atomic access". But that's also
-assuming that S2 has a device mapping, and it is EL1 that did
-something wrong. Surely you should check the IPA against its memory
-type?
-
-Further questions: what happens when a L2 guest triggers such fault?
-I don't think you can't arbitrarily route it back to L2 without
-looking at why it faulted.
+As it stands, this either does the wrong thing by always having the
+low 32bit set to an UNKNOWN value, or actively leaks kernel data.
+TBH, I don't see it being usable in practice (the more I read this
+part of the architecture, the more broken it looks).
 
 Thanks,
 
