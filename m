@@ -1,134 +1,246 @@
-Received: from mail-vk1-f201.google.com (mail-vk1-f201.google.com [209.85.221.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29621207644
-	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 19:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733339671; cv=none; b=tidrAxV95vVl2msBK5F42JQa+NuMl3Qy1svkWRrJZ79o+Xaw4ZORVUdgBHbk0t/LenohUr4Fc/vr9ec7N/nSIyuOdrEOuTS2xnrBoRsYWTuOzlDvMnjDczHoij00t9Pb8jr8FsEgbqvyVXl9KC3x4yl7Konh7diJ8kruRN2lsT8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733339671; c=relaxed/simple;
-	bh=Jp+x9mfldwtvN108bvLRJrP/iKtS1pLZnKipgWETFWY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qdyNnzShy38dpwzydYKgohN1DehHn5aZMAJut6YYZ6CPZMb335MG+ACj1J7tAkq1qEZbZm7owCsnYGfSdgt80D0BGzFPIHsCKbce+NPYiSE6kqA2CFMaK1jC4i3RaiJ7tMsVwdjNN/+FS8iyJE1mesmb+UszMBJdNmDU+dOPKAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m7fkGTvT; arc=none smtp.client-ip=209.85.221.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED94D18732E;
+	Wed,  4 Dec 2024 21:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733346979; cv=fail; b=AVjPVmvQK4Gxnp9gBuZzx5enjPurquv1bnaK2DG7RvJT4aRei+MN7gpwuoc8HeztuZQozeowXyY1FmfkcQiv6uNGJ0evhXDBRTAcv3H/gcR5AVeNYoww7mFhwU4XUQXWOWI7TjhiOws5a39GliYqM7+uqc6rJFbWO3J8azpHrPI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733346979; c=relaxed/simple;
+	bh=hWTq9LZowM9xPDqa/9OEECNlY+Qc08ep8ev3eMvcDho=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jhMFVyY6CLPD1ctqNgIIPkIwwb5shJi6mn2RJyMQO/e+dLu8pEDnB9G8/oo5etyBhRj//zMFgIMQNcO1faiVSdRJCPbFbMlksQq53MrznPT1SKc5XFOwniYjuBM331H8RuCu123cXzafuoUNt00TDA/lbYXxmvsJ0dUNC7nWL0A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ACMvqfmZ; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m7fkGTvT"
-Received: by mail-vk1-f201.google.com with SMTP id 71dfb90a1353d-50db8e947c1so30988e0c.3
-        for <kvmarm@lists.linux.dev>; Wed, 04 Dec 2024 11:14:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733339667; x=1733944467; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X68RCfWU06ROg+bUYFUfNwQoohzZnJeYoYKE3JS2eGc=;
-        b=m7fkGTvTORUEO09PSW7J8odyAGpz6SLxFyeRQQVOlCdADDDKINTMUpmU9U35SAkNj+
-         BBzyEAkQTL7OopVP6YmYwVMPpYyNCmrhRK1ihtS28AC5WV/03/nlFGZ5Vt3sya3qaG7K
-         7SCUQdLlFdhrmuyTx/imrT9d2dc3t6MSfWnxRylcKh34wXqTXhiMEioVMydQbE/faryT
-         P9TDLFsfH5NntfTICS5g6se0vXwHNuS+3ASHIpcDFSSIRVvraIbaZPGFeiGSxyYrZutk
-         v5UdmuPNp908EhOf4BjsQtH6/D7FusSbcu3U/Gvx0MW/nLd64Y96/qOvxvH97SVYA2Su
-         08Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733339667; x=1733944467;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X68RCfWU06ROg+bUYFUfNwQoohzZnJeYoYKE3JS2eGc=;
-        b=N1GlT8op1x2CcKxgpEA/jbC9ngLi2Qxaqzjb0pSTy/fneZOnPw+u5WEWkM6WF6CIfs
-         1ADx8QfhuaCr19nmF8jWVTPu+L0G0Q661DjY9ZD6eoDo0J/es0VFxXrf2x4Fp4kzhMKg
-         zdpffd+Pdh8X91shDeknu1rteUefWszjn6o8LjaOK9A8Eg2ypdWFYtD6pzlQC7UWyrjt
-         dvye2JDxZHHx++se01UXTIzdiWfTxdtOP+D0/r6jz0BiBSZ3HoDZjbHFGdUj0hHgeohM
-         Hu4UGrKAg+e1S4DGvwqJZ0DSmUF6PmYOjVqb9hPAnb2mnIY07uBLkfTi+ds6s1ka1i4t
-         Zv3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVcPmGIzZ94apWfFgNOjEWFpqqu48RhgZOyzFm24kVjxY55Ph0MXcWqmGU2ADH1KKjbg+1qujA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzwMO35vUXbkAUOg80lr7AAomRrUgxDqljPayAhbjjo4mEAmM5e
-	cYkJuCT6gGmD3D++f/eGAmpwDrsAFBFeU+PZBz51HakGAbOXvXoY5lHl6P+al2ehaYBXeH2Bfhv
-	aO0MdbHtjKw6KgcLuyw==
-X-Google-Smtp-Source: AGHT+IGSL6/LfQGJ9Uj3DkWwK1IsrYPhpONzXFegfmhrDCtj+kw22erCa4lpakX9RjG5PxsHges9rOrFeGcBxOQ3
-X-Received: from vkbr6.prod.google.com ([2002:a05:6122:6606:b0:515:3ac1:ec42])
- (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6122:a25:b0:515:5008:118d with SMTP id 71dfb90a1353d-515bf2a393bmr10094302e0c.2.1733339666972;
- Wed, 04 Dec 2024 11:14:26 -0800 (PST)
-Date: Wed,  4 Dec 2024 19:13:47 +0000
-In-Reply-To: <20241204191349.1730936-1-jthoughton@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ACMvqfmZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733346978; x=1764882978;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=hWTq9LZowM9xPDqa/9OEECNlY+Qc08ep8ev3eMvcDho=;
+  b=ACMvqfmZ1vzWZ0gEym+j+rVTeaccyN0qURAJsWbKlZXoUpJwsudgSQW8
+   JdzZXj6Na9wFeJHQE4NYD7ChOETGQmonVoSrz964jbj1IpK6D7eYevGMq
+   XFNUxr3l+3u4Q+QA0lYBqxRAMKg+Gh6ZpK+JcdB7h3mZYr+0VLMEhqml9
+   LXoofF0shgd4N0lgkj+xfblnnIKgf05DLegvvuMte6H/sI7jMlIHFpX23
+   +Bgx+h/y+vy5Ai39jTFfk/IJWu0+EkDkUbkEv46A1510eNYTFndu3xkLZ
+   Pu0ZhwwEvKx3mwlRYedc9iwzKuhVKh4iR3RA/TU75KVceB9vBU1Clu0mT
+   w==;
+X-CSE-ConnectionGUID: eKsmlOZgTc6EsAkKcP2vxA==
+X-CSE-MsgGUID: xAEHGEWgT4OjZIyr6G260Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="33552067"
+X-IronPort-AV: E=Sophos;i="6.12,208,1728975600"; 
+   d="scan'208";a="33552067"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 13:16:13 -0800
+X-CSE-ConnectionGUID: UBTsWwKhSPWHZObkMyw/kg==
+X-CSE-MsgGUID: jBslxR4mSQWMFMcxvRxWGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="98916573"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2024 13:16:14 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 4 Dec 2024 13:16:12 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 4 Dec 2024 13:16:12 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.174)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 4 Dec 2024 13:16:12 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wnqer9t3VNaCKbdEWDfEEJHQ6DXhrheJ3AysPowgsXc8Yu+1vOh43Ey84qTOtmV5n89vfPhLrs1NTWudvGqU5UDT5HNYQKrmDWNPehAa56C3r8oW0FdD4fQF1l0i8FrGeWXtfdny/TxSPeyowWxoW+dQfjKHy/795uCfkAnCtFj/6AERb3J91jOr+Nqt9i4x7ljPGaEK2xpt/ps2SoJ1G8WvGy5vr3AY52PNqc/UKgBbjO3GrsHS/7XD/SZOuNCcR7jRwvh6eiJ3eTaVxaYNl0Q9Hyl7E57LshG0ZDBE6PhTA2g4BLSCUsBkaB7DtJbBwMR6OgRQ3nm8/cPNph8sMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f3Of9tQMy3fJu1opUlfRC7vLIJRoubcl2p/S/KXZKno=;
+ b=C1Fmo7AiY6ByijmLZKmgDEBehXtYPOK5TvXoIPlvpO9aitQCS8BcziX1+KNxZPyE3kE5BgHjwbYSGtaTtMguvmEBnEmbHZAj7AWvmLQWC1UHJPI1M1sn9P0RHkDG+O2RvAx3H1F31tv7Y6lkMWbrxFbMRfIZARdHIYfOsff4yN24NnK3GG2vAUuLznmTkYAk4g3jy5gdHYsGdp1V1tYMtTHg0BuZCPiBSQzpwJVekKFJqPOhSv838sdHMMw4qZpjNiObjbB1Wug+4aLyhMCQTYUGxxkBqfoS8Y5mn6NYL57AxvcMb1PShRN11NJiyfRxcETHrvU0V7soL2xI4w63tw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by PH7PR11MB6473.namprd11.prod.outlook.com (2603:10b6:510:1f3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Wed, 4 Dec
+ 2024 21:16:08 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%5]) with mapi id 15.20.8230.010; Wed, 4 Dec 2024
+ 21:16:08 +0000
+Date: Wed, 4 Dec 2024 13:16:05 -0800
+From: Dan Williams <dan.j.williams@intel.com>
+To: Steven Price <steven.price@arm.com>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>
+CC: Sami Mujawar <sami.mujawar@arm.com>, Catalin Marinas
+	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+	<will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
+	<oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, "Zenghui
+ Yu" <yuzenghui@huawei.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, "Alexandru
+ Elisei" <alexandru.elisei@arm.com>, Christoffer Dall
+	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+	<linux-coco@lists.linux.dev>, Ganapatrao Kulkarni
+	<gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, "Shanker
+ Donthineni" <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, "Dan
+ Williams" <dan.j.williams@intel.com>, "Aneesh Kumar K . V"
+	<aneesh.kumar@kernel.org>, Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v7 10/11] virt: arm-cca-guest: TSM_REPORT support for
+ realms
+Message-ID: <6750c695194cd_2508129427@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20241017131434.40935-1-steven.price@arm.com>
+ <20241017131434.40935-11-steven.price@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241017131434.40935-11-steven.price@arm.com>
+X-ClientProxiedBy: MW4PR04CA0244.namprd04.prod.outlook.com
+ (2603:10b6:303:88::9) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241204191349.1730936-1-jthoughton@google.com>
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204191349.1730936-13-jthoughton@google.com>
-Subject: [PATCH v1 12/13] KVM: selftests: Add KVM_MEM_USERFAULT + guest_memfd
- toggle tests
-From: James Houghton <jthoughton@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
-	James Houghton <jthoughton@google.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
-	Anish Moorthy <amoorthy@google.com>, Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
-	David Matlack <dmatlack@google.com>, Wang@google.com, Wei W <wei.w.wang@intel.com>, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|PH7PR11MB6473:EE_
+X-MS-Office365-Filtering-Correlation-Id: 771f9046-fea4-4d42-2969-08dd14a8dec6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?A07JeXDUlxX90iu/WUK0asy4RoTKrc1yPifkCnHO7ENxpP2xwck4bXG3dlW9?=
+ =?us-ascii?Q?7bQPkT5pASIlBdx4vyz0V1Zon7c+0zgt5Kgt6ZWZyQ5e2pFjb5tDvy2m3DtP?=
+ =?us-ascii?Q?vmvhh6j4gNF/0NmMxetKyVPaGOQNAswbnAsiMVxPdgPiQn45nHlbrBgI9WJu?=
+ =?us-ascii?Q?cjAfr0T949cPUbzFSo5vV3/71q3Z2/gx/GsvRSwiQsqbsh2nSxRfhSAqtbuN?=
+ =?us-ascii?Q?ah6fQKQganprn2L3hteXwB2rYqeUBSM6lBQrznGQfon/OAUvs0BTkA972p48?=
+ =?us-ascii?Q?67ATJT4X805IUwdNIYxc+G7hvF/9H2kgykmSh2APs6Q7+x6mDUWN9dJrLLGw?=
+ =?us-ascii?Q?Ss5r0Yztptt1xBcOMp0ADfHKuSocUYlUYG5vkxMMrzBzAwrVK5qjjggRFAwL?=
+ =?us-ascii?Q?2yuviv8JEHX83R36OEAWicvytpc76WECtSPqgs3rNQJ4W2ZEP9S52oxYBd8t?=
+ =?us-ascii?Q?UvVIoGZUwMSdr2Ph5XScskbiL5lDQi4XSa8ZdO4qY1XLJEhUDS+6/bDveuWG?=
+ =?us-ascii?Q?4VgZsG04j3vYgprTW9XNKyQtLKGR0KJG6L1Kyf1LXVvj5a2H4P2UF1ze3usW?=
+ =?us-ascii?Q?fuYhkkVDUNeJ1wVlZ/XF1NdK0Tmym+QTlOPXpz6CirNYqEz4ZhMUFvs0Iriu?=
+ =?us-ascii?Q?7iti67tFDQk1P7sXjzeKvupM49GMaDuPC2CEvu2CvewotBS5/eZJ70MGyGKd?=
+ =?us-ascii?Q?ZxZhNzm+sI0cGyhc9Up3T9VGXGomRZqT5Y9BIjUQuGBkuGbRyAXJiyyNa+yK?=
+ =?us-ascii?Q?Zlj0Bt3DkAlg/80OXDPZkYaSxrLgBRd+r+OGxGss0bUDwY1p9heAwlsc3ttn?=
+ =?us-ascii?Q?UK8RHNJcKJMz8CHwMeRD3CrvXUfolG3ZtaGRfFTkSfusTFv+m5QxciNkhoo5?=
+ =?us-ascii?Q?x8l7XjvNofg0VawXe4FYVQ+uUtsh9o0R1kgGwAoJkjF0Aq8dwtZTz0W5KvM5?=
+ =?us-ascii?Q?Z3NmftWSqOFTO5AAWVyOwZy6bXYKWf/GcAR6IEy40gRaAMJji6AihgIqJly3?=
+ =?us-ascii?Q?9Anx+Bmaxo1VdePJtOliYm9ebdOwF7Q0GAyfOSnBJ3WajafDCXguE2OZnBsi?=
+ =?us-ascii?Q?gdpuStBp/6YEHovS82hh+Wrv+jvKt72pfIzajxZyJFGamH8vpVl+icIja9Qr?=
+ =?us-ascii?Q?ccnh7MK/g2yxV5jT7pIO0ymUVDq/4QxYyFcjIZrAI1JC+nzl8aHaB+dPPLHN?=
+ =?us-ascii?Q?n1+y93mwoGeiOiVr7X3cp/jnGfAJ88b/iRXGzZJwAzw92w+PdQfXU3QlpAnD?=
+ =?us-ascii?Q?/bmyeF+FPKBkSFL/gdfK7L4Jx1+5uPcQaVcbEfLIsSmBRU9ERGf9yVrJ6q1Y?=
+ =?us-ascii?Q?bYU=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?al3rIA/m/cPLbMi5+ba5z8jEXyiCw9KPpwhphmJorqaeOxxAOrhOkP4f11ZQ?=
+ =?us-ascii?Q?3bt5yXMCFYoMFkLBgaVRFWcVA9TIwmmpZpFYEFHX/uxkteoDnA1UrEUPLvzV?=
+ =?us-ascii?Q?R+0FSi8rSr2rwCiThIfOHfx5zCurWMJqyxsT5yKtY4A6sdTmTaKU2pQ/pS6m?=
+ =?us-ascii?Q?qeFzBdUc/DPcizgjsx/v9b5GPfFzOfFlYGoacgHk74Eq1OlHQ2PeT69EQShn?=
+ =?us-ascii?Q?dMtYIr8RZ5UkWJyGG79F6wdmTnMn3iYn2jcLcnqcPjj/YLs4tlSV4+RFgjEH?=
+ =?us-ascii?Q?uyvgQkru2Cfwtnbfs8NsYeU//+6/dU6lgqs7i8r55B0U0N69OxqzfEOcb/vp?=
+ =?us-ascii?Q?GnJVMBDxxSFMqNMUu9rUf9GJMxIEt0tm0xcWTyMOE8sDiXxGSKjD4zZmxNz8?=
+ =?us-ascii?Q?Q5E/YNjE+6C+q7yWCkp2yVPbbxDlegZ878ZChSZ3bwulbJWcFiCklSwLRCHq?=
+ =?us-ascii?Q?9hGlI1XriaxBdRUCmyryr3ldMLSMmoUOrtxBAfmE5NpeY4GR0vfQy/hC0J7Q?=
+ =?us-ascii?Q?0OFLjEbRfwsfb4FNt4PCW4HBBnpQwS2sQbaZ/5O8wZBWDXD9fTfKg54ncGPV?=
+ =?us-ascii?Q?094dRIlyY8gWNE49O5ngoGkyTNYBg6MXfD2su3bD7rR5ShmamHGQXThGK6Ui?=
+ =?us-ascii?Q?glmQEclvI10CmbBpPuwsLDXs8PWXOGXmH3YqhraNsnuYYSRprVZ54g2wfJxQ?=
+ =?us-ascii?Q?SIO6YqdygRwcHVSEGPuLFoha+z0zT4I3zAM73SedUPVN2z/yIyyrT4EKuRkw?=
+ =?us-ascii?Q?ITMNnFswSbLlAYKBKUyG8aG66a2M2ttaIuPQE29iJI6SSPNTUYPEGCukVwmF?=
+ =?us-ascii?Q?EnjPg38zllSFKYuSwZ1NJvFl8fGZarIhAfjswvOS+Vzn6yzYoJkXx1xU9h/d?=
+ =?us-ascii?Q?kHDHHhcZGE9EvBQ/Mnj4nwwAsG2+LhR0Wnv5BT5Gkh8sPnrvxto8ySXxuenY?=
+ =?us-ascii?Q?BKuDbN4TVzCtzto8NVdNDxgYiqhapJPf6lBJxdWAa3GPf279znkX6zT60rzM?=
+ =?us-ascii?Q?QYqm30CElN3jES/67pjVNKpRKGOY+vNW55cx9WTaWQpIqeH0TZhtDMD/ormF?=
+ =?us-ascii?Q?DKplOshkLYcMBleooLjHcEYhCjYrtNwtBgErLg6l7oRegASw1WpVXPp68nRc?=
+ =?us-ascii?Q?SboARFseUVDB19N+NbmpNRgXHg6ad9jFOLbnshQlgY9i0N8UlYARf+15vJI3?=
+ =?us-ascii?Q?xA2JEmPYI8pXw4QZ2N1NqyFsntwE+JbKPT1SlgdPjJYhm4ot2p73rF+WDatV?=
+ =?us-ascii?Q?sL2T8rRj6tlTE8SOKS0G1N3xjzSV6RXXR34XDzUZE0W/aKl86uEuAr5AgvR2?=
+ =?us-ascii?Q?lsUrGsVl1gH34/X8yvhuqkwRjmLffJVbNqhxMVgQF58ViJQ5G+L0XrWi7Csa?=
+ =?us-ascii?Q?ulyF/yuM6cuMACNj2h2HMpj052YKSGPSzRa9614tyWREN6fPUEoFfWPRPKIr?=
+ =?us-ascii?Q?fLILjuCxsDVaDqmOJ5s2GWCfsVho9EQ7/3lJ9eU47SwaFWkEPBR0mD2Z5ItU?=
+ =?us-ascii?Q?a2B0GdsbE+tU75XkYXuVSGPNTdLXQt+E9xvaMimSZZdMZJrPF4pDH/j7iZzV?=
+ =?us-ascii?Q?hw8O82wqTxpXeFKftCIoJsAqqyKDvkOHKmco6P88U1ddYpBPnb7dnCuEeHIs?=
+ =?us-ascii?Q?Yg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 771f9046-fea4-4d42-2969-08dd14a8dec6
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2024 21:16:08.2847
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y8yxSx/K6oGisPGcUnHptwOFJzzbEZy4al3blbXCD9Youlop2mCn7/jJ32+0TmEHqTqIbgZdhh9o7exFFJ/ifBDye5+6Fi/nbhW+GOmcaac=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6473
+X-OriginatorOrg: intel.com
 
-Make sure KVM_MEM_USERFAULT can be toggled on and off for
-KVM_MEM_GUEST_MEMFD memslots.
+Steven Price wrote:
+> From: Sami Mujawar <sami.mujawar@arm.com>
+> 
+> Introduce an arm-cca-guest driver that registers with
+> the configfs-tsm module to provide user interfaces for
+> retrieving an attestation token.
+> 
+> When a new report is requested the arm-cca-guest driver
+> invokes the appropriate RSI interfaces to query an
+> attestation token.
+> 
+> The steps to retrieve an attestation token are as follows:
+>   1. Mount the configfs filesystem if not already mounted
+>      mount -t configfs none /sys/kernel/config
+>   2. Generate an attestation token
+>      report=/sys/kernel/config/tsm/report/report0
+>      mkdir $report
+>      dd if=/dev/urandom bs=64 count=1 > $report/inblob
+>      hexdump -C $report/outblob
+>      rmdir $report
+> 
+> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v6:
+>  * Avoid get_cpu() and instead make the init attestation call using
+>    smp_call_function_single(). Improve comments to explain the logic.
+>  * Minor code reorgnisation and comment cleanup following Gavin's review
+>    (thanks!)
+> ---
+>  drivers/virt/coco/Kconfig                     |   2 +
+>  drivers/virt/coco/Makefile                    |   1 +
+>  drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
+>  drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
+>  .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 224 ++++++++++++++++++
+>  5 files changed, 240 insertions(+)
+>  create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
+>  create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
+>  create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+[..]
+> diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
+> new file mode 100644
+> index 000000000000..9dd27c3ee215
+> --- /dev/null
+> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
+> @@ -0,0 +1,11 @@
+> +config ARM_CCA_GUEST
+> +	tristate "Arm CCA Guest driver"
+> +	depends on ARM64
+> +	default m
 
-Signed-off-by: James Houghton <jthoughton@google.com>
----
- .../selftests/kvm/set_memory_region_test.c    | 30 +++++++++++++++++++
- 1 file changed, 30 insertions(+)
+I am working on some updates to the TSM_REPORTS interface, rebased them
+to test the changes with this driver, and discovered that this driver is
+enabled by default.
 
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index d233cdfb0241..57b7032d7cc3 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -556,6 +556,35 @@ static void test_add_overlapping_private_memory_regions(void)
- 	close(memfd);
- 	kvm_vm_free(vm);
- }
-+
-+static void test_private_memory_region_userfault(void)
-+{
-+	struct kvm_vm *vm;
-+	int memfd;
-+
-+	pr_info("Testing toggling KVM_MEM_USERFAULT on KVM_MEM_GUEST_MEMFD memory regions\n");
-+
-+	vm = vm_create_barebones_type(KVM_X86_SW_PROTECTED_VM);
-+
-+	test_invalid_guest_memfd(vm, vm->kvm_fd, 0, "KVM fd should fail");
-+	test_invalid_guest_memfd(vm, vm->fd, 0, "VM's fd should fail");
-+
-+	memfd = vm_create_guest_memfd(vm, MEM_REGION_SIZE, 0);
-+
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_GUEST_MEMFD,
-+				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
-+
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT,
-+				   KVM_MEM_GUEST_MEMFD | KVM_MEM_USERFAULT,
-+				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
-+
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_GUEST_MEMFD,
-+				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
-+
-+	close(memfd);
-+
-+	kvm_vm_free(vm);
-+}
- #endif
- 
- int main(int argc, char *argv[])
-@@ -582,6 +611,7 @@ int main(int argc, char *argv[])
- 	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
- 		test_add_private_memory_region();
- 		test_add_overlapping_private_memory_regions();
-+		test_private_memory_region_userfault();
- 	} else {
- 		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");
- 	}
--- 
-2.47.0.338.g60cca15819-goog
+Just a reminder to please do not mark new drivers as "default m" [1]. In
+this case it is difficult to imagine that every arm64 kernel on the
+planet needs this functionality enabled by default. In general, someone
+should be able to run olddefconfig with a new kernel and not be exposed
+to brand new drivers that they have not considered previously.
 
+[1]: http://lore.kernel.org/CA+55aFzxL6-Xp=-mnBwMisZsuKhRZ6zRDJoAmH8W5LDHU2oJuw@mail.gmail.com/
