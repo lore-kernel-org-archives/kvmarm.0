@@ -1,55 +1,55 @@
 Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0FB1F5403
-	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 19:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2891F5430
+	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 19:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733339663; cv=none; b=K5BVEMODOq67bJY1Z7a7xjJRpHXgG0QAeq207ZQErECozzKXhpoTLWjj+DTF0aB8cP+y3jCYSZeOP6vM0RbnGVdQ0XjBNXdGMynxaTQWhIZggJnk+TrPOLNcOKP/R87Y9ePkV9b83w/+p4Z4XDcFfgrfknWWbMOhs9eFMnYrZRk=
+	t=1733339664; cv=none; b=B1TnVr5Zr9/Ry6uHUgD3sC5u8IYutAkSsIjKmLII07mmXE76GcvH/rtKlQBgtRjj+imK46tU+ErLYE9KtYkqqJr83tQ7/wnEayx/hlsDhI8x+QvnspooEJZgb1wqC9A8mhFOaJRXfc+O66GSdAbzMDb2CzdBZ8lEPdSdNWyVfKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733339663; c=relaxed/simple;
-	bh=XRqLRNPGp4B36Newh1hGDaGyYURJiyoWnca3tYrEiRo=;
+	s=arc-20240116; t=1733339664; c=relaxed/simple;
+	bh=7uKPJu5MZttnLGZHU4AcApt1HeYqG3NuIftXyYnBeQo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ebkQS3q3elEy+w8oX/nSxX+6m5DZCd6gyanA1itaPgTm8ZuI+yQIkwgq7qax6/G6LTKojSnxx9LBh8UiW8tpLsTIWuDWDGX4X5X21QGtzR6b4yGRz8fGBsJBcv2FoYttm/EGREKvR03JTMAA9Q0EZE7R3G5bUG/q9RCj5dlvyEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DKBpsu7S; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=mNMFJ99NDnboCh/yADfP1YcqoPPMPCiDRtv7+lkKl/upGP6dzcs7Xdw5u2GnC8stm3V12UmznVvWk5ySYOgcTzgKOqzqMtQ2jTOsG3MunmK2eKPK7qL9ZmTiWZCfiNfZkwTUCtZg68OulXTM6jJbiOLyBIt+8zDI0IupwF3zrE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TwUXtrT8; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DKBpsu7S"
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b67201e64eso12125885a.0
-        for <kvmarm@lists.linux.dev>; Wed, 04 Dec 2024 11:14:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TwUXtrT8"
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b35758d690so17757785a.1
+        for <kvmarm@lists.linux.dev>; Wed, 04 Dec 2024 11:14:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733339660; x=1733944460; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733339661; x=1733944461; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tFj98HJEqxlM2yS1YScvzRxxJLlbahOUdL6PgedEnEc=;
-        b=DKBpsu7SaVDr9JKwmUzbBYrPIMQ6QpP5JjnY/Fqy3dPs5DYlg84SLL8YcN0YlDN6BQ
-         HB4NB7H8VDXdJAfv8/zGhjoUkZG336CZRBOBstl14Vr3wa+CWtmXQ3hbJUv3PCYl4Cyx
-         qLAFNmecrOEUa7BzXwVwy/OLtmtZhHaNOmhTCPEwk4c+t/e86xjmN24GimV41uT0R/vE
-         KUOpQpsi9Wwe8rzZc1WEPVaAcb5g2sdZcnk+J3nT8yjh8OFv4fTrnGhNsBn73avT+aFp
-         dwijpox47CmUdGoMXVSgPNFYUpprYDB6EVbtJXV6Go5Xgv5rRJa2paYnCs4grJAHdAxZ
-         U8RA==
+        bh=3LkXqlJAd4fQvrkyb/GIMYTRcu+OGHQVMPLjSgCJbVo=;
+        b=TwUXtrT8jh4Pzs1QUxoestIRitGgfCqgMN5BtkH56+yxEEiKepjq8Mh9RxBVXHYJa4
+         Z7EAvd/xJcWavCgl0LmUxAcegoy/HdQngl2fAjFyQA/Z8QKZcDxoxGRkPBXpwCgFpNQ0
+         Y1MKJZlYHvlEIRMViosnVTkESh5AunY7ZV/F32RYgCthgbJqXUj1aaHlyfP2T22GBKF1
+         I0H3IpXEcXklYxXuwflAzfj1T13GcnwTs3Ek+QHO0pRZtzJziEV0MViqXGjOY4JAz4+d
+         Wg4gUyNylm8FrXMXCfXTaIWjHOUvKA0FBrDzx6e3rc3JSL7giyh+UAoLKcYsJywzMPFw
+         5L/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733339660; x=1733944460;
+        d=1e100.net; s=20230601; t=1733339661; x=1733944461;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tFj98HJEqxlM2yS1YScvzRxxJLlbahOUdL6PgedEnEc=;
-        b=Ia8uliSmkis1N9KE4cxTlLq2wiPNib3S77TuEdJ17d5AGCfWx7TjcD+Q8IR2aRi20P
-         Gu7JC9rskh76PnFuPlncsZOPR+ERFEPMSNf7RZFZjWBW7akciZ8WPLaMBcuuhdbrpo+t
-         yVQxjkDWwduD7xYPUV0jGpBICtYVwIMfUztolFcjuonbRhpn46G5t5Fcd0+E0QAs8QHy
-         6LGsw5M7t5R0Hq6KfpwM6sXMklfWWKjeyNOm0iPf7M5g3N9B6YNPq6ex6J59Mn9xG6Uw
-         qUF4sRGXYZbNmV0EJaX4B/i5jRVp6OlbQdlR2OBMMlWVbAbJJu615DsoNTWZ1PMIMEE0
-         prmA==
-X-Forwarded-Encrypted: i=1; AJvYcCXe9LFfqAueOa5oNzckReUYp/+DpmQW87Euixd4HC4/scUJNLPIGrBVYeQw7WxfgEYsa5aIi2I=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxIm/XXIQ/PGHtP5B4KU4ee1TJjfzv5o1Rcq4gpQV/VNidVmEfC
-	KFmx8S1yee4jvq4te7rq7TuktywPWcczE4of89MDXrYqcuu5E7dZ41NG9AlZvs1V6yTI1Beo0Dk
-	+4ZQlcJf217iIxUpozw==
-X-Google-Smtp-Source: AGHT+IEjAFXSEtfmGOodffFw31TXE80vwkJvDLAFbZ3yUQDUssUZgM+UMQkcUbluyRy21fc1aO4FFwapwVcSSi9j
-X-Received: from qtbci19.prod.google.com ([2002:a05:622a:2613:b0:462:aa34:aae2])
+        bh=3LkXqlJAd4fQvrkyb/GIMYTRcu+OGHQVMPLjSgCJbVo=;
+        b=YW38uop3qeBPZIK59ZavtDcSmyNjylirQHFKD443jIOiLjSYCr1XW6RgYi4UgsHJTU
+         3YU8QLA0AX7u1rBoXEW5+5Re+BGwHyeeYJt0sg9uZZxsiamViK7XbJJsUJsT+XmZURU3
+         2z2Ce4vTjOwoNTxVfK9jBuG3RCs5OVBNSvpJU2Sm+PdIAad6GLZ2K/PHo7/pLHxB4tcH
+         RZO2+tvtfELSC9qCtr12QBgWAnWJoBvdPMAb988+T67tuDzcrQ5qc6kp2/insGj+7wv6
+         Q7xSu0sLbfo4MdsrKjQgptGaUwP0Ohf7uBLYgtSmxBZ0aXl6LU8bfuXyluYMtyMxQr3r
+         O03w==
+X-Forwarded-Encrypted: i=1; AJvYcCVq7wVRFdmSZZ9vA8nhdYt0zDgwJijndpGcOcxFsIF2QDOC1/jMHFhPn5bcJiqK/6dWVGPZlyw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzeHQHliWKdDXqwioEpAFxzUWUFUw9LO2sQmZQOTjHmKf4erOKe
+	Q7n5pg1K4jZcZF3JQgjO7pzaykibr46QRtlGXqz+EPQoe4myRkUrAXrossxhFWbVL2vOn3GX9Xe
+	uNG8uE/p5N27nHRCEbQ==
+X-Google-Smtp-Source: AGHT+IG2YC7xA0GwWXk+cMxHq3A6sTNXchADXjRqs7ScJbz/ng/FU66WmJEiNslyAxyIF4C+tDiCnDtGEeEHeuoK
+X-Received: from uah9.prod.google.com ([2002:a05:6130:5209:b0:856:f0b0:717])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3188:b0:7b6:73f5:2867 with SMTP id af79cd13be357-7b6a61c819cmr926705785a.44.1733339660438;
- Wed, 04 Dec 2024 11:14:20 -0800 (PST)
-Date: Wed,  4 Dec 2024 19:13:40 +0000
+ 2002:a05:620a:40c2:b0:7b6:6b07:e80d with SMTP id af79cd13be357-7b6abbb7350mr835946485a.57.1733339661300;
+ Wed, 04 Dec 2024 11:14:21 -0800 (PST)
+Date: Wed,  4 Dec 2024 19:13:41 +0000
 In-Reply-To: <20241204191349.1730936-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241204191349.1730936-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241204191349.1730936-6-jthoughton@google.com>
-Subject: [PATCH v1 05/13] KVM: x86/mmu: Add support for KVM_MEM_USERFAULT
+Message-ID: <20241204191349.1730936-7-jthoughton@google.com>
+Subject: [PATCH v1 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
@@ -74,211 +74,81 @@ Content-Type: text/plain; charset="UTF-8"
 
 Adhering to the requirements of KVM Userfault:
 
-1. Zap all sptes for the memslot when KVM_MEM_USERFAULT is toggled on
-   with kvm_arch_flush_shadow_memslot().
-2. Only all PAGE_SIZE sptes while KVM_MEM_USERFAULT is enabled (for both
-   normal/GUP memory and guest_memfd memory).
-3. Reconstruct huge mappings when KVM_MEM_USERFAULT is toggled off with
-   kvm_mmu_recover_huge_pages().
-
-With the new logic in kvm_mmu_slot_apply_flags(), I've simplified the
-two dirty-logging-toggle checks into one, and I have dropped the
-WARN_ON() that was there.
+1. When it is toggled (either on or off), zap the second stage with
+   kvm_arch_flush_shadow_memslot(). This is to (1) respect
+   userfault-ness and (2) to reconstruct block mappings.
+2. While KVM_MEM_USERFAULT is enabled, restrict new second-stage mappings
+   to be PAGE_SIZE, just like when dirty logging is enabled.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/mmu/mmu.c          | 27 +++++++++++++++++++++----
- arch/x86/kvm/mmu/mmu_internal.h | 20 +++++++++++++++---
- arch/x86/kvm/x86.c              | 36 ++++++++++++++++++++++++---------
- include/linux/kvm_host.h        |  5 ++++-
- 5 files changed, 71 insertions(+), 18 deletions(-)
+  I'm not 100% sure if kvm_arch_flush_shadow_memslot() is correct in
+  this case (like if the host does not have S2FWB).
+---
+ arch/arm64/kvm/Kconfig |  1 +
+ arch/arm64/kvm/mmu.c   | 23 ++++++++++++++++++++++-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ea2c4f21c1ca..286c6825cd1c 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -47,6 +47,7 @@ config KVM_X86
- 	select KVM_GENERIC_PRE_FAULT_MEMORY
- 	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
- 	select KVM_WERROR if WERROR
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index ead632ad01b4..d89b4088b580 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -38,6 +38,7 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
 +	select HAVE_KVM_USERFAULT
+ 	help
+ 	  Support hosting virtualized guest machines.
  
- config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support"
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 22e7ad235123..2f7381255d11 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4292,14 +4292,19 @@ static inline u8 kvm_max_level_for_order(int order)
- 	return PG_LEVEL_4K;
- }
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a71fe6f6bd90..53cee0bacb75 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1482,7 +1482,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * logging_active is guaranteed to never be true for VM_PFNMAP
+ 	 * memslots.
+ 	 */
+-	if (logging_active) {
++	if (logging_active || kvm_memslot_userfault(memslot)) {
+ 		force_pte = true;
+ 		vma_shift = PAGE_SHIFT;
+ 	} else {
+@@ -1571,6 +1571,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+ 	mmap_read_unlock(current->mm);
  
--static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
--					u8 max_level, int gmem_order)
-+static u8 kvm_max_private_mapping_level(struct kvm *kvm,
-+					struct kvm_memory_slot *slot,
-+					kvm_pfn_t pfn, u8 max_level,
-+					int gmem_order)
- {
- 	u8 req_max_level;
- 
- 	if (max_level == PG_LEVEL_4K)
- 		return PG_LEVEL_4K;
- 
-+	if (kvm_memslot_userfault(slot))
-+		return PG_LEVEL_4K;
-+
- 	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
- 	if (max_level == PG_LEVEL_4K)
- 		return PG_LEVEL_4K;
-@@ -4336,8 +4341,10 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
- 	}
- 
- 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
--	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->pfn,
--							 fault->max_level, max_order);
-+	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->slot,
-+							 fault->pfn,
-+							 fault->max_level,
-+							 max_order);
- 
- 	return RET_PF_CONTINUE;
- }
-@@ -4346,6 +4353,18 @@ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- 				 struct kvm_page_fault *fault)
- {
- 	unsigned int foll = fault->write ? FOLL_WRITE : 0;
-+	int userfault;
-+
-+	userfault = kvm_gfn_userfault(vcpu->kvm, fault->slot, fault->gfn);
-+	if (userfault < 0)
-+		return userfault;
-+	if (userfault) {
-+		kvm_mmu_prepare_userfault_exit(vcpu, fault);
++	if (kvm_gfn_userfault(kvm, memslot, gfn)) {
++		kvm_prepare_memory_fault_exit(vcpu, gfn << PAGE_SHIFT,
++					      PAGE_SIZE, write_fault,
++					      exec_fault, false, true);
 +		return -EFAULT;
 +	}
 +
-+	if (kvm_memslot_userfault(fault->slot))
-+		fault->max_level = PG_LEVEL_4K;
- 
- 	if (fault->is_private)
- 		return kvm_mmu_faultin_pfn_private(vcpu, fault);
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index b00abbe3f6cf..15705faa3b67 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -282,12 +282,26 @@ enum {
- 	RET_PF_SPURIOUS,
- };
- 
--static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
--						     struct kvm_page_fault *fault)
-+static inline void __kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-+						       struct kvm_page_fault *fault,
-+						       bool is_userfault)
+ 	pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
+ 				&writable, &page);
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+@@ -2062,6 +2069,20 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 				   enum kvm_mr_change change)
  {
- 	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
- 				      PAGE_SIZE, fault->write, fault->exec,
--				      fault->is_private);
-+				      fault->is_private,
-+				      is_userfault);
-+}
-+
-+static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-+						     struct kvm_page_fault *fault)
-+{
-+	__kvm_mmu_prepare_memory_fault_exit(vcpu, fault, false);
-+}
-+
-+static inline void kvm_mmu_prepare_userfault_exit(struct kvm_vcpu *vcpu,
-+						  struct kvm_page_fault *fault)
-+{
-+	__kvm_mmu_prepare_memory_fault_exit(vcpu, fault, true);
- }
- 
- static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2e713480933a..2f7080fd6218 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13053,12 +13053,36 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 	u32 new_flags = new ? new->flags : 0;
- 	bool log_dirty_pages = new_flags & KVM_MEM_LOG_DIRTY_PAGES;
- 
-+	/*
-+	 * When toggling KVM Userfault on, zap all sptes so that userfault-ness
-+	 * will be respected at refault time. All new faults will only install
-+	 * small sptes. Therefore, when toggling it off, recover hugepages.
-+	 *
-+	 * For MOVE and DELETE, there will be nothing to do, as the old
-+	 * mappings will have already been deleted by
-+	 * kvm_arch_flush_shadow_memslot().
-+	 *
-+	 * For CREATE, no mappings will have been created yet.
-+	 */
-+	if ((old_flags ^ new_flags) & KVM_MEM_USERFAULT &&
-+	    (change == KVM_MR_FLAGS_ONLY)) {
-+		if (old_flags & KVM_MEM_USERFAULT)
-+			kvm_mmu_recover_huge_pages(kvm, new);
-+		else
-+			kvm_arch_flush_shadow_memslot(kvm, old);
-+	}
+ 	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
++	u32 changed_flags = (new ? new->flags : 0) ^ (old ? old->flags : 0);
 +
 +	/*
-+	 * Nothing more to do if dirty logging isn't being toggled.
++	 * If KVM_MEM_USERFAULT changed, drop all the stage-2 mappings so that
++	 * we can (1) respect userfault-ness or (2) create block mappings.
 +	 */
-+	if (!((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES))
++	if ((changed_flags & KVM_MEM_USERFAULT) && change == KVM_MR_FLAGS_ONLY)
++		kvm_arch_flush_shadow_memslot(kvm, old);
++
++	/*
++	 * Nothing left to do if not toggling dirty logging.
++	 */
++	if (!(changed_flags & KVM_MEM_LOG_DIRTY_PAGES))
 +		return;
-+
- 	/*
- 	 * Update CPU dirty logging if dirty logging is being toggled.  This
- 	 * applies to all operations.
- 	 */
--	if ((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES)
--		kvm_mmu_update_cpu_dirty_logging(kvm, log_dirty_pages);
-+	kvm_mmu_update_cpu_dirty_logging(kvm, log_dirty_pages);
  
  	/*
- 	 * Nothing more to do for RO slots (which can't be dirtied and can't be
-@@ -13078,14 +13102,6 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 	if ((change != KVM_MR_FLAGS_ONLY) || (new_flags & KVM_MEM_READONLY))
- 		return;
- 
--	/*
--	 * READONLY and non-flags changes were filtered out above, and the only
--	 * other flag is LOG_DIRTY_PAGES, i.e. something is wrong if dirty
--	 * logging isn't being toggled on or off.
--	 */
--	if (WARN_ON_ONCE(!((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES)))
--		return;
--
- 	if (!log_dirty_pages) {
- 		/*
- 		 * Recover huge page mappings in the slot now that dirty logging
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f7a3dfd5e224..9e8a8dcf2b73 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2465,7 +2465,8 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
- static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
- 						 gpa_t gpa, gpa_t size,
- 						 bool is_write, bool is_exec,
--						 bool is_private)
-+						 bool is_private,
-+						 bool is_userfault)
- {
- 	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
- 	vcpu->run->memory_fault.gpa = gpa;
-@@ -2475,6 +2476,8 @@ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
- 	vcpu->run->memory_fault.flags = 0;
- 	if (is_private)
- 		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
-+	if (is_userfault)
-+		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_USERFAULT;
- }
- 
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+ 	 * At this point memslot has been committed and there is an
 -- 
 2.47.0.338.g60cca15819-goog
 
