@@ -1,107 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6616117D354;
-	Wed,  4 Dec 2024 09:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4161E198836
+	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 09:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733303072; cv=none; b=f+z+qVKUNL1XBkd2nlM4RffSwpcZ/otCZkUE1Aoa9Qczze2gcEoKYKAM109Dd0ESQssvv/B7o4ZGUZn9sxWQoYMWYOUV9DbKb8R4H4YRtKrh3emOkC1hXTZTlGPYXmyI7Y/YrWJ1tvAL/NSa3XWkyL93A4iiqFNN72PmBoIOBAg=
+	t=1733303325; cv=none; b=pcZqQRz/GBnRYEyIhSTmAyUVIwl4r9cvHSekYZfWzJN7WRD51TokhyOrlJrMppfrMIi/zlcm22tKNaOP+Nf3QYNOSRr2Ea1EDiQntE1Yv95yJkrN78NWrtvXyMEsMdbu/cbAOATvatJhaZdvGXZk8OISiEbqHfqXRu+ENJLtdBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733303072; c=relaxed/simple;
-	bh=VT8ZfVdCX2f7yWT+xNjlJWjbNeNrv22Jv1EIIDNEunU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eGxWWYncJRgeoluubJ+Xs/8Yi0r9ScKBNnrpjsZm3h89q2rgS5/H+0CO8ZfDVr6sGBMULz29miXEIGYAKbk1dhwU2chJTfasVt+RqW7V5YlzxCxWq5IBA3V8nC2ymR0GgmRpHbeIYnt873PUjgUwB1oOk7+eqGo0mhsxsAkqakY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUPDjmdd; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUPDjmdd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7AE8C4CED1;
-	Wed,  4 Dec 2024 09:04:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733303071;
-	bh=VT8ZfVdCX2f7yWT+xNjlJWjbNeNrv22Jv1EIIDNEunU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oUPDjmddCGZGbyLZZD1MzXPndzo55vLhSrq1uC/YHc1lbEAgA1APGQ8GTVh+Ba+4I
-	 tM78cUufghWaVjkEuv5mlwycA4BnNi6/0jwXnBJin8Xn10MAyTpk9IJBm3KQgFJZK3
-	 /LuOEDPh+YBA7j8D4GGEEO49E/7IFtGsUwGfx9LVrPWyu6daToQTaCYwlgqDK2CNhv
-	 YZg7YioF2Pl6uVVusLaFz7FMptlyRuSgtzJAs/L9Rk3BpMmNv1Ypk859PQebCvP1/5
-	 hrd2LC3EHi/nTt5TV8c0LB6mKrNGJymhVPC6FqYPbIlwvDbdITYMgEVtIj5OLYXC8J
-	 D8EPQ9a++hAXw==
-Received: from 82-132-237-135.dab.02.net ([82.132.237.135] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tIlJ6-000Nlg-VV;
-	Wed, 04 Dec 2024 09:04:29 +0000
-Date: Wed, 04 Dec 2024 09:04:26 +0000
-Message-ID: <87ikrzstt1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 05/14] KVM: arm64: Always allow fixed cycle counter
-In-Reply-To: <Z0-HBsBgf6WB7x4R@linux.dev>
-References: <20241203193220.1070811-1-oliver.upton@linux.dev>
-	<20241203193220.1070811-6-oliver.upton@linux.dev>
-	<87ldwwsbad.wl-maz@kernel.org>
-	<Z0-HBsBgf6WB7x4R@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1733303325; c=relaxed/simple;
+	bh=3wDR+JwJckqEL0sJDsu15c3Itn6za1uHnfyH9Pgd6DA=;
+	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=fhQ1ReQY+gOv0KSriOEB03uCIJ8cdukWpuXE5xkYKmVY7qWg9n/Zen8jpIeiSIdMab1669RaGDVo53AKFijNbO7MrbPSFSaw+dQ/Zud/SqalrbeKS+uiqsdyxNj/gb2cwKbQ7rXPTfRxttJVILCOmvtq9OUKgNZbjukyZVhgc4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Y3BTX4DDsz1kvGw;
+	Wed,  4 Dec 2024 17:06:24 +0800 (CST)
+Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2902D1401F1;
+	Wed,  4 Dec 2024 17:08:41 +0800 (CST)
+Received: from [10.67.121.177] (10.67.121.177) by
+ kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 4 Dec 2024 17:08:40 +0800
+CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<oliver.upton@linux.dev>, <corbet@lwn.net>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Handle DABT caused by LS64* instructions
+ on unsupported memory
+To: Marc Zyngier <maz@kernel.org>
+References: <20241202135504.14252-1-yangyicong@huawei.com>
+ <20241202135504.14252-6-yangyicong@huawei.com> <87o71trtrx.wl-maz@kernel.org>
+From: Yicong Yang <yangyicong@huawei.com>
+Message-ID: <357fbc9b-c73e-7494-0c48-27917b95005f@huawei.com>
+Date: Wed, 4 Dec 2024 17:08:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.237.135
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <87o71trtrx.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemd200014.china.huawei.com (7.221.188.8)
 
-On Tue, 03 Dec 2024 22:32:38 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On 2024/12/3 17:38, Marc Zyngier wrote:
+> On Mon, 02 Dec 2024 13:55:04 +0000,
+> Yicong Yang <yangyicong@huawei.com> wrote:
+>>
+>> From: Yicong Yang <yangyicong@hisilicon.com>
+>>
+>> FEAT_LS64* instructions only support to access Device/Uncacheable
+>> memory, otherwise a data abort for unsupported Exclusive or atomic
 > 
-> On Tue, Dec 03, 2024 at 09:32:10PM +0000, Marc Zyngier wrote:
-> > On Tue, 03 Dec 2024 19:32:11 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > The fixed CPU cycle counter is mandatory for PMUv3, so it doesn't make a
-> > > lot of sense allowing userspace to filter it. Only apply the PMU event
-> > > filter to *programmed* event counters.
-> > 
-> > But that's a change in ABI, isn't it? We explicitly say in the
-> > documentation that the cycle counter can be filtered by specifying
-> > event 0x11.
-> 
-> Yeah... A bit of a dirty shortcut I took because I don't like the ABI,
-> but distaste isn't enough to break it :)
-> 
-> > More importantly, the current filtering works in terms of events, and
-> > not in terms of counters.
-> > 
-> > Instead of changing the ABI, how about simply not supporting filtering
-> > on such non-compliant HW? Surely that would simplify a few things.
-> 
-> Yeah, that sounds reasonable. Especially if we allow programmable event
-> counters where the event ID space doesn't match the architecture.
+> Not quite. FEAT_LS64WB explicitly supports Write-Back mappings.
 
-Another thing I have been wondering is if a slightly better approach
-would be to move some of the handling to the PMU driver itself, and
-let it emulate PMUv3 if it can. This would allow conversion of event
-numbers in situ rather than polluting the PMUv3 code in KVM.
+thanks for the information, I didn't know this since it's not listed on DDI0487K.a,
+have seen this feature from [1]. will refine the comments and mention the behaviour
+applies when no FEAT_LS64WB.
 
-	M.
+[1] https://developer.arm.com/documentation/109697/2024_09/Feature-descriptions/The-Armv9-6-architecture-extension
 
--- 
-Without deviation from the norm, progress is not possible.
+> 
+>> access (0x35) is generated per spec. It's implementation defined
+>> whether the target exception level is routed and is possible to
+>> implemented as route to EL2 on a VHE VM. Per DDI0487K.a Section
+>> C3.2.12.2 Single-copy atomic 64-byte load/store:
+>>
+>>   The check is performed against the resulting memory type after all
+>>   enabled stages of translation. In this case the fault is reported
+>>   at the final enabled stage of translation.
+>>
+>> If it's implemented as generate the DABT to the final enabled stage
+>> (stage-2), inject a DABT to the guest to handle it.
+>>
+>> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+>> ---
+>>  arch/arm64/kvm/mmu.c | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index c9d46ad57e52..b7e6f0a27537 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1787,6 +1787,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>>  		return 1;
+>>  	}
+>>  
+>> +	/*
+>> +	 * If instructions of FEAT_{LS64, LS64_V, LS64_ACCDATA} operated on
+>> +	 * unsupported memory regions, a DABT for unsupported Exclusive or
+>> +	 * atomic access is generated. It's implementation defined whether
+>> +	 * the exception will be taken to, a stage-1 DABT or the final enabled
+>> +	 * stage of translation (stage-2 in this case as we hit here). Inject
+>> +	 * a DABT to the guest to handle it if it's implemented as a stage-2
+>> +	 * DABT.
+>> +	 */
+>> +	if (esr_fsc_is_excl_atomic_fault(esr)) {
+>> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>> +		return 1;
+>> +	}
+> 
+> This doesn't seem quite right. This is injecting an *External* Data
+> Abort, which is not what the spec says happens, as you are emulating
+> the *first* acceptable behaviour:
+> 
+>   "The check is performed at each enabled stage of translation, and
+>    the fault is reported for the first stage of translation that
+>    provides an inappropriate memory type. In this case, the value of
+>    the HCR_EL2.DC bit does not cause accesses generated by the
+>    instructions to generate a stage 1 Data abort,"
+> 
+> So while the exception is reported at a different EL, the fault should
+> still be an "unsupported Exclusive or atomic access". 
+
+yes it's trying to emulate the first behaviour to let guest OS handle it
+as how host OS handle it - send a SIGBUS to the EL0 task if it's performing
+on unsupported memory type. Currently if such cases happens the VM will be
+killed without the handling here. Keep the injected FSC as "unsupported
+Exclusive or atomic access" should be more proper, will make it in next
+version.
+
+> But that's also
+> assuming that S2 has a device mapping, and it is EL1 that did
+> something wrong. Surely you should check the IPA against its memory
+> type?
+
+in my case it happens when both S1 and S2 mapping is normal memory, for example
+running the hwcap test (PATCH 3/5) in the VM. But yes the memory type should
+be checked here.
+
+> 
+> Further questions: what happens when a L2 guest triggers such fault?
+> I don't think you can't arbitrarily route it back to L2 without
+> looking at why it faulted.
+> 
+
+will see what affect to the nested VM case. but as you point out, it's
+too early to inject the abort here, at least we should check the memory
+type. will address it.
+
+Thanks.
+
+
+
+
