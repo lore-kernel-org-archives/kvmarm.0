@@ -1,155 +1,246 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90E9194A65
-	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 09:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E0D1B4130
+	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 19:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733303602; cv=none; b=LjqW9Iyjr3C+c4MRm1x9B2p8aXtblWfFDsHkS+ApF8kgYDy9+S94bBhFJ35L9GxDYqZC59+vd8JkXWAgXqikG4fxCg8p9E0PtaAM9oEekF+2jQs/oPU8KSyl0TAL6OB8V/2VCIddGqVyQpCBc+/5W568ovI6HHBT7ECRumoz5wQ=
+	t=1733339658; cv=none; b=lDlXMK1QclNGHwdsF+UvMSZOEssio8OEuHJnCTQww7CCbIYkAwnlIMKG0XCwX9OKWTqV4DAcIwEWQdC/Fkxh2sllXMCWjl1tqMB7B5TfA8FdUmFGKX6D2Y0kXkatE+L2BJnl7Z+o5K+K5jxWi/nBOhgfOjbTjjpjtbBSdjgMv8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733303602; c=relaxed/simple;
-	bh=zYO/xyDtk4VQN0o/3Yb4A/WNB5aOzL+U3cJO4IeI3v8=;
-	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=m5yEytfZvsLJuLNdSPOKld+qdJJ8ltjc9FNvbCYA2K9ek3+UJ6FmOw30cezPk31EEs363NZaUJEa4BhQE1XGN8PONdFfM3WXTtJ0If8XFRYj4GEk9FBkRQndUhQoH15sdOj41O0f0KJ/GeR9fMgKPqDQrho2jrfTlXvo8G0kBDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Y3BYz2SB5z11Ls8;
-	Wed,  4 Dec 2024 17:10:15 +0800 (CST)
-Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0C2F5180104;
-	Wed,  4 Dec 2024 17:13:12 +0800 (CST)
-Received: from [10.67.121.177] (10.67.121.177) by
- kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 4 Dec 2024 17:13:11 +0800
-CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<oliver.upton@linux.dev>, <corbet@lwn.net>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
-	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
-Subject: Re: [PATCH 2/5] arm64: Add support for FEAT_{LS64, LS64_V,
- LS64_ACCDATA}
-To: Marc Zyngier <maz@kernel.org>
-References: <20241202135504.14252-1-yangyicong@huawei.com>
- <20241202135504.14252-3-yangyicong@huawei.com> <87mshdrtrr.wl-maz@kernel.org>
-From: Yicong Yang <yangyicong@huawei.com>
-Message-ID: <01b65d7a-19ae-d26a-845c-4b47c82bd6e8@huawei.com>
-Date: Wed, 4 Dec 2024 17:13:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+	s=arc-20240116; t=1733339658; c=relaxed/simple;
+	bh=xW7uoGnTy/4eMBEjOG4u+2rSCh0tjmvM8kudrhHK2JY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=To4RGhHLB4Ywiy5qCjhEBERbr0Lcb+wXjMrqD4/4Dr57JvQdC/wGvWGIPStTHf287LeYr41W2xH7UVY6FjbIDO3BYTgh1XqAJT8yH39rrEVD0bsFvH6MU3v//piHtkWAtndLFFCcMaIa45xDekxDMKMxzLRID5NrPqVKXQs4rZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0/8CxtcP; arc=none smtp.client-ip=209.85.217.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0/8CxtcP"
+Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-4afaabf616eso10208137.3
+        for <kvmarm@lists.linux.dev>; Wed, 04 Dec 2024 11:14:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733339655; x=1733944455; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GtNJo0QiZibz4F5AJzlr0Gn0CnNz2HNSdOIlXuZpqw4=;
+        b=0/8CxtcPioSx17O7sJtUUGxlOEE4+puVzZWOUq8B3JA4wvEKFKc6J1zYmQKm/hhTKe
+         cm2fbmAJDjrT9lCwb//FDDOsvXJrM3XiXl7YHpFjNOZR3UTBMz3Mhb2fIXkd/awG67k1
+         09JF/ESjQ7Qc4pTp11f+WUea5sX9ecDRh91O8oKptbo6MJUNqJvuEEs81XI992O7eyP+
+         U1MAy7QR3bIQHxOwzolM4f2iXzc0vcSJFAUPyGu+BulJFwsHTLCzHWj49JuhvEeIMmPT
+         0BvdjtqIS2HEb2Z203N1CIPog//Mv5Zut7GDgPz0pztiCpZ/FIugjUachIoo2u8RXuj1
+         +k9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733339655; x=1733944455;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GtNJo0QiZibz4F5AJzlr0Gn0CnNz2HNSdOIlXuZpqw4=;
+        b=FNi4ZMIESoGnOOjXCrzDikbq1qSspL8+U1H3MS3Lx9RhhMEPmj2pUh9TsgOhRQ40OJ
+         t6pj8qAVilM3s0kbkagyFP0uv5xoWjBUzBGnoTOJP9Idkt1O7WOI7mesA5PVTO2y3WsE
+         I/KNgsvO6awtZ4DPywsbE8tpMuDOYExgVUYyK9GmaYdpPb4zJCKmy9LvnCifvzg+uQ/i
+         pPVtzzZyJJaUyThUwf2MOK2Qj3anu9CRb+ZyE2VMRWL7IrIcmA8jXjUhHZ5LKfCOjAYC
+         b8zE/p0G4sFJdO93cAfCuLS4gq4wX/vYKSys20VuaOKSQMClekdoyuchvvqiRnSjxxts
+         JnBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXAPO1kokSJ9C0AksND7IFaNfBB493xmePWQLl4sOPLvmAfmVgV4I7o8Gdc0lJ0t/zLeAGUsQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy0EbQLTY3vRni1fkL8o+hEhYJQitiPB9b3mOPu2wY0nSxD15sC
+	5eeFiIHbRygPqMiuRyuIPnmnTkRuLafGo+df8M5mNXm3G0evA/YoUUH71bk3fzId8hj7XHrDhPL
+	lfqTFufHlkH0ZDw6x7Q==
+X-Google-Smtp-Source: AGHT+IF1BXeXjzm2ynkFwLfcOwwZSEy3kJcGkjF9TH4hluS8IOC1jCo7DbvQ0TVKaPL1457lCJsGhUwjD3KkdK7U
+X-Received: from vsbhy8.prod.google.com ([2002:a67:e7c8:0:b0:4af:497d:2ec1])
+ (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:3ed2:b0:4af:58f7:15ec with SMTP id ada2fe7eead31-4af971fcbddmr10423490137.4.1733339655146;
+ Wed, 04 Dec 2024 11:14:15 -0800 (PST)
+Date: Wed,  4 Dec 2024 19:13:35 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <87mshdrtrr.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemd200014.china.huawei.com (7.221.188.8)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241204191349.1730936-1-jthoughton@google.com>
+Subject: [PATCH v1 00/13] KVM: Introduce KVM Userfault
+From: James Houghton <jthoughton@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
+	James Houghton <jthoughton@google.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
+	Anish Moorthy <amoorthy@google.com>, Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
+	David Matlack <dmatlack@google.com>, Wang@google.com, Wei W <wei.w.wang@intel.com>, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 2024/12/3 17:38, Marc Zyngier wrote:
-> On Mon, 02 Dec 2024 13:55:01 +0000,
-> Yicong Yang <yangyicong@huawei.com> wrote:
->>
->> From: Yicong Yang <yangyicong@hisilicon.com>
->>
->> Armv8.7 introduces single-copy atomic 64-byte loads and stores
->> instructions and its variants named under FEAT_{LS64, LS64_V,
->> LS64_ACCDATA}. These features are identified by ID_AA64ISAR1_EL1.LS64
->> and the use of such instructions in userspace (EL0) can be trapped.
->> In order to support the use of corresponding instructions in userspace:
->> - Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
->> - Add identifying and enabling in the cpufeature list
->> - Expose these support of these features to userspace through HWCAP
->>   and cpuinfo
->>
->> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->> ---
->>  Documentation/arch/arm64/booting.rst    | 28 ++++++++++
->>  Documentation/arch/arm64/elf_hwcaps.rst |  9 ++++
->>  arch/arm64/include/asm/hwcap.h          |  3 ++
->>  arch/arm64/include/uapi/asm/hwcap.h     |  3 ++
->>  arch/arm64/kernel/cpufeature.c          | 70 ++++++++++++++++++++++++-
->>  arch/arm64/kernel/cpuinfo.c             |  3 ++
->>  arch/arm64/tools/cpucaps                |  3 ++
->>  7 files changed, 118 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
->> index 3278fb4bf219..c35cfe9da501 100644
->> --- a/Documentation/arch/arm64/booting.rst
->> +++ b/Documentation/arch/arm64/booting.rst
->> @@ -449,6 +449,34 @@ Before jumping into the kernel, the following conditions must be met:
->>  
->>      - HFGWTR_EL2.nGCS_EL0 (bit 52) must be initialised to 0b1.
->>  
->> +  For CPUs support for 64-byte loads and stores without status (FEAT_LS64):
->> +
->> +  - If the kernel is entered at EL1 and EL2 is present:
->> +
->> +    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
->> +
->> +  For CPUs support for 64-byte loads and stores with status (FEAT_LS64_V):
->> +
->> +  - If the kernel is entered at EL1 and EL2 is present:
->> +
->> +    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
->> +
->> +  For CPUs support for 64-byte EL0 stores with status (FEAT_LS64_ACCDATA):
->> +
->> +  - If EL3 is present:
->> +
->> +    - SCR_EL3.EnAS0 (bit 36) must be initialised to 0b1.
->> +
->> +    - SCR_EL3.ADEn (bit 37) must be initialised to 0b1.
->> +
->> +  - If the kernel is entered at EL1 and EL2 is present:
->> +
->> +    - HCRX_EL2.EnAS0 (bit 0) must be initialised to 0b1.
->> +
->> +    - HFGRTR_EL2.nACCDATA_EL1 (bit 50) must be initialised to 0b1.
->> +
->> +    - HFGWTR_EL2.nACCDATA_EL1 (bit 50) must be initialised to 0b1.
->> +
->>  The requirements described above for CPU mode, caches, MMUs, architected
->>  timers, coherency and system registers apply to all CPUs.  All CPUs must
->>  enter the kernel in the same exception level.  Where the values documented
->> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
->> index 2ff922a406ad..6cb2594f0803 100644
->> --- a/Documentation/arch/arm64/elf_hwcaps.rst
->> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
->> @@ -372,6 +372,15 @@ HWCAP2_SME_SF8DP4
->>  HWCAP2_POE
->>      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
->>  
->> +HWCAP3_LS64
->> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
->> +
->> +HWCAP3_LS64_V
->> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.
->> +
->> +HWCAP3_LS64_ACCDATA
->> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0011.
->> +
-> 
-> I don't mind the two others, but I seriously question exposing ST64BV0
-> to userspace. How is ACCDATA_EL1 populated? How is it context-switched?
-> 
-> As it stands, this either does the wrong thing by always having the
-> low 32bit set to an UNKNOWN value, or actively leaks kernel data.
-> TBH, I don't see it being usable in practice (the more I read this
-> part of the architecture, the more broken it looks).
-> 
+This is a continuation of the original KVM Userfault RFC[1] from July.
+It contains the simplifications we talked about at LPC[2].
 
-you're right, expose this LS64_ACCDATA alone to userspace won't make it
-usable since ACCDATA_EL1 cannot be accessed from EL0. will drop this at
-this stage.
+Please see the RFC[1] for the problem description. In summary,
+guest_memfd VMs have no mechanism for doing post-copy live migration.
+KVM Userfault provides such a mechanism. Today there is no upstream
+mechanism for installing memory into a guest_memfd, but there will
+be one soon (e.g. [3]).
 
-Thanks.
+There is a second problem that KVM Userfault solves: userfaultfd-based
+post-copy doesn't scale very well. KVM Userfault when used with
+userfaultfd can scale much better in the common case that most post-copy
+demand fetches are a result of vCPU access violations. This is a
+continuation of the solution Anish was working on[4]. This aspect of
+KVM Userfault is important for userfaultfd-based live migration when
+scaling up to hundreds of vCPUs with ~30us network latency for a
+PAGE_SIZE demand-fetch.
+
+The implementation in this series is version than the RFC[1]. It adds...
+ 1. a new memslot flag is added: KVM_MEM_USERFAULT,
+ 2. a new parameter, userfault_bitmap, into struct kvm_memory_slot,
+ 3. a new KVM_RUN exit reason: KVM_MEMORY_EXIT_FLAG_USERFAULT,
+ 4. a new KVM capability KVM_CAP_USERFAULT.
+
+KVM Userfault does not attempt to catch KVM's own accesses to guest
+memory. That is left up to userfaultfd.
+
+When enabling KVM_MEM_USERFAULT for a memslot, the second-stage mappings
+are zapped, and new faults will check `userfault_bitmap` to see if the
+fault should exit to userspace.
+
+When KVM_MEM_USERFAULT is enabled, only PAGE_SIZE mappings are
+permitted.
+
+When disabling KVM_MEM_USERFAULT, huge mappings will be reconstructed
+(either eagerly or on-demand; the architecture can decide).
+
+KVM Userfault is not compatible with async page faults. Nikita has
+proposed a new implementation of async page faults that is more
+userspace-driven that *is* compatible with KVM Userfault[5].
+
+Performance
+===========
+
+The takeaways I have are:
+
+1. For cases where lock contention is not a concern, there is a
+   discernable win because KVM Userfault saves the trip through the
+   userfaultfd poll/read/WAKE cycle.
+
+2. Using a single userfaultfd without KVM Userfault gets very slow as
+   the number of vCPUs increases, and it gets even slower when you add
+   more reader threads. This is due to contention on the userfaultfd
+   wait_queue locks. This is the contention that KVM Userfault avoids.
+   Compare this to the multiple-userfaultfd runs; they are much faster
+   because the wait_queue locks are sharded perfectly (1 per vCPU).
+   Perfect sharding is only possible because the vCPUs are configured to
+   touch only their own chunk of memory.
+
+Config:
+ - 64M per vcpu
+ - vcpus only touch their 64M (`-b 64M -a`)
+ - THPs disabled
+ - MGLRU disabled
+
+Each run used the following command:
+
+./demand_paging_test -b 64M -a -v <#vcpus>  \
+	-s shmem		     \ # if using shmem
+	-r <#readers> -u <uffd_mode> \ # if using userfaultfd
+	-k \			     \ # if using KVM Userfault
+	-m 3			       # when on arm64
+
+note: I patched demand_paging_test so that, when using shmem, the page
+      cache will always be preallocated, not only in the `-u MINOR`
+      case. Otherwise the comparison would be unfair. I left this patch
+      out in the selftest commits, but I am happy to add it if it would
+      be useful.
+
+== x86 (96 LPUs, 48 cores, TDP MMU enabled) ==
+
+-- Anonymous memory, single userfaultfd
+
+	userfault mode
+vcpus				2	8	64
+	no userfault		306845	220402	47720
+	MISSING (single reader)	90724	26059	3029
+	MISSING			86840	37912	1664
+	MISSING + KVM UF	143021	104385	34910
+	KVM UF			160326	128247	39913
+
+-- shmem (preallocated), single userfaultfd
+
+vcpus				2	8	64
+	no userfault		375130	214635	54420
+	MINOR (single reader)	102336	31704	3244
+	MINOR 			97981	36982	1673
+	MINOR + KVM UF		161835	113716	33577
+	KVM UF			181972	131204	42914
+
+-- shmem (preallocated), multiple userfaultfds
+
+vcpus				2	8	64
+	no userfault		374060	216108	54433
+	MINOR			102661	56978	11300
+	MINOR + KVM UF		167080	123461	48382
+	KVM UF			180439	122310	42539
+
+== arm64 (96 PEs, AmpereOne) ==
+
+-- shmem (preallocated), single userfaultfd
+
+vcpus:				2	8	64
+	no userfault		419069	363081	34348
+	MINOR (single reader)	87421	36147	3764
+	MINOR			84953	43444	1323
+	MINOR + KVM UF		164509	139986	12373
+	KVM UF			185706	122153	12153
+
+-- shmem (preallocated), multiple userfaultfds
+
+vcpus:				2	8	64
+	no userfault		401931	334142	36117
+	MINOR			83696	75617	15996
+	MINOR + KVM UF		176327	115784	12198
+	KVM UF			190074	126966	12084
+
+This series is based on the latest kvm/next.
+
+[1]: https://lore.kernel.org/kvm/20240710234222.2333120-1-jthoughton@google.com/
+[2]: https://lpc.events/event/18/contributions/1757/
+[3]: https://lore.kernel.org/kvm/20241112073837.22284-1-yan.y.zhao@intel.com/
+[4]: https://lore.kernel.org/all/20240215235405.368539-1-amoorthy@google.com/
+[5]: https://lore.kernel.org/kvm/20241118123948.4796-1-kalyazin@amazon.com/#t
+
+James Houghton (13):
+  KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
+  KVM: Add KVM_MEMORY_EXIT_FLAG_USERFAULT
+  KVM: Allow late setting of KVM_MEM_USERFAULT on guest_memfd memslot
+  KVM: Advertise KVM_CAP_USERFAULT in KVM_CHECK_EXTENSION
+  KVM: x86/mmu: Add support for KVM_MEM_USERFAULT
+  KVM: arm64: Add support for KVM_MEM_USERFAULT
+  KVM: selftests: Fix vm_mem_region_set_flags docstring
+  KVM: selftests: Fix prefault_mem logic
+  KVM: selftests: Add va_start/end into uffd_desc
+  KVM: selftests: Add KVM Userfault mode to demand_paging_test
+  KVM: selftests: Inform set_memory_region_test of KVM_MEM_USERFAULT
+  KVM: selftests: Add KVM_MEM_USERFAULT + guest_memfd toggle tests
+  KVM: Documentation: Add KVM_CAP_USERFAULT and KVM_MEM_USERFAULT
+    details
+
+ Documentation/virt/kvm/api.rst                |  33 +++-
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/mmu.c                          |  23 ++-
+ arch/x86/kvm/Kconfig                          |   1 +
+ arch/x86/kvm/mmu/mmu.c                        |  27 +++-
+ arch/x86/kvm/mmu/mmu_internal.h               |  20 ++-
+ arch/x86/kvm/x86.c                            |  36 +++--
+ include/linux/kvm_host.h                      |  19 ++-
+ include/uapi/linux/kvm.h                      |   6 +-
+ .../selftests/kvm/demand_paging_test.c        | 145 ++++++++++++++++--
+ .../testing/selftests/kvm/include/kvm_util.h  |   5 +
+ .../selftests/kvm/include/userfaultfd_util.h  |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  42 ++++-
+ .../selftests/kvm/lib/userfaultfd_util.c      |   2 +
+ .../selftests/kvm/set_memory_region_test.c    |  33 ++++
+ virt/kvm/Kconfig                              |   3 +
+ virt/kvm/kvm_main.c                           |  47 +++++-
+ 17 files changed, 409 insertions(+), 36 deletions(-)
+
+
+base-commit: 4d911c7abee56771b0219a9fbf0120d06bdc9c14
+-- 
+2.47.0.338.g60cca15819-goog
 
