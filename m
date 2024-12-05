@@ -1,73 +1,30 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF10121A42A;
-	Thu,  5 Dec 2024 14:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D37E1B59A
+	for <kvmarm@lists.linux.dev>; Thu,  5 Dec 2024 14:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733408627; cv=none; b=u20cczAZAf1FB1BjYKJcvELC+4TdPqM265F00k0xEvX+BoEpJDfK/ZLETZW2lHwbnx1drAsAxK5RhjtqPcmRkc37JfK7Cj0avkowmPwYGe6DNWPsOoXgG7g442k5y0XaGi+gaComJtU4LPga9Pwg1Jb5pErTfxjFGikc8guoiR4=
+	t=1733408783; cv=none; b=CoS9LXBCuWGhnz24z2EtZsqKNJWpJuCj/Eeylaju4yWSWPoeoApuTwYm+jpSlAGfDbLx/d2xeq8acpl7iTfSOoCOFmFSeY5YIiJX8VTxLv6X35OamZ65c0m9EEi9FnR7LmNTDnoPXyWz2SJKoBXl4phRr91XLxqJmdA5eN58s6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733408627; c=relaxed/simple;
-	bh=wwkkJQKuVKIstuMSBCRhrsXwlus/ArcTkrxaTl4VJo4=;
+	s=arc-20240116; t=1733408783; c=relaxed/simple;
+	bh=fmiLvPxLXyXJHVZaxZe5zH4M6TO5DwbtvuFZP1idAts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SDOvbfxAO/ekiLf0LSnENXP6eaHPA/ro7cEn7CgaDbUJgngy9IccysFmzaVTKy6UZuifTKhaav6VmjgWT92gG32aZPekcocgbtonSbw3r6FDQUY1V/4nN6za4/wPS8V0VwekenEz8cH53GfRPSMCqNXiItBZJfXqU0VvTBCMLPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I6ZV16EP; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I6ZV16EP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733408625; x=1764944625;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wwkkJQKuVKIstuMSBCRhrsXwlus/ArcTkrxaTl4VJo4=;
-  b=I6ZV16EPY6V9ynUIPjsJzAEu0EhAjL9MZrakjhxUgiDi4f4qNxG0b/2I
-   S2OCLmQQMTE/o8LiRfnsIJvievpKFEPzzgAYfjyja5FOj0T+s7o/mNZSv
-   DDn14qU2ibVrOpXtyaCzP1k/lHmCtxZxPNCwEAAVeHmxFyTNwcBP6RsgA
-   G61DjZT6E4djcUSB8QjPL27zbQZ7jp+Ak15zuyx4UU2B2kbO6lbh2loCX
-   JiI9Gc9s9LLiO1JsGAY6rlBMDkGLT4uUDbEj69X/wz+t6iVMvt6TeLI7b
-   IQqOcFg8PV8JD0Y5rwaBulhxWRcfZjRVoSwboBVdjWy3wlSoaYfIdpg5K
-   g==;
-X-CSE-ConnectionGUID: t/0lKtL3QM6Crpr0J3h2mA==
-X-CSE-MsgGUID: YIfgOVIqQfqnPradyYsBDQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="33637344"
-X-IronPort-AV: E=Sophos;i="6.12,210,1728975600"; 
-   d="scan'208";a="33637344"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 06:23:44 -0800
-X-CSE-ConnectionGUID: 8CmpKIUuR1ikCloIPgyAYg==
-X-CSE-MsgGUID: LKEgyXOcSkKfshkGA+W9kw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,210,1728975600"; 
-   d="scan'208";a="125015938"
-Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 05 Dec 2024 06:23:40 -0800
-Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tJClV-00004t-23;
-	Thu, 05 Dec 2024 14:23:37 +0000
-Date: Thu, 5 Dec 2024 22:22:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: James Houghton <jthoughton@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Yan Zhao <yan.y.zhao@intel.com>,
-	James Houghton <jthoughton@google.com>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Anish Moorthy <amoorthy@google.com>,
-	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-	David Matlack <dmatlack@google.com>, Wang@google.com,
-	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v1 01/13] KVM: Add KVM_MEM_USERFAULT memslot flag and
- bitmap
-Message-ID: <202412052133.pTg3UAQm-lkp@intel.com>
-References: <20241204191349.1730936-2-jthoughton@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pqylv6TnhMTbS31hgBJN8u8HsNf5AvcLVUv69TE+VfjWXr/Y2ON2CaxIaX84KqmuL1/aktc5FDFetKPK8N0vCcZNJrXHbD6ICMoamLViIiAwD6wodTcjiH+magG3iArp+mDfJvmY0V4YdexpdPWhXEuOkEWwV9NzkjOsLezVW5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D5231063;
+	Thu,  5 Dec 2024 06:26:46 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FC003F5A1;
+	Thu,  5 Dec 2024 06:26:17 -0800 (PST)
+Date: Thu, 5 Dec 2024 14:26:14 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com
+Subject: Re: [kvm-unit-tests PATCH] arm64: Add basic MTE test
+Message-ID: <Z1G3QKefOxKtkfDj@raptor>
+References: <20241126095513.129737-1-vladimir.murzin@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,173 +33,666 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241204191349.1730936-2-jthoughton@google.com>
+In-Reply-To: <20241126095513.129737-1-vladimir.murzin@arm.com>
 
-Hi James,
+Hi Vladimir,
 
-kernel test robot noticed the following build warnings:
+This is very useful, thank you for writing the test.
 
-[auto build test WARNING on 4d911c7abee56771b0219a9fbf0120d06bdc9c14]
+On Tue, Nov 26, 2024 at 09:55:13AM +0000, Vladimir Murzin wrote:
+> Test tag storage access and tag mismatch for different MTE modes.
+> 
+> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> ---
+>  arm/Makefile.arm64            |   9 ++
+>  arm/cstart64.S                |   4 +-
+>  arm/mte.c                     | 266 ++++++++++++++++++++++++++++++++++
+>  arm/run                       |   3 +-
+>  arm/unittests.cfg             |  19 +++
+>  lib/arm64/asm/mmu.h           |   1 +
+>  lib/arm64/asm/pgtable-hwdef.h |   2 +
+>  lib/arm64/asm/sysreg.h        |  12 ++
+>  8 files changed, 314 insertions(+), 2 deletions(-)
+>  create mode 100644 arm/mte.c
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 3b9034e3..30df4e56 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -17,6 +17,14 @@ ifneq ($(strip $(sve_flag)),)
+>  CFLAGS += -DCC_HAS_SVE
+>  endif
+>  
+> +mte_flag := $(call cc-option, -march=armv8.5-a+memtag, "")
+> +ifneq ($(strip $(mte_flag)),)
+> +# Don't pass the option to the compiler, we don't
+> +# want the compiler to generate MTE instructions.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/James-Houghton/KVM-Add-KVM_MEM_USERFAULT-memslot-flag-and-bitmap/20241205-032516
-base:   4d911c7abee56771b0219a9fbf0120d06bdc9c14
-patch link:    https://lore.kernel.org/r/20241204191349.1730936-2-jthoughton%40google.com
-patch subject: [PATCH v1 01/13] KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
-config: i386-buildonly-randconfig-006 (https://download.01.org/0day-ci/archive/20241205/202412052133.pTg3UAQm-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241205/202412052133.pTg3UAQm-lkp@intel.com/reproduce)
+I think the comment is at odds with the code, the define tells the test
+that the compiler *has* mte, but the comment talks about not passing the
+option to the compiler.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412052133.pTg3UAQm-lkp@intel.com/
+Maybe something like this would be easier to parse:
 
-All warnings (new ones prefixed by >>):
+# MTE is supported by the compiler, generate MTE instructions.
 
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function '__kvm_set_memory_region':
->> arch/x86/kvm/../../../virt/kvm/kvm_main.c:2049:41: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-    2049 |                 new->userfault_bitmap = (unsigned long *)mem->userfault_bitmap;
-         |                                         ^
+> +CFLAGS += -DCC_HAS_MTE
+> +endif
+> +
+> +
+>  mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+>  CFLAGS += $(mno_outline_atomics)
+>  CFLAGS += -DCONFIG_RELOC
+> @@ -57,6 +65,7 @@ tests += $(TEST_DIR)/micro-bench.$(exe)
+>  tests += $(TEST_DIR)/cache.$(exe)
+>  tests += $(TEST_DIR)/debug.$(exe)
+>  tests += $(TEST_DIR)/fpu.$(exe)
+> +tests += $(TEST_DIR)/mte.$(exe)
+>  
+>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+>  
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index b480a552..b9d7a446 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -242,6 +242,7 @@ halt:
+>   *   NORMAL             100     11111111
+>   *   NORMAL_WT          101     10111011
+>   *   DEVICE_nGRE        110     00001000
+> + *   NORMAL_TAGGED      111     11110000
 
+The attribute matches the Arm ARM and the Linux source tree.
 
-vim +2049 arch/x86/kvm/../../../virt/kvm/kvm_main.c
+>   */
+>  #define MAIR(attr, mt) ((attr) << ((mt) * 8))
+>  
+> @@ -275,7 +276,8 @@ asm_mmu_enable:
+>  		     MAIR(0x44, MT_NORMAL_NC) |		\
+>  		     MAIR(0xff, MT_NORMAL) |	        \
+>  		     MAIR(0xbb, MT_NORMAL_WT) |         \
+> -		     MAIR(0x08, MT_DEVICE_nGRE)
+> +		     MAIR(0x08, MT_DEVICE_nGRE) |       \
+> +		     MAIR(0xf0, MT_NORMAL_TAGGED)
+>  	msr	mair_el1, x1
+>  
+>  	/* TTBR0 */
+> diff --git a/arm/mte.c b/arm/mte.c
+> new file mode 100644
+> index 00000000..ae8d8b75
+> --- /dev/null
+> +++ b/arm/mte.c
+> @@ -0,0 +1,266 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2024 Arm Limited.
+> + * All rights reserved.
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <alloc_page.h>
+> +#include <stdlib.h>
+> +#include <asm/mmu.h>
+> +#include <asm/sysreg.h>
+> +#include <asm/pgtable-hwdef.h>
+> +#include <asm/processor.h>
+> +#include <asm/thread_info.h>
+> +
+> +
+> +#define MTE_TCF_SYNC		0b01
+> +#define MTE_TCF_ASYNC		0b10
+> +#define MTE_TCF_ASYMM		0b11
 
-  1931	
-  1932	/*
-  1933	 * Allocate some memory and give it an address in the guest physical address
-  1934	 * space.
-  1935	 *
-  1936	 * Discontiguous memory is allowed, mostly for framebuffers.
-  1937	 *
-  1938	 * Must be called holding kvm->slots_lock for write.
-  1939	 */
-  1940	int __kvm_set_memory_region(struct kvm *kvm,
-  1941				    const struct kvm_userspace_memory_region2 *mem)
-  1942	{
-  1943		struct kvm_memory_slot *old, *new;
-  1944		struct kvm_memslots *slots;
-  1945		enum kvm_mr_change change;
-  1946		unsigned long npages;
-  1947		gfn_t base_gfn;
-  1948		int as_id, id;
-  1949		int r;
-  1950	
-  1951		r = check_memory_region_flags(kvm, mem);
-  1952		if (r)
-  1953			return r;
-  1954	
-  1955		as_id = mem->slot >> 16;
-  1956		id = (u16)mem->slot;
-  1957	
-  1958		/* General sanity checks */
-  1959		if ((mem->memory_size & (PAGE_SIZE - 1)) ||
-  1960		    (mem->memory_size != (unsigned long)mem->memory_size))
-  1961			return -EINVAL;
-  1962		if (mem->guest_phys_addr & (PAGE_SIZE - 1))
-  1963			return -EINVAL;
-  1964		/* We can read the guest memory with __xxx_user() later on. */
-  1965		if ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
-  1966		    (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
-  1967		     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
-  1968				mem->memory_size))
-  1969			return -EINVAL;
-  1970		if (mem->flags & KVM_MEM_GUEST_MEMFD &&
-  1971		    (mem->guest_memfd_offset & (PAGE_SIZE - 1) ||
-  1972		     mem->guest_memfd_offset + mem->memory_size < mem->guest_memfd_offset))
-  1973			return -EINVAL;
-  1974		if (as_id >= kvm_arch_nr_memslot_as_ids(kvm) || id >= KVM_MEM_SLOTS_NUM)
-  1975			return -EINVAL;
-  1976		if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-  1977			return -EINVAL;
-  1978		if ((mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
-  1979			return -EINVAL;
-  1980	
-  1981		slots = __kvm_memslots(kvm, as_id);
-  1982	
-  1983		/*
-  1984		 * Note, the old memslot (and the pointer itself!) may be invalidated
-  1985		 * and/or destroyed by kvm_set_memslot().
-  1986		 */
-  1987		old = id_to_memslot(slots, id);
-  1988	
-  1989		if (!mem->memory_size) {
-  1990			if (!old || !old->npages)
-  1991				return -EINVAL;
-  1992	
-  1993			if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
-  1994				return -EIO;
-  1995	
-  1996			return kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE);
-  1997		}
-  1998	
-  1999		base_gfn = (mem->guest_phys_addr >> PAGE_SHIFT);
-  2000		npages = (mem->memory_size >> PAGE_SHIFT);
-  2001	
-  2002		if (!old || !old->npages) {
-  2003			change = KVM_MR_CREATE;
-  2004	
-  2005			/*
-  2006			 * To simplify KVM internals, the total number of pages across
-  2007			 * all memslots must fit in an unsigned long.
-  2008			 */
-  2009			if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
-  2010				return -EINVAL;
-  2011		} else { /* Modify an existing slot. */
-  2012			/* Private memslots are immutable, they can only be deleted. */
-  2013			if (mem->flags & KVM_MEM_GUEST_MEMFD)
-  2014				return -EINVAL;
-  2015			if ((mem->userspace_addr != old->userspace_addr) ||
-  2016			    (npages != old->npages) ||
-  2017			    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
-  2018				return -EINVAL;
-  2019	
-  2020			if (base_gfn != old->base_gfn)
-  2021				change = KVM_MR_MOVE;
-  2022			else if (mem->flags != old->flags)
-  2023				change = KVM_MR_FLAGS_ONLY;
-  2024			else /* Nothing to change. */
-  2025				return 0;
-  2026		}
-  2027	
-  2028		if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
-  2029		    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
-  2030			return -EEXIST;
-  2031	
-  2032		/* Allocate a slot that will persist in the memslot. */
-  2033		new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
-  2034		if (!new)
-  2035			return -ENOMEM;
-  2036	
-  2037		new->as_id = as_id;
-  2038		new->id = id;
-  2039		new->base_gfn = base_gfn;
-  2040		new->npages = npages;
-  2041		new->flags = mem->flags;
-  2042		new->userspace_addr = mem->userspace_addr;
-  2043		if (mem->flags & KVM_MEM_GUEST_MEMFD) {
-  2044			r = kvm_gmem_bind(kvm, new, mem->guest_memfd, mem->guest_memfd_offset);
-  2045			if (r)
-  2046				goto out;
-  2047		}
-  2048		if (mem->flags & KVM_MEM_USERFAULT)
-> 2049			new->userfault_bitmap = (unsigned long *)mem->userfault_bitmap;
-  2050	
-  2051		r = kvm_set_memslot(kvm, old, new, change);
-  2052		if (r)
-  2053			goto out_unbind;
-  2054	
-  2055		return 0;
-  2056	
-  2057	out_unbind:
-  2058		if (mem->flags & KVM_MEM_GUEST_MEMFD)
-  2059			kvm_gmem_unbind(new);
-  2060	out:
-  2061		kfree(new);
-  2062		return r;
-  2063	}
-  2064	EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
-  2065	
+Matches the definition for the SCTLR_EL1 TCF and TCF0 fields.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Do you think renaming MTE_TCF_ASYNC->MTE_TCF_ASYNC_ALL and
+MTE_TCF_ASYMM -> MTE_TCF_ASYNC_WRITES makes it easier to understand?
+
+> +
+> +#define MTE_GRANULE_SIZE        UL(16)
+> +#define MTE_GRANULE_MASK        (~(MTE_GRANULE_SIZE - 1))
+> +#define MTE_TAG_SHIFT           56
+> +
+> +#define untagged(p)                                             		\
+> +({                                                              		\
+> +    unsigned long __in = (unsigned long)(p);                    		\
+> +    typeof(p) __out = (typeof(p))(__in & ~(MTE_GRANULE_MASK << MTE_TAG_SHIFT));	\
+
+Can you add a space between the variable declaration and the return value from
+the macro? Same for the tagged() macro.
+
+> +    __out;                                                      		\
+> +})
+> +
+> +#define tagged(p,t)                                     	\
+> +({                                                      	\
+> +    unsigned long __in = (unsigned long)(untagged(p));  	\
+> +    unsigned long __tag = (unsigned long)(t) << MTE_TAG_SHIFT;	\
+> +    typeof(p) __out = (typeof(p))(__in | __tag);        	\
+> +    __out;                                              	\
+> +})
+> +
+> +
+> +static inline void mem_read(unsigned int *addr, unsigned int tag, unsigned int *res)
+> +{
+> +	unsigned int r;
+
+Space between the variable declaration and the rest of the function?
+
+> +	asm volatile ("ldr %0,[%1]\n"
+> +		      "str %0,[%2]\n"
+> +		      : "=r" (r)
+> +		      : "r" (tagged(addr, tag)), "r" (res));
+> +}
+> +
+> +static inline void mem_write(unsigned int *addr, unsigned int tag, unsigned int val)
+> +{
+> +	asm volatile ("str %0,[%1]\n"
+> +		      "nop\n"
+> +		      :
+> +		      : "r" (val), "r" (tagged(addr, tag))
+> +		      : "memory");
+> +}
+
+I don't understand why these functions are needed.
+
+I first assumed that they are necessary to avoid the compiler optimising
+the memory accesses and reusing a stashed register value. But the address
+is changed by adding the tag, and the tests never use the same tag, so the
+compiler won't have values in registers for the tagged addresses.
+
+I guess it's because in the future a test might reuse the same tag? That
+can easily be avoided by adding a random tag to the address - the example
+from Documentation/arch/arm64/memory-tagging-extension.rst does that.
+
+I think another way to get around this would be to add a barrier() in
+tagged.
+
+> +
+> +static volatile bool mte_exception;
+> +
+> +static void mte_fault_handler(struct pt_regs *regs, unsigned int esr)
+> +{
+> +	unsigned int dfsc = esr & 0b111111;
+
+GENMASK_UL(5, 0)?
+
+> +
+> +	if (dfsc == 0b010001)
+
+This matches the DFSC in the Arm ARM.
+
+For a synchronous tag check fault, ARM DDI0487K.a also states the following:
+
+'When FEAT_MTE is implemented, for a synchronous Tag Check Fault abort taken to
+EL1, ESR_EL1.FnV is 0 and FAR_EL1 is valid.'
+
+Do you think there's value in checking that FnV is 0 when MTE is configured to
+generate a synchronous tag check fault exception?
+
+> +		mte_exception = true;
+> +
+> +        regs->pc += 8;
+
+I think two instructions are skipped here because the test assumes that
+the first instruction from the mem_{read,write} macros will cause the
+fault.  But what happens if the first succeeds and the second instruction
+causes a tag check fault?
+
+IMO, I see two options here:
+
+1. Increment PC by one instruction, which means the second instruction gets
+executed, which is harmless as far as I can tell.
+
+2. Remove the macros, assign a random tag to the addresses and use a single
+instruction to access the address, then increment the PC by one instruction
+in the exception handler.
+
+> +}
+> +
+> +static inline void mmu_set_tagged(pgd_t *pgtable, unsigned long vaddr)
+> +{
+> +	pteval_t *p_pte = follow_pte(pgtable, vaddr);
+
+Space between local variable declaration and the body of the function?
+
+> +        if (p_pte) {
+
+Indentation with spaces instead of tabs?
+
+> +                pteval_t entry = *p_pte;
+> +
+> +		entry &= ~PTE_ATTRINDX_MASK;
+> +		entry |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
+> +
+> +                WRITE_ONCE(*p_pte, entry);
+> +                flush_tlb_page(vaddr);
+> +        }
+
+As far as I can tell, follow_pte() fails if:
+
+1. The test hasn't correctly allocated memory for 'vaddr', or
+2. Something is very wrong with the library code.
+
+I think having a report_abort() if !p_pte (with a comment explaining it)
+would be useful for debugging.
+
+Alternatively you can add a comment explaining why follow_pte() should
+never fail and don't check that p_pte != NULL.
+
+> +}
+> +
+> +static void mte_init(void)
+> +{
+> +	unsigned long sctlr = read_sysreg(sctlr_el1);
+> +	unsigned long tcr = read_sysreg(tcr_el1);
+> +
+> +	sctlr &= ~(SCTLR_EL1_ATA | SCTLR_EL1_ATA0);
+
+This can be dropped, and replaced with the second instruction below which
+sets the bits unconditionally.
+
+> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
+> +	sctlr |= SCTLR_EL1_ATA | SCTLR_EL1_ATA0;
+
+Why set ATA0? All the tests execute at EL1 as far as I can tell.
+
+> +
+> +	tcr |= TCR_TBI1 | TCR_TBI0;
+> +
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	write_sysreg(tcr, tcr_el1);
+> +
+> +	isb();
+> +        flush_tlb_all();
+
+Indentation with spaces instead of tabs?
+
+Also, invalidating the TLB is the right thing to do, because both the
+TCR_EL1 and SCTLR_EL1 bits are permitted to be cached in the TLB.
+
+> +}
+> +
+> +static inline void mte_set_tcf(unsigned long tcf)
+> +{
+> +	unsigned long sctlr = read_sysreg(sctlr_el1);
+> +
+> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
+> +	sctlr |= (tcf << SCTLR_EL1_TCF_SHIFT) & SCTLR_EL1_TCF_MASK ;
+> +	sctlr |= (tcf << SCTLR_EL1_TCF0_SHIFT) & SCTLR_EL1_TCF0_MASK ;
+> +
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	isb();
+> +}
+> +
+> +
+
+Two empty lines instead of one?
+
+> +static inline void mte_set_tag(void *addr, size_t size, unsigned int tag)
+> +{
+> +#ifdef CC_HAS_MTE
+> +	unsigned long in = (unsigned long)untagged(addr);
+> +	unsigned long start = ALIGN_DOWN(in, 16);
+> +	unsigned long end = ALIGN(in + size , 16);
+
+Space between local variable declaration and the body of the function?
+
+> +	for (unsigned long ptr = start; ptr < end; ptr += 16)
+> +            asm volatile(".arch   armv8.5-a+memtag\n"
+> +			 "stg %0, [%1]"
+> +                         :
+> +                         : "r"(tagged(ptr, tag)), "r"(ptr)
+> +                         : "memory");
+
+STG generates an untagged access, so the destination address can be also be
+tagged, i.e:
+
+		ptr = tagged(ptr, tag);
+		asm volatile("stg %0, [%0]" : : "r"(ptr) : "memory");
+
+I dropped the assembler directive because you can invoke the compiler with
+-march=armv8.5-a+memtag (the top level Makefile already checks if that
+options is supported).
+
+Up to you what you prefer.
+
+> +#endif
+> +}
+> +
+> +static inline unsigned long tfsr(void)
+
+The name here is particularly bad. The function reads TFSR_EL1, clears the
+register and returns the old value. How about get_clear_tfsr()?
+
+> +{
+> +	unsigned long r;
+> +
+> +	dsb(nsh);
+
+From the definition of DSB:
+
+'In addition, no instruction that appears in program order after the DSB
+instruction can alter any state of the system or perform any part of its
+functionality until the DSB completes other than:
+
+* Being fetched from memory and decoded.
+* Reading the general-purpose, SIMD and floating-point, SVE vector or
+predicate, Special-purpose, or System registers that are directly or
+indirectly read without causing side effects.'
+
+The read of the TFSR_EL1 register below does not have any side effects, so I
+assume it can be executed **before** the DSB completes, and thus potentially
+missing that one of the TFx fields is set. I assume that's why the kernel does
+an ISB after the DSB and before reading TFSR_EL1.
+
+> +
+> +	r = read_sysreg_s(TFSR_EL1);
+> +	write_sysreg_s(0, TFSR_EL1);
+> +
+> +	isb();
+
+ISB here is not needed, because there's no indirect read of the TFSR_EL1
+register (got that from the comment for mte_check_tfsr_el1() from the kernel
+source - it's now table D23-1 in ARM DDI0487K.a if want to double check).
+
+> +
+> +	return r;
+> +}
+> +
+> +static void mte_sync_test(void)
+> +{
+> +	unsigned int *mem = alloc_page();
+> +	unsigned int val = 0;
+> +
+> +	memset(mem, 0xff, PAGE_SIZE);
+
+alloc_page() can fail.
+
+> +	mte_init();
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 0);
+> +	mte_set_tcf(MTE_TCF_SYNC);
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+
+I think I would prefer mte_exception to explicitely be set to false here
+because it makes the tests more robust. Yes, it's a static variable and
+it's initialized to 0 (false). But the main() function could be changed to
+run all the tests in one go (see timer.c::main()), and then mte_exception
+might not necessarily be false here.
+
+Or maybe I'm just overthinking things.
+
+> +
+> +	mem_read(mem, 1, &val);
+> +
+> +	report((val == 0) && mte_exception, "read");
+> +
+> +	mte_exception = false;
+> +
+> +	mem_write(mem, 2, 0xbbbbbbbb);
+> +
+> +	report((*mem == 0xffffffff) && mte_exception, "write");
+> +}
+> +
+> +static void mte_asymm_test(void)
+> +{
+> +	unsigned int *mem = alloc_page();
+> +	unsigned int val = 0;
+> +
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_init();
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 0);
+> +	mte_set_tcf(MTE_TCF_ASYMM);
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+> +
+> +	mem_read(mem, 3, &val);
+> +	report((val == 0) && mte_exception, "read");
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
+
+I would have left the exception handler, and checked that mte_exception is
+false. Just to make sure that the access doesn't set the TF field and also
+generate an exception.
+
+Same for the fully asynchronous test below.
+
+> +
+> +	mem_write(mem, 4, 0xaaaaaaaa);
+> +	report((*mem == 0xaaaaaaaa) && (tfsr() != 0), "write");
+
+Would it be more useful to explicitely check that TFSR_EL1.TF0 == 1? As it
+stand, tfsr() != 0 can be true if TFSR_EL1.TF1 == 1, but TFSR_EL1.TF0 == 0,
+which I would say it's not correct.
+
+> +}
+> +
+> +static void mte_async_test(void)
+> +{
+> +	unsigned int *mem = alloc_page();
+> +	unsigned int val = 0;
+> +
+
+Two empty lines instead of one.
+
+> +
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_init();
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 0);
+> +	mte_set_tcf(MTE_TCF_ASYNC);
+> +
+> +	mem_read(mem, 5, &val);
+> +	report((val == 0xffffffff) && (tfsr() != 0), "read");
+> +
+> +	mem_write(mem, 6, 0xcccccccc);
+> +	report((*mem == 0xcccccccc) && (tfsr() != 0), "write");
+> +}
+> +
+> +
+
+Two emtpy lines.
+
+> +static unsigned int mte_version(void)
+
+Why unsigned int? Sorry, but this seems arbitrary - r is 64 bits, the field
+is 4 bits, and the function returns 32 bits.
+
+> +{
+> +#ifdef CC_HAS_MTE
+> +	uint64_t r;
+> +
+> +	asm volatile("mrs %x0, id_aa64pfr1_el1" : "=r"(r));
+> +
+> +	return (r >> 8) & 0b1111;
+> +#else
+> +	report_info("Compiler lack MTE support");
+> +	return 0;
+> +#endif
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +
+> +	unsigned int version = mte_version();
+> +
+> +        if (version < 2) {
+> +                report_skip("No MTE support, skip...\n");
+> +                return -1;
+> +        }
+> +
+> +        if (argc < 2)
+> +                report_abort("no test specified");
+
+Spaces mixed with tabs.
+
+> +
+> +	report_prefix_pushf("mte");
+
+report_prefix_push("mte")?
+
+> +
+> +	if (strcmp(argv[1], "sync") == 0) {
+> +                report_prefix_push(argv[1]);
+> +                mte_sync_test();
+> +                report_prefix_pop();
+> +        } else if (strcmp(argv[1], "async") == 0) {
+> +                report_prefix_push(argv[1]);
+> +		if (version < 3) {
+> +			report_skip("No MTE async, skip...\n");
+> +			return -1;
+> +		}
+> +                mte_async_test();
+> +                report_prefix_pop();
+> +
+> +        } else if (strcmp(argv[1], "asymm") == 0) {
+> +                report_prefix_push(argv[1]);
+> +		if (version < 3) {
+> +			report_skip("No MTE asymm, skip...\n");
+> +			return -1;
+> +		}
+> +                mte_asymm_test();
+> +                report_prefix_pop();
+> +
+> +        } else {
+> +                report_abort("Unknown sub-test '%s'", argv[1]);
+> +	}
+
+Spaces mixed with tabs again.
+
+> +
+> +        return report_summary();
+> +}
+> diff --git a/arm/run b/arm/run
+> index efdd44ce..b129e4e0 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -29,7 +29,8 @@ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+>  	exit 2
+>  fi
+>  
+> -M='-machine virt'
+> +MACHINE="virt"
+> +M="-machine $MACHINE$MACHINE_PROPS"
+
+I did this
+
+$ grep -r MACHINE_PROPS
+
+and there were no other matches beside of the line above.
+
+>  
+>  if [ "$ACCEL" = "kvm" ]; then
+>  	if $qemu $M,\? | grep -q gic-version; then
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 2bdad67d..9b428c02 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -271,3 +271,22 @@ smp = 2
+>  groups = nodefault
+>  accel = kvm
+>  arch = arm64
+> +
+> +# MTE tests
+> +[mte-sync]
+> +file = mte.flat
+> +groups = nodefault
+> +extra_params = -append 'sync'
+> +arch = arm64
+> +
+> +[mte-async]
+> +file = mte.flat
+> +groups = nodefault
+> +extra_params = -append 'async'
+> +arch = arm64
+> +
+> +[mte-asymm]
+> +file = mte.flat
+> +groups = nodefault
+> +extra_params = -append 'asymm'
+> +arch = arm64
+> diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
+> index 5c27edb2..9aedd09a 100644
+> --- a/lib/arm64/asm/mmu.h
+> +++ b/lib/arm64/asm/mmu.h
+> @@ -10,6 +10,7 @@
+>  #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
+>  #define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
+>  #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
+> +#define PTE_TAGGED		PTE_ATTRINDX(MT_NORMAL_TAGGED)
+>  
+>  static inline void flush_tlb_all(void)
+>  {
+> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
+> index 8c41fe12..b66b62da 100644
+> --- a/lib/arm64/asm/pgtable-hwdef.h
+> +++ b/lib/arm64/asm/pgtable-hwdef.h
+> @@ -145,6 +145,7 @@
+>  #define TCR_TG1_64K		(UL(3) << 30)
+>  #define TCR_ASID16		(UL(1) << 36)
+>  #define TCR_TBI0		(UL(1) << 37)
+> +#define TCR_TBI1		(UL(1) << 38)
+
+Matches the Arm ARM.
+
+>  
+>  /*
+>   * Memory types available.
+> @@ -156,5 +157,6 @@
+>  #define MT_NORMAL		4
+>  #define MT_NORMAL_WT		5
+>  #define MT_DEVICE_nGRE		6
+> +#define MT_NORMAL_TAGGED	7
+>  
+>  #endif /* _ASMARM64_PGTABLE_HWDEF_H_ */
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index f214a4f0..60f51dad 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -28,6 +28,7 @@
+>  	.endm
+>  #else
+>  #include <libcflat.h>
+> +#include <bitops.h>
+>  
+>  #define read_sysreg(r) ({					\
+>  	u64 __val;						\
+> @@ -81,7 +82,12 @@ asm(
+>  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+>  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+>  
+> +#define TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+
+Matches the Arm ARM.
+
+> +
+> +
+>  /* System Control Register (SCTLR_EL1) bits */
+> +#define SCTLR_EL1_ATA		_BITULL(43)
+> +#define SCTLR_EL1_ATA0		_BITULL(42)
+
+Same here.
+
+Thanks,
+Alex
+
+>  #define SCTLR_EL1_LSMAOE	_BITULL(29)
+>  #define SCTLR_EL1_NTLSMD	_BITULL(28)
+>  #define SCTLR_EL1_EE		_BITULL(25)
+> @@ -99,6 +105,12 @@ asm(
+>  #define SCTLR_EL1_A		_BITULL(1)
+>  #define SCTLR_EL1_M		_BITULL(0)
+>  
+> +#define SCTLR_EL1_TCF_SHIFT	40
+> +#define SCTLR_EL1_TCF_MASK	GENMASK_ULL(41, 40)
+> +
+> +#define SCTLR_EL1_TCF0_SHIFT	38
+> +#define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+> +
+>  #define INIT_SCTLR_EL1_MMU_OFF	\
+>  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+>  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+> -- 
+> 2.25.1
+> 
