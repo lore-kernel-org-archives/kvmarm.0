@@ -1,122 +1,172 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D131DF971
-	for <kvmarm@lists.linux.dev>; Thu,  5 Dec 2024 12:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C58D1C3318;
+	Thu,  5 Dec 2024 13:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733400438; cv=none; b=lGzMiNOS6G9uEvFR2p6ehwwNG+lQ9GW4Tfdgxs7qBDJQhrNZN6pnQAj/IwXRulQuM1KqrLDdbTWhOT1gR4Dulf4MsLyvEnPWTAa4OZp2lJMTA08hFa5ihC4Fdg3OIAT3Sx6X3RtAj6sdOzcNjTIEfpvtLH1tIn/t+j8XJcAhwkI=
+	t=1733405480; cv=none; b=rRu8lPrLAnrldDbKjDd8s5BBM7U6ptG3VPjkyO4wrSYsVLI5nAFJPtVmVHkT+FpO7023ZO7AW9vk1fQYSXCTDNXe9Qr+VdyfJx7jL2TGubb2NfWs7PCBts1NbvjEa8sCGgqEISAvPuM67F97S8lTkfNWGbJfFspTNmnT95uraxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733400438; c=relaxed/simple;
-	bh=yHPA4gghsiZ/IB/ITJyjXf4axTcB1gUH1IIvh6nY/9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cMBLwQq2LgJPYYBvMtVpLPECkGtV3hIU9dVCWJo2bVe6E3ql4CkNDsS9TSXgSukzgIa2qZJoQ9vtcL1HZNl0z1obwsawPRhCUVrELrevn6IQRZPDtcUgKFGSBqrKv+hJjZnF60oo/cLv1wB9gmOLxdiiLkVJ6hVEAzeqiUQpl9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AFE901063;
-	Thu,  5 Dec 2024 04:07:42 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 463633F5A1;
-	Thu,  5 Dec 2024 04:07:13 -0800 (PST)
-Date: Thu, 5 Dec 2024 12:07:07 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=arc-20240116; t=1733405480; c=relaxed/simple;
+	bh=/sHcCMY3XMr6dLQvSV/4gjcitj8SoTgTdLcl5qToPtk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ccsiz0pUR0wiIqL1FC+/yYMSC06eujJbrNHk1yJZd5GncEAgaxn5XtgH6HvIJ6TUuZE0cu8/1rirgcR9MABnMU/sWRrXFp71C0yA9Pd9GQP/m/NMPBQuWbQ+axBUBmRJCg1I/6+jy5Pe7l60xI5mAHG2ITlRjNGmo7CXEMCHhtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRJ8dFzz; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRJ8dFzz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C16C3C4CEDF;
+	Thu,  5 Dec 2024 13:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733405479;
+	bh=/sHcCMY3XMr6dLQvSV/4gjcitj8SoTgTdLcl5qToPtk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pRJ8dFzzpRO31xufNa4qCQ45PJFTsPpJ7gPU+o95Wycw1WnpsDXfGTTzJKfO1EPCm
+	 HHcEj8gr3dSlgZS289ywqeaHWWyl9wN5XsfP1H6Y01NUQ0K+Fpe4gT6R+VMKFpx1E/
+	 N6z5XwNhnjGFPHWPXDS7ab8Cwdt9g2m6WeJwQgWlCRCRz6B19JUZODjYAH1B0y3JSd
+	 HLYAnSq25eyzUKRNnttUim1/hUsAhuLV9nHtCBLndUwi62d8vcz76LoGdmTM1AHsnx
+	 om1U3lOkfGesIZxaQA6el1cgQefqCU7wcaprLIvG5XxqRKdWw5r+FtoDgeJMnTkYuH
+	 9Q/dI3N7NglPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tJBwr-000pIY-GJ;
+	Thu, 05 Dec 2024 13:31:17 +0000
+Date: Thu, 05 Dec 2024 13:31:16 +0000
+Message-ID: <86h67itfx7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Bjorn Andersson <andersson@kernel.org>,
 	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 06/11] KVM: arm64: nv: Acceletate EL0 counter accesses
- from hypervisor context
-Message-ID: <20241205120707.GA102570@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 06/11] KVM: arm64: nv: Acceletate EL0 counter accesses from hypervisor context
+In-Reply-To: <20241205120707.GA102570@e124191.cambridge.arm.com>
 References: <20241202172134.384923-1-maz@kernel.org>
- <20241202172134.384923-7-maz@kernel.org>
+	<20241202172134.384923-7-maz@kernel.org>
+	<20241205120707.GA102570@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202172134.384923-7-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Dec 02, 2024 at 05:21:29PM +0000, Marc Zyngier wrote:
-> Similarly to handling the physical timer accesses early when FEAT_ECV
-> causes a trap, we try to handle the physical counter without returning
-> to the general sysreg handling.
+On Thu, 05 Dec 2024 12:07:07 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> More surprisingly, we introduce something similar for the virtual
-> counter. Although this isn't necessary yet, it will prove useful on
-> systems that have a broken CNTVOFF_EL2 implementation. Yes, they exist.
+> On Mon, Dec 02, 2024 at 05:21:29PM +0000, Marc Zyngier wrote:
+> > Similarly to handling the physical timer accesses early when FEAT_ECV
+> > causes a trap, we try to handle the physical counter without returning
+> > to the general sysreg handling.
+> > 
+> > More surprisingly, we introduce something similar for the virtual
+> > counter. Although this isn't necessary yet, it will prove useful on
+> > systems that have a broken CNTVOFF_EL2 implementation. Yes, they exist.
+> > 
 > 
+> > Special care is taken to offset reads of the counter with the host's
+> > CNTPOFF_EL2, as we perform this with TGE clear.
+> 
+> Can you explain this part a bit more? I'm assuming it's somehow related to the
+> arch_timer_read_cntpct_el0() call.
+> 
+> However I think we're at EL2 inside kvm_hyp_handle_timer(), so reading
+> CNTPCT_EL0 won't involve CNTPOFF_EL2.
+> 
+> What am I missing/misunderstanding?
 
-> Special care is taken to offset reads of the counter with the host's
-> CNTPOFF_EL2, as we perform this with TGE clear.
+I think the wording above is particularly misleading, and leads to
+some bad confusion.
 
-Can you explain this part a bit more? I'm assuming it's somehow related to the
-arch_timer_read_cntpct_el0() call.
+Let's go back to basics: we're at host EL2, and handling a trap from
+guest EL2.  Although you are right that CNTPOFF_EL2 doesn't affect a
+direct read of CNTPCT_EL0 from EL2, we are emulating it as if it was
+executed from EL1 (guest EL2 being EL1).
 
-However I think we're at EL2 inside kvm_hyp_handle_timer(), so reading
-CNTPCT_EL0 won't involve CNTPOFF_EL2.
+So any offsetting that would be applied if we were not trapping
+CNTPCT_EL0 must still be applied. In the case of a read from
+hypervisor context, this is the VM-wide offset.
 
-What am I missing/misunderstanding?
+But this makes me realise that...
 
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  5 +++++
->  arch/arm64/kvm/hyp/vhe/switch.c         | 13 +++++++++++++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 34f53707892df..30e572de28749 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -501,6 +501,11 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
->  	return true;
->  }
->  
-> +static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
-> +{
-> +	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
-> +}
-> +
->  static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
->  {
->  	struct arch_timer_context *ctxt;
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index b014b0b10bf5d..49815a8a4c9bc 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -296,6 +296,13 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
->  			val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
->  		}
->  		break;
-> +	case SYS_CNTPCT_EL0:
-> +	case SYS_CNTPCTSS_EL0:
-> +		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
-> +		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
-> +					      vcpu_el2_tge_is_set(vcpu)) ?
-> +					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
-> +		break;
->  	case SYS_CNTV_CTL_EL02:
->  		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
->  		break;
-> @@ -314,6 +321,12 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
->  		else
->  			val = __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
->  		break;
-> +	case SYS_CNTVCT_EL0:
-> +	case SYS_CNTVCTSS_EL0:
-> +		/* If !ELIsInHost(EL2), the guest's CNTVOFF_EL2 applies */
-> +		val = compute_counter_value(!vcpu_el2_e2h_is_set(vcpu) ?
-> +					    vcpu_vtimer(vcpu) : vcpu_hvtimer(vcpu));
-> +		break;
->  	default:
->  		return false;
->  	}
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  5 +++++
+> >  arch/arm64/kvm/hyp/vhe/switch.c         | 13 +++++++++++++
+> >  2 files changed, 18 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 34f53707892df..30e572de28749 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -501,6 +501,11 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
+> >  	return true;
+> >  }
+> >  
+> > +static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
+> > +{
+> > +	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
+> > +}
+> > +
+> >  static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct arch_timer_context *ctxt;
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index b014b0b10bf5d..49815a8a4c9bc 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -296,6 +296,13 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  			val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
+> >  		}
+> >  		break;
+> > +	case SYS_CNTPCT_EL0:
+> > +	case SYS_CNTPCTSS_EL0:
+> > +		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
+> > +		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
+> > +					      vcpu_el2_tge_is_set(vcpu)) ?
+> > +					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
+
+... this should be simplified, because there is no case where we can
+be in HYP context *and* not be using the hptimer() context (everything
+else would be handled by kvm_handle_cntxct()).
+
+I'm minded to change this to:
+
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index a8b1a23712329..5a79ed0aac613 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -305,10 +305,7 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		break;
+ 	case SYS_CNTPCT_EL0:
+ 	case SYS_CNTPCTSS_EL0:
+-		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
+-		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
+-					      vcpu_el2_tge_is_set(vcpu)) ?
+-					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
++		val = compute_counter_value(vcpu_hptimer(vcpu));
+ 		break;
+ 	case SYS_CNTV_CTL_EL02:
+ 		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
 
 Thanks,
-Joey
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
