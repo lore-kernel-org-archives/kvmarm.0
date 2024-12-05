@@ -1,172 +1,248 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C58D1C3318;
-	Thu,  5 Dec 2024 13:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF10121A42A;
+	Thu,  5 Dec 2024 14:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733405480; cv=none; b=rRu8lPrLAnrldDbKjDd8s5BBM7U6ptG3VPjkyO4wrSYsVLI5nAFJPtVmVHkT+FpO7023ZO7AW9vk1fQYSXCTDNXe9Qr+VdyfJx7jL2TGubb2NfWs7PCBts1NbvjEa8sCGgqEISAvPuM67F97S8lTkfNWGbJfFspTNmnT95uraxA=
+	t=1733408627; cv=none; b=u20cczAZAf1FB1BjYKJcvELC+4TdPqM265F00k0xEvX+BoEpJDfK/ZLETZW2lHwbnx1drAsAxK5RhjtqPcmRkc37JfK7Cj0avkowmPwYGe6DNWPsOoXgG7g442k5y0XaGi+gaComJtU4LPga9Pwg1Jb5pErTfxjFGikc8guoiR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733405480; c=relaxed/simple;
-	bh=/sHcCMY3XMr6dLQvSV/4gjcitj8SoTgTdLcl5qToPtk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ccsiz0pUR0wiIqL1FC+/yYMSC06eujJbrNHk1yJZd5GncEAgaxn5XtgH6HvIJ6TUuZE0cu8/1rirgcR9MABnMU/sWRrXFp71C0yA9Pd9GQP/m/NMPBQuWbQ+axBUBmRJCg1I/6+jy5Pe7l60xI5mAHG2ITlRjNGmo7CXEMCHhtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRJ8dFzz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733408627; c=relaxed/simple;
+	bh=wwkkJQKuVKIstuMSBCRhrsXwlus/ArcTkrxaTl4VJo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SDOvbfxAO/ekiLf0LSnENXP6eaHPA/ro7cEn7CgaDbUJgngy9IccysFmzaVTKy6UZuifTKhaav6VmjgWT92gG32aZPekcocgbtonSbw3r6FDQUY1V/4nN6za4/wPS8V0VwekenEz8cH53GfRPSMCqNXiItBZJfXqU0VvTBCMLPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I6ZV16EP; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRJ8dFzz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C16C3C4CEDF;
-	Thu,  5 Dec 2024 13:31:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733405479;
-	bh=/sHcCMY3XMr6dLQvSV/4gjcitj8SoTgTdLcl5qToPtk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pRJ8dFzzpRO31xufNa4qCQ45PJFTsPpJ7gPU+o95Wycw1WnpsDXfGTTzJKfO1EPCm
-	 HHcEj8gr3dSlgZS289ywqeaHWWyl9wN5XsfP1H6Y01NUQ0K+Fpe4gT6R+VMKFpx1E/
-	 N6z5XwNhnjGFPHWPXDS7ab8Cwdt9g2m6WeJwQgWlCRCRz6B19JUZODjYAH1B0y3JSd
-	 HLYAnSq25eyzUKRNnttUim1/hUsAhuLV9nHtCBLndUwi62d8vcz76LoGdmTM1AHsnx
-	 om1U3lOkfGesIZxaQA6el1cgQefqCU7wcaprLIvG5XxqRKdWw5r+FtoDgeJMnTkYuH
-	 9Q/dI3N7NglPg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tJBwr-000pIY-GJ;
-	Thu, 05 Dec 2024 13:31:17 +0000
-Date: Thu, 05 Dec 2024 13:31:16 +0000
-Message-ID: <86h67itfx7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I6ZV16EP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733408625; x=1764944625;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wwkkJQKuVKIstuMSBCRhrsXwlus/ArcTkrxaTl4VJo4=;
+  b=I6ZV16EPY6V9ynUIPjsJzAEu0EhAjL9MZrakjhxUgiDi4f4qNxG0b/2I
+   S2OCLmQQMTE/o8LiRfnsIJvievpKFEPzzgAYfjyja5FOj0T+s7o/mNZSv
+   DDn14qU2ibVrOpXtyaCzP1k/lHmCtxZxPNCwEAAVeHmxFyTNwcBP6RsgA
+   G61DjZT6E4djcUSB8QjPL27zbQZ7jp+Ak15zuyx4UU2B2kbO6lbh2loCX
+   JiI9Gc9s9LLiO1JsGAY6rlBMDkGLT4uUDbEj69X/wz+t6iVMvt6TeLI7b
+   IQqOcFg8PV8JD0Y5rwaBulhxWRcfZjRVoSwboBVdjWy3wlSoaYfIdpg5K
+   g==;
+X-CSE-ConnectionGUID: t/0lKtL3QM6Crpr0J3h2mA==
+X-CSE-MsgGUID: YIfgOVIqQfqnPradyYsBDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="33637344"
+X-IronPort-AV: E=Sophos;i="6.12,210,1728975600"; 
+   d="scan'208";a="33637344"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 06:23:44 -0800
+X-CSE-ConnectionGUID: 8CmpKIUuR1ikCloIPgyAYg==
+X-CSE-MsgGUID: LKEgyXOcSkKfshkGA+W9kw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,210,1728975600"; 
+   d="scan'208";a="125015938"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 05 Dec 2024 06:23:40 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tJClV-00004t-23;
+	Thu, 05 Dec 2024 14:23:37 +0000
+Date: Thu, 5 Dec 2024 22:22:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: James Houghton <jthoughton@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 06/11] KVM: arm64: nv: Acceletate EL0 counter accesses from hypervisor context
-In-Reply-To: <20241205120707.GA102570@e124191.cambridge.arm.com>
-References: <20241202172134.384923-1-maz@kernel.org>
-	<20241202172134.384923-7-maz@kernel.org>
-	<20241205120707.GA102570@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Yan Zhao <yan.y.zhao@intel.com>,
+	James Houghton <jthoughton@google.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+	David Matlack <dmatlack@google.com>, Wang@google.com,
+	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 01/13] KVM: Add KVM_MEM_USERFAULT memslot flag and
+ bitmap
+Message-ID: <202412052133.pTg3UAQm-lkp@intel.com>
+References: <20241204191349.1730936-2-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241204191349.1730936-2-jthoughton@google.com>
 
-On Thu, 05 Dec 2024 12:07:07 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Mon, Dec 02, 2024 at 05:21:29PM +0000, Marc Zyngier wrote:
-> > Similarly to handling the physical timer accesses early when FEAT_ECV
-> > causes a trap, we try to handle the physical counter without returning
-> > to the general sysreg handling.
-> > 
-> > More surprisingly, we introduce something similar for the virtual
-> > counter. Although this isn't necessary yet, it will prove useful on
-> > systems that have a broken CNTVOFF_EL2 implementation. Yes, they exist.
-> > 
-> 
-> > Special care is taken to offset reads of the counter with the host's
-> > CNTPOFF_EL2, as we perform this with TGE clear.
-> 
-> Can you explain this part a bit more? I'm assuming it's somehow related to the
-> arch_timer_read_cntpct_el0() call.
-> 
-> However I think we're at EL2 inside kvm_hyp_handle_timer(), so reading
-> CNTPCT_EL0 won't involve CNTPOFF_EL2.
-> 
-> What am I missing/misunderstanding?
+Hi James,
 
-I think the wording above is particularly misleading, and leads to
-some bad confusion.
+kernel test robot noticed the following build warnings:
 
-Let's go back to basics: we're at host EL2, and handling a trap from
-guest EL2.  Although you are right that CNTPOFF_EL2 doesn't affect a
-direct read of CNTPCT_EL0 from EL2, we are emulating it as if it was
-executed from EL1 (guest EL2 being EL1).
+[auto build test WARNING on 4d911c7abee56771b0219a9fbf0120d06bdc9c14]
 
-So any offsetting that would be applied if we were not trapping
-CNTPCT_EL0 must still be applied. In the case of a read from
-hypervisor context, this is the VM-wide offset.
+url:    https://github.com/intel-lab-lkp/linux/commits/James-Houghton/KVM-Add-KVM_MEM_USERFAULT-memslot-flag-and-bitmap/20241205-032516
+base:   4d911c7abee56771b0219a9fbf0120d06bdc9c14
+patch link:    https://lore.kernel.org/r/20241204191349.1730936-2-jthoughton%40google.com
+patch subject: [PATCH v1 01/13] KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
+config: i386-buildonly-randconfig-006 (https://download.01.org/0day-ci/archive/20241205/202412052133.pTg3UAQm-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241205/202412052133.pTg3UAQm-lkp@intel.com/reproduce)
 
-But this makes me realise that...
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412052133.pTg3UAQm-lkp@intel.com/
 
-> 
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  5 +++++
-> >  arch/arm64/kvm/hyp/vhe/switch.c         | 13 +++++++++++++
-> >  2 files changed, 18 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index 34f53707892df..30e572de28749 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -501,6 +501,11 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
-> >  	return true;
-> >  }
-> >  
-> > +static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
-> > +{
-> > +	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
-> > +}
-> > +
-> >  static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct arch_timer_context *ctxt;
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index b014b0b10bf5d..49815a8a4c9bc 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -296,6 +296,13 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  			val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
-> >  		}
-> >  		break;
-> > +	case SYS_CNTPCT_EL0:
-> > +	case SYS_CNTPCTSS_EL0:
-> > +		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
-> > +		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
-> > +					      vcpu_el2_tge_is_set(vcpu)) ?
-> > +					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
+All warnings (new ones prefixed by >>):
 
-... this should be simplified, because there is no case where we can
-be in HYP context *and* not be using the hptimer() context (everything
-else would be handled by kvm_handle_cntxct()).
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function '__kvm_set_memory_region':
+>> arch/x86/kvm/../../../virt/kvm/kvm_main.c:2049:41: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    2049 |                 new->userfault_bitmap = (unsigned long *)mem->userfault_bitmap;
+         |                                         ^
 
-I'm minded to change this to:
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index a8b1a23712329..5a79ed0aac613 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -305,10 +305,7 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
- 		break;
- 	case SYS_CNTPCT_EL0:
- 	case SYS_CNTPCTSS_EL0:
--		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
--		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
--					      vcpu_el2_tge_is_set(vcpu)) ?
--					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
-+		val = compute_counter_value(vcpu_hptimer(vcpu));
- 		break;
- 	case SYS_CNTV_CTL_EL02:
- 		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
+vim +2049 arch/x86/kvm/../../../virt/kvm/kvm_main.c
 
-Thanks,
-
-	M.
+  1931	
+  1932	/*
+  1933	 * Allocate some memory and give it an address in the guest physical address
+  1934	 * space.
+  1935	 *
+  1936	 * Discontiguous memory is allowed, mostly for framebuffers.
+  1937	 *
+  1938	 * Must be called holding kvm->slots_lock for write.
+  1939	 */
+  1940	int __kvm_set_memory_region(struct kvm *kvm,
+  1941				    const struct kvm_userspace_memory_region2 *mem)
+  1942	{
+  1943		struct kvm_memory_slot *old, *new;
+  1944		struct kvm_memslots *slots;
+  1945		enum kvm_mr_change change;
+  1946		unsigned long npages;
+  1947		gfn_t base_gfn;
+  1948		int as_id, id;
+  1949		int r;
+  1950	
+  1951		r = check_memory_region_flags(kvm, mem);
+  1952		if (r)
+  1953			return r;
+  1954	
+  1955		as_id = mem->slot >> 16;
+  1956		id = (u16)mem->slot;
+  1957	
+  1958		/* General sanity checks */
+  1959		if ((mem->memory_size & (PAGE_SIZE - 1)) ||
+  1960		    (mem->memory_size != (unsigned long)mem->memory_size))
+  1961			return -EINVAL;
+  1962		if (mem->guest_phys_addr & (PAGE_SIZE - 1))
+  1963			return -EINVAL;
+  1964		/* We can read the guest memory with __xxx_user() later on. */
+  1965		if ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
+  1966		    (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
+  1967		     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+  1968				mem->memory_size))
+  1969			return -EINVAL;
+  1970		if (mem->flags & KVM_MEM_GUEST_MEMFD &&
+  1971		    (mem->guest_memfd_offset & (PAGE_SIZE - 1) ||
+  1972		     mem->guest_memfd_offset + mem->memory_size < mem->guest_memfd_offset))
+  1973			return -EINVAL;
+  1974		if (as_id >= kvm_arch_nr_memslot_as_ids(kvm) || id >= KVM_MEM_SLOTS_NUM)
+  1975			return -EINVAL;
+  1976		if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+  1977			return -EINVAL;
+  1978		if ((mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
+  1979			return -EINVAL;
+  1980	
+  1981		slots = __kvm_memslots(kvm, as_id);
+  1982	
+  1983		/*
+  1984		 * Note, the old memslot (and the pointer itself!) may be invalidated
+  1985		 * and/or destroyed by kvm_set_memslot().
+  1986		 */
+  1987		old = id_to_memslot(slots, id);
+  1988	
+  1989		if (!mem->memory_size) {
+  1990			if (!old || !old->npages)
+  1991				return -EINVAL;
+  1992	
+  1993			if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
+  1994				return -EIO;
+  1995	
+  1996			return kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE);
+  1997		}
+  1998	
+  1999		base_gfn = (mem->guest_phys_addr >> PAGE_SHIFT);
+  2000		npages = (mem->memory_size >> PAGE_SHIFT);
+  2001	
+  2002		if (!old || !old->npages) {
+  2003			change = KVM_MR_CREATE;
+  2004	
+  2005			/*
+  2006			 * To simplify KVM internals, the total number of pages across
+  2007			 * all memslots must fit in an unsigned long.
+  2008			 */
+  2009			if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
+  2010				return -EINVAL;
+  2011		} else { /* Modify an existing slot. */
+  2012			/* Private memslots are immutable, they can only be deleted. */
+  2013			if (mem->flags & KVM_MEM_GUEST_MEMFD)
+  2014				return -EINVAL;
+  2015			if ((mem->userspace_addr != old->userspace_addr) ||
+  2016			    (npages != old->npages) ||
+  2017			    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
+  2018				return -EINVAL;
+  2019	
+  2020			if (base_gfn != old->base_gfn)
+  2021				change = KVM_MR_MOVE;
+  2022			else if (mem->flags != old->flags)
+  2023				change = KVM_MR_FLAGS_ONLY;
+  2024			else /* Nothing to change. */
+  2025				return 0;
+  2026		}
+  2027	
+  2028		if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
+  2029		    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
+  2030			return -EEXIST;
+  2031	
+  2032		/* Allocate a slot that will persist in the memslot. */
+  2033		new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
+  2034		if (!new)
+  2035			return -ENOMEM;
+  2036	
+  2037		new->as_id = as_id;
+  2038		new->id = id;
+  2039		new->base_gfn = base_gfn;
+  2040		new->npages = npages;
+  2041		new->flags = mem->flags;
+  2042		new->userspace_addr = mem->userspace_addr;
+  2043		if (mem->flags & KVM_MEM_GUEST_MEMFD) {
+  2044			r = kvm_gmem_bind(kvm, new, mem->guest_memfd, mem->guest_memfd_offset);
+  2045			if (r)
+  2046				goto out;
+  2047		}
+  2048		if (mem->flags & KVM_MEM_USERFAULT)
+> 2049			new->userfault_bitmap = (unsigned long *)mem->userfault_bitmap;
+  2050	
+  2051		r = kvm_set_memslot(kvm, old, new, change);
+  2052		if (r)
+  2053			goto out_unbind;
+  2054	
+  2055		return 0;
+  2056	
+  2057	out_unbind:
+  2058		if (mem->flags & KVM_MEM_GUEST_MEMFD)
+  2059			kvm_gmem_unbind(new);
+  2060	out:
+  2061		kfree(new);
+  2062		return r;
+  2063	}
+  2064	EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
+  2065	
 
 -- 
-Without deviation from the norm, progress is not possible.
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
