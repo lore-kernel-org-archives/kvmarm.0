@@ -1,31 +1,31 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873E936C
-	for <kvmarm@lists.linux.dev>; Thu,  5 Dec 2024 00:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11587C2ED
+	for <kvmarm@lists.linux.dev>; Thu,  5 Dec 2024 00:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733358388; cv=none; b=VunyEVswOMr1keHujqLEEktx0LBaw/68WcK051Uea50wSpfW0VSmvfj+uhC6pbva8mMMio1n+FRXJbbdEpmJiUvX7bddkR+GbBbVWzNGpNimZOlsXW/LbPgxtNL5+WtxoFIvPY2/O35mTAuO8egPihsYtLLwCyNZT9jJiZ9Gw9c=
+	t=1733359069; cv=none; b=Wpc9fDULCAf7R2QgG8peNYDwjnOpocSLLh9W5Nw6ggKHVK3W8a26qSPoS2VfqQW6/l7paURPXVIb3YBJnyJRZvNmqgCFkRvjqQU3u4/jrwLEKSs4tGi4RynH/FgQKqOM+a7U3xvsywd+kZl3HP6G8LQ6Cl+78cWN0ZT0ZEoVJlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733358388; c=relaxed/simple;
-	bh=XCkrCQ2f/9vOpVWkxECETGiqv8L6UxPIJxiXovhru2E=;
+	s=arc-20240116; t=1733359069; c=relaxed/simple;
+	bh=KM2YJrJrmR4GN9beohUVoA1GHdeIeU0RH12p3chA3PM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ct1CuUnbmASTsm1Tjsq0tg5KK6y7qhFxetYnnLLB3PmbbUugfiqYPa8zEGQx0GDwZO0zJz7UzmN8qq2mxV6Zh4/uDaFZb9tonDEjKR5h04XB1Ik8WwfgWXh5vBqXcOCH9zgpFBLwywjLhrmuOifH3NX77dPe1dXvJlNDVnWhVuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NwDU9FQI; arc=none smtp.client-ip=91.218.175.184
+	 Content-Type:Content-Disposition:In-Reply-To; b=oU3L95MUM1K5rxVEr3T/HRMEiPuhKvDUNPPvROkMGMVychcRkVr/mMOAWNDGNj1aBxrauqMme7iqQBK8HoLghNQHCJxxcOqtI5uX1+KN44pZmYJCywuDRao4hU+prKl62I/m8qyWNu1HC062oJnh9UUdtC3JqiAkm91fg1LQPck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ncAmXn3N; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NwDU9FQI"
-Date: Wed, 4 Dec 2024 16:26:11 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ncAmXn3N"
+Date: Wed, 4 Dec 2024 16:37:34 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733358381;
+	t=1733359063;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=F5r6szPNnorsqIWpPC+AQkvg5kKkB5X+Ow8aOshGuD0=;
-	b=NwDU9FQIwoub1Gg6x2WTmSKJlM3Vv1CCwTH0gdQv3lxYpy0GYCXYNJW4L5WJKA2Y6sY9v0
-	7hnfnX7N++NtUa91/EOBAjXqVjsyInmUbGxW1DdODnGteUn9kaVQnBkX1LESOwCGHkWvtQ
-	3OSVqrt03bSDzkTEL29MjMXmQur6YSY=
+	bh=y+fesaggYnmYPTzNBJhmMN//258qRMFZQIkG5W+7nf4=;
+	b=ncAmXn3NSw8a8PcZ3ZdbA+Sk7ZibUOGTbgwXXbJrGv82qW64BwjUsCdSRqpCTs6dBEngub
+	tWEqrhO55s+7IIotR0RT41ftfStdWGaOdVmbvxXcTLAAjijsQ2KTaDB4kp43I4M78abNUt
+	ZFpijB0n+1EyiDcMrpAfOqKyqNcXjaU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -35,11 +35,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Bjorn Andersson <andersson@kernel.org>,
 	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 02/11] KVM: arm64: nv: Sync nested timer state with
- FEAT_NV2
-Message-ID: <Z1DzI75XOcJVHARq@linux.dev>
+Subject: Re: [PATCH 06/11] KVM: arm64: nv: Acceletate EL0 counter accesses
+ from hypervisor context
+Message-ID: <Z1D1zus18KCpCqjD@linux.dev>
 References: <20241202172134.384923-1-maz@kernel.org>
- <20241202172134.384923-3-maz@kernel.org>
+ <20241202172134.384923-7-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,72 +48,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241202172134.384923-3-maz@kernel.org>
+In-Reply-To: <20241202172134.384923-7-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Dec 02, 2024 at 05:21:25PM +0000, Marc Zyngier wrote:
-> Emulating the timers with FEAT_NV2 is a bit odd, as the timers
-> can be reconfigured behind our back without the hypervisor even
-> noticing. In the VHE case, that's an actual regression in the
-> architecture...
+typo: accelerate
+
+On Mon, Dec 02, 2024 at 05:21:29PM +0000, Marc Zyngier wrote:
+> Similarly to handling the physical timer accesses early when FEAT_ECV
+> causes a trap, we try to handle the physical counter without returning
+> to the general sysreg handling.
 > 
-> Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> More surprisingly, we introduce something similar for the virtual
+> counter. Although this isn't necessary yet, it will prove useful on
+> systems that have a broken CNTVOFF_EL2 implementation. Yes, they exist.
+> 
+> Special care is taken to offset reads of the counter with the host's
+> CNTPOFF_EL2, as we perform this with TGE clear.
+> 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/arm.c         |  3 +++
->  include/kvm/arm_arch_timer.h |  1 +
->  3 files changed, 48 insertions(+)
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  5 +++++
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 13 +++++++++++++
+>  2 files changed, 18 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 1215df5904185..81afafd62059f 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->  		kvm_timer_blocking(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 34f53707892df..30e572de28749 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -501,6 +501,11 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
+>  	return true;
 >  }
 >  
-> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+> +static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
 > +{
-> +	/*
-> +	 * When NV2 is on, guest hypervisors have their EL0 timer register
-> +	 * accesses redirected to the VNCR page. Any guest action taken on
-> +	 * the timer is postponed until the next exit, leading to a very
-> +	 * poor quality of emulation.
-> +	 */
-> +	if (!is_hyp_ctxt(vcpu))
-> +		return;
+> +	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
+> +}
 > +
-> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
-> +		/*
-> +		 * A non-VHE guest hypervisor doesn't have any direct access
-> +		 * to its timers: the EL2 registers trap (and the HW is
-> +		 * fully emulated), while the EL0 registers access memory
-> +		 * despite the access being notionally direct. Boo.
-> +		 *
-> +		 * We update the hardware timer registers with the
-> +		 * latest value written by the guest to the VNCR page
-> +		 * and let the hardware take care of the rest.
-> +		 */
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
-> +	} else {
-> +		/*
-> +		 * For a VHE guest hypervisor, the EL2 state is directly
-> +		 * stored in the host EL0 timers, while the emulated EL0
-> +		 * state is stored in the VNCR page. The latter could have
-> +		 * been updated behind our back, and we must reset the
-> +		 * emulation of the timers.
-> +		 */
+>  static bool kvm_hyp_handle_cntpct(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_context *ctxt;
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index b014b0b10bf5d..49815a8a4c9bc 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -296,6 +296,13 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  			val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
+>  		}
+>  		break;
+> +	case SYS_CNTPCT_EL0:
+> +	case SYS_CNTPCTSS_EL0:
+> +		/* If !ELIsInHost(EL0), the guest's CNTPOFF_EL2 applies */
+> +		val = compute_counter_value(!(vcpu_el2_e2h_is_set(vcpu) &&
+> +					      vcpu_el2_tge_is_set(vcpu)) ?
+> +					    vcpu_ptimer(vcpu) : vcpu_hptimer(vcpu));
+> +		break;
+>  	case SYS_CNTV_CTL_EL02:
+>  		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
+>  		break;
+> @@ -314,6 +321,12 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  		else
+>  			val = __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
+>  		break;
+> +	case SYS_CNTVCT_EL0:
+> +	case SYS_CNTVCTSS_EL0:
+> +		/* If !ELIsInHost(EL2), the guest's CNTVOFF_EL2 applies */
 
-nitpick: s/host EL0/EL1/
+!ELIsInHost(EL0)
 
-At least in the way the architecture terms it there's no such thing as
-an EL0 timer, and "host EL0" might lead one to think of ELIsInHost(EL0)
-
--- 
-Thanks,
-Oliver
+> +		val = compute_counter_value(!vcpu_el2_e2h_is_set(vcpu) ?
+> +					    vcpu_vtimer(vcpu) : vcpu_hvtimer(vcpu));
+> +		break;
+>  	default:
+>  		return false;
+>  	}
+> -- 
+> 2.39.2
+> 
