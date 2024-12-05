@@ -1,49 +1,45 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E771B0F20
-	for <kvmarm@lists.linux.dev>; Wed,  4 Dec 2024 23:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873E936C
+	for <kvmarm@lists.linux.dev>; Thu,  5 Dec 2024 00:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733353662; cv=none; b=kKK998cMJboQvkV5KIVEG0YANr4ahNmwpr8pzLGNLV7+gv4PM69hYqQSGTF8pzkJyKnveZ7gaV0NdS/Bgb6H9hoLRRUwfrLLBLgZQFGaDPlaRMsYN5+OTPEvvLuVdASY7Tv/JcNprH3irm7QJA0qDEYqhI/iaTzFHphwS0vXuQ0=
+	t=1733358388; cv=none; b=VunyEVswOMr1keHujqLEEktx0LBaw/68WcK051Uea50wSpfW0VSmvfj+uhC6pbva8mMMio1n+FRXJbbdEpmJiUvX7bddkR+GbBbVWzNGpNimZOlsXW/LbPgxtNL5+WtxoFIvPY2/O35mTAuO8egPihsYtLLwCyNZT9jJiZ9Gw9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733353662; c=relaxed/simple;
-	bh=qNj1yw5cwuK310Hud/aNqTEbGoEkUBx/cyZRJ9/mwlk=;
+	s=arc-20240116; t=1733358388; c=relaxed/simple;
+	bh=XCkrCQ2f/9vOpVWkxECETGiqv8L6UxPIJxiXovhru2E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iAEErfgCr2gTYDHxw7XR++SCjrEC5mUEFqMHqNT0heaTpGbgmTPyocIoeAjKFf2arijfj47VplfTwRfh8hWcBVrWzYD1HQ6v7BhGVLK9grSBXw2MdcnZFP8frNLMmu2yn286Zvjm4OGednGVnMAV3hG/FikcrTnruW/tpRaGuNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xk1r79Rj; arc=none smtp.client-ip=95.215.58.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=ct1CuUnbmASTsm1Tjsq0tg5KK6y7qhFxetYnnLLB3PmbbUugfiqYPa8zEGQx0GDwZO0zJz7UzmN8qq2mxV6Zh4/uDaFZb9tonDEjKR5h04XB1Ik8WwfgWXh5vBqXcOCH9zgpFBLwywjLhrmuOifH3NX77dPe1dXvJlNDVnWhVuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NwDU9FQI; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xk1r79Rj"
-Date: Wed, 4 Dec 2024 15:07:27 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NwDU9FQI"
+Date: Wed, 4 Dec 2024 16:26:11 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733353658;
+	t=1733358381;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BmRuvCEl+afeDDoFH+S4Ae7biN9cmirFzO8povIhSlU=;
-	b=xk1r79Rje9lKH6Gxehv7Myok+SqBGaILt9N1vHxuCICfEcxyKTF+uj/5FJp++2mvkSZ0Oe
-	dmE/wZBmxgrtmkSEAoa/27/kNUUZHboEzkpcwY+yvUQvkXDeySUVhY/vfWptdCso/3Zca7
-	r2bcl0ynh2WdL4KV0CjZUT2HyksinF4=
+	bh=F5r6szPNnorsqIWpPC+AQkvg5kKkB5X+Ow8aOshGuD0=;
+	b=NwDU9FQIwoub1Gg6x2WTmSKJlM3Vv1CCwTH0gdQv3lxYpy0GYCXYNJW4L5WJKA2Y6sY9v0
+	7hnfnX7N++NtUa91/EOBAjXqVjsyInmUbGxW1DdODnGteUn9kaVQnBkX1LESOwCGHkWvtQ
+	3OSVqrt03bSDzkTEL29MjMXmQur6YSY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: James Houghton <jthoughton@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Yan Zhao <yan.y.zhao@intel.com>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Anish Moorthy <amoorthy@google.com>,
-	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-	David Matlack <dmatlack@google.com>, Wang@google.com,
-	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v1 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
-Message-ID: <Z1Dgr_TnaFQT04Pi@linux.dev>
-References: <20241204191349.1730936-1-jthoughton@google.com>
- <20241204191349.1730936-7-jthoughton@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 02/11] KVM: arm64: nv: Sync nested timer state with
+ FEAT_NV2
+Message-ID: <Z1DzI75XOcJVHARq@linux.dev>
+References: <20241202172134.384923-1-maz@kernel.org>
+ <20241202172134.384923-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,56 +48,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241204191349.1730936-7-jthoughton@google.com>
+In-Reply-To: <20241202172134.384923-3-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-Hi James,
-
-On Wed, Dec 04, 2024 at 07:13:41PM +0000, James Houghton wrote:
-> Adhering to the requirements of KVM Userfault:
+On Mon, Dec 02, 2024 at 05:21:25PM +0000, Marc Zyngier wrote:
+> Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+> can be reconfigured behind our back without the hypervisor even
+> noticing. In the VHE case, that's an actual regression in the
+> architecture...
 > 
-> 1. When it is toggled (either on or off), zap the second stage with
->    kvm_arch_flush_shadow_memslot(). This is to (1) respect
->    userfault-ness and (2) to reconstruct block mappings.
-> 2. While KVM_MEM_USERFAULT is enabled, restrict new second-stage mappings
->    to be PAGE_SIZE, just like when dirty logging is enabled.
-> 
-> Signed-off-by: James Houghton <jthoughton@google.com>
+> Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   I'm not 100% sure if kvm_arch_flush_shadow_memslot() is correct in
->   this case (like if the host does not have S2FWB).
-
-Invalidating the stage-2 entries is of course necessary for correctness
-on the !USERFAULT -> USERFAULT transition, and the MMU will do the right
-thing regardless of whether hardware implements FEAT_S2FWB.
-
-What I think you may be getting at is the *performance* implications are
-quite worrying without FEAT_S2FWB due to the storm of CMOs, and I'd
-definitely agree with that.
-
-> @@ -2062,6 +2069,20 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  				   enum kvm_mr_change change)
->  {
->  	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-> +	u32 changed_flags = (new ? new->flags : 0) ^ (old ? old->flags : 0);
-> +
+>  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c         |  3 +++
+>  include/kvm/arm_arch_timer.h |  1 +
+>  3 files changed, 48 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 1215df5904185..81afafd62059f 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  		kvm_timer_blocking(vcpu);
+>  }
+>  
+> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+> +{
 > +	/*
-> +	 * If KVM_MEM_USERFAULT changed, drop all the stage-2 mappings so that
-> +	 * we can (1) respect userfault-ness or (2) create block mappings.
+> +	 * When NV2 is on, guest hypervisors have their EL0 timer register
+> +	 * accesses redirected to the VNCR page. Any guest action taken on
+> +	 * the timer is postponed until the next exit, leading to a very
+> +	 * poor quality of emulation.
 > +	 */
-> +	if ((changed_flags & KVM_MEM_USERFAULT) && change == KVM_MR_FLAGS_ONLY)
-> +		kvm_arch_flush_shadow_memslot(kvm, old);
+> +	if (!is_hyp_ctxt(vcpu))
+> +		return;
+> +
+> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
+> +		/*
+> +		 * A non-VHE guest hypervisor doesn't have any direct access
+> +		 * to its timers: the EL2 registers trap (and the HW is
+> +		 * fully emulated), while the EL0 registers access memory
+> +		 * despite the access being notionally direct. Boo.
+> +		 *
+> +		 * We update the hardware timer registers with the
+> +		 * latest value written by the guest to the VNCR page
+> +		 * and let the hardware take care of the rest.
+> +		 */
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
+> +	} else {
+> +		/*
+> +		 * For a VHE guest hypervisor, the EL2 state is directly
+> +		 * stored in the host EL0 timers, while the emulated EL0
+> +		 * state is stored in the VNCR page. The latter could have
+> +		 * been updated behind our back, and we must reset the
+> +		 * emulation of the timers.
+> +		 */
 
-I'd strongly prefer that we make (2) a userspace problem and don't
-eagerly invalidate stage-2 mappings on the USERFAULT -> !USERFAULT
-change.
+nitpick: s/host EL0/EL1/
 
-Having implied user-visible behaviors on ioctls is never good, and for
-systems without FEAT_S2FWB you might be better off avoiding the unmap in
-the first place.
-
-So, if userspace decides there's a benefit to invalidating the stage-2
-MMU, it can just delete + recreate the memslot.
+At least in the way the architecture terms it there's no such thing as
+an EL0 timer, and "host EL0" might lead one to think of ELIsInHost(EL0)
 
 -- 
 Thanks,
