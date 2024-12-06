@@ -1,100 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E680220683
-	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 17:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A932194120
+	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 18:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733507028; cv=none; b=laBWL7LLytgZK02RZRD8kxXfPCCqclKK9Qr7otfv+znl206MX1TNJo8Q/yIFCW4Bbf7WvuN2ENZYDfO5FkCHwN6bIU1xplg64OkSeQApP+oggqLT5W/ETL+UlmhodA2LCgjQCJGYRXSCEjHq2M57YCvglZCbXpapE+bhlERbrRo=
+	t=1733509364; cv=none; b=gRC7AO3lli02Sj679FS+TfvGgAWSW59UG7y3+OwkeZe6xrYpCNplGBz0DV6ofZj73QVArxYLrEyWRxP4qX/t5YoC2FnK1PF4h+Bd5/M6qj8LDy0qKZG3nlP9ATe3iEyk1dCfr+DruKrU16AA+us9GN6ifblpzT7vy/bQ7QeXmXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733507028; c=relaxed/simple;
-	bh=m36ms2felAIm8ttAb0ORtpc8vmNP200R40r2sWRfe6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GVIu953aiDrpjv75CwEqN/U6xGjJXckwN2IYOe9E/zr+H9XEvz4tZpuxmOgt9GmADJl7Hf/c+xVR+FjROoVT/1ur0cnouT1i3cZGVcz+BIZh0xYAJWCT31IaBsTqxzEDTryivrWkI1Bn6ZGrglY9LlOF1YCcEtcPbKT7qLcveNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZXDzbVv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733509364; c=relaxed/simple;
+	bh=cbyuqAguj2f/Nz/gXkuZ4/3ryUl/+UVbIDgnVfdtEmM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ADlQsKfrjT6I1hsnYmzgjV1oyXPUxP10UxlPj91pHg6lWSA3iZktpJMN5kVJtn92asGgEvchyhc1CnBqlzPFJ47fNFgOkImW6RIiNtVB9tyzgkWWmFV3Oceg9kN+Vx0LOS/g+eY5+nVer6d9yQDjj6lvZqYLvf7ofuSYcKnDw0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLZF+Lo4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZXDzbVv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DEA8C4CED1;
-	Fri,  6 Dec 2024 17:43:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLZF+Lo4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5608C4CED1;
+	Fri,  6 Dec 2024 18:22:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733507028;
-	bh=m36ms2felAIm8ttAb0ORtpc8vmNP200R40r2sWRfe6Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VZXDzbVvYAfO1SbeJe/TLE6CMGABko/B1N+zOIs/vX9f/jOKXNSmLyrESFHJ3Lzq/
-	 S6z3Ln/Sg3f2Vkwk7Vx+EGehY5smJgnxQaqjDMjOjGz91Y8qnCXpREmvhauXADpA+B
-	 6WAXrsk+itZqusmlmcR/pzWdapVbT2kthDUvDroOmpALoFq3SXjaiRjSAZaXNG29rE
-	 Dpsl/CIZEtEnoRMf86D7rm/moNHFik6BGNsbQfxsvfzY3ab0SNh13gnSbrr9rbnQFJ
-	 3Hneqbu7YGavvxZgKe0N04fhjeVqgrUA/rnZf8bAOIGrJk8R49nRYTtNAwwgT6o+Zl
-	 Dwe9OFYWXHLRQ==
-Date: Fri, 6 Dec 2024 17:43:42 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, kristina.martsenko@arm.com
-Subject: Re: [PATCH v4 06/14] KVM: arm64: Set protected VM traps based on its
- view of feature registers
-Message-ID: <70992791-af72-43ed-88cc-1bb5a8acaf9a@sirena.org.uk>
+	s=k20201202; t=1733509363;
+	bh=cbyuqAguj2f/Nz/gXkuZ4/3ryUl/+UVbIDgnVfdtEmM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GLZF+Lo4Qf/a94yrYD1mrrCRhsnbE+dQnIhMYwPN7QXZoe2RtWmCoqQiORjfC7hC6
+	 34wwFdgSiFreTPEXtGZ8TBE5oN1X54cFLQN0mY62lPjD8/Np/Kudbltw5PXYDGOQ87
+	 3dMKpo2o1juIf09PKQyo+AurbqkLkjJtXcW0ihTLZfrrm8q/EELDGSLGYXv9hx0lOh
+	 EcTx6/nDaSLjSMqY0V8OV5jFctiAOZc6vcWKO6XRbjTe0rLhGaMqXj1hjwy3vgstz0
+	 eYkZCLnoWVMR9DFPgKolAN8INcaTEnRvJNQ8LhmCDWreiWFr7+eu9niuiDmwhkcGJE
+	 5WW7gMpDxosCQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tJcyP-001FUX-DV;
+	Fri, 06 Dec 2024 18:22:41 +0000
+Date: Fri, 06 Dec 2024 18:22:40 +0000
+Message-ID: <868qssu0wf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	james.clark@linaro.org,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	kristina.martsenko@arm.com
+Subject: Re: [PATCH v4 06/14] KVM: arm64: Set protected VM traps based on its view of feature registers
+In-Reply-To: <70992791-af72-43ed-88cc-1bb5a8acaf9a@sirena.org.uk>
 References: <20241202154742.3611749-1-tabba@google.com>
- <20241202154742.3611749-7-tabba@google.com>
- <Z1M1DYbvuqAEU5c-@google.com>
+	<20241202154742.3611749-7-tabba@google.com>
+	<Z1M1DYbvuqAEU5c-@google.com>
+	<70992791-af72-43ed-88cc-1bb5a8acaf9a@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4iR098i89+hFApT8"
-Content-Disposition: inline
-In-Reply-To: <Z1M1DYbvuqAEU5c-@google.com>
-X-Cookie: Sales tax applies.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, qperret@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, kristina.martsenko@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 06 Dec 2024 17:43:42 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Fri, Dec 06, 2024 at 05:31:57PM +0000, Quentin Perret wrote:
+> > On Monday 02 Dec 2024 at 15:47:33 (+0000), Fuad Tabba wrote:
+> 
+> > > -	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_RAS), id_aa64pfr0) <
+> > > -	    ID_AA64PFR0_EL1_RAS_V1P1) {
+> > > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
+> 
+> > I'm admittedly getting a bit lost in the kvm_has_feat() macro maze, but
+> > should this be:
+> 
+> > 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
+> 
+> > to replicate the existing check?
+> 
+> kvm_has_feat() checks for a value <= the supplied constant while the
 
---4iR098i89+hFApT8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Not quite:
 
-On Fri, Dec 06, 2024 at 05:31:57PM +0000, Quentin Perret wrote:
-> On Monday 02 Dec 2024 at 15:47:33 (+0000), Fuad Tabba wrote:
+#define kvm_has_feat(kvm, id, fld, limit)				\
+	kvm_cmp_feat(kvm, id, fld, >=, limit)
 
-> > -	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_RAS), id_aa64pfr0) <
-> > -	    ID_AA64PFR0_EL1_RAS_V1P1) {
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
+> existing check is just < and the values for the field are:
+> 
+> UnsignedEnum	31:28	RAS
+> 	0b0000	NI
+> 	0b0001	IMP
+> 	0b0010	V1P1
+> EndEnum
+> 
+> so they're both checking for the same thing.
 
-> I'm admittedly getting a bit lost in the kvm_has_feat() macro maze, but
-> should this be:
+Evidently not. The original code is checking for RASv1p1, while the
+change turns that into a check for the original RAS spec.
 
-> 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
+	M.
 
-> to replicate the existing check?
-
-kvm_has_feat() checks for a value <= the supplied constant while the
-existing check is just < and the values for the field are:
-
-UnsignedEnum	31:28	RAS
-	0b0000	NI
-	0b0001	IMP
-	0b0010	V1P1
-EndEnum
-
-so they're both checking for the same thing.
-
---4iR098i89+hFApT8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdTN80ACgkQJNaLcl1U
-h9BWPgf+IQiyhQrKBJvuASNYJ/HHdApW24+9RZSV8wxRm63d5lAl4Wl5Mh78cHTL
-P9yv+xL4VRJ34d9S9Vko6160kelDqIf3oMuyEJYMluKpGEy5L7fazjPdusj3CrJP
-3moUCZDvr5TvJ64mXXlTyU9VKsC2miihqrnlPO0siYsWP1ZrmvmbzS6rSh7dZceg
-W82rM4+3wTQj+hAzP26UHRRPneo+n8prEb/qrZ6eHjCYkKQdB3usSyBwsvOdRebR
-GSiXe33WBxpgL2PYc8sNM53Qc5jir2U2t2ivinp9wpNQHzzAfibP94h/s7Z0rRAa
-SgPzixBbmLmWFsOHYwa5U0IcS+5uVQ==
-=+crv
------END PGP SIGNATURE-----
-
---4iR098i89+hFApT8--
+-- 
+Without deviation from the norm, progress is not possible.
