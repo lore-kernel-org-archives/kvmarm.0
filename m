@@ -1,793 +1,314 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FA925760
-	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 10:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA7646426
+	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 11:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733482245; cv=none; b=c16ZaMpV28VtdJO1INvft6mZt3n+qHXTSSgjDBgJTXogsD53S3lCwA4/eAu32yaWGT27mKRTQ5aDwJRKp0Ul1oQCz26hUU/mt8HjWNVzIu0s4kKpZ5NGOjMuE6XLPrsbggIXuipZSimK36aD3ji2w3fFeL+6LbhcknlRvcQZoqA=
+	t=1733484154; cv=none; b=m2INGEm2f3dVUg9tJAmaj7TSFfDtEswnDHOoL0B9DuK1cmTf98kuiba6sn6y8V9Iqot1VL2xaTSAcPGjga1/EUeRNPiBIXRhSPRnhCCzS65/3WCweNUX4D/+2uEuGKIn8kM4ZsTe+Kq0l6CHGQwPaJpgZmVMwPEgYfNFagtd+Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733482245; c=relaxed/simple;
-	bh=t03iRbu4Q/pcnxh+Y4cAe9kaSIEnV2eV64W5oGN0FGk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pSl/lIXWUAR53LdQGCRVxWlrpL+t1SG1ptbd9aRhbMHv+RzZGYNK6BgUlicdw/+Yc9mG7qDZ1+7I4H9Poh3Pydb5hmcj4YGGJzbLueGomMCPPY2QjP2QbUIXxP2DVk9asHts5eTOYbzkB4AkfTIQA6s1LkjsKzgoQRoBN5WcRRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4F4F81474;
-	Fri,  6 Dec 2024 02:51:09 -0800 (PST)
-Received: from [10.1.33.151] (e121487-lin.cambridge.arm.com [10.1.33.151])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AFDE83F58B;
-	Fri,  6 Dec 2024 02:50:40 -0800 (PST)
-Message-ID: <feed385c-22d0-4a32-b90f-1b63aa4487a1@arm.com>
-Date: Fri, 6 Dec 2024 10:50:38 +0000
+	s=arc-20240116; t=1733484154; c=relaxed/simple;
+	bh=zjCFuh6399BU/10gIz0jzv25S2gCos33QmZfq4593Qw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=AcBIKUQY5GhARJaHFWZCWgNAJvehq2EUSLObFCTpEdNkTtkNi0t/1OLdW3IdsqZ1riC5VH12vWaiQft6Qa3rgN0Bv2G9+AQmdotTf1vCGQujrlWyQa6koQz5OIKfylKRDCWSLv40PwaKrfwRGT0Dz/5eEbrroHnDLI2PM3dnDwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IHCj4BYd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHCj4BYd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733484150;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hR/36+jL1HEYne7ZJbaetgKkJOfY5RpKpU8sxbUibaY=;
+	b=IHCj4BYdlrX2Dk8eVLBPuB6nyvoxsbHbiRu/iWE/206VRs8khuuyVy9VJh3AhJDruKpUdF
+	xshPFsYOUsh9Qbt+UX4wJlJrskBX8oh4YboAQt6W/jWvFCsYuTfdbpK5nNKLRWbeIyLq7y
+	5007Dx8xzlDm5+Ieqgls+uxB0ndKsB8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-WcQ5LRSEMKSeIQy1KaSVIQ-1; Fri,
+ 06 Dec 2024 06:22:27 -0500
+X-MC-Unique: WcQ5LRSEMKSeIQy1KaSVIQ-1
+X-Mimecast-MFC-AGG-ID: WcQ5LRSEMKSeIQy1KaSVIQ
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7EED19560A3;
+	Fri,  6 Dec 2024 11:22:25 +0000 (UTC)
+Received: from gondolin.str.redhat.com (dhcp-192-244.str.redhat.com [10.33.192.244])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E235D19560A2;
+	Fri,  6 Dec 2024 11:22:18 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com
+Cc: shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
+Date: Fri,  6 Dec 2024 12:21:53 +0100
+Message-ID: <20241206112213.88394-1-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] arm64: Add basic MTE test
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com
-References: <20241126095513.129737-1-vladimir.murzin@arm.com>
- <Z1G3QKefOxKtkfDj@raptor>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <Z1G3QKefOxKtkfDj@raptor>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-Hi Alexandru,
-
-On 12/5/24 14:26, Alexandru Elisei wrote:
-> Hi Vladimir,
-> 
-> This is very useful, thank you for writing the test.
-
-Thanks for taking time reviewing it ;) 
-
-> 
-> On Tue, Nov 26, 2024 at 09:55:13AM +0000, Vladimir Murzin wrote:
->> Test tag storage access and tag mismatch for different MTE modes.
->>
->> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
->> ---
->>  arm/Makefile.arm64            |   9 ++
->>  arm/cstart64.S                |   4 +-
->>  arm/mte.c                     | 266 ++++++++++++++++++++++++++++++++++
->>  arm/run                       |   3 +-
->>  arm/unittests.cfg             |  19 +++
->>  lib/arm64/asm/mmu.h           |   1 +
->>  lib/arm64/asm/pgtable-hwdef.h |   2 +
->>  lib/arm64/asm/sysreg.h        |  12 ++
->>  8 files changed, 314 insertions(+), 2 deletions(-)
->>  create mode 100644 arm/mte.c
->>
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index 3b9034e3..30df4e56 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -17,6 +17,14 @@ ifneq ($(strip $(sve_flag)),)
->>  CFLAGS += -DCC_HAS_SVE
->>  endif
->>  
->> +mte_flag := $(call cc-option, -march=armv8.5-a+memtag, "")
->> +ifneq ($(strip $(mte_flag)),)
->> +# Don't pass the option to the compiler, we don't
->> +# want the compiler to generate MTE instructions.
-> I think the comment is at odds with the code, the define tells the test
-> that the compiler *has* mte, but the comment talks about not passing the
-> option to the compiler.
-> 
-> Maybe something like this would be easier to parse:
-> 
-> # MTE is supported by the compiler, generate MTE instructions.
-> 
-
-Ack.
-
->> +CFLAGS += -DCC_HAS_MTE
->> +endif
->> +
->> +
->>  mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
->>  CFLAGS += $(mno_outline_atomics)
->>  CFLAGS += -DCONFIG_RELOC
->> @@ -57,6 +65,7 @@ tests += $(TEST_DIR)/micro-bench.$(exe)
->>  tests += $(TEST_DIR)/cache.$(exe)
->>  tests += $(TEST_DIR)/debug.$(exe)
->>  tests += $(TEST_DIR)/fpu.$(exe)
->> +tests += $(TEST_DIR)/mte.$(exe)
->>  
->>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->>  
->> diff --git a/arm/cstart64.S b/arm/cstart64.S
->> index b480a552..b9d7a446 100644
->> --- a/arm/cstart64.S
->> +++ b/arm/cstart64.S
->> @@ -242,6 +242,7 @@ halt:
->>   *   NORMAL             100     11111111
->>   *   NORMAL_WT          101     10111011
->>   *   DEVICE_nGRE        110     00001000
->> + *   NORMAL_TAGGED      111     11110000
-> The attribute matches the Arm ARM and the Linux source tree.
-> 
->>   */
->>  #define MAIR(attr, mt) ((attr) << ((mt) * 8))
->>  
->> @@ -275,7 +276,8 @@ asm_mmu_enable:
->>  		     MAIR(0x44, MT_NORMAL_NC) |		\
->>  		     MAIR(0xff, MT_NORMAL) |	        \
->>  		     MAIR(0xbb, MT_NORMAL_WT) |         \
->> -		     MAIR(0x08, MT_DEVICE_nGRE)
->> +		     MAIR(0x08, MT_DEVICE_nGRE) |       \
->> +		     MAIR(0xf0, MT_NORMAL_TAGGED)
->>  	msr	mair_el1, x1
->>  
->>  	/* TTBR0 */
->> diff --git a/arm/mte.c b/arm/mte.c
->> new file mode 100644
->> index 00000000..ae8d8b75
->> --- /dev/null
->> +++ b/arm/mte.c
->> @@ -0,0 +1,266 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2024 Arm Limited.
->> + * All rights reserved.
->> + */
->> +
->> +#include <libcflat.h>
->> +#include <alloc_page.h>
->> +#include <stdlib.h>
->> +#include <asm/mmu.h>
->> +#include <asm/sysreg.h>
->> +#include <asm/pgtable-hwdef.h>
->> +#include <asm/processor.h>
->> +#include <asm/thread_info.h>
->> +
->> +
->> +#define MTE_TCF_SYNC		0b01
->> +#define MTE_TCF_ASYNC		0b10
->> +#define MTE_TCF_ASYMM		0b11
-> Matches the definition for the SCTLR_EL1 TCF and TCF0 fields.
-> 
-> Do you think renaming MTE_TCF_ASYNC->MTE_TCF_ASYNC_ALL and
-> MTE_TCF_ASYMM -> MTE_TCF_ASYNC_WRITES makes it easier to understand?
-
-I can add comment as remider about these settings:
-
-/* Tag Check Faults cause a synchronous exception */
-#define MTE_TCF_SYNC	0b01
-/* Tag Check Faults are asynchronously accumulated */
-#define MTE_TCF_ASYNC	0b10
-/*
- * Tag Check Faults cause a synchronous exception on reads,
- * and are asynchronously accumulated on writes
- */
-#define MTE_TCF_ASYMM	0b11
-
-WDYT?
-
-> 
->> +
->> +#define MTE_GRANULE_SIZE        UL(16)
->> +#define MTE_GRANULE_MASK        (~(MTE_GRANULE_SIZE - 1))
->> +#define MTE_TAG_SHIFT           56
->> +
->> +#define untagged(p)                                             		\
->> +({                                                              		\
->> +    unsigned long __in = (unsigned long)(p);                    		\
->> +    typeof(p) __out = (typeof(p))(__in & ~(MTE_GRANULE_MASK << MTE_TAG_SHIFT));	\
-> Can you add a space between the variable declaration and the return value from
-> the macro? Same for the tagged() macro.
-
-Ack.
-
-> 
->> +    __out;                                                      		\
->> +})
->> +
->> +#define tagged(p,t)                                     	\
->> +({                                                      	\
->> +    unsigned long __in = (unsigned long)(untagged(p));  	\
->> +    unsigned long __tag = (unsigned long)(t) << MTE_TAG_SHIFT;	\
->> +    typeof(p) __out = (typeof(p))(__in | __tag);        	\
->> +    __out;                                              	\
->> +})
->> +
->> +
->> +static inline void mem_read(unsigned int *addr, unsigned int tag, unsigned int *res)
->> +{
->> +	unsigned int r;
-> Space between the variable declaration and the rest of the function?
-> 
-
-I see that you have questions related to this function so I better explain it here
-
->> +	asm volatile ("ldr %0,[%1]\n"
-
-Here load value from tagged memory.
-
->> +		      "str %0,[%2]\n"
-
-Here we copy loaded value in untagged memory "res".
-
-If there was an expection due to access to tagged memory we step over the copy so
-content of "res" won't change, otherwise we update the contnet. We use "res" to
-check value we loaded (if any)
-
->> +		      : "=r" (r)
->> +		      : "r" (tagged(addr, tag)), "r" (res));
->> +}
->> +
->> +static inline void mem_write(unsigned int *addr, unsigned int tag, unsigned int val)
->> +{
->> +	asm volatile ("str %0,[%1]\n"
->> +		      "nop\n"
->> +		      :
->> +		      : "r" (val), "r" (tagged(addr, tag))
->> +		      : "memory");
->> +}
-> I don't understand why these functions are needed.
-
-These are needed for precise control how we access to the memory. We advance
-the pc in exeption handler so we better not to rely on what compiler can 
-generate...
-
-> 
-> I first assumed that they are necessary to avoid the compiler optimising
-> the memory accesses and reusing a stashed register value. But the address
-> is changed by adding the tag, and the tests never use the same tag, so the
-> compiler won't have values in registers for the tagged addresses.
-> 
-> I guess it's because in the future a test might reuse the same tag? That
-> can easily be avoided by adding a random tag to the address - the example
-> from Documentation/arch/arm64/memory-tagging-extension.rst does that.
-> 
-> I think another way to get around this would be to add a barrier() in
-> tagged.
-> 
->> +
->> +static volatile bool mte_exception;
->> +
->> +static void mte_fault_handler(struct pt_regs *regs, unsigned int esr)
->> +{
->> +	unsigned int dfsc = esr & 0b111111;
-> GENMASK_UL(5, 0)?
-
-Ack
-
-> 
->> +
->> +	if (dfsc == 0b010001)
-> This matches the DFSC in the Arm ARM.
-> 
-> For a synchronous tag check fault, ARM DDI0487K.a also states the following:
-> 
-> 'When FEAT_MTE is implemented, for a synchronous Tag Check Fault abort taken to
-> EL1, ESR_EL1.FnV is 0 and FAR_EL1 is valid.'
-> 
-> Do you think there's value in checking that FnV is 0 when MTE is configured to
-> generate a synchronous tag check fault exception?
-
-It is easy check to add, so why not...
-
-> 
->> +		mte_exception = true;
->> +
->> +        regs->pc += 8;
-> I think two instructions are skipped here because the test assumes that
-> the first instruction from the mem_{read,write} macros will cause the
-> fault.  But what happens if the first succeeds and the second instruction
-> causes a tag check fault?
-
-Only first instruction acccesses tagged memory the second instruction either
-"nop" or copy ("str") value read from tagged memory to untagged memory 
-
-> 
-> IMO, I see two options here:
-> 
-> 1. Increment PC by one instruction, which means the second instruction gets
-> executed, which is harmless as far as I can tell.
-
-No it will copy whatevere garbadge left in the regiter to untagged memory which
-we use late to check if value got loaded or not
-
-> 
-> 2. Remove the macros, assign a random tag to the addresses and use a single
-> instruction to access the address, then increment the PC by one instruction
-> in the exception handler.
-> 
->> +}
->> +
->> +static inline void mmu_set_tagged(pgd_t *pgtable, unsigned long vaddr)
->> +{
->> +	pteval_t *p_pte = follow_pte(pgtable, vaddr);
-> Space between local variable declaration and the body of the function?
-
-Ack
-
-> 
->> +        if (p_pte) {
-> Indentation with spaces instead of tabs
-
-Shame on me... sory about that
-
-> 
->> +                pteval_t entry = *p_pte;
->> +
->> +		entry &= ~PTE_ATTRINDX_MASK;
->> +		entry |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
->> +
->> +                WRITE_ONCE(*p_pte, entry);
->> +                flush_tlb_page(vaddr);
->> +        }
-> As far as I can tell, follow_pte() fails if:
-> 
-> 1. The test hasn't correctly allocated memory for 'vaddr', or
-> 2. Something is very wrong with the library code.
-> 
-> I think having a report_abort() if !p_pte (with a comment explaining it)
-> would be useful for debugging.
-
-I like that idea!
-
-> 
-> Alternatively you can add a comment explaining why follow_pte() should
-> never fail and don't check that p_pte != NULL.
-> 
->> +}
->> +
->> +static void mte_init(void)
->> +{
->> +	unsigned long sctlr = read_sysreg(sctlr_el1);
->> +	unsigned long tcr = read_sysreg(tcr_el1);
->> +
->> +	sctlr &= ~(SCTLR_EL1_ATA | SCTLR_EL1_ATA0);
-> This can be dropped, and replaced with the second instruction below which
-> sets the bits unconditionally.
-
-Ack
-
-> 
->> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
->> +	sctlr |= SCTLR_EL1_ATA | SCTLR_EL1_ATA0;
-> Why set ATA0? All the tests execute at EL1 as far as I can tell.
-
-No reason
-
-> 
->> +
->> +	tcr |= TCR_TBI1 | TCR_TBI0;
->> +
->> +	write_sysreg(sctlr, sctlr_el1);
->> +	write_sysreg(tcr, tcr_el1);
->> +
->> +	isb();
->> +        flush_tlb_all();
-> Indentation with spaces instead of tabs?
-> 
-> Also, invalidating the TLB is the right thing to do, because both the
-> TCR_EL1 and SCTLR_EL1 bits are permitted to be cached in the TLB.
-> 
->> +}
->> +
->> +static inline void mte_set_tcf(unsigned long tcf)
->> +{
->> +	unsigned long sctlr = read_sysreg(sctlr_el1);
->> +
->> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
->> +	sctlr |= (tcf << SCTLR_EL1_TCF_SHIFT) & SCTLR_EL1_TCF_MASK ;
->> +	sctlr |= (tcf << SCTLR_EL1_TCF0_SHIFT) & SCTLR_EL1_TCF0_MASK ;
->> +
->> +	write_sysreg(sctlr, sctlr_el1);
->> +	isb();
->> +}
->> +
->> +
-> Two empty lines instead of one?
-
-Ack
-
-> 
->> +static inline void mte_set_tag(void *addr, size_t size, unsigned int tag)
->> +{
->> +#ifdef CC_HAS_MTE
->> +	unsigned long in = (unsigned long)untagged(addr);
->> +	unsigned long start = ALIGN_DOWN(in, 16);
->> +	unsigned long end = ALIGN(in + size , 16);
-> Space between local variable declaration and the body of the function?
-
-Ack
-
-> 
->> +	for (unsigned long ptr = start; ptr < end; ptr += 16)
->> +            asm volatile(".arch   armv8.5-a+memtag\n"
->> +			 "stg %0, [%1]"
->> +                         :
->> +                         : "r"(tagged(ptr, tag)), "r"(ptr)
->> +                         : "memory");
-> STG generates an untagged access, so the destination address can be also be
-> tagged, i.e:
-> 
-> 		ptr = tagged(ptr, tag);
-> 		asm volatile("stg %0, [%0]" : : "r"(ptr) : "memory");
-
-Works fo me.
-
-> 
-> I dropped the assembler directive because you can invoke the compiler with
-> -march=armv8.5-a+memtag (the top level Makefile already checks if that
-> options is supported).
-> 
-> Up to you what you prefer.
-
-I prefere user won't bother messing with specific "-march" :)
-
-> 
->> +#endif
->> +}
->> +
->> +static inline unsigned long tfsr(void)
-> The name here is particularly bad. The function reads TFSR_EL1, clears the
-> register and returns the old value. How about get_clear_tfsr()?
-
-Ack
-
-> 
->> +{
->> +	unsigned long r;
->> +
->> +	dsb(nsh);
->>From the definition of DSB:
-> 
-> 'In addition, no instruction that appears in program order after the DSB
-> instruction can alter any state of the system or perform any part of its
-> functionality until the DSB completes other than:
-> 
-> * Being fetched from memory and decoded.
-> * Reading the general-purpose, SIMD and floating-point, SVE vector or
-> predicate, Special-purpose, or System registers that are directly or
-> indirectly read without causing side effects.'
-> 
-> The read of the TFSR_EL1 register below does not have any side effects, so I
-> assume it can be executed **before** the DSB completes, and thus potentially
-> missing that one of the TFx fields is set. I assume that's why the kernel does
-> an ISB after the DSB and before reading TFSR_EL1.
-
-Ack
-
-> 
->> +
->> +	r = read_sysreg_s(TFSR_EL1);
->> +	write_sysreg_s(0, TFSR_EL1);
->> +
->> +	isb();
-> ISB here is not needed, because there's no indirect read of the TFSR_EL1
-> register (got that from the comment for mte_check_tfsr_el1() from the kernel
-> source - it's now table D23-1 in ARM DDI0487K.a if want to double check).
-> 
-
-Ack
-
->> +
->> +	return r;
->> +}
->> +
->> +static void mte_sync_test(void)
->> +{
->> +	unsigned int *mem = alloc_page();
->> +	unsigned int val = 0;
->> +
->> +	memset(mem, 0xff, PAGE_SIZE);
-> alloc_page() can fail.
-> 
->> +	mte_init();
->> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
->> +	mte_set_tag(mem, PAGE_SIZE, 0);
->> +	mte_set_tcf(MTE_TCF_SYNC);
->> +
->> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
-> I think I would prefer mte_exception to explicitely be set to false here
-> because it makes the tests more robust. Yes, it's a static variable and
-> it's initialized to 0 (false). But the main() function could be changed to
-> run all the tests in one go (see timer.c::main()), and then mte_exception
-> might not necessarily be false here.
-> 
-> Or maybe I'm just overthinking things.
-
-I'll add explcit reset for mte_exception.
-
-> 
->> +
->> +	mem_read(mem, 1, &val);
->> +
->> +	report((val == 0) && mte_exception, "read");
->> +
->> +	mte_exception = false;
->> +
->> +	mem_write(mem, 2, 0xbbbbbbbb);
->> +
->> +	report((*mem == 0xffffffff) && mte_exception, "write");
->> +}
->> +
->> +static void mte_asymm_test(void)
->> +{
->> +	unsigned int *mem = alloc_page();
->> +	unsigned int val = 0;
->> +
->> +	memset(mem, 0xff, PAGE_SIZE);
->> +	mte_init();
->> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
->> +	mte_set_tag(mem, PAGE_SIZE, 0);
->> +	mte_set_tcf(MTE_TCF_ASYMM);
->> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
->> +
->> +	mem_read(mem, 3, &val);
->> +	report((val == 0) && mte_exception, "read");
->> +
->> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
-> I would have left the exception handler, and checked that mte_exception is
-> false. Just to make sure that the access doesn't set the TF field and also
-> generate an exception.
-> 
-> Same for the fully asynchronous test below.
-> 
-
-I think we do not expect any exception here so we can rely on defaut exception
-handler to stop the world and produce output with all handy information for debug.
-
->> +
->> +	mem_write(mem, 4, 0xaaaaaaaa);
->> +	report((*mem == 0xaaaaaaaa) && (tfsr() != 0), "write");
-> Would it be more useful to explicitely check that TFSR_EL1.TF0 == 1? As it
-> stand, tfsr() != 0 can be true if TFSR_EL1.TF1 == 1, but TFSR_EL1.TF0 == 0,
-> which I would say it's not correct.
-> 
-
-Good point. I'll update with explicit check
-
->> +}
->> +
->> +static void mte_async_test(void)
->> +{
->> +	unsigned int *mem = alloc_page();
->> +	unsigned int val = 0;
->> +
-> Two empty lines instead of one.
-
-Ack
-
-> 
->> +
->> +	memset(mem, 0xff, PAGE_SIZE);
->> +	mte_init();
->> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
->> +	mte_set_tag(mem, PAGE_SIZE, 0);
->> +	mte_set_tcf(MTE_TCF_ASYNC);
->> +
->> +	mem_read(mem, 5, &val);
->> +	report((val == 0xffffffff) && (tfsr() != 0), "read");
->> +
->> +	mem_write(mem, 6, 0xcccccccc);
->> +	report((*mem == 0xcccccccc) && (tfsr() != 0), "write");
->> +}
->> +
->> +
-> Two emtpy lines.
-> 
-
-Ack
-
->> +static unsigned int mte_version(void)
-> Why unsigned int? Sorry, but this seems arbitrary - r is 64 bits, the field
-> is 4 bits, and the function returns 32 bits.
-
-Because at the end we are interested in non-negative number, unsigned int fits
-this purpose, no?
-
-> 
->> +{
->> +#ifdef CC_HAS_MTE
->> +	uint64_t r;
->> +
->> +	asm volatile("mrs %x0, id_aa64pfr1_el1" : "=r"(r));
->> +
->> +	return (r >> 8) & 0b1111;
->> +#else
->> +	report_info("Compiler lack MTE support");
->> +	return 0;
->> +#endif
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +
->> +	unsigned int version = mte_version();
->> +
->> +        if (version < 2) {
->> +                report_skip("No MTE support, skip...\n");
->> +                return -1;
->> +        }
->> +
->> +        if (argc < 2)
->> +                report_abort("no test specified");
-> Spaces mixed with tabs.
-
-Ack
-
-> 
->> +
->> +	report_prefix_pushf("mte");
-> report_prefix_push("mte")?
-> 
->> +
->> +	if (strcmp(argv[1], "sync") == 0) {
->> +                report_prefix_push(argv[1]);
->> +                mte_sync_test();
->> +                report_prefix_pop();
->> +        } else if (strcmp(argv[1], "async") == 0) {
->> +                report_prefix_push(argv[1]);
->> +		if (version < 3) {
->> +			report_skip("No MTE async, skip...\n");
->> +			return -1;
->> +		}
->> +                mte_async_test();
->> +                report_prefix_pop();
->> +
->> +        } else if (strcmp(argv[1], "asymm") == 0) {
->> +                report_prefix_push(argv[1]);
->> +		if (version < 3) {
->> +			report_skip("No MTE asymm, skip...\n");
->> +			return -1;
->> +		}
->> +                mte_asymm_test();
->> +                report_prefix_pop();
->> +
->> +        } else {
->> +                report_abort("Unknown sub-test '%s'", argv[1]);
->> +	}
-> Spaces mixed with tabs again.
-> 
-
-Ack
-
->> +
->> +        return report_summary();
->> +}
->> diff --git a/arm/run b/arm/run
->> index efdd44ce..b129e4e0 100755
->> --- a/arm/run
->> +++ b/arm/run
->> @@ -29,7 +29,8 @@ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
->>  	exit 2
->>  fi
->>  
->> -M='-machine virt'
->> +MACHINE="virt"
->> +M="-machine $MACHINE$MACHINE_PROPS"
-> I did this
-> 
-> $ grep -r MACHINE_PROPS
-> 
-> and there were no other matches beside of the line above.
-> 
->>  
->>  if [ "$ACCEL" = "kvm" ]; then
->>  	if $qemu $M,\? | grep -q gic-version; then
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 2bdad67d..9b428c02 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -271,3 +271,22 @@ smp = 2
->>  groups = nodefault
->>  accel = kvm
->>  arch = arm64
->> +
->> +# MTE tests
->> +[mte-sync]
->> +file = mte.flat
->> +groups = nodefault
->> +extra_params = -append 'sync'
->> +arch = arm64
->> +
->> +[mte-async]
->> +file = mte.flat
->> +groups = nodefault
->> +extra_params = -append 'async'
->> +arch = arm64
->> +
->> +[mte-asymm]
->> +file = mte.flat
->> +groups = nodefault
->> +extra_params = -append 'asymm'
->> +arch = arm64
->> diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
->> index 5c27edb2..9aedd09a 100644
->> --- a/lib/arm64/asm/mmu.h
->> +++ b/lib/arm64/asm/mmu.h
->> @@ -10,6 +10,7 @@
->>  #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
->>  #define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
->>  #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
->> +#define PTE_TAGGED		PTE_ATTRINDX(MT_NORMAL_TAGGED)
->>  
->>  static inline void flush_tlb_all(void)
->>  {
->> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
->> index 8c41fe12..b66b62da 100644
->> --- a/lib/arm64/asm/pgtable-hwdef.h
->> +++ b/lib/arm64/asm/pgtable-hwdef.h
->> @@ -145,6 +145,7 @@
->>  #define TCR_TG1_64K		(UL(3) << 30)
->>  #define TCR_ASID16		(UL(1) << 36)
->>  #define TCR_TBI0		(UL(1) << 37)
->> +#define TCR_TBI1		(UL(1) << 38)
-> Matches the Arm ARM.
-> 
->>  
->>  /*
->>   * Memory types available.
->> @@ -156,5 +157,6 @@
->>  #define MT_NORMAL		4
->>  #define MT_NORMAL_WT		5
->>  #define MT_DEVICE_nGRE		6
->> +#define MT_NORMAL_TAGGED	7
->>  
->>  #endif /* _ASMARM64_PGTABLE_HWDEF_H_ */
->> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
->> index f214a4f0..60f51dad 100644
->> --- a/lib/arm64/asm/sysreg.h
->> +++ b/lib/arm64/asm/sysreg.h
->> @@ -28,6 +28,7 @@
->>  	.endm
->>  #else
->>  #include <libcflat.h>
->> +#include <bitops.h>
->>  
->>  #define read_sysreg(r) ({					\
->>  	u64 __val;						\
->> @@ -81,7 +82,12 @@ asm(
->>  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
->>  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
->>  
->> +#define TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
-> Matches the Arm ARM.
-> 
->> +
->> +
->>  /* System Control Register (SCTLR_EL1) bits */
->> +#define SCTLR_EL1_ATA		_BITULL(43)
->> +#define SCTLR_EL1_ATA0		_BITULL(42)
-> Same here.
-> 
-> Thanks,
-> Alex
-
-Once again, thanks for you time!
-
-Vladimir
-
-> 
->>  #define SCTLR_EL1_LSMAOE	_BITULL(29)
->>  #define SCTLR_EL1_NTLSMD	_BITULL(28)
->>  #define SCTLR_EL1_EE		_BITULL(25)
->> @@ -99,6 +105,12 @@ asm(
->>  #define SCTLR_EL1_A		_BITULL(1)
->>  #define SCTLR_EL1_M		_BITULL(0)
->>  
->> +#define SCTLR_EL1_TCF_SHIFT	40
->> +#define SCTLR_EL1_TCF_MASK	GENMASK_ULL(41, 40)
->> +
->> +#define SCTLR_EL1_TCF0_SHIFT	38
->> +#define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
->> +
->>  #define INIT_SCTLR_EL1_MMU_OFF	\
->>  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
->>  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
->> -- 
->> 2.25.1
->>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+
+A respin/update on the aarch64 KVM cpu models. Also available at
+gitlab.com/cohuck/qemu arm-cpu-model-rfcv2
+
+Find Eric's original cover letter below, so that I do not need to
+repeat myself on the aspects that have not changed since RFCv1 :)
+
+Changes from RFCv1:
+
+Rebased on more recent QEMU (some adaptions in the register conversions
+of the first few patches.)
+
+Based on feedback, I have removed the "custom" cpu model; instead, I
+have added the new SYSREG_<REG>_<FIELD> properties to the "host" model.
+This works well if you want to tweak anything that does not correspond
+to the existing properties for the host model; however, if you e.g.
+wanted to tweak sve, you have two ways to do so -- we'd probably either
+want to check for conflicts, or just declare precedence. The kvm-specific
+props remain unchanged, as they are orthogonal to this configuration.
+
+The cpu model expansion for the "host" model now dumps the new SYSREG_
+properties in addition to the existing host model properties; this is a
+bit ugly, but I don't see a good way on how to split this up.
+
+Some more adaptions due to the removal of the "custom" model.
+
+Things *not* changed from RFCv1:
+
+SYSREG_ property naming (can be tweaked easily, once we are clear on what
+the interface should look like.)
+
+Sysreg generation scripts, and the generated files (I have not updated
+anything there.) I think generating the various definitions makes sense,
+as long as we double-check the generated files on each update (which would
+be something to trigger manually anyway.)
+
+What I would like us to reach some kind of consensus on:
+
+How to continue with the patches moving the ID registers from the isar
+struct into the idregs array. These are a bit of churn to drag along;
+if they make sense, maybe they can be picked independently of this series?
+
+Whether it make sense to continue with the approach of tweaking values in
+the ID registers in general. If we want to be able to migrate between cpus
+that do not differ wildly, we'll encounter differences that cannot be
+expressed via FEAT_xxx -- e.g. when comparing various AmpereAltra Max systems,
+they only differ in parts of CTR_EL0 -- which is not a feature register, but
+a writable register.
+
+Please take a look, and looking forward to your feedback :)
+
+***********************************************************************
+
+Title: Introduce a customizable aarch64 KVM host model 
+
+This RFC series introduces a KVM host "custom" model.
+
+Since v6.7 kernel, KVM/arm allows the userspace to overwrite the values
+of a subset of ID regs. The list of writable fields continues to grow.
+The feature ID range is defined as the AArch64 System register space
+with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
+
+The custom model uses this capability and allows to tune the host
+passthrough model by overriding some of the host passthrough ID regs. 
+
+The end goal is to get more flexibility when migrating guests
+between different machines. We would like the upper software layer
+to be able detect how tunable the vpcu is on both source and destination
+and accordingly define a customized KVM host model that can fit
+both ends. With the legacy host passthrough model, this migration
+use case would fail.
+
+QEMU queries the host kernel to get the list of writable ID reg
+fields and expose all the writable fields as uint64 properties. Those
+are named "SYSREG_<REG>_<FIELD>". REG and FIELD names are those
+described in ARM ARM Reference manual and linux arch/arm64/tools/sysreg.
+Some awk scriptsintroduced in the series help parsing the sysreg file and
+generate some code. those scripts are used in a similar way as
+scripts/update-linux-headers.sh.  In case the ABI gets broken, it is
+still possible to manually edit the generated code. However it is
+globally expected the REG and FIELD names are stable.
+
+The list of SYSREG_ID properties can be retrieved through the qmp
+monitor using query-cpu-model-expansion [2].
+
+The first part of the series mostly consists in migrating id reg
+storage from named fields in ARMISARegisters to anonymous index
+ordered storage in an IdRegMap struct array. The goal is to have
+a generic way to store all id registers, also compatible with the
+way we retrieve their writable capability at kernel level through
+the KVM_ARM_GET_REG_WRITABLE_MASKS ioctl. Having named fields
+prevented us from getting this scalability/genericity. Although the
+change is invasive  it is quite straightforward and should be easy
+to be reviewed.
+
+Then the bulk of the job is to retrieve the writable ID fields and
+match them against a "human readable" description of those fields.
+We use awk scripts, derived from kernel arch/arm64/tools/gen-sysreg.awk
+(so all the credit to Mark Rutland) that populates a data structure
+which describes all the ID regs in sysreg and their fields. We match
+writable ID reg fields with those latter and dynamically create a
+uint64 property. 
+
+Then we need to extend the list of id regs read from the host
+so that we get a chance to let their value overriden and write them
+back into KVM .
+
+This expectation is that this custom KVM host model can prepare for
+the advent of named models. Introducing named models with reduced
+and explicitly defined features is the next step.
+
+Obviously this series is not able to cope with non writable ID regs.
+For instance the problematic of MIDR/REVIDR setting is not handled
+at the moment.
+
+
+TESTS:
+- with few IDREG fields that can be easily examined from guest
+  userspace:
+  -cpu custom,SYSREG_ID_AA64ISAR0_EL1_DP=0x0,SYSREG_ID_AA64ISAR1_EL1_DPB=0x0
+- migration between custom models
+- TCG A57 non regressions. Light testing for TCG though. Deep
+  review may detect some mistakes when migrating between named fields
+  and IDRegMap storage
+- light testing of introspection. Testing a given writable ID field
+  value with query-cpu-model-expansion is not supported yet.
+
+TODO/QUESTIONS:
+- Some idreg named fields are not yet migrated to an array storage.
+  some of them are not in isar struct either. Maybe we could have
+  handled TCG and KVM separately and it may turn out that this
+  conversion is unneeded. So as it is quite cumbersome I prefered
+  to keep it for a later stage.
+- the custom model does not come with legacy host properties
+  such as SVE, MTE, expecially those that induce some KVM
+  settings. This needs to be fixed.
+- The custom model and its exposed properties depend on the host
+  capabilities. More and more IDREG become writable meaning that
+  the custom model gains more properties over the time and it is
+  host linux dependent. At the moment there is no versioning in
+  place. By default the custom model is a host passthrough model
+  (besides the legacy functions). So if the end-user tries to set
+  a field that is not writable from a kernel pov, it will fail.
+  Nevertheless a versionned custom model could constrain the props
+  exposed, independently on the host linux capabilities.
+- the QEMU layer does not take care of IDREG field value consistency.
+  The kernel neither. I imagine this could be the role of the upper
+  layer to implement a vcpu profile that makes sure settings are
+  consistent. Here we come to "named" models. What should they look
+  like on ARM?
+- Implementation details:
+  -  it seems there are a lot of duplications in
+  the code. ID regs are described in different manners, with different
+  data structs, for TCG, now for KVM.
+  - The IdRegMap->regs is sparsely populated. Maybe a better data
+  struct could be used, although this is the one chosen for the kernel
+  uapi.
+
+References:
+
+[1] [PATCH v12 00/11] Support writable CPU ID registers from userspace
+https://lore.kernel.org/all/20230609190054.1542113-1-oliver.upton@linux.dev/
+
+[2]
+qemu-system-aarch64 -qmp unix:/home/augere/TEST/QEMU/qmp-sock,server,nowait -M virt --enable-kvm -cpu custom
+scripts/qmp/qmp-shell /home/augere/TEST/QEMU/qmp-sock
+Welcome to the QMP low-level shell!
+Connected to QEMU 9.0.50
+(QEMU) query-cpu-model-expansion type=full model={"name":"custom"}
+
+[3]
+KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES
+KVM_ARM_GET_REG_WRITABLE_MASKS
+Documentation/virt/kvm/api.rst
+
+[4] linux "sysreg" file
+linux/arch/arm64/tools/sysreg and gen-sysreg.awk
+./tools/include/generated/asm/sysreg-defs.h
+
+
+Cornelia Huck (3):
+  kvm: kvm_get_writable_id_regs
+  arm-qmp-cmds: introspection for ID register props
+  arm/cpu-features: document ID reg properties
+
+Eric Auger (17):
+  arm/cpu: Add sysreg definitions in cpu-sysregs.h
+  arm/cpu: Store aa64isar0 into the idregs arrays
+  arm/cpu: Store aa64isar1/2 into the idregs array
+  arm/cpu: Store aa64drf0/1 into the idregs array
+  arm/cpu: Store aa64mmfr0-3 into the idregs array
+  arm/cpu: Store aa64drf0/1 into the idregs array
+  arm/cpu: Store aa64smfr0 into the idregs array
+  arm/cpu: Store id_isar0-7 into the idregs array
+  arm/cpu: Store id_mfr0/1 into the idregs array
+  arm/cpu: Store id_dfr0/1 into the idregs array
+  arm/cpu: Store id_mmfr0-5 into the idregs array
+  arm/cpu: Add infra to handle generated ID register definitions
+  arm/cpu: Add sysreg generation scripts
+  arm/cpu: Add generated files
+  arm/kvm: Allow reading all the writable ID registers
+  arm/kvm: write back modified ID regs to KVM
+  arm/cpu: more customization for the kvm host cpu model
+
+ docs/system/arm/cpu-features.rst      |  47 +-
+ hw/intc/armv7m_nvic.c                 |  27 +-
+ scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++
+ scripts/gen-cpu-sysregs-header.awk    |  47 ++
+ scripts/update-aarch64-sysreg-code.sh |  27 +
+ target/arm/arm-qmp-cmds.c             |  19 +
+ target/arm/cpu-custom.h               |  58 +++
+ target/arm/cpu-features.h             | 311 ++++++------
+ target/arm/cpu-sysreg-properties.c    | 682 ++++++++++++++++++++++++++
+ target/arm/cpu-sysregs.h              | 152 ++++++
+ target/arm/cpu.c                      | 123 ++---
+ target/arm/cpu.h                      | 120 +++--
+ target/arm/cpu64.c                    | 260 +++++++---
+ target/arm/helper.c                   |  68 +--
+ target/arm/internals.h                |   6 +-
+ target/arm/kvm.c                      | 253 +++++++---
+ target/arm/kvm_arm.h                  |  16 +-
+ target/arm/meson.build                |   1 +
+ target/arm/ptw.c                      |   6 +-
+ target/arm/tcg/cpu-v7m.c              | 174 +++----
+ target/arm/tcg/cpu32.c                | 320 ++++++------
+ target/arm/tcg/cpu64.c                | 460 ++++++++---------
+ target/arm/trace-events               |   8 +
+ 23 files changed, 2594 insertions(+), 916 deletions(-)
+ create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+ create mode 100755 scripts/gen-cpu-sysregs-header.awk
+ create mode 100755 scripts/update-aarch64-sysreg-code.sh
+ create mode 100644 target/arm/cpu-custom.h
+ create mode 100644 target/arm/cpu-sysreg-properties.c
+ create mode 100644 target/arm/cpu-sysregs.h
+
+-- 
+2.47.0
 
