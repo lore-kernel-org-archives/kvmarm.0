@@ -1,147 +1,105 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F774191F9B
-	for <kvmarm@lists.linux.dev>; Thu,  5 Dec 2024 23:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425802F32
+	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 00:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733441505; cv=none; b=qApcSaux3BkMrUe+YrOpSuDZt3FOBEo0u7ErogzyHAQqisRFzTj6yqhG4ysL8bMXWQcv4S3QSklbZ20lKWK+y+F4Yzh7IZAZJnVeMUapE7/NdziWQHH4ibUqbQ7dBD+CY1PwoGAnBkJi7cPuhKns3OCoxxQI/BRTJlzBi4gIgQw=
+	t=1733445960; cv=none; b=BAd3hVy8gE2+lu7DQ3b6N5U/5eb3JS8exXes7SyooS09pemg9i5ivPctSu+GRfiLqZ4W527B4u9wMBtawN2y22kvaTuqFhATo6KwlavCwE+rRa78G0Hi5anEgfHpuNehJQk9PssNWrjZ/DqpssA3mdHjQBbAPkwKLLTSuEtLoC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733441505; c=relaxed/simple;
-	bh=/ihX0lCXBJfFCvsOFHIJu6cysZ6Vq0x4cO5iS9Q7qBY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mIs9Bv9a4DiQ2xSYq4gacFZlgKfq83XKHfAhn/x9kumg5k4axVvMt/T9gB2mLoIdqpIb8XKydaCnfuwePM5kHpH+e6YdTXbkfizS+vuxPZg3LwEgLui2RH85y++E81Uj8wLMAvvxYPn0x54B7yh6q5+RImh+1WgL38lmH1L+8rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VOIhuJfC; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1733445960; c=relaxed/simple;
+	bh=0RGUP8aR1u8PiGNTSUiShD+hyc50bnVjQxicQOqIotY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CnNw7sG3jyJzC3iCnAddypgW+LohQZ/DNk6bWE14xXvNo7yqFK/7EqsqrZ6KD1dONUO2x1NQBpf63NRYuE+7EIRAuFvqjVpWOR1l2uqJHVPEqcPT1EWaTSPIGD9crJEmYmDRVI4gotHkuIBwhUbjryH7fWCV+z30vvnQ7nPt6gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dxA2HNTa; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VOIhuJfC"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6efe5c1dea4so1004127b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 05 Dec 2024 15:31:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733441501; x=1734046301; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T0IMN5OU4hbVrS5t00San57aLCq8tVf/YYU7UNV9XtU=;
-        b=VOIhuJfC3RBceGD0bR6Lf/xDuQmNA84+d6dBu/GqcqEXFS6e4n7axumxNHJ8y9oB3/
-         tpenvxh0NvePpziuOItw0GxM+PVItK7xmDCDfjQTZ2vMlvT+2U3sPxIOkqR/XH3Qmmby
-         svUS8IiuEFXa+IWgOgIbd5PV8kaT6VcPKVpRzwJxJJvMgu0ceq//dR/r377F72VB7SrK
-         8iFsDJCaV/LTEYJRmxSdeCzJIvcnmiShtsbYlyF1HijY1khQn4cyrd0RhHbP/njOaS2Q
-         CUEBNIgeKmV1wJohDBwhhRw8iRG51uxFJ4z11PzwO4G6iDHXiTYofS6Wqlu8wZmjImZI
-         2YfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733441501; x=1734046301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T0IMN5OU4hbVrS5t00San57aLCq8tVf/YYU7UNV9XtU=;
-        b=whfowoRk65TsObLh21xrSx2Dq4ixOGYlxjePfBn0qz7HODB7+2iNaiMYo+9RMsabc+
-         ayz62HVKee+EKWw6N7ywwxEQATFhS7Bvul8tBxL0t3oNTsq1DsyBlueexcJMnbrmCwkP
-         SGZumRCvLu7dLO/rmlJBuTbzwTwP666Jhm5V6CBH7/0vFt2X6F8KOCp8tx+XMWLYW8U/
-         FH0QomG6FW1EpkxbOuYhtSbHXH50y9AhpMg0NjbPKJrV+DTGjpSQsWXNdW3MewTJcZLO
-         QYusSjjcSo7jurolgGY9167ORMfu3N856ZnLWJ+hERtA0W2KS6dx8pRDr82AJnNRECXG
-         KRig==
-X-Forwarded-Encrypted: i=1; AJvYcCXjQlt+MK8dQqBOrBmtmT4DzyUBLWR/ZKgBDnR0B1o/U6TCd+A6mVSWUFUhawOR7m5um/8X08A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyG8961/cp8sImNMVZV/WXHuH396pdIeQWBG4rXttzn36mhE2DO
-	hwjvPKztgt7qQepDy9/mB2VWEvyY817ETyLZkurF0lO62pWqyFP7vqEaff9MqJVIWIHRmxraiOe
-	18zDC+LSn93nzGTZNxdFSzJHVZERO/lmU68py
-X-Gm-Gg: ASbGnculolWFrjWc8Mzfhp4Qd/tPVmJbfRpP3ZQUKSWKdEaW/J3c5TJwEtzucDg7Gd5
-	W3pouiyOfFtKfKqHMW/s0VUH/4sTb7KHfebi/j2etKAGb+97XwMJ+n3aFFotq
-X-Google-Smtp-Source: AGHT+IGmoqWrGrMqKXzXbSlaDtMUJEUS1r8dSNypZARIHLTYBVYvB4FriHIdmOjPWn9wrKQu/NTZU5U476BPS24s0cI=
-X-Received: by 2002:a05:690c:6083:b0:6ee:6c7d:4888 with SMTP id
- 00721157ae682-6efe3c6049bmr11833187b3.22.1733441501392; Thu, 05 Dec 2024
- 15:31:41 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dxA2HNTa"
+Date: Thu, 5 Dec 2024 16:45:45 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1733445956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N5nG2prdL1skIINqaX1bovIzolBU3gInNcwFgxO/rw0=;
+	b=dxA2HNTaXIewdfp4tSj8/enaHs9W6w1oqZ9zhUaPD0pq2L6Zt4apsXKgnU3vsW+EkIvvdd
+	QLfsh+b4yQewYZzepTteXQnOvUg8uOCIolm/2gpdPxVlqK4G2Si6meatvyPBj6Zp2FodFX
+	j92vIX2Ujdc82NL3ZWqMpqXGhDFoa2o=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+	David Matlack <dmatlack@google.com>, Wei W <wei.w.wang@intel.com>,
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
+Message-ID: <Z1JJOfnuKQ9LCHq-@linux.dev>
+References: <20241204191349.1730936-1-jthoughton@google.com>
+ <20241204191349.1730936-7-jthoughton@google.com>
+ <Z1Dgr_TnaFQT04Pi@linux.dev>
+ <CADrL8HWC7HhYmEBWa+5KeWmyD+iT1zPBJUAUtNyrhH7ZpLXJNQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241204191349.1730936-1-jthoughton@google.com>
- <20241204191349.1730936-7-jthoughton@google.com> <Z1Dgr_TnaFQT04Pi@linux.dev>
-In-Reply-To: <Z1Dgr_TnaFQT04Pi@linux.dev>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 5 Dec 2024 15:31:05 -0800
-Message-ID: <CADrL8HWC7HhYmEBWa+5KeWmyD+iT1zPBJUAUtNyrhH7ZpLXJNQ@mail.gmail.com>
-Subject: Re: [PATCH v1 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
-	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
-	David Matlack <dmatlack@google.com>, Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADrL8HWC7HhYmEBWa+5KeWmyD+iT1zPBJUAUtNyrhH7ZpLXJNQ@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Dec 4, 2024 at 3:07=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> Hi James,
-
-Hi Oliver!
-
->
-> On Wed, Dec 04, 2024 at 07:13:41PM +0000, James Houghton wrote:
-> > Adhering to the requirements of KVM Userfault:
+On Thu, Dec 05, 2024 at 03:31:05PM -0800, James Houghton wrote:
+> > > @@ -2062,6 +2069,20 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+> > >                                  enum kvm_mr_change change)
+> > >  {
+> > >       bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
+> > > +     u32 changed_flags = (new ? new->flags : 0) ^ (old ? old->flags : 0);
+> > > +
+> > > +     /*
+> > > +      * If KVM_MEM_USERFAULT changed, drop all the stage-2 mappings so that
+> > > +      * we can (1) respect userfault-ness or (2) create block mappings.
+> > > +      */
+> > > +     if ((changed_flags & KVM_MEM_USERFAULT) && change == KVM_MR_FLAGS_ONLY)
+> > > +             kvm_arch_flush_shadow_memslot(kvm, old);
 > >
-> > 1. When it is toggled (either on or off), zap the second stage with
-> >    kvm_arch_flush_shadow_memslot(). This is to (1) respect
-> >    userfault-ness and (2) to reconstruct block mappings.
-> > 2. While KVM_MEM_USERFAULT is enabled, restrict new second-stage mappin=
-gs
-> >    to be PAGE_SIZE, just like when dirty logging is enabled.
+> > I'd strongly prefer that we make (2) a userspace problem and don't
+> > eagerly invalidate stage-2 mappings on the USERFAULT -> !USERFAULT
+> > change.
 > >
-> > Signed-off-by: James Houghton <jthoughton@google.com>
-> > ---
-> >   I'm not 100% sure if kvm_arch_flush_shadow_memslot() is correct in
-> >   this case (like if the host does not have S2FWB).
->
-> Invalidating the stage-2 entries is of course necessary for correctness
-> on the !USERFAULT -> USERFAULT transition, and the MMU will do the right
-> thing regardless of whether hardware implements FEAT_S2FWB.
->
-> What I think you may be getting at is the *performance* implications are
-> quite worrying without FEAT_S2FWB due to the storm of CMOs, and I'd
-> definitely agree with that.
+> > Having implied user-visible behaviors on ioctls is never good, and for
+> > systems without FEAT_S2FWB you might be better off avoiding the unmap in
+> > the first place.
+> >
+> > So, if userspace decides there's a benefit to invalidating the stage-2
+> > MMU, it can just delete + recreate the memslot.
+> 
+> Ok I think that's reasonable. So for USERFAULT -> !USERFAULT, I'll
+> just follow the precedent set by dirty logging. For x86 today, we
+> collapse the mappings, and for arm64 we do not.
+> 
+> Is arm64 ever going to support collapsing back to huge mappings after
+> dirty logging is disabled?
 
-Thanks for clarifying that for me.
+Patches on list is always a good place to start :)
 
-> > @@ -2062,6 +2069,20 @@ void kvm_arch_commit_memory_region(struct kvm *k=
-vm,
-> >                                  enum kvm_mr_change change)
-> >  {
-> >       bool log_dirty_pages =3D new && new->flags & KVM_MEM_LOG_DIRTY_PA=
-GES;
-> > +     u32 changed_flags =3D (new ? new->flags : 0) ^ (old ? old->flags =
-: 0);
-> > +
-> > +     /*
-> > +      * If KVM_MEM_USERFAULT changed, drop all the stage-2 mappings so=
- that
-> > +      * we can (1) respect userfault-ness or (2) create block mappings=
-.
-> > +      */
-> > +     if ((changed_flags & KVM_MEM_USERFAULT) && change =3D=3D KVM_MR_F=
-LAGS_ONLY)
-> > +             kvm_arch_flush_shadow_memslot(kvm, old);
->
-> I'd strongly prefer that we make (2) a userspace problem and don't
-> eagerly invalidate stage-2 mappings on the USERFAULT -> !USERFAULT
-> change.
->
-> Having implied user-visible behaviors on ioctls is never good, and for
-> systems without FEAT_S2FWB you might be better off avoiding the unmap in
-> the first place.
->
-> So, if userspace decides there's a benefit to invalidating the stage-2
-> MMU, it can just delete + recreate the memslot.
+What I'd expect on FEAT_S2FWB hardware is that invalidating the whole
+stage-2 and faulting back in block entries would give the best
+experience.
 
-Ok I think that's reasonable. So for USERFAULT -> !USERFAULT, I'll
-just follow the precedent set by dirty logging. For x86 today, we
-collapse the mappings, and for arm64 we do not.
+Only in the case of !FWB would a literal table -> block collapse be
+beneficial, as the MMU could potentially elide CMOs when remapping. But
+that assumes you're starting with a fully-mapped table and there are no
+holes that are "out of sync" with the guest.
 
-Is arm64 ever going to support collapsing back to huge mappings after
-dirty logging is disabled?
+-- 
+Thanks,
+Oliver
