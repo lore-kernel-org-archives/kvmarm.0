@@ -1,112 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f201.google.com (mail-vk1-f201.google.com [209.85.221.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A932194120
-	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 18:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938FD1FBEAF
+	for <kvmarm@lists.linux.dev>; Fri,  6 Dec 2024 22:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733509364; cv=none; b=gRC7AO3lli02Sj679FS+TfvGgAWSW59UG7y3+OwkeZe6xrYpCNplGBz0DV6ofZj73QVArxYLrEyWRxP4qX/t5YoC2FnK1PF4h+Bd5/M6qj8LDy0qKZG3nlP9ATe3iEyk1dCfr+DruKrU16AA+us9GN6ifblpzT7vy/bQ7QeXmXo=
+	t=1733525222; cv=none; b=Kcbu0o+Uubl0RLr2RFv/PDhiRsowT4TjVrlGK55Jh8fr+OOYsLYAWYywBX6jduD7ZGPQBepHvcmHPrPXpzlkC68stWMXmib+/wkW19SC0iHc1GjeXBRjfJrVBHF46BvwuBSHDKIHpdupHVgYMQEOLYIPMdLLWyneZ8C58lxOCdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733509364; c=relaxed/simple;
-	bh=cbyuqAguj2f/Nz/gXkuZ4/3ryUl/+UVbIDgnVfdtEmM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ADlQsKfrjT6I1hsnYmzgjV1oyXPUxP10UxlPj91pHg6lWSA3iZktpJMN5kVJtn92asGgEvchyhc1CnBqlzPFJ47fNFgOkImW6RIiNtVB9tyzgkWWmFV3Oceg9kN+Vx0LOS/g+eY5+nVer6d9yQDjj6lvZqYLvf7ofuSYcKnDw0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLZF+Lo4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733525222; c=relaxed/simple;
+	bh=iITAE1Ks58yzjB7pv45kbC7F7m3AmF+RtaX7q902Uf8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jbVBz++S2S67ADxTzfxXCoHhTPUvLxG3dMArDp5CeCeu9qJc1lPtxbXpXa6bRQJWM18HbNz3hdBBQ2klZD0B4RORhluLCPYYU/ZlWfUsgtk0lYngzvGEfubCyg7GYG3JdZ9qh/98po4vXPoLc6EvQfjO0zjteSCpF3LjymlCvE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QnjpZpni; arc=none smtp.client-ip=209.85.221.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLZF+Lo4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5608C4CED1;
-	Fri,  6 Dec 2024 18:22:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733509363;
-	bh=cbyuqAguj2f/Nz/gXkuZ4/3ryUl/+UVbIDgnVfdtEmM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GLZF+Lo4Qf/a94yrYD1mrrCRhsnbE+dQnIhMYwPN7QXZoe2RtWmCoqQiORjfC7hC6
-	 34wwFdgSiFreTPEXtGZ8TBE5oN1X54cFLQN0mY62lPjD8/Np/Kudbltw5PXYDGOQ87
-	 3dMKpo2o1juIf09PKQyo+AurbqkLkjJtXcW0ihTLZfrrm8q/EELDGSLGYXv9hx0lOh
-	 EcTx6/nDaSLjSMqY0V8OV5jFctiAOZc6vcWKO6XRbjTe0rLhGaMqXj1hjwy3vgstz0
-	 eYkZCLnoWVMR9DFPgKolAN8INcaTEnRvJNQ8LhmCDWreiWFr7+eu9niuiDmwhkcGJE
-	 5WW7gMpDxosCQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tJcyP-001FUX-DV;
-	Fri, 06 Dec 2024 18:22:41 +0000
-Date: Fri, 06 Dec 2024 18:22:40 +0000
-Message-ID: <868qssu0wf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	james.clark@linaro.org,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	kristina.martsenko@arm.com
-Subject: Re: [PATCH v4 06/14] KVM: arm64: Set protected VM traps based on its view of feature registers
-In-Reply-To: <70992791-af72-43ed-88cc-1bb5a8acaf9a@sirena.org.uk>
-References: <20241202154742.3611749-1-tabba@google.com>
-	<20241202154742.3611749-7-tabba@google.com>
-	<Z1M1DYbvuqAEU5c-@google.com>
-	<70992791-af72-43ed-88cc-1bb5a8acaf9a@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QnjpZpni"
+Received: by mail-vk1-f201.google.com with SMTP id 71dfb90a1353d-51610d5f436so171491e0c.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Dec 2024 14:47:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733525219; x=1734130019; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8xOebWP/M8X2cP/fdZF9vXfDo8byCjFk2C5X5FbCC10=;
+        b=QnjpZpnitJxAEwPD17aWWQecGZRnKwXEkOkFvjSapL4z8NbNdscXYxaQerkg0A6AHB
+         +aL1YzxEsmMuHV5a9u1vv2jXxqjfPW0IMaNQQmPjReRKbULhLUp6LIqK1YpEe4l67ZPC
+         D52SpEKdEF9aYb6hMtJ+wmTfESA83OIUVkS9ponmN0q4xo+8c44LokocKKzdRd507Lv0
+         i6zRDSiWiOaE2JFOkthTpGl4LFd9C0Uy2MNxhw5L/FG4GJhuEiiYa/1jkWyJrYMaxTuD
+         ouxcpKD3ueJEf5syrRkHqMgKvBNJYGr1fS6jlHKH63pv/zgpY0bxDt5ffv9nBS10abUJ
+         bAug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733525219; x=1734130019;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8xOebWP/M8X2cP/fdZF9vXfDo8byCjFk2C5X5FbCC10=;
+        b=uMHS7Yi4XPg6MWaGMIFUFo+cGSalv3fSr5K1wrqAX7l9Y9ki3h0bU39zf+69m5rZMe
+         aidm7H4MrJjAa4nupkIlHRi17FK0/KdJAMo76kH0IGlmIEIuF3MJBBFWFPcRE9YHvL7K
+         agKo7Zrdw4cicFWiE/viZv9HtwrV8r87KYXrQzbm76fBSvO7e3coJI5LMrirkWza7+Jh
+         NhQHA68pacVAUHqakl7LmSB+GvTIaqBnWSud6VQesZiIpBtwQHRfFbQ8Sh6KJKjE/MGw
+         w8NE9Oewl9ziL0i2ZNBQOvZ+S/PQjoYId0KGuxKmn+tRqWg/X8uATvOaNBC6Y4G6RcT0
+         DcfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWxFfXvNMWf1bIuQa0138CJJ3mvo2CqejzBCa/kHSxxvYmeklpQC+fXJfmb87+NwRkzOyLFT80=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy6s9OOZo5t4UAwt7EPoF9RRgllMmN2yakdslDKrDsSEi3xMSRZ
+	tfs1HCwsl6QZUjqgl7OtjKiGxWeHIZ5oDqO8GsKOZLhgJn10/XXhlc7AwrAiuq2KOjCRraLsxX5
+	hqhhgQdf4G2EzYiGipg==
+X-Google-Smtp-Source: AGHT+IFWYRH0ZDfG1SCEobsGl/BiWTfQRI31egCmHBP1UIFLmQh8g16wMoeT9PBzM1Kkhhw9DuLZq6uIHa5tY1W0
+X-Received: from vkbes1.prod.google.com ([2002:a05:6122:1b81:b0:50d:806e:dfd0])
+ (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6122:1da1:b0:50b:e9a5:cd7b with SMTP id 71dfb90a1353d-515fcae70a3mr5700023e0c.9.1733525219486;
+ Fri, 06 Dec 2024 14:46:59 -0800 (PST)
+Date: Fri,  6 Dec 2024 22:46:58 +0000
+In-Reply-To: <202412052133.pTg3UAQm-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, qperret@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.clark@linaro.org, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, kristina.martsenko@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <202412052133.pTg3UAQm-lkp@intel.com>
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241206224658.2833655-1-jthoughton@google.com>
+Subject: Re: [PATCH v1 01/13] KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
+From: James Houghton <jthoughton@google.com>
+To: lkp@intel.com
+Cc: amoorthy@google.com, corbet@lwn.net, dmatlack@google.com, 
+	jthoughton@google.com, kalyazin@amazon.com, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org, 
+	oe-kbuild-all@lists.linux.dev, oliver.upton@linux.dev, pbonzini@redhat.com, 
+	peterx@redhat.com, pgonda@google.com, seanjc@google.com, wei.w.wang@intel.com, 
+	yan.y.zhao@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 06 Dec 2024 17:43:42 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Fri, Dec 06, 2024 at 05:31:57PM +0000, Quentin Perret wrote:
-> > On Monday 02 Dec 2024 at 15:47:33 (+0000), Fuad Tabba wrote:
-> 
-> > > -	if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_RAS), id_aa64pfr0) <
-> > > -	    ID_AA64PFR0_EL1_RAS_V1P1) {
-> > > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
-> 
-> > I'm admittedly getting a bit lost in the kvm_has_feat() macro maze, but
-> > should this be:
-> 
-> > 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
-> 
-> > to replicate the existing check?
-> 
-> kvm_has_feat() checks for a value <= the supplied constant while the
+>    arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function '__kvm_set_memory_region':
+> >> arch/x86/kvm/../../../virt/kvm/kvm_main.c:2049:41: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+>     2049 |                 new->userfault_bitmap = (unsigned long *)mem->userfault_bitmap;
+>          |                                         ^
 
-Not quite:
+I realize that, not only have I done this cast slightly wrong, I'm
+missing a few checks on userfault_bitmap that I should have. Applying
+this diff, or at least something like it, to fix it:
 
-#define kvm_has_feat(kvm, id, fld, limit)				\
-	kvm_cmp_feat(kvm, id, fld, >=, limit)
-
-> existing check is just < and the values for the field are:
-> 
-> UnsignedEnum	31:28	RAS
-> 	0b0000	NI
-> 	0b0001	IMP
-> 	0b0010	V1P1
-> EndEnum
-> 
-> so they're both checking for the same thing.
-
-Evidently not. The original code is checking for RASv1p1, while the
-change turns that into a check for the original RAS spec.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b552cdef2850..30f09141df64 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1977,6 +1977,12 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		return -EINVAL;
+ 	if ((mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
+ 		return -EINVAL;
++	if (mem->flags & KVM_MEM_USERFAULT &&
++	    ((mem->userfault_bitmap != untagged_addr(mem->userfault_bitmap)) ||
++	     !access_ok((void __user *)(unsigned long)mem->userfault_bitmap,
++			DIV_ROUND_UP(mem->memory_size >> PAGE_SHIFT, BITS_PER_LONG)
++			 * sizeof(long))))
++		return -EINVAL;
+ 
+ 	slots = __kvm_memslots(kvm, as_id);
+ 
+@@ -2053,7 +2059,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 			goto out;
+ 	}
+ 	if (mem->flags & KVM_MEM_USERFAULT)
+-		new->userfault_bitmap = (unsigned long *)mem->userfault_bitmap;
++		new->userfault_bitmap =
++		  (unsigned long __user *)(unsigned long)mem->userfault_bitmap;
+ 
+ 	r = kvm_set_memslot(kvm, old, new, change);
+ 	if (r)
