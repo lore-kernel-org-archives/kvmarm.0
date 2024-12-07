@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1C11DFE1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931AC14A08E
 	for <kvmarm@lists.linux.dev>; Sat,  7 Dec 2024 19:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733598488; cv=none; b=LHRyHHQUNes1R9zOEvuC5Z0szHiLHwbsmimgpNokll9AonMv9khUqeIVg6Xh2UHzQ98piAPjdxw+l49wOCmfr94RJD/EshUGnOW3msHyIzSqDrxI8TMW9HNzlBXH4NcrOr1fugGyiUtS5Vh5ZTPwJviJ8AoMJEKmTX/LHb5+mtw=
+	t=1733598488; cv=none; b=gRFOn1ROMqVfH3CLRWXtjvjkR0bFYUxrq5q3HURDAsWOyqjU2BpoWC6Xu+qH5CnF99/EnYUSwOOdnajA5DSB7q4QghFe89NACH9aDzs/jtaoIKd+gJeHWhoHXz3i5spgDkeSImKYUaWOJ22+VWxWSIzdVhkKCLE0BKc5YHnPNd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733598488; c=relaxed/simple;
-	bh=0j8vGZ36dxNbKwWwiSrTlZRlNfkcvdeaJx1lNvFy98k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GHvzbVRrl0Vg2AMDQ+E+uMGF2p+JRdsl1mx0yWcKug3LYgRXMJUzGAvpgyqcb/Pvog3srbudT2imb5P7/LAP6j3Dpdq16+6DnSSZdm0ZizYt3x6AACG7NgQBVPt2NKy7HyI+ZKaIGL23q2z5DQ8iuh46dqz+EGHqluwK0ith63c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cj1tQVA/; arc=none smtp.client-ip=10.30.226.201
+	bh=ieCSJY6ovtV+5BP0KLjpV97miFo9w2jKSQmZAKncuJk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dY14H/A/WQQaxZbZhSTgC3bkPO1JDONNUavlwlr0ntMFFIZobAeE1voz/Z3pz1Z+hmPe34ygfS12E443f/F6fqwuhL5NWQpq9KCdY3SR85I8tR7tfYCABoTM7tgx9MTiLclqo4yY66BsUtq0mMjwRy6jlfSSr13R4Ua5Ao6c6nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDstrgRc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cj1tQVA/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39180C4CECD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDstrgRc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E789C4CEE0;
 	Sat,  7 Dec 2024 19:08:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1733598488;
-	bh=0j8vGZ36dxNbKwWwiSrTlZRlNfkcvdeaJx1lNvFy98k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cj1tQVA/BPJZfPrBqbmzM2KpgqILpeBNeIWW9kHkz9yumzqeIA4LwgO+VSZ2Z/pMC
-	 loNuKDimZlXvHLfsEhKMu+8s9FAqhDuejcKVDJHhrkL9YFIdEEiY9qJ+AXIKgca6zA
-	 Duyg0h8BQIlvyuQeZV9FNvLqEu9vGwjHwtMZIziTO/HdvCnK/Yq25Ol5qWTdgmoQOX
-	 fcvX7g0VXwUiwZ8UJcSpYiK1OLKSkEhbdh8b/u9PaE2J0fxU4Ez4rJh/aoj498vDUD
-	 b9ihZ1PKq9lZz/CIHh2TJt2ajTNfPA+xDdEVHHCrw9lBEfEGp4sqTH2mtlZ7NmkMb/
-	 h5XzS212VWUQw==
+	bh=ieCSJY6ovtV+5BP0KLjpV97miFo9w2jKSQmZAKncuJk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mDstrgRc3DVnIPMquH9SUR5DmN++/RW9bLlH+EXnQNm1tPZjG/GQmwRUuD92yMN5Y
+	 /sZT5Qeu6XmbZ7Ur/xO29B5aGMrog2esOHQMsd/2dP/G6SxIO+E6Kw0cMuCjq7GoGm
+	 H2uV0V/DDrXYM0F5h3jTTgBUx4/2ydMw7befQBC16Lsjh+M6ta0VcvmlG/dgkP7g1o
+	 QZkuVHrncM9M4kEHlycnZWII0OW34n/jIJHAfTG6Y2dLHSkR1K5QtLpCbrtrHc3cv7
+	 nGGeGH8Wf8FFR0PFDwC2xGzTrpmHbe2SiivkHx/hL4INnUAAD5OCBuJpXNw6/lBPlK
+	 uZkMDzqLlbQRg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tK09t-001TOc-Rb;
-	Sat, 07 Dec 2024 19:08:05 +0000
+	id 1tK09u-001TOc-3X;
+	Sat, 07 Dec 2024 19:08:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -39,10 +40,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 0/4] arm64/sysreg: Get rid of *_ELx as fields for EL12 accessors
-Date: Sat,  7 Dec 2024 19:07:36 +0000
-Message-Id: <20241207190740.2607673-1-maz@kernel.org>
+Subject: [PATCH 1/4] arm64/sysreg: Allow a 'Mapping' descriptor for system registers
+Date: Sat,  7 Dec 2024 19:07:37 +0000
+Message-Id: <20241207190740.2607673-2-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20241207190740.2607673-1-maz@kernel.org>
+References: <20241207190740.2607673-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,43 +58,53 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We keep adding *_ELx definition to the sysreg as an abstraction for
-the mapping between an EL1 register and its EL12 counterpart.
+*EL02 and *_EL12 system registers are actually only accessors for
+EL0 and EL1 registers accessed from EL2 when HCR_EL2.E2H==1. They
+do not have fields of their own.
 
-But nothing in the architecture has these ELx suffixes to describe
-such abstraction. When they are mentioned, it always is as a shortcut
-for EL1, EL2 or EL3, and never for EL12. That's because *_EL12 are
-*not* registers. They are accessors, nothing else. So what we
-currently have is not only bizarre, it is actively wrong.
+To that effect, introduce a 'Mapping' entry, describing which
+system register an _EL12 register maps to.
 
-This small series aims are injecting some sanity, by explicitly
-describing EL12 registers as mappings to EL1 registers, and keeping
-the ELx description as fields for the EL{1,2} registers.
+Implementation wise, this is handled the same was as Fields,
+which ls only a comment.
 
-Marc Zyngier (4):
-  arm64/sysreg: Allow a 'Mapping' descriptor for system registers
-  arm64/sysreg: Get rid of the TCR2_EL1x SysregFields
-  arm64/sysreg: Convert *_EL12 accessors to Mapping
-  arm64/sysreg: Get rid of CPACR_ELx SysregFields
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/gen-sysreg.awk | 2 +-
+ arch/arm64/tools/sysreg         | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
- arch/arm64/include/asm/el2_setup.h      |  6 ++--
- arch/arm64/include/asm/kvm_arm.h        |  2 --
- arch/arm64/include/asm/kvm_emulate.h    | 40 ++++++++++++-------------
- arch/arm64/include/asm/kvm_nested.h     |  8 ++---
- arch/arm64/kernel/cpufeature.c          |  4 +--
- arch/arm64/kvm/at.c                     |  6 ++--
- arch/arm64/kvm/emulate-nested.c         |  2 +-
- arch/arm64/kvm/fpsimd.c                 |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  4 +--
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c        |  6 ++--
- arch/arm64/kvm/hyp/vhe/switch.c         | 16 +++++-----
- arch/arm64/mm/proc.S                    |  5 ++--
- arch/arm64/tools/gen-sysreg.awk         |  2 +-
- arch/arm64/tools/sysreg                 | 39 ++++++++++++------------
- 16 files changed, 73 insertions(+), 75 deletions(-)
-
+diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
+index d1254a056114e..1a2afc9fdd42e 100755
+--- a/arch/arm64/tools/gen-sysreg.awk
++++ b/arch/arm64/tools/gen-sysreg.awk
+@@ -206,7 +206,7 @@ END {
+ 
+ # Currently this is effectivey a comment, in future we may want to emit
+ # defines for the fields.
+-/^Fields/ && block_current() == "Sysreg" {
++(/^Fields/ || /^Mapping/) && block_current() == "Sysreg" {
+ 	expect_fields(2)
+ 
+ 	if (next_bit != 63)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index b081b54d6d227..b6846c601df6c 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -38,6 +38,13 @@
+ # Fields	<fieldsname>
+ # EndSysreg
+ 
++# For register names indicating a cross-EL access (*_EL12, *EL02),
++# a Mapping entry describes the register it actually accesses:
++
++# Sysreg 	<name_EL12>	<op0> 	<op1>	<crn>	<crm>	<op2>
++# Mapping	<name_EL1>
++# EndSysreg
++
+ # For ID registers we adopt a few conventions for translating the
+ # language in the ARM into defines:
+ #
 -- 
 2.39.2
 
