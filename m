@@ -1,170 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6DE14F9FA
-	for <kvmarm@lists.linux.dev>; Sat,  7 Dec 2024 19:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF511B7F4
+	for <kvmarm@lists.linux.dev>; Sun,  8 Dec 2024 08:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733598489; cv=none; b=Wx5S9t6w+phn9IS+BZRjfsE1BjAHe7/8S8WSsmAU2vdN8poPNYHm76XWXB+jAy5M8gqwRmrJF9TZEh4CoHScY25BSNVKPUVX6kDQhnHfXj/KYbqdP7UlWAg0bxcEopv/QT6ZlE4Vl6B9om0jL0q2siK0q3dE9UgTG2b2+tyOYz0=
+	t=1733647790; cv=none; b=H3aSUC1tfsqA5agOY+bNfiJZwNE2SXP0F/Lg3BhpY9hIFHeFFXPK2/WEuu2GNp40uyob+nLZOmBJPG15BMkM63ZjhWGysgURqNJyM++SqnadSLu0owcZtOz563ZoxYMIhkhsFN7wSbgB5QOFFCr0qnwm1N98NLSeozZUdlTOy8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733598489; c=relaxed/simple;
-	bh=ZC7d56oVMqqp7u1xr2KdKB6p6gazYRFX5ireIjl4BqU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f4QbjmWwDlb78SpLxD1L5u4Nr/oQgdb7uDxN3dt0mDsomf6oo7sU5aUA94RyygB9Sbf82fWRtvQOq1wYDxfLaPptqTAu0ZTmUluRzoh+kd55or4fvbwrZAElAnVBy3gxM8Sl8sW4UGw4TlMiCPJG7NoMwgSAsXl9Z8HTCH+JDf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SENIG6j/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733647790; c=relaxed/simple;
+	bh=4qUZxOdGlWFXhXVdk62zj9QIKNrm7MsALvQdgFLmnpc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=d/GCTKKpWRGpZLlMGjvJb2g6EpnOoj4UItdXVXsHuqedt9gc3wJh5bF28MapmT26XyR9eSmWrcBSKhqBz4nwQ7ms2seEDXHfh/yrzFDzVAZibfK9CVhCchEWz96hYMW0nEOYdq2c/xdga3WxZFwR7ufEyXO6+7dbZWx2Xh4JAII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KPXY/fM1; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SENIG6j/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47F18C4CEDF;
-	Sat,  7 Dec 2024 19:08:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733598488;
-	bh=ZC7d56oVMqqp7u1xr2KdKB6p6gazYRFX5ireIjl4BqU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SENIG6j/E/tVq3RRFeq4CtqIOrVILoev4VL6CkhIahDtCehg61Hn+3vqdQqhDqNbo
-	 k2H2Yi+QE9VYFJsY06u7RoPlFBN4cGzKt5yBOChyK/tzyMwZ1pj2/65a8OMleItDgJ
-	 8ayl+VFZTsc4ijN6LY6Kkjgl8YZOjiXKKEIbBL536RgmmaKr8ehWVMPMWcfwH5ELPJ
-	 WOBhgmwTUZ4V3XYzL4IBYrGLYpBEVCl32jlhnoEKcXdTBAEdDHeFdRfEXQvPGiH1nc
-	 ORPlDgFGNmRnz00Ga+um+zFY5dvSvjKGvb7L5WTmjoUxScUFtwUpa/sqFjhwL7EYQG
-	 x5JQ5h/0zr5ZA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tK09u-001TOc-9t;
-	Sat, 07 Dec 2024 19:08:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 2/4] arm64/sysreg: Get rid of the TCR2_EL1x SysregFields
-Date: Sat,  7 Dec 2024 19:07:38 +0000
-Message-Id: <20241207190740.2607673-3-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20241207190740.2607673-1-maz@kernel.org>
-References: <20241207190740.2607673-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPXY/fM1"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7fd455ed70eso240269a12.1
+        for <kvmarm@lists.linux.dev>; Sun, 08 Dec 2024 00:49:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733647788; x=1734252588; darn=lists.linux.dev;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4qUZxOdGlWFXhXVdk62zj9QIKNrm7MsALvQdgFLmnpc=;
+        b=KPXY/fM1zKTn+Cd8Trbk5jA6ImQRE+aNFUOEXASWRla9kEycBR8jFgd7oGQjMnsS9+
+         PTaMITvGJmuCmFFcNtEnRS+GoHPIUmMlM0Obc+J6Orq1L89Eby0RJYFtEjfif22xD1fX
+         57xo5/KrAOd1TuBk9pOCR3R0VTuZtZUMeC3HnKuROk7jJUBV/iMlP3NyDaqR25vSeTTy
+         vL0IzTW3ytnczLNjOGzJBWVQSjihRFXnhOuMxF17yXDdbQHQMKrQZmw8nGQjSUB6g+P8
+         T2enq+Hh7UmK2Ktbzu70nhXUEGWsHiAfGB82FI8opZHi2Y0aRa8ucINTyHtFha1muEJk
+         WVGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733647788; x=1734252588;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4qUZxOdGlWFXhXVdk62zj9QIKNrm7MsALvQdgFLmnpc=;
+        b=o4u9xmOYCNXTDnbl1obnz4BpO5DZzq4hcp/p50PKqR/gRlTR37iJ5ibn906JU85xiY
+         N9SYH/OYH2Pb5rUWSAMV8p2r5Bqmt0vk5EYC9hWoc4w2PZDA1u0A9MlRLGlRywbvQmiw
+         mzoyz9jFhKcGrrhQ8KUFfyUp45DVuR0h4l9ueBYWTTVCD49pe4xd3h+b7yNDrJDhvvuc
+         z7fH0RChyqAoR1C+o4WqVMj1CVBUbesFtEmfvvN1esUzUh0+DkqeVknwv4xLvYSrdpAq
+         a2knElSh9GCC1AppI1FQUIG1sgM0xEkwkfMG7yiNhmPLJPpKLP2g9cNKcOi5+ugrIhT2
+         wh5g==
+X-Gm-Message-State: AOJu0Yx51qmpay9sp7V7K2P8VTm3pm134q7RVnQPSPFmXVbA/XRwpsFN
+	ZRBU84sRVvyAiSEKPpPJ+pMokaXq6SI6fPmerOrjqDyu87wSDGVaZevwiB0SEP8GjsmVM4jIusE
+	FkxxHvZUf3LdSFKNRLL7z0KSrkY1ekqn+1YXyBQ==
+X-Gm-Gg: ASbGncun4LNhSltyMoFMhup8maQo5EK+5BF8+0s28NNpG0xaiIBjlLHr8vE0JuKcM9n
+	7Or1dNk0nfEab4fmOXIn6sBfhXADppJGEYBk8
+X-Google-Smtp-Source: AGHT+IF97m54KcpoXMoRhqvT9CTM4tUjKkR9lDBTjvFv/d1Ho552kL3o24Ro+SecRgcw/6EssTlHCcNX6UmkjtKejEY=
+X-Received: by 2002:a17:903:11c8:b0:215:65f3:27f2 with SMTP id
+ d9443c01a7336-21614d1f236mr125967925ad.8.1733647787902; Sun, 08 Dec 2024
+ 00:49:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+From: =?UTF-8?B?5p2O56GV?= <shilishuoya@gmail.com>
+Date: Sun, 8 Dec 2024 16:49:37 +0800
+Message-ID: <CADTb_0OACnCHNyot1VtqoVdy-92VCaWBLtMnYdVG-31R+oPgpA@mail.gmail.com>
+Subject: to learn some kvm development knowledge
+To: kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-TCR2_ELx is a pretty bizarre construct, as it is shared between
-TCR2_EL1 and TCR2_EL12. But the latter is obviously only an
-accessor to the former.
-
-In order to make things more consistent, upgrade TCR2_EL1x to
-a full-blown sysreg definition for TCR2_EL1, and describe TCR2_EL12
-as a mapping to TCR2_EL1.
-
-This results in a couple of minor changes to the actual code.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kernel/cpufeature.c | 2 +-
- arch/arm64/kvm/at.c            | 6 +++---
- arch/arm64/mm/proc.S           | 5 +++--
- arch/arm64/tools/sysreg        | 8 ++------
- 4 files changed, 9 insertions(+), 12 deletions(-)
-
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 6ce71f444ed84..7712df48758e9 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2376,7 +2376,7 @@ static void cpu_enable_mops(const struct arm64_cpu_capabilities *__unused)
- #ifdef CONFIG_ARM64_POE
- static void cpu_enable_poe(const struct arm64_cpu_capabilities *__unused)
- {
--	sysreg_clear_set(REG_TCR2_EL1, 0, TCR2_EL1x_E0POE);
-+	sysreg_clear_set(REG_TCR2_EL1, 0, TCR2_EL1_E0POE);
- 	sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_E0POE);
- }
- #endif
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 8c5d7990e5b31..0905b8778a9bb 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -111,7 +111,7 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
- 		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
- 	case TR_EL10:
- 		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
--			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1x_PIE);
-+			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE);
- 	default:
- 		BUG();
- 	}
-@@ -140,8 +140,8 @@ static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
- 		}
- 
- 		val = __vcpu_sys_reg(vcpu, TCR2_EL1);
--		wi->poe = val & TCR2_EL1x_POE;
--		wi->e0poe = val & TCR2_EL1x_E0POE;
-+		wi->poe = val & TCR2_EL1_POE;
-+		wi->e0poe = val & TCR2_EL1_E0POE;
- 	}
- }
- 
-diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index b8edc5765441e..fb30c8804f87b 100644
---- a/arch/arm64/mm/proc.S
-+++ b/arch/arm64/mm/proc.S
-@@ -501,7 +501,7 @@ alternative_else_nop_endif
- #ifdef CONFIG_ARM64_HAFT
- 	cmp	x9, ID_AA64MMFR1_EL1_HAFDBS_HAFT
- 	b.lt	1f
--	orr	tcr2, tcr2, TCR2_EL1x_HAFT
-+	orr	tcr2, tcr2, TCR2_EL1_HAFT
- #endif /* CONFIG_ARM64_HAFT */
- 1:
- #endif	/* CONFIG_ARM64_HW_AFDBM */
-@@ -532,7 +532,8 @@ alternative_else_nop_endif
- #undef PTE_MAYBE_NG
- #undef PTE_MAYBE_SHARED
- 
--	orr	tcr2, tcr2, TCR2_EL1x_PIE
-+	orr	tcr2, tcr2, TCR2_EL1_PIE
-+	msr	REG_TCR2_EL1, x0
- 
- .Lskip_indirection:
- 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index b6846c601df6c..19d137d9c50ed 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2999,7 +2999,7 @@ Sysreg	TTBR1_EL1	3	0	2	0	1
- Fields	TTBRx_EL1
- EndSysreg
- 
--SysregFields	TCR2_EL1x
-+Sysreg	TCR2_EL1	3	0	2	0	3
- Res0	63:16
- Field	15	DisCH1
- Field	14	DisCH0
-@@ -3013,14 +3013,10 @@ Field	3	POE
- Field	2	E0POE
- Field	1	PIE
- Field	0	PnCH
--EndSysregFields
--
--Sysreg	TCR2_EL1	3	0	2	0	3
--Fields	TCR2_EL1x
- EndSysreg
- 
- Sysreg	TCR2_EL12	3	5	2	0	3
--Fields	TCR2_EL1x
-+Mapping	TCR2_EL1
- EndSysreg
- 
- Sysreg	TCR2_EL2	3	4	2	0	3
--- 
-2.39.2
-
+subscribe kvmarm@lists.linux.dev
