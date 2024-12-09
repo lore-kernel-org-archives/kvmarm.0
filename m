@@ -1,138 +1,210 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D02F5FEE6
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 08:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF334216606;
+	Mon,  9 Dec 2024 09:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733732095; cv=none; b=Y7agVxhA+rcI85UUcG8Q5TFrW7Bc7wGf+OFkHsCZykkol77xqgkXe14qvBb4DbTJ7LV+NWQBYKEJoBxZ+cht7TUHPkOKiwnsxT382uUgswZTu58Xpdua3hAjSiS30t/Acg7F9eJqFNbAdMlKWfTfsrEz29mRzikT7FTAXvg7Kyk=
+	t=1733738072; cv=none; b=sCnRhwXzyPCq0lMnl1YhYYaOKQeFEcTQkrPBuXqhzTPSG7igKkD2hUvGdhkijn0sQewDbNE112VDA6YeSQVxjOIYou4wAgjufQf8eLVR+yS3VIDxxiHJkeOTTV7iTsujA7yzt+3a+Ca7uWf/e/OyE4U3fiulwJSbVwKF4mr7bdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733732095; c=relaxed/simple;
-	bh=yuiimQnXJRE9YVLq4TC6OObCfEIzIrjQVfgH38AYD2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LMqCilsFMilbGIS2dN3qumebyMAWA5oBI7dd5Toqf6gjtvvn3LLuZqoD9sxzHaOBDKQ89v3g981p0kx5OwWciFgCNzf5485QkFswCtzhJrdkc5aHeoI4XBIMLY1VoMU7uRM/xbz+i5a12MvED/1XfI+lfJ5/NsyeE0OobfxTxzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rV8/LTuS; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1733738072; c=relaxed/simple;
+	bh=8KrOzz1PgbSErfhC2I3kQ/sYbxXPyl6RjlXIVILvOrI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KF5OokXC3si8WOCeIzk4prxBqP+bZrw0Bvl9ItUcZ6ZcrvhBG2V96vUH1umKi1Q8F3Btl/UaCTVO0mM5jYNlmpHrJhbwg4NjcDGf1ha46GTC7sebw3k6g65lTjuc4/qxsTaiDcENl/g2QK8wcKcBtydztVNJ9VmwBVHMHQmZTqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ndjpzBnT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rV8/LTuS"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434ed674047so62825e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 09 Dec 2024 00:14:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733732092; x=1734336892; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=38VOcmtNIf+FGDDeC2rlfe3RwwgSY9ulk0n9SpJxDqk=;
-        b=rV8/LTuSx5kayoVxAgNnaARGExl+KwJzD69TyiH4150oFZyDyTYkozQPHrFcAtmb4a
-         4YTU6pPnkpjjwKef2s5i9eMXlt8l7lhkxAIKoyLiQ18OaTkXyeALOnqDO24lcw1zrEfP
-         uN0zGA92HRUwCZlx8QvGpHV7LL41jHLOomIxfH51UzgL1jKDoFd/O+PxDwITE06D4gqW
-         9H3ry+3+ukBWSNoXWAXDIB7tskIlIdRkQsMJgKuWC4QPSOu3ITyRFgQpBtaxGSHvN1O0
-         jI28eBWbJiRCKoHh0Q6zTijR1sl40fCm3PdvwfrchVxOb3GROB2iIT5dlvGPVGl2vtqb
-         YHeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733732092; x=1734336892;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=38VOcmtNIf+FGDDeC2rlfe3RwwgSY9ulk0n9SpJxDqk=;
-        b=eRZ5QAh8xLi6bh8JM/NwlqMVTNer/8xBeajmSysIcG2j4wLABTm9BMI8xkzs1HXfJo
-         iY2n1Op6K078Rtq8T3hx2niUuQw50DGrHrHX3RYMnyhgEMQzCv5bTrke8QBR7RbRZTNi
-         bI6hhbwMvqqxeEaON5hHDiF+9q6hHkmfU1FT3MDBmDCEOuM26r9v5xnRx0JeYM55w1mH
-         zY8Mkdt89G9Db66+atWANtcS43CFa799sDpQwlZZYG/+UsdQhvRTgshAixO5I2nNEjeF
-         8ps/YpeQ+wyCPl1qxJUDYij3JOXfhO7RFozotqyPEf2KL7gbq9VkwGrKQ70gyTCafF0Z
-         bQeA==
-X-Gm-Message-State: AOJu0Yxtxn3KZ45kodQ22O3S3pKEMm30NTFuSnJfOfMu3rWhOz7edV/K
-	KHXRqwbEHJy8rIPjDP1ZLea3XIVO1j5xYiY5NbiQxKPvppLMX7ZVkjlsR9WhZHsre+B6ELAnw8t
-	EDvqN59+x4i4hHSywAS/ylpgMKGz3mNuqHFmw
-X-Gm-Gg: ASbGnctQRDHYnhN/v9rKKa/Lvizo0m1L4W/nRaYJEyzbDjoziKeM3G9feegSDmYtn1B
-	w31590royj/aKZIMbI4sx5VcrV98wqg==
-X-Google-Smtp-Source: AGHT+IECcCGIULUtAZnSfmvAEsNbU/UmcoDuc/+jvY7I76xPVuvbxulGInOe9FXP6l0BfMl0Nn0opoQej/DRcojogCg=
-X-Received: by 2002:a05:600c:6c4e:b0:434:9fac:3408 with SMTP id
- 5b1f17b1804b1-434e8347d19mr2398065e9.2.1733732092346; Mon, 09 Dec 2024
- 00:14:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ndjpzBnT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E781C4CED1;
+	Mon,  9 Dec 2024 09:54:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733738072;
+	bh=8KrOzz1PgbSErfhC2I3kQ/sYbxXPyl6RjlXIVILvOrI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ndjpzBnT83lfYQeQZCm6qfkczXzMeH7Q3bMaOjhcWbn0YGlmSsOGCwnVpY9rAK+ld
+	 R2VVnNr2zFwgWPZ+y98EZjBx3AAglqflxNZpODD4cr4v58E5TGU/cKEN388ajDIZEE
+	 VXV9LXTsXvNK0RMHoqhbCHXFFvJKP4V3GKRzxnzfO76csJMtY7BwjkkxEg4ult/NmQ
+	 juOXJr+3xJrttFZc0vV8HEcnwczLZ/bLtQVpr0nb2wLAFrCdqWpHnlPKR1Zgw7oPRi
+	 3NAyyySso3/tVzBuQ+gBlqe2P7iv8spop1O/bL49nnjsGhBMAr33xAqRhfyxMT6frT
+	 N7pfEqMpro7tA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tKaTF-001oNM-SO;
+	Mon, 09 Dec 2024 09:54:29 +0000
+Date: Mon, 09 Dec 2024 09:54:29 +0000
+Message-ID: <867c89tc4q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm <kvmarm@lists.linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	christoffer.dall@arm.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	coltonlewis@google.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
+In-Reply-To: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
+References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-5-tabba@google.com>
- <Z1MwAomiLhnMn--k@google.com>
-In-Reply-To: <Z1MwAomiLhnMn--k@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 9 Dec 2024 08:14:15 +0000
-Message-ID: <CA+EHjTy6Y6w9RyU2Vn8O+DDviSJf=P-Y4c+xVFqY-3GmHBv3kQ@mail.gmail.com>
-Subject: Re: [PATCH v4 04/14] KVM: arm64: Use KVM extension checks for allowed
- protected VM capabilities
-To: Quentin Perret <qperret@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
-	kristina.martsenko@arm.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Quentin,
+Ganapatrao,
 
-On Fri, 6 Dec 2024 at 17:10, Quentin Perret <qperret@google.com> wrote:
->
-> On Monday 02 Dec 2024 at 15:47:31 (+0000), Fuad Tabba wrote:
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > index fb733b36c6c1..59ff6aac514c 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > @@ -329,34 +329,20 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
-> >
-> >       bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
-> >
-> > -     /*
-> > -      * For protected VMs, always allow:
-> > -      * - CPU starting in poweroff state
-> > -      * - PSCI v0.2
-> > -      */
-> > -     set_bit(KVM_ARM_VCPU_POWER_OFF, allowed_features);
->
-> For my understanding, why do we drop this bit?
+Did you notice that the Columbia list was killed over two years ago,
+as per ac107abef1976 ("KVM: arm64: Advertise new kvmarm mailing
+list")? Consider that script/get_maintainer.pl is your friend.
 
-Since the hypervisor is responsible for the power state of protected
-VMs. This should either be a separate patch or I should explain it in
-the commit message. Any preference?
+Cc'ing the correct list instead,
+
+On Mon, 09 Dec 2024 05:32:01 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>=20
+> During automated testing of Nested Virtualization using avocado-vt,
+
+Which is not merged upstream. So what branch are you using? Based on
+what kernel version? On what HW? With which virtualisation features?
+
+> it has been observed that during some boot test iterations,
+> the Guest-Hypervisor boot was getting crashed with a
+> synchronous exception while it is still booting EDK2.
+>=20
+> The test is launching Multiple instances of Guest-Hypervisor boot
+
+Is the multiple instance aspect really relevant to the reproduction of
+the problem?
+
+> and while booting, QEMU monitor issued the command "info register"
+> at regular intervals to take a register dump. To execute this
+> command, QEMU stops the run and does the register read of various
+> registers. While resuming the run, the function kvm_arm_timer_write()
+> writes back the saved CNTV_CTL_EL0 register with ISTATUS cleared always
+
+It is userspace that causes this write-back, right? AFAICT, KVM never
+does that on its own.
+
+> and resulting in the loss of pending interrupt for emulated timers.
+
+How does a missing interrupt result in a synchronous exception in
+EDK2? In my experience, EDK2 panics if it sees spurious interrupts,
+not when it is missing interrupts (it just locks up, which is
+expected).
+
+> In hardware based timers, ISTATUS is a RO/WI bit and gets set by the
+> h/w, if the condition is still met. However, in Nested-Virtualization
+> case, the Guest-Hypervisor's=C2=A0EDK2 is using an emulated virtual timer
+> and losing ISTATUS state and the interrupt forever.
+
+Why is this specific to NV? Can't the same thing happen to the
+physical timer in a non-VHE configuration?
+
+>=20
+> Adding fix in kvm_arm_timer_write to set ISTATUS for emulated
+> timers, if the timer expired already.
+>=20
+> Fixes: 81dc9504a700 ("KVM: arm64: nv: timers: Support hyp timer emulation=
+")
+
+Where is this coming from? This patch doesn't touch the code you are
+changing, so how can it be the source of your problems? As far as I
+can tell, this has been the case since 5c5196da4e966 ("KVM: arm/arm64:
+Support EL1 phys timer register access in set/get reg").
+
+> Co-developed-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> Signed-off-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 1215df590418..aca58113d790 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -1199,7 +1199,16 @@ static void kvm_arm_timer_write(struct kvm_vcpu *v=
+cpu,
+>  		break;
+> =20
+>  	case TIMER_REG_CTL:
+> -		timer_set_ctl(timer, val & ~ARCH_TIMER_CTRL_IT_STAT);
+> +		struct timer_map map;
+> +
+> +		val &=3D ~ARCH_TIMER_CTRL_IT_STAT;
+> +		get_timer_map(vcpu, &map);
+> +		/* Set ISTATUS bit for emulated timers, if timer expired. */
+> +		if (timer =3D=3D map.emul_vtimer || timer =3D=3D map.emul_ptimer) {
+> +			if (!kvm_timer_compute_delta(timer))
+> +				val |=3D ARCH_TIMER_CTRL_IT_STAT;
+> +		}
+> +		timer_set_ctl(timer, val);
+>  		break;
+
+This really looks awfully complicated, when it is only a matter of
+recomputing the interrupt state, something that is at the core of the
+timer emulation. Why can't the following work:
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 895f09658ef83..bd6efafbe7109 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1298,13 +1298,17 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vc=
+pu,
+ 				enum kvm_arch_timer_regs treg,
+ 				u64 val)
+ {
++	unsigned long tmp =3D val;
++
+ 	switch (treg) {
+ 	case TIMER_REG_TVAL:
+ 		timer_set_cval(timer, kvm_phys_timer_read() - timer_get_offset(timer) + =
+(s32)val);
+ 		break;
+=20
+ 	case TIMER_REG_CTL:
+-		timer_set_ctl(timer, val & ~ARCH_TIMER_CTRL_IT_STAT);
++		__assign_bit(__ffs(ARCH_TIMER_CTRL_IT_STAT), &tmp,
++			     kvm_timer_should_fire(timer));
++		timer_set_ctl(timer, tmp);
+ 		break;
+=20
+ 	case TIMER_REG_CVAL:
+
+But overall, this very much looks like it is only papering over the
+real issue, which is that the *emulation* should regenerate the
+pending bit, and not rely on the userspace interface.
+
+As far as I can tell, we already correctly compute the status bit on
+read (read_timer_ctl()), so the guest should always observe something
+consistent when it traps. We also *never* use the status bit as an
+input to the emulation, and always recompute it from scratch (it is
+only there for the benefit of the guest or userspace).
+
+So I can't see how upstream is broken in at the moment, and you need
+to explain how this actually triggers. Ideally, with a standalone
+reproducer or a selftest.
 
 Thanks,
-/fuad
 
-> >       set_bit(KVM_ARM_VCPU_PSCI_0_2, allowed_features);
-> >
-> > -     /*
-> > -      * Check if remaining features are allowed:
-> > -      * - Performance Monitoring
-> > -      * - Scalable Vectors
-> > -      * - Pointer Authentication
-> > -      */
-> > -     if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), PVM_ID_AA64DFR0_ALLOW))
-> > +     if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PMU_V3))
-> >               set_bit(KVM_ARM_VCPU_PMU_V3, allowed_features);
-> >
-> > -     if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), PVM_ID_AA64PFR0_ALLOW))
-> > -             set_bit(KVM_ARM_VCPU_SVE, allowed_features);
-> > -
-> > -     if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API), PVM_ID_AA64ISAR1_ALLOW) &&
-> > -         FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA), PVM_ID_AA64ISAR1_ALLOW))
-> > +     if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PTRAUTH_ADDRESS))
-> >               set_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, allowed_features);
-> >
-> > -     if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPI), PVM_ID_AA64ISAR1_ALLOW) &&
-> > -         FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPA), PVM_ID_AA64ISAR1_ALLOW))
-> > +     if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PTRAUTH_GENERIC))
-> >               set_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, allowed_features);
-> >
-> > +     if (kvm_pvm_ext_allowed(KVM_CAP_ARM_SVE))
-> > +             set_bit(KVM_ARM_VCPU_SVE, allowed_features);
-> > +
-> >       bitmap_and(kvm->arch.vcpu_features, host_kvm->arch.vcpu_features,
-> >                  allowed_features, KVM_VCPU_MAX_FEATURES);
-> >  }
-> > --
-> > 2.47.0.338.g60cca15819-goog
-> >
->
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
