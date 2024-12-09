@@ -1,417 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B97233123
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 14:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CDB1A23A2
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 14:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733752875; cv=none; b=MI9i5hqh8U2C3HeUSDIccz7LqhiVvV21E2QUjYhey4MASpWZobhnwIvWbdPdNj/qIG1sqS0UCIyyjGfOb62eMZPNTnsqXRGRRLOXidBWRMHFaNS1HPxuSKv2eUtiB4F4dzQC7CJqq7E4xziGeb8tmKVvKlgX+8TwWhiG/l2I0cw=
+	t=1733753156; cv=none; b=IdlIvr4HxYoWFzFA374mTUJNT64ug2EBLrjnuyppzLwp5N4qTmodd15iMQD6iGUhuQQDPu3MJM7yZoSBWp0NxgeDhM2EBWljynfYo+BcsjWHUWpQUw9vPINKN8+MaNLN3ApqsWNtmi/mthPA/J+acpENJceoc4MjJ7qLhVJwMHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733752875; c=relaxed/simple;
-	bh=+rEXca8jDDJ4vD3zZCA3H8sahLXlkzZ5vdnjX/TgnaQ=;
+	s=arc-20240116; t=1733753156; c=relaxed/simple;
+	bh=TtWfRQ26OIhM7EeP/8RgbWs9Yf5wwY/1/Y9HcoU6Mkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qHyMMNKjXzwPBJ/FedE2SkRNrzEwgWbSOlpiZG0PxnUhfB0XDkFHTUwCP7pQ6uuDBJ9WjfX0CgBrR9G74yi1HvZhBYY6TDnJC8sA7piLO0KRtd/xooDquA7vDm9qkpqEdxk3DUL59KGfjWBamd9O0yr//8dgG7bwmdBj8nk9tB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE48E113E;
-	Mon,  9 Dec 2024 06:01:40 -0800 (PST)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C9033F720;
-	Mon,  9 Dec 2024 06:01:11 -0800 (PST)
-Date: Mon, 9 Dec 2024 14:01:08 +0000
-From: Mark Rutland <mark.rutland@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cUmCLawIc6OHRhwH06vnKLJKckhK5+rtOhs2/YLdwrDb1CP8JQXgFl4VvR5tAe6LwI0SxX7jqGtRDcbX7U3eRY/sK0+Wrp5BOLAkRXY+GV9Yg44qfEFYzbScmDPF3DGWPJgHO+9pJFTtm6p3fGe2uSnhi1AV33LjzttW/U5eRWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FFiJhMoV; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FFiJhMoV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2283C4CED1;
+	Mon,  9 Dec 2024 14:05:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733753156;
+	bh=TtWfRQ26OIhM7EeP/8RgbWs9Yf5wwY/1/Y9HcoU6Mkw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FFiJhMoVz9wtNpUFVkpnA743TrXqCKzFC5Fs1K0IYtqJXoDA9aglbIjTO9h8vsOpW
+	 un9zS1OJoAcFQ1cT/6+4XcKWP6Ro+wSWGlv4zxXuuxAy5UqvGNrIwILDFbgtS/KMeb
+	 pdCN46SnXhyYsECzrDi6OLrv3Fx4cdyxUCRzQTt4TVU3XsLPmA1gjehUmjZBrCR4ML
+	 TUhVXvDxyMeZEbNVl00aDm/ffuH6+74ApHtwApjQpQf0K7c1D4c1jrhjBum6gX3J+z
+	 LR3p/FcQ946lsxQfNUsWHAs4yq9QcVbtyig7360UNzcbtVaQfSWUFxQ28CoJoMKad1
+	 iKnvFxXmRHenQ==
+Date: Mon, 9 Dec 2024 14:05:51 +0000
+From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 4/4] arm64/sysreg: Get rid of CPACR_ELx SysregFields
-Message-ID: <Z1b4JKEXEK9PkZEu@J2N7QTR9R3.cambridge.arm.com>
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 1/4] arm64/sysreg: Allow a 'Mapping' descriptor for
+ system registers
+Message-ID: <06726aa6-3be0-434c-9870-3d40a5ff24f9@sirena.org.uk>
 References: <20241207190740.2607673-1-maz@kernel.org>
- <20241207190740.2607673-5-maz@kernel.org>
+ <20241207190740.2607673-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="m5vTs3lMncUYB5AX"
+Content-Disposition: inline
+In-Reply-To: <20241207190740.2607673-2-maz@kernel.org>
+X-Cookie: Lensmen eat Jedi for breakfast.
+
+
+--m5vTs3lMncUYB5AX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241207190740.2607673-5-maz@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 07, 2024 at 07:07:40PM +0000, Marc Zyngier wrote:
-> There is no such thing as CPACR_ELx in the architecture.
-> What we have is CPACR_EL1, for which CPTR_EL12 is an accessor.
-> 
-> Rename CPACR_ELx_* to CPACR_EL1_*, and fix the bit of code using
-> these names.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Sat, Dec 07, 2024 at 07:07:37PM +0000, Marc Zyngier wrote:
+> *EL02 and *_EL12 system registers are actually only accessors for
+> EL0 and EL1 registers accessed from EL2 when HCR_EL2.E2H=3D=3D1. They
+> do not have fields of their own.
+>=20
+> To that effect, introduce a 'Mapping' entry, describing which
+> system register an _EL12 register maps to.
+>=20
+> Implementation wise, this is handled the same was as Fields,
+> which ls only a comment.
 
-I ahven't look at this in great detail, but conceptaully it makes sense
-to me, so:
+With Mark Rutland's suggested clarifications
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Mark Brown <broonie@kernel.org
 
-Mark.
+--m5vTs3lMncUYB5AX
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> ---
->  arch/arm64/include/asm/el2_setup.h      |  6 ++--
->  arch/arm64/include/asm/kvm_arm.h        |  2 --
->  arch/arm64/include/asm/kvm_emulate.h    | 40 ++++++++++++-------------
->  arch/arm64/include/asm/kvm_nested.h     |  8 ++---
->  arch/arm64/kernel/cpufeature.c          |  2 +-
->  arch/arm64/kvm/emulate-nested.c         |  2 +-
->  arch/arm64/kvm/fpsimd.c                 |  2 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  4 +--
->  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  2 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  6 ++--
->  arch/arm64/kvm/hyp/vhe/switch.c         | 16 +++++-----
->  arch/arm64/tools/sysreg                 |  6 +---
->  13 files changed, 47 insertions(+), 53 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> index 85ef966c08cd2..cc39c57df7873 100644
-> --- a/arch/arm64/include/asm/el2_setup.h
-> +++ b/arch/arm64/include/asm/el2_setup.h
-> @@ -154,7 +154,7 @@
->  /* Coprocessor traps */
->  .macro __init_el2_cptr
->  	__check_hvhe .LnVHE_\@, x1
-> -	mov	x0, #CPACR_ELx_FPEN
-> +	mov	x0, #CPACR_EL1_FPEN
->  	msr	cpacr_el1, x0
->  	b	.Lskip_set_cptr_\@
->  .LnVHE_\@:
-> @@ -332,7 +332,7 @@
->  
->  	// (h)VHE case
->  	mrs	x0, cpacr_el1			// Disable SVE traps
-> -	orr	x0, x0, #CPACR_ELx_ZEN
-> +	orr	x0, x0, #CPACR_EL1_ZEN
->  	msr	cpacr_el1, x0
->  	b	.Lskip_set_cptr_\@
->  
-> @@ -353,7 +353,7 @@
->  
->  	// (h)VHE case
->  	mrs	x0, cpacr_el1			// Disable SME traps
-> -	orr	x0, x0, #CPACR_ELx_SMEN
-> +	orr	x0, x0, #CPACR_EL1_SMEN
->  	msr	cpacr_el1, x0
->  	b	.Lskip_set_cptr_sme_\@
->  
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 3e0f0de1d2da8..43e365fbff0b2 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -391,8 +391,6 @@
->  	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
->  	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
->  
-> -#define CPACR_EL1_TTA		(1 << 28)
-> -
->  #define kvm_mode_names				\
->  	{ PSR_MODE_EL0t,	"EL0t" },	\
->  	{ PSR_MODE_EL1t,	"EL1t" },	\
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index cf811009a33c9..4f1d99725f6b3 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -556,13 +556,13 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
->  	({								\
->  		u64 cptr = 0;						\
->  									\
-> -		if ((set) & CPACR_ELx_FPEN)				\
-> +		if ((set) & CPACR_EL1_FPEN)				\
->  			cptr |= CPTR_EL2_TFP;				\
-> -		if ((set) & CPACR_ELx_ZEN)				\
-> +		if ((set) & CPACR_EL1_ZEN)				\
->  			cptr |= CPTR_EL2_TZ;				\
-> -		if ((set) & CPACR_ELx_SMEN)				\
-> +		if ((set) & CPACR_EL1_SMEN)				\
->  			cptr |= CPTR_EL2_TSM;				\
-> -		if ((clr) & CPACR_ELx_TTA)				\
-> +		if ((clr) & CPACR_EL1_TTA)				\
->  			cptr |= CPTR_EL2_TTA;				\
->  		if ((clr) & CPTR_EL2_TAM)				\
->  			cptr |= CPTR_EL2_TAM;				\
-> @@ -576,13 +576,13 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
->  	({								\
->  		u64 cptr = 0;						\
->  									\
-> -		if ((clr) & CPACR_ELx_FPEN)				\
-> +		if ((clr) & CPACR_EL1_FPEN)				\
->  			cptr |= CPTR_EL2_TFP;				\
-> -		if ((clr) & CPACR_ELx_ZEN)				\
-> +		if ((clr) & CPACR_EL1_ZEN)				\
->  			cptr |= CPTR_EL2_TZ;				\
-> -		if ((clr) & CPACR_ELx_SMEN)				\
-> +		if ((clr) & CPACR_EL1_SMEN)				\
->  			cptr |= CPTR_EL2_TSM;				\
-> -		if ((set) & CPACR_ELx_TTA)				\
-> +		if ((set) & CPACR_EL1_TTA)				\
->  			cptr |= CPTR_EL2_TTA;				\
->  		if ((set) & CPTR_EL2_TAM)				\
->  			cptr |= CPTR_EL2_TAM;				\
-> @@ -595,13 +595,13 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
->  #define cpacr_clear_set(clr, set)					\
->  	do {								\
->  		BUILD_BUG_ON((set) & CPTR_VHE_EL2_RES0);		\
-> -		BUILD_BUG_ON((clr) & CPACR_ELx_E0POE);			\
-> -		__build_check_all_or_none((clr), CPACR_ELx_FPEN);	\
-> -		__build_check_all_or_none((set), CPACR_ELx_FPEN);	\
-> -		__build_check_all_or_none((clr), CPACR_ELx_ZEN);	\
-> -		__build_check_all_or_none((set), CPACR_ELx_ZEN);	\
-> -		__build_check_all_or_none((clr), CPACR_ELx_SMEN);	\
-> -		__build_check_all_or_none((set), CPACR_ELx_SMEN);	\
-> +		BUILD_BUG_ON((clr) & CPACR_EL1_E0POE);			\
-> +		__build_check_all_or_none((clr), CPACR_EL1_FPEN);	\
-> +		__build_check_all_or_none((set), CPACR_EL1_FPEN);	\
-> +		__build_check_all_or_none((clr), CPACR_EL1_ZEN);	\
-> +		__build_check_all_or_none((set), CPACR_EL1_ZEN);	\
-> +		__build_check_all_or_none((clr), CPACR_EL1_SMEN);	\
-> +		__build_check_all_or_none((set), CPACR_EL1_SMEN);	\
->  									\
->  		if (has_vhe() || has_hvhe())				\
->  			sysreg_clear_set(cpacr_el1, clr, set);		\
-> @@ -624,16 +624,16 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
->  	u64 val;
->  
->  	if (has_vhe()) {
-> -		val = (CPACR_ELx_FPEN | CPACR_EL1_ZEN_EL1EN);
-> +		val = (CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN);
->  		if (cpus_have_final_cap(ARM64_SME))
->  			val |= CPACR_EL1_SMEN_EL1EN;
->  	} else if (has_hvhe()) {
-> -		val = CPACR_ELx_FPEN;
-> +		val = CPACR_EL1_FPEN;
->  
->  		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
-> -			val |= CPACR_ELx_ZEN;
-> +			val |= CPACR_EL1_ZEN;
->  		if (cpus_have_final_cap(ARM64_SME))
-> -			val |= CPACR_ELx_SMEN;
-> +			val |= CPACR_EL1_SMEN;
->  	} else {
->  		val = CPTR_NVHE_EL2_RES1;
->  
-> @@ -685,7 +685,7 @@ static inline bool ____cptr_xen_trap_enabled(const struct kvm_vcpu *vcpu,
->  #define __guest_hyp_cptr_xen_trap_enabled(vcpu, xen)				\
->  	(!vcpu_has_nv(vcpu) ? false :						\
->  	 ____cptr_xen_trap_enabled(vcpu,					\
-> -				   SYS_FIELD_GET(CPACR_ELx, xen,		\
-> +				   SYS_FIELD_GET(CPACR_EL1, xen,		\
->  						 vcpu_sanitised_cptr_el2(vcpu))))
->  
->  static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 233e655227164..6cd08198bf195 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -33,14 +33,14 @@ static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
->  
->  static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
->  {
-> -	u64 cpacr_el1 = CPACR_ELx_RES1;
-> +	u64 cpacr_el1 = CPACR_EL1_RES1;
->  
->  	if (cptr_el2 & CPTR_EL2_TTA)
-> -		cpacr_el1 |= CPACR_ELx_TTA;
-> +		cpacr_el1 |= CPACR_EL1_TTA;
->  	if (!(cptr_el2 & CPTR_EL2_TFP))
-> -		cpacr_el1 |= CPACR_ELx_FPEN;
-> +		cpacr_el1 |= CPACR_EL1_FPEN;
->  	if (!(cptr_el2 & CPTR_EL2_TZ))
-> -		cpacr_el1 |= CPACR_ELx_ZEN;
-> +		cpacr_el1 |= CPACR_EL1_ZEN;
->  
->  	cpacr_el1 |= cptr_el2 & (CPTR_EL2_TCPAC | CPTR_EL2_TAM);
->  
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 7712df48758e9..6e220da3a495b 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2377,7 +2377,7 @@ static void cpu_enable_mops(const struct arm64_cpu_capabilities *__unused)
->  static void cpu_enable_poe(const struct arm64_cpu_capabilities *__unused)
->  {
->  	sysreg_clear_set(REG_TCR2_EL1, 0, TCR2_EL1_E0POE);
-> -	sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_E0POE);
-> +	sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_E0POE);
->  }
->  #endif
->  
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 1ffbfd1c3cf2e..f1b7287e1f3c3 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -494,7 +494,7 @@ static enum trap_behaviour check_cptr_tta(struct kvm_vcpu *vcpu)
->  	if (!vcpu_el2_e2h_is_set(vcpu))
->  		val = translate_cptr_el2_to_cpacr_el1(val);
->  
-> -	if (val & CPACR_ELx_TTA)
-> +	if (val & CPACR_EL1_TTA)
->  		return BEHAVE_FORWARD_RW;
->  
->  	return BEHAVE_HANDLE_LOCALLY;
-> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index ea5484ce1f3ba..98718bd65bf15 100644
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -169,7 +169,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
->  	if (has_vhe() && system_supports_sme()) {
->  		/* Also restore EL0 state seen on entry */
->  		if (vcpu_get_flag(vcpu, HOST_SME_ENABLED))
-> -			sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_SMEN);
-> +			sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_SMEN);
->  		else
->  			sysreg_clear_set(CPACR_EL1,
->  					 CPACR_EL1_SMEN_EL0EN,
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 34f53707892df..abfa6ad92e91e 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -419,9 +419,9 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->  
->  	/* First disable enough traps to allow us to update the registers */
->  	if (sve_guest || (is_protected_kvm_enabled() && system_supports_sve()))
-> -		cpacr_clear_set(0, CPACR_ELx_FPEN | CPACR_ELx_ZEN);
-> +		cpacr_clear_set(0, CPACR_EL1_FPEN | CPACR_EL1_ZEN);
->  	else
-> -		cpacr_clear_set(0, CPACR_ELx_FPEN);
-> +		cpacr_clear_set(0, CPACR_EL1_FPEN);
->  	isb();
->  
->  	/* Write out the host state if it's in the registers */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 6aa0b13d86e58..6c90ef6736d63 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -68,7 +68,7 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
->  	if (!guest_owns_fp_regs())
->  		return;
->  
-> -	cpacr_clear_set(0, CPACR_ELx_FPEN | CPACR_ELx_ZEN);
-> +	cpacr_clear_set(0, CPACR_EL1_FPEN | CPACR_EL1_ZEN);
->  	isb();
->  
->  	if (vcpu_has_sve(vcpu))
-> @@ -481,7 +481,7 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
->  		handle_host_smc(host_ctxt);
->  		break;
->  	case ESR_ELx_EC_SVE:
-> -		cpacr_clear_set(0, CPACR_ELx_ZEN);
-> +		cpacr_clear_set(0, CPACR_EL1_ZEN);
->  		isb();
->  		sve_cond_update_zcr_vq(sve_vq_from_vl(kvm_host_sve_max_vl) - 1,
->  				       SYS_ZCR_EL2);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 01616c39a8107..a6638c4ecd32d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -68,7 +68,7 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
->  	/* Trap SVE */
->  	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), feature_ids)) {
->  		if (has_hvhe())
-> -			cptr_clear |= CPACR_ELx_ZEN;
-> +			cptr_clear |= CPACR_EL1_ZEN;
->  		else
->  			cptr_set |= CPTR_EL2_TZ;
->  	}
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index cc69106734ca7..0f6b01b3da5cf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -48,14 +48,14 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->  	val |= has_hvhe() ? CPACR_EL1_TTA : CPTR_EL2_TTA;
->  	if (cpus_have_final_cap(ARM64_SME)) {
->  		if (has_hvhe())
-> -			val &= ~CPACR_ELx_SMEN;
-> +			val &= ~CPACR_EL1_SMEN;
->  		else
->  			val |= CPTR_EL2_TSM;
->  	}
->  
->  	if (!guest_owns_fp_regs()) {
->  		if (has_hvhe())
-> -			val &= ~(CPACR_ELx_FPEN | CPACR_ELx_ZEN);
-> +			val &= ~(CPACR_EL1_FPEN | CPACR_EL1_ZEN);
->  		else
->  			val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
->  
-> @@ -192,7 +192,7 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
->  
->  		/* Re-enable SVE traps if not supported for the guest vcpu. */
->  		if (!vcpu_has_sve(vcpu))
-> -			cpacr_clear_set(CPACR_ELx_ZEN, 0);
-> +			cpacr_clear_set(CPACR_EL1_ZEN, 0);
->  
->  	} else {
->  		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 80581b1c39959..59d992455793d 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -77,12 +77,12 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
->  	 * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
->  	 * shift value for trapping the AMU accesses.
->  	 */
-> -	u64 val = CPACR_ELx_TTA | CPTR_EL2_TAM;
-> +	u64 val = CPACR_EL1_TTA | CPTR_EL2_TAM;
->  
->  	if (guest_owns_fp_regs()) {
-> -		val |= CPACR_ELx_FPEN;
-> +		val |= CPACR_EL1_FPEN;
->  		if (vcpu_has_sve(vcpu))
-> -			val |= CPACR_ELx_ZEN;
-> +			val |= CPACR_EL1_ZEN;
->  	} else {
->  		__activate_traps_fpsimd32(vcpu);
->  	}
-> @@ -122,13 +122,13 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
->  	 * hypervisor has traps enabled to dispel any illusion of something more
->  	 * complicated taking place.
->  	 */
-> -	if (!(SYS_FIELD_GET(CPACR_ELx, FPEN, cptr) & BIT(0)))
-> -		val &= ~CPACR_ELx_FPEN;
-> -	if (!(SYS_FIELD_GET(CPACR_ELx, ZEN, cptr) & BIT(0)))
-> -		val &= ~CPACR_ELx_ZEN;
-> +	if (!(SYS_FIELD_GET(CPACR_EL1, FPEN, cptr) & BIT(0)))
-> +		val &= ~CPACR_EL1_FPEN;
-> +	if (!(SYS_FIELD_GET(CPACR_EL1, ZEN, cptr) & BIT(0)))
-> +		val &= ~CPACR_EL1_ZEN;
->  
->  	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
-> -		val |= cptr & CPACR_ELx_E0POE;
-> +		val |= cptr & CPACR_EL1_E0POE;
->  
->  	val |= cptr & CPTR_EL2_TCPAC;
->  
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index ad2f6265f7948..4e575c1b266f7 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1985,7 +1985,7 @@ Field	1	A
->  Field	0	M
->  EndSysreg
->  
-> -SysregFields	CPACR_ELx
-> +Sysreg	CPACR_EL1	3	0	1	0	2
->  Res0	63:30
->  Field	29	E0POE
->  Field	28	TTA
-> @@ -1996,10 +1996,6 @@ Field	21:20	FPEN
->  Res0	19:18
->  Field	17:16	ZEN
->  Res0	15:0
-> -EndSysregFields
-> -
-> -Sysreg	CPACR_EL1	3	0	1	0	2
-> -Fields	CPACR_ELx
->  EndSysreg
->  
->  Sysreg	SMPRI_EL1	3	0	1	2	4
-> -- 
-> 2.39.2
-> 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdW+T8ACgkQJNaLcl1U
+h9Czvwf+PSttBMTnItSkDEFFS3RT0/CsH9qdmk0+RQXLDaxb6bfvwBfoYsD09/Rn
+dfVBjFLNKYoGMGzQxrqlLryqki3CnjmMGdZzuqhkcKEVZIfpzVmredUfH9uwIKZr
+E3q4MNiEyd8vv4tnNoC9wDQ6mVm5/qBjph9yfY8MxVlQHQdMrFgqx+HSRHDn6ZKE
+OSFhU7L6blyxaz1pIwEEfiRhBsG+ZaXop39NUIYa+k1NbUfNxy41zrGAap1a65La
+ISAaxuNoHVMH3JuvKSh9j1L2yvLGXXOUPXB3j9dqZnPGKcf8aWQQ+VdFCgh+blJu
+16oUCFJqBy6IvLuhCB0NlgO5P3sV8g==
+=gLmv
+-----END PGP SIGNATURE-----
+
+--m5vTs3lMncUYB5AX--
