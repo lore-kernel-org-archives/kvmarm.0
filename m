@@ -1,139 +1,115 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C981A23AF
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 13:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16F51A2395
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 13:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733752157; cv=none; b=Rc8S/27Ngi5hDb77bqUfhciwLV9MhrBW8G4iD4sntLmRSGxuf6wzT89kzLMmhsfXo2qcP7wa/c1ZMEDj6KKpL1KbAaM3ZlhY6RwjZ4gFtt10mLjHJt4+uH7IhKCK/96LJn4r1cn+tn8GsNTpBlPEoqQSSXVvhTyOYkvn5cRZcao=
+	t=1733752595; cv=none; b=EK8F5T5G5kuoyKA0SajpCOvNPS3iBDgd0aYJRZik7pKzF8YQyVRTT4H5HsiInEKafzoaCtY0PILQ+vb9tzQwrNcQfMISsTzPt8MSRT0qs9SHtgVAI55e9gv7W1Hyvi1ScuZdIkRwpy7BPgO3hqzTeJeT377BFUvnEi0wTkgE7r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733752157; c=relaxed/simple;
-	bh=yQHHP54uQ5+5uU+C5swOowcYCMvlHkfMQqR23g3oSE4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BIEd8umtyzowWX8Fq/wDkZJ41DVREBVM6Pt5WlG3fcekUl+AWzqJsP8/sGtk3cLXlE9avkkaKCuKz8opefz/VbJRWoLq3O0gX0bsxJBwVPRGFDmz7RbHWr2AM5xepOOuxms9IpszJEq9eMaJHvNaCAzxxUFDhB0xtZcxEJoyYlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y6NQF30gvz6GCF3;
-	Mon,  9 Dec 2024 21:44:37 +0800 (CST)
-Received: from frapeml100008.china.huawei.com (unknown [7.182.85.131])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7C0A41408F9;
-	Mon,  9 Dec 2024 21:49:08 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100008.china.huawei.com (7.182.85.131) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 9 Dec 2024 14:49:08 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Mon, 9 Dec 2024 14:49:08 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Cornelia Huck <cohuck@redhat.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>
-CC: "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
-	<will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, jiangkunkun
-	<jiangkunkun@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH v3 3/3] arm64: paravirt: Enable errata based on
- implementation CPUs
-Thread-Topic: [PATCH v3 3/3] arm64: paravirt: Enable errata based on
- implementation CPUs
-Thread-Index: AQHbSjI8+ZGtwNDcik6x/q40bpGhkrLdzFoAgAAfO7A=
-Date: Mon, 9 Dec 2024 13:49:07 +0000
-Message-ID: <d92ea2dcc3b04ebb8bc5ba71bff448bc@huawei.com>
-References: <20241209115311.40496-1-shameerali.kolothum.thodi@huawei.com>
- <20241209115311.40496-4-shameerali.kolothum.thodi@huawei.com>
- <875xnt10oj.fsf@redhat.com>
-In-Reply-To: <875xnt10oj.fsf@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1733752595; c=relaxed/simple;
+	bh=EpajT4aNY/ORmO1xbU5SzM8tzGdGtBDOaPs7qqa4dYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZRrPAd7y/wo7lxz/QC8kp7cHS/aQJPQt3S+wEtblxo0Az2pWi86kQgAQPJtmOsiYeQlbxR3LfVjVawCWzvv4f4zDgVA4wilf2UnZckIDUkr16ueRonFqFJHJN84JCii98+0uNTa8zgETP9OcwQFN5yjJXbpHSbUnQfjIbCB41A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D1EF113E;
+	Mon,  9 Dec 2024 05:56:59 -0800 (PST)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C7C843F720;
+	Mon,  9 Dec 2024 05:56:29 -0800 (PST)
+Date: Mon, 9 Dec 2024 13:56:23 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 1/4] arm64/sysreg: Allow a 'Mapping' descriptor for
+ system registers
+Message-ID: <Z1b3B2swQ0HrB3bO@J2N7QTR9R3.cambridge.arm.com>
+References: <20241207190740.2607673-1-maz@kernel.org>
+ <20241207190740.2607673-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241207190740.2607673-2-maz@kernel.org>
 
+On Sat, Dec 07, 2024 at 07:07:37PM +0000, Marc Zyngier wrote:
+> *EL02 and *_EL12 system registers are actually only accessors for
+> EL0 and EL1 registers accessed from EL2 when HCR_EL2.E2H==1. They
+> do not have fields of their own.
+> 
+> To that effect, introduce a 'Mapping' entry, describing which
+> system register an _EL12 register maps to.
+> 
+> Implementation wise, this is handled the same was as Fields,
+> which ls only a comment.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/tools/gen-sysreg.awk | 2 +-
+>  arch/arm64/tools/sysreg         | 7 +++++++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
+> index d1254a056114e..1a2afc9fdd42e 100755
+> --- a/arch/arm64/tools/gen-sysreg.awk
+> +++ b/arch/arm64/tools/gen-sysreg.awk
+> @@ -206,7 +206,7 @@ END {
+>  
+>  # Currently this is effectivey a comment, in future we may want to emit
+>  # defines for the fields.
+> -/^Fields/ && block_current() == "Sysreg" {
+> +(/^Fields/ || /^Mapping/) && block_current() == "Sysreg" {
+>  	expect_fields(2)
+>  
+>  	if (next_bit != 63)
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index b081b54d6d227..b6846c601df6c 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -38,6 +38,13 @@
+>  # Fields	<fieldsname>
+>  # EndSysreg
+>  
+> +# For register names indicating a cross-EL access (*_EL12, *EL02),
+> +# a Mapping entry describes the register it actually accesses:
 
+It might be better to say:
 
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Monday, December 9, 2024 12:49 PM
-> To: Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
-> maz@kernel.org; oliver.upton@linux.dev
-> Cc: catalin.marinas@arm.com; will@kernel.org; mark.rutland@arm.com;
-> eric.auger@redhat.com; yuzenghui <yuzenghui@huawei.com>; Wangzhou
-> (B) <wangzhou1@hisilicon.com>; jiangkunkun <jiangkunkun@huawei.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Anthony Jebson
-> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [PATCH v3 3/3] arm64: paravirt: Enable errata based on
-> implementation CPUs
->=20
-> On Mon, Dec 09 2024, Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com> wrote:
->=20
-> > Retrieve any migration target implementation CPUs using the hypercall
-> > and enable associated errata.
-> >
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> > Note:
-> >
-> > One thing I am not sure here is how to handle the hypercall error.
-> > Do we need to fail the Guest boot or just carry on without any
-> > target implementation CPU support? At the moment it just carries on.
-> >
-> > Thanks,
-> > Shameer
-> > ---
-> >  arch/arm64/include/asm/cputype.h  | 25 +++++++++++++++++++++++--
-> >  arch/arm64/include/asm/paravirt.h |  3 +++
-> >  arch/arm64/kernel/cpu_errata.c    | 20 +++++++++++++++++---
-> >  arch/arm64/kernel/cpufeature.c    |  2 ++
-> >  arch/arm64/kernel/image-vars.h    |  2 ++
-> >  arch/arm64/kernel/paravirt.c      | 31
-> +++++++++++++++++++++++++++++++
-> >  6 files changed, 78 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/cputype.h
-> b/arch/arm64/include/asm/cputype.h
-> > index dcf0e1ce892d..9e466f3ae9c6 100644
-> > --- a/arch/arm64/include/asm/cputype.h
-> > +++ b/arch/arm64/include/asm/cputype.h
-> > @@ -265,6 +265,16 @@ struct midr_range {
-> >  #define MIDR_REV(m, v, r) MIDR_RANGE(m, v, r, v, r)
-> >  #define MIDR_ALL_VERSIONS(m) MIDR_RANGE(m, 0, 0, 0xf, 0xf)
-> >
-> > +#define MAX_TARGET_IMPL_CPUS 64
-> > +
-> > +struct target_impl_cpu {
-> > +	u32 midr;
-> > +	u32 revidr;
-> > +};
->=20
-> Doesn't this need to be u64 for both (even if the upper bits for
-> MIDR_EL1 are reserved?)
+| For VHE aliases (*_EL12, *_EL02) of system registers, a Mapping entry
+| describes the register the alias actually accesses:
 
-Yes, both are u64 as per specification with upper bits reserved. And the=20
-external hypercall interface has uint64.
+... and with that'd it's probably best to place this above the
+description of SysregFields, so that people see this first and don't
+copy the anti-pattern you're trying to remove.
 
-But in kernel, AFAICS, at present all the _midr_range_() functions expect u=
-32.
-So not sure we gain much now by changing to u64.
+For SysregFields we could clarify the existing wording to:
 
-Thanks,
-Shameer
-=20
+| Where multiple system regsiters are not VHE aliases but share a common
+| layout, a SysregFields block can be used to describe the shared
+| layout:
 
+With or without those changes:
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> +
+> +# Sysreg 	<name_EL12>	<op0> 	<op1>	<crn>	<crm>	<op2>
+> +# Mapping	<name_EL1>
+> +# EndSysreg
+> +
+>  # For ID registers we adopt a few conventions for translating the
+>  # language in the ARM into defines:
+>  #
+> -- 
+> 2.39.2
+> 
