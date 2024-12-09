@@ -1,78 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5537835950
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 14:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4BE1B0422
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 14:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733754149; cv=none; b=YpkYBOh2SO3m05Am4GJIEKoQ7ILMAhLrbZ84UPPRoW1xpp+1MliaHfnXfKPESe0eRPZIQYB8F4NbFwwbCL/jHHuZ1RI9v+Yi2f2KRlJbHs96BD8ykkT00wtPd04XYisEmOoyZCwYA4rXJmikSXTG7eRt8eDazPR7EuJwJJhjGSU=
+	t=1733754276; cv=none; b=DlePlV8sCwoQljQhW9oi2ssoSRfulMm/xoGoVlynWWhLXh7R98Qoj335nvbbjMbLd+Vjbcg7AdWpjC0GF60KDNpamb7lrBUZqyaUo7+UsVPC/pd1osG83+0Cgpl2XgEbm9d9rCZcNVuu8Vul57c7RRB5HCFM4DOX83yvgSUhq2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733754149; c=relaxed/simple;
-	bh=Hk2ii8RYr1XXVNys27bsSr8dA87e/0mQrw7DBTk62cs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z+83OuE7UkRQzImwxGCcRzsP+DFc1CxHN4t2P/DeW8rFwOOzUV3QKWNR7LZgHYshK2T9fqxRupE0EDypm2d37VYqoVmOt29QI5x5onXsr00Ih6UpS4cxBXLOVRMrL2VVj4QkJK5YVEzPECvrmasKl5TrMDw/DcGWJNfa9GmqklE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXeX3jTu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXeX3jTu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5283AC4CEDE;
-	Mon,  9 Dec 2024 14:22:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733754148;
-	bh=Hk2ii8RYr1XXVNys27bsSr8dA87e/0mQrw7DBTk62cs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eXeX3jTuvqP3UVfF8VrIE1fenbqYGh+4vZIaQfTXVAaF2DS4+GTfxT/MjpgvRFy1T
-	 31HsBqWW4MQCaEWIqspfc3/mwafSogObGqis17G3wpa5B+K+hSDU5C+RwuQsIBe1ID
-	 p8EnfcqMFt29bODXBllIfHVhDz/ogMRtd/aWatY9VAgQUMcrWdaLIqTk0ajSQyndBS
-	 ccttENwb5qyWy7GBNVA/LJ1BrC6yE3zmY0JYisKYme27Us/7fFr0AopW2qaNjU6bCX
-	 MSm3MDZp3By+xouIeS2DMuhvnp0t3SdjsRZ6dTMz6Bgr4bglgTpZ5YaZ/qV8zVYbSs
-	 z73EJ7KuNJ13A==
-Date: Mon, 9 Dec 2024 14:22:24 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 3/4] arm64/sysreg: Convert *_EL12 accessors to Mapping
-Message-ID: <49a35d0c-7ed6-4b87-bbc2-02a35b5a9604@sirena.org.uk>
-References: <20241207190740.2607673-1-maz@kernel.org>
- <20241207190740.2607673-4-maz@kernel.org>
+	s=arc-20240116; t=1733754276; c=relaxed/simple;
+	bh=Oeo32UMYg5H8XyPLX7x3SN757WLg8xYyo5+dfHLDgN0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iUraOaraKmx/4CDs91HfTjhoJQAeD40J8Xzg006pvby9/HP5+6qUmpQKfNIY2MJUcgNtJgX/7VKXf32FciSGcYVLld5t82+ZhahQdqqhxfiSdbKg2T3HWXUnggR6YvnqGnDS6dg//m5bJuSV5YeK6E481KBTukkjIbmWTQh0FWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 69FD91650;
+	Mon,  9 Dec 2024 06:24:59 -0800 (PST)
+Received: from T9219K2H65.arm.com (unknown [10.119.39.206])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0FBC3F720;
+	Mon,  9 Dec 2024 06:24:30 -0800 (PST)
+From: Chase Conklin <chase.conklin@arm.com>
+To: maz@kernel.org
+Cc: andersson@kernel.org,
+	christoffer.dall@arm.com,
+	joey.gouly@arm.com,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 00/11] KVM: arm64: Add NV timer support
+Date: Mon,  9 Dec 2024 08:24:29 -0600
+Message-Id: <20241209142429.882-1-chase.conklin@arm.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241202172134.384923-1-maz@kernel.org>
+References: <20241202172134.384923-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="B9oMMmb8MLjHL9v5"
-Content-Disposition: inline
-In-Reply-To: <20241207190740.2607673-4-maz@kernel.org>
-X-Cookie: Lensmen eat Jedi for breakfast.
+Content-Transfer-Encoding: 8bit
 
+Hi Marc,
 
---B9oMMmb8MLjHL9v5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Mon, 2 Dec 2024 17:21:23 +0000, Marc Zyngier <maz@kernel.org> wrote: 
+> Here's another batch of NV-related patches, this time bringing in most
+> of the timer support for EL2 as well as nested guests.
+> 
+> The code is pretty convoluted for a bunch of reasons:
+> 
+> - FEAT_NV2 breaks the timer semantics by redirecting HW controls to
+>   memory, meaning that a guest could setup a timer and never see it
+>   firing until the next exit
+> 
+> - We go try hard to reflect the timer state in memory, but that's not
+>   great.
+> 
+> - With FEAT_ECV, we can finally correctly emulate the virtual timer,
+>   but this emulation is pretty costly
+> 
+> - As a way to make things suck less, we handle timer reads as early as
+>   possible, and only defer writes to the normal trap handling
+> 
+> - Finally, some implementations are badly broken, and require some
+>   hand-holding, irrespective of NV support. So we try and reuse the NV
+>   infrastructure to make them usable. This could be further optimised,
+>   but I'm running out of patience for this sort of HW.
+> 
+> What this is not implementing is support for CNTPOFF_EL2. It appears
+> that the architecture doesn't let you correctly emulate it, so I guess
+> this will be trap/emulate for the foreseeable future.
+> 
+> This series is on top of v6.13-rc1, and has been tested on my usual M2
+> setup, but also on a Snapdragon X1 Elite devkit. I would like to thank
+> Qualcomm for the free hardware with no strings (nor support) attached!
+> 
+> If you are feeling brave, you can run the whole thing from [1].
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
+>
 
-On Sat, Dec 07, 2024 at 07:07:39PM +0000, Marc Zyngier wrote:
-> Perform a bulk convert of the remaining EL12 accessors to use the
-> Mapping qualifier, which meakes things a bit clearer.
+I was feeling brave, and I think I see an issue in the cpufeature change
+in the kvm-arm64/nv-e2h-select branch that's a part of
+kvm-arm64/nv-next. In d75a4820a897 ("arm64: cpufeature: Handle NV_frac as a synonym of NV2"),
+I don't see NV_frac being added to the FTR bits. I believe that means it
+will get sanitized out and consequently not seen by the NV feature
+detection code. Does that commit also need:
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9fa8bd77ae0..f97459e160b 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -480,6 +480,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
 
---B9oMMmb8MLjHL9v5
-Content-Type: application/pgp-signature; name="signature.asc"
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
+        S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
++       S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
+        ARM64_FTR_END,
+ };
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdW/R8ACgkQJNaLcl1U
-h9BvnQf8CDc+zo4lXTgr4kzGL3vkHBle8d0SVe3490in9rDummjt8l3/8zpiP4cI
-jlfq0PIGYLLy906pSFRHsJyvT7mKVLwlNZb/Bz3y2uX0YD0V99LSVTzoemNLBIjq
-rij5KXLlaOs90RmEIW6fTb5Of+ibaH+9k1L+npmblxSoCTlUV9vtST+VSZD2jCjq
-hOHIRkBTiJatGpRkaLJY1z4tKNC4yHSmonItysGh8YCdiqHsM5uYQT0eBRuIcM6p
-MZsEDC2ng9gr17YLqkgDD+iGO1v+6RcEGkvLezZmFPJXfre0JcT2s1I8ERc1oA6F
-z5yKM/IGxCLpenbZSwljSmapKNSYhA==
-=3jqe
------END PGP SIGNATURE-----
-
---B9oMMmb8MLjHL9v5--
+Thanks,
+Chase
