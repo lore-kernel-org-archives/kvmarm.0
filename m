@@ -1,69 +1,69 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A31214809
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 08:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1F8215172
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 08:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733731626; cv=none; b=VoOaBNgkc9Z243x/Yn0kwxsKBd9ZyU8vkErxb6nmFvgTMa6ydgti8kiPI5tmj9aYsL/gU0jsIJUslO+xDZR3FGV9nsEQNk+mFvs5iwPx12FMCGVpuEj6eMP6mWgll34w97y+yqcKKuGV0x8Rxj08IlYL7fkB+C7dpZa2jy8Sdhc=
+	t=1733731814; cv=none; b=Uv+zIto2kRFO4N24FXGIMpo6viqu9jU7DBhYZZJkX5EvYn5CLRGqsesHGcGP6J6CUSD35gQdKSJcKofApV78h6MyPXL9Xi3YnUkWqzX8b7134FQ54A6eN5/iRpnY7Ima7sgo4eGqcBggDX4hnNOuySo2ob3PVhfHGPBC65IzTXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733731626; c=relaxed/simple;
-	bh=I+CZQxwwIDwJytfpHHBP+hlx0lJosL6xfdX5C2+VbgY=;
+	s=arc-20240116; t=1733731814; c=relaxed/simple;
+	bh=PFlSvc+5Z3Xe44MU0qpEF86vpSSNPVhCpQ4kV8qHKP8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fmMbkI1dasRGUm9TQP3Or71VcMcBU4tJ0avAy1JqKZ3m4O1alCE4EhUtVEgdR8xJ79H8kQnA1glMC+9BHRK2bKe4490G6rNwBxKe6UYZUKfcIfxZtQOEe+WVF7GezBeiCJEPKTVSTjwtbT43+st3L0nsHWwmSCvqJVZcPCAhqOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UAPnRH1v; arc=none smtp.client-ip=209.85.128.49
+	 To:Cc:Content-Type; b=lawm99O6PavZye1slElj81znusN+Zod4/xoGRl+2K2DBZEzcMs4x5bbcq+71dh3XKQJLk9pCXilKmLm4AIaY2rn5gqvLXo0rRv9M4ViAzAbdnA9Hv6j8NPmusBEZYvL0EO+BAyA95fKAoJrZbpguA4rGz9toChVVVqE6MT9XgD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YtMzLEdb; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UAPnRH1v"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-434ed674047so62295e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 09 Dec 2024 00:07:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YtMzLEdb"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-434e5e71a08so71165e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 09 Dec 2024 00:10:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733731623; x=1734336423; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733731811; x=1734336611; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=82S7PbDe0oe1fScv2wnm6abSAjxVCV0v9XILXewfqtQ=;
-        b=UAPnRH1vThkB8kF+ULQkDGzMpTucvakC59B9IaMoU/4XN0yh0TbI7gKxZMbCmf+bb+
-         a0szkYk4QvqFhLoDvhwTdTmv/0zYDgs83IJ1IyfdHQPjENb1rG22ysJQ2Y5hN9Heu0Ui
-         EDeTE+zNkt2VQMUHBv+oR+n3g0ShUjg6jlVbp6B+wvNaZ2fJGkj10niDYqUQLTEwbP7N
-         YozSFtdidGcu+dUiLnS1JI6g6nyzKceBKZcKo9ad+FruprCYjyaoPG1NLpSTX8KP190k
-         aIHLX5QycQox+ikRA3x2qNXhSr4/+j5etGpt7DH3vJ3pifI23xQgqIMjQbdA/4h2Frwy
-         p9kQ==
+        bh=TJbTrtvGneL0K+ke9Gwc/0whnIda/bBfVk+UfsZChhU=;
+        b=YtMzLEdbesS+b6jeymE8N52bnp97P+rLttUxDjyDzF4nfXEB9gHik6rIDZLYvv8r50
+         vPzt/uwVljCX5KUuJSm70312fQF1V08Hn0kAwfwDmK5t9lkWbWs9jK+L5HJMEAzCi0mp
+         bQmehR8H4R5CDbUljU4bh9STcevjswEqZBmMzj3kum6+TenDWZgPcAa/svcNa4XeiUeT
+         Gg/tWe/roF18qaFTCNozu2UQVcV1iORLdjQ85VFa17XQYKBygj6OMnrX83rdgZAP9cr6
+         DvJONsiQdsIQl5T+0hWTO8eF7P7LTwdx2oDOfja1o4oK+9La4nh/QLz+FDVnt6f+l559
+         O71A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733731623; x=1734336423;
+        d=1e100.net; s=20230601; t=1733731811; x=1734336611;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=82S7PbDe0oe1fScv2wnm6abSAjxVCV0v9XILXewfqtQ=;
-        b=FV+7dQfHNKKyjQH8kh8VGulNGZxc5Pn4cu+QSzmRO+fUS214pM7kwVo83BhVG1Ie5B
-         UDAO00E4d3I4SaOMn6ulfyNJuZ1UmO7sqrTIcZzkBFRC60nUkcOsIGgM+Yt8ZnFHyUJ+
-         OALz6/YyBfFoqyJ20LpR/q4ehk0QDbjEmbpm4hxSF/Ux02cxLCK6beEjwELFOWOHRNFb
-         wCnaxDPZfGz0hx9aQDKCZG6w8zFwDPfJFs3VwZxtVdrqMFi8Mt5E0BCr19wenKQuW7ol
-         4GayCYrLLmPWSJtnYP9eUZn6IQqjzO3dlTZRP2NLzAcD8o6iCuKvTHFy9G87xMojFq3F
-         eWuQ==
-X-Gm-Message-State: AOJu0YyIMmJmFj8irz0aWnsqHijQ37j3kJbR7u16gz2uOQjxIgqC6NFC
-	Eaf607fx2dwqAn1DCPg+A3kJzWjoWZk5ujj/61E8gQdI8FIDFi9+5RsH8E7G9+3CWaey2PmcR2H
-	Dqzt8l6AE4y8q+pePy7QgPhVeBcnXZrhBMGlH
-X-Gm-Gg: ASbGncsTTmpsemQmHpG1rxDWRWAxnsmFUHfg6rf7ZAWVQTuqhDFJoqMlMBtud6xLlYZ
-	GcKpPHFYzUtlbmU/6GRK0A44xHivGeQ==
-X-Google-Smtp-Source: AGHT+IFHPISoszHs24tCysjuD8a25wVHcJsjEOG5WotyQnhYTjm7sOA+Rb4A/vSCrQZbyHT4VvtHjyFj9CA292vpIGQ=
-X-Received: by 2002:a05:600c:332a:b0:434:9e01:cac1 with SMTP id
- 5b1f17b1804b1-434e92dbcbbmr2217355e9.7.1733731623312; Mon, 09 Dec 2024
- 00:07:03 -0800 (PST)
+        bh=TJbTrtvGneL0K+ke9Gwc/0whnIda/bBfVk+UfsZChhU=;
+        b=nUbwjnSoTL5F0af72/CP8O5B1XDSbQcD0AmyLtsiLG3ndrFo2v1cb7kM65BahHzz7G
+         YFzKQ03jRkl5O5FBOWwswk96ELQzf56+RwdhszDu6bOoeAtDI3CDFICPnIszP8jBjaQ1
+         va7HVjIj0ybd0AIhLONhth+OlxAPi9hK2MW4yG8Xfh6YC9mH+XdbIS8tZP9I4B9g5keY
+         IFtnbhrmT2TfPuurt+ZdmFDqKeNMBAsxyCkVUN4Fj5h7Tbfoggy/fKgwJM9l+7aEeKrY
+         bEb7CJH199KWiRUntOszlPYA7xk5eexAg5IoCCBF1WUG6VM0bZ5ixU3RtOLeIa0nvH5a
+         37RQ==
+X-Gm-Message-State: AOJu0Yyb1mbKPBZegWa+EfJ5Pqb17+LH6YTUgDiKHrwiWJEPTtJuWZth
+	VKMyGh1RV16q6uwkpIq2/J4Yd53MLwa7jaigK+lEcGVQ0gmL9DuBFrS61LSJkM18Oo//3S1DLF6
+	sG8h8YGxD2+hg+kzPU7fscNCnAJjrrbUONeup
+X-Gm-Gg: ASbGnctWsoAnocjJ9voKuqQuLOmUeudfE8uf7Pi9pQ0S+AAcgYW0W/EbPE5SZnQ1vUX
+	ROqoaKMWthHlP61NpIWiO1GFz0mYLMA==
+X-Google-Smtp-Source: AGHT+IHzonQzcQEPPJQ19YlDfCKStU1KuBNC12yGt6wg237N05KxGZu/6cvhmSjtaskyGSZGiX3jh152NoyInvIXc1I=
+X-Received: by 2002:a05:600c:6c4e:b0:434:9fac:3408 with SMTP id
+ 5b1f17b1804b1-434e8347d19mr2392935e9.2.1733731811183; Mon, 09 Dec 2024
+ 00:10:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-3-tabba@google.com>
- <Z1Mp4zmZRL_8QEmb@google.com>
-In-Reply-To: <Z1Mp4zmZRL_8QEmb@google.com>
+References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-6-tabba@google.com>
+ <Z1MwuSh6jc94cem0@google.com>
+In-Reply-To: <Z1MwuSh6jc94cem0@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 9 Dec 2024 08:06:26 +0000
-Message-ID: <CA+EHjTwzDDPTyqs-VgGvPK+gk-+fDsD8WdQN1cJjzNcCYWBJFw@mail.gmail.com>
-Subject: Re: [PATCH v4 02/14] KVM: arm64: Group setting traps for protected
- VMs by control register
+Date: Mon, 9 Dec 2024 08:09:34 +0000
+Message-ID: <CA+EHjTwSFW5hMFWhkOMBgO1QFq1t0LaGBns_-MnDZkzU6qdfXQ@mail.gmail.com>
+Subject: Re: [PATCH v4 05/14] KVM: arm64: Initialize feature id registers for
+ protected VMs
 To: Quentin Perret <qperret@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -72,112 +72,36 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	kristina.martsenko@arm.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Quentin,
-
-On Fri, 6 Dec 2024 at 16:44, Quentin Perret <qperret@google.com> wrote:
+On Fri, 6 Dec 2024 at 17:13, Quentin Perret <qperret@google.com> wrote:
 >
-> On Monday 02 Dec 2024 at 15:47:29 (+0000), Fuad Tabba wrote:
-> > +static void pvm_init_traps_cptr(struct kvm_vcpu *vcpu)
-> >  {
-> > -     const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> > -     u64 mdcr_set = 0;
-> > -     u64 mdcr_clear = 0;
-> > -     u64 cptr_set = 0;
-> > +     const u64 id_aa64pfr0 = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
-> > +     const u64 id_aa64pfr1 = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR1_EL1);
-> > +     const u64 id_aa64dfr0 = pvm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> > +     u64 val = vcpu->arch.cptr_el2;
+> On Monday 02 Dec 2024 at 15:47:32 (+0000), Fuad Tabba wrote:
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > index 59fb2f056177..1261da6a2861 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -204,8 +204,7 @@ static u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
+> >       return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
+> >  }
 > >
-> > -     /* Trap/constrain PMU */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), feature_ids)) {
-> > -             mdcr_set |= MDCR_EL2_TPM | MDCR_EL2_TPMCR;
-> > -             mdcr_clear |= MDCR_EL2_HPME | MDCR_EL2_MTPME |
-> > -                           MDCR_EL2_HPMN_MASK;
-> > +     if (!has_hvhe()) {
-> > +             val |= CPTR_NVHE_EL2_RES1;
-> > +             val &= ~(CPTR_NVHE_EL2_RES0);
+> > -/* Read a sanitized cpufeature ID register by its encoding */
+> > -u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> > +static u64 pvm_calc_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> >  {
+> >       switch (id) {
+> >       case SYS_ID_AA64PFR0_EL1:
+> > @@ -240,10 +239,25 @@ u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> >       }
+> >  }
+> >
+> > +/* Read a sanitized cpufeature ID register by its encoding */
+> > +u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> > +{
+> > +     return pvm_calc_id_reg(vcpu, id);
+> > +}
 >
-> It's a bit odd to do that at the beginning of the function no? Perhaps
-> do it last to be sure to overwrite all the changes below?
->
-> Also, not sure we need the RES1 part here, kvm_get_reset_cptr_el2()
-> should have set those for us.
+> That wrapper doesn't look particularly useful, perhaps we could drop it?
 
-I agree on both, and by the end of this series they end up being as
-you suggest. The purpose of this particular patch is just the grouping
-of the traps, while keeping everything else the way it is.
+It does get dropped in the next patch.
 
 Cheers,
 /fuad
-
->
-> >       }
-> >
-> > -     /* Trap Debug */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), feature_ids))
-> > -             mdcr_set |= MDCR_EL2_TDRA | MDCR_EL2_TDA | MDCR_EL2_TDE;
-> > -
-> > -     /* Trap OS Double Lock */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DoubleLock), feature_ids))
-> > -             mdcr_set |= MDCR_EL2_TDOSA;
-> > +     /* Trap AMU */
-> > +     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU), id_aa64pfr0))
-> > +             val |= CPTR_EL2_TAM;
-> >
-> > -     /* Trap SPE */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer), feature_ids)) {
-> > -             mdcr_set |= MDCR_EL2_TPMS;
-> > -             mdcr_clear |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
-> > +     /* Trap SVE */
-> > +     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), id_aa64pfr0)) {
-> > +             if (has_hvhe())
-> > +                     val &= ~(CPACR_ELx_ZEN);
-> > +             else
-> > +                     val |= CPTR_EL2_TZ;
-> >       }
-> >
-> > -     /* Trap Trace Filter */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceFilt), feature_ids))
-> > -             mdcr_set |= MDCR_EL2_TTRF;
-> > +     /* No SME support in KVM. */
-> > +     BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME), id_aa64pfr1));
-> > +     if (has_hvhe())
-> > +             val &= ~(CPACR_ELx_SMEN);
-> > +     else
-> > +             val |= CPTR_EL2_TSM;
-> >
-> >       /* Trap Trace */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceVer), feature_ids)) {
-> > +     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceVer), id_aa64dfr0)) {
-> >               if (has_hvhe())
-> > -                     cptr_set |= CPACR_EL1_TTA;
-> > +                     val |= CPACR_EL1_TTA;
-> >               else
-> > -                     cptr_set |= CPTR_EL2_TTA;
-> > +                     val |= CPTR_EL2_TTA;
-> >       }
-> >
-> > -     /* Trap External Trace */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_ExtTrcBuff), feature_ids))
-> > -             mdcr_clear |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
-> > -
-> > -     vcpu->arch.mdcr_el2 |= mdcr_set;
-> > -     vcpu->arch.mdcr_el2 &= ~mdcr_clear;
-> > -     vcpu->arch.cptr_el2 |= cptr_set;
-> > -}
-> > -
-> > -/*
-> > - * Set trap register values based on features in ID_AA64MMFR0.
-> > - */
-> > -static void pvm_init_traps_aa64mmfr0(struct kvm_vcpu *vcpu)
-> > -{
-> > -     const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64MMFR0_EL1);
-> > -     u64 mdcr_set = 0;
-> > -
-> > -     /* Trap Debug Communications Channel registers */
-> > -     if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_FGT), feature_ids))
-> > -             mdcr_set |= MDCR_EL2_TDCC;
-> > -
-> > -     vcpu->arch.mdcr_el2 |= mdcr_set;
-> > +     vcpu->arch.cptr_el2 = val;
-> >  }
