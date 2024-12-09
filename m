@@ -1,66 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A488D12B169
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 15:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F2278C9C;
+	Mon,  9 Dec 2024 15:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733759146; cv=none; b=HB5Qpv1cYuhSTfCwXuLi0a7BYAkkvq9fbt8E42EQ4CmyGuHxaYjKVwnIJOrqbZRTJwp4BejTecPECR6AB0qXoNalyrNtWGBTRWqoNVoRigXNAF68y0Hgb9Qp59L4odVHX8YH+O+C9UQnRJ0/1e9xGCAOJLEX3VeZh0aYmNOCGtQ=
+	t=1733759543; cv=none; b=eh3vyiNdC//BRGS403qc+2Yhzz5+KnCEbgGKw7wtqm2ZPp6srZvJz3prE9oIZ8kWy+Mzw38yyZBiO0K+IRZHAFyP0F90hv47LclW5T/o+o/JKez5jyRsuz7CJstiH9UVXXn7nOa91kiIc2tFnb1PA6aepqEBv6ySp4z/NT8LUWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733759146; c=relaxed/simple;
-	bh=waieXy8ZvxsddVWFcwGo31hwJetNKj8FiS3REo21d6Q=;
+	s=arc-20240116; t=1733759543; c=relaxed/simple;
+	bh=jWxo2jIBvLBzYak18bM2E9DaATq5/K318coH0N0pg24=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S9Kj/ro0TuTIJdG8WHsXJnf3hI9euujYCxZIOgSS318JKLiEs5VtKeSRyov23aESVpyvMgJdXb6x62VmTy8vSVdiClBLfJn47of1m+pxrr/a/ysbtyVURSLUh1cbTSuZK0FMjgFKwIOd7VVge3iacSb0xRWvJ0nO12L08jpeyV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wy0dW8FJ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=fyIKzj63tY7RSZq3bD9E4oS3E3tz02XYQdy7o+GT/G1SC9Cm7qAYWbN88354sI2qrrO02A1JPRs6g/ILgqXEWimxRG8wMDqFPQPj4vbIh4SlCAOCwBS+NKcbDJrnks3ay0XyKe1bx90fw34xfeDCRlr7iJVvyVGxNQD9dPe8dwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLhFS8ir; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wy0dW8FJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A145C4CED1;
-	Mon,  9 Dec 2024 15:45:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLhFS8ir"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAAB5C4CED1;
+	Mon,  9 Dec 2024 15:52:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733759146;
-	bh=waieXy8ZvxsddVWFcwGo31hwJetNKj8FiS3REo21d6Q=;
+	s=k20201202; t=1733759542;
+	bh=jWxo2jIBvLBzYak18bM2E9DaATq5/K318coH0N0pg24=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Wy0dW8FJU/b3g+a3NoTzQQy5QfvRYg83SpSl2IkfWHKLsdU8GVlIQnSR98bc2Rz7p
-	 ZP0gDvMgrr8mRLd+fVqjO8omGS+87srdoEpk/GuBB1p22RyGBuAidKfrG7lptTWcTE
-	 L58g0xMfRP6ffdsizOq9rwtQ6Sl6GfrlFf/J/PbOTtLr2Cl04VXwiEOY7jE80GWTCC
-	 S9T04DA4w3qtEUgD4P6gdfn4kyHs+C9WWD8hOYie61trS35EK8QEnNiWOFAE1OdqgU
-	 a69Af1QJyAOAmgNFH6Q+PtE6nsdP3g9OdztWQRw5Ze58rD8/DSdbCUaLZL9m29CuTv
-	 ojk4tyWsRzD3Q==
+	b=cLhFS8irN0EUwo75llXUqSxyhAAENEyMQHEGjwfKgEd4be6y4ALUCa9voVNK3tWB+
+	 jNShTnrGPjlAqieQa/9JHZMZDkLepOxQhjSEge9Y0YWJSZytDZHsRnYcCpv0szfARy
+	 PjlbQ1MKIWpYOFLSNmE2ap+APsn5MhASWxx5fBAB2B4ipdaG7xouZ+wIAtOwevtcx7
+	 Aka/DYUNMBsHhbHGW+060x4ndT6ic9SqVajoM2jFtSfv21v7zGNtrwfu2QuUrbKrFb
+	 XBGeAvCuc8FX9cqBEc5iEKg0Y8tK3f1gTzN1nuxnXoHTM1yS6Y9Yl72YzDgSMNAxsT
+	 wBbgVPn+9lk4A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tKfxA-001vzD-4z;
-	Mon, 09 Dec 2024 15:45:44 +0000
-Date: Mon, 09 Dec 2024 15:45:43 +0000
-Message-ID: <861pyguafs.wl-maz@kernel.org>
+	id 1tKg3Y-001w6K-QD;
+	Mon, 09 Dec 2024 15:52:20 +0000
+Date: Mon, 09 Dec 2024 15:52:19 +0000
+Message-ID: <86zfl4svkc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: Cornelia Huck <cohuck@redhat.com>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org"
-	<will@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	yuzenghui
-	<yuzenghui@huawei.com>,
-	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	jiangkunkun
-	<jiangkunkun@huawei.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Linuxarm <linuxarm@huawei.com>
-Subject: Re: [PATCH v3 3/3] arm64: paravirt: Enable errata based on implementation CPUs
-In-Reply-To: <d92ea2dcc3b04ebb8bc5ba71bff448bc@huawei.com>
-References: <20241209115311.40496-1-shameerali.kolothum.thodi@huawei.com>
-	<20241209115311.40496-4-shameerali.kolothum.thodi@huawei.com>
-	<875xnt10oj.fsf@redhat.com>
-	<d92ea2dcc3b04ebb8bc5ba71bff448bc@huawei.com>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm <kvmarm@lists.linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	christoffer.dall@arm.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	coltonlewis@google.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
+In-Reply-To: <8be59ff3-6a68-48e1-8181-0ce4b2e7180f@os.amperecomputing.com>
+References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
+	<867c89tc4q.wl-maz@kernel.org>
+	<c5b1c3d7-56ca-4afc-a831-045dba4beffa@os.amperecomputing.com>
+	<865xntt2kv.wl-maz@kernel.org>
+	<8be59ff3-6a68-48e1-8181-0ce4b2e7180f@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,93 +67,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, cohuck@redhat.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, eric.auger@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 09 Dec 2024 13:49:07 +0000,
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Mon, 09 Dec 2024 15:39:28 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
 > 
 > 
-> > -----Original Message-----
-> > From: Cornelia Huck <cohuck@redhat.com>
-> > Sent: Monday, December 9, 2024 12:49 PM
-> > To: Shameerali Kolothum Thodi
-> > <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
-> > maz@kernel.org; oliver.upton@linux.dev
-> > Cc: catalin.marinas@arm.com; will@kernel.org; mark.rutland@arm.com;
-> > eric.auger@redhat.com; yuzenghui <yuzenghui@huawei.com>; Wangzhou
-> > (B) <wangzhou1@hisilicon.com>; jiangkunkun <jiangkunkun@huawei.com>;
-> > Jonathan Cameron <jonathan.cameron@huawei.com>; Anthony Jebson
-> > <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
-> > Linuxarm <linuxarm@huawei.com>
-> > Subject: Re: [PATCH v3 3/3] arm64: paravirt: Enable errata based on
-> > implementation CPUs
+> On 09-12-2024 06:50 pm, Marc Zyngier wrote:
+> > On Mon, 09 Dec 2024 12:25:34 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >>>> 
+> >>>> During automated testing of Nested Virtualization using avocado-vt,
+> >>> 
+> >>> Which is not merged upstream. So what branch are you using? Based on
+> >>> what kernel version? On what HW? With which virtualisation features?
+> >>> 
+> >> 
+> >> Testing is done on Ampere's AmpereOne platform using 6.10 based kernel
+> >> with NV patches from your repo.
 > > 
-> > On Mon, Dec 09 2024, Shameer Kolothum
-> > <shameerali.kolothum.thodi@huawei.com> wrote:
+> > Grmbl... *Which* patches? At least give me the SHA1 of the branch,
+> > because I have no idea what you are running. And 6.10 is definitely
+> > not something I care about. If you're using the NV patches, the
+> > *minimum* you should run is 6.13-rc1, because that's what the current
+> > code is based on.
 > > 
-> > > Retrieve any migration target implementation CPUs using the hypercall
-> > > and enable associated errata.
-> > >
-> > > Signed-off-by: Shameer Kolothum
-> > <shameerali.kolothum.thodi@huawei.com>
-> > > ---
-> > > Note:
-> > >
-> > > One thing I am not sure here is how to handle the hypercall error.
-> > > Do we need to fail the Guest boot or just carry on without any
-> > > target implementation CPU support? At the moment it just carries on.
-> > >
-> > > Thanks,
-> > > Shameer
-> > > ---
-> > >  arch/arm64/include/asm/cputype.h  | 25 +++++++++++++++++++++++--
-> > >  arch/arm64/include/asm/paravirt.h |  3 +++
-> > >  arch/arm64/kernel/cpu_errata.c    | 20 +++++++++++++++++---
-> > >  arch/arm64/kernel/cpufeature.c    |  2 ++
-> > >  arch/arm64/kernel/image-vars.h    |  2 ++
-> > >  arch/arm64/kernel/paravirt.c      | 31
-> > +++++++++++++++++++++++++++++++
-> > >  6 files changed, 78 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/cputype.h
-> > b/arch/arm64/include/asm/cputype.h
-> > > index dcf0e1ce892d..9e466f3ae9c6 100644
-> > > --- a/arch/arm64/include/asm/cputype.h
-> > > +++ b/arch/arm64/include/asm/cputype.h
-> > > @@ -265,6 +265,16 @@ struct midr_range {
-> > >  #define MIDR_REV(m, v, r) MIDR_RANGE(m, v, r, v, r)
-> > >  #define MIDR_ALL_VERSIONS(m) MIDR_RANGE(m, 0, 0, 0xf, 0xf)
-> > >
-> > > +#define MAX_TARGET_IMPL_CPUS 64
-> > > +
-> > > +struct target_impl_cpu {
-> > > +	u32 midr;
-> > > +	u32 revidr;
-> > > +};
-> > 
-> > Doesn't this need to be u64 for both (even if the upper bits for
-> > MIDR_EL1 are reserved?)
 > 
-> Yes, both are u64 as per specification with upper bits reserved. And the 
-> external hypercall interface has uint64.
-> 
-> But in kernel, AFAICS, at present all the _midr_range_() functions expect u32.
-> So not sure we gain much now by changing to u64.
+> I tried 6.13-rc1 based nv-next branch today, which failed to boot
+> UEFI as L1. Yet to debug this.
 
-For MIDR_EL1, I don't think that's a problem as long as we make sure
-this is a kernel-private representation, and that it doesn't leak to
-userspace or the PV interface.
+Works nicely here with kvmtool as the VMM. From what I understand,
+EDK2 needs some surgery to correctly boot at EL2 without FEAT_E2H0.
 
-For REVIDR_EL1, it *is* a problem, as the whole register is IMPDEF,
-and an implementation could legitimately use the top bits.
+> We do have the FEAT_ECV on AmpereOne, I was the one reported/fixed bug
+> with FEAT_ECV(CNTPOFF offset issue) in the past.
 
-So at this stage, it probably makes sense to keep both as 64bit
-values.
-
-Thanks,
+Sorry, I don't keep track of the feature set for machines I don't have
+access to.
 
 	M.
 
