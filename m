@@ -1,54 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F316C35975;
-	Mon,  9 Dec 2024 15:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD724233132;
+	Mon,  9 Dec 2024 15:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733757360; cv=none; b=TW9y7g1gakWfaMWshuyPXnEupMsTgGHeZQD8k+ViZMvCjRJHNYGQEiBC2nAKZsNGriTv6txyTLXbkhuMk8HN0BDLrGFdAlnRR0JfRU+oJ8CuFijSiHWigfvCN8mVJYabUb5/HRm7724MsdcJ7vZyuxKevshA4K2zgeItl9D5/Fc=
+	t=1733757810; cv=none; b=WvweYxrlFK3GMlsqOqZztO3NJM0cjiqL0LKsuND1PXZHZ519zaDJhLNDcxgHpSkb0EIZgvYZPHlPJuFq1rWvqjGC/5+SiKJ6RoW4YCHsUfHJHlYTUUu61wcd6O/lJkNPYGgn7WEWp4t+1pH3slqd7TUxiDt0K6MIeVxic/r7LKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733757360; c=relaxed/simple;
-	bh=mcjsf124K02oDwscCt6MS031CZT8Tzgco1aQjG7wAmA=;
+	s=arc-20240116; t=1733757810; c=relaxed/simple;
+	bh=KqvUAHtm3J6eCMmXZ+bSvIdzAZallzTuC51lAI5H8dc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZrZo0Wc77aL5Jy+CZdDzfXltH/Yf8XNXP6nPuYCgjjTQzej7p24LaxLWq/5K+UuEWSdiblQhhAl6cQ8qzoZRJA1T3mW09lJknpw/f0bCQqHgUJ67N6vkwvFE2baiMFw0ZzCfih33NkEpcI/G5XRda+p7WiBpZeLqwsVKmCeYKV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJlASOXa; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=VSKaMQi9DlChfjcKFifCapHlasld/S95lsAbh2TjDPjCy51ZPZITGV6NFTwawAbPSeTxCSsO5PhSkBVNHcrZVma9Xl/Rkpe3b8jCeFt5OL32mLbvK7iOl5h1pX3S8wMfgJZ/RqikSuG/0qbvAJE1EzM/zeKNzhe3ECWgl/F/PN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTPHwSWO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJlASOXa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77FC4C4CED1;
-	Mon,  9 Dec 2024 15:15:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTPHwSWO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4130DC4CED1;
+	Mon,  9 Dec 2024 15:23:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733757359;
-	bh=mcjsf124K02oDwscCt6MS031CZT8Tzgco1aQjG7wAmA=;
+	s=k20201202; t=1733757810;
+	bh=KqvUAHtm3J6eCMmXZ+bSvIdzAZallzTuC51lAI5H8dc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nJlASOXa3tZr3ijkUcVgDFy/kwmLac4beue++sR7ndcHfPUDuM0VeMwrqSfnr+7dZ
-	 6iZq/O7vOnnjI9PHgpfwgxmCXmbfwlcn1cdVHHnDkqmomkSJ/JYxm4bnOTMz9nnDDy
-	 GHdc4nWStVwa+0BHuqKWnJWqHUEku2o9LziBjNXTf2AeP367PFK3JCQtaietyXmuio
-	 qd6LbKkmf3AA8RuAp5/74MzUengrIuFYltf9ZC2HkyG9C6CLLKOsqu8QGvk53Ud6A/
-	 KZ//qaE9wQD58s4m6NdBvCBM3e9YnOk8LCOPvJ8j+59+j+q0B1Ej+RIdYTBa3u5Kwu
-	 +izeADjr4Srtg==
+	b=MTPHwSWOpruDhkz/BsphPDA+PiRFODp/9H1eta80wwvbMbAm3WM/1ZBERyhSQr9W/
+	 VzFJ1sXm5kOJKtp397D8Cb/Hsm5VdkiLKtBlL+bsmuqke/YfVKIaCuo0HMvCfHqKLY
+	 Ue5VcIvwgs3e6wzmHNYRNsH4RAenLMinMrlqogbXrLT5FjzSUzxyt5yYdYzSzAmO9T
+	 YF/93YJlLpwL+V6/ekZEjtZGMRfHrk765oz5IpAqqwL9QVAMlsSKZxD56RPpVCFJR0
+	 mbUvjmajrslQ5r3dre95D4Ui6E2sDksr/P9MuuIX3ULVp8j3pKvZlytn9z4C5KbgZc
+	 +m8THVr3084Pg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tKfUL-001vMG-5J;
-	Mon, 09 Dec 2024 15:15:57 +0000
-Date: Mon, 09 Dec 2024 15:15:56 +0000
-Message-ID: <864j3cubtf.wl-maz@kernel.org>
+	id 1tKfbb-001vXl-Ou;
+	Mon, 09 Dec 2024 15:23:27 +0000
+Date: Mon, 09 Dec 2024 15:23:27 +0000
+Message-ID: <8634iwubgw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Chase Conklin <chase.conklin@arm.com>
-Cc: andersson@kernel.org,
-	christoffer.dall@arm.com,
-	joey.gouly@arm.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm <kvmarm@lists.linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	oliver.upton@linux.dev,
+	christoffer.dall@arm.com,
 	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH 00/11] KVM: arm64: Add NV timer support
-In-Reply-To: <20241209142429.882-1-chase.conklin@arm.com>
-References: <20241202172134.384923-1-maz@kernel.org>
-	<20241209142429.882-1-chase.conklin@arm.com>
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	coltonlewis@google.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
+In-Reply-To: <865xntt2kv.wl-maz@kernel.org>
+References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
+	<867c89tc4q.wl-maz@kernel.org>
+	<c5b1c3d7-56ca-4afc-a831-045dba4beffa@os.amperecomputing.com>
+	<865xntt2kv.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,48 +66,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: chase.conklin@arm.com, andersson@kernel.org, christoffer.dall@arm.com, joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Chase,
+On Mon, 09 Dec 2024 13:20:48 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> So here's my current guess, since you don't give me the needed
+> information. For what you describe to happen, I can only see two
+> possibilities:
+> 
+> - either your HW doesn't have FEAT_ECV, in which case the guest
+>   directly reads from memory
+> 
+> - or you are running with something like this patch [1], and we serve
+>   the guest by reading from memory very early, without returning to
+>   the bulk of the emulation code
+> 
+> In either case, we only publish the updated status if the current IRQ
+> state is different from the computed output of the timer while
+> performing the emulation.
+> 
+> So if you were writing back a status bit set to 0 while the interrupt
+> was already pending, we'd deliver an interrupt, but not recompute the
+> status. The guest would consider the interrupt as spurious, not touch
+> the timer, and we'd never make forward progress. Rinse, repeat.
+> 
+> Assuming I got the analysis right, it would only be a matter of
+> hoisting the publication of the status into timer_emulate(), so that
+> it is made up to date on load.
+> 
+> Please give the fixup below a go.
 
-On Mon, 09 Dec 2024 14:24:29 +0000,
-Chase Conklin <chase.conklin@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, 2 Dec 2024 17:21:23 +0000, Marc Zyngier <maz@kernel.org>
-> wrote:
->
-> > If you are feeling brave, you can run the whole thing from [1].
-> > 
-> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
-> >
-> 
-> I was feeling brave, and I think I see an issue in the cpufeature change
-> in the kvm-arm64/nv-e2h-select branch that's a part of
-> kvm-arm64/nv-next. In d75a4820a897 ("arm64: cpufeature: Handle NV_frac as a synonym of NV2"),
-> I don't see NV_frac being added to the FTR bits. I believe that means it
-> will get sanitized out and consequently not seen by the NV feature
-> detection code. Does that commit also need:
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9fa8bd77ae0..f97459e160b 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -480,6 +480,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
-> 
->  static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
->         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
-> +       S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
->         ARM64_FTR_END,
->  };
+Plus this on top for a good measure:
 
-Ah, I always get tripped by that one. You are absolutely correct, this
-is needed. I'll fold that in.
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 91bda986c344b..c71193a7bb9c5 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -968,9 +968,6 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+ 	 * which allows trapping of the timer registers even with NV2.
+ 	 * Still, this is still worse than FEAT_NV on its own. Meh.
+ 	 */
+-	if (cpus_have_final_cap(ARM64_HAS_ECV) || !is_hyp_ctxt(vcpu))
+-		return;
+-
+ 	if (!vcpu_el2_e2h_is_set(vcpu)) {
+ 		/*
+ 		 * A non-VHE guest hypervisor doesn't have any direct access
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index ff62b8b55b46e..1b8bb30dbb2ff 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1257,7 +1257,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+ 			kvm_timer_sync_user(vcpu);
+ 
+-		if (vcpu_has_nv(vcpu))
++		if (is_hyp_ctxt(vcpu))
+ 			kvm_timer_sync_nested(vcpu);
+ 
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
 
-Thanks again,
 
 	M.
 
