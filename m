@@ -1,107 +1,129 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1F8215172
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 08:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD435FEE6
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 08:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733731814; cv=none; b=Uv+zIto2kRFO4N24FXGIMpo6viqu9jU7DBhYZZJkX5EvYn5CLRGqsesHGcGP6J6CUSD35gQdKSJcKofApV78h6MyPXL9Xi3YnUkWqzX8b7134FQ54A6eN5/iRpnY7Ima7sgo4eGqcBggDX4hnNOuySo2ob3PVhfHGPBC65IzTXM=
+	t=1733731950; cv=none; b=AqxONp3UQI3kmhYbWpbqFySLAeiZWy6n8mxKh5eGowwA2Aw8mHEy3zJzLGyjd9H9lVEW+U8uNVtLcIUAr1QA54XWrYOv+TVTQmuhTo+DiIQtyNaGf6gpC5gB0Tem7eYLEzC/VG5J2WVhC7tImTyKnPnYFvZCm/CgBCxeQUkEYvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733731814; c=relaxed/simple;
-	bh=PFlSvc+5Z3Xe44MU0qpEF86vpSSNPVhCpQ4kV8qHKP8=;
+	s=arc-20240116; t=1733731950; c=relaxed/simple;
+	bh=jiwzthSSyNa/tSRsTGkULxv/q35SeWC9scNB2Tc1b4M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lawm99O6PavZye1slElj81znusN+Zod4/xoGRl+2K2DBZEzcMs4x5bbcq+71dh3XKQJLk9pCXilKmLm4AIaY2rn5gqvLXo0rRv9M4ViAzAbdnA9Hv6j8NPmusBEZYvL0EO+BAyA95fKAoJrZbpguA4rGz9toChVVVqE6MT9XgD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YtMzLEdb; arc=none smtp.client-ip=209.85.128.46
+	 To:Cc:Content-Type; b=gb84sVZeKbSxbtZOx9WWpQlkPiXNmU834S5pmZNW2G1cbNknKoAJOGb0anbq2TZXgwtoU9dWi123NU2QlQ3vz+OWu+TgswjxwnPYsvKOhHlgOhzP0qCwwtTbjse4wJUdw3jCJR3YRsS7Vmw5FiCgiLd0OokGzYbMak3wl+f01lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ikydAE1Q; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YtMzLEdb"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-434e5e71a08so71165e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 09 Dec 2024 00:10:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ikydAE1Q"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-434f150e9b5so51205e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Dec 2024 00:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733731811; x=1734336611; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733731945; x=1734336745; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TJbTrtvGneL0K+ke9Gwc/0whnIda/bBfVk+UfsZChhU=;
-        b=YtMzLEdbesS+b6jeymE8N52bnp97P+rLttUxDjyDzF4nfXEB9gHik6rIDZLYvv8r50
-         vPzt/uwVljCX5KUuJSm70312fQF1V08Hn0kAwfwDmK5t9lkWbWs9jK+L5HJMEAzCi0mp
-         bQmehR8H4R5CDbUljU4bh9STcevjswEqZBmMzj3kum6+TenDWZgPcAa/svcNa4XeiUeT
-         Gg/tWe/roF18qaFTCNozu2UQVcV1iORLdjQ85VFa17XQYKBygj6OMnrX83rdgZAP9cr6
-         DvJONsiQdsIQl5T+0hWTO8eF7P7LTwdx2oDOfja1o4oK+9La4nh/QLz+FDVnt6f+l559
-         O71A==
+        bh=4NciFRRoGn6D2XlVHSYt3WE5Tr/WBuHB/hCa+auTFK8=;
+        b=ikydAE1Qb7ti7EpFLZ2p5Ou4VaON+i9meh7tE14DAE0dIH75RolnFoNj3JMwsk9jC5
+         DjALj/CmeJI+khAU+sigZ5mJuQhLnMM7cGtNwV8Eud7rhS+AZj/dhaCr6z6ai3rP6CYn
+         HFVKatbM3q4n74bYLvEkQigDQ5AnEth0luWQRn7HXyiZVEWW930duAmaX7lJk2n5azlT
+         s9PAcPARidTO4zQka/4AkDXcsIxn2x+j5PyjTBx5FPo086I7BpiOQx4FaMOySxdNZCH1
+         Tf06MPxj2F63/i4WFj4qw/1RW8ePdrqFoUiluQConH3jvXPdbKeearxLAOXECaelysfF
+         MzaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733731811; x=1734336611;
+        d=1e100.net; s=20230601; t=1733731945; x=1734336745;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TJbTrtvGneL0K+ke9Gwc/0whnIda/bBfVk+UfsZChhU=;
-        b=nUbwjnSoTL5F0af72/CP8O5B1XDSbQcD0AmyLtsiLG3ndrFo2v1cb7kM65BahHzz7G
-         YFzKQ03jRkl5O5FBOWwswk96ELQzf56+RwdhszDu6bOoeAtDI3CDFICPnIszP8jBjaQ1
-         va7HVjIj0ybd0AIhLONhth+OlxAPi9hK2MW4yG8Xfh6YC9mH+XdbIS8tZP9I4B9g5keY
-         IFtnbhrmT2TfPuurt+ZdmFDqKeNMBAsxyCkVUN4Fj5h7Tbfoggy/fKgwJM9l+7aEeKrY
-         bEb7CJH199KWiRUntOszlPYA7xk5eexAg5IoCCBF1WUG6VM0bZ5ixU3RtOLeIa0nvH5a
-         37RQ==
-X-Gm-Message-State: AOJu0Yyb1mbKPBZegWa+EfJ5Pqb17+LH6YTUgDiKHrwiWJEPTtJuWZth
-	VKMyGh1RV16q6uwkpIq2/J4Yd53MLwa7jaigK+lEcGVQ0gmL9DuBFrS61LSJkM18Oo//3S1DLF6
-	sG8h8YGxD2+hg+kzPU7fscNCnAJjrrbUONeup
-X-Gm-Gg: ASbGnctWsoAnocjJ9voKuqQuLOmUeudfE8uf7Pi9pQ0S+AAcgYW0W/EbPE5SZnQ1vUX
-	ROqoaKMWthHlP61NpIWiO1GFz0mYLMA==
-X-Google-Smtp-Source: AGHT+IHzonQzcQEPPJQ19YlDfCKStU1KuBNC12yGt6wg237N05KxGZu/6cvhmSjtaskyGSZGiX3jh152NoyInvIXc1I=
-X-Received: by 2002:a05:600c:6c4e:b0:434:9fac:3408 with SMTP id
- 5b1f17b1804b1-434e8347d19mr2392935e9.2.1733731811183; Mon, 09 Dec 2024
- 00:10:11 -0800 (PST)
+        bh=4NciFRRoGn6D2XlVHSYt3WE5Tr/WBuHB/hCa+auTFK8=;
+        b=OK9t6zoLPHSeC0x+C9WSvARUm1FHqWktpuDD6i6bwT1HvjWse1/hmJDjJSXJr2cr4A
+         +Y5jN+R1FcJonm8HYjNs5sk1eNnDEeVkmCcrKAOzjpsARJyqPFD9bxDHBrnzxSH2BABr
+         BGpOU92CBP6k68AIJy9CthoTv+o3UW+IlCoTwDLfBJgvt0HXysMhMvPjbinPtXcLaeNK
+         GSPKnbtwuZk+yO0NqfLHX/U04r3AbWiNcMm2VprVAtUqTAu/Iol826yWMYYLRCvzLl1C
+         kYh7RznNCbeLpwd62sJRtO2yauGuyI2YUOGbmTyWWFXfP4Sh9JozSjQyQhpo/V3/v7iw
+         O6ww==
+X-Forwarded-Encrypted: i=1; AJvYcCXDUDFkU5ypuLpU2+H5qtkof8Ky5+jX4h/bxyZZrCI0Did1YACUSrNHbQzLLpsElERtpYcS40o=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxpJqQCt+CHShJjSHFZcFBH1t2m6gnmCvOdgb0I+j9CDPijGNGX
+	kB42luWNzuca1PS5+Ct6yuW2/jI4OHY1+uuKr5+6RMLDq9FDXUttGbgzl7V94ri2BVctP2fFxLe
+	TszalOKFAc7gCSGv/iPzKYE+AxLVNGuVSWbft/D8psxi8pwDw0w==
+X-Gm-Gg: ASbGncudpKAm/PVujaSF9zbYl7YXq+8TZsmVCgnApcr/l9FxWDNXpxBskYZKl0Cd0e7
+	tmUF/GBtIj9HPPcbBiwb/wEx9A19mcQ==
+X-Google-Smtp-Source: AGHT+IFdVhh7qM5pFXOICqgM0O7MUeIFhVrQjqgHLd5tsYdNifpK22oNMUZtWMNgXZXQSPq85vrS0iUacvhsHRyHJcw=
+X-Received: by 2002:a05:600c:2246:b0:431:416b:9ecf with SMTP id
+ 5b1f17b1804b1-434e83ab555mr2569925e9.6.1733731944790; Mon, 09 Dec 2024
+ 00:12:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-6-tabba@google.com>
- <Z1MwuSh6jc94cem0@google.com>
-In-Reply-To: <Z1MwuSh6jc94cem0@google.com>
+References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-7-tabba@google.com>
+ <Z1M1DYbvuqAEU5c-@google.com> <70992791-af72-43ed-88cc-1bb5a8acaf9a@sirena.org.uk>
+ <868qssu0wf.wl-maz@kernel.org>
+In-Reply-To: <868qssu0wf.wl-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 9 Dec 2024 08:09:34 +0000
-Message-ID: <CA+EHjTwSFW5hMFWhkOMBgO1QFq1t0LaGBns_-MnDZkzU6qdfXQ@mail.gmail.com>
-Subject: Re: [PATCH v4 05/14] KVM: arm64: Initialize feature id registers for
- protected VMs
-To: Quentin Perret <qperret@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
+Date: Mon, 9 Dec 2024 08:11:48 +0000
+Message-ID: <CA+EHjTwc8VWVtU+2GArE8a8TwoZsqmaBNYuLyjqn8JpszxXqjA@mail.gmail.com>
+Subject: Re: [PATCH v4 06/14] KVM: arm64: Set protected VM traps based on its
+ view of feature registers
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
+	james.clark@linaro.org, will@kernel.org, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
 	kristina.martsenko@arm.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 6 Dec 2024 at 17:13, Quentin Perret <qperret@google.com> wrote:
->
-> On Monday 02 Dec 2024 at 15:47:32 (+0000), Fuad Tabba wrote:
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > index 59fb2f056177..1261da6a2861 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > @@ -204,8 +204,7 @@ static u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
-> >       return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
-> >  }
-> >
-> > -/* Read a sanitized cpufeature ID register by its encoding */
-> > -u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> > +static u64 pvm_calc_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >  {
-> >       switch (id) {
-> >       case SYS_ID_AA64PFR0_EL1:
-> > @@ -240,10 +239,25 @@ u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >       }
-> >  }
-> >
-> > +/* Read a sanitized cpufeature ID register by its encoding */
-> > +u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> > +{
-> > +     return pvm_calc_id_reg(vcpu, id);
-> > +}
->
-> That wrapper doesn't look particularly useful, perhaps we could drop it?
+Hi,
 
-It does get dropped in the next patch.
+On Fri, 6 Dec 2024 at 18:22, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 06 Dec 2024 17:43:42 +0000,
+> Mark Brown <broonie@kernel.org> wrote:
+> >
+> > On Fri, Dec 06, 2024 at 05:31:57PM +0000, Quentin Perret wrote:
+> > > On Monday 02 Dec 2024 at 15:47:33 (+0000), Fuad Tabba wrote:
+> >
+> > > > - if (FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_RAS), id_aa64pfr0) <
+> > > > -     ID_AA64PFR0_EL1_RAS_V1P1) {
+> > > > + if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
+> >
+> > > I'm admittedly getting a bit lost in the kvm_has_feat() macro maze, but
+> > > should this be:
+> >
+> > >     if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
+> >
+> > > to replicate the existing check?
+> >
+> > kvm_has_feat() checks for a value <= the supplied constant while the
+>
+> Not quite:
+>
+> #define kvm_has_feat(kvm, id, fld, limit)                               \
+>         kvm_cmp_feat(kvm, id, fld, >=, limit)
+>
+> > existing check is just < and the values for the field are:
+> >
+> > UnsignedEnum  31:28   RAS
+> >       0b0000  NI
+> >       0b0001  IMP
+> >       0b0010  V1P1
+> > EndEnum
+> >
+> > so they're both checking for the same thing.
+>
+> Evidently not. The original code is checking for RASv1p1, while the
+> change turns that into a check for the original RAS spec.
 
-Cheers,
+Marc is right. This change was intentional, since the goal is to trap
+if RAS isn't implemented/supported by the guest. I should comment on
+this change in the commit message.
+
+Thanks,
 /fuad
+
+
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
