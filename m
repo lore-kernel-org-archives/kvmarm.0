@@ -1,64 +1,59 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506FD9461
-	for <kvmarm@lists.linux.dev>; Sun,  8 Dec 2024 09:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C70A54918
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 02:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733649089; cv=none; b=IO8otfj/C3HBJQKw9/lU5ogl2h8RJJPTfnJvmogpw+NFcnUMRu1dKGpV9Ji6UX17h30P/Mww5fqE4+f6DQjgNcnUkNCmModqR9cc3RV3t0uC3wOWiOxM/JYaeva7ULvNuWWkH/dcghmOYV0F43qIqj5KTsDLYVkmxVAkPK/fpXE=
+	t=1733710854; cv=none; b=YU6gIx8R7m35XY/vQxI3DI/LDKicj7vf/XOTvMOvoYF8y6AJy/19EyfhxkrRxREyiFSEgfdjqqk4HV8OJQcxImrI5U16bcSDHY8UrnkwZ0LZMD4CQTikYzNFFDZsQTUW0teZZqqZz2dhYa+oWjiFo2MWHtHrNXDX7vPfXnX2Sis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733649089; c=relaxed/simple;
-	bh=bO05SnqFtUiNZGIvMfxRQ1SNB/6fmbFYF50rx4Jwc5A=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=WEZ2DCU6E149/mxON+MhkXnW32qOodJwiYtY2qVAQDVGzOLjhgbsgaxB6z7PG0SQiMBsgnHpHP0cRhBgTqjUkQxaP/mddySrvHhtxEvSrxwGYk6wjTBHbufKHyjMCeUWuuLj4JtxYbuB+IffrZ+SqLiL+4IwO7EfLqOOJC3yMuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzSilIFI; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzSilIFI"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2163b0c09afso3730475ad.0
-        for <kvmarm@lists.linux.dev>; Sun, 08 Dec 2024 01:11:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733649086; x=1734253886; darn=lists.linux.dev;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bO05SnqFtUiNZGIvMfxRQ1SNB/6fmbFYF50rx4Jwc5A=;
-        b=UzSilIFIcKF2r42N0aphlOym0BKsN8u7kJQAUli/ZUrJmauznMTHOaG3UcVLBfCJjC
-         wlmjKcmxl2b15K+2RXHRTO5XUK/wSI3UGS6hLjfcvDu14UE04/JYQ8eoyzwGBln98rLh
-         DXOZYFyevuiUpSB4NeDG68wovziQKp3D3ydXnk2MRwoTaBfiP/hhV03nbiij6bkzQTHt
-         6y2xrQEVUUdySj3I4eXwsKDUAJmu0GE2IguhPeVuEnoOVN24IgFtJ7W3Fc7tE/LFR7GG
-         TAnPf8NywJPkvq0b5e5/L2Q38nY5a5A7/worb3bQGwhDnNL7JHyPnk0EikWMvEd3Ytn3
-         kD/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733649086; x=1734253886;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bO05SnqFtUiNZGIvMfxRQ1SNB/6fmbFYF50rx4Jwc5A=;
-        b=n3KXs1gRoiN2c+7Fr/3mtEL0oJL0vYOVGfvK9Y0HzkPibyCJSK/fjd7s2WDfgyhY7P
-         Q/Vxp47/Ou1nY1zom9qFAPFYyvu9LDShkRq+dGxjQQy8gp8Sqv7xVo/TT6VMZSpUOse4
-         gpug+uc691L15qc86zroY0VPAGyE5H2Hb6ouIWrowHAkV2/RVbzn2zKjuuRM39wLx/A0
-         SdW7461/U4eamQ4BhdbS/4nGVq0g68+amMPRV/S2iVIaiFg7/QbWC2EXnhPa92NJXP2X
-         Z96MEeQTdo5VDpxMsreuXAu17dzmtc/R3tUalaQ36+wYRPUh2jSYFc44hLx1iIdmVNjA
-         hdjg==
-X-Gm-Message-State: AOJu0YyPSUqwCra3NdPRu3XxFi+kTM+InecOMV4k2OKXXL5k5kSPlQn0
-	YTukwJ8X5CaxUQ73hE+6F4e3f/nX9cdeP9cXdYwClP2JaDZnEj59FC4rGrWEXDrLflQ3ndeTGzP
-	01uvvBUOkwMbfLssYHMKHckHMeH7VxmahfFe5XQ==
-X-Gm-Gg: ASbGncuTWaQE/OBWIWTfSYYr7Y4yRAivhOjM3AxLFP2tfwhOCppBUqWo634pQJuPP+i
-	jUvYxhxsAq8P2nkYCPW528CTgBu0GcoMVZR4z
-X-Google-Smtp-Source: AGHT+IGVCvpm05aAlGm83xn6DMkvOwO35zFoap8Uuvhmba6pH47XfLCyBEbtAGdPw9WYV/F4yJEG5IywiDc6afEZzhk=
-X-Received: by 2002:a17:903:2344:b0:215:b6f5:dd2c with SMTP id
- d9443c01a7336-21614da2f2amr121904235ad.43.1733649086039; Sun, 08 Dec 2024
- 01:11:26 -0800 (PST)
+	s=arc-20240116; t=1733710854; c=relaxed/simple;
+	bh=7JscrbicuuLsVaCOffYdokD9BSe1ENYelILYWub8yNY=;
+	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=DFdRaqWf+XCXEae36v3qx5GHVOMtD7xFOIHz4Bzxsm+JtwFkDj0lCDDxyvLu1ru1e69DL2JMPK2/R2AvVb19SzAURAybB1wSrNg84fkxTmEo01aVugI9at48WLT3fAUaxN7r26xt0Pkn0yoWvgnUNASNvzrmtp7709arwVm06to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Y65Dt3Sm9z1JDw9
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 10:20:30 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 16BB51A0188
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 10:20:43 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 9 Dec 2024 10:20:42 +0800
+Subject: Re: subscribe mailing list to learn recent kvm development, not robot
+To: =?UTF-8?B?5p2O56GV?= <shilishuoya@gmail.com>
+References: <CADTb_0MHZnoRLdCRp8VgCPGLmOOeOP9gd1Xtfr-KQ4UN3CMZmg@mail.gmail.com>
+CC: <kvmarm@lists.linux.dev>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <5952b96e-c64a-2a90-97f1-63923b16e559@huawei.com>
+Date: Mon, 9 Dec 2024 10:20:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: =?UTF-8?B?5p2O56GV?= <shilishuoya@gmail.com>
-Date: Sun, 8 Dec 2024 17:11:15 +0800
-Message-ID: <CADTb_0MHZnoRLdCRp8VgCPGLmOOeOP9gd1Xtfr-KQ4UN3CMZmg@mail.gmail.com>
-Subject: subscribe mailing list to learn recent kvm development, not robot
-To: kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CADTb_0MHZnoRLdCRp8VgCPGLmOOeOP9gd1Xtfr-KQ4UN3CMZmg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-subscribe kvmarm shilishuoya@gmail.com
+On 2024/12/8 17:11, 李硕 wrote:
+> subscribe kvmarm shilishuoya@gmail.com
+
+To subscribe the list, you need to send a email to
+<kvmarm+subscribe@lists.linux.dev>, instead of the list itself. Look
+at [1] for more information.
+
+[1] https://lore.kernel.org/kvmarm/86edvbg3q7.wl-maz@kernel.org
+
+Thanks,
+Zenghui
