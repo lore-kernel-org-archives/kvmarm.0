@@ -1,29 +1,29 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129EB224891
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 11:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDFF22489F
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 11:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733745242; cv=none; b=mxv/NFKL7krGpoFVTlYlf0naEjIMc0FVqWenDoWhOw8noKnel6Ad0eEzNqN8I0iqgP7tbgKo1wnlntumx32jUz79jFcLC6/NykQDY7cugV42OogznsD4LoivtfIk3B2Y0gU66oy7bW9zmDdeC207e9suufwt7ChW7ekqhSFd/YM=
+	t=1733745243; cv=none; b=rEycyF/h/Zozi0N/ui4wLChj4KG2k6vznaWB+G4QBq/XaxywAhyuoCdF53QqA7nUOcNss2glJF5+mJ0ONrRZMLHyc/8V/ktJC6Bt8xfDItlV6+Dd9zZJjqk54inv5+8Sn9IXJEHbw8ii/YvXbnIg3kBPKTqkg3Bau84eLokJmPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733745242; c=relaxed/simple;
-	bh=h1zWYSFvYiy7fBea/2ISMRZa21KsKdgKqfHKTjjQq7Q=;
+	s=arc-20240116; t=1733745243; c=relaxed/simple;
+	bh=s8qg4AxxbpIdjXwt1oQfcx747SHo4055XmGShFlJ04g=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VxRfbxBa0VLUdwYcGkILSbZr/U5fYagh84xa8dfUJXMlWLZkCQcjR+OWbuBY3gLspbojDdtcMPyysrBJJcgXdlnGoF2COVhxpD2IQP5GzjwxYQyGdPkI2fBd0pFb2OGrxyKaUO+vEsd6+maLUrWxeJc8rFV7b2zT7vdqBpoW0bI=
+	 MIME-Version:Content-Type; b=AZ4OVbARX1aJwPvyQbGrKuAm6Nkn9+PWdspDX1pRLxORhK1bQP4d/NOvq0HLT/PzVZ/Gm0CLGCTceCZ6aLH+VZvq/iu/2HcuBgu9cMYZsiOmp84sc0KfPT8kxIYfhUn6ewZhaXfelmTkL5pXuVjOSZLiXVGVAIJ/HjdT70/Op8o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y6KsD1GDPz6GC3Q;
-	Mon,  9 Dec 2024 19:49:20 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Y6KsP11w3z6GCG2;
+	Mon,  9 Dec 2024 19:49:29 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0A10C1400DD;
-	Mon,  9 Dec 2024 19:53:51 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 0140B140517;
+	Mon,  9 Dec 2024 19:54:00 +0800 (CST)
 Received: from A2303104131.china.huawei.com (10.203.177.241) by
  frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 9 Dec 2024 12:53:43 +0100
+ 15.1.2507.39; Mon, 9 Dec 2024 12:53:52 +0100
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <oliver.upton@linux.dev>
 CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
@@ -31,9 +31,9 @@ CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
 	<wangzhou1@hisilicon.com>, <jiangkunkun@huawei.com>,
 	<jonathan.cameron@huawei.com>, <anthony.jebson@huawei.com>,
 	<linux-arm-kernel@lists.infradead.org>, <linuxarm@huawei.com>
-Subject: [PATCH v3 2/3] KVM: arm64: Introduce hypercall support for retrieving target implementations
-Date: Mon, 9 Dec 2024 11:53:10 +0000
-Message-ID: <20241209115311.40496-3-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v3 3/3] arm64: paravirt: Enable errata based on implementation CPUs
+Date: Mon, 9 Dec 2024 11:53:11 +0000
+Message-ID: <20241209115311.40496-4-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20241209115311.40496-1-shameerali.kolothum.thodi@huawei.com>
 References: <20241209115311.40496-1-shameerali.kolothum.thodi@huawei.com>
@@ -47,82 +47,203 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  frapeml500008.china.huawei.com (7.182.85.71)
 
-If the Guest requires migration to multiple targets, this hypercall
-will provide a way to retrieve the target CPU implementations from
-the user space VMM.
+Retrieve any migration target implementation CPUs using the hypercall
+and enable associated errata.
 
-Subsequent patch will use this to enable the associated errata.
-
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- Documentation/virt/kvm/arm/hypercalls.rst | 30 +++++++++++++++++++++++
- include/linux/arm-smccc.h                 |  7 ++++++
- 2 files changed, 37 insertions(+)
+Note:
 
-diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
-index af7bc2c2e0cb..16b4c02cf9d9 100644
---- a/Documentation/virt/kvm/arm/hypercalls.rst
-+++ b/Documentation/virt/kvm/arm/hypercalls.rst
-@@ -142,3 +142,33 @@ region is equal to the memory protection granule advertised by
- |                     |          |    +---------------------------------------------+
- |                     |          |    | ``INVALID_PARAMETER (-3)``                  |
- +---------------------+----------+----+---------------------------------------------+
-+
-+``ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID``
-+-------------------------------------------------------
-+
-+Request the target CPU implementation information for the Guest VM. This hypercall
-+must be handled by the userspace VMM. The Guest kernel will use this information to
-+enable the associated errata. A maximum of 64 implementations is supported.
-+
-++---------------------+-------------------------------------------------------------+
-+| Presence:           | Optional;  KVM/ARM64 Guests only                            |
-++---------------------+-------------------------------------------------------------+
-+| Calling convention: | HVC64                                                       |
-++---------------------+----------+--------------------------------------------------+
-+| Function ID:        | (uint32) | 0xC600007E                                       |
-++---------------------+----------+----+---------------------------------------------+
-+| Arguments:          | (uint64) | R1 | selected implementation index               |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint64) | R2 | Reserved / Must be zero                     |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint64) | R3 | Reserved / Must be zero                     |
-++---------------------+----------+----+---------------------------------------------+
-+| Return Values:      | (int64)  | R0 | -1 on error else the maximum required CPU   |
-+|                     |          |    | implementation index.                       |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint64) | R1 | MIDR_EL1 of the selected implementation     |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint64) | R2 | REVIDR_EL1 of the selected implementation   |
-+|                     +----------+----+---------------------------------------------+
-+|                     | (uint64) | R3 | Reserved / Must be zero                     |
-++---------------------+----------+----+---------------------------------------------+
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 67f6fdf2e7cd..6c080fa9d345 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -179,6 +179,7 @@
- #define ARM_SMCCC_KVM_FUNC_PKVM_RESV_62		62
- #define ARM_SMCCC_KVM_FUNC_PKVM_RESV_63		63
- /* End of pKVM hypercall range */
-+#define ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS	126
- #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
- #define ARM_SMCCC_KVM_NUM_FUNCS			128
+One thing I am not sure here is how to handle the hypercall error.
+Do we need to fail the Guest boot or just carry on without any
+target implementation CPU support? At the moment it just carries on.
+
+Thanks,
+Shameer
+---
+ arch/arm64/include/asm/cputype.h  | 25 +++++++++++++++++++++++--
+ arch/arm64/include/asm/paravirt.h |  3 +++
+ arch/arm64/kernel/cpu_errata.c    | 20 +++++++++++++++++---
+ arch/arm64/kernel/cpufeature.c    |  2 ++
+ arch/arm64/kernel/image-vars.h    |  2 ++
+ arch/arm64/kernel/paravirt.c      | 31 +++++++++++++++++++++++++++++++
+ 6 files changed, 78 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index dcf0e1ce892d..9e466f3ae9c6 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -265,6 +265,16 @@ struct midr_range {
+ #define MIDR_REV(m, v, r) MIDR_RANGE(m, v, r, v, r)
+ #define MIDR_ALL_VERSIONS(m) MIDR_RANGE(m, 0, 0, 0xf, 0xf)
  
-@@ -225,6 +226,12 @@
- 			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
- 			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD)
- 
-+#define ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID		\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_64,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS)
++#define MAX_TARGET_IMPL_CPUS 64
 +
- /* ptp_kvm counter type ID */
- #define KVM_PTP_VIRT_COUNTER			0
- #define KVM_PTP_PHYS_COUNTER			1
++struct target_impl_cpu {
++	u32 midr;
++	u32 revidr;
++};
++
++extern u32 target_impl_cpu_num;
++extern struct target_impl_cpu target_impl_cpus[];
++
+ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
+ 					   u32 rv_max)
+ {
+@@ -276,8 +286,19 @@ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
+ 
+ static inline bool is_midr_in_range(struct midr_range const *range)
+ {
+-	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+-				       range->rv_min, range->rv_max);
++	int i;
++
++	if (!target_impl_cpu_num)
++		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
++					       range->rv_min, range->rv_max);
++
++	for (i = 0; i < target_impl_cpu_num; i++) {
++		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
++					    range->model,
++					    range->rv_min, range->rv_max))
++			return true;
++	}
++	return false;
+ }
+ 
+ static inline bool
+diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
+index 9aa193e0e8f2..95f1c15bbb7d 100644
+--- a/arch/arm64/include/asm/paravirt.h
++++ b/arch/arm64/include/asm/paravirt.h
+@@ -19,11 +19,14 @@ static inline u64 paravirt_steal_clock(int cpu)
+ }
+ 
+ int __init pv_time_init(void);
++void __init pv_target_impl_cpu_init(void);
+ 
+ #else
+ 
+ #define pv_time_init() do {} while (0)
+ 
++#define pv_target_impl_cpu_init() do {} while (0)
++
+ #endif // CONFIG_PARAVIRT
+ 
+ #endif
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 929685c00263..4055082ce69b 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -14,6 +14,9 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/smp_plat.h>
+ 
++u32 target_impl_cpu_num;
++struct target_impl_cpu target_impl_cpus[MAX_TARGET_IMPL_CPUS];
++
+ static bool __maybe_unused
+ __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
+ 			 u32 midr, u32 revidr)
+@@ -32,9 +35,20 @@ __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
+ static bool __maybe_unused
+ is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
+ {
+-	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
+-	return __is_affected_midr_range(entry, read_cpuid_id(),
+-					read_cpuid(REVIDR_EL1));
++	int i;
++
++	if (!target_impl_cpu_num) {
++		WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
++		return __is_affected_midr_range(entry, read_cpuid_id(),
++						read_cpuid(REVIDR_EL1));
++	}
++
++	for (i = 0; i < target_impl_cpu_num; i++) {
++		if (__is_affected_midr_range(entry, target_impl_cpus[i].midr,
++					     target_impl_cpus[i].midr))
++			return true;
++	}
++	return false;
+ }
+ 
+ static bool __maybe_unused
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 4cc4ae16b28d..d32c767bf189 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -85,6 +85,7 @@
+ #include <asm/kvm_host.h>
+ #include <asm/mmu_context.h>
+ #include <asm/mte.h>
++#include <asm/paravirt.h>
+ #include <asm/processor.h>
+ #include <asm/smp.h>
+ #include <asm/sysreg.h>
+@@ -3642,6 +3643,7 @@ unsigned long cpu_get_elf_hwcap3(void)
+ 
+ static void __init setup_boot_cpu_capabilities(void)
+ {
++	pv_target_impl_cpu_init();
+ 	/*
+ 	 * The boot CPU's feature register values have been recorded. Detect
+ 	 * boot cpucaps and local cpucaps for the boot CPU, then enable and
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 8f5422ed1b75..694e19709c46 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -49,6 +49,8 @@ PROVIDE(__pi_arm64_sw_feature_override	= arm64_sw_feature_override);
+ PROVIDE(__pi_arm64_use_ng_mappings	= arm64_use_ng_mappings);
+ #ifdef CONFIG_CAVIUM_ERRATUM_27456
+ PROVIDE(__pi_cavium_erratum_27456_cpus	= cavium_erratum_27456_cpus);
++PROVIDE(__pi_target_impl_cpu_num	= target_impl_cpu_num);
++PROVIDE(__pi_target_impl_cpus		= target_impl_cpus);
+ #endif
+ PROVIDE(__pi__ctype			= _ctype);
+ PROVIDE(__pi_memstart_offset_seed	= memstart_offset_seed);
+diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
+index aa718d6a9274..95fc3aae4a27 100644
+--- a/arch/arm64/kernel/paravirt.c
++++ b/arch/arm64/kernel/paravirt.c
+@@ -153,6 +153,37 @@ static bool __init has_pv_steal_clock(void)
+ 	return (res.a0 == SMCCC_RET_SUCCESS);
+ }
+ 
++void  __init pv_target_impl_cpu_init(void)
++{
++	struct arm_smccc_res res;
++	int index = 0, max_idx = -1;
++
++	/* Check we have already set targets */
++	if (target_impl_cpu_num)
++		return;
++
++	do {
++		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID,
++				     index, &res);
++		if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
++			return;
++
++		if (max_idx < 0) {
++			/* res.a0 should have a valid maximum CPU implementation index */
++			if (res.a0 >= MAX_TARGET_IMPL_CPUS)
++				return;
++			max_idx = res.a0;
++		}
++
++		target_impl_cpus[index].midr = res.a1;
++		target_impl_cpus[index].revidr = res.a2;
++		index++;
++	} while (index <= max_idx);
++
++	target_impl_cpu_num = index;
++	pr_info("Number of target implementation CPUs is %d\n", target_impl_cpu_num);
++}
++
+ int __init pv_time_init(void)
+ {
+ 	int ret;
 -- 
 2.47.0
 
