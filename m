@@ -1,30 +1,32 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6D01F5F6
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 18:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD85B70819
+	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 18:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733767788; cv=none; b=WX0TTzMtbepYOuZFe/heV0zcRTs1fSILV9Y7rbap2Thn0q6TBFQGpwQmm1i3Fb5DxZwxzennFY8SRlIE7jMCz2fxMgUjL7dHgvmUR67Xi3FumCntFuP2MrVGmSs0twQX7r9hHccw4Ti5QtxcrjV8Xetv7Gr2Jprnz5NMjeqEVrY=
+	t=1733767790; cv=none; b=E3HfcgnbExyotbcoNc3ww/iRRO1X3cn6z38D5Jw/4/RgZ8iFmRygyd3ExH9hBE4LF4rhWLdo86pKAOC5P+oWfNpsREE7XngbhbDCTm0MiACqOfSM6O0SMHNDwlbVLlMqdPqurGvQauRNUqHaMeSq4/b563ejYCVgNFt+2Io3cNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733767788; c=relaxed/simple;
-	bh=fpHp8iqCI1/ONxCLKm7ZVDm2BFNBB2pA9qUpJfrrUBU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IIHgMzSfASCchNssPjtwWoRX1IjuYhOlV+vgcsBsa+3fGtHGd9uINw7CyCUASmE5kNQ41pHqyEvL6ELSoWK0aU5Qish+AQ+f2LOkH3Jj5Xvq0EJ/3+zfx+2atrzS9ZwXa1GaS64a1/qOueixgXEm0CBsC6FOn3h9X8kaNUYxnXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YshvdKuu; arc=none smtp.client-ip=91.218.175.186
+	s=arc-20240116; t=1733767790; c=relaxed/simple;
+	bh=8Mcfi0WnE+0hciNMB3spz22lf2rIzvCwopZv2rFXgdM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hAjEtOGmixu8oEd/bZ8t6uaU2OwoTcOTPpBuOnbeGtqil+2jRinpnaX4x/JeD/jjlRG6SiEO/RTRw5q2bivhXTXZx+/FVDSMEm3nBUpnhCuyiFjVEu54UUqpeDcQQWc/DgieiEhKUmatguen9C8sdHOQvPHPQW3GSnTSxSySqNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y1Q67JP0; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YshvdKuu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y1Q67JP0"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733767783;
+	t=1733767785;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=D9Aaw1vsm+K9jZL6YxY/GyXAi0ciu/xL209/asglqzQ=;
-	b=YshvdKuunhnnwm6fpuYQZHXNRsBkMH48KzNARZRnqWHXaFnNOGNCmpxvqc2TM7AslcLNFb
-	Xf/Ios0BzUS0b7cMuRwqXeSNvxRSkmXuyGaFWTthEAV+Tqjer/dtKv04fCHqGKDXfZ7qGQ
-	WhVnIOGWUNO5ncJzDRLfqSkaH6vwsmk=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/r+Op2VkYMFfyWTwdNGdEUeRbYFIi6CFfELq/9SyBY=;
+	b=Y1Q67JP0bIClBuwtKn3cycdgb6ueyq0kLa+8lDdGT+51H9ask5jbpSjm4riGX5RGqY1BhQ
+	efT5G1JBn+Iq2CIAOtvenT+TyBDN2NHIvPmibuhumT5kBAHcDW2JXWOqK5NMtOnxmY9o7a
+	xNdCYt9nv9Z/rDU9u3KbUG+l5u/txlM=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -36,9 +38,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	James Clark <james.clark@linaro.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 00/16] KVM: arm64: Debug cleanups
-Date: Mon,  9 Dec 2024 10:09:10 -0800
-Message-Id: <20241209180926.2161373-1-oliver.upton@linux.dev>
+Subject: [PATCH v3 01/16] KVM: arm64: Drop MDSCR_EL1_DEBUG_MASK
+Date: Mon,  9 Dec 2024 10:09:11 -0800
+Message-Id: <20241209180926.2161373-2-oliver.upton@linux.dev>
+In-Reply-To: <20241209180926.2161373-1-oliver.upton@linux.dev>
+References: <20241209180926.2161373-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,56 +52,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On top of the cleanups, this series takes a considerable bite out of the
-volume of sysreg traps when running windows, which likes to read
-MDSCR_EL1 quite a lot.
+Nothing is using this macro, get rid of it.
 
-v2: https://lore.kernel.org/kvmarm/20241115224924.2132364-13-oliver.upton@linux.dev/
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/debug.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-v2 -> v3:
- - Respin to 6.13-rc2
- - Fix unsafe usage of percpu data in kvm_debug_set_guest_ownership()
-   which led to a splat (James)
-
-Oliver Upton (16):
-  KVM: arm64: Drop MDSCR_EL1_DEBUG_MASK
-  KVM: arm64: Get rid of __kvm_get_mdcr_el2() and related warts
-  KVM: arm64: Track presence of SPE/TRBE in kvm_host_data instead of
-    vCPU
-  KVM: arm64: Move host SME/SVE tracking flags to host data
-  KVM: arm64: Evaluate debug owner at vcpu_load()
-  KVM: arm64: Clean up KVM_SET_GUEST_DEBUG handler
-  KVM: arm64: Select debug state to save/restore based on debug owner
-  KVM: arm64: Remove debug tracepoints
-  KVM: arm64: Remove vestiges of debug_ptr
-  KVM: arm64: Use debug_owner to track if debug regs need save/restore
-  KVM: arm64: Reload vCPU for accesses to OSLAR_EL1
-  KVM: arm64: Compute MDCR_EL2 at vcpu_load()
-  KVM: arm64: Don't hijack guest context MDSCR_EL1
-  KVM: arm64: Manage software step state at load/put
-  KVM: arm64: nv: Honor MDCR_EL2.TDE routing for debug exceptions
-  KVM: arm64: Avoid reading ID_AA64DFR0_EL1 for debug save/restore
-
- arch/arm64/include/asm/kvm_asm.h           |   5 +-
- arch/arm64/include/asm/kvm_host.h          |  94 ++---
- arch/arm64/include/asm/kvm_nested.h        |   1 +
- arch/arm64/kvm/arm.c                       |  14 +-
- arch/arm64/kvm/debug.c                     | 378 +++++++--------------
- arch/arm64/kvm/emulate-nested.c            |  23 +-
- arch/arm64/kvm/fpsimd.c                    |  12 +-
- arch/arm64/kvm/guest.c                     |  31 +-
- arch/arm64/kvm/handle_exit.c               |   5 +-
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h  |  42 +--
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  43 ++-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c         |  13 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c         |   8 -
- arch/arm64/kvm/hyp/vhe/debug-sr.c          |   5 -
- arch/arm64/kvm/sys_regs.c                  |  55 +--
- arch/arm64/kvm/trace_handle_exit.h         |  75 ----
- 16 files changed, 281 insertions(+), 523 deletions(-)
-
-
-base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index ce8886122ed3..587e9eb4372e 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -16,11 +16,6 @@
+ 
+ #include "trace.h"
+ 
+-/* These are the bits of MDSCR_EL1 we may manipulate */
+-#define MDSCR_EL1_DEBUG_MASK	(DBG_MDSCR_SS | \
+-				DBG_MDSCR_KDE | \
+-				DBG_MDSCR_MDE)
+-
+ static DEFINE_PER_CPU(u64, mdcr_el2);
+ 
+ /*
 -- 
 2.39.5
 
