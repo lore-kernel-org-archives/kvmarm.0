@@ -1,82 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2751B4239
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 14:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F316C35975;
+	Mon,  9 Dec 2024 15:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733755811; cv=none; b=Ix9gyWfnZ/ExhAWant5bP7NkqqdOtVxIUS/LjhOmSTfrQo477RwhtYjTDBD6cdzEA6aoCrf8xVI+kFcmwSKib2FjobC4GHstXKRJTwpeV0Y0dSbTX35nB3YyVJIspGOBtvUCTKvLncCpFmQHMNj3CU/vN66NeT/rtP63p2nl99A=
+	t=1733757360; cv=none; b=TW9y7g1gakWfaMWshuyPXnEupMsTgGHeZQD8k+ViZMvCjRJHNYGQEiBC2nAKZsNGriTv6txyTLXbkhuMk8HN0BDLrGFdAlnRR0JfRU+oJ8CuFijSiHWigfvCN8mVJYabUb5/HRm7724MsdcJ7vZyuxKevshA4K2zgeItl9D5/Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733755811; c=relaxed/simple;
-	bh=QNICOKCDqQx8wLcl9YtGpAxA37hpdnJ/XSY727ONqJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kWiRs92sOQAaLA+Wa0LUIERk8zXWvG/cCmatzxmTVXavtpNZ2b1E+9VD3TNy4uSi7edXm5qjb5zW+Um3b11fmBq1lasrlAEFt3i+5tdyPgxKRQl0e/NAUeROPwNSfCalaU9AivxSqLPzOqH4Q+kcheif/rwP50Swbvc/noiSqu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j4MoffX6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733757360; c=relaxed/simple;
+	bh=mcjsf124K02oDwscCt6MS031CZT8Tzgco1aQjG7wAmA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZrZo0Wc77aL5Jy+CZdDzfXltH/Yf8XNXP6nPuYCgjjTQzej7p24LaxLWq/5K+UuEWSdiblQhhAl6cQ8qzoZRJA1T3mW09lJknpw/f0bCQqHgUJ67N6vkwvFE2baiMFw0ZzCfih33NkEpcI/G5XRda+p7WiBpZeLqwsVKmCeYKV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJlASOXa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j4MoffX6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46C55C4CEDE;
-	Mon,  9 Dec 2024 14:50:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJlASOXa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77FC4C4CED1;
+	Mon,  9 Dec 2024 15:15:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733755810;
-	bh=QNICOKCDqQx8wLcl9YtGpAxA37hpdnJ/XSY727ONqJE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j4MoffX6wSrVo6cfkuKH+CMYY8YOjbfmeAhyNrfHawm0f8B3TeFhbvBgNvbSG7Tgk
-	 ayxVG/rEKf9EqQ8TPvm2z7n5poFbiBj1abqJYaJsvI8V2YXy27FvSJgGOeDVcYNuEK
-	 LCeETF7M7T6rqUJN7JwKff5pBEaUQbKBt0g7InetSDfMc+76x0FbdOkr3S3UWliAZ0
-	 /o6k1jYXtbqXo2N6r3kDRYs+T6zrQHGhecsb7RCO3TM1jkCNfCsZ8AEjrC3pwUeA2r
-	 5Wr7uAoPNX7sLDslaQxTqbF81NXVpOLSg1UArZSpWwaQRQx8FKJ94gGgD3HGszgkUc
-	 EQEU7x4NRLslQ==
-Date: Mon, 9 Dec 2024 14:50:06 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 4/4] arm64/sysreg: Get rid of CPACR_ELx SysregFields
-Message-ID: <aa8a6c68-13d6-4311-8903-577cec91f8fa@sirena.org.uk>
-References: <20241207190740.2607673-1-maz@kernel.org>
- <20241207190740.2607673-5-maz@kernel.org>
+	s=k20201202; t=1733757359;
+	bh=mcjsf124K02oDwscCt6MS031CZT8Tzgco1aQjG7wAmA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nJlASOXa3tZr3ijkUcVgDFy/kwmLac4beue++sR7ndcHfPUDuM0VeMwrqSfnr+7dZ
+	 6iZq/O7vOnnjI9PHgpfwgxmCXmbfwlcn1cdVHHnDkqmomkSJ/JYxm4bnOTMz9nnDDy
+	 GHdc4nWStVwa+0BHuqKWnJWqHUEku2o9LziBjNXTf2AeP367PFK3JCQtaietyXmuio
+	 qd6LbKkmf3AA8RuAp5/74MzUengrIuFYltf9ZC2HkyG9C6CLLKOsqu8QGvk53Ud6A/
+	 KZ//qaE9wQD58s4m6NdBvCBM3e9YnOk8LCOPvJ8j+59+j+q0B1Ej+RIdYTBa3u5Kwu
+	 +izeADjr4Srtg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tKfUL-001vMG-5J;
+	Mon, 09 Dec 2024 15:15:57 +0000
+Date: Mon, 09 Dec 2024 15:15:56 +0000
+Message-ID: <864j3cubtf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Chase Conklin <chase.conklin@arm.com>
+Cc: andersson@kernel.org,
+	christoffer.dall@arm.com,
+	joey.gouly@arm.com,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 00/11] KVM: arm64: Add NV timer support
+In-Reply-To: <20241209142429.882-1-chase.conklin@arm.com>
+References: <20241202172134.384923-1-maz@kernel.org>
+	<20241209142429.882-1-chase.conklin@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="skbI6LnrmfTymsLf"
-Content-Disposition: inline
-In-Reply-To: <20241207190740.2607673-5-maz@kernel.org>
-X-Cookie: Lensmen eat Jedi for breakfast.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: chase.conklin@arm.com, andersson@kernel.org, christoffer.dall@arm.com, joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Hi Chase,
 
---skbI6LnrmfTymsLf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 09 Dec 2024 14:24:29 +0000,
+Chase Conklin <chase.conklin@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, 2 Dec 2024 17:21:23 +0000, Marc Zyngier <maz@kernel.org>
+> wrote:
+>
+> > If you are feeling brave, you can run the whole thing from [1].
+> > 
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
+> >
+> 
+> I was feeling brave, and I think I see an issue in the cpufeature change
+> in the kvm-arm64/nv-e2h-select branch that's a part of
+> kvm-arm64/nv-next. In d75a4820a897 ("arm64: cpufeature: Handle NV_frac as a synonym of NV2"),
+> I don't see NV_frac being added to the FTR bits. I believe that means it
+> will get sanitized out and consequently not seen by the NV feature
+> detection code. Does that commit also need:
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 9fa8bd77ae0..f97459e160b 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -480,6 +480,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
+> 
+>  static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
+>         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
+> +       S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
+>         ARM64_FTR_END,
+>  };
 
-On Sat, Dec 07, 2024 at 07:07:40PM +0000, Marc Zyngier wrote:
-> There is no such thing as CPACR_ELx in the architecture.
-> What we have is CPACR_EL1, for which CPTR_EL12 is an accessor.
->=20
-> Rename CPACR_ELx_* to CPACR_EL1_*, and fix the bit of code using
-> these names.
+Ah, I always get tripped by that one. You are absolutely correct, this
+is needed. I'll fold that in.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Thanks again,
 
---skbI6LnrmfTymsLf
-Content-Type: application/pgp-signature; name="signature.asc"
+	M.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdXA50ACgkQJNaLcl1U
-h9BRJAf/S0ycslVskgXpXkjdvI/5+VVEFQFc/0Bq4LuCxfAySEoj5lYXZBfkCbyU
-fUepdbv4utG+qLWjLDeezQFKDMSLU1jCaOjly/wS5lDoyo3/Q2eUZ47d1YbaFxad
-A8d8UEQCnmqDrUGhBf+PGERd4nhI25x9PIZNDDlQBHkQ7T5DN9cUZYvi54cLADxM
-XWFgKnnYYSg6iQR69KkjYx5cult0bxD6Icx7PhqyZbNo/lD+S79mlTeajEtNk9CP
-G1qYyebgGVHIRXOVajFW3w3/wWAigddiBAnhIWatFTwWhv2yHC8Ti3Y9QZ5EX6wm
-N8mhwTBF+RWlkQrCZZTXZWvs+rFNRg==
-=/h92
------END PGP SIGNATURE-----
-
---skbI6LnrmfTymsLf--
+-- 
+Without deviation from the norm, progress is not possible.
