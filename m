@@ -1,49 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A571BC09F;
-	Tue, 10 Dec 2024 17:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09D61C07ED;
+	Tue, 10 Dec 2024 17:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733850329; cv=none; b=d+v5vmitrQDftvmkyMXBJ15yCi9crxmLbJZtzY+Ws32+UyESwt6TN0E+VmLC2oI983ak3at8wGHanYiO38wcbNS0ndTd/IOFC5wwIeCn8BNiS6CihA+EMnz1fWqJWxVP518orLYpcZ71us+olY4ZGVI856ceeBjSHuwECTnguDg=
+	t=1733850601; cv=none; b=FN06FKpDrMdHqbq7m608K2Np+NTqIWxh83BiksMr9K8QEkU6D68M0y/VeIji+v8OZJIi1HsFQU7TVzKcyxAfy//IBLmVyt0IBTlo8sjm6S/URF2978RTvMIv/ffdpR8VlWFP61n4ZMJ1GHSIdZXeEKIKtKfn/OfLs1wOASWjHwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733850329; c=relaxed/simple;
-	bh=vaU+OdFiuVkaJ6PMcJ/NEkM/VLKOJSMZuqjDER3Bpz8=;
+	s=arc-20240116; t=1733850601; c=relaxed/simple;
+	bh=2Lcmq7SHHNoVqPiQ1a9keIwEUzJcb799Uq6YwdCactM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oPMRM+srIf6FctEWH0RfzoL7e/clMUa/yzEl2WLQ7EI9gw3GHvSUzwuTr3aVbL13pb8vhM3f57fMTZ1DXSvQvF+Wqbab66P/E2J1xLyO112uqzMFGv4NdDvn7DJpW2RN+ujYwG/Z8RtuAIzNkpdcNG2LchidqqnTQP3zVVxLfxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VV1f8zSK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=L0EvRMsV2i44n6gJstgYUNE0tT/aeWNQSFV79zoODV2vfW41MPHJi5C9D4qLSDLhfv7tSrW91H/rOmLqMhBsc3Rl0Rpug61VjrVhQeMYW2XjXHKplXi93mPUQFr3VrM9Ruj5UuT85B2r0MZfdyTGxGPOpEOy6hl8GkWwyi3/oOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOUMN7Tc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VV1f8zSK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6DE7C4CED6;
-	Tue, 10 Dec 2024 17:05:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOUMN7Tc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 783CAC4CED6;
+	Tue, 10 Dec 2024 17:09:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733850325;
-	bh=vaU+OdFiuVkaJ6PMcJ/NEkM/VLKOJSMZuqjDER3Bpz8=;
+	s=k20201202; t=1733850600;
+	bh=2Lcmq7SHHNoVqPiQ1a9keIwEUzJcb799Uq6YwdCactM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VV1f8zSKGEMXCGTCBnMhrA+rQFBCZl5bL/h2jdGK8Wcsir+Y9G9PPmgXu8oxBWvTE
-	 x7gXi+DeyVO8im7f+lh908tmy23Fbg4xQBZMDTL/nTJ97O7UCmKq+cHZ5gqhKYvd4b
-	 q7g1N0FhbNVhu2h28h503mjPz42ul2my6iEtWOV2XzTn6c3KTZ4gbfYFgYR8F1S50Q
-	 p0vzgyBCJixO3f7edsXewIg6IND5ZdYsEhTbfz7gFGRPvZdvz2ABIpxtBgjgx2H/3r
-	 PPAQitViGoIsCZi25UrbvCf10WC1Kq1+CaIQGRvGBfG8hkkc6sOAmUephMEjXkvagC
-	 DLCikw+OPercg==
-Date: Tue, 10 Dec 2024 17:05:20 +0000
+	b=SOUMN7Tc4of6hly92PWfFlwTA8xXM7VUYU4bNYDTSXF5sc6BM3VXU2Vig0QEc+AEe
+	 B1bLwSJepN5c33ArBzRH/+2pfEq9bq/zGF3WIdULrNuXpP1H/DUZTn6BTurWdhn31k
+	 lgmllm0L8VibP5t8qgXhC4Z5W443RodVG3Kh8Bfkaz6ttEMteL6rd+fiatbPoa3jit
+	 zTzD5bHnDOW6C3AMOBf8ljeQk7bvJny9XNdkjva9Qx+j/8MPGE1Iv58QlOzoj6xPJV
+	 WzOXQUuppv12EqtG5qRvWoW22GOh7S6MNxeGdySvWKax0o1KLpqnuF3pGZAb20h7hq
+	 lhndv/N0MNHSg==
+Date: Tue, 10 Dec 2024 17:09:55 +0000
 From: Will Deacon <will@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH V2 5/7] arm64/cpufeature: Add field details for
- ID_AA64DFR1_EL1 register
-Message-ID: <20241210170519.GA16075@willie-the-truck>
-References: <20241028053426.2486633-1-anshuman.khandual@arm.com>
- <20241028053426.2486633-6-anshuman.khandual@arm.com>
- <20241210164144.GA16039@willie-the-truck>
- <Z1hyueAQJTroNIRW@J2N7QTR9R3>
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601
+ 2024-09
+Message-ID: <20241210170953.GB16075@willie-the-truck>
+References: <20241203-arm64-2024-dpisa-v3-0-a6c78b1aa297@kernel.org>
+ <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,44 +50,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z1hyueAQJTroNIRW@J2N7QTR9R3>
+In-Reply-To: <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Dec 10, 2024 at 04:56:25PM +0000, Mark Rutland wrote:
-> On Tue, Dec 10, 2024 at 04:41:44PM +0000, Will Deacon wrote:
-> > On Mon, Oct 28, 2024 at 11:04:24AM +0530, Anshuman Khandual wrote:
-> > > +static const struct arm64_ftr_bits ftr_id_aa64dfr1[] = {
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABL_CMPs_SHIFT, 8, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_DPFZS_SHIFT, 4, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_EBEP_SHIFT, 4, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ITE_SHIFT, 4, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABLE_SHIFT, 4, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_PMICNTR_SHIFT, 4, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_SPMU_SHIFT, 4, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_CTX_CMPs_SHIFT, 8, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_WRPs_SHIFT, 8, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_BRPs_SHIFT, 8, 0),
-> > > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_SYSPMUID_SHIFT, 8, 0),
-> > > +	ARM64_FTR_END,
-> > > +};
-> > 
-> > I think I mentioned this on an earlier series, but it would be useful to
-> > see some justification in the commit message as to why some of these
-> > features are considered STRICT vs NONSTRICT and why LOWER_SAFE is
-> > preferred over EXACT.
-> > 
-> > For example, why is EBEP strict whereas other PMU-related fields aren't?
-> > Why is the CTX_CMPs field treated differently to the same field in DFR0?
-> > 
-> > I'm not saying the above table is wrong, it just looks arbitrary without
-> > the justification.
+On Tue, Dec 03, 2024 at 12:39:21PM +0000, Mark Brown wrote:
+> DDI0601 2024-09 defines several new feature flags in ID_AA64ISAR3_EL1,
+> update our description in sysreg to reflect these.
 > 
-> FWIW, Anshuman and I discussed that on the v1 thread, after this v2
-> thread was posted. Anshuman promised to provide some rationale and make
-> some updates in the next version (i.e. v3):
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/tools/sysreg | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
 > 
->   https://lore.kernel.org/linux-arm-kernel/8efe902c-8b9f-494a-b9da-430d8ced32ef@arm.com/
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 911f16c82ebd3ee98ffed965b02a5c6b153bc50c..c5af604eda6a721cedf5c9c68d6f7038156de651 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1566,7 +1566,23 @@ EndEnum
+>  EndSysreg
+>  
+>  Sysreg	ID_AA64ISAR3_EL1	3	0	0	6	3
+> -Res0	63:16
+> +Res0	63:32
+> +UnsignedEnum	31:28	FPRCVT
+> +	0b0000	NI
+> +	0b0010	IMP
+> +EndEnum
+> +UnsignedEnum	27:24	LSUI
+> +	0b0000	NI
+> +	0b0010	IMP
+> +EndEnum
+> +UnsignedEnum	23:20	OCCMO
+> +	0b0000	NI
+> +	0b0010	IMP
+> +EndEnum
+> +UnsignedEnum	19:16	LSFE
+> +	0b0000	NI
+> +	0b0010	IMP
 
-Perfect! I'll wait for the v3, then.
+These IMP encodings look wrong to me -- the document you reference in
+the commit message uses 0b0001 for the "implemented" cases.
+
+Can we _please_ just generate this stuff. It feels like we've been
+making silly typos over and over again with the current approach so
+either it's hard or we're not very good at it. Either way, it should be
+automated.
+
+Others have managed it [1], so it's clearly do-able.
 
 Will
+
+[1] https://github.com/ashwio/arm64-sysreg-lib
