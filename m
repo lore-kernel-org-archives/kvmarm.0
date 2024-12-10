@@ -1,159 +1,330 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8022A1AAA1B
-	for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 13:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DCB1AA792
+	for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 13:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733838977; cv=none; b=okm/DZtfvQ2GIt/GbKm7ULZqO3Jqs1TZtB8v+9bycyhB24ZMkLQMXvvrlKWSBhsYbmehsd7Om5I9Ef0sDxu90KMonHybNsV6gSscpdSJHfjXeO9XiwD2vMRbeBwF9IlCl9OfNNCRObcIZif1EDKgXH3k9VFc6Yb42sXrK5d/XzM=
+	t=1733839162; cv=none; b=fyEYjlktN83dkaIN+5+V1Z8hrojzJEtCCEro2vYKSpT7BT4AuUju2+ivV82/AqPfFzZ5XkJKl3smKY8tULTjrO4Qa7TJiWQTjsS8RG4cg6vUbedFB3Yrsf03/LCINBghK3If4uR7wzMyKGYwoCISikT1UCInhmaVeR4anZQSuqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733838977; c=relaxed/simple;
-	bh=81SDwr+i7U7nSFtgaowgS3f+OVFldJCp5ag1L+YrymY=;
+	s=arc-20240116; t=1733839162; c=relaxed/simple;
+	bh=2JQ39qGn6LXdaMkpu9+UxDI2h2BmkKbWaQUiv/FMb7g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HyvqwXR+MGmhUkfJPwuRULGpq2z32YfWmA2wdgVQpd9xurnotsZ1OxAHSJqY8o6K+OPc1pr4Io0OWg0hKJnSZipJV10sfuPV1IdQsHj1DgQ+7a0ZedUaNiBrLeYkrI3CkpX2D/j7/Dbk12QDyKGpnyY49A+3ELTKjMPxuKl6UPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q9Dziher; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=NN5IG/QfylndXIpxFmN6AA4QKbotVUsQWQR596zFLV+2inDGmAArQzz11sTlRrTscSRsWfZSP9yJaDqNPvVdppndzYU4etqBtaXUWbHqD9a5AUrtCCw4tjS1qdEMPB9pgBZ5rgVvqhfburPQiRrNlqXDF7xmdqb/VJ+KiiK8vuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=POZe6OTG; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9Dziher"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733838974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pSFsmOdcddKIbSt6Sh45W8nB+T2Eq7+gB4QNkOWTcWE=;
-	b=Q9Dziheryldl+QVF0EqymzP5Zec23z42JHveQuHrgramDfb/rkb+EyT68aDO7TBISf6UZ2
-	TgMTuyPnLu9rZLZDsZ1mZskXSdPRWuezzW3hcwbYI/qQLQ2Yi7s3F6mFsYPV8fyR6sYSqe
-	L0GWoary69kzhVIq+taOfxoR3aodmp8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-i5rnwkhzNcqng7WfcpOZtg-1; Tue, 10 Dec 2024 08:56:11 -0500
-X-MC-Unique: i5rnwkhzNcqng7WfcpOZtg-1
-X-Mimecast-MFC-AGG-ID: i5rnwkhzNcqng7WfcpOZtg
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43619b135bcso1705135e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 05:56:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="POZe6OTG"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-434f150e9b5so38945e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 05:59:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733839159; x=1734443959; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pdR2Nah9eSS1608JQ+7pYdwSPFrgUeYicsyPZ54iPZ8=;
+        b=POZe6OTGZiziPp5TAU88EFKdk74TJQEbDYV+09zGAfLoHOgBlI9MTwQWMZagDCe83Z
+         iOLQ1sRp4mfX1ogUiVh8okMCPENSfKTmyIX1kJ7rIK+QuRSoWZ5rfjFbTGXSN7V9KnKx
+         A/Y2AF8fKBu8DE1f9CaW+fvreU3tvIphTW2ylKab2BdScOhIGcfhbe8P0cTnyu59RGvK
+         V3MSY/FSn5lsYjuRKAkhuWkf10PWIZYtPNqK1cdulGfH+exvpFX5qmWjXU/CYfiNX8eJ
+         T15R5e9k9YhUbh0Diz2xGpA1RVsIRwBGr74tbIuJVml278ELgIyFL8U5snncxd9Xed30
+         sLcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733838970; x=1734443770;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pSFsmOdcddKIbSt6Sh45W8nB+T2Eq7+gB4QNkOWTcWE=;
-        b=ZkmWOfKwPskBNXXo1/SwW61eG38W9x4vnZPqX05hF/fWspJ5U6h5I8lYBJJr2Ym3iI
-         k+ohYcIzMHyuyvC3lUgAQSzfHLv6FcoHLtMHZA0GWJimZsYzapLk0/ccXw1WZpkS/xX7
-         gXFuM3Xc55sc6G5StqkPNIluV2R5Pcgm0z14AnixLacE20qGxyncwqbCDYP6/4XexrYP
-         iA5ReQXySiBcMzC6aUrdGiLQLfmboP/FU0d0YBIvw6ALRurLvXDaB6rbe/fYF9X488Xo
-         b3uozFicqijwcPuduuN0dEiedyqBfSnHJwoSyx4Ml8uIZwb4DHTZiIDYuJsX7QEWcPMx
-         tN+A==
-X-Gm-Message-State: AOJu0YxSr8IY1sWRXJl4TrSXgAwajseD5MAJ8xF00xNGsjFaDZgnsgUb
-	rHwL82eFeFdT/we8gDQ8muc7cdv8a2ZHLatG3vQUL7aNg0Chb+fUZIf5UUrFpX019LfN6n/vcWW
-	gA9/BEhP+Ub7AuRyB4pM3R2N1wajB9kE1+rgDuOT45BoH3TzI0Jd+hoqU6QNJbXf8DRvg8jYP/j
-	T+wR+n+ruI2hXc1ndLviofkF+gk695
-X-Gm-Gg: ASbGncsu1dWk573osE3g5aA8ilbCDhx6jZlefB6DBQs610CPQm9z5wUkz/7d3GRYngF
-	ixTnbLTwK+m2HHG94RAO4pj3He8OVkBOJusE=
-X-Received: by 2002:a05:600c:a46:b0:42c:b16e:7a22 with SMTP id 5b1f17b1804b1-434ddeb5573mr131813295e9.12.1733838970196;
-        Tue, 10 Dec 2024 05:56:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGT6PKtby95Y/i0ysLL1kDTYIt+/yB6BbpbwY8jHyRrAnXXeBFggcg1I6c0FSATV4N/GlcZ6ogQmesGlCgDfo4=
-X-Received: by 2002:a05:600c:a46:b0:42c:b16e:7a22 with SMTP id
- 5b1f17b1804b1-434ddeb5573mr131813105e9.12.1733838969816; Tue, 10 Dec 2024
- 05:56:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733839159; x=1734443959;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pdR2Nah9eSS1608JQ+7pYdwSPFrgUeYicsyPZ54iPZ8=;
+        b=LcF9ylnsG39heJEnG7PDYgevL0vggsZM9Q5xGE28lFc29wEHOVruAGvHIccOgndUac
+         n2sBH/afXnn2Hdg4fZvECeSJZtOHOd9bvbCbaNyPjNdTN5L4k6lCaivx7lbobrDk43CF
+         L3/HvnFUrY1sVgBFXr9jWXiL/hGSyeMA7t/yGxVRD5ol8v2lu0yQt8eibTvAUOQ03SFS
+         MOi283rJ7Sjgl+VgkS3YaANAaysnT4BtZXHV9D35kkwhzSidvyARwxohRjCiJEwihh3f
+         9/eCyZV3DUhpC09YspNJJ09FG2cfgwj3M1aNUu8MezZhWFuD43IDrP5L9oWie8ybSH1/
+         XIHw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpsvBfhavmp7Uennu6jIBJwTBf7epOAlhkIBPTaAeRhBEM0Hf3GI4KLd7HWtd3ZlK7aKUBVyU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwV73JXxDiEEUIV8jbXNga4owNwRe4tUkJVltJ5JE8lCierSPu7
+	bP8P/PR/GvWraRM7tVSHFfCzX6yTvs3UBOw0JQL23KLU2uEWxUtoP7KdqiYwXWF0sjwt+j7mFyJ
+	6YkpCwpin0CB937kHR8xBREl5KUE8HkPbBit3
+X-Gm-Gg: ASbGnctbTmwqHiQlYfHGCss5eoW467/RBQq42nrn3Ph46WB8k/YqlGqgrbw7ki8NyLi
+	fhUNJJHsBn5kgjqaOzNMkqyqabA+g8ImOSK8DhT7KN50we1sV+GUwGrT0Gck68XcQ
+X-Google-Smtp-Source: AGHT+IF4x286LsTWFdiAcln9DVxYku4Zh8GMWeAmxfnCKtWgmpy5Npqzo9xC8vyBUc50ELL4I2PYhOBwkjRB7UTXebM=
+X-Received: by 2002:a05:600c:35cb:b0:436:1868:b29f with SMTP id
+ 5b1f17b1804b1-4361868b697mr502665e9.6.1733839159010; Tue, 10 Dec 2024
+ 05:59:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <Z0-n5WnAg8tBjLhG@linux.dev>
-In-Reply-To: <Z0-n5WnAg8tBjLhG@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 10 Dec 2024 14:55:56 +0100
-Message-ID: <CABgObfZqKKAmJuL+awFFQ8Y1+GvTOWNuvPGav9Y0DVWRhC7EOw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.13, part #2
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Marc Zyngier <maz@kernel.org>, James Clark <james.clark@linaro.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: E098FN3UqLsm3hhKl9RXLDEMk15EIutHm9UwdebdKoA_1733838970
-X-Mimecast-Originator: redhat.com
+References: <20241203103735.2267589-1-qperret@google.com> <20241203103735.2267589-11-qperret@google.com>
+In-Reply-To: <20241203103735.2267589-11-qperret@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 10 Dec 2024 13:58:42 +0000
+Message-ID: <CA+EHjTwHSyQ1FJc7axbLNuBxSWpRVE6brb34nO+F59=QRmfQEg@mail.gmail.com>
+Subject: Re: [PATCH v2 10/18] KVM: arm64: Introduce __pkvm_host_share_guest()
+To: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Vincent Donnefort <vdonnefort@google.com>, 
+	Sebastian Ene <sebastianene@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 4, 2024 at 1:53=E2=80=AFAM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> Hi Paolo,
->
-> Another week, another batch of fixes. The most notable here is the MDCR_E=
-L2
-> change from James, which addresses a rather stupid regression I introduce=
-d
-> in 6.13.
->
-> Please pull.
+Hi Quentin,
 
-Done, thanks!
-
-Paolo
-
+On Tue, 3 Dec 2024 at 10:37, Quentin Perret <qperret@google.com> wrote:
 >
+> In preparation for handling guest stage-2 mappings at EL2, introduce a
+> new pKVM hypercall allowing to share pages with non-protected guests.
+>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h              |  1 +
+>  arch/arm64/include/asm/kvm_host.h             |  3 +
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h      |  2 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 34 +++++++++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 70 +++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  7 ++
+>  7 files changed, 118 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 89c0fac69551..449337f5b2a3 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -65,6 +65,7 @@ enum __kvm_host_smccc_func {
+>         /* Hypercalls available after pKVM finalisation */
+>         __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
+>         __KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
+> +       __KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
+>         __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
+>         __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
+>         __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e18e9244d17a..f75988e3515b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -771,6 +771,9 @@ struct kvm_vcpu_arch {
+>         /* Cache some mmu pages needed inside spinlock regions */
+>         struct kvm_mmu_memory_cache mmu_page_cache;
+>
+> +       /* Pages to be donated to pkvm/EL2 if it runs out */
+
+Runs out of what? :) I'm being facetious, it's just that the comment
+is a bit unclear.
+
+> +       struct kvm_hyp_memcache pkvm_memcache;
+> +
+>         /* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+>         u64 vsesr_el2;
+>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 25038ac705d8..a7976e50f556 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -39,6 +39,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+>  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+> +int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu, enum kvm_pgtable_prot prot);
+>
+>  bool addr_is_memory(phys_addr_t phys);
+>  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index 08f3a0416d4c..457318215155 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -47,6 +47,8 @@ struct hyp_page {
+>
+>         /* Host (non-meta) state. Guarded by the host stage-2 lock. */
+>         enum pkvm_page_state host_state : 8;
+> +
+> +       u32 host_share_guest_count;
+>  };
+>
+>  extern u64 __hyp_vmemmap;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 95d78db315b3..d659462fbf5d 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -211,6 +211,39 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+>         cpu_reg(host_ctxt, 1) =  ret;
+>  }
+>
+> +static int pkvm_refill_memcache(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +{
+> +       struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> +
+> +       return refill_memcache(&hyp_vcpu->vcpu.arch.pkvm_memcache,
+> +                              host_vcpu->arch.pkvm_memcache.nr_pages,
+> +                              &host_vcpu->arch.pkvm_memcache);
+> +}
+> +
+> +static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
+> +{
+> +       DECLARE_REG(u64, pfn, host_ctxt, 1);
+> +       DECLARE_REG(u64, gfn, host_ctxt, 2);
+> +       DECLARE_REG(enum kvm_pgtable_prot, prot, host_ctxt, 3);
+> +       struct pkvm_hyp_vcpu *hyp_vcpu;
+> +       int ret = -EINVAL;
+> +
+> +       if (!is_protected_kvm_enabled())
+> +               goto out;
+> +
+> +       hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+> +       if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> +               goto out;
+> +
+> +       ret = pkvm_refill_memcache(hyp_vcpu);
+> +       if (ret)
+> +               goto out;
+> +
+> +       ret = __pkvm_host_share_guest(pfn, gfn, hyp_vcpu, prot);
+> +out:
+> +       cpu_reg(host_ctxt, 1) =  ret;
+> +}
+> +
+>  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
+>  {
+>         DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
+> @@ -420,6 +453,7 @@ static const hcall_t host_hcall[] = {
+>
+>         HANDLE_FUNC(__pkvm_host_share_hyp),
+>         HANDLE_FUNC(__pkvm_host_unshare_hyp),
+> +       HANDLE_FUNC(__pkvm_host_share_guest),
+>         HANDLE_FUNC(__kvm_adjust_pc),
+>         HANDLE_FUNC(__kvm_vcpu_run),
+>         HANDLE_FUNC(__kvm_flush_vm_context),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 1595081c4f6b..a69d7212b64c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -861,6 +861,27 @@ static int hyp_complete_donation(u64 addr,
+>         return pkvm_create_mappings_locked(start, end, prot);
+>  }
+>
+> +static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte, u64 addr)
+> +{
+> +       if (!kvm_pte_valid(pte))
+> +               return PKVM_NOPAGE;
+> +
+> +       return pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte));
+> +}
+> +
+> +static int __guest_check_page_state_range(struct pkvm_hyp_vcpu *vcpu, u64 addr,
+> +                                         u64 size, enum pkvm_page_state state)
+> +{
+> +       struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+> +       struct check_walk_data d = {
+> +               .desired        = state,
+> +               .get_page_state = guest_get_page_state,
+> +       };
+> +
+> +       hyp_assert_lock_held(&vm->lock);
+> +       return check_page_state_range(&vm->pgt, addr, size, &d);
+> +}
+> +
+>  static int check_share(struct pkvm_mem_share *share)
+>  {
+>         const struct pkvm_mem_transition *tx = &share->tx;
+> @@ -1343,3 +1364,52 @@ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
+>
+>         return ret;
+>  }
+> +
+> +int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu,
+> +                           enum kvm_pgtable_prot prot)
+> +{
+> +       struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+> +       u64 phys = hyp_pfn_to_phys(pfn);
+> +       u64 ipa = hyp_pfn_to_phys(gfn);
+> +       struct hyp_page *page;
+> +       int ret;
+> +
+> +       if (prot & ~KVM_PGTABLE_PROT_RWX)
+> +               return -EINVAL;
+> +
+> +       ret = range_is_allowed_memory(phys, phys + PAGE_SIZE);
+> +       if (ret)
+> +               return ret;
+> +
+> +       host_lock_component();
+> +       guest_lock_component(vm);
+> +
+> +       ret = __guest_check_page_state_range(vcpu, ipa, PAGE_SIZE, PKVM_NOPAGE);
+> +       if (ret)
+> +               goto unlock;
+> +
+> +       page = hyp_phys_to_page(phys);
+> +       switch (page->host_state) {
+> +       case PKVM_PAGE_OWNED:
+> +               WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_OWNED));
+> +               break;
+> +       case PKVM_PAGE_SHARED_OWNED:
+> +               /* Only host to np-guest multi-sharing is tolerated */
+
+Initially I thought the comment was related to the warning below,
+which confused me. Now I think what you're trying to say is that we'll
+allow the share, and the (unrelated to the comment) warning is to
+ensure that the PKVM_PAGE_SHARED_OWNED is consistent with the share
+count.
+
+I think what you should have here, which would work better with the
+comment, is something like:
+
+                /* Only host to np-guest multi-sharing is tolerated */
++               if (pkvm_hyp_vcpu_is_protected(vcpu))
++                       return -EPERM;
+
+That would even make the comment unnecessary.
+
+
+> +               WARN_ON(!page->host_share_guest_count);
+> +               break;
+> +       default:
+> +               ret = -EPERM;
+> +               goto unlock;
+> +       }
+> +
+> +       WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
+> +                                      pkvm_mkstate(prot, PKVM_PAGE_SHARED_BORROWED),
+> +                                      &vcpu->vcpu.arch.pkvm_memcache, 0));
+> +       page->host_share_guest_count++;
+> +
+> +unlock:
+> +       guest_unlock_component(vm);
+> +       host_unlock_component();
+> +
+> +       return ret;
+> +}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index d5c23449a64c..d6c61a5e7b6e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -795,6 +795,13 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+>         /* Push the metadata pages to the teardown memcache */
+>         for (idx = 0; idx < hyp_vm->nr_vcpus; ++idx) {
+>                 struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vm->vcpus[idx];
+> +               struct kvm_hyp_memcache *vcpu_mc = &hyp_vcpu->vcpu.arch.pkvm_memcache;
+> +
+> +               while (vcpu_mc->nr_pages) {
+> +                       void *addr = pop_hyp_memcache(vcpu_mc, hyp_phys_to_virt);
+
+nit: newline
+
+Cheers,
+/fuad
+
+
+
+> +                       push_hyp_memcache(mc, addr, hyp_virt_to_phys);
+> +                       unmap_donated_memory_noclear(addr, PAGE_SIZE);
+> +               }
+>
+>                 teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
+>         }
 > --
-> Thanks,
-> Oliver
+> 2.47.0.338.g60cca15819-goog
 >
-> The following changes since commit 13905f4547b050316262d54a5391d50e83ce61=
-3a:
->
->   KVM: arm64: Use MDCR_EL2.HPME to evaluate overflow of hyp counters (202=
-4-11-20 17:23:32 -0800)
->
-> are available in the Git repository at:
->
->   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags=
-/kvmarm-fixes-6.13-2
->
-> for you to fetch changes up to be7e611274224b23776469d7f7ce50e25ac53142:
->
->   KVM: arm64: vgic-its: Add error handling in vgic_its_cache_translation =
-(2024-12-03 16:22:10 -0800)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.13, part #2
->
->  - Fix confusion with implicitly-shifted MDCR_EL2 masks breaking
->    SPE/TRBE initialization
->
->  - Align nested page table walker with the intended memory attribute
->    combining rules of the architecture
->
->  - Prevent userspace from constraining the advertised ASID width,
->    avoiding horrors of guest TLBIs not matching the intended context in
->    hardware
->
->  - Don't leak references on LPIs when insertion into the translation
->    cache fails
->
-> ----------------------------------------------------------------
-> James Clark (1):
->       arm64: Fix usage of new shifted MDCR_EL2 values
->
-> Keisuke Nishimura (1):
->       KVM: arm64: vgic-its: Add error handling in vgic_its_cache_translat=
-ion
->
-> Marc Zyngier (2):
->       KVM: arm64: Fix S1/S2 combination when FWB=3D=3D1 and S2 has Device=
- memory type
->       KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be overridden
->
->  arch/arm64/include/asm/el2_setup.h |  4 ++--
->  arch/arm64/kernel/hyp-stub.S       |  4 ++--
->  arch/arm64/kvm/at.c                | 11 +++++++++--
->  arch/arm64/kvm/hyp/nvhe/pkvm.c     |  4 ++--
->  arch/arm64/kvm/sys_regs.c          |  3 ++-
->  arch/arm64/kvm/vgic/vgic-its.c     | 12 +++++++++++-
->  6 files changed, 28 insertions(+), 10 deletions(-)
->
-
