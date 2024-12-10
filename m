@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB69228C83
-	for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 05:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1379822F3A8
+	for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 05:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733810161; cv=none; b=eAoyp7RuXcKIQve7Bgyndy3VTK0KvGJoIpEwekCXx2gUGURdOZsukHAyZImzujK5n4w/yoLKygPB665oRJq9fVn4Dr6yPcE7IeOaeitsXjo3l8rA4kMcGyLbPnuToudtxVUn7roiKwOCyAQsjJa6ZzyfGubyrj47/ozrmRMz9Uw=
+	t=1733810165; cv=none; b=N6fXhT19nxkQZNynAXFW3iDRZtEInIaBpOupubChmn4tMGRzGl5u+ggIRLkKV+4UaRAc3O1xAm7HUgZElA/l9M25RganI7tS4LAW5akTDq4gYWjtRnyvwKfkZov3FwsUnumdb1FLqP/B/qFVTlfPrtme+iaslBpBpXrYQ+lyj1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733810161; c=relaxed/simple;
-	bh=Odl+DwkueB9FnhSVH+MnqvDr8an4fLSyXPf3dn7lGtg=;
+	s=arc-20240116; t=1733810165; c=relaxed/simple;
+	bh=Kb2mAhQuDznJ/xq2ScWlltmk8IeJqrp5a+QMu+fQdRg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RzD5sYbaIxKgb2bNTvnfeDIiaGzUiNDWWhjyqnnt8J3CsGvL1+Wwb2Pdu67kIvyNdSrGbrCzfTvJKKmkhZwl9jCXiDcBCj6OEflwTb2h59uLPyDBkSzB8M7omQgNiT4sZQiLJBBtfhRHXqoBsDXM2ceJLwmXCbzg8W+mBuAVnq8=
+	 MIME-Version; b=InXHXtF5K35jcfV/dO+gaUnZGbT6Pt6O5gxIRIFzM5zK956KHf2jtfH7+R5lvfbs9fC1tLb+tkacgmVReMaGE8xl84emn7oA57GrCf2UoS3E2ecpbmwnVo3ZE5ggnQICL82hw1tMcIJ0//i5LZ75QXGEisVPwEB4cf6Rt9VVvzU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A945A113E;
-	Mon,  9 Dec 2024 21:56:27 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3928113E;
+	Mon,  9 Dec 2024 21:56:31 -0800 (PST)
 Received: from a077893.arm.com (unknown [10.163.48.173])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 032483F58B;
-	Mon,  9 Dec 2024 21:55:55 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2DEB13F58B;
+	Mon,  9 Dec 2024 21:55:59 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
@@ -31,9 +31,9 @@ Cc: ryan.roberts@arm.com,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH V2 30/46] arm64/sysreg: Add register fields for SPMCNTENSET_EL0
-Date: Tue, 10 Dec 2024 11:22:55 +0530
-Message-Id: <20241210055311.780688-31-anshuman.khandual@arm.com>
+Subject: [PATCH V2 31/46] arm64/sysreg: Add register fields for SPMSELR_EL0
+Date: Tue, 10 Dec 2024 11:22:56 +0530
+Message-Id: <20241210055311.780688-32-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241210055311.780688-1-anshuman.khandual@arm.com>
 References: <20241210055311.780688-1-anshuman.khandual@arm.com>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds register fields for SPMCNTENSET_EL0 as per the definitions based
+This adds register fields for SPMSELR_EL0 as per the definitions based
 on DDI0601 2024-09.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -55,85 +55,30 @@ Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/tools/sysreg | 67 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+ arch/arm64/tools/sysreg | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 9f278055fe77..a7b8f5602163 100644
+index a7b8f5602163..e57973b27e9c 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -312,6 +312,73 @@ Field	1	P
- Field	0	E
+@@ -513,6 +513,18 @@ Field	1	P1
+ Field	0	P0
  EndSysreg
  
-+Sysreg	SPMCNTENSET_EL0	2	3	9	12	1
-+Field	63	P63
-+Field	62	P62
-+Field	61	P61
-+Field	60	P60
-+Field	59	P59
-+Field	58	P58
-+Field	57	P57
-+Field	56	P56
-+Field	55	P55
-+Field	54	P54
-+Field	53	P53
-+Field	52	P52
-+Field	51	P51
-+Field	50	P50
-+Field	49	P49
-+Field	48	P48
-+Field	47	P47
-+Field	46	P46
-+Field	45	P45
-+Field	44	P44
-+Field	43	P43
-+Field	42	P42
-+Field	41	P41
-+Field	40	P40
-+Field	39	P39
-+Field	38	P38
-+Field	37	P37
-+Field	36	P36
-+Field	35	P35
-+Field	34	P34
-+Field	33	P33
-+Field	32	P32
-+Field	31	P31
-+Field	30	P30
-+Field	29	P29
-+Field	28	P28
-+Field	27	P27
-+Field	26	P26
-+Field	25	P25
-+Field	24	P24
-+Field	23	P23
-+Field	22	P22
-+Field	21	P21
-+Field	20	P20
-+Field	19	P19
-+Field	18	P18
-+Field	17	P17
-+Field	16	P16
-+Field	15	P15
-+Field	14	P14
-+Field	13	P13
-+Field	12	P12
-+Field	11	P11
-+Field	10	P10
-+Field	9	P9
-+Field	8	P8
-+Field	7	P7
-+Field	6	P6
-+Field	5	P5
-+Field	4	P4
-+Field	3	P3
-+Field	2	P2
-+Field	1	P1
-+Field	0	P0
++Sysreg	SPMSELR_EL0	2	3	9	12	5
++Res0	63:10
++Field	9:4	SYSPMUSEL
++Res0	3:2
++UnsignedEnum	1:0	BANK
++	0b00	BANK_0
++	0b01	BANK_1
++	0b10	BANK_2
++	0b11	BANK_3
++EndEnum
 +EndSysreg
 +
- Sysreg	SPMCNTENCLR_EL0	2	3	9	12	2
+ Sysreg	SPMOVSSET_EL0	2	3	9	14	3
  Field	63	P63
  Field	62	P62
 -- 
