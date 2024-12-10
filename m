@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09D61C07ED;
-	Tue, 10 Dec 2024 17:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228C51BC9E2;
+	Tue, 10 Dec 2024 18:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733850601; cv=none; b=FN06FKpDrMdHqbq7m608K2Np+NTqIWxh83BiksMr9K8QEkU6D68M0y/VeIji+v8OZJIi1HsFQU7TVzKcyxAfy//IBLmVyt0IBTlo8sjm6S/URF2978RTvMIv/ffdpR8VlWFP61n4ZMJ1GHSIdZXeEKIKtKfn/OfLs1wOASWjHwg=
+	t=1733856191; cv=none; b=EmGgH90INrrx84oTmB2p6pAwQxI8YGXDM+KDHpOlxqejAqL3WDWYpyHlSlK0kdY34E0Z8HfVhUyafy9DVlQdWnxtNyIIU5aR5ySfHk1P9wUYl8LfeG2kSJwBvx60yHLBN8ertaFSpZX1HxLdODdKoSjYabEUNHXyRLoyf83lU10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733850601; c=relaxed/simple;
-	bh=2Lcmq7SHHNoVqPiQ1a9keIwEUzJcb799Uq6YwdCactM=;
+	s=arc-20240116; t=1733856191; c=relaxed/simple;
+	bh=LeyVSRDVsBs+4yUCaB87Pq4OseXmV/4M3itrMP0/wm0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L0EvRMsV2i44n6gJstgYUNE0tT/aeWNQSFV79zoODV2vfW41MPHJi5C9D4qLSDLhfv7tSrW91H/rOmLqMhBsc3Rl0Rpug61VjrVhQeMYW2XjXHKplXi93mPUQFr3VrM9Ruj5UuT85B2r0MZfdyTGxGPOpEOy6hl8GkWwyi3/oOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOUMN7Tc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=D6kB471+RH9aSlGCf0zFY8/4jpEmUN/3zTaKabx3jwTLtULLi3nypm04FETCQc3/ANBcF3OXTaCBAF/plJ5BerUNinAX3bhAm8gzLI/rSCifUzSFbm8uGCpfUFYKtrV/UiTCHpkreFmXYkByb0KF8isdUcFAfu4l5tObY/8G9/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3QZf2QU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOUMN7Tc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 783CAC4CED6;
-	Tue, 10 Dec 2024 17:09:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3QZf2QU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21645C4CED6;
+	Tue, 10 Dec 2024 18:43:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733850600;
-	bh=2Lcmq7SHHNoVqPiQ1a9keIwEUzJcb799Uq6YwdCactM=;
+	s=k20201202; t=1733856190;
+	bh=LeyVSRDVsBs+4yUCaB87Pq4OseXmV/4M3itrMP0/wm0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SOUMN7Tc4of6hly92PWfFlwTA8xXM7VUYU4bNYDTSXF5sc6BM3VXU2Vig0QEc+AEe
-	 B1bLwSJepN5c33ArBzRH/+2pfEq9bq/zGF3WIdULrNuXpP1H/DUZTn6BTurWdhn31k
-	 lgmllm0L8VibP5t8qgXhC4Z5W443RodVG3Kh8Bfkaz6ttEMteL6rd+fiatbPoa3jit
-	 zTzD5bHnDOW6C3AMOBf8ljeQk7bvJny9XNdkjva9Qx+j/8MPGE1Iv58QlOzoj6xPJV
-	 WzOXQUuppv12EqtG5qRvWoW22GOh7S6MNxeGdySvWKax0o1KLpqnuF3pGZAb20h7hq
-	 lhndv/N0MNHSg==
-Date: Tue, 10 Dec 2024 17:09:55 +0000
-From: Will Deacon <will@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	b=l3QZf2QU1+RKgBarpr3fmwhoA5L2UhFOM9C1RZQnVhg7boSvpELYwkm/EJ/f9atQd
+	 vcOIEchsMsRDa9jgC/fglZJI4mvMN8alAfd84kefwG0FYRw9KC7vSHFuP09km5/IcS
+	 CEYTczJEmB7IJNgFMxl4xacUh4LnlRveu+fsyKUwjmNFziOu2IJaDx/1TDPb2lVAJH
+	 XPZD8d5WjtzFfxNjLIQQUKn24rKrurj5mnKjbj0jihY+320p6VCbzNOOZ6uUrh1Kf0
+	 fPS4qcE2JDYYupqGny4KQBES6fDNu1O06rc9d2vfaK5+NPJrBOPt8m5DmUq4BEvGZU
+	 p5ZGCHa9/GO1g==
+Date: Tue, 10 Dec 2024 18:43:05 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Will Deacon <will@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
@@ -39,65 +39,56 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
 Subject: Re: [PATCH v3 2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601
  2024-09
-Message-ID: <20241210170953.GB16075@willie-the-truck>
+Message-ID: <b859bdcd-7343-4d53-9f3a-f374deca725a@sirena.org.uk>
 References: <20241203-arm64-2024-dpisa-v3-0-a6c78b1aa297@kernel.org>
  <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
+ <20241210170953.GB16075@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="O7xabmfxJqulB9XD"
+Content-Disposition: inline
+In-Reply-To: <20241210170953.GB16075@willie-the-truck>
+X-Cookie: Leave no stone unturned.
+
+
+--O7xabmfxJqulB9XD
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Dec 03, 2024 at 12:39:21PM +0000, Mark Brown wrote:
-> DDI0601 2024-09 defines several new feature flags in ID_AA64ISAR3_EL1,
-> update our description in sysreg to reflect these.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/tools/sysreg | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 911f16c82ebd3ee98ffed965b02a5c6b153bc50c..c5af604eda6a721cedf5c9c68d6f7038156de651 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1566,7 +1566,23 @@ EndEnum
->  EndSysreg
->  
->  Sysreg	ID_AA64ISAR3_EL1	3	0	0	6	3
-> -Res0	63:16
-> +Res0	63:32
-> +UnsignedEnum	31:28	FPRCVT
-> +	0b0000	NI
-> +	0b0010	IMP
-> +EndEnum
-> +UnsignedEnum	27:24	LSUI
-> +	0b0000	NI
-> +	0b0010	IMP
-> +EndEnum
-> +UnsignedEnum	23:20	OCCMO
-> +	0b0000	NI
-> +	0b0010	IMP
-> +EndEnum
-> +UnsignedEnum	19:16	LSFE
-> +	0b0000	NI
-> +	0b0010	IMP
+On Tue, Dec 10, 2024 at 05:09:55PM +0000, Will Deacon wrote:
 
-These IMP encodings look wrong to me -- the document you reference in
-the commit message uses 0b0001 for the "implemented" cases.
+> Can we _please_ just generate this stuff. It feels like we've been
+> making silly typos over and over again with the current approach so
+> either it's hard or we're not very good at it. Either way, it should be
+> automated.
 
-Can we _please_ just generate this stuff. It feels like we've been
-making silly typos over and over again with the current approach so
-either it's hard or we're not very good at it. Either way, it should be
-automated.
+> Others have managed it [1], so it's clearly do-able.
 
-Others have managed it [1], so it's clearly do-able.
+Yes, the issues here are not technical ones.  Though there are some
+complications -  eg, IIRC the XML doesn't encode the signedness of
+fields like we do and there's areas where we've deliberately diverged.
+Given the amount of review I end up having to do of sysreg changes your
+reasoning is especially apparent to me.  I've passed this feedback on
+(again).
 
-Will
+--O7xabmfxJqulB9XD
+Content-Type: application/pgp-signature; name="signature.asc"
 
-[1] https://github.com/ashwio/arm64-sysreg-lib
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdYi7gACgkQJNaLcl1U
+h9CY6wf/S1Ub6ZKKgKDElFV3e1bfepjDl2LGu2hOv6vTYntBUtYf58M4kC5iUUsW
+VhM9pHp1mjel6TFgH+3a9a7LKOOBdnfROZzmbN/WJnMaggX6kUKJ7NdtfxoQptN0
+ifPvJgGbPi5qIBlrVVBPwbw3Zk/Y9RQtbXZqPmz+SeAI2jCre4pjauoNoYpFPrha
+fBV6p6e22M5wwV3E+7WfrBxuDvXcxbxoa9oQMNaozZgyFKkMRhW3rlVjKqQ6WtCp
+vDYL9qGYhVUjVa0XxOlI7pph9xGF8qHFU7uEt14rssvlKisbIJzOn+WbtsQImdwA
+kRgTDRh0VHV1QUFKgSC2MoK5ROEFNg==
+=DVp6
+-----END PGP SIGNATURE-----
+
+--O7xabmfxJqulB9XD--
