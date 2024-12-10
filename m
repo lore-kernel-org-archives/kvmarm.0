@@ -1,58 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEF3231CAB;
-	Tue, 10 Dec 2024 09:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7079378F5F;
+	Tue, 10 Dec 2024 09:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733821565; cv=none; b=gTxNJd56GJ+L1dVeUT3JfinoY+2fcUmAX4JlmKhJ9cLz3n0JnwUk5cnWft3BmgxAPgQ47YCr6z+H1d6ciScvipArt1LHHXVqjk0fek4DcBK8pInP3y1tiJ7/jEWFdCVip2wtUe5l+B/ZEoJ8FlBpopCy/XMhKZfW5yxdYP8o/hM=
+	t=1733824180; cv=none; b=dyYimnuTji5GTSeQWPAa2ddLj30/UdTELpiLgJVkABSTuQqi1PhOHRB+k27jV4UNwThyIy+/D9xmpLbb/aMnZ9BTN8bvOGO4uYFaIzLUU9NYRGtvA/+XE7rgtebRRirYADjEsNzeHGHn8a+Q8cWRMRYsyCDPmbi+snjcWLvSRdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733821565; c=relaxed/simple;
-	bh=UxzPXa/tKxoJipIPRU020pEKj1v70WB+y8JGomD9bMY=;
+	s=arc-20240116; t=1733824180; c=relaxed/simple;
+	bh=NrY3YRq//HQXc5Zz8ylLbD15FcekagcoyDDQYiTzGEo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=En3rKzZwxULsmtDD3ahtbjZ8EqTQqJBRfLpiwFu092GwuiLgwBNXVWHIEs8RxeDwl6UFqsI+V3FTg5tE3AIjrYraqVigJvLABLuKSkGVoQKzK8Xg1SKAyw8uAVnu/hBw/Hsuf/fouLAW0sh6c7ujkpCMruAQWrWgqrUku/reBVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J5ADtMND; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=dw0JPeChjugYlrRDBFz5iy4ub/ftKEoIuNcJPHnQowZeb8QeZwHHh9vSRQBFGlMNwZMzsY7F6qr0RwjA6JrdZW+DzQb7BjMSrMAY9DaQKpE5Tb+Si8la1lM3oQVTVsqsMVwP7fC+sk950CNm5aCaMKU6hF88MJFxQdgLRMHRk3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2l45DES; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J5ADtMND"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFBD1C4CEDD;
-	Tue, 10 Dec 2024 09:06:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2l45DES"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366C8C4CED6;
+	Tue, 10 Dec 2024 09:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733821564;
-	bh=UxzPXa/tKxoJipIPRU020pEKj1v70WB+y8JGomD9bMY=;
+	s=k20201202; t=1733824180;
+	bh=NrY3YRq//HQXc5Zz8ylLbD15FcekagcoyDDQYiTzGEo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J5ADtMNDjrv8Tdc3EOhcbscAr7atYG+YukrITjlrjnZUe4HyauiBujzjNZ1UujMfJ
-	 VWwFd4rr8iegccUzExq269wO9mHT/OtKtuHcMcGDdpw7YSIhyAitvYNIXgroTtutW3
-	 CSvd7zFO3bnn5qQE0SrtzQGuelkde7EeBJ733US3Ee6iU4BNzgIhqsLzG5n7+z6a7g
-	 unJF6imCcuLorACsmysFxRdFvmjmze0jga2+ZchNVmNrnNpaJHvIE1Y68uvORR63Bm
-	 TIpdbMCYMcUHwW+oAduOLEM8ddnSybG4WTa6peRrfTLoA1rYA8Ej752Fqc+WwUkEUY
-	 3APjn6YR47Duw==
-Received: from 82-132-225-50.dab.02.net ([82.132.225.50] helo=wait-a-minute.misterjones.org)
+	b=S2l45DESv/WhTR2+g4xv8B9bCTglekRh2uz7K1KY9cusAgjNyf3VQB37WYae7YISP
+	 wB4WrPtyg1tCHL/d9X/oNG5ED3D5WFQ3OOvD3/ESvK3pxzy/15jz498m2j82KUpCTl
+	 xR4sURDuYLenzKUGh8w+2/IUdRKh0zoy6f1EmYjA2WaqyqsaU8dgOOieuTGpMgOP2s
+	 GPbj0H3MhkggU9kCS7x93U9KWPTyVZOuYTNfMh9QEUvJCrhhbbdWvdWCq7h+TAWuy0
+	 0bZG7wYvcFsziA3r+E4xVY3VC6kK3r9tJN46z5HwzOG7vo2DEzP0Qsp6Uit/VkZ83y
+	 /0evu/CC5U0Xw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tKwBu-002CXk-9o;
-	Tue, 10 Dec 2024 09:06:02 +0000
-Date: Tue, 10 Dec 2024 09:05:59 +0000
-Message-ID: <87frmvsya0.wl-maz@kernel.org>
+	id 1tKws5-002DVo-DT;
+	Tue, 10 Dec 2024 09:49:37 +0000
+Date: Tue, 10 Dec 2024 09:49:37 +0000
+Message-ID: <86wmg7sw9a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	ryan.roberts@arm.com,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH V2 46/46] KVM: arm64: nv: Add trap forwarding for FEAT_FGT2 described registers
-In-Reply-To: <20241210055311.780688-47-anshuman.khandual@arm.com>
-References: <20241210055311.780688-1-anshuman.khandual@arm.com>
-	<20241210055311.780688-47-anshuman.khandual@arm.com>
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 05/14] KVM: arm64: Always allow fixed cycle counter
+In-Reply-To: <Z1DQKg02tebLmGsO@linux.dev>
+References: <20241203193220.1070811-1-oliver.upton@linux.dev>
+	<20241203193220.1070811-6-oliver.upton@linux.dev>
+	<87ldwwsbad.wl-maz@kernel.org>
+	<Z0-HBsBgf6WB7x4R@linux.dev>
+	<87ikrzstt1.wl-maz@kernel.org>
+	<Z1DQKg02tebLmGsO@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,146 +66,70 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.225.50
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, ryan.roberts@arm.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 10 Dec 2024 05:53:11 +0000,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+On Wed, 04 Dec 2024 21:56:58 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Describe remaining MDCR_EL2 register, and associate that with all FEAT_FGT2
-> exposed system registers it allows to trap.
-
-MDCR_EL2 register *bits*? How is that related to FGT2 at all?
-
+> On Wed, Dec 04, 2024 at 09:04:26AM +0000, Marc Zyngier wrote:
+> > On Tue, 03 Dec 2024 22:32:38 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > > More importantly, the current filtering works in terms of events, and
+> > > > not in terms of counters.
+> > > > 
+> > > > Instead of changing the ABI, how about simply not supporting filtering
+> > > > on such non-compliant HW? Surely that would simplify a few things.
+> > > 
+> > > Yeah, that sounds reasonable. Especially if we allow programmable event
+> > > counters where the event ID space doesn't match the architecture.
+> > 
+> > Another thing I have been wondering is if a slightly better approach
+> > would be to move some of the handling to the PMU driver itself, and
+> > let it emulate PMUv3 if it can. This would allow conversion of event
+> > numbers in situ rather than polluting the PMUv3 code in KVM.
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V2:
+> Sure, but I think the actual event fed into perf_event_create_kernel_counter()
+> should be the correct hardware event, not a PMUv3 event reinterpreted
+> behind the scenes. Otherwise, we'd need to devise an alternate config encoding
+> for PMUv3-like events since the event ID spaces overlap.
 > 
-> - Dropped check_cntr_accessible_N and CGT_CNTR_ACCESSIBLE_N constructs
-> - SYS_PMEVCNTSVR_EL1(N) access traps have been forwarded to CGT_MDCR_HPMN
-> - Updated check_mdcr_hpmn() to handle SYS_PMEVCNTSVR_EL1(N) registers
-> - Changed behaviour as BEHAVE_FORWARD_RW for CGT_MDCR_EnSPM
+> I'm thinking this could be a helper in the arm_pmu struct that takes a
+> PMUv3 event and spits out (in this case) an M1 event. The resulting KVM
+> code would be miniscule, like:
 > 
->  arch/arm64/include/asm/kvm_host.h |   2 +
->  arch/arm64/kvm/emulate-nested.c   | 158 ++++++++++++++++++++++++++++++
->  2 files changed, 160 insertions(+)
+> u64 kvm_map_pmu_event(struct kvm *kvm, u64 eventsel)
+> {
+> 	struct arm_pmu *pmu = kvm->arch.arm_pmu;
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index c80c07be3358..4cdce62642d1 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -441,6 +441,7 @@ enum vcpu_sysreg {
->  	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
->  	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
->  	PMUSERENR_EL0,	/* User Enable Register */
-> +	SPMSELR_EL0,	/* System PMU Select Register */
+> 	if (!pmu->map_pmuv3_event)
+> 		return eventsel;
+> 
+> 	return pmu->map_pmuv3_event(eventsel);
+> }
+> 
+> static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+> {
+> 
+> 	[...]
+> 
+> 	attr.config = kvm_map_pmu_event(vcpu->kvm, eventsel);
+> 	event = perf_event_create_kernel_counter(&attr, ...);
+> }
+> 
+> We could even have the M1 PMU driver populate arm_pmu->pmceid_bitmap
+> with the events it knows about and get PMCEID emulation for free.
 
-How could a system PMU be relevant to a VM?  What is the point of
-bloating the vcpu for something that we will hopefully *never* make
-visible to guests?
+CONFIG_PMUv3_COMPAT? ;-)
 
->  
->  	/* Pointer Authentication Registers in a strict increasing order. */
->  	APIAKEYLO_EL1,
-> @@ -501,6 +502,7 @@ enum vcpu_sysreg {
->  	CNTHP_CVAL_EL2,
->  	CNTHV_CTL_EL2,
->  	CNTHV_CVAL_EL2,
-> +	SPMACCESSR_EL2, /* System PMU Access Register */
+I think this is probably the less intrusive thing to do for KVM
+(outside of the butt-ugly trap decoding thingy), and it squarely puts
+the responsibility on the PMU driver to expose something that makes
+sense in a given context.
 
-Same here. It is pretty striking that these registers are never
-saved/restored or handled as traps, which is a good indication that
-this is pretty pointless.
-
->  
->  	/* Anything from this can be RES0/RES1 sanitised */
->  	MARKER(__SANITISED_REG_START__),
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 6c63cbfc11ea..c7d6d2034f27 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -79,6 +79,7 @@ enum cgt_group_id {
->  	CGT_MDCR_TDRA,
->  	CGT_MDCR_E2PB,
->  	CGT_MDCR_TPMS,
-> +	CGT_MDCR_EnSPM,
->  	CGT_MDCR_TTRF,
->  	CGT_MDCR_E2TB,
->  	CGT_MDCR_TDCC,
-> @@ -125,6 +126,7 @@ enum cgt_group_id {
->  	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
->  	CGT_CNTHCTL_EL1PTEN,
->  
-> +	CGT_SPMSEL_SPMACCESS,
->  	CGT_CPTR_TTA,
->  	CGT_MDCR_HPMN,
->  
-> @@ -351,6 +353,12 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.mask		= MDCR_EL2_TPMS,
->  		.behaviour	= BEHAVE_FORWARD_RW,
->  	},
-> +	[CGT_MDCR_EnSPM] = {
-> +		.index		= MDCR_EL2,
-> +		.value		= MDCR_EL2_EnSPM,
-> +		.mask		= MDCR_EL2_EnSPM,
-> +		.behaviour	= BEHAVE_FORWARD_RW,
-> +	},
->  	[CGT_MDCR_TTRF] = {
->  		.index		= MDCR_EL2,
->  		.value		= MDCR_EL2_TTRF,
-> @@ -509,6 +517,7 @@ static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
->  	switch (sysreg) {
->  	case SYS_PMEVTYPERn_EL0(0) ... SYS_PMEVTYPERn_EL0(30):
->  	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
-> +	case SYS_PMEVCNTSVR_EL1(0) ... SYS_PMEVCNTSVR_EL1(30):
->  		idx = (sys_reg_CRm(sysreg) & 0x3) << 3 | sys_reg_Op2(sysreg);
->  		break;
->  	case SYS_PMXEVTYPER_EL0:
-> @@ -528,6 +537,22 @@ static enum trap_behaviour check_mdcr_hpmn(struct kvm_vcpu *vcpu)
->  	return BEHAVE_HANDLE_LOCALLY;
->  }
->  
-> +static enum trap_behaviour check_spmsel_spmaccess(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 spmaccessr_el2, spmselr_el2;
-> +	int syspmusel;
-> +
-> +	if (__vcpu_sys_reg(vcpu, MDCR_EL2) & MDCR_EL2_EnSPM) {
-
-I don't mind the test, but I don't see any sanitising of MDCR_EL2 to
-make EnSPM as RES0 when FEAT_SPMU is not implemented, which will be
-100% of the cases.
-
-> +		spmselr_el2 = __vcpu_sys_reg(vcpu, SPMSELR_EL0);
-> +		spmaccessr_el2 = __vcpu_sys_reg(vcpu, SPMACCESSR_EL2);
-
-So these two values are *guaranteed* to be zero. At this stage, what
-is the point?
-
-> +		syspmusel = FIELD_GET(SPMSELR_EL0_SYSPMUSEL_MASK, spmselr_el2);
-> +
-> +		if (((spmaccessr_el2 >> (syspmusel * 2)) & 0x3) == 0x0)
-> +			return BEHAVE_FORWARD_RW;
-
-What about value 0b01, which causes *writes* to be trapped?
-
-> +	}
-> +	return BEHAVE_HANDLE_LOCALLY;
-
-And then what? How do we handle this locally?
-
-Honestly, short of any additional handling, we would be better off
-just injecting an UNDEF back into the guest.
+Thanks,
 
 	M.
 
