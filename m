@@ -1,134 +1,148 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C96D1F5F6
-	for <kvmarm@lists.linux.dev>; Mon,  9 Dec 2024 18:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208F81A2550
+	for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 02:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733767827; cv=none; b=mJgNp9o8lP/Nap6dwT0jmWK+wnFMhthR74ZVYQAlat30ejkpLN61ZQak5Gi0EGvEqf0/lLaJvHO9gMgZAQ2ClrqeRdfFT1UyHSNJcti/IhLJRVgR6OPh/jhURm7dllyghq2pdX7G+qVl6LGxqG7f0a3sWzVF1NJgHZI4dfjuVeQ=
+	t=1733799097; cv=none; b=ASvRgOoS2Me01yve1/g0XjsuFrr8TCJJMS30cSzqWlaoA68UZ1sSvWX503Bjdhvzr8v8tHCIQiQkptD5PShcy/UcpdvwGSnA4aVKMfKs9JoEcZvKDXd1yS7t981I5eU7lvfWlcVtvthSf7TBLEqJCYT8gliaNY6ul7zcE+2AXvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733767827; c=relaxed/simple;
-	bh=kFmrffjPTHDvLRIbu40Zh3UrO4tcLxijJtAEeehy6K4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FAnKTMje5/aF00YoCEYDSTFnfT/WDCnhvBKi6LvHjKnWuDJPL2oON82tEUWNoZDo1BYDtFtF4yi09dhzCegdNEKGjzQzU/iDt3onnaRr9GyRDHVJt3eZ6UKjAaL9dX9nSz9hqTzTqaw1NQ+vdkHPqwiJ+lHirsyjwjvb43I920o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SFY9UQzX; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SFY9UQzX"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1733767821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f9yi0YOOYNDdJkqxrDH6/EGfgIdV/7SSosb9MoUMaTM=;
-	b=SFY9UQzXjyLjf7j3qUTCS3nTxKcRG+qUiqcF+MBkwewOt3CDnplkkm7tuSa4N432D/WeFb
-	kHz+7YuvQCls3UUldPN6/WoGNvBXqQHQ8vAOplPQbljVQkoo+73f4+IL2hZfof5JeThkiR
-	Y9vf4HxcLL57dJFUyJoScpl07N21n8Q=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	James Clark <james.clark@linaro.org>,
+	s=arc-20240116; t=1733799097; c=relaxed/simple;
+	bh=ikP2AZ1QNPCVrbja1AFpFnlbiV4vcygxdxdBVYqzhWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cCSwGbgmB8WJZVouY6mT7laP7lHkqXLpw+UiUS7y8B/Zsp6V6bhmGhDgJmLOqG01KdfbZ1I/8jZrg2LLl8XJBdYDrIVvZmg6pscg3Cl3bqyPIF/arEtsuNQtx91l75mnCwJRw8Ch/QfYspBV82kQqnNawrOnTrIpWthLUVRMOow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+	by vmicros1.altlinux.org (Postfix) with ESMTP id D828F72C8CC;
+	Tue, 10 Dec 2024 05:51:27 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+	by imap.altlinux.org (Postfix) with ESMTPSA id C789B36D018A;
+	Tue, 10 Dec 2024 05:51:27 +0300 (MSK)
+Date: Tue, 10 Dec 2024 05:51:27 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 16/16] KVM: arm64: Avoid reading ID_AA64DFR0_EL1 for debug save/restore
-Date: Mon,  9 Dec 2024 10:09:26 -0800
-Message-Id: <20241209180926.2161373-17-oliver.upton@linux.dev>
-In-Reply-To: <20241209180926.2161373-1-oliver.upton@linux.dev>
-References: <20241209180926.2161373-1-oliver.upton@linux.dev>
+Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+Subject: Re: v6.13-rc1: Internal error: Oops - Undefined instruction:
+ 0000000002000000 [#1] SMP
+Message-ID: <20241210025127.jmkcpw7ixu4r7hxl@altlinux.org>
+References: <20241202153618.GA6834@willie-the-truck>
+ <86ttbmt71k.wl-maz@kernel.org>
+ <20241202155940.p267a3tz5ypj4sog@altlinux.org>
+ <86ser6t6fs.wl-maz@kernel.org>
+ <20241202223119.k3uod4ksnlf7gqh2@altlinux.org>
+ <20241203092721.j473dthkbq6wzez7@altlinux.org>
+ <1847e34fa7724d28aeb22d93752f64f2@huawei.com>
+ <20241203221453.mwh6sozyczi4ec2k@altlinux.org>
+ <87jzcfsuep.wl-maz@kernel.org>
+ <20241206205602.7phcrxqsv4c6oul4@altlinux.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <20241206205602.7phcrxqsv4c6oul4@altlinux.org>
 
-Similar to other per-CPU profiling/debug features we handle, store the
-number of breakpoints/watchpoints in kvm_host_data to avoid reading the
-ID register 4 times on every guest entry/exit. And if you're in the
-nested virt business that's quite a few avoidable exits to the L0
-hypervisor.
+On Fri, Dec 06, 2024 at 11:56:02PM +0300, Vitaly Chikunov wrote:
+> On Wed, Dec 04, 2024 at 08:51:26AM +0000, Marc Zyngier wrote:
+> > On Tue, 03 Dec 2024 22:14:53 +0000,
+> > Vitaly Chikunov <vt@altlinux.org> wrote:
+> > > On Tue, Dec 03, 2024 at 10:03:11AM +0000, Shameerali Kolothum Thodi wrote:
+> > 
+> > Mark has described what the problem is likely to be. 6.6-stable needs
+> > to have 6685f5d572c22e10 backported, and it probably should have been
+> > Cc: to stable. Can you please apply the following patch to your *host*
+> > machine and retest?
+> 
+> We tested the host with this patch applied over 6.6.63 and 6.13-rc1
+> guest does not Oops anymore.
+> 
+> I'd suggest this is also get backported to 6.12.y branch.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h         |  4 ++++
- arch/arm64/kvm/debug.c                    |  3 +++
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h | 17 ++++-------------
- 3 files changed, 11 insertions(+), 13 deletions(-)
+Please, can someone backport this patch to v6.12 and send to stable? This
+would be really useful to have this fixed and it's noted this is a
+critical bug.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d48516de778d..e7c740c99ee3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -661,6 +661,10 @@ struct kvm_host_data {
- 
- 	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
- 	unsigned int nr_event_counters;
-+
-+	/* Number of debug breakpoints/watchpoints for this CPU (minus 1) */
-+	unsigned int debug_brps;
-+	unsigned int debug_wrps;
- };
- 
- struct kvm_host_psci_config {
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 2b2065c94251..3bff1b8dccc4 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -63,6 +63,9 @@ void kvm_init_host_debug_data(void)
- 		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
- 							      read_sysreg(pmcr_el0));
- 
-+	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
-+	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
-+
- 	if (has_vhe())
- 		return;
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-index c14586d87361..502a5b73ee70 100644
---- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-@@ -106,12 +106,8 @@ static struct kvm_guest_debug_arch *__vcpu_debug_regs(struct kvm_vcpu *vcpu)
- static void __debug_save_state(struct kvm_guest_debug_arch *dbg,
- 			       struct kvm_cpu_context *ctxt)
- {
--	u64 aa64dfr0;
--	int brps, wrps;
--
--	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
--	brps = (aa64dfr0 >> 12) & 0xf;
--	wrps = (aa64dfr0 >> 20) & 0xf;
-+	int brps = *host_data_ptr(debug_brps);
-+	int wrps = *host_data_ptr(debug_wrps);
- 
- 	save_debug(dbg->dbg_bcr, dbgbcr, brps);
- 	save_debug(dbg->dbg_bvr, dbgbvr, brps);
-@@ -124,13 +120,8 @@ static void __debug_save_state(struct kvm_guest_debug_arch *dbg,
- static void __debug_restore_state(struct kvm_guest_debug_arch *dbg,
- 				  struct kvm_cpu_context *ctxt)
- {
--	u64 aa64dfr0;
--	int brps, wrps;
--
--	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
--
--	brps = (aa64dfr0 >> 12) & 0xf;
--	wrps = (aa64dfr0 >> 20) & 0xf;
-+	int brps = *host_data_ptr(debug_brps);
-+	int wrps = *host_data_ptr(debug_wrps);
- 
- 	restore_debug(dbg->dbg_bcr, dbgbcr, brps);
- 	restore_debug(dbg->dbg_bvr, dbgbvr, brps);
--- 
-2.39.5
+Thanks,
 
+> 
+> Thanks,
+> 
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 370a1a7bd369..258a39bcd3c7 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1330,6 +1330,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+> >  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> >  
+> >  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> > +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MPAM_frac);
+> >  		break;
+> >  	case SYS_ID_AA64ISAR1_EL1:
+> >  		if (!vcpu_has_ptrauth(vcpu))
+> > @@ -1472,6 +1473,13 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> >  
+> >  	val &= ~ID_AA64PFR0_EL1_AMU_MASK;
+> >  
+> > +	/*
+> > +	 * MPAM is disabled by default as KVM also needs a set of PARTID to
+> > +	 * program the MPAMVPMx_EL2 PARTID remapping registers with. But some
+> > +	 * older kernels let the guest see the ID bit.
+> > +	 */
+> > +	val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
+> > +
+> >  	return val;
+> >  }
+> >  
+> > @@ -1560,6 +1568,29 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> >  	return set_id_reg(vcpu, rd, val);
+> >  }
+> >  
+> > +static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > +			       const struct sys_reg_desc *rd, u64 user_val)
+> > +{
+> > +	u64 hw_val = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> > +	u64 mpam_mask = ID_AA64PFR0_EL1_MPAM_MASK;
+> > +
+> > +	/*
+> > +	 * Commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits
+> > +	 * in ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to
+> > +	 * guests, but didn't add trap handling. KVM doesn't support MPAM and
+> > +	 * always returns an UNDEF for these registers. The guest must see 0
+> > +	 * for this field.
+> > +	 *
+> > +	 * But KVM must also accept values from user-space that were provided
+> > +	 * by KVM. On CPUs that support MPAM, permit user-space to write
+> > +	 * the sanitizied value to ID_AA64PFR0_EL1.MPAM, but ignore this field.
+> > +	 */
+> > +	if ((hw_val & mpam_mask) == (user_val & mpam_mask))
+> > +		user_val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
+> > +
+> > +	return set_id_reg(vcpu, rd, user_val);
+> > +}
+> > +
+> >  /*
+> >   * cpufeature ID register user accessors
+> >   *
+> > @@ -2018,7 +2049,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
+> >  	  .access = access_id_reg,
+> >  	  .get_user = get_id_reg,
+> > -	  .set_user = set_id_reg,
+> > +	  .set_user = set_id_aa64pfr0_el1,
+> >  	  .reset = read_sanitised_id_aa64pfr0_el1,
+> >  	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
+> >  	ID_SANITISED(ID_AA64PFR1_EL1),
+> > 
