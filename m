@@ -1,61 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7079378F5F;
-	Tue, 10 Dec 2024 09:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A23523DE81;
+	Tue, 10 Dec 2024 09:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733824180; cv=none; b=dyYimnuTji5GTSeQWPAa2ddLj30/UdTELpiLgJVkABSTuQqi1PhOHRB+k27jV4UNwThyIy+/D9xmpLbb/aMnZ9BTN8bvOGO4uYFaIzLUU9NYRGtvA/+XE7rgtebRRirYADjEsNzeHGHn8a+Q8cWRMRYsyCDPmbi+snjcWLvSRdo=
+	t=1733824534; cv=none; b=hUING3vYqjF1urrczMU9gp9u3g3vP5pGMxrAb5AeIZqu5ygdLzo+fjNOb0QJCJgs/HtUmEeRSphgxkmMjybbpBoYxIQ0DFsa+kenNID3+2M0PhcmEq+9Aq9sgF9ep7ayFGdO/bJaskkCYAIkjq4LjXLQWPzNQYZU+G5bZE6vek0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733824180; c=relaxed/simple;
-	bh=NrY3YRq//HQXc5Zz8ylLbD15FcekagcoyDDQYiTzGEo=;
+	s=arc-20240116; t=1733824534; c=relaxed/simple;
+	bh=DFBgpZ+GyeGFvQROTuPH+b8C7qktrfoCAOS1rlm02M0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dw0JPeChjugYlrRDBFz5iy4ub/ftKEoIuNcJPHnQowZeb8QeZwHHh9vSRQBFGlMNwZMzsY7F6qr0RwjA6JrdZW+DzQb7BjMSrMAY9DaQKpE5Tb+Si8la1lM3oQVTVsqsMVwP7fC+sk950CNm5aCaMKU6hF88MJFxQdgLRMHRk3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2l45DES; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=aiiAMzhKsncrAsQwUby4vXUTQHdyWYopmPvh6gHtdLdDFHz9krSem3phT3tp9WPCTP6IS3x6vsbrvklb6DfZk3y3nosoZqEkP68Ej6/9EDhtYg+aI81K2ZBpwDV6KeyHOx0ZEZPPMATbO0rxg8Ql+Uwp5x54QBRd6m1ml72ajT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ee/8oLjy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2l45DES"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366C8C4CED6;
-	Tue, 10 Dec 2024 09:49:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ee/8oLjy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853BCC4CED6;
+	Tue, 10 Dec 2024 09:55:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733824180;
-	bh=NrY3YRq//HQXc5Zz8ylLbD15FcekagcoyDDQYiTzGEo=;
+	s=k20201202; t=1733824533;
+	bh=DFBgpZ+GyeGFvQROTuPH+b8C7qktrfoCAOS1rlm02M0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S2l45DESv/WhTR2+g4xv8B9bCTglekRh2uz7K1KY9cusAgjNyf3VQB37WYae7YISP
-	 wB4WrPtyg1tCHL/d9X/oNG5ED3D5WFQ3OOvD3/ESvK3pxzy/15jz498m2j82KUpCTl
-	 xR4sURDuYLenzKUGh8w+2/IUdRKh0zoy6f1EmYjA2WaqyqsaU8dgOOieuTGpMgOP2s
-	 GPbj0H3MhkggU9kCS7x93U9KWPTyVZOuYTNfMh9QEUvJCrhhbbdWvdWCq7h+TAWuy0
-	 0bZG7wYvcFsziA3r+E4xVY3VC6kK3r9tJN46z5HwzOG7vo2DEzP0Qsp6Uit/VkZ83y
-	 /0evu/CC5U0Xw==
+	b=ee/8oLjyl51YQdZrFeqR8rfpe0OdrQ10Z73U12nZOaBhAK0nLIPxcBymYS48NjwuD
+	 fm01yklQ15V+/wri18iBkL4UAhgKgA6QQU4yvuwusdr1ARmAofp8NpeomAR4wZSNAH
+	 mxuCvViJ+Haey3J271OKwrkuACQdMvGtBFj5L6LVN2h5KbIiWQXGcp9emCnWMTfRCj
+	 6JoPT5WkTb5QXkywha6H5xGu/rSdFML60FY2DsQAAlL5Vm02hL87NccdtecI7lDQe/
+	 zMQLR40bztkfBb/TRkzSNrya76uU/8nB+K+0yLbVkXvI9YhWm5xIREg6/CE4WuSev+
+	 KTlE4BLYfFHqQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tKws5-002DVo-DT;
-	Tue, 10 Dec 2024 09:49:37 +0000
-Date: Tue, 10 Dec 2024 09:49:37 +0000
-Message-ID: <86wmg7sw9a.wl-maz@kernel.org>
+	id 1tKwxn-002Dkv-3c;
+	Tue, 10 Dec 2024 09:55:31 +0000
+Date: Tue, 10 Dec 2024 09:55:30 +0000
+Message-ID: <86v7vrsvzh.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
 	Will Deacon <will@kernel.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 05/14] KVM: arm64: Always allow fixed cycle counter
-In-Reply-To: <Z1DQKg02tebLmGsO@linux.dev>
-References: <20241203193220.1070811-1-oliver.upton@linux.dev>
-	<20241203193220.1070811-6-oliver.upton@linux.dev>
-	<87ldwwsbad.wl-maz@kernel.org>
-	<Z0-HBsBgf6WB7x4R@linux.dev>
-	<87ikrzstt1.wl-maz@kernel.org>
-	<Z1DQKg02tebLmGsO@linux.dev>
+	"Wangzhou (B)" <wangzhou1@hisilicon.com>,
+	Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+Subject: Re: v6.13-rc1: Internal error: Oops - Undefined instruction: 0000000002000000 [#1] SMP
+In-Reply-To: <20241210025127.jmkcpw7ixu4r7hxl@altlinux.org>
+References: <20241202153618.GA6834@willie-the-truck>
+	<86ttbmt71k.wl-maz@kernel.org>
+	<20241202155940.p267a3tz5ypj4sog@altlinux.org>
+	<86ser6t6fs.wl-maz@kernel.org>
+	<20241202223119.k3uod4ksnlf7gqh2@altlinux.org>
+	<20241203092721.j473dthkbq6wzez7@altlinux.org>
+	<1847e34fa7724d28aeb22d93752f64f2@huawei.com>
+	<20241203221453.mwh6sozyczi4ec2k@altlinux.org>
+	<87jzcfsuep.wl-maz@kernel.org>
+	<20241206205602.7phcrxqsv4c6oul4@altlinux.org>
+	<20241210025127.jmkcpw7ixu4r7hxl@altlinux.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,67 +71,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: vt@altlinux.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, will@kernel.org, james.morse@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, mark.rutland@arm.com, wangzhou1@hisilicon.com, glebfm@altlinux.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 04 Dec 2024 21:56:58 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, 10 Dec 2024 02:51:27 +0000,
+Vitaly Chikunov <vt@altlinux.org> wrote:
 > 
-> On Wed, Dec 04, 2024 at 09:04:26AM +0000, Marc Zyngier wrote:
-> > On Tue, 03 Dec 2024 22:32:38 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > > More importantly, the current filtering works in terms of events, and
-> > > > not in terms of counters.
-> > > > 
-> > > > Instead of changing the ABI, how about simply not supporting filtering
-> > > > on such non-compliant HW? Surely that would simplify a few things.
+> On Fri, Dec 06, 2024 at 11:56:02PM +0300, Vitaly Chikunov wrote:
+> > On Wed, Dec 04, 2024 at 08:51:26AM +0000, Marc Zyngier wrote:
+> > > On Tue, 03 Dec 2024 22:14:53 +0000,
+> > > Vitaly Chikunov <vt@altlinux.org> wrote:
+> > > > On Tue, Dec 03, 2024 at 10:03:11AM +0000, Shameerali Kolothum Thodi wrote:
 > > > 
-> > > Yeah, that sounds reasonable. Especially if we allow programmable event
-> > > counters where the event ID space doesn't match the architecture.
+> > > Mark has described what the problem is likely to be. 6.6-stable needs
+> > > to have 6685f5d572c22e10 backported, and it probably should have been
+> > > Cc: to stable. Can you please apply the following patch to your *host*
+> > > machine and retest?
 > > 
-> > Another thing I have been wondering is if a slightly better approach
-> > would be to move some of the handling to the PMU driver itself, and
-> > let it emulate PMUv3 if it can. This would allow conversion of event
-> > numbers in situ rather than polluting the PMUv3 code in KVM.
+> > We tested the host with this patch applied over 6.6.63 and 6.13-rc1
+> > guest does not Oops anymore.
+> > 
+> > I'd suggest this is also get backported to 6.12.y branch.
 > 
-> Sure, but I think the actual event fed into perf_event_create_kernel_counter()
-> should be the correct hardware event, not a PMUv3 event reinterpreted
-> behind the scenes. Otherwise, we'd need to devise an alternate config encoding
-> for PMUv3-like events since the event ID spaces overlap.
-> 
-> I'm thinking this could be a helper in the arm_pmu struct that takes a
-> PMUv3 event and spits out (in this case) an M1 event. The resulting KVM
-> code would be miniscule, like:
-> 
-> u64 kvm_map_pmu_event(struct kvm *kvm, u64 eventsel)
-> {
-> 	struct arm_pmu *pmu = kvm->arch.arm_pmu;
-> 
-> 	if (!pmu->map_pmuv3_event)
-> 		return eventsel;
-> 
-> 	return pmu->map_pmuv3_event(eventsel);
-> }
-> 
-> static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
-> {
-> 
-> 	[...]
-> 
-> 	attr.config = kvm_map_pmu_event(vcpu->kvm, eventsel);
-> 	event = perf_event_create_kernel_counter(&attr, ...);
-> }
-> 
-> We could even have the M1 PMU driver populate arm_pmu->pmceid_bitmap
-> with the events it knows about and get PMCEID emulation for free.
+> Please, can someone backport this patch to v6.12 and send to stable? This
+> would be really useful to have this fixed and it's noted this is a
+> critical bug.
 
-CONFIG_PMUv3_COMPAT? ;-)
+Look: it took you a few good days to simply *report* that the hack I
+gave you was helping. Surely you can similarly wait for a few days for
+the interested parties to spin proper patches and *test* them?
 
-I think this is probably the less intrusive thing to do for KVM
-(outside of the butt-ugly trap decoding thingy), and it squarely puts
-the responsibility on the PMU driver to expose something that makes
-sense in a given context.
+And if you really cannot wait, feel free to backport this change to
+whatever stable release you feel needs to be fixed and post the
+result.  I promise that I will review it. After all, you are so far
+the only person with both the HW and the problem.
 
 Thanks,
 
