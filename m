@@ -1,490 +1,203 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061.outbound.protection.outlook.com [40.107.244.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC371D63FA;
-	Wed, 11 Dec 2024 01:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733879092; cv=none; b=LXNF2CNgFHZQo13y10JWEqovstruqfKLwKN3AKUz8sOPUEE1EKysl4F5acvsrkmhv97CtEQBBDlglo6D0qXqZnyClFd1+gclGIdwGO8S+N2Arkf0xfEeu9q1rU7ZF37kNJ6FVWc5wGiDX0fouuVc4vCw2FhenTybSVaJIoT3n+o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733879092; c=relaxed/simple;
-	bh=iv/w/FqsQC6tPqMPucMTK26kMUPc3meLY49LgS4Xj9U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aqdSAakU09Q4S8FVUUory6VzWjrphYBgVR65stLPSZ+HTNH6cbqUFGLNxIaRNP74OK/aJ+MWafIP6w4HtyyB7ib41dyk6Tnh6Xp7jE9cXmSPo4tQWj1DMqBDb7drbnL046O/fdDqZ4PHVui5BwQH1Il2I9plqSuJC4hRODpsYNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSt1lCZD; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6951FC104
+	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 02:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733885927; cv=fail; b=NReQqfhf7QiGU1N6uoZIozqxJTwc5Qjn3HGDQCHwWW9jsKFWgm20aoVex32CLCXZkqKaRxozc1AMEMG/c0P7YOlvkiIXgdslpyCNVOvyAji9VmPoiMVztTW974nzPAnx6ZTvdJYwelgbKcFODhICo4gg/AeLcCslsXdNiwWPJTM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733885927; c=relaxed/simple;
+	bh=fyjHBv4td4+Ael9pFbhPXxJFEvgvvveboZlnmo8QkTQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=g+IudG/8jUqsp7j4Uuv04OhRahuaTrXXS8y+lmP8w1XgZP7FJhpIJQLhhHtduOcOZzBM56W6dIPwOjOaJrBUu/vvqDuMFpGjVd9GuEFcdPV3JBNQ7A41t9r2Px7DNU6g9RjmcDm8Fnp2WHQNkT/295C12aJO/YY1AGHLSjObNlA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KPKU+JxD; arc=fail smtp.client-ip=40.107.244.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSt1lCZD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C2C0C4CEDF;
-	Wed, 11 Dec 2024 01:04:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733879092;
-	bh=iv/w/FqsQC6tPqMPucMTK26kMUPc3meLY49LgS4Xj9U=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fSt1lCZDZEjQ8/BBA+7Vgt6iSnCjnpGrhgDmchKTkWVYrhWouQWul8ZZDj3f9WEHc
-	 vWLi7cw8GF1GwV7SlSbeRy+53XLeSd+d0BDmIDpN6ZO1BajlbbTQeHInCqCZnV6Bsb
-	 iiybyBGSYMKT+AHOCPQNkxRW6Sx7tGhut1l+US/0bhn4FHV9Tg36ec1GWSJyMJjD++
-	 aTqJw0kfPnr61SnR8RmU/P1pSs6NnghgQRpwVxzUlXtVhuR5Ecg8tLjfmTVWO81IUX
-	 dC2Y917qisk9/RotAZIea6OrK59iqUZ0ZcKN4h3zkzi0MSGmTwsdCOoiUqR9XYPYK1
-	 jWhXPuSzNXcRw==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 11 Dec 2024 01:02:54 +0000
-Subject: [PATCH v4 9/9] kselftest/arm64: Add 2024 dpISA extensions to hwcap
- test
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KPKU+JxD"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JogQRrLyujIr6KHvgxEnXFxtLCIK85r8ZLwpTAs+FkWuwgYrx3pEmqws1aj1GaXtQT3GMPNK8qOqfc9e4EWQMis6vesBl6nyNJa7z1I3spFx/xnujM1NvUs/sf/RvPV1vuAmc7AcsRO++IQfO/3YpJmW5LWQiID04Y/O/hl+UNcNCxGfSociiPygvaSwoYsZt+VQ8Yk22Nks0uVpD7/UYrjoONQ0QpmZ23acDoyfutDBeSJNMZk2ZadEWA7fK1iC0ZxP0G58OLpqoukspRwjF1XHdEVtSKNXiZCtjpMcVDe+0Uo0IB/TeU16hjufA7nhJ67u9p50YZZlfmOYYAm7cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fyjHBv4td4+Ael9pFbhPXxJFEvgvvveboZlnmo8QkTQ=;
+ b=GyLGhwuKWM5FMjZbHew4Cyp2qUK4IeSyv9s7OTe42Z2V1z2qtxS4gs1csNqapkVe+9qNpREN2pbJgp8lL1IXMOurBs7E/SfTlfBHX7+occVgiN06Yy+d2VaGn053fgHxZDcPmgHFXZG1gifa5xbakSu0yKaMzat+TuTo3H4sMByC8ROCW5ZiB/CfZ6qjnnGS510JPRMEHZMb/JTZ+BLViubldEr5fHQbyU09o4oJXXF9pxN2M7n8gDSk9IGpE0MyzRmcsZx9XAKg15uwfes4JyKCdxiz3GqHAE4j9HQ07CIHyw9WIS+bZiU9G2ekkFFjSVsvomNXO1uOfhPQ6udSIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fyjHBv4td4+Ael9pFbhPXxJFEvgvvveboZlnmo8QkTQ=;
+ b=KPKU+JxD4y31uhD2IufCrh8EkJ7jrBpqtFGoKUN2cqm+Mnw/FCCpqWe3orKVvtjYaTuorWZjPvXrsJGhbFOjH2lf5qmxmaIHn8lV6oH4mRHDQFfVnZfdiF2JDywwKw1aT3w9o1DOuuNcqCPowU/1odUz7EJESVdhCTYj9s64RjRQtc0/Nu+5SaO01UL99Szapvl0Wk9Su121VzqNdZLB8PREbmKDZBYjxOj0bNzM5AVsaSAuiFUjkaxS6kMtib8f/D7KVaB4ti21K5XTUhu08+NFwjz9aZsK2zPQ+Bs3Yqj1YtQaOLPYoIcvdNXAvjQZ8mmJP3aeyuuflcI3TrOUvg==
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
+ by SJ2PR12MB8928.namprd12.prod.outlook.com (2603:10b6:a03:53e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.14; Wed, 11 Dec
+ 2024 02:58:38 +0000
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::ae1b:d89a:dfb6:37c2]) by SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::ae1b:d89a:dfb6:37c2%3]) with mapi id 15.20.8207.014; Wed, 11 Dec 2024
+ 02:58:38 +0000
+From: Ankit Agrawal <ankita@nvidia.com>
+To: Will Deacon <will@kernel.org>
+CC: Jason Gunthorpe <jgg@nvidia.com>, "maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com"
+	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>, "lpieralisi@kernel.org"
+	<lpieralisi@kernel.org>, Aniket Agashe <aniketa@nvidia.com>, Neo Jia
+	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
+ (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy
+ Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, John
+ Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, Zhi Wang
+	<zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>, Uday Dhoke
+	<udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>, "coltonlewis@google.com"
+	<coltonlewis@google.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>, "ardb@kernel.org"
+	<ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>, "linux-mm@kvack.org"
+	<linux-mm@kvack.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Thread-Topic: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Thread-Index: AQHbObyY4gofHx3CJE6tGYAUqrUkhLLfp+2AgADUH40=
+Date: Wed, 11 Dec 2024 02:58:38 +0000
+Message-ID:
+ <SA1PR12MB71991EC85E8EEDD1C5115886B03E2@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20241118131958.4609-1-ankita@nvidia.com>
+ <20241118131958.4609-2-ankita@nvidia.com>
+ <20241210141334.GD15607@willie-the-truck>
+In-Reply-To: <20241210141334.GD15607@willie-the-truck>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|SJ2PR12MB8928:EE_
+x-ms-office365-filtering-correlation-id: 358bb3a9-bfa7-4874-0331-08dd198fb619
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?l3YHN8EWlLMDQHRHTY17HNQBoe2zFW7bFRYDrGoR+1mleZss/F4QZXTMOP?=
+ =?iso-8859-1?Q?hQoWErDiOg3WksUi9Z4tO+1HYAvTtugTrG+cOD5lA2SB0eTFx55Ak+xW6U?=
+ =?iso-8859-1?Q?WRhs4qRdR9ndCj4jeBunXScGuZpoPRDBsE+A9E/OYaPLT1faH0VPHsm0Yl?=
+ =?iso-8859-1?Q?wgb9XRzWDTeR1AZHvjE1mNl4oxUTNU5JIJKhLyaZShQAYChwPgel2j9uuB?=
+ =?iso-8859-1?Q?yz0FcSt79AR9fXXfUskq0uijxZb/peAOPzDBjuv5AguL7/Us6jVjcyx4Mj?=
+ =?iso-8859-1?Q?BbitEj+94wbTE9ih+FmMjb6ZllwG3Nlz3zCRcFoAVNKvkLu2UVVH+xFtIw?=
+ =?iso-8859-1?Q?DiJlxt302ZS8fkLdeShPLmfA1R37ahwQZ+UJ36JgQDk/Lm3EQsg+v0Ca8j?=
+ =?iso-8859-1?Q?jSop9R4A99uzyLvF5v4+zhj8lKdKgsjR8H2b/+pUm4Ho6Aq/elOqsORmXU?=
+ =?iso-8859-1?Q?TK2MfvGOQTDnLKZrsdWJ6PTfsUJLuOnruI1xaPUtQFYRAZfp4e7O7BXSCI?=
+ =?iso-8859-1?Q?D6TMn3zDsybM2+lGYCnpPFXjHEDKRYGC8Z46OJ5GFzCK9Z5qfF120w8JjK?=
+ =?iso-8859-1?Q?zXxXgA7FtsKc8ob4iZsNpN6mVL7lgrpyudF77JwO/TN7MpBjH37KAxq2sG?=
+ =?iso-8859-1?Q?Zw+piOkC4TThnlASk1tdB+cgf/5JaNi9Wjb0KuiilJsDUnr6BPR1vbmW4d?=
+ =?iso-8859-1?Q?K7roSwQMwzCW1mok4HvE4gokntZRLlwYrVFDFMdjRIrw2u/1sHy6EYcsfH?=
+ =?iso-8859-1?Q?SZdSfxZtNM88GBFNKh9zSktZ/N3AYg09WMLjCxGfFVEkxLXtIHddvjVJ+W?=
+ =?iso-8859-1?Q?w5swkS2sdK6e32r63b7IokqzkFRW/pb0Nst6P+cy/ML8/YIgXr5ctqncXA?=
+ =?iso-8859-1?Q?83uLhRd9R/n0pKM4gKM7yqOA+RYSg3mJztCP+b5Yxtc77MdyhuIRMYU+CA?=
+ =?iso-8859-1?Q?uZ4DiC30cUi/4DZ3qe3BpEhkIFyuCr2JSikbYbTfwg3QgUavw+v+C+Bb/r?=
+ =?iso-8859-1?Q?YcCqsO7GvcEfEuDgXgKoYUAIVBbLF/IH8/He+T3EjzzpqqAZCPrsTzsAxn?=
+ =?iso-8859-1?Q?tTODvJz2PtNjA1UAl5bP2DHQ2MO9X/n/fyeJ/bqNLqO6QjQWyi+Fya1YJf?=
+ =?iso-8859-1?Q?EuVPB4G9bsGp+Rmi9KAqaLo+j4PN14/Unp+29tImbKFlRO4MbEHDamhzRD?=
+ =?iso-8859-1?Q?DC8pVQlowz9oEOiOPcIGZLH8Qbjjy87wXIp0VW1HQ34YLG/oi+4J22h66U?=
+ =?iso-8859-1?Q?UyhKTAEyyVC93Cq3eWBpgKxkdoYiwSsP2lsG7N2KfgZjQM6M18kIPmvWKz?=
+ =?iso-8859-1?Q?MYRnvQQHGLFtmEHcZiY3yujG69hrwAzc6kNMiHDnl65N3s+k1jYnS9H4dh?=
+ =?iso-8859-1?Q?EvSFrXfm6qBp/tb//0BskSZXTHSu2kj552r95pXHngtJ/rSbObToEOIO35?=
+ =?iso-8859-1?Q?noZ9Wr/PCSHPeSvBvRhnN/r0GGjx1iU9fmBlVA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?t/8guk6HaRFWo8RVePZM14mgSojFu3yG1D8cEVxOf8XhvkDhsgug6w2e6Z?=
+ =?iso-8859-1?Q?kx1oMnWy8IHN3piSeDtIzHINA0q5pcpi7+LNvOJSsH1ycbDhoMjP5Tg3W6?=
+ =?iso-8859-1?Q?3JF2O8iSPsd1fEoycm1qUJr915fbVk7sSOWKv1Mh9V6S0JmzfYaiMfi4L6?=
+ =?iso-8859-1?Q?7xLwYwgGIqKX0xPQyTgrQcFhFGsM1Kn1bILVWChHpIa1FBVvZmbq4gEeIK?=
+ =?iso-8859-1?Q?1+nILxqgY14YNbHYdjyYbbCsOdewhXwKcDre4XQGe8WRWMamdX8N3QoZIx?=
+ =?iso-8859-1?Q?HjssEoI1niyIBK5cQyjPWnbBs57VJmjXovyzhWiLglNhIntxz9jZ50HNp4?=
+ =?iso-8859-1?Q?7siGhOO1kOZMqOBdV0yI5X+/PMi4NTkFbYlwbDEcGfNsHLE68uUa7DJNt1?=
+ =?iso-8859-1?Q?n4aFlzLg1+sjlI+4Ggr7GgxvBNszTsk1QBLAq+HWvItBupZzq+Q1oDopWp?=
+ =?iso-8859-1?Q?HC77yo1bEdFfByqmcE/rf1xuSerXb8/YoldWuiHztusc4Zr4EhVMTU6u47?=
+ =?iso-8859-1?Q?JVSv25PR8hKbZV/SSufjp8pj8Mqod2Bnbi+4ebgJQJZWnnXG/dHdx9RWMD?=
+ =?iso-8859-1?Q?+ZKnyucLsxANy93ithph+MxVsH7XXeEMm7b3PBIliaHJQN3pY9tWrCFJ79?=
+ =?iso-8859-1?Q?nRiKTki5l1dBCjT07Iq6gwffpu24YfiZNp68PNXS42reurJVzu1Cbw7qN6?=
+ =?iso-8859-1?Q?9fTAeg9wniJcQ3KgvDKeozDpJA2azR64OFdb+0oP6Y9VSFCXfgblxNn++s?=
+ =?iso-8859-1?Q?k68PUpieumjYrHcHfqXoyi8Ug7ydF3nOsWtCezC10bWxtejuHRlChxZTeb?=
+ =?iso-8859-1?Q?QDZi2QVrEp0Uv16lkWFSynnMp0b//L7UJziIyl2eCDRUz43Xp36N8XQ8q5?=
+ =?iso-8859-1?Q?WScQAvVjSJuTxbyt0VT/cCZG5jmvxbmNtcmStkysoai25L+yZSnlHI+lcI?=
+ =?iso-8859-1?Q?MxY0P89qu+Xo3xTgxbQSLR7OMmq7zlH0dpfh06tuMwyWoeoTiZ7uV2W1Wr?=
+ =?iso-8859-1?Q?HvjREJWzqwjEgPerZwlQFV1rDJ21WLadXTUmY/vvwLIysKuHIznIJZP4GB?=
+ =?iso-8859-1?Q?lVxAVEzE0WTl/9/EMK3F6ugA124brxD+4nba85rxRbGSgGGgQOU4kc0Mrw?=
+ =?iso-8859-1?Q?RqRSoyq3HQ6rBlwhaHAuA6L9tjozwbM3x2bxf4epp1bDukBWtU4Vkbb/vT?=
+ =?iso-8859-1?Q?OkAe5KXIliUnfv+hih/yaWUmlazADKz/I6ocbssHE9brn2BueoVlsF8E8S?=
+ =?iso-8859-1?Q?RrbkG6sItLQpvxBRhVsJdnubHS6TNqeCpMdUih/O8e18/4PeKtOuN+suoi?=
+ =?iso-8859-1?Q?ZNbqEjFwFfUHGP5TiQvtzo/KRRt5vjURHWJMssuqD03xtfW3lyLv072D4g?=
+ =?iso-8859-1?Q?obho+FSd6Yt2/9gVWxWhJoN+SzVp2IebL0Mj50Av5oJSiMxumqSpYvWUkN?=
+ =?iso-8859-1?Q?FgTUd7FbcCyqmUaB/YPEJpNx0OAG415/iEg/q49WntF00Qm33IP7sbMv1g?=
+ =?iso-8859-1?Q?Qt/37+PQVbNjpasG9h9+xJoRol9fx/gk568V9tOSVCz5ehsjhZmHXTEx0j?=
+ =?iso-8859-1?Q?/eMJrWoDMMc3cyCxRBm/CNwCzsYfESl8VBDuEuDdy0oeTg4kJVPB/k/l+k?=
+ =?iso-8859-1?Q?hAYgQfdeE5Pf8=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241211-arm64-2024-dpisa-v4-9-0fd403876df2@kernel.org>
-References: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
-In-Reply-To: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-9b746
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10054; i=broonie@kernel.org;
- h=from:subject:message-id; bh=iv/w/FqsQC6tPqMPucMTK26kMUPc3meLY49LgS4Xj9U=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnWOUVzEm5VT+wUpOmup7O9a342BuGW98g3WzIW+9N
- s12hKhCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ1jlFQAKCRAk1otyXVSH0KBXB/
- 9r71PKDqagzQlH5Qur1yeAu9PrW/R9QpR0lJysjytV2mkBjt2eX9kOANcKjqxgbCXgzhdQfNpIt0pI
- Ub9G7QOD16Nk2Q/+OdzLepW9ECU1cr3tlf+BnnbHO6z3IBjgwmBYUKgSXzqg/bBx1+dEiltpxajcou
- zJeNmXTWGZYh+sggpLrPXmRJtERzyOeyAU30D7EXT7L/7WwAsfHBTOC1TqiixwZxSUm3WEK479yTrP
- Q59CReB/4W2Qzru1DiDJUpgw78gQiiYyNOIEHIGobBNbROfTpSOEFf7D3a7ANfNzR6e04M3Jn4+9Hj
- Rf9whhn63m02exaj1IIntnC0yBZ3JW
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 358bb3a9-bfa7-4874-0331-08dd198fb619
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2024 02:58:38.2044
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jKYxk+oOeQi/IL0QyfdByvrYitVdTY1K9E3eue3MLorytYViiFnikTfBmPaprEORA1HQcmRs83HujjxNcdmYzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8928
 
-Add coverage of the hwcaps for the 2024 dpISA extensions to the hwcap
-test.
-
-We don't actually test SIGILL generation for CMPBR since the need to
-branch makes it a pain to generate and the SIGILL detection would be
-unreliable anyway. Since this should be very unusual we provide a stub
-function rather than supporting a missing test.
-
-The sigill functions aren't well sorted in the file so the ordering is a
-bit random.
-
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 273 +++++++++++++++++++++++++++++-
- 1 file changed, 271 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index 0029ed9c5c9aa4451f3d0573ee672eca993fb2f4..2a230cfa4cb4108580a16161e2df03a513710dbc 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -46,6 +46,12 @@ static void atomics_sigill(void)
- 	asm volatile(".inst 0xb82003ff" : : : );
- }
- 
-+static void cmpbr_sigill(void)
-+{
-+	/* Not implemented, too complicated and unreliable anyway */
-+}
-+
-+
- static void crc32_sigill(void)
- {
- 	/* CRC32W W0, W0, W1 */
-@@ -82,6 +88,18 @@ static void f8fma_sigill(void)
- 	asm volatile(".inst 0xec0fc00");
- }
- 
-+static void f8mm4_sigill(void)
-+{
-+	/* FMMLA V0.4SH, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e00ec00");
-+}
-+
-+static void f8mm8_sigill(void)
-+{
-+	/* FMMLA V0.4S, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e80ec00");
-+}
-+
- static void faminmax_sigill(void)
- {
- 	/* FAMIN V0.4H, V0.4H, V0.4H */
-@@ -98,6 +116,12 @@ static void fpmr_sigill(void)
- 	asm volatile("mrs x0, S3_3_C4_C4_2" : : : "x0");
- }
- 
-+static void fprcvt_sigill(void)
-+{
-+	/* FCVTAS S0, H0 */
-+	asm volatile(".inst 0x1efa0000");
-+}
-+
- static void gcs_sigill(void)
- {
- 	unsigned long *gcspr;
-@@ -226,6 +250,42 @@ static void sme2p1_sigill(void)
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
- }
- 
-+static void sme2p2_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* UXTB Z0.D, P0/Z, Z0.D  */
-+	asm volatile(".inst 0x4c1a000" : : : );
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void sme_aes_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* AESD z0.b, z0.b, z0.b */
-+	asm volatile(".inst 0x4522e400" : : : "z0");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void sme_sbitperm_sigill(void)
-+{
-+	/* SMSTART SM */
-+	asm volatile("msr S0_3_C4_C3_3, xzr" : : : );
-+
-+	/* BDEP Z0.B, Z0.B, Z0.B */
-+	asm volatile(".inst 0x4500b400" : : : "z0");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
- static void smei16i32_sigill(void)
- {
- 	/* SMSTART */
-@@ -334,13 +394,73 @@ static void smesf8dp4_sigill(void)
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
- }
- 
-+static void smesf8mm8_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FMMLA V0.4S, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e80ec00");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesf8mm4_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FMMLA V0.4SH, V0.16B, V0.16B */
-+	asm volatile(".inst 0x6e00ec00");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
- static void smesf8fma_sigill(void)
- {
- 	/* SMSTART */
- 	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
- 
--	/* FMLALB V0.8H, V0.16B, V0.16B */
--	asm volatile(".inst 0xec0fc00");
-+	/* FMLALB Z0.8H, Z0.B, Z0.B */
-+	asm volatile(".inst 0x64205000");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesfexpa_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* FEXPA Z0.D, Z0.D */
-+	asm volatile(".inst 0x04e0b800");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smesmop4_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* SMOP4A ZA0.S, Z0.B, { Z0.B - Z1.B } */
-+	asm volatile(".inst 0x80108000");
-+
-+	/* SMSTOP */
-+	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-+}
-+
-+static void smestmop_sigill(void)
-+{
-+	/* SMSTART */
-+	asm volatile("msr S0_3_C4_C7_3, xzr" : : : );
-+
-+	/* STMOPA ZA0.S, { Z0.H - Z1.H }, Z0.H, Z20[0] */
-+	asm volatile(".inst 0x80408008");
- 
- 	/* SMSTOP */
- 	asm volatile("msr S0_3_C4_C6_3, xzr" : : : );
-@@ -364,18 +484,42 @@ static void sve2p1_sigill(void)
- 	asm volatile(".inst 0x65000000" : : : "z0");
- }
- 
-+static void sve2p2_sigill(void)
-+{
-+	/* NOT Z0.D, P0/Z, Z0.D */
-+	asm volatile(".inst 0x4cea000" : : : "z0");
-+}
-+
- static void sveaes_sigill(void)
- {
- 	/* AESD z0.b, z0.b, z0.b */
- 	asm volatile(".inst 0x4522e400" : : : "z0");
- }
- 
-+static void sveaes2_sigill(void)
-+{
-+	/* AESD {Z0.B - Z1.B }, { Z0.B - Z1.B }, Z0.Q */
-+	asm volatile(".inst 0x4522ec00" : : : "z0");
-+}
-+
- static void sveb16b16_sigill(void)
- {
- 	/* BFADD Z0.H, Z0.H, Z0.H */
- 	asm volatile(".inst 0x65000000" : : : );
- }
- 
-+static void svebfscale_sigill(void)
-+{
-+	/* BFSCALE Z0.H, P0/M, Z0.H, Z0.H */
-+	asm volatile(".inst 0x65098000" : : : "z0");
-+}
-+
-+static void svef16mm_sigill(void)
-+{
-+	/* FMMLA Z0.S, Z0.H, Z0.H */
-+	asm volatile(".inst 0x6420e400");
-+}
-+
- static void svepmull_sigill(void)
- {
- 	/* PMULLB Z0.Q, Z0.D, Z0.D */
-@@ -394,6 +538,12 @@ static void svesha3_sigill(void)
- 	asm volatile(".inst 0x4203800" : : : "z0");
- }
- 
-+static void sveeltperm_sigill(void)
-+{
-+	/* COMPACT Z0.B, P0, Z0.B */
-+	asm volatile(".inst 0x5218000" : : : "x0");
-+}
-+
- static void svesm4_sigill(void)
- {
- 	/* SM4E Z0.S, Z0.S, Z0.S */
-@@ -469,6 +619,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "aes",
- 		.sigill_fn = aes_sigill,
- 	},
-+	{
-+		.name = "CMPBR",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_CMPBR,
-+		.cpuinfo = "cmpbr",
-+		.sigill_fn = cmpbr_sigill,
-+	},
- 	{
- 		.name = "CRC32",
- 		.at_hwcap = AT_HWCAP,
-@@ -523,6 +680,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "f8fma",
- 		.sigill_fn = f8fma_sigill,
- 	},
-+	{
-+		.name = "F8MM8",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_F8MM8,
-+		.cpuinfo = "f8mm8",
-+		.sigill_fn = f8mm8_sigill,
-+	},
-+	{
-+		.name = "F8MM4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_F8MM4,
-+		.cpuinfo = "f8mm4",
-+		.sigill_fn = f8mm4_sigill,
-+	},
- 	{
- 		.name = "FAMINMAX",
- 		.at_hwcap = AT_HWCAP2,
-@@ -545,6 +716,13 @@ static const struct hwcap_data {
- 		.sigill_fn = fpmr_sigill,
- 		.sigill_reliable = true,
- 	},
-+	{
-+		.name = "FPRCVT",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_FPRCVT,
-+		.cpuinfo = "fprcvt",
-+		.sigill_fn = fprcvt_sigill,
-+	},
- 	{
- 		.name = "GCS",
- 		.at_hwcap = AT_HWCAP,
-@@ -691,6 +869,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "sme2p1",
- 		.sigill_fn = sme2p1_sigill,
- 	},
-+	{
-+		.name = "SME 2.2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME2P2,
-+		.cpuinfo = "sme2p2",
-+		.sigill_fn = sme2p2_sigill,
-+	},
-+	{
-+		.name = "SME AES",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_AES,
-+		.cpuinfo = "smeaes",
-+		.sigill_fn = sme_aes_sigill,
-+	},
- 	{
- 		.name = "SME I16I32",
- 		.at_hwcap = AT_HWCAP2,
-@@ -740,6 +932,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "smelutv2",
- 		.sigill_fn = smelutv2_sigill,
- 	},
-+	{
-+		.name = "SME SBITPERM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SBITPERM,
-+		.cpuinfo = "smesbitperm",
-+		.sigill_fn = sme_sbitperm_sigill,
-+	},
- 	{
- 		.name = "SME SF8FMA",
- 		.at_hwcap = AT_HWCAP2,
-@@ -747,6 +946,20 @@ static const struct hwcap_data {
- 		.cpuinfo = "smesf8fma",
- 		.sigill_fn = smesf8fma_sigill,
- 	},
-+	{
-+		.name = "SME SF8MM8",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SF8MM8,
-+		.cpuinfo = "smesf8mm8",
-+		.sigill_fn = smesf8mm8_sigill,
-+	},
-+	{
-+		.name = "SME SF8MM4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SF8MM8,
-+		.cpuinfo = "smesf8mm4",
-+		.sigill_fn = smesf8mm4_sigill,
-+	},
- 	{
- 		.name = "SME SF8DP2",
- 		.at_hwcap = AT_HWCAP2,
-@@ -761,6 +974,27 @@ static const struct hwcap_data {
- 		.cpuinfo = "smesf8dp4",
- 		.sigill_fn = smesf8dp4_sigill,
- 	},
-+	{
-+		.name = "SME SFEXPA",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SFEXPA,
-+		.cpuinfo = "smesfexpa",
-+		.sigill_fn = smesfexpa_sigill,
-+	},
-+	{
-+		.name = "SME SMOP4",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_SMOP4,
-+		.cpuinfo = "smesmop4",
-+		.sigill_fn = smesmop4_sigill,
-+	},
-+	{
-+		.name = "SME STMOP",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SME_STMOP,
-+		.cpuinfo = "smestmop",
-+		.sigill_fn = smestmop_sigill,
-+	},
- 	{
- 		.name = "SVE",
- 		.at_hwcap = AT_HWCAP,
-@@ -783,6 +1017,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "sve2p1",
- 		.sigill_fn = sve2p1_sigill,
- 	},
-+	{
-+		.name = "SVE 2.2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE2P2,
-+		.cpuinfo = "sve2p2",
-+		.sigill_fn = sve2p2_sigill,
-+	},
- 	{
- 		.name = "SVE AES",
- 		.at_hwcap = AT_HWCAP2,
-@@ -790,6 +1031,34 @@ static const struct hwcap_data {
- 		.cpuinfo = "sveaes",
- 		.sigill_fn = sveaes_sigill,
- 	},
-+	{
-+		.name = "SVE AES2",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_AES2,
-+		.cpuinfo = "sveaes2",
-+		.sigill_fn = sveaes2_sigill,
-+	},
-+	{
-+		.name = "SVE BFSCALE",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_BFSCALE,
-+		.cpuinfo = "svebfscale",
-+		.sigill_fn = svebfscale_sigill,
-+	},
-+	{
-+		.name = "SVE ELTPERM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_ELTPERM,
-+		.cpuinfo = "sveeltperm",
-+		.sigill_fn = sveeltperm_sigill,
-+	},
-+	{
-+		.name = "SVE F16MM",
-+		.at_hwcap = AT_HWCAP,
-+		.hwcap_bit = HWCAP_SVE_F16MM,
-+		.cpuinfo = "svef16mm",
-+		.sigill_fn = svef16mm_sigill,
-+	},
- 	{
- 		.name = "SVE2 B16B16",
- 		.at_hwcap = AT_HWCAP2,
-
--- 
-2.39.5
-
+Thanks Will for taking a look.=0A=
+=0A=
+>> The device memory such as on the Grace Hopper systems is interchangeable=
+=0A=
+>> with DDR memory and retains its properties. Allow executable faults=0A=
+>> on the memory determined as Normal cacheable.=0A=
+>=0A=
+> Sorry, but a change this subtle to the arch code is going to need a _much=
+_=0A=
+> better explanation than the rambling text above.=0A=
+=0A=
+Understood, I'll work on the text and try to make it coherent.=0A=
+=0A=
+=0A=
+> I also suspect that you're trying to do too many things in one patch.=0A=
+> In particular, the changes to execute permission handling absolutely=0A=
+> need to be discussed as a single patch in the series.=0A=
+>=0A=
+> Please can you split this up in to a set of changes with useful commit=0A=
+> messages so that we can review them?=0A=
+=0A=
+Yes. I'll take out the execute permission part to a separate patch.=0A=
+=0A=
+=0A=
+> Jason knows how to do this so you could ask him for help if you're stuck.=
+=0A=
+> Otherwise, there are plenty of examples of well-written commit messages=
+=0A=
+> on the mailing list and in the git history.=0A=
+=0A=
+Ack.=0A=
+=0A=
