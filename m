@@ -1,49 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DE41F0E4A;
-	Wed, 11 Dec 2024 22:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12CD1BC085;
+	Wed, 11 Dec 2024 22:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733956821; cv=none; b=n/Cy/uYj3J08aiZbSUkx7xekZcC2UqxQPqhV6ljTT/UbSlXFVTfwePsyGNms+nVd/v7uG2GTuOkY5X4rZLT3dl8KVGSiWESyDkglAdh7hvvgT12PuTqY884HqGj+J75i4ryU56U/HHScyumOqspgZ3prs/mE1MqvFRzvIZThx38=
+	t=1733957978; cv=none; b=BjtrPMFBHtu/khAFP9a6OC52EvxmDdI0/HDXZPbWNa0pOEgMpCwD4u6qWB/Xdqyco3aPFtp1DVaY9mNuO9zJw6XIrJ5hIJRbjdSh5Us0LxNoXBzwQ8JAuGpKtsrMeIGLdzWIlBUh0qZm4b3O1R6pMnJpjbSsp27Az4vBXk70KSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733956821; c=relaxed/simple;
-	bh=hD8/P8msz1Ork95b5s3aX3duWl/S0eBHHPkq0olmuXQ=;
+	s=arc-20240116; t=1733957978; c=relaxed/simple;
+	bh=ba8OhYJWZ7/RdSdR8zo6eTaxvZtkyE7pWbYivefWwDo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kOeZCfjp0FEvH/cyhM8/Si9iXRwSCF77+hQDtEF9DKI+cLLNmmh2BgZqMV792YcidYB9HhCOKcKYLBGvcS5rKXp8dsgCCyEjiuGMiIO3EPAjEZSO0/kMTR7d7osDob5XuHl0uDO5ulDo6T2NmFnZzM745fkhwCJBp7NDqiJtnfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Leq5SNJm; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=k6Lj7y3ivRb1p+jom7HfSLubWS4Nzgp80mDWPJ255dgyKmJU5+PUAqjyBdst2H41eqNUI5bBHZd7HOPFOx46BoV0LHklq8KAJOSEz0XUXlCU6okAl1/Z2P5yKyBYxG1+w462NUxf/y2ZAsAXpxCBP89rwOiX8yNJoWYh7H3Banc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaW+15dg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Leq5SNJm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1AC7C4CEDD;
-	Wed, 11 Dec 2024 22:40:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaW+15dg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 544C4C4CED2;
+	Wed, 11 Dec 2024 22:59:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733956821;
-	bh=hD8/P8msz1Ork95b5s3aX3duWl/S0eBHHPkq0olmuXQ=;
+	s=k20201202; t=1733957977;
+	bh=ba8OhYJWZ7/RdSdR8zo6eTaxvZtkyE7pWbYivefWwDo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Leq5SNJmh6z5QJtQMQJACDt4lasqGOaOAngRVE/wMFXEMuvlApieRAfGYeEFX5tO8
-	 VfHDAn0SvseO7e2tofEC7y9LdInHBx3a8tqkg8rNdP2ITGLM3up/IODHssACnpduCw
-	 jOOZ7cxJ/gdeOc95Tvs6I3FdIviZ8j+MIXIEMnR9vWY1KDwdn+l61JI1Pg0lucDqcl
-	 WFPZn/cFhqetVURxnNv5m3tCf1k/WG/6JOaU9CSA9NZnuzpDjMy2qm1Okr82ArcRKd
-	 ODhqdafz6ncwa62FO6sN1Y8fSqrYW7eTe0ETHyx6wlklenvH9UKWPs3Ic+PzxhDLdV
-	 mu4oOmWLtF9ww==
-Date: Wed, 11 Dec 2024 22:40:15 +0000
+	b=WaW+15dgE5AhR7mM92AiA6N5aJE7lkhwrwK16HZxjs4UoJDius5M1h9sMsfQmFYRJ
+	 k4G+vsfFOATgIp4A9IWmEDFXj2uAEANp3yfKGYKxdInMn8EgftnquPb91kaVHKroiW
+	 ro09RxLYMw8dcZu/Ii/Ny2j9diSMfFbubvjCkbampS7gmb5oXyIHzZ3HezADhQxLsJ
+	 kLtQmKUCKChmXo1gLDb5N9G6fk88uyjFB1OdDva8/FHvdXnzTcnimD5ILgDGNoI//6
+	 Mvq/J5aBVmgX0czKCB9R0vqUxmSaexbQItgIfnNj3BUQUqlWpcYI61Sjqn3U+6acYH
+	 upCxWWuLsTdGg==
+Date: Wed, 11 Dec 2024 22:59:32 +0000
 From: Will Deacon <will@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601
- 2024-09
-Message-ID: <20241211224015.GB17836@willie-the-truck>
-References: <20241203-arm64-2024-dpisa-v3-0-a6c78b1aa297@kernel.org>
- <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
- <20241210170953.GB16075@willie-the-truck>
- <b859bdcd-7343-4d53-9f3a-f374deca725a@sirena.org.uk>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, apatel@ventanamicro.com,
+	andre.przywara@arm.com, suzuki.poulose@arm.com,
+	s.abdollahi22@imperial.ac.uk
+Subject: Re: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
+Message-ID: <20241211225931.GC17836@willie-the-truck>
+References: <20241128151246.10858-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,34 +45,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b859bdcd-7343-4d53-9f3a-f374deca725a@sirena.org.uk>
+In-Reply-To: <20241128151246.10858-1-alexandru.elisei@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Dec 10, 2024 at 06:43:05PM +0000, Mark Brown wrote:
-> On Tue, Dec 10, 2024 at 05:09:55PM +0000, Will Deacon wrote:
+On Thu, Nov 28, 2024 at 03:12:42PM +0000, Alexandru Elisei wrote:
+> (resending because I accidently only sent the cover letter, sorry for that)
 > 
-> > Can we _please_ just generate this stuff. It feels like we've been
-> > making silly typos over and over again with the current approach so
-> > either it's hard or we're not very good at it. Either way, it should be
-> > automated.
+> The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
+> the riscv maintainer because it looks to me like riscv is similarly
+> affected.
 > 
-> > Others have managed it [1], so it's clearly do-able.
+> Patch #4 ("arm64: Increase the payload memory region size to 512MB") might
+> be controversial. Follows a bug report I received from Abdollahi Sina in
+> private. Details in the commit message, but the gist of the patch is that
+> the memory region where kernel + initrd + DTB are copied to are changed
+> from 256MB to 512MB.  As a result, the DTB and initrd are moved from below
+> ram_start + 256MB to ram_start + 512MB to accomodate a larger initrd.  If
+> users rely on finding the DTB and initrd at the current addresses, then I'm
+> not sure the patch is justified - after all, if someone really wants to use
+> such a large initrd instead of a disk image with virtio, then replacing
+> SZ_256M with SZ_512M locally doesn't look like a big ask.
 > 
-> Yes, the issues here are not technical ones.  Though there are some
-> complications -  eg, IIRC the XML doesn't encode the signedness of
-> fields like we do and there's areas where we've deliberately diverged.
-> Given the amount of review I end up having to do of sysreg changes your
-> reasoning is especially apparent to me.  I've passed this feedback on
-> (again).
+> On the other hand, if there are no users that rely on the current payload
+> layout, increasing the memory region size to 512MB to allow for more
+> unusual use cases, while still maintaining compatibility with older
+> kernels, doesn't seem unreasonable to me.
+> 
+> Please comment, I don't feel strongly either way - I'll happy drop the last
+> patch if there are objections.
 
-One thing we _could_ do is have a tool (in-tree) that takes two copies
-of the sysreg file (i.e. before and after applying a diff) along with a
-copy of the XML and, for the the new fields being added, shows how the
-XML represents those compared to the diff. It should then be relatively
-straightforward to flag the use of an unallocated encoding (like we had
-here) and also things like assigning a field name to a RES0 region.
+Well, I won't reject an imperial.ac.uk patch on a hunch, so let's go for
+the whole lot and see if anybody complains!
 
-So this wouldn't be generating the patches from the XML, but more like
-using the XML as an oracle in a linter.
+I'll fix the indentation issue spotted by Drew when applying (thanks!).
 
 Will
