@@ -1,82 +1,171 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6381DDC2C;
-	Wed, 11 Dec 2024 16:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119091FF1B4;
+	Wed, 11 Dec 2024 17:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733934503; cv=none; b=PfrYFcEf16LeffSjq8btuuep2kfGpIHBipg5Fubl2beDcQh2t264HAFLmwfAGQcut0f2ImKairk7noIAef5oqPRyt6Ewi6HNGDbI3bkXnCv97ZO1D2WVuAvTVZaCtlPslxZ9WFUYf0PPj7GY44rrahc7o18i8qMtyH503NVSkKg=
+	t=1733938840; cv=none; b=J+uhkj3GE8l45lFUtswbWJ+M+u/e/8uxSUXVwwdVRsbA3Z2iCaTP100zs0D70IgPWfsD0pp7iMKRDrbSDkNJyILv0oVutg8DJ4W/LSNVHypUgBrBdeRyXo/AXOKB3G29bu8DWrbyrPtx5jd+d5VDItemZHZohJWSiFm6khr+rEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733934503; c=relaxed/simple;
-	bh=LXPkCuR2SivnRYq9dCkjsf2KZvGLOYoks6cx+5KrVNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+adJxnWRqzJl3f18ZFIoCeUd0duPg1xb5MR6ddbXpKoswkJ59GSy3p6cENNtaJ1v3yg0jyqPxSZ1anWsbbMBdhyUiop2dgCsRVrvGup+6Q5iWSfqw2oeSH4Kih9Q6HE0zCgyERvF+XSxk1nRMrGzG5cjIThlEbNY9ZOBYpKccU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/6Dagzc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733938840; c=relaxed/simple;
+	bh=7yO+0JOWcw0rv4ZXgLl4IZjD04zJh6IohJpO9cxyyR4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s5Tvcc7nM3bcfkzXIp/QZgoAV8a/lEwvofWGlW0AE+XjJKrRYKXub5BZDLW1yXM2/QsSKJIv/ywl3Zd2s+ulQIHXL1hlStj0gdbbjbFYIwUvN+9iDlCq97GhNNAQVxOAOXlZZ3u5UiHacPO+f/Sg5g6WceyGrUKXUwRyXBaqXDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jN0+EohD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/6Dagzc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94745C4CEDF;
-	Wed, 11 Dec 2024 16:28:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jN0+EohD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99A0FC4CED2;
+	Wed, 11 Dec 2024 17:40:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733934502;
-	bh=LXPkCuR2SivnRYq9dCkjsf2KZvGLOYoks6cx+5KrVNI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K/6DagzcvgXPGBIjb2VKXo5Vd8TVb2h1SAsb2coJAuauL0I658hRF/AzJdyz48E8P
-	 1K/CnVd+HuPTKt3MQkX58EdS+Bh3LX5JcgRSTN0phemolAyHs/DJ4F85mbJWxRugN1
-	 oEDBhekCL491PJ74fmsNYkY4Yn2holKMFnBPC5LwI45s+C02d33+2wuzJplt0iFHD6
-	 Dc2N2yCquH//fIvkOMHXVGZEAofYIAtuguXiiAkrTECRHH09TIzwyBArW/mZsU2nGG
-	 xu8zW4wKPDP/H4wwacscWTNaTtPQW3Ycks7C+3RGTzF001nmUCjb5fPwqjfdwE0EZz
-	 cMA3o+jQ/xKhw==
-Date: Wed, 11 Dec 2024 16:28:17 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH V2 02/46] arm64/sysreg: Update register fields for
- ID_AA64MMFR4_EL1
-Message-ID: <f27091f1-879a-4434-8124-2d1e27241078@sirena.org.uk>
-References: <20241210055311.780688-1-anshuman.khandual@arm.com>
- <20241210055311.780688-3-anshuman.khandual@arm.com>
+	s=k20201202; t=1733938839;
+	bh=7yO+0JOWcw0rv4ZXgLl4IZjD04zJh6IohJpO9cxyyR4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jN0+EohD6he6UDoJlTpTfDWT/wwFototv80uKDF1b5BMq6m036pgZ+IgmxeBqnKpF
+	 fc3+FO1HDyrs3NEoh9O+5mfLuqYQvVivDSWCu0hqokW/8phl6au4ToL9gSmoZT3nWn
+	 Afe201ZRmJJgjyYkXEhLLLc0+9WorLzkIA2kI5YAVKP4UxKZ7DTbGnEvLc0mH33swc
+	 P6Xx5kTW5Tq32xHNBbepXxXzeC3JefDmQ8y6lo5Zz2n3vncjHI9QLukrphrc/A+BZ7
+	 hkb39ihNED62ZcKleRTqf+JYp4I+lXeYfAmDfmOXuZ6wPOgNsg3t/veK4w16tqrmVy
+	 90Z8qKtxj5uzg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tLQhR-002lbb-7S;
+	Wed, 11 Dec 2024 17:40:37 +0000
+Date: Wed, 11 Dec 2024 17:40:36 +0000
+Message-ID: <86o71irucr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?B?TWlrb8WCYWo=?= Lenczewski <miko.lenczewski@arm.com>
+Cc: ryan.roberts@arm.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [RESEND RFC PATCH v1 1/5] arm64: Add TLB Conflict Abort Exception handler to KVM
+In-Reply-To: <20241211160218.41404-2-miko.lenczewski@arm.com>
+References: <20241211160218.41404-1-miko.lenczewski@arm.com>
+	<20241211160218.41404-2-miko.lenczewski@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="AuImAyBVAiYKZd95"
-Content-Disposition: inline
-In-Reply-To: <20241210055311.780688-3-anshuman.khandual@arm.com>
-X-Cookie: Every path has its puddle.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miko.lenczewski@arm.com, ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 11 Dec 2024 16:01:37 +0000,
+Miko=C5=82aj Lenczewski <miko.lenczewski@arm.com> wrote:
+>=20
+> Currently, KVM does not handle the case of a stage 2 TLB conflict abort
+> exception. The Arm ARM specifies that the worst-case handling of such an
+> exception requires a `tlbi vmalls12e1`.
 
---AuImAyBVAiYKZd95
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Not quite. It says (I_JCCRT):
 
-On Tue, Dec 10, 2024 at 11:22:27AM +0530, Anshuman Khandual wrote:
-> This updates ID_AA64MMFR4_EL1 register as per the definitions based on
-> DDI0601 2024-09.
+<quote>
+* For the EL1&0 translation regime, when stage 2 translations are in
+  use, either VMALLS12E1 or ALLE1.
+</quote>
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+> Perform such an invalidation when this exception is encountered.
 
---AuImAyBVAiYKZd95
-Content-Type: application/pgp-signature; name="signature.asc"
+What you fail to describe is *why* this is needed. You know it, I know
+it, but not everybody does. A reference to the ARM ARM would
+definitely be helpful.
 
------BEGIN PGP SIGNATURE-----
+>=20
+> Signed-off-by: Miko=C5=82aj Lenczewski <miko.lenczewski@arm.com>
+> ---
+>  arch/arm64/include/asm/esr.h | 8 ++++++++
+>  arch/arm64/kvm/mmu.c         | 6 ++++++
+>  2 files changed, 14 insertions(+)
+>=20
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index d1b1a33f9a8b..8a66f81ca291 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -121,6 +121,7 @@
+>  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+>  #define ESR_ELx_FSC_SECC	(0x18)
+>  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
+> +#define ESR_ELx_FSC_TLBABT	(0x30)
+> =20
+>  /* Status codes for individual page table levels */
+>  #define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
+> @@ -464,6 +465,13 @@ static inline bool esr_fsc_is_access_flag_fault(unsi=
+gned long esr)
+>  	       (esr =3D=3D ESR_ELx_FSC_ACCESS_L(0));
+>  }
+> =20
+> +static inline bool esr_fsc_is_tlb_conflict_abort(unsigned long esr)
+> +{
+> +	esr =3D esr & ESR_ELx_FSC;
+> +
+> +	return esr =3D=3D ESR_ELx_FSC_TLBABT;
+> +}
+> +
+>  /* Indicate whether ESR.EC=3D=3D0x1A is for an ERETAx instruction */
+>  static inline bool esr_iss_is_eretax(unsigned long esr)
+>  {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c9d46ad57e52..c8c6f5a97a1b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1756,6 +1756,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	ipa =3D fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
+>  	is_iabt =3D kvm_vcpu_trap_is_iabt(vcpu);
+> =20
+> +	if (esr_fsc_is_tlb_conflict_abort(esr)) {
+> +		// does a `tlbi vmalls12e1is`
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdZvaEACgkQJNaLcl1U
-h9Dt8wf/Xkj06W8/tQXbtUdCh+cZdMzvCYsmFjs77GpeWcGAMwMMXAakKXLvdIaZ
-Y8MeZMkUNJbkjjQHFfvq769HABUCe5pvxstBlcm5RwkLw779YKyPfHhKBj804gnP
-ygoSQuth62S2cQ98ZxCS0X1uKsLuMO7bufZc7FH8OeBCBSY2pm9TnqAMbnpXyb01
-/0po6atZiUVhyFENAG12VmiVbyFN2xH5ePDRmvwV6OlGLkuHfnxYBbnxhyTDhwp7
-24tWFW+aSQKpCHgfwIndNpqkXtdEFjc+LE8S4T1i1KEd877lYfPn5oe39LeEZCou
-FvWw3dF3ew82JkVHikP0R6DqLMWRhg==
-=jJAi
------END PGP SIGNATURE-----
+nit: this isn't a very useful comment.
 
---AuImAyBVAiYKZd95--
+> +		__kvm_tlb_flush_vmid(&vcpu->kvm->arch.mmu);
+> +		return 1;
+> +	}
+
+That's not enough, unfortunately. A nested VM has *many* VMIDs (the
+flattening of all translation contexts that the guest uses).
+
+So you can either iterate over all the valid VMIDs owned by this
+guest, or more simply issue a TLBI ALLE1, which will do the trick in a
+much more efficient way.
+
+The other thing is that you are using an IS invalidation, which is
+farther reaching than necessary. Why would you invalidate the TLBs for
+CPUs that are only innocent bystanders? A non-shareable invalidation
+seems preferable to me.
+
+> +
+>  	if (esr_fsc_is_translation_fault(esr)) {
+>  		/* Beyond sanitised PARange (which is the IPA limit) */
+>  		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit())) {
+
+But it also begs the question: why only KVM, and not the host? This
+handler will only take effect for a TLB Conflict abort delivered from
+an EL1 guest to EL2.
+
+However, it doesn't seem to me that the host is equipped to deal with
+this sort of exception for itself. Shouldn't you start with that?
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
