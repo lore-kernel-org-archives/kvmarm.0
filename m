@@ -1,99 +1,85 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B561C4A20
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 22:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DE41F0E4A;
+	Wed, 11 Dec 2024 22:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733954776; cv=none; b=fPW28fzdkyIND6wk1Hy/jODonK8qmiHtD2AI0USOIAzWuZ8Bz16kd9LtpAEpXVib2wF4XGN15c8UgTVG87MRXyvapQdhSwoJOdKDHMV10Wsq7uB+6WhiWwk+Le+W3GsCrUgKcJpkHAtM/6Vegi8dZJ6SLTrVqe+bwGhP7ZguHJ8=
+	t=1733956821; cv=none; b=n/Cy/uYj3J08aiZbSUkx7xekZcC2UqxQPqhV6ljTT/UbSlXFVTfwePsyGNms+nVd/v7uG2GTuOkY5X4rZLT3dl8KVGSiWESyDkglAdh7hvvgT12PuTqY884HqGj+J75i4ryU56U/HHScyumOqspgZ3prs/mE1MqvFRzvIZThx38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733954776; c=relaxed/simple;
-	bh=dc04m6m7A0zBx/3GsGuHlwEymHutsumTTMAD3LQrhZQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dac8iXWEmwInW7lS2wf6H/5hDEY8WdKF6na2q7SJDRxsgRNI6xMqO8beaYTWEc+d/7DOvJ37/+C1L1IJwZmcp4Qt7LWC3aV7kq+jkGywiAR5RmK/howkOBUoJPwUYtL2CllI2otQ4DRJEPJLFWtvKQqUHctlihVOU87L0NA2iuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2uEGbk+d; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1733956821; c=relaxed/simple;
+	bh=hD8/P8msz1Ork95b5s3aX3duWl/S0eBHHPkq0olmuXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOeZCfjp0FEvH/cyhM8/Si9iXRwSCF77+hQDtEF9DKI+cLLNmmh2BgZqMV792YcidYB9HhCOKcKYLBGvcS5rKXp8dsgCCyEjiuGMiIO3EPAjEZSO0/kMTR7d7osDob5XuHl0uDO5ulDo6T2NmFnZzM745fkhwCJBp7NDqiJtnfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Leq5SNJm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2uEGbk+d"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21681a2c0d5so16172045ad.2
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 14:06:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733954774; x=1734559574; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uTDUEy5ndzyMUOmAANu+2Q5dKv5CytQeXy0bYdZM4AE=;
-        b=2uEGbk+dRjnCYmAx7b3BrqsQYGdcqv4WrdTQr4a/Fhhfj0fPF21G7SAmFZWa9RcJYh
-         VTGnoakAT+eR+W164dqd0Cp+9znfg8Rdt+F3hO5yAym+8cp3xEUDoHPxTQ2fllamdvyO
-         OU/oWjGFyPx9wShbApeLrjZPw3KDG+a68JMR3wwG28G58L15YKlaRgG9G8SrPjxOx8hy
-         uSzcxaS/VYJM9nIokK+/4OodauVzFbPJVgOdzPpP8J6S0HkhkLiVMgcU++OPs2a/vEoI
-         JKtaMJjWfVQ4OI94xawP0NL9Y61XzSe6b5X0ZXWeRqDo0IJrwsawpcXou9hui3WXeFAs
-         Mybw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733954774; x=1734559574;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uTDUEy5ndzyMUOmAANu+2Q5dKv5CytQeXy0bYdZM4AE=;
-        b=k/L4FSVByE3pTAoxaOjVt/uBU7xp3mGmB3+gvJg1IxIXBP5rNi3Ypy3Wc/yMZ4m5Xt
-         f5sQx9Hx02uCAVAm3RO9VNOr36tvSPa8+Skth0/ABscX4MHcSkTzdOKLapm+buEI61xs
-         CERq75s06JawmQ4yxVushuWJl2JiYpQ/tLCVw+kQstbO+KSYvP5gbAPKsvxaKo1dCn1k
-         QwfoOOV2q06k9Te3qk3IVTPkmfFVzTudDFli8Pnw0DSgjyLLKlPn155zbv2wT/oEwz8e
-         LEZptSIarWY/t1CeYui5OJBEBdfVf7iRp1TKAgpbrVcBnB5sDplfwGt82Pzn1MqYFhpO
-         L99A==
-X-Forwarded-Encrypted: i=1; AJvYcCUdM6Tk+fsTDc/DW1X8JDFgr8vRljfQSY90Oq2RErfz7P0kFxnNS23Rsa7n6UIN8d08s+ZKxaI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxWHkRfnkPJcV36e5ckS2Hxom/D08sJuC4T+xjVwsS+dvYAxEo3
-	to4jORHzAQUUhqJyly0RKrYL5hVjwziV5I+IIVH6s6Cs1kMG8ms2RissB7/okn0EqA9Re5jQ/NI
-	Bbg==
-X-Google-Smtp-Source: AGHT+IHFSnyjPEDTcWJnAvaiGma2JfY/srzHSvKplMJ9OueXQOEiKTtjMmaF+b36NOyPghd7X0ZdCPZjbkA=
-X-Received: from plgn1.prod.google.com ([2002:a17:902:f601:b0:216:499e:dadb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db04:b0:215:44fe:163e
- with SMTP id d9443c01a7336-21778397514mr77377935ad.1.1733954774653; Wed, 11
- Dec 2024 14:06:14 -0800 (PST)
-Date: Wed, 11 Dec 2024 14:06:12 -0800
-In-Reply-To: <20240910152207.38974-15-nikwip@amazon.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Leq5SNJm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1AC7C4CEDD;
+	Wed, 11 Dec 2024 22:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733956821;
+	bh=hD8/P8msz1Ork95b5s3aX3duWl/S0eBHHPkq0olmuXQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Leq5SNJmh6z5QJtQMQJACDt4lasqGOaOAngRVE/wMFXEMuvlApieRAfGYeEFX5tO8
+	 VfHDAn0SvseO7e2tofEC7y9LdInHBx3a8tqkg8rNdP2ITGLM3up/IODHssACnpduCw
+	 jOOZ7cxJ/gdeOc95Tvs6I3FdIviZ8j+MIXIEMnR9vWY1KDwdn+l61JI1Pg0lucDqcl
+	 WFPZn/cFhqetVURxnNv5m3tCf1k/WG/6JOaU9CSA9NZnuzpDjMy2qm1Okr82ArcRKd
+	 ODhqdafz6ncwa62FO6sN1Y8fSqrYW7eTe0ETHyx6wlklenvH9UKWPs3Ic+PzxhDLdV
+	 mu4oOmWLtF9ww==
+Date: Wed, 11 Dec 2024 22:40:15 +0000
+From: Will Deacon <will@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601
+ 2024-09
+Message-ID: <20241211224015.GB17836@willie-the-truck>
+References: <20241203-arm64-2024-dpisa-v3-0-a6c78b1aa297@kernel.org>
+ <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
+ <20241210170953.GB16075@willie-the-truck>
+ <b859bdcd-7343-4d53-9f3a-f374deca725a@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240910152207.38974-1-nikwip@amazon.de> <20240910152207.38974-15-nikwip@amazon.de>
-Message-ID: <Z1oM1HQqXrIr1tij@google.com>
-Subject: Re: [PATCH 14/15] KVM: x86: Implement KVM_TRANSLATE2
-From: Sean Christopherson <seanjc@google.com>
-To: Nikolas Wipper <nikwip@amazon.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf <graf@amazon.de>, James Gowans <jgowans@amazon.com>, 
-	nh-open-source@amazon.com, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b859bdcd-7343-4d53-9f3a-f374deca725a@sirena.org.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Sep 10, 2024, Nikolas Wipper wrote:
-> +int kvm_arch_vcpu_ioctl_translate2(struct kvm_vcpu *vcpu,
-> +				    struct kvm_translation2 *tr)
-> +{
-> +	int idx, set_bit_mode = 0, access = 0;
-> +	struct x86_exception exception = { };
-> +	gva_t vaddr = tr->linear_address;
-> +	u16 status = 0;
-> +	gpa_t gpa;
-> +
-> +	if (tr->flags & KVM_TRANSLATE_FLAGS_SET_ACCESSED)
-> +		set_bit_mode |= PWALK_SET_ACCESSED;
-> +	if (tr->flags & KVM_TRANSLATE_FLAGS_SET_DIRTY)
-> +		set_bit_mode |= PWALK_SET_DIRTY;
-> +	if (tr->flags & KVM_TRANSLATE_FLAGS_FORCE_SET_ACCESSED)
-> +		set_bit_mode |= PWALK_FORCE_SET_ACCESSED;
-> +
-> +	if (tr->access & KVM_TRANSLATE_ACCESS_WRITE)
-> +		access |= PFERR_WRITE_MASK;
-> +	if (tr->access & KVM_TRANSLATE_ACCESS_USER)
-> +		access |= PFERR_USER_MASK;
-> +	if (tr->access & KVM_TRANSLATE_ACCESS_EXEC)
-> +		access |= PFERR_FETCH_MASK;
+On Tue, Dec 10, 2024 at 06:43:05PM +0000, Mark Brown wrote:
+> On Tue, Dec 10, 2024 at 05:09:55PM +0000, Will Deacon wrote:
+> 
+> > Can we _please_ just generate this stuff. It feels like we've been
+> > making silly typos over and over again with the current approach so
+> > either it's hard or we're not very good at it. Either way, it should be
+> > automated.
+> 
+> > Others have managed it [1], so it's clearly do-able.
+> 
+> Yes, the issues here are not technical ones.  Though there are some
+> complications -  eg, IIRC the XML doesn't encode the signedness of
+> fields like we do and there's areas where we've deliberately diverged.
+> Given the amount of review I end up having to do of sysreg changes your
+> reasoning is especially apparent to me.  I've passed this feedback on
+> (again).
 
-WRITE and FETCH accesses need to be mutually exclusive.
+One thing we _could_ do is have a tool (in-tree) that takes two copies
+of the sysreg file (i.e. before and after applying a diff) along with a
+copy of the XML and, for the the new fields being added, shows how the
+XML represents those compared to the diff. It should then be relatively
+straightforward to flag the use of an unallocated encoding (like we had
+here) and also things like assigning a field name to a RES0 region.
+
+So this wouldn't be generating the patches from the XML, but more like
+using the XML as an oracle in a linter.
+
+Will
