@@ -1,109 +1,82 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A897346F
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 13:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00A81DD873;
+	Wed, 11 Dec 2024 15:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733923855; cv=none; b=EyXebdSRNOR/9NbyewxE4KNU2kuuN0Gi1bw33vBpsZw+pki0GkB9bsSlu7TaiyRRqXdhzlHC7dw8kDJrTKLgkKlbTVBuk/6Y6b5T9c/x3krbvKqqxOwcioHhz0yRbhsC9ZcSN2tlroTNFYiSkcT+cKnWKV3iCABOFt0Na2QX4Us=
+	t=1733932096; cv=none; b=ZskZfxv+y5Swyp8685KaW0dDQ3D9IwDaF+QTFDgdcSqjiFYPxRxNFiYkoDex6xoCsMUY6cNwlZnv/FkJWF8QqPgcC7QytG3AlLQVaVevsvOnyBQchuXuqWT4zzRXu4BH1PUyXkLPTF46PpFjpTWVTqUIHQ4rjdHQgoqPsm0e9wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733923855; c=relaxed/simple;
-	bh=C1UIaXO+VRGavSCatmr6n7DFTKuxbco27SL9QauqXHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W7u84vcQe1N1lbYAOSKUgBvvbEG00sfANw0iYNU/LMoYInT5bbiQbVALy0yV46fLcASQBQtS0kYiUgVblLkbAT5crzRXKT42h9CgPrBObQ/KFhj0ArtKzgfxpb2J18imf3dmKDjXQhv1herkz5et3z3cFxbkr6WWc7LrqRkH6rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rM5SvJh4; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1733932096; c=relaxed/simple;
+	bh=YLacmmQOff+oT4ZIe+wvYVJYKWjSDhRMK864cvAg1II=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dpu3/FoHD3FI1IzNc06nPn8qQ8VOEJdcLDgSqZ37CVj+B/DgG4ikgpAGfRQS8BHcCdtrS34h184UCJ2ijhej6BGF8JXLj4W109URAoGmPwHRdj6TMe4lb71uSWhfbUD+AY8OsNfifikToNSUhlZLW/WbFYSutCF6vSCB1Apxw0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfOojM+c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rM5SvJh4"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-434fa6bf6e4so38335e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 05:30:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733923852; x=1734528652; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ulXepV2jQyhdTDFrhVhKMW5GrTR/j6m545w2I4GVRQs=;
-        b=rM5SvJh4Zq4DS3aLBF43yqb6Lip9IiXsUN7LHeDs0xrObrxRIWUdLr6dWTA9ySHFXV
-         c7BZ6jZny4Z1mT7TprrNi7YkfwBPHCCLdRwiNuOpL66qy3KNuSRrEaPWENtGa6+Xk5YZ
-         8JbxM+xBxnbfuoVKFoz2i/V5JoT7o3d0LtfhNhPckJf8H4QlT5Nt5lzq+JXUtqdlxxjW
-         vpyjSSjj4iYyzzbAYSFKxYnfyIkViH/NQnjX8G1ed35WPQ+wfYlG74wJN2ezCxOoIOgv
-         eszaipkwN+5jgh+hjs8v7mrr7DcIuno/2pEykZ3dfEP4ImeYrgI7Mi2TAd0YQ19KwHHu
-         pnmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733923852; x=1734528652;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ulXepV2jQyhdTDFrhVhKMW5GrTR/j6m545w2I4GVRQs=;
-        b=n/tfpyP0YvD+Nf2/T/vQD5gMJaprrcT9Ngb2kjD1uXF9bBkkY0MCIRsg+7G32jg989
-         DzIzhweBytWktJNQBpWxlC+G+wjbvj6zDgMKCqMHTaJCn4pA9xcpYFIbJw/kTuD0J92N
-         QWYnQ/hjylIn4GZbv7TADXMnAT10trrOfS3h3YyG1SJoELk9gVGXavrwl7BjeEGzB7tP
-         Cp24Y2XYBWE39zeRYwLZZGAjjqwGGW86YFxtwhfAnpee1mlRcJcfNiMGTrxE9lZrPJ/7
-         LviMSCEVGsDG14o9EaWdt7UNLsRe+WSlSc4LNztNT3JLPEn4EgRTsQn7xA3g7+g7NYIS
-         ikSA==
-X-Gm-Message-State: AOJu0Yx0a6Qc5Dt4jfpEfPyQjqna3SzHkWUpo2WCzUej0/Y+8IMR48P9
-	S8PoW6+WrP0eTo3SHPwkVRhQDNJj33rIe9qFDFfg7ACIyzvZCGhReuKDbnWf1mSGwBkBVa3+YrU
-	mDMRNvuiDzwewUC+IpaorJ+QpZHIjDOqDYeXp
-X-Gm-Gg: ASbGncvYfHp5eZ3ZzYnQgEOjcsluswWg1yHwxY9cq/A3TPQTUORiE5enkJv15GNlu1h
-	hs9M/MiFZX8jYhAQ4jYzmWMF/qS6IqXJ6Z/QhlvRcZy5X16VaTF/jUnRxYgRlDewc
-X-Google-Smtp-Source: AGHT+IHRmXPiKVksQ+Q/0QXbqfJBa96/TnVG7AgNvAzq10478M87vDfF4wy2b2OQtQNTCiOmKVHSqDgIJgLmrCedgrY=
-X-Received: by 2002:a05:600c:6c8a:b0:436:1811:a79c with SMTP id
- 5b1f17b1804b1-4361dc51b9bmr977485e9.5.1733923852355; Wed, 11 Dec 2024
- 05:30:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfOojM+c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC480C4AF09;
+	Wed, 11 Dec 2024 15:48:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733932096;
+	bh=YLacmmQOff+oT4ZIe+wvYVJYKWjSDhRMK864cvAg1II=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pfOojM+cAe7XzR10RosCRkC50GMmSbyW0dbLpej6mH2vmg4uwZVX9ZDpNGnPsOL+o
+	 XdeuXZ9KznvEy4yZxxn0/wnA6Up6vIxsSiYm7ri9S8RJlYvKP5wQfAAicfBiV7+wHx
+	 zXDm6p8yGY3807+VpDrcLF3vN6wsvoS1IO2K75wkIRaknG3jFOQabXBMo3oeJpN5iz
+	 flgkpkAfVyLDtvI0UTf9k64Fi9vV0fWBIciyDkZMmR0Z8hfMEW0MK1o1MPP5nGYz4P
+	 +MUa56R9TjQrDPb7xU3fsCxT9n4cUt4sB1UoIW15IpH8dqNR14YPuz9IMDrTqS6d4g
+	 UdUjjqSZWvoxA==
+Date: Wed, 11 Dec 2024 15:48:10 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH V2 01/46] arm64/sysreg: Update register fields for
+ ID_AA64MMFR0_EL1
+Message-ID: <409a5ef5-5237-41d9-9cf6-274c010ab2d8@sirena.org.uk>
+References: <20241210055311.780688-1-anshuman.khandual@arm.com>
+ <20241210055311.780688-2-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-5-tabba@google.com>
- <Z1MwAomiLhnMn--k@google.com> <CA+EHjTy6Y6w9RyU2Vn8O+DDviSJf=P-Y4c+xVFqY-3GmHBv3kQ@mail.gmail.com>
- <Z1mTtS9nGvVM-BIq@google.com>
-In-Reply-To: <Z1mTtS9nGvVM-BIq@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Dec 2024 13:30:15 +0000
-Message-ID: <CA+EHjTz6B_8YzreN5EEqh6u-ZGLj0GjBxGe2THCwjWP0RT5KeA@mail.gmail.com>
-Subject: Re: [PATCH v4 04/14] KVM: arm64: Use KVM extension checks for allowed
- protected VM capabilities
-To: Quentin Perret <qperret@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
-	kristina.martsenko@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2I+DX9YYFLWygnpT"
+Content-Disposition: inline
+In-Reply-To: <20241210055311.780688-2-anshuman.khandual@arm.com>
+X-Cookie: Every path has its puddle.
 
-On Wed, 11 Dec 2024 at 13:29, Quentin Perret <qperret@google.com> wrote:
->
-> On Monday 09 Dec 2024 at 08:14:15 (+0000), Fuad Tabba wrote:
-> > Hi Quentin,
-> >
-> > On Fri, 6 Dec 2024 at 17:10, Quentin Perret <qperret@google.com> wrote:
-> > >
-> > > On Monday 02 Dec 2024 at 15:47:31 (+0000), Fuad Tabba wrote:
-> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > > index fb733b36c6c1..59ff6aac514c 100644
-> > > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > > @@ -329,34 +329,20 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
-> > > >
-> > > >       bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
-> > > >
-> > > > -     /*
-> > > > -      * For protected VMs, always allow:
-> > > > -      * - CPU starting in poweroff state
-> > > > -      * - PSCI v0.2
-> > > > -      */
-> > > > -     set_bit(KVM_ARM_VCPU_POWER_OFF, allowed_features);
-> > >
-> > > For my understanding, why do we drop this bit?
-> >
-> > Since the hypervisor is responsible for the power state of protected
-> > VMs. This should either be a separate patch or I should explain it in
-> > the commit message. Any preference?
->
-> Gotcha, perhaps make that its own patch so we have a commit message
-> motivating the change?
 
-Will do.
-/fuad
+--2I+DX9YYFLWygnpT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Tue, Dec 10, 2024 at 11:22:26AM +0530, Anshuman Khandual wrote:
+> This updates ID_AA64MMFR0_EL1.FGT and ID_AA64MMFR0_EL1.PARANGE register
+> fields as per the definitions based on DDI0601 2024-09.
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--2I+DX9YYFLWygnpT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdZtDkACgkQJNaLcl1U
+h9B72Af/d+gjIUWdLm18k49dviMnY4a321sGjl9OHJTUhuUbdXMekpz9ytDLvG1u
+Nc510KWK2itLqRJxSA/At6y9HgJ7UHCbzx6pdiB6I9EPrw1yR/LKSLPz7ErzR6hY
+4meDA9QAX/63Qj0HEOyD8iBXmQq3gIjpIRvQyOmTcm934hit2phWeFRLZ4/u9wWr
+2wR4BVWVxM+JpV61uV0h7IkU62WPdzhuI7UcCcdnQhvmZxUhzaJ7a8QtQhHiBZ1t
+cAzSst4Ngq1wIbkr3cYdlfXtRsNTdb5G2afCOoJUWeK/jhZ9i52ayCtrtgRWuTus
+3JX3K7bRXz9ek3InC7zvffHfagA0uQ==
+=p2f7
+-----END PGP SIGNATURE-----
+
+--2I+DX9YYFLWygnpT--
