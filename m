@@ -1,99 +1,111 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD79423FD14
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 13:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FC123FD04
+	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 13:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733922722; cv=none; b=p6LCIuFKFfVhw5B8WeurnTLKgbJqnCS6C/GR4LmKLzv0BoVHojgOg6ctLVIqSWcOmfsk0RmSDGCCP2wR8c5dSDqvjUfd+HHdXm5bkCJbVqqJBs+wPEHhYQln9DsMhKNt1jmyiqUiFnXVf5hYw6Xg1Jlq/c/DIV5R8XGvgPIysUE=
+	t=1733923772; cv=none; b=fT1V+AulhIRLGC/y5jTfCBcHyqoa5KvCk1ub3OW8uEGUdOJYDqTvVw01SqTtRhSrrFi9tekHKPE1B/qgm60jgXFU05ZIjPdoqRFYCM+W1YWggCjavv5NQT0+DWcsjzUwSOYv7kgvcyexFn2BxNiSLiGggk/qHRDL24KVdO2HvDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733922722; c=relaxed/simple;
-	bh=2bOroIvbtA2JFMR2DeSrnhFbxHGRRbwy2U1x57WiKpc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aJlHMJ9u+92rjjT4Iw+saz2NBnaalah1v89pBwUXej239cqcO3wYC1vNtFdFSimH9TkIlYFeT9eqCEpJvKJjv8AXHbk0N7wxmehXlDZNdng8XdgnTgE8BV+7KU9sob6K2PZpyEUpSSpJj2LSJNETGiaQN6+wCDNqB2UaDzXb2Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=19lnMYJ0; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1733923772; c=relaxed/simple;
+	bh=ezI7OjCcE02zRhevjwMQHQMxZFoMhHMxL6oO1nhKR4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oUCdi4ZuyYO3yXQhU3rCeF+33KBuzBhO43iLja/yd/hwMxv5IVGfduYiN0mk0KosqMUVEsaZTx+ShN6xAL9hUyWLWAZ3Y6hTg55fdC1wQcEbO6QZBKYDYWDvfBzWeUM6Io7zEer3EoFNhWNRq/iGsJikski2WeKPAgxd9IwpdO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MFGUdbff; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="19lnMYJ0"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43621d2dd4cso3115e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 05:12:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MFGUdbff"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa543c4db92so569436266b.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 05:29:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733922719; x=1734527519; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SpgIVXJPCWJq+BvZ7U8OZJJ7fZhImEdZ13gLAjbI154=;
-        b=19lnMYJ0kaQQGBi9I5PbW/XXtQvmxQAYUreW5ZZ10i+3j+itL/AFFoE028KaM0e5UL
-         crAJ7wNcxQ5L9DGP55DN9ADjKquFB4jUAdxkShZ4gY2ClpKEteufzrNqp7DmLo+hw8D8
-         6jrmHxgqdLgJU/2DPOLaxrdf2gTwtgx/dDFxHE8zMP1GyRIC3eNM6UKy9SpkX3pBkv+I
-         IYeBAjZYUWaZkL+PEukqk91qpa2yNtXmNdMPN6iGp98yCfhDFb37KAeNpPf9PWlRg8A3
-         TVF/KTcuwMPM0XbfsU6S/Yw2EuoLcmgfXnHcUxrNMh3hLleeiadwgYPZ0AD8BdBG6+em
-         8dhg==
+        d=google.com; s=20230601; t=1733923769; x=1734528569; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pZ8WmE2oVMcuY+D5rgASzXIuAkJx2FsjYv4FOWBBAgs=;
+        b=MFGUdbff3UvwkvKU6IBkMn34jIi+JNojevFby4cfFdj4qNInpG4omvI//xXMFPCNsf
+         raM7ZgpMHJy7h8GO/bAjYab4Wtf31KgG94cozAhcfpsUh/lC2Sedn3fRT7tsduysEEVQ
+         rW1RGvWDl1L1/WJYxmazZ6/r+HODrDUD7WB5aQ3Qkl7yF0VK6nJTU9oXvvSUYNhAqaZF
+         Vr3X/Bp3+GCnCF3Ntqb4sOVDR8EMvhzJ9e+NXMxvD2TMhiNa2aOqymxFTJlA197lBMar
+         dT0h6MsM1C9SRv530IqdXqS3BMU2F3NSAbGaa0kvHtGmGrY0OnEiHMdr5rUd5KJHQ1Kw
+         ECPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733922719; x=1734527519;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SpgIVXJPCWJq+BvZ7U8OZJJ7fZhImEdZ13gLAjbI154=;
-        b=bP6A9bly8HYK684Mwd48lWxrR19MkrC5hCI35AffBJ6VqODPNN41KdqAR8UJTc3/V1
-         1Rc12km0X/sJ7TRJdW0NT1JXsZyfj9fIDl7GUV6R3HNsOpOgklf6Wfxq5wvBnqxL/ax0
-         Wa4560yyT+oBnvPUvydiJNJjTYWcD8sg1SZrM5Yc8jvMuxx5Z2/l+Ntlvy/tQqcqD4Rn
-         nHPi7uM75BEIox4LiZ0iJEks93m1Klt6t/pby70IsQmvEJcnwNbIRMbmknGgnb0X6vH3
-         J2vBDM+i8L2qbNxD+NAUITMEh3dR1WUEQqCiht74MvE05CcoZIuzsQfeacDq8bFMjwOp
-         87Mg==
-X-Gm-Message-State: AOJu0YxkNaI70E3aN/vBk+sFWy/aDpko3VxxBKFA5zL+atfc2NtkOx9C
-	poTGM3yCyiY5MBNpasGqCG8HbEsj4oxz8geEP5CMkLYePEWNvAeC17bBFyaItvPnLcqaCZ6IBTw
-	qk2Hn7F+EhFDWtJAYPuUMQJvqGpoIP+po6x1b
-X-Gm-Gg: ASbGncsy7+k2ba46KCJm3S5eLormF2T9d+ZoStbhgYZWB8QZtq3hl4eM6++dd6zIBYK
-	c46Nj99+Kl1c6/70mBhDmWcBmUbzPdeZ2bWhcs871XMqyhNsOJYpy3RNfHpypkWVd
-X-Google-Smtp-Source: AGHT+IEfuetELzIWhfEeFRhYatZdwR7CYhn8kG7Vcp2ICa4z5Mba1kHJ461NL/L61xviWIJRhaUMxTdQVlaJz2Q/5Lg=
-X-Received: by 2002:a05:600c:6c8a:b0:436:1811:a79c with SMTP id
- 5b1f17b1804b1-4361dc51b9bmr958645e9.5.1733922718921; Wed, 11 Dec 2024
- 05:11:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733923769; x=1734528569;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pZ8WmE2oVMcuY+D5rgASzXIuAkJx2FsjYv4FOWBBAgs=;
+        b=RGctfMV+y6A1zkwRsBmCo63qX56Pzv/i8OMNSEjsgpLdnv+PZUXTlYf84NZz4XH8dp
+         ZK9q+k1CyXg+iOEJl6rxUBJ1zSYzZM/ohOT2Iq0yQ9WJ0r4vGLAbZ6YjnmhAeXZ8F592
+         Wn8/cXBLwZ9OhVru0Ij9efTt4lp9KW4Fi8zKuJa/JSFBicSiUcVtzU6qw/H3IyAoMRod
+         tnly59qyXOlH1SdqXx1M5gLkNOx8SiJPRktPS4N4h9xUj56SxNGoQw1kmrHzJddSE0rv
+         CBn8WpvHQWVBHdfPC6k+5OPChS4I6iMm5Asrm/lgB00I1/Gq5Aoz3MVwdoASaU0gZHAP
+         /a/g==
+X-Gm-Message-State: AOJu0YzMDxFEt30e7ugiYRwP6D8xViSFk0BtfjBefBHHi78Jgi0FmvM0
+	vSlBOf1dcRCYcGh9kj5dPvtC4cnKiYk44IH9t2r+isSR2ZQ4yYIAG0L+6ODQeg==
+X-Gm-Gg: ASbGnct+Gc3WIW+YdtCYrP7t0Qm+DgggDr9fdilPEE09+xQyilTuWxI3UbZGtEU6v2E
+	+KwZqLCTQsDg0vhlGG42Ktde3QouHEe4Ldbd/wCQnakcLhRCAbZ9FpKUOAFIWb3KrArL5TKrJm0
+	HizOwPoGs4DmJCzzIfX0vAAJkkJN7HlJ6WIuoZhH9S5YSgRw6g/zAq7g+Z3FuvmhPhB4+tupybY
+	veavZ59cY0UWfcXztBexNv2Rp9YJjL/IPu98t40AAMpnZh2I9hBY5VK/nwFlNQOnzsOxw0XDPT4
+	H/UAf6ZymWN0
+X-Google-Smtp-Source: AGHT+IHHtuhS5qRK2Vs4YR08EkU42S9jU4/gGJNdMqiKWPhEwaUH1bEnXVsl3kwAZG7CQUix98OaLQ==
+X-Received: by 2002:a17:907:7703:b0:aa6:74a9:ce6e with SMTP id a640c23a62f3a-aa6b1179ab6mr244042966b.16.1733923769090;
+        Wed, 11 Dec 2024 05:29:29 -0800 (PST)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa685669acesm483241866b.189.2024.12.11.05.29.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 05:29:28 -0800 (PST)
+Date: Wed, 11 Dec 2024 13:29:25 +0000
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org,
+	kristina.martsenko@arm.com
+Subject: Re: [PATCH v4 04/14] KVM: arm64: Use KVM extension checks for
+ allowed protected VM capabilities
+Message-ID: <Z1mTtS9nGvVM-BIq@google.com>
+References: <20241202154742.3611749-1-tabba@google.com>
+ <20241202154742.3611749-5-tabba@google.com>
+ <Z1MwAomiLhnMn--k@google.com>
+ <CA+EHjTy6Y6w9RyU2Vn8O+DDviSJf=P-Y4c+xVFqY-3GmHBv3kQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-8-tabba@google.com>
- <Z1mGzwZqVQCWWSTX@google.com>
-In-Reply-To: <Z1mGzwZqVQCWWSTX@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Dec 2024 13:11:22 +0000
-Message-ID: <CA+EHjTzaVadZgO++bSYopQpy8DyfP1W8ytoOd6Q7yy+yEVqfeA@mail.gmail.com>
-Subject: Re: [PATCH v4 07/14] KVM: arm64: Rework specifying restricted
- features for protected VMs
-To: Quentin Perret <qperret@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
-	kristina.martsenko@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTy6Y6w9RyU2Vn8O+DDviSJf=P-Y4c+xVFqY-3GmHBv3kQ@mail.gmail.com>
 
-On Wed, 11 Dec 2024 at 12:34, Quentin Perret <qperret@google.com> wrote:
->
-> On Monday 02 Dec 2024 at 15:47:34 (+0000), Fuad Tabba wrote:
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index f333b189fb43..230b0638f0c2 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1422,6 +1422,7 @@ static inline bool __vcpu_has_feature(const struct kvm_arch *ka, int feature)
-> >       return test_bit(feature, ka->vcpu_features);
-> >  }
+On Monday 09 Dec 2024 at 08:14:15 (+0000), Fuad Tabba wrote:
+> Hi Quentin,
+> 
+> On Fri, 6 Dec 2024 at 17:10, Quentin Perret <qperret@google.com> wrote:
 > >
-> > +#define kvm_vcpu_has_feature(k, f)   __vcpu_has_feature(&(k)->arch, (f))
-> >  #define vcpu_has_feature(v, f)       __vcpu_has_feature(&(v)->kvm->arch, (f))
->
-> Nit: I see nested uses the raw __vcpu_has_feature() helper, so I guess
-> we should try and be consistent. Either way works, we can do the same
-> thing in sys_regs.c, or convert nested.c to use kvm_vcpu_has_feature().
+> > On Monday 02 Dec 2024 at 15:47:31 (+0000), Fuad Tabba wrote:
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > index fb733b36c6c1..59ff6aac514c 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > @@ -329,34 +329,20 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
+> > >
+> > >       bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
+> > >
+> > > -     /*
+> > > -      * For protected VMs, always allow:
+> > > -      * - CPU starting in poweroff state
+> > > -      * - PSCI v0.2
+> > > -      */
+> > > -     set_bit(KVM_ARM_VCPU_POWER_OFF, allowed_features);
+> >
+> > For my understanding, why do we drop this bit?
+> 
+> Since the hypervisor is responsible for the power state of protected
+> VMs. This should either be a separate patch or I should explain it in
+> the commit message. Any preference?
 
-I'll add a patch on the respin to fix the nested callers. The lines
-that call these macros/helpers are already quite long, and even though
-it will add a bit of churn, imo the resulting code is more readable
-with a kvm_vcpu_has_feature() helper.
-
-Cheers,
-/fuad
+Gotcha, perhaps make that its own patch so we have a commit message
+motivating the change?
