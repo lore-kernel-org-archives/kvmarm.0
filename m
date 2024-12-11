@@ -1,63 +1,62 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66701E9B03
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 09:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD21C236FAA
+	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 10:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733911094; cv=none; b=hphiT4225mGw0tuyobKkbUko9USxPFf/o+1z80c6/jhKm3loMBuBO72uZwDTNyoz+SuCTozNP2MrNzRXP/WuFNRrj4KPXpBPlmqo5JPVxWKr0gSKVcET1GqDYjIeesD5G/WPykROY5kFvILumio/X3YvjJVGeq0zK/cZp5UNyMQ=
+	t=1733911412; cv=none; b=aiBTseqZQzW1qFpAp86tIPP0t5CJ9RWPD/aZO8HS0gxIV1gDdOeNg7ivWTNTH92ME0D7f0ZF3zUSIXD+9DeyJFbDkES3CZc1ySjv15m6GgK+D/W40/50Wdp4Cn6TG9UhWMtTd0ZIlar3KymXoPh/Qzz88K3LIaV9IleCE/iPoVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733911094; c=relaxed/simple;
-	bh=y55wIex4pQa90iKPixPdpPl4dg3F27VPnM0gGblWQU0=;
+	s=arc-20240116; t=1733911412; c=relaxed/simple;
+	bh=I7e2UE0n90FPZgbYCqwjYe9I0fH+uvt69aDGJHawIS8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lsc644qNFOIc4PZtgV9/P6/VWWm3twnFxnE749xJo7Ym7IWssLvIw51aR73d6SEKgoUlJVuRf9h/CnIFlHW4LFBHF/BA6Q7iPdmmmaGZV02V6bJZjUj4w2iKiVITd0GvYdaB8/DvVivMFzw0QiK8gTK5u6gsNfE7tHNCWD3Vd2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x0ClyGFQ; arc=none smtp.client-ip=209.85.218.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=fvTbsbPb+ReXCEuFJxGBALTsZ6oXOfRok84kCOt5RgPWLkaAYGO6TkS0rH1G6B+iUcNN5yo2kWpzTC3B2/gIC1COr8rjYodzvJ95Tv9UpOfuq/tZSPMHw44UAkSO8gxcqXva+HO89MEh4V096KIpNxzP/vL283rvtO3Xwtdq3Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XxQP4KXZ; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x0ClyGFQ"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aa696d3901bso502292166b.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 01:58:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XxQP4KXZ"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso5203444a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 02:03:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733911091; x=1734515891; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733911409; x=1734516209; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NoxTFED1OV6IIvC50S+pNWi2oVo0JYbWqlKUFL/WbNs=;
-        b=x0ClyGFQMT8LlqkAp+0VFWhrfoWPXSKThXBimiCSxZYtfYtOhKttJpX7k4KbXDwMWN
-         6iEW+cjSI2dOCU9HEpF6Vyr21y3oMMI8ruwACD2WWJkHzD4Jp6H62c00i7M+dev1pr8/
-         OPQ6cpxV74SakQe4/KsqNqJ+t4bSPgEPzz/ZmHFraaOdfzTYLVcnX2IDvlztaJA1NRcJ
-         Wg2susPyb5z+wJLHTstJPwB1drWHEDvWlJb+9Wl0kWrmoH0Nu+42+f2JgONVoSgN/Hzu
-         O987HhrAA21FV4P6yaZ3UYntYESKyt349qSAW0ecqQbE529ZPTG9vQwdumPc2luaK+NN
-         2neQ==
+        bh=uCeBFQbxDNcGU8eAxUj/y7sI+rg04GZNTgWblO08pkI=;
+        b=XxQP4KXZEggk+n/H43B9NsILjt/0aiD0NsQEONaWrDUrpxG3j6V3b6/nKUj5R56fMt
+         OMypxZw3yqR+4z2jP+ywTz6Dq7+zUsuRYNpbB5bU3gDGsyHOeCXonguOa1AF12MC//6L
+         BbtfPaQxY2fNlLL/HZA9Ztuu8VshbWP52I7/rB9rT2L6ldPDyAgydOD678YjrERs0xeJ
+         RXro7HLzSX7pK9rrW3nsFCozkROJyNJDW4Cx9nzf1lkH4Zn/64bh03g5Y/asAxUu1zTQ
+         2dlwOam6lVXWmkekVS3vUZS/jIaYGVcKhzPur4M9Q4cI5ugwsYZ/3Dp2vbMzV3vkSowk
+         MJ4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733911091; x=1734515891;
+        d=1e100.net; s=20230601; t=1733911409; x=1734516209;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NoxTFED1OV6IIvC50S+pNWi2oVo0JYbWqlKUFL/WbNs=;
-        b=sZsAnVMGcJOU66RYkulXrz8Czg7yMGP8exN189fArCeZMC3+m/pjRrrXAWictsVawC
-         +zH59O2htnKcFjVFHjP/7tDZlxFu1mB1vCpQuIQkX97DR4aJwGwkA5dLPeDopCdFgB+1
-         TEErbfb3GSrOX/OT1VpOR2uit7BzkCZbu+QfLcxgwjeCt8WqHZbZnOwpzwrau2ZC9qm4
-         uSWRWl525cFkxYRCuff/ZnhwQpKw9zF3RtfoeQ1ckkrV4lQlD47y+cpPwU/sYMb2vrCO
-         uTzbbe13PIJz1GNqy6ctU4J2yrbrQ3D6iHpJFP2X4Dz8fa2jxxHzS3adYj92czBVgy0m
-         mm6g==
-X-Forwarded-Encrypted: i=1; AJvYcCX0GayKEZvpLBXS8htZ24sUmaTHxcNwZNV62/zkRHrdXkT7ImrxqgXRXoMH1D/a3Y2Ieyb+Xk4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzIvNikMfzbcDmiKeJ45/6N90qs47rPwqnDOjC5A4hTfwJCQka1
-	yszkUcaRYb7JtfcwIiLfjJCnuo9jPbzRukCA1JNHONPkDSb5BJrFwUDOer/RcPOxfZMhUmHzpUO
-	C36rs
-X-Gm-Gg: ASbGncsqcMr7kWp8WDja+IgvWMD5LqHh2W57EoWHF+SYnRH9dUMrSdr0W6niDcYTx/K
-	t0hrS7HBlWsvPjzdGIA6//aGaEfVbjv7MnYyqBu/g3JjOxet+bhrz4IPBzRmvKXefDxyPN6NYi0
-	jNGFYJQrRB7HLQu74kSlObbnODmFmo8OYWNk+vYCLALtyjXtqRbwtg7R8dHbVGlB/47SqWH24/K
-	89bxtUquvik3nk+DCFIB9oyfpBAbONgnF8I1vr+LYfsIx1NPXUk90DEZmTMfarBxuQUlej4W33b
-	Dwc4gsa+p+m8
-X-Google-Smtp-Source: AGHT+IF/0ntKZsypMhJqLoHZz7Y4KeXzGESSzQOBIbmcxUlmHH3DEZpbKATmONAsAAvwZztD3FrYtg==
-X-Received: by 2002:a17:907:7707:b0:aa6:79fa:b483 with SMTP id a640c23a62f3a-aa6b0f1f0c0mr192342966b.0.1733911090953;
-        Wed, 11 Dec 2024 01:58:10 -0800 (PST)
+        bh=uCeBFQbxDNcGU8eAxUj/y7sI+rg04GZNTgWblO08pkI=;
+        b=YL++d8+49FK2AVcruDkvU9Y4ZOzHxs7UU5n5XRinpfmjOi8vMZ06HsytLx3igQENNm
+         gwLN0fHYBAYNKfMuQaZw016a2WZMgrEz4bjvMj5Cw8jTZNvMEpYK5hcrpFDF0OtJu2ND
+         jmG35Luyox9YHpY69qh7ks+t+9yjRJwzMKZffon7t/COJlYOHRzjpQ3sj17In2GnPeTE
+         kLiPaQ4mZGfTNCgHJrhc9zBgmI62ryF910WOS2Vx96aB1CJezoRC+0+vNl8zIayALRys
+         rBI/F+bu8b2uZd2oiRc6OPfzhVfyi/4cHu6Z3QFKUYxNjMB99RLmjHPWknbHsAyc2vZX
+         RpZw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvDnrkEfi6N+E6SFFIqOmZH4J1EAquc6y0BKm5kKsPdyv9Q/29jUxKLnE5ncMr9gXXchbrhRI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz63Hzc40uQyZmNsp0Ks+HReyPO2N1NuSrldzlGiHJFyhE0j/NU
+	BYhZTKtudhTE3Ojm7U5w52HpkbM9NF4jjt1Zo+pcRFMOvC+6rZFa4nBTC/ijfQ==
+X-Gm-Gg: ASbGncs1onDLbOQ+wwlvq0VtoPZ371uye8BVSHZvSFvrpJNXYnBko80pQyaI4nSjGgt
+	YoBfL8XuC7w/A4eZ4L5OlXDCvXuHtk3E2v4WH/2aV4Rja92ElzOB6gHIv5AF2NrAB/LtqwjK14Z
+	j0lLhLxQrlBNqXbZVP9dbgKq2Y0X6YHNyM3ZSsaNvoIZTOcidZ2n1DvBf2QIberEzPQ9mywvhba
+	YdYeaV1v2jNu9NonlcY7lPsCdawVSdZvfbkWf0FW0DX4xjdj3+qm8EfQnBZKezh6OldoL4yAJDr
+	NAe39OFS5yR8
+X-Google-Smtp-Source: AGHT+IFlnlrpokPXa68KO5qLY5+q1kB5CE8QSEZpGK7a+vw6fuvmt14yba9TOC/UESn8Ss3rIxUq4w==
+X-Received: by 2002:a17:906:30d1:b0:aa6:6e41:ea55 with SMTP id a640c23a62f3a-aa6b112c3c6mr209577866b.7.1733911408899;
+        Wed, 11 Dec 2024 02:03:28 -0800 (PST)
 Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa68880b3f7sm432885166b.92.2024.12.11.01.58.10
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa68880b3f7sm433504366b.92.2024.12.11.02.03.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 01:58:10 -0800 (PST)
-Date: Wed, 11 Dec 2024 09:58:07 +0000
+        Wed, 11 Dec 2024 02:03:28 -0800 (PST)
+Date: Wed, 11 Dec 2024 10:03:24 +0000
 From: Quentin Perret <qperret@google.com>
 To: Fuad Tabba <tabba@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
@@ -70,13 +69,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Sebastian Ene <sebastianene@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 10/18] KVM: arm64: Introduce __pkvm_host_share_guest()
-Message-ID: <Z1liL3BtoPnSyvlh@google.com>
+Subject: Re: [PATCH v2 16/18] KVM: arm64: Introduce __pkvm_tlb_flush_vmid()
+Message-ID: <Z1ljbPFsUdUC8AD3@google.com>
 References: <20241203103735.2267589-1-qperret@google.com>
- <20241203103735.2267589-11-qperret@google.com>
- <CA+EHjTwHSyQ1FJc7axbLNuBxSWpRVE6brb34nO+F59=QRmfQEg@mail.gmail.com>
- <Z1hhHRdpCZcLs046@google.com>
- <CA+EHjTw4GX3j_ssN-tWnf780xkvyKO5mBN6fnvXeWvQcBDmcNg@mail.gmail.com>
+ <20241203103735.2267589-17-qperret@google.com>
+ <CA+EHjTw_e_q5TFkgxvVDKxwj-C5S0Hd1OfVO4_FitrB8_J2Rpw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -85,61 +82,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTw4GX3j_ssN-tWnf780xkvyKO5mBN6fnvXeWvQcBDmcNg@mail.gmail.com>
+In-Reply-To: <CA+EHjTw_e_q5TFkgxvVDKxwj-C5S0Hd1OfVO4_FitrB8_J2Rpw@mail.gmail.com>
 
-On Tuesday 10 Dec 2024 at 15:51:01 (+0000), Fuad Tabba wrote:
-> On Tue, 10 Dec 2024 at 15:41, Quentin Perret <qperret@google.com> wrote:
-> > > Initially I thought the comment was related to the warning below,
-> > > which confused me.
-> >
-> > It actually is about the warning below :-)
-> >
-> > > Now I think what you're trying to say is that we'll
-> > > allow the share, and the (unrelated to the comment) warning is to
-> > > ensure that the PKVM_PAGE_SHARED_OWNED is consistent with the share
-> > > count.
-> >
-> > So, the only case where the host should ever attempt do use
-> > __pkvm_host_share_guest() on a page that is already shared is for a page
-> > already shared *with an np-guest*. The page->host_share_guest_count being
-> > elevated is the easiest way to check that the page is indeed in that
-> > state, hence the warning.
-> >
-> > If for example the host was trying to share with an np-guest a page that
-> > is currently shared with the hypervisor, that check would fail. We can
-> > discuss whether or not we would want to allow it, but for now there is
-> > strictly no need for it so I went with the restrictive option. We can
-> > relax that constraint later if need be.
-> >
-> > > I think what you should have here, which would work better with the
-> > > comment, is something like:
-> > >
-> > >                 /* Only host to np-guest multi-sharing is tolerated */
-> > > +               if (pkvm_hyp_vcpu_is_protected(vcpu))
-> > > +                       return -EPERM;
-> > >
-> > > That would even make the comment unnecessary.
-> >
-> > I would prefer not adding this here, handle___pkvm_host_share_guest() in
-> > hyp-main.c already does that for us.
+On Tuesday 10 Dec 2024 at 15:23:02 (+0000), Fuad Tabba wrote:
+> Hi Quentin,
 > 
-> I understand now, and I agree that an additional check isn't
-> necessary. Could you clarify the comment though? It's the word "only"
-> that threw me off, since to me it implied that the check was enforcing
-> the word "only". Maybe:
+> On Tue, 3 Dec 2024 at 10:38, Quentin Perret <qperret@google.com> wrote:
+> >
+> > Introduce a new hypercall to flush the TLBs of non-protected guests. The
+> > host kernel will be responsible for issuing this hypercall after changing
+> > stage-2 permissions using the __pkvm_host_relax_guest_perms() or
+> > __pkvm_host_wrprotect_guest() paths. This is left under the host's
+> > responsibility for performance reasons.
+> >
+> > Note however that the TLB maintenance for all *unmap* operations still
+> > remains entirely under the hypervisor's responsibility for security
+> > reasons -- an unmapped page may be donated to another entity, so a stale
+> > TLB entry could be used to leak private data.
+> >
+> > Signed-off-by: Quentin Perret <qperret@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h   |  1 +
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 17 +++++++++++++++++
+> >  2 files changed, 18 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index 6178e12a0dbc..df6237d0459c 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -87,6 +87,7 @@ enum __kvm_host_smccc_func {
+> >         __KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
+> >         __KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+> >         __KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+> > +       __KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+> >  };
+> >
+> >  #define DECLARE_KVM_VHE_SYM(sym)       extern char sym[]
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > index de0012a75827..219d7fb850ec 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -398,6 +398,22 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+> >         __kvm_tlb_flush_vmid(kern_hyp_va(mmu));
+> >  }
+> >
+> > +static void handle___pkvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +       DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
+> > +       struct pkvm_hyp_vm *hyp_vm;
+> > +
+> > +       if (!is_protected_kvm_enabled())
+> > +               return;
+> > +
+> > +       hyp_vm = get_pkvm_hyp_vm(handle);
+> > +       if (!hyp_vm)
+> > +               return;
+> > +
+> > +       __kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
+> > +       put_pkvm_hyp_vm(hyp_vm);
+> > +}
 > 
-> >                 /* Tolerate host to np-guest multi-sharing. */
+> Since this is practically the same as kvm_tlb_flush_vmid(), does it
+> make sense to modify that instead (handle___kvm_tlb_flush_vmid()) to
+> do the right thing depending on whether pkvm is enabled? Thinking as
+> well for the future in case we want to support the rest of the
+> kvm_tlb_flush_vmid_*().
 
-I guess 'only' is somewhat important, it is the _only_ type of
-multi-sharing that we allow and the check enforces precisely that. The
-WARN_ON() will be triggered for any other type of multi-sharing, so we
-are really checking that _only_ np-guest multi-sharing goes through.
+I considered it, but the two implementations want different arguments --
+pkvm wants the handle while standard KVM uses the kvm struct address
+directly. I had an implementation at some point that multiplexed the
+implementations on a single HVC (we'd interpret the arguments
+differently depending on pKVM being enabled or not) but that felt more
+error prone than simply having two HVCs.
 
-Perhaps the confusing part is that the code as-is relies on WARN_ON()
-being fatal for the enforcement. Would it help if I changed the 'break'
-statement right after to 'fallthrough' so we proceed to return -EPERM?
-In practice we won't return anything as the hypervisor will panic, but
-I presume it is better from a logic perspective.
-
-Cheers,
-Quentin
+Happy to reconsider if we can find a good way to make it work though.
