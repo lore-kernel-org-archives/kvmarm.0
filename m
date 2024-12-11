@@ -1,41 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12CD1BC085;
-	Wed, 11 Dec 2024 22:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6D1F4E3D;
+	Wed, 11 Dec 2024 23:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733957978; cv=none; b=BjtrPMFBHtu/khAFP9a6OC52EvxmDdI0/HDXZPbWNa0pOEgMpCwD4u6qWB/Xdqyco3aPFtp1DVaY9mNuO9zJw6XIrJ5hIJRbjdSh5Us0LxNoXBzwQ8JAuGpKtsrMeIGLdzWIlBUh0qZm4b3O1R6pMnJpjbSsp27Az4vBXk70KSU=
+	t=1733960668; cv=none; b=d35+hLkyKFHrG4tODsswPV+5llsTlJOK/jAE0byBLRbeGZEJO/N0d7EJ6cnOsePBG1WbpH3OH58RN/4L25iTZ2MQ7hbUj7FGpAo06K26aWbRh2TmEA25kTvIK4o2cTfF79cyOIU/eyiDizdYc/IrFb3gTG/9Bq6I6ZNUp99W1kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733957978; c=relaxed/simple;
-	bh=ba8OhYJWZ7/RdSdR8zo6eTaxvZtkyE7pWbYivefWwDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k6Lj7y3ivRb1p+jom7HfSLubWS4Nzgp80mDWPJ255dgyKmJU5+PUAqjyBdst2H41eqNUI5bBHZd7HOPFOx46BoV0LHklq8KAJOSEz0XUXlCU6okAl1/Z2P5yKyBYxG1+w462NUxf/y2ZAsAXpxCBP89rwOiX8yNJoWYh7H3Banc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaW+15dg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733960668; c=relaxed/simple;
+	bh=NhjoOwOjzquX2bXnZzEYItVz/He94fvuHxQEX3N9G6E=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UwTiOrt24GKzOEw0GBP4VJ7drS0qZUUpDdDIOwL9iC8uaMQjdaEHqWPZE6SzynLuFcM/PdEbl7ms2L89T6/0ejMA8YdoefyaIQSV14xcb8Ea8OUicz5HUQxLKq2QtrrxCoTVOiphvml5dl/JJyVinyYqkFxdrPd/Odknr2IAPTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Loz5Dw5d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaW+15dg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 544C4C4CED2;
-	Wed, 11 Dec 2024 22:59:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Loz5Dw5d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F2BC4AF0B;
+	Wed, 11 Dec 2024 23:44:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733957977;
-	bh=ba8OhYJWZ7/RdSdR8zo6eTaxvZtkyE7pWbYivefWwDo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WaW+15dgE5AhR7mM92AiA6N5aJE7lkhwrwK16HZxjs4UoJDius5M1h9sMsfQmFYRJ
-	 k4G+vsfFOATgIp4A9IWmEDFXj2uAEANp3yfKGYKxdInMn8EgftnquPb91kaVHKroiW
-	 ro09RxLYMw8dcZu/Ii/Ny2j9diSMfFbubvjCkbampS7gmb5oXyIHzZ3HezADhQxLsJ
-	 kLtQmKUCKChmXo1gLDb5N9G6fk88uyjFB1OdDva8/FHvdXnzTcnimD5ILgDGNoI//6
-	 Mvq/J5aBVmgX0czKCB9R0vqUxmSaexbQItgIfnNj3BUQUqlWpcYI61Sjqn3U+6acYH
-	 upCxWWuLsTdGg==
-Date: Wed, 11 Dec 2024 22:59:32 +0000
+	s=k20201202; t=1733960665;
+	bh=NhjoOwOjzquX2bXnZzEYItVz/He94fvuHxQEX3N9G6E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Loz5Dw5dkLz7Jykt2rrpTouLZH3Gs2C/w+EJHtak+Jf5fXazB1SbzLsbJpNdDRJy0
+	 7WNZGb8AsPd0kZ9xWfJOiq6kBzVsce3R76h6EYpxnbBt46GBBm7d/qKfzrWc5i6PT6
+	 nxt0d3Omjq38QqbVNnIHZCTx8Ui3jJRd39GMZqHAshT/eX95+Uah3Ic4i7ZvQD1Wwo
+	 RMdpx+SAc/VfXWt0VOB1dq8466Ijf9B5iV4xalUTxZA58O4w12gZgdGnHBmEOuvaK4
+	 16pOWO7IF3lLGYIr5pZ8YvDT6ifmOIH05g7L2tTzD8Bk22cVbvNn9TMXzkaHxCs7wi
+	 pFoRm8rUUl95g==
 From: Will Deacon <will@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, apatel@ventanamicro.com,
-	andre.przywara@arm.com, suzuki.poulose@arm.com,
+To: julien.thierry.kdev@gmail.com,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	apatel@ventanamicro.com,
+	andre.przywara@arm.com,
+	suzuki.poulose@arm.com,
 	s.abdollahi22@imperial.ac.uk
 Subject: Re: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
-Message-ID: <20241211225931.GC17836@willie-the-truck>
+Date: Wed, 11 Dec 2024 23:44:14 +0000
+Message-Id: <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20241128151246.10858-1-alexandru.elisei@arm.com>
 References: <20241128151246.10858-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -43,12 +53,10 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241128151246.10858-1-alexandru.elisei@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 28, 2024 at 03:12:42PM +0000, Alexandru Elisei wrote:
+On Thu, 28 Nov 2024 15:12:42 +0000, Alexandru Elisei wrote:
 > (resending because I accidently only sent the cover letter, sorry for that)
 > 
 > The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
@@ -66,17 +74,23 @@ On Thu, Nov 28, 2024 at 03:12:42PM +0000, Alexandru Elisei wrote:
 > such a large initrd instead of a disk image with virtio, then replacing
 > SZ_256M with SZ_512M locally doesn't look like a big ask.
 > 
-> On the other hand, if there are no users that rely on the current payload
-> layout, increasing the memory region size to 512MB to allow for more
-> unusual use cases, while still maintaining compatibility with older
-> kernels, doesn't seem unreasonable to me.
-> 
-> Please comment, I don't feel strongly either way - I'll happy drop the last
-> patch if there are objections.
+> [...]
 
-Well, I won't reject an imperial.ac.uk patch on a hunch, so let's go for
-the whole lot and see if anybody complains!
+Applied to arm64 (sina), thanks!
 
-I'll fix the indentation issue spotted by Drew when applying (thanks!).
+[1/4] arm: Fix off-by-one errors when computing payload memory layout
+      https://git.kernel.org/arm64/c/167aa1e
+[2/4] arm: Check return value for host_to_guest_flat()
+      https://git.kernel.org/arm64/c/ca57fb6
+[3/4] arm64: Use the kernel header image_size when loading into memory
+      https://git.kernel.org/arm64/c/32345de
+[4/4] arm64: Increase the payload memory region size to 512MB
+      https://git.kernel.org/arm64/c/9b26a8e
 
+Cheers,
+-- 
 Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
