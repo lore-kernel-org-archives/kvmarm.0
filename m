@@ -1,61 +1,61 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52D1238E23
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 12:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E469225A52
+	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 12:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733920470; cv=none; b=ZHlLzAPebJzuF92yEk+VtFazM592lSzLVwRwgagsSqSbl9rOg9lXbwz0v/BIc/2XPZGj94y0vLyRh5GZi4so77Zyhq994+5Lq0pMJqBTAarMx5apncAcUX3www2x61FqYB/EQ3h238ZlV4jFB4026+mIBYKWihKE1ZA07Nw7z3g=
+	t=1733920700; cv=none; b=nuuKbLU8ZpVllti8kPKzRbTtUxw8tSNzyODGLxJ6214Ez/NkDh6kntMrkbk5hZQ5Mp2xc5yPZQaHGIotXQCQdsDF4yNs0rUYBXSSbsn44ulxJDl0vfdjugPQFCuroX3iwwEzy75m2LXwq1P2aeGEEQeXQtXkBZo9ChgZIJmehP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733920470; c=relaxed/simple;
-	bh=6TfHgc0zUQff+agx/i3rd8oWAsQO/SIH9JYUBfgRkFg=;
+	s=arc-20240116; t=1733920700; c=relaxed/simple;
+	bh=d8QwBI5WuN/+dH4l3O0PLt+SRsNxppzG4OgEwivjAdQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e96622W8UXBQ3g1ucpthYaGKlhxvUOD6Y3ICFMQJCLxU01PeB4P76+rlcFYcU01W3VZlQmic6pk/k7Pt86FeFzXTng3a2UXQwS7xU+Nj6/gQg2Ym5mw13IKOVzkV1osn4v2msm5tAA5HZabbFRuxHH7LCj3txsIXrSZv3lOsb68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ai2HwDql; arc=none smtp.client-ip=209.85.218.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=r8oFD9AkfAM0vzruvNurVQJrzVThqdN6ZPswXJ1t7sA9XYMwCTs11vGQEFr/TtzLF7+3OAx1oD+xfuYp5bzezmi14k/McIQojEbxqFxaWo9h2xaBUjo/6TWw7zwAgaGREDlWvGv7cAXb3Uv9E4id5954+p+Mh3oBuA1VVioEIJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mPyj/H/f; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ai2HwDql"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa68b513abcso584022266b.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 04:34:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mPyj/H/f"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa69251292dso548237766b.2
+        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 04:38:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733920467; x=1734525267; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733920697; x=1734525497; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tia9vB659w6sJFo+z8gVVhw9SCVZDEDlbolaVohvnm0=;
-        b=ai2HwDqlZx3n9f1mz+14a8LIS4c8QqHbiY607m7r7HHTJFrKtJbuHLQeQBU9Pg6jOe
-         Fxj4iq5JVluL4uDR9S34FybWplCmdc7p6ieFefjyDkMHu43sVwBFuTuE3m7QZa4coBvR
-         iFcbDrX2GsrYl+kh5BuntZp2RHP+zC7jJtDbrSi8f8kCRL+p3gHt2TTilbQhpUWUBBNx
-         SIcO0Q0AIogDXFv6bkJgpcM+q2+i/mayIuAweoQjDT9NqVYCkc2m+dZoiYmkiW61/v25
-         MEB1PeCOJ5DIia6x+UT1FvvWhAH6ZTZbI8qhQwomr6j4N9S4cuB3495c5opg7Xeu0Pe0
-         8imw==
+        bh=4/2Xaa3Dzt+5ztTkftxM7MuahK+LJjUTZ502uY5Dxyc=;
+        b=mPyj/H/f7gCp71Ef3U1EgpBhQTXuh2u2RI7yyCwFIln9coLYQGbbNk7TFNP0lHu0jn
+         jf/CqU/z//g1LlQ0QFnMvb+x+b0ivaYPzrnlk6JgbUVaDLhUPQOuQ97wRb+a+39eckDc
+         lnDsfBE8v88J3426ODpq/08sdIbOROKiPN45IirJjnunAuFo69x1qUi4RYNWBgJ8QRV9
+         QSDNbK4Gon+97DCrMNFXt5k6mAPQFnusej5W9JWpW0wjPDy/Ox77yy7kGcrnMd9n/xuN
+         QLZm38FAWS2sQPhwXTjqD6bii42rP8X5XXQbDCv4QlehGv4JVUOmoTqV28HYotp5OrQM
+         wQlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733920467; x=1734525267;
+        d=1e100.net; s=20230601; t=1733920697; x=1734525497;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tia9vB659w6sJFo+z8gVVhw9SCVZDEDlbolaVohvnm0=;
-        b=QrsMVnHXvzOrqPPf3UaXIjnCH+aKFLCK0Xytzye2GsKzXpvUBk04L/lQWxv5xaQVEz
-         QlfJkuf50NuTDbIP31Y8vCNpBGHPBVNdY5WRBdnnKEidwY9lbRdUwKT05Bj87ul1x/Fj
-         Vt2+BVqhqLoc/4j2QcXQTkTgp78Pdp57Un1exKpLWoOBNFLqRnB7oFeVZSN3uM5rbtW5
-         RzzglL66zUC8ponDFVJZtKKmzbwzooPbQgB7XRbAgFOS3tPgdP9gwS9t4mmi2z1jbnx1
-         Z0SALlXsabvoa1kdXwg+LY2kJNODN8SuZwJWq5GPyCjooSl5xJ5agVtcGVgRlEceCtXc
-         7lSg==
-X-Gm-Message-State: AOJu0YzgR8cZnTc9jxjRc0M3PKE5m+/RYxwdh8NvBrDa9807WQaYT9Ae
-	LmUjpBPXPnwB7QYYGfcjKusBx5rf3sssuAUypE947hgyIOLz0oPP5QWl71mATw==
-X-Gm-Gg: ASbGncvJLMFrpJpxaQO/Z+/DVBJcltCwIkND5sHF8eI89FViZhOyijl8HnNP8KMTBk8
-	gpDTwYbD7gvIslQT+BOWeQ2X3xNS5BOB35RcOJbEvuCY4NN2Kq1ufv4Pk8+WdeK5eG35lx+UPB3
-	d7Hbhbk8Lp6MyW9mUSTAZphG2dcweHgf2zzxc+8+z0m165WjJjWZ7BxiNSiibsHfdxAF3RKOSnO
-	QvYHPS6SOPsvZHd2MdaC+gpLv1EZyOVwaQ6ljSNVZr5z+rw6nr8VCxmv5MUd0XUKmQf7yczVOqH
-	bOGDJ9DGqUFl
-X-Google-Smtp-Source: AGHT+IGfijMMKjuLwCN4FI28W1IXgWX5yc3a7561qwngrsOIMBdubzqnGhrHwul9v673IkWy4GJKZg==
-X-Received: by 2002:a17:906:599c:b0:aa6:b5d8:d5c2 with SMTP id a640c23a62f3a-aa6b5d8d624mr173985366b.41.1733920466577;
-        Wed, 11 Dec 2024 04:34:26 -0800 (PST)
+        bh=4/2Xaa3Dzt+5ztTkftxM7MuahK+LJjUTZ502uY5Dxyc=;
+        b=pDHj1/e5gYtbP3XECWKNzW8ouf1+kNSec4LehmhJH091goWUsQTPARazpNBVHqJIXQ
+         Xolz66ZDkHYrTMUycBENjiADkYjlmOyqxPUlLEBKZ0x7hbhR/OLDt91pIHa70228kZtM
+         Mocf68IyAH0MoTFi8v/+2OxUlBtcFnHB6GkSbcv/SUNLGbWMH06BtHjVNClH1g40piJy
+         TWr5o+xDTPI0dcI+6ry84mVtblBw4D1kEAYNRGIb67n/L+h0ODRASneQQ63H+UedwjBx
+         5UAuSHLBCqtSFDqGG0YhRrY/C9moAnu1Dmh/TNP9Aja4x2eebSeeMJ2xgc5ozd3WZk61
+         1oCQ==
+X-Gm-Message-State: AOJu0YzZSipUGLZBgkET9KXz1JUFNbQazrn/5SDPCY0cl/gCnPo3pMZk
+	B7EKWqUCt2EcWeYhTdzNzfS/851G6+iFpK8WQMnXoFQHbX6+aSfI9jIbevSLBA==
+X-Gm-Gg: ASbGncuyD9nYvYxEJ55Lk4x5zvwHrnuP7BP3a8a/sIvjBRl/u2qbjhA77XYBWPkmOzm
+	88ncSKXwnWvwOWy/GmHcOyO4Vn8PjMEqRmelTkH4kb33/5/PQIrkYM7rijsBCOXC34tNeu0LKrG
+	F19eQZGrW1pCz+y6ozvI+kYruU2WoZl2u9vfJ7eCOj42VUGGyIvdfJY6sKrd68Lp4QAk7XFQn4k
+	AvitLn8Hoa8jd7K5tDpr8rl+YC8/WxdHzU2gTY7Lrw19CLU+4lh/m7puvkIcV+ksEcKRxuOSdeK
+	E0+xR6SMDK/v
+X-Google-Smtp-Source: AGHT+IH5ipgPbbdkuBNOvIujiXUCRr4dV1jLAa3zBl9FrLSEGeuaXMb+t2LT4GmatSEIkAmek7cOMQ==
+X-Received: by 2002:a17:906:2921:b0:aa6:33cf:b389 with SMTP id a640c23a62f3a-aa6b11f648dmr209782166b.34.1733920696526;
+        Wed, 11 Dec 2024 04:38:16 -0800 (PST)
 Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa683a0a736sm487811566b.142.2024.12.11.04.34.25
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa6a7e199aasm214057766b.28.2024.12.11.04.38.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 04:34:26 -0800 (PST)
-Date: Wed, 11 Dec 2024 12:34:23 +0000
+        Wed, 11 Dec 2024 04:38:16 -0800 (PST)
+Date: Wed, 11 Dec 2024 12:38:13 +0000
 From: Quentin Perret <qperret@google.com>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -63,11 +63,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
 	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org,
 	kristina.martsenko@arm.com
-Subject: Re: [PATCH v4 07/14] KVM: arm64: Rework specifying restricted
- features for protected VMs
-Message-ID: <Z1mGzwZqVQCWWSTX@google.com>
+Subject: Re: [PATCH v4 09/14] KVM: arm64: Remove redundant setting of HCR_EL2
+ trap bit
+Message-ID: <Z1mHtVJ4f7_N_wk4@google.com>
 References: <20241202154742.3611749-1-tabba@google.com>
- <20241202154742.3611749-8-tabba@google.com>
+ <20241202154742.3611749-10-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,20 +76,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241202154742.3611749-8-tabba@google.com>
+In-Reply-To: <20241202154742.3611749-10-tabba@google.com>
 
-On Monday 02 Dec 2024 at 15:47:34 (+0000), Fuad Tabba wrote:
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f333b189fb43..230b0638f0c2 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1422,6 +1422,7 @@ static inline bool __vcpu_has_feature(const struct kvm_arch *ka, int feature)
->  	return test_bit(feature, ka->vcpu_features);
->  }
+On Monday 02 Dec 2024 at 15:47:36 (+0000), Fuad Tabba wrote:
+> In hVHE mode, HCR_E2H should be set for both protected and
+> non-protected VMs. Since commit 23c9d58cb458 ("KVM: arm64: Fix
+
+I'm not finding that sha upstream, in which branch is it?
+
+> initializing traps in protected mode"), this has been fixed, and
+> the setting of the flag here is redundant.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index ffa500b500f2..cede527a59d4 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -57,9 +57,6 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
+>  	/* No support for AArch32. */
+>  	val |= HCR_RW;
 >  
-> +#define kvm_vcpu_has_feature(k, f)	__vcpu_has_feature(&(k)->arch, (f))
->  #define vcpu_has_feature(v, f)	__vcpu_has_feature(&(v)->kvm->arch, (f))
-
-Nit: I see nested uses the raw __vcpu_has_feature() helper, so I guess
-we should try and be consistent. Either way works, we can do the same
-thing in sys_regs.c, or convert nested.c to use kvm_vcpu_has_feature().
+> -	if (has_hvhe())
+> -		val |= HCR_E2H;
+> -
+>  	/*
+>  	 * Always trap:
+>  	 * - Feature id registers: to control features exposed to guests
+> -- 
+> 2.47.0.338.g60cca15819-goog
+> 
