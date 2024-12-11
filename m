@@ -1,69 +1,69 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3562623FD02
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 12:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD79423FD14
+	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 13:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733921755; cv=none; b=P+mi+qXxjN/jYJ5VjZ6LkH7oW8xXd4ltVJu+eISJ8rfHJ2GSOtnaVp3bhl7QveCzV58hAJ1zCOvIR44FmPQadr94YEEBYv0XVledoajGcihqMrKCH8yzsN9HxH1F9CV3g+9+ORBnI+0iYY71cnx5rpnCtSU0qFeo/dNlgdncFzc=
+	t=1733922722; cv=none; b=p6LCIuFKFfVhw5B8WeurnTLKgbJqnCS6C/GR4LmKLzv0BoVHojgOg6ctLVIqSWcOmfsk0RmSDGCCP2wR8c5dSDqvjUfd+HHdXm5bkCJbVqqJBs+wPEHhYQln9DsMhKNt1jmyiqUiFnXVf5hYw6Xg1Jlq/c/DIV5R8XGvgPIysUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733921755; c=relaxed/simple;
-	bh=YRLzPnsRFyvCzJ3QMXzqfU+0b1eB+yM33ZVyUzKbYP4=;
+	s=arc-20240116; t=1733922722; c=relaxed/simple;
+	bh=2bOroIvbtA2JFMR2DeSrnhFbxHGRRbwy2U1x57WiKpc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l5GEIzdY5Dr8m8deWY4a27QfxpcR6eTPzTu3nsVeuk6SBuanDL1iewrPWpsBlgs2ZscPc9K28NMMA/o/rYaXNWUS55ntn7x2uAuWYN2+HBNAAHqKOw7q1d952v5bt7rkybe6RHvIdSG/8svQPHdH4FfQlPAXf3MyEERpaltGNkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JzuATLYa; arc=none smtp.client-ip=209.85.128.54
+	 To:Cc:Content-Type; b=aJlHMJ9u+92rjjT4Iw+saz2NBnaalah1v89pBwUXej239cqcO3wYC1vNtFdFSimH9TkIlYFeT9eqCEpJvKJjv8AXHbk0N7wxmehXlDZNdng8XdgnTgE8BV+7KU9sob6K2PZpyEUpSSpJj2LSJNETGiaQN6+wCDNqB2UaDzXb2Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=19lnMYJ0; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JzuATLYa"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-435b0df5dbdso37415e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 04:55:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="19lnMYJ0"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43621d2dd4cso3115e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 05:12:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733921752; x=1734526552; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733922719; x=1734527519; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tp1qrh2uE1dCCEghnnvrSjtwgId1DtRFpj1taeMf/RI=;
-        b=JzuATLYanDy5Dt/f1VB3OHLAIggw75syuNOAx2MCV15Cwhxb/x7WHvWfTyDPfXdbzr
-         LA4c6GqJzWpwn1YyvkCAb3x8771K+QTohfo8S6Zdz9msupqcO+bPHUmX3gsY6Hp2qy+M
-         9oUZhWMqmiln4VJxGKBwHbuAX7sNj2lkZjm96ctH8MbVhIRk2jIO+LhN0tP7820PRf7g
-         z78NLencAvtao+kVJ9nQaKeGAKz21CJ7o0q9sMcPevfu88kvEwiuFB903vLKsSiMcHuE
-         6wjj81STY8Se/RkOnuVyEcw8EwkIUrMEVfuaC/VwXRVnHl+7oKBe/xh/WPJcClmlFhOZ
-         gCIA==
+        bh=SpgIVXJPCWJq+BvZ7U8OZJJ7fZhImEdZ13gLAjbI154=;
+        b=19lnMYJ0kaQQGBi9I5PbW/XXtQvmxQAYUreW5ZZ10i+3j+itL/AFFoE028KaM0e5UL
+         crAJ7wNcxQ5L9DGP55DN9ADjKquFB4jUAdxkShZ4gY2ClpKEteufzrNqp7DmLo+hw8D8
+         6jrmHxgqdLgJU/2DPOLaxrdf2gTwtgx/dDFxHE8zMP1GyRIC3eNM6UKy9SpkX3pBkv+I
+         IYeBAjZYUWaZkL+PEukqk91qpa2yNtXmNdMPN6iGp98yCfhDFb37KAeNpPf9PWlRg8A3
+         TVF/KTcuwMPM0XbfsU6S/Yw2EuoLcmgfXnHcUxrNMh3hLleeiadwgYPZ0AD8BdBG6+em
+         8dhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733921752; x=1734526552;
+        d=1e100.net; s=20230601; t=1733922719; x=1734527519;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tp1qrh2uE1dCCEghnnvrSjtwgId1DtRFpj1taeMf/RI=;
-        b=KM1OjJHzsM4ngmiLuor2VL57U9tIAL/MOqSZDvdlP8j73tO/sqbVH+dq6ThzcM8f6z
-         O42zi0IWkLB0XOH7l6huQxM1HXa6cAl703zWPRu65+WuYPMyyB2WTwsMuWfL/zQIfPPA
-         mzLo1JL+qN7f7trIzmgm7ZOnWj+WyOwKRKozrkXThO26Zen+B//OFDzHcZ9uub3M8oy/
-         PjIvZKyDCQxIIQv+E5caS3JFBbLXuwvB1krAU/hg9Ju/VVF+txekRhM0zc6UQYE5Q8oQ
-         xfcF9eWVvBDUXCGpyaMiGiaVTwmyYXykNGaD/vEE++GxGRoDkH4JRwnrlHMptniZ7Jwx
-         V6yA==
-X-Gm-Message-State: AOJu0YzfOWc6L1hn7mcrCxCHHMtEZOQntq3nk5fDc7aVe9szB9tMy9Ta
-	/uK3iTrO2IrF/nKj1Um1AkdPQ0iHjP7pgX+Kp2jrw4NbRLivfiDTgczOVrLAh08F4+K5FfZk21D
-	8OmFcRWh+8FeYpmW0bwndk9espVd7Eav5cR8U
-X-Gm-Gg: ASbGncuGXhD7ifl9YMmB272sLHfmbDCGho/6fg0oyyQLVqD3W2Q1AcSyuLE3hQAQdA8
-	KtvcbZpqnA6iBMy5x4HAtjwzPP917LjMSazTkWyN2Q3sftPm9l1l0sOHvBS53NPMX
-X-Google-Smtp-Source: AGHT+IF3dIT7fuJS+iL7UWob1CNU5m9rhIXgg1PTuH15dSwzo7oLBkZEFY6Rh4KIzkFLuEKi5aXZccIAjHgUrb//06M=
-X-Received: by 2002:a05:600c:2105:b0:434:9fac:3408 with SMTP id
- 5b1f17b1804b1-4361c0f4f80mr1205495e9.2.1733921752418; Wed, 11 Dec 2024
- 04:55:52 -0800 (PST)
+        bh=SpgIVXJPCWJq+BvZ7U8OZJJ7fZhImEdZ13gLAjbI154=;
+        b=bP6A9bly8HYK684Mwd48lWxrR19MkrC5hCI35AffBJ6VqODPNN41KdqAR8UJTc3/V1
+         1Rc12km0X/sJ7TRJdW0NT1JXsZyfj9fIDl7GUV6R3HNsOpOgklf6Wfxq5wvBnqxL/ax0
+         Wa4560yyT+oBnvPUvydiJNJjTYWcD8sg1SZrM5Yc8jvMuxx5Z2/l+Ntlvy/tQqcqD4Rn
+         nHPi7uM75BEIox4LiZ0iJEks93m1Klt6t/pby70IsQmvEJcnwNbIRMbmknGgnb0X6vH3
+         J2vBDM+i8L2qbNxD+NAUITMEh3dR1WUEQqCiht74MvE05CcoZIuzsQfeacDq8bFMjwOp
+         87Mg==
+X-Gm-Message-State: AOJu0YxkNaI70E3aN/vBk+sFWy/aDpko3VxxBKFA5zL+atfc2NtkOx9C
+	poTGM3yCyiY5MBNpasGqCG8HbEsj4oxz8geEP5CMkLYePEWNvAeC17bBFyaItvPnLcqaCZ6IBTw
+	qk2Hn7F+EhFDWtJAYPuUMQJvqGpoIP+po6x1b
+X-Gm-Gg: ASbGncsy7+k2ba46KCJm3S5eLormF2T9d+ZoStbhgYZWB8QZtq3hl4eM6++dd6zIBYK
+	c46Nj99+Kl1c6/70mBhDmWcBmUbzPdeZ2bWhcs871XMqyhNsOJYpy3RNfHpypkWVd
+X-Google-Smtp-Source: AGHT+IEfuetELzIWhfEeFRhYatZdwR7CYhn8kG7Vcp2ICa4z5Mba1kHJ461NL/L61xviWIJRhaUMxTdQVlaJz2Q/5Lg=
+X-Received: by 2002:a05:600c:6c8a:b0:436:1811:a79c with SMTP id
+ 5b1f17b1804b1-4361dc51b9bmr958645e9.5.1733922718921; Wed, 11 Dec 2024
+ 05:11:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-11-tabba@google.com>
- <Z1mJlF-H5R_-f83I@google.com>
-In-Reply-To: <Z1mJlF-H5R_-f83I@google.com>
+References: <20241202154742.3611749-1-tabba@google.com> <20241202154742.3611749-8-tabba@google.com>
+ <Z1mGzwZqVQCWWSTX@google.com>
+In-Reply-To: <Z1mGzwZqVQCWWSTX@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Dec 2024 12:55:15 +0000
-Message-ID: <CA+EHjTwDSo3XXxruPQSbJZJ7wNqyFX4fec-SFuYfd2XBqJX_DA@mail.gmail.com>
-Subject: Re: [PATCH v4 10/14] KVM: arm64: Calculate cptr_el2 traps on
- activating traps
+Date: Wed, 11 Dec 2024 13:11:22 +0000
+Message-ID: <CA+EHjTzaVadZgO++bSYopQpy8DyfP1W8ytoOd6Q7yy+yEVqfeA@mail.gmail.com>
+Subject: Re: [PATCH v4 07/14] KVM: arm64: Rework specifying restricted
+ features for protected VMs
 To: Quentin Perret <qperret@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -72,54 +72,28 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	kristina.martsenko@arm.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 11 Dec 2024 at 12:46, Quentin Perret <qperret@google.com> wrote:
+On Wed, 11 Dec 2024 at 12:34, Quentin Perret <qperret@google.com> wrote:
 >
-> On Monday 02 Dec 2024 at 15:47:37 (+0000), Fuad Tabba wrote:
-> > -static void pvm_init_traps_cptr(struct kvm_vcpu *vcpu)
-> > -{
-> > -     struct kvm *kvm = vcpu->kvm;
-> > -     u64 val = vcpu->arch.cptr_el2;
-> > -
-> > -     if (!has_hvhe()) {
-> > -             val |= CPTR_NVHE_EL2_RES1;
-> > -             val &= ~(CPTR_NVHE_EL2_RES0);
-> > -     }
-> > -
-> > -     if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
-> > -             val |= CPTR_EL2_TAM;
-> > -
-> > -     /* SVE can be disabled by userspace even if supported. */
-> > -     if (!vcpu_has_sve(vcpu)) {
-> > -             if (has_hvhe())
-> > -                     val &= ~(CPACR_ELx_ZEN);
-> > -             else
-> > -                     val |= CPTR_EL2_TZ;
-> > -     }
-> > -
-> > -     /* No SME support in KVM. */
-> > -     BUG_ON(kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP));
-> > -     if (has_hvhe())
-> > -             val &= ~(CPACR_ELx_SMEN);
-> > -     else
-> > -             val |= CPTR_EL2_TSM;
-> > -
-> > -     if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceVer, IMP)) {
-> > -             if (has_hvhe())
-> > -                     val |= CPACR_EL1_TTA;
-> > -             else
-> > -                     val |= CPTR_EL2_TTA;
-> > -     }
-> > -
-> > -     vcpu->arch.cptr_el2 = val;
-> > -}
+> On Monday 02 Dec 2024 at 15:47:34 (+0000), Fuad Tabba wrote:
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index f333b189fb43..230b0638f0c2 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1422,6 +1422,7 @@ static inline bool __vcpu_has_feature(const struct kvm_arch *ka, int feature)
+> >       return test_bit(feature, ka->vcpu_features);
+> >  }
+> >
+> > +#define kvm_vcpu_has_feature(k, f)   __vcpu_has_feature(&(k)->arch, (f))
+> >  #define vcpu_has_feature(v, f)       __vcpu_has_feature(&(v)->kvm->arch, (f))
 >
-> Mooh, wasn't this function added in this very series? Not a huge deal,
-> but is there any way we could consolidate things a bit?
+> Nit: I see nested uses the raw __vcpu_has_feature() helper, so I guess
+> we should try and be consistent. Either way works, we can do the same
+> thing in sys_regs.c, or convert nested.c to use kvm_vcpu_has_feature().
 
-Yes it was, but it was added when I was doing the grouping in Patch
-02, without changing the actual trapping, to make that commit easier
-to read. If I were to consolidate them then Patch 02 would be changing
-more than one thing at the same time, making it (imo) more difficult
-to reason about things...
+I'll add a patch on the respin to fix the nested callers. The lines
+that call these macros/helpers are already quite long, and even though
+it will add a bit of churn, imo the resulting code is more readable
+with a kvm_vcpu_has_feature() helper.
 
+Cheers,
 /fuad
