@@ -1,62 +1,62 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4930236F98
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 10:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B971ACECC
+	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 10:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733912098; cv=none; b=l7tPCzWEC1oo8xmQRLM0uC7ujL/7docQ+KUW2XknkGtqoGMjxE6VnKxUjiK+eVS54iZhLiCP32izmcaURLlaWkQxFdBi7fPoV7M/p1RFCp/XtNrYQxkU7u3sg63QgbCdAFRIUcjcWDEDHFPTruORP1hXPIRrZTDVuNcH2/lg4sw=
+	t=1733912330; cv=none; b=R1otmG6ww4xvw1QZjB+859uf6RUxYUNn7BfICPcJo1E/eKqDZEo/Gt/X/H+sch5nOUpB5jstCR2n2Q7kpNJmek/EuTDiIKpQb265QGv+Vb4nx5ZJGMU1IqEAio5WJJBTcSi7XPia9UV0+vCY2XtO8QjW5X4ckLJBWKY7MZWrra8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733912098; c=relaxed/simple;
-	bh=8kPuR/R4ZmuxjLQhM3C4+YPUUpyXPzxmYEFgc4jJ63Y=;
+	s=arc-20240116; t=1733912330; c=relaxed/simple;
+	bh=meUvehoP0pPXR9PXhZw/v2e/9k24os0TrmSI4rVMEys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DXURn/TlL4Wt1g0hn5ervkes2CBfJrEV8gSJBcn8ROD9IHL3NoSxLeXOAqHQFQG2stYTjB5bky80z159GLQS03KdWbsbLJeFl25dkVOXEcLSQjVUrPldP6l0JYCyGdJonFgnEJUHQH2zsF3K6cXf06R2KwtXAA18h14vz2RbLyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F4pBhHHs; arc=none smtp.client-ip=209.85.218.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=iWu8jVzNw5ciXue9Pgk8gYYuGFI2OiR4eLhydeUyjUN3Ie8sbCjtF9i835+mAKrNNav3ddCzzetS06MUx+hx+S0gg5m5+9b31CTMfcLplHBPxR0Gk0jAbAnu4eclks8XbjegncC/z32Qd4rLNYSpYaP1fWLfz/TW9lxfrcl8wgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bIG+rxLF; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F4pBhHHs"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9ec267b879so1283927566b.2
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 02:14:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bIG+rxLF"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aa6997f33e4so401673466b.3
+        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 02:18:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733912095; x=1734516895; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1733912327; x=1734517127; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aAYNlgaGtbIb3faMoAC6BM9L0RPwmWJIn6sYTEEwFWM=;
-        b=F4pBhHHsdF8qeYaVYYcMjbkCwcQZ0IpLlnY86bZJ5JNWPdwF87Cd2KUKnz33OHSpdE
-         inO3epWVvJatxv0PauGxIpSRkd0y8IQMWmzHR7XR73v5o/q7y8u2L2hMaft2CNicbi9C
-         tkUSzXIS8Vssqrt3uKijftwWBcVNDSa3ZSt/JvhhSkkNxgnos7vr+rHVMaNTaznfk2JK
-         6As0S7lO4VeBTJhCeJkvbllpoQviLlk5MrX5tGeO3iyN0Tr0zjBVdHyDnOqXUBBBR4ys
-         Ltl1Hiprxh+IkusktDmsJe49NuNYmy+yhfwZprQV5fhUaHhualJRTI05jNsjRAsBy2kO
-         FhYw==
+        bh=ihYDcY3LWn4CcltGS+7wcqEJGOYARfyiPsaNarrTPi4=;
+        b=bIG+rxLFB0sKbBfsjr9fHCNL5A0B8qnYQ1OQgoK8v2oXAUKhRSpUGIQin0MesT9VMz
+         LKQAmHoEMHFwoRImbQE7UWPGJSiMssFgS35k1SLyq5bHh0z6MA+do/BU4vjxOcPICkAe
+         o3itNSlaG5LnczorjqgLnisKZ5JNWmpUQhQr0y2FWacyIuZk9xKRtpf2Kaga/wNmf2v5
+         muxP2XmpoKVxwRvhsbdHWFrFvzdhSMd6YOhio04yjiM9ioiD9Q9+i5PNBF/s3JFEmYQE
+         3ETLws0Cp1exoScPpVjH211Ka3nCr1eoyxkb5KD9TqFS6newQk0yBZvpzdivo0l6TH6N
+         Hf6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733912095; x=1734516895;
+        d=1e100.net; s=20230601; t=1733912327; x=1734517127;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aAYNlgaGtbIb3faMoAC6BM9L0RPwmWJIn6sYTEEwFWM=;
-        b=B8huuMMfCFwPzglIgDZmib2g2KAZF2UVxDiBjc8CIoYMOn4aApfiI4/iQfUkX1ihjb
-         Pcb4bETIMUA0m6szRevsSv8/8E0AiSxwWGaZ85exbD51/+B+xJkqITUwRG/tSHIA6RLP
-         YYL4Pt+RbZRbrE0Hc3TZ3ofzpq9Zsd7zfeyuSdQx6L/+TvGBTx1c2xzfou7xl4+0YFID
-         sAnBwjsaIlqw8BN5sLWMNCFRCyaVWSiUghuOvWpcTZQCo17Z495DnNPLs+Q5hfXGoKH8
-         cpTprRfdUPhjI5uVsppMV+BVG6sBydVu69AQRimM+0j7J163bIMPUNklsyDM2SHdp13m
-         vxRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWIYmKvmStqkmhjHtfJL9Vd2zTbvuG5WlzUEAT8IOgNyQUENfJgj30umolCM9JFjoVUlhxLAtU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzh3idoIa9yUKyujixun4X7ZKnFQVZVA3jevcfA7tmZg0djenjY
-	PbKDiEYSN3SU2OAkJVHXfYr1ODuVXv7oA9sk7hlQBKCidlnDC3Ep2kv2o611Xw==
-X-Gm-Gg: ASbGncuflccHm9h73jol3+kOiGZ0KyuwAMxsARyNpq0G7U/PrDHCYi2+qktK5utY9Hw
-	g6KY4P0v9xoUA507hH/zSINpxW4tWLmyYp+0Lyg8FFJ5ulQLpLRfGucwNDMsy07sRU06eV4ExcX
-	htr7tYj7Ef9nzyjTapQCG9TpVhgIH0EIcD7DuVEkR/AxlSApJ41DM7mzYD4unm5R/yqLTDknwDP
-	oo5Ey89HgI4ODPXg6iYhmgYj5X6v4shqKJ5rpxCOvl81naxqVHpPj3cGvf+B3OCk9J/3v0pq6FC
-	1EZ6KBiUJnXN
-X-Google-Smtp-Source: AGHT+IFMcTlkeGboQKqbrDdMcECPHEth8gqU16Ievc6ebB6cHKDKOmVuqDalLIEjr7JcNgbRfs9Dnw==
-X-Received: by 2002:a17:907:1587:b0:aa6:6e02:e885 with SMTP id a640c23a62f3a-aa6b13b1375mr155243166b.47.1733912095003;
-        Wed, 11 Dec 2024 02:14:55 -0800 (PST)
+        bh=ihYDcY3LWn4CcltGS+7wcqEJGOYARfyiPsaNarrTPi4=;
+        b=lC/aTpSy9ILMTECMM8LurH34JDArH9OXkOAz5C4OXR98VnmzpkIfqtx9YiuvvA77PB
+         YNmETpI1YoRlDGJCFBiEGoWgEfHDwW54F0cPKyj5cMHPGXwm8+v2hH0XKQ+4JyQ6WVdq
+         HdWGmwdoK/HyiEUWXH2gGwpFu30xxu3ymqqhFerfRx1XywkiwkhBIZv35UL93J4J6PuL
+         v7kUS4sX3O7PUAQUecApYXDeJUAfOzv2MyHgWPHGrk0qVXn98Md/Q6y7CyAqoASNru8p
+         Cg5DBXLFtKtBvY8cwPa08UbH4gO45KBLUBuaXKmFSGlsD60rJFDpDnjKDOeQbL5T38lw
+         vb1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVy/5IrLIDBI65LH7qM8PbelnqBXDt+G/k7VrPRt3VSAkE1i5j3axsm750Ek1zyNelVkE8/UIQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwsKRpGBjFLyFcpXU/YrW0pkxVXcRNNHix6xrXV6WK3VG19Az/N
+	rtR8tPgrzYB9w9xosFK1eg4Pwx5mk369IZYmu9BcSvp+5201slE6qjH95InKbg==
+X-Gm-Gg: ASbGncvg61f21C5FhWDOnIDSAkAJN35h5uUcQbCD5vJ6BQU/bYxQGvYeCycRMXAjJQ4
+	V3aWpetBjutWjw5ZYx6M1UTwmcLiD753QNpQ/c/lk/lBwDtv25qxumdLxVuebCVCF+xudtsbaJX
+	8ZghTlU/ENlXzTLqqdD8BHqb0b0ZGgz/NZn8oMd5dARghKGJYLAKvghbvliPwLflQqEh4RWU+GZ
+	Vdk4e1uHe3z/yWrbrm6iy0/UdEnfdRxQ1jP1Fhv6L5LurTjXNe4dGo8qk0QBtqCq8CHW7V4tSc4
+	VSFadZKZcb9b
+X-Google-Smtp-Source: AGHT+IHm02VkP/5m/qDW5G8yxXRC3oyr+fzt3izQJU/H+8B1ChDswIr+GMq6gipyIZLTGIZO6CUeqA==
+X-Received: by 2002:a17:906:3cb1:b0:aa6:66eb:9c06 with SMTP id a640c23a62f3a-aa6b1141c94mr206656266b.5.1733912327068;
+        Wed, 11 Dec 2024 02:18:47 -0800 (PST)
 Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa67557f0desm553688466b.144.2024.12.11.02.14.54
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa665119a06sm641148666b.121.2024.12.11.02.18.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 02:14:54 -0800 (PST)
-Date: Wed, 11 Dec 2024 10:14:51 +0000
+        Wed, 11 Dec 2024 02:18:46 -0800 (PST)
+Date: Wed, 11 Dec 2024 10:18:44 +0000
 From: Quentin Perret <qperret@google.com>
 To: Fuad Tabba <tabba@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
@@ -69,15 +69,14 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Sebastian Ene <sebastianene@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 10/18] KVM: arm64: Introduce __pkvm_host_share_guest()
-Message-ID: <Z1lmG-3KnOZrOCCa@google.com>
+Subject: Re: [PATCH v2 15/18] KVM: arm64: Introduce
+ __pkvm_host_mkyoung_guest()
+Message-ID: <Z1lnBDBNq_PKKN4l@google.com>
 References: <20241203103735.2267589-1-qperret@google.com>
- <20241203103735.2267589-11-qperret@google.com>
- <CA+EHjTwHSyQ1FJc7axbLNuBxSWpRVE6brb34nO+F59=QRmfQEg@mail.gmail.com>
- <Z1hhHRdpCZcLs046@google.com>
- <CA+EHjTw4GX3j_ssN-tWnf780xkvyKO5mBN6fnvXeWvQcBDmcNg@mail.gmail.com>
- <Z1liL3BtoPnSyvlh@google.com>
- <CA+EHjTw+3oAcp3ujjPmbcu42=95nw8WA=rZHYFL91ZK_Wfs_vA@mail.gmail.com>
+ <20241203103735.2267589-16-qperret@google.com>
+ <CA+EHjTzOjwNyUkS5_zSUiAbiCauLKKgkKU6TM_-+Wsh9A0FdRQ@mail.gmail.com>
+ <Z1iaof2DgZfZxc4l@google.com>
+ <CA+EHjTyzh_tqH-M4zSDEQ9meK_W_c-sQDvJ6H4kBd4e_MCmLfA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,78 +85,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTw+3oAcp3ujjPmbcu42=95nw8WA=rZHYFL91ZK_Wfs_vA@mail.gmail.com>
+In-Reply-To: <CA+EHjTyzh_tqH-M4zSDEQ9meK_W_c-sQDvJ6H4kBd4e_MCmLfA@mail.gmail.com>
 
-On Wednesday 11 Dec 2024 at 10:07:16 (+0000), Fuad Tabba wrote:
-> On Wed, 11 Dec 2024 at 09:58, Quentin Perret <qperret@google.com> wrote:
-> >
-> > On Tuesday 10 Dec 2024 at 15:51:01 (+0000), Fuad Tabba wrote:
-> > > On Tue, 10 Dec 2024 at 15:41, Quentin Perret <qperret@google.com> wrote:
-> > > > > Initially I thought the comment was related to the warning below,
-> > > > > which confused me.
-> > > >
-> > > > It actually is about the warning below :-)
-> > > >
-> > > > > Now I think what you're trying to say is that we'll
-> > > > > allow the share, and the (unrelated to the comment) warning is to
-> > > > > ensure that the PKVM_PAGE_SHARED_OWNED is consistent with the share
-> > > > > count.
-> > > >
-> > > > So, the only case where the host should ever attempt do use
-> > > > __pkvm_host_share_guest() on a page that is already shared is for a page
-> > > > already shared *with an np-guest*. The page->host_share_guest_count being
-> > > > elevated is the easiest way to check that the page is indeed in that
-> > > > state, hence the warning.
-> > > >
-> > > > If for example the host was trying to share with an np-guest a page that
-> > > > is currently shared with the hypervisor, that check would fail. We can
-> > > > discuss whether or not we would want to allow it, but for now there is
-> > > > strictly no need for it so I went with the restrictive option. We can
-> > > > relax that constraint later if need be.
-> > > >
-> > > > > I think what you should have here, which would work better with the
-> > > > > comment, is something like:
-> > > > >
-> > > > >                 /* Only host to np-guest multi-sharing is tolerated */
-> > > > > +               if (pkvm_hyp_vcpu_is_protected(vcpu))
-> > > > > +                       return -EPERM;
-> > > > >
-> > > > > That would even make the comment unnecessary.
-> > > >
-> > > > I would prefer not adding this here, handle___pkvm_host_share_guest() in
-> > > > hyp-main.c already does that for us.
-> > >
-> > > I understand now, and I agree that an additional check isn't
-> > > necessary. Could you clarify the comment though? It's the word "only"
-> > > that threw me off, since to me it implied that the check was enforcing
-> > > the word "only". Maybe:
-> > >
-> > > >                 /* Tolerate host to np-guest multi-sharing. */
-> >
-> > I guess 'only' is somewhat important, it is the _only_ type of
-> > multi-sharing that we allow and the check enforces precisely that. The
-> > WARN_ON() will be triggered for any other type of multi-sharing, so we
-> > are really checking that _only_ np-guest multi-sharing goes through.
-> >
-> > Perhaps the confusing part is that the code as-is relies on WARN_ON()
-> > being fatal for the enforcement. Would it help if I changed the 'break'
-> > statement right after to 'fallthrough' so we proceed to return -EPERM?
-> > In practice we won't return anything as the hypervisor will panic, but
-> > I presume it is better from a logic perspective.
+On Wednesday 11 Dec 2024 at 10:11:17 (+0000), Fuad Tabba wrote:
+> Hi Quentin,
 > 
-> It would, but then we wouldn't be tolerating np-guest multisharing,
-> but like you said, it's not like we're tolerating it now anyway.
+> On Tue, 10 Dec 2024 at 19:46, Quentin Perret <qperret@google.com> wrote:
+> >
+> > On Tuesday 10 Dec 2024 at 15:14:03 (+0000), Fuad Tabba wrote:
+> > > > +int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu)
+> > > > +{
+> > > > +       struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+> > > > +       u64 ipa = hyp_pfn_to_phys(gfn);
+> > > > +       u64 phys;
+> > > > +       int ret;
+> > > > +
+> > > > +       host_lock_component();
+> > > > +       guest_lock_component(vm);
+> > > > +
+> > > > +       ret = __check_host_unshare_guest(vm, &phys, ipa);
+> > >
+> > > While I'm bikeshedding some more, does the name
+> > > __check_host_unshare_guest() make sense? Should it be something like
+> > > __check_host_changeperm_guest(), or something along those lines? (feel
+> > > free to ignore this :) )
+> >
+> > I understand the comment, but not a huge fan of 'changeperm' as that
+> > sounds like we're only allowing permission changes while we use this
+> > all over the place. Maybe __check_host_is_shared_guest()? Naming is
+> > hard, so happy to take suggestions :-)
 > 
-> I wonder if it would be better simply not to allow multisharing at all for now.
+> I've gone and done it now :) I almost like that, it's the *is* part I
+> don't like since it implied a boolean return. Maybe just
+> __check_host_shared_guest(), no is?
 
-That would mean turning off MMU notifiers in the host and taking
-long-term GUP pins on np-guest pages I think. Multi-sharing can be
-caused by many things, KSM, the zero page ... so we we'd need to turn
-all of that off (IOW, no MMU notifiers).
+Deal!
 
-That's more or less the status quo in Android, but I vote for not going
-down that path upstream. pKVM should ideally be transparent for np-guest
-support if at all possible.
-
-Thanks,
+Cheers,
 Quentin
