@@ -1,88 +1,82 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145581DE3BC
-	for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 16:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6381DDC2C;
+	Wed, 11 Dec 2024 16:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733932991; cv=none; b=jCCzMXW+KS+GIxZ9yV4h/v75nbGL+jNJu9IwXOYVe+STk8FfouVWMgdZ27eRkwxrs8WiBruLFWF4NtZI5Ftm8+yc3ChHMohG6qRZDiTAdqLl7FcE5L/iHZKV/Ma4vckL35siIk06b7SkB8+IVEv7SgGLehuYnRPA/AEd+c4C3nA=
+	t=1733934503; cv=none; b=PfrYFcEf16LeffSjq8btuuep2kfGpIHBipg5Fubl2beDcQh2t264HAFLmwfAGQcut0f2ImKairk7noIAef5oqPRyt6Ewi6HNGDbI3bkXnCv97ZO1D2WVuAvTVZaCtlPslxZ9WFUYf0PPj7GY44rrahc7o18i8qMtyH503NVSkKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733932991; c=relaxed/simple;
-	bh=WNhpzgsdAKtSd1yhrheXVoze9Qh5uwyI4MdEQXOJRBE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DaRBC3veISspY79M04BKaLb4i0qu3O9lMx5XCSd65ymATsdMQH4msywchZewVcVNxKgcr7RZi9Shw766ZUCt3Zw8dB/kvLw3I0Kn/7w4Oq9CQsYOQKrCVWvYlImcJrxys9Wf30PeiSSGqyiwd6CywUhZ6xDfJ24poYj5zt6NE7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C32071713;
-	Wed, 11 Dec 2024 08:03:37 -0800 (PST)
-Received: from mazurka.cambridge.arm.com (mazurka.cambridge.arm.com [10.1.196.66])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A0CF63F5A1;
-	Wed, 11 Dec 2024 08:03:07 -0800 (PST)
-From: =?UTF-8?q?Miko=C5=82aj=20Lenczewski?= <miko.lenczewski@arm.com>
-To: ryan.roberts@arm.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Cc: =?UTF-8?q?Miko=C5=82aj=20Lenczewski?= <miko.lenczewski@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [RESEND RFC PATCH v1 5/5] arm64/mm: Elide tlbi in contpte_convert() under BBML2
-Date: Wed, 11 Dec 2024 16:01:41 +0000
-Message-ID: <20241211160218.41404-6-miko.lenczewski@arm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241211160218.41404-1-miko.lenczewski@arm.com>
-References: <20241211160218.41404-1-miko.lenczewski@arm.com>
+	s=arc-20240116; t=1733934503; c=relaxed/simple;
+	bh=LXPkCuR2SivnRYq9dCkjsf2KZvGLOYoks6cx+5KrVNI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g+adJxnWRqzJl3f18ZFIoCeUd0duPg1xb5MR6ddbXpKoswkJ59GSy3p6cENNtaJ1v3yg0jyqPxSZ1anWsbbMBdhyUiop2dgCsRVrvGup+6Q5iWSfqw2oeSH4Kih9Q6HE0zCgyERvF+XSxk1nRMrGzG5cjIThlEbNY9ZOBYpKccU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/6Dagzc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/6Dagzc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94745C4CEDF;
+	Wed, 11 Dec 2024 16:28:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733934502;
+	bh=LXPkCuR2SivnRYq9dCkjsf2KZvGLOYoks6cx+5KrVNI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K/6DagzcvgXPGBIjb2VKXo5Vd8TVb2h1SAsb2coJAuauL0I658hRF/AzJdyz48E8P
+	 1K/CnVd+HuPTKt3MQkX58EdS+Bh3LX5JcgRSTN0phemolAyHs/DJ4F85mbJWxRugN1
+	 oEDBhekCL491PJ74fmsNYkY4Yn2holKMFnBPC5LwI45s+C02d33+2wuzJplt0iFHD6
+	 Dc2N2yCquH//fIvkOMHXVGZEAofYIAtuguXiiAkrTECRHH09TIzwyBArW/mZsU2nGG
+	 xu8zW4wKPDP/H4wwacscWTNaTtPQW3Ycks7C+3RGTzF001nmUCjb5fPwqjfdwE0EZz
+	 cMA3o+jQ/xKhw==
+Date: Wed, 11 Dec 2024 16:28:17 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH V2 02/46] arm64/sysreg: Update register fields for
+ ID_AA64MMFR4_EL1
+Message-ID: <f27091f1-879a-4434-8124-2d1e27241078@sirena.org.uk>
+References: <20241210055311.780688-1-anshuman.khandual@arm.com>
+ <20241210055311.780688-3-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="AuImAyBVAiYKZd95"
+Content-Disposition: inline
+In-Reply-To: <20241210055311.780688-3-anshuman.khandual@arm.com>
+X-Cookie: Every path has its puddle.
 
-If we support BBM level 2, we can potentially avoid an intermediate
-TLB invalidation, as hardware is capable of managing the TLB itself
-in this situation. Hardware will either silently clear out the
-offending entry, or will take a TLB Conflict Abort Exception.
 
-Note that such aborts should not occur on Arm hardware and indeed
-were not seen on any of the benchmarked systems.
+--AuImAyBVAiYKZd95
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Eliding the invalidation results in a 12% improvement on a
-microbenchmark which targeted the worst case of contpte_convert(), which
-represents an 80% reduction in the overhead of contpte_convert().
+On Tue, Dec 10, 2024 at 11:22:27AM +0530, Anshuman Khandual wrote:
+> This updates ID_AA64MMFR4_EL1 register as per the definitions based on
+> DDI0601 2024-09.
 
-Note also that this patch is pending review to ensure that it is
-architecturally valid, and we are working with Arm architects to
-validate this patch.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-Signed-off-by: Mikołaj Lenczewski <miko.lenczewski@arm.com>
----
- arch/arm64/mm/contpte.c | 3 ---
- 1 file changed, 3 deletions(-)
+--AuImAyBVAiYKZd95
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/arch/arm64/mm/contpte.c b/arch/arm64/mm/contpte.c
-index fc927be800ee..009690770415 100644
---- a/arch/arm64/mm/contpte.c
-+++ b/arch/arm64/mm/contpte.c
-@@ -72,9 +72,6 @@ static void contpte_convert(struct mm_struct *mm, unsigned long addr,
- 		__flush_tlb_range(&vma, start_addr, addr, PAGE_SIZE, true, 3);
- 
- 	__set_ptes(mm, start_addr, start_ptep, pte, CONT_PTES);
--
--	if (system_supports_bbml2())
--		__flush_tlb_range(&vma, start_addr, addr, PAGE_SIZE, true, 3);
- }
- 
- void __contpte_try_fold(struct mm_struct *mm, unsigned long addr,
--- 
-2.45.2
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdZvaEACgkQJNaLcl1U
+h9Dt8wf/Xkj06W8/tQXbtUdCh+cZdMzvCYsmFjs77GpeWcGAMwMMXAakKXLvdIaZ
+Y8MeZMkUNJbkjjQHFfvq769HABUCe5pvxstBlcm5RwkLw779YKyPfHhKBj804gnP
+ygoSQuth62S2cQ98ZxCS0X1uKsLuMO7bufZc7FH8OeBCBSY2pm9TnqAMbnpXyb01
+/0po6atZiUVhyFENAG12VmiVbyFN2xH5ePDRmvwV6OlGLkuHfnxYBbnxhyTDhwp7
+24tWFW+aSQKpCHgfwIndNpqkXtdEFjc+LE8S4T1i1KEd877lYfPn5oe39LeEZCou
+FvWw3dF3ew82JkVHikP0R6DqLMWRhg==
+=jJAi
+-----END PGP SIGNATURE-----
+
+--AuImAyBVAiYKZd95--
