@@ -1,109 +1,115 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF848633F
-	for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 19:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58ACB3A8CB;
+	Wed, 11 Dec 2024 01:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733860008; cv=none; b=UX0BT1DHoxWf+ztsKWtpJJ1Tyt91HpQLPqvFfm/qAfSiLeTihiWwBIzBP/JRAnQyVNcJVsefqyR59IiGuwZz1qHkDKpjjTMfeEypVTETKT4ZdPDmD0OMlU2neO/waVBfnVu38yy7Jw1R3YsZH/5cDHN9UATHdc1uwAYspk+k1ho=
+	t=1733879065; cv=none; b=fl3Dda40S61SWuigL2UmOJssWBfWjLZvM4FfEhklLHuAMv8dYD0VasaHX+sGsMhj8jxfaXamuQF3y39+6mDaChoi3PgCewUHlVwtl9gNI4XBDRG1f22I6l4oUznfkYAo5b1RRUOlCx//3gvMqN9bJF6g9uHtwdIgUO3pUmnEkHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733860008; c=relaxed/simple;
-	bh=n8zO3jKoyxsj6HbTi05UzzHpPoCA3MPc6h5O6atmL3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TksuccO/5FxjV6xM2UNUTE4EiaiuKua90drO2LB6vCFLh0w4FfR4HPEvkRBwpOcnOh7s5ZVa1m2p0d6wYnb46DJ3r0OWCMwULcE0PX/arEfZUqvmi0mfkjxJCy7iuyHApBPgx9p8uW/UiHcGw82Iv4NSg1vuA9EuYUlr7Cn0V4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Rkunz/0; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1733879065; c=relaxed/simple;
+	bh=jLX4rlgMDPCJWTDHkPE3yprw7Tf6zXMkVO5ew0qsRzg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AR9bTzEdWWgVU0RMumAhHeOntdwPxfipoTDtbP7gsj5tKW8okjsMw7I6d69hMOPvDsnFEp1TqPC4+AumlSfNxh0hKMPcjCZjUSwKNcSGppgVsYxdmJYybgz2F11x5JQ4rd+Vtcr0IJPEuIvyWRXfSp2O4TRmToDxAvCAEpAzDnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIPt9K6a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Rkunz/0"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a9a0ec0a94fso893238966b.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Dec 2024 11:46:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1733860005; x=1734464805; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A0dTmTZsOI9hQmaca48zwWtaCXiY2ZalD73VTkV/Wfc=;
-        b=4Rkunz/0n7XDRiNAhqvOLMRgu42IVPlCpLo7wAocdTCJS0MZ6x0FVgeOFOEEBwhGnC
-         y4MSzVChBsR2Z6LhfbmBYIsUgKvXi7do7qIqay45vwWpwqeDxr9AbRtptOGTuDEjGI0n
-         1znzNoZSbZy7nmJKmz5IrxeiLkyW8aBJOV8YIL97AH8UZuLorS5D26odtXZX56mup48+
-         h6n2o2ph4zSLxmd5qRO0nkey8SSVkK2a9FCj3Ubf7NvLcFPN6HNeGyFADYBZ0Sk55kWF
-         RHqRQSm3NR1WoGroClTcUPeNALW9RW2YW4mOP/wUa6TymgmcIMR4FuD9MYcY6ynjkWOZ
-         A5xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733860005; x=1734464805;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A0dTmTZsOI9hQmaca48zwWtaCXiY2ZalD73VTkV/Wfc=;
-        b=T9GVUodGfXETZDtPa5feY6kQh8LCBGOPLpDtwbvDuLyMl4pHniiJ1bQ6zRPwJ3Ln9o
-         Uo7764FFRvRNxEbFJnCjo5gdaY4jCsfQUfFY6/rRDjUc+Qcf+Zd533dCF63z2B0CElR2
-         Tz9eJ2+ml20jjy04RJNmL4sVJl9rMzSZIfG43RPTN0a57Os0K4tBHqIHFZxhbVYi6sDQ
-         VJ6wTuHcN9BAQ4ZUq92BGRmg4AglHDQvg73fHUBJ4DIO/vRplOKXDbI8flTwli6wB9OU
-         dxebM71V1XQlv+BSd2Muaye+ZvQLnCCJSpDO1a6F3g4QNLVNf9ZluHhMyWG5+lbjp/qt
-         y8DA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaszy0eG9BkgEbMeP20bsfQULm6eCUe9sjWoLq/ZGs3RSaQsDhpP7JVdp8knUsLzW9UFjGJDE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxf3NGe9ZjfQuVaNQcrH9Kt/S2k3KfoWrLZK8dYg0ilt4S5FLFm
-	NbRqGN5cvX3rRNzE/qf6wobseDH8tPX9sf5Sgv7kiMzHqh8oblyoYxEpaurCJg==
-X-Gm-Gg: ASbGncuNsh96EE1rFMKO09IpD8YEm9Es1QkLw4ZIXeqQBU8JDslzCXRPumnYdK/WiGX
-	ksatALQhgBZ6BDOjC9hGaBPMUjgSdhVNDjJG3bIPIOTlwSjkf8YpuKaIFUMBFPudzzDlU/PGKN4
-	eXYRlJpKmoeYDrIj/dCosKbEcmxLUkmgY+bYkWfmcGifyEWXM8sQad3GUtvY3KYgxchNfOwpgUy
-	8JrYPF8hhUTxykEP3PEU61cmqneJxSJtj96sODDnyuuxGs9bCugX67xODOthD4NVxZq8oEv1k6N
-	UHtR+lktfA1I
-X-Google-Smtp-Source: AGHT+IF8OXUsJlvVq2WfJtUgUFxuNR6rqta58L0bNZagCkPdnarHQO7ASCTfCCHZ8UICmUNDGta8LQ==
-X-Received: by 2002:a17:907:7819:b0:aa6:ac19:b579 with SMTP id a640c23a62f3a-aa6b11eb111mr4655566b.26.1733860004764;
-        Tue, 10 Dec 2024 11:46:44 -0800 (PST)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa692e4e9d5sm296409866b.129.2024.12.10.11.46.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 11:46:44 -0800 (PST)
-Date: Tue, 10 Dec 2024 19:46:41 +0000
-From: Quentin Perret <qperret@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 15/18] KVM: arm64: Introduce
- __pkvm_host_mkyoung_guest()
-Message-ID: <Z1iaof2DgZfZxc4l@google.com>
-References: <20241203103735.2267589-1-qperret@google.com>
- <20241203103735.2267589-16-qperret@google.com>
- <CA+EHjTzOjwNyUkS5_zSUiAbiCauLKKgkKU6TM_-+Wsh9A0FdRQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIPt9K6a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881E8C4CED6;
+	Wed, 11 Dec 2024 01:04:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733879065;
+	bh=jLX4rlgMDPCJWTDHkPE3yprw7Tf6zXMkVO5ew0qsRzg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=VIPt9K6avZPGcJX95i8dZcZr4WHiFeI8pQWxYiEQ1IxNs3eY2ofLeuQAKXbWBYM9/
+	 sQmT5tfAA3Oc40yH+mwcwBsGb8iq3PvNUTjff3ekPbZ2fDCKO6XKQqfvWpVRWQ75Fh
+	 SQQrQNXbR1TGoxJ6cZKWhXuhsIfPWFCmS7+DLxYFa+ItGPmwLy5JSnQ8GzhUxdg7sp
+	 dPVdyiUY+zBuDQ2Y7sUv4SQ6LoWndxj/YiGWvlUbC3oGA+zkx8NF+80L15nyCD7+/l
+	 vBFD9Xr+9ttQQ4/HymTlKu/TtpjxUoGkJ4NW9Ift8s+I7zaF6hwGR+G3aZSHwUYD+u
+	 41qwgAo9MsEHw==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/9] arm64: Support 2024 dpISA extensions
+Date: Wed, 11 Dec 2024 01:02:45 +0000
+Message-Id: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTzOjwNyUkS5_zSUiAbiCauLKKgkKU6TM_-+Wsh9A0FdRQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALXkWGcC/23OSw6CMBCA4auQrq2ZPmiLK+9hXAxQoFGBtIZoC
+ He3JSZqZPlPMt/MTIL1zgZyyGbi7eSCG/oYcpeRqsO+tdTVsQkHLhmAoehvStKUtB5dQGqgYKA
+ l6kYaEtdGbxv3WMnTOXbnwn3wz/XCxNL0jfENbGIUKApTgynjNTTHi/W9ve4H35KkTfxLELAh8
+ CiUSgFDltcc8z9BfAQOYkMQ6QdVaVMyRF7oH2FZlheedAloNQEAAA==
+X-Change-ID: 20241008-arm64-2024-dpisa-8091074a7f48
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-9b746
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2175; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=jLX4rlgMDPCJWTDHkPE3yprw7Tf6zXMkVO5ew0qsRzg=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnWOUOpUj1V2UXYPLuLrtYppEWr2dhV1p85fuVagzR
+ gYNQooeJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ1jlDgAKCRAk1otyXVSH0BzyB/
+ 9GDTPkWnyb41SmxP3yIFjbgzxKspUYlH7g5GhliS3owYK1Zp6vFQGZ+qQHXW1QyBWYhXoYm+gPcNW3
+ tApSmN4cH8lEJW21vvhZelgf5FsSNTfv7axUvnrNsTdqfFX0SqT/YUbMWc8A7Vq6drXVOiWBRkn2dP
+ /nTdH+5hSEAxf/rb0Hj7a698k5s6+dxkGERVWV06OvuBtnjvPBXiN695n1RY6tQOS3ZbRAk+XZ+nGd
+ 7NUwOHysJDA7vQEQsQ4YSXl10w2jSHvSpFn7Kr6Lh9ps4s5yeMj6ihPa8LK/HXbt9SfJMFgu9zRPQL
+ 1Yrcan4GgMgqPM+IKvJhVzUBxGL19i
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tuesday 10 Dec 2024 at 15:14:03 (+0000), Fuad Tabba wrote:
-> > +int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu)
-> > +{
-> > +       struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
-> > +       u64 ipa = hyp_pfn_to_phys(gfn);
-> > +       u64 phys;
-> > +       int ret;
-> > +
-> > +       host_lock_component();
-> > +       guest_lock_component(vm);
-> > +
-> > +       ret = __check_host_unshare_guest(vm, &phys, ipa);
-> 
-> While I'm bikeshedding some more, does the name
-> __check_host_unshare_guest() make sense? Should it be something like
-> __check_host_changeperm_guest(), or something along those lines? (feel
-> free to ignore this :) )
+The 2024 architecture release includes a number of data processing
+extensions, mostly SVE and SME additions with a few others.  These are
+all very straightforward extensions which add instructions but no
+architectural state so only need hwcaps and exposing of the ID registers
+to KVM guests and userspace.
 
-I understand the comment, but not a huge fan of 'changeperm' as that
-sounds like we're only allowing permission changes while we use this
-all over the place. Maybe __check_host_is_shared_guest()? Naming is
-hard, so happy to take suggestions :-)
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v4:
+- Fix encodings for ID_AA64ISAR3_EL1.
+- Link to v3: https://lore.kernel.org/r/20241203-arm64-2024-dpisa-v3-0-a6c78b1aa297@kernel.org
+
+Changes in v3:
+- Commit log update for the hwcap test.
+- Link to v2: https://lore.kernel.org/r/20241030-arm64-2024-dpisa-v2-0-b6601a15d2a5@kernel.org
+
+Changes in v2:
+- Filter KVM guest visible bitfields in ID_AA64ISAR3_EL1 to only those
+  we make writeable.
+- Link to v1: https://lore.kernel.org/r/20241028-arm64-2024-dpisa-v1-0-a38d08b008a8@kernel.org
+
+---
+Mark Brown (9):
+      arm64/sysreg: Update ID_AA64PFR2_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64FPFR0_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64ZFR0_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64SMFR0_EL1 to DDI0601 2024-09
+      arm64/sysreg: Update ID_AA64ISAR2_EL1 to DDI0601 2024-09
+      arm64/hwcap: Describe 2024 dpISA extensions to userspace
+      KVM: arm64: Allow control of dpISA extensions in ID_AA64ISAR3_EL1
+      kselftest/arm64: Add 2024 dpISA extensions to hwcap test
+
+ Documentation/arch/arm64/elf_hwcaps.rst   |  51 ++++++
+ arch/arm64/include/asm/hwcap.h            |  17 ++
+ arch/arm64/include/uapi/asm/hwcap.h       |  17 ++
+ arch/arm64/kernel/cpufeature.c            |  35 ++++
+ arch/arm64/kernel/cpuinfo.c               |  17 ++
+ arch/arm64/kvm/sys_regs.c                 |   6 +-
+ arch/arm64/tools/sysreg                   |  87 +++++++++-
+ tools/testing/selftests/arm64/abi/hwcap.c | 273 +++++++++++++++++++++++++++++-
+ 8 files changed, 493 insertions(+), 10 deletions(-)
+---
+base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
+change-id: 20241008-arm64-2024-dpisa-8091074a7f48
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
