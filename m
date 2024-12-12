@@ -1,154 +1,182 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDAF321577F
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 15:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F7421504F
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 15:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734015929; cv=none; b=mgiqppAuLNSjDOYqfaZf8rl/uB0leWgpfwMcPksUKXOnf9y3v3owB1qSw34B9Vmv0ZFb7mEenXKeqaBsQkvXHiB2aS8vE6wXrfyzwTC2JIgSXviHlm+qBBWqPPKCqBDye9woD0vkCGz2V3HsKuhhmVIODJj12pusROdZ2T9eeik=
+	t=1734016456; cv=none; b=aItJVNVlugkEh9rHI5JaoPmOKR4GH/EvFXUBGa2nUKBUV9vb4DAREZmwTMxVfCF5Mfc1+ksfp4BvHxLZ2dmdnESXxmr9x3nwTAhvAyIFJ1+I2EFsZWcUBipHykzXLoUw/lqmrEiuvZHDL9c2HUF9+6Dny7nb3bjAUxWiPsDAQw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734015929; c=relaxed/simple;
-	bh=z3oBJl9NNxgVEM5YXZk6/8Ne2+HCX2A0fwmyGUHK4VM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i//ppOUDtGfdtU5AZIReUIBaqoojz9llkVSCC8TnGybcAVxtp6bUd4QLO6HtGLYVsNbkXKfiPGI5yWWIOWOuMmtzE4SEkPlST5PkDIgZcKOVZN+H7AYjY+ksF8P/TdTxnH2fO9W1cWHyxIkQ1DkS0ICRjfZlzZYSWRMEZ4aDuvM=
+	s=arc-20240116; t=1734016456; c=relaxed/simple;
+	bh=aXuxiHH97Dt1pne7PboneSqViqy4zgKlX18/6Q533UY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AyaD347zI2ErZzBsarykHhG24Gg7NjFk638yIzhyFHTwJb1HC/3jN5KDKPNRbfpWisXvPcVkzYbX5fdJvHKCPBBqTTthtg6BsQCYtEB2eF2B2m3R/HzCN18XRzu29h/wV/EeQJQYyfpz//meAbBBnrcT1rCnIY+WizTLEgzflxs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FBD9169E;
-	Thu, 12 Dec 2024 07:05:55 -0800 (PST)
-Received: from [10.1.27.173] (XHFQ2J9959.cambridge.arm.com [10.1.27.173])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F7873F720;
-	Thu, 12 Dec 2024 07:05:25 -0800 (PST)
-Message-ID: <2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
-Date: Thu, 12 Dec 2024 15:05:24 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D68F6169E;
+	Thu, 12 Dec 2024 07:14:41 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EB9E3F720;
+	Thu, 12 Dec 2024 07:14:11 -0800 (PST)
+From: Joey Gouly <joey.gouly@arm.com>
+To: stable@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	joey.gouly@arm.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	shameerali.kolothum.thodi@huawei.com,
+	vt@altlinux.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+Date: Thu, 12 Dec 2024 15:14:06 +0000
+Message-Id: <20241212151406.1436382-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: =?UTF-8?Q?Miko=C5=82aj_Lenczewski?= <miko.lenczewski@arm.com>,
- catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20241211160218.41404-1-miko.lenczewski@arm.com>
- <20241211160218.41404-3-miko.lenczewski@arm.com>
- <87cyhxs3xq.wl-maz@kernel.org> <084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
- <86ikrprn7w.wl-maz@kernel.org>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <86ikrprn7w.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/12/2024 14:26, Marc Zyngier wrote:
-> On Thu, 12 Dec 2024 10:55:45 +0000,
-> Ryan Roberts <ryan.roberts@arm.com> wrote:
->>
->> On 12/12/2024 08:25, Marc Zyngier wrote:
->>>> +
->>>> +	local_flush_tlb_all();
->>>
->>> The elephant in the room: if TLBs are in such a sorry state, what
->>> guarantees we can make it this far?
->>
->> I'll leave Miko to respond to your other comments, but I wanted to address this
->> one, since it's pretty fundamental. We went around this loop internally and
->> concluded that what we are doing is architecturally sound.
->>
->> The expectation is that a conflict abort can only be generated as a result of
->> the change in patch 4 (and patch 5). That change makes it possible for the TLB
->> to end up with a multihit. But crucially that can only happen for user space
->> memory because that change only operates on user memory. And while the TLB may
->> detect the conflict at any time, the conflict abort is only permitted to be
->> reported when an architectural access is prevented by the conflict. So we never
->> do anything that would allow a conflict for a kernel memory access and a user
->> memory conflict abort can never be triggered as a result of accessing kernel memory.
->>
->> Copy/pasting comment from AlexC on the topic, which explains it better than I can:
->>
->> """
->> The intent is certainly that in cases where the hardware detects a TLB conflict
->> abort, it is only permitted to report it (by generating an exception) if it
->> applies to an access that is being attempted architecturally. ... that property
->> can be built from the following two properties:
->>
->> 1. The TLB conflict can only be reported as an Instruction Abort or a Data Abort
->>
->> 2. Those two exception types must be reported synchronously and precisely.
->> """
-> 
-> I totally agree with this. The issue is that nothing says that the
-> abort is in any way related to userspace.
-> 
->>>
->>> I honestly don't think you can reliably handle a TLB Conflict abort in
->>> the same translation regime as the original fault, given that we don't
->>> know the scope of that fault. You are probably making an educated
->>> guess that it is good enough on the CPUs you know of, but I don't see
->>> anything in the architecture that indicates the "blast radius" of a
->>> TLB conflict.
->>
->> OK, so I'm claiming that the blast radius is limited to the region of memory
->> that we are operating on in contpte_collapse() in patch 4. Perhaps we need to go
->> re-read the ARM and come back with the specific statements that led us to that
->> conclusion?
+From: James Morse <james.morse@arm.com>
 
-From the ARM:
-"""
-RFCPSG: If level 1 or level 2 is supported and the Contiguous bit in a set of
-Block descriptors or Page descriptors is changed, then a TLB conflict abort can
-be generated because multiple translation table entries might exist within a TLB
-that translates the same IA.
-"""
+commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
 
-Although I guess it's not totally explicit, I've interpretted that as saying
-that conflicting TLB entries can only arise for the IA range for which the
-contiguous bits have been modified in the translation tables.
+commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
+ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
+but didn't add trap handling. A previous patch supplied the missing trap
+handling.
 
-Given we are only fiddling with the contiguous bits for user space mappings in
-this way, that's why I'm asserting we will only get a conflict abort for user
-space mappings... assuming the absence of kernel bugs, anyway...
+Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
+be migratable, but there is little point enabling the MPAM CPU
+interface on new VMs until there is something a guest can do with it.
 
-> 
-> But we don't know for sure what caused this conflict by the time we
-> arrive in the handler. It could equally be because we have a glaring
-> bug somewhere on the kernel side, even if you are *now* only concerned
-> with userspace.
+Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
+that supports MPAM, politely ignore the VMMs attempts to set this bit.
 
-OK I see what you are saying; previously a conflict abort would have led to
-calling do_bad(), which returns 1, which causes do_mem_abort() to either kill
-the kernel or the process depending on the origin of the abort. (although if it
-came from kernel due to bug, we're just hoping that the conflict doesn't affect
-the path through the handler). With this change, we always assume we can fix it
-with the TLBI.
+Guests exposed to this bug have the sanitised value of the MPAM field,
+so only the correct value needs to be ignored. This means the field
+can continue to be used to block migration to incompatible hardware
+(between MPAM=1 and MPAM=5), and the VMM can't rely on the field
+being ignored.
 
-How about this change to ensure we still die for issues originating from the kernel?
+Signed-off-by: James Morse <james.morse@arm.com>
+Co-developed-by: Joey Gouly <joey.gouly@arm.com>
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+[ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Cc: stable@vger.kernel.org # 6.6.x
+Cc: Vitaly Chikunov <vt@altlinux.org>
+Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
+---
 
-if (!user_mode(regs) || !system_supports_bbml2())
-		return do_bad(far, esr, regs);
+This fixes an issue seen when using KVM with a 6.6 host kernel, and
+newer (6.13+) kernels in the guest.
 
-> 
-> If anything, this should absolutely check for FAR_EL1 and assert that
-> this is indeed caused by such change.
+Tested with a stripped down version of set_id_regs from the original
+patch series.
 
-I'm not really sure how we would check this reliably? Without patch 5, the
-problem is somewhat constrained; we could have as many changes in flight as
-there are CPUs so we could keep a list of all the {mm_struct, VA-range} that are
-being modified. But if patch 5 is confirmed to be architecturally sound, then
-there is no "terminating tlbi" so there is no bound on the set of {mm_struct,
-VA-range}'s that could legitimately cause a conflict abort.
+ arch/arm64/kvm/sys_regs.c | 52 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 50 insertions(+), 2 deletions(-)
 
-Thanks,
-Ryan
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 370a1a7bd369..2031703424ea 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1330,6 +1330,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+ 
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
++		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MPAM_frac);
+ 		break;
+ 	case SYS_ID_AA64ISAR1_EL1:
+ 		if (!vcpu_has_ptrauth(vcpu))
+@@ -1472,6 +1473,13 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 
+ 	val &= ~ID_AA64PFR0_EL1_AMU_MASK;
+ 
++	/*
++	 * MPAM is disabled by default as KVM also needs a set of PARTID to
++	 * program the MPAMVPMx_EL2 PARTID remapping registers with. But some
++	 * older kernels let the guest see the ID bit.
++	 */
++	val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
++
+ 	return val;
+ }
+ 
+@@ -1560,6 +1568,42 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	return set_id_reg(vcpu, rd, val);
+ }
+ 
++static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
++			       const struct sys_reg_desc *rd, u64 user_val)
++{
++	u64 hw_val = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
++	u64 mpam_mask = ID_AA64PFR0_EL1_MPAM_MASK;
++
++	/*
++	 * Commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits
++	 * in ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to
++	 * guests, but didn't add trap handling. KVM doesn't support MPAM and
++	 * always returns an UNDEF for these registers. The guest must see 0
++	 * for this field.
++	 *
++	 * But KVM must also accept values from user-space that were provided
++	 * by KVM. On CPUs that support MPAM, permit user-space to write
++	 * the sanitizied value to ID_AA64PFR0_EL1.MPAM, but ignore this field.
++	 */
++	if ((hw_val & mpam_mask) == (user_val & mpam_mask))
++		user_val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
++
++	return set_id_reg(vcpu, rd, user_val);
++}
++
++static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
++			       const struct sys_reg_desc *rd, u64 user_val)
++{
++	u64 hw_val = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
++	u64 mpam_mask = ID_AA64PFR1_EL1_MPAM_frac_MASK;
++
++	/* See set_id_aa64pfr0_el1 for comment about MPAM */
++	if ((hw_val & mpam_mask) == (user_val & mpam_mask))
++		user_val &= ~ID_AA64PFR1_EL1_MPAM_frac_MASK;
++
++	return set_id_reg(vcpu, rd, user_val);
++}
++
+ /*
+  * cpufeature ID register user accessors
+  *
+@@ -2018,10 +2062,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_ID_AA64PFR0_EL1),
+ 	  .access = access_id_reg,
+ 	  .get_user = get_id_reg,
+-	  .set_user = set_id_reg,
++	  .set_user = set_id_aa64pfr0_el1,
+ 	  .reset = read_sanitised_id_aa64pfr0_el1,
+ 	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
+-	ID_SANITISED(ID_AA64PFR1_EL1),
++	{ SYS_DESC(SYS_ID_AA64PFR1_EL1),
++	  .access = access_id_reg,
++	  .get_user = get_id_reg,
++	  .set_user = set_id_aa64pfr1_el1,
++	  .reset = kvm_read_sanitised_id_reg, },
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
+ 	ID_SANITISED(ID_AA64ZFR0_EL1),
+-- 
+2.25.1
 
