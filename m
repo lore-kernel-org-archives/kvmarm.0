@@ -1,232 +1,201 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE89229683;
-	Thu, 12 Dec 2024 16:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FAF22370C
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 17:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734022491; cv=none; b=dbknDbVzcjBo6tb1LXZEV+EoJVOxnYe3tgUqkbC0wWbY2raw6WftFd0S+kFyGrRlizk65vsmW8ZrCOIMvt5UHdKcbvA347JSLykPMAjYNU1pTGUp8VheA2H+WQ7PWEA4xb8DPCDzoRvyX1D3upXYZpD8GguPEcBwVHYfixy1DUo=
+	t=1734025579; cv=none; b=EurJTnY9MsNxgYskIOYN5yn6m8bR750rTWlnbFHfeyCqNPzd5QxtivnOI5rSg7A1RH33c289BAwqau4jKw4iC4BnsRCgZWcYB6kLlvaLZxIVz3ooXLYBCMT4eWaEQjy+kyaek2v0jr7kRXK7MuoU2qJtlWRkLwfD4vSxMpEdjo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734022491; c=relaxed/simple;
-	bh=yiWv2LJR/WooY+cewsBGG/BFAypWaPMtuTHxogaMDkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kVhfYOYjVQxvlJtmusM/BdSYnIdB+llaGQ9UYnYiSBXt70e0/90YmyLiJuwWWzN8pMGImAFd+RF95n6AQPguKlL5wEvBeTbw5wovwoNT3Pvd6XL/yBItw/tOkbYDYYdP2ZL3KCnrpIi8qRW60zUUc9BWrSjRAsNe9rnRzuvsEU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D6A11762;
-	Thu, 12 Dec 2024 08:55:16 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 793573F58B;
-	Thu, 12 Dec 2024 08:54:45 -0800 (PST)
-Date: Thu, 12 Dec 2024 16:54:40 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [PATCH v6 32/43] arm64: rme: Enable PMU support with a realm
- guest
-Message-ID: <20241212165440.GA1479329@e124191.cambridge.arm.com>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-33-steven.price@arm.com>
+	s=arc-20240116; t=1734025579; c=relaxed/simple;
+	bh=yBznrJE56VRWhrBvxk3/sZkoRE2CzrKK9JIJqvtRp14=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ThT+7zpjiYIiF6Gs2z9ON3gyWq00tv2fgr8Y66yOirhdnIpo2/reuge/iZN9ShVjz+FZQ28yQU/VoK68IsP4YEpPG06amlCOSixIy0ibN5Jv5hCj6Zpt4ZdepA6Je7NFcs2V6dqmDt+64OrRvYTYXR/zo2k7quBJXVYz0whx84o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GLLVdX+n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GLLVdX+n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734025575;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yBznrJE56VRWhrBvxk3/sZkoRE2CzrKK9JIJqvtRp14=;
+	b=GLLVdX+nrfzWjWkfYrgi3h/7m0U8Y4IoxQyZPqFTE1mwdeqZ4Iinq1cP8X64rC6+jjwIER
+	fwVbkVsHZGf/yqiUtfWZDFbUqizayb8LfF0ZOWMjP/7df4Tg1Nu0IzYkrOYQFZrnLdLrFR
+	8kPBFB0se7lXpEqwBYDWx479WpER+Jw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-bXWYHW6DNiGex-VE02dERA-1; Thu, 12 Dec 2024 12:46:14 -0500
+X-MC-Unique: bXWYHW6DNiGex-VE02dERA-1
+X-Mimecast-MFC-AGG-ID: bXWYHW6DNiGex-VE02dERA
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-46775c891d2so27871581cf.2
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 09:46:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734025574; x=1734630374;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yBznrJE56VRWhrBvxk3/sZkoRE2CzrKK9JIJqvtRp14=;
+        b=oVoHxlqJKxHt3YWnI56tBXsQyjSmvHfvGm5XuphhJiE6wCh2G6DSfmMmFq6lHuEOCi
+         jZcrZrt2IEU7k9ykNYfBw84HhlP89DxT/umpoqkQbeBJXCgMnCzHDgWJbPH1wsfoFpQB
+         DKNDdjfO87Tz3+XSipe1I9FA3x4wfg42nUPTjuYmkp+vxywuQ8HmhgeLAwXXirBy1Ua9
+         WdH6z3DwcqJItxSkc7h86TnWnFLi94yw7zlf8bxs9X6TpncMg5vYFnVwACT7qzskY0GB
+         lZKvYIER36yiAk6XUhmwt+G2PVzRvra8Q3bZIRTO32Bcl2VNSShXXkXQ8MMpyu1e1m/H
+         rpIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVE1KDB3EChGYs0n0khgiEc/8tBlWXA3XIC1p3Hc6549Ubjetoe8eIOlU8rQrkbf1d/lpqJikc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwuSXQNR0FVwpos1XAfBplKeLFststUjVJpIjTH6Vox+I99Q38S
+	9vE65cB/PV+/o7q4G2p8jRVy47JgbqI1Dr6nBHQdGl7LaAabWR0DxJrRcd7C8NY3a+jIufzH+30
+	t0IWjayutb0U2feCMa/lQuHpEgHc5r8JWykQd2nPiOB6ph4OAx1kvnw==
+X-Gm-Gg: ASbGncsza8tvd8AX5GYxpTe6+egLraJm2cF3/1KEPr+QCR5zfscH0sWJTXMBnqisJ3W
+	3etPZAkBVMqzs6tz97IfQOwZNKeur+kCKNTgY1zuvk1arUeyrs7yZsMC0zIPWuAZCKoBiqVjIj4
+	L1IdTJNw6iEKgD7sS7DVJysf9jnKMouvyjXPALUkxk/35X3vIIXu1OsCpRHHjlh0BCxC/Mx1wVD
+	kNF0PIpww0E8mIvfoiMzGpD0cZTnaVNVa0QQKgfYJYSpXxm1fFZyvl8r7eYVNu8u1Potc1qLdR+
+	pSv2/i86kiktiK9gqEtazVRdKELl
+X-Received: by 2002:a05:622a:1481:b0:467:6486:beea with SMTP id d75a77b69052e-467a16d8d82mr17250521cf.38.1734025573789;
+        Thu, 12 Dec 2024 09:46:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESjabeM15BdQhC8Wj8b+Ah/nkx1/l8WK0j38QBKEhg2gmiHasG+E2HVEBwie5+liQCRSqa5Q==
+X-Received: by 2002:a05:622a:1481:b0:467:6486:beea with SMTP id d75a77b69052e-467a16d8d82mr17250071cf.38.1734025573505;
+        Thu, 12 Dec 2024 09:46:13 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4674feaaab4sm59534911cf.18.2024.12.12.09.46.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2024 09:46:12 -0800 (PST)
+Message-ID: <12a2ef7c-0ba3-49d9-9e08-733b8ca6a753@redhat.com>
+Date: Thu, 12 Dec 2024 18:46:07 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212155610.76522-33-steven.price@arm.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH RFCv2 02/20] arm/cpu: Add sysreg definitions in
+ cpu-sysregs.h
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
+ peter.maydell@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
+ oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
+Cc: shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+ pbonzini@redhat.com
+References: <20241206112213.88394-1-cohuck@redhat.com>
+ <20241206112213.88394-3-cohuck@redhat.com>
+ <2a83a49b-6863-4fb8-b5de-c3eacf3cdb77@linaro.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <2a83a49b-6863-4fb8-b5de-c3eacf3cdb77@linaro.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: YU_5-Z7QZLNHm7zdghcH7-zTAK1Pu_lHG6C5AGEij80_1734025574
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 12, 2024 at 03:55:57PM +0000, Steven Price wrote:
-> Use the PMU registers from the RmiRecExit structure to identify when an
-> overflow interrupt is due and inject it into the guest. Also hook up the
-> configuration option for enabling the PMU within the guest.
-> 
-> When entering a realm guest with a PMU interrupt pending, it is
-> necessary to disable the physical interrupt. Otherwise when the RMM
-> restores the PMU state the physical interrupt will trigger causing an
-> immediate exit back to the host. The guest is expected to acknowledge
-> the interrupt causing a host exit (to update the GIC state) which gives
-> the opportunity to re-enable the physical interrupt before the next PMU
-> event.
-> 
-> Number of PMU counters is configured by the VMM by writing to PMCR.N.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v2:
->  * Add a macro kvm_pmu_get_irq_level() to avoid compile issues when PMU
->    support is disabled.
-> ---
->  arch/arm64/kvm/arm.c      | 11 +++++++++++
->  arch/arm64/kvm/guest.c    |  7 +++++++
->  arch/arm64/kvm/pmu-emul.c |  3 +++
->  arch/arm64/kvm/rme.c      |  8 ++++++++
->  arch/arm64/kvm/sys_regs.c |  2 +-
->  include/kvm/arm_pmu.h     |  4 ++++
->  6 files changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6f7f96ab781d..ae3596a25272 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -15,6 +15,7 @@
->  #include <linux/vmalloc.h>
->  #include <linux/fs.h>
->  #include <linux/mman.h>
-> +#include <linux/perf/arm_pmu.h>
->  #include <linux/sched.h>
->  #include <linux/kvm.h>
->  #include <linux/kvm_irqfd.h>
-> @@ -1209,6 +1210,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  	run->exit_reason = KVM_EXIT_UNKNOWN;
->  	run->flags = 0;
->  	while (ret > 0) {
-> +		bool pmu_stopped = false;
-> +
->  		/*
->  		 * Check conditions before entering the guest
->  		 */
-> @@ -1240,6 +1243,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  		kvm_pmu_flush_hwstate(vcpu);
->  
-> +		if (vcpu_is_rec(vcpu) && kvm_pmu_get_irq_level(vcpu)) {
-> +			pmu_stopped = true;
-> +			arm_pmu_set_phys_irq(false);
-> +		}
-> +
->  		local_irq_disable();
->  
->  		kvm_vgic_flush_hwstate(vcpu);
-> @@ -1342,6 +1350,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  		preempt_enable();
->  
-> +		if (pmu_stopped)
-> +			arm_pmu_set_phys_irq(true);
-> +
->  		/*
->  		 * The ARMv8 architecture doesn't give the hypervisor
->  		 * a mechanism to prevent a guest from dropping to AArch32 EL0
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 920e0fd73698..b4e3839f6076 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -804,6 +804,8 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return kvm_arm_sys_reg_get_reg(vcpu, reg);
->  }
->  
-> +#define KVM_REG_ARM_PMCR_EL0		ARM64_SYS_REG(3, 3, 9, 12, 0)
+Hi Richard,
+On 12/12/24 15:37, Richard Henderson wrote:
+> On 12/6/24 05:21, Cornelia Huck wrote:
+>> +#define SYS_ID_AA64PFR0_EL1                             sys_reg(3,
+>> 0, 0, 4, 0)
+> ...
+>> +typedef struct ARMSysReg {
+>> +    int op0;
+>> +    int op1;
+>> +    int crn;
+>> +    int crm;
+>> +    int op2;
+>> +} ARMSysReg;
+> ...
+>> +static inline ARMSysReg sys_reg(int op0, int op1, int crn, int crm,
+>> int op2)
+>> +{
+>> +        ARMSysReg sr = {op0, op1, crn, crm, op2};
+>> +
+>> +        return sr;
+>> +}
+>
+> Not a fan.  Why take 20 bytes to represent these?
+sure we can optimize it
+>
+> Our existing ENCODE_CP_REG and ENCODE_AA64_CP_REG macros seem much
+> better, even if the argument ordering doesn't match the column
+> ordering in Table D22-2.
+>
+>> @@ -841,6 +849,51 @@ typedef struct IdRegMap {
+>>       uint64_t regs[NR_ID_REGS];
+>>   } IdRegMap;
+>>   +#define ARM_FEATURE_ID_RANGE_IDX(op0, op1, crn, crm,
+>> op2)               \
+>> +       
+>> ({                                                              \
+>> +                __u64 __op1 = (op1) &
+>> 3;                                \
+>> +                __op1 -= (__op1 ==
+>> 3);                                  \
+>> +                (__op1 << 6 | ((crm) & 7) << 3 |
+>> (op2));                \
+>> +        })
+>
+> Ah, well, this answers my question re patch 1.
+>
+> It seems a shame to use 128 slots to represent all 9 id registers in
+> the op1={1,3} space.
+wouldn't it make sense to use a hashtable then as we don't have
+consecutive indexes?
+>
+> Do we really need anything beyond the defined registers, or even the
+> defined registers for which qemu knows how to do anything?
+what do you mean by "defined registers". The end goal is to be able to
+tune any id reg that the kernel allows to write. So I guess we shall
+encompass more regs than qemu currently handles.
 
-There's already SYS_PMCR_EL0 defined, so it seems this is not needed?
+Wrt op1={1,3}, tbh I initially sticked to the KVM API. Now looking at
+D22-2, effectively we have very few ID regs there. If we were to use a
+hashtable we may be more flexible in picking up the indexes that are
+relevant for us.
+>
+> I'm certainly happy to replace ARMISARegisters fields with an array,
+> but more like
+>
+> enum ARMIDRegisterIdx {
+>     ID_AA64ISAR0_IDX,
+>     etc
+>     ordering arbitrary, either machine or macro generated,
+>     but every register has a symbolic index.
+>     NUM_ID_IDX,
+> };
+>
+> enum ARMSysregs {
+>     SYS_ID_AA64PFR0_EL1 = ENCODE_AA64_CP_REG(...),
+>     etc
+> };
+>
+> const uint32_t id_register_sysreg[NUM_ID_IDX] = {
+>     [ID_AA64ISAR0_IDX] = SYS_ID_AA64PFR0_EL1,
+>     etc
+> };
+>
+> struct ARMISARegisters {
+>     uint64_t id[NUM_ID_IDX];
+> };
+>
+> This seems trivial to automate, and wastes no space.
 
-> +
->  /*
->   * The RMI ABI only enables setting some GPRs and PC. The selection of GPRs
->   * that are available depends on the Realm state and the reason for the last
-> @@ -818,6 +820,11 @@ static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
->  		u64 off = core_reg_offset_from_id(reg->id);
->  
->  		return kvm_realm_validate_core_reg(off);
-> +	} else {
-> +		switch (reg->id) {
-> +		case KVM_REG_ARM_PMCR_EL0:
-> +			return true;
-> +		}
->  	}
->  
->  	return false;
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 456102bc0b55..5628b573ca41 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -397,6 +397,9 @@ static bool kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
->  {
->  	u64 reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
->  
-> +	if (vcpu_is_rec(vcpu))
-> +		return vcpu->arch.rec.run->exit.pmu_ovf_status;
-> +
->  	reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
->  
->  	/*
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 27a479feb907..e562e77c1f94 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -303,6 +303,11 @@ static int realm_create_rd(struct kvm *kvm)
->  	params->rtt_base = kvm->arch.mmu.pgd_phys;
->  	params->vmid = realm->vmid;
->  
-> +	if (kvm->arch.arm_pmu) {
-> +		params->pmu_num_ctrs = kvm->arch.pmcr_n;
-> +		params->flags |= RMI_REALM_PARAM_FLAG_PMU;
-> +	}
-> +
->  	params_phys = virt_to_phys(params);
->  
->  	if (rmi_realm_create(rd_phys, params_phys)) {
-> @@ -1370,6 +1375,9 @@ int kvm_create_rec(struct kvm_vcpu *vcpu)
->  	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
->  		return -EINVAL;
->  
-> +	if (vcpu->kvm->arch.arm_pmu && !kvm_vcpu_has_pmu(vcpu))
-> +		return -EINVAL;
-> +
->  	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
->  	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 83c6b4a07ef5..a4713609e230 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1324,7 +1324,7 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  	 * implements. Ignore this error to maintain compatibility
->  	 * with the existing KVM behavior.
->  	 */
-> -	if (!kvm_vm_has_ran_once(kvm) &&
-> +	if (!kvm_vm_has_ran_once(kvm) && !kvm_realm_is_created(kvm) &&
->  	    new_n <= kvm_arm_pmu_get_max_counters(kvm))
->  		kvm->arch.pmcr_n = new_n;
->  
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index e61dd7dd2286..30625a6fd143 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -77,6 +77,8 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_pmu_resync_el0(void);
->  
-> +#define kvm_pmu_get_irq_level(vcpu) ((vcpu)->arch.pmu.irq_level)
-> +
->  #define kvm_vcpu_has_pmu(vcpu)					\
->  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
->  
-> @@ -164,6 +166,8 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  	return 0;
->  }
->  
-> +#define kvm_pmu_get_irq_level(vcpu) (false)
-> +
->  #define kvm_vcpu_has_pmu(vcpu)		({ false; })
->  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+Sure we will study such rework. As long as the key (ID_AA64ISAR0_IDX)
+can be matched against the index used by the KVM API we should be fine.
 
-Thanks,
-Joey
+Thanks
+
+Eric
+>
+>
+> r~
+>
+
