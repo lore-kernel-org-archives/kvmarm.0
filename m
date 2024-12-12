@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F1925949C
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 07:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5921FECD6
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 08:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733989283; cv=none; b=VsEcyWaTnt9jz1zp1oKqMapuZhpeEdlommEDDM3p70F77nEICnf6Mnr+MUIUMXl4iL03abzjvDpUvJmueIYJz5yP6gjbSb+/bfxpaS37/8QNO66n+hR74JwQfyIXOB0BTB/DgJCav3OOGG2b+uSpmAvV8xs8NsUr/CE7Vssty7A=
+	t=1733991167; cv=none; b=NVm1TDgWZM4IvJ5nr7hsN55mj29jiLpYA3MhrYndPJ+wsl8rWJxB9hJp2WhTQw65J54G67y5GrkTFrYRJcAczONgwP7Jgv+HjfJOPureV32NpxP41h+/cBx2l8T/BjZ9pdKCwKHM3qz4wNWK45SH20l9ys20jAko34N5hrNBjOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733989283; c=relaxed/simple;
-	bh=uAByMjOFYXHeIZ/LGPByc5ccB6fLfIJSawVhUBRNBeU=;
+	s=arc-20240116; t=1733991167; c=relaxed/simple;
+	bh=nbkZ5rb10SLcsJW//zuvcKM8vgk7zgWENNxiKMite/s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=etLELTPQDwJQ2EnVUxfqPr1fsSDKqFoq718XfeQcMX98x96ADQckHY8IU/BG3Wz3KG2B00BASHtZS9M+m1wQ6GwytO4A6HAvznNcs8eeisQP5H6Ev9iCFqQF5wrvkp6GcTItQOCOPvcX7AvlvnGUFlIPpQEAvMlieBa0HxIJwcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f4CxVzJq; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=JbcaKS9R6hk+e4KfQSlsgeCasAEfxUGqsjvWOJuhlh1hGeVA4sfklNWct15Mc8KsigBJPq/y1B/MaiM1UYcdxE9xPtaXOBqMdDo0cFsOkAbG0FLdsUy2qk+xODnI5aPOCdqXE2Yh3I2ZqCvTtnTLnkWns9V8TYeKlB3Wj9LXaA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuOWbvZj; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f4CxVzJq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuOWbvZj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733989278;
+	s=mimecast20190719; t=1733991164;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+BBjqkexuxRVsrMPO4GlnyeXmHrcoGbCCP6iUHH48A4=;
-	b=f4CxVzJqwLZfQp+LCVjN9xs25eIMpTlmYE7SdVEFK0QyKGZ2q6ELpRJb9y7AbZ2qUwOIfh
-	OokcIuASmHZydd4ZKwDzXoMd7TBRIhH+bvUIaeXx/bs4qNCv1n1aoFp4rGm1DtzlXi4mMz
-	LlonYXO57PgRlnzYQd46r9zcVxqRiks=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=RIR3RDbWw10AWYhrJExyps7irls6kROXPVO1dLjtdE4=;
+	b=FuOWbvZjtRjNz5KVIl/GjsjpW4l79P14JzSAguuVB7yNiHjZhrErB9BJ9lHsTlxf0iT63R
+	rCoDXcyvqbRIb8FTXXHExKNwQKP8tauQ9r3x5gNbE7/9YFjgknZzvUfOwP5UZ7DxoVdbEi
+	luLdSWNkK3lutevLCbbDJZ08REkXopA=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-448-I--In3N0PTSjMycaQ71WsA-1; Thu, 12 Dec 2024 02:41:17 -0500
-X-MC-Unique: I--In3N0PTSjMycaQ71WsA-1
-X-Mimecast-MFC-AGG-ID: I--In3N0PTSjMycaQ71WsA
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6d8f4a0df93so10400126d6.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Dec 2024 23:41:17 -0800 (PST)
+ us-mta-90-gwiO_OxwO1OOM8ZJnG3WdA-1; Thu, 12 Dec 2024 03:12:41 -0500
+X-MC-Unique: gwiO_OxwO1OOM8ZJnG3WdA-1
+X-Mimecast-MFC-AGG-ID: gwiO_OxwO1OOM8ZJnG3WdA
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b6e9fb0436so124402485a.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 00:12:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733989275; x=1734594075;
+        d=1e100.net; s=20230601; t=1733991161; x=1734595961;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+BBjqkexuxRVsrMPO4GlnyeXmHrcoGbCCP6iUHH48A4=;
-        b=IdYThY9jLcOBoBBD5TXa7pW0fiHjSs/R2CGMjHWc4i6MgrNm2KmcaQDVcD5NtwiJsp
-         40hMXVNAygfTyUCDSlczbvPysD7zllAOnz24b5HWhT2a+gK+pq1Biw6XJSKbYqx6enq5
-         g3yJurUdY4tpcgAPrj6QZFSy6PxpgsCY76S9bPCtSAdPx7GQb9HugS9StfVndE9HnWQ7
-         9DCtnpM1srFBmts3pGy3NEzsZemQ5FYxcsT85rxAeLiwa3SBaf0/scCvvdLXS/20tImb
-         6SIKMh9d2FYfJTcb3WoCfX77kYTnsS3WjTPZkFZ1v5X7I/MzDQXn6QOFY05wZg+vo0Lo
-         /c3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUycOc3DBT9IQ5XyFzh1pO9SGnoOrLxNRpMchaEnqwQLXx3pa3pY0CmAv1aDXRz4rIN1EoeAr0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzn+YYeS60T7PkjbAwya1Xv/jtkmOYAzFNf7mFLWXFVzmTaYC6V
-	8XDBtRPeEpuL9tN4rZcXZIBYEFLF04Q8DLFi98zvEL23iRzY510QpEAOhmQjK70gHqjl5rWxA6k
-	BCGnJrDjGmA4jXHHnJx9WuRhrt0thDO2nB+y74hN3XkivweB0EyjRm7dwT+ZuPw==
-X-Gm-Gg: ASbGnct7mSgsCmC90H5dTJq6y6RRMo3BukopE9BfrIGTfxbAUxfibisMxQI58sD5WSW
-	Ut/ucYBeKb/uyw6NeYIK7Ll+U306g5ZxB7eemSbteuxmJC/0l0u7qWCLRon2cKrL8ZSrakIyYd+
-	Rug7zRjvi2iDwSMAVWTCvJzCE1XVZyBB5EnbU1HezuEKIcb5kVE7O2RfXq07eyC99hrrG2rhvuz
-	qOE9fCCMvQYOYePSXpkbiQyQ9Sl6oKDO4jhe4LNunm0I5g1/7ATTJaf7+XW6negTiSPqtUrx1C4
-	jq1/4NW8vX5yxNDAvXMCPScLQSpI
-X-Received: by 2002:a05:6214:2129:b0:6d4:1662:348c with SMTP id 6a1803df08f44-6dae38f5795mr35838216d6.17.1733989275344;
-        Wed, 11 Dec 2024 23:41:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHGREz05z/QXRJ9hkMXdYiNNC8IfSda0B0oYfur9EByF99pBgpCDDgNYCds16XzlHWCFNLnTA==
-X-Received: by 2002:a05:6214:2129:b0:6d4:1662:348c with SMTP id 6a1803df08f44-6dae38f5795mr35837876d6.17.1733989274955;
-        Wed, 11 Dec 2024 23:41:14 -0800 (PST)
+        bh=RIR3RDbWw10AWYhrJExyps7irls6kROXPVO1dLjtdE4=;
+        b=wAJyx7PKU9T61NaUfV7YJQkVwj61aNPYPXVJ3NuadWrE1cjeSHm0GQbmVjcJaonEGV
+         B2ol4zEX/GxMv7FWxwMN0ZOQj2s3iCtpOFLXcWTvUt2d3HTfh+UimkHX+1pUE0R+XHiV
+         cfzNR3CZsU8g8JJZF9sIcDakZEtN7+lWC4Xp62ZLxtmWcivdk0JV8CWgdZyZ4RIHwtgR
+         ddiMt/M9Ab2rTtuhWU1wj47/MvawVHkGEV5AhaXMLflbNchMuQgxi8+YU8WsBfM9szuJ
+         2DtCC48Da1JFZaHE81X5D8Q7askKnoj+GjOsQaXokCLow7sc1T1GT3aC4SpXVJNkIANC
+         HXqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDHRUlznZ+nRoQT0aYo25+b6D11aE87/wFp+sXqQoip83uPQ/i0Qc2sFfJ9ZgYbRYCOpbb9fY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywt6H/nOQpQJpFlNCpFqSecm4jCMfLYMbLdxAAAg+4Tahjy4t7M
+	a8SM4s0WCXmRIzMa8v/FkeaCOZztzPHQ9Vh9YgMbLb0BULGEirQe951Eo5N7SnoBViIXV5MipCR
+	B4Nuh72azXC96edGsEyBmknnD++cpSwCk/p/GrhJ/2Erh7fLsq3zeEg==
+X-Gm-Gg: ASbGncvvkYGdDGkv0lqdB5oxyUrrLBPc2pT/buYr4fMWA3O8OeQ71BekSbRWhiUL+Pb
+	0TPiv5gBwAdDVW232X2guotqLZB6AsH7T7rgnUswQlf25ZTr8VGn2o+/aSg9kwqk2omtubSYIPK
+	vjHtqAaW0reivL34UsFY0kbD3Hkxk2ErQB0vJD0NacAKssJuSeLv9D7j87xrGkF2LFlr9rIs7ID
+	SBDs1m4p884Pmgx6uCAME7k1eZ5gnr+Ky+AC4tAQEOthwXYOWHR/OufYG7vCIor9kCjigDdYfjk
+	AUrFUYv+Fillo3vKt28hi6ziWV8O
+X-Received: by 2002:a05:6214:1d0e:b0:6d8:9dad:e14b with SMTP id 6a1803df08f44-6dae38f468emr35241356d6.13.1733991160478;
+        Thu, 12 Dec 2024 00:12:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHKUoc79FfTGHrJUPXCz6maORxx+WoLuvjk9v75rMsolCJyEV9N+/g5r+Kgo74Cx6oElyIFXQ==
+X-Received: by 2002:a05:6214:1d0e:b0:6d8:9dad:e14b with SMTP id 6a1803df08f44-6dae38f468emr35240966d6.13.1733991160019;
+        Thu, 12 Dec 2024 00:12:40 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dae944ce81sm4009876d6.61.2024.12.11.23.41.08
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d8da6739a9sm79922446d6.3.2024.12.12.00.12.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2024 23:41:13 -0800 (PST)
-Message-ID: <74616ed3-24d3-44fd-a8b0-bb2927dbd5d5@redhat.com>
-Date: Thu, 12 Dec 2024 08:41:07 +0100
+        Thu, 12 Dec 2024 00:12:38 -0800 (PST)
+Message-ID: <edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
+Date: Thu, 12 Dec 2024 09:12:33 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -90,13 +90,13 @@ References: <20241206112213.88394-1-cohuck@redhat.com>
 From: Eric Auger <eric.auger@redhat.com>
 In-Reply-To: <20241206112213.88394-1-cohuck@redhat.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: k2H669GiFrps9hdppIhlxr2-PAreOq3Tq0uk05HRkTU_1733989277
+X-Mimecast-MFC-PROC-ID: -dIEi7gt5GY-CQls5Bk4NzLvGUhoAPqTYzDHGQwXvyU_1733991161
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Peter, Richard,
+Connie,
 
 On 12/6/24 12:21, Cornelia Huck wrote:
 > A respin/update on the aarch64 KVM cpu models. Also available at
@@ -139,17 +139,6 @@ On 12/6/24 12:21, Cornelia Huck wrote:
 > How to continue with the patches moving the ID registers from the isar
 > struct into the idregs array. These are a bit of churn to drag along;
 > if they make sense, maybe they can be picked independently of this series?
-What is your opinion on that? Patches 2 -12 are dedicated to the move of
-isar struct's individual idreg fields to an array. To me , this
-anonymous storage looks more generic, scalable and adapted to the way we
-retrieve information from KVM. Do you think this is an acceptable
-reshuffle of the code and can we envision to push those changes in a
-separate prerequisite series that would avoid us to rebase everytime
-until we get a solution for named vcpu models?
-
-Thanks
-
-Eric
 >
 > Whether it make sense to continue with the approach of tweaking values in
 > the ID registers in general. If we want to be able to migrate between cpus
@@ -157,6 +146,45 @@ Eric
 > expressed via FEAT_xxx -- e.g. when comparing various AmpereAltra Max systems,
 > they only differ in parts of CTR_EL0 -- which is not a feature register, but
 > a writable register.
+In v1 most of the commenters said they would prefer to see FEAT props
+instead of IDREG field props. I think we shall try to go in this
+direction anyway. As you pointed out there will be some cases where FEAT
+won't be enough (CTR_EL0 is a good example). So I tend to think the end
+solution will be a mix of FEAT and ID reg field props.
+
+Personally I would smoothly migrate what we can from ID reg field props
+to FEAT props (maybe using prop aliases?), starting from the easiest 1-1
+mappings and then adressing the FEAT that are more complex but are
+explictly needed to enable the use cases we are interested in, at RedHat:
+migration within Ampere AltraMax family, migration within NVidia Grace
+family, migration within AmpereOne family and migration between Graviton3/4.
+
+We have no info about other's use cases. If some of you want to see some
+other live migration combinations addressed, please raise your voice.
+Some CSPs may have their own LM solution/requirements but they don't use
+qemu. So I think we shall concentrate on those use cases.
+
+You did the exercise to identify most prevalent patterns for FEAT to
+IDREG fields mappings. I think we should now encode this conversion
+table for those which are needed in above use cases.
+
+From a named model point of view, since I do not see much traction
+upstream besides Red Hat use cases, targetting ARM spec revision
+baselines may be overkill. Personally I would try to focus on above
+models: AltraMax, AmpereOne, Grace, ... Or maybe the ARM cores they may
+be derived from. According to the discussion we had with Marc in [1] it
+seems it does not make sense to target migration between very
+heterogeneous machines and Dan said we would prefer to avoid adding
+plenty of feat add-ons to a named models. So I would rather be as close
+as possible to a specific family definition.   
+
+Thanks
+
+Eric
+
+[1]
+https://lore.kernel.org/all/c879fda9-db5a-4743-805d-03c0acba8060@redhat.com/#r
+
 >
 > Please take a look, and looking forward to your feedback :)
 >
