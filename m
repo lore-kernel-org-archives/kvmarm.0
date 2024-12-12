@@ -1,91 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE9320E315;
-	Thu, 12 Dec 2024 09:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2189220FABB;
+	Thu, 12 Dec 2024 09:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733996494; cv=none; b=MIVlC99gyGzLbgSlWRaZ0R9xjJajsB9biomZk84AL7ACIrcFM+ui70PWU/jI1o6EZm+CHje134nJKpd5z/Su27GPy/GtsU2RZyMn/O8jlPP974koEiiC1MxcaVSfVchZ4787qgZZzrzUFC7ynxCrEXdnXG+mfc5LqfzwLp1SdS0=
+	t=1733997428; cv=none; b=uwxDdbXDu1wsP4WAxUwXcxouOfuHigYD8juGWLV7tNHD32IMxw8UIcKqDYnv9zSbe3UYkHeOc7YfiYUT7Xk4pL71hoSVVVK0jMv8fRAL1HrYXF9JRWXd5kQSgKsbTZGhgkisIJLPAcYFiDFEwpjY4fu/VZ3zPIms7Yj3G+LW0N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733996494; c=relaxed/simple;
-	bh=8T9YqQIGe01+p2hPomlifpNUHNh46GGlOzTjpfIdD7o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DxzQs34j1hO0zhrKyb5ZK6nCn4cuQekVQQL/jWw/upzncWF9yZ2CovrqvPJ8ESKzA4nfN0KPBHBRiSgWP+wvFsywS23nlA8W9QxAPCAHNyfO7sa8/DZGc8tx2XFm7ZZEKfAlZ4LSLHjdTmpUZ4+tlpuGnCZdKtnmSJKDaJPfcPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=olGgcMgg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733997428; c=relaxed/simple;
+	bh=CR4xKt3dKhiMF/jgSb/r1xl+RaNR7Vqb2fCQvyj4HNs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jVoM4RfIPfrf5NfVELbxbfXAwSvpbrvxcMECMKUQS715Ca/0T0WUg3OLR68IgfI/sNonpfjMBzbG68PKEjsmpGdZ/DQqPGmMYVzkbfBR3p+7m11ioX3qiwRomgLzx74JJ7IDS+Zpc7/3OYi4G96DtIuzFCz81DS7b4vGmFvawm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwisyUAO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="olGgcMgg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53F0C4CECE;
-	Thu, 12 Dec 2024 09:41:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwisyUAO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACE41C4CED7;
+	Thu, 12 Dec 2024 09:57:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733996494;
-	bh=8T9YqQIGe01+p2hPomlifpNUHNh46GGlOzTjpfIdD7o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=olGgcMggf0fE1LeSI76/UaPOD4ftsCZOroqJTEOGj9ippWzQmUy3icmHWXgt+n1hr
-	 NrEveF/eWzKta86ruTjo/akhkLAWp6ktgL5enw2HyOdSlQkXOlR+oZlUQr3Cu2AL8G
-	 k7819e9L+NedCTEbNku6Arlz0zh4rk/U2SnKV8VwxJBmH0xGtej74hu87oCbwcFxpv
-	 ausS4U8ybsPMwi4Ts9fxSO8/y3fkbu6u3OYJLiTsYHgrfpmCfRyPPl3jZKGGPlfnw5
-	 rgk5KsfvSXDEvRFKq6f1ceW7RUs41R4Ydi0GL8tlfiosLOMJi3EFfc5GPUt9uUTfxP
-	 YFr+SF2N/1thg==
-Date: Thu, 12 Dec 2024 09:41:28 +0000
-From: Will Deacon <will@kernel.org>
-To: julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, kernel-team@android.com, maz@kernel.org,
-	oliver.upton@linux.dev, apatel@ventanamicro.com,
-	andre.przywara@arm.com, suzuki.poulose@arm.com,
-	s.abdollahi22@imperial.ac.uk
-Subject: Re: [PATCH RESEND kvmtool 0/4] arm: Payload memory layout change
-Message-ID: <20241212094127.GA18819@willie-the-truck>
-References: <20241128151246.10858-1-alexandru.elisei@arm.com>
- <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
+	s=k20201202; t=1733997427;
+	bh=CR4xKt3dKhiMF/jgSb/r1xl+RaNR7Vqb2fCQvyj4HNs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dwisyUAO0Fe6OZk999b8H0f2W5l7v/tFtXoXFpH2iLDcjvQ2Jh+/cr/Oiikwk25Ea
+	 hpk9539OgJtSVYvyeBvqBs2mxR3IyU+Xxq1GUDel1LMdEN97lCrb2ACSNcJKnm0mjt
+	 HvxwR4/Pk9ZwAggD5eIZnVz/wezev9YpHja2gumgolOyK+UXqhefClt1oOAtPLbQfL
+	 POc3mTK8N7Vcvns+D9/ijUNSsiFPsvJWVehyFn/rY9+68WlRSXk2zy/Gqbq/dfimr1
+	 b6AsgRZsKCsGOO3Lsq9ygPPrTIYm4IU9ibALKy4Fa6W+OXI5HB3ZJq1j4Z5A8NdIRh
+	 JV2EDm/s3lhvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tLfwP-0031hu-H5;
+	Thu, 12 Dec 2024 09:57:05 +0000
+Date: Thu, 12 Dec 2024 09:57:05 +0000
+Message-ID: <86msh1rzpq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: =?UTF-8?B?TWlrb8WCYWo=?= Lenczewski <miko.lenczewski@arm.com>,
+	catalin.marinas@arm.com,	will@kernel.org,	corbet@lwn.net,
+	oliver.upton@linux.dev,	joey.gouly@arm.com,	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [RESEND RFC PATCH v1 1/5] arm64: Add TLB Conflict Abort Exception handler to KVM
+In-Reply-To: <5d4ccb2c-da45-4471-9bb1-90212b50dad7@arm.com>
+References: <20241211160218.41404-1-miko.lenczewski@arm.com>
+	<20241211160218.41404-2-miko.lenczewski@arm.com>
+	<86o71irucr.wl-maz@kernel.org>
+	<5d4ccb2c-da45-4471-9bb1-90212b50dad7@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <173395873873.2737640.3783988676491071650.b4-ty@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, miko.lenczewski@arm.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Dec 11, 2024 at 11:44:14PM +0000, Will Deacon wrote:
-> On Thu, 28 Nov 2024 15:12:42 +0000, Alexandru Elisei wrote:
-> > (resending because I accidently only sent the cover letter, sorry for that)
-> > 
-> > The first 3 patches are fixes to kvm__arch_load_kernel_image(). I've CC'ed
-> > the riscv maintainer because it looks to me like riscv is similarly
-> > affected.
-> > 
-> > Patch #4 ("arm64: Increase the payload memory region size to 512MB") might
-> > be controversial. Follows a bug report I received from Abdollahi Sina in
-> > private. Details in the commit message, but the gist of the patch is that
-> > the memory region where kernel + initrd + DTB are copied to are changed
-> > from 256MB to 512MB.  As a result, the DTB and initrd are moved from below
-> > ram_start + 256MB to ram_start + 512MB to accomodate a larger initrd.  If
-> > users rely on finding the DTB and initrd at the current addresses, then I'm
-> > not sure the patch is justified - after all, if someone really wants to use
-> > such a large initrd instead of a disk image with virtio, then replacing
-> > SZ_256M with SZ_512M locally doesn't look like a big ask.
-> > 
-> > [...]
+Hi Ryan,
+
+On Thu, 12 Dec 2024 09:23:20 +0000,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
 > 
-> Applied to arm64 (sina), thanks!
+> Hi Marc,
 > 
-> [1/4] arm: Fix off-by-one errors when computing payload memory layout
->       https://git.kernel.org/arm64/c/167aa1e
-> [2/4] arm: Check return value for host_to_guest_flat()
->       https://git.kernel.org/arm64/c/ca57fb6
-> [3/4] arm64: Use the kernel header image_size when loading into memory
->       https://git.kernel.org/arm64/c/32345de
-> [4/4] arm64: Increase the payload memory region size to 512MB
->       https://git.kernel.org/arm64/c/9b26a8e
+> I believe the intent of this patch is to protect the host/KVM against a guest
+> that is using BBML2. The host/KVM always assumes BBML0 and therefore doesn't do
+> any operations that are allowed by the arch to cause a conflict abort. Therefore
+> the host doesn't need to handle it. But a guest could be taking advantage of
+> BBML2 and therefore it's architiecturally possible for a conflict abort to be
+> raised to EL2. I think today that would take down the host?
+> 
+> So really I think this could be considered a stand-alone KVM
+> hardening improvement?
 
-Sorry, these links are all broken as I generated the thankyou note
-against a testing branch. Rest assured that the changes are pushed to
-the kvmtool.git:
+I'm not disputing the need for a TLB Conflict abort handler. It will
+be a good addition once we agree on what needs to be done.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/
+> > However, it doesn't seem to me that the host is equipped to deal with
+> > this sort of exception for itself. Shouldn't you start with that?
+> 
+> If the host isn't doing any BBML2 operations it doesn't need to handle it, I
+> don't think? Obviously that changes later in the series and Miko is adding the
+> required handling to the host.
 
-Will
+Yes, and that's what I overlooked yesterday, and I replied to that
+change this morning.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
