@@ -1,125 +1,248 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D205209F5F
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 13:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C54C1EEE6
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 13:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734009218; cv=none; b=CUEfLnviHoRLFJyPm8MJkgaOxI+wqH/w0eG+k7CEFnO27nIBQT2swK4qFy4wsq/0rTi9ExVqMsqw3e0PJLDq6IoRji0vcD2oGb8DXmel3vToAxw0Bo1qSHGLrWax0gFHeOryBy9whe9CswOE/7B3TuSJXdghus3HIb3K31aywUQ=
+	t=1734010179; cv=none; b=Ecbn+lU3mbvWwCzcziYd1NEVxxAXBmdP5IZbNDTuniF6k/KbGpO9wQlMPMHhQjUt3zKdXim1p/LZruyFhqLmS+3aE9ft1ZQFK6hvIsHnLPTOC0FtASNjClileXf7PuKb4DgXUsh6pSIIXpDRfsj//eqDkdviOtC1iyHymLM816g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734009218; c=relaxed/simple;
-	bh=1gWJ627Oewxt6wS9Eh2CHGrTM20edxHBpdt7ByE6PEY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Nd9OIQvV4I2HeTkNVr0mhdFx4XVPHuuUlFeF0US5IvEajY1GzWsa4koYMNDzcyxy2bP12yD1QQcmq7zks99NKfUSBFq4r/ofR4nlCW28drjytyIzMxrxjwbzTGt3zvci0+Tp+0eE6VB/t3cVwLHtqd72UHSJIHzPeWLLJD1a4Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gRZR0lrG; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1734010179; c=relaxed/simple;
+	bh=y+MTHO5ILruYFtyk7+4rRJ5wb4EdgWEzjhT8+z3yK7M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SjD0KkAtZKfBv/eO+JxqTlhi7kM7qH4OgJDVviYYPK6jMNJaRHC/jKnTCoH9s2sw6N3J9p5zy5KHGwy8fC+ZjjuC0CG8RUPWR0wjzb/vYfZlGpqfyn3ks1eRUKYPgr0W2YSgxc0Ah+aunf/Gp6xY7p1BAyR0d6WkR296N0fdsdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EQLH9IsD; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRZR0lrG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQLH9IsD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734009215;
+	s=mimecast20190719; t=1734010176;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Wxof28cpgCbDnkhoQWNSoVVTvYRkzUUHJ4j75bS+0v0=;
-	b=gRZR0lrGHgwIuHSrT/G7TF7DVCcZbxDSUx/kLA3t3EMDRf/czzyE3+6/QFC+2+DEQKvTt5
-	4SqkNUjgAjmuYlJFgQ5JWu5EofwzhQvaKeh0ZGFpk35V/NKiSn6H8CAeaynqrSaHrfapQe
-	a0YMHAKgudMoDXSW4oDjW0h0JOPPAAY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gwEJLU8VfEe4WpG6Kyyy8koTZmYNzH3QNWOlLWxrr8c=;
+	b=EQLH9IsDNhhN9BPxTbm9f4Au8DhacMvhSIeSqZSEogy+eFXwRyUmAAnKdzJ1iSNVA4waNI
+	IaFe/bZmmsPAomciVQEPMlcLJMBwzdRNFlTYMAjCsXbzk9k+lsnl+XWk4aySNSfFrW89Bj
+	zcTJm8/1NVT2gO5tRfOJxpBORkBaQ8Y=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-117-IdC1jEKePEaD5Knu7RwZgA-1; Thu, 12 Dec 2024 08:13:32 -0500
-X-MC-Unique: IdC1jEKePEaD5Knu7RwZgA-1
-X-Mimecast-MFC-AGG-ID: IdC1jEKePEaD5Knu7RwZgA
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-385e9c69929so283032f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 05:13:31 -0800 (PST)
+ us-mta-638-CDWxhI8pNHeFzq321fmahg-1; Thu, 12 Dec 2024 08:29:35 -0500
+X-MC-Unique: CDWxhI8pNHeFzq321fmahg-1
+X-Mimecast-MFC-AGG-ID: CDWxhI8pNHeFzq321fmahg
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3862be3bfc9so354000f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 05:29:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734009211; x=1734614011;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wxof28cpgCbDnkhoQWNSoVVTvYRkzUUHJ4j75bS+0v0=;
-        b=kZl3GDpoqvRerWbvNlc0e23zqk3O4ylTImkLM6Rm81gRUgPtd4torDnSf5UkjXZjdz
-         E6OApugNkC3xcVfZzGyGkBdu7xfHvWpQ8zlHF6RUOLo0dh3svFbvicUdLlh4t5W5sVnY
-         8xnwkD69EaEgxluZc8w9KLPyA2tOkFtRBrqsPKXtCo2qMGe2dw9j6r06soZ1BL2PPdlN
-         cHKy04UbcsSic38SRPqQJ9MU3hley46AXS6UY/7PHqE0F5Enp1EtEIXXqT+1GKMR3rKI
-         FseEvm2FXWPqX6romDy1Z/YfKhlSe/Q79OMTsglrKBYareRQ13ILBOHS8mGx6mi/p+oj
-         OFIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWweaLb1iPBhIeyWPrvroZgeIPPhzw0jMcjEkL5L499O7i6eCgpK0shZmUvzRIqqMSldFviI60=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzRT9+lVZbzNIy5mLq/Qp8k4Jn9V4d6j1vO5HGND0GSHdNv3aSo
-	ceixpEMtQErZifvqjMbDaYQOi6jixwG013BfOjUms5SEIgU4r1wi15lZc7TqPXtT1KpOGPlhToH
-	Vt8KpAOd8JxtAsjgI+/J02gm4Ms+BjHbxDb1AMV6bfn6PcsUXGYWXMg==
-X-Gm-Gg: ASbGncu0Ik13XhZbEqy8SMHi7DtjhNaBL5TJcDV4Rw9zsXXFEvfcDnGMlHl+jlUXrQA
-	oC2EGt7DssccMfweXnDqNub15swH3y8zikRFdXczIWeG+d7x8lplC6F+CGK39HSDj4dbLaDrTO3
-	SuMHcH8gQyHW22wXjN2cbQRMQ8JxF74kYsMK2h1FaA2XpC4isEoX5m86Hjw/BCpZPfoYu7K1Qeg
-	KFlls2lZaDcKUPW6pgPg+fbZebrk9vifY9B/OYV4ynxaD+e5Dins5TbEqK/935mo/v4oJDsSlMK
-	yoOXb4P2hXRnXoB3oNsv+IJVLY1i
-X-Received: by 2002:a05:6000:1842:b0:386:4034:f9a8 with SMTP id ffacd0b85a97d-3864cec576fmr5320001f8f.38.1734009210969;
-        Thu, 12 Dec 2024 05:13:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFA9jreMWG/dYyAwe1URrFUYx8Xo0dt4ngkcqqQNsGq7c7BNDX5RAIlfNLMhrZNJ9g/WfPCmw==
-X-Received: by 2002:a05:6000:1842:b0:386:4034:f9a8 with SMTP id ffacd0b85a97d-3864cec576fmr5319966f8f.38.1734009210560;
-        Thu, 12 Dec 2024 05:13:30 -0800 (PST)
-Received: from rh (p200300f6af0bca008282df582fad0b68.dip0.t-ipconnect.de. [2003:f6:af0b:ca00:8282:df58:2fad:b68])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38782521dfesm3907401f8f.107.2024.12.12.05.13.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 05:13:30 -0800 (PST)
-Date: Thu, 12 Dec 2024 14:13:29 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, 
-    qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, 
-    richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org, 
-    oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, 
-    armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, 
-    jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, 
-    philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64
- KVM host model
-In-Reply-To: <20241206112213.88394-1-cohuck@redhat.com>
-Message-ID: <90431f60-e366-50e9-e95e-2ec9c6812056@redhat.com>
-References: <20241206112213.88394-1-cohuck@redhat.com>
+        d=1e100.net; s=20230601; t=1734010174; x=1734614974;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gwEJLU8VfEe4WpG6Kyyy8koTZmYNzH3QNWOlLWxrr8c=;
+        b=SNtzRQp5jUlN+tQXh/n8bwzMzgTCcCxcxm/m1bqjWGZds4WeEprdGd76MdasB/fFOl
+         dMxESn3J6WUsfdw433lxFlRUsfZRTDRZabWEsXSdxk/jiT3zjshL3PLNQctN3ucWUoPt
+         Un/MUiN3pZHnT/1BqLlkMH69/X/WvcfU0yfb/18cSDOVk8Yi7nxrZHyXQDRkFgejy+SR
+         tHex46kg2iydeuKrEO0inwkKpkS8pxmSsx7aus77BA4mEnRbpR7jp0MJ9jx6dsc0j6uT
+         4bIziSOSk1/E4vcEex8TKBoyel3pS84+/kZ0LuHs+s2W43t/MiyzDYIf6nfKWFKtwEzq
+         yGMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXs8SdIvdXaQWWThHGauFMvDBI+IcE2z9NUTR74NcMNLwTQFaUiQcA2J7YsspXH7Guf4seOg4A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwaXZK4Wj3HuvLyGqzVbDWbKt+lC8SZka47mGDnk8eYDXkY16ex
+	NgR7mfc8UW0fmJf1SW7yBSirGYBKvFyHniRmMrnLrLDWe+r2O+CcPtx0Ze1WnlH+Ix/MKld6gRK
+	ePFZ42CFw82EcM9fce/nEK94OG3fxJDYtuOKUzTUoyauxdfTzc2T05g==
+X-Gm-Gg: ASbGncu48oeHi4LFE6jD7NzI3zHzuX2R2kaKssWUFpTcI1I1ndkBbHA4uzOYwoeAzCA
+	7HJqpEqtoFirYUpdmW7vMdxeD8Pl1/uR/p4M57F0EClHjEtxxsh5Bkxeehasn0P5ta1hQXASa7B
+	DIJz0gOP6E7IybfkOoPwfyMpasPv1WdmaGao/pvfbDCJN8kmovyWRyLUqY2g1iqedk3Xs5I/QAn
+	jIVFX91yhfO0PTV0nxQlJ83JIpv0kbP36cKMXVt58Fob2m+4XDPFhGVMFl1IU7fDMcwG/TucEx5
+	JNTQifb4STJ3LfUr8Oej1Lw=
+X-Received: by 2002:a5d:64ab:0:b0:385:c511:240a with SMTP id ffacd0b85a97d-38787696b5amr2543349f8f.25.1734010174186;
+        Thu, 12 Dec 2024 05:29:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGTfSI/0zDLuU0Exc652J9apgcTbTgWAF7L89bL0PLGIQC9v8M+acncx/nDbCMCg2misxlIvw==
+X-Received: by 2002:a5d:64ab:0:b0:385:c511:240a with SMTP id ffacd0b85a97d-38787696b5amr2543320f8f.25.1734010173698;
+        Thu, 12 Dec 2024 05:29:33 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38782514db8sm4103844f8f.84.2024.12.12.05.29.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2024 05:29:32 -0800 (PST)
+Message-ID: <7b29665f-a9b5-4f51-ace1-7bad4eaba10c@redhat.com>
+Date: Thu, 12 Dec 2024 14:29:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM
+ host model
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "alex.bennee@linaro.org" <alex.bennee@linaro.org>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+Cc: "shahuang@redhat.com" <shahuang@redhat.com>,
+ "mark.rutland@arm.com" <mark.rutland@arm.com>,
+ "philmd@linaro.org" <philmd@linaro.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Wangzhou (B)" <wangzhou1@hisilicon.com>, Linuxarm <linuxarm@huawei.com>
+References: <20241206112213.88394-1-cohuck@redhat.com>
+ <edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
+ <38604260-6f92-4f16-9a4d-c310cbc52d77@redhat.com>
+ <4fb49b5b02bb417399ee871b2c85bb35@huawei.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <4fb49b5b02bb417399ee871b2c85bb35@huawei.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: VIPDwdlMKOifxdpwVzzUeyCaxbrJpHla0sIj03h7GhA_1734009211
+X-Mimecast-MFC-PROC-ID: WJP4--ttO3fs0aWDQ2XbM7nqFvcs1ijJDkHor9XPaYs_1734010174
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 6 Dec 2024, Cornelia Huck wrote:
-> A respin/update on the aarch64 KVM cpu models. Also available at
-> gitlab.com/cohuck/qemu arm-cpu-model-rfcv2
->
-> Find Eric's original cover letter below, so that I do not need to
-> repeat myself on the aspects that have not changed since RFCv1 :)
->
-> Changes from RFCv1:
->
-> Rebased on more recent QEMU (some adaptions in the register conversions
-> of the first few patches.)
->
-> Based on feedback, I have removed the "custom" cpu model; instead, I
-> have added the new SYSREG_<REG>_<FIELD> properties to the "host" model.
-> This works well if you want to tweak anything that does not correspond
-> to the existing properties for the host model; however, if you e.g.
-> wanted to tweak sve, you have two ways to do so -- we'd probably either
-> want to check for conflicts, or just declare precedence. The kvm-specific
-> props remain unchanged, as they are orthogonal to this configuration.
->
-> The cpu model expansion for the "host" model now dumps the new SYSREG_
-> properties in addition to the existing host model properties; this is a
-> bit ugly, but I don't see a good way on how to split this up.
->
+Hi Shameer,
+On 12/12/24 14:09, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
+> 
+>> -----Original Message-----
+>> From: Eric Auger <eauger@redhat.com>
+>> Sent: Thursday, December 12, 2024 8:42 AM
+>> To: eric.auger@redhat.com; Cornelia Huck <cohuck@redhat.com>;
+>> eric.auger.pro@gmail.com; qemu-devel@nongnu.org; qemu-
+>> arm@nongnu.org; kvmarm@lists.linux.dev; peter.maydell@linaro.org;
+>> richard.henderson@linaro.org; alex.bennee@linaro.org; maz@kernel.org;
+>> oliver.upton@linux.dev; sebott@redhat.com; Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com>; armbru@redhat.com;
+>> berrange@redhat.com; abologna@redhat.com; jdenemar@redhat.com
+>> Cc: shahuang@redhat.com; mark.rutland@arm.com; philmd@linaro.org;
+>> pbonzini@redhat.com
+>> Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable
+>> aarch64 KVM host model
+>>
+>> Shameer,
+>>
+>> On 12/12/24 09:12, Eric Auger wrote:
+>>> Connie,
+>>>
+>>> On 12/6/24 12:21, Cornelia Huck wrote:
+>>>> A respin/update on the aarch64 KVM cpu models. Also available at
+>>>> gitlab.com/cohuck/qemu arm-cpu-model-rfcv2
+>>>>
+>>>> Find Eric's original cover letter below, so that I do not need to
+>>>> repeat myself on the aspects that have not changed since RFCv1 :)
+>>>>
+>>>> Changes from RFCv1:
+>>>>
+>>>> Rebased on more recent QEMU (some adaptions in the register
+>> conversions
+>>>> of the first few patches.)
+>>>>
+>>>> Based on feedback, I have removed the "custom" cpu model; instead, I
+>>>> have added the new SYSREG_<REG>_<FIELD> properties to the "host"
+>> model.
+>>>> This works well if you want to tweak anything that does not correspond
+>>>> to the existing properties for the host model; however, if you e.g.
+>>>> wanted to tweak sve, you have two ways to do so -- we'd probably either
+>>>> want to check for conflicts, or just declare precedence. The kvm-specific
+>>>> props remain unchanged, as they are orthogonal to this configuration.
+>>>>
+>>>> The cpu model expansion for the "host" model now dumps the new
+>> SYSREG_
+>>>> properties in addition to the existing host model properties; this is a
+>>>> bit ugly, but I don't see a good way on how to split this up.
+>>>>
+>>>> Some more adaptions due to the removal of the "custom" model.
+>>>>
+>>>> Things *not* changed from RFCv1:
+>>>>
+>>>> SYSREG_ property naming (can be tweaked easily, once we are clear on
+>> what
+>>>> the interface should look like.)
+>>>>
+>>>> Sysreg generation scripts, and the generated files (I have not updated
+>>>> anything there.) I think generating the various definitions makes sense,
+>>>> as long as we double-check the generated files on each update (which
+>> would
+>>>> be something to trigger manually anyway.)
+>>>>
+>>>> What I would like us to reach some kind of consensus on:
+>>>>
+>>>> How to continue with the patches moving the ID registers from the isar
+>>>> struct into the idregs array. These are a bit of churn to drag along;
+>>>> if they make sense, maybe they can be picked independently of this
+>> series?
+>>>>
+>>>> Whether it make sense to continue with the approach of tweaking
+>> values in
+>>>> the ID registers in general. If we want to be able to migrate between
+>> cpus
+>>>> that do not differ wildly, we'll encounter differences that cannot be
+>>>> expressed via FEAT_xxx -- e.g. when comparing various AmpereAltra Max
+>> systems,
+>>>> they only differ in parts of CTR_EL0 -- which is not a feature register, but
+>>>> a writable register.
+>>> In v1 most of the commenters said they would prefer to see FEAT props
+>>> instead of IDREG field props. I think we shall try to go in this
+>>> direction anyway. As you pointed out there will be some cases where
+>> FEAT
+>>> won't be enough (CTR_EL0 is a good example). So I tend to think the end
+>>> solution will be a mix of FEAT and ID reg field props.
+>>>
+>>> Personally I would smoothly migrate what we can from ID reg field props
+>>> to FEAT props (maybe using prop aliases?), starting from the easiest 1-1
+>>> mappings and then adressing the FEAT that are more complex but are
+>>> explictly needed to enable the use cases we are interested in, at RedHat:
+>>> migration within Ampere AltraMax family, migration within NVidia Grace
+>>> family, migration within AmpereOne family and migration between
+>> Graviton3/4.
+>>>
+>>> We have no info about other's use cases. If some of you want to see some
+>>> other live migration combinations addressed, please raise your voice.
+>> In relation to [1] you seem to be also interested in the migration
+>> between heterogeneous systems with qemu.
+> 
+> Yes. That is correct.
+> 
+>> Do you think targeting migration within a cpu family is enough for your
+>> use cases. How different are the source and destination host on your
+>> cases. Do you thing feat props are relevant in your case or would you
+>> need lower granularity at idreg field levelto pass the migration?
+> 
+> I think, from the current requirement we have for migration, the source and
+> destination mostly can be handled by FEAT_XXX. But like Ampere, we do need
+> to manage the CTR_EL0 differences[1].
+OK
+> 
+> Also we do have differences in GIC support as well(AA64PFR0_EL1.GIC) which 
+> I am not sure how to manage with FEAT_XXX.
+interesting. We need to further look at this one.
+> 
+> And we are checking with our Product team whether we need to support migration
+> from an old CPU type in which case we have to do a bit more analysis.
+Sure, please come back to us whenever you get more insights. It will
+help us define the scope of this upstream work
 
-I gave this a spin today and successfully migrated a VM between 2 similar
-machines that only differ in the DIC bit of the cache type register using:
+Thanks!
 
- 	-cpu host,SYSREG_CTR_EL0_DIC=0
-
-This allows me to get rid of my horrid qemu hacks to achieve the same.
-
-Thanks,
-Sebastian
+Eric
+> 
+> Thanks,
+> Shameer
+> 
+> 1. https://lore.kernel.org/kvmarm/20241022073943.35764-1-shameerali.kolothum.thodi@huawei.com/
+> 
+> 
+> 
+>  
+>  
 
