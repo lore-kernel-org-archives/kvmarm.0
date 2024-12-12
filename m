@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2F9237FE4
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 18:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31F9238E1F
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 18:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734026747; cv=none; b=NIjG/awA2QIEeqPP8wr+U9SmpRvdD8PrbyI4tX12/F5AK1p9zuqt6/xaP/LaxNmL21XkVEQp9O/YIlkHI/9KS/qk+9yjEkdKFRiUspT5Ilcv+akXNBExkz6VPnP+uX5honjTPWhzQJYNBeG3WJwaoLPSP4OeKv2qAzPhQQhk76k=
+	t=1734026750; cv=none; b=oUzWvsN1Uf5Iku2aP7X8cEuYAKCon3V1qHFbjvjEU+u/qgDn2a4lZmOauCkkIv1Zn2JZwKxZoksS2UpNZ6nbmKpOj2e2ZaRtaPRZht7bbDsuZfWXehlVbhSUnM4u/lJKRX06iAIZI9lXXJrKmeeaY4/C4Iv3E84dcFoDL58d8+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734026747; c=relaxed/simple;
-	bh=A77HVtgiNiiuQUM+4fbCpZhMG/L5Q9L2AOqjPUwbohA=;
+	s=arc-20240116; t=1734026750; c=relaxed/simple;
+	bh=ZTCW3MPLRkAgIQ6KHNuQcNDS5MIsVNoOiDzEFUuD1n4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AfIvVAUNWlrPX7rNKRRn5YNqGEJb0KDAxG119MJ5pdLQfC2l7Q3czaO6nbBdXeL20uN3E65ksvf7i+j1bc1lY9I+c0VVyBvH/NFkfma1CKZTN38tjRnQNOsdKnChdS5bcUZudp/PXpgz/fJVq0dsIXkq19A9smmqI+t7Sxjsw0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MO0EYzSa; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=lp19Npn+Cwzrc+jzQ2mfSqvMzo+ir0RoRenwh8af4UvrgMKbGkXqWC2ztzsaZSUDYFG4/suUUpOuqkTfXS7Yc5u2GE6OpPOULcAvq+90FeSKwPNMlLA/k4KfH7v1IbUNlIS11a/9eKw8YQTjY1ki6ED81TKJX2YvFSJYbrwMsY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zAsXtir/; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MO0EYzSa"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43626224274so5441995e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:05:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zAsXtir/"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4361efc9d23so9229665e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:05:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734026744; x=1734631544; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734026747; x=1734631547; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JE/i5lAaPb/dJbCdJrBXAH1qN4sLI6tJdn5DSSo5Z6Q=;
-        b=MO0EYzSagqpVVddeWDz4qh2TnNtlLA8igiZiv11VbWRQN+Zdc8bFGVTWUaFouwW/Kz
-         3/1iGginoazbmj1TLWHgaNGzrUQRL4wp3qX22ve65ePjIlqpZa1M4VrPzspCs/iTLo7U
-         pJgN069cHqEsTCxZ9mnQsSyaS6AZv4WWNAV2BangjnlwCgaRiQKTPuK4eR1JOVWn6IGj
-         yb3q4hTv/MCFkcqWgzmxyR+2oWR3qebnCOrNPqN95FfkAAbUK3/biK9Fr3LMB+hfsTrX
-         6AHE9T7Q4i+lA0WLG9IPSyKhMpxRDFDy2TgCwOEgboKcLykDkzFk9zSAWYFqF9SaIEWP
-         XbLA==
+        bh=HFThXzKnjRTlltuWbtKfTZlx0mgnbefnBgFBqpI1yLQ=;
+        b=zAsXtir/1tzeRfJZP2YDSTjChiQFceFGw8vtYI0kHUjG0XsL6by8liCe/0n++a4LyK
+         Oq+AQLnqQtaynyzLuNFBi8M+tRN+1B/eUpM0scOu7lfBhaxvprzU9ber2rsaWubEMOT3
+         ElkpSRM08HwqjXO9v3G+TROF3V+apt0gId9uZYMyfexF0Z7RFFus6u5oW3YuOOPKZ42f
+         bOEowvonTIPNjw5bdoRsxduNZH/wbu8WETvxHZaBielBRXw/BJnivGYj5eEaTJyt5WNs
+         0kRzFtIxFNJQ0NI+IBImn+cgIzP8S10goUo4B1WS2lABQIhfiG9/bTzHtSF7gDi5EDSu
+         lE4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734026744; x=1734631544;
+        d=1e100.net; s=20230601; t=1734026747; x=1734631547;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JE/i5lAaPb/dJbCdJrBXAH1qN4sLI6tJdn5DSSo5Z6Q=;
-        b=Gn4MqaHwhBdqLJLoT51caSQaQGUuNetD3d5QuL6HE2tE+9fVIth1w0izjTOowxEC08
-         5ZFyR+Ivht+mqlN3wGIi6US2zgMLzzILoXEvQQchWvbG2Lwx+U19aJV6Jmv6M6lsSDWd
-         njd1LLxXbNartVWRwWPQ59r3zzOaegXYeOKbA95+u7SjydaJEOHW4yCBqiafl89WTHbE
-         XIxe4/0cQ/bDN3DpdvopQpEiXufGGgR2YRsJ7YPe3TF/QveCjWzznQnfSmDWlNfGWFDQ
-         chFkV5Hid4DHjAZ6noUDMQGl4gtttU6zehU5zxedEAlbBsdEUPLSzFS7nUG5N8JhB1Cy
-         PhbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2K5IzfCtvbtwhysb9YNeksJEbXxBnmLg6DoCbWO3GouME1yvf63LtWIS1sCyTaBBjPsPiXCg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzjVYhyouzZdGCZBntI7ytLgjIqh1n8jFn6Pm8O//2mnX7vdNpc
-	eL9pn/BmloLtIxl6mE2jrceFj3mkvCOh9U9GBlCdGakJPxh+8gfQDUD8pu/P1TuMMQjYeF4820y
-	D1v/BZcg70A==
-X-Google-Smtp-Source: AGHT+IFLzVaDnxOQQpqmcBPGMzPT4gfF0J87Ucqw5+xEyz4q3jDg+AjzzwnSPOPsWSAVi+g32NOxN+jbO3aNIw==
-X-Received: from wmbd18.prod.google.com ([2002:a05:600c:58d2:b0:434:a98d:6a1c])
+        bh=HFThXzKnjRTlltuWbtKfTZlx0mgnbefnBgFBqpI1yLQ=;
+        b=ccHG7S1E06YwATRMrFh/XA3bpwKTkbu4uH/CfQnN1mQ4Io+JjJULUg0RjHwaOkXI7D
+         H+2OxnI83Pckpd0bcbd4Mx+yh/CtE35tRxHQAMNd5H74r4160rq2r686d5U2bFarhKxI
+         dXyAhp7qXf+tmq91cZMMwELnI1MZxKEUakuKqPRIbNRzcQR9BE+xqIUFB4HmHYj4Ap+6
+         XyeqkN4ACwLrg6Le1FCVaQAhIN8v/3dG2HgnDZaytfHHPMMVs9YhSzgZCy/40j6Dut4p
+         No2M7zNmxNOQ7eMAae3krcq52GeE1kv54b5jbDlIk77pzvgVdx95EABarrwFNpDV13p5
+         9Cpg==
+X-Forwarded-Encrypted: i=1; AJvYcCXtha8omliyFxsfGw+WOzbMD/W5El0SjcFa6qD012yylOhhOEiBq9nV3/WqSj3wRhrsxWaHoEU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3yWGPzrItkjJ/1j+wSmxa/M75xrS2Z3gkqiPksw3WzT4VOjLx
+	zmdAQErV03orEG1uFBfrknEkxHtagLrbRjk57q8PuljvzC5dCmqHzBp95hWB97BEsaeLfxfm+NH
+	TEgOE32kWEQ==
+X-Google-Smtp-Source: AGHT+IEcA6NxPQcYOWP3jecw4tajvZQj85hXUMMgjZMFtmkSC/sm2wXlubiRoWv+mV1LLv3tR1NkxUnUlZkBAA==
+X-Received: from wmdv18.prod.google.com ([2002:a05:600c:12d2:b0:436:164a:763e])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:5029:b0:431:44fe:fd9a with SMTP id 5b1f17b1804b1-4361c3e010amr64441725e9.19.1734026744100;
- Thu, 12 Dec 2024 10:05:44 -0800 (PST)
-Date: Thu, 12 Dec 2024 18:03:53 +0000
+ 2002:a05:600c:524b:b0:434:a781:f5d9 with SMTP id 5b1f17b1804b1-4361c3aaefamr76123965e9.11.1734026746134;
+ Thu, 12 Dec 2024 10:05:46 -0800 (PST)
+Date: Thu, 12 Dec 2024 18:03:54 +0000
 In-Reply-To: <20241212180423.1578358-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241212180423.1578358-1-smostafa@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241212180423.1578358-30-smostafa@google.com>
-Subject: [RFC PATCH v2 29/58] KVM: arm64: smmu-v3: Setup event queue
+Message-ID: <20241212180423.1578358-31-smostafa@google.com>
+Subject: [RFC PATCH v2 30/58] KVM: arm64: smmu-v3: Reset the device
 From: Mostafa Saleh <smostafa@google.com>
 To: iommu@lists.linux.dev, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -73,76 +73,73 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The host can use the event queue for debuging, and unlike the command
-queue, it would be managed by the kernel.
-However, it must set in a shared state so it can't be donated to the
-hypervisor later.
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-This relies on the ARM_SMMU_EVTQ_BASE can't be changed after
-de-privilege.
+Now that all structures are initialized, send global invalidations and
+reset the SMMUv3 device.
 
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 39 +++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 38 +++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-index 43d2ce7828c1..5020f74421ad 100644
+index 5020f74421ad..58662c2c4c97 100644
 --- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
 +++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-@@ -342,6 +342,41 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
+@@ -441,6 +441,40 @@ static int smmu_init_strtab(struct hyp_arm_smmu_v3_device *smmu)
  	return 0;
  }
  
-+/*
-+ * Event q support is optional and managed by the kernel,
-+ * However, it must set in a shared state so it can't be donated
-+ * to the hypervisor later.
-+ * This relies on the ARM_SMMU_EVTQ_BASE can't be changed after
-+ * de-privilege.
-+ */
-+static int smmu_init_evtq(struct hyp_arm_smmu_v3_device *smmu)
++static int smmu_reset_device(struct hyp_arm_smmu_v3_device *smmu)
 +{
-+	u64 evtq_base, evtq_pfn;
-+	size_t evtq_nr_entries, evtq_size, evtq_nr_pages;
-+	size_t i;
 +	int ret;
++	struct arm_smmu_cmdq_ent cfgi_cmd = {
++		.opcode = CMDQ_OP_CFGI_ALL,
++	};
++	struct arm_smmu_cmdq_ent tlbi_cmd = {
++		.opcode = CMDQ_OP_TLBI_NSNH_ALL,
++	};
 +
-+	evtq_base = readq_relaxed(smmu->base + ARM_SMMU_EVTQ_BASE);
-+	if (!evtq_base)
-+		return 0;
-+
-+	if (evtq_base & ~(Q_BASE_RWA | Q_BASE_ADDR_MASK | Q_BASE_LOG2SIZE))
-+		return -EINVAL;
-+
-+	evtq_nr_entries = 1 << (evtq_base & Q_BASE_LOG2SIZE);
-+	evtq_size = evtq_nr_entries * EVTQ_ENT_DWORDS * 8;
-+	evtq_nr_pages = PAGE_ALIGN(evtq_size) >> PAGE_SHIFT;
-+
-+	evtq_pfn = PAGE_ALIGN(evtq_base & Q_BASE_ADDR_MASK) >> PAGE_SHIFT;
-+
-+	for (i = 0 ; i < evtq_nr_pages ; ++i) {
-+		ret = __pkvm_host_share_hyp(evtq_pfn + i);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
- static int smmu_init_strtab(struct hyp_arm_smmu_v3_device *smmu)
- {
- 	int ret;
-@@ -429,6 +464,10 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
- 	if (ret)
- 		return ret;
- 
-+	ret = smmu_init_evtq(smmu);
++	/* Invalidate all cached configs and TLBs */
++	ret = smmu_write_cr0(smmu, CR0_CMDQEN);
 +	if (ret)
 +		return ret;
 +
- 	ret = smmu_init_strtab(smmu);
++	ret = smmu_add_cmd(smmu, &cfgi_cmd);
++	if (ret)
++		goto err_disable_cmdq;
++
++	ret = smmu_add_cmd(smmu, &tlbi_cmd);
++	if (ret)
++		goto err_disable_cmdq;
++
++	ret = smmu_sync_cmd(smmu);
++	if (ret)
++		goto err_disable_cmdq;
++
++	/* Enable translation */
++	return smmu_write_cr0(smmu, CR0_SMMUEN | CR0_CMDQEN | CR0_ATSCHK);
++
++err_disable_cmdq:
++	return smmu_write_cr0(smmu, 0);
++}
++
+ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
+ {
+ 	int ret;
+@@ -472,6 +506,10 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
  	if (ret)
  		return ret;
+ 
++	ret = smmu_reset_device(smmu);
++	if (ret)
++		return ret;
++
+ 	return kvm_iommu_init_device(&smmu->iommu);
+ }
+ 
 -- 
 2.47.0.338.g60cca15819-goog
 
