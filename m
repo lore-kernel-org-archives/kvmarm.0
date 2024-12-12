@@ -1,184 +1,204 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518822135AC;
-	Thu, 12 Dec 2024 15:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864B92210F8;
+	Thu, 12 Dec 2024 15:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734018531; cv=none; b=W9sSl4O2L2U2GkPE9vnkT394xhOL7a/dfmAqG+xH7bfz7TpkUj3AsgMRk0vqdpW+t9UOx0qHD42bhcqXtsdANNKtI+hEhiVHT/NcE1rXdlShhUXCCln+edTIGieYIBYf5qeMV3tdkOGYKbGoAcR4UOlf5NChcOUknZZIG0mzgiQ=
+	t=1734019001; cv=none; b=j57r/802gxmk8LuLcdw/1IWVBY9aCQX18IErNbXHlpnQvEAPHQa+rm1LMt+4tgWy9gI68LVoZ+Eg0+2wUBeLz5Sl6pb6TkzLvuXXx7WPc6s70FPBUEdVJ7aaKDCHOpDnbTohD7czD3p0tiLiEM/3aeGXPlBLXUt3Cg2kxddB/ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734018531; c=relaxed/simple;
-	bh=mPQRjGnXG+0+zoGZDl5Y97k8+OqQv9RO2G0rAjvoyKY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ai9R4f+MLldIxOV4HamYo4G93ubeYQq+3SbTCoIsIP8zZ2fSM2r/ygC0npK1BuTBa9tR8XpaidW2qWMRqDQWweM7KewC0ZYaLowcAXfcYAPe5oETZSzmBXLO/m8G0yVP5sn4mCiKU6OiZ9mMYKs/2+4EjAiHOuaeZhwClWk2EZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/bUYKJb; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/bUYKJb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC8A2C4CECE;
-	Thu, 12 Dec 2024 15:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734018530;
-	bh=mPQRjGnXG+0+zoGZDl5Y97k8+OqQv9RO2G0rAjvoyKY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t/bUYKJbZsL4NErnW6sI1MyJPkUK7Hv57rjXC85kfmtivjpCAObRUlSFkXC+d9CXB
-	 t2Bamp1jnF20qAQkkikv6oIQDOGtDdaKPPI01VOEwAUaXOPZsdjIYZWtBFTeuAEz+k
-	 vmnFsk0YDzr7PRMdphvaSzrXRJ80OEguZGCPY0s7uHQan0wEr0BU6iiGXVp0r9YPr7
-	 0ORymP+FrOe80StbudP5EhOKebE8G9WA4PepWvqhxQt19C9TP9XtKS5hncChOkCFcF
-	 k3IggTfO0HwhXoQ7f1hANm2IpfegpgSdXW2XCp5J0Blf1dNpT3BnLa3yRfjFxc+oqd
-	 5MkejfcODGxpA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tLlQl-0037eT-Ge;
-	Thu, 12 Dec 2024 15:48:48 +0000
-Date: Thu, 12 Dec 2024 15:48:47 +0000
-Message-ID: <86h678sy00.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: =?UTF-8?B?TWlrb8WCYWo=?= Lenczewski <miko.lenczewski@arm.com>,
-	catalin.marinas@arm.com,	will@kernel.org,	corbet@lwn.net,
-	oliver.upton@linux.dev,	joey.gouly@arm.com,	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1734019001; c=relaxed/simple;
+	bh=G96xLoC/eSHXYXHq+4DeBJeMDS2lbNoxJbax3AUA8J0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NWP2F1TmrHqwdNRQs1gr/0vjnd4OQFo+fcmpI4g8HB5sco0voNeYcHIadJtE9DaqSM3iN0pUKITuej+lMkaWGneXUBXFpCtv9uEwQLWDyYssMibJWMVlB+YcZx48m8oEllL+Jn4qEh5bSqLSDveseRkt4qgfKOtyvmiDwINhaQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E36B71762;
+	Thu, 12 Dec 2024 07:57:05 -0800 (PST)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.39.50])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B30E53F720;
+	Thu, 12 Dec 2024 07:56:33 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
-In-Reply-To: <2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
-References: <20241211160218.41404-1-miko.lenczewski@arm.com>
-	<20241211160218.41404-3-miko.lenczewski@arm.com>
-	<87cyhxs3xq.wl-maz@kernel.org>
-	<084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
-	<86ikrprn7w.wl-maz@kernel.org>
-	<2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v6 00/43] arm64: Support for Arm CCA in KVM
+Date: Thu, 12 Dec 2024 15:55:25 +0000
+Message-ID: <20241212155610.76522-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, miko.lenczewski@arm.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 12 Dec 2024 15:05:24 +0000,
-Ryan Roberts <ryan.roberts@arm.com> wrote:
-> 
-> On 12/12/2024 14:26, Marc Zyngier wrote:
-> > On Thu, 12 Dec 2024 10:55:45 +0000,
-> > Ryan Roberts <ryan.roberts@arm.com> wrote:
-> >>
-> >> On 12/12/2024 08:25, Marc Zyngier wrote:
-> >>>> +
-> >>>> +	local_flush_tlb_all();
-> >>>
-> >>> The elephant in the room: if TLBs are in such a sorry state, what
-> >>> guarantees we can make it this far?
-> >>
-> >> I'll leave Miko to respond to your other comments, but I wanted to address this
-> >> one, since it's pretty fundamental. We went around this loop internally and
-> >> concluded that what we are doing is architecturally sound.
-> >>
-> >> The expectation is that a conflict abort can only be generated as a result of
-> >> the change in patch 4 (and patch 5). That change makes it possible for the TLB
-> >> to end up with a multihit. But crucially that can only happen for user space
-> >> memory because that change only operates on user memory. And while the TLB may
-> >> detect the conflict at any time, the conflict abort is only permitted to be
-> >> reported when an architectural access is prevented by the conflict. So we never
-> >> do anything that would allow a conflict for a kernel memory access and a user
-> >> memory conflict abort can never be triggered as a result of accessing kernel memory.
-> >>
-> >> Copy/pasting comment from AlexC on the topic, which explains it better than I can:
-> >>
-> >> """
-> >> The intent is certainly that in cases where the hardware detects a TLB conflict
-> >> abort, it is only permitted to report it (by generating an exception) if it
-> >> applies to an access that is being attempted architecturally. ... that property
-> >> can be built from the following two properties:
-> >>
-> >> 1. The TLB conflict can only be reported as an Instruction Abort or a Data Abort
-> >>
-> >> 2. Those two exception types must be reported synchronously and precisely.
-> >> """
-> > 
-> > I totally agree with this. The issue is that nothing says that the
-> > abort is in any way related to userspace.
-> > 
-> >>>
-> >>> I honestly don't think you can reliably handle a TLB Conflict abort in
-> >>> the same translation regime as the original fault, given that we don't
-> >>> know the scope of that fault. You are probably making an educated
-> >>> guess that it is good enough on the CPUs you know of, but I don't see
-> >>> anything in the architecture that indicates the "blast radius" of a
-> >>> TLB conflict.
-> >>
-> >> OK, so I'm claiming that the blast radius is limited to the region of memory
-> >> that we are operating on in contpte_collapse() in patch 4. Perhaps we need to go
-> >> re-read the ARM and come back with the specific statements that led us to that
-> >> conclusion?
-> 
-> From the ARM:
-> """
-> RFCPSG: If level 1 or level 2 is supported and the Contiguous bit in a set of
-> Block descriptors or Page descriptors is changed, then a TLB conflict abort can
-> be generated because multiple translation table entries might exist within a TLB
-> that translates the same IA.
-> """
-> 
-> Although I guess it's not totally explicit, I've interpretted that as saying
-> that conflicting TLB entries can only arise for the IA range for which the
-> contiguous bits have been modified in the translation tables.
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-Right, that's reassuring, thanks for digging that one.
+The related guest support was merged for v6.13-rc1 so you no longer need
+that separately.
 
-> Given we are only fiddling with the contiguous bits for user space mappings in
-> this way, that's why I'm asserting we will only get a conflict abort for user
-> space mappings... assuming the absence of kernel bugs, anyway...
+There are numerous changes since v5, many thanks for the review
+comments. The highlights are below, and individual patches have a changelog.
 
-For now. But if you dare scanning the list, you'll find a lot of
-people willing to do far more than just that. Including changing the
-shape of the linear map.
+ * KVM_VCPU_MAX_FEATURES is incremented. *NOTE*: This effectively
+   exposes the nested virtualisation feature. So this series as it
+   stands has a dependency on that being finished before it can be
+   merged. See [2] for more details.
 
->
-> > 
-> > But we don't know for sure what caused this conflict by the time we
-> > arrive in the handler. It could equally be because we have a glaring
-> > bug somewhere on the kernel side, even if you are *now* only concerned
-> > with userspace.
-> 
-> OK I see what you are saying; previously a conflict abort would have led to
-> calling do_bad(), which returns 1, which causes do_mem_abort() to either kill
-> the kernel or the process depending on the origin of the abort. (although if it
-> came from kernel due to bug, we're just hoping that the conflict doesn't affect
-> the path through the handler). With this change, we always assume we can fix it
-> with the TLBI.
-> 
-> How about this change to ensure we still die for issues originating from the kernel?
-> 
-> if (!user_mode(regs) || !system_supports_bbml2())
-> 		return do_bad(far, esr, regs);
+ * Properly support the RMM providing a more limited number of GIC LRs
+   than the hardware.
 
-That wouldn't catch a TLB conflict on get_user(), would it?
+ * Drop patch tracking number of pages for the top level PGD, it's
+   easier calculating it when we need it.
 
-> > If anything, this should absolutely check for FAR_EL1 and assert that
-> > this is indeed caused by such change.
-> 
-> I'm not really sure how we would check this reliably? Without patch 5, the
-> problem is somewhat constrained; we could have as many changes in flight as
-> there are CPUs so we could keep a list of all the {mm_struct, VA-range} that are
-> being modified. But if patch 5 is confirmed to be architecturally sound, then
-> there is no "terminating tlbi" so there is no bound on the set of {mm_struct,
-> VA-range}'s that could legitimately cause a conflict abort.
+ * Drop the "spare page" - it was causing code complexity and it's a bit
+   premature to start making such optimisations before we've got real
+   platforms to benchmark.
 
-I didn't mean to imply that we should identify the exact cause of the
-abort. I was hoping to simply check that FAR_EL1 reports a userspace
-VA. Why wouldn't that work?
+Major limitations:
 
-	M.
+ * Only supports 4k host PAGE_SIZE (if PAGE_SIZE != 4k then the realm
+   extensions are disabled). I'm looking at removing this restriction,
+   but I didn't want to delay this posting.
+
+ * No support for huge pages when mapping the guest's pages. There is
+   some 'dead' code left over from before guest_mem was supported. This
+   is partly a current limitation of guest_memfd. It's also on my todo list to
+   look at improving this.
+
+The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
+
+This series is based on v6.13-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v6
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v4
+
+[1] https://developer.arm.com/documentation/den0137/1-0rel0/
+[2] https://lore.kernel.org/r/a7011738-a084-46fa-947f-395d90b37f8b%40arm.com
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: rme: allow userspace to inject aborts
+  arm64: rme: support RSI_HOST_CALL
+
+Sean Christopherson (1):
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+
+Steven Price (30):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  arm64: kvm: Allow passing machine type in KVM creation
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  KVM: arm64: vgic: Provide helper for number of list registers
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: rme: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: rme: Enable PMU support with a realm guest
+  kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
+  arm64: kvm: Expose support for private memory
+  KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+  KVM: arm64: Allow activating realms
+
+Suzuki K Poulose (3):
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Expose debug HW register numbers for Realm
+  arm64: rme: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |    3 +
+ arch/arm64/include/asm/kvm_emulate.h |   40 +
+ arch/arm64/include/asm/kvm_host.h    |   17 +-
+ arch/arm64/include/asm/kvm_rme.h     |  152 +++
+ arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  259 +++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   45 +-
+ arch/arm64/kvm/arm.c                 |  174 ++-
+ arch/arm64/kvm/guest.c               |  107 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    6 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  195 +++-
+ arch/arm64/kvm/pmu-emul.c            |    6 +
+ arch/arm64/kvm/psci.c                |   29 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  195 ++++
+ arch/arm64/kvm/rme.c                 | 1588 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   79 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    5 +
+ arch/arm64/kvm/vgic/vgic.c           |   54 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/kvm_host.h             |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   31 +-
+ virt/kvm/kvm_main.c                  |    7 +
+ 35 files changed, 3557 insertions(+), 103 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
