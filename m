@@ -1,64 +1,73 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3C0748D
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 13:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D28211A0E
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 14:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734011982; cv=none; b=aPSVqJDnvGRup6FlPmqzP3/cMsbFw6KRgsaRlvGW1fKEuJsr8hGJsZL3UNJ0ZpNxt0hwM6qEjHeZ5Bg07824qbHoy0+IqEesgUpYP+c+9n6H3fTRMqwaioJEaQggX6kDEUWbrLKRxljgggp+NehTYOLXK75657D850qNLAM7pLg=
+	t=1734012743; cv=none; b=kPtc6bx6ZoPJkmB8oH5S8dN7jliDAf2RBKTHOL9q9t9RuvHc0vRZ5cEb9Gzi91zi2f69NjHt7nI5Z7dy5DSmScaFlVt2npfiBc2fce0uyy1H6xStOaydzNu6P5ri8lc3V7R7tVuRthH7K3fpmEDhIitzUXRmjGAa9GjyQKF3DzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734011982; c=relaxed/simple;
-	bh=f9DJQ5KNRMbkkamz8t4+VV/pgLnzTnnWTCtp0Vmyy5M=;
+	s=arc-20240116; t=1734012743; c=relaxed/simple;
+	bh=lNzM/5KHaOdjwOXaIll3vIt6zX42tMOo69nIstNet+E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=bp9rb1e/FdbxCGgyRRgPaRSCAraLcbo1BIgaob9LZfqAZSEkD8fXPSn1gC1q7q3trt3O2DTP9jZ7uNwLp0vh6+pBVw6Dv02xeJP1uJlYknYSyXk1TDEerf50ymxkg+HWXfiE/fR1jPhWG9xgzriE8yHR31KD4U0hEGiT92c3J9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ToZTuTaQ; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 In-Reply-To:Content-Type; b=EbC52S7nl76fo+I1viYtc7DhBReBrRB9lmUB/uKf97vf3PFwQ5E7SO6q48nkBcnhYoRvuaR2S91R6CaQn/ERhAfWLLQFZJBkVqr29BFTaSX5Yz0+HarPC0rY5WaXmZhNPpNELVWNgmc32Sm6yNfCYogicIvDqJTsYgCqlzEZHxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iysdQTE2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ToZTuTaQ"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-71e2766994bso273080a34.3
-        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 05:59:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734011980; x=1734616780; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nz+Ev7LYG8CfqCq+2dhn+rzxKVPN0OVRSTVDNYX1Qbk=;
-        b=ToZTuTaQsXgB7pkwrycpHADkAcfox5nH/4o+ibaGlS7WKJB7buQICZDPNza7CCypj0
-         Yo4rzMZZl6HUH1BH+tduV0HJZ2dtSz+DOyg5ce/IpGYBOoNZAWpbmyRqNoGvHl7Ewprd
-         n1S/0ec9m7P59Sy+pE3IFCi/y4XjEgCt3IhiQYmPYOP2YUg1rvgYaJyAsGDK7H5KLojP
-         Y0lWHm0zE3Y8w3ZIolBUcKrazTcCYvMH1xk6xXRh7NN602ARg1gc1h/LKEAb1txjF/K/
-         MFunQtthkCkV1XEFC5d6E5udzXC5oLasdlQ9FaZpKJBMLRRTzGNGq2R0FREMcXzmU5ME
-         WNnA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iysdQTE2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734012740;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lNzM/5KHaOdjwOXaIll3vIt6zX42tMOo69nIstNet+E=;
+	b=iysdQTE2bdsKOFs+uXCbXxyhnXJG7xxknE6yy0d2IB6waznL+Z2ds/WCaKGq7znggoHp5V
+	U9xilxPTZOVs0kirsFTa8s0PkJ2WCpHDbVsPwvrhoOaqjoaU6bJbUiUmSDzcuEdV8k4AGN
+	vmODWmyvm0XjEkansbvVpsEEC/GT/Vs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-112-osn5nVihPOe9-JNDnuQ4sQ-1; Thu, 12 Dec 2024 09:12:19 -0500
+X-MC-Unique: osn5nVihPOe9-JNDnuQ4sQ-1
+X-Mimecast-MFC-AGG-ID: osn5nVihPOe9-JNDnuQ4sQ
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43625ceae52so3853145e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 06:12:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734011980; x=1734616780;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nz+Ev7LYG8CfqCq+2dhn+rzxKVPN0OVRSTVDNYX1Qbk=;
-        b=KdzbjGoodhgtBoKYzdCU4oifkyPAWGMxyHsViHMdQFeqFKPyZpGGv6b808fXK2sR0I
-         SctXjK01/oYHoOp1ePDz5DM9fc1wdyj8sOY3IkWJ2/SejhXocZJxqTgmOhjeV7gzaQVq
-         BpF4Qs34X5rSlhZyMyc2YiaOw2BW1rYMpFP0JS/KxGz2256W00Dmhnu/PQVaY97Bb814
-         ACKd3CBl880k5a2fdgwMrUTuweijSgp58p+T4YcxAg4aa+oOhrflc4mteRjPTYMwIsLO
-         bwdj/Ao/K81XazSS0OnPJXS/mn2IFPSIP8UeZV+MOnXEbyU9R6t5DyT2p0TZvfyf2Bfl
-         PGtw==
-X-Forwarded-Encrypted: i=1; AJvYcCVexsEX9wV9dSbCc6coDW19blw/57bTJR7zTtnEyhWVIZeTC3kYQJDRkURzhRAiDoqASAd50NM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzJI3YqRRmh9xxdclT3L8HljZSu/T3Ki24QeJ8lm0WPNAIql8do
-	URlvx5cZEyHVDIm+VP0hMiKbirwLv6nxFqHknV3eCDqkHsRAaNVNnM4hGsjFy8Y=
-X-Gm-Gg: ASbGncs80PoyoNNw6AKyn2qItn3nU6SZHfD1S0JGHWto5P64Ldc1I8gFr4fADmaosmY
-	PZXWKkioyygL+B7AN2xjsU+pOx/8qEW4d1mqNrQq3SUBufCCNJ0qhrvDj7nUrpaSmKo57jUT04Q
-	Nb/QOYIFQmfq5373K0/FjqS1PT68Pm+iOBqKxxs1Lk/BsznkBVpgNRrxLGnN08gMoEcC705Bv7V
-	JJe3orQeqJowTISU73orKkg4nKbb7jBNkxlL7lGmGIDugLUO3r1/ndQnpxely9SlM94YLv99+/d
-	DRrFaXZavAMqkrvPyLDIn9vKfbUqIT7j2Pw=
-X-Google-Smtp-Source: AGHT+IH5eDYRi/vQn78qhwaOELL0IdjRh9Im2SLDv6UWdiI16v0PX3maXqZOmvheBWXSyL4zOa53rQ==
-X-Received: by 2002:a05:6830:3509:b0:71d:f9f1:7f3a with SMTP id 46e09a7af769-71e370fd784mr187396a34.24.1734011980143;
-        Thu, 12 Dec 2024 05:59:40 -0800 (PST)
-Received: from [192.168.4.112] (fixed-187-189-51-143.totalplay.net. [187.189.51.143])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71e08cd4525sm1200291a34.3.2024.12.12.05.59.39
+        d=1e100.net; s=20230601; t=1734012738; x=1734617538;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lNzM/5KHaOdjwOXaIll3vIt6zX42tMOo69nIstNet+E=;
+        b=jK7EuuWXwF2U12KYCuC3iZn+lmRRo7Q/S0+bgWPnNSCwLySyieLq6522x9cdMLiRFo
+         gaUQVzY6dH/J9dTRIyCeFX88ef81/ruRvzI5YqsuTuGW+y75WDnTR+2z0pKvN2ZdlVn6
+         HquubBpuczs9domQaY+35GO2RSD+yxemTD/o579pB+jFORVMY22RYn3vxcuwA1YT1J9Z
+         map7Di00OYW42Hu53B4iQIVqWnaMWdg0vMevvipy1jQyS5XvqSnHP/Q3r2lPEzuai7Qz
+         icYqAIVn4cj6x9RXghW8ce94+awrPn18IZn7BvZ/qcKiCG69OkjYBJtrzVOXCG7ROQxG
+         Srag==
+X-Forwarded-Encrypted: i=1; AJvYcCUr1LbEa/7SuZazZtlVu70Fh77jcJ8RbO2aU0I/eX0KZ/QRGRA3RRXTL/SdZ+M0QI+b6l2UA6I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx30L7aLbp8EdurPSwVK3UzyB4TlyqeVIVh9+qVrVIZU9XVaJsg
+	8fqnJ7Htl4HVRKBYELKifvEvP7NacVfcbJJEC+j5XNO5JYaxxXArGHIJM2+HZRxdDImqsRNzdnq
+	L+QhGVDRfn1Psbmo3M92m+bkH6wppcMyCbIDm7TD5enfcGfFmi/hZrA==
+X-Gm-Gg: ASbGncuMUCQMIUrn4wwIsO/HxRyrJn9bZEb11OkHTaHT+mMl8m+Mv6psu+z1zOvcbJP
+	si+nwQKS3RvYb1zOOSx6bsjf5M0t10ZLhUipVz90WMxMrj79LjKXxQi95aIm8BG60qWIeivkzdV
+	ajH7T1NNQdcMFNQLjuW+rkk+CEdwkZlEuooXFtvnM5Uu3RJB+pzUpfmy3rFy2U7O8wWfaPVskJn
+	Vi3Yn40qK65eU7ZiXpegPEw7zDORdFUQL1Z60V5b2Qd1wpA9m1Vxs8o5RpR66yQ9ZJk5HkW0Oun
+	LA35FwB/HewsOfM+tLlWHCaU7FLK
+X-Received: by 2002:a05:600c:5107:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-43622842924mr34681945e9.17.1734012738455;
+        Thu, 12 Dec 2024 06:12:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGU8Gkh/6x9u1nP/VCWEubXoDik5WGdtMCiI9rgLd/giqAVYpPerfHi1FsZqd0S62AvM7EIUQ==
+X-Received: by 2002:a05:600c:5107:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-43622842924mr34677335e9.17.1734012733105;
+        Thu, 12 Dec 2024 06:12:13 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436255531f2sm17862685e9.9.2024.12.12.06.12.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 05:59:39 -0800 (PST)
-Message-ID: <a1ad71d4-4148-42ee-b77a-fc4df1f5c2c0@linaro.org>
-Date: Thu, 12 Dec 2024 07:59:37 -0600
+        Thu, 12 Dec 2024 06:12:12 -0800 (PST)
+Message-ID: <f06b5f10-6ff4-4851-96db-56d6596bd176@redhat.com>
+Date: Thu, 12 Dec 2024 15:12:10 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,30 +75,59 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
 Subject: Re: [PATCH RFCv2 01/20] kvm: kvm_get_writable_id_regs
-To: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
- eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev
 References: <20241206112213.88394-1-cohuck@redhat.com>
  <20241206112213.88394-2-cohuck@redhat.com>
+ <a1ad71d4-4148-42ee-b77a-fc4df1f5c2c0@linaro.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <a1ad71d4-4148-42ee-b77a-fc4df1f5c2c0@linaro.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: IY4UX6Yu4bBZpzzgZQdfEN4OGtMMAvKHPplvcinvBFs_1734012738
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20241206112213.88394-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 12/6/24 05:21, Cornelia Huck wrote:
-> +#define NR_ID_REGS (3 * 8 * 8)
-> +
-> +typedef struct IdRegMap {
-> +    uint64_t regs[NR_ID_REGS];
-> +} IdRegMap;
-> +
+Hi Richard,
 
-Where does the NR_ID_REGS come from?  In particular the * 3?
-IIRC, all of the id registers are in op0=3, op1=0, crn=0, crm={0-7}, op2={0-7}.
+On 12/12/24 14:59, Richard Henderson wrote:
+> On 12/6/24 05:21, Cornelia Huck wrote:
+>> +#define NR_ID_REGS (3 * 8 * 8)
+>> +
+>> +typedef struct IdRegMap {
+>> +    uint64_t regs[NR_ID_REGS];
+>> +} IdRegMap;
+>> +
+>
+> Where does the NR_ID_REGS come from?  In particular the * 3?
+> IIRC, all of the id registers are in op0=3, op1=0, crn=0, crm={0-7},
+> op2={0-7}.
 
-Whatever the actual answer, some comments would be good.
+According to the KVM API and code,
+
+"The Feature ID space is defined as the AArch64 System register space
+with +op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}."
 
 
-r~
+hence that choice
+
+See:
+https://lore.kernel.org/all/20230919175017.538312-3-jingzhangos@google.com/
+
+Definitively we can add a comment
+
+Thanks
+
+Eric
+
+>
+> Whatever the actual answer, some comments would be good.
+>
+>
+> r~
+>
+
