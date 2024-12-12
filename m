@@ -1,220 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B19211471
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F10290F;
+	Thu, 12 Dec 2024 11:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734000952; cv=none; b=bbv+IJ+2I1vQ2dcF04eSeu6D+yYIojVa+Rauo+ryolgEZS7NhUTOUzd8vwuLtd9V1tO6gIJbwxV3AYapbbb+09UCxGlD8qYW9CkDBUNkAJAXMI2mOiUt01ZgfBeFLDvBIgjJVFi/13fjqc+f7Y78D57IFQd565GpRs8cZffsD5s=
+	t=1734003192; cv=none; b=D1WhYIxdTZoHNbzk7Dritcxd2cOFkF9Lg+sFLntwx/QsCYaR/b7RJzUhmonk0H00AuKarFGuPde2s2vV5s9ZvKruC5ciaaWJCwm7FGkaJhG/8CCZmnvJQZ2LLW9UHVPXE4Ql7ChrHX5NvGZp06djURVSvZxk5ofOYwClzN6jlFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734000952; c=relaxed/simple;
-	bh=mAmNokK3nzXTOlldPzCpAMxEI538DZ5VSES6sCOF50I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W1tY+fKi/ikWOVc94TeugRcxIWKuxaikHZcwKnuZIHC4s4e5L4hvqrJAvPHN4+p1+of3w/GBS9i4YX3z5jC6objwdWUBWPGup/1Day6pNh6sHIZCe1eWmSAKem5OYqUiYZnwys0KbB3fP64pgqa2XtK3Nsgv72+Rz+l3ba5ucvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92E3C153B;
-	Thu, 12 Dec 2024 02:56:17 -0800 (PST)
-Received: from [10.57.92.2] (unknown [10.57.92.2])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 102953F720;
-	Thu, 12 Dec 2024 02:55:46 -0800 (PST)
-Message-ID: <084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
-Date: Thu, 12 Dec 2024 10:55:45 +0000
+	s=arc-20240116; t=1734003192; c=relaxed/simple;
+	bh=bI+wKiXz+sjwrXGi9W8a7W5Mqy1BmYf1t3VdgNU8DeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YuriFMTmMCYGFY5vWEAAmAcYP+pCrUtAjc9sCyoDOD/qbWQmPXew66usHcENnAJP9w5Pj59ID1c34Ut0qmCDkPVuRb8RfGWjEh3W/oROo7JO5NAc/b+G+spRkoJtDHNQNiBKjiopUqJ7bfGUOWZ7sWh06TWtChSMM5Z8PRcL9WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dk4cN6NT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dk4cN6NT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E3BC4CED4;
+	Thu, 12 Dec 2024 11:33:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734003192;
+	bh=bI+wKiXz+sjwrXGi9W8a7W5Mqy1BmYf1t3VdgNU8DeE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Dk4cN6NTIy2EYGlRKrBLcv8H25jiVzfMj+JOS+5UV3Q6EiSqkPEvqWwc4w7MMOylo
+	 o/DH1ZUOM8UkfVfIMd8gN+z5G39uY4kSPbqjN0lMevSrvzs2PdHwguxSMWXz9iotEZ
+	 fYn4pz+J2iIQ/1lgydd29BcI5TNCjOmJKnikWAt9Tb+fyCcnrx09XtDBlbChM335dM
+	 HrQdGVJx336iJSTYcIjD4CK6/EAgIbf4dbr84Bke5HKdqxBf6+R96Ui1nSMOOZ99y+
+	 Iq88KR0ONVsEbL9CB3TywJTtsVQQEYqAaO3jDnvPe+bz34WzQ4fbOIY+mH8/YUVutW
+	 48SY8Dk2mTf1w==
+Date: Thu, 12 Dec 2024 11:33:05 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601
+ 2024-09
+Message-ID: <248dea18-bfad-4ec9-9a7d-5c87c7f48c84@sirena.org.uk>
+References: <20241203-arm64-2024-dpisa-v3-0-a6c78b1aa297@kernel.org>
+ <20241203-arm64-2024-dpisa-v3-2-a6c78b1aa297@kernel.org>
+ <20241210170953.GB16075@willie-the-truck>
+ <b859bdcd-7343-4d53-9f3a-f374deca725a@sirena.org.uk>
+ <20241211224015.GB17836@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>,
- =?UTF-8?Q?Miko=C5=82aj_Lenczewski?= <miko.lenczewski@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20241211160218.41404-1-miko.lenczewski@arm.com>
- <20241211160218.41404-3-miko.lenczewski@arm.com>
- <87cyhxs3xq.wl-maz@kernel.org>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <87cyhxs3xq.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cChPOZNdbKWWH8te"
+Content-Disposition: inline
+In-Reply-To: <20241211224015.GB17836@willie-the-truck>
+X-Cookie: All is fear in love and war.
 
-On 12/12/2024 08:25, Marc Zyngier wrote:
-> Ah, so this is where this is hiding. I missed it in my review of patch
-> #1 yesterday.
-> 
-> On Wed, 11 Dec 2024 16:01:38 +0000,
-> Mikołaj Lenczewski <miko.lenczewski@arm.com> wrote:
->>
->> The Break-Before-Make cpu feature supports multiple levels (levels 0-2),
->> and this commit adds a dedicated BBML2 cpufeature to test against
->> support for.
->>
->> In supporting BBM level 2, we open ourselves up to potential TLB
->> Conflict Abort Exceptions during expected execution, instead of only
->> in exceptional circumstances. In the case of an abort, it is
->> implementation defined at what stage the abort is generated, and
-> 
-> *IF* stage-2 is enabled. Also, in the case of the EL2&0 translation
-> regime, no stage-2 applies, so it can only be a stage-1 abort.
-> 
->> the minimal set of required invalidations is also implementation
->> defined. The maximal set of invalidations is to do a `tlbi vmalle1`
->> or `tlbi vmalls12e1`, depending on the stage.
->>
->> Such aborts should not occur on Arm hardware, and were not seen in
->> benchmarked systems, so unless performance concerns arise, implementing
-> 
-> Which systems? Given that you have deny-listed *all* half recent ARM
-> Ltd implementations, I'm a bit puzzled.
-> 
->> the abort handlers with the worst-case invalidations seems like an
->> alright hack.
->>
->> Signed-off-by: Mikołaj Lenczewski <miko.lenczewski@arm.com>
->> ---
->>  arch/arm64/include/asm/cpufeature.h | 14 ++++++++++++++
->>  arch/arm64/kernel/cpufeature.c      |  7 +++++++
->>  arch/arm64/mm/fault.c               | 27 ++++++++++++++++++++++++++-
->>  arch/arm64/tools/cpucaps            |  1 +
->>  4 files changed, 48 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index 8b4e5a3cd24c..a9f2ac335392 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -866,6 +866,20 @@ static __always_inline bool system_supports_mpam_hcr(void)
->>  	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
->>  }
->>  
->> +static inline bool system_supports_bbml2(void)
->> +{
->> +	/* currently, BBM is only relied on by code touching the userspace page
->> +	 * tables, and as such we are guaranteed that caps have been finalised.
->> +	 *
->> +	 * if later we want to use BBM for kernel mappings, particularly early
->> +	 * in the kernel, this may return 0 even if BBML2 is actually supported,
->> +	 * which means unnecessary break-before-make sequences, but is still
->> +	 * correct
-> 
-> Comment style, capitalisation, punctuation.
-> 
->> +	 */
->> +
->> +	return alternative_has_cap_unlikely(ARM64_HAS_BBML2);
->> +}
->> +
->>  int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
->>  bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
->>  
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index 6ce71f444ed8..7cc94bd5da24 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -2917,6 +2917,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->>  		.matches = has_cpuid_feature,
->>  		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
->>  	},
->> +	{
->> +		.desc = "BBM Level 2 Support",
->> +		.capability = ARM64_HAS_BBML2,
->> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
->> +		.matches = has_cpuid_feature,
->> +		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, BBM, 2)
->> +	},
->>  	{
->>  		.desc = "52-bit Virtual Addressing for KVM (LPA2)",
->>  		.capability = ARM64_HAS_LPA2,
->> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->> index ef63651099a9..dc119358cbc1 100644
->> --- a/arch/arm64/mm/fault.c
->> +++ b/arch/arm64/mm/fault.c
->> @@ -844,6 +844,31 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
->>  	return 0;
->>  }
->>  
->> +static int do_conflict_abort(unsigned long far, unsigned long esr,
->> +			     struct pt_regs *regs)
->> +{
->> +	if (!system_supports_bbml2())
->> +		return do_bad(far, esr, regs);
->> +
->> +	/* if we receive a TLB conflict abort, we know that there are multiple
->> +	 * TLB entries that translate the same address range. the minimum set
->> +	 * of invalidations to clear these entries is implementation defined.
->> +	 * the maximum set is defined as either tlbi(vmalls12e1) or tlbi(alle1).
->> +	 *
->> +	 * if el2 is enabled and stage 2 translation enabled, this may be
->> +	 * raised as a stage 2 abort. if el2 is enabled but stage 2 translation
->> +	 * disabled, or if el2 is disabled, it will be raised as a stage 1
->> +	 * abort.
->> +	 *
->> +	 * local_flush_tlb_all() does a tlbi(vmalle1), which is enough to
->> +	 * handle a stage 1 abort.
-> 
-> Same comment about comments.
-> 
->> +	 */
->> +
->> +	local_flush_tlb_all();
-> 
-> The elephant in the room: if TLBs are in such a sorry state, what
-> guarantees we can make it this far?
 
-I'll leave Miko to respond to your other comments, but I wanted to address this
-one, since it's pretty fundamental. We went around this loop internally and
-concluded that what we are doing is architecturally sound.
+--cChPOZNdbKWWH8te
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The expectation is that a conflict abort can only be generated as a result of
-the change in patch 4 (and patch 5). That change makes it possible for the TLB
-to end up with a multihit. But crucially that can only happen for user space
-memory because that change only operates on user memory. And while the TLB may
-detect the conflict at any time, the conflict abort is only permitted to be
-reported when an architectural access is prevented by the conflict. So we never
-do anything that would allow a conflict for a kernel memory access and a user
-memory conflict abort can never be triggered as a result of accessing kernel memory.
+On Wed, Dec 11, 2024 at 10:40:15PM +0000, Will Deacon wrote:
+> On Tue, Dec 10, 2024 at 06:43:05PM +0000, Mark Brown wrote:
 
-Copy/pasting comment from AlexC on the topic, which explains it better than I can:
+> > Yes, the issues here are not technical ones.  Though there are some
+> > complications -  eg, IIRC the XML doesn't encode the signedness of
+> > fields like we do and there's areas where we've deliberately diverged.
+> > Given the amount of review I end up having to do of sysreg changes your
+> > reasoning is especially apparent to me.  I've passed this feedback on
+> > (again).
 
-"""
-The intent is certainly that in cases where the hardware detects a TLB conflict
-abort, it is only permitted to report it (by generating an exception) if it
-applies to an access that is being attempted architecturally. ... that property
-can be built from the following two properties:
+> One thing we _could_ do is have a tool (in-tree) that takes two copies
+> of the sysreg file (i.e. before and after applying a diff) along with a
+> copy of the XML and, for the the new fields being added, shows how the
+> XML represents those compared to the diff. It should then be relatively
+> straightforward to flag the use of an unallocated encoding (like we had
+> here) and also things like assigning a field name to a RES0 region.
 
-1. The TLB conflict can only be reported as an Instruction Abort or a Data Abort
+> So this wouldn't be generating the patches from the XML, but more like
+> using the XML as an oracle in a linter.
 
-2. Those two exception types must be reported synchronously and precisely.
-"""
+That'd be useful, yes - unfortunately I think that's still something I
+can't work on myself at the moment for the above mentioned non-technical
+reasons.
 
-> 
-> I honestly don't think you can reliably handle a TLB Conflict abort in
-> the same translation regime as the original fault, given that we don't
-> know the scope of that fault. You are probably making an educated
-> guess that it is good enough on the CPUs you know of, but I don't see
-> anything in the architecture that indicates the "blast radius" of a
-> TLB conflict.
+--cChPOZNdbKWWH8te
+Content-Type: application/pgp-signature; name="signature.asc"
 
-OK, so I'm claiming that the blast radius is limited to the region of memory
-that we are operating on in contpte_collapse() in patch 4. Perhaps we need to go
-re-read the ARM and come back with the specific statements that led us to that
-conclusion?
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Ryan
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdayfAACgkQJNaLcl1U
+h9Bo9wf8DjHXD65QAeLiB/WQD6MKK2q1vhHifOtaL+lp7nN90YodMEadPyi1bgC0
+7kGLdiSnfBrGie39QosDOpgsd8FrzTWBLbvr7eoAWBjuhNZlFmz0S1sMsZ5eESte
+qFb6DrYC1LG2RbGC6TUy+CUW8gxKmzVYlbES/17f1lrq3v1yH5QSKhZNu2o1uSIJ
+FneGYGH2H23/rX8qM+0QVZlRgiRkUN1AFmlZPOol5YpDCwgppQH4VBMoRgg/kKVs
+4tOIqWWuDBnQ0thBa4o7EeoN+qS7iHl7mEzTkbHxse7zMe+mg3Ffs8jgdtxN55In
+2Rt9VoKhAE5mbSmIlPhZUM08qgHkBA==
+=OGMy
+-----END PGP SIGNATURE-----
 
-> 
-> Which makes me think that your KVM patch is equally broken on nVHE and
-> hVHE. Such fault should probably be handled while at EL2, not after
-> returning to EL1.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+--cChPOZNdbKWWH8te--
