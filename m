@@ -1,133 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D28211A0E
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 14:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B4D2144A8;
+	Thu, 12 Dec 2024 14:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734012743; cv=none; b=kPtc6bx6ZoPJkmB8oH5S8dN7jliDAf2RBKTHOL9q9t9RuvHc0vRZ5cEb9Gzi91zi2f69NjHt7nI5Z7dy5DSmScaFlVt2npfiBc2fce0uyy1H6xStOaydzNu6P5ri8lc3V7R7tVuRthH7K3fpmEDhIitzUXRmjGAa9GjyQKF3DzI=
+	t=1734013623; cv=none; b=h9+zzcvwl5uR3vqG1rcyIBl1z0rCzjYxolKEeDfZ7MgbWVVvI36xZkgxSbPr7j0UoB73ot162RtiqvjwOIZ0zNFZgaw8bPnkyihw2sCf1vpiv3jgCqoNJzpnexAl9jUmsvF+3Zygpswu8DZt+jYc+d5WuWMiPZwq6btA1CZwziE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734012743; c=relaxed/simple;
-	bh=lNzM/5KHaOdjwOXaIll3vIt6zX42tMOo69nIstNet+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EbC52S7nl76fo+I1viYtc7DhBReBrRB9lmUB/uKf97vf3PFwQ5E7SO6q48nkBcnhYoRvuaR2S91R6CaQn/ERhAfWLLQFZJBkVqr29BFTaSX5Yz0+HarPC0rY5WaXmZhNPpNELVWNgmc32Sm6yNfCYogicIvDqJTsYgCqlzEZHxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iysdQTE2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734013623; c=relaxed/simple;
+	bh=6MPo7a5U4fv2OQP0G0xKutPCOZIplNypB0d4BP0B7X4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UfbSyOmfmgb48hxTNPUs8aOenWBipAwjzFVHWYFdUdvoiZqOP2vkuQkIQa6ymzAUChq7DIfTKoLQ2edk4lBKtnPnla7vJtUOJRzS6Mb1FikQJbol1VRFaWnbKjaGln3oDRpASjYFIcBU7r9qWV8xfLbW2oQpxguQnCAEe4ziBDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6PNpVOm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iysdQTE2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734012740;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lNzM/5KHaOdjwOXaIll3vIt6zX42tMOo69nIstNet+E=;
-	b=iysdQTE2bdsKOFs+uXCbXxyhnXJG7xxknE6yy0d2IB6waznL+Z2ds/WCaKGq7znggoHp5V
-	U9xilxPTZOVs0kirsFTa8s0PkJ2WCpHDbVsPwvrhoOaqjoaU6bJbUiUmSDzcuEdV8k4AGN
-	vmODWmyvm0XjEkansbvVpsEEC/GT/Vs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-osn5nVihPOe9-JNDnuQ4sQ-1; Thu, 12 Dec 2024 09:12:19 -0500
-X-MC-Unique: osn5nVihPOe9-JNDnuQ4sQ-1
-X-Mimecast-MFC-AGG-ID: osn5nVihPOe9-JNDnuQ4sQ
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43625ceae52so3853145e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 06:12:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734012738; x=1734617538;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lNzM/5KHaOdjwOXaIll3vIt6zX42tMOo69nIstNet+E=;
-        b=jK7EuuWXwF2U12KYCuC3iZn+lmRRo7Q/S0+bgWPnNSCwLySyieLq6522x9cdMLiRFo
-         gaUQVzY6dH/J9dTRIyCeFX88ef81/ruRvzI5YqsuTuGW+y75WDnTR+2z0pKvN2ZdlVn6
-         HquubBpuczs9domQaY+35GO2RSD+yxemTD/o579pB+jFORVMY22RYn3vxcuwA1YT1J9Z
-         map7Di00OYW42Hu53B4iQIVqWnaMWdg0vMevvipy1jQyS5XvqSnHP/Q3r2lPEzuai7Qz
-         icYqAIVn4cj6x9RXghW8ce94+awrPn18IZn7BvZ/qcKiCG69OkjYBJtrzVOXCG7ROQxG
-         Srag==
-X-Forwarded-Encrypted: i=1; AJvYcCUr1LbEa/7SuZazZtlVu70Fh77jcJ8RbO2aU0I/eX0KZ/QRGRA3RRXTL/SdZ+M0QI+b6l2UA6I=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx30L7aLbp8EdurPSwVK3UzyB4TlyqeVIVh9+qVrVIZU9XVaJsg
-	8fqnJ7Htl4HVRKBYELKifvEvP7NacVfcbJJEC+j5XNO5JYaxxXArGHIJM2+HZRxdDImqsRNzdnq
-	L+QhGVDRfn1Psbmo3M92m+bkH6wppcMyCbIDm7TD5enfcGfFmi/hZrA==
-X-Gm-Gg: ASbGncuMUCQMIUrn4wwIsO/HxRyrJn9bZEb11OkHTaHT+mMl8m+Mv6psu+z1zOvcbJP
-	si+nwQKS3RvYb1zOOSx6bsjf5M0t10ZLhUipVz90WMxMrj79LjKXxQi95aIm8BG60qWIeivkzdV
-	ajH7T1NNQdcMFNQLjuW+rkk+CEdwkZlEuooXFtvnM5Uu3RJB+pzUpfmy3rFy2U7O8wWfaPVskJn
-	Vi3Yn40qK65eU7ZiXpegPEw7zDORdFUQL1Z60V5b2Qd1wpA9m1Vxs8o5RpR66yQ9ZJk5HkW0Oun
-	LA35FwB/HewsOfM+tLlWHCaU7FLK
-X-Received: by 2002:a05:600c:5107:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-43622842924mr34681945e9.17.1734012738455;
-        Thu, 12 Dec 2024 06:12:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGU8Gkh/6x9u1nP/VCWEubXoDik5WGdtMCiI9rgLd/giqAVYpPerfHi1FsZqd0S62AvM7EIUQ==
-X-Received: by 2002:a05:600c:5107:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-43622842924mr34677335e9.17.1734012733105;
-        Thu, 12 Dec 2024 06:12:13 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436255531f2sm17862685e9.9.2024.12.12.06.12.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2024 06:12:12 -0800 (PST)
-Message-ID: <f06b5f10-6ff4-4851-96db-56d6596bd176@redhat.com>
-Date: Thu, 12 Dec 2024 15:12:10 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6PNpVOm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6205FC4CECE;
+	Thu, 12 Dec 2024 14:27:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734013622;
+	bh=6MPo7a5U4fv2OQP0G0xKutPCOZIplNypB0d4BP0B7X4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=q6PNpVOmLPyEw1+IiMCQTZUJKvThRlkRMdbxEe91miFEvsKsKLOR1S08OE2JUOVPX
+	 pIUYYoRwECf1Z76DFXGpy6DgZOAs259cE/OWJ93X8eeHIvBk/RDrTh/kzaO45UWhuH
+	 JCgLhJ4NjR+06BdPOkfdQrEdaF+sVSivRsuRBKNxvBwISH9PFuk81+9sutjt+sdu2J
+	 o/6SvW9yFGuEZAQPhFqVbjF/SUptQkYQLM49oYQ78SO4pIWfyXhPvByCqSO/vEiHUG
+	 3/L7d1ICA8wso23FQLMYHvqEjTnexPnCqOf4UL9Yosn0me5MCQRhcEEIdoRoQOkhVv
+	 NxUKET0QXOG/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tLk9b-0035tU-WD;
+	Thu, 12 Dec 2024 14:27:00 +0000
+Date: Thu, 12 Dec 2024 14:26:59 +0000
+Message-ID: <86ikrprn7w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: =?UTF-8?B?TWlrb8WCYWo=?= Lenczewski <miko.lenczewski@arm.com>,
+	catalin.marinas@arm.com,	will@kernel.org,	corbet@lwn.net,
+	oliver.upton@linux.dev,	joey.gouly@arm.com,	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
+In-Reply-To: <084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
+References: <20241211160218.41404-1-miko.lenczewski@arm.com>
+	<20241211160218.41404-3-miko.lenczewski@arm.com>
+	<87cyhxs3xq.wl-maz@kernel.org>
+	<084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH RFCv2 01/20] kvm: kvm_get_writable_id_regs
-To: Richard Henderson <richard.henderson@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev
-References: <20241206112213.88394-1-cohuck@redhat.com>
- <20241206112213.88394-2-cohuck@redhat.com>
- <a1ad71d4-4148-42ee-b77a-fc4df1f5c2c0@linaro.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <a1ad71d4-4148-42ee-b77a-fc4df1f5c2c0@linaro.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: IY4UX6Yu4bBZpzzgZQdfEN4OGtMMAvKHPplvcinvBFs_1734012738
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, miko.lenczewski@arm.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Richard,
+On Thu, 12 Dec 2024 10:55:45 +0000,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
+> 
+> On 12/12/2024 08:25, Marc Zyngier wrote:
+> >> +
+> >> +	local_flush_tlb_all();
+> > 
+> > The elephant in the room: if TLBs are in such a sorry state, what
+> > guarantees we can make it this far?
+> 
+> I'll leave Miko to respond to your other comments, but I wanted to address this
+> one, since it's pretty fundamental. We went around this loop internally and
+> concluded that what we are doing is architecturally sound.
+> 
+> The expectation is that a conflict abort can only be generated as a result of
+> the change in patch 4 (and patch 5). That change makes it possible for the TLB
+> to end up with a multihit. But crucially that can only happen for user space
+> memory because that change only operates on user memory. And while the TLB may
+> detect the conflict at any time, the conflict abort is only permitted to be
+> reported when an architectural access is prevented by the conflict. So we never
+> do anything that would allow a conflict for a kernel memory access and a user
+> memory conflict abort can never be triggered as a result of accessing kernel memory.
+> 
+> Copy/pasting comment from AlexC on the topic, which explains it better than I can:
+> 
+> """
+> The intent is certainly that in cases where the hardware detects a TLB conflict
+> abort, it is only permitted to report it (by generating an exception) if it
+> applies to an access that is being attempted architecturally. ... that property
+> can be built from the following two properties:
+> 
+> 1. The TLB conflict can only be reported as an Instruction Abort or a Data Abort
+> 
+> 2. Those two exception types must be reported synchronously and precisely.
+> """
 
-On 12/12/24 14:59, Richard Henderson wrote:
-> On 12/6/24 05:21, Cornelia Huck wrote:
->> +#define NR_ID_REGS (3 * 8 * 8)
->> +
->> +typedef struct IdRegMap {
->> +    uint64_t regs[NR_ID_REGS];
->> +} IdRegMap;
->> +
->
-> Where does the NR_ID_REGS come from?  In particular the * 3?
-> IIRC, all of the id registers are in op0=3, op1=0, crn=0, crm={0-7},
-> op2={0-7}.
+I totally agree with this. The issue is that nothing says that the
+abort is in any way related to userspace.
 
-According to the KVM API and code,
+> > 
+> > I honestly don't think you can reliably handle a TLB Conflict abort in
+> > the same translation regime as the original fault, given that we don't
+> > know the scope of that fault. You are probably making an educated
+> > guess that it is good enough on the CPUs you know of, but I don't see
+> > anything in the architecture that indicates the "blast radius" of a
+> > TLB conflict.
+> 
+> OK, so I'm claiming that the blast radius is limited to the region of memory
+> that we are operating on in contpte_collapse() in patch 4. Perhaps we need to go
+> re-read the ARM and come back with the specific statements that led us to that
+> conclusion?
 
-"The Feature ID space is defined as the AArch64 System register space
-with +op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}."
+But we don't know for sure what caused this conflict by the time we
+arrive in the handler. It could equally be because we have a glaring
+bug somewhere on the kernel side, even if you are *now* only concerned
+with userspace.
 
+If anything, this should absolutely check for FAR_EL1 and assert that
+this is indeed caused by such change.
 
-hence that choice
+Thanks,
 
-See:
-https://lore.kernel.org/all/20230919175017.538312-3-jingzhangos@google.com/
+	M.
 
-Definitively we can add a comment
-
-Thanks
-
-Eric
-
->
-> Whatever the actual answer, some comments would be good.
->
->
-> r~
->
-
+-- 
+Without deviation from the norm, progress is not possible.
