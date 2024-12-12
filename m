@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF0423E6EB
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 18:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFC523EA6B
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 18:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734026771; cv=none; b=VH1CQLzicNbLyF4UQXBJZQKo92khIia/+k4E7U3UeAr+LzdmWX520yxSdK3vTH5At0YdEfZcvHhM5a49S6j9/hybJvRHHvaNjfet5kEXLecPUbj8eJ2I6P2RkWeu5jo+nT4x7frxv9gxhU52vGAajKZbizUDCiKPgYaUfxxTkaA=
+	t=1734026773; cv=none; b=Tw3Dcv6HkPiKN9uag92ijvSQ29shc+EvmpKmusqg5/vy4eo7GW3wrl3kG7wj8gpWqGQH9Hyn+K8HluuOY+6QuEdbXCFC3XulXvkhBmtXAccnT96nIdVLN3URpyZvwbWRmzyIpNyT117fwBeKvU6rSGLkJz7RDApJKtOQgixXryM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734026771; c=relaxed/simple;
-	bh=onbrJ9zcCDEgz4deQmM2rr2og6c6fCddvp2W4BDAzsY=;
+	s=arc-20240116; t=1734026773; c=relaxed/simple;
+	bh=83jtEu1bEidihroGtU2ASbvYlrug3jgXmpI7mOWQ/pY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nkpyQX46UXGJRT3amCwqqWnPsmGYx5CTYnKvXwFmaEaEl0y9VKw3ie7CFua799BPEVcGbZUCMKdK+JObTWKhjc72jiOyzdis+B5Km51IUSe9nGkN554vae6mnM3sBT02GvFsMIVNdSOtqSq21qMZ2BlldEIiAb7GwOGm3n40+FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h+dT7/2x; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=PTXXeIFZh4rL69zPyRx6NCNUNu/u9N6i6cYtsppuZN1SmgGotO5YdvKYpp64IpPxMjAZ0moo9JOUcDqTxmqfpbmL3rDv0G6z4tq8akDYj8NGPfxbQqUcTC0GDu1F1x8/ivpngVZ27ajr+JL46Zi7eBsY+7v4XviuSE56fb7ekHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CBxE9nyx; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h+dT7/2x"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4359eb032c9so7203885e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:06:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CBxE9nyx"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-434fb9646efso8353405e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:06:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734026767; x=1734631567; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734026769; x=1734631569; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gI/xVfW0NJIG4pabP2PrJlF4/ywCtn5dWW4kgaXryCA=;
-        b=h+dT7/2xHOI+aGzTAMZkJwxVoKIJeziynVQHxxKn+cnK+fmEfmmbk+3+uCi5Y+jOhT
-         ipW3HUZndi+jiltO/nBj5Ji/Bx9EkD6iOcrmuPlpAQe9wK6gtkKoo3XDNqjDP8x+u/v8
-         8fPlMm77h4f1lZ8WTCn0u81e+4R6m9iWgcLnTxNQ2DUDdVFSCwKhCSpMBSZbDOLHOA4q
-         zBVsX6bC4phxX0SRUIZhhGw9SXHb2/z7WtwUoT2KLWom6GENnqgZcBT4jzSXbBHd2tDS
-         FKRcFFdbSgBQfb9cQyDM3Eh+fh9IWpabeEzXWI+t312qTqTDt3pWuM7upHvYZ2/ZEjFM
-         aiCA==
+        bh=EpD1lhD14fjHF53MLiJhdNjSda5T/6inc9eTWlsnoLw=;
+        b=CBxE9nyx8d7lluNAbIhmjmKcpfG27assjzBA1TB1EF+B2ZjAo9oW/sqONx/d+5kCSI
+         6OmvSMvHnmLfPOghwSNKrCMRv9a1YzE2ZWJAMp1hPEwYM5kqODMFkGxT49cqydCLIMld
+         bTxvzoJjYJtItdm0q1pXgsyzeHkgXAv96bipMwIPwr/9Nv6UYO8fC59q41lhC0pXVcMU
+         mVyMKXtAnmgHHxHtoUHWQEH43+09geHkNTKHi7Plk1iGsUVtuEUVasFX1NUiHfiAXi1E
+         ePSaYbypnucpgsXtrkIb2nHYcPGUuFXFhfCpGTeh5diMNB8cY9m9HKBSzfFldjn0/+yb
+         0G+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734026767; x=1734631567;
+        d=1e100.net; s=20230601; t=1734026769; x=1734631569;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gI/xVfW0NJIG4pabP2PrJlF4/ywCtn5dWW4kgaXryCA=;
-        b=UPiYDah57EL+aqs+9/Rhs8oncb1A99escjrMgC3vSuDiKYy3XQyFUjpoBdk7mbNUsp
-         XNtRfAEDtJPxnzYyplaFkW644QLdJe2ecYwAoBP0OU582W4RhewtDbEl1ur6iW+MvcT6
-         /15wmPhAibeKuD4xmkBrzlGpsL0/9BVuqbxHwrpKRS8rracypQT1txbGs+THzXowhkRI
-         GXw7wpvvcCK+/PLmtvAk/c3AjCZmTARVoibwYAYfjqsDtiFsUgZoAeTSBGmLnLR251LR
-         UyT37n57xCHMmrql47ZazHsB/n346iFU+R4YuXtj0BgxaqXpniC382N5Whw+s0lb/3nu
-         LkhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTpn+G7mHt6qTYubf3m0WBT2DVCCtPCbzGCGFTyCJpTioUmqJeLEIPWyI53s63PGKkr3GUwWw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyza9aD7WGMhJK9/kBQm2MzOVdxm8egXIUqzV7m1jBDDULVtZmx
-	a7KNcNBp0A5/u81MmfucATKww+Q7W8vwGJawAVK85T8kn4Xw9aiJhgfQuLUaXDtyJybYwp+Z4eS
-	6lbjJs2h9oQ==
-X-Google-Smtp-Source: AGHT+IHQ4cd+c/HRUSDI+U6v3tD80p/r2kIFY0himPqzGsq85TsqDSkq/5V4+Is4wQaH97N2w1ilsWBcofMkbQ==
-X-Received: from wmgg16.prod.google.com ([2002:a05:600d:10:b0:434:a7ee:3c40])
+        bh=EpD1lhD14fjHF53MLiJhdNjSda5T/6inc9eTWlsnoLw=;
+        b=JXsW/PRa0mfPcbgr8Da1cnBQWWiiKeHGN3S0hIWocSvpD3OT2Loz4j5PtibwrvAYJr
+         F3l2IRiMYkiX/s8f/tscVO3yZC+6VKJEitX/e2FoLmY14p4lHoUpAwvR3B3dw6r//f5N
+         4r79yGP3OJYjoSvDWgn7Ii7y+4KASSWPjXDERY0m0GZ97DXOxjl0O/ubQrTf38f5IBzL
+         sQtpzy3wnR3vUTC6gsK6Okk62SO5kFWWCQRRfFBu0033ADZnE3dG/nmzRD/WmM6Kg1jQ
+         atZHSgC4CJexjdkqCOggikeLTaKw0tMGbHYuIyoZX9MdxjoUufyJ/HTl7H/TBfATX2Gj
+         U/zg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBc/9thHYO4UF5PLSOjl8UstSFQhULe7dqqvuwvVvPvPMiDyHzBMKes/4yemtS33PS3M5yOeQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yybf/hZ5LoeJiFYRBQ+rh/8jBbuoRmCZ5B7ol3i6WD1YluXD1HD
+	0NZvTsD+fBWxyZ67ReFXHv9jvTQpUL8QT8GW4TzWeCdmkhzApeiXqRzA0vb6kHDimdgU9P/HQBm
+	PA6U8m5hKVQ==
+X-Google-Smtp-Source: AGHT+IHoAtLMCXcx0pNbqpLg+273hrX6BxpTnA/fbV1HglY7lURxrvsoWLSyAcKravbhVxC4p30yvMPx2T2q2A==
+X-Received: from wmbay15.prod.google.com ([2002:a05:600c:1e0f:b0:434:ff52:1c7])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:19ca:b0:434:f819:251a with SMTP id 5b1f17b1804b1-4362282ab8emr40017385e9.9.1734026767627;
- Thu, 12 Dec 2024 10:06:07 -0800 (PST)
-Date: Thu, 12 Dec 2024 18:04:04 +0000
+ 2002:a05:600c:5127:b0:434:fddf:5c0a with SMTP id 5b1f17b1804b1-4361c344c70mr73849075e9.3.1734026769635;
+ Thu, 12 Dec 2024 10:06:09 -0800 (PST)
+Date: Thu, 12 Dec 2024 18:04:05 +0000
 In-Reply-To: <20241212180423.1578358-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241212180423.1578358-1-smostafa@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241212180423.1578358-41-smostafa@google.com>
-Subject: [RFC PATCH v2 40/58] KVM: arm64: smmu-v3: Add map/unmap pages and iova_to_phys
+Message-ID: <20241212180423.1578358-42-smostafa@google.com>
+Subject: [RFC PATCH v2 41/58] KVM: arm64: smmu-v3: Add DABT handler
 From: Mostafa Saleh <smostafa@google.com>
 To: iommu@lists.linux.dev, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -73,216 +73,94 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add map_pages and iova_to_phys HVC code, which
-mainly calls the io-pgtable.
-
-For unmap_pages, we rely on IO_PGTABLE_QUIRK_UNMAP_INVAL, where the
-driver first calls unmap_pages which invalidate all the pages as
-a typical unmap, issuing all the necessary TLB invalidations.
-Then, we will start a page table with 2 callbacks:
-- visit_leaf: for each unmapped leaf, it would decrement the refcount
-  of the page using __pkvm_host_unuse_dma(), reversing the what IOMMU
-  core does in map.
-- visit_post_table: this would free any invalidated tables as they
-  wouldn't be freed because of the quirk.
+Add a data abort handler for the SMMUv3, we allow access for
+ETVQ and GERROR for debug purpose.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 147 ++++++++++++++++++++
- 1 file changed, 147 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 58 +++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-index ec3f8d9749d3..1821a3420a4d 100644
+index 1821a3420a4d..2a99873d980f 100644
 --- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
 +++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-@@ -808,15 +808,74 @@ static const struct iommu_flush_ops smmu_tlb_ops = {
- 	.tlb_add_page	= smmu_tlb_add_page,
- };
+@@ -13,6 +13,7 @@
+ #include <nvhe/mem_protect.h>
+ #include <nvhe/mm.h>
+ #include <nvhe/pkvm.h>
++#include <nvhe/trap_handler.h>
  
-+static void smmu_unmap_visit_leaf(phys_addr_t addr, size_t size,
-+				  struct io_pgtable_walk_common *data,
-+				  void *wd)
-+{
-+	u64 *ptep = wd;
-+
-+	WARN_ON(__pkvm_host_unuse_dma(addr, size));
-+	*ptep = 0;
-+}
-+
-+/*
-+ * On unmap with the IO_PGTABLE_QUIRK_UNMAP_INVAL, unmap doesn't clear
-+ * or free any tables, so after the unmap walk the table and on the post
-+ * walk we free invalid tables.
-+ * One caveat, is that a table can be unmapped while it points to other
-+ * tables which would be valid, and we would need to free those also.
-+ * The simples solution is to look at the walk PTE info and if any of
-+ * the parents is invalid it means that this table also needs to freed.
-+ */
-+static void smmu_unmap_visit_post_table(struct arm_lpae_io_pgtable_walk_data *walk_data,
-+					arm_lpae_iopte *ptep, int lvl)
-+{
-+	struct arm_lpae_io_pgtable *data = walk_data->cookie;
-+	size_t table_size;
-+	int i;
-+	bool invalid = false;
-+
-+	if (lvl == data->start_level)
-+		table_size = ARM_LPAE_PGD_SIZE(data);
-+	else
-+		table_size = ARM_LPAE_GRANULE(data);
-+
-+	for (i = 0 ; i <= lvl ; ++i)
-+		invalid |= !iopte_valid(walk_data->ptes[lvl]);
-+
-+	if (!invalid)
-+		return;
-+
-+	__arm_lpae_free_pages(ptep, table_size, &data->iop.cfg, data->iop.cookie);
-+	*ptep = 0;
-+}
-+
- static void smmu_iotlb_sync(struct kvm_hyp_iommu_domain *domain,
- 			    struct iommu_iotlb_gather *gather)
- {
- 	size_t size;
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+	struct io_pgtable *pgtable = smmu_domain->pgtable;
-+	struct arm_lpae_io_pgtable *data = io_pgtable_to_data(pgtable);
-+	struct arm_lpae_io_pgtable_walk_data wd = {
-+		.cookie = data,
-+		.visit_post_table = smmu_unmap_visit_post_table,
-+	};
-+	struct io_pgtable_walk_common walk_data = {
-+		.visit_leaf = smmu_unmap_visit_leaf,
-+		.data = &wd,
-+	};
+ #define ARM_SMMU_POLL_TIMEOUT_US	100000 /* 100ms arbitrary timeout */
  
- 	if (!gather->pgsize)
- 		return;
- 	size = gather->end - gather->start + 1;
- 	smmu_tlb_inv_range(domain, gather->start, size,  gather->pgsize, true);
+@@ -1269,6 +1270,62 @@ static phys_addr_t smmu_iova_to_phys(struct kvm_hyp_iommu_domain *domain,
+ 	return paddr;
+ }
+ 
++static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
++			     struct kvm_cpu_context *host_ctxt,
++			     u64 esr, u32 off)
++{
++	bool is_write = esr & ESR_ELx_WNR;
++	unsigned int len = BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
++	int rd = (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
++	const u32 no_access  = 0;
++	const u32 read_write = (u32)(-1);
++	const u32 read_only = is_write ? no_access : read_write;
++	u32 mask = no_access;
 +
 +	/*
-+	 * Now decrement the refcount of unmapped pages thanks to
-+	 * IO_PGTABLE_QUIRK_UNMAP_INVAL
++	 * Only handle MMIO access with u32 size and alignment.
++	 * We don't need to change 64-bit registers for now.
 +	 */
-+	pgtable->ops.pgtable_walk(&pgtable->ops, gather->start, size, &walk_data);
- }
- 
- static int smmu_domain_config_s2(struct kvm_hyp_iommu_domain *domain,
-@@ -966,6 +1025,7 @@ static int smmu_domain_finalise(struct hyp_arm_smmu_v3_device *smmu,
- 			.oas = smmu->ias,
- 			.coherent_walk = smmu->features & ARM_SMMU_FEAT_COHERENCY,
- 			.tlb = &smmu_tlb_ops,
-+			.quirks = IO_PGTABLE_QUIRK_UNMAP_INVAL,
- 		};
- 	} else {
- 		cfg = (struct io_pgtable_cfg) {
-@@ -975,6 +1035,7 @@ static int smmu_domain_finalise(struct hyp_arm_smmu_v3_device *smmu,
- 			.oas = smmu->oas,
- 			.coherent_walk = smmu->features & ARM_SMMU_FEAT_COHERENCY,
- 			.tlb = &smmu_tlb_ops,
-+			.quirks = IO_PGTABLE_QUIRK_UNMAP_INVAL,
- 		};
- 	}
- 
-@@ -1125,6 +1186,89 @@ static int smmu_detach_dev(struct kvm_hyp_iommu *iommu, struct kvm_hyp_iommu_dom
- 	return ret;
- }
- 
-+static int smmu_map_pages(struct kvm_hyp_iommu_domain *domain, unsigned long iova,
-+			  phys_addr_t paddr, size_t pgsize,
-+			  size_t pgcount, int prot, size_t *total_mapped)
-+{
-+	size_t mapped;
-+	size_t granule;
-+	int ret;
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+	struct io_pgtable *pgtable = smmu_domain->pgtable;
++	if ((len != sizeof(u32)) || (off & (sizeof(u32) - 1)))
++		return false;
 +
-+	if (!pgtable)
-+		return -EINVAL;
++	switch (off) {
++	case ARM_SMMU_EVTQ_PROD + SZ_64K:
++		mask = read_write;
++		break;
++	case ARM_SMMU_EVTQ_CONS + SZ_64K:
++		mask = read_write;
++		break;
++	case ARM_SMMU_GERROR:
++		mask = read_only;
++		break;
++	case ARM_SMMU_GERRORN:
++		mask = read_write;
++		break;
++	};
 +
-+	granule = 1UL << __ffs(smmu_domain->pgtable->cfg.pgsize_bitmap);
-+	if (!IS_ALIGNED(iova | paddr | pgsize, granule))
-+		return -EINVAL;
++	if (!mask)
++		return false;
++	if (is_write)
++		writel_relaxed(cpu_reg(host_ctxt, rd) & mask, smmu->base + off);
++	else
++		cpu_reg(host_ctxt, rd) = readl_relaxed(smmu->base + off);
 +
-+	hyp_spin_lock(&smmu_domain->pgt_lock);
-+	while (pgcount && !ret) {
-+		mapped = 0;
-+		ret = pgtable->ops.map_pages(&pgtable->ops, iova, paddr,
-+					     pgsize, pgcount, prot, 0, &mapped);
-+		if (ret)
-+			break;
-+		WARN_ON(!IS_ALIGNED(mapped, pgsize));
-+		WARN_ON(mapped > pgcount * pgsize);
-+
-+		pgcount -= mapped / pgsize;
-+		*total_mapped += mapped;
-+		iova += mapped;
-+		paddr += mapped;
-+	}
-+	hyp_spin_unlock(&smmu_domain->pgt_lock);
-+
-+	return 0;
++	return true;
 +}
 +
-+static size_t smmu_unmap_pages(struct kvm_hyp_iommu_domain *domain, unsigned long iova,
-+			       size_t pgsize, size_t pgcount, struct iommu_iotlb_gather *gather)
++static bool smmu_dabt_handler(struct kvm_cpu_context *host_ctxt, u64 esr, u64 addr)
 +{
-+	size_t granule, unmapped, total_unmapped = 0;
-+	size_t size = pgsize * pgcount;
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+	struct io_pgtable *pgtable = smmu_domain->pgtable;
++	struct hyp_arm_smmu_v3_device *smmu;
 +
-+	if (!pgtable)
-+		return -EINVAL;
-+
-+	granule = 1UL << __ffs(smmu_domain->pgtable->cfg.pgsize_bitmap);
-+	if (!IS_ALIGNED(iova | pgsize, granule))
-+		return 0;
-+
-+	hyp_spin_lock(&smmu_domain->pgt_lock);
-+	while (total_unmapped < size) {
-+		unmapped = pgtable->ops.unmap_pages(&pgtable->ops, iova, pgsize,
-+						    pgcount, gather);
-+		if (!unmapped)
-+			break;
-+		iova += unmapped;
-+		total_unmapped += unmapped;
-+		pgcount -= unmapped / pgsize;
++	for_each_smmu(smmu) {
++		if (addr < smmu->mmio_addr || addr >= smmu->mmio_addr + smmu->mmio_size)
++			continue;
++		return smmu_dabt_device(smmu, host_ctxt, esr, addr - smmu->mmio_addr);
 +	}
-+	hyp_spin_unlock(&smmu_domain->pgt_lock);
-+	return total_unmapped;
-+}
-+
-+static phys_addr_t smmu_iova_to_phys(struct kvm_hyp_iommu_domain *domain,
-+				     unsigned long iova)
-+{
-+	phys_addr_t paddr;
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+	struct io_pgtable *pgtable = smmu_domain->pgtable;
-+
-+	if (!pgtable)
-+		return -EINVAL;
-+
-+	hyp_spin_lock(&smmu_domain->pgt_lock);
-+	paddr = pgtable->ops.iova_to_phys(&pgtable->ops, iova);
-+	hyp_spin_unlock(&smmu_domain->pgt_lock);
-+
-+	return paddr;
++	return false;
 +}
 +
  /* Shared with the kernel driver in EL1 */
  struct kvm_iommu_ops smmu_ops = {
  	.init				= smmu_init,
-@@ -1134,4 +1278,7 @@ struct kvm_iommu_ops smmu_ops = {
- 	.iotlb_sync			= smmu_iotlb_sync,
- 	.attach_dev			= smmu_attach_dev,
- 	.detach_dev			= smmu_detach_dev,
-+	.map_pages			= smmu_map_pages,
-+	.unmap_pages			= smmu_unmap_pages,
-+	.iova_to_phys			= smmu_iova_to_phys,
+@@ -1281,4 +1338,5 @@ struct kvm_iommu_ops smmu_ops = {
+ 	.map_pages			= smmu_map_pages,
+ 	.unmap_pages			= smmu_unmap_pages,
+ 	.iova_to_phys			= smmu_iova_to_phys,
++	.dabt_handler			= smmu_dabt_handler,
  };
 -- 
 2.47.0.338.g60cca15819-goog
