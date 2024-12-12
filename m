@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E137C239BC8
-	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 18:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6360823A1A1
+	for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 18:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734026755; cv=none; b=guW2HtGFyjGIAugdZD6gEwHKMeIx/u/AIH/jBVDePZdM02Fysnb8LfvsuDaNqL9PsBWMeRCs2SoZt3QXiM69dKjlHy3YOT0L5lkTKwU7ZPh50gFMGuwOfQC+fdbHhCarZcPCLMhGWJv69gCIAv9yl/Y80bNWD5gqPazvmlbLNnI=
+	t=1734026758; cv=none; b=qvcjW6sOBEn3LEzsCIMexgem4q5iaejekGCo3LDFJEq7qVUbuEpCdwTuHFYs9llsEsp44QZ0lwvpdvG/2JG9Cp6nWMx5YXkjmoFdNELjuvEw3S/qcQSnZgcaab4kcWE0GWxNbzuB54KhL2sLfaEjg2st5y9UZuvAJy4K9Kiar04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734026755; c=relaxed/simple;
-	bh=aMJpNnqVCqfIZxdPd82zCfyFBJH1oACArK53wQftNKU=;
+	s=arc-20240116; t=1734026758; c=relaxed/simple;
+	bh=xoLHfhtpFrxTH540A3d41QMdNpP9ylrvZba0P+No9Hs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JRAmiTKRQIwlB30PfBvtBAlzmwwakySUS9fFkmjBzuTXxbUvURUfnjd99ZVg5+kApb//glyHjYSAzkPjxQN/ST7NUjmocQPpZ2465AT7OMKhu7dUqh6eZY3HDohzmX3qmROHPrERRyX1WbUxB+tXwM/+Nt85cql79LMosIxoAmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BLyV7PGr; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=saW3E7luYQ/uGEUo3Ws6r9WRK+y4PT0rxOvNg0bPmX4HC3azyVyOVOmKDT2ipbvIhsThvuK+2Tgeo3MInpLF9eq4SgtYVqsIBk69LS02BjWXnxJ9CAzz8JUO0y5DoARbX05yzBlFpyHOlkUTr4BvYdwhZQhuxx68DqAxtsG7da0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CflE8zKf; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BLyV7PGr"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-436228ebc5eso5627605e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:05:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CflE8zKf"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4361ac607b6so7285185e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Dec 2024 10:05:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734026752; x=1734631552; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734026755; x=1734631555; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0JvanTJSMR+XI/Wjo2HTOKln5DEsfQoh3Hho27FSuog=;
-        b=BLyV7PGrXba5b5/pNA/p3X3GobKEiZ3bv2Qh75mr7t0tVcO7KtBAQt0q21XaQ00YgL
-         o/yhoZukI9PSD/tgem0fxcglRKuNZUOeZpmKcm8mxcm37uyb+3d1lGamI9SDpyBWg+Fz
-         21n4HFMlp6lRMaEbhqXS2s+4UOdkCbUTpG0tpiub9zyVhUmnffwGfVCdOAnhDw/v69O2
-         0rSQVw2Y1yDserqJb8pzCbVE8YbOc99DmWGw5jkqXDJoaTzPtplAyPVXCOHqti7u4CTr
-         S1KTWUCY6eKJe+SrB8c0XzdXfgTbuLaOVeI3Egz6R+OZpZL3Tx74e1ewriDomFT+DBkF
-         amSQ==
+        bh=/jsol/FD7xLO/XnO3v0kMgo+OuMQmHauwbh0Fn9n2Qc=;
+        b=CflE8zKfgYH7rqZ5CMLggGfZ1CfnrPRnvMP6Ny5GhbJA64pNhTWG6zsLskFRZdN7LH
+         f2/um8EMjYr4iBGRq9Bhc1tAJrnYFhlDeVgWgLMSue1378BHucPcVJb9U8iSw8dLJD0f
+         4h0AzO2/bZtdva4dK0DVv8D3K7iBVByq0jMXjVOJrvn5G9ceYcwqFHMQWotwfn32xWyy
+         T2ypJb0pTw7pRMVK1q6gLuFhWWiXtvOkOszRlYaHS/xGTDfjLbzd1O/BT3FhgLATKknG
+         W3UuS8XeS/5gvWpt/HxAn2EOAUuBXl7EI7bfziE4OYGYj4rvr8H+J7dPOE8aVcwavybB
+         37UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734026752; x=1734631552;
+        d=1e100.net; s=20230601; t=1734026755; x=1734631555;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0JvanTJSMR+XI/Wjo2HTOKln5DEsfQoh3Hho27FSuog=;
-        b=dOMerziFpW/wXrebXn/7f7v6OKbUcERwNQZGDBOBOSY3tjUcfkIGzwQIDt3OKNhaUq
-         UM5XlfXXzGw7cu457u+QifhkKH+/LSCqGZ5t+srEZvJDrz16I6ASjV7Nhc+jzXkDgzGT
-         4uUlX1OO3iRHMlAbU3Gm33QpqHagY4Z+57GJ79uKM1GXrFQtqv/ObxpfWKo2k/nb4qf6
-         HBt0zvAbqoMRoCJz7YKFqzUqchz6N22OyO28pTEtA0+g24F1pNexnE+qbzcNpC4xu5SK
-         Wbfxdkw8JPvjwHF/njHlsEEFgD9tG3UmExFkYPhfb3AzHDG0uHZA2vLQN8x99oxKWJYH
-         DxIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVG1PZayy38ycFNEL9WYBf15phGs2y7oYJcaBu44g5Yt//M6BImCH21uB0VeXaNo+w56WbQF4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxLYVHnDAt5UUl8PSnbao41AKBWpHib0dcV23tgpmMiyVvb6wb4
-	FQgx3ISsVSEPxheFW/mkqr+aaNTKIwfozLWVwZVYJEj5qV6yTx32V7ucL/741X/lihXjXjkSfNv
-	WU5qdWlIWFg==
-X-Google-Smtp-Source: AGHT+IGWGdZgTY7Fu4Fy8oS8GVUUpzVpI6h6GF8Kt9ZH/qx6w2Z6AjSEvrQ/zUVQNCjYoCTIQFsDcTLIxiWTaw==
-X-Received: from wmkz18.prod.google.com ([2002:a7b:c7d2:0:b0:434:a15f:e7ea])
+        bh=/jsol/FD7xLO/XnO3v0kMgo+OuMQmHauwbh0Fn9n2Qc=;
+        b=g8XL1fBvGdzVoHh1qS/EQn7vcZPZCkQMX3vAIv9VeDTaggL6NlLPYFOteX+ynVFSLW
+         N+iKiLgmsbh8CmR+Ko42N8A/VZE9D352T/W+PS7WiyQVfjA6JaTykON0ivbB/xxFMAOy
+         V22fdgT+43CSMIDtIRI7NoEYvGbdCn9DHinMocSs7iTpGuYS78O8Ma8LW1uSW9zJmlJ3
+         qsAnZ+uXumGwG9WZbXtEsL7yC3ej23RYOF73oitaSaDkvr3v3US1ka5Gcq/OJzBNooZ4
+         MTDO9zQNgPkTHNF7+UwuHt9XQShTChBcYqrNp6cJUeA7xpefgJ6Y+WYBVfd95BQXgIZJ
+         5SNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEq5HRTD1/7KrIYgUvlMsXBbfHW640GWTKGgPVUCZJLgbx+IVhgifTtq/cgYfLK/txQSBCs5g=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxPfiTEvluTu/bW5UizlybHi7FszZzzpOHGtuMPiKWKC0ESiK+b
+	Wgox98Y0oU+2Tl38Vcf8ounJyjehHUgMkDarudquhrxEtXBM44ZcF9rGU+qd6KiMFwNXjylrYya
+	kxapbRx2F1A==
+X-Google-Smtp-Source: AGHT+IFPvic4v0yXTXsiiS55qmyvRxNfbGXACyTICF0QYMQMm//s6fh52UUXvcsaAQ5ADTdRambhNe92sr/RSw==
+X-Received: from wmol7.prod.google.com ([2002:a05:600c:47c7:b0:434:a471:130f])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4e4b:b0:434:a239:d2fe with SMTP id 5b1f17b1804b1-4361c400c1bmr52688975e9.28.1734026752664;
- Thu, 12 Dec 2024 10:05:52 -0800 (PST)
-Date: Thu, 12 Dec 2024 18:03:57 +0000
+ 2002:a05:600c:35cb:b0:434:f9ad:7238 with SMTP id 5b1f17b1804b1-4362286391fmr34351085e9.22.1734026754968;
+ Thu, 12 Dec 2024 10:05:54 -0800 (PST)
+Date: Thu, 12 Dec 2024 18:03:58 +0000
 In-Reply-To: <20241212180423.1578358-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241212180423.1578358-1-smostafa@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241212180423.1578358-34-smostafa@google.com>
-Subject: [RFC PATCH v2 33/58] KVM: arm64: smmu-v3: Add TLB ops
+Message-ID: <20241212180423.1578358-35-smostafa@google.com>
+Subject: [RFC PATCH v2 34/58] KVM: arm64: smmu-v3: Add context descriptor functions
 From: Mostafa Saleh <smostafa@google.com>
 To: iommu@lists.linux.dev, kvmarm@lists.linux.dev, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -73,197 +73,85 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add TLB invalidation functions would be used next from the page table
-code and attach/detach functions.
+Add functions to allocate and access context descriptors that would
+be used in stage-1 attach.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 167 ++++++++++++++++++++
- 1 file changed, 167 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 53 +++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-index 3181933e9a34..5f00d5cdf5bc 100644
+index 5f00d5cdf5bc..d58424e45e1d 100644
 --- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
 +++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-@@ -602,10 +602,177 @@ static void smmu_free_domain(struct kvm_hyp_iommu_domain *domain)
- 	hyp_free(smmu_domain);
+@@ -215,6 +215,19 @@ static int smmu_sync_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
+ 	return smmu_send_cmd(smmu, &cmd);
  }
  
-+static void smmu_inv_domain(struct hyp_arm_smmu_v3_domain *smmu_domain)
++__maybe_unused
++static int smmu_sync_cd(struct hyp_arm_smmu_v3_device *smmu, u32 sid, u32 ssid)
 +{
-+	struct kvm_hyp_iommu_domain *domain = smmu_domain->domain;
-+	struct hyp_arm_smmu_v3_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_cmdq_ent cmd = {};
++	struct arm_smmu_cmdq_ent cmd = {
++		.opcode = CMDQ_OP_CFGI_CD,
++		.cfgi.sid	= sid,
++		.cfgi.ssid	= ssid,
++		.cfgi.leaf = true,
++	};
 +
-+	if (smmu_domain->pgtable->cfg.fmt == ARM_64_LPAE_S2) {
-+		cmd.opcode = CMDQ_OP_TLBI_S12_VMALL;
-+		cmd.tlbi.vmid = domain->domain_id;
-+	} else {
-+		cmd.opcode = CMDQ_OP_TLBI_NH_ASID;
-+		cmd.tlbi.asid = domain->domain_id;
-+	}
-+
-+	if (smmu->iommu.power_is_off)
-+		return;
-+
-+	WARN_ON(smmu_send_cmd(smmu, &cmd));
++	return smmu_send_cmd(smmu, &cmd);
 +}
 +
-+static void smmu_tlb_flush_all(void *cookie)
+ static int smmu_alloc_l2_strtab(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
+ {
+ 	struct arm_smmu_strtab_cfg *cfg = &smmu->strtab_cfg;
+@@ -291,6 +304,46 @@ smmu_get_alloc_ste_ptr(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
+ 	return smmu_get_ste_ptr(smmu, sid);
+ }
+ 
++__maybe_unused
++static u64 *smmu_get_cd_ptr(u64 *cdtab, u32 ssid)
 +{
-+	struct kvm_hyp_iommu_domain *domain = cookie;
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+	struct hyp_arm_smmu_v3_device *smmu = smmu_domain->smmu;
-+
-+	kvm_iommu_lock(&smmu->iommu);
-+	smmu_inv_domain(smmu_domain);
-+	kvm_iommu_unlock(&smmu->iommu);
-+}
-+
-+static int smmu_tlb_inv_range_smmu(struct hyp_arm_smmu_v3_device *smmu,
-+				   struct kvm_hyp_iommu_domain *domain,
-+				   struct arm_smmu_cmdq_ent *cmd,
-+				   unsigned long iova, size_t size, size_t granule)
-+{
-+	int ret = 0;
-+	unsigned long end = iova + size, num_pages = 0, tg = 0;
-+	size_t inv_range = granule;
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+
-+	kvm_iommu_lock(&smmu->iommu);
-+	if (smmu->iommu.power_is_off)
-+		goto out_ret;
-+
-+	/* Almost copy-paste from the kernel dirver. */
-+	if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
-+		/* Get the leaf page size */
-+		tg = __ffs(smmu_domain->pgtable->cfg.pgsize_bitmap);
-+
-+		num_pages = size >> tg;
-+
-+		/* Convert page size of 12,14,16 (log2) to 1,2,3 */
-+		cmd->tlbi.tg = (tg - 10) / 2;
-+
-+		/*
-+		 * Determine what level the granule is at. For non-leaf, both
-+		 * io-pgtable and SVA pass a nominal last-level granule because
-+		 * they don't know what level(s) actually apply, so ignore that
-+		 * and leave TTL=0. However for various errata reasons we still
-+		 * want to use a range command, so avoid the SVA corner case
-+		 * where both scale and num could be 0 as well.
-+		 */
-+		if (cmd->tlbi.leaf)
-+			cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
-+		else if ((num_pages & CMDQ_TLBI_RANGE_NUM_MAX) == 1)
-+			num_pages++;
-+	}
-+
-+	while (iova < end) {
-+		if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
-+			/*
-+			 * On each iteration of the loop, the range is 5 bits
-+			 * worth of the aligned size remaining.
-+			 * The range in pages is:
-+			 *
-+			 * range = (num_pages & (0x1f << __ffs(num_pages)))
-+			 */
-+			unsigned long scale, num;
-+
-+			/* Determine the power of 2 multiple number of pages */
-+			scale = __ffs(num_pages);
-+			cmd->tlbi.scale = scale;
-+
-+			/* Determine how many chunks of 2^scale size we have */
-+			num = (num_pages >> scale) & CMDQ_TLBI_RANGE_NUM_MAX;
-+			cmd->tlbi.num = num - 1;
-+
-+			/* range is num * 2^scale * pgsize */
-+			inv_range = num << (scale + tg);
-+
-+			/* Clear out the lower order bits for the next iteration */
-+			num_pages -= num << scale;
-+		}
-+		cmd->tlbi.addr = iova;
-+		WARN_ON(smmu_add_cmd(smmu, cmd));
-+		BUG_ON(iova + inv_range < iova);
-+		iova += inv_range;
-+	}
-+
-+	ret = smmu_sync_cmd(smmu);
-+out_ret:
-+	kvm_iommu_unlock(&smmu->iommu);
-+	return ret;
-+}
-+
-+static void smmu_tlb_inv_range(struct kvm_hyp_iommu_domain *domain,
-+			       unsigned long iova, size_t size, size_t granule,
-+			       bool leaf)
-+{
-+	struct hyp_arm_smmu_v3_domain *smmu_domain = domain->priv;
-+	unsigned long end = iova + size;
-+	struct arm_smmu_cmdq_ent cmd;
-+
-+	cmd.tlbi.leaf = leaf;
-+	if (smmu_domain->pgtable->cfg.fmt == ARM_64_LPAE_S2) {
-+		cmd.opcode = CMDQ_OP_TLBI_S2_IPA;
-+		cmd.tlbi.vmid = domain->domain_id;
-+	} else {
-+		cmd.opcode = CMDQ_OP_TLBI_NH_VA;
-+		cmd.tlbi.asid = domain->domain_id;
-+		cmd.tlbi.vmid = 0;
-+	}
-+	/*
-+	 * There are no mappings at high addresses since we don't use TTB1, so
-+	 * no overflow possible.
-+	 */
-+	BUG_ON(end < iova);
-+	WARN_ON(smmu_tlb_inv_range_smmu(smmu_domain->smmu, domain,
-+					&cmd, iova, size, granule));
-+}
-+
-+static void smmu_tlb_flush_walk(unsigned long iova, size_t size,
-+				size_t granule, void *cookie)
-+{
-+	smmu_tlb_inv_range(cookie, iova, size, granule, false);
-+}
-+
-+static void smmu_tlb_add_page(struct iommu_iotlb_gather *gather,
-+			      unsigned long iova, size_t granule,
-+			      void *cookie)
-+{
-+	if (gather)
-+		kvm_iommu_iotlb_gather_add_page(cookie, gather, iova, granule);
-+	else
-+		smmu_tlb_inv_range(cookie, iova, granule, granule, true);
++	/* Only linear supported for now. */
++	return cdtab + ssid * CTXDESC_CD_DWORDS;
 +}
 +
 +__maybe_unused
-+static const struct iommu_flush_ops smmu_tlb_ops = {
-+	.tlb_flush_all	= smmu_tlb_flush_all,
-+	.tlb_flush_walk = smmu_tlb_flush_walk,
-+	.tlb_add_page	= smmu_tlb_add_page,
-+};
-+
-+static void smmu_iotlb_sync(struct kvm_hyp_iommu_domain *domain,
-+			    struct iommu_iotlb_gather *gather)
++static u64 *smmu_alloc_cd(struct hyp_arm_smmu_v3_device *smmu, u32 pasid_bits)
 +{
-+	size_t size;
++	u64 *cd_table;
++	int flags = 0;
++	u32 requested_order = get_order((1 << pasid_bits) *
++					(CTXDESC_CD_DWORDS << 3));
 +
-+	if (!gather->pgsize)
-+		return;
-+	size = gather->end - gather->start + 1;
-+	smmu_tlb_inv_range(domain, gather->start, size,  gather->pgsize, true);
++	/*
++	 * We support max of 64K linear tables only, this should be enough
++	 * for 128 pasids
++	 */
++	if (WARN_ON(requested_order > 4))
++		return NULL;
++
++	if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
++		flags |= IOMMU_PAGE_NOCACHE;
++
++	cd_table = kvm_iommu_donate_pages(requested_order, flags);
++	if (!cd_table)
++		return NULL;
++	return (u64 *)hyp_virt_to_phys(cd_table);
 +}
 +
- /* Shared with the kernel driver in EL1 */
- struct kvm_iommu_ops smmu_ops = {
- 	.init				= smmu_init,
- 	.get_iommu_by_id		= smmu_id_to_iommu,
- 	.alloc_domain			= smmu_alloc_domain,
- 	.free_domain			= smmu_free_domain,
-+	.iotlb_sync			= smmu_iotlb_sync,
- };
++__maybe_unused
++static void smmu_free_cd(u64 *cd_table, u32 pasid_bits)
++{
++	u32 order = get_order((1 << pasid_bits) *
++			      (CTXDESC_CD_DWORDS << 3));
++
++	kvm_iommu_reclaim_pages(cd_table, order);
++}
++
+ static int smmu_init_registers(struct hyp_arm_smmu_v3_device *smmu)
+ {
+ 	u64 val, old;
 -- 
 2.47.0.338.g60cca15819-goog
 
