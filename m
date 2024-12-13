@@ -1,49 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492E2175AB;
-	Fri, 13 Dec 2024 17:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22182364D6;
+	Fri, 13 Dec 2024 17:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734109506; cv=none; b=SRXp3IhgBoMOWYcyNzaLPpBA/D7L+lfPTnifZyNmPornFLujFMrNfCEAchoTYlixHDHdrhYNxrAqx6s0I/31yqwqtq2C66++igsGAlhwpGAJm4BukyNNZkq/qIyIhgsvtrRksDwzgem34QVaIgiIqzAwcaOOX3atsl3cxmYPhg4=
+	t=1734110132; cv=none; b=hlVq4Jc9VqJHn/yQgmL4Ws3hsJVgjJn1Nv9Avp1/k8NSU6JgdS9H0WIs1aQfwEBvuYn6+tjes/AlOu8YyMY3ZtS+n0koq7U3db6EPd5iFHzCgtRVUxYnFfFtSUuWlPR/9Si4eUBkxGxmM4/LajLGBQEWJBy/4DDHgXhrZJ6zshc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734109506; c=relaxed/simple;
-	bh=61bXG60i+jrRdV9+oCAxeLnAz20I+9y5LRabAtXcBIA=;
+	s=arc-20240116; t=1734110132; c=relaxed/simple;
+	bh=2YJ7aI7lgNgInMsZf1T3jkaRml+zGxaMkU8tu0NSViU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q8GrTDsLWCtfsR8PtMY4/8okP1UfrOjJGKOLlNuZiWcqvgwfYj+QgfWNK9Mb/zArI0C/mARr4AJiNXwNA6TmLnqviMZG2eMyeSijE7DwawQ3D+s22lKAeYrmOItXs7iVun4g6OrkZjPXFthzn6+1WgdxxEv10ZjjPGYML7Rm+78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzLpXGwh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=GAk9Nqb6zpBLQOKRv0avaYyY6EE25oFzHmEQ64MGtz56tMyU0lMP/9652FtWB+6r2/xSmZa7v7EDur/oS3O6xhJeNWRrqeDgtEtd3UHaS2VD9EX5DqBZLbN8bGRgyYXMHGIab2ChrM218hafzR2gWb974gIpA7vXJBtSHVOdU9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jwFnfZHt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzLpXGwh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F79C4CED0;
-	Fri, 13 Dec 2024 17:05:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jwFnfZHt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CAEFC4CED0;
+	Fri, 13 Dec 2024 17:15:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734109506;
-	bh=61bXG60i+jrRdV9+oCAxeLnAz20I+9y5LRabAtXcBIA=;
+	s=k20201202; t=1734110130;
+	bh=2YJ7aI7lgNgInMsZf1T3jkaRml+zGxaMkU8tu0NSViU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lzLpXGwhsOwiC/u5pupNLMOg5zx+DlxIyADRES4IOsCcC4mD++gtUX29U8c6uI0P9
-	 OUjPsit3ujZJmErTU1/8pznVfSh9NaV6DHP5y+0CCuJ+Yd8A9F01P9NwOXtp7+yhLu
-	 1HuRVayC5FQibnP44JI3rwLnnzbj8d8FFhq7l+HMaECDBawsfCrKcE//ValqmC+2X6
-	 ybmENiU5SegEV0+USuTMjW37a7hGCGirqJuHAaBhOi4OwYHdCHvMXG6zUNPdLLPn4h
-	 3617ut7HXFZr6R3GaguBQ8eEeNE3VdkI211pc6ZV3sNNnE+rSDASsORaRbiAYQA7SL
-	 +H+tAx5zOmHDg==
+	b=jwFnfZHtJRdNKH+ybm0QEKAg3qZ60IbY6L+VQxt6+YdW6BM9uAmHxcpXyXVYEzrWP
+	 zS6eE7+dWYNwAcELVtbJ8ASixRhGLltL43p7NN601ihIoHc2VFp1tK0cOMprJ1iUgy
+	 Sv/yj3sFyCi+2fo2qth+eR/ynsRTrG4gbk/sMkoZSQprSQlMZ+xD614plNzaEUwzaO
+	 taWeJtDMp8NIklaovuK6UEAV0H4q5z3lNBqUd4nNbTFsOFifCqtH6dCdI7WruFce93
+	 GBWzlkhIQKssH89xiDNeCVssv6vKGkDj+TpS1/rXUQ2h4B3eOJoDPFh4aryZtmsBWI
+	 /NKGalKaxhcXg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tM968-003Vth-03;
-	Fri, 13 Dec 2024 17:05:04 +0000
-Date: Fri, 13 Dec 2024 17:05:03 +0000
-Message-ID: <86cyhvsedc.wl-maz@kernel.org>
+	id 1tM9GC-003W5f-7g;
+	Fri, 13 Dec 2024 17:15:28 +0000
+Date: Fri, 13 Dec 2024 17:15:27 +0000
+Message-ID: <86bjxfsdw0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Uros Bizjak <ubizjak@gmail.com>
 Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 2/3] irqchip/gic: Correct declaration of *percpu_base pointer in union gic_base
-In-Reply-To: <20241213145809.2918-2-ubizjak@gmail.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/3] KVM: arm64: timers: Fix percpu address space issues in kvm_timer_hyp_init()
+In-Reply-To: <20241213145809.2918-1-ubizjak@gmail.com>
 References: <20241213145809.2918-1-ubizjak@gmail.com>
-	<20241213145809.2918-2-ubizjak@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,64 +59,96 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ubizjak@gmail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tglx@linutronix.de
+X-SA-Exim-Rcpt-To: ubizjak@gmail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 13 Dec 2024 14:57:53 +0000,
+On Fri, 13 Dec 2024 14:57:52 +0000,
 Uros Bizjak <ubizjak@gmail.com> wrote:
 > 
-> percpu_base is used in various percpu functions that expect variable in
-> __percpu address space. Correct the declaration of percpu_base to
+> Cast return value from kvm_get_running_vcpus() in the __percpu
+> address space to the generic address space via uintptr_t [1]
+> to fix a couple of:
 > 
-> void __iomem * __percpu *percpu_base;
+> arch_timer.c:1395:66: warning: incorrect type in argument 2 (different address spaces)
+> arch_timer.c:1395:66:    expected void *vcpu_info
+> arch_timer.c:1395:66:    got struct kvm_vcpu *[noderef] __percpu *
 > 
-> to declare the variable as __percpu pointer.
-> 
-> The patch fixes several sparse warnings:
-> 
-> irq-gic.c:1172:44: warning: incorrect type in assignment (different address spaces)
-> irq-gic.c:1172:44:    expected void [noderef] __percpu *[noderef] __iomem *percpu_base
-> irq-gic.c:1172:44:    got void [noderef] __iomem *[noderef] __percpu *
-> ...
-> irq-gic.c:1184:26: warning: incorrect type in initializer (different address spaces)
-> irq-gic.c:1184:26:    expected void const [noderef] __percpu *__vpp_verify
-> irq-gic.c:1184:26:    got void [noderef] __percpu *[noderef] __iomem *
-> ...
-> irq-gic.c:1184:71: warning: incorrect type in assignment (different address spaces)
-> irq-gic.c:1184:71:    expected void [noderef] __percpu *
-> irq-gic.c:1184:71:    got void [noderef] __iomem *
-> ...
-> irq-gic.c:1231:43: warning: incorrect type in argument 1 (different address spaces)
-> irq-gic.c:1231:43:    expected void [noderef] __percpu *__pdata
-> irq-gic.c:1231:43:    got void [noderef] __percpu *[noderef] __iomem *percpu_base
+> sparse warnings.
 > 
 > There were no changes in the resulting object files.
 > 
+> [1] https://sparse.docs.kernel.org/en/latest/annotations.html#address-space-name
+> 
 > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 > Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Joey Gouly <joey.gouly@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
 > ---
->  drivers/irqchip/irq-gic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/arch_timer.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> index 8fae6dc01024..6503573557fd 100644
-> --- a/drivers/irqchip/irq-gic.c
-> +++ b/drivers/irqchip/irq-gic.c
-> @@ -64,7 +64,7 @@ static void gic_check_cpu_features(void)
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 1215df590418..a13bb9e8dc19 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -1392,7 +1392,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
 >  
->  union gic_base {
->  	void __iomem *common_base;
-> -	void __percpu * __iomem *percpu_base;
-> +	void __iomem * __percpu *percpu_base;
->  };
+>  	if (has_gic) {
+>  		err = irq_set_vcpu_affinity(host_vtimer_irq,
+> -					    kvm_get_running_vcpus());
+> +					    (void *)(uintptr_t)kvm_get_running_vcpus());
+>  		if (err) {
+>  			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+>  			goto out_free_vtimer_irq;
+> @@ -1416,7 +1416,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
 >  
->  struct gic_chip_data {
+>  		if (has_gic) {
+>  			err = irq_set_vcpu_affinity(host_ptimer_irq,
+> -						    kvm_get_running_vcpus());
+> +						    (void *)(uintptr_t)kvm_get_running_vcpus());
+>  			if (err) {
+>  				kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+>  				goto out_free_ptimer_irq;
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+I think the fix is worse than the current code, because there is no
+real semantics behind the pointer being passed to
+irq_set_vcpu_affinity(). All that is required is that it is a non-NULL
+pointer.
+
+I expect the following hack to work just as well and not suffer from
+any sparse indigestion. Untested though.
 
 	M.
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 1215df5904185..8058d92048fb4 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1391,8 +1391,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
+ 	}
+ 
+ 	if (has_gic) {
+-		err = irq_set_vcpu_affinity(host_vtimer_irq,
+-					    kvm_get_running_vcpus());
++		err = irq_set_vcpu_affinity(host_vtimer_irq, info);
+ 		if (err) {
+ 			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+ 			goto out_free_vtimer_irq;
+@@ -1415,8 +1414,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
+ 		}
+ 
+ 		if (has_gic) {
+-			err = irq_set_vcpu_affinity(host_ptimer_irq,
+-						    kvm_get_running_vcpus());
++			err = irq_set_vcpu_affinity(host_ptimer_irq, info);
+ 			if (err) {
+ 				kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
+ 				goto out_free_ptimer_irq;
 
 -- 
 Without deviation from the norm, progress is not possible.
