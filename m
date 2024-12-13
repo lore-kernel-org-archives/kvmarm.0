@@ -1,53 +1,58 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11E41C3BE7
-	for <kvmarm@lists.linux.dev>; Fri, 13 Dec 2024 15:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBF91C3BEB
+	for <kvmarm@lists.linux.dev>; Fri, 13 Dec 2024 16:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734104630; cv=none; b=oPgAxqdpUJ7KXvcdqeWnSeD35fWPwejVftYCAW+P8MYP0nE70PhS3atryNLwByhOVtQegLT2zaMdBRmuAIdfT7zk4qKoVs/Chwfi7JoKng4Y1qiDVy4ZkebtSH0GtirNFRARmlvFhO+W9ivLvdoK9YhntnBL7R4tSPb7gSGmSYk=
+	t=1734106632; cv=none; b=q+MWO4rhkA2du8vmG3mDXmuEvuN9CreB/ZJHHVb1Uf/ezhcEBiTtPgYhNyxSY4/vedYHJb22AiZXftMgLv3FQ4kgGFYSmiNdN59d00XhCz7QwhrGxCdFTK8tfQdS6Y3HVBC7Jdr+Qmbah07p7Ky/OmEH96lG0K+xTscG6WWsAhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734104630; c=relaxed/simple;
-	bh=RYU/4FdKkB0xorZ2TsYbbW9T90/h6t9JRgfYUWysE+s=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EJjOTqzlCIWGeI03j4jII13mHtc9N9hS50GPbo+MkdmshGeQcD96WewQbGaSlzSystwPnznDMXb9iiNTjmKbMFumE4F5FsQwIFJAq3Dmw0/w4GducPXY6rpOzrmSbgk3h3cqr5Kq22rGcs+dOWJvlWTgs/uE/I9fQFUyG2+uBLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fW1kJB62; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1734106632; c=relaxed/simple;
+	bh=Mc8m+5THX0rGjtXDbtI/W+2S+F4KR+Fo+OyARm9TdeE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FCLuTHvvwwlPFs8fVVnCR1Glr6JenbOKv77IEP4sVJMMarGkeFr4SwqiPtNRdSfzytS/lfQgVkxYggBX3cR4Q+MndLcJ0Wfmky5DvaREByfnnhwzTRKLc9dUhvhhCu3X7BVmgFzf/DvTNcuE21u0Uu67benQVri3FctRuzDdOcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B2ht/sp5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fW1kJB62"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2ht/sp5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734104627;
+	s=mimecast20190719; t=1734106629;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RYU/4FdKkB0xorZ2TsYbbW9T90/h6t9JRgfYUWysE+s=;
-	b=fW1kJB62hOL0/qouCH4pZTxbRUxT/29xnU36TQ038gXhMSOTZz99gJSNfbWLqgryRwvgkp
-	E1wBOTpyvYl23GRzrJT4CGRlHNIhAWYh0iGzVdOPU0Ck1ROTAGkoqViO9Li3oL9FOKiJqf
-	34z9njiwqaR4dalvDr5E8qe+2xsGTho=
+	bh=VCgH5AryLvd0TODvVd649/Xxmtwsd61I9FaTyvDZ7JI=;
+	b=B2ht/sp5EXCCTRpL320gF1m2i320OJ2Bp4rD7EVSSSAveb0zdDUesf7d1sSPcSjgFYv6Dv
+	fgMXQ9FELq25ahR6MGciwh+TX2iMPyput2eh5wfAnolNtFhU4N5RzhunfW3KPBJ9uUdXEB
+	qDvlszp8dGrj4M4OhEkHapmQkulJBRA=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-612-a3xUOItJNimu-9lRPDa6NA-1; Fri,
- 13 Dec 2024 10:43:41 -0500
-X-MC-Unique: a3xUOItJNimu-9lRPDa6NA-1
-X-Mimecast-MFC-AGG-ID: a3xUOItJNimu-9lRPDa6NA
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-607-ro4mGKYUP_Gy4kHmZuyYzQ-1; Fri,
+ 13 Dec 2024 11:17:06 -0500
+X-MC-Unique: ro4mGKYUP_Gy4kHmZuyYzQ-1
+X-Mimecast-MFC-AGG-ID: ro4mGKYUP_Gy4kHmZuyYzQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D4951955E9C;
-	Fri, 13 Dec 2024 15:43:40 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 509551955EA1;
+	Fri, 13 Dec 2024 16:17:04 +0000 (UTC)
 Received: from localhost (dhcp-192-244.str.redhat.com [10.33.192.244])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A04D9195605A;
-	Fri, 13 Dec 2024 15:43:38 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 337F1300FA9C;
+	Fri, 13 Dec 2024 16:17:00 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+To: Richard Henderson <richard.henderson@linaro.org>, eric.auger@redhat.com,
  eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev
-Subject: Re: [PATCH RFCv2 01/20] kvm: kvm_get_writable_id_regs
-In-Reply-To: <f06b5f10-6ff4-4851-96db-56d6596bd176@redhat.com>
+ kvmarm@lists.linux.dev, peter.maydell@linaro.org, alex.bennee@linaro.org,
+ maz@kernel.org, oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
+Cc: shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+ pbonzini@redhat.com
+Subject: Re: [PATCH RFCv2 02/20] arm/cpu: Add sysreg definitions in
+ cpu-sysregs.h
+In-Reply-To: <bcc5e5a2-91d4-45b3-9f67-d6b49833a3ef@linaro.org>
 Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
  Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
  153243,
@@ -55,60 +60,46 @@ Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
  Michael O'Neill, Amy
  Ross"
 References: <20241206112213.88394-1-cohuck@redhat.com>
- <20241206112213.88394-2-cohuck@redhat.com>
- <a1ad71d4-4148-42ee-b77a-fc4df1f5c2c0@linaro.org>
- <f06b5f10-6ff4-4851-96db-56d6596bd176@redhat.com>
+ <20241206112213.88394-3-cohuck@redhat.com>
+ <2a83a49b-6863-4fb8-b5de-c3eacf3cdb77@linaro.org>
+ <12a2ef7c-0ba3-49d9-9e08-733b8ca6a753@redhat.com>
+ <bcc5e5a2-91d4-45b3-9f67-d6b49833a3ef@linaro.org>
 User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Fri, 13 Dec 2024 16:43:35 +0100
-Message-ID: <875xnnd1w8.fsf@redhat.com>
+Date: Fri, 13 Dec 2024 17:16:58 +0100
+Message-ID: <8734ird0cl.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Dec 12 2024, Eric Auger <eric.auger@redhat.com> wrote:
+On Thu, Dec 12 2024, Richard Henderson <richard.henderson@linaro.org> wrote:
 
-> Hi Richard,
+> On 12/12/24 11:46, Eric Auger wrote:
+>>> Do we really need anything beyond the defined registers, or even the
+>>> defined registers for which qemu knows how to do anything?
+>> what do you mean by "defined registers". The end goal is to be able to
+>> tune any id reg that the kernel allows to write. So I guess we shall
+>> encompass more regs than qemu currently handles.
 >
-> On 12/12/24 14:59, Richard Henderson wrote:
->> On 12/6/24 05:21, Cornelia Huck wrote:
->>> +#define NR_ID_REGS (3 * 8 * 8)
->>> +
->>> +typedef struct IdRegMap {
->>> +=C2=A0=C2=A0=C2=A0 uint64_t regs[NR_ID_REGS];
->>> +} IdRegMap;
->>> +
->>
->> Where does the NR_ID_REGS come from?=C2=A0 In particular the * 3?
->> IIRC, all of the id registers are in op0=3D3, op1=3D0, crn=3D0, crm=3D{0=
--7},
->> op2=3D{0-7}.
+> Defined registers as in "have an architected definition".
 >
-> According to the KVM API and code,
+> E.g. there's no need to set any fields in (op0=0 op1=0 crn=0, crm=0, op2=1), because that 
+> isn't a defined system register.  It's in id register space sure, and almost certainly 
+> RAZ, but there's no call to either set it or represent it within qemu.
 >
-> "The Feature ID space is defined as the AArch64 System register space
-> with +op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7}, op2=3D=
-=3D{0-7}."
->
->
-> hence that choice
->
-> See:
-> https://lore.kernel.org/all/20230919175017.538312-3-jingzhangos@google.co=
-m/
->
-> Definitively we can add a comment
+> Because you're working to a a symbolic command-line interface, with FEAT_FOO, ID_REG.FIELD 
+> names, qemu will (be extended to) handle every register named.
 
-I've added
+Going from the definitions, we have the potential to generate props for
+anything that has been named (do we have named registers/fields that are not
+architected?) Exposed on the command line are only those register fields
+that are actually writable with the current KVM interface (see patch 18.)
 
-/*
- * ID registers in op0=3D=3D3, op1=3D=3D{0,1,3}, crn=3D0, crm=3D=3D{0-7}, o=
-p2=3D=3D{0-7},
- * as used by the KVM_ARM_GET_REG_WRITABLE_MASKS ioctl call.
- */
+I'm still not quite sure how to continue with FEAT_FOO, but I guess
+we're still going to need the ID_REG.FIELD names in any case to handle
+differences like DIC in CTR_EL0 mentioned elsewhere in this thread.
 
