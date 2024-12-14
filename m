@@ -1,124 +1,111 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C39518C002
-	for <kvmarm@lists.linux.dev>; Fri, 13 Dec 2024 19:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7642F1AA78E;
+	Sat, 14 Dec 2024 22:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734119340; cv=none; b=U0Wct8+alhSGR07IYv/D3LJVgnE7jmwFK5HKu4bjDN2gEXKiGnNLxwdyhjtYvTcT7O1RyysLxldW13TJ7trdx7YoAq8NJ7W/SyadYwWXjwvVc95G26VUk1RThv2ta35Z88rwo/XDi2uZ+h7T6Z5F7M2hZqurrQSHkNcVQFZoOdI=
+	t=1734216458; cv=none; b=PRFpjfg/KZAVfkqTtkqz9LEhYoBXEjvCa6Sdgx4gkRZ+pKHvAfCEhkn1Ajk6mSiXmc3xrmTBfLOC6cNtv+L8B0Z+yi0VJDFVIqOUxxsyO2bGYpIe5HdN2roZ1ya+2k8Jk4OW/57bugxvMucAX15+BHT4R9rByKNt+X0ZOVyZ+v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734119340; c=relaxed/simple;
-	bh=Hcu+xxfk93UjbX+XANzHa25tjGomPC71CobQm6FJoQA=;
+	s=arc-20240116; t=1734216458; c=relaxed/simple;
+	bh=AKxRtbsHNV4cXXEwh68zgfEHkimry76rewwLYZhrLjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ltJAu7fHEotP0vi7Ot+MeFf8zC9ANjpuTwwPeg1Vu8YETkHl2xC2iRCWy8Q158IkQ1OKDXhH8HOK8RIIUQNiY7Gkt/QWJQ62+2vA6wY+eqeyZVLo+xAvnGW+BNK5j4PrOGDwuXYihwW8fiqTaIgGZIDXKP1seOiru4YQVOSN+v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QctuGGte; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=qQ91RxBmMlg6q8TlYY90nHzxa5buPhkTIOCAk2Jh3Y1favp3KOIHIkiosNj8btbuJZPtASPTVU+mcK/iYwVr+mDoJANVOGfHheklp498BR6VWHG1RPHF6yGk5DfrfxP2kApoGo1HCzIWFbDkXuwbhKPsEfu2EVgFHRNZzpx8Brg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dizwexfw; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QctuGGte"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43621d2dd4cso10445e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 13 Dec 2024 11:48:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734119337; x=1734724137; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wTudxL7akG15arLWgUhGBbqBkCySihKjSTxtiyHKj/M=;
-        b=QctuGGteSG/mZiFanCFZJJeIlNzf7Quj5UTkl/TTvk3g8MpHddGGl/YsiQxlLsA+Rv
-         YEwA4LiQhlNxNzPwG8jhlRjpHZrdRxjV3uo55LNLq2gE/smBN6d4eEo7Mn4WyIfPkF6D
-         jF4CNPPW70n07Xl9BLoooRJGGuNbAghP+IaTO6fWonGesuoxlk8rxVsk4zrxnWhtwObf
-         5ZWPDDPJiJk6bGjZI95JyPBEaign5wFkxIxW9ySknvTXtiRTPiDHQCaTBZpK2i+YLXW1
-         AkRB2YilKOSsJvASHpoDA2FH5gcPSfYOMh7rdVbEkQCEbIB8vmIyQVIR9G1dcD+QqD/F
-         1JZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734119337; x=1734724137;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wTudxL7akG15arLWgUhGBbqBkCySihKjSTxtiyHKj/M=;
-        b=eEOfKE9aMVqrmISE/pMJBnTeK96AIYyvlS5SmAj9As9preWdDiFQ0TsglezDtpdIDK
-         1UBZ3cIOUtkem2TWvhNUHx7OjXdbyhhb7qXOwjMPs401j5dz2NY5m6LrejYrwd+MCoAW
-         8bKByJlEnhNOAHChf4g/50M8gByUsYRDoyek46bQ6yzXxPeLTpgv7XZHQo9tBaAa6Ms/
-         wbNLXj2Vh80ymxm70IlHI7gu/dZPg28rClrU36C4pH1n0iqdQBTfO11BWIQMudt4GX/c
-         YKsQCoXR3KLzI5qQHHPpU68Kb2RSI2uiv4KZ8WZTJVpyiQrF4pb2bFKtDtuY/cyc2I5r
-         gzVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXnMdkbUtBAN3wsb0aRI57gUXiTYqonEMDBD8ZpxgGLvWgL8UZuGvNp768eG5MTBjGuX21OAnw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyElDzD3qYLb3hHQg/YjFAAjpf4ZTqKjjH+I7kCWMtEPvVTSjJc
-	pbMI1r7blwZIyTT4eQTns2a2XZ0ahhHdfZIujnMqg2KbYXtvwjHaa43HVan6cw==
-X-Gm-Gg: ASbGncsjAX31DBJj9gtfhby3aFeyk5LVqXeM/HyEwahd3jAv5Tz52pn2rlnRXS0lVR9
-	edP3bcNgHittnWlRlrfQC3xa19HqtK2MgwSX0IkQ++gOM13fDkHXfO1zzqqeOm9UReUBLRyjufQ
-	1sUgyb9Lr8ZsVdjSYzYKQr01tnKKTFrJ3DW/1pYce+r15TAJ62BjQf+tCSSj6VjrnX4blI32+ux
-	n2dpWSGomotgFShfmRRJ3cIm8izlXxijo9jtT4oLqcJ+nbEDIMWnzYf4HuABgpFn9iGFoaBbPcJ
-	ccMPEwtZ3MxjDVWHzTI=
-X-Google-Smtp-Source: AGHT+IFh74AH+6TGpxyM/Uf5omXCGX0AECGGvFVa2XBNN6YOFzqhpkphP8YdxRAEn5U+Y5leBLnhfw==
-X-Received: by 2002:a05:600c:35c5:b0:428:e6eb:1340 with SMTP id 5b1f17b1804b1-436367928cfmr106175e9.4.1734119337464;
-        Fri, 13 Dec 2024 11:48:57 -0800 (PST)
-Received: from google.com (158.100.79.34.bc.googleusercontent.com. [34.79.100.158])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-388c806ce56sm342452f8f.111.2024.12.13.11.48.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 11:48:56 -0800 (PST)
-Date: Fri, 13 Dec 2024 19:48:52 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, robdclark@gmail.com, joro@8bytes.org,
-	robin.murphy@arm.com, jean-philippe@linaro.org, nicolinc@nvidia.com,
-	vdonnefort@google.com, qperret@google.com, tabba@google.com,
-	danielmentz@google.com, tzukui@google.com
-Subject: Re: [RFC PATCH v2 40/58] KVM: arm64: smmu-v3: Add map/unmap pages
- and iova_to_phys
-Message-ID: <Z1yPpEn_MElCRzLG@google.com>
-References: <20241212180423.1578358-1-smostafa@google.com>
- <20241212180423.1578358-41-smostafa@google.com>
- <20241212194435.GA5484@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dizwexfw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1734216457; x=1765752457;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AKxRtbsHNV4cXXEwh68zgfEHkimry76rewwLYZhrLjc=;
+  b=dizwexfwZN8zALBhZUV8ET9Py6Vxoiz5we0qMKOVGj0vabriqSymMU6j
+   KgX9AWKsKGEKdBl7jW8nNb6JgOCiS2QQIqA+9fpVK1FctkFiEtMpZ19LV
+   rw2Y6caS8lvQnpekT54lcigBkP1qKq2B0g5YhO7XNB+A3WOCJWRY2qqJh
+   VjTlx9wLx39bmugAPXJx2x6ijOXiIA+IkdNmszcvCujuxCH0ronT/odiW
+   +u6kJypB/3Zu2pdxnN3X1bHVQqEMch9N3NqWH6g8IswvAqwAHwwtK0nMM
+   Y51PhB4gcWPoJkzP5JN3KFoT0fiq1HgkfyC6r+/qBuRJUzEnb0i1kZRGh
+   A==;
+X-CSE-ConnectionGUID: WfPd0W6uQpyEsgUx1+H6fQ==
+X-CSE-MsgGUID: PqjAXTBRQRy9BGIcAHOFwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11286"; a="45329654"
+X-IronPort-AV: E=Sophos;i="6.12,235,1728975600"; 
+   d="scan'208";a="45329654"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2024 14:47:36 -0800
+X-CSE-ConnectionGUID: GKJobGtzR7membUQCuxeXw==
+X-CSE-MsgGUID: IF8cd/2vSpiSpmThf6WLqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="96705256"
+Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 14 Dec 2024 14:47:32 -0800
+Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tMav3-000DIU-13;
+	Sat, 14 Dec 2024 22:47:29 +0000
+Date: Sun, 15 Dec 2024 06:46:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: James Houghton <jthoughton@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	James Houghton <jthoughton@google.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+	David Matlack <dmatlack@google.com>, Wang@google.com,
+	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 10/13] KVM: selftests: Add KVM Userfault mode to
+ demand_paging_test
+Message-ID: <202412150600.wLk8rmZf-lkp@intel.com>
+References: <20241204191349.1730936-11-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241212194435.GA5484@ziepe.ca>
+In-Reply-To: <20241204191349.1730936-11-jthoughton@google.com>
 
-Hi Jason,
+Hi James,
 
-On Thu, Dec 12, 2024 at 03:44:35PM -0400, Jason Gunthorpe wrote:
-> On Thu, Dec 12, 2024 at 06:04:04PM +0000, Mostafa Saleh wrote:
-> > Add map_pages and iova_to_phys HVC code, which
-> > mainly calls the io-pgtable.
-> > 
-> > For unmap_pages, we rely on IO_PGTABLE_QUIRK_UNMAP_INVAL, where the
-> > driver first calls unmap_pages which invalidate all the pages as
-> > a typical unmap, issuing all the necessary TLB invalidations.
-> > Then, we will start a page table with 2 callbacks:
-> > - visit_leaf: for each unmapped leaf, it would decrement the refcount
-> >   of the page using __pkvm_host_unuse_dma(), reversing the what IOMMU
-> >   core does in map.
-> > - visit_post_table: this would free any invalidated tables as they
-> >   wouldn't be freed because of the quirk.
-> 
-> I don't know if the timelines will work out, but the pagetable stuff
-> I'm working on will let you write a much more appropriate
-> implementation for pkvm's usage than trying to hack it into the
-> iopgtable code like this.
+kernel test robot noticed the following build errors:
 
-I didn’t check your new page table patches yet, but I would say it’s
-more likely your patches would land first, because as mentioned in the
-cover letter, there are still many dependencies for pKVM before IOMMU
-support lands, so I don’t mind converging if possible.
+[auto build test ERROR on 4d911c7abee56771b0219a9fbf0120d06bdc9c14]
 
-Thanks,
-Mostafa
+url:    https://github.com/intel-lab-lkp/linux/commits/James-Houghton/KVM-Add-KVM_MEM_USERFAULT-memslot-flag-and-bitmap/20241205-032516
+base:   4d911c7abee56771b0219a9fbf0120d06bdc9c14
+patch link:    https://lore.kernel.org/r/20241204191349.1730936-11-jthoughton%40google.com
+patch subject: [PATCH v1 10/13] KVM: selftests: Add KVM Userfault mode to demand_paging_test
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241215/202412150600.wLk8rmZf-lkp@intel.com/reproduce)
 
-> 
-> Even the iommu focused routines I have got now would solve this
-> problem because they allways spit out a linked list of all the memory
-> to free after map/unmap and never internally free it..
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412150600.wLk8rmZf-lkp@intel.com/
 
-> 
-> Jason
+All errors (new ones prefixed by >>):
+
+>> demand_paging_test.c:220:2: error: address argument to atomic operation must be a pointer to _Atomic type ('unsigned long *' invalid)
+     220 |         atomic_fetch_and_explicit(bitmap_chunk,
+         |         ^                         ~~~~~~~~~~~~
+   /opt/cross/clang-ab51eccf88/lib/clang/19/include/stdatomic.h:169:35: note: expanded from macro 'atomic_fetch_and_explicit'
+     169 | #define atomic_fetch_and_explicit __c11_atomic_fetch_and
+         |                                   ^
+   1 error generated.
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
