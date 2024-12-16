@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4B81FFC44;
-	Mon, 16 Dec 2024 08:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2681FFC44;
+	Mon, 16 Dec 2024 08:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734339101; cv=none; b=WBTyk0jb3ZnYvCshyNohChiI0ZSpdpk1MycTg5cupsIdiAigeciYHESguzdTPoJEpoX3n0b/lXkf9q4KJnkF27sQfRxDqyFP9V2it8mws4O7yS5SNbgWmwsUL6nDwogNBE5vgxuN/w0uszsKz7SluLySLoWicWYKBSyfKbc2XQk=
+	t=1734339128; cv=none; b=diU6wJvYqG+oM+2r39T1VzKEN3MuiFozs5Dhi+VaGBsteX4HqCcyNgcMUSt1YDW+0WaafEWA0W09Ki0k2dmqZwQ65kC02LdxP8lGG6HPEP5sHBY0erJTobsFq2o8JxspN1QDW4PkV3du2tDAA4gFb2T/nN0No3WNhZjDeRbgfD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734339101; c=relaxed/simple;
-	bh=xDfMqbtpveuEA6F6/Q0bKlrDUQoLGiQ9kMneWrI0Rww=;
+	s=arc-20240116; t=1734339128; c=relaxed/simple;
+	bh=gs8goDXstShtLE5/00djVnwCrZT3j32AWHB5T4dafHw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sIXCBeW/8TSOd0HygPdou8M/04gcrsYOu0+ub5Lw22jUHr5cRL4nS7P9C3uRhD0t4E+9L+dOzolrHulfA/BqjWdSA9S18GCsj2TsEVVyEPu3YOpTLsL8/qJziIP03wFi/fdGBZ252OV0LTehM4eDTcwkwhTFttMoBGaxcX9YlDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNaabnPf; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=qKUM7CJxfTSGxEfu4jGDtPvDHBBgCzxMCdoCyTFIzqHkKbakYkCmOTVJxKZEJVUxZGcRHO6ONAXHtCUXA/0p8UW/2taywGWEUeRrya8A1mRvseQgQpZlTw40D/e+k8vaeihqLhXwxkoMWT61QCs3XPNLVlotv7mjjHyYjE8KTVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJvDvFsa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNaabnPf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE76C4CED0;
-	Mon, 16 Dec 2024 08:51:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJvDvFsa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C61DC4CED3;
+	Mon, 16 Dec 2024 08:52:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734339101;
-	bh=xDfMqbtpveuEA6F6/Q0bKlrDUQoLGiQ9kMneWrI0Rww=;
+	s=k20201202; t=1734339127;
+	bh=gs8goDXstShtLE5/00djVnwCrZT3j32AWHB5T4dafHw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rNaabnPfNb18pFdNjCn0qVW/KFYgJluqsh9NmX2eOL/Mb+gS2UpL8IgmvtQ+rWO0I
-	 z2VNIFGimQ1eESVKlBx04uPJ5CmTYl0oiEG29EAvaNuhkWFbeSj8auGf9SoQjQNjIO
-	 JYRtx+eEgMjW3M9UMLPNIdAq0wUzACu0zCwl+wwUx31AQ7FyFvE3NTxznn7QxC/efU
-	 47RW0/Q6byaEc7ZSUn66rP11WxuRM4e2dDYkjRGlfR1MGQk8c0t6CY3iIT6tNaD999
-	 b9VzNSWMnSSpnVnUZnGHMO4Ceaq/lbrZl87p1pFzffNTzfcTI8/XCsh5t6UVJ2qxhQ
-	 xm88DZA3DT1jQ==
+	b=sJvDvFsa933M12L8z+R4lazlDeiMs4UtDXOn0WqNRRBAbC+8GphlQaAoN7xajLvFt
+	 t2/m3hUqTR+Mu/Upg/Wnklr7ARLghcz1q/2TDtMFkloRcBnNkuO1HQdVhYri7NhfJT
+	 p6uTExjlBm63voZi8dj0FJy5bdczf/xMOZbQ7/FDRRbl+jjSW19xEKnROes8x/+lI6
+	 4kDiW4WXXLM9gPV7K578dXKQzD1rjx0qbD3i8ZQP5gpVnXi32g1HIlP9zONzuDY2qV
+	 vnXiE34zKI+Ugkh437jG3ikY1Il8+rFP2kBZzd9iiz+7EdEYKOCald7Xqarly4lHTl
+	 /3ch0HGR/P3uQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tN6pG-0046LV-MO;
-	Mon, 16 Dec 2024 08:51:38 +0000
-Date: Mon, 16 Dec 2024 08:51:38 +0000
-Message-ID: <86a5cwrox1.wl-maz@kernel.org>
+	id 1tN6ph-0046M6-Ar;
+	Mon, 16 Dec 2024 08:52:05 +0000
+Date: Mon, 16 Dec 2024 08:52:04 +0000
+Message-ID: <868qsgrowb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	stable@vger.kernel.org,
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: stable@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	gshan@redhat.com,
@@ -51,9 +50,8 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
 Subject: Re: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
-In-Reply-To: <2024121528-refurbish-plausibly-31c7@gregkh>
+In-Reply-To: <20241212151406.1436382-1-joey.gouly@arm.com>
 References: <20241212151406.1436382-1-joey.gouly@arm.com>
-	<2024121528-refurbish-plausibly-31c7@gregkh>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,65 +63,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, joey.gouly@arm.com, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, vt@altlinux.org, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, vt@altlinux.org, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 15 Dec 2024 09:22:53 +0000,
-Greg KH <gregkh@linuxfoundation.org> wrote:
+On Thu, 12 Dec 2024 15:14:06 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> On Thu, Dec 12, 2024 at 03:14:06PM +0000, Joey Gouly wrote:
-> > From: James Morse <james.morse@arm.com>
-> > 
-> > commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
-> > 
-> > commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
-> > ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
-> > but didn't add trap handling. A previous patch supplied the missing trap
-> > handling.
-> > 
-> > Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
-> > be migratable, but there is little point enabling the MPAM CPU
-> > interface on new VMs until there is something a guest can do with it.
-> > 
-> > Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
-> > that supports MPAM, politely ignore the VMMs attempts to set this bit.
-> > 
-> > Guests exposed to this bug have the sanitised value of the MPAM field,
-> > so only the correct value needs to be ignored. This means the field
-> > can continue to be used to block migration to incompatible hardware
-> > (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
-> > being ignored.
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Co-developed-by: Joey Gouly <joey.gouly@arm.com>
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: stable@vger.kernel.org # 6.6.x
-> > Cc: Vitaly Chikunov <vt@altlinux.org>
-> > Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
-> > ---
-> > 
-> > This fixes an issue seen when using KVM with a 6.6 host kernel, and
-> > newer (6.13+) kernels in the guest.
-> > 
-> > Tested with a stripped down version of set_id_regs from the original
-> > patch series.
+> From: James Morse <james.morse@arm.com>
 > 
-> What about 6.12.y?  You can't just skip a stable tree, otherwise you
-> will get a regression when you upgrade to 6.12.y, right?
+> commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
+> 
+> commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
+> ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
+> but didn't add trap handling. A previous patch supplied the missing trap
+> handling.
+> 
+> Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
+> be migratable, but there is little point enabling the MPAM CPU
+> interface on new VMs until there is something a guest can do with it.
+> 
+> Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
+> that supports MPAM, politely ignore the VMMs attempts to set this bit.
+> 
+> Guests exposed to this bug have the sanitised value of the MPAM field,
+> so only the correct value needs to be ignored. This means the field
+> can continue to be used to block migration to incompatible hardware
+> (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
+> being ignored.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Co-developed-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: stable@vger.kernel.org # 6.6.x
+> Cc: Vitaly Chikunov <vt@altlinux.org>
+> Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
 
-Posted as [1].
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 	M.
-
-[1] https://lore.kernel.org/r/20241216085002.334880-1-maz@kernel.org
 
 -- 
 Without deviation from the norm, progress is not possible.
