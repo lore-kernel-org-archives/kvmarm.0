@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CC61CB518
-	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 04:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10F61CB51B
+	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 04:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734322141; cv=none; b=CloOZj3tRCa71AAO6OxAhNbdueXof5OPyeKmru6YBI2HwysaLvv6RH0r/NEcESKkWuOzqnKD53GAKbwNMCdw27mTbqoPlHRjg8tuSaWhO6DDC/oL+pEdReKrVyN3ZoHuUGlNAZ0JoBrPWwnklCIOoiUdZYrmkkHhMg5gvmlivjQ=
+	t=1734322145; cv=none; b=nr6jGaEVVgC0Hc9mg3S7zNslNc4qYiTQ3ZM9/E6FrxhAgTkjFizpOsTzA3D0N0fA6ZGLwJtOL9gcTm32in5291tHj/lN5Gpd3wN+JfhBWd5FYnOmHoVN0rbF0CvtLK6MZK/2a3FCl92mxA4fwMrVU0kK/OtHeI0g36Eu5bi0N1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734322141; c=relaxed/simple;
-	bh=sm1+8wKPa8Px/JwDiO3hfRddBEYurSFy1/JjUHjmVlE=;
+	s=arc-20240116; t=1734322145; c=relaxed/simple;
+	bh=IeUs7k0HB31r6gPF9UlyWyc85kOFsHKd/2r0oJxY2LI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D00ebptwDmw5Eais52D26VjlMQdN4SVEktMdWVNTqgQ3IACEOY8+RijPeVJVEE6QhImF/Vd8W2pbMSPni96dw0XzTRuDN7t8HJoe8AnrSjur8BdX5OYRJve1N27/kWilc9wqzQJgXoNl04GlkZuN0g5cA9URIotWf1rY4pPTGVY=
+	 MIME-Version; b=Q6AjyLbAKwR80tsh2aNn48uFo02Nd/cYjQd6ike992nVYPt0oOa1LyAXrSoXcKvIKlw9JZTxgRNXMsEPPwRFNAx17dskvSyKFXCov5GH8IYV4+IWFWqlleOHynOcBAGrz8agnv0jp1Qw+1xl4GScG6Nol19e1yofudcUS02WoQg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 303CE1BA8;
-	Sun, 15 Dec 2024 20:09:27 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B43A1AED;
+	Sun, 15 Dec 2024 20:09:31 -0800 (PST)
 Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 37E3C3F58B;
-	Sun, 15 Dec 2024 20:08:54 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A2C263F58B;
+	Sun, 15 Dec 2024 20:08:59 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
@@ -32,9 +32,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Mark Brown <broonie@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	kvmarm@lists.linux.dev
-Subject: [PATCH V3 4/7] arm64/sysreg: Add register fields for HDFGWTR2_EL2
-Date: Mon, 16 Dec 2024 09:38:28 +0530
-Message-Id: <20241216040831.2448257-5-anshuman.khandual@arm.com>
+Subject: [PATCH V3 5/7] arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
+Date: Mon, 16 Dec 2024 09:38:29 +0530
+Message-Id: <20241216040831.2448257-6-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241216040831.2448257-1-anshuman.khandual@arm.com>
 References: <20241216040831.2448257-1-anshuman.khandual@arm.com>
@@ -46,59 +46,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds register fields for HDFGWTR2_EL2 as per the definitions based
-on DDI0601 2024-09.
+This adds required field details for ID_AA64DFR1_EL1, and also drops dummy
+ftr_raz[] array which is now redundant. These register fields will be used
+to enable increased breakpoint and watchpoint registers via FEAT_Debugv8p9
+later. The register fields have been marked as FTR_STRICT, unless there is
+a known variation in practice.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
+cc: Mark Brown <broonie@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
-Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/tools/sysreg | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Changes in V3:
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index a9dc5e4f9d97..8bf22f3904bd 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2586,6 +2586,34 @@ Field	1	nPMIAR_EL1
- Field	0	nPMECR_EL1
- EndSysreg
+- Updated the commit message
+- Marked ID_AA64DFR1_EL1.ABLE as FTR_NONSTRICT in ftr_id_aa64dfr1[]
+
+ arch/arm64/kernel/cpufeature.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 6ce71f444ed8..0dc22fde104e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -534,6 +534,21 @@ static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+ 	ARM64_FTR_END,
+ };
  
-+Sysreg HDFGWTR2_EL2	3	4	3	1	1
-+Res0	63:25
-+Field	24	nPMBMAR_EL1
-+Field	23	nMDSTEPOP_EL1
-+Field	22	nTRBMPAM_EL1
-+Field	21	nPMZR_EL0
-+Field	20	nTRCITECR_EL1
-+Field	19	nPMSDSFR_EL1
-+Res0	18:17
-+Field	16	nSPMSCR_EL1
-+Field	15	nSPMACCESSR_EL1
-+Field	14	nSPMCR_EL0
-+Field	13	nSPMOVS
-+Field	12	nSPMINTEN
-+Field	11	nSPMCNTEN
-+Field	10	nSPMSELR_EL0
-+Field	9	nSPMEVTYPERn_EL0
-+Field	8	nSPMEVCNTRn_EL0
-+Field	7	nPMSSCR_EL1
-+Res0	6
-+Field	5	nMDSELR_EL1
-+Field	4	nPMUACR_EL1
-+Field	3	nPMICFILTR_EL0
-+Field	2	nPMICNTR_EL0
-+Field	1	nPMIAR_EL1
-+Field	0	nPMECR_EL1
-+EndSysreg
++static const struct arm64_ftr_bits ftr_id_aa64dfr1[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABL_CMPs_SHIFT, 8, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_DPFZS_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_EBEP_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ITE_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABLE_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_PMICNTR_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_SPMU_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_CTX_CMPs_SHIFT, 8, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_WRPs_SHIFT, 8, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_BRPs_SHIFT, 8, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_SYSPMUID_SHIFT, 8, 0),
++	ARM64_FTR_END,
++};
 +
- Sysreg HDFGRTR_EL2	3	4	3	1	4
- Field	63	PMBIDR_EL1
- Field	62	nPMSNEVFR_EL1
+ static const struct arm64_ftr_bits ftr_mvfr0[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, MVFR0_EL1_FPRound_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, MVFR0_EL1_FPShVec_SHIFT, 4, 0),
+@@ -720,10 +735,6 @@ static const struct arm64_ftr_bits ftr_single32[] = {
+ 	ARM64_FTR_END,
+ };
+ 
+-static const struct arm64_ftr_bits ftr_raz[] = {
+-	ARM64_FTR_END,
+-};
+-
+ #define __ARM64_FTR_REG_OVERRIDE(id_str, id, table, ovr) {	\
+ 		.sys_id = id,					\
+ 		.reg = 	&(struct arm64_ftr_reg){		\
+@@ -796,7 +807,7 @@ static const struct __ftr_reg_entry {
+ 
+ 	/* Op1 = 0, CRn = 0, CRm = 5 */
+ 	ARM64_FTR_REG(SYS_ID_AA64DFR0_EL1, ftr_id_aa64dfr0),
+-	ARM64_FTR_REG(SYS_ID_AA64DFR1_EL1, ftr_raz),
++	ARM64_FTR_REG(SYS_ID_AA64DFR1_EL1, ftr_id_aa64dfr1),
+ 
+ 	/* Op1 = 0, CRn = 0, CRm = 6 */
+ 	ARM64_FTR_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0),
 -- 
 2.25.1
 
