@@ -1,190 +1,272 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C248289A
-	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 16:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FDB2066DC;
+	Mon, 16 Dec 2024 17:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734368345; cv=none; b=bJ3j6/0x1EnPgr49O6Tlt7/jwtSxPph6E0L59995ggR/VG5EV7prNcsRD0byw5OfAil8rQsHPCW92GiVhHxhTtv+mkupxVQf4+ecikxe+ssHRllSNOHq0sKzuNKlX5K3ZcnNZHfXRpjvieZMllR80HAwiBEnhgsJ1VuaneedXKM=
+	t=1734371470; cv=none; b=X8eJ+wT2JmWkWH+1Lj1QaX/HW9tdL+EItpifTqH2bppROcobTPGPnjOceclJxnEPkFR1dVqrBkT/DcaKLJRZyS8PenazVwnlZIwadd+9tsugC6GW6N1ge1GzTakL7J4WUVqS1m3pzT7Y27Bovfxx/mwogRc5O33h9tBmNHsAOE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734368345; c=relaxed/simple;
-	bh=q1Ov2XF8Bfd0lpNvypBIiw/JaUwz0bdBJBIkRN/Bo30=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cqHWRLyTi4DPRAzdfDruxf6b/HAjbI22CxgWfdtVXUBcSBm669zrb8ijkpobo3KoGUns5cHuSxaG7u3MNvNaxZab6THg1OAi0+iUbbFLi2uk4h9rOTwK/hEpEzGigPuvYIeI6ATbOC7gdoLayswaotg5sGDU60gyc7CnmBkGP/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cJEZX+Ck; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJEZX+Ck"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734368342;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q1Ov2XF8Bfd0lpNvypBIiw/JaUwz0bdBJBIkRN/Bo30=;
-	b=cJEZX+Ckd0eUcIV0y4oU/7ODYRS5VHzH4uvXiSp3ejwZLmP12+nJF7/X3LzZD9Cgb9IwQx
-	BOPYIP97d0NqHDU9sor40axuGK+KUl2M7jbrUHVCtECB24zjVME8iNfPUeFEVmgSOZby2s
-	Zd2ahjNQr4cN8tNnjHjzW1rLjEOit8A=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-aL26ZOMIOXKwalJGZKkHpA-1; Mon,
- 16 Dec 2024 11:58:53 -0500
-X-MC-Unique: aL26ZOMIOXKwalJGZKkHpA-1
-X-Mimecast-MFC-AGG-ID: aL26ZOMIOXKwalJGZKkHpA
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A53311955EC7;
-	Mon, 16 Dec 2024 16:58:45 +0000 (UTC)
-Received: from localhost (dhcp-192-244.str.redhat.com [10.33.192.244])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C6ADA1956056;
-	Mon, 16 Dec 2024 16:58:43 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
- oliver.upton@linux.dev, sebott@redhat.com,
- shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
-Cc: shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
- pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64
- KVM host model
-In-Reply-To: <87wmfzbmut.fsf@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20241206112213.88394-1-cohuck@redhat.com>
- <edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
- <87wmfzbmut.fsf@redhat.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Mon, 16 Dec 2024 17:58:40 +0100
-Message-ID: <87ttb3bm4f.fsf@redhat.com>
+	s=arc-20240116; t=1734371470; c=relaxed/simple;
+	bh=rBCWtRTu5Vr8cgrNPrVT8W5KU7Hajgp2sLYgmxLWcRU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sFiOPVGQ33OWOxk1CdV0+K/DykRQhjwEq5Izo0v7O7USgFjyvm3jGShGRU/YYsFZ2ebqUiKTcDJPCiQ3m/X6MfO0bI7apLHUdaf/gOHpQAEWd3vAME22EgV4zq0+MTjAMfei8DSNtsyiedprbNNboDwLUcI4/A1J8OD0txIB4eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65D33106F;
+	Mon, 16 Dec 2024 09:51:35 -0800 (PST)
+Received: from [10.57.71.247] (unknown [10.57.71.247])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4F4BF3F58B;
+	Mon, 16 Dec 2024 09:51:04 -0800 (PST)
+Message-ID: <e88930d3-f933-41a3-a698-3a34633e5019@arm.com>
+Date: Mon, 16 Dec 2024 17:51:03 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 04/43] arm64: RME: Add SMC definitions for calling the
+ RMM
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20241212155610.76522-1-steven.price@arm.com>
+ <20241212155610.76522-5-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20241212155610.76522-5-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 16 2024, Cornelia Huck <cohuck@redhat.com> wrote:
+On 12/12/2024 15:55, Steven Price wrote:
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
+> 
+> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+> 
+> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v5:
+>   * Sorted the SMC #defines by value.
+>   * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>     RMI calls.
+>   * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>     number of available list registers could be lower.
+>   * Provided a define for the reserved fields of FeatureRegister0.
+>   * Fix inconsistent names for padding fields.
+> Changes since v4:
+>   * Update to point to final released RMM spec.
+>   * Minor rearrangements.
+> Changes since v3:
+>   * Update to match RMM spec v1.0-rel0-rc1.
+> Changes since v2:
+>   * Fix specification link.
+>   * Rename rec_entry->rec_enter to match spec.
+>   * Fix size of pmu_ovf_status to match spec.
+> ---
+>   arch/arm64/include/asm/rmi_smc.h | 259 +++++++++++++++++++++++++++++++
+>   1 file changed, 259 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> 
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> new file mode 100644
+> index 000000000000..eec659e284cd
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_smc.h
+> @@ -0,0 +1,259 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2023-2024 ARM Ltd.
+> + *
+> + * The values and structures in this file are from the Realm Management Monitor
+> + * specification (DEN0137) version 1.0-rel0:
+> + * https://developer.arm.com/documentation/den0137/1-0rel0/
+> + */
+> +
+> +#ifndef __ASM_RME_SMC_H
+> +#define __ASM_RME_SMC_H
+> +
+> +#include <linux/arm-smccc.h>
+> +
+> +#define SMC_RMI_CALL(func)				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
+> +			   ARM_SMCCC_SMC_64,		\
+> +			   ARM_SMCCC_OWNER_STANDARD,	\
+> +			   (func))
+> +
+> +#define SMC_RMI_VERSION			SMC_RMI_CALL(0x0150)
+> +#define SMC_RMI_GRANULE_DELEGATE	SMC_RMI_CALL(0x0151)
+> +#define SMC_RMI_GRANULE_UNDELEGATE	SMC_RMI_CALL(0x0152)
+> +#define SMC_RMI_DATA_CREATE		SMC_RMI_CALL(0x0153)
+> +#define SMC_RMI_DATA_CREATE_UNKNOWN	SMC_RMI_CALL(0x0154)
+> +#define SMC_RMI_DATA_DESTROY		SMC_RMI_CALL(0x0155)
+> +
+> +#define SMC_RMI_REALM_ACTIVATE		SMC_RMI_CALL(0x0157)
+> +#define SMC_RMI_REALM_CREATE		SMC_RMI_CALL(0x0158)
+> +#define SMC_RMI_REALM_DESTROY		SMC_RMI_CALL(0x0159)
+> +#define SMC_RMI_REC_CREATE		SMC_RMI_CALL(0x015a)
+> +#define SMC_RMI_REC_DESTROY		SMC_RMI_CALL(0x015b)
+> +#define SMC_RMI_REC_ENTER		SMC_RMI_CALL(0x015c)
+> +#define SMC_RMI_RTT_CREATE		SMC_RMI_CALL(0x015d)
+> +#define SMC_RMI_RTT_DESTROY		SMC_RMI_CALL(0x015e)
+> +#define SMC_RMI_RTT_MAP_UNPROTECTED	SMC_RMI_CALL(0x015f)
+> +
+> +#define SMC_RMI_RTT_READ_ENTRY		SMC_RMI_CALL(0x0161)
+> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED	SMC_RMI_CALL(0x0162)
+> +
+> +#define SMC_RMI_PSCI_COMPLETE		SMC_RMI_CALL(0x0164)
+> +#define SMC_RMI_FEATURES		SMC_RMI_CALL(0x0165)
+> +#define SMC_RMI_RTT_FOLD		SMC_RMI_CALL(0x0166)
+> +#define SMC_RMI_REC_AUX_COUNT		SMC_RMI_CALL(0x0167)
+> +#define SMC_RMI_RTT_INIT_RIPAS		SMC_RMI_CALL(0x0168)
+> +#define SMC_RMI_RTT_SET_RIPAS		SMC_RMI_CALL(0x0169)
+> +
+> +#define RMI_ABI_MAJOR_VERSION	1
+> +#define RMI_ABI_MINOR_VERSION	0
+> +
+> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
+> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
+> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
+> +
+> +#define RMI_UNASSIGNED			0
+> +#define RMI_ASSIGNED			1
+> +#define RMI_TABLE			2
+> +
+> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
+> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
+> +
+> +#define RMI_SUCCESS		0
+> +#define RMI_ERROR_INPUT		1
+> +#define RMI_ERROR_REALM		2
+> +#define RMI_ERROR_REC		3
+> +#define RMI_ERROR_RTT		4
+> +
+> +enum rmi_ripas {
+> +	RMI_EMPTY = 0,
+> +	RMI_RAM = 1,
+> +	RMI_DESTROYED = 2,
+> +};
+> +
+> +#define RMI_NO_MEASURE_CONTENT	0
+> +#define RMI_MEASURE_CONTENT	1
+> +
+> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
+> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
+> +#define RMI_FEATURE_REGISTER_0_SVE_EN		BIT(9)
+> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
+> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
+> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
+> +#define RMI_FEATURE_REGISTER_0_PMU_EN		BIT(26)
+> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
+> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256	BIT(32)
+> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512	BIT(33)
+> +#define RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS	GENMASK(37, 34)
+> +#define RMI_FEATURE_REGISTER_0_MAX_RECS_ORDER	GENMASK(41, 38)
+> +#define RMI_FEATURE_REGISTER_0_Reserved		GENMASK(63, 42)
+> +
+> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
+> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
+> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
+> +
+> +/*
+> + * Note many of these fields are smaller than u64 but all fields have u64
+> + * alignment, so use u64 to ensure correct alignment.
+> + */
+> +struct realm_params {
+> +	union { /* 0x0 */
+> +		struct {
+> +			u64 flags;
+> +			u64 s2sz;
+> +			u64 sve_vl;
+> +			u64 num_bps;
+> +			u64 num_wps;
+> +			u64 pmu_num_ctrs;
+> +			u64 hash_algo;
+> +		};
+> +		u8 padding0[0x400];
+> +	};
+> +	union { /* 0x400 */
+> +		u8 rpv[64];
+> +		u8 padding1[0x400];
+> +	};
+> +	union { /* 0x800 */
+> +		struct {
+> +			u64 vmid;
+> +			u64 rtt_base;
+> +			s64 rtt_level_start;
+> +			u64 rtt_num_start;
+> +		};
+> +		u8 padding2[0x800];
+> +	};
+> +};
+> +
+> +/*
+> + * The number of GPRs (starting from X0) that are
+> + * configured by the host when a REC is created.
+> + */
+> +#define REC_CREATE_NR_GPRS		8
+> +
+> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
+> +
+> +#define REC_PARAMS_AUX_GRANULES		16
+> +
+> +struct rec_params {
+> +	union { /* 0x0 */
+> +		u64 flags;
+> +		u8 padding0[0x100];
+> +	};
+> +	union { /* 0x100 */
+> +		u64 mpidr;
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 pc;
+> +		u8 padding2[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		u64 gprs[REC_CREATE_NR_GPRS];
+> +		u8 padding3[0x500];
+> +	};
+> +	union { /* 0x800 */
+> +		struct {
+> +			u64 num_rec_aux;
+> +			u64 aux[REC_PARAMS_AUX_GRANULES];
+> +		};
+> +		u8 padding4[0x800];
+> +	};
+> +};
+> +
+> +#define REC_ENTER_EMULATED_MMIO		BIT(0)
+> +#define REC_ENTER_INJECT_SEA		BIT(1)
+> +#define REC_ENTER_TRAP_WFI		BIT(2)
+> +#define REC_ENTER_TRAP_WFE		BIT(3)
+> +#define REC_ENTER_RIPAS_RESPONSE	BIT(4)
+> +
 
-> On Thu, Dec 12 2024, Eric Auger <eric.auger@redhat.com> wrote:
->
->> Connie,
->>
->> On 12/6/24 12:21, Cornelia Huck wrote:
->>> Whether it make sense to continue with the approach of tweaking values =
-in
->>> the ID registers in general. If we want to be able to migrate between c=
-pus
->>> that do not differ wildly, we'll encounter differences that cannot be
->>> expressed via FEAT_xxx -- e.g. when comparing various AmpereAltra Max s=
-ystems,
->>> they only differ in parts of CTR_EL0 -- which is not a feature register=
-, but
->>> a writable register.
->> In v1 most of the commenters said they would prefer to see FEAT props
->> instead of IDREG field props. I think we shall try to go in this
->> direction anyway. As you pointed out there will be some cases where FEAT
->> won't be enough (CTR_EL0 is a good example). So I tend to think the end
->> solution will be a mix of FEAT and ID reg field props.
->
-> Some analysis of FEAT_xxx mappings:
-> https://lore.kernel.org/qemu-devel/87ikstn8sc.fsf@redhat.com/
->
-> (actually, ~190 of FEAT_xxx map to a single value in a single register,
-> so mappings are easy other than the sheer amount of them)
->
-> We probably should simply not support FEAT_xxx that are solely defined
-> via dependencies.
->
-> Some more real-world examples from some cpu pairings I had looked at:
-> https://lore.kernel.org/qemu-devel/87ldx2krdp.fsf@redhat.com/
-> (but also see Peter's follow-up, the endianness field is actually
-> covered by a feature)
->
-> The values-in-registers-not-covered-by-features we are currently aware
-> of are:
-> - number of breakpoints
-> - PARange values
-> - GIC
-> - some fields in CTR_EL0
-> (see also
-> https://lore.kernel.org/qemu-devel/4fb49b5b02bb417399ee871b2c85bb35@huawe=
-i.com/
-> for the latter two)
+Minor nit: Everywhere else, the flags bit definitions indicate
 
-And the differences in GIC might be actually due to a GICv3 not being
-configured, together with running a recent kernel, which will zero the
-field. So we might actually already be able to handle it for most cases.
+OBJECT_FLAG_xyz
 
->
-> Also, MIDR/REVIDR handling.
->
-> Given that we'll need a mix if we support FEAT_xxx, should we mandate
-> the FEAT_xxx syntax if there is a mapping and allow direct specification
-> of register fields only if there is none, or allow them as alternatives
-> (with proper priority handling, or alias handling?)
->
->>
->> Personally I would smoothly migrate what we can from ID reg field props
->> to FEAT props (maybe using prop aliases?), starting from the easiest 1-1
->> mappings and then adressing the FEAT that are more complex but are
->> explictly needed to enable the use cases we are interested in, at RedHat:
->> migration within Ampere AltraMax family, migration within NVidia Grace
->> family, migration within AmpereOne family and migration between Graviton=
-3/4.
->
-> For these, we'll already need the mix (my examples above all came from
-> these use cases.)
->
-> (Of course, the existing legacy props need to be expressed as well. I
-> guess they should map to registers directly.)
->
->>
->> We have no info about other's use cases. If some of you want to see some
->> other live migration combinations addressed, please raise your voice.
->> Some CSPs may have their own LM solution/requirements but they don't use
->> qemu. So I think we shall concentrate on those use cases.
->>
->> You did the exercise to identify most prevalent patterns for FEAT to
->> IDREG fields mappings. I think we should now encode this conversion
->> table for those which are needed in above use cases.
->
-> I'd focus on the actually needed features first, as otherwise it's
-> really overwhelming.
->
->>
->> From a named model point of view, since I do not see much traction
->> upstream besides Red Hat use cases, targetting ARM spec revision
->> baselines may be overkill. Personally I would try to focus on above
->> models: AltraMax, AmpereOne, Grace, ... Or maybe the ARM cores they may
->> be derived from. According to the discussion we had with Marc in [1] it
->> seems it does not make sense to target migration between very
->> heterogeneous machines and Dan said we would prefer to avoid adding
->> plenty of feat add-ons to a named models. So I would rather be as close
->> as possible to a specific family definition.=C2=A0 =C2=A0
->
-> Using e.g. Neoverse-V2 as a base currently looks most attractive to
-> me -- going with Armv<x>.<y> would probably give a larger diff (although
-> the diff for Graviton3/4 is pretty large anyway.)
->
->>
->> Thanks
->>
->> Eric
->>
->> [1]
->> https://lore.kernel.org/all/c879fda9-db5a-4743-805d-03c0acba8060@redhat.=
-com/#r
+inline with that should this be :
+
+REC_ENTER_FLAG_xyz ?
+
+
+Rest looks fine to me
+
+Suzuki
 
