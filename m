@@ -1,101 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37B928FD;
-	Sun, 15 Dec 2024 09:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395732AD18
+	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 04:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734254576; cv=none; b=nkKjWACvsPb7aq94B05ox0zUzAeAMleT1+rklmE4n8+yhWi/AZCNrBTCu/hXy7BxgJHAlryRFBFZG+gV8gji3U8p4AJplH27AeVieQqr8O0kl1FIJY76A+zR0oy8Asspy1LQKchIi91twU2DT40Vh0nCi1uz+D6ImueLz634u7Y=
+	t=1734322126; cv=none; b=C8lExwiSMYTjiB9IUuUUiDl8LiemYO+G+bVEFZ3vcWXfMu10E2XBOpsR00wE+YHjLycsLMlJJVMkOFUENCq6YptNYtv583vCmO2k01UgC/FYbLTrN+/5PxEGEEzzYIaOk/M49dsSGAL9yhkDjK2LglYeihoCu0t6BO5JSnjMcKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734254576; c=relaxed/simple;
-	bh=VA/fr2fanU2w8E9A58sNN9gLlEV2wRsSO8gXxlKoJjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JtXgfRgag4rTG27QgpnMmjzx3vPIA1H2OG/ZWGHh9rx6reJpwRPMe9hSx8rPBosj4N6UwEupQAdUhyGV5DWbbd2CUBRvKhYEftN1dB7+uz7GYaqcUDFJE0rUJr90MEVs7bSqjumKBM2IiYeCQWqZTfRv6GsU1D7Ik4O1yIsv0GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rhdoQNf8; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rhdoQNf8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB77C4CECE;
-	Sun, 15 Dec 2024 09:22:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1734254576;
-	bh=VA/fr2fanU2w8E9A58sNN9gLlEV2wRsSO8gXxlKoJjc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rhdoQNf8ZGsxq0OtLSI6TOY8eXGLpQiMg80mC9co5MB8vkpw0TO6RSdI2TXbLarRr
-	 3puHKaN152VDKGxcAGKQHHoUv8YpKIcGE7RdDdhGElwIw2TV+oXx0ek8hpp+N495bn
-	 eMNvUw87z4AMK5lq0N6m/Vfd2qbHpnzNSDSI0ALQ=
-Date: Sun, 15 Dec 2024 10:22:53 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com,
-	maz@kernel.org, oliver.upton@linux.dev,
-	shameerali.kolothum.thodi@huawei.com, vt@altlinux.org,
+	s=arc-20240116; t=1734322126; c=relaxed/simple;
+	bh=CZ4eSp91/4F2neH+q+SkUsBpnJbvHGgsDt3x692kCeQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t4X7f1HvAeqa48UNg1yoZkHHngaC27yK7awEr4wdGVmixwxgu1jcG4CbyHYlpIpFhb6gpuqPC4VK/IYJSYZWQcXDCNCyV1HINrDSr4j2SS13Q0m6V7/w1I5I+5mbinBKAOFwa243G1FHaNGbCONqzWN2nfe+WJJG4XW39UjF2ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 553B311FB;
+	Sun, 15 Dec 2024 20:09:09 -0800 (PST)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.49])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5AE0D3F58B;
+	Sun, 15 Dec 2024 20:08:37 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default
- and ignore VMM writes
-Message-ID: <2024121528-refurbish-plausibly-31c7@gregkh>
-References: <20241212151406.1436382-1-joey.gouly@arm.com>
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: [PATCH V3 0/7] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+Date: Mon, 16 Dec 2024 09:38:24 +0530
+Message-Id: <20241216040831.2448257-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212151406.1436382-1-joey.gouly@arm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 12, 2024 at 03:14:06PM +0000, Joey Gouly wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
-> 
-> commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
-> ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
-> but didn't add trap handling. A previous patch supplied the missing trap
-> handling.
-> 
-> Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
-> be migratable, but there is little point enabling the MPAM CPU
-> interface on new VMs until there is something a guest can do with it.
-> 
-> Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
-> that supports MPAM, politely ignore the VMMs attempts to set this bit.
-> 
-> Guests exposed to this bug have the sanitised value of the MPAM field,
-> so only the correct value needs to be ignored. This means the field
-> can continue to be used to block migration to incompatible hardware
-> (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
-> being ignored.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Co-developed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: stable@vger.kernel.org # 6.6.x
-> Cc: Vitaly Chikunov <vt@altlinux.org>
-> Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
-> ---
-> 
-> This fixes an issue seen when using KVM with a 6.6 host kernel, and
-> newer (6.13+) kernels in the guest.
-> 
-> Tested with a stripped down version of set_id_regs from the original
-> patch series.
+This series enables FEAT_Debugv8p9 thus extending breakpoint and watchpoint
+support upto 64. This series is based on v6.13-rc3 although this depends on
+FEAT_FGT2 FGU series posted earlier, for MDSELR_EL1 handling in various KVM
+guest configurations.
 
-What about 6.12.y?  You can't just skip a stable tree, otherwise you
-will get a regression when you upgrade to 6.12.y, right?
+https://lore.kernel.org/all/20241210055311.780688-3-anshuman.khandual@arm.com/
 
-thanks,
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
 
-greg k-h
+Changes in V3:
+
+- Marked ID_AA64DFR1_EL1.ABLE as FTR_NONSTRICT in ftr_id_aa64dfr1[]
+- Dropped MDCR_EL3.TDA boot requirement from documentation (separate series)
+- Dropped MDCR_EL2_EBWE definition as MDCR_EL2 is now defined in tools sysreg
+- Used SYS_FIELD_PREP() in read_wb_reg() and write_wb_reg()
+- Added MAX_PER_BANK based BUILD_BUG_ON() tests in arch_hw_breakpoint_init()
+- Dropped local variables i.e mdsel_bank and index
+- Derived bank and index from MAX_PER_BANK as required
+
+Changes in V2:
+
+https://lore.kernel.org/all/20241028053426.2486633-1-anshuman.khandual@arm.com/
+
+Following changes have been made per review comments from Mark Rutland
+
+- Orr MDCR_EL2_EBWE directly without an intermittent register
+- Alphabetically order header files in debug-monitors.c
+- Dropped embwe_ref_count mechanism
+- Dropped preempt_enable() from AARCH64_DBG_READ
+- Dropped preempt_disable() from AARCH64_DBG_WRITE
+- Dropped set_bank_index()
+- Renamed read/write_wb_reg() as __read/__write_wb_reg()
+- Modified read/write_wb_reg() to have MDSELR_E1 based banked read/write
+- Added required sysreg tools patches from KVM FEAT_FGT2 series for build
+
+Changes in V1:
+
+https://lore.kernel.org/all/20241001043602.1116991-1-anshuman.khandual@arm.com/
+
+- Changed FTR_STRICT to FTR_NONSTRICT for the following ID_AA64DFR1_EL1
+  register fields - ABL_CMPs, DPFZS, PMICNTR, CTX_CMPs, WRPs and BRPs
+
+Changes in RFC V2:
+
+https://lore.kernel.org/linux-arm-kernel/20240620092607.267132-1-anshuman.khandual@arm.com/
+
+- This series has been split from RFC V1 dealing only with arm64 breakpoints
+- Restored back DBG_MDSCR_MASK definition (unrelated change)
+- Added preempt_disable()/enable() blocks between selecting banks and registers
+
+Changes in RFC:
+
+https://lore.kernel.org/all/20240405080008.1225223-1-anshuman.khandual@arm.com/
+
+
+Anshuman Khandual (7):
+  arm64/sysreg: Update register fields for ID_AA64MMFR0_EL1
+  arm64/sysreg: Add register fields for MDSELR_EL1
+  arm64/sysreg: Add register fields for HDFGRTR2_EL2
+  arm64/sysreg: Add register fields for HDFGWTR2_EL2
+  arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
+  arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
+  arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+
+ Documentation/arch/arm64/booting.rst    | 18 +++++++
+ arch/arm64/include/asm/debug-monitors.h |  1 +
+ arch/arm64/include/asm/el2_setup.h      | 26 +++++++++
+ arch/arm64/include/asm/hw_breakpoint.h  | 47 +++++++++++++----
+ arch/arm64/kernel/cpufeature.c          | 21 ++++++--
+ arch/arm64/kernel/debug-monitors.c      | 15 ++++--
+ arch/arm64/kernel/hw_breakpoint.c       | 48 ++++++++++++++++-
+ arch/arm64/tools/sysreg                 | 70 +++++++++++++++++++++++++
+ 8 files changed, 225 insertions(+), 21 deletions(-)
+
+-- 
+2.25.1
+
