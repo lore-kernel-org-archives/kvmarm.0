@@ -1,112 +1,119 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5181D5AC6
-	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 22:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2611D54EF;
+	Mon, 16 Dec 2024 23:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734388408; cv=none; b=ByeU38f7pWU3vvFRLLTmiTNjwLj0grAaTR7+LdfYUEmhrQDdZVvABgFG01Q7mZu9m2UP5b84dbztTpnhxYmTflFfCtnwAKqO01QPEBxn+6Jadubb/WRzarOQOxezSIQtg0x5geBbevme66zDd+B+hdKLTABtgyc0+jjc+d1xSy4=
+	t=1734390914; cv=none; b=JKA690Kt+KixzfgX2bhrxNtO2YHYY24JnSjTU0twnhk1aRfs0dqjmjUDh8LQtovcOwxKwoRfqlePnk6wlxk2+ihWf2ujT+XkITw4DfVW9W6sdShD5qI+/1VRdBhwEumAVEOKjss5mnRbInU+KX3ILOdR1YGqs6DoJn5i/qoquLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734388408; c=relaxed/simple;
-	bh=AQ6L0FE4N7ae+Cg2Eu7wbgOie9mHJiVhQr34moiqfqI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=RVBr1YMstbHizWKDqlM28A9i/DGildA+WpkE3jw0GK7r4ZU0d4So8iP6wA/H6Qzc2xAahlVfQ25X7NBQSbUolXh5K7HEQclx7MwI/yWO/Ny4/9+IECTEKrjPQXaKsSRJrYQd3yTTCQWHLKy6mDlrCGjz7/ufmTOZW3X6/QrOKm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BaR+m4J2; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1734390914; c=relaxed/simple;
+	bh=WDQGE0FFR/+3pDl5MBnQd9HPJMHqNLi1cxrtKgTsVJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VhDRyTRdAhndHjfkcw8fHC/RJ0ioMwo60E2H4uueXMb0AC3DkKQki8Oox8w2yaOdpTzY5G0jT9+aKr7fOhZ6jqcB+HmrObsL22I420/Vz2nYw5XcGEzQyYdGgz5kF9PBd91Y0f1AdDWsWYJ2DfNghqaSxREKCctBt6lUqdQ81IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EczuVcps; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BaR+m4J2"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7fd312feb10so2856484a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 14:33:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734388406; x=1734993206; darn=lists.linux.dev;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9jJCzoGzQp+cdjga58qGUwc3ffJR9vhNALvR1f7QLKI=;
-        b=BaR+m4J2/9XWPlTD0NWD2Q83yqmV2i8VKeMZlpvjLfBQQopZNeaCQI+d/fHoMn/nYg
-         8uyUaa3O40njUMKwZlND2hdxHcbohKoyiBjFHz9d/JPyC6ff0sreYX9YkyBiwT21tcqy
-         9f5MneM+OKbFR0sz28VoscqDdQbWyEiDk87UAVBOsapS9Ds+q0EhMT48otealOiIR55B
-         MPiP+DeQebE/ayTmEHfezl02rHzWgZ2dzybzbx4YbEJd5o3J38nzFsIWlWw0pupBMVRw
-         1XdHYN3CdLJYn+iEn515gigVAOiWC6GBAnr+Danju5IUhZWcfwOYMk98I1ZNGvuxNeSt
-         zbqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734388406; x=1734993206;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9jJCzoGzQp+cdjga58qGUwc3ffJR9vhNALvR1f7QLKI=;
-        b=tmu4h0mvRfY9LSX5tqbpUsxFGCb7hkZosBvWKfwdbnJ53Xc4SmlNBjXQCeRE5bdJ0C
-         UF/GLYvZmyBuGNKIG/objRNFEbj/7OWayG8I0FvBND6SovyO+4oAGpdtodHrUVgkUDgA
-         atNE3phXwF06zCgeEV29jcXUK8gEGZLG1aignNELUu+JVRX+F/BlAPB9kUCqWamNYsPG
-         DO5yFiz1gPI0pkVDMNUV5CcZ4ePXvcseYi8rUW2J73h4KbXZHEW9KZhTDDDmhgY+FLQI
-         +PZEPs+I2+6TJP+UbGYUcnX1XOGBNrpl/bmhVdsUQHb0RNGzJSAzFxnG839wWNPFKkuK
-         FM1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUNZa5ydMVcGDldIT9ROAO6W9wToLv9RgUotlAWa0qjjPIo46meGdUIX6NLI8pPC34hPuVQr20=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx6D83YfuyGePOJbigSxquOv1QvZ4HVK8hW34X+ZJ3A6ZyrIqrU
-	iAaQxB1oYi/PTFsHpUCWwHZszp4rpGVHqzdYlCnw+cqKBJAxCyTFkGkoCYVTXSlhR/tGihRplh5
-	vWw==
-X-Google-Smtp-Source: AGHT+IHhtWHdid0XDbI59B1aoA+CN7rFIH/zmVAk3APPQqAwY7oJZB6TaL0aH/5JThWes+dWQrGdtB7EGl0=
-X-Received: from pjd5.prod.google.com ([2002:a17:90b:54c5:b0:2ef:8eb8:e4eb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c887:b0:2ee:6e22:bfd0
- with SMTP id 98e67ed59e1d1-2f2d7eece80mr1530327a91.21.1734388406334; Mon, 16
- Dec 2024 14:33:26 -0800 (PST)
-Date: Mon, 16 Dec 2024 14:33:24 -0800
-In-Reply-To: <20241128005547.4077116-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EczuVcps"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B59BC4CED0;
+	Mon, 16 Dec 2024 23:15:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734390913;
+	bh=WDQGE0FFR/+3pDl5MBnQd9HPJMHqNLi1cxrtKgTsVJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EczuVcpsRKVXCx0lYb5AdO0DfZtDyc0OfdX1XCRaKY5G5FnncKpFRuGDSEv498F0s
+	 +xX0kftqNilbwMoL2B+3vy3htfse1J7b8bjov9lXk5bjaIjiJ76zV4f/IFD/Btq8V5
+	 SUBv8c03T+udxenBUuYd1ge/HiudjWA3JyPw8kUpcwA+SLs0gGJ4bWjxSFZ4aY4uKo
+	 eV3VsryU7XdRnzIrwuSEHgPv0EzUQS0Ypm8N/pd77nza1oTR7GJd3XqvPD9YCs4EvA
+	 aX/hKsqvcqDkPjRb/v/kmCD+5Jkf32MjNqVkKObramCBDQUdMnw92l+O9fujlq5uZK
+	 cmJO8DGbuxH3A==
+Date: Mon, 16 Dec 2024 17:15:05 -0600
+From: Rob Herring <robh@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH V2 18/46] arm64/sysreg: Add register fields for PMUACR_EL1
+Message-ID: <20241216231505.GA601635-robh@kernel.org>
+References: <20241210055311.780688-1-anshuman.khandual@arm.com>
+ <20241210055311.780688-19-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241128005547.4077116-1-seanjc@google.com>
-Message-ID: <Z2CqtL1R0-368hO-@google.com>
-Subject: Re: [PATCH v4 00/16] KVM: selftests: "tree" wide overhauls
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Andrew Jones <ajones@ventanamicro.com>, James Houghton <jthoughton@google.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241210055311.780688-19-anshuman.khandual@arm.com>
 
-On Wed, Nov 27, 2024, Sean Christopherson wrote:
-> Two separate series (mmu_stress_test[1] and $ARCH[2]), posted as one to
-> avoid unpleasant conflicts, and because I hope to land both in kvm/next
-> shortly after 6.12-rc1 since they impact all of KVM selftests.
+On Tue, Dec 10, 2024 at 11:22:43AM +0530, Anshuman Khandual wrote:
+> This adds register fields for PMUACR_EL1 as per the definitions based
+> on DDI0601 2024-09.
 > 
-> mmu_stress_test
-> ---------------
-> Convert the max_guest_memory_test into a more generic mmu_stress_test.
-> The basic gist of the "conversion" is to have the test do mprotect() on
-> guest memory while vCPUs are accessing said memory, e.g. to verify KVM
-> and mmu_notifiers are working as intended.
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/tools/sysreg | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
 > 
-> The original plan was that patch 3 would be a single patch, but things
-> snowballed in order to rework vcpu_get_reg() to return a value instead
-> of using an out-param.  Having to define a variable just to bump the
-> program counter on arm64 annoyed me.
-> 
-> $ARCH
-> -----
-> Play nice with treewrite builds of unsupported architectures, e.g. arm
-> (32-bit), as KVM selftests' Makefile doesn't do anything to ensure the
-> target architecture is actually one KVM selftests supports.
-> 
-> The last two patches are opportunistic changes (since the above Makefile
-> change will generate conflicts everywhere) to switch to using $(ARCH)
-> instead of the target triple for arch specific directories, e.g. arm64
-> instead of aarch64, mainly so as not to be different from the rest of
-> the kernel.
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 214ad6da1dff..462adb8031ca 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2349,6 +2349,43 @@ Res0	63:5
+>  Field	4:0	SEL
+>  EndSysreg
+>  
+> +Sysreg	PMUACR_EL1	3	0	9	14	4
 
-Paolo,
+I already added this and various other PMUv3.9 registers you've added 
+here in v6.12 and v6.13. So are you on an old base or the tool allows 
+multiple definitions? If the latter, that should be fixed.
 
-Unless you or someone else have concerns, can you apply this to kvm/next sooner
-than later?  I'd like to start applying selftests changes for 6.14 and don't want
-generate conflicts, and I really don't want to have to rebase and push this series
-out again.
+> +Res0	63:33
+> +Field	32	FM
+> +Field	31	C
+> +Field	30	P30
+> +Field	29	P29
+> +Field	28	P28
+> +Field	27	P27
+> +Field	26	P26
+> +Field	25	P25
+> +Field	24	P24
+> +Field	23	P23
+> +Field	22	P22
+> +Field	21	P21
+> +Field	20	P20
+> +Field	19	P19
+> +Field	18	P18
+> +Field	17	P17
+> +Field	16	P16
+> +Field	15	P15
+> +Field	14	P14
+> +Field	13	P13
+> +Field	12	P12
+> +Field	11	P11
+> +Field	10	P10
+> +Field	9	P9
+> +Field	8	P8
+> +Field	7	P7
+> +Field	6	P6
+> +Field	5	P5
+> +Field	4	P4
+> +Field	3	P3
+> +Field	2	P2
+> +Field	1	P1
+> +Field	0	P0
 
-Thanks!
+We're never going to use Pnn defines. This is just useless bloat unless 
+we're aiming to top amd gpu defines LOC.
+
+Rob
