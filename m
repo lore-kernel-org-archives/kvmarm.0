@@ -1,57 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2681FFC44;
-	Mon, 16 Dec 2024 08:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5582E628;
+	Mon, 16 Dec 2024 09:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734339128; cv=none; b=diU6wJvYqG+oM+2r39T1VzKEN3MuiFozs5Dhi+VaGBsteX4HqCcyNgcMUSt1YDW+0WaafEWA0W09Ki0k2dmqZwQ65kC02LdxP8lGG6HPEP5sHBY0erJTobsFq2o8JxspN1QDW4PkV3du2tDAA4gFb2T/nN0No3WNhZjDeRbgfD8=
+	t=1734340187; cv=none; b=cN4tkCmk8To/IUy+k/HWw2kwdnn6BTvhr077BbOnjyR/vJn4LVA4fhrA/UuTvGXK7QIC6Y3kYYAaOsaSIukarIK6dmEt4Mc1GtuxzzPGMP3W1FMLSsj7zCWLV1M3gnAqePhNM4PjIWveaEzEnbpWLxmdJOCoRatNpwzWR2FwRX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734339128; c=relaxed/simple;
-	bh=gs8goDXstShtLE5/00djVnwCrZT3j32AWHB5T4dafHw=;
+	s=arc-20240116; t=1734340187; c=relaxed/simple;
+	bh=X52xQmeRvmCvazkS+Ms21FXQkeUYcg+KEnCBdAPKsKo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qKUM7CJxfTSGxEfu4jGDtPvDHBBgCzxMCdoCyTFIzqHkKbakYkCmOTVJxKZEJVUxZGcRHO6ONAXHtCUXA/0p8UW/2taywGWEUeRrya8A1mRvseQgQpZlTw40D/e+k8vaeihqLhXwxkoMWT61QCs3XPNLVlotv7mjjHyYjE8KTVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJvDvFsa; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CKEFeoczdMPrbGhuBeakgttgkwgLHBCKmON79sWTm+OMf7JbUp4NbZ+CGSFD2LzpRJnpO37zf97B0fcQHL2XVk7a/ER0jrwK6TCYrXZogzoDb3DlBUqBehGY1lFKrFKsCbXKK9szp7hQdmC+OIa2ONYWswTdHNwW7ndFuHAeHnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cctCAbYR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJvDvFsa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C61DC4CED3;
-	Mon, 16 Dec 2024 08:52:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cctCAbYR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06E26C4CED0;
+	Mon, 16 Dec 2024 09:09:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734339127;
-	bh=gs8goDXstShtLE5/00djVnwCrZT3j32AWHB5T4dafHw=;
+	s=k20201202; t=1734340187;
+	bh=X52xQmeRvmCvazkS+Ms21FXQkeUYcg+KEnCBdAPKsKo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sJvDvFsa933M12L8z+R4lazlDeiMs4UtDXOn0WqNRRBAbC+8GphlQaAoN7xajLvFt
-	 t2/m3hUqTR+Mu/Upg/Wnklr7ARLghcz1q/2TDtMFkloRcBnNkuO1HQdVhYri7NhfJT
-	 p6uTExjlBm63voZi8dj0FJy5bdczf/xMOZbQ7/FDRRbl+jjSW19xEKnROes8x/+lI6
-	 4kDiW4WXXLM9gPV7K578dXKQzD1rjx0qbD3i8ZQP5gpVnXi32g1HIlP9zONzuDY2qV
-	 vnXiE34zKI+Ugkh437jG3ikY1Il8+rFP2kBZzd9iiz+7EdEYKOCald7Xqarly4lHTl
-	 /3ch0HGR/P3uQ==
+	b=cctCAbYRWrbjXJfufpjd3nowwqC8anwHN+n/Cri5Idn30lAdBNwV6ukV+FhLxN4xu
+	 RixlyaxLA+gaXA8zfaPlEEyCtfD9q3Hnp7Y03dxGLiZe0uKN/iIkdGb8Sg/zflkiUI
+	 TEuK+OsWXpkLeI+EyJpud0ZccLBwiGjfWtpPldmJJ2JUKcM4IQLjblY2liAQ2txwrA
+	 i3O064JoMU0hGmplKCxW/GdTJtgAqiKzNV/ME9afxSKbMIybmAe8/ahj77qIGJ11GX
+	 3wNuYE9adGfLMkhqfYmW69HA7bS7pWeZRRbLMuZJy8bXdC7rbZ6/0FJDivTjIdTj2u
+	 tas1YxZ2spVHQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tN6ph-0046M6-Ar;
-	Mon, 16 Dec 2024 08:52:05 +0000
-Date: Mon, 16 Dec 2024 08:52:04 +0000
-Message-ID: <868qsgrowb.wl-maz@kernel.org>
+	id 1tN76m-0046dr-RG;
+	Mon, 16 Dec 2024 09:09:44 +0000
+Date: Mon, 16 Dec 2024 09:09:43 +0000
+Message-ID: <867c80ro2w.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: stable@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+To: syzbot <syzbot+67a9ec5b1706e0184581@syzkaller.appspotmail.com>
+Cc: catalin.marinas@arm.com,
+	joey.gouly@arm.com,
 	kvmarm@lists.linux.dev,
-	gshan@redhat.com,
-	james.morse@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	oliver.upton@linux.dev,
-	shameerali.kolothum.thodi@huawei.com,
-	vt@altlinux.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
-In-Reply-To: <20241212151406.1436382-1-joey.gouly@arm.com>
-References: <20241212151406.1436382-1-joey.gouly@arm.com>
+	suzuki.poulose@arm.com,
+	syzkaller-bugs@googlegroups.com,
+	will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [syzbot] [kvmarm?] BUG: unable to handle kernel paging request in __hwasan_check_x0_ADDR
+In-Reply-To: <675aa352.050a0220.1ac542.0018.GAE@google.com>
+References: <675aa352.050a0220.1ac542.0018.GAE@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,50 +60,103 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, vt@altlinux.org, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: syzbot+67a9ec5b1706e0184581@syzkaller.appspotmail.com, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 12 Dec 2024 15:14:06 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Thu, 12 Dec 2024 08:48:18 +0000,
+syzbot <syzbot+67a9ec5b1706e0184581@syzkaller.appspotmail.com> wrote:
 > 
-> From: James Morse <james.morse@arm.com>
+> Hello,
 > 
-> commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
+> syzbot found the following issue on:
 > 
-> commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
-> ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
-> but didn't add trap handling. A previous patch supplied the missing trap
-> handling.
+> HEAD commit:    5db899a34f75 Merge remote-tracking branch 'kernel/kvmarm/n..
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git fuzzme
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16db78f8580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=fde68ab6d6c8c8ab
+> dashboard link: https://syzkaller.appspot.com/bug?extid=67a9ec5b1706e0184581
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: arm64
 > 
-> Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
-> be migratable, but there is little point enabling the MPAM CPU
-> interface on new VMs until there is something a guest can do with it.
+> Unfortunately, I don't have any reproducer for this issue yet.
 > 
-> Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
-> that supports MPAM, politely ignore the VMMs attempts to set this bit.
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-5db899a3.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/4938b757ff4a/vmlinux-5db899a3.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/936938b47987/Image-5db899a3.gz.xz
 > 
-> Guests exposed to this bug have the sanitised value of the MPAM field,
-> so only the correct value needs to be ignored. This means the field
-> can continue to be used to block migration to incompatible hardware
-> (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
-> being ignored.
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+67a9ec5b1706e0184581@syzkaller.appspotmail.com
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Co-developed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: stable@vger.kernel.org # 6.6.x
-> Cc: Vitaly Chikunov <vt@altlinux.org>
-> Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
+> Unable to handle kernel paging request at virtual address efff800000000137
+> KASAN: probably user-memory-access in range [0x0000000000001370-0x000000000000137f]
+> Mem abort info:
+>   ESR = 0x0000000096000005
+>   EC = 0x25: DABT (current EL), IL = 32 bits
+>   SET = 0, FnV = 0
+>   EA = 0, S1PTW = 0
+>   FSC = 0x05: level 1 translation fault
+> Data abort info:
+>   ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+>   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> swapper pgtable: 4k pages, 52-bit VAs, pgdp=0000000044a53000
+> [efff800000000137] pgd=1000000049992003, p4d=1000000049993003, pud=0000000000000000
+> Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6560 Comm: syz.2.929 Not tainted 6.12.0-rc7-syzkaller-g5db899a34f75 #0
+> Hardware name: linux,dummy-virt (DT)
+> pstate: 80402009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : __hwasan_check_x0_67043363+0x4/0x30
+> lr : vgic_get_irq+0x7c/0x3d4 arch/arm64/kvm/vgic/vgic.c:93
+> sp : ffff80008c597650
+> x29: ffff80008c597660 x28: 00000000000000e0 x27: 0000000000000004
+> x26: 0000000000000002 x25: ffff800083a7fe20 x24: 16f0000014accd90
+> x23: 16f0000014acb9a0 x22: 0000000000000000 x21: a9ff80008c583000
+> x20: 0000000000000001 x19: efff800000000000 x18: 0000000000000005
+> x17: 0000000000000000 x16: 0000000000000137 x15: 0000000000000000
+> x14: 0000000000000002 x13: 0000000000000003 x12: 70f000000a33ba80
+> x11: 0000000000080000 x10: 0000000000001378 x9 : efff800000000000
+> x8 : 0000000000000001 x7 : 0000000000000001 x6 : 0000000000000001
+> x5 : ffff80008c597858 x4 : ffff8000800f2b38 x3 : ffff8000800f7a00
+> x2 : 0000000000000001 x1 : 0000000000000001 x0 : 0000000000001378
+> Call trace:
+>  __hwasan_check_x0_67043363+0x4/0x30
+>  vgic_mmio_write_invlpi+0xb0/0x174 arch/arm64/kvm/vgic/vgic-mmio-v3.c:546
+>  dispatch_mmio_write+0x2a4/0x308
+>  kvm_iodevice_write include/kvm/iodev.h:54 [inline]
+>  __kvm_io_bus_write+0x290/0x340 virt/kvm/kvm_main.c:5852
+>  kvm_io_bus_write+0x100/0x1bc virt/kvm/kvm_main.c:5877
+>  io_mem_abort+0x4b8/0x7a0 arch/arm64/kvm/mmio.c:204
+>  kvm_handle_guest_abort+0xb4c/0x1c64 arch/arm64/kvm/mmu.c:1880
+>  handle_trap_exceptions arch/arm64/kvm/handle_exit.c:351 [inline]
+>  handle_exit+0x1a0/0x274 arch/arm64/kvm/handle_exit.c:381
+>  kvm_arch_vcpu_ioctl_run+0xbc0/0x15b0 arch/arm64/kvm/arm.c:1279
+>  kvm_vcpu_ioctl+0x660/0xf78 virt/kvm/kvm_main.c:4475
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:907 [inline]
+>  __se_sys_ioctl fs/ioctl.c:893 [inline]
+>  __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
+>  __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>  invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
+>  el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
+>  do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
+>  el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
+>  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+>  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+> Code: a90efbfd d2800441 143a3ed3 9344dc10 (38706930)
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+This seems to be something that is already handled by d561491ba927c
+("KVM: arm64: vgic-v3: Sanitise guest writes to GICR_INVLPIR"), which
+made it into 6.13-rc1.
+
+The branch you are using doesn't seem to contain that particular
+commit. I have now updated it to -rc3, which should plug that issue.
+
+Let me know if it keeps appearing.
+
+Thanks,
 
 	M.
 
