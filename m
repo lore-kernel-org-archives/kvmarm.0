@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAC92AF03
-	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 10:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43355203D5A
+	for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 10:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734346295; cv=none; b=GAyneG5vj3EUv/ainr1IXTYB01YWz2URbc9LwDZzVO3eakpLR8sJMbrkhKz9k6uWQ0V5Qy3oNzL2VZwqkpqD1R3KmiALcTwyOWIPQzKn8mRCrRNFsr6A25M0C7G3HOi8Xp+EGMVb24Xiype+LXSgTCYiEtF5THClqM9Exb3ZFD4=
+	t=1734346296; cv=none; b=WGNRR3JuoZ6gVtmikMpdXwfP4Am1pDHsqMW6NUXsIBuUcCmO33iFKZYqyQ7nk9/gSmjRgtAkcj3WdeijC3I9pdhHY0B83k8upP9VciBdjjf2Oizz71dn49PYN4dGPBaIswSL+fLO8lFYl1MKNv2gGULh49Qyi+xwRCq84Vs0yvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734346295; c=relaxed/simple;
-	bh=wU0ba7EJlu/c/7zmAgjVe2lNKtj+Cb0qvSldp9rkIr8=;
+	s=arc-20240116; t=1734346296; c=relaxed/simple;
+	bh=5+x5PdKqwqC9v0R+RZdvhIjiXfl3A0a3M7LGqElN/yE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GghHuwCLxqC+FG4ouwx2/Fq8mxFJ/Hq5dn3OUS/1I2cT3gXa75WZVCMQ8KCi8QXpd331LfYnFA65We0Pjmu6f0CShOyu/B01xnikcsCeaPkgNk4atmGhnzuUKG7DTE29M6R9ZqTo7AQAYyXTeQ+qEQ4XhrirOvFkHeuB7mZAvL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1F3XMfE5; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=VkAVSj1GBqYBJEpz0dQU1XOXHCnxox9G92+HP+LhXUDrDuKDIcZfMvgnLb46qp8hgHjA/An32D8WluhIAKB+sm6Rv4g1bSyCXgN1IKvMournA79KzgH0VGQIcOj9WPqWSBEo6fkQEghm7oegCajCUO/nK7PHvlVCqLjiFiU7sLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=he2WZECW; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1F3XMfE5"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43635895374so8359685e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 02:51:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="he2WZECW"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-436379713baso8883995e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 16 Dec 2024 02:51:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734346292; x=1734951092; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734346294; x=1734951094; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GWRlIiI31BxmGPjckPOwy0oDiGPfB3G4L1dgRWKrBVw=;
-        b=1F3XMfE5PhKP/OfP0LRpC4HdfSg+jNYr52H1w3Su888qgx0qwGne6vrO7rTxqgc5OH
-         rd9Np2+43jHNYM41x2P2zub7SL2V5YC2WdhaPt8GdVNmufFgxBjs9dGEipszhNVy2+kR
-         h5CBxSAPBd617a8h7MWQERu8X60LbysAAEU32fGC7ugEboG2gdv+3iQo9Qd5VVUalzsK
-         xILWEHWSSV+qoHYh76oHCo24BDxgB866Bsik3oOE3b48ZBQ9FAS6u30IceDuduHRNJqg
-         7jH/AR1C9U5aGEL6YWBGC8IMYJpgoxF/n9MaKOnMliq0yX7s2jg/TyofJ6mix/FbTvDX
-         kaCg==
+        bh=Vkc2lJTmOE5SwiXWL8j1pu4J4OtvYGFDXBGNRHI6lfg=;
+        b=he2WZECWxHq3PCOG6aURXMq9u//xw2pOEEUrbBcnItxZnkueEJ9ImH7pkYmg+SApB9
+         sfe9YBpNq4666aBvz7e7xTzjeXqcrA5bMHuLox0Wmu8eq7rI4LdzVbDh59A8fAY/bI0i
+         BBMHTnRvaG6WwZukbiQGTUqwhyC2G/wurjuowolidyuHg162tKcaD2lGCQI/m5xlDzXz
+         TMQJFaCWhRRHJ7l6zgq7F9re3cPfNbjC1cw2x9GGJy8iTUC35ig1j9HversEykpQTUlj
+         79MmFZ9k4RUVNsRtuo2KcTQcRx3IiJCbHhuzkDxdYDdFIBimLqX4Td1Kkua8voDkxgTz
+         /QNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734346292; x=1734951092;
+        d=1e100.net; s=20230601; t=1734346294; x=1734951094;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GWRlIiI31BxmGPjckPOwy0oDiGPfB3G4L1dgRWKrBVw=;
-        b=tiLI7u4u8pKV1jUBMZFD/IrkXr65vtz8T4eezx/xvY+wFdEbwhXGzjUDaFo50WVJzS
-         bjhOk66wV3ebhCz5pNJXvS+fP7eu4kf7ieo6IIh9l6BX5i2Mb+7q0/N1SSlN2+Q8klVd
-         awSstDktzmsau3V7LfPuirU506/Xwvp3YUeaV0UpXEI5PNFQshCW+FyGysZrPrZ24TLS
-         GtMJ2ouctobNU9zhMpLSGE/W5NiW/nmxPu7V3nMc5g+PM/W3ZO62kW9BceLbXFCoPyS+
-         V7axkLxi8bCj5LFvmM7lE0QZ+s8po1ArVkEKLeFS3UPG1CE8krNuU9sq0qA4VSUzwZD0
-         q1tQ==
-X-Gm-Message-State: AOJu0YyhuEg6Sc7iRZ9+MghZ94DW1K/wh7Wcs+4T8so3W/+l0XvJazyP
-	gJu3an7FbIeu+Gysx+JTM4XyG70YfpGWgZcD+R0mISjd3Fu2UDEs6f7vsvgn0zG6XTRVXXfU052
-	1eejTHzh74klLfB8FyPnmDFacaDRt+68oWGMHT27ZLxo6Q5lslP8I92Zy8CuLex9MsjiezAI3hY
-	z1ruy7NK7G+fdA063pSGI/7mrdWTQ=
-X-Google-Smtp-Source: AGHT+IEuNL+lWG9lMFyK20DSLRl1dnkflzDK3gJDdXF5BmkvWUPWorOkbhhkOY3ezU3DDXl2n09tnPFLlg==
-X-Received: from wmqf13.prod.google.com ([2002:a05:600c:4e8d:b0:434:f21d:7e31])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2cf:b0:386:4332:cc99
- with SMTP id ffacd0b85a97d-387888069d8mr13864516f8f.17.1734346291723; Mon, 16
- Dec 2024 02:51:31 -0800 (PST)
-Date: Mon, 16 Dec 2024 10:50:56 +0000
+        bh=Vkc2lJTmOE5SwiXWL8j1pu4J4OtvYGFDXBGNRHI6lfg=;
+        b=OlbXJM89kLxFp3faa10kS+NcMZpO973TslzgZGXmv7w3LSCSnufG5CGPecoGppdFd5
+         A9V1celIODAs/Mup3NspxKjyramKjnhcdMG/PATVRHYs8n+AjBhh0AdGF9FjtWU+wtA6
+         tBKGGH3Gr0nUjU4Hp1wBmZogkQMmdu8/9lV2Dh+hFWO7jy8EVhhCkxppsUd4CPGdsssX
+         vo9wDn6fS22UBedEw45jO2QIkPsrZ6qnBX5ZWw5wJn08A+1+PVUEK8iaWifQaua743dL
+         ftinwxPeJpaLpUVW09OiPhnuNXFElufnRbPh3iJ30enyAa8sKSarQKuW4zBE2Kdv7RnR
+         OXrw==
+X-Gm-Message-State: AOJu0YyqlIpqo1R7WPJouk+tPu1rX0lGO1Fc1dAMrQAOAZsnfrc2xcWP
+	Hm3zNKi1DztGra01iiM169OlKHXUq8T2j3iviSDNBP+ezNmCBy4IAD4KA2jFxA/cuRRExEYGc99
+	0VjcQh/YHb3EwB3TB4VS4c4Z7U/BPr7fli8EobARmt7ep38NOEenZzIIC0BRDbd0sRn450UqvRi
+	UG77DH+7uS+1aTp4BPBqbdnAomx08=
+X-Google-Smtp-Source: AGHT+IE6dzPeC92Qjqfbxx0NlZAcvO57FuNuJtWGIFlLNf+nKTtzoaYF9JxHvI4ZxzEANAaeGwhjrxt5iQ==
+X-Received: from wmsd5.prod.google.com ([2002:a05:600c:3ac5:b0:431:1903:8a3e])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:871b:b0:434:f0df:a14
+ with SMTP id 5b1f17b1804b1-4362aa147f8mr118538075e9.2.1734346293709; Mon, 16
+ Dec 2024 02:51:33 -0800 (PST)
+Date: Mon, 16 Dec 2024 10:50:57 +0000
 In-Reply-To: <20241216105057.579031-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241216105057.579031-1-tabba@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241216105057.579031-17-tabba@google.com>
-Subject: [PATCH v5 16/17] KVM: arm64: Convert the SVE guest vcpu flag to a vm flag
+Message-ID: <20241216105057.579031-18-tabba@google.com>
+Subject: [PATCH v5 17/17] KVM: arm64: Use kvm_vcpu_has_feature() directly for
+ struct kvm
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org, 
@@ -69,160 +70,44 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.clark@linaro.org,
 	qperret@google.com, kristina.martsenko@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The vcpu flag GUEST_HAS_SVE is per-vcpu, but it is based on what
-is now a per-vm feature. Make the flag per-vm.
+Now that we have introduced kvm_vcpu_has_feature(), use it in the
+remaining code that checks for features in struct kvm, instead of
+using the __vcpu_has_feature() helper.
 
+No functional change intended.
+
+Suggested-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 12 +++++++++---
- arch/arm64/include/asm/kvm_host.h    | 18 ++++++++++++------
- arch/arm64/kvm/hyp/nvhe/pkvm.c       | 11 +++++++----
- arch/arm64/kvm/reset.c               |  2 +-
- 4 files changed, 29 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/nested.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 406e99a452bf..2d91fb88298a 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -620,7 +620,7 @@ static __always_inline void kvm_write_cptr_el2(u64 val)
- }
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index aeaa6017ffd8..92e746040de4 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1021,8 +1021,8 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+ 		res0 |= HCR_NV2;
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, IMP))
+ 		res0 |= (HCR_AT | HCR_NV1 | HCR_NV);
+-	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
+-	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
++	if (!(kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
++	      kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
+ 		res0 |= (HCR_API | HCR_APK);
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TME, IMP))
+ 		res0 |= BIT(39);
+@@ -1078,8 +1078,8 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
  
- /* Resets the value of cptr_el2 when returning to the host. */
--static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
-+static __always_inline void __kvm_reset_cptr_el2(struct kvm *kvm)
- {
- 	u64 val;
- 
-@@ -631,14 +631,14 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 	} else if (has_hvhe()) {
- 		val = CPACR_ELx_FPEN;
- 
--		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs())
-+		if (!kvm_has_sve(kvm) || !guest_owns_fp_regs())
- 			val |= CPACR_ELx_ZEN;
- 		if (cpus_have_final_cap(ARM64_SME))
- 			val |= CPACR_ELx_SMEN;
- 	} else {
- 		val = CPTR_NVHE_EL2_RES1;
- 
--		if (vcpu_has_sve(vcpu) && guest_owns_fp_regs())
-+		if (kvm_has_sve(kvm) && guest_owns_fp_regs())
- 			val |= CPTR_EL2_TZ;
- 		if (!cpus_have_final_cap(ARM64_SME))
- 			val |= CPTR_EL2_TSM;
-@@ -647,6 +647,12 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 	kvm_write_cptr_el2(val);
- }
- 
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+#define kvm_reset_cptr_el2(v)	__kvm_reset_cptr_el2(kern_hyp_va((v)->kvm))
-+#else
-+#define kvm_reset_cptr_el2(v)	__kvm_reset_cptr_el2((v)->kvm)
-+#endif
-+
- /*
-  * Returns a 'sanitised' view of CPTR_EL2, translating from nVHE to the VHE
-  * format if E2H isn't set.
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e6be8fe6627a..c834b6768247 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -331,6 +331,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
- 	/* Fine-Grained UNDEF initialised */
- #define KVM_ARCH_FLAG_FGU_INITIALIZED			8
-+	/* SVE exposed to guest */
-+#define KVM_ARCH_FLAG_GUEST_HAS_SVE			9
- 	unsigned long flags;
- 
- 	/* VM-wide vCPU feature set */
-@@ -862,12 +864,10 @@ struct kvm_vcpu_arch {
- #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
- #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
- 
--/* SVE exposed to guest */
--#define GUEST_HAS_SVE		__vcpu_single_flag(cflags, BIT(0))
-+/* KVM_ARM_VCPU_INIT completed */
-+#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
- /* SVE config completed */
- #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
--/* KVM_ARM_VCPU_INIT completed */
--#define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(2))
- 
- /* Exception pending */
- #define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
-@@ -956,8 +956,14 @@ struct kvm_vcpu_arch {
- 				 KVM_GUESTDBG_USE_HW | \
- 				 KVM_GUESTDBG_SINGLESTEP)
- 
--#define vcpu_has_sve(vcpu) (system_supports_sve() &&			\
--			    vcpu_get_flag(vcpu, GUEST_HAS_SVE))
-+#define kvm_has_sve(kvm)	(system_supports_sve() &&		\
-+				 test_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &(kvm)->arch.flags))
-+
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+#define vcpu_has_sve(vcpu)	kvm_has_sve(kern_hyp_va((vcpu)->kvm))
-+#else
-+#define vcpu_has_sve(vcpu)	kvm_has_sve((vcpu)->kvm)
-+#endif
- 
- #ifdef CONFIG_ARM64_PTR_AUTH
- #define vcpu_has_ptrauth(vcpu)						\
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index b399d69b4b67..446a9114b0d3 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -248,10 +248,13 @@ void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struct kvm *host_kvm)
- {
- 	struct kvm *kvm = &hyp_vm->kvm;
-+	unsigned long host_arch_flags = READ_ONCE(host_kvm->arch.flags);
- 	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
- 
- 	/* No restrictions for non-protected VMs. */
- 	if (!kvm_vm_is_protected(kvm)) {
-+		hyp_vm->kvm.arch.flags = host_arch_flags;
-+
- 		bitmap_copy(kvm->arch.vcpu_features,
- 			    host_kvm->arch.vcpu_features,
- 			    KVM_VCPU_MAX_FEATURES);
-@@ -271,8 +274,10 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
- 	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PTRAUTH_GENERIC))
- 		set_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, allowed_features);
- 
--	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_SVE))
-+	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_SVE)) {
- 		set_bit(KVM_ARM_VCPU_SVE, allowed_features);
-+		kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_GUEST_HAS_SVE);
-+	}
- 
- 	bitmap_and(kvm->arch.vcpu_features, host_kvm->arch.vcpu_features,
- 		   allowed_features, KVM_VCPU_MAX_FEATURES);
-@@ -308,10 +313,8 @@ static void pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *
- {
- 	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
- 
--	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
--		vcpu_clear_flag(vcpu, GUEST_HAS_SVE);
-+	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
- 		vcpu_clear_flag(vcpu, VCPU_SVE_FINALIZED);
--	}
- }
- 
- static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 1cfab6a5d8a5..803e11b0dc8f 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -85,7 +85,7 @@ static void kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
- 	 * KVM_REG_ARM64_SVE_VLS.  Allocation is deferred until
- 	 * kvm_arm_vcpu_finalize(), which freezes the configuration.
- 	 */
--	vcpu_set_flag(vcpu, GUEST_HAS_SVE);
-+	set_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &vcpu->kvm->arch.flags);
- }
- 
- /*
+ 	/* HFG[RW]TR_EL2 */
+ 	res0 = res1 = 0;
+-	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
+-	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
++	if (!(kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
++	      kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
+ 		res0 |= (HFGxTR_EL2_APDAKey | HFGxTR_EL2_APDBKey |
+ 			 HFGxTR_EL2_APGAKey | HFGxTR_EL2_APIAKey |
+ 			 HFGxTR_EL2_APIBKey);
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
