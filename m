@@ -1,158 +1,102 @@
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48221DE3D7
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 09:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FBA1DDC3F
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 10:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734428906; cv=none; b=I5FxOuixubbngFsrzSmMg1vLQj1pLhhUbFo0jfTruJm0cGRYESR/mUfWAsAGNGacTLzOJivTPULLCGipa5MHcFPHBb3M22+F70VGFo9AvMs9/xwbJ+rDrxWX0n2w9zZRryLdD+X7FZxZX7QkBTywGbM2PzPkB4KQEPeJ/yEw3jM=
+	t=1734432068; cv=none; b=iEZpG4Ksm9N1B0pSaQ5S7R96RpeEqGFfBprvDKBd5rnVN2f+jue/TzUAy/SV2Zj6LzfVvxHVgH6fClmzw1JyeaZmebc2ZzCFaq/sVCd0zVOxPokqrtbUoiFOBWVeP2W+ZY2HyiyZfa+jFKganRMyoFKQq7J5fdH1Ta6EfKOHo4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734428906; c=relaxed/simple;
-	bh=I0fyUejRXrcZeygj2FiK1acNIwCSe5DLIYY2zBUhphM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=byOMAjegSY+uYRLnQxoBMTWhZoIVVIF9bVjPQvzZLrQrf2J3nwIR0NkWp5lxQl6hsMOtoqKIVTDD9M93u7b89iadOrvamQRKWT2NGpPPjbR4qm8mNlD5xKfGf17uHEHCGCOzQS/dcIp68QZ2MvmRjgByhpTvSd3M2EBhRQMnd/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-845dee0425cso234004539f.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 01:48:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734428904; x=1735033704;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k7Ohw9FdZun9tCxVR+V58AxTTwpDnpaw4I4rebrkACs=;
-        b=skYlOUShtF8+YRynCOPKCQBGORPvH7lHwMOI9Fu8hGm82fqexFiAc3kvPyGcLFonhk
-         JtggbgpBS1WGrgvnBkaUbUFoL9DkYQONen7wdL4uLAwZWmJzV5zDQ0GUXlUSITedAWmS
-         oIDH/ybp3YtC3FLhLgDefiC0/oiXUhvN7mRTJR3bnxef2kjk9HvONyUYp20QmSeXpiqH
-         YsoVKXoJEDnh1b6wv5oV77aK+OWK46OvCruP8jpOro4qai2oD1csvk7ZP20gUWX97/aj
-         +/AqKL5Z7jND0CR3N9Ds2GMVqGBCw5W6d6O0pdreGpQ1JaHw8yZ7Atje9p+WqDWAYxeX
-         4htQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuU6Ci9km01X19EOYX+fJBf2bjK+/OXb6RCn5KCT7EN5DOz4pDrLa4DZQdJEkIxhHmdjQoWSc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx3YmlEj+PJXT42UgrJ3EzJ9gPBK/b0+WyNB8YrgRZ/qBThF6LS
-	L4PsG7O5/6t8dGDmzRzMSjjj6W9g7Je3Rk/EEKGz1iL0WjMCFpKkypC6jVj/JOQ13ijz4cGuWw1
-	M4AyCjLt4tcysifbYMoj7FZFSsQ3jGVLDsakcg1xoUfiqsoknOL5xQnI=
-X-Google-Smtp-Source: AGHT+IHI9tYk8oBynelfPrOkch9cOquRNVuGZrHan+16Hk0hGAubvsg8DCIGxrVhoM/XYZRyY38tAlmP5tjN4bfiN2UpHZ89frcW
+	s=arc-20240116; t=1734432068; c=relaxed/simple;
+	bh=aAycJgXnOkrXr7gy855/I4y532oL0myxx9xjae+yWvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNRj6NWjnnJDLtukRGnone9W3dUs59v7UtDlH+8ZRGfSFRcITdiiGj28FYG2T9lttPb7hqUOiKpEoufy2nWbsCEdB0fOcr90/0i3c333tyAxwlx2mQxzG0EzW3iTlSR7Gim9pFSPtN1lLuemgGGBLeHXYJ3rqgLnMydRKzj38Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 608111007;
+	Tue, 17 Dec 2024 02:41:33 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FD993F528;
+	Tue, 17 Dec 2024 02:41:03 -0800 (PST)
+Date: Tue, 17 Dec 2024 10:40:58 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com,
+	maz@kernel.org, oliver.upton@linux.dev,
+	shameerali.kolothum.thodi@huawei.com, vt@altlinux.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default
+ and ignore VMM writes
+Message-ID: <20241217104058.GA2151333@e124191.cambridge.arm.com>
+References: <20241212151406.1436382-1-joey.gouly@arm.com>
+ <2024121528-refurbish-plausibly-31c7@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1905:b0:3a0:c820:c5f0 with SMTP id
- e9e14a558f8ab-3aff9256d09mr175850255ab.24.1734428904148; Tue, 17 Dec 2024
- 01:48:24 -0800 (PST)
-Date: Tue, 17 Dec 2024 01:48:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676148e8.050a0220.37aaf.0158.GAE@google.com>
-Subject: [syzbot] [kvmarm?] BUG: unable to handle kernel paging request in vgic_its_set_attr
-From: syzbot <syzbot+62e8b837d5ec5953c8e2@syzkaller.appspotmail.com>
-To: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, 
-	syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2024121528-refurbish-plausibly-31c7@gregkh>
 
-Hello,
+On Sun, Dec 15, 2024 at 10:22:53AM +0100, Greg KH wrote:
+> On Thu, Dec 12, 2024 at 03:14:06PM +0000, Joey Gouly wrote:
+> > From: James Morse <james.morse@arm.com>
+> > 
+> > commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
+> > 
+> > commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
+> > ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
+> > but didn't add trap handling. A previous patch supplied the missing trap
+> > handling.
+> > 
+> > Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
+> > be migratable, but there is little point enabling the MPAM CPU
+> > interface on new VMs until there is something a guest can do with it.
+> > 
+> > Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
+> > that supports MPAM, politely ignore the VMMs attempts to set this bit.
+> > 
+> > Guests exposed to this bug have the sanitised value of the MPAM field,
+> > so only the correct value needs to be ignored. This means the field
+> > can continue to be used to block migration to incompatible hardware
+> > (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
+> > being ignored.
+> > 
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > Co-developed-by: Joey Gouly <joey.gouly@arm.com>
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > Reviewed-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Cc: stable@vger.kernel.org # 6.6.x
+> > Cc: Vitaly Chikunov <vt@altlinux.org>
+> > Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
+> > ---
+> > 
+> > This fixes an issue seen when using KVM with a 6.6 host kernel, and
+> > newer (6.13+) kernels in the guest.
+> > 
+> > Tested with a stripped down version of set_id_regs from the original
+> > patch series.
+> 
+> What about 6.12.y?  You can't just skip a stable tree, otherwise you
+> will get a regression when you upgrade to 6.12.y, right?
 
-syzbot found the following issue on:
+I did have it ported/tested locally, but I wasn't sure of the stable process,
+so just sent out one!  Next time I will send all the backports at the same
+time.
 
-HEAD commit:    5db899a34f75 Merge remote-tracking branch 'kernel/kvmarm/n..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git fuzzme
-console output: https://syzkaller.appspot.com/x/log.txt?x=148b6a0f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fde68ab6d6c8c8ab
-dashboard link: https://syzkaller.appspot.com/bug?extid=62e8b837d5ec5953c8e2
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
+Thanks Marc Z for sending it out!
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-5db899a3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4938b757ff4a/vmlinux-5db899a3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/936938b47987/Image-5db899a3.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+62e8b837d5ec5953c8e2@syzkaller.appspotmail.com
-
-Unable to handle kernel paging request at virtual address efff800000000001
-KASAN: null-ptr-deref in range [0x0000000000000010-0x000000000000001f]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-swapper pgtable: 4k pages, 52-bit VAs, pgdp=0000000044a53000
-[efff800000000001] pgd=1000000049992003, p4d=1000000049993003, pud=0000000000000000
-Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
-Modules linked in:
-CPU: 0 UID: 0 PID: 5975 Comm: syz.1.647 Not tainted 6.12.0-rc7-syzkaller-g5db899a34f75 #0
-Hardware name: linux,dummy-virt (DT)
-pstate: 60402009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : __hwasan_check_x0_67043362+0x4/0x30
-lr : vgic_its_save_ite arch/arm64/kvm/vgic/vgic-its.c:2101 [inline]
-lr : vgic_its_save_itt arch/arm64/kvm/vgic/vgic-its.c:2204 [inline]
-lr : vgic_its_save_device_tables arch/arm64/kvm/vgic/vgic-its.c:2353 [inline]
-lr : vgic_its_save_tables_v0+0x258/0x634 arch/arm64/kvm/vgic/vgic-its.c:2573
-sp : ffff80008bd17be0
-x29: ffff80008bd17c30 x28: 6cf0000019180180 x27: 5bf000001952a880
-x26: 0000000000000008 x25: 0000000000000000 x24: 0000000000000000
-x23: 07f000001952a8c0 x22: 07f000001952a8d0 x21: 00000000c0030000
-x20: 07f000001952a8d0 x19: efff800000000000 x18: 00000000000000e8
-x17: 0000000000000000 x16: 0000000000000001 x15: 0000000000000000
-x14: 000000000002061b x13: 0000000000000000 x12: 0000000001fbb6cb
-x11: 0000000000000000 x10: 0000000000002000 x9 : efff800000000000
-x8 : 0000000020000000 x7 : ffff8000800fc528 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 8df00000195be2f0 x3 : 0000000000000008
-x2 : ffff8000800fc5a4 x1 : 0000000000000000 x0 : 0000000000000010
-Call trace:
- __hwasan_check_x0_67043362+0x4/0x30
- vgic_its_set_attr+0x394/0x508 arch/arm64/kvm/vgic/vgic-its.c:2736
- kvm_device_ioctl_attr+0x150/0x18c virt/kvm/kvm_main.c:4721
- kvm_device_ioctl+0x154/0x1b0
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __arm64_sys_ioctl+0x108/0x184 fs/ioctl.c:893
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x78/0x1b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xe8/0x1b0 arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x40/0x50 arch/arm64/kernel/syscall.c:151
- el0_svc+0x54/0x14c arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-Code: a90efbfd d2800401 143a3edf 9344dc10 (38706930) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	a90efbfd 	stp	x29, x30, [sp, #232]
-   4:	d2800401 	mov	x1, #0x20                  	// #32
-   8:	143a3edf 	b	0xe8fb84
-   c:	9344dc10 	sbfx	x16, x0, #4, #52
-* 10:	38706930 	ldrb	w16, [x9, x16] <-- trapping instruction
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Joey
