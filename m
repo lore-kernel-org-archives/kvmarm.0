@@ -1,172 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E868615A;
-	Tue, 17 Dec 2024 17:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C721442F
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 17:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734457113; cv=none; b=jlwB97o6JO0lfuwepExGiKvKz3C9prOLiO5YJVc2YT08RoyQsZ1LUvMlDIHzhL70Yx5qGzTzTjEzaZ9Y/6aSWxc/apGVh4r3DMKW9HMdBdGgkXLZY6tAAsjSMfreRUGynriSU8rGNKt71i566pabGQm42oD7HWJgUEE4oEWJl7c=
+	t=1734458032; cv=none; b=KqnmvRwtuJ/J9l5BAElFXBN0t7ZQmkaA1c7S+aPwRAZMJ9UjXVQs01Gmyv3rLzd+23HHAFWmH9UgOaTACIccxQ7CIp411ZjTs9ImoYetfTaWayB7fpwrtSb1PHdUiHXqZMG+/O4TggAKbZqu/hanxAjCnSXt5vOJ/4jmRCKG9Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734457113; c=relaxed/simple;
-	bh=drmIapqZOtyKxi6JCkbBuJFmy/DxlTvVFIXPKTYMk9U=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=loNbSLV1fDZsIaPXOT96/sCdz22dj+vtE6K4Da1rivJO4Z/ya8Ia2ebXbfo4Yg1WU1uy0pfVokm4Oko4iWrNHSwsYEq3hGtf03DEcHBXlIAFJ3LfGY/3Tui9T6CrtiUbezypWq14I8kN7zFCj5f+I0vkJVUKXMpFeROBlhSppSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntwJA53l; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734458032; c=relaxed/simple;
+	bh=ylCMkM+rCVvPe98DY/sSklo6uJuTEB/sBfvaxn51beg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XZK9r3UlJvcvPSeINkLIUJmonI1AHC1PBoz6QTK3xDHsix01ng68uQ+NL78Oh9aK7xTK5AgQ/jeKkcp087Ld/xqfrbNl5q+wt99oZ4WMmvEXRnoOV+VLvQOXEt0K7QGZJjNfYpuolTg2mAhZVjLPC1isWanXxs91NszPJVTV694=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TrDezsEY; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntwJA53l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BADDEC4CED3;
-	Tue, 17 Dec 2024 17:38:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734457112;
-	bh=drmIapqZOtyKxi6JCkbBuJFmy/DxlTvVFIXPKTYMk9U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ntwJA53lwMeohmy4JIXkA1wKebsYZPaKwX3NKwqqMYygVn5QQ4T4UbkIOi6IR8/1u
-	 Djv6ipAsJakD7Fz5GNDF3i+Sxwn//P16A27Wf1pb8TpMpfTyLjQy5RNDj/+qw3zeN/
-	 C2Ig3oX3ZVehVEmpkcLrDQqAnquGJUS2FqivaPFz/yZjGEl/m3nSHWjRz3KyE0HBTq
-	 drgL4AfqQFrW2XiKCpyoNrvoVKSYGQd4JpxLGHM07or+KXe+1981CLJgRQRQvcE7Hn
-	 5dIlvREIx1aVEMXqQP/KlH0XTqNbFVeuRLhmdvk0dzfnyCGpx4g6SHULXVNCHu/3rb
-	 v86pckt9T6V4g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tNbWg-004eRJ-5C;
-	Tue, 17 Dec 2024 17:38:30 +0000
-Date: Tue, 17 Dec 2024 17:38:25 +0000
-Message-ID: <86ldweqkfi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TrDezsEY"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734458028;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2QLMIYgaoudjtrwIYcCzEDgQCqf3TXu0gKs9q/Mjz24=;
+	b=TrDezsEYiZgW7Ttgl2rhVI3K9OaIwScSaTzoCl0n1amGy/4FHAirIZuHLsVNkYJYsMbhUU
+	FImlMwDNVQ88dJhfymlk1xlBsV4wSUciUKHHPjSXcmAX8PFFca0OPoJQiQE/BAtFx0/SRo
+	GOlIjWPDnsON1+AX48hvdHihrCEod6E=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Eric Auger <eauger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH 11/16] KVM: arm64: nv: Add Maintenance Interrupt emulation
-In-Reply-To: <20241217151331.934077-12-maz@kernel.org>
-References: <20241217151331.934077-1-maz@kernel.org>
-	<20241217151331.934077-12-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	James Clark <james.clark@linaro.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/4] KVM: arm64: PMU fixes for 6.13
+Date: Tue, 17 Dec 2024 09:53:32 -0800
+Message-Id: <20241217175336.3657966-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andre.przywara@arm.com, eauger@redhat.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 17 Dec 2024 15:13:26 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> Emulating the vGIC means emulating the dreaded Maintenance Interrupt.
-> 
-> This is a two-pronged problem:
-> 
-> - while running L2, getting an MI translates into an MI injected
->   in the L1 based on the state of the HW.
-> 
-> - while running L1, we must accurately reflect the state of the
->   MI line, based on the in-memory state.
-> 
-> The MI INTID is added to the distributor, as expected on any
-> virtualisation-capable implementation, and further patches
-> will allow its configuration.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/arm.c                 |  6 ++++
->  arch/arm64/kvm/vgic/vgic-init.c      | 22 ++++++++++++++
->  arch/arm64/kvm/vgic/vgic-v3-nested.c | 45 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c           |  9 ++++++
->  arch/arm64/kvm/vgic/vgic.h           |  2 ++
->  include/kvm/arm_vgic.h               |  4 +++
->  6 files changed, 88 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 5e353b2c225b4..756cc4e74e10f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -824,6 +824,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  	if (ret)
->  		return ret;
->  
-> +	if (vcpu_has_nv(vcpu)) {
-> +		ret = kvm_vgic_vcpu_nv_init(vcpu);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	/*
->  	 * This needs to happen after any restriction has been applied
->  	 * to the feature set.
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index bc7e22ab5d812..d2724315a70e9 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -180,6 +180,20 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
->  	return 0;
->  }
->  
-> +int kvm_vgic_vcpu_nv_init(struct kvm_vcpu *vcpu)
-> +{
-> +	int ret;
-> +
-> +	guard(mutex)(&vcpu->kvm->arch.config_lock);
-> +
-> +	/* Cope with vintage userspace. Maybe we should fail instead */
-> +	if (vcpu->kvm->arch.vgic.maint_irq == 0)
-> +		vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
+Small set of fixes for PMU, mostly focused on plugging gaps in nested
+support that I'd missed last time around:
 
-Well, that didn't take too long, and Joey did hit a bug here. Although
-the two fields have the same name, they represent something totally
-different:
+ - Don't attempt to enable/disable EL2 counters when PMCR_EL0.E is
+   changed. This is already the case since the enable state of a
+   counter is re-evaluated in kvm_pmu_create_perf_event(), though the
+   handling of PMCR_EL0.E would suggest otherwise.
 
-- kvm_vgic_global_state.maint_irq is the interrupt number Linux uses
-  for the host. It's just a number, without any signification other
-  than for the kernel's own stuff.
+ - Enable/disable EL2 counters when MDCR_EL2.HPME is changed.
 
-- vcpu->kvm->arch.vgic.maint_irq is an GIC INTID. Really not the same
-  thing as the above.
+ - Only reset 'guest' counters when PMCR_EL0.P is set, excluding EL2
+   counters from being reset.
 
-What this should read is something like:
+Applies to 6.13-rc3, tested on the M2 w/ my PMUv3 patches thrown on top.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index d2724315a70e9..8d92b05639588 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -188,7 +188,7 @@ int kvm_vgic_vcpu_nv_init(struct kvm_vcpu *vcpu)
- 
- 	/* Cope with vintage userspace. Maybe we should fail instead */
- 	if (vcpu->kvm->arch.vgic.maint_irq == 0)
--		vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
-+		vcpu->kvm->arch.vgic.maint_irq = irq_get_irq_data(kvm_vgic_global_state.maint_irq)->hwirq;
- 	ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq, vcpu);
- 
- 	return ret;
+Oliver Upton (4):
+  KVM: arm64: Add unified helper for reprogramming counters by mask
+  KVM: arm64: Use KVM_REQ_RELOAD_PMU to handle PMCR_EL0.E change
+  KVM: arm64: nv: Reload PMU events upon MDCR_EL2.HPME change
+  KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters
 
-So I guess there are two things that need to happen:
+ arch/arm64/kvm/pmu-emul.c | 89 +++++++++++++++------------------------
+ arch/arm64/kvm/sys_regs.c | 32 +++++++++++---
+ include/kvm/arm_pmu.h     |  6 +--
+ 3 files changed, 62 insertions(+), 65 deletions(-)
 
-- rename vcpu->kvm->arch.vgic.maint_irq to something like "mi_intid"
 
-- make the damn thing fail, as the comment suggests. We don't have any
-  legacy worth speaking of anyway.
-
-Another thing is that Joey (who really didn't waste any time finding
-issues) pointed out that we happily allow NV without GICv3. Clearly,
-this should also be prevented.
-
-Thanks Joey!
-
-	M.
-
+base-commit: 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
