@@ -1,189 +1,259 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC061D63C6;
-	Mon, 16 Dec 2024 23:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF426E2BE
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 03:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734392579; cv=none; b=gNCCsDByrbNzCuDw2KtKBQk+teAJB0KXI4KfXUxNMC8EvsY8DHT/aNYUKHTvxqcFHw+Cjm9BjHuiC4yMJ7RHaQ45oWr2vaLJFRZ6MwbCWOhFvDaRE/InSrPcIkiRqfahWruhtgN6HsM+SwSKBONm30UOC5Y6IkUb9YMu1AW/N00=
+	t=1734407306; cv=none; b=Dz5tH+PWkH+owqGeRwlQUf9Lf5lpHdp7WGggHPZyXdC0Od6BY/LUjoyHjtzu3wMX+/eVnq1fCTSDArW6PMjB0FwjinjnAtidkjO7a5Hi61Ley2dORbxkd70szuRnEvFOVjJf5mI9lfva+pDLtojC/C0OveOJWo9L+1Hinlg/aPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734392579; c=relaxed/simple;
-	bh=l9/IM5DK3ADr42QtgwUNbWJj+tcvKoSHuW74nZOhIOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ifro6YwNrQrj/3wosEvVpXGJDUNQe63k2QgCUXtSAkmuQbSMBlakQ6BN76N0PbzVDdudFEGepkyeAUq5zf9HxkHYHamisH/FIABUP4cxfRKWfKamLMnajAQYr6SUPIdhAkncF72hI1F+OiBbcbN1XPG5qx+2daIkfnKyemr5Z9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TeAKWYMt; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TeAKWYMt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0DA8C4CED3;
-	Mon, 16 Dec 2024 23:42:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734392579;
-	bh=l9/IM5DK3ADr42QtgwUNbWJj+tcvKoSHuW74nZOhIOI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TeAKWYMtgpjXG7dc85ISU9j6nRO40mbDGB1um+uayjQaSRprGvfN/g87iXczdu+Xy
-	 79rS7XMZWnhry/ibvEwXJpTb0i52jo3YXnv5JUCuDV4hAH98advS6apIGDzsVBekqG
-	 8GexjslubEflXux3UFQmuEPBOr0Y5fOx4KbQXGUIbj+vl8c7mM5we3Rh3l1bzdqdde
-	 a0ICMdEVut4JWUJyGQnIssv2NRb5et9DCzSIr9UPgzJc2v2NjsyA/CiutR1kGeG3bq
-	 UyaWBRJhqNTw/+IYcsN0jvuoIOa8dZG0wTb3CfKqyPC/2zt1NKDiYbNg0rVGsO5sIg
-	 T4oH8JltltR8Q==
-Date: Mon, 16 Dec 2024 17:42:51 -0600
-From: Rob Herring <robh@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=arc-20240116; t=1734407306; c=relaxed/simple;
+	bh=bSnEOXFRCTRCa26H4csv+FcvXBCngb0EEW7isqrqg9o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Due9QwCVxRJ8VnBZWYwGiTm1mfdrD8ChVvr3G/WlMFXlDyxBNrkf7B0mAo3twCKEuCqa8YD5HXUX1ZMWAIWj4GmnrPr97NAAwyn5eFT2BXWERkABD1IuJJ9YpAveiHLRdG2As2+2/bqGbJoCnEpMldDJgY7jgd5msQGYW7FIXIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32CDA1063;
+	Mon, 16 Dec 2024 19:48:48 -0800 (PST)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.16.49])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7C23E3F720;
+	Mon, 16 Dec 2024 19:48:13 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-mm@kvack.org
+Cc: steven.price@arm.com,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH V3 6/7] arm64/boot: Enable EL2 requirements for
- FEAT_Debugv8p9
-Message-ID: <20241216234251.GA629562-robh@kernel.org>
-References: <20241216040831.2448257-1-anshuman.khandual@arm.com>
- <20241216040831.2448257-7-anshuman.khandual@arm.com>
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: [PATCH] mm/ptdump: Drop GENERIC_PTDUMP
+Date: Tue, 17 Dec 2024 09:18:07 +0530
+Message-Id: <20241217034807.2541349-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241216040831.2448257-7-anshuman.khandual@arm.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 16, 2024 at 09:38:30AM +0530, Anshuman Khandual wrote:
-> Fine grained trap control for MDSELR_EL1 register needs to be configured in
-> HDFGRTR2_EL2, and HDFGWTR2_EL2 registers when kernel enters at EL1, but EL2
-> is also present.
+GENERIC_PTDUMP does not guard any code but instead just used for platform's
+subscription into core ptdump defined under PTDUMP_CORE, which is selected.
+Instead use PTDUMP_CORE for platform subscription and drop GENERIC_PTDUMP.
 
-Shouldn't this be "when kernel enters at EL2, and EL3 is also present"? 
-Though it is really "If EL3 set FGTEn2 and the kernel is entered in 
-EL2, then FGT2 must be initialized for MDSELR_EL1."
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-riscv@lists.infradead.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-mm@kvack.org
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+---
+This patch applies on v6.13-rc3 and has been tested on arm64, although it
+also clears build tests on impacted platforms.
 
-If it was me, I'd just plagarize what was written for prior FGT 
-commits for this code. :)
+ Documentation/arch/arm64/ptdump.rst       | 1 -
+ arch/arm64/Kconfig                        | 2 +-
+ arch/arm64/kvm/Kconfig                    | 3 +--
+ arch/powerpc/Kconfig                      | 2 +-
+ arch/powerpc/configs/mpc885_ads_defconfig | 1 -
+ arch/riscv/Kconfig                        | 2 +-
+ arch/s390/Kconfig                         | 2 +-
+ arch/x86/Kconfig                          | 2 +-
+ arch/x86/Kconfig.debug                    | 2 +-
+ kernel/configs/debug.config               | 1 -
+ mm/Kconfig.debug                          | 8 ++------
+ 11 files changed, 9 insertions(+), 17 deletions(-)
 
-> This adds a new helper __init_el2_fgt2() initializing this
-> new FEAT_FGT2 based fine grained registers.
+diff --git a/Documentation/arch/arm64/ptdump.rst b/Documentation/arch/arm64/ptdump.rst
+index 5dcfc5d7cddf..61ca040a885b 100644
+--- a/Documentation/arch/arm64/ptdump.rst
++++ b/Documentation/arch/arm64/ptdump.rst
+@@ -22,7 +22,6 @@ offlining of memory being accessed by the ptdump code.
+ In order to dump the kernel page tables, enable the following
+ configurations and mount debugfs::
+ 
+- CONFIG_GENERIC_PTDUMP=y
+  CONFIG_PTDUMP_CORE=y
+  CONFIG_PTDUMP_DEBUGFS=y
+ 
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 100570a048c5..b5479c8b454c 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -154,7 +154,7 @@ config ARM64
+ 	select GENERIC_IRQ_SHOW_LEVEL
+ 	select GENERIC_LIB_DEVMEM_IS_ALLOWED
+ 	select GENERIC_PCI_IOMAP
+-	select GENERIC_PTDUMP
++	select PTDUMP_CORE
+ 	select GENERIC_SCHED_CLOCK
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_TIME_VSYSCALL
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index ead632ad01b4..fe17d7f5b061 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -71,8 +71,7 @@ config PTDUMP_STAGE2_DEBUGFS
+ 	depends on KVM
+ 	depends on DEBUG_KERNEL
+ 	depends on DEBUG_FS
+-	depends on GENERIC_PTDUMP
+-	select PTDUMP_CORE
++	depends on PTDUMP_CORE
+ 	default n
+ 	help
+ 	  Say Y here if you want to show the stage-2 kernel pagetables
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index a0ce777f9706..c716f8df10de 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -203,7 +203,7 @@ config PPC
+ 	select GENERIC_IRQ_SHOW
+ 	select GENERIC_IRQ_SHOW_LEVEL
+ 	select GENERIC_PCI_IOMAP		if PCI
+-	select GENERIC_PTDUMP
++	select PTDUMP_CORE
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_TIME_VSYSCALL
+ 	select GENERIC_VDSO_TIME_NS
+diff --git a/arch/powerpc/configs/mpc885_ads_defconfig b/arch/powerpc/configs/mpc885_ads_defconfig
+index 77306be62e9e..ea6f836407d2 100644
+--- a/arch/powerpc/configs/mpc885_ads_defconfig
++++ b/arch/powerpc/configs/mpc885_ads_defconfig
+@@ -78,4 +78,3 @@ CONFIG_DEBUG_VM_PGTABLE=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_BDI_SWITCH=y
+ CONFIG_PPC_EARLY_DEBUG=y
+-CONFIG_GENERIC_PTDUMP=y
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index d4a7ca0388c0..05f969729e72 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -111,7 +111,7 @@ config RISCV
+ 	select GENERIC_IRQ_SHOW_LEVEL
+ 	select GENERIC_LIB_DEVMEM_IS_ALLOWED
+ 	select GENERIC_PCI_IOMAP
+-	select GENERIC_PTDUMP if MMU
++	select PTDUMP_CORE if MMU
+ 	select GENERIC_SCHED_CLOCK
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_TIME_VSYSCALL if MMU && 64BIT
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index 0077969170e8..0e19fe547d84 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -155,7 +155,7 @@ config S390
+ 	select GENERIC_CPU_VULNERABILITIES
+ 	select GENERIC_ENTRY
+ 	select GENERIC_GETTIMEOFDAY
+-	select GENERIC_PTDUMP
++	select PTDUMP_CORE
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_TIME_VSYSCALL
+ 	select GENERIC_VDSO_TIME_NS
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 9d7bd0ae48c4..d84cb2ac93ac 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -173,7 +173,7 @@ config X86
+ 	select GENERIC_IRQ_RESERVATION_MODE
+ 	select GENERIC_IRQ_SHOW
+ 	select GENERIC_PENDING_IRQ		if SMP
+-	select GENERIC_PTDUMP
++	select PTDUMP_CORE
+ 	select GENERIC_SMP_IDLE_THREAD
+ 	select GENERIC_TIME_VSYSCALL
+ 	select GENERIC_GETTIMEOFDAY
+diff --git a/arch/x86/Kconfig.debug b/arch/x86/Kconfig.debug
+index 74777a97e394..198d7f090b98 100644
+--- a/arch/x86/Kconfig.debug
++++ b/arch/x86/Kconfig.debug
+@@ -59,7 +59,7 @@ config EARLY_PRINTK_USB_XDBC
+ config EFI_PGT_DUMP
+ 	bool "Dump the EFI pagetable"
+ 	depends on EFI
+-	select PTDUMP_CORE
++	depends on PTDUMP_CORE
+ 	help
+ 	  Enable this if you want to dump the EFI page table before
+ 	  enabling virtual mode. This can be used to debug miscellaneous
+diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
+index 20552f163930..8aafd050b754 100644
+--- a/kernel/configs/debug.config
++++ b/kernel/configs/debug.config
+@@ -73,7 +73,6 @@ CONFIG_DEBUG_VM=y
+ CONFIG_DEBUG_VM_PGFLAGS=y
+ CONFIG_DEBUG_VM_RB=y
+ CONFIG_DEBUG_VM_VMACACHE=y
+-CONFIG_GENERIC_PTDUMP=y
+ CONFIG_KASAN=y
+ CONFIG_KASAN_GENERIC=y
+ CONFIG_KASAN_INLINE=y
+diff --git a/mm/Kconfig.debug b/mm/Kconfig.debug
+index 41a58536531d..b206e5a11f96 100644
+--- a/mm/Kconfig.debug
++++ b/mm/Kconfig.debug
+@@ -187,7 +187,7 @@ config DEBUG_WX
+ 	bool "Warn on W+X mappings at boot"
+ 	depends on ARCH_HAS_DEBUG_WX
+ 	depends on MMU
+-	select PTDUMP_CORE
++	depends on PTDUMP_CORE
+ 	help
+ 	  Generate a warning if any W+X mappings are found at boot.
+ 
+@@ -212,9 +212,6 @@ config DEBUG_WX
+ 
+ 	  If in doubt, say "Y".
+ 
+-config GENERIC_PTDUMP
+-	bool
+-
+ config PTDUMP_CORE
+ 	bool
+ 
+@@ -222,8 +219,7 @@ config PTDUMP_DEBUGFS
+ 	bool "Export kernel pagetable layout to userspace via debugfs"
+ 	depends on DEBUG_KERNEL
+ 	depends on DEBUG_FS
+-	depends on GENERIC_PTDUMP
+-	select PTDUMP_CORE
++	depends on PTDUMP_CORE
+ 	help
+ 	  Say Y here if you want to show the kernel pagetable layout in a
+ 	  debugfs file. This information is only useful for kernel developers
+-- 
+2.30.2
 
-"This adds" is the same as saying "This patch/commit adds" which is well 
-documented to avoid. Use imperative "Add a new helper...". Though it is 
-clear from the diff that is what you are doing...
-
-
-> MDCR_EL2.EBWE needs to be enabled for additional (beyond 16) breakpoint and
-> watchpoint exceptions when kernel enters at EL1, but EL2 is also present.
-> This updates __init_el2_debug() as required for FEAT_Debugv8p9.
-> 
-> While here, also update booting.rst with MDCR_EL3 and SCR_EL3 requirements.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: kvmarm@lists.linux.dev
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V3:
-> 
-> - Dropped MDCR_EL3.TDA boot requirement from documentation (separate series)
-> - Dropped MDCR_EL2_EBWE definition as MDCR_EL2 is now defined in tools sysreg
-> 
-> https://lore.kernel.org/all/20241211065425.1106683-1-anshuman.khandual@arm.com/
-> 
->  Documentation/arch/arm64/booting.rst | 18 ++++++++++++++++++
->  arch/arm64/include/asm/el2_setup.h   | 26 ++++++++++++++++++++++++++
->  2 files changed, 44 insertions(+)
-> 
-> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-> index 3278fb4bf219..054cfe1cad18 100644
-> --- a/Documentation/arch/arm64/booting.rst
-> +++ b/Documentation/arch/arm64/booting.rst
-> @@ -288,6 +288,12 @@ Before jumping into the kernel, the following conditions must be met:
->  
->      - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
->  
-> +  For CPUs with the Fine Grained Traps (FEAT_FGT2) extension present:
-> +
-> +  - If EL3 is present and the kernel is entered at EL2:
-> +
-> +    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
-> +
->    For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
->  
->    - If EL3 is present and the kernel is entered at EL2:
-> @@ -322,6 +328,18 @@ Before jumping into the kernel, the following conditions must be met:
->      - ZCR_EL2.LEN must be initialised to the same value for all CPUs the
->        kernel will execute on.
->  
-> +  For CPUs with FEAT_Debugv8p9 extension present:
-> +
-> +  - If the kernel is entered at EL1 and EL2 is present:
-> +
-> +    - HDFGRTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
-> +    - HDFGWTR2_EL2.nMDSELR_EL1 (bit 5) must be initialized to 0b1
-> +    - MDCR_EL2.EBWE (bit 43) must be initialized to 0b1
-> +
-> +  - If EL3 is present:
-> +
-> +    - MDCR_EL3.EBWE (bit 43) must be initialized to 0b1
-> +
->    For CPUs with the Scalable Matrix Extension (FEAT_SME):
->  
->    - If EL3 is present:
-> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> index 4ef52d7245bb..2fbfe27d38b5 100644
-> --- a/arch/arm64/include/asm/el2_setup.h
-> +++ b/arch/arm64/include/asm/el2_setup.h
-> @@ -105,6 +105,13 @@
->  						// to own it.
->  
->  .Lskip_trace_\@:
-> +	mrs	x1, id_aa64dfr0_el1
-> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
-> +	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
-> +	b.lt	.Lskip_dbg_v8p9_\@
-> +
-> +	orr	x2, x2, #MDCR_EL2_EBWE
-> +.Lskip_dbg_v8p9_\@:
->  	msr	mdcr_el2, x2			// Configure debug traps
->  .endm
->  
-> @@ -244,6 +251,24 @@
->  .Lskip_gcs_\@:
->  .endm
->  
-> +.macro __init_el2_fgt2
-> +	mrs	x1, id_aa64mmfr0_el1
-> +	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-> +	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
-
-We already read this field in __init_el2_fgt, shouldn't we leverage that 
-and move all this there rather than read the feature reg twice.
-
-> +	b.lt	.Lskip_fgt2_\@
-> +
-> +	mrs	x1, id_aa64dfr0_el1
-> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_DebugVer_SHIFT, #4
-> +	cmp	x1, #ID_AA64DFR0_EL1_DebugVer_V8P9
-> +	b.lt	.Lskip_dbg_v8p9_\@
-> +
-> +	mov_q   x0, HDFGWTR2_EL2_nMDSELR_EL1
-> +	msr_s	SYS_HDFGWTR2_EL2, x0
-> +	msr_s	SYS_HDFGRTR2_EL2, x0
-
-If Debug v8.9 is not present, but FGT2 is, shouldn't we write 0 to these 
-registers? That is what we do for FGT.
-
-
-I just realized I forgot to add FGT2 setup for the PMUv3.9 features I 
-already added in 6.12 and 6.13. So this really needs to land sooner 
-rather than later to add that. 
-
-Rob
