@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857F02E628;
-	Tue, 17 Dec 2024 10:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8551DDC1E;
+	Tue, 17 Dec 2024 10:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432731; cv=none; b=KWJSjQi3Q3tTWhRqUpNub3gjlulE2iMv+5tO6jckDi/h6KxVt+SRO18dzaFUayuvJNxElLaBpqK2o7l1Z1liLlRm0p68tMHLXc27Jx5EphRE/+tJLfNQUraoSHqHW5zG9m7NB/M/nYnTKc/2Ph/GXdNBbssoJqb1lW//bkZ6f+Y=
+	t=1734432961; cv=none; b=Duf4YO00/Y75Ld74VhKVI01eJnUoa8I20ZYBPnFWiP1jsECrHpbxhb37aH8YkkcfwTDcPcVjE/NpcjNLcfXmOIDeS9/Hc1QqM11LA7HkTydanFAiXG/mICSwLPMccXvE/RUtM77c8P46Hgcsc72rwHXdKLy1bUIq3g2SZklklXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432731; c=relaxed/simple;
-	bh=pbhED1WbvB9d+y73Nfhx61ssmrE6bWmVhm/9iC3ocu0=;
+	s=arc-20240116; t=1734432961; c=relaxed/simple;
+	bh=NS1IvYP+0vQDhKLZQWwGEG18/PVpO+pMPWRt8Qw7xiw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=azR+4jkiscrCEFFIgm1ZoG6BhwUaTjWFd01Bg5/QoK1OVpTHxclitJJQLfdK98zQQHCPZL49wosuUcZXMXXeIeWKyNcoe15Z6IGQ/vWtWHmxtxM4RwC/0vMO/AB5zl5p0bWBP7GJ/PhFVzJmF3X8NGf93B5Z0CRr2KRMdwGx4d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVOlyztk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=awLMqvCD1YoeoMldR6o58s8FwFws5dpaqi4IJ/l64Ep7/G1AaJ43HOPBXqLXYGfLFMTCJf072OHeCPSrXvBFsKb/XDpZ4inQJdK4WBMXR8bX5zrD3Upodzp9Wku+Vm31v0Hsn3sRJzB2yC6FPzVCSN7cmpee+/i+D8XpFsaeids=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRTYVhlp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVOlyztk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0698CC4CED3;
-	Tue, 17 Dec 2024 10:52:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRTYVhlp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C2B4C4CED3;
+	Tue, 17 Dec 2024 10:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734432731;
-	bh=pbhED1WbvB9d+y73Nfhx61ssmrE6bWmVhm/9iC3ocu0=;
+	s=k20201202; t=1734432960;
+	bh=NS1IvYP+0vQDhKLZQWwGEG18/PVpO+pMPWRt8Qw7xiw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XVOlyztkQvyaa+I6Xxgm1t/sm7HrLdvCK9q5B5+qKIfOFD70QPSOfuNecJnkyt2I2
-	 Q9RZIt/bdmjTUknNXb74KyBIbTBIyFv3tYN8GrNG62ifYSjq5orFhzWVzvQw+jLuzR
-	 tP9IwheTiZKs0Xj72EAb8kcIrZgfkEKZJJ1JoldTYY6dTsuriadr/ccbXMwbE0KLKo
-	 9Dw+eWYab34nAGaHkODlESVlo/7xSbUEMfOq661DbGJJP/0lMkQIqhy/LiTzsMY9Lo
-	 b/nggm7T11t954G1VK79a5Ewva+8KeMT83tibMH+sFxBCcXPV7drLDB8NrXgKp9jH7
-	 LEfiFBLhWJnbg==
+	b=WRTYVhlpsxFgoWDpX90PCgXIn+l8vtZtPdS25P4neZY3A3QAvn7TbdqjhL7yPdUH+
+	 qEdutgCjAH2qWQaSl2x9L3W2HVWMdMTz26X/yX7LIbqCCq2zI8aR/aay+lG6jKKPja
+	 ZM2Z+OxqLcQjQza4l9yykfMyR+xyIgWZj+1R9d3GNKUkS0lpRW0idd88Tz0y8HpJr4
+	 jc4bbjGxQIhKwZ0te8QV4HSl9Q4ITa0hjoCR8kmZPq9RiWjgRTGTU7B1xZypR6EvaJ
+	 LiwZI/tCO2B1xduU8uPdXAET5lTQrXwc7kRsW9brTgr69ZV9rLLimIx9WIW/x0pIN2
+	 7Djy4CrR4/jlA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tNVBQ-004WXi-OM;
-	Tue, 17 Dec 2024 10:52:08 +0000
-Date: Tue, 17 Dec 2024 10:52:08 +0000
-Message-ID: <861py6sht3.wl-maz@kernel.org>
+	id 1tNVF8-004Wc7-M9;
+	Tue, 17 Dec 2024 10:55:58 +0000
+Date: Tue, 17 Dec 2024 10:55:58 +0000
+Message-ID: <86zfkur329.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -48,10 +48,10 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 01/18] KVM: arm64: Change the layout of enum pkvm_page_state
-In-Reply-To: <20241216175803.2716565-2-qperret@google.com>
+Subject: Re: [PATCH v3 03/18] KVM: arm64: Make hyp_page::order a u8
+In-Reply-To: <20241216175803.2716565-4-qperret@google.com>
 References: <20241216175803.2716565-1-qperret@google.com>
-	<20241216175803.2716565-2-qperret@google.com>
+	<20241216175803.2716565-4-qperret@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,69 +67,32 @@ X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.co
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Dec 2024 17:57:46 +0000,
+On Mon, 16 Dec 2024 17:57:48 +0000,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> The 'concrete' (a.k.a non-meta) page states are currently encoded using
-> software bits in PTEs. For performance reasons, the abstract
-> pkvm_page_state enum uses the same bits to encode these states as that
-> makes conversions from and to PTEs easy.
-> 
-> In order to prepare the ground for moving the 'concrete' state storage
-> to the hyp vmemmap, re-arrange the enum to use bits 0 and 1 for this
-> purpose.
-> 
-> No functional changes intended.
+> We don't need 16 bits to store the hyp page order, and we'll need some
+> bits to store page ownership data soon, so let's reduce the order
+> member.
 > 
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
+>  arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  6 +++---
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h |  5 +++--
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 14 +++++++-------
+>  3 files changed, 13 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 0972faccc2af..8c30362af2b9 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -24,25 +24,27 @@
->   */
->  enum pkvm_page_state {
->  	PKVM_PAGE_OWNED			= 0ULL,
-> -	PKVM_PAGE_SHARED_OWNED		= KVM_PGTABLE_PROT_SW0,
-> -	PKVM_PAGE_SHARED_BORROWED	= KVM_PGTABLE_PROT_SW1,
-> -	__PKVM_PAGE_RESERVED		= KVM_PGTABLE_PROT_SW0 |
-> -					  KVM_PGTABLE_PROT_SW1,
-> +	PKVM_PAGE_SHARED_OWNED		= BIT(0),
-> +	PKVM_PAGE_SHARED_BORROWED	= BIT(1),
-> +	__PKVM_PAGE_RESERVED		= BIT(0) | BIT(1),
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> index 97c527ef53c2..f1725bad6331 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> @@ -7,7 +7,7 @@
+>  #include <nvhe/memory.h>
+>  #include <nvhe/spinlock.h>
 >  
->  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
-> -	PKVM_NOPAGE,
-> +	PKVM_NOPAGE			= BIT(2),
->  };
-> +#define PKVM_PAGE_META_STATES_MASK	(~(BIT(0) | BIT(1)))
+> -#define HYP_NO_ORDER	USHRT_MAX
+> +#define HYP_NO_ORDER	0xff
 
-Shouldn't that be ~__PKVM_PAGE_RESERVED, given that you just defined it?
-
->  
->  #define PKVM_PAGE_STATE_PROT_MASK	(KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
->  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
->  						 enum pkvm_page_state state)
->  {
-> -	return (prot & ~PKVM_PAGE_STATE_PROT_MASK) | state;
-> +	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
-> +	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
-> +	return prot;
->  }
->  
->  static inline enum pkvm_page_state pkvm_getstate(enum kvm_pgtable_prot prot)
->  {
-> -	return prot & PKVM_PAGE_STATE_PROT_MASK;
-> +	return FIELD_GET(PKVM_PAGE_STATE_PROT_MASK, prot);
->  }
->  
->  struct host_mmu {
-
-Thanks,
+nit: (u8)(~0)?
 
 	M.
 
