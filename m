@@ -1,102 +1,137 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FBA1DDC3F
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 10:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857F02E628;
+	Tue, 17 Dec 2024 10:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432068; cv=none; b=iEZpG4Ksm9N1B0pSaQ5S7R96RpeEqGFfBprvDKBd5rnVN2f+jue/TzUAy/SV2Zj6LzfVvxHVgH6fClmzw1JyeaZmebc2ZzCFaq/sVCd0zVOxPokqrtbUoiFOBWVeP2W+ZY2HyiyZfa+jFKganRMyoFKQq7J5fdH1Ta6EfKOHo4k=
+	t=1734432731; cv=none; b=KWJSjQi3Q3tTWhRqUpNub3gjlulE2iMv+5tO6jckDi/h6KxVt+SRO18dzaFUayuvJNxElLaBpqK2o7l1Z1liLlRm0p68tMHLXc27Jx5EphRE/+tJLfNQUraoSHqHW5zG9m7NB/M/nYnTKc/2Ph/GXdNBbssoJqb1lW//bkZ6f+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432068; c=relaxed/simple;
-	bh=aAycJgXnOkrXr7gy855/I4y532oL0myxx9xjae+yWvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNRj6NWjnnJDLtukRGnone9W3dUs59v7UtDlH+8ZRGfSFRcITdiiGj28FYG2T9lttPb7hqUOiKpEoufy2nWbsCEdB0fOcr90/0i3c333tyAxwlx2mQxzG0EzW3iTlSR7Gim9pFSPtN1lLuemgGGBLeHXYJ3rqgLnMydRKzj38Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 608111007;
-	Tue, 17 Dec 2024 02:41:33 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FD993F528;
-	Tue, 17 Dec 2024 02:41:03 -0800 (PST)
-Date: Tue, 17 Dec 2024 10:40:58 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com,
-	maz@kernel.org, oliver.upton@linux.dev,
-	shameerali.kolothum.thodi@huawei.com, vt@altlinux.org,
+	s=arc-20240116; t=1734432731; c=relaxed/simple;
+	bh=pbhED1WbvB9d+y73Nfhx61ssmrE6bWmVhm/9iC3ocu0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=azR+4jkiscrCEFFIgm1ZoG6BhwUaTjWFd01Bg5/QoK1OVpTHxclitJJQLfdK98zQQHCPZL49wosuUcZXMXXeIeWKyNcoe15Z6IGQ/vWtWHmxtxM4RwC/0vMO/AB5zl5p0bWBP7GJ/PhFVzJmF3X8NGf93B5Z0CRr2KRMdwGx4d0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVOlyztk; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVOlyztk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0698CC4CED3;
+	Tue, 17 Dec 2024 10:52:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734432731;
+	bh=pbhED1WbvB9d+y73Nfhx61ssmrE6bWmVhm/9iC3ocu0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XVOlyztkQvyaa+I6Xxgm1t/sm7HrLdvCK9q5B5+qKIfOFD70QPSOfuNecJnkyt2I2
+	 Q9RZIt/bdmjTUknNXb74KyBIbTBIyFv3tYN8GrNG62ifYSjq5orFhzWVzvQw+jLuzR
+	 tP9IwheTiZKs0Xj72EAb8kcIrZgfkEKZJJ1JoldTYY6dTsuriadr/ccbXMwbE0KLKo
+	 9Dw+eWYab34nAGaHkODlESVlo/7xSbUEMfOq661DbGJJP/0lMkQIqhy/LiTzsMY9Lo
+	 b/nggm7T11t954G1VK79a5Ewva+8KeMT83tibMH+sFxBCcXPV7drLDB8NrXgKp9jH7
+	 LEfiFBLhWJnbg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tNVBQ-004WXi-OM;
+	Tue, 17 Dec 2024 10:52:08 +0000
+Date: Tue, 17 Dec 2024 10:52:08 +0000
+Message-ID: <861py6sht3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default
- and ignore VMM writes
-Message-ID: <20241217104058.GA2151333@e124191.cambridge.arm.com>
-References: <20241212151406.1436382-1-joey.gouly@arm.com>
- <2024121528-refurbish-plausibly-31c7@gregkh>
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 01/18] KVM: arm64: Change the layout of enum pkvm_page_state
+In-Reply-To: <20241216175803.2716565-2-qperret@google.com>
+References: <20241216175803.2716565-1-qperret@google.com>
+	<20241216175803.2716565-2-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2024121528-refurbish-plausibly-31c7@gregkh>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, vdonnefort@google.com, sebastianene@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Dec 15, 2024 at 10:22:53AM +0100, Greg KH wrote:
-> On Thu, Dec 12, 2024 at 03:14:06PM +0000, Joey Gouly wrote:
-> > From: James Morse <james.morse@arm.com>
-> > 
-> > commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
-> > 
-> > commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
-> > ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
-> > but didn't add trap handling. A previous patch supplied the missing trap
-> > handling.
-> > 
-> > Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
-> > be migratable, but there is little point enabling the MPAM CPU
-> > interface on new VMs until there is something a guest can do with it.
-> > 
-> > Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
-> > that supports MPAM, politely ignore the VMMs attempts to set this bit.
-> > 
-> > Guests exposed to this bug have the sanitised value of the MPAM field,
-> > so only the correct value needs to be ignored. This means the field
-> > can continue to be used to block migration to incompatible hardware
-> > (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
-> > being ignored.
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Co-developed-by: Joey Gouly <joey.gouly@arm.com>
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: stable@vger.kernel.org # 6.6.x
-> > Cc: Vitaly Chikunov <vt@altlinux.org>
-> > Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
-> > ---
-> > 
-> > This fixes an issue seen when using KVM with a 6.6 host kernel, and
-> > newer (6.13+) kernels in the guest.
-> > 
-> > Tested with a stripped down version of set_id_regs from the original
-> > patch series.
+On Mon, 16 Dec 2024 17:57:46 +0000,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> What about 6.12.y?  You can't just skip a stable tree, otherwise you
-> will get a regression when you upgrade to 6.12.y, right?
+> The 'concrete' (a.k.a non-meta) page states are currently encoded using
+> software bits in PTEs. For performance reasons, the abstract
+> pkvm_page_state enum uses the same bits to encode these states as that
+> makes conversions from and to PTEs easy.
+> 
+> In order to prepare the ground for moving the 'concrete' state storage
+> to the hyp vmemmap, re-arrange the enum to use bits 0 and 1 for this
+> purpose.
+> 
+> No functional changes intended.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 0972faccc2af..8c30362af2b9 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -24,25 +24,27 @@
+>   */
+>  enum pkvm_page_state {
+>  	PKVM_PAGE_OWNED			= 0ULL,
+> -	PKVM_PAGE_SHARED_OWNED		= KVM_PGTABLE_PROT_SW0,
+> -	PKVM_PAGE_SHARED_BORROWED	= KVM_PGTABLE_PROT_SW1,
+> -	__PKVM_PAGE_RESERVED		= KVM_PGTABLE_PROT_SW0 |
+> -					  KVM_PGTABLE_PROT_SW1,
+> +	PKVM_PAGE_SHARED_OWNED		= BIT(0),
+> +	PKVM_PAGE_SHARED_BORROWED	= BIT(1),
+> +	__PKVM_PAGE_RESERVED		= BIT(0) | BIT(1),
+>  
+>  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
+> -	PKVM_NOPAGE,
+> +	PKVM_NOPAGE			= BIT(2),
+>  };
+> +#define PKVM_PAGE_META_STATES_MASK	(~(BIT(0) | BIT(1)))
 
-I did have it ported/tested locally, but I wasn't sure of the stable process,
-so just sent out one!  Next time I will send all the backports at the same
-time.
+Shouldn't that be ~__PKVM_PAGE_RESERVED, given that you just defined it?
 
-Thanks Marc Z for sending it out!
+>  
+>  #define PKVM_PAGE_STATE_PROT_MASK	(KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
+>  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+>  						 enum pkvm_page_state state)
+>  {
+> -	return (prot & ~PKVM_PAGE_STATE_PROT_MASK) | state;
+> +	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
+> +	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
+> +	return prot;
+>  }
+>  
+>  static inline enum pkvm_page_state pkvm_getstate(enum kvm_pgtable_prot prot)
+>  {
+> -	return prot & PKVM_PAGE_STATE_PROT_MASK;
+> +	return FIELD_GET(PKVM_PAGE_STATE_PROT_MASK, prot);
+>  }
+>  
+>  struct host_mmu {
 
-Joey
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
