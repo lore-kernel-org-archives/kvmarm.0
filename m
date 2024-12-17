@@ -1,100 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091A21FA8FB;
-	Tue, 17 Dec 2024 15:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C7C1494A9
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 17:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734450961; cv=none; b=nFi/1+307g+zLhnG1uv/P4G/+kbqJRhfmtOhthJwWW9dvOLi46769bzmqW/CCQV6/18KCfkwJcLF4mxBpfdgW9HHtXNNMQDgBSr6J6hkrxFkBmL7VGTo74U+9Yqt1SDwdk+mrMCFEAc7zliwZGgKRopT6yKBONkJtjY4aLjeyFg=
+	t=1734454989; cv=none; b=aqYMh1qFps2s9tSPqEB8h5/17DVB32XaQew/gfgyPECgSTIaEal8cvs8AUw0f/iiXmtRIjVAHVLxoY58HzWoeeUteR3cRUnXt+zUNJb766xRoRHFIR5awKUY6H7lzBgXS6IJJclmvKMTZlzRnQ2LdE0UrglVLozZMAHkB9wqFho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734450961; c=relaxed/simple;
-	bh=pSqIvGUdX5z1ZDvXSMhgi6s8eapLJ2Q23yPsaZtnyLg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j/p7FXqNDSYY01o6xeStCoBMm5d/psYChGLr1yQbYuiE9AMrhk+5kr3aIPBMKxI+TQuxRMT+LW27FMzMVb99mRvRZ/LYJPLNm00gx5mVm6c6BA3ZkBYFvUz1kBVlf+A15eoBc7IlUZ/EbdbG5VRxO6j5TwG1O88KrXiCUbWxkew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9NN28U+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734454989; c=relaxed/simple;
+	bh=y4rvd2i45ul2OIU5/nJesQGlmoS4ZWQ/I/mmlz+Q+ow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VWE5qqRqyyvGNZi/AEXBtHiE9g6CmNL6RfvpmMQuvO+r5YewWrNo5mlJ/WfG7zj4NyXEA6j7Zj+kxUVAhL41j/e6VBeMOPZMlviBQ60hFEZMJs9tVlLXFt7RLysKcd0Nq+Qrg+MyFXp/+GB6fePaLI5gIvb5e9ZMcAx536CuPFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i3A/LYSq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9NN28U+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F3FC4CED6;
-	Tue, 17 Dec 2024 15:56:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3A/LYSq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30787C4CEE0
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 17:03:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734450960;
-	bh=pSqIvGUdX5z1ZDvXSMhgi6s8eapLJ2Q23yPsaZtnyLg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L9NN28U+JGrpcx/66+ZeOSHqeE5mltmLAXtDfsyUVLMgujnJaPgOXjpeBBZzyWegm
-	 4/YJfQgDBcVPsa9H2WCm7nAwVJREzYYrFAeFwM6ikVbDDaNb4TPPrj5SSktawWRqog
-	 8MET55XR+pb5FyIpMszmUPrwj30RT8RNaUqR0qaGLioxAriRg5DNh59XL3nw8KJtpt
-	 11RhM4FjCGzUco4J9T42f3Th7kK/i8oJppgL9TcZsnpPWXvn6R8eQ+CqiMwatrS1EZ
-	 ERxoq6hpdlPQ0fen7uh2F5IHIUV5vhkNNyOkNO0Pcl4fQFSbzZ5qwM3QA9yoUnGSAY
-	 udLrLtIhRiGqA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tNZvS-004cWL-OM;
-	Tue, 17 Dec 2024 15:55:58 +0000
-Date: Tue, 17 Dec 2024 15:55:57 +0000
-Message-ID: <86o71aqp6a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
-In-Reply-To: <b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
-References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
-	<875xnisocy.wl-maz@kernel.org>
-	<53b40aa8-f51c-4c4e-a4ad-e6a9512e5197@sirena.org.uk>
-	<86v7viqusg.wl-maz@kernel.org>
-	<b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1734454989;
+	bh=y4rvd2i45ul2OIU5/nJesQGlmoS4ZWQ/I/mmlz+Q+ow=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=i3A/LYSqFumD5PYmmp1gUpj+0qB+2xkRxXi2l7E/ripxz9fZlHVcmj9lsU0HxzRn+
+	 QIMV4RbqDd6Tu3z16J+OVDrfXm3Uxmh17biZLf/xWBqmE6dMMTgkuO8uIY14maKNEh
+	 SezSLO9l7KNVKfJZ+bxBU+u34gVl1pwJb0vdDevX/hCV4MzgzXRLYIzT7a9LERiyvo
+	 YBImUV+TW740F6GnGi1LQQqLkDEGSN2BdjOR89EhfsxhX/aOlCpYjmsFN54iRL52Rp
+	 RwuVUqtXEhMrph6yYSdO7cUrB3H1BNp9VcVu9068jW3oEMa5F2eBR0DLQQtuzZPeG9
+	 FWAiFeBIcdnZg==
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e3983426f80so3590708276.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 09:03:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUNTEBKl9lXkM0LVCK9AMsI1brL9Q5WcnQcm1X/CRtXInEzb09ryROt6+ip6RvBNHLzcixbHEo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxc5aIq/UMd0QlKUb2ciS95YMWqenHjxHvCP1pajf5btIUarlGL
+	5gojJlv4eSYyUvP3WislWdvKeRASgadxv8MMczFmtoRl8KlnUFKAKmTQY1Xqfai9Bfq20ukMxjZ
+	BruOeuV1Nen3zQq3eQOW3epbs6w==
+X-Google-Smtp-Source: AGHT+IGKvG8I/im/k/IPybn045bPPxXVEzIGxeaZoFQYWf7CnT275gjzpCkuXW1FxOqOUlHA0uA3p6+cPeXvMyJJp6Q=
+X-Received: by 2002:a05:6902:2681:b0:e4b:b2bd:5fa0 with SMTP id
+ 3f1490d57ef6-e53606627d2mr320097276.20.1734454988345; Tue, 17 Dec 2024
+ 09:03:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20241210055311.780688-1-anshuman.khandual@arm.com>
+ <20241210055311.780688-19-anshuman.khandual@arm.com> <20241216231505.GA601635-robh@kernel.org>
+ <a442bca4-d1c0-4f3e-ae13-4836caec2da9@sirena.org.uk>
+In-Reply-To: <a442bca4-d1c0-4f3e-ae13-4836caec2da9@sirena.org.uk>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 17 Dec 2024 11:02:57 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+45YNGNEcDVFvKH3Tiwtz0HF9_O4tPfQH0dbXra2bcRQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+45YNGNEcDVFvKH3Tiwtz0HF9_O4tPfQH0dbXra2bcRQ@mail.gmail.com>
+Subject: Re: [PATCH V2 18/46] arm64/sysreg: Add register fields for PMUACR_EL1
+To: Mark Brown <broonie@kernel.org>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, 
+	ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 17 Dec 2024 15:10:28 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Tue, Dec 17, 2024 at 01:54:39PM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > The selftests are shipped as part of the kernel source and frequently
-> > > used for testing the kernel, it's all one source base and we want to
-> > > ensure that for example the test fix gets backported if the relevant
-> > > kernel patch does.
-> 
-> > That's not what Fixes: describes. If you want to invent a new tag that
-> > expresses a dependency, do that. Don't use these tags to misrepresent
-> > what the patches does.
-> 
-> No, this isn't a new use - a Fixes: tag indicates that the referenced
-> commit introduced the problem being fixed and that is exactly what's
-> going on here.  Like I say the selftests are not a completely separate
-> project, they are a part of the same source release as the rest of the
-> kernel and it is helpful to track information like this.
+On Tue, Dec 17, 2024 at 9:30=E2=80=AFAM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> On Mon, Dec 16, 2024 at 05:15:05PM -0600, Rob Herring wrote:
+> > On Tue, Dec 10, 2024 at 11:22:43AM +0530, Anshuman Khandual wrote:
+>
+> > > +Sysreg     PMUACR_EL1      3       0       9       14      4
+>
+> > I already added this and various other PMUv3.9 registers you've added
+> > here in v6.12 and v6.13. So are you on an old base or the tool allows
+> > multiple definitions? If the latter, that should be fixed.
+>
+> The tool is written in awk and hence *really* dumb so it's not going to
+> notice this, and so long as the resulting definitions are identical the
+> compiler won't either.  It would indeed be nice if the tooling were able
+> to detect this.
 
-Well, we'll have to agree to disagree.
+Something like this should work:
 
-	M.
+git grep -h '^Sysreg\s' arch/arm64/tools/sysreg | tr -s ' \t' ' ' |
+sort | uniq -c | sort -n | grep -E '^\s+([2-9]|1[0-9])'
 
--- 
-Without deviation from the norm, progress is not possible.
+No duplicates currently.
+
+Rob
