@@ -1,122 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5132342AA1;
-	Tue, 17 Dec 2024 08:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B7642AA1
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 08:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734424242; cv=none; b=RH1VoDeGzHk13AXVEOsiOUT8zl7Qht+k9CuZlDgH13MrSSLXibbOWJ7RkrFM/3YvHqAe+cY1BAjbJz8AGBBzI1sq6pAk0wD/AWHJYTob4I2m6hEAt5j17AJ1z4GIk45Mf5DyHHVqBJPyWGfgWsLk5vUC1r6RVbdb7jRZgpANYtU=
+	t=1734425025; cv=none; b=OvzyZzvMsQFyhu/DlvGBqajivSNEeZ3QRTi8Jczl2UeZBZ4Eql9uhHjmBBfLCblIRktHanQCOCcSKiZ5GzveLSgh+GbzAuFCCSoBIN7MMDsAQl3XONHzQOct2ygeM89W0yQYgc+CqWXX4bTfRnVvh3ROKoIzIOYIWC1+h0Tz57s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734424242; c=relaxed/simple;
-	bh=sJTelRh5BsOfm4lONdvvjAu3mDOe48NrRuTOIBtnAMI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K+HAseZuvJUF0HZxal4awqmQ16CGFCO9sKdOxr2ML6PzDoH6Gb48NK5xtpxnlOwnLcteW59dMJdypW1/CANg5H23c3OizQoP1gHityStU221d/9Jb2mTDT+QsjIINZhIvMIH02eT3GJTQBu9+Y9G33+rqGpyWLvu278k8GfxM1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l71SWLKk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734425025; c=relaxed/simple;
+	bh=Dh0Ctz2vowSmtTs36YbhCWvch6CdaR0SnXYuH2Kk708=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UHPQZblalQd/agKjC8LO66esFg/RwBzvTO86EDWW3ZbffFB0hlR2zINaI0cq2yTFXBcHzNTyhE42qRTlrXnZNm+FiU/Qoqm13GcGAq80ZET5ZJTWTDYYS6yw8v1TOzeEi3hZTqPP27+dNwB5PmINCZCvztwuimZPduKSnDyE4Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qLAyW/nH; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l71SWLKk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4114C4CED3;
-	Tue, 17 Dec 2024 08:30:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734424241;
-	bh=sJTelRh5BsOfm4lONdvvjAu3mDOe48NrRuTOIBtnAMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l71SWLKkp5Nr6M3mGg7Pnz7kNu8F11xrwYQn0V5no43bAVGRUefq9YI++b48YR2iF
-	 XLzjqUZM8Kxrli6aeQOs/nhmsuSFeNGB58flYwT/Osicp7ooEbd8k/maROtfilItWx
-	 95hl/39ExSBwDRDk4bJtjMT+Nbyye7DCJ6/WPw2lkagcGYv4pi58fdXz5JhxWL9ESo
-	 53w70EyCfe9PH5Z07DepXeIuhq7+cIVJYuMQ5oEEGF242D6/uau1OwGXGUfVnf37WB
-	 drfRHAwCnDGcxlCO89pXxOsWD7CExbpQTB5CIAN+tPV64VgIdYVKDufjF/4KaiRUPP
-	 dE4KMrklV1DIQ==
-Received: from [82.132.185.145] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tNSyV-004TdD-Hg;
-	Tue, 17 Dec 2024 08:30:39 +0000
-Date: Tue, 17 Dec 2024 08:30:37 +0000
-Message-ID: <875xnisocy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
-In-Reply-To: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
-References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qLAyW/nH"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43622893c3cso26335e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 00:43:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734425022; x=1735029822; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=d00JPz9uD5IVTXLbqjCoJE43ltdbYjCzx2p8kqI3aJM=;
+        b=qLAyW/nHn2cDIt1lG1qSU3aoo1igBjnjMM4diEwREqqMwX4zxLdoUI5oEF5jal0K7O
+         8GJf4/cN0aNhfZzaPmBR2lzEzoKeX9ugS2PTxyuD1/eyo997OePnpx6hsPODGh4XY5uE
+         0HJkEUUhSsiudo925shQJe2Mft8euPbVo1QDJCG0ed+/IYHRUAJwXGgYorNKqr+rqSah
+         9wFoLcBBYPUPW9FiYWvC2frK5SpFKIGxpIyGKO5bfaX7PV9IoxY6X6Qw9Sp2qaSfWuK+
+         qOg80cW4onx/AC+gLKsog/WSZHEv09yWmneIBWgcFVNbvbGkvsqJLj3098khquxGMfnK
+         7T5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734425022; x=1735029822;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d00JPz9uD5IVTXLbqjCoJE43ltdbYjCzx2p8kqI3aJM=;
+        b=jsOFK76xnrmBgVnB5jBo5eUn+SO48rV1w56ewqY4nrMB/9iPJgFZlfJ3Hsuhh0ikRE
+         uqdrLqmW1FrCgvKIa1pm4l+Iax85Tudc3lqHQxu9vgltZq0J38NyIa84mhnaRAiPrwl/
+         H+4pZtC6/yjgA/KTa11j/HInVsEHlEKYj6/dw+FEwqaRrx/B9h1AhMaVMK9LT9PW/zk8
+         VTvXYJA1xszoWlxtNrj2phRnE2dgw/8mcdX/pozICJ9rLu5fhSdbgjRSbx9Wqjpp1KY5
+         iFscuZqBoCSOuWVOjTNSYAMNYkmcS+DLz+5avcjtzjE3DywuzWkbDQoQtmgb+/qMCHl0
+         fS4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW01KUZ9VhRIe9b9Qd2IOw9PPbcKuv0n8/ln1F8lz+7IXJeOHxBryXV8M+k/suwAiVJCiNjx5I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywm442Uj/oTBiCBeCAmgh1koSB6iyN8XKGRofzYV1Z5GDHa2mo9
+	kTs+i+YHPE+u2jNgFWreKIBzG6ussCr9E8Onw1+0T3i74EHkE3cjzwTe58Ms93eJq4CpvSzAq/l
+	oJRivp1dLZVrsdAGLezq+w1uxNBYkSyqEiB1U
+X-Gm-Gg: ASbGncsqReJ9zpw8tKG3llaH7bkI2WKfaspY+9v8vjIVFVNYb06vq5PHf4kBbmfOgm1
+	T9LXr/DSMiyo3xFYz6Yu5lbLqwjHwLeHQ6xBrpF4rGC5hRmyCoUIQvo/Yb9Oipyu4LFc=
+X-Google-Smtp-Source: AGHT+IEsm2ztvlxRIl5e4zdw11F91muRBnmV6gL9hKtcRS9F1Dhy25XfzClb2ijrhja7+oQZG9pObyx3mcUaDBXuJjA=
+X-Received: by 2002:a05:600c:5690:b0:434:9e1d:44ef with SMTP id
+ 5b1f17b1804b1-4364ad4d797mr740325e9.7.1734425022162; Tue, 17 Dec 2024
+ 00:43:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.185.145
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20241216175803.2716565-1-qperret@google.com> <20241216175803.2716565-2-qperret@google.com>
+In-Reply-To: <20241216175803.2716565-2-qperret@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 17 Dec 2024 08:43:05 +0000
+Message-ID: <CA+EHjTzYA5tFSR8YUfuEGzPjDYnp1a+T=K6AfwjGUVmxcQudjA@mail.gmail.com>
+Subject: Re: [PATCH v3 01/18] KVM: arm64: Change the layout of enum pkvm_page_state
+To: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Vincent Donnefort <vdonnefort@google.com>, 
+	Sebastian Ene <sebastianene@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 16 Dec 2024 19:28:24 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> In commit 03c7527e97f7 ("KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits
-> to be overridden") we made that bitfield in the ID registers unwritable
-> however the change neglected to make the corresponding update to set_id_regs
-> resulting in it failing:
-> 
-> # ok 56 ID_AA64MMFR0_EL1_BIGEND
-> # ==== Test Assertion Failure ====
-> #   aarch64/set_id_regs.c:434: masks[idx] & ftr_bits[j].mask == ftr_bits[j].mask
-> #   pid=5566 tid=5566 errno=22 - Invalid argument
-> #      1	0x00000000004034a7: test_vm_ftr_id_regs at set_id_regs.c:434
-> #      2	0x0000000000401b53: main at set_id_regs.c:684
-> #      3	0x0000ffff8e6b7543: ?? ??:0
-> #      4	0x0000ffff8e6b7617: ?? ??:0
-> #      5	0x0000000000401e6f: _start at ??:?
-> #   0 != 0xf0 (masks[idx] & ftr_bits[j].mask != ftr_bits[j].mask)
-> not ok 8 selftests: kvm: set_id_regs # exit=254
-> 
-> Remove ID_AA64MMFR1_EL1.ASIDBITS from the set of bitfields we test for
-> writeability.
-> 
-> Fixes: 03c7527e97f7 ("KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be overridden")
+On Mon, 16 Dec 2024 at 17:58, Quentin Perret <qperret@google.com> wrote:
+>
+> The 'concrete' (a.k.a non-meta) page states are currently encoded using
+> software bits in PTEs. For performance reasons, the abstract
+> pkvm_page_state enum uses the same bits to encode these states as that
+> makes conversions from and to PTEs easy.
+>
+> In order to prepare the ground for moving the 'concrete' state storage
+> to the hyp vmemmap, re-arrange the enum to use bits 0 and 1 for this
+> purpose.
+>
+> No functional changes intended.
+>
+> Signed-off-by: Quentin Perret <qperret@google.com>
 
-A patch for a test doesn't fix anything in the kernel.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Cheers,
+/fuad
+
 > ---
->  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> index a79b7f18452d2ec336ae623b8aa5c9cf329b6b4e..3a97c160b5fec990aaf8dfaf100a907b913f057c 100644
-> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> @@ -152,7 +152,6 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGENDEL0, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, SNSMEM, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGEND, 0),
-> -	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ASIDBITS, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, PARANGE, 0),
->  	REG_FTR_END,
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 0972faccc2af..8c30362af2b9 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -24,25 +24,27 @@
+>   */
+>  enum pkvm_page_state {
+>         PKVM_PAGE_OWNED                 = 0ULL,
+> -       PKVM_PAGE_SHARED_OWNED          = KVM_PGTABLE_PROT_SW0,
+> -       PKVM_PAGE_SHARED_BORROWED       = KVM_PGTABLE_PROT_SW1,
+> -       __PKVM_PAGE_RESERVED            = KVM_PGTABLE_PROT_SW0 |
+> -                                         KVM_PGTABLE_PROT_SW1,
+> +       PKVM_PAGE_SHARED_OWNED          = BIT(0),
+> +       PKVM_PAGE_SHARED_BORROWED       = BIT(1),
+> +       __PKVM_PAGE_RESERVED            = BIT(0) | BIT(1),
+>
+>         /* Meta-states which aren't encoded directly in the PTE's SW bits */
+> -       PKVM_NOPAGE,
+> +       PKVM_NOPAGE                     = BIT(2),
 >  };
-> 
-
-With the Fixes: line dropped,
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> +#define PKVM_PAGE_META_STATES_MASK     (~(BIT(0) | BIT(1)))
+>
+>  #define PKVM_PAGE_STATE_PROT_MASK      (KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
+>  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+>                                                  enum pkvm_page_state state)
+>  {
+> -       return (prot & ~PKVM_PAGE_STATE_PROT_MASK) | state;
+> +       prot &= ~PKVM_PAGE_STATE_PROT_MASK;
+> +       prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
+> +       return prot;
+>  }
+>
+>  static inline enum pkvm_page_state pkvm_getstate(enum kvm_pgtable_prot prot)
+>  {
+> -       return prot & PKVM_PAGE_STATE_PROT_MASK;
+> +       return FIELD_GET(PKVM_PAGE_STATE_PROT_MASK, prot);
+>  }
+>
+>  struct host_mmu {
+> --
+> 2.47.1.613.gc27f4b7a9f-goog
+>
