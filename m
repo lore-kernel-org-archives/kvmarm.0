@@ -1,93 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5781F6695
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 15:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D7DEAC6;
+	Tue, 17 Dec 2024 15:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734448881; cv=none; b=rmL+/aA+FZ7U5WcfrSc6PsGgDqDvRzZxV9Ute1CEJzGhUL5BPKB7DAaFMIhs+ll5zuk4N4bRE48lqXxQRWb2Y/06bQn3R8/aZzO++mT+WQbjX43sKFh4eNgUL9qdPCq7UBVZAHiLgDFS9eesZecUHLeVlTWw0RwtRLbJ/xMeRtQ=
+	t=1734449452; cv=none; b=YKfG69zgjFn4hqnBNlC8koN3ESIK6oAR7iXva2vO0xKEekWUMpOzWWz9e6Sqg/LIwscS8ZnHXYpKxi6Ob8QLzUUcw8lFRZ+zsoOyQktyi2+zeTOgcDBzKRfyNVN9G3tMemgoCWSnic4A5MUNtDKnMbhBRGZO76m0NV6x3vhOPGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734448881; c=relaxed/simple;
-	bh=dK879g794qcUQiGAgdNVuQBSKvfyXP7Cb2+vlps/UdM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N4ExcjsweT4hWMX0VG6pvx2/cvG8iGVChAuUouQ702uCn6a2Tbb9GA5TXf5a5LlQ7J1tAGmWVKAbx+VSSOit4T5SMvQNDDWnt/b+ydb9MBlHXlgbwGusrSyj4m3ODMiyscTNgn6YPFj62Fh64G9+MWvNSV7ldlVFb82IY5zLFSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ks4qRnM1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734449452; c=relaxed/simple;
+	bh=CIAcHeU4KM0O0CufWD9C+h0Wc+x23DDtuyagNJApBrQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3PsBRdk03Aul9UBkSTjJv1RiQceS/mXsm5sGf04h39e/TIb3V5dpB7kEz9JgNk0jeJgICVoQCHxLZBqCMcLD5UIWkScIjji4Hur+VtlzxgTkuyTtg/yezHk/BRzlONJhQ0L0XBbNrThLJZ+ClckAUy5Kt5I7BWOZzM5WkJqr2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHdjj97s; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ks4qRnM1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8116C4CED3;
-	Tue, 17 Dec 2024 15:21:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHdjj97s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 116FAC4CED3;
+	Tue, 17 Dec 2024 15:30:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734448880;
-	bh=dK879g794qcUQiGAgdNVuQBSKvfyXP7Cb2+vlps/UdM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ks4qRnM1VWBZ826cl6ud0LvujlH1rhUFb5oKLHh23WXwfM9W2R1BxYpGRUz/gUWPf
-	 WaOPoCao0yC6vHs8k52a9MxwDXezc5aMrwXm31tizLJ33Vd+/c9FmknPjITbj4wCL5
-	 h76X3y92fMtaRN29NBQR/VrpQI6e7EbYEAzKfwPgIJFLe2j6TElSXzSEuRVDIAOyc6
-	 1rzkyAHVqOxB8+SDfwd2y2Reo+2w+0Amw8WP2zbCjzBlNwdsvfPkUqGIOEdwCGV0m3
-	 E+tMsEcK3EVDQcN1Ql+Fn6K/p0z/DfXJ14C5FYXRhebIP5FvptLddhTY1NvNdCu55n
-	 PZsbH6l5Vb23w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tNZNu-004bpm-PV;
-	Tue, 17 Dec 2024 15:21:18 +0000
-Date: Tue, 17 Dec 2024 15:21:18 +0000
-Message-ID: <86r066qqs1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
-	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com,
-	shahuang@redhat.com,
-	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
-In-Reply-To: <20241206112213.88394-1-cohuck@redhat.com>
-References: <20241206112213.88394-1-cohuck@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1734449452;
+	bh=CIAcHeU4KM0O0CufWD9C+h0Wc+x23DDtuyagNJApBrQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fHdjj97sxjzlNB3JK2Jpom62ElP+sskc6RpMxqUzFdy1MJIU8pdwrzCKmlqTxphtu
+	 wZZYcZTr+b2roHFxNbQJ4PO3P+qWN+wcxgmSlFv/7fCBKCCISumweHZYvtzfy56fcv
+	 TlGM1WzXWB06WMZiqF6m+tDkA3B0QiN3mKueXZniKxvmIwVpupZMhQYe8L5hWnKxZr
+	 KmnzAza4mhqx0NKquNEaPmQn9KW3m95hs8MnGP07ejynBmVLG+x3BwsxU4zeI3Vn6+
+	 wT8rtjDt+H8xxJ4u63aivg44oL2q52v7ek98DnJJynhJrcBpiozTK2AGttBDSM8Zc/
+	 XtEFj9XkVyyBg==
+Date: Tue, 17 Dec 2024 15:30:46 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH V2 18/46] arm64/sysreg: Add register fields for PMUACR_EL1
+Message-ID: <a442bca4-d1c0-4f3e-ae13-4836caec2da9@sirena.org.uk>
+References: <20241210055311.780688-1-anshuman.khandual@arm.com>
+ <20241210055311.780688-19-anshuman.khandual@arm.com>
+ <20241216231505.GA601635-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dR49XDTrrQMzBub5"
+Content-Disposition: inline
+In-Reply-To: <20241216231505.GA601635-robh@kernel.org>
+X-Cookie: The sum of the Universe is zero.
 
-On Fri, 06 Dec 2024 11:21:53 +0000,
-Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> A respin/update on the aarch64 KVM cpu models. Also available at
-> gitlab.com/cohuck/qemu arm-cpu-model-rfcv2
-> 
-> Find Eric's original cover letter below, so that I do not need to
-> repeat myself on the aspects that have not changed since RFCv1 :)
 
-Does anyone have a branch containing both this series and Eric's KVM
-NV support series?
+--dR49XDTrrQMzBub5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Asking for a friend...
+On Mon, Dec 16, 2024 at 05:15:05PM -0600, Rob Herring wrote:
+> On Tue, Dec 10, 2024 at 11:22:43AM +0530, Anshuman Khandual wrote:
 
-	M.
+> > +Sysreg	PMUACR_EL1	3	0	9	14	4
 
--- 
-Without deviation from the norm, progress is not possible.
+> I already added this and various other PMUv3.9 registers you've added=20
+> here in v6.12 and v6.13. So are you on an old base or the tool allows=20
+> multiple definitions? If the latter, that should be fixed.
+
+The tool is written in awk and hence *really* dumb so it's not going to
+notice this, and so long as the resulting definitions are identical the
+compiler won't either.  It would indeed be nice if the tooling were able
+to detect this.
+
+--dR49XDTrrQMzBub5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdhmSUACgkQJNaLcl1U
+h9C1zwf/eDf1On3DPPEQMj1fRbUgVwTEP7S7Jc5mAoMoX8wBFrshSjIwgW9wg3B+
+DS6A3ns+eySSevDhGpLNhRhuWchooLog1sTGI5O97W/nRI58uuoWyks9j3+AEVwz
+ML8wD+D6C8gXRdid6N7Nd2zhiOFHa7A2L2KxDr0lxR3IrODIZKpgm3RhUo5v6jdy
+OqLG2rOjBZVdK0wTiJyUwvYLMeNxu1Hc0d7qRfwHcLIVvUj5OlSxvZ3/YeYE0i8W
++0E8PlHFs7iRqOJ+vBpH8Ksp7SWkmwFNrT9yW/Qis8dJe3RwPmVLOXf6+prZNh9l
+DRTSdF21zIoBq2h5t3q+3oCUyUgWPw==
+=Opzu
+-----END PGP SIGNATURE-----
+
+--dR49XDTrrQMzBub5--
