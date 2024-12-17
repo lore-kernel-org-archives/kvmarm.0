@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E941F3D35;
-	Tue, 17 Dec 2024 14:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAE21DFE00;
+	Tue, 17 Dec 2024 14:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734444221; cv=none; b=pWcs90YPtaFO8+u5RH8jAVsce2uYXaIS+30xqZPIl98iOtcNNn/eUBAJ+b5QjJ0kg2b+gUW2hGg1a0A2ARFi18Zq3LxmP3AW5Yzw8UWZ+jDbA6xlp+dkLcLfxm80pzmchx1lcxVN5ApeB0BggkqCsVyToT0dyj7O5VKOShyTD1M=
+	t=1734444378; cv=none; b=JHQgtwvtIe2EKh3mI2imCCz+NfCWoCedi/73BE2isafulM7Fg0R2smRmyNWkrMUwOdvfC69wgK8QuAyNjP9EYJ7bxUWrJgTxfa7mAN0S4eLx5WHYbtvNsbeWmIRVmADk9NcYvgw96pKBCaqDErTkn2wEukKi41obI8vNrgMpNos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734444221; c=relaxed/simple;
-	bh=v6Mx8Qstrdyl1WmK0KU5FBzKXLvdhh9L0FdXGaiTGUk=;
+	s=arc-20240116; t=1734444378; c=relaxed/simple;
+	bh=sRYFkVqoQ7WVWtIBYz2OuAjeAt/6gkjTXYc/NTa8jnk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sW5YWTf6x95ILM0O4bLLw5M/K/09k1KilPQ6nyBtZY3mak7+y8xed1ZsMq+q62+Hnlyfmv2uZayWGDDx0194/1g4FKm5iMGmAgQV2k6LrUeMeMpdCB2RxKU7SDLJd2CEcW4zS3/3YEZHqq77UQHh58iPYlOJVf2nFuSQ1bt6REs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kccIWUkl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=QVB5I4TqdNiO81HwPO3XS+6DysoESbgIx4y+TfIYuCebbZOtvxbuzGASQZr+X8aBy9nGnqWPSd1rfwhLrFcj4APGDGtmobqcqBfNZzucBwW4c7QNjel3sONwI0GKLmzc0Ad+Lti25PKu0KSnIu9aU8HSicOAleQ7D8Jq140aMB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prbcWabO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kccIWUkl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77033C4CED3;
-	Tue, 17 Dec 2024 14:03:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prbcWabO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A3EC4CED4;
+	Tue, 17 Dec 2024 14:06:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734444220;
-	bh=v6Mx8Qstrdyl1WmK0KU5FBzKXLvdhh9L0FdXGaiTGUk=;
+	s=k20201202; t=1734444377;
+	bh=sRYFkVqoQ7WVWtIBYz2OuAjeAt/6gkjTXYc/NTa8jnk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kccIWUklVcQaM9I2p3b1Y/1qjg7zFLdGTFRVMA7eMryOXnahMX3OxpUlTDjFkXetZ
-	 XOSwHzNsi5vy4xjJydSP8ZWbnxAF2gij+SbSgju7WN35R9MrhoBF0MXXMzuNLpuUs5
-	 s3dqHODDkEfUGEeR8a1xPWeRaBUN6HiZejRCDSTdy4G3v2Q3Vu8GQrRv/yiesKf0qw
-	 vnoAB/Eb45xIEgs5s5q25xTOISqu/97RFAHWl9AzogyatT9n6BEMvq19ZQLIr/Wb04
-	 I0972iBUnUagL0rws4TyjdIc2u44F+/eHE14Pqtow82oJPmMAYZR4BGJh7DfkXd0a3
-	 Wywlotn860MdQ==
+	b=prbcWabOTuBkNbtMYI66UPlJNIkVKDob7yE4wXS+0mv640w8Mflnrm0MVNz/CrCwx
+	 jzbSn1g5TZ47pfAUdJaSvC4JWoIteeZ1FX2PrDaCMweujLl8tfWqfK/zRO3YPAQMYa
+	 /pvZtZqEl7zp/NFAX8jI6vZBLxHeHQ/dS6GAf7ngKQZBQU4EnLaii64OmE10VEPNMG
+	 Mx1QSxTLouq1iXjiY1rzzc7voVwNAQ2hHz+uqDvwxv+4aqUiOoESgIjb0JD6mTmtVr
+	 E2TgM1hBP4fpvHk9lzYmxj2ANZq52Uc46/La0B/oULauaBxSj8hARLaGKvmVWV1Smb
+	 5iAxg8B00VrRQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tNYAk-004Zrs-86;
-	Tue, 17 Dec 2024 14:03:38 +0000
-Date: Tue, 17 Dec 2024 14:03:37 +0000
-Message-ID: <86ttb2qudi.wl-maz@kernel.org>
+	id 1tNYDH-004ZwV-Rt;
+	Tue, 17 Dec 2024 14:06:15 +0000
+Date: Tue, 17 Dec 2024 14:06:15 +0000
+Message-ID: <86seqmqu94.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -48,10 +48,12 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 18/18] KVM: arm64: Plumb the pKVM MMU in KVM
-In-Reply-To: <20241216175803.2716565-19-qperret@google.com>
+Subject: Re: [PATCH v3 11/18] KVM: arm64: Introduce __pkvm_host_unshare_guest()
+In-Reply-To: <Z2F9xb4jrK1zRtNV@google.com>
 References: <20241216175803.2716565-1-qperret@google.com>
-	<20241216175803.2716565-19-qperret@google.com>
+	<20241216175803.2716565-12-qperret@google.com>
+	<86wmfyr1j4.wl-maz@kernel.org>
+	<Z2F9xb4jrK1zRtNV@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,419 +69,59 @@ X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.co
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Dec 2024 17:58:03 +0000,
+On Tue, 17 Dec 2024 13:33:57 +0000,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> Introduce the KVM_PGT_S2() helper macro to allow switching from the
-> traditional pgtable code to the pKVM version easily in mmu.c. The cost
-> of this 'indirection' is expected to be very minimal due to
-> is_protected_kvm_enabled() being backed by a static key.
+> On Tuesday 17 Dec 2024 at 11:29:03 (+0000), Marc Zyngier wrote:
+> > > +static int __check_host_shared_guest(struct pkvm_hyp_vm *vm, u64 *__phys, u64 ipa)
+> > > +{
+> > > +	enum pkvm_page_state state;
+> > > +	struct hyp_page *page;
+> > > +	kvm_pte_t pte;
+> > > +	u64 phys;
+> > > +	s8 level;
+> > > +	int ret;
+> > > +
+> > > +	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
+> > > +	if (ret)
+> > > +		return ret;
+> > > +	if (level != KVM_PGTABLE_LAST_LEVEL)
+> > 
+> > So there is still a very strong assumption that a guest is only
+> > provided page mappings, and no blocks?
 > 
-> With this, everything is in place to allow the delegation of
-> non-protected guest stage-2 page-tables to pKVM, so let's stop using the
-> host's kvm_s2_mmu from EL2 and enjoy the ride.
+> Yep, very much so. It's one of the main limitations of the series as-is
+> (with the absence of support for mapping anything else than memory in
+> guests). Those limitations were mentioned in the cover letter of v1, but
+> I should have kept that mention in later versions, sorry!
 > 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/include/asm/kvm_mmu.h   |  16 +++++
->  arch/arm64/kvm/arm.c               |   9 ++-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c |   2 -
->  arch/arm64/kvm/mmu.c               | 107 +++++++++++++++++++++--------
->  4 files changed, 101 insertions(+), 33 deletions(-)
+> The last patch of the series has a tweak to user_mem_abort() to force
+> mappings to PTE level which is trivial to do as we already need to do
+> similar things for dirty logging. And __pkvm_host_share_guest() doesn't
+> take a 'size' parameter in its current form, it assumes it is being
+> passed a single pfn. So all in all this works well, and simplifies the
+> series a lot.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 66d93e320ec8..d116ab4230e8 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -353,6 +353,22 @@ static inline bool kvm_is_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->  	return &kvm->arch.mmu != mmu;
->  }
->  
-> +static inline void kvm_fault_lock(struct kvm *kvm)
-> +{
-> +	if (is_protected_kvm_enabled())
-> +		write_lock(&kvm->mmu_lock);
-> +	else
-> +		read_lock(&kvm->mmu_lock);
-> +}
-> +
-> +static inline void kvm_fault_unlock(struct kvm *kvm)
-> +{
-> +	if (is_protected_kvm_enabled())
-> +		write_unlock(&kvm->mmu_lock);
-> +	else
-> +		read_unlock(&kvm->mmu_lock);
-> +}
-> +
->  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
->  #else
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 55cc62b2f469..9bcbc7b8ed38 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -502,7 +502,10 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
-> -	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> +	if (!is_protected_kvm_enabled())
-> +		kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> +	else
-> +		free_hyp_memcache(&vcpu->arch.pkvm_memcache);
->  	kvm_timer_vcpu_terminate(vcpu);
->  	kvm_pmu_vcpu_destroy(vcpu);
->  	kvm_vgic_vcpu_destroy(vcpu);
-> @@ -574,6 +577,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	struct kvm_s2_mmu *mmu;
->  	int *last_ran;
->  
-> +	if (is_protected_kvm_enabled())
-> +		goto nommu;
-> +
->  	if (vcpu_has_nv(vcpu))
->  		kvm_vcpu_load_hw_mmu(vcpu);
->  
-> @@ -594,6 +600,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  		*last_ran = vcpu->vcpu_idx;
->  	}
->  
-> +nommu:
->  	vcpu->cpu = cpu;
->  
->  	kvm_vgic_load(vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 130f5f23bcb5..258d572eed62 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -103,8 +103,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
->  	/* Limit guest vector length to the maximum supported by the host.  */
->  	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_host_sve_max_vl);
->  
-> -	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
-> -
->  	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
->  	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
->  	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 641e4fec1659..7c2995cb4577 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -15,6 +15,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_pgtable.h>
-> +#include <asm/kvm_pkvm.h>
->  #include <asm/kvm_ras.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
-> @@ -31,6 +32,14 @@ static phys_addr_t __ro_after_init hyp_idmap_vector;
->  
->  static unsigned long __ro_after_init io_map_base;
->  
-> +#define KVM_PGT_S2(fn, ...)								\
-> +	({										\
-> +		typeof(kvm_pgtable_stage2_ ## fn) *__fn = kvm_pgtable_stage2_ ## fn;	\
-> +		if (is_protected_kvm_enabled())						\
-> +			__fn = pkvm_pgtable_ ## fn;					\
-> +		__fn(__VA_ARGS__);							\
-> +	})
-> +
+> Huge-page support should come as a natural extension to this series, but
+> I was hoping it could be done separately as that should have no
+> *functional* impact observable from userspace. I'm slightly more
+> concerned about the lack of support for mapping MMIO, but that too is
+> going to be some work, and I guess you should just turn pKVM off if
+> you want that for now...
+> 
+> Happy to address either or both of these limitations as part of this
+> series if we think they're strictly required to land this stuff
+> upstream, this is obviously up for debate. But that's going to be quite
+> a few patches on top :-)
 
-My gripe with this is that it makes it much harder to follow what is
-happening by using tags (ctags, etags, whatever). I ended up with the
-hack below, which is super ugly, but preserves the tagging
-functionality for non-pKVM.
+No, I just wanted to make sure I did have the correct interpretation
+of what this does. 'd rather have something that works first, and then
+add large mapping support. You can even sell it as a performance
+improvement! :)
 
-I'll scratch my head to find something more elegant...
+Thanks,
 
 	M.
-
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 76a8b70176a6c..b9b9acb685d8f 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -143,21 +143,21 @@ struct pkvm_mapping {
- 	u64 pfn;
- };
- 
--int pkvm_pgtable_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu, struct kvm_pgtable_mm_ops *mm_ops);
--void pkvm_pgtable_destroy(struct kvm_pgtable *pgt);
--int pkvm_pgtable_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu, struct kvm_pgtable_mm_ops *mm_ops);
-+void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
-+int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
- 			   void *mc, enum kvm_pgtable_walk_flags flags);
--int pkvm_pgtable_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
--int pkvm_pgtable_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size);
--int pkvm_pgtable_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
--bool pkvm_pgtable_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64 size, bool mkold);
--int pkvm_pgtable_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
-+int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
-+int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size);
-+int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
-+bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64 size, bool mkold);
-+int pkvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
- 			     enum kvm_pgtable_walk_flags flags);
--void pkvm_pgtable_mkyoung(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_walk_flags flags);
--int pkvm_pgtable_split(struct kvm_pgtable *pgt, u64 addr, u64 size, struct kvm_mmu_memory_cache *mc);
--void pkvm_pgtable_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level);
--kvm_pte_t *pkvm_pgtable_create_unlinked(struct kvm_pgtable *pgt, u64 phys, s8 level,
-+void pkvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_walk_flags flags);
-+int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, struct kvm_mmu_memory_cache *mc);
-+void pkvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level);
-+kvm_pte_t *pkvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt, u64 phys, s8 level,
- 					enum kvm_pgtable_prot prot, void *mc, bool force_pte);
- 
- #endif	/* __ARM64_KVM_PKVM_H__ */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7c2995cb45773..4b9153468a327 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -32,12 +32,13 @@ static phys_addr_t __ro_after_init hyp_idmap_vector;
- 
- static unsigned long __ro_after_init io_map_base;
- 
--#define KVM_PGT_S2(fn, ...)								\
--	({										\
--		typeof(kvm_pgtable_stage2_ ## fn) *__fn = kvm_pgtable_stage2_ ## fn;	\
--		if (is_protected_kvm_enabled())						\
--			__fn = pkvm_pgtable_ ## fn;					\
--		__fn(__VA_ARGS__);							\
-+#define __S2(fn, ...)							\
-+	({								\
-+		typeof(fn) *__fn = fn;					\
-+		/* upgrade the function name from kvm_* to pkvm_* */	\
-+		if (is_protected_kvm_enabled())				\
-+			__fn = p ## fn;					\
-+		__fn(__VA_ARGS__);					\
- 	})
- 
- static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
-@@ -156,7 +157,7 @@ static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
- 			return -EINVAL;
- 
- 		next = __stage2_range_addr_end(addr, end, chunk_size);
--		ret = KVM_PGT_S2(split, pgt, addr, next - addr, cache);
-+		ret = __S2(kvm_pgtable_stage2_split, pgt, addr, next - addr, cache);
- 		if (ret)
- 			break;
- 	} while (addr = next, addr != end);
-@@ -242,7 +243,7 @@ static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
- 	void *pgtable = page_to_virt(page);
- 	s8 level = page_private(page);
- 
--	KVM_PGT_S2(free_unlinked, &kvm_s2_mm_ops, pgtable, level);
-+	__S2(kvm_pgtable_stage2_free_unlinked, &kvm_s2_mm_ops, pgtable, level);
- }
- 
- static void stage2_free_unlinked_table(void *addr, s8 level)
-@@ -299,7 +300,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
- 
- static int kvm_s2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
--	return KVM_PGT_S2(unmap, pgt, addr, size);
-+	return __S2(kvm_pgtable_stage2_unmap, pgt, addr, size);
- }
- 
- /*
-@@ -357,7 +358,7 @@ void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
- 
- static int kvm_s2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
--	return KVM_PGT_S2(flush, pgt, addr, size);
-+	return __S2(kvm_pgtable_stage2_flush, pgt, addr, size);
- }
- 
- void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
-@@ -968,7 +969,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 		return -ENOMEM;
- 
- 	mmu->arch = &kvm->arch;
--	err = KVM_PGT_S2(init, pgt, mmu, &kvm_s2_mm_ops);
-+	err = __S2(kvm_pgtable_stage2_init, pgt, mmu, &kvm_s2_mm_ops);
- 	if (err)
- 		goto out_free_pgtable;
- 
-@@ -997,7 +998,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	return 0;
- 
- out_destroy_pgtable:
--	KVM_PGT_S2(destroy, pgt);
-+	__S2(kvm_pgtable_stage2_destroy, pgt);
- out_free_pgtable:
- 	kfree(pgt);
- 	return err;
-@@ -1094,7 +1095,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
--		KVM_PGT_S2(destroy, pgt);
-+		__S2(kvm_pgtable_stage2_destroy, pgt);
- 		kfree(pgt);
- 	}
- }
-@@ -1167,7 +1168,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			break;
- 
- 		write_lock(&kvm->mmu_lock);
--		ret = KVM_PGT_S2(map, pgt, addr, PAGE_SIZE, pa, prot, &cache, 0);
-+		ret = __S2(kvm_pgtable_stage2_map, pgt, addr, PAGE_SIZE, pa, prot, &cache, 0);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1181,7 +1182,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- static int kvm_s2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
--	return KVM_PGT_S2(wrprotect, pgt, addr, size);
-+	return __S2(kvm_pgtable_stage2_wrprotect, pgt, addr, size);
- }
- /**
-  * kvm_stage2_wp_range() - write protect stage2 memory region range
-@@ -1743,9 +1744,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		 * PTE, which will be preserved.
- 		 */
- 		prot &= ~KVM_NV_GUEST_MAP_SZ;
--		ret = KVM_PGT_S2(relax_perms, pgt, fault_ipa, prot, flags);
-+		ret = __S2(kvm_pgtable_stage2_relax_perms, pgt, fault_ipa, prot, flags);
- 	} else {
--		ret = KVM_PGT_S2(map, pgt, fault_ipa, vma_pagesize,
-+		ret = __S2(kvm_pgtable_stage2_map, pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     memcache, flags);
- 	}
-@@ -1771,7 +1772,7 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 
- 	read_lock(&vcpu->kvm->mmu_lock);
- 	mmu = vcpu->arch.hw_mmu;
--	KVM_PGT_S2(mkyoung, mmu->pgt, fault_ipa, flags);
-+	__S2(kvm_pgtable_stage2_mkyoung, mmu->pgt, fault_ipa, flags);
- 	read_unlock(&vcpu->kvm->mmu_lock);
- }
- 
-@@ -1977,7 +1978,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
- 
--	return KVM_PGT_S2(test_clear_young, kvm->arch.mmu.pgt,
-+	return __S2(kvm_pgtable_stage2_test_clear_young, kvm->arch.mmu.pgt,
- 						   range->start << PAGE_SHIFT,
- 						   size, true);
- 	/*
-@@ -1993,7 +1994,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
- 
--	return KVM_PGT_S2(test_clear_young, kvm->arch.mmu.pgt,
-+	return __S2(kvm_pgtable_stage2_test_clear_young, kvm->arch.mmu.pgt,
- 						   range->start << PAGE_SHIFT,
- 						   size, false);
- }
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 9de9159afa5a1..37d6494d0fd87 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -317,7 +317,7 @@ static struct rb_node *find_first_mapping_node(struct rb_root *root, u64 gfn)
- 			break;										\
- 		else
- 
--int pkvm_pgtable_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu, struct kvm_pgtable_mm_ops *mm_ops)
-+int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu, struct kvm_pgtable_mm_ops *mm_ops)
- {
- 	pgt->pkvm_mappings	= RB_ROOT;
- 	pgt->mmu		= mmu;
-@@ -325,7 +325,7 @@ int pkvm_pgtable_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu, struct kv
- 	return 0;
- }
- 
--void pkvm_pgtable_destroy(struct kvm_pgtable *pgt)
-+void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-@@ -345,7 +345,7 @@ void pkvm_pgtable_destroy(struct kvm_pgtable *pgt)
- 	}
- }
- 
--int pkvm_pgtable_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
- 			   void *mc, enum kvm_pgtable_walk_flags flags)
- {
-@@ -375,7 +375,7 @@ int pkvm_pgtable_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return ret;
- }
- 
--int pkvm_pgtable_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
-+int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-@@ -394,7 +394,7 @@ int pkvm_pgtable_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	return ret;
- }
- 
--int pkvm_pgtable_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
-+int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-@@ -411,7 +411,7 @@ int pkvm_pgtable_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	return ret;
- }
- 
--int pkvm_pgtable_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
-+int pkvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	struct pkvm_mapping *mapping;
-@@ -423,7 +423,7 @@ int pkvm_pgtable_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	return 0;
- }
- 
--bool pkvm_pgtable_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64 size, bool mkold)
-+bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64 size, bool mkold)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-@@ -438,30 +438,30 @@ bool pkvm_pgtable_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return young;
- }
- 
--int pkvm_pgtable_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
-+int pkvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
- 			     enum kvm_pgtable_walk_flags flags)
- {
- 	return kvm_call_hyp_nvhe(__pkvm_host_relax_perms_guest, addr >> PAGE_SHIFT, prot);
- }
- 
--void pkvm_pgtable_mkyoung(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_walk_flags flags)
-+void pkvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_walk_flags flags)
- {
- 	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_mkyoung_guest, addr >> PAGE_SHIFT));
- }
- 
--void pkvm_pgtable_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level)
-+void pkvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level)
- {
- 	WARN_ON_ONCE(1);
- }
- 
--kvm_pte_t *pkvm_pgtable_create_unlinked(struct kvm_pgtable *pgt, u64 phys, s8 level,
-+kvm_pte_t *pkvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt, u64 phys, s8 level,
- 					enum kvm_pgtable_prot prot, void *mc, bool force_pte)
- {
- 	WARN_ON_ONCE(1);
- 	return NULL;
- }
- 
--int pkvm_pgtable_split(struct kvm_pgtable *pgt, u64 addr, u64 size, struct kvm_mmu_memory_cache *mc)
-+int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, struct kvm_mmu_memory_cache *mc)
- {
- 	WARN_ON_ONCE(1);
- 	return -EINVAL;
 
 -- 
 Without deviation from the norm, progress is not possible.
