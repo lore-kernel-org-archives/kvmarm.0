@@ -1,205 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C94B50276;
-	Tue, 17 Dec 2024 11:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC7B1E8823
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 13:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734434946; cv=none; b=bALP5DDIYdsO6zbgbssVE5ZIjOok2xOq2Nt0sgT1EcO9iV7yaLP4mHx+jL8QrMaBX0ef0bTyB7TRFqXMg+JJ65cOmH7oGG4QQ0vXQOPP0djKTXV7t1aQ0xj75LAYeSAmqmZGeXVxQ/MnTkmKAvq9698juTvkYJpiaySx6XKgWTk=
+	t=1734440749; cv=none; b=Bg4pIvylxBO6i7hhg1+BDrENsrRS9btH+PMERbQ/NVzNlwdABN+m2Rw8MNLzDhvum8m1XcVGyyQebuCR5fSeJeb3TepxMf7KXWqha1omnNjkt6s4ddYhrf/sTDJP4StJL32gqy+Sjc3Va2dsRu0iwh+OBHdSua9I+A2igf4MS/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734434946; c=relaxed/simple;
-	bh=ZA5XJc1vs+Zrcy5PAhS+ySqSiRH75TTc9k5gF60rrqQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p3rCZ7qWH16OgW9BfjmEF0xD2KNTru2pA4Y4d1f6/HJmUxoIMYJg7eiMbJtOA2Kj7TUd/IThqjA31js4JlqB6/Z5XqNEHjJiOo/2pDrsz/CHwoU/Sj71zA2c32fSjCRZ6EwvjMrjlyNA9KQK2EFi5scYd+dPTpJPGEPjr+Q2TcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iRDb92u8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734440749; c=relaxed/simple;
+	bh=ESLSBuERl19IWMtBVZAhzvVsC7jbezB5GMfTsOfRYWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lbY4JgKl0egT0AtIpeZgGQS246yWxjDZGK2/5hX6CWisQ13QpUWsxw1kIwR7w8DmbbBS0LaPoDD7SKQbLnEB1IaXwM0GhwP+fRkY3Xoq5bmi45Ueh+H5wsX9uDblqrZbNHe/9GbHsviijIVUwKJmFYvattgrgJIG3v7euxCMARY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CFAJ66RE; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRDb92u8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE4CBC4CED3;
-	Tue, 17 Dec 2024 11:29:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734434945;
-	bh=ZA5XJc1vs+Zrcy5PAhS+ySqSiRH75TTc9k5gF60rrqQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iRDb92u8TAdFe2L/MQWADYGyZL8MCBNrpOsboMkeHw0/zWr0gojL+7Mt3c+iwyf91
-	 boA8Cz82WAde/dYj8fUeAybaStJvaLTqOZbHFNwHXpW11XE89HLAMuerU6fKTjMH3w
-	 CwJZPtz85bsnz5hS0rESPLdufXsvlCSCqJqvHZM9E8/rXrvA68SGI4uWdqsRoRFVph
-	 Jy0pwm/pSLruQFXTSYdO/kg2H13Rw9szuIlw12OpG95c4tAKivjnu51Z9ZIg4+l8Wh
-	 nJ/YXO2G965ZdtDOmYQnzkueWm+Xv7H88UZUQGcTJO9CuXLFkdRo0HFifcOYx/59AC
-	 85zgxgcSM+/nA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tNVl9-004X4R-H3;
-	Tue, 17 Dec 2024 11:29:03 +0000
-Date: Tue, 17 Dec 2024 11:29:03 +0000
-Message-ID: <86wmfyr1j4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CFAJ66RE"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aa6aad76beeso736622966b.2
+        for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 05:05:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734440746; x=1735045546; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jFIpSlbWhQWU4BmnuczxZhQrx3hDBfJmwoIXHjm0XOk=;
+        b=CFAJ66REjszTEcxbWT9yuzPbKkyyx3/zjIFMNw9Ix4nzS4HCYSyoh42i7A9hX5WHXb
+         AutY4Z1aV6P+Lh9+KqPs22OTY+J8oJ7xgMP5v73Y1NG5D/zNIdoEOG2ODmXp6cuHKWTu
+         T1KRZ+CMsutYoVAnBOHyH6jGpCAytMHlwwC/lwOn7qZebvCt0iYg+pm9N+IHOaea5mJO
+         Q30odmzMlEWRNgFE8hKIIk0AaTsR2H3tBi/H5EO2LsVtVrj02nscVt0mjWaDS4PPqQUJ
+         ePPbOGvI7pXBzB8eyRUZutdjsVEz/aIFpYNf7lfngF/+zqu4Tip9TVPHDd0sLKQb4h4I
+         mJpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734440746; x=1735045546;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jFIpSlbWhQWU4BmnuczxZhQrx3hDBfJmwoIXHjm0XOk=;
+        b=E2yastU+HjVrB4juuiLLC0y8MooZ/H4WPs/LQeUyRcvzagU8imRMccZRVQUGr+aIkH
+         GlWszFHw5V3Rg9ALWEhw29wfbMXkNyCuyd6OUdiVu937pS3bqS298FOiJSNUgRyN/H8o
+         6gnOLo/QoHc2lTax5GWSOrLYrYUi52quWyvxdavLG9dAbsPQb2T3GHzipd6/LR0+Fek0
+         bIkVyYMtbmsE+P2YYNKch1nUg+jolfnpSp6+LuCeXJ+fP/pBcE9wDPUq9fxgC4EDRxdb
+         5qyY9euyW7FgiIbFIXunWkh62RVFZOz8n9njDxd2KXbeZF3+W9ZHXpsgmLm38n8rDkEO
+         jMDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeC44IGAPy5NOJa0tPl9JZXBD9UPpkgnU0C+BQhEuAbTi5YyMScjD70nWD5Wicr2o0VMZeyZo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz15CHmMEflgp+Q9ovzYLB31E3Hmm7VBvg+RhIMZLITx/ndfd5/
+	QrOS5YoqWl7CZRBySkZnNBDzFsWb4vFxsj8ZGiAFtLQ7pnJ8xu2bUk4OdWbqoQ==
+X-Gm-Gg: ASbGncsAc7E/50aDpBwBfzNx69fGK9dpW+pBt+x+YxeyvxUW18YsXpxcLBbVYVOFZNm
+	qyl9dMvMExwqSfCrwF4djpkHQJpb7gXnqlyWXrhMVs4GXBF9XYppVYbLdq0IyB6KkhM0H9GjsJT
+	LKEFDkTLK7UjAu4OX5K4zqWfY4ESijIFI5bnReo9Is9P+uk+5Szio27lQN7YYPT03dK7T8YCZfx
+	OCzgQ80ZvvFTEn2wCIX1Y02P4OWtMTn12wzU15mEmp2JsETdn9221WTaEs03TX3EMmW1teSalow
+	kA9la78fc3p0HkY=
+X-Google-Smtp-Source: AGHT+IGm64uJtVDjEAURcs9xZJG95uD+8LpWsogmwS7IwX0FntYGVqCsBRC/TY5BflaZ6Q9qsi8S9Q==
+X-Received: by 2002:a17:906:6a1a:b0:aab:7461:fbe5 with SMTP id a640c23a62f3a-aab77e9c72cmr1588746566b.45.1734440745515;
+        Tue, 17 Dec 2024 05:05:45 -0800 (PST)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aab96005f89sm446090766b.35.2024.12.17.05.05.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 05:05:45 -0800 (PST)
+Date: Tue, 17 Dec 2024 13:05:41 +0000
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Sebastian Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 11/18] KVM: arm64: Introduce __pkvm_host_unshare_guest()
-In-Reply-To: <20241216175803.2716565-12-qperret@google.com>
+Subject: Re: [PATCH v3 00/18] KVM: arm64: Non-protected guest stage-2 support
+ for pKVM
+Message-ID: <Z2F3JZII0gh8iOH2@google.com>
 References: <20241216175803.2716565-1-qperret@google.com>
-	<20241216175803.2716565-12-qperret@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <CA+EHjTz7=dRz5X-CjjniJgwd87Q4DQbRdXzi0on4C21urYnhOQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, vdonnefort@google.com, sebastianene@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTz7=dRz5X-CjjniJgwd87Q4DQbRdXzi0on4C21urYnhOQ@mail.gmail.com>
 
-On Mon, 16 Dec 2024 17:57:56 +0000,
-Quentin Perret <qperret@google.com> wrote:
+On Tuesday 17 Dec 2024 at 09:25:52 (+0000), Fuad Tabba wrote:
+> On Mon, 16 Dec 2024 at 17:58, Quentin Perret <qperret@google.com> wrote:
+> >
+> > Hi all,
+> >
+> > This is the v3 of the series adding support for non-protected guests
+> > stage-2 to pKVM. Please refer to v1 for all the context:
 > 
-> In preparation for letting the host unmap pages from non-protected
-> guests, introduce a new hypercall implementing the host-unshare-guest
-> transition.
+> For the series:
 > 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h              |  1 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  6 ++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 21 ++++++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 67 +++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 12 ++++
->  6 files changed, 108 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 449337f5b2a3..0b6c4d325134 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -66,6 +66,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
->  	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
->  	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
->  	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index a7976e50f556..e528a42ed60e 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -40,6 +40,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
->  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu, enum kvm_pgtable_prot prot);
-> +int __pkvm_host_unshare_guest(u64 gfn, struct pkvm_hyp_vm *hyp_vm);
->  
->  bool addr_is_memory(phys_addr_t phys);
->  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> index be52c5b15e21..0cc2a429f1fb 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -64,6 +64,11 @@ static inline bool pkvm_hyp_vcpu_is_protected(struct pkvm_hyp_vcpu *hyp_vcpu)
->  	return vcpu_is_protected(&hyp_vcpu->vcpu);
->  }
->  
-> +static inline bool pkvm_hyp_vm_is_protected(struct pkvm_hyp_vm *hyp_vm)
-> +{
-> +	return kvm_vm_is_protected(&hyp_vm->kvm);
-> +}
-> +
->  void pkvm_hyp_vm_table_init(void *tbl);
->  
->  int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
-> @@ -78,6 +83,7 @@ void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu);
->  struct pkvm_hyp_vcpu *pkvm_get_loaded_hyp_vcpu(void);
->  
->  struct pkvm_hyp_vm *get_pkvm_hyp_vm(pkvm_handle_t handle);
-> +struct pkvm_hyp_vm *get_np_pkvm_hyp_vm(pkvm_handle_t handle);
->  void put_pkvm_hyp_vm(struct pkvm_hyp_vm *hyp_vm);
->  
->  #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index d659462fbf5d..3c3a27c985a2 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -244,6 +244,26 @@ static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) =  ret;
->  }
->  
-> +static void handle___pkvm_host_unshare_guest(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-> +	DECLARE_REG(u64, gfn, host_ctxt, 2);
-> +	struct pkvm_hyp_vm *hyp_vm;
-> +	int ret = -EINVAL;
-> +
-> +	if (!is_protected_kvm_enabled())
-> +		goto out;
-> +
-> +	hyp_vm = get_np_pkvm_hyp_vm(handle);
-> +	if (!hyp_vm)
-> +		goto out;
-> +
-> +	ret = __pkvm_host_unshare_guest(gfn, hyp_vm);
-> +	put_pkvm_hyp_vm(hyp_vm);
-> +out:
-> +	cpu_reg(host_ctxt, 1) =  ret;
-> +}
-> +
->  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> @@ -454,6 +474,7 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__pkvm_host_share_hyp),
->  	HANDLE_FUNC(__pkvm_host_unshare_hyp),
->  	HANDLE_FUNC(__pkvm_host_share_guest),
-> +	HANDLE_FUNC(__pkvm_host_unshare_guest),
->  	HANDLE_FUNC(__kvm_adjust_pc),
->  	HANDLE_FUNC(__kvm_vcpu_run),
->  	HANDLE_FUNC(__kvm_flush_vm_context),
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index fb9592e721cf..30243b7922f1 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1421,3 +1421,70 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu,
->  
->  	return ret;
->  }
-> +
-> +static int __check_host_shared_guest(struct pkvm_hyp_vm *vm, u64 *__phys, u64 ipa)
-> +{
-> +	enum pkvm_page_state state;
-> +	struct hyp_page *page;
-> +	kvm_pte_t pte;
-> +	u64 phys;
-> +	s8 level;
-> +	int ret;
-> +
-> +	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
-> +	if (ret)
-> +		return ret;
-> +	if (level != KVM_PGTABLE_LAST_LEVEL)
+> Tested-by: Fuad Tabba <tabba@google.com>
 
-So there is still a very strong assumption that a guest is only
-provided page mappings, and no blocks?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thank you!
+Quentin
