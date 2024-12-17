@@ -1,59 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8D61F4705;
-	Tue, 17 Dec 2024 15:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091A21FA8FB;
+	Tue, 17 Dec 2024 15:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734449905; cv=none; b=BIULa3xB/2ewRGRhgraO3RjgVSE81dG9odIwGb5TzpG/jNri6x1Cua1cMiAGcLmhkpz1QJxY1zHA3QEME3P/mrkNm509vAbfNetCzi/GJOsPTLff6RsKwEeelRz42GjfSZCf8XGjJRS4toEYIxmKKQDvN8Mu5M2r8+ufeIj7s/w=
+	t=1734450961; cv=none; b=nFi/1+307g+zLhnG1uv/P4G/+kbqJRhfmtOhthJwWW9dvOLi46769bzmqW/CCQV6/18KCfkwJcLF4mxBpfdgW9HHtXNNMQDgBSr6J6hkrxFkBmL7VGTo74U+9Yqt1SDwdk+mrMCFEAc7zliwZGgKRopT6yKBONkJtjY4aLjeyFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734449905; c=relaxed/simple;
-	bh=X2u8fLufVEyNW4OWF48VzRGWSScBNIeH6Vs7gnyqQmg=;
+	s=arc-20240116; t=1734450961; c=relaxed/simple;
+	bh=pSqIvGUdX5z1ZDvXSMhgi6s8eapLJ2Q23yPsaZtnyLg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k/hfqQVDJ2lAtkoccuTP/50szyfyZ7I87v3WUcyi9zj7w2CearxkX8bRpMAKg1T/otRxH7UDOjxXHv/PJXNt+DrEkbr4G8nqGkdawZiWc7BoRBMi4I7d9Lyq6QeI/mQDpI//GUPYuhU5THidu7zwn/NDLwQvZTqRfZtSqfiX41Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9YYYtG7; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=j/p7FXqNDSYY01o6xeStCoBMm5d/psYChGLr1yQbYuiE9AMrhk+5kr3aIPBMKxI+TQuxRMT+LW27FMzMVb99mRvRZ/LYJPLNm00gx5mVm6c6BA3ZkBYFvUz1kBVlf+A15eoBc7IlUZ/EbdbG5VRxO6j5TwG1O88KrXiCUbWxkew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9NN28U+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9YYYtG7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE50CC4CED6;
-	Tue, 17 Dec 2024 15:38:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9NN28U+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F3FC4CED6;
+	Tue, 17 Dec 2024 15:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734449904;
-	bh=X2u8fLufVEyNW4OWF48VzRGWSScBNIeH6Vs7gnyqQmg=;
+	s=k20201202; t=1734450960;
+	bh=pSqIvGUdX5z1ZDvXSMhgi6s8eapLJ2Q23yPsaZtnyLg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L9YYYtG7LgZ+O0tPfWXoslJrFkuiNf0B3hxUi4RG/9Y2U0a7RCyyz9lsjOEE6y9Md
-	 U0nfWBce56DCHBvQi/gIP7LvJ+6pj+VYpMJLk3o8RMQVG7IVkn4vZDZQMLa0/XBAk8
-	 yEVsQ86PZRVoJA0M8X8enb6I/zhj3tWDZ2hAsi3NuIz8NPW9oLcN/y2I9h3QSW3Xcf
-	 QiMl+xS+o1x1JCuMRsDe6Y7S2vH3p3exwgX9b65QkPHiOVmlHRfP0zTr4ibUR258sA
-	 AVpwKMr70NhoBdNGMNgxw2gm2iKlxc93jV6hA8BMWrdQnkqu8WZdIhZJ8uwXlMw9j6
-	 3PQEmUX5bCQqQ==
+	b=L9NN28U+JGrpcx/66+ZeOSHqeE5mltmLAXtDfsyUVLMgujnJaPgOXjpeBBZzyWegm
+	 4/YJfQgDBcVPsa9H2WCm7nAwVJREzYYrFAeFwM6ikVbDDaNb4TPPrj5SSktawWRqog
+	 8MET55XR+pb5FyIpMszmUPrwj30RT8RNaUqR0qaGLioxAriRg5DNh59XL3nw8KJtpt
+	 11RhM4FjCGzUco4J9T42f3Th7kK/i8oJppgL9TcZsnpPWXvn6R8eQ+CqiMwatrS1EZ
+	 ERxoq6hpdlPQ0fen7uh2F5IHIUV5vhkNNyOkNO0Pcl4fQFSbzZ5qwM3QA9yoUnGSAY
+	 udLrLtIhRiGqA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tNZeQ-004cDg-Jf;
-	Tue, 17 Dec 2024 15:38:22 +0000
-Date: Tue, 17 Dec 2024 15:38:21 +0000
-Message-ID: <86pllqqpzm.wl-maz@kernel.org>
+	id 1tNZvS-004cWL-OM;
+	Tue, 17 Dec 2024 15:55:58 +0000
+Date: Tue, 17 Dec 2024 15:55:57 +0000
+Message-ID: <86o71aqp6a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
+To: Mark Brown <broonie@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 18/18] KVM: arm64: Plumb the pKVM MMU in KVM
-In-Reply-To: <Z2GLR8KZzJn1YpUu@google.com>
-References: <20241216175803.2716565-1-qperret@google.com>
-	<20241216175803.2716565-19-qperret@google.com>
-	<86ttb2qudi.wl-maz@kernel.org>
-	<Z2GLR8KZzJn1YpUu@google.com>
+Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
+In-Reply-To: <b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
+References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
+	<875xnisocy.wl-maz@kernel.org>
+	<53b40aa8-f51c-4c4e-a4ad-e6a9512e5197@sirena.org.uk>
+	<86v7viqusg.wl-maz@kernel.org>
+	<b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,41 +66,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, vdonnefort@google.com, sebastianene@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Dec 2024 14:31:35 +0000,
-Quentin Perret <qperret@google.com> wrote:
+On Tue, 17 Dec 2024 15:10:28 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Tuesday 17 Dec 2024 at 14:03:37 (+0000), Marc Zyngier wrote:
-> > My gripe with this is that it makes it much harder to follow what is
-> > happening by using tags (ctags, etags, whatever). I ended up with the
-> > hack below, which is super ugly, but preserves the tagging
-> > functionality for non-pKVM.
+> [1  <text/plain; us-ascii (7bit)>]
+> On Tue, Dec 17, 2024 at 01:54:39PM +0000, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
 > 
-> Ack.
+> > > The selftests are shipped as part of the kernel source and frequently
+> > > used for testing the kernel, it's all one source base and we want to
+> > > ensure that for example the test fix gets backported if the relevant
+> > > kernel patch does.
 > 
-> > I'll scratch my head to find something more elegant...
+> > That's not what Fixes: describes. If you want to invent a new tag that
+> > expresses a dependency, do that. Don't use these tags to misrepresent
+> > what the patches does.
 > 
-> I find your proposal pretty reasonable -- I had a few different ideas
-> but they were all really over-engineered, so I figured relying on a
-> naming convention was the simplest. And any divergence will be flagged
-> at compile time, so that shouldn't be too hard to maintain looking
-> forward.
-> 
-> The __S2 name isn't massively descriptive though. Maybe KVM_PGT_CALL()
-> or something? Thinking about it, this abstraction doesn't need to be
-> restricted to stage-2 stuff. We could most likely hide the
-> __pkvm_host_{un}share_hyp() logic behind a pkvm_pgtable_hyp_{un}map()
-> implementation in pkvm.c as well...
+> No, this isn't a new use - a Fixes: tag indicates that the referenced
+> commit introduced the problem being fixed and that is exactly what's
+> going on here.  Like I say the selftests are not a completely separate
+> project, they are a part of the same source release as the rest of the
+> kernel and it is helpful to track information like this.
 
-Oh, I'm happy with *any* name. I just changed it to make sure any
-missing occurrence would blow up.
-
-And yes, if we can make that more uniform, I'm all for that.
-
-Thanks,
+Well, we'll have to agree to disagree.
 
 	M.
 
