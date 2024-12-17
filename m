@@ -1,32 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F4E1FC7E0
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 21:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B7D1F9EDA
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 21:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734470500; cv=none; b=Z3sfAHcOLZ73quHeuUrrYy0IwjmJfU14c4bQKPWWuuTIPLHNx4Uf8tIkaTjtgrEV4ZHg2GBwwyEfUUBv6GoK+Iq8AuBdd0tmv/+lQtEpDAZMCqXZ0oU+TlR6wkw3GNia5MZCtZdFsWYg0C7xQAya+a0I5DSQqVPN/XjLVLqMd0A=
+	t=1734470569; cv=none; b=KC+fJgVk5j4MW5uhnyKYaopuh0Nk335bPKMtd5699638kxDIqn13Yz1tjItQQKmyDEPjIkhed2aHx5LlepRgKPG45u13uq/o9B9nGtofNiNzlDffU8EZzN459kR/8QmRsaz/I1yx5XOXRGTzbTLBczYxjaUX/jM0I3TRF8tOuB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734470500; c=relaxed/simple;
-	bh=MXMO6HM+iSiZcB+0JlvSfCWzsqeO9iyIKaDuZHMuzgQ=;
+	s=arc-20240116; t=1734470569; c=relaxed/simple;
+	bh=Ubwiyn2TQr4wkm8jdzpmKEPHRmzV6Jrn5JMCzt3KHnA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ez3EN+frQbCZIot1Mf/ySU4GKUo4vq2ReVCnGuT4WAcJmBN34Uh+Sm1V6W1YE2CMcvPzxo/mlAR0y5Uri9Q0n8RJGl8hTWec5gbO3zMC4Y2mUqbkdQmXljkDqYll4Hyvo2uF1evtvKzxTZY//7IJCS7EdmFau+93dFjIXEmq74A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rZLNaTfC; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=IQwqr3LHZJcMa10yneGJEzqwgcyyzxohPsuYVtidtzbsa2sfrEmMFNnk3MWmxasNSZQzrtgaBAGtGwVjsOGZ9N51ja8huqTZscstf4bEII24QdYOG3GNrkbL7vC5XXf9J4XX6fBjeZVaXNbOR760pc2pHglZwGm76p+3O1BYBLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W80u9i4H; arc=none smtp.client-ip=91.218.175.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rZLNaTfC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W80u9i4H"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734470497;
+	t=1734470565;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CJFymO38mcOTwo9Ozy+04D6XjuWZMyD8ycVX0URXSkM=;
-	b=rZLNaTfCEsziEgMq9tNF0aLUYY9DIeVJcADzb38IxuwltCL3ddXw/uZcwoisq/I04YudCl
-	TDdxzzPZy1KlvfB0bekieecTRrnaxG97ovgfCghK5WMTfb4zaYt9xyrnOnQJJXUMqlM/ux
-	s9suG354SnWVyc1/NWCBR8pqThWhdQ8=
+	bh=6GKBll1jVI+4KI5lsojh+atfM/dunkfyY0owsZPklhU=;
+	b=W80u9i4HP18C3HMwynU7mz1BVXfjUNBjNPg/p/tApgrZYcvbglLmuaDCaGf0ZcIoVTau1p
+	3UEbsLT+k46nb/vHs5Or6RGDm5w4j/7Aptt+x+ZFRmDv+cEJkdZYgFqT+QEB4ng1giIsTh
+	FPDIUjNl4q4r5HYRBtZ5OQPToaM+N0s=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -42,9 +42,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 13/18] KVM: arm64: Advertise PMUv3 if IMPDEF traps are present
-Date: Tue, 17 Dec 2024 13:20:43 -0800
-Message-Id: <20241217212048.3709204-14-oliver.upton@linux.dev>
+Subject: [PATCH 14/18] KVM: arm64: Advertise 0 event counters for IMPDEF PMU
+Date: Tue, 17 Dec 2024 13:22:33 -0800
+Message-Id: <20241217212233.3709321-1-oliver.upton@linux.dev>
 In-Reply-To: <20241217212048.3709204-1-oliver.upton@linux.dev>
 References: <20241217212048.3709204-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -56,37 +56,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Advertise a baseline PMUv3 implementation when running on hardware with
-IMPDEF traps of the PMUv3 sysregs.
+The programmable event counters on Apple M* parts are quite different
+from what's available in PMUv3, as the event counters aren't fungible
+(some events only work on specific counters) and the event ID space
+doesn't match the architecture.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/pmu-emul.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pmu-emul.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 98690e53dc73..553d02a03877 100644
+index 553d02a03877..3803737cbf7c 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -1262,7 +1262,17 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
- 	pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer,
- 			       read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1));
+@@ -1046,6 +1046,9 @@ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
+ {
+ 	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
  
--	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
-+	/*
-+	 * Spoof a barebones PMUv3 implementation if the system supports IMPDEF
-+	 * traps of the PMUv3 sysregs
-+	 */
 +	if (cpus_have_final_cap(ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS))
-+		return ID_AA64DFR0_EL1_PMUVer_IMP;
++		return 0;
 +
-+	/*
-+	 * Otherwise, treat IMPLEMENTATION DEFINED functionality as
-+	 * unimplemented
-+	 */
- 	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
- 		return 0;
- 
+ 	/*
+ 	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
+ 	 * Ignore those and return only the general-purpose counters.
 -- 
 2.39.5
 
