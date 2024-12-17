@@ -1,25 +1,41 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDEC85260
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 04:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C982C148314
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 07:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734410000; cv=none; b=atr7VXCnYDZoiaeJu9lxr3OhhrGgJE3xy4latWbABLVwwOYf+jxcUm4hsVyRUhR69JXckyP/nZ0AcyHA33jcVc4GiHMkaSUQWtqIDGoooH+c4bZdOPJ45OZgGi+YfWW8qb/E66IGBtma5NMIxbQWPlUiGl703Oo1AvpQ0s2xOKw=
+	t=1734421679; cv=none; b=htCGPYEYxJc+Ba0o6MJn32vmueINK5wCee9y+dchPPy0ehnc+exE4Gi+0GW/tOCQXjfduYvdpvp/iMidJgSMWNYZQa7qO3LgmVjVURgmrzImIu7exovr5cp1wODZun/IokxWQsU2HzDBQZKc8Jn10BJbW/k2yzuCrohSbQkWZhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734410000; c=relaxed/simple;
-	bh=sd81yIlf0nBnARe0qAYmvCM77kaaeYj7T2eUfE939ms=;
+	s=arc-20240116; t=1734421679; c=relaxed/simple;
+	bh=MgOQrO27meBf7NsG6OWTkY99J5lARFg7R+CbynX6vlg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QVr1DbvaP/RzA9xMwqT8paTrlR6w/SZdwKGCGj93MH6G6pA/F5jdSnbCyrq8OZkrv9l2Jv/eqxwEIUKSpZmUbZvo05XhgAWeHR8UTwunrydgijlndm8Ez/XmDzR3v+PmFgobxePt4S+7IayDhnTvMmqNQtofIcP9s8nYaFeiMV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E5411063;
-	Mon, 16 Dec 2024 20:33:44 -0800 (PST)
-Received: from [10.162.16.49] (a077893.blr.arm.com [10.162.16.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E6F1E3F720;
-	Mon, 16 Dec 2024 20:33:12 -0800 (PST)
-Message-ID: <0b8a055f-eab9-4b44-baac-ad25756dbbfd@arm.com>
-Date: Tue, 17 Dec 2024 10:03:10 +0530
+	 In-Reply-To:Content-Type; b=LivhCZi9FfizTgpqBocVBFHay1gL6cA7KEeJHqyxlUXKDVR9eo6Kuq5VJsxrFKOnApT6RPaHo3YXy9B1NZeMwJD6NQcIILU4t+vwaM4S0Rv7+P5javF6VgEMGQLoMdsuAfLnE9QY8u0iLLyU3RhLl/AqzmQemy5P9Pg5+R5oSqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4YC86z6Lcmz9sPd;
+	Tue, 17 Dec 2024 08:47:55 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id fC7tw8E5ccA2; Tue, 17 Dec 2024 08:47:55 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4YC86z5K7qz9rvV;
+	Tue, 17 Dec 2024 08:47:55 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A3F418B768;
+	Tue, 17 Dec 2024 08:47:55 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id iR2VLUnfgYsc; Tue, 17 Dec 2024 08:47:55 +0100 (CET)
+Received: from [192.168.232.97] (unknown [192.168.232.97])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 73D238B763;
+	Tue, 17 Dec 2024 08:47:54 +0100 (CET)
+Message-ID: <ddd4439e-6f6f-4513-a7dc-b7f01bec03dc@csgroup.eu>
+Date: Tue, 17 Dec 2024 08:47:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,121 +43,132 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 18/46] arm64/sysreg: Add register fields for PMUACR_EL1
-To: Rob Herring <robh@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org, ryan.roberts@arm.com,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>
-References: <20241210055311.780688-1-anshuman.khandual@arm.com>
- <20241210055311.780688-19-anshuman.khandual@arm.com>
- <20241216231505.GA601635-robh@kernel.org>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20241216231505.GA601635-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] mm/ptdump: Drop GENERIC_PTDUMP
+To: Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org
+Cc: steven.price@arm.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org
+References: <20241217034807.2541349-1-anshuman.khandual@arm.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20241217034807.2541349-1-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-On 12/17/24 04:45, Rob Herring wrote:
-> On Tue, Dec 10, 2024 at 11:22:43AM +0530, Anshuman Khandual wrote:
->> This adds register fields for PMUACR_EL1 as per the definitions based
->> on DDI0601 2024-09.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Mark Brown <broonie@kernel.org>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/tools/sysreg | 37 +++++++++++++++++++++++++++++++++++++
->>  1 file changed, 37 insertions(+)
->>
->> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
->> index 214ad6da1dff..462adb8031ca 100644
->> --- a/arch/arm64/tools/sysreg
->> +++ b/arch/arm64/tools/sysreg
->> @@ -2349,6 +2349,43 @@ Res0	63:5
->>  Field	4:0	SEL
->>  EndSysreg
->>  
->> +Sysreg	PMUACR_EL1	3	0	9	14	4
+Le 17/12/2024 à 04:48, Anshuman Khandual a écrit :
+> GENERIC_PTDUMP does not guard any code but instead just used for platform's
+> subscription into core ptdump defined under PTDUMP_CORE, which is selected.
+> Instead use PTDUMP_CORE for platform subscription and drop GENERIC_PTDUMP.
 > 
-> I already added this and various other PMUv3.9 registers you've added 
-> here in v6.12 and v6.13. So are you on an old base or the tool allows 
-> multiple definitions? If the latter, that should be fixed.
-
-This series is based on v6.13-rc1 and as you mentioned PMUACR_EL1 has
-already been added into tools sysreg.
-
-Sysreg  PMUACR_EL1      3       0       9       14      4
-Res0    63:33
-Field   32      F0
-Field   31      C
-Field   30:0    P
-EndSysreg
-
-Seems like the tool does allow multiple definitions for a single register.
-The generated header (arch/arm64/include/generated/asm/sysreg-defs.h) does
-include redundant blocks for the following.
-
-#define REG_PMUACR_EL1                                  S3_0_C9_C14_4
-#define SYS_PMUACR_EL1                                  sys_reg(3, 0, 9, 14, 4)
-#define SYS_PMUACR_EL1_Op0                              3
-#define SYS_PMUACR_EL1_Op1                              0
-#define SYS_PMUACR_EL1_CRn                              9
-#define SYS_PMUACR_EL1_CRm                              14
-#define SYS_PMUACR_EL1_Op2                              4
-
-#define PMUACR_EL1_C                                    GENMASK(31, 31)
-#define PMUACR_EL1_C_MASK                               GENMASK(31, 31)
-#define PMUACR_EL1_C_SHIFT                              31
-#define PMUACR_EL1_C_WIDTH                              1
-
-I am wondering how this did not cause any re-definition warning ?
-
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Cc: Paul Walmsley <paul.walmsley@sifive.com>
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-riscv@lists.infradead.org
+> Cc: linux-s390@vger.kernel.org
+> Cc: linux-mm@kvack.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> This patch applies on v6.13-rc3 and has been tested on arm64, although it
+> also clears build tests on impacted platforms.
 > 
->> +Res0	63:33
->> +Field	32	FM
->> +Field	31	C
->> +Field	30	P30
->> +Field	29	P29
->> +Field	28	P28
->> +Field	27	P27
->> +Field	26	P26
->> +Field	25	P25
->> +Field	24	P24
->> +Field	23	P23
->> +Field	22	P22
->> +Field	21	P21
->> +Field	20	P20
->> +Field	19	P19
->> +Field	18	P18
->> +Field	17	P17
->> +Field	16	P16
->> +Field	15	P15
->> +Field	14	P14
->> +Field	13	P13
->> +Field	12	P12
->> +Field	11	P11
->> +Field	10	P10
->> +Field	9	P9
->> +Field	8	P8
->> +Field	7	P7
->> +Field	6	P6
->> +Field	5	P5
->> +Field	4	P4
->> +Field	3	P3
->> +Field	2	P2
->> +Field	1	P1
->> +Field	0	P0
+>   Documentation/arch/arm64/ptdump.rst       | 1 -
+>   arch/arm64/Kconfig                        | 2 +-
+>   arch/arm64/kvm/Kconfig                    | 3 +--
+>   arch/powerpc/Kconfig                      | 2 +-
+>   arch/powerpc/configs/mpc885_ads_defconfig | 1 -
+>   arch/riscv/Kconfig                        | 2 +-
+>   arch/s390/Kconfig                         | 2 +-
+>   arch/x86/Kconfig                          | 2 +-
+>   arch/x86/Kconfig.debug                    | 2 +-
+>   kernel/configs/debug.config               | 1 -
+>   mm/Kconfig.debug                          | 8 ++------
+>   11 files changed, 9 insertions(+), 17 deletions(-)
 > 
-> We're never going to use Pnn defines. This is just useless bloat unless 
-> we're aiming to top amd gpu defines LOC.
 
-Okay, this patch was trying to be cautiously comprehensive. But anyways
-PMUACR_EL1 has already been added and hence this is redundant now.
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index a0ce777f9706..c716f8df10de 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -203,7 +203,7 @@ config PPC
+>   	select GENERIC_IRQ_SHOW
+>   	select GENERIC_IRQ_SHOW_LEVEL
+>   	select GENERIC_PCI_IOMAP		if PCI
+> -	select GENERIC_PTDUMP
+> +	select PTDUMP_CORE
+
+Please keep alphabetical order.
+
+>   	select GENERIC_SMP_IDLE_THREAD
+>   	select GENERIC_TIME_VSYSCALL
+>   	select GENERIC_VDSO_TIME_NS
+
+> diff --git a/mm/Kconfig.debug b/mm/Kconfig.debug
+> index 41a58536531d..b206e5a11f96 100644
+> --- a/mm/Kconfig.debug
+> +++ b/mm/Kconfig.debug
+> @@ -187,7 +187,7 @@ config DEBUG_WX
+>   	bool "Warn on W+X mappings at boot"
+>   	depends on ARCH_HAS_DEBUG_WX
+>   	depends on MMU
+> -	select PTDUMP_CORE
+> +	depends on PTDUMP_CORE
+
+This change is unclear to me. It works because all arch selecting 
+ARCH_HAS_DEBUG_WX also select GENERIC_PTDUMP. For riscv it's even more 
+tricking, Riscv only selects GENERIC_PTDUMP when MMU is set, so it works 
+because here it also depends on MMU.
+
+But what happens if in the future an architecture selects 
+ARCH_HAS_DEBUG_WX without selecting PTDUMP_CORE ?
+
+
+>   	help
+>   	  Generate a warning if any W+X mappings are found at boot.
+>   
+> @@ -212,9 +212,6 @@ config DEBUG_WX
+>   
+>   	  If in doubt, say "Y".
+>   
+> -config GENERIC_PTDUMP
+> -	bool
+> -
+>   config PTDUMP_CORE
+>   	bool
+>   
+> @@ -222,8 +219,7 @@ config PTDUMP_DEBUGFS
+>   	bool "Export kernel pagetable layout to userspace via debugfs"
+>   	depends on DEBUG_KERNEL
+>   	depends on DEBUG_FS
+> -	depends on GENERIC_PTDUMP
+> -	select PTDUMP_CORE
+> +	depends on PTDUMP_CORE
+>   	help
+>   	  Say Y here if you want to show the kernel pagetable layout in a
+>   	  debugfs file. This information is only useful for kernel developers
+
