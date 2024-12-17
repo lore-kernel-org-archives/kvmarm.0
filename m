@@ -1,32 +1,32 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7951F9ED9
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 21:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F52D1FA830
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 21:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734470469; cv=none; b=hTYFu+E1sELn9ivXscrJUZS05D1JTpaFINffRLCcpO08ymOHvQKR2TZoIUeuD9yglilKGqxoj3rJJPdfqLlhHIKsN/AUaLGSNmyjCSogCfq7wOhkfvAX5tkUG8g3gE5WVXWwADTyjmHFnvaU3nMa5KKgQWzegUrJyKHc8jtvGrA=
+	t=1734470473; cv=none; b=Q4fMjtfxr3zMJqss0F3i5JVFd5mqvCnY+4gcX/DYld0dR/ayI1AHpQhC19P936TnvtQ+S9t1kVHCF7L7yYmlxYjWrtyt4bjdN+J+uJUhErKX3JkT5LtVFfZybCnWCMQf/WNNzyrK1Qcx3TbCrETiI+SIfcihI1+h2jof5GIqPE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734470469; c=relaxed/simple;
-	bh=buy8FBwMtT0wxxmP/EHcZGI1fziOVUj+xaCyjH1kHAk=;
+	s=arc-20240116; t=1734470473; c=relaxed/simple;
+	bh=eiwq6RgB8GhHpBYsd2ZpxBy2hA1o6EoqjXwu7pBcIKU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GjOZq4iIDJwol+muxfk7FdlFe0PAtCyxyWMIly658euUSvq5eEkVoGJbQOyLRlACTEtwNmKbsaS1pQlP06m6pOm28eEZc8ZE+l4JpbxG47lonZYYzjpvda+pCz+G9L91YxALFu2hRTKNKFni9n7nPNiAGBf75lcjPyxmA9knUE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Tox/sNoL; arc=none smtp.client-ip=95.215.58.179
+	 MIME-Version; b=MWj4lP2LlN5pJbjqPdX7uZve8D1nCHixmDYpPSzoTPF24SBY1qijbTnLPzFAH6+KKU9my0GiIci9co+WtKixK8n/fgxxQS0dqrXWyoi9xoko/xLJr0+HKppJpT9tbUZ70qGYrp/PjZK3HCl9tFM9zIvWzvnl1V4r+csNar3qDgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ddoRcP90; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Tox/sNoL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ddoRcP90"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734470465;
+	t=1734470468;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+p5reWVqLjy4I/TWVxsMBx1YnEZvRo6ajPef4GWCnXg=;
-	b=Tox/sNoLBiokraoX4u63fsoY+aBMXBFWs7EwpKNlUXjk++sdAoJK3FFEF7F9DXhpL7YrGr
-	cR0zvMw9Ar9gnlIUuX0t80UcnnyCqRD1yx5fgYD3leL2DbS4fevRb1SOnoIEe+8EC+CnHx
-	7yRgiSi4duk7jnQ662T0wdr0l6+Luh4=
+	bh=S9OvSlPazCgFtig4k2fUccNlDviHoE6kU11ttZKdFgo=;
+	b=ddoRcP90eOxaD/OLmG314kYYJZdKueqpRMZqLSDK8LApVxf6E0CFffLjN5P7svI4JCuymF
+	kCtEx16eZ2XrvMPB/tQdxl6bQjt9AJGodbwK9RcIZcQjvjHt/75D23JxGd6hv26ImJaZLY
+	zu0vVyzFpI7uxSBh78RomHXfH+jdE0Y=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -42,9 +42,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 02/18] drivers/perf: apple_m1: Support host/guest event filtering
-Date: Tue, 17 Dec 2024 13:20:32 -0800
-Message-Id: <20241217212048.3709204-3-oliver.upton@linux.dev>
+Subject: [PATCH 03/18] drivers/perf: apple_m1: Map generic branch events
+Date: Tue, 17 Dec 2024 13:20:33 -0800
+Message-Id: <20241217212048.3709204-4-oliver.upton@linux.dev>
 In-Reply-To: <20241217212048.3709204-1-oliver.upton@linux.dev>
 References: <20241217212048.3709204-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -56,91 +56,27 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The PMU appears to have a separate register for filtering 'guest'
-exception levels (i.e. EL1 and !ELIsInHost(EL0)) which has the same
-layout as PMCR1_EL1. Conveniently, there exists a VHE register alias
-(PMCR1_EL12) that can be used to configure it.
-
-Support guest events by programming the EL12 register with the intended
-guest kernel/userspace filters. Limit support for guest events to VHE
-(i.e. kernel running at EL2), as it avoids involving KVM to context
-switch PMU registers. VHE is the only supported mode on M* parts anyway,
-so this isn't an actual feature limitation.
+Map the generic perf events for branch prediction stats to the
+corresponding hardware events.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- drivers/perf/apple_m1_cpu_pmu.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ drivers/perf/apple_m1_cpu_pmu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/perf/apple_m1_cpu_pmu.c b/drivers/perf/apple_m1_cpu_pmu.c
-index ecc71f6808dd..2a34523500f8 100644
+index 2a34523500f8..d6d4ff6da862 100644
 --- a/drivers/perf/apple_m1_cpu_pmu.c
 +++ b/drivers/perf/apple_m1_cpu_pmu.c
-@@ -120,6 +120,8 @@ enum m1_pmu_events {
- 	 */
- 	M1_PMU_CFG_COUNT_USER					= BIT(8),
- 	M1_PMU_CFG_COUNT_KERNEL					= BIT(9),
-+	M1_PMU_CFG_COUNT_HOST					= BIT(10),
-+	M1_PMU_CFG_COUNT_GUEST					= BIT(11),
+@@ -170,6 +170,8 @@ static const unsigned m1_pmu_perf_map[PERF_COUNT_HW_MAX] = {
+ 	PERF_MAP_ALL_UNSUPPORTED,
+ 	[PERF_COUNT_HW_CPU_CYCLES]		= M1_PMU_PERFCTR_CORE_ACTIVE_CYCLE,
+ 	[PERF_COUNT_HW_INSTRUCTIONS]		= M1_PMU_PERFCTR_INST_ALL,
++	[PERF_COUNT_HW_BRANCH_INSTRUCTIONS]	= M1_PMU_PERFCTR_INST_BRANCH,
++	[PERF_COUNT_HW_BRANCH_MISSES]		= M1_PMU_PERFCTR_BRANCH_MISPRED_NONSPEC,
  };
  
- /*
-@@ -326,7 +328,7 @@ static void m1_pmu_disable_counter_interrupt(unsigned int index)
- }
- 
- static void __m1_pmu_configure_event_filter(unsigned int index, bool user,
--					    bool kernel)
-+					    bool kernel, bool host)
- {
- 	u64 clear, set, user_bit, kernel_bit;
- 
-@@ -354,7 +356,10 @@ static void __m1_pmu_configure_event_filter(unsigned int index, bool user,
- 	else
- 		clear |= kernel_bit;
- 
--	sysreg_clear_set_s(SYS_IMP_APL_PMCR1_EL1, clear, set);
-+	if (host)
-+		sysreg_clear_set_s(SYS_IMP_APL_PMCR1_EL1, clear, set);
-+	else if (is_kernel_in_hyp_mode())
-+		sysreg_clear_set_s(SYS_IMP_APL_PMCR1_EL12, clear, set);
- }
- 
- static void __m1_pmu_configure_eventsel(unsigned int index, u8 event)
-@@ -389,10 +394,13 @@ static void __m1_pmu_configure_eventsel(unsigned int index, u8 event)
- static void m1_pmu_configure_counter(unsigned int index, unsigned long config_base)
- {
- 	bool kernel = config_base & M1_PMU_CFG_COUNT_KERNEL;
-+	bool guest = config_base & M1_PMU_CFG_COUNT_GUEST;
-+	bool host = config_base & M1_PMU_CFG_COUNT_HOST;
- 	bool user = config_base & M1_PMU_CFG_COUNT_USER;
- 	u8 evt = config_base & M1_PMU_CFG_EVENT;
- 
--	__m1_pmu_configure_event_filter(index, user, kernel);
-+	__m1_pmu_configure_event_filter(index, user && host, kernel && host, true);
-+	__m1_pmu_configure_event_filter(index, user && guest, kernel && guest, false);
- 	__m1_pmu_configure_eventsel(index, evt);
- }
- 
-@@ -568,7 +576,7 @@ static int m1_pmu_set_event_filter(struct hw_perf_event *event,
- {
- 	unsigned long config_base = 0;
- 
--	if (!attr->exclude_guest) {
-+	if (!attr->exclude_guest && !is_kernel_in_hyp_mode()) {
- 		pr_debug("ARM performance counters do not support mode exclusion\n");
- 		return -EOPNOTSUPP;
- 	}
-@@ -576,6 +584,10 @@ static int m1_pmu_set_event_filter(struct hw_perf_event *event,
- 		config_base |= M1_PMU_CFG_COUNT_KERNEL;
- 	if (!attr->exclude_user)
- 		config_base |= M1_PMU_CFG_COUNT_USER;
-+	if (!attr->exclude_host)
-+		config_base |= M1_PMU_CFG_COUNT_HOST;
-+	if (!attr->exclude_guest)
-+		config_base |= M1_PMU_CFG_COUNT_GUEST;
- 
- 	event->config_base = config_base;
- 
+ /* sysfs definitions */
 -- 
 2.39.5
 
