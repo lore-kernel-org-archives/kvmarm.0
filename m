@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8551DDC1E;
-	Tue, 17 Dec 2024 10:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAF81DFE0C;
+	Tue, 17 Dec 2024 11:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432961; cv=none; b=Duf4YO00/Y75Ld74VhKVI01eJnUoa8I20ZYBPnFWiP1jsECrHpbxhb37aH8YkkcfwTDcPcVjE/NpcjNLcfXmOIDeS9/Hc1QqM11LA7HkTydanFAiXG/mICSwLPMccXvE/RUtM77c8P46Hgcsc72rwHXdKLy1bUIq3g2SZklklXw=
+	t=1734433393; cv=none; b=dSaeV1fe29hZYPEGIG2EbYWs6kYSLnTGZGelLwrcVLKq8eR72AjRFI8Mrn2RiWh418hFtESAvl141RPA7QvjHt4adKgteKglj+AYjbqATv6oJ6Mw8eBevg/Xnpojyux7925sCNIFiKnOuEd+mUnAHDSf+W23+CYGzme/VsEC4EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432961; c=relaxed/simple;
-	bh=NS1IvYP+0vQDhKLZQWwGEG18/PVpO+pMPWRt8Qw7xiw=;
+	s=arc-20240116; t=1734433393; c=relaxed/simple;
+	bh=2NJR/iFzF/OAv9mApDUHc/rR7eYb/PKueeBcLQtbFwQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=awLMqvCD1YoeoMldR6o58s8FwFws5dpaqi4IJ/l64Ep7/G1AaJ43HOPBXqLXYGfLFMTCJf072OHeCPSrXvBFsKb/XDpZ4inQJdK4WBMXR8bX5zrD3Upodzp9Wku+Vm31v0Hsn3sRJzB2yC6FPzVCSN7cmpee+/i+D8XpFsaeids=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRTYVhlp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Iz5Vq7Vyl2cWAPMT+mMp7fvzHZj1JbUhJz62LHIW1+gd55mLZbDUp9pisx4L/b4Z96igAGME2As9ymyaoRfLHAL8q3cIZpy+4fDXEHNFCv6P0q+/5fl+Ywyl8XsyTin/P3D6ghlD7eVWDjyRJaAFOEnZYM0HYQq4NccI1lzTKTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzU4up4z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRTYVhlp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C2B4C4CED3;
-	Tue, 17 Dec 2024 10:56:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzU4up4z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581E1C4CED4;
+	Tue, 17 Dec 2024 11:03:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734432960;
-	bh=NS1IvYP+0vQDhKLZQWwGEG18/PVpO+pMPWRt8Qw7xiw=;
+	s=k20201202; t=1734433392;
+	bh=2NJR/iFzF/OAv9mApDUHc/rR7eYb/PKueeBcLQtbFwQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WRTYVhlpsxFgoWDpX90PCgXIn+l8vtZtPdS25P4neZY3A3QAvn7TbdqjhL7yPdUH+
-	 qEdutgCjAH2qWQaSl2x9L3W2HVWMdMTz26X/yX7LIbqCCq2zI8aR/aay+lG6jKKPja
-	 ZM2Z+OxqLcQjQza4l9yykfMyR+xyIgWZj+1R9d3GNKUkS0lpRW0idd88Tz0y8HpJr4
-	 jc4bbjGxQIhKwZ0te8QV4HSl9Q4ITa0hjoCR8kmZPq9RiWjgRTGTU7B1xZypR6EvaJ
-	 LiwZI/tCO2B1xduU8uPdXAET5lTQrXwc7kRsW9brTgr69ZV9rLLimIx9WIW/x0pIN2
-	 7Djy4CrR4/jlA==
+	b=jzU4up4z8oan5qBtU82XldC7ibWuEKkBdxlJ1RFuynkMDjZolZdAvA3an/+n/Wp2E
+	 CtX/DcEHQxDF9PAQmGZ0JUi60U6viCwoBvvqTnZXhpuNg5Rx2cYg6C040rnkJyPVEG
+	 xjf0W93WwkuyWE5LBMFhmPsQ52QFiUr5YYAMLibyY58eu9jxOOXakYXS5/IYUOUAge
+	 aLEvFBGkxtHmKxHPK7kxqV628cKL9BxRTCkbSooL3CjCXtbMfWzfOiChtc8tPfcYjb
+	 c+8uCd7h9sS1QSrAox0ryLpaBkPCFGNbU0XEIIJbKUW40H0XwLzrIifeDYpvaN5JXz
+	 pxfZ+GaxY8cJw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tNVF8-004Wc7-M9;
-	Tue, 17 Dec 2024 10:55:58 +0000
-Date: Tue, 17 Dec 2024 10:55:58 +0000
-Message-ID: <86zfkur329.wl-maz@kernel.org>
+	id 1tNVM5-004WjL-0a;
+	Tue, 17 Dec 2024 11:03:09 +0000
+Date: Tue, 17 Dec 2024 11:03:08 +0000
+Message-ID: <86y10er2qb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -48,10 +48,10 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 03/18] KVM: arm64: Make hyp_page::order a u8
-In-Reply-To: <20241216175803.2716565-4-qperret@google.com>
+Subject: Re: [PATCH v3 04/18] KVM: arm64: Move host page ownership tracking to the hyp vmemmap
+In-Reply-To: <20241216175803.2716565-5-qperret@google.com>
 References: <20241216175803.2716565-1-qperret@google.com>
-	<20241216175803.2716565-4-qperret@google.com>
+	<20241216175803.2716565-5-qperret@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,32 +67,56 @@ X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.co
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Dec 2024 17:57:48 +0000,
+On Mon, 16 Dec 2024 17:57:49 +0000,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> We don't need 16 bits to store the hyp page order, and we'll need some
-> bits to store page ownership data soon, so let's reduce the order
-> member.
+> We currently store part of the page-tracking state in PTE software bits
+> for the host, guests and the hypervisor. This is sub-optimal when e.g.
+> sharing pages as this forces to break block mappings purely to support
+> this software tracking. This causes an unnecessarily fragmented stage-2
+> page-table for the host in particular when it shares pages with Secure,
+> which can lead to measurable regressions. Moreover, having this state
+> stored in the page-table forces us to do multiple costly walks on the
+> page transition path, hence causing overhead.
+> 
+> In order to work around these problems, move the host-side page-tracking
+> logic from SW bits in its stage-2 PTEs to the hypervisor's vmemmap.
 > 
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  6 +++---
->  arch/arm64/kvm/hyp/include/nvhe/memory.h |  5 +++--
->  arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 14 +++++++-------
->  3 files changed, 13 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h |   6 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 100 ++++++++++++++++-------
+>  arch/arm64/kvm/hyp/nvhe/setup.c          |   7 +-
+>  3 files changed, 77 insertions(+), 36 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-> index 97c527ef53c2..f1725bad6331 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-> @@ -7,7 +7,7 @@
->  #include <nvhe/memory.h>
->  #include <nvhe/spinlock.h>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index 45b8d1840aa4..8bd9a539f260 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -8,7 +8,7 @@
+>  #include <linux/types.h>
 >  
-> -#define HYP_NO_ORDER	USHRT_MAX
-> +#define HYP_NO_ORDER	0xff
+>  /*
+> - * SW bits 0-1 are reserved to track the memory ownership state of each page:
+> + * Bits 0-1 are reserved to track the memory ownership state of each page:
+>   *   00: The page is owned exclusively by the page-table owner.
+>   *   01: The page is owned by the page-table owner, but is shared
+>   *       with another entity.
+> @@ -43,7 +43,9 @@ static inline enum pkvm_page_state pkvm_getstate(enum kvm_pgtable_prot prot)
+>  struct hyp_page {
+>  	u16 refcount;
+>  	u8 order;
+> -	u8 reserved;
+> +
+> +	/* Host (non-meta) state. Guarded by the host stage-2 lock. */
+> +	enum pkvm_page_state host_state : 8;
 
-nit: (u8)(~0)?
+An enum as a bitfield? Crazy! :)
+
+You probably want an assert somewhere that ensures that hyp_page is a
+32bit quantity, just to make sure (and avoid hard to track bugs).
+
+Thanks,
 
 	M.
 
