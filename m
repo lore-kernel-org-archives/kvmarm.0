@@ -1,32 +1,32 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244491EB9E8
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 17:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FED1F8925
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 17:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734458163; cv=none; b=Wyx7hT9GflPCc2zITrJRYQyezID7JKlv3uI8yNlPVqJmbLyuu/PSE/SWlnKSP4HIuHPlqBxwlyNrGoowrJXrkRcPvuXn4QrkGgbqD1UULoHgI5KzMVt8VHNgIrO9MiqkZ6BBbzQTloAzN9RI4q4JctyFom3TedQL7wyPMDuSnxk=
+	t=1734458192; cv=none; b=oxtmo3EJgkK4IyAo4SNnSSUU0g8skJiW8BpYjbsrbEQqI3Ayydz4vxTAuaUXY/MDvwJhhYWVOq6R30jQ+Ape5pFpkU5t9GKVdsIx2OlYVJSndsD2cTDxDdafbPZngK3mo+t4O9Pr3Pt0mOQ//98OxlXzuwGyZBo3PA/kERU4U50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734458163; c=relaxed/simple;
-	bh=FOIHciXozTi2Q9MOVbZiynuyVg8lOn6RN4ASE3Et+uU=;
+	s=arc-20240116; t=1734458192; c=relaxed/simple;
+	bh=SRNvdsDnj7pE45rJIoxRTJXz5MjmKAv5n7BiMb5oUaI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DvqyJFFmT+K90duV6LiaR0ItzfVehJQaEpKCqYwZKv1VJmpGSC7mQrR9ZJJ/LSXC0PvHU3ZMKjWkLHlxRPqNY8qfW+JJIx46W80U6GARnXikFwt8Jis6OP9y1GldIJYnLjUp4/vyUgOHFpdkmBDGzocQOGc4w0j3+R/uB31EYco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=keeYDn88; arc=none smtp.client-ip=91.218.175.183
+	 MIME-Version; b=eKbceolh/392pA4mEQQSwoMFDLLS+w/T8Dxwh0H7GjgYmQIWUhHtcAeD/stmmBpiZ4wrmCOJ/BaRmm/REVja/AKbzeXDBjNAOBrek2yqw1IYt0hY20/6F3xwdOlFJk7gRPfLLxrQTFJFMQJngzVIrjFMO7uBsHlP8IWSTXmf3Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fi45UOh1; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="keeYDn88"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fi45UOh1"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734458160;
+	t=1734458189;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iDc2GNru3KC9FE1VZE6S/9RVzT2UkIuUC3Ho/X5pGOU=;
-	b=keeYDn886Onn1w6UxX/rWCXPM6x5wBaB9crxHV9cxjWvu4mLCzofFWwA2Rs3uQ6eMRYPnE
-	3ikRJTt7mPz/CjrJCwkHAvNhdMHsMMNVR/itgFarnEJWmx/z0PHH3gT9WFbrTTd/e4n19q
-	ShQS0WhSjoP+wowIdH5077HZwfMzc7I=
+	bh=CDgr0mr176E5xiO0kHiuxiG6mLUMJNXRv037b+CSgSo=;
+	b=Fi45UOh18wWfHm58v0U0DXxIozByNLBzulB147dN0Kt28eAE1+Y0yk0Xi99phniGRDSf1U
+	jJy09LbFbrC6Uf1Rb2Wj/ow/LDAE7rrgPc6U2GAdjdWiFw4a+nhF4nAK2wK8QZjXUBJyDG
+	GFC023gWGcEw36dcqLmBERkmFoRSTII=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -37,9 +37,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Colton Lewis <coltonlewis@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 3/4] KVM: arm64: nv: Reload PMU events upon MDCR_EL2.HPME change
-Date: Tue, 17 Dec 2024 09:55:50 -0800
-Message-Id: <20241217175550.3658212-1-oliver.upton@linux.dev>
+Subject: [PATCH 4/4] KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters
+Date: Tue, 17 Dec 2024 09:56:11 -0800
+Message-Id: <20241217175611.3658290-1-oliver.upton@linux.dev>
 In-Reply-To: <20241217175336.3657966-1-oliver.upton@linux.dev>
 References: <20241217175336.3657966-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -51,55 +51,38 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-MDCR_EL2.HPME is the 'global' enable bit for event counters reserved for
-EL2. Give the PMU a kick when it's changed to ensure events are
-reprogrammed before returning to the guest.
+An important distinction from other registers affected by HPMN is that
+PMCR_EL0 only affects the guest range of counters, regardless of the EL
+from which it is accessed. Ensure that PMCR_EL0.P is always applied to
+'guest' counters by manually computing the mask rather than deriving it
+from the current context.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pmu-emul.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6ef8641d9833..634ff18a59a1 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2448,6 +2448,26 @@ static unsigned int s1pie_el2_visibility(const struct kvm_vcpu *vcpu,
- 	return __el2_visibility(vcpu, rd, s1pie_visibility);
- }
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index c6423782a8aa..6c5950b9ceac 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -617,8 +617,14 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
  
-+static bool access_mdcr(struct kvm_vcpu *vcpu,
-+			struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	u64 old = __vcpu_sys_reg(vcpu, MDCR_EL2);
+ 	if (val & ARMV8_PMU_PMCR_P) {
+-		unsigned long mask = kvm_pmu_accessible_counter_mask(vcpu);
+-		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
++		/*
++		 * Unlike other PMU sysregs, the controls in PMCR_EL0 always apply
++		 * to the 'guest' range of counters and never the 'hyp' range.
++		 */
++		unsigned long mask = kvm_pmu_implemented_counter_mask(vcpu) &
++				     ~kvm_pmu_hyp_counter_mask(vcpu) &
++				     ~BIT(ARMV8_PMU_CYCLE_IDX);
 +
-+	if (!access_rw(vcpu, p, r))
-+		return false;
-+
-+	/*
-+	 * Request a reload of the PMU to enable/disable the counters affected
-+	 * by HPME.
-+	 */
-+	if ((old ^ __vcpu_sys_reg(vcpu, MDCR_EL2)) & MDCR_EL2_HPME)
-+		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-+
-+	return true;
-+}
-+
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2981,7 +3001,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
- 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
- 	EL2_REG_VNCR(HCR_EL2, reset_hcr, 0),
--	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(MDCR_EL2, access_mdcr, reset_val, 0),
- 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
- 	EL2_REG_VNCR(HSTR_EL2, reset_val, 0),
- 	EL2_REG_VNCR(HFGRTR_EL2, reset_val, 0),
+ 		for_each_set_bit(i, &mask, 32)
+ 			kvm_pmu_set_pmc_value(kvm_vcpu_idx_to_pmc(vcpu, i), 0, true);
+ 	}
 -- 
 2.39.5
 
