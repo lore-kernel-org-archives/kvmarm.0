@@ -1,174 +1,122 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C982C148314
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 07:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5132342AA1;
+	Tue, 17 Dec 2024 08:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734421679; cv=none; b=htCGPYEYxJc+Ba0o6MJn32vmueINK5wCee9y+dchPPy0ehnc+exE4Gi+0GW/tOCQXjfduYvdpvp/iMidJgSMWNYZQa7qO3LgmVjVURgmrzImIu7exovr5cp1wODZun/IokxWQsU2HzDBQZKc8Jn10BJbW/k2yzuCrohSbQkWZhQ=
+	t=1734424242; cv=none; b=RH1VoDeGzHk13AXVEOsiOUT8zl7Qht+k9CuZlDgH13MrSSLXibbOWJ7RkrFM/3YvHqAe+cY1BAjbJz8AGBBzI1sq6pAk0wD/AWHJYTob4I2m6hEAt5j17AJ1z4GIk45Mf5DyHHVqBJPyWGfgWsLk5vUC1r6RVbdb7jRZgpANYtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734421679; c=relaxed/simple;
-	bh=MgOQrO27meBf7NsG6OWTkY99J5lARFg7R+CbynX6vlg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LivhCZi9FfizTgpqBocVBFHay1gL6cA7KEeJHqyxlUXKDVR9eo6Kuq5VJsxrFKOnApT6RPaHo3YXy9B1NZeMwJD6NQcIILU4t+vwaM4S0Rv7+P5javF6VgEMGQLoMdsuAfLnE9QY8u0iLLyU3RhLl/AqzmQemy5P9Pg5+R5oSqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4YC86z6Lcmz9sPd;
-	Tue, 17 Dec 2024 08:47:55 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fC7tw8E5ccA2; Tue, 17 Dec 2024 08:47:55 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4YC86z5K7qz9rvV;
-	Tue, 17 Dec 2024 08:47:55 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A3F418B768;
-	Tue, 17 Dec 2024 08:47:55 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id iR2VLUnfgYsc; Tue, 17 Dec 2024 08:47:55 +0100 (CET)
-Received: from [192.168.232.97] (unknown [192.168.232.97])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 73D238B763;
-	Tue, 17 Dec 2024 08:47:54 +0100 (CET)
-Message-ID: <ddd4439e-6f6f-4513-a7dc-b7f01bec03dc@csgroup.eu>
-Date: Tue, 17 Dec 2024 08:47:54 +0100
+	s=arc-20240116; t=1734424242; c=relaxed/simple;
+	bh=sJTelRh5BsOfm4lONdvvjAu3mDOe48NrRuTOIBtnAMI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K+HAseZuvJUF0HZxal4awqmQ16CGFCO9sKdOxr2ML6PzDoH6Gb48NK5xtpxnlOwnLcteW59dMJdypW1/CANg5H23c3OizQoP1gHityStU221d/9Jb2mTDT+QsjIINZhIvMIH02eT3GJTQBu9+Y9G33+rqGpyWLvu278k8GfxM1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l71SWLKk; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l71SWLKk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4114C4CED3;
+	Tue, 17 Dec 2024 08:30:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734424241;
+	bh=sJTelRh5BsOfm4lONdvvjAu3mDOe48NrRuTOIBtnAMI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l71SWLKkp5Nr6M3mGg7Pnz7kNu8F11xrwYQn0V5no43bAVGRUefq9YI++b48YR2iF
+	 XLzjqUZM8Kxrli6aeQOs/nhmsuSFeNGB58flYwT/Osicp7ooEbd8k/maROtfilItWx
+	 95hl/39ExSBwDRDk4bJtjMT+Nbyye7DCJ6/WPw2lkagcGYv4pi58fdXz5JhxWL9ESo
+	 53w70EyCfe9PH5Z07DepXeIuhq7+cIVJYuMQ5oEEGF242D6/uau1OwGXGUfVnf37WB
+	 drfRHAwCnDGcxlCO89pXxOsWD7CExbpQTB5CIAN+tPV64VgIdYVKDufjF/4KaiRUPP
+	 dE4KMrklV1DIQ==
+Received: from [82.132.185.145] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tNSyV-004TdD-Hg;
+	Tue, 17 Dec 2024 08:30:39 +0000
+Date: Tue, 17 Dec 2024 08:30:37 +0000
+Message-ID: <875xnisocy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
+In-Reply-To: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
+References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm/ptdump: Drop GENERIC_PTDUMP
-To: Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org
-Cc: steven.price@arm.com, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org
-References: <20241217034807.2541349-1-anshuman.khandual@arm.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20241217034807.2541349-1-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.185.145
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-Le 17/12/2024 à 04:48, Anshuman Khandual a écrit :
-> GENERIC_PTDUMP does not guard any code but instead just used for platform's
-> subscription into core ptdump defined under PTDUMP_CORE, which is selected.
-> Instead use PTDUMP_CORE for platform subscription and drop GENERIC_PTDUMP.
+On Mon, 16 Dec 2024 19:28:24 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: Paul Walmsley <paul.walmsley@sifive.com>
-> Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: kvmarm@lists.linux.dev
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Cc: linux-riscv@lists.infradead.org
-> Cc: linux-s390@vger.kernel.org
-> Cc: linux-mm@kvack.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> In commit 03c7527e97f7 ("KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits
+> to be overridden") we made that bitfield in the ID registers unwritable
+> however the change neglected to make the corresponding update to set_id_regs
+> resulting in it failing:
+> 
+> # ok 56 ID_AA64MMFR0_EL1_BIGEND
+> # ==== Test Assertion Failure ====
+> #   aarch64/set_id_regs.c:434: masks[idx] & ftr_bits[j].mask == ftr_bits[j].mask
+> #   pid=5566 tid=5566 errno=22 - Invalid argument
+> #      1	0x00000000004034a7: test_vm_ftr_id_regs at set_id_regs.c:434
+> #      2	0x0000000000401b53: main at set_id_regs.c:684
+> #      3	0x0000ffff8e6b7543: ?? ??:0
+> #      4	0x0000ffff8e6b7617: ?? ??:0
+> #      5	0x0000000000401e6f: _start at ??:?
+> #   0 != 0xf0 (masks[idx] & ftr_bits[j].mask != ftr_bits[j].mask)
+> not ok 8 selftests: kvm: set_id_regs # exit=254
+> 
+> Remove ID_AA64MMFR1_EL1.ASIDBITS from the set of bitfields we test for
+> writeability.
+> 
+> Fixes: 03c7527e97f7 ("KVM: arm64: Do not allow ID_AA64MMFR0_EL1.ASIDbits to be overridden")
+
+A patch for a test doesn't fix anything in the kernel.
+
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
-> This patch applies on v6.13-rc3 and has been tested on arm64, although it
-> also clears build tests on impacted platforms.
+>  tools/testing/selftests/kvm/aarch64/set_id_regs.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
->   Documentation/arch/arm64/ptdump.rst       | 1 -
->   arch/arm64/Kconfig                        | 2 +-
->   arch/arm64/kvm/Kconfig                    | 3 +--
->   arch/powerpc/Kconfig                      | 2 +-
->   arch/powerpc/configs/mpc885_ads_defconfig | 1 -
->   arch/riscv/Kconfig                        | 2 +-
->   arch/s390/Kconfig                         | 2 +-
->   arch/x86/Kconfig                          | 2 +-
->   arch/x86/Kconfig.debug                    | 2 +-
->   kernel/configs/debug.config               | 1 -
->   mm/Kconfig.debug                          | 8 ++------
->   11 files changed, 9 insertions(+), 17 deletions(-)
+> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> index a79b7f18452d2ec336ae623b8aa5c9cf329b6b4e..3a97c160b5fec990aaf8dfaf100a907b913f057c 100644
+> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> @@ -152,7 +152,6 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGENDEL0, 0),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, SNSMEM, 0),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGEND, 0),
+> -	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ASIDBITS, 0),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, PARANGE, 0),
+>  	REG_FTR_END,
+>  };
 > 
 
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index a0ce777f9706..c716f8df10de 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -203,7 +203,7 @@ config PPC
->   	select GENERIC_IRQ_SHOW
->   	select GENERIC_IRQ_SHOW_LEVEL
->   	select GENERIC_PCI_IOMAP		if PCI
-> -	select GENERIC_PTDUMP
-> +	select PTDUMP_CORE
+With the Fixes: line dropped,
 
-Please keep alphabetical order.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
->   	select GENERIC_SMP_IDLE_THREAD
->   	select GENERIC_TIME_VSYSCALL
->   	select GENERIC_VDSO_TIME_NS
+	M.
 
-> diff --git a/mm/Kconfig.debug b/mm/Kconfig.debug
-> index 41a58536531d..b206e5a11f96 100644
-> --- a/mm/Kconfig.debug
-> +++ b/mm/Kconfig.debug
-> @@ -187,7 +187,7 @@ config DEBUG_WX
->   	bool "Warn on W+X mappings at boot"
->   	depends on ARCH_HAS_DEBUG_WX
->   	depends on MMU
-> -	select PTDUMP_CORE
-> +	depends on PTDUMP_CORE
-
-This change is unclear to me. It works because all arch selecting 
-ARCH_HAS_DEBUG_WX also select GENERIC_PTDUMP. For riscv it's even more 
-tricking, Riscv only selects GENERIC_PTDUMP when MMU is set, so it works 
-because here it also depends on MMU.
-
-But what happens if in the future an architecture selects 
-ARCH_HAS_DEBUG_WX without selecting PTDUMP_CORE ?
-
-
->   	help
->   	  Generate a warning if any W+X mappings are found at boot.
->   
-> @@ -212,9 +212,6 @@ config DEBUG_WX
->   
->   	  If in doubt, say "Y".
->   
-> -config GENERIC_PTDUMP
-> -	bool
-> -
->   config PTDUMP_CORE
->   	bool
->   
-> @@ -222,8 +219,7 @@ config PTDUMP_DEBUGFS
->   	bool "Export kernel pagetable layout to userspace via debugfs"
->   	depends on DEBUG_KERNEL
->   	depends on DEBUG_FS
-> -	depends on GENERIC_PTDUMP
-> -	select PTDUMP_CORE
-> +	depends on PTDUMP_CORE
->   	help
->   	  Say Y here if you want to show the kernel pagetable layout in a
->   	  debugfs file. This information is only useful for kernel developers
-
+-- 
+Without deviation from the norm, progress is not possible.
