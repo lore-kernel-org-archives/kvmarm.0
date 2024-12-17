@@ -1,68 +1,68 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA2B19B5B4
-	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 08:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CB32E628
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 09:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734425896; cv=none; b=XB1uv8o1Lmfbxuy4akruErQALw91r4xWbdWnJwNbFB9SgL+bmh1YeEEEGuBx4bONCUSYSXDvdq+dEGdq2NBzTn2aJR3FyBec5Gc1pi6//AYmOUo3dSUxrSUeiI+qRzh2BvLW/MUYg2ylCfCRyLQgZ60QGDexbdWjAXMIALsnxdw=
+	t=1734426076; cv=none; b=tqOXPK8nmc4OY6c8KG1YKEIJDIW/BTGEtlWo4XhlCjhKtM608cW8dcBMI49xW9KdFuSf+DeGRfad7X8/iGG2DerVjjW17Pnqmk0nWZYXMu1/w4kgVyPlDTrTZLrPoVq5nQEpVzJzST75XinMVcf9aa+ypoHRyac5ymV13lFwB3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734425896; c=relaxed/simple;
-	bh=5ei2u8waFHNXln0kfNmWVKqhewKVjoULHXhJF6AJVXM=;
+	s=arc-20240116; t=1734426076; c=relaxed/simple;
+	bh=3RenyzS3NONn/LSyfsCTUFB7A3rM0DdKDQDhYTRM9lo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tp5VxUU6MUF0WySFjS3byY/OpIlUN+SID7Zs/1ah4mi4kfGAMQ/xdm9oDzb2hfkRitfUFWCEy5C2GAg2AlWUDOMK6Wp4MbSZWQzXQpsmJbWKv3eFuLGlp8TjIgKbjMuKQrY7QB/MyLyQxwqL4Lkpz1fJLbPe2qb4hI2DmgOzox0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vrOJHEdc; arc=none smtp.client-ip=209.85.128.42
+	 To:Cc:Content-Type; b=U77r+ad4ffDomrpYqlZctXjpjfgdZcedYXfwEHIslIUeOsTMJidQ5ydZHBqQbqnhDZlwOyoYsWAsg1BZnNa1YMB7apXes3F9E8gnFhMOQzRwkQtWWBQTImdU2Z0L1YO5fWy2omt3/7fhT4W7qlAqtv8FlYRFzkd8SbjY7CaPZUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=seacuWc0; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vrOJHEdc"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4361d5730caso27715e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 00:58:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="seacuWc0"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4361d5730caso28125e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 01:01:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734425893; x=1735030693; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734426072; x=1735030872; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zi9Cb0JXIv6qknzxniEvO9UIstkZaMDWbi894gneAi8=;
-        b=vrOJHEdcBf60ZEQEvZcqMcvplwi+XM6kVl+Wk3zlXgrx/460NYwkR2iiyZhzj8kFbd
-         FwMHxPz42BQBJ+izJ6zmpVmZZACTqcqYbuliGRnt76nTjESu+HbSU8swt2iLBiDfqpxw
-         jfDdjZPISA3UGicCibYjG+BnLvDGsC8MpZ6Xz8LHVWB9azTmNI8alV1zV7PVz3XvWnx8
-         hEGTlgG9BP/V2CzES6ruRk29/M/M7gvwgr+9ier2qQl+ECK/CmJ83a1UwacLCCoHTiYc
-         z+OWyhiFu8daLJ8Qr6adDNLCgpXDti25ydjXaAggeSqYA7ldrhbEvNLv+TvefdFBYYbc
-         NG4Q==
+        bh=Xn36mxEjfO11KqvkRwmiDrEX6J7ZOG8Km82941NlBuM=;
+        b=seacuWc0eoQLJQSRBU6YoUHhLSQct2l0uxWBYtBeRIF7gr9PfStuC7917WBXjTXxh4
+         BzBMwCiT837cfzuDCSJnYNyg272tA0BZgxq3fgy32S5xYCS5bRFa79d9P+wBzHuu32wb
+         zH2bCpdjMGak3Pc+54JNEXlIjbWI6exB/YoJmCz0qbeo52/SNraI/GgODsHJriVQdvW7
+         1TXjmGLVuzCfUgdvmm3///lCwVUFaUqBa7xtLawONS72HqBisxZG/DsOt8HGlvrmeUVU
+         BCoXPNkjUPdhRUFmnRxDVSslUa+Icz9LEmzk4SVKOBsqKSzafQQx0Fj/FuBsjti3fk2G
+         tkdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734425893; x=1735030693;
+        d=1e100.net; s=20230601; t=1734426072; x=1735030872;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zi9Cb0JXIv6qknzxniEvO9UIstkZaMDWbi894gneAi8=;
-        b=GbUbhUPLxzdwQkNZTGxQT7PlHQRbVzxhzbjB1gp8VaPD+6ooUR8U1sFB1pWF57fM8e
-         xHl+B5y92pxLYWUXQK3hBze5sTYiVaATGYKdW1xwUZ5OPCEJ2+t3QYqq2WICree9lOE4
-         JvfxGCUNsGwfX9wmw7pgkfNBkhVpBhiFRw4wwYu1+9lNFEobmIcN2BjSFMj1Hk2xdoVO
-         VPAd3QZxt/wqUZNNu813v7aeqfw7OEEiGmtQ+hZ5NtI5usqUNdKzmNS477wN3xTlkhmu
-         VNy97LxMhEcPEhMchgBxng1vCTFHKcSeNap39v0ly0d10aBBUDCSZRHfhzvglxrupZI1
-         dz9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVXOHOhCVs03GA1SY7aYIBdyaFaGUV03XxNIsLbuiiiDpyWPF59sLpXghuSubVBSyr7DcCFsk0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxXEwh6oYDJ0Q+dCZwoNEODl2GA67um44eyQsUe4526jKFfBALL
-	CpSsJxiGgyL+AxWWE/TuJqFkkJw0bZIXsST1hBLSzMJaMnMAIGNSWE5mOpPtDKhQFB53pXkNSAa
-	WZmvTyeOpMpNNPaWsWAw9FBJpnq1kn4i9MQLQPLQGmrOjIAk1kL5Q
-X-Gm-Gg: ASbGncuzGuroQkIBK29TcjS9OUosDtHhxKP+gHtpw33vFrHfWBMSrO/Gx9iTOFtBc2I
-	MQUoUNb/Y1cy+Wod+IUph3kqmJ+eXUMMAwechibqR/ySSgfXbv5pzjKy49yNRuE2H/+s=
-X-Google-Smtp-Source: AGHT+IH6cdmhYpwRWiZB/ZV5vSi18IhtigKu9D+VojiJ+Wuao7fHQY46QuAyKXvWoaUnPqjxiHSCHKPg3eD4TVHISuM=
-X-Received: by 2002:a7b:ce88:0:b0:436:186e:13a6 with SMTP id
- 5b1f17b1804b1-436492cf51dmr1049705e9.6.1734425892536; Tue, 17 Dec 2024
- 00:58:12 -0800 (PST)
+        bh=Xn36mxEjfO11KqvkRwmiDrEX6J7ZOG8Km82941NlBuM=;
+        b=nqMUSQ2DlWBqUkqdYStVzVpHcccVFs1eq5CeOGU/RMWabUTd0ukLrYuwp9DyBvRJWD
+         iIxn4ooOoqud+s/fK/yx2/hm6I0EHkYHkJQ/xFGXQlZjc6+Tl8leVOqnQKZXP+881MjL
+         yoqhhg+4btpkrBmQwKDT5H7X9atcyEtYsiKX5INLf/mw4Mlg2j2Or+tEXfHF/ahq2bND
+         cqVTPrM05WHoAMIdRIjVppM4WwglpZGKqUZShDdAk+OakjYyEISNVrw+jnitWzTY1K5V
+         QzhYzUJqLnXCfXcvdNZpIDNUbmDNCPZ3YRk4SfdTJPjOaUHRFrypy0Elx34HFIQXUdcJ
+         alEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUv0hASxRISNatfBCQIeBbvXDCGGsQx9G5bA3BnHTugHkgzYaExE6EnCi739c9cSlCE7pEGuaU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwXRQOSN6eoj4KdBGtc0ff+sCT4fPTH/Vl+wnlMRxx6uYu3DW7+
+	7nnZNrK0uDQcVzXppqIpE/sBdZpsDKulZYvMMrOmjh+tQHNO2K5NY5nvzKk3ZG549DThk+Czxn+
+	t/8vrxIr3UAqCc8INC8y39hpJPIuZUnWf4z5KLt0j9gyuACC1I3zs
+X-Gm-Gg: ASbGnctf9JFE8SuceE989PpbnxWk5r2q5BRMPJbynvsB17stua8b0awnuCV12163HRA
+	mY/1PVH5p3OgoNAIOFkpueA4qW8TBtTrr4nT6kQ2GUArLvC5FJ5LNWZgUPkzWm8yjNKc=
+X-Google-Smtp-Source: AGHT+IGTMsIK/+fqyiclNvnxiumOrPL+9bRBaA9Q/a+ejFhKcdGovQJz4621GOwlV2PhnNytnWUP3JoeS+CcBPepzUE=
+X-Received: by 2002:a05:600c:258:b0:434:a0fd:95d9 with SMTP id
+ 5b1f17b1804b1-4364ad50a2bmr724755e9.5.1734426072395; Tue, 17 Dec 2024
+ 01:01:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241216175803.2716565-1-qperret@google.com> <20241216175803.2716565-15-qperret@google.com>
-In-Reply-To: <20241216175803.2716565-15-qperret@google.com>
+References: <20241216175803.2716565-1-qperret@google.com> <20241216175803.2716565-16-qperret@google.com>
+In-Reply-To: <20241216175803.2716565-16-qperret@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 17 Dec 2024 08:57:36 +0000
-Message-ID: <CA+EHjTz0sC4idnRMLjVoOcbyZ3kTXM3+hkPHdo=V1XZ3aJ6BbQ@mail.gmail.com>
-Subject: Re: [PATCH v3 14/18] KVM: arm64: Introduce __pkvm_host_test_clear_young_guest()
+Date: Tue, 17 Dec 2024 09:00:36 +0000
+Message-ID: <CA+EHjTx-2vBMY67Y6hm4U-DFirM93BK-CQOvcnBgYXO75xhmFw@mail.gmail.com>
+Subject: Re: [PATCH v3 15/18] KVM: arm64: Introduce __pkvm_host_mkyoung_guest()
 To: Quentin Perret <qperret@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -74,8 +74,9 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Mon, 16 Dec 2024 at 17:58, Quentin Perret <qperret@google.com> wrote:
 >
-> Plumb the kvm_stage2_test_clear_young() callback into pKVM for
-> non-protected guest. It will be later be called from MMU notifiers.
+> Plumb the kvm_pgtable_stage2_mkyoung() callback into pKVM for
+> non-protected guests. It will be called later from the fault handling
+> path.
 >
 > Signed-off-by: Quentin Perret <qperret@google.com>
 
@@ -87,85 +88,83 @@ Cheers,
 > ---
 >  arch/arm64/include/asm/kvm_asm.h              |  1 +
 >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 22 +++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 19 ++++++++++++++++
->  4 files changed, 43 insertions(+)
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 19 ++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 20 +++++++++++++++++++
+>  4 files changed, 41 insertions(+)
 >
 > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 8663a588cf34..4f97155d6323 100644
+> index 4f97155d6323..a3b07db2776c 100644
 > --- a/arch/arm64/include/asm/kvm_asm.h
 > +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -69,6 +69,7 @@ enum __kvm_host_smccc_func {
->         __KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
+> @@ -70,6 +70,7 @@ enum __kvm_host_smccc_func {
 >         __KVM_HOST_SMCCC_FUNC___pkvm_host_relax_perms_guest,
 >         __KVM_HOST_SMCCC_FUNC___pkvm_host_wrprotect_guest,
-> +       __KVM_HOST_SMCCC_FUNC___pkvm_host_test_clear_young_guest,
+>         __KVM_HOST_SMCCC_FUNC___pkvm_host_test_clear_young_guest,
+> +       __KVM_HOST_SMCCC_FUNC___pkvm_host_mkyoung_guest,
 >         __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
 >         __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
 >         __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
 > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index fc9fdd5b0a52..b3aaad150b3e 100644
+> index b3aaad150b3e..65c34753d86c 100644
 > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
 > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -43,6 +43,7 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu, enum k
->  int __pkvm_host_unshare_guest(u64 gfn, struct pkvm_hyp_vm *hyp_vm);
+> @@ -44,6 +44,7 @@ int __pkvm_host_unshare_guest(u64 gfn, struct pkvm_hyp_vm *hyp_vm);
 >  int __pkvm_host_relax_perms_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu, enum kvm_pgtable_prot prot);
 >  int __pkvm_host_wrprotect_guest(u64 gfn, struct pkvm_hyp_vm *hyp_vm);
-> +int __pkvm_host_test_clear_young_guest(u64 gfn, bool mkold, struct pkvm_hyp_vm *vm);
+>  int __pkvm_host_test_clear_young_guest(u64 gfn, bool mkold, struct pkvm_hyp_vm *vm);
+> +int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu);
 >
 >  bool addr_is_memory(phys_addr_t phys);
 >  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
 > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 98d317735107..616e172a9c48 100644
+> index 616e172a9c48..32c4627b5b5b 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -303,6 +303,27 @@ static void handle___pkvm_host_wrprotect_guest(struct kvm_cpu_context *host_ctxt
+> @@ -324,6 +324,24 @@ static void handle___pkvm_host_test_clear_young_guest(struct kvm_cpu_context *ho
 >         cpu_reg(host_ctxt, 1) = ret;
 >  }
 >
-> +static void handle___pkvm_host_test_clear_young_guest(struct kvm_cpu_context *host_ctxt)
+> +static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
 > +{
-> +       DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-> +       DECLARE_REG(u64, gfn, host_ctxt, 2);
-> +       DECLARE_REG(bool, mkold, host_ctxt, 3);
-> +       struct pkvm_hyp_vm *hyp_vm;
+> +       DECLARE_REG(u64, gfn, host_ctxt, 1);
+> +       struct pkvm_hyp_vcpu *hyp_vcpu;
 > +       int ret = -EINVAL;
 > +
 > +       if (!is_protected_kvm_enabled())
 > +               goto out;
 > +
-> +       hyp_vm = get_np_pkvm_hyp_vm(handle);
-> +       if (!hyp_vm)
+> +       hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+> +       if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
 > +               goto out;
 > +
-> +       ret = __pkvm_host_test_clear_young_guest(gfn, mkold, hyp_vm);
-> +       put_pkvm_hyp_vm(hyp_vm);
+> +       ret = __pkvm_host_mkyoung_guest(gfn, hyp_vcpu);
 > +out:
-> +       cpu_reg(host_ctxt, 1) = ret;
+> +       cpu_reg(host_ctxt, 1) =  ret;
 > +}
 > +
 >  static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
 >  {
 >         DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> @@ -516,6 +537,7 @@ static const hcall_t host_hcall[] = {
->         HANDLE_FUNC(__pkvm_host_unshare_guest),
+> @@ -538,6 +556,7 @@ static const hcall_t host_hcall[] = {
 >         HANDLE_FUNC(__pkvm_host_relax_perms_guest),
 >         HANDLE_FUNC(__pkvm_host_wrprotect_guest),
-> +       HANDLE_FUNC(__pkvm_host_test_clear_young_guest),
+>         HANDLE_FUNC(__pkvm_host_test_clear_young_guest),
+> +       HANDLE_FUNC(__pkvm_host_mkyoung_guest),
 >         HANDLE_FUNC(__kvm_adjust_pc),
 >         HANDLE_FUNC(__kvm_vcpu_run),
 >         HANDLE_FUNC(__kvm_flush_vm_context),
 > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 94e4251b5077..0e42c3baaf4b 100644
+> index 0e42c3baaf4b..eae03509d371 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1530,3 +1530,22 @@ int __pkvm_host_wrprotect_guest(u64 gfn, struct pkvm_hyp_vm *vm)
+> @@ -1549,3 +1549,23 @@ int __pkvm_host_test_clear_young_guest(u64 gfn, bool mkold, struct pkvm_hyp_vm *
 >
 >         return ret;
 >  }
 > +
-> +int __pkvm_host_test_clear_young_guest(u64 gfn, bool mkold, struct pkvm_hyp_vm *vm)
+> +int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu)
 > +{
+> +       struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
 > +       u64 ipa = hyp_pfn_to_phys(gfn);
 > +       u64 phys;
 > +       int ret;
@@ -175,7 +174,7 @@ Cheers,
 > +
 > +       ret = __check_host_shared_guest(vm, &phys, ipa);
 > +       if (!ret)
-> +               ret = kvm_pgtable_stage2_test_clear_young(&vm->pgt, ipa, PAGE_SIZE, mkold);
+> +               kvm_pgtable_stage2_mkyoung(&vm->pgt, ipa, 0);
 > +
 > +       guest_unlock_component(vm);
 > +       host_unlock_component();
