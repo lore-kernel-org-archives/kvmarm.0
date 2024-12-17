@@ -1,108 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B17A1F76C7;
-	Tue, 17 Dec 2024 19:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD621F9ED9
+	for <kvmarm@lists.linux.dev>; Tue, 17 Dec 2024 21:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734463342; cv=none; b=CXofuSjqRrIAXgIV8ZjcM/PP7c8Oi3QR9ymYZGqmzkRQjeNPVYlnMZbO4EEfR68God7XM39tdNcV05qin+hZhdA7DsazPnIiFjm/T/GzdH0lIwFxldlfkVFUh1f+Qj4LfwnEH6K5XjPWCkp6if73Cq343jh4CjuUIvPGhz58Gyk=
+	t=1734470467; cv=none; b=kBszzRIAx/833Kd8wihS+R0PoD80HWLBysUMTadvJpkbcP9lvn+YF98phe35W444yAnr1AcKpgSLRnVY4gubXultGrYsPiVkULnq7aATL2TbsOzO3GCS5l6LtQsFSQjLotM81k5sHc6W2M3vYKGzsDvptULdrFC6PJ6rLHGSv/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734463342; c=relaxed/simple;
-	bh=9mNOA8/WNTIvajmOpeIQjXIZVIGGtLZcsx8KEPpiCsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ozjgu0CyYQPNgh5c8YsNxrJc5cnvS/EJxO3H2lW8t+iiU/7a7J4k6RK9Cu6gAZBeVV38sO4OADqe8jbvxlnu+U4Ng0QxjKf91RQytDuhKcvH6cYFb51k8JX90ayAilfAXMa6k5qzgwI/4lIjCS7cR0BjV40cNYZdslKQWJOknAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkIXFDJT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734470467; c=relaxed/simple;
+	bh=JwzBZ7oalDLHpD5BqDpabadr1mzyOW1XCymQ+1AHYgA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=So7kgwVU+0sbfeIfUyR+ayUfsgJfyoWin+ITbdZtf6GoecVadumtyPKvEQVH18FPhEhZsDBCCtrNsup1DOllxyZRMTBROWMxiRwqk2xqlRYtzAP3qVF+MAH2EwBqqZ2QHXmycxbVBtr9IZ9dwbV1+9gfi5obEHq3vT+7x+s5Wbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hYPr2gbp; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkIXFDJT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA13AC4CED3;
-	Tue, 17 Dec 2024 19:22:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734463340;
-	bh=9mNOA8/WNTIvajmOpeIQjXIZVIGGtLZcsx8KEPpiCsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mkIXFDJTUssl2V6+nik/zcYBEbniOgN/ejXZqXsaBUKkIvtLGg7iodsVtHUa/YG3s
-	 nsl0kmRA+DSsYmywJOLN7ICCvJyViwS4NTU4Khb/irkzeUFmkH4akAP3jaTZ4JIejC
-	 Ox1Ae5Z8TInNWC2AaaEeD8W3kmnGqufIutlmKwetK1DTmxe2aKWKvc7N77GtDdAVYy
-	 BYc+ptatgw07i6sWU8iRM/NjUhFD/VDGOXNtlVdUUNorPB+RzA7spd48cWjK8QcOai
-	 LpGanlHJs+xA7jSyL3JhHYgG8o00dRivzklmG8u/kWoUUGJ25352nDKFxEVy8bK3Ev
-	 LZA6SlPeY6tLg==
-Date: Tue, 17 Dec 2024 19:22:14 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hYPr2gbp"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734470462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2qhjrvfbT10T4ib4bSsYSy2qtieNec7luPdoIC3wwps=;
+	b=hYPr2gbpzrhMY50ScvyOtwrCEDpHjj/9XEnJKW/qUObs9G47i99w3yA8GscuW6noHQ0uX5
+	yghgGf/RhYMmwmPHZHSbQ6lQLWi5G9OwXzo6HGoO0lPee7gt1E+CFwhqLPMj1YT2Sxn8zs
+	Ugi4jCe+cvnX4qdGazBaw/suiI3TkX0=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix set_id_regs selftest for ASIDBITS
- becoming unwritable
-Message-ID: <9b657364-140b-482d-82fe-01c59711e764@sirena.org.uk>
-References: <20241216-kvm-arm64-fix-set-id-asidbits-v1-1-8b105b888fc3@kernel.org>
- <875xnisocy.wl-maz@kernel.org>
- <53b40aa8-f51c-4c4e-a4ad-e6a9512e5197@sirena.org.uk>
- <86v7viqusg.wl-maz@kernel.org>
- <b13b14df-00ee-4bee-8f65-d2cb7a9bfa6b@sirena.org.uk>
- <Z2G8TFw4wg7bnwzB@linux.dev>
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 01/18] drivers/perf: apple_m1: Refactor event select/filter configuration
+Date: Tue, 17 Dec 2024 13:20:31 -0800
+Message-Id: <20241217212048.3709204-2-oliver.upton@linux.dev>
+In-Reply-To: <20241217212048.3709204-1-oliver.upton@linux.dev>
+References: <20241217212048.3709204-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KSSckS5oYWmHvwuz"
-Content-Disposition: inline
-In-Reply-To: <Z2G8TFw4wg7bnwzB@linux.dev>
-X-Cookie: The sum of the Universe is zero.
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+Supporting guest mode events will necessitate programming two event
+filters. Prepare by splitting up the programming of the event selector +
+event filter into separate headers.
 
---KSSckS5oYWmHvwuz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Opportunistically replace RMW patterns with sysreg_clear_set_s().
 
-On Tue, Dec 17, 2024 at 10:00:44AM -0800, Oliver Upton wrote:
-> On Tue, Dec 17, 2024 at 03:10:28PM +0000, Mark Brown wrote:
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/apple_m1_pmu.h |  1 +
+ drivers/perf/apple_m1_cpu_pmu.c       | 52 ++++++++++++++++-----------
+ 2 files changed, 33 insertions(+), 20 deletions(-)
 
-> > No, this isn't a new use - a Fixes: tag indicates that the referenced
-> > commit introduced the problem being fixed and that is exactly what's
-> > going on here.  Like I say the selftests are not a completely separate
-> > project, they are a part of the same source release as the rest of the
-> > kernel and it is helpful to track information like this.
+diff --git a/arch/arm64/include/asm/apple_m1_pmu.h b/arch/arm64/include/asm/apple_m1_pmu.h
+index 99483b19b99f..02e05d05851f 100644
+--- a/arch/arm64/include/asm/apple_m1_pmu.h
++++ b/arch/arm64/include/asm/apple_m1_pmu.h
+@@ -37,6 +37,7 @@
+ #define PMCR0_PMI_ENABLE_8_9	GENMASK(45, 44)
+ 
+ #define SYS_IMP_APL_PMCR1_EL1	sys_reg(3, 1, 15, 1, 0)
++#define SYS_IMP_APL_PMCR1_EL12	sys_reg(3, 1, 15, 7, 2)
+ #define PMCR1_COUNT_A64_EL0_0_7	GENMASK(15, 8)
+ #define PMCR1_COUNT_A64_EL1_0_7	GENMASK(23, 16)
+ #define PMCR1_COUNT_A64_EL0_8_9	GENMASK(41, 40)
+diff --git a/drivers/perf/apple_m1_cpu_pmu.c b/drivers/perf/apple_m1_cpu_pmu.c
+index 1d4d01e1275e..ecc71f6808dd 100644
+--- a/drivers/perf/apple_m1_cpu_pmu.c
++++ b/drivers/perf/apple_m1_cpu_pmu.c
+@@ -325,11 +325,10 @@ static void m1_pmu_disable_counter_interrupt(unsigned int index)
+ 	__m1_pmu_enable_counter_interrupt(index, false);
+ }
+ 
+-static void m1_pmu_configure_counter(unsigned int index, u8 event,
+-				     bool user, bool kernel)
++static void __m1_pmu_configure_event_filter(unsigned int index, bool user,
++					    bool kernel)
+ {
+-	u64 val, user_bit, kernel_bit;
+-	int shift;
++	u64 clear, set, user_bit, kernel_bit;
+ 
+ 	switch (index) {
+ 	case 0 ... 7:
+@@ -344,19 +343,24 @@ static void m1_pmu_configure_counter(unsigned int index, u8 event,
+ 		BUG();
+ 	}
+ 
+-	val = read_sysreg_s(SYS_IMP_APL_PMCR1_EL1);
+-
++	clear = set = 0;
+ 	if (user)
+-		val |= user_bit;
++		set |= user_bit;
+ 	else
+-		val &= ~user_bit;
++		clear |= user_bit;
+ 
+ 	if (kernel)
+-		val |= kernel_bit;
++		set |= kernel_bit;
+ 	else
+-		val &= ~kernel_bit;
++		clear |= kernel_bit;
+ 
+-	write_sysreg_s(val, SYS_IMP_APL_PMCR1_EL1);
++	sysreg_clear_set_s(SYS_IMP_APL_PMCR1_EL1, clear, set);
++}
++
++static void __m1_pmu_configure_eventsel(unsigned int index, u8 event)
++{
++	u64 clear = 0, set = 0;
++	int shift;
+ 
+ 	/*
+ 	 * Counters 0 and 1 have fixed events. For anything else,
+@@ -369,21 +373,29 @@ static void m1_pmu_configure_counter(unsigned int index, u8 event,
+ 		break;
+ 	case 2 ... 5:
+ 		shift = (index - 2) * 8;
+-		val = read_sysreg_s(SYS_IMP_APL_PMESR0_EL1);
+-		val &= ~((u64)0xff << shift);
+-		val |= (u64)event << shift;
+-		write_sysreg_s(val, SYS_IMP_APL_PMESR0_EL1);
++		clear |= (u64)0xff << shift;
++		set |= (u64)event << shift;
++		sysreg_clear_set_s(SYS_IMP_APL_PMESR0_EL1, clear, set);
+ 		break;
+ 	case 6 ... 9:
+ 		shift = (index - 6) * 8;
+-		val = read_sysreg_s(SYS_IMP_APL_PMESR1_EL1);
+-		val &= ~((u64)0xff << shift);
+-		val |= (u64)event << shift;
+-		write_sysreg_s(val, SYS_IMP_APL_PMESR1_EL1);
++		clear |= (u64)0xff << shift;
++		set |= (u64)event << shift;
++		sysreg_clear_set_s(SYS_IMP_APL_PMESR1_EL1, clear, set);
+ 		break;
+ 	}
+ }
+ 
++static void m1_pmu_configure_counter(unsigned int index, unsigned long config_base)
++{
++	bool kernel = config_base & M1_PMU_CFG_COUNT_KERNEL;
++	bool user = config_base & M1_PMU_CFG_COUNT_USER;
++	u8 evt = config_base & M1_PMU_CFG_EVENT;
++
++	__m1_pmu_configure_event_filter(index, user, kernel);
++	__m1_pmu_configure_eventsel(index, evt);
++}
++
+ /* arm_pmu backend */
+ static void m1_pmu_enable_event(struct perf_event *event)
+ {
+@@ -398,7 +410,7 @@ static void m1_pmu_enable_event(struct perf_event *event)
+ 	m1_pmu_disable_counter(event->hw.idx);
+ 	isb();
+ 
+-	m1_pmu_configure_counter(event->hw.idx, evt, user, kernel);
++	m1_pmu_configure_counter(event->hw.idx, event->hw.config_base);
+ 	m1_pmu_enable_counter(event->hw.idx);
+ 	m1_pmu_enable_counter_interrupt(event->hw.idx);
+ 	isb();
+-- 
+2.39.5
 
-> A Fixes tag suggests a bug in the referenced commit, which isn't the
-> case here.
-
-> I agree that having some relation between the two is useful for
-> determining the scope of a backport, but conveniently in this case the
-> test failure was introduced in 6.13.
-
-While the patch introducing the test failure was introduced in -rc3 it
-was tagged as a fix for d5a32b60dc18 ("KVM: arm64: Allow userspace to
-change ID_AA64MMFR{0-2}_EL1") which was in v6.7 so I'm expecting to see
-it being backported to relevant stable kernels, which will in turn cause
-testsuite failures in those stable kernels if this change doesn't go
-back with it.  Hopefully they'll find it from the commit message.
-
-I would say there's a case that leaving the tests broken is a bug, it's
-certainly some kind of problem.  Obviously we're sometimes a bit relaxed
-on that within a series, though it's fortunately relatively rare.
-
---KSSckS5oYWmHvwuz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdhz2YACgkQJNaLcl1U
-h9CZ+Qf8CgogvpmIGkRfSWc1vGgw0N6bTzH396O9wr/88wFUL7jPGP1DKTMW4Bdw
-K6lOtGL59M2SLDObeGZqQSShw7sQPOewW54CNZlyj0GIZzkz/ezfRG/+Jzb3Y33h
-VNgyLvJ5g6twjzKTfDbo0TXFgAiBk5+wO8igobH7DWZlXEWaWku9w6fmoZhFkF4T
-f4ne4D+3iSg0iihgcjth8ReHrIuGZ6Cx6vw9LwjCmFwBuJlRQxmDKeJKktEUKFrk
-n2IGbzOiiq0ZPl2zNLX0fRYIFwP/+E7yyIwhtWbKJootYl5DAyJzJtDIFhP5tEBI
-rxqQc5m7WTdNbZEedU0trXAx7uPrSA==
-=V2CE
------END PGP SIGNATURE-----
-
---KSSckS5oYWmHvwuz--
