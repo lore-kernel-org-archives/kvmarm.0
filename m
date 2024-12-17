@@ -1,127 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAE21DFE00;
-	Tue, 17 Dec 2024 14:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55113398A;
+	Tue, 17 Dec 2024 14:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734444378; cv=none; b=JHQgtwvtIe2EKh3mI2imCCz+NfCWoCedi/73BE2isafulM7Fg0R2smRmyNWkrMUwOdvfC69wgK8QuAyNjP9EYJ7bxUWrJgTxfa7mAN0S4eLx5WHYbtvNsbeWmIRVmADk9NcYvgw96pKBCaqDErTkn2wEukKi41obI8vNrgMpNos=
+	t=1734445406; cv=none; b=ACybXAWebStetslo3CJp5hTnWL3tIjI/rLCgzFi8f753K+bVMWgrRcEWrl5B1LQCRLTh2DgX5F5A2mSRGKb6Kh9nNyR+G4KR1JBHgbVQTSJ3fvl7h1TgUtxdr32OoOStGu/PZacY4S6Mboa/Ew2DDC6Vy1kJKvMvPAcF4JPf7MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734444378; c=relaxed/simple;
-	bh=sRYFkVqoQ7WVWtIBYz2OuAjeAt/6gkjTXYc/NTa8jnk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QVB5I4TqdNiO81HwPO3XS+6DysoESbgIx4y+TfIYuCebbZOtvxbuzGASQZr+X8aBy9nGnqWPSd1rfwhLrFcj4APGDGtmobqcqBfNZzucBwW4c7QNjel3sONwI0GKLmzc0Ad+Lti25PKu0KSnIu9aU8HSicOAleQ7D8Jq140aMB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prbcWabO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734445406; c=relaxed/simple;
+	bh=cqzDHLstDJY65pRGflLzfJn6LPL7Nl6rrznsIuKxP9c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YWAe7wV3UoA/IKHZ1Fv+9vFSdG3e4CfAGZ8NTwU7mVm/r914bOqZImLt348+YECecYA5e4yH2PUN1h/Wy3BTo5xPddh/HHycc736tjb/GmKwrndjxeYg1jFbsC9HhsqnlS+aNJ6iE+2ptohE7zPx2zdhHzH9hSF+1eEJQxamhoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N6ti4CYA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prbcWabO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A3EC4CED4;
-	Tue, 17 Dec 2024 14:06:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6ti4CYA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5870FC4CED3;
+	Tue, 17 Dec 2024 14:23:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734444377;
-	bh=sRYFkVqoQ7WVWtIBYz2OuAjeAt/6gkjTXYc/NTa8jnk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=prbcWabOTuBkNbtMYI66UPlJNIkVKDob7yE4wXS+0mv640w8Mflnrm0MVNz/CrCwx
-	 jzbSn1g5TZ47pfAUdJaSvC4JWoIteeZ1FX2PrDaCMweujLl8tfWqfK/zRO3YPAQMYa
-	 /pvZtZqEl7zp/NFAX8jI6vZBLxHeHQ/dS6GAf7ngKQZBQU4EnLaii64OmE10VEPNMG
-	 Mx1QSxTLouq1iXjiY1rzzc7voVwNAQ2hHz+uqDvwxv+4aqUiOoESgIjb0JD6mTmtVr
-	 E2TgM1hBP4fpvHk9lzYmxj2ANZq52Uc46/La0B/oULauaBxSj8hARLaGKvmVWV1Smb
-	 5iAxg8B00VrRQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1734445406;
+	bh=cqzDHLstDJY65pRGflLzfJn6LPL7Nl6rrznsIuKxP9c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N6ti4CYATMYnZQXwVUJTFMXoD+FcXxODn4XcrSg14ZPqo1MqZM+fQht9zD3sM9t0T
+	 EgJ1+txAmd4Nui2fI7cqneIcdHbqA+BReGaQ09BlcEf1EqhxmO306ccpHFfyA4n/6o
+	 2wN03JhVbIDW7/rDKVngn1VnSBsh/cvY+ZatIesFbcj+KEUXBEv1t9dxThKiMEip4V
+	 VPztgXxX+hQget0zuW+9Ho7xWcbo2VfCwUJexjbq+tqNphbDYHUlm3wzMsVoJhvzd6
+	 Q5JYBU2TZP2EG8vTMeqX10AKwzAo0Cm4Hjh2HK2bCmAAuHvGyCaSZHHQnZfhvGlHxj
+	 RqmLN1EkikBNw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tNYDH-004ZwV-Rt;
-	Tue, 17 Dec 2024 14:06:15 +0000
-Date: Tue, 17 Dec 2024 14:06:15 +0000
-Message-ID: <86seqmqu94.wl-maz@kernel.org>
+	id 1tNYTs-004aJx-92;
+	Tue, 17 Dec 2024 14:23:24 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 11/18] KVM: arm64: Introduce __pkvm_host_unshare_guest()
-In-Reply-To: <Z2F9xb4jrK1zRtNV@google.com>
-References: <20241216175803.2716565-1-qperret@google.com>
-	<20241216175803.2716565-12-qperret@google.com>
-	<86wmfyr1j4.wl-maz@kernel.org>
-	<Z2F9xb4jrK1zRtNV@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: [PATCH v2 00/12] KVM: arm64: Add NV timer support
+Date: Tue, 17 Dec 2024 14:23:08 +0000
+Message-Id: <20241217142321.763801-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, vdonnefort@google.com, sebastianene@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Dec 2024 13:33:57 +0000,
-Quentin Perret <qperret@google.com> wrote:
-> 
-> On Tuesday 17 Dec 2024 at 11:29:03 (+0000), Marc Zyngier wrote:
-> > > +static int __check_host_shared_guest(struct pkvm_hyp_vm *vm, u64 *__phys, u64 ipa)
-> > > +{
-> > > +	enum pkvm_page_state state;
-> > > +	struct hyp_page *page;
-> > > +	kvm_pte_t pte;
-> > > +	u64 phys;
-> > > +	s8 level;
-> > > +	int ret;
-> > > +
-> > > +	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +	if (level != KVM_PGTABLE_LAST_LEVEL)
-> > 
-> > So there is still a very strong assumption that a guest is only
-> > provided page mappings, and no blocks?
-> 
-> Yep, very much so. It's one of the main limitations of the series as-is
-> (with the absence of support for mapping anything else than memory in
-> guests). Those limitations were mentioned in the cover letter of v1, but
-> I should have kept that mention in later versions, sorry!
-> 
-> The last patch of the series has a tweak to user_mem_abort() to force
-> mappings to PTE level which is trivial to do as we already need to do
-> similar things for dirty logging. And __pkvm_host_share_guest() doesn't
-> take a 'size' parameter in its current form, it assumes it is being
-> passed a single pfn. So all in all this works well, and simplifies the
-> series a lot.
-> 
-> Huge-page support should come as a natural extension to this series, but
-> I was hoping it could be done separately as that should have no
-> *functional* impact observable from userspace. I'm slightly more
-> concerned about the lack of support for mapping MMIO, but that too is
-> going to be some work, and I guess you should just turn pKVM off if
-> you want that for now...
-> 
-> Happy to address either or both of these limitations as part of this
-> series if we think they're strictly required to land this stuff
-> upstream, this is obviously up for debate. But that's going to be quite
-> a few patches on top :-)
+Here's another version of the series initially posted at [1], which
+implements support for timers in NV context.
 
-No, I just wanted to make sure I did have the correct interpretation
-of what this does. 'd rather have something that works first, and then
-add large mapping support. You can even sell it as a performance
-improvement! :)
+From v1:
 
-Thanks,
+- Repainted EL0->EL1 when rambling about the timers
 
-	M.
+- Simplified access to EL1 counters from HYP context
+
+- Update the status register when handled as an early trap
+
+- Added some documentation about the default PPI numbers
+
+The whole thing has been tested with 6.13-rc3 as part of the my NV
+integration branch [2], and is functional enough to run an L3 guest
+with kvmtool as the VMM and EDK2 as the firmware. YMMV.
+
+[1] https://lore.kernel.org/r/20241202172134.384923-1-maz@kernel.org
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
+
+Marc Zyngier (12):
+  KVM: arm64: nv: Add handling of EL2-specific timer registers
+  KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+  KVM: arm64: nv: Publish emulated timer interrupt state in the
+    in-memory state
+  KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
+  KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV in
+    use
+  KVM: arm64: nv: Accelerate EL0 counter accesses from hypervisor
+    context
+  KVM: arm64: Handle counter access early in non-HYP context
+  KVM: arm64: nv: Add trap routing for
+    CNTHCTL_EL2.EL1{NVPCT,NVVCT,TVT,TVCT}
+  KVM: arm64: nv: Propagate CNTHCTL_EL2.EL1NV{P,V}CT bits
+  KVM: arm64: nv: Sanitise CNTHCTL_EL2
+  KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity
+  KVM: arm64: nv: Document EL2 timer API
+
+ Documentation/virt/kvm/devices/vcpu.rst |  15 +-
+ arch/arm64/include/asm/cputype.h        |   2 +
+ arch/arm64/include/asm/kvm_host.h       |   2 +-
+ arch/arm64/include/asm/sysreg.h         |   4 +
+ arch/arm64/kernel/cpu_errata.c          |   8 ++
+ arch/arm64/kernel/image-vars.h          |   3 +
+ arch/arm64/kvm/arch_timer.c             | 179 +++++++++++++++++++++---
+ arch/arm64/kvm/arm.c                    |   3 +
+ arch/arm64/kvm/emulate-nested.c         |  58 +++++++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  39 ++++--
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c      |  16 ++-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 107 ++++++++++++++
+ arch/arm64/kvm/nested.c                 |  15 ++
+ arch/arm64/kvm/sys_regs.c               | 146 ++++++++++++++++++-
+ arch/arm64/tools/cpucaps                |   1 +
+ include/clocksource/arm_arch_timer.h    |   6 +
+ include/kvm/arm_arch_timer.h            |  23 +++
+ 17 files changed, 580 insertions(+), 47 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
