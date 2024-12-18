@@ -1,446 +1,114 @@
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80121FFC4E
-	for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 19:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D751B154BF5
+	for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 20:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734550906; cv=none; b=eNNBdZcOYLI89U5uiKDs7wKORb33FJukqGMccRlxwdcGubBFaxmvqjI3rBI5LdTo5V5fZiym6jsfdJlRl/kcKOvutRcCl37VqytK8mnpexLHnmnBKgGf4eNS/UAukzLLOkZxBUzeF565fZX3h+b1aNSDS43CfEuED3qCqfwF1hM=
+	t=1734554210; cv=none; b=bTHDEwZc1ihW7OVLI3+seKH74zqD/bxsZ3+fKl0lw/4gP10tv2KAh1VzLMS9P4UIacnGsvho2bohQliC0DnU5ribtKiDllYw/KS8g9vojLbaqrQATGCfQOCJV13JhFpK14PD/LRYN797U4IihDnXckImm44sMEJoDVPgRCasemE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734550906; c=relaxed/simple;
-	bh=EdWS/cM8rpDng5Kp13NdSXMWPacjmnHjsdgRhxMe9r4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k5ksOrBtRGEjdp5qdj95S4iLaI2z4Mb4hMa/HXy5akMwyRBAEUQXQajPRyMBQU9q+ZUI4cm7T8KAfQYMlHKix82xlp+fu0iKXuqp8Aa62mXhAEb71/LCfVRKf8j7gVaXuilzqdlaEd3lg+jz7iD+faCZl1D4hYwXkph4oCO49sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=11Z3Rw60; arc=none smtp.client-ip=209.85.208.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
+	s=arc-20240116; t=1734554210; c=relaxed/simple;
+	bh=Tpw6S761iO8x2S4jmRvodQBmVu0JhevnglBIB+94/Lg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=slg35OalXgoQBNtwB4iVfJu9q/bPmoUD22YXaoluoVoPN0LYJSetPgj0S9SdjvzBBJyQ5Zh7KfpM7pQ6pyJxOgI3/xHtbeyWKVrrmZ57PJj53pmvCq5VCd+bxa8y1exErp1Ug7ddM0ZBAxjo76nk9AkEbhGTifRoxiVnsX6z1ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r6PuCsFL; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="11Z3Rw60"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5d3cb2e6c42so7667716a12.3
-        for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 11:41:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734550902; x=1735155702; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vrp18CDHZ6Mn1scEH2wlnFhiKHJPrKlVzJRYJ5Umd4I=;
-        b=11Z3Rw608IPMfUxHU46Xx1MczxRbX0OfkNZnDBv3wLXCuqh6ka0aTqojaQFBl5uGN8
-         sJ1XvrP9VInuexhvDen9YGRbjBoyKHNIf+aGkoD8uCUOwADleNkH3hKzs1eh2o9fYwG5
-         qqSZ/SrdUL10SoL/LVpGCiM4c4MX23Qa0BtIz5+2Bt+L8xjrT+Fp8xhB1Z0hC2Zw4a4c
-         0e/J/7XOpXzEyXcSTfZ4W1D8zbrwxVAUCw2J85qRX67HsNFaTVEqJGtV+Z8bdxOEaP8g
-         EtwstZFuipzKlmBmyG1qtIBQ95wFsxQ2KsQGP2+3wBH8t4KfS8IPMzDJFenVr8I8q4cX
-         Hplw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734550902; x=1735155702;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vrp18CDHZ6Mn1scEH2wlnFhiKHJPrKlVzJRYJ5Umd4I=;
-        b=GKecTDAcUAMqJzepJr24BKzq5MTGZpCMsbqM7Tj/5G2VKKrMNgSYOpAAWUK5kGdN22
-         CKEhvTeZKzfK98Xm8ewoo7ItuU7OTR35iOrLruZ1GJEIaUByY4r0/faMSbDyYtP0HeAN
-         yQrLpp1W5jtArWOPZSMi7TuZN3GJ0TDj7UlArwpD19iAXF3IHZoPnQAWbIcV4j3wtQRq
-         4JNpnlF7Jd39+ocqcI+NbQYSiHBPeN+d4yy9ffPe5hnKOHiZSS9q7wuaXm3jYrvHa6B0
-         lzCv13qylFrX1Hu6LhhZJHy8/D+gUn96bFllfXXHoROojOYqXaEy0hNd9tNR7KEU1j9i
-         0BIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIMdGWDlMNKtx8CUUp5F+mIChOgZT5I7cJHDIDxFU2BOkieAHhQrZA7T73bX8mE11kmEgPZJ0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YztJDoyF+7CdSSBkfd1nNwsgAmYtazDKQ2BytGXkIa3WFPSiEXx
-	PEx3wh5C+6XET8zc0BedzSD3lcsvhx3VhP/f0hf5Seld6KpSNiVn+7uQkmnaK7lD1f7gMyhW8eS
-	IRJkyVA==
-X-Google-Smtp-Source: AGHT+IE/bh/YBSK6Nzso5i2wcnxVL5uqB8UYSDaBDVMvQfLpUj7+lL77OQ9xcJ56VGz3+7xUpwFFrCHSkRHC
-X-Received: from edbek21.prod.google.com ([2002:a05:6402:3715:b0:5d7:c7b4:8772])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:51cb:b0:5d1:22c2:6c56
- with SMTP id 4fb4d7f45d1cf-5d7ee3b4b98mr3413543a12.17.1734550902170; Wed, 18
- Dec 2024 11:41:42 -0800 (PST)
-Date: Wed, 18 Dec 2024 19:40:59 +0000
-In-Reply-To: <20241218194059.3670226-1-qperret@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r6PuCsFL"
+Date: Wed, 18 Dec 2024 12:36:38 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734554205;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7WbTkP6RqlE5rWSkc72WvweX2+xrEmwlBCpERx3uqjE=;
+	b=r6PuCsFLcvbVjw+4exy3HaLbJDX3gXl2uiLkuH9VM9rkwF0+gcwkFn2/noJ7Ju2ywLIn2L
+	gd/wJ3xm1SSvg55k8nj8IsJuWwURWIftDAFu8PtzNh0G+DRzai7eANCuDwsQSdkDqXu6zO
+	oyrfqlV4aYasIrY46LMt8+kEd54PC0M=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	James Clark <james.clark@linaro.org>
+Subject: Re: [PATCH v3 10/16] KVM: arm64: Use debug_owner to track if debug
+ regs need save/restore
+Message-ID: <Z2MyVmxBb_8WtWcH@linux.dev>
+References: <20241209180926.2161373-1-oliver.upton@linux.dev>
+ <20241209180926.2161373-11-oliver.upton@linux.dev>
+ <86frmkrhcl.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241218194059.3670226-1-qperret@google.com>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241218194059.3670226-19-qperret@google.com>
-Subject: [PATCH v4 18/18] KVM: arm64: Plumb the pKVM MMU in KVM
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Sebastian Ene <sebastianene@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86frmkrhcl.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Introduce the KVM_PGT_CALL() helper macro to allow switching from the
-traditional pgtable code to the pKVM version easily in mmu.c. The cost
-of this 'indirection' is expected to be very minimal due to
-is_protected_kvm_enabled() being backed by a static key.
+On Wed, Dec 18, 2024 at 06:11:54PM +0000, Marc Zyngier wrote:
+> On Mon, 09 Dec 2024 18:09:20 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index f84306b11261..5b8982bcc0bb 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -621,40 +621,12 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
+> >  	}
+> >  }
+> >  
+> > -/*
+> > - * We want to avoid world-switching all the DBG registers all the
+> > - * time:
+> > - *
+> > - * - If we've touched any debug register, it is likely that we're
+> > - *   going to touch more of them. It then makes sense to disable the
+> > - *   traps and start doing the save/restore dance
+> > - * - If debug is active (DBG_MDSCR_KDE or DBG_MDSCR_MDE set), it is
+> > - *   then mandatory to save/restore the registers, as the guest
+> > - *   depends on them.
+> > - *
+> > - * For this, we use a DIRTY bit, indicating the guest has modified the
+> > - * debug registers, used as follow:
+> > - *
+> > - * On guest entry:
+> > - * - If the dirty bit is set (because we're coming back from trapping),
+> > - *   disable the traps, save host registers, restore guest registers.
+> > - * - If debug is actively in use (DBG_MDSCR_KDE or DBG_MDSCR_MDE set),
+> > - *   set the dirty bit, disable the traps, save host registers,
+> > - *   restore guest registers.
+> > - * - Otherwise, enable the traps
+> > - *
+> > - * On guest exit:
+> > - * - If the dirty bit is set, save guest registers, restore host
+> > - *   registers and clear the dirty bit. This ensure that the host can
+> > - *   now use the debug registers.
+> > - */
+> >  static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+> >  			    struct sys_reg_params *p,
+> >  			    const struct sys_reg_desc *r)
+> >  {
+> >  	access_rw(vcpu, p, r);
+> >  	if (p->is_write)
+> > -		vcpu_set_flag(vcpu, DEBUG_DIRTY);
+> >  
+> >  	kvm_debug_set_guest_ownership(vcpu);
+> >  	return true;
+> 
+> Sorry for stating the same thing again, but this is a repeat of [1].
+> Should I add this on top?
 
-With this, everything is in place to allow the delegation of
-non-protected guest stage-2 page-tables to pKVM, so let's stop using the
-host's kvm_s2_mmu from EL2 and enjoy the ride.
+Argh! No, thanks for catching this (again). I really ought to make sure
+I squash fixes in when I say I do...
 
-Tested-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/include/asm/kvm_mmu.h   | 16 ++++++
- arch/arm64/kvm/arm.c               |  9 +++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c |  2 -
- arch/arm64/kvm/mmu.c               | 87 ++++++++++++++++++++----------
- 4 files changed, 82 insertions(+), 32 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 66d93e320ec8..d116ab4230e8 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -353,6 +353,22 @@ static inline bool kvm_is_nested_s2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	return &kvm->arch.mmu != mmu;
- }
- 
-+static inline void kvm_fault_lock(struct kvm *kvm)
-+{
-+	if (is_protected_kvm_enabled())
-+		write_lock(&kvm->mmu_lock);
-+	else
-+		read_lock(&kvm->mmu_lock);
-+}
-+
-+static inline void kvm_fault_unlock(struct kvm *kvm)
-+{
-+	if (is_protected_kvm_enabled())
-+		write_unlock(&kvm->mmu_lock);
-+	else
-+		read_unlock(&kvm->mmu_lock);
-+}
-+
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
- #else
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 55cc62b2f469..9bcbc7b8ed38 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -502,7 +502,10 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
--	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	if (!is_protected_kvm_enabled())
-+		kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	else
-+		free_hyp_memcache(&vcpu->arch.pkvm_memcache);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_pmu_vcpu_destroy(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-@@ -574,6 +577,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	struct kvm_s2_mmu *mmu;
- 	int *last_ran;
- 
-+	if (is_protected_kvm_enabled())
-+		goto nommu;
-+
- 	if (vcpu_has_nv(vcpu))
- 		kvm_vcpu_load_hw_mmu(vcpu);
- 
-@@ -594,6 +600,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		*last_ran = vcpu->vcpu_idx;
- 	}
- 
-+nommu:
- 	vcpu->cpu = cpu;
- 
- 	kvm_vgic_load(vcpu);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 130f5f23bcb5..258d572eed62 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -103,8 +103,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	/* Limit guest vector length to the maximum supported by the host.  */
- 	hyp_vcpu->vcpu.arch.sve_max_vl	= min(host_vcpu->arch.sve_max_vl, kvm_host_sve_max_vl);
- 
--	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
--
- 	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
- 	hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
- 	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 641e4fec1659..9403524c11c6 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -15,6 +15,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_pgtable.h>
-+#include <asm/kvm_pkvm.h>
- #include <asm/kvm_ras.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-@@ -31,6 +32,8 @@ static phys_addr_t __ro_after_init hyp_idmap_vector;
- 
- static unsigned long __ro_after_init io_map_base;
- 
-+#define KVM_PGT_FN(fn)		(!is_protected_kvm_enabled() ? fn : p ## fn)
-+
- static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
- 					   phys_addr_t size)
- {
-@@ -147,7 +150,7 @@ static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
- 			return -EINVAL;
- 
- 		next = __stage2_range_addr_end(addr, end, chunk_size);
--		ret = kvm_pgtable_stage2_split(pgt, addr, next - addr, cache);
-+		ret = KVM_PGT_FN(kvm_pgtable_stage2_split)(pgt, addr, next - addr, cache);
- 		if (ret)
- 			break;
- 	} while (addr = next, addr != end);
-@@ -168,15 +171,23 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
-  */
- int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
- {
--	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-+	if (is_protected_kvm_enabled())
-+		kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
-+	else
-+		kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
- 	return 0;
- }
- 
- int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
- 				      gfn_t gfn, u64 nr_pages)
- {
--	kvm_tlb_flush_vmid_range(&kvm->arch.mmu,
--				gfn << PAGE_SHIFT, nr_pages << PAGE_SHIFT);
-+	u64 size = nr_pages << PAGE_SHIFT;
-+	u64 addr = gfn << PAGE_SHIFT;
-+
-+	if (is_protected_kvm_enabled())
-+		kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
-+	else
-+		kvm_tlb_flush_vmid_range(&kvm->arch.mmu, addr, size);
- 	return 0;
- }
- 
-@@ -225,7 +236,7 @@ static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
- 	void *pgtable = page_to_virt(page);
- 	s8 level = page_private(page);
- 
--	kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
-+	KVM_PGT_FN(kvm_pgtable_stage2_free_unlinked)(&kvm_s2_mm_ops, pgtable, level);
- }
- 
- static void stage2_free_unlinked_table(void *addr, s8 level)
-@@ -324,7 +335,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 	WARN_ON(size & ~PAGE_MASK);
--	WARN_ON(stage2_apply_range(mmu, start, end, kvm_pgtable_stage2_unmap,
-+	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
- 				   may_block));
- }
- 
-@@ -336,7 +347,7 @@ void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
- 
- void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
- {
--	stage2_apply_range_resched(mmu, addr, end, kvm_pgtable_stage2_flush);
-+	stage2_apply_range_resched(mmu, addr, end, KVM_PGT_FN(kvm_pgtable_stage2_flush));
- }
- 
- static void stage2_flush_memslot(struct kvm *kvm,
-@@ -942,10 +953,14 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 		return -ENOMEM;
- 
- 	mmu->arch = &kvm->arch;
--	err = kvm_pgtable_stage2_init(pgt, mmu, &kvm_s2_mm_ops);
-+	err = KVM_PGT_FN(kvm_pgtable_stage2_init)(pgt, mmu, &kvm_s2_mm_ops);
- 	if (err)
- 		goto out_free_pgtable;
- 
-+	mmu->pgt = pgt;
-+	if (is_protected_kvm_enabled())
-+		return 0;
-+
- 	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
- 	if (!mmu->last_vcpu_ran) {
- 		err = -ENOMEM;
-@@ -959,7 +974,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
- 	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
- 
--	mmu->pgt = pgt;
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 
- 	if (kvm_is_nested_s2_mmu(kvm, mmu))
-@@ -968,7 +982,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	return 0;
- 
- out_destroy_pgtable:
--	kvm_pgtable_stage2_destroy(pgt);
-+	KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
- out_free_pgtable:
- 	kfree(pgt);
- 	return err;
-@@ -1065,7 +1079,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
--		kvm_pgtable_stage2_destroy(pgt);
-+		KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
- 		kfree(pgt);
- 	}
- }
-@@ -1082,9 +1096,11 @@ static void *hyp_mc_alloc_fn(void *unused)
- 
- void free_hyp_memcache(struct kvm_hyp_memcache *mc)
- {
--	if (is_protected_kvm_enabled())
--		__free_hyp_memcache(mc, hyp_mc_free_fn,
--				    kvm_host_va, NULL);
-+	if (!is_protected_kvm_enabled())
-+		return;
-+
-+	kfree(mc->mapping);
-+	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, NULL);
- }
- 
- int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
-@@ -1092,6 +1108,12 @@ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
- 	if (!is_protected_kvm_enabled())
- 		return 0;
- 
-+	if (!mc->mapping) {
-+		mc->mapping = kzalloc(sizeof(struct pkvm_mapping), GFP_KERNEL_ACCOUNT);
-+		if (!mc->mapping)
-+			return -ENOMEM;
-+	}
-+
- 	return __topup_hyp_memcache(mc, min_pages, hyp_mc_alloc_fn,
- 				    kvm_host_pa, NULL);
- }
-@@ -1130,8 +1152,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			break;
- 
- 		write_lock(&kvm->mmu_lock);
--		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache, 0);
-+		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, addr, PAGE_SIZE,
-+				 pa, prot, &cache, 0);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1151,7 +1173,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-  */
- void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
- {
--	stage2_apply_range_resched(mmu, addr, end, kvm_pgtable_stage2_wrprotect);
-+	stage2_apply_range_resched(mmu, addr, end, KVM_PGT_FN(kvm_pgtable_stage2_wrprotect));
- }
- 
- /**
-@@ -1442,9 +1464,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	unsigned long mmu_seq;
- 	phys_addr_t ipa = fault_ipa;
- 	struct kvm *kvm = vcpu->kvm;
--	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
- 	struct vm_area_struct *vma;
- 	short vma_shift;
-+	void *memcache;
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
-@@ -1472,8 +1494,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * and a write fault needs to collapse a block entry into a table.
- 	 */
- 	if (!fault_is_perm || (logging_active && write_fault)) {
--		ret = kvm_mmu_topup_memory_cache(memcache,
--						 kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-+		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
-+
-+		if (!is_protected_kvm_enabled()) {
-+			memcache = &vcpu->arch.mmu_page_cache;
-+			ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
-+		} else {
-+			memcache = &vcpu->arch.pkvm_memcache;
-+			ret = topup_hyp_memcache(memcache, min_pages);
-+		}
- 		if (ret)
- 			return ret;
- 	}
-@@ -1494,7 +1523,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * logging_active is guaranteed to never be true for VM_PFNMAP
- 	 * memslots.
- 	 */
--	if (logging_active) {
-+	if (logging_active || is_protected_kvm_enabled()) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
- 	} else {
-@@ -1634,7 +1663,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		prot |= kvm_encode_nested_level(nested);
- 	}
- 
--	read_lock(&kvm->mmu_lock);
-+	kvm_fault_lock(kvm);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq)) {
- 		ret = -EAGAIN;
-@@ -1696,16 +1725,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		 * PTE, which will be preserved.
- 		 */
- 		prot &= ~KVM_NV_GUEST_MAP_SZ;
--		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot, flags);
-+		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, fault_ipa, prot, flags);
- 	} else {
--		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
-+		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     memcache, flags);
- 	}
- 
- out_unlock:
- 	kvm_release_faultin_page(kvm, page, !!ret, writable);
--	read_unlock(&kvm->mmu_lock);
-+	kvm_fault_unlock(kvm);
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret)
-@@ -1724,7 +1753,7 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 
- 	read_lock(&vcpu->kvm->mmu_lock);
- 	mmu = vcpu->arch.hw_mmu;
--	kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa, flags);
-+	KVM_PGT_FN(kvm_pgtable_stage2_mkyoung)(mmu->pgt, fault_ipa, flags);
- 	read_unlock(&vcpu->kvm->mmu_lock);
- }
- 
-@@ -1764,7 +1793,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		}
- 
- 		/* Falls between the IPA range and the PARange? */
--		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-+		if (fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr))) {
- 			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
- 
- 			if (is_iabt)
-@@ -1930,7 +1959,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
- 
--	return kvm_pgtable_stage2_test_clear_young(kvm->arch.mmu.pgt,
-+	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
- 						   range->start << PAGE_SHIFT,
- 						   size, true);
- 	/*
-@@ -1946,7 +1975,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
- 
--	return kvm_pgtable_stage2_test_clear_young(kvm->arch.mmu.pgt,
-+	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
- 						   range->start << PAGE_SHIFT,
- 						   size, false);
- }
 -- 
-2.47.1.613.gc27f4b7a9f-goog
-
+Thanks,
+Oliver
