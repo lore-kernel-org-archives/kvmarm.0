@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B471917F1
-	for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 16:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CD81FC0F2
+	for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 18:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734541024; cv=none; b=sTC5PNuNKQgCXqXqto8lTcLwWEsGf/RvwtRmIqEXFInosw0QTzWFrWkH6gfa0y0GraHto6VWfwd29H8ltCUAizFXXDbfZ92/af0Ge48hJlT+rxAJHE3pPCu+61r5av2u0pAdxdxl7gyQ6nqQiNk20+o3QLa+mvLb3Kz7X0/5N0s=
+	t=1734545517; cv=none; b=JOmtueoSjfhLz3omI0OUvd0AsfWZjpn/mDA84kLZZbuFo11vRkMnCNIPlddmjP7kCWq0SYy768qXOzUpIuglJj7GBRTKvSTj6Lq0F+O9mXAfBa8i9vsZR9pLz55MyGQHodUp8vxnZZrZ5ZFyZvIGt41kL+uOiuvNxwl4jp7XsOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734541024; c=relaxed/simple;
-	bh=W5I+c8BU2jlkCC/viGtloqXYWpj/NJYSnADUyBcOXTg=;
+	s=arc-20240116; t=1734545517; c=relaxed/simple;
+	bh=q7xlQW7nPLn0QaEYr90sK5wbW1PKNa6jLEJqH+CSvn0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KALOKclYeVL9kr4Zr81um+YPCwQ9N/CDR1JZ+Hux5SsSwznmwdzZ62eSOPGwACmDRZgDfI4N7evpazvPjl1rfx/7VGldpz219xp1+cFf0BVsI1cu4qf+XMwIfKFumatDBtljHcGvymGWvn/hWziiGag/rqte+k2kjie0WGmSwPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EqBhIS53; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=f41uw9TIRrlGbSP/0RFspdvGKzeGrXwzzrvZdcbJsraUgyIlMcmwls189QnpOxNmGPVluq0G1nYr67Z+yjbpW0j6a5HXjBzF8/8871gP0EQsvi6rnYD9ct7icUclp3VgxGZ5Yy/23bObzcllN2IU3Zfce30f872aIlqI+tRClBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4jbMXYj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EqBhIS53"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2231DC4CECD;
-	Wed, 18 Dec 2024 16:57:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4jbMXYj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77F80C4CEDD;
+	Wed, 18 Dec 2024 18:11:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734541024;
-	bh=W5I+c8BU2jlkCC/viGtloqXYWpj/NJYSnADUyBcOXTg=;
+	s=k20201202; t=1734545517;
+	bh=q7xlQW7nPLn0QaEYr90sK5wbW1PKNa6jLEJqH+CSvn0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EqBhIS53aMg1xCKU3ADtLwe52eblQTEiq/DPcm9dss1bYjP4Dp8sUSeHc2MbafCbu
-	 VjaR19INxto3cgxMupkKab6YvkpMJWwMuO1YmjERIx6SKeRO5fawhDQzMuUMNosk4G
-	 pT2CxmzAOmXh/jKENxxYh1rwQ05cwB4FQYU7kFNu3gpHjumEOJbRtlJufug1sVQfT9
-	 NqD6xLlr3FmVMlDC2S8rFeWmdB1P1k6d5g2SH5se9sHTIfVgYPvkprVwj74xh30bNk
-	 q96trjT+7jetL3bxboHrZcqACO3+5LAh8eT4e9sPZCLbzRYnrQ6d8QeuOe8fwwsqb+
-	 L4eIQJhqQansg==
+	b=M4jbMXYjNQNU1pfXiXZYhp54H075Mw45ANjiIZVME/FfJ+ug1PIkT2fL2IimB3xhq
+	 uHSkWg0DSLG3DSCqC/1SNH642ThxyyvjxOHFNZUBzsx16VJ2YPtZZHKsEZ1jqkCqmm
+	 LyGYcRNsHemYzdjaGIVzI3OwlpgQwUI/uLnwVA3pDf0/D4/5BNw87kSzyGv4/djkwR
+	 /MDfG9t2swZk95LGxGgWXY13slZg2DLizWeX9wshDtVn+DoPx579wTQadCUrn55/S6
+	 p45i3IqvABaHosk1gW6iEjfv3cljkW8G4LWVApjoZGGSHOkGW7KAdRc8xF+E5t5WxT
+	 vHoyfcbI1OmjA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tNxM5-0050X1-Tc;
-	Wed, 18 Dec 2024 16:57:02 +0000
-Date: Wed, 18 Dec 2024 16:57:01 +0000
-Message-ID: <86h671q68y.wl-maz@kernel.org>
+	id 1tNyWZ-0051pi-7l;
+	Wed, 18 Dec 2024 18:11:55 +0000
+Date: Wed, 18 Dec 2024 18:11:54 +0000
+Message-ID: <86frmkrhcl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -44,9 +44,10 @@ Cc: kvmarm@lists.linux.dev,
 	Colton Lewis <coltonlewis@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	James Clark <james.clark@linaro.org>
-Subject: Re: [PATCH 0/4] KVM: arm64: PMU fixes for 6.13
-In-Reply-To: <20241217175336.3657966-1-oliver.upton@linux.dev>
-References: <20241217175336.3657966-1-oliver.upton@linux.dev>
+Subject: Re: [PATCH v3 10/16] KVM: arm64: Use debug_owner to track if debug regs need save/restore
+In-Reply-To: <20241209180926.2161373-11-oliver.upton@linux.dev>
+References: <20241209180926.2161373-1-oliver.upton@linux.dev>
+	<20241209180926.2161373-11-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,38 +63,75 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Dec 2024 17:53:32 +0000,
+On Mon, 09 Dec 2024 18:09:20 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Small set of fixes for PMU, mostly focused on plugging gaps in nested
-> support that I'd missed last time around:
-> 
->  - Don't attempt to enable/disable EL2 counters when PMCR_EL0.E is
->    changed. This is already the case since the enable state of a
->    counter is re-evaluated in kvm_pmu_create_perf_event(), though the
->    handling of PMCR_EL0.E would suggest otherwise.
-> 
->  - Enable/disable EL2 counters when MDCR_EL2.HPME is changed.
-> 
->  - Only reset 'guest' counters when PMCR_EL0.P is set, excluding EL2
->    counters from being reset.
-> 
-> Applies to 6.13-rc3, tested on the M2 w/ my PMUv3 patches thrown on top.
-> 
-> Oliver Upton (4):
->   KVM: arm64: Add unified helper for reprogramming counters by mask
->   KVM: arm64: Use KVM_REQ_RELOAD_PMU to handle PMCR_EL0.E change
->   KVM: arm64: nv: Reload PMU events upon MDCR_EL2.HPME change
->   KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters
-> 
->  arch/arm64/kvm/pmu-emul.c | 89 +++++++++++++++------------------------
->  arch/arm64/kvm/sys_regs.c | 32 +++++++++++---
->  include/kvm/arm_pmu.h     |  6 +--
->  3 files changed, 62 insertions(+), 65 deletions(-)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f84306b11261..5b8982bcc0bb 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -621,40 +621,12 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> -/*
+> - * We want to avoid world-switching all the DBG registers all the
+> - * time:
+> - *
+> - * - If we've touched any debug register, it is likely that we're
+> - *   going to touch more of them. It then makes sense to disable the
+> - *   traps and start doing the save/restore dance
+> - * - If debug is active (DBG_MDSCR_KDE or DBG_MDSCR_MDE set), it is
+> - *   then mandatory to save/restore the registers, as the guest
+> - *   depends on them.
+> - *
+> - * For this, we use a DIRTY bit, indicating the guest has modified the
+> - * debug registers, used as follow:
+> - *
+> - * On guest entry:
+> - * - If the dirty bit is set (because we're coming back from trapping),
+> - *   disable the traps, save host registers, restore guest registers.
+> - * - If debug is actively in use (DBG_MDSCR_KDE or DBG_MDSCR_MDE set),
+> - *   set the dirty bit, disable the traps, save host registers,
+> - *   restore guest registers.
+> - * - Otherwise, enable the traps
+> - *
+> - * On guest exit:
+> - * - If the dirty bit is set, save guest registers, restore host
+> - *   registers and clear the dirty bit. This ensure that the host can
+> - *   now use the debug registers.
+> - */
+>  static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+>  {
+>  	access_rw(vcpu, p, r);
+>  	if (p->is_write)
+> -		vcpu_set_flag(vcpu, DEBUG_DIRTY);
+>  
+>  	kvm_debug_set_guest_ownership(vcpu);
+>  	return true;
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Sorry for stating the same thing again, but this is a repeat of [1].
+Should I add this on top?
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 55c49150fac40..92e2c4c12f0dc 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -619,8 +619,6 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+ 			    const struct sys_reg_desc *r)
+ {
+ 	access_rw(vcpu, p, r);
+-	if (p->is_write)
+-
+ 	kvm_debug_set_guest_ownership(vcpu);
+ 	return true;
+ }
 
 	M.
+
+[1] https://lore.kernel.org/r/Zy_0T00hOjVfmKTz@linux.dev
 
 -- 
 Without deviation from the norm, progress is not possible.
