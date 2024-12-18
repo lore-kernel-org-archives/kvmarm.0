@@ -1,71 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287881A2C04
-	for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 15:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837E26F305
+	for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 15:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734535174; cv=none; b=GcgYQs76yeYa7kUD/e2l/9pFaAgcEPLc/frb+k8IbFYa8KVMrZOn49cuiktRX6MXrXOQ7RsVEPLUglJ37tJVlPO3x9v+TKvmLMbc01MUzjqagS+fjbrGUNqnxFaiyL8akwPNEhpYSEwUn/7uqu2XIhO4L9o65rjbmj33ODB/ztc=
+	t=1734535372; cv=none; b=o6C2abPyPoqCI96aH9FRD3P9sV3wm8ODPOjAL1ztwHWfUuBzdIzgYhS/lZe0rHIdgLjFLUP7ZwOJUZL3npKz7F8/VmQujuwRtnwmIOj9cz3bNA9kJAWfQF9aDHVvQtQaLxjWbC5ayz62K1LaTaZikj3DEyBsPZd2xmmMsnrisak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734535174; c=relaxed/simple;
-	bh=DyGCkBT40L20NaH3Pin2wSf4wxZvPtFkzqxS3HqQiFM=;
+	s=arc-20240116; t=1734535372; c=relaxed/simple;
+	bh=Wy0++N495xzNH+uVamD5pjs+IZyRqs9bavIxX37s7PM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X9CeNV2YRkua6IIHCml68r2p/es+6ED1eqHnaMXjM20evMcV7PkyrN6OcAn3uPPDvNajCaRd7feEdU/SQqfc5F6MiMlkpFX0KPSlfXwS/aoh50AFiaRhyDywkQRtUsYItpWZ/T+HC4nSaU4rYW3/1ebyR7MLSqLLd45SAaGDz+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z2vanNG8; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=iq74tBfM6Lt0/gSi+xEKqmlbRf+xWwpD15uCUSeI+HNFi+XocXk551gUDyL5LCqYcReROgWmOQO9qK4u7Bdjfp0BNfbCRH8DHKTq9JsAuwzkWs5CFUKCVnyHe3Jb2Ehe39XdHyYjT/McrqyiFyVPEpig8stEJRn3wwLha4s/lyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=flZLwuEp; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2vanNG8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="flZLwuEp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734535172;
+	s=mimecast20190719; t=1734535369;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lJSP7v7O+oDOfPrBvlBn9hMnhyj2hpIG70qFLCRuzJA=;
-	b=Z2vanNG8DMj4ADtPsqhRCylZaC+aLsQ/2ZWEGaKzI20xdqQQ+vJZpRNvti69mD0oOkUC2C
-	SW1vLEJvYrAWIs5htdW8t7mOz5FeyC9WPh5fZIPqHfDJPEkBAjAkVWjOT5rxfGIghVpAbP
-	dQPgB1nTg6WyMrCbi1piIbSXjLQsALc=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Mxwx7T8xQX7F7d9YmlWUpy9SyCJUmBxMFMKphhhpq4Q=;
+	b=flZLwuEpIgiGn+mgPnRAOx1s5HE+2IMxFliHz/7R8j0zfBFKTRSLAVOH23TaPzC3smZOBC
+	uoUi6P1hhTxMRjCcKyQUk8WprJxH24+3a7otPgIakKsb/sdJX1C+2itkNNtQUZqNJjj+dW
+	ysu3fQ6rdkGUXDVxEOC4Vi/FvGAADZk=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-378-DS8CAKsENy-651V7846fHQ-1; Wed, 18 Dec 2024 10:19:30 -0500
-X-MC-Unique: DS8CAKsENy-651V7846fHQ-1
-X-Mimecast-MFC-AGG-ID: DS8CAKsENy-651V7846fHQ
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6dcccc8b035so21622536d6.1
-        for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 07:19:30 -0800 (PST)
+ us-mta-658-VS-3Z1dEP9GMWRlc9gRuzA-1; Wed, 18 Dec 2024 10:22:48 -0500
+X-MC-Unique: VS-3Z1dEP9GMWRlc9gRuzA-1
+X-Mimecast-MFC-AGG-ID: VS-3Z1dEP9GMWRlc9gRuzA
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b6eeef7cb8so466366885a.2
+        for <kvmarm@lists.linux.dev>; Wed, 18 Dec 2024 07:22:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734535170; x=1735139970;
+        d=1e100.net; s=20230601; t=1734535368; x=1735140168;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lJSP7v7O+oDOfPrBvlBn9hMnhyj2hpIG70qFLCRuzJA=;
-        b=LeXJW+n/2nLNGU3MBPhj3mdY0FiV9PxHU27/ffMxANiQPgMS8AjCP7h7KlPH+VjxrL
-         ivFkqIC72L8IKSe9ZMXZkY0xImTzKmnesw6G46rCGWJ4xVmK+gy0Mgvr7hyCdYcHT7gQ
-         dN0PeSfpLE+wUBphv2dkoEzbZ92oiebS1rzbQr4TJUDY0UuFfUHQv/sl32zPRFBAEUCW
-         k2vEGy8PrTW+zevqbY+gIKIW9MeUOUDIQ4mzA2gG0lilRx/inRd6kETKxo2l+Mkzq0vy
-         XOajFF4GtcmTBA4tfJlqBgARLgBkurowT3SrcXy5HMVL63SpW12Jahk/gxbQQBg+EqRA
-         LXUw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1shh0qw4AZ3bNibc7AgTkjkFXQtMzqunuiYfia56UFJCZ1VtlyhBO+MdTvMdwxQIcZItlRIw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy6fgigvIpDoDBMZRWLexVpUcwqEpyEM1pzl7gK4AKXWZEmoxDf
-	VkZTSfhyC+zYi85JFLhwqDx6npm5JwMdgXALk7tBUfJFwQq8ZeCjm1fY2U5qR2/V8H8dGf26TTP
-	ME9H1hA6iob2LrdtT7EjxzPjs/bfWhZwTCmrWj6rUhP68UXGFIiGIBQ==
-X-Gm-Gg: ASbGncsACgTMxu1/+Jk9EWn0CDB/neTJqIk2FjDeibI5Bq2yKZWjae9vgnA8DlGtYKb
-	1avTTNEsoL26t7lz+Lre0Jqgo+dw5KGLs3pa/YWa9TaQ/8xgTlAHpg4G3PHHpVi4Gw5UN0IvMjR
-	bvXiXqRtkI7HYrZ3Z+cA3p0PkSpQiyq/AXmin/Q8h27Wd/yCDh/yVHJkNwcAnuUfmDiHjqIvVQG
-	qh3AKWAFwR5jk87/nv2wjE13IEnat5EFtaLqxW1FGg2LXeNv7oFXazXhMQKqmhnCd3Q1eGCnnlK
-	6tABybWN47b5uToP3/S7+gs=
-X-Received: by 2002:a05:6214:2487:b0:6d8:a9a6:83ef with SMTP id 6a1803df08f44-6dd09aae408mr56951436d6.20.1734535170209;
-        Wed, 18 Dec 2024 07:19:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHmeRQfKzOtSLywUp/ORft5eZda7HUnNeyjbDa8MumUrqjCzsC9niZRmKtWoztYMdJy7SLsAA==
-X-Received: by 2002:a05:6214:2487:b0:6d8:a9a6:83ef with SMTP id 6a1803df08f44-6dd09aae408mr56950996d6.20.1734535169928;
-        Wed, 18 Dec 2024 07:19:29 -0800 (PST)
+        bh=Mxwx7T8xQX7F7d9YmlWUpy9SyCJUmBxMFMKphhhpq4Q=;
+        b=VF80XasfyZLgFTdytWVgj6jceEGyMTt1It4it11TBJibq6NLE51tLVBiCLyV4ABKZJ
+         EPiB/xZFQJIj1wPdhaw3Mb4+Ru4cuwUKkgFV6R/lWz1XTUv7P8cvcyRkfyrmE642T03c
+         xv74s8Er8/Z9A6fTJ6UP8P2QUo07wIAygzTi1YN3a8RlVxa0/dFE0dQ0fKc9bVYUDUmq
+         qt0iOT+lyddu68JDK8wwfuHsrYnQvgzfJb22Ux/Al3eWNG5WdJyww1RIA1sy1NPqeho4
+         E4cmO/ju28nEAWPH4BoHNCEZVJaNN00XzNwnxr5zgoVNXO9gBaNpzMa80o+sI2YzjQ97
+         JmGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQTu390NP9NLOGaIwJyQP163wySmEvRwG5sJA1VJ1MSDvBwpz7fLtvvirHfprSZd0FLoFQ2c4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxPEd9yqkpQEFTu0EpwOKA5eBefAaTA6lhzgYl86FZ7aoAKOASf
+	/kbyxkJtdKaL6kyJyo/sL8N0MTMkryUl5WGaAJxrsSTZtj01A0aKDk8kf/zy1JdCFo7Jxlwbk7w
+	7P/jbL2NslrzRoj2uKKik/lsy2Et2CoSUFeASfUMUWvJJ4kV8hwMnWQ==
+X-Gm-Gg: ASbGncuGCwHUrHoYlAO2pePVKbjwqj/dvrkLE3ObXT6XwSjksR+heJRD4zklHDo5kJI
+	8D5hUfs/I7TH8JhtEQz1PIGKHajAvHFCK2YMKAC5WVX74tog+JX/TYOAOh9oT8WWh3HwHEiCx82
+	ZUYkM2+/jgUg7ikiPuAYlctBvipj/0KqFtf4e6uIFJkMZhQhGBl4lLS8S8BT/5ChlPeHISYWT+5
+	9nRvpFwixxLGumzGFAAt2sBrgi77hDXdxf3b5RBqcGnc9CYwSUl0GInVyjIqIkr97U+u0oOad+8
+	W1SpDuOthmF4yLBzsR9thME=
+X-Received: by 2002:a05:622a:345:b0:466:8a95:d1cc with SMTP id d75a77b69052e-46908eccbbfmr50231331cf.47.1734535367907;
+        Wed, 18 Dec 2024 07:22:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFDphvG9D+OqeokedTCW6poW/8dGPSq+hi4s2HJPD6c7Y6vBGeH4Zz/CqDbOTkejk9pqrPBCA==
+X-Received: by 2002:a05:622a:345:b0:466:8a95:d1cc with SMTP id d75a77b69052e-46908eccbbfmr50230991cf.47.1734535367576;
+        Wed, 18 Dec 2024 07:22:47 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dccd367f7csm50865876d6.94.2024.12.18.07.19.24
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-467b2c69b10sm51678321cf.18.2024.12.18.07.22.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Dec 2024 07:19:29 -0800 (PST)
-Message-ID: <287abeb0-8660-49b0-bf69-97eaa5bbe6a2@redhat.com>
-Date: Wed, 18 Dec 2024 16:19:21 +0100
+        Wed, 18 Dec 2024 07:22:47 -0800 (PST)
+Message-ID: <b77f9c33-0161-4891-b3cc-a629c6380e63@redhat.com>
+Date: Wed, 18 Dec 2024 16:22:41 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 08/46] arm64/sysreg: Add register fields for
- HFGRTR2_EL2
+Subject: Re: [PATCH V2 09/46] arm64/sysreg: Add register fields for
+ HFGWTR2_EL2
 To: Anshuman Khandual <anshuman.khandual@arm.com>,
  linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
  linux-arm-kernel@lists.infradead.org, maz@kernel.org
@@ -83,11 +83,11 @@ Cc: ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
  <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
 References: <20241210055311.780688-1-anshuman.khandual@arm.com>
- <20241210055311.780688-9-anshuman.khandual@arm.com>
+ <20241210055311.780688-10-anshuman.khandual@arm.com>
 From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20241210055311.780688-9-anshuman.khandual@arm.com>
+In-Reply-To: <20241210055311.780688-10-anshuman.khandual@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: n-qnOHcpub6qivQAJrzitlfrE8IFUAn9rGRbQrNzTM0_1734535170
+X-Mimecast-MFC-PROC-ID: yZ00TGmLgEx1ZI2nGFyWSGWqQ2jJxyG9NtESw6ROJHI_1734535368
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -96,7 +96,7 @@ Content-Transfer-Encoding: 7bit
 
 
 On 12/10/24 06:52, Anshuman Khandual wrote:
-> This adds register fields for HFGRTR2_EL2 as per the definitions based
+> This adds register fields for HFGWTR2_EL2 as per the definitions based
 > on DDI0601 2024-09.
 > 
 > Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -113,14 +113,14 @@ Eric
 >  1 file changed, 19 insertions(+)
 > 
 > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 9d339f735648..9513ae05dc93 100644
+> index 9513ae05dc93..30a0d3ee71a7 100644
 > --- a/arch/arm64/tools/sysreg
 > +++ b/arch/arm64/tools/sysreg
-> @@ -2619,6 +2619,25 @@ Field	1	nPMIAR_EL1
->  Field	0	nPMECR_EL1
+> @@ -2638,6 +2638,25 @@ Field	1	nERXGSR_EL1
+>  Field	0	nPFAR_EL1
 >  EndSysreg
 >  
-> +Sysreg	HFGRTR2_EL2	3	4	3	1	2
+> +Sysreg	HFGWTR2_EL2	3	4	3	1	3
 > +Res0	63:15
 > +Field	14	nACTLRALIAS_EL1
 > +Field	13	nACTLRMASK_EL1
@@ -135,7 +135,7 @@ Eric
 > +Field	4	nSCTLRMASK_EL1
 > +Field	3	nCPACRMASK_EL1
 > +Field	2	nRCWSMASK_EL1
-> +Field	1	nERXGSR_EL1
+> +Res0	1
 > +Field	0	nPFAR_EL1
 > +EndSysreg
 > +
