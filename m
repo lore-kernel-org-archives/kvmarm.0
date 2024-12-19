@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6721CD15
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 10:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4780E433A4
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 10:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734602669; cv=none; b=L9Wtcx2SshCV4AXVJqUTJ39z4W3zyNmfJHlvQQ/OBgAr0d3/oJ0+j43EiOUDS5DHmduX/0bnKZKxx0oixyHhh2NXp5eo9+2mQEVCjBtzXJjPq4LoeJ9L5Z86aZE8duIoAtFqcUjBDSkohmoe2WSlhFHUAKUUF2pKkQ218XLWXMU=
+	t=1734602862; cv=none; b=Xwf7SVK2nX9i7wPzd6nYzOf9kNzxTHoe3CBL+JLbsGZb5fahgNJ48yjXYQiRkiB242r+sr9wc8NZac8x3Vpqx7a5rdSW2gpK8t4feA/vlEEM2LMqxadtM/GTAXFbzV7QdUFpJAw/tSQZDvIFnHjFpLz0Z9xCpZ0y7AloJFXxKAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734602669; c=relaxed/simple;
-	bh=cRYB4PH+c23IkVx/mV1DYU4u2EVScVI/3SCcaAcJt5w=;
+	s=arc-20240116; t=1734602862; c=relaxed/simple;
+	bh=kTpvFJZx81GGCddn1uaeuT6TXgrOaV1RGpXPH6ZTP/U=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QE2R30q3H2Kh2bblHQ8wMvVYFenMIwssA5vuP+i7SWxWnEVhPw7gluy9sc5fjbj3Pjm9UprUTmQrFyvyenbsJzG851QQrQz0qCK0WeND4bE4VgqNF0OLOV7BA6bIc9I/mUvU6oakgkocA3noAkMGqY9sMHtQ7Qe9k/p+bp7+EpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eyahSqZ1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=RMO/5MEy73Vf5OfdKVXWotEz6Zh4NLg0ufvUbJ6qZmxTaKRzm1UBPic5Ta1QmxA5hrkIsrFKAQIieRb5L4CmqdVKTAA2VlTVRY2HOzakXvBpeGdqT9DFX1+frpCt53ZPi+fjbU4v0nrXOw+Ou4+BlcQo/7S47e11iYPXW3SayUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxvsVQjd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyahSqZ1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925A4C4CECE;
-	Thu, 19 Dec 2024 10:04:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxvsVQjd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC50FC4CECE;
+	Thu, 19 Dec 2024 10:07:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734602666;
-	bh=cRYB4PH+c23IkVx/mV1DYU4u2EVScVI/3SCcaAcJt5w=;
+	s=k20201202; t=1734602861;
+	bh=kTpvFJZx81GGCddn1uaeuT6TXgrOaV1RGpXPH6ZTP/U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eyahSqZ14m0lXxek4DdumBpzgHdo6CE6viZIiQFCcErL3c814CAr5G91sdZhQxrbj
-	 b3suOgTOKT/6bMTyG/NRU28HlvY34aNi7q4vC1e65ji9mg8jt1qoPKzcSzLX6AahqS
-	 1FMPYr69tb4vEW40ZilatC7+qYbxhAUxsQefo2G8olgqVpmN/BGK6Tbp7gVjo92lMy
-	 3rvYBAN4r30vpja2fjoOOiX5yC00pYrLjZiGIldNn20N6wSOJLCY4zsxS30NkbmSVX
-	 vc7bt+uK/WG5bCPYuf9N5Ow4mgwc3zLddaw6PP7U09j3RJ4+FaQliEKLb7fommQq1k
-	 x67t8Ud3T4J+A==
+	b=AxvsVQjd06HGvwlk4/6Qit6g/wiN63+LMk/9MD0DkTuAry4irqSpYTa9GUx9Uo71t
+	 wenrpuTxjUatdixUvRIevXXaCvG5A3aTrokHhNL4uRotXGXkq5YPH/qmu+vCNFFF0D
+	 tRg7CXm8KUYTgUYWggNtD/7hG7JiKhZML56KLN6DWAAQ4+XqE3uIHh/u/Hr5CUUeYj
+	 /of2Qcmk0CKIhmGEfAfMXmYjhiaS7jg5o7yE1B8VbRiTRv4+onQmIw/UkFrGnJdHnk
+	 MZg+yedMLo13yHuKQnhTYJgAJAtR9jFvfD3BE4wCOF2kY2NvcG5SqCT0kJ9FUi5xaR
+	 xx+NeMjd08Pow==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tODOK-005ENb-10;
-	Thu, 19 Dec 2024 10:04:24 +0000
-Date: Thu, 19 Dec 2024 10:04:22 +0000
-Message-ID: <86bjx8q995.wl-maz@kernel.org>
+	id 1tODRT-005EQP-Lw;
+	Thu, 19 Dec 2024 10:07:39 +0000
+Date: Thu, 19 Dec 2024 10:07:39 +0000
+Message-ID: <86a5csq93o.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Cc: <kvmarm@lists.linux.dev>,
@@ -51,10 +51,9 @@ Cc: <kvmarm@lists.linux.dev>,
 	<anthony.jebson@huawei.com>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<linuxarm@huawei.com>
-Subject: Re: [PATCH v4 3/3] arm64: paravirt: Enable errata based on implementation CPUs
-In-Reply-To: <20241218105345.73472-4-shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v4 0/3] KVM: arm64: Errata management for VM Live migration
+In-Reply-To: <20241218105345.73472-1-shameerali.kolothum.thodi@huawei.com>
 References: <20241218105345.73472-1-shameerali.kolothum.thodi@huawei.com>
-	<20241218105345.73472-4-shameerali.kolothum.thodi@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,206 +69,32 @@ X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 18 Dec 2024 10:53:45 +0000,
+Hi Shameer,
+
+On Wed, 18 Dec 2024 10:53:42 +0000,
 Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 > 
-> Retrieve any migration target implementation CPUs using the hypercall
-> and enable associated errata.
+> Hi,
 > 
-> Reviewed-by: Sebastian Ott <sebott@redhat.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  arch/arm64/include/asm/cputype.h  | 25 +++++++++++++++++++++++--
->  arch/arm64/include/asm/paravirt.h |  3 +++
->  arch/arm64/kernel/cpu_errata.c    | 20 +++++++++++++++++---
->  arch/arm64/kernel/cpufeature.c    |  2 ++
->  arch/arm64/kernel/image-vars.h    |  2 ++
->  arch/arm64/kernel/paravirt.c      | 31 +++++++++++++++++++++++++++++++
->  6 files changed, 78 insertions(+), 5 deletions(-)
+> v3 --> v4(Minor updates)
+> https://lore.kernel.org/kvmarm/20241209115311.40496-1-shameerali.kolothum.thodi@huawei.com/
 > 
-> diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-> index dcf0e1ce892d..019d1b7dae80 100644
-> --- a/arch/arm64/include/asm/cputype.h
-> +++ b/arch/arm64/include/asm/cputype.h
-> @@ -265,6 +265,16 @@ struct midr_range {
->  #define MIDR_REV(m, v, r) MIDR_RANGE(m, v, r, v, r)
->  #define MIDR_ALL_VERSIONS(m) MIDR_RANGE(m, 0, 0, 0xf, 0xf)
->  
-> +#define MAX_TARGET_IMPL_CPUS 64
-> +
-> +struct target_impl_cpu {
-> +	u64 midr;
-> +	u64 revidr;
-> +};
-> +
-> +extern u32 target_impl_cpu_num;
-> +extern struct target_impl_cpu target_impl_cpus[];
-> +
->  static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
->  					   u32 rv_max)
->  {
-> @@ -276,8 +286,19 @@ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
->  
->  static inline bool is_midr_in_range(struct midr_range const *range)
->  {
-> -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> -				       range->rv_min, range->rv_max);
-> +	int i;
-> +
-> +	if (!target_impl_cpu_num)
-> +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> +					       range->rv_min, range->rv_max);
-> +
-> +	for (i = 0; i < target_impl_cpu_num; i++) {
-> +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
-> +					    range->model,
-> +					    range->rv_min, range->rv_max))
-> +			return true;
-> +	}
-> +	return false;
->  }
->  
->  static inline bool
-> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-> index 9aa193e0e8f2..95f1c15bbb7d 100644
-> --- a/arch/arm64/include/asm/paravirt.h
-> +++ b/arch/arm64/include/asm/paravirt.h
-> @@ -19,11 +19,14 @@ static inline u64 paravirt_steal_clock(int cpu)
->  }
->  
->  int __init pv_time_init(void);
-> +void __init pv_target_impl_cpu_init(void);
->  
->  #else
->  
->  #define pv_time_init() do {} while (0)
->  
-> +#define pv_target_impl_cpu_init() do {} while (0)
-> +
->  #endif // CONFIG_PARAVIRT
->  
->  #endif
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index 929685c00263..4055082ce69b 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -14,6 +14,9 @@
->  #include <asm/kvm_asm.h>
->  #include <asm/smp_plat.h>
->  
-> +u32 target_impl_cpu_num;
-> +struct target_impl_cpu target_impl_cpus[MAX_TARGET_IMPL_CPUS];
-> +
->  static bool __maybe_unused
->  __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
->  			 u32 midr, u32 revidr)
-> @@ -32,9 +35,20 @@ __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
->  static bool __maybe_unused
->  is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
->  {
-> -	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-> -	return __is_affected_midr_range(entry, read_cpuid_id(),
-> -					read_cpuid(REVIDR_EL1));
-> +	int i;
-> +
-> +	if (!target_impl_cpu_num) {
-> +		WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-> +		return __is_affected_midr_range(entry, read_cpuid_id(),
-> +						read_cpuid(REVIDR_EL1));
-> +	}
-> +
-> +	for (i = 0; i < target_impl_cpu_num; i++) {
-> +		if (__is_affected_midr_range(entry, target_impl_cpus[i].midr,
-> +					     target_impl_cpus[i].midr))
-> +			return true;
-> +	}
-> +	return false;
->  }
->  
->  static bool __maybe_unused
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 4cc4ae16b28d..d32c767bf189 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -85,6 +85,7 @@
->  #include <asm/kvm_host.h>
->  #include <asm/mmu_context.h>
->  #include <asm/mte.h>
-> +#include <asm/paravirt.h>
->  #include <asm/processor.h>
->  #include <asm/smp.h>
->  #include <asm/sysreg.h>
-> @@ -3642,6 +3643,7 @@ unsigned long cpu_get_elf_hwcap3(void)
->  
->  static void __init setup_boot_cpu_capabilities(void)
->  {
-> +	pv_target_impl_cpu_init();
->  	/*
->  	 * The boot CPU's feature register values have been recorded. Detect
->  	 * boot cpucaps and local cpucaps for the boot CPU, then enable and
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 8f5422ed1b75..694e19709c46 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -49,6 +49,8 @@ PROVIDE(__pi_arm64_sw_feature_override	= arm64_sw_feature_override);
->  PROVIDE(__pi_arm64_use_ng_mappings	= arm64_use_ng_mappings);
->  #ifdef CONFIG_CAVIUM_ERRATUM_27456
->  PROVIDE(__pi_cavium_erratum_27456_cpus	= cavium_erratum_27456_cpus);
-> +PROVIDE(__pi_target_impl_cpu_num	= target_impl_cpu_num);
-> +PROVIDE(__pi_target_impl_cpus		= target_impl_cpus);
->  #endif
->  PROVIDE(__pi__ctype			= _ctype);
->  PROVIDE(__pi_memstart_offset_seed	= memstart_offset_seed);
-> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-> index aa718d6a9274..95fc3aae4a27 100644
-> --- a/arch/arm64/kernel/paravirt.c
-> +++ b/arch/arm64/kernel/paravirt.c
-> @@ -153,6 +153,37 @@ static bool __init has_pv_steal_clock(void)
->  	return (res.a0 == SMCCC_RET_SUCCESS);
->  }
->  
-> +void  __init pv_target_impl_cpu_init(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	int index = 0, max_idx = -1;
-> +
-> +	/* Check we have already set targets */
-> +	if (target_impl_cpu_num)
-> +		return;
-> +
-> +	do {
-> +		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID,
-> +				     index, &res);
-> +		if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +			return;
+>  -Changed MIDR/REVIDR to 64 bits based on feedback from Connie
+>   and Marc(Patch #3).
+>  -Added R-by tags from Sebastian (Thanks!).
 
-Can't you probe for this as part of the KVM guest services?
+Thanks again for putting this together.
 
-> +
-> +		if (max_idx < 0) {
-> +			/* res.a0 should have a valid maximum CPU implementation index */
-> +			if (res.a0 >= MAX_TARGET_IMPL_CPUS)
-> +				return;
-> +			max_idx = res.a0;
-> +		}
-> +
-> +		target_impl_cpus[index].midr = res.a1;
-> +		target_impl_cpus[index].revidr = res.a2;
-> +		index++;
-> +	} while (index <= max_idx);
-> +
-> +	target_impl_cpu_num = index;
-> +	pr_info("Number of target implementation CPUs is %d\n", target_impl_cpu_num);
-> +}
-> +
->  int __init pv_time_init(void)
->  {
->  	int ret;
+I think it would be really good to have a sample userspace
+implementation of this extension so that we can play with it for real
+before fully committing to it.
 
-Independent of this, I wonder what we should output in sysfs
-(/sys/devices/system/cpu/cpu*/regs/identification/*).
+I am also wondering is we should make it mandatory that a guest is
+presented with an MIDR_EL1.Implementer value set to 0, which denotes
+SW use, and would make it plain to the guest (and crucially, guest
+userspace) that we are going to play tricks.
 
-Thanks,
+Thoughts?
 
 	M.
 
