@@ -1,158 +1,137 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E422AD16
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 15:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7964981727;
+	Thu, 19 Dec 2024 15:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734622919; cv=none; b=TdQRl1Lzf3W8izQ3i1trhklHCYsajP9qRMi0qU9XbRMlMknnGa53C2nUGIJ3ii4adAPo1Qm6d9mC1DIos4KBhGKVVM70+jP2KlxF6G24tKgeIxo48qKzkPmLs+Xtv8ldxqlCSeA2ZiC710rJEuwNuiIn8fMCm2v4cj+IrEuyd88=
+	t=1734623352; cv=none; b=dQT7MCHTrODVmHaHcj5/X4JhqvUN609KqxoEBHmlWaZiTHYgNr0PZrpgyDxqogHSNi1bNpWTO4JcDZ+VLK0j+vYEXCJ+XY/NIDTGkkp3SBEWPJlbHAHgvRWIl38Y1q14UI99dvRG08u3PGF5tcepQDCQ0ss/VP7mI6xqGvmtZ8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734622919; c=relaxed/simple;
-	bh=JT6efBVKqubwl6mff1iO/fWWnelB4X1FDGSeUIpzVXY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hyRstqPDIcAa70uHZd/h8wctAWAI1TxVO81XBD5RPOaL33Y1OUH1AJ49cJ5zYgNn8fqz2kdcQFzWpYXPZvkxq8LmSfFk5uKbnzUyeOOlw3egfgZkS46fIEWh9WkdzkJZ17evCNsIShXGYDu5q7NOczflhxbJs3f7HNyWuDFS36s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YtuUEpUr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734623352; c=relaxed/simple;
+	bh=Em6tjA4shpu07NzsF3bttoRoasi6FATll0gF+/u1AaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LAyEJwNNrDBs2mENUHDLMNVLNHcrYIu9O3y9E00hLxNDlDlthtuvztoEyVZVp7vD0ZYk7/hlbvTBqLnE7kv/mp4qGkyQIwaFIlCQR4L7PFVpt+kW4LIHMJyTmE7o/sXxm7CU2LUBCU8O7OWPEozawjyxOCVvHwf/f0gZSBtNXm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mpTedCyG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YtuUEpUr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60F5EC4CECE;
-	Thu, 19 Dec 2024 15:41:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mpTedCyG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6EDAC4CECE;
+	Thu, 19 Dec 2024 15:49:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734622919;
-	bh=JT6efBVKqubwl6mff1iO/fWWnelB4X1FDGSeUIpzVXY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YtuUEpUrjVn8+lKZ7otJAzgavXmA+SvAYu0KyW4vdH1VbreJ1cJKqVJvuq9QP16fW
-	 0UKeGlyTG3T/66OwubbvqpUfWa7xSwzAKORIbC/qVSavLi9/uaRWFUPTrHxoAwFCBW
-	 anOTfhikMvHolmG8is56+dzfppsoWEXGLd1eXrl2pzw1/MQD1QSkF297wpqR3pr3Od
-	 yoK/0qenK7+PdmErk4OM1dpVQASpd8sbfVGaPKk+DIOu3cNo/5W6AC9rQKDMm+rDai
-	 aCUyWcbSsxSF1Eb+uZH9X1qium+y6ToYTTAhR/5KfgwYDAVJhfml3gsm1HXQBvahnU
-	 JgemaMgfiWVqA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tOIez-005J4X-4n;
-	Thu, 19 Dec 2024 15:41:57 +0000
-Date: Thu, 19 Dec 2024 15:41:56 +0000
-Message-ID: <86zfkrptmj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>,	Cornelia Huck <cohuck@redhat.com>,
-	Daniel =?UTF-8?B?IlAuIEJlcnJhbmfDqSI=?= <berrange@redhat.com>,
-	eric.auger.pro@gmail.com,	qemu-devel@nongnu.org,	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,	alex.bennee@linaro.org,
-	oliver.upton@linux.dev,	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,	armbru@redhat.com,
-	abologna@redhat.com,	jdenemar@redhat.com,	shahuang@redhat.com,
-	mark.rutland@arm.com,	philmd@linaro.org,	pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
-In-Reply-To: <Z2Q2rWj9cV0W_XVq@gezellig>
-References: <20241206112213.88394-1-cohuck@redhat.com>
-	<edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
-	<Z1qoa8yXscTSAJ9e@redhat.com>
-	<8734it1bv6.fsf@redhat.com>
-	<1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
-	<Z2QE9AqZnpGM5sWD@gezellig>
-	<8634ijrh8q.wl-maz@kernel.org>
-	<Z2Q2rWj9cV0W_XVq@gezellig>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1734623352;
+	bh=Em6tjA4shpu07NzsF3bttoRoasi6FATll0gF+/u1AaU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mpTedCyGbS2Qz6Hu3kWxKi9equYBguWZ8nsXhXkkF9vjOE7G0/e3kwCDoThhdoc1V
+	 tXIU4rRqrwITm27Lk1S6G0g0xRedDuunpL5sADY1cpaMeM4Kp2pve6dq0nsbNPt+yA
+	 GvAW3jUtcYHQN49d7iI8Bk5ec1APOqgnjXOEokCQkp9ef7JJBcXk9itbrGtu6che9r
+	 ZjyvAbChGmr7jgbyYcoPRS/+SpO0DbvV62aSqalS2DRU3f+lG6D3ewlIp/3k0puGHZ
+	 KF43plamGupTNbwUkdB4H/e9nlOXsZWPUmyRy5uu6TvC1xWHo4CtKhfJtyDRHXB5NA
+	 T53TpmkaVB6uQ==
+Date: Thu, 19 Dec 2024 15:49:06 +0000
+From: Will Deacon <will@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH V2 5/7] arm64/cpufeature: Add field details for
+ ID_AA64DFR1_EL1 register
+Message-ID: <20241219154905.GA24724@willie-the-truck>
+References: <20241028053426.2486633-1-anshuman.khandual@arm.com>
+ <20241028053426.2486633-6-anshuman.khandual@arm.com>
+ <20241210164144.GA16039@willie-the-truck>
+ <a382200e-00c4-405a-a417-f4c09bd91fb7@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kchamart@redhat.com, eric.auger@redhat.com, cohuck@redhat.com, berrange@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a382200e-00c4-405a-a417-f4c09bd91fb7@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, 19 Dec 2024 15:07:25 +0000,
-Kashyap Chamarthy <kchamart@redhat.com> wrote:
->=20
-> On Thu, Dec 19, 2024 at 12:26:29PM +0000, Marc Zyngier wrote:
-> > On Thu, 19 Dec 2024 11:35:16 +0000,
-> > Kashyap Chamarthy <kchamart@redhat.com> wrote:
->=20
-> [...]
->=20
-> > > Consider this:
-> > >=20
-> > > Say, there's a serious security issue in a released ARM CPU.  As part=
- of
-> > > the fix, two new CPU flags need to be exposed to the guest OS, call t=
-hem
-> > > "secflag1" and "secflag2".  Here, the user is configuring a baseline
-> > > model + two extra CPU flags, not to get close to some other CPU model
-> > > but to mitigate itself against a serious security flaw.
-> >=20
-> > If there's such a security issue, that the hypervisor's job to do so,
-> > not userspace.=20
->=20
-> I don't disagree.  Probably that has always been the case on ARM.  I
-> asked the above based on how QEMU on x86 handles it today.
->=20
-> > See what KVM does for CSV3, for example (and all the
-> > rest of the side-channel stuff).
->=20
-> Noted.  From a quick look in the kernel tree, I assume you're referring
-> to these commits[1].
->=20
-> > You can't rely on userspace for security, that'd be completely
-> > ludicrous.
->=20
-> As Dan Berrang=C3=A9 points out, it's the bog-standard way QEMU deals with
-> some of the CPU-related issues on x86 today.  See this "important CPU
-> flags"[2] section in the QEMU docs.
+On Wed, Dec 11, 2024 at 10:02:42AM +0530, Anshuman Khandual wrote:
+> 
+> 
+> On 12/10/24 22:11, Will Deacon wrote:
+> > On Mon, Oct 28, 2024 at 11:04:24AM +0530, Anshuman Khandual wrote:
+> >> This adds required field details for ID_AA64DFR1_EL1, and also drops dummy
+> >> ftr_raz[] array which is now redundant. These register fields will be used
+> >> to enable increased breakpoint and watchpoint registers via FEAT_Debugv8p9
+> >> later.
+> >>
+> >> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> >> Cc: Will Deacon <will@kernel.org>
+> >> cc: Mark Brown <broonie@kernel.org>
+> >> Cc: Mark Rutland <mark.rutland@arm.com>
+> >> Cc: Marc Zyngier <maz@kernel.org>
+> >> Cc: linux-arm-kernel@lists.infradead.org
+> >> Cc: linux-kernel@vger.kernel.org
+> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> >> ---
+> >>  arch/arm64/kernel/cpufeature.c | 21 ++++++++++++++++-----
+> >>  1 file changed, 16 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> >> index 718728a85430..bd4d85f5dd92 100644
+> >> --- a/arch/arm64/kernel/cpufeature.c
+> >> +++ b/arch/arm64/kernel/cpufeature.c
+> >> @@ -530,6 +530,21 @@ static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+> >>  	ARM64_FTR_END,
+> >>  };
+> >>  
+> >> +static const struct arm64_ftr_bits ftr_id_aa64dfr1[] = {
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABL_CMPs_SHIFT, 8, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_DPFZS_SHIFT, 4, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_EBEP_SHIFT, 4, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ITE_SHIFT, 4, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_ABLE_SHIFT, 4, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_PMICNTR_SHIFT, 4, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_SPMU_SHIFT, 4, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_CTX_CMPs_SHIFT, 8, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_WRPs_SHIFT, 8, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_BRPs_SHIFT, 8, 0),
+> >> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR1_EL1_SYSPMUID_SHIFT, 8, 0),
+> >> +	ARM64_FTR_END,
+> >> +};
+> > 
+> > I think I mentioned this on an earlier series, but it would be useful to
+> > see some justification in the commit message as to why some of these
+> > features are considered STRICT vs NONSTRICT and why LOWER_SAFE is
+> > preferred over EXACT.
+> 
+> I have updated the commit message regarding STRICT vs NONSTRICT as Mark had
+> mentioned earlier (see below). But just wondering about FTR_LOWER_SAFE. All
+> similar fields have been marked as FTR_LOWER_SAFE.
+> 
+> > 
+> > For example, why is EBEP strict whereas other PMU-related fields aren't?
+> 
+> IIUC there are two types of fields here.
+> 
+> - Feature presence     (EBEP, ITE, ABLE etc)		---> FTR_STRICT
+> - Debug resource count (WRPs, BRPs, CTX_CMPs etc)	---> FTR_NONSTRICT
+> 
+> > Why is the CTX_CMPs field treated differently to the same field in DFR0?
+> 
+> There is mismatch not only for CTX_CMPs but for WRPs and BRPs as well. As
+> mentioned earlier, being resource count type, I believe these should be
+> marked as FTR_NONSTRICT in existing DFR0 as well. I could send a patch
+> fixing DFR0 first.
+> 
+> > 
+> > I'm not saying the above table is wrong, it just looks arbitrary without
+> > the justification.
+> 
+> Please find the updated version (v3) for this patch here for reference.
 
-I had a look, and we do things quite differently. For example, the
-spec-ctrl equivalent in implemented in FW and in KVM, and is exposed
-by default if the HW is vulnerable. Userspace could hide that the
-mitigation is there, but that's the extent of the configurability.
+Please send new versions as new threads otherwise it's too easy to lose
+track. Also, please give the rationale for the handling of each new field
+in the commit message.
 
->=20
-> Mind you, I'm _not_ saying this is how ARM should do it.  I don't know
-> enough about ARM to make such remarks.
->=20
->     * * *
->=20
-> To reply to your other question on this thread[3] about "which ABI?"  I
-> think Dan is talking about the *guest* ABI: the virtual "chipset" that
-> is exposed to a guest (e.g. PCI(e) topology, ACPI tables, CPU model,
-> etc).  As I understand it, this "guest ABI" should remain predictable,
-> regardless of:
->=20
->   - whether you're updating KVM, QEMU, or the underlying physical
->     hardware itself; or
->   - if the guest is migrated, live or offline
->=20
-> (As you might know, QEMU's "machine types" concept allows to create a
-> stable guest ABI.)
-
-All of this is under control of QEMU, *except* for the "maximum" of
-the architectural features exposed to the guest. All you can do is
-*downgrade* from there, and only to a limited extent.
-
-That, in turn has a direct impact on what you call the "CPU model",
-which for the ARM architecture really doesn't exist. All we have is a
-bag of discrete features, with intricate dependencies between them.
-
-Even ignoring virtualisation: you can readily find two machines using
-the same CPUs (let's say Neoverse-N1), integrated by the same vendor
-(let's say, Ampere), in SoCs that bear the same name (Altra), and
-realise that they have a different feature set. Fun, isn't it?
-
-That's why I don't see CPU models as a viable thing in terms of ABI.
-They are an approximation of what you could have, but the ABI is
-elsewhere.
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Will
