@@ -1,123 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939081A4E70
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 18:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D2341760
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 18:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734632166; cv=none; b=dWzK+x2bH9et6Iu7F01vC4VqSDWz67Gc1nvNk6fnAalu/8S/kYZeh1WZzcDESqlRNq4zRqF5IfpNR+s52HH+Bli6yAex4vR5V8QpkFUYyhJc+Bje/qvJjH5eMU+U63jVeAZMnRtO+RcjZprxKokoq0MzI0xxOitKJ04U9ZruNGI=
+	t=1734634173; cv=none; b=LJqfhnDnN5N+s1YNbIiOzJNoZlcfsB9vifaii+oqei6nY/fUm4EvVgrUimWL1G3Uru6S2nMF2rdWh11RLxosKA//JrjaLmkB3QtWi/AJfNggBEcVJ6TL8kUgZlgqmYgLKTrSMv351j1p1ZRYEDk71Ys9U2h+iUgDhrmkW8g3NUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734632166; c=relaxed/simple;
-	bh=6Ru1WifqyFOFkxxpz2vHqG7YF2grfX7gaaKnKpi5JK4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GWQqL2nDsGDm2Q1Tqmd6RMeYAISqG1SvNLJ4IEkzn5U5hxsitcsXcaKE6qJWpgYALEvUZ3Sa2U2eVNuSDSd9wNNFsQAbFtkKr7ksZMAbeGapJdimtG7fLR/UGQRdiewzSJfD6cPE7r1K8vX764PCNORRyoOjupfALkvVRff+r8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVf0+wfY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734634173; c=relaxed/simple;
+	bh=/FLWDTPFbLG9DG5vzOMUOczrPmOEfAof7+piK4UuRCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NY0fdbxE7KvVp2aycZzgL/H2N5yKNvNQHH0N1VsrayuoMQQ5d78iC+/G7Ek2e5tHiTPr6SAey8GhLd6MYaLzeO0qYF1nrz8xXXgkgv9609EbbpOBMIhh82Qmlv0bO3kZsh6vGYMI1MFdU4IQOdE34AtgWoplcTHQ82j3tdULyhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TCzzr4TX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVf0+wfY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E71C4CED6;
-	Thu, 19 Dec 2024 18:16:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TCzzr4TX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D969C4CECE;
+	Thu, 19 Dec 2024 18:49:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734632166;
-	bh=6Ru1WifqyFOFkxxpz2vHqG7YF2grfX7gaaKnKpi5JK4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CVf0+wfYKxa/renOq5MaNRGIh7QLPi2sGQz4XdDVlx6lwi3LuugU1Oepktp00Trmf
-	 ThvtxPjbyji+HcfO7LSPXyCULXFmt+PDis8LIzmDkam78XLoCkEsP+ozxbXLAh26+A
-	 KXm0eqUtWvvwUiszPMRSlFrcOH2iprGb89/UzJHCjaA6cTPmx6L1tM8rk5Qo/TKDDl
-	 wcvXH9TpExcKY7/6dydHALmrFzkoPPnv8ZirNsStAqKuBeBymjb8jZobR/+jsUmwhr
-	 CAY6usaGgZ/5xaqrTbPCPDtpNfWVG2ku2M5Yam5lZGBBoPinW7R13fwMvQrHj/YVZK
-	 sf1JgzdS7U4pg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tOL46-005McR-SJ;
-	Thu, 19 Dec 2024 18:16:03 +0000
-Date: Thu, 19 Dec 2024 18:16:02 +0000
-Message-ID: <86wmfvpmhp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	James Clark <james.clark@linaro.org>
-Subject: Re: [PATCH v3 12/16] KVM: arm64: Compute MDCR_EL2 at vcpu_load()
-In-Reply-To: <Z2RfONQgWszZBBJx@linux.dev>
-References: <20241209180926.2161373-1-oliver.upton@linux.dev>
-	<20241209180926.2161373-13-oliver.upton@linux.dev>
-	<86ed24rg0h.wl-maz@kernel.org>
-	<Z2RfONQgWszZBBJx@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1734634172;
+	bh=/FLWDTPFbLG9DG5vzOMUOczrPmOEfAof7+piK4UuRCg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TCzzr4TX35E/WB6YctHhMiH+VIJfPOGsEVrrnIIUz+m4ocaKkh57u4JuiNAfiCfa4
+	 /pbe5jcnXJAmpWs0dlBZdDzF43U2KEAMFajh5S5QipBJEhZIXAbPSeH8ONlW3Hd8wu
+	 Thpx3+mzPCjyg+BvF2ZEI4U77k5vVZ5jWlOkZ9h+Fic28C1bphU5KcfXn62kPdHKS6
+	 VxvG+lLl7ZHntOGQgweR+6jxFYzfYHzRoHuPbmixq435nm5AMt5eipV54NBHr4o7Cr
+	 jVSzLl3HNzyQGDq78RlwW+sSuDMqrWTkkZBl6ZdJMmEs7YMTHFk4UdCIrQkJ94Fopm
+	 IIAks3/lx7kSA==
+Date: Thu, 19 Dec 2024 18:49:28 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH v2 2/4] arm64/sysreg: Get rid of the TCR2_EL1x
+ SysregFields
+Message-ID: <53a95b37-0b46-4ec8-bad6-a431f81cdc44@sirena.org.uk>
+References: <20241219173351.1123087-1-maz@kernel.org>
+ <20241219173351.1123087-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, james.clark@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="a+0hFz7K0adwt5ZB"
+Content-Disposition: inline
+In-Reply-To: <20241219173351.1123087-3-maz@kernel.org>
+X-Cookie: You have taken yourself too seriously.
 
-On Thu, 19 Dec 2024 18:00:24 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Dec 18, 2024 at 06:40:46PM +0000, Marc Zyngier wrote:
-> > On Mon, 09 Dec 2024 18:09:22 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > @@ -288,6 +270,12 @@ void kvm_debug_set_guest_ownership(struct kvm_vcpu *vcpu)
-> > >  
-> > >  	WARN_ON_ONCE(vcpu->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED);
-> > >  	vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
-> > > +
-> > > +	preempt_disable();
-> > > +	kvm_arm_setup_mdcr_el2(vcpu);
-> > > +	if (has_vhe())
-> > > +		write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-> > > +	preempt_enable();
-> > 
-> > I'm not confident that the preemption_disable() does anything.
-> > Specially given that it doesn't include setting the ownership as part
-> > of the critical section. So if that works at it is now, then the
-> > critical section is pointless.
-> 
-> We use percpu data to construct mdcr_el2, so disabling preemption
-> ensures that we use the right copy + stick mdcr in the right CPU.
 
-Ah crap, I missed the copy of PMCR_EL0.N. Fair enough then.
+--a+0hFz7K0adwt5ZB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
-> But point taken about guest ownership, nothing stops preemption from
-> blowing away the GUEST_OWNED state.
-> 
-> > I also find it rather fragile that we have multiple places where we
-> > write MDCR_EL2, and I would love this to go for good. Any idea?
-> 
-> Totally agree, that was at least one of the motivators for this series
-> originally. For v4 I'm planning to hoist the preempt_disable() + programming
-> of MDCR_EL2 into kvm_arm_setup_mdcr_el2(), which would be shared w/
-> vcpu_load() and hide the details of how MDCR gets set up.
+On Thu, Dec 19, 2024 at 05:33:48PM +0000, Marc Zyngier wrote:
+> TCR2_EL1x is a pretty bizarre construct, as it is shared between
+> TCR2_EL1 and TCR2_EL12. But the latter is obviously only an
+> accessor to the former.
 
-Yeah, something like that is probably OK, at least for now.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-> I still want us to have a way of reconfiguring MDCR_EL2 on the fly to
-> lazily restore the debug registers without going through an entire
-> put/load. I'm thinking that eventually we can do the same thing for the
-> PMU when Colton + co have partitioned PMU support worked out.
+Sorry, I thought I'd sent this on v1.
 
-A full load/put is overkill indeed. But something more lightweight and
-limited to the debug stuff may be useful. That may cause some
-restructuring, but probably worth it.
+--a+0hFz7K0adwt5ZB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-	M.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdkarcACgkQJNaLcl1U
+h9Auugf9HdJD/xc50mrg+8pmJHd5i5jsUnscG2fMzBioJ6tkmETXISrPkaPiAmgv
+OnJhO1CFYvP4eHa/OSBoh6+8SIDVyIxS20q6wNphB4TmkcEu4jDKa7zJzcYCanuj
+0B/9kq0uuVOajjg/5Fsx0Gtw9u1a28YJAjt3GlP7tHQXLnGt1ao0D8jr00kG7bvn
+12zTsJ2gSJ9+/3X82hM08l91I7LFICIH0MQuoE0cJJkqWg9RBEqZP5OjWPtQ3pF2
+NxPgnyt2N1sJbksED6M8V/Bmt2WBcgslnSQ98Gf/9YB8MndEDO+hj4N+nK1xpnQA
+f6pBzicIWev9whRTmkmhIVNloAHO7A==
+=Wlkz
+-----END PGP SIGNATURE-----
 
--- 
-Without deviation from the norm, progress is not possible.
+--a+0hFz7K0adwt5ZB--
