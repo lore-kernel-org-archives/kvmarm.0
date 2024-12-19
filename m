@@ -1,217 +1,263 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F34A801
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 13:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348681FCCF3
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 14:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734613286; cv=none; b=CvFeytXEDbSB253JcSEojUwmnqxswc97WNjCK6zGB1xoeriBzXUfZ+Xw2WzevL3DSUMM+yuZUnvCgjM/vQxZscuox6bZo4Oh9uzXzMM74mAoYqprCPXyxApnDJwJH9eIzxRn19s406OyUDxuxI0Kxp4MWPV2IQxIboxtNEvPZKU=
+	t=1734618254; cv=none; b=UZswf2H8XHHnldjbGEC1TaYNCQpL+ChxRq7xtmgkccVCiBt1xpugJduT/fQk9vW8xYNMCJQegvoAzb5Nheq+j+vutof3B4zdRGCaEDMFwRR4PjQVnpqcun/J5UaSod6itM6Vny8dYU7oE1KG9bMbxLHSR6Yzd/7GlrtQIR0YnfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734613286; c=relaxed/simple;
-	bh=O3IkwvJlk6EBCbr2lI7kMh54S9htt+kwglnpdJT+ukE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYD948oDKcQJaMBXKf/XuF1kWA0UVvZ2lQwcluRIsqVKpbAz2wzncdg4JNz0fbbtSI37K6Xw1bW/5/ycvP2RiIVgBQpBKk9Mf0Eu/LBaud8G7jBk14mpEocF65va1Ng0+cRln7saFc8XIqJrl8SQKy6UGuYSoul6ODepjorNWMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3TIdzt5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734618254; c=relaxed/simple;
+	bh=BPob3r66xo8dFDNqEidWe3lsaIV/5JdDt3161Tki7hc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pd3wgY4uI7UUkbBCXngQ4AMAfJ9L8xwv4IyrT6MAAiima9K+S5C7MtU/W+XevvJ8lK8EeyDhdDGtj6a7qTgGpr7DZjnp2nC0kro+b1ZfHmXIJZ6jEK+l96qtagXyaqKhIanTf+JbNeA0ZUu8+3iJ9v3fCR+PRf8OWk2eJ47jOvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DViSgdh0; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3TIdzt5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D95EC4CECE;
-	Thu, 19 Dec 2024 13:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734613285;
-	bh=O3IkwvJlk6EBCbr2lI7kMh54S9htt+kwglnpdJT+ukE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h3TIdzt5xtQnJM11PaGOl95b1BWvsSe+ZHJeBjhc31RHJgMZejnO1qDTuQfovc7TA
-	 VwHy4cegzvveiwVKVCUJsqpLT01aPf5OQHz1VAZZVabKGxvMvzhy8EKN8Au0F8v132
-	 d0/mAoKgfZ6P+JW+yHGxDSlAAQNt5pbN5mmVnIHXkIPfFXGCaDnbsmgggvYFmJcgQ6
-	 45lWnARrnByJ+BayzFIMnEciYmiq+crassTiJ4f295vWgONIvnY1+k+6XkBlXyu+Ly
-	 voDsBzEOce4+quovWgOWv7uxL8WXfIXeJODctp9WBgyOtiq96yqT0PHADbAkeFqLil
-	 vqSFVTU2CBidw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tOG9b-005GyE-BC;
-	Thu, 19 Dec 2024 13:01:23 +0000
-Date: Thu, 19 Dec 2024 13:01:22 +0000
-Message-ID: <861py3rfml.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Daniel =?UTF-8?B?IlAuIEJlcnJhbmfDqSI=?= <berrange@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	eric.auger.pro@gmail.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
-	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com,
-	shahuang@redhat.com,
-	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
-In-Reply-To: <Z2QT2tPbC1GsTJVL@redhat.com>
-References: <20241206112213.88394-1-cohuck@redhat.com>
-	<edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
-	<Z1qoa8yXscTSAJ9e@redhat.com>
-	<8734it1bv6.fsf@redhat.com>
-	<1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
-	<Z2QE9AqZnpGM5sWD@gezellig>
-	<8634ijrh8q.wl-maz@kernel.org>
-	<Z2QT2tPbC1GsTJVL@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DViSgdh0"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-435b0df5dbdso58065e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 06:24:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734618250; x=1735223050; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0mF0heT2EsQndTEIg+1n0gHprFJ8BxQdp0xOf3Xlv8A=;
+        b=DViSgdh0chanOYst07qZnk2sVHOmpw8ILDgYi569+sG7+WFtg0yPanLUwTGnKNMmjo
+         QFTiyiCn4BSewRyR5S4dNNoGAHu/ZccphCuddpYRsw/T3WeYAviphU1j5N+/HSCsk+Mo
+         PTSqA/Psi6U4Kai8W/4OhiwFM3JzmIifo9Wkgvo8+WYP7RnT7KMqYJshAY5mcYBTDEZj
+         R8fJdrjt+vCsJRj95vE0F+QZeMdD/6ds1YidTWHxD07YOUHwW9Nl05VOh1HY8DQ7G7AL
+         wNnq+CqE+3qauqrXFXed83u2vz3FtcrAGqdfGZi4V0GMiJiVc4oIzOO94Nbfs5p8u7Vp
+         t8xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734618250; x=1735223050;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0mF0heT2EsQndTEIg+1n0gHprFJ8BxQdp0xOf3Xlv8A=;
+        b=lzOwOD7RqGrtIVpzD40WFZCgFvoM2TjP4Cs3tB6/2S48+4GyS6v9gm/mK5riiSRmms
+         g4ea8K+43PADS+2MFkgb/is0CaxKZHoie76f7SATsdvhA/JEJyK8s8Qx6S2RUDJGaPjq
+         vWKZY7UTYmfAy3NLPepMBS5maVhvVv1koB/mQ7vTediiVNN3UxHZDT5FzsIg1ZkQ4O+C
+         /iVReoytG5zEwHV9/JLGOApZUYn/pmrPdFa9VLWF3Xytuau3ny6HT2pe3f5cRXmEnyom
+         r1/A9CQrd/NuVK89BbwIWdjK8c9GBxZUmLUruQcFHuOR+XTLQqpSb4SeLQszmq927xU4
+         paFg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3hf8lpIOhIiB8zom3SHnRhqmIXwwAvuGHpR/Scn+0WyhM0QNrtv49RjfyVfY3xFcBegvy+Kc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyF/QYQXqO1Ax06Vdno1G1S5sL7uB32ERLCFiMlf+kMVfDgYFJ4
+	fx9GreL0PkIdyplkti+fU1fnR3zJcCDKpl7iq40igmokMFGx+zRAPFqWCVTNyA==
+X-Gm-Gg: ASbGncvw8fPwhUM+tBBrfzBYDghic1mX/6rIpE2VO6b7lmBPEXfkv36xgC80o0qVEC5
+	YWJLsl+wPIYNaagJtD7yFZfHL39MfmHZJBX7A9S1ILG6chLvkP2EabWAjmpCm4T9QMNHLc534xh
+	vw6uJNexntcvEv0AYkN5g2OeoxZUjIff5Aa7bB/+32TUufJNbdgZroNudN9Wl/mIAQZchAW4qTp
+	Agr25NCu/yctMplqBe9rYDl8FlB0iinlB8wUf6XF6YQEHmOC3w7vwYuru8u0bIXuBOB/Ba/FwLx
+	0A1Vf3LVvUsiAeepHl8=
+X-Google-Smtp-Source: AGHT+IFPdnsOq4Xdu3lmcHrohZg3ZaDg9fAxDEjwde7d0y24seJ+Gf3Cv6GehVm5ybmSKZZ/QDT42w==
+X-Received: by 2002:a05:600c:1c21:b0:436:186e:13a6 with SMTP id 5b1f17b1804b1-4365e6f26b9mr1380595e9.6.1734618250380;
+        Thu, 19 Dec 2024 06:24:10 -0800 (PST)
+Received: from google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c829235sm1658623f8f.15.2024.12.19.06.24.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 06:24:09 -0800 (PST)
+Date: Thu, 19 Dec 2024 14:24:05 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, robdclark@gmail.com, joro@8bytes.org,
+	jean-philippe@linaro.org, jgg@ziepe.ca, nicolinc@nvidia.com,
+	vdonnefort@google.com, qperret@google.com, tabba@google.com,
+	danielmentz@google.com, tzukui@google.com
+Subject: Re: [RFC PATCH v2 55/58] drivers/iommu: Add deferred map_sg
+ operations
+Message-ID: <Z2Qshft8lQjI-x7c@google.com>
+References: <20241212180423.1578358-1-smostafa@google.com>
+ <20241212180423.1578358-56-smostafa@google.com>
+ <ce4c8db4-4895-426b-8d9d-97dc5d74fbc4@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: berrange@redhat.com, kchamart@redhat.com, eric.auger@redhat.com, cohuck@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ce4c8db4-4895-426b-8d9d-97dc5d74fbc4@arm.com>
 
-On Thu, 19 Dec 2024 12:38:50 +0000,
-Daniel "P. Berrang=C3=A9" <berrange@redhat.com> wrote:
->=20
-> On Thu, Dec 19, 2024 at 12:26:29PM +0000, Marc Zyngier wrote:
-> > On Thu, 19 Dec 2024 11:35:16 +0000,
-> > Kashyap Chamarthy <kchamart@redhat.com> wrote:
-> > >=20
-> > > On Thu, Dec 12, 2024 at 11:04:30AM +0100, Eric Auger wrote:
-> > >=20
-> > > Hi Eric,
-> > >=20
-> > > > On 12/12/24 10:36, Cornelia Huck wrote:
-> > > > > On Thu, Dec 12 2024, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
-> > >=20
-> > > [...]
-> > >=20
-> > > > >> Consider you mgmt app wants to set a CPU model that's common acr=
-oss
-> > > > >> heterogeneous hardware. They don't neccessarily want/need to be
-> > > > >> able to live migrate between heterogeneous CPUs, but for simplic=
-ity
-> > > > >> of configuration desire to set a single named CPU across all gue=
-sts,
-> > > > >> irrespective of what host hey are launched on. The ARM spec base=
-line
-> > > > >> named models would give you that config simplicity.
-> > > > > If we use architecture extensions (i.e. Armv8.x/9.x) as baseline,=
- I'm
-> > > > > seeing some drawbacks:
-> > > > > - a lot of work before we can address some specific use cases
-> > > > > - old models can get new optional features
-> > > > > - a specific cpu might have a huge set of optional features on to=
-p of
-> > > > >   the baseline model
-> > > > >
-> > > > > Using a reference core such as Neoverse-V2 probably makes more se=
-nse
-> > > > > (easier to get started, less feature diff?) It would still make a=
- good
-> > > > > starting point for a simple config.
-> > > > >
-> > > > Actually from a dev point of view I am not sure it changes much to =
-have
-> > > > either ARM spec rev baseline or CPU ref core named model.
-> > > >=20
-> > > > One remark is that if you look at
-> > > > https://developer.arm.com/documentation/109697/2024_09?lang=3Den
-> > > > you will see there are quite a lot of spec revisions and quite a fe=
-w of
-> > > > them are actually meaningful in the light of currently avaiable and
-> > > > relevant HW we want to address. What I would like to avoid is to be
-> > > > obliged to look at all of them in a generic manner while we just wa=
-nt to
-> > > > address few cpu ref models.
-> > > >=20
-> > > > Also starting from the ARM spec rev baseline the end-user may need =
-to
-> > > > add more feature opt-ins to be close to a specific cpu model. So I
-> > > > foresee extra complexity for the end-user.
-> > >=20
-> > > (Assuming I'm parsing your last para right; correct me if not.)
-> > >=20
-> > > Isn't a user wanting to add extra CPU flags (on top of a baseline) a
-> > > "normal behaviour" and not "extra complexity"?  Besides coming close =
-to
-> > > a specific CPU model, there's the additional important use-case of CPU
-> > > flags that provide security mitigation.
-> > >=20
-> > > Consider this:
-> > >=20
-> > > Say, there's a serious security issue in a released ARM CPU.  As part=
- of
-> > > the fix, two new CPU flags need to be exposed to the guest OS, call t=
-hem
-> > > "secflag1" and "secflag2".  Here, the user is configuring a baseline
-> > > model + two extra CPU flags, not to get close to some other CPU model
-> > > but to mitigate itself against a serious security flaw.
-> >=20
-> > If there's such a security issue, that the hypervisor's job to do so,
-> > not userspace. See what KVM does for CSV3, for example (and all the
-> > rest of the side-channel stuff).
-> >=20
-> > You can't rely on userspace for security, that'd be completely
-> > ludicrous.
->=20
-> Actually that's a normal situation QEMU has to deal with.
->=20
-> QEMU needs to be able to expose a deterministic fixed ABI to the guest
-> VM, and that includes control over what CPU features are exposed to
-> it. In most cases, the hypervisor cannot arbitrary force enable new
-> guest features without agreement from QEMU.
+Hi Robin,
 
-Which ABI? The only ABI that matters is what is defined by the
-architecture. When it comes to CPU features, new features are exposed
-by default. If QEMU wants to turn it off, it can in most (but not all)
-cases. But that's the extent of the "agreement" we have with
-userspace, QEMU or otherwise.
+On Thu, Dec 19, 2024 at 12:48:27PM +0000, Robin Murphy wrote:
+> On 2024-12-12 6:04 pm, Mostafa Saleh wrote:
+> > With pKVM SMMUv3 driver which para-virtualizes the IOMMU in the
+> > hypervisor, has an extra overhead with map_sg, as it loops over
+> > iommu_map, and for each map requires context switching, disabling
+> > interrupts...
+> > 
+> > Instead, add an new domain operations:
+> > - alloc_cookie_sg: Allocate a new sg deferred cookie
+> > - add_deferred_map_sg: Add a mapping to the cookie
+> > - consume_deferred_map_sg: Consume and release the cookie
+> > 
+> > Alternativly, we can pass the sg list as is. However, this would
+> > duplicate some of the logic and it would make more sense to
+> > conolidate all the sg list parsing for IOMMU drivers in one place.
+> 
+> But why bother with fiddly overly-specific machinery at all when you can
+> already make ->map_pages asynchronous and consolidate the expensive part
+> into ->iotlb_sync_map in general, like s390 does?
 
-If a feature is deemed broken or unsafe, KVM will turn it at least
-hide it from the guest without userspace's intervention, and if
-possible actively turn it off.
+This was my initial idea too. But I believe there is no enough context in
+iotlb_sync_map, so we either have to create a per-domain deferred_map list
+which is synced on any iotlb_sync_map, but that would require to lock the
+map operation, hence impacting concurrency.
 
-> If a guest happens to be using '-cpu host', then when a new CPU flag
-> arrives as part of a security fix, there is at least no CPU config
-> change required. QEMU may or may not need changes, in order that
-> the behaviour associated with the new CPU flag is correctly handled.
+Or we have to use some complex logic to extract context from iotlb_sync_map,
+(something like range iova tree in map and then on sync we can retrieve that)
+That’s why I proposed this approach, where the IOMMU subsystem by design is
+aware of the semantics and “helps” by providing the right data structures/calls.
 
-How is that "flag" visible from the guest? The only way to expose
-properties is through the ID registers, and you can't invent your own,
-nor expose something that is not already handled by the host.
-
-> If the guest is using a named CPU model, as well as modifying QEMU
-> to know about the new flag, the host admin needs to explicitly
-> decide whether & when to expose the new CPU flag for each guest VM
-> on the host.
->
-> Until the new CPU flag is exposed to the guest, while the host itself
-> may be able to remain protected to the new security issue, the guest
-> OS is likely remain vulnerable, or have degraded operation in some way.
-
-I think that's the point where we talk past each other. There is no
-"flag" that can be exposed to a guest as part of the architecture. We
-have a set of architectural features, and in 99% of the cases, we can
-only expose to the guest a feature that both exists on the host and
-that the hypervisor understands.
+I had a quick look now at s390, and it seems a bit different as they only
+notify the hypervisor about the iova range being changed, and don’t need
+to provide iova->paddr mapping which pKVM does.
 
 Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Mostafa
+> 
+> Thanks,
+> Robin.
+> 
+> > virtio-iommu is another IOMMU that can benfit from this, but it
+> > would need to have a new operation that standerdize passing
+> > an sglist based on these ops.
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >   drivers/iommu/iommu.c | 53 +++++++++++++++++++++++++++++++++++++++++--
+> >   include/linux/iommu.h | 19 ++++++++++++++++
+> >   2 files changed, 70 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > index 83c8e617a2c5..3a3c48631dd6 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -2608,6 +2608,37 @@ size_t iommu_unmap_fast(struct iommu_domain *domain,
+> >   }
+> >   EXPORT_SYMBOL_GPL(iommu_unmap_fast);
+> > +static int __iommu_add_sg(struct iommu_map_cookie_sg *cookie_sg,
+> > +			  unsigned long iova, phys_addr_t paddr, size_t size)
+> > +{
+> > +	struct iommu_domain *domain = cookie_sg->domain;
+> > +	const struct iommu_domain_ops *ops = domain->ops;
+> > +	unsigned int min_pagesz;
+> > +	size_t pgsize, count;
+> > +
+> > +	if (unlikely(!(domain->type & __IOMMU_DOMAIN_PAGING)))
+> > +		return -EINVAL;
+> > +
+> > +	if (WARN_ON(domain->pgsize_bitmap == 0UL))
+> > +		return -ENODEV;
+> > +
+> > +	/* find out the minimum page size supported */
+> > +	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
+> > +
+> > +	/*
+> > +	 * both the virtual address and the physical one, as well as
+> > +	 * the size of the mapping, must be aligned (at least) to the
+> > +	 * size of the smallest page supported by the hardware
+> > +	 */
+> > +	if (!IS_ALIGNED(iova | paddr | size, min_pagesz)) {
+> > +		pr_err("unaligned: iova 0x%lx pa %pa size 0x%zx min_pagesz 0x%x\n",
+> > +		       iova, &paddr, size, min_pagesz);
+> > +		return -EINVAL;
+> > +	}
+> > +	pgsize = iommu_pgsize(domain, iova, paddr, size, &count);
+> > +	return ops->add_deferred_map_sg(cookie_sg, paddr, pgsize, count);
+> > +}
+> > +
+> >   ssize_t iommu_map_sg(struct iommu_domain *domain, unsigned long iova,
+> >   		     struct scatterlist *sg, unsigned int nents, int prot,
+> >   		     gfp_t gfp)
+> > @@ -2617,6 +2648,9 @@ ssize_t iommu_map_sg(struct iommu_domain *domain, unsigned long iova,
+> >   	phys_addr_t start;
+> >   	unsigned int i = 0;
+> >   	int ret;
+> > +	bool deferred_sg = ops->alloc_cookie_sg && ops->add_deferred_map_sg &&
+> > +			   ops->consume_deferred_map_sg;
+> > +	struct iommu_map_cookie_sg *cookie_sg;
+> >   	might_sleep_if(gfpflags_allow_blocking(gfp));
+> > @@ -2625,12 +2659,24 @@ ssize_t iommu_map_sg(struct iommu_domain *domain, unsigned long iova,
+> >   				__GFP_HIGHMEM)))
+> >   		return -EINVAL;
+> > +	if (deferred_sg) {
+> > +		cookie_sg = ops->alloc_cookie_sg(iova, prot, nents, gfp);
+> > +		if (!cookie_sg) {
+> > +			pr_err("iommu: failed alloc cookie\n");
+> > +			return -ENOMEM;
+> > +		}
+> > +		cookie_sg->domain = domain;
+> > +	}
+> > +
+> >   	while (i <= nents) {
+> >   		phys_addr_t s_phys = sg_phys(sg);
+> >   		if (len && s_phys != start + len) {
+> > -			ret = __iommu_map(domain, iova + mapped, start,
+> > -					len, prot, gfp);
+> > +			if (deferred_sg)
+> > +				ret = __iommu_add_sg(cookie_sg, iova + mapped, start, len);
+> > +			else
+> > +				ret = __iommu_map(domain, iova + mapped, start,
+> > +						  len, prot, gfp);
+> >   			if (ret)
+> >   				goto out_err;
+> > @@ -2654,6 +2700,9 @@ ssize_t iommu_map_sg(struct iommu_domain *domain, unsigned long iova,
+> >   			sg = sg_next(sg);
+> >   	}
+> > +	if (deferred_sg)
+> > +		ops->consume_deferred_map_sg(cookie_sg);
+> > +
+> >   	if (ops->iotlb_sync_map) {
+> >   		ret = ops->iotlb_sync_map(domain, iova, mapped);
+> >   		if (ret)
+> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> > index c75877044185..5e60ac349228 100644
+> > --- a/include/linux/iommu.h
+> > +++ b/include/linux/iommu.h
+> > @@ -601,6 +601,14 @@ struct iommu_ops {
+> >   	u8 user_pasid_table:1;
+> >   };
+> > +/**
+> > + * struct iommu_map_cookie_sg - Cookie for a deferred map sg
+> > + * @domain: Domain for the sg lit
+> > + */
+> > +struct iommu_map_cookie_sg {
+> > +	struct iommu_domain *domain;
+> > +};
+> > +
+> >   /**
+> >    * struct iommu_domain_ops - domain specific operations
+> >    * @attach_dev: attach an iommu domain to a device
+> > @@ -638,6 +646,11 @@ struct iommu_ops {
+> >    * @enable_nesting: Enable nesting
+> >    * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
+> >    * @free: Release the domain after use.
+> > + * @alloc_cookie_sg: Allocate a cookie that would be used to create
+> > + *		     a sg list, filled from the next functions
+> > + * @add_deferred_map_sg: Add a mapping to a cookie of a sg list.
+> > + * @consume_deferred_map_sg: Consume the sg list as now all mappings are added,
+> > + *			     it should also release the cookie as it's not used.
+> >    */
+> >   struct iommu_domain_ops {
+> >   	int (*attach_dev)(struct iommu_domain *domain, struct device *dev);
+> > @@ -668,6 +681,12 @@ struct iommu_domain_ops {
+> >   				  unsigned long quirks);
+> >   	void (*free)(struct iommu_domain *domain);
+> > +
+> > +	struct iommu_map_cookie_sg *(*alloc_cookie_sg)(unsigned long iova, int prot,
+> > +						       unsigned int nents, gfp_t gfp);
+> > +	int (*add_deferred_map_sg)(struct iommu_map_cookie_sg *cookie,
+> > +				   phys_addr_t paddr, size_t pgsize, size_t pgcount);
+> > +	int (*consume_deferred_map_sg)(struct iommu_map_cookie_sg *cookie);
+> >   };
+> >   /**
+> 
