@@ -1,32 +1,32 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F9E86337
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 22:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BFF1C3F13
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 22:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734648128; cv=none; b=gziqjZUGIJZSBVR71t8ccCzGS2Sz6htnLxUpmPW+lJlggCqa8oppZff+l/ge5lYi2SnRwTIYdrW//WPYn6lKmRVW+Hg4tLhkNRZlGyxO5Qdmji5+JJdQr7z6LSxApb2ZhO9YftzkpxaocNDSF6M2wQiE9ed5Tzf8i528xgQn2lI=
+	t=1734648131; cv=none; b=gQek9PJE/h2X9LmbJizz4Z2JGgNcP3Yc1K6rwSUWZGcfPypFswviIpFzUkq6qLMOdyWLAqzsiytxBnJfICpbkYdELGbOLSlPhH9mJVGelGB3W0jtdSesVKOVTO952MsMeZcV9EFZUHy7XeiIO2hjketPmOqxlJ4Rr1SEdiut+Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734648128; c=relaxed/simple;
-	bh=bs6QAaVVsD60fC1VwBn8d9M9M6jldFLaFT0nCyHUXH8=;
+	s=arc-20240116; t=1734648131; c=relaxed/simple;
+	bh=dzmLxP6EjQCrJ5Ta1F8r1yTrILJ7V821ihbo3S1jsdM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TSEl8xjs7xoaTCbq8ApedUT/++OMOSKakIo1EsFWB65X0EJOKtDzsOfFS5jEZSyRRh+0KmBhb8bmClEMyjJiIxjXP+r36XokhtscRVP9Fm9l6jR6aXG13d9qd3sPM5nd/Q+3wwNek5PhPm1b9knZ7oLwqkPD/P0o82lj3mX+/kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=opck6Wzn; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=VP7X7SRmW+p7vTUh8PHWWvlkWBSpUR81zdbNimFVnIEASUOczeSEFDCpshRTqbYC1rxv0e9S4fvZLl39q5MDflAf2Y/oygvf9Cca+rXxoGKW4wtKDoMldFnTihCxXesIZZidsJzLnIXiu1AFbSwELp4IV9MUaK8mE8iqAqeWOgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vxFZgXAd; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="opck6Wzn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vxFZgXAd"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734648125;
+	t=1734648127;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5Q3szi4lFo1opWi8A0WIoPReSA8gqQE22VeVA23yYg0=;
-	b=opck6Wznvh4Fql7guUH/Ast6d73UoBEr46eUICqcTj1yBkJWRMCYJifQ+fIuCsfraqYBXb
-	cRpFYqRqvD3yXWw9f1MsOFZVlFQ0xgVtSIFcyGfLOg9trIoPbfc9i7OiXMPHsMo1Hm9YxJ
-	iptWZdeiwMeBxgKQfFPILmspeyLSt18=
+	bh=Je/BQghng+w2bt+hnJU75nV+yahVV5nH1ArdWHQGqbA=;
+	b=vxFZgXAdD44E7+aSHt/M1s4xj+kN03Wu3fXiwRcpXhAz+ZwPwN5etj8mrM864tnKAOAHTK
+	/CTwIkW7Qv1snG7QmsgjYCgjmPo63lMWQUUtUe/eAaZLTw+ejmtGU3uMI8TqCs3nI9uDSb
+	mBG9eja2WnDNW9pJW+Yfsx/CmoZzoc0=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -38,9 +38,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	James Clark <james.clark@linaro.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 16/19] KVM: arm64: nv: Honor MDCR_EL2.TDE routing for debug exceptions
-Date: Thu, 19 Dec 2024 14:41:13 -0800
-Message-Id: <20241219224116.3941496-17-oliver.upton@linux.dev>
+Subject: [PATCH v4 17/19] KVM: arm64: Avoid reading ID_AA64DFR0_EL1 for debug save/restore
+Date: Thu, 19 Dec 2024 14:41:14 -0800
+Message-Id: <20241219224116.3941496-18-oliver.upton@linux.dev>
 In-Reply-To: <20241219224116.3941496-1-oliver.upton@linux.dev>
 References: <20241219224116.3941496-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -52,98 +52,84 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Inject debug exceptions into vEL2 if MDCR_EL2.TDE is set.
+Similar to other per-CPU profiling/debug features we handle, store the
+number of breakpoints/watchpoints in kvm_host_data to avoid reading the
+ID register 4 times on every guest entry/exit. And if you're in the
+nested virt business that's quite a few avoidable exits to the L0
+hypervisor.
 
 Tested-by: James Clark <james.clark@linaro.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kvm/emulate-nested.c     | 23 +++++++++++++++++++----
- arch/arm64/kvm/handle_exit.c        |  3 +++
- 3 files changed, 23 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_host.h         |  4 ++++
+ arch/arm64/kvm/debug.c                    |  3 +++
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h | 17 ++++-------------
+ 3 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 233e65522716..ec6e28d63d26 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -64,6 +64,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d48516de778d..e7c740c99ee3 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -661,6 +661,10 @@ struct kvm_host_data {
  
- extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
-+extern bool forward_debug_exception(struct kvm_vcpu *vcpu);
- extern void kvm_init_nested(struct kvm *kvm);
- extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
- extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 1ffbfd1c3cf2..e37fb598cc24 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2345,14 +2345,14 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
- 	return true;
- }
- 
--static bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-+static bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg, u64 control_bit)
- {
- 	bool control_bit_set;
- 
- 	if (!vcpu_has_nv(vcpu))
- 		return false;
- 
--	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
-+	control_bit_set = __vcpu_sys_reg(vcpu, reg) & control_bit;
- 	if (!is_hyp_ctxt(vcpu) && control_bit_set) {
- 		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
- 		return true;
-@@ -2360,9 +2360,24 @@ static bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
- 	return false;
- }
- 
-+static bool forward_hcr_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-+{
-+	return __forward_traps(vcpu, HCR_EL2, control_bit);
-+}
+ 	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
+ 	unsigned int nr_event_counters;
 +
- bool forward_smc_trap(struct kvm_vcpu *vcpu)
- {
--	return forward_traps(vcpu, HCR_TSC);
-+	return forward_hcr_traps(vcpu, HCR_TSC);
-+}
-+
-+static bool forward_mdcr_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-+{
-+	return __forward_traps(vcpu, MDCR_EL2, control_bit);
-+}
-+
-+bool forward_debug_exception(struct kvm_vcpu *vcpu)
-+{
-+	return forward_mdcr_traps(vcpu, MDCR_EL2_TDE);
- }
++	/* Number of debug breakpoints/watchpoints for this CPU (minus 1) */
++	unsigned int debug_brps;
++	unsigned int debug_wrps;
+ };
  
- static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
-@@ -2406,7 +2421,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	 * Forward this trap to the virtual EL2 if the virtual
- 	 * HCR_EL2.NV bit is set and this is coming from !EL2.
- 	 */
--	if (forward_traps(vcpu, HCR_NV))
-+	if (forward_hcr_traps(vcpu, HCR_NV))
+ struct kvm_host_psci_config {
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 7d3c71d65518..d921e7f7bd59 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -71,6 +71,9 @@ void kvm_init_host_debug_data(void)
+ 		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
+ 							      read_sysreg(pmcr_el0));
+ 
++	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
++	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
++
+ 	if (has_vhe())
  		return;
  
- 	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 1e302f0c8903..512d152233ff 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -183,6 +183,9 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
- 	struct kvm_run *run = vcpu->run;
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
+diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+index c14586d87361..502a5b73ee70 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+@@ -106,12 +106,8 @@ static struct kvm_guest_debug_arch *__vcpu_debug_regs(struct kvm_vcpu *vcpu)
+ static void __debug_save_state(struct kvm_guest_debug_arch *dbg,
+ 			       struct kvm_cpu_context *ctxt)
+ {
+-	u64 aa64dfr0;
+-	int brps, wrps;
+-
+-	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+-	brps = (aa64dfr0 >> 12) & 0xf;
+-	wrps = (aa64dfr0 >> 20) & 0xf;
++	int brps = *host_data_ptr(debug_brps);
++	int wrps = *host_data_ptr(debug_wrps);
  
-+	if (!vcpu->guest_debug && forward_debug_exception(vcpu))
-+		return 1;
-+
- 	run->exit_reason = KVM_EXIT_DEBUG;
- 	run->debug.arch.hsr = lower_32_bits(esr);
- 	run->debug.arch.hsr_high = upper_32_bits(esr);
+ 	save_debug(dbg->dbg_bcr, dbgbcr, brps);
+ 	save_debug(dbg->dbg_bvr, dbgbvr, brps);
+@@ -124,13 +120,8 @@ static void __debug_save_state(struct kvm_guest_debug_arch *dbg,
+ static void __debug_restore_state(struct kvm_guest_debug_arch *dbg,
+ 				  struct kvm_cpu_context *ctxt)
+ {
+-	u64 aa64dfr0;
+-	int brps, wrps;
+-
+-	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+-
+-	brps = (aa64dfr0 >> 12) & 0xf;
+-	wrps = (aa64dfr0 >> 20) & 0xf;
++	int brps = *host_data_ptr(debug_brps);
++	int wrps = *host_data_ptr(debug_wrps);
+ 
+ 	restore_debug(dbg->dbg_bcr, dbgbcr, brps);
+ 	restore_debug(dbg->dbg_bvr, dbgbvr, brps);
 -- 
 2.39.5
 
