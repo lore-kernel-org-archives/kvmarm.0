@@ -1,40 +1,78 @@
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE29223330
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 10:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C92222D6B
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 11:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734605929; cv=none; b=LFmvBLxcHkVlkVQgGxtDaCz+wFPQL2b1RF/R8xD4Z62iAqBQXGFZA2VS7zPU9rEfU5pFcQ/Erix4w/JC76cdbTsk7N1x+/ED5IyVe4uBbw9qRoujrMi2xjhxFUQGWJM7mfX9rdf8te3XdP5br5JObRSc/G5JlVrxX23D/hs/D10=
+	t=1734606630; cv=none; b=U70+QzCxZGRH+78OL/RZ5m1/iykSIrk5pQNOpTEA3b5HzxLITes2hpUxwWjXcL2WaxwkFCyyp+91o+pBRY+ejs8hdGgKakS3gjdRmNFzNfzw/ihwW10wpTmsJBfDOfaa0b8kmT2mgn8fzvV5zLpTzpMnmUeVUQXnfVrTW7Ncg2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734605929; c=relaxed/simple;
-	bh=G5kcT4WxhFuzMY1pRCiYzc4K//k/tyl+NmgIcVDYP9Q=;
+	s=arc-20240116; t=1734606630; c=relaxed/simple;
+	bh=KA1ixWNP5WI3RizWmsymPfBhlXudCJCqwF4L4GJqyeo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H3kBYg0TaxmVEWAjpWtlvu58lZpHNBxNeXJ1BIk9TXRih9ONXPBnLwJQ5CFA3W3XGupiBjduRp7ATzgKi16jexCKbH5Tgaui0+gNMR8rrE1uXU+ORmM8ugmt3O03t1kUyWhA6FwFU2cey3PD7rXyf07pWM2hHi7SQKNNlJuzubY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id 1A80172C8CC;
-	Thu, 19 Dec 2024 13:49:23 +0300 (MSK)
-Received: from pony.office.basealt.ru (unknown [193.43.10.9])
-	by imap.altlinux.org (Postfix) with ESMTPSA id 1026E36D0193;
-	Thu, 19 Dec 2024 13:49:23 +0300 (MSK)
-Received: by pony.office.basealt.ru (Postfix, from userid 500)
-	id DB1BF360CB20; Thu, 19 Dec 2024 13:49:22 +0300 (MSK)
-Date: Thu, 19 Dec 2024 13:49:22 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, stable@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, gshan@redhat.com, james.morse@arm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Jing Zhang <jingzhangos@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 6.6 v1] KVM: arm64: Disable MPAM visibility by default
- and ignore VMM writes
-Message-ID: <fqmjpadvbc7hoakm5qsmaxbgr7jomuehxjm3axo3sbpl4nzqvg@innog6dkmwqd>
-References: <20241212151406.1436382-1-joey.gouly@arm.com>
- <2024121528-refurbish-plausibly-31c7@gregkh>
- <20241217104058.GA2151333@e124191.cambridge.arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nmYIaTUze+UlU+zdyr0UrCyM2jR9+iaxzuADnTKu1aYy5VjhVReOTgO7Uiofi8nMtbMiX572B50+EJQtABYiJSyK/ZOmZR/JVNNqa0nWg1NQjJiWsJOSBEkeleofGekJYL+0X3diMfN/9y5atvkJMs0aPfKPJ3qwfMz8pE5yRec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ygi/OeO9; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ygi/OeO9"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa66e4d1d5aso98826866b.2
+        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 03:10:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734606627; x=1735211427; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=d5b9H3Sr5EYFy0j2cHR9n5SDx5jRbjOaoGMUJe0iL/U=;
+        b=Ygi/OeO9+UzbmajMc6vHkpvx2nYinn6BjP1ZrGaPTMbYfeGOFWuVT485m3FGl6l7mB
+         1qZmFPWd6wf0ufvDw7jR2jWoYJuqtbQJ2v+cOnW5oTJsRb0PrHZQUIn6A+V8dhaV6siP
+         EGoE17/0qDyV0LCYoIBfk9IqGAnqwgOnCixHIKnRpNJ5HtgJXANakRwXe+MfWI0uu6zT
+         YTsiITXozmUmZjjBUpdLAs4Su82CO6k3JL2hZeCerkS+0GSA4OvsBxtdMP6eD1/Nr1/8
+         bf61q2pUtPOVXknUUqsnqQjCM9j9hV4BW1JGqLHQtsRRw1nOSm+ziFUUsEqkp8FmLFM1
+         GzJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734606627; x=1735211427;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d5b9H3Sr5EYFy0j2cHR9n5SDx5jRbjOaoGMUJe0iL/U=;
+        b=BjZinrW1RqRcYGnF8RCguEaXK/kr+BW6YB+FdAMzGuImF/k2TIy6T44zFgb9/cR8Id
+         Sbp+EN7xoaLRmqIx6/LFfl04YbCqqxWNmEYpU7eAN2cQgDEoYdgmlPoQ8al0jUshFLVn
+         OnzU/qfvECUwvZzRmsBn7YXdTkhaV3m/TGCbEEZYKXGEZzMX9By/o7X9s0pJs6gq2hML
+         OzEEZUlmEGPjxNrxqwTIhOWdZjyNgvHQB897MO9Vc7YoFdoWknw5phi6qiTHJEQhYpzE
+         RVGAkfHmZ52nBXy4XUYkOfZMSfwbWSUKoOiiP8QMiKu/GRPG93HIKPMUtzjwiTCxtWjM
+         CoMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrKJOEktC8sRxy3WN3OWkoXypFB2B8YpXpqID9r8lymvCtnnzMMmqKqW3b2V1emDXWoJ3bxas=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyiRRPUh0t1PfcyjPX0uy/S8IaMWtBL49Tqoi/SgNivxkC4RJRd
+	4F03C1O3DiqRVq1jbxT4bCahDcKff6hdBxmeKbiuHqZqbb9bSbpLZFvIwtZ3hYICJ7YYijH7MyX
+	fuA==
+X-Gm-Gg: ASbGncvQ6ejfggfd9LmBJFAzs+noFswB+K5Fj/fiPcrEoDxfO7IRI48eJsB+sbvFfvp
+	yakbi80IXG+pwbLTskVBdYD4jxmjvvD7fbTKNek4J3Zr5h8mDl1S+bmoT9wZoxHoeeorMPHqRM8
+	uLSkHZ9lnToxwqbLA9tmJc4LhsCRGVFtXDIlfPul79S3jtezj9/srxYsLs5NOEULuz8JTg58KDd
+	Z1Hj0/m3xMpyZBWZCXe2LCvN5C7qYY/SqDLnnyFBWfkMvb7PrcdHe6gug0ePY9VgEbHSYEqnYyJ
+	DYOg47XPErMhaIw=
+X-Google-Smtp-Source: AGHT+IG1QUopT3Ag0ASkVgubCSavXZGnEyoaVH9YZtChHHKZ/cqx6LkSAMoHjTC7eHCXPYeU1uUf5Q==
+X-Received: by 2002:a17:907:7da0:b0:aa6:8d51:8fdb with SMTP id a640c23a62f3a-aac079029cdmr282978566b.19.1734606626623;
+        Thu, 19 Dec 2024 03:10:26 -0800 (PST)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e894f7fsm54124966b.46.2024.12.19.03.10.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 03:10:26 -0800 (PST)
+Date: Thu, 19 Dec 2024 11:10:23 +0000
+From: Quentin Perret <qperret@google.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, robdclark@gmail.com, joro@8bytes.org,
+	robin.murphy@arm.com, jean-philippe@linaro.org, jgg@ziepe.ca,
+	nicolinc@nvidia.com, vdonnefort@google.com, tabba@google.com,
+	danielmentz@google.com, tzukui@google.com
+Subject: Re: [RFC PATCH v2 21/58] KVM: arm64: pkvm: Add
+ __pkvm_host_add_remove_page()
+Message-ID: <Z2P_H4eahmrvhkIl@google.com>
+References: <20241212180423.1578358-1-smostafa@google.com>
+ <20241212180423.1578358-22-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,68 +81,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241217104058.GA2151333@e124191.cambridge.arm.com>
+In-Reply-To: <20241212180423.1578358-22-smostafa@google.com>
 
-Marc, Joey,
+On Thursday 12 Dec 2024 at 18:03:45 (+0000), Mostafa Saleh wrote:
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> +/*
+> + * Temporarily unmap a page from the host stage-2, if @remove is true, or put it
+> + * back. After restoring the ownership to host, the page will be lazy-mapped.
+> + */
+> +int __pkvm_host_add_remove_page(u64 pfn, bool remove)
+> +{
+> +	int ret;
+> +	u64 host_addr = hyp_pfn_to_phys(pfn);
+> +	u8 owner = remove ? PKVM_ID_HYP : PKVM_ID_HOST;
+> +
+> +	host_lock_component();
+> +	ret = host_stage2_set_owner_locked(host_addr, PAGE_SIZE, owner);
 
-On Tue, Dec 17, 2024 at 10:40:58AM GMT, Joey Gouly wrote:
-> On Sun, Dec 15, 2024 at 10:22:53AM +0100, Greg KH wrote:
-> > On Thu, Dec 12, 2024 at 03:14:06PM +0000, Joey Gouly wrote:
-> > > From: James Morse <james.morse@arm.com>
-> > > 
-> > > commit 6685f5d572c22e1003e7c0d089afe1c64340ab1f upstream.
-> > > 
-> > > commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
-> > > ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
-> > > but didn't add trap handling. A previous patch supplied the missing trap
-> > > handling.
-> > > 
-> > > Existing VMs that have the MPAM field of ID_AA64PFR0_EL1 set need to
-> > > be migratable, but there is little point enabling the MPAM CPU
-> > > interface on new VMs until there is something a guest can do with it.
-> > > 
-> > > Clear the MPAM field from the guest's ID_AA64PFR0_EL1 and on hardware
-> > > that supports MPAM, politely ignore the VMMs attempts to set this bit.
-> > > 
-> > > Guests exposed to this bug have the sanitised value of the MPAM field,
-> > > so only the correct value needs to be ignored. This means the field
-> > > can continue to be used to block migration to incompatible hardware
-> > > (between MPAM=1 and MPAM=5), and the VMM can't rely on the field
-> > > being ignored.
-> > > 
-> > > Signed-off-by: James Morse <james.morse@arm.com>
-> > > Co-developed-by: Joey Gouly <joey.gouly@arm.com>
-> > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > > Link: https://lore.kernel.org/r/20241030160317.2528209-7-joey.gouly@arm.com
-> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > > [ joey: fixed up merge conflict, no ID_FILTERED macro in 6.6 ]
-> > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > Cc: stable@vger.kernel.org # 6.6.x
-> > > Cc: Vitaly Chikunov <vt@altlinux.org>
-> > > Link: https://lore.kernel.org/linux-arm-kernel/20241202045830.e4yy3nkvxtzaybxk@altlinux.org/
-> > > ---
-> > > 
-> > > This fixes an issue seen when using KVM with a 6.6 host kernel, and
-> > > newer (6.13+) kernels in the guest.
-> > > 
-> > > Tested with a stripped down version of set_id_regs from the original
-> > > patch series.
-> > 
-> > What about 6.12.y?  You can't just skip a stable tree, otherwise you
-> > will get a regression when you upgrade to 6.12.y, right?
-> 
-> I did have it ported/tested locally, but I wasn't sure of the stable process,
-> so just sent out one!  Next time I will send all the backports at the same
-> time.
-> 
-> Thanks Marc Z for sending it out!
+Any reason why this can't be expressed using __pkvm_host_donate_hyp()
+and __pkvm_hyp_donate_host()?
 
-Thank you for backporting this, and thanks to everyone involved in the fix.
-
-Vitaly,
-
-> 
-> Joey
+This doesn't check any state, so it feels like a dangerous primitive to
+have. Is the issue the overhead of mapping/unmapping into EL2 stage-1?
