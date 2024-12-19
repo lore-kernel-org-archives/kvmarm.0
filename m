@@ -1,66 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD27221DAD;
-	Thu, 19 Dec 2024 12:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1106C22145D
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 12:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734611021; cv=none; b=C5C09FnKdqIDsT8pyESYz4BENqYUljQvt13n/e953K5Qn0VUGQrnov4MU+WZwBLbSemdRY69euhftXohwMeLujWxkwMCGZVtQW9Aw6gaG55B3mklztqNzTVUA+vf7BDQl7L7i8rKC82M6MYF7hebEPrNzZs4leDvo2lzE0lRlF8=
+	t=1734611193; cv=none; b=qVyFsn5BQsHS6BIz1snARkWN56jsf1WFzLHZMZqZziiSNi0Rfdm2PXniaEP/RVNCiuRozFbvKFvbj57MPaLJOkRKW/RAYdCt1BSDIUl2gkDrELKyFfSzSnOyquDZXIQX/6ypPzTScSLugYi6HxGrWIY8bcXHKZ/kfGSH7g3ph8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734611021; c=relaxed/simple;
-	bh=/IuAcPIwUBrCjXNwP8OYHSPNpkb99m7b4O65MtXVJrM=;
+	s=arc-20240116; t=1734611193; c=relaxed/simple;
+	bh=04mrj61m5M0eK5uxb9qdhTTuprN8gSJHsEGg321+jug=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lt352QQjAHuGIFTku4st+y65lT/qASiJOL+00juEbSR4ZKWjWtxO6qbemL4wG3tDMtagfsEbdtP04Yg8pLuEOdvLhpf+LxKG7YWxxEsIQmo9v0PEvLK/ihl4LzuAbPZ4CHpPIYhwahg/EuRnLY+cZWA3CsSy7dT4n8qWDbkAXVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jF6svL7s; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=oGgeLq/VLxnA7rrmyakEegEGob6fhUW4DXQhZy2TAi4B1/MpQD1XnkYiVW/nQ/v/LVaVhKY40LfU2Q0Yaj+jKPjbaclklt4ZnNiDhrbnR8gOs0AmG8fF8WxaAs0BpSNTa7h+NYqFEyEYhfs5ov/JLPMnBYy6PVSGJNysHV4T9CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tu9FO8H0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jF6svL7s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B74EBC4CECE;
-	Thu, 19 Dec 2024 12:23:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tu9FO8H0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 876BBC4CECE;
+	Thu, 19 Dec 2024 12:26:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734611020;
-	bh=/IuAcPIwUBrCjXNwP8OYHSPNpkb99m7b4O65MtXVJrM=;
+	s=k20201202; t=1734611192;
+	bh=04mrj61m5M0eK5uxb9qdhTTuprN8gSJHsEGg321+jug=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jF6svL7s0EeSRwdvaf52rRum1UQJK+YieySotxqwrp+hKKcFWbEYueceh6qoA46PI
-	 a3crP6EOruTdfvMfM2YinuL7CDidKdKgn92CaJ6BDjpHx4gtuGMjnOES7sOOlY8et4
-	 RBoJkQVp3qzkIXGyR7SCny5K8dopP1nACDB1c8zMANv6Kf5LH8V7/Sq+pAw2VRa8w9
-	 C9/wx4JnBYquaLo6GdDATgfuW651htP7wf3RFc7mKpF+4QmGYjjEzcY2nZ/ddbnRCI
-	 0W7Gtsgb6dFbUG6rkGfzzwgWiFCgSaMrCXTBh5NceepKj0VzmDUcQQ25G1j4VwpKjY
-	 vsbSPHSXYSK5g==
+	b=Tu9FO8H01Fn5WM+XuIr+y7JwK+/oOLnvU7jJj6ovl99TvBJD/McqbMYuu/kRbpU5a
+	 K2prrYhSmM+4J7InIx/NZQxGvujabU4YHkeem9PDUqPerCX8sIyvrd9wDt2WiAmoQ2
+	 fb5WjxJtfKZ26gD6kte0oWo81onM79tkmTEJnMjRZ5XRkB1iJkqM4YuzFw2ql5mCGP
+	 qB2yBT57i+/oPAmpWl66JkjZil1tK+3QyEr5m6PFs+YGnu9cz8G49sXcQnLrM00iTb
+	 nEpRbn/Iy3XEYXXM5mWr73rY8PXQLZzX3th8PBIFiPC2alQZOdiEVpTWkyI12f8nO5
+	 SBIo6VxjVFSWw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tOFZ4-005GGT-Dw;
-	Thu, 19 Dec 2024 12:23:38 +0000
-Date: Thu, 19 Dec 2024 12:23:37 +0000
-Message-ID: <864j2zrhdi.wl-maz@kernel.org>
+	id 1tOFbq-005GKK-DH;
+	Thu, 19 Dec 2024 12:26:30 +0000
+Date: Thu, 19 Dec 2024 12:26:29 +0000
+Message-ID: <8634ijrh8q.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Eric Auger <eauger@redhat.com>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	christoffer.dall@arm.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	coltonlewis@google.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
-In-Reply-To: <2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
-References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
-	<867c89tc4q.wl-maz@kernel.org>
-	<c5b1c3d7-56ca-4afc-a831-045dba4beffa@os.amperecomputing.com>
-	<865xntt2kv.wl-maz@kernel.org>
-	<8be59ff3-6a68-48e1-8181-0ce4b2e7180f@os.amperecomputing.com>
-	<bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
-	<86y10osr19.wl-maz@kernel.org>
-	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
-	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>,	Cornelia Huck <cohuck@redhat.com>,
+	Daniel =?UTF-8?B?IlAuIEJlcnJhbmfDqSI=?= <berrange@redhat.com>,
+	eric.auger.pro@gmail.com,	qemu-devel@nongnu.org,	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,	alex.bennee@linaro.org,
+	oliver.upton@linux.dev,	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,	armbru@redhat.com,
+	abologna@redhat.com,	jdenemar@redhat.com,	shahuang@redhat.com,
+	mark.rutland@arm.com,	philmd@linaro.org,	pbonzini@redhat.com
+Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
+In-Reply-To: <Z2QE9AqZnpGM5sWD@gezellig>
+References: <20241206112213.88394-1-cohuck@redhat.com>
+	<edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
+	<Z1qoa8yXscTSAJ9e@redhat.com>
+	<8734it1bv6.fsf@redhat.com>
+	<1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
+	<Z2QE9AqZnpGM5sWD@gezellig>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,82 +62,81 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
+X-SA-Exim-Rcpt-To: kchamart@redhat.com, eric.auger@redhat.com, cohuck@redhat.com, berrange@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 19 Dec 2024 09:30:11 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> 
-> On 09-12-2024 11:04 pm, Eric Auger wrote:
-> > Hi Marc,
-> > 
-> > On 12/9/24 18:30, Marc Zyngier wrote:
-> >> On Mon, 09 Dec 2024 16:46:30 +0000,
-> >> Eric Auger <eauger@redhat.com> wrote:
-> >>> 
-> >>> Hi,
-> >>> 
-> >>> On 12/9/24 16:39, Ganapatrao Kulkarni wrote:
-> >>>> 
-> >>>> 
-> >>>> On 09-12-2024 06:50 pm, Marc Zyngier wrote:
-> >>>>> On Mon, 09 Dec 2024 12:25:34 +0000,
-> >>>>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >>>>>>>> 
-> >>>>>>>> During automated testing of Nested Virtualization using avocado-vt,
-> >>>>>>> 
-> >>>>>>> Which is not merged upstream. So what branch are you using? Based on
-> >>>>>>> what kernel version? On what HW? With which virtualisation features?
-> >>>>>>> 
-> >>>>>> 
-> >>>>>> Testing is done on Ampere's AmpereOne platform using 6.10 based kernel
-> >>>>>> with NV patches from your repo.
-> >>>>> 
-> >>>>> Grmbl... *Which* patches? At least give me the SHA1 of the branch,
-> >>>>> because I have no idea what you are running. And 6.10 is definitely
-> >>>>> not something I care about. If you're using the NV patches, the
-> >>>>> *minimum* you should run is 6.13-rc1, because that's what the current
-> >>>>> code is based on.
-> >>>>> 
-> >>>> 
-> >>>> I tried 6.13-rc1 based nv-next branch today, which failed to boot
-> >>>> UEFI as L1. Yet to debug this.
-> >>> 
-> >>> I confirm am stuck with the same issue with nv-next on AmpereOne.
-> >> 
-> >> All I can say is that it Works For Me (TM) on M2 and Snapdragon, using
-> >> kvmtool, a fresh EDK2 built by Ard, and with the guest running purely
-> >> VHE (FEAT_E2H0 not implemented).
-> >> 
-> >> I haven't tried QEMU, I don't have an AmpereOne. I have also spent way
-> >> too much time on this recently. So I'm afraid people interested in
-> >> making this particular combination work will have to debug it.
-> > 
-> > yes I do agree. I am currently setting up kvmtool to double check and I
-> > will debug the qemu issue.
-> 
-> I could boot Guest-hypervisor using QEMU with -bios and nv-next as L0
-> with edk2 (QEMU_EFI.fd) built from upstream tree and fedora-41 as
-> Guest-Hypervisor.
+On Thu, 19 Dec 2024 11:35:16 +0000,
+Kashyap Chamarthy <kchamart@redhat.com> wrote:
+>=20
+> On Thu, Dec 12, 2024 at 11:04:30AM +0100, Eric Auger wrote:
+>=20
+> Hi Eric,
+>=20
+> > On 12/12/24 10:36, Cornelia Huck wrote:
+> > > On Thu, Dec 12 2024, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
+ote:
+>=20
+> [...]
+>=20
+> > >> Consider you mgmt app wants to set a CPU model that's common across
+> > >> heterogeneous hardware. They don't neccessarily want/need to be
+> > >> able to live migrate between heterogeneous CPUs, but for simplicity
+> > >> of configuration desire to set a single named CPU across all guests,
+> > >> irrespective of what host hey are launched on. The ARM spec baseline
+> > >> named models would give you that config simplicity.
+> > > If we use architecture extensions (i.e. Armv8.x/9.x) as baseline, I'm
+> > > seeing some drawbacks:
+> > > - a lot of work before we can address some specific use cases
+> > > - old models can get new optional features
+> > > - a specific cpu might have a huge set of optional features on top of
+> > >   the baseline model
+> > >
+> > > Using a reference core such as Neoverse-V2 probably makes more sense
+> > > (easier to get started, less feature diff?) It would still make a good
+> > > starting point for a simple config.
+> > >
+> > Actually from a dev point of view I am not sure it changes much to have
+> > either ARM spec rev baseline or CPU ref core named model.
+> >=20
+> > One remark is that if you look at
+> > https://developer.arm.com/documentation/109697/2024_09?lang=3Den
+> > you will see there are quite a lot of spec revisions and quite a few of
+> > them are actually meaningful in the light of currently avaiable and
+> > relevant HW we want to address. What I would like to avoid is to be
+> > obliged to look at all of them in a generic manner while we just want to
+> > address few cpu ref models.
+> >=20
+> > Also starting from the ARM spec rev baseline the end-user may need to
+> > add more feature opt-ins to be close to a specific cpu model. So I
+> > foresee extra complexity for the end-user.
+>=20
+> (Assuming I'm parsing your last para right; correct me if not.)
+>=20
+> Isn't a user wanting to add extra CPU flags (on top of a baseline) a
+> "normal behaviour" and not "extra complexity"?  Besides coming close to
+> a specific CPU model, there's the additional important use-case of CPU
+> flags that provide security mitigation.
+>=20
+> Consider this:
+>=20
+> Say, there's a serious security issue in a released ARM CPU.  As part of
+> the fix, two new CPU flags need to be exposed to the guest OS, call them
+> "secflag1" and "secflag2".  Here, the user is configuring a baseline
+> model + two extra CPU flags, not to get close to some other CPU model
+> but to mitigate itself against a serious security flaw.
 
-Cool. This shows that Ard's hard work on EDK2 is paying off.
+If there's such a security issue, that the hypervisor's job to do so,
+not userspace. See what KVM does for CSV3, for example (and all the
+rest of the side-channel stuff).
 
-> 
-> The issue was disappeared when upgraded from fc39 to fc41. Same was
-> experienced with the kvmtool boot as well(KVMTOOL_EFI.fd).
-
-I guess the fc39 kernel is too old to understand the VHE-only ID
-registers, which was introduced in 6.9.
-
-Once you teach QEMU how to disable VHE, you should be able to boot
-older kernels that predate this change.
+You can't rely on userspace for security, that'd be completely
+ludicrous.
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
