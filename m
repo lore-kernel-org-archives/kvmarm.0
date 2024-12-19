@@ -1,92 +1,125 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF3E14AD17
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 03:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF2C1F76D3;
+	Thu, 19 Dec 2024 05:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734578032; cv=none; b=AcaZk5qz8/1pYFgbMGPWmRzjtUa92ltTGdbA161eMmv+BRQFacCPM3ArpltzkEflzR6DPubLRtdG2TwjjyY0I/SPn/mmApbWWS5RUBDijLxjYs+KaVRDXTO2gg7T/7V8TeZBVGIGEFQZATCkBVrsw/yHX6wIsHZOiOCLTdumasc=
+	t=1734586668; cv=none; b=H1Na5GxwYUj0Rg5rQDWF0qu9DMbyj606oXwWwP/I0vTDJyNN2mBK96bUNFWtnuT7uKAHuCZCSiNVvSEVewhoJZNjNKBygThglwp/1QGsR1yMThNjbAF/TSXLXSVvrYcH8NyZMym0mLI4AxG9SAw7T+yzSEhO45R1NGsZYCJt3bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734578032; c=relaxed/simple;
-	bh=Yd7KWnA9tasUsxrpICQTKPvx6pwIvbAh9dZde/RDFCY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pxk6l64gp0S+upJNQx7Z0Qxf72XWKGJ9wK8KqPiAoguA2iLhU7kkjhtr+az9OIQ3fojY9w4Bql1WUJH42NafwHy0dw9DhPjkf0FeCleGrsmVnFztJ0l3KEsi6TUEVK2gufE3c7IWrdHMYEcxf2POuSzHAw1nMerzSIYSFY4SNQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A19731480;
-	Wed, 18 Dec 2024 19:14:16 -0800 (PST)
-Received: from [10.162.16.49] (unknown [10.162.16.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1CF143F528;
-	Wed, 18 Dec 2024 19:13:44 -0800 (PST)
-Message-ID: <c707ecfd-6f1f-47d2-93ec-116f5dfd419e@arm.com>
-Date: Thu, 19 Dec 2024 08:43:42 +0530
+	s=arc-20240116; t=1734586668; c=relaxed/simple;
+	bh=f1ssCOL5WoAFhkE7v38y7Xu2e53FiZUAYFBGnEjCpZ0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=emYalXpsgELIl4JNv00a1vcNfNPowWhRpqrD6e+Od6KO4enRn3V0nRM2loOGirb+mlqizrYfpxoPrOOJkaFnc1J6j5iOfTREQBUGl9Sv9ZRXFl86SIPulmAK+IujiV0zNv4hNUOnYtFeqRJZ96G6ThhREQ+bcnn1blGAmNPkVIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ialAkShi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ialAkShi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 411AFC4CED0;
+	Thu, 19 Dec 2024 05:37:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734586668;
+	bh=f1ssCOL5WoAFhkE7v38y7Xu2e53FiZUAYFBGnEjCpZ0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ialAkShidwlJwrlWfPoJnFpY0idSboazhqgfcvsMXJ4WZ10TEkwwaukZOvjp1u9kt
+	 u3hH5jq9vP1fMuychVCt6eJSWQR/bvHOH0Sd4QBD83X+3/P3SxKTevMjhHIlz6iKy2
+	 uo5tjyk50uEf0LbeIylxsmL6KBvKi1gTzZxli23s90z1ilTnwa9+2ovQ3Nxof7121B
+	 kSqD9OY+pdi/8dwkUkPnn0h5b7tbyYlI2hycHVqAKgqCESNVjDoR/5tdCBdqjj2aLb
+	 K7jF0+7AETgI2iKjB50StOBX6IbCSwNVx7ItYL7i9U4wbTIdZi9Ev+7zINcUdVkNn8
+	 naAuwTRmpNLYg==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
+In-Reply-To: <20241212155610.76522-13-steven.price@arm.com>
+References: <20241212155610.76522-1-steven.price@arm.com>
+ <20241212155610.76522-13-steven.price@arm.com>
+Date: Thu, 19 Dec 2024 11:07:22 +0530
+Message-ID: <yq5apllos06l.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 15/46] arm64/sysreg: Add register fields for PFAR_EL1
-To: Eric Auger <eauger@redhat.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org
-Cc: ryan.roberts@arm.com, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-References: <20241210055311.780688-1-anshuman.khandual@arm.com>
- <20241210055311.780688-16-anshuman.khandual@arm.com>
- <5203176c-2646-425b-b375-edb7931ef54f@redhat.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <5203176c-2646-425b-b375-edb7931ef54f@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+
+Steven Price <steven.price@arm.com> writes:
+
+> +static int alloc_rec_aux(struct page **aux_pages,
+> +			 u64 *aux_phys_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	int ret;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < num_aux; i++) {
+> +		struct page *aux_page;
+> +		phys_addr_t aux_page_phys;
+> +
+> +		aux_page = alloc_page(GFP_KERNEL);
+> +		if (!aux_page) {
+> +			ret = -ENOMEM;
+> +			goto out_err;
+> +		}
+> +		aux_page_phys = page_to_phys(aux_page);
+> +		if (rmi_granule_delegate(aux_page_phys)) {
+> +			__free_page(aux_page);
+> +			ret = -ENXIO;
+> +			goto out_err;
+> +		}
+> +		aux_pages[i] = aux_page;
+> +		aux_phys_pages[i] = aux_page_phys;
+> +	}
+> +
+> +	return 0;
+> +out_err:
+> +	free_rec_aux(aux_pages, i);
+> +	return ret;
+> +}
+>
+
+We can possibly switch the above to the alloc/free helper so that all
+granule allocation is done by alloc_delegated_granule() ?
+
+static int alloc_rec_aux(struct realm *realm, u64 *aux_phys_pages, unsigned int num_aux)
+{
+	int ret;
+	unsigned int i;
+
+	for (i = 0; i < num_aux; i++) {
+		phys_addr_t aux_page_phys;
+
+		aux_page_phys = alloc_delegated_granule(realm, NULL, GFP_KERNEL);
+		if (aux_page_phys == PHYS_ADDR_MAX) {
+			ret = -ENOMEM;
+			goto out_err;
+		}
+		aux_phys_pages[i] = aux_page_phys;
+	}
+
+	return 0;
+out_err:
+	free_rec_aux(realm, aux_phys_pages, i);
+	return ret;
+}
 
 
 
-On 12/18/24 21:12, Eric Auger wrote:
-> Hi Anshuman,
-> 
-> On 12/10/24 06:52, Anshuman Khandual wrote:
->> This adds register fields for PFAR_EL1 as per the definitions based on
->> DDI0601 2024-09.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Mark Brown <broonie@kernel.org>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/tools/sysreg | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
->> index 18b814ff2c41..e33edb41721a 100644
->> --- a/arch/arm64/tools/sysreg
->> +++ b/arch/arm64/tools/sysreg
->> @@ -3533,3 +3533,10 @@ Field	5	F
->>  Field	4	P
->>  Field	3:0	Align
->>  EndSysreg
->> +
->> +Sysreg	PFAR_EL1	3	0	6	0	5
->> +Field	63	NS
->> +Field	62	NSE
->> +Res0	61:56
->> +Field	55:0	PA
-> Just wondering: part of the PA definition depends on FEAT_D128 or
-> FEAT_LPA and the reset field value is UNKNOWN if the feature is not
-> available. Shouldn't introduce separate fields directly?
-Generated PFAR_EL1_PA_MASK aka GENMASK_ULL(55, 0) should cover all the
-cases for PA i.e 48 bits, LPA, D128 etc. Although individual use cases
-will have to trim the mask subsequently as required.
 
-Are you suggesting something like the following instead where the user
-will have to concatenate these fields selectively to find the required
-PA mask ?
-
-Field	55:52	PA_D128
-Field	51:48	PA_LPA
-Field	47:0	PA
