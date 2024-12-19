@@ -1,63 +1,62 @@
 Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5342594
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 11:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960212236EE
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 11:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734607174; cv=none; b=UDHnEB3gdZ4x/9SFbkVZedbZk9zqwol/E45JnWrH80/SALwo21knUi4w+EyJvcTSHROnd+gE2SYdV0aR1ld0jBocovIyl114lUSI1mZMizY/SJhtd6zmcUen3O5Yz9EovVF7bp9ZhzZtFHz0aEcIdr51QiW7pBAOq8+6rR859Ok=
+	t=1734607308; cv=none; b=QfcFEewsIgPdJjfZ0eC4BT4NMdi6E2MKCR+ZpkeLPkIs8027DI4pPL1CWraArYjsWMYzlAyNJvXeLOAldVjJpZXB8ELsHOKN/35bQXDCu71I9ndmSYqR8eOZs84Uj3hIZa3L6MwmwXq9DKO3mk25AxNzNbSC1wMP5k5InvU/lvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734607174; c=relaxed/simple;
-	bh=uCO8XIxLkLERtbLGEzOZDP1Nn56oL2YEsBEMIpvgr34=;
+	s=arc-20240116; t=1734607308; c=relaxed/simple;
+	bh=l82VQ6MNWoJAziJkHRiYqGJu8wD4XsbM7Tq5GCvOgOs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BPi+yUAMnAEe8v8AXNvJxJo2AW4e/W83nUac6otzM0+Rhvyc8ipcLU/5hzRsGovOdiSXmrx1fUiamLHSqzo1yuOUCGEtLJbxo/8bx/hn38tQOdsZzoI7+o5xbTAv01pXLBaDNrN+oKkgDnZ6xx/8vQinq3I03367HDiSqyKbuwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QTEo+0xJ; arc=none smtp.client-ip=209.85.128.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=PS0YhzKpoD4lCi60zO3Lo+0JlosehjxFKnDOAf7+URYNMkkiVoaX5GvCDpQQuKDoV0++R1jjaM4Unf18GSjufP9flmnJxG8gCS2NR/AGs+wO0GEXCUfsFFr/sQvFSYNAAVRwSgVBm4KEFiFbSz6wvAjfmERkRMMypk9+JKmpsKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rq9icYwf; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QTEo+0xJ"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-435b0df5dbdso48615e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 03:19:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rq9icYwf"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43622893c3cso35285e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 03:21:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734607171; x=1735211971; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734607305; x=1735212105; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DaFUYqfbJ0FVFTC0Qejf2fBra+Am279oXsL2ycAM8YU=;
-        b=QTEo+0xJeIC+sTYNn0ZfLc8c2k8PhbvETP/6AXsXD/n57vUk9XpKb2Wpew95FyB8Qb
-         AeZAn01dkDk+u4nyGrc+odT2uh9T1cNTe3sImrSJ+S/tUo/wHJmTfLcm8NFJSSh5rph+
-         vcPdHYl6CFrn3ffVLYTRB/54k8zMax/gKX+tltWnZm36lV0TYcVcpUfuqSk6yIV+mIGQ
-         sO7criDATb19xy1fhOGApTZnBlF/pT5Zh7muG7rg5KiJdmxftR0ptH6HJD+NGnn5o22a
-         sKv5T0H34rw8OVB/rivC3wXJjzEbGeZxt57aB1fF02l1XKnaengZZRsYefU7MuzjNVa5
-         xA9g==
+        bh=WGkN0eIRMsbxDqZZzBkMr+wzaFkYCBiUXPyTbRF2MxQ=;
+        b=Rq9icYwfK0T6ENK6Z+1fpj6H9eZst3oEGT/HYp87GGZqRsAmiGQPlvtsikVWT5zayW
+         lqAvshkS4sMhxXC98caGs3dGz+6luj4+amQVsOQYMygUhSmhxh8i4+IVt6mvhObdzgUi
+         PhIXFZAuz3HV95Xn7ABwZQ2Qdx0GFKlYUhlX/wW9iUzlFom8BAgrSPH7mYY+bvrSHTSi
+         cbKiX0Q5TIGdeS6KCvLX7OtDMgDEE4Gw0/7el6Oa3YJ6g/WotJdSWNspTybtbBmICj8I
+         SmsPy/x17zTLF6d5a6WRowKWHk0Hb9VdelhwV1O1F3r2+cH1ktyQ/ResLcZ7T/7++VpC
+         e2ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734607171; x=1735211971;
+        d=1e100.net; s=20230601; t=1734607305; x=1735212105;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DaFUYqfbJ0FVFTC0Qejf2fBra+Am279oXsL2ycAM8YU=;
-        b=KLjiFTLEYFTffK2P+izgYCFaGLFy2yN5D5SEUlvdPM79BmhgEVwtzIqMVW2ii9ihGQ
-         GGdDJgfhFSqqVFatgWp6369eBrbhkuqg3BVmqfBkHIwRoItk8P3S1ME8I9zlRQy7lDdG
-         b/BOrKVjaSgAVR3U+9lC4PpXrjm6V8OiZ2lqu1BbELzf0h6mQEHwNUmMsbKgFwJF4yBL
-         aK3PSwU6Vf3Yoi7Wid4Tlp4ZbhltFz1ssefU9q59RZz+kQqG5iE1l85feDyRArv5o3uf
-         Pc0z+kcy+yQspf8fKBNyOzlfDCrRtoyTIXSQdd2ox5K74Wch3BleD/+seeVsfMUXcu5N
-         qGLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmLvZKE4r0tiU6g/Ld/tPkXb3RGriZZd4SQbuxUE/QB3kAv9CeZd5mOqk52SCZLMOzwgHSZWo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzXTFzUadW0aUk+FT93tROXQtVIFHXXJrpQKeHe+jJzmbPLfP7c
-	t2eo29vbse1UjPwLgt+pRodb0Nev9xDL2hOKMRwUquPNJvt0uDR6iEaU8QTitFXG/vNroPjfaez
-	JDw==
-X-Gm-Gg: ASbGnctVLoB+IC0fdQ3LGQTUJTkyO3BN/lUGjGAHA9ETqUxeFoe7hZe4cd/JJ88kIqz
-	lxzZMdEQPPZrMrPuDlWyUJj/7znl8W9AEL9KxQmp/FjdR+17HuYCh34YQrkubBjUK489Bcmu6hb
-	kQgsta7Kx2P2pjfPmyy8mh0b6qPAhnZx70hK5eakSWdz7to77PtFv7nzzhRHFBEJIAIt8bGHYlr
-	i3qCJDLo+QXr35dGSrx1CqWiuDXXB4hen+KIpU1Do0PxchR3lr9DUbAKOGhhzxwP0y7LW4PYcTV
-	RZjCWhmIuqTAhcNYyDc=
-X-Google-Smtp-Source: AGHT+IGXfoawYuXIuMfIIDaYD8hngDHiUTctYslUp+cxCbwWzZSbONX4t2aPmw9QcUFfEenJ6bez4w==
-X-Received: by 2002:a05:600c:3590:b0:434:9fac:3408 with SMTP id 5b1f17b1804b1-4365e5dd70dmr1072565e9.2.1734607171199;
-        Thu, 19 Dec 2024 03:19:31 -0800 (PST)
+        bh=WGkN0eIRMsbxDqZZzBkMr+wzaFkYCBiUXPyTbRF2MxQ=;
+        b=dYd08mu5Ww3jZjKNlsY0bRrZTZV8LvQBN9f5Zn0CfWvhhSLHauNaHUMDlw0caXaxgu
+         DrylzY4XW5YsXJtleBg5iHmd73mbQMkSH9V29BbU3YNiwmrlXXwxBo4/CPQpzV5q0mV4
+         bJH93ksK5uyNX93J1A1EUfCB8H2Bj7RTljD+oj0J9OuXXJdmBTjP69kpP+YbBNCLQqeY
+         GZeQz22gL9Mg43XpV8ARHjU5x9Opste0xR3deXQCEZe3iiw8dwmNeFWiQuErbuSDXCHU
+         V4S5NYTZbmwWbKt++3ZAIud5uj7AzhclOazHZOucWrvmAqu+hBAVqyZmqei89UVvKsSk
+         wREg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBF62epQfwm5hIeplpV0ov35c5PmvSG+vEgDnPFLcUq2q6OD2G+RJozklIbf20rZagmCTtJtA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxqgiGQBqeE0P3pHpa6yp8kJRcXLuuVOWdQqbiNLrruRCLZAZcK
+	bqHuXN78UGdEQULA791flV7iwbJXahv9fqWHoqxrQwCHLTpp4GwjiNEn0ZqrIA==
+X-Gm-Gg: ASbGncsS6Oj52d44IkBl+iWSgZpk1uvisu26lNl53i25NXTByfb6/k1xqJ4/JAYF06X
+	nQvhRfj4+wrvatG2tihb7Y9Ul4aOy4hitElFbNDp/JSu5vsOz1CzUDDQGN6xHZyIbERlTW8+Bex
+	EHSrD2/MHhkcR5//2LmEr/2kz5va+bcsmhl2tiAPQhoFeeWJLOo/X+h/G/zlDJw5Qf/4aMfncdR
+	uVFZKvwwopTiT85GdjX/B0pzEmU/2fPodUSCY95HsR2oxEUqH0qVTbd0ZokFhHN04G6u8jtJtmH
+	DKxNJ4TVucBDD0xvfik=
+X-Google-Smtp-Source: AGHT+IH3i8v/BrwemmECFyya82qa5WpmpoQwTNEogOS40Upy0/Fstoyzd3BnWRDUcSAESI7APhWcyQ==
+X-Received: by 2002:a05:600c:4a01:b0:436:4e4c:7bae with SMTP id 5b1f17b1804b1-4365fca3ba4mr846885e9.1.1734607304693;
+        Thu, 19 Dec 2024 03:21:44 -0800 (PST)
 Received: from google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8a6cb1sm1345355f8f.89.2024.12.19.03.19.30
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8bb4bcsm1308850f8f.111.2024.12.19.03.21.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 03:19:30 -0800 (PST)
-Date: Thu, 19 Dec 2024 11:19:26 +0000
+        Thu, 19 Dec 2024 03:21:44 -0800 (PST)
+Date: Thu, 19 Dec 2024 11:21:40 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: Quentin Perret <qperret@google.com>
 Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
@@ -68,12 +67,11 @@ Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
 	robin.murphy@arm.com, jean-philippe@linaro.org, jgg@ziepe.ca,
 	nicolinc@nvidia.com, vdonnefort@google.com, tabba@google.com,
 	danielmentz@google.com, tzukui@google.com
-Subject: Re: [RFC PATCH v2 21/58] KVM: arm64: pkvm: Add
- __pkvm_host_add_remove_page()
-Message-ID: <Z2QBPtRvnB3PGvMG@google.com>
+Subject: Re: [RFC PATCH v2 11/58] KVM: arm64: pkvm: Add pkvm_udelay()
+Message-ID: <Z2QBxPyBsxGNSuzT@google.com>
 References: <20241212180423.1578358-1-smostafa@google.com>
- <20241212180423.1578358-22-smostafa@google.com>
- <Z2P_H4eahmrvhkIl@google.com>
+ <20241212180423.1578358-12-smostafa@google.com>
+ <Z2QADxbdoYi5q9iT@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -82,28 +80,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z2P_H4eahmrvhkIl@google.com>
+In-Reply-To: <Z2QADxbdoYi5q9iT@google.com>
 
-On Thu, Dec 19, 2024 at 11:10:23AM +0000, Quentin Perret wrote:
-> On Thursday 12 Dec 2024 at 18:03:45 (+0000), Mostafa Saleh wrote:
+On Thu, Dec 19, 2024 at 11:14:23AM +0000, Quentin Perret wrote:
+> On Thursday 12 Dec 2024 at 18:03:35 (+0000), Mostafa Saleh wrote:
 > > From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > +/*
-> > + * Temporarily unmap a page from the host stage-2, if @remove is true, or put it
-> > + * back. After restoring the ownership to host, the page will be lazy-mapped.
-> > + */
-> > +int __pkvm_host_add_remove_page(u64 pfn, bool remove)
-> > +{
-> > +	int ret;
-> > +	u64 host_addr = hyp_pfn_to_phys(pfn);
-> > +	u8 owner = remove ? PKVM_ID_HYP : PKVM_ID_HOST;
-> > +
-> > +	host_lock_component();
-> > +	ret = host_stage2_set_owner_locked(host_addr, PAGE_SIZE, owner);
+> > 
+> > Add a simple delay loop for drivers.
+> > 
+> > This could use more work. It should be possible to insert a wfe and save
+> > power, but I haven't studied whether it is safe to do so with the host
+> > in control of the event stream. The SMMU driver will use wfe anyway for
+> > frequent waits (provided the implementation can send command queue
+> > events).
 > 
-> Any reason why this can't be expressed using __pkvm_host_donate_hyp()
-> and __pkvm_hyp_donate_host()?
+> Mooh, I'm thoroughly hating that we need this -- pKVM is non preemptible
+> so we better not wait for too long.
+> 
+> I can surely figure it out from the following patches, but could you
+> please expand on the use-case?
 
-That makes more sense, I will fix it.
+The driver needs to poll some SMMU MMIO, so it needs to measure time
+in terms of udelay to timeout, at the moment its arbitrary set to 100ms.
+
+Thanks,
+Mostafa
 > 
-> This doesn't check any state, so it feels like a dangerous primitive to
-> have. Is the issue the overhead of mapping/unmapping into EL2 stage-1?
+> On a side note I'm not too worried about the power impact of not having
+> a wfe in there, again we better not be spinning for long enough that
+> power starts to be noticeable.
