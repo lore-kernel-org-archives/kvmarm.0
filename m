@@ -1,32 +1,32 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BFF1C3F13
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 22:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3911C4A12
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 22:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734648131; cv=none; b=gQek9PJE/h2X9LmbJizz4Z2JGgNcP3Yc1K6rwSUWZGcfPypFswviIpFzUkq6qLMOdyWLAqzsiytxBnJfICpbkYdELGbOLSlPhH9mJVGelGB3W0jtdSesVKOVTO952MsMeZcV9EFZUHy7XeiIO2hjketPmOqxlJ4Rr1SEdiut+Y8=
+	t=1734648133; cv=none; b=VGqq00iS8PDQX6xLW5y6UGMbtSUH88TawE9KhiL/WgysSUQ8RxfaCGDFhvT1A0oKwBTEIccJU+vnTa4q1YgLzwS8I8HexQPsFK5II34n0X4AnS0mBPPPyoOpo7ahLlwIY9k71lHj8c0MQOBznDlimqhGBGQ83iAEtWMbe0nC4xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734648131; c=relaxed/simple;
-	bh=dzmLxP6EjQCrJ5Ta1F8r1yTrILJ7V821ihbo3S1jsdM=;
+	s=arc-20240116; t=1734648133; c=relaxed/simple;
+	bh=704kRvMD3ezrGkCR1doEKeRI9B/BkiRsrU3+wvkThg4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VP7X7SRmW+p7vTUh8PHWWvlkWBSpUR81zdbNimFVnIEASUOczeSEFDCpshRTqbYC1rxv0e9S4fvZLl39q5MDflAf2Y/oygvf9Cca+rXxoGKW4wtKDoMldFnTihCxXesIZZidsJzLnIXiu1AFbSwELp4IV9MUaK8mE8iqAqeWOgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vxFZgXAd; arc=none smtp.client-ip=95.215.58.176
+	 MIME-Version; b=f2Tx0iSFmtkyUzfRkUwoc6eGBf/hyYki5L+wxJzYQ5Q8v15hfg881ToV45vwr/ZS/b4DUWEXBfwoUdjSmoLUG5YMZJPZvec1LWzGyfimwQOrqsYoMLrkeHOktnE1KkEPAJZFGkPUbA409/nRz4jZOCqrdk0LejPhtozXWkL8eO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IgBNAS9M; arc=none smtp.client-ip=95.215.58.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vxFZgXAd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IgBNAS9M"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734648127;
+	t=1734648129;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Je/BQghng+w2bt+hnJU75nV+yahVV5nH1ArdWHQGqbA=;
-	b=vxFZgXAdD44E7+aSHt/M1s4xj+kN03Wu3fXiwRcpXhAz+ZwPwN5etj8mrM864tnKAOAHTK
-	/CTwIkW7Qv1snG7QmsgjYCgjmPo63lMWQUUtUe/eAaZLTw+ejmtGU3uMI8TqCs3nI9uDSb
-	mBG9eja2WnDNW9pJW+Yfsx/CmoZzoc0=
+	bh=MvD1c26tddUHW2pdNX5TiKWxS+wfvLjBr8Hdq2XPJ9Q=;
+	b=IgBNAS9MbUG21GMeDmZMxE93gTyEBvZiI3/pnKTr9KUCn8nuE/zzHHitRi9TipBcFFIYZg
+	Legw1ef7ie1OC+a5/uYga9WkZCgmqxLogl1EfwhBQMzDlQJcsqbiL1Mk0zIsSzPB3b76WK
+	KDqLgg3YxZxe95w1xxqT0cYRwJvF7vc=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -38,9 +38,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	James Clark <james.clark@linaro.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 17/19] KVM: arm64: Avoid reading ID_AA64DFR0_EL1 for debug save/restore
-Date: Thu, 19 Dec 2024 14:41:14 -0800
-Message-Id: <20241219224116.3941496-18-oliver.upton@linux.dev>
+Subject: [PATCH v4 18/19] KVM: arm64: Fold DBGxVR/DBGxCR accessors into common set
+Date: Thu, 19 Dec 2024 14:41:15 -0800
+Message-Id: <20241219224116.3941496-19-oliver.upton@linux.dev>
 In-Reply-To: <20241219224116.3941496-1-oliver.upton@linux.dev>
 References: <20241219224116.3941496-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -52,84 +52,266 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Similar to other per-CPU profiling/debug features we handle, store the
-number of breakpoints/watchpoints in kvm_host_data to avoid reading the
-ID register 4 times on every guest entry/exit. And if you're in the
-nested virt business that's quite a few avoidable exits to the L0
-hypervisor.
+There is a nauseating amount of boilerplate for accessing the
+breakpoint and watchpoint registers. Fold everything together into a
+single set of accessors and select the right storage based on the sysreg
+encoding.
 
-Tested-by: James Clark <james.clark@linaro.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h         |  4 ++++
- arch/arm64/kvm/debug.c                    |  3 +++
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h | 17 ++++-------------
- 3 files changed, 11 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 197 +++++++++++++-------------------------
+ 1 file changed, 69 insertions(+), 128 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d48516de778d..e7c740c99ee3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -661,6 +661,10 @@ struct kvm_host_data {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index ed4adbf5a25e..d9c7911ec58a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -658,143 +658,78 @@ static void dbg_to_reg(struct kvm_vcpu *vcpu,
+ 	p->regval = (*dbg_reg & mask) >> shift;
+ }
  
- 	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
- 	unsigned int nr_event_counters;
+-static bool trap_bvr(struct kvm_vcpu *vcpu,
+-		     struct sys_reg_params *p,
+-		     const struct sys_reg_desc *rd)
+-{
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+-
+-	if (p->is_write)
+-		reg_to_dbg(vcpu, p, rd, dbg_reg);
+-	else
+-		dbg_to_reg(vcpu, p, rd, dbg_reg);
+-
+-	return true;
+-}
+-
+-static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 val)
+-{
+-	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm] = val;
+-	return 0;
+-}
+-
+-static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 *val)
+-{
+-	*val = vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+-	return 0;
++static u64 *demux_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
++{
++	struct kvm_guest_debug_arch *dbg = &vcpu->arch.vcpu_debug_state;
 +
-+	/* Number of debug breakpoints/watchpoints for this CPU (minus 1) */
-+	unsigned int debug_brps;
-+	unsigned int debug_wrps;
- };
++	switch (rd->Op2) {
++	case 0b100:
++		return &dbg->dbg_bvr[rd->CRm];
++	case 0b101:
++		return &dbg->dbg_bcr[rd->CRm];
++	case 0b110:
++		return &dbg->dbg_wvr[rd->CRm];
++	case 0b111:
++		return &dbg->dbg_wcr[rd->CRm];
++	default:
++		KVM_BUG_ON(1, vcpu->kvm);
++		return NULL;
++	}
+ }
  
- struct kvm_host_psci_config {
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 7d3c71d65518..d921e7f7bd59 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -71,6 +71,9 @@ void kvm_init_host_debug_data(void)
- 		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
- 							      read_sysreg(pmcr_el0));
+-static u64 reset_bvr(struct kvm_vcpu *vcpu,
+-		      const struct sys_reg_desc *rd)
++static bool trap_dbg_wb_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			    const struct sys_reg_desc *rd)
+ {
+-	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm] = rd->val;
+-	return rd->val;
+-}
++	u64 *reg = demux_wb_reg(vcpu, rd);
  
-+	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
-+	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
+-static bool trap_bcr(struct kvm_vcpu *vcpu,
+-		     struct sys_reg_params *p,
+-		     const struct sys_reg_desc *rd)
+-{
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
++	if (!reg)
++		return false;
+ 
+ 	if (p->is_write)
+-		reg_to_dbg(vcpu, p, rd, dbg_reg);
++		reg_to_dbg(vcpu, p, rd, reg);
+ 	else
+-		dbg_to_reg(vcpu, p, rd, dbg_reg);
++		dbg_to_reg(vcpu, p, rd, reg);
+ 
+ 	return true;
+ }
+ 
+-static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 val)
+-{
+-	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm] = val;
+-	return 0;
+-}
+-
+-static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 *val)
+-{
+-	*val = vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+-	return 0;
+-}
+-
+-static u64 reset_bcr(struct kvm_vcpu *vcpu,
+-		      const struct sys_reg_desc *rd)
++static int set_dbg_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			  u64 val)
+ {
+-	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm] = rd->val;
+-	return rd->val;
+-}
++	u64 *reg = demux_wb_reg(vcpu, rd);
+ 
+-static bool trap_wvr(struct kvm_vcpu *vcpu,
+-		     struct sys_reg_params *p,
+-		     const struct sys_reg_desc *rd)
+-{
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+-
+-	if (p->is_write)
+-		reg_to_dbg(vcpu, p, rd, dbg_reg);
+-	else
+-		dbg_to_reg(vcpu, p, rd, dbg_reg);
+-
+-	return true;
+-}
+-
+-static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 val)
+-{
+-	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm] = val;
+-	return 0;
+-}
++	if (!reg)
++		return -EINVAL;
+ 
+-static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 *val)
+-{
+-	*val = vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
++	*reg = val;
+ 	return 0;
+ }
+ 
+-static u64 reset_wvr(struct kvm_vcpu *vcpu,
+-		      const struct sys_reg_desc *rd)
+-{
+-	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm] = rd->val;
+-	return rd->val;
+-}
+-
+-static bool trap_wcr(struct kvm_vcpu *vcpu,
+-		     struct sys_reg_params *p,
+-		     const struct sys_reg_desc *rd)
++static int get_dbg_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			  u64 *val)
+ {
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+-
+-	if (p->is_write)
+-		reg_to_dbg(vcpu, p, rd, dbg_reg);
+-	else
+-		dbg_to_reg(vcpu, p, rd, dbg_reg);
++	u64 *reg = demux_wb_reg(vcpu, rd);
+ 
+-	return true;
+-}
++	if (!reg)
++		return -EINVAL;
+ 
+-static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 val)
+-{
+-	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm] = val;
++	*val = *reg;
+ 	return 0;
+ }
+ 
+-static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-		   u64 *val)
++static u64 reset_dbg_wb_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+ {
+-	*val = vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+-	return 0;
+-}
++	u64 *reg = demux_wb_reg(vcpu, rd);
+ 
+-static u64 reset_wcr(struct kvm_vcpu *vcpu,
+-		      const struct sys_reg_desc *rd)
+-{
+-	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm] = rd->val;
++	/*
++	 * Bail early if we couldn't find storage for the register, the
++	 * KVM_BUG_ON() in demux_wb_reg() will prevent this VM from ever
++	 * being run.
++	 */
++	if (!reg)
++		return 0;
 +
- 	if (has_vhe())
- 		return;
++	*reg = rd->val;
+ 	return rd->val;
+ }
  
-diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-index c14586d87361..502a5b73ee70 100644
---- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-@@ -106,12 +106,8 @@ static struct kvm_guest_debug_arch *__vcpu_debug_regs(struct kvm_vcpu *vcpu)
- static void __debug_save_state(struct kvm_guest_debug_arch *dbg,
- 			       struct kvm_cpu_context *ctxt)
- {
--	u64 aa64dfr0;
--	int brps, wrps;
--
--	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
--	brps = (aa64dfr0 >> 12) & 0xf;
--	wrps = (aa64dfr0 >> 20) & 0xf;
-+	int brps = *host_data_ptr(debug_brps);
-+	int wrps = *host_data_ptr(debug_wrps);
+@@ -1303,13 +1238,17 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+-	  trap_bvr, reset_bvr, 0, 0, get_bvr, set_bvr },		\
++	  trap_dbg_wb_reg, reset_dbg_wb_reg, 0, 0,			\
++	  get_dbg_wb_reg, set_dbg_wb_reg },				\
+ 	{ SYS_DESC(SYS_DBGBCRn_EL1(n)),					\
+-	  trap_bcr, reset_bcr, 0, 0, get_bcr, set_bcr },		\
++	  trap_dbg_wb_reg, reset_dbg_wb_reg, 0, 0,			\
++	  get_dbg_wb_reg, set_dbg_wb_reg },				\
+ 	{ SYS_DESC(SYS_DBGWVRn_EL1(n)),					\
+-	  trap_wvr, reset_wvr, 0, 0,  get_wvr, set_wvr },		\
++	  trap_dbg_wb_reg, reset_dbg_wb_reg, 0, 0,			\
++	  get_dbg_wb_reg, set_dbg_wb_reg },				\
+ 	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
+-	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
++	  trap_dbg_wb_reg, reset_dbg_wb_reg, 0, 0,			\
++	  get_dbg_wb_reg, set_dbg_wb_reg }
  
- 	save_debug(dbg->dbg_bcr, dbgbcr, brps);
- 	save_debug(dbg->dbg_bvr, dbgbvr, brps);
-@@ -124,13 +120,8 @@ static void __debug_save_state(struct kvm_guest_debug_arch *dbg,
- static void __debug_restore_state(struct kvm_guest_debug_arch *dbg,
- 				  struct kvm_cpu_context *ctxt)
- {
--	u64 aa64dfr0;
--	int brps, wrps;
+ #define PMU_SYS_REG(name)						\
+ 	SYS_DESC(SYS_##name), .reset = reset_pmu_reg,			\
+@@ -3523,18 +3462,20 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+  * None of the other registers share their location, so treat them as
+  * if they were 64bit.
+  */
+-#define DBG_BCR_BVR_WCR_WVR(n)						      \
+-	/* DBGBVRn */							      \
+-	{ AA32(LO), Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_bvr, NULL, n }, \
+-	/* DBGBCRn */							      \
+-	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_bcr, NULL, n },	      \
+-	/* DBGWVRn */							      \
+-	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_wvr, NULL, n },	      \
+-	/* DBGWCRn */							      \
+-	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_wcr, NULL, n }
 -
--	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
--
--	brps = (aa64dfr0 >> 12) & 0xf;
--	wrps = (aa64dfr0 >> 20) & 0xf;
-+	int brps = *host_data_ptr(debug_brps);
-+	int wrps = *host_data_ptr(debug_wrps);
+-#define DBGBXVR(n)							      \
+-	{ AA32(HI), Op1( 0), CRn( 1), CRm((n)), Op2( 1), trap_bvr, NULL, n }
++#define DBG_BCR_BVR_WCR_WVR(n)							\
++	/* DBGBVRn */								\
++	{ AA32(LO), Op1( 0), CRn( 0), CRm((n)), Op2( 4),			\
++	  trap_dbg_wb_reg, NULL, n },						\
++	/* DBGBCRn */								\
++	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_dbg_wb_reg, NULL, n },	\
++	/* DBGWVRn */								\
++	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_dbg_wb_reg, NULL, n },	\
++	/* DBGWCRn */								\
++	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_dbg_wb_reg, NULL, n }
++
++#define DBGBXVR(n)								\
++	{ AA32(HI), Op1( 0), CRn( 1), CRm((n)), Op2( 1),			\
++	  trap_dbg_wb_reg, NULL, n }
  
- 	restore_debug(dbg->dbg_bcr, dbgbcr, brps);
- 	restore_debug(dbg->dbg_bvr, dbgbvr, brps);
+ /*
+  * Trapped cp14 registers. We generally ignore most of the external
 -- 
 2.39.5
 
