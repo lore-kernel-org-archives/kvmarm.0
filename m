@@ -1,32 +1,32 @@
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A3C1C4A12
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 22:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4043F1C07CB
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 22:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734648123; cv=none; b=cKZ51pFJUuqWss19UFh8aXFIi876BpdIgjUhu4NnrJiouwxQuzZmk+Cirk1pzLaadd6ZSUCXo1y71HuquUQ4kaA8REKQO3n35NTjjhcmTVpHBzEouEJrNxJyMT0aEmCQOlDoI3e4VZ+XnkFJPMhyaeT73mj+kJ2Xm07Fh/qW0Lw=
+	t=1734648127; cv=none; b=VhAbO4jjWEWIe3meWGp2ElPXW+CpaDwEUWM8M80sWDQL/a6utqSygwhIajRY3hwZUxwwpI04qRsGjYE1amumHrUaZ7xlxVHL7dE9XX9XKqmkctuAdsCsa4ht0recxitySDKzLW0uQRxv9bYYyJNn8IiOApguuGJnRPD9zoHWr9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734648123; c=relaxed/simple;
-	bh=Zma8hIeMaHBe7F3Ej/i6pVV5V/d8WfVQ6FQozK2+4qc=;
+	s=arc-20240116; t=1734648127; c=relaxed/simple;
+	bh=9Q8fNPIOj61qGuuHmFP5tASUk53dsqoVFCMA43cC5fk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hee8AjQ6onRiKPwG1ARK7QwYuGNf5qOVVO8o90IoPMri1/WvGxeKG94IFMzNu3C/pATAaiXuV+/oGgR0I7FA5I2xjx6gqT4ZKiKkRr2WVtsKj456batdJnrbSmtwYKNK9j4uvOX8CdDtF7dq6PUqSC+xFCSw3Ovo6JYpO2PHCTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PqyKIrn2; arc=none smtp.client-ip=95.215.58.185
+	 MIME-Version:Content-Type; b=F0UNrOOmivJLax1wMJnEM2zhjBwoFEH51zxRQI3071ePrwZ8mGD+wMGD68o2HQz7LLlG0vZagtcbhtBiRJsurhEmhpy92FAjwAVhYhlvKAyW4iPs5kWeaSwNXyTsMQjxlMDKJwPdMR+tTUZrAVB1zKq/Neysgguvfx0j3+V6xqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wIuf/y1K; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PqyKIrn2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wIuf/y1K"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734648120;
+	t=1734648122;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HFhG0PWg6wqZP13GfTaeRLw4c/HffZWX07vhb8I/iXo=;
-	b=PqyKIrn26n9Tgcbooj8AkkyH0wnsO5EPzKHBhGwJo5VLXsKwYsffjb0NB6yNcm0sFatwkR
-	GdgDhuivYdYfvZvcvt2V0JFxv3hczyWUPKPM50y8R0f35RRewNuf/2Hm2GJkZXO/rvyWyQ
-	H1w/e+8W+zaPDkIU3oGqROpGY8mvb08=
+	bh=UyBWgI+X1eBVGu0tq7yluXxylXTwYGZsWdYU5Zmqfh8=;
+	b=wIuf/y1KjSO35QLGIq2p2g45FATCpthhCx8NTNG+6jBh1Qsa569rh4b8evCJKQSy/Gjzek
+	1RaGJTI7KZQjbVl0OLCfrFjUbWPWq5DM3BAy1mblvL3FjVbsK3sfjjAHu24XVaKhK5bC71
+	GtCLOIpBzzGjBuP4dtlZ4RnzBVRQG5k=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -38,9 +38,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	James Clark <james.clark@linaro.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 14/19] KVM: arm64: Don't hijack guest context MDSCR_EL1
-Date: Thu, 19 Dec 2024 14:41:11 -0800
-Message-Id: <20241219224116.3941496-15-oliver.upton@linux.dev>
+Subject: [PATCH v4 15/19] KVM: arm64: Manage software step state at load/put
+Date: Thu, 19 Dec 2024 14:41:12 -0800
+Message-Id: <20241219224116.3941496-16-oliver.upton@linux.dev>
 In-Reply-To: <20241219224116.3941496-1-oliver.upton@linux.dev>
 References: <20241219224116.3941496-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,218 +49,326 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Stealing MDSCR_EL1 in the guest's kvm_cpu_context for external debugging
-is rather gross. Just add a field for this instead and let the context
-switch code pick the correct one based on the debug owner.
+KVM takes over the guest's software step state machine if the VMM is
+debugging the guest, but it does the save/restore fiddling for every
+guest entry.
+
+Note that the only constraint on host usage of software step is that the
+guest's configuration remains visible to userspace via the ONE_REG
+ioctls. So, we can cut down on the amount of fiddling by doing this at
+load/put instead.
 
 Tested-by: James Clark <james.clark@linaro.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h          |  2 +-
- arch/arm64/kvm/debug.c                     | 73 +++++++++++-----------
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 39 ++++++++----
- 3 files changed, 64 insertions(+), 50 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  24 ++---
+ arch/arm64/kvm/arm.c              |   4 +-
+ arch/arm64/kvm/debug.c            | 151 ++++++++----------------------
+ arch/arm64/kvm/guest.c            |   2 +-
+ arch/arm64/kvm/handle_exit.c      |   2 +-
+ 5 files changed, 48 insertions(+), 135 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c630d59e7f4c..e7036096d9c2 100644
+index e7036096d9c2..d48516de778d 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -751,6 +751,7 @@ struct kvm_vcpu_arch {
- 	 */
- 	struct kvm_guest_debug_arch vcpu_debug_state;
- 	struct kvm_guest_debug_arch external_debug_state;
-+	u64 external_mdscr_el1;
+@@ -764,17 +764,6 @@ struct kvm_vcpu_arch {
+ 	struct arch_timer_cpu timer_cpu;
+ 	struct kvm_pmu pmu;
  
- 	enum {
- 		VCPU_DEBUG_FREE,
-@@ -771,7 +772,6 @@ struct kvm_vcpu_arch {
- 	 * are using guest debug.
- 	 */
- 	struct {
--		u32	mdscr_el1;
- 		bool	pstate_ss;
- 	} guest_debug_preserved;
+-	/*
+-	 * Guest registers we preserve during guest debugging.
+-	 *
+-	 * These shadow registers are updated by the kvm_handle_sys_reg
+-	 * trap handler if the guest accesses or updates them while we
+-	 * are using guest debug.
+-	 */
+-	struct {
+-		bool	pstate_ss;
+-	} guest_debug_preserved;
+-
+ 	/* vcpu power state */
+ 	struct kvm_mp_state mp_state;
+ 	spinlock_t mp_state_lock;
+@@ -924,12 +913,14 @@ struct kvm_vcpu_arch {
+ #define IN_WFIT			__vcpu_single_flag(sflags, BIT(1))
+ /* vcpu system registers loaded on physical CPU */
+ #define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(2))
+-/* Software step state is Active-pending */
+-#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(3))
++/* Software step state is Active-pending for external debug */
++#define HOST_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(3))
++/* Software step state is Active pending for guest debug */
++#define GUEST_SS_ACTIVE_PENDING __vcpu_single_flag(sflags, BIT(4))
+ /* PMUSERENR for the guest EL0 is on physical CPU */
+-#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(4))
++#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(5))
+ /* WFI instruction trapped */
+-#define IN_WFI			__vcpu_single_flag(sflags, BIT(5))
++#define IN_WFI			__vcpu_single_flag(sflags, BIT(6))
  
+ 
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+@@ -1341,9 +1332,8 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ 
+ void kvm_init_host_debug_data(void);
+-void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+-void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
++void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu);
+ void kvm_debug_set_guest_ownership(struct kvm_vcpu *vcpu);
+ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val);
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index ec581aeb41f9..563cd0b626b9 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -622,6 +622,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
++	kvm_vcpu_put_debug(vcpu);
+ 	kvm_arch_vcpu_put_fp(vcpu);
+ 	if (has_vhe())
+ 		kvm_vcpu_put_vhe(vcpu);
+@@ -1181,7 +1182,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 			continue;
+ 		}
+ 
+-		kvm_arm_setup_debug(vcpu);
+ 		kvm_arch_vcpu_ctxflush_fp(vcpu);
+ 
+ 		/**************************************************************
+@@ -1198,8 +1198,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * Back from guest
+ 		 *************************************************************/
+ 
+-		kvm_arm_clear_debug(vcpu);
+-
+ 		/*
+ 		 * We must sync the PMU state before the vgic state so
+ 		 * that the vgic can properly sample the updated state of the
 diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 900a63030fda..9426d0888e9f 100644
+index 9426d0888e9f..7d3c71d65518 100644
 --- a/arch/arm64/kvm/debug.c
 +++ b/arch/arm64/kvm/debug.c
-@@ -31,19 +31,12 @@
+@@ -3,7 +3,8 @@
+  * Debug and Guest Debug support
+  *
+  * Copyright (C) 2015 - Linaro Ltd
+- * Author: Alex Bennée <alex.bennee@linaro.org>
++ * Authors: Alex Bennée <alex.bennee@linaro.org>
++ * 	    Oliver Upton <oliver.upton@linux.dev>
   */
- static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
- {
--	u64 val = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+ 
+ #include <linux/kvm_host.h>
+@@ -14,35 +15,6 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_emulate.h>
+ 
 -
--	vcpu->arch.guest_debug_preserved.mdscr_el1 = val;
- 	vcpu->arch.guest_debug_preserved.pstate_ss =
- 					(*vcpu_cpsr(vcpu) & DBG_SPSR_SS);
+-/*
+- * save/restore_guest_debug_regs
+- *
+- * For some debug operations we need to tweak some guest registers. As
+- * a result we need to save the state of those registers before we
+- * make those modifications.
+- *
+- * Guest access to MDSCR_EL1 is trapped by the hypervisor and handled
+- * after we have restored the preserved value to the main context.
+- *
+- * When single-step is enabled by userspace, we tweak PSTATE.SS on every
+- * guest entry. Preserve PSTATE.SS so we can restore the original value
+- * for the vcpu after the single-step is disabled.
+- */
+-static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->arch.guest_debug_preserved.pstate_ss =
+-					(*vcpu_cpsr(vcpu) & DBG_SPSR_SS);
+-}
+-
+-static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+-{
+-	if (vcpu->arch.guest_debug_preserved.pstate_ss)
+-		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+-	else
+-		*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+-}
+-
+ /**
+  * kvm_arm_setup_mdcr_el2 - configure vcpu mdcr_el2 value
+  *
+@@ -91,89 +63,6 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+ 	preempt_enable();
  }
  
- static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
- {
--	u64 val = vcpu->arch.guest_debug_preserved.mdscr_el1;
+-/**
+- * kvm_arm_setup_debug - set up debug related stuff
+- *
+- * @vcpu:	the vcpu pointer
+- *
+- * This is called before each entry into the hypervisor to setup any
+- * debug related registers.
+- *
+- * Additionally, KVM only traps guest accesses to the debug registers if
+- * the guest is not actively using them. Since the guest must not interfere
+- * with the hardware state when debugging the guest, we must ensure that
+- * trapping is enabled whenever we are debugging the guest using the
+- * debug registers.
+- */
 -
--	vcpu_write_sys_reg(vcpu, val, MDSCR_EL1);
+-void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+-{
+-	unsigned long mdscr;
 -
- 	if (vcpu->arch.guest_debug_preserved.pstate_ss)
- 		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
- 	else
-@@ -156,36 +149,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
- 			else
- 				*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+-	trace_kvm_arm_setup_debug(vcpu, vcpu->guest_debug);
 -
--			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
--			mdscr |= DBG_MDSCR_SS;
--			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
--		} else {
--			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
--			mdscr &= ~DBG_MDSCR_SS;
--			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+-	/* Check if we need to use the debug registers. */
+-	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
+-		/* Save guest debug state */
+-		save_guest_debug_regs(vcpu);
+-
+-		/*
+-		 * Single Step (ARM ARM D2.12.3 The software step state
+-		 * machine)
+-		 *
+-		 * If we are doing Single Step we need to manipulate
+-		 * the guest's MDSCR_EL1.SS and PSTATE.SS. Once the
+-		 * step has occurred the hypervisor will trap the
+-		 * debug exception and we return to userspace.
+-		 *
+-		 * If the guest attempts to single step its userspace
+-		 * we would have to deal with a trapped exception
+-		 * while in the guest kernel. Because this would be
+-		 * hard to unwind we suppress the guest's ability to
+-		 * do so by masking MDSCR_EL.SS.
+-		 *
+-		 * This confuses guest debuggers which use
+-		 * single-step behind the scenes but everything
+-		 * returns to normal once the host is no longer
+-		 * debugging the system.
+-		 */
+-		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+-			/*
+-			 * If the software step state at the last guest exit
+-			 * was Active-pending, we don't set DBG_SPSR_SS so
+-			 * that the state is maintained (to not run another
+-			 * single-step until the pending Software Step
+-			 * exception is taken).
+-			 */
+-			if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+-				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+-			else
+-				*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
+-		}
+-	}
+-}
+-
+-void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+-{
+-	trace_kvm_arm_clear_debug(vcpu->guest_debug);
+-
+-	/*
+-	 * Restore the guest's debug registers if we were using them.
+-	 */
+-	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
+-		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+-			if (!(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
+-				/*
+-				 * Mark the vcpu as ACTIVE_PENDING
+-				 * until Software Step exception is taken.
+-				 */
+-				vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
 -		}
 -
--		/*
--		 * Enable breakpoints and watchpoints if userspace wants them.
--		 */
--		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
--			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
--			mdscr |= DBG_MDSCR_MDE;
--			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+-		restore_guest_debug_regs(vcpu);
+-	}
+-}
 -
--		/*
--		 * The OS Lock blocks debug exceptions in all ELs when it is
--		 * enabled. If the guest has enabled the OS Lock, constrain its
--		 * effects to the guest. Emulate the behavior by clearing
--		 * MDSCR_EL1.MDE. In so doing, we ensure that host debug
--		 * exceptions are unaffected by guest configuration of the OS
--		 * Lock.
--		 */
--		} else if (kvm_vcpu_os_lock_enabled(vcpu)) {
--			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
--			mdscr &= ~DBG_MDSCR_MDE;
--			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
- 		}
- 	}
- }
-@@ -231,6 +194,41 @@ void kvm_init_host_debug_data(void)
- 		host_data_set_flag(HAS_TRBE);
- }
- 
-+/*
-+ * Configures the 'external' MDSCR_EL1 value for the guest, i.e. when the host
-+ * has taken over MDSCR_EL1.
-+ *
-+ *  - Userspace is single-stepping the guest, and MDSCR_EL1.SS is forced to 1.
-+ *
-+ *  - Userspace is using the breakpoint/watchpoint registers to debug the
-+ *    guest, and MDSCR_EL1.MDE is forced to 1.
-+ *
-+ *  - The guest has enabled the OS Lock, and KVM is forcing MDSCR_EL1.MDE to 0,
-+ *    masking all debug exceptions affected by the OS Lock.
-+ */
-+static void setup_external_mdscr(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Use the guest's MDSCR_EL1 as a starting point, since there are
-+	 * several other features controlled by MDSCR_EL1 that are not relevant
-+	 * to the host.
-+	 *
-+	 * Clear the bits that KVM may use which also satisfies emulation of
-+	 * the OS Lock as MDSCR_EL1.MDE is cleared.
-+	 */
-+	u64 mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1) & ~(MDSCR_EL1_SS |
-+							   MDSCR_EL1_MDE |
-+							   MDSCR_EL1_KDE);
-+
-+	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
-+		mdscr |= MDSCR_EL1_SS;
-+
-+	if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW)
-+		mdscr |= MDSCR_EL1_MDE | MDSCR_EL1_KDE;
-+
-+	vcpu->arch.external_mdscr_el1 = mdscr;
-+}
-+
- void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
+ void kvm_init_host_debug_data(void)
  {
- 	u64 mdscr;
-@@ -253,6 +251,7 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
- 	 */
+ 	u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
+@@ -252,6 +141,22 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
  	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
  		vcpu->arch.debug_owner = VCPU_DEBUG_HOST_OWNED;
-+		setup_external_mdscr(vcpu);
+ 		setup_external_mdscr(vcpu);
++
++		/*
++		 * Steal the guest's single-step state machine if userspace wants
++		 * single-step the guest.
++		 */
++		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
++			if (*vcpu_cpsr(vcpu) & DBG_SPSR_SS)
++				vcpu_clear_flag(vcpu, GUEST_SS_ACTIVE_PENDING);
++			else
++				vcpu_set_flag(vcpu, GUEST_SS_ACTIVE_PENDING);
++
++			if (!vcpu_get_flag(vcpu, HOST_SS_ACTIVE_PENDING))
++				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
++			else
++				*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
++		}
  	} else {
  		mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
  
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index a998b2f6abcb..76ff095c6b6e 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -18,9 +18,34 @@
- 
- static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
- 
-+static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
-+{
-+	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
-+
-+	if (!vcpu)
-+		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
-+
-+	return vcpu;
-+}
-+
-+static inline bool ctxt_is_guest(struct kvm_cpu_context *ctxt)
-+{
-+	return host_data_ptr(host_ctxt) != ctxt;
-+}
-+
-+static inline u64 *ctxt_mdscr_el1(struct kvm_cpu_context *ctxt)
-+{
-+	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
-+
-+	if (ctxt_is_guest(ctxt) && kvm_host_owns_debug_regs(vcpu))
-+		return &vcpu->arch.external_mdscr_el1;
-+
-+	return &ctxt_sys_reg(ctxt, MDSCR_EL1);
-+}
-+
- static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- {
--	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-+	*ctxt_mdscr_el1(ctxt)	= read_sysreg(mdscr_el1);
- 
- 	// POR_EL0 can affect uaccess, so must be saved/restored early.
- 	if (ctxt_has_s1poe(ctxt))
-@@ -33,16 +58,6 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
+@@ -264,6 +169,26 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
+ 	kvm_arm_setup_mdcr_el2(vcpu);
  }
  
--static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
--{
--	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
--
--	if (!vcpu)
--		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
--
--	return vcpu;
--}
--
- static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
- {
- 	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
-@@ -139,7 +154,7 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
++void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu)
++{
++	if (likely(!(vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
++		return;
++
++	/*
++	 * Save the host's software step state and restore the guest's before
++	 * potentially returning to userspace.
++	 */
++	if (!(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
++		vcpu_set_flag(vcpu, HOST_SS_ACTIVE_PENDING);
++	else
++		vcpu_clear_flag(vcpu, HOST_SS_ACTIVE_PENDING);
++
++	if (vcpu_get_flag(vcpu, GUEST_SS_ACTIVE_PENDING))
++		*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
++	else
++		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
++}
++
+ /*
+  * Updates ownership of the debug registers after a trapped guest access to a
+  * breakpoint/watchpoint register. Host ownership of the debug registers is of
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 1fe097c67766..2196979a24a3 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -924,7 +924,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
  
- static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
--	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
-+	write_sysreg(*ctxt_mdscr_el1(ctxt),  mdscr_el1);
+ 	if (!(dbg->control & KVM_GUESTDBG_ENABLE)) {
+ 		vcpu->guest_debug = 0;
+-		vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
++		vcpu_clear_flag(vcpu, HOST_SS_ACTIVE_PENDING);
+ 		return 0;
+ 	}
  
- 	// POR_EL0 can affect uaccess, so must be saved/restored early.
- 	if (ctxt_has_s1poe(ctxt))
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index d7c2990e7c9e..1e302f0c8903 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -193,7 +193,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+ 		run->debug.arch.far = vcpu->arch.fault.far_el2;
+ 		break;
+ 	case ESR_ELx_EC_SOFTSTP_LOW:
+-		vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
++		*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+ 		break;
+ 	}
+ 
 -- 
 2.39.5
 
