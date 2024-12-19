@@ -1,193 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069A219F128
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 17:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA0F1A2541
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 18:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734630725; cv=none; b=kdD5HNTJZFf1fO0XnoNlTiKYOVCicOJ5IMZQ6eufyZARmY3rOhtB0vqBOU/NAjCDOBIS1R1qChIXegWEBu8ccwHdp6Z+sFBHBaar1Q6xHvtDdq1MF9WPAP4CB8UmXbO4ZSHU8n8r3XAx/04Q9N4BJc1htQMIdM8kN8O6xFUpAtI=
+	t=1734631233; cv=none; b=eal0Lfvx0Rl7Yoo73M8Xp+QSw5Lx3oFURtnXVYOQPZ5I1yWtmbBO0NYYwsh9MBGZTLguhNhPlkHvI55fCjXcTRjJPoUEMtwcenKPusg1cUYxNNbabQ8A5KruzQVHCaQwUXWzTZ9vpC2Z6mIZWBqhtZE90xxgvmvAk7zdHg2k4Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734630725; c=relaxed/simple;
-	bh=2EJfJbKHQeZ9DBkX7O0UaxEoLhF8GIg0BsjIK9Ov9xc=;
+	s=arc-20240116; t=1734631233; c=relaxed/simple;
+	bh=Ik9ilDqzlZi04w0XI4iZPeRl831EgOFTBdme0lMBhxA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uIlUdUI8S0p3RVgmuuINs3x1XzQbyJOSyYrxMePLO493PbQjXRjVsdkCRH/m6hGN0Kwro+cifUuqYfHNaHe1l0/+w0oEOxvPbWz49ep2Mf6UZPduQI06FRmV6MXMOoLHyfc34wDBwJSKJo6aMajVcnrDjgFVTruItNh/4N+8tlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PeiU41tE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=WOCces/vc71StGaf759fYbqkQb+tjZBzoO76rO56sgKXYO+AqZ1kyI/+3XO8YjuNYZU3432YnoUuoOWMrg46/BR29RPKLyM/6DPxyPmEdoGY7BaRNyY/vGaBHAreYlzwULwSvbn8PhZ6a74m3eFSinpwbsXpVy/g8wBqexQqR+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f2F+kiVV; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeiU41tE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734630722;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f2F+kiVV"
+Date: Thu, 19 Dec 2024 10:00:24 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734631229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/65f699+zP0hxZzXVK7O5ivtKVynSZ4cs9bwdZ4NyD0=;
-	b=PeiU41tEoC/UEQ95sHNB4wzZh2qpxXZHBVgkPbLQHcscbk13r8Spyv8O53+BrpaSRwYyNV
-	bpzwhqGYx8Ey0iSpJ65sMj2pEBpfpDyI8h/o94VnTUdXZBhxZRU0obssk23DlzMQLrymm0
-	hEKUayFP+tuja3clFjh95xRYpoIIXHs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-127-e4tCeR3XMtKyv4rSvegFPA-1; Thu,
- 19 Dec 2024 12:51:59 -0500
-X-MC-Unique: e4tCeR3XMtKyv4rSvegFPA-1
-X-Mimecast-MFC-AGG-ID: e4tCeR3XMtKyv4rSvegFPA
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51B0419560B7;
-	Thu, 19 Dec 2024 17:51:56 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.54])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C4A9019560A2;
-	Thu, 19 Dec 2024 17:51:47 +0000 (UTC)
-Date: Thu, 19 Dec 2024 17:51:44 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	bh=T+KW5Z1SyjnwC2CV1KePHdgbc9vFX6WqdnGxoiX2XlQ=;
+	b=f2F+kiVV81s0egQBc1Suh5x3DpT1qpgURzOe4Z280N+7Mqr7tFk4lmJWA1PaXu/LOoqvYW
+	dkxk30BNebH6B3ejDpO4Sg9onFCmQp56yEzuYWk1nsnIFH8PIELYTcko1UNvWYzO2JYpYG
+	M8H5zaWyAcuKkrlSwVSm2bpslHpxAN0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
-	qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org, richard.henderson@linaro.org,
-	alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
-	abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com,
-	mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64
- KVM host model
-Message-ID: <Z2RdMJHydsvPpmdH@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20241206112213.88394-1-cohuck@redhat.com>
- <edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
- <Z1qoa8yXscTSAJ9e@redhat.com>
- <8734it1bv6.fsf@redhat.com>
- <1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
- <Z2QE9AqZnpGM5sWD@gezellig>
- <8634ijrh8q.wl-maz@kernel.org>
- <Z2Q2rWj9cV0W_XVq@gezellig>
- <86zfkrptmj.wl-maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	James Clark <james.clark@linaro.org>
+Subject: Re: [PATCH v3 12/16] KVM: arm64: Compute MDCR_EL2 at vcpu_load()
+Message-ID: <Z2RfONQgWszZBBJx@linux.dev>
+References: <20241209180926.2161373-1-oliver.upton@linux.dev>
+ <20241209180926.2161373-13-oliver.upton@linux.dev>
+ <86ed24rg0h.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <86zfkrptmj.wl-maz@kernel.org>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <86ed24rg0h.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Dec 19, 2024 at 03:41:56PM +0000, Marc Zyngier wrote:
-> On Thu, 19 Dec 2024 15:07:25 +0000,
-> Kashyap Chamarthy <kchamart@redhat.com> wrote:
-> > 
-> > On Thu, Dec 19, 2024 at 12:26:29PM +0000, Marc Zyngier wrote:
-> > > On Thu, 19 Dec 2024 11:35:16 +0000,
-> > > Kashyap Chamarthy <kchamart@redhat.com> wrote:
-> > 
-> > [...]
-> > 
-> > > > Consider this:
-> > > > 
-> > > > Say, there's a serious security issue in a released ARM CPU.  As part of
-> > > > the fix, two new CPU flags need to be exposed to the guest OS, call them
-> > > > "secflag1" and "secflag2".  Here, the user is configuring a baseline
-> > > > model + two extra CPU flags, not to get close to some other CPU model
-> > > > but to mitigate itself against a serious security flaw.
-> > > 
-> > > If there's such a security issue, that the hypervisor's job to do so,
-> > > not userspace. 
-> > 
-> > I don't disagree.  Probably that has always been the case on ARM.  I
-> > asked the above based on how QEMU on x86 handles it today.
-> > 
-> > > See what KVM does for CSV3, for example (and all the
-> > > rest of the side-channel stuff).
-> > 
-> > Noted.  From a quick look in the kernel tree, I assume you're referring
-> > to these commits[1].
-> > 
-> > > You can't rely on userspace for security, that'd be completely
-> > > ludicrous.
-> > 
-> > As Dan Berrangé points out, it's the bog-standard way QEMU deals with
-> > some of the CPU-related issues on x86 today.  See this "important CPU
-> > flags"[2] section in the QEMU docs.
+On Wed, Dec 18, 2024 at 06:40:46PM +0000, Marc Zyngier wrote:
+> On Mon, 09 Dec 2024 18:09:22 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > @@ -288,6 +270,12 @@ void kvm_debug_set_guest_ownership(struct kvm_vcpu *vcpu)
+> >  
+> >  	WARN_ON_ONCE(vcpu->arch.debug_owner == VCPU_DEBUG_GUEST_OWNED);
+> >  	vcpu->arch.debug_owner = VCPU_DEBUG_GUEST_OWNED;
+> > +
+> > +	preempt_disable();
+> > +	kvm_arm_setup_mdcr_el2(vcpu);
+> > +	if (has_vhe())
+> > +		write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> > +	preempt_enable();
 > 
-> I had a look, and we do things quite differently. For example, the
-> spec-ctrl equivalent in implemented in FW and in KVM, and is exposed
-> by default if the HW is vulnerable. Userspace could hide that the
-> mitigation is there, but that's the extent of the configurability.
+> I'm not confident that the preemption_disable() does anything.
+> Specially given that it doesn't include setting the ownership as part
+> of the critical section. So if that works at it is now, then the
+> critical section is pointless.
 
-Whether it is enabled by default or disabled by default isn't a
-totally fatal problem. If QEMU can toggle it to the opposite value,
-we have the same level of configurability in both cases.
+We use percpu data to construct mdcr_el2, so disabling preemption
+ensures that we use the right copy + stick mdcr in the right CPU.
 
-It does, however, have implications for QEMU as if KVM gained support
-for exposing the new feature by default and QEMU didn't know about
-it, then the guest ABI would have changed without QEMU realizing it.
+But point taken about guest ownership, nothing stops preemption from
+blowing away the GUEST_OWNED state.
 
-IOW, it would imply a requirement for timely QEMU updates to match
-the kernel, which is something we wouldn't need in x86 world where
-the feature is disabled by default. Disable by default is a more
-stable approach from QEMU's POV.
+> I also find it rather fragile that we have multiple places where we
+> write MDCR_EL2, and I would love this to go for good. Any idea?
 
-> > Mind you, I'm _not_ saying this is how ARM should do it.  I don't know
-> > enough about ARM to make such remarks.
-> > 
-> >     * * *
-> > 
-> > To reply to your other question on this thread[3] about "which ABI?"  I
-> > think Dan is talking about the *guest* ABI: the virtual "chipset" that
-> > is exposed to a guest (e.g. PCI(e) topology, ACPI tables, CPU model,
-> > etc).  As I understand it, this "guest ABI" should remain predictable,
-> > regardless of:
-> > 
-> >   - whether you're updating KVM, QEMU, or the underlying physical
-> >     hardware itself; or
-> >   - if the guest is migrated, live or offline
-> > 
-> > (As you might know, QEMU's "machine types" concept allows to create a
-> > stable guest ABI.)
-> 
-> All of this is under control of QEMU, *except* for the "maximum" of
-> the architectural features exposed to the guest. All you can do is
-> *downgrade* from there, and only to a limited extent.
-> 
-> That, in turn has a direct impact on what you call the "CPU model",
-> which for the ARM architecture really doesn't exist. All we have is a
-> bag of discrete features, with intricate dependencies between them.
-> 
-> Even ignoring virtualisation: you can readily find two machines using
-> the same CPUs (let's say Neoverse-N1), integrated by the same vendor
-> (let's say, Ampere), in SoCs that bear the same name (Altra), and
-> realise that they have a different feature set. Fun, isn't it?
+Totally agree, that was at least one of the motivators for this series
+originally. For v4 I'm planning to hoist the preempt_disable() + programming
+of MDCR_EL2 into kvm_arm_setup_mdcr_el2(), which would be shared w/
+vcpu_load() and hide the details of how MDCR gets set up.
 
-"Fun" is probably not the word I'd pick :-)
+I still want us to have a way of reconfiguring MDCR_EL2 on the fly to
+lazily restore the debug registers without going through an entire
+put/load. I'm thinking that eventually we can do the same thing for the
+PMU when Colton + co have partitioned PMU support worked out.
 
-> That's why I don't see CPU models as a viable thing in terms of ABI.
-> They are an approximation of what you could have, but the ABI is
-> elsewhere.
-
-Right, this makes life quite challenging for QEMU. The premise of named
-CPU models (as opposed to -host), is to facilitate the migration of VMs
-between heterogenous hardware platforms. That assumes it is possible to
-downgrade the CPU on both src + dst, to the common baseline you desire.
-
-If we were to define a named CPU model, for that to be usable, QEMU
-would have to be able to query the "maxmimum" architectural features,
-and validate that the delta between the host maximum, and the named
-CPU model is possible to downgrade. Is arm providing sufficient info
-to let QEMU do that ?
-
-With regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Thanks,
+Oliver
