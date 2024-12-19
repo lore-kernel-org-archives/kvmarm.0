@@ -1,112 +1,149 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4855223C6A
-	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 11:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445F6223C67
+	for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 11:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734607736; cv=none; b=LO2O/QW8i3iOthBwctw4VqfRVWtYZ/AP9fywsSjRK5I56n3Zk+r01+t/0ofqP9CLYPNZAWLv2ax0Xxs7Q201QUZpRg062zTRnpIknVVEEJToQ1ACGYuDvqCl1ZYBqRZslwfSWdQS0t9X0IlRBgVz9gnH4C95hz0P6suCVFYEp7o=
+	t=1734608138; cv=none; b=f51WTDEDvprEYCihWM3oeV/RD61sRviJyFnXSwlOfZJ2jj55yJCptTiiMT1++4odfoO8G4/PA9rssE00i9ZDabHc5qhxd4HoFF5/rdbKIbRKtmDiPW2nW9fcIvxLpooDvRhmOYUXOcWo5+4J+hB0+2sJwT2jU8PtHk8tqhGiaUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734607736; c=relaxed/simple;
-	bh=wYKv/Dx2yzx4NRTRmlHoRaJNN2B+pKE2rkXs/FSqNo4=;
+	s=arc-20240116; t=1734608138; c=relaxed/simple;
+	bh=h+tW40KPLTVaK3ARl1ZR83pVvbmYhQqTxWDIo9cbeak=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YDZfFRHImeGTs5BL4So5fFbrxZews/M70uh23LEWd+9ofLVROV0lFRY2fB3AYOw5Asn5fV1O49/EsC1yJvHtxBURCzo5+hcFYOO35KAS+Iz80TSW0MQttcgpQPH5I/Ro23awkt2uqJvK8zu7JVCBngMbQMRTFzRGNx3yOBuKBY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=op5R8iBf; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJkECa2Xg0IJt8yj7IsPr9i8tOURiLjwoFFgO/XuAtT5E1OBM1ugC03dqD+Z9CxHAX6yIS4cVT1FZHMp0Wruot4efM013Wi+4xIQyypk/JP7AlfBgM0qJX2ZY+UxCmJrv+aD8VZxL9CLctFyDh9alHXRFtKxFqWG7l9VxjLya70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fFU+6lpl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="op5R8iBf"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3f57582a2so3203757a12.1
-        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 03:28:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734607731; x=1735212531; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+efOnqODR5XSbllpBxRT6OF6WIdT5YO+sNBFdgpMN8Y=;
-        b=op5R8iBfS7BCVAexGHKqtgC+D3noXl8r3fDfDZ91Zi9VtVi/l0VaNZc0+q22sPhCry
-         zWpAf5nVQKqaDH3QrGzuDiTYWQFPeSA3MKTJigM/SymqBKQ1tWubmmF8WXcb2Y0Xa471
-         drT6ZUulcakFrubTmheK6QdAHy69eZDdojEV92tary84RARLUAs16O7CdFTaUkXfp0rb
-         ao2nw+7M7wT3NhPz9b2OWa5p8LleXbXrOKEUnXy70zLG+GqBn5heCxOy0suVTyq5qQc5
-         pA9t8tmxOZV1DtQvLIP+mJAWscsFUuDLd4BKzG8VJKSlCJkUOJYKY0cu6RQsbIsm4Q5N
-         w9XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734607731; x=1735212531;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+efOnqODR5XSbllpBxRT6OF6WIdT5YO+sNBFdgpMN8Y=;
-        b=H7tfjZRQ6JOUDyOYxHrW7Bly3pSw0Pb9HveQibU8y9UYgxwxFbgX4q+aGi9zte3aB7
-         TztKK8T2PYD/Zt89T0QiD7J/rmEBRkUeJ1quHFChBo4KJrlQ9gwBHqh+rZkZt7LosbWG
-         kquNXhfw7pm59rZneDB8NQOchooPzyNfSFeYQ+0qfBMwgdsPPVdTHlkc/1di4e0rHWiI
-         xPOmKbDU8Xav9O7SdH09fQNZaJa/17BKJk6wmzeXEb+vCm8UGwe78zxBasULlPetV6Hv
-         46e8FLUr8WZRPujo3O3ZheCNmaxC7zPfMY3xNdNcLd2WTIOcFvYGQq0Hm7WJTEIETCll
-         f1RA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6vpRfCxmcZXU3peEwgGQdxvviKbbVm5dX3QJbNBR/DfwttT/sNedx8XMG+w0RZ4FSZrjG+Vg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwFK/kHSohl1WKqQIxGw6f5jLU6wNd/l8zUAxoqESYDloWApt/F
-	xWQlRA7kcnqhUN0C5wTbnS9z+dT4RDu5JzTJVgAtpayk02JYPlySwIHQT1ruXg==
-X-Gm-Gg: ASbGncsXn3Ejx/PwIT4FhQx5NjqfY9pr9mXMldmYWAbRNWUHiaK9qOtx1NDzhidhMEn
-	1XoQOSwrVlfhWCRi+m97NXTQ3506C3WBK9M88q1cgnNtKyd/sLzJ9YEJyAXKw/yZB30ohHqLKKd
-	wKJmqUesftGaj25RTKwqPcxP1zfRMohk+SRbswIVT0QN9UYwFOlCv0o3vvVOZ3zR9V0TxrvLpX7
-	WyEi0INPKmsXtVINMgdNkKUvs2MyP+MyHT88snwrkF4QdcM62OzDVuMTe2U4WM1q0fxfLTtniyd
-	Pd/0bVdDRjvO9K8=
-X-Google-Smtp-Source: AGHT+IG3dsXDyN2H9c+ztZK9RDs7OlGyiKmp55kArM+zF0vJy/3UJNS0k2iPLxglWUvLs+MgvKzUiA==
-X-Received: by 2002:a17:906:308c:b0:aa6:abe7:ff49 with SMTP id a640c23a62f3a-aac08187acdmr234318566b.16.1734607731259;
-        Thu, 19 Dec 2024 03:28:51 -0800 (PST)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e82f58asm55970766b.39.2024.12.19.03.28.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 03:28:50 -0800 (PST)
-Date: Thu, 19 Dec 2024 11:28:48 +0000
-From: Quentin Perret <qperret@google.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, robdclark@gmail.com, joro@8bytes.org,
-	robin.murphy@arm.com, jean-philippe@linaro.org, jgg@ziepe.ca,
-	nicolinc@nvidia.com, vdonnefort@google.com, tabba@google.com,
-	danielmentz@google.com, tzukui@google.com
-Subject: Re: [RFC PATCH v2 11/58] KVM: arm64: pkvm: Add pkvm_udelay()
-Message-ID: <Z2QDcODuqcJojTpG@google.com>
-References: <20241212180423.1578358-1-smostafa@google.com>
- <20241212180423.1578358-12-smostafa@google.com>
- <Z2QADxbdoYi5q9iT@google.com>
- <Z2QBxPyBsxGNSuzT@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFU+6lpl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734608134;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yq+VKCJRuzaPj/tEAEpk5ad2XnMB+1nVIjSVaI1/maE=;
+	b=fFU+6lpleO1BQx+GMA/r8dsE8cgX5ONgl3pQo0YYPwxlWVO27/9ZTbR4Ma/2plLEDy8ZWl
+	bQAa7OmYd5r82v6RnHxPCJK10tk3IUdIst7dg/9/h/4rqfNYHDoxQ048sp0Ft8/UP9bYmD
+	bTojnNZP2lUq2F1j4JG0NrNGHoYbkRo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-365-6TGaY4NcOJSmusE8GbInrg-1; Thu,
+ 19 Dec 2024 06:35:32 -0500
+X-MC-Unique: 6TGaY4NcOJSmusE8GbInrg-1
+X-Mimecast-MFC-AGG-ID: 6TGaY4NcOJSmusE8GbInrg
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3678719560B3;
+	Thu, 19 Dec 2024 11:35:29 +0000 (UTC)
+Received: from gezellig (unknown [10.39.193.32])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED11630044C1;
+	Thu, 19 Dec 2024 11:35:20 +0000 (UTC)
+Date: Thu, 19 Dec 2024 12:35:16 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	eric.auger.pro@gmail.com, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org, richard.henderson@linaro.org,
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+	shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64
+ KVM host model
+Message-ID: <Z2QE9AqZnpGM5sWD@gezellig>
+References: <20241206112213.88394-1-cohuck@redhat.com>
+ <edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
+ <Z1qoa8yXscTSAJ9e@redhat.com>
+ <8734it1bv6.fsf@redhat.com>
+ <1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z2QBxPyBsxGNSuzT@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thursday 19 Dec 2024 at 11:21:40 (+0000), Mostafa Saleh wrote:
-> On Thu, Dec 19, 2024 at 11:14:23AM +0000, Quentin Perret wrote:
-> > On Thursday 12 Dec 2024 at 18:03:35 (+0000), Mostafa Saleh wrote:
-> > > From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > 
-> > > Add a simple delay loop for drivers.
-> > > 
-> > > This could use more work. It should be possible to insert a wfe and save
-> > > power, but I haven't studied whether it is safe to do so with the host
-> > > in control of the event stream. The SMMU driver will use wfe anyway for
-> > > frequent waits (provided the implementation can send command queue
-> > > events).
-> > 
-> > Mooh, I'm thoroughly hating that we need this -- pKVM is non preemptible
-> > so we better not wait for too long.
-> > 
-> > I can surely figure it out from the following patches, but could you
-> > please expand on the use-case?
+On Thu, Dec 12, 2024 at 11:04:30AM +0100, Eric Auger wrote:
+
+Hi Eric,
+
+> On 12/12/24 10:36, Cornelia Huck wrote:
+> > On Thu, Dec 12 2024, Daniel P. Berrangé <berrange@redhat.com> wrote:
+
+[...]
+
+> >> Consider you mgmt app wants to set a CPU model that's common across
+> >> heterogeneous hardware. They don't neccessarily want/need to be
+> >> able to live migrate between heterogeneous CPUs, but for simplicity
+> >> of configuration desire to set a single named CPU across all guests,
+> >> irrespective of what host hey are launched on. The ARM spec baseline
+> >> named models would give you that config simplicity.
+> > If we use architecture extensions (i.e. Armv8.x/9.x) as baseline, I'm
+> > seeing some drawbacks:
+> > - a lot of work before we can address some specific use cases
+> > - old models can get new optional features
+> > - a specific cpu might have a huge set of optional features on top of
+> >   the baseline model
+> >
+> > Using a reference core such as Neoverse-V2 probably makes more sense
+> > (easier to get started, less feature diff?) It would still make a good
+> > starting point for a simple config.
+> >
+> Actually from a dev point of view I am not sure it changes much to have
+> either ARM spec rev baseline or CPU ref core named model.
 > 
-> The driver needs to poll some SMMU MMIO, so it needs to measure time
-> in terms of udelay to timeout, at the moment its arbitrary set to 100ms.
+> One remark is that if you look at
+> https://developer.arm.com/documentation/109697/2024_09?lang=en
+> you will see there are quite a lot of spec revisions and quite a few of
+> them are actually meaningful in the light of currently avaiable and
+> relevant HW we want to address. What I would like to avoid is to be
+> obliged to look at all of them in a generic manner while we just want to
+> address few cpu ref models.
+> 
+> Also starting from the ARM spec rev baseline the end-user may need to
+> add more feature opt-ins to be close to a specific cpu model. So I
+> foresee extra complexity for the end-user.
 
-OK, I'll look at the patches to see how hard it'd be to return to the
-host for scheduling while this is happening. It's probably hard because
-we're presumably in a funky state, but it's worth trying to figure it
-out. Any EL2 section longer than 100us or so is problematic in my view,
-so a 100*ms* timeout is scary!
+(Assuming I'm parsing your last para right; correct me if not.)
+
+Isn't a user wanting to add extra CPU flags (on top of a baseline) a
+"normal behaviour" and not "extra complexity"?  Besides coming close to
+a specific CPU model, there's the additional important use-case of CPU
+flags that provide security mitigation.
+
+Consider this:
+
+Say, there's a serious security issue in a released ARM CPU.  As part of
+the fix, two new CPU flags need to be exposed to the guest OS, call them
+"secflag1" and "secflag2".  Here, the user is configuring a baseline
+model + two extra CPU flags, not to get close to some other CPU model
+but to mitigate itself against a serious security flaw.
+
+An example that comes to mind is the infamous "speculative store bypass"
+(SSB) vulnerability and how QEMU addressed it[1][2] in x86.  I'm sure,
+as you know, it also affects ARM[3].
+
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04796.html
+    — i386: define the 'ssbd' CPUID feature bit (CVE-2018-3639)
+
+[2] https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04797.html
+    — i386: Define the Virt SSBD MSR and handling of it (CVE-2018-3639)
+
+[3] https://developer.arm.com/documentation/ddi0601/2024-06/AArch64-Registers/SSBS--Speculative-Store-Bypass-Safe
+
+-- 
+/kashyap
+
