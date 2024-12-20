@@ -1,57 +1,57 @@
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A02E566A
-	for <kvmarm@lists.linux.dev>; Fri, 20 Dec 2024 01:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C8F13AA35
+	for <kvmarm@lists.linux.dev>; Fri, 20 Dec 2024 01:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734658758; cv=none; b=rRKQAYevEwm6DKc9N3cqPeCz38zikung+37cvab1Y4/ghR3aWGZcMTj3nk6Gy5TeHgDiwYRAdLSR7VLy5442eHCRfLVP1B5faWqi/r3bkVpqROMrPAwBnVyFoFLZjxNFTNh0Z7CbL2+wUsFtMXYQjQx943rZsFpNJymdnCa6Ytk=
+	t=1734658759; cv=none; b=R3/8z+Js8iILo+7ayyQBQ+GVHNH1vLrLzo9X9gc2Y4/lJ9+SfgBrLSSL2gCYEg6VdFoCyHvvPOQmPD9TOn208E8+NhbI1Ngk/fJuhCjt2mccuI2DjJd2BSs5UDTuqPq/HGmg3JsBtBpbshm3F/1b6H9NKjtPACg0ovTx5CEUoJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734658758; c=relaxed/simple;
-	bh=cdYoQmC1gHgaq22PDsiZGCRoGD7RLzRK9PeAtDWgW1s=;
+	s=arc-20240116; t=1734658759; c=relaxed/simple;
+	bh=eeF/zKkticJHl5FU2ydo7jdEXM5cm9h9vTJoDSn8JMo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=STMO3E9c9OZOGNXmWAUYlkKZGsVI5g0OJu3T+Y8xaOcdlZBehy9Cx7cpL2YF7TYgIU26o99pA+Kg7pSP3jw/ABgTQxksK5bBZvIFjaUzijCqZa/yxLbMUFOi4Yiytp/1Bo9ErWMtSilM/+K0y1nGBaLsokTRacKkjQeWMSZpstU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3a12RHDz; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=fJ04J+v8vNilSBVOU4gTd8ElyqMFh4ORWdl3k9EuESyU1kJdEIhZdSjR/01Q1UjDB2gwCUT7cm3VDPQxbOQO9unv3BbAOy7a/qq9uPJK3csiSJDLWZ9LC3WOo581Y8PgKUTNSVEZkjWO9fy+s/lrbrYrirctaMS1aMacGZWsF5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x30kfg+E; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3a12RHDz"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-801d5add29eso935643a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 17:39:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x30kfg+E"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-8019f05c629so1485976a12.2
+        for <kvmarm@lists.linux.dev>; Thu, 19 Dec 2024 17:39:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734658755; x=1735263555; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1734658757; x=1735263557; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=FOB7JN0OSt2j8FiVppNC5qzgljC2YrzarOO3DmltLC8=;
-        b=3a12RHDzQdqGAyKaIgutLcD9zbb0L48ygf7SnGHEx5Cj/NfLdgRovh09E4WBQsffxc
-         ZQMDDc2fmHIipRdrfUKy/gxf7sieb9Yt5dLnoe6TZe0/oV/IvYz24xSPal6TEagECahF
-         r7XfrsbNoksYi2CJsRPBNUdpc19SBR7huySKlEzPYXVmnIwgc37ZzCDWvzA5V0ZDQCbp
-         IHeRBWawOoqeuDfoj2bDZ2Rnzme3ymRT3fL0XzNlzBI0rFt1mij9pIuTekPKAKOFiKs2
-         Hm8lfvmxNn3CUL2AOVgXSJ+Ms0J9EUEE/d8EvflLkiyrN7gZnwGKZB2ht3PtDJcPefbT
-         uHnA==
+        bh=lQGXs4fRzhUjC9h6471rkcBzWgIFKg5z0MpBCPWHmMU=;
+        b=x30kfg+E+oEfcTAPRj0M+zVxJvwdrL8OhvHZMxdbrx49u67xQ/GnE3ApwkjZnPCb3G
+         QGVp4r3MYm9PjOmfXEunCwClS13BrXjGaeDURJgV0Wq7rzRWLBtkWMfaNS9ioIciwYCB
+         EinqpGjXYjdOgSaXJh8uOmYKs+b0/nfXA/KnQEFdPlaAfJ6oXHxQemuZbpUPpFkHxlqC
+         LMdDOqVL4EAHXtTE6EB/21lbMsBzvgett3SgNHLJ+0F9fGioofO4kY8cF0Fn85iqg/9o
+         e0rUEaVrly/WWYhG5f64fv1VwMbWGSO7o/LKIS1X2RyzSZIMszEBOMETbeiBdZSDfSl9
+         FFgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734658755; x=1735263555;
+        d=1e100.net; s=20230601; t=1734658757; x=1735263557;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FOB7JN0OSt2j8FiVppNC5qzgljC2YrzarOO3DmltLC8=;
-        b=VaERsOXNNLcsPIuFE8R8CBruM/IwALTaOoKX1/T4xBvMzPP+ABp++7d8ENpBRFjuT3
-         MaPBOIuOy1eeYoGOuj+GjJBnYj9rtoDUhTqnx4IdxoIrAmrSyQUIqst/+Fv5lZtIx6y5
-         je6c6RoYa6Eb7IZspe+XPssG+fkIV8hUga47ur/uJI58r7iSvfP+dGv71CZLQP1GZbUt
-         i/v8bT6/0PawFIKiGzh9smw5mOVRvvqC/kYb+InPmyeHf1G5CLwNbQUyaOAlF82C8YbE
-         sKFGPIHtFmT6+075WdnO2zMqgXoandAYDUg66pOrDDK7cqhWfyHnqkIEgN+MfcwcC7Vb
-         f3iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdB/yPV3J5xtk2hj5rt7jhDg9kubUBdn+87Mezc92gcr5OD+OOL2GDNV1jISrMs8wB06puh1o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwabbaQcuYbJnYf19O421ZyNQo38JVu74J2TXGN8nDrsdKBDlNy
-	2+5e2mX71XfQkVwKCiCrvjJ59dgiflAtwmrBLdeCJAFGnDND6HdoPbF9S+XDRlW3HBfMqpSCGYY
-	X4Q==
-X-Google-Smtp-Source: AGHT+IGgztxRUxTUpaMUvL86uRz7hYZyu/zAmCoVzo4yvg4Q5SlFHbLBFYN3ktm59BGI0bTCiW14R+y2ITQ=
-X-Received: from pfbkt9.prod.google.com ([2002:a05:6a00:4ba9:b0:72a:bc54:8507])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:33a6:b0:1e5:c43f:f36d
- with SMTP id adf61e73a8af0-1e5e046189cmr1878060637.18.1734658755535; Thu, 19
- Dec 2024 17:39:15 -0800 (PST)
+        bh=lQGXs4fRzhUjC9h6471rkcBzWgIFKg5z0MpBCPWHmMU=;
+        b=vEqkhsxPbACMLVk71cx1tx4r8b9YmEG+mj549T+tF9ippartIFSHalSpxa0D7l6YHp
+         bOjKbxxBbv95RgppCjEhqeSYt7ZLxxTnm9H+e9FJSKShzvAXpLrdahQY1TqvYeHDlyXO
+         CppLwA985CRnJtyzQweP3Mps1IPXbPOldjE7+kLBFiGHgNPFhsfrcEc+qGbkLuZ75chB
+         hv4FDpFVDrPKLkAMKcNHsQbBFyo7sb1sN8jSCsRFWe3aPwPu0/lwLIT3PzHUkiDCTKDM
+         uiOyKOoVYgXreHfX300Wo9R8L/ciGsCE5vw3DDS+KzxGHGrffljEF4iSK2UEkBYCu+Tr
+         AztQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+iwxbuUtGHreeDAzVGNOE4PTQRN8BUBATlUQ1Eucshnp+c21xlaStJW4H02/RbZuQJFRD4+o=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzs4dPqfVVpGwOfVvS8pX0QR06z23F3SiisxSwL6OSzsSStn2fK
+	ATvVH+KDqKNx5c/VDZq0mWGpCJ/0obSX5h3Lq4JGD6mlTeHx8O00OfU0eI8S2hUJWwReZc35jjn
+	S4w==
+X-Google-Smtp-Source: AGHT+IGUByijU78nvHemXzOEaAQQDSmObXI7NYnb4v2toowk5S9287aNHUtx84WY5rqumwN+j1k67ZUHOWo=
+X-Received: from pfd7.prod.google.com ([2002:a05:6a00:a807:b0:727:2d74:d385])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2d1f:b0:1e1:b1e4:e750
+ with SMTP id adf61e73a8af0-1e5e04717a2mr2014875637.18.1734658757426; Thu, 19
+ Dec 2024 17:39:17 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 19 Dec 2024 17:39:02 -0800
+Date: Thu, 19 Dec 2024 17:39:03 -0800
 In-Reply-To: <20241220013906.3518334-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20241220013906.3518334-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20241220013906.3518334-5-seanjc@google.com>
-Subject: [PATCH 4/8] KVM: selftests: Macrofy vm_get_stat() to auto-generate
- stat name string
+Message-ID: <20241220013906.3518334-6-seanjc@google.com>
+Subject: [PATCH 5/8] KVM: selftests: Add struct and helpers to wrap binary
+ stats cache
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -76,83 +76,138 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Turn vm_get_stat() into a macro that generates a string for the stat name,
-as opposed to taking a string.  This will allow hardening stat usage in
-the future to generate errors on unknown stats at compile time.
+Add a struct and helpers to manage the binary stats cache, which is
+currently used only for VM-scoped stats.  This will allow expanding the
+selftests infrastructure to provide support for vCPU-scoped binary stats,
+which, except for the ioctl to get the stats FD are identical to VM-scoped
+stats.
 
-No functional change intended.
+Defer converting __vm_get_stat() to a scope-agnostic helper to a future
+patch, as getting the stats FD from KVM needs to be moved elsewhere
+before it can be made completely scope-agnostic.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util.h     | 14 +++++++-------
- .../kvm/x86/dirty_log_page_splitting_test.c        |  6 +++---
- .../testing/selftests/kvm/x86/nx_huge_pages_test.c |  4 ++--
- 3 files changed, 12 insertions(+), 12 deletions(-)
+ .../testing/selftests/kvm/include/kvm_util.h  | 11 +++--
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 47 +++++++++++--------
+ 2 files changed, 34 insertions(+), 24 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 4c4e5a847f67..044c2231431e 100644
+index 044c2231431e..9a64bab42f89 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -534,13 +534,13 @@ void read_stat_data(int stats_fd, struct kvm_stats_header *header,
- void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
- 		   size_t max_elements);
+@@ -46,6 +46,12 @@ struct userspace_mem_region {
+ 	struct hlist_node slot_node;
+ };
  
--static inline uint64_t vm_get_stat(struct kvm_vm *vm, const char *stat_name)
--{
--	uint64_t data;
++struct kvm_binary_stats {
++	int fd;
++	struct kvm_stats_header header;
++	struct kvm_stats_desc *desc;
++};
++
+ struct kvm_vcpu {
+ 	struct list_head list;
+ 	uint32_t id;
+@@ -99,10 +105,7 @@ struct kvm_vm {
+ 
+ 	struct kvm_vm_arch arch;
+ 
+-	/* Cache of information for binary stats interface */
+-	int stats_fd;
+-	struct kvm_stats_header stats_header;
+-	struct kvm_stats_desc *stats_desc;
++	struct kvm_binary_stats stats;
+ 
+ 	/*
+ 	 * KVM region slots. These are the default memslots used by page
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 21b5a6261106..c88f5e7871f7 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -657,6 +657,20 @@ userspace_mem_region_find(struct kvm_vm *vm, uint64_t start, uint64_t end)
+ 	return NULL;
+ }
+ 
++static void kvm_stats_release(struct kvm_binary_stats *stats)
++{
++	int ret;
++
++	if (!stats->desc)
++		return;
++
++	free(stats->desc);
++	stats->desc = NULL;
++
++	ret = close(stats->fd);
++	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
++}
++
+ __weak void vcpu_arch_free(struct kvm_vcpu *vcpu)
+ {
+ 
+@@ -711,13 +725,7 @@ void kvm_vm_release(struct kvm_vm *vmp)
+ 	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
+ 
+ 	/* Free cached stats metadata and close FD */
+-	if (vmp->stats_desc) {
+-		free(vmp->stats_desc);
+-		vmp->stats_desc = NULL;
 -
--	__vm_get_stat(vm, stat_name, &data, 1);
--	return data;
--}
-+#define vm_get_stat(vm, stat)				\
-+({							\
-+	uint64_t data;					\
-+							\
-+	__vm_get_stat(vm, #stat, &data, 1);		\
-+	data;						\
-+})
+-		ret = close(vmp->stats_fd);
+-		TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
+-	}
++	kvm_stats_release(&vmp->stats);
+ }
  
- void vm_create_irqchip(struct kvm_vm *vm);
- 
-diff --git a/tools/testing/selftests/kvm/x86/dirty_log_page_splitting_test.c b/tools/testing/selftests/kvm/x86/dirty_log_page_splitting_test.c
-index 2929c067c207..b0d2b04a7ff2 100644
---- a/tools/testing/selftests/kvm/x86/dirty_log_page_splitting_test.c
-+++ b/tools/testing/selftests/kvm/x86/dirty_log_page_splitting_test.c
-@@ -41,9 +41,9 @@ struct kvm_page_stats {
- 
- static void get_page_stats(struct kvm_vm *vm, struct kvm_page_stats *stats, const char *stage)
+ static void __vm_mem_region_delete(struct kvm_vm *vm,
+@@ -2214,34 +2222,33 @@ void read_stat_data(int stats_fd, struct kvm_stats_header *header,
+  *
+  * Read the data values of a specified stat from the binary stats interface.
+  */
+-void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
++void __vm_get_stat(struct kvm_vm *vm, const char *name, uint64_t *data,
+ 		   size_t max_elements)
  {
--	stats->pages_4k = vm_get_stat(vm, "pages_4k");
--	stats->pages_2m = vm_get_stat(vm, "pages_2m");
--	stats->pages_1g = vm_get_stat(vm, "pages_1g");
-+	stats->pages_4k = vm_get_stat(vm, pages_4k);
-+	stats->pages_2m = vm_get_stat(vm, pages_2m);
-+	stats->pages_1g = vm_get_stat(vm, pages_1g);
- 	stats->hugepages = stats->pages_2m + stats->pages_1g;
++	struct kvm_binary_stats *stats = &vm->stats;
+ 	struct kvm_stats_desc *desc;
+ 	size_t size_desc;
+ 	int i;
  
- 	pr_debug("\nPage stats after %s: 4K: %ld 2M: %ld 1G: %ld huge: %ld\n",
-diff --git a/tools/testing/selftests/kvm/x86/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86/nx_huge_pages_test.c
-index e7efb2b35f8b..c0d84827f736 100644
---- a/tools/testing/selftests/kvm/x86/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86/nx_huge_pages_test.c
-@@ -73,7 +73,7 @@ static void check_2m_page_count(struct kvm_vm *vm, int expected_pages_2m)
- {
- 	int actual_pages_2m;
+-	if (!vm->stats_desc) {
+-		vm->stats_fd = vm_get_stats_fd(vm);
+-		read_stats_header(vm->stats_fd, &vm->stats_header);
+-		vm->stats_desc = read_stats_descriptors(vm->stats_fd,
+-							&vm->stats_header);
++	if (!stats->desc) {
++		stats->fd = vm_get_stats_fd(vm);
++		read_stats_header(stats->fd, &stats->header);
++		stats->desc = read_stats_descriptors(stats->fd, &stats->header);
+ 	}
  
--	actual_pages_2m = vm_get_stat(vm, "pages_2m");
-+	actual_pages_2m = vm_get_stat(vm, pages_2m);
+-	size_desc = get_stats_descriptor_size(&vm->stats_header);
++	size_desc = get_stats_descriptor_size(&stats->header);
  
- 	TEST_ASSERT(actual_pages_2m == expected_pages_2m,
- 		    "Unexpected 2m page count. Expected %d, got %d",
-@@ -84,7 +84,7 @@ static void check_split_count(struct kvm_vm *vm, int expected_splits)
- {
- 	int actual_splits;
+-	for (i = 0; i < vm->stats_header.num_desc; ++i) {
+-		desc = (void *)vm->stats_desc + (i * size_desc);
++	for (i = 0; i < stats->header.num_desc; ++i) {
++		desc = (void *)stats->desc + (i * size_desc);
  
--	actual_splits = vm_get_stat(vm, "nx_lpage_splits");
-+	actual_splits = vm_get_stat(vm, nx_lpage_splits);
+-		if (strcmp(desc->name, stat_name))
++		if (strcmp(desc->name, name))
+ 			continue;
  
- 	TEST_ASSERT(actual_splits == expected_splits,
- 		    "Unexpected NX huge page split count. Expected %d, got %d",
+-		read_stat_data(vm->stats_fd, &vm->stats_header, desc,
+-			       data, max_elements);
++		read_stat_data(stats->fd, &stats->header, desc, data, max_elements);
+ 		return;
+ 	}
+ 
+-	TEST_FAIL("Unabled to find stat '%s'", stat_name);
++	TEST_FAIL("Unabled to find stat '%s'", name);
+ }
+ 
+ __weak void kvm_arch_vm_post_create(struct kvm_vm *vm)
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
