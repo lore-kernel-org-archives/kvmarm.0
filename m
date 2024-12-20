@@ -1,163 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6F41C549D;
-	Fri, 20 Dec 2024 14:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EEE17BD3
+	for <kvmarm@lists.linux.dev>; Fri, 20 Dec 2024 15:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734704009; cv=none; b=RvojEeNUvwoeOIBCHVYsPD+7A0aZ4On5SFq3uvxVctd15L7xyLFH/TqsUH8E+vrmbPXIlAJsev4OWktWy6F0oZ31y4sVqbsaYVubNBNIS3X3CoWd3zGD4JOf8FgQYwvS9VZX66NCxf6orMUhvr8cfxLSV9hpoZoUALsDJ53hzIA=
+	t=1734706878; cv=none; b=bbPnHklgB9oFkFsHL+puhmcXK9OlkdYjzqLqFpnj8beJtYNAcJ2RTiXLklk1fPDIdv1RpesWHnxbHYRzhLpKlWcvSQr47b8KrLFKttt0BBXUQYHmhVP2F8jEbkLfF3An0w2yIXdr7RGlMcm08LVhIiNIWF2/a3IuWDyxnw6MIaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734704009; c=relaxed/simple;
-	bh=IfxXl6UuG4j5BIYEfkssc862+8tnobUWp4ToirmrRTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JsqrpQSYQBNuc1m4vymh9qT9NlGRlZCTNieXK2UnfITnFoKXobYDE6JhhhimKI7ZeYbLaZZvDNEWELOXc4cUJNPWeQFN1ljHJ6T/ZIXmEl5M6zLqto5QyTjIDOUjsrX2vfTodmLhZVBR9fhZjNbfseQPmZATDbb2Z1CpuMKJMdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ClQHk595; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734706878; c=relaxed/simple;
+	bh=FU8u7FgteP60R1LVsxBg0Y2jrMf1zurXaeJFrIqaxrc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KfI5l0yR0PZKvLumeTTlzKGaB+oCjQCAtwA8lKac+tEAWCYBUKniIoBY8sREvhD08KCl12eoJZwhtOgzcJwILzXQvaEAqNWZeoLhy84dNC0Af38J1hAD8eSSyMDeUcJi35LbH0zMhmndoRLT+KLUy/RmZJARrFOOeL8tGcmlXuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aq7TqP1a; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ClQHk595"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14334C4CECD;
-	Fri, 20 Dec 2024 14:13:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734704007;
-	bh=IfxXl6UuG4j5BIYEfkssc862+8tnobUWp4ToirmrRTw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ClQHk595OanK3NzR1jRz96i5ng2jJw5jsvAlQtROFDF0mMP6HpYkOOjk7gpcozy1M
-	 09nrL57Tv17Tqe2GScMn4nbdj22MAQ6yha3SDW77160RWKR5OTsMfGpEe99PR8sshe
-	 5FT05wI5eAKBNyFmp0apHsR+qWtlOcPemRveYpuRHW4BTgJx1UwUMkHjVuZqljA+On
-	 7c2/IBZQ7YxXR/CIFQfk+DoowDh37N7VkgpeHcilbyvbtT9350TR+B+Rn/iYoBsfxX
-	 n7GD738cBWuy00SH9W3PxmYEaUPzk2tcvvghNnB6z1Z2fEDeAuF5E3svfU79yO853Y
-	 w5XZBuLZuYU6A==
-Date: Fri, 20 Dec 2024 14:13:22 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Selftest for pKVM transitions
-Message-ID: <20241220141321.GA26794@willie-the-truck>
-References: <20241129125800.992468-1-qperret@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aq7TqP1a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734706876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nZvwncwJOuHramMroFGr8eBsUbQp9V+RXkC2LSaW6Lg=;
+	b=aq7TqP1aBwMvpgm6udG7x+SqYvB08OKQdTT36tf6oqtwGKXPjCtCNUosU99RiqUQxkfCGG
+	bcUQ3HtBsmbE92O2E5p43Q7JpuyzIh96SaSsD2Ba/5kU61RSeZedFBQw6V6oAgaCqutK+e
+	TPl5aSDbgtyl8ex/W1THToFyMyeGkzY=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-619-JQCwutYbOvi5j9rBr_W_nQ-1; Fri,
+ 20 Dec 2024 10:01:11 -0500
+X-MC-Unique: JQCwutYbOvi5j9rBr_W_nQ-1
+X-Mimecast-MFC-AGG-ID: JQCwutYbOvi5j9rBr_W_nQ
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 292DD195605B;
+	Fri, 20 Dec 2024 15:01:03 +0000 (UTC)
+Received: from localhost (dhcp-192-244.str.redhat.com [10.33.192.244])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3008F1956053;
+	Fri, 20 Dec 2024 15:00:59 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
+ mark.rutland@arm.com, eric.auger@redhat.com, sebott@redhat.com,
+ yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com,
+ jonathan.cameron@huawei.com, anthony.jebson@huawei.com,
+ linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+Subject: Re: [PATCH v4 3/3] arm64: paravirt: Enable errata based on
+ implementation CPUs
+In-Reply-To: <86v7veppsj.wl-maz@kernel.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20241218105345.73472-1-shameerali.kolothum.thodi@huawei.com>
+ <20241218105345.73472-4-shameerali.kolothum.thodi@huawei.com>
+ <86bjx8q995.wl-maz@kernel.org> <Z2RapzikZQGgeE_6@linux.dev>
+ <86v7veppsj.wl-maz@kernel.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Fri, 20 Dec 2024 16:00:57 +0100
+Message-ID: <87ikrebdqu.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241129125800.992468-1-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 6LyvB_b7u5ZuUYY2BepSESaR96g2_bVq1DaUlhLgync_1734706865
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 
-On Fri, Nov 29, 2024 at 12:58:00PM +0000, Quentin Perret wrote:
-> We have recently found a bug [1] in the pKVM memory ownership
-> transitions by code inspection, but it could have been caught with a
-> test.
-> 
-> Introduce a boot-time selftest exercising all the known pKVM memory
-> transitions and importantly checks the rejection of illegal transitions.
+On Fri, Dec 20 2024, Marc Zyngier <maz@kernel.org> wrote:
 
-Thanks for doing this!
+> On Thu, 19 Dec 2024 17:40:55 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+>> 
+>> > Independent of this, I wonder what we should output in sysfs
+>> > (/sys/devices/system/cpu/cpu*/regs/identification/*).
+>> 
+>> It's a bit crap, but maybe implementation index 0 gets reported through
+>> the 'main' midr/revidr files, otherwise have a directory per
+>> implementation index of midr/revidr.
+>
+> Having slept on that one, I'm starting to think that we should keep
+> the status-quo of reporting what the kernel snapshot at boot time.
+> There is no good reason to force the VMM to report the potential
+> implementations in any specific order.
+>
+> The "alternative-implementations" is interesting, but we don't keep it
+> per-CPU, so I don't  think it fits the current scheme. But maybe
+> something in /sys/devices/system/cpu, outside of the cpu* hierarchy?
 
-> 
-> The new test is hidden behind a new Kconfig option separate from
-> CONFIG_EL2_NVHE_DEBUG on purpose as that has side effects on the
-> transition checks ([1] doesn't reproduce with EL2 debug enabled).
+I agree that this should be reported outside of the cpu* hierarchy,
+maybe smth like
 
-Hmm. What does a test failure look like without CONFIG_EL2_NVHE_DEBUG
-enabled? Do we still get file:line information?
+/sys/devices/system/cpu/alternatives/
+   identification/
+     regs0/
+       aidr_el1
+       midr_el1
+       revidr_el1
+     regs1/
+       aidr_el1
+       midr_el1
+       revidr_el1
 
-[...]
+(with no guarantee as to _which_ triplet will show up under regs<n>)
 
-> +void pkvm_ownership_selftest(void)
-> +{
-> +	void *virt = hyp_alloc_pages(&host_s2_pool, 0);
-> +	u64 phys, size, pfn;
-> +
-> +	WARN_ON(!virt);
-> +	selftest_page = hyp_virt_to_page(virt);
-> +	selftest_page->refcount = 0;
-> +
-> +	size = PAGE_SIZE << selftest_page->order;
-> +	phys = hyp_virt_to_phys(virt);
-> +	pfn = hyp_phys_to_pfn(phys);
-> +
-> +	selftest_state.host = PKVM_NOPAGE;
-> +	selftest_state.hyp = PKVM_PAGE_OWNED;
-> +	assert_page_state();
-> +	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
-> +	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
-> +
-> +	selftest_state.host = PKVM_PAGE_OWNED;
-> +	selftest_state.hyp = PKVM_NOPAGE;
-> +	assert_transition_res(0,	__pkvm_hyp_donate_host, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-> +	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
+Also depends on the intended consumers, I guess.
 
-Should we recheck the unshare transitions here?
+>
+> Either way, this isn't something we should worry too much right now.
 
-> +	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
-> +	selftest_state.hyp = PKVM_PAGE_SHARED_BORROWED;
-> +	assert_transition_res(0,	__pkvm_host_share_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
+I agree as well.
 
-We could check unshare_ffa here.
-
-> +	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-> +
-> +	assert_transition_res(0,	hyp_pin_shared_mem, virt, virt + size);
-
-Is it worth trying an extra pin + unpin?
-
-> +	WARN_ON(!hyp_page_count(virt));
-
-Can we assert an exact value (e.g. count == 1)?
-
-> +	assert_transition_res(-EBUSY,	__pkvm_host_unshare_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
-
-unshare_ffa again here.
-
-> +	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-> +
-> +	hyp_unpin_shared_mem(virt, virt + size);
-> +	assert_page_state();
-> +	WARN_ON(hyp_page_count(virt));
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-
-Is this block actually testing anything new? Once we've asserted the page
-state and checked the refcount, the transitions seem redundant to me.
-
-> +	selftest_state.host = PKVM_PAGE_OWNED;
-> +	selftest_state.hyp = PKVM_NOPAGE;
-> +	assert_transition_res(0,	__pkvm_host_unshare_hyp, pfn);
-> +
-> +	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
-> +	selftest_state.hyp = PKVM_NOPAGE;
-> +	assert_transition_res(0,	__pkvm_host_share_ffa, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-> +	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
-> +	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-> +	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
-> +
-> +	selftest_state.host = PKVM_PAGE_OWNED;
-> +	selftest_state.hyp = PKVM_NOPAGE;
-> +	assert_transition_res(0,	__pkvm_host_unshare_ffa, pfn, 1);
-
-Try it twice?
-
-Will
