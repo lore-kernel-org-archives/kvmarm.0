@@ -1,36 +1,45 @@
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0CC1EA6F
-	for <kvmarm@lists.linux.dev>; Sat, 21 Dec 2024 01:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9FA1EE7D9;
+	Sat, 21 Dec 2024 09:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734745122; cv=none; b=gCKw4pp5DxVEEiw/VKYpbPzp01C0S8+sevpPAB/i9AIxs/pnwy+vGuYNBl2R1WW4JmHtchNMj3cgkxesrmSDjqAapNKKGrTrdO5UtafLAllN6XALbTb8k9c9M+ZZ8cq0Mk1X3wZ+0v1WPX1BGDwHhpmEtbNirhDeqtl9Io7MttA=
+	t=1734775068; cv=none; b=W/OyvzrGGltXiIj6a9+zS2YduhC9EOzLSreolXyGuTZ2IdALOG3m74bmmEsWsMyUiIOu8wRPYXBTP+5FwrAjw+NYuJqteGGhH58XcKgl9HfkoVosWkZ+23CYayElLNv0gLJZTyKSyHxxTqdljXy0HKzsfu/KKxzlFRFE+dAA6VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734745122; c=relaxed/simple;
-	bh=Si+Qd6kAVLaoxJtaoFM2XNl9uaYPslnJ1INVhXz0QG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NOP/KbBV3v5Je6GFUzvTKdX5XASVktf54x/OIIvIO0058fBT3dvTO7L3QkustATeshxJrvs3m9wb8s2TGUw+EhGfxaCmqme09dPibP3zL1vVqGZ/QZhrySmYvivz8jQHng/U3CQTQhgZ52ZO3DcdTHG1misMkHDeTNrc084mG3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sFTMWHQk; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1734775068; c=relaxed/simple;
+	bh=cA6hokD0aqM2pcntllYiH12JP8LjCCMtE3OBF6ZIU2E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MUlj6t6Tb82WQjIbpDsmqQU5PjrgSGEaikqkmj9OYTBoLgTGfSrpzyP2XFutLeX+f4WJciY//e+W8rfI4j7hkh8PdvrjXKXxBr/rN8GAhr0CLkNFz2GLFijQ5JurB29v2Lf+MP/Uw5CmQhK6rGaiOn9rmS4tuI9xpHX4paEiWPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXIavt0c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sFTMWHQk"
-Date: Fri, 20 Dec 2024 17:38:28 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1734745118;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9RyL7OQcEcJazDGmreABUEOWcdfoZAcUPUZ/ZMoqlEM=;
-	b=sFTMWHQk3svhyXXcqpblS4NAqRAygfiwVk62in7jQiqKZ8RDFeqE0usaQTEXiPxGUKAwkn
-	F8GVGYSSsBkJoaSOUZLB9kuQ9NEN6rZvMmtJuSkjoPS29Ugexrqm60cwlAHZW1jlIq3uvo
-	JYz0WLKQfIW+gmZqo3HvHeHBiSNMmoo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXIavt0c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB42DC4CECE;
+	Sat, 21 Dec 2024 09:57:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734775067;
+	bh=cA6hokD0aqM2pcntllYiH12JP8LjCCMtE3OBF6ZIU2E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DXIavt0ctCzoRX6EWaFKlPy82zEACQJDe+Dy1mSS0OhpFN+1N4KNG+FFMTl1+ADv3
+	 OhxofaFzqqou8Osw/eOxOX/YcfWtMpQe/+LoVXJLj1nRvvB2BYf/m0YzPXFMKytp1Y
+	 P1OmYOcAMAuxK/W0ypddKUw2tgSuv923hTIx0HYOb+BZJIMUHmaYgXlaspkPCG4RjW
+	 NqNKzvVNGRRdRRqIY1o6Yt7dG9upzA+w8nVJ4qiKTA4S2Pa/TDfgkl97xE1T7lfwp2
+	 POWK/P3oLwsWUn+iC5uA36EXyJ7oEIbSnMM2QJus3XD5+WWvhfKx7qvTHl4bQ8VrlV
+	 YyJLgGqsldSkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tOwEz-005u3E-7c;
+	Sat, 21 Dec 2024 09:57:45 +0000
+Date: Sat, 21 Dec 2024 09:57:44 +0000
+Message-ID: <874j2xs6hz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Bjorn Andersson <andersson@kernel.org>,
@@ -38,45 +47,70 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Chase Conklin <chase.conklin@arm.com>,
 	Eric Auger <eauger@redhat.com>
-Subject: Re: [PATCH v2 01/12] KVM: arm64: nv: Add handling of EL2-specific
- timer registers
-Message-ID: <Z2Yb8BWnqpt441V-@linux.dev>
+Subject: Re: [PATCH v2 01/12] KVM: arm64: nv: Add handling of EL2-specific timer registers
+In-Reply-To: <Z2Yb8BWnqpt441V-@linux.dev>
 References: <20241217142321.763801-1-maz@kernel.org>
- <20241217142321.763801-2-maz@kernel.org>
+	<20241217142321.763801-2-maz@kernel.org>
+	<Z2Yb8BWnqpt441V-@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241217142321.763801-2-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Dec 17, 2024 at 02:23:09PM +0000, Marc Zyngier wrote:
-> @@ -3879,9 +4020,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
->  	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
->  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
->  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
-> +	{ SYS_DESC(SYS_AARCH32_CNTVCT),	      access_arch_timer },
->  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
->  	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
->  	{ SYS_DESC(SYS_AARCH32_CNTPCTSS),     access_arch_timer },
-> +	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
->  };
+On Sat, 21 Dec 2024 01:38:28 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Tue, Dec 17, 2024 at 02:23:09PM +0000, Marc Zyngier wrote:
+> > @@ -3879,9 +4020,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+> >  	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+> >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+> >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+> > +	{ SYS_DESC(SYS_AARCH32_CNTVCT),	      access_arch_timer },
+> >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> >  	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+> >  	{ SYS_DESC(SYS_AARCH32_CNTPCTSS),     access_arch_timer },
+> > +	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
+> >  };
+> 
+> Huh. You know, I had always thought we hid 32-bit EL0 from nested
+> guests, but I now realize that isn't the case. Of course, we don't have
+> the necessary trap reflection for exits that came out of a 32-bit EL0,
+> nor should we bother.
+> 
+> Of the 4 NV2 implementations I'm aware of (Neoverse-V1, Neoverse-V2,
+> AmpereOne, M2) only Neoverse-V1 supports 32-bit userspace. And even
+> then, a lot of deployments of V1 have a broken NV2 implementation.
+> 
+> What do you think about advertising a 64-bit only EL0 for nested VMs?
 
-Huh. You know, I had always thought we hid 32-bit EL0 from nested
-guests, but I now realize that isn't the case. Of course, we don't have
-the necessary trap reflection for exits that came out of a 32-bit EL0,
-nor should we bother.
+I'm completely OK with that.
 
-Of the 4 NV2 implementations I'm aware of (Neoverse-V1, Neoverse-V2,
-AmpereOne, M2) only Neoverse-V1 supports 32-bit userspace. And even
-then, a lot of deployments of V1 have a broken NV2 implementation.
+Actually, we already nuke the guest if exiting from 32bit context, no
+matter the EL (vcpu_mode_is_bad_32bit() is where this happens).  But
+we're missing the ID_AA64PFR0_EL1.EL0 sanitising, which is a bug. I'll
+send a patch shortly.
 
-What do you think about advertising a 64-bit only EL0 for nested VMs?
+Now, for this particular patch, I still think we should gracefully
+handle access to the EL1 timer from a 32bit capable, non-NV guest.
+Just in case we end-up with a CPU with a broken CNTVOFF_EL2 *and*
+32bit capability.
+
+In the end, it doesn't cost us much to support this case, and it helps
+that we can verify that we handle all registers without exception.
+
+Thoughts?
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
