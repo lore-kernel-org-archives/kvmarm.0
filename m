@@ -1,156 +1,219 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065BF25949B;
-	Sat, 21 Dec 2024 13:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713101FC7FC
+	for <kvmarm@lists.linux.dev>; Sat, 21 Dec 2024 14:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734788756; cv=none; b=fHzOm7q2FTwVa5e4pndbQRU7B4BEmjl6chG2Z4a0jdOvl+PC0r0rugPHKEhFqc0Nza2aMK/v4hkPic9JslJ1rBxVQny9k6eBcSBnokfp+3++H7sjug5u1491EcfhnPLky5whJ5N9Trj8YclfQ4WnRk4b/qfjWozvQ6jz4WcJlDM=
+	t=1734792307; cv=none; b=LrMQI4AqhfHBKAM6XF9rGxR9Tg0HuNqY2ByFhN5Sd+Sr/moUx04PyWXnkqVAMoZ32PJAJY1ig6XYxKN16BDxpJRaz4X81V2aIbF7u+7SKO9MmmXmkpEp2eWEQUucwH0WNVtdObTrhXaVpXH5tj21EDiamb23o8C2RhR3gn4TbTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734788756; c=relaxed/simple;
-	bh=vc17nBTECp2i/rSapbYdWNJZtzHMd3CmJ4JxYM4hQPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kb+ehG8ssJTujwue8jY94DOADddyBW0w4jjMCnIL8V64ZhHyktr7GDSpUrDPOhzqud9frBXX/kWGrFojrNovIsz6RVO1emjebmxBngugHMiGKveqSQ4xQOwqfsJZGuO/Q63pRC9miZPEhwVKUoDuE8GaE6FWkzWxltCjYpmwsXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jannau.net; spf=pass smtp.mailfrom=jannau.net; dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b=TvV1Pzxa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hVK09Ri5; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jannau.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jannau.net
+	s=arc-20240116; t=1734792307; c=relaxed/simple;
+	bh=RTxtRLIzNICSkFSsFrtMnneEz9Nx55H3GX4PCepvgTI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bMQnQH1/E8pGkPmGX9O/OdO6UiOdsmdWrY+dt5mhMCC9wg+mIW/zn15cQKkP9pH1ZklBCQg92V7m5geqokaXMM9Z36dGPmipn9JvrkGjVNTYyePsfmiCSjGRSdIcA7yskOPcuf0+CXfFQnEUUs3pM/88Q2nbOfTNgfq6q+HRYPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qIcKCcyr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b="TvV1Pzxa";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hVK09Ri5"
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id B6291114012E;
-	Sat, 21 Dec 2024 08:45:52 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Sat, 21 Dec 2024 08:45:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jannau.net; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1734788752; x=1734875152; bh=bE3VuT8nsu
-	8wH/NcmNLwmjpan81n5nZM7l2ihsD7w6k=; b=TvV1PzxadDVx9nYjiOTs//1BE/
-	91OUtYCme66eCNJMVeHli36Cp4mjztFxK35EYIP1h1yotAe3IMR2HV/pzSjbBPzT
-	TljCmUoI1rb7F/XJIgEZMotUiGjXVawAkJa6TveNE9EH1oe5/Dc8jsFSyYYgROCA
-	NMoMqZANmNMCr6M6yVot1fjWz/8hnH10F5p+QQiwfYCVaeE2ZRbXR6unXl66HdBg
-	dKwVgQV4LZfRFO/IndmYjodwz3JkMZ2RC+nNhCcHhtCttQmp9TheIUvPjUKE/jZS
-	zEQHJYt6t6RfIVtyTEgN55Ra6vyzIH/domYmAGShEsAcVBdLYcr80NkhG9iA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1734788752; x=1734875152; bh=bE3VuT8nsu8wH/NcmNLwmjpan81n5nZM7l2
-	ihsD7w6k=; b=hVK09Ri5p6Ljy+rKNuBqAOXt1Fc5+nseFQzvvYiqfMUZrIUkgad
-	wjVdksFQIcZzjE4L1DNHh1vxylO/M1nBXHThzDX8eIOkjVHuFHeXI8Zcrvf9q740
-	Xw5+nnGXhe4vE4ZgABlD8IozDFzAMMSLgCLdOjo3CVXLLCRKfm5qiqKlkoOzvTL4
-	VhoCX6hAKPXyJPvD5eNcgK2DqkJXmPZVyfOIHP4v2FDIni3qsLMMr4O+uSQzHuqO
-	Pk6Kme8K3zaJF5JwV2JMxCW+VD2WknIvaaPcRPWzSM0HohNfmeMpaZvqiLJYKjfZ
-	UZzu2vrIx4haGOIolv+pbGAAkRXtBSv/bow==
-X-ME-Sender: <xms:kMZmZwsFywgE024mlAgvbsa2SNYyKT7m2AXFdzkgPvBXCEHTMQdtIw>
-    <xme:kMZmZ9cjE52ahsur5INrHwRrBLnXj2PTs6vIpVFD61xpozOxEjNkvuKBi8lWvdeWJ
-    4-B8OHtNePj4b1VXtY>
-X-ME-Received: <xmr:kMZmZ7zE7YYe53J0H6RKMQ0A7ol8XKYFlvu3zXHx6zeRpUIj3v3vb5hOrCrPWLzjuxGwMy9gdhuRpZSxtc727f2DSCzaKEoZaQs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddruddthedgfedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomheplfgrnhhnvgcuifhruhhnrghuuceojhesjhgrnhhnrghurdhnvghtqeenuc
-    ggtffrrghtthgvrhhnpefgvdffveelgedujeeffeehheekheelheefgfejffeftedugeet
-    hfeuudefheefteenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
-    hrohhmpehjsehjrghnnhgruhdrnhgvthdpnhgspghrtghpthhtohepudehpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopeholhhivhgvrhdruhhpthhonheslhhinhhugidrug
-    gvvhdprhgtphhtthhopehkvhhmrghrmheslhhishhtshdrlhhinhhugidruggvvhdprhgt
-    phhtthhopehmrgiisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjohgvhidrghhouh
-    hlhiesrghrmhdrtghomhdprhgtphhtthhopehsuhiiuhhkihdrphhouhhlohhsvgesrghr
-    mhdrtghomhdprhgtphhtthhopeihuhiivghnghhhuhhisehhuhgrfigvihdrtghomhdprh
-    gtphhtthhopehmihiihhgrnhhgsehgohhoghhlvgdrtghomhdprhgtphhtthhopegtohhl
-    thhonhhlvgifihhssehgohhoghhlvgdrtghomhdprhgtphhtthhopehrrghnrghnthgrse
-    hgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:kMZmZzMYMbxNKDZTU30BJEzm4UB0sfPOEUQa9a3PSeXpqw7v-HD68w>
-    <xmx:kMZmZw_k7AEaAotwDy1RIjctUIt69gtq0qHA4pHxrux8_K_kqb-EsQ>
-    <xmx:kMZmZ7UwfWcPnpfyvTB03Z6MX-D3yDMRbDIq7NlLhUSxc7gDIW8pAA>
-    <xmx:kMZmZ5fsidmnKnYtRFGAMB-AOoreA7Z9kaQ69Ahbw7T8hcy_a2Eggw>
-    <xmx:kMZmZzelUpnZqgmVXitvSoXGTBsS5q0zjgqNP_10BFDLRzIsgw_vYrkY>
-Feedback-ID: i47b949f6:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 21 Dec 2024 08:45:51 -0500 (EST)
-Date: Sat, 21 Dec 2024 14:45:49 +0100
-From: Janne Grunau <j@jannau.net>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	asahi@lists.linux.dev
-Subject: Re: [PATCH 00/18] KVM: arm64: Support FEAT_PMUv3 on Apple hardware
-Message-ID: <20241221134549.GA2917938@robin.jannau.net>
-References: <20241217212048.3709204-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qIcKCcyr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC18C4CECE;
+	Sat, 21 Dec 2024 14:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734792307;
+	bh=RTxtRLIzNICSkFSsFrtMnneEz9Nx55H3GX4PCepvgTI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qIcKCcyrV5Xt9uX6Ze4j3ef5rc4a7tjlNFm1GJAlY06VlFE98bqA3yId7jM2NHJdf
+	 vbpDcB4HWTkYkIxwZS24LnpRHo8t5dChFIz+pkF4A6llYH6tzkJz0AlfdEpu3Sw3M5
+	 FMx9Z79DjLqI9IlY7HfAVVV5s+sx8IIH+QIsBjiOJFe4d2xLBPZGHiicC+kc4nrxDX
+	 YWMG9VqLmQ3bZhPmmA47+bmCoT+eP18TrHUjMNbZdDRzTx3IpLGHvHCPJ4dQVYOx3+
+	 neQRnUhoN99zp/cMUCmQrlkX3zLoJpyqdctyo6lfoDOdQVgIipksnXcTNC71tro4cK
+	 NVfiHCqxiLTOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tP0j2-005wV5-Ir;
+	Sat, 21 Dec 2024 14:45:04 +0000
+Date: Sat, 21 Dec 2024 14:45:03 +0000
+Message-ID: <86o715p028.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>,	Cornelia Huck <cohuck@redhat.com>,
+	Daniel =?UTF-8?B?IlAuIEJlcnJhbmfDqSI=?= <berrange@redhat.com>,
+	eric.auger.pro@gmail.com,	qemu-devel@nongnu.org,	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,	alex.bennee@linaro.org,
+	oliver.upton@linux.dev,	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,	armbru@redhat.com,
+	abologna@redhat.com,	jdenemar@redhat.com,	shahuang@redhat.com,
+	mark.rutland@arm.com,	philmd@linaro.org,	pbonzini@redhat.com
+Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
+In-Reply-To: <Z2Vak-hbCMaxm-JJ@gezellig>
+References: <20241206112213.88394-1-cohuck@redhat.com>
+	<edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
+	<Z1qoa8yXscTSAJ9e@redhat.com>
+	<8734it1bv6.fsf@redhat.com>
+	<1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
+	<Z2QE9AqZnpGM5sWD@gezellig>
+	<8634ijrh8q.wl-maz@kernel.org>
+	<Z2Q2rWj9cV0W_XVq@gezellig>
+	<86zfkrptmj.wl-maz@kernel.org>
+	<Z2Vak-hbCMaxm-JJ@gezellig>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241217212048.3709204-1-oliver.upton@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kchamart@redhat.com, eric.auger@redhat.com, cohuck@redhat.com, berrange@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Dec 17, 2024 at 01:20:30PM -0800, Oliver Upton wrote:
-> One of the interesting features of some Apple M* parts is an IMPDEF trap
-> that routes EL1/EL0 accesses of the PMUv3 registers to EL2. This allows
-> a hypervisor to emulate an architectural PMUv3 on top of the IMPDEF PMU
-> hardware present in the CPU.
-> 
-> And if you squint, this _might_ look like a CPU erratum :-)
-> 
-> This series takes advantage of these IMPDEF traps to provide PMUv3 to
-> KVM guests. As a starting point, only expose the fixed CPU cycle counter
-> and no event counters. Conveniently, this is enough to get Windows
-> running as a KVM guest on Apple hardware.
-> 
-> I've tried to keep the deviation to a minimum by refactoring some of the
-> flows used for PMUv3, e.g. computing PMCEID from the arm_pmu bitmap
-> instead of reading hardware directly.
-> 
-> RFC -> v1:
->  - Rebase to 6.13-rc3
->  - Add support for 1 event counter in addition to CPU cycle counter
->  - Don't sneak past the PMU event filter (Marc)
->  - Have the PMU driver provide a PMUv3 -> HW event ID mapping (Marc)
-> 
-> Tested on my M2 with Linux and Windows guests. If possible, I'd
-> appreciate someone testing on an M1 as I haven't added those MIDRs to
-> the erratum yet.
+On Fri, 20 Dec 2024 11:52:51 +0000,
+Kashyap Chamarthy <kchamart@redhat.com> wrote:
+>=20
+> On Thu, Dec 19, 2024 at 03:41:56PM +0000, Marc Zyngier wrote:
+> > On Thu, 19 Dec 2024 15:07:25 +0000,
+> > Kashyap Chamarthy <kchamart@redhat.com> wrote:
+> > >=20
+> > > On Thu, Dec 19, 2024 at 12:26:29PM +0000, Marc Zyngier wrote:
+> > > > On Thu, 19 Dec 2024 11:35:16 +0000,
+> > > > Kashyap Chamarthy <kchamart@redhat.com> wrote:
+>=20
+> [...]
+>=20
+> > > > You can't rely on userspace for security, that'd be completely
+> > > > ludicrous.
+> > >=20
+> > > As Dan Berrang=C3=A9 points out, it's the bog-standard way QEMU deals=
+ with
+> > > some of the CPU-related issues on x86 today.  See this "important CPU
+> > > flags"[2] section in the QEMU docs.
+> >=20
+> > I had a look, and we do things quite differently. For example, the
+> > spec-ctrl equivalent in implemented in FW and in KVM, and is exposed
+> > by default if the HW is vulnerable. Userspace could hide that the
+> > mitigation is there, but that's the extent of the configurability.
+>=20
+> Noted.  As Dan says, as long as QEMU can toggle the feature on/off, then
+> that might be sufficient in the context of migratability.
+>=20
+> [...]
+>=20
+> > > To reply to your other question on this thread[3] about "which ABI?" =
+ I
+> > > think Dan is talking about the *guest* ABI: the virtual "chipset" that
+> > > is exposed to a guest (e.g. PCI(e) topology, ACPI tables, CPU model,
+> > > etc).  As I understand it, this "guest ABI" should remain predictable,
+> > > regardless of:
+> > >=20
+> > >   - whether you're updating KVM, QEMU, or the underlying physical
+> > >     hardware itself; or
+> > >   - if the guest is migrated, live or offline
+> > >=20
+> > > (As you might know, QEMU's "machine types" concept allows to create a
+> > > stable guest ABI.)
+> >=20
+> > All of this is under control of QEMU, *except* for the "maximum" of
+> > the architectural features exposed to the guest. All you can do is
+> > *downgrade* from there, and only to a limited extent.
+> >=20
+> > That, in turn has a direct impact on what you call the "CPU model",
+> > which for the ARM architecture really doesn't exist. All we have is a
+> > bag of discrete features, with intricate dependencies between them.
+>=20
+> I see; thanks for this explanation.  Your last sentence above is the
+> shortest summary of the CPU features situation on ARM I've ever read so
+> far.=20
+>=20
+> So, I infer this from what you're saying (do correct if it's wrong):
+>=20
+>   =E2=80=A2 Currently it is impractical (not feasible?) to pull together a
+>     minimal-and-usable set of CPU features + their dependencies on ARM
+>     to come up with a "CPU model" that can work across a reasonable set
+>     of hardware.
 
-Tested on M1 (t8103) with perf in a Linux guest and the patch below
+It isn't quite that. It *is* technically possible, and KVM does give
+you the tools you need for that. In practice, the diversity of the
+ecosystem is so huge that you can only rely on some very basic stuff
+unless the implementations are already very close. And that "small
+details" such as the timer frequency are strictly identical.
 
-Tested-by: Janne Grunau <j@jannau.net>
+>=20
+>   =E2=80=A2 If the above is true, then the ability to toggle CPU features=
+ on and
+>     off might become even more important for QEMU =E2=80=94 if it wants t=
+o be
+>     able to support live migration across mixed set of hardware on ARM.  =
 
-I'll import this into the downstream asahi kernel as there was a request
-for performance counters to aid FEX-Emu development recently.
 
-Janne
+Turning CPU features off is not always possible. Hiding them is
+generally possible, with a number of exceptions. We try our best to
+provide both, but it's... complicated.
 
---- 
+[...]
 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 441ee4ffc7709..45ef67ec970f5 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -195,6 +195,12 @@ has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
- }
+> Related tangent on CPU feature discoverability on ARM:
+>=20
+> Speaking of "Neoverse-N1", looking at a system that I have access to,
+> the `lscpu` output does not say anything about who the integrator is; it
+> only says:
+>=20
+>     ...
+>     Vendor ID:                ARM
+>     Model name:             Neoverse-N1
+>     ...
+>=20
+> I realize, `lscpu` displays only whatever the kernel knows.  Nothing in
+> `dmidecode` either.
 
- static const struct midr_range impdef_pmuv3_cpus[] = {
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
- 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
- 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
- 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
+The kernel does not know anything about the "Neoverse-N1" string. It
+can match some MIDR_EL1 values for errata workaround purposes, but
+doesn't gives two hoots about a human readable string.
+
+Every other year, we get asked to add a full database of strings in
+the kernel. The answer is a simple, polite, and final "no way". This
+serves no purpose at all. lscpu does have that database, and that's
+the right place to do it.
+
+When it comes to integration, the firmware can optionally report some
+information, which is the EL3 version of a commercial break (see the
+SOC_ID stuff). This isn't wildly deployed, thankfully.
+
+> Also, it looks like there's no equivalent of a "CPUID" instruction (I
+> realize it is x86-specific) on ARM.  Although, I came across a Google
+> Git repo that seems to implement a bespoke, "aarch64_cpuid".  From a
+> what I see, it seems to fetch the "Main ID Register" (MIDR_EL1) - I
+> don't know enough about it to understand its implications:
+>=20
+>     https://github.com/google/cpu_features/blob/main/src/impl_aarch64_cpu=
+id.c
+
+MIDR_EL1 doesn't give you much, and you cannot assume anything about
+the the feature set from it. Linux already allows you to inspect the
+ID registers from userspace (by trapping, emulating, and sanitising
+the result). That's the only reliable source of information.
+
+>
+> > That's why I don't see CPU models as a viable thing in terms of ABI.
+> > They are an approximation of what you could have, but the ABI is
+> > elsewhere.
+>=20
+> Hmm, this is "significant new information" for me.  If CPU models can't
+> be part of the guest ABI on ARM, then the whole "migratability across
+> heterogenous hardware" on QEMU requires deeper thinking.
+
+As I said all along, the only source of truth is the set of ID
+registers. Nothing else. You can build a "model" on top of that, but
+not the other way around.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
