@@ -1,219 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713101FC7FC
-	for <kvmarm@lists.linux.dev>; Sat, 21 Dec 2024 14:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35071D5CDD
+	for <kvmarm@lists.linux.dev>; Sat, 21 Dec 2024 21:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734792307; cv=none; b=LrMQI4AqhfHBKAM6XF9rGxR9Tg0HuNqY2ByFhN5Sd+Sr/moUx04PyWXnkqVAMoZ32PJAJY1ig6XYxKN16BDxpJRaz4X81V2aIbF7u+7SKO9MmmXmkpEp2eWEQUucwH0WNVtdObTrhXaVpXH5tj21EDiamb23o8C2RhR3gn4TbTE=
+	t=1734818331; cv=none; b=FljhJ2L+YdhfgdczdhWajznl2KuSfmSdBGyiZHsiVwroAMv/QnBLad0g0n3rj/x1NAKOLMD+H69shOmpqwb88zNX66uuaj1vjBxynNKhQOl7LKZzLTlNMDiDo/ysqhcfrNBd5c2wzPYeGtVZXTgUJQ1L/AMojnnyb/xrmQY3Ix4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734792307; c=relaxed/simple;
-	bh=RTxtRLIzNICSkFSsFrtMnneEz9Nx55H3GX4PCepvgTI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bMQnQH1/E8pGkPmGX9O/OdO6UiOdsmdWrY+dt5mhMCC9wg+mIW/zn15cQKkP9pH1ZklBCQg92V7m5geqokaXMM9Z36dGPmipn9JvrkGjVNTYyePsfmiCSjGRSdIcA7yskOPcuf0+CXfFQnEUUs3pM/88Q2nbOfTNgfq6q+HRYPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qIcKCcyr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734818331; c=relaxed/simple;
+	bh=YmqEabFpC/1TJIUM0H58+TKJqMOxL0YYqTaF+I7Yf14=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jGr27ddMYWIVr0zWlOQIWqG6U3Lv6OENM+thpGxIAVbppzD/9k9K27oIpc6C1CKfdL6xpZNzo5p5HEFm1WaB74C+JxXVnHzjOjd/xAjqbLKeW2hVejEyo0FNjjqIqWdsnLlik4MWcgUXeW+/KpEgp0DM1DZ1TAoBrpB0J/8gTX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EknnvT+C; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qIcKCcyr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC18C4CECE;
-	Sat, 21 Dec 2024 14:45:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734792307;
-	bh=RTxtRLIzNICSkFSsFrtMnneEz9Nx55H3GX4PCepvgTI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qIcKCcyrV5Xt9uX6Ze4j3ef5rc4a7tjlNFm1GJAlY06VlFE98bqA3yId7jM2NHJdf
-	 vbpDcB4HWTkYkIxwZS24LnpRHo8t5dChFIz+pkF4A6llYH6tzkJz0AlfdEpu3Sw3M5
-	 FMx9Z79DjLqI9IlY7HfAVVV5s+sx8IIH+QIsBjiOJFe4d2xLBPZGHiicC+kc4nrxDX
-	 YWMG9VqLmQ3bZhPmmA47+bmCoT+eP18TrHUjMNbZdDRzTx3IpLGHvHCPJ4dQVYOx3+
-	 neQRnUhoN99zp/cMUCmQrlkX3zLoJpyqdctyo6lfoDOdQVgIipksnXcTNC71tro4cK
-	 NVfiHCqxiLTOQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tP0j2-005wV5-Ir;
-	Sat, 21 Dec 2024 14:45:04 +0000
-Date: Sat, 21 Dec 2024 14:45:03 +0000
-Message-ID: <86o715p028.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>,	Cornelia Huck <cohuck@redhat.com>,
-	Daniel =?UTF-8?B?IlAuIEJlcnJhbmfDqSI=?= <berrange@redhat.com>,
-	eric.auger.pro@gmail.com,	qemu-devel@nongnu.org,	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,	alex.bennee@linaro.org,
-	oliver.upton@linux.dev,	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,	armbru@redhat.com,
-	abologna@redhat.com,	jdenemar@redhat.com,	shahuang@redhat.com,
-	mark.rutland@arm.com,	philmd@linaro.org,	pbonzini@redhat.com
-Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
-In-Reply-To: <Z2Vak-hbCMaxm-JJ@gezellig>
-References: <20241206112213.88394-1-cohuck@redhat.com>
-	<edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
-	<Z1qoa8yXscTSAJ9e@redhat.com>
-	<8734it1bv6.fsf@redhat.com>
-	<1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
-	<Z2QE9AqZnpGM5sWD@gezellig>
-	<8634ijrh8q.wl-maz@kernel.org>
-	<Z2Q2rWj9cV0W_XVq@gezellig>
-	<86zfkrptmj.wl-maz@kernel.org>
-	<Z2Vak-hbCMaxm-JJ@gezellig>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EknnvT+C"
+Date: Sat, 21 Dec 2024 13:58:36 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1734818325;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UIxrn6gDBkTgraPiBRw+gNRB2bS9Ks0FdtrVzsG+Kzg=;
+	b=EknnvT+CTw9gKiB+Xw7ZwYqNKELcHsd1ZsrQW01NthyXKt6fZ8ZuruypV3qFto2Yo3HWBF
+	x/2xL5NOOEIZ0/dOeExugYmjUfks51yPerp3hxDq3lbLaV5HjdeRZd/9nQSTYwnB/y5cVA
+	tTn4uvrsgtx/rfcl0q+YMkhERjk6BDI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH v2 01/12] KVM: arm64: nv: Add handling of EL2-specific
+ timer registers
+Message-ID: <Z2c6DJYW1_sSbFIw@linux.dev>
+References: <20241217142321.763801-1-maz@kernel.org>
+ <20241217142321.763801-2-maz@kernel.org>
+ <Z2Yb8BWnqpt441V-@linux.dev>
+ <874j2xs6hz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kchamart@redhat.com, eric.auger@redhat.com, cohuck@redhat.com, berrange@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <874j2xs6hz.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 20 Dec 2024 11:52:51 +0000,
-Kashyap Chamarthy <kchamart@redhat.com> wrote:
->=20
-> On Thu, Dec 19, 2024 at 03:41:56PM +0000, Marc Zyngier wrote:
-> > On Thu, 19 Dec 2024 15:07:25 +0000,
-> > Kashyap Chamarthy <kchamart@redhat.com> wrote:
-> > >=20
-> > > On Thu, Dec 19, 2024 at 12:26:29PM +0000, Marc Zyngier wrote:
-> > > > On Thu, 19 Dec 2024 11:35:16 +0000,
-> > > > Kashyap Chamarthy <kchamart@redhat.com> wrote:
->=20
-> [...]
->=20
-> > > > You can't rely on userspace for security, that'd be completely
-> > > > ludicrous.
-> > >=20
-> > > As Dan Berrang=C3=A9 points out, it's the bog-standard way QEMU deals=
- with
-> > > some of the CPU-related issues on x86 today.  See this "important CPU
-> > > flags"[2] section in the QEMU docs.
-> >=20
-> > I had a look, and we do things quite differently. For example, the
-> > spec-ctrl equivalent in implemented in FW and in KVM, and is exposed
-> > by default if the HW is vulnerable. Userspace could hide that the
-> > mitigation is there, but that's the extent of the configurability.
->=20
-> Noted.  As Dan says, as long as QEMU can toggle the feature on/off, then
-> that might be sufficient in the context of migratability.
->=20
-> [...]
->=20
-> > > To reply to your other question on this thread[3] about "which ABI?" =
- I
-> > > think Dan is talking about the *guest* ABI: the virtual "chipset" that
-> > > is exposed to a guest (e.g. PCI(e) topology, ACPI tables, CPU model,
-> > > etc).  As I understand it, this "guest ABI" should remain predictable,
-> > > regardless of:
-> > >=20
-> > >   - whether you're updating KVM, QEMU, or the underlying physical
-> > >     hardware itself; or
-> > >   - if the guest is migrated, live or offline
-> > >=20
-> > > (As you might know, QEMU's "machine types" concept allows to create a
-> > > stable guest ABI.)
-> >=20
-> > All of this is under control of QEMU, *except* for the "maximum" of
-> > the architectural features exposed to the guest. All you can do is
-> > *downgrade* from there, and only to a limited extent.
-> >=20
-> > That, in turn has a direct impact on what you call the "CPU model",
-> > which for the ARM architecture really doesn't exist. All we have is a
-> > bag of discrete features, with intricate dependencies between them.
->=20
-> I see; thanks for this explanation.  Your last sentence above is the
-> shortest summary of the CPU features situation on ARM I've ever read so
-> far.=20
->=20
-> So, I infer this from what you're saying (do correct if it's wrong):
->=20
->   =E2=80=A2 Currently it is impractical (not feasible?) to pull together a
->     minimal-and-usable set of CPU features + their dependencies on ARM
->     to come up with a "CPU model" that can work across a reasonable set
->     of hardware.
+On Sat, Dec 21, 2024 at 09:57:44AM +0000, Marc Zyngier wrote:
+> On Sat, 21 Dec 2024 01:38:28 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > On Tue, Dec 17, 2024 at 02:23:09PM +0000, Marc Zyngier wrote:
+> > > @@ -3879,9 +4020,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+> > >  	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
+> > >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+> > >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+> > > +	{ SYS_DESC(SYS_AARCH32_CNTVCT),	      access_arch_timer },
+> > >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+> > >  	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+> > >  	{ SYS_DESC(SYS_AARCH32_CNTPCTSS),     access_arch_timer },
+> > > +	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
+> > >  };
+> > 
+> > Huh. You know, I had always thought we hid 32-bit EL0 from nested
+> > guests, but I now realize that isn't the case. Of course, we don't have
+> > the necessary trap reflection for exits that came out of a 32-bit EL0,
+> > nor should we bother.
+> > 
+> > Of the 4 NV2 implementations I'm aware of (Neoverse-V1, Neoverse-V2,
+> > AmpereOne, M2) only Neoverse-V1 supports 32-bit userspace. And even
+> > then, a lot of deployments of V1 have a broken NV2 implementation.
+> > 
+> > What do you think about advertising a 64-bit only EL0 for nested VMs?
+> 
+> I'm completely OK with that.
+> 
+> Actually, we already nuke the guest if exiting from 32bit context, no
+> matter the EL (vcpu_mode_is_bad_32bit() is where this happens).  But
+> we're missing the ID_AA64PFR0_EL1.EL0 sanitising, which is a bug. I'll
+> send a patch shortly.
+> 
+> Now, for this particular patch, I still think we should gracefully
+> handle access to the EL1 timer from a 32bit capable, non-NV guest.
+> Just in case we end-up with a CPU with a broken CNTVOFF_EL2 *and*
+> 32bit capability.
+> 
+> In the end, it doesn't cost us much to support this case, and it helps
+> that we can verify that we handle all registers without exception.
+> 
+> Thoughts?
 
-It isn't quite that. It *is* technically possible, and KVM does give
-you the tools you need for that. In practice, the diversity of the
-ecosystem is so huge that you can only rely on some very basic stuff
-unless the implementations are already very close. And that "small
-details" such as the timer frequency are strictly identical.
+Absolutely. The only reason I made the comment is because the 32-bit
+changes had nudged me into thinking about it. Happy with the patch as
+is.
 
->=20
->   =E2=80=A2 If the above is true, then the ability to toggle CPU features=
- on and
->     off might become even more important for QEMU =E2=80=94 if it wants t=
-o be
->     able to support live migration across mixed set of hardware on ARM.  =
-
-
-Turning CPU features off is not always possible. Hiding them is
-generally possible, with a number of exceptions. We try our best to
-provide both, but it's... complicated.
-
-[...]
-
-> Related tangent on CPU feature discoverability on ARM:
->=20
-> Speaking of "Neoverse-N1", looking at a system that I have access to,
-> the `lscpu` output does not say anything about who the integrator is; it
-> only says:
->=20
->     ...
->     Vendor ID:                ARM
->     Model name:             Neoverse-N1
->     ...
->=20
-> I realize, `lscpu` displays only whatever the kernel knows.  Nothing in
-> `dmidecode` either.
-
-The kernel does not know anything about the "Neoverse-N1" string. It
-can match some MIDR_EL1 values for errata workaround purposes, but
-doesn't gives two hoots about a human readable string.
-
-Every other year, we get asked to add a full database of strings in
-the kernel. The answer is a simple, polite, and final "no way". This
-serves no purpose at all. lscpu does have that database, and that's
-the right place to do it.
-
-When it comes to integration, the firmware can optionally report some
-information, which is the EL3 version of a commercial break (see the
-SOC_ID stuff). This isn't wildly deployed, thankfully.
-
-> Also, it looks like there's no equivalent of a "CPUID" instruction (I
-> realize it is x86-specific) on ARM.  Although, I came across a Google
-> Git repo that seems to implement a bespoke, "aarch64_cpuid".  From a
-> what I see, it seems to fetch the "Main ID Register" (MIDR_EL1) - I
-> don't know enough about it to understand its implications:
->=20
->     https://github.com/google/cpu_features/blob/main/src/impl_aarch64_cpu=
-id.c
-
-MIDR_EL1 doesn't give you much, and you cannot assume anything about
-the the feature set from it. Linux already allows you to inspect the
-ID registers from userspace (by trapping, emulating, and sanitising
-the result). That's the only reliable source of information.
-
->
-> > That's why I don't see CPU models as a viable thing in terms of ABI.
-> > They are an approximation of what you could have, but the ABI is
-> > elsewhere.
->=20
-> Hmm, this is "significant new information" for me.  If CPU models can't
-> be part of the guest ABI on ARM, then the whole "migratability across
-> heterogenous hardware" on QEMU requires deeper thinking.
-
-As I said all along, the only source of truth is the set of ID
-registers. Nothing else. You can build a "model" on top of that, but
-not the other way around.
-
+-- 
 Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Oliver
