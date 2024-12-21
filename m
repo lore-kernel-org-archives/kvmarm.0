@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686FA136341;
-	Sat, 21 Dec 2024 11:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B99864D;
+	Sat, 21 Dec 2024 12:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734782076; cv=none; b=iqpPaZ+Rt7SI2XKQwXJ7RwvGlBNr/7dvQW07EQSJY8vvPc1mFWws9ncf02z9xpPwYrFKHjyhtRebPGJKMb+4MgVfC7vvCZnSkSKfVDpVuRiuRbo4hXSwkhStVaChQHtFf1acWdXpd+Zw9a5GpUtUnCuL7Z+F67Oqycr6oNz57eM=
+	t=1734784493; cv=none; b=TSK2XGJW4OIqyqeq6+nvxsqWKH72nJfqZBdWSi2Tt3YLrM/XUCHGDN7NUh6+sJyy3RWPtLxPZJSSJ2q82HQ09TI9yeJoTUbpJ5tDHVidow2V4NimasP33QIrIoC0pWHavHh+ouyNJVrCdhboX/3r+SYCdW1+UwbOwWG+jOMYF38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734782076; c=relaxed/simple;
-	bh=q7uq/JtiziK9m+oCyIhkRWaYt/+eaxpP5L0cM24iWfs=;
+	s=arc-20240116; t=1734784493; c=relaxed/simple;
+	bh=mJh65cE8FpJnhcgX4NYekYpaa0p+s7y+XkLuWQvx+YY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e520sKYC8x/bx+PdC/L2VvWsCn/c6bAvXqNg9TTYK9D/og3tlzhmqMmHY570BXohHxeieDBHT1+KhhAKDrABL1RcVKO2sdKvl0IvJdG6tCA9i81CCrwlfb+o3o6IBZ5bSyN8nHrBVIKaxednQKoG2oh/rNzUJEqodRimfCN5F1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ujtI1LH7; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=WWJbp8XUfmD0KLSxa4pgdCQk4Dx8wfasM7Z+jbEGb5xwhlXFwFQ7upJbSSTEMsNIIN64sYxBQ0iXXizvNt1ZfTQtShGAp6RM2Bto11ayTpYJFj5JDnXmNx9tWz1i/rldCGV6VlnRDKoTmLgMoJVrwOKvbzD5W8joAmoagUjQ6d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Er7xCeD9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ujtI1LH7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEBBDC4CECE;
-	Sat, 21 Dec 2024 11:54:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Er7xCeD9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A087C4CECE;
+	Sat, 21 Dec 2024 12:34:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734782076;
-	bh=q7uq/JtiziK9m+oCyIhkRWaYt/+eaxpP5L0cM24iWfs=;
+	s=k20201202; t=1734784492;
+	bh=mJh65cE8FpJnhcgX4NYekYpaa0p+s7y+XkLuWQvx+YY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ujtI1LH7HC2rDsP7roTEr4uyMS4PxtBEeM10FL1m7cnLKQDsM5FNhsZfK6GCMvltW
-	 By06D1ra3BSEvVyEmz9kdKhe8WGPc+ylXIkBn88BF3LHS3r8Kc4VKCLqMzusDOx/+/
-	 NSzy/Chr9+tnpu/Cc0DvD/ZMgnlLjMi0fUHpYt1afTIlVIKMG+mAi3UKuK6t3l0C9C
-	 +w/D90VoloceWZAwMDiuIIdLhwJJ0Q9UNe/ueJzBtWqQcBuiOHXqkLWzKzISJJylt6
-	 SrZ3LaNxPuYKdoW72VAPozzd6n2bwtdsQ23fULbT6nwt/AsiRccaFteR1NKoyB7Tl4
-	 41VXeADvLgsvA==
+	b=Er7xCeD9KIZUg6+fdQRcrAsfzMhj8fh9cjF3x83fWt8QglmFFHpKCmFhPjhF+fxQy
+	 Ys+3Fm2Gh2Uz19PlsrF8AMWFHmN+XRIj4oDkJGR8fk3Ils/c9eiQLOhIOCu+84LBcA
+	 T0qs2VHHg//aP16oq1G4fUsmRkcmxM2W9Pbfpo14Q0nRt86OIzv2veB2Z7s0f+R7Yg
+	 le4zFjvwK0IoCWmZKEzWLjm/Ri4XhybuUH/DJH7BHb50t4PMWo/pUsJJWKITk8f2Qy
+	 DyI02tlAco34X19KI+kaoe7t3T8D9fZQVchzyMDvK3aw8uEyTqXwY4WpQHNv9hdehJ
+	 Jvf4jJWXprrlQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tOy41-005v4Q-9G;
-	Sat, 21 Dec 2024 11:54:33 +0000
-Date: Sat, 21 Dec 2024 11:54:31 +0000
-Message-ID: <86seqhp7yg.wl-maz@kernel.org>
+	id 1tOyh0-005vOL-95;
+	Sat, 21 Dec 2024 12:34:50 +0000
+Date: Sat, 21 Dec 2024 12:34:48 +0000
+Message-ID: <86r061p63b.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: James Clark <james.clark@linaro.org>
 Cc: kvmarm@lists.linux.dev,
@@ -42,26 +42,23 @@ Cc: kvmarm@lists.linux.dev,
 	coresight@lists.linaro.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas
- <catalin.marinas@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mike Leach <mike.leach@linaro.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Mark Brown <broonie@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
 	"Rob Herring (Arm)" <robh@kernel.org>,
 	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Fuad Tabba <tabba@google.com>,
-	James Morse <james.morse@arm.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 6/8] KVM: arm64: coresight: Give TRBE enabled state to KVM
-In-Reply-To: <e6b46080-b9ae-4aad-b06d-81407c195e28@linaro.org>
+Subject: Re: [PATCH v8 7/8] KVM: arm64: Support trace filtering for guests
+In-Reply-To: <20241127100130.1162639-8-james.clark@linaro.org>
 References: <20241127100130.1162639-1-james.clark@linaro.org>
-	<20241127100130.1162639-7-james.clark@linaro.org>
-	<86ttayp9n9.wl-maz@kernel.org>
-	<e6b46080-b9ae-4aad-b06d-81407c195e28@linaro.org>
+	<20241127100130.1162639-8-james.clark@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -73,189 +70,127 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, broonie@kernel.org, anshuman.khandual@arm.com, robh@kernel.org, shiqiliu@hust.edu.cn, tabba@google.com, james.morse@arm.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, broonie@kernel.org, anshuman.khandual@arm.com, james.morse@arm.com, robh@kernel.org, shiqiliu@hust.edu.cn, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 20 Dec 2024 17:32:17 +0000,
+On Wed, 27 Nov 2024 10:01:24 +0000,
 James Clark <james.clark@linaro.org> wrote:
 > 
+> For nVHE, switch the filter value in and out if the Coresight driver
+> asks for it. This will support filters for guests when sinks other than
+> TRBE are used.
 > 
+> For VHE, just write the filter directly to TRFCR_EL1 where trace can be
+> used even with TRBE sinks.
 > 
-> On 20/12/2024 5:05 pm, Marc Zyngier wrote:
-> > On Wed, 27 Nov 2024 10:01:23 +0000,
-> > James Clark <james.clark@linaro.org> wrote:
-> >> 
-> >> Currently in nVHE, KVM has to check if TRBE is enabled on every guest
-> >> switch even if it was never used. Because it's a debug feature and is
-> >> more likely to not be used than used, give KVM the TRBE buffer status to
-> >> allow a much simpler and faster do-nothing path in the hyp.
-> >> 
-> >> This is always called with preemption disabled except for probe/hotplug
-> >> which gets wrapped with preempt_disable().
-> >> 
-> >> Protected mode disables trace regardless of TRBE (because
-> >> guest_trfcr_el1 is always 0), which was not previously done. HAS_TRBE
-> >> becomes redundant, but HAS_TRF is now required for this.
-> >> 
-> >> Signed-off-by: James Clark <james.clark@linaro.org>
-> >> ---
-> >>   arch/arm64/include/asm/kvm_host.h            | 10 +++-
-> >>   arch/arm64/kvm/debug.c                       | 25 ++++++++--
-> >>   arch/arm64/kvm/hyp/nvhe/debug-sr.c           | 51 +++++++++++---------
-> >>   drivers/hwtracing/coresight/coresight-trbe.c |  5 ++
-> >>   4 files changed, 65 insertions(+), 26 deletions(-)
-> >> 
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >> index 7e3478386351..ba251caa593b 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -611,7 +611,8 @@ struct cpu_sve_state {
-> >>    */
-> >>   struct kvm_host_data {
-> >>   #define KVM_HOST_DATA_FLAG_HAS_SPE	0
-> >> -#define KVM_HOST_DATA_FLAG_HAS_TRBE	1
-> >> +#define KVM_HOST_DATA_FLAG_HAS_TRF	1
-> >> +#define KVM_HOST_DATA_FLAG_TRBE_ENABLED	2
-> >>   	unsigned long flags;
-> >>     	struct kvm_cpu_context host_ctxt;
-> >> @@ -657,6 +658,9 @@ struct kvm_host_data {
-> >>   		u64 mdcr_el2;
-> >>   	} host_debug_state;
-> >>   +	/* Guest trace filter value */
-> >> +	u64 guest_trfcr_el1;
-> > 
-> > Guest value? Or host state while running the guest? If the former,
-> > then this has nothing to do here. If the latter, this should be
-> > spelled out (trfcr_in_guest?), and the comment amended.
-> > 
-> >> +
-> >>   	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
-> >>   	unsigned int nr_event_counters;
-> >>   };
-> >> @@ -1381,6 +1385,8 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
-> >>   void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> >>   void kvm_clr_pmu_events(u64 clr);
-> >>   bool kvm_set_pmuserenr(u64 val);
-> >> +void kvm_enable_trbe(void);
-> >> +void kvm_disable_trbe(void);
-> >>   #else
-> >>   static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> >>   static inline void kvm_clr_pmu_events(u64 clr) {}
-> >> @@ -1388,6 +1394,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
-> >>   {
-> >>   	return false;
-> >>   }
-> >> +static inline void kvm_enable_trbe(void) {}
-> >> +static inline void kvm_disable_trbe(void) {}
-> >>   #endif
-> >>     void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> >> index dd9e139dfd13..0c340ae7b5d1 100644
-> >> --- a/arch/arm64/kvm/debug.c
-> >> +++ b/arch/arm64/kvm/debug.c
-> >> @@ -314,7 +314,26 @@ void kvm_init_host_debug_data(void)
-> >>   	    !(read_sysreg_s(SYS_PMBIDR_EL1) & PMBIDR_EL1_P))
-> >>   		host_data_set_flag(HAS_SPE);
-> >>   -	if (cpuid_feature_extract_unsigned_field(dfr0,
-> >> ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
-> >> -	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
-> >> -		host_data_set_flag(HAS_TRBE);
-> >> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT))
-> >> +		host_data_set_flag(HAS_TRF);
-> >>   }
-> >> +
-> >> +void kvm_enable_trbe(void)
-> >> +{
-> >> +	if (has_vhe() || is_protected_kvm_enabled() ||
-> >> +	    WARN_ON_ONCE(preemptible()))
-> >> +		return;
-> >> +
-> >> +	host_data_set_flag(TRBE_ENABLED);
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(kvm_enable_trbe);
-> >> +
-> >> +void kvm_disable_trbe(void)
-> >> +{
-> >> +	if (has_vhe() || is_protected_kvm_enabled() ||
-> >> +	    WARN_ON_ONCE(preemptible()))
-> >> +		return;
-> >> +
-> >> +	host_data_clear_flag(TRBE_ENABLED);
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(kvm_disable_trbe);
-> >> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> >> index 858bb38e273f..9479bee41801 100644
-> >> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> >> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> >> @@ -51,32 +51,39 @@ static void __debug_restore_spe(u64 pmscr_el1)
-> >>   	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
-> >>   }
-> >>   -static void __debug_save_trace(u64 *trfcr_el1)
-> >> +static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
-> >>   {
-> >> -	*trfcr_el1 = 0;
-> >> +	*saved_trfcr = read_sysreg_el1(SYS_TRFCR);
-> >> +	write_sysreg_el1(new_trfcr, SYS_TRFCR);
-> >>   -	/* Check if the TRBE is enabled */
-> >> -	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
-> >> +	/* No need to drain if going to an enabled state or from disabled state */
-> >> +	if (new_trfcr || !*saved_trfcr)
-> > 
-> > What if TRFCR_EL1.TS is set to something non-zero? I'd rather you
-> > check for the E*TRE bits instead of assuming things.
-> > 
+> Signed-off-by: James Clark <james.clark@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h  |  5 +++++
+>  arch/arm64/kvm/debug.c             | 28 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c |  1 +
+>  3 files changed, 34 insertions(+)
 > 
-> Yeah it's probably better that way. TS is actually always set when any
-> tracing session starts and then never cleared, so doing it the simpler
-> way made it always flush even after tracing finished, which probably
-> wasn't great.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ba251caa593b..cce07887551b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -613,6 +613,7 @@ struct kvm_host_data {
+>  #define KVM_HOST_DATA_FLAG_HAS_SPE	0
+>  #define KVM_HOST_DATA_FLAG_HAS_TRF	1
+>  #define KVM_HOST_DATA_FLAG_TRBE_ENABLED	2
+> +#define KVM_HOST_DATA_FLAG_GUEST_FILTER	3
 
-Quite. Can you please *test* these things?
+Guest filter what? This is meaningless.
 
-[...]
+>  	unsigned long flags;
+>  
+>  	struct kvm_cpu_context host_ctxt;
+> @@ -1387,6 +1388,8 @@ void kvm_clr_pmu_events(u64 clr);
+>  bool kvm_set_pmuserenr(u64 val);
+>  void kvm_enable_trbe(void);
+>  void kvm_disable_trbe(void);
+> +void kvm_set_trfcr(u64 guest_trfcr);
+> +void kvm_clear_trfcr(void);
+>  #else
+>  static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+>  static inline void kvm_clr_pmu_events(u64 clr) {}
+> @@ -1396,6 +1399,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>  }
+>  static inline void kvm_enable_trbe(void) {}
+>  static inline void kvm_disable_trbe(void) {}
+> +static inline void kvm_set_trfcr(u64 guest_trfcr) {}
+> +static inline void kvm_clear_trfcr(void) {}
+>  #endif
+>  
+>  void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 0c340ae7b5d1..9266f2776991 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -337,3 +337,31 @@ void kvm_disable_trbe(void)
+>  	host_data_clear_flag(TRBE_ENABLED);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_disable_trbe);
+> +
+> +void kvm_set_trfcr(u64 guest_trfcr)
 
-> >> @@ -253,8 +256,10 @@ static void trbe_drain_and_disable_local(struct trbe_cpudata *cpudata)
-> >>     static void trbe_reset_local(struct trbe_cpudata *cpudata)
-> >>   {
-> >> +	preempt_disable();
-> >>   	trbe_drain_and_disable_local(cpudata);
-> >>   	write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-> >> +	preempt_enable();
-> > 
-> > This looks terribly wrong. If you need to disable preemption here, why
-> > doesn't the critical section cover all register accesses? Surely you
-> > don't want to nuke another CPU's context?
-> > 
-> > But looking at the calling sites, this makes even less sense. The two
-> > callers of this thing mess with *per-CPU* interrupts. Dealing with
-> > per-CPU interrupts in preemptible context is a big no-no (hint: they
-> > start with a call to smp_processor_id()).
-> > 
-> > So what is this supposed to ensure?
-> > 
-> > 	M.
-> > 
-> 
-> These ones are only intended to silence the
-> WARN_ON_ONCE(preemptible()) in kvm_enable_trbe() when this is called
-> from boot/hotplug (arm_trbe_enable_cpu()). Preemption isn't disabled,
-> but a guest can't run at that point either.
->
-> The "real" calls to kvm_enable_trbe() _are_ called from an atomic
-> context. I think there was a previous review comment about when it was
-> safe to call the KVM parts of this change, which is why I added the
-> warning making sure it was always called with preemption disabled. But
-> actually I could remove the warning and these preempt_disables() and
-> replace them with a comment.
+Again. Is this the guest's view? or the host view while running the
+guest? I asked the question on the previous patch, and you didn't
+reply.
 
-You should keep the WARN_ON(), and either *never* end-up calling this
-stuff during a CPUHP event, or handle the fact that preemption isn't
-initialised yet. For example by checking whether the current CPU is
-online.
+> +{
+> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
+> +		return;
+> +
+> +	if (has_vhe())
+> +		write_sysreg_s(guest_trfcr, SYS_TRFCR_EL12);
+> +	else {
+> +		*host_data_ptr(guest_trfcr_el1) = guest_trfcr;
+> +		host_data_set_flag(GUEST_FILTER);
+> +	}
 
-But this sort of random spreading of preemption disabling is not an
-acceptable outcome.
+Oh come on. This is basic coding style, see section 3 in
+Documentation/process/coding-style.rst.
+
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_set_trfcr);
+> +
+> +void kvm_clear_trfcr(void)
+> +{
+> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
+> +		return;
+> +
+> +	if (has_vhe())
+> +		write_sysreg_s(0, SYS_TRFCR_EL12);
+> +	else {
+> +		*host_data_ptr(guest_trfcr_el1) = 0;
+> +		host_data_clear_flag(GUEST_FILTER);
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_clear_trfcr);
+
+Why do we have two helpers? Clearly, calling kvm_set_trfcr() with
+E{1,0}TRE=={0,0} should result in *disabling* things.  Except it
+doesn't, and you should fix it. Once that is fixed, it becomes obvious
+that kvm_clear_trfcr() serves no purpose.
+
+To sum it up, KVM's API should reflect the architecture instead of
+making things up.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 9479bee41801..7edee7ace433 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -67,6 +67,7 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+>  static bool __trace_needs_switch(void)
+>  {
+>  	return host_data_test_flag(TRBE_ENABLED) ||
+> +	       host_data_test_flag(GUEST_FILTER) ||
+>  	       (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRF));
+
+Wouldn't it make more sense to just force the "GUEST_FILTER" flag in
+the pKVM case, and drop the 3rd term altogether?
 
 	M.
 
