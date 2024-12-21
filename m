@@ -1,64 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B99864D;
-	Sat, 21 Dec 2024 12:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A10E1F236E
+	for <kvmarm@lists.linux.dev>; Sat, 21 Dec 2024 13:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734784493; cv=none; b=TSK2XGJW4OIqyqeq6+nvxsqWKH72nJfqZBdWSi2Tt3YLrM/XUCHGDN7NUh6+sJyy3RWPtLxPZJSSJ2q82HQ09TI9yeJoTUbpJ5tDHVidow2V4NimasP33QIrIoC0pWHavHh+ouyNJVrCdhboX/3r+SYCdW1+UwbOwWG+jOMYF38=
+	t=1734786144; cv=none; b=aRp0/E3e9E1KGieUqs8CBytz73jr+iHcuEXFJPjC7UAWIcBuXpTZnCcBoTgXf5a/wwdWKj5yghpsJemFYQxy4TthdcIlWqzh03bYEp3CF+N2WOTathPw+HrKZIzCusOa4ZVueMDUl9l6G2i3AASiWkO8yZBpMExB4MsOU4fA36c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734784493; c=relaxed/simple;
-	bh=mJh65cE8FpJnhcgX4NYekYpaa0p+s7y+XkLuWQvx+YY=;
+	s=arc-20240116; t=1734786144; c=relaxed/simple;
+	bh=3EWo7emVjASneGQ7QyGa6FJQi3Vp+azIw98Wgkn13mM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WWJbp8XUfmD0KLSxa4pgdCQk4Dx8wfasM7Z+jbEGb5xwhlXFwFQ7upJbSSTEMsNIIN64sYxBQ0iXXizvNt1ZfTQtShGAp6RM2Bto11ayTpYJFj5JDnXmNx9tWz1i/rldCGV6VlnRDKoTmLgMoJVrwOKvbzD5W8joAmoagUjQ6d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Er7xCeD9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=fORmSyWdoix+Gc2wtsD5Ijl00zEmSViAoBdaGzp0vNcdVyU6BoCy5RPLXWWWRK+nBgsbsa5+8GXeLcGoTHSTcSheZnmVIpA9F459ntgLTKpeZXCF3Qh/IAXeALQqdhWsM6wZmVFByFwT9rORGeTcGonoK5keEdmD5pX0Qf8BUwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Na7n0kmR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Er7xCeD9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A087C4CECE;
-	Sat, 21 Dec 2024 12:34:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Na7n0kmR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04386C4CED6;
+	Sat, 21 Dec 2024 13:02:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734784492;
-	bh=mJh65cE8FpJnhcgX4NYekYpaa0p+s7y+XkLuWQvx+YY=;
+	s=k20201202; t=1734786144;
+	bh=3EWo7emVjASneGQ7QyGa6FJQi3Vp+azIw98Wgkn13mM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Er7xCeD9KIZUg6+fdQRcrAsfzMhj8fh9cjF3x83fWt8QglmFFHpKCmFhPjhF+fxQy
-	 Ys+3Fm2Gh2Uz19PlsrF8AMWFHmN+XRIj4oDkJGR8fk3Ils/c9eiQLOhIOCu+84LBcA
-	 T0qs2VHHg//aP16oq1G4fUsmRkcmxM2W9Pbfpo14Q0nRt86OIzv2veB2Z7s0f+R7Yg
-	 le4zFjvwK0IoCWmZKEzWLjm/Ri4XhybuUH/DJH7BHb50t4PMWo/pUsJJWKITk8f2Qy
-	 DyI02tlAco34X19KI+kaoe7t3T8D9fZQVchzyMDvK3aw8uEyTqXwY4WpQHNv9hdehJ
-	 Jvf4jJWXprrlQ==
+	b=Na7n0kmRoQIcVSTmuJXHUUe3jKOzsBefRCJ+n81Y9L5P58oTFPalqUehmreFafB5+
+	 8Msc3NzT+pyoh8pBy6nidinmsNJ21Bf2Xag9y1nAJRX0AXznS7UD/wNG/ofivw10Hk
+	 Ne2QjCC+EJmXWoGn22wi2rlJbF6mdGONONsS/pvoxXO+wz8ytXz2XkpxOJTbZuy1EK
+	 zxCEQBwPg4UxsMDrKgBeJD/HPd1UJw+xayOWEa6EAx3+1NANR+zcrM5wK03u0SYI8T
+	 63snwMF4KfdftFLJ6dCCBpe3C9Ch3BHOFpoj/GbbjDIreq5IekUWHkxXLusJK1/Ts5
+	 OJdYPMzEW9Sog==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tOyh0-005vOL-95;
-	Sat, 21 Dec 2024 12:34:50 +0000
-Date: Sat, 21 Dec 2024 12:34:48 +0000
-Message-ID: <86r061p63b.wl-maz@kernel.org>
+	id 1tOz7d-005vi1-Kd;
+	Sat, 21 Dec 2024 13:02:21 +0000
+Date: Sat, 21 Dec 2024 13:02:20 +0000
+Message-ID: <86plllp4tf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: kvmarm@lists.linux.dev,
+To: Daniel =?UTF-8?B?IlAuIEJlcnJhbmfDqSI=?= <berrange@redhat.com>
+Cc: Kashyap Chamarthy <kchamart@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	eric.auger.pro@gmail.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
 	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	coresight@lists.linaro.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	James Morse <james.morse@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 7/8] KVM: arm64: Support trace filtering for guests
-In-Reply-To: <20241127100130.1162639-8-james.clark@linaro.org>
-References: <20241127100130.1162639-1-james.clark@linaro.org>
-	<20241127100130.1162639-8-james.clark@linaro.org>
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com,
+	shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [PATCH RFCv2 00/20] kvm/arm: Introduce a customizable aarch64 KVM host model
+In-Reply-To: <Z2RdMJHydsvPpmdH@redhat.com>
+References: <20241206112213.88394-1-cohuck@redhat.com>
+	<edc12140-6345-4868-938d-c80c4d2c2004@redhat.com>
+	<Z1qoa8yXscTSAJ9e@redhat.com>
+	<8734it1bv6.fsf@redhat.com>
+	<1fea79e4-7a31-4592-8495-7b18cd82d02b@redhat.com>
+	<Z2QE9AqZnpGM5sWD@gezellig>
+	<8634ijrh8q.wl-maz@kernel.org>
+	<Z2Q2rWj9cV0W_XVq@gezellig>
+	<86zfkrptmj.wl-maz@kernel.org>
+	<Z2RdMJHydsvPpmdH@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,131 +77,157 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, broonie@kernel.org, anshuman.khandual@arm.com, james.morse@arm.com, robh@kernel.org, shiqiliu@hust.edu.cn, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: berrange@redhat.com, kchamart@redhat.com, eric.auger@redhat.com, cohuck@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 27 Nov 2024 10:01:24 +0000,
-James Clark <james.clark@linaro.org> wrote:
-> 
-> For nVHE, switch the filter value in and out if the Coresight driver
-> asks for it. This will support filters for guests when sinks other than
-> TRBE are used.
-> 
-> For VHE, just write the filter directly to TRFCR_EL1 where trace can be
-> used even with TRBE sinks.
-> 
-> Signed-off-by: James Clark <james.clark@linaro.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h  |  5 +++++
->  arch/arm64/kvm/debug.c             | 28 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c |  1 +
->  3 files changed, 34 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index ba251caa593b..cce07887551b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -613,6 +613,7 @@ struct kvm_host_data {
->  #define KVM_HOST_DATA_FLAG_HAS_SPE	0
->  #define KVM_HOST_DATA_FLAG_HAS_TRF	1
->  #define KVM_HOST_DATA_FLAG_TRBE_ENABLED	2
-> +#define KVM_HOST_DATA_FLAG_GUEST_FILTER	3
+On Thu, 19 Dec 2024 17:51:44 +0000,
+Daniel "P. Berrang=C3=A9" <berrange@redhat.com> wrote:
+>=20
+> On Thu, Dec 19, 2024 at 03:41:56PM +0000, Marc Zyngier wrote:
+> > On Thu, 19 Dec 2024 15:07:25 +0000,
+> > Kashyap Chamarthy <kchamart@redhat.com> wrote:
+> > >=20
+> > > On Thu, Dec 19, 2024 at 12:26:29PM +0000, Marc Zyngier wrote:
+> > > > On Thu, 19 Dec 2024 11:35:16 +0000,
+> > > > Kashyap Chamarthy <kchamart@redhat.com> wrote:
+> > >=20
+> > > [...]
+> > >=20
+> > > > > Consider this:
+> > > > >=20
+> > > > > Say, there's a serious security issue in a released ARM CPU.  As =
+part of
+> > > > > the fix, two new CPU flags need to be exposed to the guest OS, ca=
+ll them
+> > > > > "secflag1" and "secflag2".  Here, the user is configuring a basel=
+ine
+> > > > > model + two extra CPU flags, not to get close to some other CPU m=
+odel
+> > > > > but to mitigate itself against a serious security flaw.
+> > > >=20
+> > > > If there's such a security issue, that the hypervisor's job to do s=
+o,
+> > > > not userspace.=20
+> > >=20
+> > > I don't disagree.  Probably that has always been the case on ARM.  I
+> > > asked the above based on how QEMU on x86 handles it today.
+> > >=20
+> > > > See what KVM does for CSV3, for example (and all the
+> > > > rest of the side-channel stuff).
+> > >=20
+> > > Noted.  From a quick look in the kernel tree, I assume you're referri=
+ng
+> > > to these commits[1].
+> > >=20
+> > > > You can't rely on userspace for security, that'd be completely
+> > > > ludicrous.
+> > >=20
+> > > As Dan Berrang=C3=A9 points out, it's the bog-standard way QEMU deals=
+ with
+> > > some of the CPU-related issues on x86 today.  See this "important CPU
+> > > flags"[2] section in the QEMU docs.
+> >=20
+> > I had a look, and we do things quite differently. For example, the
+> > spec-ctrl equivalent in implemented in FW and in KVM, and is exposed
+> > by default if the HW is vulnerable. Userspace could hide that the
+> > mitigation is there, but that's the extent of the configurability.
+>=20
+> Whether it is enabled by default or disabled by default isn't a
+> totally fatal problem. If QEMU can toggle it to the opposite value,
+> we have the same level of configurability in both cases.
+>=20
+> It does, however, have implications for QEMU as if KVM gained support
+> for exposing the new feature by default and QEMU didn't know about
+> it, then the guest ABI would have changed without QEMU realizing it.
 
-Guest filter what? This is meaningless.
+No. It just imposes that QEMU implements its part of the architecture,
+which is that any ID reg it doesn't know about and that is advertised
+as writable gets written back to 0, which is (in general, but with a
+couple of exceptions) the value indicating that a feature is not
+implemented.
 
->  	unsigned long flags;
->  
->  	struct kvm_cpu_context host_ctxt;
-> @@ -1387,6 +1388,8 @@ void kvm_clr_pmu_events(u64 clr);
->  bool kvm_set_pmuserenr(u64 val);
->  void kvm_enable_trbe(void);
->  void kvm_disable_trbe(void);
-> +void kvm_set_trfcr(u64 guest_trfcr);
-> +void kvm_clear_trfcr(void);
->  #else
->  static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
->  static inline void kvm_clr_pmu_events(u64 clr) {}
-> @@ -1396,6 +1399,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
->  }
->  static inline void kvm_enable_trbe(void) {}
->  static inline void kvm_disable_trbe(void) {}
-> +static inline void kvm_set_trfcr(u64 guest_trfcr) {}
-> +static inline void kvm_clear_trfcr(void) {}
->  #endif
->  
->  void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 0c340ae7b5d1..9266f2776991 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -337,3 +337,31 @@ void kvm_disable_trbe(void)
->  	host_data_clear_flag(TRBE_ENABLED);
->  }
->  EXPORT_SYMBOL_GPL(kvm_disable_trbe);
-> +
-> +void kvm_set_trfcr(u64 guest_trfcr)
+The ID register space is architected, and has been unchanged for the
+past 13 years.
 
-Again. Is this the guest's view? or the host view while running the
-guest? I asked the question on the previous patch, and you didn't
-reply.
+> IOW, it would imply a requirement for timely QEMU updates to match
+> the kernel, which is something we wouldn't need in x86 world where
+> the feature is disabled by default. Disable by default is a more
+> stable approach from QEMU's POV.
 
-> +{
-> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
-> +		return;
-> +
-> +	if (has_vhe())
-> +		write_sysreg_s(guest_trfcr, SYS_TRFCR_EL12);
-> +	else {
-> +		*host_data_ptr(guest_trfcr_el1) = guest_trfcr;
-> +		host_data_set_flag(GUEST_FILTER);
-> +	}
+Given the above, I don't see where the burden is. And that ship has
+sailed since the beginning of KVM/arm, really. It is also worth
+realising that for a very long time, it wasn't really possible to
+"disable" new features. Even today, disabling a feature really means
+emulating its absence.
 
-Oh come on. This is basic coding style, see section 3 in
-Documentation/process/coding-style.rst.
+>=20
+> > > Mind you, I'm _not_ saying this is how ARM should do it.  I don't know
+> > > enough about ARM to make such remarks.
+> > >=20
+> > >     * * *
+> > >=20
+> > > To reply to your other question on this thread[3] about "which ABI?" =
+ I
+> > > think Dan is talking about the *guest* ABI: the virtual "chipset" that
+> > > is exposed to a guest (e.g. PCI(e) topology, ACPI tables, CPU model,
+> > > etc).  As I understand it, this "guest ABI" should remain predictable,
+> > > regardless of:
+> > >=20
+> > >   - whether you're updating KVM, QEMU, or the underlying physical
+> > >     hardware itself; or
+> > >   - if the guest is migrated, live or offline
+> > >=20
+> > > (As you might know, QEMU's "machine types" concept allows to create a
+> > > stable guest ABI.)
+> >=20
+> > All of this is under control of QEMU, *except* for the "maximum" of
+> > the architectural features exposed to the guest. All you can do is
+> > *downgrade* from there, and only to a limited extent.
+> >=20
+> > That, in turn has a direct impact on what you call the "CPU model",
+> > which for the ARM architecture really doesn't exist. All we have is a
+> > bag of discrete features, with intricate dependencies between them.
+> >=20
+> > Even ignoring virtualisation: you can readily find two machines using
+> > the same CPUs (let's say Neoverse-N1), integrated by the same vendor
+> > (let's say, Ampere), in SoCs that bear the same name (Altra), and
+> > realise that they have a different feature set. Fun, isn't it?
+>=20
+> "Fun" is probably not the word I'd pick :-)
 
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_set_trfcr);
-> +
-> +void kvm_clear_trfcr(void)
-> +{
-> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
-> +		return;
-> +
-> +	if (has_vhe())
-> +		write_sysreg_s(0, SYS_TRFCR_EL12);
-> +	else {
-> +		*host_data_ptr(guest_trfcr_el1) = 0;
-> +		host_data_clear_flag(GUEST_FILTER);
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_clear_trfcr);
+Of course not. "Braindead" is the word I wanted to write, but sarcasm
+took over... ;-)
 
-Why do we have two helpers? Clearly, calling kvm_set_trfcr() with
-E{1,0}TRE=={0,0} should result in *disabling* things.  Except it
-doesn't, and you should fix it. Once that is fixed, it becomes obvious
-that kvm_clear_trfcr() serves no purpose.
+>=20
+> > That's why I don't see CPU models as a viable thing in terms of ABI.
+> > They are an approximation of what you could have, but the ABI is
+> > elsewhere.
+>=20
+> Right, this makes life quite challenging for QEMU. The premise of named
+> CPU models (as opposed to -host), is to facilitate the migration of VMs
+> between heterogenous hardware platforms. That assumes it is possible to
+> downgrade the CPU on both src + dst, to the common baseline you desire.
+>=20
+> If we were to define a named CPU model, for that to be usable, QEMU
+> would have to be able to query the "maxmimum" architectural features,
+> and validate that the delta between the host maximum, and the named
+> CPU model is possible to downgrade. Is arm providing sufficient info
+> to let QEMU do that ?
 
-To sum it up, KVM's API should reflect the architecture instead of
-making things up.
+I think so. On creating a brand new VM, you get the maximum allowed on
+the HW, and the subset of features you can downgrade. The intersection
+of these two sets and your model's will tell you whether you can
+actually instantiate this model on this host. You can also decide that
+it is OK to let a extra features advertised, such as extra page sizes
+or 32bit support, which the hypervisor can hide, but not disable.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 9479bee41801..7edee7ace433 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -67,6 +67,7 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
->  static bool __trace_needs_switch(void)
->  {
->  	return host_data_test_flag(TRBE_ENABLED) ||
-> +	       host_data_test_flag(GUEST_FILTER) ||
->  	       (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRF));
-
-Wouldn't it make more sense to just force the "GUEST_FILTER" flag in
-the pKVM case, and drop the 3rd term altogether?
+Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
