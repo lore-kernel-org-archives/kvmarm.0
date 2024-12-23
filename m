@@ -1,298 +1,601 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89E219AA5A
-	for <kvmarm@lists.linux.dev>; Mon, 23 Dec 2024 11:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACE41A8F67
+	for <kvmarm@lists.linux.dev>; Mon, 23 Dec 2024 12:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734953808; cv=none; b=raT6UbtnxrfPi3dUydrCQqzghmMa67Fp+aYJWqmrxMdTnMYDC7/EnvnWKiI4xQpSncIVigXMrT8uUAxvY/mUqmd7QEsidF+PzwjTwNPl+0k8T5GOe3oyISCusq/pgitg1q9AE4mTm/GyIkb/YYU1r8aF8C9g8A8C8Kl8+2FXpYw=
+	t=1734955420; cv=none; b=d4zR9uhot7f2FT0PqMPEit55jgKPMTIkd7mN0iVKlhW8hsqa287CyssEv35OTwgphP/XEqL/yrg0rrGnwpykgPQjRnjssnEfP8DzdWgESlpNOUvhLPPixqJLWud1nXNGVTkf5v1eCef1bTq3/atqLfQEMz3Yq5VtwEziDgFzgks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734953808; c=relaxed/simple;
-	bh=P5x4oAHeG7HJEd/0t9TBmtHI+gPp2r6ifa994LIjj8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WVJfZ7zmflPMIuE0GnXGOI8zr4nKWp+KF4tuElXmh7YnLW8LAemO5WMe5eeGOC/8Tr4AmgKZ+IAIXhdPMt4DgOf7IG6lPoGhVZrWrUHaFjdwhcwvAI5SIVil6FAGuITiRT+XiQlEeUxVq96wnGKX/+D59zKZ0nwaS2nYiFSld6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qwXarii6; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qwXarii6"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4361a50e337so27858555e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 23 Dec 2024 03:36:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734953804; x=1735558604; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pfAEnN47k2yUPyXkehPRQB5Var7XNNy5tr8DW7zJULQ=;
-        b=qwXarii6Rwt0Rd9cdPZRp6j6kMg+68g4ykYJlw8Xwi+TOlMDasQvTnjCg6XVSyeTWH
-         qIOu32sT0Jo+gfoiMmYZau4bjsvTlH/tFkg4kD+ZOXaMBB4bejW041jAbDPbOMufJU+e
-         HhFcQ2u3UDolAdgz1sQFTzgC6rRP49iMhCov4lo8sAaZJzisFq3lV1RWUHva/YxUO7mf
-         rNA3w1B5U2+/wmbfGsY25LEYQMAc13JZrzbfdv24eflghMu47ocNbLVj6ffc+qPAPXmY
-         23S2y2+x5Weo3El/0OrAX0bmXsQIRU3ARayTcAyKFLSLpoHgVbF5elqgr7J2qB+to3VV
-         /CHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734953804; x=1735558604;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pfAEnN47k2yUPyXkehPRQB5Var7XNNy5tr8DW7zJULQ=;
-        b=i9MJq5XR4/IFFza9ANciAI3IGtsZ6Zs9geupPlMnuEjxCjfz3FfRdgPKHae2hjo+BT
-         DnW3msxnIOAzu+djIGOM2vZVqGFdOZwYHVjxaRseixq/q69Px8jJwN6+yK/wEvH7+gDy
-         umCRkqIcnsuhdzFZDJo0QxZD92aAyDRR8beDLLUACconEfhY6Bl3RpsCja+rdIqEWgWq
-         dMmFJA8lJCb28IAi6hQ0bLJTBA9Un5JhIjItwdE4MEtHlb8Hr7ySm/AmGb4C6Mh2sxG4
-         WW9QEgHNn3gfD0xj3+rFyE8/gpRinF5u4EvhzYT+mSNv22OG/Pe3O1SFKmBtxTAV21uS
-         uSQQ==
-X-Gm-Message-State: AOJu0Yybms4UDEFHcfYuu6ok0cisZ4cfCFJSPsT+UpXSLDC8W4FSdCGu
-	lo28+BqKUMlth7ToksnjBWE9tPvTa6mcgZF9sbGYJIPWfp+L+cEu7jTVsIrtRZ4=
-X-Gm-Gg: ASbGncv2mlz6AXEL0pe8tPNJ2gk3SxmbT04C/Ek2rGwXcXh5f/m6BsOZfdUK5e7YLZ0
-	5DD8V+D83b/a4tKCEUYgoOBXptuY2zKVsL/eNQiK6glNnjsc7I2enZFTezd90mvdusgLFHilGyw
-	U3zHgpq07oN4o2I3S1dorvimZNv0CMzKTgsXNNUdFBmd9i4ffwWoKBOTngMghf0uCeGwVHfk0Ty
-	hd21edB1JsjP/WgXUVxyrEPhYkaKFarKdm8A2GPcd8149onf5RHBzFYoU3caHUHdg==
-X-Google-Smtp-Source: AGHT+IH1xux9sPKNWQ/qyA/QpYj6eYBI9DgnVKcK7PP07rrtLIZQhCaDtbBqQzfpAVwh4XJhK9q1vw==
-X-Received: by 2002:a5d:5f4a:0:b0:385:f19f:5a8f with SMTP id ffacd0b85a97d-38a221f2d90mr10269118f8f.4.1734953803802;
-        Mon, 23 Dec 2024 03:36:43 -0800 (PST)
-Received: from [192.168.68.163] ([145.224.66.70])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8ace0esm10999383f8f.106.2024.12.23.03.36.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Dec 2024 03:36:43 -0800 (PST)
-Message-ID: <b1cc3ea5-e1d4-494e-9110-dd7b6d5e95e7@linaro.org>
-Date: Mon, 23 Dec 2024 11:36:41 +0000
+	s=arc-20240116; t=1734955420; c=relaxed/simple;
+	bh=Nunw0684NxaYtkNdf21EN3zolcb7F8ZCoxsEeFCCKdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOSVsBonnCtwrN45LuasshrdQp4Te5viqAheyLCc9FZj9c1NedP02TtZv2Qy8aKGlq7sNSx2ej8OaCCE3TF904mtAhio9NloTPrPI9s3NvReuIyHoEcosCe/eSbDui48ZroATxdvO8e8cB1Jvte27EQhyACUaMUmvFmNEsIqJpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62D31152B;
+	Mon, 23 Dec 2024 04:04:03 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A1AB3F720;
+	Mon, 23 Dec 2024 04:03:34 -0800 (PST)
+Date: Mon, 23 Dec 2024 12:03:31 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com, andrew.jones@linux.dev,
+	eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests  PATCH v2] arm64: Add basic MTE test
+Message-ID: <Z2lRk_NLHxDPvmrS@raptor>
+References: <20241212103447.34593-1-vladimir.murzin@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 6/8] KVM: arm64: coresight: Give TRBE enabled state to
- KVM
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com,
- coresight@lists.linaro.org, Joey Gouly <joey.gouly@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Mark Brown <broonie@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- "Rob Herring (Arm)" <robh@kernel.org>, Shiqi Liu <shiqiliu@hust.edu.cn>,
- Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
- Raghavendra Rao Ananta <rananta@google.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20241127100130.1162639-1-james.clark@linaro.org>
- <20241127100130.1162639-7-james.clark@linaro.org>
- <86ttayp9n9.wl-maz@kernel.org>
- <e6b46080-b9ae-4aad-b06d-81407c195e28@linaro.org>
- <86seqhp7yg.wl-maz@kernel.org>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <86seqhp7yg.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241212103447.34593-1-vladimir.murzin@arm.com>
 
+Hi Vladimir,
 
+The patch looks good, but it just occured to me, the tests do a great job
+checking that tagged accesses fail when they should be failing, but they don't
+check that taggedd accesses *succeed* when they should not be failing. I think
+that's useful to have at the start of each test, if nothing just as a sanity
+check.
 
-On 21/12/2024 11:54 am, Marc Zyngier wrote:
-> On Fri, 20 Dec 2024 17:32:17 +0000,
-> James Clark <james.clark@linaro.org> wrote:
->>
->>
->>
->> On 20/12/2024 5:05 pm, Marc Zyngier wrote:
->>> On Wed, 27 Nov 2024 10:01:23 +0000,
->>> James Clark <james.clark@linaro.org> wrote:
->>>>
->>>> Currently in nVHE, KVM has to check if TRBE is enabled on every guest
->>>> switch even if it was never used. Because it's a debug feature and is
->>>> more likely to not be used than used, give KVM the TRBE buffer status to
->>>> allow a much simpler and faster do-nothing path in the hyp.
->>>>
->>>> This is always called with preemption disabled except for probe/hotplug
->>>> which gets wrapped with preempt_disable().
->>>>
->>>> Protected mode disables trace regardless of TRBE (because
->>>> guest_trfcr_el1 is always 0), which was not previously done. HAS_TRBE
->>>> becomes redundant, but HAS_TRF is now required for this.
->>>>
->>>> Signed-off-by: James Clark <james.clark@linaro.org>
->>>> ---
->>>>    arch/arm64/include/asm/kvm_host.h            | 10 +++-
->>>>    arch/arm64/kvm/debug.c                       | 25 ++++++++--
->>>>    arch/arm64/kvm/hyp/nvhe/debug-sr.c           | 51 +++++++++++---------
->>>>    drivers/hwtracing/coresight/coresight-trbe.c |  5 ++
->>>>    4 files changed, 65 insertions(+), 26 deletions(-)
->>>>
->>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>> index 7e3478386351..ba251caa593b 100644
->>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>> @@ -611,7 +611,8 @@ struct cpu_sve_state {
->>>>     */
->>>>    struct kvm_host_data {
->>>>    #define KVM_HOST_DATA_FLAG_HAS_SPE	0
->>>> -#define KVM_HOST_DATA_FLAG_HAS_TRBE	1
->>>> +#define KVM_HOST_DATA_FLAG_HAS_TRF	1
->>>> +#define KVM_HOST_DATA_FLAG_TRBE_ENABLED	2
->>>>    	unsigned long flags;
->>>>      	struct kvm_cpu_context host_ctxt;
->>>> @@ -657,6 +658,9 @@ struct kvm_host_data {
->>>>    		u64 mdcr_el2;
->>>>    	} host_debug_state;
->>>>    +	/* Guest trace filter value */
->>>> +	u64 guest_trfcr_el1;
->>>
->>> Guest value? Or host state while running the guest? If the former,
->>> then this has nothing to do here. If the latter, this should be
->>> spelled out (trfcr_in_guest?), and the comment amended.
->>>
->>>> +
->>>>    	/* Number of programmable event counters (PMCR_EL0.N) for this CPU */
->>>>    	unsigned int nr_event_counters;
->>>>    };
->>>> @@ -1381,6 +1385,8 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
->>>>    void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
->>>>    void kvm_clr_pmu_events(u64 clr);
->>>>    bool kvm_set_pmuserenr(u64 val);
->>>> +void kvm_enable_trbe(void);
->>>> +void kvm_disable_trbe(void);
->>>>    #else
->>>>    static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
->>>>    static inline void kvm_clr_pmu_events(u64 clr) {}
->>>> @@ -1388,6 +1394,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
->>>>    {
->>>>    	return false;
->>>>    }
->>>> +static inline void kvm_enable_trbe(void) {}
->>>> +static inline void kvm_disable_trbe(void) {}
->>>>    #endif
->>>>      void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
->>>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->>>> index dd9e139dfd13..0c340ae7b5d1 100644
->>>> --- a/arch/arm64/kvm/debug.c
->>>> +++ b/arch/arm64/kvm/debug.c
->>>> @@ -314,7 +314,26 @@ void kvm_init_host_debug_data(void)
->>>>    	    !(read_sysreg_s(SYS_PMBIDR_EL1) & PMBIDR_EL1_P))
->>>>    		host_data_set_flag(HAS_SPE);
->>>>    -	if (cpuid_feature_extract_unsigned_field(dfr0,
->>>> ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->>>> -	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->>>> -		host_data_set_flag(HAS_TRBE);
->>>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT))
->>>> +		host_data_set_flag(HAS_TRF);
->>>>    }
->>>> +
->>>> +void kvm_enable_trbe(void)
->>>> +{
->>>> +	if (has_vhe() || is_protected_kvm_enabled() ||
->>>> +	    WARN_ON_ONCE(preemptible()))
->>>> +		return;
->>>> +
->>>> +	host_data_set_flag(TRBE_ENABLED);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(kvm_enable_trbe);
->>>> +
->>>> +void kvm_disable_trbe(void)
->>>> +{
->>>> +	if (has_vhe() || is_protected_kvm_enabled() ||
->>>> +	    WARN_ON_ONCE(preemptible()))
->>>> +		return;
->>>> +
->>>> +	host_data_clear_flag(TRBE_ENABLED);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(kvm_disable_trbe);
->>>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->>>> index 858bb38e273f..9479bee41801 100644
->>>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->>>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->>>> @@ -51,32 +51,39 @@ static void __debug_restore_spe(u64 pmscr_el1)
->>>>    	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
->>>>    }
->>>>    -static void __debug_save_trace(u64 *trfcr_el1)
->>>> +static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
->>>>    {
->>>> -	*trfcr_el1 = 0;
->>>> +	*saved_trfcr = read_sysreg_el1(SYS_TRFCR);
->>>> +	write_sysreg_el1(new_trfcr, SYS_TRFCR);
->>>>    -	/* Check if the TRBE is enabled */
->>>> -	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
->>>> +	/* No need to drain if going to an enabled state or from disabled state */
->>>> +	if (new_trfcr || !*saved_trfcr)
->>>
->>> What if TRFCR_EL1.TS is set to something non-zero? I'd rather you
->>> check for the E*TRE bits instead of assuming things.
->>>
->>
->> Yeah it's probably better that way. TS is actually always set when any
->> tracing session starts and then never cleared, so doing it the simpler
->> way made it always flush even after tracing finished, which probably
->> wasn't great.
+On Thu, Dec 12, 2024 at 10:34:47AM +0000, Vladimir Murzin wrote:
+> Test tag storage access and tag mismatch for different MTE modes.
 > 
-> Quite. Can you please *test* these things?
+> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> ---
 > 
-> [...]
+>  v1 -> v2
+>     - Addressed comments (I hope I did not miss any) from Alexandru
 > 
-
-Sorry to confuse things I wasn't 100% accurate here, yes it's tested and 
-working. It works because of the split set/clear_trfcr() API. The 
-Coresight driver specifically calls clear at the end of the session 
-rather than a set of 0. That signals this function not to be called so 
-there's no excessive swapping.
-
-Secondly, the buffer flushing case is triggered by TRBE_ENABLED, which 
-forces TRFCR to 0, so "if (new_trfcr)" is an OK way to gate the flush.
-
-
->>>> @@ -253,8 +256,10 @@ static void trbe_drain_and_disable_local(struct trbe_cpudata *cpudata)
->>>>      static void trbe_reset_local(struct trbe_cpudata *cpudata)
->>>>    {
->>>> +	preempt_disable();
->>>>    	trbe_drain_and_disable_local(cpudata);
->>>>    	write_sysreg_s(0, SYS_TRBLIMITR_EL1);
->>>> +	preempt_enable();
->>>
->>> This looks terribly wrong. If you need to disable preemption here, why
->>> doesn't the critical section cover all register accesses? Surely you
->>> don't want to nuke another CPU's context?
->>>
->>> But looking at the calling sites, this makes even less sense. The two
->>> callers of this thing mess with *per-CPU* interrupts. Dealing with
->>> per-CPU interrupts in preemptible context is a big no-no (hint: they
->>> start with a call to smp_processor_id()).
->>>
->>> So what is this supposed to ensure?
->>>
->>> 	M.
->>>
->>
->> These ones are only intended to silence the
->> WARN_ON_ONCE(preemptible()) in kvm_enable_trbe() when this is called
->> from boot/hotplug (arm_trbe_enable_cpu()). Preemption isn't disabled,
->> but a guest can't run at that point either.
->>
->> The "real" calls to kvm_enable_trbe() _are_ called from an atomic
->> context. I think there was a previous review comment about when it was
->> safe to call the KVM parts of this change, which is why I added the
->> warning making sure it was always called with preemption disabled. But
->> actually I could remove the warning and these preempt_disables() and
->> replace them with a comment.
+>  arm/Makefile.arm64            |  10 +-
+>  arm/cstart64.S                |   4 +-
+>  arm/mte.c                     | 299 ++++++++++++++++++++++++++++++++++
+>  arm/run                       |   3 +-
+>  arm/unittests.cfg             |  19 +++
+>  lib/arm64/asm/mmu.h           |   1 +
+>  lib/arm64/asm/pgtable-hwdef.h |   2 +
+>  lib/arm64/asm/sysreg.h        |  12 ++
+>  8 files changed, 347 insertions(+), 3 deletions(-)
+>  create mode 100644 arm/mte.c
 > 
-> You should keep the WARN_ON(), and either *never* end-up calling this
-> stuff during a CPUHP event, or handle the fact that preemption isn't
-> initialised yet. For example by checking whether the current CPU is
-> online.
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 3b9034e3..48dcdbd4 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -17,10 +17,17 @@ ifneq ($(strip $(sve_flag)),)
+>  CFLAGS += -DCC_HAS_SVE
+>  endif
+>  
+> +mte_flag := $(call cc-option, -march=armv8.5-a+memtag, "")
+> +ifneq ($(strip $(mte_flag)),)
+> +# MTE is supported by the compiler, generate MTE instructions
+> +CFLAGS += -DCC_HAS_MTE
+> +endif
+> +
+> +
+>  mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+>  CFLAGS += $(mno_outline_atomics)
+>  CFLAGS += -DCONFIG_RELOC
+> -CFLAGS += -mgeneral-regs-only
+> +CFLAGS += -mgeneral-regs-only -save-temps
+
+Hmm.. I can't seem to figure out why -save-temps is required for the MTE test.
+From man gcc, -save-temps is a knob that tells gcc not to delete the
+intermediate files that it generates. Am I missing something?
+
+>  
+>  define arch_elf_check =
+>  	$(if $(shell ! $(READELF) -rW $(1) >&/dev/null && echo "nok"),
+> @@ -57,6 +64,7 @@ tests += $(TEST_DIR)/micro-bench.$(exe)
+>  tests += $(TEST_DIR)/cache.$(exe)
+>  tests += $(TEST_DIR)/debug.$(exe)
+>  tests += $(TEST_DIR)/fpu.$(exe)
+> +tests += $(TEST_DIR)/mte.$(exe)
+>  
+>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+>  
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index b480a552..b9d7a446 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -242,6 +242,7 @@ halt:
+>   *   NORMAL             100     11111111
+>   *   NORMAL_WT          101     10111011
+>   *   DEVICE_nGRE        110     00001000
+> + *   NORMAL_TAGGED      111     11110000
+>   */
+>  #define MAIR(attr, mt) ((attr) << ((mt) * 8))
+>  
+> @@ -275,7 +276,8 @@ asm_mmu_enable:
+>  		     MAIR(0x44, MT_NORMAL_NC) |		\
+>  		     MAIR(0xff, MT_NORMAL) |	        \
+>  		     MAIR(0xbb, MT_NORMAL_WT) |         \
+> -		     MAIR(0x08, MT_DEVICE_nGRE)
+> +		     MAIR(0x08, MT_DEVICE_nGRE) |       \
+> +		     MAIR(0xf0, MT_NORMAL_TAGGED)
+>  	msr	mair_el1, x1
+>  
+>  	/* TTBR0 */
+> diff --git a/arm/mte.c b/arm/mte.c
+> new file mode 100644
+> index 00000000..718f0a61
+> --- /dev/null
+> +++ b/arm/mte.c
+> @@ -0,0 +1,299 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2024 Arm Limited.
+> + * All rights reserved.
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <alloc_page.h>
+> +#include <stdlib.h>
+> +#include <asm/mmu.h>
+> +#include <asm/sysreg.h>
+> +#include <asm/pgtable-hwdef.h>
+> +#include <asm/processor.h>
+> +#include <asm/thread_info.h>
+> +
+> +
+> +/* Tag Check Faults cause a synchronous exception */
+> +#define MTE_TCF_SYNC	0b01
+> +/* Tag Check Faults are asynchronously accumulated */
+> +#define MTE_TCF_ASYNC	0b10
+> +/*
+> + * Tag Check Faults cause a synchronous exception on reads,
+> + * and are asynchronously accumulated on writes
+> + */
+> +#define MTE_TCF_ASYMM	0b11
+> +
+> +#define MTE_GRANULE_SIZE        UL(16)
+> +#define MTE_GRANULE_MASK        (~(MTE_GRANULE_SIZE - 1))
+> +#define MTE_TAG_SHIFT           56
+> +
+> +#define untagged(p)									\
+> +({											\
+> +	unsigned long __in = (unsigned long)(p);					\
+> +	typeof(p) __out = (typeof(p))(__in & ~(MTE_GRANULE_MASK << MTE_TAG_SHIFT));	\
+> +											\
+> +	__out;										\
+> +})
+> +
+> +#define tagged(p,t)							\
+> +({									\
+> +	unsigned long __in = (unsigned long)(untagged(p));		\
+> +	unsigned long __tag = (unsigned long)(t) << MTE_TAG_SHIFT;	\
+> +	typeof(p) __out = (typeof(p))(__in | __tag);			\
+> +									\
+> +	__out;								\
+> +})
+> +
+> +/*
+> + * If we use a normal (non hand coded inline assembly) load or store
+> + * to access a tagged address, the compiler will reasonably assume
+> + * that the access succeeded, and the next instruction may do
+> + * something based on that assumption.
+> + *
+> + * But a test might want the tagged access to fail on purpose, and if
+> + * we advance the PC to the next instruction, the one added by the
+> + * compiler, we might leave the program in an unexpected state.
+> + */
+> +static inline void mem_read(unsigned int *addr, unsigned int tag, unsigned int *res)
+> +{
+> +	unsigned int r;
+> +
+> +	asm volatile ("ldr %0,[%1]\n"
+> +		      "str %0,[%2]\n"
+> +		      : "=r" (r)
+> +		      : "r" (tagged(addr, tag)), "r" (res));
+> +}
+> +
+> +static inline void mem_write(unsigned int *addr, unsigned int tag, unsigned int val)
+> +{
+> +	/* The NOP allows the same exception handler as mem_read() to be used. */
+> +	asm volatile ("str %0,[%1]\n"
+> +		      "nop\n"
+> +		      :
+> +		      : "r" (val), "r" (tagged(addr, tag))
+> +		      : "memory");
+> +}
+> +
+> +static volatile bool mte_exception;
+> +
+> +static void mte_fault_handler(struct pt_regs *regs, unsigned int esr)
+> +{
+> +	unsigned int dfsc = esr & GENMASK(5, 0);
+> +	unsigned int fnv = esr & BIT(10);
+> +
+> +	if ((dfsc == 0b010001) && (fnv == 0))
+> +		mte_exception = true;
+> +
+> +	/*
+> +	 * mem_read() reads the value from the tagged pointer, then
+> +	 * stores this value in the untagged 'res' pointer. The
+> +	 * function that called mem_read() will want to check that the
+> +	 * initial value of 'res' hasn't changed if a tag check fault
+> +	 * is reported. Skip over two instructions so 'res' isn't
+> +	 * overwritten.
+> +	 */
+> +	regs->pc += 8;
+> +}
+> +
+> +static inline void mmu_set_tagged(pgd_t *pgtable, unsigned long vaddr)
+> +{
+> +	pteval_t *p_pte = follow_pte(pgtable, vaddr);
+> +
+> +	if (p_pte) {
+> +		pteval_t entry = *p_pte;
+> +
+> +		entry &= ~PTE_ATTRINDX_MASK;
+> +		entry |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
+> +
+> +		WRITE_ONCE(*p_pte, entry);
+> +		flush_tlb_page(vaddr);
+> +	} else {
+> +		report_abort("Cannot find PTE");
+> +	}
+> +}
+> +
+> +static void mte_init(void)
+> +{
+> +	unsigned long sctlr = read_sysreg(sctlr_el1);
+> +	unsigned long tcr = read_sysreg(tcr_el1);
+> +
+> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
+> +	sctlr &= ~SCTLR_EL1_ATA0;
+> +	sctlr |= SCTLR_EL1_ATA;
+> +
+> +	tcr |= TCR_TBI1 | TCR_TBI0;
+> +
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	write_sysreg(tcr, tcr_el1);
+> +
+> +	isb();
+> +	flush_tlb_all();
+> +}
+> +
+> +static inline void mte_set_tcf(unsigned long tcf)
+> +{
+> +	unsigned long sctlr = read_sysreg(sctlr_el1);
+> +
+> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
+> +	sctlr |= (tcf << SCTLR_EL1_TCF_SHIFT) & SCTLR_EL1_TCF_MASK ;
+> +	sctlr |= (tcf << SCTLR_EL1_TCF0_SHIFT) & SCTLR_EL1_TCF0_MASK ;
+> +
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	isb();
+> +}
+> +
+> +
+> +static inline void mte_set_tag(void *addr, size_t size, unsigned int tag)
+> +{
+> +#ifdef CC_HAS_MTE
+> +	unsigned long in = (unsigned long)untagged(addr);
+> +	unsigned long start = ALIGN_DOWN(in, 16);
+> +	unsigned long end = ALIGN(in + size , 16);
+> +
+> +	for (unsigned long ptr = start; ptr < end; ptr += 16)
+> +		asm volatile(".arch   armv8.5-a+memtag\n"
+> +			     "stg %0, [%0]"
+> +			     :
+> +			     : "r"(tagged(ptr, tag))
+> +			     : "memory");
+> +#endif
+> +}
+> +
+> +static inline unsigned long get_clear_tfsr(void)
+> +{
+> +	unsigned long r;
+> +
+> +	dsb(nsh);
+> +	isb();
+> +
+> +	r = read_sysreg_s(TFSR_EL1);
+> +	write_sysreg_s(0, TFSR_EL1);
+> +
+> +	return r;
+> +}
+> +
+> +static void mte_sync_test(void)
+> +{
+> +	unsigned int *mem = alloc_page();
+> +	unsigned int val = 0;
+> +
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_init();
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 0);
+> +	mte_set_tcf(MTE_TCF_SYNC);
+> +	mte_exception = false;
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+> +
+> +	mem_read(mem, 1, &val);
+
+When I came back to the patch, I read this and I thought that the value 1
+represents what the value of 'val' should be. Do you think the code would be
+easier to read if mem_read() took a tagged address directly, i.e:
+
+	mem_read(tagged(mem, 1), &val);
+
+Up to you what you prefer.
+
+> +
+> +	report((val == 0) && mte_exception, "read");
+> +
+> +	mte_exception = false;
+> +
+> +	mem_write(mem, 2, 0xbbbbbbbb);
+> +
+> +	report((*mem == 0xffffffff) && mte_exception, "write");
+> +}
+> +
+> +static void mte_asymm_test(void)
+> +{
+> +	unsigned int *mem = alloc_page();
+> +	unsigned int val = 0;
+> +
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_init();
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 0);
+> +	mte_set_tcf(MTE_TCF_ASYMM);
+> +	mte_exception = false;
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+> +
+> +	mem_read(mem, 3, &val);
+> +	report((val == 0) && mte_exception, "read");
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
+> +
+> +	mem_write(mem, 4, 0xaaaaaaaa);
+> +	report((*mem == 0xaaaaaaaa) && (get_clear_tfsr() == 1), "write");
+
+Do you think it would be easier to understand the code if TFSR_EL1_TF0 would be
+used here instead of 1? Up to you what you prefer, but if you do decide to use
+a define, please also add TFSR_EL1_TF1, just in case someone decides to expand
+the test some day with an address in the upper virtual address space.
+
+> +}
+> +
+> +static void mte_async_test(void)
+> +{
+> +	unsigned int *mem = alloc_page();
+> +	unsigned int val = 0;
+> +
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_init();
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 0);
+> +	mte_set_tcf(MTE_TCF_ASYNC);
+> +
+> +	mem_read(mem, 5, &val);
+> +	report((val == 0xffffffff) && (get_clear_tfsr() == 1), "read");
+> +
+> +	mem_write(mem, 6, 0xcccccccc);
+> +	report((*mem == 0xcccccccc) && (get_clear_tfsr() == 1), "write");
+> +}
+> +
+> +
+> +static unsigned int mte_version(void)
+> +{
+> +#ifdef CC_HAS_MTE
+> +	uint64_t r;
+> +
+> +	asm volatile("mrs %x0, id_aa64pfr1_el1" : "=r"(r));
+> +
+> +	return (r >> 8) & 0b1111;
+> +#else
+> +	report_info("Compiler lack MTE support");
+> +	return 0;
+> +#endif
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +
+> +	unsigned int version = mte_version();
+> +
+> +	if (version < 2) {
+> +		report_skip("No MTE support, skip...\n");
+> +		return -1;
+
+Can you change the return to:
+
+		return report_summary();
+
+Explanation below.
+
+> +	}
+> +
+> +	if (argc < 2)
+> +		report_abort("no test specified");
+> +
+> +	report_prefix_pushf("mte");
+
+report_prefix_push() (without the 'f' at the end).
+
+> +
+> +	if (strcmp(argv[1], "sync") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		mte_sync_test();
+> +		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "async") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		if (version < 3) {
+> +			report_skip("No MTE async, skip...\n");
+> +			return -1;
+> +		}
+> +		mte_async_test();
+> +		report_prefix_pop();
+> +
+> +	} else if (strcmp(argv[1], "asymm") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		if (version < 3) {
+> +			report_skip("No MTE asymm, skip...\n");
+> +			return -1;
+> +		}
+> +		mte_asymm_test();
+> +		report_prefix_pop();
+> +
+> +	} else {
+> +		report_abort("Unknown sub-test '%s'", argv[1]);
+> +	}
+> +
+> +	return report_summary();
+> +}
+> diff --git a/arm/run b/arm/run
+> index efdd44ce..b129e4e0 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -29,7 +29,8 @@ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+>  	exit 2
+>  fi
+>  
+> -M='-machine virt'
+> +MACHINE="virt"
+> +M="-machine $MACHINE$MACHINE_PROPS"
+
+Sorry, but I still don't understand what $MACHINE_PROPS does, I can't seem to
+find where it's initialized :(
+
+>  
+>  if [ "$ACCEL" = "kvm" ]; then
+>  	if $qemu $M,\? | grep -q gic-version; then
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 2bdad67d..9b428c02 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -271,3 +271,22 @@ smp = 2
+>  groups = nodefault
+>  accel = kvm
+>  arch = arm64
+> +
+> +# MTE tests
+> +[mte-sync]
+> +file = mte.flat
+> +groups = nodefault
+> +extra_params = -append 'sync'
+> +arch = arm64
+> +
+> +[mte-async]
+> +file = mte.flat
+> +groups = nodefault
+> +extra_params = -append 'async'
+> +arch = arm64
+> +
+> +[mte-asymm]
+> +file = mte.flat
+> +groups = nodefault
+> +extra_params = -append 'asymm'
+> +arch = arm64
+
+I think it would be better if the tests are not in the nodefault group. As far
+as I can tell, they are in the nondefault group because not all hardware and KVM
+versions support MTE (please correct me if I'm wrong).
+
+If the tests are in the nodefault group, then a CI administrator must
+keep track of those machine that have MTE and manually run them, otherwise they
+will never get run, even if the machines support it.
+
+If you remove them from the nondefault group, with the change I proposed to
+main() the test runner will not mark them as failed on systems that don't
+support MTE:
+
+$ ./run_tests.sh
+[..]
+SKIP mte-sync (1 tests, 1 skipped)
+SKIP mte-async (1 tests, 1 skipped)
+SKIP mte-asymm (1 tests, 1 skipped)
+
+but they will get automatically run on systems that support MTE.
+
+Also, would you mind putting the tests in the mte group:
+
+	groups = mte
+
+so they can be run with ./run_tests.sh -g mte.
+
+Thanks,
+Alex
+
+> diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
+> index 5c27edb2..9aedd09a 100644
+> --- a/lib/arm64/asm/mmu.h
+> +++ b/lib/arm64/asm/mmu.h
+> @@ -10,6 +10,7 @@
+>  #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
+>  #define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
+>  #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
+> +#define PTE_TAGGED		PTE_ATTRINDX(MT_NORMAL_TAGGED)
+>  
+>  static inline void flush_tlb_all(void)
+>  {
+> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
+> index 8c41fe12..b66b62da 100644
+> --- a/lib/arm64/asm/pgtable-hwdef.h
+> +++ b/lib/arm64/asm/pgtable-hwdef.h
+> @@ -145,6 +145,7 @@
+>  #define TCR_TG1_64K		(UL(3) << 30)
+>  #define TCR_ASID16		(UL(1) << 36)
+>  #define TCR_TBI0		(UL(1) << 37)
+> +#define TCR_TBI1		(UL(1) << 38)
+>  
+>  /*
+>   * Memory types available.
+> @@ -156,5 +157,6 @@
+>  #define MT_NORMAL		4
+>  #define MT_NORMAL_WT		5
+>  #define MT_DEVICE_nGRE		6
+> +#define MT_NORMAL_TAGGED	7
+>  
+>  #endif /* _ASMARM64_PGTABLE_HWDEF_H_ */
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index f214a4f0..60f51dad 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -28,6 +28,7 @@
+>  	.endm
+>  #else
+>  #include <libcflat.h>
+> +#include <bitops.h>
+>  
+>  #define read_sysreg(r) ({					\
+>  	u64 __val;						\
+> @@ -81,7 +82,12 @@ asm(
+>  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+>  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+>  
+> +#define TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+> +
+> +
+>  /* System Control Register (SCTLR_EL1) bits */
+> +#define SCTLR_EL1_ATA		_BITULL(43)
+> +#define SCTLR_EL1_ATA0		_BITULL(42)
+>  #define SCTLR_EL1_LSMAOE	_BITULL(29)
+>  #define SCTLR_EL1_NTLSMD	_BITULL(28)
+>  #define SCTLR_EL1_EE		_BITULL(25)
+> @@ -99,6 +105,12 @@ asm(
+>  #define SCTLR_EL1_A		_BITULL(1)
+>  #define SCTLR_EL1_M		_BITULL(0)
+>  
+> +#define SCTLR_EL1_TCF_SHIFT	40
+> +#define SCTLR_EL1_TCF_MASK	GENMASK_ULL(41, 40)
+> +
+> +#define SCTLR_EL1_TCF0_SHIFT	38
+> +#define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+> +
+>  #define INIT_SCTLR_EL1_MMU_OFF	\
+>  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+>  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+> -- 
+> 2.25.1
 > 
-> But this sort of random spreading of preemption disabling is not an
-> acceptable outcome.
-> 
-> 	M.
-> 
-
-I'll look into this again. This was my initial attempt but couldn't find 
-any easily accessible state that allowed to to be done this way. Maybe I 
-missed something, but the obvious cpu_online() etc were already true at 
-this point.
-
-Thanks
-James
-
-
