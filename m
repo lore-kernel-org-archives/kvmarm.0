@@ -1,233 +1,213 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BB0CA6F
-	for <kvmarm@lists.linux.dev>; Mon, 23 Dec 2024 14:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B908632
+	for <kvmarm@lists.linux.dev>; Tue, 24 Dec 2024 21:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734964667; cv=none; b=UMjmIR9v2SHRfc314WIR9UyhK/EGfi5B7GA2SoemjdqtiQWLSLeqsN+haRWqgMFwKGgHNjgy0TxHWwjgRCTfFklAJXMJqSKNMG92u79roa5Ouzvh7lObUT4RIPjYx/7l3/ROpzwrMfC3SGTwgPF03PDwnGhyMHoAV3CZrrJM6xk=
+	t=1735074468; cv=none; b=qX6vLqFPy4K7LJwqUpcaSjfQnJK8qsta+BlHqZxoB759uF89DAe3EesCYJNS8y9RRK5geNxUOi5TlXLfnVdY/sSf1QCwfwIleebMVcID8lnyqlTdq2A8chxS94sZ4Q8g0/6LffzjBQfIEVNFxjsR5UTH7L+3aSCaoXPA5xVlxCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734964667; c=relaxed/simple;
-	bh=lw7lIvErJaBbCirvsGojhEfatCngB8nndlwtgua5WJM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hT3f/lI5hAQULhlXz9/seb/ENVMby30dFomjJbCTpRmggyZeENNw67wtWdYe4o8fm1qZuoRWoBexZk5dqOhgVY+gj01fx/ArI66San2jk7gJgmsbi1ylw4TaqfEw1aiWPEY1xxAlZNOfH8ffLS/1dD/BvLmEx9ItEZq5Qr/ZthY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4DFA8150C;
-	Mon, 23 Dec 2024 06:38:11 -0800 (PST)
-Received: from [10.1.31.134] (e121487-lin.cambridge.arm.com [10.1.31.134])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A3EE3F59E;
-	Mon, 23 Dec 2024 06:37:42 -0800 (PST)
-Message-ID: <0fc53bdf-f919-40b9-8530-d11593ec55f7@arm.com>
-Date: Mon, 23 Dec 2024 14:37:40 +0000
+	s=arc-20240116; t=1735074468; c=relaxed/simple;
+	bh=cu8feJKg9gSJ6HmweoHxeTuCpE8orjL+HPupLligW6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=Vg+9vt1qdWrx0EmMjeeuUKSe1sK2gWI5OS2y97/EdRWshE7AIJWUKlyHCWLTIYTU4MmI15z1x0CN6iS8nRr2drgM9FTrtxxJE/Ik94nj2lTeZyoi86nHkS+0yzB1PNLDsl5WARSuo4Y0A2nxjjCSQUmsCKhntKNCh9cOPgt7rng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=avS3b4Hx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avS3b4Hx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735074465;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sZs6YfEI3/l5tOpZdRufVPmaqDWxkIbDThpOmOAjfL0=;
+	b=avS3b4HxVagMX/aRUjVARku2IB9YztSB+GV9tqJSpBPtA3XogHUGWwfMlqzWxe4tjOLVel
+	anBVPngy8b5CFNAXiR5aQrmAYxOUBYPs/4x51etgS/Ia35e8TZTF9McxTn4OQ6gMu23yq4
+	S3eOpIHxgN3+qyFMg5OOKqLoC8H4bpo=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-64-WpZy013WOFOrVHzZqzW3Zw-1; Tue, 24 Dec 2024 16:07:41 -0500
+X-MC-Unique: WpZy013WOFOrVHzZqzW3Zw-1
+X-Mimecast-MFC-AGG-ID: WpZy013WOFOrVHzZqzW3Zw
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b6e241d34eso740013685a.0
+        for <kvmarm@lists.linux.dev>; Tue, 24 Dec 2024 13:07:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735074461; x=1735679261;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sZs6YfEI3/l5tOpZdRufVPmaqDWxkIbDThpOmOAjfL0=;
+        b=aDTiu5G+V350LWz+NnPt0Aly4ab66AItzHTDaK0im7NWqQux6MY30aKNuf4rB/QzQb
+         9ZNfETybSO3BoKpB2ZBgkrm/HG6THgKz4O9PlAwupAQGQ3ctQVWmbtxtT32wdPt4bd28
+         7+XgMl9q75mcFkvN6ahGZuKNPkLpSFp39xW95iSu5pZtb7fg+W9ggRSgpZtB36P/gyEc
+         xarnz9d1BIlL/4U6q7zcPgaC7f5Xg/4W3dYKzvEo9oWU5CKQEccU0PMzGfUDsM95rjg5
+         tQelD69tGbgaLFXL1cLXTcYDLQT+WU5ql9TbahecsRefwvJ2XYA0VFybrz9U8zhMync7
+         AxHw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBEcY7RtFxSMKdOh2GzU02LBed0uNonvqnPnK4GDk4zBciQaGhXtubqHq2HcGb3DXvTttAV1I=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzTVEoopLIaoslSU4aoz3EXPAheEo4wt8k3CsATLXMUQWVPaP0E
+	fGv+7YcBUNACH/Y//bUnmUqwTqGbSXqoRB0qL91Y2FfZcAdfMIz2zSgXeFZ3ElVvQni8KKhdlsf
+	ufV2XCOT8Rc25Jx7npP9+5/sBOWpH/5OJn682fK3m80U/R3+22sEOxg==
+X-Gm-Gg: ASbGnctTj5NeqrQwNllR0WalJkiI+ZfKvQB02X9/me84NztYNap33l7a7CNQ71Nye3/
+	5DGPPeHbC39wueKHRwInzd8+7WwqjCyRZe21W2AF9wRJHhDagYlczA8F+vnxvKYPLHPKOA3kGCb
+	NG2NmycVCSrr2BvLMAw8uzotDRC4wFW28qTEamd3c7kl/VaY64Fo6bjWbHQch8U31ZbgJ5cfrJ6
+	soEbuwP7qjXo9sTlUbszdOniQl4QON+yTuzJ0zsyHIFi9m5NmdpTJXc/8MZh1pkjpNSoA4S4/Uw
+	CjbAVZqDNvd9913K1w==
+X-Received: by 2002:a05:620a:4113:b0:7b8:626b:7ab with SMTP id af79cd13be357-7b9ba75eccdmr2798803585a.19.1735074460863;
+        Tue, 24 Dec 2024 13:07:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFnN/zY/woHUhG5osGnG+exxCB/UJU+6pyhc9ubSIWO3+84Rcn5ofakxvIKipqBFvygMHhkKw==
+X-Received: by 2002:a05:620a:4113:b0:7b8:626b:7ab with SMTP id af79cd13be357-7b9ba75eccdmr2798800285a.19.1735074460495;
+        Tue, 24 Dec 2024 13:07:40 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e676f26sm56608011cf.19.2024.12.24.13.07.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Dec 2024 13:07:39 -0800 (PST)
+Date: Tue, 24 Dec 2024 16:07:36 -0500
+From: Peter Xu <peterx@redhat.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>,
+	David Matlack <dmatlack@google.com>, Wang@google.com,
+	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
+Message-ID: <Z2simHWeYbww90OZ@x1n>
+References: <20241204191349.1730936-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2] arm64: Add basic MTE test
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com, andrew.jones@linux.dev,
- eric.auger@redhat.com
-References: <20241212103447.34593-1-vladimir.murzin@arm.com>
- <Z2lRk_NLHxDPvmrS@raptor>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <Z2lRk_NLHxDPvmrS@raptor>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20241204191349.1730936-1-jthoughton@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: VUm3IeRqsirWg5GveGGSfdxTQCqaszXm-K900OEDgeE_1735074461
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Hi Alexandru,
+James,
 
-On 12/23/24 12:03, Alexandru Elisei wrote:
-> Hi Vladimir,
+On Wed, Dec 04, 2024 at 07:13:35PM +0000, James Houghton wrote:
+> This is a continuation of the original KVM Userfault RFC[1] from July.
+> It contains the simplifications we talked about at LPC[2].
 > 
-> The patch looks good, but it just occured to me, the tests do a great job
-> checking that tagged accesses fail when they should be failing, but they don't
-> check that taggedd accesses *succeed* when they should not be failing. I think
-> that's useful to have at the start of each test, if nothing just as a sanity
-> check.
+> Please see the RFC[1] for the problem description. In summary,
+> guest_memfd VMs have no mechanism for doing post-copy live migration.
+> KVM Userfault provides such a mechanism. Today there is no upstream
+> mechanism for installing memory into a guest_memfd, but there will
+> be one soon (e.g. [3]).
 > 
+> There is a second problem that KVM Userfault solves: userfaultfd-based
+> post-copy doesn't scale very well. KVM Userfault when used with
+> userfaultfd can scale much better in the common case that most post-copy
+> demand fetches are a result of vCPU access violations. This is a
+> continuation of the solution Anish was working on[4]. This aspect of
+> KVM Userfault is important for userfaultfd-based live migration when
+> scaling up to hundreds of vCPUs with ~30us network latency for a
+> PAGE_SIZE demand-fetch.
 
-Well, there are successful tagged access, yet with zero tag :) We can move to
-non-zero tag, something like
-
-static inline void mte_memset(void *addr, int val, size_t size)
-{
-	unsigned long old = mte_set_tcf(MTE_TCF_SYNC);
-	memset(addr, val, size);
-	mte_set_tcf(old);
-}
-
-...
-
-static void mte_async_test(void)
-{
-	unsigned int *mem = tagged(alloc_page(), 3);
-	unsigned int val = 0;
-
-	mte_init();
-	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
-	mte_set_tag(mem, PAGE_SIZE, 3);
-	mte_memset(mem, 0xff, PAGE_SIZE);
-	mte_set_tcf(MTE_TCF_ASYNC);
-...
-
-<snip>
-
->> -CFLAGS += -mgeneral-regs-only
->> +CFLAGS += -mgeneral-regs-only -save-temps
-> Hmm.. I can't seem to figure out why -save-temps is required for the MTE test.
->>From man gcc, -save-temps is a knob that tells gcc not to delete the
-> intermediate files that it generates. Am I missing something?
-
-No, it is not required and just leftover from my other debug...
-
-<snip>
-
->> +
->> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
->> +
->> +	mem_read(mem, 1, &val);
-> When I came back to the patch, I read this and I thought that the value 1
-> represents what the value of 'val' should be. Do you think the code would be
-> easier to read if mem_read() took a tagged address directly, i.e:
-> 
-> 	mem_read(tagged(mem, 1), &val);
-> 
-> Up to you what you prefer.
-> 
-
-Ack.
-
-<snip>
-
->> +	report((*mem == 0xaaaaaaaa) && (get_clear_tfsr() == 1), "write");
-> Do you think it would be easier to understand the code if TFSR_EL1_TF0 would be
-> used here instead of 1? Up to you what you prefer, but if you do decide to use
-> a define, please also add TFSR_EL1_TF1, just in case someone decides to expand
-> the test some day with an address in the upper virtual address space.
-
-Ack.
-
-<snip>
->> +int main(int argc, char *argv[])
->> +{
->> +
->> +	unsigned int version = mte_version();
->> +
->> +	if (version < 2) {
->> +		report_skip("No MTE support, skip...\n");
->> +		return -1;
-> Can you change the return to:
-> 
-> 		return report_summary();
-> 
-> Explanation below.
-
-Ack.
+I think it would be clearer to nail down the goal of the feature.  If it's
+a perf-oriented feature we don't need to mention gmem, but maybe it's not.
 
 > 
->> +	}
->> +
->> +	if (argc < 2)
->> +		report_abort("no test specified");
->> +
->> +	report_prefix_pushf("mte");
-> report_prefix_push() (without the 'f' at the end).
+> The implementation in this series is version than the RFC[1]. It adds...
+>  1. a new memslot flag is added: KVM_MEM_USERFAULT,
+>  2. a new parameter, userfault_bitmap, into struct kvm_memory_slot,
+>  3. a new KVM_RUN exit reason: KVM_MEMORY_EXIT_FLAG_USERFAULT,
+>  4. a new KVM capability KVM_CAP_USERFAULT.
 > 
+> KVM Userfault does not attempt to catch KVM's own accesses to guest
+> memory. That is left up to userfaultfd.
 
-Ack.
+I assume it means this is an "perf optimization" feature then?  As it
+doesn't work for remote-fault processes like firecracker, or
+remote-emulated processes like QEMU's vhost-user?
 
-<snip>
+Even though it could still 100% cover x86_64's setup if it's not as
+complicated as above?  I mean, I assumed above sentence was for archs like
+ARM that I remember having no-vcpu-context accesses so things like that is
+not covered too.  Perhaps x86_64 is the goal?  If so, would also be good to
+mention some details.
 
->> +}
->> diff --git a/arm/run b/arm/run
->> index efdd44ce..b129e4e0 100755
->> --- a/arm/run
->> +++ b/arm/run
->> @@ -29,7 +29,8 @@ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
->>  	exit 2
->>  fi
->>  
->> -M='-machine virt'
->> +MACHINE="virt"
->> +M="-machine $MACHINE$MACHINE_PROPS"
-> Sorry, but I still don't understand what $MACHINE_PROPS does, I can't seem to
-> find where it's initialized :(
 > 
-
-I'm not sure what you are looking/asking for :( 
-
-My last reply [1] demonstrates usage for $MACHINE_PROPS
-
-QEMU=qemu-system-aarch64 ACCEL=tcg MACHINE_PROPS=",mte=on" arm/run arm/mte.flat -append "sync"
-
->>  
->>  if [ "$ACCEL" = "kvm" ]; then
->>  	if $qemu $M,\? | grep -q gic-version; then
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 2bdad67d..9b428c02 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -271,3 +271,22 @@ smp = 2
->>  groups = nodefault
->>  accel = kvm
->>  arch = arm64
->> +
->> +# MTE tests
->> +[mte-sync]
->> +file = mte.flat
->> +groups = nodefault
->> +extra_params = -append 'sync'
->> +arch = arm64
->> +
->> +[mte-async]
->> +file = mte.flat
->> +groups = nodefault
->> +extra_params = -append 'async'
->> +arch = arm64
->> +
->> +[mte-asymm]
->> +file = mte.flat
->> +groups = nodefault
->> +extra_params = -append 'asymm'
->> +arch = arm64
-> I think it would be better if the tests are not in the nodefault group. As far
-> as I can tell, they are in the nondefault group because not all hardware and KVM
-> versions support MTE (please correct me if I'm wrong).
+> When enabling KVM_MEM_USERFAULT for a memslot, the second-stage mappings
+> are zapped, and new faults will check `userfault_bitmap` to see if the
+> fault should exit to userspace.
 > 
-> If the tests are in the nodefault group, then a CI administrator must
-> keep track of those machine that have MTE and manually run them, otherwise they
-> will never get run, even if the machines support it.
+> When KVM_MEM_USERFAULT is enabled, only PAGE_SIZE mappings are
+> permitted.
 > 
-> If you remove them from the nondefault group, with the change I proposed to
-> main() the test runner will not mark them as failed on systems that don't
-> support MTE:
+> When disabling KVM_MEM_USERFAULT, huge mappings will be reconstructed
+> (either eagerly or on-demand; the architecture can decide).
 > 
-> $ ./run_tests.sh
-> [..]
-> SKIP mte-sync (1 tests, 1 skipped)
-> SKIP mte-async (1 tests, 1 skipped)
-> SKIP mte-asymm (1 tests, 1 skipped)
+> KVM Userfault is not compatible with async page faults. Nikita has
+> proposed a new implementation of async page faults that is more
+> userspace-driven that *is* compatible with KVM Userfault[5].
 > 
-> but they will get automatically run on systems that support MTE.
+> Performance
+> ===========
 > 
+> The takeaways I have are:
+> 
+> 1. For cases where lock contention is not a concern, there is a
+>    discernable win because KVM Userfault saves the trip through the
+>    userfaultfd poll/read/WAKE cycle.
+> 
+> 2. Using a single userfaultfd without KVM Userfault gets very slow as
+>    the number of vCPUs increases, and it gets even slower when you add
+>    more reader threads. This is due to contention on the userfaultfd
+>    wait_queue locks. This is the contention that KVM Userfault avoids.
+>    Compare this to the multiple-userfaultfd runs; they are much faster
+>    because the wait_queue locks are sharded perfectly (1 per vCPU).
+>    Perfect sharding is only possible because the vCPUs are configured to
+>    touch only their own chunk of memory.
 
-Looks really neat!
+I'll try to spend some more time after holidays on this perf issue. But
+will still be after the 1g support on !coco gmem if it would work out. As
+the 1g function is still missing in QEMU, so that one has higher priority
+comparing to either perf or downtime (e.g. I'll also need to measure
+whether QEMU will need minor fault, or stick with missing as of now).
 
-> Also, would you mind putting the tests in the mte group:
-> 
-> 	groups = mte
-> 
-> so they can be run with ./run_tests.sh -g mte.
-> 
+Maybe I'll also start to explore a bit on [g]memfd support on userfault,
+I'm not sure whether anyone started working on some generic solution before
+for CoCo / gmem postcopy - we need to still have a solution for either
+firecrackers or OVS/vhost-user.  I feel like we need that sooner or later,
+one way or another.  I think I'll start without minor faults support until
+justified, and if I'll ever be able to start it at all in a few months next
+year..
 
-Ack.
+Let me know if there's any comment on above thoughts.
 
-[1] https://lore.kernel.org/all/c2d9b61b-7dce-422b-8a3c-898f1003c9e4@arm.com/T/#t
+I guess this feauture might be useful to QEMU too, but QEMU always needs
+uffd or something similar, then we need to measure and justify this one
+useful in a real QEMU setup.  For example, need to see how the page
+transfer overhead compares with lock contentions when there're, say, 400
+vcpus.  If some speedup on userfault + the transfer overhead is close to
+what we can get with vcpu exits, then QEMU may still stick with a simple
+model.  But not sure.
 
-Cheers
-Vladimir
+When integrated with this feature, it also means some other overheads at
+least to QEMU.  E.g., trap / resolve page fault needs two ops now (uffd and
+the bitmap).  Meanwhile even if vcpu can get rid of uffd's one big
+spinlock, it may contend again in userspace, either on page resolution or
+on similar queuing.  I think I mentioned it previously but I guess it's
+nontrivial to justify.  In all cases, I trust that you should have better
+judgement on this.  It's just that QEMU can at least behave differently, so
+not sure how it'll go there.
+
+Happy holidays. :)
+
+Thanks,
+
+-- 
+Peter Xu
+
