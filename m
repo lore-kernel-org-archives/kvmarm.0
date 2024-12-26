@@ -1,213 +1,279 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B908632
-	for <kvmarm@lists.linux.dev>; Tue, 24 Dec 2024 21:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D93360;
+	Thu, 26 Dec 2024 14:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735074468; cv=none; b=qX6vLqFPy4K7LJwqUpcaSjfQnJK8qsta+BlHqZxoB759uF89DAe3EesCYJNS8y9RRK5geNxUOi5TlXLfnVdY/sSf1QCwfwIleebMVcID8lnyqlTdq2A8chxS94sZ4Q8g0/6LffzjBQfIEVNFxjsR5UTH7L+3aSCaoXPA5xVlxCg=
+	t=1735222961; cv=none; b=ssw9WchLrfIbPDb1zPCZfb/x1o0Se6ygD2L1a9mm7gNObv8e8gg7OR7Pp7tJKu86NwGUYAF+H6dPtz0V+Ypb6uI8iz9OEZWH4lpSRdIWZbjBLORXDy2Qn+wHdKD7uAdDX5ClxJR0E/az+V/IeqBYKeIWTm5CC4Qb1+PU5JI0udE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735074468; c=relaxed/simple;
-	bh=cu8feJKg9gSJ6HmweoHxeTuCpE8orjL+HPupLligW6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=Vg+9vt1qdWrx0EmMjeeuUKSe1sK2gWI5OS2y97/EdRWshE7AIJWUKlyHCWLTIYTU4MmI15z1x0CN6iS8nRr2drgM9FTrtxxJE/Ik94nj2lTeZyoi86nHkS+0yzB1PNLDsl5WARSuo4Y0A2nxjjCSQUmsCKhntKNCh9cOPgt7rng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=avS3b4Hx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1735222961; c=relaxed/simple;
+	bh=FxKzkVloadueSLTJozS/cKJF/u7Mcxr8Wpq/HPmw1UA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PRmcNsgQ2CiE0OESKvGPcFg2MiX7Cdl9JB8SFYwLpqtpk3HApQdJmVkDLEtA4m7hNELmt743zgRi7eobd0EU22WzD5N3GgKsvUiJAZs/IZwdJKYmz0PhvTdJAv2vwFKQjef+q1lMmnrAFY2O3rHz2iGYPiaT6ht3Tk2619M7DfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvzTYHsc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avS3b4Hx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735074465;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZs6YfEI3/l5tOpZdRufVPmaqDWxkIbDThpOmOAjfL0=;
-	b=avS3b4HxVagMX/aRUjVARku2IB9YztSB+GV9tqJSpBPtA3XogHUGWwfMlqzWxe4tjOLVel
-	anBVPngy8b5CFNAXiR5aQrmAYxOUBYPs/4x51etgS/Ia35e8TZTF9McxTn4OQ6gMu23yq4
-	S3eOpIHxgN3+qyFMg5OOKqLoC8H4bpo=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-64-WpZy013WOFOrVHzZqzW3Zw-1; Tue, 24 Dec 2024 16:07:41 -0500
-X-MC-Unique: WpZy013WOFOrVHzZqzW3Zw-1
-X-Mimecast-MFC-AGG-ID: WpZy013WOFOrVHzZqzW3Zw
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b6e241d34eso740013685a.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Dec 2024 13:07:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735074461; x=1735679261;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZs6YfEI3/l5tOpZdRufVPmaqDWxkIbDThpOmOAjfL0=;
-        b=aDTiu5G+V350LWz+NnPt0Aly4ab66AItzHTDaK0im7NWqQux6MY30aKNuf4rB/QzQb
-         9ZNfETybSO3BoKpB2ZBgkrm/HG6THgKz4O9PlAwupAQGQ3ctQVWmbtxtT32wdPt4bd28
-         7+XgMl9q75mcFkvN6ahGZuKNPkLpSFp39xW95iSu5pZtb7fg+W9ggRSgpZtB36P/gyEc
-         xarnz9d1BIlL/4U6q7zcPgaC7f5Xg/4W3dYKzvEo9oWU5CKQEccU0PMzGfUDsM95rjg5
-         tQelD69tGbgaLFXL1cLXTcYDLQT+WU5ql9TbahecsRefwvJ2XYA0VFybrz9U8zhMync7
-         AxHw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBEcY7RtFxSMKdOh2GzU02LBed0uNonvqnPnK4GDk4zBciQaGhXtubqHq2HcGb3DXvTttAV1I=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzTVEoopLIaoslSU4aoz3EXPAheEo4wt8k3CsATLXMUQWVPaP0E
-	fGv+7YcBUNACH/Y//bUnmUqwTqGbSXqoRB0qL91Y2FfZcAdfMIz2zSgXeFZ3ElVvQni8KKhdlsf
-	ufV2XCOT8Rc25Jx7npP9+5/sBOWpH/5OJn682fK3m80U/R3+22sEOxg==
-X-Gm-Gg: ASbGnctTj5NeqrQwNllR0WalJkiI+ZfKvQB02X9/me84NztYNap33l7a7CNQ71Nye3/
-	5DGPPeHbC39wueKHRwInzd8+7WwqjCyRZe21W2AF9wRJHhDagYlczA8F+vnxvKYPLHPKOA3kGCb
-	NG2NmycVCSrr2BvLMAw8uzotDRC4wFW28qTEamd3c7kl/VaY64Fo6bjWbHQch8U31ZbgJ5cfrJ6
-	soEbuwP7qjXo9sTlUbszdOniQl4QON+yTuzJ0zsyHIFi9m5NmdpTJXc/8MZh1pkjpNSoA4S4/Uw
-	CjbAVZqDNvd9913K1w==
-X-Received: by 2002:a05:620a:4113:b0:7b8:626b:7ab with SMTP id af79cd13be357-7b9ba75eccdmr2798803585a.19.1735074460863;
-        Tue, 24 Dec 2024 13:07:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnN/zY/woHUhG5osGnG+exxCB/UJU+6pyhc9ubSIWO3+84Rcn5ofakxvIKipqBFvygMHhkKw==
-X-Received: by 2002:a05:620a:4113:b0:7b8:626b:7ab with SMTP id af79cd13be357-7b9ba75eccdmr2798800285a.19.1735074460495;
-        Tue, 24 Dec 2024 13:07:40 -0800 (PST)
-Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e676f26sm56608011cf.19.2024.12.24.13.07.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Dec 2024 13:07:39 -0800 (PST)
-Date: Tue, 24 Dec 2024 16:07:36 -0500
-From: Peter Xu <peterx@redhat.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Yan Zhao <yan.y.zhao@intel.com>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Anish Moorthy <amoorthy@google.com>,
-	Peter Gonda <pgonda@google.com>,
-	David Matlack <dmatlack@google.com>, Wang@google.com,
-	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
-Message-ID: <Z2simHWeYbww90OZ@x1n>
-References: <20241204191349.1730936-1-jthoughton@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvzTYHsc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731C0C4CED1;
+	Thu, 26 Dec 2024 14:22:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735222960;
+	bh=FxKzkVloadueSLTJozS/cKJF/u7Mcxr8Wpq/HPmw1UA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lvzTYHscMfIOt9mMuShw9L09QtMMmzsfUJ85mskwkhcFz1L/aqSc2x00ktpPNb0Ks
+	 S8gDReMW0un8OopPQNlVsnt1ndc63FmrAYD27FW6HMDVV2451PPs6nnP9Z+Iw3nwjK
+	 JWQK3heUy2Rz9QTfo7OSNyrFDAssokhz724oFKPLnBlyEtcTge9nNtkQ2QxUMTY2Ha
+	 Oo91BvMCX6DfriMwc6ceV+Bh8ber7nLUI+0bjGx1ara2Hqe2RuY0tWwiid2jrCp18u
+	 bt1NOFeC1BC5OIGBAtIikA8EvAWetVoIEQFRbGQgGIQL4XUepvOd0AO3CS/i7tv061
+	 Zfrcd+vIhas/A==
+Received: from 82-132-222-168.dab.02.net ([82.132.222.168] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tQol3-0072lJ-Us;
+	Thu, 26 Dec 2024 14:22:38 +0000
+Date: Thu, 26 Dec 2024 14:22:32 +0000
+Message-ID: <87ttaqr0bb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@linaro.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	suzuki.poulose@arm.com,
+	coresight@lists.linaro.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas
+ <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mike Leach <mike.leach@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	Shiqi Liu <shiqiliu@hust.edu.cn>,
+	Fuad Tabba <tabba@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 7/8] KVM: arm64: Support trace filtering for guests
+In-Reply-To: <0cfda877-7c3d-4e59-a1b1-fe245f7298f0@linaro.org>
+References: <20241127100130.1162639-1-james.clark@linaro.org>
+	<20241127100130.1162639-8-james.clark@linaro.org>
+	<86r061p63b.wl-maz@kernel.org>
+	<0cfda877-7c3d-4e59-a1b1-fe245f7298f0@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <20241204191349.1730936-1-jthoughton@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: VUm3IeRqsirWg5GveGGSfdxTQCqaszXm-K900OEDgeE_1735074461
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.222.168
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, broonie@kernel.org, anshuman.khandual@arm.com, james.morse@arm.com, robh@kernel.org, shiqiliu@hust.edu.cn, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-James,
-
-On Wed, Dec 04, 2024 at 07:13:35PM +0000, James Houghton wrote:
-> This is a continuation of the original KVM Userfault RFC[1] from July.
-> It contains the simplifications we talked about at LPC[2].
+On Mon, 23 Dec 2024 11:28:06 +0000,
+James Clark <james.clark@linaro.org> wrote:
 > 
-> Please see the RFC[1] for the problem description. In summary,
-> guest_memfd VMs have no mechanism for doing post-copy live migration.
-> KVM Userfault provides such a mechanism. Today there is no upstream
-> mechanism for installing memory into a guest_memfd, but there will
-> be one soon (e.g. [3]).
 > 
-> There is a second problem that KVM Userfault solves: userfaultfd-based
-> post-copy doesn't scale very well. KVM Userfault when used with
-> userfaultfd can scale much better in the common case that most post-copy
-> demand fetches are a result of vCPU access violations. This is a
-> continuation of the solution Anish was working on[4]. This aspect of
-> KVM Userfault is important for userfaultfd-based live migration when
-> scaling up to hundreds of vCPUs with ~30us network latency for a
-> PAGE_SIZE demand-fetch.
+> 
+> On 21/12/2024 12:34 pm, Marc Zyngier wrote:
+> > On Wed, 27 Nov 2024 10:01:24 +0000,
+> > James Clark <james.clark@linaro.org> wrote:
+> >> 
+> >> For nVHE, switch the filter value in and out if the Coresight driver
+> >> asks for it. This will support filters for guests when sinks other than
+> >> TRBE are used.
+> >> 
+> >> For VHE, just write the filter directly to TRFCR_EL1 where trace can be
+> >> used even with TRBE sinks.
+> >> 
+> >> Signed-off-by: James Clark <james.clark@linaro.org>
+> >> ---
+> >>   arch/arm64/include/asm/kvm_host.h  |  5 +++++
+> >>   arch/arm64/kvm/debug.c             | 28 ++++++++++++++++++++++++++++
+> >>   arch/arm64/kvm/hyp/nvhe/debug-sr.c |  1 +
+> >>   3 files changed, 34 insertions(+)
+> >> 
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index ba251caa593b..cce07887551b 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -613,6 +613,7 @@ struct kvm_host_data {
+> >>   #define KVM_HOST_DATA_FLAG_HAS_SPE	0
+> >>   #define KVM_HOST_DATA_FLAG_HAS_TRF	1
+> >>   #define KVM_HOST_DATA_FLAG_TRBE_ENABLED	2
+> >> +#define KVM_HOST_DATA_FLAG_GUEST_FILTER	3
+> > 
+> > Guest filter what? This is meaningless.
+> > 
+> 
+> KVM_HOST_DATA_FLAG_SWAP_TRFCR maybe?
 
-I think it would be clearer to nail down the goal of the feature.  If it's
-a perf-oriented feature we don't need to mention gmem, but maybe it's not.
+A flag indicates a state, just like a level interrupt. So in cannot be
+a verb that indicates an action, after which the flag should be
+dropped (just like an edge interrupt). Maybe if you explained what
+this is supposed to indicate, we could come up with a better name.
+
+I would have thought that something like EL1_TRACING_ENABLED would be
+adequate, but it is unusually hard to understand what this is supposed
+to be doing.
 
 > 
-> The implementation in this series is version than the RFC[1]. It adds...
->  1. a new memslot flag is added: KVM_MEM_USERFAULT,
->  2. a new parameter, userfault_bitmap, into struct kvm_memory_slot,
->  3. a new KVM_RUN exit reason: KVM_MEMORY_EXIT_FLAG_USERFAULT,
->  4. a new KVM capability KVM_CAP_USERFAULT.
+> >>   	unsigned long flags;
+> >>     	struct kvm_cpu_context host_ctxt;
+> >> @@ -1387,6 +1388,8 @@ void kvm_clr_pmu_events(u64 clr);
+> >>   bool kvm_set_pmuserenr(u64 val);
+> >>   void kvm_enable_trbe(void);
+> >>   void kvm_disable_trbe(void);
+> >> +void kvm_set_trfcr(u64 guest_trfcr);
+> >> +void kvm_clear_trfcr(void);
+> >>   #else
+> >>   static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+> >>   static inline void kvm_clr_pmu_events(u64 clr) {}
+> >> @@ -1396,6 +1399,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
+> >>   }
+> >>   static inline void kvm_enable_trbe(void) {}
+> >>   static inline void kvm_disable_trbe(void) {}
+> >> +static inline void kvm_set_trfcr(u64 guest_trfcr) {}
+> >> +static inline void kvm_clear_trfcr(void) {}
+> >>   #endif
+> >>     void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
+> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> >> index 0c340ae7b5d1..9266f2776991 100644
+> >> --- a/arch/arm64/kvm/debug.c
+> >> +++ b/arch/arm64/kvm/debug.c
+> >> @@ -337,3 +337,31 @@ void kvm_disable_trbe(void)
+> >>   	host_data_clear_flag(TRBE_ENABLED);
+> >>   }
+> >>   EXPORT_SYMBOL_GPL(kvm_disable_trbe);
+> >> +
+> >> +void kvm_set_trfcr(u64 guest_trfcr)
+> > 
+> > Again. Is this the guest's view? or the host view while running the
+> > guest? I asked the question on the previous patch, and you didn't
+> > reply.
+> > 
 > 
-> KVM Userfault does not attempt to catch KVM's own accesses to guest
-> memory. That is left up to userfaultfd.
+> Ah sorry missed that one:
+> 
+> > Guest value? Or host state while running the guest? If the former,
+> > then this has nothing to do here. If the latter, this should be
+> > spelled out (trfcr_in_guest?), and the comment amended.
+> 
+> Yes, the latter, guest TRFCR reads are undef anyway. I can rename this
+> and the host_data variable to be trfcr_in_guest.
+> 
+> >> +{
+> >> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
+> >> +		return;
+> >> +
+> >> +	if (has_vhe())
+> >> +		write_sysreg_s(guest_trfcr, SYS_TRFCR_EL12);
+> >> +	else {
+> >> +		*host_data_ptr(guest_trfcr_el1) = guest_trfcr;
+> >> +		host_data_set_flag(GUEST_FILTER);
+> >> +	}
+> > 
+> > Oh come on. This is basic coding style, see section 3 in
+> > Documentation/process/coding-style.rst.
+> > 
+> 
+> Oops, I'd have thought checkpatch could catch something like that. Will fix.
 
-I assume it means this is an "perf optimization" feature then?  As it
-doesn't work for remote-fault processes like firecracker, or
-remote-emulated processes like QEMU's vhost-user?
+Checkpatch serves little to no purpose, really, and relying on it is a
+very bad idea.
 
-Even though it could still 100% cover x86_64's setup if it's not as
-complicated as above?  I mean, I assumed above sentence was for archs like
-ARM that I remember having no-vcpu-context accesses so things like that is
-not covered too.  Perhaps x86_64 is the goal?  If so, would also be good to
-mention some details.
+>
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(kvm_set_trfcr);
+> >> +
+> >> +void kvm_clear_trfcr(void)
+> >> +{
+> >> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
+> >> +		return;
+> >> +
+> >> +	if (has_vhe())
+> >> +		write_sysreg_s(0, SYS_TRFCR_EL12);
+> >> +	else {
+> >> +		*host_data_ptr(guest_trfcr_el1) = 0;
+> >> +		host_data_clear_flag(GUEST_FILTER);
+> >> +	}
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(kvm_clear_trfcr);
+> > 
+> > Why do we have two helpers? Clearly, calling kvm_set_trfcr() with
+> > E{1,0}TRE=={0,0} should result in *disabling* things.  Except it
+> > doesn't, and you should fix it. Once that is fixed, it becomes
+> obvious> that kvm_clear_trfcr() serves no purpose.
+> > 
+> 
+> With only one kvm_set_trfcr() there's no way to distinguish swapping
+> in a 0 value or stopping swapping altogether. I thought we wanted a
+> single flag that gated the register accesses so the hyp mostly does
+> nothing? With only kvm_set_trfcr() you first need to check FEAT_TRF
+> then you need to compare the real register with trfcr_in_guest to know
+> whether to swap or not every time.
+> 
+> Actually I think some of the previous versions had something like this
+> but it was a bit more complicated.
+> 
+> Maybe set/clear_trfcr() aren't great names. Perhaps
+> kvm_set_trfcr_in_guest() and kvm_disable_trfcr_in_guest()? With the
+> second one hinting that it stops the swapping regardless of what the
+> values are.
+
+I really think the way you name thing is getting in the way of simply
+*understanding* what you are doing.
+
+You don't disable or enable TRFCR. You enable or disable EL1 tracing
+while in guest context. TRFCR is the tool by which you are doing that,
+and the value you pass to these helpers is the tracing configuration.
 
 > 
-> When enabling KVM_MEM_USERFAULT for a memslot, the second-stage mappings
-> are zapped, and new faults will check `userfault_bitmap` to see if the
-> fault should exit to userspace.
-> 
-> When KVM_MEM_USERFAULT is enabled, only PAGE_SIZE mappings are
-> permitted.
-> 
-> When disabling KVM_MEM_USERFAULT, huge mappings will be reconstructed
-> (either eagerly or on-demand; the architecture can decide).
-> 
-> KVM Userfault is not compatible with async page faults. Nikita has
-> proposed a new implementation of async page faults that is more
-> userspace-driven that *is* compatible with KVM Userfault[5].
-> 
-> Performance
-> ===========
-> 
-> The takeaways I have are:
-> 
-> 1. For cases where lock contention is not a concern, there is a
->    discernable win because KVM Userfault saves the trip through the
->    userfaultfd poll/read/WAKE cycle.
-> 
-> 2. Using a single userfaultfd without KVM Userfault gets very slow as
->    the number of vCPUs increases, and it gets even slower when you add
->    more reader threads. This is due to contention on the userfaultfd
->    wait_queue locks. This is the contention that KVM Userfault avoids.
->    Compare this to the multiple-userfaultfd runs; they are much faster
->    because the wait_queue locks are sharded perfectly (1 per vCPU).
->    Perfect sharding is only possible because the vCPUs are configured to
->    touch only their own chunk of memory.
+> I don't think calling kvm_set_trfcr() with E{1,0}TRE=={0,0} is
+> actually broken in this version, it means that the Coresight driver
+> wants that value to be installed for guests. So it should actually
+> _enable_ swapping in the value of 0, not disable anything.
 
-I'll try to spend some more time after holidays on this perf issue. But
-will still be after the 1g support on !coco gmem if it would work out. As
-the 1g function is still missing in QEMU, so that one has higher priority
-comparing to either perf or downtime (e.g. I'll also need to measure
-whether QEMU will need minor fault, or stick with missing as of now).
+But you can decide whether there is need for "swapping" if the
+configuration is different than what's on the host, can't you?
 
-Maybe I'll also start to explore a bit on [g]memfd support on userfault,
-I'm not sure whether anyone started working on some generic solution before
-for CoCo / gmem postcopy - we need to still have a solution for either
-firecrackers or OVS/vhost-user.  I feel like we need that sooner or later,
-one way or another.  I think I'll start without minor faults support until
-justified, and if I'll ever be able to start it at all in a few months next
-year..
+> 
+> > To sum it up, KVM's API should reflect the architecture instead of
+> > making things up.
+> > 
+> 
+> We had kvm_set_trfcr(u64 host_trfcr, u64 guest_trfcr) on the last
+> version, which also serves the same purpose I mentioned above because
+> you can check if they're the same or not and disable swapping. I don't
+> know if that counts as reflecting the architecture better. But Oliver
+> mentioned he preferred it more "intent" based which is why I added the
+> clear_trfcr().
 
-Let me know if there's any comment on above thoughts.
+My personal take on this would be something like:
 
-I guess this feauture might be useful to QEMU too, but QEMU always needs
-uffd or something similar, then we need to measure and justify this one
-useful in a real QEMU setup.  For example, need to see how the page
-transfer overhead compares with lock contentions when there're, say, 400
-vcpus.  If some speedup on userfault + the transfer overhead is close to
-what we can get with vcpu exits, then QEMU may still stick with a simple
-model.  But not sure.
+void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest)
+{
+	[VHE stuff omitted]
 
-When integrated with this feature, it also means some other overheads at
-least to QEMU.  E.g., trap / resolve page fault needs two ops now (uffd and
-the bitmap).  Meanwhile even if vcpu can get rid of uffd's one big
-spinlock, it may contend again in userspace, either on page resolution or
-on similar queuing.  I think I mentioned it previously but I guess it's
-nontrivial to justify.  In all cases, I trust that you should have better
-judgement on this.  It's just that QEMU can at least behave differently, so
-not sure how it'll go there.
+	*host_data_ptr(guest_trfcr_el1) = trfcr_while_in_guest;
+	if (read_sysreg_s(SYS_TRFCR_EL1) != trfcr_while_in_guest);
+		host_data_set_flag(EL1_TRACING_CONFIGURED);
+	else
+		host_data_clear_flag(EL1_TRACING_CONFIGURED);
+}
 
-Happy holidays. :)
+and that'd about about it.
 
 Thanks,
 
--- 
-Peter Xu
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
