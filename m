@@ -1,279 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2104.outbound.protection.outlook.com [40.92.40.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D93360;
-	Thu, 26 Dec 2024 14:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735222961; cv=none; b=ssw9WchLrfIbPDb1zPCZfb/x1o0Se6ygD2L1a9mm7gNObv8e8gg7OR7Pp7tJKu86NwGUYAF+H6dPtz0V+Ypb6uI8iz9OEZWH4lpSRdIWZbjBLORXDy2Qn+wHdKD7uAdDX5ClxJR0E/az+V/IeqBYKeIWTm5CC4Qb1+PU5JI0udE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735222961; c=relaxed/simple;
-	bh=FxKzkVloadueSLTJozS/cKJF/u7Mcxr8Wpq/HPmw1UA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PRmcNsgQ2CiE0OESKvGPcFg2MiX7Cdl9JB8SFYwLpqtpk3HApQdJmVkDLEtA4m7hNELmt743zgRi7eobd0EU22WzD5N3GgKsvUiJAZs/IZwdJKYmz0PhvTdJAv2vwFKQjef+q1lMmnrAFY2O3rHz2iGYPiaT6ht3Tk2619M7DfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvzTYHsc; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1101863E
+	for <kvmarm@lists.linux.dev>; Sat, 28 Dec 2024 02:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.40.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735351293; cv=fail; b=kvUKgGXQCAwxRJhFdDMH4gYQrqtEVIfzDNQiGdrO1IbqhnZd3lIYaDFme8YKrE5wHTTwJz++mbGc96+LvFQP9Yl6DEMu+RD/K3zd9+dQkpeotHN9RCmlG1mXZ5qasan0nvRq4or4GLGG0vdJA7I7YNJJCtc82d03Fzv+j4YjHv8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735351293; c=relaxed/simple;
+	bh=MyoInFUANRJ8YiKPEILFiXptH0URQ03IO5DSxNOM7Es=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=KBMcr6Q8P4pTmQZPLZhqB17fvXr2oBJxEYyu/g8Ug5tc+mfupMbTOb4TwwUFYiW++e0QRMzO8acH3tj/mXse5V8yuXuLq3oSBj9Vb5QmS0115hqhSu/cXF9JQIEiBuPjpJ1FmSJ45eXYNyOwFj7rLTud5FqNZlt4NYdey5jD/yE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=L2Zz2Kqg; arc=fail smtp.client-ip=40.92.40.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvzTYHsc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731C0C4CED1;
-	Thu, 26 Dec 2024 14:22:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735222960;
-	bh=FxKzkVloadueSLTJozS/cKJF/u7Mcxr8Wpq/HPmw1UA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lvzTYHscMfIOt9mMuShw9L09QtMMmzsfUJ85mskwkhcFz1L/aqSc2x00ktpPNb0Ks
-	 S8gDReMW0un8OopPQNlVsnt1ndc63FmrAYD27FW6HMDVV2451PPs6nnP9Z+Iw3nwjK
-	 JWQK3heUy2Rz9QTfo7OSNyrFDAssokhz724oFKPLnBlyEtcTge9nNtkQ2QxUMTY2Ha
-	 Oo91BvMCX6DfriMwc6ceV+Bh8ber7nLUI+0bjGx1ara2Hqe2RuY0tWwiid2jrCp18u
-	 bt1NOFeC1BC5OIGBAtIikA8EvAWetVoIEQFRbGQgGIQL4XUepvOd0AO3CS/i7tv061
-	 Zfrcd+vIhas/A==
-Received: from 82-132-222-168.dab.02.net ([82.132.222.168] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tQol3-0072lJ-Us;
-	Thu, 26 Dec 2024 14:22:38 +0000
-Date: Thu, 26 Dec 2024 14:22:32 +0000
-Message-ID: <87ttaqr0bb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	suzuki.poulose@arm.com,
-	coresight@lists.linaro.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas
- <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	James Morse <james.morse@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 7/8] KVM: arm64: Support trace filtering for guests
-In-Reply-To: <0cfda877-7c3d-4e59-a1b1-fe245f7298f0@linaro.org>
-References: <20241127100130.1162639-1-james.clark@linaro.org>
-	<20241127100130.1162639-8-james.clark@linaro.org>
-	<86r061p63b.wl-maz@kernel.org>
-	<0cfda877-7c3d-4e59-a1b1-fe245f7298f0@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="L2Zz2Kqg"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bs6WW8kmdQgLGY5bnm6sWzQ1WcB3kW49udL8iX/rJewKZFe7kT0Q9083m6/qxpJiHIESiqtadjVCS1+wOEeq8JcCVOg8r/ksttVix/e1G7VNSzkhbqReHNmt3/9TFysqATKYee6nwoeTEojrV3qIeIaqLPycEXk8ejb8P3I17ypB7Z12mUhUlEm3qWaeUtQXbHH8s5zYiLZUWJewgCd6Bf/XNuhY43OYQQI5qxKdXGqkQpMxurfxJcyG/7H48lZA1rivVgUl4wKGrXsADN2W3AGTYIr7i/cCdT9hhUNzEf0OKHkomagpF0j62c4k+7O4ixpTRKy54/wrNJqU2/7SXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RAW63aFjDrsMk3na1YDUUo56y1xRAx/GTgUsUIshXmU=;
+ b=MBkiuzPuV+Y0Y5MHkZxQfdgdJ40VfpFp6DqN31eB8wsJtvpHr/h2Sum/GVbk+QQUWRMkCetLEX0EceAkZ+f2sjxuo/047VLL8GIs6wvYkFDCj1q55Ar9xoObIGn54SaPHGf0hLqX+8maM8gPtTmbSEiDpfL+2uoYlN+uqxssrF5WzeKe328PLEdwurfz7dnOfznW7Zqhm2QoaRlBD5jySwh99S7ZeBgUO5wefxSq0FFJoCYGRZsb/7As2BzDBVlQRQIYFb1tS15IXq839w5niz0RKaUo5VL/22KVvh2GKHtPLUwHeV0O4fJrS1Z22IEcvz8xTKGVn9mTBuPnwc0usA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RAW63aFjDrsMk3na1YDUUo56y1xRAx/GTgUsUIshXmU=;
+ b=L2Zz2KqgX440c13BF8/bBSskS1F5ErALx8YMFrW904GViC1lG56DqLTNIwZ/U31DGuoWeDzqGBohqeTu2NqfD2uElJdGB7iK95LAMHvE09tH/snoyrEYUkkWbEkMmRd6TVZxZTgPqvmkO4nf4JCZwYbnAuYL6gy18fnzxi8xgP8DEOlTgnxJefJFiv+OzAiiKQJf2qt+l/gq6TiUePRfzyA7Sq16quUHeVSNT7fyf22izP5Q6PlZsKRqqcp865jzfaMSLKsZ6hJjKLfWgtKNTEDEdmKVXp691qm3lha0uJVn7fCdKzGZ1l53MVlTlTa1tOQoZf7aT4RQnfoqE2Pf1w==
+Received: from SJ2P223MB1026.NAMP223.PROD.OUTLOOK.COM (2603:10b6:a03:570::8)
+ by BL4P223MB1359.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:5a8::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.14; Sat, 28 Dec
+ 2024 02:01:27 +0000
+Received: from SJ2P223MB1026.NAMP223.PROD.OUTLOOK.COM
+ ([fe80::b5cd:c37a:bd3e:e3fd]) by SJ2P223MB1026.NAMP223.PROD.OUTLOOK.COM
+ ([fe80::b5cd:c37a:bd3e:e3fd%4]) with mapi id 15.20.8293.000; Sat, 28 Dec 2024
+ 02:01:27 +0000
+From: Steven Davis <goldside000@outlook.com>
+To: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>
+CC: "joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Steven Davis <goldside000@outlook.com>
+Subject: [PATCH] arm64: kvm: Fix potential overflow in len
+Thread-Topic: [PATCH] arm64: kvm: Fix potential overflow in len
+Thread-Index: AQHbWMxnX+FBSwywOku5TBqhZiIaKQ==
+Date: Sat, 28 Dec 2024 02:01:27 +0000
+Message-ID: <20241228020119.12379-1-goldside000@outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2P223MB1026:EE_|BL4P223MB1359:EE_
+x-ms-office365-filtering-correlation-id: 61c398a7-2e8f-4d4a-5479-08dd26e38a52
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199028|15080799006|8062599003|8060799006|19110799003|38102599003|440099028|3412199025|102099032|1710799026;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?QaUjHQLzVW0hrjAJHz77vAIlwz8DNcDEPk6Pm4DINktvkSkWY2+Nw/+daO?=
+ =?iso-8859-1?Q?RAwP8FUa4wTEXKTS98yclz+u5k6pfOKdif5FfTJULQSTiY+B8KmPy59rZP?=
+ =?iso-8859-1?Q?+w4E9fMGJgjlVhiax/545Y9qzh2l94f7/OOxuaZCLHYL39jyIW3wmjGSw7?=
+ =?iso-8859-1?Q?egEIq18Ygra/Iftqi8TUCkfT9pEpTPh+sH+R7HCYv0Dkth+fdNvLyGmnSU?=
+ =?iso-8859-1?Q?Bfc2K/aEc9cGTpAWYIj39P8x4G77tvaqysj9a41oIXKuEikuryEkX0pScW?=
+ =?iso-8859-1?Q?H92x7JVuUk7Fg4McImyf6k29D3s2jFMet0cOOU8bVIzA6MWcRmFGXDLce9?=
+ =?iso-8859-1?Q?6nJCxXyFJmEYYcTwKmDd6jb5gde6hl70kvtGTutHpqQW9UrhAq2g9KdkWq?=
+ =?iso-8859-1?Q?PT43uKbAOMXPdYTBaVRK4A06V0xcvuE6eL9w/LjXy07qA2sbtoFBnwC1ak?=
+ =?iso-8859-1?Q?sgkam+N9lDNUiZk0iKkfUVX2bE8NyqC0RCZWowFlKAEnGvm00lyvEbrXnL?=
+ =?iso-8859-1?Q?FZB4Jfo+sSGu6+m9dZwkj23NTUGBFrYKf4uzrZeI9/+yiZGH3epb3BjqfG?=
+ =?iso-8859-1?Q?mwCeAo0qae/ECLNFQ1/tMmxgI4kECWxMyTRMsmlUWENHlYEt4jxZFubAqV?=
+ =?iso-8859-1?Q?6+MKxxYcwtbF3oByPqyEx+U81yjl/3wo6gqlvmOJ/FurpyDOMXXRtzCBG5?=
+ =?iso-8859-1?Q?AbqV61x5di7ngBKpyD3wfejiB6a/I2IyGjNltbRDNJ7I7w09EuudXAeRZc?=
+ =?iso-8859-1?Q?S9u27eNByE0tiQsX8lZ2U7JcBkoyaudr+KBZV8fM55qGhNnxVJiSj4bnDX?=
+ =?iso-8859-1?Q?UtD4725eZeGj1uF0l9f5cKDFJAH+sjrEbnua7znbtfTNyUwJkvoqAl7YOY?=
+ =?iso-8859-1?Q?HgdJgJmpNdgA6fzDR9bniNUqM0v4RZdTu0Q7ZZ8XjonhamXrilIv4BZb48?=
+ =?iso-8859-1?Q?xca8QlIS8zrLVF14dlkxLBl119ayJD0vNoxpXVDHM+awKkT6qHrtiOKHxf?=
+ =?iso-8859-1?Q?mR7xDpWty6OenNoFhZdRNw7vu7iv/gx9OKFeoLfFfhUYx8LTtAoLkIDrxL?=
+ =?iso-8859-1?Q?MXtn6JpCZXJaAmfJXNaH0lDmkwRmzyS/SxdmsVVXTPCOnkKIM/Tf9AtNEb?=
+ =?iso-8859-1?Q?ssBKq4wH3jJGG0ZAQorMdIw9H+or0=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?j3i3XqFSTNisQNF69RuuIVALpbdqis1Tm7AYPw8jFJLp3udu0kF9o9dreu?=
+ =?iso-8859-1?Q?fsoaBxU38j+E9ioY/OA87ZXu7BYqFH37GXAL8wH1PbekY8w0CUcl/o7uIQ?=
+ =?iso-8859-1?Q?YwdzwL/kS+c2PXdIbi1LIdZAAPrqWi1NX8SXHyZL+/hYPuX3Y7VWaZR2uQ?=
+ =?iso-8859-1?Q?LYEfbaWEMKMsVF34rdsEzNLrck6+kZVm8qxLdIjfOYH8XCe+lhgGzzMDFC?=
+ =?iso-8859-1?Q?HQZyoZPfLvwfmInHJXOjdpFYC7IRR+rRghH5y7WkUn8iVP3G4TetzwIfgK?=
+ =?iso-8859-1?Q?bwKSMP0dlrZMYmY02VTpV9G143Ul7MODu2FsISDyHZn2WqZP4tjxOTeQ7Q?=
+ =?iso-8859-1?Q?y5sCZh7YkUowHLxTzHdPmMbK0DG3sWMZ2lkyoFCqN+TUxqWLYfTW9irLVQ?=
+ =?iso-8859-1?Q?zRWmkjc9XCrlcJZUWhqDg0UnpMyLpX05soASDPW1WyxZaB+PFa2JkBI75W?=
+ =?iso-8859-1?Q?dghT1Gfy75d5sIwjv3oQScDt3Dfpj4ew7Fx5udSJXStefMfUZ/cOxor7hf?=
+ =?iso-8859-1?Q?S7N1FPPjhTZRmtrNf+0ZoSkN1Ls1oxfMJbCPveDxKkm3teygu/QtkW4/R6?=
+ =?iso-8859-1?Q?S/81YPnSDzkIDvZ38NyJvyi4d3Vl+WtmbZEk8dg2JZqKavPz49JZkSeHDC?=
+ =?iso-8859-1?Q?flaAox4FiVSS+Fp7dDM+7EYT7dunT2N80Z1ASsl0zw4lNVt7HZx5eg/7+t?=
+ =?iso-8859-1?Q?w1XErLiwhqfDszZQZPX/0KhoYRc8rXfGe9lTcQ5ZEhPysZf1TlP3g2dEo4?=
+ =?iso-8859-1?Q?cBlEgOrL0MJb0YxNw+Iw/qOSjcNv90/rAZj9FMW+qqEmubwnXNl5+QI4A3?=
+ =?iso-8859-1?Q?gXFYnjm6a2B/mb0N2tRP2qZqjTlskeajZjpDv+y0K/pvNB/uvy0va7f3mB?=
+ =?iso-8859-1?Q?R/Qop+diWsEieiejF31Q9+u5Phknbqw+sXC3RxXEQIsxZ3qgcJbroqjw6H?=
+ =?iso-8859-1?Q?X98TK6agWLLSuXyNCfgtVHh1FwBldoko3+ZstUCXkAhvva5FvqPAa0VjpF?=
+ =?iso-8859-1?Q?/cEjCNbM9wmCvxGryusa1OLVd2zqYRP8bBa16h+kAV9s2kgVQAK3GMZgoN?=
+ =?iso-8859-1?Q?3hnflvWsoSyeeHvdqjGoVw7ZA+aGutZRUWe7rQ91fRv+V1Nm/91hTmXvhD?=
+ =?iso-8859-1?Q?MaTpEE/gBYuPTSDC71noTMplze2iJ0ArZrqKgK4NzR0h953KXFHTp2/tqX?=
+ =?iso-8859-1?Q?NRcqbNhXfMB3MAf+OiQ65QIaito5A9z3hUkjVYaWphG/CD0PKo3JMZ3iLU?=
+ =?iso-8859-1?Q?ENF2Oy9ClBpIJdxfRFYq7jsEx2sQOcmhUgitwYUK4=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.222.168
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, broonie@kernel.org, anshuman.khandual@arm.com, james.morse@arm.com, robh@kernel.org, shiqiliu@hust.edu.cn, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2P223MB1026.NAMP223.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61c398a7-2e8f-4d4a-5479-08dd26e38a52
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Dec 2024 02:01:27.6138
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4P223MB1359
 
-On Mon, 23 Dec 2024 11:28:06 +0000,
-James Clark <james.clark@linaro.org> wrote:
-> 
-> 
-> 
-> On 21/12/2024 12:34 pm, Marc Zyngier wrote:
-> > On Wed, 27 Nov 2024 10:01:24 +0000,
-> > James Clark <james.clark@linaro.org> wrote:
-> >> 
-> >> For nVHE, switch the filter value in and out if the Coresight driver
-> >> asks for it. This will support filters for guests when sinks other than
-> >> TRBE are used.
-> >> 
-> >> For VHE, just write the filter directly to TRFCR_EL1 where trace can be
-> >> used even with TRBE sinks.
-> >> 
-> >> Signed-off-by: James Clark <james.clark@linaro.org>
-> >> ---
-> >>   arch/arm64/include/asm/kvm_host.h  |  5 +++++
-> >>   arch/arm64/kvm/debug.c             | 28 ++++++++++++++++++++++++++++
-> >>   arch/arm64/kvm/hyp/nvhe/debug-sr.c |  1 +
-> >>   3 files changed, 34 insertions(+)
-> >> 
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >> index ba251caa593b..cce07887551b 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -613,6 +613,7 @@ struct kvm_host_data {
-> >>   #define KVM_HOST_DATA_FLAG_HAS_SPE	0
-> >>   #define KVM_HOST_DATA_FLAG_HAS_TRF	1
-> >>   #define KVM_HOST_DATA_FLAG_TRBE_ENABLED	2
-> >> +#define KVM_HOST_DATA_FLAG_GUEST_FILTER	3
-> > 
-> > Guest filter what? This is meaningless.
-> > 
-> 
-> KVM_HOST_DATA_FLAG_SWAP_TRFCR maybe?
+The MMIO sign-extension logic in kvm_handle_mmio_return can
+trigger an integer overflow or undefined behavior when len
+is invalid (e.g., len =3D=3D 0 or len exceeds the size of unsigned
+long). Specifically, the expression (len * 8) - 1 may result
+in an out-of-bounds shift in the computation of the mask.
 
-A flag indicates a state, just like a level interrupt. So in cannot be
-a verb that indicates an action, after which the flag should be
-dropped (just like an edge interrupt). Maybe if you explained what
-this is supposed to indicate, we could come up with a better name.
+This patch adds validation to ensure len is greater than
+0 and less than the size of unsigned long before performing
+the sign-extension logic. If len falls outside this range,
+the problematic logic is skipped, preventing potential issues.
 
-I would have thought that something like EL1_TRACING_ENABLED would be
-adequate, but it is unusually hard to understand what this is supposed
-to be doing.
+Signed-off-by: Steven Davis <goldside000@outlook.com>
+---
+ arch/arm64/kvm/mmio.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-> 
-> >>   	unsigned long flags;
-> >>     	struct kvm_cpu_context host_ctxt;
-> >> @@ -1387,6 +1388,8 @@ void kvm_clr_pmu_events(u64 clr);
-> >>   bool kvm_set_pmuserenr(u64 val);
-> >>   void kvm_enable_trbe(void);
-> >>   void kvm_disable_trbe(void);
-> >> +void kvm_set_trfcr(u64 guest_trfcr);
-> >> +void kvm_clear_trfcr(void);
-> >>   #else
-> >>   static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> >>   static inline void kvm_clr_pmu_events(u64 clr) {}
-> >> @@ -1396,6 +1399,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
-> >>   }
-> >>   static inline void kvm_enable_trbe(void) {}
-> >>   static inline void kvm_disable_trbe(void) {}
-> >> +static inline void kvm_set_trfcr(u64 guest_trfcr) {}
-> >> +static inline void kvm_clear_trfcr(void) {}
-> >>   #endif
-> >>     void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> >> index 0c340ae7b5d1..9266f2776991 100644
-> >> --- a/arch/arm64/kvm/debug.c
-> >> +++ b/arch/arm64/kvm/debug.c
-> >> @@ -337,3 +337,31 @@ void kvm_disable_trbe(void)
-> >>   	host_data_clear_flag(TRBE_ENABLED);
-> >>   }
-> >>   EXPORT_SYMBOL_GPL(kvm_disable_trbe);
-> >> +
-> >> +void kvm_set_trfcr(u64 guest_trfcr)
-> > 
-> > Again. Is this the guest's view? or the host view while running the
-> > guest? I asked the question on the previous patch, and you didn't
-> > reply.
-> > 
-> 
-> Ah sorry missed that one:
-> 
-> > Guest value? Or host state while running the guest? If the former,
-> > then this has nothing to do here. If the latter, this should be
-> > spelled out (trfcr_in_guest?), and the comment amended.
-> 
-> Yes, the latter, guest TRFCR reads are undef anyway. I can rename this
-> and the host_data variable to be trfcr_in_guest.
-> 
-> >> +{
-> >> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
-> >> +		return;
-> >> +
-> >> +	if (has_vhe())
-> >> +		write_sysreg_s(guest_trfcr, SYS_TRFCR_EL12);
-> >> +	else {
-> >> +		*host_data_ptr(guest_trfcr_el1) = guest_trfcr;
-> >> +		host_data_set_flag(GUEST_FILTER);
-> >> +	}
-> > 
-> > Oh come on. This is basic coding style, see section 3 in
-> > Documentation/process/coding-style.rst.
-> > 
-> 
-> Oops, I'd have thought checkpatch could catch something like that. Will fix.
-
-Checkpatch serves little to no purpose, really, and relying on it is a
-very bad idea.
-
->
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(kvm_set_trfcr);
-> >> +
-> >> +void kvm_clear_trfcr(void)
-> >> +{
-> >> +	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
-> >> +		return;
-> >> +
-> >> +	if (has_vhe())
-> >> +		write_sysreg_s(0, SYS_TRFCR_EL12);
-> >> +	else {
-> >> +		*host_data_ptr(guest_trfcr_el1) = 0;
-> >> +		host_data_clear_flag(GUEST_FILTER);
-> >> +	}
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(kvm_clear_trfcr);
-> > 
-> > Why do we have two helpers? Clearly, calling kvm_set_trfcr() with
-> > E{1,0}TRE=={0,0} should result in *disabling* things.  Except it
-> > doesn't, and you should fix it. Once that is fixed, it becomes
-> obvious> that kvm_clear_trfcr() serves no purpose.
-> > 
-> 
-> With only one kvm_set_trfcr() there's no way to distinguish swapping
-> in a 0 value or stopping swapping altogether. I thought we wanted a
-> single flag that gated the register accesses so the hyp mostly does
-> nothing? With only kvm_set_trfcr() you first need to check FEAT_TRF
-> then you need to compare the real register with trfcr_in_guest to know
-> whether to swap or not every time.
-> 
-> Actually I think some of the previous versions had something like this
-> but it was a bit more complicated.
-> 
-> Maybe set/clear_trfcr() aren't great names. Perhaps
-> kvm_set_trfcr_in_guest() and kvm_disable_trfcr_in_guest()? With the
-> second one hinting that it stops the swapping regardless of what the
-> values are.
-
-I really think the way you name thing is getting in the way of simply
-*understanding* what you are doing.
-
-You don't disable or enable TRFCR. You enable or disable EL1 tracing
-while in guest context. TRFCR is the tool by which you are doing that,
-and the value you pass to these helpers is the tracing configuration.
-
-> 
-> I don't think calling kvm_set_trfcr() with E{1,0}TRE=={0,0} is
-> actually broken in this version, it means that the Coresight driver
-> wants that value to be installed for guests. So it should actually
-> _enable_ swapping in the value of 0, not disable anything.
-
-But you can decide whether there is need for "swapping" if the
-configuration is different than what's on the host, can't you?
-
-> 
-> > To sum it up, KVM's API should reflect the architecture instead of
-> > making things up.
-> > 
-> 
-> We had kvm_set_trfcr(u64 host_trfcr, u64 guest_trfcr) on the last
-> version, which also serves the same purpose I mentioned above because
-> you can check if they're the same or not and disable swapping. I don't
-> know if that counts as reflecting the architecture better. But Oliver
-> mentioned he preferred it more "intent" based which is why I added the
-> clear_trfcr().
-
-My personal take on this would be something like:
-
-void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest)
-{
-	[VHE stuff omitted]
-
-	*host_data_ptr(guest_trfcr_el1) = trfcr_while_in_guest;
-	if (read_sysreg_s(SYS_TRFCR_EL1) != trfcr_while_in_guest);
-		host_data_set_flag(EL1_TRACING_CONFIGURED);
-	else
-		host_data_clear_flag(EL1_TRACING_CONFIGURED);
-}
-
-and that'd about about it.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+index ab365e839..e4132dbc3 100644
+--- a/arch/arm64/kvm/mmio.c
++++ b/arch/arm64/kvm/mmio.c
+@@ -124,12 +124,15 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+ 		len =3D kvm_vcpu_dabt_get_as(vcpu);
+ 		data =3D kvm_mmio_read_buf(run->mmio.data, len);
+=20
+-		if (kvm_vcpu_dabt_issext(vcpu) &&
+-		    len < sizeof(unsigned long)) {
+-			mask =3D 1U << ((len * 8) - 1);
+-			data =3D (data ^ mask) - mask;
++		if (kvm_vcpu_dabt_issext(vcpu)) {
++			if (len > 0 && len < sizeof(unsigned long)) {
++				mask =3D 1U << ((len * 8) - 1);
++				data =3D (data ^ mask) - mask;
++			}
+ 		}
+=20
++
++
+ 		if (!kvm_vcpu_dabt_issf(vcpu))
+ 			data =3D data & 0xffffffff;
+=20
+--=20
+2.39.5
