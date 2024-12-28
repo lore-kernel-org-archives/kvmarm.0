@@ -1,68 +1,96 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAB25CB8
-	for <kvmarm@lists.linux.dev>; Sat, 28 Dec 2024 07:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16A0146D6B;
+	Sat, 28 Dec 2024 10:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735369754; cv=none; b=DfO6zt2W4to9uQSTbTuljRtwn43mr8QelnVlbCbgKDLvKLj0KcRlmGSf5Ui6mKYkryCwn2bsP37zJBwjb8IRGdq1JtHjHTnKx2ZT/xH8PxrhAXmLFY9kVTxhPScxU8Id8GI7nXKvmReIZEY5F80CVnOFlYWMxDC0pxg7YZVAzdg=
+	t=1735380471; cv=none; b=W5i24GMKyLLrnBk5RXXMzD5POP/0Axij91OSPvXEZPUvnyRiaFhkuVm3HUaU8xsrlMXpEYvxDQdHH25D+F5bHiEnkdOd58GTKSvyBG16mDP1AJb/jwoR1/gyj0vxoAv0KWJG0ClTwaqNwTl8mhfYvyH+LYXi3DMmASG2AzkL8eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735369754; c=relaxed/simple;
-	bh=rxXz1MmNHuN54yT8M/7T0NgZD/x6d7uTf6RlG0v7rQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txOgF2G1+M6t336h/3rIWfR9RYzxyAFAi4Zeq+ndS+QpdKAin1jmjIJbZIaARpAQA4jGOSsUtNnNKKaFEe998lIjfh8EbwSgnIkbYckONzdcEnXO2uU+9MjyLhmBuuXrrhaFD+I2/9kmJu3eS7wnkdgLFokHg8jYGp7XaFAzFZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OY26m7mD; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1735380471; c=relaxed/simple;
+	bh=YLgD9eimGEFiztCLYuVJVZB87yEhKC50Hf8bnQfMVHA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JquyThghVTKgMMxjMdkFMo/n3QwCyeqSvPxNkqiQzmeKQgSqUXl1ky1YLL66c9D7BG9J67Z3MliGnD//q7e/dXuK1V2o570c6iOU2242cCUCMX7j145cP7JmUyMQecQR3jVPpJek21vqBSi3/e4iRFv14kZi4Ete3KuKNzB+GJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVkxFkW/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OY26m7mD"
-Date: Fri, 27 Dec 2024 23:09:00 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1735369750;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V/bl5wEDeaiNds7u1yM+UwWhWCIetJXMbtJpgY90QJg=;
-	b=OY26m7mDXk5361LiqXd/LFshVSsSJMyikA2h6xS5dDlHIH//2l0ZJs/TSDc+DdqoYDuPOs
-	ZAQbgcBPMPcKJNdS4MIrWpp8vKS+IK1st2s5Tf+/QRfxt7QSj8GX8olxBt0VXTdjx2CA6X
-	CClxqlO0kz9UX7UdU8mBCxOOqKhYPu4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVkxFkW/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A70CC4CECD;
+	Sat, 28 Dec 2024 10:07:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735380470;
+	bh=YLgD9eimGEFiztCLYuVJVZB87yEhKC50Hf8bnQfMVHA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PVkxFkW/RQ5Mz+51SY5V7br71skXrRCzCH785yUeFXKbZuawZECj52Lri4gSCev9K
+	 jtm0ffLDnGci9QiCTkVNCMtCO/EY1X7EAOpp698yoq/+k/v6XaBkeGv8swIqY/I3bW
+	 v7lo218YUeylrxjV/MzNCm4e1C1pQOedYuIpddqFMe8Wv4PXR/CuQicOn76E/ALTK4
+	 VD8xu1/sWCPs1ge9/EZfVsIRtBv2G/Iwrtg5lfszIReOqm8ZztEnIYEe4Das7BUReu
+	 OoM6PFcjs+7bpqpudTeoLLl9wD6VtVeAiKJmkACiv85VhBkICpWrAMZPwcHdrSTl4W
+	 jPO4peHwpaTAQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tRTjY-007NEB-1n;
+	Sat, 28 Dec 2024 10:07:48 +0000
+Date: Sat, 28 Dec 2024 10:07:47 +0000
+Message-ID: <86jzbkp1cc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Steven Davis <goldside000@outlook.com>
-Cc: "maz@kernel.org" <maz@kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+Cc: "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>,
+	"catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>,
 	"will@kernel.org" <will@kernel.org>,
 	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>,
 	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] arm64: kvm: Fix potential overflow in len
-Message-ID: <Z2-j6ZCQbvfNP4z5@linux.dev>
+In-Reply-To: <20241228020119.12379-1-goldside000@outlook.com>
 References: <20241228020119.12379-1-goldside000@outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241228020119.12379-1-goldside000@outlook.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: goldside000@outlook.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Dec 28, 2024 at 02:01:27AM +0000, Steven Davis wrote:
+On Sat, 28 Dec 2024 02:01:27 +0000,
+Steven Davis <goldside000@outlook.com> wrote:
+> 
 > The MMIO sign-extension logic in kvm_handle_mmio_return can
 > trigger an integer overflow or undefined behavior when len
 > is invalid (e.g., len == 0 or len exceeds the size of unsigned
 > long). Specifically, the expression (len * 8) - 1 may result
 > in an out-of-bounds shift in the computation of the mask.
+> 
+> This patch adds validation to ensure len is greater than
+> 0 and less than the size of unsigned long before performing
+> the sign-extension logic. If len falls outside this range,
+> the problematic logic is skipped, preventing potential issues.
 
-I don't believe we need this. len is known to be nonzero and at most 8,
-which is already being tested for in the existing condition. See the
-definition of kvm_vcpu_dabt_get_as() if you're curious why that is.
+I'd be curious to understand how you came to this conclusion, given
+how len is computed. If anything, we could *remove* some of the
+checks, rather than adding additional ones.
+
+Also, "skipping" things is rarely an acceptable behaviour when
+emulating hardware behaviour.
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
