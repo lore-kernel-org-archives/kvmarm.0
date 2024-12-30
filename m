@@ -1,96 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16A0146D6B;
-	Sat, 28 Dec 2024 10:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9465195
+	for <kvmarm@lists.linux.dev>; Mon, 30 Dec 2024 15:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735380471; cv=none; b=W5i24GMKyLLrnBk5RXXMzD5POP/0Axij91OSPvXEZPUvnyRiaFhkuVm3HUaU8xsrlMXpEYvxDQdHH25D+F5bHiEnkdOd58GTKSvyBG16mDP1AJb/jwoR1/gyj0vxoAv0KWJG0ClTwaqNwTl8mhfYvyH+LYXi3DMmASG2AzkL8eY=
+	t=1735571996; cv=none; b=jB9JSgY3hFh2+MiYPXIb5GEmVAoYEt0e7mkY8ZEafmTD+BBMg6GailBURZ00XWdSGfViSNmp8IZ6jzh6ByLHpGgAh2rjeeTXXnBKQzSDEys5Ockd/h6pKdp66PXfXf1vBobXDFm77ViHARz4+SlIp2vWJIxMkPp2uf/2pW4bBfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735380471; c=relaxed/simple;
-	bh=YLgD9eimGEFiztCLYuVJVZB87yEhKC50Hf8bnQfMVHA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JquyThghVTKgMMxjMdkFMo/n3QwCyeqSvPxNkqiQzmeKQgSqUXl1ky1YLL66c9D7BG9J67Z3MliGnD//q7e/dXuK1V2o570c6iOU2242cCUCMX7j145cP7JmUyMQecQR3jVPpJek21vqBSi3/e4iRFv14kZi4Ete3KuKNzB+GJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVkxFkW/; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVkxFkW/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A70CC4CECD;
-	Sat, 28 Dec 2024 10:07:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735380470;
-	bh=YLgD9eimGEFiztCLYuVJVZB87yEhKC50Hf8bnQfMVHA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PVkxFkW/RQ5Mz+51SY5V7br71skXrRCzCH785yUeFXKbZuawZECj52Lri4gSCev9K
-	 jtm0ffLDnGci9QiCTkVNCMtCO/EY1X7EAOpp698yoq/+k/v6XaBkeGv8swIqY/I3bW
-	 v7lo218YUeylrxjV/MzNCm4e1C1pQOedYuIpddqFMe8Wv4PXR/CuQicOn76E/ALTK4
-	 VD8xu1/sWCPs1ge9/EZfVsIRtBv2G/Iwrtg5lfszIReOqm8ZztEnIYEe4Das7BUReu
-	 OoM6PFcjs+7bpqpudTeoLLl9wD6VtVeAiKJmkACiv85VhBkICpWrAMZPwcHdrSTl4W
-	 jPO4peHwpaTAQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tRTjY-007NEB-1n;
-	Sat, 28 Dec 2024 10:07:48 +0000
-Date: Sat, 28 Dec 2024 10:07:47 +0000
-Message-ID: <86jzbkp1cc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Davis <goldside000@outlook.com>
-Cc: "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>,
-	"catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] arm64: kvm: Fix potential overflow in len
-In-Reply-To: <20241228020119.12379-1-goldside000@outlook.com>
-References: <20241228020119.12379-1-goldside000@outlook.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1735571996; c=relaxed/simple;
+	bh=S/Ll8f27Fe/EqeKTPX0yHtRu6tAE6lX9HA1plT4XLHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eCQwo7E7nl0k9Vlj8wQqURCzOmznR6AyX7HGm+nOAlkElildMNKs2OPspRbByJd4lseYwEstppW2ulHKl8S13Km5yyNzeUZvd/MYcSycINELpTsqfe2jUdQ7hVw9DLObPhTnQf8TzBLS+rDl4lYddop2l7Hp8DcsxNn1QfJDwSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2683143D;
+	Mon, 30 Dec 2024 07:20:20 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA6913F673;
+	Mon, 30 Dec 2024 07:19:51 -0800 (PST)
+Date: Mon, 30 Dec 2024 15:19:48 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com, andrew.jones@linux.dev,
+	eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2] arm64: Add basic MTE test
+Message-ID: <Z3K6FLG2qfwphAfS@raptor>
+References: <20241212103447.34593-1-vladimir.murzin@arm.com>
+ <Z2lRk_NLHxDPvmrS@raptor>
+ <0fc53bdf-f919-40b9-8530-d11593ec55f7@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: goldside000@outlook.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0fc53bdf-f919-40b9-8530-d11593ec55f7@arm.com>
 
-On Sat, 28 Dec 2024 02:01:27 +0000,
-Steven Davis <goldside000@outlook.com> wrote:
+Hi Vladimir,
+
+On Mon, Dec 23, 2024 at 02:37:40PM +0000, Vladimir Murzin wrote:
+> Hi Alexandru,
 > 
-> The MMIO sign-extension logic in kvm_handle_mmio_return can
-> trigger an integer overflow or undefined behavior when len
-> is invalid (e.g., len == 0 or len exceeds the size of unsigned
-> long). Specifically, the expression (len * 8) - 1 may result
-> in an out-of-bounds shift in the computation of the mask.
+> On 12/23/24 12:03, Alexandru Elisei wrote:
+> > Hi Vladimir,
+> > 
+> > The patch looks good, but it just occured to me, the tests do a great job
+> > checking that tagged accesses fail when they should be failing, but they don't
+> > check that taggedd accesses *succeed* when they should not be failing. I think
+> > that's useful to have at the start of each test, if nothing just as a sanity
+> > check.
+> > 
 > 
-> This patch adds validation to ensure len is greater than
-> 0 and less than the size of unsigned long before performing
-> the sign-extension logic. If len falls outside this range,
-> the problematic logic is skipped, preventing potential issues.
+> Well, there are successful tagged access, yet with zero tag :) We can move to
+> non-zero tag, something like
+> 
+> static inline void mte_memset(void *addr, int val, size_t size)
+> {
+> 	unsigned long old = mte_set_tcf(MTE_TCF_SYNC);
+> 	memset(addr, val, size);
+> 	mte_set_tcf(old);
+> }
+> 
+> ...
+> 
+> static void mte_async_test(void)
+> {
+> 	unsigned int *mem = tagged(alloc_page(), 3);
+> 	unsigned int val = 0;
+> 
+> 	mte_init();
+> 	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> 	mte_set_tag(mem, PAGE_SIZE, 3);
+> 	mte_memset(mem, 0xff, PAGE_SIZE);
+> 	mte_set_tcf(MTE_TCF_ASYNC);
+> ...
 
-I'd be curious to understand how you came to this conclusion, given
-how len is computed. If anything, we could *remove* some of the
-checks, rather than adding additional ones.
+I have a few ideas here:
 
-Also, "skipping" things is rarely an acceptable behaviour when
-emulating hardware behaviour.
+* Tag checked accesses when the address bits [59:55] are 0 are also controlled
+with TCR_EL1.TCMA0, and the bit is set to 0 in asm_mmu_enabled() - this is what
+we want. But if you want to explicitely check tagged accesses with the zero tag
+I would suggest that the bit is explicitely cleared first (probably in
+mte_init()), to make sure the tests starts with a known good configuration (very
+useful for debugging!) and to avoid surprises if something changes in the
+startup sequence of a test.
 
-	M.
+* All tag checked accesses should probably happen after setting SCTLR_EL1.TCF,
+since the field is set to 0b00 in cstart64.S (when SCTLR_EL1 is set to
+INIT_SCTLR_EL1_MMU_OFF).
 
--- 
-Without deviation from the norm, progress is not possible.
+I don't have a preference, up to you to decide (you can even go so far as to
+check that TCR_EL1.TCMA0 works as expected if you feel it's useful), I was just
+pointing out some of the choices you have.
+
+[..]
+> >> +}
+> >> diff --git a/arm/run b/arm/run
+> >> index efdd44ce..b129e4e0 100755
+> >> --- a/arm/run
+> >> +++ b/arm/run
+> >> @@ -29,7 +29,8 @@ if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+> >>  	exit 2
+> >>  fi
+> >>  
+> >> -M='-machine virt'
+> >> +MACHINE="virt"
+> >> +M="-machine $MACHINE$MACHINE_PROPS"
+> > Sorry, but I still don't understand what $MACHINE_PROPS does, I can't seem to
+> > find where it's initialized :(
+> > 
+> 
+> I'm not sure what you are looking/asking for :( 
+> 
+> My last reply [1] demonstrates usage for $MACHINE_PROPS
+> 
+> QEMU=qemu-system-aarch64 ACCEL=tcg MACHINE_PROPS=",mte=on" arm/run arm/mte.flat -append "sync"
+
+Sorry about that, I must have missed your reply :( Adding MACHINE_PROPS is a
+nifty idea, but I don't think it's good practice to depend on that to be able to
+run a test. ./run_tests.sh <testname> should work without user
+intervention/configuration.
+
+For your particular example, you don't need to add a new environment
+variable if you want to run the test with arm/run, you can do this instead:
+
+QEMU=/path/to/qemu ACCEL=tcg arm/run arm/mte.flat -machine mte=on -append "sync"
+
+arm/run passes all the parameters as they are to qemu.
+
+In general, you can have the machine type in the unit test definition in
+arm/unitests.cfg, in the 'extra_params' field, just like for the gicv2 and gicv3
+tests. In theory, there's a separate 'machine' field in the test definition (see
+docs/unittests.txt), but arm/arm64 ignores it.
+
+This is what I had in mind for the test definition:
+
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 9b428c02dabc..fe1011454f88 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -275,18 +275,18 @@ arch = arm64
+ # MTE tests
+ [mte-sync]
+ file = mte.flat
+-groups = nodefault
+-extra_params = -append 'sync'
++groups = mte
++extra_params = -machine mte=on -append 'sync'
+ arch = arm64
+
+ [mte-async]
+ file = mte.flat
+-groups = nodefault
+-extra_params = -append 'async'
++groups = mte
++extra_params = -machine mte=on -append 'async'
+ arch = arm64
+
+ [mte-asymm]
+ file = mte.flat
+-groups = nodefault
+-extra_params = -append 'asymm'
++groups = mte
++extra_params = -machine mte=on -append 'asymm'
+ arch = arm64
+
+Interestingly though, when I try to run a test (either with ./run_tests.sh
+mte-sync, or by trying out your example), I get this error:
+
+qemu-system-aarch64: MTE requested, but not supported by the guest CPU
+
+My guess is that's caused by kvm-unit-tests defaulting to cortex-a57 as the
+model CPU. Changing the cpu to 'max' makes the test run. How are you getting
+around this on your end?
+
+Thanks,
+Alex
