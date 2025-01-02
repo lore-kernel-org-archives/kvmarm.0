@@ -1,109 +1,85 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D465E3D68
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jan 2025 12:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D0F3D68
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jan 2025 12:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735819630; cv=none; b=HYKZOdaMiHfFg8X9usN7EMa0cvy2OH4JybEz610Pt4GXV6omkYUZEPVhkd5//x6bFeTWSqGVDnBCKrTqucTQTm3FtBanBfzZrUnmcaTilkeBgNM4lfa8rFprfyDNa4mDwaauLorh2YChphbhmKK2vvQQrQR7yIpsKCsOtqW3CgU=
+	t=1735819811; cv=none; b=qiodnkHZ5G9MWkNmaO8XVznEtChJNkwCqHvVhAUhAJsMUlA7S1BG1MQFUNEI8Hq4eCYmg3bEFPgy5jWAP2N2WB7+YzRPO4rlf6PKKbBmSqzWgx2LQXcXMq0Z4fOoi/tSQIZfjabLmVQQx5Dqwq1MKOZ2/S8De5qLXVKhG914J2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735819630; c=relaxed/simple;
-	bh=nPqphhQ3v/qlhIdSSar6/dfUS15VV96Jz/Xqxwk+xiQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pu9csURiINiCmfcAFy/M6QrTW61xf499U7BRxqMMVuVg8Nr5Fxftu5LzYkoAyqfTQT5PJ6Uy+2dJuPw4uP1LcweslSj9LhUeXKPVEzYYwBbp9hWrAwhFD8bjmK+rN+dKhem1NwOl+KQHnfd3rsoaWeoAawpXRCK++fv7JRiaiVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YP55k1CmQz6K6nF;
-	Thu,  2 Jan 2025 20:06:18 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id BF298140A9C;
-	Thu,  2 Jan 2025 20:07:06 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 2 Jan
- 2025 13:07:05 +0100
-Date: Thu, 2 Jan 2025 12:07:04 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Will Deacon <will@kernel.org>
-CC: Ryan Roberts <ryan.roberts@arm.com>, Marc Zyngier <maz@kernel.org>,
-	=?UTF-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	<catalin.marinas@arm.com>, <corbet@lwn.net>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-	<yangyicong@huawei.com>, <guohanjun@huawei.com>,
-	<wangkefeng.wang@huawei.com>, <liaochang1@huawei.com>,
-	<sunnanyong@huawei.com>, <yangyicong@huawei.com>, <linuxarm@huawei.com>
-Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
-Message-ID: <20250102120704.00002984@huawei.com>
-In-Reply-To: <20241219164528.GH24724@willie-the-truck>
-References: <20241211160218.41404-1-miko.lenczewski@arm.com>
-	<20241211160218.41404-3-miko.lenczewski@arm.com>
-	<87cyhxs3xq.wl-maz@kernel.org>
-	<084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
-	<86ikrprn7w.wl-maz@kernel.org>
-	<2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
-	<86h678sy00.wl-maz@kernel.org>
-	<5c551e43-78e9-4336-ab16-b55c0d6c7f92@arm.com>
-	<20241219164528.GH24724@willie-the-truck>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1735819811; c=relaxed/simple;
+	bh=S5Wz7QMpHKhmhdlY2UY4x2qiEYobGLTFNk9vqTQbUmo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WGkS1yx9os4CBta5DWMC/VoDgi7RmSWfd+wyBogDgJHe2Q+DIe6kcFVQhe0458FZfOKHXqU/x2OLXfnrE+CBnblez6P3OQCBMBNojGzxSfdaar3lP+OHFEsh1cfOYchJpJ78PjQHmpwHMVtGBsb5BTYIap5iiNvbZb1yhA6Eh1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E437153B;
+	Thu,  2 Jan 2025 04:10:36 -0800 (PST)
+Received: from [10.1.25.140] (e121487-lin.cambridge.arm.com [10.1.25.140])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BFD43F673;
+	Thu,  2 Jan 2025 04:10:07 -0800 (PST)
+Message-ID: <6db97d9c-abe0-4418-903f-bc4662a8cab0@arm.com>
+Date: Thu, 2 Jan 2025 12:10:05 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2] arm64: Add basic MTE test
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com, andrew.jones@linux.dev,
+ eric.auger@redhat.com
+References: <20241212103447.34593-1-vladimir.murzin@arm.com>
+ <Z2lRk_NLHxDPvmrS@raptor> <0fc53bdf-f919-40b9-8530-d11593ec55f7@arm.com>
+ <Z3K6FLG2qfwphAfS@raptor> <590394e4-b21f-4ff8-a250-0cbf50adfe38@arm.com>
+ <Z3Z8ZHDLATOS1UH3@raptor>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <Z3Z8ZHDLATOS1UH3@raptor>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- frapeml500008.china.huawei.com (7.182.85.71)
 
-On Thu, 19 Dec 2024 16:45:28 +0000
-Will Deacon <will@kernel.org> wrote:
+Hi Alexandru,
 
-> On Thu, Dec 12, 2024 at 04:03:52PM +0000, Ryan Roberts wrote:
-> > >>> If anything, this should absolutely check for FAR_EL1 and assert that
-> > >>> this is indeed caused by such change.  
-> > >>
-> > >> I'm not really sure how we would check this reliably? Without patch 5, the
-> > >> problem is somewhat constrained; we could have as many changes in flight as
-> > >> there are CPUs so we could keep a list of all the {mm_struct, VA-range} that are
-> > >> being modified. But if patch 5 is confirmed to be architecturally sound, then
-> > >> there is no "terminating tlbi" so there is no bound on the set of {mm_struct,
-> > >> VA-range}'s that could legitimately cause a conflict abort.  
-> > > 
-> > > I didn't mean to imply that we should identify the exact cause of the
-> > > abort. I was hoping to simply check that FAR_EL1 reports a userspace
-> > > VA. Why wouldn't that work?  
-> > 
-> > Ahh gottya! Yes agreed, this sounds like the right approach.  
+On 1/2/25 11:45, Alexandru Elisei wrote:
+> Hi Vladimir,
 > 
-> Please, can we just not bother handling conflict aborts at all outside of
-> KVM? This is all dead code, it's complicated and it doesn't scale to the
-> in-kernel use-cases that others want. There's also not been any attempt
-> to add the pKVM support for handling host-side conflict aborts from what
-> I can tell.
+> On Thu, Jan 02, 2025 at 10:04:37AM +0000, Vladimir Murzin wrote:
+> [..]
+>> On 12/30/24 15:19, Alexandru Elisei wrote:
+>>> Hi Vladimir,
+>>> Interestingly though, when I try to run a test (either with ./run_tests.sh
+>>> mte-sync, or by trying out your example), I get this error:
+>>>
+>>> qemu-system-aarch64: MTE requested, but not supported by the guest CPU
+>>>
+>>> My guess is that's caused by kvm-unit-tests defaulting to cortex-a57 as the
+>>> model CPU. Changing the cpu to 'max' makes the test run. How are you getting
+>>> around this on your end?
+>>>
+>> ./configure --arch=arm64 --processor=max
+> Ah, so that explains it. Would you mind adding this information to the commit
+> message, perhaps something like this:
 > 
-> For now, I would suggest limiting this series just to the KVM support
-> for handling a broken/malicious guest. If the contpte performance
-> improvements are worthwhile (I've asked for data), then let's add support
-> for the CPUs that handle the conflict in hardware (I believe this is far
-> more common than reporting the abort) so that the in-kernel users can
-> benefit whilst keeping the code manageable at the same time.
+> If using TCG as the accelerator, qemu must emulate a CPU that supports MTE
+> in order for the tests to run. Use configure --processor to set an
+> appropriate CPU. If unsure about a particular processor, 'max' will most
+> likely work with a new enough qemu version.
 > 
 
-Hi All,
+Yes, I can add it when re-spin v4 (sorry just sent v3). Alternatively, we can
+merge change defaulting processor to `max` for arm64 which IMO much better
+solution (and does not require me to re-spin the patch) ;-)
 
-Given direction the discussion is going in time to raise a hand.
+Cheers
+Vladimir
 
-Huawei has implementations that support BBML2, and might report TLB conflict
-abort after changing block size directly until an appropriate TLB invalidation
-instruction completes and this Implementation Choice is architecturally compliant.
-
-Jonathan
-
-> Will
-> 
+>> Thanks
+>> Vladimir
+>>
+>>> Thanks,
+>>> Alex
+>>>
 
