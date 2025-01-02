@@ -1,103 +1,98 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B651B4257
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jan 2025 20:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2F88F7D
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jan 2025 22:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735849115; cv=none; b=C0rzU6VHwx1V2jVJV/UrmuY4cyA2boAYP0y1/H7T3F80rQjDj73/LZyiBQSOyglrqjZzwjGsumAKwxfLpr1/yKP5XHoBFZ5OZ7jFQP2VgFWjvBF4YserMXdIqpIhN3PBF2C0VcvBvN8ODPxKHZtuNgRhwVgUyOyRcO/naSmQgRg=
+	t=1735856443; cv=none; b=fzE0gxY25CkPCaELa91eKuVvCKLsdMVb8zbo34b5GIvLyEJNjxfL5C0bn7w54NaDjGDYw8t9zu8tCVVeSkl/tBdaKX1N8Rl6Awr9YZAKmCutVbqqlTSYJjxqa91k4/oTQTsyRVc/cveb/cJd7pW5Mb5SLb2vXpAv/RVqdlXG/Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735849115; c=relaxed/simple;
-	bh=4e1IdUvGapScSUpgK7R6llp+8eAfEdh0yOfh5Obu5/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=agJj0iTJGzLq9FLJ/eMiGoI52hTtflN3erBGtwHDoSXQXZY3BoosWLsbMaF77uOKtsmtn74CNTwQ6NF0PvztthHb4wXDTRQI//6nAkXGQ4gy2SiGg9d8yAPiHv58XtC22rjr0RSorth7aivW8qYKvG7/2tSjdFV6hLMALLy+O4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kMPQDZLC; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1735856443; c=relaxed/simple;
+	bh=ZPMVFvekgfEQcPWq4ctHuJPlF/h6r6wwUm37ZrGm/GE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rnepLODtEZIaUJ8m1cXZcG47yEVSX8c6bEJfn1e0EiSA2eDBsDx/Ioq33HFizHavzWzIc5laHV9qmeF8iQO823u6zU5XdB6F/HZEr7YyuxKFliREmOglChW6b9jSv5S9ebkZwchBp/WazyK4YCB7TBGK9MgUwwYlq39Zpw7Ckcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vOy6lKPY; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kMPQDZLC"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-46792996074so114953321cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 02 Jan 2025 12:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1735849112; x=1736453912; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4e1IdUvGapScSUpgK7R6llp+8eAfEdh0yOfh5Obu5/E=;
-        b=kMPQDZLCKrLiEYmepXWxkJF7vuDJhl/aRjPxXnCQ98ey+3JCawZ0s9Dmk92qjFvAZk
-         u9/kMBnMAGrTVs+jIfePMTFuvQlaw9Z2wwDAqkiXTIbDj/fi6H68OGyTy2nEJgY4d+Yw
-         C8cEjDA5skbP5oLq8V3AUDXYPYLIxr1FkEq3WJBRTRZEsHtSVBU7yFphExGPQY/axkXH
-         UfXDXQ97vQy3ogLbh8zzTz5y2aj9ur2EK0eJYfGJHiy9/BwU1CAU5m3pGrK+zs175N2V
-         DY+rljaOQOpXZkTC7KPOrCB2pAP6kh512YIuQDj+Z43XcQ8oByAPpyf0utbYNn3bNcpd
-         aiNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735849112; x=1736453912;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4e1IdUvGapScSUpgK7R6llp+8eAfEdh0yOfh5Obu5/E=;
-        b=TJgClSsqOziMWd7Yq2rCmC8AWcAscj0HC3t3vKzcuBEZIr6rvwg3O4ItFMfdHmSVm9
-         d0lqXrT7d2VI+3dXkrUyuFzngwPFokLiBKEp/b3zyoGv3dki8kRC8aQf24Q9MhTvwj/J
-         jEMxJBLNcBy8KZg1n6mYkkQUbfgB/qo2HeDNDLG7LVTebttJ+cjZnvR57bGugeub66oF
-         /iayqgvkuDPCss21B/hJ8i87nn4dcS0Eyw31Bxl4eyCQavrDf0h3n+rsUSit6O6lrrgj
-         5wOAol8kpaN9tALh4ZT1jDQtneleNo3MKMxfMOyNX9AhsOQNfGDs9grRM/unCLqRg6/m
-         w6/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWufCAyTI//dim0g8fD8EWeRd51h4L7IkKSMBwU+udZ9isbv2HoeXzAtCFOsf4FuM5mHp5RFQc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzqaCkgKByZYBOZ8uHXe/fyZMCMPUNJDbkCyBihIswT46zF3Lz8
-	Z9G07UMDKsVAeQd7x0UKc01z+QXpgirsywq5tCG9lqDs8S8C4Xw6gRXTp/scR8o=
-X-Gm-Gg: ASbGncvbWwu2gbEgylT6T+X2AGro3iAidDHigHUoWCwIy9NHqpU2vcx+Gf2Z39GB8eG
-	wrGx4NzXz0vgJp5aEIDPQrUkj7OTQWC+ptopqrojzjvMiY4wO4UViMaIfVZeK9uXpmSobnACAuz
-	xghcc+CiZI+oVQ+ae7QdlwiqOqBFAYFB2+0R0H0esuevkuou6sQVHGYZlfkohtGg1/qxoFDMBee
-	UHFkP+OJhYuoXVJJqq7EOrRth4OA+RkA+ORPALJElykGh2DZRc6DIcclB1u3pE9COCn6ByNgRCO
-	kOufRRfU4sAG0+z4NoDXXOBqUULJwg==
-X-Google-Smtp-Source: AGHT+IEubZlgbIa9gMEMKah3ttFKamsGoFQpk1RjIrpqZNlNGIW4EdOxYKL1s14UXV0ZPoQHIA67hQ==
-X-Received: by 2002:ac8:5d02:0:b0:467:6461:e143 with SMTP id d75a77b69052e-46a4a8efe3bmr794078931cf.33.1735849112516;
-        Thu, 02 Jan 2025 12:18:32 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46afc4597d3sm21460311cf.50.2025.01.02.12.18.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2025 12:18:31 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tTReJ-00000000MFl-10vf;
-	Thu, 02 Jan 2025 16:18:31 -0400
-Date: Thu, 2 Jan 2025 16:18:31 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	robdclark@gmail.com, joro@8bytes.org, jean-philippe@linaro.org,
-	nicolinc@nvidia.com, vdonnefort@google.com, qperret@google.com,
-	tabba@google.com, danielmentz@google.com, tzukui@google.com
-Subject: Re: [RFC PATCH v2 55/58] drivers/iommu: Add deferred map_sg
- operations
-Message-ID: <20250102201831.GB26854@ziepe.ca>
-References: <20241212180423.1578358-1-smostafa@google.com>
- <20241212180423.1578358-56-smostafa@google.com>
- <ce4c8db4-4895-426b-8d9d-97dc5d74fbc4@arm.com>
- <Z2Qshft8lQjI-x7c@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vOy6lKPY"
+Date: Thu, 2 Jan 2025 14:20:30 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1735856440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=20Vuf44vqQZnOQ/grQMGvEwR/ncOA7pXlyQr1M4eRZQ=;
+	b=vOy6lKPYq6ZugWKkqZ6PDlKMwCEESwJfUXKPs+DQm+S+bRQaCtEMBRC10BWQ2aE87OYaCi
+	xdhfAT1aybofvSdhpIWCmOdJHWY/gjzH07AhczmmGzze+g8gHxNmI3GcdLcZ/yTjGTlqlS
+	jujWLHAxhbCVnkOkwOeV4RC2FnWsDnU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+	Quentin Perret <qperret@google.com>
+Subject: [GIT PULL] Last KVM/arm64 fixes for 6.13
+Message-ID: <Z3cRLtgqPUCvyrkj@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z2Qshft8lQjI-x7c@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Dec 19, 2024 at 02:24:05PM +0000, Mostafa Saleh wrote:
-> I had a quick look now at s390, and it seems a bit different as they only
-> notify the hypervisor about the iova range being changed, and don’t need
-> to provide iova->paddr mapping which pKVM does.
+Hi Paolo,
 
-Can you explain this statement some more. It seems strange to me, why
-would the pkvm side, which has it's own page table, need to be be told
-about the iova->paddr during range unmapping requests - and why would
-the host/guest side have to unnecessarily store this information?
+A little slow on the draw with the last set of fixes because of the
+holidays. Nothing particularly remarkable here given that both pKVM
+and NV are in a half-baked state upstream, although the selftests fix
+does plug a new test failure as of 6.13.
 
-Jason
+Please pull.
+
+-- 
+Thanks,
+Oliver
+
+The following changes since commit 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8:
+
+  Linux 6.13-rc3 (2024-12-15 15:58:23 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.13-3
+
+for you to fetch changes up to e96d8b80afd3f63ffad58c0fdd5e0c380c4c404e:
+
+  KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters (2024-12-18 13:22:25 -0800)
+
+----------------------------------------------------------------
+KVM/arm64 changes for 6.13, part #3
+
+ - Always check page state in hyp_ack_unshare()
+
+ - Align set_id_regs selftest with the fact that ASIDBITS field is RO
+
+ - Various vPMU fixes for bugs that only affect nested virt
+
+----------------------------------------------------------------
+Mark Brown (1):
+      KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
+
+Oliver Upton (4):
+      KVM: arm64: Add unified helper for reprogramming counters by mask
+      KVM: arm64: Use KVM_REQ_RELOAD_PMU to handle PMCR_EL0.E change
+      KVM: arm64: nv: Reload PMU events upon MDCR_EL2.HPME change
+      KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters
+
+Quentin Perret (1):
+      KVM: arm64: Always check the state from hyp_ack_unshare()
+
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c             |  3 -
+ arch/arm64/kvm/pmu-emul.c                         | 89 +++++++++--------------
+ arch/arm64/kvm/sys_regs.c                         | 32 ++++++--
+ include/kvm/arm_pmu.h                             |  6 +-
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c |  1 -
+ 5 files changed, 62 insertions(+), 69 deletions(-)
