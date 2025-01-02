@@ -1,138 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8421E1A23A0;
-	Thu,  2 Jan 2025 12:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CDB18C903
+	for <kvmarm@lists.linux.dev>; Thu,  2 Jan 2025 12:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735821038; cv=none; b=f0qu2C93p++FccuaaSIYdAKoqghBXD7+v4RSNEDs7W8M/UbzLlvM5iyQIB18ptdhI/3aczYLthSCKexH/LouF4Rp/Q71mKx2XM0XWF978xmFvDvNchNdIU+S3ex/lUxqq/P57fX1mh4fizndbgEIpscSC53VyAZ0PM60XqaSsQE=
+	t=1735821253; cv=none; b=JJ+oBkTnRMbVhx4Q5lWK22jU84DcUJEJFpyys6ArEIsL0LG/R8Fxf6A4Z/oyKKJTb3WGoMX2kG17l7cb85F7REgij6WRwOGFp8u1tt6Tv9ZeYYZyUhtoa5ITM6WBzPbLfiEWucvdRRUAH03uLJ9y8LhBT4avmVCReZInYv3kvqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735821038; c=relaxed/simple;
-	bh=5Y53HP2kEwTqZJxhsBAZ3UIGAtplC1vps/WlfAM1w9w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JTNbjjTcebYZcCtI07vH/69Gsca9/OfeyO/4J0I7Bdt+WmiwtKTpaM+dXsf7qNFTKoOT8hB3tDN7LmaG4MKigPNOWPgu3liTWyoQQ8ySbnmUGmQGozlTNhwjeu4V70l3kUaQB7H5fa7cm7P8ifZeeuRwk6EnjVsJMprrQn4bKmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BT+NulpX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735821253; c=relaxed/simple;
+	bh=FJdR2n/noBslzLW0g9phdlMT2J8JN0ttwI6fUdHh7qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RGHGh0noNTfElkQpPwPs4pzmWX2n6pfnIuC2qE098cMhFUwBAB3t9x9txUo8pDIrTDBzUk4Jyh9WBUuVRoH/emfkVXZfeuah4gNvBBLcL6yIq39VQKkSbYve4Mh81SEauBZ5A1gFewqG1dd6B6quEkRRGSHR7sASJgikh4FXfGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EaP1GsV+; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BT+NulpX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBE4BC4CED7;
-	Thu,  2 Jan 2025 12:30:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735821037;
-	bh=5Y53HP2kEwTqZJxhsBAZ3UIGAtplC1vps/WlfAM1w9w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BT+NulpXbRBMoekFmZhX+SBJ+x9krUVQYwp7v87ECmwZd5FMVyfvJeuQDoBP2zX9z
-	 mRowweN388f0rC+iFNpRiMrvOnKU+gqnZAEcQRED+0HwVI8xRZB8z45buVtDy7f4KF
-	 uRqsN9t56Ak3cTPiTGgSJTa+oj9sxnS/q0zYLwsqiYwFJ6kz4wQbe+wP0Hxk5gy6qZ
-	 SjVRMHOoN+SQ3u/67qqp1LnEl6Tntp85lekpEsZlmWKuZ2o3mvecJrqJ1jIEziN5Li
-	 d5QTZ10B1u/XQDRS7fv7m7QUeHSChGXnVzgWhEHIi694hQ0sMIyulWoT89HZSoLnrn
-	 Ki93Ijyzns/4Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tTKLT-008PkE-9O;
-	Thu, 02 Jan 2025 12:30:35 +0000
-Date: Thu, 02 Jan 2025 12:30:34 +0000
-Message-ID: <86ed1lpfdh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Will Deacon <will@kernel.org>,	Ryan Roberts <ryan.roberts@arm.com>,
-	=?UTF-8?B?TWlrb8WCYWo=?= Lenczewski
- <miko.lenczewski@arm.com>,<catalin.marinas@arm.com>,<corbet@lwn.net>,
- <oliver.upton@linux.dev>,<joey.gouly@arm.com>,<suzuki.poulose@arm.com>,
- <yuzenghui@huawei.com>,<linux-arm-kernel@lists.infradead.org>,
- <linux-doc@vger.kernel.org>,<linux-kernel@vger.kernel.org>,
- <kvmarm@lists.linux.dev>,<yangyicong@huawei.com>,<guohanjun@huawei.com>,
- <wangkefeng.wang@huawei.com>,<liaochang1@huawei.com>,
- <sunnanyong@huawei.com>,<linuxarm@huawei.com>
-Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
-In-Reply-To: <20250102120704.00002984@huawei.com>
-References: <20241211160218.41404-1-miko.lenczewski@arm.com>
-	<20241211160218.41404-3-miko.lenczewski@arm.com>
-	<87cyhxs3xq.wl-maz@kernel.org>
-	<084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
-	<86ikrprn7w.wl-maz@kernel.org>
-	<2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
-	<86h678sy00.wl-maz@kernel.org>
-	<5c551e43-78e9-4336-ab16-b55c0d6c7f92@arm.com>
-	<20241219164528.GH24724@willie-the-truck>
-	<20250102120704.00002984@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EaP1GsV+"
+Date: Thu, 2 Jan 2025 13:34:04 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1735821247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WyLgVAvnU84rWbs3BydgFKXcjlVQM93t8r0hK9CLkKA=;
+	b=EaP1GsV+zpcbcYntYPAP/RqEMVF7tRUBjHr1fBcw5FjcGMYYxO7BXDNXJ13boMWhtyT/5R
+	fbLCg5m0Mnk16s6mJmcjfLltSHhMc7nhgLJhNYszpGPVd4iarzEeb6rf247s4UYQ/ULzwx
+	DzkisrphFgIExaLMtJ1sgR0gPkqn6Qc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.linux.dev, 
+	nikos.nikoleris@arm.com, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2] arm64: Add basic MTE test
+Message-ID: <20250102-ed20423136d7184a12792d22@orel>
+References: <20241212103447.34593-1-vladimir.murzin@arm.com>
+ <Z2lRk_NLHxDPvmrS@raptor>
+ <0fc53bdf-f919-40b9-8530-d11593ec55f7@arm.com>
+ <Z3K6FLG2qfwphAfS@raptor>
+ <20241230-3c7d660ca38c9b390ec74b01@orel>
+ <Z3LKLvkLjId1SeTI@raptor>
+ <20241230-bccb6213d3a71a09a7d32834@orel>
+ <Z3aGP00bYI9fspi_@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Jonathan.Cameron@huawei.com, will@kernel.org, ryan.roberts@arm.com, miko.lenczewski@arm.com, catalin.marinas@arm.com, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, yangyicong@huawei.com, guohanjun@huawei.com, wangkefeng.wang@huawei.com, liaochang1@huawei.com, sunnanyong@huawei.com, linuxarm@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z3aGP00bYI9fspi_@raptor>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Jonathan,
-
-On Thu, 02 Jan 2025 12:07:04 +0000,
-Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+On Thu, Jan 02, 2025 at 12:27:43PM +0000, Alexandru Elisei wrote:
+> Hi Drew,
 > 
-> On Thu, 19 Dec 2024 16:45:28 +0000
-> Will Deacon <will@kernel.org> wrote:
-> 
-> > On Thu, Dec 12, 2024 at 04:03:52PM +0000, Ryan Roberts wrote:
-> > > >>> If anything, this should absolutely check for FAR_EL1 and assert that
-> > > >>> this is indeed caused by such change.  
-> > > >>
-> > > >> I'm not really sure how we would check this reliably? Without patch 5, the
-> > > >> problem is somewhat constrained; we could have as many changes in flight as
-> > > >> there are CPUs so we could keep a list of all the {mm_struct, VA-range} that are
-> > > >> being modified. But if patch 5 is confirmed to be architecturally sound, then
-> > > >> there is no "terminating tlbi" so there is no bound on the set of {mm_struct,
-> > > >> VA-range}'s that could legitimately cause a conflict abort.  
-> > > > 
-> > > > I didn't mean to imply that we should identify the exact cause of the
-> > > > abort. I was hoping to simply check that FAR_EL1 reports a userspace
-> > > > VA. Why wouldn't that work?  
+> On Mon, Dec 30, 2024 at 05:52:54PM +0100, Andrew Jones wrote:
+> > On Mon, Dec 30, 2024 at 04:28:30PM +0000, Alexandru Elisei wrote:
+> > > Hi Drew,
 > > > 
-> > > Ahh gottya! Yes agreed, this sounds like the right approach.  
+> > > On Mon, Dec 30, 2024 at 04:45:01PM +0100, Andrew Jones wrote:
+> > > > On Mon, Dec 30, 2024 at 03:19:48PM +0000, Alexandru Elisei wrote:
+> > > > ...
+> > > > > Interestingly though, when I try to run a test (either with ./run_tests.sh
+> > > > > mte-sync, or by trying out your example), I get this error:
+> > > > > 
+> > > > > qemu-system-aarch64: MTE requested, but not supported by the guest CPU
+> > > > > 
+> > > > > My guess is that's caused by kvm-unit-tests defaulting to cortex-a57 as the
+> > > > > model CPU. Changing the cpu to 'max' makes the test run. How are you getting
+> > > > > around this on your end?
+> > > > >
+> > > > 
+> > > > We can (and I think should) change to 'max' for the default model.
+> > > 
+> > > I think so too, something like this maybe?
+> > > 
+> > > diff --git a/configure b/configure
+> > > index 86cf1da36467..4babbd5f5e74 100755
+> > > --- a/configure
+> > > +++ b/configure
+> > > @@ -286,7 +286,7 @@ fi
+> > >  [ -z "$processor" ] && processor="$arch"
+> > > 
+> > >  if [ "$processor" = "arm64" ]; then
+> > > -    processor="cortex-a57"
+> > > +    processor="max"
+> > >  elif [ "$processor" = "arm" ]; then
+> > >      processor="cortex-a15"
+> > >  fi
+> > > 
+> > > Can't do the same for arm, because Makefile.arm passes the processor to
+> > > -mcpu and that causes a build error.
 > > 
-> > Please, can we just not bother handling conflict aborts at all outside of
-> > KVM? This is all dead code, it's complicated and it doesn't scale to the
-> > in-kernel use-cases that others want. There's also not been any attempt
-> > to add the pKVM support for handling host-side conflict aborts from what
-> > I can tell.
-> > 
-> > For now, I would suggest limiting this series just to the KVM support
-> > for handling a broken/malicious guest. If the contpte performance
-> > improvements are worthwhile (I've asked for data), then let's add support
-> > for the CPUs that handle the conflict in hardware (I believe this is far
-> > more common than reporting the abort) so that the in-kernel users can
-> > benefit whilst keeping the code manageable at the same time.
-> > 
+> > I wonder if we can improve the mcpu thing by just selecting some generic
+> > cpu type at this point? Or just dropping it and counting on the compiler
+> > to use generic cpu type? It'd be nice to use max for both arm and arm64,
 > 
-> Hi All,
+> I tried setting the default to 'max' for both arm and arm64. If I pass
+> 'max' as the cpu type to arm, I get the build error above. If I don't pass
+> -mcpu to the arm compiler when $PROCESSOR=max, I get different errors
+> because of unsupported instructions:
 > 
-> Given direction the discussion is going in time to raise a hand.
+> /tmp/ccOHIrg7.s: Assembler messages:
+> /tmp/ccOHIrg7.s:46: Error: selected processor does not support `yield' in ARM mode
+> /tmp/ccGCB0zP.s: Assembler messages:
+> /tmp/ccGCB0zP.s:55: Error: selected processor does not support `ldrex r2,[r4]' in ARM mode
+> /tmp/ccGCB0zP.s:59: Error: selected processor does not support `strex r3,r2,[r4]' in ARM mode
+> /tmp/ccGCB0zP.s:71: Error: selected processor does not support `dmb ish' in ARM mode
+> /tmp/ccGCB0zP.s:99: Error: selected processor does not support `dmb ish' in ARM mode
+> /tmp/ccGCB0zP.s:144: Error: selected processor does not support `dmb ish' in ARM mode
+> [..]
 > 
-> Huawei has implementations that support BBML2, and might report TLB conflict
-> abort after changing block size directly until an appropriate TLB invalidation
-> instruction completes and this Implementation Choice is architecturally compliant.
+> and the errors go on. This means that the default cannot be 'max' for arm.
+> 
+> I also realized that the configure --processor option for arm64:
+> 
+>    --processor=PROCESSOR  processor to compile for (aarch64)
+> 
+> does not work as advertised, because the $PROCESSOR variable is not passed
+> down to the compiler.
+> 
+> So what I'm proposing is this:
+> 
+> - Patch #1: pass $PROCESSOR to the arm64 compiler, to reconcile the help
+>   text for --processor and to achieve parity with arm.
+> 
+> - Patch #2: have arm64 ignore $PROCESSOR when compiling if it's 'max.  By
+>   ignore I mean don't add a -mcpu argument to the compiler invocation.
+>   Change configure to raise an error if --processor=max is used for arm
+>   (users might think that if it works for arm64, it also works for arm).
+> 
+> - Patch #3: change the default for arm64 to 'max', but don't touch the
+>   default for arm.
+> 
+> What do you think?
 
-Compliant, absolutely. That's the letter of the spec. The usefulness
-aspect is, however, more debatable, and this is what Will is pointing
-out.
-
-Dealing with TLB Conflict aborts is an absolute pain if you need
-to handle it within the same Translation Regime and using the same
-TTBR as the one that has generated the fault. So at least for the time
-being, it might be preferable to only worry about the implementations
-that will promise to never generate such an abort and quietly perform
-an invalidation behind the kernel's back.
+Works for me.
 
 Thanks,
+drew
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Thanks,
+> Alex
+> 
+> > but if nobody has time to do the arm work / testing to be sure we can,
+> > then I'm fine with just a patch changing arm64.
+> > 
+> > Thanks,
+> > drew
