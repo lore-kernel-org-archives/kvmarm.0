@@ -1,65 +1,68 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08501192593
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jan 2025 15:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847AC1A8409
+	for <kvmarm@lists.linux.dev>; Fri,  3 Jan 2025 15:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735918528; cv=none; b=XySbuPTeijXtAkzwpJcJqJCUpHv6B8+4G8yN41xDwJTIuj52/SDr3NLy1koGbZ3c41goby2ZyIQHiPi39T4PuKYDGsvn/mhmU/DpA3BKdBkCr7r/Jyq66IwMzS7zNTK19f3kyEDJVxrpbZWcmejpRgjcS/JL45Ll29JvE/6A1kI=
+	t=1735919281; cv=none; b=dSWFzac7e8AfXmdXvWxZYNnhz8ixGwXVR3+sllIDkc+nX0NSppHYptJSvhVpagxIU7bhCdyyp/Hh8YbXm8M0zhN7rc8zjC1gYEjEv1W/zTloIxTS8xNj2o6WRb3sv/iLohHpf2QiD4AHyTEImvvAf2xp5BW+3QzZ19xVQpw83RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735918528; c=relaxed/simple;
-	bh=vcCOxf9MjAm6R004BwmvpnBmn1ugdF3644CrfRERETA=;
+	s=arc-20240116; t=1735919281; c=relaxed/simple;
+	bh=x1YRhiBcjzePAFHkv66VCQ/BK2Y0AMCZi/UgyHe1DBM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JQphRWQMMvBxTieV5bcrV42cuvs/q6xlI6J5kxMdk9avoWYanHpEsBHImonlLc9m+xKlfdcuFHmG/QTQB17faKkfhpgYPHO1CVgpmbLJojg0x6lYrDTJSvpVQ6BE0PpyqS7h7JuTSBR/7HDJLcfvKmSltTOANV5ViQm55LZPoOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I/AszDTU; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z9jlWtG6pOpVYzy1mDvIyDdZ3RmIfC1DMNLn/q9a2DFsQGzi9XDyFIGKgiFfFeCF51tb6gktFbT4LtQbwszbviywXgb06Yf91tNzz3RjVsFvtAEVvJfEkNh1UE5whuFsFEFBZ55glHPb+fs8vdsisaNLpJrbX9B7cae9hS0m+Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=XM2X9T3z; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I/AszDTU"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43621d2dd4cso57365e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 03 Jan 2025 07:35:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="XM2X9T3z"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6d8fd060e27so89733096d6.1
+        for <kvmarm@lists.linux.dev>; Fri, 03 Jan 2025 07:47:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1735918525; x=1736523325; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7TAFKlJ6U7QCklm7PSgnN2whltr6YSbd0ouHsKVqiJ0=;
-        b=I/AszDTUp6GYgFaa1bkY9aAM9HPQMXKcEehUCobNOTqRT9CUcBj6DG7wp36YUoF8oS
-         fmyLaksj3GWeX1HXJZ0nHFIfIdkmqYKPNM6o0z3WIOggUwJ6ZU6ZEmJvNwato0TDNTtk
-         74t1d1pLtO/W7e33eNFJi9EArAjM+xGmZxx7euIW7gmzMkMKqYdvKS3K54ZeCZbQquqy
-         32OAH3jBFB6A9qehq/0IfQbMylI4ttQtSmInwctLF8zBhSuAH4ZOZWrF3vF4Iyyz1YYE
-         zd87dtGa58Oz1bZKgfLbfqa/Z12XpskqA+E6bfaf8DZfmpol34GLBE2aUnjQBmEglzTA
-         0TVg==
+        d=ziepe.ca; s=google; t=1735919278; x=1736524078; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=x1YRhiBcjzePAFHkv66VCQ/BK2Y0AMCZi/UgyHe1DBM=;
+        b=XM2X9T3ziwxKTI2VA5vWogy+pcZjpaXd1o+HT6yrIuDalHHaJmeJnFOcyTyJ2xj4/a
+         LIoQIXE49JYF59hyvx+E1iEEVkjZu98kdBBjcK2wrQzVJLad9+2/q93dpDy+ZQl6fWT1
+         I1IF58jQ9GiY6kROpL1oaeWYroAsTo+svUP+bE/4bPCajNOdGY5NPOBrtD8b9y+UTXNd
+         M/RpEFk/LH3N8cE7UhMyCq8Ntb6zmMUdlTZpoc1IIWsYfON8svKz6tTg4zmp/L2idgFk
+         Vhq1aZcLeOC4bOKs1Tv51fUAcH272LzS6liqdH8cZdA3KMLf62FjD1AaXLgtHsmWEvnJ
+         SRBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735918525; x=1736523325;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7TAFKlJ6U7QCklm7PSgnN2whltr6YSbd0ouHsKVqiJ0=;
-        b=XPV0EkZJ7p/6In1r3N/g/+d1fYNlIuvjkpse3FI2mzDjuvC1+OStDXGMFsV0jgU65D
-         Jhq0lfmFJDvrQSnf8gjMoxYkImfaSo8HTWuxygJ4p3bhNZUkltfI/hDa22K5RUca54KE
-         964PTtgdnbY0MPkfhsAGHM57MMMTtMiW+UvTccaLpo1pVophMP5y/LlYa+K4P6c1+ZF/
-         IMwuld9Tx5+s37FCQHB/ldedooSI9L5h846TnQG26+eFoCvT4dtM1KXYvXyjxE3ehE4j
-         A9S/92M3IsbXMLYpXKNoUCcWPanqRUxdnwaHyd+5B8JXNN7YUWSroy9I9e4j1Yc7gG7K
-         EgtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsFHNbSe4yCaZbFoHC3Eup9TWXXhKT373xMLfF6unl432r4r3lVlfEP18g7gwJfz81FYEvqwE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwnJd6dGa4KvJ6fz/x+j81wvvk26OmYA6wf3f1ygQCOfqCtVOx1
-	YOota3RZA1VR2zfZAf48aespEtgKX7tBebXI21ORn6saum1kgKCU8LOpCTULwQ==
-X-Gm-Gg: ASbGncup202Sfhi1PjipjcJy3Xd7ycvHLowDE3B6Lw9V6M7J93K71eeitKM5Sm0mgNa
-	39xkeH9VWld89ai4IGHulOn+1QWD6MeL73U1K2Z799Xo36O6qB/Xia3/WEJWTHsEECe7HN0sbqM
-	1dZ+DUJcxUVf+NR7rXD2PXNao/yeVtg34CaYx4AABXywNry4MVw6jXMecu0FTo10BzlHwUr2AS9
-	Z+ofVG5v67n6oVdUFY+CNnFlfpusIx/PH6q/bOWnTbXdtRnwjOCT97T3e+5L/GFqlpoU6vtRpFz
-	xoatXL4XnjIpnW+1YIg=
-X-Google-Smtp-Source: AGHT+IFYpv295mC4BjSl9FSXlia/fjrHlkEb0FIGQ5Me85JthE8z4rdE+//UhwlzrKWnZRqRsAmKQA==
-X-Received: by 2002:a05:600c:5788:b0:434:9e1d:44ef with SMTP id 5b1f17b1804b1-436ccb413f2mr875415e9.7.1735918525147;
-        Fri, 03 Jan 2025 07:35:25 -0800 (PST)
-Received: from google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c832b32sm40339218f8f.23.2025.01.03.07.35.24
+        d=1e100.net; s=20230601; t=1735919278; x=1736524078;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x1YRhiBcjzePAFHkv66VCQ/BK2Y0AMCZi/UgyHe1DBM=;
+        b=lF1v4XxWTlDcD5a1kbWyjTr35m9twSs+PFtNzBb9Lm8kFZJ7Wc7zu4PNjkFVVNx8TV
+         7ivHHr361mFemQRGy/Et3H3ysZDBMTPjp1Lfo0fXbQ5Do99g3Ia08NQY5jyCVCXRkpsS
+         bs3c5fiMcErIpH5ActLUSEIMGen0639wyu7wOz2O461fzcFpvYXXagPQ9SJwQVjyXjbv
+         lgRWS0FDdkvPSLJsCS9u+HEFX/LkxhVznguBeQBfcxch1hTaAYSw3keGaMU7kbOxHY+Z
+         QnwDLDrGmRWholWSPjPzXeg2FBoEMbOoASEk5Tnknog/Lby7SwJzkvtPyElOVqU47/jM
+         Jixg==
+X-Forwarded-Encrypted: i=1; AJvYcCXxuRMBSkM6ndxPz1Vz2zuH6ijRZ5sZ/CrBsPDd53/4yJpOa61gdHa8slm/KdSnVwmbaMV3FuY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyA2PIbeH7FUcrEd0vMu/1b5r8Pbvo3YBFLg+M4IHVpHXf9Y3LK
+	o5erjdwAoST+WfTpj8pwuVFvvUbkGeqIoLCJ+gSAJLUGbX9+GYBP+TJPfZ0BJis=
+X-Gm-Gg: ASbGncsL+4ZLrQrY8uiZzLeIFreNwV6S7daPeIFjpcKxsotku9t4neMOwb6B6YgiuH0
+	Jjtic+kHLour5/qMKtDiHNcV9CdGksHo5qm+hNPNAAwlR9fPdycfVITNovl5C3tcWPSdZf1I96J
+	lhHyGJzAakOELjQlv+1jdFJC0TsJudegIWPVhAqfTgswS27lnap08CJTloDNyu/k/z6CtSz+1nr
+	35JeQtmUnU2Ztim/ytk02WLNqT5L+6z3IHcei4FzqmcuNWYXw2UPdM90BAzUQh9soPUwXt/XIhA
+	yfaoEo9UApSHZSCAcJ/u/991sEfraQ==
+X-Google-Smtp-Source: AGHT+IHsMKKIkxQ7rcmRTm1VnxBXPwiUOd3sAui5NPCMrkirqlLHWMPVy74SUV1oTWvKIM353GCAdg==
+X-Received: by 2002:a05:6214:1314:b0:6d9:2e0c:56c9 with SMTP id 6a1803df08f44-6dd23308374mr932119066d6.9.1735919278451;
+        Fri, 03 Jan 2025 07:47:58 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd31faa052sm120006416d6.9.2025.01.03.07.47.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 07:35:24 -0800 (PST)
-Date: Fri, 3 Jan 2025 15:35:20 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+        Fri, 03 Jan 2025 07:47:57 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tTju1-00000000jEE-0Nuy;
+	Fri, 03 Jan 2025 11:47:57 -0400
+Date: Fri, 3 Jan 2025 11:47:57 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
 Cc: Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
@@ -70,57 +73,43 @@ Cc: Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
 	tabba@google.com, danielmentz@google.com, tzukui@google.com
 Subject: Re: [RFC PATCH v2 55/58] drivers/iommu: Add deferred map_sg
  operations
-Message-ID: <Z3gDuPe5C1Uj7y4m@google.com>
+Message-ID: <20250103154757.GG26854@ziepe.ca>
 References: <20241212180423.1578358-1-smostafa@google.com>
  <20241212180423.1578358-56-smostafa@google.com>
  <ce4c8db4-4895-426b-8d9d-97dc5d74fbc4@arm.com>
  <Z2Qshft8lQjI-x7c@google.com>
  <20250102201831.GB26854@ziepe.ca>
+ <Z3gDuPe5C1Uj7y4m@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250102201831.GB26854@ziepe.ca>
+In-Reply-To: <Z3gDuPe5C1Uj7y4m@google.com>
 
-On Thu, Jan 02, 2025 at 04:18:31PM -0400, Jason Gunthorpe wrote:
-> On Thu, Dec 19, 2024 at 02:24:05PM +0000, Mostafa Saleh wrote:
-> > I had a quick look now at s390, and it seems a bit different as they only
-> > notify the hypervisor about the iova range being changed, and don’t need
-> > to provide iova->paddr mapping which pKVM does.
-> 
-> Can you explain this statement some more. It seems strange to me, why
-> would the pkvm side, which has it's own page table, need to be be told
-> about the iova->paddr during range unmapping requests - and why would
-> the host/guest side have to unnecessarily store this information?
+On Fri, Jan 03, 2025 at 03:35:20PM +0000, Mostafa Saleh wrote:
 
-No, it doesn’t need to be told about the paddr on unmapping.
+> An alternative approach as Robin suggested, is to treat all iommu_map as sg map,
+> and when the driver gets the iotlb_sync_map() call it can just issue the hypercall,
+> however this call only provides the IOVA range, which requires extra work or locking
+> as mentioned in the thread, and as Robin mentioned s390 doing something similar,
+> I was highlighting that in their driver, this call only notifies the hypervisor
+> about an IOVA and not an actual pv map as pKVM, so it much simpler in their case.
 
-The problem is as follows;
-- With the current IOMMU API, an iommu_map_sg() function ends up looping on
-  iommu_map() which is very slow as map is a hypercall and there is a lot of
-  context switching.
-- So, we add a map_sg hypercall, instead of consuming the kernel scatterlist
-  which duplicates logic and can be complicated to do. A new iommu operation is
-  added add_deferred_map_sg(), where at iommu_map_sg() instead of calling
-  iommu_map() it calls add_deferred_map_sg() to add mapping, and 2 other new ops
-  also added to create and consume a sg request which comes from a single iommu_map_sg().
+Oh, that is much clearer, maybe incorporate some of that into the
+commit message.
 
-The drawback of this approach is that it adds 3 new iommu_ops with a bit of niche
-semantics, which for now only used by this driver.
+We are going in a general direction of trying to make the fast dma
+mapping path not require sg, so adding sg specific optimizations to
+the low level driver is not good.
 
-An alternative approach as Robin suggested, is to treat all iommu_map as sg map,
-and when the driver gets the iotlb_sync_map() call it can just issue the hypercall,
-however this call only provides the IOVA range, which requires extra work or locking
-as mentioned in the thread, and as Robin mentioned s390 doing something similar,
-I was highlighting that in their driver, this call only notifies the hypervisor
-about an IOVA and not an actual pv map as pKVM, so it much simpler in their case.
+Batching the hypercalls in the gather and then flushing to execute the
+batch seems more reasonable.
 
-Thanks,
-Mostafa
-> 
-> Jason
+You could probably work on advancing this infrastructure separately
+via virtio-iommu..
+
+Jason
