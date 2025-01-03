@@ -1,38 +1,56 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2F88F7D
-	for <kvmarm@lists.linux.dev>; Thu,  2 Jan 2025 22:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C17EEBB;
+	Fri,  3 Jan 2025 15:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735856443; cv=none; b=fzE0gxY25CkPCaELa91eKuVvCKLsdMVb8zbo34b5GIvLyEJNjxfL5C0bn7w54NaDjGDYw8t9zu8tCVVeSkl/tBdaKX1N8Rl6Awr9YZAKmCutVbqqlTSYJjxqa91k4/oTQTsyRVc/cveb/cJd7pW5Mb5SLb2vXpAv/RVqdlXG/Ts=
+	t=1735918521; cv=none; b=YOulkhI1kXXydiklksSDlCAohJtb4ldyvWethdi9H12/kZWbjsf/K+IaBHFOWYgh+lcl2R0SlGa5uvDxcz6ALUJJXvdoshlNwHd7BIteZbKXadewA43nWJGqg6+dd8TFdp9dInkTQOU/i/v904gIAUuFjokIrW5lLLUVJ881PgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735856443; c=relaxed/simple;
-	bh=ZPMVFvekgfEQcPWq4ctHuJPlF/h6r6wwUm37ZrGm/GE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rnepLODtEZIaUJ8m1cXZcG47yEVSX8c6bEJfn1e0EiSA2eDBsDx/Ioq33HFizHavzWzIc5laHV9qmeF8iQO823u6zU5XdB6F/HZEr7YyuxKFliREmOglChW6b9jSv5S9ebkZwchBp/WazyK4YCB7TBGK9MgUwwYlq39Zpw7Ckcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vOy6lKPY; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1735918521; c=relaxed/simple;
+	bh=dkuPRC1mSjn4P8CTQpXiKsb9NwR2J22sVbc7YWENjVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eDMtJk5GY+BuD9f3QBHDl/Au8XXzJIoiuTJYBlRZXQWIz6tM6DCpcisNM8ZE80FnhHfuxuLtx8f2vaeeEYU9B0MKPL9JTOLaLoy1gJ8zT1sEv0td4IqJZ0H32YLAOACDgmNoETK19Y0Vy6Ao4AHMQxrLnUXFU1PcgUuCDAN32z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1KuaD0q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vOy6lKPY"
-Date: Thu, 2 Jan 2025 14:20:30 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1735856440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=20Vuf44vqQZnOQ/grQMGvEwR/ncOA7pXlyQr1M4eRZQ=;
-	b=vOy6lKPYq6ZugWKkqZ6PDlKMwCEESwJfUXKPs+DQm+S+bRQaCtEMBRC10BWQ2aE87OYaCi
-	xdhfAT1aybofvSdhpIWCmOdJHWY/gjzH07AhczmmGzze+g8gHxNmI3GcdLcZ/yTjGTlqlS
-	jujWLHAxhbCVnkOkwOeV4RC2FnWsDnU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Subject: [GIT PULL] Last KVM/arm64 fixes for 6.13
-Message-ID: <Z3cRLtgqPUCvyrkj@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1KuaD0q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3970C4CECE;
+	Fri,  3 Jan 2025 15:35:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735918520;
+	bh=dkuPRC1mSjn4P8CTQpXiKsb9NwR2J22sVbc7YWENjVU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O1KuaD0q/TR9Z9VX8BTduZF2dys6lmbAfhAI8bRnES3qkTy3CBDj21H5x/HzoYsBg
+	 2t9ZvhpSfHKK9Sic3ctzN1U95spySL9t7KT/0+u4btOxhayr53AR4x5ZA6aPLK58Jv
+	 5urJ3Cdw9XADU627FMHClUSdrePUc50OA118G5gDZSEtPAzCIB039F65oWmufeEy8p
+	 i7zMeU4m9jHccFKRpQmc9WpV8snU3y1JAHmPLAxrTdcfxMM3HIC+ztdpFV/N13Gnjm
+	 OwqD3168y7jsBxUNGK/9dp707yab1SsntJyv+QaM1WnJ8V1jaBBo04vIPzQG27ACY8
+	 PkhewEQcNobjg==
+Date: Fri, 3 Jan 2025 15:35:13 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	=?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
+	catalin.marinas@arm.com, corbet@lwn.net, oliver.upton@linux.dev,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	yangyicong@huawei.com, guohanjun@huawei.com,
+	wangkefeng.wang@huawei.com, liaochang1@huawei.com,
+	sunnanyong@huawei.com, linuxarm@huawei.com
+Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
+Message-ID: <20250103153512.GD3816@willie-the-truck>
+References: <20241211160218.41404-3-miko.lenczewski@arm.com>
+ <87cyhxs3xq.wl-maz@kernel.org>
+ <084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
+ <86ikrprn7w.wl-maz@kernel.org>
+ <2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
+ <86h678sy00.wl-maz@kernel.org>
+ <5c551e43-78e9-4336-ab16-b55c0d6c7f92@arm.com>
+ <20241219164528.GH24724@willie-the-truck>
+ <20250102120704.00002984@huawei.com>
+ <86ed1lpfdh.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,58 +59,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <86ed1lpfdh.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi Paolo,
+On Thu, Jan 02, 2025 at 12:30:34PM +0000, Marc Zyngier wrote:
+> On Thu, 02 Jan 2025 12:07:04 +0000,
+> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> > On Thu, 19 Dec 2024 16:45:28 +0000
+> > Will Deacon <will@kernel.org> wrote:
+> > > On Thu, Dec 12, 2024 at 04:03:52PM +0000, Ryan Roberts wrote:
+> > > > >>> If anything, this should absolutely check for FAR_EL1 and assert that
+> > > > >>> this is indeed caused by such change.  
+> > > > >>
+> > > > >> I'm not really sure how we would check this reliably? Without patch 5, the
+> > > > >> problem is somewhat constrained; we could have as many changes in flight as
+> > > > >> there are CPUs so we could keep a list of all the {mm_struct, VA-range} that are
+> > > > >> being modified. But if patch 5 is confirmed to be architecturally sound, then
+> > > > >> there is no "terminating tlbi" so there is no bound on the set of {mm_struct,
+> > > > >> VA-range}'s that could legitimately cause a conflict abort.  
+> > > > > 
+> > > > > I didn't mean to imply that we should identify the exact cause of the
+> > > > > abort. I was hoping to simply check that FAR_EL1 reports a userspace
+> > > > > VA. Why wouldn't that work?  
+> > > > 
+> > > > Ahh gottya! Yes agreed, this sounds like the right approach.  
+> > > 
+> > > Please, can we just not bother handling conflict aborts at all outside of
+> > > KVM? This is all dead code, it's complicated and it doesn't scale to the
+> > > in-kernel use-cases that others want. There's also not been any attempt
+> > > to add the pKVM support for handling host-side conflict aborts from what
+> > > I can tell.
+> > > 
+> > > For now, I would suggest limiting this series just to the KVM support
+> > > for handling a broken/malicious guest. If the contpte performance
+> > > improvements are worthwhile (I've asked for data), then let's add support
+> > > for the CPUs that handle the conflict in hardware (I believe this is far
+> > > more common than reporting the abort) so that the in-kernel users can
+> > > benefit whilst keeping the code manageable at the same time.
+> > > 
+> > 
+> > Given direction the discussion is going in time to raise a hand.
+> > 
+> > Huawei has implementations that support BBML2, and might report TLB conflict
+> > abort after changing block size directly until an appropriate TLB invalidation
+> > instruction completes and this Implementation Choice is architecturally compliant.
+> 
+> Compliant, absolutely. That's the letter of the spec. The usefulness
+> aspect is, however, more debatable, and this is what Will is pointing
+> out.
+> 
+> Dealing with TLB Conflict aborts is an absolute pain if you need
+> to handle it within the same Translation Regime and using the same
+> TTBR as the one that has generated the fault. So at least for the time
+> being, it might be preferable to only worry about the implementations
+> that will promise to never generate such an abort and quietly perform
+> an invalidation behind the kernel's back.
 
-A little slow on the draw with the last set of fixes because of the
-holidays. Nothing particularly remarkable here given that both pKVM
-and NV are in a half-baked state upstream, although the selftests fix
-does plug a new test failure as of 6.13.
+Agreed. We're not dropping support for CPUs that don't give us what we'd
+like here, we're just not bending over to port and maintain new
+optimisations for them. I think that's a reasonable compromise?
 
-Please pull.
+That said, thanks for raising this, Jonathan. It's a useful data point
+to know that TLB conflict aborts exist in the wild!
 
--- 
-Thanks,
-Oliver
-
-The following changes since commit 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8:
-
-  Linux 6.13-rc3 (2024-12-15 15:58:23 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.13-3
-
-for you to fetch changes up to e96d8b80afd3f63ffad58c0fdd5e0c380c4c404e:
-
-  KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters (2024-12-18 13:22:25 -0800)
-
-----------------------------------------------------------------
-KVM/arm64 changes for 6.13, part #3
-
- - Always check page state in hyp_ack_unshare()
-
- - Align set_id_regs selftest with the fact that ASIDBITS field is RO
-
- - Various vPMU fixes for bugs that only affect nested virt
-
-----------------------------------------------------------------
-Mark Brown (1):
-      KVM: arm64: Fix set_id_regs selftest for ASIDBITS becoming unwritable
-
-Oliver Upton (4):
-      KVM: arm64: Add unified helper for reprogramming counters by mask
-      KVM: arm64: Use KVM_REQ_RELOAD_PMU to handle PMCR_EL0.E change
-      KVM: arm64: nv: Reload PMU events upon MDCR_EL2.HPME change
-      KVM: arm64: Only apply PMCR_EL0.P to the guest range of counters
-
-Quentin Perret (1):
-      KVM: arm64: Always check the state from hyp_ack_unshare()
-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c             |  3 -
- arch/arm64/kvm/pmu-emul.c                         | 89 +++++++++--------------
- arch/arm64/kvm/sys_regs.c                         | 32 ++++++--
- include/kvm/arm_pmu.h                             |  6 +-
- tools/testing/selftests/kvm/aarch64/set_id_regs.c |  1 -
- 5 files changed, 62 insertions(+), 69 deletions(-)
+Will
