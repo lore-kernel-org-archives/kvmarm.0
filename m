@@ -1,107 +1,243 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7B813665B
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jan 2025 18:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67491DF244
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jan 2025 18:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736186814; cv=none; b=gUkgVRqyib/+OPEkYRk8BfvlHXsbx8s6SAjkAKHxlsTOVTSROuD2uTzgDfnG1pXgv0dsigsWzcZxiCrokyh+ZyFWeMBkNb1BiYXrmyxD5JruLXJ0Kk080+rVU1xdYp5M8BSGzvAQ8SdVyI2uuVS7QUlc24UXxxw/8j62YKZNrAw=
+	t=1736188341; cv=none; b=px5SfxQbktNGLXNhYqHHRihYBR0J+fGle7/evfqnHQJ5ob8xgiNK8y+Uejgi56UqvUppKFO91j5yphPJGxuyyO11QPsH0f0j/bx4Cb8ND4ij8VqWx9PVsUmJBnOC2dt4o45x6Dafg3ya7YG/IegUNlXvz+nESd7ZwTRVeR0wHt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736186814; c=relaxed/simple;
-	bh=IYBstVCYrspgWhZSdpjgcQcvE2+H3d+Eb8ozdPQwSSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dttyvfOM0i0QWKraMbzRKtgJICHWjDfAFzkXnjbiFZ3+fKLJyyaA34AE3EOfppBsgBqq8gS1y7cJI11L2wb2v7xXOJwpqUm+ulfry8oceFeELENmusr+I25MNtxDjwztKLJ98EuRkupNxvR/+FLmervSU4KzscvO44+V4+XJU5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIIpyGYg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736188341; c=relaxed/simple;
+	bh=9am/nlJUYfwTGhYDbGeiAOrRHeBRpqmgQoduL+8umoU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OMhHRowhp5eAtYUTpLs7AutsXR2K57jJ/RxcK0fLjKe3WK/z+fcU8BWcd8rWbaToQJa6yj5glWZ5Ia84ihsVv2aJrXInckQuQ11sTv6nVrvpNQJtqBOB5e3ytAdKybdj3JEXEG87kUbzdlSOGa7ZpcWb92yvL42irA+govDuK1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bqWhLUzm; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIIpyGYg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4346FC4CED2;
-	Mon,  6 Jan 2025 18:06:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736186813;
-	bh=IYBstVCYrspgWhZSdpjgcQcvE2+H3d+Eb8ozdPQwSSk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WIIpyGYg4A0HSXK+GbaXaVsI7rlmV0ozDlF6Uji2MoYBbeY53IbCAbjABtlxuA71m
-	 RrFVPwDkpoHaHT7BTIJL7ruVIy964XL03t8P22IJn3ZhWtsoO1wMh+FleuJYbTpxkX
-	 et6dswvL7KrgmABKFEBnUt2h0HNjCXAkfdWcU1V3TBv+u5tmV/hmMgxHTPEEEkJhpm
-	 PcMGpzTwnJrvJrmfKPVNTUhyncASpV2TYDqipsDk20jjo/2NjWd1DkEhDZhdfvO9Ko
-	 iR9TQw4XSIV3wDmzyHLtWDrCQrvFVpdY0CN7H1aeULUiouaPRhfgYQWgH3scfe69ic
-	 SF0pmz3l16ZDA==
-Date: Mon, 6 Jan 2025 18:06:49 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2] arm64: Add basic JSON register parser
-Message-ID: <467ffed2-933a-4f45-8802-3b799dfd6753@sirena.org.uk>
-References: <20250102144339.1564778-1-maz@kernel.org>
- <63543c41-607e-45cd-9266-a60838ff233e@sirena.org.uk>
- <8634hvq50l.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bqWhLUzm"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3862b364578so7287515f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 06 Jan 2025 10:32:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736188337; x=1736793137; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mMBHoWGKqgX/Qc6KXJyNk8iaddCY/jFnFkKsjyLo+bs=;
+        b=bqWhLUzmiOk0LdCIuH84LtRTyfOjV5Q445VfsN8SVeIJyF+Nysu0iZx5zp2A+sQzh7
+         DR0xbDl2qSb1MzO8156q+/W+pXeiFJGVT4zOMlTnSEFn5OZ1rf3B6SzHULro4/gLUSny
+         0KI7Ay7JL68G9VmZ5XLeFaq/ZtUYH7SntOkUXcafSvICKsJzTTDCKQEsOj5FD9sejUQF
+         7D/UAFIoTJSVOtA6PagLJC+n7hbzxrfuJtKuLQKSvYrfjRVrp1IeX7oGhrwbasttF2Zi
+         89W0UZRt8L6NV0plggYZmmyiXAt2ZSDFaxTrEuJu4jkA4T7aiOSytj/MAt/okvPz4mOy
+         pDxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736188337; x=1736793137;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mMBHoWGKqgX/Qc6KXJyNk8iaddCY/jFnFkKsjyLo+bs=;
+        b=SNAGQJq4IwEfiFe7bEZMbvesDdETWLz4nZtdFnxqXKKbFtgGzQpTmk6zbtAnRqv3g8
+         Gf019HLRd9hKjLEYwEMTgX6fpoidKZIUkzODBCUjrijWNdrD+nEdyfO4dmpmPBCjZTAo
+         62MoFPkC2ENm0sIJbZxffQ58qMJg3jFYwspx7qii9sstZ+wJFUgaxJlTPtePTrKGV319
+         wdR4srC/j9gTjctbN6CjM5JSgqgcnU+EDx1wwPVGXy3cTxll+/3YZmHcPjuIYaDclwgF
+         WWf9l7L6TlnDrvwSz/ZpkOqoE4q+PN7fo+ljbBeV6Ywp/Qk4j86tCoOCApn5qY4lg5iS
+         FWLw==
+X-Gm-Message-State: AOJu0YyF0URcPJQRRHrnfALYTk/M6FTGNQUHBLSrHrMq9wcMlTeZ8XKO
+	OTXqEhjcQZ8H3IAWFwtqZby4f1oOFsarulp+ShpYh36bHE88keCwzkpByVCZtrOZAmTWtDNLt9B
+	pp5GvBXsoqGapb0eiCA==
+X-Google-Smtp-Source: AGHT+IG5n82ztTIgQ8mNVnITN9/jqp+oTUnhPTHVxgRvKMcf4+SVIsSRmIj/SKnm+YL5qePo6RJCpb6nXQrhC9Pv
+X-Received: from wmqb1.prod.google.com ([2002:a05:600c:4e01:b0:434:ef30:4be3])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:1446:b0:388:cacf:24b0 with SMTP id ffacd0b85a97d-38a791253dbmr235580f8f.2.1736188336997;
+ Mon, 06 Jan 2025 10:32:16 -0800 (PST)
+Date: Mon,  6 Jan 2025 18:32:13 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PQfbZOQezoF/RsuD"
-Content-Disposition: inline
-In-Reply-To: <8634hvq50l.wl-maz@kernel.org>
-X-Cookie: Do not pick the flowers.
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20250106183213.4094616-1-vdonnefort@google.com>
+Subject: [PATCH] KVM: arm64: Fix nVHE stacktrace VA bits mask
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev
+Cc: kvmarm@lists.linux.dev, kernel-team@android.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+The hypervisor VA space size depends on both the ID map's
+(IDMAP_VA_BITS) and the kernel stage-1 (VA_BITS). When VA_BITS is
+smaller than IDMAP_VA_BITS (i.e. 39-bit), the stacktrace can contain
+addresses bigger than the current VA_BITS mask.
 
---PQfbZOQezoF/RsuD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+As the hyp_va_bits value needs to be used outside of the init code now,
+use a global variable, shared by all the kvm users in mmu.c, arm.c and
+now stacktrace.c.
 
-On Mon, Jan 06, 2025 at 04:30:18PM +0000, Marc Zyngier wrote:
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-> The moment you use a general purpose language, you end-up reinventing
-> JSON in another way, and I didn't have the courage to do that. Also,
-> jq feels like an exotic mix of functional programming and Forth,
-> something toxic enough to be irresistible.
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 66d93e320ec8..8195a77056a9 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -139,6 +139,8 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+ 
+ #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
+ 
++extern u32 hyp_va_bits;
++
+ /*
+  * We currently support using a VM-specified IPA size. For backward
+  * compatibility, the default IPA size is fixed to 40bits.
+@@ -182,7 +184,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+ 
+ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+-int __init kvm_mmu_init(u32 *hyp_va_bits);
++int __init kvm_mmu_init(void);
+ 
+ static inline void *__kvm_vector_slot2addr(void *base,
+ 					   enum arm64_hyp_spectre_vector slot)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a102c3aebdbc..90d28c35c5b5 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1987,7 +1987,7 @@ static int kvm_init_vector_slots(void)
+ 	return 0;
+ }
+ 
+-static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
++static void __init cpu_prepare_hyp_mode(int cpu)
+ {
+ 	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
+ 	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+@@ -2351,7 +2351,7 @@ static void __init teardown_hyp_mode(void)
+ 	}
+ }
+ 
+-static int __init do_pkvm_init(u32 hyp_va_bits)
++static int __init do_pkvm_init(void)
+ {
+ 	void *per_cpu_base = kvm_ksym_ref(kvm_nvhe_sym(kvm_arm_hyp_percpu_base));
+ 	int ret;
+@@ -2412,7 +2412,7 @@ static void kvm_hyp_init_symbols(void)
+ 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+ }
+ 
+-static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
++static int __init kvm_hyp_init_protection(void)
+ {
+ 	void *addr = phys_to_virt(hyp_mem_base);
+ 	int ret;
+@@ -2421,7 +2421,7 @@ static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = do_pkvm_init(hyp_va_bits);
++	ret = do_pkvm_init();
+ 	if (ret)
+ 		return ret;
+ 
+@@ -2505,7 +2505,6 @@ static void pkvm_hyp_init_ptrauth(void)
+ /* Inits Hyp-mode on all online CPUs */
+ static int __init init_hyp_mode(void)
+ {
+-	u32 hyp_va_bits;
+ 	int cpu;
+ 	int err = -ENOMEM;
+ 
+@@ -2519,7 +2518,7 @@ static int __init init_hyp_mode(void)
+ 	/*
+ 	 * Allocate Hyp PGD and setup Hyp identity mapping
+ 	 */
+-	err = kvm_mmu_init(&hyp_va_bits);
++	err = kvm_mmu_init();
+ 	if (err)
+ 		goto out_err;
+ 
+@@ -2633,7 +2632,7 @@ static int __init init_hyp_mode(void)
+ 		}
+ 
+ 		/* Prepare the CPU initialization parameters */
+-		cpu_prepare_hyp_mode(cpu, hyp_va_bits);
++		cpu_prepare_hyp_mode(cpu);
+ 	}
+ 
+ 	kvm_hyp_init_symbols();
+@@ -2654,7 +2653,7 @@ static int __init init_hyp_mode(void)
+ 		if (err)
+ 			goto out_err;
+ 
+-		err = kvm_hyp_init_protection(hyp_va_bits);
++		err = kvm_hyp_init_protection();
+ 		if (err) {
+ 			kvm_err("Failed to init hyp memory protection\n");
+ 			goto out_err;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c9d46ad57e52..62a99c86cd1d 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -29,6 +29,8 @@ static unsigned long __ro_after_init hyp_idmap_start;
+ static unsigned long __ro_after_init hyp_idmap_end;
+ static phys_addr_t __ro_after_init hyp_idmap_vector;
+ 
++u32 __ro_after_init hyp_va_bits;
++
+ static unsigned long __ro_after_init io_map_base;
+ 
+ static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
+@@ -1986,7 +1988,7 @@ static struct kvm_pgtable_mm_ops kvm_hyp_mm_ops = {
+ 	.virt_to_phys		= kvm_host_pa,
+ };
+ 
+-int __init kvm_mmu_init(u32 *hyp_va_bits)
++int __init kvm_mmu_init(void)
+ {
+ 	int err;
+ 	u32 idmap_bits;
+@@ -2020,9 +2022,9 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
+ 	 */
+ 	idmap_bits = IDMAP_VA_BITS;
+ 	kernel_bits = vabits_actual;
+-	*hyp_va_bits = max(idmap_bits, kernel_bits);
++	hyp_va_bits = max(idmap_bits, kernel_bits);
+ 
+-	kvm_debug("Using %u-bit virtual addresses at EL2\n", *hyp_va_bits);
++	kvm_debug("Using %u-bit virtual addresses at EL2\n", hyp_va_bits);
+ 	kvm_debug("IDMAP page: %lx\n", hyp_idmap_start);
+ 	kvm_debug("HYP VA range: %lx:%lx\n",
+ 		  kern_hyp_va(PAGE_OFFSET),
+@@ -2047,7 +2049,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
+ 		goto out;
+ 	}
+ 
+-	err = kvm_pgtable_hyp_init(hyp_pgtable, *hyp_va_bits, &kvm_hyp_mm_ops);
++	err = kvm_pgtable_hyp_init(hyp_pgtable, hyp_va_bits, &kvm_hyp_mm_ops);
+ 	if (err)
+ 		goto out_free_pgtable;
+ 
+diff --git a/arch/arm64/kvm/stacktrace.c b/arch/arm64/kvm/stacktrace.c
+index 3ace5b75813b..ef7a22598d89 100644
+--- a/arch/arm64/kvm/stacktrace.c
++++ b/arch/arm64/kvm/stacktrace.c
+@@ -19,6 +19,7 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ 
++#include <asm/kvm_mmu.h>
+ #include <asm/stacktrace/nvhe.h>
+ 
+ static struct stack_info stackinfo_get_overflow(void)
+@@ -145,7 +146,7 @@ static void unwind(struct unwind_state *state,
+  */
+ static bool kvm_nvhe_dump_backtrace_entry(void *arg, unsigned long where)
+ {
+-	unsigned long va_mask = GENMASK_ULL(vabits_actual - 1, 0);
++	unsigned long va_mask = GENMASK_ULL(hyp_va_bits - 1, 0);
+ 	unsigned long hyp_offset = (unsigned long)arg;
+ 
+ 	/* Mask tags and convert to kern addr */
 
-Yeah, it's super neat for the inline processing stuff.
+base-commit: 13563da6ffcf49b8b45772e40b35f96926a7ee1e
+-- 
+2.47.1.613.gc27f4b7a9f-goog
 
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > then we can hopefully use that for things like diffing two architecture
-> > versions while handling cases where we've intentionally diverged from
-> > how the architecture describes things. It'd be nice to have something
-> > that'd go through and check for updates to registers we already have
-> > mapped and provide an updated sysreg file.  It might however just be
-> > easier to use something like this and then work with sysreg files using
-> > text processing tools.
-
-> My current plan is somehow different: extract all the trapping
-> information for each register handled by KVM, and *automatically*
-> generate tests that check that KVM is doing the right thing. Or rather
-> convince someone to do that.
-
-> Then get rid of all such manually implemented tests from the kernel,
-> once and for all.
-
-That would be awesome - there's far too much stuff needs typing in
-there.  There's a bunch of these places where we either already use
-register data or could use it if it required less typing/verification to
-do so, the ideas I mentioned were just the first things that popped into
-my mind.  Having a reliable machine readable data source for this
-information is going to be *so* helpful.
-
---PQfbZOQezoF/RsuD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmd8G7gACgkQJNaLcl1U
-h9BrgQf/bv5vWOvyO9cU7dNIbkh1TXkpAgkTON9IqDitBobS4uT9In8Kp5yTUbgs
-4B9Tly5vaLM1hfCCU8Nyy/UnPqqG8gKyS330oSkdHsBa1nr5n5aJXcgXqRznrj1E
-/kWGSiG3QXPNwe69C3GL2E7FY8LAu0dMCKAL1IBlpz8nV/rhak5yR4f6gNxinn5O
-BDO6JwH/UFIO3KctwS1nrX9cRCeXpRs6NAA5dnlSz0a2udt3rxRuTatn7GSzt/4u
-lfnEsI/+3A4cBPBFHx22t7MpeiJutrHWAoraKuM2LDm0mpqEomutaJKqXysiqA7Q
-vZPXjHfAKBklRMThzbMMnwG8B/XicA==
-=/UTO
------END PGP SIGNATURE-----
-
---PQfbZOQezoF/RsuD--
