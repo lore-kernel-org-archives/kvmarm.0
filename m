@@ -1,39 +1,38 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC938821
-	for <kvmarm@lists.linux.dev>; Mon,  6 Jan 2025 23:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351CC1DB37B
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jan 2025 23:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736205660; cv=none; b=TeMu6d30ADtd86/XyPJwPfm0WxMzjMp7pzrHwtDuWSB8c97I8AlZ3t7Cn7rQ2WjBL0MsTriawC9svTSEXDAI5nhUw4wwGH1bGqtp7NKHntuMByYYBaflOyz93NxLldRQAVpsMqICj8Lk2bm0s3Hvjy9JsunlcrcdrDzG+I1Hwvo=
+	t=1736205837; cv=none; b=Rr64hArWv0yCw4YX4zWKgmeMYN/e5KNbdgUEKpMtXddVlNdbotdw4nImC+DW1CdwzAbGNilg7iNQ5nfl19WlnN5uQCzfMWzH1ZpKoX4Q8S/JllMyrRBgkyRiTu+64q+l3ULJjT6ytJFQPnPD5YIQ8XRAxPvtL64oNbne5f0Z+5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736205660; c=relaxed/simple;
-	bh=2hTo7yY72ZrfGb8G0FjM0ORl9GOsTtm0JNv+Dby320M=;
+	s=arc-20240116; t=1736205837; c=relaxed/simple;
+	bh=OEYq/rEy6/hbdmh2MT0bxPjVthoQLZK4+INfmZYEYjA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=htIxf+nk1sfDW8Oc0Fj9rZ6NMPtx+yTR2XkwbpUall82sdsaGr9hRsuQ4/igpaiFZWU4w1hmxmgkn+UuRGEzfcNeNiP6uGqfZL5fIOHd6ICTosM5xho/2T7KlvwLhUaanWO0kRe11aOQwj6f1uy5M5CAuPJEjcWKABshvWN+rNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dw1e1cto; arc=none smtp.client-ip=95.215.58.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=cdJK6rcMUvxsURJ0a2NhZkDw1gy0lsJX8bcPp9pLysGH+rKmqCqLw4lWBILCL/g7gJT+jrF16qc0TyKWDvdApdZ1VGfXUUMB4T6l+41fv5ClLsPMPedHZa5Y6/fDn2MrXpkufca1EDvZqIEvNQIcYTkcDDFYtthGXo+Fm2XcZm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QDP+2lni; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dw1e1cto"
-Date: Mon, 6 Jan 2025 15:20:47 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QDP+2lni"
+Date: Mon, 6 Jan 2025 15:23:49 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736205655;
+	t=1736205833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gNcyYWZnXfW6aFkgFU5YA1nQFdknczTHmN2ptcVvk0s=;
-	b=dw1e1ctoHziDCJke08fFxKJCLhgc2JYbKdHAJnM5ClybtvuLq9GHJ+7Oke3os7lcHVj3+q
-	jeCw0XOxumnJVBWPlJGPVMu+4dx5YojcAgWZP0Spu072Ds2cDLMh78NcGmBZotlJLh39Z1
-	DQUT+WjFFtHp2FqGss8WJzK2B+vt4WE=
+	bh=n/MVW3wKwQVEQEzkvuZSJWY6SOrTiolGYkjM4qTiFeg=;
+	b=QDP+2lniNTT+JKJRFgXs6zXBXhvMQJeKXfyVnK3LTBSl0sCDrmL+Mi3Z2VoDMYQJ86RUxk
+	xuMvud68d/ESYKTesSxPpww7BndZMddNiXwcaLSKF+8swlUAjMaTjzTExiLQ0F8MCMQ4kt
+	v6+eAspNeQJL/rTYJR7gBYHPRe8BAVM=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, joey.gouly@arm.com,
-	tabba@google.com
-Subject: Re: [PATCH] KVM: arm64: Fix FEAT_MOPS in pKVM
-Message-ID: <Z3xlT51luMieOAab@linux.dev>
-References: <20250106112329.64013-1-vladimir.murzin@arm.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, tabba@google.com
+Subject: Re: [PATCH] KVM: arm64: Fix FEAT_MTE in pKVM
+Message-ID: <Z3xmBcWcuQSXnrIo@linux.dev>
+References: <20250106112421.65355-1-vladimir.murzin@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,24 +41,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250106112329.64013-1-vladimir.murzin@arm.com>
+In-Reply-To: <20250106112421.65355-1-vladimir.murzin@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-+cc Fuad
-
-On Mon, Jan 06, 2025 at 11:23:29AM +0000, Vladimir Murzin wrote:
-> Flush HCRX_EL2 when switching between the host and the guests.
+On Mon, Jan 06, 2025 at 11:24:21AM +0000, Vladimir Murzin wrote:
+> Make sure we do not trap access to Allocation Tags.
 > 
-> Fixes: 84de212d739e ("KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest")
+> Fixes: b56680de9c64 ("KVM: arm64: Initialize trap register values in hyp in pKVM")
 > Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 
-We shouldn't be trusting the host's hcrx_el2 in this case and should
-instead calculate it for the pVM similar to the other trap registers
-(see pkvm_vcpu_init_traps() and friends).
+I imagine Marc will pick this up for 6.14, so:
 
-It is apparent, though, that we erroneously exposed MOPS before commit
-3d7ff00700d1 ("KVM: arm64: Rework specifying restricted features for protected VMs").
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 -- 
 Thanks,
-Oliver 
+Oliver
