@@ -1,177 +1,233 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BB41ABEAC
-	for <kvmarm@lists.linux.dev>; Fri,  3 Jan 2025 18:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C17541760
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jan 2025 02:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735928324; cv=none; b=KDzzyM3uZnEu+sIrlNsVPYmGw8vSScM7KWek5EsbA+Myun+QPePmzt5wHJzyGJQ9WXgi3uChOs4vQwHoA6zblg/glpKHL0YtVQ0Em6yvfwJo8Jrgf3uk5K+fOi3yNZGewf+Fu8n2vI38eltYcpi4KUxqVmrhYmisUzKoF+WAf6M=
+	t=1736129910; cv=none; b=A745P2T+46cGtaj/4p8Xj+4LMBVjiVHXfMRzVZ5nlPIcdxTFqaw5fsFOCIvSOz5wKdTwWAqEOYZp2p/oHeTU9nreOV5QFho6LytnTVl5zyv+qWXQT/93/8z7OjT1F3R34xtQKcRtrYPng4ZQqEdTSd6sMbiYXI244fqSjY1oXFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735928324; c=relaxed/simple;
-	bh=pxO/NktkU5DBpkU1jGn2Y3KNP8LSY+fi3uLD59T0a6Y=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xyxfwl0COW+HqOavsyBIJiPz/8jUFiRHDIpUbCwlY/bcWf+PHVCApb1r1HUd4/h96Cna+AYQv7rxRbqO6Lpa3+MKhQdZ/1r9BllL691yVSOR+EDmZMyT9AN3Ogzc2wAkr6mbrd/uqCKD0HBYW6trgFBe+xn0b2OaBnfTcbySWBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YPsHt0PHNz6K6G1;
-	Sat,  4 Jan 2025 02:17:46 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id AD2E71404C4;
-	Sat,  4 Jan 2025 02:18:38 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 3 Jan
- 2025 19:18:37 +0100
-Date: Fri, 3 Jan 2025 18:18:36 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Ryan Roberts <ryan.roberts@arm.com>
-CC: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- =?UTF-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>,
-	<catalin.marinas@arm.com>, <corbet@lwn.net>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-	<yangyicong@huawei.com>, <guohanjun@huawei.com>,
-	<wangkefeng.wang@huawei.com>, <liaochang1@huawei.com>,
-	<sunnanyong@huawei.com>, <linuxarm@huawei.com>
-Subject: Re: [RESEND RFC PATCH v1 2/5] arm64: Add BBM Level 2 cpu feature
-Message-ID: <20250103181836.000045b1@huawei.com>
-In-Reply-To: <2a6448f5-a48b-42fd-9589-acdb434f0a8a@arm.com>
-References: <20241211160218.41404-3-miko.lenczewski@arm.com>
-	<87cyhxs3xq.wl-maz@kernel.org>
-	<084c5ada-51af-4c1a-b50a-4401e62ddbd6@arm.com>
-	<86ikrprn7w.wl-maz@kernel.org>
-	<2b1cc228-a8d5-4383-ab25-abbbcccd2e2c@arm.com>
-	<86h678sy00.wl-maz@kernel.org>
-	<5c551e43-78e9-4336-ab16-b55c0d6c7f92@arm.com>
-	<20241219164528.GH24724@willie-the-truck>
-	<20250102120704.00002984@huawei.com>
-	<86ed1lpfdh.wl-maz@kernel.org>
-	<20250103153512.GD3816@willie-the-truck>
-	<2a6448f5-a48b-42fd-9589-acdb434f0a8a@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1736129910; c=relaxed/simple;
+	bh=TpJBngqm5TssDDgdGPDvuC68gCm66HR25l2nMZ81g5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OkrHG2C5Nhg7G+5euhUXZisL+Mymp8zYlI3oROhUqkL+U6jIR34PLy+ES5rsjyaSAA9tY/2FlnOeYvB/PlcPVYLvn++Yd+n5+FUlGgrmtgKweZ6xSGIDULyoy87+N2EcbU1f29R7/yJdSOYkYXoKGHVCmAJBW77x41uyjN8pPW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=ZMzsJy4z; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="ZMzsJy4z"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2ee9a780de4so14655513a91.3
+        for <kvmarm@lists.linux.dev>; Sun, 05 Jan 2025 18:18:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1736129906; x=1736734706; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c3FJfKlQLbEvoXC4i0ViMWpomAcv0lK5A9XqztX79Kg=;
+        b=ZMzsJy4zXHAUN8SGXaoTTsNHuOFpl1yVKAH8Pvu8a3wtJeKWmTLg6Qjuqve78MxHb+
+         IBRgwoVKhuCBSZbgvnhNggs4QGubUkflTXaHIjLx+8ouG2TyP4Z7KjxzKtimTHtyc+c8
+         WTjs69WYF4AZedq5724aroG+eJMpCkzaivDKwDVTu5nvgl+mOyB797x+RGR9yySDqEAx
+         fXzJbxV9kFOxYlcwGOzR2umCtoBlXmgNBQqGDxJY9lXsnZWAkCJgJC0cfXlthlAlVMYJ
+         FxC2+oYOxaxSLDSuOSusz0eDTMKXj+y8nme1XrFXgSoLL8QZ4hzi4S4WvNsQVGjfOnfE
+         e+cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736129906; x=1736734706;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c3FJfKlQLbEvoXC4i0ViMWpomAcv0lK5A9XqztX79Kg=;
+        b=pE23dV4S5oQvJ8ueesho/6NlZ+AgsXyKUl1SY7MIUCd8a0OXWAtUn4IK5FK6A4YLrw
+         XfgGZiyqa2tTDSqVWpvabsOrbqlojzmndpe87Tjh1uGrrH/oV59GnUY3tTqGDvr2ViZa
+         Jy+T8fLnCgmk1EsSNYV6YRR5FkvJj5ceCzU8E/ZThjZ8coho4y1vfremeG8AGO/audgO
+         i5LI4XgPDXGowBl96zghg1OMbUv08ZBeH4F6ScDdEaX1V2NLtfgGQTiJBFSeVkh61DFl
+         optGi79hj0rQTFQXhJGRf8kBu2gFeuYjzHG08xhsI8T/wAgJVrX+nBzXiF+2OGERL0l+
+         86+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVTR609dd7KC7PVaEMf+hSb2sycP5u2JOpiNxyi5+3ivRrE1k+gLNGqroBgv0GqJ4tiVBR10Vw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzH/5SK9FE8F3mn7L5YmymzV6EFvUNaB6SWkMkMYat81ewQsJgU
+	8wQ47ndg8/+Y8TAcklffcpzfnXuFzg1P8KMdm28jIKQOX91Z+hIz6PKgIp+e+J0hLxKdjHH+csh
+	pnqAxIY0SICki3unxVmZyj2NjsXMlB+uaCU6yxEnM8V+He+eFxljdC/TuSDWwhIQ=
+X-Gm-Gg: ASbGncvckFg0JoKwOWksAqMoLs+YQ8vyl36UyDW+VeuC6JEFA8O7yRm941keBOz9K9m
+	Fl55pFUxlgoioV2bQ4H+OpjQJsoiBuBbHc6637bdkL/jYN+9ZUaA8LgcUe5nczEzBTEhGbYgX+N
+	4YEbPQDTSru5r9AD+52qwdy/Diqa7kvpP6gNS3yzoefL5G8pouI2Gno3Gvr1E4gTQmRoME6iohC
+	AekhipuszVqOnpYhf+HqmCTnH71eljsh8FyAZZ3xgl6aM2DKTX5Nk52TwVKNZsI1q/j0eIix2h/
+	negoJ9M6zI6P3hz1Igo=
+X-Google-Smtp-Source: AGHT+IGE8R9wiGHsmz58x7rugsfqF4Xs7KaBBCUmHfCSZU9wMJhEA7KbG8rFzAqei36mZzEJGHa3mQ==
+X-Received: by 2002:a17:90a:d88c:b0:2ea:59e3:2d2e with SMTP id 98e67ed59e1d1-2f452e22528mr87032884a91.10.1736129906353;
+        Sun, 05 Jan 2025 18:18:26 -0800 (PST)
+Received: from zenbook (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f4477ec656sm32253706a91.30.2025.01.05.18.18.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jan 2025 18:18:25 -0800 (PST)
+Date: Mon, 6 Jan 2025 10:19:10 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Chase Conklin <chase.conklin@arm.com>, Eric Auger <eauger@redhat.com>, r09922117@csie.ntu.edu.tw
+Subject: Re: [PATCH v2 02/12] KVM: arm64: nv: Sync nested timer state with
+ FEAT_NV2
+Message-ID: <fqiqfjzwpgbzdtouu2pwqlu7llhnf5lmy4hzv5vo6ph4v3vyls@jdcfy3fjjc5k>
+References: <20241217142321.763801-1-maz@kernel.org>
+ <20241217142321.763801-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241217142321.763801-3-maz@kernel.org>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Fri, 3 Jan 2025 16:00:59 +0000
-Ryan Roberts <ryan.roberts@arm.com> wrote:
+Hi Marc and other KVM ARM developers,
 
-> On 03/01/2025 15:35, Will Deacon wrote:
-> > On Thu, Jan 02, 2025 at 12:30:34PM +0000, Marc Zyngier wrote:  
-> >> On Thu, 02 Jan 2025 12:07:04 +0000,
-> >> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:  
-> >>> On Thu, 19 Dec 2024 16:45:28 +0000
-> >>> Will Deacon <will@kernel.org> wrote:  
-> >>>> On Thu, Dec 12, 2024 at 04:03:52PM +0000, Ryan Roberts wrote:  
-> >>>>>>>> If anything, this should absolutely check for FAR_EL1 and assert that
-> >>>>>>>> this is indeed caused by such change.    
-> >>>>>>>
-> >>>>>>> I'm not really sure how we would check this reliably? Without patch 5, the
-> >>>>>>> problem is somewhat constrained; we could have as many changes in flight as
-> >>>>>>> there are CPUs so we could keep a list of all the {mm_struct, VA-range} that are
-> >>>>>>> being modified. But if patch 5 is confirmed to be architecturally sound, then
-> >>>>>>> there is no "terminating tlbi" so there is no bound on the set of {mm_struct,
-> >>>>>>> VA-range}'s that could legitimately cause a conflict abort.    
-> >>>>>>
-> >>>>>> I didn't mean to imply that we should identify the exact cause of the
-> >>>>>> abort. I was hoping to simply check that FAR_EL1 reports a userspace
-> >>>>>> VA. Why wouldn't that work?    
-> >>>>>
-> >>>>> Ahh gottya! Yes agreed, this sounds like the right approach.    
-> >>>>
-> >>>> Please, can we just not bother handling conflict aborts at all outside of
-> >>>> KVM? This is all dead code, it's complicated and it doesn't scale to the
-> >>>> in-kernel use-cases that others want. There's also not been any attempt
-> >>>> to add the pKVM support for handling host-side conflict aborts from what
-> >>>> I can tell.
-> >>>>
-> >>>> For now, I would suggest limiting this series just to the KVM support
-> >>>> for handling a broken/malicious guest. If the contpte performance
-> >>>> improvements are worthwhile (I've asked for data), then let's add support
-> >>>> for the CPUs that handle the conflict in hardware (I believe this is far
-> >>>> more common than reporting the abort) so that the in-kernel users can
-> >>>> benefit whilst keeping the code manageable at the same time.
-> >>>>  
-> >>>
-> >>> Given direction the discussion is going in time to raise a hand.
-> >>>
-> >>> Huawei has implementations that support BBML2, and might report TLB conflict
-> >>> abort after changing block size directly until an appropriate TLB invalidation
-> >>> instruction completes and this Implementation Choice is architecturally compliant.  
-> >>
-> >> Compliant, absolutely. That's the letter of the spec. The usefulness
-> >> aspect is, however, more debatable, and this is what Will is pointing
-> >> out.
-> >>
-> >> Dealing with TLB Conflict aborts is an absolute pain if you need
-> >> to handle it within the same Translation Regime and using the same
-> >> TTBR as the one that has generated the fault. So at least for the time
-> >> being, it might be preferable to only worry about the implementations
-> >> that will promise to never generate such an abort and quietly perform
-> >> an invalidation behind the kernel's back.  
-> > 
-> > Agreed. We're not dropping support for CPUs that don't give us what we'd
-> > like here, we're just not bending over to port and maintain new
-> > optimisations for them. I think that's a reasonable compromise?
+I am trying to learn about NV and I have a few questions wile reading
+the code and comments:
 
-Subject to usual maintainability vs performance questions sure.
-Given we are the ones with the implementation, it's perhaps up to us
-to prove the added complexity for a given optimization is worth the hassle
-(maybe leaning on Arm to help out ;)  We have some activity going on
-around this, but are unfortunately not ready to share.
+On Tue, Dec 17, 2024 at 02:23:10PM +0000, Marc Zyngier wrote:
+> Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+> can be reconfigured behind our back without the hypervisor even
+> noticing. In the VHE case, that's an actual regression in the
+> architecture...
 
-> > 
-> > That said, thanks for raising this, Jonathan. It's a useful data point
-> > to know that TLB conflict aborts exist in the wild!  
-
-My work here is done ;)
+I'm curious why you implied NV2 isn't a regression in the nVHE case? In
+my understanding without NV2 and ECV, an nVHE guest hypervisor would
+directly program CNT{P, V}_*_EL0 registers without traps, and with NV2,
+those accesses would be turned into memory accesses to the VNCR page,
+delaying the set up of the timer until the next exit.
+So NV2 also makes it worse for an nVHE guest hypervisor. What have I
+missed here?
 
 > 
-> Indeed. Just to make it explicit; if we were to support all architecturally
-> compliant BBML2 implementations, we would need to drop the final patch in this
-> series. But since it sounds like we will be taking the approach of only allowing
-> these optimizations for implementations that never raise conflict abort and
-> handle it all in HW, it should be safe to keep the optimization in that final
-> patch. I'll work with Miko to get this bashed into shape and reposted.
-
-Obviously I'd want perf numbers to justify it (working on that) but I'd like
-to keep on the table the option of patch 5 being the only part that is dependent
-on being non conflict aborting hardware. I think even that is a performance
-question rather than a correctness one - it simply widens the window in which
-we might see a fault and have to dump the TLB. (I may well have missed something
-though).
-
-As a side note on that last patch, it is easy to conceive of a BBML2
-solution that doesn't do conflict aborts, but for which it is still a performance
-nightmare to not flush. As a fictional implementation, where our CPUs get a conflict
-abort, we could instead have stalled the core and pushed the abort info to a management
-controller, and flushed the whole TLB to resolve (plus probably the CPU pipeline).
-If sufficiently rare that's not a totally stupid implementation (subject to some
-optimizations). It is basically offloading what we are going to do in software on
-a conflict abort with somewhat similar performance cost making widening the window
-a very bad idea.
-
-So the proposed allow list might need to be rather more nuanced than "can we get
-a fault?"  We all love per uarch performance related opt ins.
-
-Jonathan
-
+> Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c         |  3 +++
+>  include/kvm/arm_arch_timer.h |  1 +
+>  3 files changed, 48 insertions(+)
 > 
-> Thanks,
-> Ryan
-> 
-> > 
-> > Will  
-> 
-> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 1215df5904185..ee5f732fbbece 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  		kvm_timer_blocking(vcpu);
+>  }
+>  
+> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * When NV2 is on, guest hypervisors have their EL1 timer register
+> +	 * accesses redirected to the VNCR page. Any guest action taken on
+> +	 * the timer is postponed until the next exit, leading to a very
+> +	 * poor quality of emulation.
+> +	 */
+> +	if (!is_hyp_ctxt(vcpu))
+> +		return;
+> +
+> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
+> +		/*
+> +		 * A non-VHE guest hypervisor doesn't have any direct access
+> +		 * to its timers: the EL2 registers trap (and the HW is
+> +		 * fully emulated), while the EL0 registers access memory
+> +		 * despite the access being notionally direct. Boo.
 
+Reading this part of the comment I understand it as for an nVHE guest
+hypervisor, the timer map would look like:
+
+map->emul_vtimer == vcpu_hvtimer(vcpu)  /* EL2 HW is fully emulated */
+map->emul_ptimer == vcpu_hptimer(vcpu)  /* EL2 HW is fully emulated */
+map->direct_vtimer == vcpu_vtimer(vcpu) /* EL0 notionally direct */
+map->direct_ptimer == vcpu_ptimer(vcpu) /* EL0 notionally direct */
+
+But looking at get_timer_map() I see we enter the first nested if
+statement, regardless of whether the guest hypervisor is VHE or nVHE,
+since it checks like the following:
+
+if (vcpu_has_nv(vcpu)) {
+	if (is_hyp_ctxt(vcpu)) {
+		map->direct_vtimer == vcpu_hvtimer(vcpu);
+		map->direct_ptimer == vcpu_hptimer(vcpu);
+		map->emul_vtimer == vcpu_vtimer(vcpu);
+		map->emul_ptimer == vcpu_ptimer(vcpu);
+	} else {
+		[...]
+	}
+} else if (...) {
+	[...]
+} else {
+	[...]
+}
+
+Which contradicts what the above comment says.
+What did I misunderstand?
+
+Thank you so much, any guidance is much appreciated.
+
+Wei-Lin Chang
+
+> +		 *
+> +		 * We update the hardware timer registers with the
+> +		 * latest value written by the guest to the VNCR page
+> +		 * and let the hardware take care of the rest.
+> +		 */
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
+> +	} else {
+> +		/*
+> +		 * For a VHE guest hypervisor, the EL2 state is directly
+> +		 * stored in the host EL1 timers, while the emulated EL0
+> +		 * state is stored in the VNCR page. The latter could have
+> +		 * been updated behind our back, and we must reset the
+> +		 * emulation of the timers.
+> +		 */
+> +		struct timer_map map;
+> +		get_timer_map(vcpu, &map);
+> +
+> +		soft_timer_cancel(&map.emul_vtimer->hrtimer);
+> +		soft_timer_cancel(&map.emul_ptimer->hrtimer);
+> +		timer_emulate(map.emul_vtimer);
+> +		timer_emulate(map.emul_ptimer);
+> +	}
+> +}
+> +
+>  /*
+>   * With a userspace irqchip we have to check if the guest de-asserted the
+>   * timer and if so, unmask the timer irq signal on the host interrupt
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a102c3aebdbc4..fa3089822f9f3 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1228,6 +1228,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+>  			kvm_timer_sync_user(vcpu);
+>  
+> +		if (vcpu_has_nv(vcpu))
+> +			kvm_timer_sync_nested(vcpu);
+> +
+>  		kvm_arch_vcpu_ctxsync_fp(vcpu);
+>  
+>  		/*
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index fd650a8789b91..6e3f6b7ff2b22 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -98,6 +98,7 @@ int __init kvm_timer_hyp_init(bool has_gic);
+>  int kvm_timer_enable(struct kvm_vcpu *vcpu);
+>  void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+>  void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+>  bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+>  void kvm_timer_update_run(struct kvm_vcpu *vcpu);
+> -- 
+> 2.39.2
+> 
