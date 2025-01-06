@@ -1,141 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932F570820;
-	Mon,  6 Jan 2025 14:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615E31547E3
+	for <kvmarm@lists.linux.dev>; Mon,  6 Jan 2025 15:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736174940; cv=none; b=f92NZT4osJO8Q2vNDq4bjms6eT/YwBbuMU9oguKV8CjcbxJ3D2g2F/jr8h23B5cuNNNLHJwsCUGbmiTi75WPcpUIvu60kZGdEfyvG5E1bokWLdONUBNy02oFTj1m4j9ToX+iaTkXPFF7pDvGLfq/ovnJEQKVfvk2t8sjXXuRA/k=
+	t=1736176800; cv=none; b=JoZNcDcQiQD0Nl1NgfZYgiBhjHGKFGwPbq2Omw8wsPwTe2ciErpWkeLSYGAe5TDKMs8l2kkWHUZCKkUDyO9kDwQ4yMxl80sZOnUORHwHs9zMipUKV/nAxBC3rAAD3zCsJq5M0NUQ7cXYHX4Gn+OfvyOz1p7MquZ7xxrB5vISraE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736174940; c=relaxed/simple;
-	bh=2JN+gBkPhHzJCWuj7PlmFSM09w4wT7EZySxRTYlxXHg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VBVElAbE45AAMHuFbKWEFPKXvuCgFT/uaKI9XDykQZ7H9uXFJLILiNC0YivF8lMKtJ+6zAXTRVK3dAtAPNklQWrwAdKA/nrZ5FFYQuOWQh3zIr82pJ2S93uDJAE9q5Oq6setE+fePK+V9sY/N23k53HnGrVzjtxErXO+JQMsYJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9BOJWgH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736176800; c=relaxed/simple;
+	bh=UkdUQEPRT6i+uYaYiBtXiQpMuazGQOuxcBrbiT0G75k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f9PcsFgh+cMnO+7kfSfY4D/AFX29w33e78TkIoawD8VULvMcqWrIq1au7zjn6YsCUcS9nho0sLNq2wsE8DGZdympgAQzbGCHdDS1e/zfXVQPzk2+uXPwJuPW7gpvw0iucz1jTkeVPTvzKS5a2ZRJFqidMqa8s/DgTiwsoVDSJGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FuzifQjT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9BOJWgH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EB9FC4CED2;
-	Mon,  6 Jan 2025 14:49:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FuzifQjT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7C22C4CED2;
+	Mon,  6 Jan 2025 15:19:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736174940;
-	bh=2JN+gBkPhHzJCWuj7PlmFSM09w4wT7EZySxRTYlxXHg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W9BOJWgHUxcYkmTHpWiciXSpajc5Cid/MajLEE6Dy6HFEb1OP4rY7RzVviUS7uTdr
-	 mPciLvzXytVEZ1OGG8fSnDoxA/g41Zb4s8M5BaFyeSX4SvChBcyAjs9PRB/syE+0MO
-	 IWEP9Jh3gpc34112bcRNWnyqutxhCvBJXvaXWphwksuM0YibxtkC7LZK5NZnapQQ5z
-	 BML5EkKO97G84c7a7s+5yEPm5IkVduxpVf82DBMby8NvKUE7iHgqhTNUw3KtYfve/A
-	 qwvtHo0UH1bqUW4FJLm20fSPd/fkKTyAqT8MhFlwfklXtj6z8Spt8m6eeXHKiHoYcR
-	 No5TPd/YDdKew==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tUoPZ-009S9Z-4y;
-	Mon, 06 Jan 2025 14:48:57 +0000
-Date: Mon, 06 Jan 2025 14:48:56 +0000
-Message-ID: <865xmsov53.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	coresight@lists.linaro.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	s=k20201202; t=1736176800;
+	bh=UkdUQEPRT6i+uYaYiBtXiQpMuazGQOuxcBrbiT0G75k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FuzifQjTQOs1u1UrAgrBNuZt+jDfroiJRBhZHjDsp8pnecPNE187xQcU18Es8aPHJ
+	 F7x5K3fqndbEPi1HLBklJDcbrkec8A1qFParGUziTh1dX9Zkc/4CkPXA1VhPNyqFFG
+	 ZTSbGtPk2v6zRK1bq8JDhDEYwtq2TbIzQSCxp0CJsHLF3AT9mQpGWO3e4XcF4lZZOi
+	 gI660hmJ9zoDoTWv+JFvQWP2QxqqZpNfCFkGoTptilObuoKNecei3MndNLaDHPomMi
+	 JuYJak83wgku4GUXV41XqCxF1/XjQqL0aSyoWH/DTxTmxawJhkI0l4FUSZY8J3CKcE
+	 ir11btL1tkdhA==
+Date: Mon, 6 Jan 2025 15:19:55 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	James Morse <james.morse@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 0/7] kvm/coresight: Support exclude guest and exclude host
-In-Reply-To: <20250106142446.628923-1-james.clark@linaro.org>
-References: <20250106142446.628923-1-james.clark@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2] arm64: Add basic JSON register parser
+Message-ID: <63543c41-607e-45cd-9266-a60838ff233e@sirena.org.uk>
+References: <20250102144339.1564778-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, mark.rutland@arm.com, anshuman.khandual@arm.com, shiqiliu@hust.edu.cn, james.morse@arm.com, broonie@kernel.org, robh@kernel.org, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tGudmCzAGUiaRC50"
+Content-Disposition: inline
+In-Reply-To: <20250102144339.1564778-1-maz@kernel.org>
+X-Cookie: Do not pick the flowers.
 
-On Mon, 06 Jan 2025 14:24:35 +0000,
-James Clark <james.clark@linaro.org> wrote:
-> 
-> FEAT_TRF is a Coresight feature that allows trace capture to be
-> completely filtered at different exception levels, unlike the existing
-> TRCVICTLR controls which may still emit target addresses of branches,
-> even if the following trace is filtered.
-> 
-> Without FEAT_TRF, it was possible to start a trace session on a host and
-> also collect trace from the guest as TRCVICTLR was never programmed to
-> exclude guests (and it could still emit target addresses even if it
-> was).
-> 
-> With FEAT_TRF, the current behavior of trace in guests exists depends on
-> whether nVHE or VHE are being used. Both of the examples below are from
-> the host's point of view, as Coresight isn't accessible from guests.
-> This patchset is only relevant to when FEAT_TRF exists, otherwise there
-> is no change.
-> 
-> Current behavior:
-> 
->   nVHE/pKVM:
-> 
->   Because the host and the guest are both using TRFCR_EL1, trace will be
->   generated in guests depending on the same filter rules the host is
->   using. For example if the host is tracing userspace only, then guest
->   userspace trace will also be collected.
-> 
->   (This is further limited by whether TRBE is used because an issue
->   with TRBE means that it's completely disabled in nVHE guests, but it's
->   possible to have other tracing components.)
-> 
->   VHE:
-> 
->   With VHE, the host filters will be in TRFCR_EL2, but the filters in
->   TRFCR_EL1 will be active when the guest is running. Because we don't
->   write to TRFCR_EL1, guest trace will be completely disabled.
-> 
-> New behavior:
-> 
-> The guest filtering rules from the Perf session are now honored for both
-> nVHE and VHE modes. This is done by either writing to TRFCR_EL12 at the
-> start of the Perf session and doing nothing else further, or caching the
-> guest value and writing it at guest switch for nVHE. In pKVM, trace is
-> now be disabled for both protected and unprotected guests.
-> 
-> There is also an optimization where the Coresight drivers pass their
-> enabled state to KVM. This means in the common case KVM doesn't have to
-> touch any sysregs when the feature isn't in use.
-> 
-> Applies to kvmarm/next (00163be8bb59).
 
-Can you *PLEASE* stop this absolutely nonsense of posting patches
-based on top of random commits? Please look at how we integrate new
-developments: they are *always* based on an early -rc tag (usually
--rc3).
+--tGudmCzAGUiaRC50
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If you depend on other patches, add them to your series and post the
-whole thing.
+On Thu, Jan 02, 2025 at 02:43:39PM +0000, Marc Zyngier wrote:
+> We currently populate the sysreg file by hand from the ARM ARM,
+> resulting in a bunch of errors being introduced on a regular basis.
+> While there is an XML dump of the architecture produced on a quarterly
+> basis, the license that comes attached to it excludes any sort of
+> open-source usage.
 
-Thanks,
+=2E..
 
-	M.
+> I completely expect this to quickly rewritten by people who know
+> what they are doing (I don't) and improved as we understand more
+> of the data model.
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks for jumping on this so quickly. =20
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+to the extent I understand jq, and it seems to be doing sensible things
+for the registers I've tried it with.  This is going to be useful for
+getting started and it's helpful to see the feature dependencies.  Like
+you suggest it's a good basis for further development, even if we also
+get some other tools that won't stop this being useful.
+
+What I was thinking with this stuff was to use something like Python and
+parse the files into data structures in memory before outputting them,
+then we can hopefully use that for things like diffing two architecture
+versions while handling cases where we've intentionally diverged from
+how the architecture describes things.  It'd be nice to have something
+that'd go through and check for updates to registers we already have
+mapped and provide an updated sysreg file.  It might however just be
+easier to use something like this and then work with sysreg files using
+text processing tools.
+
+--tGudmCzAGUiaRC50
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmd79JsACgkQJNaLcl1U
+h9CsDQf9EI7wJLaFHE50fuo8Q0mRKjG1NhLb++/W8L9uDimppvyXkjI97a/+gF99
+UmA72J0MhrV7PkP2zkZN9+htNH8JxngA5nZ8wVV6mU+zVtQE5bjcG+KPfZC6sTw2
+009e9Fn/E2Lzv+zRuByHwcv9U6bh/x1hI66aCqe5XmGgo877Ty19TuHHWqk5EiKO
+BLHCmoho03JJKqQBHwiuW09LWPGSKJaOxXeoIS3cuaPPT6BqyOfQ0pJVWYXT3J/p
+7gmsCwD5aUt1WUJAVV6OsCBptNKL521EmXu/XgqGaYDA0ob8InyTC3v/nhAd8+7w
+Ec10RQbziCCknYNhcAXVnm2wezX7HQ==
+=fiYP
+-----END PGP SIGNATURE-----
+
+--tGudmCzAGUiaRC50--
