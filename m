@@ -1,87 +1,89 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2467E1EBA08
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jan 2025 11:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5911F1E1A25
+	for <kvmarm@lists.linux.dev>; Tue,  7 Jan 2025 11:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736249724; cv=none; b=own9cP2WvwIAB9NvISUMoKaxtRSYY2WZ1rQbZ6mUEDDPExgv6iLr39DWDO7/iRNxT2gHIuEacwOy7G6itc6fi7MUuwyCsk6YWunNyonLWz5/kyJDHLY7oDNKzjgCDxrFJwzwulOHQPnHnSUpjApAKu+QKCerHdMGyVg6/vLr4+s=
+	t=1736249731; cv=none; b=E7TSHF9N+P2aAEfen+ykV9Dz8Rc+dmHum8uvd5ewoSTTZ2r9EB3/1TWbZtZoVLvPCoEKvBhMy3+zmClaHrXioAnBHX99CMtESIVXuePxuOaw7YUF0MRfkSnnRc31Rot/xO1c6+CH1rMM5ZBr0C1S4nZrC6FPEVpuXjmifSuvo3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736249724; c=relaxed/simple;
-	bh=9uHyOrrOFup8ywIsXJt/dCpriAmXRhqS6RmKsLTj27A=;
+	s=arc-20240116; t=1736249731; c=relaxed/simple;
+	bh=CPIQBfuEyrb/RFbkN7gxRqH/FsCDuiKTV0q6WzsLc6A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SueE1JC1IXvJc0wxKBZYJwVrPVJ3lvh85+qQ/sDMfEZPaLk2t9guBVVmEqbuDIclCacubPzUG9uLcjFyq30Ld2kjOq5YSuq5txi/QI/32Vw2NrVNmi7NMYa5WJmjyosY7YtDLTKeEV0/bNPpDbST4nbzSRllauvjxPd3+eFcfdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ajD1UG1E; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=gEAqsBV4YG3PmfJHJt1Rf9SPxqRL5JPfpLwkqNuvSrzmRwug7wEM8f65/ORxkkq+CVAgC5q1I11+P0as3ERoBHbp5C9AP7qk3koTr7V1YfsgLYsqhmq64+3twn/HAHEjoB3x396HwbYOtyExe31aehQZLbSfjSE3LR9K8jyNrCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=z08gdP4j; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ajD1UG1E"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43623f0c574so106159395e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 07 Jan 2025 03:35:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z08gdP4j"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3863703258fso9568885f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 07 Jan 2025 03:35:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736249719; x=1736854519; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1736249726; x=1736854526; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tx00l9gj3r75Pyuu5HDGlCD21/i3mIfLGI99rWPrWTA=;
-        b=ajD1UG1ESk6MD+VDx0MXBu0b/C3HcfEAp4wgKqU+quW7gDpGh5z2HyjIrw5Ynovlk0
-         Ws1kKaM3szzjp84E/9+GIgb7TZA+YFCCpr4Q6bjhkwHbfhw2tO0lwKlvk69IADD4aoBw
-         zVVJZL3010JGLvzo/Zhw85Af5gJwdBiyJC1Fkg3SZxPM/VQzjKdmT3gp20Ggn7SWqC1y
-         Z3Ym2pYZ3yuyhq3uyZ2T2VGbDTaLKXENsqw/S4ZTC9ASa6Wrq3pVlZFdsfJ3ebLp4KO+
-         Xyvi+pvcCnG7coXyvkrTjrIu9v/03V0jxuiB1QohUdkOqrib5OSEF+C+nmWlNl4vhECb
-         zL5w==
+        bh=w4FURCINKr7NX33Z60V+IaJr5vxjm1rQB4e+HJZrgWs=;
+        b=z08gdP4jxGT5UWceA3quwm0PRWRYnNdfBXHpSaWJauwA6dyMEzxRAwVYJyX3RzJTAV
+         AcxT3DRTgOGKqXmshCW2qi5r7/xAiVd6glOqp7WMlzQEGcgHo56AzNBUCb1K89W+pknL
+         dPIE5iCXSlDBkKNma29Yq9t1l3on6YvhJCf+7y7S08gYtODSxoxo3+8EoGQPQGufoE+f
+         cVufIKi4rcnh1ids+9V6Ch2pwZUdO2UXhUl2JtNH0E1WrfQsutCTVu+VeiPLFazws+ir
+         yL3IcGTFYSUu808oTcXzh5SZv4ouNY517klmcuezPCDqLkfWSPtBMAWpvwmJSGOrqKlF
+         dmUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736249719; x=1736854519;
+        d=1e100.net; s=20230601; t=1736249726; x=1736854526;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tx00l9gj3r75Pyuu5HDGlCD21/i3mIfLGI99rWPrWTA=;
-        b=eOKqKY2XizlfalrKjaw12CJRGBqKOvIUbcSlNElDWxP12MIq1+9Zxp9qEw1sWXK1LD
-         fVE5o/4RkQ0phW03YbdGfzIhfMMixwLE51kP04kEdG7XT7ze40B68r1FRQxBBgeOmKqM
-         BRCT/9RUQOgse6ySRDmSW5UboaeF8nsY+nBH2rAcmVRX0dDCXQ8rON5xx14AHqdu/Qt2
-         KDc32wMnisGZ/qglMAh+5pzFrfitbN7DZ/18R+yh+LT0vwXkXgOBq23/1GfOBf3eGQ39
-         EiYexmFLJpzV9f+o2fYnqpPlBDKgvYf+iCddT5HPxkpdgJP84RSFhW7MBnLbaA7iWhOG
-         /LrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmYRQCm3lJTDy75B8aganY98S0e0GyrOa/cR9IgTtnwEIqnx1aXVoQJFIrKWwsSGc4tNYO/rc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwUWGrldeGc5Aw2JjyaDmm53kxuO99tz0thgxlPOZkX+vnUTJNV
-	kXM88C1lGb0M4HccKDWYn8qZ1D98ZaERZFvGOkhA4v2kzVwwCBD8m1RRv5bZaIQ=
-X-Gm-Gg: ASbGnctNnShzw5djxuAP4kOSASoSMt5kaui2dUw1WducHkHHOqYWykUEQgBzaUj5PYF
-	ENI0ZdYhVFjjy9FKXm+LxmW6BJp+j8bVtuBVyHaMnGKOEOomojNsR/YNh1N0g9VBX/N0FGx/vOC
-	idmGQ/uobIgv48AIrwHzU0zCeO1xHENyYW3UJetvbII04xg6WgZKdm3QuqajoCpBbeRAvObj2dT
-	Q/PU4pGk0lVCNRNnyYTX3Ouuht+p2KN5yITXlXH5TpUXTl5S9TIbJKU
-X-Google-Smtp-Source: AGHT+IG6ssd+zopKDv9p4eYWzeGZXI+rmR402qUYF0KXs7CGMwpDT/5oKkPAsjDCmwrKzLWBArlwFw==
-X-Received: by 2002:a5d:47cf:0:b0:385:ee59:44eb with SMTP id ffacd0b85a97d-38a221fa9ffmr50282094f8f.33.1736249719405;
-        Tue, 07 Jan 2025 03:35:19 -0800 (PST)
+        bh=w4FURCINKr7NX33Z60V+IaJr5vxjm1rQB4e+HJZrgWs=;
+        b=OP1eKvzBtbyoRN79zcxC0Xgfe3JSKPFEW7VLzfhQ4GGrsgKe8hs8iqKdEsckzrMiuA
+         8Pbgl7wtWxgHoPBElcMI4gHs66JdWP13B1/rCbiLtc7AdSV3B3EemoRUX+PQSKURopHX
+         4XLWtiMofLrNlG4erSVacFVvEMMGPAQFHBos8hpx4o+ltY1EAwVFDoUwxkGg07ZpQBrv
+         GAF0k4a2dSRDMlNSuEDjsrFty2XYXNHdGjIzGpyB7r1Sk5sHZ3eW5/BTiFneCIwvHjaZ
+         RZCKoQHtsJ7iThb4ZRHcp+nEML20VhJghILgyLlWSPKKUictozbkp4ERa7eUWUw0jQBf
+         OIiA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrHVpVUPbxFcs0ZWblaX6bN8XImpaymkeTsJhUuiqGkrLLgAfgvgj/iMhzx1izkaOmnIsS7Fg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxy5zGvubzMEbj/H7sqiVbYRNxwZbaM1oKV0KapkqDMFUqZqKvR
+	z4KF/CkN+zpEmFbMHAMtw2re418CkO2gVU551oyH4DCbJy+nSYhFa8cyxIJPlpYUg0B0YNeyQCs
+	+
+X-Gm-Gg: ASbGncsMyymUYHZpUobBtvbiMpqX11B2mTk/daX0MiYCNxvwctVnLrPaEhrYfAFzVhJ
+	PgF//2+rfQM8CbZV2OtoZiYcZPtB4lziADQerkLf1AiHImic3YguWAHjpdJjW8kmfWxNRMaEPvn
+	EtT4wazFHW74j9bIxmvU5AbkFh8OcUFCIg5GKzeee6JZ4/Y500YWiQQIGJBKzmnkPdDd4Af5UJ9
+	IaEKDJ9Z/QQaRVG282/8iFbLgGMZVjQsvdEEhoSIgCDFmn4bihhiakS
+X-Google-Smtp-Source: AGHT+IEH29RMdYlOmIr/teZDq42S20d3YAI2pbz+RQf7IWI1JVotICYgQnNFDbF65Xs29g0Y40tGeg==
+X-Received: by 2002:a05:6000:402b:b0:385:faf5:ebb8 with SMTP id ffacd0b85a97d-38a7913498cmr2345876f8f.7.1736249726462;
+        Tue, 07 Jan 2025 03:35:26 -0800 (PST)
 Received: from pop-os.. ([145.224.66.180])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e1acsm50299218f8f.68.2025.01.07.03.35.18
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c89e1acsm50299218f8f.68.2025.01.07.03.35.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 03:35:19 -0800 (PST)
+        Tue, 07 Jan 2025 03:35:26 -0800 (PST)
 From: James Clark <james.clark@linaro.org>
 To: maz@kernel.org,
 	kvmarm@lists.linux.dev,
 	oliver.upton@linux.dev,
 	suzuki.poulose@arm.com,
 	coresight@lists.linaro.org
-Cc: James Clark <james.clark@linaro.org>,
+Cc: James Clark <james.clark@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mike Leach <mike.leach@linaro.org>,
+	James Clark <james.clark@linaro.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	James Morse <james.morse@arm.com>,
 	Shiqi Liu <shiqiliu@hust.edu.cn>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Mark Brown <broonie@kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	"Rob Herring (Arm)" <robh@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v10 09/10] KVM: arm64: Support trace filtering for guests
-Date: Tue,  7 Jan 2025 11:32:46 +0000
-Message-Id: <20250107113252.260631-10-james.clark@linaro.org>
+Subject: [PATCH v10 10/10] coresight: Pass guest TRFCR value to KVM
+Date: Tue,  7 Jan 2025 11:32:47 +0000
+Message-Id: <20250107113252.260631-11-james.clark@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250107113252.260631-1-james.clark@linaro.org>
 References: <20250107113252.260631-1-james.clark@linaro.org>
@@ -93,65 +95,218 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For nVHE, switch the filter value in and out if the Coresight driver
-asks for it. This will support filters for guests when sinks other than
-TRBE are used.
+From: James Clark <james.clark@arm.com>
 
-For VHE, just write the filter directly to TRFCR_EL1 where trace can be
-used even with TRBE sinks.
+Currently the userspace and kernel filters for guests are never set, so
+no trace will be generated for them. Add support for tracing guests by
+passing the desired TRFCR value to KVM so it can be applied to the
+guest.
 
-Signed-off-by: James Clark <james.clark@linaro.org>
+By writing either E1TRE or E0TRE, filtering on either guest kernel or
+guest userspace is also supported. And if both E1TRE and E0TRE are
+cleared when exclude_guest is set, that option is supported too. This
+change also brings exclude_host support which is difficult to add as a
+separate commit without excess churn and resulting in no trace at all.
+
+cpu_prohibit_trace() gets moved to TRBE because the ETM driver doesn't
+need the read, it already has the base TRFCR value. TRBE only needs
+the read to disable it and then restore.
+
+Testing
+=======
+
+The addresses were counted with the following:
+
+  $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
+
+Guest kernel only:
+
+  $ perf record -e cs_etm//Gk -a -- true
+    535 EL1
+      1 EL2
+
+Guest user only (only 5 addresses because the guest runs slowly in the
+model):
+
+  $ perf record -e cs_etm//Gu -a -- true
+    5 EL0
+
+Host kernel only:
+
+  $  perf record -e cs_etm//Hk -a -- true
+   3501 EL2
+
+Host userspace only:
+
+  $  perf record -e cs_etm//Hu -a -- true
+    408 EL0
+      1 EL2
+
+Signed-off-by: James Clark <james.clark@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/debug.c            | 18 ++++++++++++++++++
- 2 files changed, 20 insertions(+)
+ .../coresight/coresight-etm4x-core.c          | 49 ++++++++++++++++---
+ drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
+ drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
+ .../coresight/coresight-self-hosted-trace.h   |  9 ----
+ drivers/hwtracing/coresight/coresight-trbe.c  | 10 ++++
+ 5 files changed, 56 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index b244ec44bd3a..1284f4c2da27 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1388,6 +1388,7 @@ void kvm_clr_pmu_events(u64 clr);
- bool kvm_set_pmuserenr(u64 val);
- void kvm_enable_trbe(void);
- void kvm_disable_trbe(void);
-+void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
- #else
- static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u64 clr) {}
-@@ -1397,6 +1398,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
- }
- static inline void kvm_enable_trbe(void) {}
- static inline void kvm_disable_trbe(void) {}
-+static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
- #endif
- 
- void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index e1ac3d2a65be..22815a40d2ee 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -339,3 +339,21 @@ void kvm_disable_trbe(void)
- 	host_data_clear_flag(TRBE_ENABLED);
- }
- EXPORT_SYMBOL_GPL(kvm_disable_trbe);
+diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+index dd8c74f893db..fbc4aa378527 100644
+--- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
++++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+@@ -6,6 +6,7 @@
+ #include <linux/acpi.h>
+ #include <linux/bitops.h>
+ #include <linux/kernel.h>
++#include <linux/kvm_host.h>
+ #include <linux/moduleparam.h>
+ #include <linux/init.h>
+ #include <linux/types.h>
+@@ -268,10 +269,28 @@ struct etm4_enable_arg {
+  */
+ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
+ {
++	u64 trfcr;
 +
-+void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest)
-+{
-+	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
-+		return;
+ 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
+ 	if (!drvdata->trfcr)
+ 		return;
+-	cpu_prohibit_trace();
 +
-+	if (has_vhe()) {
-+		write_sysreg_s(trfcr_while_in_guest, SYS_TRFCR_EL12);
-+		return;
-+	}
++	trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
 +
-+	*host_data_ptr(trfcr_while_in_guest) = trfcr_while_in_guest;
-+	if (read_sysreg_s(SYS_TRFCR_EL1) != trfcr_while_in_guest)
-+		host_data_set_flag(EL1_TRACING_CONFIGURED);
-+	else
-+		host_data_clear_flag(EL1_TRACING_CONFIGURED);
++	write_trfcr(trfcr);
++	kvm_tracing_set_el1_configuration(trfcr);
 +}
-+EXPORT_SYMBOL_GPL(kvm_tracing_set_el1_configuration);
++
++static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
++{
++	u64 trfcr = drvdata->trfcr;
++
++	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
++		trfcr &= ~TRFCR_ELx_ExTRE;
++	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
++		trfcr &= ~TRFCR_ELx_E0TRE;
++
++	return trfcr;
+ }
+ 
+ /*
+@@ -286,18 +305,28 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
+  */
+ static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
+ {
+-	u64 trfcr = drvdata->trfcr;
++	u64 trfcr, guest_trfcr;
+ 
+ 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
+-	if (!trfcr)
++	if (!drvdata->trfcr)
+ 		return;
+ 
+-	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
+-		trfcr &= ~TRFCR_ELx_ExTRE;
+-	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
+-		trfcr &= ~TRFCR_ELx_E0TRE;
++	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
++		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
++	else
++		trfcr = etm4x_get_kern_user_filter(drvdata);
+ 
+ 	write_trfcr(trfcr);
++
++	/* Set filters for guests and pass to KVM */
++	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
++		guest_trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
++	else
++		guest_trfcr = etm4x_get_kern_user_filter(drvdata);
++
++	/* TRFCR_EL1 doesn't have CX so mask it out. */
++	guest_trfcr &= ~TRFCR_EL2_CX;
++	kvm_tracing_set_el1_configuration(guest_trfcr);
+ }
+ 
+ #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
+@@ -655,6 +684,12 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
+ 	if (attr->exclude_user)
+ 		config->mode = ETM_MODE_EXCL_USER;
+ 
++	if (attr->exclude_host)
++		config->mode |= ETM_MODE_EXCL_HOST;
++
++	if (attr->exclude_guest)
++		config->mode |= ETM_MODE_EXCL_GUEST;
++
+ 	/* Always start from the default config */
+ 	etm4_set_default_config(config);
+ 
+diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
+index 9e9165f62e81..1119762b5cec 100644
+--- a/drivers/hwtracing/coresight/coresight-etm4x.h
++++ b/drivers/hwtracing/coresight/coresight-etm4x.h
+@@ -817,7 +817,7 @@ enum etm_impdef_type {
+  * @s_ex_level: Secure ELs where tracing is supported.
+  */
+ struct etmv4_config {
+-	u32				mode;
++	u64				mode;
+ 	u32				pe_sel;
+ 	u32				cfg;
+ 	u32				eventctrl0;
+diff --git a/drivers/hwtracing/coresight/coresight-priv.h b/drivers/hwtracing/coresight/coresight-priv.h
+index 05f891ca6b5c..76403530f33e 100644
+--- a/drivers/hwtracing/coresight/coresight-priv.h
++++ b/drivers/hwtracing/coresight/coresight-priv.h
+@@ -42,6 +42,9 @@ extern const struct device_type coresight_dev_type[];
+ 
+ #define ETM_MODE_EXCL_KERN	BIT(30)
+ #define ETM_MODE_EXCL_USER	BIT(31)
++#define ETM_MODE_EXCL_HOST	BIT(32)
++#define ETM_MODE_EXCL_GUEST	BIT(33)
++
+ struct cs_pair_attribute {
+ 	struct device_attribute attr;
+ 	u32 lo_off;
+diff --git a/drivers/hwtracing/coresight/coresight-self-hosted-trace.h b/drivers/hwtracing/coresight/coresight-self-hosted-trace.h
+index 53840a2c41f2..303d71911870 100644
+--- a/drivers/hwtracing/coresight/coresight-self-hosted-trace.h
++++ b/drivers/hwtracing/coresight/coresight-self-hosted-trace.h
+@@ -21,13 +21,4 @@ static inline void write_trfcr(u64 val)
+ 	isb();
+ }
+ 
+-static inline u64 cpu_prohibit_trace(void)
+-{
+-	u64 trfcr = read_trfcr();
+-
+-	/* Prohibit tracing at EL0 & the kernel EL */
+-	write_trfcr(trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE));
+-	/* Return the original value of the TRFCR */
+-	return trfcr;
+-}
+ #endif /*  __CORESIGHT_SELF_HOSTED_TRACE_H */
+diff --git a/drivers/hwtracing/coresight/coresight-trbe.c b/drivers/hwtracing/coresight/coresight-trbe.c
+index a728802d2206..d6eb0d525a4d 100644
+--- a/drivers/hwtracing/coresight/coresight-trbe.c
++++ b/drivers/hwtracing/coresight/coresight-trbe.c
+@@ -1113,6 +1113,16 @@ static bool is_perf_trbe(struct perf_output_handle *handle)
+ 	return true;
+ }
+ 
++static u64 cpu_prohibit_trace(void)
++{
++	u64 trfcr = read_trfcr();
++
++	/* Prohibit tracing at EL0 & the kernel EL */
++	write_trfcr(trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE));
++	/* Return the original value of the TRFCR */
++	return trfcr;
++}
++
+ static irqreturn_t arm_trbe_irq_handler(int irq, void *dev)
+ {
+ 	struct perf_output_handle **handle_ptr = dev;
 -- 
 2.34.1
 
