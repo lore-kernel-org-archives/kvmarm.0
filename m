@@ -1,111 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA17419AD8B;
-	Tue,  7 Jan 2025 17:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E901F37DA;
+	Tue,  7 Jan 2025 19:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736270326; cv=none; b=ZepS4r8jzWv7t1PLQOPQC/woCTnm6DD8DWILE/BGe6of5GsIMidSVW+GCqD2cVGCs8oAL1Snu2OZEx5OR2g01GfPux1BukDtrRSYQYVOPG3KAjwFBHC/DBYyfTIACbFUj46Dh/8Dtez0wNcYNPLy5JcFgo5VHWr7QX1u6f3q1GQ=
+	t=1736279592; cv=none; b=n3jqeJWMnQS+p4Gl5u4mMoAVe64T+ke1e6+ScyCsBBdCScdrr+oPlAgc1NUNOV3ubFGhEe/AcAlZzHKbek0k5S0GgAMZOXRRqKMR6C44szrpcMmhd1jqlGHdDxFYxeRnPr2qa4e4EZKS2xRV1H6mlJ1GRI8wIt2ihcBBzO3P9XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736270326; c=relaxed/simple;
-	bh=rcX8ixVRnBXLhZk41AKtcgO9a3ngIO7uwqWcHOz69Ec=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e3HsOusp3hkcVdKzprAwCA0wYdgfmzCIYEBQqZ6oks7Gs/PNg5QLDrMrg5K5KiCm9nxUJcqWxQhNaEbq17zmlJXawUgl+p4pHimVdcXV8eWPnJszhQmPvRGA3bI8EC/+297oID2GgTXl1sYOLDtxAkbyRuGPPkytWRF5YEsAT0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L53kt8aD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L53kt8aD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6434FC4CED6;
-	Tue,  7 Jan 2025 17:18:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736270326;
-	bh=rcX8ixVRnBXLhZk41AKtcgO9a3ngIO7uwqWcHOz69Ec=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L53kt8aDnVLWtXngveoCegXYkz8KwTsfho0anKyXn8H3mB+sEgDsL5AOHQ/5rngHJ
-	 fpm9F9JEgkeVS9/TfO0l5ruUCk1yRfDojpy0KzIjv+hpMsm+CC8NGEQ1EjBZYbE/WQ
-	 Q97epwwpsnjSkyXfqpgU5BDiKEautbJc1tj0owzrTIaKxH1Nap7llXGBoYWw2YPRmo
-	 WAx7epIVRbQ3W2o+2cyELw+5un0UB7WT2m0U6GmX9nYtgP/YNgqZIEAdCrtFE9ZJxK
-	 bEbKq2qUm+vt96mqwPGECVJOcQ5cr9/zvTWqAIh/IWLz0QTlPqgHgaFaa9z1OwvWqR
-	 yhXT6xVJkoJWw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tVDE4-009sW7-1R;
-	Tue, 07 Jan 2025 17:18:44 +0000
-Date: Tue, 07 Jan 2025 17:18:43 +0000
-Message-ID: <86zfk2wnik.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	kernel-team@android.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 0/9] arm64: Support 2024 dpISA extensions
-In-Reply-To: <173626298431.2741856.11908646584681839796.b4-ty@kernel.org>
-References: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
-	<173626298431.2741856.11908646584681839796.b4-ty@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1736279592; c=relaxed/simple;
+	bh=YGFpvKIg02fTJ+GW1a1CCPZozGf8TSgdYsbLbq6lkjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZlKmmji2JsAe7qfy7583SHqXq8BfW5mJI3EdY2W6e7ECiKoiDrAA6tj7aOcgJbIGxGMgw1AUCbY9dcBtNT9E1sdTI1kJy0vARQO8DSi0mIzrLIrW+wTJWDlaX/n3Yq826ZAGT+rq5gtk6JJtmFld+eQdtxlhEIA6ebBpZkrIXfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 409AAC4CED6;
+	Tue,  7 Jan 2025 19:53:11 +0000 (UTC)
+Date: Tue, 7 Jan 2025 14:54:39 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org, maz@kernel.org,
+ oliver.upton@linux.dev, kvmarm@lists.linux.dev, will@kernel.org,
+ qperret@google.com, kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/13] Tracefs support for pKVM
+Message-ID: <20250107145439.5bd66362@gandalf.local.home>
+In-Reply-To: <20240911093029.3279154-1-vdonnefort@google.com>
+References: <20240911093029.3279154-1-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, catalin.marinas@arm.com, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, broonie@kernel.org, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
 
-On Tue, 07 Jan 2025 16:42:38 +0000,
-Will Deacon <will@kernel.org> wrote:
-> 
-> On Wed, 11 Dec 2024 01:02:45 +0000, Mark Brown wrote:
-> > The 2024 architecture release includes a number of data processing
-> > extensions, mostly SVE and SME additions with a few others.  These are
-> > all very straightforward extensions which add instructions but no
-> > architectural state so only need hwcaps and exposing of the ID registers
-> > to KVM guests and userspace.
-> > 
-> > 
-> > [...]
-> 
-> For the sysreg definitions that Marc's fantastic script is happy with,
-> applied to arm64 (for-next/cpufeature), thanks!
-> 
-> [1/9] arm64/sysreg: Update ID_AA64PFR2_EL1 to DDI0601 2024-09
->       https://git.kernel.org/arm64/c/1ad9a56442a0
-> [2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601 2024-09
->       https://git.kernel.org/arm64/c/054339beae58
-> [3/9] arm64/sysreg: Update ID_AA64FPFR0_EL1 to DDI0601 2024-09
->       https://git.kernel.org/arm64/c/12b5ff517a19
-> [4/9] arm64/sysreg: Update ID_AA64ZFR0_EL1 to DDI0601 2024-09
->       https://git.kernel.org/arm64/c/9a43ee864349
-> 
-> [6/9] arm64/sysreg: Update ID_AA64ISAR2_EL1 to DDI0601 2024-09
->       https://git.kernel.org/arm64/c/d66e21d59ed0
-> 
-> The KVM patch needs an Ack from the maintainers and the hwcap change
-> probably needs checking in light of [1].
 
-I've now acked the KVM patch in case you want to take it, or I can add
-it to the KVM queue, since I already have a merge of the cpufeature
-branch.
+Hi Vincent,
 
-Thanks,
+Are you still working on this series? I was expecting an update.
 
-	M.
+-- Steve
 
--- 
-Without deviation from the norm, progress is not possible.
+
+On Wed, 11 Sep 2024 10:30:16 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
+
+> The growing set of features supported by the hypervisor in protected
+> mode necessitates debugging and profiling tools. Tracefs is the
+> ideal candidate for this task:
+> 
+>   * It is simple to use and to script.
+> 
+>   * It is supported by various tools, from the trace-cmd CLI to the
+>     Android web-based perfetto.
+> 
+>   * The ring-buffer, where are stored trace events consists of linked
+>     pages, making it an ideal structure for sharing between kernel and
+>     hypervisor.
+> 
+> This series introduces a method to create events and to generate them
+> from the hypervisor (hyp_enter/hyp_exit given as an example) as well as
+> a Tracefs user-space interface to read them.
+> 
+> A presentation was given on this matter during the tracing summit in
+> 2022. [1]
