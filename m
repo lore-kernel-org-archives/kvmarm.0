@@ -1,102 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BAB1E2844
-	for <kvmarm@lists.linux.dev>; Tue,  7 Jan 2025 09:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319501E1C1A
+	for <kvmarm@lists.linux.dev>; Tue,  7 Jan 2025 09:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736242280; cv=none; b=kaKsuej0VxCr89ZKgRSPIpjRYoNfsaBBWx6GCTgCEeEerRIJ42tUZ0oJf6SdBfuzQWXVRASBwBuKU8jIOoaiCqT3WuYTDYlk5F1RTM7mXSlH6+/w6VDdp+ODLkSETTwKApkeZfhmVx8TAfhiP3rZ5Hk+kJDAQ4Rl1PSWLseX48E=
+	t=1736243982; cv=none; b=SyfkO1W50ZMiTyiG8G+ruDlilL/HpoSpoApjUEb0Vz38EHTuIA5prY5Kw8y1eiVP6XmJgpsKJXDPcWx+OHWWju4egC34Kk42xsMnp4tzjz552rRwMyuA89wfMcymRtxT0kNLoaZnJZxUtiiYIw+zi4I2C+KATb9QDaqwr3cF3qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736242280; c=relaxed/simple;
-	bh=CaBk+HCXzISi/V9QHHnknAncziV1cfTksEsUBzRp8f8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+UrSac2y+hxc83ciPLqXzsqtbAyOeA9GF01VUjWffc+zPVmD/StzEWJ/g1HG3NEuBUA/ElXswqzX+OXup+4oE2J8uG8m0SWIQfCTaDaqyZ19tCJhB0U4V+TKQRScI4wF7hMtR0bS+t8Sg1JFodEMrbHjLByKs0DOjrqYIOoU2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQ1DpMzn; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQ1DpMzn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA7FFC4CED6;
-	Tue,  7 Jan 2025 09:31:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736242278;
-	bh=CaBk+HCXzISi/V9QHHnknAncziV1cfTksEsUBzRp8f8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oQ1DpMznhDrsNvG7OIpD/lr+j5Xlj3Lre6BrRA55fospF5lHvkGC8gfOPKZCebhoC
-	 4bx7BZ4IqFjHo3srg0hGWK95zua4eHioDeZw4QyyUejGglBZLg2SFMP4DJZgGQLMqC
-	 jkMHxPTYfwqnlOD8rPA1Tiy9DM9xiSinnI7y+6JqCjkN34+0AiFNxowbqTxx5gM8dU
-	 jxW/fbYz/xh4LCTAD1nsdHEKztkZbDp6/lq9PID7oENrIlQi0ILJs8ZFgOu8eZYTcl
-	 TQXH2FWtzl+38ZgpOZcAMxHmu4M2prSF//Ps9QDN1/1PPzlvCO3tFklUFZLSO2FG7q
-	 CGfIsB0lX4yEA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tV5vg-009iYS-ES;
-	Tue, 07 Jan 2025 09:31:16 +0000
-Date: Tue, 07 Jan 2025 09:31:16 +0000
-Message-ID: <86zfk3nf6j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev,
-	kernel-team@android.com,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <zenghui.yu@linux.dev>
-Subject: Re: [PATCH] KVM: arm64: Fix nVHE stacktrace VA bits mask
-In-Reply-To: <20250106183213.4094616-1-vdonnefort@google.com>
-References: <20250106183213.4094616-1-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1736243982; c=relaxed/simple;
+	bh=jVL0On8ztBEsX+aNPk1z8t/2uAcpC1ayqn7io1VkbX0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OTwAXkzseiJ8a+lUzWlzZ/owvE5A9QEEPnXnp5mCCjD8iaPfz+r+7rtqAD36XeSZO9CcpXxYU7Ul5s1F31vjmXcUcA/XslEgP/tgABRYcbRUt6Md59OhEOVKLeQo3BSHZ/wUI/s6j5rlYxL/xoYgJYH00v7OGKZ1zuGvUdzpYXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF5C4143D;
+	Tue,  7 Jan 2025 02:00:06 -0800 (PST)
+Received: from [10.1.33.173] (e121487-lin.cambridge.arm.com [10.1.33.173])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A9E73F673;
+	Tue,  7 Jan 2025 01:59:37 -0800 (PST)
+Message-ID: <870bf5b6-af03-46a6-b4f2-63832f0be5e3@arm.com>
+Date: Tue, 7 Jan 2025 09:59:35 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, joey.gouly@arm.com, zenghui.yu@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Fix FEAT_MOPS in pKVM
+To: Fuad Tabba <tabba@google.com>, Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, joey.gouly@arm.com
+References: <20250106112329.64013-1-vladimir.murzin@arm.com>
+ <Z3xlT51luMieOAab@linux.dev>
+ <CA+EHjTwraTsHmLRbyYV1-u-FQ8dqFPL1E5z2DFOe4yFUbQYXQQ@mail.gmail.com>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <CA+EHjTwraTsHmLRbyYV1-u-FQ8dqFPL1E5z2DFOe4yFUbQYXQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Vincent,
+On 1/7/25 08:08, Fuad Tabba wrote:
+> On Mon, 6 Jan 2025 at 23:20, Oliver Upton <oliver.upton@linux.dev> wrote:
+>> +cc Fuad
+>>
+>> On Mon, Jan 06, 2025 at 11:23:29AM +0000, Vladimir Murzin wrote:
+>>> Flush HCRX_EL2 when switching between the host and the guests.
+>>>
+>>> Fixes: 84de212d739e ("KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest")
+>>> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+>> We shouldn't be trusting the host's hcrx_el2 in this case and should
+>> instead calculate it for the pVM similar to the other trap registers
+>> (see pkvm_vcpu_init_traps() and friends).
+>>
+>> It is apparent, though, that we erroneously exposed MOPS before commit
+>> 3d7ff00700d1 ("KVM: arm64: Rework specifying restricted features for protected VMs").
+> Yeah, actually FEAT_MOPS needs a bit more work for it to work with
+> pKVM. I have patches (downstream, Android) that add MOPS support for
+> pKVM. If there's interest I can post them now, but since protected VMs
+> aren't completely done upstream I thought I'd wait a bit.
 
-Please add all the KVM/arm64 reviewers in the future (I added them
-this time).
+Fair enough.
 
-On Mon, 06 Jan 2025 18:32:13 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+Vladimir
+
 > 
-> The hypervisor VA space size depends on both the ID map's
-> (IDMAP_VA_BITS) and the kernel stage-1 (VA_BITS). When VA_BITS is
-> smaller than IDMAP_VA_BITS (i.e. 39-bit), the stacktrace can contain
-> addresses bigger than the current VA_BITS mask.
+> Cheers,
+> /fuad
 > 
-> As the hyp_va_bits value needs to be used outside of the init code now,
-> use a global variable, shared by all the kvm users in mmu.c, arm.c and
-> now stacktrace.c.
+>> --
+>> Thanks,
+>> Oliver
 
-I tend to dislike this approach for at least three reasons:
-
-- it makes it hard to follow *when* hyp_va_bits is made valid, while
-  passing the value as a parameter is self explanatory. Specially
-  given how convoluted the nVHE/pKVM init is these days.
-
-- it prevents the eventual use of *multiple* VA bit values (one for
-  TTBR0, one for TTBR1) once the grand plan for hVHE is completed
-  (right after full NV support is merged! ;-)
-
-- it makes the change larger than it should be, specially for
-  something that should be backported.
-
-So I'd rather you keep the general shape of the code as it, and simply
-publish this 'hyp_va_bits' for the purpose of the backtrace code.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
