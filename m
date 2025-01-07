@@ -1,91 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69661EB9FA;
-	Tue,  7 Jan 2025 15:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486DF1F5406;
+	Tue,  7 Jan 2025 16:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736264368; cv=none; b=iN5b+2r7jN48EbQuG46SH3rH3I3fLRWBDWCAydeqjTexgQ/kT3xk85wYoQBuPdc3qSU9YGwOzL3od0+AFtnm7vuCPvphyFK01/BP+A4gOd62GVUa20+AU/MzEOiJUzey5ZBRtfiNCafOaXdDgvUzldi0NW1sI/ZX7Xtx+r72/Ys=
+	t=1736268167; cv=none; b=XLjT0/BsufRY/P44ut92Bwo4SgoMIIz/NbF9/gRgZDvC7M+lG/WIiyA8uEY/GPaGcKS5p0GPCfXYaeDOuXMM005NNu1xHeOK9dtY34qIr2+5TNTZPcvUOYCwQ4qn+EDBqt9e+QGeOX8MAQY4T+ePuDxjvV/BpBXoGTNjH8q72zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736264368; c=relaxed/simple;
-	bh=oD8IZZwblmQdes/eUweJjCun95li3dhJu+Tixr8By8Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XfaIrRCzMYVVUFd14pw6deYxyHaqVQ/iT5QgK3jERjqbhONe8I+FsNW3lEUxhTXXmSZOelxqYM+5Gyb4xMiNiQvsTRo6TbTL2W/3BHFpTtt84TZBIu3lgVwKegKNr60WikO/QUFFBv+3/lvT5BiD2kieA72z3wucbbSAIwcDNs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qvcWubaS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736268167; c=relaxed/simple;
+	bh=7m9srgpMEiXCY3EwU421KJCD1mkHAQtbO2dhdmFCRw0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uf8IWaYsX3VXWvS8IaV5uxVSyKJYjKfez5JdP+k8aGtfoW6XoTujqeICliO8dlYTSIR8oByq/QphUNVfWyxLUZCDOjiiOoUN+JQxR0x6f3ikF7uOkQguYnkNsmOFzc0Shnna7OsDO24yigLOOeFuCQUXNz45fx8FiqGVTqyKRTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWF6m7NP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qvcWubaS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B10E2C4CED6;
-	Tue,  7 Jan 2025 15:39:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWF6m7NP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F22AC4CED6;
+	Tue,  7 Jan 2025 16:42:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736264366;
-	bh=oD8IZZwblmQdes/eUweJjCun95li3dhJu+Tixr8By8Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qvcWubaS3/P9y4urANkoZVtMDfSIRtNxM86ZjQW81wGXVyxkDitHE4ipa0sS//RXS
-	 mfFdJEPfMslBdRELTXEHTcXt6tnmlLNmIiNu+BxQJXdjWBsvElmQ5m0yqNcOWQog+F
-	 LmuyODBWk/DXiq1DsEWApRiqbtrHo0qHWPMZgx5dMrQfJMb3AqhewA1SSsUKaiFq0C
-	 qOW3Ax73VQYIpgm7lCKiVH4HowMczROQYoy6YnNUTWJhUQZCAe6h+uFcHBOO+/IBsN
-	 NOSWHSyLfUFP96hHNybbA1ixMhQZ/4OmilRubx6cO1eW5izbr2WCHFEwhCaSuDDP8c
-	 L4JPYDrmq93Ow==
-Date: Tue, 7 Jan 2025 15:39:20 +0000
+	s=k20201202; t=1736268167;
+	bh=7m9srgpMEiXCY3EwU421KJCD1mkHAQtbO2dhdmFCRw0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CWF6m7NPfxEG40b4664zvEnm1bLBbYX24kosBrfehIi+uCYikhhmwIgk8aX6vTd3M
+	 WX73/yYf7UoE0cTeCqfXrk4UF9hU0ugpJGt/sStNIL4JTMessrl/tX5ZXJMkQntu2s
+	 dP7uYqFoQDO1Is5Q9HmqxckBWzw84D67zhOsV1gnEh7EHT/clAiHIH9jE2IhW5wdYZ
+	 czkQPMsMiZ1jtXLgnhrabVozQQE/fGQ18EJxYvdPTxa817TFIT+y/bO+QKs//XuRRa
+	 IL8Pzfqr1VbRW7vrYKgqIQ/jM4tsj2FH3aL+3iofcfaDbEpFg+kYGWWS3LnDEEYI/l
+	 +FQTBg+LuFrNA==
 From: Will Deacon <will@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 5/9] arm64/sysreg: Update ID_AA64SMFR0_EL1 to DDI0601
- 2024-09
-Message-ID: <20250107153919.GA7728@willie-the-truck>
+	Shuah Khan <shuah@kernel.org>,
+	Mark Brown <broonie@kernel.org>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 0/9] arm64: Support 2024 dpISA extensions
+Date: Tue,  7 Jan 2025 16:42:38 +0000
+Message-Id: <173626298431.2741856.11908646584681839796.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
 References: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
- <20241211-arm64-2024-dpisa-v4-5-0fd403876df2@kernel.org>
- <20250107151323.GA7368@willie-the-truck>
- <9e93418d-ef66-42bb-b276-9f92da2596fa@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e93418d-ef66-42bb-b276-9f92da2596fa@sirena.org.uk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 07, 2025 at 03:26:34PM +0000, Mark Brown wrote:
-> On Tue, Jan 07, 2025 at 03:13:24PM +0000, Will Deacon wrote:
-> > On Wed, Dec 11, 2024 at 01:02:50AM +0000, Mark Brown wrote:
+On Wed, 11 Dec 2024 01:02:45 +0000, Mark Brown wrote:
+> The 2024 architecture release includes a number of data processing
+> extensions, mostly SVE and SME additions with a few others.  These are
+> all very straightforward extensions which add instructions but no
+> architectural state so only need hwcaps and exposing of the ID registers
+> to KVM guests and userspace.
 > 
-> > > -Res0	27:0
-> > > +UnsignedEnum	27	SF8MM8
-> > > +	0b0	NI
-> > > +	0b1	IMP
-> > > +EndEnum
-> > > +UnsignedEnum	26	SF8MM4
-> > > +	0b0	NI
-> > > +	0b1	IMP
-> > > +EndEnum
 > 
-> > afaict, bits 27 and 26 are still RES0 in all the documentation I can
-> > find...
-> 
-> They're in the 2024-09 XML release here:
-> 
->    https://developer.arm.com/documentation/ddi0601/2024-09/AArch64-Registers/ID-AA64SMFR0-EL1--SME-Feature-ID-Register-0?lang=en
-> 
-> which was current at the time the series was sent but I see that they've
-> been removed in the 2024-12 release which came out later, right at the
-> end of last year:
-> 
->    https://developer.arm.com/documentation/ddi0601/2024-12/AArch64-Registers/ID-AA64SMFR0-EL1--SME-Feature-ID-Register-0?lang=en
-> 
-> so we should just remove these.  I'll respin (or should I do it
-> incrementally to save on re-review of the rest of it?).
+> [...]
 
-Gimme a sec as I'm the process of applying the other sysregs bits (which
-looked fine).
+For the sysreg definitions that Marc's fantastic script is happy with,
+applied to arm64 (for-next/cpufeature), thanks!
 
+[1/9] arm64/sysreg: Update ID_AA64PFR2_EL1 to DDI0601 2024-09
+      https://git.kernel.org/arm64/c/1ad9a56442a0
+[2/9] arm64/sysreg: Update ID_AA64ISAR3_EL1 to DDI0601 2024-09
+      https://git.kernel.org/arm64/c/054339beae58
+[3/9] arm64/sysreg: Update ID_AA64FPFR0_EL1 to DDI0601 2024-09
+      https://git.kernel.org/arm64/c/12b5ff517a19
+[4/9] arm64/sysreg: Update ID_AA64ZFR0_EL1 to DDI0601 2024-09
+      https://git.kernel.org/arm64/c/9a43ee864349
+
+[6/9] arm64/sysreg: Update ID_AA64ISAR2_EL1 to DDI0601 2024-09
+      https://git.kernel.org/arm64/c/d66e21d59ed0
+
+The KVM patch needs an Ack from the maintainers and the hwcap change
+probably needs checking in light of [1].
+
+Cheers,
+-- 
 Will
+
+[1] https://lore.kernel.org/r/20250106174020.1793678-1-maz@kernel.org
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
