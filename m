@@ -1,141 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C335CB8;
-	Tue,  7 Jan 2025 13:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6CA1E377F;
+	Tue,  7 Jan 2025 15:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736257338; cv=none; b=O2sclIFCOJ5t0X5TZ8MaAd1fAoBProG8TOzcjFeT+MymNOtZLvQ2NcehW5SWQdBWLikbU8KdJV+S57A/KqbUSq91JZGikM/lGjkiXmdZCaWyac6tqDuo4Vc3tXmK7qO13ql1F9/Y/oOu1Iu9lrp/9fdsAe1Uoo2pH6ecASfmwY8=
+	t=1736262810; cv=none; b=UyyY/vjek2VExchkNh6VJCvTqJ6puIb5G/CelxOyGRBwhzAU9b12QpdmFDT5Xg3Sz2pHJH3LY4DUaG9aXCtdi6ZNA0NWtW9kSfBMDbL+9Vvu6NosXroeo4WKBGbtsUcgINwjX/ij5EQkYiy5QKen2eOWze2w2ZNNtSZ4rpp48wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736257338; c=relaxed/simple;
-	bh=W7FS2V/XkDChOIfQqxynnw3YZaJOtH2JQmXtylUSxXY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rmt9jnfGF/KAq6Ia6Jy0jdkzPdJ2g1UXdFaahJQQOTZuSPN0fcgx/kTLxf29hmnaLVAuFpv8GRNHmWsCu3xp6clAm5uwlqWU5FSgxNXTTaUXyGe6IQ6mdJzKzMMxL+Bgam7vlkZ3Xsk2dpeFqPg1cI7l5vdVAeJYc6pnUljvc7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A0mB0N9e; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736262810; c=relaxed/simple;
+	bh=KlzauW3PgDKVIWbsqXawXo+ipjiNK9vtMAkDOh4G9u0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dPBs5TH2dRnWydVy1YmMbso+MDkBw4U+ydmgl2vSg/cVUNGczDAKyyDaNsIvMPDdb7KtyTdwvOFVG+YtOg9M1qzMqQRQxv2CLsNzGQZHAt5hQXELlp96bAm6iT6+fZ8zTY4OHqHLyWqHnV28FWIWHwdEf9f0hMX/42ymGcpyQaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqI8oUkr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A0mB0N9e"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 726BFC4CED6;
-	Tue,  7 Jan 2025 13:42:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqI8oUkr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7B28C4CED6;
+	Tue,  7 Jan 2025 15:13:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736257337;
-	bh=W7FS2V/XkDChOIfQqxynnw3YZaJOtH2JQmXtylUSxXY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=A0mB0N9eznEDMh6SASE8Lr0SGe5+idZsUgQJZZkibDFhq3Hg1wduxD4ZckNR2V6Cu
-	 hGmM3GPhwmAbRb6wHVS7XfVssbkBzyiXbAq4Pp/K9sFbahVx3Z28Ap3W/wLU3ni7VZ
-	 f8TaskApgH9GmjR9Qr7nzYTuTlcchZYTWAdZXUvg4bCNeCqMpl0YGDlSUVSXgDjtEi
-	 JV1lhjDJANf4CF08/aLPg6kPUsViujSXEOycWti1TKp5M3WA2zltgfEzDYN1O2qd3p
-	 bsE2cjJpGTiVxzmI0UTj0AUm+awmFWl+0ztJDg7ecJfOnh5mlhWdpC3FddXoI25sUX
-	 l3yDyK97TjUHA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tV9qZ-009ncW-6K;
-	Tue, 07 Jan 2025 13:42:15 +0000
-Date: Tue, 07 Jan 2025 13:42:09 +0000
-Message-ID: <8634huyc3y.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Rob Herring <robh@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-Cc:	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
+	s=k20201202; t=1736262810;
+	bh=KlzauW3PgDKVIWbsqXawXo+ipjiNK9vtMAkDOh4G9u0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iqI8oUkrsXt02ErcpWwCjOZ0+kwUPWOHvsmYw1hBh1mh2dbvvPVZ2Wan01b2RdMmq
+	 Bw12CenQBYNbPpk04NSbiV5xzljPk2/wp7zk8S8ftSdWoxjXND1+v4YblHl6k5MH++
+	 uNHKKh5lkGKTiLC++MtN7FoSCbfohmK1LakO9YkIpUsKb9wONt2LAlg9ChpZUQeCgC
+	 gSTbiGy0gG/sFw3mPAOPbR2+B5pA6Axb3g0W5e0pQzVNJzKT9fnPA6kZCDwLAs5hes
+	 77se1IHjYOYnoA4b3g75FNPn3IB0wloW5wxPW75rT1h/yQj2DgpMdq/V3o4HdF6Rzj
+	 HviMJNifgFAPA==
+Date: Tue, 7 Jan 2025 15:13:24 +0000
+From: Will Deacon <will@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-In-Reply-To: <Z30adHnQ7ZFaU9UR@arm.com>
-References: <20241220072240.1003352-1-anshuman.khandual@arm.com>
-	<20250102160402.GB3990035-robh@kernel.org>
-	<Z30adHnQ7ZFaU9UR@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 5/9] arm64/sysreg: Update ID_AA64SMFR0_EL1 to DDI0601
+ 2024-09
+Message-ID: <20250107151323.GA7368@willie-the-truck>
+References: <20241211-arm64-2024-dpisa-v4-0-0fd403876df2@kernel.org>
+ <20241211-arm64-2024-dpisa-v4-5-0fd403876df2@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: robh@kernel.org, catalin.marinas@arm.com, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, will@kernel.org, ryan.roberts@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, corbet@lwn.net, eric.auger@redhat.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241211-arm64-2024-dpisa-v4-5-0fd403876df2@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, 07 Jan 2025 12:13:40 +0000,
-Catalin Marinas <catalin.marinas@arm.com> wrote:
+On Wed, Dec 11, 2024 at 01:02:50AM +0000, Mark Brown wrote:
+> DDI0601 2024-09 introduces SME 2.2 as well as a few new optional features,
+> update sysreg to reflect the changes in ID_AA64SMFR0_EL1 enumerating them.
 > 
-> On Thu, Jan 02, 2025 at 10:04:02AM -0600, Rob Herring wrote:
-> > On Fri, Dec 20, 2024 at 12:52:33PM +0530, Anshuman Khandual wrote:
-> > > This series adds fine grained trap control in EL2 required for FEAT_PMUv3p9
-> > > registers like PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 which are already
-> > > being used in the kernel. This is required to prevent their EL1 access trap
-> > > into EL2.
-> > > 
-> > > PMZR_EL0 register trap control i.e HDFGWTR2_EL2.nPMZR_EL0 remains unchanged
-> > > for now as it does not get accessed in the kernel, and there is no plan for
-> > > its access from user space.
-> > > 
-> > > I have taken the liberty to pick up all the review tags for patches related
-> > > to tools sysreg update from the KVM FGT2 V2 patch series posted earlier.
-> > > 
-> > > https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandual@arm.com/
-> > > 
-> > > Rob had earler mentioned about FEAT_FGT2 based trap control requirement for
-> > > FEAT_PMUv3p9 registers that are currently being used in kernel. The context
-> > > can be found here.
-> > > 
-> > > https://lore.kernel.org/all/20241216234251.GA629562-robh@kernel.org/
-> > > 
-> > > This series is based on v6.13-rc3
-> > > 
-> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > Cc: Will Deacon <will@kernel.org>
-> > > Cc: Marc Zyngier <maz@kernel.org>
-> > > Cc: Ryan Roberts <ryan.roberts@arm.com>
-> > > Cc: Mark Rutland <mark.rutland@arm.com>
-> > > Cc: Mark Brown <robh@kernel.org>
-> > > Cc: Rob Herring <robh@kernel.org>
-> > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > Cc: Jonathan Corbet <corbet@lwn.net>
-> > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > Cc: kvmarm@lists.linux.dev
-> > > Cc: linux-doc@vger.kernel.org
-> > > Cc: linux-kernel@vger.kernel.org
-> > > Cc: linux-arm-kernel@lists.infradead.org
-> > > 
-> > > Anshuman Khandual (7):
-> > >   arm64/sysreg: Update register fields for ID_AA64MMFR0_EL1
-> > >   arm64/sysreg: Add register fields for HDFGRTR2_EL2
-> > >   arm64/sysreg: Add register fields for HDFGWTR2_EL2
-> > >   arm64/sysreg: Add register fields for HFGITR2_EL2
-> > >   arm64/sysreg: Add register fields for HFGRTR2_EL2
-> > >   arm64/sysreg: Add register fields for HFGWTR2_EL2
-> > >   arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-> > 
-> > In case it is not clear, this series should be applied to 6.13 as the 2 
-> > PMUv3p9 features already landed in 6.13 (per counter EL0 control) and 
-> > 6.12 (ICNTR). 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/tools/sysreg | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
 > 
-> So is this a fix that needs backporting to 6.12 or 6.13, e.g. fix for
-> d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction
-> counter")? It's pretty late in the cycle to take the series for 6.13.
-> 
-> But does KVM actually expose the feature to EL1 in ID_AA64DFR1_EL1 and
-> than traps it at EL2?
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index c792bd3b0afbb5fb7e438a4d760d9f2d15621eee..d78b12c59658b480739ae797f5ea2c2f14d8d765 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1105,6 +1105,7 @@ UnsignedEnum	59:56	SMEver
+>  	0b0000	SME
+>  	0b0001	SME2
+>  	0b0010	SME2p1
+> +	0b0011	SME2p2
+>  	0b0000	IMP
+>  EndEnum
+>  UnsignedEnum	55:52	I16I64
+> @@ -1169,7 +1170,36 @@ UnsignedEnum	28	SF8DP2
+>  	0b0	NI
+>  	0b1	IMP
+>  EndEnum
+> -Res0	27:0
+> +UnsignedEnum	27	SF8MM8
+> +	0b0	NI
+> +	0b1	IMP
+> +EndEnum
+> +UnsignedEnum	26	SF8MM4
+> +	0b0	NI
+> +	0b1	IMP
+> +EndEnum
 
-We limit the PMU emulation to v3p8, so *hopefully* this doesn't trip
-anything in KVM, even if we don't advertise support for these
-features. This has been tested, right?
+afaict, bits 27 and 26 are still RES0 in all the documentation I can
+find...
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
