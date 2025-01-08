@@ -1,162 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61451F890B;
-	Wed,  8 Jan 2025 11:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7951F8AD4
+	for <kvmarm@lists.linux.dev>; Wed,  8 Jan 2025 11:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736334917; cv=none; b=G58iJ6SeS9r5mC8uy7kqejIzKQWM8p1GfD4zYYWlj8g4iVMAbNMapGDrfjLSuYQ3J2NL7E2S+DOE5lyBPfx42fmLclq66xPb5Xn0sdHQjA0LSsUEQXp8l2kk0rKCrX39BS5uW28TpmHiyIbPh8Y5OJK6NGdomCgkGRomFUZYS1U=
+	t=1736335812; cv=none; b=aJRLJwpB9Be1+njoeCGhBPQDpbzHrHF3HKhxEINte5Q2a+6qH9jxILiFeUkdVM3NDnF6UDnVVL+bz5aeaW/AfN+kfZu2P4vqE+64RascNFe/tr/gQNhc3Jd88cRISizxckoWfxkdwpidFWhhAxtLlEJ+Pkg7MWJ/AX24NmYYE2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736334917; c=relaxed/simple;
-	bh=Elaxu5tvDfDqTfiI1npE4/wrE2bdRCCJwzlgYNjlzvg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qStOn57Oqpw2J+/eh62F/PkCj8t9QI85G8WwrQaXx2ZuS6jAtSVeV7KuFFDH8q3NZVAJGDXPOn0lIuyh00eXRRada0mO61snKrHGxEuHhohdQ2p3nU/GQSBE2N2LnyRl1yx9LcWRhWKRi6yQx9hMz9AMwWfwuSWHfxKm6YXsebI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZWaMFUd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736335812; c=relaxed/simple;
+	bh=DL3L7wjt7m6xdNDVzlXZ9DBHuhuce+VBHCyYTQJC1Ww=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a4Z21f4fEjc7u/GycaHOG42PJXxtcf7r0m6SeSL/L4etLh7F20fds6Ai2+kZ+YmSv1bTzCn0HvRJigW17x8B0vrGyiv09D3/FFI83yRY+1qG9jrHeV5FfCCaRP1CihX98T437VsJ4nyNl5NfCcJzCoCAbTpTrKEmQgtM7UjQUV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fVDm1pnX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZWaMFUd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185B5C4CEDD;
-	Wed,  8 Jan 2025 11:15:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fVDm1pnX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3543C4CEDD;
+	Wed,  8 Jan 2025 11:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736334916;
-	bh=Elaxu5tvDfDqTfiI1npE4/wrE2bdRCCJwzlgYNjlzvg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eZWaMFUdQ4BXOsA3Wj9/uv5gb1OM+OW8JSJohPFzVH3Rme2gPMdH+cvxN0LpMVjdr
-	 F9M+IumsPFG9Z/QlgsSzcKM0XzKx08+taXkrvxXrHPpkMzFMR1X7iuNuX9oF5EA3pq
-	 whSSXwsu33PwIjN1oQLDWREDfZsQDbxezQv97LsC3B75cnVLNUHTeNf6exzd8tOC7q
-	 ridPe5ZrkOD1n5tnFDrkU8G5Cwh5fVHSUKb6fG1+cC/naJVEC2P6QgkV1GwmNBNXvi
-	 zq6GwF3QY6yYHtMZIRblFPxZch9sSE/t+aaPo+f7M8E+bh8ZIo8XEzEQKxcxQyGrtH
-	 VpdGNqQ11DGzg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1736335811;
+	bh=DL3L7wjt7m6xdNDVzlXZ9DBHuhuce+VBHCyYTQJC1Ww=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fVDm1pnX1RQb4afCymYc5xUYmMusPfPRyUVEqW6Dr/4Jt3o3Nittan7+T6aZqsW2V
+	 xT9ig9U3fNXGbszcP+dptmHQZOQf2TMarjcHf7QbpTAd9phMefFyMT0lveVLZ6hzfc
+	 hpNBttVCZNrT6iFDF/lTPoXm9Y+Q6UOcNK2sW/P6VGrkhfVGGl4o4/dAf3IArq/yCo
+	 zR6x5OWbWmdULLoGoAJqvlEJ6Oo8Q5EkrZWsWuIoy1+fhkueUqOET3WkyuBAbyZE36
+	 EGYvH09pQHuOMEZK8hLO4D9TwG+bbN9gxa7t+7x61kCFoe1HGzEy8EZKCGnQm8nMNA
+	 fKfusmfMNJmAg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tVU1p-00A7G3-NT;
-	Wed, 08 Jan 2025 11:15:13 +0000
-Date: Wed, 08 Jan 2025 11:15:13 +0000
-Message-ID: <86wmf5wo8u.wl-maz@kernel.org>
+	id 1tVUGG-00A7YQ-HV;
+	Wed, 08 Jan 2025 11:30:09 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Eric Auger <eric.auger@redhat.com>,
+To: oliver.upton@linux.dev,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	zenghui.yu@linux.dev,
 	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-In-Reply-To: <CAL_JsqLLnh1o4L1=PpNt5brBwZZCgp7mOygByOYakchrzc29Ow@mail.gmail.com>
-References: <20241220072240.1003352-1-anshuman.khandual@arm.com>
-	<20250102160402.GB3990035-robh@kernel.org>
-	<Z30adHnQ7ZFaU9UR@arm.com>
-	<CAL_JsqLLnh1o4L1=PpNt5brBwZZCgp7mOygByOYakchrzc29Ow@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kernel-team@android.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2] KVM: arm64: Fix nVHE stacktrace VA bits mask
+Date: Wed,  8 Jan 2025 11:30:05 +0000
+Message-Id: <173633579701.13074.16597350364665610752.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250107112821.416591-1-vdonnefort@google.com>
+References: <20250107112821.416591-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: robh@kernel.org, catalin.marinas@arm.com, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, will@kernel.org, ryan.roberts@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, corbet@lwn.net, eric.auger@redhat.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, vdonnefort@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, zenghui.yu@linux.dev, kvmarm@lists.linux.dev, kernel-team@android.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 07 Jan 2025 22:13:47 +0000,
-Rob Herring <robh@kernel.org> wrote:
->=20
-> On Tue, Jan 7, 2025 at 6:13=E2=80=AFAM Catalin Marinas <catalin.marinas@a=
-rm.com> wrote:
-> >
-> > On Thu, Jan 02, 2025 at 10:04:02AM -0600, Rob Herring wrote:
-> > > On Fri, Dec 20, 2024 at 12:52:33PM +0530, Anshuman Khandual wrote:
-> > > > This series adds fine grained trap control in EL2 required for FEAT=
-_PMUv3p9
-> > > > registers like PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 which are=
- already
-> > > > being used in the kernel. This is required to prevent their EL1 acc=
-ess trap
-> > > > into EL2.
-> > > >
-> > > > PMZR_EL0 register trap control i.e HDFGWTR2_EL2.nPMZR_EL0 remains u=
-nchanged
-> > > > for now as it does not get accessed in the kernel, and there is no =
-plan for
-> > > > its access from user space.
-> > > >
-> > > > I have taken the liberty to pick up all the review tags for patches=
- related
-> > > > to tools sysreg update from the KVM FGT2 V2 patch series posted ear=
-lier.
-> > > >
-> > > > https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandu=
-al@arm.com/
-> > > >
-> > > > Rob had earler mentioned about FEAT_FGT2 based trap control require=
-ment for
-> > > > FEAT_PMUv3p9 registers that are currently being used in kernel. The=
- context
-> > > > can be found here.
-> > > >
-> > > > https://lore.kernel.org/all/20241216234251.GA629562-robh@kernel.org/
-> > > >
-> > > > This series is based on v6.13-rc3
-> > > >
-> > > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > > Cc: Will Deacon <will@kernel.org>
-> > > > Cc: Marc Zyngier <maz@kernel.org>
-> > > > Cc: Ryan Roberts <ryan.roberts@arm.com>
-> > > > Cc: Mark Rutland <mark.rutland@arm.com>
-> > > > Cc: Mark Brown <robh@kernel.org>
-> > > > Cc: Rob Herring <robh@kernel.org>
-> > > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > > Cc: Jonathan Corbet <corbet@lwn.net>
-> > > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > > Cc: kvmarm@lists.linux.dev
-> > > > Cc: linux-doc@vger.kernel.org
-> > > > Cc: linux-kernel@vger.kernel.org
-> > > > Cc: linux-arm-kernel@lists.infradead.org
-> > > >
-> > > > Anshuman Khandual (7):
-> > > >   arm64/sysreg: Update register fields for ID_AA64MMFR0_EL1
-> > > >   arm64/sysreg: Add register fields for HDFGRTR2_EL2
-> > > >   arm64/sysreg: Add register fields for HDFGWTR2_EL2
-> > > >   arm64/sysreg: Add register fields for HFGITR2_EL2
-> > > >   arm64/sysreg: Add register fields for HFGRTR2_EL2
-> > > >   arm64/sysreg: Add register fields for HFGWTR2_EL2
-> > > >   arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-> > >
-> > > In case it is not clear, this series should be applied to 6.13 as the=
- 2
-> > > PMUv3p9 features already landed in 6.13 (per counter EL0 control) and
-> > > 6.12 (ICNTR).
-> >
-> > So is this a fix that needs backporting to 6.12 or 6.13, e.g. fix for
-> > d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction
-> > counter")? It's pretty late in the cycle to take the series for 6.13.
->=20
-> Ideally, yes. But given the state of h/w implementations, backporting
-> it later is probably fine if that is your preference.
->=20
-> > But does KVM actually expose the feature to EL1 in ID_AA64DFR1_EL1 and
-> > than traps it at EL2?
->=20
-> As Marc pointed out KVM only advertises PMUv3.8. Regardless, guest
-> accesses to these registers are trapped with or without this series.
+On Tue, 07 Jan 2025 11:28:21 +0000, Vincent Donnefort wrote:
+> The hypervisor VA space size depends on both the ID map's
+> (IDMAP_VA_BITS) and the kernel stage-1 (VA_BITS). However, the
+> hypervisor stacktrace decoding is solely relying on VA_BITS. This is
+> especially an issue when VA_BITS < IDMAP_VA_BITS (i.e. VA_BITS is
+> 39-bit): the hypervisor may have addresses bigger than the stacktrace is
+> masking.
+> 
+> [...]
 
-And most probably generates a nice splat in the kernel log, as nobody
-updated KVM to handle *correctly* PMICNTR_EL0 traps, let alone deal
-with the FGT2 registers.
+Applied to next, thanks!
+
+[1/1] KVM: arm64: Fix nVHE stacktrace VA bits mask
+      commit: 68344037b764401f751c66661c53334ea1e15324
+
+Cheers,
 
 	M.
-
---=20
+-- 
 Without deviation from the norm, progress is not possible.
+
+
