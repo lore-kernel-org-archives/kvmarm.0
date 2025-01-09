@@ -1,116 +1,113 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7E313C80C;
-	Thu,  9 Jan 2025 16:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC1B1FE452
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jan 2025 19:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736441143; cv=none; b=t9GTsVxPOPPtBdUqGFFKxOWtIqTskS3seWA2NbqgA+FMZ2NYev1AQxuEYcZCu2R4S1CWVEZBtsvGAvFqqEDimOoaQkew/r8SY9+pEkACmVFM4Nk0L2LXF91JdFV/Vt/WE0Bm0b94O1YstqU6SARwv0qburv9OACBeEzTI/t3O/k=
+	t=1736452115; cv=none; b=Ynta7/oD5M24/1IODNyox6VM0B8MVbmOb849EeNubQNo6HoD7VXHzdEPOTiTYJvvo+rSExYkCdAgyeF2AbzuFPID1L4Q/0YgL3U/QzAtlAD+qZy3KHIeJGDU0xfeO+RmdfljWrZRMbOahsdgde//qqHhJ8T1lMzwHouQdGIavwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736441143; c=relaxed/simple;
-	bh=dthvaoFmVx6ekANWfNCrbEN7/AW4ltSxGAfXIHK7Mao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jC7m+8g4Y73JEfk5HS7dIt6eLPHB4yrpkZ450YSzjCK908FgtYVPIlU1ZZIv9EWZoGHFbxGhUCODQ//drqvxYmFrMtiSQg4a/c7JAn+lxxJg2wiyivMXkdkC1ih4p/A0/DUgjmktIC0lgIg5C1TWsLlKj5Y+vcvAVbP12feqcrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nnT6kB7l; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1736452115; c=relaxed/simple;
+	bh=PrFEaEU7DDCl4he6jOcyQtK457MKdnxMIh7aWoIbbEE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tSBRkO28aK0x1YNbX2wMdu7yMsH+5FqM2OmAdKfw5GwoU1w3PaP+70CuIi3yeu1bUSHZfkiaZwKxfaKb9Pkb15GSY2q9peXwepzfIKklcyyEdX8vidVdXzS4gkB8v7lvxNn/pbwHcaJ/5ZbaW05JT3/1dx7n7AS11PmbhXwhPds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RklXU5dO; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nnT6kB7l"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736441142; x=1767977142;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dthvaoFmVx6ekANWfNCrbEN7/AW4ltSxGAfXIHK7Mao=;
-  b=nnT6kB7l6RlK3laClk74UvMlV6u7CtKUtabpBox6tsDndrhH9rDJmLfF
-   aiZos2DKLW5i9NKtaZEb//2fnaHqkzEeADJd+bJ6TtBER+f1KNFR6xMbU
-   TuTLqEZ2bbhA4N3OwdnMCL4jg0uWlMuIEr6XOTyoZcy6uYCueuLQ6Ia+B
-   GunfO0VNmM1cC9R0TXilWRyuk4d3MI7LeKlL8OMtP9EAnPt0l650p5+2X
-   /CIkKeMY2MOM+vMIQrOjWbXpmhBUsceCaRL+IY6XseH1VjAMAquJCq1yH
-   MX4YXRPmrnjxRGtpLW3+D6Xnijnhiym1Drh4IgIwsonWlsQlkXBXvnalA
-   Q==;
-X-CSE-ConnectionGUID: pOqtSRE2R/OU7J+XwmXZEQ==
-X-CSE-MsgGUID: FPFF5lGsQ7O1Mb1Kz0cj1w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="54259038"
-X-IronPort-AV: E=Sophos;i="6.12,301,1728975600"; 
-   d="scan'208";a="54259038"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 08:45:41 -0800
-X-CSE-ConnectionGUID: vM2BVWakT9eb+szAJCcFHg==
-X-CSE-MsgGUID: fnYt+aC4RcSjiy9r1+zr/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103983305"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 09 Jan 2025 08:45:36 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tVvf3-000Hsl-1X;
-	Thu, 09 Jan 2025 16:45:33 +0000
-Date: Fri, 10 Jan 2025 00:45:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vincent Donnefort <vdonnefort@google.com>, rostedt@goodmis.org,
-	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
-	linux-trace-kernel@vger.kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Cc: oe-kbuild-all@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
-	qperret@google.com, will@kernel.org, kernel-team@android.com,
-	linux-kernel@vger.kernel.org,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v2 02/12] ring-buffer: Introducing ring-buffer remote
-Message-ID: <202501100025.WNnMyW13-lkp@intel.com>
-References: <20250108114536.627715-3-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RklXU5dO"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9204f898so2188779a91.2
+        for <kvmarm@lists.linux.dev>; Thu, 09 Jan 2025 11:48:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736452114; x=1737056914; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DtNoMkgEfRqjn0GoMRLYiLeDG4/kOjxv1c8ix0/Uo/Q=;
+        b=RklXU5dO9EnriAK40HNx9yP9jq52yxFmaHEsgYhkzeIsaLqdT14el/UBkmXJvehECt
+         esK7Q7MBRXZarMMRAyWVz4skex6CBwAYpqwjEfTQ9j4IEPOiivwmlk2xbh0C9urkBzcD
+         soVomeT512ThzEd0QOlVmEDSx4iz5eUraZkmWolEol0Lc3dnKxEz1670CXMdtEEv6Xw7
+         7FiBIAjkUBi9VZM3w1p0Fy9FhRsCe0JSRjqidY77azDPvgMTJL5zhk4AoUAzUX+NkYwu
+         8uJTbIvmD1pO/kxbYfR4l6xoF22o7S769exQeU27LyweeffViMnvy6Pcgk57AMighu3n
+         VHVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736452114; x=1737056914;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DtNoMkgEfRqjn0GoMRLYiLeDG4/kOjxv1c8ix0/Uo/Q=;
+        b=VgAb94cL/B7ZSmP1zdve+pzJPfkUA6oyOTtA80kY/qEVoA5OlN95MOIXmVgFIq5azN
+         onxw81uYgFOa94B1fqPPFwjvRmrAzaOLHVjJ4DR2TRwZKvw7MssTY6OWU4n4ltLlaee9
+         DrNBSnu4UdOeIfRsZmRqJt9L///9u7OPEWE5cAYKQxNFXT5QV19GDoK/uNsNOXgfRXcS
+         IIQvAudonOXWROzQS2cxH6I5htWDuptG0JIhnLMuFAICDEveR/gwe4IOFy6HMRyGag68
+         rWNxO0IsRmNvL3Wi6qyaPlaSSLAbBAV9F2GjFm9KK4RsFzDyLuYUnWxmtI+i6zWfMSf2
+         EFzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRttlL0c3z44Zzhyprxo1Ne+n544SJlhXexx88FSjzDSRhfgh1+0XlMq4pMPD5/mMb5sk191Q=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw35/VrHvrpTfdmvwRCeI3+a2HStY4VoJcRMw/gZGCFdqzga73r
+	rMYnQTO+YSi5P5SXRWuj2X9NTa5Pvxx1BZEJdhpa0NiCBS0K+qHIiTW8x0tRbZ4GQkJl7no5f8N
+	DNA==
+X-Google-Smtp-Source: AGHT+IGQsYeXCTLoQtv4zUeKKUd67KMOBJssqkUIj3hvgSqGZyfbB6lhOhAReCaRc5UAnOKDVlHxinf8YUY=
+X-Received: from pjbsl13.prod.google.com ([2002:a17:90b:2e0d:b0:2ef:85ba:108f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8a:b0:2ee:c9d8:d01a
+ with SMTP id 98e67ed59e1d1-2f548f33b54mr11852213a91.11.1736452113738; Thu, 09
+ Jan 2025 11:48:33 -0800 (PST)
+Date: Thu,  9 Jan 2025 11:47:13 -0800
+In-Reply-To: <20241220013906.3518334-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108114536.627715-3-vdonnefort@google.com>
+Mime-Version: 1.0
+References: <20241220013906.3518334-1-seanjc@google.com>
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <173645122896.885867.13450184481916964756.b4-ty@google.com>
+Subject: Re: [PATCH 0/8] KVM: selftests: Binary stats fixes and infra updates
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-Hi Vincent,
+On Thu, 19 Dec 2024 17:38:58 -0800, Sean Christopherson wrote:
+> Fix a handful of bugs in the binary stats infrastructure, expand support
+> to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
+> enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
+> getting a stat that actually exists.
+> 
+> Most of the bugs are benign, and AFAICT, none actually cause problems in
+> the current code base.  The worst of the bugs is lack of validation that
+> the requested stat actually exists, which is quite annoying if someone
+> fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
+> 
+> [...]
 
-kernel test robot noticed the following build warnings:
+Applied 1-7 to kvm-x86 selftests (x86 wants to build tests on the vCPU-scoped
+stats infrastructure).  
 
-[auto build test WARNING on 09a0fa92e5b45e99cf435b2fbf5ebcf889cf8780]
+I'll hold off on the compile-time assertions stuff until there's consensus that
+we want to go that route for all architectures (not at all urgent).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vincent-Donnefort/ring-buffer-Check-for-empty-ring-buffer-with-rb_num_of_entries/20250108-200217
-base:   09a0fa92e5b45e99cf435b2fbf5ebcf889cf8780
-patch link:    https://lore.kernel.org/r/20250108114536.627715-3-vdonnefort%40google.com
-patch subject: [PATCH v2 02/12] ring-buffer: Introducing ring-buffer remote
-config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20250110/202501100025.WNnMyW13-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501100025.WNnMyW13-lkp@intel.com/reproduce)
+[1/8] KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
+      https://github.com/kvm-x86/linux/commit/b68ec5b6869f
+[2/8] KVM: selftests: Close VM's binary stats FD when releasing VM
+      https://github.com/kvm-x86/linux/commit/a59768d6cb64
+[3/8] KVM: selftests: Assert that __vm_get_stat() actually finds a stat
+      https://github.com/kvm-x86/linux/commit/52ef723593fe
+[4/8] KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name string
+      https://github.com/kvm-x86/linux/commit/7884da344973
+[5/8] KVM: selftests: Add struct and helpers to wrap binary stats cache
+      https://github.com/kvm-x86/linux/commit/384544c026f6
+[6/8] KVM: selftests: Get VM's binary stats FD when opening VM
+      https://github.com/kvm-x86/linux/commit/6d22ccb1c309
+[7/8] KVM: selftests: Add infrastructure for getting vCPU binary stats
+      https://github.com/kvm-x86/linux/commit/60d432517838
+[8/8] KVM: selftests: Add compile-time assertions to guard against stats typos
+      not applied
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501100025.WNnMyW13-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> kernel/trace/ring_buffer.c:2535: warning: Function parameter or struct member 'remote' not described in '__ring_buffer_alloc_remote'
->> kernel/trace/ring_buffer.c:2535: warning: Function parameter or struct member 'key' not described in '__ring_buffer_alloc_remote'
-
-
-vim +2535 kernel/trace/ring_buffer.c
-
-  2528	
-  2529	/**
-  2530	 * __ring_buffer_alloc_remote
-  2531	 *
-  2532	 */
-  2533	struct trace_buffer *__ring_buffer_alloc_remote(struct ring_buffer_remote *remote,
-  2534							struct lock_class_key *key)
-> 2535	{
-  2536		return alloc_buffer(0, 0, 0, 0, 0, key, remote);
-  2537	}
-  2538	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--
+https://github.com/kvm-x86/linux/tree/next
