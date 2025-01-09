@@ -1,113 +1,172 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-ua1-f74.google.com (mail-ua1-f74.google.com [209.85.222.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC1B1FE452
-	for <kvmarm@lists.linux.dev>; Thu,  9 Jan 2025 19:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73255200B95
+	for <kvmarm@lists.linux.dev>; Thu,  9 Jan 2025 20:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452115; cv=none; b=Ynta7/oD5M24/1IODNyox6VM0B8MVbmOb849EeNubQNo6HoD7VXHzdEPOTiTYJvvo+rSExYkCdAgyeF2AbzuFPID1L4Q/0YgL3U/QzAtlAD+qZy3KHIeJGDU0xfeO+RmdfljWrZRMbOahsdgde//qqHhJ8T1lMzwHouQdGIavwU=
+	t=1736455798; cv=none; b=fkilRFfzE8ZaqvOffjTK7ApIOwAdG7umcgRPgbIBTSS4MZ0FB0t0O6wSYPyeno2E1u8eYtM4MjHtnFnsvI9RT/B2aEuDGQRLwTAVSwZwEsCeETqv9QI/Q84xPtEYAPdUgPS+ZjZvSz13xh6c0bUYdaAdL3owlVcdS6HnTAJpToo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452115; c=relaxed/simple;
-	bh=PrFEaEU7DDCl4he6jOcyQtK457MKdnxMIh7aWoIbbEE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tSBRkO28aK0x1YNbX2wMdu7yMsH+5FqM2OmAdKfw5GwoU1w3PaP+70CuIi3yeu1bUSHZfkiaZwKxfaKb9Pkb15GSY2q9peXwepzfIKklcyyEdX8vidVdXzS4gkB8v7lvxNn/pbwHcaJ/5ZbaW05JT3/1dx7n7AS11PmbhXwhPds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RklXU5dO; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1736455798; c=relaxed/simple;
+	bh=YkgfGnO9YuSs6jW3cToj++wCeLfYHp3+3X5IEmvRJsw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Lk/oKatC2NCHJJfeOhHiZt/e/tZGC1x+GGR0lfT+t/erIwr9w+HlBoTV3waRjRDIsB8ujZxKMWu8y4MDAWzkT7M7OJWODONERKFEgugbEya5GhsLQOUQOZmp7aShiSgrt9zASyv0ZEHQxsYXSa7RXTOqv4DfZWoT7EhQeuF6/4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FhS1DF4L; arc=none smtp.client-ip=209.85.222.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RklXU5dO"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9204f898so2188779a91.2
-        for <kvmarm@lists.linux.dev>; Thu, 09 Jan 2025 11:48:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FhS1DF4L"
+Received: by mail-ua1-f74.google.com with SMTP id a1e0cc1a2514c-8610ad53f70so343254241.0
+        for <kvmarm@lists.linux.dev>; Thu, 09 Jan 2025 12:49:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736452114; x=1737056914; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DtNoMkgEfRqjn0GoMRLYiLeDG4/kOjxv1c8ix0/Uo/Q=;
-        b=RklXU5dO9EnriAK40HNx9yP9jq52yxFmaHEsgYhkzeIsaLqdT14el/UBkmXJvehECt
-         esK7Q7MBRXZarMMRAyWVz4skex6CBwAYpqwjEfTQ9j4IEPOiivwmlk2xbh0C9urkBzcD
-         soVomeT512ThzEd0QOlVmEDSx4iz5eUraZkmWolEol0Lc3dnKxEz1670CXMdtEEv6Xw7
-         7FiBIAjkUBi9VZM3w1p0Fy9FhRsCe0JSRjqidY77azDPvgMTJL5zhk4AoUAzUX+NkYwu
-         8uJTbIvmD1pO/kxbYfR4l6xoF22o7S769exQeU27LyweeffViMnvy6Pcgk57AMighu3n
-         VHVA==
+        d=google.com; s=20230601; t=1736455795; x=1737060595; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zwxnelFEQr4C3vtPtPgRGtQjenWxHSmpAHQLFMvsChA=;
+        b=FhS1DF4LKz+8K0brml/6pbym8TcrqJ0sjpHQoeFhbrx7eAu44IquXRfOFAcWZUwTS2
+         QME5vcGk2NQJSX/AAtmjWprn3qsXt1lR6cUjBjNwY0BzgZzIv4STK6v/iUe7CuEmjHU7
+         9qBH51sUKqYGFNfrmQaREArDv/ARLAGXqvQGAnzJ2oR0wY5NnGGXHYP9px33eFQki3qV
+         DEKaQP87V+Y3ga/NXAdBn5ZZZVfQWe6hkB1hFyD0cJh0PmP7wImB0r8PUK1W5ZjZgWqt
+         S6tDxH6m76/ANAXMCm/vmR/vJjz80UHHsxh/wDt5RxoyA35l2roBT1Hplwe5EqTmGd32
+         nY0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736452114; x=1737056914;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DtNoMkgEfRqjn0GoMRLYiLeDG4/kOjxv1c8ix0/Uo/Q=;
-        b=VgAb94cL/B7ZSmP1zdve+pzJPfkUA6oyOTtA80kY/qEVoA5OlN95MOIXmVgFIq5azN
-         onxw81uYgFOa94B1fqPPFwjvRmrAzaOLHVjJ4DR2TRwZKvw7MssTY6OWU4n4ltLlaee9
-         DrNBSnu4UdOeIfRsZmRqJt9L///9u7OPEWE5cAYKQxNFXT5QV19GDoK/uNsNOXgfRXcS
-         IIQvAudonOXWROzQS2cxH6I5htWDuptG0JIhnLMuFAICDEveR/gwe4IOFy6HMRyGag68
-         rWNxO0IsRmNvL3Wi6qyaPlaSSLAbBAV9F2GjFm9KK4RsFzDyLuYUnWxmtI+i6zWfMSf2
-         EFzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVRttlL0c3z44Zzhyprxo1Ne+n544SJlhXexx88FSjzDSRhfgh1+0XlMq4pMPD5/mMb5sk191Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw35/VrHvrpTfdmvwRCeI3+a2HStY4VoJcRMw/gZGCFdqzga73r
-	rMYnQTO+YSi5P5SXRWuj2X9NTa5Pvxx1BZEJdhpa0NiCBS0K+qHIiTW8x0tRbZ4GQkJl7no5f8N
-	DNA==
-X-Google-Smtp-Source: AGHT+IGQsYeXCTLoQtv4zUeKKUd67KMOBJssqkUIj3hvgSqGZyfbB6lhOhAReCaRc5UAnOKDVlHxinf8YUY=
-X-Received: from pjbsl13.prod.google.com ([2002:a17:90b:2e0d:b0:2ef:85ba:108f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8a:b0:2ee:c9d8:d01a
- with SMTP id 98e67ed59e1d1-2f548f33b54mr11852213a91.11.1736452113738; Thu, 09
- Jan 2025 11:48:33 -0800 (PST)
-Date: Thu,  9 Jan 2025 11:47:13 -0800
-In-Reply-To: <20241220013906.3518334-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1736455795; x=1737060595;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zwxnelFEQr4C3vtPtPgRGtQjenWxHSmpAHQLFMvsChA=;
+        b=osB3GyigJc7wbTkrY5LIu7kbBLuyW/ztx3rVneDWGeAwUITjtGlLYy6q18jvavXgOC
+         81wvY9J5WvHC22cwzX+JMXnhJj6paiOoxJanR4VSTcsltM8g5hsCQkRHJZ6yY2CNUDYy
+         Adg5OfCXqUYkSMMwPPI4FNdaLfT051ae1XkuiAny64mKUEXiz6H6W2O0sXmsZJ5nbIv+
+         WkE8/r4a716ZOlXh2kFLDj+IkpSa7q/jYypb/vGIA+Cqn05+Dr6Ozls0aDPbsHtDqdEz
+         so9RK+l7JWRe/OO0JTVdFc/4h+c3eD6OIbWfopnWsKrnZbLiOvWSBZFEjYsZ1nTgDOh4
+         S+Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbHe7g6zv0KitluR+XROOBTPkaacirxgEejxMoveFo7ZKsYO0L4KUP44X0ql8AMdin7EfMIcY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzjo7mHvDsWgzkrQMS55+kjMvgt10KJx4kV9nqE8PxTKBLmQuGk
+	0zhLCLx+1sJCDOF1KpOYBHSwd08g3hJimFw7kd9YoMNcYKXyapSaetLdk0IYYkZz+i4oHpLwNac
+	VR1cA7uIhizQ0pzMWyw==
+X-Google-Smtp-Source: AGHT+IEQb1u/rfnn1fSyPTU2pPIfyZ5lKsGhAlzX80eQpvo3eWAajg+PF8bqh67MyuBcqLLCXncCH9d2iaL7ubsN
+X-Received: from vsbbq8.prod.google.com ([2002:a05:6102:5348:b0:4af:b35d:162c])
+ (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:2b92:b0:4af:f892:e9f0 with SMTP id ada2fe7eead31-4b3d0f2d8f1mr8447963137.14.1736455795460;
+ Thu, 09 Jan 2025 12:49:55 -0800 (PST)
+Date: Thu,  9 Jan 2025 20:49:16 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20241220013906.3518334-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173645122896.885867.13450184481916964756.b4-ty@google.com>
-Subject: Re: [PATCH 0/8] KVM: selftests: Binary stats fixes and infra updates
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20250109204929.1106563-1-jthoughton@google.com>
+Subject: [PATCH v2 00/13] KVM: Introduce KVM Userfault
+From: James Houghton <jthoughton@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
+	James Houghton <jthoughton@google.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
+	Anish Moorthy <amoorthy@google.com>, Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
+	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 19 Dec 2024 17:38:58 -0800, Sean Christopherson wrote:
-> Fix a handful of bugs in the binary stats infrastructure, expand support
-> to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
-> enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
-> getting a stat that actually exists.
-> 
-> Most of the bugs are benign, and AFAICT, none actually cause problems in
-> the current code base.  The worst of the bugs is lack of validation that
-> the requested stat actually exists, which is quite annoying if someone
-> fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
-> 
-> [...]
+This is a v2 of KVM Userfault, mostly unchanged from v1[5]. Changelog here:
 
-Applied 1-7 to kvm-x86 selftests (x86 wants to build tests on the vCPU-scoped
-stats infrastructure).  
+v1->v2:
+- For arm64, no longer zap stage 2 when disabling KVM_MEM_USERFAULT
+  (thanks Oliver).
+- Fix the userfault_bitmap validation and casts (thanks kernel test
+  robot).
+- Fix _Atomic cast for the userfault bitmap in the selftest (thanks
+  kernel test robot).
+- Pick up Reviewed-by on doc changes (thanks Bagas).
 
-I'll hold off on the compile-time assertions stuff until there's consensus that
-we want to go that route for all architectures (not at all urgent).
+And here is a trimmed down cover letter from v1, slightly modified
+given the small arm64 change:
 
-[1/8] KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
-      https://github.com/kvm-x86/linux/commit/b68ec5b6869f
-[2/8] KVM: selftests: Close VM's binary stats FD when releasing VM
-      https://github.com/kvm-x86/linux/commit/a59768d6cb64
-[3/8] KVM: selftests: Assert that __vm_get_stat() actually finds a stat
-      https://github.com/kvm-x86/linux/commit/52ef723593fe
-[4/8] KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name string
-      https://github.com/kvm-x86/linux/commit/7884da344973
-[5/8] KVM: selftests: Add struct and helpers to wrap binary stats cache
-      https://github.com/kvm-x86/linux/commit/384544c026f6
-[6/8] KVM: selftests: Get VM's binary stats FD when opening VM
-      https://github.com/kvm-x86/linux/commit/6d22ccb1c309
-[7/8] KVM: selftests: Add infrastructure for getting vCPU binary stats
-      https://github.com/kvm-x86/linux/commit/60d432517838
-[8/8] KVM: selftests: Add compile-time assertions to guard against stats typos
-      not applied
+Please see the RFC[1] for the problem description. In summary,
+guest_memfd VMs have no mechanism for doing post-copy live migration.
+KVM Userfault provides such a mechanism.
 
---
-https://github.com/kvm-x86/linux/tree/next
+There is a second problem that KVM Userfault solves: userfaultfd-based
+post-copy doesn't scale very well. KVM Userfault when used with
+userfaultfd can scale much better in the common case that most post-copy
+demand fetches are a result of vCPU access violations. This is a
+continuation of the solution Anish was working on[3]. This aspect of
+KVM Userfault is important for userfaultfd-based live migration when
+scaling up to hundreds of vCPUs with ~30us network latency for a
+PAGE_SIZE demand-fetch.
+
+The implementation in this series is version than the RFC[1]. It adds...
+ 1. a new memslot flag is added: KVM_MEM_USERFAULT,
+ 2. a new parameter, userfault_bitmap, into struct kvm_memory_slot,
+ 3. a new KVM_RUN exit reason: KVM_MEMORY_EXIT_FLAG_USERFAULT,
+ 4. a new KVM capability KVM_CAP_USERFAULT.
+
+KVM Userfault does not attempt to catch KVM's own accesses to guest
+memory. That is left up to userfaultfd.
+
+When enabling KVM_MEM_USERFAULT for a memslot, the second-stage mappings
+are zapped, and new faults will check `userfault_bitmap` to see if the
+fault should exit to userspace.
+
+When KVM_MEM_USERFAULT is enabled, only PAGE_SIZE mappings are
+permitted.
+
+When disabling KVM_MEM_USERFAULT, huge mappings will be reconstructed
+consistent with dirty log disabling. So on x86, huge mappings will be
+reconstructed, but on arm64, they won't be.
+
+KVM Userfault is not compatible with async page faults. Nikita has
+proposed a new implementation of async page faults that is more
+userspace-driven that *is* compatible with KVM Userfault[4].
+
+See v1 for more performance details[5]. They are unchanged in this v2.
+
+This series is based on the latest kvm/next.
+
+[1]: https://lore.kernel.org/kvm/20240710234222.2333120-1-jthoughton@google.com/
+[2]: https://lpc.events/event/18/contributions/1757/
+[3]: https://lore.kernel.org/all/20240215235405.368539-1-amoorthy@google.com/
+[4]: https://lore.kernel.org/kvm/20241118123948.4796-1-kalyazin@amazon.com/#t
+[5]: https://lore.kernel.org/kvm/20241204191349.1730936-1-jthoughton@google.com/
+
+James Houghton (13):
+  KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
+  KVM: Add KVM_MEMORY_EXIT_FLAG_USERFAULT
+  KVM: Allow late setting of KVM_MEM_USERFAULT on guest_memfd memslot
+  KVM: Advertise KVM_CAP_USERFAULT in KVM_CHECK_EXTENSION
+  KVM: x86/mmu: Add support for KVM_MEM_USERFAULT
+  KVM: arm64: Add support for KVM_MEM_USERFAULT
+  KVM: selftests: Fix vm_mem_region_set_flags docstring
+  KVM: selftests: Fix prefault_mem logic
+  KVM: selftests: Add va_start/end into uffd_desc
+  KVM: selftests: Add KVM Userfault mode to demand_paging_test
+  KVM: selftests: Inform set_memory_region_test of KVM_MEM_USERFAULT
+  KVM: selftests: Add KVM_MEM_USERFAULT + guest_memfd toggle tests
+  KVM: Documentation: Add KVM_CAP_USERFAULT and KVM_MEM_USERFAULT
+    details
+
+ Documentation/virt/kvm/api.rst                |  33 +++-
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/mmu.c                          |  26 +++-
+ arch/x86/kvm/Kconfig                          |   1 +
+ arch/x86/kvm/mmu/mmu.c                        |  27 +++-
+ arch/x86/kvm/mmu/mmu_internal.h               |  20 ++-
+ arch/x86/kvm/x86.c                            |  36 +++--
+ include/linux/kvm_host.h                      |  19 ++-
+ include/uapi/linux/kvm.h                      |   6 +-
+ .../selftests/kvm/demand_paging_test.c        | 145 ++++++++++++++++--
+ .../testing/selftests/kvm/include/kvm_util.h  |   5 +
+ .../selftests/kvm/include/userfaultfd_util.h  |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  42 ++++-
+ .../selftests/kvm/lib/userfaultfd_util.c      |   2 +
+ .../selftests/kvm/set_memory_region_test.c    |  33 ++++
+ virt/kvm/Kconfig                              |   3 +
+ virt/kvm/kvm_main.c                           |  54 ++++++-
+ 17 files changed, 419 insertions(+), 36 deletions(-)
+
+
+base-commit: 10b2c8a67c4b8ec15f9d07d177f63b563418e948
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
