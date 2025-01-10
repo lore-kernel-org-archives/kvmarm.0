@@ -1,144 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C650C198A32;
-	Thu,  9 Jan 2025 22:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E2A1A23A2
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 01:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736462339; cv=none; b=uH0H1F3lAh/NkwhWsYZ1o2eHdd/J5zGn/4bh6Oip7StzfhTuQqP73Lxp0KYGuySMbs5PvxljKza0aHp/I7dW3WCmSqqXSSR6BWKx7fHVBLfKZ5+3byB3CP38J1J3iiphazqC48SfnqR+6qrct0A32g8aw63OU3iiaVIOTPPtmkE=
+	t=1736471715; cv=none; b=Y8r8gJ2YSbznR+mqM16FxGkh8r8mQUyY1v2yBrhzFqBnR28WVq4HFL8LT/72oThZjGtu8JCbCbN6DMZsdOg9rWak/5KkdJGnPSokqDWGZqnJfpB1n3pp5iB6/agOm2jPoNAIwMzGQIWWTLiogI/tEMc6nCpiEoQY/lTS71jv07Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736462339; c=relaxed/simple;
-	bh=u9tRbb9joTkBrv5uTYIVoS7cPhgcAnfwGtXhLaCQmdQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fjXda3aHDIvLDBAr3OUtTvYwYxxAVHoxv+hJU08fXgFVDJ46xXRIo+PDypYP9CxJTdgu6G82FuKAixvGfS7vz7k898wb8fDDKmqtxI8NWpIn6VKsMU/Jj2RRpcw3rQRIk1DVa6M+McgqqSpoKy6uh6SQClDUXgwJtCjKhhsVXDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KSPRf2Ds; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736471715; c=relaxed/simple;
+	bh=ZSi0AyJ/RHt8qURQBIV0l6kjFCICQc7I9ltkvIwEkCQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DKQFMHevoiEcNoruY7QcK19TM4l+6rNvU8UnYRoyy+51DZA3zGKNp52Wi7pJdFwLdVvTjLVXsavk+hITjXKHbydVbIF9yGb6Tapv6mGEQDzLiFF4060tTefbobu+4mBeVf+Kmd3uPYxvW1oHDQ4ZmmBN8Gb04e0EpGvRpo2t6fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DNcohnMO; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KSPRf2Ds"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3941EC4CED2;
-	Thu,  9 Jan 2025 22:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736462339;
-	bh=u9tRbb9joTkBrv5uTYIVoS7cPhgcAnfwGtXhLaCQmdQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KSPRf2DsN86DG4BtdFwintfzn/Hd6oIuL3Co8GvBQBja2IgKwhHnvj9SSROXMmHkK
-	 Mwk+ngmqryvXqhslWgGN4ulJO+XOERp/Bjz83qNgZ8TBhVXh4yrWQeOSIOJoG2GymG
-	 b21TrnGWGlKQnH3URURfRxFjIBDftL5AwZbZYPQCgPfpQofo1MnYPLz/oIp6+xLBLl
-	 qtxBmuAasWS0ZAHQJIxQUykAX7ISOM8yyLJ7lNEwb+vXc3MQdWOxu141qlC/jZ6pDu
-	 AIupBZSxeOIAQkKpBugrkuTZHH3Ld0/BuFxrpGCm+EaUr/MJiucpbFcpV1mylbdIOB
-	 xjk21aA+dxGTw==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
-Date: Thu,  9 Jan 2025 16:38:36 -0600
-Message-ID: <20250109223836.419240-1-robh@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DNcohnMO"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9b9981f1so3914744a91.3
+        for <kvmarm@lists.linux.dev>; Thu, 09 Jan 2025 17:15:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736471712; x=1737076512; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7VwFFFatQRWj4k7jYl4E+a9CzYdFY2Mg+JsqSac4RoA=;
+        b=DNcohnMOgYKZ4JHVlq9heoXpnoTQca/+LtyuDQyB4sLzHUpJjiE8OyKHfKBYZYbY4B
+         XSavwuy+1wUgHoq8ov2c+vNjZqnZTQwghLxqQnJI7IeeS4er9Ou49GDsgIJhjW5GWhhO
+         FSa+VZeml/zsICiYbh9je6NpGnLUr9+Owc17R/On0HDKTkxBuNOewjBBVsLHbBljU195
+         pmOOY69C+R2LzXdfsZHSqkWBr6LjtiqUH6rKctP/e+8XI9fdIa+jvQq1pWUuRowTby/W
+         lXilVJip0Xju++FKGuicPzEAW8DkIN3ctqs6H5G9fAnLZr/2oVrwd+J+TRi9OVG7nPQk
+         MEtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736471712; x=1737076512;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7VwFFFatQRWj4k7jYl4E+a9CzYdFY2Mg+JsqSac4RoA=;
+        b=dSc1Zm5CY6lgkLckaggsEZtWB1BRUHROJo0RtYLao6WXjdIaCqdfLO5N14yRiHrYKj
+         bYK4dXDGESFe0IUPm3D0sI83PSS6WnI8lCP8d0fRHKjg8AcHx/fn+NGvOoQxbysxi05S
+         e+aWLeug1jcDj9zIRAIvTrt0mNbcIH3nxZyAXzF4nNhPwI4oQST7OGOmuQ8szFjTFuPC
+         06G5IFqLE/Zq2HY79osZBWNuz0Sm6pOJeDxIXIqXtTtUMzR8HxpVUUNtGUf0H4pyHBjp
+         xcfGVSF42A2F+kJrsmyqKNtaazPgjWiYoCzEKU8R5FE8rDUCM8uqP4s/haniXrsYgOU+
+         76nw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUXvwKgfDI2REUx2j26Lq5TgFwESt91RCLPiETo+BDC1Ts9XF2Mj75Z5E0v36O48mxuUnefSc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwCiAPYwt5lKPJHoBwbMn8iBUzyEEcQkTSZMDUQeS8Lcff/OMdH
+	WoLm+LIe/upN/8yK4Np+16VK+6qNnrtxgggCY/9Dd3SXllaRiAKwi63XwI543urbNEv+b7mUxCE
+	ibA==
+X-Google-Smtp-Source: AGHT+IHAhOQ1hNL+2ODVngM4YtoUZlDh3MWUPi4xjwAS/ekbAexZ0ECdQPoeafSTa9dwqEUdAQpSzA4aRUA=
+X-Received: from pfiu8.prod.google.com ([2002:a05:6a00:1248:b0:72d:35ed:213f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:e83:b0:725:b7dd:e668
+ with SMTP id d2e1a72fcca58-72d2201700cmr11665849b3a.17.1736471711800; Thu, 09
+ Jan 2025 17:15:11 -0800 (PST)
+Date: Thu, 9 Jan 2025 17:15:04 -0800
+In-Reply-To: <173645122896.885867.13450184481916964756.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20241220013906.3518334-1-seanjc@google.com> <173645122896.885867.13450184481916964756.b4-ty@google.com>
+Message-ID: <Z4B0mJOwH6xGjuZ6@google.com>
+Subject: Re: [PATCH 0/8] KVM: selftests: Binary stats fixes and infra updates
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-From: Mark Rutland <mark.rutland@arm.com>
+On Thu, Jan 09, 2025, Sean Christopherson wrote:
+> On Thu, 19 Dec 2024 17:38:58 -0800, Sean Christopherson wrote:
+> > Fix a handful of bugs in the binary stats infrastructure, expand support
+> > to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
+> > enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
+> > getting a stat that actually exists.
+> > 
+> > Most of the bugs are benign, and AFAICT, none actually cause problems in
+> > the current code base.  The worst of the bugs is lack of validation that
+> > the requested stat actually exists, which is quite annoying if someone
+> > fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
+> > 
+> > [...]
+> 
+> Applied 1-7 to kvm-x86 selftests (x86 wants to build tests on the vCPU-scoped
+> stats infrastructure).  
+> 
+> I'll hold off on the compile-time assertions stuff until there's consensus that
+> we want to go that route for all architectures (not at all urgent).
+> 
+> [1/8] KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
+>       https://github.com/kvm-x86/linux/commit/b68ec5b6869f
+> [2/8] KVM: selftests: Close VM's binary stats FD when releasing VM
+>       https://github.com/kvm-x86/linux/commit/a59768d6cb64
+> [3/8] KVM: selftests: Assert that __vm_get_stat() actually finds a stat
+>       https://github.com/kvm-x86/linux/commit/52ef723593fe
+> [4/8] KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name string
+>       https://github.com/kvm-x86/linux/commit/7884da344973
+> [5/8] KVM: selftests: Add struct and helpers to wrap binary stats cache
+>       https://github.com/kvm-x86/linux/commit/384544c026f6
+> [6/8] KVM: selftests: Get VM's binary stats FD when opening VM
+>       https://github.com/kvm-x86/linux/commit/6d22ccb1c309
+> [7/8] KVM: selftests: Add infrastructure for getting vCPU binary stats
+>       https://github.com/kvm-x86/linux/commit/60d432517838
 
-The Branch Record Buffer Extension (BRBE) adds a number of system
-registers and instructions which we don't currently intend to expose to
-guests. Our existing logic handles this safely, but this could be
-improved with some explicit handling of BRBE.
+Argh, apparently I only tested this series on platforms with high RLIMIT_NOFILE
+values.  Creating the stats fd for all vCPUs causes kvm_create_max_vcpus to fail
+on some of my systems due to doubling the number of fds needed.
 
-KVM currently hides BRBE from guests: the cpufeature code's
-ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field, and so
-this will be zero in the sanitised value of ID_AA64DFR0 exposed to
-guests via read_sanitised_id_aa64dfr0_el1().
+One option would be to figure out a clean way to avoid creating the stats fds
+for barebones VMs, but x86's recalc_apic_map_test also fails.  That test creates
+512 (max "supported" by selftests) using vm_create_with_vcpus().
 
-KVM currently traps BRBE usage from guests: the default configuration of
-the fine-grained trap controls HDFGRTR_EL2.{nBRBDATA,nBRBCTL,nBRBIDR}
-and HFGITR_EL2.{nBRBINJ_nBRBIALL} cause these to be trapped to EL2.
+Doubling the rlimit from 1024+100 to 2048+100 for the max test doesn't seem insane,
+so my plan is to move the rlimit twiddling into common code, and then account for
+the vCPU stats fds.
 
-Well-behaved guests shouldn't try to use the registers or instructions,
-but badly-behaved guests could use these, resulting in unnecessary
-warnings from KVM before it injects an UNDEF, e.g.
-
-| kvm [197]: Unsupported guest access at: 401c98
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 0), Op2( 0), func_read },
-| kvm [197]: Unsupported guest access at: 401d04
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 0), Op2( 1), func_read },
-| kvm [197]: Unsupported guest access at: 401d70
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 2), Op2( 0), func_read },
-| kvm [197]: Unsupported guest access at: 401ddc
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 1), Op2( 0), func_read },
-| kvm [197]: Unsupported guest access at: 401e48
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 1), Op2( 1), func_read },
-| kvm [197]: Unsupported guest access at: 401eb4
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 1), Op2( 2), func_read },
-| kvm [197]: Unsupported guest access at: 401f20
-|  { Op0( 2), Op1( 1), CRn( 9), CRm( 0), Op2( 2), func_read },
-| kvm [197]: Unsupported guest access at: 401f8c
-|  { Op0( 1), Op1( 1), CRn( 7), CRm( 2), Op2( 4), func_write },
-| kvm [197]: Unsupported guest access at: 401ff8
-|  { Op0( 1), Op1( 1), CRn( 7), CRm( 2), Op2( 5), func_write },
-
-As with other features that we know how to handle, these warnings aren't
-particularly interesting, and we can simply treat these as UNDEFINED
-without any warning. Add the necessary fine-grained undef configuration
-to make this happen, as suggested by Marc Zyngier:
-
-  https://lore.kernel.org/linux-arm-kernel/86r0czk6wd.wl-maz@kernel.org/
-
-At the same time, update read_sanitised_id_aa64dfr0_el1() to hide BRBE
-from guests, as we do for SPE. This will prevent accidentally exposing
-BRBE to guests if/when ftr_id_aa64dfr0[] gains a BRBE entry.
-
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
-Based on discussion with Marc, I think this doesn't need to wait on BRBE
-support in perf, so sending it now by itself.
----
- arch/arm64/kvm/sys_regs.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 83c6b4a07ef5..bc91ddc75487 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1806,6 +1806,9 @@ static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
- 	/* Hide SPE from guests */
- 	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
- 
-+	/* Hide BRBE from guests */
-+	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
-+
- 	return val;
- }
- 
-@@ -4972,6 +4975,14 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
- 						  HAFGRTR_EL2_RES1);
- 
-+	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP)) {
-+		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_EL2_nBRBDATA  |
-+						 HDFGRTR_EL2_nBRBCTL   |
-+						 HDFGRTR_EL2_nBRBIDR);
-+		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nBRBINJ |
-+						HFGITR_EL2_nBRBIALL);
-+	}
-+
- 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
--- 
-2.45.2
-
+I'll drop the above commits and post a v2.
