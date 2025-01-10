@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAE420E6E9
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 13:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB70420E6E9
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 13:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736517566; cv=none; b=iTK5CwMTObrjxBBWXlEuE8P4fLvTi3qsrowpnEWtLWkVOC2iHDqGkSG1K3PT0Efgo8SySdyDDlOP8d7RYDpAvaxoeM8vWCDnLjxaNSLRH7b0K7at6ZEtQflSUxunCvo+vzdbDL94LwlOeDZcNvFEv9f2wK3CQ6VT+ovxJJQuOWM=
+	t=1736517570; cv=none; b=Uv3rJTD44UetYmiokeKpl90+qnjQqGNXBmRNyVBl1uTEWiVur/Rj1oeuA8oATxUkjVltwjctr2/ecOuKmtOxZhvAII/SHyQ9QfuCKDUUEGe0vU+wFtTcyP8VUi387GPvQaVAr645Nhhh6fjhJpOgcUze69hlPxfGBomqoiR/u2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736517566; c=relaxed/simple;
-	bh=udBxpb3HOOOvvPrarp7g6N5TtQvw/QJWWhnlFNSSzO0=;
+	s=arc-20240116; t=1736517570; c=relaxed/simple;
+	bh=I0jxUxeeWcFKjR2yLCSseqwrOP6basArqiRUBOV0EBM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FoSEuq/q72A2LQo+pC9v8uOVNPhg7/rBznRakW7tK6dAvKHMoJGh+rH7uS4H+NuV3pcOP3DmPvJBnUAwlJchieBBxa5Cf0SZ2cIZOx8G2CP1XknoPNi73FosX2bSe+d3WYsNULXfGcx9jYwsu6JEfhZ2vzueduYVkZLdDT006Z0=
+	 MIME-Version; b=eu5YUd2sozXe8R3POpTdjeQbSjeIeXJwxy/auKI8SwoQ8z2U1eosSqJeAZK/BLrMtIs+NX09UkF+sH0pLx1QcqOuubKUTVeL5SBEORUmq3zU9GWSGUxtER62D3JOrRnMOIFMZRq7IPQ3TBXe1jWjYw6wWhU3YopLiUs6b8acOzg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 170421FC4;
-	Fri, 10 Jan 2025 05:59:53 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8033A1FC7;
+	Fri, 10 Jan 2025 05:59:55 -0800 (PST)
 Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5CF83F59E;
-	Fri, 10 Jan 2025 05:59:22 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A6DF3F59E;
+	Fri, 10 Jan 2025 05:59:24 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: andrew.jones@linux.dev,
 	eric.auger@redhat.com,
@@ -33,9 +33,9 @@ Cc: kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org,
 	vladimir.murzin@arm.com
-Subject: [kvm-unit-tests PATCH v1 3/5] arm64: Implement the ./configure --processor option
-Date: Fri, 10 Jan 2025 13:58:46 +0000
-Message-ID: <20250110135848.35465-4-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v1 4/5] arm/arm64: Add support for --processor=max
+Date: Fri, 10 Jan 2025 13:58:47 +0000
+Message-ID: <20250110135848.35465-5-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250110135848.35465-1-alexandru.elisei@arm.com>
 References: <20250110135848.35465-1-alexandru.elisei@arm.com>
@@ -47,49 +47,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The help text for the ./configure --processor option says:
+For arm64, newer architecture features are supported only on newer CPUs.
+Instead of expecting the user to know which CPU model supports which
+feature when using the TCG accelerator for qemu, let's make it easier and
+add support for the --processor 'max' value.
 
-    --processor=PROCESSOR  processor to compile for (cortex-a57)
+The --processor value is passed to the compiler's -mcpu argument and to
+qemu's -cpu argument. 'max' is a special value that only qemu understands -
+it means that all CPU features that qemu implements are supported by the
+guest CPU, and passing it to the compiler causes a build error. So omit the
+-mcpu argument when $PROCESSOR=max.
 
-but, unlike arm, the build system does not pass a -mcpu argument to the
-compiler. Fix it, and bring arm64 at parity with arm.
+This affects only the TCG accelerator; when using KVM or HVF,
+kvm-unit-tests sets the cpu model to 'host'.
 
-Note that this introduces a regression, which is also present on arm: if
-the --processor argument is something that the compiler doesn't understand,
-but qemu does (like 'max'), then compilation fails. This will be fixed in a
-following patch; another fix is to specify a CPU model that gcc implements
-by using --cflags=-mcpu=<cpu>.
+Note that using --processor=max with a 32 bit compiler will cause a build
+error: the CPU model that the compiler defaults to when the -mcpu argument
+is missing lacks support for some of the instructions that kvm-unit-tests
+uses. The solution in the case is to specify a CPU model for the compiler
+using --cflags:
+
+  ./configure --arch=arm --processor=max --cflags=-mcpu=<cpu>
+
+This patch doesn't introduce a regression for arm when --processor=max is
+used, it's only the error that changes: from an unknown processor type to
+using instructions that are not available on the processor.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/Makefile.arm    | 1 -
- arm/Makefile.common | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ arm/Makefile.common | 2 ++
+ configure           | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 7fd39f3ada64..d6250b7fb686 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -12,7 +12,6 @@ $(error Cannot build arm32 tests as EFI apps)
- endif
- 
- CFLAGS += $(machine)
--CFLAGS += -mcpu=$(PROCESSOR)
- CFLAGS += -mno-unaligned-access
- 
- ifeq ($(TARGET),qemu)
 diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f828dbe01d33..a5d97bcf477a 100644
+index a5d97bcf477a..b757250dc9ae 100644
 --- a/arm/Makefile.common
 +++ b/arm/Makefile.common
-@@ -25,6 +25,7 @@ AUXFLAGS ?= 0x0
+@@ -25,7 +25,9 @@ AUXFLAGS ?= 0x0
  # stack.o relies on frame pointers.
  KEEP_FRAME_POINTER := y
  
-+CFLAGS += -mcpu=$(PROCESSOR)
++ifneq ($(PROCESSOR),max)
+ CFLAGS += -mcpu=$(PROCESSOR)
++endif
  CFLAGS += -std=gnu99
  CFLAGS += -ffreestanding
  CFLAGS += -O2
+diff --git a/configure b/configure
+index 138840c3f76d..46964d36a7d8 100755
+--- a/configure
++++ b/configure
+@@ -67,7 +67,10 @@ usage() {
+ 	Options include:
+ 	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+ 	                           arm, arm64/aarch64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+-	    --processor=PROCESSOR  processor to compile for ($default_processor)
++	    --processor=PROCESSOR  processor to compile for ($default_processor). For arm and arm64, the
++	                           value 'max' is special and it will be passed directly to
++	                           qemu, bypassing the compiler. In this case, --cflags can be
++	                           used to compile for a specific processor.
+ 	    --target=TARGET        target platform that the tests will be running on (qemu or
+ 	                           kvmtool, default is qemu) (arm/arm64 only)
+ 	    --cross-prefix=PREFIX  cross compiler prefix
 -- 
 2.47.1
 
