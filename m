@@ -1,60 +1,60 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2041.outbound.protection.outlook.com [40.107.94.41])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2064.outbound.protection.outlook.com [40.107.101.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A952624B25D
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 21:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE21192D9E
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 21:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736543051; cv=fail; b=EoljMmw5y8jYKsbydqfUn+DAGvQeurDHOv6i99oaC5n1FCFErTOVpSHrzBTJqQAUZUtJpabB2gjhPHB29oE7GcAyVQMnxdRZ03AdiiheIVwahuJQC2U2xkygQXPJLpYuuE3Vr+3fDalvqu2Jl9YDg3M+8vDewFLsZI25yJv57pA=
+	t=1736543759; cv=fail; b=iYuaiXTM/dVzIQXduZQnXH5EvTqOcLSXN3dszRc3SX8FoanSgK3tfE5MklpD07taN7CMvd+eA8nxhOHUrchfVieIkFzYkOgRYpOf2ANkCbsNcX+aEiPjZdKnNufavFhdq1aA0pDjokA0d/BRxTHa0h0doar8QPTselFoRusGYy8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736543051; c=relaxed/simple;
-	bh=DcDHt+iH8LMg+eXhtJ63HunM1FQy0MLLHA+JCCh54Zg=;
+	s=arc-20240116; t=1736543759; c=relaxed/simple;
+	bh=yAREwn/49E5+0U1ZKvnogPwAwFJFrHKMvvmO3SAbc/0=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E5ZIXiXVbjOb2ZUmLADGa0CjB4zxZyLoo9BRCWnoK3JZWmurc23PbUNTbGjxRf9lMuQVZvE07somTW6JjENWJY38F4HSD5UtQ0rpitPtuVD0M65jTrKO/hfAWpbKo0jMFoKLXOF6d9FXUjHMfaxvCCPY0L+UoNwhwLcCcSOnESk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rB5Rx2Eb; arc=fail smtp.client-ip=40.107.94.41
+	 Content-Type:MIME-Version; b=G8x071x+kW/0Lp9jCdxh0JFwOL/M9rPaCnDYjvYJ9LocSLy2okjd42pHcLSnceUXK34AIhn4R/CO7bJoPtXAjY20fDpMhgA8F1H3fG0CXeNlDkTJxTiFVSH+qf2zcNrW5lIJjo6bHw1UfuW4duJbJ6a6vrnkTX5XG9ySBHSLbkE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OP/YaxD3; arc=fail smtp.client-ip=40.107.101.64
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rB5Rx2Eb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OP/YaxD3"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=h6k7CWckVZsJL5hHHxzTaNVjwSoS18F8BHEXhF5qCaZ3V29qniiGindxdMKbXyihwy3Mce1Yrb4fch7tCmKPwZVDt5yNvq/E730CdcXG4h6xAM2q18Wi3qMSb+nVuAtqchznkd4oD5G0y1zvrlamarKBEcp0ii7wS6iiTn9PlAU332dTqTfmq5Y+geDRRT6xNlgf7qevROnNqMD+YJ8eq/ziuzC2RS5KV98/JVkIwka5Xhw1/6TBQ4u6rIeCitxedoV+FUOk/bIsCXVd014SrB9fB7P3VqnJ61EiaLBIowFSK2mE5CsDSLMxCskhluukxGG2w0UdQu8XGWNyowSnbw==
+ b=VweRW55kZibxKQkdEjrxkFVt3qktuYuBvahfowvUDZx8RQazGaZnQE2eFstLd+uW0Jo6wVKb+DiNcCxXAgHOy8UOTgmvd72C+khbStM3zZHKo3rH1wPT7btCL3ooFWcUqXso+JIIVhBF71QqF4kn6YfwrIHIs2m320UwNkLWHIcG8VGNOibfUrhAPrcHz9kKXLZZd67bBp5N/MVSGmCKIOPZx7v8h8vpk1gyoYri7fRSz7Oz+BAgRlBrJ+d4Oxez0DdQWLAk0CBYcANQmhs+p+myYRcV9DjUkTE1LtCCmU5Z3Dy016cmEEdQLcA0Zki0Frn2EL4BSrmPA6dCfwOG9Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DcDHt+iH8LMg+eXhtJ63HunM1FQy0MLLHA+JCCh54Zg=;
- b=FMMTPbk9sya6F1RyUQHrHQG5tFC4BdNU8nZxueMeZpL/IdOT0GH9MoJIYvoDu93zVdrb58sz99Fu3MJts/wQz0oQJSPqseq1R40kUHpZU2jJSX7XPtXpxftjQJ4ZhWotCmLlKL7CDUscCjwwzclGnDQd1pcEu9Fva629V5PggqliR3CySYnIWpTUc0idTSmpURdfMEibSi8yybr9/4LCjz3vA1b/wI0OF0GyN/3lZGnc2c5PoUx0J971XNkCR+Zq26sTGTx+AQiNl6bw+vhK7Wo47d+r1Bm6N1PdLaKcg64uRvSAhKG4XTjtZnCcEPz8IxifS/yWx9f1PSQ3smWqPA==
+ bh=yAREwn/49E5+0U1ZKvnogPwAwFJFrHKMvvmO3SAbc/0=;
+ b=UXUAEIpLESQmpFY9RxuphiiwBvoarDf7kNnWn6y20TUXtTKh+3XbAFOpUUa4/jmPDZVa2XlNrtMXVZyZlw5hEONRIWxTBoxWwUV7Ds6nkZkJ45ncdi4QV0yvQ9IKZAKSWP3EiW6S87pC0P+nuEOIcULD7S6xAhkox9RYN2H4xWkHwCVebKk//eBCp5bdt87bI0ABncn4SQeFBducLlcZ5YCzyf7BSQDinhMHzk6jE4z4k3EFuj8lsPPrlzTmoTlE9MkrH3O4HDfzfz83U1uU/XJmMZnsfgMguBBbd4vvO5zI75M39nNKwWhhFcqYJK9hARfe2D5KsYwwkz31z+l+mw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DcDHt+iH8LMg+eXhtJ63HunM1FQy0MLLHA+JCCh54Zg=;
- b=rB5Rx2EbNJLckdTAhgYP7RE0F+6msNkNrbKCk/xKVTlIoiSZPF7V3dmd8AdrLHQrPnXYCVlF7NdXY8uefGhe1v8Zb8jbcQVF0pVLU4RPXaXyUuMy5FMELALYPXqquTKlzNPuOqZmTb9z7ppzidg7aUM75lYyrPJbr/s/yeiElDOD0x4EMigWer2TMatAcKucCFK/nUyuDPmnZvby3t24Vvb8srZ+cBIGVMkWOEPnvehfXESAbxXvWhhrHB17ioj79nJtO4G6fXj4XgNwOhOBLIJsv93vAYogWJxXRFV9uVzXUJD4oEw1kOm4tuWjwbQ8qQEh+4PKzaV4kM1b9hi3VQ==
+ bh=yAREwn/49E5+0U1ZKvnogPwAwFJFrHKMvvmO3SAbc/0=;
+ b=OP/YaxD3GuchszFv6unA/SHWoW2k8JKw1DVHSDj2qdQ7ckvG4lvTbYZB1SNTsG6yTVSVt9zfJIggymthe/lcf0k+cYlCczzPLJfvCKoBgSM4/69Oo8gAB6xSgvNWhrTkNzVzLQKu9Wxiy92oYF5TqDcCtDUPyDiZOy8/GWSh1oEDMG73ZXhTS1X4IlJTPzo/9j7B9aIzvVbf+DYZe8IOdzv60ho52ao6w9Oei52xJS7Q9r7R0hkR9/YcNYgsHlc4Mm1Bg0g0n7d6WX18LRy+kOMR80x6F1s6Om2yw+lOMyAgKi8eNF+9OYFSp2HIFbD/k1q4wTYRBzE8UavEfpgmsg==
 Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
- by DM6PR12MB4060.namprd12.prod.outlook.com (2603:10b6:5:216::15) with
+ by DS0PR12MB7927.namprd12.prod.outlook.com (2603:10b6:8:147::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.14; Fri, 10 Jan
- 2025 21:04:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.11; Fri, 10 Jan
+ 2025 21:15:53 +0000
 Received: from SA1PR12MB7199.namprd12.prod.outlook.com
  ([fe80::ae1b:d89a:dfb6:37c2]) by SA1PR12MB7199.namprd12.prod.outlook.com
  ([fe80::ae1b:d89a:dfb6:37c2%4]) with mapi id 15.20.8335.010; Fri, 10 Jan 2025
- 21:04:06 +0000
+ 21:15:53 +0000
 From: Ankit Agrawal <ankita@nvidia.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-CC: Jason Gunthorpe <jgg@nvidia.com>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com"
-	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "will@kernel.org"
-	<will@kernel.org>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>, "lpieralisi@kernel.org"
-	<lpieralisi@kernel.org>, Aniket Agashe <aniketa@nvidia.com>, Neo Jia
-	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
- (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy
- Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, John
- Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, Zhi Wang
-	<zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>, Uday Dhoke
-	<udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+To: David Hildenbrand <david@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>
+CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>, "ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>, "shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Aniket Agashe
+	<aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
+	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram
+ Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, Alistair Popple
+	<apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams
+	<danw@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
 	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
 	"sebastianene@google.com" <sebastianene@google.com>, "coltonlewis@google.com"
 	<coltonlewis@google.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
@@ -69,13 +69,16 @@ Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
  VMA flags
 Thread-Topic: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
  VMA flags
-Thread-Index: AQHbObyY4gofHx3CJE6tGYAUqrUkhLLhvSCAgC7sTkE=
-Date: Fri, 10 Jan 2025 21:04:06 +0000
+Thread-Index: AQHbObyY4gofHx3CJE6tGYAUqrUkhLLveBuAgBrLBoCAAxi2gIADd6/9
+Date: Fri, 10 Jan 2025 21:15:53 +0000
 Message-ID:
- <SA1PR12MB7199AF5268C8384F9DAE3B50B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <SA1PR12MB7199E3C81FDC017820773DE0B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
 References: <20241118131958.4609-1-ankita@nvidia.com>
- <20241118131958.4609-2-ankita@nvidia.com> <Z1oL1yZtdvGUIW9h@arm.com>
-In-Reply-To: <Z1oL1yZtdvGUIW9h@arm.com>
+ <20241118131958.4609-2-ankita@nvidia.com>
+ <a2d95399-62ad-46d3-9e48-6fa90fd2c2f3@redhat.com>
+ <20250106165159.GJ5556@nvidia.com>
+ <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
+In-Reply-To: <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -84,71 +87,71 @@ msip_labels:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|DM6PR12MB4060:EE_
-x-ms-office365-filtering-correlation-id: 8234d61a-4a62-4f34-c7e1-08dd31ba51c8
+x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|DS0PR12MB7927:EE_
+x-ms-office365-filtering-correlation-id: 96ec3086-c664-4a7c-24c6-08dd31bbf734
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
  BCL:0;ARA:13230040|7416014|1800799024|376014|366016|38070700018;
 x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?nLUH98J6SAzXtOx7U8Sz3WdxRoijR2Lh407f/F2VT1rhMFjFmOFJfCDJKb?=
- =?iso-8859-1?Q?FO9wCDz+D42CTQMMr7eM38i+DmJVYGJ80ayXvOQctIusNT7a+h5cl+ZRcu?=
- =?iso-8859-1?Q?xHv6guqeeH2+St6HaZclNg2d7jCYNoNdC+ECxKeCqvY/2V+mons5u2/5PY?=
- =?iso-8859-1?Q?ECbjfH0ka5iuiQ2YlbQOt/u9JsSJQHH6wAG6+xB5YY/94MyNii6/qabZu+?=
- =?iso-8859-1?Q?62r4Y6SKkxFgw5wAXMzVbNizPs74UWI/SqPknZlI9y6BVodKE/cpuj55F1?=
- =?iso-8859-1?Q?wDGRbq63f3aN+jwJyzcj60c2LzR5jVhxyZ4GCvhB+7m/iNUJDVKPLaCaML?=
- =?iso-8859-1?Q?Y5T82y06YvIsgKviKMLOJYth/wWWUxcWDueA932KlgZAegxL1NAQrdYMTa?=
- =?iso-8859-1?Q?rPJMYRitMb+6etc2FPVs57bbii5qlRr+EiT9X+WZlQ7fIhsRqWMRy7Rigx?=
- =?iso-8859-1?Q?T+vKzGfPCLnvdCfpxQR3PFiE51lnc29Pv+mQDPpSIq/NKhNsUGgfytP/Lb?=
- =?iso-8859-1?Q?571zeBd83SMeu/VOlpcLi7ZKhosMN2hgj94LDvPXPXzBUDjUYe91cUitS1?=
- =?iso-8859-1?Q?5x8LqL1QEvhQUHdWKrB+Tg/BIIHkBmJ6YNC6hyC5vnQwWHJ0wglYbwHBEf?=
- =?iso-8859-1?Q?2RP5U/vIZy/AWhgsmZUMV1fpclaukQkKDgtzaTXnk0ZRYfspz4TysJH2Vq?=
- =?iso-8859-1?Q?tUFPbO3UDBg92LlaBQ8Y/VwjKZRGSdKxW9BA8Wg7LCldmxM90ZX6TPKPPb?=
- =?iso-8859-1?Q?cyGRuGfz7ZhlVTW5XRgboJz59UyW4XsqzyKup28UTNgu0TR++GzPiv7VQw?=
- =?iso-8859-1?Q?39F5+hpCJE7yD5/lrqAndSeyjqnKDclGkjGShKdwPV4vUHp41H8u/J3qaj?=
- =?iso-8859-1?Q?iR6IdoiZGatbKFKBny6ZhToT68aut/DOmbVso8wfZ44MBt6I6Fp8uWHTNw?=
- =?iso-8859-1?Q?I62MYWlUr3G/gu5F4YEmxx08B4dtGL3b47RtMWzeiiJb7jUGKKn8V4ekSf?=
- =?iso-8859-1?Q?QkaI3hqJH7iMWZLjkE0JghkKqrgu4YAvsySMHr2JmkDSGHhzjZG3OItp9C?=
- =?iso-8859-1?Q?Nrr0jhn3H586EpJmVnM0X0SSnRLqYW4sr31vCV7h/1SsOQJNZXJz+TUJIN?=
- =?iso-8859-1?Q?5Fbc2uv3ynn8zaLFiWgB5idLHRu3oYWUbF/pDL5ISJU4FnjY2Z5TxHl9/p?=
- =?iso-8859-1?Q?/XydCAFyxT/ZXnR7RA21/tmLaBip4ebXLGDe50nIdcOzrv7KBETKCkeDw6?=
- =?iso-8859-1?Q?M8NirgBtzJMWhYfdfRTjb/G/ylbJUDU0Hm9xlwH5cR/A/YpfmqGtvJ5FTP?=
- =?iso-8859-1?Q?pUKinyCD7t/QPU6X/00cBl/t15I05zTeh2eOeFwi0ZLR4ad84B0v4jmG4E?=
- =?iso-8859-1?Q?7BPAGu/glIb+yKZG8EpXPswyJmXOl0frun1zMYqKm2OwqHwDQvddLjQgnh?=
- =?iso-8859-1?Q?fjljKdPjcqhfwPMCLtq+i5SjyBheM/SQKiossN2Y879ZzK6q+4hOsSJLdG?=
- =?iso-8859-1?Q?Akjlt+9CS7EjrdlmYYMSd3?=
+ =?iso-8859-1?Q?5M/R/jISvg8Q05mnSkmsF9qwpIqg5djl+mBbERHIB+WVXX9jnHwXvVVaIp?=
+ =?iso-8859-1?Q?Jp7ALGYoSbeznWHOlTdTFTGJUta+XPQA3ADL/hui68RvbIYl4WxxZmfI6p?=
+ =?iso-8859-1?Q?7+gXZ8KPO5mbSc7MUfetoeVfTtK8kcHTsx6ZvlhYkOMj+RuvIv0pBilGOe?=
+ =?iso-8859-1?Q?r3g9cvWd9Yr5z9R7mCZkikKyIh8cMl0cZIP9P42rEUdOp0RdMC2JfQ/Hil?=
+ =?iso-8859-1?Q?JCr9ihKmpk/mrxplj53barToBNeYeTTtiJx0YwSosGnhDmnCQeBt0huD/N?=
+ =?iso-8859-1?Q?UI50ZqA7+rl2JoLoBbe0/AOMUXEot6vAFib8gObA7d8Z7Vqc3c/jbTSo7y?=
+ =?iso-8859-1?Q?U9V7C2F0KjxUF5Qgp1zEe20d/0g6x6wjuWAIaN/HcjxliR2ktPVxjOv1oX?=
+ =?iso-8859-1?Q?BNTxklFwQM9+cpk5Nsv0ZJbG3oDUOIFNGH64JM66v3mBQgw+IAWwZFQt59?=
+ =?iso-8859-1?Q?WQXKUbfTMm+z6A3go7eneP3q9/r+pbiQS3hTuD2bUqSRkrweXeRgnsKuFt?=
+ =?iso-8859-1?Q?e4RwN8u+VjnY6N4zNQFiqOeZz64wUGDdaRWIi3+GTj7NKKeEplFS9JEzdP?=
+ =?iso-8859-1?Q?uh+ZoKPJoe6gzYSmHMQDD4Iy4fetEkq6QFaL79QMtmdDOz1vahpS40TLFy?=
+ =?iso-8859-1?Q?G9duhSQ1WKVPO0j11VZSVDnzkZiKFZXCdSjtTh2oF1A3fBdPLIkpDMJx15?=
+ =?iso-8859-1?Q?ZdVs0+MelGBaHv7WIj/DHkqpIPiZSezKDGK/TSi8QpRX1YXpIcmJLntF85?=
+ =?iso-8859-1?Q?8BkJqo/Y/ZojMCIecFXTz6CGgIga1CLbXZ4PdaA9FptBIYOZt7P/ho4t2+?=
+ =?iso-8859-1?Q?8aY5GSLgyhGT2Bd5IUOem5RBXlHgc4X054J28MAExG+C1/zqZ9gSknlKMR?=
+ =?iso-8859-1?Q?Vx7OVBssaV5wVzqhmBqnqHQe6ZjtD7WkL4YlulHd7G8hgeVrgN8UDKwzCQ?=
+ =?iso-8859-1?Q?YMGKf/xd4XrGyKLvpiiuFsXu/gHM6lhDANjCvnD16LIQHXjVqQF9RZ5dcn?=
+ =?iso-8859-1?Q?mdjm2Q+uJBfoasCGONgCp+PYMMbnKOaeqaKVcDE0P/+Jnp9OHXx4Gf+rO+?=
+ =?iso-8859-1?Q?qR+JqYdJUwsAdpCdacAvUsFUm3cLZjltZEowhpcWiHC0HhE92yLap61LaV?=
+ =?iso-8859-1?Q?iZ1ijzSHiY79fM7zMfZnNttiJvxBkhK1fol8y2u8DLnmuPmPKIUVfAmqgF?=
+ =?iso-8859-1?Q?5PtrrVJivDSq90HPeaENtEAx2uxldtSkLLcmn8mzEPa8JOh61SzfNarY9W?=
+ =?iso-8859-1?Q?BWK6TTOlA2YspDwNhd7FAZqUZMSgkCv3gXY11IYXdz/zxlZU71yrsBYg9V?=
+ =?iso-8859-1?Q?lcx+yi0fIx66yxPhO/1H8OxVoGpv+UpjiJL/P1NT7sJSVU0TorCRyoUoen?=
+ =?iso-8859-1?Q?Ei1QuxG7t9ylMh0dyQynoDuQ50Peodz3oAys0Hhea6/0mKbFQi2URvkSQ8?=
+ =?iso-8859-1?Q?23UoquC9Qp0y//E6oVJLxZNhC+C1GwaHQ9LTAV+tvH/WyioDXxJUTTNDPc?=
+ =?iso-8859-1?Q?4vQj266FuhWsmRUgzdUIm0?=
 x-forefront-antispam-report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?WtkAmijE2lkL94XPoLhZoXZ7OTXRFy2Ss+SfiF+AnwgVzKUHC/zh/w+8XC?=
- =?iso-8859-1?Q?63D/530B9CjNGZmwK038OD7dnS+cJaktoxAXlCYmzj0N4Sy8g6AA7jdoXX?=
- =?iso-8859-1?Q?fhxapjupiSe7TREixJWdIu29rFCNO2O3rTKgnjaYF90FJeuA+WMZebv1yv?=
- =?iso-8859-1?Q?JDd2nysfrlCM5ewwneuoJuHr8fp4oe3eu0N8AdEUV6KatwfZMN4CMPwD+I?=
- =?iso-8859-1?Q?eFZ3PhF3gugwWH6HxdKJHsuJCK7izqBjsC3j95dHna6OK4iLbm06Jw0Ukp?=
- =?iso-8859-1?Q?S1SG1z/cH24ScXaI20i3apf+I1aMK7KrZozadeEMxhK/+4LSmQHlIb7VMc?=
- =?iso-8859-1?Q?+lofUHhXOydj2XHOZgotwi1owF1bfoitoVHXRgLTrtQWxRJkoY2Dax15dE?=
- =?iso-8859-1?Q?qrOdcDN19NAemL8NnYKcupvws330zEadknd2BiSW5+E9+ROypyjh6Twc+a?=
- =?iso-8859-1?Q?7JIa/uFHwhNBn2z/uEY+5lDdbcIdgPuMUUnGSgjkO8nEhdA11cD/gnymIm?=
- =?iso-8859-1?Q?vYMmNc/5efHWWEccnMwwZOAjPwtAVpabmMKG6LJPEV0ia3ii+Izs06df0w?=
- =?iso-8859-1?Q?ZOSGED1dU+3tXTzbahCrHlVnwj9c4c2TY/wGfcwP3/9DALqt3nGO1tZAUg?=
- =?iso-8859-1?Q?olzW4N5+g5EaMWU+SnQlGbY0OY+RvnpWaKNvH+UBeay+uV9jMW+CbVgNRl?=
- =?iso-8859-1?Q?wlK0ENMgpqhj6OGyhywZTrTQJlDr7mlNpFqoTcl2bme+5gHj0RfnxPpeEJ?=
- =?iso-8859-1?Q?AMMlhM1eZ56RyAUktAEsER9UrWPuj4F6v2KfuPuVPNeh9cilPvdQt3dW9J?=
- =?iso-8859-1?Q?MyjDhJttZeRImeSt8BDO317+lUESbtzbxSMiQxZXWY7YQDIes/DCFnQee5?=
- =?iso-8859-1?Q?ONA9/HNg6U9fEAVcwNzw7CasR1tkDv/DDii/pts+2DMqNWxeKAGX0ord46?=
- =?iso-8859-1?Q?2SR1d4Q8k2JJetT9cFtbt/O0IkZLYRJ0v8JkxMwtiuG/FXBaLcNh109XUN?=
- =?iso-8859-1?Q?Ord0mDL9hEnW4oZZR60kpuSRsU6Pg1smUwEw/EhYztvQbTP9qr/SnRgHrQ?=
- =?iso-8859-1?Q?BqwNBgxaVz6mCR31aI30sNvW/gOG7mfiCVNRjYwgKHHZnuEuvfZNP78Nml?=
- =?iso-8859-1?Q?E9F4jYgelbjlrJ2/SH/1L4NGqzXBfaXOl2tr1f+9TWrzZAjzr8CtP3oAZE?=
- =?iso-8859-1?Q?3wrNGxMxlRSISbUOY1+yvFTHuE5tpYhuisyOh3eaUNg81Dsc1fOS//RWf5?=
- =?iso-8859-1?Q?Zbe9Ot/7YKzRJ2D2gFIntCr1ZiPIinfOmrfjrZEa+xR1NK0xqzzN+C2DiY?=
- =?iso-8859-1?Q?t1FK0zulVSeRJJZjfo6Z+B+29SsHouFcbf0dCJ+R3rjKbe7yPjXhzYvHJr?=
- =?iso-8859-1?Q?mP5/KEx6eLXqXiKhColf7jFyr0v4ObZvEL0N6AfPodGC3Y3j17H5Tk1942?=
- =?iso-8859-1?Q?X3Sz/iAGOdQQyHGZnb3hCPSOVFttWx0EkZ+YUHSf9o6cSDu3Sy6+cVYU9M?=
- =?iso-8859-1?Q?65boIY0uiRcEe0at7EWBFDmb0tbVmFF1USFN8youRFUJaRB778nZ8CZ+Ds?=
- =?iso-8859-1?Q?7m++BQA7NtA8xO0EWbu2T6PSozPd3YYESSHbi1NlFd4h1Uiad77eTuDcfa?=
- =?iso-8859-1?Q?dc64+vHWSzWPI=3D?=
+ =?iso-8859-1?Q?VXj9w+WD9+uk6L62OY+j1mvCfnTWXrYLHODnIn0IJZ1ta5n3XIJ8X/ZjXe?=
+ =?iso-8859-1?Q?zL76L7KHtHBpQZyEwI/uUf8K5p0hbQRb2P9MyzAqTqJdBYWdqQgAuhG7Of?=
+ =?iso-8859-1?Q?DWvsvJgsHLbbtaA3bPxRgiTLSdU0afo4OVYl4YSP5DWUAdrwC5rr4YF3UC?=
+ =?iso-8859-1?Q?w8KxJzbpzJBq9/akVobpnwo61zcX0A4F3zJD9+NjTRPTf5vce1QZM2ON2D?=
+ =?iso-8859-1?Q?DX/Ic6bdvCL56S2U/od0ADN9xsGuN4DkmcGE6umYALRwNutR4SWLPsDJSS?=
+ =?iso-8859-1?Q?V90f1w3/3gv5aEvbYRrM44wkJDQXHLtS5pPg5rHzRkas1+Fhu//AtirSDy?=
+ =?iso-8859-1?Q?+wqGKhK4QdsVzDv6XE8H4Li2SBM4q5jOt+jVJqkyEufHQYUo5v40zZAx7r?=
+ =?iso-8859-1?Q?0suiFJF5bZN8OCWfpHP7d0KwvrFhpJo9oG+2dYYLZxSv9Ds3ctHBm/ldGQ?=
+ =?iso-8859-1?Q?++uqtRBVWFBNAYgsOid+Pp57Vqhq5omd0fMIofMVgreyGRcb0UylvlXeeT?=
+ =?iso-8859-1?Q?DoQwZAiyJuzgeIfOsXM8jOur8hDIKgfXEAJSrKbgL18/bU44nsUZLz+c86?=
+ =?iso-8859-1?Q?14yjmG5ecokUkSDITxzTindwXVQwCE9R02hAVB1Ogdb5sdAu7rZfv9PO4Y?=
+ =?iso-8859-1?Q?37KGc3xpDFA2INeCjyluSlxRK8E4MOELIPzgg6QoT8sN2x/l7hFXd5bYJU?=
+ =?iso-8859-1?Q?pMdd4pDCC+r/FNcjZN4a185lhIFlaEhTK4Jlr6gw8sxt8d9RxLxIvz2wmz?=
+ =?iso-8859-1?Q?u1DReViuM/lH4MtzgD2X1y8PjtPVnhsMxrYdKpTp6C5YZQLM0E20PrzL+H?=
+ =?iso-8859-1?Q?iFRQqoCLn4MQuwONkzyImn6QGV/QPfxtfdOVAZBcA6sikWpX9cqjaDJ+3O?=
+ =?iso-8859-1?Q?BKuRSODpkAEBKc1TDXgBm/YmS4YRom1Is8QtKP/LOANkHVWCC2aaBJRdXu?=
+ =?iso-8859-1?Q?FUXKMVBpupYbk124ki1x9sqTO/yu9NJ4njhhWvhPNrG+kfqLn3cPsQXR3b?=
+ =?iso-8859-1?Q?KZlA6JVX9cLI/AP1XKDs+rLsn7ko+n8MsVM9/Bpcjnp3Z2ttqn3L635Yw5?=
+ =?iso-8859-1?Q?TMGHiL45f0FwN9f51j1/bQ3RYcItuI3YfzvHArdug61sZqA76BPT/rtDmM?=
+ =?iso-8859-1?Q?GGx7Kx2lgv08DMSmARD5WmU4OYpkXAjFlJtJl494kCBofLRgzJsFVi24Ul?=
+ =?iso-8859-1?Q?vH2XfPGu+4K78fuc166f1EJLdZ/I9cTv3JX81rvoBFNKUsFIRfnNcixNDk?=
+ =?iso-8859-1?Q?PYfJHjlXFko1fW/v3crlaPoCOtBXJxfnd7cKRQAqtyM79oNYsRgoXJi81p?=
+ =?iso-8859-1?Q?AvsvGKjFhrUGiEf5nR/cuocwo0WA/jWV4IzxPDE26uz9TZPdMxtaiFX8cw?=
+ =?iso-8859-1?Q?8htFCjouZBMGwjoxhJo0loWpeyKCWkx+p39f2N0v9Cm/IrlWFpM/l+a+WK?=
+ =?iso-8859-1?Q?lep2rq/lfDQhvQRjUPvoIsyYA3h8fXm288VViRaQnXrdqylhNH6p6uCorQ?=
+ =?iso-8859-1?Q?fNMbNakEtGXr5M2mv+Les55qm1Tv5CnUkXjcRU/oXGc3Zicq5Nlm3nnHY+?=
+ =?iso-8859-1?Q?pomEemcfPJRwJpo+k4g4AHCCERXK+MvK9JpKl+7w8twuPppPo0Pw18cTzd?=
+ =?iso-8859-1?Q?2tnb4Zbv2P900=3D?=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -160,182 +163,52 @@ MIME-Version: 1.0
 X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8234d61a-4a62-4f34-c7e1-08dd31ba51c8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2025 21:04:06.2072
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96ec3086-c664-4a7c-24c6-08dd31bbf734
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2025 21:15:53.1973
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mw9RiQPGgjgHi4fgMRXuRMBokisKeAEkm8AKJ/jVPEIrGEDEmeGrCQLtJvSVb+ppiZRzVlEqzTgDZkRgZQjZ7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4060
+X-MS-Exchange-CrossTenant-userprincipalname: 9LCpjPbwljMkvarmOw2u76xxl4jWke8K0qcdCL+hRLBiBrJV6uBGrL2D2Zj8bv1d9aBpmPG/eOQB3f1hYkfXfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7927
 
-Thanks Catalin for the review. Comments inline.=0A=
+>>>> This patch solves the problems where it is possible for the kernel to=
 =0A=
-> Please note that a pfn_valid() does not imply the memory is in the=0A=
-> linear map, only that there's a struct page. Some cache maintenance you=
+>>>> have VMAs pointing at cachable memory without causing=0A=
+>>>> pfn_is_map_memory() to be true, eg DAX memremap cases and CXL/pre-CXL=
 =0A=
-> do later in the patch may fail. kvm_is_device_pfn() was changed by=0A=
-> commit 873ba463914c ("arm64: decouple check whether pfn is in linear map=
+>>>> devices. This memory is now properly marked as cachable in KVM.=0A=
+>>>=0A=
+>>> Does this only imply in worse performance, or does this also affect=0A=
+>>> correctness? I suspect performance is the problem, correct?=0A=
+>>=0A=
+>> Correctness. Things like atomics don't work on non-cachable mappings.=0A=
+>=0A=
+> Hah! This needs to be highlighted in the patch description. And maybe=0A=
+> this even implies Fixes: etc?=0A=
 =0A=
-> from pfn_valid()"), see the log for some explanation.=0A=
+Understood. I'll put that in the patch description.=0A=
 =0A=
-Thanks for the clarification. So, it appears that the original pfn_is_map_m=
-emory()=0A=
-need to be kept. I am getting the impression from the comments that we shou=
-ld=0A=
-only add the change to extend the cacheability for the very specific case t=
-hat we=0A=
-are trying to address. i.e. all of the following is true:=0A=
-- type is VM_PFNMAP=0A=
-- user mapping is cacheable (MT_NORMAL or MT_NORMAL_TAGGED)=0A=
+>>> Likely you assume to never end up with COW VM_PFNMAP -- I think it's=0A=
+>>> possible when doing a MAP_PRIVATE /dev/mem mapping on systems that allo=
+w=0A=
+>>> for mapping /dev/mem. Maybe one could just reject such cases (if KVM PF=
+N=0A=
+>>> lookup code not already rejects them, which might just be that case IIR=
+C).=0A=
+>>=0A=
+>> At least VFIO enforces SHARED or it won't create the VMA.=0A=
+>>=0A=
+>> drivers/vfio/pci/vfio_pci_core.c:=A0=A0=A0=A0=A0=A0 if ((vma->vm_flags &=
+ VM_SHARED) =3D=3D 0)=0A=
+>=0A=
+> That makes a lot of sense for VFIO.=0A=
+=0A=
+So, I suppose we don't need to check this? Specially if we only extend the=
+=0A=
+changes to the following case:=0A=
+- type is VM_PFNMAP &&=0A=
+- user mapping is cacheable (MT_NORMAL or MT_NORMAL_TAGGED) &&=0A=
 - The suggested VM_FORCE_CACHED is set.=0A=
-=0A=
->> Also take care of the following two cases that prevents the memory to=0A=
->> be safely mapped as cacheable:=0A=
->> 1. The VMA pgprot have VM_IO set alongwith MT_NORMAL or=0A=
->>=A0=A0=A0 MT_NORMAL_TAGGED. Although unexpected and wrong, presence of su=
-ch=0A=
->>=A0=A0=A0 configuration cannot be ruled out.=0A=
->> 2. Configurations where VM_MTE_ALLOWED is not set and KVM_CAP_ARM_MTE=0A=
->>=A0=A0=A0 is enabled. Otherwise a malicious guest can enable MTE at stage=
- 1=0A=
->>=A0=A0=A0 without the hypervisor being able to tell. This could cause ext=
-ernal=0A=
->>=A0=A0=A0 aborts.=0A=
->=0A=
-> A first point I'd make - we can simplify this a bit and only allow such=
-=0A=
-> configuration if FWB is present. Do you have a platform without FWB that=
-=0A=
-> needs such feature?=0A=
-=0A=
-No, we don't have a platform without FWB. So I'll check for FWB presence.=
-=0A=
-=0A=
-> Another reason for the above is my second point - I don't like relying=0A=
-> on the user mapping memory type for this (at some point we may have=0A=
-> device pass-through without a VMM mapping). Can we use something like a=
-=0A=
-> new VM_FORCE_CACHED flag instead? There's precedent for this with=0A=
-> VM_ALLOW_ANY_UNCACHED.=0A=
-=0A=
-Ack, this will help better control the affected configurations. I'll introd=
-uce=0A=
-this flag in the next version.=0A=
-=0A=
->> Note when FWB is not enabled, the kernel expects to trivially do=0A=
->> cache management by flushing the memory by linearly converting a=0A=
->> kvm_pte to phys_addr to a KVA, see kvm_flush_dcache_to_poc(). This is=0A=
->> only possibile for struct page backed memory. Do not allow non-struct=0A=
->> page memory to be cachable without FWB.=0A=
->=0A=
-> I want to be sure we actually have a real case for this for the !FWB=0A=
-> case. One issue is that it introduces a mismatch between the VMM and the=
-=0A=
-> guest mappings I'd rather not have to have to deal with. Another is that=
-=0A=
-> we can't guarantee it is mapped in the kernel linear map, pfn_valid()=0A=
-> does not imply this (I'll say this a few times through this patch).=0A=
-=0A=
-I am not aware of such case. I'll restrict the changes to FWB then.=0A=
-=0A=
->> The device memory such as on the Grace Hopper systems is interchangeable=
-=0A=
->> with DDR memory and retains its properties. Allow executable faults=0A=
->> on the memory determined as Normal cacheable.=0A=
->=0A=
-> As Will said, please introduce the exec handling separately, it will be=
-=0A=
-> easier to follow the patches.=0A=
->=0A=
-> The exec fault would require cache maintenance in certain conditions=0A=
-> (depending on CTR_EL0.{DIC,IDC}). Since you introduce some conditions on=
-=0A=
-> pfn_valid() w.r.t. D-cache maintenance, I assume we have similar=0A=
-> restrictions for I/D cache coherency.=0A=
-=0A=
-I suppose if we only do the change to extend to the aforementioned case=0A=
-of the following being true, the check for exec fault could safely be as it=
- is=0A=
-in the patch (albeit it has to be moved to a separate patch).=0A=
-- type is VM_PFNMAP=0A=
-- user mapping is cacheable (MT_NORMAL or MT_NORMAL_TAGGED)=0A=
-- The suggested VM_FORCE_CACHED is set.=0A=
-=0A=
->> +static bool mapping_type_normal_cacheable(unsigned long mt)=0A=
->> +{=0A=
->> +=A0=A0=A0=A0 return (mt =3D=3D MT_NORMAL || mt =3D=3D MT_NORMAL_TAGGED)=
-;=0A=
->> +}=0A=
->=0A=
-> Personally I'd not use this at all, maybe at most as a safety check and=
-=0A=
-> warn but I'd rather have an opt-in from the host driver (which could=0A=
-> also ensure that the user mapping is cached).=0A=
-=0A=
-Understood, will make it part of the check as mentioned above.=0A=
-=0A=
->> +=A0=A0=A0=A0=A0 * pfn_valid() indicates to the code if there is a struc=
-t page, or=0A=
->> +=A0=A0=A0=A0=A0 * if the memory is in the kernel map. Any memory region=
- otherwise=0A=
->> +=A0=A0=A0=A0=A0 * is unsafe to be cacheable.=0A=
->> +=A0=A0=A0=A0=A0 */=0A=
->> +=A0=A0=A0=A0 if (!pfn_valid(pfn))=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 noncacheable =3D true;=0A=
->=0A=
-> The assumptions here are wrong. pfn_valid() does not imply the memory is=
-=0A=
-> in the kernel map.=0A=
-=0A=
-Understood, thanks for the clarification.=0A=
-=0A=
->> +=A0=A0=A0=A0 if (!mapping_type_normal_cacheable(mt)) {=0A=
->>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (vfio_allow_any_uc)=0A=
->>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 prot |=
-=3D KVM_PGTABLE_PROT_NORMAL_NC;=0A=
->>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 else=0A=
->> @@ -1684,6 +1725,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, =
-phys_addr_t fault_ipa,=0A=
->>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 prot |=3D KVM_PGTABLE_PROT_X;=
-=0A=
->>=A0=A0=A0=A0=A0=A0 }=0A=
->=0A=
-> I'd leave the device check in place, maybe rename it to something else=0A=
-> to distinguish from linear map memory (e.g. !pfn_is_map_memory()) and=0A=
-> only deal with the attributes for this device pfn which could be Device,=
-=0A=
-> Normal-NC or Normal-WB depending on the presence of some VM_* flags.=0A=
-> Deny execution in the first patch, introduce it subsequently.=0A=
-=0A=
-Ack.=0A=
-=0A=
->> +=A0=A0=A0=A0 /*=0A=
->> +=A0=A0=A0=A0=A0 *=A0 When FWB is unsupported KVM needs to do cache flus=
-hes=0A=
->> +=A0=A0=A0=A0=A0 *=A0 (via dcache_clean_inval_poc()) of the underlying m=
-emory. This is=0A=
->> +=A0=A0=A0=A0=A0 *=A0 only possible if the memory is already mapped into=
- the kernel map=0A=
->> +=A0=A0=A0=A0=A0 *=A0 at the usual spot.=0A=
->> +=A0=A0=A0=A0=A0 *=0A=
->> +=A0=A0=A0=A0=A0 *=A0 Validate that there is a struct page for the PFN w=
-hich maps=0A=
->> +=A0=A0=A0=A0=A0 *=A0 to the KVA that the flushing code expects.=0A=
->> +=A0=A0=A0=A0=A0 */=0A=
->> +=A0=A0=A0=A0 if (!stage2_has_fwb(pgt) && !(pfn_valid(pfn))) {=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D -EINVAL;=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto out_unlock;=0A=
->> +=A0=A0=A0=A0 }=0A=
->=0A=
-> Cache maintenance relies on memory being mapped. That's what=0A=
-> memblock_is_map_memory() gives us. Hotplugged memory ends up in memblock=
-=0A=
-> as arm64 selects ARCH_KEEP_MEMBLOCK.=0A=
-=0A=
-Ok, so will replace the pfn_valid with pfn_is_map_memory. Did I get that ri=
-ght?=0A=
-=0A=
-Apologies for being slow in getting back.=0A=
 =0A=
 - Ankit Agrawal=
