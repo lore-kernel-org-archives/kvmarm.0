@@ -1,50 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C523520E030;
-	Fri, 10 Jan 2025 13:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3433C20FAA8
+	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 13:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736514951; cv=none; b=P3nwEfQXdT4VTUXbWF5xqzs7iYmk1NAsXxY1SfCi0yhi9QYgX6xoiF+CP9gUtzHqrgZS+OoDJ+ycetY6UoMoqfswcCvizfxM8HddelZSGxt6l+fWA/BGmvydFsfiztp1Ky0XcGZZraIU1JsGgYfAHYFJq+JGZNOrXiQvpn3XBoc=
+	t=1736517560; cv=none; b=S2zJLqfn/B9dEjWYhHKYVc3gsRksk/CXX+AzfeFVRZW2xrg4G8MT5+S6ymTomUuDf+vfNiVVBsKi/l9uquwT6aXQPkjE7+5VhqgNJoHPcs7DkBUgqDQsPMfa/Unt2ZaZnLmLABjXc43LvZrmvLBLQ4+QX6TYqyvGxmW+c+CC9tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736514951; c=relaxed/simple;
-	bh=dQCOdZRGnjBtaZDEqHo5YmfoSv+DEbTUQJY9M9fyED4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NbhLYxTIOMG493SNcBeztSob+6U3w+qSTwkCr/4Npv2eM36J7THRyaq66N3CDcj3D4VbbLS71HyMFiz4PHo8FUpPR5aMv3YtWxQbe+KmKBZYpO/2K6quKmZo5/fGgKZZgaE+A2z6IOU1yGtwaT9THp4vi4GkSEXPAxBZxP9xyhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FEFEC4CED6;
-	Fri, 10 Jan 2025 13:15:48 +0000 (UTC)
-Date: Fri, 10 Jan 2025 13:15:46 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 3/7] arm64: cpufeature: add Allocation Tag Access
- Permission (MTE_PERM) feature
-Message-ID: <Z4Edgo6dvU3KBCLQ@arm.com>
-References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
- <20250110110023.2963795-4-aneesh.kumar@kernel.org>
+	s=arc-20240116; t=1736517560; c=relaxed/simple;
+	bh=1Nk/7LREUzWn06GVCKgwTqOsLkSYpHQZDnABmWtHRmY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XxaLeQP56+jWJiE8I98dY0pKbp3eNy74PtbpZ8/hhRxh3EJANzOdWhGflH84KCZiqKzgtv7dFwu45E5Pu75zPJwDAIYLLiuPYssrxe2ck4vVX2+qIHMhZUjuGdni3UmubmT26n7vfJ/+bW9u0v566mc8c0ini2BWbBPlkljnjd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C754F1477;
+	Fri, 10 Jan 2025 05:59:45 -0800 (PST)
+Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DDD93F59E;
+	Fri, 10 Jan 2025 05:59:15 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: andrew.jones@linux.dev,
+	eric.auger@redhat.com,
+	lvivier@redhat.com,
+	thuth@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	david@redhat.com,
+	pbonzini@redhat.com
+Cc: kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	vladimir.murzin@arm.com
+Subject: [kvm-unit-tests PATCH v1 0/5] arm64: Change the default --processor to max
+Date: Fri, 10 Jan 2025 13:58:43 +0000
+Message-ID: <20250110135848.35465-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250110110023.2963795-4-aneesh.kumar@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 04:30:19PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> This indicates if the system supports MTE_PERM. This will be used by KVM
-> for stage 2 mapping. This is a CPUCAP_SYSTEM feature because if we enable
-> the feature all cpus must have it.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+(CC'ing everyone from MAINTAINERS because I'm touching configure)
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Vladimir sent a test for MTE [1], which didn't work on the default -cpu
+model, cortex-a57, because that CPU didn't implement MTE. There were two
+options to get it working:
+
+1. Add -cpu max to the extra_params unittest parameter.
+2. Make the default value for the configure --processor option 'max'.
+
+We decided that the second option was preferable, so here it is.
+
+The first patch might look unrelated, but when I was writing the function
+to select the default processor based on the architecture I noticed that
+for arm64, $arch is first equal to aarch64, then it gets changed to arm64.
+My first instinct was to have it be arm64 from the start, but then I
+realized that, despite the help text, --arch=aarch64 has been supported
+ever since arm64 was added to kvm-unit-tests. So I decided that it might
+more prudent to go with it and document it.
+
+[1] https://lore.kernel.org/all/20241212103447.34593-1-vladimir.murzin@arm.com/
+
+Alexandru Elisei (5):
+  configure: Document that the architecture name 'aarch64' is also
+    supported
+  configure: Display the default processor for arm and arm64
+  arm64: Implement the ./configure --processor option
+  arm/arm64: Add support for --processor=max
+  configure: arm64: Make 'max' the default for --processor
+
+ arm/Makefile.arm    |  1 -
+ arm/Makefile.common |  3 +++
+ configure           | 35 ++++++++++++++++++++++++++---------
+ 3 files changed, 29 insertions(+), 10 deletions(-)
+
+
+base-commit: 0ed2cdf3c80ee803b9150898e687e77e4d6f5db2
+-- 
+2.47.1
+
