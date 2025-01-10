@@ -1,121 +1,166 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E2A1A23A2
-	for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 01:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C6D1E32C5;
+	Fri, 10 Jan 2025 11:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736471715; cv=none; b=Y8r8gJ2YSbznR+mqM16FxGkh8r8mQUyY1v2yBrhzFqBnR28WVq4HFL8LT/72oThZjGtu8JCbCbN6DMZsdOg9rWak/5KkdJGnPSokqDWGZqnJfpB1n3pp5iB6/agOm2jPoNAIwMzGQIWWTLiogI/tEMc6nCpiEoQY/lTS71jv07Y=
+	t=1736506834; cv=none; b=M2qUnqOfU7uR/6qUWXgiE7hZd8py6LT2I2XpPaamL++jSYmBCopkUCnLa1cvZGC/LW1ukNGt/OtBIF6QsWUGhU/lXWNy5XLTiNUkaJpFkyQcSwF7VfPXjGlCxEhD44LIzANaajZLsfFtHz5YtlnPYE/Kjhupx6xWljQUvVHmGmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736471715; c=relaxed/simple;
-	bh=ZSi0AyJ/RHt8qURQBIV0l6kjFCICQc7I9ltkvIwEkCQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DKQFMHevoiEcNoruY7QcK19TM4l+6rNvU8UnYRoyy+51DZA3zGKNp52Wi7pJdFwLdVvTjLVXsavk+hITjXKHbydVbIF9yGb6Tapv6mGEQDzLiFF4060tTefbobu+4mBeVf+Kmd3uPYxvW1oHDQ4ZmmBN8Gb04e0EpGvRpo2t6fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DNcohnMO; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1736506834; c=relaxed/simple;
+	bh=hmKqAySisZ8LuAN+/uPxTk1GZdXBJbQHEcD26LX9Uvk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LiL8aPPVwq5wIdoniw/BCY1+IKPTHIaaS9B0ie9La2przBYEKcV4/H6VpRV6o2ALQQ7wOL5Jn4P6naX9gQBLRDLWA7WjhMiU4munxtC+KtiZDWl+mjS9yyzmsCwSfLOvR4QyqPU9T3Rwx1jficumaOzAIasOcAqP8XQiqkEpUho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaTE5gOn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DNcohnMO"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9b9981f1so3914744a91.3
-        for <kvmarm@lists.linux.dev>; Thu, 09 Jan 2025 17:15:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736471712; x=1737076512; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VwFFFatQRWj4k7jYl4E+a9CzYdFY2Mg+JsqSac4RoA=;
-        b=DNcohnMOgYKZ4JHVlq9heoXpnoTQca/+LtyuDQyB4sLzHUpJjiE8OyKHfKBYZYbY4B
-         XSavwuy+1wUgHoq8ov2c+vNjZqnZTQwghLxqQnJI7IeeS4er9Ou49GDsgIJhjW5GWhhO
-         FSa+VZeml/zsICiYbh9je6NpGnLUr9+Owc17R/On0HDKTkxBuNOewjBBVsLHbBljU195
-         pmOOY69C+R2LzXdfsZHSqkWBr6LjtiqUH6rKctP/e+8XI9fdIa+jvQq1pWUuRowTby/W
-         lXilVJip0Xju++FKGuicPzEAW8DkIN3ctqs6H5G9fAnLZr/2oVrwd+J+TRi9OVG7nPQk
-         MEtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736471712; x=1737076512;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VwFFFatQRWj4k7jYl4E+a9CzYdFY2Mg+JsqSac4RoA=;
-        b=dSc1Zm5CY6lgkLckaggsEZtWB1BRUHROJo0RtYLao6WXjdIaCqdfLO5N14yRiHrYKj
-         bYK4dXDGESFe0IUPm3D0sI83PSS6WnI8lCP8d0fRHKjg8AcHx/fn+NGvOoQxbysxi05S
-         e+aWLeug1jcDj9zIRAIvTrt0mNbcIH3nxZyAXzF4nNhPwI4oQST7OGOmuQ8szFjTFuPC
-         06G5IFqLE/Zq2HY79osZBWNuz0Sm6pOJeDxIXIqXtTtUMzR8HxpVUUNtGUf0H4pyHBjp
-         xcfGVSF42A2F+kJrsmyqKNtaazPgjWiYoCzEKU8R5FE8rDUCM8uqP4s/haniXrsYgOU+
-         76nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUXvwKgfDI2REUx2j26Lq5TgFwESt91RCLPiETo+BDC1Ts9XF2Mj75Z5E0v36O48mxuUnefSc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwCiAPYwt5lKPJHoBwbMn8iBUzyEEcQkTSZMDUQeS8Lcff/OMdH
-	WoLm+LIe/upN/8yK4Np+16VK+6qNnrtxgggCY/9Dd3SXllaRiAKwi63XwI543urbNEv+b7mUxCE
-	ibA==
-X-Google-Smtp-Source: AGHT+IHAhOQ1hNL+2ODVngM4YtoUZlDh3MWUPi4xjwAS/ekbAexZ0ECdQPoeafSTa9dwqEUdAQpSzA4aRUA=
-X-Received: from pfiu8.prod.google.com ([2002:a05:6a00:1248:b0:72d:35ed:213f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:e83:b0:725:b7dd:e668
- with SMTP id d2e1a72fcca58-72d2201700cmr11665849b3a.17.1736471711800; Thu, 09
- Jan 2025 17:15:11 -0800 (PST)
-Date: Thu, 9 Jan 2025 17:15:04 -0800
-In-Reply-To: <173645122896.885867.13450184481916964756.b4-ty@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaTE5gOn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A25C4CED6;
+	Fri, 10 Jan 2025 11:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736506834;
+	bh=hmKqAySisZ8LuAN+/uPxTk1GZdXBJbQHEcD26LX9Uvk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PaTE5gOnVDvQpX3bKHw0UVOqETF7/1i3r308EHm+mvFcWj3bZmcfj+b3ZBlyyUAhI
+	 PEv9V480O0dNjjSJ/DSBaknQNcnZr260jPrrd1d3TTaPyxSZsJLnZ3DOVbqnerJyNc
+	 VMg23qcDp/4I4gnnYhGxCgq7/1UDaDuEkAAzZfWX2ulfbY2wXDwN32oI6olKD5rqz0
+	 5qls0Fg1iCVbrMsDcbR5vcp88CnqvVLtmoAXSlHSHfd0moYugkE+KFsDuZBR/U4zqV
+	 oX2zMTIHXkZ/K+BHm3rJyzTO3qLWf/ycapqMyMheQZH91kM95sehPe3RgcjuHBfMYl
+	 tOg0pp7BZ2SQA==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Subject: [PATCH v2 0/7] Add support for NoTagAccess memory attribute
+Date: Fri, 10 Jan 2025 16:30:16 +0530
+Message-ID: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20241220013906.3518334-1-seanjc@google.com> <173645122896.885867.13450184481916964756.b4-ty@google.com>
-Message-ID: <Z4B0mJOwH6xGjuZ6@google.com>
-Subject: Re: [PATCH 0/8] KVM: selftests: Binary stats fixes and infra updates
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 09, 2025, Sean Christopherson wrote:
-> On Thu, 19 Dec 2024 17:38:58 -0800, Sean Christopherson wrote:
-> > Fix a handful of bugs in the binary stats infrastructure, expand support
-> > to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
-> > enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
-> > getting a stat that actually exists.
-> > 
-> > Most of the bugs are benign, and AFAICT, none actually cause problems in
-> > the current code base.  The worst of the bugs is lack of validation that
-> > the requested stat actually exists, which is quite annoying if someone
-> > fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
-> > 
-> > [...]
-> 
-> Applied 1-7 to kvm-x86 selftests (x86 wants to build tests on the vCPU-scoped
-> stats infrastructure).  
-> 
-> I'll hold off on the compile-time assertions stuff until there's consensus that
-> we want to go that route for all architectures (not at all urgent).
-> 
-> [1/8] KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
->       https://github.com/kvm-x86/linux/commit/b68ec5b6869f
-> [2/8] KVM: selftests: Close VM's binary stats FD when releasing VM
->       https://github.com/kvm-x86/linux/commit/a59768d6cb64
-> [3/8] KVM: selftests: Assert that __vm_get_stat() actually finds a stat
->       https://github.com/kvm-x86/linux/commit/52ef723593fe
-> [4/8] KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name string
->       https://github.com/kvm-x86/linux/commit/7884da344973
-> [5/8] KVM: selftests: Add struct and helpers to wrap binary stats cache
->       https://github.com/kvm-x86/linux/commit/384544c026f6
-> [6/8] KVM: selftests: Get VM's binary stats FD when opening VM
->       https://github.com/kvm-x86/linux/commit/6d22ccb1c309
-> [7/8] KVM: selftests: Add infrastructure for getting vCPU binary stats
->       https://github.com/kvm-x86/linux/commit/60d432517838
+A VMM allows assigning different types of memory regions to the guest and not
+all memory regions support storing allocation tags. Currently, the kernel
+doesn't allow enabling the MTE feature in the guest if any of the assigned
+memory regions don't allow MTE. This prevents the usage of MTE in the guest even
+though the guest will never use these memory regions as allocation-tagged
+memory.
 
-Argh, apparently I only tested this series on platforms with high RLIMIT_NOFILE
-values.  Creating the stats fd for all vCPUs causes kvm_create_max_vcpus to fail
-on some of my systems due to doubling the number of fds needed.
+One example of such a configuration is a VFIO passthrough-enabled guest.
+Enabling MTE with such config results in failure as shown below(kvmtool VMM)
 
-One option would be to figure out a clean way to avoid creating the stats fds
-for barebones VMs, but x86's recalc_apic_map_test also fails.  That test creates
-512 (max "supported" by selftests) using vm_create_with_vcpus().
+[  617.921030] vfio-pci 0000:01:00.0: resetting
+[  618.024719] vfio-pci 0000:01:00.0: reset done
+  Error: 0000:01:00.0: failed to register region with KVM
+  Warning: [0abc:aced] Error activating emulation for BAR 0
+  Error: 0000:01:00.0: failed to configure regions
+  Warning: Failed init: vfio__init
 
-Doubling the rlimit from 1024+100 to 2048+100 for the max test doesn't seem insane,
-so my plan is to move the rlimit twiddling into common code, and then account for
-the vCPU stats fds.
+  Fatal: Initialisation failed
 
-I'll drop the above commits and post a v2.
+This patch series provides a way to enable MTE in such configs. Even though
+NoTagAccess can only be used with cacheable mapping, having the ability to map
+both MTE capable and non-capable VMAs allow us to support VFIO with the MTE
+capability enabled.
+
+Also, there is a possibility of cachable device memory. That memory, if exposed
+to guest as WB and the guest enables MTE, may trigger SErrors (Arm ARM mention
+this as "[RBCFRK] The result of an access to an Allocation Tag where Allocation
+Tag storage is not provided is IMPLEMENTATION DEFINED"). With FEAT_MTE_PERM KVM
+could trap and do necessary corrective action.
+
+Another use case is virtiofs dax support, which can use a page cache region as a
+virtio-shm region. We can use MTE_PERM to enable MTE in this config.
+
+In summary, different types of memory, whether WB MMIO or RAM presented as
+virtio-(pmem, shm etc.) backed by files in the VMM, the VM should be aware it is
+not standard RAM and should not attempt to enable MTE on it. If it does (either
+by mistake or malice), FEAT_MTE_PERM will trap and cause a VM exit with
+KVM_VM_EXIT_MEMORY_FAULT as the reason.
+
+A VM exit with exit reason KVM_VM_EXIT_MEMORY_FAULT, gives sufficient
+flexibility for any future fault-handling schemes we come up with (One possible
+use case is to allocate additional allocation tag space for schemes that want to
+use this for supporting smaller allocation tag pool and retry the guest
+instruction again). For the current implementation where we expect the guest to
+be terminated, this can also be achieved from within the hypervisor.
+
+Implementation notes:
+For non-MTE-allowed memory, the hypervisor will install stage2 translation with
+NoTagAccess memory attributes. Guest access of allocation tags with these memory
+regions will result in a VM Exit. One detail to note here is that NoTagAccess
+memory attribute can only be applied to Normal cacheable memory ie, using the
+attribute value of MemAttr[3:0] = 0b0100 implies Normal, NoTagAccess, write-back
+cacheable memory region. No other memory attribute value will trap the
+allocation tag access.
+
+Migration notes:
+The feature is only exposed to an EL2 guest only if it is capable of nested
+virtualization. Otherwise, a read of ID_AA64PFR2_EL1_FPMR will not expose
+MTE_PERM feature. We also want to make sure that an EL2 guest using this feature
+as part of its stage2 translation can only migrate to a target that supports the
+feature in the hardware. This is achieved by using KVM_CAP_ARM_MTE_PERM.
+
+Nested virtualization notes:
+This being a stage2 translation attribute, it is exposed to EL2 guest only if it
+is capable of a VirtualEL2 state. When an EL1 guest is started with MTE_PERM
+capability enabled, the EL2 hypervisor will look at the EL1 stage2 tables to
+determine whether a NoTagAccess attribute needs to be inserted in the shadow
+stage2 table at EL2. (Limitation, upstream nested virt support disables MTE in
+EL1 guest and in a similar fashion, we don't allow MTE_PERM with EL1 guest for
+now. This also mean we can drop the patch "KVM: arm64: MTE: Nested guest
+support" because the feature is only used by EL2 guest for now.)
+
+Changes from v1:
+* Add KVM_CAP_ARM_MTE_PERM to handle migration.
+* Add handling of NoTagAccess with Nested guest stage2.
+* Add changes to split some of the kvm_pgtable_prot bits.
+
+
+Aneesh Kumar K.V (Arm) (7):
+  arm64: Update the values to binary from hex
+  KVM: arm64: MTE: Update code comments
+  arm64: cpufeature: add Allocation Tag Access Permission (MTE_PERM)
+    feature
+  KVM: arm64: MTE: Add KVM_CAP_ARM_MTE_PERM
+  KVM: arm64: MTE: Use stage-2 NoTagAccess memory attribute if supported
+  KVM: arm64: MTE: Nested guest support
+  KVM: arm64: Split some of the kvm_pgtable_prot bits into separate
+    defines
+
+ Documentation/virt/kvm/api.rst        | 17 ++++++++++
+ arch/arm64/include/asm/cpufeature.h   |  5 +++
+ arch/arm64/include/asm/kvm_emulate.h  |  5 +++
+ arch/arm64/include/asm/kvm_host.h     |  7 +++++
+ arch/arm64/include/asm/kvm_nested.h   | 10 ++++++
+ arch/arm64/include/asm/kvm_pgtable.h  |  9 ++++--
+ arch/arm64/include/asm/memory.h       | 14 +++++----
+ arch/arm64/kernel/cpufeature.c        |  9 ++++++
+ arch/arm64/kvm/arm.c                  | 11 +++++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 43 +++++++++++++++----------
+ arch/arm64/kvm/mmu.c                  | 45 ++++++++++++++++++++-------
+ arch/arm64/kvm/nested.c               | 28 +++++++++++++++++
+ arch/arm64/kvm/sys_regs.c             | 15 ++++++---
+ arch/arm64/tools/cpucaps              |  1 +
+ include/linux/kvm_host.h              | 10 ++++++
+ include/uapi/linux/kvm.h              |  2 ++
+ 17 files changed, 191 insertions(+), 42 deletions(-)
+
+
+base-commit: 56e6a3499e14716b9a28a307bb6d18c10e95301e
+-- 
+2.43.0
+
