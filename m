@@ -1,205 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729124B249;
-	Sat, 11 Jan 2025 11:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E03CBE46;
+	Sat, 11 Jan 2025 13:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736593296; cv=none; b=nurbDl9BTXekFk1lMN8xbYK/fOt2bC7i7+g2mFvWwTm9ZIyu7qsNsx20aVhTSPrxgYII8F99rM1c9jhL9GOn99eDikQ8N2iuo6ndW0kP9miBJH9EP6q4lzqOEhPgOXrnMvZ7sbpD7UyGOb2ps2kIT0IepfOjTJT23RQJ8Yir8ag=
+	t=1736601605; cv=none; b=LvdTBmsGEhIRhBNseZlhe3n/clK8kHWHqo2bj4j9k/tczWNaCzOQiKhZkTuvag0IBPFIg1KldxZrWumDiAAcGft1CjP4jvxcxf1frZZ1Dj8AW72J8aeDht0bJaFgrgxUnKuqEatVVPc1LC4lJpaY2kEOQ8peYuFLD+eajo7JI+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736593296; c=relaxed/simple;
-	bh=gy67Eo8C1hKneW/xn+UE+Oh9vmay9ok/H+SGcDXNdi8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k94aVMSKwsD3ZaSxx7c0dHCp2h3ydskOEaev54gY96NX1WzFt99x6BhYOFeVMDf4E3Hgl7Lx6qVwbS66iupz39XwPAUiX/4uV8dbXgc+Ky21ff0HzICGPMzHbIeQGf0ZG6IfOzjb3cj14GCJKE7g9Pz/yO6VLGOAgFO9amqlw6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5/bVuzb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736601605; c=relaxed/simple;
+	bh=fG66nWrGM/6PKKdN96pf+ez5Xk8Ie0mSxd7kZ9d9Bw4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dc80jrgSl9V8BS64M0RkH4ugG1DapVQzE/Fo/jr5S5xY10/g07q6CJsTyUm3VePBNMZ8rxQ2ACqSN955btkoKMxEbAslsGD/eu4thdE21/ATL0HzUAKqSS3vV48BcOhE6uoNrpWhchrOPqskBV8p0h0mUiRLxNDKme7fiYJjpMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lXsffBe9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5/bVuzb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B134C4CED2;
-	Sat, 11 Jan 2025 11:01:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXsffBe9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF449C4CED2;
+	Sat, 11 Jan 2025 13:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736593296;
-	bh=gy67Eo8C1hKneW/xn+UE+Oh9vmay9ok/H+SGcDXNdi8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s5/bVuzbBSzTi3/QQcP+Y5MyFvpGcjUyPB4u8ZMRYy0G+Pa+O0yWM7q7/jnwyAI8n
-	 lTwe1nz38A6Bibbxyz/hndpTkb3vjQFTiwJAS5t+XIIhRP3WeI5b84YSIiZaz4VuMZ
-	 YTpIm+6Iid4koRAJwFjMR6C2FC62G7CMhrmd5KTYuD0wkH6lO78w5jNrlfcH+oKZp9
-	 06HYKpx254waJxqGuoxRbXper7rm/FeuXfIR66r/Wv8xArJK/xuWmLtvMc4LGs2gfx
-	 eb7JOt1v/wlvhMvB47kcDPS9oZHCYxmp3PJCpwInb8C/xqs+7FwXVi8cojI57iQkI/
-	 T2Ri6OEh71jxw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tWZFE-00B9ML-Kd;
-	Sat, 11 Jan 2025 11:01:33 +0000
-Date: Sat, 11 Jan 2025 11:01:31 +0000
-Message-ID: <87ikqlr4vo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	s=k20201202; t=1736601605;
+	bh=fG66nWrGM/6PKKdN96pf+ez5Xk8Ie0mSxd7kZ9d9Bw4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=lXsffBe9KjcI63HpkBhTvXaY/EH8m/VFeZc3qjATDk8+a5FETP8h75tIzzPNL86qT
+	 O7cSStyrG7g2RCJEFeMypeC9wMMXGw87m29lds0vmE8cIi1fUXQ1vuU2Yuaf4uvulM
+	 5Yb7bfEgJ0ugBSccNuW9P0e7Ow8Z9MRFHkVmxQDtxGLuDISWxOm8rgGEdK175IurTR
+	 FMPsLfKenDc8larSgUoxA3U1CDfMEEXOnueJ2vAGMkR40xJpg5mTF3rlomwOU1CPwg
+	 dki3CNqsfnlKHAKDtgnT8cWkUDuVA5vnk02/l0FwI1Aa5DgTtuVTI+vWSNuDbx3wKq
+	 JxCxvuLDvRYoA==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
-In-Reply-To: <20250111012450.1262638-4-seanjc@google.com>
-References: <20250111012450.1262638-1-seanjc@google.com>
-	<20250111012450.1262638-4-seanjc@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: MTE: Use stage-2 NoTagAccess memory
+ attribute if supported
+In-Reply-To: <Z4Fk58k8YptDkVgm@arm.com>
+References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
+ <20250110110023.2963795-6-aneesh.kumar@kernel.org>
+ <Z4Fk58k8YptDkVgm@arm.com>
+Date: Sat, 11 Jan 2025 18:49:55 +0530
+Message-ID: <yq5amsfxtrlw.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Sat, 11 Jan 2025 01:24:48 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
-> that KVM_RUN needs to be re-executed prior to save/restore in order to
-> complete the instruction/operation that triggered the userspace exit.
-> 
-> KVM's current approach of adding notes in the Documentation is beyond
-> brittle, e.g. there is at least one known case where a KVM developer added
-> a new userspace exit type, and then that same developer forgot to handle
-> completion when adding userspace support.
+Catalin Marinas <catalin.marinas@arm.com> writes:
 
-Is this going to fix anything? If they couldn't be bothered to read
-the documentation, let alone update it, how is that going to be
-improved by extra rules and regulations?
+> On Fri, Jan 10, 2025 at 04:30:21PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>> Currently, the kernel won't start a guest if the MTE feature is enabled
 
-I don't see how someone ignoring the documented behaviour of a given
-exit reason is, all of a sudden, have an epiphany and take a *new*
-flag into account.
+...
 
-> 
-> On x86, there are multiple exits that need completion, but they are all
-> conveniently funneled through a single callback, i.e. in theory, this is a
-> one-time thing for KVM x86 (and other architectures could follow suit with
-> additional refactoring).
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/api.rst    | 48 ++++++++++++++++++++++---------
->  arch/powerpc/kvm/book3s_emulate.c |  1 +
->  arch/powerpc/kvm/book3s_hv.c      |  1 +
->  arch/powerpc/kvm/book3s_pr.c      |  2 ++
->  arch/powerpc/kvm/booke.c          |  1 +
->  arch/x86/include/uapi/asm/kvm.h   |  7 +++--
->  arch/x86/kvm/x86.c                |  2 ++
->  include/uapi/linux/kvm.h          |  3 ++
->  virt/kvm/kvm_main.c               |  1 +
->  9 files changed, 49 insertions(+), 17 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c92c8d4e8779..8e172675d8d6 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6505,7 +6505,7 @@ local APIC is not used.
->  
->  	__u16 flags;
->  
-> -More architecture-specific flags detailing state of the VCPU that may
-> +Common and architecture-specific flags detailing state of the VCPU that may
->  affect the device's behavior. Current defined flags::
->  
->    /* x86, set if the VCPU is in system management mode */
-> @@ -6518,6 +6518,8 @@ affect the device's behavior. Current defined flags::
->    /* arm64, set for KVM_EXIT_DEBUG */
->    #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
->  
-> +  /* all architectures, set when the exit needs completion (via KVM_RUN) */
-> +  #define KVM_RUN_NEEDS_COMPLETION  (1 << 15)
->  ::
->  
->  	/* in (pre_kvm_run), out (post_kvm_run) */
-> @@ -6632,19 +6634,10 @@ requires a guest to interact with host userspace.
->  
->  .. note::
->  
-> -      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN,
-> -      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR, KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL
-> -      the corresponding operations are complete (and guest state is consistent)
-> -      only after userspace has re-entered the kernel with KVM_RUN.  The kernel
-> -      side will first finish incomplete operations and then check for pending
-> -      signals.
-> +      For some exits, userspace must re-enter the kernel with KVM_RUN to
-> +      complete the exit and ensure guest state is consistent.
->  
-> -      The pending state of the operation is not preserved in state which is
-> -      visible to userspace, thus userspace should ensure that the operation is
-> -      completed before performing a live migration.  Userspace can re-enter the
-> -      guest with an unmasked signal pending or with the immediate_exit field set
-> -      to complete pending operations without allowing any further instructions
-> -      to be executed.
-> +      See KVM_CAP_NEEDS_COMPLETION for details.
->  
->  ::
->  
-> @@ -8239,7 +8232,7 @@ Note: Userspace is responsible for correctly configuring CPUID 0x15, a.k.a. the
->  core crystal clock frequency, if a non-zero CPUID 0x15 is exposed to the guest.
->  
->  7.36 KVM_CAP_X86_GUEST_MODE
-> -------------------------------
-> +---------------------------
->  
->  :Architectures: x86
->  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> @@ -8252,6 +8245,33 @@ KVM exits with the register state of either the L1 or L2 guest
->  depending on which executed at the time of an exit. Userspace must
->  take care to differentiate between these cases.
->  
-> +7.37 KVM_CAP_NEEDS_COMPLETION
-> +-----------------------------
-> +
-> +:Architectures: all
-> +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> +
-> +The presence of this capability indicates that KVM_RUN will set
-> +KVM_RUN_NEEDS_COMPLETION in kvm_run.flags if KVM requires userspace to re-enter
-> +the kernel KVM_RUN to complete the exit.
-> +
-> +For select exits, userspace must re-enter the kernel with KVM_RUN to complete
-> +the corresponding operation, only after which is guest state guaranteed to be
-> +consistent.  On such a KVM_RUN, the kernel side will first finish incomplete
-> +operations and then check for pending signals.
-> +
-> +The pending state of the operation for such exits is not preserved in state
-> +which is visible to userspace, thus userspace should ensure that the operation
-> +is completed before performing state save/restore, e.g. for live migration.
-> +Userspace can re-enter the guest with an unmasked signal pending or with the
-> +immediate_exit field set to complete pending operations without allowing any
-> +further instructions to be executed.
-> +
-> +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
-> +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
-> +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
-> +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
+>> @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>  		if (!vma)
+>>  			break;
+>>  
+>> -		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+>> +		if (kvm_has_mte(kvm) &&
+>> +		    !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) {
+>>  			ret = -EINVAL;
+>>  			break;
+>>  		}
+>
+> I don't think we should change this, or at least not how it's done above
+> (Suzuki raised a related issue internally relaxing this for VM_PFNMAP).
+>
+> For standard memory slots, we want to reject them upfront rather than
+> deferring to the fault handler. An example here is file mmap() passed as
+> standard RAM to the VM. It's an unnecessary change in behaviour IMHO.
+> I'd only relax this for VM_PFNMAP mappings further down in this
+> function (and move the VM_PFNMAP check above; see Suzuki's internal
+> patch, unless he posted it publicly already).
+>
 
-So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
-must be present for all of these exits, right? And from what I can
-tell, this capability is unconditionally advertised.
+But we want to handle memslots backed by pagecache pages for virtio-shm
+here (virtiofs dax use case). With MTE_PERM, we can essentially skip the
+kvm_vma_mte_allowed(vma) check because we handle all types in the fault
+handler.
 
-Yet, you don't amend arm64 to publish that flag. Not that I think this
-causes any issue (even if you save the state at that point without
-reentering the guest, it will be still be consistent), but that
-directly contradicts the documentation (isn't that ironic? ;-).
 
-Or is your intent to *relax* the requirements on arm64 (and anything
-else but x86 and POWER)?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+-aneesh
