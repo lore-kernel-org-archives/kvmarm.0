@@ -1,57 +1,57 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE5F1799F
-	for <kvmarm@lists.linux.dev>; Sat, 11 Jan 2025 01:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BA140C03
+	for <kvmarm@lists.linux.dev>; Sat, 11 Jan 2025 01:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736558696; cv=none; b=q1Jkjj/PBKfSX8iDll2dUT4XhLWAEsfCkO6tKy7ZtE+jjBkN5iZFT+WfRvq3YaeQzFjwaCyR/17QRQdYO3bPFjm3vy1pj3YHYmfFih8ZXv1zm+dyBbNAXer9rWrCzsxgUdAULigRMiSdXW1ZHTNLIpp2xhvDLqXNPiw36+Q+eik=
+	t=1736558698; cv=none; b=GNNIqBOOWnvca0+PHLKDrM05SBraOo2FHbhIDttLk792KmJwhnFWTlbGbMXZHP/JGLd10ayrO0qp6Ju7qNGNDIvAUsVbn+vMe60G55ztNY4avfl+tG2lA9wKVVMNYWpJoYZtY3nlOnuXwfXsI5qtcHxALAtZKLEmmlCYXWINzl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736558696; c=relaxed/simple;
-	bh=lQwpsShXHQI91s1IhBjcEI9cJsgfBQq8tkKtVM0oTIo=;
+	s=arc-20240116; t=1736558698; c=relaxed/simple;
+	bh=AVYzQUQrTSkLUbewlYjOO2i8641BAIJsb+Od5cW5JHI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=isEysPAAvsYHSDftQvDCAW6rZ41UQ/QoiKPXdRt0ddCkDMdJ3/eeKTT3er46tK/W01J3h2hvIM4qWjyQdSJ6qDpShJJyiW/qVxlROR1xKHCNxiPgB23A+HYgPTFYRYq1jrbKiZpgFUuJR5q1UUwbZMy74Btj4aVW2dt2z/7371g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bzUbZwZd; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=s1FK3fmMWgcCJLBUATobofzraHiBukVqURD7T9rm5X7eyzc4LKqljCPO1gRxccc4f7zzRgxSelSEK+eWKqJ9hvP9V9HatzPYT8ar7yXPxAGkKGO2+QTz+FsSde8SArbho0lf8JZM59M3TqtldvjJCz1C1/geQ192+IqNDVh99Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lc5Xn3bJ; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bzUbZwZd"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f2a9743093so4787842a91.3
-        for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 17:24:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lc5Xn3bJ"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2162f80040aso43083795ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 17:24:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736558694; x=1737163494; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1736558696; x=1737163496; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=L3TyIoxqzKbU5TOqXbLBWWXwSPvFkN5kGJBIZi+nPuA=;
-        b=bzUbZwZd5dSH2DcLLCGAPB5EO98k80VR5msFg/7jkAaX2ivnUi7McZREjqlQJkVWvb
-         WgzP61Pb/eW4jgTR2UdfH0+dpugeFgyEiWsIt2r/TveqJOJTNH+MFhsSFa/MLbHMkcNr
-         akF0OdY6fPbCqMDsaNc02CteAm2xIMmTDhlEuTGoI6WmSo+FoKkGjZyEFqJohJKM2aKD
-         HwJdhT3jFvKffVtX1QppsmPZLdNNRjl/0rpWLD6KlvmSYSOrOeEGwLaCJXH1cci7jXFE
-         +fX6SGoGpOeQQnRRLh0Z6HzJnFfCBknRRp/l33uUB25kGEBHvYHh5brKjTFD6aaCJADv
-         hdmw==
+        bh=yPMtRfEi+Y38oJbaqxUUwsgL1BiiO9TX2S4BZFXkjhs=;
+        b=lc5Xn3bJIl9zYWVa+LEoLWgUYHOMFXFdEDCWLfQP9jg3uC1/AWIZQmZWB2/tkwSTfu
+         BCd6WVHiN7qCr73qXTdqPEPNfb0x1HJsPAado/iAQjNgMW/lTkeCAjfCvKrUf8JG4vFa
+         EsxMfGtL46mspLCx+ek+i4JIrHXrTrBscNgBo8sMGaVQFdMDbRFMihiPfoQn69YuVEAy
+         jgCTZi3aY1C+G0gRGt9sqJRbRNFiQFqm1AS0cRYD5KNcyFzdnXOTIapQw1aFGlf0qOcc
+         NehS1dnRE/n7Hiv6ypZaYWlrfKfjCAHMDz257aHAVyFE+7g0/R5OrvjlgXb6XFcfQ+oL
+         JnJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736558694; x=1737163494;
+        d=1e100.net; s=20230601; t=1736558696; x=1737163496;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L3TyIoxqzKbU5TOqXbLBWWXwSPvFkN5kGJBIZi+nPuA=;
-        b=oiav2hF3vI1wy0+4SNwxkP2rYUbxoTEa/StCPlc+LsvPFGkoMetVjxr9BS5Y1nefvt
-         +1N5I/eIhcj5aKj519gOhZYdew1PbtsDqWeE+/d317j6qRnhi7JPcCdB2Ai+blwBYIec
-         3GevZNXInKbHxTzuu8XO9wJyWZhdvrGIi9qHShaa1AtmheI0/BoJMwiYaoS2uLkzgdGV
-         6qRxS6blCZQIrHhGrF6i+JytlnAb1JodP/M8+asdh3aydLqWSLd3dE5fxfD1OdtUcuDQ
-         OjWhovNdcIHnXslLNaJNmuZvHt05YRKU28jhfnE2y81LUf7Sb7IRS5NAC9Q8Vgyl2SYk
-         m8JA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzOJMzbVJzoerVhRRAXKwOT2SHwNgWlMJrAeWczXad82dR0ouSGmsk9QO/gvclmh1S0KYYUKU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy4yW2gdI0tuGlpjPnrpiQxw9PlEqC8oSGlVYihS+Eh+bMOe3K5
-	UbxKlBCcNHb4DFMxr0Xo2RZFZshl9ECfsugkcAfaCVV2kyZfnMKVW5zpSvSSkzHTobLwbXvd9x1
-	+vg==
-X-Google-Smtp-Source: AGHT+IHQFtnrz9Qz4G4DVM+w+HCWHLq9SWFcOY5MsmF5EmSUkf18xpdPguK9lOowTA48c954eXDA8ByTfJE=
-X-Received: from pfld20.prod.google.com ([2002:a05:6a00:1994:b0:728:b3dd:ba8c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:114e:b0:728:f337:a721
- with SMTP id d2e1a72fcca58-72d21f29214mr17702842b3a.7.1736558694264; Fri, 10
- Jan 2025 17:24:54 -0800 (PST)
+        bh=yPMtRfEi+Y38oJbaqxUUwsgL1BiiO9TX2S4BZFXkjhs=;
+        b=bg2+VHN5G5wVJxBcsWLWXHHphq+RCE/BzySeGjQ4bR4MhwNF/jbpKNDRpgdLIYq4nO
+         5O4L7KgiPV4tSwTGsE5bNHSckevkav4jTgC+YM00ykE7W3qe5BsJ3KADHYvvuNwfG7+z
+         zGgyVmiN4nOLeCOjQOyNcBF4tFmbWv2lSiL8wt12PFTM3F0SH57OOvMaSESjDptUh8t9
+         JrSQOOx9FkI2ybN7JDykAn0gjxo61IKczFjeyPAIeEouxnZPIx3p7xEl32FeB6Iv6H5C
+         0NPWLjqAWjPwtZUwjjuRMpdibStFYXC2ScAdAl1Q09LDtyBvOQHJTHJpo83LSgRfi+df
+         eUgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWseKZkyv2G01hZWKjjhkrIveIFefvnY+gIGe+ZMrpMa8M7MZntpUZ27Wcy29OwxX89qd5X9kY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwdWda3x56U7gvv+MoHeZtXDd4IJuojyfYe1KpD5Ps8hKptC8rl
+	I8IwWbM8QpY3DC6Mxdx6TRH7gaKSxP0A8AQcgHIaxsVr8MmTB5zPudppHNk1igBhYxRq06Rx+Xv
+	6Dg==
+X-Google-Smtp-Source: AGHT+IFD3f0YjwZz/pTHPUxUy4yfVqFt92VRSC3L2LvrexSYRapcV9Xo2L4A2CKFVBcFdjD8/mn4jkTqU/U=
+X-Received: from pgkp11.prod.google.com ([2002:a63:f44b:0:b0:7fc:fac3:7df6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:4325:b0:1e1:b062:f3fa
+ with SMTP id adf61e73a8af0-1e88d1dba97mr25121737637.34.1736558695870; Fri, 10
+ Jan 2025 17:24:55 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 10 Jan 2025 17:24:46 -0800
+Date: Fri, 10 Jan 2025 17:24:47 -0800
 In-Reply-To: <20250111012450.1262638-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250111012450.1262638-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250111012450.1262638-2-seanjc@google.com>
-Subject: [PATCH 1/5] KVM: x86: Document that KVM_EXIT_HYPERCALL requires completion
+Message-ID: <20250111012450.1262638-3-seanjc@google.com>
+Subject: [PATCH 2/5] KVM: Clear vcpu->run->flags at start of KVM_RUN for all architectures
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Michael Ellerman <mpe@ellerman.id.au>, 
@@ -72,78 +72,84 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Update KVM's documentation to call out that KVM_EXIT_HYPERCALL requires
-userspace to do KVM_RUN before state save/restore, so that KVM can skip
-the hypercall instruction, otherwise resuming the vCPU after restore will
-restart the instruction and potentially lead to a spurious MAP_GPA_RANGE.
+Clear kvm_run.flags at the start of KVM_RUN for all architectures to
+minimize the probability of leaving a stale flag set.
 
-Fixes: 0dbb11230437 ("KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall")
-Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/api.rst | 39 +++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+ arch/arm64/kvm/arm.c         | 1 -
+ arch/arm64/kvm/handle_exit.c | 2 +-
+ arch/powerpc/kvm/book3s_hv.c | 4 +---
+ arch/x86/kvm/x86.c           | 1 -
+ virt/kvm/kvm_main.c          | 3 +++
+ 5 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 454c2aaa155e..c92c8d4e8779 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6615,13 +6615,29 @@ The 'data' member contains, in its first 'len' bytes, the value as it would
- appear if the VCPU performed a load or store of the appropriate width directly
- to the byte array.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a102c3aebdbc..925fa010bb7b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1128,7 +1128,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
  
-+It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
-+``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
-+requires a guest to interact with host userspace.
+ 	ret = 1;
+ 	run->exit_reason = KVM_EXIT_UNKNOWN;
+-	run->flags = 0;
+ 	while (ret > 0) {
+ 		/*
+ 		 * Check conditions before entering the guest
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index d7c2990e7c9e..63692c254a07 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -186,7 +186,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+ 	run->exit_reason = KVM_EXIT_DEBUG;
+ 	run->debug.arch.hsr = lower_32_bits(esr);
+ 	run->debug.arch.hsr_high = upper_32_bits(esr);
+-	run->flags = KVM_DEBUG_ARCH_HSR_HIGH_VALID;
++	run->flags |= KVM_DEBUG_ARCH_HSR_HIGH_VALID;
+ 
+ 	switch (ESR_ELx_EC(esr)) {
+ 	case ESR_ELx_EC_WATCHPT_LOW:
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 25429905ae90..b253f7372774 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -1704,9 +1704,7 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+ 		/* Exit to guest with KVM_EXIT_NMI as exit reason */
+ 		run->exit_reason = KVM_EXIT_NMI;
+ 		run->hw.hardware_exit_reason = vcpu->arch.trap;
+-		/* Clear out the old NMI status from run->flags */
+-		run->flags &= ~KVM_RUN_PPC_NMI_DISP_MASK;
+-		/* Now set the NMI status */
++		/* Note, run->flags is cleared at the start of KVM_RUN. */
+ 		if (vcpu->arch.mce_evt.disposition == MCE_DISPOSITION_RECOVERED)
+ 			run->flags |= KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
+ 		else
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1b04092ec76a..a8aa12e0911d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11465,7 +11465,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu_load(vcpu);
+ 	kvm_sigset_activate(vcpu);
+-	kvm_run->flags = 0;
+ 	kvm_load_guest_fpu(vcpu);
+ 
+ 	kvm_vcpu_srcu_read_lock(vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index de2c11dae231..7d2076439081 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4336,6 +4336,9 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 
+ 			put_pid(oldpid);
+ 		}
 +
-+.. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
++		vcpu->run->flags = 0;
 +
-+		/* KVM_EXIT_HYPERCALL */
-+		struct {
-+			__u64 nr;
-+			__u64 args[6];
-+			__u64 ret;
-+			__u64 flags;
-+		} hypercall;
-+
-+
- .. note::
- 
-       For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN,
--      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR the corresponding
--      operations are complete (and guest state is consistent) only after userspace
--      has re-entered the kernel with KVM_RUN.  The kernel side will first finish
--      incomplete operations and then check for pending signals.
-+      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR, KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL
-+      the corresponding operations are complete (and guest state is consistent)
-+      only after userspace has re-entered the kernel with KVM_RUN.  The kernel
-+      side will first finish incomplete operations and then check for pending
-+      signals.
- 
-       The pending state of the operation is not preserved in state which is
-       visible to userspace, thus userspace should ensure that the operation is
-@@ -6632,21 +6648,6 @@ to the byte array.
- 
- ::
- 
--		/* KVM_EXIT_HYPERCALL */
--		struct {
--			__u64 nr;
--			__u64 args[6];
--			__u64 ret;
--			__u64 flags;
--		} hypercall;
--
--
--It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
--``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
--requires a guest to interact with host userspace.
--
--.. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
--
- For arm64:
- ----------
- 
+ 		vcpu->wants_to_run = !READ_ONCE(vcpu->run->immediate_exit__unsafe);
+ 		r = kvm_arch_vcpu_ioctl_run(vcpu);
+ 		vcpu->wants_to_run = false;
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
