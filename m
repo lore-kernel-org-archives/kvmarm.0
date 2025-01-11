@@ -1,57 +1,57 @@
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF74017C98
-	for <kvmarm@lists.linux.dev>; Sat, 11 Jan 2025 00:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E054437A
+	for <kvmarm@lists.linux.dev>; Sat, 11 Jan 2025 00:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736556657; cv=none; b=FD3kZATqGCScAsR5clCa/Dg1NzuNALO2lqojzar/Q65V9bwoFt9hYRfpxprNgtuuIaK1SywXGo+GCaa9EkMGqmUeu7k0eSkXPvH1zr/KG8R2FDneVDR33cFAa/Jj1BuMAsprhnPBQscb+Th6taEOKDiBHi2RGNsQ6KbadjoDCrw=
+	t=1736556658; cv=none; b=E29KbSP+xFQ/h9oZaMWiucJ8l/hwV1zLMGKV8eqZ2+Kevyh/KcuJ+hJqHFCWaxZN89rvxEYzunvmi3v2LGCGy0fZqp8KWwCR8e2eyxd9cK1ZyW1EPhLQQ+FgMVnP7tMJ4zRTADdqO2fbAj1RA5nE7w2AG5NYXMfsjJOSuZHUoKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736556657; c=relaxed/simple;
-	bh=x+G/SKe65zYqmcjfUDWiwO99pE05MNdhz6X9PomzPYg=;
+	s=arc-20240116; t=1736556658; c=relaxed/simple;
+	bh=nrdiuySPKeqHKMTcasOrezgYsu9kEOPLrcUW0My/0sA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DtpOpG8JAdAiLnNoDotGeXHzRK6UHtkhDSvKOeefwgMzbgMrzaBmIqL8SFNDkdvP865SJBN14s21WSRzzStfPwjUv6STlnrwXc0a9vVi15l5Lo+Ursla03yhEG7BqN9j7Q5vrSNvGgmxAlvYQe4IPa4T1HWoUroMk79cTiZqKNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tEWqm/st; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=hvssQ8gqVKQVDmVqAB8K8OxV/2z5SBP78+WYvNpivzoqHh9HDihIVnJG0/fTNIqULKq3Lz9ZYI9BxbpyQrZEopNyeSlnV8Vi104JQ1OVDauYtI/tjwhUkkSrjH5hYS0tcH/qGbAJFCk8Ns2JknKGYFSQdFq4LoygaqaMkIjR8AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ywhKPngr; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tEWqm/st"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so6693917a91.3
-        for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 16:50:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ywhKPngr"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee8ced572eso4788226a91.0
+        for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 16:50:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736556655; x=1737161455; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1736556657; x=1737161457; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJst1sRt7o765YHKTsyCLHu+qBA9pewJkWtnndgMLN0=;
-        b=tEWqm/stSj9kxK33dw3klGgTKtZI4sjgr7ur2HfmG51UbDpIAowuhLrXaMgJwUGRrT
-         5EbylOMno4p8JpPqxtH1c5b/qPTCUyFVXgaIMzYSEAPZ8HC1Z2JvqLDgXF29hrTnp+uv
-         fwQP6JUU1hScJJgIVbUpBJzP/rH4dzEe+dcReuH8ERfq7Sq8AkEAbjPd2yG1CXpw4E2K
-         2zNVjcSei4y4FGBKcuotMAi+8FdpnWAeYoABTucEUIacr7TY3Kf/Wq8WSOSxfo1QQ2r0
-         TImlnwFuFZxfBiG7y/aJ1U8xMtwA289Xe3FlW3B924+9mEYupLCYhSAKm+16vgNQmCyA
-         HSVg==
+        bh=fmZxaHK89gYqxCqQ02UIn+br/dW4oBYWdpIBYGTzQvU=;
+        b=ywhKPngr7JfomfZ2i3WqyEUN0nxVytDtU7vGuubGPbiLCtvDJNp1JBh6FSyYLMMZPb
+         DplYGogSM94S9MfHWKG6oO96Qqme5PqsJi1gpcwnueOWVeR7UZJ3UD0z2BknliAZcka1
+         nLi91nyS5/YEb9ridTCyu9HqQ1Hd01ufUwx1U5G8mXfu0ZO0ser0RtzE67HsZosZwve2
+         /1uaJw8WF4JtxbddEI4xGKqCzj2kOyAOJM10hzJ0oj3vaELHUFP36admhqXwRhqmBnSE
+         JAC+7Mb6zV42s4nsUfu7fS3jNB3nvQNoYtwo3hdltEaKJV7A1PjDKV7hspkGRtAhVwk/
+         nGAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736556655; x=1737161455;
+        d=1e100.net; s=20230601; t=1736556657; x=1737161457;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VJst1sRt7o765YHKTsyCLHu+qBA9pewJkWtnndgMLN0=;
-        b=V0Wcyw85Dzy8S0UpSKeh9dB0wPwd4/kxkzN4luTNECNN5AKeEGlY1slsvW2DbM9/WC
-         2UFSONC2kqOa9uKmKz1d17HFbpY9KK8JzjySnaDj/n/osrgCoKAiKFjabFBqnk4Yy592
-         plcaQoDacuvI4vJhw4iBhG7/jzle471uBQwJ9Sy/YHmpPX6KXIKOE31g8l3qHqlzhRED
-         njkiKz3zanoTecz+M2s1l/MeLQnZ5a1DdkvGmif2fe5r6gfTzvqXIrqjBLSL2DnwESlS
-         ByRh9uX6zhkfDilO0BIIZwXKLZqckNY3XrHpgIJmIxqmzBHiT4P1f/2hdyF3/srGMyfu
-         HYig==
-X-Forwarded-Encrypted: i=1; AJvYcCWNnaw+S2PlmHJWFht25Yym0y0QUyuUwU8VOnbJTQBDJUcaNilLMlHwydNxdkw9uKTvtXeicGY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxRcJZzgo0rZ5N9l2xH3AzrzPdf2vWsSTo70cC9a/5RoI6G3VUh
-	dx6CY0U0nH4413Otr9Q5zY62UGeEodCOQGP04C+plKqJIz905KNeaywaLz4dnkiE/q+X+scfuTC
-	E5w==
-X-Google-Smtp-Source: AGHT+IFaIgnmyMwcv0JpFmACh/zvowyMAMYrlakJCH8pPaULUTBzt/qI/JqGqmGqNNZlkEWD/D5dHaJ9LLc=
-X-Received: from pjbqd16.prod.google.com ([2002:a17:90b:3cd0:b0:2f4:47fc:7f17])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c83:b0:2ee:fa0c:cebc
- with SMTP id 98e67ed59e1d1-2f548ececc3mr18761170a91.20.1736556655284; Fri, 10
- Jan 2025 16:50:55 -0800 (PST)
+        bh=fmZxaHK89gYqxCqQ02UIn+br/dW4oBYWdpIBYGTzQvU=;
+        b=R4KMw0oxc8YnmxTUxy+K2wXuEzIv3oxMmaOrS9sTjENnsCBWUPxMZfJya0lJY+r3hZ
+         lO/1fNup/g+k+ECPp8F66megMcmhT65OQ6ERIN2Z/sbIU9MtEG1khuw0+Yyjh3EhGCLb
+         GzxLz7+JCYOxv6Ccnx5ear7mmRksGawAJfKQYIhJwXjbNNqzCmsKJj/iaNhR3hxu3f3Z
+         NNgQkABku0HnrGiAMTlOknJQDtJT7wuSXbR+XACy9EziBrsnbmbahLBjsXIzAgvaf9+0
+         AC/iar1MFK/9FKrZj9aMLlYnDCRKra0ROD1M2zoYQ5GTzFbrz1Xeiw5FRNeyHkBqJY3b
+         Fcmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUY25CE3qByLsR0T3R194VXTwtifYujbdroa64nopRFe/ok9u/jGvJMHMKbKJMPmmlhA/NCQTQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxOBfJ1JksTR8NaXbbr3xkdXARv9eGVCIqxRZ90JxHVIfUY3aR/
+	4icTNlLczSIunPc5OHdvFZoThn8YJa742BzHNb2VmKRCs7ksYWlGs5gkkqltx81G/pmHbM9v7YK
+	GTg==
+X-Google-Smtp-Source: AGHT+IEiPYhZFrxECLTpeRyhrniySkHxs86k154WoHT+4SPRvFRx2z0MZkxZdNLfF3LCv7K79vdra9fQLrE=
+X-Received: from pjz13.prod.google.com ([2002:a17:90b:56cd:b0:2ef:7af4:5e8e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2cc5:b0:2ee:c91a:ad05
+ with SMTP id 98e67ed59e1d1-2f548e984abmr17519047a91.3.1736556656714; Fri, 10
+ Jan 2025 16:50:56 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 10 Jan 2025 16:50:42 -0800
+Date: Fri, 10 Jan 2025 16:50:43 -0800
 In-Reply-To: <20250111005049.1247555-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250111005049.1247555-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250111005049.1247555-3-seanjc@google.com>
-Subject: [PATCH v2 2/9] KVM: selftests: Close VM's binary stats FD when
- releasing VM
+Message-ID: <20250111005049.1247555-4-seanjc@google.com>
+Subject: [PATCH v2 3/9] KVM: selftests: Assert that __vm_get_stat() actually
+ finds a stat
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -76,55 +76,34 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Close/free a VM's binary stats cache when the VM is released, not when the
-VM is fully freed.  When a VM is re-created, e.g. for state save/restore
-tests, the stats FD and descriptor points at the old, defunct VM.  The FD
-is still valid, in that the underlying stats file won't be freed until the
-FD is closed, but reading stats will always pull information from the old
-VM.
+Fail the test if it attempts to read a stat that doesn't exist, e.g. due
+to a typo (hooray, strings), or because the test tried to get a stat for
+the wrong scope.  As is, there's no indiciation of failure and @data is
+left untouched, e.g. holds '0' or random stack data in most cases.
 
-Note, this is a benign bug in the current code base as none of the tests
-that recreate VMs use binary stats.
-
-Fixes: 83f6e109f562 ("KVM: selftests: Cache binary stats metadata for duration of test")
+Fixes: 8448ec5993be ("KVM: selftests: Add NX huge pages test")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/lib/kvm_util.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 91d295ef5d02..9138801ecb60 100644
+index 9138801ecb60..21b5a6261106 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -709,6 +709,15 @@ void kvm_vm_release(struct kvm_vm *vmp)
+@@ -2238,9 +2238,10 @@ void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
  
- 	ret = close(vmp->kvm_fd);
- 	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
+ 		read_stat_data(vm->stats_fd, &vm->stats_header, desc,
+ 			       data, max_elements);
+-
+-		break;
++		return;
+ 	}
 +
-+	/* Free cached stats metadata and close FD */
-+	if (vmp->stats_desc) {
-+		free(vmp->stats_desc);
-+		vmp->stats_desc = NULL;
-+
-+		ret = close(vmp->stats_fd);
-+		TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
-+	}
++	TEST_FAIL("Unabled to find stat '%s'", stat_name);
  }
  
- static void __vm_mem_region_delete(struct kvm_vm *vm,
-@@ -748,12 +757,6 @@ void kvm_vm_free(struct kvm_vm *vmp)
- 	if (vmp == NULL)
- 		return;
- 
--	/* Free cached stats metadata and close FD */
--	if (vmp->stats_desc) {
--		free(vmp->stats_desc);
--		close(vmp->stats_fd);
--	}
--
- 	/* Free userspace_mem_regions. */
- 	hash_for_each_safe(vmp->regions.slot_hash, ctr, node, region, slot_node)
- 		__vm_mem_region_delete(vmp, region);
+ __weak void kvm_arch_vm_post_create(struct kvm_vm *vm)
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
