@@ -1,57 +1,57 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF9B1553A7
-	for <kvmarm@lists.linux.dev>; Sat, 11 Jan 2025 00:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F8C16C850
+	for <kvmarm@lists.linux.dev>; Sat, 11 Jan 2025 00:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736556665; cv=none; b=F/mevvIJOAw4bXzTafrhl1ZXlFQlKGylJIhkH9h++mfcSpHb0NvZSvPLqGDyOhPP/scQf6VkslA/v6iBaqHcQSTZtM73k8qZSSvOqt7Xz7+k3XJY6vwOyk9RuTtyYiMbrn9Lu3du/y9c60a73IBmXk13v2Zry38gmy0yTCJKggo=
+	t=1736556667; cv=none; b=Ky9nDoqMReA9Bf4lUma1zJKnjITrD2W4xd3fGhyFcHze/AY/Ob5uhMKIs8dTtwphGunnj05RQljojxzzGl58lJn5AtdiuksbmH0enG8ok2jaG97B8FfWjIN5QgWpWiVo4B6tZ48Wgp7yPC68x4+KKuK25QYFjQL1iRMika8g9No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736556665; c=relaxed/simple;
-	bh=P1tpMNzbS5Njgz1DwTNPeyi/z6xYk/XJDEeQ78FSaJY=;
+	s=arc-20240116; t=1736556667; c=relaxed/simple;
+	bh=icJ/SksT713q+MIz2dX20BPrbRU3ISPR44l7a9C713I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JBFo6kbPsJZbGl6cZlsji1x/r7quyscaYeEMZLMIlXl8ahFHB+vVwqlB3aHGJE78Q61mFKIFhBfOaS8gvJFCUfLvlZb8uU0Nw/TQTZpX6JsF2vdH/FyScyAvgFJtk3Eyv6g7eKJAS3JXtUrG1/TYOEavNxh0mQFJJbASpfJIhVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tgymi5L5; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=GFJY12gznqDPuu/iMLIR8zMsdG7KErmlFpDIga/+00cEN98m8ORwyRb39U+J0IGiNH0JCtahaEfvt/BElKlKWdN954Gx06BcxUXz56hjvbrUK7Vo74eD1QSkN8FD2udf4sAcIvzqItvWxiO6sW0vWgu4/M4mvgu8ht4+pJn/064=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NKlis5YY; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tgymi5L5"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef7fbd99a6so4627280a91.1
-        for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 16:51:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NKlis5YY"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9b9981f1so6633478a91.3
+        for <kvmarm@lists.linux.dev>; Fri, 10 Jan 2025 16:51:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736556663; x=1737161463; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1736556665; x=1737161465; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=wbJUIEbFpcT4LmqIjAYiV2s86GObQLOrAwx+1Pf2g7A=;
-        b=Tgymi5L55dcpU776Pnxv6NvakpvPBNIGXLbmSU90VHSGhzHb4x+jY4BcB6gBvQXRR9
-         dP9IYVBlm28/jTosGybA++AOkdsNTGSrBbG87LaVF148MLRNwr+7qGUSrPqDEbhjsB7Y
-         vSuN8GgQYM5BKdvPsAdSSKnq5Xde0X3gOVs3LZ0s9J+uaFlRsY3XEe5vrt/7DK1apCqB
-         Vgk45FCNB4D5kmYLTej+KEXrZsz/3NIp7D15LW5igzHyzIEdlLmFuSa2WJcI6pmjIiwA
-         UbjNypAQ4pC618TvTclpJMNEKik7cAqZTTdjwXQuMaf9gahxD+1ryZpUr3XnZXExElUa
-         DyFg==
+        bh=jTPjKFoWnkMFK18trrM7yX38QagKVQtox0CY8pTl0Bc=;
+        b=NKlis5YY43Qw+I+qSVIISI/i/Ii5DlBXlHs4nK9u/SXMoU8srzfDmY8Z74O4uYFUmP
+         vvZuoe9ljgB1Gye+SYi8Z3OHgUHSaY8yr44kMFArr3kMEHE1kNQLGI9LZpljfu2RvXH6
+         jAesPWHBTQx4BBPrCtJdlvBVQM0kXDlTXaXYRILDHNhBYqVxbhvxTVPmT4weASqte69B
+         1J4NuPu/tDMPLto4j0Lh1NO2ZdghzXA3eRX3t6QC+Jxr9+6wVQSrWqf8Uaav0qkeVQ3T
+         /LL7t1/rgk2tDxsOYuweXeRbVTI500qhuXxaYfl20XgIeeHEX2RWEcVGiYr5CvF+XfYM
+         t9KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736556663; x=1737161463;
+        d=1e100.net; s=20230601; t=1736556665; x=1737161465;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wbJUIEbFpcT4LmqIjAYiV2s86GObQLOrAwx+1Pf2g7A=;
-        b=Uu0mzHBOp9WgPqyVS5utymq8AKc2gbgWRfrlLWXFfOXk4dZubHHnAmJc+cUykIdLHc
-         2nAktaydTQJ9oWZ9/j9vATIYCOdpM5hmHY31wHLZWEutg6KgVoxjTRokosJe46PWZlvA
-         YN0gTRrbMvNoQnN1weQEbJL4+8sDSOmm7MUOY0VpNV2kseue9lCLTTDAh7iAuFyKLVi6
-         tXXuDPnjQjWzZA3yVED3S50RXcsSFEG4hj0O1ICXQZ/U/+t3cWL8fClOZVgC58vHVxjs
-         nuX+vQmR5Xuj5TDacG4I7i4PHbzN+YHak0hbq6eFGpcXBcES3nwouPgd84gp1OvLGnb9
-         3TwA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9/xUbt0MTnwdix24txqMupLmjfOH25KMXxicXNM5/RTxjDieDvRYys/vjjMnJUulqGyylG5E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxjFMz+LGcMBBsi0y+wAMqkILGTf80caoyRzPh5fSNF/QIO+za2
-	aAJ1Mo3yfqg2BKoQsJKDxo4FQcZ+irO/iegS6d16p0imdM8JkcDtrdOjWlMrlOa/xB33fZMIuet
-	LVQ==
-X-Google-Smtp-Source: AGHT+IGH6342S92kOvdYD94+ymoteQzN/cfHIZ0hJZS0WFG0jyjicN3k4eAbOT3Lbu+t8kUVV+/QXmvVvSI=
-X-Received: from pjboi12.prod.google.com ([2002:a17:90b:3a0c:b0:2eb:12c1:bf8f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:270c:b0:2ee:6e22:bfd0
- with SMTP id 98e67ed59e1d1-2f548ee48demr16948021a91.21.1736556663692; Fri, 10
- Jan 2025 16:51:03 -0800 (PST)
+        bh=jTPjKFoWnkMFK18trrM7yX38QagKVQtox0CY8pTl0Bc=;
+        b=Fpkc0UZUaRAj2HJ8wKntw0hauAo0eH/ocLt3IUlYfFV0/etuh1/OvcOxW0ZbWJn3nK
+         341CNUcbApIQf1Y+nluK8twzHj2WpqcVVpMbRoS8u6Kexht+lWC+FVC5lb2oS9B6m7pq
+         DR4tuA7PYcwzVsgDlPxBXhzjR6dUMZvRgcLmIrdzuDrPm+cPmm48oY+lthqCSiqOB9Ud
+         iCDpQQotHo6w5EkQjDvDb9mnPoL1dYWapqPy5lZwIYFsG/87VXfHb8my0m+rIfZf+0WP
+         0/Y5PqqOwYdZBh//bxC3rx/9e75AObq737vCzlWGQ1XP/XTLTfUWobQgbsqizQn1gRXY
+         ALPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUp5OecXfSmDE9m5mteVhIpR51Q1K5jCD3W77QtQgyd3gIyZT/YV+6hVdAzeUzD+ZnuuQ8tMxw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyCA/RwZXkMOtbddDDGubLIxKDv1qKALgq8rrEHdfRNDWBUNQqO
+	5QOHIBbDZdwVLojJpjNMQXTs5su9tPqIpHGaAyVAJ6GS+u2YJjSdfCecXKaKB7ak4x3Wp7F7ZD0
+	wPQ==
+X-Google-Smtp-Source: AGHT+IFOLE/1SSJYHsGdzvK8LKxhrHPTw3kVbRGTeeJk8BpZZB2Ck9vGEUtjLxLwAqw4e0hK1JN9nSs0EVE=
+X-Received: from pjbsg5.prod.google.com ([2002:a17:90b:5205:b0:2ee:3cc1:793d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c84:b0:2ea:a25d:3baa
+ with SMTP id 98e67ed59e1d1-2f548f17351mr17744741a91.5.1736556665395; Fri, 10
+ Jan 2025 16:51:05 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 10 Jan 2025 16:50:47 -0800
+Date: Fri, 10 Jan 2025 16:50:48 -0800
 In-Reply-To: <20250111005049.1247555-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250111005049.1247555-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250111005049.1247555-8-seanjc@google.com>
-Subject: [PATCH v2 7/9] KVM: selftests: Adjust number of files rlimit for all
- "standard" VMs
+Message-ID: <20250111005049.1247555-9-seanjc@google.com>
+Subject: [PATCH v2 8/9] KVM: selftests: Add infrastructure for getting vCPU
+ binary stats
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -76,141 +76,146 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Move the max vCPUs test's RLIMIT_NOFILE adjustments to common code, and
-use the new helper to adjust the resource limit for non-barebones VMs by
-default.  x86's recalc_apic_map_test creates 512 vCPUs, and a future
-change will open the binary stats fd for all vCPUs, which will put the
-recalc APIC test above some distros' default limit of 1024.
+Now that the binary stats cache infrastructure is largely scope agnostic,
+add support for vCPU-scoped stats.  Like VM stats, open and cache the
+stats FD when the vCPU is created so that it's guaranteed to be valid when
+vcpu_get_stats() is invoked.
+
+Account for the extra per-vCPU file descriptor in kvm_set_files_rlimit(),
+so that tests that create large VMs don't run afoul of resource limits.
+
+To sanity check that the infrastructure actually works, and to get a bit
+of bonus coverage, add an assert in x86's xapic_ipi_test to verify that
+the number of HLTs executed by the test matches the number of HLT exits
+observed by KVM.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  |  2 ++
- .../selftests/kvm/kvm_create_max_vcpus.c      | 28 +--------------
- tools/testing/selftests/kvm/lib/kvm_util.c    | 34 +++++++++++++++++++
- 3 files changed, 37 insertions(+), 27 deletions(-)
+ .../testing/selftests/kvm/include/kvm_util.h  | 20 +++++++-----
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 32 ++++++++-----------
+ .../selftests/kvm/x86/xapic_ipi_test.c        |  2 ++
+ 3 files changed, 27 insertions(+), 27 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 9a64bab42f89..d4670b5962ab 100644
+index d4670b5962ab..373912464fb4 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -966,6 +966,8 @@ static inline struct kvm_vm *vm_create_shape_with_one_vcpu(struct vm_shape shape
+@@ -61,6 +61,7 @@ struct kvm_vcpu {
+ #ifdef __x86_64__
+ 	struct kvm_cpuid2 *cpuid;
+ #endif
++	struct kvm_binary_stats stats;
+ 	struct kvm_dirty_gfn *dirty_gfns;
+ 	uint32_t fetch_index;
+ 	uint32_t dirty_gfns_count;
+@@ -534,17 +535,20 @@ void read_stat_data(int stats_fd, struct kvm_stats_header *header,
+ 		    struct kvm_stats_desc *desc, uint64_t *data,
+ 		    size_t max_elements);
  
- struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
+-void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
+-		   size_t max_elements);
++void kvm_get_stat(struct kvm_binary_stats *stats, const char *name,
++		  uint64_t *data, size_t max_elements);
  
-+void kvm_set_files_rlimit(uint32_t nr_vcpus);
+-#define vm_get_stat(vm, stat)				\
+-({							\
+-	uint64_t data;					\
+-							\
+-	__vm_get_stat(vm, #stat, &data, 1);		\
+-	data;						\
++#define __get_stat(stats, stat)							\
++({										\
++	uint64_t data;								\
++										\
++	kvm_get_stat(stats, #stat, &data, 1);					\
++	data;									\
+ })
+ 
++#define vm_get_stat(vm, stat) __get_stat(&(vm)->stats, stat)
++#define vcpu_get_stat(vcpu, stat) __get_stat(&(vcpu)->stats, stat)
 +
- void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
- void kvm_print_vcpu_pinning_help(void);
- void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
-diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-index c78f34699f73..c5310736ed06 100644
---- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-+++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-@@ -10,7 +10,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
--#include <sys/resource.h>
+ void vm_create_irqchip(struct kvm_vm *vm);
  
- #include "test_util.h"
- 
-@@ -39,36 +38,11 @@ int main(int argc, char *argv[])
- {
- 	int kvm_max_vcpu_id = kvm_check_cap(KVM_CAP_MAX_VCPU_ID);
- 	int kvm_max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
--	/*
--	 * Number of file descriptors reqired, KVM_CAP_MAX_VCPUS for vCPU fds +
--	 * an arbitrary number for everything else.
--	 */
--	int nr_fds_wanted = kvm_max_vcpus + 100;
--	struct rlimit rl;
- 
- 	pr_info("KVM_CAP_MAX_VCPU_ID: %d\n", kvm_max_vcpu_id);
- 	pr_info("KVM_CAP_MAX_VCPUS: %d\n", kvm_max_vcpus);
- 
--	/*
--	 * Check that we're allowed to open nr_fds_wanted file descriptors and
--	 * try raising the limits if needed.
--	 */
--	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl), "getrlimit() failed!");
--
--	if (rl.rlim_cur < nr_fds_wanted) {
--		rl.rlim_cur = nr_fds_wanted;
--		if (rl.rlim_max < nr_fds_wanted) {
--			int old_rlim_max = rl.rlim_max;
--			rl.rlim_max = nr_fds_wanted;
--
--			int r = setrlimit(RLIMIT_NOFILE, &rl);
--			__TEST_REQUIRE(r >= 0,
--				       "RLIMIT_NOFILE hard limit is too low (%d, wanted %d)",
--				       old_rlim_max, nr_fds_wanted);
--		} else {
--			TEST_ASSERT(!setrlimit(RLIMIT_NOFILE, &rl), "setrlimit() failed!");
--		}
--	}
-+	kvm_set_files_rlimit(kvm_max_vcpus);
- 
- 	/*
- 	 * Upstream KVM prior to 4.8 does not support KVM_CAP_MAX_VCPU_ID.
+ static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 16ee03e76d66..f49bb504fa72 100644
+index f49bb504fa72..b1c3c7260902 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -12,6 +12,7 @@
- #include <assert.h>
- #include <sched.h>
- #include <sys/mman.h>
-+#include <sys/resource.h>
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <unistd.h>
-@@ -411,6 +412,37 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
- 	return vm_adjust_num_guest_pages(mode, nr_pages);
+@@ -415,10 +415,11 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ void kvm_set_files_rlimit(uint32_t nr_vcpus)
+ {
+ 	/*
+-	 * Number of file descriptors required, nr_vpucs vCPU fds + an arbitrary
+-	 * number for everything else.
++	 * Each vCPU will open two file descriptors: the vCPU itself and the
++	 * vCPU's binary stats file descriptor.  Add an arbitrary amount of
++	 * buffer for all other files a test may open.
+ 	 */
+-	int nr_fds_wanted = nr_vcpus + 100;
++	int nr_fds_wanted = nr_vcpus * 2 + 100;
+ 	struct rlimit rl;
+ 
+ 	/*
+@@ -746,6 +747,8 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 	ret = close(vcpu->fd);
+ 	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
+ 
++	kvm_stats_release(&vcpu->stats);
++
+ 	list_del(&vcpu->list);
+ 
+ 	vcpu_arch_free(vcpu);
+@@ -1339,6 +1342,11 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+ 	TEST_ASSERT(vcpu->run != MAP_FAILED,
+ 		    __KVM_SYSCALL_ERROR("mmap()", (int)(unsigned long)MAP_FAILED));
+ 
++	if (kvm_has_cap(KVM_CAP_BINARY_STATS_FD))
++		vcpu->stats.fd = vcpu_get_stats_fd(vcpu);
++	else
++		vcpu->stats.fd = -1;
++
+ 	/* Add to linked-list of VCPUs. */
+ 	list_add(&vcpu->list, &vm->vcpus);
+ 
+@@ -2251,23 +2259,9 @@ void read_stat_data(int stats_fd, struct kvm_stats_header *header,
+ 		    desc->name, size, ret);
  }
  
-+void kvm_set_files_rlimit(uint32_t nr_vcpus)
-+{
-+	/*
-+	 * Number of file descriptors required, nr_vpucs vCPU fds + an arbitrary
-+	 * number for everything else.
-+	 */
-+	int nr_fds_wanted = nr_vcpus + 100;
-+	struct rlimit rl;
-+
-+	/*
-+	 * Check that we're allowed to open nr_fds_wanted file descriptors and
-+	 * try raising the limits if needed.
-+	 */
-+	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl), "getrlimit() failed!");
-+
-+	if (rl.rlim_cur < nr_fds_wanted) {
-+		rl.rlim_cur = nr_fds_wanted;
-+		if (rl.rlim_max < nr_fds_wanted) {
-+			int old_rlim_max = rl.rlim_max;
-+
-+			rl.rlim_max = nr_fds_wanted;
-+			__TEST_REQUIRE(setrlimit(RLIMIT_NOFILE, &rl) >= 0,
-+				       "RLIMIT_NOFILE hard limit is too low (%d, wanted %d)",
-+				       old_rlim_max, nr_fds_wanted);
-+		} else {
-+			TEST_ASSERT(!setrlimit(RLIMIT_NOFILE, &rl), "setrlimit() failed!");
-+		}
-+	}
-+
-+}
-+
- struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
- 			   uint64_t nr_extra_pages)
+-/*
+- * Read the data of the named stat
+- *
+- * Input Args:
+- *   vm - the VM for which the stat should be read
+- *   stat_name - the name of the stat to read
+- *   max_elements - the maximum number of 8-byte values to read into data
+- *
+- * Output Args:
+- *   data - the buffer into which stat data should be read
+- *
+- * Read the data values of a specified stat from the binary stats interface.
+- */
+-void __vm_get_stat(struct kvm_vm *vm, const char *name, uint64_t *data,
+-		   size_t max_elements)
++void kvm_get_stat(struct kvm_binary_stats *stats, const char *name,
++		  uint64_t *data, size_t max_elements)
  {
-@@ -420,6 +452,8 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
- 	struct kvm_vm *vm;
+-	struct kvm_binary_stats *stats = &vm->stats;
+ 	struct kvm_stats_desc *desc;
+ 	size_t size_desc;
  	int i;
+diff --git a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
+index a76078a08ff8..574a944763b7 100644
+--- a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
++++ b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
+@@ -465,6 +465,8 @@ int main(int argc, char *argv[])
+ 	cancel_join_vcpu_thread(threads[0], params[0].vcpu);
+ 	cancel_join_vcpu_thread(threads[1], params[1].vcpu);
  
-+	kvm_set_files_rlimit(nr_runnable_vcpus);
++	TEST_ASSERT_EQ(data->hlt_count, vcpu_get_stat(params[0].vcpu, halt_exits));
 +
- 	pr_debug("%s: mode='%s' type='%d', pages='%ld'\n", __func__,
- 		 vm_guest_mode_string(shape.mode), shape.type, nr_pages);
- 
+ 	fprintf(stderr,
+ 		"Test successful after running for %d seconds.\n"
+ 		"Sending vCPU sent %lu IPIs to halting vCPU\n"
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
