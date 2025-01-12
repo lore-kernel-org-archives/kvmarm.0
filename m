@@ -1,110 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1362C1A8F7A;
-	Sun, 12 Jan 2025 14:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF622157469;
+	Sun, 12 Jan 2025 16:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736690530; cv=none; b=DV9uIIC54MK6t7FvLLadI1BDtdoIHYWrgoyA2k5LxfqVY1MPLwldpbRteUmt3A995VIgqnUEsscD/CKyh4JpN6OMKMH3JNftYm3x4T64RZo4UYZpo30kVDH6A3hxIqmfAMThlxHBPDKPLjUbCOSHSQkdQXfaIXzbyXBfoRaMVIQ=
+	t=1736700637; cv=none; b=kyS88c3MtapW4UnIeCVBefcm0yi/aqo1D+Ce60lhIMXcUofTuBFZFxQwE+V8C2O5M9QjfLhMbMLqyVUenos2bHDaBcOddZDZd1zmOGniBZqr4clyEl35AuX8vssxyo8ascDDWeIjdhghWm+VANgVjIrGhMr1SxpWEZvrc0sNV9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736690530; c=relaxed/simple;
-	bh=LkIr9/qMHsqCCXEL2skzxvD0LdZzq3jF/JileN/w4jw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BgHKL535PAUr8DdZrv5DZNL2gvoQ7Z29XHD1EIOUpeykTf0ercyNj1khd/29JNZQMOdwmgySnlgaeYcn6otWq/vegsfPmus/cxiueErOXkjODaqA4UojZb/Esjal4wWz1dTGyG48wnUlVTWQ7CL/i+I0v0kFCgQPgmbnymCgPlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zhj19cq0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736700637; c=relaxed/simple;
+	bh=+VkGKow8plOWnLeNwlQycmgXpMLo8zy0sbUQstHgjn8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Oyon+2kycpchLZEZNYyMsZKWJwi5d3KGmwF/xYolv/AU75S7gcvtcmjPlmDdlQizuVylldLBuaSqufsHTj4jfnjnHhHH5+X8SI2EYnSacx2cwNBBfn2qW5FG949SsWFPykUTn1kQRyLZLbWggZccJl5BBMddB56XG1IxenjGclc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eaLyy0gI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zhj19cq0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BA06C4CEDF;
-	Sun, 12 Jan 2025 14:02:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eaLyy0gI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 565DCC4CEDF;
+	Sun, 12 Jan 2025 16:50:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736690529;
-	bh=LkIr9/qMHsqCCXEL2skzxvD0LdZzq3jF/JileN/w4jw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zhj19cq008cHmAcc1BbuLxVaBOg+52Dy4VUj4XFLqfkyf7hCic/gU47KrLHhrspu3
-	 iwXmmPzW0VXy/MySqRbivBrPkQC/xd/+3C93eC/wA8v7pEzypWtaT8+EBEdxMqooMD
-	 s7NeqWgm4oJpdotgRxK6aRIQWc75r87vhxtkN1NxaigS44qXKjPLaeuUvtnWUlzZFU
-	 njeMHOVo2Or2Sex1ANK6cumunmYgUl7BnpgyqCRMRjmROvVu7ltvMNN3Gkm36jQcVq
-	 3qy6ELfLcK+uAjvt0Z3Ozg1p93Ti0wKAVhR+f9kUnLJ8ZIBNya5TMFWCI6ff9k01Wr
-	 Hr7DxHTWut56w==
+	s=k20201202; t=1736700637;
+	bh=+VkGKow8plOWnLeNwlQycmgXpMLo8zy0sbUQstHgjn8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eaLyy0gIGDzMaxtKhSVA+XFYu7ZH/rYpprCQX0no9wYqYMc3xg+b0vPa4dH5hRn9Z
+	 8MngDr5CYLQdZFoJdzHAnpsrJOlQ/2g7dWYY/qoRfT6B6SFx4bYdDz0qi+2MnOj4V6
+	 FmyodEArNN3cpGRGpYMWxTyrvBPux1ihBLNvhnRvYY6cYprvh0vgpilbMXuKNv6qBh
+	 Xt3rHeuieF4eRt0CehrhuTdnZnjXuRkoQKhnbFIaEjKkAeBMFX8rHKna2dRCi/75xo
+	 AgetygdeJhZspkd4pRJiwAOdpgAXXEoq2FMU9BRIk8uW1GzqMnUouyFMXA85ZQC5hS
+	 1iExjwFphUDtQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tWyXX-00BM8R-9A;
-	Sun, 12 Jan 2025 14:02:07 +0000
+	id 1tX1AZ-00BNnv-2d;
+	Sun, 12 Jan 2025 16:50:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	coresight@lists.linaro.org,
-	James Clark <james.clark@linaro.org>
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
 Cc: Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	James Morse <james.morse@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: (subset) [PATCH v10 00/10] kvm/coresight: Support exclude guest and exclude host
-Date: Sun, 12 Jan 2025 14:02:02 +0000
-Message-Id: <173669046278.1179369.4535548560849309424.b4-ty@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 0/2] KVM: arm64: nv: Fix sysreg RESx-ication
+Date: Sun, 12 Jan 2025 16:50:27 +0000
+Message-Id: <20250112165029.1181056-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250107113252.260631-1-james.clark@linaro.org>
-References: <20250107113252.260631-1-james.clark@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, james.clark@linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, mark.rutland@arm.com, anshuman.khandual@arm.com, robh@kernel.org, broonie@kernel.org, shiqiliu@hust.edu.cn, james.morse@arm.com, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 07 Jan 2025 11:32:37 +0000, James Clark wrote:
-> FEAT_TRF is a Coresight feature that allows trace capture to be
-> completely filtered at different exception levels, unlike the existing
-> TRCVICTLR controls which may still emit target addresses of branches,
-> even if the following trace is filtered.
-> 
-> Without FEAT_TRF, it was possible to start a trace session on a host and
-> also collect trace from the guest as TRCVICTLR was never programmed to
-> exclude guests (and it could still emit target addresses even if it
-> was).
-> 
-> [...]
+Joey recently reported that some rather basic tests were failing on
+NV, and managed to track it down to critical register fields (such as
+HCR_EL2.E2H) not having their expect value.
 
-Applied to next, thanks!
+Further investigation has outlined a couple of critical issues:
 
-[05/10] tools: arm64: Update sysreg.h header files
-        commit: 38138762faffeb923d9f49efbcc09884f1530786
-[06/10] arm64/sysreg/tools: Move TRFCR definitions to sysreg
-        commit: c382ee674c8b5005798606267d660cf995218b18
-[07/10] coresight: trbe: Remove redundant disable call
-        commit: a2b579c41fe9c295804abd167751f9fdc73c7006
-[08/10] KVM: arm64: coresight: Give TRBE enabled state to KVM
-        commit: a665e3bc88081dd65642d83fc22a1abdb6a901bc
-[09/10] KVM: arm64: Support trace filtering for guests
-        commit: 054b88391bbe2e470c5484cb91622238314344fb
-[10/10] coresight: Pass guest TRFCR value to KVM
-        commit: aaf69eff6cdb8613ff1f6a520821f769dc92f969
+- Evaluating HCR_EL2.E2H must always be done with a sanitising
+  accessor, no ifs, no buts. Given that KVM assumes a fixed value for
+  this bit, we cannot leave it to the guest to mess with.
 
-Cheers,
+- Resetting the sysreg file must result in the RESx bits taking
+  effect. Otherwise, we may end-up making the wrong decision (see
+  above), and we definitely expose invalid values to the guest. Note
+  that because we compute the RESx masks very late in the VM setup, we
+  need to apply these masks at that particular point as well.
 
-	M.
+The two patches in this series are enough to fix the current set of
+issues, but __vcpu_sys_reg() needs some extra work as it is doing the
+wrong thing when used as a lvalue. I'll post a separate series for
+that, as the two problems are fairly orthogonal, and this results in a
+significant amount of churn.
+
+All kudos to Joey for patiently tracking that one down. This was
+hidden behind a myriad of other issues, and nailing this sucker down
+is nothing short of a debugging lesson. Drinks on me next time.
+
+Unless someone shouts, I'll take this in for 6.14.
+
+Marc Zyngier (2):
+  KVM: arm64: nv: Always evaluate HCR_EL2 using sanitising accessors
+  KVM: arm64: nv: Apply RESx settings to sysreg reset values
+
+ arch/arm64/include/asm/kvm_emulate.h | 36 ++++++++++++----------------
+ arch/arm64/include/asm/kvm_nested.h  |  2 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c   |  4 ++--
+ arch/arm64/kvm/nested.c              |  9 +++++--
+ arch/arm64/kvm/sys_regs.c            |  5 +++-
+ 5 files changed, 29 insertions(+), 27 deletions(-)
+
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.39.2
 
