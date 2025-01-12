@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AD51E492;
-	Sat, 11 Jan 2025 15:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEB3195B37;
+	Sun, 12 Jan 2025 10:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736607758; cv=none; b=Hce9rSVS6RxxxYIGsFEDPFv1PPZvnYfQL/EJCkK/UFJdYZ5F+7rbQm06AnXIJyRWbWGXUpAT3FjLmNhsNhaJOWzb7jUJ1l5bAPrpcp2O+ZHi/ExvEMOwq7M7sxus1cLlI2e8pCvxigQkDe0p6yK1YQzBBUxyzQJzJyQQUBc74uo=
+	t=1736678535; cv=none; b=fSpACoFGg0myqXqJiEOmFEGDuVRzwNaCss1EyhxczutLMhJb7VOml7cazB1i14KqQ150k2BM+WxFwihfEHu2ahl0H+rrRdQZ1GPhC/fBIicdZUTC2tGXx5LqmU7khOW/UY08eUZNEbkpqkl1FgfC5RHnQ8JQ7ZdDLC/l3u8q6EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736607758; c=relaxed/simple;
-	bh=U6bro49caK6aBzW6XG6V8QOCPxjNZ0rPepiWlKEKqd0=;
+	s=arc-20240116; t=1736678535; c=relaxed/simple;
+	bh=R7njldLDOz8MV+CZLpoFpvBPG4OpdGcvpLOzHB78ebk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WlI0W0nHaHEIGeDyFAPrxFOax5u8b+Lwm0w8Cy0yIBWs+gx5DyffMNHq+OKFk1OnirVdpxRxPdLYJDS4fpRTmvhcn/RNA2uW5IIF/hLdxSmYQytjV5SMXaI2Ff7WofaCWAt9jRdKwzR4fmaHCP5rsCrCd4O3dviMBusBIk6YkOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pAxFbrlv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=N9j0+hjbQazGjrvFNfquAYR95Ax1mdslPJyyj+iNge0TslOyA/I8ZjxpCFyDc3exr3umvtS4+VbBWgdFNbKhA+XO1UXfeRWuRddQYRMlX2Zdb0hoL3GUvFMv0Fpu/U5upaV5opSgfr6lHeAKeEi58i9G1ls8uH2WL9AxnBDGKS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o79/Iqzl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pAxFbrlv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C313C4CED2;
-	Sat, 11 Jan 2025 15:02:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o79/Iqzl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B29C4CEDF;
+	Sun, 12 Jan 2025 10:42:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736607758;
-	bh=U6bro49caK6aBzW6XG6V8QOCPxjNZ0rPepiWlKEKqd0=;
+	s=k20201202; t=1736678534;
+	bh=R7njldLDOz8MV+CZLpoFpvBPG4OpdGcvpLOzHB78ebk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pAxFbrlvT1HYG5aLIdA47ajh4hlbVAT+fWIMgcyLXsQM239da7+yQ0KjaOad78SDC
-	 a1uYSdK7mXAdYP0jWelWC3fHZAWcYqshrtiMtqagMwb9vmLpSpGIWO3B5+7/SZ3rCf
-	 E0xRN6O/0IcTbHN2XDkzU7yA+WTdqFfGqq5ZEzCLzrFCqIZyNxM9X8c/JHQRAoxfhn
-	 +tSpngkIwXnPJwoseZQ7eb6AI1OFOLhNUwxqpHtJDyswqmJarqnrmIgrIn3EWpqmih
-	 p/muBQthODZyn/ERV8zdLWr7vEJoTN7LIZxZUy4Fy0B8nPWRdtqhR523CMZtXSiWdg
-	 Ee14JZGEMVMTA==
+	b=o79/IqzlgeWXj8aFVfeBJ0yTS6UJ4ZM5TaD2tf626OSCln+In8HPJnvW4+R2vDG68
+	 7WfGLN8ZlnI1A/lNz66TRBgM81AFGCebhSViaRjfYTSG1k2S4xp3mWw4shP99vedJt
+	 fAgWSAcSMfmv/2/fzCsF5SZqxttWAfsn27TuhCuoF83fEX6E4NbCyrCOsVzLZtkfbB
+	 E0+pgCJSHiCKW6674OH0L15SVy12WoWkdWqwtl66PWXNBCWjhwoDC0Ua0Zn1Xd4+9v
+	 HChnmpU5Ibxi1xVTeHBCL4pZD8Msl2wYs/kNFeqQiyXpyP3jYHfeihja2Px/n8rDYu
+	 MfazNqKy6LvvA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tWd0W-00BBeb-3P;
-	Sat, 11 Jan 2025 15:02:36 +0000
+	id 1tWvQ4-00BKDr-3a;
+	Sun, 12 Jan 2025 10:42:12 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -39,18 +39,18 @@ To: Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	"Rob Herring (Arm)" <robh@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Quentin Perret <qperret@google.com>
+Cc: Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
-Date: Sat, 11 Jan 2025 15:02:33 +0000
-Message-Id: <173660773861.818546.3192188976167687860.b4-ty@kernel.org>
+Subject: Re: [PATCH 0/3] KVM: arm64: Simplify pKVM memory transitions
+Date: Sun, 12 Jan 2025 10:42:07 +0000
+Message-Id: <173667852147.882737.8982373220700597868.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250109223836.419240-1-robh@kernel.org>
-References: <20250109223836.419240-1-robh@kernel.org>
+In-Reply-To: <20250110121936.1559655-1-qperret@google.com>
+References: <20250110121936.1559655-1-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,27 +60,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, robh@kernel.org, mark.rutland@arm.com, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, tabba@google.com, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 09 Jan 2025 16:38:36 -0600, Rob Herring (Arm) wrote:
-> The Branch Record Buffer Extension (BRBE) adds a number of system
-> registers and instructions which we don't currently intend to expose to
-> guests. Our existing logic handles this safely, but this could be
-> improved with some explicit handling of BRBE.
-> 
-> KVM currently hides BRBE from guests: the cpufeature code's
-> ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field, and so
-> this will be zero in the sanitised value of ID_AA64DFR0 exposed to
-> guests via read_sanitised_id_aa64dfr0_el1().
+On Fri, 10 Jan 2025 12:19:33 +0000, Quentin Perret wrote:
+> Since its early days, pKVM has formalized memory 'transitions' (shares
+> and donations) using 'struct pkvm_mem_transition' and bunch of helpers
+> to manipulate it. The intention was for all transitions to use this
+> machinery to ensure we're checking things consistently. However, as
+> development progressed, it became clear that the rigidity of this model
+> made it really difficult to use in some use-cases which ended-up
+> side-stepping it entirely. That is the case for the
+> hyp_{un}pin_shared_mem() and host_{un}share_guest() paths upstream which
+> use lower level helpers directly, as well as for several other pKVM
+> features that should land upstream in the future (ex: when a guest
+> relinquishes a page during ballooning, when annotating a page that is
+> being DMA'd to, ...). On top of this, the pkvm_mem_transition machinery
+> requires a lot of boilerplate which makes the code hard to read, but
+> also adds layers of indirection that no compilers seems to see through,
+> hence leading to suboptimal generated code.
 > 
 > [...]
 
 Applied to next, thanks!
 
-[1/1] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
-      commit: a7f1fa5564be565bd4bc18875bb46ffd0c01d292
+[1/3] KVM: arm64: Drop pkvm_mem_transition for FF-A
+      commit: ed2f80fd76bd2c6e00d2e90f78d21a3055ee3562
+[2/3] KVM: arm64: Drop pkvm_mem_transition for host/hyp sharing
+      commit: d3b3473c15e4391673d8dca9c36dd5e9c3a8a4ac
+[3/3] KVM: arm64: Drop pkvm_mem_transition for host/hyp donations
+      commit: 2d2aa2eb275fa6f80d68ed442c3328273bbbecba
 
 Cheers,
 
