@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D361BEF90;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA2A1BF7E0;
 	Sun, 12 Jan 2025 17:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736701731; cv=none; b=aDFISVwEKPtYq70TWGBNI53rh8VJl1vPp6jUJSn02qXAQAg6uDFS9zSz8ecnx8Sv1MLtQPK6xoi84/6DiorpDM07xwKEGjybruNvj+OLWrGuPTRQA7R5dclLdfRUgLvv8cU9ESF6hxvXxyILYm30VBt0k3wJI1jEYGdx+PxJrZ4=
+	t=1736701731; cv=none; b=gGqtPvRu0VEGSoN1CwwvTIExDE0cX1626pvCS+042y9XtWFl4S0zvMWPNVw3Yk3iToT/+O3ZR+k8azPAZ4z8KuR9Hu4TFg1pCWB/065nFmJbO/14Wxv7zq0vUUzi7cGd4Ze/hbZdVhu60b0VHEUTEGwCsuonebOshOp9Kf1OMJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736701731; c=relaxed/simple;
-	bh=k4zd0+92+vTENw2V6ehlfzPFY0qjPTy8ivaAl3XmJ68=;
+	bh=Bgxuo34U3iIpwaIaLAPc1QHIjxi5FsZIEKUZNx2/DWg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eZoeyIuLtez+6zMNATa5O95idyUA3O96WmKk9wCAFKaQZg4KcEU+CR/svvkbgBQ4k8p/oYsfWQNkK52z7lrnFQexub2Nlyw6ElvWGaTvOF2hL0cZsZblzhsWrHsWs7hIJdvy+puUP2SUGzYKdtIGj+qKEBW8q+EXFwSaaYUPU6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUNHFvsS; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=b8rQzJZHNevAf4uEkXh1e2EW3SCAMxBKBUQ8UODiLNl4m6hs7CCjfgS/uPEgbd7Taqn4+JHqk/PQoFe2tcY6lsVzcuofjSnW8N1YF+aT0v8p6VZlS2qWTIphOO75eVxkUIbIsS1jEmeOz1l4TvwuOZB/4w8a/XdWPN3AWiEbK2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kPSKJCls; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUNHFvsS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11205C4CEE5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kPSKJCls"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83D8CC4CEE4;
 	Sun, 12 Jan 2025 17:08:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736701731;
-	bh=k4zd0+92+vTENw2V6ehlfzPFY0qjPTy8ivaAl3XmJ68=;
+	bh=Bgxuo34U3iIpwaIaLAPc1QHIjxi5FsZIEKUZNx2/DWg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NUNHFvsSatMbYGcP3JabQJJkMbYnt0HsAk57CyHDV2PxKoRAsDMABvwpUvblnU85n
-	 6V+Ikp6CrDJ1aCpzxN8R5/CV8ExtcRB6NIpUf2Z7zlXQxEoK4nxiWTwsoBqbxnU4Or
-	 KhFq8nnpfvSrBzhGFkSrcqgyE3Td7q8RkkFAlTL5ohHJ1L1tUHx1omfgWqKQWQL6UN
-	 /gB45EEoB2xo6qEn0D3O530s5EhUTuIYOoZ0W/podFxRVZml2KI8Oz+oNsJZ5Xo+uk
-	 vY1iK2pK0wyhTo187Fb80pQrDva5mW27W4i+Z3PUDXzsn+54b6U01a3QSOIK0MoGvZ
-	 5mpynFf/QIozg==
+	b=kPSKJClsYN8jjxQ45J79Dl3QRPivT/ogbh1mGElYqbDSNKkNBPuO54+bDeKKP9GO2
+	 NCzbROYkzozPK0tOV66WVosAjjEk2jjEK/M9gV/eHNmP6NBdN11vvGicwZjFK7CfmM
+	 buCkOyNZXYTVZUJUMTgSq0ye7cEpaBwHlC98TDU32K33s1x2w4u4s47T7Kz6FXmxfL
+	 PQN1HyIghe4XyQPIp4vzyT/0jK4NoIKCaGKmVARYBpDvCMZZmfQjMFsb6huqloUfb8
+	 7B5X0ZnUhr0vKTS3t5VvaPwdozTzmSfCclYrdmFeisEa7KBvKdrLqlLRYUWqbl4Qhp
+	 PmNwPTMQSVEwQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tX1SC-00BNxR-V5;
+	id 1tX1SD-00BNxR-ET;
 	Sun, 12 Jan 2025 17:08:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 02/17] arm64: sysreg: Add layout for ICH_VTR_EL2
-Date: Sun, 12 Jan 2025 17:08:30 +0000
-Message-Id: <20250112170845.1181891-3-maz@kernel.org>
+Subject: [PATCH v2 04/17] KVM: arm64: Move host SVE/SME state flags out of vCPU
+Date: Sun, 12 Jan 2025 17:08:32 +0000
+Message-Id: <20250112170845.1181891-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250112170845.1181891-1-maz@kernel.org>
 References: <20250112170845.1181891-1-maz@kernel.org>
@@ -60,185 +60,119 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ICH_VTR_EL2-related macros are missing a number of config
-bits that we are about to handle. Take this opportunity to fully
-describe the layout of that register as part of the automatic
-generation infrastructure.
+From: Oliver Upton <oliver.upton@linux.dev>
 
-This results in a bit of churn to repaint constants that are now
-generated with a different format.
+We're running a bit tight on vCPU state flags, and there's no good
+reason for tracking bits of host state in the vCPU. Rather than do the
+unspeakable and add another byte of sflags, move some of the obvious
+host bits over to kvm_host_data where they really belong.
 
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Link: https://lore.kernel.org/r/20240823212703.3576061-3-oliver.upton@linux.dev
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h       | 13 -------------
- arch/arm64/kvm/vgic-sys-reg-v3.c      |  8 ++++----
- arch/arm64/kvm/vgic/vgic-v3.c         | 16 +++++++---------
- arch/arm64/tools/sysreg               | 14 ++++++++++++++
- tools/arch/arm64/include/asm/sysreg.h | 13 -------------
- 5 files changed, 25 insertions(+), 39 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 26 ++++++++++++++++----------
+ arch/arm64/kvm/fpsimd.c           | 12 ++++++------
+ 2 files changed, 22 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 3e84ef8f5b311..cf74ebcd46d95 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -561,7 +561,6 @@
- 
- #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
- #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
--#define SYS_ICH_VTR_EL2			sys_reg(3, 4, 12, 11, 1)
- #define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
- #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
- #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
-@@ -1030,18 +1029,6 @@
- #define ICH_VMCR_ENG1_SHIFT	1
- #define ICH_VMCR_ENG1_MASK	(1 << ICH_VMCR_ENG1_SHIFT)
- 
--/* ICH_VTR_EL2 bit definitions */
--#define ICH_VTR_PRI_BITS_SHIFT	29
--#define ICH_VTR_PRI_BITS_MASK	(7 << ICH_VTR_PRI_BITS_SHIFT)
--#define ICH_VTR_ID_BITS_SHIFT	23
--#define ICH_VTR_ID_BITS_MASK	(7 << ICH_VTR_ID_BITS_SHIFT)
--#define ICH_VTR_SEIS_SHIFT	22
--#define ICH_VTR_SEIS_MASK	(1 << ICH_VTR_SEIS_SHIFT)
--#define ICH_VTR_A3V_SHIFT	21
--#define ICH_VTR_A3V_MASK	(1 << ICH_VTR_A3V_SHIFT)
--#define ICH_VTR_TDS_SHIFT	19
--#define ICH_VTR_TDS_MASK	(1 << ICH_VTR_TDS_SHIFT)
--
- /*
-  * Permission Indirection Extension (PIE) permission encodings.
-  * Encodings with the _O suffix, have overlays applied (Permission Overlay Extension).
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 9e7c486b48c2e..5eacb4b3250a1 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -35,12 +35,12 @@ static int set_gic_ctlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
- 
- 	vgic_v3_cpu->num_id_bits = host_id_bits;
- 
--	host_seis = FIELD_GET(ICH_VTR_SEIS_MASK, kvm_vgic_global_state.ich_vtr_el2);
-+	host_seis = FIELD_GET(ICH_VTR_EL2_SEIS, kvm_vgic_global_state.ich_vtr_el2);
- 	seis = FIELD_GET(ICC_CTLR_EL1_SEIS_MASK, val);
- 	if (host_seis != seis)
- 		return -EINVAL;
- 
--	host_a3v = FIELD_GET(ICH_VTR_A3V_MASK, kvm_vgic_global_state.ich_vtr_el2);
-+	host_a3v = FIELD_GET(ICH_VTR_EL2_A3V, kvm_vgic_global_state.ich_vtr_el2);
- 	a3v = FIELD_GET(ICC_CTLR_EL1_A3V_MASK, val);
- 	if (host_a3v != a3v)
- 		return -EINVAL;
-@@ -68,10 +68,10 @@ static int get_gic_ctlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
- 	val |= FIELD_PREP(ICC_CTLR_EL1_PRI_BITS_MASK, vgic_v3_cpu->num_pri_bits - 1);
- 	val |= FIELD_PREP(ICC_CTLR_EL1_ID_BITS_MASK, vgic_v3_cpu->num_id_bits);
- 	val |= FIELD_PREP(ICC_CTLR_EL1_SEIS_MASK,
--			  FIELD_GET(ICH_VTR_SEIS_MASK,
-+			  FIELD_GET(ICH_VTR_EL2_SEIS,
- 				    kvm_vgic_global_state.ich_vtr_el2));
- 	val |= FIELD_PREP(ICC_CTLR_EL1_A3V_MASK,
--			  FIELD_GET(ICH_VTR_A3V_MASK, kvm_vgic_global_state.ich_vtr_el2));
-+			  FIELD_GET(ICH_VTR_EL2_A3V, kvm_vgic_global_state.ich_vtr_el2));
- 	/*
- 	 * The VMCR.CTLR value is in ICC_CTLR_EL1 layout.
- 	 * Extract it directly using ICC_CTLR_EL1 reg definitions.
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 6c21be12959d6..0bdecbbe74898 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -283,12 +283,10 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
- 		vgic_v3->vgic_sre = 0;
- 	}
- 
--	vcpu->arch.vgic_cpu.num_id_bits = (kvm_vgic_global_state.ich_vtr_el2 &
--					   ICH_VTR_ID_BITS_MASK) >>
--					   ICH_VTR_ID_BITS_SHIFT;
--	vcpu->arch.vgic_cpu.num_pri_bits = ((kvm_vgic_global_state.ich_vtr_el2 &
--					    ICH_VTR_PRI_BITS_MASK) >>
--					    ICH_VTR_PRI_BITS_SHIFT) + 1;
-+	vcpu->arch.vgic_cpu.num_id_bits = FIELD_GET(ICH_VTR_EL2_IDbits,
-+						    kvm_vgic_global_state.ich_vtr_el2);
-+	vcpu->arch.vgic_cpu.num_pri_bits = FIELD_GET(ICH_VTR_EL2_PRIbits,
-+						     kvm_vgic_global_state.ich_vtr_el2) + 1;
- 
- 	/* Get the show on the road... */
- 	vgic_v3->vgic_hcr = ICH_HCR_EL2_En;
-@@ -632,7 +630,7 @@ static const struct midr_range broken_seis[] = {
- 
- static bool vgic_v3_broken_seis(void)
- {
--	return ((kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK) &&
-+	return ((kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_EL2_SEIS) &&
- 		is_midr_in_range_list(read_cpuid_id(), broken_seis));
- }
- 
-@@ -706,10 +704,10 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	if (vgic_v3_broken_seis()) {
- 		kvm_info("GICv3 with broken locally generated SEI\n");
- 
--		kvm_vgic_global_state.ich_vtr_el2 &= ~ICH_VTR_SEIS_MASK;
-+		kvm_vgic_global_state.ich_vtr_el2 &= ~ICH_VTR_EL2_SEIS;
- 		group0_trap = true;
- 		group1_trap = true;
--		if (ich_vtr_el2 & ICH_VTR_TDS_MASK)
-+		if (ich_vtr_el2 & ICH_VTR_EL2_TDS)
- 			dir_trap = true;
- 		else
- 			common_trap = true;
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 9938926421b5c..f5927d345eea3 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2960,6 +2960,20 @@ Field	1	UIE
- Field	0	En
- EndSysreg
- 
-+Sysreg	ICH_VTR_EL2	3	4	12	11	1
-+Res0	63:32
-+Field	31:29	PRIbits
-+Field	28:26	PREbits
-+Field	25:23	IDbits
-+Field	22	SEIS
-+Field	21	A3V
-+Field	20	nV4
-+Field	19	TDS
-+Field	18	DVIM
-+Res0	17:5
-+Field	4:0	ListRegs
-+EndSysreg
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e18e9244d17a4..8cc25845b4be3 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -610,6 +610,12 @@ struct cpu_sve_state {
+  * field.
+  */
+ struct kvm_host_data {
++	/* SVE enabled for EL0 */
++#define HOST_SVE_ENABLED	0
++	/* SME enabled for EL0 */
++#define HOST_SME_ENABLED	1
++	unsigned long flags;
 +
- Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
- Fields	CONTEXTIDR_ELx
- EndSysreg
-diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-index d314ccab7560a..f43e303d31d25 100644
---- a/tools/arch/arm64/include/asm/sysreg.h
-+++ b/tools/arch/arm64/include/asm/sysreg.h
-@@ -420,7 +420,6 @@
+ 	struct kvm_cpu_context host_ctxt;
  
- #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
- #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
--#define SYS_ICH_VTR_EL2			sys_reg(3, 4, 12, 11, 1)
- #define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
- #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
- #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
-@@ -673,18 +672,6 @@
- #define ICH_VMCR_ENG1_SHIFT	1
- #define ICH_VMCR_ENG1_MASK	(1 << ICH_VMCR_ENG1_SHIFT)
+ 	/*
+@@ -913,22 +919,18 @@ struct kvm_vcpu_arch {
+ /* Save TRBE context if active  */
+ #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
  
--/* ICH_VTR_EL2 bit definitions */
--#define ICH_VTR_PRI_BITS_SHIFT	29
--#define ICH_VTR_PRI_BITS_MASK	(7 << ICH_VTR_PRI_BITS_SHIFT)
--#define ICH_VTR_ID_BITS_SHIFT	23
--#define ICH_VTR_ID_BITS_MASK	(7 << ICH_VTR_ID_BITS_SHIFT)
--#define ICH_VTR_SEIS_SHIFT	22
--#define ICH_VTR_SEIS_MASK	(1 << ICH_VTR_SEIS_SHIFT)
--#define ICH_VTR_A3V_SHIFT	21
--#define ICH_VTR_A3V_MASK	(1 << ICH_VTR_A3V_SHIFT)
--#define ICH_VTR_TDS_SHIFT	19
--#define ICH_VTR_TDS_MASK	(1 << ICH_VTR_TDS_SHIFT)
--
- /*
-  * Permission Indirection Extension (PIE) permission encodings.
-  * Encodings with the _O suffix, have overlays applied (Permission Overlay Extension).
+-/* SVE enabled for host EL0 */
+-#define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+-/* SME enabled for EL0 */
+-#define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
+ /* Physical CPU not in supported_cpus */
+-#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
++#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(0))
+ /* WFIT instruction trapped */
+-#define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
++#define IN_WFIT			__vcpu_single_flag(sflags, BIT(1))
+ /* vcpu system registers loaded on physical CPU */
+-#define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
++#define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(2))
+ /* Software step state is Active-pending */
+-#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
++#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(3))
+ /* PMUSERENR for the guest EL0 is on physical CPU */
+-#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
++#define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(4))
+ /* WFI instruction trapped */
+-#define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
++#define IN_WFI			__vcpu_single_flag(sflags, BIT(5))
+ 
+ 
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+@@ -1307,6 +1309,10 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+ 	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
+ #endif
+ 
++#define host_data_set_flag(nr)		set_bit(nr, host_data_ptr(flags))
++#define host_data_test_flag(nr)		test_bit(nr, host_data_ptr(flags))
++#define host_data_clear_flag(nr)	clear_bit(nr, host_data_ptr(flags))
++
+ /* Check whether the FP regs are owned by the guest */
+ static inline bool guest_owns_fp_regs(void)
+ {
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index ea5484ce1f3ba..0e0f37d1990a3 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -65,14 +65,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ 	*host_data_ptr(fpsimd_state) = kern_hyp_va(&current->thread.uw.fpsimd_state);
+ 	*host_data_ptr(fpmr_ptr) = kern_hyp_va(&current->thread.uw.fpmr);
+ 
+-	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
++	host_data_clear_flag(HOST_SVE_ENABLED);
+ 	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
+-		vcpu_set_flag(vcpu, HOST_SVE_ENABLED);
++		host_data_set_flag(HOST_SVE_ENABLED);
+ 
+ 	if (system_supports_sme()) {
+-		vcpu_clear_flag(vcpu, HOST_SME_ENABLED);
++		host_data_clear_flag(HOST_SME_ENABLED);
+ 		if (read_sysreg(cpacr_el1) & CPACR_EL1_SMEN_EL0EN)
+-			vcpu_set_flag(vcpu, HOST_SME_ENABLED);
++			host_data_set_flag(HOST_SME_ENABLED);
+ 
+ 		/*
+ 		 * If PSTATE.SM is enabled then save any pending FP
+@@ -168,7 +168,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (has_vhe() && system_supports_sme()) {
+ 		/* Also restore EL0 state seen on entry */
+-		if (vcpu_get_flag(vcpu, HOST_SME_ENABLED))
++		if (host_data_test_flag(HOST_SME_ENABLED))
+ 			sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_SMEN);
+ 		else
+ 			sysreg_clear_set(CPACR_EL1,
+@@ -227,7 +227,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 		 * for EL0.  To avoid spurious traps, restore the trap state
+ 		 * seen by kvm_arch_vcpu_load_fp():
+ 		 */
+-		if (vcpu_get_flag(vcpu, HOST_SVE_ENABLED))
++		if (host_data_test_flag(HOST_SVE_ENABLED))
+ 			sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_ZEN_EL0EN);
+ 		else
+ 			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
 -- 
 2.39.2
 
