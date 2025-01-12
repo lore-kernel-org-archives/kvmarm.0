@@ -1,269 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4645A1DFCB;
-	Sun, 12 Jan 2025 13:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1362C1A8F7A;
+	Sun, 12 Jan 2025 14:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736690338; cv=none; b=tbCSaL1ohgoxzDA0shPkkG7ubtoYNr1o1P0huy00AlHhyvzty1D7rv60od4c2qPYqWr6/qCc4JueZrHJR9+0uwGrhlHxidqyWQIuWj8mA7Vkw+MozevwKCnsjpLrBJjKSbiw6nT+1J+vXDPUYTPKHJzIggSAKS581/q4q5arPcw=
+	t=1736690530; cv=none; b=DV9uIIC54MK6t7FvLLadI1BDtdoIHYWrgoyA2k5LxfqVY1MPLwldpbRteUmt3A995VIgqnUEsscD/CKyh4JpN6OMKMH3JNftYm3x4T64RZo4UYZpo30kVDH6A3hxIqmfAMThlxHBPDKPLjUbCOSHSQkdQXfaIXzbyXBfoRaMVIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736690338; c=relaxed/simple;
-	bh=APhxbnjBE8VyIpBOed7Hi5AvGBInNUGG+g4deDfnG4g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RVmaH0fuhi5mPeDMy9zdgIUz6/28MVOZe0c+6mpfJy1wAdD669u7eYdRio0LrdNakw85twev5l2sB90u+MRhSotogqU5/xFi5q1AZwwMmEujSSJy554+0cZ7JcbH/jbI203FakVKQ5O2olJzrQajc+o5fIGFgPADDvK0vOjMsJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdcVsSta; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736690530; c=relaxed/simple;
+	bh=LkIr9/qMHsqCCXEL2skzxvD0LdZzq3jF/JileN/w4jw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BgHKL535PAUr8DdZrv5DZNL2gvoQ7Z29XHD1EIOUpeykTf0ercyNj1khd/29JNZQMOdwmgySnlgaeYcn6otWq/vegsfPmus/cxiueErOXkjODaqA4UojZb/Esjal4wWz1dTGyG48wnUlVTWQ7CL/i+I0v0kFCgQPgmbnymCgPlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zhj19cq0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdcVsSta"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BF85C4CEDF;
-	Sun, 12 Jan 2025 13:58:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zhj19cq0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BA06C4CEDF;
+	Sun, 12 Jan 2025 14:02:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736690337;
-	bh=APhxbnjBE8VyIpBOed7Hi5AvGBInNUGG+g4deDfnG4g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MdcVsStasamu1oIzH5gBxL5q3MGP98/HsqC4ijiVTxQB5C9iLdfTJCaE18jrem8J9
-	 Ec95Wq8IZwXp2BMnE2M96Ad1sJyeoEK/WfCbYY3Bdb90lqIvG954nELKOjrrONzUN9
-	 joB5nxYRKJdFJpdaOpwjc5Cfu8u4Ih8qKGCtdw2X2rPC/dSA+1RnVVcukHbjFFuCeq
-	 A2Zo7woNcF+HVZNzxfxvXouLV/LHmjClnNu8ebavVz7RwtShiw4QhikOWwAC3TS1AW
-	 UGt8/BAC6FSD1+wNOZ1DzRrWJD1+v/B8JVmGYjdPDc9D8RcKhwP11TUMA3Khu1pLuz
-	 9UGP6VPiHeFOw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	s=k20201202; t=1736690529;
+	bh=LkIr9/qMHsqCCXEL2skzxvD0LdZzq3jF/JileN/w4jw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Zhj19cq008cHmAcc1BbuLxVaBOg+52Dy4VUj4XFLqfkyf7hCic/gU47KrLHhrspu3
+	 iwXmmPzW0VXy/MySqRbivBrPkQC/xd/+3C93eC/wA8v7pEzypWtaT8+EBEdxMqooMD
+	 s7NeqWgm4oJpdotgRxK6aRIQWc75r87vhxtkN1NxaigS44qXKjPLaeuUvtnWUlzZFU
+	 njeMHOVo2Or2Sex1ANK6cumunmYgUl7BnpgyqCRMRjmROvVu7ltvMNN3Gkm36jQcVq
+	 3qy6ELfLcK+uAjvt0Z3Ozg1p93Ti0wKAVhR+f9kUnLJ8ZIBNya5TMFWCI6ff9k01Wr
+	 Hr7DxHTWut56w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tWyUR-00BM6X-3S;
-	Sun, 12 Jan 2025 13:58:55 +0000
-Date: Sun, 12 Jan 2025 13:58:54 +0000
-Message-ID: <87cygsqgkh.wl-maz@kernel.org>
+	id 1tWyXX-00BM8R-9A;
+	Sun, 12 Jan 2025 14:02:07 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	oliver.upton@linux.dev,
 	suzuki.poulose@arm.com,
 	coresight@lists.linaro.org,
-	James Clark <james.clark@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	James Clark <james.clark@linaro.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mike Leach <mike.leach@linaro.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Mark Rutland <mark.rutland@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
 	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	James Morse <james.morse@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Fuad Tabba <tabba@google.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 06/10] arm64/sysreg/tools: Move TRFCR definitions to sysreg
-In-Reply-To: <20250107113252.260631-7-james.clark@linaro.org>
+Subject: Re: (subset) [PATCH v10 00/10] kvm/coresight: Support exclude guest and exclude host
+Date: Sun, 12 Jan 2025 14:02:02 +0000
+Message-Id: <173669046278.1179369.4535548560849309424.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250107113252.260631-1-james.clark@linaro.org>
 References: <20250107113252.260631-1-james.clark@linaro.org>
-	<20250107113252.260631-7-james.clark@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, james.clark@arm.com, broonie@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, mark.rutland@arm.com, shiqiliu@hust.edu.cn, james.morse@arm.com, anshuman.khandual@arm.com, tabba@google.com, robh@kernel.org, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com, coresight@lists.linaro.org, james.clark@linaro.org, joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, mark.rutland@arm.com, anshuman.khandual@arm.com, robh@kernel.org, broonie@kernel.org, shiqiliu@hust.edu.cn, james.morse@arm.com, tabba@google.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 07 Jan 2025 11:32:43 +0000,
-James Clark <james.clark@linaro.org> wrote:
->=20
-> From: James Clark <james.clark@arm.com>
->=20
-> Convert TRFCR to automatic generation. Add separate definitions for ELx
-> and EL2 as TRFCR_EL1 doesn't have CX. This also mirrors the previous
-> definition so no code change is required.
->=20
-> Also add TRFCR_EL12 which will start to be used in a later commit.
->=20
-> Unfortunately, to avoid breaking the Perf build with duplicate
-> definition errors, the tools copy of the sysreg.h header needs to be
-> updated at the same time rather than the usual second commit. This is
-> because the generated version of sysreg
-> (arch/arm64/include/generated/asm/sysreg-defs.h), is currently shared
-> and tools/ does not have its own copy.
->=20
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Signed-off-by: James Clark <james.clark@arm.com>
-> Signed-off-by: James Clark <james.clark@linaro.org>
+On Tue, 07 Jan 2025 11:32:37 +0000, James Clark wrote:
+> FEAT_TRF is a Coresight feature that allows trace capture to be
+> completely filtered at different exception levels, unlike the existing
+> TRCVICTLR controls which may still emit target addresses of branches,
+> even if the following trace is filtered.
+> 
+> Without FEAT_TRF, it was possible to start a trace session on a host and
+> also collect trace from the guest as TRCVICTLR was never programmed to
+> exclude guests (and it could still emit target addresses even if it
+> was).
+> 
+> [...]
 
-I've added the following patch to the series, dropping the TCFCR_ELx
-construct and fixing the code that makes use of it.
+Applied to next, thanks!
+
+[05/10] tools: arm64: Update sysreg.h header files
+        commit: 38138762faffeb923d9f49efbcc09884f1530786
+[06/10] arm64/sysreg/tools: Move TRFCR definitions to sysreg
+        commit: c382ee674c8b5005798606267d660cf995218b18
+[07/10] coresight: trbe: Remove redundant disable call
+        commit: a2b579c41fe9c295804abd167751f9fdc73c7006
+[08/10] KVM: arm64: coresight: Give TRBE enabled state to KVM
+        commit: a665e3bc88081dd65642d83fc22a1abdb6a901bc
+[09/10] KVM: arm64: Support trace filtering for guests
+        commit: 054b88391bbe2e470c5484cb91622238314344fb
+[10/10] coresight: Pass guest TRFCR value to KVM
+        commit: aaf69eff6cdb8613ff1f6a520821f769dc92f969
+
+Cheers,
 
 	M.
-
-=46rom fc77862e06ca1c15e44b0c915da193bd8ed855bc Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Sun, 12 Jan 2025 13:08:59 +0000
-Subject: [PATCH] arm64/sysreg: Get rid of TRFCR_ELx SysregFields
-
-There is no such thing as TRFCR_ELx in the architecture.
-What we have is TRFCR_EL1, for which TRFCR_EL12 is an accessor.
-
-Rename TRFCR_ELx_* to TRFCR_EL1_*, and fix the bit of code using
-these names.
-
-Similarly, TRFCR_EL12 is redefined as a mapping to TRFCR_EL1.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: James Clark <james.clark@linaro.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
----
- arch/arm64/tools/sysreg                          |  8 ++------
- .../hwtracing/coresight/coresight-etm4x-core.c   | 16 ++++++++--------
- .../hwtracing/coresight/coresight-etm4x-sysfs.c  | 10 +++++-----
- drivers/hwtracing/coresight/coresight-trbe.c     |  2 +-
- 4 files changed, 16 insertions(+), 20 deletions(-)
-
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 4c2c9c6767c93..ac5202e1df862 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1999,7 +1999,7 @@ Field	17:16	ZEN
- Res0	15:0
- EndSysreg
-=20
--SysregFields TRFCR_ELx
-+Sysreg	TRFCR_EL1	3	0	1	2	1
- Res0	63:7
- UnsignedEnum	6:5	TS
- 	0b0001	VIRTUAL
-@@ -2011,10 +2011,6 @@ Field	1	ExTRE
- Field	0	E0TRE
- EndSysregFields
-=20
--Sysreg	TRFCR_EL1	3	0	1	2	1
--Fields	TRFCR_ELx
--EndSysreg
--
- Sysreg	SMPRI_EL1	3	0	1	2	4
- Res0	63:4
- Field	3:0	PRIORITY
-@@ -2991,7 +2987,7 @@ Mapping	ZCR_EL1
- EndSysreg
-=20
- Sysreg	TRFCR_EL12	3	5	1	2	1
--Fields	TRFCR_ELx
-+Mapping	TRFCR_EL1
- EndSysreg
-=20
- Sysreg	SMCR_EL12	3	5	1	2	6
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/h=
-wtracing/coresight/coresight-etm4x-core.c
-index fbc4aa3785279..2c1a60577728e 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-@@ -275,7 +275,7 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *=
-drvdata)
- 	if (!drvdata->trfcr)
- 		return;
-=20
--	trfcr =3D drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	trfcr =3D drvdata->trfcr & ~(TRFCR_EL1_ExTRE | TRFCR_EL1_E0TRE);
-=20
- 	write_trfcr(trfcr);
- 	kvm_tracing_set_el1_configuration(trfcr);
-@@ -286,9 +286,9 @@ static u64 etm4x_get_kern_user_filter(struct etmv4_drvd=
-ata *drvdata)
- 	u64 trfcr =3D drvdata->trfcr;
-=20
- 	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
--		trfcr &=3D ~TRFCR_ELx_ExTRE;
-+		trfcr &=3D ~TRFCR_EL1_ExTRE;
- 	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
--		trfcr &=3D ~TRFCR_ELx_E0TRE;
-+		trfcr &=3D ~TRFCR_EL1_E0TRE;
-=20
- 	return trfcr;
- }
-@@ -312,7 +312,7 @@ static void etm4x_allow_trace(struct etmv4_drvdata *drv=
-data)
- 		return;
-=20
- 	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
--		trfcr =3D drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+		trfcr =3D drvdata->trfcr & ~(TRFCR_EL1_ExTRE | TRFCR_EL1_E0TRE);
- 	else
- 		trfcr =3D etm4x_get_kern_user_filter(drvdata);
-=20
-@@ -320,7 +320,7 @@ static void etm4x_allow_trace(struct etmv4_drvdata *drv=
-data)
-=20
- 	/* Set filters for guests and pass to KVM */
- 	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
--		guest_trfcr =3D drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+		guest_trfcr =3D drvdata->trfcr & ~(TRFCR_EL1_ExTRE | TRFCR_EL1_E0TRE);
- 	else
- 		guest_trfcr =3D etm4x_get_kern_user_filter(drvdata);
-=20
-@@ -1176,9 +1176,9 @@ static void cpu_detect_trace_filtering(struct etmv4_d=
-rvdata *drvdata)
- 	 * tracing at the kernel EL and EL0, forcing to use the
- 	 * virtual time as the timestamp.
- 	 */
--	trfcr =3D (TRFCR_ELx_TS_VIRTUAL |
--		 TRFCR_ELx_ExTRE |
--		 TRFCR_ELx_E0TRE);
-+	trfcr =3D (TRFCR_EL1_TS_VIRTUAL |
-+		 TRFCR_EL1_ExTRE |
-+		 TRFCR_EL1_E0TRE);
-=20
- 	/* If we are running at EL2, allow tracing the CONTEXTIDR_EL2. */
- 	if (is_kernel_in_hyp_mode())
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-sysfs.c b/drivers/=
-hwtracing/coresight/coresight-etm4x-sysfs.c
-index a9f19629f3f84..c767f8ae4cf1d 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-sysfs.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-sysfs.c
-@@ -2319,11 +2319,11 @@ static ssize_t ts_source_show(struct device *dev,
- 		goto out;
- 	}
-=20
--	switch (drvdata->trfcr & TRFCR_ELx_TS_MASK) {
--	case TRFCR_ELx_TS_VIRTUAL:
--	case TRFCR_ELx_TS_GUEST_PHYSICAL:
--	case TRFCR_ELx_TS_PHYSICAL:
--		val =3D FIELD_GET(TRFCR_ELx_TS_MASK, drvdata->trfcr);
-+	switch (drvdata->trfcr & TRFCR_EL1_TS_MASK) {
-+	case TRFCR_EL1_TS_VIRTUAL:
-+	case TRFCR_EL1_TS_GUEST_PHYSICAL:
-+	case TRFCR_EL1_TS_PHYSICAL:
-+		val =3D FIELD_GET(TRFCR_EL1_TS_MASK, drvdata->trfcr);
- 		break;
- 	default:
- 		val =3D -1;
-diff --git a/drivers/hwtracing/coresight/coresight-trbe.c b/drivers/hwtraci=
-ng/coresight/coresight-trbe.c
-index d6eb0d525a4d6..fff67aac84181 100644
---- a/drivers/hwtracing/coresight/coresight-trbe.c
-+++ b/drivers/hwtracing/coresight/coresight-trbe.c
-@@ -1118,7 +1118,7 @@ static u64 cpu_prohibit_trace(void)
- 	u64 trfcr =3D read_trfcr();
-=20
- 	/* Prohibit tracing at EL0 & the kernel EL */
--	write_trfcr(trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE));
-+	write_trfcr(trfcr & ~(TRFCR_EL1_ExTRE | TRFCR_EL1_E0TRE));
- 	/* Return the original value of the TRFCR */
- 	return trfcr;
- }
---=20
-2.39.2
-
-
---=20
+-- 
 Without deviation from the norm, progress is not possible.
+
+
