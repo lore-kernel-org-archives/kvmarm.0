@@ -1,96 +1,135 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D096124025D
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 15:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340EF1C5D4C
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 15:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736782179; cv=none; b=d4jppvQ+hxjAAFCOKn8vzhMWdZMWAholornUnhggptvqGYbAxZPNkJeR/Qn0jzSG4e98HLVDSGHn064nUUJPcbBOabhs1kfusBkLp7ewNoQ/LM+/G85s9zcrHKiPuBqCFVzeMFv4XnWAOawv/1PfP9ek1aWAtc39Q4+MyrhbrW8=
+	t=1736783025; cv=none; b=HmiPmHFJSDjyOjRb7qt3kSRSiL0WwzmX4C9JFJ8+kVy8P8ZYfcmRUS2OwHpC+EBUJaKqty01kax+yW3f9hI4XoizKuyVvcwKnWzOugvgjtPPSaFwaSawRJaFxw9rQTzDO0ihya0RaJSLI5HxwvCZ24DFTnt3G2bTLe1ML7CzEZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736782179; c=relaxed/simple;
-	bh=y0gHRClRmOHchgJy4s4ISmgVSvPE8gz6DBLQ5ez3Cpw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d5zZ4QYEIaLnCRfjGmp9gJxlaALzDU9VgN6OcpEgVj7yfN2mRGzQnFfOwUGRxphy5xl3VOf3oXAhFQIscr2F3N29jqgamG6KazGykVoN4OVVEDdFR9JaBSVTV9F7vPGQP08iXF8g/hIwih4040/c8MdN0UO1B/YpDrNOHppAvpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UQEGUKFI; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1736783025; c=relaxed/simple;
+	bh=gGT5O+5jGSnq3FXOduFRfbgLcgYYNBiLos8tPqRNUJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WyZ8HsyoK/QZuABf85ivSd6V9alPcyFfdYqsm2cTdOE68Idsi7PaTDa64Wt8DLDu0SfqzijyNFDVl1k0rOO7qsxibk8dGB7N6GZKvVnOxe/ZCRMymrdg8jlRoR0bQye5t/HUTcizDaiG5BvTrtydxnChcOEoCBH4nLZuysCpiog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WsVq8oSI; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UQEGUKFI"
-Date: Mon, 13 Jan 2025 16:29:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736782164;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rSA+hNOyAkcLqPBtZ57pM1gCyD3g1ELMOtUcZw34bIg=;
-	b=UQEGUKFI8PzrtF1awGKC1+UN8EXl+LliNVAFCiprEQoOfIHy5va7+W4MlnEdWWNcLmpDsz
-	wYZNGBL+YidgdfYdiBT/c/xX40vXVBQ9PUZcUtGG+3YpfU++G1qEUPptM+FXTwU6n4cito
-	z3guQdmmPa9/29n366iCvVlmeT2WITc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, vladimir.murzin@arm.com
-Subject: Re: [kvm-unit-tests PATCH v1 5/5] configure: arm64: Make 'max' the
- default for --processor
-Message-ID: <20250113-f6e1c55d5200410161aa61b5@orel>
-References: <20250110135848.35465-1-alexandru.elisei@arm.com>
- <20250110135848.35465-6-alexandru.elisei@arm.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WsVq8oSI"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43621d27adeso30993645e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 07:43:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1736783021; x=1737387821; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=onYqQa61OGFyF4QvM2h8YBVOy4czv714EXLgoMhI3Xc=;
+        b=WsVq8oSIDNiPeYwhu49Bipv3rPf1xFmMMuOLy91luft2/lT6ZAWa3v0opT7kjNoG+V
+         CKxMviobdxXZORh7VnGWxi2sWW1kv/6rIqUwwJbl2N898OcGFuY5nnmaDyWfMj9C0Yiq
+         2FstT+ai6/3WrXxr/XffbzkBMnFvnD775oBUdPUY1yUV2OYDyV2WymPAh3SpQl3KdyKa
+         UwFtJjiVtZ8zvO+Jo4HieYi2m/DdlT0uaJFFcHAwx2VLo9KoN5QfjvViuwM7kNyC0+AW
+         H9SnjMJCTNDLu5mkckV0w7VPkaP9s+vMEhvsEusL2LffODiDjTKT2wFHF/Zj4bay/W9r
+         /3JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736783021; x=1737387821;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=onYqQa61OGFyF4QvM2h8YBVOy4czv714EXLgoMhI3Xc=;
+        b=C44iwT2MkGUa6Mid+gcam5fuvP9O75AkUhtfl5Use1Vko1STNboz40hf3ko7WYr/Yp
+         2GmVcbgpE0s7GX0PN3U9cw3/xrP9ZJChZmyos2IW1BDpy+BecfmyZjbhlT9jgf3OlIGf
+         l1q6Djk7IYXQWkWKLVIuHICcBoV8jyRClMa6uQVoUtjJlLPnrdX6KKkx5ansYOZFLZww
+         zd78+bXwnMWFbzeWPV3wLHb5smx/9IserydaolpDKBiqaZTt3RQJ3LpFS7OVMbM1tI1T
+         7Cb9N3c3C1aHREi8ABJlZikk6fote04LqCjHLDyMmJBqgVrXnn09YHYUOmHfdpKsftFD
+         bJNg==
+X-Gm-Message-State: AOJu0Yyxmfvs+XiYA7XHuHmi5MmG8ueHYLzfEeqNUS7CLju3b2oCllsT
+	9F35IOvPb8T04aUA5fFiX1i2GnifJYWe/cqOmsk26uKa0Y3RhJ9GJQzWs+Fy8Gg=
+X-Gm-Gg: ASbGncvtlH4SrK5TbqHqPk8xz0K+i8D7CQqg16kxdso3lsq9Yc62TkVfPeGDqS/JzpY
+	SEF5z1XbZx62ZaMW+M4arBmxJY+BujSiju+WcFzZRuJSeFgFfqGlB5KnkXSpskRG+m3LDxIwS5c
+	i1W2o2Cazn1oJ7LU2wHTdtriNp5KP7vcs4F0Bd8VCxffwJejbQ2+PBsuKP5YXXP7kAxICVpbGrP
+	st2Oz+BluuTbmenAb1XSrcXTyKZTyC1QLIHdtgf2ZudWG2B70rWGeovNVirwPSokzar
+X-Google-Smtp-Source: AGHT+IGQr4kpiFB9wczlaOYRTmEvbwC5k8AQlqeQKyaHs7iqTu2Ox0YvNOuXblM8h6c/Pixyirgj0Q==
+X-Received: by 2002:a05:600c:1c28:b0:434:a734:d268 with SMTP id 5b1f17b1804b1-436e2699dfbmr216122595e9.14.1736783021472;
+        Mon, 13 Jan 2025 07:43:41 -0800 (PST)
+Received: from [192.168.68.163] ([212.105.145.205])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e89f29sm181691685e9.28.2025.01.13.07.43.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Jan 2025 07:43:41 -0800 (PST)
+Message-ID: <760969b6-18b7-42ac-9524-2f1f845b3703@linaro.org>
+Date: Mon, 13 Jan 2025 15:43:39 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250110135848.35465-6-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 04/10] arm64/sysreg: Add a comment that the sysreg
+ file should be sorted
+To: Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ coresight@lists.linaro.org, James Clark <james.clark@arm.com>,
+ Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ "Rob Herring (Arm)" <robh@kernel.org>, Shiqi Liu <shiqiliu@hust.edu.cn>,
+ James Morse <james.morse@arm.com>, Fuad Tabba <tabba@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250107113252.260631-1-james.clark@linaro.org>
+ <20250107113252.260631-5-james.clark@linaro.org>
+ <87frloqjso.wl-maz@kernel.org>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <87frloqjso.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 10, 2025 at 01:58:48PM +0000, Alexandru Elisei wrote:
-> Newer architecture features are supported by qemu TCG on newer CPUs. When
-> writing a test for such architecture features, it is necessary to pass the
-> correct -cpu argument to qemu. Make it easier on users and test authors
-> alike by making 'max' the default value for --processor. The 'max' CPU
-> model contains all the features of the cortex-a57 CPU (the old default), so
-> no regression should be possible.
-> 
-> A side effect is that, by default, the compiler will not receive a -mcpu
-> argument for compiling the code. The expectation is that this is fine,
-> since support for -mcpu=$PROCESSOR has only been added for arm64 in the
-> last commit.
-> 
-> The default for arm (cortex-a15) has been kept unchanged, because passing
-> --processor=max will cause compilation to break. If the user wants the qemu
-> CPU model to be 'max', the user will also have to supply a suitable compile
-> CPU target via --cflags=-mcpu=<cpu> configure option.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 46964d36a7d8..3ab0ec208e10 100755
-> --- a/configure
-> +++ b/configure
-> @@ -14,7 +14,7 @@ function get_default_processor()
->          default_processor="cortex-a15"
->          ;;
->      "arm64" | "aarch64")
-> -        default_processor="cortex-a57"
-> +        default_processor="max"
->          ;;
->      *)
->          default_processor=$arch
-> -- 
-> 2.47.1
->
 
-Another reason to introduce a new parameter (qemu_cpu) is that we can also
-change arm32 to 'max', reducing divergence between arm32 and arm64.
 
-Thanks,
-drew
+On 12/01/2025 12:49 pm, Marc Zyngier wrote:
+> On Tue, 07 Jan 2025 11:32:41 +0000,
+> James Clark <james.clark@linaro.org> wrote:
+>>
+>> From: James Clark <james.clark@arm.com>
+>>
+>> There are a few entries particularly at the end of the file that aren't
+>> in order. To avoid confusion, add a comment that might help new entries
+>> to be added in the right place.
+>>
+>> Reviewed-by: Mark Brown <broonie@kernel.org>
+>> Signed-off-by: James Clark <james.clark@arm.com>
+>> Signed-off-by: James Clark <james.clark@linaro.org>
+>> ---
+>>   arch/arm64/tools/sysreg | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+>> index b081b54d6d22..4ba167089e2a 100644
+>> --- a/arch/arm64/tools/sysreg
+>> +++ b/arch/arm64/tools/sysreg
+>> @@ -48,6 +48,8 @@
+>>   # feature that introduces them (eg, FEAT_LS64_ACCDATA introduces enumeration
+>>   # item ACCDATA) though it may be more taseful to do something else.
+>>   
+>> +# Please try to keep entries in this file sorted by sysreg encoding.
+>> +
+>>   Sysreg	OSDTRRX_EL1	2	0	0	0	2
+>>   Res0	63:32
+>>   Field	31:0	DTRRX
+> 
+> "Do as I say, don't do as I do".
+> 
+> I don't think this makes any sense if we don't actually sort the file
+> the first place.
+> 
+> 	M.
+> 
+
+I think it's ok if it avoids review comments that new entries should be 
+sorted. Or maybe we do the opposite and the comment should say this file 
+is allowed to be unsorted...
+
