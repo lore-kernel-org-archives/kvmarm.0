@@ -1,55 +1,55 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C36F1B4148
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 19:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2784F1C1F09
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 19:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736796696; cv=none; b=Xaxh9RT58gHKA8LUtvNzqGTNp06I4AfS8riCDK1MNuJ641Wsatov3iU3BmImQVXsDMOfICxmZ42buEPMhK7YLIwEs/xvEKp27ScjoE093i2e/zzL/CoeQHOwd4rcrrFao67D9s9sEEG0yc5WPqkulodKtYLSETpEKeVakRrVRT4=
+	t=1736796697; cv=none; b=uikos3W/zg5M3i9CylMf7z6Iqr0x0C9Yqt8qItDm0CaVwiUJpxbHObkWbEw70Bwrr24bSZsnkQehK0q8dS7lJuG0lfv+7SBlQ6XeYqslZlVn1mf32EeYLt0fUR7+FTjvfpx31U/oRTox2txgFgowLZIDrrt3ZycGIxXOu5kAtjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736796696; c=relaxed/simple;
-	bh=KGw6PIS5lxWJWHqlm1sRjO8GTmcv1T61ELZxiaRBqmA=;
+	s=arc-20240116; t=1736796697; c=relaxed/simple;
+	bh=7CBYbOa08e+cYUeyzldUH8J0XYLzdIZ7bkoffuV60xE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NOF2XEgNEdwWC0WJx9pu89Q0nsSDV+TAdLoc3DYKGEjqa8OT/5T+FyWa57bnc0IqEK7RU8hbxL7aZxA9xtwbAeAFHqP+6ka6gWK5H77k4HjybK9Aa4q5WtqESOsNDbbCRq0OE220435fEk4VjaAdF6q0t+YemRf6u6xWUkxxNac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KdUu+B09; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=OerDHUfv0CunMkdq1tjTIDAlpM0X4Lh+pyKHc/sUZaZkfz0c8jbaZhixOtXSUBr+XAE9qPFt6f3F+3uzypfXkL0SsfB2GmVK6LWwq3X1OhGl+k0374mVMRDGQTLSmS2Jt7WawFXDTnJq3VLky5NIQIMvxdbUmJpvTobnICnxEpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IeS3aDRR; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KdUu+B09"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21661949f23so136584475ad.3
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 11:31:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IeS3aDRR"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee9f66cb12so8342768a91.1
+        for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 11:31:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736796694; x=1737401494; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1736796695; x=1737401495; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2PWimBk5DhwL9cF43Xhuc6g6cWmEmAEK8mMsdBs1h1s=;
-        b=KdUu+B09Hybanc2c7bg8jHngjDWZRp7GDWCLYLRvASPS/4g9TM1WCNLMdXsf057m01
-         viBCTTwS0Xy9uZuU4l6pcQYvN/Yi6m7iXZHzWwuREDyc7OU6d2nOBYC4SnfhE+mAX6MP
-         qiu/N+fhr5cJI1zgZ/R979+gJiIX0Z/zf2bzHUa2sx3bkcuhoyua1J+Zs9RKgb3aVLj3
-         stEcSDBddWb7y3D2zULwtIlKm4p1GainAzpOpbeyN6QfzXOEDiigmNxYV9TGF81dZs+E
-         4p6MukjHpLwrPRg9DG7Cie4P961PZFrv86n/n9LqJkBulXw0fkDB9tlu05RG73vVGO7F
-         3M2w==
+        bh=AjSHhLfzPpweAeruuV41TxV8cjx61KJKZIlFZE69SAQ=;
+        b=IeS3aDRRRr/xBzAa82eCbC8ogxahrss0Igl4J+srfF9GfdgDQBSi+xGZU3UczE/u4U
+         h5WnrAnpNFCCDbuCLatINGK71VnUWmlgRNOAkRuGh9jCH5yYTcwi3N8AHN6+f6toFQnp
+         twAw8hw+gvv9nA3xYH/qwPpu6s5zpGt3ihP+LKBouTseI2fZUTiCUJObl39v/2QKP4vx
+         DC7xRMCOwDrnxB7Pa/wqGZf9l0L76EtMvl6F/ja4x9F8fHd7QAMUl95sEZtbQ/s+qcUi
+         CbicoVMIQDChVLKZIgIx18tzC/P7MqtUxGpKdkR1yKYaFFtVPzGyArnMTRUVcmQdIXum
+         he8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736796694; x=1737401494;
+        d=1e100.net; s=20230601; t=1736796695; x=1737401495;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2PWimBk5DhwL9cF43Xhuc6g6cWmEmAEK8mMsdBs1h1s=;
-        b=IzcZSO+xThjmcacN7f36hiEOMzlzU/igGz8gv5TrBUPMZWBVmBykg1eBI8vkSzVVv8
-         q0N0rARl3unDM5cqG13iNb3EOUEDMKPIcLMEjodk3vvy0iOCREwAyUDEc/69G41J0kmJ
-         vty+G7THU54YuUvComlKKtueJEEVhee3z8d32CImqr0JQ4Nazb42UG4ZstCE13EFTcRm
-         +yMD/KMagaCX09/66cBJwlRiVJThy2jHhHpmnbMrUMOBRdjgNk/GOwd/vuXr/OzwNDAL
-         rHyRINTCTdnuZWWb5Ur0Iz8UjxB9mHoEGcFVWaFX0RJ7jv9Qj2Azei5nzobDDMsfPBmT
-         jv7w==
-X-Gm-Message-State: AOJu0Yx4e+lO++dx43eFCK8uZShTGiRpe20fH5mqxaDNLcOW2i3EQ6Wi
-	SyPj13kwA8qqv/G9MfacGBSqogjoj4Kzru7rkJsikMbCwSVXAa4KEcD9Oa6/h1mk9mVd3jIeofD
-	QcV8Y/5agvv2rRRLV/ubXK3TUOUOkVJT2xhVtMDJGImMbTxdeAtxKJNCi1nekuRH/6zKV7yzDz/
-	FUVAK54jtejuzBv1ZZQHM6je5GaTaScE1iikcqVtc68BhxeKkHlMHkCz4qPXQ=
-X-Google-Smtp-Source: AGHT+IE53D6sRek6iO0DXKKc/drL2kO78dR/t9m8UV/64TjSz8QuQZBuhOrcyZOy57H9+hzVq/ih8zpJhVPFYciB2Q==
-X-Received: from plbkl14.prod.google.com ([2002:a17:903:74e:b0:215:57bd:17e7])
+        bh=AjSHhLfzPpweAeruuV41TxV8cjx61KJKZIlFZE69SAQ=;
+        b=YyTTOiOnXaEVAcaFEwrsFhwb6S4KOaQC94Im6AXSU5RerTs5o6JMxVMCfu4dYA/LAL
+         aMCZpH0vuBWsl55T8tuK/fxYsuRtW3OrOjt8mVmRpeu/6GrVubyts8k60Cx2QShiSQkW
+         Nb9lOdUSwkTb0geVsg8108NsJiBhxnHwp6riahaF7ea67PmrRSVJ5bL7U+VxRG7U2TCo
+         dPgNMDL7/xCKJvEn4m4WBrYcuH+UC5F/spgjTXjP3a3oiJr4cTgXrTgCmw+hs0sc2aMz
+         HfIBTSVkrqusNI+NCWRG0bkYWLy/7CCImaXwbb3mAtKbwF8PSJekwzHYehlb7sWQqRJ5
+         /mMQ==
+X-Gm-Message-State: AOJu0YyT4Q50cXKP5/AxSTZgzH8tXsydEwSSBiV3ctfQWQ1t7kC1qgn4
+	8n/GmbPwlo2tBYVBVNcGr58pvw4lkUmWL7l2oprcLWxiVyEHwbrG1iww+ncpxrqWCGXsNOaF3Vj
+	ivBAEPiCZC9KgOMArbwS5VwK7f0ETSp+ASWWLLmE/WV4v7WJCPejt5dIstLLzaUSH3ubkFJpEXq
+	kCCYw+oLESDkJjoB+X3yD7JwhssjGV878kaoiv2wejGv+mABLPJSg4FfgeBhM=
+X-Google-Smtp-Source: AGHT+IHgy/xhjs0ZlLXfoJvzHD/baMNuiYAMQ8oeX9ah+6G+BrGfVdNx/nIjUYcPrD4FhCjo+aJMyh+mafTgb4aApA==
+X-Received: from pjbsw3.prod.google.com ([2002:a17:90b:2c83:b0:2f4:3ea1:9033])
  (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:e74f:b0:216:7cde:523 with SMTP id d9443c01a7336-21a83f6710dmr367766355ad.32.1736796693775;
- Mon, 13 Jan 2025 11:31:33 -0800 (PST)
-Date: Mon, 13 Jan 2025 11:31:27 -0800
+ 2002:a17:90b:2f4e:b0:2eb:140d:f6df with SMTP id 98e67ed59e1d1-2f548e98382mr28470262a91.1.1736796695319;
+ Mon, 13 Jan 2025 11:31:35 -0800 (PST)
+Date: Mon, 13 Jan 2025 11:31:28 -0800
 In-Reply-To: <20250113193128.1533449-1-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250113193128.1533449-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.47.1.688.g23fc6f90ad-goog
-Message-ID: <20250113193128.1533449-2-jingzhangos@google.com>
-Subject: [RFC PATCH 1/2] KVM: arm64: vgic-its: Add debugfs interface to expose
- ITS tables
+Message-ID: <20250113193128.1533449-3-jingzhangos@google.com>
+Subject: [RFC PATCH 2/2] KVM: arm64: vgic-its: Add tracepoints for VGIC ITS commands
 From: Jing Zhang <jingzhangos@google.com>
 To: KVMARM <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -69,404 +68,278 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This commit introduces a debugfs interface to display the contents of the
-VGIC Interrupt Translation Service (ITS) tables.
+This commit adds tracepoints to the KVM VGIC ITS on ARM64 to improve
+observability and debuggability. The following ITS commands now have
+associated tracepoints: MAPI, DISCARD, CLEAR, INT, INV, MAPD, MAPC,
+MOVI, MOVALL, and INVALL.
 
-The ITS tables map Device/Event IDs to Interrupt IDs and target processors.
-Exposing this information through debugfs allows for easier inspection and
-debugging of the interrupt routing configuration.
+Each tracepoint captures essential information such as device ID, event
+ID, and other relevant parameters, allowing for detailed monitoring of
+ITS operations.
 
-The debugfs interface presents the ITS table data in a tabular format:
+These tracepoints are useful for:
 
-  Device ID: 0, Event ID Range: [0 - 65535]
-  EVENT_ID    INTID  HWINTID   TARGET   COL_ID HW
-  -----------------------------------------------
-         0       32        0        0        0  0
-         1       33        0        0        0  0
-         2       34        0        0        0  0
-       ...      ...      ...      ...      ... ..
+*   Debugging interrupt routing issues.
+*   Performance analysis and optimization.
+*   Understanding ITS behavior.
+*   Root-causing interrupt handling errors.
 
-The output is generated using the seq_file interface, allowing for efficient
-handling of potentially large ITS tables.
-
-This interface is read-only and does not allow modification of the ITS
-tables. It is intended for debugging and informational purposes only.
+This enhancement provides crucial insights into interrupt handling in
+ARM64 virtualized environments, aiding in development, debugging, and
+maintenance.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/vgic/vgic-its-debug.c | 234 +++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-its.c       |  39 +----
- arch/arm64/kvm/vgic/vgic.h           |  33 ++++
- 4 files changed, 276 insertions(+), 32 deletions(-)
- create mode 100644 arch/arm64/kvm/vgic/vgic-its-debug.c
+ arch/arm64/kvm/vgic/trace.h    | 135 +++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-its.c |  19 +++++
+ 2 files changed, 154 insertions(+)
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 3cf7adb2b503..b1e7b9c29589 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -23,7 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
- 	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
- 	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
--	 vgic/vgic-its.o vgic/vgic-debug.o
-+	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-its-debug.o
+diff --git a/arch/arm64/kvm/vgic/trace.h b/arch/arm64/kvm/vgic/trace.h
+index 83c64401a7fc..22953c0ef159 100644
+--- a/arch/arm64/kvm/vgic/trace.h
++++ b/arch/arm64/kvm/vgic/trace.h
+@@ -27,6 +27,141 @@ TRACE_EVENT(vgic_update_irq_pending,
+ 		  __entry->vcpu_id, __entry->irq, __entry->level)
+ );
  
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
- kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-diff --git a/arch/arm64/kvm/vgic/vgic-its-debug.c b/arch/arm64/kvm/vgic/vgic-its-debug.c
-new file mode 100644
-index 000000000000..1ff0dd013793
---- /dev/null
-+++ b/arch/arm64/kvm/vgic/vgic-its-debug.c
-@@ -0,0 +1,234 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vgic-its-debug.c - Debugfs interface for exposing VGIC ITS tables.
-+ *
-+ * Copyright (C) 2025 Google
-+ *
-+ * This file provides a debugfs interface to display the contents of the
-+ * VGIC Interrupt Translation Service (ITS) tables. This allows for
-+ * inspection of the mapping between Event IDs, Interrupt IDs, and target
-+ * processors. The information is presented in a tabular format through a
-+ * seq_file interface.
-+ */
++DECLARE_EVENT_CLASS(vgic_its_cmd_class,
++	TP_PROTO(__u32 device_id, __u32 event_id),
++	TP_ARGS(device_id, event_id),
 +
-+#include <linux/debugfs.h>
-+#include <linux/kvm_host.h>
-+#include <linux/seq_file.h>
-+#include <kvm/arm_vgic.h>
-+#include "vgic.h"
++	TP_STRUCT__entry(
++		__field(	__u32,		device_id		)
++		__field(	__u32,		event_id		)
++	),
 +
-+/**
-+ * struct vgic_its_iter - Iterator for traversing VGIC ITS tables.
-+ * @dev: Pointer to the current its_device being processed.
-+ * @ite: Pointer to the current its_ite within the device being processed.
-+ *
-+ * This structure is used to maintain the current position during iteration
-+ * over the ITS tables. It holds pointers to both the current device and the
-+ * current ITE within that device.
-+ */
-+struct vgic_its_iter {
-+	struct its_device *dev;
-+	struct its_ite *ite;
-+};
++	TP_fast_assign(
++		__entry->device_id		= device_id;
++		__entry->event_id		= event_id;
++	),
 +
-+/**
-+ * end_of_iter - Checks if the iterator has reached the end of the ITS tables.
-+ * @iter: The iterator to check.
-+ *
-+ * Return: True if the iterator is at the end, false otherwise.
-+ */
-+static inline bool end_of_iter(struct vgic_its_iter *iter)
-+{
-+	return !iter->dev && !iter->ite;
-+}
++	TP_printk("Device ID: %u, Event ID: %u",
++		  __entry->device_id, __entry->event_id)
++);
 +
-+/**
-+ * iter_next - Advances the iterator to the next entry in the ITS tables.
-+ * @its: The VGIC ITS structure.
-+ * @iter: The iterator to advance.
-+ *
-+ * This function moves the iterator to the next ITE within the current device,
-+ * or to the first ITE of the next device if the current ITE is the last in
-+ * the device. If the current device is the last device, the iterator is set
-+ * to indicate the end of iteration.
-+ */
-+static void iter_next(struct vgic_its *its, struct vgic_its_iter *iter)
-+{
-+	struct its_device *dev = iter->dev;
-+	struct its_ite *ite = iter->ite;
++DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_mapi,
++	TP_PROTO(__u32 device_id, __u32 event_id),
++	TP_ARGS(device_id, event_id));
 +
-+	if (!ite || list_is_last(&ite->ite_list, &dev->itt_head)) {
-+		if (list_is_last(&dev->dev_list, &its->device_list)) {
-+			dev = NULL;
-+			ite = NULL;
-+		} else {
-+			dev = list_next_entry(dev, dev_list);
-+			ite = list_first_entry_or_null(&dev->itt_head,
-+						       struct its_ite,
-+						       ite_list);
-+		}
-+	} else {
-+		ite = list_next_entry(ite, ite_list);
-+	}
++DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_discard,
++	TP_PROTO(__u32 device_id, __u32 event_id),
++	TP_ARGS(device_id, event_id));
 +
-+	iter->dev = dev;
-+	iter->ite = ite;
-+}
++DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_clear,
++	TP_PROTO(__u32 device_id, __u32 event_id),
++	TP_ARGS(device_id, event_id));
 +
-+/**
-+ * vgic_its_debug_start - Start function for the seq_file interface.
-+ * @s: The seq_file structure.
-+ * @pos: The starting position (offset).
-+ *
-+ * This function initializes the iterator to the beginning of the ITS tables
-+ * and advances it to the specified position. It acquires the its_lock mutex
-+ * to protect shared data.
-+ *
-+ * Return: An iterator pointer on success, NULL if no devices are found or
-+ *         the end of the list is reached, or ERR_PTR(-ENOMEM) on memory
-+ *         allocation failure.
-+ */
-+static void *vgic_its_debug_start(struct seq_file *s, loff_t *pos)
-+{
-+	struct vgic_its *its = s->private;
-+	struct vgic_its_iter *iter;
-+	struct its_device *dev;
-+	loff_t offset = *pos;
++DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_int,
++	TP_PROTO(__u32 device_id, __u32 event_id),
++	TP_ARGS(device_id, event_id));
 +
-+	mutex_lock(&its->its_lock);
++DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_inv,
++	TP_PROTO(__u32 device_id, __u32 event_id),
++	TP_ARGS(device_id, event_id));
 +
-+	dev = list_first_entry_or_null(&its->device_list,
-+				       struct its_device, dev_list);
-+	if (!dev)
-+		return NULL;
++TRACE_EVENT(vgic_its_cmd_mapd,
++	TP_PROTO(__u32 device_id, bool valid, __u8 num_eventid_bits, __u64 itt_addr),
++	TP_ARGS(device_id, valid, num_eventid_bits, itt_addr),
 +
-+	iter = kmalloc(sizeof(*iter), GFP_KERNEL);
-+	if (!iter)
-+		return ERR_PTR(-ENOMEM);
++	TP_STRUCT__entry(
++		__field(	__u32,		device_id		)
++		__field(	bool,		valid			)
++		__field(	__u8,		num_eventid_bits	)
++		__field(	__u64,		itt_addr		)
++	),
 +
-+	iter->dev = dev;
-+	iter->ite = list_first_entry_or_null(&dev->itt_head,
-+					     struct its_ite, ite_list);
++	TP_fast_assign(
++		__entry->device_id		= device_id;
++		__entry->valid			= valid;
++		__entry->num_eventid_bits	= num_eventid_bits;
++		__entry->itt_addr		= itt_addr;
++	),
 +
-+	while (!end_of_iter(iter) && offset--)
-+		iter_next(its, iter);
++	TP_printk("Device ID: %u, valid: %d, num_eventid_bits: %u, itt_addr: %llx",
++		  __entry->device_id, __entry->valid,
++		  __entry->num_eventid_bits, __entry->itt_addr)
++);
 +
-+	if (end_of_iter(iter)) {
-+		kfree(iter);
-+		return NULL;
-+	}
++TRACE_EVENT(vgic_its_cmd_mapc,
++	TP_PROTO(__u32 collection_id, bool valid),
++	TP_ARGS(collection_id, valid),
 +
-+	return iter;
-+}
++	TP_STRUCT__entry(
++		__field(	__u32,		collection_id		)
++		__field(	bool,		valid			)
++	),
 +
-+/**
-+ * vgic_its_debug_next - Next function for the seq_file interface.
-+ * @s: The seq_file structure.
-+ * @v: The current iterator.
-+ * @pos: The current position (offset).
-+ *
-+ * This function advances the iterator to the next entry and increments the
-+ * position.
-+ *
-+ * Return: An iterator pointer on success, or NULL if the end of the list is
-+ *         reached.
-+ */
-+static void *vgic_its_debug_next(struct seq_file *s, void *v, loff_t *pos)
-+{
-+	struct vgic_its *its = s->private;
-+	struct vgic_its_iter *iter = v;
++	TP_fast_assign(
++		__entry->collection_id		= collection_id;
++		__entry->valid			= valid;
++	),
 +
-+	++*pos;
-+	iter_next(its, iter);
++	TP_printk("Collection ID: %u, valid: %d",
++		  __entry->collection_id, __entry->valid)
++);
 +
-+	if (end_of_iter(iter)) {
-+		kfree(iter);
-+		return NULL;
-+	}
-+	return iter;
-+}
++TRACE_EVENT(vgic_its_cmd_movi,
++	TP_PROTO(__u32 device_id, __u32 event_id, __u32 collection_id),
++	TP_ARGS(device_id, event_id, collection_id),
 +
-+/**
-+ * vgic_its_debug_stop - Stop function for the seq_file interface.
-+ * @s: The seq_file structure.
-+ * @v: The current iterator.
-+ *
-+ * This function frees the iterator and releases the its_lock mutex.
-+ */
-+static void vgic_its_debug_stop(struct seq_file *s, void *v)
-+{
-+	struct vgic_its *its = s->private;
-+	struct vgic_its_iter *iter = v;
++	TP_STRUCT__entry(
++		__field(	__u32,		device_id		)
++		__field(	__u32,		event_id		)
++		__field(	__u32,		collection_id		)
++	),
 +
-+	if (!IS_ERR_OR_NULL(iter))
-+		kfree(iter);
-+	mutex_unlock(&its->its_lock);
-+}
++	TP_fast_assign(
++		__entry->device_id		= device_id;
++		__entry->event_id		= event_id;
++		__entry->collection_id		= collection_id;
++	),
 +
-+/**
-+ * vgic_its_debug_show - Show function for the seq_file interface.
-+ * @s: The seq_file structure.
-+ * @v: The current iterator.
-+ *
-+ * This function formats and prints the ITS table entry information to the
-+ * seq_file output.
-+ *
-+ * Return: 0 on success.
-+ */
-+static int vgic_its_debug_show(struct seq_file *s, void *v)
-+{
-+	struct vgic_its_iter *iter = v;
-+	struct its_device *dev = iter->dev;
-+	struct its_ite *ite = iter->ite;
++	TP_printk("Device ID: %u, Event ID: %u, Collection ID: %u",
++		  __entry->device_id, __entry->event_id, __entry->collection_id)
++);
 +
-+	if (list_is_first(&ite->ite_list, &dev->itt_head)) {
-+		seq_printf(s, "\n");
-+		seq_printf(s, "Device ID: %u, Event ID Range: [0 - %llu]\n",
-+			   dev->device_id, BIT_ULL(dev->num_eventid_bits) - 1);
-+		seq_printf(s, "EVENT_ID    INTID  HWINTID   TARGET   COL_ID HW\n");
-+		seq_printf(s, "-----------------------------------------------\n");
-+	}
++TRACE_EVENT(vgic_its_cmd_movall,
++	TP_PROTO(int vcpu_source, int vcpu_target),
++	TP_ARGS(vcpu_source, vcpu_target),
 +
-+	if (ite && ite->irq && ite->collection) {
-+		seq_printf(s, "%8u %8u %8u %8u %8u %2d\n",
-+			   ite->event_id, ite->irq->intid, ite->irq->hwintid,
-+			   ite->collection->target_addr,
-+			   ite->collection->collection_id, ite->irq->hw);
-+	}
++	TP_STRUCT__entry(
++		__field(	int,		vcpu_source		)
++		__field(	int,		vcpu_target		)
++	),
 +
-+	return 0;
-+}
++	TP_fast_assign(
++		__entry->vcpu_source		= vcpu_source;
++		__entry->vcpu_target		= vcpu_target;
++	),
 +
-+static const struct seq_operations vgic_its_debug_sops = {
-+	.start = vgic_its_debug_start,
-+	.next  = vgic_its_debug_next,
-+	.stop  = vgic_its_debug_stop,
-+	.show  = vgic_its_debug_show
-+};
++	TP_printk("Source VCPU: %d, Target VCPU: %d",
++		  __entry->vcpu_source, __entry->vcpu_target)
++);
 +
-+DEFINE_SEQ_ATTRIBUTE(vgic_its_debug);
++TRACE_EVENT(vgic_its_cmd_invall,
++	TP_PROTO(__u32 collection_id, int vcpu_id),
++	TP_ARGS(collection_id, vcpu_id),
 +
-+/**
-+ * vgic_its_debug_init - Initializes the debugfs interface for VGIC ITS.
-+ * @dev: The KVM device structure.
-+ *
-+ * This function creates a debugfs file named "vgic-its-state@%its_base"
-+ * to expose the ITS table information.
-+ *
-+ * Return: 0 on success.
-+ */
-+int vgic_its_debug_init(struct kvm_device *dev)
-+{
-+	struct vgic_its *its = dev->private;
-+	char name[32];
++	TP_STRUCT__entry(
++		__field(	__u32,		collection_id		)
++		__field(	int,		vcpu_id			)
++	),
 +
-+	snprintf(name, sizeof(name), "vgic-its-state@%llx", (u64)its->vgic_its_base);
-+	debugfs_create_file(name, 0444, dev->kvm->debugfs_dentry, its, &vgic_its_debug_fops);
++	TP_fast_assign(
++		__entry->collection_id		= collection_id;
++		__entry->vcpu_id		= vcpu_id;
++	),
 +
-+	return 0;
-+}
++	TP_printk("Collection ID: %u, VCPU ID: %d",
++		  __entry->collection_id, __entry->vcpu_id)
++);
 +
-+void vgic_its_debug_destroy(struct kvm_device *dev)
-+{
-+}
-+
+ #endif /* _TRACE_VGIC_H */
+ 
+ #undef TRACE_INCLUDE_PATH
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index fb96802799c6..569f9da9049f 100644
+index 569f9da9049f..d7524e3abad6 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -154,36 +154,6 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	return irq;
+@@ -22,6 +22,7 @@
+ 
+ #include "vgic.h"
+ #include "vgic-mmio.h"
++#include "trace.h"
+ 
+ static struct kvm_device_ops kvm_arm_vgic_its_ops;
+ 
+@@ -795,6 +796,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+ 	u32 event_id = its_cmd_get_id(its_cmd);
+ 	struct its_ite *ite;
+ 
++	trace_vgic_its_cmd_discard(device_id, event_id);
++
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (ite && its_is_collection_mapped(ite->collection)) {
+ 		struct its_device *device = find_its_device(its, device_id);
+@@ -829,6 +832,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+ 	struct its_ite *ite;
+ 	struct its_collection *collection;
+ 
++	trace_vgic_its_cmd_movi(device_id, event_id, coll_id);
++
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (!ite)
+ 		return E_ITS_MOVI_UNMAPPED_INTERRUPT;
+@@ -1035,6 +1040,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 	struct vgic_irq *irq;
+ 	int lpi_nr;
+ 
++	trace_vgic_its_cmd_mapi(device_id, event_id);
++
+ 	device = find_its_device(its, device_id);
+ 	if (!device)
+ 		return E_ITS_MAPTI_UNMAPPED_DEVICE;
+@@ -1161,6 +1168,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	struct its_device *device;
+ 	gpa_t gpa;
+ 
++	trace_vgic_its_cmd_mapd(device_id, valid, num_eventid_bits, itt_addr);
++
+ 	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
+ 		return E_ITS_MAPD_DEVICE_OOR;
+ 
+@@ -1204,6 +1213,8 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
+ 	valid = its_cmd_get_validbit(its_cmd);
+ 	coll_id = its_cmd_get_collection(its_cmd);
+ 
++	trace_vgic_its_cmd_mapc(coll_id, valid);
++
+ 	if (!valid) {
+ 		vgic_its_free_collection(its, coll_id);
+ 		vgic_its_invalidate_cache(its);
+@@ -1248,6 +1259,7 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
+ 	u32 event_id = its_cmd_get_id(its_cmd);
+ 	struct its_ite *ite;
+ 
++	trace_vgic_its_cmd_clear(device_id, event_id);
+ 
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (!ite)
+@@ -1278,6 +1290,7 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
+ 	u32 event_id = its_cmd_get_id(its_cmd);
+ 	struct its_ite *ite;
+ 
++	trace_vgic_its_cmd_inv(device_id, event_id);
+ 
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (!ite)
+@@ -1338,6 +1351,8 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+ 	vcpu = collection_to_vcpu(kvm, collection);
+ 	vgic_its_invall(vcpu);
+ 
++	trace_vgic_its_cmd_invall(coll_id, vcpu->vcpu_id);
++
+ 	return 0;
  }
  
--struct its_device {
--	struct list_head dev_list;
--
--	/* the head for the list of ITTEs */
--	struct list_head itt_head;
--	u32 num_eventid_bits;
--	gpa_t itt_addr;
--	u32 device_id;
--};
--
--#define COLLECTION_NOT_MAPPED ((u32)~0)
--
--struct its_collection {
--	struct list_head coll_list;
--
--	u32 collection_id;
--	u32 target_addr;
--};
--
--#define its_is_collection_mapped(coll) ((coll) && \
--				((coll)->target_addr != COLLECTION_NOT_MAPPED))
--
--struct its_ite {
--	struct list_head ite_list;
--
--	struct vgic_irq *irq;
--	struct its_collection *collection;
--	u32 event_id;
--};
--
- /**
-  * struct vgic_its_abi - ITS abi ops and settings
-  * @cte_esz: collection table entry size
-@@ -1938,6 +1908,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+@@ -1364,6 +1379,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+ 	if (!vcpu1 || !vcpu2)
+ 		return E_ITS_MOVALL_PROCNUM_OOR;
  
- 	mutex_lock(&its->its_lock);
++	trace_vgic_its_cmd_movall(vcpu1->vcpu_id, vcpu2->vcpu_id);
++
+ 	if (vcpu1 == vcpu2)
+ 		return 0;
  
-+	vgic_its_debug_destroy(kvm_dev);
-+
- 	vgic_its_free_device_list(kvm, its);
- 	vgic_its_free_collection_list(kvm, its);
- 	vgic_its_invalidate_cache(its);
-@@ -2771,7 +2743,12 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- 		if (ret)
- 			return ret;
+@@ -1392,6 +1409,8 @@ static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
+ 	u32 msi_data = its_cmd_get_id(its_cmd);
+ 	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
  
--		return vgic_register_its_iodev(dev->kvm, its, addr);
-+		ret = vgic_register_its_iodev(dev->kvm, its, addr);
-+		if (ret)
-+			return ret;
++	trace_vgic_its_cmd_int(msi_devid, msi_data);
 +
-+		return vgic_its_debug_init(dev);
-+
- 	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
- 		return vgic_its_ctrl(dev->kvm, its, attr->attr);
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 122d95b4e284..c2891d7b5e62 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -172,6 +172,36 @@ struct vgic_reg_attr {
- 	gpa_t addr;
- };
- 
-+struct its_device {
-+	struct list_head dev_list;
-+
-+	/* the head for the list of ITTEs */
-+	struct list_head itt_head;
-+	u32 num_eventid_bits;
-+	gpa_t itt_addr;
-+	u32 device_id;
-+};
-+
-+#define COLLECTION_NOT_MAPPED ((u32)~0)
-+
-+struct its_collection {
-+	struct list_head coll_list;
-+
-+	u32 collection_id;
-+	u32 target_addr;
-+};
-+
-+#define its_is_collection_mapped(coll) ((coll) && \
-+				((coll)->target_addr != COLLECTION_NOT_MAPPED))
-+
-+struct its_ite {
-+	struct list_head ite_list;
-+
-+	struct vgic_irq *irq;
-+	struct its_collection *collection;
-+	u32 event_id;
-+};
-+
- int vgic_v3_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
- 		       struct vgic_reg_attr *reg_attr);
- int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
-@@ -353,4 +383,7 @@ static inline bool kvm_has_gicv3(struct kvm *kvm)
- 	return kvm_has_feat(kvm, ID_AA64PFR0_EL1, GIC, IMP);
+ 	return vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
  }
  
-+int vgic_its_debug_init(struct kvm_device *dev);
-+void vgic_its_debug_destroy(struct kvm_device *dev);
-+
- #endif
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
