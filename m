@@ -1,94 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FC821ADD6
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 10:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7505F1FBBE8
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 15:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736763447; cv=none; b=OXaERTPKLMnTIOBVQA1w/zvQcZuUv7JMRsiJVlLik5OpGO37NOxLxm9myyqmIh3vbEFlfAceaEwDYaDq1kyBHchAj9KoBXHpO2BMf/tHKqDTzdPiijWc/X/YtH5NS2SdbKLuEaD0UTk7auvByALxRUmhEiLpd6eGrAsLV/sJ0Zc=
+	t=1736780541; cv=none; b=Dsd4OtdSgf55NzJtQpLsvnPfoyPYqmICq4UxCRkMu0MIGA9KSGpYLx2pfeBJYCzIiERSQnU0xn5jx624+S4zDzOS3FVdow4pxg7izK7c2GwHDQtF5NQsSCi+1/cKU/hiMMGhvD+RQ2urUadLVsDIJ8WA+KWgDXRze2/Bm50mGX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736763447; c=relaxed/simple;
-	bh=515zETJoHIbSRyv7lF/l85HLG1TVpBQuDX1nN1fObTs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EF4xvHCcVK7i1lsFiwp6fEVMYrQWxgkY0CBSXg/JrYz25AvQ++UOCXF3ENbR0WIGm/GM7a3xa5e0oOKwoHLEDoKCQ49x91zSJY8hEQATKQf5E+CDuMn+4kTLB+MUf81cA0FsIIRp7G9ooPQvaowRZGjo0k6FcdowRkIEm+7umfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D9A51424;
-	Mon, 13 Jan 2025 02:17:52 -0800 (PST)
-Received: from [10.1.28.144] (e121487-lin.cambridge.arm.com [10.1.28.144])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 23D0E3F66E;
-	Mon, 13 Jan 2025 02:17:20 -0800 (PST)
-Message-ID: <44d60dff-ab73-4d10-9110-c5c2ddebadf6@arm.com>
-Date: Mon, 13 Jan 2025 10:17:18 +0000
+	s=arc-20240116; t=1736780541; c=relaxed/simple;
+	bh=jReV93cCbYPy83WgD/3sAghiioBKnnwhpLE7WasF130=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=THMGqBH1X2gHznH/h6hSmZATVymevz/N1eyedCumu5kBDQcON7EidaZ3CiT0niemhbCsed0r6uQosF+nujdS6m+VkPSb6byJc1bDGG3ArbEFF1GhTEupP7IV/8avErypiw+iQBxDQkvV9ImVvRsIWn1NsrITCeHtuVrK8Dx3ezs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VgUr5y4b; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VgUr5y4b"
+Date: Mon, 13 Jan 2025 16:01:58 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736780522;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KwFSzUI7AdO7FN349dbUBnEYz5JimFOvpyWuoBOACSs=;
+	b=VgUr5y4bQO1Br7MsgRdM1yCg/KVoRF6a29p+gYXkeY6gfIyCy+x35yMDZCFlI5dFxc3uid
+	JtEpJHj3e3C8PLPpr9BNvSyShTJt3K0xoqNMpByq1XfH+tJUKm4mzI5Q+UAPA//+02zQa1
+	COW1rZcCyiE9+UKnRWMTecZzncHIwj8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/5] configure: Document that the
+ architecture name 'aarch64' is also supported
+Message-ID: <20250113-0fe04c6089726d1d06a254ec@orel>
+References: <20250110135848.35465-1-alexandru.elisei@arm.com>
+ <20250110135848.35465-2-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v1 0/5] arm64: Change the default
- --processor to max
-To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
- eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
- david@redhat.com, pbonzini@redhat.com
-Cc: kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-References: <20250110135848.35465-1-alexandru.elisei@arm.com>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20250110135848.35465-1-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250110135848.35465-2-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 1/10/25 13:58, Alexandru Elisei wrote:
-> (CC'ing everyone from MAINTAINERS because I'm touching configure)
+On Fri, Jan 10, 2025 at 01:58:44PM +0000, Alexandru Elisei wrote:
+> $arch, on arm64, defaults to 'aarch64', and later in the script is replaced
+> by 'arm64'. Intentional or not, document that the name 'aarch64' is also
+> supported when configuring for the arm64 architecture. This has been the
+> case since the initial commit that added support for the arm64
+> architecture, commit 39ac3f8494be ("arm64: initial drop").
 > 
-> Vladimir sent a test for MTE [1], which didn't work on the default -cpu
-> model, cortex-a57, because that CPU didn't implement MTE. There were two
-> options to get it working:
+> The help text for --arch changes from*:
 > 
-> 1. Add -cpu max to the extra_params unittest parameter.
-> 2. Make the default value for the configure --processor option 'max'.
+>    --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
+>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
 > 
-> We decided that the second option was preferable, so here it is.
+> to:
 > 
-> The first patch might look unrelated, but when I was writing the function
-> to select the default processor based on the architecture I noticed that
-> for arm64, $arch is first equal to aarch64, then it gets changed to arm64.
-> My first instinct was to have it be arm64 from the start, but then I
-> realized that, despite the help text, --arch=aarch64 has been supported
-> ever since arm64 was added to kvm-unit-tests. So I decided that it might
-> more prudent to go with it and document it.
+>     --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
+>                            arm, arm64/aarch64, i386, ppc64, riscv32, riscv64, s390x, x86_64
 > 
-> [1] https://lore.kernel.org/all/20241212103447.34593-1-vladimir.murzin@arm.com/
+> *Worth pointing out that the default architecture is 'aarch64', even though
+> the rest of the help text doesn't have it as one of the supported
+> architectures.
 > 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 86cf1da36467..5b0a2d7f39c0 100755
+> --- a/configure
+> +++ b/configure
+> @@ -47,7 +47,7 @@ usage() {
+>  
+>  	Options include:
+>  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+> -	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> +	                           arm, arm64/aarch64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+>  	    --processor=PROCESSOR  processor to compile for ($arch)
+>  	    --target=TARGET        target platform that the tests will be running on (qemu or
+>  	                           kvmtool, default is qemu) (arm/arm64 only)
+> -- 
+> 2.47.1
+>
 
-Thanks Alex! That removes extra hassle of setting up -cpu to match required
-feature. My MTE test continue working fine and require one less configuration
-option - undeniable improvement in user experience!
+I'd prefer to support --arch=aarch64, but then always refer to it as only
+arm64 everywhere else. We need to support arch=aarch64 since that's what
+'uname -m' returns, but I don't think we need to change the help text for
+it. If we don't want to trust our users to figure out arm64==aarch64,
+then we can do something like
 
-FWIW:
-Tested-by: Vladimir Murzin <vladimir.murzin@arm.com> # arm64
+@@ -216,12 +197,12 @@ while [[ $optno -le $argc ]]; do
+            werror=
+            ;;
+        --help)
+-           usage
++           do_help=1
+            ;;
+        *)
+            echo "Unknown option '$opt'"
+            echo
+-           usage
++           do_help=1
+            ;;
+     esac
+ done
 
-Vladimir
+And then only do
 
-> Alexandru Elisei (5):
->   configure: Document that the architecture name 'aarch64' is also
->     supported
->   configure: Display the default processor for arm and arm64
->   arm64: Implement the ./configure --processor option
->   arm/arm64: Add support for --processor=max
->   configure: arm64: Make 'max' the default for --processor
-> 
->  arm/Makefile.arm    |  1 -
->  arm/Makefile.common |  3 +++
->  configure           | 35 ++++++++++++++++++++++++++---------
->  3 files changed, 29 insertions(+), 10 deletions(-)
-> 
-> 
-> base-commit: 0ed2cdf3c80ee803b9150898e687e77e4d6f5db2
-> -- 2.47.1
-> 
+ if [ $do_help ]; then
+    usage
+ fi
 
+after $arch and other variables have had a chance to be converted.
+
+Thanks,
+drew
