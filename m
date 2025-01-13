@@ -1,167 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690961C549F;
-	Mon, 13 Jan 2025 19:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190901D318B
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 20:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736797092; cv=none; b=ep+6Jp/MvI3gSNjKnQZqKCFiwHh30Jw77z9WEHSdDU3Nrm7xhNCEDrW6Gm70mfRRfsgbG4lTK/uN+PNqcbjloIoT+stp9lpgcGHaZaoRziimKR2f6GYqM2JY3EqY91e14EwOyTiwr/ZORL8011QZiXQD4wfu6cnq6WifegkcnRU=
+	t=1736801289; cv=none; b=WZ2FKrFGgI8t/xOAvPzKubN2oZ7bmHSOLe39zkOi6ZlKyE27n/HqcagDWsYTLMh4VR060Sb2mX1HuYea2GGszBoSLwVCCvEorZeH17FyeVwo3nkY/a9JwEhePTzzPHEOraRt9F4DwLizcIOO5DkmPGm8ErU9KcxMH62uj5b3GwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736797092; c=relaxed/simple;
-	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CJbrHFneCwtTf31XjWTqTyIirpJgeJJuR+quKQkJ0oJnJsoN9XIiK1TAZtULIEcfj7ve/hBbhMlNSBxwnfQIzTnHdPCSL04ln2VlZVVekdc2789/ESxRaBx+btidyELIlYznPnQPMTrsnNpcn8LilvAiNg1sRUCpS+EVTFQewkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYmJ9Ai9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736801289; c=relaxed/simple;
+	bh=Y3coRwO2DtTxhh4XfUfkwSXhxRyzgnRjylok44BCaAk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l1XwZib/D+x4FrIk8oCcz6vAaG/WHSegoUiXMrUCYToyQSJixS7qHOEcA7OcUDM5yCRJC1w5FInqzhdyaTpIzGJh7lJIAj2y/RM3H/631JrlLha7ggmHnWHHilbCk7IOrGK12PjbJCLSkQgPviyL4eBRBE2I4OEtMFKm5yD5MWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k51LLgJN; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYmJ9Ai9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA9AC4CEE1;
-	Mon, 13 Jan 2025 19:38:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736797092;
-	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mYmJ9Ai9JhKhbnL/24T8j29IHGHpFxP7mY+XRsEHVBJu++4+QAEE05xDeaQ0loZUH
-	 uI9f//3bbpxPTDmCqxr8uK1bsOeR84DIBfnfN314ou1gekXcm4sWwtM8IoL1N9owcO
-	 uYNOxhB4CMZQndJw7LPUNF3sjdk3UrS69dt9otVHmnzFz66RM27r5QwFGcDyVkSFe5
-	 qfh4TD/mPUmFZ3N1TK4/VhH3sEE84uIZjQv4/qGrhfUtTD6xplhEQJi2rG2n4E+wu6
-	 4bmcAAje2IIvRAwPdYo90ZHDMB1+pS1ASzL73O2f2C+D4HdK0TjfHizjClScKO7qfz
-	 257t6nkLTBD/w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tXQGH-00Bltd-Ms;
-	Mon, 13 Jan 2025 19:38:09 +0000
-Date: Mon, 13 Jan 2025 19:38:08 +0000
-Message-ID: <87bjwaqzbz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
-In-Reply-To: <Z4ViZb7rruRiN-Oe@google.com>
-References: <20250111012450.1262638-1-seanjc@google.com>
-	<20250111012450.1262638-4-seanjc@google.com>
-	<87ikqlr4vo.wl-maz@kernel.org>
-	<Z4U03KRYy2DVEgJR@google.com>
-	<86ikqiwq7y.wl-maz@kernel.org>
-	<Z4ViZb7rruRiN-Oe@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k51LLgJN"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d9f0ab2313so1993a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 12:48:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736801286; x=1737406086; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lfn+cvLcuo2+8PMQ2pEe08Zdvwxhoz9ADZwuC0pV8LY=;
+        b=k51LLgJNFxqy7MILSXRnlZ4dRp2SYjJNZj49rBX4oFkBlCfL+pBzD06TGoLDtGL2FO
+         Kat6z5A/L6DKvVuF9KV+ihpe982+eR5BCU/SA2HAB9hztpp4M/rQHXXxvjuoXhN/TINt
+         S4DMEhs1T2MzcHGvuo1CkyFPC+0ovQbhYF0yliL16S+nOsfDybXFJes/jcUHqCCJucht
+         5SuC1a4V/myIY37j4casg50r8023blUMGEuuD1kSuF4vwFIFqHueFUL2rvkUji0Qx9Fc
+         9YuoPBwBQUBzrWumoBE54DKkwPBRMJsPxyBuKCLjjLMeN1PTPkTEtJNT1plYCN2uPNpb
+         gl7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736801286; x=1737406086;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lfn+cvLcuo2+8PMQ2pEe08Zdvwxhoz9ADZwuC0pV8LY=;
+        b=HR1G7B/ARZjcyenOQdd10fcPuMoNEVs3vQl/VEGDGeDnMhwQAGAIbe9g2zI/CQlLU/
+         7AYXa2/XKuYMGW7eem+X4YOTN1i//BYZbCvJ+3eRR1aSxtiEtSSHE/rSQLzOi2jXWf6r
+         rEOu0NTodWneMciGi/hc5l1jnxSyakP8GonPI7sTuAfQTho0fXxKHd5RQ4MsoBS3gsOY
+         RN5D5cKwJhD5vkGxdYjugNLBsJNWyLb1S1a3dVcWY82W98GYFza0aqpf6nZEV0LvjvUb
+         +Uq4bjkKDlctH/2B0EtUEJ7hDFE3EO/uPPUgKf3A9R3VRfYdKLXd7gZjUREP2Mj/BCMH
+         e2rg==
+X-Forwarded-Encrypted: i=1; AJvYcCVx/C9SmvShd7/T6hthKyEPb71O+jep6YY/TzG2mApKB+IQJNndZRhMP5hT4xUH5lL077OEB1g=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyA3Sc22CY4EmbMwUvSkgDkxtyIBsw3l3jXClMmoSiUf4Xmgmra
+	1d9rUubf3XXDJHEaUiMwWAfZwoBZMcRY3h5hBu9xEZejOKPWNnY39miKnq2Liv+79kslMWHWALu
+	Q+WLz9/KFO+Wytnj/z7pQYCDZrz788GsnfbTz
+X-Gm-Gg: ASbGncuDyvp9HXunFruPHsNek9qR52/cjnW672KbkkVOpfC/MNUstjLz9bVbUEhGxlN
+	vYMYqDegjFDLIsD8T5Nbjt2VTSZ8CWcgQG3hBHZA=
+X-Google-Smtp-Source: AGHT+IGDjMK+xCaZiz4na3kjUNgqUb+ERX7RVjtWKGSTA7bjfWQk5Kqr4iYGaho77kNGjfWYma759hCeMwaFShvNC1E=
+X-Received: by 2002:a05:6402:1213:b0:5d0:d7ca:7bf4 with SMTP id
+ 4fb4d7f45d1cf-5d9f5e6332fmr20182a12.0.1736801286447; Mon, 13 Jan 2025
+ 12:48:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
+ <20250110110023.2963795-6-aneesh.kumar@kernel.org> <Z4Fk58k8YptDkVgm@arm.com>
+ <yq5amsfxtrlw.fsf@kernel.org> <Z4Vk5gTnd8o7VKWL@arm.com>
+In-Reply-To: <Z4Vk5gTnd8o7VKWL@arm.com>
+From: Peter Collingbourne <pcc@google.com>
+Date: Mon, 13 Jan 2025 12:47:54 -0800
+X-Gm-Features: AbW1kvYWxIU1dFGSmkykoAkcDmgqCqq-9XdXuQzSMRHTH9jIGVye6w4pEqFRlP4
+Message-ID: <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: MTE: Use stage-2 NoTagAccess memory
+ attribute if supported
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price <steven.price@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 13 Jan 2025 18:58:45 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Mon, Jan 13, 2025, Marc Zyngier wrote:
-> > On Mon, 13 Jan 2025 15:44:28 +0000,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > > 
-> > > On Sat, Jan 11, 2025, Marc Zyngier wrote:
-> > > > On Sat, 11 Jan 2025 01:24:48 +0000,
-> > > > Sean Christopherson <seanjc@google.com> wrote:
-> > > > > 
-> > > > > Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
-> > > > > that KVM_RUN needs to be re-executed prior to save/restore in order to
-> > > > > complete the instruction/operation that triggered the userspace exit.
-> > > > > 
-> > > > > KVM's current approach of adding notes in the Documentation is beyond
-> > > > > brittle, e.g. there is at least one known case where a KVM developer added
-> > > > > a new userspace exit type, and then that same developer forgot to handle
-> > > > > completion when adding userspace support.
-> > > > 
-> > > > Is this going to fix anything? If they couldn't be bothered to read
-> > > > the documentation, let alone update it, how is that going to be
-> > > > improved by extra rules and regulations?
-> > > > 
-> > > > I don't see how someone ignoring the documented behaviour of a given
-> > > > exit reason is, all of a sudden, have an epiphany and take a *new*
-> > > > flag into account.
-> > > 
-> > > The idea is to reduce the probability of introducing bugs, in KVM or userspace,
-> > > every time KVM attaches a completion callback.  Yes, userspace would need to be
-> > > updated to handle KVM_RUN_NEEDS_COMPLETION, but once that flag is merged, neither
-> > > KVM's documentation nor userspace would never need to be updated again.  And if
-> > > all architectures took an approach of handling completion via function callback,
-> > > I'm pretty sure we'd never need to manually update KVM itself either.
-> > 
-> > You are assuming that we need this completion, and I dispute this
-> > assertion.
-> 
-> Ah, gotcha.
-> 
-> > > > > +The pending state of the operation for such exits is not preserved in state
-> > > > > +which is visible to userspace, thus userspace should ensure that the operation
-> > > > > +is completed before performing state save/restore, e.g. for live migration.
-> > > > > +Userspace can re-enter the guest with an unmasked signal pending or with the
-> > > > > +immediate_exit field set to complete pending operations without allowing any
-> > > > > +further instructions to be executed.
-> > > > > +
-> > > > > +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
-> > > > > +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
-> > > > > +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
-> > > > > +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
-> > > > 
-> > > > So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
-> > > > must be present for all of these exits, right? And from what I can
-> > > > tell, this capability is unconditionally advertised.
-> > > > 
-> > > > Yet, you don't amend arm64 to publish that flag. Not that I think this
-> > > > causes any issue (even if you save the state at that point without
-> > > > reentering the guest, it will be still be consistent), but that
-> > > > directly contradicts the documentation (isn't that ironic? ;-).
-> > > 
-> > > It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
-> > > 
-> > > 	if (run->exit_reason == KVM_EXIT_MMIO) {
-> > > 		ret = kvm_handle_mmio_return(vcpu);
-> > > 		if (ret <= 0)
-> > > 			return ret;
-> > > 	}
-> > 
-> > That's satisfying a load from the guest forwarded to userspace.
-> 
-> And MMIO stores, no?  I.e. PC needs to be incremented on stores as well.
-
-Yes, *after* the store as completed. If you replay the instruction,
-the same store comes out.
-
+On Mon, Jan 13, 2025 at 11:09=E2=80=AFAM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
 >
-> > If the VMM did a save of the guest at this stage, restored and resumed it,
-> > *nothing* bad would happen, as PC still points to the instruction that got
-> > forwarded. You'll see the same load again.
-> 
-> But replaying an MMIO store could cause all kinds of problems, and even MMIO
-> loads could theoretically be problematic, e.g. if there are side effects in the
-> device that trigger on access to a device register.
+> On Sat, Jan 11, 2025 at 06:49:55PM +0530, Aneesh Kumar K.V wrote:
+> > Catalin Marinas <catalin.marinas@arm.com> writes:
+> > > On Fri, Jan 10, 2025 at 04:30:21PM +0530, Aneesh Kumar K.V (Arm) wrot=
+e:
+> > >> Currently, the kernel won't start a guest if the MTE feature is enab=
+led
+> >
+> > ...
+> >
+> > >> @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm =
+*kvm,
+> > >>            if (!vma)
+> > >>                    break;
+> > >>
+> > >> -          if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+> > >> +          if (kvm_has_mte(kvm) &&
+> > >> +              !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) =
+{
+> > >>                    ret =3D -EINVAL;
+> > >>                    break;
+> > >>            }
+> > >
+> > > I don't think we should change this, or at least not how it's done ab=
+ove
+> > > (Suzuki raised a related issue internally relaxing this for VM_PFNMAP=
+).
+> > >
+> > > For standard memory slots, we want to reject them upfront rather than
+> > > deferring to the fault handler. An example here is file mmap() passed=
+ as
+> > > standard RAM to the VM. It's an unnecessary change in behaviour IMHO.
+> > > I'd only relax this for VM_PFNMAP mappings further down in this
+> > > function (and move the VM_PFNMAP check above; see Suzuki's internal
+> > > patch, unless he posted it publicly already).
+> >
+> > But we want to handle memslots backed by pagecache pages for virtio-shm
+> > here (virtiofs dax use case).
+>
+> Ah, I forgot about this use case. So with virtiofs DAX, does a host page
+> cache page (host VMM mmap()) get mapped directly into the guest as a
+> separate memory slot? In this case, the host vma would not have
+> VM_MTE_ALLOWED set.
+>
+> > With MTE_PERM, we can essentially skip the
+> > kvm_vma_mte_allowed(vma) check because we handle all types in the fault
+> > handler.
+>
+> This was pretty much the early behaviour when we added KVM support for
+> MTE, allow !VM_MTE_ALLOWED and trap them later. However, we disallowed
+> VM_SHARED because of some non-trivial race. Commit d89585fbb308 ("KVM:
+> arm64: unify the tests for VMAs in memslots when MTE is enabled")
+> changed this behaviour and the VM_MTE_ALLOWED check happens upfront. A
+> subsequent commit removed the VM_SHARED check.
+>
+> It's a minor ABI change but I'm trying to figure out why we needed this
+> upfront check rather than simply dropping the VM_SHARED check. Adding
+> Peter in case he remembers. I can't see any race if we simply skipped
+> this check altogether, irrespective of FEAT_MTE_PERM.
 
-But that's the VMM's problem. If it has modified its own state and
-doesn't return to the guest to complete the instruction, that's just
-as bad as a load, which *do* have side effects as well.
+I don't see a problem with removing the upfront check. The reason I
+kept the check was IIRC just that there was already a check there and
+its logic needed to be adjusted for my VM_SHARED changes.
 
-Overall, the guest state exposed by KVM is always correct, and
-replaying the instruction is not going to change that. It is if the
-VMM is broken that things turn ugly *for the VMM itself*, and I claim
-that no amount of flag being added is going to help that.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Peter
