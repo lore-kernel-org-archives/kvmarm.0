@@ -1,108 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2921F1FBBDE;
-	Mon, 13 Jan 2025 15:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B46240250
+	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 15:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736780849; cv=none; b=f4tJSeVrOkixXyTsMSCNraDfzqGbVTpmSOzEdi+67WO8XTmu2J9k36oOmnXIXZ7dda4Sk22JYk+/WloaqP5j/D21hT98bPdEc9fGlwdfHVV7E/m2I10Z+CaRetG5D1LM3q+lifxSZcH158anSUlIxvkOHHNkZeWN1/Zmq1O07WI=
+	t=1736781078; cv=none; b=s5a9tP3nz4CanhdXzPmF+35RgAuCQXj4iCZppTF5qw5FEHjIwQmulEPDlm/lsZjF0dHGE/SdV1TkmE+sCdMW+ARTReZBIAj9ssAlW8Rj6JzTscxySSwtjDMRTRlPwadJ2m9CjPjDd45iZLMuD0r0iDBGdVNYnfJeDTOKOwog3lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736780849; c=relaxed/simple;
-	bh=oi6ab4XbpzTbc1+7t7QB9hXM8i6N02vrJ4FXa3pV+hk=;
+	s=arc-20240116; t=1736781078; c=relaxed/simple;
+	bh=Srll5vISOStViqEFRHRuz5l1tVr8nZ6oxdB4N0twGR0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=utOaPk/bv2n/hP9PgPljCtR0pGpQHAULPWApjxOqrSbie2h84hCVOyPHzZae46N1zPtgf+8sU/oiYmg63xuw5dULr+1n00Iwobx+/lffrn2QNiYNIfv1ckxevzaDSEtbA04bnfwHsnxYWL4/DXde/RM8ZT6xmiuZ9sN0UzoKNWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EzyQJyi9; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XsiSHXVdrXVJ8faC5kSiVkDMtubcWNCJ3WbnlhTlw+876OnTWHnAp6G1/Ck73bD4k+QXUimYVGJGam8CiuoEC2aBzoPz5FGvLa7/tWt4zG2Mf7rIzkfpFRsR0xUSta4udiI/JQPyQtctwFpezRfR0G98rbsNeXLRP4o2CnCh9FI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a2aSCgBu; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EzyQJyi9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7123C4CED6;
-	Mon, 13 Jan 2025 15:07:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736780848;
-	bh=oi6ab4XbpzTbc1+7t7QB9hXM8i6N02vrJ4FXa3pV+hk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EzyQJyi9R/9hVcyvFqkltzhelPri5SRJlX5xK/GsdadHsGHy6z6r+wcQUsDeH/BHL
-	 4pcIYDHSJqxLxsTeaj8GXbDxU2m1zcxj71cqt0xQ13xFueay0+PH7rWdBi2bgLEccE
-	 XJkXsiVza9TkZs0C6ibyIYWdHZ6H5l2ayPHEoE5+/1VlbbqVINM2rwCnvPTX/r8fOE
-	 oEwtZHKWjcDmYxEJj5yN+YmNrmND1Nip98WxsBQeoREkKkT8x1yQGU+iNIDbUrGlc1
-	 WMFX0z9ZFKPpyv3G3PWr+cdrqoXmVGyoyh3NMhzV02OMzbwRhFSCSIwD1U6WVERwaB
-	 mWZAbuvY3KbGA==
-Date: Mon, 13 Jan 2025 15:07:21 +0000
-From: Mark Brown <broonie@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: maz@kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev,
-	suzuki.poulose@arm.com, coresight@lists.linaro.org,
-	James Clark <james.clark@arm.com>, Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	James Morse <james.morse@arm.com>, Shiqi Liu <shiqiliu@hust.edu.cn>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Aishwarya TCV <Aishwarya.TCV@arm.com>
-Subject: Re: [PATCH v9 2/7] tools: arm64: Update sysreg.h header files
-Message-ID: <1dad2a07-6aa2-4ddb-a337-ca3bba560f92@sirena.org.uk>
-References: <20250106142446.628923-1-james.clark@linaro.org>
- <20250106142446.628923-3-james.clark@linaro.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a2aSCgBu"
+Date: Mon, 13 Jan 2025 16:11:06 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736781068;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xLwBznsIvWChVrWyQ/Y1KottiOWCI/F91TbjA2wc0AA=;
+	b=a2aSCgBuFAUHHZ2qluxkDCW1r86/Jn2YuYdQd1tk+HuQfMVxRj6nw2X0GwNzCVRZStipgo
+	X3/zlLiG44z1iH1iU39ygCG6LXbI/5HFyRI8oWtDfGRHRlV6dUWYp7H2CUmGS9UvyPoFFX
+	JHNYyxBmVcqUwbNF9KwURzWYO1EG/gs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v1 2/5] configure: Display the default
+ processor for arm and arm64
+Message-ID: <20250113-45b57478be2241a35ffa1b67@orel>
+References: <20250110135848.35465-1-alexandru.elisei@arm.com>
+ <20250110135848.35465-3-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="whoHAOHtY/l4dkaU"
-Content-Disposition: inline
-In-Reply-To: <20250106142446.628923-3-james.clark@linaro.org>
-X-Cookie: Marriage is the sole cause of divorce.
-
-
---whoHAOHtY/l4dkaU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250110135848.35465-3-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 06, 2025 at 02:24:37PM +0000, James Clark wrote:
-> From: James Clark <james.clark@arm.com>
->=20
-> Created with the following:
->=20
->   cp include/linux/kasan-tags.h tools/include/linux/
->   cp arch/arm64/include/asm/sysreg.h tools/arch/arm64/include/asm/
->=20
-> Update the tools copy of sysreg.h so that the next commit to add a new
-> register doesn't have unrelated changes in it. Because the new version
-> of sysreg.h includes kasan-tags.h, that file also now needs to be copied
-> into tools.
+On Fri, Jan 10, 2025 at 01:58:45PM +0000, Alexandru Elisei wrote:
+> The help text for the --processor option displays the architecture name as
+> the default processor type. But the default for arm is cortex-a15, and for
+> arm64 is cortex-a57. Teach configure to display the correct default
+> processor type for these two architectures.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  configure | 30 ++++++++++++++++++++++--------
+>  1 file changed, 22 insertions(+), 8 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 5b0a2d7f39c0..138840c3f76d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5,6 +5,24 @@ if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ] ; then
+>      exit 1
+>  fi
+>  
+> +function get_default_processor()
+> +{
+> +    local arch="$1"
+> +
+> +    case "$arch" in
+> +    "arm")
+> +        default_processor="cortex-a15"
+> +        ;;
+> +    "arm64" | "aarch64")
+> +        default_processor="cortex-a57"
+> +        ;;
+> +    *)
+> +        default_processor=$arch
+> +    esac
+> +
+> +    echo "$default_processor"
+> +}
+> +
+>  srcdir=$(cd "$(dirname "$0")"; pwd)
+>  prefix=/usr/local
+>  cc=gcc
+> @@ -33,6 +51,7 @@ page_size=
+>  earlycon=
+>  efi=
+>  efi_direct=
+> +default_processor=$(get_default_processor $arch)
+>  
+>  # Enable -Werror by default for git repositories only (i.e. developer builds)
+>  if [ -e "$srcdir"/.git ]; then
+> @@ -48,7 +67,7 @@ usage() {
+>  	Options include:
+>  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+>  	                           arm, arm64/aarch64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> -	    --processor=PROCESSOR  processor to compile for ($arch)
+> +	    --processor=PROCESSOR  processor to compile for ($default_processor)
+>  	    --target=TARGET        target platform that the tests will be running on (qemu or
+>  	                           kvmtool, default is qemu) (arm/arm64 only)
+>  	    --cross-prefix=PREFIX  cross compiler prefix
+> @@ -283,13 +302,8 @@ else
+>      fi
+>  fi
+>  
+> -[ -z "$processor" ] && processor="$arch"
+> -
+> -if [ "$processor" = "arm64" ]; then
+> -    processor="cortex-a57"
+> -elif [ "$processor" = "arm" ]; then
+> -    processor="cortex-a15"
+> -fi
+> +# $arch will have changed when cross-compiling.
+> +[ -z "$processor" ] && processor=$(get_default_processor $arch)
 
-This breaks the build of the KVM selftests:
+The fact that $arch and $processor are wrong until they've had a chance to
+be converted might be another reason for the $do_help idea. But it'll
+always be fragile since another change that does some sort of conversion
+could end up getting added after the '[ $do_help ] && usage' someday.
 
-aarch64/aarch32_id_regs.c:150:16: error: use of undeclared identifier 'ID_A=
-A64PFR0_EL1_ELx_64BIT_ONLY'
-  150 |         return el0 =3D=3D ID_AA64PFR0_EL1_ELx_64BIT_ONLY;
-      |                       ^
-1 warning and 1 error generated.
+Thanks,
+drew
 
-since it's pulled over the changes in 056600ff7330 ("arm64/cpufeature:
-Replace custom macros with fields from ID_AA64PFR0_EL1") but not updated
-the test to reflect this.
-
---whoHAOHtY/l4dkaU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmeFLCkACgkQJNaLcl1U
-h9B6Qwf/QPeV8LvvKgGAErZB3th7rCS0P+WFRYom7XPEzXTvxrJkMpfproE/YfIe
-yb8cRX+Wm65xgxozRV7WfJBq19dyU+TirkCiY4DFTF7uuOHr61tbkDzRP+/Y4VnT
-HM/92xixwLioSy4xt6byM8GbaPzDi5uNS841VPbG8hzayntBbt17TgsPq7KAzNCh
-F2v4Mxr7OoQlL7xLa6C47AOSvb3tekvB3Yy22IKm2IK+TBSotrwDrxnmH8iNtwUv
-PsUYYM0iQr6RixcpqymDN+fZ+VGXZ+jR8/vCBPv9KWqSkLUnj9Dtu/Hw45oaqsAT
-HDflGT7KLQF8JB/nIGGEeRsIUSkK9g==
-=01JN
------END PGP SIGNATURE-----
-
---whoHAOHtY/l4dkaU--
+>  
+>  if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+>      testdir=x86
+> -- 
+> 2.47.1
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
