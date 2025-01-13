@@ -1,345 +1,167 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2784F1C1F09
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 19:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690961C549F;
+	Mon, 13 Jan 2025 19:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736796697; cv=none; b=uikos3W/zg5M3i9CylMf7z6Iqr0x0C9Yqt8qItDm0CaVwiUJpxbHObkWbEw70Bwrr24bSZsnkQehK0q8dS7lJuG0lfv+7SBlQ6XeYqslZlVn1mf32EeYLt0fUR7+FTjvfpx31U/oRTox2txgFgowLZIDrrt3ZycGIxXOu5kAtjA=
+	t=1736797092; cv=none; b=ep+6Jp/MvI3gSNjKnQZqKCFiwHh30Jw77z9WEHSdDU3Nrm7xhNCEDrW6Gm70mfRRfsgbG4lTK/uN+PNqcbjloIoT+stp9lpgcGHaZaoRziimKR2f6GYqM2JY3EqY91e14EwOyTiwr/ZORL8011QZiXQD4wfu6cnq6WifegkcnRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736796697; c=relaxed/simple;
-	bh=7CBYbOa08e+cYUeyzldUH8J0XYLzdIZ7bkoffuV60xE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OerDHUfv0CunMkdq1tjTIDAlpM0X4Lh+pyKHc/sUZaZkfz0c8jbaZhixOtXSUBr+XAE9qPFt6f3F+3uzypfXkL0SsfB2GmVK6LWwq3X1OhGl+k0374mVMRDGQTLSmS2Jt7WawFXDTnJq3VLky5NIQIMvxdbUmJpvTobnICnxEpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IeS3aDRR; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
+	s=arc-20240116; t=1736797092; c=relaxed/simple;
+	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CJbrHFneCwtTf31XjWTqTyIirpJgeJJuR+quKQkJ0oJnJsoN9XIiK1TAZtULIEcfj7ve/hBbhMlNSBxwnfQIzTnHdPCSL04ln2VlZVVekdc2789/ESxRaBx+btidyELIlYznPnQPMTrsnNpcn8LilvAiNg1sRUCpS+EVTFQewkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYmJ9Ai9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IeS3aDRR"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee9f66cb12so8342768a91.1
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 11:31:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736796695; x=1737401495; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AjSHhLfzPpweAeruuV41TxV8cjx61KJKZIlFZE69SAQ=;
-        b=IeS3aDRRRr/xBzAa82eCbC8ogxahrss0Igl4J+srfF9GfdgDQBSi+xGZU3UczE/u4U
-         h5WnrAnpNFCCDbuCLatINGK71VnUWmlgRNOAkRuGh9jCH5yYTcwi3N8AHN6+f6toFQnp
-         twAw8hw+gvv9nA3xYH/qwPpu6s5zpGt3ihP+LKBouTseI2fZUTiCUJObl39v/2QKP4vx
-         DC7xRMCOwDrnxB7Pa/wqGZf9l0L76EtMvl6F/ja4x9F8fHd7QAMUl95sEZtbQ/s+qcUi
-         CbicoVMIQDChVLKZIgIx18tzC/P7MqtUxGpKdkR1yKYaFFtVPzGyArnMTRUVcmQdIXum
-         he8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736796695; x=1737401495;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AjSHhLfzPpweAeruuV41TxV8cjx61KJKZIlFZE69SAQ=;
-        b=YyTTOiOnXaEVAcaFEwrsFhwb6S4KOaQC94Im6AXSU5RerTs5o6JMxVMCfu4dYA/LAL
-         aMCZpH0vuBWsl55T8tuK/fxYsuRtW3OrOjt8mVmRpeu/6GrVubyts8k60Cx2QShiSQkW
-         Nb9lOdUSwkTb0geVsg8108NsJiBhxnHwp6riahaF7ea67PmrRSVJ5bL7U+VxRG7U2TCo
-         dPgNMDL7/xCKJvEn4m4WBrYcuH+UC5F/spgjTXjP3a3oiJr4cTgXrTgCmw+hs0sc2aMz
-         HfIBTSVkrqusNI+NCWRG0bkYWLy/7CCImaXwbb3mAtKbwF8PSJekwzHYehlb7sWQqRJ5
-         /mMQ==
-X-Gm-Message-State: AOJu0YyT4Q50cXKP5/AxSTZgzH8tXsydEwSSBiV3ctfQWQ1t7kC1qgn4
-	8n/GmbPwlo2tBYVBVNcGr58pvw4lkUmWL7l2oprcLWxiVyEHwbrG1iww+ncpxrqWCGXsNOaF3Vj
-	ivBAEPiCZC9KgOMArbwS5VwK7f0ETSp+ASWWLLmE/WV4v7WJCPejt5dIstLLzaUSH3ubkFJpEXq
-	kCCYw+oLESDkJjoB+X3yD7JwhssjGV878kaoiv2wejGv+mABLPJSg4FfgeBhM=
-X-Google-Smtp-Source: AGHT+IHgy/xhjs0ZlLXfoJvzHD/baMNuiYAMQ8oeX9ah+6G+BrGfVdNx/nIjUYcPrD4FhCjo+aJMyh+mafTgb4aApA==
-X-Received: from pjbsw3.prod.google.com ([2002:a17:90b:2c83:b0:2f4:3ea1:9033])
- (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2f4e:b0:2eb:140d:f6df with SMTP id 98e67ed59e1d1-2f548e98382mr28470262a91.1.1736796695319;
- Mon, 13 Jan 2025 11:31:35 -0800 (PST)
-Date: Mon, 13 Jan 2025 11:31:28 -0800
-In-Reply-To: <20250113193128.1533449-1-jingzhangos@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYmJ9Ai9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA9AC4CEE1;
+	Mon, 13 Jan 2025 19:38:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736797092;
+	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mYmJ9Ai9JhKhbnL/24T8j29IHGHpFxP7mY+XRsEHVBJu++4+QAEE05xDeaQ0loZUH
+	 uI9f//3bbpxPTDmCqxr8uK1bsOeR84DIBfnfN314ou1gekXcm4sWwtM8IoL1N9owcO
+	 uYNOxhB4CMZQndJw7LPUNF3sjdk3UrS69dt9otVHmnzFz66RM27r5QwFGcDyVkSFe5
+	 qfh4TD/mPUmFZ3N1TK4/VhH3sEE84uIZjQv4/qGrhfUtTD6xplhEQJi2rG2n4E+wu6
+	 4bmcAAje2IIvRAwPdYo90ZHDMB1+pS1ASzL73O2f2C+D4HdK0TjfHizjClScKO7qfz
+	 257t6nkLTBD/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tXQGH-00Bltd-Ms;
+	Mon, 13 Jan 2025 19:38:09 +0000
+Date: Mon, 13 Jan 2025 19:38:08 +0000
+Message-ID: <87bjwaqzbz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
+In-Reply-To: <Z4ViZb7rruRiN-Oe@google.com>
+References: <20250111012450.1262638-1-seanjc@google.com>
+	<20250111012450.1262638-4-seanjc@google.com>
+	<87ikqlr4vo.wl-maz@kernel.org>
+	<Z4U03KRYy2DVEgJR@google.com>
+	<86ikqiwq7y.wl-maz@kernel.org>
+	<Z4ViZb7rruRiN-Oe@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250113193128.1533449-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.47.1.688.g23fc6f90ad-goog
-Message-ID: <20250113193128.1533449-3-jingzhangos@google.com>
-Subject: [RFC PATCH 2/2] KVM: arm64: vgic-its: Add tracepoints for VGIC ITS commands
-From: Jing Zhang <jingzhangos@google.com>
-To: KVMARM <kvmarm@lists.linux.dev>, ARMLinux <linux-arm-kernel@lists.infradead.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This commit adds tracepoints to the KVM VGIC ITS on ARM64 to improve
-observability and debuggability. The following ITS commands now have
-associated tracepoints: MAPI, DISCARD, CLEAR, INT, INV, MAPD, MAPC,
-MOVI, MOVALL, and INVALL.
+On Mon, 13 Jan 2025 18:58:45 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Mon, Jan 13, 2025, Marc Zyngier wrote:
+> > On Mon, 13 Jan 2025 15:44:28 +0000,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > > 
+> > > On Sat, Jan 11, 2025, Marc Zyngier wrote:
+> > > > On Sat, 11 Jan 2025 01:24:48 +0000,
+> > > > Sean Christopherson <seanjc@google.com> wrote:
+> > > > > 
+> > > > > Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
+> > > > > that KVM_RUN needs to be re-executed prior to save/restore in order to
+> > > > > complete the instruction/operation that triggered the userspace exit.
+> > > > > 
+> > > > > KVM's current approach of adding notes in the Documentation is beyond
+> > > > > brittle, e.g. there is at least one known case where a KVM developer added
+> > > > > a new userspace exit type, and then that same developer forgot to handle
+> > > > > completion when adding userspace support.
+> > > > 
+> > > > Is this going to fix anything? If they couldn't be bothered to read
+> > > > the documentation, let alone update it, how is that going to be
+> > > > improved by extra rules and regulations?
+> > > > 
+> > > > I don't see how someone ignoring the documented behaviour of a given
+> > > > exit reason is, all of a sudden, have an epiphany and take a *new*
+> > > > flag into account.
+> > > 
+> > > The idea is to reduce the probability of introducing bugs, in KVM or userspace,
+> > > every time KVM attaches a completion callback.  Yes, userspace would need to be
+> > > updated to handle KVM_RUN_NEEDS_COMPLETION, but once that flag is merged, neither
+> > > KVM's documentation nor userspace would never need to be updated again.  And if
+> > > all architectures took an approach of handling completion via function callback,
+> > > I'm pretty sure we'd never need to manually update KVM itself either.
+> > 
+> > You are assuming that we need this completion, and I dispute this
+> > assertion.
+> 
+> Ah, gotcha.
+> 
+> > > > > +The pending state of the operation for such exits is not preserved in state
+> > > > > +which is visible to userspace, thus userspace should ensure that the operation
+> > > > > +is completed before performing state save/restore, e.g. for live migration.
+> > > > > +Userspace can re-enter the guest with an unmasked signal pending or with the
+> > > > > +immediate_exit field set to complete pending operations without allowing any
+> > > > > +further instructions to be executed.
+> > > > > +
+> > > > > +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
+> > > > > +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
+> > > > > +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
+> > > > > +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
+> > > > 
+> > > > So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
+> > > > must be present for all of these exits, right? And from what I can
+> > > > tell, this capability is unconditionally advertised.
+> > > > 
+> > > > Yet, you don't amend arm64 to publish that flag. Not that I think this
+> > > > causes any issue (even if you save the state at that point without
+> > > > reentering the guest, it will be still be consistent), but that
+> > > > directly contradicts the documentation (isn't that ironic? ;-).
+> > > 
+> > > It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
+> > > 
+> > > 	if (run->exit_reason == KVM_EXIT_MMIO) {
+> > > 		ret = kvm_handle_mmio_return(vcpu);
+> > > 		if (ret <= 0)
+> > > 			return ret;
+> > > 	}
+> > 
+> > That's satisfying a load from the guest forwarded to userspace.
+> 
+> And MMIO stores, no?  I.e. PC needs to be incremented on stores as well.
 
-Each tracepoint captures essential information such as device ID, event
-ID, and other relevant parameters, allowing for detailed monitoring of
-ITS operations.
+Yes, *after* the store as completed. If you replay the instruction,
+the same store comes out.
 
-These tracepoints are useful for:
+>
+> > If the VMM did a save of the guest at this stage, restored and resumed it,
+> > *nothing* bad would happen, as PC still points to the instruction that got
+> > forwarded. You'll see the same load again.
+> 
+> But replaying an MMIO store could cause all kinds of problems, and even MMIO
+> loads could theoretically be problematic, e.g. if there are side effects in the
+> device that trigger on access to a device register.
 
-*   Debugging interrupt routing issues.
-*   Performance analysis and optimization.
-*   Understanding ITS behavior.
-*   Root-causing interrupt handling errors.
+But that's the VMM's problem. If it has modified its own state and
+doesn't return to the guest to complete the instruction, that's just
+as bad as a load, which *do* have side effects as well.
 
-This enhancement provides crucial insights into interrupt handling in
-ARM64 virtualized environments, aiding in development, debugging, and
-maintenance.
+Overall, the guest state exposed by KVM is always correct, and
+replaying the instruction is not going to change that. It is if the
+VMM is broken that things turn ugly *for the VMM itself*, and I claim
+that no amount of flag being added is going to help that.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/kvm/vgic/trace.h    | 135 +++++++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-its.c |  19 +++++
- 2 files changed, 154 insertions(+)
+	M.
 
-diff --git a/arch/arm64/kvm/vgic/trace.h b/arch/arm64/kvm/vgic/trace.h
-index 83c64401a7fc..22953c0ef159 100644
---- a/arch/arm64/kvm/vgic/trace.h
-+++ b/arch/arm64/kvm/vgic/trace.h
-@@ -27,6 +27,141 @@ TRACE_EVENT(vgic_update_irq_pending,
- 		  __entry->vcpu_id, __entry->irq, __entry->level)
- );
- 
-+DECLARE_EVENT_CLASS(vgic_its_cmd_class,
-+	TP_PROTO(__u32 device_id, __u32 event_id),
-+	TP_ARGS(device_id, event_id),
-+
-+	TP_STRUCT__entry(
-+		__field(	__u32,		device_id		)
-+		__field(	__u32,		event_id		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->device_id		= device_id;
-+		__entry->event_id		= event_id;
-+	),
-+
-+	TP_printk("Device ID: %u, Event ID: %u",
-+		  __entry->device_id, __entry->event_id)
-+);
-+
-+DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_mapi,
-+	TP_PROTO(__u32 device_id, __u32 event_id),
-+	TP_ARGS(device_id, event_id));
-+
-+DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_discard,
-+	TP_PROTO(__u32 device_id, __u32 event_id),
-+	TP_ARGS(device_id, event_id));
-+
-+DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_clear,
-+	TP_PROTO(__u32 device_id, __u32 event_id),
-+	TP_ARGS(device_id, event_id));
-+
-+DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_int,
-+	TP_PROTO(__u32 device_id, __u32 event_id),
-+	TP_ARGS(device_id, event_id));
-+
-+DEFINE_EVENT(vgic_its_cmd_class, vgic_its_cmd_inv,
-+	TP_PROTO(__u32 device_id, __u32 event_id),
-+	TP_ARGS(device_id, event_id));
-+
-+TRACE_EVENT(vgic_its_cmd_mapd,
-+	TP_PROTO(__u32 device_id, bool valid, __u8 num_eventid_bits, __u64 itt_addr),
-+	TP_ARGS(device_id, valid, num_eventid_bits, itt_addr),
-+
-+	TP_STRUCT__entry(
-+		__field(	__u32,		device_id		)
-+		__field(	bool,		valid			)
-+		__field(	__u8,		num_eventid_bits	)
-+		__field(	__u64,		itt_addr		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->device_id		= device_id;
-+		__entry->valid			= valid;
-+		__entry->num_eventid_bits	= num_eventid_bits;
-+		__entry->itt_addr		= itt_addr;
-+	),
-+
-+	TP_printk("Device ID: %u, valid: %d, num_eventid_bits: %u, itt_addr: %llx",
-+		  __entry->device_id, __entry->valid,
-+		  __entry->num_eventid_bits, __entry->itt_addr)
-+);
-+
-+TRACE_EVENT(vgic_its_cmd_mapc,
-+	TP_PROTO(__u32 collection_id, bool valid),
-+	TP_ARGS(collection_id, valid),
-+
-+	TP_STRUCT__entry(
-+		__field(	__u32,		collection_id		)
-+		__field(	bool,		valid			)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->collection_id		= collection_id;
-+		__entry->valid			= valid;
-+	),
-+
-+	TP_printk("Collection ID: %u, valid: %d",
-+		  __entry->collection_id, __entry->valid)
-+);
-+
-+TRACE_EVENT(vgic_its_cmd_movi,
-+	TP_PROTO(__u32 device_id, __u32 event_id, __u32 collection_id),
-+	TP_ARGS(device_id, event_id, collection_id),
-+
-+	TP_STRUCT__entry(
-+		__field(	__u32,		device_id		)
-+		__field(	__u32,		event_id		)
-+		__field(	__u32,		collection_id		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->device_id		= device_id;
-+		__entry->event_id		= event_id;
-+		__entry->collection_id		= collection_id;
-+	),
-+
-+	TP_printk("Device ID: %u, Event ID: %u, Collection ID: %u",
-+		  __entry->device_id, __entry->event_id, __entry->collection_id)
-+);
-+
-+TRACE_EVENT(vgic_its_cmd_movall,
-+	TP_PROTO(int vcpu_source, int vcpu_target),
-+	TP_ARGS(vcpu_source, vcpu_target),
-+
-+	TP_STRUCT__entry(
-+		__field(	int,		vcpu_source		)
-+		__field(	int,		vcpu_target		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_source		= vcpu_source;
-+		__entry->vcpu_target		= vcpu_target;
-+	),
-+
-+	TP_printk("Source VCPU: %d, Target VCPU: %d",
-+		  __entry->vcpu_source, __entry->vcpu_target)
-+);
-+
-+TRACE_EVENT(vgic_its_cmd_invall,
-+	TP_PROTO(__u32 collection_id, int vcpu_id),
-+	TP_ARGS(collection_id, vcpu_id),
-+
-+	TP_STRUCT__entry(
-+		__field(	__u32,		collection_id		)
-+		__field(	int,		vcpu_id			)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->collection_id		= collection_id;
-+		__entry->vcpu_id		= vcpu_id;
-+	),
-+
-+	TP_printk("Collection ID: %u, VCPU ID: %d",
-+		  __entry->collection_id, __entry->vcpu_id)
-+);
-+
- #endif /* _TRACE_VGIC_H */
- 
- #undef TRACE_INCLUDE_PATH
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 569f9da9049f..d7524e3abad6 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -22,6 +22,7 @@
- 
- #include "vgic.h"
- #include "vgic-mmio.h"
-+#include "trace.h"
- 
- static struct kvm_device_ops kvm_arm_vgic_its_ops;
- 
-@@ -795,6 +796,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
- 	u32 event_id = its_cmd_get_id(its_cmd);
- 	struct its_ite *ite;
- 
-+	trace_vgic_its_cmd_discard(device_id, event_id);
-+
- 	ite = find_ite(its, device_id, event_id);
- 	if (ite && its_is_collection_mapped(ite->collection)) {
- 		struct its_device *device = find_its_device(its, device_id);
-@@ -829,6 +832,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
- 	struct its_ite *ite;
- 	struct its_collection *collection;
- 
-+	trace_vgic_its_cmd_movi(device_id, event_id, coll_id);
-+
- 	ite = find_ite(its, device_id, event_id);
- 	if (!ite)
- 		return E_ITS_MOVI_UNMAPPED_INTERRUPT;
-@@ -1035,6 +1040,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	struct vgic_irq *irq;
- 	int lpi_nr;
- 
-+	trace_vgic_its_cmd_mapi(device_id, event_id);
-+
- 	device = find_its_device(its, device_id);
- 	if (!device)
- 		return E_ITS_MAPTI_UNMAPPED_DEVICE;
-@@ -1161,6 +1168,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	struct its_device *device;
- 	gpa_t gpa;
- 
-+	trace_vgic_its_cmd_mapd(device_id, valid, num_eventid_bits, itt_addr);
-+
- 	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &gpa))
- 		return E_ITS_MAPD_DEVICE_OOR;
- 
-@@ -1204,6 +1213,8 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
- 	valid = its_cmd_get_validbit(its_cmd);
- 	coll_id = its_cmd_get_collection(its_cmd);
- 
-+	trace_vgic_its_cmd_mapc(coll_id, valid);
-+
- 	if (!valid) {
- 		vgic_its_free_collection(its, coll_id);
- 		vgic_its_invalidate_cache(its);
-@@ -1248,6 +1259,7 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
- 	u32 event_id = its_cmd_get_id(its_cmd);
- 	struct its_ite *ite;
- 
-+	trace_vgic_its_cmd_clear(device_id, event_id);
- 
- 	ite = find_ite(its, device_id, event_id);
- 	if (!ite)
-@@ -1278,6 +1290,7 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
- 	u32 event_id = its_cmd_get_id(its_cmd);
- 	struct its_ite *ite;
- 
-+	trace_vgic_its_cmd_inv(device_id, event_id);
- 
- 	ite = find_ite(its, device_id, event_id);
- 	if (!ite)
-@@ -1338,6 +1351,8 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
- 	vcpu = collection_to_vcpu(kvm, collection);
- 	vgic_its_invall(vcpu);
- 
-+	trace_vgic_its_cmd_invall(coll_id, vcpu->vcpu_id);
-+
- 	return 0;
- }
- 
-@@ -1364,6 +1379,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 	if (!vcpu1 || !vcpu2)
- 		return E_ITS_MOVALL_PROCNUM_OOR;
- 
-+	trace_vgic_its_cmd_movall(vcpu1->vcpu_id, vcpu2->vcpu_id);
-+
- 	if (vcpu1 == vcpu2)
- 		return 0;
- 
-@@ -1392,6 +1409,8 @@ static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
- 	u32 msi_data = its_cmd_get_id(its_cmd);
- 	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
- 
-+	trace_vgic_its_cmd_int(msi_devid, msi_data);
-+
- 	return vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
- }
- 
 -- 
-2.47.1.613.gc27f4b7a9f-goog
-
+Without deviation from the norm, progress is not possible.
