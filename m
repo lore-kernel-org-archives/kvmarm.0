@@ -1,178 +1,92 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B45528EC6E
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 09:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA4220F97E
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 11:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736848539; cv=none; b=HlBy8N57I7IXJq8UI0q/0csxyFXb26f6oqJuW98ohsp/egtXJWZC7Lsg3Zfbk36qezCQOCOcYr1bXHkKXKvk4vEA3956zybeloi1chP6Pg/a5p7D29BSqDmIuoBVEZbfr6TxemyPBQ9eLYAAzIRM0rA9RYFW1E8zWexyXTqhZ9k=
+	t=1736853196; cv=none; b=dZQkwlZOSlxgCEv2LVtY/IECgkoiKKh0wIdS8FPRTYcQ1cMXSz2uK2FiNl6paAkRjF1INcDBumeUAyrKtq5HuT5f5g9UQZTrSQ628SUTv5ASA67gRusEZLiXw4b2Yotr9tdIvDwo2pDBaXkcFIdptV1dMf0ffk5H/6wYjx1mlTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736848539; c=relaxed/simple;
-	bh=xxLGlU/FIT4lnPp7o3tKeTD0oD4NlG02E+vY4nChYG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WkjBzW0pKM7xZL/kdnnlFpLNQWK8YqKBaWeBhBWQvYdgN2sk5iBYRayEpyIxmbnyO8MQ70WNR8PfhUPlwBCrFE8qs76er0iZ4kSuNaH7CYtojk4Jrjy+Vw7bWkGkB0jZBkwng8HeuV7qcZVeoEjeko1tH+EVtvKpMjvwf1B/LP8=
+	s=arc-20240116; t=1736853196; c=relaxed/simple;
+	bh=zFaf5kTMHUz0TfNJ+32cNY1IyhUd5nDg6JJHZkJ0db0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PaOk4g+YsSJw5Fzdmw7pvz1C+JbQDSG/s4rl5SkKA2HUvoBkBUwaAtPrGiFAfjYQb2K4ZAO6CmXppcGTbxhkxxnAjS5k4K2WSTaQ49BibNWS62iICsWqZRa5AuyUBN8wY9FgLO7tn3PbIBNxkhBWdxwVd3+aFEF5u1SeFKqd5SY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AD7D11FB;
-	Tue, 14 Jan 2025 01:56:04 -0800 (PST)
-Received: from [10.57.35.117] (unknown [10.57.35.117])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8C9713F792;
-	Tue, 14 Jan 2025 01:55:33 -0800 (PST)
-Message-ID: <bfd6361b-1a6f-43e5-9ad1-80692c146d61@arm.com>
-Date: Tue, 14 Jan 2025 09:55:32 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33F4C11FB;
+	Tue, 14 Jan 2025 03:13:42 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A99BF3F66E;
+	Tue, 14 Jan 2025 03:13:12 -0800 (PST)
+Date: Tue, 14 Jan 2025 11:13:07 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: nv: Fix sysreg RESx-ication
+Message-ID: <20250114111307.GA3312699@e124191.cambridge.arm.com>
+References: <20250112165029.1181056-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/7] KVM: arm64: MTE: Use stage-2 NoTagAccess memory
- attribute if supported
-Content-Language: en-GB
-To: Peter Collingbourne <pcc@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, Steven Price <steven.price@arm.com>,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
- <20250110110023.2963795-6-aneesh.kumar@kernel.org> <Z4Fk58k8YptDkVgm@arm.com>
- <yq5amsfxtrlw.fsf@kernel.org> <Z4Vk5gTnd8o7VKWL@arm.com>
- <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250112165029.1181056-1-maz@kernel.org>
 
-Hi,
-
-
-On 13/01/2025 20:47, Peter Collingbourne wrote:
-> On Mon, Jan 13, 2025 at 11:09 AM Catalin Marinas
-> <catalin.marinas@arm.com> wrote:
->>
->> On Sat, Jan 11, 2025 at 06:49:55PM +0530, Aneesh Kumar K.V wrote:
->>> Catalin Marinas <catalin.marinas@arm.com> writes:
->>>> On Fri, Jan 10, 2025 at 04:30:21PM +0530, Aneesh Kumar K.V (Arm) wrote:
->>>>> Currently, the kernel won't start a guest if the MTE feature is enabled
->>>
->>> ...
->>>
->>>>> @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->>>>>             if (!vma)
->>>>>                     break;
->>>>>
->>>>> -          if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
->>>>> +          if (kvm_has_mte(kvm) &&
->>>>> +              !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) {
->>>>>                     ret = -EINVAL;
->>>>>                     break;
->>>>>             }
->>>>
->>>> I don't think we should change this, or at least not how it's done above
->>>> (Suzuki raised a related issue internally relaxing this for VM_PFNMAP).
->>>>
->>>> For standard memory slots, we want to reject them upfront rather than
->>>> deferring to the fault handler. An example here is file mmap() passed as
->>>> standard RAM to the VM. It's an unnecessary change in behaviour IMHO.
->>>> I'd only relax this for VM_PFNMAP mappings further down in this
->>>> function (and move the VM_PFNMAP check above; see Suzuki's internal
->>>> patch, unless he posted it publicly already).
-
-For the record, here is the patch Catalin was referring to.
-
-
---->8---
-
-kvm: arm64: Allow device mappings with MTE
-
-When a VM is configured to use MTE, we prevent mapping a "Device" to the VM.
-
-e.g: with kvmtool (with additional debugging to dump error code and 
-addresses)
-
-$ lkvm run ... --vfio 0000:01:00.0 ...
-
-  Info: Using IOMMU type 3 for VFIO container
-    Error: 0000:01:00.0: failed to register region with KVM 
-50020000-50022000: -22
-       Warning: [0abc:aced] Error activating emulation for BAR 0
-       Error: 0000:01:00.0: failed to configure regions
-       Warning: Failed init: vfio__init
-
-Only check for the MTE allowed for a VMA if it is not backed by "device"
-
-Fixes: ea7fc1bb1cd1b ("KVM: arm64: Introduce MTE VM feature")
-Cc: Steven Price <steven.price at arm.com>
-Cc: Marc Zyngier <maz at kernel.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose at arm.com>
----
-  arch/arm64/kvm/mmu.c | 8 +++-----
-  1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 8b2d803e558a..7e084f22e185 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2295,17 +2295,15 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-  		if (!vma)
-  			break;
-
--		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
--			ret = -EINVAL;
--			break;
--		}
--
-  		if (vma->vm_flags & VM_PFNMAP) {
-  			/* IO region dirty page logging not allowed */
-  			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-  				ret = -EINVAL;
-  				break;
-  			}
-+		} else if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
-+			ret = -EINVAL;
-+			break;
-  		}
-  		hva = min(reg_end, vma->vm_end);
-  	} while (hva < reg_end);
--- 
-2.34.1
-
-
-Suzuki
-
-
->>>
->>> But we want to handle memslots backed by pagecache pages for virtio-shm
->>> here (virtiofs dax use case).
->>
->> Ah, I forgot about this use case. So with virtiofs DAX, does a host page
->> cache page (host VMM mmap()) get mapped directly into the guest as a
->> separate memory slot? In this case, the host vma would not have
->> VM_MTE_ALLOWED set.
->>
->>> With MTE_PERM, we can essentially skip the
->>> kvm_vma_mte_allowed(vma) check because we handle all types in the fault
->>> handler.
->>
->> This was pretty much the early behaviour when we added KVM support for
->> MTE, allow !VM_MTE_ALLOWED and trap them later. However, we disallowed
->> VM_SHARED because of some non-trivial race. Commit d89585fbb308 ("KVM:
->> arm64: unify the tests for VMAs in memslots when MTE is enabled")
->> changed this behaviour and the VM_MTE_ALLOWED check happens upfront. A
->> subsequent commit removed the VM_SHARED check.
->>
->> It's a minor ABI change but I'm trying to figure out why we needed this
->> upfront check rather than simply dropping the VM_SHARED check. Adding
->> Peter in case he remembers. I can't see any race if we simply skipped
->> this check altogether, irrespective of FEAT_MTE_PERM.
+On Sun, Jan 12, 2025 at 04:50:27PM +0000, Marc Zyngier wrote:
+> Joey recently reported that some rather basic tests were failing on
+> NV, and managed to track it down to critical register fields (such as
+> HCR_EL2.E2H) not having their expect value.
 > 
-> I don't see a problem with removing the upfront check. The reason I
-> kept the check was IIRC just that there was already a check there and
-> its logic needed to be adjusted for my VM_SHARED changes.
+> Further investigation has outlined a couple of critical issues:
 > 
-> Peter
+> - Evaluating HCR_EL2.E2H must always be done with a sanitising
+>   accessor, no ifs, no buts. Given that KVM assumes a fixed value for
+>   this bit, we cannot leave it to the guest to mess with.
+> 
+> - Resetting the sysreg file must result in the RESx bits taking
+>   effect. Otherwise, we may end-up making the wrong decision (see
+>   above), and we definitely expose invalid values to the guest. Note
+>   that because we compute the RESx masks very late in the VM setup, we
+>   need to apply these masks at that particular point as well.
+> 
+> The two patches in this series are enough to fix the current set of
+> issues, but __vcpu_sys_reg() needs some extra work as it is doing the
+> wrong thing when used as a lvalue. I'll post a separate series for
+> that, as the two problems are fairly orthogonal, and this results in a
+> significant amount of churn.
+> 
+> All kudos to Joey for patiently tracking that one down. This was
+> hidden behind a myriad of other issues, and nailing this sucker down
+> is nothing short of a debugging lesson. Drinks on me next time.
+> 
+> Unless someone shouts, I'll take this in for 6.14.
+> 
 
+Testing using the updated kvm-arm64/nv-next branch:
+Tested-by: Joey Gouly <joey.gouly@arm.com>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+Joey
+
+> Marc Zyngier (2):
+>   KVM: arm64: nv: Always evaluate HCR_EL2 using sanitising accessors
+>   KVM: arm64: nv: Apply RESx settings to sysreg reset values
+> 
+>  arch/arm64/include/asm/kvm_emulate.h | 36 ++++++++++++----------------
+>  arch/arm64/include/asm/kvm_nested.h  |  2 +-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c   |  4 ++--
+>  arch/arm64/kvm/nested.c              |  9 +++++--
+>  arch/arm64/kvm/sys_regs.c            |  5 +++-
+>  5 files changed, 29 insertions(+), 27 deletions(-)
+> 
+> -- 
+> 2.39.2
+> 
