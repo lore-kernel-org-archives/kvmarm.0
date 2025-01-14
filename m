@@ -1,39 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E0A14C5A1;
-	Tue, 14 Jan 2025 15:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D6723244D;
+	Tue, 14 Jan 2025 15:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736867267; cv=none; b=Y3mVn8u/IcRQaE4vdGfsmNsWN4jhwzLLCO0VKbfB7j1+CmuRKAenPKiaCaeGIqfgLUZg8S8/vF/hIZISqHQnDuBCA9GncBGbM6PVptuhYj/9AtS4w49dABSDP6KxLyE7nEtlBatg/PPM5zNNACC3yfLbDypkT1TGzKJyQNy73Sg=
+	t=1736867319; cv=none; b=pp2VwL9UuvP2rL0br3EiU9KsVck6G5jbUjRdWhdkm70yIAGU9/5XQCYAkStnOa4oxc+9qY9TDKixJjzn6IW7cOzHaFKlybnAGSL4NbA8MfWjFIta9Lsii01hzeFCJeHsDtt+6Sk5wRLOXKOs4UYpZG8qm8F3lT4GtDKbWh9qCZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736867267; c=relaxed/simple;
-	bh=OJUsxyrxfC11aQT26TYfZHa68Gx/au1vC79F/kqbr4M=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S90xk1tBBKRkdXooYVsBCrtSAHGBLL/zsp/yxX6KpFAKWStwSHXPJEg+3yNLcxM6Uz4cVMXnZeqRcNCgi6wYBIdRvVPbBZcBRcnaFbhAOXIMZYLF+iAJMhm7PYgZK51SPF+tsEpthQME+brjG64jc458gwulp4HPCwkx+MyaC/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXnV/r9W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736867319; c=relaxed/simple;
+	bh=xJfUfmSMNxwZh9TdSU5lSOsMug3psv6T68LmhCdjkI0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WdqBUJAXCm6GY+0M5mCO5d8vXKMR1mLjp5TelkXQViUIShBbni7Bf50GwF3kHDKDLOb4jmyVJOK9GB3jHK9DSIa84X+sGElYGR/4ym2VSdTLlajJNrk8llJOU6OgtkRhNDF6bc9IEzr/czpeW5zoXVwBGCMD0KU8MeychYTLj8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H4OdmfOA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXnV/r9W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BA55C4CEDD;
-	Tue, 14 Jan 2025 15:07:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4OdmfOA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8FFAC4CEDD;
+	Tue, 14 Jan 2025 15:08:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736867266;
-	bh=OJUsxyrxfC11aQT26TYfZHa68Gx/au1vC79F/kqbr4M=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=eXnV/r9WUSVIa5mpEYC0Ii8R3z9An4EuL+3t/H4jmYLyWT22LC5ojAMXfN78yI1Tu
-	 x5UdwirEFdkPqZvVZ5lqPQZ1lI8PXoy8bPZ5naoykYIipP5dukhr7tgyd3Cmijq69h
-	 Kpj+EkMfGf6KaoQQ3cPKsKH+jBrPpLNLxF2G+JmOVDoQJGFt2bBf567jKsYrYe0vc/
-	 OoPsY/aP0peoscsY0qQYFLawglUFGOPRykmnbi1b41xOpUQ1SV1dQqGSfjU+3ghIYV
-	 yUK12JaDPxn9FKYuhtiMngf0Vut3qPUFK9Udcn6gX2FiqfSI2hvHYvUKjasYe2Dzxr
-	 Ahy2BIcFVMfiw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1736867319;
+	bh=xJfUfmSMNxwZh9TdSU5lSOsMug3psv6T68LmhCdjkI0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H4OdmfOA8t0is47SKZQII6aypPMAfS1+hG3tv9HnRJyLyndr/HYKqvopkwa0ah5v3
+	 Q4OCajX5wp244AotJU0dHzCOKXTfLCJb4h+OCzYFvZItsWrdYVubqFU+21Q5Wo8NsW
+	 MZBEkrmNtM02lXIP6L/QtTAbSDpNwTVsvpkmKSKaCAa83xE/DjDVBas3rPTBX6IsVu
+	 ztuzwIM3S8NtCCNTOtKX2SKLPuMcFujM0Lh2+19YWb5kFmjaQh0Fh4VTkfcic+SlEQ
+	 olkKK4DYYVdZNiQjDck5iBaJK1urYA/zv4dcA+hDe6Z/juqH33XDrvb3oMBxESjo/V
+	 cftrLpkwYXptQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tXiW8-00CApI-4F;
-	Tue, 14 Jan 2025 15:07:44 +0000
+	id 1tXiWy-00CAqI-Sw;
+	Tue, 14 Jan 2025 15:08:36 +0000
+Date: Tue, 14 Jan 2025 15:08:36 +0000
+Message-ID: <86ed15whzf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: catalin.marinas@arm.com,
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com,
 	joey.gouly@arm.com,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,42 +44,73 @@ To: catalin.marinas@arm.com,
 	oliver.upton@linux.dev,
 	suzuki.poulose@arm.com,
 	will@kernel.org,
-	yuzenghui@huawei.com,
-	Sebastian Ene <sebastianene@google.com>
+	yuzenghui@huawei.com
 Subject: Re: [PATCH] KVM: arm64: Fix the upper limit of the walker range
-Date: Tue, 14 Jan 2025 15:07:40 +0000
-Message-Id: <173686725256.1564007.10057410083015197983.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250114145050.563658-2-sebastianene@google.com>
+In-Reply-To: <Z4Z8yRPGwvqHpzRs@google.com>
 References: <20250114145050.563658-2-sebastianene@google.com>
+	<86frllwilm.wl-maz@kernel.org>
+	<Z4Z8yRPGwvqHpzRs@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, sebastianene@google.com
+X-SA-Exim-Rcpt-To: sebastianene@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 14 Jan 2025 14:50:51 +0000, Sebastian Ene wrote:
-> Prevent the walker from running into weeds when walking an
-> entire address range.
+On Tue, 14 Jan 2025 15:03:37 +0000,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
+> On Tue, Jan 14, 2025 at 02:55:17PM +0000, Marc Zyngier wrote:
+> > On Tue, 14 Jan 2025 14:50:51 +0000,
+> > Sebastian Ene <sebastianene@google.com> wrote:
+> > > 
+> > > Prevent the walker from running into weeds when walking an
+> > > entire address range.
+> > > 
+> > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/pgtable.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > index 40bd55966..2ffb5571e 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -260,7 +260,7 @@ static int _kvm_pgtable_walk(struct kvm_pgtable *pgt, struct kvm_pgtable_walk_da
+> > >  {
+> > >  	u32 idx;
+> > >  	int ret = 0;
+> > > -	u64 limit = BIT(pgt->ia_bits);
+> > > +	u64 limit = BIT(pgt->ia_bits) - 1;
+> > >  
+> > >  	if (data->addr > limit || data->end > limit)
+> > >  		return -ERANGE;
+> > 
+> > Huh, nice catch. I guess this deserves a
+> > 
+> > Fixes: b1e57de62cfb4 ("KVM: arm64: Add stand-alone page-table walker infrastructure")
+> > Cc: stable@vger.kernel.org
+> > 
+> > right?
+> > 
+> > 	M.
 > 
+> Hi Marc,
+> 
+> Thanks for the prompt review. Adding the missing bits now and re-spinnig
+> v2.
 
-Applied to next, thanks!
-
-[1/1] KVM: arm64: Fix the upper limit of the walker range
-      commit: bc9e4ec6e98838314c07575a5fbc06755d21913c
-
-Cheers,
+Too late! ;-)
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
