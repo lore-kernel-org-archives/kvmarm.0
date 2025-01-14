@@ -1,144 +1,178 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB1E1D5AD8
-	for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 22:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B45528EC6E
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 09:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736805858; cv=none; b=VFrg5412/KcwbcRNbbQuuFPB4j0fKF6aRri61GQSx+bw0ahr0NiBL2FDyP3TgWQtrDS71mfINjl91EPWsvvezRjTtPTQhpCJzjtOhYYf/J1ALZXZnFikGPt4JgYCIeZLmOPxcw0AY3k2cv4Op0EiYQbwyRwN9O+9o1+vmBiVDlQ=
+	t=1736848539; cv=none; b=HlBy8N57I7IXJq8UI0q/0csxyFXb26f6oqJuW98ohsp/egtXJWZC7Lsg3Zfbk36qezCQOCOcYr1bXHkKXKvk4vEA3956zybeloi1chP6Pg/a5p7D29BSqDmIuoBVEZbfr6TxemyPBQ9eLYAAzIRM0rA9RYFW1E8zWexyXTqhZ9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736805858; c=relaxed/simple;
-	bh=EchIjsJPujj7t/pv7t0veqTlDk1UffPAlzXdJgJLSDc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nSBEscMjcRVD48urbdahTSKZDEcM66GLKpP1KehQU+B9EL2UVcA2sGb+jj8co0tOcSOnY+fgKA43QMdSLNzDcqB5q2WKeTnGQsKSu+flkUtub8KpsbnrJH5x7WYj8okZ2UQ08/Yy3p/LlaDKplwb8iKXhCQ5ARJyapuPePpDUnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Ywuzhx9; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Ywuzhx9"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f129f7717fso8656381a91.0
-        for <kvmarm@lists.linux.dev>; Mon, 13 Jan 2025 14:04:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736805856; x=1737410656; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ouQM0W6rpy+hi197i8Zk+lTDosT4d/QAcoc26c/0W4=;
-        b=0Ywuzhx90CA411BErMkKlYxj1O1Tph0KKDPP7j/7Ftv68qyekDpP06cPQ31WI/AKf4
-         Z0bfuTOmbdcf3+xcY7h05AN9X5tS4WT2cLHo2VJn8e0dhaQDM7HH7XgkpmlbMTQftviD
-         8N7rlVyBNIhsW8lUzSzk1gAeGX8HDJynQIdKylpF99FHiABqWPB7SMuDuUgHgmxxO5yF
-         cix3HvXqWmltjikF+/CK+PW+EIcF8h+G3Ylnbq+68GFueDwN2k/kycIWDgGkxunyjdyz
-         xV55rEqPMP719lT8vCOSC/i82vY971wMpmLN5hXni3lnqHAw56o+AGao5V7QNxOMd76I
-         oIYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736805856; x=1737410656;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ouQM0W6rpy+hi197i8Zk+lTDosT4d/QAcoc26c/0W4=;
-        b=MKdxRKyMDDv504oKOXalz6fg+c3SyvnDf6aH8au3l/seT2AnE1E+vb5ZWmT815xs9N
-         /DZm5Q4yz7wnTzjIgh2a612w/xUgc+bW34N/XJcx5jm/MtyC4+K+0hTbchX6c0el/os0
-         GTdPHhu31BIDgsV5T8C/rTPSOOpuac7RcRlWAdZMLeIII99Z5juvasMGrE2dBPDLtEpM
-         S+bN55v407KMVjm+48ePg7hs2F/E+SxnUYt7SvJhRA4K7MdV8q18XyzkFqLp309kLee/
-         jDMybxXcZd+wwUYvNVpnychBSBnr+kShbf0Kgccdiw5HL3LiQ9kRItqlb9tqUNHpIknO
-         ioUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBZYdKHq16FIuZ1zMyvPTr+zeJpEhGhFV3CdiNFrcaLhC7rjVef7rSzg9zY0IW0VTQSqTMbl4=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy+f2Zw4BlJfQ0f0D4D8tC4eUnrbUBF0p0HYX831xbiqfV44gQm
-	/LF1W0FbQ5F+dbe8tR4ysRKK7MFQsl2iLfaUIIqb56qTPF9n/1VtIJh0jCzabxs0TAsFZCbGyHu
-	eRw==
-X-Google-Smtp-Source: AGHT+IHPN8TIZGkXrQIWMGITx0F8fOm3vw8dMWb7JVx/B9HZzRXtZecChEPlXNK7/wkOh+HdmqOb1zcL5aE=
-X-Received: from pjbdb14.prod.google.com ([2002:a17:90a:d64e:b0:2e2:9021:cf53])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f90:b0:2f6:f107:faf8
- with SMTP id 98e67ed59e1d1-2f6f107fe30mr4478474a91.24.1736805856584; Mon, 13
- Jan 2025 14:04:16 -0800 (PST)
-Date: Mon, 13 Jan 2025 14:04:15 -0800
-In-Reply-To: <87bjwaqzbz.wl-maz@kernel.org>
+	s=arc-20240116; t=1736848539; c=relaxed/simple;
+	bh=xxLGlU/FIT4lnPp7o3tKeTD0oD4NlG02E+vY4nChYG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WkjBzW0pKM7xZL/kdnnlFpLNQWK8YqKBaWeBhBWQvYdgN2sk5iBYRayEpyIxmbnyO8MQ70WNR8PfhUPlwBCrFE8qs76er0iZ4kSuNaH7CYtojk4Jrjy+Vw7bWkGkB0jZBkwng8HeuV7qcZVeoEjeko1tH+EVtvKpMjvwf1B/LP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AD7D11FB;
+	Tue, 14 Jan 2025 01:56:04 -0800 (PST)
+Received: from [10.57.35.117] (unknown [10.57.35.117])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8C9713F792;
+	Tue, 14 Jan 2025 01:55:33 -0800 (PST)
+Message-ID: <bfd6361b-1a6f-43e5-9ad1-80692c146d61@arm.com>
+Date: Tue, 14 Jan 2025 09:55:32 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250111012450.1262638-1-seanjc@google.com> <20250111012450.1262638-4-seanjc@google.com>
- <87ikqlr4vo.wl-maz@kernel.org> <Z4U03KRYy2DVEgJR@google.com>
- <86ikqiwq7y.wl-maz@kernel.org> <Z4ViZb7rruRiN-Oe@google.com> <87bjwaqzbz.wl-maz@kernel.org>
-Message-ID: <Z4WN3_wUZ1H_e7ou@google.com>
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit
- needs completion
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/7] KVM: arm64: MTE: Use stage-2 NoTagAccess memory
+ attribute if supported
+Content-Language: en-GB
+To: Peter Collingbourne <pcc@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, Steven Price <steven.price@arm.com>,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
+ <20250110110023.2963795-6-aneesh.kumar@kernel.org> <Z4Fk58k8YptDkVgm@arm.com>
+ <yq5amsfxtrlw.fsf@kernel.org> <Z4Vk5gTnd8o7VKWL@arm.com>
+ <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 13, 2025, Marc Zyngier wrote:
-> On Mon, 13 Jan 2025 18:58:45 +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > On Mon, Jan 13, 2025, Marc Zyngier wrote:
-> > > On Mon, 13 Jan 2025 15:44:28 +0000,
-> > > Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > On Sat, Jan 11, 2025, Marc Zyngier wrote:
-> > > > > Yet, you don't amend arm64 to publish that flag. Not that I think this
-> > > > > causes any issue (even if you save the state at that point without
-> > > > > reentering the guest, it will be still be consistent), but that
-> > > > > directly contradicts the documentation (isn't that ironic? ;-).
-> > > > 
-> > > > It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
-> > > > 
-> > > > 	if (run->exit_reason == KVM_EXIT_MMIO) {
-> > > > 		ret = kvm_handle_mmio_return(vcpu);
-> > > > 		if (ret <= 0)
-> > > > 			return ret;
-> > > > 	}
-> > > 
-> > > That's satisfying a load from the guest forwarded to userspace.
-> > 
-> > And MMIO stores, no?  I.e. PC needs to be incremented on stores as well.
+Hi,
+
+
+On 13/01/2025 20:47, Peter Collingbourne wrote:
+> On Mon, Jan 13, 2025 at 11:09 AM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+>>
+>> On Sat, Jan 11, 2025 at 06:49:55PM +0530, Aneesh Kumar K.V wrote:
+>>> Catalin Marinas <catalin.marinas@arm.com> writes:
+>>>> On Fri, Jan 10, 2025 at 04:30:21PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>>>>> Currently, the kernel won't start a guest if the MTE feature is enabled
+>>>
+>>> ...
+>>>
+>>>>> @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>>>>             if (!vma)
+>>>>>                     break;
+>>>>>
+>>>>> -          if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+>>>>> +          if (kvm_has_mte(kvm) &&
+>>>>> +              !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) {
+>>>>>                     ret = -EINVAL;
+>>>>>                     break;
+>>>>>             }
+>>>>
+>>>> I don't think we should change this, or at least not how it's done above
+>>>> (Suzuki raised a related issue internally relaxing this for VM_PFNMAP).
+>>>>
+>>>> For standard memory slots, we want to reject them upfront rather than
+>>>> deferring to the fault handler. An example here is file mmap() passed as
+>>>> standard RAM to the VM. It's an unnecessary change in behaviour IMHO.
+>>>> I'd only relax this for VM_PFNMAP mappings further down in this
+>>>> function (and move the VM_PFNMAP check above; see Suzuki's internal
+>>>> patch, unless he posted it publicly already).
+
+For the record, here is the patch Catalin was referring to.
+
+
+--->8---
+
+kvm: arm64: Allow device mappings with MTE
+
+When a VM is configured to use MTE, we prevent mapping a "Device" to the VM.
+
+e.g: with kvmtool (with additional debugging to dump error code and 
+addresses)
+
+$ lkvm run ... --vfio 0000:01:00.0 ...
+
+  Info: Using IOMMU type 3 for VFIO container
+    Error: 0000:01:00.0: failed to register region with KVM 
+50020000-50022000: -22
+       Warning: [0abc:aced] Error activating emulation for BAR 0
+       Error: 0000:01:00.0: failed to configure regions
+       Warning: Failed init: vfio__init
+
+Only check for the MTE allowed for a VMA if it is not backed by "device"
+
+Fixes: ea7fc1bb1cd1b ("KVM: arm64: Introduce MTE VM feature")
+Cc: Steven Price <steven.price at arm.com>
+Cc: Marc Zyngier <maz at kernel.org>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose at arm.com>
+---
+  arch/arm64/kvm/mmu.c | 8 +++-----
+  1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8b2d803e558a..7e084f22e185 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2295,17 +2295,15 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+  		if (!vma)
+  			break;
+
+-		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+-			ret = -EINVAL;
+-			break;
+-		}
+-
+  		if (vma->vm_flags & VM_PFNMAP) {
+  			/* IO region dirty page logging not allowed */
+  			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+  				ret = -EINVAL;
+  				break;
+  			}
++		} else if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
++			ret = -EINVAL;
++			break;
+  		}
+  		hva = min(reg_end, vma->vm_end);
+  	} while (hva < reg_end);
+-- 
+2.34.1
+
+
+Suzuki
+
+
+>>>
+>>> But we want to handle memslots backed by pagecache pages for virtio-shm
+>>> here (virtiofs dax use case).
+>>
+>> Ah, I forgot about this use case. So with virtiofs DAX, does a host page
+>> cache page (host VMM mmap()) get mapped directly into the guest as a
+>> separate memory slot? In this case, the host vma would not have
+>> VM_MTE_ALLOWED set.
+>>
+>>> With MTE_PERM, we can essentially skip the
+>>> kvm_vma_mte_allowed(vma) check because we handle all types in the fault
+>>> handler.
+>>
+>> This was pretty much the early behaviour when we added KVM support for
+>> MTE, allow !VM_MTE_ALLOWED and trap them later. However, we disallowed
+>> VM_SHARED because of some non-trivial race. Commit d89585fbb308 ("KVM:
+>> arm64: unify the tests for VMAs in memslots when MTE is enabled")
+>> changed this behaviour and the VM_MTE_ALLOWED check happens upfront. A
+>> subsequent commit removed the VM_SHARED check.
+>>
+>> It's a minor ABI change but I'm trying to figure out why we needed this
+>> upfront check rather than simply dropping the VM_SHARED check. Adding
+>> Peter in case he remembers. I can't see any race if we simply skipped
+>> this check altogether, irrespective of FEAT_MTE_PERM.
 > 
-> Yes, *after* the store as completed. If you replay the instruction,
-> the same store comes out.
+> I don't see a problem with removing the upfront check. The reason I
+> kept the check was IIRC just that there was already a check there and
+> its logic needed to be adjusted for my VM_SHARED changes.
 > 
-> > > If the VMM did a save of the guest at this stage, restored and resumed it,
-> > > *nothing* bad would happen, as PC still points to the instruction that got
-> > > forwarded. You'll see the same load again.
-> > 
-> > But replaying an MMIO store could cause all kinds of problems, and even MMIO
-> > loads could theoretically be problematic, e.g. if there are side effects in the
-> > device that trigger on access to a device register.
-> 
-> But that's the VMM's problem. If it has modified its own state and
-> doesn't return to the guest to complete the instruction, that's just
-> as bad as a load, which *do* have side effects as well.
+> Peter
 
-Agreed, just wanted to make sure I wasn't completely misunderstanding something
-about arm64.
-
-> Overall, the guest state exposed by KVM is always correct, and
-> replaying the instruction is not going to change that. It is if the
-> VMM is broken that things turn ugly *for the VMM itself*, 
-> and I claim that no amount of flag being added is going to help that.
-
-On x86 at least, adding KVM_RUN_NEEDS_COMPLETION reduces the chances for human
-error.  x86 has had bugs in both KVM (patch 1) and userspace (Google's VMM when
-handling MSR exits) that would have been avoided if KVM_RUN_NEEDS_COMPLETION existed.
-Unless the VMM is doing something decidely odd, userspace needs to write code once
-(maybe even just once for all architectures).  For KVM, the flag is set based on
-whether or not the vCPU has a valid completion callback, i.e. will be correct so
-long as the underlying KVM code is correct.
-
-Contrast that with the current approach, where the KVM developer needs to get
-the KVM code correct and remember to update KVM's documentation.  Documentation
-is especially problematic, because in practice it can't be tested, i.e. is much
-more likely to be missed by the developer and the maintainer.  The VMM either
-needs to blindly redo KVM_RUN (as selftests do, and apparently as QEMU does), or
-the developer adding VMM support needs to be diligent in reading KVM's documentation.
-And like KVM documentation, testing that the VMM is implemented to KVM's "spec"
-is effectively impossible in practice, because 99.9999% of the time userspace
-exits and save/restore will work just fine.
-
-I do agree that the VMM is likely going to run into problems sooner or later if
-the developers/maintainers don't fundamentally understand the need to redo KVM_RUN,
-but I also think there's significant value in reducing the chances for simple
-human error to result in broken VMs.
