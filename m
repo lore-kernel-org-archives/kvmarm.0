@@ -1,143 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C9114F9ED
-	for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 14:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666FA15B0EC
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 15:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736866672; cv=none; b=Sm9j2Ah2Yruh2DiomBo5r4lwEfWsKppO6wqCJ2/zr/yYRAZf1IZsRKpASL0eYLJ7RSffZ0aKGLIrC6sVIOQtjFhh8D2NIcEqUyakY5kVfUoruLOEIr5CrzNSxloc7WpF4+N7BadN3o352mOwd1fJ9tvxI4fOFYrRbbesdT3151I=
+	t=1736867024; cv=none; b=R2p4cSaG5Et6Gj0TiXcHizHHmIGIwFmf+BAGwENpMG69h30UmH+zXqw0ze5FzPcNLO8Um69cKohnIr8saOac788KriW0wLKuPY+3+T7ypbJ2PZGxClOMerVRJVCtQ1YefQUrk3tBxcQTk9mFavJeNlVSVgO/SPqMRoADfmpUpLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736866672; c=relaxed/simple;
-	bh=T6Yz/vRVgXl1GGTCcH+3tZW8cmxZsJWW/vsAVKOJXa8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UMw0MeQbU36lJko7wpXqROjnXsWK6VfPp7TTcTtmlnOpxXFRLSYtAbNWF0Guv1vfhQpKfHZaRTkXIkFAZHmukk2YBOFLjfq1ONfYxBDCG0UpwNuOXHeAh+qVvc29dO1Ua+X3cga+g2ZpBQViUgXC/v3t/tYoB4/3laMw18UvtHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elBpfutk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736867024; c=relaxed/simple;
+	bh=L0m2hO5GDz/6RXvIPW29Bm3Papzh/ACjoqWJuz/Pkqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZMPREFn9naGaOtzHdVj4svHlaw9ll61/Iqp/eeoY23n6guz5w+GcJHhYsPR0wZIXzqR9k+RsyfMHq2RidTGxQP6Y2lg2pCipt/Lerjfje58wK4yclurFn+L6fLCUq6Ll1IegKXmmL+BzOSpwLn+YCvuW+veQekS0pI33Wco8VyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FuZ1hJun; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elBpfutk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736866669;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4SmzP/tN6OjoTvpKUmzAp05cCCcydG3yT7FnpCUoYlk=;
-	b=elBpfutkFQ5H3dr2lRyWIaVwxHkMNcjN2SbRhcSaC6/xFgoHZqpNbWeFDLD4HwCmjrB3RW
-	DCpNkbn+NdKZyWxYbNPQwxirKRpBMdmbL0HofQItNQ5lHnbQdAgpkRErtuHrLaATaFBFcl
-	+ovcCS31wkMOzXS2cOK2AMN6eY7L138=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-67-03GMdqWiNdOdYVP6zXFqWg-1; Tue, 14 Jan 2025 09:57:48 -0500
-X-MC-Unique: 03GMdqWiNdOdYVP6zXFqWg-1
-X-Mimecast-MFC-AGG-ID: 03GMdqWiNdOdYVP6zXFqWg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361ecebc5bso29677955e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 06:57:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FuZ1hJun"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-435b0df5dbdso56485e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 07:03:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736867021; x=1737471821; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=r3uX9sXBfAGLVLkprPT9LjGtR+jH3MZBlHxc/29olV4=;
+        b=FuZ1hJunhhD4iyca5EtBj9G5MXvCypW6M6OTQXMvDIBlUpcrjU2FRPR+hnsstKuGdF
+         uAr/ZFEO+OcH0gQFWStiAZgbDCyFX16oWMuJZxZKj5wncht2pkvxkbI7/EU+diO/xKlo
+         b/n8ciSK7Gkn83Qa6nnh2izR9RxhsnnhJ7GXssYPB7VzTD751193MJNxJgzawnYKydox
+         TCd1aewDn16OoNGts4O1KXki2msszg0AzxnXHYmpDb0Mz6GC7IYwiSgdCwOVUJzsHJ6d
+         4RRQljvKQ4fPVNWy7z0u20rVx7UhoPwqUG4a/FBNAMtDAz04+sXOcxUh/eJ38M0cZoUk
+         pvNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736866667; x=1737471467;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4SmzP/tN6OjoTvpKUmzAp05cCCcydG3yT7FnpCUoYlk=;
-        b=HzslcyktN4LmgfVKPoQ0VAko4IIgITGwL6zmRvoSyo/5CZweFg9afaQJWzJUQOMgyV
-         dZ3YQ7KSraeM6loHE7kay2OFRTWV+HoWLhZuNlyl2gFFwDK9YLNBH1DWxiDAWEQvGRre
-         zKLHyqXRjsXA25iPizS5c3E2AD2iF9daaZAZZ5xatb/jDMeSs+Wk3ZHx76fIihTwmiAi
-         KtWHRzP/r653lz0anPSmm1u3yIawkq3m/pU+BONWIbKfJOjCF5WNftysJ/Zy1SunHjBF
-         cyRWkMdboyH/CaCyxpC0gNBAbOig1UNrwiV5wF12aW1lN9FFg4ZLp+rCqr8r7RiQby3k
-         b7hA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAV/Yrq60ucB7Va4QjBL4t26P5oxK/0Oi+1xRXx1C+/85az9z41NjpGNkVByiMEQM/dZkkG7s=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyKYeRdTbjSxhuTmNILEBHbP2gTTCWCEyEfY+ZnWoG8oDh9YGct
-	o/CypmcHj1ZxhYoCV68rBpMvxPpZmT59bEkR1jxCSBRGdbrR8aXInAlUTq8S+PwMNJVezfc8jf1
-	lUE00glegCEYPGmP9SCV2/PEwquB4nOymwDLC1bvuq6GjCjzyeDB4fnihmQZkrw==
-X-Gm-Gg: ASbGncvxj1OWwE70cYlNL9JUsh5MV6zyYsNr9vRSqHewULizAmabQv03VPtnReP2W6H
-	7FmgcOBHgF0C7313xdoVhuo+pgxIaXefy20j8FLBb7K3D/nRk9SSXtbPucR/ql9KR0umoM9LWCv
-	kI6gDnv9MfDy7HFDuN7oKBVJ6yjn8JgtyEdfVJXYormMOsLn/atfontfE55wWAek8j1RFPNJGEV
-	B6MPJdoiMDBwaMBa1HgOSRCGUB7doepL0uNMubk1GxDvp4jU0TPCepnP8rEr/Bt3AHeW1q91xkA
-	dWx5AdrZ2sRltQkNFwrtReI=
-X-Received: by 2002:a05:600c:468a:b0:434:a968:89a3 with SMTP id 5b1f17b1804b1-436e26a78a5mr189805455e9.9.1736866666657;
-        Tue, 14 Jan 2025 06:57:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IExk0wU6asFYaR4DpbkMbnI7udaC/CcYasNtWPbYNjEYNALHWG8jGD2PzfrC1f6nYMjRGJSZA==
-X-Received: by 2002:a05:600c:468a:b0:434:a968:89a3 with SMTP id 5b1f17b1804b1-436e26a78a5mr189805235e9.9.1736866666247;
-        Tue, 14 Jan 2025 06:57:46 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2df3610sm211355245e9.20.2025.01.14.06.57.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jan 2025 06:57:45 -0800 (PST)
-Message-ID: <4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
-Date: Tue, 14 Jan 2025 15:57:43 +0100
+        d=1e100.net; s=20230601; t=1736867021; x=1737471821;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r3uX9sXBfAGLVLkprPT9LjGtR+jH3MZBlHxc/29olV4=;
+        b=ZEoVpEf1epCPu01sPh+gvNypcddOpLH6iUQnU4PrFVktmTuGTc3j4jRDRxue8OIvyh
+         U7rU0J0KLVfyX5CLWGSF4k8S4aIII59tIqM9pWP3ksWr4yoRJJoe9Ry9na2SIOTE14XT
+         mzaauqLsPU7jrwhFT2mxHqSq/vFYYrKLvAqX0mWuXUpRwd6ZIdPr4p1YwH+wa/seMOTZ
+         7eeogfPWtRXgzYs6+KWVbFZFffYLhWxxMD1fW68q8cJVOMQY0pBJbxs7sVT8Kio4bObQ
+         KqfyqZam0//c57EkLlIxyM6qDKq9ASZPJcD76w0U0ZY7OWH9b6Hg9yUmJf7MN+6KYiSj
+         OoSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWoSg2Mc1SYkVLyrYNq+B91JCm0d6h5eUI4pxBJZFTadP/ERA5cV7N40QUODIAuE3fvQ3D0BRA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyH3Y3B1fYC9W2Ti5OiVow40TLJ30/F8/Zcijp4JcY2uT6YcsuU
+	rRzibD30bgCm9+ks7gRVo3SDE60dNKdQfvfsZH53bC+AoQZmX0fwh+NdsAwsgt8bvWwW0VZFDS3
+	VsA==
+X-Gm-Gg: ASbGncsUwxzBtDT8d8636vc+GU4V84mL5j/JvG0/OmHFY/sKn1EpcjhAQoXXBNbRXWt
+	/Ks6VlHMZXgoMOlsvvlb3G6YGeRgjr6NWgpXN9vzaIVcDLUmPUykz1qrH6I65AoY+113cSLDOPe
+	zxMPWg+6N8A0k+Ed9LkBKCyBNGTy156n9N7mr60t30CLg4p/GPIzvi/JNvxK8hfivQLhGXLQliJ
+	YuYmyvTZTUMsHykMYFNwIGYMNBA5iQnsGoVJHgDgKK3ToLx2s8Hwpr4H/AziAfIeseyqrLsd8PB
+	m/RxvzoB0cQsRzJ9GmNxGPlq
+X-Google-Smtp-Source: AGHT+IGYqkoeO9rhW5ofYX5hkCQ3axs1adHzVPrXSPhBirum2F1DdwApMWgQvcwBhmV8s97iNigOAw==
+X-Received: by 2002:a05:600c:22d4:b0:434:9fac:3408 with SMTP id 5b1f17b1804b1-4376cbbdea5mr1143785e9.2.1736867020368;
+        Tue, 14 Jan 2025 07:03:40 -0800 (PST)
+Received: from google.com (47.246.140.34.bc.googleusercontent.com. [34.140.246.47])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e37d2f5sm15218121f8f.17.2025.01.14.07.03.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 07:03:39 -0800 (PST)
+Date: Tue, 14 Jan 2025 15:03:37 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH] KVM: arm64: Fix the upper limit of the walker range
+Message-ID: <Z4Z8yRPGwvqHpzRs@google.com>
+References: <20250114145050.563658-2-sebastianene@google.com>
+ <86frllwilm.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer
- expired
-To: Marc Zyngier <maz@kernel.org>
-Cc: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- kvmarm <kvmarm@lists.linux.dev>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, oliver.upton@linux.dev,
- christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org,
- catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com,
- yuzenghui@huawei.com, darren@os.amperecomputing.com,
- vishnu@os.amperecomputing.com
-References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
- <867c89tc4q.wl-maz@kernel.org>
- <c5b1c3d7-56ca-4afc-a831-045dba4beffa@os.amperecomputing.com>
- <865xntt2kv.wl-maz@kernel.org>
- <8be59ff3-6a68-48e1-8181-0ce4b2e7180f@os.amperecomputing.com>
- <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
- <86y10osr19.wl-maz@kernel.org>
- <4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
- <2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
- <152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
- <86h661wje4.wl-maz@kernel.org>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <86h661wje4.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 9jgppIc6Y8pqZGBLul2qp_L4KvaweWyeZFo9Y3jWXII_1736866667
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86frllwilm.wl-maz@kernel.org>
+
+On Tue, Jan 14, 2025 at 02:55:17PM +0000, Marc Zyngier wrote:
+> On Tue, 14 Jan 2025 14:50:51 +0000,
+> Sebastian Ene <sebastianene@google.com> wrote:
+> > 
+> > Prevent the walker from running into weeds when walking an
+> > entire address range.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 40bd55966..2ffb5571e 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -260,7 +260,7 @@ static int _kvm_pgtable_walk(struct kvm_pgtable *pgt, struct kvm_pgtable_walk_da
+> >  {
+> >  	u32 idx;
+> >  	int ret = 0;
+> > -	u64 limit = BIT(pgt->ia_bits);
+> > +	u64 limit = BIT(pgt->ia_bits) - 1;
+> >  
+> >  	if (data->addr > limit || data->end > limit)
+> >  		return -ERANGE;
+> 
+> Huh, nice catch. I guess this deserves a
+> 
+> Fixes: b1e57de62cfb4 ("KVM: arm64: Add stand-alone page-table walker infrastructure")
+> Cc: stable@vger.kernel.org
+> 
+> right?
+> 
+> 	M.
 
 Hi Marc,
 
-On 1/14/25 3:38 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On Tue, 14 Jan 2025 13:12:21 +0000,
-> Eric Auger <eauger@redhat.com> wrote:
->>
->> I also confirm that using a mailine edk2 fixed the issues I faced
->> previously (fed/rhel L1 guest not booting).
->>
->> I used Marc's nv-next branch and qemu rebase.
-> 
-> When did you sample this branch? It is almost daily rebased at the
-> moment, given that we keep piling up things in kvmarm/next.
-5 days ago.
+Thanks for the prompt review. Adding the missing bits now and re-spinnig
+v2.
 
-If you want me to test a specific branch, please let me know, esp. in
-the context of latest series including
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 
-[PATCH v2 00/17] KVM: arm64: Add NV GICv3 support
-> 
->> With a rhel L1 guest I can now boot buildroot, debian and rhel guest as
->> L2 (feat mainline edk2). For rhel, I tested different kinds of page size
->> combinations for L1/L2 (4k and 64kB) and it worked.
->>
->> I tested on AmpereOne and Grace-Hopper systems
-> 
-> Thanks for the confirmation. I haven't had a chance to try QEMU yet,
-> but I expect that save/restore will not work. Something to look into,
-I have not tested this yet.I will give it a try.
-
-Eric
-> I guess.
-> 
-> 	M.
-> 
-
+Cheers
+Sebastian
