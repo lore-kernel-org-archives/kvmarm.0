@@ -1,106 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43446232437;
-	Tue, 14 Jan 2025 14:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEE28615A
+	for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 14:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736865495; cv=none; b=AQNzncuA+NH9LIwmVLTqtFM16qC3Eh9ljg1j2UQskWVoB9t63Svk38ydIL9q2Rd2d2Dn/+koiOBLTYbSmxAVIWXHZIpLOldgrdHfptN2hUfCVl0feAOx83IlSKmMUWm2UVP5P+EHG1dGKCBay36QOcjS32dTRH9N+YI59ISnR6w=
+	t=1736866268; cv=none; b=TkpDZ1PJorczfq1RnHNK//RMhLkVTGYtNM6KC3OIBRFTqikPwZ6PzXY6l8cfTn2Ehs1pOODGadBGrOofNSTYzWGTCqcRsmcnx58pt8Ua4wXfmY4o89xpgHSe28ReLo4XQpl0ccTbs9nDVyuW9c8uBnk2YMb3wBuQGmx3+R34d5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736865495; c=relaxed/simple;
-	bh=t5pKKRaZXMFN04XNj8c9l0TranyPnmuUTvNseaq70Ko=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KuzbIGKsXfD/ZU6JciMd7G1g2WgMpLYAUvdUvIefHXppvubBYwXe00zs5bpEN6dLp5cI7cjWi4/0bkQIAgPaWffoPw0Yua1cIupFvgoD6VUKw4cuyMektNB4J9AwYLCaFZGngnDhVGJZpRhnqfNxR2ao3uuYtHeGsB5crXXbnyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mcVeVHIJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736866268; c=relaxed/simple;
+	bh=FncsAYkcJF/nMHqGnW/3nMpMk2ByWsCClyouYgkRPcM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Content-Type; b=hqk+/uPsD1kzc2C1D12qfLPeFMPillUsJZIr+09X1CP7axOIWfmDGqhz5ir8hKWKKOBeolpPbS6sWjsnsHhwVNPXt2ZYHlKRjtciGCD4AL3mcd0ZAeF6tNkhXJglY2NlrJvbnZELz5jLJOOGy30llWrZKn8Fm0X3Etq2rlclxtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=liJnYOX4; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mcVeVHIJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE596C4CEDD;
-	Tue, 14 Jan 2025 14:38:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736865494;
-	bh=t5pKKRaZXMFN04XNj8c9l0TranyPnmuUTvNseaq70Ko=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mcVeVHIJlyJjhLxtcTweGFuTVje6KkFV5GA94S+8FW0JiECfQJ7sI+wHbGuz9rb54
-	 OzaZvDk7mKQIf736UjsUpkp/tuF8BDXlPqBTD2A399Ml7FDsw92Z8P0kotee0ERds+
-	 nQeB/x4sljaMu6p1SyBQ/Zvq1NT26wZtqwa/GPpVsB9gM+/E4igMd5WA0nUqUdvVJQ
-	 nQpRnsH+yOhmEfrqISP/eDX6QBfNWlcuzKRE8RWEqKMjPgrga8WgZKkmzDf6ZR4d2G
-	 T4pqA3lCm0x6DYRyK3Y+i/XuxMiwmjLbpDoTAVKyw/dbfR+1o+ZIjU+Z67FYfafiXy
-	 Jcmxbzp0ThLZA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tXi3Y-00CAAy-DX;
-	Tue, 14 Jan 2025 14:38:12 +0000
-Date: Tue, 14 Jan 2025 14:38:11 +0000
-Message-ID: <86h661wje4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	christoffer.dall@arm.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	coltonlewis@google.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
-In-Reply-To: <152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
-References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
-	<867c89tc4q.wl-maz@kernel.org>
-	<c5b1c3d7-56ca-4afc-a831-045dba4beffa@os.amperecomputing.com>
-	<865xntt2kv.wl-maz@kernel.org>
-	<8be59ff3-6a68-48e1-8181-0ce4b2e7180f@os.amperecomputing.com>
-	<bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
-	<86y10osr19.wl-maz@kernel.org>
-	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
-	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
-	<152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="liJnYOX4"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-436289a570eso19216885e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 14 Jan 2025 06:51:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736866265; x=1737471065; darn=lists.linux.dev;
+        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0eTIIfStQ+7VgOiC8tdc+ucwS1WrBZu33tceKYHTFlo=;
+        b=liJnYOX4gnzwb9EHgrl6kpDzPfqEw3bSoZPkLY4vCJwzItyMs8s9q+gNGOgO5J9/jJ
+         ALc4MouOqF6VoSHxJwUJtuO0hw0ltD9+NTChlIPxR7nNkH8hnlshfb4HUj8S5gLLCMhH
+         NxSKMcMUW++PhD0K5ZTo6Dzz3lNL0j8kfGm/h6pS+8fImk7F250wt7qu6lO2eV9Xgkhg
+         yc03ELuBwrCgtQ7m1nh5q+PxPUATBo8TMkR0W2bzKgIhUcV1MmJV4a5XZCsbjHUp3Cmx
+         tMu+rX3TrzCvYTM6qy+e6pHtCOXAWm5s4g0tGjmpVgzqyLnSl5DhpROJcimkC8h12nPE
+         q9RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736866265; x=1737471065;
+        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0eTIIfStQ+7VgOiC8tdc+ucwS1WrBZu33tceKYHTFlo=;
+        b=qT6AG4bWTMZux8EtdY3pCe9zJj3aOyT0K0NgNzuZ0Zj+jCVWKR2sVL2ckQqq+HuAqF
+         AnBK+xx0e3Z/fp1LREKysChfPOUncJP6jEfsblHEPB3P1BkQsT634HdGnlx0DA4ozsCZ
+         3xdUnGYW4UpX+wCsNKVuJGoC+Ncl3mifp+TD4lvjJWbjM2vdzkvEL99ypwECg9BaXIYT
+         rwl2TI2K4X5yETiAzNhQyB26c9IsIEpCeLyKe1RCA/evwDWy9IQk50ZeINtOqdToYXPr
+         ogmZbsqZOpetCBE9P59yqfTI6rq+ZqDtrY8CQ4IZSeqOO1UT/Y3lJY3ZJ8ITmckya8R0
+         gaRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUf0KyvBWnAT3sKHqa+2QTw+nvluBs/c7q5cGBTVjmOccjge8smc1rwUEISjQLiMRR6WJwUuuw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzVFP1RiVz9ePmmSJWup5ZsAR2xhO8pOw3bKj/Qz5lXcRB1fcJ2
+	PCekLHpiOewaESrCgZU/FzT9ubqa7fcNCzqr4PkET14JnttqfWhh0biTQC0mv91JzHKbe1jUGd4
+	A+qskh4vc9sxQ6cICYvdP5wY/bA==
+X-Google-Smtp-Source: AGHT+IHHxF6PgjGCqVXzpxA4AjixYi8BbG8haFoZBwrYz/9M9zFcbsfYBWQrtZ6low6sVY/sgvFdwRItNXxCPl5Z6Pk=
+X-Received: from wmbfp16.prod.google.com ([2002:a05:600c:6990:b0:434:fc6f:e8c3])
+ (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:4f4e:b0:436:1ac2:1acf with SMTP id 5b1f17b1804b1-436e26e28cemr219984475e9.20.1736866265825;
+ Tue, 14 Jan 2025 06:51:05 -0800 (PST)
+Date: Tue, 14 Jan 2025 14:50:51 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.688.g23fc6f90ad-goog
+Message-ID: <20250114145050.563658-2-sebastianene@google.com>
+Subject: [PATCH] KVM: arm64: Fix the upper limit of the walker range
+From: Sebastian Ene <sebastianene@google.com>
+To: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, sebastianene@google.com, 
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Eric,
+Prevent the walker from running into weeds when walking an
+entire address range.
 
-On Tue, 14 Jan 2025 13:12:21 +0000,
-Eric Auger <eauger@redhat.com> wrote:
-> 
-> I also confirm that using a mailine edk2 fixed the issues I faced
-> previously (fed/rhel L1 guest not booting).
-> 
-> I used Marc's nv-next branch and qemu rebase.
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-When did you sample this branch? It is almost daily rebased at the
-moment, given that we keep piling up things in kvmarm/next.
-
-> With a rhel L1 guest I can now boot buildroot, debian and rhel guest as
-> L2 (feat mainline edk2). For rhel, I tested different kinds of page size
-> combinations for L1/L2 (4k and 64kB) and it worked.
-> 
-> I tested on AmpereOne and Grace-Hopper systems
-
-Thanks for the confirmation. I haven't had a chance to try QEMU yet,
-but I expect that save/restore will not work. Something to look into,
-I guess.
-
-	M.
-
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 40bd55966..2ffb5571e 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -260,7 +260,7 @@ static int _kvm_pgtable_walk(struct kvm_pgtable *pgt, struct kvm_pgtable_walk_da
+ {
+ 	u32 idx;
+ 	int ret = 0;
+-	u64 limit = BIT(pgt->ia_bits);
++	u64 limit = BIT(pgt->ia_bits) - 1;
+ 
+ 	if (data->addr > limit || data->end > limit)
+ 		return -ERANGE;
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.1.688.g23fc6f90ad-goog
+
