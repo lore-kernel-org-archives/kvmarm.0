@@ -1,98 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8244B2459D5;
-	Wed, 15 Jan 2025 13:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9982419F4;
+	Wed, 15 Jan 2025 13:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736946025; cv=none; b=j9GgIEjBoU3/Df3RlwlFcykAaCqtFxlEZG7n1B9gA75z5xoUtGemSzAFomDBYuVR9A+F1m/enAkgL2/gt3BgIviiNcRd+Nttmjh+3cjobpGl0cQrsDA82Vx8eKWysVOaOL3xqUZo3AH1sTFQq//wpktna2B4t7w+0oJE/00ELQo=
+	t=1736946918; cv=none; b=OLPGChDTQYEuCg6qivZXIGQ9vjVplHUH13jLoQk2AMTJpPM6rspbKtKuC+nQ9lSE5UtrZxnJ2RtOjFOi+HansPW4uQtVdvBDXz/0DklMatt59PjLjSEl/aLur1kJXx2i0M6FVb37WJ71Pc0krBARN+TMoo0sCiTjWfFUVq3OilE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736946025; c=relaxed/simple;
-	bh=U0bl6y0YBn/kdTJqiabz3QWmzU2o1jrN/faqMQfvqdo=;
+	s=arc-20240116; t=1736946918; c=relaxed/simple;
+	bh=u1mUI33kuxL9vq8o1c8EWqH+sAF5rcsL4E091haG1WM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qJXwDbI6v6lKmAQm49t4X9rxp96zfi/fo3adAZalqYzurtvFaaFMuQYHmhHmcUQ5wKTtCh4C7IQMxq5QHyUkC0h0HTtBikB0LizOW6F8N5V9lI9WfmUIabAgx1UUWLKL5y0HESQlVVd/RbB1+29zYR/VrGJu3fhwXrtp5IjUz7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJZ7K9rk; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJZ7K9rk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11807C4CEDF;
-	Wed, 15 Jan 2025 13:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736946025;
-	bh=U0bl6y0YBn/kdTJqiabz3QWmzU2o1jrN/faqMQfvqdo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QJZ7K9rknsXfd/r00PhA3uD9zyHTyHpUiyumyM5Qz0IXdyH7kux5pU0elQmREeoL2
-	 iH/jZ2lMokG6eTZzJ3d5co7HIiBBEdMF+yW2K4zxnnWih9M/dY7Dzz0xGd9OOOQ582
-	 g4D2OcbUoiPlwW51z+31BAyM5V8k04g5WmKdhlRcHhNoaRDQwEfMf/sD2RfwGqKcaX
-	 P83ahgQs4u+7KQWZFrzu0q5wdhiGinhqpnpeJLIwpvYENXvPzHvXw2mas4H6TBO6ML
-	 gwznKmT67Vipxys3QGrAy87h6xI3r5BhgPrQVUn75oF+VuU8p7A+O43JsY+4D5H0Tc
-	 7bHnxb3Dcs8GQ==
-Date: Wed, 15 Jan 2025 13:00:18 +0000
-From: Mark Brown <broonie@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev, oliver.upton@linux.dev,
-	suzuki.poulose@arm.com, coresight@lists.linaro.org,
-	James Clark <james.clark@arm.com>, Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>, James Morse <james.morse@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 04/10] arm64/sysreg: Add a comment that the sysreg
- file should be sorted
-Message-ID: <3b0afabc-49a7-47cb-84bc-5d1017693be3@sirena.org.uk>
-References: <20250107113252.260631-1-james.clark@linaro.org>
- <20250107113252.260631-5-james.clark@linaro.org>
- <87frloqjso.wl-maz@kernel.org>
- <760969b6-18b7-42ac-9524-2f1f845b3703@linaro.org>
- <86jzaywtea.wl-maz@kernel.org>
- <CAL_JsqJFgunOVqpXnj+0HQ_HYbbVrtjCTJ25KzJHhjay-0i5tQ@mail.gmail.com>
- <b4082b98-e234-4825-9935-971a630f438b@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHEdbyHYHoo2y6PoV8el5rNVum7Cmg9fGDeEi0HadHh9fJCY4/2HE0MprWzynayj3RmFYF5stLhyEgv9Kjr0JaJfK9o4tdwUkTrEZBEwndf9rXpln9DKcMYKwSyP5EwidM/xeTEE/BYMwIf4TLY6qxrp3O965n4Yd/CvHDf6A/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BF0C4CEDF;
+	Wed, 15 Jan 2025 13:15:16 +0000 (UTC)
+Date: Wed, 15 Jan 2025 13:15:12 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Peter Collingbourne <pcc@google.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: MTE: Use stage-2 NoTagAccess memory
+ attribute if supported
+Message-ID: <Z4e04P1bQlFBDHo7@arm.com>
+References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
+ <20250110110023.2963795-6-aneesh.kumar@kernel.org>
+ <Z4Fk58k8YptDkVgm@arm.com>
+ <yq5amsfxtrlw.fsf@kernel.org>
+ <Z4Vk5gTnd8o7VKWL@arm.com>
+ <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="FA7VJeg3rZaKM37v"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b4082b98-e234-4825-9935-971a630f438b@linaro.org>
-X-Cookie: Phasers locked on target, Captain.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
 
+On Mon, Jan 13, 2025 at 12:47:54PM -0800, Peter Collingbourne wrote:
+> On Mon, Jan 13, 2025 at 11:09 AM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > On Sat, Jan 11, 2025 at 06:49:55PM +0530, Aneesh Kumar K.V wrote:
+> > > Catalin Marinas <catalin.marinas@arm.com> writes:
+> > > > On Fri, Jan 10, 2025 at 04:30:21PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> > > >> Currently, the kernel won't start a guest if the MTE feature is enabled
+> > >
+> > > ...
+> > >
+> > > >> @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> > > >>            if (!vma)
+> > > >>                    break;
+> > > >>
+> > > >> -          if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+> > > >> +          if (kvm_has_mte(kvm) &&
+> > > >> +              !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) {
+> > > >>                    ret = -EINVAL;
+> > > >>                    break;
+> > > >>            }
+> > > >
+> > > > I don't think we should change this, or at least not how it's done above
+> > > > (Suzuki raised a related issue internally relaxing this for VM_PFNMAP).
+> > > >
+> > > > For standard memory slots, we want to reject them upfront rather than
+> > > > deferring to the fault handler. An example here is file mmap() passed as
+> > > > standard RAM to the VM. It's an unnecessary change in behaviour IMHO.
+> > > > I'd only relax this for VM_PFNMAP mappings further down in this
+> > > > function (and move the VM_PFNMAP check above; see Suzuki's internal
+> > > > patch, unless he posted it publicly already).
+> > >
+> > > But we want to handle memslots backed by pagecache pages for virtio-shm
+> > > here (virtiofs dax use case).
+> >
+> > Ah, I forgot about this use case. So with virtiofs DAX, does a host page
+> > cache page (host VMM mmap()) get mapped directly into the guest as a
+> > separate memory slot? In this case, the host vma would not have
+> > VM_MTE_ALLOWED set.
+> >
+> > > With MTE_PERM, we can essentially skip the
+> > > kvm_vma_mte_allowed(vma) check because we handle all types in the fault
+> > > handler.
+> >
+> > This was pretty much the early behaviour when we added KVM support for
+> > MTE, allow !VM_MTE_ALLOWED and trap them later. However, we disallowed
+> > VM_SHARED because of some non-trivial race. Commit d89585fbb308 ("KVM:
+> > arm64: unify the tests for VMAs in memslots when MTE is enabled")
+> > changed this behaviour and the VM_MTE_ALLOWED check happens upfront. A
+> > subsequent commit removed the VM_SHARED check.
+> >
+> > It's a minor ABI change but I'm trying to figure out why we needed this
+> > upfront check rather than simply dropping the VM_SHARED check. Adding
+> > Peter in case he remembers. I can't see any race if we simply skipped
+> > this check altogether, irrespective of FEAT_MTE_PERM.
+> 
+> I don't see a problem with removing the upfront check. The reason I
+> kept the check was IIRC just that there was already a check there and
+> its logic needed to be adjusted for my VM_SHARED changes.
 
---FA7VJeg3rZaKM37v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Prior to commit d89585fbb308, kvm_arch_prepare_memory_region() only
+rejected a memory slot if VM_SHARED was set. This commit unified the
+checking with user_mem_abort(), with slots being rejected if
+(!VM_MTE_ALLOWED || VM_SHARED). A subsequent commit dropped the
+VM_SHARED check, so we ended up with memory slots being rejected only if
+!VM_MTE_ALLOWED (of course, if kvm_has_mte()). This wasn't the case
+before the VM_SHARED relaxation.
 
-On Wed, Jan 15, 2025 at 10:43:07AM +0000, James Clark wrote:
+So if you don't remember any strong reason for this change, I think we
+should go back to the original behaviour of deferring the VM_MTE_ALLOWED
+check to user_mem_abort() (and still permitting VM_SHARED).
 
-> Actually I updated gen-sysreg.awk to fail the build if it's not sorted, was
-> just about to post it. I don't know if a build failure or a warning is
-> preferred but I can do either.
-
-A build failure is probably safer, people are more likely to notice it
-and warnings from things that aren't the compiler can get a bit shaky
-with tooling sometimes.
-
---FA7VJeg3rZaKM37v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmeHsWEACgkQJNaLcl1U
-h9AKiAf/T0593rB+5OtpW6l8XdCx2oJ9KJOa4vmhVmJ7ULEl4UHP7PW3IhIt74dD
-l1ALeGJsqbZN0F5ZuqCMZnIghZuEyp5MmiRTGI8BCvXwCUsXC53xzPJJrE675KvF
-eb3HGQ7ZWEGIX8IqRqfJGwKwULLn3lxwCIg8ZHNoo93XyhzakKDfdA8Gn+0EoTye
-cdLFS5VYYEWyAXgmzWxwOMORUCC5EA9Zi5K7AhL5tRf3g7j291NsZyEb0BiKg6pM
-H+r6FCSi4SyjIQrqnczzEgUdW/yeiYIvWP07nPElK1qE3tOfOiQ5NncFaWPoPpml
-LK1E81LY1CQXLzJXJL/JnDNvGkBDMA==
-=a7cL
------END PGP SIGNATURE-----
-
---FA7VJeg3rZaKM37v--
+-- 
+Catalin
