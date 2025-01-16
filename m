@@ -1,113 +1,144 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4514B22A7E2
-	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 19:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0A922FAFC
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 20:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737055195; cv=none; b=iiV2Vaho7rQ2mskdLgPOEprw9TK+kSwa2W1+F65fFlm54d1STLR0MN9RsZ9vS6EgH8x9Dt89Fpek3qYjC03k4+Z3hqgT5bdc5XQVMH9XSQb08Jor7nAZihwQxIf3Ct3lI75d9rzgwXcYD3wOtP5pfmfdsdBsXHliHrvZ3Q4UzDk=
+	t=1737058801; cv=none; b=I3lXCJcC4ubCWCICEB6kPnISfHqx3560Ka56isxsGmmOBp4BCqjN0cSro42u/unq1jE0CM/JPxArWidH46mX8CCnmW0EHoSJ+ndn282cti6KvP+6Cr6QOOAcNqiF+8HNumzvh+ENXI65PXI2/PVYVq7bH5b0j7afgToa0umte0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737055195; c=relaxed/simple;
-	bh=bChrpxoXYLOi2YUup3iemrrMhFmpTodAygOPpJhId9Y=;
+	s=arc-20240116; t=1737058801; c=relaxed/simple;
+	bh=nNoBF4UfWoe23a1lrQ7UdZ6UWanGe/SAkh9O53HaEmA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j87EFziwiiZzO8qc4VE8lQdjcqXqVTADmRzolJJJLHVqjjYEfMHOY74whWuArDGvTP9ivCObirGJfw9DxHaBFzh35zINH/9bWAz4O4EMHZoSbv3gKdYoDCAaBsslPWV+/WgLAkJsQbOGD43OqBuUCT3bnxP8LNO+JPGyX6B2ehs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=G49tWjEA; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 In-Reply-To:Content-Type:Content-Disposition; b=iqx9Ey3dayunEFPqC4OW6wlz+gOTsXratogEHczCWHICM1Od/QUymYsv0GmWv7ju3Q2M0/efFQAhkqyZ7BYRfejkBkKQhpaMPUU/HzeDZrXyjAaAyIoDy9z+RXQQN07zoAmYEFnsBlKdqP7BEYaPdmA+gCWQRbH6ud7VB2xh7xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gj069CJa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="G49tWjEA"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b6f1be1daeso120047785a.0
-        for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 11:19:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1737055193; x=1737659993; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bChrpxoXYLOi2YUup3iemrrMhFmpTodAygOPpJhId9Y=;
-        b=G49tWjEALMsHRg+7TOZCK5Xpr5trL2L3J3rEva4cWATLUB2G/gkte4xsdBcN1i4UZ+
-         4rSH8++pEjGsO2IjpARJn0irCOhB8tT9oA4vh1Ph9oyJCZGYnJ35sT5MPxACtejyQLUX
-         fWXsuLsATiNxoQuS5a/uGzSAd4UJlsCBxDD2mNHgx6uJUXzzHNrtaWH8Nk/s8ThWG7/P
-         cdKD7uzhSU76XIPy7L+Eef8GP8BiGSMRWYlv9Ktqc6VF5o229juI1NZkWbICfUAtGhzu
-         hoKL9piOr8DEzo0MM0/y4ZsP/d0mIF4Zk4EZXjAeXCwTj2/irk/vMg1yC3Zyf6FtTjud
-         ryWQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gj069CJa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737058798;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hxyx17H16LTaCMPogGfVhxD8KdAjR1MUqsEp+1MdmBk=;
+	b=Gj069CJa4nUwP9pKLTx2K5xZxYQESBVIoikqa9aC/KEUu5iNOYUOCzLH/zic+lmPFyOIga
+	G9zjhhgA69K46lgaCiVTQoh4F4qJ0+/ow4VSS3XpEB5sBDmXlFB8f3YoEKIAyKnTUoTcOJ
+	7AkXARApq90qXGCo36r3AybiBSQqNPQ=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-ZI8lxK4tODa3JeVlpxr_Fg-1; Thu, 16 Jan 2025 15:19:56 -0500
+X-MC-Unique: ZI8lxK4tODa3JeVlpxr_Fg-1
+X-Mimecast-MFC-AGG-ID: ZI8lxK4tODa3JeVlpxr_Fg
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-21632eacb31so17559295ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 12:19:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737055193; x=1737659993;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bChrpxoXYLOi2YUup3iemrrMhFmpTodAygOPpJhId9Y=;
-        b=pyqiEtaq2oHS/6Z0E1NBja9HCT5BeNaZWp7ARCVza/6lzpe/Ga8giL5A3/ORQMt2Sy
-         WrzP3aiS6qgKl/b8HTHbX9lDTwgcN14dlVXXNs2BWWAjjK0mxekKL7vpwmcKorM7gYAh
-         F/jECAfSt3PrzpE2Rf8riGj1ZpsGAdrrnBA9X6Lc9psGZd5sk0WcNEILG9kYM6cVcZBf
-         1rKA/brb2jG/7rdz6sdDzFOfPq3yGlbr3lm1l4n4WEgfOpD9NUrD3bjGx6G9MSitOVMx
-         rWQKjVhewZAQZ8zT/ulyvIjlIJm+zPD3CXO++9gFroXP+FlFS81NAmzxf2GLtXephNXb
-         7zlg==
-X-Forwarded-Encrypted: i=1; AJvYcCXAVIhzboqx5C1uT/vdn+slYRr0gCulg+Er3wxtQVw+tHSkRwmEb+ZrC3qIv2x6BPfkOE2llng=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxQAoHVNcUjWtHAjgYd7gV1kAcfnLRVBvRm1WVh0rLG/Ape4TKh
-	X1Imb/eNm8yNDM8K90AiBP6P5ARR9TIVNWbL7lModBs21bCeT4TPZ+ijqBwvhe8=
-X-Gm-Gg: ASbGncvpUjbfUVb3AH7GTKARVx43t6gfqGTcKCfVIb/N+dbqtO9TWGZnwQkLUh3MpIB
-	W79Wt5YSQ9WUMSZ1J1Y2iLjZld+AVFhARiRWjEvvLmZUnbzFHH3TC/ZTViKmFNHTy1PJCiWLiXV
-	sDwWbf+8uPZDvETgvsu06XgnNVobTQa9Fb08K/dWbNaBHc19ASlIxYFv3nN75lugiy7Y5g3mpGr
-	Fqm7QA99kyy3jzIkVeeOPP0LYTG6l0+uvisiQSZ5X371SSM9Q7kwsibcOSCpfuLO/K2k7qXgIuO
-	QJC0aTGUaUH2nIGj3o8UXukmR/MTRQ==
-X-Google-Smtp-Source: AGHT+IGTm4bFEwhL8GqLcY8z3nt0mSjwsh1Z+7KfLW6eIDlz0sFoLhtw28pz+YDUvgq5sFx2TdqJnA==
-X-Received: by 2002:a05:620a:2a13:b0:7b6:d8aa:7ef9 with SMTP id af79cd13be357-7be6320c0f9mr4896085a.32.1737055193220;
-        Thu, 16 Jan 2025 11:19:53 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be6147f2e7sm33743585a.32.2025.01.16.11.19.52
+        d=1e100.net; s=20230601; t=1737058795; x=1737663595;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hxyx17H16LTaCMPogGfVhxD8KdAjR1MUqsEp+1MdmBk=;
+        b=MSuocWipQD8zz1Ea1HxbqWProAmXgjZJ0SpAs+n5CWeH/SUQGYd1Z5myI9rR5Fb3EM
+         jD+XzBbgTEJdcBXrO5xTgQXUs4Cg+BBK77RkTx6RugKqczDx8FWui+hZiQlX46Xdf2aj
+         6TOS9xlHuo/hkb+Ej5/1ruJrFf0tBe5pBL0/5XgR4Nkbmdn1pf2ow/KDtTHOAZ+F8OEl
+         JxoLHuI2vwxMERJE80dA/dsRFH4k/EjMBc+LqLp6rjthBq/pJzChnEwQfuCkTaIreP5v
+         7QqnWIdjJCm5I98X8cW5lL6xLPTw6r1C2vrL6mPt6oVMbCqYDvB3AhsOoGkQL62QxBYL
+         OFtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTpsFtc/Y1+tcq2kFLXwrnnktx79lPx7TUc0NXnO/PcZj3kng4V2z0VBo1TX3KZ5lsReuRC2E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwgDwb0kpO8IJILgnTAbHwmRIbAeVzLGKoFcTd+jW7DCTOSGgNQ
+	dYXfAODtTY6KKCh2ASWwlMf7EYG3Ou6JDUToXkNc6vx5B24gHBJZeDQOOuPDKC2tdOu83X3ZlGe
+	PFapXPYHAcX4s/4DcsLASfI5mUdklqh2XiIiPCKu2bXuHrsRPoAyxqw==
+X-Gm-Gg: ASbGncuk3r5t0GasCBpTQUVrBMsiSVqK6UcnPPjzfBl1YOvGp/CB83OOA+mrBi8a1K4
+	mZAXS5Cly68dS53HWMoA3aGfM+qTITa8461RE8P1pHPrmaEG+uG/Q7Q2vz2jl8sac6p9K90Fmmn
+	CBW/7TjscDM5jgwP/DlhCifFxE5Hs7LvTPMeIOJpOEIGOJ8st1yJmVycBXm1DsJSBVY+2Q/uKFc
+	iiYc6WLgaYBnQwOnhNfWqUibBSEl99oH8Ta8oCG8VwIVJCWnCsMnwxsUrHYLp31MAfDXG2d7dem
+	CsjOtFxA2Q0bVfTqrA==
+X-Received: by 2002:a17:903:1105:b0:216:6f1a:1c81 with SMTP id d9443c01a7336-21c352c77eamr1589135ad.2.1737058795383;
+        Thu, 16 Jan 2025 12:19:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFCdUZtxdruuZ9dhKBDB1S+oAh8pcb12HPEW8IyTWaMSLHmWxJL1Esm0PAWT5jrhgt1RJfKYw==
+X-Received: by 2002:a17:903:1105:b0:216:6f1a:1c81 with SMTP id d9443c01a7336-21c352c77eamr1588855ad.2.1737058795018;
+        Thu, 16 Jan 2025 12:19:55 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d3ac3e2sm3791465ad.139.2025.01.16.12.19.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 11:19:52 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tYVPE-00000002xf3-0us0;
-	Thu, 16 Jan 2025 15:19:52 -0400
-Date: Thu, 16 Jan 2025 15:19:52 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+        Thu, 16 Jan 2025 12:19:54 -0800 (PST)
+Date: Thu, 16 Jan 2025 15:19:49 -0500
+From: Peter Xu <peterx@redhat.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>,
+	David Matlack <dmatlack@google.com>, Wei W <wei.w.wang@intel.com>,
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, robdclark@gmail.com, joro@8bytes.org,
-	robin.murphy@arm.com, jean-philippe@linaro.org, nicolinc@nvidia.com,
-	vdonnefort@google.com, qperret@google.com, tabba@google.com,
-	danielmentz@google.com, tzukui@google.com
-Subject: Re: [RFC PATCH v2 00/58] KVM: Arm SMMUv3 driver for pKVM
-Message-ID: <20250116191952.GD674319@ziepe.ca>
-References: <20241212180423.1578358-1-smostafa@google.com>
- <20241212194119.GA4679@ziepe.ca>
- <Z1yNWI9lBNIZg6Le@google.com>
- <20250102201614.GA26854@ziepe.ca>
- <Z35rEeSVwfZVA9IF@google.com>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
+Message-ID: <Z4lp5QzdOX0oYGOk@x1n>
+References: <20241204191349.1730936-1-jthoughton@google.com>
+ <Z2simHWeYbww90OZ@x1n>
+ <CADrL8HUkP2ti1yWwp=1LwTX2Koit5Pk6LFcOyTpN2b+B3MfKuw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+In-Reply-To: <CADrL8HUkP2ti1yWwp=1LwTX2Koit5Pk6LFcOyTpN2b+B3MfKuw@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: oDRmK9ptKJwDu6Vi4fx8ja6hh37OKg5W6j5Ca0CUkgY_1737058795
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z35rEeSVwfZVA9IF@google.com>
 
-On Wed, Jan 08, 2025 at 12:09:53PM +0000, Mostafa Saleh wrote:
+James,
 
-> I am open to gradually upstream this as you mentioned where as a first
-> step pKVM would establish DMA isolation without translation for host,
-> that should be enough to have functional pKVM and run protected workloads.
+Sorry for a late reply.
 
-Personally I hate these giant patch series, you should strip it down
-to small meaningful steps and try to stay below 20 per series.
+I still do have one or two pure questions, but nothing directly relevant to
+your series.
 
-I think getting pkvm to own the SMMU HW is a great first step that
-everything else can build on
+On Thu, Jan 02, 2025 at 12:53:11PM -0500, James Houghton wrote:
+> So I'm not pushing for KVM Userfault to replace userfaultfd; it's not
+> worth the extra/duplicated complexity. And at LPC, Paolo and Sean
+> indicated that this direction was indeed wrong. I have another way to
+> make this work in mind. :)
 
-> But although that might be usable on some systems, I don’t think that’s
-> practical in the long term as it limits the amount of HW that can run pKVM.
+Do you still want to share it, more or less? :)
 
-I suspect you will end up doing everything. Old HW needs paravirt, new
-HW will want nesting and its performance. Users other than mobile will
-come. If we were to use pKVM on server workloads we need nesting for
-performance.
+> 
+> For the gmem case, userfaultfd cannot be used, so KVM Userfault isn't
+> replacing it. And as of right now anyway, KVM Userfault *does* provide
+> a complete post-copy system for gmem.
+> 
+> When gmem pages can be mapped into userspace, for post-copy to remain
+> functional, userspace-mapped gmem will need userfaultfd integration.
+> Keep in mind that even after this integration happens, userfaultfd
+> alone will *not* be a complete post-copy solution, as vCPU faults
+> won't be resolved via the userspace page tables.
 
-Jason
+Do you know in context of CoCo, whether a private page can be accessed at
+all outside of KVM?
+
+I think I'm pretty sure now a private page can never be mapped to
+userspace.  However, can another module like vhost-kernel access it during
+postcopy?  My impression of that is still a yes, but then how about
+vhost-user?
+
+Here, the "vhost-kernel" part represents a question on whether private
+pages can be accessed at all outside KVM.  While "vhost-user" part
+represents a question on whether, if the previous vhost-kernel question
+answers as "yes it can", such access attempt can happen in another
+process/task (hence, not only does it lack KVM context, but also not
+sharing the same task context).
+
+Thanks,
+
+-- 
+Peter Xu
+
