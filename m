@@ -1,117 +1,97 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A574D1DE2A5
-	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 10:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD1719539F;
+	Thu, 16 Jan 2025 10:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737024147; cv=none; b=ImDyw8ZULY8yErhS/T20Ah4mmWJk0c5bYXMQ3WdcXThWIzyf3swO7wepyKHNu690dU9u92/NjJBtjrVbZMz3gZEbFSmQbVFRt8OUe6FHFlSOiyTkmPoOxEEObY83rt55nVmX08q+0cV1ExtWsglFqjBrDxYcc5vLqo6myDAUjnI=
+	t=1737024938; cv=none; b=W1M9Z0SPJqIbyibZg5tY5qdUZaw8+tDzindvVUj5qNO7ZiFwnXIOtgE5Qe18h8ARtkzLIU+alz51E44F5wy2m+hmFNKbMqPRW1Y38htTj7BDg29nlNMOkg6Y4pLIc4ELCLuNChgRKhuogU8mACEspYFGMhlzf/gUilBRuNzthS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737024147; c=relaxed/simple;
-	bh=7rZXtru7PzxMDzyUWKoqiV7OzSEydGVItccBESVxCZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UcyB3xMR3cv3Mn9kBhBnzCRaGZ1KwZGaX8NqeEkaBIcGqaAkuMHhsWKr888U1jzcBmN6TibaAzDUs33/3Nr/oVd7HiDrF5tusN1TpQ5DmrwsaUTKbdAsFoRu6ctWd8AOpoHp7U0LzExyi/WK2DtQHI8ZKpRZ4ItNEP4kwf9uZdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6358C11FB;
-	Thu, 16 Jan 2025 02:42:53 -0800 (PST)
-Received: from mazurka.cambridge.arm.com (mazurka.cambridge.arm.com [10.2.80.64])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EFCF3F77D;
-	Thu, 16 Jan 2025 02:42:23 -0800 (PST)
-Date: Thu, 16 Jan 2025 10:42:21 +0000
-From: =?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, ryan.roberts@arm.com,
-	catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com,
-	will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v1] arm64: Add TLB Conflict Abort Exception handler to KVM
-Message-ID: <20250116104221.GB17031@mazurka.cambridge.arm.com>
-References: <20250110172411.39845-3-miko.lenczewski@arm.com>
- <865xmgw1n1.wl-maz@kernel.org>
+	s=arc-20240116; t=1737024938; c=relaxed/simple;
+	bh=7t9yVD5T2eBuQqjdqyQ+IxjsRIWm6Eu4aTVUaQ3Sq0A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uJd/hBfDNqCNUju0wy7/f+3i81FlkTyOSL7C+9xBUS5lcIYaFEQaA9S7rrClVQUDvoFyboy4st7d7noAcnkYGU/qs4RizyhfrIJWTgkhyQ7s7EE7/679WSiMAefOhRwi2oLZZXXOZJh9NRmrAFxmJonIRp+3SMt9bT7pEfnSv5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+3T2+oL; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+3T2+oL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60DDBC4CED6;
+	Thu, 16 Jan 2025 10:55:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737024937;
+	bh=7t9yVD5T2eBuQqjdqyQ+IxjsRIWm6Eu4aTVUaQ3Sq0A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R+3T2+oLp4Ylup6p3DZ+31EvipsIHmwzxrhqleYNBBotRTKFwtwogPRe77szwdZMp
+	 rQYL9Z4WtETYXyADR7m0B9KaFBH+FT1+0yzXYJJMVXxwLnGj4bEkHOk5nnXQa6n2yx
+	 S1ZVRDW3QL569sQ61dpOytHXbZa12mTA9ExWBIMP40qq1sbWwYnjTMc+TaGGst9nbn
+	 w7JwyoNa11GDsI5m9ljMH5vOtGLDYVAC3iNDsofF3Msff2gXTNIQ156ijpcqm1xisA
+	 jJoJq1tpYtokYKLhQPqXCHUojs0eSJWV5piS4eX5ArxVD6JjAkxae816u/F/j+kqIE
+	 qgfQJLm8pZgIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tYNXD-00Cm4I-8E;
+	Thu, 16 Jan 2025 10:55:35 +0000
+Date: Thu, 16 Jan 2025 10:55:33 +0000
+Message-ID: <8634hjvxi2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>, Mark Brown <broonie@kernel.org>
+Cc: 	catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH] KVM: arm64: Fix the upper limit of the walker range
+In-Reply-To: <14cce00c-29bd-4feb-b7d0-7aae6e948d1e@sirena.org.uk>
+References: <20250114145050.563658-2-sebastianene@google.com>
+	<14cce00c-29bd-4feb-b7d0-7aae6e948d1e@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <865xmgw1n1.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, broonie@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jan 15, 2025 at 03:13:54PM +0000, Marc Zyngier wrote:
-> On Fri, 10 Jan 2025 17:24:07 +0000,
-> Mikołaj Lenczewski <miko.lenczewski@arm.com> wrote:
-> > 
-> > Currently, KVM does not handle the case of a stage 2 TLB conflict abort
-> > exception. This can legitimately occurs when the guest is eliding full
-> > BBM semantics as permitted by BBM level 2. In this case it is possible
-> > for a confclit abort to be delivered to EL2. We handle that by
-> > invalidating the full TLB.
-> > 
-> > The Arm ARM specifies that the worst-case invalidation is either a
-> > `tlbi vmalls12e1` or a `tlbi alle1` (as per DDI0487K section D8.16.3).
-> > We implement `tlbi alle1` by extending the existing
-> > __kvm_flush_vm_context() helper to allow for differentiating between
-> > inner-shareable and cpu-local invalidations.
-> > 
-> > This commit applies on top of v6.13-rc2 (fac04efc5c79).
-> > 
-> > Signed-off-by: Mikołaj Lenczewski <miko.lenczewski@arm.com>
-> > ---
-> >  arch/arm64/include/asm/esr.h       |  8 ++++++++
-> >  arch/arm64/include/asm/kvm_asm.h   |  2 +-
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  2 +-
-> >  arch/arm64/kvm/hyp/nvhe/tlb.c      |  9 +++++++--
-> >  arch/arm64/kvm/hyp/vhe/tlb.c       |  9 +++++++--
-> >  arch/arm64/kvm/mmu.c               | 13 +++++++++++++
-> >  arch/arm64/kvm/vmid.c              |  2 +-
-> >  7 files changed, 38 insertions(+), 7 deletions(-)
-> >
+On Thu, 16 Jan 2025 01:16:40 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> [...]
+> On Tue, Jan 14, 2025 at 02:50:51PM +0000, Sebastian Ene wrote:
 > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index c9d46ad57e52..7c0d97449d23 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1756,6 +1756,19 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >  	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> >  
-> > +	if (esr_fsc_is_tlb_conflict_abort(esr)) {
-> > +
-> > +		/* Architecturely, at this stage 2 tlb conflict abort, we must
-> > +		 * either perform a `tlbi vmalls12e1`, or a `tlbi alle1`. Due
-> > +		 * to nesting of VMs, we would have to iterate all flattened
-> > +		 * VMIDs to clean out a single guest, so we perform a `tlbi alle1`
-> > +		 * instead to save time.
-> > +		 */
-> > +		__kvm_flush_vm_context(true);
-> > +
-> > +		return 1;
-> > +	}
-> > +
+> > Prevent the walker from running into weeds when walking an
+> > entire address range.
 > 
-> This is broken. At this stage, you are preemptible, so whatever
-> invalidation you are performing might be happening on the wrong CPU
-> (and I really don't want to see a broadcast invalidation).
+> The KVM page_fault_test selftest started failing in next-20250115 on
+> at least n1sdp and TX2 in VHE mode and a bisect seems to point to this
+> change.  The bisect only just finished, I've done no further
+> investigation.
 > 
-> I really don't see why this can't be handled as a fixup in the inner
-> run loop, which would save *a lot* of cycles and do the right thing.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> When the test fails it generates backtraces like that below:
 
-Aplogies for my very late reply. Thank you for tatking the time to
-review my patch. Will work on this.
+[...]
+
+Thanks for the heads up.
+
+Given how close we are to the merge window opening, I've dropped this
+patch from -next.
+
+Seb: it looks this breaks a bunch of existing assumptions. Let's
+revisit this before -rc1, if possible.
+
+Thanks,
+
+	M.
 
 -- 
-Kind regards,
-Mikołaj Lenczewski
+Without deviation from the norm, progress is not possible.
