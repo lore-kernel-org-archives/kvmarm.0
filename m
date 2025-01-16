@@ -1,141 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9417413B58C;
-	Thu, 16 Jan 2025 22:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D294222CF02
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 22:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737066537; cv=none; b=YB2GgE3TighGNxwttKSMpxghBkn8ZqLiwolnaOxxmv1Jwn+QhkdOwyf+fOwl6m01wPiZMiJwbtp8PTE9PpOwLtjoMEiwgcA6NFeoWapYOugbHpeDsQJy34KWUwo23eeerDtiFluodIzpjeiIHSnKAF36pww+XP5qasKR0m5epDc=
+	t=1737067910; cv=none; b=n7ZVcvhjL6foh8kn2ZLlofaxEgcCprnvJWBC1LepMRpsQEn6yl+OAq1BeslRFrcjSd9doG6R28aNe8s8+yyG22r2BLksxzdWbtUgCeGzESqZ/7OhSY9THHmxPAOzr2zmaVq8Vf1p4olMbSy1aHMgee95lMw0VLfplQe4UrdLmco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737066537; c=relaxed/simple;
-	bh=z4Z21kOLF9xnwI/o2ML1cm/gAlvjMWxEDrwbA9fs3D4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rNlCc1NufJp2A6p5lQWbktpZKVM1Jmr22pnYpOwMElWnDlyTtH78kzsSxEaA6gYyugQc52+cWfPc/2G6JaC/UlWeVe4jBA/rtd0V7Ef+ieILOOAmkh2WtUuHgxZWXzV6BudTMYzXqeLz+MXlOTKusDJ7Dp7s8maZH9gswfygkLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3862C4CED6;
-	Thu, 16 Jan 2025 22:28:50 +0000 (UTC)
-Date: Thu, 16 Jan 2025 22:28:48 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>, David Hildenbrand <david@redhat.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <Z4mIIA5UuFcHNUwL@arm.com>
-References: <20241118131958.4609-2-ankita@nvidia.com>
- <a2d95399-62ad-46d3-9e48-6fa90fd2c2f3@redhat.com>
- <20250106165159.GJ5556@nvidia.com>
- <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
- <SA1PR12MB7199E3C81FDC017820773DE0B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250113162749.GN5556@nvidia.com>
- <0743193c-80a0-4ef8-9cd7-cb732f3761ab@redhat.com>
- <20250114133145.GA5556@nvidia.com>
- <SA1PR12MB71998E1E70F3A03D5E30DE40B0182@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250115143213.GQ5556@nvidia.com>
+	s=arc-20240116; t=1737067910; c=relaxed/simple;
+	bh=8vzofeRWcsorue9hM39qV72+nCmIg6eJE6V/BKMgF4A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ivmIHe90L+R4y+SCuz+3Yzy2Rdbfl/48mnDO9U40Yf3pzNfablj8/gY0MwN0uVoY+VqoyGO/5RuzlfbC/8yckucIEzehkx1XzUDb9SS57m4pSrRoyRFvLvcqQdAIIoQxP8L40Un37ZOHZXkIfcVFZznKKCF1FNTR1lZehZIlJoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qf1MWNIZ; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qf1MWNIZ"
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e39779a268bso2518145276.1
+        for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 14:51:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737067908; x=1737672708; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mo8wWiVSieP36PQBtcad/p/Y6sOL31Xn/K7FaizLB00=;
+        b=Qf1MWNIZLpmjp7H5NgEQ4KqXQarLsSUR7nxyWGbAG8XsKW+eWKb3igwbDbltUJI+So
+         WrF8FVvqw6mdkzUsD4XDhBNIidE/CHJux1MGJbGrMNu5G+fFrIK6o/nqf1ZRXArtq9zT
+         XVCI4QHMsx4Y1VW4GA7xx6TW3efu18d5cNG7ZfLk1ECabSvePMul4lA7U9pA0Jlv5jpf
+         lRoBNBnRqymI4vWm9k06RJE5uLjmy6rit2Yff+Mx68ibdOGo+2YWEMYzJ0E8IdZhXnVm
+         EewW0agLD/ZdzYlHbuIOe6/JI6EvEhFvA0yDkNfutMK6e7HcTmTLBReBMirhgJUKEPPz
+         UHbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737067908; x=1737672708;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mo8wWiVSieP36PQBtcad/p/Y6sOL31Xn/K7FaizLB00=;
+        b=ikUUWSLb0HQ5XNAQdE8Fr1+1zdWt/wdP6wPzUvNKsIA7usXcmC/yTjzMQQwepnlELJ
+         88oiCG9bz/7pM9m32ps6Z2hxtDiJGJLY8fvHXMaupX+/gfRtpIf7rdL5uWXeIcYgKoV8
+         mTn/AzDD267hkgAzRrypM2dB6RZChA+HYHl8hNJRf78c4yMe8AlR2IoXIi0iQzqmSD5Y
+         BLR/7CE0cdCcfU0TlsbGDHUF2bcYaxauYqlCrGJ529xBKGo2lubHNJ6FrgajDly4OOvs
+         Fy7Pf4nC0s7aIiNbGhKTSf56bi5ERW6fz4xejFjVcNP8lraj8kQu0AKMfKFV0GikjkVw
+         11Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+iXBYVv5HJu11UeskTnTplbVJIDbkJBc4iV2e8Jhy+noTKFvL4dLhd/WzBsc9yeBdlkX5wkw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzlLjMqfwcvNp3crjD3ueQFevHv/9O152gYfh9jNb4RglMoT4BQ
+	JMO+Amuo7Q2RIR9dGwh57rKgLxnazbaBvQrkbWu7jqc9V4hsYp9LT54e/8anI5uHO1RPVgiR/Kh
+	ceWZ9Z43sq7hAIT4UiW3FmzYa8+wm2iGcl6lr
+X-Gm-Gg: ASbGncvV+G4L5cei+FdX3oDH+SAwwXiqirAi918y1T4bcr1dR92memWvAo4Z+ZIeRU9
+	wvbBwB7c6hFt0oA6QIPF+tYumBfwcjELOi1b4Jg0UdEXn4pbRs8zQmGZnWoy2efVbrAWn
+X-Google-Smtp-Source: AGHT+IHDVU+IJsNlLjF83+Ds9RyEMFn3PvbsQABSjjSiGmmyVwS/zqJzA12leRcKXime5YwyEjpU/j8pOjxtozPQTYw=
+X-Received: by 2002:a05:6902:1447:b0:e54:9a7a:bce1 with SMTP id
+ 3f1490d57ef6-e57b0c833demr376797276.20.1737067907684; Thu, 16 Jan 2025
+ 14:51:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115143213.GQ5556@nvidia.com>
+References: <20241204191349.1730936-1-jthoughton@google.com>
+ <Z2simHWeYbww90OZ@x1n> <CADrL8HUkP2ti1yWwp=1LwTX2Koit5Pk6LFcOyTpN2b+B3MfKuw@mail.gmail.com>
+ <Z4lp5QzdOX0oYGOk@x1n> <Z4lsxgFSdiqpNtdG@x1n>
+In-Reply-To: <Z4lsxgFSdiqpNtdG@x1n>
+From: James Houghton <jthoughton@google.com>
+Date: Thu, 16 Jan 2025 14:51:11 -0800
+X-Gm-Features: AbW1kvYOIA-rxNht25vJwL_NVGMkqbp_NoziG0prE60wf6DVUh2TfK28c0IaFFg
+Message-ID: <CADrL8HWRavCoZ_NtXJvcLOvjOiGDCor6ucWeEqkecA3VDY-adg@mail.gmail.com>
+Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Yan Zhao <yan.y.zhao@intel.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
+	Anish Moorthy <amoorthy@google.com>, Peter Gonda <pgonda@google.com>, 
+	David Matlack <dmatlack@google.com>, Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 10:32:13AM -0400, Jason Gunthorpe wrote:
-> On Tue, Jan 14, 2025 at 11:13:48PM +0000, Ankit Agrawal wrote:
-> > > Do we really want another weirdly defined VMA flag? I'd really like to
-> > > avoid this.. 
-> > 
-> > I'd let Catalin chime in on this. My take of the reason for his suggestion is
-> > that we want to reduce the affected configs to only the NVIDIA grace based
-> > systems. The nvgrace-gpu module would be setting the flag and the
-> > new codepath will only be applicable there. Or am I missing something here?
-> 
-> We cannot add VMA flags that are not clearly defined. The rules for
-> when the VMA creater should set the flag need to be extermely clear
-> and well defined.
-> 
-> > > Can't we do a "this is a weird VM_PFNMAP thing, let's consult the VMA
-> > > prot + whatever PFN information to find out if it is weird-device and
-> > > how we could safely map it?"
-> > 
-> > My understanding was that the new suggested flag VM_FORCE_CACHED
-> > was essentially to represent "whatever PFN information to find out if it is
-> > weird-device". Is there an alternate reliable check to figure this out?
-> 
-> For instance FORCE_CACHED makes no sense, how will the VMA creator
-> know it should set this flag?
-> 
-> > Currently in the patch we check the following. So Jason, is the suggestion that
-> > we simply return error to forbid such condition if VM_PFNMAP is set?
-> > +	else if (!mte_allowed && kvm_has_mte(kvm))
-> 
-> I really don't know enought about mte, but I would take the position
-> that VM_PFNMAP does not support MTE, and maybe it is even any VMA
-> without VM_MTE/_ALLOWED does not support MTE?
-> 
-> At least it makes alost more sense for the VMA creator to indicate
-> positively that the underlying HW supports MTE.
+On Thu, Jan 16, 2025 at 12:32=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote=
+:
+>
+> On Thu, Jan 16, 2025 at 03:19:49PM -0500, Peter Xu wrote:
+> > James,
+> >
+> > Sorry for a late reply.
+> >
+> > I still do have one or two pure questions, but nothing directly relevan=
+t to
+> > your series.
+> >
+> > On Thu, Jan 02, 2025 at 12:53:11PM -0500, James Houghton wrote:
+> > > So I'm not pushing for KVM Userfault to replace userfaultfd; it's not
+> > > worth the extra/duplicated complexity. And at LPC, Paolo and Sean
+> > > indicated that this direction was indeed wrong. I have another way to
+> > > make this work in mind. :)
+> >
+> > Do you still want to share it, more or less? :)
 
-Sorry, I didn't get the chance to properly read this thread. I'll try
-tomorrow and next week.
+I think I'm referring to how to make 4K demand fetches for 1G-backed
+guest memory work, and I kind of said what I was thinking a little
+further down:
 
-Basically I don't care whether MTE is supported on such vma, I doubt
-you'd want to enable MTE anyway. But the way MTE was designed in the Arm
-architecture, prior to FEAT_MTE_PERM, it allows a guest to enable MTE at
-Stage 1 when Stage 2 is Normal WB Cacheable. We have no idea what enable
-MTE at Stage 1 means if the memory range doesn't support it. It could be
-external aborts, SError or simply accessing data (as tags) at random
-physical addresses that don't belong to the guest. So if a vma does not
-have VM_MTE_ALLOWED, we either disable Stage 2 cacheable or allow it
-with FEAT_MTE_PERM (patches from Aneesh on the list). Or, a bigger
-happen, disable MTE in guests (well, not that big, not many platforms
-supporting MTE, especially in the enterprise space).
+On Thu, Jan 2, 2025 at 9:53=E2=80=AFAM James Houghton <jthoughton@google.co=
+m> wrote:
+>
+> FWIW, I think userspace mapping of gmem + userfaultfd support for
+> userspace-mapped gmem + 1G page support for gmem =3D good 1G post-copy
+> for QEMU (i.e., use gmem instead of hugetlbfs after gmem supports 1G
+> pages).
+>
+> Remember the feedback I got from LSFMM a while ago? "don't use
+> hugetlbfs." gmem seems like the natural replacement.
 
-A second problem, similar to relaxing to Normal NC we merged last year,
-we can't tell what allowing Stage 2 cacheable means (SError etc). That's
-why I thought this knowledge lies with the device, KVM doesn't have the
-information. Checking vm_page_prot instead of a VM_* flag may work if
-it's mapped in user space but this might not always be the case. I don't
-see how VM_PFNMAP alone can tell us anything about the access properties
-supported by a device address range. Either way, it's the driver setting
-vm_page_prot or some VM_* flag. KVM has no clue, it's just a memory
-slot.
+I guess this might not work if QEMU *needs* to use HugeTLB for
+whatever reason, but Google's hypervisor just needs 1G pages; it
+doesn't matter where they come from really.
 
-A third aspect, more of a simplification when reasoning about this, was
-to use FWB at Stage 2 to force cacheability and not care about cache
-maintenance, especially when such range might be mapped both in user
-space and in the guest.
+> > > For the gmem case, userfaultfd cannot be used, so KVM Userfault isn't
+> > > replacing it. And as of right now anyway, KVM Userfault *does* provid=
+e
+> > > a complete post-copy system for gmem.
+> > >
+> > > When gmem pages can be mapped into userspace, for post-copy to remain
+> > > functional, userspace-mapped gmem will need userfaultfd integration.
+> > > Keep in mind that even after this integration happens, userfaultfd
+> > > alone will *not* be a complete post-copy solution, as vCPU faults
+> > > won't be resolved via the userspace page tables.
+> >
+> > Do you know in context of CoCo, whether a private page can be accessed =
+at
+> > all outside of KVM?
+> >
+> > I think I'm pretty sure now a private page can never be mapped to
+> > userspace.  However, can another module like vhost-kernel access it dur=
+ing
+> > postcopy?  My impression of that is still a yes, but then how about
+> > vhost-user?
+> >
+> > Here, the "vhost-kernel" part represents a question on whether private
+> > pages can be accessed at all outside KVM.  While "vhost-user" part
+> > represents a question on whether, if the previous vhost-kernel question
+> > answers as "yes it can", such access attempt can happen in another
+> > process/task (hence, not only does it lack KVM context, but also not
+> > sharing the same task context).
+>
+> Right after I sent it, I just recalled whenever a device needs to access
+> the page, it needs to be converted to shared pages first..
 
--- 
-Catalin
+Yep! This is my understanding anyway. Devices will need to GUP or use
+the userspace page tables to access guest memory; both of which will
+go to userfaultfd. And userspace hasn't told KVM to make some pages
+shared, then these GUPs/faults will fail.
+
+Maybe Trusted I/O changes some things here... let me reply to Sean. :)
+
+> So I suppose the questions were not valid at all!  It is not about the
+> context but that the pages will be shared always whenever a device in
+> whatever form will access it..
+>
+> Fundamentally I'm thinking about whether userfaultfd must support (fd,
+> offset) tuple.  Now I suppose it's not, because vCPUs accessing
+> private/shared will all exit to userspace, while all non-vCPU / devices c=
+an
+> access shared pages only.
+>
+> In that case, looks like userfaultfd can support CoCo on device emulation=
+s
+> by sticking with virtual-address traps like before, at least from that
+> specific POV.
+
+Yeah, I don't think the userfaultfd API needs to change to support
+gmem, because it's going to be using the VMAs / user mappings of gmem.
