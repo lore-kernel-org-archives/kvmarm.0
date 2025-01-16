@@ -1,97 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD1719539F;
-	Thu, 16 Jan 2025 10:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B88F1DE4EC
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 13:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737024938; cv=none; b=W1M9Z0SPJqIbyibZg5tY5qdUZaw8+tDzindvVUj5qNO7ZiFwnXIOtgE5Qe18h8ARtkzLIU+alz51E44F5wy2m+hmFNKbMqPRW1Y38htTj7BDg29nlNMOkg6Y4pLIc4ELCLuNChgRKhuogU8mACEspYFGMhlzf/gUilBRuNzthS0=
+	t=1737035409; cv=none; b=SnaYcfzbY47J2wTZ3oUdfVnT1YoQqCObFUcaLi9aIVGSNwVAW36qAlaFEQFK0FWAYZgUeGc49+EtHDDXfAXisLUUsqMCrSs0gRxpY4q/4zC+NbK1iSsY2ivJy0nhw2VnnqGq4davaVEjFvONwAvjKNt5Baod/Fl0GDDkQO/ohvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737024938; c=relaxed/simple;
-	bh=7t9yVD5T2eBuQqjdqyQ+IxjsRIWm6Eu4aTVUaQ3Sq0A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uJd/hBfDNqCNUju0wy7/f+3i81FlkTyOSL7C+9xBUS5lcIYaFEQaA9S7rrClVQUDvoFyboy4st7d7noAcnkYGU/qs4RizyhfrIJWTgkhyQ7s7EE7/679WSiMAefOhRwi2oLZZXXOZJh9NRmrAFxmJonIRp+3SMt9bT7pEfnSv5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+3T2+oL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+3T2+oL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60DDBC4CED6;
-	Thu, 16 Jan 2025 10:55:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737024937;
-	bh=7t9yVD5T2eBuQqjdqyQ+IxjsRIWm6Eu4aTVUaQ3Sq0A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=R+3T2+oLp4Ylup6p3DZ+31EvipsIHmwzxrhqleYNBBotRTKFwtwogPRe77szwdZMp
-	 rQYL9Z4WtETYXyADR7m0B9KaFBH+FT1+0yzXYJJMVXxwLnGj4bEkHOk5nnXQa6n2yx
-	 S1ZVRDW3QL569sQ61dpOytHXbZa12mTA9ExWBIMP40qq1sbWwYnjTMc+TaGGst9nbn
-	 w7JwyoNa11GDsI5m9ljMH5vOtGLDYVAC3iNDsofF3Msff2gXTNIQ156ijpcqm1xisA
-	 jJoJq1tpYtokYKLhQPqXCHUojs0eSJWV5piS4eX5ArxVD6JjAkxae816u/F/j+kqIE
-	 qgfQJLm8pZgIw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tYNXD-00Cm4I-8E;
-	Thu, 16 Jan 2025 10:55:35 +0000
-Date: Thu, 16 Jan 2025 10:55:33 +0000
-Message-ID: <8634hjvxi2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>, Mark Brown <broonie@kernel.org>
-Cc: 	catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH] KVM: arm64: Fix the upper limit of the walker range
-In-Reply-To: <14cce00c-29bd-4feb-b7d0-7aae6e948d1e@sirena.org.uk>
-References: <20250114145050.563658-2-sebastianene@google.com>
-	<14cce00c-29bd-4feb-b7d0-7aae6e948d1e@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1737035409; c=relaxed/simple;
+	bh=SLQfJPpx9moSlt3HR020SpUS6TcUSYn6JnbSzglVC7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jibMnSZQ05AoVB0iniyNeuVhxVfjWVm9iScESPMoX4PjQtxcV8V5PLDYsJZB+QLRei45zY2dioUsjTF0F9icDpAIF/+a7qsOnCP4JKwX0lQw9G+1Qr7/2jM1ZAZyDgPGNv98tNahRczwHEP4ojlHZAOKwvU4rxhOkwviHwV7b+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 494ED106F;
+	Thu, 16 Jan 2025 05:50:35 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D5B313F77D;
+	Thu, 16 Jan 2025 05:49:59 -0800 (PST)
+Message-ID: <e79c78a7-24a3-42e6-a217-ec64f8320e91@arm.com>
+Date: Thu, 16 Jan 2025 13:49:54 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, broonie@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Fix the upper limit of the walker range
+To: Marc Zyngier <maz@kernel.org>, Sebastian Ene <sebastianene@google.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ oliver.upton@linux.dev, will@kernel.org, Aishwarya.TCV@arm.com
+References: <20250114145050.563658-2-sebastianene@google.com>
+ <14cce00c-29bd-4feb-b7d0-7aae6e948d1e@sirena.org.uk>
+ <8634hjvxi2.wl-maz@kernel.org>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <8634hjvxi2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 16 Jan 2025 01:16:40 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On 16/01/2025 10:55, Marc Zyngier wrote:
+> On Thu, 16 Jan 2025 01:16:40 +0000,
+> Mark Brown <broonie@kernel.org> wrote:
+>>
+>> On Tue, Jan 14, 2025 at 02:50:51PM +0000, Sebastian Ene wrote:
+>>
+>>> Prevent the walker from running into weeds when walking an
+>>> entire address range.
+>>
+>> The KVM page_fault_test selftest started failing in next-20250115 on
+>> at least n1sdp and TX2 in VHE mode and a bisect seems to point to this
+>> change.  The bisect only just finished, I've done no further
+>> investigation.
+>>
+>> When the test fails it generates backtraces like that below:
 > 
-> On Tue, Jan 14, 2025 at 02:50:51PM +0000, Sebastian Ene wrote:
+> [...]
 > 
-> > Prevent the walker from running into weeds when walking an
-> > entire address range.
+> Thanks for the heads up.
 > 
-> The KVM page_fault_test selftest started failing in next-20250115 on
-> at least n1sdp and TX2 in VHE mode and a bisect seems to point to this
-> change.  The bisect only just finished, I've done no further
-> investigation.
+> Given how close we are to the merge window opening, I've dropped this
+> patch from -next.
 > 
-> When the test fails it generates backtraces like that below:
+> Seb: it looks this breaks a bunch of existing assumptions. Let's
+> revisit this before -rc1, if possible.
+In kvm_pgtable_walk() we set the walk_data.end to PAGE_ALIGNED(start + 
+size), where size is BIT(ia_size) and start = 0, for 
+kvm_pgtable_stage2_destroy().
 
-[...]
+And subtracting the limit in _kvm_pgtable_walk makes things go bad,
+  returning -ERANGE.
+Given the kvm_pgtable_walk() passes the "end" as the top address (not 
+including it), and is always PAGE_ALIGNED, we should probably leave 
+things as it is in the code.
 
-Thanks for the heads up.
 
-Given how close we are to the merge window opening, I've dropped this
-patch from -next.
+Cheers
+Suzuki
 
-Seb: it looks this breaks a bunch of existing assumptions. Let's
-revisit this before -rc1, if possible.
 
-Thanks,
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
