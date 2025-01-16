@@ -1,200 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770EB17578;
-	Thu, 16 Jan 2025 15:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBC022B8D2;
+	Thu, 16 Jan 2025 15:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737040201; cv=none; b=Bef13Tq+1R26oXkiqhCBJnENwNB6CPJZPm/3gjH6ldulJJ4sxnj/mFWZCs2TFCHkWTHRkprvrTlM/f2CFgKQVAeUPfalFFJKvOiB7JmLQuGX+dfrbI21PRFQDO+AekCrMSGryzlRHQGasFokUIgExqUsvCPKA//L0Slh49DR3Bk=
+	t=1737041563; cv=none; b=qkZxiOW6bUVRwHOLNkLQu9ZqPUbPUJ4R4fWPNfPyrBw4K8l1uYDjH0V+vvmzx8gv1qRN+tvH0xHNjswWi6/PtVt76jlHAu0WnNh9ZJSuCs7/Ug6RyuJziO2EyMtv9KlsW0KUyabuGjd3g5ZKDxShPio3nPE4HxdrqE2BsI7ICdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737040201; c=relaxed/simple;
-	bh=L3LKFN888pCcYtXfi2qM4Z727c0oTzkfgjaKEUCtMv4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XPByflPYk5uOlwvnqYXzjTgYnAtq8AFDXDZh0IYgtNWd5UAvLlJTbx8Y04BZ6GRlTBfNYcK1bDl74Rg2z/YKVZhYKqMAjOw4ZV/rUxT62CeiyYa9G3KeOg3baXWfwjVeLoRzx/nefp+czTw+SmYz+jvuHMcxQbUCOPQJ/4XTdh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cu9mO6no; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cu9mO6no"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D6BC4CED6;
-	Thu, 16 Jan 2025 15:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737040201;
-	bh=L3LKFN888pCcYtXfi2qM4Z727c0oTzkfgjaKEUCtMv4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Cu9mO6noCnsX6IAbFrKrerNkGnSmMXPBnJ1iZVTY1jaco0pl3ntQIwUNnZnh6uPuG
-	 znTOS1tt+8zyN3gm144ex4xcCs4dfeI6pyd9nL2OkTvAGyhCQzu1++QY+Xg2t4e07a
-	 +ToB1XKf1jo6si4+XiJXFxPAi1kW3n2GWnVpFxlUmSN6eVO+AZAht0mvGZp3DjWeuu
-	 /UzkFCzFIVyLR1rfAI8EBNOFQu/7MJzc/FVuspekd5DufguCxOSu/qhbyOH9a1q20a
-	 QU3mB/0CcCwo1LYZ5eqDiEG3MznPGbqkc2f0+FtolDRrBBYAsOOUrqwAcyj6xm9uux
-	 I9E2DU8IUFnAg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tYRVO-00Cpqo-JN;
-	Thu, 16 Jan 2025 15:09:58 +0000
-Date: Thu, 16 Jan 2025 15:09:57 +0000
-Message-ID: <861px2x0ai.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1737041563; c=relaxed/simple;
+	bh=jF9zoBFJYwbcnwqBqK9Tijw0V2WTjLhw0+24Tc0rS1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VTZQGprilSQh6LXDizq3JOy7xgVXCFrrOXilJTSGz1iRx3e9n1wIPH5ytfps2NaYpSRoFVPmlaJUWn3ExXDZCS3e6PDytq9gPGJMcbx25v01FbQ8t65be/Cp1Jn/SAxbUo9DEpAEK7hTSxv56Eh1ERDRHcb/fIt/u7Or9A4uWyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4B50C4CED6;
+	Thu, 16 Jan 2025 15:32:40 +0000 (UTC)
+Date: Thu, 16 Jan 2025 15:32:38 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: arm64: timers: Fix percpu address space issues in kvm_timer_hyp_init()
-In-Reply-To: <CAFULd4Zf4=bh6X+xg+0i5jE8doyD_ffpaWOhsdHciVHRrQj+9A@mail.gmail.com>
-References: <20241213145809.2918-1-ubizjak@gmail.com>
-	<86bjxfsdw0.wl-maz@kernel.org>
-	<CAFULd4Zf4=bh6X+xg+0i5jE8doyD_ffpaWOhsdHciVHRrQj+9A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Jonathan Corbet <corbet@lwn.net>,
+	Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+Message-ID: <Z4kmlhnlpKjS_MII@arm.com>
+References: <20241220072240.1003352-1-anshuman.khandual@arm.com>
+ <20250102160402.GB3990035-robh@kernel.org>
+ <Z30adHnQ7ZFaU9UR@arm.com>
+ <CAL_JsqLLnh1o4L1=PpNt5brBwZZCgp7mOygByOYakchrzc29Ow@mail.gmail.com>
+ <86wmf5wo8u.wl-maz@kernel.org>
+ <CAL_JsqKKiEOj=a1k6U-bB0F6-ht7QokDnh3bspHupp-QG=haSg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ubizjak@gmail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqKKiEOj=a1k6U-bB0F6-ht7QokDnh3bspHupp-QG=haSg@mail.gmail.com>
 
-On Thu, 16 Jan 2025 14:25:09 +0000,
-Uros Bizjak <ubizjak@gmail.com> wrote:
->=20
-> On Fri, Dec 13, 2024 at 6:15=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
-te:
+On Wed, Jan 08, 2025 at 07:47:16AM -0600, Rob Herring wrote:
+> On Wed, Jan 8, 2025 at 5:15 AM Marc Zyngier <maz@kernel.org> wrote:
+> > On Tue, 07 Jan 2025 22:13:47 +0000,
+> > Rob Herring <robh@kernel.org> wrote:
+> > > On Tue, Jan 7, 2025 at 6:13 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > > But does KVM actually expose the feature to EL1 in ID_AA64DFR1_EL1 and
+> > > > than traps it at EL2?
+> > >
+> > > As Marc pointed out KVM only advertises PMUv3.8. Regardless, guest
+> > > accesses to these registers are trapped with or without this series.
 > >
-> > On Fri, 13 Dec 2024 14:57:52 +0000,
-> > Uros Bizjak <ubizjak@gmail.com> wrote:
-> > >
-> > > Cast return value from kvm_get_running_vcpus() in the __percpu
-> > > address space to the generic address space via uintptr_t [1]
-> > > to fix a couple of:
-> > >
-> > > arch_timer.c:1395:66: warning: incorrect type in argument 2 (differen=
-t address spaces)
-> > > arch_timer.c:1395:66:    expected void *vcpu_info
-> > > arch_timer.c:1395:66:    got struct kvm_vcpu *[noderef] __percpu *
-> > >
-> > > sparse warnings.
-> > >
-> > > There were no changes in the resulting object files.
-> > >
-> > > [1] https://sparse.docs.kernel.org/en/latest/annotations.html#address=
--space-name
-> > >
-> > > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> > > Cc: Marc Zyngier <maz@kernel.org>
-> > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > Cc: Joey Gouly <joey.gouly@arm.com>
-> > > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > Cc: Zenghui Yu <yuzenghui@huawei.com>
-> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > Cc: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/arch_timer.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > > index 1215df590418..a13bb9e8dc19 100644
-> > > --- a/arch/arm64/kvm/arch_timer.c
-> > > +++ b/arch/arm64/kvm/arch_timer.c
-> > > @@ -1392,7 +1392,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
-> > >
-> > >       if (has_gic) {
-> > >               err =3D irq_set_vcpu_affinity(host_vtimer_irq,
-> > > -                                         kvm_get_running_vcpus());
-> > > +                                         (void *)(uintptr_t)kvm_get_=
-running_vcpus());
-> > >               if (err) {
-> > >                       kvm_err("kvm_arch_timer: error setting vcpu aff=
-inity\n");
-> > >                       goto out_free_vtimer_irq;
-> > > @@ -1416,7 +1416,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
-> > >
-> > >               if (has_gic) {
-> > >                       err =3D irq_set_vcpu_affinity(host_ptimer_irq,
-> > > -                                                 kvm_get_running_vcp=
-us());
-> > > +                                                 (void *)(uintptr_t)=
-kvm_get_running_vcpus());
-> > >                       if (err) {
-> > >                               kvm_err("kvm_arch_timer: error setting =
-vcpu affinity\n");
-> > >                               goto out_free_ptimer_irq;
-> >
-> > I think the fix is worse than the current code, because there is no
-> > real semantics behind the pointer being passed to
-> > irq_set_vcpu_affinity(). All that is required is that it is a non-NULL
-> > pointer.
->=20
-> If this is the case, we can just remove dependence on the pointer in
-> the called function.
-
-No, we can't.
-
->=20
-> Something like in the attached patch.
-
+> > And most probably generates a nice splat in the kernel log, as nobody
+> > updated KVM to handle *correctly* PMICNTR_EL0 traps, let alone deal
+> > with the FGT2 registers.
+> 
+> Isn't that this series[1]? Should that have come first, I guess I know
+> that *now*.
 [...]
+> [1] https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandual@arm.com/
 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 1215df590418..10c293c2d2f5 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1238,12 +1238,10 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *=
-vcpu,
->  	}
->  }
-> =20
-> -static int timer_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-> +static int timer_irq_set_vcpu_affinity(struct irq_data *d,
-> +				       void __always_unused *vcpu)
->  {
-> -	if (vcpu)
-> -		irqd_set_forwarded_to_vcpu(d);
-> -	else
-> -		irqd_clr_forwarded_to_vcpu(d);
-> +	irqd_set_forwarded_to_vcpu(d);
-> =20
->  	return 0;
->  }
-> @@ -1391,8 +1389,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
->  	}
-> =20
->  	if (has_gic) {
-> -		err =3D irq_set_vcpu_affinity(host_vtimer_irq,
-> -					    kvm_get_running_vcpus());
-> +		err =3D irq_set_vcpu_affinity(host_vtimer_irq, NULL);
->  		if (err) {
->  			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
->  			goto out_free_vtimer_irq;
-> @@ -1415,8 +1412,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
->  		}
-> =20
->  		if (has_gic) {
-> -			err =3D irq_set_vcpu_affinity(host_ptimer_irq,
-> -						    kvm_get_running_vcpus());
-> +			err =3D irq_set_vcpu_affinity(host_ptimer_irq, NULL);
+It's not any clearer to me. Does this series depend on the 46-patch one?
+Or, if we had the other, is this no longer needed? Or none of these,
+they are independent.
 
-And now you breaking everything by ignoring the semantics of
-irq_set_vcpu_affinity(), which uses a NULL pointer to *stop* the
-forwarding.
-
-Congratulations, KVM doesn't work anymore, except on systems such as
-the Apple stuff (which are the only systems requiring the
-timer_irq_set_vcpu_affinity() hack). Just look at what the irqchips
-are implementing to convince yourself.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+-- 
+Catalin
