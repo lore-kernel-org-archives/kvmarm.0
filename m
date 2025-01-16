@@ -1,35 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26671DDA17
-	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 10:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A574D1DE2A5
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 10:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737024075; cv=none; b=JY/ynk8nCszPVwj8/roEZqBZlLemHYc3rAv/8irdtilBllgGH/K/scSbowURg2oESUnSbJyGMgWbcYxa/TuWYU4i7iTcgP42v8w8DsF3kWnzEZF6zz/kt4XJCVy1xQTfLSl6MemoPZdI3CLC/1KCuM1ye2k7aDsON/J4fCUAzgc=
+	t=1737024147; cv=none; b=ImDyw8ZULY8yErhS/T20Ah4mmWJk0c5bYXMQ3WdcXThWIzyf3swO7wepyKHNu690dU9u92/NjJBtjrVbZMz3gZEbFSmQbVFRt8OUe6FHFlSOiyTkmPoOxEEObY83rt55nVmX08q+0cV1ExtWsglFqjBrDxYcc5vLqo6myDAUjnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737024075; c=relaxed/simple;
-	bh=ovrQiNl+EzPno96GYFJ9gfyXLQAyGXjWYEzGkkCaqvg=;
+	s=arc-20240116; t=1737024147; c=relaxed/simple;
+	bh=7rZXtru7PzxMDzyUWKoqiV7OzSEydGVItccBESVxCZg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ON1/5bAkZxNZ7f1pdcyMSDrKXF6dm4DeC8j6DA0Xof/EACuIFljRTTNkMNRd3Ax+fxZeySBmwCabJH36qBQHQW8R8oNSiIIk8j+qwa7bixX2QklIvNxDGRFm89ziGK82m+UZZTSBL728fO98uTp0pWwgu3SIbt781yo+T20f8C8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=UcyB3xMR3cv3Mn9kBhBnzCRaGZ1KwZGaX8NqeEkaBIcGqaAkuMHhsWKr888U1jzcBmN6TibaAzDUs33/3Nr/oVd7HiDrF5tusN1TpQ5DmrwsaUTKbdAsFoRu6ctWd8AOpoHp7U0LzExyi/WK2DtQHI8ZKpRZ4ItNEP4kwf9uZdM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C98111FB;
-	Thu, 16 Jan 2025 02:41:40 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6358C11FB;
+	Thu, 16 Jan 2025 02:42:53 -0800 (PST)
 Received: from mazurka.cambridge.arm.com (mazurka.cambridge.arm.com [10.2.80.64])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 275473F77D;
-	Thu, 16 Jan 2025 02:41:10 -0800 (PST)
-Date: Thu, 16 Jan 2025 10:41:07 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EFCF3F77D;
+	Thu, 16 Jan 2025 02:42:23 -0800 (PST)
+Date: Thu, 16 Jan 2025 10:42:21 +0000
 From: =?utf-8?Q?Miko=C5=82aj?= Lenczewski <miko.lenczewski@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, ryan.roberts@arm.com,
 	catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com,
-	will@kernel.org, maz@kernel.org, joey.gouly@arm.com,
+	will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	suzuki.poulose@arm.com, yuzenghui@huawei.com
 Subject: Re: [PATCH v1] arm64: Add TLB Conflict Abort Exception handler to KVM
-Message-ID: <20250116104107.GA17031@mazurka.cambridge.arm.com>
+Message-ID: <20250116104221.GB17031@mazurka.cambridge.arm.com>
 References: <20250110172411.39845-3-miko.lenczewski@arm.com>
- <Z4Fr1HkKCm9AXSIA@linux.dev>
+ <865xmgw1n1.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,21 +39,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z4Fr1HkKCm9AXSIA@linux.dev>
+In-Reply-To: <865xmgw1n1.wl-maz@kernel.org>
 
-On Fri, Jan 10, 2025 at 10:49:56AM -0800, Oliver Upton wrote:
-> On Fri, Jan 10, 2025 at 05:24:07PM +0000, Mikołaj Lenczewski wrote:
+On Wed, Jan 15, 2025 at 03:13:54PM +0000, Marc Zyngier wrote:
+> On Fri, 10 Jan 2025 17:24:07 +0000,
+> Mikołaj Lenczewski <miko.lenczewski@arm.com> wrote:
+> > 
 > > Currently, KVM does not handle the case of a stage 2 TLB conflict abort
 > > exception. This can legitimately occurs when the guest is eliding full
 > > BBM semantics as permitted by BBM level 2. In this case it is possible
 > > for a confclit abort to be delivered to EL2. We handle that by
 > > invalidating the full TLB.
+> > 
+> > The Arm ARM specifies that the worst-case invalidation is either a
+> > `tlbi vmalls12e1` or a `tlbi alle1` (as per DDI0487K section D8.16.3).
+> > We implement `tlbi alle1` by extending the existing
+> > __kvm_flush_vm_context() helper to allow for differentiating between
+> > inner-shareable and cpu-local invalidations.
+> > 
+> > This commit applies on top of v6.13-rc2 (fac04efc5c79).
+> > 
+> > Signed-off-by: Mikołaj Lenczewski <miko.lenczewski@arm.com>
+> > ---
+> >  arch/arm64/include/asm/esr.h       |  8 ++++++++
+> >  arch/arm64/include/asm/kvm_asm.h   |  2 +-
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  2 +-
+> >  arch/arm64/kvm/hyp/nvhe/tlb.c      |  9 +++++++--
+> >  arch/arm64/kvm/hyp/vhe/tlb.c       |  9 +++++++--
+> >  arch/arm64/kvm/mmu.c               | 13 +++++++++++++
+> >  arch/arm64/kvm/vmid.c              |  2 +-
+> >  7 files changed, 38 insertions(+), 7 deletions(-)
+> >
 > 
-> typo: conflict
+> [...]
 > 
-> Also, a bit of a nitpick, but mentioning that TLB conflict abort routing
-> is implementation defined when S2 is enabled is valuable information.
-> 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index c9d46ad57e52..7c0d97449d23 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
 > > @@ -1756,6 +1756,19 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
 > >  	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
 > >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
@@ -66,33 +89,28 @@ On Fri, Jan 10, 2025 at 10:49:56AM -0800, Oliver Upton wrote:
 > > +		 * VMIDs to clean out a single guest, so we perform a `tlbi alle1`
 > > +		 * instead to save time.
 > > +		 */
+> > +		__kvm_flush_vm_context(true);
+> > +
+> > +		return 1;
+> > +	}
+> > +
 > 
-> I'm not sure I follow this.
+> This is broken. At this stage, you are preemptible, so whatever
+> invalidation you are performing might be happening on the wrong CPU
+> (and I really don't want to see a broadcast invalidation).
 > 
-> At this point we've taken a TLB conflict abort out of a specific
-> hardware MMU context, and it's unclear to me why a conflict abort in one
-> stage-2 MMU has any bearing on the other stage-2 MMUs that could be
-> associated with this guest.
+> I really don't see why this can't be handled as a fixup in the inner
+> run loop, which would save *a lot* of cycles and do the right thing.
 > 
-> Even in NV, KVM is always responsible for the maintenance of hardware
-> stage-2 MMUs. So stage-2 TLBI elision in the guest hypervisor should
-> not lead to a stage-2 TLB conflict abort.
+> Thanks,
 > 
-> TLBI ALLE1 is a larger hammer than what's actually necessary here. Could
-> you perhaps introduce a new invalidation routine,
-> __kvm_tlb_flush_vmid_nsh(), that does a TLBI VMALLS12E1 behind the
-> scenes?
-> 
-> If an NV guest is playing games at stage-1 across VMIDs then it gets to
-> suffer the consequences (additional TLB conflict aborts).
+> 	M.
 > 
 > -- 
-> Thanks,
-> Oliver
+> Without deviation from the norm, progress is not possible.
 
-Apologies for the very late reply. Thank you for taking the time to
-review my patch. Will fix the type, and work on fixing the logic there
-to use a TLBI VMALLS12E1.
+Aplogies for my very late reply. Thank you for tatking the time to
+review my patch. Will work on this.
 
 -- 
 Kind regards,
