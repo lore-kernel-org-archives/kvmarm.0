@@ -1,221 +1,139 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261361DE2B9
-	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 14:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687CE22BAB7
+	for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 14:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737037525; cv=none; b=sFC6ZZJqaZZ3LbjmyFAFkAzSMV8xTiJdijhpzE7wwLs6/T10jZHq3jwzMLnc60dR3iI/NJrsTPJopfgOlfZL0lHskGovKIcAacRzqR1LQQJHlRxF9+xiL9HN0nNGB7T4o6lbwDyZdNAqe7ROlqQ2qNoNR8ht15OpRaGH4RCpv/o=
+	t=1737039010; cv=none; b=qy1Nc6pKwhrZgeKTz1GlGJKSEQA39e9XXRb8GADiUI82x5grCGouhbZX3aleo4KW1Az3ufu/+NlLebP3ro+NfViAf6ark411E04rN2asD0IsptrDMSA+frrrwWwmtw3LqdYmSeoC9yxjmbn8MBdktF0umqBVIE+IO+Voe5JGmQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737037525; c=relaxed/simple;
-	bh=PNtyIBG6bDjbGmxnlkS6bfveWSmGD7fM02aITudwhxk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YPkW/uVnRSWyq2YImJxazx3JaAbbdLNxKUhSevzFjS5Wdrhuzz9Y1TBjq2vGCXJTbDdkRf5PK061aRj55b7fG5uqWkSXJNqqxlRWJdCMXxmxV2cRivitI712o9uSSYdvQdWBWogdOOI4+8HOuIuonW+xveeNvoVg/x3iij18z/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RInpwzCR; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1737039010; c=relaxed/simple;
+	bh=4hbCTX37OlL7FWZdGlRYXpiEDdg5Z2+huHxFb8o3nLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ee9X81AhFw58GUhAPqkloSaUcPsC82HkgnL5F2Iq6bV+N4LxWLFSPskKJ4smDIIhtEGbglw3kcq9Qvf4544ShqDavaNAJiE9UR4QgMb/XabnTWgNsbJyfIFgklZKApeok78x7EVUC4vwaWl/AZGDf47nAmJ21j9uYGjz9DYnN/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pjpazH+X; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RInpwzCR"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-30034ad2ca3so8101691fa.1
-        for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 06:25:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pjpazH+X"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4368a290e0dso45685e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 16 Jan 2025 06:50:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737037521; x=1737642321; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CMm9oC8JLc9tH1UbysAyP6D76A9/5ushkDqcGo4ZtBI=;
-        b=RInpwzCRzcjuyZQegsTU6V++rRQY0gmTOANBsTKtjMrzWFnnBB/yFQO5cxjbEeMY8A
-         ualU11suls5ZHRLz5YJiVKtQritPG74On8t5KzNLAc+zQFl0teZwAHyk4R3aAgr9ZL6d
-         Gt97mMlQwwK2zmVr6iI8x//YDssS3RWfvPjXvmt16J1iOanc8BIj0mn6mIrv7PEt5XoL
-         2FVf0LrEuRL21tshSJEkCOpSjmeEaWrHqUpiVCoyg4M1pXpg5/xhmIy0ObSbB5hAU08z
-         DlHOATocw3IIXMfY8z5FpMUmCACXZ+2jGnmULLV9Go3451xz3TaSALQ20QzZSuKSL9gX
-         pxJQ==
+        d=google.com; s=20230601; t=1737039007; x=1737643807; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=th+KCDURk+54uiOu7vrQtTKV4wr7vJCxQzUoT2E5qpU=;
+        b=pjpazH+X68jQNoIyqascnXXmdcoYD4Wy3+xh9i5UJQNVS7qzkCLQPDpFqkywGArHAx
+         0shTvPc/Kr0p7dkZsJXztGZWo1opjGvpTlwArHZFmiyooym4eH4H9r3VbfXOrUCJGs0L
+         5Kq485zP5Zer2drCm0+D+1HVLu7g12FdP4+Od4qWEGkukYzvtPuSn3jLzEi4ESxNsxYg
+         3o+Pb1IQHxQm4Xfgv7m8kXcAyy20S18gI62RFQ4A3QfuPya5ADZ4RNRfzfeH5QEvubE3
+         bHTowtoB8vjrMtCWA3PrrrivYD2VK/DqFR0avJ7CKNx6MXEISEzHVofmemLIxJzF+bBe
+         oFog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737037521; x=1737642321;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CMm9oC8JLc9tH1UbysAyP6D76A9/5ushkDqcGo4ZtBI=;
-        b=eZ5ZwyqtF0pGXqi0WpWi1AvKw9wPJaV34t1VLxgR9GBTgLkFu7vo/aZhxQfHSypUmq
-         LlPMDDtOPprjw1KZ1YrvNuRkLuFfs3VUUvULf+z/MQGMcsOAFjjWir6UA7js6Ghex5tY
-         h1oiUahuBw/zdFalrIBakn3tD8Kpm10RT/agMTmloCwxmCaQDQBRfYUsJAo4zPukEY76
-         Wz6vxiW+1j3hWt6vySEHScGaYqzjhvsq3JFx57D6mk1ZRqq35+wEo+qZbz0jxoBiEEv0
-         XwHs8CXwOoq5xgUs6WvlcXZDynIo+gPCXcpBQ165+LdNdCyp1E/NNOJJmJqme9iWHYza
-         Ebnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtxHiLo3caZ4AXObM9QIDpn+TeLT4fjrUTuSn1W31qF9vH5Txpgd4oZBe33T9QyR2yVG7zX+8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyOh+qAacYqD6RpqfVEbOk+t4VyZxdUnxgRdlXL513nuW97hZ1m
-	JD3N2f0wotTK1Yxqb2FUhnMhCNKy54OBI2TCY8AXjIkY7o9JcSt4RJGnk0reVGcXy8jFUIoQ/Ik
-	/5y/v4TNpeuV/Es+TfxZs0zb2xf8=
-X-Gm-Gg: ASbGnct1gltEy6GaFW1TwC95sK9ZfB6WCDkaAMfVlhz2oW2IgUwYC6P1EBaU5BJyWg8
-	U+Qc2hmFf/WTvfLNxS7hGnNLLCAZjHWQIhILAtA==
-X-Google-Smtp-Source: AGHT+IEN3o/uKUe8sAJeF8y+RZ7VmfjTzka5mMUZSRGrctHFErqfQ8UZaQGq95WFGmwt8fYxKJIHiiG4zY8SoxFaik4=
-X-Received: by 2002:a05:651c:1545:b0:300:2524:84f2 with SMTP id
- 38308e7fff4ca-305f45324b0mr111390931fa.2.1737037520803; Thu, 16 Jan 2025
- 06:25:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737039007; x=1737643807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=th+KCDURk+54uiOu7vrQtTKV4wr7vJCxQzUoT2E5qpU=;
+        b=tdNC3UFYHGVCZr74dXYEp+/9ZpV5bwzqKcRWd2YXD9ys+NHESqUaaey8utr43mn8OK
+         4f+HIfrxd8Es5plgSbsGV5EJ8QAy/fheIQgRT8iF7GOnJ4sxKFxh/nbPcqZV04jxsk++
+         Eqk7GtNYYDz6xPHkZqB6tjeuy+4OuS0vl5qtpGJ0lTnR3r6FfPQKKML/jaSLbJ6PGREI
+         YmXSoxK9VNXy/hIXcRt/koQgB0E2oGrBYD/nVg/EZeAKxmg6J12HazVzlUCKfzk74TTb
+         cd0EDh5bU/UPpee+mYw+HPQuTEw5B0slo/f+z879wVLamzmeuqzGwU/rsEhX6U1/Vf7O
+         w7EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6A4MhOTVXr7OQ66uuyDbV3eGQTthV4vBYQ5Bo5zIqs+FWwB5iKYM2XFyNybgJwCfFgsQmrsc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwKrIJWkQsZLHDa0kSKzjIe8IodtnD714T+D70+wLQOWdUuqZNq
+	K/4ypc06boFOCBfB70VsCk/0KM9TNThzXE/6DAsM1IMwlwMu0Sz0h4oO3JZHIQ==
+X-Gm-Gg: ASbGnctQttNCq1ygngjYXxcRmGxr5RZhsrHlsIErrAfHc3iy2vWyMzEKNjxrZP2HqJN
+	UxNVEk8/HTc1eT3dW/A/hx4dBpNAmw7X8sQM6ZWUeFKo26zRYDpCHO/6NNlwzKqNM8mEXRI8L51
+	BOfDCljQm/tf/NMKWt5cMVuqSy55VA71zFGJ8Ma718EMGxsjXHjmLyhEM51SBiwMmg2jAsqUh1+
+	YL7CaqSEzoZtHor5LN6wN8HEsdp0o4jXzooBbqMyYt1Pz0u8DqBoF8ns65vU1R+JwUyl+5Nh+8i
+	sfBByibMM9xh2sTgLy6yLnWc
+X-Google-Smtp-Source: AGHT+IHbW5e6FcdINOIJSuAL5IxGPUZUYCUoVAOoYMejLluSZuDbScxH72g/lWhucPA8oug2f237Bw==
+X-Received: by 2002:a05:600c:693:b0:436:1811:a79c with SMTP id 5b1f17b1804b1-4388b98b77amr1013155e9.5.1737039006638;
+        Thu, 16 Jan 2025 06:50:06 -0800 (PST)
+Received: from google.com (47.246.140.34.bc.googleusercontent.com. [34.140.246.47])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438904625e5sm1453475e9.32.2025.01.16.06.50.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 06:50:05 -0800 (PST)
+Date: Thu, 16 Jan 2025 14:50:03 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
+	catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev, will@kernel.org, Aishwarya.TCV@arm.com
+Subject: Re: [PATCH] KVM: arm64: Fix the upper limit of the walker range
+Message-ID: <Z4kcmwzoRINgTtrO@google.com>
+References: <20250114145050.563658-2-sebastianene@google.com>
+ <14cce00c-29bd-4feb-b7d0-7aae6e948d1e@sirena.org.uk>
+ <8634hjvxi2.wl-maz@kernel.org>
+ <e79c78a7-24a3-42e6-a217-ec64f8320e91@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241213145809.2918-1-ubizjak@gmail.com> <86bjxfsdw0.wl-maz@kernel.org>
-In-Reply-To: <86bjxfsdw0.wl-maz@kernel.org>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Thu, 16 Jan 2025 15:25:09 +0100
-X-Gm-Features: AbW1kvYklpOf0q0rjC_Uwf-POYuajHKr5oRd1-oyGpfHb4KzOgc8ghKB3RkZwwE
-Message-ID: <CAFULd4Zf4=bh6X+xg+0i5jE8doyD_ffpaWOhsdHciVHRrQj+9A@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: timers: Fix percpu address space issues
- in kvm_timer_hyp_init()
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000063b351062bd390d3"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e79c78a7-24a3-42e6-a217-ec64f8320e91@arm.com>
 
---00000000000063b351062bd390d3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 16, 2025 at 01:49:54PM +0000, Suzuki K Poulose wrote:
 
-On Fri, Dec 13, 2024 at 6:15=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
+Hi,
+
+> On 16/01/2025 10:55, Marc Zyngier wrote:
+> > On Thu, 16 Jan 2025 01:16:40 +0000,
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > 
+> > > On Tue, Jan 14, 2025 at 02:50:51PM +0000, Sebastian Ene wrote:
+> > > 
+> > > > Prevent the walker from running into weeds when walking an
+> > > > entire address range.
+> > > 
+> > > The KVM page_fault_test selftest started failing in next-20250115 on
+> > > at least n1sdp and TX2 in VHE mode and a bisect seems to point to this
+> > > change.  The bisect only just finished, I've done no further
+> > > investigation.
+> > > 
+> > > When the test fails it generates backtraces like that below:
+> > 
+> > [...]
+> > 
+> > Thanks for the heads up.
+> > 
+> > Given how close we are to the merge window opening, I've dropped this
+> > patch from -next.
+> > 
+> > Seb: it looks this breaks a bunch of existing assumptions. Let's
+> > revisit this before -rc1, if possible.
+> In kvm_pgtable_walk() we set the walk_data.end to PAGE_ALIGNED(start +
+> size), where size is BIT(ia_size) and start = 0, for
+> kvm_pgtable_stage2_destroy().
+> 
+> And subtracting the limit in _kvm_pgtable_walk makes things go bad,
+>  returning -ERANGE.
+> Given the kvm_pgtable_walk() passes the "end" as the top address (not
+> including it), and is always PAGE_ALIGNED, we should probably leave things
+> as it is in the code.
 >
-> On Fri, 13 Dec 2024 14:57:52 +0000,
-> Uros Bizjak <ubizjak@gmail.com> wrote:
-> >
-> > Cast return value from kvm_get_running_vcpus() in the __percpu
-> > address space to the generic address space via uintptr_t [1]
-> > to fix a couple of:
-> >
-> > arch_timer.c:1395:66: warning: incorrect type in argument 2 (different =
-address spaces)
-> > arch_timer.c:1395:66:    expected void *vcpu_info
-> > arch_timer.c:1395:66:    got struct kvm_vcpu *[noderef] __percpu *
-> >
-> > sparse warnings.
-> >
-> > There were no changes in the resulting object files.
-> >
-> > [1] https://sparse.docs.kernel.org/en/latest/annotations.html#address-s=
-pace-name
-> >
-> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Cc: Zenghui Yu <yuzenghui@huawei.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/kvm/arch_timer.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 1215df590418..a13bb9e8dc19 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -1392,7 +1392,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
-> >
-> >       if (has_gic) {
-> >               err =3D irq_set_vcpu_affinity(host_vtimer_irq,
-> > -                                         kvm_get_running_vcpus());
-> > +                                         (void *)(uintptr_t)kvm_get_ru=
-nning_vcpus());
-> >               if (err) {
-> >                       kvm_err("kvm_arch_timer: error setting vcpu affin=
-ity\n");
-> >                       goto out_free_vtimer_irq;
-> > @@ -1416,7 +1416,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
-> >
-> >               if (has_gic) {
-> >                       err =3D irq_set_vcpu_affinity(host_ptimer_irq,
-> > -                                                 kvm_get_running_vcpus=
-());
-> > +                                                 (void *)(uintptr_t)kv=
-m_get_running_vcpus());
-> >                       if (err) {
-> >                               kvm_err("kvm_arch_timer: error setting vc=
-pu affinity\n");
-> >                               goto out_free_ptimer_irq;
->
-> I think the fix is worse than the current code, because there is no
-> real semantics behind the pointer being passed to
-> irq_set_vcpu_affinity(). All that is required is that it is a non-NULL
-> pointer.
 
-If this is the case, we can just remove dependence on the pointer in
-the called function.
+Thanks for looking into this.
+I have a fix but it is too much of a surgery so we decided not to send
+it and instead go with the removal of my change. 
 
-Something like in the attached patch.
+> 
+> Cheers
+> Suzuki
+> 
+> 
+> > 
+> > Thanks,
+> > 
+> > 	M.
+> > 
+>
 
-Uros.
-
-> I expect the following hack to work just as well and not suffer from
-> any sparse indigestion. Untested though.
->
->         M.
->
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 1215df5904185..8058d92048fb4 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1391,8 +1391,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
->         }
->
->         if (has_gic) {
-> -               err =3D irq_set_vcpu_affinity(host_vtimer_irq,
-> -                                           kvm_get_running_vcpus());
-> +               err =3D irq_set_vcpu_affinity(host_vtimer_irq, info);
->                 if (err) {
->                         kvm_err("kvm_arch_timer: error setting vcpu affin=
-ity\n");
->                         goto out_free_vtimer_irq;
-> @@ -1415,8 +1414,7 @@ int __init kvm_timer_hyp_init(bool has_gic)
->                 }
->
->                 if (has_gic) {
-> -                       err =3D irq_set_vcpu_affinity(host_ptimer_irq,
-> -                                                   kvm_get_running_vcpus=
-());
-> +                       err =3D irq_set_vcpu_affinity(host_ptimer_irq, in=
-fo);
->                         if (err) {
->                                 kvm_err("kvm_arch_timer: error setting vc=
-pu affinity\n");
->                                 goto out_free_ptimer_irq;
->
-> --
-> Without deviation from the norm, progress is not possible.
-
---00000000000063b351062bd390d3
-Content-Type: text/plain; charset="US-ASCII"; name="arch_timer.diff.txt"
-Content-Disposition: attachment; filename="arch_timer.diff.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m5zf9nx60>
-X-Attachment-Id: f_m5zf9nx60
-
-ZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2FyY2hfdGltZXIuYyBiL2FyY2gvYXJtNjQva3Zt
-L2FyY2hfdGltZXIuYwppbmRleCAxMjE1ZGY1OTA0MTguLjEwYzI5M2MyZDJmNSAxMDA2NDQKLS0t
-IGEvYXJjaC9hcm02NC9rdm0vYXJjaF90aW1lci5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL2FyY2hf
-dGltZXIuYwpAQCAtMTIzOCwxMiArMTIzOCwxMCBAQCB2b2lkIGt2bV9hcm1fdGltZXJfd3JpdGVf
-c3lzcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAl9CiB9CiAKLXN0YXRpYyBpbnQgdGltZXJf
-aXJxX3NldF92Y3B1X2FmZmluaXR5KHN0cnVjdCBpcnFfZGF0YSAqZCwgdm9pZCAqdmNwdSkKK3N0
-YXRpYyBpbnQgdGltZXJfaXJxX3NldF92Y3B1X2FmZmluaXR5KHN0cnVjdCBpcnFfZGF0YSAqZCwK
-KwkJCQkgICAgICAgdm9pZCBfX2Fsd2F5c191bnVzZWQgKnZjcHUpCiB7Ci0JaWYgKHZjcHUpCi0J
-CWlycWRfc2V0X2ZvcndhcmRlZF90b192Y3B1KGQpOwotCWVsc2UKLQkJaXJxZF9jbHJfZm9yd2Fy
-ZGVkX3RvX3ZjcHUoZCk7CisJaXJxZF9zZXRfZm9yd2FyZGVkX3RvX3ZjcHUoZCk7CiAKIAlyZXR1
-cm4gMDsKIH0KQEAgLTEzOTEsOCArMTM4OSw3IEBAIGludCBfX2luaXQga3ZtX3RpbWVyX2h5cF9p
-bml0KGJvb2wgaGFzX2dpYykKIAl9CiAKIAlpZiAoaGFzX2dpYykgewotCQllcnIgPSBpcnFfc2V0
-X3ZjcHVfYWZmaW5pdHkoaG9zdF92dGltZXJfaXJxLAotCQkJCQkgICAga3ZtX2dldF9ydW5uaW5n
-X3ZjcHVzKCkpOworCQllcnIgPSBpcnFfc2V0X3ZjcHVfYWZmaW5pdHkoaG9zdF92dGltZXJfaXJx
-LCBOVUxMKTsKIAkJaWYgKGVycikgewogCQkJa3ZtX2Vycigia3ZtX2FyY2hfdGltZXI6IGVycm9y
-IHNldHRpbmcgdmNwdSBhZmZpbml0eVxuIik7CiAJCQlnb3RvIG91dF9mcmVlX3Z0aW1lcl9pcnE7
-CkBAIC0xNDE1LDggKzE0MTIsNyBAQCBpbnQgX19pbml0IGt2bV90aW1lcl9oeXBfaW5pdChib29s
-IGhhc19naWMpCiAJCX0KIAogCQlpZiAoaGFzX2dpYykgewotCQkJZXJyID0gaXJxX3NldF92Y3B1
-X2FmZmluaXR5KGhvc3RfcHRpbWVyX2lycSwKLQkJCQkJCSAgICBrdm1fZ2V0X3J1bm5pbmdfdmNw
-dXMoKSk7CisJCQllcnIgPSBpcnFfc2V0X3ZjcHVfYWZmaW5pdHkoaG9zdF9wdGltZXJfaXJxLCBO
-VUxMKTsKIAkJCWlmIChlcnIpIHsKIAkJCQlrdm1fZXJyKCJrdm1fYXJjaF90aW1lcjogZXJyb3Ig
-c2V0dGluZyB2Y3B1IGFmZmluaXR5XG4iKTsKIAkJCQlnb3RvIG91dF9mcmVlX3B0aW1lcl9pcnE7
-Cg==
---00000000000063b351062bd390d3--
+Thanks,
+Sebastian
