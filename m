@@ -1,127 +1,195 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7AA18B463;
-	Fri, 17 Jan 2025 15:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85A719DF62
+	for <kvmarm@lists.linux.dev>; Fri, 17 Jan 2025 16:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737127148; cv=none; b=YUTgOFGs2Zv5MfT+sBUy2y1Grij9DKgHE53EIrfEWlS/ZZJExxg8YIpcJw1J82jqRfEeTUgKUFTg9VBG2bEsS17u8qB9KxkZh80+ylwCws6nW2kkBdzBZzI5DqeE/Pc3/mdtcFkGWX5YRgdOzA8xFAVH/n1aR8KJAjFvNwxVv6o=
+	t=1737133122; cv=none; b=Jdx7ZFx1QGqf3yhloKw0eNBe0lRweflNJIVNLxat7/vzz1x9J/ts5D1DLAt2IEdcnLTSrbswFSjkrJ2330kk4z9LYTJuinW9I286gvTwmkRSEr2f/rowaJ4uJkDOY4C3NkWFvSiMTroFtqgTqo+jAe/EwJaNoy2il7SObVzCXow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737127148; c=relaxed/simple;
-	bh=7AOxCMuccgymNntQbj/et0ikbZnJWyXKUNvh4MpAzXs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f8M+NsuC83WnuhDZfLKmSAnlzY6sXUAz/OtlxBhtsKWooJs/QXMNZg9EVntP/gnfIXKAZYmDky7DpPmeoc83Go19n3WhnaPnmrhtmUQ/DCW6JFTP3ZrXQsLtYAgfhNaStOlXGg178p4VXDCRY652Ek2bpBaAbsRwAM+BI7NWCSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PrbVfVri; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737133122; c=relaxed/simple;
+	bh=d9CMVfu77Lbl09HlLX1NxNointIgaEnL5WdIO6frQtQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jVG/5r6w4FtCO+ki6/sW6NU6eikZm3yphZCyTCJxQiauhSpyCsPYdi6qIVai/IouE/vADFUlzG1Py/9/IZDe3xsVhopzaepcxk31yt+on2HLj/F4pwRK4DYuvfQ6vizX4U5yumJFjkfYnLbVSnS72+4/S+FFdNAvsk0LMHVat5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tg5Lo23H; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PrbVfVri"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B979C4CEDD;
-	Fri, 17 Jan 2025 15:19:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737127147;
-	bh=7AOxCMuccgymNntQbj/et0ikbZnJWyXKUNvh4MpAzXs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PrbVfVri3RKrgzY464O7T1XWwlE8GZGBCAUfU0JRBmdgeKCpLpwfZL2VQcT0yd74w
-	 RFB+mmtRKK6EkME5FgMT1VP/IR/YH8mJqvA6ZcAaM9swgSUecTay/8uy2OmAGTcW6H
-	 x6bUblZbKVWcGelutGq2WhasMb/NpT3kmiGyU3EbIU8UA6ivUOoII52fka3J6vkNlv
-	 0BOzCsz0vjpjjZb3SzOBtXAlsR8NX6W8/Pv9kdHnkqzwrVEXYNyFy2sfwwfjb8SK5b
-	 6rqE0CsWytuXy9sMzCdEPRhHP3K/Twqn+H09PDUx4VDX0ldNnYKV57h2IRtZInHgfx
-	 I7VQFXzY8sADA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tYo7k-00D9zb-Ku;
-	Fri, 17 Jan 2025 15:19:04 +0000
-Date: Fri, 17 Jan 2025 15:19:03 +0000
-Message-ID: <86wmetv57c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Eric Auger <eauger@redhat.com>
-Subject: Re: [PATCH v2 09/12] KVM: arm64: nv: Propagate CNTHCTL_EL2.EL1NV{P,V}CT bits
-In-Reply-To: <qbmqsm3llnpy2t4ig3uyggkapwlbox2wnfu52gksbhcq4vfpqx@dz5bbn3asn5s>
-References: <20241217142321.763801-1-maz@kernel.org>
-	<20241217142321.763801-10-maz@kernel.org>
-	<qbmqsm3llnpy2t4ig3uyggkapwlbox2wnfu52gksbhcq4vfpqx@dz5bbn3asn5s>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tg5Lo23H"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737133119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=3RDMY+65UFDdSOlQmyBvvEbMu1oS+daUhpKHh3ifXvQ=;
+	b=Tg5Lo23HMG19grR//GkZvTzNFp//YN1xyAEwqlBTW4Af/5XB1MPQrhF97QSTNf21EMHs2K
+	V5Cy8KrG5SWGJo+tHj1rm+HKY/fWQ2F0HlT+6vEAK0xYKoMXNjW/ui52aQkJv4pgXzfEgW
+	gB68igF2o2gckagWfg8xzqPNpbCDsxA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-694-dqq2K245Mrup-CRP0BXk_A-1; Fri, 17 Jan 2025 11:58:38 -0500
+X-MC-Unique: dqq2K245Mrup-CRP0BXk_A-1
+X-Mimecast-MFC-AGG-ID: dqq2K245Mrup-CRP0BXk_A
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-436225d4389so15673265e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 17 Jan 2025 08:58:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737133117; x=1737737917;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3RDMY+65UFDdSOlQmyBvvEbMu1oS+daUhpKHh3ifXvQ=;
+        b=c8qxPoS3Xre0V5lQnM+Ct1Wt84NbZXBULH5BxiSlCGAFwdHdupr0kMOWO7hoTUOhxK
+         Kc7dTiq6L6VvwIBywXG3E1HSVxcEZSMBPy17Xo7hg4VGmkaxwtqWrA/OTUZzM8Qejlh9
+         LKoLsbLGJ8q8PTFXaS5Jxm7cvQX94edp45pMW5jXIzuD+B5oLx7pLGSeYzmpagQi7q/r
+         hGQ2nMfq7//bp3hsPmw9PtGV46/AdL8WawKfO6oCWGrUAsuLAHZaR+l3wGkyFa2jjOPv
+         GecfkyKW3OpAYa7+hATskBSWDedPONmOEF9HeKNOW2BKvaizg+KHSVzEawrSU6Emp8Qy
+         2DkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkHbqbV93fksPXW6QpLIk55EzhZVloxWa057IKphLeDXN8qhMDkuwU8VzeRHz3u0HJ5Apley8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwP2+2EJCZz3rfCaJXrxM4SAYurypcA60Y2QuUkT7jU0ztXAAqx
+	W1TffAnnyNpoGWvV3JjRR/5Xtn1hwVryTBHBowouhgcgqXPDfApMwfp0RikFf1iYpsK1GA4kWG5
+	v26IUoH8FTcgoC+UEsDt2JxuOow60QC3R4oGP9Rqvk5a2pXM7+aqbYQ==
+X-Gm-Gg: ASbGncsk3uMqtgMNl7ol6p4sVZMH/7KFluKGy5O7ZNsk80yviQI40bNn5lWqSpYf1Lb
+	KCGN9dIdXOSFQfzLZGWHkZrZvwMpiFRFUnEel4ht7HZkRIoQqbImS0gqj32uMd8lZCgAgeztUGq
+	8RglHAf3UzjYQ6Y7aYDnLVL9LJVEt+GBidHDtuV/TSRjffYxE9Px09sR+JGnZY9U44yMGh3RETg
+	3/wJEjyrVqaASy0peZ4+L7IprVRvVxj6l2PfehUo62QQPmTCJQ2Y5I=
+X-Received: by 2002:a05:600c:35cf:b0:434:f1bd:1e40 with SMTP id 5b1f17b1804b1-438918c6162mr28854225e9.6.1737133116883;
+        Fri, 17 Jan 2025 08:58:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEYIoDtomSYmqLa26VwMFEEd3Bi1NL5xFaYrY1IZ5nECd1ybECqHqqQatedShGbF3GKsjZvQw==
+X-Received: by 2002:a05:600c:35cf:b0:434:f1bd:1e40 with SMTP id 5b1f17b1804b1-438918c6162mr28853815e9.6.1737133116326;
+        Fri, 17 Jan 2025 08:58:36 -0800 (PST)
+Received: from [10.10.13.81] ([45.156.240.116])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890417a76sm38554555e9.16.2025.01.17.08.58.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 08:58:35 -0800 (PST)
+Message-ID: <23fa05f8-ea30-4261-91d8-b34fc678c4de@redhat.com>
+Date: Fri, 17 Jan 2025 17:58:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+To: Jason Gunthorpe <jgg@nvidia.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+ "shahuang@redhat.com" <shahuang@redhat.com>,
+ "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+ Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+ Alistair Popple <apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>,
+ Dan Williams <danw@nvidia.com>, Zhi Wang <zhiw@nvidia.com>,
+ Matt Ochs <mochs@nvidia.com>, Uday Dhoke <udhoke@nvidia.com>,
+ Dheeraj Nigam <dnigam@nvidia.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "sebastianene@google.com" <sebastianene@google.com>,
+ "coltonlewis@google.com" <coltonlewis@google.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "ardb@kernel.org"
+ <ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "gshan@redhat.com" <gshan@redhat.com>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+References: <a2d95399-62ad-46d3-9e48-6fa90fd2c2f3@redhat.com>
+ <20250106165159.GJ5556@nvidia.com>
+ <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
+ <SA1PR12MB7199E3C81FDC017820773DE0B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <20250113162749.GN5556@nvidia.com>
+ <0743193c-80a0-4ef8-9cd7-cb732f3761ab@redhat.com>
+ <20250114133145.GA5556@nvidia.com>
+ <SA1PR12MB71998E1E70F3A03D5E30DE40B0182@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <20250115143213.GQ5556@nvidia.com> <Z4mIIA5UuFcHNUwL@arm.com>
+ <20250117140050.GC5556@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250117140050.GC5556@nvidia.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: vrf39-vP3fNZfGlH7DLNB9LE1KuPQmeHR4F0u4yitdY_1737133117
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 06 Jan 2025 02:33:39 +0000,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+
+>> I don't see how VM_PFNMAP alone can tell us anything about the
+>> access properties supported by a device address range. Either way,
+>> it's the driver setting vm_page_prot or some VM_* flag. KVM has no
+>> clue, it's just a memory slot.
 > 
-> Hi Marc and other KVM ARM developers,
-> 
-> I have a question while learning about NV and reading the code:
-> 
-> On Tue, Dec 17, 2024 at 02:23:17PM +0000, Marc Zyngier wrote:
-> > Allow a guest hypervisor to trap accesses to CNT{P,V}CT_EL02 by
-> > propagating these trap bits to the host trap configuration.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/arch_timer.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 6f04f31c0a7f2..e5951e6eaf236 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -824,6 +824,10 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
-> >  	 * Apply the enable bits that the guest hypervisor has requested for
-> >  	 * its own guest. We can only add traps that wouldn't have been set
-> >  	 * above.
-> > +	 * Implementation choices: we do not support NV when E2H=0 in the
-> > +	 * guest, and we don't support configuration where E2H is writable
-> > +	 * by the guest (either FEAT_VHE or FEAT_E2H0 is implemented, but
-> > +	 * not both). This simplifies the handling of the EL1NV* bits.
-> 
-> Previously I was not aware that KVM ARM has these constraints on guest's
-> view of NV and E2H, so I appreciate this comment very much. However,
-> after digging through the code I could not find anywhere where these
-> constraints are enforced, for example initially I thought I would find
-> ID_AA64MMFR2_EL1_NV being zeroed in limit_nv_id_regs(), or HCR_NV added
-> to the res0 mask of HCR_EL2, base on whether FEAT_VHE or FEAT_E2H0 is
-> available to the guest. But seems like in these places the code applies
-> constraints looking at the host's capabilities, not the guest's.
-> Do you mind providing some pointers for me to investigate the code mode?
+> I think David's point about VM_PFNMAP was to avoid some of the
+> pfn_valid() logic. If we get VM_PFNMAP we just assume it is non-struct
+> page and follow the VMA's pgprot.
 
-Where have you looked?
+Exactly what I meant.
 
-These constraints are enforced in the kvm-arm64/nv-e2h-select
-branch[1], which is pulled in the kvm-arm64/nv-next branch[2].
+If we only expect DEVICE stuff in VM_PFNMAP, then we can limit all the 
+weirdness (and figuring out what todo using pgprot etc) to exactly that.
 
-The NV support is split in discrete series in order to make things
-easier to review, but you need to have seen them all to somehow
-connect the dots.
-
-HTH,
-
-	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-e2h-select
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
+VM_IO without VM_PFNMAP might be interesting; not sure if we even want 
+to support that here.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+
+David / dhildenb
+
