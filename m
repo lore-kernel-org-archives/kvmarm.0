@@ -1,168 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E2D54765
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 16:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529851EB9F4
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 16:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737389640; cv=none; b=ksy1+3GHNykPgFyfTjxbybWEs3goYS0XN/ecu3ZZjHMMFm9cxkGmZkPOGJgpBVYK/8XWEMTvOLzvBFl4jmYDAdMkqDq2nQf7I23ibOgGTTgseAISvZN8XJXC7sgD5beRnmyge98HJSoPbv9VTKcHQqQQH/pqa8Vr+WTVDkC2lkw=
+	t=1737389918; cv=none; b=g/cKQxHJHNgbASMMwB6//eliqZNo7Ie/iqHjp0ZLSxQ8kHs6xwMdcyrqFld39IeZiypbFWb5k1YvLPZ4d52w97wWyfAwJBLkjbLHiirBrkwWAfzI8khWuJ+IVMfUsHLB12AOCYl/m4aYG4SvLMMP53rAGV2sTgdcT1Dx+pqxiwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737389640; c=relaxed/simple;
-	bh=dicmTpGKvGRXydkJyA8oNSHXAQRDfmL3ALzcwM2h/WQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jKseAUraBEsdLe+W9qNGzAEi/JpXPAvfGETyLoxWa9RHPrgPbNO5vPtvZMl7wwIgHimbz9qm6PhEbLxgoj/cQUUIXqHNphDODAWyiumOy15NS5fB/GCgCythjK5CLCYxMKBaF7mkDR4GlzusxtSUQ6775Ur80ZCLmWkPx4ZhSWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqP7OfGM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqP7OfGM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F21DCC4CEDD;
-	Mon, 20 Jan 2025 16:13:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737389640;
-	bh=dicmTpGKvGRXydkJyA8oNSHXAQRDfmL3ALzcwM2h/WQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oqP7OfGMqMzURcSeBNIVeKnwIDMUVULDAJQ1n9MWo51RuG9UD3xAmRGubWaVePZhQ
-	 MXnOTQ9UatSTr7S9tBTOtsHBmVYX/t9p2g6WZLmQvy93Xl1RDJbWnXxnAoDRNBx7Wm
-	 bK3UmlyaE0SzKjYtpE0ZylFlVsxuPzMaAyM4C5PnXXTnkqDUvyE+Tn37f0DDhwFn76
-	 xbebHmZUotdfSsARzX/sKDBDFpr/MGX/VHuWoIzIHIIKMxJlcPzO0g4twa0IwPcIzQ
-	 KHHh02P1yg4/wXrK5hpKmArOfXi3UpF8fyeSN5QSRZVwj54qGQSdPj5WX7az4R08jP
-	 8WdEgtW2VNmxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tZuPV-00DofX-10;
-	Mon, 20 Jan 2025 16:13:57 +0000
-Date: Mon, 20 Jan 2025 16:13:56 +0000
-Message-ID: <86sepdv4xn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Lokesh Vutla <lokeshvutla@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1737389918; c=relaxed/simple;
+	bh=z+vQqh7pwTAsF9RkwsAn/t9oMzJjPX+0U290heMAJu4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hG4ZcRw1DGWxMIlP9YnN21Xp72iEqrfs3i2sm59onsoK5tCTjssj+VQCJlsLEp1FY60sAElLXZofDU5Ppf5t9fUUiv0qwQBGN3qWwYjsZx3dDsQSDKwuTdmdOiYEPIZAzUWoXWJNe7bekKvAQarpw1OATEX6jR6nthTO2qvpE6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DE021688;
+	Mon, 20 Jan 2025 08:19:03 -0800 (PST)
+Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C4D383F5A1;
+	Mon, 20 Jan 2025 08:18:33 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: will@kernel.org,
+	julien.thierry.kdev@gmail.com
+Cc: apatel@ventanamicro.com,
+	andrew.jones@linux.dev,
+	andre.przywara@arm.com,
 	kvmarm@lists.linux.dev,
-	sachinparekh@google.com
-Subject: Re: [PATCH] KVM: arm64: Flush hyp bss section after initialization of variables in bss
-In-Reply-To: <20250120151514.1769597-1-lokeshvutla@google.com>
-References: <20250120151514.1769597-1-lokeshvutla@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Subject: [PATCH kvmtool v1 2/2] Do not a print a warning on failing host<->guest address translation
+Date: Mon, 20 Jan 2025 16:18:00 +0000
+Message-ID: <20250120161800.30270-3-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250120161800.30270-1-alexandru.elisei@arm.com>
+References: <20250120161800.30270-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: lokeshvutla@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, sachinparekh@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 20 Jan 2025 15:15:14 +0000,
-Lokesh Vutla <lokeshvutla@google.com> wrote:
-> 
-> To determine CPU features during initialization, the NVHE hypervisor
+guest_flat_to_host() and host_to_guest_flat return NULL, respectively 0,
+when the address is not found in the existing memslots. It is expected that
+the calling code will handle this error.
 
-s/NVHE/nVHE/
+However, both functions also print an error message containing the
+offending address. This can be redundant, if the calling code also prints
+the address, or even misleading, if the calling code can gracefully handle
+the failure, like is the case in kvm__dump_mem().
 
-> utilizes sanitized values of the host's CPU features registers. These
-> values, stored in u64 idaa64*_el1_sys_val variables are updated by the
-> kvm_hyp_init_symbols() function at EL1. To ensure EL2 visibility, the
+Change the warning to a debug, since knowing the address might still be
+useful for those call sites where the address isn't printed, or if the
+error isn't handled at all.
 
-visibility *with the MMU off*
+Before, when running the PMU test from kvm-unit-tests using the test
+runner, which redirects stdout (where kvm__dump_mem() writes) and stderr
+(where pr_warning() writes):
 
-> data cache needs to be flushed after these updates. However,
-> individually flushing each variable using kvm_flush_dcache_to_poc() is
-> inefficient.
-> 
-> These cpu feature variables would be part of the bss section of
-> the hypervisor. Hence, flush the entire bss section of hypervisor
-> once the initialization is complete.
-> 
-> Motivation for this change:
-> * Since the existing variables are not flushed from EL1, the
->   id_aa64pfr0_el1_sys_val is seen as 0 from EL2.
-> * based on this value check_override macro in hypervisor skips
->   updating the sve (cpacr_el1) at finalise_el2_state.
-> * The default value for cpacr_el1 enables the sve traps to EL2.
-> * With sve enabled, during the context switch from EL0 -> EL1 (which is
->   much later in the boot process), the sve registers are saved/restored.
-> * Since sve traps are enabled, accessing sve registers at EL1 caused a
->   trap to EL2.
-> * However, hypervisor is not ready to handle sve traps at this stage
->   causing the below kernel crash during the boot:
+  Error: KVM exit reason: 9 ("KVM_EXIT_FAIL_ENTRY")
+  Warning: unable to translate guest address 0x0 to host
 
-Drop this section, it doesn't bring much to the discussion.
+ Registers:
 
-> 
-> [    0.320850][    T1] Run /init as init process
-> [    0.321392][    T1] kvm [1]: nVHE hyp BUG at: [<ffffffc08112ee8c>] __kvm_nvhe_$x.24+0x254/0x254!
-> [    0.321522][    T1] kvm [1]: Cannot dump pKVM nVHE stacktrace: !CONFIG_PROTECTED_NVHE_STACKTRACE
-> [    0.321635][    T1] kvm [1]: Hyp Offset: 0xffffff6e60000000
-> [    0.321710][    T1] Kernel panic - not syncing: HYP panic:
-> [    0.321710][    T1] PS:634023c9 PC:000000522112ee8c ESR:00000000f2000800
-> [    0.321710][    T1] FAR:0000000000000000 CPACR:0000000000310000 PAR:0000000000000800
-> [    0.321710][    T1] VCPU:0000000000000000
-> [...]
-> [    0.322251][    T1] Call trace:
-> [    0.322292][    T1]  dump_backtrace+0x100/0x180
-> [    0.322355][    T1]  show_stack+0x20/0x30
-> [    0.322410][    T1]  dump_stack_lvl+0x40/0x88
-> [    0.322471][    T1]  dump_stack+0x18/0x24
-> [    0.322523][    T1]  panic+0x13c/0x364
-> [    0.322578][    T1]  nvhe_hyp_panic_handler+0x148/0x1cc
-> [    0.322646][    T1]  do_sve_acc+0xec/0x260
-> [    0.322706][    T1]  el0_sve_acc+0x34/0x68
+<snip>
 
-This is essentially content-free, given that there is no
-backtrace. Please drop this.
+*lr:
+ 0x00000000: <unknown>
+ 0x00000008: <unknown>
+ 0x00000010: <unknown>
+ 0x00000018: <unknown>
 
->
-> Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
-> Suggested-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Lokesh Vutla <lokeshvutla@google.com>
-> ---
->  arch/arm64/kvm/arm.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a102c3aebdbc..5d3b2069a2d5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2661,6 +2661,12 @@ static int __init init_hyp_mode(void)
->  		}
->  	}
->  
-> +	/*
-> +	 * Flush entire BSS since part of its data is read while the MMU is off.
-> +	 */
-> +	kvm_flush_dcache_to_poc(kvm_ksym_ref(__hyp_bss_start),
-> +				kvm_ksym_ref(__hyp_bss_end) - kvm_ksym_ref(__hyp_bss_start));
-> +
->  	return 0;
->  
->  out_err:
+The error is caused by the VCPU migrating to a physical CPU with a
+different PMU. In the example, the warning not only is unnecessary, but is
+quite a distance away from the offending address and can confuse the person
+looking at the code, like it happened to the patch author.
 
-I don't understand how this fixes anything. At this stage, the
-hypervisor has already been initialised, and I expect it will have
-evaluated the wrong values.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Even worse, I strongly suspect that by the time you perform this, S2
-is enabled on the host, and that the BSS is off-limit. Which means it
-could fault and send you to lalaland.
-
-Have you actually tested this with upstream?
-
-I would have expected the clean operations to be called from
-kvm_hyp_init_symbols(), which runs before EL2 gets initialised in
-protected mode.
-
-	M.
-
+diff --git a/kvm.c b/kvm.c
+index 42b881217df6..07089cf1b332 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -354,7 +354,7 @@ void *guest_flat_to_host(struct kvm *kvm, u64 offset)
+ 			return bank->host_addr + (offset - bank_start);
+ 	}
+ 
+-	pr_warning("unable to translate guest address 0x%llx to host",
++	pr_debug("unable to translate guest address 0x%llx to host",
+ 			(unsigned long long)offset);
+ 	return NULL;
+ }
+@@ -371,7 +371,7 @@ u64 host_to_guest_flat(struct kvm *kvm, void *ptr)
+ 			return bank->guest_phys_addr + (ptr - bank_start);
+ 	}
+ 
+-	pr_warning("unable to translate host address %p to guest", ptr);
++	pr_debug("unable to translate host address %p to guest", ptr);
+ 	return 0;
+ }
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.34.1
+
