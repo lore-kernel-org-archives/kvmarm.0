@@ -1,105 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AFF1BE87B
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jan 2025 22:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529841C5F25
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 12:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737151690; cv=none; b=Ktai30nEq/qigs0IWw1w5kDArOLHVreUCRdSkg15X6+ZJMbLVxqHvoNm0dIunArTj8g33HDMOaLzHb70091n3P07+8uSDaAcj7F3vP8TppXbGorYhqq+KK13bo71wkFhQqfafPUK6PWNl9igcDecy1ygow6tPILwj5E0DFsXo9c=
+	t=1737374538; cv=none; b=akTNVbD3rSxoFWpnNRRUT6mZdGil1Yt2GEmjnMKOKp4hu1YWX0nWxq/Rp0iILG9ADt0nDGLwiBMh3PYR4xKam2zJfxWpbvlUOHaSQC/endlYS1BKrr+7JpJ+MYtvNB8ave9iyrGGdXd667hFfZ+3WMxO49ph56pTaf9B8mmsN/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737151690; c=relaxed/simple;
-	bh=6eMskAXrsKj+yPhrh5gsUKk0GeOs6CV2lDoAzrqp+eY=;
+	s=arc-20240116; t=1737374538; c=relaxed/simple;
+	bh=avDRX6riECMKR7igsGJkj8U4YigXns77GHJ18tfHbU4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tDZ08AwBmH+HVV8SNJcbngY2tEjj02HaCjOuZ3b1GrT0kqGLre7uVgTnbt+VuuUYOvwvhN2+01+B7GmHZuO3onYtXS1S3Fi2bDuESBn7HN8Ydg+SNbtK73bvMPV8P6dgswJraapFoGY2AMyoZGOGZ19zyCn7YeXv9zFt9TMPQb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8l/Kqq4; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=LhRQvW4rCeqpzmoIqWi28y4Gq3awuweWjgwv3P9/Qh9pkFUN5X7Cpx5xifmTx4wC7Bs/VgJvGRZ7ZCwi9t2d0t84okn4xvWu39+mzo6TWNw5b3qVf0Nbeq009JgNdO7GbmzIXB0e7YrE6CXs94qQYdAGEgd7iWYH9HSvv8qpQA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fu/8ZEZY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8l/Kqq4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C02BC4CEE5
-	for <kvmarm@lists.linux.dev>; Fri, 17 Jan 2025 22:08:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737151690;
-	bh=6eMskAXrsKj+yPhrh5gsUKk0GeOs6CV2lDoAzrqp+eY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=N8l/Kqq4V9SaA8CdBa8HP/4dyleSc4jRLHY3fUjNNqrDC49X/8nR9ba78yxKm50IE
-	 2YAYZvWnjmBQMedzs2D+N2qO6dU/4ZN2mymr36Tq2zXCASZlR8/Y5a2rMV47fZTF5W
-	 A9RVRJgy8Z+h2pYIt0Vvn/gdcVUn4L1kpG8odH298sEC5lB1TLJ+6mNUVhPif2xJam
-	 3QorP8g1IWh9kh1D0S04nU99sSjlJFiZGN3Nl8p2Ott05e0L8qcg0ia1Shvk3MA++V
-	 Hezt16+AhWEcSveUT59qU/5t34dRsrqF33ZP22yU6/X+JnPiqfylInUjEQCIitpWNX
-	 IEX16esO2G8aQ==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5401bd6cdb4so2693048e87.2
-        for <kvmarm@lists.linux.dev>; Fri, 17 Jan 2025 14:08:10 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU5+cxKOBwL82N3HrI2gKuTfLQ3vrisnmjXWJut628KUZ+FTdY2fuJDJ8qf0dnX9wNtLyG8DzM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzdscpzoFT4GTaLl6B4+Fnf+bJNiTX/Uu8rqIgvr+8/MgOe2twa
-	qiJmW0J3RHT2Kef8G4iZJ5Zf7R+/aX+eeQNDilhvU+4ljS88FFFa1YmrOu1ORTvW+IBpKZ/p6wM
-	IjJSstZvL42AaGv4EPcvUjUUIUw==
-X-Google-Smtp-Source: AGHT+IEgpKi5iU2Ry8bgcFk3ypohPNuQOcWdD3eLZQ0Yrk230Xh+rHDMCHRK1H7BAsvHETXiMfMqJ+pcY/x3PQ0wC54=
-X-Received: by 2002:a05:6512:12ca:b0:540:1fec:f321 with SMTP id
- 2adb3069b0e04-5439c285412mr1386422e87.41.1737151688439; Fri, 17 Jan 2025
- 14:08:08 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fu/8ZEZY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737374536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fexiX3t4iLg5WJeHYZBOyI9XPTWA4aqxc31q4mlujto=;
+	b=Fu/8ZEZY02chzvE5Sxz1oUlADv5LPUExgcAP2CZV49scxgVmM0K7eXdhlMx8xpKgWRqv0n
+	6CumzXjV7O/1Q+LV6Sf7SXbBmYo0tPl585Xnc3dC/nl3OJioav9hpBM16vDI2a4Z/E38v3
+	cXg+ZtDgD05L2uXiGq054bNO4qI9FBw=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-552-3s8CBYtWMgC-PqjI18z9SQ-1; Mon, 20 Jan 2025 07:02:15 -0500
+X-MC-Unique: 3s8CBYtWMgC-PqjI18z9SQ-1
+X-Mimecast-MFC-AGG-ID: 3s8CBYtWMgC-PqjI18z9SQ
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so8400803a91.2
+        for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 04:02:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737374534; x=1737979334;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fexiX3t4iLg5WJeHYZBOyI9XPTWA4aqxc31q4mlujto=;
+        b=gLTLaD26EyBaoV4hOQjN/vX8S6UZZWUDLxGPs7MDn5ZU3PGjfDEfSd2zwwe/ZygjV0
+         GeMvt8Pp1EnghGI5Ibe/G3aYhWuopxgEfwmGTl7OZmPODx+WVq7Atxut0OEgabqpxrUJ
+         CclhVklows8Iryad0+21lbnKiBeIx2QS5EUOQBrAornyakutmQpDwbEqkf1AxFv//hwq
+         ylxmDy1/fpX1W227AYZdjSqCSHrLvCv8Os94RG+Yk09+6qSC29lNm9WnL+IQry+5Dqnw
+         rDEOvuRmA+EWDumjXUkEGHaxWVOQbuwYMwhsOo8M5ZiZYukA2FNgYlpxpj3M0tc0kAxi
+         EaXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZBQOCXHsr42gcAqvW72TpaY6tosVmHI5Yja7BOHhYnI2JA0AkVwjWHwnXL0mnUcMDeAVJ9BQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxI1p5LqTh94jtFDMY0uj7/SiKVb98qfh6zjkRxGSD29exoRwJO
+	/S2j1Q5UkSoYzRTv9wndtILHU6blJ5VsFfdcSRuETmFnLAwG42EALb2gpAkTr/wglThIe7zNmnj
+	KYUP3HSJLLkcvPaOCFBQyBf4ITrWF0cOW1geweFJ73rEPZAfg/uGArKBgcNROZYo+XDc1Zip1fH
+	1rD8jhGeE67p9TsWc09BcsyEbd9Gxl
+X-Gm-Gg: ASbGncsWyGMHsJ/FuMH8zMeTJucm5SQwlKwmA1zFvYNNCFm2H2BJwi5oicvADx+Tosq
+	6SyO3a0TgCMHuFlTuNROzY7Gkk9FnBrjIb3uQoKm6utZ7HW36aPQR
+X-Received: by 2002:a17:90b:2803:b0:2ee:ad18:b30d with SMTP id 98e67ed59e1d1-2f782c4bd4dmr16496045a91.6.1737374533963;
+        Mon, 20 Jan 2025 04:02:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHOCF0Lznp77ArLmeUPdmlx9sZZQ0u9IJTB8m9AZJMkb86ZWhU7cWNeBlgeTiJ+ImUI9S/aJk3IrYNM5QQgQRw=
+X-Received: by 2002:a17:90b:2803:b0:2ee:ad18:b30d with SMTP id
+ 98e67ed59e1d1-2f782c4bd4dmr16495993a91.6.1737374533558; Mon, 20 Jan 2025
+ 04:02:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20241220072240.1003352-1-anshuman.khandual@arm.com>
- <20250102160402.GB3990035-robh@kernel.org> <Z30adHnQ7ZFaU9UR@arm.com>
- <CAL_JsqLLnh1o4L1=PpNt5brBwZZCgp7mOygByOYakchrzc29Ow@mail.gmail.com>
- <86wmf5wo8u.wl-maz@kernel.org> <CAL_JsqKKiEOj=a1k6U-bB0F6-ht7QokDnh3bspHupp-QG=haSg@mail.gmail.com>
- <Z4kmlhnlpKjS_MII@arm.com>
-In-Reply-To: <Z4kmlhnlpKjS_MII@arm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 17 Jan 2025 16:07:56 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqK1k7fG=yDZSbTbV63yRP5U9=GpuAiv=NWZJWdppUtRwA@mail.gmail.com>
-X-Gm-Features: AbW1kvZCaGPAdTzQQUI5Q5j42V1TeAoCQ3yfC8Cjc8iBuIXUrThvrm6lQVxJhg4
-Message-ID: <CAL_JsqK1k7fG=yDZSbTbV63yRP5U9=GpuAiv=NWZJWdppUtRwA@mail.gmail.com>
-Subject: Re: [PATCH 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Jonathan Corbet <corbet@lwn.net>, 
-	Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20250117115208.1616503-1-maz@kernel.org>
+In-Reply-To: <20250117115208.1616503-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 20 Jan 2025 13:02:00 +0100
+X-Gm-Features: AbW1kvav04dHAd6EFLXeH44giVkOFuZp7i48ZD-kxEE0FGoV-Ua3PABvmPT0ddY
+Message-ID: <CABgObfYckN2J_Q3d--ZfAP=QbtGWp-teOpXGPfubU=BN4DSrgw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.14
+To: Marc Zyngier <maz@kernel.org>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Chase Conklin <chase.conklin@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Fuad Tabba <tabba@google.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Hardevsinh Palaniya <hardevsinh.palaniya@siliconsignals.io>, 
+	James Clark <james.clark@linaro.org>, Joey Gouly <Joey.Gouly@arm.com>, 
+	Kalesh Singh <kaleshsingh@google.com>, Mark Brown <broonie@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Mostafa Saleh <smostafa@google.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Quentin Perret <qperret@google.com>, 
+	Rob Herring <robh@kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Thorsten Blum <thorsten.blum@linux.dev>, 
+	Vincent Donnefort <vdonnefort@google.com>, Vladimir Murzin <vladimir.murzin@arm.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: K6G_Tv86sesPiYnqqel9Wix01imJ6z_fx5zpMTlWbbw_1737374534
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 16, 2025 at 9:32=E2=80=AFAM Catalin Marinas <catalin.marinas@ar=
-m.com> wrote:
+On Fri, Jan 17, 2025 at 12:52=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
+e:
 >
-> On Wed, Jan 08, 2025 at 07:47:16AM -0600, Rob Herring wrote:
-> > On Wed, Jan 8, 2025 at 5:15=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
-ote:
-> > > On Tue, 07 Jan 2025 22:13:47 +0000,
-> > > Rob Herring <robh@kernel.org> wrote:
-> > > > On Tue, Jan 7, 2025 at 6:13=E2=80=AFAM Catalin Marinas <catalin.mar=
-inas@arm.com> wrote:
-> > > > > But does KVM actually expose the feature to EL1 in ID_AA64DFR1_EL=
-1 and
-> > > > > than traps it at EL2?
-> > > >
-> > > > As Marc pointed out KVM only advertises PMUv3.8. Regardless, guest
-> > > > accesses to these registers are trapped with or without this series=
-.
-> > >
-> > > And most probably generates a nice splat in the kernel log, as nobody
-> > > updated KVM to handle *correctly* PMICNTR_EL0 traps, let alone deal
-> > > with the FGT2 registers.
-> >
-> > Isn't that this series[1]? Should that have come first, I guess I know
-> > that *now*.
-> [...]
-> > [1] https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandu=
-al@arm.com/
+> Paolo,
 >
-> It's not any clearer to me. Does this series depend on the 46-patch one?
-> Or, if we had the other, is this no longer needed? Or none of these,
-> they are independent.
+> Here's the initial set of KVM/arm64 changes for 6.14. The bulk of the
+> changes are around debug and protect mode, both of which are being
+> radically cleaned up. On the feature side, we gain support for
+> non-protected guests in protected mode, EL2 timer support, and some
+> better CoreSight support.
+>
+> The rest is the usual mix of cleanups and bug fixes. Note that this
+> drags two other branches:
+>
+> - arm64's for-next/cpufeature to resolve conflicts that were not
+>   trivial to resolve
+>
+> - kvmarm-fixes-6.13-3 which was only merged in 6.13-rc7, while this
+>   branch is firmly based on -rc3, and we had some dependencies with
+>   it.
+>
+> As usual, gory details in the tag below.
 
-They are independent. I think ideally we'd want everything landing at
-the same time, but we're past ideal at this point. Without this
-series, if someone uses PMU on v8.9 and firmware enabled FGT2, then
-the kernel will crash. Without the above series, KVM will have
-warnings in the kernel log, but otherwise function.
+Pulled, thanks.
 
-Rob
+Paolo
+
