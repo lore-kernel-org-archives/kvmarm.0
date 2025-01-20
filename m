@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E671EC012
-	for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 16:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25731EE7CD
+	for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 16:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737391460; cv=none; b=SM+/2VCmMVSyraWFv2bQNQjlPm1u96TAmwqnWbmtZVlBu1J+OPkXtR8MMM3fmDLvKomOxfWmn/cDRs1u8loLqIFS98l8LDuGRJYjg2HCBTq3fJvWLczLGfWEuy/AudapvlmPoiFdvoseXXtnYm61Ndj5Rnko9cfX0qk3t5RRDp0=
+	t=1737391463; cv=none; b=RSxhkjBwcG8BYpNaqwa3lb3Ipqf4Jw5ste+A9Gjkcp67kcliWMQ/RyPBq8zX+qC7ubb7qExtK6mjws5mM6ETYVKOclU17Y1icvLq86w30NPPeoh0Cw8OhaGMMXxgJPUbB9NYxLPHlp+MvOBCaaD/JyIzJzhkp+h/LXyEEeSyzdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737391460; c=relaxed/simple;
-	bh=ovSjkdUX7BuXHroB0uRQIMIyN52F0thSyV5KanQXoeQ=;
+	s=arc-20240116; t=1737391463; c=relaxed/simple;
+	bh=F5JLESh64pYGf8TOT5XAacDpOwefATNhBDvIEA6pnoU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ONy9TEG9DmOgxFL7lRPifEozZAX22JKC/bmRrcIhs6tjOqumQQtJK+lVpD7pBgOgi3Rc48NcXqUxYxGJc6wuBfH+aojUgvjmQjxpmlpUTqFenUPlhcBNiLDjsA3SnDwh7EBZ3aZIXUIxedSR/AL8JHiQCkOzR48hn7gH5Twg/T8=
+	 MIME-Version; b=uio8HCZp/6Xtr8fcFTQ3aC2FikD/ca+D59AVz34PoJUmHtz9curF44HoVldwirnvG1x/xXVGSypsn1DD4V7C85gdlnOSIQUvuAwqXNjyu+sa6a+DkJYk6uiGpT9ZxGzm2wpAYnRNBFI/e4PwilLtN9aZyafSsw9ArgLp/TZVBE8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19A1D106F;
-	Mon, 20 Jan 2025 08:44:46 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8AD52169C;
+	Mon, 20 Jan 2025 08:44:49 -0800 (PST)
 Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A9683F5A1;
-	Mon, 20 Jan 2025 08:44:14 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E750E3F5A1;
+	Mon, 20 Jan 2025 08:44:17 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: andrew.jones@linux.dev,
 	eric.auger@redhat.com,
@@ -41,9 +41,9 @@ Cc: kvm@vger.kernel.org,
 	yuzenghui@huawei.com,
 	joey.gouly@arm.com,
 	andre.przywara@arm.com
-Subject: [kvm-unit-tests PATCH v2 13/18] run_tests: Do not probe for maximum number of VCPUs when using kvmtool
-Date: Mon, 20 Jan 2025 16:43:11 +0000
-Message-ID: <20250120164316.31473-14-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v2 14/18] run_tests: Add KVMTOOL environment variable for kvmtool binary path
+Date: Mon, 20 Jan 2025 16:43:12 +0000
+Message-ID: <20250120164316.31473-15-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250120164316.31473-1-alexandru.elisei@arm.com>
 References: <20250120164316.31473-1-alexandru.elisei@arm.com>
@@ -55,41 +55,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The --probe-maxsmp parameter updates MAX_SMP with the maximum number of
-VCPUs that the host supports. Qemu will exit with an error when creating a
-virtual machine if the number of VCPUs is exceeded.
-
-kvmtool behaves differently: it will automatically limit the number of
-VCPUs to the what KVM supports, which is exactly what --probe-maxsmp wants
-to achieve. When doing --probe-maxsmp with kvmtool, print a message
-explaining why it's redundant and don't do anything else.
+kvmtool is often used for prototyping new features, and a developer might
+not want to install it system-wide. Add a KVMTOOL environment variable to
+make it easier for tests to use a binary not in $PATH.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- run_tests.sh | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ run_tests.sh          | 1 +
+ scripts/arch-run.bash | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/run_tests.sh b/run_tests.sh
-index 61480d0c05ed..acaaadbb879b 100755
+index acaaadbb879b..d38954be9093 100755
 --- a/run_tests.sh
 +++ b/run_tests.sh
-@@ -89,7 +89,15 @@ while [ $# -gt 0 ]; do
-             list_tests="yes"
-             ;;
-         --probe-maxsmp)
--            probe_maxsmp
-+            case "$TARGET" in
-+            qemu)
-+                probe_maxsmp
-+                ;;
-+            kvmtool)
-+                echo "kvmtool automatically limits the number of VCPUs to maximum supported"
-+                echo "The 'smp' test parameter won't be modified"
-+                ;;
-+            esac
-             ;;
-         --)
-             ;;
+@@ -36,6 +36,7 @@ The following environment variables are used:
+     TIMEOUT         Timeout duration for the timeout(1) command
+     CHECK           Overwrites the 'check' unit test parameter (see
+                     docs/unittests.txt)
++    KVMTOOL         Path to kvmtool binary for ARCH-run
+ EOF
+ }
+ 
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 34f633cade01..5d840b72f8cb 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -457,7 +457,7 @@ search_kvmtool_binary ()
+ {
+ 	local kvmtoolcmd kvmtool
+ 
+-	for kvmtoolcmd in lkvm vm lkvm-static; do
++	for kvmtoolcmd in ${KVMTOOL:-lkvm vm lkvm-static}; do
+ 		if $kvmtoolcmd --help 2>/dev/null| grep -q 'The most commonly used'; then
+ 			kvmtool="$kvmtoolcmd"
+ 			break
 -- 
 2.47.1
 
