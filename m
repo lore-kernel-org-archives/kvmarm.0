@@ -1,115 +1,153 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1839A3BBE5
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jan 2025 04:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7C0182BC
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jan 2025 06:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737434425; cv=none; b=Q58e8goxryGHgIYQpkcgvTtjTgil9SdjXmy+svGf2XX5Ij4FXmNLBLcpq3560Lpi+kobmY3/KCJQ3acdZ7ic8UzlRJMzyfle+0JBVlsri54xZTe2hJNZfb/+N5njwbcDDSW5PXzlXn+alG/obhQFZucdmT+e7yL++BrIMnn28Q4=
+	t=1737439418; cv=none; b=AMMFcoADEY1wL42vIjt3yne4PX8GAJ1B6GzUiPmPmqNJ+tjfNDr3nwR/fvUNI/h7m7crVCzEUfas+yuWs4d0WAMwSCwUhWwy4pu2E1mkEDwTukLeEprD0FZlAhHHxhVUrPBebF6PbRftsp7hfRYaeofonIftdmRpvdnWt6v7ikg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737434425; c=relaxed/simple;
-	bh=duHDPIpK5kU4H7/Yoa4QyItBCX1GS/+WUeuKKzr8CYc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cYpcE3YI/FepbF/lxVyByo+sccZGow1vk6PQRfYQxyQCCZNJZLAzgsqzM0aKrZbSu+xGLcBuChPmEwFGueYL7Kuac/Gdd93Vkg3Ay9fs9HTFVgz5tpOSP00N+I14AqfY6kCXpBuv/Fq2hBQjV+UlRdjA/bccP1Ol/3K1OJAVkDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--lokeshvutla.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=01cbxQx6; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--lokeshvutla.bounces.google.com
+	s=arc-20240116; t=1737439418; c=relaxed/simple;
+	bh=/m5vQYZTdQ/WFQfN/eHdTFWqddZXNNA9CMeL15MdoGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iZxyZ1ykmu0hMZA/Xi2R8BBkTXgPc0VZJt+A6ioz4SCErhU+bzJPsMeyZ3fD6H5lPpMOVdxAve3/DBfyApkrITOCmNH+PUhLPI8wIYjZ5X7cuyXSiUMiRlV40ornNWp3xIgJE5yzvakVIYdmAOuhwsyPRUTYj0WqkSAMFJ7GfR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=WRwkHObA; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="01cbxQx6"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef35de8901so9585323a91.3
-        for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 20:40:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="WRwkHObA"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2ee74291415so6992903a91.3
+        for <kvmarm@lists.linux.dev>; Mon, 20 Jan 2025 22:03:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737434423; x=1738039223; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=W6HslTJVcoTc76NPV/AhEAAiVSfWCRn3Y3i6yxgDWLg=;
-        b=01cbxQx6VJiZboT1fJgJOpfLo5+pGDUwY7wnlIPdKc14AC0MA57ni2s0xQrN4d7eOq
-         czObrd8+DPH3q4Ai2zuCqeBFxItSEssOuPMXKZ6fAuRD0/tRR+JRzQjnIH6K/mh/sxkp
-         0UHN7jaGeY0f5gdHxktBiZapkCUG8YORiXtc3zpGsiRBlOHTrAKxnj6u53bFIjK0J6mF
-         Jvb+Or+k4Kqrc+7I1ktyIGM6Qnf8Pix5ZFVx2JI1opSlraML25Rp8SrArKKeIHgzwsFY
-         BZgShi49sxrg0LHK/3qG9BZaYFBbjfMAV8GzP8Q2f4FVKP2xy1lNCMtaP/8gT+QuOKgT
-         8HFA==
+        d=csie.ntu.edu.tw; s=google; t=1737439414; x=1738044214; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wF4cOYbAGgO/RufcLN3HIyG7NCa0ScnR/GNeXKWmqEY=;
+        b=WRwkHObA2tEiPHcmidnFNkZ90fJCHza6RoX60i3LMeempHwtL7rlDovjujMx41ynt8
+         uhb2fNCK1B054LV+focNZJ01un11E5nW68DwetJ4XBn5c57OyaGQu8+TZtjEYTqLpngv
+         9ka/2IFpUlg0FaSAB1ptf2s2PaIxj1hbh/UEFvRjq7YqlPDTec/MGXoCnSjmdD4aWNmF
+         tJtPuOEZQDnvUvziq1G7qEQ0Mb2VW4v+tUeXC7GP8uPFMyMxObsOBB56msUZ/ZRB/afC
+         +/U+zHQCuBLs4vir0wZvhsEx+yqsKKU6krNcIBkLvjbpnpbCCsasZt7HO4XpqK5dUW1n
+         8naA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737434423; x=1738039223;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W6HslTJVcoTc76NPV/AhEAAiVSfWCRn3Y3i6yxgDWLg=;
-        b=Oirv0x9Y02PNOrfgi4m61PE0jaKcB8UtA/OetcZl+CIc8xl9XHYoUL8jaI9X/pKJsL
-         LPBOgP8DfLOS6VQJbnN07NYWvnQdqeao9n0k+EePfxEXGuo7qqSjwIpeslauKluAFMee
-         f7fu1klpGNY3JEMaPvqpUHdPwMv9STOMKFpm373kINwPBm16LFqkr49tN9CEYwDOj9L+
-         OkKiUhEuKp6Asw+gQzLFo+2EyoBm3WdTdi6s5T+ffNT7Us2gyKrazCAKkdRtsymHxEof
-         nNPcLA/1eLSURuo5PhIL/epiqmmuCzIIY5NMGILpSDR+zFC1mKqJSdLg/0rgEiMnkzmw
-         Mv3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXyfwXtJafzgnQLPTraTXYXGH7pt/SutHqIp0jwJDRzEEu+x82mJlZrraJBN2D4rhq2AiRfBNA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxpapgbi+pIBMhSWk5x0uN6jTiWGqb0XGKQEJgjT/OX7pimst/s
-	mat8OYI5iOhHzWekvuspqaOuN7xg8iLOSSWv3olHItFW/QvduKPOfFFeVAksBU4VsxuHO6xgfQH
-	Bn2JbmaQzIuyC2Sdl+/Ws9g==
-X-Google-Smtp-Source: AGHT+IF4p997QdwvM0SsDbErEoy+U/aICq4fFswhgZuSPgNMtUKRK4y7HpGvS1wx8IpyVVRWtWkg/psQwIA3R5wW3Q==
-X-Received: from pjoz4.prod.google.com ([2002:a17:90a:9804:b0:2ea:3a1b:f493])
- (user=lokeshvutla job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2e06:b0:2ee:d824:b594 with SMTP id 98e67ed59e1d1-2f782d8ccdemr21933409a91.31.1737434423306;
- Mon, 20 Jan 2025 20:40:23 -0800 (PST)
-Date: Tue, 21 Jan 2025 04:40:16 +0000
+        d=1e100.net; s=20230601; t=1737439414; x=1738044214;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wF4cOYbAGgO/RufcLN3HIyG7NCa0ScnR/GNeXKWmqEY=;
+        b=dLuQULl1vuOdzyYMPiHwqwy53zZmkML5xc5RSq8qe0AvU/WlwYbBRwCDV5PYOdUQX9
+         bID0hVVqEgb3EnjpV/dtrMs0dimJ/MjEpHUywpwFbg8CK3JDyNqYQRdpM7136XNTVpso
+         p2fzB+b3JWxIPLOWJe1V95qHe9+TCL1uypUIfY9Yz3CrzzNq1bZskjrAOwcawkxiIu1H
+         CDJHswemk/SpwFtUM25BWX7eIE/vIQfUP+2v7l9p2YYn0i5FyVB9sJsvY4lcJvkd1kue
+         0QPxnVOBhAJFMEpRatG8IyZc62CP8WZP0Xq2/9Gn/Sq8mk/hpp5koA5Xqimoq1ZoaTdA
+         E74g==
+X-Gm-Message-State: AOJu0Yytt2QXSHdG+gJ0AXw9VIpm3aSH8KkX2oGjRQ/QXe+YKSkDG3CG
+	YMBI/YndlLeNjAg+Fg/0RgWM6Rf98gWcJLgUDBxPWWQJgy9z3LA39yDZLV35iB+Je9m0iLQqZ2C
+	kdlrA5SPBIVxovBGWHjXs12+linLD85uE+H/NUDMzrDX/ihk=
+X-Gm-Gg: ASbGnctubvR7ZYzNJQP2lIY3muv3wn+irXkSNsmBj9qFZ7GYHOtNOOSwFIvfIZRE0RA
+	FJxOUqCL0p5vjzInJbS2uykYvAqxID8xRzyBLAvk9SA+ImRMlKwwVpsIP2Ryrg38FAlYhkfXaAh
+	+I+zvL1AmZHhSWLFQD2/Irb6PgLooh1IumQ7v1WKLAoDtjjz40bi0lRaOBJQD9Yn7w5y5Dgp8vK
+	gK+5kx6MIxtWO6BfWJehJdXGFB4iMagqwFakInIqrUrUlm83S7miSrn6fnpI9QW2RjzgEE8b7N+
+	otGkNNyUagC+XAQSV3otN4ITrT3Xm3sQ
+X-Google-Smtp-Source: AGHT+IFYx8DTwR4EYN24qsSl35fQVXwjk20eSy/eyrx/w4w7hv/zybodC9ah8qtt+C9HHOtDYV5LZA==
+X-Received: by 2002:a05:6a00:3487:b0:725:456e:76e with SMTP id d2e1a72fcca58-72daf94f68dmr21324015b3a.6.1737439413834;
+        Mon, 20 Jan 2025 22:03:33 -0800 (PST)
+Received: from zenbook (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab9c8b3dsm8465180b3a.95.2025.01.20.22.03.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 22:03:33 -0800 (PST)
+Date: Tue, 21 Jan 2025 14:04:26 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Chase Conklin <chase.conklin@arm.com>, Eric Auger <eauger@redhat.com>, r09922117@csie.ntu.edu.tw
+Subject: Re: [PATCH v2 09/12] KVM: arm64: nv: Propagate
+ CNTHCTL_EL2.EL1NV{P,V}CT bits
+Message-ID: <2uvoet55pchhcwafgdkcjca5m4mrvtwpgbmg4gmltimv62oauo@p4cipsni3a2q>
+References: <20241217142321.763801-1-maz@kernel.org>
+ <20241217142321.763801-10-maz@kernel.org>
+ <qbmqsm3llnpy2t4ig3uyggkapwlbox2wnfu52gksbhcq4vfpqx@dz5bbn3asn5s>
+ <86wmetv57c.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250121044016.2219256-1-lokeshvutla@google.com>
-Subject: [PATCH v2] KVM: arm64: Flush hyp bss section after initialization of
- variables in bss
-From: Lokesh Vutla <lokeshvutla@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	lokeshvutla@google.com, sachinparekh@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86wmetv57c.wl-maz@kernel.org>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-To determine CPU features during initialization, the nVHE hypervisor
-utilizes sanitized values of the host's CPU features registers. These
-values, stored in u64 idaa64*_el1_sys_val variables are updated by the
-kvm_hyp_init_symbols() function at EL1. To ensure EL2 visibility with
-the MMU off, the data cache needs to be flushed after these updates.
-However, individually flushing each variable using
-kvm_flush_dcache_to_poc() is inefficient.
+On Fri, Jan 17, 2025 at 03:19:03PM +0000, Marc Zyngier wrote:
+> On Mon, 06 Jan 2025 02:33:39 +0000,
+> Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+> > 
+> > Hi Marc and other KVM ARM developers,
+> > 
+> > I have a question while learning about NV and reading the code:
+> > 
+> > On Tue, Dec 17, 2024 at 02:23:17PM +0000, Marc Zyngier wrote:
+> > > Allow a guest hypervisor to trap accesses to CNT{P,V}CT_EL02 by
+> > > propagating these trap bits to the host trap configuration.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/arch_timer.c | 7 +++++++
+> > >  1 file changed, 7 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > > index 6f04f31c0a7f2..e5951e6eaf236 100644
+> > > --- a/arch/arm64/kvm/arch_timer.c
+> > > +++ b/arch/arm64/kvm/arch_timer.c
+> > > @@ -824,6 +824,10 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+> > >  	 * Apply the enable bits that the guest hypervisor has requested for
+> > >  	 * its own guest. We can only add traps that wouldn't have been set
+> > >  	 * above.
+> > > +	 * Implementation choices: we do not support NV when E2H=0 in the
+> > > +	 * guest, and we don't support configuration where E2H is writable
+> > > +	 * by the guest (either FEAT_VHE or FEAT_E2H0 is implemented, but
+> > > +	 * not both). This simplifies the handling of the EL1NV* bits.
+> > 
+> > Previously I was not aware that KVM ARM has these constraints on guest's
+> > view of NV and E2H, so I appreciate this comment very much. However,
+> > after digging through the code I could not find anywhere where these
+> > constraints are enforced, for example initially I thought I would find
+> > ID_AA64MMFR2_EL1_NV being zeroed in limit_nv_id_regs(), or HCR_NV added
+> > to the res0 mask of HCR_EL2, base on whether FEAT_VHE or FEAT_E2H0 is
+> > available to the guest. But seems like in these places the code applies
+> > constraints looking at the host's capabilities, not the guest's.
+> > Do you mind providing some pointers for me to investigate the code mode?
+> 
+> Where have you looked?
+> 
+> These constraints are enforced in the kvm-arm64/nv-e2h-select
+> branch[1], which is pulled in the kvm-arm64/nv-next branch[2].
+> 
+> The NV support is split in discrete series in order to make things
+> easier to review, but you need to have seen them all to somehow
+> connect the dots.
 
-These cpu feature variables would be part of the bss section of
-the hypervisor. Hence, flush the entire bss section of hypervisor
-once the initialization is complete.
+Ah, that makes sense. I was only looking at kvmarm/next, and wasn't
+really sure what the other branches are up to.
+Thanks for telling me, looks like I got a lot more (complex) code to
+study. :)
 
-Fixes: 6c30bfb18d0b ("KVM: arm64: Add handlers for protected VM System Registers")
-Suggested-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Lokesh Vutla <lokeshvutla@google.com>
----
-v1: https://lore.kernel.org/kvmarm/20250120151514.1769597-1-lokeshvutla@google.com/
-- Applies on top of Linux 6.13 tag.
-Changes since v1:
-* Updated Commit message based on review
-* Updated kvm_flush_dcache_to_poc() to call from kvm_hyp_init_symbols()
+Sincerely,
+Wei-Lin Chang
 
- arch/arm64/kvm/arm.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a102c3aebdbc..caacb2da8e09 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2410,6 +2410,13 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(id_aa64smfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64SMFR0_EL1);
- 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
- 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
-+
-+	/*
-+	 * Flush entire BSS since part of its data containing init symbols is read
-+	 * while the MMU is off.
-+	 */
-+	kvm_flush_dcache_to_poc(kvm_ksym_ref(__hyp_bss_start),
-+				kvm_ksym_ref(__hyp_bss_end) - kvm_ksym_ref(__hyp_bss_start));
- }
- 
- static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
--- 
-2.48.0.rc2.279.g1de40edade-goog
-
+> 
+> HTH,
+> 
+> 	M.
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-e2h-select
+> [2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
