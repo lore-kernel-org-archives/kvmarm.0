@@ -1,31 +1,31 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC74C3BBF2
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jan 2025 16:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED6213BC0C
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jan 2025 16:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737477040; cv=none; b=dPMrxPypvXURqTLK7Gtro+723SVL3H0N+T6mvFYvilkEDrCXcQ4QDQHNv8f+FN3nsd5FYQYHKi9YIEpzWuobG7XodpQMH1owM2yYMwHLEjcdiW2AD6AiL5x6ySDo3OCxFz5U0M/9gIp2FtXW/XRgsHJs5ElaP7xG1+qPgIpe9cw=
+	t=1737478003; cv=none; b=ayWwxyAZmM0siMVv+S1YP/SJwxfGaxBaZq2GV7j8H5dVy9qWQyCqZsFx4ywyXXjtNQID8J0aCjYjc44JiUUDbyQdbwVAN03j/eexo1CKntwXtp+xIVRqTDXr68mVKRyWm+mTQCj2/+fn/ZG938AHOP20gmBjlakJxcZ2lSuXhqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737477040; c=relaxed/simple;
-	bh=u8XKd19wBqMOBmQp8Sy/AWNogFU0MAF07u7Oivlk5l4=;
+	s=arc-20240116; t=1737478003; c=relaxed/simple;
+	bh=a9LrMgS3L2CqIoqK9/MsIWlfNGYY2yYlEwg4J+gUG+I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqkEOoxzysa/mFi/rzNCIitsOW4UMgHli5GrCbILKkQZf9BVjOossxV5lWbHjfLwRgzKu1l0gXQKLjKoPYbUOx6RaVX03E7aQ+AHRNic96+oNBaTgyUyOPmdlCoOXsfKqw62OD+85UNxqkVpBfDViL/aWB8NjfVYKqh6JzwceKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xY8F3an6; arc=none smtp.client-ip=91.218.175.185
+	 Content-Type:Content-Disposition:In-Reply-To; b=X8Mo4tzLBIa/9rxDGltMi1ZwMSkPtPGFq5W+RNiI1djif5HkKh9PwEdjRCyQpxQbZecKniBUSo7dEUyQnLFveH/RMBNcIU2tRHQscV2JiD3q4/nKgLge3mSAbyMNW2yvqmcSsBbBK4zaZc4lUIv4lO9aEX+QbIeNMvl/nx5ZZxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wuIDtc2y; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xY8F3an6"
-Date: Tue, 21 Jan 2025 17:30:18 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wuIDtc2y"
+Date: Tue, 21 Jan 2025 17:46:33 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737477021;
+	t=1737477998;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cCgssfmF7bQh08XnJwCfEdidZwB380Ri5cMen/pv4ro=;
-	b=xY8F3an6zCEpk15gGynkafua9yyx97TTaOBTqWZmP6mBMpuavhwbnszC6x+BQY+pVarPUn
-	9IvUfPiMo6ic2OurHPSlmvcdOVCeiJWpDOw+NbVIPLWLHem49eE1yCj7W3pRiH/N6rOqw+
-	2K3BWGs0CUwO6E6xqSiFWrYvpeaqZh0=
+	bh=LMDJSTgByuHuWrF2+uScssRNOl6HgzX8LOlSQPUcRws=;
+	b=wuIDtc2yfqgfAnYegMfah6645g08I7FlG9GU+dqPRMQ8U6LBeH9IjLof1MGjb+rxaAdz5i
+	Al49afIJSCUlxQktOJcZOoe7U8yEBBNg+SPcqQRNW71XBPUaUxkZp9xBqizTpvIqsdEqo8
+	3Kzqt2+TM67t9sZxvlZR/57kF/8p+Bw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
@@ -36,11 +36,11 @@ Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
 	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
 	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
 	andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 09/18] scripts/runtime: Skip test when
- kvmtool and $accel is not KVM
-Message-ID: <20250121-52d0e326cb9a3091229a7a77@orel>
+Subject: Re: [kvm-unit-tests PATCH v2 10/18] scripts/arch-run: Add support
+ for kvmtool
+Message-ID: <20250121-90381c319e835109e0515bbd@orel>
 References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-10-alexandru.elisei@arm.com>
+ <20250120164316.31473-11-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,35 +49,179 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250120164316.31473-10-alexandru.elisei@arm.com>
+In-Reply-To: <20250120164316.31473-11-alexandru.elisei@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 20, 2025 at 04:43:07PM +0000, Alexandru Elisei wrote:
-> kvmtool, unlike qemu, cannot emulate a different architecture than the
-> host's, and as a result the only $accel parameter it can support is 'kvm'.
+On Mon, Jan 20, 2025 at 04:43:08PM +0000, Alexandru Elisei wrote:
+> Add two new functions, search_kvmtool_binary(), which, like the name
+> suggests, searches for the location of the kvmtool binary, and
+> run_kvmtool(), which runs a test with kvmtool as the VMM.
+> 
+> initrd_create() has also been modified to use the kvmtool syntax for
+> supplying an initrd, which is --initrd (two dashes instead of the single
+> dash that qemu uses).
+> 
+> arm/run does not know how to use these functions yet, but this will be
+> added in a subsequent patch.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  scripts/runtime.bash | 5 +++++
->  1 file changed, 5 insertions(+)
+>  scripts/arch-run.bash | 94 +++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 81 insertions(+), 13 deletions(-)
 > 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index ee8a188b22ce..55d58eef9c7c 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -153,6 +153,11 @@ function run()
->          accel="$ACCEL"
->      fi
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index d6eaf0ee5f09..34f633cade01 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -75,16 +75,47 @@ run_qemu ()
+>  	return $ret
+>  }
 >  
-> +    if [[ "$TARGET" = kvmtool ]] && [[ -n "$accel" ]] && [[ "$accel" != "kvm" ]]; then
-> +        print_result "SKIP" $testname "" "kvmtool does not support $accel"
-> +        return 2
-> +    fi
+> +run_kvmtool ()
+> +{
+> +	local stdout errors ret sig
 > +
->      # check a file for a particular value before running a test
->      # the check line can contain multiple files to check separated by a space
->      # but each check parameter needs to be of the form <path>=<value>
+> +	initrd_create || return $?
+> +
+> +	echo -n "$@"
+> +	[ "$ENVIRON_DEFAULT" = "yes" ] && echo -n " #"
+> +	echo " $INITRD"
+> +
+> +	# stdout to {stdout}, stderr to $errors and stderr
+> +	exec {stdout}>&1
+> +	"${@}" $INITRD </dev/null 2> >(tee /dev/stderr) > /dev/fd/$stdout
+> +	ret=$?
+> +	exec {stdout}>&-
+> +
+> +	return $ret
+> +}
+
+It seems like run_qemu should mostly apply to kvmtool since kvmtool could
+also terminate on a signal, like the timeout SIGALRM. Maybe we should try
+to get them to use the same thing and name it run_test()? Or at least we
+can factor out the common parts to avoid duplication.
+
+> +
+>  run_test_status ()
+>  {
+> -	local stdout ret
+> +	local stdout ret ret_success
+>  
+>  	exec {stdout}>&1
+> -	lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
+> +
+> +	# For qemu, an exit status of 1 means that the test completed. For kvmtool,
+> +	# 0 means the same thing.
+> +	case "$TARGET" in
+> +	qemu)
+> +		ret_success=1
+> +		lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
+> +		;;
+> +	kvmtool)
+> +		ret_success=0
+> +		lines=$(run_kvmtool "$@" > >(tee /dev/fd/$stdout))
+> +		;;
+> +	esac
+>  	ret=$?
+>  	exec {stdout}>&-
+>  
+> -	if [ $ret -eq 1 ]; then
+> +	if [ $ret -eq $ret_success ]; then
+>  		testret=$(grep '^EXIT: ' <<<"$lines" | head -n1 | sed 's/.*STATUS=\([0-9][0-9]*\).*/\1/')
+>  		if [ "$testret" ]; then
+>  			if [ $testret -eq 1 ]; then
+> @@ -422,6 +453,25 @@ search_qemu_binary ()
+>  	export PATH=$save_path
+>  }
+>  
+> +search_kvmtool_binary ()
+> +{
+> +	local kvmtoolcmd kvmtool
+> +
+> +	for kvmtoolcmd in lkvm vm lkvm-static; do
+> +		if $kvmtoolcmd --help 2>/dev/null| grep -q 'The most commonly used'; then
+> +			kvmtool="$kvmtoolcmd"
+> +			break
+> +		fi
+> +	done
+> +
+> +	if [ -z "$kvmtool" ]; then
+> +		echo "A kvmtool binary was not found." >&2
+
+Do we want to support a KVMTOOL environment variable analogous to $QEMU?
+If so we can also add the help text that search_qemu_binary() has here.
+
+> +		return 2
+> +	fi
+> +
+> +	command -v $kvmtool
+> +}
+> +
+>  initrd_cleanup ()
+>  {
+>  	rm -f $KVM_UNIT_TESTS_ENV
+> @@ -447,7 +497,18 @@ initrd_create ()
+>  	fi
+>  
+>  	unset INITRD
+> -	[ -f "$KVM_UNIT_TESTS_ENV" ] && INITRD="-initrd $KVM_UNIT_TESTS_ENV"
+> +	if [ ! -f "$KVM_UNIT_TESTS_ENV" ]; then
+> +		return 0
+> +	fi
+> +
+> +	case "$TARGET" in
+> +		qemu)
+> +			INITRD="-initrd $KVM_UNIT_TESTS_ENV"
+> +			;;
+> +		kvmtool)
+> +			INITRD="--initrd $KVM_UNIT_TESTS_ENV"
+> +			;;
+> +	esac
+
+vmm_opts[qemu,initrd]='-initrd'
+vmm_opts[kvmtool,initrd]='--initrd'
+
+>  
+>  	return 0
+>  }
+> @@ -471,18 +532,25 @@ env_params ()
+>  	local qemu have_qemu
+>  	local _ rest
+>  
+> -	qemu=$(search_qemu_binary) && have_qemu=1
+> +	env_add_params TARGET
+> +
+> +	# kvmtool's versioning has been broken since it was split from the kernel
+> +	# source.
+> +	if [ "$TARGET" = "qemu" ]; then
+> +		qemu=$(search_qemu_binary) && have_qemu=1
+>  
+> -	if [ "$have_qemu" ]; then
+> -		if [ -n "$ACCEL" ] || [ -n "$QEMU_ACCEL" ]; then
+> -			[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
+> +		if [ "$have_qemu" ]; then
+> +			if [ -n "$ACCEL" ] || [ -n "$QEMU_ACCEL" ]; then
+> +				[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
+> +			fi
+> +			QEMU_VERSION_STRING="$($qemu -h | head -1)"
+> +			# Shellcheck does not see QEMU_MAJOR|MINOR|MICRO are used
+> +			# shellcheck disable=SC2034
+> +			IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
+>  		fi
+> -		QEMU_VERSION_STRING="$($qemu -h | head -1)"
+> -		# Shellcheck does not see QEMU_MAJOR|MINOR|MICRO are used
+> -		# shellcheck disable=SC2034
+> -		IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
+> +
+> +		env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
+>  	fi
+> -	env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
+>  
+>  	KERNEL_VERSION_STRING=$(uname -r)
+>  	IFS=. read -r KERNEL_VERSION KERNEL_PATCHLEVEL rest <<<"$KERNEL_VERSION_STRING"
 > -- 
 > 2.47.1
+>
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Thanks,
+drew
