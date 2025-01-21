@@ -1,87 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104271B85CA
-	for <kvmarm@lists.linux.dev>; Tue, 21 Jan 2025 08:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FC71F3FC0
+	for <kvmarm@lists.linux.dev>; Tue, 21 Jan 2025 14:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737448867; cv=none; b=Rto+hxMl/S4FmrQEmpigxKFzxVzfeD/iwqA6ZrM1gUKdh+mfGR1dIBHqcUY36l6K9ho48uE44/CBLXnOQzq60MR/O8TqiUjd7tsKYJkFAI5AVK/ZVmKHyIWYFpv0b/+iG88Ewuyl9BkbCltWqSqF4HpK1udtSugOzNSTuG/xKcA=
+	t=1737470489; cv=none; b=JdFuGSfR5q6FA8fF1OCAgEn67cNMsWPJ6Wr2WZy8PCntFaQtcuyC14vO59g43i7s/t/X3nPg1GdiVFGoXew7j7uYgmFbuGz0nKc2dcyxep9A2a+MifxCihMwkNv5P9bQPJM33+sLaIFILAajeTbnSUqomEWXlWHgPygGAbFZuhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737448867; c=relaxed/simple;
-	bh=ly915CsFIVxI/p5+bfchBNsCBHutAPPsxgSvZwYY+io=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pGh42w/03O/yPIJAUrsqCPXSyUNxCwp41H/K+aPn3nrtoEECqBexMmzbJtgT2B6T3dMWhugl1vBRZOt/Q32IWlV8pmISHApp2w2+ptbshT9BO4+Lejp5PBW8fhcgcXQrB1ZFG+hfqdyxzNtY5VyR4hNlgCNBl9mKOH2QOhFZh5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GM3Jc218; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737470489; c=relaxed/simple;
+	bh=0tDSw5HQQv+ZjKR7TrxZKpDd5ZMpssn2xb4TcobRd3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUlrlRwamnFfLVOcDhKpyZbmXG2ved9l71IvdIL0OveBPDgPPWx7oXy0yyXyX3f80qie0nbZsjXMvUQUxyAONsG4yqOHeeJLj5ZZ8NmMP7NwMtbJi1wBzHk0VYjICZYpDmfQjJZzQ/4+cnNQ5fNZLt+IJ46xRWwkKsfO51ZdYV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MfmAIDOw; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GM3Jc218"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78028C4CEDF;
-	Tue, 21 Jan 2025 08:41:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737448866;
-	bh=ly915CsFIVxI/p5+bfchBNsCBHutAPPsxgSvZwYY+io=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GM3Jc218irhc3CXpNOYXaoLuY8Q4UuQBItakNCpI1IFBYH5En3E5+jChedYEyXGvX
-	 PFJsHKv/0OwECreHK2xmnGT7iX+Itwematkp5ouhBv4rY1YpqiNf9uf6Eo5rtWE5SM
-	 11T7I5AeFyjtvQP8oa+FcFjJknyBXgVpyGtjXJhChLcY3Tjuvs8CzVVZoGiZj+0ObI
-	 oet50BNFLHUk9/M1duPCFG0vUdwHlNtxH/IhiYqWKRskol5fskHjfYvUPu+j8Iw4/I
-	 8fpwFkQrMSNndgsm23AIhStCZFAidumWChO1Atgmr+CyghJtnFeSuNXRO9RJIZ7xMc
-	 JC/JEm0BRRWMw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ta9ol-00E0J4-5G;
-	Tue, 21 Jan 2025 08:41:04 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Lokesh Vutla <lokeshvutla@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	sachinparekh@google.com
-Subject: Re: [PATCH v2] KVM: arm64: Flush hyp bss section after initialization of variables in bss
-Date: Tue, 21 Jan 2025 08:40:50 +0000
-Message-Id: <173744884188.1663521.13719944692301643191.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250121044016.2219256-1-lokeshvutla@google.com>
-References: <20250121044016.2219256-1-lokeshvutla@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MfmAIDOw"
+Date: Tue, 21 Jan 2025 15:41:13 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737470480;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gf/1W+m78aXfLIDaJ6uGUwztghDrNUX5iY9PP5ywKHE=;
+	b=MfmAIDOwPguHo8xunevud183sAezfRujYbii7fySiBS7KLOvel3jZLxFLZdOKqYMmnRAAO
+	np6PXOSd8Sj3vtB2H3dRlHmdV+23IoNDIVT3J/I9cNdCR0+1cOm1G2sdK2e0n4Fufi6sDY
+	SlF0FxE8wfW5aO/P8LGJOhlvzZat4N8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
+	andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 01/18] run_tests: Document
+ --probe-maxsmp argument
+Message-ID: <20250121-033cee8123fdac80f70bc0ee@orel>
+References: <20250120164316.31473-1-alexandru.elisei@arm.com>
+ <20250120164316.31473-2-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, tabba@google.com, lokeshvutla@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, sachinparekh@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250120164316.31473-2-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 21 Jan 2025 04:40:16 +0000, Lokesh Vutla wrote:
-> To determine CPU features during initialization, the nVHE hypervisor
-> utilizes sanitized values of the host's CPU features registers. These
-> values, stored in u64 idaa64*_el1_sys_val variables are updated by the
-> kvm_hyp_init_symbols() function at EL1. To ensure EL2 visibility with
-> the MMU off, the data cache needs to be flushed after these updates.
-> However, individually flushing each variable using
-> kvm_flush_dcache_to_poc() is inefficient.
+On Mon, Jan 20, 2025 at 04:42:59PM +0000, Alexandru Elisei wrote:
+> Commit 5dd20ec76ea63 ("runtime: Update MAX_SMP probe") added the
+> --probe-maxmp argument, but the help message for run_tests.sh wasn't
+> updated. Document --probe-maxsmp.
 > 
-> [...]
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  run_tests.sh | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 152323ffc8a2..f30b6dbd131c 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -17,14 +17,15 @@ cat <<EOF
+>  
+>  Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t] [-l]
+>  
+> -    -h, --help      Output this help text
+> -    -v, --verbose   Enables verbose mode
+> -    -a, --all       Run all tests, including those flagged as 'nodefault'
+> -                    and those guarded by errata.
+> -    -g, --group     Only execute tests in the given group
+> -    -j, --parallel  Execute tests in parallel
+> -    -t, --tap13     Output test results in TAP format
+> -    -l, --list      Only output all tests list
+> +    -h, --help          Output this help text
+> +    -v, --verbose       Enables verbose mode
+> +    -a, --all           Run all tests, including those flagged as 'nodefault'
+> +                        and those guarded by errata.
+> +    -g, --group         Only execute tests in the given group
+> +    -j, --parallel      Execute tests in parallel
+> +    -t, --tap13         Output test results in TAP format
+> +    -l, --list          Only output all tests list
+> +        --probe-maxsmp  Update the maximum number of VCPUs supported by host
+>  
+>  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
+>  specify the appropriate qemu binary for ARCH-run.
+> -- 
+> 2.47.1
+> 
+>
 
-Applied to fixes, thanks!
-
-[1/1] KVM: arm64: Flush hyp bss section after initialization of variables in bss
-      commit: 9bcbb6104a344d3526e185ee1e7b985509914e90
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
