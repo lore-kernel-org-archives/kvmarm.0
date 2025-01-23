@@ -1,40 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777F020F09C
-	for <kvmarm@lists.linux.dev>; Thu, 23 Jan 2025 14:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C632F852
+	for <kvmarm@lists.linux.dev>; Thu, 23 Jan 2025 15:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737642021; cv=none; b=idbg+IjJephbXHxgbX1N8e10k92TCEPvevJyui1/83eW7rF0YxdsGpJUkntnp9Ys/QI063BZHg2lcV0zhDT18VvANP3zNL3VhewUG5SEZ+CBoY6P8hvFNtEbynJ+HPWxAlWwt6c9sJkGexu/EmwLB/XM81lQZ6MJVndRuqMRko0=
+	t=1737646609; cv=none; b=eCi6JFGXWFUNApymj9Io08Bqzuw43Pew+QZqnEkArfl5Sxn1gKy/Vlx40GNzophiKs+QLfXResHqwLoTcSNY8BmMCJ01d3bR5ZBZtWMC7dE5osAzcp6oTUFZMlmtIwlXlRQtzVhailllTH4kI90R5eqq1Frsq5PLY7TaI0ejD40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737642021; c=relaxed/simple;
-	bh=0XgpFNiqBrZwOPcOSQr6PpF8QuiHUlFjdT+D+/Io9JU=;
+	s=arc-20240116; t=1737646609; c=relaxed/simple;
+	bh=vVMicQnUKZpo1ViAzQ7vlBGv1KYxvfJdFGP+PXB41F8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qo2HqfU2mBWT6iqeopSLOpg6mKU1Y46QxfZj2CNO0xG6n3jqJ0tqNvfaRfNqjjQqP3bAkxLEzj4UK4+KqNcYU1iCgDHqSPUdYeUwQovZ+iolXHQB3QZvP1ODqoU/wHhZcbXQJMVOGnoBDyLCrlAeLIhwMi9TCx44TTkHcj3tYMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3FE41063;
-	Thu, 23 Jan 2025 06:20:45 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 547893F694;
-	Thu, 23 Jan 2025 06:20:14 -0800 (PST)
-Date: Thu, 23 Jan 2025 14:20:07 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 12/18] scripts/runtime: Add default
- arguments for kvmtool
-Message-ID: <Z5JQF38bJQFeWrbJ@raptor>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ruvkh1FJSC6qQreWdaOB+e6nK+N0tbD3G+CUUEJVYstfeB89hC3bmPieVi1t42YAqKucO3eoiFkK2d0GYmaWnlUtz9AulWGvz7NRMKrWRebjV4JFkf0vozt0iXRAT90up7H2tbwIyCCQrFb5JnrxTRG7buvo90HTkvLtk5SBqis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RajfLYfS; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RajfLYfS"
+Date: Thu, 23 Jan 2025 16:36:34 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737646599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7daHCSAZnVQzRP+983s7ap8EHdLiIYE2KVKyVsz4xmM=;
+	b=RajfLYfSBFBSWc6mFyySZKDs5szeMKvPp68QvuBuich9RvwWiU/TPw5u4GCyHN1qDh1J2w
+	RuwGLEDTJihJADhrHv1AyFrSodpLrhKTaeVCo6MkAq4qIKInk09/reGjTOPg8prtIaY4NU
+	7bwcJ4hGN3mVOcxgkKzuPoaeQN18ibg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
+	andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 13/18] run_tests: Do not probe for
+ maximum number of VCPUs when using kvmtool
+Message-ID: <20250123-1155fba5858c4ee31e647d8a@orel>
 References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-13-alexandru.elisei@arm.com>
- <20250121-16510b161f5b92ce9c5ae4e1@orel>
+ <20250120164316.31473-14-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,80 +49,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250121-16510b161f5b92ce9c5ae4e1@orel>
+In-Reply-To: <20250120164316.31473-14-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
-
-On Thu, Jan 23, 2025 at 03:07:18PM +0100, Andrew Jones wrote:
-> On Mon, Jan 20, 2025 at 04:43:10PM +0000, Alexandru Elisei wrote:
-> > kvmtool, unless told otherwise, will do its best to make sure that a kernel
-> > successfully boots in a virtual machine. Among things like automatically
-> > creating a rootfs, it also adds extra parameters to the kernel command
-> > line. This is actively harmful to kvm-unit-tests, because some tests parse
-> > the kernel command line and they will fail if they encounter the options
-> > added by kvmtool.
-> > 
-> > Fortunately for us, kvmtool commit 5613ae26b998 ("Add --nodefaults command
-> > line argument") addded the --nodefaults kvmtool parameter which disables
+On Mon, Jan 20, 2025 at 04:43:11PM +0000, Alexandru Elisei wrote:
+> The --probe-maxsmp parameter updates MAX_SMP with the maximum number of
+> VCPUs that the host supports. Qemu will exit with an error when creating a
+> virtual machine if the number of VCPUs is exceeded.
 > 
-> added
+> kvmtool behaves differently: it will automatically limit the number of
+> VCPUs to the what KVM supports, which is exactly what --probe-maxsmp wants
+> to achieve. When doing --probe-maxsmp with kvmtool, print a message
+> explaining why it's redundant and don't do anything else.
 > 
-> > all the implicit virtual machine configuration that cannot be disabled by
-> > using other parameters, like modifying the kernel command line. Always use
-> > --nodefaults to allow a test to run.
-> > 
-> > kvmtool can be too verbose when running a virtual machine, and this is
-> > controlled with parameters. Add those to the default kvmtool command line
-> > to reduce this verbosity to a minimum.
-> > 
-> > Before:
-> > 
-> > $ vm run arm/selftest.flat --cpus 2 --mem 256 --params "setup smp=2 mem=256"
-> >   Info: # lkvm run -k arm/selftest.flat -m 256 -c 2 --name guest-5035
-> > Unknown subtest
-> > 
-> > EXIT: STATUS=127
-> >   Warning: KVM compatibility warning.
-> > 	virtio-9p device was not detected.
-> > 	While you have requested a virtio-9p device, the guest kernel did not initialize it.
-> > 	Please make sure that the guest kernel was compiled with CONFIG_NET_9P_VIRTIO=y enabled in .config.
-> >   Warning: KVM compatibility warning.
-> > 	virtio-net device was not detected.
-> > 	While you have requested a virtio-net device, the guest kernel did not initialize it.
-> > 	Please make sure that the guest kernel was compiled with CONFIG_VIRTIO_NET=y enabled in .config.
-> >   Info: KVM session ended normally.
-> > 
-> > After:
-> > 
-> > $ vm run arm/selftest.flat --nodefaults --network mode=none --loglevel=warning --cpus 2 --mem 256 --params "setup smp=2 mem=256"
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  run_tests.sh | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> On riscv I've noticed that with --nodefaults if I don't add parameters
-> with --params then kvmtool segfaults. I have to add --params "" to
-> avoid it. Does that also happen on arm? Anyway, that's something we
-> should fix in kvmtool rather than workaround it here.
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 61480d0c05ed..acaaadbb879b 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -89,7 +89,15 @@ while [ $# -gt 0 ]; do
+>              list_tests="yes"
+>              ;;
+>          --probe-maxsmp)
+> -            probe_maxsmp
+> +            case "$TARGET" in
+> +            qemu)
+> +                probe_maxsmp
+> +                ;;
+> +            kvmtool)
+> +                echo "kvmtool automatically limits the number of VCPUs to maximum supported"
+> +                echo "The 'smp' test parameter won't be modified"
+> +                ;;
+> +            esac
+>              ;;
+>          --)
+>              ;;
+> -- 
+> 2.47.1
+>
 
-This should fix it:
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
-diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 85c8f95604f6..f6a702533258 100644
---- a/riscv/fdt.c
-+++ b/riscv/fdt.c
-@@ -256,9 +256,10 @@ static int setup_fdt(struct kvm *kvm)
-                if (kvm->cfg.kernel_cmdline)
-                        _FDT(fdt_property_string(fdt, "bootargs",
-                                                 kvm->cfg.kernel_cmdline));
--       } else
-+       } else if (kvm->cfg.real_cmdline) {
-                _FDT(fdt_property_string(fdt, "bootargs",
-                                         kvm->cfg.real_cmdline));
-+       }
-
-        _FDT(fdt_property_string(fdt, "stdout-path", "serial0"));
-
-
-Looking at the timestamp on the commit, the patch that added --nodefaults
-came before the patch that added riscv to kvmtool (by about a month). Just
-in case you want to add a Fixes tag.
+but I hope we can do something with the associative array idea to
+avoid all the TARGET case statements that are getting scattered
+around. Here, we could rename probe_maxsmp to qemu_probe_maxmp and
+then add kvmtool_probe_maxsmp which does this output and each
+to their respective vmm[$vmm,probe_maxsmp] member.
 
 Thanks,
-Alex
+drew
