@@ -1,294 +1,246 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011069.outbound.protection.outlook.com [52.101.65.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0F71CEACD
-	for <kvmarm@lists.linux.dev>; Fri, 24 Jan 2025 15:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737731949; cv=none; b=dlW61O2znBYSOF6A/EqnyK4ddLOueWPKxD9P0VO0HKEIgpAqwo6NLg7t9Gs1+vJ7Qu7HIbGZHkrIQ45GKvu3HvsLjwYT9DhDhUXDpheKiam+pDmSZNNile01HmV/Pf0rgOC89prIMVWhyu1RMk2Pg/m7LZhY7nnkpWvT8/dzECQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737731949; c=relaxed/simple;
-	bh=CFngofGFp143bI2qys7eYrz5Vu+rhbpie7sYLrp+ggk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PO2nIHv537mtUnrftaO47PpoI93U9+MxX3/MVDIgciQio3XouwsS657hZzeCTx2HbxWkIA4K9B3HdsdmCkS4i4i+hCENtpQkqx3kJ1gg2E4zif21PkbkZQcsghKpOGxWyl17qqkRo7N0sYcvcP0L/05ixLmNEvuqsGCWFkSZnYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YfhHk28K5z6K63S;
-	Fri, 24 Jan 2025 23:17:06 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id A3572140114;
-	Fri, 24 Jan 2025 23:19:05 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.203.177.241) by
- frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 24 Jan 2025 16:18:57 +0100
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <oliver.upton@linux.dev>
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
-	<cohuck@redhat.com>, <eric.auger@redhat.com>, <sebott@redhat.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <jiangkunkun@huawei.com>,
-	<jonathan.cameron@huawei.com>, <anthony.jebson@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linuxarm@huawei.com>
-Subject: [PATCH v5 4/4] arm64: paravirt: Enable errata based on implementation CPUs
-Date: Fri, 24 Jan 2025 15:17:32 +0000
-Message-ID: <20250124151732.6072-5-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com>
-References: <20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A3B78F32
+	for <kvmarm@lists.linux.dev>; Sun, 26 Jan 2025 15:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737905145; cv=fail; b=lCD+JDZEWDaa2MngNuAGN2ASaYClYcqOWw8VmuPUFIK1pid+O4ZyO4dKQvsX+GzkrRaejazOFk4SJs7kLjQrsI+G9JHTzehT5QKxHY9lvG6bGrF63pMtbnFV3BoBhDt7wRH8u3BuWAazavp/tV+O8tAwpM4CnhQ6HFvCykgAfS4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737905145; c=relaxed/simple;
+	bh=iYQq3gvHraqFvIt4yhwPtgeeoV8ukIr3k97qKWj7ALY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=O1QN5P3SNloW2KyWmDd6SstK6xzbjq7QsJu+nWrmPNoKVg0nUA6GERo9PAwBRbUU9naN6ovm5hvit4R1DhTXs74gXMoOAza0L/aP6Io5lYZgiMz5U0vbd6w/wSb0T6sQ54lYLJ1fUA/IHv2o4ZlGW5wdxT7wcqc1dVtOYEgxlX0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=epam.com; spf=pass smtp.mailfrom=epam.com; dkim=pass (2048-bit key) header.d=epam.com header.i=@epam.com header.b=HA4KJ0ZQ; arc=fail smtp.client-ip=52.101.65.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=epam.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=epam.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=epam.com header.i=@epam.com header.b="HA4KJ0ZQ"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cc/tjF4XeQTH0PM5ZBY6JfTu1R8dXJmoCtVgr36EmEcl3uAZg2zbqiBYV4/BpRREQbr5Lx11btmBMG4XuVpQsZu4BzkCOYLepNW5+pwdxjuh48EE30x4l9uvOe4JmYRrTXucCIDcVoGqvwGCe4z5ZpxKdBnb7dQoMtqZxr4NIRREnOESp83YprkPXi/PsEMV1AV4axcoy4KNHkj3ChYaqDXOud3+Zq0Ds8nLKioX5r2nbqhCiR+GdIih1NRFC1/ndONKbI5DwAGJ0KbG708DSI++XRr/Riv6douJ9TtVY1nr0FduCGJYY4tijoizIGoCJA/wtnf59pW0opfQM02Xrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vg4+DKrzpktTBCueSoAGLm6ue7Hn4I+oyp1ttWn8C/M=;
+ b=klTB8B0SypLKHyZtcwjaR4qApXmzN1tiyiYinv1XipBSIDClpWlToxdq6AB53DGvQeaKAmN95nhr/j6DaaVAQqyCi/u0jPu6bcnZMi9dNRhKSMyTGqXoSpiEgRc2mdyw7s0fRpmmhEtjFCp6lxgEYffBOJPok5IvLiW58LNkb1Hd03bazeSOaNf35hFDOhYl28SxKkVlzmYRZOOTIP7labn93EPMzL0wtp2Xg06+ZK8wLGca2P8eM7puZiCRhSEXKpHU6/hydyK9J1/22bizRsybpnvPDp44s7WKZpE6Px6WlX/OAYpeyxjLQIbz9q9L4s2e3xb//aB6wqpBOIe03A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=epam.com; dmarc=pass action=none header.from=epam.com;
+ dkim=pass header.d=epam.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=epam.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vg4+DKrzpktTBCueSoAGLm6ue7Hn4I+oyp1ttWn8C/M=;
+ b=HA4KJ0ZQHZs4IlrB2LeH6wXkeUugEvWkbJk9row7uDz+eaOidpbTg3jJsJ6Pcr+KhNdVHHezsXJAAEOfi09/pBLwTvWvDFNAvZqYa1MV5FltNsmo7ONfVy28xuSHvpMVyTL/OFsQKimwiag5L8pFr6EtI799nEK7a0BVXw33nOTRWejXn1h5WqCoGN94UnfcltzVQ2OHjo+ieMjKkTUAefmsdXWbdpnDCs9DpZm7qe0OPjvpkw9gpbXDpkjADDE0KZ+66upTG9Y4R2b2Jcq3V+EfYf47XqR3UvIgtO0iYWHkg4xb2XuxRcGVKVamnvrpzRhmgPjNPrjmc2+Z3xyIYQ==
+Received: from GV1PR03MB10456.eurprd03.prod.outlook.com
+ (2603:10a6:150:16a::21) by DB4PR03MB8657.eurprd03.prod.outlook.com
+ (2603:10a6:10:387::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.21; Sun, 26 Jan
+ 2025 15:25:39 +0000
+Received: from GV1PR03MB10456.eurprd03.prod.outlook.com
+ ([fe80::a41e:5aa8:e298:757e]) by GV1PR03MB10456.eurprd03.prod.outlook.com
+ ([fe80::a41e:5aa8:e298:757e%6]) with mapi id 15.20.8377.021; Sun, 26 Jan 2025
+ 15:25:39 +0000
+From: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
+	<yuzenghui@huawei.com>, Bjorn Andersson <andersson@kernel.org>, Christoffer
+ Dall <christoffer.dall@arm.com>, Ganapatrao Kulkarni
+	<gankulkarni@os.amperecomputing.com>, Chase Conklin <chase.conklin@arm.com>,
+	Eric Auger <eauger@redhat.com>, Dmytro Terletskyi
+	<Dmytro_Terletskyi@epam.com>
+Subject: Re: [PATCH v2 02/12] KVM: arm64: nv: Sync nested timer state with
+ FEAT_NV2
+Thread-Topic: [PATCH v2 02/12] KVM: arm64: nv: Sync nested timer state with
+ FEAT_NV2
+Thread-Index: AQHbcAaOrTBbbSLpA0ukEQZvbJQCdQ==
+Date: Sun, 26 Jan 2025 15:25:39 +0000
+Message-ID: <87frl51tse.fsf@epam.com>
+References: <20241217142321.763801-1-maz@kernel.org>
+	<20241217142321.763801-3-maz@kernel.org>
+In-Reply-To: <20241217142321.763801-3-maz@kernel.org> (Marc Zyngier's message
+	of "Tue, 17 Dec 2024 14:23:10 +0000")
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=epam.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1PR03MB10456:EE_|DB4PR03MB8657:EE_
+x-ms-office365-filtering-correlation-id: d9cbbbae-32ef-447c-1f18-08dd3e1db0a0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?4GEbVx9bcR11FumCTr4eM4L+KUjv5i49aqUbx39+mXe6OHrIn/BA5eHbYJ?=
+ =?iso-8859-1?Q?p+ZyGilDnf2NO5BLh3QtQ/kk8AUM4LToBB1VdT/0rz1ubnp750Lk9IUAoj?=
+ =?iso-8859-1?Q?jQzsY5/y/Z0XOlGK1XacQUfNYNFbQgJf0AHWIaJo46NHLnN0LAHx8fTwy6?=
+ =?iso-8859-1?Q?Pu1+vokZRqjXnHD+K5OtQKRBovAELvK49OYCIAHuLmJnJd1yJaCgKjIzp4?=
+ =?iso-8859-1?Q?PQWmaNrzavNDFZX72nWXz/mR/YDN7lPfb5D0rvdI4nVryoVcICkMe4nZ0j?=
+ =?iso-8859-1?Q?c1J9UlzpLSbfThd9Jm8l1XpFMuBTa/xs8D2p9h0uAylC/n5tVqhkdJtDCZ?=
+ =?iso-8859-1?Q?Z5a71+1t7Eez2yJrDgNU7bIlw7olXNqJEX8k+o4VjI/ykLAjxvt4UTnqiv?=
+ =?iso-8859-1?Q?jQ2KytK8TbXS/92VgWimshXwmb+zIsTQZYHpUn6OtpzeWtlprgPio0ljid?=
+ =?iso-8859-1?Q?Q8HgTx7EySoHTuj8ibfeOvz8zGxRVIlGZorMXYeVDl3DnlXNdUqIiWUhwb?=
+ =?iso-8859-1?Q?I8PnJaXa2MYBKljC0sdMZB1TVRAtzA28Xwlso97k7ULYF4VUBhju69kzO7?=
+ =?iso-8859-1?Q?2bQoQy0tjVVPEQys2S1eFao5RjQXHOz2J3jbWEnsE4jYiqdmBHD2Jjok8k?=
+ =?iso-8859-1?Q?spJhf26F2NaThWUPTGXhq8mvJSevXO1eDWm4lTm0WGX2ciA/Glf++En0jK?=
+ =?iso-8859-1?Q?GmL30vndZsGeTKdrbedFTTddaap/0mX6B3y0qkqW62qiNkj6Cq6Tlp+SMJ?=
+ =?iso-8859-1?Q?PX8Fk/Qd9xYYsQN6ZWQjBFMtTxi+KLgSSBbD48zekBqdwDhk3yhPdKDQWx?=
+ =?iso-8859-1?Q?mXbvqZj6ZxHujGjKHD6JDvBf/Li3KgxkV6ap5LOBCxYQ9tcjztjkRf2RTk?=
+ =?iso-8859-1?Q?REvaWcKogrhKDjojrM2i6Gc/IeIxF/an6ohwvcsm3WJvs+FbbP1+1i7o/J?=
+ =?iso-8859-1?Q?I5S7tFbj44pEeSpqusRZdwZoD0Yfw7FtdChfHeZXnAZJomL4mpgoBw7bvE?=
+ =?iso-8859-1?Q?ILlrpi/eKD4wseAY9Tf3yCJU8L9w9u3XITkZ6EcBG9utCVmW0t88OEDTuS?=
+ =?iso-8859-1?Q?5phFlTIv1LX5Q63qdPq1u++RGV77WRHwAVurf7WWCfpfSGP0ToD35G7lwf?=
+ =?iso-8859-1?Q?RvP4S3Zwp2/0oshupUqmjMBhJCvGSxq8ieT+9rDw4L1Pai0vQYr/xzDujx?=
+ =?iso-8859-1?Q?y58HWBzho7wzQe37gvUyGUF4KKYMwDciNkJm1Itr9yRe1kylm0ameOfkw4?=
+ =?iso-8859-1?Q?rO6xAo0UvmgvCo2ygE6IPANzLGrasUQz5QJW+2SOYIf40NW1dZCzCREP6j?=
+ =?iso-8859-1?Q?Qx48P4zZ87ayPhNeDLLA79cBsfnIv2jPprb8BP0UFo9PDqB25pyC5bVSsS?=
+ =?iso-8859-1?Q?96XKDRe4iDe+pcks5hY9stHMnNOvehEUlvSZ31RK+SAhp4s95Eu5i7+//P?=
+ =?iso-8859-1?Q?pLVDktfc7Iw/ACkYXn1PNxJwBOxKiZQ1UD8Rimo48CEM+X+6UfE4bVnzbH?=
+ =?iso-8859-1?Q?N67/m0DQ502IDjm+859oHx?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR03MB10456.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?WkgU/8Vu27y9+bSmyH67fAXaGYlSCTPGPSXo6zMwRZ2dXAWcI4MURsVXc4?=
+ =?iso-8859-1?Q?GKZFL3J3DVwtPHCCz4J2+fyeZu7hUXjrnAHRZ7YZQljJQUPEJSGP8PIPTo?=
+ =?iso-8859-1?Q?HyIehgMfw4y4xXDPDwqI73J/S52hcV7KZPX95Ys2kUWwFznFQklsiUBOnp?=
+ =?iso-8859-1?Q?OvhCs2UQ90OUkXfS9Kzb/BXtOPSyUCjW/ShQ1bVzpRBSyqOC7zjPwS0bGb?=
+ =?iso-8859-1?Q?98X9TaTMGiw/qJDd4ScQAdVZBk5Rdm+arghp4lewrC/H255K/Rt2oZUrZo?=
+ =?iso-8859-1?Q?WRb2nSK8Fm3vRxLoZI7hOye2HHSWBulcLqXxm59OB8k8BHm6R0ByFXuU3J?=
+ =?iso-8859-1?Q?+4L+fiJLIr6NNA8UyJs5ZG5QB8xrPViq3lMZxnIGzln0+KcJU/jWcNSMiI?=
+ =?iso-8859-1?Q?HFaaj6xxujBEQ9UHU93ZyildJUP1ZemlXBGPMSaDgobQD9A6PFaufxSyfn?=
+ =?iso-8859-1?Q?H8untUn8/1oO3P5N7gb1WeVMDEq0a3RL1Xq4DLIYIifO7Uu6LrQndvS0T7?=
+ =?iso-8859-1?Q?CUyUZIeyF8BqSatepKFgF7335rP9/sGtIrmNHLzDECGqcTRpqL5SGrA+Nf?=
+ =?iso-8859-1?Q?SkdOqPmSnmVget+M/GyONTIjRCNsYUa8tg8YnPjj7FR/fyksxOZ4OVvjd1?=
+ =?iso-8859-1?Q?xPBME38MUTVV4a0FVsbS2iOklX9Z5xYxhLoZ28eCOuBYFvs/xlua9oKkyH?=
+ =?iso-8859-1?Q?8rWlHV633pSbO9s2FsGG1cgKUQctnlPRa8Shnm+3lF5CUAr/H9+XyQt0c+?=
+ =?iso-8859-1?Q?/gS0jTDh5RMvaENySwclfzXRZTQhqGb36yCY/nlz4FFzE10Xfeu/UGCMKw?=
+ =?iso-8859-1?Q?gfFgZHglwz8KzT/anaO3HHc91v1eAqTYtaxOt+0en1qZdVMI7YuQ7quH/o?=
+ =?iso-8859-1?Q?ofdzfsDUXjVu+9PbVW7Nu2N31liJxD2f/w895wlndCiEWFg3mV9DisIRZy?=
+ =?iso-8859-1?Q?1PLc1Mr9vMxkm2GbtDsTiHDHK8Px6JiyMJliZedMn+OXMSuQbmfcC8AF9w?=
+ =?iso-8859-1?Q?VEGVrCGbyFwS4vtmSUgBfKEv19BZLP7pSUccZAgU3YmQAvnDGIhca2G6xw?=
+ =?iso-8859-1?Q?IT1f1YymW8hUlOfrRjooYHLkc1tkA8853QtioyWbxY6qHzk1mirKH0/3FL?=
+ =?iso-8859-1?Q?EQSmIIJR89pB38crvggyL5W40VoIMIZwxOw2/cf8Gxkvv6bK53zFvVSDJG?=
+ =?iso-8859-1?Q?U8PCy4VLfzjY1EqGTH5XFjLaIhAcvWRlS3hn92sXSL6f3aB/0GQdN8Sguz?=
+ =?iso-8859-1?Q?Hwhq0U/m+NSitMpdQlPFWfeU1ne3rYYxGbVFIJ6bmmHpeM8O5ZfhpRf34v?=
+ =?iso-8859-1?Q?/81a9oLG0wjsUmIPkjFkhbRk6gDeS/fSgKJqvTt6kjYF1GXq/6PTAxsyqy?=
+ =?iso-8859-1?Q?JHNLw81Yz5KfvIzIYeeTyInifkN1VD2z6js8jMjKvu/peArIgdnBqHCgOB?=
+ =?iso-8859-1?Q?+ea1Ggq2YHH4St+AUy1Ee53UH4UEzxR4Sva82MT+CePlP2MCXIZTPP82wW?=
+ =?iso-8859-1?Q?iTXWNnO70Rg9qzF7uMvUDlm1sm88ETrTUmJgMFYZzj8g5aIJQNhGxT9n38?=
+ =?iso-8859-1?Q?arRmNXmWurt76e9kP9bDgPy4jIT7CTZ7yaOEkVf4PqHxlLznNjc5CJCJEM?=
+ =?iso-8859-1?Q?R6i77QOmlUImbV44mQhUJdtC9huhGyGkHjICudD6yCVebNLR4kAzkJiA?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-OriginatorOrg: epam.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR03MB10456.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9cbbbae-32ef-447c-1f18-08dd3e1db0a0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2025 15:25:39.4127
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b41b72d0-4e9f-4c26-8a69-f949f367c91d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vZmV3X7t6BKl7A8te1bSUmZjcZXzmypcNjBN2DcKeQBhX+zt1IWXlxEVitWgayWbTuyRGHXWAGvcGnDazRibTCzARgzJlW++7PXsUq8/1Ac=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR03MB8657
 
-Retrieve any migration target implementation CPUs using the hypercall
-and enable associated errata.
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- arch/arm64/include/asm/cputype.h  | 24 +++++++++++--
- arch/arm64/include/asm/paravirt.h |  3 ++
- arch/arm64/kernel/cpu_errata.c    | 20 +++++++++--
- arch/arm64/kernel/cpufeature.c    |  2 ++
- arch/arm64/kernel/image-vars.h    |  2 ++
- arch/arm64/kernel/paravirt.c      | 58 +++++++++++++++++++++++++++++++
- include/linux/arm-smccc.h         |  2 ++
- 7 files changed, 106 insertions(+), 5 deletions(-)
+Hi Marc,
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index dcf0e1ce892d..f95f04ec6f66 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -265,6 +265,15 @@ struct midr_range {
- #define MIDR_REV(m, v, r) MIDR_RANGE(m, v, r, v, r)
- #define MIDR_ALL_VERSIONS(m) MIDR_RANGE(m, 0, 0, 0xf, 0xf)
- 
-+struct target_impl_cpu {
-+	u64 midr;
-+	u64 revidr;
-+	u64 aidr;
-+};
-+
-+extern u32 target_impl_cpu_num;
-+extern struct target_impl_cpu *target_impl_cpus;
-+
- static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
- 					   u32 rv_max)
- {
-@@ -276,8 +285,19 @@ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
- 
- static inline bool is_midr_in_range(struct midr_range const *range)
- {
--	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
--				       range->rv_min, range->rv_max);
-+	int i;
-+
-+	if (!target_impl_cpu_num)
-+		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-+					       range->rv_min, range->rv_max);
-+
-+	for (i = 0; i < target_impl_cpu_num; i++) {
-+		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
-+					    range->model,
-+					    range->rv_min, range->rv_max))
-+			return true;
-+	}
-+	return false;
- }
- 
- static inline bool
-diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-index 9aa193e0e8f2..95f1c15bbb7d 100644
---- a/arch/arm64/include/asm/paravirt.h
-+++ b/arch/arm64/include/asm/paravirt.h
-@@ -19,11 +19,14 @@ static inline u64 paravirt_steal_clock(int cpu)
- }
- 
- int __init pv_time_init(void);
-+void __init pv_target_impl_cpu_init(void);
- 
- #else
- 
- #define pv_time_init() do {} while (0)
- 
-+#define pv_target_impl_cpu_init() do {} while (0)
-+
- #endif // CONFIG_PARAVIRT
- 
- #endif
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 929685c00263..147b036d8bbd 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -14,6 +14,9 @@
- #include <asm/kvm_asm.h>
- #include <asm/smp_plat.h>
- 
-+u32 target_impl_cpu_num;
-+struct target_impl_cpu *target_impl_cpus;
-+
- static bool __maybe_unused
- __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
- 			 u32 midr, u32 revidr)
-@@ -32,9 +35,20 @@ __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
- static bool __maybe_unused
- is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
- {
--	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
--	return __is_affected_midr_range(entry, read_cpuid_id(),
--					read_cpuid(REVIDR_EL1));
-+	int i;
-+
-+	if (!target_impl_cpu_num) {
-+		WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-+		return __is_affected_midr_range(entry, read_cpuid_id(),
-+						read_cpuid(REVIDR_EL1));
-+	}
-+
-+	for (i = 0; i < target_impl_cpu_num; i++) {
-+		if (__is_affected_midr_range(entry, target_impl_cpus[i].midr,
-+					     target_impl_cpus[i].midr))
-+			return true;
-+	}
-+	return false;
- }
- 
- static bool __maybe_unused
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 4cc4ae16b28d..d32c767bf189 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -85,6 +85,7 @@
- #include <asm/kvm_host.h>
- #include <asm/mmu_context.h>
- #include <asm/mte.h>
-+#include <asm/paravirt.h>
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/sysreg.h>
-@@ -3642,6 +3643,7 @@ unsigned long cpu_get_elf_hwcap3(void)
- 
- static void __init setup_boot_cpu_capabilities(void)
- {
-+	pv_target_impl_cpu_init();
- 	/*
- 	 * The boot CPU's feature register values have been recorded. Detect
- 	 * boot cpucaps and local cpucaps for the boot CPU, then enable and
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 8f5422ed1b75..694e19709c46 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -49,6 +49,8 @@ PROVIDE(__pi_arm64_sw_feature_override	= arm64_sw_feature_override);
- PROVIDE(__pi_arm64_use_ng_mappings	= arm64_use_ng_mappings);
- #ifdef CONFIG_CAVIUM_ERRATUM_27456
- PROVIDE(__pi_cavium_erratum_27456_cpus	= cavium_erratum_27456_cpus);
-+PROVIDE(__pi_target_impl_cpu_num	= target_impl_cpu_num);
-+PROVIDE(__pi_target_impl_cpus		= target_impl_cpus);
- #endif
- PROVIDE(__pi__ctype			= _ctype);
- PROVIDE(__pi_memstart_offset_seed	= memstart_offset_seed);
-diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-index aa718d6a9274..4547dc2ddc13 100644
---- a/arch/arm64/kernel/paravirt.c
-+++ b/arch/arm64/kernel/paravirt.c
-@@ -13,6 +13,7 @@
- #include <linux/export.h>
- #include <linux/io.h>
- #include <linux/jump_label.h>
-+#include <linux/memblock.h>
- #include <linux/printk.h>
- #include <linux/psci.h>
- #include <linux/reboot.h>
-@@ -20,6 +21,7 @@
- #include <linux/types.h>
- #include <linux/static_call.h>
- 
-+#include <asm/hypervisor.h>
- #include <asm/paravirt.h>
- #include <asm/pvclock-abi.h>
- #include <asm/smp_plat.h>
-@@ -153,6 +155,62 @@ static bool __init has_pv_steal_clock(void)
- 	return (res.a0 == SMCCC_RET_SUCCESS);
- }
- 
-+void  __init pv_target_impl_cpu_init(void)
-+{
-+	int i;
-+	unsigned long max_cpus;
-+	struct arm_smccc_res res;
-+	const u32 funcs[] = {
-+		ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER,
-+		ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS,
-+	};
-+
-+	/* Check we have already set targets */
-+	if (target_impl_cpu_num)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(funcs); ++i) {
-+		if (!kvm_arm_hyp_service_available(funcs[i]))
-+			return;
-+	}
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID,
-+			     0, &res);
-+	if (res.a0 != SMCCC_RET_SUCCESS)
-+		return;
-+
-+	if (res.a1 != ARM_SMCCC_KVM_DISCOVER_IMPL_VER_1_0 || !res.a2) {
-+		pr_warn("Unsupported target impl version or CPU implementations\n");
-+		return;
-+	}
-+
-+	max_cpus = res.a2;
-+	target_impl_cpus = memblock_alloc(sizeof(*target_impl_cpus) * max_cpus,
-+					  __alignof__(*target_impl_cpus));
-+	if (!target_impl_cpus) {
-+		pr_warn("Not enough memory for struct target_impl_cpu\n");
-+		return;
-+	}
-+
-+	for (i = 0; i < max_cpus; i++) {
-+		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID,
-+				     i, &res);
-+		if (res.a0 != SMCCC_RET_SUCCESS) {
-+			memblock_free(target_impl_cpus,
-+				      sizeof(*target_impl_cpus) * max_cpus);
-+			target_impl_cpus = NULL;
-+			pr_warn("Discovering target implementation CPUs failed\n");
-+			return;
-+		}
-+		target_impl_cpus[i].midr = res.a1;
-+		target_impl_cpus[i].revidr = res.a2;
-+		target_impl_cpus[i].aidr = res.a3;
-+	};
-+
-+	target_impl_cpu_num = max_cpus;
-+	pr_info("Number of target implementation CPUs is %d\n", target_impl_cpu_num);
-+}
-+
- int __init pv_time_init(void)
- {
- 	int ret;
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index f19be5754090..4b4ce6ecac0a 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -228,6 +228,8 @@
- 			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
- 			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD)
- 
-+#define ARM_SMCCC_KVM_DISCOVER_IMPL_VER_1_0	0x100000000
-+
- #define ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID		\
- 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
- 			   ARM_SMCCC_SMC_64,				\
--- 
-2.47.0
+Thank you for these patches. We (myself and Dmytro Terletskyi) are
+trying to use this series to launch up Xen on Amazon Graviton 4 platform.
+Graviton 4 is built on Neoverse V2 cores and does **not** support
+FEAT_ECV. Looks like we have found issue in this particular patch on
+this particular setup.
 
+Marc Zyngier <maz@kernel.org> writes:
+
+> Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+> can be reconfigured behind our back without the hypervisor even
+> noticing. In the VHE case, that's an actual regression in the
+> architecture...
+>
+> Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c         |  3 +++
+>  include/kvm/arm_arch_timer.h |  1 +
+>  3 files changed, 48 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 1215df5904185..ee5f732fbbece 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  		kvm_timer_blocking(vcpu);
+>  }
+> =20
+> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * When NV2 is on, guest hypervisors have their EL1 timer register
+> +	 * accesses redirected to the VNCR page. Any guest action taken on
+> +	 * the timer is postponed until the next exit, leading to a very
+> +	 * poor quality of emulation.
+> +	 */
+> +	if (!is_hyp_ctxt(vcpu))
+> +		return;
+> +
+> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
+> +		/*
+> +		 * A non-VHE guest hypervisor doesn't have any direct access
+> +		 * to its timers: the EL2 registers trap (and the HW is
+> +		 * fully emulated), while the EL0 registers access memory
+> +		 * despite the access being notionally direct. Boo.
+> +		 *
+> +		 * We update the hardware timer registers with the
+> +		 * latest value written by the guest to the VNCR page
+> +		 * and let the hardware take care of the rest.
+> +		 */
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
+> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
+
+
+Here you are overwriting trapped/emulated state of  EL2 vtimer with EL0
+vtimer, which renders all writes to EL2 timer registers useless.
+
+This is the behavior we observed:
+
+ 1. Xen writes to CNTHP_CVAL_EL2, which is trapped and handled in
+    kvm_arm_timer_write_sysreg().
+
+ 2. timer_set_cval() updates __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
+
+ 3. timer_restore_state() updates real CNTP_CVAL_EL0 with value from
+   __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
+
+ (so far so good)
+
+ 4. kvm_timer_sync_nested() is called and it updates real CNTP_CVAL_EL0
+ with __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), overwriting value that we got
+ from Xen.
+
+The same stands for other hypervisor timer registers of course.
+
+I am wondering, what is the correct fix for this issue?
+
+Also, we are observing issues with timers in Dom0, which seems related
+to this, but we didn't pinpoint exact problem yet.
+
+--=20
+WBR, Volodymyr=
