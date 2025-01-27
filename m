@@ -1,63 +1,66 @@
-Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5131946C3
-	for <kvmarm@lists.linux.dev>; Mon, 27 Jan 2025 22:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011951DB95E
+	for <kvmarm@lists.linux.dev>; Mon, 27 Jan 2025 22:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738016454; cv=none; b=WhI+LM4taJ4hedv0rWf/pkHyE7WGOmTFzV/AbupR9VoaI1c6vm90/vQWzd0BgftGgoIlGAk1X62PlLuI0/Eu2dV6qhKosXbnLqjVVJXYiI32QA3UOap7VVnilBU6zFtWVi3RP8gDcTXkKAN3wznYdMIIr+2MRcK3lCS9LTYnjY0=
+	t=1738016455; cv=none; b=IhaAP3ebLTwOXbdYkow49vVMF+FOgqzkg5TJWxlYuTx2tXOe8mWYgCzk1xnznRBO2oH+tX9s1H8vRKdUEmXHYLKJhytOZrjUjDAJgG2CMu5iteU4/I2rZ9GLUoIfSXI+YEqHoSsguX/HGVZjPxXwx0CmLukUzcJeCAwZTjRE6nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738016454; c=relaxed/simple;
-	bh=YR+PMK0VyLwKWhT0xbtwEKZ7//CuT8dMl7x5cZfrnYo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XgP0l83XkMiakhxDVTC8lujvVf8BnoqQxZ1k5AReh8w3iC3eFy9YNpJOyiWxyu/APHFqP8sFKXg3805Nqunuk3I+MHcUtMdxM+8SihEr2HVz4ooWNlXrRDOVGlRF1Wg4Nj0pDS6VCnPDCLBVcNQz4k+Hfprv6NPGNn1s0NRwI8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xduxv3A1; arc=none smtp.client-ip=209.85.160.73
+	s=arc-20240116; t=1738016455; c=relaxed/simple;
+	bh=e+fynXqXDHpzzqW8Vs+cdjC+w3ueF0FGlAHIDITfNr8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=U+WN8L4+3dQetCeCx7uoibuqbvZGokwyseHV5VCiHHT6KIBpJHfEwCFPtfiLFevT4C+9fobbGy4Y4N+nZ4q+uPWqdBmjHM6Ch3LqjOhasmfQ2o2Hxq10nm4bm6V82E6z0TNOkL+/SQLWrJBLQ8A4k8EeO/CbZqyfsuBY4lqK5ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DcWvWJFp; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xduxv3A1"
-Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-2a8e3905c56so1580635fac.2
-        for <kvmarm@lists.linux.dev>; Mon, 27 Jan 2025 14:20:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DcWvWJFp"
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3cfb20d74b5so35279675ab.3
+        for <kvmarm@lists.linux.dev>; Mon, 27 Jan 2025 14:20:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738016451; x=1738621251; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VGVx2inDcPb4kyuc5g9Cp41GlSlePFgSKTBuQPtRjD4=;
-        b=xduxv3A1Gpln0NHADUvUWBoFal2GQ7ONgsHTl6g/+gHtBuJyv3x9ECkW7O4zYtdxuc
-         y4OSxlA35NyNkw1sSoRuO+GqhfBpeljHGQMKD+eDVdB4MGZBEqc/jIrZf6DbDouw1ieO
-         /UYPNgdl1MTjVicDoFkq5+OKMBrwKTiiWwtUrxRVAN+aZNS1FdLHZ5a4QEjm9X+q+iiZ
-         eCAvoil/ylcr+A4pRtb/DwTk96VbNKez2EqQtSwYG4Aa6nfVu+J8kw1WFWvSSgX5/ReD
-         opuMv6wCXBhuQyDlAo7azbhAWwEQpdObWqAbUIT6Vq4IA738OoVeBZyXoGcYRf4Z248Y
-         f6dw==
+        d=google.com; s=20230601; t=1738016453; x=1738621253; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaVkSfHrHzVfJjq8AwEUCvEhNWS7AN/5lexlisUUmk8=;
+        b=DcWvWJFpS/tf3JY7qVGUVlLmxKwME58DzCNVMk9PJMNezKEIgE9o8wwP/51ktZnRrr
+         eXMNGng43xIICmVBWYO8nlmaGqN+zN9HAuaxm2wQIFf8lQ5fEAAXkCHuEBZVx985Mr9M
+         8V0+Nf83bJ1I3G8XlqAVMVd+05zw73O1xT7+taHwlfALCIMcKQwpg0NOOJGxZDFzVz/x
+         cLcFmW6qN4cr7MBFJBlkJt1wr3sAVonXYZVUoFebBmHT83J71BXyPaPCdKz7IIMjPgk4
+         YCdDXEoiywqutv38g3Uf/G5DgtQLOTrRdP0GgR7llMK1MoHZl0ljawLOMLoIPhDmjMRy
+         yK8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738016451; x=1738621251;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VGVx2inDcPb4kyuc5g9Cp41GlSlePFgSKTBuQPtRjD4=;
-        b=ZQxMcLOfa2Y1x0tLISbaG1jM5bCCPAOE3Vd7cVJ50XF1LyGxQ3in3BNGPC0S+8nBV+
-         aWBTk438qXfegJHSdU6gnD80JPUUnfd8xwxXGlAyo5e4l0b3zCq2lUb7LcUW0ZKsRMRX
-         bi9U54Xobld9Q/3HeWL2LQiVeYXa28TceSd+aHggzzrrcz40v6p4wzbS0reQ8qu8+Mlb
-         NJEjMA0Ckfq+4bjJruLYYwgyZhlh7SPoSgHXH7LBT70kO205kjdY+mSdLHb+uTNZvkqG
-         /CmE6XTcfKVx3u+R9OiOQ/mbjVR7x3bX/v8/K+U76oJ5HDWO6NMTAAGBpNvsG8M1yd4m
-         Gr6A==
-X-Forwarded-Encrypted: i=1; AJvYcCU5SD3gNQJ81j8o9RIrpX7GszNl6nf74hM8lRUFb11i7e7Mi4bIaXcPjSaTdEu7RCG0Ih2EO5o=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx+deaIVFwtfH6krB5KEkd2i3LxB73pp7W+9lNXKfOPVnbd9a45
-	E3PagsuE+CFUtw9An76aegSuq9HcYLe8SG3jU1C8nvF3IJLK3D1G99D/yM4sFKA6a4nbsbUWOOa
-	QYAmBJm7jWEhj71B30nsMrA==
-X-Google-Smtp-Source: AGHT+IEyp+zn4K8xvMBme9w+olqOdC2WoYBUbvWUqnKRlZMr1gAx+eFOYXOnePYqDL8MpO28ip3SYaynWBZeMCj6Qg==
-X-Received: from oabnw13.prod.google.com ([2002:a05:6870:bb0d:b0:2b2:2b44:5abb])
+        d=1e100.net; s=20230601; t=1738016453; x=1738621253;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaVkSfHrHzVfJjq8AwEUCvEhNWS7AN/5lexlisUUmk8=;
+        b=o+GAdR5BtPDRHKHR9DsEVAyO/PU0MBkeg3ZAZLiw08nfFrYwbdlPWTbnJE5NhA+fxC
+         6uRiOplHkICJJRJoQVf3erXhJvn8uXBfBP2WxCSbI1mkzXdY7pSblsI+dkbpB3z1sKhx
+         4dT5X7e5H/T+dunk1WpWUDlmCIj46oT7dJELpg2VoiqkfQnGC3AvuzgziB/stgi0ZoRs
+         oohQDPFF+KrIKfz7iucrxIWQSSrDU6drzurDyLZ9frDUPDAWge9H9SfP/TPZKoI19p5R
+         ii2TOxtm41fX7tjo2yqStey0634UxvsNYbTfJjBuQFbVdbAer2jXxHURW9daFJ9ulbNy
+         b9+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUU8aU/EVtxc9g7xPjtnF/JxOAX2BWPfBoyx95Tym9spXYGpTREKfavdQ3D4295eOllg0Hlvpk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YypBhyehflH6wDOKSbNtwAeST8LZxvGa/uH+dH36uIEgYOps0dG
+	2KSXjL6SEBLFvZixvMzAL6RgU9WCNM2ILSbLPQwhO0aucvd9KDOEKf1/hTVNRUjV82kicYHKo4i
+	ngS6izyJhBoq3RFdiWsQXUw==
+X-Google-Smtp-Source: AGHT+IFYMP4DnSoUUl5kkRFoQsqHI/1D0lC2aOLiNQgEnibJSp/Pb6c49edDE2uZE1uw/6tcaw+6CTgspGEMpXa6dw==
+X-Received: from ilbbu12.prod.google.com ([2002:a05:6e02:350c:b0:3ce:8579:c1eb])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6871:3a88:b0:29e:2422:49f9 with SMTP id 586e51a60fabf-2b1c0aee5efmr22900341fac.25.1738016450898;
- Mon, 27 Jan 2025 14:20:50 -0800 (PST)
-Date: Mon, 27 Jan 2025 22:20:26 +0000
+ 2002:a05:6e02:1f85:b0:3cf:b08e:7e91 with SMTP id e9e14a558f8ab-3cfb08e7f5bmr197753565ab.13.1738016453125;
+ Mon, 27 Jan 2025 14:20:53 -0800 (PST)
+Date: Mon, 27 Jan 2025 22:20:28 +0000
+In-Reply-To: <20250127222031.3078945-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250127222031.3078945-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250127222031.3078945-1-coltonlewis@google.com>
-Subject: [RFC PATCH 0/4] PMU partitioning driver support
+Message-ID: <20250127222031.3078945-3-coltonlewis@google.com>
+Subject: [RFC PATCH 2/4] KVM: arm64: Make guests see only counters they can access
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
@@ -70,43 +73,52 @@ Cc: Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.c
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series introduces support in the ARM PMUv3 driver for
-partitioning PMU counters into two separate ranges by taking advantage
-of the MDCR_EL2.HPMN register field.
+The ARM architecture specifies that when MDCR_EL2.HPMN is set, EL1 and
+EL0, which includes KVM guests, should read that value for PMCR.N.
 
-The advantage of a partitioned PMU would be to allow KVM guests direct
-access to a subset of PMU functionality, greatly reducing the overhead
-of performance monitoring in guests.
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ arch/arm64/kvm/pmu-emul.c                                 | 8 +++++++-
+ tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-While this series could be accepted on its own merits, practically
-there is a lot more to be done before it will be fully useful, so I'm
-sending as an RFC for now.
-
-This patch is based on v6.13-rc7. It needs a small additional change
-after Oliver's Debug cleanups series going into 6.14, specifically
-this patch [1], because it changes kvm_arm_setup_mdcr_el2() to
-initialize HPMN from a cached value read early in the boot process
-instead of reading from the register. The only sensible way I can see
-to deal with this is returning to reading the register.
-
-[1] https://lore.kernel.org/kvmarm/20241219224116.3941496-3-oliver.upton@linux.dev/
-
-Colton Lewis (4):
-  perf: arm_pmuv3: Introduce module param to partition the PMU
-  KVM: arm64: Make guests see only counters they can access
-  perf: arm_pmuv3: Generalize counter bitmasks
-  perf: arm_pmuv3: Keep out of guest counter partition
-
- arch/arm/include/asm/arm_pmuv3.h              |  10 ++
- arch/arm64/include/asm/arm_pmuv3.h            |  10 ++
- arch/arm64/kvm/pmu-emul.c                     |   8 +-
- drivers/perf/arm_pmuv3.c                      | 113 ++++++++++++++++--
- include/linux/perf/arm_pmu.h                  |   2 +
- include/linux/perf/arm_pmuv3.h                |  34 +++++-
- .../kvm/aarch64/vpmu_counter_access.c         |   2 +-
- 7 files changed, 160 insertions(+), 19 deletions(-)
-
-
-base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
---
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 6c5950b9ceac..052ce8c721fe 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -993,12 +993,18 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
+ {
+ 	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
++	u8 limit;
++
++	if (arm_pmu->partitioned)
++		limit = arm_pmu->hpmn - 1;
++	else
++		limit = ARMV8_PMU_MAX_GENERAL_COUNTERS;
+ 
+ 	/*
+ 	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
+ 	 * Ignore those and return only the general-purpose counters.
+ 	 */
+-	return bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS);
++	return bitmap_weight(arm_pmu->cntr_mask, limit);
+ }
+ 
+ static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+index f9c0c86d7e85..4d5acdb66bc2 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+@@ -610,7 +610,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
+  */
+ static void run_error_test(uint64_t pmcr_n)
+ {
+-	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
++	pr_debug("Error test with pmcr_n %lu (larger than the host allows)\n", pmcr_n);
+ 
+ 	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
+ 	destroy_vpmu_vm();
+-- 
 2.48.1.262.g85cc9f2d1e-goog
+
