@@ -1,255 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7067D1F95A;
-	Mon, 27 Jan 2025 17:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01773189F57
+	for <kvmarm@lists.linux.dev>; Mon, 27 Jan 2025 17:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737998162; cv=none; b=XljAdiXsGe9XwsTTRkkpUIRpQ0SBiac99NjfcC10JoyJTXzVZ7iJHyGLT/OYtz1P9j9mZZoX4fWkUI2ciSgqirsBm4K5V6FuoyyUqZsVfVi+3Qcyhh/o8+MgwbPHONZDgI1WlEjZctKaMpOgJmWQwa1iFCGfwU+GsojvvkZ4Wow=
+	t=1737998673; cv=none; b=WYXfdFW3SQY4iBfV1GThxABOkSnVpcIo/5QChrRYtvclwytw1KLeJXr4hiVWsS+iir+dWAXua+FjtxELn7HT2E38TwiZ9F0mG4+WwqxpJp8vKVJbK/rmOWVkcVEKBRIjiUvjmxjyF3NmhsOpPNeKZNeWlpcGe9w3BCGHnYFdCVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737998162; c=relaxed/simple;
-	bh=N1fX6+bzR+65LUJel3imzbkdoouWyn23HZhhv1zrwwU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p2F9skEPLi+apluchvPQAXmpuNzJsuzHn+lk6mY1Ea771GXWQ3mIJYgALOgBAXv90pvapz3ze+6eKMlDN3CbJV/80TN4lZGvUVBDHIBpFmrs9SEQGASK/rQDoMj5lpDy1g2VxfKXlvWI261YAjIyAZ8Vg7Px6S26sM9pBxE8l7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z512/ExL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z512/ExL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCDB1C4CEE0;
-	Mon, 27 Jan 2025 17:16:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737998162;
-	bh=N1fX6+bzR+65LUJel3imzbkdoouWyn23HZhhv1zrwwU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z512/ExLrazSWVuiElAn6gHXY5zZXk5vswjrVH9Yo9gymQuUwSHqFD9QgiK+MYBdW
-	 WWTVlUHfvuoU1rbMmEUyZ8q3UTqnm/D7eAR8aTRlgr6rlZuxKHj8L//cG8bAw8CdwS
-	 QNgjK4UyrCKkGRZRWRe2aCvMwo4NeRQDHWHJtLn/UOFn3z4+c1Msgol5ugyJ9goWXQ
-	 6Vl9hRQyGF0G6aq65S6mOfzK5m4a+rszK8hE5jDArgLY/TNHmr3+80E8AJWuDBgxIY
-	 Lpsj29eQv45kJY2VPAnisCi2L/ngkL+GEg6m9M4gRO0PfaTWN7yR7YL+6lvENmCaZd
-	 rq6TfrhSBRUKw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tcSiM-00FoSv-V4;
-	Mon, 27 Jan 2025 17:15:59 +0000
-Date: Mon, 27 Jan 2025 17:15:57 +0000
-Message-ID: <86h65kuqia.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer
- Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni
-	<gankulkarni@os.amperecomputing.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Eric Auger <eauger@redhat.com>,
-	Dmytro Terletskyi
-	<Dmytro_Terletskyi@epam.com>, Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Subject: Re: [PATCH v2 02/12] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
-In-Reply-To: <87frl51tse.fsf@epam.com>
-References: <20241217142321.763801-1-maz@kernel.org>
-	<20241217142321.763801-3-maz@kernel.org>
-	<87frl51tse.fsf@epam.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1737998673; c=relaxed/simple;
+	bh=byWs8oCr7vnVeCFRMQhR2rBVzByD/sn2EzuKOKQogVI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QWfgB8rb5ERfuK18uLDvIbmD5UONIrVcuO4a/XoybcqkUckF0wUcAtEuXHtZJrDvputxoytOhKvRlA7B88EU36VAFRftdIkrfzN/D6nYGz8Xc6dBwg/atrK6wpilVKuvlnpA+iFl3UI7Cjkbg/sg/WwNp4HFVIQikg7r68cuf+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YhZww54Htz6M4Xw;
+	Tue, 28 Jan 2025 01:22:24 +0800 (CST)
+Received: from frapeml500007.china.huawei.com (unknown [7.182.85.172])
+	by mail.maildlp.com (Postfix) with ESMTPS id 72BE6140B73;
+	Tue, 28 Jan 2025 01:24:27 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ frapeml500007.china.huawei.com (7.182.85.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 27 Jan 2025 18:24:27 +0100
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Mon, 27 Jan 2025 18:24:26 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
+	<maz@kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>, "mark.rutland@arm.com"
+	<mark.rutland@arm.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "sebott@redhat.com"
+	<sebott@redhat.com>, yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)"
+	<wangzhou1@hisilicon.com>, jiangkunkun <jiangkunkun@huawei.com>, "Jonathan
+ Cameron" <jonathan.cameron@huawei.com>, Anthony Jebson
+	<anthony.jebson@huawei.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
+Subject: RE: [PATCH v5 3/4] KVM: arm64: Report all the KVM/arm64-specific
+ hypercalls
+Thread-Topic: [PATCH v5 3/4] KVM: arm64: Report all the KVM/arm64-specific
+ hypercalls
+Thread-Index: AQHbbnQf1mRnk6lqN0urqeTQZlYYF7Mqzb0AgAASSJA=
+Date: Mon, 27 Jan 2025 17:24:26 +0000
+Message-ID: <c448a912008d4c69b1e7940838fb061d@huawei.com>
+References: <20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com>
+ <20250124151732.6072-4-shameerali.kolothum.thodi@huawei.com>
+ <Z5e86rCgvbtK84CT@linux.dev>
+In-Reply-To: <Z5e86rCgvbtK84CT@linux.dev>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com, Dmytro_Terletskyi@epam.com, r09922117@csie.ntu.edu.tw
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
 
-+ Wei-Lin Chang, who spotted something similar 3 weeks ago, that I
-didn't manage to investigate in time.
 
-On Sun, 26 Jan 2025 15:25:39 +0000,
-Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
-> 
-> 
-> Hi Marc,
-> 
-> Thank you for these patches. We (myself and Dmytro Terletskyi) are
-> trying to use this series to launch up Xen on Amazon Graviton 4 platform.
-> Graviton 4 is built on Neoverse V2 cores and does **not** support
-> FEAT_ECV. Looks like we have found issue in this particular patch on
-> this particular setup.
-> 
-> Marc Zyngier <maz@kernel.org> writes:
-> 
-> > Emulating the timers with FEAT_NV2 is a bit odd, as the timers
-> > can be reconfigured behind our back without the hypervisor even
-> > noticing. In the VHE case, that's an actual regression in the
-> > architecture...
+
+> -----Original Message-----
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Sent: Monday, January 27, 2025 5:06 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvmarm@lists.linux.dev; maz@kernel.org; catalin.marinas@arm.com;
+> will@kernel.org; mark.rutland@arm.com; cohuck@redhat.com;
+> eric.auger@redhat.com; sebott@redhat.com; yuzenghui
+> <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
+> jiangkunkun <jiangkunkun@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Anthony Jebson
+> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
+> Linuxarm <linuxarm@huawei.com>
+> Subject: Re: [PATCH v5 3/4] KVM: arm64: Report all the KVM/arm64-specific
+> hypercalls
+>=20
+> Hi Shameer,
+>=20
+> On Fri, Jan 24, 2025 at 03:17:31PM +0000, Shameer Kolothum wrote:
+> > Currently ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID returns
+> the bitmap
+> > corresponding to KVM_REG_ARM_VENDOR_HYP_BMAP and it only
+> returns
+> > _KVM_FEATURES_FUNC_ID and _KVM_PTP_FUNC_ID. Change that to
+> return all
+> > the KVM/arm64-specific hypercalls exposed by
+> > KVM/arm64 to guest operating systems.
 > >
-> > Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Shameer Kolothum
+> <shameerali.kolothum.thodi@huawei.com>
 > > ---
-> >  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/arm.c         |  3 +++
-> >  include/kvm/arm_arch_timer.h |  1 +
-> >  3 files changed, 48 insertions(+)
+> >  arch/arm64/kvm/hypercalls.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 1215df5904185..ee5f732fbbece 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-> >  		kvm_timer_blocking(vcpu);
-> >  }
-> >  
-> > +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/*
-> > +	 * When NV2 is on, guest hypervisors have their EL1 timer register
-> > +	 * accesses redirected to the VNCR page. Any guest action taken on
-> > +	 * the timer is postponed until the next exit, leading to a very
-> > +	 * poor quality of emulation.
-> > +	 */
-> > +	if (!is_hyp_ctxt(vcpu))
-> > +		return;
+> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> > index 27ce4cb44904..6132cb542200 100644
+> > --- a/arch/arm64/kvm/hypercalls.c
+> > +++ b/arch/arm64/kvm/hypercalls.c
+> > @@ -359,7 +359,11 @@ int kvm_smccc_call_handler(struct kvm_vcpu
+> *vcpu)
+> >  		val[3] =3D ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
+> >  		break;
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+> > -		val[0] =3D smccc_feat->vendor_hyp_bmap;
+> > +		val[0] =3D GENMASK(ARM_SMCCC_KVM_FUNC_MMIO_GUARD,
+> > +				 ARM_SMCCC_KVM_FUNC_FEATURES);
+> > +		/* Function numbers 8-63 are reserved for pKVM for now */
+> > +		val[2] =3D
+> GENMASK((ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS - 64),
 > > +
-> > +	if (!vcpu_el2_e2h_is_set(vcpu)) {
-> > +		/*
-> > +		 * A non-VHE guest hypervisor doesn't have any direct access
-> > +		 * to its timers: the EL2 registers trap (and the HW is
-> > +		 * fully emulated), while the EL0 registers access memory
-> > +		 * despite the access being notionally direct. Boo.
-> > +		 *
-> > +		 * We update the hardware timer registers with the
-> > +		 * latest value written by the guest to the VNCR page
-> > +		 * and let the hardware take care of the rest.
-> > +		 */
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
-> 
-> 
-> Here you are overwriting trapped/emulated state of  EL2 vtimer with EL0
-> vtimer, which renders all writes to EL2 timer registers useless.
-> 
-> This is the behavior we observed:
-> 
->  1. Xen writes to CNTHP_CVAL_EL2, which is trapped and handled in
->     kvm_arm_timer_write_sysreg().
-> 
->  2. timer_set_cval() updates __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
-> 
->  3. timer_restore_state() updates real CNTP_CVAL_EL0 with value from
->    __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
-> 
->  (so far so good)
-> 
->  4. kvm_timer_sync_nested() is called and it updates real CNTP_CVAL_EL0
->  with __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), overwriting value that we got
->  from Xen.
-> 
-> The same stands for other hypervisor timer registers of course.
-> 
-> I am wondering, what is the correct fix for this issue?
-> 
-> Also, we are observing issues with timers in Dom0, which seems related
-> to this, but we didn't pinpoint exact problem yet.
+> (ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER - 64));
+> >  		break;
+>=20
+> This isn't right. The pKVM carveout exists for some KVM-internal
+> bookkeeping to (hopefully) avoid breaking guest ABI between what's in the
+> downstream android kernel and what eventually gets accepted upstream.
+>=20
+> The purpose of this hypercall is for the guest to discover what interface=
+s are
+> actually implemented by the hypervisor, and we definitely do not
+> implement these upstream at the moment.
 
-Thanks for the great debug above, much appreciated.
-
-As Wei-Lin pointed out in their email[1], there is a copious amount of
-nonsense here. This is due to leftovers from the mix of NV+NV2 that
-KVM was initially trying to handle before switching to NV2 only.
-
-The whole VHE vs nVHE makes no sense at all, and both should have the
-same behaviour. The only difference is around what gets trapped, and
-what doesn't.
-
-Finally, this crap is masking a subtle bug in timer_emulate(), where
-we return too early on updating the IRQ state, hence failing to
-publish the interrupt state.
-
-Could you please give the hack below a go with your setup and report
-whether it solves this particular issue?
-
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 0e29958e20187..56f4905cdb859 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -471,10 +471,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
- 
- 	trace_kvm_timer_emulate(ctx, should_fire);
- 
--	if (should_fire != ctx->irq.level) {
-+	if (should_fire != ctx->irq.level)
- 		kvm_timer_update_irq(ctx->vcpu, should_fire, ctx);
--		return;
--	}
- 
- 	kvm_timer_update_status(ctx, should_fire);
- 
-@@ -976,31 +974,21 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
- 	 * which allows trapping of the timer registers even with NV2.
- 	 * Still, this is still worse than FEAT_NV on its own. Meh.
- 	 */
--	if (!vcpu_el2_e2h_is_set(vcpu)) {
--		if (cpus_have_final_cap(ARM64_HAS_ECV))
--			return;
--
--		/*
--		 * A non-VHE guest hypervisor doesn't have any direct access
--		 * to its timers: the EL2 registers trap (and the HW is
--		 * fully emulated), while the EL0 registers access memory
--		 * despite the access being notionally direct. Boo.
--		 *
--		 * We update the hardware timer registers with the
--		 * latest value written by the guest to the VNCR page
--		 * and let the hardware take care of the rest.
--		 */
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
--	} else {
-+	if (!cpus_have_final_cap(ARM64_HAS_ECV)) {
- 		/*
- 		 * For a VHE guest hypervisor, the EL2 state is directly
--		 * stored in the host EL1 timers, while the emulated EL0
-+		 * stored in the host EL1 timers, while the emulated EL1
- 		 * state is stored in the VNCR page. The latter could have
- 		 * been updated behind our back, and we must reset the
- 		 * emulation of the timers.
-+		 *
-+		 * A non-VHE guest hypervisor doesn't have any direct access
-+		 * to its timers: the EL2 registers trap despite being
-+		 * notionally direct (we use the EL1 HW, as for VHE), while
-+		 * the EL1 registers access memory.
-+		 *
-+		 * In both cases, process the emulated timers on each guest
-+		 * exit. Boo.
- 		 */
- 		struct timer_map map;
- 		get_timer_map(vcpu, &map);
+Ok. I had some confusion on pKVM ones as I could see the kvm_arm_hyp_servic=
+e_available()
+being called with those in arm-pkvm-guest.c. So that explains it.
+.
+I will remove the pKVM ones and just add support to report the ones introdu=
+ced
+in this series.
 
 Thanks,
+Shameer
 
-	M.
-
-[1] https://lore.kernel.org/r/fqiqfjzwpgbzdtouu2pwqlu7llhnf5lmy4hzv5vo6ph4v3vyls@jdcfy3fjjc5k
-
--- 
-Without deviation from the norm, progress is not possible.
