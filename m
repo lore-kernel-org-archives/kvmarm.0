@@ -1,181 +1,236 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA51BE40
-	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 14:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ECB18DF86
+	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 15:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738073773; cv=none; b=N6Tch5jcQtnRWGVVrKZtiGiyM6BZXHlb2Bl0gfKFBH1S711LB4ZHi520qiNA20tg29LgF7BblYPUy3Q+UN9O5Wrz/TMDqTzMidiwYFsGYXPBzzfTfecMA34Cq5pfqqxdgN9BV2s026ztpJXAw73Wl20VCo9/eG4B6un8GPeztY8=
+	t=1738077941; cv=none; b=qvAvnLGnmn/bkLALrC1Ad0X3x4HdnGQOxhVwS9aRwfXsEov3nb6VN2jKYmUihoMlY9l8xOhMzeOCvijNAOWzDlpA8Ik32Kg1gyK8kUKbCWqEReoyl8DApbxAK1NNRsDUhUQ9xUGWuktfs5kaLiozzdWWbWMdQdDMMXhl1iSYb4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738073773; c=relaxed/simple;
-	bh=cm889WjMHZL1J2ibUizUif4EDqPvdKN9Kogl8TIUPsg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=q0GZd6uytb9IH8xYwyovfJOvn2yl8dgMranDQZZusI2PQ8Qqsa9Rn85av6UheNQ9I2bQhj7doUzQLAyy7K0nA6JwqSUt1Zscz/7Pm/gydnbb2fJpqOH+LBOYElbqlytGZERI6Ay1ECSfKYe9K1MxU6Sy2eJtr+nvB5w8M+i+RPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Yj6j83rtsz6M4HX;
-	Tue, 28 Jan 2025 22:14:04 +0800 (CST)
-Received: from frapeml100005.china.huawei.com (unknown [7.182.85.132])
-	by mail.maildlp.com (Postfix) with ESMTPS id 92C641402DB;
-	Tue, 28 Jan 2025 22:16:08 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100005.china.huawei.com (7.182.85.132) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 28 Jan 2025 15:16:08 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Tue, 28 Jan 2025 15:16:08 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
-	<maz@kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "mark.rutland@arm.com"
-	<mark.rutland@arm.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, "sebott@redhat.com"
-	<sebott@redhat.com>, yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)"
-	<wangzhou1@hisilicon.com>, jiangkunkun <jiangkunkun@huawei.com>, "Jonathan
- Cameron" <jonathan.cameron@huawei.com>, Anthony Jebson
-	<anthony.jebson@huawei.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH v5 2/4] KVM: arm64: Introduce hypercall support for
- retrieving target implementations
-Thread-Topic: [PATCH v5 2/4] KVM: arm64: Introduce hypercall support for
- retrieving target implementations
-Thread-Index: AQHbbnPvQIqQDHYICESJXD2PsLgGhrMq02oAgAFFeFA=
-Date: Tue, 28 Jan 2025 14:16:08 +0000
-Message-ID: <c10e377aa58c408599e06007052cff7a@huawei.com>
-References: <20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com>
- <20250124151732.6072-3-shameerali.kolothum.thodi@huawei.com>
- <Z5fBrFVIs0jOiR9W@linux.dev>
-In-Reply-To: <Z5fBrFVIs0jOiR9W@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1738077941; c=relaxed/simple;
+	bh=nV+FzWKbANZx9HgkidFwG5xrewDqm4kJlQ/F9Fw2IS8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iTL1s9XWT/500H9X30rEGWTyUPs5GH6fAJOxhZHBng3kaBrYzwQ5icJ9aCM4vbk1CTEZqXPiGYpRxdi1dMIreMGiGlKNML1XqY5j1Qj55LHFu9qvQZ0cYjNP1DeT+0bHWArbe+NUGH8yyZsgfu6UAzonLy93BS9vfN9O571vTO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CjQUKk8t; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CjQUKk8t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E61FC4CEE9
+	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 15:25:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738077940;
+	bh=nV+FzWKbANZx9HgkidFwG5xrewDqm4kJlQ/F9Fw2IS8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CjQUKk8tgxNT5FiUYgBP/EkH7tciprh6KefMogl3Po5J42mA3NXuFZi0diBTojoUc
+	 8dehbYcAIgY1+RCViQd/qQrLPWw6Sr5NiNCPOH2Zt26btzxy5SF2dyEHjCzr/mVi2g
+	 U5YsZURkMYZA5Ajf74Ykhuf5uAc6+UvVXSU1XpiiTLluENpKrp8UJ3zO2Rf1VOAC1B
+	 yf0cVzboM9VEGvZehKjN1UTBQTY6oRiojzAiRao8mFyZSrQqKEw9Ez+EU0+ZquVV8t
+	 /ixlbIXRNpi/g/TyT76quaBuGmBMlqqNg7cVdf/1CEItBggR9PxZdBr7iZ5hanR/QA
+	 q/RK3c0WhfAiQ==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-540254357c8so5797697e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 07:25:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXfnVv2Kionc1yQuCOlXhd7FgsHSaPiLTj/Elo0VhRvCIKDD6pRDNj53Kb8TKEQ1Bx5dN8/+M8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzli5sH9JhvKOVjOUcFGNysCt+e3dIxFQ6AJ2AnKwvSVYyQ7OCX
+	WqqUxAujobx2NSpi5Pw8jm7ObsPFjLoLERUO17ZXM+VV9iV8G4rxZGlc5i6LeJpzW3UqfA845xC
+	q6+Rw7PLwSxePaoHmZ7b6MOY4TQ==
+X-Google-Smtp-Source: AGHT+IEFby41Dzk8Di02mNOM5Cxy2EFRJLFUx7f25ID/UUfCbjR1gV58RWSxAT/uUFzd04BUgt4V0MNwsnwXgwYKw80=
+X-Received: by 2002:a05:6512:3c92:b0:53e:39ed:85e6 with SMTP id
+ 2adb3069b0e04-5439c27fa73mr18344610e87.32.1738077938743; Tue, 28 Jan 2025
+ 07:25:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+References: <20250127222031.3078945-1-coltonlewis@google.com> <20250127222031.3078945-2-coltonlewis@google.com>
+In-Reply-To: <20250127222031.3078945-2-coltonlewis@google.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 28 Jan 2025 09:25:25 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLa9KmYjkVBpxwkQXfQyj53=dgj_9rijca5JGem46qZLg@mail.gmail.com>
+X-Gm-Features: AWEUYZkt7YkAXKfFlHInNwyPOLFZ80Bbbmqn6_x8T3vnHAb5bp8zMcQevYuFBUs
+Message-ID: <CAL_JsqLa9KmYjkVBpxwkQXfQyj53=dgj_9rijca5JGem46qZLg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jan 27, 2025 at 4:26=E2=80=AFPM Colton Lewis <coltonlewis@google.co=
+m> wrote:
+>
+> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+> allowed, EL0 while counters HPMN..N are only accessible by EL2.
+>
+> Introduce a module parameter in the PMUv3 driver to set this
+> register. The name reserved_guest_counters reflects the intent to
+> reserve some counters for the guest so they may eventually be allowed
+> direct access to a subset of PMU functionality for increased
+> performance.
+>
+> Track HPMN and whether the pmu is partitioned in struct arm_pmu.
+>
+> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
+> specifically disallows that case because it's not useful given the
+> intention to allow guests access to their own counters.
+>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm/include/asm/arm_pmuv3.h   | 10 +++++++
+>  arch/arm64/include/asm/arm_pmuv3.h | 10 +++++++
+>  drivers/perf/arm_pmuv3.c           | 43 ++++++++++++++++++++++++++++--
+>  include/linux/perf/arm_pmu.h       |  2 ++
+>  include/linux/perf/arm_pmuv3.h     |  7 +++++
+>  5 files changed, 70 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_=
+pmuv3.h
+> index 2ec0e5e83fc9..49ad90486aa5 100644
+> --- a/arch/arm/include/asm/arm_pmuv3.h
+> +++ b/arch/arm/include/asm/arm_pmuv3.h
+> @@ -277,4 +277,14 @@ static inline u64 read_pmceid1(void)
+>         return val;
+>  }
+>
+> +static inline u32 read_mdcr(void)
+> +{
+> +       return read_sysreg(mdcr_el2);
+> +}
+> +
+> +static inline void write_mdcr(u32 val)
+> +{
+> +       write_sysreg(val, mdcr_el2);
+> +}
+> +
+>  #endif
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/=
+arm_pmuv3.h
+> index 8a777dec8d88..fc37e7e81e07 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -188,4 +188,14 @@ static inline bool is_pmuv3p9(int pmuver)
+>         return pmuver >=3D ID_AA64DFR0_EL1_PMUVer_V3P9;
+>  }
+>
+> +static inline u64 read_mdcr(void)
+> +{
+> +       return read_sysreg(mdcr_el2);
+> +}
+> +
+> +static inline void write_mdcr(u64 val)
+> +{
+> +       write_sysreg(val, mdcr_el2);
+> +}
+> +
+>  #endif
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index b5cc11abc962..55f9ae560715 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -325,6 +325,7 @@ GEN_PMU_FORMAT_ATTR(threshold_compare);
+>  GEN_PMU_FORMAT_ATTR(threshold);
+>
+>  static int sysctl_perf_user_access __read_mostly;
+> +static u8 reserved_guest_counters __read_mostly;
+>
+>  static bool armv8pmu_event_is_64bit(struct perf_event *event)
+>  {
+> @@ -500,6 +501,29 @@ static void armv8pmu_pmcr_write(u64 val)
+>         write_pmcr(val);
+>  }
+>
+> +static u64 armv8pmu_mdcr_read(void)
+> +{
+> +       return read_mdcr();
+> +}
+> +
+> +static void armv8pmu_mdcr_write(u64 val)
+> +{
+> +       write_mdcr(val);
+> +       isb();
+> +}
+> +
+> +static void armv8pmu_partition(u8 hpmn)
+> +{
+> +       u64 mdcr =3D armv8pmu_mdcr_read();
+> +
+> +       mdcr &=3D ~MDCR_EL2_HPMN_MASK;
+> +       mdcr |=3D FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
+> +       /* Prevent guest counters counting at EL2 */
+> +       mdcr |=3D ARMV8_PMU_MDCR_HPMD;
+> +
+> +       armv8pmu_mdcr_write(mdcr);
+> +}
+> +
+>  static int armv8pmu_has_overflowed(u64 pmovsr)
+>  {
+>         return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
+> @@ -1069,6 +1093,9 @@ static void armv8pmu_reset(void *info)
+>
+>         bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
+>
+> +       if (cpu_pmu->partitioned)
+> +               armv8pmu_partition(cpu_pmu->hpmn);
+> +
+>         /* The counter and interrupt enable registers are unknown at rese=
+t. */
+>         armv8pmu_disable_counter(mask);
+>         armv8pmu_disable_intens(mask);
+> @@ -1205,6 +1232,7 @@ static void __armv8pmu_probe_pmu(void *info)
+>  {
+>         struct armv8pmu_probe_info *probe =3D info;
+>         struct arm_pmu *cpu_pmu =3D probe->pmu;
+> +       u8 pmcr_n;
+>         u64 pmceid_raw[2];
+>         u32 pmceid[2];
+>         int pmuver;
+> @@ -1215,10 +1243,19 @@ static void __armv8pmu_probe_pmu(void *info)
+>
+>         cpu_pmu->pmuver =3D pmuver;
+>         probe->present =3D true;
+> +       pmcr_n =3D FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
+>
+>         /* Read the nb of CNTx counters supported from PMNC */
+> -       bitmap_set(cpu_pmu->cntr_mask,
+> -                  0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
+> +       bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+> +
+> +       if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr=
+_n) {
+> +               cpu_pmu->hpmn =3D reserved_guest_counters;
+> +               cpu_pmu->partitioned =3D true;
 
+You're storing the same information 3 times. 'partitioned' is just
+'reserved_guest_counters !=3D 0' or 'cpu_pmu->hpmn !=3D pmcr_n'.
 
-> -----Original Message-----
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Sent: Monday, January 27, 2025 5:26 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; maz@kernel.org; catalin.marinas@arm.com;
-> will@kernel.org; mark.rutland@arm.com; cohuck@redhat.com;
-> eric.auger@redhat.com; sebott@redhat.com; yuzenghui
-> <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
-> jiangkunkun <jiangkunkun@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Anthony Jebson
-> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [PATCH v5 2/4] KVM: arm64: Introduce hypercall support for
-> retrieving target implementations
->=20
-> On Fri, Jan 24, 2025 at 03:17:30PM +0000, Shameer Kolothum wrote:
-> > If the Guest requires migration to multiple targets, these hypercalls
-> > will provide a way to retrieve the target CPU implementations from
-> > the user space VMM.
-> >
-> > Subsequent patch will use this to enable the associated errata.
-> >
-> > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  Documentation/virt/kvm/arm/hypercalls.rst | 59
-> +++++++++++++++++++++++
-> >  include/linux/arm-smccc.h                 | 15 ++++++
-> >  2 files changed, 74 insertions(+)
-> >
-> > diff --git a/Documentation/virt/kvm/arm/hypercalls.rst
-> b/Documentation/virt/kvm/arm/hypercalls.rst
-> > index af7bc2c2e0cb..718725cbf6c7 100644
-> > --- a/Documentation/virt/kvm/arm/hypercalls.rst
-> > +++ b/Documentation/virt/kvm/arm/hypercalls.rst
-> > @@ -142,3 +142,62 @@ region is equal to the memory protection granule
-> advertised by
-> >  |                     |          |    +-------------------------------=
---------------+
-> >  |                     |          |    | ``INVALID_PARAMETER (-3)``    =
-              |
-> >  +---------------------+----------+----+-------------------------------=
---------------+
-> > +
-> > +``ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID``
-> > +-------------------------------------------------------
-> > +Request the target CPU implementation version information and the
-> number of target
-> > +implementations for the Guest VM.
-> > +
-> > ++---------------------+-----------------------------------------------=
---------------+
-> > +| Presence:           | Optional;  KVM/ARM64 Guests only              =
-              |
-> > ++---------------------+-----------------------------------------------=
---------------+
-> > +| Calling convention: | HVC64                                         =
-              |
-> > ++---------------------+----------+------------------------------------=
---------------+
-> > +| Function ID:        | (uint32) | 0xC6000040                         =
-              |
-> > ++---------------------+----------+------------------------------------=
---------------+
-> > +| Arguments:          | None                                          =
-              |
-> > ++---------------------+----------+----+-------------------------------=
---------------+
-> > +| Return Values:      | (int64)  | R0 | ``SUCCESS (0)``               =
-              |
-> > +|                     |          |    +-------------------------------=
---------------+
-> > +|                     |          |    | ``NOT_SUPPORTED (-1)``        =
-              |
-> > +|                     +----------+----+-------------------------------=
---------------+
-> > +|                     | (uint64) | R1 | Bit[63] Must be zero          =
-              |
-> > +|                     |          |    +-------------------------------=
---------------+
->=20
-> Why? R0 is sufficient to determine if the hypercall was successful, and
-> this is already defined as an unsigned quantity to the guest.
+> +       } else {
+> +               reserved_guest_counters =3D 0;
+> +               cpu_pmu->hpmn =3D pmcr_n;
+> +               cpu_pmu->partitioned =3D false;
+> +       }
+>
+>         /* Add the CPU cycles counter */
+>         set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
+> @@ -1516,3 +1553,5 @@ void arch_perf_update_userpage(struct perf_event *e=
+vent,
+>         userpg->cap_user_time_zero =3D 1;
+>         userpg->cap_user_time_short =3D 1;
+>  }
+> +
+> +module_param(reserved_guest_counters, byte, 0);
 
-Hmm..I was trying to imitate(badly ofcourse) the SMCCC_VERSION where
-bit 31 must be zero but again in that case it is Int32 so it makes sense th=
-ere.
+Module params are generally discouraged. Since this driver can't be a
+module, this is a boot time only option. There's little reason this
+can't be a sysfs setting. There's some complexity in changing this
+when counters are in use (just reject the change) and when we have
+asymmetric PMUs. Alternatively, it could be a sysctl like user access.
 
->=20
-> > +|                     |          |    | Bits [62:32] Major version    =
-              |
-> > +|                     |          |    +-------------------------------=
---------------+
-> > +|                     |          |    | Bits [31:0] Minor version     =
-              |
-> > +|                     +----------+----+-------------------------------=
---------------+
->=20
-> Do we really need a full u64 of version information? If you collapse
-> this down to a u32 it'd align with the versioning scheme for PSCI /
-> SMCCC.
-=20
-Ok. How about this,
-
-Bits [63:32]  Reserved/] Must be zero
-Bits [31:16]  Major Rev (Should we leave the bit 31 to zero here to match
-                      SMCCC_VERSION?)
-Bits [15:0]    Minor Rev
-
-Thanks,
-Shameer
-
+Rob
