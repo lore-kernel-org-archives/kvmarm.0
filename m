@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FA11D63CE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F471D5AAD
 	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 16:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738081052; cv=none; b=nav/M2Npf3+jlAb9xQBRLEyB8wBQsKHKYrvf3dK0VGVP6IcJ03hrT/Ly4MkLFjMvxscqfx8Un+tdOUq5ynVOT7AHoUo9ttDEIONJngBcjnYAcRSLcbjnj8adngRFjeq7yiy3MTL0y9XJLAOZr7HSwHwFFDsk/5kgXD4dUSnUGHw=
+	t=1738081052; cv=none; b=Pask1KXFMzs/ooZWFtWmcObd2yIFhtYAhpgDhczbovO4PoRMFylMBL5T/Cg9I1E1G1F5OGvsD1iRjkkD64IVrx8MHwueeYsHPpaFmzWXKnKER4/tzmiIGwb+ZzB9JOpFggvGTJZ0/UW1UEx4wJbuw//dhYvYmbztxJO35iZxJ8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738081052; c=relaxed/simple;
-	bh=PNu3hTn0GvE3wS0oJZaBn6WB6mPAiAa0NyTaE8ZHxk8=;
+	bh=VQtqCF5VwxQZ3zUdT5Ya9xq6VhdkLVv1Fj7Qtdf+K5E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aX85VfeQkrvVEspxAloknPhTEGDiA4N4fdCnouTgEeYRhrzrjDPVqk4QPD0JZr+sCVDGdld3BHiowhcVpvv850385cLciUge10LYG579QPIRGNiy4Xi5JUqLrDDycW8IoRAHMESKUhDFA9oJ5hkrcjwRURpx8GhKPzV2g0BFn/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJ0qZBOM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=nVNMSUonyZMuHmZ4NTYY9tFJDFkkE7tgQKMW4kT2i2VH8XoLjNnwIjRghTjpjUe4P8e+UUxBuBlH8+I0CB1R62prAfSP0S74dUKd2CI+SkdL53VXSuc8lMeyA/w5sfS8r4D4Ol+kjo5DK5LwAvN9ZsiqXys2cqIwjYBo+HWM9V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cw9h1ude; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ0qZBOM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFB5C4CEDF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cw9h1ude"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5003FC4CEE3;
 	Tue, 28 Jan 2025 16:17:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1738081052;
-	bh=PNu3hTn0GvE3wS0oJZaBn6WB6mPAiAa0NyTaE8ZHxk8=;
+	bh=VQtqCF5VwxQZ3zUdT5Ya9xq6VhdkLVv1Fj7Qtdf+K5E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lJ0qZBOM0pMf2U4Bl0q4VeWgk16hoV43PhEi5vzpjvwyQoH5E3mbJB/L9MXRW8aEI
-	 7ATzlMHI3Nosq/xtXp3WNMuZ81Hr3aS4lStg/skTluw658AhJJdLE4j5wTU8HPb184
-	 pV+WUSppdpxVvsc540E0rq0BtjxlnXE7GQAJORZIW+A3fl+5hHPlYTGcLW8qkxQNkP
-	 Xi0mBWavTLeN3iV09pWpTa8UhiGPN1P1I4JdrGu4DAYnuybw1Cz6DaRGzNQNKLITJu
-	 G9Xxg88cYh0Eu1XETI4z+xoK6V3cINFl658CJY1Kr9ja6AU6sENBH0619IA4ftktl9
-	 gX3/4M7PWpdqQ==
+	b=Cw9h1ude8ichfU8pcmw7OAiZfaNagCoGoYZREWS4HpvZEGGI0qDuFO+sQPwwtxy7Q
+	 hkgTadm12wz5FNDARPJabzg5QTRWgBQnjELR4unV23s9IaTj+qXeWV709zrRwphqYg
+	 Qw5MPLPI9HnZEB2tFYYcLzlg7NvidctOk7EjL1LKDcppNYyw8ghvtwUikpilXaEGUh
+	 /q5VOnJCzi3JTJM1mTO1zJU38lqDaqsDwiIQMMcfy32KVjdf5sl6k9zsYc9/8e3ANr
+	 h91f/RWl6oM0aYt0Ns3uY06gHtO8ApmbXDc5IuOpY3aWcf3rVu+KMVsLag4rE6K8da
+	 /wstY9Vd9s+Ag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tcoHK-00G6bi-6f;
+	id 1tcoHK-00G6bi-FP;
 	Tue, 28 Jan 2025 16:17:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/3] KVM: arm64: timer: Correctly handle EL1 timer emulation when !FEAT_ECV
-Date: Tue, 28 Jan 2025 16:17:20 +0000
-Message-Id: <20250128161721.3279927-3-maz@kernel.org>
+Subject: [PATCH 3/3] KVM: arm64: timer: Consolidate NV configuration of virtual timers
+Date: Tue, 28 Jan 2025 16:17:21 +0000
+Message-Id: <20250128161721.3279927-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250128161721.3279927-1-maz@kernel.org>
 References: <20250128161721.3279927-1-maz@kernel.org>
@@ -60,86 +60,131 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Both Wei-Lin Chang and Volodymyr Babchuk report that the way we
-handle the emulation of EL1 timers with NV is completely wrong,
-specially in the case of HCR_EL2.E2H==0.
+The way we configure the virtual timers with NV is rather odd:
 
-There are three problems in about as many lines of code:
+- the EL1 virtual timer gets setup in kvm_timer_vcpu_reset(). Why not?
 
-- With E2H==0, the EL1 timers are overwritten with the EL1 state,
-  while they should actually contain the EL2 state (as per the timer
-  map)
+- the EL2 virtual timer gets setup at vcpu_load time, which is really
+  bizarre, because this really should be a one-off.
 
-- With E2H==1, we run the full EL1 timer emulation even when ECV
-  is present, hiding a bug in timer_emulate() (see previous patch)
+The reason for the second point is that this setup is conditionned
+on HCR_EL2.E2H, as it decides whether CNTVOFF_EL2 applies to the
+EL2 virtual counter or not. And of course, this is not known at
+the point where we reset the timer. Huh.
 
-- The comments are actively misleading, and say all the wrong things.
+Solve this by introducing a NV-specific init for the timers,
+matching what we do for the other subsystems, that gets called
+once we know for sure that the configuration is final (on first
+vcpu run, effectively).
 
-This is only attributable to the code having been initially written
-for FEAT_NV, hacked up to handle FEAT_NV2 *in parallel*, and vaguely
-hacked again to be FEAT_NV2 only. Oh, and yours truly being a gold
-plated idiot.
+This makes kvm_timer_vcpu_load_nested_switch() slightly simpler.
 
-The fix is obvious: just delete most of the E2H==0 code, have a unified
-handling of the timers (because they really are E2H agnostic), and
-make sure we don't execute any of that when FEAT_ECV is present.
-
-Fixes: 4bad3068cfa9f ("KVM: arm64: nv: Sync nested timer state with FEAT_NV2")
-Reported-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Reported-by: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/fqiqfjzwpgbzdtouu2pwqlu7llhnf5lmy4hzv5vo6ph4v3vyls@jdcfy3fjjc5k
-Link: https://lore.kernel.org/r/87frl51tse.fsf@epam.com
 ---
- arch/arm64/kvm/arch_timer.c | 30 ++++++++++--------------------
- 1 file changed, 10 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/arch_timer.c  | 48 ++++++++++++++++--------------------
+ arch/arm64/kvm/arm.c         |  3 +++
+ include/kvm/arm_arch_timer.h |  1 +
+ 3 files changed, 25 insertions(+), 27 deletions(-)
 
 diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 035e43f5d4f9a..e59836e0260cf 100644
+index e59836e0260cf..43109277281a7 100644
 --- a/arch/arm64/kvm/arch_timer.c
 +++ b/arch/arm64/kvm/arch_timer.c
-@@ -974,31 +974,21 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
- 	 * which allows trapping of the timer registers even with NV2.
- 	 * Still, this is still worse than FEAT_NV on its own. Meh.
- 	 */
--	if (!vcpu_el2_e2h_is_set(vcpu)) {
--		if (cpus_have_final_cap(ARM64_HAS_ECV))
--			return;
+@@ -759,21 +759,6 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
+ 					    timer_irq(map->direct_ptimer),
+ 					    &arch_timer_irq_ops);
+ 		WARN_ON_ONCE(ret);
 -
 -		/*
--		 * A non-VHE guest hypervisor doesn't have any direct access
--		 * to its timers: the EL2 registers trap (and the HW is
--		 * fully emulated), while the EL0 registers access memory
--		 * despite the access being notionally direct. Boo.
--		 *
--		 * We update the hardware timer registers with the
--		 * latest value written by the guest to the VNCR page
--		 * and let the hardware take care of the rest.
+-		 * The virtual offset behaviour is "interesting", as it
+-		 * always applies when HCR_EL2.E2H==0, but only when
+-		 * accessed from EL1 when HCR_EL2.E2H==1. So make sure we
+-		 * track E2H when putting the HV timer in "direct" mode.
 -		 */
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
--	} else {
-+	if (!cpus_have_final_cap(ARM64_HAS_ECV)) {
- 		/*
- 		 * For a VHE guest hypervisor, the EL2 state is directly
--		 * stored in the host EL1 timers, while the emulated EL0
-+		 * stored in the host EL1 timers, while the emulated EL1
- 		 * state is stored in the VNCR page. The latter could have
- 		 * been updated behind our back, and we must reset the
- 		 * emulation of the timers.
-+		 *
-+		 * A non-VHE guest hypervisor doesn't have any direct access
-+		 * to its timers: the EL2 registers trap despite being
-+		 * notionally direct (we use the EL1 HW, as for VHE), while
-+		 * the EL1 registers access memory.
-+		 *
-+		 * In both cases, process the emulated timers on each guest
-+		 * exit. Boo.
- 		 */
- 		struct timer_map map;
- 		get_timer_map(vcpu, &map);
+-		if (map->direct_vtimer == vcpu_hvtimer(vcpu)) {
+-			struct arch_timer_offset *offs = &map->direct_vtimer->offset;
+-
+-			if (vcpu_el2_e2h_is_set(vcpu))
+-				offs->vcpu_offset = NULL;
+-			else
+-				offs->vcpu_offset = &__vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+-		}
+ 	}
+ }
+ 
+@@ -1045,18 +1030,6 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ 	for (int i = 0; i < nr_timers(vcpu); i++)
+ 		timer_set_ctl(vcpu_get_timer(vcpu, i), 0);
+ 
+-	/*
+-	 * A vcpu running at EL2 is in charge of the offset applied to
+-	 * the virtual timer, so use the physical VM offset, and point
+-	 * the vcpu offset to CNTVOFF_EL2.
+-	 */
+-	if (vcpu_has_nv(vcpu)) {
+-		struct arch_timer_offset *offs = &vcpu_vtimer(vcpu)->offset;
+-
+-		offs->vcpu_offset = &__vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+-		offs->vm_offset = &vcpu->kvm->arch.timer_data.poffset;
+-	}
+-
+ 	if (timer->enabled) {
+ 		for (int i = 0; i < nr_timers(vcpu); i++)
+ 			kvm_timer_update_irq(vcpu, false,
+@@ -1102,6 +1075,27 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+ 	}
+ }
+ 
++void kvm_timer_vcpu_nv_init(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * A vcpu running at EL2 is in charge of the offset applied to
++	 * the virtual timer, so use the physical VM offset, and point
++	 * the vcpu offset to CNTVOFF_EL2.
++	 *
++	 * The virtual offset behaviour is "interesting", as it always
++	 * applies when HCR_EL2.E2H==0, but only when accessed from EL1 when
++	 * HCR_EL2.E2H==1. Apply it to the HV timer when E2H==0.
++	 */
++	struct arch_timer_offset *offs = &vcpu_vtimer(vcpu)->offset;
++	u64 *voff = __ctxt_sys_reg(&vcpu->arch.ctxt, CNTVOFF_EL2);
++
++	offs->vcpu_offset = voff;
++	offs->vm_offset = &vcpu->kvm->arch.timer_data.poffset;
++
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		vcpu_hvtimer(vcpu)->offset.vcpu_offset = voff;
++}
++
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 0725a0b50a3e9..deb74ab5775aa 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -815,6 +815,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		return ret;
+ 
++	if (vcpu_has_nv(vcpu))
++		kvm_timer_vcpu_nv_init(vcpu);
++
+ 	/*
+ 	 * This needs to happen after any restriction has been applied
+ 	 * to the feature set.
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 681cf0c8b9df4..351813133aef6 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -98,6 +98,7 @@ int __init kvm_timer_hyp_init(bool has_gic);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
++void kvm_timer_vcpu_nv_init(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
 -- 
 2.39.2
 
