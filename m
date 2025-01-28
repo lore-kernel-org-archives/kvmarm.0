@@ -1,88 +1,277 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778D51DF73D
-	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 09:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260F0161310;
+	Tue, 28 Jan 2025 09:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738055486; cv=none; b=FirJQEwDGbniTNDW+5arf4pXK93CArnX9YqaBSahBuLZEyzzGpOz6IUVix44ZBljyxAUTYOx64J45c/TAzz18ZCriTAQkrMszvSBq3+kQy6KSSJ5LK8K6RVmUXKW1Gy1jLJR1nuafSdeYPfdVarIHTx5HNUxrzAIGZ4wigygMvQ=
+	t=1738056437; cv=none; b=mT+/D5c/e9G6A+hKsXqCsnP3DdTnlbvJlsWlEa+4LsRT9ttTEJufFVHgRPGXSFsQzi+23xna3C7xYs3/GL9+nOqmZ6IYc6hwZyVFIC7PlAQMQP98hRK2I9PZJRl3L7oAT5rQGtydRiXpYbJVFBomf4qXtLOsRs8AYOV8Y8qfZII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738055486; c=relaxed/simple;
-	bh=FltoNwx1CJICDVmBGovb3tzHU01UgL7Ot70tmwww9PY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ozXl8OL9cTvM04JXVaR3VekVR593A69aRFUv7HkePoVomtYx76eDmytA2fHiHesQ5SFEyIBO9W3kn8VISJBH51kj6fcTmSa7p4IanBSYnJkPJUg7N6dx7UXw3ULroK2fYAjbQDT94p3gDio8jd3CMdvB/109+rnqQ6Bqims26DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4EE0F497;
-	Tue, 28 Jan 2025 01:11:50 -0800 (PST)
-Received: from [10.162.16.94] (a077893.blr.arm.com [10.162.16.94])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6BC663F528;
-	Tue, 28 Jan 2025 01:11:20 -0800 (PST)
-Message-ID: <7f5c68c7-8036-4d18-950f-80e55ac8ea11@arm.com>
-Date: Tue, 28 Jan 2025 14:41:17 +0530
+	s=arc-20240116; t=1738056437; c=relaxed/simple;
+	bh=iCbYshpRg08hQdbDkopUn5Vj56lVut9iyZDGmvAZw7I=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nAW60gVBVPinj0KRlgbq/cZeE4owNtFiabIwEk7AZDOHzRPkCNLpDM8RpDeI6I3VzZUO+pw0JHbTij6w/lp10YcX7teolFGl7xrru7HWY9fPmEy68Lhhxg2oNM6qiw77/0xAC+LJQVW3Y8BxmgQAosPw+yD7Kluwdpc14MAXPGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b08JNMw+; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b08JNMw+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C31B6C4CED3;
+	Tue, 28 Jan 2025 09:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738056437;
+	bh=iCbYshpRg08hQdbDkopUn5Vj56lVut9iyZDGmvAZw7I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b08JNMw+vaEv82euLbu4+0DU88tcR/JEBIgAf6VlfLo1QQMtGt38AHlFHC42H20XL
+	 cmrht6F3EPXIl4c4mXS4qDAVNPuWz5kasQ6Rxl16FHOGM4JUU6i1s2XNVw3U0F19uM
+	 jfdgLNh5QuRML5bZ/l4f/GNmzaoKBjk4E34m7vUjOcN5b1JgGE7f3RjRlpsWzEOXnq
+	 th6KsNYgcrKfEOwnrJ2rve6znz5UV0rvHA3Cd7e1v6HiPtyYhcZHbZFpfjkbB3xEjM
+	 C8oaGFGlTKf+dYASmXZBsw8l/cUOuNHa0cx6JOEhxs7A3IMORv3zY7YqQU8lr0+xOp
+	 DlCsXitVTBSBw==
+Received: from 82-132-220-9.dab.02.net ([82.132.220.9] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tchsI-00G0MS-DY;
+	Tue, 28 Jan 2025 09:27:14 +0000
+Date: Tue, 28 Jan 2025 09:27:11 +0000
+Message-ID: <87ikpzthjk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to partition the PMU
+In-Reply-To: <20250127222031.3078945-2-coltonlewis@google.com>
+References: <20250127222031.3078945-1-coltonlewis@google.com>
+	<20250127222031.3078945-2-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-To: Rob Herring <robh@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Jonathan Corbet <corbet@lwn.net>, Eric Auger <eric.auger@redhat.com>,
- kvmarm@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241220072240.1003352-1-anshuman.khandual@arm.com>
- <20250102160402.GB3990035-robh@kernel.org> <Z30adHnQ7ZFaU9UR@arm.com>
- <CAL_JsqLLnh1o4L1=PpNt5brBwZZCgp7mOygByOYakchrzc29Ow@mail.gmail.com>
- <86wmf5wo8u.wl-maz@kernel.org>
- <CAL_JsqKKiEOj=a1k6U-bB0F6-ht7QokDnh3bspHupp-QG=haSg@mail.gmail.com>
- <Z4kmlhnlpKjS_MII@arm.com>
- <CAL_JsqK1k7fG=yDZSbTbV63yRP5U9=GpuAiv=NWZJWdppUtRwA@mail.gmail.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <CAL_JsqK1k7fG=yDZSbTbV63yRP5U9=GpuAiv=NWZJWdppUtRwA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.220.9
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 1/18/25 03:37, Rob Herring wrote:
-> On Thu, Jan 16, 2025 at 9:32 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->>
->> On Wed, Jan 08, 2025 at 07:47:16AM -0600, Rob Herring wrote:
->>> On Wed, Jan 8, 2025 at 5:15 AM Marc Zyngier <maz@kernel.org> wrote:
->>>> On Tue, 07 Jan 2025 22:13:47 +0000,
->>>> Rob Herring <robh@kernel.org> wrote:
->>>>> On Tue, Jan 7, 2025 at 6:13 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->>>>>> But does KVM actually expose the feature to EL1 in ID_AA64DFR1_EL1 and
->>>>>> than traps it at EL2?
->>>>>
->>>>> As Marc pointed out KVM only advertises PMUv3.8. Regardless, guest
->>>>> accesses to these registers are trapped with or without this series.
->>>>
->>>> And most probably generates a nice splat in the kernel log, as nobody
->>>> updated KVM to handle *correctly* PMICNTR_EL0 traps, let alone deal
->>>> with the FGT2 registers.
->>>
->>> Isn't that this series[1]? Should that have come first, I guess I know
->>> that *now*.
->> [...]
->>> [1] https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandual@arm.com/
->>
->> It's not any clearer to me. Does this series depend on the 46-patch one?
->> Or, if we had the other, is this no longer needed? Or none of these,
->> they are independent.
+On Mon, 27 Jan 2025 22:20:27 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> They are independent. I think ideally we'd want everything landing at
-> the same time, but we're past ideal at this point. Without this
-> series, if someone uses PMU on v8.9 and firmware enabled FGT2, then
-> the kernel will crash. Without the above series, KVM will have
-> warnings in the kernel log, but otherwise function.
+> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+> allowed, EL0 while counters HPMN..N are only accessible by EL2.
+> 
+> Introduce a module parameter in the PMUv3 driver to set this
+> register. The name reserved_guest_counters reflects the intent to
+> reserve some counters for the guest so they may eventually be allowed
+> direct access to a subset of PMU functionality for increased
+> performance.
+> 
+> Track HPMN and whether the pmu is partitioned in struct arm_pmu.
+> 
+> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
+> specifically disallows that case because it's not useful given the
+> intention to allow guests access to their own counters.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm/include/asm/arm_pmuv3.h   | 10 +++++++
+>  arch/arm64/include/asm/arm_pmuv3.h | 10 +++++++
+>  drivers/perf/arm_pmuv3.c           | 43 ++++++++++++++++++++++++++++--
+>  include/linux/perf/arm_pmu.h       |  2 ++
+>  include/linux/perf/arm_pmuv3.h     |  7 +++++
+>  5 files changed, 70 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
+> index 2ec0e5e83fc9..49ad90486aa5 100644
+> --- a/arch/arm/include/asm/arm_pmuv3.h
+> +++ b/arch/arm/include/asm/arm_pmuv3.h
+> @@ -277,4 +277,14 @@ static inline u64 read_pmceid1(void)
+>  	return val;
+>  }
+>  
+> +static inline u32 read_mdcr(void)
+> +{
+> +	return read_sysreg(mdcr_el2);
+> +}
+> +
+> +static inline void write_mdcr(u32 val)
+> +{
+> +	write_sysreg(val, mdcr_el2);
+> +}
+> +
 
-Right, they are independent. Just that Rob had observed this PMU v3.8 boot
-requirement while reviewing the HW breakpoint series earlier. I should just
-respin this series after the upcoming v6.14-rc1 release is out ?
+This will obviously break the 32bit build.
+
+>  #endif
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+> index 8a777dec8d88..fc37e7e81e07 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -188,4 +188,14 @@ static inline bool is_pmuv3p9(int pmuver)
+>  	return pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P9;
+>  }
+>  
+> +static inline u64 read_mdcr(void)
+> +{
+> +	return read_sysreg(mdcr_el2);
+> +}
+> +
+> +static inline void write_mdcr(u64 val)
+> +{
+> +	write_sysreg(val, mdcr_el2);
+> +}
+> +
+>  #endif
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index b5cc11abc962..55f9ae560715 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -325,6 +325,7 @@ GEN_PMU_FORMAT_ATTR(threshold_compare);
+>  GEN_PMU_FORMAT_ATTR(threshold);
+>  
+>  static int sysctl_perf_user_access __read_mostly;
+> +static u8 reserved_guest_counters __read_mostly;
+>  
+>  static bool armv8pmu_event_is_64bit(struct perf_event *event)
+>  {
+> @@ -500,6 +501,29 @@ static void armv8pmu_pmcr_write(u64 val)
+>  	write_pmcr(val);
+>  }
+>  
+> +static u64 armv8pmu_mdcr_read(void)
+> +{
+> +	return read_mdcr();
+> +}
+> +
+> +static void armv8pmu_mdcr_write(u64 val)
+> +{
+> +	write_mdcr(val);
+> +	isb();
+> +}
+> +
+> +static void armv8pmu_partition(u8 hpmn)
+> +{
+> +	u64 mdcr = armv8pmu_mdcr_read();
+> +
+> +	mdcr &= ~MDCR_EL2_HPMN_MASK;
+> +	mdcr |= FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
+> +	/* Prevent guest counters counting at EL2 */
+> +	mdcr |= ARMV8_PMU_MDCR_HPMD;
+> +
+> +	armv8pmu_mdcr_write(mdcr);
+> +}
+> +
+>  static int armv8pmu_has_overflowed(u64 pmovsr)
+>  {
+>  	return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
+> @@ -1069,6 +1093,9 @@ static void armv8pmu_reset(void *info)
+>  
+>  	bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
+>  
+> +	if (cpu_pmu->partitioned)
+> +		armv8pmu_partition(cpu_pmu->hpmn);
+> +
+
+Kaboom, see below.
+
+>  	/* The counter and interrupt enable registers are unknown at reset. */
+>  	armv8pmu_disable_counter(mask);
+>  	armv8pmu_disable_intens(mask);
+> @@ -1205,6 +1232,7 @@ static void __armv8pmu_probe_pmu(void *info)
+>  {
+>  	struct armv8pmu_probe_info *probe = info;
+>  	struct arm_pmu *cpu_pmu = probe->pmu;
+> +	u8 pmcr_n;
+>  	u64 pmceid_raw[2];
+>  	u32 pmceid[2];
+>  	int pmuver;
+> @@ -1215,10 +1243,19 @@ static void __armv8pmu_probe_pmu(void *info)
+>  
+>  	cpu_pmu->pmuver = pmuver;
+>  	probe->present = true;
+> +	pmcr_n = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
+>  
+>  	/* Read the nb of CNTx counters supported from PMNC */
+> -	bitmap_set(cpu_pmu->cntr_mask,
+> -		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
+> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+> +
+> +	if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr_n) {
+> +		cpu_pmu->hpmn = reserved_guest_counters;
+> +		cpu_pmu->partitioned = true;
+
+Isn't this going to completely explode on a kernel running at EL1?
+
+Also, how does it work in an asymmetric configuration where some CPUs
+can satisfy the reservation, and some can't?
+
+> +	} else {
+> +		reserved_guest_counters = 0;
+> +		cpu_pmu->hpmn = pmcr_n;
+> +		cpu_pmu->partitioned = false;
+> +	}
+>  
+>  	/* Add the CPU cycles counter */
+>  	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
+> @@ -1516,3 +1553,5 @@ void arch_perf_update_userpage(struct perf_event *event,
+>  	userpg->cap_user_time_zero = 1;
+>  	userpg->cap_user_time_short = 1;
+>  }
+> +
+> +module_param(reserved_guest_counters, byte, 0);
+> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+> index 4b5b83677e3f..ad97aabed25a 100644
+> --- a/include/linux/perf/arm_pmu.h
+> +++ b/include/linux/perf/arm_pmu.h
+> @@ -101,6 +101,8 @@ struct arm_pmu {
+>  	void		(*reset)(void *);
+>  	int		(*map_event)(struct perf_event *event);
+>  	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
+> +	u8		hpmn; /* MDCR_EL2.HPMN: counter partition pivot */
+> +	bool	        partitioned;
+>  	bool		secure_access; /* 32-bit ARM only */
+>  #define ARMV8_PMUV3_MAX_COMMON_EVENTS		0x40
+>  	DECLARE_BITMAP(pmceid_bitmap, ARMV8_PMUV3_MAX_COMMON_EVENTS);
+> diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
+> index d698efba28a2..d399e8c6f98e 100644
+> --- a/include/linux/perf/arm_pmuv3.h
+> +++ b/include/linux/perf/arm_pmuv3.h
+> @@ -223,6 +223,13 @@
+>  				 ARMV8_PMU_PMCR_X | ARMV8_PMU_PMCR_DP | \
+>  				 ARMV8_PMU_PMCR_LC | ARMV8_PMU_PMCR_LP)
+>  
+> +/*
+> + * Per-CPU MDCR: config reg
+> + */
+> +#define ARMV8_PMU_MDCR_HPMN		GENMASK(4, 0)
+> +#define ARMV8_PMU_MDCR_HPME		BIT(7)
+> +#define ARMV8_PMU_MDCR_HPMD		BIT(17)
+> +
+
+I'd rather we find a way to use the existing definitions form the
+sysreg file rather than add more duplication.
+
+I also don't see how the kernel knows not to access the low-numbered
+counters at this point. Maybe in a later patch, I'll keep reading.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
