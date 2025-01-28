@@ -1,71 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705CA768FC
-	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 05:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778D51DF73D
+	for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 09:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738043238; cv=none; b=X4S87ajME7hEZ2sBlrK/8Nbtp0was4ig7xHCcG1M/c7qjCiZU0mb/atdAk24w1JsGdZxpS14F6VoA7Vuf57EPahPctdrGp3La8pg88AS62Gu2hL0e5ypSFL21BH+uk/BYi53G/ce5v4rEyE9ZZUGU5qB5GVl80OzkJkr+MlxYjs=
+	t=1738055486; cv=none; b=FirJQEwDGbniTNDW+5arf4pXK93CArnX9YqaBSahBuLZEyzzGpOz6IUVix44ZBljyxAUTYOx64J45c/TAzz18ZCriTAQkrMszvSBq3+kQy6KSSJ5LK8K6RVmUXKW1Gy1jLJR1nuafSdeYPfdVarIHTx5HNUxrzAIGZ4wigygMvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738043238; c=relaxed/simple;
-	bh=bSqOpBh9c+WYhpQcPwZJnbX4nNxmGrR1DPwd0RwuTs0=;
+	s=arc-20240116; t=1738055486; c=relaxed/simple;
+	bh=FltoNwx1CJICDVmBGovb3tzHU01UgL7Ot70tmwww9PY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bws4KvFYO4+1CSioZD5VFpoebBuvbuSN9D4DJkx5k3+F8U15G2/x8VKra1KDdbG9+UBKhF2Y7/S88MnMwCIHPRCqLU30wGwogQ5P4CtBIwndOpyt2myJbeW2QsnhZxE0QtfyujwASd7BjW5Dfpzgcyq0Opv5KyqD3UBxKvSnbjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h1pp2J5o; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1pp2J5o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738043235;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZfRypJrBXY8TUZ/BgiawVGat4WmGQVQwJaXYpw4b6P4=;
-	b=h1pp2J5oV2LbLUQ7u8/l/cLg3V7VyVHldNy1UOoiBvQw4rUWk+QfAnDCoozwnZTmM3neUJ
-	Q1o1F2U0QySw6yOEqbY2o5NbhlC0e771yUUJuQaXSLD2yT95tfFvIa8bJy0XND+N0pyiMY
-	1vseXGZDeyw80Zogrgmc61yJvqHJpdM=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-Q_Kmrm2rMZuOBj-R129blQ-1; Tue, 28 Jan 2025 00:47:13 -0500
-X-MC-Unique: Q_Kmrm2rMZuOBj-R129blQ-1
-X-Mimecast-MFC-AGG-ID: Q_Kmrm2rMZuOBj-R129blQ
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-21650d4612eso143316155ad.2
-        for <kvmarm@lists.linux.dev>; Mon, 27 Jan 2025 21:47:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738043232; x=1738648032;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZfRypJrBXY8TUZ/BgiawVGat4WmGQVQwJaXYpw4b6P4=;
-        b=mvvPtz+IMmrq2FsGdmoIC97IIREFkGW5Z2NOJRawmO4WbBdzNu3XYLa+zRb+H1lvY4
-         YbbE+KlZ3seY9/JbMX3YLQtGiJPoHzJrg6mZ2QyTeeWlk9Yvv1517kGKm4OjFRQualfj
-         Hlmdp8bEknj+aPklOF75piQWuNQby7yD89gk3U9U/GlyVRQOrZnAvex7nQ0cPHINDV4e
-         nhd9r+ivGv4oZy3XvRWJwU8Aa7Rj7uEPKS7rDAWN4MqvjDrSBkwhSGRhZ+AhwjFYJ3JP
-         8WRyCImOuIqOt8SMeGj8F73qMpnUeblbhjYV7LivpAmF30x58dioP5KEHltMDAX0DsOo
-         w56A==
-X-Forwarded-Encrypted: i=1; AJvYcCU78dZzuihSoDpzXNOOFaYf1ShT8Lh8CCEnCAuix2r4gvZ7iNGJuef63FeI5Pl/QdsXMpNpx+I=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx4XbQuxCL/43zSfSTI+4BUyb28UppHQsnhXAbzKlDkd6WWhmon
-	0Yba6YSXzzW4Ihw5kudCIVlQnxVI/1ZrMH9Rf+jiLuP0alcxtjy9UQ0W3yuaSFV8a+OT4ijmXWd
-	qEFQZ81Vn2Mo5nW07KkGzvM7ZrP07tYw5D+loZdRvQNoesvGz/RNysw==
-X-Gm-Gg: ASbGncuOOXeNpnsoz8JufAIVWRq9/8UlWzF2lvqMmn75gY5Rgmx93vGioLO0w1gKdT5
-	9AaXB8ijuJZY7XkpS6f1qWi12TRoy1pFcsaTate+wCopD5mobLuJAn1UqvxWZzxoS1qXkqDwvEI
-	bYqfm3T4F+qTQRMfbfUUvwBBd2o8rEY2+XHbc3kV2U0INcaAxHpslen4/PVJrmf8laeh4pvsFlC
-	4vF82cX1uGZBBGi5iUCdf6qblF9mOowUW3XGauH2HGbOph+XMmqXK51oEzYJiF2iqF2pYNAxxEH
-	mdV42A==
-X-Received: by 2002:a05:6a20:1591:b0:1e6:5323:58c5 with SMTP id adf61e73a8af0-1eb214a06f0mr63365307637.12.1738043232169;
-        Mon, 27 Jan 2025 21:47:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGj7WcMyL/2PjgoUCXeF8pDrIwXJ8iDNSOsLtS1l4yE0zK1FCS82DOSLWaxPfSPcfKWvA2L5w==
-X-Received: by 2002:a05:6a20:1591:b0:1e6:5323:58c5 with SMTP id adf61e73a8af0-1eb214a06f0mr63365273637.12.1738043231858;
-        Mon, 27 Jan 2025 21:47:11 -0800 (PST)
-Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a69eb81sm8276685b3a.26.2025.01.27.21.47.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 21:47:10 -0800 (PST)
-Message-ID: <1032c158-c5a6-4845-affa-f444e0071e5a@redhat.com>
-Date: Tue, 28 Jan 2025 15:47:02 +1000
+	 In-Reply-To:Content-Type; b=ozXl8OL9cTvM04JXVaR3VekVR593A69aRFUv7HkePoVomtYx76eDmytA2fHiHesQ5SFEyIBO9W3kn8VISJBH51kj6fcTmSa7p4IanBSYnJkPJUg7N6dx7UXw3ULroK2fYAjbQDT94p3gDio8jd3CMdvB/109+rnqQ6Bqims26DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4EE0F497;
+	Tue, 28 Jan 2025 01:11:50 -0800 (PST)
+Received: from [10.162.16.94] (a077893.blr.arm.com [10.162.16.94])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6BC663F528;
+	Tue, 28 Jan 2025 01:11:20 -0800 (PST)
+Message-ID: <7f5c68c7-8036-4d18-950f-80e55ac8ea11@arm.com>
+Date: Tue, 28 Jan 2025 14:41:17 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,77 +27,62 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 06/43] arm64: RME: Check for RME support at KVM init
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-7-steven.price@arm.com> <yq5amsgsrzva.fsf@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <yq5amsgsrzva.fsf@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: BPYXAuq25rI6Zcpzkn4KNaj37JNYKSZOblU77DIopGI_1738043232
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+To: Rob Herring <robh@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Will Deacon <will@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Jonathan Corbet <corbet@lwn.net>, Eric Auger <eric.auger@redhat.com>,
+ kvmarm@lists.linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241220072240.1003352-1-anshuman.khandual@arm.com>
+ <20250102160402.GB3990035-robh@kernel.org> <Z30adHnQ7ZFaU9UR@arm.com>
+ <CAL_JsqLLnh1o4L1=PpNt5brBwZZCgp7mOygByOYakchrzc29Ow@mail.gmail.com>
+ <86wmf5wo8u.wl-maz@kernel.org>
+ <CAL_JsqKKiEOj=a1k6U-bB0F6-ht7QokDnh3bspHupp-QG=haSg@mail.gmail.com>
+ <Z4kmlhnlpKjS_MII@arm.com>
+ <CAL_JsqK1k7fG=yDZSbTbV63yRP5U9=GpuAiv=NWZJWdppUtRwA@mail.gmail.com>
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <CAL_JsqK1k7fG=yDZSbTbV63yRP5U9=GpuAiv=NWZJWdppUtRwA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 12/19/24 3:44 PM, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
+
+
+On 1/18/25 03:37, Rob Herring wrote:
+> On Thu, Jan 16, 2025 at 9:32 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
+>>
+>> On Wed, Jan 08, 2025 at 07:47:16AM -0600, Rob Herring wrote:
+>>> On Wed, Jan 8, 2025 at 5:15 AM Marc Zyngier <maz@kernel.org> wrote:
+>>>> On Tue, 07 Jan 2025 22:13:47 +0000,
+>>>> Rob Herring <robh@kernel.org> wrote:
+>>>>> On Tue, Jan 7, 2025 at 6:13 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
+>>>>>> But does KVM actually expose the feature to EL1 in ID_AA64DFR1_EL1 and
+>>>>>> than traps it at EL2?
+>>>>>
+>>>>> As Marc pointed out KVM only advertises PMUv3.8. Regardless, guest
+>>>>> accesses to these registers are trapped with or without this series.
+>>>>
+>>>> And most probably generates a nice splat in the kernel log, as nobody
+>>>> updated KVM to handle *correctly* PMICNTR_EL0 traps, let alone deal
+>>>> with the FGT2 registers.
+>>>
+>>> Isn't that this series[1]? Should that have come first, I guess I know
+>>> that *now*.
+>> [...]
+>>> [1] https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandual@arm.com/
+>>
+>> It's not any clearer to me. Does this series depend on the 46-patch one?
+>> Or, if we had the other, is this no longer needed? Or none of these,
+>> they are independent.
 > 
->> +static int rmi_check_version(void)
->> +{
->> +	struct arm_smccc_res res;
->> +	int version_major, version_minor;
->> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
->> +						     RMI_ABI_MINOR_VERSION);
->> +
->> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
->> +
->> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
->> +		return -ENXIO;
->> +
->> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
->> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
->> +
->> +	if (res.a0 != RMI_SUCCESS) {
->> +		kvm_err("Unsupported RMI ABI (v%d.%d) we want v%d.%d\n",
->> +			version_major, version_minor,
->> +			RMI_ABI_MAJOR_VERSION,
->> +			RMI_ABI_MINOR_VERSION);
->> +		return -ENXIO;
->> +	}
->> +
->> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
->> +
->> +	return 0;
->> +}
->> +
-> 
-> Should we include both high and low version numbers in the kvm_err
-> message on error? ie,
-> 
-> 	high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
-> 	high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
-> 
+> They are independent. I think ideally we'd want everything landing at
+> the same time, but we're past ideal at this point. Without this
+> series, if someone uses PMU on v8.9 and firmware enabled FGT2, then
+> the kernel will crash. Without the above series, KVM will have
+> warnings in the kernel log, but otherwise function.
 
-I think so since a range of supported versions are returned in the failing case.
-
-Besides, 'unsigned short' is more suitable for the local variable version_{major, minor}
-since both are 16-bits in width. 'unsigned short' explicitly indicates their
-width.
-
-Thanks,
-Gavin
-
+Right, they are independent. Just that Rob had observed this PMU v3.8 boot
+requirement while reviewing the HW breakpoint series earlier. I should just
+respin this series after the upcoming v6.14-rc1 release is out ?
