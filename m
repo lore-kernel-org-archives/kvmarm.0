@@ -1,277 +1,215 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260F0161310;
-	Tue, 28 Jan 2025 09:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE1719CC05;
+	Tue, 28 Jan 2025 10:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738056437; cv=none; b=mT+/D5c/e9G6A+hKsXqCsnP3DdTnlbvJlsWlEa+4LsRT9ttTEJufFVHgRPGXSFsQzi+23xna3C7xYs3/GL9+nOqmZ6IYc6hwZyVFIC7PlAQMQP98hRK2I9PZJRl3L7oAT5rQGtydRiXpYbJVFBomf4qXtLOsRs8AYOV8Y8qfZII=
+	t=1738060292; cv=none; b=X2Q6EkOJ6JqF0t2ySv/h3Lty+MAFzBFM/ldAkge3RABQ/Z23xlyAIONbYU5+S/Fi00YDLX8sNp/Aq4aKpuVzCnQoFAHrugec9Au8Sn3WxbnkWbzzPDhUDeF1tsEr0YBnzm7iwKEMaQl7GrWLzZej+WnemLBfe9FvHGbB6UGbCGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738056437; c=relaxed/simple;
-	bh=iCbYshpRg08hQdbDkopUn5Vj56lVut9iyZDGmvAZw7I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nAW60gVBVPinj0KRlgbq/cZeE4owNtFiabIwEk7AZDOHzRPkCNLpDM8RpDeI6I3VzZUO+pw0JHbTij6w/lp10YcX7teolFGl7xrru7HWY9fPmEy68Lhhxg2oNM6qiw77/0xAC+LJQVW3Y8BxmgQAosPw+yD7Kluwdpc14MAXPGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b08JNMw+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738060292; c=relaxed/simple;
+	bh=H6SMlW4tY/dv7HZV8uwUnEiNFCo2HjcWfwj2mK+HPNg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=r9t1GHq+4uYaDWll0jPQD0FX9Bi9LXEvcQzDOl1tJvACdbw0MeXXfUuB2EaelmIF0ahmxmPGYVC5iZe2r/TzIcbEWOXKtUyDf5DtbDtypI+Ac3EJSiTCS117MX4TP04FF4Ldr2djOkXtjEeCMQLx7G1OyHnyAux5XvF5qSyAIB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j7XEAQDT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b08JNMw+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C31B6C4CED3;
-	Tue, 28 Jan 2025 09:27:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j7XEAQDT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1EBC4CEE3;
+	Tue, 28 Jan 2025 10:31:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738056437;
-	bh=iCbYshpRg08hQdbDkopUn5Vj56lVut9iyZDGmvAZw7I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b08JNMw+vaEv82euLbu4+0DU88tcR/JEBIgAf6VlfLo1QQMtGt38AHlFHC42H20XL
-	 cmrht6F3EPXIl4c4mXS4qDAVNPuWz5kasQ6Rxl16FHOGM4JUU6i1s2XNVw3U0F19uM
-	 jfdgLNh5QuRML5bZ/l4f/GNmzaoKBjk4E34m7vUjOcN5b1JgGE7f3RjRlpsWzEOXnq
-	 th6KsNYgcrKfEOwnrJ2rve6znz5UV0rvHA3Cd7e1v6HiPtyYhcZHbZFpfjkbB3xEjM
-	 C8oaGFGlTKf+dYASmXZBsw8l/cUOuNHa0cx6JOEhxs7A3IMORv3zY7YqQU8lr0+xOp
-	 DlCsXitVTBSBw==
-Received: from 82-132-220-9.dab.02.net ([82.132.220.9] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tchsI-00G0MS-DY;
-	Tue, 28 Jan 2025 09:27:14 +0000
-Date: Tue, 28 Jan 2025 09:27:11 +0000
-Message-ID: <87ikpzthjk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	s=k20201202; t=1738060292;
+	bh=H6SMlW4tY/dv7HZV8uwUnEiNFCo2HjcWfwj2mK+HPNg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=j7XEAQDT/q4YR7UEVN2p/mLn9RtQkVY2foZWR9AwCE3nHgBuOJRF0tbfRs1y25VVy
+	 SDi03wCHYZg87XJTCjIVLvPonP6CaRkNdXpR9So1+DbFDkjvEpJVtA7NI/wSYz1q2Z
+	 lNk246Glj0e+W7JlFZbDXchAOCwvQpNSb9ybuzmjo0mNUf8bsXfZN0UXNmJhgt3Fns
+	 4U8WEGVPEQpSV0oYr7sKxUc1Ptd8pj5V6gu5NwJDjS4DhxW/SG8hIJIUQcuZMyRBzX
+	 zTvgPNc93F+ip+StPb1tZTBxEbgSv0MVQdMn8nHv64xIMmkhWxv2t4h/X2aI2hkAIP
+	 DcIRzduyT3ieQ==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Peter Collingbourne <pcc@google.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to partition the PMU
-In-Reply-To: <20250127222031.3078945-2-coltonlewis@google.com>
-References: <20250127222031.3078945-1-coltonlewis@google.com>
-	<20250127222031.3078945-2-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: MTE: Use stage-2 NoTagAccess memory
+ attribute if supported
+In-Reply-To: <Z4e04P1bQlFBDHo7@arm.com>
+References: <20250110110023.2963795-1-aneesh.kumar@kernel.org>
+ <20250110110023.2963795-6-aneesh.kumar@kernel.org>
+ <Z4Fk58k8YptDkVgm@arm.com> <yq5amsfxtrlw.fsf@kernel.org>
+ <Z4Vk5gTnd8o7VKWL@arm.com>
+ <CAMn1gO4huP4D_1mFdC8FsmvHkaQn+hC02ULcfBuS30VDM9=9gA@mail.gmail.com>
+ <Z4e04P1bQlFBDHo7@arm.com>
+Date: Tue, 28 Jan 2025 16:01:18 +0530
+Message-ID: <yq5afrl3cjrd.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.220.9
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 27 Jan 2025 22:20:27 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
-> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
-> allowed, EL0 while counters HPMN..N are only accessible by EL2.
-> 
-> Introduce a module parameter in the PMUv3 driver to set this
-> register. The name reserved_guest_counters reflects the intent to
-> reserve some counters for the guest so they may eventually be allowed
-> direct access to a subset of PMU functionality for increased
-> performance.
-> 
-> Track HPMN and whether the pmu is partitioned in struct arm_pmu.
-> 
-> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
-> specifically disallows that case because it's not useful given the
-> intention to allow guests access to their own counters.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arch/arm/include/asm/arm_pmuv3.h   | 10 +++++++
->  arch/arm64/include/asm/arm_pmuv3.h | 10 +++++++
->  drivers/perf/arm_pmuv3.c           | 43 ++++++++++++++++++++++++++++--
->  include/linux/perf/arm_pmu.h       |  2 ++
->  include/linux/perf/arm_pmuv3.h     |  7 +++++
->  5 files changed, 70 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
-> index 2ec0e5e83fc9..49ad90486aa5 100644
-> --- a/arch/arm/include/asm/arm_pmuv3.h
-> +++ b/arch/arm/include/asm/arm_pmuv3.h
-> @@ -277,4 +277,14 @@ static inline u64 read_pmceid1(void)
->  	return val;
->  }
->  
-> +static inline u32 read_mdcr(void)
-> +{
-> +	return read_sysreg(mdcr_el2);
-> +}
-> +
-> +static inline void write_mdcr(u32 val)
-> +{
-> +	write_sysreg(val, mdcr_el2);
-> +}
-> +
+Catalin Marinas <catalin.marinas@arm.com> writes:
 
-This will obviously break the 32bit build.
+> On Mon, Jan 13, 2025 at 12:47:54PM -0800, Peter Collingbourne wrote:
+>> On Mon, Jan 13, 2025 at 11:09=E2=80=AFAM Catalin Marinas
+>> <catalin.marinas@arm.com> wrote:
+>> > On Sat, Jan 11, 2025 at 06:49:55PM +0530, Aneesh Kumar K.V wrote:
+>> > > Catalin Marinas <catalin.marinas@arm.com> writes:
+>> > > > On Fri, Jan 10, 2025 at 04:30:21PM +0530, Aneesh Kumar K.V (Arm) w=
+rote:
+>> > > >> Currently, the kernel won't start a guest if the MTE feature is e=
+nabled
+>> > >
+>> > > ...
+>> > >
+>> > > >> @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct k=
+vm *kvm,
+>> > > >>            if (!vma)
+>> > > >>                    break;
+>> > > >>
+>> > > >> -          if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+>> > > >> +          if (kvm_has_mte(kvm) &&
+>> > > >> +              !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma=
+)) {
+>> > > >>                    ret =3D -EINVAL;
+>> > > >>                    break;
+>> > > >>            }
+>> > > >
+>> > > > I don't think we should change this, or at least not how it's done=
+ above
+>> > > > (Suzuki raised a related issue internally relaxing this for VM_PFN=
+MAP).
+>> > > >
+>> > > > For standard memory slots, we want to reject them upfront rather t=
+han
+>> > > > deferring to the fault handler. An example here is file mmap() pas=
+sed as
+>> > > > standard RAM to the VM. It's an unnecessary change in behaviour IM=
+HO.
+>> > > > I'd only relax this for VM_PFNMAP mappings further down in this
+>> > > > function (and move the VM_PFNMAP check above; see Suzuki's internal
+>> > > > patch, unless he posted it publicly already).
+>> > >
+>> > > But we want to handle memslots backed by pagecache pages for virtio-=
+shm
+>> > > here (virtiofs dax use case).
+>> >
+>> > Ah, I forgot about this use case. So with virtiofs DAX, does a host pa=
+ge
+>> > cache page (host VMM mmap()) get mapped directly into the guest as a
+>> > separate memory slot? In this case, the host vma would not have
+>> > VM_MTE_ALLOWED set.
+>> >
+>> > > With MTE_PERM, we can essentially skip the
+>> > > kvm_vma_mte_allowed(vma) check because we handle all types in the fa=
+ult
+>> > > handler.
+>> >
+>> > This was pretty much the early behaviour when we added KVM support for
+>> > MTE, allow !VM_MTE_ALLOWED and trap them later. However, we disallowed
+>> > VM_SHARED because of some non-trivial race. Commit d89585fbb308 ("KVM:
+>> > arm64: unify the tests for VMAs in memslots when MTE is enabled")
+>> > changed this behaviour and the VM_MTE_ALLOWED check happens upfront. A
+>> > subsequent commit removed the VM_SHARED check.
+>> >
+>> > It's a minor ABI change but I'm trying to figure out why we needed this
+>> > upfront check rather than simply dropping the VM_SHARED check. Adding
+>> > Peter in case he remembers. I can't see any race if we simply skipped
+>> > this check altogether, irrespective of FEAT_MTE_PERM.
+>>=20
+>> I don't see a problem with removing the upfront check. The reason I
+>> kept the check was IIRC just that there was already a check there and
+>> its logic needed to be adjusted for my VM_SHARED changes.
+>
+> Prior to commit d89585fbb308, kvm_arch_prepare_memory_region() only
+> rejected a memory slot if VM_SHARED was set. This commit unified the
+> checking with user_mem_abort(), with slots being rejected if
+> (!VM_MTE_ALLOWED || VM_SHARED). A subsequent commit dropped the
+> VM_SHARED check, so we ended up with memory slots being rejected only if
+> !VM_MTE_ALLOWED (of course, if kvm_has_mte()). This wasn't the case
+> before the VM_SHARED relaxation.
+>
+> So if you don't remember any strong reason for this change, I think we
+> should go back to the original behaviour of deferring the VM_MTE_ALLOWED
+> check to user_mem_abort() (and still permitting VM_SHARED).
+>
 
->  #endif
-> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-> index 8a777dec8d88..fc37e7e81e07 100644
-> --- a/arch/arm64/include/asm/arm_pmuv3.h
-> +++ b/arch/arm64/include/asm/arm_pmuv3.h
-> @@ -188,4 +188,14 @@ static inline bool is_pmuv3p9(int pmuver)
->  	return pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P9;
->  }
->  
-> +static inline u64 read_mdcr(void)
-> +{
-> +	return read_sysreg(mdcr_el2);
-> +}
-> +
-> +static inline void write_mdcr(u64 val)
-> +{
-> +	write_sysreg(val, mdcr_el2);
-> +}
-> +
->  #endif
-> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index b5cc11abc962..55f9ae560715 100644
-> --- a/drivers/perf/arm_pmuv3.c
-> +++ b/drivers/perf/arm_pmuv3.c
-> @@ -325,6 +325,7 @@ GEN_PMU_FORMAT_ATTR(threshold_compare);
->  GEN_PMU_FORMAT_ATTR(threshold);
->  
->  static int sysctl_perf_user_access __read_mostly;
-> +static u8 reserved_guest_counters __read_mostly;
->  
->  static bool armv8pmu_event_is_64bit(struct perf_event *event)
->  {
-> @@ -500,6 +501,29 @@ static void armv8pmu_pmcr_write(u64 val)
->  	write_pmcr(val);
->  }
->  
-> +static u64 armv8pmu_mdcr_read(void)
-> +{
-> +	return read_mdcr();
-> +}
-> +
-> +static void armv8pmu_mdcr_write(u64 val)
-> +{
-> +	write_mdcr(val);
-> +	isb();
-> +}
-> +
-> +static void armv8pmu_partition(u8 hpmn)
-> +{
-> +	u64 mdcr = armv8pmu_mdcr_read();
-> +
-> +	mdcr &= ~MDCR_EL2_HPMN_MASK;
-> +	mdcr |= FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
-> +	/* Prevent guest counters counting at EL2 */
-> +	mdcr |= ARMV8_PMU_MDCR_HPMD;
-> +
-> +	armv8pmu_mdcr_write(mdcr);
-> +}
-> +
->  static int armv8pmu_has_overflowed(u64 pmovsr)
->  {
->  	return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
-> @@ -1069,6 +1093,9 @@ static void armv8pmu_reset(void *info)
->  
->  	bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
->  
-> +	if (cpu_pmu->partitioned)
-> +		armv8pmu_partition(cpu_pmu->hpmn);
-> +
+Something as below?
 
-Kaboom, see below.
+From 466237a6f0a165152c157ab4a73f34c400cffe34 Mon Sep 17 00:00:00 2001
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Date: Tue, 28 Jan 2025 14:21:52 +0530
+Subject: [PATCH] KVM: arm64: Drop mte_allowed check during memslot creation
 
->  	/* The counter and interrupt enable registers are unknown at reset. */
->  	armv8pmu_disable_counter(mask);
->  	armv8pmu_disable_intens(mask);
-> @@ -1205,6 +1232,7 @@ static void __armv8pmu_probe_pmu(void *info)
->  {
->  	struct armv8pmu_probe_info *probe = info;
->  	struct arm_pmu *cpu_pmu = probe->pmu;
-> +	u8 pmcr_n;
->  	u64 pmceid_raw[2];
->  	u32 pmceid[2];
->  	int pmuver;
-> @@ -1215,10 +1243,19 @@ static void __armv8pmu_probe_pmu(void *info)
->  
->  	cpu_pmu->pmuver = pmuver;
->  	probe->present = true;
-> +	pmcr_n = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
->  
->  	/* Read the nb of CNTx counters supported from PMNC */
-> -	bitmap_set(cpu_pmu->cntr_mask,
-> -		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
-> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
-> +
-> +	if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr_n) {
-> +		cpu_pmu->hpmn = reserved_guest_counters;
-> +		cpu_pmu->partitioned = true;
+Before commit d89585fbb308 ("KVM: arm64: unify the tests for VMAs in
+memslots when MTE is enabled"), kvm_arch_prepare_memory_region() only
+rejected a memory slot if VM_SHARED was set. This commit unified the
+checking with user_mem_abort(), with slots being rejected if either
+VM_MTE_ALLOWED is not set or VM_SHARED set. A subsequent commit
+c911f0d46879 ("KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE
+enabled") dropped the VM_SHARED check, so we ended up with memory slots
+being rejected if VM_MTE_ALLOWED is not set. This wasn't the case before
+the commit d89585fbb308. The rejection of the memory slot with VM_SHARED
+set was done to avoid a race condition with the test/set of the
+PG_mte_tagged flag. Before Commit d77e59a8fccd ("arm64: mte: Lock a page
+for MTE tag initialization") the kernel avoided allowing MTE with shared
+pages, thereby preventing two tasks sharing a page from setting up the
+PG_mte_tagged flag racily.
 
-Isn't this going to completely explode on a kernel running at EL1?
+Commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag
+initialization") further updated the locking so that the kernel
+allows VM_SHARED mapping with MTE. With this commit, we can enable
+memslot creation with VM_SHARED VMA mapping.
 
-Also, how does it work in an asymmetric configuration where some CPUs
-can satisfy the reservation, and some can't?
+This patch results in a minor tweak to the ABI. We now allow creating
+memslots that don't have the VM_MTE_ALLOWED flag set. If the guest uses
+such a memslot with Allocation Tags, the kernel will generate -EFAULT.
+ie, instead of failing early, we now fail later during KVM_RUN.
 
-> +	} else {
-> +		reserved_guest_counters = 0;
-> +		cpu_pmu->hpmn = pmcr_n;
-> +		cpu_pmu->partitioned = false;
-> +	}
->  
->  	/* Add the CPU cycles counter */
->  	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
-> @@ -1516,3 +1553,5 @@ void arch_perf_update_userpage(struct perf_event *event,
->  	userpg->cap_user_time_zero = 1;
->  	userpg->cap_user_time_short = 1;
->  }
-> +
-> +module_param(reserved_guest_counters, byte, 0);
-> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-> index 4b5b83677e3f..ad97aabed25a 100644
-> --- a/include/linux/perf/arm_pmu.h
-> +++ b/include/linux/perf/arm_pmu.h
-> @@ -101,6 +101,8 @@ struct arm_pmu {
->  	void		(*reset)(void *);
->  	int		(*map_event)(struct perf_event *event);
->  	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
-> +	u8		hpmn; /* MDCR_EL2.HPMN: counter partition pivot */
-> +	bool	        partitioned;
->  	bool		secure_access; /* 32-bit ARM only */
->  #define ARMV8_PMUV3_MAX_COMMON_EVENTS		0x40
->  	DECLARE_BITMAP(pmceid_bitmap, ARMV8_PMUV3_MAX_COMMON_EVENTS);
-> diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-> index d698efba28a2..d399e8c6f98e 100644
-> --- a/include/linux/perf/arm_pmuv3.h
-> +++ b/include/linux/perf/arm_pmuv3.h
-> @@ -223,6 +223,13 @@
->  				 ARMV8_PMU_PMCR_X | ARMV8_PMU_PMCR_DP | \
->  				 ARMV8_PMU_PMCR_LC | ARMV8_PMU_PMCR_LP)
->  
-> +/*
-> + * Per-CPU MDCR: config reg
-> + */
-> +#define ARMV8_PMU_MDCR_HPMN		GENMASK(4, 0)
-> +#define ARMV8_PMU_MDCR_HPME		BIT(7)
-> +#define ARMV8_PMU_MDCR_HPMD		BIT(17)
-> +
+This change is needed because, without it, users are not able to use MTE
+with VFIO passthrough, as shown below (kvmtool VMM).
 
-I'd rather we find a way to use the existing definitions form the
-sysreg file rather than add more duplication.
+[  617.921030] vfio-pci 0000:01:00.0: resetting
+[  618.024719] vfio-pci 0000:01:00.0: reset done
+  Error: 0000:01:00.0: failed to register region with KVM
+  Warning: [0abc:aced] Error activating emulation for BAR 0
+  Error: 0000:01:00.0: failed to configure regions
+  Warning: Failed init: vfio__init
 
-I also don't see how the kernel knows not to access the low-numbered
-counters at this point. Maybe in a later patch, I'll keep reading.
+  Fatal: Initialisation failed
 
-	M.
+Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+---
+ arch/arm64/kvm/mmu.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 007dda958eab..610becd8574e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2146,11 +2146,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 		if (!vma)
+ 			break;
+=20
+-		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+-			ret =3D -EINVAL;
+-			break;
+-		}
+-
+ 		if (vma->vm_flags & VM_PFNMAP) {
+ 			/* IO region dirty page logging not allowed */
+ 			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+--=20
+2.43.0
+
+
