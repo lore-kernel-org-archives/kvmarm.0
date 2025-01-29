@@ -1,129 +1,165 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE731E2843
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 21:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD701A8F97
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 23:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738186026; cv=none; b=XyPI4fHv8Tf0H+dau4ZXvj99wyL+P0S7JJT6xOwUYjTbzg8VL6rilpnYgKyp7qXramw8rOj8aO8csD1lcw6d0HKjhtwqZoFjAtTspRx5h5mL0gZeTOu3Fv3r7Q5m7U2npojaNqiq+1JJSO7FHEXBFGmzdrT5n58WHhDWvO7cU3g=
+	t=1738192021; cv=none; b=MwyKNkWuhyBgZrShCfcTH9Gvvvb9+PDhyjhZvFpA9BNNh1hjcmBsefh4h0MIb1Vzw4S6swfS1e16FNxP/EggWY1D5tKoq5RtgiCb2bQ10dQbmXtiIEp8kji+4koz30rM6VjpPTbH8WDChATxLKQaRSHbg1fL/lCZUAvvctsweA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738186026; c=relaxed/simple;
-	bh=nN9FJWNplkIKmzFXRfsaSEmbobI8sxtet+92PBTyajw=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=KXM1N+9aQ9v5r7YsTX/euOJXHCI2A0x+drub7+0NytI8AfysoFl9xLjH4jFwbpuAZjhqOIoPgWORwCd8QuPxYZRvt2t3lw+t3E4HBaCKRSZKpE4ZdKzh0RY1TK6Ul1fNl7WwM1ogJwHq/X459iRgc6Z9XbzsZoDZ+PGjZyOM+4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1cODmyAo; arc=none smtp.client-ip=209.85.166.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1738192021; c=relaxed/simple;
+	bh=zUh44u3xHyFvSH3tS0Wr7/FzaJHez2vFFdMcDL88fsI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZERbIshjg7FG1XqcEyX5mHN3EhmNTjY27ayJjdx6rapZ0EjCpkPIMn/oOsZrAIBFsCORstk+iB8uQT8FPsTcoR82/6VV5xyd7UsEqSvPejLAmTHudBnBeooAQCJhru66ILlUEPoC/20XUn+4Y6XwagUIKD+Z9bO0VWOYwjlxEn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W67kCPEP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1cODmyAo"
-Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3cfba354f79so3364045ab.1
-        for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 13:27:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738186023; x=1738790823; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=f5TFKrdlu748ABqlHsuP9NDv0QkMzFjiUtwaLrqTFf0=;
-        b=1cODmyAoTc1Ic6rfoqX87GFzO0ny4eAiKsGFAnpp0qKoEj5mGxV086KWiUA99vXogf
-         lOgHRx3l19IS5TxOE8D8wQUDpFxRPpKO+F5uFl6cnhFeCo5BkcfR+afGRTae6WszZIyd
-         MMwU9q1udwiDsan13anMk094ehpN8ZJJ4Le15vxyayiHkMjMKZzrq3aeNd8XvbsU+9Tm
-         eBiFlFBHG7F1REaAMy9DO2lky8GoHu16ZzYYkTS4U0XFGoDuH5p+Dj9tWv/lCEgT1shC
-         gIjTov8fVNpjAoLCp5p4HHjcX3fyGuvGXCFXcUDofH/NYNZnHe9lJLYhsS0bC9ihvAI4
-         sNpA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W67kCPEP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738192018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KyHbZ+Pwxh06r8uU1Lo24oDU5q1mx0zS6wBE1H4R6WI=;
+	b=W67kCPEP/yZdGQkg2Gmrl9fEB9XzKOwBLbXJIhk9Os0f8qMBtek1zkD+XA3iOhMuAILlXy
+	h5sFNKx82O7x8WknJ+ZIrHqIybOeMf/bWPFVfaUdNZITyiXPkFAhrnVPlzBVWZev9OrVq7
+	wApN7rU+ttxP4aRYg4qNTUcvfbOqfEk=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-588-hL8_aTJCMMCANfy4PfjmeA-1; Wed, 29 Jan 2025 18:06:57 -0500
+X-MC-Unique: hL8_aTJCMMCANfy4PfjmeA-1
+X-Mimecast-MFC-AGG-ID: hL8_aTJCMMCANfy4PfjmeA
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so252934a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 15:06:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738186023; x=1738790823;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1738192016; x=1738796816;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5TFKrdlu748ABqlHsuP9NDv0QkMzFjiUtwaLrqTFf0=;
-        b=O7XpuiUrnkwei58Uz7cR7Mc0IY6UKpo4+c08cHK6MJWPicoqAWB3qKfBYRpFDeZS4a
-         9ClgpJAW/j1V7eOQtLJToXeUPKSMRT8tDWBwMmNjQrPffKKGVvOFusX3whewCJTdHx9h
-         +htFLo+dr603158tpE3bPSI9SVlalyx+L0UlHgwG5vopzr42GbvzwddWZeEsNq1GARJG
-         cQdyd+AD8Gua5A9BBXU7i3dzqgMDGbnOiOvFHvKv3JH6MAQ/74f2xYUDYnPBB1hI2zRM
-         Hy7WD5mMFPTF7ftEnL9ycYVvWdlYOMOrCXkvHhhfcdmejxGCubSPOUEMkTqaIhjMUQEy
-         N8jA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYd9oIfL/qjwT13cn6E4zE4gOlotn/RRnjKzrWQ+TMd7V0VPLIqsrABlTroNr9+kNuqZsJr/U=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx068t6RkjEYL1bO4Ir11xeTZXlbZzDXTxrCE9BjWCPSw9gCDg+
-	GOJxMQ6hQkdF/KosRpOZQN1SoClRQvVmgBJNGVc8UYdfaSXjjVNVY6ZHZcedXagtVmeiBfid8vT
-	GdkrTeybpN2/Z4wiwvpuliQ==
-X-Google-Smtp-Source: AGHT+IEe9UoVLvNSaHlSkXBd6Ho5IN4ChMz7y7gjFQYGYFiTLbvYP7nErowhtJVcYSVDfJu2qMuLzToHlUCNsQ59Ig==
-X-Received: from ilbbb15.prod.google.com ([2002:a05:6e02:f:b0:3ce:69d1:ce53])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:20cd:b0:3a7:66e0:a98a with SMTP id e9e14a558f8ab-3cffe3d1e48mr43753655ab.9.1738186023704;
- Wed, 29 Jan 2025 13:27:03 -0800 (PST)
-Date: Wed, 29 Jan 2025 21:27:03 +0000
-In-Reply-To: <86bjvpvdn5.wl-maz@kernel.org> (message from Marc Zyngier on Wed,
- 29 Jan 2025 15:33:02 +0000)
+        bh=KyHbZ+Pwxh06r8uU1Lo24oDU5q1mx0zS6wBE1H4R6WI=;
+        b=WpLKUFgHA7DBVMekEEKyMm1P+p9kASx1UFIylDb0hLs+GpFQD7GzpsiMKjHdILN8OT
+         12Rj2VKo5cu1zYliPICBTufWLypQ0LVWu6U/9giwNm7gusQXa71AqjnmixzYlhMNoDP9
+         ZGig2MIORnf7Hl7EU1QpzV53dmJkhghWsfjQiszhhALWpXUL7UP5m4pboE7hPyvfdzeJ
+         fFttPvpePX5sxkNNUrAMK/aaS/JES3yzi9yjnKghjITviGr3LgraWH6gHgLo9Cld8DIw
+         oLRyh9DGvCUEBLo/DPxIzWYzjMQ6A10m7IP6CTaAC8fZD4dSCeLsyZdfadrDoSf+1AXH
+         GTPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXDzj4sidxD0ywjQ2aTz995S5Cj6Abr1r0eAb8o0MXp0ajOR7i6QUoUB/OqNS6bTSMgE+AZRvQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwNKlmibHhj2E2zbrGICmv3pUNl3TpvmPxGxLD+t3BJkoo7sY6J
+	4bd27pb/5Q7uD1929nq5h4uePiRqYcduwodwB0M5X4AHq+om0fddbMtzlYjxQdaVvN1/y29moCP
+	ymh/lq79gOYVsHVDwBneMJbMhpWzimVz4g0J9tiYoA5ZJUa3aqpYnpg==
+X-Gm-Gg: ASbGncsUr85ohn11LRbUdssv9o6/FLilR81XG4eCaLxgya5kNAEZz19AHSM68jFs32q
+	WVPLsqtopKcIQ2ixQ1AIX1Ly1ukpUd/qHLfqimbOrGQOLd8N9OhUrbMie4MsEsjEIuc8AkrkubE
+	1i19tZe//Y/YR/bE8v+1hkql1l8Z0Uot6pal+2Dd3x/PXYRwQn7OVZOMJ6NwNEebdGv7TtDL+WI
+	XSuERqug0fH0T2CYVnQOGwrVXW6vAVLPI0W43y2dimBsNaM/8IRnuk37bwtU2AhF6PA4lkX5sV8
+	a1AoAg==
+X-Received: by 2002:a05:6a00:1396:b0:725:db34:6a7d with SMTP id d2e1a72fcca58-72fd0c7c6c5mr7442926b3a.23.1738192016160;
+        Wed, 29 Jan 2025 15:06:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHK+GFtKGuVAzhj66wtlYDvlWWvG3WVubkOllbBq8t3Ltf+GMVUhA51a8pFaMKDNQBYDvAy4Q==
+X-Received: by 2002:a05:6a00:1396:b0:725:db34:6a7d with SMTP id d2e1a72fcca58-72fd0c7c6c5mr7442904b3a.23.1738192015836;
+        Wed, 29 Jan 2025 15:06:55 -0800 (PST)
+Received: from [192.168.68.55] ([180.233.125.64])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe631bfb0sm30521b3a.23.2025.01.29.15.06.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jan 2025 15:06:55 -0800 (PST)
+Message-ID: <dcb08082-4048-4573-9dd4-bf3b81a06bb9@redhat.com>
+Date: Thu, 30 Jan 2025 09:06:47 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntzfj91fbs.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
- partition the PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
-	pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 11/43] arm64: RME: RTT tear down
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241212155610.76522-1-steven.price@arm.com>
+ <20241212155610.76522-12-steven.price@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241212155610.76522-12-steven.price@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 1jkoIM7GjNsrxCR56C0zYd5kWpP2qIPXfSoU-Jn9PIM_1738192016
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Marc Zyngier <maz@kernel.org> writes:
+On 12/13/24 1:55 AM, Steven Price wrote:
+> The RMM owns the stage 2 page tables for a realm, and KVM must request
+> that the RMM creates/destroys entries as necessary. The physical pages
+> to store the page tables are delegated to the realm as required, and can
+> be undelegated when no longer used.
+> 
+> Creating new RTTs is the easy part, tearing down is a little more
+> tricky. The result of realm_rtt_destroy() can be used to effectively
+> walk the tree and destroy the entries (undelegating pages that were
+> given to the realm).
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v5:
+>   * Rename some RME_xxx defines to do with page sizes as RMM_xxx - they are
+>     a property of the RMM specification not the RME architecture.
+> Changes since v2:
+>   * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
+>     later patch when they are actually used.
+>   * Some simplifications now rmi_xxx() functions allow NULL as an output
+>     parameter.
+>   * Improved comments and code layout.
+> ---
+>   arch/arm64/include/asm/kvm_rme.h |  19 ++++++
+>   arch/arm64/kvm/mmu.c             |   6 +-
+>   arch/arm64/kvm/rme.c             | 112 +++++++++++++++++++++++++++++++
+>   3 files changed, 134 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 209cd99f03dd..32bdedf1d866 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -71,5 +71,24 @@ u32 kvm_realm_ipa_limit(void);
+>   int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>   int kvm_init_realm_vm(struct kvm *kvm);
+>   void kvm_destroy_realm(struct kvm *kvm);
+> +void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+> +
+> +#define RMM_RTT_BLOCK_LEVEL	2
+> +#define RMM_RTT_MAX_LEVEL	3
+> +
+> +#define RMM_PAGE_SHIFT		12
+> +#define RMM_PAGE_SIZE		BIT(RMM_PAGE_SHIFT)
+> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
+> +#define RMM_RTT_LEVEL_SHIFT(l)	\
+> +	((RMM_PAGE_SHIFT - 3) * (4 - (l)) + 3)
+> +#define RMM_L2_BLOCK_SIZE	BIT(RMM_RTT_LEVEL_SHIFT(2))
+> +
+> +static inline unsigned long rme_rtt_level_mapsize(int level)
+> +{
+> +	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
+> +		return RMM_PAGE_SIZE;
+> +
+> +	return (1UL << RMM_RTT_LEVEL_SHIFT(level));
+> +}
+>   
+>   #endif
 
-> On Tue, 28 Jan 2025 22:08:27 +0000,
-> Colton Lewis <coltonlewis@google.com> wrote:
+All those definitions can be moved to rme.c since they're only used in rme.c
 
->> >> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
->> >> +
->> >> +	if (reserved_guest_counters > 0 && reserved_guest_counters <  
->> pmcr_n) {
->> >> +		cpu_pmu->hpmn = reserved_guest_counters;
->> >> +		cpu_pmu->partitioned = true;
+Thanks,
+Gavin
 
->> > Isn't this going to completely explode on a kernel running at EL1?
-
->> Trying to access an EL2 register at EL1 can do that. I'll add the
->> appropriate hypercalls.
-
-> But what about a guest that would get passed the magic parameter? I
-> think you want to prevent that too.
-
-That doesn't matter because the ARM manual states that when HPMN is set,
-reads of PMCR.N from EL1 have that value and I've made sure in the
-second patch KVM does that, so a guest believes it has a system where
-reserved_guest_counters/HPMN == PMCR.N so there is no partition.
-
-
->> > Also, how does it work in an asymmetric configuration where some CPUs
->> > can satisfy the reservation, and some can't?
-
->> The CPUs that can't read their own value of PMCR.N below what the
->> attempted reservation is and so do not get partitioned. Nothing changes
->> for that CPU if it can't meet the reservation.
-
-> That's not what I meant. The question really is:
-
-> - do we want the reservation to be the number of counters reserved for
->    the host
-
-> - or do we want it to be for the guest?
-
-> On symmetric systems, it doesn't matter. On broken big-little systems,
-> this changes everything (it has a direct impact on userspace's ability
-> to use the counters).
-
-> I think the design should reflect a decision on the above.
-
-As currently written and reflected in the name reserved_guest_counters
-this series is making a reservation for the guest.
-
-After talking with Oliver it probably makes more sense to make a
-reservation for the host. This is closer to the semantics of the
-underlying CPU feature.
-
-In the limit case it's impossible to leave the host without
-counters. All valid values for HPMN leave the host at least 1, but
-should we make any guarantees beyond that?
