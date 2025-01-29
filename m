@@ -1,71 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB161DA4E
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 04:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A383EEAF6
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 04:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738123686; cv=none; b=IuUKuZucnuSzQChD+kQiExVlVQZ/OjuY1ESy46r6/Ct37v6hfocsc9nXYPSsr5c5IXJZfshbyE/bVddvpffgDCgXUeF9wnCqbEwQLTOQRtmDG3tM6erILbCKLesSy583q6LrHsrJoiMPZZa8WPkW6mdSh+YeyxEUu3Is+uekSFI=
+	t=1738126236; cv=none; b=qWsPilAWYSTwoBMEybImSXmTEpmDgL4mTm7ts74Nhe4kjJGucU7mFVNEVDuyyQ3/ueMPBfDh9pRVd3R67X7VW34MY0WtzUpjtfuPVveb9IG7L4Jf4q2ubA6txkSYMBWKatJ7UOZverRCRki4srcCD5aO+VC1Wv0CNXveTedT5k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738123686; c=relaxed/simple;
-	bh=CsAeFJeoQweV080X+SOo03x6K4oJXpfbYalIrjSAXhw=;
+	s=arc-20240116; t=1738126236; c=relaxed/simple;
+	bh=YYUC6GKqVjKjSa8HQ0ij/8CMuynJrEIMoqLwa8xg9LE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MUZis1Qq5gFOof2f7JgiCEp/U/n/7sWHgThqMqWWjsgfsRQH2oIgiYITtaq2FkR0wikTQUwuzZDv5metFO+NeDeNcYXvlIlC2JhZwkG2fq9ZsAuCBpn8TGMraD9ZO9xgq2cyO16t/ZEHPK1li7hcxldcOxEfXv0YY2sPqXVYUMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cDq+KGmu; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=iOkvqTszdoyuScUk/sDZ+VHIhfFXf4pCMSAxyq8glUXzFlqvSaGzDPtXfRzynUm1kqZ9lCgoIa84/ey3gtn85r0C3Vs+vDp62Qb18xSXpyw9ksZ266CxTdSwC3PHWQl38BbquVyFUAlE89qLBEd+krbNAGdO0/hOc9jgA+B4QLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W4om4aEF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cDq+KGmu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W4om4aEF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738123682;
+	s=mimecast20190719; t=1738126232;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=++vP7Pzm+0U/vbuzpGurQDME6fn3ZbIwZpBgDGBaFV0=;
-	b=cDq+KGmuqLNeAHcmuQKXgmemTzj6i7s9oaokuT4PqzJaaZA0Tb7i69sbIZNyQTtkVnPCmF
-	DUnxitFsma+f9WBOoRDLXJSOZcOWIOX8UHNARw9hGfFdCRGqNdS+yytys9ecMgMDGJjgom
-	Hsvfm3JLFf98Q1Ojq7d9aZFGHcOs0Tg=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=dnie7b2QLZHOtsz9Z4JDce0HC9WOty7SOXWzLQevN+A=;
+	b=W4om4aEFRORshPlJDfNsR1KyL7GXZraa9J02VvLo7Zn/6uh9UdW0oeIiERpswh6wGNJXBq
+	qF2MEU4smh6Pf4WTs2tUVTSpMR7SNRiSx84Wz+W3VfPdxZjdf5Ta5nOzMCguF+lJtN7Yo5
+	nkqnVCONjF8qu3R+0tCRDJAKBFqfQZo=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-ENeUBq1hM22cTxVH3KmM9A-1; Tue, 28 Jan 2025 23:08:01 -0500
-X-MC-Unique: ENeUBq1hM22cTxVH3KmM9A-1
-X-Mimecast-MFC-AGG-ID: ENeUBq1hM22cTxVH3KmM9A
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-21640607349so147281665ad.0
-        for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 20:08:01 -0800 (PST)
+ us-mta-627-0pkV-qYoOISie2HcOFVtaA-1; Tue, 28 Jan 2025 23:50:31 -0500
+X-MC-Unique: 0pkV-qYoOISie2HcOFVtaA-1
+X-Mimecast-MFC-AGG-ID: 0pkV-qYoOISie2HcOFVtaA
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2166855029eso124587745ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 28 Jan 2025 20:50:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738123680; x=1738728480;
+        d=1e100.net; s=20230601; t=1738126230; x=1738731030;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=++vP7Pzm+0U/vbuzpGurQDME6fn3ZbIwZpBgDGBaFV0=;
-        b=ChK3vZbSMREg8yRYnIHFu4AO7ub/kIm0/15jTHDSJM84CEfEfxa8SSCKjfiMjQ+Zys
-         x23p1ilQlIzPrTNk/Ajo2Ffp0mUMGHgCCBg7I4CRhbfrXMGjjC4Vh/cxxawKiWmK8R5C
-         B9QD1XnmGYQRmt/9U4zWzPOtmlMk+9QdDTtjRJGE69Au9B5/AveQtSS12U476iN4ZiRv
-         l8P7WoZTJFFfwi+gjBeBZYgQOHlk2VyT8O3WedzOdDA2WlGBuDmsY74QmYQhsodFOx/C
-         N9kRkZg9h2MPSsQTaKAW0JW6I2T2Onh/ugz9RhESJ3q8b9CDcZFuO6GThP8XicG848UZ
-         zGyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWj/xMLstHjmX5Wn7RuXuOwE0tpHUF2OWp3S68ukHDj/zXsFwRKwgQbcyNuyWqcm9aNGhBniqQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzbXVsn7TMx9ewfxwNA2bw1dsAmLTJbo/skogvIpe4pmPG1gWJP
-	kMzlKRml3Sor0cDjj+GRZNVtSWALdxKiFI44R+xSP4lMrSBr/RgWZiUvbk8fwfFzKXa3RWDJo7a
-	TodYOEwMMuYp//E+x3zbHux3aBAdz5M9JqBshUDpzn6XouAMrG7T9sA==
-X-Gm-Gg: ASbGncswXX+y0Tr/PmDEviZXKyXFannYZfMwS6uuc9esNj9Mnpm5yoKgBFQKkolxL3l
-	BRPP18wa98tft3OGoHB1l8AdtUBx91x9jP5Z124iOeYhYlbT9ASSjKEGgXlQgFj5troHgcpApYP
-	beRMru5Yvj+5+uEkQuB0Bn70anmUDLOwrGYQBN+V5IHhS37CYyhZk5IyxM50+a9Jjn5gwCBrYjN
-	U/5vccKeeF50jtTDsLXL9eoc1MfbolpBiy4T7sqXuwE3LGeUCWYufBZ8/HskcoKAiKLU09395z7
-	mgOv2w==
-X-Received: by 2002:a17:902:ce01:b0:215:3a42:dc17 with SMTP id d9443c01a7336-21dd7c4c298mr26327455ad.7.1738123680330;
-        Tue, 28 Jan 2025 20:08:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHQIoq8D2QaYFpzEq5kL3xdCHIiITAzdgGLjBLAtD4+BnGQNR/G88wzSm8jyqJiShrpZVo+NA==
-X-Received: by 2002:a17:902:ce01:b0:215:3a42:dc17 with SMTP id d9443c01a7336-21dd7c4c298mr26327115ad.7.1738123680051;
-        Tue, 28 Jan 2025 20:08:00 -0800 (PST)
+        bh=dnie7b2QLZHOtsz9Z4JDce0HC9WOty7SOXWzLQevN+A=;
+        b=hf62rQv008BSzfm4bk+/nxArENDr6kegNXSEMEgZGs8AhdAKEMff9RQKlM3bgQU/3P
+         yphU4VnQrhoCry6wkyK1KKcPVA64BKWxiyfr4O35Agw13hqp7GaQdvaEfUM1H5VVH5Db
+         /VqaGjLFtSvvGzPIVQBNh9/y1pIl2JNAuJVox//kcbZpjA8OoRi0q3S8TSyIexacTT3N
+         OMywkzvaH7SFruvhHSdPrQ/NV1ag2xI2EZ3j/HCRjnxE2/SKMOJB7n9oolXi0EXUtPsc
+         THmS5DODsW1KrtArktBNtT93N2XcWMSRDGJ92nqtVAwKq2GIKVCz0okSfYLP2wM+FBi/
+         7jyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXcOcjClER6wlElO5umhSo7woFPoReiyijtV6+a33NpESMdnICvpQrmFWZorrY1kvoGkCBrV/Q=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz+1brBR/OrtZeJx6dEmDbsrpWEI2wkh1+yZDbx9HDv8tVrlhD7
+	Goj3K6KhAJY9VjhzfToouS0nXDxSeX4Q0dqFcpqMusbbhD95Rg/7LZIJ7NQ6j4MUSE67jgZYcB8
+	2cFu0lCL1iY0nXmJ2ohTsjWYJCf/CrbNBdUBMRAV+Sve8f40GJc9wZQ==
+X-Gm-Gg: ASbGncs4RMqA4uucXHkSXKMal4pIAPTwqRnVhl2gSrrN2gmXz8Z0j5LbR9YlraWtrwH
+	QlcdrErOXLXgnBw2GgMxOa3rnEt9yRoSg1P11qJe5Dn/ilNr6FRBTB0LDcAZmrtHGg3fyKMqX+/
+	G8eipfMVsgbU8B19OFOdUNoZgTHiZB1ujp5uiH9WmAawVJb9e4NbJYMxkTnw3u+IpAWmpMGOQ/l
+	pllAoahd9Clsmk4i5wUXBtJNBgDmyb48KU4ZtIKxE0JYJLyGYONRGKCeFniL/H/rmOAa939vjus
+	kC4p9A==
+X-Received: by 2002:a17:902:e742:b0:215:a97a:c6bb with SMTP id d9443c01a7336-21dd7c65891mr25754385ad.12.1738126230214;
+        Tue, 28 Jan 2025 20:50:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMqKCsMqj6oPSufQyu9NcOncGLMFRZQV6U3d6wG1hA9zWz3o8a6Zro3eM6yrw9ZTQ1ckrhUw==
+X-Received: by 2002:a17:902:e742:b0:215:a97a:c6bb with SMTP id d9443c01a7336-21dd7c65891mr25753985ad.12.1738126229836;
+        Tue, 28 Jan 2025 20:50:29 -0800 (PST)
 Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da41415e9sm90098135ad.116.2025.01.28.20.07.52
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da4141536sm89662845ad.156.2025.01.28.20.50.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Jan 2025 20:07:59 -0800 (PST)
-Message-ID: <a580d287-2fb0-4e9d-adbb-57e4dbf25765@redhat.com>
-Date: Wed, 29 Jan 2025 14:07:51 +1000
+        Tue, 28 Jan 2025 20:50:29 -0800 (PST)
+Message-ID: <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
+Date: Wed, 29 Jan 2025 14:50:21 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,8 +73,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/43] arm64: kvm: Allow passing machine type in KVM
- creation
+Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -90,69 +89,179 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-11-steven.price@arm.com>
+ <20241212155610.76522-13-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241212155610.76522-11-steven.price@arm.com>
+In-Reply-To: <20241212155610.76522-13-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: EGZ1pOtrLo4nEYI5I0DsnmSOxztjLoI8bud-HWgBZ2o_1738123680
+X-Mimecast-MFC-PROC-ID: 6728deHt8uaf9hLAsDjbEp2R4bia_Mi0NbJfzGuQndE_1738126230
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/13/24 1:55 AM, Steven Price wrote:
-> Previously machine type was used purely for specifying the physical
-> address size of the guest. Reserve the higher bits to specify an ARM
-> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-> used to create a realm guest.
+> The RMM maintains a data structure known as the Realm Execution Context
+> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+> virtual CPUs. KVM must delegate memory and request the structures are
+> created when vCPUs are created, and suitably tear down on destruction.
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> RECs must also be supplied with addition pages - auxiliary (or AUX)
+> granules - for storing the larger registers state (e.g. for SVE). The
+> number of AUX granules for a REC depends on the parameters with which
+> the Realm was created - the RMM makes this information available via the
+> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor (RD).
+> 
+> Note that only some of register state for the REC can be set by KVM, the
+> rest is defined by the RMM (zeroed). The register state then cannot be
+> changed by KVM after the REC is created (except when the guest
+> explicitly requests this e.g. by performing a PSCI call). The RMM also
+> requires that the VMM creates RECs in ascending order of the MPIDR.
+> 
+> See Realm Management Monitor specification (DEN0137) for more information:
+> https://developer.arm.com/documentation/den0137/
+> 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->   arch/arm64/kvm/arm.c     | 17 +++++++++++++++++
->   arch/arm64/kvm/mmu.c     |  3 ---
->   include/uapi/linux/kvm.h | 19 +++++++++++++++----
->   3 files changed, 32 insertions(+), 7 deletions(-)
+> Changes since v5:
+>   * Separate the concept of vcpu_is_rec() and
+>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>     the indication that the VCPU is a REC.
+> Changes since v2:
+>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
+> ---
+>   arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>   arch/arm64/include/asm/kvm_host.h    |   3 +
+>   arch/arm64/include/asm/kvm_rme.h     |  18 ++++
+>   arch/arm64/kvm/arm.c                 |   9 ++
+>   arch/arm64/kvm/reset.c               |  11 ++
+>   arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
+>   6 files changed, 192 insertions(+)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 27f54a7778aa..ec2b6d9c9c07 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -722,7 +722,14 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
+>   
+>   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>   {
+> +	if (static_branch_unlikely(&kvm_rme_is_available))
+> +		return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
+>   	return false;
+>   }
+>   
+
+It seems the check on kvm_rme_is_available is unnecessary because KVM_ARM_VCPU_REC
+is possible to be true only when kvm_rme_is_available is true.
+
+> +static inline bool kvm_arm_vcpu_rec_finalized(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.rec.mpidr != INVALID_HWID;
+> +}
+> +
+>   #endif /* __ARM64_KVM_EMULATE_H__ */
+
+I would suggest to rename to kvm_arm_rec_finalized() since vCPU and REC are
+similar objects at the same level. It'd better to avoid duplicate object
+name reference in the function name.
+
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8482638dce3b..220195c727ef 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -789,6 +789,9 @@ struct kvm_vcpu_arch {
+>   
+>   	/* Per-vcpu CCSIDR override or NULL */
+>   	u32 *ccsidr;
+> +
+> +	/* Realm meta data */
+> +	struct realm_rec rec;
+>   };
+>   
+>   /*
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 32bdedf1d866..62d4a63d3035 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -6,6 +6,7 @@
+>   #ifndef __ASM_KVM_RME_H
+>   #define __ASM_KVM_RME_H
+>   
+> +#include <asm/rmi_smc.h>
+>   #include <uapi/linux/kvm.h>
+>   
+>   /**
+> @@ -65,6 +66,21 @@ struct realm {
+>   	unsigned int ia_bits;
+>   };
+>   
+> +/**
+> + * struct realm_rec - Additional per VCPU data for a Realm
+> + *
+> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
+> + * @rec_page: Kernel VA of the RMM's private page for this REC
+> + * @aux_pages: Additional pages private to the RMM for this REC
+> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+> + */
+> +struct realm_rec {
+> +	unsigned long mpidr;
+> +	void *rec_page;
+> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+> +	struct rec_run *run;
+> +};
+> +
+>   void kvm_init_rme(void);
+>   u32 kvm_realm_ipa_limit(void);
+>   
+> @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>   int kvm_init_realm_vm(struct kvm *kvm);
+>   void kvm_destroy_realm(struct kvm *kvm);
+>   void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+> +int kvm_create_rec(struct kvm_vcpu *vcpu);
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>   
+>   #define RMM_RTT_BLOCK_LEVEL	2
+>   #define RMM_RTT_MAX_LEVEL	3
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index c505ec61180a..73016e1e0067 100644
+> index 73016e1e0067..2d97147651be 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -207,6 +207,23 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	mutex_unlock(&kvm->lock);
->   #endif
+> @@ -525,6 +525,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   	/* Force users to call KVM_ARM_VCPU_INIT */
+>   	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
 >   
-> +	if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
+> +	vcpu->arch.rec.mpidr = INVALID_HWID;
+> +
+>   	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>   
+>   	/* Set up the timer */
+> @@ -1467,6 +1469,9 @@ static unsigned long system_supported_vcpu_features(void)
+>   	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+>   		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
+>   
+> +	if (!static_branch_unlikely(&kvm_rme_is_available))
+> +		clear_bit(KVM_ARM_VCPU_REC, &features);
+> +
+>   	return features;
+>   }
+>   
+> @@ -1506,6 +1511,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>   	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
+>   		return -EINVAL;
+>   
+> +	/* RME is incompatible with AArch32 */
+> +	if (test_bit(KVM_ARM_VCPU_REC, &features))
 > +		return -EINVAL;
 > +
-> +	switch (type & KVM_VM_TYPE_ARM_MASK) {
-> +	case KVM_VM_TYPE_ARM_NORMAL:
-> +		break;
-> +	case KVM_VM_TYPE_ARM_REALM:
-> +		kvm->arch.is_realm = true;
-> +		if (!kvm_is_realm(kvm)) {
-> +			/* Realm support unavailable */
-> +			return -EINVAL;
-> +		}
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
->   	kvm_init_nested(kvm);
+>   	return 0;
+>   }
 >   
->   	ret = kvm_share_hyp(kvm, kvm + 1);
 
-Corresponding to comments for PATCH[6], the block of the code can be modified
-to avoid using kvm_is_realm() here. In this way, kvm_is_realm() can be simplifed
-as I commented for PATCH[6].
+One corner case seems missed in kvm_vcpu_init_check_features(). It's allowed to
+initialize a vCPU with REC feature even kvm_is_realm(kvm) is false. Hopefully,
+I didn't miss something.
 
-	case KVM_VM_TYPE_ARM_REALM:
-		if (static_branch_unlikely(&kvm_rme_is_available))
-			return -EPERM;	/* -EPERM may be more suitable than -EINVAL */
-
-		kvm->arch.is_realm = true;
-		break;
+[...]
 
 Thanks,
 Gavin
