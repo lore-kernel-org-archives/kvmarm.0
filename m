@@ -1,79 +1,99 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058AD19DF60
-	for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 11:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E1418C31
+	for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 12:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738149351; cv=none; b=dviZh/QhOHhOqXCQTAhZmVBGJMedKAUgREehiwkJlCmftaLKHJ7kSZr3vk1px9SFsM3YRegqQqLpnP7Bz965UjZlKL3SvH+ciMNQ2oAbC8DFT2R+NMDDROUTMzWwFIXZRfPBA5Q1Ova4wJElHLODawdWGi7tRHF7K9Htbja8bFM=
+	t=1738152974; cv=none; b=tglfCH+wghTjz9RkAedBQm0LAUhyJWssM+qASqoIvyv9ti0jJVa2w3/C2Dv3qlk3rDMcP45bWh/xzaiY5JZWUY10NK670CVV0QnSPzKdvNeSrfgSG80mfxE3ZBzdINikmrD24YZVRToSMUUsZ2LyW2o232+6MjVgUDjUm6Rc0UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738149351; c=relaxed/simple;
-	bh=9LklkQyZ4FLpGPXHWHvasvNafazcgSsZ9+b3vACuhhA=;
+	s=arc-20240116; t=1738152974; c=relaxed/simple;
+	bh=/baOjcO8BDS9wABFMnNMjlMdnguKi8ayu5Sr/AxFX8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fdsLVVnaXlNJhug/Pe4A2E22gcw3vatJD4zeplI/JIoQ3KKFbAe1ruH8AqoF7XY30cbN4pb88uaT2NW3r5qFG9aRwdF5FJg1DS+r106h7y1LjiOgUxs/GJBn5lyJar6/XfoOxakf5e/l03RKL2rk9RWX/3VvmZLAvdd0uLv4otI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OKWnu1bU; arc=none smtp.client-ip=209.85.128.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=YlaXSmivwNCHMzbqXC8J4kkeBT4tLhQxMOCeGSEre46cjNekkA73VwAc2EFznyX4TbL6+72yjAsfE5EPKd5nMQtFDaKaQgFCwb1I5FaPTHId9kY7TxTsWl9O79sapPZWa4vCOVoClv2JJ/jHZ1p+JIMs2W9nld0ZBe5GPLB3Yms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WVzBACTX; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OKWnu1bU"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4368a290e0dso105985e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 03:15:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVzBACTX"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-438d9c391fcso85175e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 Jan 2025 04:16:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738149347; x=1738754147; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1738152970; x=1738757770; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=lIj0S75Nq583PWPyqj5G995an+ZD2/gTQqnPSbczUig=;
-        b=OKWnu1bUZFSY43uKddtIF6LSNhwiLbP105aRAUDf4lS/0uacqSaet59xR0oM2w+93x
-         04rdoMzyUr4ouOV7LLrtodP2EKQUesQ7Xj00KdSzDCTALTW7pce9L2Vlbf+YyTS+EhVO
-         Y2HXQHiStHVZA2h4hzo6bJnAo9PTjHxNsvthMsiP8oLpcE/NWGbDpGVQ5sJk4UjrQ9iA
-         99zZNBlD1eKnL8AvJQYZ7EhatvWj9AW6ox298qGVCCWvx0miJIV4NkfNqVq65Kf1Lltv
-         gqT142AvydD/v5wnSeaYFhV7KrhHfk2WIHjHFGCRUjSChg+mFfuxQ6O0vrHnqDHqROZs
-         zhPQ==
+        bh=KsoV/LvY+nhEMjljzompPtNYOVC1vuKo/PhocupCgIA=;
+        b=WVzBACTXRcVHxNlDl2H8O2lOyqFCGo/7qa/MBgKYeZ9J7EuTZNWnH/lIjnmeMLcdD2
+         QYp8q4tMOEoq9+9m/5ie2FoomZglOXzQLO+RE+9Ddt7x7VZe5Czj2VBDP2J0wcmu7CeX
+         FwctmiX5KnPQCeqxBl3L7ZyTcj+vJtj9Fty2UdCtfperAjJm6tsykWPkETHPKlGyKbBy
+         CZj2eQLpA0AWpWEVU2GGZ3YxCcFtIEc0syjOv9wjnmex61oyjlUQsCP0RV3tXaQ0FWyN
+         J8A2bIY3mVeXNDUiV0RK/Z4+4ideMKQQ4sjZnSmNfCziq16wdLXPqf3pd6GFmwETf3xu
+         nI9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738149347; x=1738754147;
+        d=1e100.net; s=20230601; t=1738152970; x=1738757770;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIj0S75Nq583PWPyqj5G995an+ZD2/gTQqnPSbczUig=;
-        b=p79lpvaGqbt/is3O1iRPyE5lojRvvHYrJhxYn4lJBQvriFi2RVU1alyvqAGvqvbH8O
-         MhcDCzTo48QXntwsRQjbbAsJVjGHVnZFbZF9cMNa3EkCgMqkWsiOIJQRk4eOuQnUto+k
-         Frh7Bm94xiwbt93O56leRoZPU9UxMHDIxNoW4eO302F1gXTI4eDy0zGBpKtFFVLtPHqP
-         YKEUzEBlOKerhIW3MXZnEUYbZnASdLwGluxUNSb9eSjj2tnXlzo17AbRAYgIEF4sGlu2
-         7DyC5D32s/3nNwfoIlbAEKcRu2cjqCAwLdGW7+QhPr1a0fWusb0dsZOjFw6xOIXK3i01
-         J0Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCWvg3P3xX5FzVdvcDXaT1gYceq+BKtK1KOwj2R7FFE8c6iPJqznv++uGM/La9Nqywcp9u7J35Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw6t5GN34CxF2G4omCSZRm3C8h4VyYVperTexF5G/XIu3g4aNz5
-	5bzB8NZ1u7EiNUPj+AZKvlJMip81sVaaatw1DYGFKisNDU4jSs2kfniJOcm7V5hud7zZMdUTUM3
-	kTQ==
-X-Gm-Gg: ASbGncvEWpFKfqDS/oDSuDOZJXiCToG1tQjsoT4Zfr7wdAEfrWfAO3NXds096HGcP3F
-	bbopu94FxilFJ57wBMKbX6SQ3YzoOo2y9kRn7RgKspHHUwdIU0FQTsmpz04VEaQQ4Um9Mt2ckby
-	hwkXamVQx1etUmAQe18bhwEkKHZneY0QMuVvPa1KnYtkzwLHiBLgmfJldyQxoJKSdpb0JvHXD6H
-	wtPTsWNAZsAb16o49SyawXhVL+o/fHKSrCntJleoOZduyZkN3Wy1S5ON0FaXCuTtaXQZtZze4Mk
-	CCP3/a0FlnhjyCIdACVuMhH7PDPU01k99N+Es/nl254nefiZbb8=
-X-Google-Smtp-Source: AGHT+IHxyZfWztzZgfuJiUeDYUFJ1Qtfo43qMHUxbq5Zh05k0OwXtJFs0omeilOH7fX0Bdxckb3jCg==
-X-Received: by 2002:a05:600c:1f84:b0:42b:a961:e51 with SMTP id 5b1f17b1804b1-438dc21f186mr939945e9.0.1738149347033;
-        Wed, 29 Jan 2025 03:15:47 -0800 (PST)
+        bh=KsoV/LvY+nhEMjljzompPtNYOVC1vuKo/PhocupCgIA=;
+        b=CtWpPPlXVM3O0i97XMkrn88s8yKYItW+o3p1oXGUUf38f1m60xJpSJ8bfZM/oLRW0z
+         Es+oIlX06wVASYryWOclLxD943PTCr+9SkLICzntOfi5zqYtdwhgpRXmzvPrHHlAPNTB
+         1wiixTM9k7W/VN3OPqjpcA3IkrGNpt6b7WOC0BrZkCmH7d3zGvTokU3Mri6vAgT+3Xik
+         GIACtcIFHgDfavBstZHotTC4B13AfoBZ70+ahzAyekFGryLJU0lc+IcwigT8SpCX9EMG
+         0Q3H5jK7WwTK0jrHhVuLsRPyOBcMUPi03mP4HS3Yi2lAvpVuKkss11cjRoZXGPiOq1Zt
+         6uGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVT7y32nMoSiFVLySo1osBET1edBOzSeUj/OmiffAkMNitiCZHA1kztoE27NS09poSajfY8xLw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywi0ruzbVC5wkvpIRgkUx/Iu2VSf0MgiJBuLxyWi85RsZOqS+4L
+	ynj4NkwLpusLdX28pc7Nj15y6G/zxmo0JxVKLljfpNFoFYwBRa+f19GvGlcMgQ==
+X-Gm-Gg: ASbGnctZnpbwY+1GhyfE8vfIoDs8CI1l4+Ns63BOdQZ9NOeMLxius3lIu7Ck2YesDOz
+	7RyP0WPqDziqvGecyg3maUu6rSCXcMr4IFDeOCGJkGACUdZK3Kjm/y7U9hGX4W2kRUbycEXc0+k
+	me3YyhVhmnmHdJ/seKXtZ4RL5fx7QMFIG19x8zP23CzuXK4TDksVAmhLc3UbOZPtEbJd+nAfzUF
+	aRTTBRQ2DZj/mLTo7V+xWvO/WHDVY09PbHXEv/GNDI9SN3Edrh2+EhK5lB3Jz+8IO61ngqQdCHi
+	EPjV3FaObiOJ4c4ncn/vA5rs2SGYNQ5ShD6dKc1mszcXjSCCouM=
+X-Google-Smtp-Source: AGHT+IHdxx2hNjGazr2D3TklGqwL4KUAhuNB+hsGlC38PJET1VJkzQdQAU4y4v+hrBc5bwG0U2GAiA==
+X-Received: by 2002:a7b:c3d8:0:b0:42c:9e35:cde6 with SMTP id 5b1f17b1804b1-438dc37d9aemr978295e9.2.1738152970287;
+        Wed, 29 Jan 2025 04:16:10 -0800 (PST)
 Received: from google.com (88.140.78.34.bc.googleusercontent.com. [34.78.140.88])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc52096sm19488465e9.39.2025.01.29.03.15.46
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c3ec83e20sm10167480f8f.23.2025.01.29.04.16.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 03:15:46 -0800 (PST)
-Date: Wed, 29 Jan 2025 11:15:42 +0000
+        Wed, 29 Jan 2025 04:16:09 -0800 (PST)
+Date: Wed, 29 Jan 2025 12:16:05 +0000
 From: Mostafa Saleh <smostafa@google.com>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: iommu@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, robdclark@gmail.com, joro@8bytes.org,
-	jean-philippe@linaro.org, jgg@ziepe.ca, nicolinc@nvidia.com,
-	vdonnefort@google.com, qperret@google.com, tabba@google.com,
-	danielmentz@google.com, tzukui@google.com
-Subject: Re: [RFC PATCH v2 27/58] KVM: arm64: smmu-v3: Setup command queue
-Message-ID: <Z5oN3sAk2RY4vyOr@google.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"robdclark@gmail.com" <robdclark@gmail.com>,
+	"joro@8bytes.org" <joro@8bytes.org>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"vdonnefort@google.com" <vdonnefort@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"danielmentz@google.com" <danielmentz@google.com>,
+	"tzukui@google.com" <tzukui@google.com>
+Subject: Re: [RFC PATCH v2 00/58] KVM: Arm SMMUv3 driver for pKVM
+Message-ID: <Z5ocBVxDnqZVINXQ@google.com>
 References: <20241212180423.1578358-1-smostafa@google.com>
- <20241212180423.1578358-28-smostafa@google.com>
- <4e9d04e4-729d-483d-8533-06b3e0a2fb04@arm.com>
+ <20241212194119.GA4679@ziepe.ca>
+ <Z1yNWI9lBNIZg6Le@google.com>
+ <20250102201614.GA26854@ziepe.ca>
+ <Z35rEeSVwfZVA9IF@google.com>
+ <BN9PR11MB52767756EE35DA2359C351F08C1A2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20250116191455.GC674319@ziepe.ca>
+ <BN9PR11MB52766732572A17627D16CBAC8C1B2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Z5DQuNn3GoU1vYPV@google.com>
+ <BN9PR11MB52760945FBCF542F77DCF4CA8CE02@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -83,244 +103,129 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4e9d04e4-729d-483d-8533-06b3e0a2fb04@arm.com>
+In-Reply-To: <BN9PR11MB52760945FBCF542F77DCF4CA8CE02@BN9PR11MB5276.namprd11.prod.outlook.com>
 
-On Thu, Jan 23, 2025 at 01:01:55PM +0000, Robin Murphy wrote:
-> On 2024-12-12 6:03 pm, Mostafa Saleh wrote:
-> > From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+On Thu, Jan 23, 2025 at 08:13:34AM +0000, Tian, Kevin wrote:
+> > From: Mostafa Saleh <smostafa@google.com>
+> > Sent: Wednesday, January 22, 2025 7:04 PM
 > > 
-> > Map the command queue allocated by the host into the hypervisor address
-> > space. When the host mappings are finalized, the queue is unmapped from
-> > the host.
+> > On Fri, Jan 17, 2025 at 06:57:12AM +0000, Tian, Kevin wrote:
+> > > > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > > > Sent: Friday, January 17, 2025 3:15 AM
+> > > >
+> > > > On Thu, Jan 16, 2025 at 06:39:31AM +0000, Tian, Kevin wrote:
+> > > > > > From: Mostafa Saleh <smostafa@google.com>
+> > > > > > Sent: Wednesday, January 8, 2025 8:10 PM
+> > > > > >
+> > > > > > On Thu, Jan 02, 2025 at 04:16:14PM -0400, Jason Gunthorpe wrote:
+> > > > > > > On Fri, Dec 13, 2024 at 07:39:04PM +0000, Mostafa Saleh wrote:
+> > > > > > > > Yeah, SVA is tricky, I guess for that we would have to use nesting,
+> > > > > > > > but tbh, I don’t think it’s a deal breaker for now.
+> > > > > > >
+> > > > > > > Again, it depends what your actual use case for translation is inside
+> > > > > > > the host/guest environments. It would be good to clearly spell this
+> > out..
+> > > > > > > There are few drivers that directly manpulate the iommu_domains
+> > of a
+> > > > > > > device. a few gpus, ath1x wireless, some tegra stuff, "venus". Which
+> > > > > > > of those are you targetting?
+> > > > > > >
+> > > > > >
+> > > > > > Not sure I understand this point about manipulating domains.
+> > > > > > AFAIK, SVA is not that common, including mobile spaces but I can be
+> > > > wrong,
+> > > > > > that’s why it’s not a priority here.
+> > > > >
+> > > > > Nested translation is required beyond SVA. A scenario which requires
+> > > > > a vIOMMU and multiple device domains within the guest would like to
+> > > > > embrace nesting. Especially for ARM vSMMU nesting is a must.
+> > 
+> > We can still do para-virtualization for guests the same way we do for the
+> > host and use a single stage IOMMU.
 > 
-> Don't forget the fun of reimplementing the errata workarounds to avoid
-> generating certain problematic command sequences - beware it's mostly
-> implicit in the current kernel driver :)
+> same way but both require a nested setup.
+> 
+> In concept there are two layers of address translations: GVA->GPA via
+> guest page table, and GPA->HPA via pKVM page table.
+> 
+> The difference between host/guest is just on the GPA mapping. For host
+> it's 1:1 with additional hardening for which portion can be mapped and
+> which cannot. For guest it's non-identical with the mapping established
+> from the host.
+> 
+> A nested translation naturally fits that conceptual layers.
+> 
+> Using a single-stage IOMMU means you need to combine two layers
+> into one layer i.e. GVA->HPA by removing GPA. Then you have to
+> paravirt guest page table so every guest PTE change is intercepted
+> to replace GPA with HPA.
+> 
+> Doing so completely kills the benefit of SVA, which is why Jason said
+> a no-go.
 
-Thanks, I see I missed “ARM_SMMU_OPT_CMDQ_FORCE_SYNC”, I will try to re-use
-as much of the command queue code as possible in v3, although it’s unlikely
-the hypervisor will have the some insertion algorithm as the host, but at
-least for the command population.
+I agree, this can’t work with SVA, in order to make that work we would
+need some new para-virt operation to install the S1 table, and the
+hypervisor has to configure the device in nested translation.
+
+But, for guests that doesn’t need SVA, they can just use single-stage
+para-virt (like virtio-iommu)
+
+> 
+> > 
+> > > >
+> > > > Right, if you need an iommu domain in the guest there are only three
+> > > > mainstream ways to get this in Linux:
+> > > >  1) Use the DMA API and have the iommu group be translating. This is
+> > > >     optional in that the DMA API usually supports identity as an option.
+> > > >  2) A driver directly calls iommu_paging_domain_alloc() and manually
+> > > >     attaches it to some device, and does not use the DMA API. My list
+> > > >     above of ath1x/etc are examples doing this
+> > > >  3) Use VFIO
+> > > >
+> > > > My remark to Mostafa is to be specific, which of the above do you want
+> > > > to do in your mobile guest (and what driver exactly if #2) and why.
+> > > >
+> > > > This will help inform what the performance profile looks like and
+> > > > guide if nesting/para virt is appropriate.
+> > >
+> > 
+> > AFAIK, the most common use cases would be:
+> > - Devices using DMA API because it requires a lot of memory to be
+> >   contiguous in IOVA, which is hard to do with identity
+> > - Devices with security requirements/constraints to be isolated from the
+> >   rest of the system, also using DMA API
+> > - VFIO is something we are looking at the moment and have prototyped with
+> >   pKVM, and it should be supported soon in Android (only for platform
+> >   devices for now)
+> 
+> what really matters is the frequency of map/unmap.
+Yes, though it differs between devices/systems :/ that’s why I reckon we
+would need both on the long term. However, starting with some benchmarks
+for these cases can help to understand the magnitude of both solutions
+and prioritise which one is more suitable to start with for upstream.
 
 Thanks,
 Mostafa
-
 > 
-> Thanks,
-> Robin.
-> 
-> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >   arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 165 ++++++++++++++++++++
-> >   include/kvm/arm_smmu_v3.h                   |   4 +
-> >   2 files changed, 169 insertions(+)
 > > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-> > index f7e60c188cb0..e15356509424 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-> > @@ -41,6 +41,15 @@ struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
-> >   	__ret;							\
-> >   })
-> > +#define smmu_wait_event(_smmu, _cond)				\
-> > +({								\
-> > +	if ((_smmu)->features & ARM_SMMU_FEAT_SEV) {		\
-> > +		while (!(_cond))				\
-> > +			wfe();					\
-> > +	}							\
-> > +	smmu_wait(_cond);					\
-> > +})
-> > +
-> >   static int smmu_write_cr0(struct hyp_arm_smmu_v3_device *smmu, u32 val)
-> >   {
-> >   	writel_relaxed(val, smmu->base + ARM_SMMU_CR0);
-> > @@ -60,6 +69,123 @@ static void smmu_reclaim_pages(u64 phys, size_t size)
-> >   	WARN_ON(__pkvm_hyp_donate_host(phys >> PAGE_SHIFT, size >> PAGE_SHIFT));
-> >   }
-> > +#define Q_WRAP(smmu, reg)	((reg) & (1 << (smmu)->cmdq_log2size))
-> > +#define Q_IDX(smmu, reg)	((reg) & ((1 << (smmu)->cmdq_log2size) - 1))
-> > +
-> > +static bool smmu_cmdq_full(struct hyp_arm_smmu_v3_device *smmu)
-> > +{
-> > +	u64 cons = readl_relaxed(smmu->base + ARM_SMMU_CMDQ_CONS);
-> > +
-> > +	return Q_IDX(smmu, smmu->cmdq_prod) == Q_IDX(smmu, cons) &&
-> > +	       Q_WRAP(smmu, smmu->cmdq_prod) != Q_WRAP(smmu, cons);
-> > +}
-> > +
-> > +static bool smmu_cmdq_empty(struct hyp_arm_smmu_v3_device *smmu)
-> > +{
-> > +	u64 cons = readl_relaxed(smmu->base + ARM_SMMU_CMDQ_CONS);
-> > +
-> > +	return Q_IDX(smmu, smmu->cmdq_prod) == Q_IDX(smmu, cons) &&
-> > +	       Q_WRAP(smmu, smmu->cmdq_prod) == Q_WRAP(smmu, cons);
-> > +}
-> > +
-> > +static int smmu_add_cmd(struct hyp_arm_smmu_v3_device *smmu,
-> > +			struct arm_smmu_cmdq_ent *ent)
-> > +{
-> > +	int i;
-> > +	int ret;
-> > +	u64 cmd[CMDQ_ENT_DWORDS] = {};
-> > +	int idx = Q_IDX(smmu, smmu->cmdq_prod);
-> > +	u64 *slot = smmu->cmdq_base + idx * CMDQ_ENT_DWORDS;
-> > +
-> > +	if (smmu->iommu.power_is_off)
-> > +		return -EPIPE;
-> > +
-> > +	ret = smmu_wait_event(smmu, !smmu_cmdq_full(smmu));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	cmd[0] |= FIELD_PREP(CMDQ_0_OP, ent->opcode);
-> > +
-> > +	switch (ent->opcode) {
-> > +	case CMDQ_OP_CFGI_ALL:
-> > +		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
-> > +		break;
-> > +	case CMDQ_OP_CFGI_CD:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SSID, ent->cfgi.ssid);
-> > +		fallthrough;
-> > +	case CMDQ_OP_CFGI_STE:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_LEAF, ent->cfgi.leaf);
-> > +		break;
-> > +	case CMDQ_OP_TLBI_NH_VA:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
-> > +		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
-> > +		break;
-> > +	case CMDQ_OP_TLBI_NSNH_ALL:
-> > +		break;
-> > +	case CMDQ_OP_TLBI_NH_ASID:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-> > +		fallthrough;
-> > +	case CMDQ_OP_TLBI_S12_VMALL:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-> > +		break;
-> > +	case CMDQ_OP_TLBI_S2_IPA:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
-> > +		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
-> > +		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
-> > +		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_IPA_MASK;
-> > +		break;
-> > +	case CMDQ_OP_CMD_SYNC:
-> > +		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_SEV);
-> > +		break;
-> > +	default:
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	for (i = 0; i < CMDQ_ENT_DWORDS; i++)
-> > +		slot[i] = cpu_to_le64(cmd[i]);
-> > +
-> > +	smmu->cmdq_prod++;
-> > +	writel(Q_IDX(smmu, smmu->cmdq_prod) | Q_WRAP(smmu, smmu->cmdq_prod),
-> > +	       smmu->base + ARM_SMMU_CMDQ_PROD);
-> > +	return 0;
-> > +}
-> > +
-> > +static int smmu_sync_cmd(struct hyp_arm_smmu_v3_device *smmu)
-> > +{
-> > +	int ret;
-> > +	struct arm_smmu_cmdq_ent cmd = {
-> > +		.opcode = CMDQ_OP_CMD_SYNC,
-> > +	};
-> > +
-> > +	ret = smmu_add_cmd(smmu, &cmd);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	return smmu_wait_event(smmu, smmu_cmdq_empty(smmu));
-> > +}
-> > +
-> > +__maybe_unused
-> > +static int smmu_send_cmd(struct hyp_arm_smmu_v3_device *smmu,
-> > +			 struct arm_smmu_cmdq_ent *cmd)
-> > +{
-> > +	int ret = smmu_add_cmd(smmu, cmd);
-> > +
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	return smmu_sync_cmd(smmu);
-> > +}
-> > +
-> >   static int smmu_init_registers(struct hyp_arm_smmu_v3_device *smmu)
-> >   {
-> >   	u64 val, old;
-> > @@ -94,6 +220,41 @@ static int smmu_init_registers(struct hyp_arm_smmu_v3_device *smmu)
-> >   	return 0;
-> >   }
-> > +static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
-> > +{
-> > +	u64 cmdq_base;
-> > +	size_t cmdq_nr_entries, cmdq_size;
-> > +	int ret;
-> > +	enum kvm_pgtable_prot prot = PAGE_HYP;
-> > +
-> > +	cmdq_base = readq_relaxed(smmu->base + ARM_SMMU_CMDQ_BASE);
-> > +	if (cmdq_base & ~(Q_BASE_RWA | Q_BASE_ADDR_MASK | Q_BASE_LOG2SIZE))
-> > +		return -EINVAL;
-> > +
-> > +	smmu->cmdq_log2size = cmdq_base & Q_BASE_LOG2SIZE;
-> > +	cmdq_nr_entries = 1 << smmu->cmdq_log2size;
-> > +	cmdq_size = cmdq_nr_entries * CMDQ_ENT_DWORDS * 8;
-> > +
-> > +	cmdq_base &= Q_BASE_ADDR_MASK;
-> > +
-> > +	if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
-> > +		prot |= KVM_PGTABLE_PROT_NORMAL_NC;
-> > +
-> > +	ret = ___pkvm_host_donate_hyp_prot(cmdq_base >> PAGE_SHIFT,
-> > +					   PAGE_ALIGN(cmdq_size) >> PAGE_SHIFT,
-> > +					   false, prot);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	smmu->cmdq_base = hyp_phys_to_virt(cmdq_base);
-> > +
-> > +	memset(smmu->cmdq_base, 0, cmdq_size);
-> > +	writel_relaxed(0, smmu->base + ARM_SMMU_CMDQ_PROD);
-> > +	writel_relaxed(0, smmu->base + ARM_SMMU_CMDQ_CONS);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >   static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
-> >   {
-> >   	int ret;
-> > @@ -113,6 +274,10 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
-> >   	if (ret)
-> >   		return ret;
-> > +	ret = smmu_init_cmdq(smmu);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> >   	return kvm_iommu_init_device(&smmu->iommu);
-> >   }
-> > diff --git a/include/kvm/arm_smmu_v3.h b/include/kvm/arm_smmu_v3.h
-> > index fb24bcef1624..393a1a04edba 100644
-> > --- a/include/kvm/arm_smmu_v3.h
-> > +++ b/include/kvm/arm_smmu_v3.h
-> > @@ -16,8 +16,12 @@ struct hyp_arm_smmu_v3_device {
-> >   	struct kvm_hyp_iommu	iommu;
-> >   	phys_addr_t		mmio_addr;
-> >   	size_t			mmio_size;
-> > +	unsigned long		features;
-> >   	void __iomem		*base;
-> > +	u32			cmdq_prod;
-> > +	u64			*cmdq_base;
-> > +	size_t			cmdq_log2size;
-> >   };
-> >   extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
+> > > Yeah that part would be critical to help decide which route to pursue
+> > > first. Even when all options might be required in the end when pKVM
+> > > is scaled to more scenarios, as you mentioned in another mail, a staging
+> > > approach would be much preferrable to evolve.
+> > 
+> > I agree that would probably be the case. I will work on more staging
+> > approach for v3, mostly without the pv part as Jason suggested.
+> > 
+> > >
+> > > The pros/cons between nesting/para virt is clear - more static the
+> > > mapping is, more gain from the para approach due to less paging
+> > > walking and smaller tlb footprint, while vice versa nesting performs
+> > > much better by avoiding frequent para calls on page table mgmt. 😊
+> > 
+> > I am also working to get the numbers for both cases so we know
+> > the order of magnitude of each case, as I guess it won't be as clear
+> > for large systems with many DMA initiators what approach is best.
+> > 
+> > 
 > 
+> That'd be great!
