@@ -1,164 +1,78 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC2713FEE;
-	Thu, 30 Jan 2025 16:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AF61AF0BA
+	for <kvmarm@lists.linux.dev>; Thu, 30 Jan 2025 21:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738256193; cv=none; b=ON2xj480LhNU2rrYCy002Q+LLXwgDvqoaU3YVjcncel0i6SN/2UtbkygJq1U5A9Egff5BQOYmGTIMr+nDFtVIn1j6VyMluXPp1OZH6XZ9ExFdm9Ch0oak/mUmh2NuWMNU1UP1PBpAjizGVMP2rzigG/yl7g5DPKKSbejWUxJj+E=
+	t=1738273292; cv=none; b=hCI2JEAF1a7Ywrc+PKz0C3IkkOUOt5tQFwybLF6CJOjZN2FZ0CCEGFU0ZhJyUl6JuXQsc6YWjo245NdJxO++HPf+0pBpiv81t9P52LpMyDJgUGqx68YjikPRSjHOMEEq+UkEZmxo6uJlXNcbC4eKGeNOMA0CLQQcfD4newMPheI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738256193; c=relaxed/simple;
-	bh=eLyjG0G1KbV38YOTYlWw6vyTB9t+tEh09C2FyplIcgs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uYtkfWktmGT/Q2gbgffbfYsKHsdoQR527uhANo7WJKb7/4AWlEykGXvZS6zCCnaznbBWMjAQMiPh4l92cQV4FGa3gYRwU0EJqBlUAKtmb/5UNMeH2WUTbv+WwVqM+68Q69NmdM4PSr/jq73v7QVxh5uUBszT9An/7m8Dbx38yvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E7DB497;
-	Thu, 30 Jan 2025 08:56:55 -0800 (PST)
-Received: from [10.1.32.52] (e122027.cambridge.arm.com [10.1.32.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20D4F3F63F;
-	Thu, 30 Jan 2025 08:56:24 -0800 (PST)
-Message-ID: <699f918e-5db4-467c-9dcf-c1474aaef265@arm.com>
-Date: Thu, 30 Jan 2025 16:56:22 +0000
+	s=arc-20240116; t=1738273292; c=relaxed/simple;
+	bh=FPTNXf/h9CuzGMdcgXwJERrwzTDmKl9zLynfQdw9tZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=toAlJYJthCDgQOjcsMO+9POPSoqLDxPLVTquYNzHNzrjMf+IPC9F6jaoIcbBRbVqEOmdk11FO5gKnJ8CN4SomQZ9/lsaBUAEPzGl17449Msft//4GnwGrFwVpMbOCLqt0h68uveGAEJ/IGWpZ5yZ+LBSiMY+XmcBsxSnvLMObXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LA2qhgbZ; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LA2qhgbZ"
+Date: Thu, 30 Jan 2025 13:41:04 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738273282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ojmpRg/HOY6aK9s6IqWiNPKBEyVR6Jj69/+3d+ZdCh4=;
+	b=LA2qhgbZmA6VzVvZVSo1cYrCXUmkBVvxEKcPO74NlnJvQxCgsXQGYyGA7SdoUveUNOkTQ5
+	AOtsUnlqpOdDHYn7KpcAkDxoDu15xW+NZV3vb+7JHsrsC1F65p0FoDir5helebx0FjhwFm
+	mS+2QQfSAySHTzLyIM0x7ZPQTeJQ5dg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Dmytro Terletskyi <Dmytro_Terletskyi@epam.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: timer: Consolidate NV configuration of
+ virtual timers
+Message-ID: <Z5vx8NVN8lF6QuJz@linux.dev>
+References: <20250128161721.3279927-1-maz@kernel.org>
+ <20250128161721.3279927-4-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 16/43] arm64: RME: Allow VMM to set RIPAS
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-17-steven.price@arm.com>
- <4c1c507d-25ae-488f-88d3-fd6ffe337d0d@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <4c1c507d-25ae-488f-88d3-fd6ffe337d0d@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250128161721.3279927-4-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 29/01/2025 23:25, Gavin Shan wrote:
-> On 12/13/24 1:55 AM, Steven Price wrote:
->> Each page within the protected region of the realm guest can be marked
->> as either RAM or EMPTY. Allow the VMM to control this before the guest
->> has started and provide the equivalent functions to change this (with
->> the guest's approval) at runtime.
->>
->> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
->> unmapped from the guest and undelegated allowing the memory to be reused
->> by the host. When transitioning to RIPAS RAM the actual population of
->> the leaf RTTs is done later on stage 2 fault, however it may be
->> necessary to allocate additional RTTs to allow the RMM track the RIPAS
->> for the requested range.
->>
->> When freeing a block mapping it is necessary to temporarily unfold the
->> RTT which requires delegating an extra page to the RMM, this page can
->> then be recovered once the contents of the block mapping have been
->> freed.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes from v5:
->>   * Adapt to rebasing.
->>   * Introduce find_map_level()
->>   * Rename some functions to be clearer.
->>   * Drop the "spare page" functionality.
->> Changes from v2:
->>   * {alloc,free}_delegated_page() moved from previous patch to this one.
->>   * alloc_delegated_page() now takes a gfp_t flags parameter.
->>   * Fix the reference counting of guestmem pages to avoid leaking memory.
->>   * Several misc code improvements and extra comments.
->> ---
->>   arch/arm64/include/asm/kvm_rme.h |  17 ++
->>   arch/arm64/kvm/mmu.c             |   8 +-
->>   arch/arm64/kvm/rme.c             | 411 +++++++++++++++++++++++++++++++
->>   3 files changed, 433 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
->> asm/kvm_rme.h
->> index be64b749fcac..4e7758f0e4b5 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -92,6 +92,15 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32
->> ia_bits);
->>   int kvm_create_rec(struct kvm_vcpu *vcpu);
->>   void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>   +void kvm_realm_unmap_range(struct kvm *kvm,
->> +               unsigned long ipa,
->> +               u64 size,
->> +               bool unmap_private);
->> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->> +            unsigned long addr, unsigned long end,
->> +            unsigned long ripas,
->> +            unsigned long *top_ipa);
->> +
-> 
-> The declaration of realm_set_ipa_state() is unnecessary since its scope has
-> been limited to rme.c
+> +void kvm_timer_vcpu_nv_init(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * A vcpu running at EL2 is in charge of the offset applied to
+> +	 * the virtual timer, so use the physical VM offset, and point
+> +	 * the vcpu offset to CNTVOFF_EL2.
+> +	 *
+> +	 * The virtual offset behaviour is "interesting", as it always
+> +	 * applies when HCR_EL2.E2H==0, but only when accessed from EL1 when
+> +	 * HCR_EL2.E2H==1. Apply it to the HV timer when E2H==0.
+> +	 */
 
-Ack, the function can be static too.
+I'm definitely being pedantic, but all the talk of an HV timer when
+E2H==0 isn't sitting well with me. Since a programmable E2H has gone
+out the window there isn't such thing as an HV timer when E2H==0, as
+FEAT_VHE isn't implemented for the VM.
 
->>   #define RMM_RTT_BLOCK_LEVEL    2
->>   #define RMM_RTT_MAX_LEVEL    3
->>   @@ -110,4 +119,12 @@ static inline unsigned long
->> rme_rtt_level_mapsize(int level)
->>       return (1UL << RMM_RTT_LEVEL_SHIFT(level));
->>   }
->>   +static inline bool realm_is_addr_protected(struct realm *realm,
->> +                       unsigned long addr)
->> +{
->> +    unsigned int ia_bits = realm->ia_bits;
->> +
->> +    return !(addr & ~(BIT(ia_bits - 1) - 1));
->> +}
->> +
->>   #endif
-> 
-> The check on the specified address to determine its range seems a bit
-> complicated
-> to me, it can be simplified like below. Besides, it may be a good idea
-> to rename
-> it to have the prefix "kvm_realm_".
-> 
-> static inline bool kvm_realm_is_{private | protected}_address(struct
-> realm *realm,
->                           unsigned long addr)
-> {
->     return !(addr & BIT(realm->ia_bits - 1));
-> }
+And along those lines, accesses to CNTHV_*_EL2 registers should undef
+when FEAT_VHE isn't implemented for the VM but I don't think we have any
+enforcement of that.
 
-Ack
-
-> A question related to the terms used in this series to describe a
-> granule's state:
-> "protected" or "private", "unprotected" or "shared". Those terms are all
-> used in
-> the function names of this series. I guess it would be nice to unify so
-> that
-> "private" and "shared" to be used, which is consistent to the terms used by
-> guest-memfd. For example, kvm_realm_is_protected_address() can be
-> renamed to
-> kvm_realm_is_private_address().
-
-Happy with the rename here. More generally it's a little awkward because
-the RMM spec does refer to protected/unprotected (e.g.
-RMI_RTT_MAP_UNPROTECTED). So there's always a choice between aligning
-with the RMM spec or aligning with guest-memfd.
-
+-- 
 Thanks,
-
-Steve
-
+Oliver
