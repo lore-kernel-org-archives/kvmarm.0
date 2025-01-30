@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA551DDC22;
-	Thu, 30 Jan 2025 14:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F511EBFFA;
+	Thu, 30 Jan 2025 16:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738246497; cv=none; b=byJFtEj6faZpOnXv8IWvIXyYeTUdbTWT7kqOk9MMLOmynFZR6BOqmpnVLQUoHC1n9HidOQcmd4LOcwVALhiFxiqhb6aB1IXXwalBi2QsBM1y/O+O/TJn96+ExcTTLInlPOKuUPJPZjS/6L0NeZ2qxzy76kJWuLuLE6pOcbEwB5Q=
+	t=1738255229; cv=none; b=dvJW69YOjz77/ONYpdLw2bkKSZUUeleYbIjSccPuZjqhyGTebi/8w8gBMCVyd+nMkV2WPCuzvYOw6QD5EqCbaTOajiVyKfqwVQNCtq93uteeAx1INkEswvkgwycQuH2WzJUBFm6bsdLJooib6iSTgmzap7EIEjG5yMk4Wds4Gvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738246497; c=relaxed/simple;
-	bh=62uvUPVokekdadvzzYgMQHmplXUKl1Kb/D+EIGlWRtw=;
+	s=arc-20240116; t=1738255229; c=relaxed/simple;
+	bh=CBLwdVRlb+iZaCTkBqzKN0bBsz22zqWBado1sqMK/Jo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UptKO7kOzH01IORiSWx1q/amMqjWgkFvJMN3qib3DnbGuAcVmUzb2/PBfEHhv73VG/fFjT7mmxhfvVhrjPs3w/wOARJX5UGwioZr3GHkIr9Z8ZbdzeMQAQG6TjDj+1UzwYmwx1a82q62WMlI8leiqkhXdLOQPc0LPc3obNAcdw0=
+	 In-Reply-To:Content-Type; b=e2yY6c4zBLo/YTuc0YbRc+9FpzvUiWyaBdNfh8/Wvp+bYc3SukqbrLHy6z6TNjTJD8qw/mMm8qY1XDAk2ieqpphq4DHm4agTzSGxgMlfXbra8072UUQLvL3023XoJ91Bj2MYrudQ2BLQZWjOKsIdjQsOxGZhcsLHbQx9tsg0Ipw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 940B1497;
-	Thu, 30 Jan 2025 06:15:14 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2439497;
+	Thu, 30 Jan 2025 08:40:51 -0800 (PST)
 Received: from [10.1.32.52] (e122027.cambridge.arm.com [10.1.32.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BF713F694;
-	Thu, 30 Jan 2025 06:14:45 -0800 (PST)
-Message-ID: <1356de81-2fa1-4ad5-80bd-d02440603288@arm.com>
-Date: Thu, 30 Jan 2025 14:14:43 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0B083F63F;
+	Thu, 30 Jan 2025 08:40:21 -0800 (PST)
+Message-ID: <9174bc24-6217-4663-a370-291d4790a212@arm.com>
+Date: Thu, 30 Jan 2025 16:40:20 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/43] arm64: kvm: Allow passing machine type in KVM
- creation
+Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -43,81 +42,193 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-11-steven.price@arm.com>
- <a580d287-2fb0-4e9d-adbb-57e4dbf25765@redhat.com>
+ <20241212155610.76522-13-steven.price@arm.com>
+ <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <a580d287-2fb0-4e9d-adbb-57e4dbf25765@redhat.com>
+In-Reply-To: <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 29/01/2025 04:07, Gavin Shan wrote:
+On 29/01/2025 04:50, Gavin Shan wrote:
 > On 12/13/24 1:55 AM, Steven Price wrote:
->> Previously machine type was used purely for specifying the physical
->> address size of the guest. Reserve the higher bits to specify an ARM
->> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
->> used to create a realm guest.
+>> The RMM maintains a data structure known as the Realm Execution Context
+>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+>> virtual CPUs. KVM must delegate memory and request the structures are
+>> created when vCPUs are created, and suitably tear down on destruction.
 >>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> RECs must also be supplied with addition pages - auxiliary (or AUX)
+>> granules - for storing the larger registers state (e.g. for SVE). The
+>> number of AUX granules for a REC depends on the parameters with which
+>> the Realm was created - the RMM makes this information available via the
+>> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
+>> (RD).
+>>
+>> Note that only some of register state for the REC can be set by KVM, the
+>> rest is defined by the RMM (zeroed). The register state then cannot be
+>> changed by KVM after the REC is created (except when the guest
+>> explicitly requests this e.g. by performing a PSCI call). The RMM also
+>> requires that the VMM creates RECs in ascending order of the MPIDR.
+>>
+>> See Realm Management Monitor specification (DEN0137) for more
+>> information:
+>> https://developer.arm.com/documentation/den0137/
+>>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->>   arch/arm64/kvm/arm.c     | 17 +++++++++++++++++
->>   arch/arm64/kvm/mmu.c     |  3 ---
->>   include/uapi/linux/kvm.h | 19 +++++++++++++++----
->>   3 files changed, 32 insertions(+), 7 deletions(-)
+>> Changes since v5:
+>>   * Separate the concept of vcpu_is_rec() and
+>>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>>     the indication that the VCPU is a REC.
+>> Changes since v2:
+>>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
+>> patches.
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>>   arch/arm64/include/asm/kvm_host.h    |   3 +
+>>   arch/arm64/include/asm/kvm_rme.h     |  18 ++++
+>>   arch/arm64/kvm/arm.c                 |   9 ++
+>>   arch/arm64/kvm/reset.c               |  11 ++
+>>   arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
+>>   6 files changed, 192 insertions(+)
 >>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
+>> include/asm/kvm_emulate.h
+>> index 27f54a7778aa..ec2b6d9c9c07 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -722,7 +722,14 @@ static inline bool kvm_realm_is_created(struct
+>> kvm *kvm)
+>>     static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>>   {
+>> +    if (static_branch_unlikely(&kvm_rme_is_available))
+>> +        return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
+>>       return false;
+>>   }
+>>   
+> 
+> It seems the check on kvm_rme_is_available is unnecessary because
+> KVM_ARM_VCPU_REC
+> is possible to be true only when kvm_rme_is_available is true.
+
+Similar to a previous patch - the check of the static key is to avoid
+overhead on systems without RME.
+
+>> +static inline bool kvm_arm_vcpu_rec_finalized(struct kvm_vcpu *vcpu)
+>> +{
+>> +    return vcpu->arch.rec.mpidr != INVALID_HWID;
+>> +}
+>> +
+>>   #endif /* __ARM64_KVM_EMULATE_H__ */
+> 
+> I would suggest to rename to kvm_arm_rec_finalized() since vCPU and REC are
+> similar objects at the same level. It'd better to avoid duplicate object
+> name reference in the function name.
+
+Ack
+
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
+>> asm/kvm_host.h
+>> index 8482638dce3b..220195c727ef 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -789,6 +789,9 @@ struct kvm_vcpu_arch {
+>>         /* Per-vcpu CCSIDR override or NULL */
+>>       u32 *ccsidr;
+>> +
+>> +    /* Realm meta data */
+>> +    struct realm_rec rec;
+>>   };
+>>     /*
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> index 32bdedf1d866..62d4a63d3035 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -6,6 +6,7 @@
+>>   #ifndef __ASM_KVM_RME_H
+>>   #define __ASM_KVM_RME_H
+>>   +#include <asm/rmi_smc.h>
+>>   #include <uapi/linux/kvm.h>
+>>     /**
+>> @@ -65,6 +66,21 @@ struct realm {
+>>       unsigned int ia_bits;
+>>   };
+>>   +/**
+>> + * struct realm_rec - Additional per VCPU data for a Realm
+>> + *
+>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
+>> this VCPU
+>> + * @rec_page: Kernel VA of the RMM's private page for this REC
+>> + * @aux_pages: Additional pages private to the RMM for this REC
+>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+>> + */
+>> +struct realm_rec {
+>> +    unsigned long mpidr;
+>> +    void *rec_page;
+>> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+>> +    struct rec_run *run;
+>> +};
+>> +
+>>   void kvm_init_rme(void);
+>>   u32 kvm_realm_ipa_limit(void);
+>>   @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
+>> kvm_enable_cap *cap);
+>>   int kvm_init_realm_vm(struct kvm *kvm);
+>>   void kvm_destroy_realm(struct kvm *kvm);
+>>   void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+>> +int kvm_create_rec(struct kvm_vcpu *vcpu);
+>> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>>     #define RMM_RTT_BLOCK_LEVEL    2
+>>   #define RMM_RTT_MAX_LEVEL    3
 >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index c505ec61180a..73016e1e0067 100644
+>> index 73016e1e0067..2d97147651be 100644
 >> --- a/arch/arm64/kvm/arm.c
 >> +++ b/arch/arm64/kvm/arm.c
->> @@ -207,6 +207,23 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned
->> long type)
->>       mutex_unlock(&kvm->lock);
->>   #endif
->>   +    if (type & ~(KVM_VM_TYPE_ARM_MASK |
->> KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
+>> @@ -525,6 +525,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>>       /* Force users to call KVM_ARM_VCPU_INIT */
+>>       vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
+>>   +    vcpu->arch.rec.mpidr = INVALID_HWID;
+>> +
+>>       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>>         /* Set up the timer */
+>> @@ -1467,6 +1469,9 @@ static unsigned long
+>> system_supported_vcpu_features(void)
+>>       if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+>>           clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
+>>   +    if (!static_branch_unlikely(&kvm_rme_is_available))
+>> +        clear_bit(KVM_ARM_VCPU_REC, &features);
+>> +
+>>       return features;
+>>   }
+>>   @@ -1506,6 +1511,10 @@ static int
+>> kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>>       if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
+>>           return -EINVAL;
+>>   +    /* RME is incompatible with AArch32 */
+>> +    if (test_bit(KVM_ARM_VCPU_REC, &features))
 >> +        return -EINVAL;
 >> +
->> +    switch (type & KVM_VM_TYPE_ARM_MASK) {
->> +    case KVM_VM_TYPE_ARM_NORMAL:
->> +        break;
->> +    case KVM_VM_TYPE_ARM_REALM:
->> +        kvm->arch.is_realm = true;
->> +        if (!kvm_is_realm(kvm)) {
->> +            /* Realm support unavailable */
->> +            return -EINVAL;
->> +        }
->> +        break;
->> +    default:
->> +        return -EINVAL;
->> +    }
->> +
->>       kvm_init_nested(kvm);
->>         ret = kvm_share_hyp(kvm, kvm + 1);
+>>       return 0;
+>>   }
+>>   
 > 
-> Corresponding to comments for PATCH[6], the block of the code can be
-> modified
-> to avoid using kvm_is_realm() here. In this way, kvm_is_realm() can be
-> simplifed
-> as I commented for PATCH[6].
-> 
->     case KVM_VM_TYPE_ARM_REALM:
->         if (static_branch_unlikely(&kvm_rme_is_available))
->             return -EPERM;    /* -EPERM may be more suitable than -
-> EINVAL */
-> 
->         kvm->arch.is_realm = true;
->         break;
+> One corner case seems missed in kvm_vcpu_init_check_features(). It's
+> allowed to
+> initialize a vCPU with REC feature even kvm_is_realm(kvm) is false.
+> Hopefully,
+> I didn't miss something.
 
-Yes that's more readable. I'd used kvm_is_realm() because I wanted to
-keep the check on kvm_rme_is_available to one place, but coming back to
-the code there's definitely a "Huh?" moment from setting 'is_realm' and
-then testing if it's a realm!
-
-I also agree -EPERM is probably better to signify that the kernel
-supports realms but the hardware doesn't.
+Ah, yes good point. I'll pass a kvm pointer to
+kvm_vcpu_init_check_features() and use kvm_is_realm() in there.
 
 Thanks,
 
 Steve
+
+> [...]
+> 
+> Thanks,
+> Gavin
+> 
 
