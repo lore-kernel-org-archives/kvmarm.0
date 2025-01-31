@@ -1,100 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13584139E
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jan 2025 08:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82511322E
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jan 2025 11:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738313177; cv=none; b=uNFHkavr6Ns/LD9737kMLWhIUbn9TDKKH/xkvn7HZwULqvtT81x7znsd2q2amrFckzWQAOfS9yQSe10jtOxmpbLxQ82GuBOg+iUVtgiwstXwSjFCbKJOm7FFa+STwUUFBOfQX2pjYQmR3ZqsyHEH36XTMUl/PK+DgiFdpmUd/tI=
+	t=1738321305; cv=none; b=Fy/hDABOO1Ct1ZnVufzFFqFfLg6bH351dWk6nshiPc3/8S7tGGJrWzohfm7CtR8/0NfO2SGvC0VuioP/OzHbyESyAyc6HKJRt562fpP2TLm6tGM/nTopytUimENyX5jixbR2BV6FcP5eQYQsKCLD9Kuw/1wHd/5el5Bab8hvzOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738313177; c=relaxed/simple;
-	bh=Erb/cbxJJ/om2z1Ke1SymY4HRmWgNzv1Y97lwGY2w/w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WJqmXPzwSFm/jxCULsL2h5Fadsnnf+Cb8zHciSjfoKF8E7Dw9fkl07/QyH5BuZy8VJRYjoyRZf6YcW5kjrgDQy+ki49P73ztXGINkamYa0es29ivQZi3Raq+7N5FENPImTPcsq/B2KsnWCleEzI3tabh8MJHJS5fmzx6+IqXil4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0k/m0h7; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0k/m0h7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7424DC4CED1;
-	Fri, 31 Jan 2025 08:46:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738313174;
-	bh=Erb/cbxJJ/om2z1Ke1SymY4HRmWgNzv1Y97lwGY2w/w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l0k/m0h7531VXkdVt4CoOD57yCo3Y+rgu7h6CdfD9Zj0AadnD2mtjaB/evKKq64+/
-	 JxFzvAHfteNXwx9RJwr0IwXewN0pjWuaDgog9VdZv+rR+B+PS4Cste6c2ngAyF24/t
-	 iVnZVu+mp7guz+qDlfCs+r93Og9IERIQJr1ic1Mffq2mnhkleuBs18FpetrP9I3T/Q
-	 3XMfMryNThlK4By4nnoAeDqYVd3rvb2AQ96bjQkaSk96ew4rEAQlxGx1FOC/pJhvwU
-	 zm/gqpGPLsQEMu+ZYL3MOQdnj+nP+sCfEX25dHEOq4jCmqMrWKtKkvjFoXnTQJGw6Z
-	 7bN6fwDS+4o0Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tdmfE-00GpS4-2H;
-	Fri, 31 Jan 2025 08:46:12 +0000
-Date: Fri, 31 Jan 2025 08:46:11 +0000
-Message-ID: <868qqrv0a4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1738321305; c=relaxed/simple;
+	bh=tt7H/zNsZKG0S60obN/uvyN04GjacLQklnYE3MKKk9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLS0QdNxu3y0u1zDhS2eV8kRpYnT+X1nyRt4je1PfBhWokLmzoEsINdBl2PUNy4tNlL0Fz5Nf6tuLiwM1v6rv7Js2o4a/VJSL0gHNKgDIDAFXiz2DaOX0h6+Rrr/smfpTKv8W2lYQbll6plprJZL5RrqfUmPwXO4lAiTNY29lwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C83E497;
+	Fri, 31 Jan 2025 03:02:08 -0800 (PST)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24B813F63F;
+	Fri, 31 Jan 2025 03:01:41 -0800 (PST)
+Date: Fri, 31 Jan 2025 11:01:38 +0000
+From: Mark Rutland <mark.rutland@arm.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Dmytro Terletskyi <Dmytro_Terletskyi@epam.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: timer: Consolidate NV configuration of virtual timers
-In-Reply-To: <Z5vx8NVN8lF6QuJz@linux.dev>
-References: <20250128161721.3279927-1-maz@kernel.org>
-	<20250128161721.3279927-4-maz@kernel.org>
-	<Z5vx8NVN8lF6QuJz@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+	joey.gouly@arm.com, kvmarm@lists.linux.dev, maz@kernel.org,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
+Subject: Re: [PATCH 0/4] arm64: mitigate CVE-2024-7881 in the absence of
+ firmware mitigation
+Message-ID: <Z5ytkrfzphlio2Ow@J2N7QTR9R3>
+References: <20250128155428.210645-1-mark.rutland@arm.com>
+ <Z5vzxWX4AY-JY4TV@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, r09922117@csie.ntu.edu.tw, Volodymyr_Babchuk@epam.com, Dmytro_Terletskyi@epam.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z5vzxWX4AY-JY4TV@linux.dev>
 
-On Thu, 30 Jan 2025 21:41:04 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, Jan 30, 2025 at 01:48:53PM -0800, Oliver Upton wrote:
+> Hi Mark,
 > 
-> > +void kvm_timer_vcpu_nv_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/*
-> > +	 * A vcpu running at EL2 is in charge of the offset applied to
-> > +	 * the virtual timer, so use the physical VM offset, and point
-> > +	 * the vcpu offset to CNTVOFF_EL2.
-> > +	 *
-> > +	 * The virtual offset behaviour is "interesting", as it always
-> > +	 * applies when HCR_EL2.E2H==0, but only when accessed from EL1 when
-> > +	 * HCR_EL2.E2H==1. Apply it to the HV timer when E2H==0.
-> > +	 */
+> On Tue, Jan 28, 2025 at 03:54:24PM +0000, Mark Rutland wrote:
+> > On some CPUs from Arm Ltd, it is possible for unprivileged code to cause
+> > a hardware prefetcher to form an address using the contents of a memory
+> > location which is accessible by privileged accesses in the active
+> > translation regime, potentially leaking the contents of this memory
+> > location via a side channel. This has been assigned CVE-2024-7881:
+> > 
+> >   https://developer.arm.com/Arm%20Security%20Center/Arm%20CPU%20Vulnerability%20CVE-2024-7881
+> > 
+> > Arm's recommended mitigation is that firmware configures an
+> > IMPLEMENTATION DEFINED control bit (CPUACTLR6_EL1[41]) to disable the
+> > affected prefetcher, and updates to Trusted Firmware-A are available to
+> > do this. For systems which have not yet recevied a firmware update, KPTI
+> > can help to mitigate the issue.
+> > 
+> > These patches enable KPTI for affected parts when the firmware
+> > mitigation is not present. The presence of the mitigation is identified
+> > by the presence of the SMCCC_ARCH_WORKAROUND_4 SMCCC call, which was
+> > deployed with the mitigation. This is documented in the SMCCC 1.6 G BET0
+> > specification:
+> > 
+> >   https://developer.arm.com/documentation/den0028/gbet0/?lang=en
+> > 
+> > I have tested this on a few configurations of virtual platforms. I'd
+> > appreciate any feedback, especially on the KVM changes.
 > 
-> I'm definitely being pedantic, but all the talk of an HV timer when
-> E2H==0 isn't sitting well with me. Since a programmable E2H has gone
-> out the window there isn't such thing as an HV timer when E2H==0, as
-> FEAT_VHE isn't implemented for the VM.
+> The KVM changes look reasonable and follow the usual model for this
+> crud. It would be nice to report the mitigation state to userspace
+> somehow as I would like to have a KVM selftest for all of the hardware
+> vulnerabilities.
 
-Ah, that's a very good point!
+Lemme go figure that out. Just to check, do you mean exposed through a
+KVM mechanism, or under /sys/devices/system/cpu/vulnerabilities/ ? I
+assume the latter.
 
-> And along those lines, accesses to CNTHV_*_EL2 registers should undef
-> when FEAT_VHE isn't implemented for the VM but I don't think we have any
-> enforcement of that.
+> But anyway,
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Indeed. Let me fix this and add the required UNDEF behaviour.
+Thanks; much appreciated!
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Mark.
