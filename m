@@ -1,113 +1,80 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF3E1EC011
-	for <kvmarm@lists.linux.dev>; Fri, 31 Jan 2025 22:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705652F56
+	for <kvmarm@lists.linux.dev>; Fri, 31 Jan 2025 22:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738362602; cv=none; b=G5jwqfzLbDZI7iUy7GlQk2RvYIn1QHiOilg48lHJDJ6hobjcmQrk7MM0G3KTHISlo39kLOHvx6xDW3PfsEc+Jf1OTtSMy1N2TBzfIIZrT/O0b1kUZAkLDo6+lWXr5+RnKSBPpQLHHsmP0gYvVAXzb7pHsKJcWTJ/Qk6dsTBf25g=
+	t=1738362747; cv=none; b=Ij8Yu8uF9kqVJyiI8pNfPta8sMzQcBKbrztdu9S9nuyzJDfIZivXvM7/beVEJRl6aFeiOa5Ynp6eH7dOzwJo4uAO8vC1jhinD/4TpXQMmHyQClIQallbw4pdg+XMTOl01lLH5V4tGIBspbsv4xRgxFfc7TgJEVCQ5vM7imWELU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738362602; c=relaxed/simple;
-	bh=vIsnZFkAZNQUX4M5k5+wwEUbMz3BxSQEYDQ5PUr41rw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h/JsXMzAw1WCECb3HrDVdJAK/p349mVJmTftLmuvmyzj+h6kshppz7dfFXqPYY2+iyCPSioM8oFJBGivnBlPZst0sg8CWfMpZ15Eo5J1zyRyHlHz49EXe6xERK8mvTW6Qj3oPcDKtWr+jw8cum7eRxXOqb2wJjv7f1RqRbxC/7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rDPK8Pme; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1738362747; c=relaxed/simple;
+	bh=filg/AMn2V5XxLVhFgMOngZitf2cIiSdIG1OP7o9tbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=owx2zdP2VEOMnFnm2/0l+AZqNnXTJzEtajQZsXZpV2juQB0i/XJVXCIPdtTum3qiWVvm2yVZVlRclplxXE0LayL/XZb37THN5sY/fUgETWA/AlI/dwMbtHbKpFTJ4YtDk1pSfAFQGTdf/OPJJR8bJDO/YPSL2OZyT/XSH9KE2SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ehuwshZn; arc=none smtp.client-ip=91.218.175.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rDPK8Pme"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ehuwshZn"
+Date: Fri, 31 Jan 2025 22:32:13 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738362597;
+	t=1738362738;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TFYkLpq0/bvCrqY/t5fvUaOC/8WopcK28OFnqaHgl3c=;
-	b=rDPK8PmeVux+Jus7fEZCvhcyIpakWo77Wc0HmrYzvth41DcYZdI5mTo83b4dax7SjIXcJE
-	m8wMhrHLI2UoUpyraulmIyQ2IHkLpmzgjNSlPmgvk8I/OQvwSZoNCeBYf0axVFb9SAA7Ih
-	B8KmIaHzfUnquRcqmocYSV0xvkUrSvY=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A3Bqe62g7W7r2RL3thtf4WjsyKswqUZfibH5kjKyu4s=;
+	b=ehuwshZn70k7Vw406pKb+AHlH7rhG4mkvjCQs/olkmnbepFYpMLM20GPwoUWF3K8KCejgw
+	hj5Z9upDwpgbHoFnJZBKefpJl9LlwhEVEzW8kg1bBzkve15Zuc1XvwbrPvGBXJC6ja0wzL
+	CBtIemVrDWnJXl1pnHVTAiwOp6bH1VA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH] KVM: arm64: Flush/sync debug state in protected mode
-Date: Fri, 31 Jan 2025 22:29:24 +0000
-Message-ID: <20250131222922.1548780-3-oliver.upton@linux.dev>
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	James Clark <james.clark@linaro.org>,
+	Aishwarya TCV <Aishwarya.TCV@arm.com>
+Subject: Re: [PATCH v4 11/19] KVM: arm64: Use debug_owner to track if debug
+ regs need save/restore
+Message-ID: <Z51PbTtzKh66dqco@linux.dev>
+References: <20241219224116.3941496-1-oliver.upton@linux.dev>
+ <20241219224116.3941496-12-oliver.upton@linux.dev>
+ <5f62740f-a065-42d9-9f56-8fb648b9c63f@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f62740f-a065-42d9-9f56-8fb648b9c63f@sirena.org.uk>
 X-Migadu-Flow: FLOW_OUT
 
-The recent changes to debug state management broke self-hosted debug for
-guests when running in protected mode, since both the debug owner and
-the debug state itself aren't shared with the hyp's view of the vcpu.
+On Fri, Jan 31, 2025 at 12:22:22AM +0000, Mark Brown wrote:
+> On Thu, Dec 19, 2024 at 02:41:08PM -0800, Oliver Upton wrote:
+> 
+> > Use the debug owner to determine if the debug regs are in use instead of
+> > keeping around the DEBUG_DIRTY flag. Debug registers are now
+> > saved/restored after the first trap, regardless of whether it was a read
+> > or a write. This also shifts the point at which KVM becomes lazy to
+> > vcpu_put() rather than the next exception taken from the guest.
+> > 
+> > Tested-by: James Clark <james.clark@linaro.org>
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> We've started seeing issues on TX2 with the KVM debug-exceptions
+> kselftest in pKVM boots:
 
-Fix it by flushing/syncing the relevant bits with the hyp vcpu.
+Thanks for catching this. Just put a fix on the list [*], hopefully Marc
+can pick it up sometime soon.
 
-Fixes: beb470d96cec ("KVM: arm64: Use debug_owner to track if debug regs need save/restore")
-Reported-by: Mark Brown <broonie@kernel.org>
-Closes: https://lore.kernel.org/kvmarm/5f62740f-a065-42d9-9f56-8fb648b9c63f@sirena.org.uk/
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+[*]: https://lore.kernel.org/kvmarm/20250131222922.1548780-3-oliver.upton@linux.dev/
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 5c134520e180..6e12c070832f 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -91,11 +91,34 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
- }
- 
-+static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+
-+	hyp_vcpu->vcpu.arch.debug_owner = host_vcpu->arch.debug_owner;
-+
-+	if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu))
-+		hyp_vcpu->vcpu.arch.vcpu_debug_state = host_vcpu->arch.vcpu_debug_state;
-+	else if (kvm_host_owns_debug_regs(&hyp_vcpu->vcpu))
-+		hyp_vcpu->vcpu.arch.external_debug_state = host_vcpu->arch.external_debug_state;
-+}
-+
-+static void sync_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+
-+	if (kvm_guest_owns_debug_regs(&hyp_vcpu->vcpu))
-+		host_vcpu->arch.vcpu_debug_state = hyp_vcpu->vcpu.arch.vcpu_debug_state;
-+	else if (kvm_host_owns_debug_regs(&hyp_vcpu->vcpu))
-+		host_vcpu->arch.external_debug_state = hyp_vcpu->vcpu.arch.external_debug_state;
-+}
-+
- static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
- 
- 	fpsimd_sve_flush();
-+	flush_debug_state(hyp_vcpu);
- 
- 	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
- 
-@@ -123,6 +146,7 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	unsigned int i;
- 
- 	fpsimd_sve_sync(&hyp_vcpu->vcpu);
-+	sync_debug_state(hyp_vcpu);
- 
- 	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
- 
-
-base-commit: 9bcbb6104a344d3526e185ee1e7b985509914e90
 -- 
-2.48.1.362.g079036d154-goog
-
+Thanks,
+Oliver
