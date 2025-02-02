@@ -1,71 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122FC1D47C3
-	for <kvmarm@lists.linux.dev>; Sun,  2 Feb 2025 06:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FF261FCE
+	for <kvmarm@lists.linux.dev>; Sun,  2 Feb 2025 06:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738478517; cv=none; b=VBPA6uiBu/zaknbBBTZG2KuMHC0yVSdoXyFLYJr1o2UC5MgEVeAoZaqM+evjC+kY+w/uyGzPgz9+ASdnwLSRU6ipweYjj0OhJYup2hb86MiN8w0MV442UB73T1kdkyRkbT9/HUdYRch9+wd62oSDJyrrGdVxTDCl77viTsfvQT8=
+	t=1738479181; cv=none; b=XThs8VfITb47UAzPR5CNVMuBQXq5oc9pG2NGG4TlMr0VbmsRjYQ09dvlZlEXYw5ovUDyuA9tXlv6dkMEx+dE//5lFc0fc4NAi8bvr8JehcZDOUrGjF1i6y0CMUmo4KamXhK4az9adSlUBtSm+yXZPxF0GYSEeq6BtkxDMJ0Pf88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738478517; c=relaxed/simple;
-	bh=wSTLzGhMLffhO/v6hJYaRpeR5d/1GKbHdC9MlbN+LvE=;
+	s=arc-20240116; t=1738479181; c=relaxed/simple;
+	bh=+XQoM2eQ5of19S1D3GwOInAKkzoHqEfVZIdX70/L1xE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mV3PL5k91x7PaQ9eTGP76aKJfxhXIc1ENUmunvZrRbdEsVPU9Jp26Bt70GE4XPdINhanBHWPdB+HKw670jlSHdgAezQcgruy4Stqv4Cd+9k3iHVjtNSiTWxNWhQ/OF36xgFF85wmNd+r5qUm7xe8nyWjkvodYCNenBeuQ41HRzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YKAQxyXJ; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=uzbStG+ExYB6WcbxFnsQpO6nFmlFLCG8yb0IsT9fJErjuaYi/rg1Ef4/0U2bGdJGGVR6gMg3WOdDIkSx9PSwmpuximSa8cOx3V3kjsBCyQBqPBA5KnSN2sjKR6MdsQbaJ5mNOK9fTdJUVzJSCMYa3M+bMCR6OIgQeuKMDXEEORY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q1pMLCBc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKAQxyXJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1pMLCBc"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738478513;
+	s=mimecast20190719; t=1738479178;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=O9bc7QlURY2KqxOqSdcgXWV1nxuIWVaexteEdP17afs=;
-	b=YKAQxyXJzy7Oz3kx1bT51cjJjtdmLL6cMJ7PWwq9c0IpZdJYLiP6TCyHesePlfH5WWcDaN
-	F+hXKBreEhnY08/czhSd+h46CnETwIn0oD6ni97Z1zCzJnVUvQPGZOO32vtmzrIxUasSr8
-	sgxcszAlrDU3GxcARtoGW2HLCGy00Zw=
+	bh=dmFZPr7vvicMrPdu+ITYGzZQ8FMqK4dGeuyKQ/HiL5g=;
+	b=Q1pMLCBc0rasqGXCGTeNKk8uEBtee+GaVk+LCgZEm7d7y04QL8G+36Eo61anUtzXWqiUFy
+	UJVUvqKTvRtN/oCM8qBGjBRxbJ0mM2/hv8IwlP+mNte2IGytUiWafBSqHRnhFsrtpkFJ35
+	3yRVw6U/H//QwlRTUOBCPVT5/rQXSjo=
 Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
  [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-360-WZ3MCGUNPAylEPs-m6qxOA-1; Sun, 02 Feb 2025 01:41:51 -0500
-X-MC-Unique: WZ3MCGUNPAylEPs-m6qxOA-1
-X-Mimecast-MFC-AGG-ID: WZ3MCGUNPAylEPs-m6qxOA
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-21681a2c0d5so59570735ad.2
-        for <kvmarm@lists.linux.dev>; Sat, 01 Feb 2025 22:41:50 -0800 (PST)
+ us-mta-283-HkimpMYvOEO7tGaclHNuWw-1; Sun, 02 Feb 2025 01:52:57 -0500
+X-MC-Unique: HkimpMYvOEO7tGaclHNuWw-1
+X-Mimecast-MFC-AGG-ID: HkimpMYvOEO7tGaclHNuWw
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-216311faa51so59741405ad.0
+        for <kvmarm@lists.linux.dev>; Sat, 01 Feb 2025 22:52:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738478510; x=1739083310;
+        d=1e100.net; s=20230601; t=1738479176; x=1739083976;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O9bc7QlURY2KqxOqSdcgXWV1nxuIWVaexteEdP17afs=;
-        b=uCyyr3fR2qeWs47a9rSfEQir2SV2SLal7FyS267q8p+yTvlHfLhPKY6ZkcE7a/WmjY
-         R1wiU0bZZAiFoW5S2w3uWcyotXFJmL5ASaCiF40i4F2zl+AgJTEMz3LXdoBP5z3ILKAn
-         QtRgMEHXnIQnWBpc0HfLXyKOGn6w2PNuiNCtj/TePdiH+VWVHzCi1MMFBUoM8MV8Cder
-         EHPBVCXujzC6V/dSkh1Kt4741IiSxokG+ZFEmvcTTnI4M7IYRIBJkvx8Z1BW344x/FZB
-         fXujcNW5U+eUuULHggDfxk7g02pUuIoCTVLHAyHAVsRQc/LrKRIoAX7pIVNKskQxOPV5
-         G7Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCWAV4fbuWFD9diLxzheW2rPCDnBHyIPkcTZ9ckflq/rBVWEFDUQOUv0oVb6nA4IEhHhjdgIU74=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxwbxkaMbCZyQlhB/LxI70/3cqb7ghhJyy58imdtxI1eqB+HRBb
-	03xfKaKFiEZmAvkqX6a41sU383aygWHMDcyBbWadECH8WwP1qHsVA1Z/blWNFk0NK56X+GYxuMl
-	ukigOQ5cUpU5XcYZH4t3J8D6mlkF7Trd0vLnCHk9ZXbckQsaBHxZ3xQ==
-X-Gm-Gg: ASbGncubvvUeYf7gpwg3B1fuFzRUu5OlcSMv13FjkQInYHx3kq8GPsvJJ31rASUtCUf
-	9CFEe/qqWRHPt+C/82Tm061J6SZyZoBLyrkovLYsoZ6ruT0t4d7Vd/UIeRluld5JalPV3YzUakD
-	uw22eLaqp2ax2KT7FZdJ5nvByebN5QHBotl40+poR3yS/NV4FW3j3cmM8qnZ1s0DTcntfsXuxCS
-	TDzx5hGAzZ9eqY6oZ7/bODGEfafrkomaP3+dlaAAQ7Zc1k+UTC6e2fgHFiTXXkF2zaQzchBlv4A
-	2hborg==
-X-Received: by 2002:a17:902:e742:b0:215:a97a:c6bb with SMTP id d9443c01a7336-21dd7c65891mr279349365ad.12.1738478509998;
-        Sat, 01 Feb 2025 22:41:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEgiNqSMRe7eOLK7UU7yfr7SRk/XUpHiWVSGyN9DA4ZXFp8THxJ4DGREQDo0HNpjoMWa/PKyw==
-X-Received: by 2002:a17:902:e742:b0:215:a97a:c6bb with SMTP id d9443c01a7336-21dd7c65891mr279349065ad.12.1738478509619;
-        Sat, 01 Feb 2025 22:41:49 -0800 (PST)
+        bh=dmFZPr7vvicMrPdu+ITYGzZQ8FMqK4dGeuyKQ/HiL5g=;
+        b=TlgztAQahYz4mUAc4Kt040OnwHe7TIGDkhx3ziUynivMqqiHd5wOvmeCP0rGJugsCV
+         UBgpG7jy59TKO8r8ePBA4Fws+IPgD+dwxJxT7KWkCeYWiw4drYbCsFeiFNysSTZJwZun
+         yrJ5snBJcGPJrQ5g8Mk4n10uZ04jAF/WFiCY+M9h57vVE3VwmRfy3vL3m2K+c0TAg7ox
+         kwtokT3NXMCfE6Sxee06f19O4MciG0ZerXt1uE0npUSkXo0zaYDnK28Jqlq+iHdqIDVK
+         kM0qguN94wn1SADjwFdqwarHrFQzsq0EO7qttcxgWM1pZka9tG9xX7GsPwqTY2nCB1aZ
+         aa0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUctglQcoP7hutRDIJN66U8g/VdXCO7WFp1KmOwtpPHjlYiW6uU6ipK8KS6UIUT/ylq5nK6+mo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxoU5z0AnyEpZZ1NN1AayL7od73RbSoXBAyYS9d4wAk3vvNiKEV
+	gBru1v48dJFpHYd7ANt2eHd8XwB3pYBz7oC20z/ROR6Vxs+foUxJMPphQA2Kiqi4MxY563p0iyK
+	ROnY95KtZWPmtc3pzFsf/hYGBVMrhB5Qj99K8T/+FrJZtiRrtKezgyQ==
+X-Gm-Gg: ASbGncvO0y9a0e2IS04/QXsR3e/cia3/db+CPfDjfJmUQJORjiVi0z+u6N0ylST0R8o
+	WAvFoqx7n53d5PzmqzDXFwj7qxjnOwb95HzwFsGz0DG29dSvRYlGGXmAthdZfmB0zXVClQp9Dky
+	iHNYiHMNfD7z37ITewK8uRqxPEzXd+M0OGtncDUZ/V+jxS+SeOePI68ysdq/YZfvyMK4IpfsWet
+	zr3NSBQbG31+VirvmjLlig1qDRkxYdFrzp4fMEL41trEt2bc/egpTGG1gOxAwvFyduSS0L7ovHz
+	Md+xiA==
+X-Received: by 2002:a17:903:246:b0:215:b1e3:c051 with SMTP id d9443c01a7336-21de1968f37mr191228055ad.11.1738479176567;
+        Sat, 01 Feb 2025 22:52:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGr8YDEgf3AQME0gtW8Rc2bNGoGwAlcqKLbbyp/bsjze7Hnub47aEwGNl8h+IYW0bDy17/2PA==
+X-Received: by 2002:a17:903:246:b0:215:b1e3:c051 with SMTP id d9443c01a7336-21de1968f37mr191227855ad.11.1738479176239;
+        Sat, 01 Feb 2025 22:52:56 -0800 (PST)
 Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de32efa0csm53772495ad.116.2025.02.01.22.41.42
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de3335cc9sm54443775ad.258.2025.02.01.22.52.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Feb 2025 22:41:49 -0800 (PST)
-Message-ID: <69a424e0-1350-484c-9ce7-b40c4fcacd8e@redhat.com>
-Date: Sun, 2 Feb 2025 16:41:40 +1000
+        Sat, 01 Feb 2025 22:52:55 -0800 (PST)
+Message-ID: <82659880-f7a6-48ad-bf54-8371fc3d41d8@redhat.com>
+Date: Sun, 2 Feb 2025 16:52:47 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,101 +73,83 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 27/43] arm64: rme: support RSI_HOST_CALL
+Subject: Re: [PATCH v6 29/43] arm64: RME: Always use 4k pages for realms
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
  <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-28-steven.price@arm.com>
+ <20241212155610.76522-30-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241212155610.76522-28-steven.price@arm.com>
+In-Reply-To: <20241212155610.76522-30-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: hC4Z5z2bPYcZkRsn_x4aZwESdMqX23xrewjrjcyxygI_1738478510
+X-Mimecast-MFC-PROC-ID: oumJw-QYcNALoB9O7KIuVmSpoFXDACKqt_5F57ujEZ0_1738479177
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/13/24 1:55 AM, Steven Price wrote:
-> From: Joey Gouly <joey.gouly@arm.com>
+> Always split up huge pages to avoid problems managing huge pages. There
+> are two issues currently:
 > 
-> Forward RSI_HOST_CALLS to KVM's HVC handler.
+> 1. The uABI for the VMM allows populating memory on 4k boundaries even
+>     if the underlying allocator (e.g. hugetlbfs) is using a larger page
+>     size. Using a memfd for private allocations will push this issue onto
+>     the VMM as it will need to respect the granularity of the allocator.
 > 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> 2. The guest is able to request arbitrary ranges to be remapped as
+>     shared. Again with a memfd approach it will be up to the VMM to deal
+>     with the complexity and either overmap (need the huge mapping and add
+>     an additional 'overlapping' shared mapping) or reject the request as
+>     invalid due to the use of a huge page allocator.
+> 
+> For now just break everything down to 4k pages in the RMM controlled
+> stage 2.
+> 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> Changes since v4:
->   * Setting GPRS is now done by kvm_rec_enter() rather than
->     rec_exit_host_call() (see previous patch - arm64: RME: Handle realm
->     enter/exit). This fixes a bug where the registers set by user space
->     were being ignored.
-> ---
->   arch/arm64/kvm/rme-exit.c | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
+>   arch/arm64/kvm/mmu.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
-> index 8f0f9ab57f28..b2a367474d74 100644
-> --- a/arch/arm64/kvm/rme-exit.c
-> +++ b/arch/arm64/kvm/rme-exit.c
-> @@ -103,6 +103,26 @@ static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
->   	return 0;
->   }
->   
-> +static int rec_exit_host_call(struct kvm_vcpu *vcpu)
-> +{
-> +	int ret, i;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +
-> +	vcpu->stat.hvc_exit_stat++;
-> +
-> +	for (i = 0; i < REC_RUN_GPRS; i++)
-> +		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
-> +
-> +	ret = kvm_smccc_call_handler(vcpu);
-> +
-> +	if (ret < 0) {
-> +		vcpu_set_reg(vcpu, 0, ~0UL);
-> +		ret = 1;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-
-It seems that the return value from kvm_smccc_call() won't be negative. Besides,
-the host call requests are currently handled by kvm_psci_call(), which isn't
-what we want. So I think a new helper is needed and called in kvm_smccc_call_handler().
-The new helper simply push the error (NOT_SUPPORTED) to x0. Otherwise, a unexpected
-return value will be seen by guest.
-
-handle_rec_exit
-   rec_exit_host_call
-     kvm_smccc_call_handler
-
->   static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
->   {
->   	struct realm_rec *rec = &vcpu->arch.rec;
-> @@ -164,6 +184,8 @@ int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
->   		return rec_exit_psci(vcpu);
->   	case RMI_EXIT_RIPAS_CHANGE:
->   		return rec_exit_ripas_change(vcpu);
-> +	case RMI_EXIT_HOST_CALL:
-> +		return rec_exit_host_call(vcpu);
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index e88714903ce5..9ede143ccef1 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1603,6 +1603,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   	if (logging_active) {
+>   		force_pte = true;
+>   		vma_shift = PAGE_SHIFT;
+> +	} else if (kvm_is_realm(kvm)) {
+> +		// Force PTE level mappings for realms
+> +		force_pte = true;
+> +		vma_shift = PAGE_SHIFT;
+>   	} else {
+>   		vma_shift = get_vma_page_shift(vma, hva);
 >   	}
->   
->   	kvm_pr_unimpl("Unsupported exit reason: %u\n",
+
+Since a memory abort is specific to a vCPU instead of a VM, so vcpu_is_rec()
+instead of kvm_is_realm() is more accurate for the check. Besides, it looks
+duplicate to the check added by "PATCH[20/43] arm64: RME: Runtime faulting
+of memory", which is as below.
+
+        /* FIXME: We shouldn't need to disable this for realms */
+        if (vma_pagesize == PAGE_SIZE && !(force_pte || device || kvm_is_realm(kvm))) {
+                                                                  ^^^^^^^^^^^^^^^^^
+                                                                  Can be dropped now.
 
 Thanks,
 Gavin
+                  
+
 
