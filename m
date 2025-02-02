@@ -1,71 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FF261FCE
-	for <kvmarm@lists.linux.dev>; Sun,  2 Feb 2025 06:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883FD1BFE00
+	for <kvmarm@lists.linux.dev>; Sun,  2 Feb 2025 07:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738479181; cv=none; b=XThs8VfITb47UAzPR5CNVMuBQXq5oc9pG2NGG4TlMr0VbmsRjYQ09dvlZlEXYw5ovUDyuA9tXlv6dkMEx+dE//5lFc0fc4NAi8bvr8JehcZDOUrGjF1i6y0CMUmo4KamXhK4az9adSlUBtSm+yXZPxF0GYSEeq6BtkxDMJ0Pf88=
+	t=1738480384; cv=none; b=Tkfa+/qg0uBrs6unTPSWfEJul3N/ljluBZ5/FcrIm0VMw1c2NxErWP0kLJj6/CO3L0vIzKBA+ZjJKQ9DDlZupRk9VaZ6gzFTqNxsloM6Nr49sWC9UA3AZVu0rRx0+TC+H+s9xiMX0dFWlt7JbAz7MB6oIoO5X/7vzdFsi7ymW1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738479181; c=relaxed/simple;
-	bh=+XQoM2eQ5of19S1D3GwOInAKkzoHqEfVZIdX70/L1xE=;
+	s=arc-20240116; t=1738480384; c=relaxed/simple;
+	bh=CXPd9+3PCf0ABtxW27kGa+FmX6LrCMM7KEngRhxn1qQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uzbStG+ExYB6WcbxFnsQpO6nFmlFLCG8yb0IsT9fJErjuaYi/rg1Ef4/0U2bGdJGGVR6gMg3WOdDIkSx9PSwmpuximSa8cOx3V3kjsBCyQBqPBA5KnSN2sjKR6MdsQbaJ5mNOK9fTdJUVzJSCMYa3M+bMCR6OIgQeuKMDXEEORY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q1pMLCBc; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=RKus9i6AAZY2Znl2KzdVacbl7QrmTiIxaJWHMucd0JavdpKQNX22f5VL9k82eD3Q8vz0LM/j0vYHTlUvbv5viy8yXiRr5bSN6NFLA7ajxDkTNbN4Jin+IBmAlAGAYG7/dGokuw5vH12A+Slz3K75GuI7farWX27pwg16bGPy2Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iak71eLf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1pMLCBc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iak71eLf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738479178;
+	s=mimecast20190719; t=1738480381;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dmFZPr7vvicMrPdu+ITYGzZQ8FMqK4dGeuyKQ/HiL5g=;
-	b=Q1pMLCBc0rasqGXCGTeNKk8uEBtee+GaVk+LCgZEm7d7y04QL8G+36Eo61anUtzXWqiUFy
-	UJVUvqKTvRtN/oCM8qBGjBRxbJ0mM2/hv8IwlP+mNte2IGytUiWafBSqHRnhFsrtpkFJ35
-	3yRVw6U/H//QwlRTUOBCPVT5/rQXSjo=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+Akyo3JQj2YPzoJhRHm4ECXXW4B+Mshy1bBF/6XTbeo=;
+	b=iak71eLfDyT2saDd4rfe8VQXebcZSq49M9olITqfJgYOArcPRzZfAweFtwoc3TBZhSROZM
+	pgG9+EiyQaVbIVggRHNbIzSz/EoMsjZ3IWqNNx0j6YDoubWX3dByUZIdKIKP8Ux2VQXeHM
+	1zfAz9L8bkISHd0GAJEM2pVBzstd2WA=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-283-HkimpMYvOEO7tGaclHNuWw-1; Sun, 02 Feb 2025 01:52:57 -0500
-X-MC-Unique: HkimpMYvOEO7tGaclHNuWw-1
-X-Mimecast-MFC-AGG-ID: HkimpMYvOEO7tGaclHNuWw
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-216311faa51so59741405ad.0
-        for <kvmarm@lists.linux.dev>; Sat, 01 Feb 2025 22:52:57 -0800 (PST)
+ us-mta-665-q_nYBr7BMo2GSHWepijdYw-1; Sun, 02 Feb 2025 02:12:58 -0500
+X-MC-Unique: q_nYBr7BMo2GSHWepijdYw-1
+X-Mimecast-MFC-AGG-ID: q_nYBr7BMo2GSHWepijdYw
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-216430a88b0so70368755ad.0
+        for <kvmarm@lists.linux.dev>; Sat, 01 Feb 2025 23:12:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738479176; x=1739083976;
+        d=1e100.net; s=20230601; t=1738480377; x=1739085177;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dmFZPr7vvicMrPdu+ITYGzZQ8FMqK4dGeuyKQ/HiL5g=;
-        b=TlgztAQahYz4mUAc4Kt040OnwHe7TIGDkhx3ziUynivMqqiHd5wOvmeCP0rGJugsCV
-         UBgpG7jy59TKO8r8ePBA4Fws+IPgD+dwxJxT7KWkCeYWiw4drYbCsFeiFNysSTZJwZun
-         yrJ5snBJcGPJrQ5g8Mk4n10uZ04jAF/WFiCY+M9h57vVE3VwmRfy3vL3m2K+c0TAg7ox
-         kwtokT3NXMCfE6Sxee06f19O4MciG0ZerXt1uE0npUSkXo0zaYDnK28Jqlq+iHdqIDVK
-         kM0qguN94wn1SADjwFdqwarHrFQzsq0EO7qttcxgWM1pZka9tG9xX7GsPwqTY2nCB1aZ
-         aa0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUctglQcoP7hutRDIJN66U8g/VdXCO7WFp1KmOwtpPHjlYiW6uU6ipK8KS6UIUT/ylq5nK6+mo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxoU5z0AnyEpZZ1NN1AayL7od73RbSoXBAyYS9d4wAk3vvNiKEV
-	gBru1v48dJFpHYd7ANt2eHd8XwB3pYBz7oC20z/ROR6Vxs+foUxJMPphQA2Kiqi4MxY563p0iyK
-	ROnY95KtZWPmtc3pzFsf/hYGBVMrhB5Qj99K8T/+FrJZtiRrtKezgyQ==
-X-Gm-Gg: ASbGncvO0y9a0e2IS04/QXsR3e/cia3/db+CPfDjfJmUQJORjiVi0z+u6N0ylST0R8o
-	WAvFoqx7n53d5PzmqzDXFwj7qxjnOwb95HzwFsGz0DG29dSvRYlGGXmAthdZfmB0zXVClQp9Dky
-	iHNYiHMNfD7z37ITewK8uRqxPEzXd+M0OGtncDUZ/V+jxS+SeOePI68ysdq/YZfvyMK4IpfsWet
-	zr3NSBQbG31+VirvmjLlig1qDRkxYdFrzp4fMEL41trEt2bc/egpTGG1gOxAwvFyduSS0L7ovHz
-	Md+xiA==
-X-Received: by 2002:a17:903:246:b0:215:b1e3:c051 with SMTP id d9443c01a7336-21de1968f37mr191228055ad.11.1738479176567;
-        Sat, 01 Feb 2025 22:52:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGr8YDEgf3AQME0gtW8Rc2bNGoGwAlcqKLbbyp/bsjze7Hnub47aEwGNl8h+IYW0bDy17/2PA==
-X-Received: by 2002:a17:903:246:b0:215:b1e3:c051 with SMTP id d9443c01a7336-21de1968f37mr191227855ad.11.1738479176239;
-        Sat, 01 Feb 2025 22:52:56 -0800 (PST)
+        bh=+Akyo3JQj2YPzoJhRHm4ECXXW4B+Mshy1bBF/6XTbeo=;
+        b=Aq//yGcLSy3RqEMt2gNuQ3nBxuxJcJf5gvrHszxgDlHjSLsHpQrhWDCc9AE25/vx/T
+         UNtoeLB0cfLu73GITiz6hspRboKxsh5Opc0pEgVU+MfXE+zvFRDC25HdXdYw0urOhH68
+         dX1Vvm+zPUK/dZ9JbveC7w9AKkrvkWXCYynMzzUMsEW5RNUFdOl6tDTb9xcOU8RbimW0
+         5yBKCOTtulr9Zz6nGCk8aSxy0BbWUmZJMIh2qU0vG9Tj2YT5EB2q+Im782uDSWAphhFy
+         ACAwljXb8EwO9rfP/BE1YS3f8UMudOpZlRTvxMoLCRrSjSRCqsxAPASExJ7DMeJFWp+w
+         QELw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcpvlOF6TE8b/7GuzvyKWADOb0a0kT1vKHgyjbRuSDIyKy/0oOZpUmzgt0VVX3MJKeJUzqTUI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzAEInpugVfsc/gVtPnpMT992QBgLpsNBZnJUMQo32ZBJYWdiDq
+	BsPld3jzE1Dp+mmFcvmosfrp8U7qsT+JP2ba7GkohJ2I7ccdyFTFjVuwty6YqvhHbTXwJu+DSq6
+	3ChunkY9h1RN92uI0jgSYeyoVwl5VOGdVytdyzQ4u2dNCWgtUPdiirA==
+X-Gm-Gg: ASbGncvSQlLJzMnbbjIlljwaZqV9f9+GeN9LVVb+w/SAjVP91P31GBTc2re91Bjbg5r
+	8iS85A/cSy2XBhMopIEdSC2/rF+5YRhkKvUmjqhudhGYFEvkqzP5o/w1MeW1skKUoV/+WSYi48d
+	yVT/Kf4xJy1fonkA0bjepjrHZ+rzQ47aYNu6jMdFrR/f4TXZkDQ+vQiXIHLlh7BBHjP1z5i3X4K
+	8SiCwrl92VCqfF5TtAVNM/NhkwXyCd5QL0DdE3Z7p2od/v8rcDtcQaQ/5yOd13xTd55mUyHkJ1H
+	RA+0+w==
+X-Received: by 2002:a17:903:110c:b0:216:1ad2:1d5 with SMTP id d9443c01a7336-21dd7deebd1mr265357445ad.41.1738480377002;
+        Sat, 01 Feb 2025 23:12:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEbEpN4KQNQWRi1soSDL1v4OtYLgM2DYDPCY0eEgB/YujTFWmFABLlbkBOcGlGdKwPsn62yg==
+X-Received: by 2002:a17:903:110c:b0:216:1ad2:1d5 with SMTP id d9443c01a7336-21dd7deebd1mr265357095ad.41.1738480376627;
+        Sat, 01 Feb 2025 23:12:56 -0800 (PST)
 Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de3335cc9sm54443775ad.258.2025.02.01.22.52.49
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de32ea5f1sm54843395ad.130.2025.02.01.23.12.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Feb 2025 22:52:55 -0800 (PST)
-Message-ID: <82659880-f7a6-48ad-bf54-8371fc3d41d8@redhat.com>
-Date: Sun, 2 Feb 2025 16:52:47 +1000
+        Sat, 01 Feb 2025 23:12:56 -0800 (PST)
+Message-ID: <f339729a-00a8-40b5-af05-f0f019579e5e@redhat.com>
+Date: Sun, 2 Feb 2025 17:12:48 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,7 +73,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 29/43] arm64: RME: Always use 4k pages for realms
+Subject: Re: [PATCH v6 30/43] arm64: rme: Prevent Device mappings for Realms
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -89,67 +89,80 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-30-steven.price@arm.com>
+ <20241212155610.76522-31-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241212155610.76522-30-steven.price@arm.com>
+In-Reply-To: <20241212155610.76522-31-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: oumJw-QYcNALoB9O7KIuVmSpoFXDACKqt_5F57ujEZ0_1738479177
+X-Mimecast-MFC-PROC-ID: 1p-MG6lSaEsSfUtepgA6bFxcmQM8IvAjAm2ZP7B2ONM_1738480377
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/13/24 1:55 AM, Steven Price wrote:
-> Always split up huge pages to avoid problems managing huge pages. There
-> are two issues currently:
-> 
-> 1. The uABI for the VMM allows populating memory on 4k boundaries even
->     if the underlying allocator (e.g. hugetlbfs) is using a larger page
->     size. Using a memfd for private allocations will push this issue onto
->     the VMM as it will need to respect the granularity of the allocator.
-> 
-> 2. The guest is able to request arbitrary ranges to be remapped as
->     shared. Again with a memfd approach it will be up to the VMM to deal
->     with the complexity and either overmap (need the huge mapping and add
->     an additional 'overlapping' shared mapping) or reject the request as
->     invalid due to the use of a huge page allocator.
-> 
-> For now just break everything down to 4k pages in the RMM controlled
-> stage 2.
+> Physical device assignment is not yet supported by the RMM, so it
+> doesn't make much sense to allow device mappings within the realm.
+> Prevent them when the guest is a realm.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->   arch/arm64/kvm/mmu.c | 4 ++++
->   1 file changed, 4 insertions(+)
+> Changes from v5:
+>   * Also prevent accesses in user_mem_abort()
+> ---
+>   arch/arm64/kvm/mmu.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index e88714903ce5..9ede143ccef1 100644
+> index 9ede143ccef1..cef7c3dcbf99 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1603,6 +1603,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (logging_active) {
->   		force_pte = true;
->   		vma_shift = PAGE_SHIFT;
-> +	} else if (kvm_is_realm(kvm)) {
-> +		// Force PTE level mappings for realms
-> +		force_pte = true;
-> +		vma_shift = PAGE_SHIFT;
->   	} else {
->   		vma_shift = get_vma_page_shift(vma, hva);
->   	}
+> @@ -1149,6 +1149,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>   	if (is_protected_kvm_enabled())
+>   		return -EPERM;
+>   
+> +	/* We don't support mapping special pages into a Realm */
+> +	if (kvm_is_realm(kvm))
+> +		return -EINVAL;
+> +
 
-Since a memory abort is specific to a vCPU instead of a VM, so vcpu_is_rec()
-instead of kvm_is_realm() is more accurate for the check. Besides, it looks
-duplicate to the check added by "PATCH[20/43] arm64: RME: Runtime faulting
-of memory", which is as below.
+		return -EPERM;
 
-        /* FIXME: We shouldn't need to disable this for realms */
-        if (vma_pagesize == PAGE_SIZE && !(force_pte || device || kvm_is_realm(kvm))) {
-                                                                  ^^^^^^^^^^^^^^^^^
-                                                                  Can be dropped now.
+>   	size += offset_in_page(guest_ipa);
+>   	guest_ipa &= PAGE_MASK;
+>   
+> @@ -1725,6 +1729,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   	if (exec_fault && device)
+>   		return -ENOEXEC;
+>   
+> +	/*
+> +	 * Don't allow device accesses to protected memory as we don't (yet)
+> +	 * support protected devices.
+> +	 */
+> +	if (device && kvm_is_realm(kvm) &&
+> +	    kvm_gpa_from_fault(kvm, fault_ipa) == fault_ipa)
+> +		return -EINVAL;
+> +
+
+s/kvm_is_realm/vcpu_is_rec
+
+I don't understand the check very well. What I understood is mem_abort() is called
+only when kvm_gpa_from_fault(kvm, fault_ipa) != fault_ipa, meaning only the page
+faults in the shared address space is handled by mem_abort(). So I guess we perhaps
+need something like below.
+
+	if (vcpu_is_rec(vcpu) && device)
+		return -EPERM;
+
+kvm_handle_guest_abort
+   kvm_slot_can_be_private
+     private_memslot_fault	// page fault in the private space is handled here
+   io_mem_abort			// MMIO emulation is handled here
+   user_mem_abort                // page fault in the shared space is handled here
+
+>   	/*
+>   	 * Potentially reduce shadow S2 permissions to match the guest's own
+>   	 * S2. For exec faults, we'd only reach this point if the guest
 
 Thanks,
 Gavin
-                  
-
 
