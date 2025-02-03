@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CE670820
-	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 06:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A04502F
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 06:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738562674; cv=none; b=CjT/+u3zf7JAjLOdGvoEVjCu13QPPtTfs3ziEsbDoGUJ2+kYD1U0377SuCXGa1niyPzJnpxQevu2/OtGc6k5RgZtslUm+Txrg3Lf48250bBYZmV+NmBH98Ji/tBr/P2ZpHTfhuvnecT0dOe3XBhF1mbL7p8iyc/8N4s0Ocnylxg=
+	t=1738564726; cv=none; b=Clg6IsH0y9MGdc62w0nrRHgHUy6Q0NgRGJYt8zgyeVhPXvHjoEdQasDQd/hSi9vYPDxvGAhSPShu/QcNEKRI32j5UGwA7+ldIwKwqZ66ZlI2ES0ck9OFz1zmMXi1ghCsmufhwXWfM+MnDPfo9SRQBeey4qK4eOD5EnuF4X5B7FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738562674; c=relaxed/simple;
-	bh=w1IKu0BfJ+ZZ+MghaLy9rJoVvE/lYu9W/92oo9jaNXo=;
+	s=arc-20240116; t=1738564726; c=relaxed/simple;
+	bh=KBq44VxD0mtvsZUAYhFY7MMb8UXLSNUlwTI4ITmj+/U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mQOnzVojbLXUmfsUNp3CIkN/2mnAx2h3acpo4TEG2I4lh1vBKIybB8I9kmOzTddnoXh0+1fmcoQ0I4/+pRxnKixeE5jDLZZgOPWxYvEDh5ern3CPYrygo7F5OM2pqxbt9PNuZgG56rPbErH610Y++s7QrHiWRqvz68eWluODWcY=
+	 In-Reply-To:Content-Type; b=ggdrQXg7G/My3LdoQfOoILvSd6TEviFZA0HdoROBJhNeoiX+z8HJX+PVF6PgiEgMcV39xy3Kuc1qJZGvOL5YyaOVLi3pKpKQKezZVszPAO3uHWwv+iYpTWeykU5AqTxNx/03eaMbcJXRKN+uMEKdXLLL+MWRTExhSlMha92b0W0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E39C1476;
-	Sun,  2 Feb 2025 22:04:56 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8FC21476;
+	Sun,  2 Feb 2025 22:39:06 -0800 (PST)
 Received: from [10.162.16.79] (unknown [10.162.16.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7EF0F3F63F;
-	Sun,  2 Feb 2025 22:04:27 -0800 (PST)
-Message-ID: <5bcc9ffb-62a0-4b98-9b41-9cf1786751a6@arm.com>
-Date: Mon, 3 Feb 2025 11:34:24 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 187F73F63F;
+	Sun,  2 Feb 2025 22:38:37 -0800 (PST)
+Message-ID: <8584f5cc-70b0-46a0-9582-8d7b4d491ba6@arm.com>
+Date: Mon, 3 Feb 2025 12:08:35 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 02/11] perf: arm_pmu: Don't disable counter in
- armpmu_add()
+Subject: Re: [PATCH v19 03/11] perf: arm_pmuv3: Don't disable counter in
+ armv8pmu_enable_event()
 To: "Rob Herring (Arm)" <robh@kernel.org>, Will Deacon <will@kernel.org>,
  Mark Rutland <mark.rutland@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -39,87 +39,56 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
  kvmarm@lists.linux.dev
 References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
- <20250202-arm-brbe-v19-v19-2-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-3-1c1300802385@kernel.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250202-arm-brbe-v19-v19-2-1c1300802385@kernel.org>
+In-Reply-To: <20250202-arm-brbe-v19-v19-3-1c1300802385@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-
-
 
 On 2/3/25 06:12, Rob Herring (Arm) wrote:
 > From: Mark Rutland <mark.rutland@arm.com>
 > 
-> Currently armpmu_add() tries to handle a newly-allocated counter having
-> a stale associated event, but this should not be possible, and if this
-
-A stale associated event ? Does that mean hw_events->events[idx] still
-points to a valid event even though counter idx has already been freed
-up and allocated to a new event.
-
-> were to happen the current mitigation is insufficient and potentially
-> expensive. It would be better to warn if we encounter the impossible
-> case.
-
+> Currently armv8pmu_enable_event() starts by disabling the event counter
+> it has been asked to enable. This should not be necessary as the counter
+> (and the PMU as a whole) should not be active when
+> armv8pmu_enable_event() is called.
 Makes sense.
 
 > 
-> Calls to pmu::add() and pmu::del() are serialized by the core perf code,
-> and armpmu_del() clears the relevant slot in pmu_hw_events::events[]
-> before clearing the bit in pmu_hw_events::used_mask such that the
-> counter can be reallocated. Thus when armpmu_add() allocates a counter
-> index from pmu_hw_events::used_mask, it should not be possible to observe
-> a stale even in pmu_hw_events::events[] unless either
-> pmu_hw_events::used_mask or pmu_hw_events::events[] have been corrupted.
-> 
-> If this were to happen, we'd end up with two events with the same
-> event->hw.idx, which would clash with each other during reprogramming,
-> deletion, etc, and produce bogus results. Add a WARN_ON_ONCE() for this
-> case so that we can detect if this ever occurs in practice.
+> Remove the redundant call to armv8pmu_disable_event_counter(). At the
+> same time, remove the comment immeditately above as everything it says
 
-Agreed.
+s/immeditately/immediately
 
-> 
-> That possiblity aside, there's no need to call arm_pmu::disable(event)
+> is obvious from the function names below.
 
-s/possiblity/possibility
+But should this comment drop change be folded into the next patch which
+exclusively drops all obviously redundant disable/enable comments.
 
-> for the new event. The PMU reset code initialises the counter in a
-> disabled state, and armpmu_del() will disable the counter before it can
-> be reused. Remove the redundant disable.
 > 
 > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 > ---
->  drivers/perf/arm_pmu.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>  drivers/perf/arm_pmuv3.c | 5 -----
+>  1 file changed, 5 deletions(-)
 > 
-> diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
-> index 398cce3d76fc..2f33e69a8caf 100644
-> --- a/drivers/perf/arm_pmu.c
-> +++ b/drivers/perf/arm_pmu.c
-> @@ -342,12 +342,10 @@ armpmu_add(struct perf_event *event, int flags)
->  	if (idx < 0)
->  		return idx;
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index 9ebc950559c0..5406b9ca591a 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -795,11 +795,6 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
 >  
+>  static void armv8pmu_enable_event(struct perf_event *event)
+>  {
 > -	/*
-> -	 * If there is an event in the counter we are going to use then make
-> -	 * sure it is disabled.
+> -	 * Enable counter and interrupt, and set the counter to count
+> -	 * the event that we're interested in.
 > -	 */
-> +	/* The newly-allocated counter should be empty */
-
-Should this comment also include what happens when two events some how end
-up using the same 'event->hw.idx' as mentioned in the commit message, just
-to make things clearer.
-
-> +	WARN_ON_ONCE(hw_events->events[idx]);
-> +
->  	event->hw.idx = idx;
-> -	armpmu->disable(event);
->  	hw_events->events[idx] = event;
->  
->  	hwc->state = PERF_HES_STOPPED | PERF_HES_UPTODATE;
+> -	armv8pmu_disable_event_counter(event);
+>  	armv8pmu_write_event_type(event);
+>  	armv8pmu_enable_event_irq(event);
+>  	armv8pmu_enable_event_counter(event);
 > 
 
 Otherwise LGTM.
