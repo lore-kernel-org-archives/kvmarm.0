@@ -1,158 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC0C1D47AD;
-	Mon,  3 Feb 2025 19:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEB820FAB0
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 21:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738612251; cv=none; b=aNlNoOOp2Nm48QV7Ng6qAH/pDc7u/2pjZr+3dESH+ALzba0DGsfbRF4uqK1Qs2pHFUhFwt96SrMKcrPvI50dnvQywbsxu6mumR6DVuCBD9Pu8aR4UEKgOSzwTrMg1miPkLbHF5+WetK0sIzUCmqBkayztTsCgPWX3JzjTCIVmyA=
+	t=1738618647; cv=none; b=iXh+E65cZ2dZATeglkHADBT+K5067HXJr0S0qTY9nkCD47krpL29JV8EjXRFrEo9k2SMDH2WPJL088XNnikbVVPDZp+PY/9rFaZINREcjqlsG0fwcRpnOwlr+sQ4wQemNL5gpeBqLeyaRWQ3g3Hi7Ka3cOrCYTTWLFrJdVTOACA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738612251; c=relaxed/simple;
-	bh=XGTTmaTbuMSIUnCt/V5Tc/8kvFz5nJOKfbKLcWa9s3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MAIAIGY62r5jijzJ1M0Ux/nV4V+fDsVgt/+Koa+kz2qDj00+RAhjDZHxcNuSRehmzCsN29Eyid0sYoykcK3eGxitQt2y2ZX+BrjzIzWNqxu/OqVw5DQURbhs8T+bRuIJAUo/7IkeNLFzMO/8shM8XASgSedcs1bTmaFojPhUtAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAXZqrDi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738618647; c=relaxed/simple;
+	bh=QLnx4/Rgy7zQOoI/TasPwiI6+hjEJs/e68fuOcK9rGs=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=GfU9c5uTcbxuR7SfyLMFK0PY0JuBj8EfcjHzI2FsZLI0wTx3GyeQMvhg2qhGZDi+n5NsO0dO6vbeYspNRpz0cQ6yghhKpZwtdpQ5yq31rGnc4QjC09+doO5PL2a/QgbypG2YDnZHUXoaXUxDvT0DfnfLEv1Bw0LIZBkNd9bvHCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ElZAX9lX; arc=none smtp.client-ip=209.85.166.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAXZqrDi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0FB8C4CED2;
-	Mon,  3 Feb 2025 19:50:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738612250;
-	bh=XGTTmaTbuMSIUnCt/V5Tc/8kvFz5nJOKfbKLcWa9s3Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bAXZqrDiQryC0tZT1Jvjwk0Hug2a/rdR9Nw+kTstb0+BCXLrUOuSQbo1lVNQ2vmSi
-	 K1tImNuPQdfBlAMkQL6jOnwINQ3bYRrRJT3pqTwxAwuS8kfwiNUXlcwlhNgNOLgj11
-	 +MWeuhHdpwvVW+kzNtlI3ZE1qn26hGWUmJzyiNyyUVcp63QMwW3b+S0jmYc/5g4Ay2
-	 tte+dvrLu3DOqnqk0g8fgdWQZpfjbS2KE7wNbHASFpK8NmqSwoCxbcwqIrK4IdMg+D
-	 n8yL1s/oeiWuWMr66w06GKok5qw1gS8x8m4DJgyReEPoMOMWeR2ydjXhSHWq0NwYTs
-	 D1QGf0cmG5mpg==
-Date: Mon, 3 Feb 2025 19:50:44 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 09/18] KVM: arm64: Introduce __pkvm_vcpu_{load,put}()
-Message-ID: <5ca7588c-7bf2-4352-8661-e4a56a9cd9aa@sirena.org.uk>
-References: <20241218194059.3670226-1-qperret@google.com>
- <20241218194059.3670226-10-qperret@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ElZAX9lX"
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-844e5b72c69so774414739f.3
+        for <kvmarm@lists.linux.dev>; Mon, 03 Feb 2025 13:37:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738618645; x=1739223445; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XEqP/YEsjQP6HXPcAZ+OLL0SnqZRyU2wi8fLU4Seg48=;
+        b=ElZAX9lXipl2tpx6GPKkb/Y6PrI9RvJp6sdfIetfUJUgcvBXExj2OdYMdY3XQLYXUD
+         TlDP2i9RtR0NUpK3EsSWUv3Bwp4dtcngx6pH1LRI39aE8MYAe07/0FxfNX18Oz7LaUE7
+         J2RPFU9lAbHgsAjGgmCdi8b+G/tZP/Yg8p/TXMqoYPGY2F9ZgJ3bYvzZaJEP161QT8eO
+         aZLreYeV2nCiVJsbyLOF4TvL+49i62/G95bHVviElN81JzT+2iP1wGTOmUL3N8YtmCrc
+         Zk37VkrBN0Mc7Tcz1+z/XeqhgltuA0c5yu6iBt1EWFSDlY2NY0Gzjns5yHWd5j8sDABl
+         Ky7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738618645; x=1739223445;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XEqP/YEsjQP6HXPcAZ+OLL0SnqZRyU2wi8fLU4Seg48=;
+        b=ehjVoyLb1Xf0rGmmDLeNQXHTkpZlWTaG+1YGAbnB4lgMr5kkwcUydFRsalY0jZ0/fL
+         lhwyH2LY9UlMFrav54Sott6RdxXc0+Ro/nYFTqa69wAq5Opk25bUBRO7mC1XcjGoYd0E
+         /KQDtuZYVGZ0dSa+XY/AaSUqzuNSmlkw+xT7UHrQnoQIFqmuhKbZHAYHwJj9OqPm0qvk
+         jBDuDvXAPSmOz3xip5nuHHZqX8veFfeDHa68vcWykrdiCuhuU3tVkdc77rhEFS/5W9oL
+         TKnC9zgiwo5vtK5YOck4jNsyJe2GFF9dC/UyDUi0jaCIDeJAWIVQ1Msl7obXsl8hEy5m
+         4nlg==
+X-Forwarded-Encrypted: i=1; AJvYcCWSOnnvImuTGGcmnkPoWhPYT9+8a2Ix/O5J/+hCbYYlxl3x99BEa3W2c8DXw2etXkcsLOxw+5w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxhjCvpdgoaxPtFE2e0ijzCnEHRW/8SBKCfdDCUxsCk4Eo4fmi9
+	M40aU65O3/qxNbYFaIR1+uhnGucTeNaBroxOyn3mhTWC70qBYYXgqXYZouV8GQvk6XqsBDH1Ky0
+	EZgsRfkdtlzLU5JsRP2SqxQ==
+X-Google-Smtp-Source: AGHT+IFzEQXFVr/GsJOoiYsXrEqAdOToUP7ubJ3+EUez4554ouloGovsV2x1HVo9oXN98kh3qBpaq5S0IrbbEWoKkA==
+X-Received: from ilbby19.prod.google.com ([2002:a05:6e02:2613:b0:3cf:c127:d037])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a92:cd83:0:b0:3cf:b571:c08c with SMTP id e9e14a558f8ab-3cffe3d1bc2mr218960215ab.3.1738618645230;
+ Mon, 03 Feb 2025 13:37:25 -0800 (PST)
+Date: Mon, 03 Feb 2025 21:37:24 +0000
+In-Reply-To: <gsntzfj91fbs.fsf@coltonlewis-kvm.c.googlers.com> (message from
+ Colton Lewis on Wed, 29 Jan 2025 21:27:03 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ANfi4BZEZ3mG3n3g"
-Content-Disposition: inline
-In-Reply-To: <20241218194059.3670226-10-qperret@google.com>
-X-Cookie: Happiness is a positive cash flow.
+Mime-Version: 1.0
+Message-ID: <gsntwme61zhn.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+From: Colton Lewis <coltonlewis@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: maz@kernel.org, kvm@vger.kernel.org, linux@armlinux.org.uk, 
+	catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, pbonzini@redhat.com, shuah@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
+Colton Lewis <coltonlewis@google.com> writes:
 
---ANfi4BZEZ3mG3n3g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Marc Zyngier <maz@kernel.org> writes:
 
-On Wed, Dec 18, 2024 at 07:40:50PM +0000, Quentin Perret wrote:
-> From: Marc Zyngier <maz@kernel.org>
->=20
-> Rather than look-up the hyp vCPU on every run hypercall at EL2,
-> introduce a per-CPU 'loaded_hyp_vcpu' tracking variable which is updated
-> by a pair of load/put hypercalls called directly from
-> kvm_arch_vcpu_{load,put}() when pKVM is enabled.
+>> On Tue, 28 Jan 2025 22:08:27 +0000,
+>> Colton Lewis <coltonlewis@google.com> wrote:
 
-Current mainline crashes when running the arch_timer_edge_cases selftest
-in pKVM mode on a LibreTech Le Potato board, with a bisection pointing
-at this change.  The system dies like this:
+>>> >> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+>>> >> +
+>>> >> +	if (reserved_guest_counters > 0 && reserved_guest_counters <
+>>> pmcr_n) {
+>>> >> +		cpu_pmu->hpmn = reserved_guest_counters;
+>>> >> +		cpu_pmu->partitioned = true;
 
-# selftests: kvm: arch_timer_edge_cases
-[  130.599140] kvm [4518]: nVHE hyp panic at: [<ffff800081102b58>] __kvm_nv=
-he___vgic_v3_restore_vmcr_aprs+0x8/0x84!
-[  130.603685] kvm [4518]: Cannot dump pKVM nVHE stacktrace: !CONFIG_PROTEC=
-TED_NVHE_STACKTRACE
-[  130.611962] kvm [4518]: Hyp Offset: 0xfffeca95ed000000
-[  130.617053] Kernel panic - not syncing: HYP panic:
+>>> > Isn't this going to completely explode on a kernel running at EL1?
 
-Full log:
+>>> Trying to access an EL2 register at EL1 can do that. I'll add the
+>>> appropriate hypercalls.
 
-   https://lava.sirena.org.uk/scheduler/job/1092083
+Ooohh. Making this work at EL1 is much more complicated than adding the
+hypercall to write MDCR because once HPMN takes effect, the upper range
+of counters that the host will use is only writable at EL2. That means
+using any register related to any counter in the upper range would also
+require a hypercall. The only way around that would be to avoid using
+this feature in the host entirely and only enable it when we load a
+guest.
 
-Bisection log:
-
-git bisect start
-# status: waiting for both good and bad commits
-# bad: [2014c95afecee3e76ca4a56956a936e23283f05b] Linux 6.14-rc1
-git bisect bad 2014c95afecee3e76ca4a56956a936e23283f05b
-# status: waiting for good commit(s), bad commit known
-# good: [ffd294d346d185b70e28b1a28abe367bbfe53c04] Linux 6.13
-git bisect good ffd294d346d185b70e28b1a28abe367bbfe53c04
-# good: [6250ebe666e425e173df5e11e8a612d57921f48d] i2c: Fix core-managed pe=
-r-client debugfs handling
-git bisect good 6250ebe666e425e173df5e11e8a612d57921f48d
-# good: [647d69605c70368d54fc012fce8a43e8e5955b04] Merge tag 'pci-v6.14-cha=
-nges' of git://git.kernel.org/pub/scm/linux/kernel/git/pci/pci
-git bisect good 647d69605c70368d54fc012fce8a43e8e5955b04
-# good: [13845bdc869f136f92ad3d40ea09b867bb4ce467] Merge tag 'char-misc-6.1=
-4-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc
-git bisect good 13845bdc869f136f92ad3d40ea09b867bb4ce467
-# bad: [9f10e7fb6a06bce4f81de5fd0f2f0390f99e89e4] Merge tag 'phy-for-6.14' =
-of git://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy
-git bisect bad 9f10e7fb6a06bce4f81de5fd0f2f0390f99e89e4
-# bad: [58f504efcda54a9079a38203acc088c3354aaa60] Merge tag 'tty-6.14-rc1' =
-of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/tty
-git bisect bad 58f504efcda54a9079a38203acc088c3354aaa60
-# good: [a37eea94f775132866ecdd466fd88027d7125515] Merge tag 'sparc-for-6.1=
-4-tag1' of git://git.kernel.org/pub/scm/linux/kernel/git/alarsson/linux-spa=
-rc
-git bisect good a37eea94f775132866ecdd466fd88027d7125515
-# bad: [5e68d2eeac70978a06406c5b156815ceb00437f9] Merge branch kvm-arm64/pk=
-vm-memshare-declutter into kvmarm-master/next
-git bisect bad 5e68d2eeac70978a06406c5b156815ceb00437f9
-# bad: [d0670128d42fa170bf8ba878cd23504c5c5cccc7] Merge branch kvm-arm64/pk=
-vm-np-guest into kvmarm-master/next
-git bisect bad d0670128d42fa170bf8ba878cd23504c5c5cccc7
-# good: [c4a6ed85455979ef3fbadc2f1bdf18734b0ecea6] KVM: arm64: Promote gues=
-t ownership for DBGxVR/DBGxCR reads
-git bisect good c4a6ed85455979ef3fbadc2f1bdf18734b0ecea6
-# bad: [d0bd3e6570aee42766e7bd884734ae078667ea1e] KVM: arm64: Introduce __p=
-kvm_host_share_guest()
-git bisect bad d0bd3e6570aee42766e7bd884734ae078667ea1e
-# good: [5398ddc5c90bd418b90d859e9267aa39399021af] KVM: arm64: Pass walk fl=
-ags to kvm_pgtable_stage2_mkyoung
-git bisect good 5398ddc5c90bd418b90d859e9267aa39399021af
-# good: [c77e5181fed54b25d489eb7d2ccb5c1c72a1063c] KVM: arm64: Make kvm_pgt=
-able_stage2_init() a static inline function
-git bisect good c77e5181fed54b25d489eb7d2ccb5c1c72a1063c
-# bad: [f7d03fcbf1f482069e9afac55b17de3bd323b8f6] KVM: arm64: Introduce __p=
-kvm_vcpu_{load,put}()
-git bisect bad f7d03fcbf1f482069e9afac55b17de3bd323b8f6
-# good: [99996d575ee69d4327bad98a0148729b73dde23a] KVM: arm64: Add {get,put=
-}_pkvm_hyp_vm() helpers
-git bisect good 99996d575ee69d4327bad98a0148729b73dde23a
-# first bad commit: [f7d03fcbf1f482069e9afac55b17de3bd323b8f6] KVM: arm64: =
-Introduce __pkvm_vcpu_{load,put}()
-
---ANfi4BZEZ3mG3n3g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmehHhMACgkQJNaLcl1U
-h9DQ7Af+P8sebWSERdjUjYV29cH9b32wtbxJMRD1Dyu0ctLbCzNOmkbja6PAw6gg
-WWur9Ds0FBcbMpWutMe3tQIF6r9ZZYobChRBsdqLRjz+hIwngMxicmhhM2vvXc7t
-D4Z8ayasEqR7OjLfEHc+lnVsgYtaswDKQq0ABGSWJhEsBSnP45Z1qqslLxiqItUq
-L2+OjIgJ0R95hsceAWbBaTmOVfzFhVHkABPqDIVLE/lWTWN+I24DABPW8KdnpGE3
-L1D6Cdw2jz2Sbi1/wzs12TorVXKRUmfTPtQtcInQNSdW1RIXeFgtlEY8f2c9fexp
-1aJFPcx2HxUBLJGMrnO6kx1IwN0xdQ==
-=8hjS
------END PGP SIGNATURE-----
-
---ANfi4BZEZ3mG3n3g--
+I know we don't like feature discrepencies between VHE and nVHE mode,
+but Oliver thinks it might be justified here to have PMU partitioning be
+VHE-only.
