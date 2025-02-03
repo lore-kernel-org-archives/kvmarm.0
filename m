@@ -1,208 +1,141 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5467B1FECC7
-	for <kvmarm@lists.linux.dev>; Sun,  2 Feb 2025 23:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7EB65C;
+	Mon,  3 Feb 2025 00:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738538803; cv=none; b=Q4RP539mBfo8vSBa9hgbKmpYF8dbC1t7KTRU0oMD49VBtko8C20uCgMmdQFJfUEE257C1uAYg4mraKrxymJlxSu2mW/P5IhiKcmv6LtlWx3ePfTrLmKjmr+CyXvQPT8co73AS7R6YA/ARkC0F4JaxY2ezV0dBGQYs9blN0mKn2U=
+	t=1738543398; cv=none; b=j5sFTOxdxYrrRSBUSTH5Pq9i5hwawouk62OdPVnstdphBuXG55Ky3A4zHUFcruxvIIo4oD1BCy/mgYeD8yvev5pNCFKNc/KYU26c4hrTX7dBgoNwppDhzJR4igoCoz6psFa99kDRxkSDw9u4mAM9Ukf3fcUqcZTSQrWqIwhoqZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738538803; c=relaxed/simple;
-	bh=z7NwxIJMtLT2Cr/NLoKbJYIk4kldTFHXswm3cyHYX/Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RmdDNvlPgpyx+tFNh6wQ8JRUuEzQbsuGbFURHx+MtaarkvDHR8ahTE+3vEjmaAAyK4dtH7lETfo2r34mHQ8+5ZyGbHP2dHH+wNfxc3K5EWhxVvQoxdpkxojS6rSKuDGqqj/NTlvbrwlPjL9HchYxsYHYY+3CZRsSUn7eb7TmLoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZY2n8Tj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1738543398; c=relaxed/simple;
+	bh=GpuZv6X9a6Iwav9fDexP5CTqJHFoGKqBKJpUPFkjJQs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JxUdCzcGWqLva002N/5J6tQ6mwzrY0sW32D+6MwHeTceNKga+v8kLDROKOYqY6gl2qFpOrHNCLfJwTwfnRK8FG4JotqtWL6ANbBbPJhQYazPCwecS6OJYyVYCOCAu/ApPfdoExOF3esNCq/EkCm+HYeNUerpnTvNHeGf4Q99xXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TwN2gbFc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZY2n8Tj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738538800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kEorSgFKgFJuDrUUhtFm3PBvl23oSWqfsEHani8D+OI=;
-	b=RZY2n8TjMUIScnxBCZpiZcHESS79uoFdQYoQ0racPq7ebIhcp20DfzQ3HcsQd3H3nCct0M
-	3TSkPX3hF1OElarSTEtJbCRU2N6FyfJE21Hlvucr8e84QsdGcveSXvVB+pfScz7teKYlmD
-	niRruhCGdQPt1miFwznJLOE7RykY274=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-o3e19wVyODuzPDNHEDbcyg-1; Sun, 02 Feb 2025 18:26:39 -0500
-X-MC-Unique: o3e19wVyODuzPDNHEDbcyg-1
-X-Mimecast-MFC-AGG-ID: o3e19wVyODuzPDNHEDbcyg
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2166a1a5cc4so76343795ad.3
-        for <kvmarm@lists.linux.dev>; Sun, 02 Feb 2025 15:26:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738538798; x=1739143598;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kEorSgFKgFJuDrUUhtFm3PBvl23oSWqfsEHani8D+OI=;
-        b=MrfoOymQIokMNWHgnptEopnKu2fNROmXNXZPfQpqPQH8eAWiOQFU4X0gZEsK3O1A4r
-         EIReIzfbWFsVutqy6SVEgN8AyTp6qAR+wkEXHcsnzlsPEvTEtD18VlBRTBiLkmbnHTWa
-         d+O2j3yY/4RnRbTzQeL9xnk3YfMu6MGNwjuX1NmduslWB6aIDGfdXrOCuAMajxmNgss9
-         IFFlWGSD+ScVPbhthGTJkC90hn8/Hwal2lWOAW23SdhrNuEsimiZsVsQtEgaxd3knyv/
-         p0UZMZa9AplAdKtUo8pQ/zymjZ+oisTYd/qM7y2YeT/ZwMx5x1yDO/htEj8rGlM7BMFf
-         hn1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUSHfsM1o1DyaLkxr+aoN8HI3MwX4WGN3zV+dUvt9Y/1lrpnSmXpTLXTS6tmBDD3bo5Qx3Jh+A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzoETVuhdHPxh5QZIItrqFnLpSMILYiKRXnbT0rxNhGf6z987cg
-	OcGByDupsr2l6M+FzuobWWcDdSblwsbMqbIOpwEGSwP56DasQ5SwpbUNiSrzm+gbsfDpWXFr7lq
-	9EhpufOmX12pV6IBgLZAtZyQh4/l4BSoOIl/jbll2WD79RYoYmn+kcA==
-X-Gm-Gg: ASbGncuuzrNT9KRjV4WWlGptaZZAJ04eCwhyDUrcCk4v3TUdsmAA2ClYda7/eoaqrVi
-	tsGcuwaLgUvpyXk9vOf7ZoCV9DqLTWkXb5EzsqAkE7q88cfFyCuGjBZKkpUisjyBGLc0+YMfQ04
-	NIKYb+Ebi2njHh98Dc6UFKJ77etuv4VsVSVJ6/DxKIcTG+xNygCb1WKqc88/9oId8nh4sg77TED
-	AjlucnngjckE3B4X+tzaUHit/Nota26WnC3dW07K11JIhEgy1NbfwcNRX7miLs4wXnI2L0PGp3W
-	ZCqXJg==
-X-Received: by 2002:a17:902:cec3:b0:216:7ee9:2227 with SMTP id d9443c01a7336-21dd7dd88e6mr310304605ad.36.1738538798023;
-        Sun, 02 Feb 2025 15:26:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGfTk8xGUBI61+sXaogs4siFVAtjNe8wBT4NdlyuKENiA8v7HLfkeSD7O9+S9Z2x6jnkLdTWg==
-X-Received: by 2002:a17:902:cec3:b0:216:7ee9:2227 with SMTP id d9443c01a7336-21dd7dd88e6mr310304415ad.36.1738538797668;
-        Sun, 02 Feb 2025 15:26:37 -0800 (PST)
-Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de3303472sm63313735ad.195.2025.02.02.15.26.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Feb 2025 15:26:36 -0800 (PST)
-Message-ID: <b8b5501b-f5fd-44da-8445-53516cad8a3e@redhat.com>
-Date: Mon, 3 Feb 2025 09:26:28 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TwN2gbFc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84CA5C4CED1;
+	Mon,  3 Feb 2025 00:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738543396;
+	bh=GpuZv6X9a6Iwav9fDexP5CTqJHFoGKqBKJpUPFkjJQs=;
+	h=From:Subject:Date:To:Cc:From;
+	b=TwN2gbFcustSVQowbpDiSu3hDdQ5n7MYCaOg3+uUa6Ar/XcJBfkMu1jb2OgKVD/Q4
+	 s7BYp78utgencj8QXwYswiRUQ3IbwABey4810SZvhuV7woxFX9znp4UbvaAcco3VTg
+	 pz3iNYNj7T8fEMQdExBXZNsaJO2oBRxRMInAKx5rk8iqaTOqJeisTpaFc0dDDlECr3
+	 2wgajwRkIsUSDibsQEEI1QtBLukE5o5oK3Y79bT0Q6pxdTTBfTt+QHT9SWuxMVHPA4
+	 5enNChqZ4+ypGpoBfytmoPcqGJ3b7p+4ZVifBnlBnNh7lKl8XEx6V7rsgmfNQrM+Ai
+	 FXjKZHaTDvMiw==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Subject: [PATCH v19 00/11] arm64/perf: Enable branch stack sampling
+Date: Sun, 02 Feb 2025 18:42:54 -0600
+Message-Id: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 38/43] arm64: RME: Configure max SVE vector length for
- a Realm
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-39-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241212155610.76522-39-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: -fep1R_j-MPjuyHL21E17Td6aScciWABcJ3YFtGo__4_1738538798
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAA4RoGcC/x2MQQqAMAzAviI9W3DVCfMr4mG6qj04pQMRhn93e
+ EwgyZBYhRMMVQblW5KcsYBxdQXL7uPGKKEIoIZsY8ih1wNnnRlv45C6YINjyz21UJJLeZXn/43
+ T+34amuVzXwAAAA==
+X-Change-ID: 20250129-arm-brbe-v19-24d5d9e5e623
+To: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@linaro.org>, 
+ Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev
 
-On 12/13/24 1:56 AM, Steven Price wrote:
-> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> 
-> Obtain the max vector length configured by userspace on the vCPUs, and
-> write it into the Realm parameters. By default the vCPU is configured
-> with the max vector length reported by RMM, and userspace can reduce it
-> with a write to KVM_REG_ARM64_SVE_VLS.
-> 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->   arch/arm64/kvm/guest.c |  3 ++-
->   arch/arm64/kvm/rme.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 44 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 429c8f10b76a..5562029368c5 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -363,7 +363,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->   	if (!vcpu_has_sve(vcpu))
->   		return -ENOENT;
->   
-> -	if (kvm_arm_vcpu_sve_finalized(vcpu))
-> +	if (kvm_arm_vcpu_sve_finalized(vcpu) || kvm_realm_is_created(vcpu->kvm))
->   		return -EPERM; /* too late! */
->   
->   	if (WARN_ON(vcpu->arch.sve_state))
-> @@ -825,6 +825,7 @@ static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
->   		switch (reg->id) {
->   		case KVM_REG_ARM_PMCR_EL0:
->   		case KVM_REG_ARM_ID_AA64DFR0_EL1:
-> +		case KVM_REG_ARM64_SVE_VLS:
->   			return true;
->   		}
->   	}
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 39dbc19e4a42..3116ecee37a8 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -297,6 +297,44 @@ static void realm_unmap_shared_range(struct kvm *kvm,
->   	}
->   }
->   
-> +static int realm_init_sve_param(struct kvm *kvm, struct realm_params *params)
-> +{
-> +	int ret = 0;
-> +	unsigned long i;
-> +	struct kvm_vcpu *vcpu;
-> +	int max_vl, realm_max_vl = -1;
-> +
+This series enables perf branch stack sampling support on arm64 via a 
+v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details 
+on BRBE can be found in the Arm ARM[1] chapter D18.
 
-I would suggest to rename 'max_vl' and 'realm_max_vl' to 'vl' and 'last_vl'
-since we're not looking for the maximal VLs. Instead, we're making sure the
-VLs on all vCPUs are equal.
+I've picked up this series from Anshuman. This version has been reworked 
+quite a bit by Mark and myself. The bulk of those changes are in patch 
+11.
 
-> +	/*
-> +	 * Get the preferred SVE configuration, set by userspace with the
-> +	 * KVM_ARM_VCPU_SVE feature and KVM_REG_ARM64_SVE_VLS pseudo-register.
-> +	 */
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		mutex_lock(&vcpu->mutex);
-> +		if (vcpu_has_sve(vcpu)) {
-> +			if (!kvm_arm_vcpu_sve_finalized(vcpu))
-> +				ret = -EINVAL;
-> +			max_vl = vcpu->arch.sve_max_vl;
-> +		} else {
-> +			max_vl = 0;
-> +		}
-> +		mutex_unlock(&vcpu->mutex);
-> +		if (ret)
-> +			return ret;
-> +
-> +		/* We need all vCPUs to have the same SVE config */
-> +		if (realm_max_vl >= 0 && realm_max_vl != max_vl)
-> +			return -EINVAL;
-> +
-> +		realm_max_vl = max_vl;
-> +	}
-> +
-> +	if (realm_max_vl > 0) {
-> +		params->sve_vl = sve_vq_from_vl(realm_max_vl) - 1;
-> +		params->flags |= RMI_REALM_PARAM_FLAG_SVE;
-> +	}
-> +	return 0;
-> +}
-> +
->   static int realm_create_rd(struct kvm *kvm)
->   {
->   	struct realm *realm = &kvm->arch.realm;
-> @@ -344,6 +382,10 @@ static int realm_create_rd(struct kvm *kvm)
->   		params->flags |= RMI_REALM_PARAM_FLAG_PMU;
->   	}
->   
-> +	r = realm_init_sve_param(kvm, params);
-> +	if (r)
-> +		goto out_undelegate_tables;
-> +
->   	params_phys = virt_to_phys(params);
->   
->   	if (rmi_realm_create(rd_phys, params_phys)) {
+Patches 1-7 are new clean-ups/prep which stand on their own. They 
+were previously posted here[2]. Please pick them up if there's no issues 
+with them.
 
-Thanks,
-Gavin
+Patches 8-11 add BRBE support with the actual support in patch 11.
+
+[1] https://developer.arm.com/documentation/ddi0487/latest/
+[2] https://lore.kernel.org/all/20250107-arm-pmu-cleanups-v1-v1-0-313951346a25@kernel.org/
+
+v19:
+ - Drop saving of branch records when task scheduled out (Mark). Make 
+   sched_task() callback actually get called. Enabling requires a call 
+   to perf_sched_cb_inc(). So the saving of branch records never 
+   happened.
+ - Got rid of added armpmu ops. All BRBE support is contained within 
+   pmuv3 code.
+ - Fix freeze on overflow for VHE
+ - The cycle counter doesn't freeze BRBE on overflow, so avoid assigning
+   it when BRBE is enabled.
+ - Drop all the Arm specific exception branches. Not a clear need for
+   them.
+ - Fix handling of branch 'cycles' reading. CC field is
+   mantissa/exponent, not an integer.
+ - Rework s/w filtering to better match h/w filtering
+ - Reject events with disjoint event filter and branch filter or with 
+   exclude_host set
+ - Dropped perf test patch which has been applied for 6.14
+ - Dropped patch "KVM: arm64: Explicitly handle BRBE traps as UNDEFINED"
+   which has been applied for 6.14
+
+v18:
+ - https://lore.kernel.org/all/20240613061731.3109448-1-anshuman.khandual@arm.com/
+
+For v1-v17, see the above link. Not going to duplicate it all here...
+
+Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
+---
+Anshuman Khandual (4):
+      arm64/sysreg: Add BRBE registers and fields
+      arm64: Handle BRBE booting requirements
+      KVM: arm64: nvhe: Disable branch generation in nVHE guests
+      perf: arm_pmuv3: Add support for the Branch Record Buffer Extension (BRBE)
+
+Mark Rutland (3):
+      perf: arm_pmu: Don't disable counter in armpmu_add()
+      perf: arm_pmuv3: Don't disable counter in armv8pmu_enable_event()
+      perf: arm_pmu: Move PMUv3-specific data
+
+Rob Herring (Arm) (4):
+      perf: arm_pmuv3: Call kvm_vcpu_pmu_resync_el0() before enabling counters
+      perf: arm_v7_pmu: Drop obvious comments for enabling/disabling counters and interrupts
+      perf: arm_v7_pmu: Don't disable counter in (armv7|krait_|scorpion_)pmu_enable_event()
+      perf: apple_m1: Don't disable counter in m1_pmu_enable_event()
+
+ Documentation/arch/arm64/booting.rst |  21 +
+ arch/arm64/include/asm/el2_setup.h   |  86 +++-
+ arch/arm64/include/asm/kvm_host.h    |   2 +
+ arch/arm64/include/asm/sysreg.h      |  17 +-
+ arch/arm64/kvm/debug.c               |   4 +
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c   |  32 ++
+ arch/arm64/tools/sysreg              | 132 ++++++
+ drivers/perf/Kconfig                 |  11 +
+ drivers/perf/Makefile                |   1 +
+ drivers/perf/apple_m1_cpu_pmu.c      |   4 -
+ drivers/perf/arm_brbe.c              | 794 +++++++++++++++++++++++++++++++++++
+ drivers/perf/arm_brbe.h              |  47 +++
+ drivers/perf/arm_pmu.c               |  23 +-
+ drivers/perf/arm_pmuv3.c             |  96 ++++-
+ drivers/perf/arm_v7_pmu.c            |  50 ---
+ include/linux/perf/arm_pmu.h         |  21 +-
+ 16 files changed, 1250 insertions(+), 91 deletions(-)
+---
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+change-id: 20250129-arm-brbe-v19-24d5d9e5e623
+
+Best regards,
+-- 
+Rob Herring (Arm) <robh@kernel.org>
 
