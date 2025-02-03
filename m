@@ -1,163 +1,127 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B281552EB
-	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 05:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CE670820
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 06:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738559360; cv=none; b=tLXUMM8X82mkiuCfBjjb4HT4z6u8eboYqgon3xx46tuFKg0PxodvWK1JZ0HdBcdOv/vI06z0SsS45vl6miWvW6g/5B5ZVx3KF51xqSqNO82bBVkWB40SZ4UKYFd7Dqc25M26/LZDDvOeLVAyMPYBgMCuRrhVzQdbZGhw8x845mY=
+	t=1738562674; cv=none; b=CjT/+u3zf7JAjLOdGvoEVjCu13QPPtTfs3ziEsbDoGUJ2+kYD1U0377SuCXGa1niyPzJnpxQevu2/OtGc6k5RgZtslUm+Txrg3Lf48250bBYZmV+NmBH98Ji/tBr/P2ZpHTfhuvnecT0dOe3XBhF1mbL7p8iyc/8N4s0Ocnylxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738559360; c=relaxed/simple;
-	bh=M+7KoGPszghZ3DyIm470DO4WGLQoIT5mBtAQcXQLepw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GjdMFbGOXOCu7rKylHs4bmm86gb8dc1ay8/gjDRQJ/Pj9ruJmcvdsHDVaI0E389xfAvwtcoYebjBcx0UnMm6fImEq/ExUb5subpvY4QlD9hdwf8iWjLRvYmfKeODow8GiDb3nxCYvz+Pk8stCm/VDyVGJRqyyPydfFppdJuveOE=
+	s=arc-20240116; t=1738562674; c=relaxed/simple;
+	bh=w1IKu0BfJ+ZZ+MghaLy9rJoVvE/lYu9W/92oo9jaNXo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mQOnzVojbLXUmfsUNp3CIkN/2mnAx2h3acpo4TEG2I4lh1vBKIybB8I9kmOzTddnoXh0+1fmcoQ0I4/+pRxnKixeE5jDLZZgOPWxYvEDh5ern3CPYrygo7F5OM2pqxbt9PNuZgG56rPbErH610Y++s7QrHiWRqvz68eWluODWcY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0DE2C1476;
-	Sun,  2 Feb 2025 21:09:42 -0800 (PST)
-Received: from a077893.blr.arm.com (unknown [10.162.16.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 739803F5A1;
-	Sun,  2 Feb 2025 21:09:13 -0800 (PST)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <robh@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH V2 7/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-Date: Mon,  3 Feb 2025 10:38:28 +0530
-Message-Id: <20250203050828.1049370-8-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250203050828.1049370-1-anshuman.khandual@arm.com>
-References: <20250203050828.1049370-1-anshuman.khandual@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E39C1476;
+	Sun,  2 Feb 2025 22:04:56 -0800 (PST)
+Received: from [10.162.16.79] (unknown [10.162.16.79])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7EF0F3F63F;
+	Sun,  2 Feb 2025 22:04:27 -0800 (PST)
+Message-ID: <5bcc9ffb-62a0-4b98-9b41-9cf1786751a6@arm.com>
+Date: Mon, 3 Feb 2025 11:34:24 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 02/11] perf: arm_pmu: Don't disable counter in
+ armpmu_add()
+To: "Rob Herring (Arm)" <robh@kernel.org>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-2-1c1300802385@kernel.org>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20250202-arm-brbe-v19-v19-2-1c1300802385@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
-access from EL1 requires appropriate EL2 fine grained trap configuration
-via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
-Otherwise such register accesses will result in traps into EL2.
 
-Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
-grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
-bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
-PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
 
-Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
-based registers to be accessible in EL2.
+On 2/3/25 06:12, Rob Herring (Arm) wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
+> 
+> Currently armpmu_add() tries to handle a newly-allocated counter having
+> a stale associated event, but this should not be possible, and if this
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Tested-by: Rob Herring (Arm) <robh@kernel.org>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
----
- Documentation/arch/arm64/booting.rst | 18 ++++++++++++++++++
- arch/arm64/include/asm/el2_setup.h   | 25 +++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+A stale associated event ? Does that mean hw_events->events[idx] still
+points to a valid event even though counter idx has already been freed
+up and allocated to a new event.
 
-diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-index cad6fdc96b98..04d97a1d5ffa 100644
---- a/Documentation/arch/arm64/booting.rst
-+++ b/Documentation/arch/arm64/booting.rst
-@@ -288,6 +288,12 @@ Before jumping into the kernel, the following conditions must be met:
- 
-     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
- 
-+  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
-+
-+  - If EL3 is present and the kernel is entered at EL2:
-+
-+    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
-+
-   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
- 
-   - If EL3 is present and the kernel is entered at EL2:
-@@ -382,6 +388,18 @@ Before jumping into the kernel, the following conditions must be met:
- 
-     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
- 
-+  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
-+
-+ - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
-+    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
-+    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-+
-+    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
-+    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
-+    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-+
-   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
- 
-   - If the kernel is entered at EL1 and EL2 is present:
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 25e162651750..1a0071faf57e 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -233,6 +233,30 @@
- .Lskip_fgt_\@:
- .endm
- 
-+.macro __init_el2_fgt2
-+	mrs	x1, id_aa64mmfr0_el1
-+	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-+	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
-+	b.lt	.Lskip_fgt2_\@
-+
-+	mov	x0, xzr
-+	mrs	x1, id_aa64dfr0_el1
-+	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
-+	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
-+	b.lt	.Lskip_pmuv3p9_\@
-+
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
-+.Lskip_pmuv3p9_\@:
-+	msr_s   SYS_HDFGRTR2_EL2, x0
-+	msr_s   SYS_HDFGWTR2_EL2, x0
-+	msr_s   SYS_HFGRTR2_EL2, xzr
-+	msr_s   SYS_HFGWTR2_EL2, xzr
-+	msr_s   SYS_HFGITR2_EL2, xzr
-+.Lskip_fgt2_\@:
-+.endm
-+
- .macro __init_el2_gcs
- 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
- 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
-@@ -283,6 +307,7 @@
- 	__init_el2_nvhe_idregs
- 	__init_el2_cptr
- 	__init_el2_fgt
-+	__init_el2_fgt2
-         __init_el2_gcs
- .endm
- 
--- 
-2.25.1
+> were to happen the current mitigation is insufficient and potentially
+> expensive. It would be better to warn if we encounter the impossible
+> case.
 
+Makes sense.
+
+> 
+> Calls to pmu::add() and pmu::del() are serialized by the core perf code,
+> and armpmu_del() clears the relevant slot in pmu_hw_events::events[]
+> before clearing the bit in pmu_hw_events::used_mask such that the
+> counter can be reallocated. Thus when armpmu_add() allocates a counter
+> index from pmu_hw_events::used_mask, it should not be possible to observe
+> a stale even in pmu_hw_events::events[] unless either
+> pmu_hw_events::used_mask or pmu_hw_events::events[] have been corrupted.
+> 
+> If this were to happen, we'd end up with two events with the same
+> event->hw.idx, which would clash with each other during reprogramming,
+> deletion, etc, and produce bogus results. Add a WARN_ON_ONCE() for this
+> case so that we can detect if this ever occurs in practice.
+
+Agreed.
+
+> 
+> That possiblity aside, there's no need to call arm_pmu::disable(event)
+
+s/possiblity/possibility
+
+> for the new event. The PMU reset code initialises the counter in a
+> disabled state, and armpmu_del() will disable the counter before it can
+> be reused. Remove the redundant disable.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  drivers/perf/arm_pmu.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
+> index 398cce3d76fc..2f33e69a8caf 100644
+> --- a/drivers/perf/arm_pmu.c
+> +++ b/drivers/perf/arm_pmu.c
+> @@ -342,12 +342,10 @@ armpmu_add(struct perf_event *event, int flags)
+>  	if (idx < 0)
+>  		return idx;
+>  
+> -	/*
+> -	 * If there is an event in the counter we are going to use then make
+> -	 * sure it is disabled.
+> -	 */
+> +	/* The newly-allocated counter should be empty */
+
+Should this comment also include what happens when two events some how end
+up using the same 'event->hw.idx' as mentioned in the commit message, just
+to make things clearer.
+
+> +	WARN_ON_ONCE(hw_events->events[idx]);
+> +
+>  	event->hw.idx = idx;
+> -	armpmu->disable(event);
+>  	hw_events->events[idx] = event;
+>  
+>  	hwc->state = PERF_HES_STOPPED | PERF_HES_UPTODATE;
+> 
+
+Otherwise LGTM.
+
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
