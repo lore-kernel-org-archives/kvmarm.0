@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DF413A3F7
-	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 05:09:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9937014900B
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 05:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738559345; cv=none; b=TYQGOT05vrUSN7HsdHdSJE05w0BHP0Tm04Fdi7j2pyEBw7i/7k8+TH8fRelgGD3bEBrlQnmbfghRFqEMRoWDuiqBkW82KqkiWKBJ5dniUJN2raZQYpeNaCRkx3Oxtmt2ikFIxB7Aw5wb4fqskpYy7JvSkn5oxd1B7eP01tNt8ME=
+	t=1738559351; cv=none; b=XUzuFff8ttGe+D8spMKaRW9pg89t18MzaSH9IYHkCmVphWFMoft97L3xoqAU7kuLaTNajMezwAU0HYvabSOY0MdKa9sIgn7YjxgvBQZbZbKsah8Rppm3M/GYtFZ4plH7gSSgDFC4V62nYJgaX8kiDYfsk0GJr42FSzwMScLEvq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738559345; c=relaxed/simple;
-	bh=/znT8QcSNFaU6D45Rblq8j92/ABliCuQOw9A/91axB4=;
+	s=arc-20240116; t=1738559351; c=relaxed/simple;
+	bh=IRciW5kavsHs+WEUjqokdcD0ofxHolNdaFn7xZTjm80=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SLoud+7F8KWVx5j+TgiZWhprTQJQrXZJekSi1us2mA+EOzRD3lIDaTrdeD/ilWk2I5rFhjlFOhjzoSqb+MTPgXnIdBHJTN+xDNWT/69nLa3kyb27xaHR4OWesMcFSbyOLSOiiwRsize1qAtf03ZDVPESrmK89Dfudssp7+JeNhU=
+	 MIME-Version; b=cqhq1gsebs9WK27Zd+mltFU2NkPObhaj995scOslQDVZoNJRFi49SWLvdMRsnwHRYPfO03yk1E5sGUXmwsq+xxA7qP80ODtjJAosc+xUKAFptUk8BUkohoKeaiHftD4reRj7GznjvGU1RDYo54TLZ9mOR7NfXlj5+5QhEUpdxPI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95FC41476;
-	Sun,  2 Feb 2025 21:09:27 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 816301476;
+	Sun,  2 Feb 2025 21:09:32 -0800 (PST)
 Received: from a077893.blr.arm.com (unknown [10.162.16.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BB8623F5A1;
-	Sun,  2 Feb 2025 21:08:58 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A6D083F5A1;
+	Sun,  2 Feb 2025 21:09:03 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -34,9 +34,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH V2 4/7] arm64/sysreg: Add register fields for HFGITR2_EL2
-Date: Mon,  3 Feb 2025 10:38:25 +0530
-Message-Id: <20250203050828.1049370-5-anshuman.khandual@arm.com>
+Subject: [PATCH V2 5/7] arm64/sysreg: Add register fields for HFGRTR2_EL2
+Date: Mon,  3 Feb 2025 10:38:26 +0530
+Message-Id: <20250203050828.1049370-6-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250203050828.1049370-1-anshuman.khandual@arm.com>
 References: <20250203050828.1049370-1-anshuman.khandual@arm.com>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds register fields for HFGITR2_EL2 as per the definitions based
+This adds register fields for HFGRTR2_EL2 as per the definitions based
 on DDI0601 2024-12.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
@@ -60,26 +60,39 @@ Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/tools/sysreg | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/tools/sysreg | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index f1c366866c93..0008ff35a655 100644
+index 0008ff35a655..cae085317b8c 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -2872,6 +2872,12 @@ Field	1	AMEVCNTR00_EL0
- Field	0	AMCNTEN0
+@@ -2700,6 +2700,25 @@ Field	1	nPMIAR_EL1
+ Field	0	nPMECR_EL1
  EndSysreg
  
-+Sysreg	HFGITR2_EL2	3	4	3	1	7
-+Res0	63:2
-+Field	1	nDCCIVAPS
-+Field	0	TSBCSYNC
++Sysreg	HFGRTR2_EL2	3	4	3	1	2
++Res0	63:15
++Field	14	nACTLRALIAS_EL1
++Field	13	nACTLRMASK_EL1
++Field	12	nTCR2ALIAS_EL1
++Field	11	nTCRALIAS_EL1
++Field	10	nSCTLRALIAS2_EL1
++Field	9	nSCTLRALIAS_EL1
++Field	8	nCPACRALIAS_EL1
++Field	7	nTCR2MASK_EL1
++Field	6	nTCRMASK_EL1
++Field	5	nSCTLR2MASK_EL1
++Field	4	nSCTLRMASK_EL1
++Field	3	nCPACRMASK_EL1
++Field	2	nRCWSMASK_EL1
++Field	1	nERXGSR_EL1
++Field	0	nPFAR_EL1
 +EndSysreg
 +
- Sysreg	ZCR_EL2	3	4	1	2	0
- Fields	ZCR_ELx
- EndSysreg
+ Sysreg HDFGRTR_EL2	3	4	3	1	4
+ Field	63	PMBIDR_EL1
+ Field	62	nPMSNEVFR_EL1
 -- 
 2.25.1
 
