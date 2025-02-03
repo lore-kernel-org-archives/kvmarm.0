@@ -1,25 +1,64 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA9B201012;
-	Mon,  3 Feb 2025 11:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84A6202F67
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 11:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738581492; cv=none; b=RLnAexRPSND9+9P6xZe624b9KhowA8K858I3T+24zVmVljHrTWe3ldLrGdesLo65Afuut6PP6/Uk5x8TJ5Nk4cwWI2sT4dekLohJKV1wR5xtFS/Md1cRtNZDGAiR1b9LKjfhpxeF+eH/NTb0IHqLlySrTewRCPJxfw1KnNaRgqA=
+	t=1738582129; cv=none; b=K7P6dkISUx3WUyXReVCD6m4hmWdyKi2ALStoWXenUU7zQQcUMZ8rg6OfB8nnMwd+fj61LKC1pqWi2eO1CJ236vDn1HlkiHPt9zmoMuSPTHgeus0eW1OeBF1y2LdnEse4Z22hDUx5kRq8XhNDYXMKVDnqgx+Un1G0F5dsc901cTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738581492; c=relaxed/simple;
-	bh=Q0vtxORNYakjV7JbkbI4UxGVRUQsNGTkfnbh8NdEeD8=;
+	s=arc-20240116; t=1738582129; c=relaxed/simple;
+	bh=/K5N3VJS4zbstl2ynRET37Jk72zu8/TikndeVhgoKOE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=doLpyYSKPg+22qsBv6Csm4RlliUEipl7RvFSY7t86qz/WG0IoglKvxFd2FekiX52dHsl6BpZjlZhMVGgJmV11HnguCgZhSy6QmUWiqSqrc+DBYOJUMXXIIPUMij6FNS1H7QcjQiOlKmA4KJrYOaapWGe7V9xjJhqGWPyffXyWIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4EA5811FB;
-	Mon,  3 Feb 2025 03:18:34 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 457093F58B;
-	Mon,  3 Feb 2025 03:18:07 -0800 (PST)
-Message-ID: <d499c3e7-cc0f-467a-8401-bc53b70259f7@arm.com>
-Date: Mon, 3 Feb 2025 11:18:06 +0000
+	 In-Reply-To:Content-Type; b=FwFa9psFlwO2SnitG9QedMJ4YcoM6Dt8CsdAwPwNQQq9TkKUj2QeV0qBPWu/2bUqiW2pF1iM3McyI4fc/g1NpDOSkdwry8z4K/MQUZZOiQr29KYJi5nJGwFDI3GMutGxl2SQu639+DN4MlkzLvLIX7uoExg2cApcHn1+SrG77LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=c4lssNts; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c4lssNts"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43626213fffso32611915e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 03 Feb 2025 03:28:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1738582126; x=1739186926; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=03gUTOPYMxUMcZhmVIjGAOR45IAzZBtmIXb7cPKWi+Y=;
+        b=c4lssNts1QQGLOJM0qMmZonFfCWoSoizPs/7RIut8z7l7fQc3+obd3DYqw05L4nrMT
+         igCDnpJJk/lYcR5sRsDWClMI9fR3hLzu6fS7ALEeAM1O37UshZZ8mZyxA1jX+K5icylu
+         VXeh381X3QTOxTqH9UPe4dz7VverjSAK7ljGjCBs7GwlSJdkOR41rRaTuHwcDC7gI/5z
+         a7rPy+/mgtATrE+DF4bNIPLmZaoe/oa34IckepTUbcVwPaFcCCczviPzbtTiKXDlKM0+
+         sWvfdmFrHQ0kOe7t7Idp4U8IRQcO9yiUPSQhazYuIKCAF3oKZbjRUIWJOz23xb3yCNqU
+         0b7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738582126; x=1739186926;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=03gUTOPYMxUMcZhmVIjGAOR45IAzZBtmIXb7cPKWi+Y=;
+        b=DksCLwrmwDIK/ITbPSCScvnFM44y4poja0SJOvpcuIAYvh4XLjbGNUmwk/w8AWK/yO
+         w/Ge1vbouvaiXFbktTYeRfx7+hL+V8Up/KLVT5QNHJEcNb0vVjo8aqL+ymLGUV2wNoEm
+         Hcdj3R95W7Iif8yd0s20k+arbdoCfCIBDEx58ILR7AQP/b+BXgygrJpRevF4JnFZqC/j
+         9G9EdpOKjVj4LJ5orxC1FK2MyFEyRNMxBcx6b5OA+qoK2M5UVYNDeGyLSFSqq6F+7ciH
+         AkT0K105BYBh4LKnmmj1096VhSMcV8lTK2fdQOQKswwYWJnye0G2VODqEiU/20C2N2NK
+         WRAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVfAWg2Wnm2kVzA2BrBKf80AKYfwqmdp/eDA4eW7bhA3Hydzp3WV/uUJ7XkSZ9TD/gHthXDp+g=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx5HMXIH/PQtdXKCMai3ADgJatsojnTVMlhRxLNHsYti1P21yea
+	5Knf7PKbQOIqB5zY5cNAwAYBJI+zNvb28zkUbUFoP6R8MC2VoPkTdvhaQ0PxvtQ=
+X-Gm-Gg: ASbGncvxGCXvZLdwp//FYAWWCO1s1b9w/ezqBgClVAt1e52J9vF/DX8o1anbysr6rlA
+	ezaCogyhe/nc6qm09qxTOVRhI9gfNUKBUD80ZzhGNQl4pryfdFX+tRyHZny/FIHMCsHY39ogMYq
+	8YF2ocKKBekUuvFCVmLq91Qn7VWUtZRpFXZh81vi0IOBBxNg3V66r9heT407Prg84XCjZzOHjDv
+	u3s3JMAwGRNYF5PkkSwovzDWIFGt2rO3zEBHnmEhCLr5K8A8L7SUxyR0z2Ki//hjt5+4Kg+hjKz
+	h6ecoCc7rkhv5CVcBMJM+U6Idw==
+X-Google-Smtp-Source: AGHT+IGzdk+Sqe63Mv9Bm/BPmdRTVGijSJCqG2+aE5exrBjEFpqR+uegx/hrDwI77yjfzrbFRZf6LQ==
+X-Received: by 2002:a05:600c:1e08:b0:438:e521:1a4d with SMTP id 5b1f17b1804b1-438e52122eamr113014465e9.5.1738582126037;
+        Mon, 03 Feb 2025 03:28:46 -0800 (PST)
+Received: from [192.168.68.163] ([145.224.90.107])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc81911sm185351695e9.38.2025.02.03.03.28.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 03:28:45 -0800 (PST)
+Message-ID: <4aaaa1de-ec5d-433b-96c2-3b28a8cffe7e@linaro.org>
+Date: Mon, 3 Feb 2025 11:28:44 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,205 +66,76 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
-To: Steven Price <steven.price@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-13-steven.price@arm.com>
- <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
- <9174bc24-6217-4663-a370-291d4790a212@arm.com>
+Subject: Re: [PATCH v19 10/11] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>
+References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-10-1c1300802385@kernel.org>
 Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <9174bc24-6217-4663-a370-291d4790a212@arm.com>
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20250202-arm-brbe-v19-v19-10-1c1300802385@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 30/01/2025 16:40, Steven Price wrote:
-> On 29/01/2025 04:50, Gavin Shan wrote:
->> On 12/13/24 1:55 AM, Steven Price wrote:
->>> The RMM maintains a data structure known as the Realm Execution Context
->>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
->>> virtual CPUs. KVM must delegate memory and request the structures are
->>> created when vCPUs are created, and suitably tear down on destruction.
->>>
->>> RECs must also be supplied with addition pages - auxiliary (or AUX)
->>> granules - for storing the larger registers state (e.g. for SVE). The
->>> number of AUX granules for a REC depends on the parameters with which
->>> the Realm was created - the RMM makes this information available via the
->>> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
->>> (RD).
->>>
->>> Note that only some of register state for the REC can be set by KVM, the
->>> rest is defined by the RMM (zeroed). The register state then cannot be
->>> changed by KVM after the REC is created (except when the guest
->>> explicitly requests this e.g. by performing a PSCI call). The RMM also
->>> requires that the VMM creates RECs in ascending order of the MPIDR.
->>>
->>> See Realm Management Monitor specification (DEN0137) for more
->>> information:
->>> https://developer.arm.com/documentation/den0137/
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>> Changes since v5:
->>>    * Separate the concept of vcpu_is_rec() and
->>>      kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
->>>      the indication that the VCPU is a REC.
->>> Changes since v2:
->>>    * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
->>> patches.
->>> ---
->>>    arch/arm64/include/asm/kvm_emulate.h |   7 ++
->>>    arch/arm64/include/asm/kvm_host.h    |   3 +
->>>    arch/arm64/include/asm/kvm_rme.h     |  18 ++++
->>>    arch/arm64/kvm/arm.c                 |   9 ++
->>>    arch/arm64/kvm/reset.c               |  11 ++
->>>    arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
->>>    6 files changed, 192 insertions(+)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
->>> include/asm/kvm_emulate.h
->>> index 27f54a7778aa..ec2b6d9c9c07 100644
->>> --- a/arch/arm64/include/asm/kvm_emulate.h
->>> +++ b/arch/arm64/include/asm/kvm_emulate.h
->>> @@ -722,7 +722,14 @@ static inline bool kvm_realm_is_created(struct
->>> kvm *kvm)
->>>      static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->>>    {
->>> +    if (static_branch_unlikely(&kvm_rme_is_available))
->>> +        return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
->>>        return false;
->>>    }
->>>    
->>
->> It seems the check on kvm_rme_is_available is unnecessary because
->> KVM_ARM_VCPU_REC
->> is possible to be true only when kvm_rme_is_available is true.
-> 
-> Similar to a previous patch - the check of the static key is to avoid
-> overhead on systems without RME.
-> 
->>> +static inline bool kvm_arm_vcpu_rec_finalized(struct kvm_vcpu *vcpu)
->>> +{
->>> +    return vcpu->arch.rec.mpidr != INVALID_HWID;
->>> +}
->>> +
->>>    #endif /* __ARM64_KVM_EMULATE_H__ */
->>
->> I would suggest to rename to kvm_arm_rec_finalized() since vCPU and REC are
->> similar objects at the same level. It'd better to avoid duplicate object
->> name reference in the function name.
-> 
-> Ack
-> 
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
->>> asm/kvm_host.h
->>> index 8482638dce3b..220195c727ef 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -789,6 +789,9 @@ struct kvm_vcpu_arch {
->>>          /* Per-vcpu CCSIDR override or NULL */
->>>        u32 *ccsidr;
->>> +
->>> +    /* Realm meta data */
->>> +    struct realm_rec rec;
->>>    };
->>>      /*
->>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
->>> asm/kvm_rme.h
->>> index 32bdedf1d866..62d4a63d3035 100644
->>> --- a/arch/arm64/include/asm/kvm_rme.h
->>> +++ b/arch/arm64/include/asm/kvm_rme.h
->>> @@ -6,6 +6,7 @@
->>>    #ifndef __ASM_KVM_RME_H
->>>    #define __ASM_KVM_RME_H
->>>    +#include <asm/rmi_smc.h>
->>>    #include <uapi/linux/kvm.h>
->>>      /**
->>> @@ -65,6 +66,21 @@ struct realm {
->>>        unsigned int ia_bits;
->>>    };
->>>    +/**
->>> + * struct realm_rec - Additional per VCPU data for a Realm
->>> + *
->>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
->>> this VCPU
->>> + * @rec_page: Kernel VA of the RMM's private page for this REC
->>> + * @aux_pages: Additional pages private to the RMM for this REC
->>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
->>> + */
->>> +struct realm_rec {
->>> +    unsigned long mpidr;
->>> +    void *rec_page;
->>> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
->>> +    struct rec_run *run;
->>> +};
->>> +
->>>    void kvm_init_rme(void);
->>>    u32 kvm_realm_ipa_limit(void);
->>>    @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
->>> kvm_enable_cap *cap);
->>>    int kvm_init_realm_vm(struct kvm *kvm);
->>>    void kvm_destroy_realm(struct kvm *kvm);
->>>    void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
->>> +int kvm_create_rec(struct kvm_vcpu *vcpu);
->>> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>>      #define RMM_RTT_BLOCK_LEVEL    2
->>>    #define RMM_RTT_MAX_LEVEL    3
->>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>> index 73016e1e0067..2d97147651be 100644
->>> --- a/arch/arm64/kvm/arm.c
->>> +++ b/arch/arm64/kvm/arm.c
->>> @@ -525,6 +525,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>>        /* Force users to call KVM_ARM_VCPU_INIT */
->>>        vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->>>    +    vcpu->arch.rec.mpidr = INVALID_HWID;
->>> +
->>>        vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->>>          /* Set up the timer */
->>> @@ -1467,6 +1469,9 @@ static unsigned long
->>> system_supported_vcpu_features(void)
->>>        if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
->>>            clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
->>>    +    if (!static_branch_unlikely(&kvm_rme_is_available))
->>> +        clear_bit(KVM_ARM_VCPU_REC, &features);
->>> +
->>>        return features;
->>>    }
->>>    @@ -1506,6 +1511,10 @@ static int
->>> kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->>>        if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
->>>            return -EINVAL;
->>>    +    /* RME is incompatible with AArch32 */
->>> +    if (test_bit(KVM_ARM_VCPU_REC, &features))
->>> +        return -EINVAL;
->>> +
->>>        return 0;
->>>    }
->>>    
->>
->> One corner case seems missed in kvm_vcpu_init_check_features(). It's
->> allowed to
->> initialize a vCPU with REC feature even kvm_is_realm(kvm) is false.
->> Hopefully,
->> I didn't miss something.
-> 
-> Ah, yes good point. I'll pass a kvm pointer to
-> kvm_vcpu_init_check_features() and use kvm_is_realm() in there.
 
-nit: kvm is available from the VCPU via vcpu->kvm
 
-Cheers
-Suzuki
+On 03/02/2025 12:43 am, Rob Herring (Arm) wrote:
+> From: Anshuman Khandual <anshuman.khandual@arm.com>
+> 
+> While BRBE can record branches within guests, the host recording
+> branches in guests is not supported by perf. Therefore, BRBE needs to be
+> disabled on guest entry and restored on exit.
 
+I don't think this is strictly true. You only need a Perf session in the 
+guest to records sideband events. That allows you to make sense of the 
+userspace addresses, but by then you might as well record BRBE in the 
+guest in the first place. See [1] for an example.
+
+With kernel addresses it might be even easier as all you need is 
+--guestvmlinux, --guestkallsyms etc and no sideband events.
+
+[1]: 
+https://lore.kernel.org/all/20220711093218.10967-25-adrian.hunter@intel.com/
+
+> 
+> For nVHE, this requires explicit handling for guests. Before
+> entering a guest, save the BRBE state and disable the it. When
+> returning to the host, restore the state.
+> 
+> For VHE, it is not necessary. We initialize
+> BRBCR_EL1.{E1BRE,E0BRE}=={0,0} at boot time, and HCR_EL2.TGE==1 while
+> running in the host. We configure BRBCR_EL2.{E2BRE,E0HBRE} to enable
+> branch recording in the host. When entering the guest, we set
+> HCR_EL2.TGE==0 which means BRBCR_EL1 is used instead of BRBCR_EL2.
+> Consequently for VHE, BRBE recording is disabled at EL1 and EL0 when
+> running a guest.
+> 
+> Should recording in guests (by the host) ever be desired, the perf ABI
+> will need to be extended to distinguish guest addresses (struct
+> perf_branch_entry.priv) for starters. 
+
+There's already this which would be enough (if every entry in the branch 
+buffer matches it):
+
+   sample->cpumode == PERF_RECORD_MISC_GUEST_KERNEL
+   sample->cpumode == PERF_RECORD_MISC_GUEST_USER
+
+But I don't think we need all the extra complexity. Just let the guest 
+use all of BRBE and then there isn't really a use case that's not 
+supported. I assume a lot of these workflows were added for trace 
+because it's not supported in guests, but I don't think that applies to 
+BRBE so we can skip them and go straight to full BRBE in guest support. 
+As a later change obviously, these comments are more about the commit 
+message.
+
+James
 
