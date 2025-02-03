@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C903918641;
-	Mon,  3 Feb 2025 00:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D262C187;
+	Mon,  3 Feb 2025 00:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738543400; cv=none; b=awL3NTQD/b0g/P5ch1YGUcLSpA23Z61L18es65wovNWJza38WH1D5tQ6deCZtHfrNz//8I1OLqwFBywPVYD7tkYF0NunnTNIYlD486P9ba1OWfoRtYKtL0G7mG+CWUVa8AdiVDzMCiRC2+Zn7OG+vckSYp2AjeVu/5Y4jGEBIjQ=
+	t=1738543402; cv=none; b=ZYVL1vz+Qvl5RXwaSNKqGo0LTVBrXbrBC1VOUwzfqtZuqKEaPcZbiRFH3A+au+BpYSClPs4+FfHa7nlbruQ2eJDvUF02GjtAjUBUZEToEqXOy9XYFF8bnymL578nLdBcWMc0AxT5FanhThsjp5UTCmCMZ9BTgFaInY7VpKNV9wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738543400; c=relaxed/simple;
-	bh=jvbfAk+0Ldh4PLsv8Iq6CECrB3n0Uk9q6M/nTuRd/kM=;
+	s=arc-20240116; t=1738543402; c=relaxed/simple;
+	bh=hL4f+39bFU/TAP2cUriOWdCrZC1hK76nhw254DfXqIc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aocXiZtYcpnTBNRbtGIkQlVc0vLVe6aNCmf/wmbqHXMuLeq64zc3kLWs1aOPXp2kOl0ufm9nm8Qe5eHlatJzbwFvA8PUgz45mJwkzPgqZL1p1cM5bOd4oEXYJZnNOkQr6PwVoMW2/dnv9FCNCGRjlytaob8Y8CR6FzdbombxRtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajlOswMX; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=DQKQsys8LlL4a/Ei8rbvq2TPt9waZXlJHK0SdqPRqNJj18Hlg+proV42eaniXUAtIKu5hvhvCTjLgWuCNrw17nQIMuTmCf6m42uahKcpWqicW9+qFm4CUp6wTvokhdNBOlEcNlqE4TJm8kDU3Ey1aF6f20BCY3eqs/4inJVqE7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F01lE8v4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajlOswMX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6B9C4CED1;
-	Mon,  3 Feb 2025 00:43:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F01lE8v4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 927BBC4CEE4;
+	Mon,  3 Feb 2025 00:43:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738543400;
-	bh=jvbfAk+0Ldh4PLsv8Iq6CECrB3n0Uk9q6M/nTuRd/kM=;
+	s=k20201202; t=1738543401;
+	bh=hL4f+39bFU/TAP2cUriOWdCrZC1hK76nhw254DfXqIc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ajlOswMXmnYE9z7rDc+ppz8gD0EiXYJi+ikMR+9Wi+XGSfoUXhYsCXDkwJSkv95KO
-	 FABzbHHYk9QagiafbYfh8V+7lQaUBps3mJBUfggsayMFE4grlodzfx5Sx0EyLGyzzE
-	 B+3MCZO9ZqKwh+qLUjvTExSliqHFAhimUiZIL8p/7lvpTrDZ1tXKBosNHX6bgUFl9/
-	 pwuRRYxHyXGEl72bGXcZwtnlJ9w671AFkFil9l3dJ9bYjGtc0XG65imZTyvoBgyDFT
-	 ou4DJG00WhY5cg63mJu0LfObqUSmhk+HDjLx90U/xlH16pGujfPW+8QqV7dc29AUpR
-	 LZ/zJ3I49mTfQ==
+	b=F01lE8v49YhXEBYpLYUpEr2BoB2gLc1++0P10dPiCFD7g9dDpq9gHtI0gGxmq1igE
+	 mMik0x7uqdc8VWRE+ECksRqEkGk/mH1XlcKY3pYeyD9Y0gYC0YPLXDtoEfi8vuWFgK
+	 j8UUUrCkjuEEbiruLsq3ALFPIN9daTdiv+n7n1QefvaL5Y2KuUDNsdDEFtSSdUKnxJ
+	 WcKrZ5MpRmIt8yYYx+8IciFVbZbpolLQOblj5U2eg177dboUPbO066fPfXqN9DwAx7
+	 ZFVIy6chz16ML/+i8RF+Pwq+xJM52Uicl6YE3YqaUFeqTlhhNA3zaIC0t/h3+brq2+
+	 57cGYVwRyK5+A==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Date: Sun, 02 Feb 2025 18:42:56 -0600
-Subject: [PATCH v19 02/11] perf: arm_pmu: Don't disable counter in
- armpmu_add()
+Date: Sun, 02 Feb 2025 18:42:57 -0600
+Subject: [PATCH v19 03/11] perf: arm_pmuv3: Don't disable counter in
+ armv8pmu_enable_event()
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250202-arm-brbe-v19-v19-2-1c1300802385@kernel.org>
+Message-Id: <20250202-arm-brbe-v19-v19-3-1c1300802385@kernel.org>
 References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
 In-Reply-To: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
 To: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
@@ -54,56 +54,37 @@ X-Mailer: b4 0.15-dev
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-Currently armpmu_add() tries to handle a newly-allocated counter having
-a stale associated event, but this should not be possible, and if this
-were to happen the current mitigation is insufficient and potentially
-expensive. It would be better to warn if we encounter the impossible
-case.
+Currently armv8pmu_enable_event() starts by disabling the event counter
+it has been asked to enable. This should not be necessary as the counter
+(and the PMU as a whole) should not be active when
+armv8pmu_enable_event() is called.
 
-Calls to pmu::add() and pmu::del() are serialized by the core perf code,
-and armpmu_del() clears the relevant slot in pmu_hw_events::events[]
-before clearing the bit in pmu_hw_events::used_mask such that the
-counter can be reallocated. Thus when armpmu_add() allocates a counter
-index from pmu_hw_events::used_mask, it should not be possible to observe
-a stale even in pmu_hw_events::events[] unless either
-pmu_hw_events::used_mask or pmu_hw_events::events[] have been corrupted.
-
-If this were to happen, we'd end up with two events with the same
-event->hw.idx, which would clash with each other during reprogramming,
-deletion, etc, and produce bogus results. Add a WARN_ON_ONCE() for this
-case so that we can detect if this ever occurs in practice.
-
-That possiblity aside, there's no need to call arm_pmu::disable(event)
-for the new event. The PMU reset code initialises the counter in a
-disabled state, and armpmu_del() will disable the counter before it can
-be reused. Remove the redundant disable.
+Remove the redundant call to armv8pmu_disable_event_counter(). At the
+same time, remove the comment immeditately above as everything it says
+is obvious from the function names below.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- drivers/perf/arm_pmu.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ drivers/perf/arm_pmuv3.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
-index 398cce3d76fc..2f33e69a8caf 100644
---- a/drivers/perf/arm_pmu.c
-+++ b/drivers/perf/arm_pmu.c
-@@ -342,12 +342,10 @@ armpmu_add(struct perf_event *event, int flags)
- 	if (idx < 0)
- 		return idx;
+diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+index 9ebc950559c0..5406b9ca591a 100644
+--- a/drivers/perf/arm_pmuv3.c
++++ b/drivers/perf/arm_pmuv3.c
+@@ -795,11 +795,6 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
  
+ static void armv8pmu_enable_event(struct perf_event *event)
+ {
 -	/*
--	 * If there is an event in the counter we are going to use then make
--	 * sure it is disabled.
+-	 * Enable counter and interrupt, and set the counter to count
+-	 * the event that we're interested in.
 -	 */
-+	/* The newly-allocated counter should be empty */
-+	WARN_ON_ONCE(hw_events->events[idx]);
-+
- 	event->hw.idx = idx;
--	armpmu->disable(event);
- 	hw_events->events[idx] = event;
- 
- 	hwc->state = PERF_HES_STOPPED | PERF_HES_UPTODATE;
+-	armv8pmu_disable_event_counter(event);
+ 	armv8pmu_write_event_type(event);
+ 	armv8pmu_enable_event_irq(event);
+ 	armv8pmu_enable_event_counter(event);
 
 -- 
 2.47.2
