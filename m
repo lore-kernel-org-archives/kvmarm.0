@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33FC70821
-	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 04:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85841CAA4
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 04:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738555668; cv=none; b=A5Jsr2rr3eCvbt/9XHyBpe/4tu+Ml7Lv+zwGf7oHryLMJa+bLy4Hlo68/ke1KaEucUdMKM7F8q1EkBHIl/RSea7XSD1mQGKIPaxsJq97dXUZJCicaat4ZvhWCOmETEv4126ovafxq8zJBeby0lO+PXY2MODMQEdzVs7K+rJyZjM=
+	t=1738555752; cv=none; b=nA2DTUOdD5mvXTguw7IE8pkwNVz6OJubNTVucPuY13mrFBWwHYHjRcQxACg0Mb9JV8g0nRBVA0v1udxf9e3cGeiLOE0Zc49/f6ALjRREPsbQRtMw5qpC5GN7T5ygPKf1OdG/CdnI/6cPSU3sbEHuwjhu2RIEEG12zfWdu2SdkXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738555668; c=relaxed/simple;
-	bh=WiErfKDTIO2GUE6Pb3PkwOPEVJSvmC7PZ0BfyEI2FZ0=;
+	s=arc-20240116; t=1738555752; c=relaxed/simple;
+	bh=bcoMa0eQAZoK/33F8YMVPfn9OeW6T5JHkl52a2h2hz4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lRZcwlrpJewjbWm8EwFw5hx80tDt7QcurBCFmyjkfVbFkMqPBWOLPFTZIg0+jIcBRjEqIvoHvUAUS+t5vbtrfrUQZxmp29ZqXfxZ9P4o6BNjnZw1NLGQRIclqzICcNXPK+gAtp4nDFAXykmGFPdTZUPiaE988YAWuZ2Vv+CSvSg=
+	 In-Reply-To:Content-Type; b=i1AZCK2OZA7CEmHMmdTQymw7QzCSuuZ8S6ORXhgYpkHKHdJjjoPxbPo9TL0i4liE5xF+JO5Dsmeh14bnOzYE5LcPMDHWlxcT8jNdqX8D57KS/MBAUsZ4tm9EzZODj8xzqv+wbR0ELagpo5MtN5BnzSIX8723GFXMgsBLogCVDSA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A751A1476;
-	Sun,  2 Feb 2025 20:08:03 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C81F61476;
+	Sun,  2 Feb 2025 20:09:34 -0800 (PST)
 Received: from [10.162.16.79] (unknown [10.162.16.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C29863F63F;
-	Sun,  2 Feb 2025 20:07:34 -0800 (PST)
-Message-ID: <1910b0da-68fe-4161-b7bb-f0d5ac8d5fe7@arm.com>
-Date: Mon, 3 Feb 2025 09:37:31 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E58D23F63F;
+	Sun,  2 Feb 2025 20:09:05 -0800 (PST)
+Message-ID: <b5257952-1968-4eb3-8969-e6e3fcb5efdd@arm.com>
+Date: Mon, 3 Feb 2025 09:39:02 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 01/11] perf: arm_pmuv3: Call kvm_vcpu_pmu_resync_el0()
- before enabling counters
+Subject: Re: [PATCH v19 04/11] perf: arm_v7_pmu: Drop obvious comments for
+ enabling/disabling counters and interrupts
 To: "Rob Herring (Arm)" <robh@kernel.org>, Will Deacon <will@kernel.org>,
  Mark Rutland <mark.rutland@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -39,42 +39,126 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
  kvmarm@lists.linux.dev
 References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
- <20250202-arm-brbe-v19-v19-1-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-4-1c1300802385@kernel.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250202-arm-brbe-v19-v19-1-1c1300802385@kernel.org>
+In-Reply-To: <20250202-arm-brbe-v19-v19-4-1c1300802385@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
 On 2/3/25 06:12, Rob Herring (Arm) wrote:
-> Counting events related to setup of the PMU is not desired, but
-> kvm_vcpu_pmu_resync_el0() is called just after the PMU counters have
-> been enabled. Move the call to before enabling the counters.
+> The function calls for enabling/disabling counters and interrupts are
+> pretty obvious as to what they are doing, and the comments don't add
+> any additional value.
 > 
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 > ---
->  drivers/perf/arm_pmuv3.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/perf/arm_v7_pmu.c | 44 --------------------------------------------
+>  1 file changed, 44 deletions(-)
 > 
-> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index 0e360feb3432..9ebc950559c0 100644
-> --- a/drivers/perf/arm_pmuv3.c
-> +++ b/drivers/perf/arm_pmuv3.c
-> @@ -825,10 +825,10 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
->  	else
->  		armv8pmu_disable_user_access();
+> diff --git a/drivers/perf/arm_v7_pmu.c b/drivers/perf/arm_v7_pmu.c
+> index 420cadd108e7..7fa88e3b64e0 100644
+> --- a/drivers/perf/arm_v7_pmu.c
+> +++ b/drivers/perf/arm_v7_pmu.c
+> @@ -857,14 +857,6 @@ static void armv7pmu_enable_event(struct perf_event *event)
+>  		return;
+>  	}
 >  
-> +	kvm_vcpu_pmu_resync_el0();
-> +
->  	/* Enable all counters */
->  	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+> -	/*
+> -	 * Enable counter and interrupt, and set the counter to count
+> -	 * the event that we're interested in.
+> -	 */
 > -
-> -	kvm_vcpu_pmu_resync_el0();
+> -	/*
+> -	 * Disable counter
+> -	 */
+>  	armv7_pmnc_disable_counter(idx);
+>  
+>  	/*
+> @@ -875,14 +867,7 @@ static void armv7pmu_enable_event(struct perf_event *event)
+>  	if (cpu_pmu->set_event_filter || idx != ARMV7_IDX_CYCLE_COUNTER)
+>  		armv7_pmnc_write_evtsel(idx, hwc->config_base);
+>  
+> -	/*
+> -	 * Enable interrupt for this counter
+> -	 */
+>  	armv7_pmnc_enable_intens(idx);
+> -
+> -	/*
+> -	 * Enable counter
+> -	 */
+>  	armv7_pmnc_enable_counter(idx);
 >  }
 >  
->  static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
+> @@ -898,18 +883,7 @@ static void armv7pmu_disable_event(struct perf_event *event)
+>  		return;
+>  	}
+>  
+> -	/*
+> -	 * Disable counter and interrupt
+> -	 */
+> -
+> -	/*
+> -	 * Disable counter
+> -	 */
+>  	armv7_pmnc_disable_counter(idx);
+> -
+> -	/*
+> -	 * Disable interrupt for this counter
+> -	 */
+>  	armv7_pmnc_disable_intens(idx);
+>  }
+>  
+> @@ -1476,12 +1450,6 @@ static void krait_pmu_enable_event(struct perf_event *event)
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	int idx = hwc->idx;
+>  
+> -	/*
+> -	 * Enable counter and interrupt, and set the counter to count
+> -	 * the event that we're interested in.
+> -	 */
+> -
+> -	/* Disable counter */
+>  	armv7_pmnc_disable_counter(idx);
+>  
+>  	/*
+> @@ -1494,10 +1462,7 @@ static void krait_pmu_enable_event(struct perf_event *event)
+>  	else
+>  		armv7_pmnc_write_evtsel(idx, hwc->config_base);
+>  
+> -	/* Enable interrupt for this counter */
+>  	armv7_pmnc_enable_intens(idx);
+> -
+> -	/* Enable counter */
+>  	armv7_pmnc_enable_counter(idx);
+>  }
+>  
+> @@ -1797,12 +1762,6 @@ static void scorpion_pmu_enable_event(struct perf_event *event)
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	int idx = hwc->idx;
+>  
+> -	/*
+> -	 * Enable counter and interrupt, and set the counter to count
+> -	 * the event that we're interested in.
+> -	 */
+> -
+> -	/* Disable counter */
+>  	armv7_pmnc_disable_counter(idx);
+>  
+>  	/*
+> @@ -1815,10 +1774,7 @@ static void scorpion_pmu_enable_event(struct perf_event *event)
+>  	else if (idx != ARMV7_IDX_CYCLE_COUNTER)
+>  		armv7_pmnc_write_evtsel(idx, hwc->config_base);
+>  
+> -	/* Enable interrupt for this counter */
+>  	armv7_pmnc_enable_intens(idx);
+> -
+> -	/* Enable counter */
+>  	armv7_pmnc_enable_counter(idx);
+>  }
+>  
 > 
 
 Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
