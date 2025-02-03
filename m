@@ -1,134 +1,158 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5647820E039
-	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 18:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC0C1D47AD;
+	Mon,  3 Feb 2025 19:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738607577; cv=none; b=tCy9mHwMXoIbdBSZM2zg06iw1Cm3heCqy892WHHMoZwZPGzDMCuPUqjhDu+VKPwqliv/oPBdR6f4twaJmvINfToCvq8fDA6+ssSxBbeb+FGB5Ujee8E1FZA/hLG4W6CVPrNLcp6w+mOnkCgJEm00sqSV7hE0Sp64K3u//BP6UWo=
+	t=1738612251; cv=none; b=aNlNoOOp2Nm48QV7Ng6qAH/pDc7u/2pjZr+3dESH+ALzba0DGsfbRF4uqK1Qs2pHFUhFwt96SrMKcrPvI50dnvQywbsxu6mumR6DVuCBD9Pu8aR4UEKgOSzwTrMg1miPkLbHF5+WetK0sIzUCmqBkayztTsCgPWX3JzjTCIVmyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738607577; c=relaxed/simple;
-	bh=CMFyWCDGDbW9/mXeVsTOJ32gxb6vUpEPCaJZb22v4aI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=InUZRLP8Fx+XUkdQMX69Gw2IakpWTOQC671EPOVrwNu+KGa1YppFbvudhY9xBz/7PRl7H2J8KTMBnHcoGd7Tv1ZbwF38PlIZIjjC42AU9+8lULmsX7/gj02O5XMVtEwZKh8fDfqMECy2HY9m/ixVQLqzpAqHTRU3MeYLZbg1oj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lohwccsL; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1738612251; c=relaxed/simple;
+	bh=XGTTmaTbuMSIUnCt/V5Tc/8kvFz5nJOKfbKLcWa9s3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MAIAIGY62r5jijzJ1M0Ux/nV4V+fDsVgt/+Koa+kz2qDj00+RAhjDZHxcNuSRehmzCsN29Eyid0sYoykcK3eGxitQt2y2ZX+BrjzIzWNqxu/OqVw5DQURbhs8T+bRuIJAUo/7IkeNLFzMO/8shM8XASgSedcs1bTmaFojPhUtAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAXZqrDi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lohwccsL"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738607573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p04z4NA8ANBpeee2BaIv4nfZi9bpNGy7L59DW/TFIH4=;
-	b=lohwccsLQVXqPCGCaUJpvLH2LWJNXS1hJWN3EUOWLZD8Xy0Z6P+pE/iWpnEG+x8xcjdRKm
-	xQQ/GyjkONdhF0Iw8r/ftkacNb+HvFhns4AB+E7YE4eOx60SWOA+AzvFd+qutjeJyW/beh
-	AvimWjSrwANWSEjXLRSTctQ83k1AAys=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAXZqrDi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0FB8C4CED2;
+	Mon,  3 Feb 2025 19:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738612250;
+	bh=XGTTmaTbuMSIUnCt/V5Tc/8kvFz5nJOKfbKLcWa9s3Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bAXZqrDiQryC0tZT1Jvjwk0Hug2a/rdR9Nw+kTstb0+BCXLrUOuSQbo1lVNQ2vmSi
+	 K1tImNuPQdfBlAMkQL6jOnwINQ3bYRrRJT3pqTwxAwuS8kfwiNUXlcwlhNgNOLgj11
+	 +MWeuhHdpwvVW+kzNtlI3ZE1qn26hGWUmJzyiNyyUVcp63QMwW3b+S0jmYc/5g4Ay2
+	 tte+dvrLu3DOqnqk0g8fgdWQZpfjbS2KE7wNbHASFpK8NmqSwoCxbcwqIrK4IdMg+D
+	 n8yL1s/oeiWuWMr66w06GKok5qw1gS8x8m4DJgyReEPoMOMWeR2ydjXhSHWq0NwYTs
+	 D1QGf0cmG5mpg==
+Date: Mon, 3 Feb 2025 19:50:44 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Janne Grunau <j@jannau.net>
-Subject: [PATCH v2 14/14] arm64: Enable IMP DEF PMUv3 traps on Apple M*
-Date: Mon,  3 Feb 2025 10:31:11 -0800
-Message-Id: <20250203183111.191519-15-oliver.upton@linux.dev>
-In-Reply-To: <20250203183111.191519-1-oliver.upton@linux.dev>
-References: <20250203183111.191519-1-oliver.upton@linux.dev>
+	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 09/18] KVM: arm64: Introduce __pkvm_vcpu_{load,put}()
+Message-ID: <5ca7588c-7bf2-4352-8661-e4a56a9cd9aa@sirena.org.uk>
+References: <20241218194059.3670226-1-qperret@google.com>
+ <20241218194059.3670226-10-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ANfi4BZEZ3mG3n3g"
+Content-Disposition: inline
+In-Reply-To: <20241218194059.3670226-10-qperret@google.com>
+X-Cookie: Happiness is a positive cash flow.
 
-Apple M1 and M2 CPUs support IMPDEF traps of the PMUv3 sysregs, allowing
-a hypervisor to virtualize an architectural PMU for a VM. Flip the
-appropriate bit in HACR_EL2 on supporting hardware.
 
-Tested-by: Janne Grunau <j@jannau.net>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kernel/cpu_errata.c | 44 ++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+--ANfi4BZEZ3mG3n3g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 7ce555862895..a1e16b156fab 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -194,6 +194,43 @@ has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
- 	return is_midr_in_range(midr, &range) && has_dic;
- }
- 
-+static const struct midr_range impdef_pmuv3_cpus[] = {
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
-+	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
-+	{},
-+};
-+
-+static bool has_impdef_pmuv3(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	unsigned int pmuver;
-+
-+	if (!is_kernel_in_hyp_mode())
-+		return false;
-+
-+	pmuver = cpuid_feature_extract_unsigned_field(dfr0,
-+						      ID_AA64DFR0_EL1_PMUVer_SHIFT);
-+	if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-+		return false;
-+
-+	return is_midr_in_range_list(read_cpuid_id(), impdef_pmuv3_cpus);
-+}
-+
-+static void cpu_enable_impdef_pmuv3_traps(const struct arm64_cpu_capabilities *__unused)
-+{
-+	sysreg_clear_set_s(SYS_HACR_EL2, 0, BIT(56));
-+}
-+
- #ifdef CONFIG_ARM64_WORKAROUND_REPEAT_TLBI
- static const struct arm64_cpu_capabilities arm64_repeat_tlbi_list[] = {
- #ifdef CONFIG_QCOM_FALKOR_ERRATUM_1009
-@@ -794,6 +831,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 					{}
- 				})),
- 	},
-+	{
-+		.desc = "Apple IMPDEF PMUv3 Traps",
-+		.capability = ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS,
-+		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
-+		.matches = has_impdef_pmuv3,
-+		.cpu_enable = cpu_enable_impdef_pmuv3_traps,
-+	},
- 	{
- 	}
- };
--- 
-2.39.5
+On Wed, Dec 18, 2024 at 07:40:50PM +0000, Quentin Perret wrote:
+> From: Marc Zyngier <maz@kernel.org>
+>=20
+> Rather than look-up the hyp vCPU on every run hypercall at EL2,
+> introduce a per-CPU 'loaded_hyp_vcpu' tracking variable which is updated
+> by a pair of load/put hypercalls called directly from
+> kvm_arch_vcpu_{load,put}() when pKVM is enabled.
 
+Current mainline crashes when running the arch_timer_edge_cases selftest
+in pKVM mode on a LibreTech Le Potato board, with a bisection pointing
+at this change.  The system dies like this:
+
+# selftests: kvm: arch_timer_edge_cases
+[  130.599140] kvm [4518]: nVHE hyp panic at: [<ffff800081102b58>] __kvm_nv=
+he___vgic_v3_restore_vmcr_aprs+0x8/0x84!
+[  130.603685] kvm [4518]: Cannot dump pKVM nVHE stacktrace: !CONFIG_PROTEC=
+TED_NVHE_STACKTRACE
+[  130.611962] kvm [4518]: Hyp Offset: 0xfffeca95ed000000
+[  130.617053] Kernel panic - not syncing: HYP panic:
+
+Full log:
+
+   https://lava.sirena.org.uk/scheduler/job/1092083
+
+Bisection log:
+
+git bisect start
+# status: waiting for both good and bad commits
+# bad: [2014c95afecee3e76ca4a56956a936e23283f05b] Linux 6.14-rc1
+git bisect bad 2014c95afecee3e76ca4a56956a936e23283f05b
+# status: waiting for good commit(s), bad commit known
+# good: [ffd294d346d185b70e28b1a28abe367bbfe53c04] Linux 6.13
+git bisect good ffd294d346d185b70e28b1a28abe367bbfe53c04
+# good: [6250ebe666e425e173df5e11e8a612d57921f48d] i2c: Fix core-managed pe=
+r-client debugfs handling
+git bisect good 6250ebe666e425e173df5e11e8a612d57921f48d
+# good: [647d69605c70368d54fc012fce8a43e8e5955b04] Merge tag 'pci-v6.14-cha=
+nges' of git://git.kernel.org/pub/scm/linux/kernel/git/pci/pci
+git bisect good 647d69605c70368d54fc012fce8a43e8e5955b04
+# good: [13845bdc869f136f92ad3d40ea09b867bb4ce467] Merge tag 'char-misc-6.1=
+4-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc
+git bisect good 13845bdc869f136f92ad3d40ea09b867bb4ce467
+# bad: [9f10e7fb6a06bce4f81de5fd0f2f0390f99e89e4] Merge tag 'phy-for-6.14' =
+of git://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy
+git bisect bad 9f10e7fb6a06bce4f81de5fd0f2f0390f99e89e4
+# bad: [58f504efcda54a9079a38203acc088c3354aaa60] Merge tag 'tty-6.14-rc1' =
+of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/tty
+git bisect bad 58f504efcda54a9079a38203acc088c3354aaa60
+# good: [a37eea94f775132866ecdd466fd88027d7125515] Merge tag 'sparc-for-6.1=
+4-tag1' of git://git.kernel.org/pub/scm/linux/kernel/git/alarsson/linux-spa=
+rc
+git bisect good a37eea94f775132866ecdd466fd88027d7125515
+# bad: [5e68d2eeac70978a06406c5b156815ceb00437f9] Merge branch kvm-arm64/pk=
+vm-memshare-declutter into kvmarm-master/next
+git bisect bad 5e68d2eeac70978a06406c5b156815ceb00437f9
+# bad: [d0670128d42fa170bf8ba878cd23504c5c5cccc7] Merge branch kvm-arm64/pk=
+vm-np-guest into kvmarm-master/next
+git bisect bad d0670128d42fa170bf8ba878cd23504c5c5cccc7
+# good: [c4a6ed85455979ef3fbadc2f1bdf18734b0ecea6] KVM: arm64: Promote gues=
+t ownership for DBGxVR/DBGxCR reads
+git bisect good c4a6ed85455979ef3fbadc2f1bdf18734b0ecea6
+# bad: [d0bd3e6570aee42766e7bd884734ae078667ea1e] KVM: arm64: Introduce __p=
+kvm_host_share_guest()
+git bisect bad d0bd3e6570aee42766e7bd884734ae078667ea1e
+# good: [5398ddc5c90bd418b90d859e9267aa39399021af] KVM: arm64: Pass walk fl=
+ags to kvm_pgtable_stage2_mkyoung
+git bisect good 5398ddc5c90bd418b90d859e9267aa39399021af
+# good: [c77e5181fed54b25d489eb7d2ccb5c1c72a1063c] KVM: arm64: Make kvm_pgt=
+able_stage2_init() a static inline function
+git bisect good c77e5181fed54b25d489eb7d2ccb5c1c72a1063c
+# bad: [f7d03fcbf1f482069e9afac55b17de3bd323b8f6] KVM: arm64: Introduce __p=
+kvm_vcpu_{load,put}()
+git bisect bad f7d03fcbf1f482069e9afac55b17de3bd323b8f6
+# good: [99996d575ee69d4327bad98a0148729b73dde23a] KVM: arm64: Add {get,put=
+}_pkvm_hyp_vm() helpers
+git bisect good 99996d575ee69d4327bad98a0148729b73dde23a
+# first bad commit: [f7d03fcbf1f482069e9afac55b17de3bd323b8f6] KVM: arm64: =
+Introduce __pkvm_vcpu_{load,put}()
+
+--ANfi4BZEZ3mG3n3g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmehHhMACgkQJNaLcl1U
+h9DQ7Af+P8sebWSERdjUjYV29cH9b32wtbxJMRD1Dyu0ctLbCzNOmkbja6PAw6gg
+WWur9Ds0FBcbMpWutMe3tQIF6r9ZZYobChRBsdqLRjz+hIwngMxicmhhM2vvXc7t
+D4Z8ayasEqR7OjLfEHc+lnVsgYtaswDKQq0ABGSWJhEsBSnP45Z1qqslLxiqItUq
+L2+OjIgJ0R95hsceAWbBaTmOVfzFhVHkABPqDIVLE/lWTWN+I24DABPW8KdnpGE3
+L1D6Cdw2jz2Sbi1/wzs12TorVXKRUmfTPtQtcInQNSdW1RIXeFgtlEY8f2c9fexp
+1aJFPcx2HxUBLJGMrnO6kx1IwN0xdQ==
+=8hjS
+-----END PGP SIGNATURE-----
+
+--ANfi4BZEZ3mG3n3g--
