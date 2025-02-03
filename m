@@ -1,164 +1,111 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85841CAA4
-	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 04:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674FC23A6
+	for <kvmarm@lists.linux.dev>; Mon,  3 Feb 2025 05:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738555752; cv=none; b=nA2DTUOdD5mvXTguw7IE8pkwNVz6OJubNTVucPuY13mrFBWwHYHjRcQxACg0Mb9JV8g0nRBVA0v1udxf9e3cGeiLOE0Zc49/f6ALjRREPsbQRtMw5qpC5GN7T5ygPKf1OdG/CdnI/6cPSU3sbEHuwjhu2RIEEG12zfWdu2SdkXg=
+	t=1738559326; cv=none; b=fIxEsXtJKllWSi69EPsKEYAzGDXGfK1cngv1F8oWcxHLtLjS/RbJ2U3150D94uLvNAButSyBL1DX1N+ZwH3QFGbrHHc+J8aAJ8B5+iT40bnNIEQQZnmqnunexx2UpkL8dRDT5zPu5z5OKlCd85o0x93INtzFApp7biFxfU62xxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738555752; c=relaxed/simple;
-	bh=bcoMa0eQAZoK/33F8YMVPfn9OeW6T5JHkl52a2h2hz4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i1AZCK2OZA7CEmHMmdTQymw7QzCSuuZ8S6ORXhgYpkHKHdJjjoPxbPo9TL0i4liE5xF+JO5Dsmeh14bnOzYE5LcPMDHWlxcT8jNdqX8D57KS/MBAUsZ4tm9EzZODj8xzqv+wbR0ELagpo5MtN5BnzSIX8723GFXMgsBLogCVDSA=
+	s=arc-20240116; t=1738559326; c=relaxed/simple;
+	bh=+lwb1KgF3v7GHTKBatPBaO6Yb7mN9vK0auG6ZVMw0Ow=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BMCY2QvTC/MwmakVuNKTXVhzkbVlz272Y0Y6xXnYSAHrNJxJ9qjVMOKjz+to0H9YxhzXNpwm4aFdGt/hNX+IsS/Rieycy0PKSbpJqaORlb7ISURm6m3nVJMzeQfaY5CmwxnBKQvHhYE+rs8kNJAdu3x/IPcjB5ha15p1q1XctlA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C81F61476;
-	Sun,  2 Feb 2025 20:09:34 -0800 (PST)
-Received: from [10.162.16.79] (unknown [10.162.16.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E58D23F63F;
-	Sun,  2 Feb 2025 20:09:05 -0800 (PST)
-Message-ID: <b5257952-1968-4eb3-8969-e6e3fcb5efdd@arm.com>
-Date: Mon, 3 Feb 2025 09:39:02 +0530
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15DD41476;
+	Sun,  2 Feb 2025 21:09:08 -0800 (PST)
+Received: from a077893.blr.arm.com (unknown [10.162.16.79])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 80C423F5A1;
+	Sun,  2 Feb 2025 21:08:39 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <robh@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V2 0/7] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+Date: Mon,  3 Feb 2025 10:38:21 +0530
+Message-Id: <20250203050828.1049370-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 04/11] perf: arm_v7_pmu: Drop obvious comments for
- enabling/disabling counters and interrupts
-To: "Rob Herring (Arm)" <robh@kernel.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
- <20250202-arm-brbe-v19-v19-4-1c1300802385@kernel.org>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250202-arm-brbe-v19-v19-4-1c1300802385@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This series adds fine grained trap control in EL2 required for FEAT_PMUv3p9
+registers like PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 which are already
+being used in the kernel. This is required to prevent their EL1 access trap
+into EL2.
 
+PMZR_EL0 register trap control i.e HDFGWTR2_EL2.nPMZR_EL0 remains unchanged
+for now as it does not get accessed in the kernel, and there is no plan for
+its access from user space.
 
-On 2/3/25 06:12, Rob Herring (Arm) wrote:
-> The function calls for enabling/disabling counters and interrupts are
-> pretty obvious as to what they are doing, and the comments don't add
-> any additional value.
-> 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
->  drivers/perf/arm_v7_pmu.c | 44 --------------------------------------------
->  1 file changed, 44 deletions(-)
-> 
-> diff --git a/drivers/perf/arm_v7_pmu.c b/drivers/perf/arm_v7_pmu.c
-> index 420cadd108e7..7fa88e3b64e0 100644
-> --- a/drivers/perf/arm_v7_pmu.c
-> +++ b/drivers/perf/arm_v7_pmu.c
-> @@ -857,14 +857,6 @@ static void armv7pmu_enable_event(struct perf_event *event)
->  		return;
->  	}
->  
-> -	/*
-> -	 * Enable counter and interrupt, and set the counter to count
-> -	 * the event that we're interested in.
-> -	 */
-> -
-> -	/*
-> -	 * Disable counter
-> -	 */
->  	armv7_pmnc_disable_counter(idx);
->  
->  	/*
-> @@ -875,14 +867,7 @@ static void armv7pmu_enable_event(struct perf_event *event)
->  	if (cpu_pmu->set_event_filter || idx != ARMV7_IDX_CYCLE_COUNTER)
->  		armv7_pmnc_write_evtsel(idx, hwc->config_base);
->  
-> -	/*
-> -	 * Enable interrupt for this counter
-> -	 */
->  	armv7_pmnc_enable_intens(idx);
-> -
-> -	/*
-> -	 * Enable counter
-> -	 */
->  	armv7_pmnc_enable_counter(idx);
->  }
->  
-> @@ -898,18 +883,7 @@ static void armv7pmu_disable_event(struct perf_event *event)
->  		return;
->  	}
->  
-> -	/*
-> -	 * Disable counter and interrupt
-> -	 */
-> -
-> -	/*
-> -	 * Disable counter
-> -	 */
->  	armv7_pmnc_disable_counter(idx);
-> -
-> -	/*
-> -	 * Disable interrupt for this counter
-> -	 */
->  	armv7_pmnc_disable_intens(idx);
->  }
->  
-> @@ -1476,12 +1450,6 @@ static void krait_pmu_enable_event(struct perf_event *event)
->  	struct hw_perf_event *hwc = &event->hw;
->  	int idx = hwc->idx;
->  
-> -	/*
-> -	 * Enable counter and interrupt, and set the counter to count
-> -	 * the event that we're interested in.
-> -	 */
-> -
-> -	/* Disable counter */
->  	armv7_pmnc_disable_counter(idx);
->  
->  	/*
-> @@ -1494,10 +1462,7 @@ static void krait_pmu_enable_event(struct perf_event *event)
->  	else
->  		armv7_pmnc_write_evtsel(idx, hwc->config_base);
->  
-> -	/* Enable interrupt for this counter */
->  	armv7_pmnc_enable_intens(idx);
-> -
-> -	/* Enable counter */
->  	armv7_pmnc_enable_counter(idx);
->  }
->  
-> @@ -1797,12 +1762,6 @@ static void scorpion_pmu_enable_event(struct perf_event *event)
->  	struct hw_perf_event *hwc = &event->hw;
->  	int idx = hwc->idx;
->  
-> -	/*
-> -	 * Enable counter and interrupt, and set the counter to count
-> -	 * the event that we're interested in.
-> -	 */
-> -
-> -	/* Disable counter */
->  	armv7_pmnc_disable_counter(idx);
->  
->  	/*
-> @@ -1815,10 +1774,7 @@ static void scorpion_pmu_enable_event(struct perf_event *event)
->  	else if (idx != ARMV7_IDX_CYCLE_COUNTER)
->  		armv7_pmnc_write_evtsel(idx, hwc->config_base);
->  
-> -	/* Enable interrupt for this counter */
->  	armv7_pmnc_enable_intens(idx);
-> -
-> -	/* Enable counter */
->  	armv7_pmnc_enable_counter(idx);
->  }
->  
-> 
+I have taken the liberty to pick up all the review tags for patches related
+to tools sysreg update from the KVM FGT2 V2 patch series posted earlier.
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+https://lore.kernel.org/all/20241210055311.780688-1-anshuman.khandual@arm.com/
+
+Rob had earler mentioned about FEAT_FGT2 based trap control requirement for
+FEAT_PMUv3p9 registers that are currently being used in kernel. The context
+can be found here.
+
+https://lore.kernel.org/all/20241216234251.GA629562-robh@kernel.org/
+
+This series is based on v6.14-rc1
+
+Changes in V2:
+
+- Rebased on v6.14-rc1
+- Updated tools sysreg patches with latest DDI0601 2024-12 definitions
+- Updated document version as DDI0601 2024-12 in all commit messages
+- Added latest tags from Rob Herring for the last patch
+
+Changes in V1:
+
+https://lore.kernel.org/all/20241220072240.1003352-1-anshuman.khandual@arm.com/
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Mark Brown <robh@kernel.org>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+
+Anshuman Khandual (7):
+  arm64/sysreg: Update register fields for ID_AA64MMFR0_EL1
+  arm64/sysreg: Add register fields for HDFGRTR2_EL2
+  arm64/sysreg: Add register fields for HDFGWTR2_EL2
+  arm64/sysreg: Add register fields for HFGITR2_EL2
+  arm64/sysreg: Add register fields for HFGRTR2_EL2
+  arm64/sysreg: Add register fields for HFGWTR2_EL2
+  arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+
+ Documentation/arch/arm64/booting.rst |  18 +++++
+ arch/arm64/include/asm/el2_setup.h   |  25 +++++++
+ arch/arm64/tools/sysreg              | 103 +++++++++++++++++++++++++++
+ 3 files changed, 146 insertions(+)
+
+-- 
+2.25.1
+
