@@ -1,116 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7F4213E82
-	for <kvmarm@lists.linux.dev>; Tue,  4 Feb 2025 17:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34CA78F4A
+	for <kvmarm@lists.linux.dev>; Tue,  4 Feb 2025 18:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738690936; cv=none; b=LFiQxxGtAhIFsgzE529vLYX18oro2qVvvWIg5D14zo8mwl2ge5GQJuuprp+70s1qJuB4sGWMW1fYzRbnNcLFF4wlB7fbfvMUejfwqCMNh5mU9m1yMhHoio4Q1vrmWrxvQE0ZQ+IyFsm668bdY5rDKWwPHF2OnA1FI5491JP11ag=
+	t=1738692917; cv=none; b=ITV8mT+tBur4QdkMB6z2SyodrK2WqiTgHee4e9sZe2bw9025sGm8cz5h9ocomWfG8pPVO2uuiOFuN1TR9zFb5vsdqo3Ch5anRZ8Y0SCtdpLJxZphCfxpGoYnoTnB3NkK72emmyFQxtq1pL5mkA+GZyz4XSy8mOW4B7gfB8X2jR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738690936; c=relaxed/simple;
-	bh=C4NeFOJmhxb0HadgLbXrVb+Dqs0SXVQJ1rxhMk6r+zU=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=YnGNyu60//zWpmQ7djLQ3M4d7DVZpVScyG3uX7uw/5Fy0aEnl8hpSW7+WOfGFLMIHpyLcgLcIhca/oJt4lZ4JcjbdrxL3W33ytPWKlrZ56+W/zsgEW4j9QwBV+/7popnALirGxSy07D8MbasJLxm8ajtLtkkBg9W465RwPX25io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M0TaIpBW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1738692917; c=relaxed/simple;
+	bh=2LSVZ4W6m8nEx8goPtG1GhcWRHVAI2hM0Jp8C0NRChc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rYSr3w9EQDiqMC7ow+vxufphRZdT70SPMSdOTxVWyR4YBbFz6Bc/ifEgE4JgM9O7gubsEdWgqZ+E5Joqrb9IyfNy9FEgXX0ioYsse+O/thpwwDTpm/WvPzEHifjrJ4XiZEgxkmykYyRB7r6i82N+wl0LhDoNe+d43khjqUfEYgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R9XUANQY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0TaIpBW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738690933;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C4NeFOJmhxb0HadgLbXrVb+Dqs0SXVQJ1rxhMk6r+zU=;
-	b=M0TaIpBWkRzS8BxoQgCPytSff0SrcceY3eiJ4Vk8TBg2tV4Wqc5egnKgaAuZPB7vEUDJWx
-	sKYAA3zI8y0qrPc/7ssykHpgPKrrKfU2YedDVPjEWIaP0DbPo/3zRVbJfip+tEst6w27LC
-	vkbSqEiB43x+RNe3rtdeT04Dk/fv4rI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-110-k6w-K0KgO72VGQtVm-Pwww-1; Tue, 04 Feb 2025 12:42:11 -0500
-X-MC-Unique: k6w-K0KgO72VGQtVm-Pwww-1
-X-Mimecast-MFC-AGG-ID: k6w-K0KgO72VGQtVm-Pwww
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-467905ab1bbso52810071cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 04 Feb 2025 09:42:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738690931; x=1739295731;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4NeFOJmhxb0HadgLbXrVb+Dqs0SXVQJ1rxhMk6r+zU=;
-        b=hYKYMG8Qcdrm2uv8q3Db1YAJctpS58G8fugYrB7do2MA4vdrYIbvli/Njzn3bskiBF
-         B+te7qCkDI9Oj0Tz5UuPFc7kug6bXA8ovhSBdfPSIKQgntZHjSu4ZQfTiTrs6jbuVwm0
-         PbstBErzKfN1dCJO0npv+oRPO8t2ycqbFJpe0l6uNTxVGjbJDHfms86QEI03waRV3DQR
-         B0jk/ZYzqAyCAYVFgUSJermDrUaiF94j8fDC0jwO4zyayJ1RzLb2v497UrhMic+CNBLq
-         bqGJKnJifXxpJzm0+zleEmAkv09RcRNw8qklDVl/nlBSF9oMg0k3vtoWyR2ZomCDMq1i
-         Fayw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmZFlnF+vnigZESx0FKKingj4P3296cE8WcLFqQH/RqbA0pPquujEgGAssA6vwrFEVWw14A9g=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywr0cYM3ex1GY3M8VORyWQJWITSQ7fLI8WVYI8lNhSFwfMPR+65
-	fbuRq+jK/mCTfhTuA5U7IR6+bgps6juEUH2dUQpXMzokj/+0hlk2WrY356zrpX2VG/gKnBssPij
-	XTViMsoGm/YIExrK5UcjmWn/BxHG3+3ECOvOPG+l7AEbqZHtHxQmy3w==
-X-Gm-Gg: ASbGnctORE+hEtJkMTsPCnZnC0F7ttqAxoyLRJUWUNpEa6CSg+M+HGr6QgEA8D8g4k2
-	OLkIR4f8t4mf0gwuVsB3QmH/BagTqeXRuqILhyrKQ/b0J9M5tgWNXeWKVmoAaqEQPNuv5zD9gk+
-	sbDreg0+BOZLyZDUYTKhZeTQ8/HPZjLsBi1qQssB5e3ND08VPdG5fPl8MCn2E6KkDwHHZe+veVn
-	1crz+hlNS/vYt0YSvKNbRZdAgSCoHQG35RAiGUFAjucgzsqCp+Y4Y2MGRtYKk17CDy/bnPI7rb/
-	j/z0akr8KltjTDqBOLb04POJyGuBvGBY6RXINNpRohbUFaEM72QEFg==
-X-Received: by 2002:ac8:5794:0:b0:467:7fbf:d115 with SMTP id d75a77b69052e-46fd0a6c343mr368814651cf.12.1738690931456;
-        Tue, 04 Feb 2025 09:42:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnrxHtljGCWfirB5phvdvRvD1W53cyjXxbXjd79D0P4Hi/IOz77ZQTfITQwFUokPOGeRBSzw==
-X-Received: by 2002:ac8:5794:0:b0:467:7fbf:d115 with SMTP id d75a77b69052e-46fd0a6c343mr368814271cf.12.1738690931098;
-        Tue, 04 Feb 2025 09:42:11 -0800 (PST)
-Received: from rh (p200300f6af0e4d00dda53016e366575f.dip0.t-ipconnect.de. [2003:f6:af0e:4d00:dda5:3016:e366:575f])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46fdf0c7191sm62333371cf.21.2025.02.04.09.42.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 09:42:10 -0800 (PST)
-Date: Tue, 4 Feb 2025 18:42:04 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
-    kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, 
-    will@kernel.org, mark.rutland@arm.com, Cornelia Huck <cohuck@redhat.com>, 
-    eric.auger@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, 
-    jiangkunkun@huawei.com, jonathan.cameron@huawei.com, 
-    anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, 
-    linuxarm@huawei.com
-Subject: Re: [PATCH v5 0/4] KVM: arm64: Errata management for VM Live
- migration
-In-Reply-To: <8634gtvdmi.wl-maz@kernel.org>
-Message-ID: <f42ee0db-645a-8710-d611-8e45c4e1a4e4@redhat.com>
-References: <20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com> <76172c57-aac6-d540-5b98-8de100c0886c@redhat.com> <8634gtvdmi.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R9XUANQY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51DCBC4CEDF;
+	Tue,  4 Feb 2025 18:15:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738692915;
+	bh=2LSVZ4W6m8nEx8goPtG1GhcWRHVAI2hM0Jp8C0NRChc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R9XUANQYgg8aEVqRHCmJnRlIERZr/wMn2ysrSgkISqTI6Um1GAKN3xoVWz2ycBDGy
+	 +Vfu9N3ubxDfUbGuyuf4UzgGmljAI72wQVsyl0dTr3g9kiiStYwNOjolveQ0DRAvIQ
+	 JOETpGxVtG+s7vYHMR7NGHVO43ERx9GUQcylDUaFj+Ny+ul4JwF6DTVBTOfKIEeBdu
+	 Dfhum/6s3iqbPYGIkTUJal/XCMstr4c4WXJePKGovnyQRDfKGDcTeV+HayySyQ3eYp
+	 IMfC6tzTWdd07z7omK8iE2yOkKCCP/oSpJcgXJNNq1PMZOamEZyc9nYtUY2QuD+lqX
+	 WRc/xAnlMD1Cw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tfNS5-000W9z-4M;
+	Tue, 04 Feb 2025 18:15:13 +0000
+Date: Tue, 04 Feb 2025 18:15:11 +0000
+Message-ID: <86zfj1tw40.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	Cornelia Huck <cohuck@redhat.com>,
+	eric.auger@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com,
+	anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	linuxarm@huawei.com
+Subject: Re: [PATCH v5 0/4] KVM: arm64: Errata management for VM Live migration
+In-Reply-To: <f42ee0db-645a-8710-d611-8e45c4e1a4e4@redhat.com>
+References: <20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com>
+	<76172c57-aac6-d540-5b98-8de100c0886c@redhat.com>
+	<8634gtvdmi.wl-maz@kernel.org>
+	<f42ee0db-645a-8710-d611-8e45c4e1a4e4@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: BAaFXuuazNp8_mqN5z9AqVrCVnMgUlDwseBOw9H2Vl8_1738690931
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 4 Feb 2025, Marc Zyngier wrote:
-> On Tue, 04 Feb 2025 16:45:38 +0000,
-> Sebastian Ott <sebott@redhat.com> wrote:
->>
->> Hey,
->>
->> On Fri, 24 Jan 2025, Shameer Kolothum wrote:
->>> On ARM64 platforms most of the errata workarounds are based on CPU
->>> MIDR/REVIDR values and a number of these workarounds need to be
->>> implemented by the Guest kernel as well. This creates a problem when
->>> Guest needs to be migrated to a platform that differs in these
->>> MIDR/REVIDR values even if the VMM can come up with a common minimum
->>> feature list for the Guest using the recently introduced "Writable
->>> ID registers" support.
->>
->> Currently MIDR/REVIDR are still RO and guest access is not trapped - so
->> even with the errata management patches in place the guest state would
->> change and a migration (between hosts that differ in these regs) would
->> not be possible. Are there any plans to allow to actually change these?
->
-> Sure thing. We only need a victim! :)
+On Tue, 04 Feb 2025 17:42:04 +0000,
+Sebastian Ott <sebott@redhat.com> wrote:
+> 
+> On Tue, 4 Feb 2025, Marc Zyngier wrote:
+> > On Tue, 04 Feb 2025 16:45:38 +0000,
+> > Sebastian Ott <sebott@redhat.com> wrote:
+> >> 
+> >> Hey,
+> >> 
+> >> On Fri, 24 Jan 2025, Shameer Kolothum wrote:
+> >>> On ARM64 platforms most of the errata workarounds are based on CPU
+> >>> MIDR/REVIDR values and a number of these workarounds need to be
+> >>> implemented by the Guest kernel as well. This creates a problem when
+> >>> Guest needs to be migrated to a platform that differs in these
+> >>> MIDR/REVIDR values even if the VMM can come up with a common minimum
+> >>> feature list for the Guest using the recently introduced "Writable
+> >>> ID registers" support.
+> >> 
+> >> Currently MIDR/REVIDR are still RO and guest access is not trapped - so
+> >> even with the errata management patches in place the guest state would
+> >> change and a migration (between hosts that differ in these regs) would
+> >> not be possible. Are there any plans to allow to actually change these?
+> > 
+> > Sure thing. We only need a victim! :)
+> 
+> ;-) Nice. I'll hack smth up then.
 
-;-) Nice. I'll hack smth up then.
+Great.
 
-Sebastian
+Ideally, you would get rid of all the remaining invariant registers
+(MIDR, REVIDR and AIDR). But you must preserve the current behaviour
+as the default, sampling these registers on the CPU that initialises
+KVM, and preserve the values for userspace to observe unless they are
+written to (yes, that's broken, but we're stuck with that).
 
+Also, please don't trap MIDR_EL1. That's very pointless. You only need
+to trap REVIDR and AIDR via HCR_EL2.TID1.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
