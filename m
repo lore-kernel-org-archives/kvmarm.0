@@ -1,81 +1,46 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85971D7985
-	for <kvmarm@lists.linux.dev>; Wed,  5 Feb 2025 09:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7CF1547D8
+	for <kvmarm@lists.linux.dev>; Wed,  5 Feb 2025 10:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738749482; cv=none; b=HGwR5lIYF7SBBdPYY6ttSD+ElE6jF4SdarzbNrQxYJoYuZ06upDl4egW/4Jv2M/1PIMTOqdedFP/NiY164gmkqecqqnYK8pTxhZbNfxPnSKWCqk715/hGz7HirEXs80WnajeKS+nZ8FR8YPKSEF4sCmPj/3CmL/roTpkFvXIbxs=
+	t=1738749672; cv=none; b=Bir6Ldf5++nH06DlMGOr4PrbXxs2DTVQi+6cY8hBqap/eyWMBhvqTEsrzdeOxmbvBz76/AhS3ohcY+GP0NUz3O/WAyPz4Pv/KytXAHBN6sUsfrYQzrlW3A/ZvF2/gSz2Y6/PKNMwKV8lTW2ODipyjbjimMguwjXLNxSWr5AM6iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738749482; c=relaxed/simple;
-	bh=Nq/kqlSP3svTs4A+e6SOH1ClmbqaPxsVt5+MQGotkk0=;
+	s=arc-20240116; t=1738749672; c=relaxed/simple;
+	bh=CiuHqqToU+/eNRrP10Z4tcsqFnwK6YpS57IbttfhWUw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mL62DebwL+3tVbVhnWFdSeQ5unSkPPzjfHzbiJ/TosjHmelfrKsRyWdah+6IXZkbnf9andNr8XTGLGRp6RLkNnRyl2nEWt1GZbvr1lawIWnTFnACIfdfTStUlxbl9eyagLtdbcnrE0qLLFscIS31GrEFHYFpUV0iIefOAuTY2K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZAnmk4Y6; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZAnmk4Y6"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5dce27a72e8so313238a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 05 Feb 2025 01:58:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738749479; x=1739354279; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WbnvWfX7jxBUPOrY8qkhn5UbcYi3tt6+vaZLeX9aDhI=;
-        b=ZAnmk4Y6bC7c1NnEVmRdioChhVcJWT9N/ZCCvhoxKiya6WnQIRDUtrMLxihw6l7DVV
-         lo3No7SOca5a3DIMtBSpS2n42o/H/oPdR/V2fxtjxBR9ES92bE1oEjVK02HuJQQx3pcn
-         V06s3go8lh7FXOOL41jmwrhsxk44Sek3bj76SfReF/HHEX/0rir2JUrzTEOf0G3UmmTm
-         jm6MQmu4EcYbLr55OkqSR27nrhpzxM6TEFw9EIIUdI00yN0ZyZm3dHixvw0TC4/mmCEM
-         FQvRwayjnxcYtsH4f/dvc/BSiTUC/hrP/s8tv/SO4Afrr2+x0AXQDxu7jA9ffHR0WB3g
-         olGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738749479; x=1739354279;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WbnvWfX7jxBUPOrY8qkhn5UbcYi3tt6+vaZLeX9aDhI=;
-        b=vjXhJMCLIPjZMZgHMD8X/GfkdAqgNWm5b1CX2W8Y/W5mQdHVMxjNV5PCwdLT2p160l
-         lB5hsOF9lwZipVShLj5PeS28vW/cqxpypAjR9TUAUVtw3g8S13Ld15gtTQfE1ykLmviI
-         hDDG0Dg0MxxGNE3Q8ASH6nJ4B7+dgMabwMKA1fuLAijAfK6UNb+GGtGRPsgUlBIq3KxQ
-         GwLtCTTQwU6SWipTK+FNrLQHh/+F6CXaaoeK4jJkcT0+o0eeReFXPjzvD3FC/Lg7oZBj
-         gydwx5A8ezZ7wrgbIH5zwhLh/NPhoRNEt6mcELOJSqsZPgLp5SgCs6wNLXl8bRCpI9DJ
-         sfkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrEEFpWXlUhCcfKkD/+ArS2Ls1VjnXUnPSHYJX4eo0emwOoX9JxiaEwGG/TElTd7MkHKS8R5s=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx83vGccYBWpPWFVpMk5tLPninlTCVADvhxKVD3S2Av0VnVqzEE
-	6K6an0OxCmi4ucQyAZu4TLZWU1PLYpyO7WLQOQIUYxH/tXMqHWvUPA6MJrIBww==
-X-Gm-Gg: ASbGncs5UjU3LZLTtAQ9MLQPgkeJrfZhN/1qgMkNtJxBN6L5tosDGbHjpuTYIwxYsUq
-	a0kC91RbD6AKb4QtMcOGagMlgncoqhVZ+1koXT6KhQ8wQN62jRQf4eT14OjzzvHQ0fLckzDvHHv
-	wLGILuFJBdqdwTT6EPC7yKjfoPw0ZSXHRt5kQ77WO8FFpqb2Mx5Jw+AfwDLtXqxz/Ap50sHLczI
-	to/16GX5MmTPC7WTzhIGYRmOKosDoVTbm8DzSWMIPVi+Hwi2oJ67GNo5MLalbYR8Cwo46O6dMTK
-	eTVJ+gcwQSN7ABbvToMpteiqh9sFEiRJFUTq6HVNDmjgT0V/Xqc1
-X-Google-Smtp-Source: AGHT+IHlSCxcM4Gf9CJt6IMxYC+rLq5h9k2XD0ViVMFq5Bpo0iQeCY5EvWVi/Z+I81xJb2BJo1RUeA==
-X-Received: by 2002:a17:907:7b82:b0:ab6:f89d:5a7 with SMTP id a640c23a62f3a-ab75e26358fmr257421066b.34.1738749479093;
-        Wed, 05 Feb 2025 01:57:59 -0800 (PST)
-Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47d0dfasm1077074666b.71.2025.02.05.01.57.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 01:57:58 -0800 (PST)
-Date: Wed, 5 Feb 2025 09:57:54 +0000
-From: Quentin Perret <qperret@google.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, uJap072421@linux.dev,
-	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZecATdHwbQxHtqAJxm2nQjNnNjKPAu3ul/ENK/A1Es9pc1YCz20K18HtrWa7/6BXmvtAWPd7iqc1KQu7SpIRGqvpFxd2a3u5cVvT3AfZrlUJpy3mP1MLsoMiV2wGnF+klu17i7D2HRjb+6vR/1Wm3lPNyYs5g/gAfMCh2yuIIkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8085111FB;
+	Wed,  5 Feb 2025 02:01:32 -0800 (PST)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 648383F5A1;
+	Wed,  5 Feb 2025 02:01:04 -0800 (PST)
+Date: Wed, 5 Feb 2025 10:01:01 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-mm@kvack.org, steven.price@arm.com, christophe.leroy@csgroup.eu,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 09/18] KVM: arm64: Introduce __pkvm_vcpu_{load,put}()
-Message-ID: <Z6M2Ir6uAT8KcWma@google.com>
-References: <20241218194059.3670226-1-qperret@google.com>
- <20241218194059.3670226-10-qperret@google.com>
- <5ca7588c-7bf2-4352-8661-e4a56a9cd9aa@sirena.org.uk>
- <Z6FO04PZtY8fsJhq@linux.dev>
- <5b73e1ac-a48d-4064-a095-26cd9662f0c1@sirena.org.uk>
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: Re: [PATCH V2] mm/ptdump: Drop GENERIC_PTDUMP
+Message-ID: <Z6M23dR5wvZKW4JE@J2N7QTR9R3>
+References: <20250205050039.1506377-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -84,28 +49,130 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b73e1ac-a48d-4064-a095-26cd9662f0c1@sirena.org.uk>
+In-Reply-To: <20250205050039.1506377-1-anshuman.khandual@arm.com>
 
-On Tuesday 04 Feb 2025 at 14:32:19 (+0000), Mark Brown wrote:
-> On Mon, Feb 03, 2025 at 03:19:03PM -0800, Oliver Upton wrote:
-> > On Mon, Feb 03, 2025 at 07:50:44PM +0000, Mark Brown wrote:
-> 
-> > > Current mainline crashes when running the arch_timer_edge_cases selftest
-> > > in pKVM mode on a LibreTech Le Potato board, with a bisection pointing
-> > > at this change.  The system dies like this:
-> > > 
-> > > # selftests: kvm: arch_timer_edge_cases
-> > > [  130.599140] kvm [4518]: nVHE hyp panic at: [<ffff800081102b58>] __kvm_nvhe___vgic_v3_restore_vmcr_aprs+0x8/0x84!
-> 
-> > Thanks, fix posted here [*], although as a consequence this machine will
-> > stop running KVM in protected mode (which was never meant to work in the
-> > first place).
-> 
-> Yeah, I wasn't clear if this was something that was intended to work or
-> not - it's all in a constant state of flux.
+On Wed, Feb 05, 2025 at 10:30:39AM +0530, Anshuman Khandual wrote:
+> GENERIC_PTDUMP does not guard any code but instead just used for platform's
+> subscription into core ptdump defined under PTDUMP_CORE, which is selected.
 
-FWIW a770ee80e662 ("KVM: arm64: pkvm: Disable GICv2 support") did try to
-explicitly disable things, but was clearly incomplete...
+Selected by what?
 
-Thanks guys for the report and the quick fix!
-Quentin
+> Instead use PTDUMP_CORE for platform subscription and drop GENERIC_PTDUMP.
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Cc: Paul Walmsley <paul.walmsley@sifive.com>
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-riscv@lists.infradead.org
+> Cc: linux-s390@vger.kernel.org
+> Cc: linux-mm@kvack.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> This patch applies on v6.14-rc1
+> 
+> Changes in V2:
+> 
+> - Keep arch/powerpc/Kconfig alphabetically sorted per Christophe
+> 
+> Changes in V1:
+> 
+> https://lore.kernel.org/all/20241217034807.2541349-1-anshuman.khandual@arm.com/
+> 
+>  Documentation/arch/arm64/ptdump.rst       | 1 -
+>  arch/arm64/Kconfig                        | 2 +-
+>  arch/arm64/kvm/Kconfig                    | 3 +--
+>  arch/powerpc/Kconfig                      | 2 +-
+>  arch/powerpc/configs/mpc885_ads_defconfig | 1 -
+>  arch/riscv/Kconfig                        | 2 +-
+>  arch/s390/Kconfig                         | 2 +-
+>  arch/x86/Kconfig                          | 2 +-
+>  arch/x86/Kconfig.debug                    | 2 +-
+>  kernel/configs/debug.config               | 1 -
+>  mm/Kconfig.debug                          | 8 ++------
+>  11 files changed, 9 insertions(+), 17 deletions(-)
+> 
+> diff --git a/Documentation/arch/arm64/ptdump.rst b/Documentation/arch/arm64/ptdump.rst
+> index 5dcfc5d7cddf..61ca040a885b 100644
+> --- a/Documentation/arch/arm64/ptdump.rst
+> +++ b/Documentation/arch/arm64/ptdump.rst
+> @@ -22,7 +22,6 @@ offlining of memory being accessed by the ptdump code.
+>  In order to dump the kernel page tables, enable the following
+>  configurations and mount debugfs::
+>  
+> - CONFIG_GENERIC_PTDUMP=y
+>   CONFIG_PTDUMP_CORE=y
+>   CONFIG_PTDUMP_DEBUGFS=y
+>  
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index fcdd0ed3eca8..1f516bed81dd 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -157,7 +157,7 @@ config ARM64
+>  	select GENERIC_IRQ_SHOW_LEVEL
+>  	select GENERIC_LIB_DEVMEM_IS_ALLOWED
+>  	select GENERIC_PCI_IOMAP
+> -	select GENERIC_PTDUMP
+> +	select PTDUMP_CORE
+>  	select GENERIC_SCHED_CLOCK
+>  	select GENERIC_SMP_IDLE_THREAD
+>  	select GENERIC_TIME_VSYSCALL
+
+This change means that the ptdump core code will be built regardless of
+whether any users are selected:
+
+  [mark@lakrids:~/src/linux]% git grep CONFIG_PTDUMP_CORE
+  Documentation/arch/arm64/ptdump.rst: CONFIG_PTDUMP_CORE=y
+  arch/arm64/include/asm/ptdump.h:#ifdef CONFIG_PTDUMP_CORE
+  arch/arm64/include/asm/ptdump.h:#endif /* CONFIG_PTDUMP_CORE */
+  arch/arm64/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE)        += ptdump.o
+  arch/powerpc/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE)      += ptdump/
+  arch/riscv/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE) += ptdump.o
+  arch/s390/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE) += dump_pagetables.o
+  arch/x86/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE)  += dump_pagetables.o
+  mm/Makefile:obj-$(CONFIG_PTDUMP_CORE) += ptdump.o
+
+GENERIC_PTDUMP means "this architecture uses generic ptdump code for
+ptdump", i.e. the architecture implements all the necessary bits for
+that to work *IF* it is built.
+
+PTDUMP_CORE means "actually build the core ptdump code".
+
+If everyone uses the generic ptdump code now, maybe it's worth renaming
+GENERIC_PTDUMP to ARCH_HAS_PTDUMP or something like that, but I don't
+think this change makes sense as-is.
+
+[...]
+
+> diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
+> index 20552f163930..8aafd050b754 100644
+> --- a/kernel/configs/debug.config
+> +++ b/kernel/configs/debug.config
+> @@ -73,7 +73,6 @@ CONFIG_DEBUG_VM=y
+>  CONFIG_DEBUG_VM_PGFLAGS=y
+>  CONFIG_DEBUG_VM_RB=y
+>  CONFIG_DEBUG_VM_VMACACHE=y
+> -CONFIG_GENERIC_PTDUMP=y
+>  CONFIG_KASAN=y
+>  CONFIG_KASAN_GENERIC=y
+>  CONFIG_KASAN_INLINE=y
+
+I think this is wrong today, and removing it is the right thing to do.
+
+Architectures with support will select this themselves, and on
+architectures without support this either does nothing or causes a build
+failure.
+
+Mark.
