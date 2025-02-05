@@ -1,65 +1,65 @@
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77ADA13D897
-	for <kvmarm@lists.linux.dev>; Wed,  5 Feb 2025 18:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A095C1FCFDA
+	for <kvmarm@lists.linux.dev>; Wed,  5 Feb 2025 18:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738781357; cv=none; b=fhS/EfB3341MiBoIG8GpyYlyyfv5y5HZjP1jXqtqpsK41e7tPfcKRGhqNt+RUqksr2B18FnQWH598L5FSnWYuQxX5dRPFp3GOMgT6bOLC8bmUKV1XUvLkY4nGZJAP8KRqkFaiovk7aIb/pY1zNA6IADJkMr+giwj60I6JXeWLpM=
+	t=1738781834; cv=none; b=LoAZRBGGf3PTFlQ1bcOivDnuVdEbpJzanQIXhUMmz6hg/LWuOO5kAg8Ofeozgy8iyy4LLzPwAEZCLSfc8MfJYhA3VK2l5BAR0Glw6Xy6Vm4zr6qRnSMyBSHuidBLz0QZ6eG4jheJBYSZe/FytpSl0ohfW6raZwkBH7OazOrX8fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738781357; c=relaxed/simple;
-	bh=RFLD5Y419LMLKxBPptSqSiuNprPZyJrTzacReh60S5o=;
+	s=arc-20240116; t=1738781834; c=relaxed/simple;
+	bh=rOrAEmmc0o2wzEyiwOq4DQ4uXK1/Mbcgtx+WsCmakwQ=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=iMUV5B1vv6IoJYCKIVrBFZYhXAQe8T5IFjOAHJB71YRq2y8Trf+/iQ4SolOHCqexJBJhJb+v0c5AMHA8MnfbkTA5OrOX6/nJOYNBZfT78EVe2JTxCPXzGdufQ9hWVfHpZnvr0R7tlDK2Zz+s7IAyw6aDdb+jbXQgrG3PtLcVHOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I7tIaA2k; arc=none smtp.client-ip=209.85.210.74
+	 Content-Type; b=U0R/k/GjgQVmxDvpePeyKCfoZpoGZ37ErZggFVmrfQ3poD2szHpURWqqv8xjrTdT5ulbqcEUbWImqp8KnAQXtqw1cSk/Jsm91T3esymxfu5IJ1zm2EPbPa9rahz5QY/YmotwPfDFWV9iud3YDNKLE/gFpLCadsXtDYtE7pf300w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JfRpRAQE; arc=none smtp.client-ip=209.85.166.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7tIaA2k"
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71e197d0cdfso112133a34.0
-        for <kvmarm@lists.linux.dev>; Wed, 05 Feb 2025 10:49:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JfRpRAQE"
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3d0246e4c2dso819265ab.3
+        for <kvmarm@lists.linux.dev>; Wed, 05 Feb 2025 10:57:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738781355; x=1739386155; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1738781832; x=1739386632; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=RFLD5Y419LMLKxBPptSqSiuNprPZyJrTzacReh60S5o=;
-        b=I7tIaA2kZ9mTA5Not9PQCR7Z+7hmlZ8VAKeIxGV1dovGZerHm9j3rEijYGtx4S1zDo
-         qnkmreEv+Q+VsHNDAslu7WyH+knjsQCoX8iLTCvy4VBkSyttiFp4fPBKtzhYWvdcQ+a3
-         V4snf4P0i8X9QUVECevsSHD4zIzf7iA78QRIw9rx5sZMuxFF0ArF5eLpLMLAmoSwD0FY
-         bCcWlcDJbIOpO/ChSRG5pR/rPB/xFpoR094QkmYc5D2oKTksEujrZ0aJbQTLmtzE4Zi6
-         cI6PHsphTOGBHl6FykNQ8WHEODtpgKSeUbJxG+n5ohpmbdKVApP8NFA1OGKcXmi5GaM8
-         hgdg==
+        bh=rOrAEmmc0o2wzEyiwOq4DQ4uXK1/Mbcgtx+WsCmakwQ=;
+        b=JfRpRAQESTuGcpwOE5G9y0ocqMJBzx1boPxSiFRgCG84xSWKSrBp1seVZk1O9KfiT8
+         mv0uRF85QCoxdMwSN03LDATeaO/GJZiNPZCfueeIyghG8Lc8dtnMtR0oJScQG7j5SrBw
+         NUtgi9PoY6+Wf5T6VD19rgEyvBfSC9Ck1hSsRI+SAz/+eBLq0bwF+doHduoWihMPp2dW
+         77LaAMLr4hi4j5tmlLj8CjGscU7UibAGVXx4DQTOfWXbWlIR+EW61vyuFbblbcJmpZ5w
+         7pA0uVXvp3iC6b828MCSNMT+VNfpFVUPJh48NV/ki4X1lIgQIG+YgAc1EwkaIsSTnBlF
+         +Nnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738781355; x=1739386155;
+        d=1e100.net; s=20230601; t=1738781832; x=1739386632;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RFLD5Y419LMLKxBPptSqSiuNprPZyJrTzacReh60S5o=;
-        b=aOiBc+pGJ4FgU+8zSuxV0DWJL/N5RMH6DlNUIols9G53v7UP6vyjQrJOTlscs6Yhls
-         CeAAlDFZxArY0EQfYH3JBiIogYvbgc7enNV7jYE8eWv6aOhxzayB2vCGa0ob/7+/WuMU
-         W/8u3Dj1QYPg0+Yuv9oWzMqnKU63rGdvED9o/gIo5HIjH+uiHGcwhekUFkb7puoMgvtP
-         v2n8E7IAb9GWuyNc2ZOVV17e8cCjciOZWoOiZ/VGzbs2bRotuNUBU2PnHI+p71C7Y1Xz
-         ZR+tLIx3Xuc+9pFEMaF3jX9jSD+vDDGAlfmJ1vjlXFhb40izYk2wjCgPmNToUlUCuTu/
-         Fr8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUS3gQx85fMWYSWIZDcWiHwiwsABfAwIRPpQoqrseCEqYtn+N6RgHdHQB9vavJv5bXT1r6pmL8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwwAXZYO9g3YQp4SHPFNj6T3ef+oC3WlMZ3W9tVMpddNXCVCNOa
-	o7jvhp6OYm5WdBXFOjDiynjb+6P7LSxgjiQXrM/gZD8XJHxO+qa192s312FgEFBOUxuBPy/Piho
-	BEldCohfK4/tWXB1rUeN1bA==
-X-Google-Smtp-Source: AGHT+IG1848Nyq0Ep5YZHUoXqdxSYPedyBRtjzatXIPDIYwQRd5LUrtw/B5zE5Ng8GmU9F7dXNmOSuoU4vizvGXdRQ==
-X-Received: from otbcs10.prod.google.com ([2002:a05:6830:678a:b0:721:b316:918])
+        bh=rOrAEmmc0o2wzEyiwOq4DQ4uXK1/Mbcgtx+WsCmakwQ=;
+        b=fHW7ulA/4QZ1ibbWDPXoSycxkXHSg66Vut4wjNNtxxAUjZQHYx2ePLEMZhWTR5oAEV
+         uvEA/a/mlEoMFGWOLAvd/1XJ8EctMYaQysPnk8qHf5llnz2mJq/HNQzQCw6JgTqCN67R
+         8Bmqd8RqOT2C9Pfhk+RgbeRYj3eKYHQvg+VnzQ+Br/WK5CgQI9dhO+D9GEQuGEiSe9iy
+         3BvjQvz1Tp25ZyFgluAmLkYG/Z1tkaV8iEAt71dxXkywAZoeVo69QiTbEbQuEYhJN26Q
+         ABMPBPHwzLdk0d/GJS+fYNzRFgNtkO4fGpOAMmmyNCXW2zmsTb/1WivBgpP3lFuxLfj6
+         G6aA==
+X-Forwarded-Encrypted: i=1; AJvYcCVS/9qvgnHHsbo6LyLmkgEP489YeMWCHIae9aXcZJkN2i1fmK70DO9ZuLHf1RMr8RLJIkLzGls=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxyA0AoLNuu5nY8cieD9OklD29NvbQjaZ0IlnIhuvxFCw0CyAHN
+	olCEFeOBezMV5m3rYh2ufakkmsySjyuuyBnFIDffTJwxrgKglyvutKUC8yck4V12SsH7buXKZ50
+	QrOy3yXa7MQCM5h/Q+OF/fg==
+X-Google-Smtp-Source: AGHT+IFWjXwnbjoiuM23Lh8ngijtdwE4nXRVNLab1fsF4fpL0OVJ9k6mAwaRhufdfdCX0QUJltSRVIg24JQ3/eImKg==
+X-Received: from ilbbe10.prod.google.com ([2002:a05:6e02:304a:b0:3d0:e0a:64e1])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6830:71aa:b0:71d:f6d3:9fd2 with SMTP id 46e09a7af769-726a428cc52mr2331443a34.24.1738781355567;
- Wed, 05 Feb 2025 10:49:15 -0800 (PST)
-Date: Wed, 05 Feb 2025 18:49:14 +0000
-In-Reply-To: <Z6KoUBdmjVRuqPnU@linux.dev> (message from Oliver Upton on Tue, 4
- Feb 2025 23:52:48 +0000)
+ 2002:a05:6e02:2197:b0:3d0:1fc4:edf2 with SMTP id e9e14a558f8ab-3d04f41ec43mr42282665ab.7.1738781831860;
+ Wed, 05 Feb 2025 10:57:11 -0800 (PST)
+Date: Wed, 05 Feb 2025 18:57:10 +0000
+In-Reply-To: <Z6KqDR3S_AWXXLJK@linux.dev> (message from Oliver Upton on Wed, 5
+ Feb 2025 00:00:13 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntseos1b2t.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 1/2] perf: arm_pmuv3: Remove cyclical dependency with kvm_host.h
+Message-ID: <gsntpljw1apl.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 2/2] perf: arm_pmuv3: Uninvert dependency between {asm,perf}/arm_pmuv3.h
 From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
@@ -71,23 +71,30 @@ Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
 Oliver Upton <oliver.upton@linux.dev> writes:
 
-> Hi Colton,
+> On Tue, Feb 04, 2025 at 07:57:08PM +0000, Colton Lewis wrote:
+>> perf/arm_pmuv3.h includes asm/arm_pmuv3.h at the bottom of the
+>> file. This counterintiutive decision was presumably made so
+>> asm/arm_pmuv3.h would be included everywhere perf/arm_pmuv3.h was even
+>> though the actual dependency relationship goes the other way because
+>> asm/arm_pmuv3.h depends on the PMEVN_SWITCH macro that was presumably
+>> put there to avoid duplicating it in the asm files for arm and arm64.
 
-> On Tue, Feb 04, 2025 at 07:57:07PM +0000, Colton Lewis wrote:
->> asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
->> which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
->> causes confusing compilation problems when trying to use anything in
->> the chain.
-
->> Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
->> because asm/kvm_host.h is huge and we only need a few functions from
->> it. Move the required declarations to asm/arm_pmuv3.h.
+>> Extract the relevant macro to its own file to avoid this unusual
+>> structure so it may be included in the asm headers without worrying
+>> about ordering issues.
 
 >> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-> Please do not move KVM namespaced functions into non-KVM headers. Having
-> a separate header for KVM<->PMUv3 driver interfaces is probably the
-> right thing to do, especially since you're going to be adding more with
-> partitioned PMU support.
+> Is the intention of this change to allow asm/arm_pmuv3.h to be directly
+> included? If yes, what's the issue with using perf/arm_pmuv3.h?
 
-That seems like a good idea to me.
+That isn't the primary intent, but it's a good side effect. Headers that
+can't be directly included violate people's expectations.
+
+> We already use definitions from the non-arch header in KVM anyway...
+
+My intention here was just reorganizing a counterintuitive use of
+headers. The arch header depends on definitions in the non-arch header
+even though the inclusion relationship is the other way around.
+
+But this patch doesn't matter as much as fixing the cyclical dependency.
