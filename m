@@ -1,221 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF7F1F417C;
-	Thu,  6 Feb 2025 15:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689751F4162
+	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 15:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738856985; cv=none; b=SqixpRoHi1YiBeyDCssrJLuLywwkrvxnX51KWbPMI1gYp/mtqwtIofUu5ceE+TuGaHXy63rEPaHfKG0smp+1bs4XDLXxHlWeLI+ADDZLtkmWCdFYwEtCaXOFpYhkWrhzWeVvCzCq63pOxQtAKiatnMXhscqs+URD+3fPmyKRkmg=
+	t=1738857047; cv=none; b=k2uZBWW0aQSdu1hW+aiR0/npmZj70VyMv+vV8pjV+CGoHOtAYwPa7NU1wKHUVNHwPgXMnor3lJeAhpMOQLDgV/Cel9aA2XT/rfZwmuqdCFrjqrfz56BvBWHACdKsTt3FHOwQkbGFuKuR93QptqxAFw3uuFZszwsmFOpbK7hMdeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738856985; c=relaxed/simple;
-	bh=uO69gM1xPCPM1BzGIGUdq0NR66H7qbXzDRM+U4keUhM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FTwwqLDuHnY9kapdq5rbO7A9jtWTnjaonIAnEDMIdzk2Ubj0kM5o4lMlBPtJala5qixGsXVutWjl572sGaLVoSzFWI4UYJ9cwnPTy731t4kHknTSyJ+hgQZMsZ1shqHksA22xiOAf417zQjKFUmfgIiHmjFrVubTiX9cxAwtCis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEL1Jg3C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738857047; c=relaxed/simple;
+	bh=zVYEH9u7BZqBR99JO0eGFShudYpqrhSzoFDK0x9XVJU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ghhmu8KabyFLjDXonyPKGbtwqrQHRwNCGZUryIYgqqvOJ7ZxHP3tlpi9HZe95mjUJvltkTx/nm1+pOQb6O0Oc5fohQpc6onjW2+bbVbrQTSwdz06gv1wOXHxQdzG+LUDZfoaRtHdZhBIgNAvpVliPgywoeBvcFXkj5fSwWflOoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PWsIVXMs; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEL1Jg3C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE326C4CEE2;
-	Thu,  6 Feb 2025 15:49:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738856984;
-	bh=uO69gM1xPCPM1BzGIGUdq0NR66H7qbXzDRM+U4keUhM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WEL1Jg3CslLHaZvB5EpXJTUjmcnLPFQLuOPQIkKW0ODvqRLbH8T8rMz+TnWFESqOP
-	 CaOkDconINPBibOBMIWzYvsDdpIany/n8sf/UZWA457lkHnod1fT53qyI9ziS9iHUz
-	 ksoKUdamLfQX8W1kmVRw3V19meRkB8wjFiwEoVlzrf97ZPkUD+YvSyIRNEnEJ71rWu
-	 kFVmwI2ebvF8MFr6N0fc63ltzC+w193gXt7GlItQ7rTXWCOw7k2/Eb4JUEjSiEoyGT
-	 uNHTFbT5UsrXEXaX8hRjLi2r+ciM4vr+mxJzM/EvVLaYm6N9mHK7iqLz5FCzLJ7Up6
-	 7Erne0JDTCb5w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tg48M-001BOX-PM;
-	Thu, 06 Feb 2025 15:49:42 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 15/16] KVM: arm64: nv: Allow userland to set VGIC maintenance IRQ
-Date: Thu,  6 Feb 2025 15:49:24 +0000
-Message-Id: <20250206154925.1109065-16-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250206154925.1109065-1-maz@kernel.org>
-References: <20250206154925.1109065-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PWsIVXMs"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-46b1d40abbdso9078811cf.2
+        for <kvmarm@lists.linux.dev>; Thu, 06 Feb 2025 07:50:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738857045; x=1739461845; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zVYEH9u7BZqBR99JO0eGFShudYpqrhSzoFDK0x9XVJU=;
+        b=PWsIVXMsqxR3dtwIZ+2QlF82ZLSW3v+zAz2wmN6LAoiAuNkKW4A46vBAr/2sPAkCRE
+         duuJTfkNBt7y99TgL6/p0YxwHxiZmqGfl+D2tI1G6kdcuKsdp+eX08MCvAy12g8yjpPD
+         +Gk+f3dBV+RMZZs/wipYt2nM+WpibIFACuQ82DqSLXgpu2H/LHJ8r4ZvPPQgSw2k67c9
+         8voKmvGkLmUk8WLgRURDa1s1XPQrI6HM1zZwwlqBHJPopqq74cfwhnG1RkJQhM9UjM5k
+         n9Qxu3ZeBeZO2TBO3NrM/1HAvBaCOrzDgsInM84X5PKUWrdf0tHqy944/ZK6jlZlz1oM
+         7HJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738857045; x=1739461845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zVYEH9u7BZqBR99JO0eGFShudYpqrhSzoFDK0x9XVJU=;
+        b=hn6mSF5qhoppzFyij3yy1d4RMNVuZZLFLRZ39xm7HlPmcX1iPZ6qXxSLcihg/ajxLF
+         geXBoIWVKiGIYHlO0TX6Dd3LBccQm09yLGi4+6e6POSI3Eg5DJ+uk6tbDyxYNvZhwtlh
+         lN9Mj5NAisArT7ujJruKjYTiwx4krapLKmR63LrGQgxNFuQaFkb53OQ6uF8pdDT4/ypq
+         dU6atOcowhZQa+mM5CPprZHxhagQpYY0ds61jEV48qJgXmBxXoqUjQ5sR269pSFlNaEV
+         SDYSrlztBoPujDEPES0rQTdlUQ85WahRU0cFiVAi9lELh8tLk4PwdMZCwv7if6torCjb
+         Kh3Q==
+X-Gm-Message-State: AOJu0YwNA7BLG3u1Ht90eyLV1o5j9miHrGyYAVpHEARD8Aa2RO3yJAI7
+	2joe8mYtdhF2z6lRuNIfWRxR612XqYZGxKjffjw+v2gPOgwdiMDo4/Y2xp15wOBmVYyorb7+elx
+	RyH6iA4aZXCDfX4WV4VxT2kPFzInwZ3CqRacI
+X-Gm-Gg: ASbGnctfz7Tc675ft3XPb3x8Xg8XFHMGqkiMeAfSKmVVgHxauGbxNiowUfjtUZLeDU6
+	KXOXYXUVkLkWe8DAEGmEWOaGr+f3MSKNO6KvSAEb/vR1eaxCtxSj5r2Ctn93zFzOYWzU7YNTDks
+	fPSYpApJWSBA77i0/NsW4mcKCmpsY=
+X-Google-Smtp-Source: AGHT+IE+rncFtbwAhZ1eoJytYc7UY8vVDkzQB+FICzCa3dFx23X6hvyuFMYoDKTdtpAQ+BR2Few3Qk+b0NFFyA1UmdE=
+X-Received: by 2002:ad4:5f45:0:b0:6d8:8fdd:9797 with SMTP id
+ 6a1803df08f44-6e42fc59b24mr129162316d6.36.1738857044694; Thu, 06 Feb 2025
+ 07:50:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andre.przywara@arm.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20250206152100.1107909-1-maz@kernel.org> <20250206152100.1107909-2-maz@kernel.org>
+In-Reply-To: <20250206152100.1107909-2-maz@kernel.org>
+From: Alexander Potapenko <glider@google.com>
+Date: Thu, 6 Feb 2025 16:50:08 +0100
+X-Gm-Features: AWEUYZl1exSceb3O3opzpDJtoQyjd-knXe-SoSYCxd4Vf1FfK1UFVnubiYOcITk
+Message-ID: <CAG_fn=VMo=S_QBoSQ0oL-p1ajxU-=tX+EPqZ41POSSFMS08szg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: timer: Drop warning on failed interrupt signalling
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Andre Przywara <andre.przywara@arm.com>
+On Thu, Feb 6, 2025 at 4:21=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> We currently spit out a warning if making a timer interrupt pending
+> fails. But not only this is loud and easy to trigger from userspace,
+> we also fail to do anything useful with that information.
+>
+> Dropping the warning is the easiest thing to do for now. We can
+> always add error reporting if we really want in the future.
+>
+> Reported-by: Alexander Potapenko <glider@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Tested-by: Alexander Potapenko <glider@google.com>
 
-The VGIC maintenance IRQ signals various conditions about the LRs, when
-the GIC's virtualization extension is used.
-So far we didn't need it, but nested virtualization needs to know about
-this interrupt, so add a userland interface to setup the IRQ number.
-The architecture mandates that it must be a PPI, on top of that this code
-only exports a per-device option, so the PPI is the same on all VCPUs.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-[added some bits of documentation]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- .../virt/kvm/devices/arm-vgic-v3.rst          | 12 +++++++-
- arch/arm64/include/uapi/asm/kvm.h             |  1 +
- arch/arm64/kvm/vgic/vgic-kvm-device.c         | 29 +++++++++++++++++--
- tools/arch/arm/include/uapi/asm/kvm.h         |  1 +
- 4 files changed, 40 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 5817edb4e0467..e860498b1e359 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -291,8 +291,18 @@ Groups:
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
- 
-   Errors:
--
-     =======  =============================================
-     -EINVAL  vINTID is not multiple of 32 or info field is
- 	     not VGIC_LEVEL_INFO_LINE_LEVEL
-     =======  =============================================
-+
-+  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes the following values:
-+
-+      bits:     | 31   ....    5 | 4  ....  0 |
-+      values:   |      RES0      |   vINTID   |
-+
-+    The vINTID specifies which interrupt is generated when the vGIC
-+    must generate a maintenance interrupt. This must be a PPI.
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 568bf858f3198..fc5a641b3ed6c 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -403,6 +403,7 @@ enum {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 5f4f57aaa23ec..359094f68c23e 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -303,6 +303,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
- 			     VGIC_NR_PRIVATE_IRQS, uaddr);
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+
-+		r = put_user(dev->kvm->arch.vgic.mi_intid, uaddr);
-+		break;
-+	}
- 	}
- 
- 	return r;
-@@ -517,7 +523,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 	struct vgic_reg_attr reg_attr;
- 	gpa_t addr;
- 	struct kvm_vcpu *vcpu;
--	bool uaccess;
-+	bool uaccess, post_init = true;
- 	u32 val;
- 	int ret;
- 
-@@ -533,6 +539,9 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 		/* Sysregs uaccess is performed by the sysreg handling code */
- 		uaccess = false;
- 		break;
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
-+		post_init = false;
-+		fallthrough;
- 	default:
- 		uaccess = true;
- 	}
-@@ -552,7 +561,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 
- 	mutex_lock(&dev->kvm->arch.config_lock);
- 
--	if (unlikely(!vgic_initialized(dev->kvm))) {
-+	if (post_init != vgic_initialized(dev->kvm)) {
- 		ret = -EBUSY;
- 		goto out;
- 	}
-@@ -582,6 +591,19 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 		}
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
-+		if (!is_write) {
-+			val = dev->kvm->arch.vgic.mi_intid;
-+			ret = 0;
-+			break;
-+		}
-+
-+		ret = -EINVAL;
-+		if ((val < VGIC_NR_PRIVATE_IRQS) && (val >= VGIC_NR_SGIS)) {
-+			dev->kvm->arch.vgic.mi_intid = val;
-+			ret = 0;
-+		}
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		break;
-@@ -608,6 +630,7 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return vgic_v3_attr_regs_access(dev, attr, true);
- 	default:
- 		return vgic_set_common_attr(dev, attr);
-@@ -622,6 +645,7 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return vgic_v3_attr_regs_access(dev, attr, false);
- 	default:
- 		return vgic_get_common_attr(dev, attr);
-@@ -645,6 +669,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 		return vgic_v3_has_attr_regs(dev, attr);
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
- 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
-diff --git a/tools/arch/arm/include/uapi/asm/kvm.h b/tools/arch/arm/include/uapi/asm/kvm.h
-index 03cd7c19a683b..d5dd969028175 100644
---- a/tools/arch/arm/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm/include/uapi/asm/kvm.h
-@@ -246,6 +246,7 @@ struct kvm_vcpu_events {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
--- 
-2.39.2
-
+Thanks!
