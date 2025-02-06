@@ -1,100 +1,203 @@
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A095C1FCFDA
-	for <kvmarm@lists.linux.dev>; Wed,  5 Feb 2025 18:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A182905
+	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 00:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738781834; cv=none; b=LoAZRBGGf3PTFlQ1bcOivDnuVdEbpJzanQIXhUMmz6hg/LWuOO5kAg8Ofeozgy8iyy4LLzPwAEZCLSfc8MfJYhA3VK2l5BAR0Glw6Xy6Vm4zr6qRnSMyBSHuidBLz0QZ6eG4jheJBYSZe/FytpSl0ohfW6raZwkBH7OazOrX8fQ=
+	t=1738801111; cv=none; b=IMs363v6dt4Ehu233tIV8rCcFjFjcI7+jWjmkMNTiW1R+WezP/aK8IcAtF4bm5AW6tRtdfYPXXHH/g4kbtoDNySD7dcly7CiEGC6G1xuypYDITSrT6YYikxBfIg91pLecueK7mO3A/orrq+a/FEC2+wz/23yMyKoV/+YKvxieQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738781834; c=relaxed/simple;
-	bh=rOrAEmmc0o2wzEyiwOq4DQ4uXK1/Mbcgtx+WsCmakwQ=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=U0R/k/GjgQVmxDvpePeyKCfoZpoGZ37ErZggFVmrfQ3poD2szHpURWqqv8xjrTdT5ulbqcEUbWImqp8KnAQXtqw1cSk/Jsm91T3esymxfu5IJ1zm2EPbPa9rahz5QY/YmotwPfDFWV9iud3YDNKLE/gFpLCadsXtDYtE7pf300w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JfRpRAQE; arc=none smtp.client-ip=209.85.166.202
+	s=arc-20240116; t=1738801111; c=relaxed/simple;
+	bh=E10Fe+xOECzbVvSUHJIawMxUtiAytKMIxx8zDDSzvhw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=p11HOciqbdki7THbt4l5uEKDswWaydep7ulY8rsllawPFcQt3IYDoyodGwE6aX7eAnkyzlk0MQZNa8RH/j9bYh5hZIkvQ4hnyLuNqu5gXJ338GlOLoXBVHutyjSAzBwzduix7tLsHW5paLNRAW/Q6zSE18D1gOxu9GYK0KHxC+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cefrp8gD; arc=none smtp.client-ip=209.85.210.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JfRpRAQE"
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3d0246e4c2dso819265ab.3
-        for <kvmarm@lists.linux.dev>; Wed, 05 Feb 2025 10:57:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cefrp8gD"
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71e1c2b6f72so443427a34.1
+        for <kvmarm@lists.linux.dev>; Wed, 05 Feb 2025 16:18:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738781832; x=1739386632; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rOrAEmmc0o2wzEyiwOq4DQ4uXK1/Mbcgtx+WsCmakwQ=;
-        b=JfRpRAQESTuGcpwOE5G9y0ocqMJBzx1boPxSiFRgCG84xSWKSrBp1seVZk1O9KfiT8
-         mv0uRF85QCoxdMwSN03LDATeaO/GJZiNPZCfueeIyghG8Lc8dtnMtR0oJScQG7j5SrBw
-         NUtgi9PoY6+Wf5T6VD19rgEyvBfSC9Ck1hSsRI+SAz/+eBLq0bwF+doHduoWihMPp2dW
-         77LaAMLr4hi4j5tmlLj8CjGscU7UibAGVXx4DQTOfWXbWlIR+EW61vyuFbblbcJmpZ5w
-         7pA0uVXvp3iC6b828MCSNMT+VNfpFVUPJh48NV/ki4X1lIgQIG+YgAc1EwkaIsSTnBlF
-         +Nnw==
+        d=google.com; s=20230601; t=1738801109; x=1739405909; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Zr3/LuzVjUoCOE75RpPvv8HgrgBhtrHXf0v0cKrFx3I=;
+        b=cefrp8gDvTCB7qiCnkEb5UOkSOoifNNbRBfWeZfYD8N1wgCwgaM8kQxbldCuOJswNA
+         PwymaqE2Pgo+XkcKDQsoTWLL10med4O3iXvH5rgVHBVx8shZ95v9iEKoJt1o68XGaLXJ
+         Sm5LU64/9dp1WSPP+DSmcWDmcpkbTY6hpwkIX2Oo5rQWYi9aCo5PZswQwh+vTSZXbcqO
+         H47eQIPu0zvyUuXU9z1cVnVWA0OZtRw28mXjv/1dQ912XXUgIxWA3dB2wIFvn4apetyZ
+         y5NFYFQgys2WiysxzjUGqVBI3cdQ7svvKPmdeT65VFvwR06z/V4MbfzlOkyJnUwXdWki
+         Am3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738781832; x=1739386632;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rOrAEmmc0o2wzEyiwOq4DQ4uXK1/Mbcgtx+WsCmakwQ=;
-        b=fHW7ulA/4QZ1ibbWDPXoSycxkXHSg66Vut4wjNNtxxAUjZQHYx2ePLEMZhWTR5oAEV
-         uvEA/a/mlEoMFGWOLAvd/1XJ8EctMYaQysPnk8qHf5llnz2mJq/HNQzQCw6JgTqCN67R
-         8Bmqd8RqOT2C9Pfhk+RgbeRYj3eKYHQvg+VnzQ+Br/WK5CgQI9dhO+D9GEQuGEiSe9iy
-         3BvjQvz1Tp25ZyFgluAmLkYG/Z1tkaV8iEAt71dxXkywAZoeVo69QiTbEbQuEYhJN26Q
-         ABMPBPHwzLdk0d/GJS+fYNzRFgNtkO4fGpOAMmmyNCXW2zmsTb/1WivBgpP3lFuxLfj6
-         G6aA==
-X-Forwarded-Encrypted: i=1; AJvYcCVS/9qvgnHHsbo6LyLmkgEP489YeMWCHIae9aXcZJkN2i1fmK70DO9ZuLHf1RMr8RLJIkLzGls=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxyA0AoLNuu5nY8cieD9OklD29NvbQjaZ0IlnIhuvxFCw0CyAHN
-	olCEFeOBezMV5m3rYh2ufakkmsySjyuuyBnFIDffTJwxrgKglyvutKUC8yck4V12SsH7buXKZ50
-	QrOy3yXa7MQCM5h/Q+OF/fg==
-X-Google-Smtp-Source: AGHT+IFWjXwnbjoiuM23Lh8ngijtdwE4nXRVNLab1fsF4fpL0OVJ9k6mAwaRhufdfdCX0QUJltSRVIg24JQ3/eImKg==
-X-Received: from ilbbe10.prod.google.com ([2002:a05:6e02:304a:b0:3d0:e0a:64e1])
+        d=1e100.net; s=20230601; t=1738801109; x=1739405909;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Zr3/LuzVjUoCOE75RpPvv8HgrgBhtrHXf0v0cKrFx3I=;
+        b=rHdVyjDthvaUbqMNDwQpWobN3jUACT+BNcaItxL+6i1sEBqmoJDapbAisnj/1qL1EJ
+         txQjZVlhsbhVUcuftjAuunHOfjXsV0pTm0YiMRTlGD5X4NDvIEaYZLqXQS2bfzxOuFVR
+         DwqulpyPEdtMW4s2viOdeVDUhweGPjoORHv4BEk9qSwuBG6ifyTFa9qMzDjbqFzX7hEG
+         uBNXRMLc/p/sIUV8J9Yz/uDs/47CJvZql8i21bgzDaM3emh4HX+CxezeOnjvXHyvjHQQ
+         vf98HndQI5ELl3G53TcESaQBaSb0cwgvl/xzY5wajWGqWed20tn0Gpy7yeH0G6WaOsD9
+         Zo7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWtj1j0/n/3HWyctYZ/3Lg9gAIMrlEX9zJNg90GJXr07xPauFGJy2pGgveiBYivDksWRBoYDb0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwzCcBMPocHRMfBvbvk7577iJeQRpdrWyt0+Oh+D/0YZn0dtAT6
+	nR8hMIHq4k2DmK8hIIJsoZHzRXfQcdAys1tjIFRhZlA8VmSdomMP36jk47Go8R81xzDFmeGZpNk
+	4vMB76+fPn2w8omuf4dRclQ==
+X-Google-Smtp-Source: AGHT+IEVrsS8ZrjIpYlGyg1Ed1+MVibgRhSBBaTAljJpus0kxqPO6kMqiuj10XnP6c5iR6jfwp3/WzcdNy0U3kgBdA==
+X-Received: from otqn6.prod.google.com ([2002:a9d:6f06:0:b0:71d:fe90:fac3])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:2197:b0:3d0:1fc4:edf2 with SMTP id e9e14a558f8ab-3d04f41ec43mr42282665ab.7.1738781831860;
- Wed, 05 Feb 2025 10:57:11 -0800 (PST)
-Date: Wed, 05 Feb 2025 18:57:10 +0000
-In-Reply-To: <Z6KqDR3S_AWXXLJK@linux.dev> (message from Oliver Upton on Wed, 5
- Feb 2025 00:00:13 +0000)
+ 2002:a05:6830:3982:b0:71d:eee3:fd1a with SMTP id 46e09a7af769-726a3fbc8e8mr3724016a34.0.1738801108890;
+ Wed, 05 Feb 2025 16:18:28 -0800 (PST)
+Date: Thu,  6 Feb 2025 00:17:44 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntpljw1apl.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 2/2] perf: arm_pmuv3: Uninvert dependency between {asm,perf}/arm_pmuv3.h
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250206001744.3155465-1-coltonlewis@google.com>
+Subject: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
 From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, mark.rutland@arm.com, 
+To: kvm@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
+which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
+causes confusing compilation problems why trying to use anything
+defined in any of the headers in any other headers. Header guards is
+the only reason this cycle didn't create tons of redefinition
+warnings.
 
-> On Tue, Feb 04, 2025 at 07:57:08PM +0000, Colton Lewis wrote:
->> perf/arm_pmuv3.h includes asm/arm_pmuv3.h at the bottom of the
->> file. This counterintiutive decision was presumably made so
->> asm/arm_pmuv3.h would be included everywhere perf/arm_pmuv3.h was even
->> though the actual dependency relationship goes the other way because
->> asm/arm_pmuv3.h depends on the PMEVN_SWITCH macro that was presumably
->> put there to avoid duplicating it in the asm files for arm and arm64.
+The motivating example was figuring out it was impossible to use the
+hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
+compiler will insist they aren't defined even though kvm_host.h is
+included. Many other examples are lurking which could confuse
+developers in the future.
 
->> Extract the relevant macro to its own file to avoid this unusual
->> structure so it may be included in the asm headers without worrying
->> about ordering issues.
+Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
+because asm/kvm_host.h is huge and we only need a few functions from
+it. Move the required declarations to a new header asm/kvm_pmu.h.
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
 
-> Is the intention of this change to allow asm/arm_pmuv3.h to be directly
-> included? If yes, what's the issue with using perf/arm_pmuv3.h?
+Possibly spinning more definitions out of asm/kvm_host.h would be a
+good idea, but I'm not interested in getting bogged down in which
+functions ideally belong where. This is sufficient to break the
+cyclical dependency and get rid of the compilation issues. Though I
+mention the one example I found, many other similar problems could
+confuse developers in the future.
 
-That isn't the primary intent, but it's a good side effect. Headers that
-can't be directly included violate people's expectations.
+v2:
+* Make a new header instead of moving kvm functions into the
+  dedicated pmuv3 header
 
-> We already use definitions from the non-arch header in KVM anyway...
+v1:
+https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
 
-My intention here was just reorganizing a counterintuitive use of
-headers. The arch header depends on definitions in the non-arch header
-even though the inclusion relationship is the other way around.
+ arch/arm64/include/asm/arm_pmuv3.h |  3 +--
+ arch/arm64/include/asm/kvm_host.h  | 14 --------------
+ arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
+ include/kvm/arm_pmu.h              |  1 -
+ 4 files changed, 27 insertions(+), 17 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_pmu.h
 
-But this patch doesn't matter as much as fixing the cyclical dependency.
+diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+index 8a777dec8d88..54dd27a7a19f 100644
+--- a/arch/arm64/include/asm/arm_pmuv3.h
++++ b/arch/arm64/include/asm/arm_pmuv3.h
+@@ -6,9 +6,8 @@
+ #ifndef __ASM_PMUV3_H
+ #define __ASM_PMUV3_H
+
+-#include <asm/kvm_host.h>
+-
+ #include <asm/cpufeature.h>
++#include <asm/kvm_pmu.h>
+ #include <asm/sysreg.h>
+
+ #define RETURN_READ_PMEVCNTRN(n) \
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7cfa024de4e3..6d4a2e7ab310 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+
+-static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+-{
+-	return (!has_vhe() && attr->exclude_host);
+-}
+-
+ #ifdef CONFIG_KVM
+-void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+-void kvm_clr_pmu_events(u64 clr);
+-bool kvm_set_pmuserenr(u64 val);
+ void kvm_enable_trbe(void);
+ void kvm_disable_trbe(void);
+ void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
+ #else
+-static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+-static inline void kvm_clr_pmu_events(u64 clr) {}
+-static inline bool kvm_set_pmuserenr(u64 val)
+-{
+-	return false;
+-}
+ static inline void kvm_enable_trbe(void) {}
+ static inline void kvm_disable_trbe(void) {}
+ static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
+diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+new file mode 100644
+index 000000000000..3a8f737504d2
+--- /dev/null
++++ b/arch/arm64/include/asm/kvm_pmu.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef __KVM_PMU_H
++#define __KVM_PMU_H
++
++void kvm_vcpu_pmu_resync_el0(void);
++
++#ifdef CONFIG_KVM
++void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
++void kvm_clr_pmu_events(u64 clr);
++bool kvm_set_pmuserenr(u64 val);
++#else
++static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
++static inline void kvm_clr_pmu_events(u64 clr) {}
++static inline bool kvm_set_pmuserenr(u64 val)
++{
++	return false;
++}
++#endif
++
++static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
++{
++	return (!has_vhe() && attr->exclude_host);
++}
++
++#endif
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 147bd3ee4f7b..2c78b1b1a9bb 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ struct kvm_pmu_events *kvm_get_pmu_events(void);
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+-void kvm_vcpu_pmu_resync_el0(void);
+
+ #define kvm_vcpu_has_pmu(vcpu)					\
+ 	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
+
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+--
+2.48.1.362.g079036d154-goog
