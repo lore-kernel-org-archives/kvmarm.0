@@ -1,203 +1,226 @@
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A182905
-	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 00:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD881527B4
+	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 04:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738801111; cv=none; b=IMs363v6dt4Ehu233tIV8rCcFjFjcI7+jWjmkMNTiW1R+WezP/aK8IcAtF4bm5AW6tRtdfYPXXHH/g4kbtoDNySD7dcly7CiEGC6G1xuypYDITSrT6YYikxBfIg91pLecueK7mO3A/orrq+a/FEC2+wz/23yMyKoV/+YKvxieQE=
+	t=1738815720; cv=none; b=lL+ReD+KkqA2hUW36EoZ/jWBSt7nS44r8BJqPwZO9Xm1vs+A/VPhxGVwWAh8ooRDkejSEUCf7WOqNEs//rmOl/AyRkwe+TOu0JV+XlSIam0l8aZ8LxZGEhq/iah/4wUfmvDA+5pgOj/LBGqs9lbKiibog8wdn3Vsir+92o5hs9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738801111; c=relaxed/simple;
-	bh=E10Fe+xOECzbVvSUHJIawMxUtiAytKMIxx8zDDSzvhw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=p11HOciqbdki7THbt4l5uEKDswWaydep7ulY8rsllawPFcQt3IYDoyodGwE6aX7eAnkyzlk0MQZNa8RH/j9bYh5hZIkvQ4hnyLuNqu5gXJ338GlOLoXBVHutyjSAzBwzduix7tLsHW5paLNRAW/Q6zSE18D1gOxu9GYK0KHxC+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cefrp8gD; arc=none smtp.client-ip=209.85.210.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cefrp8gD"
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71e1c2b6f72so443427a34.1
-        for <kvmarm@lists.linux.dev>; Wed, 05 Feb 2025 16:18:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738801109; x=1739405909; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Zr3/LuzVjUoCOE75RpPvv8HgrgBhtrHXf0v0cKrFx3I=;
-        b=cefrp8gDvTCB7qiCnkEb5UOkSOoifNNbRBfWeZfYD8N1wgCwgaM8kQxbldCuOJswNA
-         PwymaqE2Pgo+XkcKDQsoTWLL10med4O3iXvH5rgVHBVx8shZ95v9iEKoJt1o68XGaLXJ
-         Sm5LU64/9dp1WSPP+DSmcWDmcpkbTY6hpwkIX2Oo5rQWYi9aCo5PZswQwh+vTSZXbcqO
-         H47eQIPu0zvyUuXU9z1cVnVWA0OZtRw28mXjv/1dQ912XXUgIxWA3dB2wIFvn4apetyZ
-         y5NFYFQgys2WiysxzjUGqVBI3cdQ7svvKPmdeT65VFvwR06z/V4MbfzlOkyJnUwXdWki
-         Am3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738801109; x=1739405909;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zr3/LuzVjUoCOE75RpPvv8HgrgBhtrHXf0v0cKrFx3I=;
-        b=rHdVyjDthvaUbqMNDwQpWobN3jUACT+BNcaItxL+6i1sEBqmoJDapbAisnj/1qL1EJ
-         txQjZVlhsbhVUcuftjAuunHOfjXsV0pTm0YiMRTlGD5X4NDvIEaYZLqXQS2bfzxOuFVR
-         DwqulpyPEdtMW4s2viOdeVDUhweGPjoORHv4BEk9qSwuBG6ifyTFa9qMzDjbqFzX7hEG
-         uBNXRMLc/p/sIUV8J9Yz/uDs/47CJvZql8i21bgzDaM3emh4HX+CxezeOnjvXHyvjHQQ
-         vf98HndQI5ELl3G53TcESaQBaSb0cwgvl/xzY5wajWGqWed20tn0Gpy7yeH0G6WaOsD9
-         Zo7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWtj1j0/n/3HWyctYZ/3Lg9gAIMrlEX9zJNg90GJXr07xPauFGJy2pGgveiBYivDksWRBoYDb0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwzCcBMPocHRMfBvbvk7577iJeQRpdrWyt0+Oh+D/0YZn0dtAT6
-	nR8hMIHq4k2DmK8hIIJsoZHzRXfQcdAys1tjIFRhZlA8VmSdomMP36jk47Go8R81xzDFmeGZpNk
-	4vMB76+fPn2w8omuf4dRclQ==
-X-Google-Smtp-Source: AGHT+IEVrsS8ZrjIpYlGyg1Ed1+MVibgRhSBBaTAljJpus0kxqPO6kMqiuj10XnP6c5iR6jfwp3/WzcdNy0U3kgBdA==
-X-Received: from otqn6.prod.google.com ([2002:a9d:6f06:0:b0:71d:fe90:fac3])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6830:3982:b0:71d:eee3:fd1a with SMTP id 46e09a7af769-726a3fbc8e8mr3724016a34.0.1738801108890;
- Wed, 05 Feb 2025 16:18:28 -0800 (PST)
-Date: Thu,  6 Feb 2025 00:17:44 +0000
+	s=arc-20240116; t=1738815720; c=relaxed/simple;
+	bh=2Hu+wGlgyE1yEoFVQUzUD28Np8bQBKIHac6+sTBpD9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sXfwQfopofUo2IqcgvCm5oiAmF9a3PdsLV8BWHexQjW2KcHaYoCg8TwUWKxPnVcHbPDe7BMHEFSYxS5ftsquD/CVv9Jrmq44+2KhfO2ioEtpwYDxvZlygNze+v029Ph0MmYhZ641Fy/Pfe+7TAB+QmVHg9F7bnsg+y5A2Lko6qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 823831007;
+	Wed,  5 Feb 2025 20:22:19 -0800 (PST)
+Received: from [10.163.34.115] (unknown [10.163.34.115])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F38B13F5A1;
+	Wed,  5 Feb 2025 20:21:48 -0800 (PST)
+Message-ID: <d5a2b423-2e13-48a1-b3b7-8e1c638bf716@arm.com>
+Date: Thu, 6 Feb 2025 09:51:45 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250206001744.3155465-1-coltonlewis@google.com>
-Subject: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] mm/ptdump: Drop GENERIC_PTDUMP
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-mm@kvack.org, steven.price@arm.com, christophe.leroy@csgroup.eu,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org
+References: <20250205050039.1506377-1-anshuman.khandual@arm.com>
+ <Z6M23dR5wvZKW4JE@J2N7QTR9R3>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <Z6M23dR5wvZKW4JE@J2N7QTR9R3>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
-which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
-causes confusing compilation problems why trying to use anything
-defined in any of the headers in any other headers. Header guards is
-the only reason this cycle didn't create tons of redefinition
-warnings.
 
-The motivating example was figuring out it was impossible to use the
-hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
-compiler will insist they aren't defined even though kvm_host.h is
-included. Many other examples are lurking which could confuse
-developers in the future.
 
-Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
-because asm/kvm_host.h is huge and we only need a few functions from
-it. Move the required declarations to a new header asm/kvm_pmu.h.
+On 2/5/25 15:31, Mark Rutland wrote:
+> On Wed, Feb 05, 2025 at 10:30:39AM +0530, Anshuman Khandual wrote:
+>> GENERIC_PTDUMP does not guard any code but instead just used for platform's
+>> subscription into core ptdump defined under PTDUMP_CORE, which is selected.
+> 
+> Selected by what?
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
+I guess that sentence was incomplete. PTDUMP_CORE gets selected by all
+the real users which requires core PTDUMP to be built and enabled.
 
-Possibly spinning more definitions out of asm/kvm_host.h would be a
-good idea, but I'm not interested in getting bogged down in which
-functions ideally belong where. This is sufficient to break the
-cyclical dependency and get rid of the compilation issues. Though I
-mention the one example I found, many other similar problems could
-confuse developers in the future.
+arch/arm64/kvm/Kconfig: select PTDUMP_CORE	/* config PTDUMP_STAGE2_DEBUGFS */
+arch/x86/Kconfig.debug: select PTDUMP_CORE	/* config EFI_PGT_DUMP */
 
-v2:
-* Make a new header instead of moving kvm functions into the
-  dedicated pmuv3 header
+mm/Kconfig.debug:       select PTDUMP_CORE	/* config PTDUMP_DEBUGFS */
+mm/Kconfig.debug:       select PTDUMP_CORE	/* config DEBUG_WX */
 
-v1:
-https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
+> 
+>> Instead use PTDUMP_CORE for platform subscription and drop GENERIC_PTDUMP.
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Michael Ellerman <mpe@ellerman.id.au>
+>> Cc: Nicholas Piggin <npiggin@gmail.com>
+>> Cc: Paul Walmsley <paul.walmsley@sifive.com>
+>> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+>> Cc: Heiko Carstens <hca@linux.ibm.com>
+>> Cc: Vasily Gorbik <gor@linux.ibm.com>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Ingo Molnar <mingo@redhat.com>
+>> Cc: Andrew Morton <akpm@linux-foundation.org>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-doc@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linuxppc-dev@lists.ozlabs.org
+>> Cc: linux-riscv@lists.infradead.org
+>> Cc: linux-s390@vger.kernel.org
+>> Cc: linux-mm@kvack.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>> This patch applies on v6.14-rc1
+>>
+>> Changes in V2:
+>>
+>> - Keep arch/powerpc/Kconfig alphabetically sorted per Christophe
+>>
+>> Changes in V1:
+>>
+>> https://lore.kernel.org/all/20241217034807.2541349-1-anshuman.khandual@arm.com/
+>>
+>>  Documentation/arch/arm64/ptdump.rst       | 1 -
+>>  arch/arm64/Kconfig                        | 2 +-
+>>  arch/arm64/kvm/Kconfig                    | 3 +--
+>>  arch/powerpc/Kconfig                      | 2 +-
+>>  arch/powerpc/configs/mpc885_ads_defconfig | 1 -
+>>  arch/riscv/Kconfig                        | 2 +-
+>>  arch/s390/Kconfig                         | 2 +-
+>>  arch/x86/Kconfig                          | 2 +-
+>>  arch/x86/Kconfig.debug                    | 2 +-
+>>  kernel/configs/debug.config               | 1 -
+>>  mm/Kconfig.debug                          | 8 ++------
+>>  11 files changed, 9 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/Documentation/arch/arm64/ptdump.rst b/Documentation/arch/arm64/ptdump.rst
+>> index 5dcfc5d7cddf..61ca040a885b 100644
+>> --- a/Documentation/arch/arm64/ptdump.rst
+>> +++ b/Documentation/arch/arm64/ptdump.rst
+>> @@ -22,7 +22,6 @@ offlining of memory being accessed by the ptdump code.
+>>  In order to dump the kernel page tables, enable the following
+>>  configurations and mount debugfs::
+>>  
+>> - CONFIG_GENERIC_PTDUMP=y
+>>   CONFIG_PTDUMP_CORE=y
+>>   CONFIG_PTDUMP_DEBUGFS=y
+>>  
+>> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+>> index fcdd0ed3eca8..1f516bed81dd 100644
+>> --- a/arch/arm64/Kconfig
+>> +++ b/arch/arm64/Kconfig
+>> @@ -157,7 +157,7 @@ config ARM64
+>>  	select GENERIC_IRQ_SHOW_LEVEL
+>>  	select GENERIC_LIB_DEVMEM_IS_ALLOWED
+>>  	select GENERIC_PCI_IOMAP
+>> -	select GENERIC_PTDUMP
+>> +	select PTDUMP_CORE
+>>  	select GENERIC_SCHED_CLOCK
+>>  	select GENERIC_SMP_IDLE_THREAD
+>>  	select GENERIC_TIME_VSYSCALL
+> 
+> This change means that the ptdump core code will be built regardless of
+> whether any users are selected:
+> 
+>   [mark@lakrids:~/src/linux]% git grep CONFIG_PTDUMP_CORE
+>   Documentation/arch/arm64/ptdump.rst: CONFIG_PTDUMP_CORE=y
+>   arch/arm64/include/asm/ptdump.h:#ifdef CONFIG_PTDUMP_CORE
+>   arch/arm64/include/asm/ptdump.h:#endif /* CONFIG_PTDUMP_CORE */
+>   arch/arm64/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE)        += ptdump.o
+>   arch/powerpc/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE)      += ptdump/
+>   arch/riscv/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE) += ptdump.o
+>   arch/s390/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE) += dump_pagetables.o
+>   arch/x86/mm/Makefile:obj-$(CONFIG_PTDUMP_CORE)  += dump_pagetables.o
+>   mm/Makefile:obj-$(CONFIG_PTDUMP_CORE) += ptdump.o
+> 
+> GENERIC_PTDUMP means "this architecture uses generic ptdump code for
+> ptdump", i.e. the architecture implements all the necessary bits for
+> that to work *IF* it is built.
+> 
+> PTDUMP_CORE means "actually build the core ptdump code".
+> 
+> If everyone uses the generic ptdump code now, maybe it's worth renaming
+> GENERIC_PTDUMP to ARCH_HAS_PTDUMP or something like that, but I don't
+> think this change makes sense as-is.
 
- arch/arm64/include/asm/arm_pmuv3.h |  3 +--
- arch/arm64/include/asm/kvm_host.h  | 14 --------------
- arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
- include/kvm/arm_pmu.h              |  1 -
- 4 files changed, 27 insertions(+), 17 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_pmu.h
+Seems like a combination of ARCH_HAS_CORE_PTDUMP for subscription and
+CORE_PTDUMP for actual enablement will make things clear. _CORE_ here
+would still let platforms define their own CONFIG_PTDUMP if preferred
+and not subscribe the generic CORE_DUMP.
 
-diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-index 8a777dec8d88..54dd27a7a19f 100644
---- a/arch/arm64/include/asm/arm_pmuv3.h
-+++ b/arch/arm64/include/asm/arm_pmuv3.h
-@@ -6,9 +6,8 @@
- #ifndef __ASM_PMUV3_H
- #define __ASM_PMUV3_H
+currently GENERIC_PTDUMP and CORE_PTDUMP just seems disjoint, because
+GENERIC_PTDUMP does not not appear to be the platform opt in required
+for CORE_PTDUMP.
 
--#include <asm/kvm_host.h>
--
- #include <asm/cpufeature.h>
-+#include <asm/kvm_pmu.h>
- #include <asm/sysreg.h>
+There is another problem.
 
- #define RETURN_READ_PMEVCNTRN(n) \
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e3..6d4a2e7ab310 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+mm/Kconfig.debug
 
--static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
--{
--	return (!has_vhe() && attr->exclude_host);
--}
--
- #ifdef CONFIG_KVM
--void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
--void kvm_clr_pmu_events(u64 clr);
--bool kvm_set_pmuserenr(u64 val);
- void kvm_enable_trbe(void);
- void kvm_disable_trbe(void);
- void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
- #else
--static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
--static inline void kvm_clr_pmu_events(u64 clr) {}
--static inline bool kvm_set_pmuserenr(u64 val)
--{
--	return false;
--}
- static inline void kvm_enable_trbe(void) {}
- static inline void kvm_disable_trbe(void) {}
- static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
-diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
-new file mode 100644
-index 000000000000..3a8f737504d2
---- /dev/null
-+++ b/arch/arm64/include/asm/kvm_pmu.h
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef __KVM_PMU_H
-+#define __KVM_PMU_H
-+
-+void kvm_vcpu_pmu_resync_el0(void);
-+
-+#ifdef CONFIG_KVM
-+void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-+void kvm_clr_pmu_events(u64 clr);
-+bool kvm_set_pmuserenr(u64 val);
-+#else
-+static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-+static inline void kvm_clr_pmu_events(u64 clr) {}
-+static inline bool kvm_set_pmuserenr(u64 val)
-+{
-+	return false;
-+}
-+#endif
-+
-+static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
-+{
-+	return (!has_vhe() && attr->exclude_host);
-+}
-+
-+#endif
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 147bd3ee4f7b..2c78b1b1a9bb 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
- struct kvm_pmu_events *kvm_get_pmu_events(void);
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
--void kvm_vcpu_pmu_resync_el0(void);
+config DEBUG_WX
+        bool "Warn on W+X mappings at boot"
+        depends on ARCH_HAS_DEBUG_WX
+        depends on MMU
+        select PTDUMP_CORE
+        help
 
- #define kvm_vcpu_has_pmu(vcpu)					\
- 	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
+Before selecting PTDUMP_CORE it does not ensure platform has opted in
+via GENERIC_PTDUMP or not. Instead it should be
 
-base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
---
-2.48.1.362.g079036d154-goog
+config DEBUG_WX
+        bool "Warn on W+X mappings at boot"
+        depends on ARCH_HAS_DEBUG_WX
+	depends on GENERIC_PTDUMP
+	depends on 
+        depends on MMU
+        select PTDUMP_CORE
+        help
+
+PTDUMP_STAGE2_DEBUGFS on arm64 does that where as EFI_PGT_DUMP on x86
+does not. Although it will be ideal but that's not a problem if the
+platform knows for sure that it opts in GENERIC_PTDUMP.
+
+> 
+> [...]
+> 
+>> diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
+>> index 20552f163930..8aafd050b754 100644
+>> --- a/kernel/configs/debug.config
+>> +++ b/kernel/configs/debug.config
+>> @@ -73,7 +73,6 @@ CONFIG_DEBUG_VM=y
+>>  CONFIG_DEBUG_VM_PGFLAGS=y
+>>  CONFIG_DEBUG_VM_RB=y
+>>  CONFIG_DEBUG_VM_VMACACHE=y
+>> -CONFIG_GENERIC_PTDUMP=y
+>>  CONFIG_KASAN=y
+>>  CONFIG_KASAN_GENERIC=y
+>>  CONFIG_KASAN_INLINE=y
+> 
+> I think this is wrong today, and removing it is the right thing to do.
+> 
+> Architectures with support will select this themselves, and on
+> architectures without support this either does nothing or causes a build
+> failure.
+
+Alright, will separate this change out first.
