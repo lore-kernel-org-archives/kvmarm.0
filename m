@@ -1,36 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DAD23642A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E0C1EDA02
 	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 15:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738855273; cv=none; b=asCnocEGQAfQDECwlkKqzdQ/3p3jaPvA1uCUxoZvCHyMr3UnfPsQDyATmL/KfPkSq5zFO2VNKaOFBp0ouEfUaDl3Li61nEv/cZ1Azh16w9oxe83/T0BT9J7J91rpHaX462JowBly24ON5dvn/x//3OulOaThQWZPjMcPrUMmQQg=
+	t=1738855273; cv=none; b=tpuwXKCR0ZFTRW5dtuzsQMjczE8iQIc94M5dXRN2TmGSlrPyhRdQlgslr7Su5o2XbQWw2tu8ie1eKA72YHvjUJi07K9b5hnpYzDdILnOER6RKMywbKU/ug+xQdLXv3qPcql/xrAFqLmHjh95tAKS4xMGqPApL2tM9suiCKDp/38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738855273; c=relaxed/simple;
-	bh=fGkPZyC1lHaD1dNGIgbR3MqllKvLH1NgrTHM4VOF/rQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XFeUTGe2IoEbNNd7vsAKjNfdASvjId1YSXGtOHOZ73EU+rTPIdLqe6vFYiI0+wQ5rT8XwMKLozvg7h9klW++7bD6CQ5OAB9tYC8ed0yOH+aF+PqzBZ2yiCRa2DpXVI8jAtcN81NeXiF8KlbInlBGXAi5m7W3Wfjul45pM+Qff8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DAPAqhM8; arc=none smtp.client-ip=10.30.226.201
+	bh=eQlGH64WFsKvyNl+JJp7HVJjAWxwJIxovk4rzFV0bm8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vpd28FeWLhWNYxrjD2fydtgPu2kwnHdr3Somk/I3JvlXxhD5LkVaWWVHIdbBmfS0CgZavlywRqo/NFWldgOunXYcaNDYci4HivucmGn2RZOl/LbE17tbmcnMLsBxchbjFkK5WNqWmmPYqcHIWBWnKS6IWOrmnfn+Gv9UhqwX0A4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JUg/B5Md; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DAPAqhM8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBB9AC4CEDF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUg/B5Md"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7928C4CEDD;
 	Thu,  6 Feb 2025 15:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1738855272;
-	bh=fGkPZyC1lHaD1dNGIgbR3MqllKvLH1NgrTHM4VOF/rQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DAPAqhM8xt+twMxtoArge3pECx/FD9GqReBEPTDv1rOzbK/WPMa8I5zDqHagGBREk
-	 sA74L5y7Q2TjyKTfzg6Y7Fj8e0h5n85bsW8bf4mdTALDj/uWCBofnPeTSa9P5HjMli
-	 gcbnTqicA8AIvE5PCAfMd3Z8O6dZ41167rto5b1sM1YrwPozWZAp221XLGw5z9JIW0
-	 TnFmoY6LXIcuOADbNyrH5df0HBRJ4BRFiz6quAld7tsUDDwgmy5qB9S2se5PH37x7M
-	 BlI4iTBR2tnnpvZPn1CsvSVwyt75dQnEk5pvqfrL4aDQSgNNmBx2GeJE/aspcTdaJ5
-	 TTzTmIQsD2IZw==
+	bh=eQlGH64WFsKvyNl+JJp7HVJjAWxwJIxovk4rzFV0bm8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JUg/B5MdF3LXUE4kZ7v8Xz5nVXk8k5lrUOA0BPQE7D/6fu53KfWkrLtFA6pA/TBQb
+	 L9s9Zg1BKhoVEiL/xD+socdW1LOERAHYZJznzwwwduKz4FTASjmGK46hi1FS9UiOBM
+	 HC+8RIsPCopfD/7eBPojmizx4EbtsBeS5IGco6uTC+dyjWoTcZyJmCSMpRWcsKUS82
+	 pr1gUFJxASd1IkCW2A7gvwZ+U6txJWuNgxNFiC+oFUiE8eXllgMN1k+a1VapjRmB8t
+	 AdN5BmXzVNRkLi8oFPCMqXRAoxuyDNaRSbEwCbMxZGPHXcIPx8wdM4DiAhEj/WfV9Z
+	 JGbvhiRS+IkXQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tg3gk-001Axu-CO;
+	id 1tg3gk-001Axu-0A;
 	Thu, 06 Feb 2025 15:21:10 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,12 +39,10 @@ Cc: Alexander Potapenko <glider@google.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 1/3] KVM: arm64: timer: Drop warning on failed interrupt signalling
-Date: Thu,  6 Feb 2025 15:20:58 +0000
-Message-Id: <20250206152100.1107909-2-maz@kernel.org>
+Subject: [PATCH 0/3] KVM: arm64: Assorted vgic fixes for 6.14
+Date: Thu,  6 Feb 2025 15:20:57 +0000
+Message-Id: <20250206152100.1107909-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250206152100.1107909-1-maz@kernel.org>
-References: <20250206152100.1107909-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,52 +55,30 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently spit out a warning if making a timer interrupt pending
-fails. But not only this is loud and easy to trigger from userspace,
-we also fail to do anything useful with that information.
+Alexander, while fuzzing KVM/arm64, found an annoying set of problems,
+all stemming from the fact that the vgic can be destroyed in parallel
+with the rest of the guest still being live.
 
-Dropping the warning is the easiest thing to do for now. We can
-always add error reporting if we really want in the future.
+Yes, this is annoying.
 
-Reported-by: Alexander Potapenko <glider@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
+Fixing this is not going to happen overnight (though I have some
+ideas), but we can make what we have today a bit more robust.
+
+This is what patch #2 is doing. Patch #1 is just removing a loud
+WARN_ON() that serves little purpose, and patch #3 fixes the actual
+bug that Alex reported.
+
+Hopefully, none of that is controversial...
+
+Marc Zyngier (3):
+  KVM: arm64: timer: Drop warning on failed interrupt signalling
+  KVM: arm64: vgic: Check for unallocated PPI/SPI arrays
+  KVM: arm64: vgic: Gracefully handle resetting an unallocated interrupt
+
  arch/arm64/kvm/arch_timer.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c  |  7 +++++++
+ 2 files changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 231c0cd9c7b4b..70802e4c91cf5 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -447,21 +447,19 @@ static void kvm_timer_update_status(struct arch_timer_context *ctx, bool level)
- static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				 struct arch_timer_context *timer_ctx)
- {
--	int ret;
--
- 	kvm_timer_update_status(timer_ctx, new_level);
- 
- 	timer_ctx->irq.level = new_level;
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_irq(timer_ctx),
- 				   timer_ctx->irq.level);
- 
--	if (!userspace_irqchip(vcpu->kvm)) {
--		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu,
--					  timer_irq(timer_ctx),
--					  timer_ctx->irq.level,
--					  timer_ctx);
--		WARN_ON(ret);
--	}
-+	if (userspace_irqchip(vcpu->kvm))
-+		return;
-+
-+	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
-+			    timer_irq(timer_ctx),
-+			    timer_ctx->irq.level,
-+			    timer_ctx);
- }
- 
- /* Only called for a fully emulated timer */
 -- 
 2.39.2
 
