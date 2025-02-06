@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FD223642A
-	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 15:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00854F5E0
+	for <kvmarm@lists.linux.dev>; Thu,  6 Feb 2025 15:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738855273; cv=none; b=nLFghT9/U79ITxOXk34y70GELs5ssqGiE3NJyU3GY1wij+39a35pmrnNUnlp4+Y4fa+jGnU5fmDLD1N1Q/5sYxnRmH3B5MlOlCYbXmMErHGfYH+kN8o5/nmDlkIFRSS1vwLrABfh1zy5fLxq+YL+OZqX7EzmeXL3oRTlUD27gJo=
+	t=1738855276; cv=none; b=L3hRDPBVQBxDKJOt0sGYag0TTF/5J0qzi20Zztrb5Zjb6Jq4Nk12zRBpr4FGqGD7ZyuviSlSk+bn49tYdsj8abvFXomBzUszU5f71EiudIjVGbdVn1dW544KLUToG1nHGbB2cXSwZb7hV1iLveEB2Ozyb2+2hQ3iDtSZkV1tNJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738855273; c=relaxed/simple;
-	bh=R18buuzsuS125/Odab8HVwhiAwt8pdMFSvfHK7BgPUE=;
+	s=arc-20240116; t=1738855276; c=relaxed/simple;
+	bh=FA5r9vVNn5Za/abXLyc0dZQCbgu8AwK0WPUB657F/R0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C4Y1xGyHzJ3wQfSQK5sINCbSVrVcFfOt4EqnSpUwTZ4NBuCUjx4UwN8vUQqvD3RgsuMYQFKk8+TsZZ2Yl9a0KMvB9QxFY0plC8zoeHucwUlK8502Epk3W5y4MJCVxDuEclaFwrsnoWEf3p6ZbBjqIm5OtNh7glycJww44PF2aV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=or1/UO5X; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=LKW/JjQx5Wn5QPaKgNe6L2uKUV4Y7V5pzmab1VLdNgnVxNh51Q6G8Ou1wr3vQw2uRVX7kzi5lwWnQ4zkQcWy378ujXeIttX/Ff/VlRN22MQImDMyhtof8meCw/iqcyh5l9MUVbhK1xCQS37tpmm6GpCBiz7JT+SjnbTZ3/MSbFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtvx5bfG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="or1/UO5X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B35D4C4CEDD;
-	Thu,  6 Feb 2025 15:21:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtvx5bfG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EAE2C4CEDD;
+	Thu,  6 Feb 2025 15:21:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738855273;
-	bh=R18buuzsuS125/Odab8HVwhiAwt8pdMFSvfHK7BgPUE=;
+	s=k20201202; t=1738855274;
+	bh=FA5r9vVNn5Za/abXLyc0dZQCbgu8AwK0WPUB657F/R0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=or1/UO5XwRfczye/Xg3Gq9snuMNbD5/7D8mXMHJadtD4gAdT5tCRPNYqcWLDwAtVb
-	 NQ0kdre2iz6RvesgTbw0NYtZIWCbkZ4LIea/r7sDruoUwy4xRgC3IeT7MIWnpNrLFG
-	 ntGemeTwGuUEI/1VAJJLP0jfYj64zmMV9sVHbmXFEu2e9vHZAqj/dL/3AC1GcaCZcg
-	 lFpn0Ty1llhSJveVbEjhW75q6PkA2NnqHkSsWwHzN3V+GEJlFn8TH+l+rtE9fpexRk
-	 CO9ail4A1mn6LfqTp+DbzcwTtHWRVzidv1M2oGPmV0aBG0tUwZs9oAHVij9HnSD8T1
-	 Q2Sgka8EvM1hQ==
+	b=dtvx5bfG+YzBIuNgI8MutaU6u4MEd+a5+k0FDYQPlfyJjS/w8VfJWz/2rDBwnmhHC
+	 GTOSIQgxMTddh1inJiPR9eaU10ug3jfaiyk90/Z95UOc5kty8cnBhHAXNVXPCA1yNV
+	 BePhIjh0pabLNtOMr3NFUcDzG+qEfxk2Oxn6W16FCF1T/HNY4IfGVr3CzuCgTot6pT
+	 5zRX+aogXO7Y9f0OkYxgnSzKRzEaggryQEKA+qhlmJbgbRxNhL965qeh9SWLix+inV
+	 lRyOS2A1bHVUr8p9/Ri3QfixSve/FTtoy7Ovfg0EYgdOnBhkFLPYxGLAA0RCPgKdac
+	 bhS9eyD6kp+Ug==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tg3gk-001Axu-JW;
-	Thu, 06 Feb 2025 15:21:11 +0000
+	id 1tg3gm-001Axu-0W;
+	Thu, 06 Feb 2025 15:21:12 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -40,9 +40,9 @@ Cc: Alexander Potapenko <glider@google.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/3] KVM: arm64: vgic: Check for unallocated PPI/SPI arrays
-Date: Thu,  6 Feb 2025 15:20:59 +0000
-Message-Id: <20250206152100.1107909-3-maz@kernel.org>
+Subject: [PATCH 3/3] KVM: arm64: vgic: Gracefully handle resetting an unallocated interrupt
+Date: Thu,  6 Feb 2025 15:21:00 +0000
+Message-Id: <20250206152100.1107909-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250206152100.1107909-1-maz@kernel.org>
 References: <20250206152100.1107909-1-maz@kernel.org>
@@ -58,42 +58,33 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Alexander's fuzzing has exhibited a large variety of races that
-all end-up with taking the address of a PPI or SPI structure while
-the vgic was torn down (because nuking it is only an ioctl() away,
-and syzkaller is amazing at finding holes).
+Playing with racing vcpu reset and vgic teardown makes it relatively
+easy to trigger a case where, by the time we try to reset a mapped
+interrupt such as a timer's, the vgic is gone and there is no
+interrupt to play with.
 
-In order to preserve some sanity, always evaluate whether the array
-containing the PPI/SPI is allocated.
+Check for NULL upfront to avoid further embarassement.
 
-Suggested-by: Alexander Potapenko <glider@google.com>
+Reported-by: Alexander Potapenko <glider@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/kvm/vgic/vgic.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index cc8c6b9b5dd8b..f454cef59e24b 100644
+index f454cef59e24b..2ea6d1d1d3091 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -89,6 +89,8 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
- 	/* SPIs */
- 	if (intid >= VGIC_NR_PRIVATE_IRQS &&
- 	    intid < (kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS)) {
-+		if (unlikely(!kvm->arch.vgic.spis))
-+			return NULL;
- 		intid = array_index_nospec(intid, kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS);
- 		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
- 	}
-@@ -107,6 +109,8 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
+@@ -542,6 +542,9 @@ void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid)
+ 	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
+ 	unsigned long flags;
  
- 	/* SGIs and PPIs */
- 	if (intid < VGIC_NR_PRIVATE_IRQS) {
-+		if (unlikely(!vcpu->arch.vgic_cpu.private_irqs))
-+			return NULL;
- 		intid = array_index_nospec(intid, VGIC_NR_PRIVATE_IRQS);
- 		return &vcpu->arch.vgic_cpu.private_irqs[intid];
- 	}
++	if (!irq)
++		return;
++
+ 	if (!irq->hw)
+ 		goto out;
+ 
 -- 
 2.39.2
 
