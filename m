@@ -1,160 +1,236 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDFE5B211;
-	Thu,  6 Feb 2025 04:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2679A22541C;
+	Thu,  6 Feb 2025 08:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738816416; cv=none; b=u6A9rRCRlUkU17aeOzLi9JG+Z2yPJ3sCkh3wZGxJ9neHY3VXbfnVwQTyB0XLfrAnme0GcUM2B2g2RjXzGdTVUjDvr7iq94CRcFl2sJgw3XXIBrMNHa4kAulqfuOXEMxjY+x53wkB5Yg3ef8SdkE8/vuq1dYtgDPkGK0plF5/vvI=
+	t=1738830431; cv=none; b=aAWXcgJ2/AMKp5AMDJDDRLIfd+WZAooGf1Y9kMWjQLT9Dl/69RWRLBvZLFMF+I8azZ2S3rQxmgXG1BhuExA9Lb69VGPYecHT3z08A0w5+YI2jyRkgYxoodVsR8MJHI8B1L6Tb5s7LvNzYZkkjoAZrq2L8PjzSkzPhcbQeUEL83s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738816416; c=relaxed/simple;
-	bh=4F2vE5gZXQ1R9viY2NLtHPxaPmsZDZ7NBG0hKYFwBCE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mhIjsIqpmmvC/jWthvxYlx/r7kiU6IknSGVpt7DODcs8kwKO2pvcYuHMSD+UVGg7JeCQKOBoUbfO/2TT2gbcOEFCTr7aR2iyA61LRPeecVSKwQXiP1abdyUk3Z+F3P7H2j95AT4iMzgWmyfgMHHDHqIwUNTfezqB0it6wEjtY0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGD/3vqi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738830431; c=relaxed/simple;
+	bh=0qtYGiPYsqYZLBqgJ+4cbTZlqzHvL7ZKnM+o5kglBH4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=foAgxFEx15b9pW8dQQ111qAN6JXVSFDDMWzt9MOMRcIe7ncKGBMnyidpGTe9Ptxsv+agF4iumYibynfLErEx2CGk4DbJn8tLtlRxdIxohvCLptmTh6iGYdosaHQbd6toEDXbxTklIfIwZXwFpw+/+bxqWRjQqbQzJ6RD8F+ZgmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/ecygOy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGD/3vqi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 338C0C4CEDD;
-	Thu,  6 Feb 2025 04:33:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/ecygOy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7696BC4CEDD;
+	Thu,  6 Feb 2025 08:27:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738816416;
-	bh=4F2vE5gZXQ1R9viY2NLtHPxaPmsZDZ7NBG0hKYFwBCE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=AGD/3vqi10PbGGO6q8Q1hjwNUeY9KxYOBiDmSdGKaSSVof+gp80epr4BeMT00PKNs
-	 32zpNG5sTPyqywLObYnaT76LudTJ/bygPlPFj0/XjsnjCK9CG/DgVIObZ12yuESM90
-	 yb2KhsTdU7MXWsSlAqZrmSAl8ClEHIm1QgZNOzAAOWxzyaEvSPSqjl0SBXGMxUKgoh
-	 7CwJmXJLEp7m826F2gw2AN8NgSSntof5V1gTJaZV5e7SrZ5LJ71BoDVHoo+dXIe37a
-	 0rExcoMtzU0q+h+MOSb7+QQcvokJKXW4swM6WgCDLBwFjBeHozQRuha6BedG0kNDiI
-	 cQHIEqsHaZjrg==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	s=k20201202; t=1738830430;
+	bh=0qtYGiPYsqYZLBqgJ+4cbTZlqzHvL7ZKnM+o5kglBH4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n/ecygOy6uKcaclmbQ12QrdKFZ7C2/0m+gI3kwhl3imre6Lv2sCXRBxobHM0niAfP
+	 TG8qr9FuyEenPumR3fFXnqKp6TG5fW/W3vaC+EXUsJ/9mt5MgyP3Vb8nqh24PPemuV
+	 dziSwQTFj2C1mr+6QmR79/tfzrVUyMK0Nb0NILWqj+wK+IX7wAzxDtQlbwZQF48amT
+	 cZC8HOdc0aCm2AH8P44vaBicHO4wU41uUo6MZmndlfenPuIV0VNMuxHE2ga9UPqF4r
+	 jqm0migL8XEdlIou78rSL1kpUbUaBXfpDP5+OE3d8pkZQFhHcYGghBlHyGKAuEDe/O
+	 01NVyRtseB++A==
+Received: from 82-132-235-183.dab.02.net ([82.132.235.183] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tfxE3-00131o-Fj;
+	Thu, 06 Feb 2025 08:27:07 +0000
+Date: Thu, 06 Feb 2025 08:27:08 +0000
+Message-ID: <87frkrtr4z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v6 20/43] arm64: RME: Runtime faulting of memory
-In-Reply-To: <3f0caace-ee05-4ddf-ae75-2157e77aa57c@redhat.com>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-21-steven.price@arm.com>
- <3f0caace-ee05-4ddf-ae75-2157e77aa57c@redhat.com>
-Date: Thu, 06 Feb 2025 10:03:25 +0530
-Message-ID: <yq5a34grsne2.fsf@kernel.org>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
+In-Reply-To: <20250206001744.3155465-1-coltonlewis@google.com>
+References: <20250206001744.3155465-1-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.235.183
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Gavin Shan <gshan@redhat.com> writes:
+Colton,
 
-> On 12/13/24 1:55 AM, Steven Price wrote:
- 
-....
+On Thu, 06 Feb 2025 00:17:44 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
+> which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
+> causes confusing compilation problems why trying to use anything
+> defined in any of the headers in any other headers. Header guards is
+> the only reason this cycle didn't create tons of redefinition
+> warnings.
+> 
+> The motivating example was figuring out it was impossible to use the
+> hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
+> compiler will insist they aren't defined even though kvm_host.h is
+> included. Many other examples are lurking which could confuse
+> developers in the future.
 
->> +static int private_memslot_fault(struct kvm_vcpu *vcpu,
->> +				 phys_addr_t fault_ipa,
->> +				 struct kvm_memory_slot *memslot)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +	gpa_t gpa = kvm_gpa_from_fault(kvm, fault_ipa);
->> +	gfn_t gfn = gpa >> PAGE_SHIFT;
->> +	bool priv_exists = kvm_mem_is_private(kvm, gfn);
->> +	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->> +	struct page *page;
->> +	kvm_pfn_t pfn;
->> +	int ret;
->> +	/*
->> +	 * For Realms, the shared address is an alias of the private GPA with
->> +	 * the top bit set. Thus is the fault address matches the GPA then it
->> +	 * is the private alias.
->> +	 */
->> +	bool is_priv_gfn = (gpa == fault_ipa);
->> +
+Well, that's because contrary to what you have asserted in v1, not all
+include files are legitimate to use willy-nilly. You have no business
+directly using asm/kvm_host.h, and linux/kvm_host.h is what you need.
+
+> 
+> Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
+> because asm/kvm_host.h is huge and we only need a few functions from
+> it. Move the required declarations to a new header asm/kvm_pmu.h.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+> 
+> Possibly spinning more definitions out of asm/kvm_host.h would be a
+> good idea, but I'm not interested in getting bogged down in which
+> functions ideally belong where. This is sufficient to break the
+
+Tough luck. I'm not interested in half baked solutions, and "what
+belongs where" *is* the problem that needs solving.
+
+> cyclical dependency and get rid of the compilation issues. Though I
+> mention the one example I found, many other similar problems could
+> confuse developers in the future.
+> 
+> v2:
+> * Make a new header instead of moving kvm functions into the
+>   dedicated pmuv3 header
+> 
+> v1:
+> https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
+> 
+>  arch/arm64/include/asm/arm_pmuv3.h |  3 +--
+>  arch/arm64/include/asm/kvm_host.h  | 14 --------------
+>  arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
+>  include/kvm/arm_pmu.h              |  1 -
+>  4 files changed, 27 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_pmu.h
+> 
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+> index 8a777dec8d88..54dd27a7a19f 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -6,9 +6,8 @@
+>  #ifndef __ASM_PMUV3_H
+>  #define __ASM_PMUV3_H
+> 
+> -#include <asm/kvm_host.h>
+> -
+>  #include <asm/cpufeature.h>
+> +#include <asm/kvm_pmu.h>
+>  #include <asm/sysreg.h>
+> 
+>  #define RETURN_READ_PMEVCNTRN(n) \
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cfa024de4e3..6d4a2e7ab310 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+> 
+> -static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+> -{
+> -	return (!has_vhe() && attr->exclude_host);
+> -}
+> -
+>  #ifdef CONFIG_KVM
+> -void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+> -void kvm_clr_pmu_events(u64 clr);
+> -bool kvm_set_pmuserenr(u64 val);
+>  void kvm_enable_trbe(void);
+>  void kvm_disable_trbe(void);
+>  void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
+>  #else
+> -static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+> -static inline void kvm_clr_pmu_events(u64 clr) {}
+> -static inline bool kvm_set_pmuserenr(u64 val)
+> -{
+> -	return false;
+> -}
+>  static inline void kvm_enable_trbe(void) {}
+>  static inline void kvm_disable_trbe(void) {}
+>  static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
+> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+> new file mode 100644
+> index 000000000000..3a8f737504d2
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_pmu.h
+> @@ -0,0 +1,26 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef __KVM_PMU_H
+> +#define __KVM_PMU_H
+> +
+> +void kvm_vcpu_pmu_resync_el0(void);
+> +
+> +#ifdef CONFIG_KVM
+> +void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+> +void kvm_clr_pmu_events(u64 clr);
+> +bool kvm_set_pmuserenr(u64 val);
+> +#else
+> +static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+> +static inline void kvm_clr_pmu_events(u64 clr) {}
+> +static inline bool kvm_set_pmuserenr(u64 val)
+> +{
+> +	return false;
+> +}
+> +#endif
+> +
+> +static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+> +{
+> +	return (!has_vhe() && attr->exclude_host);
+> +}
+> +
+> +#endif
+
+How does this solve your problem of using the HYP-calling macros?
+
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 147bd3ee4f7b..2c78b1b1a9bb 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+>  struct kvm_pmu_events *kvm_get_pmu_events(void);
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+> -void kvm_vcpu_pmu_resync_el0(void);
+> 
+>  #define kvm_vcpu_has_pmu(vcpu)					\
+>  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
 >
-> We may rename 'priv_exists' to 'was_priv_gfn', which is consistent to 'is_priv_gfn'.
-> Alternatively, we may use 'was_private' and 'is_private'.
->
->> +	if (priv_exists != is_priv_gfn) {
->> +		kvm_prepare_memory_fault_exit(vcpu,
->> +					      gpa,
->> +					      PAGE_SIZE,
->> +					      kvm_is_write_fault(vcpu),
->> +					      false, is_priv_gfn);
->> +
->> +		return -EFAULT;
->> +	}
->> +
->> +	if (!is_priv_gfn) {
->> +		/* Not a private mapping, handling normally */
->> +		return -EINVAL;
->> +	}
->> +
->> +	ret = kvm_mmu_topup_memory_cache(memcache,
->> +					 kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
->> +	if (ret)
->> +		return ret;
->> +
->> +	ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
->> +	if (ret)
->> +		return ret;
->> +
->> +	/* FIXME: Should be able to use bigger than PAGE_SIZE mappings */
->> +	ret = realm_map_ipa(kvm, fault_ipa, pfn, PAGE_SIZE, KVM_PGTABLE_PROT_W,
->> +			    memcache);
->> +	if (!ret)
->> +		return 1; /* Handled */
->> +
->> +	put_page(page);
->> +	return ret;
->> +}
+> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
 
-I also found the names confusing. Can we do
+I'm absolutely not keen on *two* PMU-related include files. They both
+describe internal APIs, and don't see a good reasoning for this
+arbitrary split other than "it works better for me and I don't want to
+do more than strictly necessary".
 
-modified   arch/arm64/kvm/mmu.c
-@@ -1487,7 +1487,7 @@ static int private_memslot_fault(struct kvm_vcpu *vcpu,
- 	struct kvm *kvm = vcpu->kvm;
- 	gpa_t gpa = kvm_gpa_from_fault(kvm, fault_ipa);
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
--	bool priv_exists = kvm_mem_is_private(kvm, gfn);
-+	bool is_priv_gfn = kvm_mem_is_private(kvm, gfn);
- 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
- 	struct page *page;
- 	kvm_pfn_t pfn;
-@@ -1497,19 +1497,19 @@ static int private_memslot_fault(struct kvm_vcpu *vcpu,
- 	 * the top bit set. Thus is the fault address matches the GPA then it
- 	 * is the private alias.
- 	 */
--	bool is_priv_gfn = (gpa == fault_ipa);
-+	bool is_priv_fault = (gpa == fault_ipa);
- 
--	if (priv_exists != is_priv_gfn) {
-+	if (is_priv_gfn != is_priv_fault) {
- 		kvm_prepare_memory_fault_exit(vcpu,
- 					      gpa,
- 					      PAGE_SIZE,
- 					      kvm_is_write_fault(vcpu),
--					      false, is_priv_gfn);
-+					      false, is_priv_fault);
- 
- 		return 0;
- 	}
- 
--	if (!is_priv_gfn) {
-+	if (!is_priv_fault) {
- 		/* Not a private mapping, handling normally */
- 		return -EINVAL;
- 	}
+For example, include/kvm was only introduced to be able to share files
+between architectures, and with 32bit KVM/arm being long dead, this
+serves no purpose anymore. Moving these things out of the way would be
+a good start and would provide a better base for further change.
+
+So please present a rationale on what needs to go where and why based
+on their usage pattern rather than personal convenience, and then
+we'll look at a possible patch. But not the other way around.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
