@@ -1,295 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE269194094;
-	Thu,  6 Feb 2025 21:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B27B23909B;
+	Thu,  6 Feb 2025 23:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738876485; cv=none; b=rKTQR+Qg6dR7YpIHDmhDl0siYRyWwnzSTtqQtuE5XNS6mdR4fyUadCQNfVcP1InXi78wkKJAWdQN80+HJPO+xZSgLallneOeibzvHvCHbs4+YwdguNJPnpUu465roKXdR2KDdwjtBeWQse0NqIr2utyU5vUzayUc736iv3SLFMQ=
+	t=1738884514; cv=none; b=Lu6Fm3LBw/9Qn41imdnoyWalWKarEPN0Rk6vN/QZyYPrPPML5IqkrsWshUVAZsJKOBF0fI+mpVy1WhXtPmdnhYWJ3jo0N9WV37ngaXAVNFFgTltTBShLOwmKy3CkiBgRD7pwpRGR+mvN26aVKfjhPMqgPN1AVgkMzMUGnBpt85Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738876485; c=relaxed/simple;
-	bh=e2SOY182HjtRf1jcrCmT/yGU2J8GDiU314PnbVwrp7g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ll4VZp4s2EFzWiDD57dzqERl5nkIvB7aGQtLbshfhIzpOJrlcvh9G7EZJufdu/T8DuLXBE+zvdsa//j5Ki4ptUHPyBZqX4hnQJmH/zrOT0VljgeBFlsPROGvEXUAb5x27UBEAHTHOPM/vnHcuUP1BJl6uPj3kTH8KPJK6uzvdAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gd1alUST; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738884514; c=relaxed/simple;
+	bh=IqCJRbnd/ake/rfsaywutu7ZEKHtAxX14+3WiTsN3po=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ql1eKzSSpnYGL+B+hO8l6mpF8NcBi9JX5FxouiqyQHdyb9WF+20X3XZ9YDXAY+bBFO+0tYWyB1jXLmVFW1C4OBwjFUO1AwYeoR9HWpwWjlrbJsVC/T1kRAPnlql3NvcWXm6HiR+yfQPjnsvjQYo2hwyFuv5nfxFsXeOMtcgGhUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=avcge3l/; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gd1alUST"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD4FC4CEDD;
-	Thu,  6 Feb 2025 21:14:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738876483;
-	bh=e2SOY182HjtRf1jcrCmT/yGU2J8GDiU314PnbVwrp7g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gd1alUST0IO6Lv5wd3A05bXQe2+4UMAsApIHndqvLWYKsFxSJzLnSIV1pH9/FJEqq
-	 Oi/vtKp55eWJktVqKpkXp4yTqD78gZ2JEtTIG56M//S0kfut3Q3jDQb5ptyEq5BacG
-	 +wKIIYrqqsV3d4LGFrh7nZXDTaDYVpD6MxHmJYSvB41BRRfYFWNdwmkSspuGzhqrPP
-	 eEUwS7WCmQfGgwo58hQ1FGiPp0H/tp/WuNVSAJ6mvbyo9ELleMKAqT3Vsoj/DDL52s
-	 q71wajBFFmlPiKz/UXxG1M4pIua9Wx016A9MJYiMBWeMuD8VSVqvPOhkbjHAu/dzBN
-	 gwiHw8Tl3Pjgw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tg9Cq-001J8q-PU;
-	Thu, 06 Feb 2025 21:14:40 +0000
-Date: Thu, 06 Feb 2025 21:14:39 +0000
-Message-ID: <86o6zeu668.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	darren@os.amperecomputing.com,
-	scott@os.amperecomputing.com
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: nv: selftests: Add guest hypervisor test
-In-Reply-To: <20250206164120.4045569-2-gankulkarni@os.amperecomputing.com>
-References: <20250206164120.4045569-1-gankulkarni@os.amperecomputing.com>
-	<20250206164120.4045569-2-gankulkarni@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="avcge3l/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738884512; x=1770420512;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IqCJRbnd/ake/rfsaywutu7ZEKHtAxX14+3WiTsN3po=;
+  b=avcge3l/RdLBZXWQyfN30RQ1r+GR1kTEZVPesmxCqx3nFctzfzzH0A7u
+   H6a3kzt/uYiWUOV+jaxOq+/0Vsnkg7ON1MLPhtlim92pOsso83hdZaiqy
+   Ahv1F5ZZ63Se3E4eKWkJVkYA8AnQZEncxwnmLs3WGKS91b24lzHUdPISI
+   24CW8LAdJfEfUClNE+aXsDB9yP0g8vmNAP0qvbLSND/cJEEq/RvRL3DDF
+   ZL2L3dpc5j/08JGeFhMFxbVVPMR7+Q450qtoit5MGQlwZzAWCmaAGmEkI
+   nigONFSN0QreRuM71pmXgYOL4wT3z1cl8jje/BomrG9NzJF+m1IaWmFl9
+   w==;
+X-CSE-ConnectionGUID: t9N0CSRNTsqyYOuA6fQHxw==
+X-CSE-MsgGUID: akTopof4S2uo5qr+cZDfng==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39646299"
+X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
+   d="scan'208";a="39646299"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 15:28:32 -0800
+X-CSE-ConnectionGUID: 0cmOU3WWQ066b+PBqxIT4w==
+X-CSE-MsgGUID: d3vf7E8eTA28v3i/7CNOvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
+   d="scan'208";a="116395562"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 06 Feb 2025 15:28:28 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tgBII-000xVn-1R;
+	Thu, 06 Feb 2025 23:28:26 +0000
+Date: Fri, 7 Feb 2025 07:27:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
+Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
+Message-ID: <202502070744.hqS7ZVVX-lkp@intel.com>
+References: <20250206001744.3155465-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, darren@os.amperecomputing.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206001744.3155465-1-coltonlewis@google.com>
 
-On Thu, 06 Feb 2025 16:41:19 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> This patch adds the required changes to init vcpu in vEL2 context.
-> Also adds a KVM selftest to execute guest code as a guest hypervisor(L1).
-> 
-> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm      |  1 +
->  .../selftests/kvm/arm64/nv_guest_hypervisor.c | 83 +++++++++++++++++++
->  .../kvm/include/arm64/kvm_util_arch.h         |  3 +
->  .../selftests/kvm/include/arm64/nv_util.h     | 28 +++++++
->  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
->  .../selftests/kvm/lib/arm64/processor.c       | 59 +++++++++----
->  6 files changed, 161 insertions(+), 14 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c
->  create mode 100644 tools/testing/selftests/kvm/include/arm64/nv_util.h
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index 4277b983cace..a85d3bec9fb1 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -154,6 +154,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
->  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
->  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
->  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
-> +TEST_GEN_PROGS_arm64 += arm64/nv_guest_hypervisor
->  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
->  TEST_GEN_PROGS_arm64 += arch_timer
->  TEST_GEN_PROGS_arm64 += coalesced_io_test
-> diff --git a/tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c b/tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c
-> new file mode 100644
-> index 000000000000..5aeefe43aff7
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c
-> @@ -0,0 +1,83 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2025 Ampere Computing LLC
-> + */
-> +#include <kvm_util.h>
-> +#include <nv_util.h>
-> +#include <processor.h>
-> +#include <vgic.h>
-> +
-> +static void guest_code(void)
-> +{
-> +	if (read_sysreg(CurrentEL) == CurrentEL_EL2)
-> +		GUEST_PRINTF("Executing guest code in vEL2\n");
-> +	else
-> +		GUEST_FAIL("Fail to run in vEL2\n");
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void guest_undef_handler(struct ex_regs *regs)
-> +{
-> +	GUEST_FAIL("Unexpected exception far_el1 = 0x%lx", read_sysreg(far_el1));
-> +}
-> +
-> +static void test_run_vcpu(struct kvm_vcpu *vcpu)
-> +{
-> +	struct ucall uc;
-> +
-> +	do {
-> +		vcpu_run(vcpu);
-> +
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			break;
-> +		case UCALL_PRINTF:
-> +			printf("%s", uc.buffer);
-> +			break;
-> +		case UCALL_DONE:
-> +			printf("Test PASS\n");
-> +			break;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
-> +	} while (uc.cmd != UCALL_DONE);
-> +}
-> +
-> +static void test_nv_guest_hypervisor(void)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu_init init;
-> +	int gic_fd;
-> +
-> +	vm = vm_create(1);
-> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +
-> +	init.features[0] = 0;
-> +	init_vcpu_nested(&init);
-> +	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-> +
-> +	__TEST_REQUIRE(is_vcpu_nested(vcpu), "Failed to Enable NV");
-> +
-> +	vm_init_descriptor_tables(vm);
-> +	vcpu_init_descriptor_tables(vcpu);
-> +	gic_fd = vgic_v3_setup(vm, 1, 64);
-> +	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
-> +
-> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-> +				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
-> +
-> +	test_run_vcpu(vcpu);
-> +	kvm_vm_free(vm);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_EL2));
-> +
-> +	test_nv_guest_hypervisor();
-> +
-> +	return 0;
-> +}
-> diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> index e43a57d99b56..ab5279c24413 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> @@ -2,6 +2,9 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
->  
-> +#define CurrentEL_EL1		(1 << 2)
-> +#define CurrentEL_EL2		(2 << 2)
-> +
->  struct kvm_vm_arch {};
->  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/arm64/nv_util.h b/tools/testing/selftests/kvm/include/arm64/nv_util.h
-> new file mode 100644
-> index 000000000000..4fecf1f18554
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/arm64/nv_util.h
-> @@ -0,0 +1,28 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (c) 2025 Ampere Computing
-> + */
-> +#ifndef SELFTEST_NV_UTIL_H
-> +#define SELFTEST_NV_UTIL_H
-> +
-> +#include <linux/bitmap.h>
-> +
-> +/* NV helpers */
-> +static inline void init_vcpu_nested(struct kvm_vcpu_init *init)
-> +{
-> +	init->features[0] |= (1 << KVM_ARM_VCPU_HAS_EL2);
-> +}
-> +
-> +static inline bool kvm_arm_vcpu_has_el2(struct kvm_vcpu_init *init)
-> +{
-> +	unsigned long features = init->features[0];
-> +
-> +	return test_bit(KVM_ARM_VCPU_HAS_EL2, &features);
-> +}
-> +
-> +static inline bool is_vcpu_nested(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->nested;
-> +}
-> +
-> +#endif /* SELFTEST_NV_UTIL_H */
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 4c4e5a847f67..8c53dbc17f8f 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -58,6 +58,7 @@ struct kvm_vcpu {
->  	struct kvm_dirty_gfn *dirty_gfns;
->  	uint32_t fetch_index;
->  	uint32_t dirty_gfns_count;
-> +	bool nested;
->  };
->  
->  struct userspace_mem_regions {
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> index 7ba3aa3755f3..35ba2ace61a2 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> @@ -10,6 +10,7 @@
->  
->  #include "guest_modes.h"
->  #include "kvm_util.h"
-> +#include "nv_util.h"
->  #include "processor.h"
->  #include "ucall_common.h"
->  
-> @@ -258,14 +259,47 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
->  	}
->  }
->  
-> +static void aarch64_vcpu_set_reg(struct kvm_vcpu *vcpu, uint64_t sctlr_el1,
-> +			uint64_t tcr_el1, uint64_t ttbr0_el1)
-> +{
-> +	uint64_t fpen;
-> +
-> +	/*
-> +	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
-> +	 * registers, which the variable argument list macros do.
-> +	 */
-> +	fpen = 3 << 20;
-> +
-> +	if (is_vcpu_nested(vcpu)) {
-> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPTR_EL2), fpen);
-> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL2), sctlr_el1);
-> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL2), tcr_el1);
-> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL2), DEFAULT_MAIR_EL1);
-> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL2), ttbr0_el1);
-> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), vcpu->id);
+Hi Colton,
 
-How about some of the basics such as HCR_EL2, MDCR_EL2? A bunch of
-things there do have an impact on how the guest behaves, and relying
-on defaults feels like a bad idea.
+kernel test robot noticed the following build errors:
 
-This also assumes VHE, without trying to enforce it.
+[auto build test ERROR on 2014c95afecee3e76ca4a56956a936e23283f05b]
 
-Finally, how to you plan to make all the existing tests run as EL2
-guests if TPIDR_EL1 isn't populated with the expected value? Surely
-you need to change the read side...
+url:    https://github.com/intel-lab-lkp/linux/commits/Colton-Lewis/KVM-arm64-Remove-cyclical-dependency-in-arm_pmuv3-h/20250206-082034
+base:   2014c95afecee3e76ca4a56956a936e23283f05b
+patch link:    https://lore.kernel.org/r/20250206001744.3155465-1-coltonlewis%40google.com
+patch subject: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
+config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20250207/202502070744.hqS7ZVVX-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250207/202502070744.hqS7ZVVX-lkp@intel.com/reproduce)
 
-	M.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502070744.hqS7ZVVX-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from arch/arm64/include/asm/kvm_host.h:38,
+                    from include/linux/kvm_host.h:45,
+                    from arch/arm64/kernel/asm-offsets.c:15:
+>> include/kvm/arm_pmu.h:177:20: error: static declaration of 'kvm_vcpu_pmu_resync_el0' follows non-static declaration
+     177 | static inline void kvm_vcpu_pmu_resync_el0(void) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~~
+   In file included from arch/arm64/include/asm/arm_pmuv3.h:10,
+                    from include/linux/perf/arm_pmuv3.h:316,
+                    from include/kvm/arm_pmu.h:11:
+   arch/arm64/include/asm/kvm_pmu.h:6:6: note: previous declaration of 'kvm_vcpu_pmu_resync_el0' with type 'void(void)'
+       6 | void kvm_vcpu_pmu_resync_el0(void);
+         |      ^~~~~~~~~~~~~~~~~~~~~~~
+   make[3]: *** [scripts/Makefile.build:102: arch/arm64/kernel/asm-offsets.s] Error 1
+   make[3]: Target 'prepare' not remade because of errors.
+   make[2]: *** [Makefile:1264: prepare0] Error 2
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:251: __sub-make] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:251: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
+
+
+vim +/kvm_vcpu_pmu_resync_el0 +177 include/kvm/arm_pmu.h
+
+5421db1be3b11c5 Marc Zyngier           2021-04-14  163  
+20492a62b99bd43 Marc Zyngier           2022-05-16  164  #define kvm_vcpu_has_pmu(vcpu)		({ false; })
+20492a62b99bd43 Marc Zyngier           2022-05-16  165  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
+20492a62b99bd43 Marc Zyngier           2022-05-16  166  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+20492a62b99bd43 Marc Zyngier           2022-05-16  167  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
+27131b199f9fdc0 Raghavendra Rao Ananta 2023-10-20  168  static inline void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu) {}
+3d0dba5764b9430 Marc Zyngier           2022-11-13  169  static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
+3d0dba5764b9430 Marc Zyngier           2022-11-13  170  {
+3d0dba5764b9430 Marc Zyngier           2022-11-13  171  	return 0;
+3d0dba5764b9430 Marc Zyngier           2022-11-13  172  }
+bc512d6a9b92390 Oliver Upton           2023-10-19  173  static inline u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
+bc512d6a9b92390 Oliver Upton           2023-10-19  174  {
+bc512d6a9b92390 Oliver Upton           2023-10-19  175  	return 0;
+bc512d6a9b92390 Oliver Upton           2023-10-19  176  }
+b1f778a223a2a8a Marc Zyngier           2023-08-20 @177  static inline void kvm_vcpu_pmu_resync_el0(void) {}
+20492a62b99bd43 Marc Zyngier           2022-05-16  178  
 
 -- 
-Without deviation from the norm, progress is not possible.
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
