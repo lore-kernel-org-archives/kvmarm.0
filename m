@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45BD1E5B9A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFA522D4EB;
 	Thu,  6 Feb 2025 15:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738856982; cv=none; b=JmMI0cb/JsYyj/IVRoJxX/Kem5uquZqpc97F7mt+J14dvaSESjC5yNcpmJXyowFM3k1l2xwg85jfzG7rQ/w/F4FUOsjEc+7XvGCV1EoLYm4PKAcGNjS5VwFuomuldpm3Ycr1iNbjWnPpoX32n8/UpK259ID9keHXaH9c7oUcWQs=
+	t=1738856982; cv=none; b=LdoeCc0jCJ6Nrd7yHE6S/PFazbu2X2U8CMl2cSwA7zIgV/f6GKeV9yMqhlD4l2HIjC9XjpisFXc73gkQb7RCx8+26vPzn0bZSH41CYZ0pD7HOOWsxcgDeQ/Lcy0USXduv3oCjnTLKd/taAgtOgCZSNgPiNh2Ykas/RFYqYzlFFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738856982; c=relaxed/simple;
-	bh=sEcaWTz1HzbI6p4xm1FOiu8u6g8i2Jl/cJgvVQbzt80=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a4syy3zShaw/ckT0bIxSLuJH7O3T3D6Lzm1e8BMFIVkbo3k6lmXiV+lr5WDt4EmrkJP/QG6xmUSvjrmT3RaidPhbp8BNXg4Fpus4VBxka+epTwiKa+97sm/q0UThfRmOP3rfUGPV+aYsPU3fGKo5yh+tQyG3A8onKxUYxnV8faQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AE3Ya8vQ; arc=none smtp.client-ip=10.30.226.201
+	bh=yuFlDaL+lICxdp2tle8fmEhBUnWIS+5Z4d11toXNzuA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Aa0kZxsvPT6Rl7MviNtBTziJ8DP4022vr9/fxo8tI4+uHiemucC9x+QQilBCIV7FcRWd9Vsl8sT38kRqE4VkJiRpmhaUbb79WP6jHI2geg3lzGhIHT4J4rcME3nBgzHw99cZE1VJMQ+jGt+J91hURicWZ1KrVGSmLGpSKuXJfKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTta+TLU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AE3Ya8vQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B9B4C4CEE3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTta+TLU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A107AC4CEDF;
 	Thu,  6 Feb 2025 15:49:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1738856981;
-	bh=sEcaWTz1HzbI6p4xm1FOiu8u6g8i2Jl/cJgvVQbzt80=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AE3Ya8vQPrdhLDVKYr2mZ4DKLRn7CebXO5ghfD/NncwCZpql+pKD3RrCOxKP0VGHL
-	 kiSzG/mrAdE+l9M+ZAZlAXxqezwpg27Z1p0TYJopH9UIvXkWfFQHdFiPYR8Bl8CDi4
-	 4o/7tRtV7vyP/NLpP/BRX0eFXU6PWFaHaCcz4JmvNNG1RCEg7x0+H/oC0s4GnYVx0I
-	 DHgTI1fQOMlu+j/qFxNajiwus8t7MEc+hQyN0sYAyUEGkwWy4NUA815Cmz+SfunonK
-	 6wDz+7rfuwmqPUt/jHXvE+IZmxkpKyCYwKi1rku9nhZTjTLByRwRIrQ7M2abtTT0B7
-	 Ok8XXLs1+x0sQ==
+	bh=yuFlDaL+lICxdp2tle8fmEhBUnWIS+5Z4d11toXNzuA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pTta+TLUZ+DOnotpeB9kVMojMOO4QFntWokJgWzDFBOECJrOuc6YG6AljZt8+KxZr
+	 /pxFM98e+dWs8BhQWbLFg/q5UCvKv5ZKrE4+gOyaSIAbeGmxFxC9AqiQx+rL7RZAk1
+	 95UDX6nAzsVdEMp0PaAbixKcKoB6JQLQIXK4DfPoVZSLMZm6/hQBN9WBXH0av59iY7
+	 qqtvZSHQ0rbXgStPywa7Q0MuV/ob86whSkGuwhXvT7pjA0S+tnArQ7lGXzwNv7KrPL
+	 JXLIzDEdLNx+bphfMg45iHb+aeP+HCGoiXTp3LW97lG73ii2AtA+IYpWPSCJtxjdHA
+	 259mnKV/T9yTw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tg48I-001BOX-Kz;
-	Thu, 06 Feb 2025 15:49:38 +0000
+	id 1tg48J-001BOX-Kd;
+	Thu, 06 Feb 2025 15:49:39 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,10 +42,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 00/16] KVM: arm64: Add NV GICv3 support
-Date: Thu,  6 Feb 2025 15:49:09 +0000
-Message-Id: <20250206154925.1109065-1-maz@kernel.org>
+Subject: [PATCH v3 03/16] arm64: sysreg: Add layout for ICH_MISR_EL2
+Date: Thu,  6 Feb 2025 15:49:12 +0000
+Message-Id: <20250206154925.1109065-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250206154925.1109065-1-maz@kernel.org>
+References: <20250206154925.1109065-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,80 +60,88 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Here's a respin of the NV support for GICv3. The integration branch
-containing this (and the rest of the NV stack) is still at [3].
+The ICH_MISR_EL2-related macros are missing a number of status
+bits that we are about to handle. Take this opportunity to fully
+describe the layout of that register as part of the automatic
+generation infrastructure.
 
-* From v2 [2]:
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/sysreg.h       |  5 -----
+ arch/arm64/tools/sysreg               | 12 ++++++++++++
+ tools/arch/arm64/include/asm/sysreg.h |  5 -----
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-  - Picked RBs from Andre, with thanks
-
-  - Rebased on 6.14-rc1
-
-* From v1 [1]:
-
-  - Fix the default value for the MI INTID to PPI9, instead of
-    something fairly random...
-
-  - Fail KVM initialisation if asking for NV on HW without a virtual
-    GICv3.
-
-[1] https://lore.kernel.org/r/20241217151331.934077-1-maz@kernel.org
-[2] https://lore.kernel.org/r/20250112170845.1181891-1-maz@kernel.org
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
-
-Andre Przywara (1):
-  KVM: arm64: nv: Allow userland to set VGIC maintenance IRQ
-
-Jintack Lim (1):
-  KVM: arm64: nv: Respect virtual HCR_EL2.TWx setting
-
-Marc Zyngier (13):
-  arm64: sysreg: Add layout for ICH_HCR_EL2
-  arm64: sysreg: Add layout for ICH_VTR_EL2
-  arm64: sysreg: Add layout for ICH_MISR_EL2
-  KVM: arm64: nv: Load timer before the GIC
-  KVM: arm64: nv: Add ICH_*_EL2 registers to vpcu_sysreg
-  KVM: arm64: nv: Plumb handling of GICv3 EL2 accesses
-  KVM: arm64: nv: Sanitise ICH_HCR_EL2 accesses
-  KVM: arm64: nv: Nested GICv3 emulation
-  KVM: arm64: nv: Handle L2->L1 transition on interrupt injection
-  KVM: arm64: nv: Add Maintenance Interrupt emulation
-  KVM: arm64: nv: Propagate used_lrs between L1 and L0 contexts
-  KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
-  KVM: arm64: nv: Fail KVM init if asking for NV without GICv3
-
-Oliver Upton (1):
-  KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
-
- .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
- arch/arm64/include/asm/kvm_emulate.h          |  13 +
- arch/arm64/include/asm/kvm_host.h             |  45 +-
- arch/arm64/include/asm/kvm_hyp.h              |   2 +
- arch/arm64/include/asm/sysreg.h               |  30 --
- arch/arm64/include/uapi/asm/kvm.h             |   1 +
- arch/arm64/kvm/Makefile                       |   2 +-
- arch/arm64/kvm/arm.c                          |  20 +-
- arch/arm64/kvm/emulate-nested.c               |  18 +-
- arch/arm64/kvm/handle_exit.c                  |   6 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c               |  16 +-
- arch/arm64/kvm/nested.c                       |  12 +
- arch/arm64/kvm/sys_regs.c                     |  95 +++-
- arch/arm64/kvm/vgic-sys-reg-v3.c              |   8 +-
- arch/arm64/kvm/vgic/vgic-init.c               |  29 ++
- arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c          | 409 ++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3.c                 |  44 +-
- arch/arm64/kvm/vgic/vgic-v4.c                 |  18 +-
- arch/arm64/kvm/vgic/vgic.c                    |  38 ++
- arch/arm64/kvm/vgic/vgic.h                    |   6 +
- arch/arm64/tools/sysreg                       |  48 ++
- drivers/irqchip/irq-apple-aic.c               |   8 +-
- include/kvm/arm_vgic.h                        |  10 +
- tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
- tools/arch/arm64/include/asm/sysreg.h         |  30 --
- 26 files changed, 833 insertions(+), 117 deletions(-)
- create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
-
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index b59b2c680e977..9511f3faac462 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -562,7 +562,6 @@
+ 
+ #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
+ #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
+-#define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
+ #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
+ #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
+ #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
+@@ -983,10 +982,6 @@
+ #define SYS_MPIDR_SAFE_VAL	(BIT(31))
+ 
+ /* GIC Hypervisor interface registers */
+-/* ICH_MISR_EL2 bit definitions */
+-#define ICH_MISR_EOI		(1 << 0)
+-#define ICH_MISR_U		(1 << 1)
+-
+ /* ICH_LR*_EL2 bit definitions */
+ #define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
+ 
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 3e82a072eb493..2c63662c1a489 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -3071,6 +3071,18 @@ Res0	17:5
+ Field	4:0	ListRegs
+ EndSysreg
+ 
++Sysreg	ICH_MISR_EL2	3	4	12	11	2
++Res0	63:8
++Field	7	VGrp1D
++Field	6	VGrp1E
++Field	5	VGrp0D
++Field	4	VGrp0E
++Field	3	NP
++Field	2	LRENP
++Field	1	U
++Field	0	EOI
++EndSysreg
++
+ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
+diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+index 5d9d7e394b254..b6c5ece4fdee7 100644
+--- a/tools/arch/arm64/include/asm/sysreg.h
++++ b/tools/arch/arm64/include/asm/sysreg.h
+@@ -558,7 +558,6 @@
+ 
+ #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
+ #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
+-#define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
+ #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
+ #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
+ #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
+@@ -979,10 +978,6 @@
+ #define SYS_MPIDR_SAFE_VAL	(BIT(31))
+ 
+ /* GIC Hypervisor interface registers */
+-/* ICH_MISR_EL2 bit definitions */
+-#define ICH_MISR_EOI		(1 << 0)
+-#define ICH_MISR_U		(1 << 1)
+-
+ /* ICH_LR*_EL2 bit definitions */
+ #define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
+ 
 -- 
 2.39.2
 
