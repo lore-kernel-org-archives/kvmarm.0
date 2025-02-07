@@ -1,121 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CD023ED6A
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0095C238D2E
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738938677; cv=none; b=bJJ54J4UuOsy63lRVg6pmkMhQF+b3ukd8v5RAOpV0kmslHR/KVGBInFKXDXdwcnc0xyinNWZ+HPfOOhkYW5tE5LmygZIHljynWhLLnH7Fw+i9m/ROQYiTx5g/McXIBz2tkdN6OIufNKqmGZkZPiNmIww/yCnQ6mQCgJ9o1yXKAY=
+	t=1738940084; cv=none; b=XgHOGW4Adfe5/ViWlWyMc2ni5+DOGUQkRDLrOnsfb6qKIf20F/0jzgw4fkzZkZS5zfAHEt3Q0s0AEVNmeOFqqIe1oS//Y+EJ6nQ82pN5yL307cwItawMzR1TPhDi3HwWx9iQabtxfWZvKpOxwQT2TDMyD1oakXtOxy2M3RnFtQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738938677; c=relaxed/simple;
-	bh=/bdZkHErgILPEkVIX2FXQXXH8tSX/nUwUyOjCUkNomY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qJbGamARTcaXqXcn1DzMCX0xOZ1E5o+4sD+CQZ25sBqFMFN9VeGNfVyPdF1x4juH2iv5URBAQYE7St0AJHBl1cLWKyS1LmpXwevhQnN8hTXa1lHxOdMRflxR6bSZW+Slv7ECQKv221ysfJTRleST/GfEVfkLOlqyr4yDT+Io3Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cd9Kgyoo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738940084; c=relaxed/simple;
+	bh=dhBxKIvdI6BiG9BZMMoSBVS3E3wXSa546KCeyQUs5Vs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=f5zQuA++hoP9LWH1/vVlw1ndM8mRutWiacPQd1zPcI4CexVWFEFs2L/Uy2c89s/lPy8Knu5IMSxBki3QnzIm5OXblRbQDgo8kjOEnZzS4q0VneCwaSPKlpjH+vXPQURmtgnDSFVx7VKtvNFrTTVbv9JV+PXsZ02Hg8kl8OmXlug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=32C53PpT; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cd9Kgyoo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744D8C4CED1;
-	Fri,  7 Feb 2025 14:31:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738938676;
-	bh=/bdZkHErgILPEkVIX2FXQXXH8tSX/nUwUyOjCUkNomY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cd9KgyooPdgHUX3sz3/Fj4LEiL6q/tkZTrlTbJvxQ1PxpqJrYHEZPcp8Z+/sFQMNw
-	 phT7PJvRvCZcKMy+CIkOQKEdl7H5oFZNTQyYosAN99+G+CaWvDgTe84ld3boNdsZku
-	 wnhFjKotpTAVqY+MlikcP1U7GqyY1BsSCZv2agg4zewlCI42nzmqCGc2aLChEEMc7l
-	 b/xxM/1MylpCJ3BLMPhhnQWkfntoWzl4wBnFKukutK+FRbn4+nKo289Qk6fWi3B/L1
-	 Xx1i5jEAHt4EEz78b/xYJLF8NwG4gMBFvT1CKAUeRhB5cQ8BYBE+sr+SxCmPqSuqVK
-	 MbBbmHknrW3Xg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tgPNx-001efz-RS;
-	Fri, 07 Feb 2025 14:31:13 +0000
-Date: Fri, 07 Feb 2025 14:31:12 +0000
-Message-ID: <86h655u8r3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	cohuck@redhat.com,
-	eric.auger@redhat.com,
-	sebott@redhat.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	jiangkunkun@huawei.com,
-	jonathan.cameron@huawei.com,
-	anthony.jebson@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	linuxarm@huawei.com
-Subject: Re: [PATCH v6 4/4] arm64: paravirt: Enable errata based on implementation CPUs
-In-Reply-To: <Z6YT7GxVKGKcnYmL@arm.com>
-References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
-	<20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
-	<Z6YT7GxVKGKcnYmL@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="32C53PpT"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-aa689b88293so261423766b.3
+        for <kvmarm@lists.linux.dev>; Fri, 07 Feb 2025 06:54:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738940081; x=1739544881; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JmM/iQkbvbBvv7fXX70IILA144cHjP/mqwSWag+vGNY=;
+        b=32C53PpTxFogoXIpX8WY6xvq3Xx4bDU7iKAamepY6B7+monWFGlOd7euq48am2DVz3
+         mh0wRkZuKZewQfKDSV6EV7s0VmP6rmrFsJy1bT5RtWsQITJESkslQZGWSvkaXofFtBvf
+         gQOi+eLAc+xUdNVkeP21LN0pYtImTv8C/fLp5pEIqjSM8BY/tvOOSb848ecKEhpw06Xi
+         OSn/yOdo8qE2gzYk4NLyiEMafQ3shGDs2brWaMnyKFA7/9Mfc2mk4Lmpa+mGyoagze6y
+         bVMbocrcA+ggd8G++wviS65kJC+WRCDXMoJF66B4sLftmUu+tH775FQ1IT/JxBj/ka6v
+         UfGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738940081; x=1739544881;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JmM/iQkbvbBvv7fXX70IILA144cHjP/mqwSWag+vGNY=;
+        b=GGEr3bDviPstPZpIHaZ68kACkXz3EemS1r+sO4yQi/DvC3shRlcLanXMUrIfbaDVML
+         fqWbtfyxGg80rVEw7hDBr8vFREkOQSPyZ59oWmF/jihZGqpw0YedjuNw6waBVpPxwaND
+         ZN0umfCvCH2YsXn1q+4leQt4yIuPk5NjaMuICr4GdI/kDGEWqA7ymn8KTYgsf6wLXr3l
+         ABFtee0O5HPh2YT+KAjKCKuiFnEYeND4wDQOi7GU7tb47PZjfr3zQNueqJORs0EvsKPc
+         v1UFe2rIU7KBvBH8FdAOUq4Y3NyImShy+CEbWzIbken85ZwO/3NWLTU4R3ujKR3FoyuS
+         vbRw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmO709AuctR8PkgQ7CHQegx6MFLOLUnXNUbPNbZ1sxWbYpDkunGPe4NV61ffzofwOXFyERiAI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzeGAS7lCb1CYGcZxQRkGhn4S7MjNN/ukl1Nnpq4ZV2hyNMhLLI
+	GFMZbvB7hgZjZpkExiup+gykPouVbRRFyVEXQAKNHwbfZSKz/vj+TgiLksCDRbsVj8K/2t2l1EJ
+	9NCp+wA==
+X-Google-Smtp-Source: AGHT+IHcnN2p00NsIVJ/Tco7clKqry81fiAhoeHRLb1kPa5FchoYCPasviVPCLtY7RbBfUFKTgyinTclnwgX
+X-Received: from ejer10.prod.google.com ([2002:a17:906:9ca:b0:aa9:1d5b:da39])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:9719:b0:aae:b259:ef63
+ with SMTP id a640c23a62f3a-ab789b27dddmr445128366b.34.1738940081474; Fri, 07
+ Feb 2025 06:54:41 -0800 (PST)
+Date: Fri,  7 Feb 2025 14:54:36 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com, sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250207145438.1333475-1-qperret@google.com>
+Subject: [PATCH 0/2] Fixes for pKVM NP-guest support
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 07 Feb 2025 14:08:44 +0000,
-Catalin Marinas <catalin.marinas@arm.com> wrote:
->=20
-> On Wed, Feb 05, 2025 at 01:22:22PM +0000, Shameer Kolothum wrote:
-> >  static inline bool is_midr_in_range(struct midr_range const *range)
-> >  {
-> > -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> > -				       range->rv_min, range->rv_max);
-> > +	int i;
-> > +
-> > +	if (!target_impl_cpu_num)
-> > +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> > +					       range->rv_min, range->rv_max);
-> > +
-> > +	for (i =3D 0; i < target_impl_cpu_num; i++) {
-> > +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
-> > +					    range->model,
-> > +					    range->rv_min, range->rv_max))
-> > +			return true;
-> > +	}
-> > +	return false;
-> >  }
->=20
-> It's a interesting approach but how does this work in practice if an
-> erratum requires a firmware counterpart? Do we expect firmwares on all
-> machines involved to have workarounds for the other machines? Or is KVM
-> going to intercept those SMCs and pretend the EL3 counterpart is there?
+Hi all,
 
-KVM already traps SMCs, and could do something on behalf of the guest
-(such as pretending that the mitigation has happened if not on the
-correct host) *IF* the mitigation is architected (=C3=A0 la WA{1,2,3}).
+Here are two patches to deal with a race between the handling of
+permission faults and MMU notifiers with pKVM that I found by
+inspection. Specifically, pKVM gets thoroughly confused when it doesn't
+find a page mapped in its relax_perm path, while standard KVM deals
+with that trivially thanks to the -EAGAIN special case in
+user_mem_abort(). The second patch addresses the problem by simplifying
+the implementation of multiple pKVM hypercalls, which also has the nice
+side effect of improving locking by not taking the global host stage-2
+lock as much.
 
-If it is implementation specific, then we can immediately stop
-pretending that a guest running on those systems can be migrated.
+Patches based on 6.14-rc1, tested in qemu on on Google Pixel 6.
 
-The only thing it helps a bit is big-little.
+Thanks!
+Quentin
 
-Overall, this isn't meant to be foolproof at all. It is only giving
-people enough ammunition to make it plain that the cross-platform
-story is a bit of a sad joke right now.
+Quentin Perret (2):
+  KVM: arm64: Improve error handling from check_host_shared_guest()
+  KVM: arm64: Simplify np-guest hypercalls
 
-Thanks,
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 73 +++++++++++++++------------
+ 1 file changed, 40 insertions(+), 33 deletions(-)
 
-	M.
+-- 
+2.48.1.502.g6dc24dfdaf-goog
 
---=20
-Without deviation from the norm, progress is not possible.
