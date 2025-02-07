@@ -1,139 +1,162 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B27B23909B;
-	Thu,  6 Feb 2025 23:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243721A8F95
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 11:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738884514; cv=none; b=Lu6Fm3LBw/9Qn41imdnoyWalWKarEPN0Rk6vN/QZyYPrPPML5IqkrsWshUVAZsJKOBF0fI+mpVy1WhXtPmdnhYWJ3jo0N9WV37ngaXAVNFFgTltTBShLOwmKy3CkiBgRD7pwpRGR+mvN26aVKfjhPMqgPN1AVgkMzMUGnBpt85Y=
+	t=1738926201; cv=none; b=h/5J1PouxarGlVhl8a8CMjwOIvPtkeQFpeAlSebgGbpQKSg9xkaVw1kyPETO+21rwqQk8VsJyXc3D2g7Z6KWMXE1aiYUxAERCXVoAfc4CbteSELUf+X4VgdQUZmPQ3xewbH3/v70kJd51x4sjg+FKZsRieuWmCDXmvUTHjCpamI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738884514; c=relaxed/simple;
-	bh=IqCJRbnd/ake/rfsaywutu7ZEKHtAxX14+3WiTsN3po=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ql1eKzSSpnYGL+B+hO8l6mpF8NcBi9JX5FxouiqyQHdyb9WF+20X3XZ9YDXAY+bBFO+0tYWyB1jXLmVFW1C4OBwjFUO1AwYeoR9HWpwWjlrbJsVC/T1kRAPnlql3NvcWXm6HiR+yfQPjnsvjQYo2hwyFuv5nfxFsXeOMtcgGhUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=avcge3l/; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1738926201; c=relaxed/simple;
+	bh=G/w4Oj2jHIwvZal21PoJOVOJ0nZO9k1bwvfRHc7G8CE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=DdcFyYcT9N3GSlADFiaKjyi8Ty+DO8bV5pZb7C2XLQOpdWz/MiW9X8iGP6jwrcdM1MY0X9s3laGkKt9GEz1hn5Uc3DtCl1Mwfn5vtfShmehNHfqX7i7dnf1k2sCvKOtRBcdD+yEp9kvxtw9N6AdEiWzicPFKYioaG8bnGhFAVgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TVqTsvuz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="avcge3l/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738884512; x=1770420512;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IqCJRbnd/ake/rfsaywutu7ZEKHtAxX14+3WiTsN3po=;
-  b=avcge3l/RdLBZXWQyfN30RQ1r+GR1kTEZVPesmxCqx3nFctzfzzH0A7u
-   H6a3kzt/uYiWUOV+jaxOq+/0Vsnkg7ON1MLPhtlim92pOsso83hdZaiqy
-   Ahv1F5ZZ63Se3E4eKWkJVkYA8AnQZEncxwnmLs3WGKS91b24lzHUdPISI
-   24CW8LAdJfEfUClNE+aXsDB9yP0g8vmNAP0qvbLSND/cJEEq/RvRL3DDF
-   ZL2L3dpc5j/08JGeFhMFxbVVPMR7+Q450qtoit5MGQlwZzAWCmaAGmEkI
-   nigONFSN0QreRuM71pmXgYOL4wT3z1cl8jje/BomrG9NzJF+m1IaWmFl9
-   w==;
-X-CSE-ConnectionGUID: t9N0CSRNTsqyYOuA6fQHxw==
-X-CSE-MsgGUID: akTopof4S2uo5qr+cZDfng==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39646299"
-X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
-   d="scan'208";a="39646299"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 15:28:32 -0800
-X-CSE-ConnectionGUID: 0cmOU3WWQ066b+PBqxIT4w==
-X-CSE-MsgGUID: d3vf7E8eTA28v3i/7CNOvw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
-   d="scan'208";a="116395562"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Feb 2025 15:28:28 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tgBII-000xVn-1R;
-	Thu, 06 Feb 2025 23:28:26 +0000
-Date: Fri, 7 Feb 2025 07:27:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-Message-ID: <202502070744.hqS7ZVVX-lkp@intel.com>
-References: <20250206001744.3155465-1-coltonlewis@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVqTsvuz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738926197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tbM9CuVu36PPibrDw89XRxqtWkXgC2pjRfq8eqbXE0c=;
+	b=TVqTsvuz9/kGxvoK9ZiE/gbR0FHrRIIgYtDados0YYQZ0K+6FYXZkG1MTo5mWKWq/j6t36
+	HFQbQ2Vtdnp03eGZ36mK2cE2Imc0JLWkHYNfdJavHm9Nz6av+HrbI5jxfCuwb0twZzbma5
+	Ui5VvpI8DEg+EToahXPAOnbKORQ7180=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-170-sgBEqSZGMV6s4az5mD8VXQ-1; Fri,
+ 07 Feb 2025 06:03:14 -0500
+X-MC-Unique: sgBEqSZGMV6s4az5mD8VXQ-1
+X-Mimecast-MFC-AGG-ID: sgBEqSZGMV6s4az5mD8VXQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9B3A1800875;
+	Fri,  7 Feb 2025 11:03:11 +0000 (UTC)
+Received: from gondolin.redhat.com (unknown [10.67.24.130])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 32BBD19560A3;
+	Fri,  7 Feb 2025 11:02:55 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com
+Cc: shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH 00/15] arm: rework id register storage
+Date: Fri,  7 Feb 2025 12:02:33 +0100
+Message-ID: <20250207110248.1580465-1-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206001744.3155465-1-coltonlewis@google.com>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi Colton,
+[Note: I've kept the cc list from the last round of cpu model patches;
+so if you're confused as to why you're cc:ed here, take it as a
+heads-up that a new cpu model series will come along soon]
 
-kernel test robot noticed the following build errors:
+This patch series contains patches extracted from the larger cpu model
+series (RFC v2 last posted at
+https://lore.kernel.org/qemu-devel/20241206112213.88394-1-cohuck@redhat.com/)
+and aims at providing a base upon which we can continue with building
+support for cpu models, but which is hopefully already an improvement
+on its own.
 
-[auto build test ERROR on 2014c95afecee3e76ca4a56956a936e23283f05b]
+Main changes from the patches in that series include:
+- post-pone the changes to handle KVM writable ID registers for cpu models
+  (I have a series including that on top of this one)
+- change how we store the list of ID registers, and access them
+  basically, use an enum for indexing, and an enum doing encodings in a
+  pattern similar to cpregs
+- move some hunks to different patches
+- update the scripts to generate the register descriptions, and run
+  them against a recent Linux sysregs file
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Colton-Lewis/KVM-arm64-Remove-cyclical-dependency-in-arm_pmuv3-h/20250206-082034
-base:   2014c95afecee3e76ca4a56956a936e23283f05b
-patch link:    https://lore.kernel.org/r/20250206001744.3155465-1-coltonlewis%40google.com
-patch subject: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20250207/202502070744.hqS7ZVVX-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250207/202502070744.hqS7ZVVX-lkp@intel.com/reproduce)
+What I've kept:
+- generating the register descriptions from the Linux sysregs file
+  I think that file is still our best bet to generate the descriptions
+  easily, and updating the definitions is a manual step that can be checked
+  for unintended changes
+- most of the hard work that Eric had been doing; all new bugs in there
+  are my own :)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502070744.hqS7ZVVX-lkp@intel.com/
+Also available at
+https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage
 
-All errors (new ones prefixed by >>):
+I plan to send cpu model patches based on top of this Real Soon(tm).
 
-   In file included from arch/arm64/include/asm/kvm_host.h:38,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:15:
->> include/kvm/arm_pmu.h:177:20: error: static declaration of 'kvm_vcpu_pmu_resync_el0' follows non-static declaration
-     177 | static inline void kvm_vcpu_pmu_resync_el0(void) {}
-         |                    ^~~~~~~~~~~~~~~~~~~~~~~
-   In file included from arch/arm64/include/asm/arm_pmuv3.h:10,
-                    from include/linux/perf/arm_pmuv3.h:316,
-                    from include/kvm/arm_pmu.h:11:
-   arch/arm64/include/asm/kvm_pmu.h:6:6: note: previous declaration of 'kvm_vcpu_pmu_resync_el0' with type 'void(void)'
-       6 | void kvm_vcpu_pmu_resync_el0(void);
-         |      ^~~~~~~~~~~~~~~~~~~~~~~
-   make[3]: *** [scripts/Makefile.build:102: arch/arm64/kernel/asm-offsets.s] Error 1
-   make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1264: prepare0] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:251: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:251: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+Cornelia Huck (2):
+  arm/kvm: add accessors for storing host features into idregs
+  arm/cpu: Add generated files
 
+Eric Auger (13):
+  arm/cpu: Add sysreg definitions in cpu-sysregs.h
+  arm/cpu: Store aa64isar0 into the idregs arrays
+  arm/cpu: Store aa64isar1/2 into the idregs array
+  arm/cpu: Store aa64pfr0/1 into the idregs array
+  arm/cpu: Store aa64mmfr0-3 into the idregs array
+  arm/cpu: Store aa64dfr0/1 into the idregs array
+  arm/cpu: Store aa64smfr0 into the idregs array
+  arm/cpu: Store id_isar0-7 into the idregs array
+  arm/cpu: Store id_mfr0/1 into the idregs array
+  arm/cpu: Store id_dfr0/1 into the idregs array
+  arm/cpu: Store id_mmfr0-5 into the idregs array
+  arm/cpu: Add infra to handle generated ID register definitions
+  arm/cpu: Add sysreg generation scripts
 
-vim +/kvm_vcpu_pmu_resync_el0 +177 include/kvm/arm_pmu.h
-
-5421db1be3b11c5 Marc Zyngier           2021-04-14  163  
-20492a62b99bd43 Marc Zyngier           2022-05-16  164  #define kvm_vcpu_has_pmu(vcpu)		({ false; })
-20492a62b99bd43 Marc Zyngier           2022-05-16  165  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
-20492a62b99bd43 Marc Zyngier           2022-05-16  166  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
-20492a62b99bd43 Marc Zyngier           2022-05-16  167  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
-27131b199f9fdc0 Raghavendra Rao Ananta 2023-10-20  168  static inline void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu) {}
-3d0dba5764b9430 Marc Zyngier           2022-11-13  169  static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
-3d0dba5764b9430 Marc Zyngier           2022-11-13  170  {
-3d0dba5764b9430 Marc Zyngier           2022-11-13  171  	return 0;
-3d0dba5764b9430 Marc Zyngier           2022-11-13  172  }
-bc512d6a9b92390 Oliver Upton           2023-10-19  173  static inline u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
-bc512d6a9b92390 Oliver Upton           2023-10-19  174  {
-bc512d6a9b92390 Oliver Upton           2023-10-19  175  	return 0;
-bc512d6a9b92390 Oliver Upton           2023-10-19  176  }
-b1f778a223a2a8a Marc Zyngier           2023-08-20 @177  static inline void kvm_vcpu_pmu_resync_el0(void) {}
-20492a62b99bd43 Marc Zyngier           2022-05-16  178  
+ hw/intc/armv7m_nvic.c                 |  27 +-
+ scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++
+ scripts/gen-cpu-sysregs-header.awk    |  70 +++
+ scripts/update-aarch64-sysreg-code.sh |  30 ++
+ target/arm/cpu-custom.h               |  55 ++
+ target/arm/cpu-features.h             | 313 +++++------
+ target/arm/cpu-sysreg-properties.c    | 713 ++++++++++++++++++++++++++
+ target/arm/cpu-sysregs.h              |  22 +
+ target/arm/cpu-sysregs.h.inc          | 164 ++++++
+ target/arm/cpu.c                      | 111 ++--
+ target/arm/cpu.h                      |  73 +--
+ target/arm/cpu64.c                    | 133 +++--
+ target/arm/helper.c                   |  68 +--
+ target/arm/internals.h                |   6 +-
+ target/arm/kvm.c                      | 138 ++---
+ target/arm/meson.build                |   1 +
+ target/arm/ptw.c                      |   6 +-
+ target/arm/tcg/cpu-v7m.c              | 174 ++++---
+ target/arm/tcg/cpu32.c                | 320 ++++++------
+ target/arm/tcg/cpu64.c                | 460 +++++++++--------
+ 20 files changed, 2308 insertions(+), 901 deletions(-)
+ create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+ create mode 100755 scripts/gen-cpu-sysregs-header.awk
+ create mode 100755 scripts/update-aarch64-sysreg-code.sh
+ create mode 100644 target/arm/cpu-custom.h
+ create mode 100644 target/arm/cpu-sysreg-properties.c
+ create mode 100644 target/arm/cpu-sysregs.h
+ create mode 100644 target/arm/cpu-sysregs.h.inc
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.48.1
+
