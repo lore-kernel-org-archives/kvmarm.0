@@ -1,42 +1,55 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388548479
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B99B175D5D
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738951444; cv=none; b=JftDWR1RAyCFFr4I19DTAf7en8zHyt8K/qj9q2QPoDHAn69lH+S4Fo5Jbvva7lmdOe+XWOCp9yKz7cUOMUE33TYchdA18eMsrHI/kz+KlyUMAGMnY4vzsuQAiKSSk/1NifulKX6364B+tTOVrS7xCIxTBYVcNaF56UcVm4z72Qk=
+	t=1738951809; cv=none; b=ZEtJhXbd2TCXn6R5cH/f4qJNnMcE5v5Ta7zo9LNj/bHqtTowEV5uvtoEfq973seFws091Z8BqbKsMMHGVyG7SfsIQVYPaTn+lu/kGlmXs+anCkiZLB78e/B0tj4ieHiEuucGf+uo0xkqOyfeylV2lsvMzqdKvhqBX5LTKcUSQY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738951444; c=relaxed/simple;
-	bh=Gs1qh+B0RQCLp6WLhye/L0Za0eB52yBA3wutFjUiy6I=;
+	s=arc-20240116; t=1738951809; c=relaxed/simple;
+	bh=+G+YBZTgA9QIbY2A+UZYK3QXLmcb1dpBWlg/zQMm6Zc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/D9KxXBBGkLFP7HORq0UsOzF4v7+FFNB1zyRFm5eV8odXkSuxNJYllUGUocYGtjrYGrm++gPJsX1SOn5y+jp5bzO2O9ZKzE3jH98zQJTKSLMw380bGSR5NUwpFjqavuGbijUDVNiENLNLEMIS2rVhcYurt8bVXJAgZ8dr2FJTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wys31Zvm; arc=none smtp.client-ip=91.218.175.186
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eh2t1Hpcnpg82DrKAB63ZmF114HdgNTb1e3SSbf+MY1YWW7NWgeU0C2DzrOUIP7SgddNsqrUO8GoAeoiwVuu6xjIhGzAWK1TVyXpd+WGUpZAxSgBBnB1H4+qiZgW5mkJoFkMiPhdM/vcE9XQG7D/iIHD/ZE9FMUlUnCKF7aqI7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DBeVwjXj; arc=none smtp.client-ip=91.218.175.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wys31Zvm"
-Date: Fri, 7 Feb 2025 10:03:55 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DBeVwjXj"
+Date: Fri, 7 Feb 2025 10:09:58 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738951439;
+	t=1738951803;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lP512jh6/P7PyHlGLlEdyRyOeCzvFzG5Z4L3Sl7a2ok=;
-	b=Wys31ZvmlScsSgLLqTvRzMIEwOGGNl420jFLRlljNH2OyqIoPgKzp/bVDGhfXO5+6P1FLU
-	tYJYlUxSTt3J18jRdITFGrDRc/VmmRb2IMIa73wundFbb9ltI4DgggzCQkbGEJ6L2VqmLG
-	DPtbIPrLTciteCxbAsEDClpGQjm7Mh4=
+	bh=ZolRaIlCgaZRdZ2y7P6BoM5Dq+0ObR3jHsmtYgVaSNI=;
+	b=DBeVwjXjnPTYpQs6Lq9Mvygma9/LdKK5EEukS36yscCrnbkZZcopW5h0QH0FR9304mEJVg
+	Xlr/eeKMf+3R0mb40Kic+82+T0Sp+HGlGTQFnlHe2KBXWxMaPSOoRxAfoJk472uVfK3Kh2
+	TQvD3khEOYtwiOiOb/dYlH+PWd6e21k=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Alexander Potapenko <glider@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: Assorted vgic fixes for 6.14
-Message-ID: <Z6ZLC1v5KU-zzbQR@linux.dev>
-References: <20250206152100.1107909-1-maz@kernel.org>
+Cc: Eric Auger <eauger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	kvmarm <kvmarm@lists.linux.dev>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org,
+	catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com,
+	yuzenghui@huawei.com, darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If
+ timer expired
+Message-ID: <Z6ZMdv8jJUvYwQzT@linux.dev>
+References: <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
+ <86y10osr19.wl-maz@kernel.org>
+ <4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
+ <2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
+ <152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
+ <86h661wje4.wl-maz@kernel.org>
+ <4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
+ <86cygpwfy0.wl-maz@kernel.org>
+ <b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
+ <86frkptzr6.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,30 +58,29 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250206152100.1107909-1-maz@kernel.org>
+In-Reply-To: <86frkptzr6.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Feb 06, 2025 at 03:20:57PM +0000, Marc Zyngier wrote:
-> Alexander, while fuzzing KVM/arm64, found an annoying set of problems,
-> all stemming from the fact that the vgic can be destroyed in parallel
-> with the rest of the guest still being live.
-> 
-> Yes, this is annoying.
-> 
-> Fixing this is not going to happen overnight (though I have some
-> ideas), but we can make what we have today a bit more robust.
-> 
-> This is what patch #2 is doing. Patch #1 is just removing a loud
-> WARN_ON() that serves little purpose, and patch #3 fixes the actual
-> bug that Alex reported.
-> 
-> Hopefully, none of that is controversial...
+Hey,
 
-I'm a bit grumbly about slapping bandaids on the problem, but given the
-fact that glider reported all of this a while ago and we still haven't
-fixed it is enough to justify these patches. So:
+On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
+> I found at least one issue that could fail the migration. Before the
+> VM starts running, we limit the feature set to the subset we actually
+> support with NV.
+> 
+> By doing this, we also change the value of IDreg fields that are not
+> writable, because they describe features that we don't support.
+> Obviously, that fails on restore.
+> 
+> I need to have a think...
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+We spoke about this a while ago (and I forgot til now), but I was
+wondering if we could use vCPU feature flags to describe NV, including
+the selection between FEAT_E2H0 and FEAT_VHE.
+
+I think this might match userspace expectations a bit more closely where
+the state of the ID registers after init gives the actual feature set
+supported by the VM.
 
 -- 
 Thanks,
