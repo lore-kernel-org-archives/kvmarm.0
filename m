@@ -1,125 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7447A225417;
-	Fri,  7 Feb 2025 13:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5EB21D00B
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738936776; cv=none; b=HlmaFqmWzQSG6TEmQtCQu4psI1Y49PUnEzSw2BTeUeVq9md0/QLj7FE6INg5mZ9CrD4efKHgB/uHncqff+bBgjjlfi3+KRx63bA/PKZoCygtC07vDdjY8BT0HJL9eBk41ePcEmQ+IjIjmR0ERLGveTwqYXUiwyfckK5hTBfwzHA=
+	t=1738937330; cv=none; b=SHZdT7yinYu4O9gJOe/lfMBWMiZwey58eBsyAXgsL0iIM2MtUJu/xiDX/5AT9GXgx2ze1/c8zxzpCbuV5M9OP2ZQAZ6k7Ga5rMYX6XGIqk5Xwl89ZSkypEbl+vY08VfJhWHvc8qfQEW05q4uxNviV1HGgdvOHdoxaMaFibL0cgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738936776; c=relaxed/simple;
-	bh=RUtQSyfhNs+tFAKcDtGzb+C8FwaGeQ+wiIdsyqFhXbg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T+LKIlVqn4ZwMQedayPGhVmG50yBhsZPoYKzlrmNL44AejJMSAw4HfxZbRmve9mYUDVfCyW6u/Dm7uUoryuHcMeEESdGi5IswZvcCm2/ooO2vN593JRPbzlFtNhDRfk2sTYStp4ciiGmoncxKzC+iJ02Uwm78iUh+o402C0oQAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAw3hZ5T; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAw3hZ5T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED126C4CED1;
-	Fri,  7 Feb 2025 13:59:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738936776;
-	bh=RUtQSyfhNs+tFAKcDtGzb+C8FwaGeQ+wiIdsyqFhXbg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eAw3hZ5TrI/Hl3CLjQVitGazqSS5beMYFUhRRCBQ6Yf2hQb/ZlVbtGxvPCkmhloIr
-	 oCGmTljVG+TGTOeUlifj/csy12k1e/TPZCAKGOBMK4OWN53NmjLWRE2eguiwnjMUIZ
-	 ryuRoS1TYrAWLjwZDJxk66sZADu56mbbchsGUZ2Qd/LBxW+ndFVrLfkgyiOUmhFzga
-	 PJXWRjzK9K9MSJDQ4+Wu14K1C9xn9CwNcmcsVeg2KP5YUWbdi7qxh0XO5owo+JtOJt
-	 gB24B6XM4p8Cp3kGNn7OoxykbUW/Ow3mgy54En8C14IKxp9cosWms/xau0Y1bEWgaw
-	 KsBNsuLAY8uuQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tgOtJ-001duf-Dm;
-	Fri, 07 Feb 2025 13:59:33 +0000
-Date: Fri, 07 Feb 2025 13:59:31 +0000
-Message-ID: <86jza1ua7w.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	darren@os.amperecomputing.com,
-	scott@os.amperecomputing.com
-Subject: Re: [RFC PATCH 1/2] KVM: arm64: nv: selftests: Add guest hypervisor test
-In-Reply-To: <9b4a8665-4fb8-42e7-b63f-d154ae75a4f0@os.amperecomputing.com>
-References: <20250206164120.4045569-1-gankulkarni@os.amperecomputing.com>
-	<20250206164120.4045569-2-gankulkarni@os.amperecomputing.com>
-	<86o6zeu668.wl-maz@kernel.org>
-	<9b4a8665-4fb8-42e7-b63f-d154ae75a4f0@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1738937330; c=relaxed/simple;
+	bh=LWe72L47xpbJcvLJWBHPqv46sQLt3DuB5r4Qkrploxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cmUs3hlWB6PLma7qUFYW6XC3mvDNeR1fU7Y5ObptZennBUa2OKpuSmb8Zny3os/FtFc4BhQTRNObsJgAASSlaJLRe332EwS2XBEk5jt1aQ4u4+vnlUCFElINqDhnYQz7R9dXekbtpZS4DTD0cfLLO0Osro24ie8undofvj6FR6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED39C4CED1;
+	Fri,  7 Feb 2025 14:08:46 +0000 (UTC)
+Date: Fri, 7 Feb 2025 14:08:44 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com,
+	eric.auger@redhat.com, sebott@redhat.com, yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com, jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com, anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+Subject: Re: [PATCH v6 4/4] arm64: paravirt: Enable errata based on
+ implementation CPUs
+Message-ID: <Z6YT7GxVKGKcnYmL@arm.com>
+References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
+ <20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, darren@os.amperecomputing.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
 
-On Fri, 07 Feb 2025 13:26:41 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> >> +	if (is_vcpu_nested(vcpu)) {
-> >> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPTR_EL2), fpen);
-> >> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL2), sctlr_el1);
-> >> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL2), tcr_el1);
-> >> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL2), DEFAULT_MAIR_EL1);
-> >> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL2), ttbr0_el1);
-> >> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), vcpu->id);
-> > 
-> > How about some of the basics such as HCR_EL2, MDCR_EL2? A bunch of
-> > things there do have an impact on how the guest behaves, and relying
-> > on defaults feels like a bad idea.
-> 
-> Sure, I will try to have these registers also set to required value
-> explicitly.
-> 
-> > 
-> > This also assumes VHE, without trying to enforce it.
-> 
-> Ok, I will try to set specific bits of HCR_EL2 to force it run in VHE.
-> 
-> > 
-> > Finally, how to you plan to make all the existing tests run as EL2
-> > guests if TPIDR_EL1 isn't populated with the expected value? Surely
-> > you need to change the read side...
-> 
-> OK, I have not yet tried running existing tests modifying to run as
-> EL2 guests. I will try to run them modifying to run in vEL2.
+On Wed, Feb 05, 2025 at 01:22:22PM +0000, Shameer Kolothum wrote:
+>  static inline bool is_midr_in_range(struct midr_range const *range)
+>  {
+> -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> -				       range->rv_min, range->rv_max);
+> +	int i;
+> +
+> +	if (!target_impl_cpu_num)
+> +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> +					       range->rv_min, range->rv_max);
+> +
+> +	for (i = 0; i < target_impl_cpu_num; i++) {
+> +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
+> +					    range->model,
+> +					    range->rv_min, range->rv_max))
+> +			return true;
+> +	}
+> +	return false;
+>  }
 
-You shouldn't try to modify them. Just make them take a parameter so
-that the initialisation is done by configuring everything at EL2.
-
-> 
-> Should we modify them to run as EL2 guests by default, if the host
-> supports/detected NV? or command line argument based run? either in
-> El1(default) or in EL2?
-
-EL1 by default.
-
-> 
-> BTW, I have also ran all existing tests on L1, most of the tests are
-> passing(atleast I did not see any failure prints).
-> 
-> arm64/debug-exceptions is failing on L1 and needs to be
-> debugged/fixed/skipped.
-> arm64/arch_timer_edge_cases fails on both L0 and L1.
-
-Then I guess you have some work to do to debug these problems, and it
-once more means that NV is not ready for merging.
-
-	M.
+It's a interesting approach but how does this work in practice if an
+erratum requires a firmware counterpart? Do we expect firmwares on all
+machines involved to have workarounds for the other machines? Or is KVM
+going to intercept those SMCs and pretend the EL3 counterpart is there?
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
