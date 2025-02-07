@@ -1,153 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DBA23C8D9;
-	Fri,  7 Feb 2025 17:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50C0191F62
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 17:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738950337; cv=none; b=YElqFB0NwOCYkjN7pdVyMmkMIm+tCXO+oX4sWQwX8yN988BcU16Gy96QD5SJETlDH7hCtkskgrpbjYZ9fHXJ70QBq5UX75iXtnow+EnGNIP4dWwli71ZCZvvTJPI3qBWPm8QtX6sDlo5VkmnYWf5QHHasUNKXyPFgXp5PAAXpEw=
+	t=1738951151; cv=none; b=LjfqQyzQAnXSI9WGelqVFGLtj8kDVjgkGXZuY4GmxMjrpqboYfH6RTPNncYGK1yqZI9UamUFuElw6Zx8SFG39HKZ92QKdVyjB/W3hFHqU4iDsqTi7E+xwXVx2J0edwVWRZsIkrhn0WXoyI7Z4itY3X20QzsmdoAwGvChRnSNg0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738950337; c=relaxed/simple;
-	bh=3AhHH+IIgrOYeTXC6491GVKSYE85dc/aXAWC+t2j57k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pPCq5rTUVpdY0bhzy6MtOESF3550rOF92JrPdxI8FXSYNAlXWf95WUGCxnRvw5tEm05zO7fO7l2+nQzijGNaPX+jTZBEBMxbbjfFB4Ony4jQTPWGzNSRHB44vDKr4thOykxcLGgmOkE9mTru//kemRaWcfi1G/e4F+29NyB1948=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQq0ZdCr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738951151; c=relaxed/simple;
+	bh=gsugIwHDEbRnM9UEhKnpw95u8gLMSq/fysiSUrT+CAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=apwjtAiWJJRHKqXEqFrx921DjFCcxjK00Bd+ASLANXUIyIIZj7rsndSD8IVNcmaxHaKN9iSGHxm06/Lmg9xNrQabE3TW818yUCpHUQ2h6lzGtYUdDCKJGn4nxf/AIS5jQFt8jeH9teNpfFZWKl4JWVwTX9ZL+/xLV2uFpJ1BCcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q07uWhaW; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQq0ZdCr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7EA6C4CED1;
-	Fri,  7 Feb 2025 17:45:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738950336;
-	bh=3AhHH+IIgrOYeTXC6491GVKSYE85dc/aXAWC+t2j57k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DQq0ZdCrM+etyDgProVmvATLt+I/WsYPwrRdfuN5VYwcoPttACqy0tBNOVwlZRw6L
-	 C0ZhxuhkHHvFJPA6cM0FaYYWtOxkgWXmNPz3gBJmiaSmZ4KIhvYAfiBqJWVLj0PYBj
-	 2CKDZJRijCY/S1npPSa8o+hKzheh9fi1JUOlJHKhma2NxyAO0ozFvk5zm3Eqz9hoqJ
-	 IqxMVpRf5gPF9tYvCZrvZH2V8vq8Ul0VQDNoTSc7/DMaNj70hmPaYnk0BdnqCOyD/4
-	 cB13jEpLhvix8J8wNhYVAaHTGJn/5kw6g3/NXT+tOkqs4+HcWDF0vycF2UFN+IAUVb
-	 GyidZ/cVo6ICA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tgSQ2-001jBl-7g;
-	Fri, 07 Feb 2025 17:45:34 +0000
-Date: Fri, 07 Feb 2025 17:45:33 +0000
-Message-ID: <86frkptzr6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	christoffer.dall@arm.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	coltonlewis@google.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
-In-Reply-To: <b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
-References: <20241209053201.339939-1-gankulkarni@os.amperecomputing.com>
-	<867c89tc4q.wl-maz@kernel.org>
-	<c5b1c3d7-56ca-4afc-a831-045dba4beffa@os.amperecomputing.com>
-	<865xntt2kv.wl-maz@kernel.org>
-	<8be59ff3-6a68-48e1-8181-0ce4b2e7180f@os.amperecomputing.com>
-	<bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
-	<86y10osr19.wl-maz@kernel.org>
-	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
-	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
-	<152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
-	<86h661wje4.wl-maz@kernel.org>
-	<4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
-	<86cygpwfy0.wl-maz@kernel.org>
-	<b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q07uWhaW"
+Date: Fri, 7 Feb 2025 09:58:56 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738951141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vYSRH4jES0cuKpYx7kPs80Ku9bgyQ0A7OnKQUis7Fqg=;
+	b=Q07uWhaW/+M7sBMweEZugC689oW9CW0FZWeX3WQp2lIxURoz8o7sCaK7GD1JusohZA32Dl
+	GbrXiPpNLn2hdB1+onXaXzZ3CwtWz0fpiCsPm9v5gjKvQTyoT0OSe9Bf4WYMjmUKE5xEAv
+	BdlFObSAWrDbQkNu/vNhiTHnebdw/68=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] Fixes for pKVM NP-guest support
+Message-ID: <Z6ZJ4LDSOG6Lr2Ba@linux.dev>
+References: <20250207145438.1333475-1-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250207145438.1333475-1-qperret@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 16 Jan 2025 17:52:10 +0000,
-Eric Auger <eauger@redhat.com> wrote:
+On Fri, Feb 07, 2025 at 02:54:36PM +0000, Quentin Perret wrote:
+> Hi all,
 > 
-> Hi Marc,
+> Here are two patches to deal with a race between the handling of
+> permission faults and MMU notifiers with pKVM that I found by
+> inspection. Specifically, pKVM gets thoroughly confused when it doesn't
+> find a page mapped in its relax_perm path, while standard KVM deals
+> with that trivially thanks to the -EAGAIN special case in
+> user_mem_abort(). The second patch addresses the problem by simplifying
+> the implementation of multiple pKVM hypercalls, which also has the nice
+> side effect of improving locking by not taking the global host stage-2
+> lock as much.
 > 
-> On 1/14/25 4:52 PM, Marc Zyngier wrote:
-> > On Tue, 14 Jan 2025 14:57:43 +0000,
-> > Eric Auger <eauger@redhat.com> wrote:
-> >>
-> >> Hi Marc,
-> >>
-> >> On 1/14/25 3:38 PM, Marc Zyngier wrote:
-> >>> Hi Eric,
-> >>>
-> >>> On Tue, 14 Jan 2025 13:12:21 +0000,
-> >>> Eric Auger <eauger@redhat.com> wrote:
-> >>>>
-> >>>> I also confirm that using a mailine edk2 fixed the issues I faced
-> >>>> previously (fed/rhel L1 guest not booting).
-> >>>>
-> >>>> I used Marc's nv-next branch and qemu rebase.
-> >>>
-> >>> When did you sample this branch? It is almost daily rebased at the
-> >>> moment, given that we keep piling up things in kvmarm/next.
-> >> 5 days ago.
-> > 
-> > OK, so probably before I reapplied everything on top of kvmarm/next.
-> > Not necessarily a bad thing, just slightly older. The core NV code
-> > isn't rapidly changing anymore, with the exception of the recursive
-> > nesting stuff that I am currently rewriting.
-> > 
-> >>
-> >> If you want me to test a specific branch, please let me know, esp. in
-> >> the context of latest series including
-> >>
-> >> [PATCH v2 00/17] KVM: arm64: Add NV GICv3 support
-> > 
-> > That'd be the current nv-next then, which has all the series currently
-> > on the list, and a few more.
-> > 
-> >>>
-> >>>> With a rhel L1 guest I can now boot buildroot, debian and rhel guest as
-> >>>> L2 (feat mainline edk2). For rhel, I tested different kinds of page size
-> >>>> combinations for L1/L2 (4k and 64kB) and it worked.
-> >>>>
-> >>>> I tested on AmpereOne and Grace-Hopper systems
-> >>>
-> >>> Thanks for the confirmation. I haven't had a chance to try QEMU yet,
-> >>> but I expect that save/restore will not work. Something to look into,
-> >> I have not tested this yet.I will give it a try.
-> > 
-> > Thanks, that'd be super helpful.
-> 
-> I confirm the migration fails when putting some registers on the dest
-> side. I will further investigate.
+> Patches based on 6.14-rc1, tested in qemu on on Google Pixel 6.
 
-I found at least one issue that could fail the migration. Before the
-VM starts running, we limit the feature set to the subset we actually
-support with NV.
+Looks reasonable to me, the locking improvements are certainly an added
+bonus.
 
-By doing this, we also change the value of IDreg fields that are not
-writable, because they describe features that we don't support.
-Obviously, that fails on restore.
-
-I need to have a think...
-
-	M.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
