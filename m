@@ -1,96 +1,128 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA731A3163
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 19:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D6610E5
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 19:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738954982; cv=none; b=FhcbIK2Kz7kmAYC7pZ9tw7QjIAdgqHx5ZyXyhAHyEQOJkhO/C1RKgGfqJnVc9Am7N0YYQBsrlth37RImnF/yY4SavWD/CFgrp64bOEbuohsLaGZmv5MfZYiRcNXdZOhgcRKyop+k0cMRoOL7TDzMgGdDHGjTPol4ULLIzzlLA3I=
+	t=1738955313; cv=none; b=IA2RMUSPjrQuV8B6EH86IxSDPed3PW0lio/LQySVajNGpg7+a2Hg20ShDNHVKD2CfK07ZnCK6Hbnw7vcYV0f1Z13HZ/BiaBy6Yo5EZ7qNDYclZsXxPhA1ygqXPKmqB5u5uB1FUNiSDVrKmsJjd4iiWzEKpxfiz68iQa6v66lKi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738954982; c=relaxed/simple;
-	bh=B0DC6l/XyLB2yPBibKSZLZTItmwhOJ+NhorWu6VR1OU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=P6Drgj2FhNBzA9vxG1cmvSjx8qk7LnrRm8r60+/Urs8+VVW9HL9F0KQC/T/8uLtr+6O1gpMt9vscgWUfVqV81IibbTBFiHWPjczzf9XcAy3lHpY9bC4ozPlbAb8yK+moka8cVa6rzKrShs/jwJoWNR04XxRr76L+L89jldgNuh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WBKCOrrL; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1738955313; c=relaxed/simple;
+	bh=IRIdsHo2f6s+8U6OjOmHN3XuXiXtRoErFCPo7YRIvzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bMzqkHgAKm/V9zeuh4qxCCV8YcJkSQ6iHc9qk3+WgY6YtyfW2AAfEXrWOR/4BN+P+48iI+D/hKa6Y0Sc/7QEK/1mw75LcFesR2VGf9yiGw9e5c2c5R+1wGVUGT6OIIG6osQOJyT2t/v4Sa/kZRR+LjgeJchq9kSDFkfa8zSKyCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SMDXcW6C; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WBKCOrrL"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21670dce0a7so58212135ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 07 Feb 2025 11:03:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738954980; x=1739559780; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=x5iLhqQVo5p3cfm1ZHXkEjzjBbO03jMKvKOw7vCeE+w=;
-        b=WBKCOrrLiKCme+pUnZtv18RQB2tz93viV+MaAgAnfDxLXfI0D90sXFpo8367t4zhQt
-         pJ1dJMN1/sEOfPVcSADNkXMJgq36mEw8ifFA2/cDEwr0vL7HZZF22yaq2t1ScHh2bhtd
-         u6h1ZWp4AktTKRpAjYUQ6hPSHb5HawWpd69nxEMANHmxpYuILDAcjA9Rbh/chMvDypoB
-         aBhqwrbhYWwtVkhxA++tzhVq6Jw2nvn01efHodqACmOgNYR49XUYrIzcfmHNzQMqZKep
-         k/MXL5knr8BhpHwY8xFWNuIOV69/vimzM6i3R7qDZTkzDEMYDFa8WtCl5UOpI3JiZbi8
-         Cj+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738954980; x=1739559780;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x5iLhqQVo5p3cfm1ZHXkEjzjBbO03jMKvKOw7vCeE+w=;
-        b=wXDqmntW7GqbekV2o2jo+pfXSh3CnLeePRFXpg2RfCwR1l31JCl7Mf4g0QjqjdWg99
-         l1VEz+Eic0wVaEiBHcmN5LX4+tJV7rqn20aZ3r37K6mxzqSut68y2zeIcUsbHP0h+yBq
-         zNnAyhES12KdoMLlTEipOKzSlH1ESlVXhNGoTVRoccsJx5P+82soGU+M2Kwrx1ytnHCO
-         /ELapZGmHN7iV5AayDBUi7theJpOrxeoBGe9cKKukk9RFs95tK5ZD17l0m6Jc2J7d9RO
-         j9EbcgeqPftwTf5H7ZMgjVdpXcwPl5z5ncqTyjpuD3zagSHc5lCP5LGIKi6BJ9e5jC2u
-         2Bcg==
-X-Forwarded-Encrypted: i=1; AJvYcCXmP/NK/nYSDPwCqkmF+IKe0HsJC/r6N8wyrO8pDu3Vg+kbnvfkm8uYIGi+J2iE56R+vF4wEbI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy4as9xkvoJ3W+2CQAgjjaeEPDSXc9c0OZ/rDWyUTwIl+qxvfm5
-	Esi23yzxnd7WVDhX+w5OjcB/eleVq8yVFwrkhPgAtQ29r+eIl3UQu47se7Mxgqs=
-X-Gm-Gg: ASbGncvcWs2NS4J6dAo+LekcgwfjccPAVUWyqUFEF0SSRCjPsWZq38/MpGtQ7F+Ap2C
-	CI7sAKZvNdKZrsBnjr41j4+BhcxpL5QnGkQbhXGDOBL1+rNUt9tjSsDXb2GOZ29dimVIjD9+v9y
-	u90OZmUvcQXn0OohCquKXzaPTyyP36Ftvs4Ms1SvqTnIr6PwuZzVxApCUBL9tmNPDphSG8Q/kRE
-	yiDO3fr94AfaJjjEy7DEdeecDvaoJnpzzFaIC8faAZF1xHOzkd2KYil60jsbQq/TGf7vZWMGdi1
-	0mW+W4gKe/05NM8MwEibnLqeg8c12TeUc1EonhGd3WZP10rq+WlVpzU=
-X-Google-Smtp-Source: AGHT+IF2LLaNMwiUuHQAdJOEiXolxAl+x/GhHZKndi/U9zcgMdqVqF1FKAZ6FFPxdWK01sK6FPeYuQ==
-X-Received: by 2002:a17:903:1c4:b0:215:72aa:693f with SMTP id d9443c01a7336-21f4e6ce75emr60838215ad.9.1738954980335;
-        Fri, 07 Feb 2025 11:03:00 -0800 (PST)
-Received: from [192.168.0.4] (71-212-39-66.tukw.qwest.net. [71.212.39.66])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3687c68asm34363405ad.172.2025.02.07.11.02.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Feb 2025 11:02:59 -0800 (PST)
-Message-ID: <f5878231-79b8-4e29-bfb0-f9a57ac3f6a4@linaro.org>
-Date: Fri, 7 Feb 2025 11:02:58 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SMDXcW6C"
+Date: Fri, 7 Feb 2025 11:08:17 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738955303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U0hzUnHzdhCo2y6/Zd0m67AYnch7xq5CWs11SS1frqA=;
+	b=SMDXcW6C8ljTR21eTp2x0+eWZlmxR3qfLrtZHahBQAHzrBnFfq/SeM0H+atDZAAsjOQz5m
+	gXSxkybAbiEROU7ZuFuiPPPJcVIrzEGMDZeEwHZws+N1vazLNlfHjfMA51O7DjjTQyfAbD
+	sMKNHNGEWC9UK9SMaK7BSzbXZqLU/DI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Eric Auger <eauger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	kvmarm <kvmarm@lists.linux.dev>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org,
+	catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com,
+	yuzenghui@huawei.com, darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If
+ timer expired
+Message-ID: <Z6ZaIVtZ2k798Dn0@linux.dev>
+References: <4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
+ <2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
+ <152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
+ <86h661wje4.wl-maz@kernel.org>
+ <4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
+ <86cygpwfy0.wl-maz@kernel.org>
+ <b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
+ <86frkptzr6.wl-maz@kernel.org>
+ <Z6ZMdv8jJUvYwQzT@linux.dev>
+ <86bjvdtxb5.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 15/15] arm/cpu: Add generated files
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev
-References: <20250207110248.1580465-1-cohuck@redhat.com>
- <20250207110248.1580465-16-cohuck@redhat.com>
-Content-Language: en-US
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250207110248.1580465-16-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86bjvdtxb5.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 2/7/25 03:02, Cornelia Huck wrote:
-> And switch to using the generated definitions.
+On Fri, Feb 07, 2025 at 06:38:22PM +0000, Marc Zyngier wrote:
+> On Fri, 07 Feb 2025 18:09:58 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > Hey,
+> > 
+> > On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
+> > > I found at least one issue that could fail the migration. Before the
+> > > VM starts running, we limit the feature set to the subset we actually
+> > > support with NV.
+> > > 
+> > > By doing this, we also change the value of IDreg fields that are not
+> > > writable, because they describe features that we don't support.
+> > > Obviously, that fails on restore.
+> > > 
+> > > I need to have a think...
+> > 
+> > We spoke about this a while ago (and I forgot til now), but I was
+> > wondering if we could use vCPU feature flags to describe NV, including
+> > the selection between FEAT_E2H0 and FEAT_VHE.
+> > 
+> > I think this might match userspace expectations a bit more closely where
+> > the state of the ID registers after init gives the actual feature set
+> > supported by the VM.
 > 
-> Generated against Linux 6.14-rc1.
+> I'm not sure that's enough. Let me give you an example:
 > 
-> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
-> ---
->   target/arm/cpu-sysreg-properties.c | 716 ++++++++++++++++++++++++++++-
->   target/arm/cpu-sysregs.h           | 116 +----
->   target/arm/cpu-sysregs.h.inc       | 164 +++++++
->   3 files changed, 860 insertions(+), 136 deletions(-)
->   create mode 100644 target/arm/cpu-sysregs.h.inc
+> My host has FEAT_XNX, described in ID_AA64MMFR1_EL1.XNX. For whatever
+> reason, we don't allow this field to be written to, even out of NV
+> context. This is odd, because for an EL1 VM, this field means nothing
+> at all.
+> 
+> However, we don't yet support FEAT_XNX with NV (it requires some extra
+> surgery in the S2 walker, in the S2 shadowing code and in AT).
+> 
+> How would you manage this field if you had a vcpu flag saying E2H0 or
+> not? I don't think it helps, at least not in that particular case. It
+> may help for some things, but not all.
+> 
+> It feels that we need to define the field limit (and what is writable
+> or not) based on the NV/!NV support, and maybe E2H0/VHE as well.
 
-Why are we committing generated files and not generating them at build-time?
+I think we're both aiming in the right direction, I just didn't make my
+point clear.
 
+The ID registers we make visible to userspace after KVM_ARM_VCPU_INIT
+*must* describe a feature set we will actually honor for the VM. No late
+masking of features (i.e. first KVM_RUN), since it pretty much
+guarantees userspace won't be able to save/restore correctly.
 
-r~
+While we describe NV up front, we've been talking about allowing
+userspace to make the E2H0 v. VHE selection through the ID registers as
+well. My suggestion is that we have userspace select the flavor of NV
+it wants (E2H0 v. VHE) up front and completely nuke from orbit the idea
+of late feature fixups.
+
+This would solve your example of XNX, as we'd apply NV enforcement early
+and not expose the feature. Same would also hold for VHE-only features,
+such as recursive NV.
+
+Hopefully I made more sense this time around :)
+
+-- 
+Thanks,
+Oliver
