@@ -1,98 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFBE175D5D
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73FB19DF5B
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738951814; cv=none; b=CFVWwDDKb/6HPYXYanMSElV0BvQhTGdSi6ALQ3sbBQVip16eSUkEII6G0UfTjl4cD7C/z7/4AqZwksBiqQsEkEETVmVAL9TcWcQ8JQ/3hIaCHsPiBI9xrBfxHMmDzPRKe8MSr/cVprdQO2cMXmrbefiFeNsCUX273Dq2VijR4qE=
+	t=1738951852; cv=none; b=aG/ZWKAqXdrgSEPX28mh+QOPiYJiau/OcOFlr8h1R3nYNUSuzFkdvZnGTYS+W51aPBvxi5oAf2lMJ4UXZepgbcA5Gyg0kp9Al5ttExMXLUtNK9qKR9LkFOgsj+cFIYu7f665JPUBIVrpl3LmEdXs+G7v5yeWNNu00fWHsbdZZMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738951814; c=relaxed/simple;
-	bh=tEtChQbqDC5VWGaTnPiu5QAw3tL4WSL0apJi/+jOPVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dwcOwi4uI4t5V/9zIG2s4g7ALNMqTFJFQdPUxGlCHAAxQD/gcxFD2lhd8uNoEsT4ztTrkScXK+dEUXTwMWK6FWnuqyAToee2+E+LcjnIxUW1ZFhyzJCIU/HV2POE8pHiC13XiA4hTY3he3sAWp0WCGDI5R8QsKZ57OKRoKTpPmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F219C4CED1;
-	Fri,  7 Feb 2025 18:10:10 +0000 (UTC)
-Date: Fri, 7 Feb 2025 18:10:08 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org,
-	mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-	sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com,
-	jiangkunkun@huawei.com, jonathan.cameron@huawei.com,
-	anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org,
-	linuxarm@huawei.com
-Subject: Re: [PATCH v6 4/4] arm64: paravirt: Enable errata based on
- implementation CPUs
-Message-ID: <Z6ZMgDyyA5oV99hu@arm.com>
-References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
- <20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
- <Z6YT7GxVKGKcnYmL@arm.com>
- <86h655u8r3.wl-maz@kernel.org>
+	s=arc-20240116; t=1738951852; c=relaxed/simple;
+	bh=MlvBE2BowHXDWbwjymFqCoSazPaseEcDREg8QI4ix3U=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fzx65Zen2aHDFHl2IIBI/1luDtWudG9OJWMgViAnydhtx4KTW9aFQ7ZnR63unFRUzGan1/AqIqgPsPKO10/0GXAggpy9RLlOPlanCpB4dic5ST3gjENEWr1LGWoOAdpUGFw+EDY9oR0CyFAb86BE6Ltk5ZB6yUg/yZN0jAPQyVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcg2Wqoo; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcg2Wqoo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 419ADC4CEDF;
+	Fri,  7 Feb 2025 18:10:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738951852;
+	bh=MlvBE2BowHXDWbwjymFqCoSazPaseEcDREg8QI4ix3U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qcg2Wqooswd9VWz+nlJX5lAmqZv/x7OO/B5x6jJRT9Jb+QygFwyFIPSd1XDOmRqQl
+	 ZRkrqW9KbTiZnh73FeDCDHPUyiXXZGm/wmpFlpvofRdY4+OitfDVkOdRnj0UOweZrw
+	 nNJMyKM0Gt1EDuUnRcFRutAfIwHdg9xQk7SAZZxUc6PjqKOVfbuB4M/QVcJic/y7VV
+	 wuKZcbLDWRIPQ8Gl+HeY473+fU52En0MYZ1JSK+7qUITgYHQpeySpRjBOQdm8+a4aW
+	 Xx9PsmPKWhwlYGAnuSRHIXH1ws9llqzC1k0WkbCC/z3fJPQdTze9YfZUkEh25MyGQF
+	 nf2uyxNP9rHpg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tgSoT-001jk8-S4;
+	Fri, 07 Feb 2025 18:10:50 +0000
+Date: Fri, 07 Feb 2025 18:10:49 +0000
+Message-ID: <86ed09tyl2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Alexander Potapenko <glider@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Assorted vgic fixes for 6.14
+In-Reply-To: <Z6ZLC1v5KU-zzbQR@linux.dev>
+References: <20250206152100.1107909-1-maz@kernel.org>
+	<Z6ZLC1v5KU-zzbQR@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <86h655u8r3.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, glider@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 07, 2025 at 02:31:12PM +0000, Marc Zyngier wrote:
-> On Fri, 07 Feb 2025 14:08:44 +0000,
-> Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Wed, Feb 05, 2025 at 01:22:22PM +0000, Shameer Kolothum wrote:
-> > >  static inline bool is_midr_in_range(struct midr_range const *range)
-> > >  {
-> > > -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> > > -				       range->rv_min, range->rv_max);
-> > > +	int i;
-> > > +
-> > > +	if (!target_impl_cpu_num)
-> > > +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> > > +					       range->rv_min, range->rv_max);
-> > > +
-> > > +	for (i = 0; i < target_impl_cpu_num; i++) {
-> > > +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
-> > > +					    range->model,
-> > > +					    range->rv_min, range->rv_max))
-> > > +			return true;
-> > > +	}
-> > > +	return false;
-> > >  }
-> > 
-> > It's a interesting approach but how does this work in practice if an
-> > erratum requires a firmware counterpart? Do we expect firmwares on all
-> > machines involved to have workarounds for the other machines? Or is KVM
-> > going to intercept those SMCs and pretend the EL3 counterpart is there?
+On Fri, 07 Feb 2025 18:03:55 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> KVM already traps SMCs, and could do something on behalf of the guest
-> (such as pretending that the mitigation has happened if not on the
-> correct host) *IF* the mitigation is architected (à la WA{1,2,3}).
+> On Thu, Feb 06, 2025 at 03:20:57PM +0000, Marc Zyngier wrote:
+> > Alexander, while fuzzing KVM/arm64, found an annoying set of problems,
+> > all stemming from the fact that the vgic can be destroyed in parallel
+> > with the rest of the guest still being live.
+> > 
+> > Yes, this is annoying.
+> > 
+> > Fixing this is not going to happen overnight (though I have some
+> > ideas), but we can make what we have today a bit more robust.
+> > 
+> > This is what patch #2 is doing. Patch #1 is just removing a loud
+> > WARN_ON() that serves little purpose, and patch #3 fixes the actual
+> > bug that Alex reported.
+> > 
+> > Hopefully, none of that is controversial...
+> 
+> I'm a bit grumbly about slapping bandaids on the problem, but given the
+> fact that glider reported all of this a while ago and we still haven't
+> fixed it is enough to justify these patches. So:
 
-That's the main thing I had in mind. I don't think we have any other
-errata that requires firmware run-time discovery and interaction, though
-you never know when we'll add new one.
+Yeah, same here. I'm starting to think that we need to either prevent
+the vgic from being asynchronously destroyed, or start refcounting all
+IRQs just like LPIs. Which is very annoying since we don't have a
+global namespace for SGIs and PPIs.
 
-> If it is implementation specific, then we can immediately stop
-> pretending that a guest running on those systems can be migrated.
+But maybe simply refcounting the vgic itself would be enough.
+Thoughts?
 
-Makes sense.
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-> The only thing it helps a bit is big-little.
+Thanks,
 
-It does help a bit or, at least, we have some code for handling these
-variations that cab be extended. However, with this patchset, the host
-only probes the availability of the workarounds on the SoC it booted. It
-has no idea about the extra MIDRs the VMM picks and what the other
-machines in the clouds support.
-
-Anyway, let's hope the VMs only migrate between platforms that are
-equally broken.
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
