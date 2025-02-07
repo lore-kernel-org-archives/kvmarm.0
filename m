@@ -1,127 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4EA190679;
-	Fri,  7 Feb 2025 18:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F37E1DF984
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738953507; cv=none; b=kvs2m7bk6XK2I6HmJtzoq8XESz1XdmbkZVanh1IiHE3QbS5rnW+nEsIezs5BCO7gfhZLeLmIBlJYcN4kVOKgwwJwno57EkJBcBD/cMuarhz4yjmfYO/LQUvRifimUqc2QlcDdzOooEKi9HRyqyY7vozySCHrt0380oLAHOW63m8=
+	t=1738953796; cv=none; b=HYfbiB7+3nIhS/KRiyQv34wVYktnt36DxMc3xAGIbKW9zBZtvxWvw4WybJfjJc9cKMWtW/BCaQrM7WwyGqUpTsW57gRGpE7R8LRL2oZkFcYEDVoPnzATHi/AiAOU/ors+VzzFycpIn5e+xEPt4wYw7ZJeufQ7HPDjIrl52dO6lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738953507; c=relaxed/simple;
-	bh=IuEkWS/NeyEzfm3i6D8opFH8M053JN7Jz2y2irFVkzY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qMfqH3KUGwiXKAHYHvk9d1t9CIfhO0G4xcYU1SwZbdLPI+DtAw5RxHhSsO3UVp9DzaCz5XjVxcQqu80vuQ4YXmrAmiGlFUDly0sYU0UUTnf+bvV7HFd1c95DBjNpAZnSOJigqLLZX0OAY/hgI030ivnqjrPsI0bPK+2HSdMSW2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OA0YeZM/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738953796; c=relaxed/simple;
+	bh=X+AzTTg+xMzudWLBX4oy8cRB+Se2I0o7FSaQpMToYwg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=mYRZCDOnoWX9HhLQyObMrKyXeEYIXTykdKxfxGrfetv7g9c72ov9IoN0e5NsSAGvYj6J5WISaIIQovK1guXkg/h/SYPDb/6cedGWtzaSKk/81UeILdc6mGnQWb/QlFjXXHrQTPMGY2clBSTq8hr7AJbwccYt7mQI7zFfZlrWfVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=coVM7Nwg; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OA0YeZM/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F752C4CED1;
-	Fri,  7 Feb 2025 18:38:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738953507;
-	bh=IuEkWS/NeyEzfm3i6D8opFH8M053JN7Jz2y2irFVkzY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OA0YeZM/gCesGVQMq5OSI7dzXDnAk0M3rovFjYOuyL/hyjFGyvG50ZwhJsp38P/Uy
-	 zVGXs+cQ+a06nyAnNYBXHNuVY4S3AU3GSCwuPr2Ma1TMGpnX3dL1PjJtOIRBP16piH
-	 ZzA9SPl4Xdcz0r6T57miigab7WugY8M48s3IQcdnVIwjw+m0Hb6kGhI0XTqgoHtWRf
-	 oKaEydO7zmMO1beJUrVO8+X/6xoHGh8zPBv07EK5PhPwzsJT8YDHeMpj8/X2uj3VXJ
-	 5x3LCFef46qEXYCX0wSUJyJUnU3q/q3UDv/w7xvCfVNYsJ34cnY+ms1tQ9mK9xv9Rb
-	 G6zfL1m58aELQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tgTFA-001kXx-3e;
-	Fri, 07 Feb 2025 18:38:24 +0000
-Date: Fri, 07 Feb 2025 18:38:22 +0000
-Message-ID: <86bjvdtxb5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Eric Auger <eauger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	christoffer.dall@arm.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	coltonlewis@google.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
-In-Reply-To: <Z6ZMdv8jJUvYwQzT@linux.dev>
-References: <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
-	<86y10osr19.wl-maz@kernel.org>
-	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
-	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
-	<152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
-	<86h661wje4.wl-maz@kernel.org>
-	<4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
-	<86cygpwfy0.wl-maz@kernel.org>
-	<b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
-	<86frkptzr6.wl-maz@kernel.org>
-	<Z6ZMdv8jJUvYwQzT@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="coVM7Nwg"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21661be2c2dso44941335ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 07 Feb 2025 10:43:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1738953793; x=1739558593; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yQ6ouQKtMw+oLrG0MpntcTg7tf/Dub71Tm/Bgzpv4ko=;
+        b=coVM7NwgZ1Hd0vF2/WLHcyzxXuI64YmG8rQVEagO1cXcAa10p8YiZGfarTdKKuwWSk
+         m5GLWiyoXlaK57izUsoBA2adz63S2ApGnfGoqJlyYh8AqVvBp4HFsdLHilwFWtghtgCG
+         KS4xmYgnfin9hl0aef2e5SK91F9vfh32D2PbKJ4HV0b219jHK7HoZX6Ezbacj3By1vFn
+         guLkT6nClC4rbfpUwJYVbOSLqVKlg7Nv7PXap+zh161gseCviGN/ElNvxu3kpsJMKtlI
+         lh2fg2UXT1KTVV5LKHFq0TE0ZhD4DZBvoen0+sJiKWhjRmnDmTYh34X7baR9xlZ2MT6D
+         4vpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738953793; x=1739558593;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQ6ouQKtMw+oLrG0MpntcTg7tf/Dub71Tm/Bgzpv4ko=;
+        b=Jcrp+a5AfBHJnM9n+Ye1F/fogZDHvJriTJGoEMbhD2i1htlWXmInEXPhXuPSddsNvP
+         0LTKeQYqPlWDj+8dZCA7+K1GQH2YpHNx2Ae5m8FI68j4Ts2Nyb8RvpyJ1oon33UUTJCK
+         a4Nlgq5vNcUFL94v3hr1Wnc/lHcNOiqv7u4fjAqfcPo3NhBrqxTdDllvlU44f5fqXdeL
+         ehEQgMt+hPNH9BgN6XRxaytkb32iWgl2ANrkWHIDAFI24oqDBSU430OLbOyNrz1bY9ed
+         H6vNE/Ws30qPmX1GeDnEXCuG6BNvxiRXN/zKSOFrtWdCnzHQ2UmVnpQg5R0504gnnZ1C
+         VfFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfYf+EdgsAU/byCTdv79M4gkZ0kIR8LDHZLxwzxy/5UXmKI1sXf0ItziyABzXTOkzoXerR/nc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyD+4RMKtuHP20YgKT41rtQ2MqsQy5ukXBEdRyRO1uadInmd3HZ
+	QMvky/7s0O9lc3HF8bsPBnxfj3pv9Kt3dfnLdCDm8qK+dPne7TJq3E3f102pJgI=
+X-Gm-Gg: ASbGncuXKYL3bsLljnV8G1Hzkz7p9X2vsTOHYZw2DhL/LJHO7MokwBjSYuyhvq5nTAT
+	g93iYeoi/+MPEk6wXKwfYOcRZve/AI4D4Mz8hJk9ElmBr+UPJM3iLcHcJL4fKAjTnjObWcd8szP
+	ovQEichRnYMOskcXt7CMkFqIqcN+FLMut5AdjU/22M2bhCSxbbOM5dUw9RQ6yxp0XvwwjhwbHSo
+	rcyPrYk8XHxtEHj6jXG/9o1OH9sxep6pNhPgOCZKXyjan6kGUvwQiZjSYN//fXhUegeHMFWQQeB
+	rE0fgw7rO7EdSnHBixRXr9waYAwWq2zIyuv2luPDX1xZw586RFZRfIw=
+X-Google-Smtp-Source: AGHT+IGTpeNLYmW2p3SDgp/nsdVhTg4C9ppV2GubFXW0LsvCUjQZYYkGCotavEk7zK0VwH12vNpbpQ==
+X-Received: by 2002:a17:902:e848:b0:215:83e1:99ff with SMTP id d9443c01a7336-21f4e6d255fmr59734945ad.27.1738953793035;
+        Fri, 07 Feb 2025 10:43:13 -0800 (PST)
+Received: from [192.168.0.4] (71-212-39-66.tukw.qwest.net. [71.212.39.66])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f368d8ccbsm34130995ad.255.2025.02.07.10.43.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 10:43:12 -0800 (PST)
+Message-ID: <8636f192-8438-4123-9dfa-83fd4194ed82@linaro.org>
+Date: Fri, 7 Feb 2025 10:43:11 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, eauger@redhat.com, gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/15] arm/kvm: add accessors for storing host features
+ into idregs
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev
+References: <20250207110248.1580465-1-cohuck@redhat.com>
+ <20250207110248.1580465-3-cohuck@redhat.com>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250207110248.1580465-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 07 Feb 2025 18:09:58 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hey,
-> 
-> On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
-> > I found at least one issue that could fail the migration. Before the
-> > VM starts running, we limit the feature set to the subset we actually
-> > support with NV.
-> > 
-> > By doing this, we also change the value of IDreg fields that are not
-> > writable, because they describe features that we don't support.
-> > Obviously, that fails on restore.
-> > 
-> > I need to have a think...
-> 
-> We spoke about this a while ago (and I forgot til now), but I was
-> wondering if we could use vCPU feature flags to describe NV, including
-> the selection between FEAT_E2H0 and FEAT_VHE.
-> 
-> I think this might match userspace expectations a bit more closely where
-> the state of the ID registers after init gives the actual feature set
-> supported by the VM.
+On 2/7/25 03:02, Cornelia Huck wrote:
+> +/* read a 32b sysreg value and store it in the idregs */
+> +static int get_host_cpu_reg32(int fd, ARMHostCPUFeatures *ahcf, ARMSysRegs sysreg)
+> +{
+> +    int index = get_sysreg_idx(sysreg);
+> +    uint64_t *reg;
+> +    int ret;
+> +
+> +    if (index < 0) {
+> +        return -ERANGE;
+> +    }
+> +    reg = &ahcf->isar.idregs[index];
+> +    ret = read_sys_reg32(fd, (uint32_t *)reg, idregs_sysreg_to_kvm_reg(sysreg));
+> +    return ret;
+> +}
 
-I'm not sure that's enough. Let me give you an example:
+I'm not keen on the casting.
 
-My host has FEAT_XNX, described in ID_AA64MMFR1_EL1.XNX. For whatever
-reason, we don't allow this field to be written to, even out of NV
-context. This is odd, because for an EL1 VM, this field means nothing
-at all.
+If we want to retain read_sys_reg32 at all, then
 
-However, we don't yet support FEAT_XNX with NV (it requires some extra
-surgery in the S2 walker, in the S2 shadowing code and in AT).
+     uint32_t tmp;
+     ret = read_sys_reg32(fd, &tmp, idregs_sysreg_to_kvm_reg(sysreg));
+     if (ret == 0) {
+         ahcf->isar.idregs[index] = tmp;
+     }
+     return ret;
 
-How would you manage this field if you had a vcpu flag saying E2H0 or
-not? I don't think it helps, at least not in that particular case. It
-may help for some things, but not all.
+That said, read_sys_reg32 does exactly the opposite, using a uint64_t temporary. 
+Therefore I would say that we should simply use read_sys_reg64.
 
-It feels that we need to define the field limit (and what is writable
-or not) based on the NV/!NV support, and maybe E2H0/VHE as well.
 
-This is getting complicated...
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+r~
