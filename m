@@ -1,109 +1,132 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B746410E5
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E8C10E5;
+	Fri,  7 Feb 2025 18:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738954254; cv=none; b=iCpQEj0snvgg3cgK6/WhzmaC2S05Q4AA8ejWXQT0xOwrHX8uz32YWHmUJOpnGlwAaC7gtgt0lWG+hpEJe7wxixiNczRPqP5ufcyCsw89f7ADUr+CDTrxUV/ILNk1SP9tH2ev73joMvjkpmNyebBSdDVfQbbRcUt79ownDmS71Oo=
+	t=1738954319; cv=none; b=ZR3Tx+fI40W+Z5l8eJeGDob1dR2WpEki4B+4asoztEvZYsOCg/d73GSBOnaF8Gaht60VamUG7x6ATgbvWCDwU74Euch9Yz6WTN+FVa++MDVpwDkmMzHyb47nEJy9PJ2MKRUMzV68I1KhPV/2O6PCQalWqoCjdKATku2ZHyzBi+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738954254; c=relaxed/simple;
-	bh=KBNdNo3MlGpx2KpU3I1UmYBCV3ZqGAdvjMtxh2DzjbE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Df4EdDTg9Mg5brwQzMrjNouu5eKGPFWNZ5hDASJujfK7xKDNOvsON6EVeGGkdRRwIXm83oAOpv4Tjm4353e+ipWVeyTfItSzLUtG1lnR9bmHtJSNeSm84JS7ZHE+lPDSgC7MT7R8Z8msmNverWM6Bvd5uTrDCaAOC5wje6QDmAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DfGU169E; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1738954319; c=relaxed/simple;
+	bh=7onJfjbDtWHDRExNm8cu9hpXQKqGW01LciP/zaYYx9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=maPoKl7+de24IJKJHJEosO+3uNPua+s2AtF6jew9RuNBigIK/TXP0uf5F0OrW/HeHW3rKobYEZ5qIhDQsgs7GbzAE4X6mqCZyCYrKh8gLqh12iCOR8hZM5FHMO/HXDsqAAvGbklCKslLJFDLQwJr+N8Kjjdz+UFBR58WRgfi688=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVJQKsBC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DfGU169E"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2fa3fe04dd2so361786a91.0
-        for <kvmarm@lists.linux.dev>; Fri, 07 Feb 2025 10:50:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738954252; x=1739559052; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ClFzQ7PCDwu5Ar2O509WOBBN9Z5B/IHbSallb/vMYQc=;
-        b=DfGU169EcbbGwrA2EfCwu1ql3Qxc8Ab8qMhsxEc/INY/vCVV99aWvDHlCUL5mqyMA7
-         QAmmVc4RAiMjUJY9MbWyAMq4eNWeqvWGYECEytpeztViusLaQCPzIOEGXTOfLxzloPTP
-         dv32K0psjQQTRgCaMdX0CvRdh3VxE6bsWCKK2oZWUfyFF2cisjDC+kwtpO8umEa58YSl
-         ia6E8jGDYyZwDkwjuQ8xz08mP3AX6r0swz2BJhugmduGJqIK8vP7UiEocNdY+yQaCyiG
-         sRjEMw+dg+AiD/ZqplER8ctWq+3TRkkPE3XBRgAq9NIki0e8RnK30T3SzUxVWyn5YSfx
-         7TDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738954252; x=1739559052;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ClFzQ7PCDwu5Ar2O509WOBBN9Z5B/IHbSallb/vMYQc=;
-        b=XFwbhDDmNGXKoyhQ5UfI9P1u2bSNHA9ZtEjiih1mrDVkHp3bdU4JI8Nj29FAIypd6S
-         LOjKN1MlHGE4327SFp27Y4FKOnXMeAkk+PxIH8DYvpGfse5hsK6xTLiLJ6DGHdwFuSXC
-         SqmrNJ9NdUb+LvEt1qB+eQLwnHCSBIHoAj+oaF6FPStLrtBThZmJWYjB79qol7/yTdO5
-         kKebWLOFCorQwyUY9RDl1kBrk2i9GaeEMUNRYKM7otMq6a45//Dtfm1NDt63m7PWqShz
-         t34w5laHdSxFP7lYk3SJdIIFig8A+sOWW1sZfGZytn5h9ifMTeKvdcXWk6PJYzZnGNg2
-         /nBw==
-X-Forwarded-Encrypted: i=1; AJvYcCULJ0huUtmKG+fZtdWQiK64yZwWSZUx7Lf/W/BUodFXG7gonraXIDM/ZtNs9utU3KT5PLriNh8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxd18N4mtXkmFpimXxE7khrTFgn40cFybj48fEE20P/SNY+y7zn
-	4fEwszAg4nm+KdNkUqbbvEm+TKRQYKexTzFF65W8Fp/4dHo7/kPQrSd/7izebq8=
-X-Gm-Gg: ASbGnct49V0iUkY8dEVEqN1quFF8g9yFxenRYEcVASwHO2wow9bbDIw/G7SV+tuEEEd
-	DTn52/AuiweSEJ8VFqMB/YL53p4/i47/6WPwhO92MGs1bdvclXtUL+j8O974QP+i0oTfShmbhaF
-	eofWQEDxAkYzEKG10U2A4LUewV6b39CQElH/4W6R+/0rQWZpVFcIGjMYEBEppowZv4Eh0Rzbvv4
-	ywRvMaIGwLII12vbkNQBuSLwzkKG8qycoSssTP5nuDztL+yGvhrhsI1QD/N0JmoVxhJEwiPL1KS
-	BfaXB4E52Cnp7R7JR1aCzSgSuhXklYBdX3r88oiDfrxETHK9Z5leY8s=
-X-Google-Smtp-Source: AGHT+IFx3qX2cQp+Q9eBXyOEC/NAQTDbyj7HflA9TUhCXxbmP1q2CgGRY6AB2kSCZUzRBvIdtf4RCA==
-X-Received: by 2002:a05:6a00:3e07:b0:72f:d50a:9096 with SMTP id d2e1a72fcca58-7305d44f5eemr8026145b3a.8.1738954252004;
-        Fri, 07 Feb 2025 10:50:52 -0800 (PST)
-Received: from [192.168.0.4] (71-212-39-66.tukw.qwest.net. [71.212.39.66])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048c16222sm3412972b3a.135.2025.02.07.10.50.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Feb 2025 10:50:51 -0800 (PST)
-Message-ID: <c06aee81-1802-405d-964d-c68b3147b294@linaro.org>
-Date: Fri, 7 Feb 2025 10:50:50 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVJQKsBC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5328C4CED1;
+	Fri,  7 Feb 2025 18:51:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738954318;
+	bh=7onJfjbDtWHDRExNm8cu9hpXQKqGW01LciP/zaYYx9M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AVJQKsBC7RMwQFymvjSHHCR2p0vwZLBFjHQLvvTRv/5cCZgPnMIV/DqIrN7B8ytIU
+	 M69yzNOlrbcpvlh/p+1eU1orKpp3MwCp3WiyvdqkTnteIRb76e1l/mmTkJmaFDU8yY
+	 LRBCZ6HNLoE9swbRVntg/VN2Kz4kkmunpQcnOLVTBeF37OfstugVNAl6GF2QBlzAJy
+	 xKb7IfTVpN4YeJ6MEHz97vd5bjTvAOXP3C8wgNBiUmKk59Q0HNeD+6c2rGsq83nQNf
+	 VnA1ep+dazqnA+VZYyLdJoCGKVNM5Dcbe4iUjkOtKttmaAR7Gs/yKW/MX1smWB6gEz
+	 2F+t1Mqsjvirg==
+Date: Fri, 7 Feb 2025 18:51:52 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v5 3/5] arm64/hwcap: Describe 2024 dpISA extensions to
+ userspace
+Message-ID: <0b3777cc-b73b-4843-97cb-5fe3cb1b9774@sirena.org.uk>
+References: <20250107-arm64-2024-dpisa-v5-0-7578da51fc3d@kernel.org>
+ <20250107-arm64-2024-dpisa-v5-3-7578da51fc3d@kernel.org>
+ <Z6ZS51BLkfFLl-5Y@J2N7QTR9R3>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/15] arm/kvm: add accessors for storing host features
- into idregs
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev
-References: <20250207110248.1580465-1-cohuck@redhat.com>
- <20250207110248.1580465-3-cohuck@redhat.com>
-Content-Language: en-US
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250207110248.1580465-3-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 2/7/25 03:02, Cornelia Huck wrote:
-> +/* read a 32b sysreg value and store it in the idregs */
-> +static int get_host_cpu_reg32(int fd, ARMHostCPUFeatures *ahcf, ARMSysRegs sysreg)
-> +{
-> +    int index = get_sysreg_idx(sysreg);
-> +    uint64_t *reg;
-> +    int ret;
-> +
-> +    if (index < 0) {
-> +        return -ERANGE;
-> +    }
-> +    reg = &ahcf->isar.idregs[index];
-> +    ret = read_sys_reg32(fd, (uint32_t *)reg, idregs_sysreg_to_kvm_reg(sysreg));
-> +    return ret;
-> +}
-> +
-> +/* read a 64b sysreg value and store it in the idregs */
-> +static int get_host_cpu_reg64(int fd, ARMHostCPUFeatures *ahcf, ARMSysRegs sysreg)
-> +{
-> +    int index = get_sysreg_idx(sysreg);
-
-Why pass the ARMSysRegs value instead of the ARMIDRegisterIdx value?
-
-You save yourself a linear search over the id_register_sysreg array, and you can't use 
-this interface with a sysreg that doesn't have an index anyway -- ERANGE is a new failure 
-mode.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DJF/VSDq3N4d5oeh"
+Content-Disposition: inline
+In-Reply-To: <Z6ZS51BLkfFLl-5Y@J2N7QTR9R3>
+X-Cookie: MMM-MM!!  So THIS is BIO-NEBULATION!
 
 
-r~
+--DJF/VSDq3N4d5oeh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Feb 07, 2025 at 06:37:27PM +0000, Mark Rutland wrote:
+> On Tue, Jan 07, 2025 at 10:59:43PM +0000, Mark Brown wrote:
+> > The 2024 dpISA introduces a number of architecture features all of which
+> > only add new instructions so only require the addition of hwcaps and ID
+> > register visibility.
+
+> While working on SME fixes atop v6.14-rc1, I found this patch breaks the
+> build spectacularly with CONFIG_ARM64_SME is enabled (splat at the end
+> of this mail), due to some missing definitions.
+
+Yes, I already sent a fix for that which Will has merged:
+
+   https://lore.kernel.org/r/20250203-arm64-remove-sf8mmx-v1-1-6f1da3dbff82=
+@kernel.org
+=20
+> From a quick scan, there are some other missing bits too. For example
+> these two caps are defined in terms of ID_AA64FPFR0_EL1 fields:
+
+> > +HWCAP_F8MM8
+> > +    Functionality implied by ID_AA64FPFR0_EL1.F8MM8 =3D=3D 0b0001.
+> > +
+> > +HWCAP_F8MM4
+> > +    Functionality implied by ID_AA64FPFR0_EL1.F8MM4 =3D=3D 0b0001.
+
+> > +#define KERNEL_HWCAP_F8MM8		__khwcap_feature(F8MM8)
+> > +#define KERNEL_HWCAP_F8MM4		__khwcap_feature(F8MM4)
+
+> > +#define HWCAP_F8MM8		(1UL << 35)
+> > +#define HWCAP_F8MM4		(1UL << 36)
+
+> ... and we expose the ID register bits to userspace:
+
+> ... but there's no corresponding arm64_elf_hwcaps additions to actually
+> expose the hwcaps.
+
+Right, indeed.  I'll send a fix for that.
+
+> There are *SME* variants in arm64_elf_hwcaps:
+
+=2E..
+
+> ... but those KERNEL_HWCAP_SME_* values are never defined, and neither
+> are the UAPI equivalents.
+
+> We need to fix that quick, in case we need to shuffle values.
+
+These were removed in the patch above, the relevant features were
+removed from the architecture between the 2024-09 and 2024-12 XML
+releases so were removed from the patch series by the time it got
+applied but with CONFIG_SME being disabled the stray reference wasn't
+caught by testing.
+
+--DJF/VSDq3N4d5oeh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmemVkcACgkQJNaLcl1U
+h9ClRwf/WB2OvIr7lgQx020+QFzQCtNHusxsthqvrkbyHfN9xFDo0WGBzEhXht2t
+SxrHeNhPqeSa1twGITVG+lAlOresDhJwX8aCNVw43dWkKCvOF8wh5eiDc7PZOLXj
+Yj9HfFBUXWDVkQQ7gUSXRYBnRgvN2PoZlXgo2B2rEmsP7KU4UjkIPEN7kLKNBYK9
+ZznUGbYZBHOF6MbJeS5IbogE25jjEfterOxJq+J71TfLys/uQO4tDPYZ444A0K00
+ZnA8s2L/xJw0G6G1nH6ExTpbO6YcTy0j5E/OlTIjvQCZRNMWWDQF6P6kXyR9buh4
+Jz2fUFFsDgRIozNSVv2icyfgc+3isQ==
+=1zDI
+-----END PGP SIGNATURE-----
+
+--DJF/VSDq3N4d5oeh--
