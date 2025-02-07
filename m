@@ -1,87 +1,98 @@
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B99B175D5D
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFBE175D5D
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 18:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738951809; cv=none; b=ZEtJhXbd2TCXn6R5cH/f4qJNnMcE5v5Ta7zo9LNj/bHqtTowEV5uvtoEfq973seFws091Z8BqbKsMMHGVyG7SfsIQVYPaTn+lu/kGlmXs+anCkiZLB78e/B0tj4ieHiEuucGf+uo0xkqOyfeylV2lsvMzqdKvhqBX5LTKcUSQY4=
+	t=1738951814; cv=none; b=CFVWwDDKb/6HPYXYanMSElV0BvQhTGdSi6ALQ3sbBQVip16eSUkEII6G0UfTjl4cD7C/z7/4AqZwksBiqQsEkEETVmVAL9TcWcQ8JQ/3hIaCHsPiBI9xrBfxHMmDzPRKe8MSr/cVprdQO2cMXmrbefiFeNsCUX273Dq2VijR4qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738951809; c=relaxed/simple;
-	bh=+G+YBZTgA9QIbY2A+UZYK3QXLmcb1dpBWlg/zQMm6Zc=;
+	s=arc-20240116; t=1738951814; c=relaxed/simple;
+	bh=tEtChQbqDC5VWGaTnPiu5QAw3tL4WSL0apJi/+jOPVs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eh2t1Hpcnpg82DrKAB63ZmF114HdgNTb1e3SSbf+MY1YWW7NWgeU0C2DzrOUIP7SgddNsqrUO8GoAeoiwVuu6xjIhGzAWK1TVyXpd+WGUpZAxSgBBnB1H4+qiZgW5mkJoFkMiPhdM/vcE9XQG7D/iIHD/ZE9FMUlUnCKF7aqI7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DBeVwjXj; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DBeVwjXj"
-Date: Fri, 7 Feb 2025 10:09:58 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738951803;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZolRaIlCgaZRdZ2y7P6BoM5Dq+0ObR3jHsmtYgVaSNI=;
-	b=DBeVwjXjnPTYpQs6Lq9Mvygma9/LdKK5EEukS36yscCrnbkZZcopW5h0QH0FR9304mEJVg
-	Xlr/eeKMf+3R0mb40Kic+82+T0Sp+HGlGTQFnlHe2KBXWxMaPSOoRxAfoJk472uVfK3Kh2
-	TQvD3khEOYtwiOiOb/dYlH+PWd6e21k=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dwcOwi4uI4t5V/9zIG2s4g7ALNMqTFJFQdPUxGlCHAAxQD/gcxFD2lhd8uNoEsT4ztTrkScXK+dEUXTwMWK6FWnuqyAToee2+E+LcjnIxUW1ZFhyzJCIU/HV2POE8pHiC13XiA4hTY3he3sAWp0WCGDI5R8QsKZ57OKRoKTpPmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F219C4CED1;
+	Fri,  7 Feb 2025 18:10:10 +0000 (UTC)
+Date: Fri, 7 Feb 2025 18:10:08 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Eric Auger <eauger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org,
-	catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com,
-	yuzenghui@huawei.com, darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If
- timer expired
-Message-ID: <Z6ZMdv8jJUvYwQzT@linux.dev>
-References: <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
- <86y10osr19.wl-maz@kernel.org>
- <4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
- <2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
- <152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
- <86h661wje4.wl-maz@kernel.org>
- <4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
- <86cygpwfy0.wl-maz@kernel.org>
- <b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
- <86frkptzr6.wl-maz@kernel.org>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org,
+	mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+	sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com,
+	jiangkunkun@huawei.com, jonathan.cameron@huawei.com,
+	anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org,
+	linuxarm@huawei.com
+Subject: Re: [PATCH v6 4/4] arm64: paravirt: Enable errata based on
+ implementation CPUs
+Message-ID: <Z6ZMgDyyA5oV99hu@arm.com>
+References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
+ <20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
+ <Z6YT7GxVKGKcnYmL@arm.com>
+ <86h655u8r3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <86frkptzr6.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86h655u8r3.wl-maz@kernel.org>
 
-Hey,
-
-On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
-> I found at least one issue that could fail the migration. Before the
-> VM starts running, we limit the feature set to the subset we actually
-> support with NV.
+On Fri, Feb 07, 2025 at 02:31:12PM +0000, Marc Zyngier wrote:
+> On Fri, 07 Feb 2025 14:08:44 +0000,
+> Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > On Wed, Feb 05, 2025 at 01:22:22PM +0000, Shameer Kolothum wrote:
+> > >  static inline bool is_midr_in_range(struct midr_range const *range)
+> > >  {
+> > > -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> > > -				       range->rv_min, range->rv_max);
+> > > +	int i;
+> > > +
+> > > +	if (!target_impl_cpu_num)
+> > > +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> > > +					       range->rv_min, range->rv_max);
+> > > +
+> > > +	for (i = 0; i < target_impl_cpu_num; i++) {
+> > > +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
+> > > +					    range->model,
+> > > +					    range->rv_min, range->rv_max))
+> > > +			return true;
+> > > +	}
+> > > +	return false;
+> > >  }
+> > 
+> > It's a interesting approach but how does this work in practice if an
+> > erratum requires a firmware counterpart? Do we expect firmwares on all
+> > machines involved to have workarounds for the other machines? Or is KVM
+> > going to intercept those SMCs and pretend the EL3 counterpart is there?
 > 
-> By doing this, we also change the value of IDreg fields that are not
-> writable, because they describe features that we don't support.
-> Obviously, that fails on restore.
-> 
-> I need to have a think...
+> KVM already traps SMCs, and could do something on behalf of the guest
+> (such as pretending that the mitigation has happened if not on the
+> correct host) *IF* the mitigation is architected (à la WA{1,2,3}).
 
-We spoke about this a while ago (and I forgot til now), but I was
-wondering if we could use vCPU feature flags to describe NV, including
-the selection between FEAT_E2H0 and FEAT_VHE.
+That's the main thing I had in mind. I don't think we have any other
+errata that requires firmware run-time discovery and interaction, though
+you never know when we'll add new one.
 
-I think this might match userspace expectations a bit more closely where
-the state of the ID registers after init gives the actual feature set
-supported by the VM.
+> If it is implementation specific, then we can immediately stop
+> pretending that a guest running on those systems can be migrated.
+
+Makes sense.
+
+> The only thing it helps a bit is big-little.
+
+It does help a bit or, at least, we have some code for handling these
+variations that cab be extended. However, with this patchset, the host
+only probes the availability of the workarounds on the SoC it booted. It
+has no idea about the extra MIDRs the VMM picks and what the other
+machines in the clouds support.
+
+Anyway, let's hope the VMs only migrate between platforms that are
+equally broken.
 
 -- 
-Thanks,
-Oliver
+Catalin
