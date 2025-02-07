@@ -1,67 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5EB21D00B
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD4E2E40B
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738937330; cv=none; b=SHZdT7yinYu4O9gJOe/lfMBWMiZwey58eBsyAXgsL0iIM2MtUJu/xiDX/5AT9GXgx2ze1/c8zxzpCbuV5M9OP2ZQAZ6k7Ga5rMYX6XGIqk5Xwl89ZSkypEbl+vY08VfJhWHvc8qfQEW05q4uxNviV1HGgdvOHdoxaMaFibL0cgE=
+	t=1738937655; cv=none; b=S2lZYI1lcVxOZuCN3exH85Nt7ihX0jtZIMMZjJ0y3PAtZNudDY36FwM1jUytuppRcMibi/zGqTkL0CKvNKHV6tmF75BoeL/OWCMU9KhHukw9KDvd3OgyjT5T5AYsTfm86kYwa3TUr6IhePXQUi07wrVhwDou+vgG7GodL+xL/Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738937330; c=relaxed/simple;
-	bh=LWe72L47xpbJcvLJWBHPqv46sQLt3DuB5r4Qkrploxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cmUs3hlWB6PLma7qUFYW6XC3mvDNeR1fU7Y5ObptZennBUa2OKpuSmb8Zny3os/FtFc4BhQTRNObsJgAASSlaJLRe332EwS2XBEk5jt1aQ4u4+vnlUCFElINqDhnYQz7R9dXekbtpZS4DTD0cfLLO0Osro24ie8undofvj6FR6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED39C4CED1;
-	Fri,  7 Feb 2025 14:08:46 +0000 (UTC)
-Date: Fri, 7 Feb 2025 14:08:44 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com,
-	eric.auger@redhat.com, sebott@redhat.com, yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com, jiangkunkun@huawei.com,
-	jonathan.cameron@huawei.com, anthony.jebson@huawei.com,
-	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
-Subject: Re: [PATCH v6 4/4] arm64: paravirt: Enable errata based on
- implementation CPUs
-Message-ID: <Z6YT7GxVKGKcnYmL@arm.com>
-References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
- <20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
+	s=arc-20240116; t=1738937655; c=relaxed/simple;
+	bh=9Q6k4uezwb7VUfhzCeqFc7EI03BM8d56WV2+2oon0wI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VtnybidNvlTPtxPEQr0SItYaB3j1Ecpf7OGt+z90ytoSo2T1TLfyRH3CGsWGZhb/uVsHuuIUnHCl+HlGH99YE/jV0rGDmC4hf1nQ4Pqkq9uO3ueTYa8d2hG4CAotqmr/VFeyeiex87Tq3JqL2+kp2G/7N7OYk9bTt3D2YZJM/Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMF89quz; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMF89quz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 257FEC4CED1;
+	Fri,  7 Feb 2025 14:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738937655;
+	bh=9Q6k4uezwb7VUfhzCeqFc7EI03BM8d56WV2+2oon0wI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IMF89quzHiFrKbQeJHgRxksbqXc9XkoxNrvT4Vj7bLc+hgfn5RNEvgTCJqnnTR1YS
+	 kAko3RZPqpqae8Bv6Ihm0sLPDl0jWbiT8mdSKu3S+t/bpssPkv9PT/1kS0XbAVTAEK
+	 pLnQSly3b6TW08GNd1+fUeoTvNEAR50ADA2berl9oD5yWrmKdUYKiGEXN33ZYuv+Dw
+	 fuMwofG15M746zvxM0xZ25aNR6P9SIPjE4WbzzzE0f9WiSLPw+qlaTWOY+HC5j8Gim
+	 K7KwJIFrWBPMjnYrrPzZXHR7UrL5aLDMLulGiPIBwzIbxEDLxZtBWXe274foZSy5N5
+	 RknoWtjXrRSEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tgP7U-001eJU-VB;
+	Fri, 07 Feb 2025 14:14:13 +0000
+Date: Fri, 07 Feb 2025 14:14:12 +0000
+Message-ID: <86ikplu9jf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com,
+	shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [PATCH 14/15] arm/cpu: Add sysreg generation scripts
+In-Reply-To: <20250207110248.1580465-15-cohuck@redhat.com>
+References: <20250207110248.1580465-1-cohuck@redhat.com>
+	<20250207110248.1580465-15-cohuck@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: cohuck@redhat.com, eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Feb 05, 2025 at 01:22:22PM +0000, Shameer Kolothum wrote:
->  static inline bool is_midr_in_range(struct midr_range const *range)
->  {
-> -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> -				       range->rv_min, range->rv_max);
-> +	int i;
-> +
-> +	if (!target_impl_cpu_num)
-> +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
-> +					       range->rv_min, range->rv_max);
-> +
-> +	for (i = 0; i < target_impl_cpu_num; i++) {
-> +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
-> +					    range->model,
-> +					    range->rv_min, range->rv_max))
-> +			return true;
-> +	}
-> +	return false;
->  }
+On Fri, 07 Feb 2025 11:02:47 +0000,
+Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> From: Eric Auger <eric.auger@redhat.com>
+> 
+> Introduce scripts that automate the generation of system register
+> definitions from a given linux source tree arch/arm64/tools/sysreg.
+> 
+> Invocation of
+> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
+> in scripts directory do generate 2 qemu files:
+> - target/arm/cpu-sysreg-properties.c
+> - target/arm/cpu-sysregs.h.inc
+> 
+> cpu-sysregs.h.inc creates defines for all system registers.
+> However cpu-sysreg-properties.c only cares about feature ID registers.
+> 
+> update-aarch64-sysreg-code.sh calls two awk scripts.
+> gen-cpu-sysreg-properties.awk is inherited from kernel
+> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
+> the original author of this script.
+> 
+> [CH: update to handle current kernel sysregs structure, and to emit
+>      the re-worked register structures]
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++++++++++++++++
+>  scripts/gen-cpu-sysregs-header.awk    |  70 ++++++
+>  scripts/update-aarch64-sysreg-code.sh |  30 +++
+>  3 files changed, 425 insertions(+)
+>  create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+>  create mode 100755 scripts/gen-cpu-sysregs-header.awk
+>  create mode 100755 scripts/update-aarch64-sysreg-code.sh
 
-It's a interesting approach but how does this work in practice if an
-erratum requires a firmware counterpart? Do we expect firmwares on all
-machines involved to have workarounds for the other machines? Or is KVM
-going to intercept those SMCs and pretend the EL3 counterpart is there?
+Shameless plug:
+
+https://lore.kernel.org/r/20250102144339.1564778-1-maz@kernel.org
+
+You could use (something like) this to generate the sysreg file itself
+from the architecture data, or another representation as required.
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
