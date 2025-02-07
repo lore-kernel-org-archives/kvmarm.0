@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4078192D98;
-	Fri,  7 Feb 2025 17:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30B118DB3A;
+	Fri,  7 Feb 2025 17:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738947948; cv=none; b=oiiYSHHv9IhUKoTJcuiBkShQQlYulg1Q4HHYVkpwnIg/Lod0zBJ71g7kgdpa5eOUsCVy7IAOZdgIbiOCnZZ6wR1m1wKoMAG6hTK2fSAODRvWzaq4p48TZZeyoaTkGRtrHDnQJbx0uqSwRAXnNA646fYrGb4qH/TgFCWVqTb8w4c=
+	t=1738948112; cv=none; b=maGO8W5AdTUBfaXkhpwBVpsy2lCi0PN60BwT1go7MiHD9t1SDn/ScUaMZraB5UL4GHGl8w3SO/NrFu8Xe3xpnvfyGzxIcNsF8VjOAVcZAy8xTTUq2mp0V28L5/3W4UYArAQDbzE3jWQXKjRMLSkbq2NMdg4FqRC1viDVCKPY1ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738947948; c=relaxed/simple;
-	bh=LnUyiUX8WRVb1HIMzOzw7mBMmuEm6kKe8ECJuYjGN6Q=;
+	s=arc-20240116; t=1738948112; c=relaxed/simple;
+	bh=PCFsR6W63KsJTL3gNOBJCr+bz3JFACcHm5OAo15EtVM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZxqFD6iprOFkqUqKxwZNS09l9RV/98TwSP9Ptg34HnjyBUxEzO0NOo6O1e8ngGaT6FpErj9Fcy210509XNcghLwaZ6+wFzUydLk6/Gw8CSW1ccFRwGD0UnIqEAPZ1F02Snj/98LA/CavJIjJvSDF3I6YPsduHqVVOqfe4ItWwVg=
+	 In-Reply-To:Content-Type; b=naSXKo+nCzD8TfLgwZMUH8fid3zR/tUjvpnCwCfD/qgLYEBoGnYjMw9+rWZVsm9YxjND60j3OLapYjGlCcNf5RE0Mbw+7gJj5d0FUZreeAQ+6SjeYNkkPKU5HQ1YK2j9xkr9XSJdUYcosVgV1O9rt7+VKlLLmRLNy5Vd8OveYF8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D024C113E;
-	Fri,  7 Feb 2025 09:06:08 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 005A7113E;
+	Fri,  7 Feb 2025 09:08:53 -0800 (PST)
 Received: from [10.1.26.24] (e122027.cambridge.arm.com [10.1.26.24])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA6573F63F;
-	Fri,  7 Feb 2025 09:05:41 -0800 (PST)
-Message-ID: <7e03ad4a-ca82-4fe6-b789-1990dbbaf256@arm.com>
-Date: Fri, 7 Feb 2025 17:05:39 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCF433F63F;
+	Fri,  7 Feb 2025 09:08:25 -0800 (PST)
+Message-ID: <fb817590-19c4-4242-8942-14c9fa275f0c@arm.com>
+Date: Fri, 7 Feb 2025 17:08:23 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 29/43] arm64: RME: Always use 4k pages for realms
+Subject: Re: [PATCH v6 30/43] arm64: rme: Prevent Device mappings for Realms
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -42,76 +42,102 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-30-steven.price@arm.com>
- <82659880-f7a6-48ad-bf54-8371fc3d41d8@redhat.com>
+ <20241212155610.76522-31-steven.price@arm.com>
+ <f339729a-00a8-40b5-af05-f0f019579e5e@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <82659880-f7a6-48ad-bf54-8371fc3d41d8@redhat.com>
+In-Reply-To: <f339729a-00a8-40b5-af05-f0f019579e5e@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 02/02/2025 06:52, Gavin Shan wrote:
+On 02/02/2025 07:12, Gavin Shan wrote:
 > On 12/13/24 1:55 AM, Steven Price wrote:
->> Always split up huge pages to avoid problems managing huge pages. There
->> are two issues currently:
->>
->> 1. The uABI for the VMM allows populating memory on 4k boundaries even
->>     if the underlying allocator (e.g. hugetlbfs) is using a larger page
->>     size. Using a memfd for private allocations will push this issue onto
->>     the VMM as it will need to respect the granularity of the allocator.
->>
->> 2. The guest is able to request arbitrary ranges to be remapped as
->>     shared. Again with a memfd approach it will be up to the VMM to deal
->>     with the complexity and either overmap (need the huge mapping and add
->>     an additional 'overlapping' shared mapping) or reject the request as
->>     invalid due to the use of a huge page allocator.
->>
->> For now just break everything down to 4k pages in the RMM controlled
->> stage 2.
+>> Physical device assignment is not yet supported by the RMM, so it
+>> doesn't make much sense to allow device mappings within the realm.
+>> Prevent them when the guest is a realm.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->>   arch/arm64/kvm/mmu.c | 4 ++++
->>   1 file changed, 4 insertions(+)
+>> Changes from v5:
+>>   * Also prevent accesses in user_mem_abort()
+>> ---
+>>   arch/arm64/kvm/mmu.c | 12 ++++++++++++
+>>   1 file changed, 12 insertions(+)
 >>
 >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index e88714903ce5..9ede143ccef1 100644
+>> index 9ede143ccef1..cef7c3dcbf99 100644
 >> --- a/arch/arm64/kvm/mmu.c
 >> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1603,6 +1603,10 @@ static int user_mem_abort(struct kvm_vcpu
+>> @@ -1149,6 +1149,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm,
+>> phys_addr_t guest_ipa,
+>>       if (is_protected_kvm_enabled())
+>>           return -EPERM;
+>>   +    /* We don't support mapping special pages into a Realm */
+>> +    if (kvm_is_realm(kvm))
+>> +        return -EINVAL;
+>> +
+> 
+>         return -EPERM;
+> 
+>>       size += offset_in_page(guest_ipa);
+>>       guest_ipa &= PAGE_MASK;
+>>   @@ -1725,6 +1729,14 @@ static int user_mem_abort(struct kvm_vcpu
 >> *vcpu, phys_addr_t fault_ipa,
->>       if (logging_active) {
->>           force_pte = true;
->>           vma_shift = PAGE_SHIFT;
->> +    } else if (kvm_is_realm(kvm)) {
->> +        // Force PTE level mappings for realms
->> +        force_pte = true;
->> +        vma_shift = PAGE_SHIFT;
->>       } else {
->>           vma_shift = get_vma_page_shift(vma, hva);
->>       }
+>>       if (exec_fault && device)
+>>           return -ENOEXEC;
+>>   +    /*
+>> +     * Don't allow device accesses to protected memory as we don't (yet)
+>> +     * support protected devices.
+>> +     */
+>> +    if (device && kvm_is_realm(kvm) &&
+>> +        kvm_gpa_from_fault(kvm, fault_ipa) == fault_ipa)
+>> +        return -EINVAL;
+>> +
 > 
-> Since a memory abort is specific to a vCPU instead of a VM, so
-> vcpu_is_rec()
-> instead of kvm_is_realm() is more accurate for the check. Besides, it looks
-> duplicate to the check added by "PATCH[20/43] arm64: RME: Runtime faulting
-> of memory", which is as below.
+> s/kvm_is_realm/vcpu_is_rec
 > 
->        /* FIXME: We shouldn't need to disable this for realms */
->        if (vma_pagesize == PAGE_SIZE && !(force_pte || device ||
-> kvm_is_realm(kvm))) {
->                                                                 
-> ^^^^^^^^^^^^^^^^^
->                                                                  Can be
-> dropped now.
+> I don't understand the check very well. What I understood is mem_abort()
+> is called
+> only when kvm_gpa_from_fault(kvm, fault_ipa) != fault_ipa, meaning only
+> the page
+> faults in the shared address space is handled by mem_abort(). So I guess
+> we perhaps
+> need something like below.
 
-Indeed, thanks for that - one less FIXME ;)
+private_memslot_fault() is only when the memslot is a private
+guest_memfd(). So there's also the situation of a 'normal' memslot which
+can still end up in user_mem_abort().
+
+As things currently stand we can't really deal with this (the bottom
+part of the IPA is protected, and therefore must come from
+guest_memfd()). But in the future we are expecting to be able to support
+protected devices.
+
+So I think really the correct solution for now is to drop the "device"
+check and update the comment to reflect the fact that
+private_memslot_fault() should be handling all protected address until
+we get support for assigning devices.
 
 Thanks,
 Steve
 
+>     if (vcpu_is_rec(vcpu) && device)
+>         return -EPERM;
+> 
+> kvm_handle_guest_abort
+>   kvm_slot_can_be_private
+>     private_memslot_fault    // page fault in the private space is
+> handled here
+>   io_mem_abort            // MMIO emulation is handled here
+>   user_mem_abort                // page fault in the shared space is
+> handled here
+> 
+>>       /*
+>>        * Potentially reduce shadow S2 permissions to match the guest's
+>> own
+>>        * S2. For exec faults, we'd only reach this point if the guest
+> 
 > Thanks,
 > Gavin
->                 
 > 
 
