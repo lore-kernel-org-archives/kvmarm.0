@@ -1,64 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD4E2E40B
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CD023ED6A
+	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 14:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738937655; cv=none; b=S2lZYI1lcVxOZuCN3exH85Nt7ihX0jtZIMMZjJ0y3PAtZNudDY36FwM1jUytuppRcMibi/zGqTkL0CKvNKHV6tmF75BoeL/OWCMU9KhHukw9KDvd3OgyjT5T5AYsTfm86kYwa3TUr6IhePXQUi07wrVhwDou+vgG7GodL+xL/Co=
+	t=1738938677; cv=none; b=bJJ54J4UuOsy63lRVg6pmkMhQF+b3ukd8v5RAOpV0kmslHR/KVGBInFKXDXdwcnc0xyinNWZ+HPfOOhkYW5tE5LmygZIHljynWhLLnH7Fw+i9m/ROQYiTx5g/McXIBz2tkdN6OIufNKqmGZkZPiNmIww/yCnQ6mQCgJ9o1yXKAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738937655; c=relaxed/simple;
-	bh=9Q6k4uezwb7VUfhzCeqFc7EI03BM8d56WV2+2oon0wI=;
+	s=arc-20240116; t=1738938677; c=relaxed/simple;
+	bh=/bdZkHErgILPEkVIX2FXQXXH8tSX/nUwUyOjCUkNomY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VtnybidNvlTPtxPEQr0SItYaB3j1Ecpf7OGt+z90ytoSo2T1TLfyRH3CGsWGZhb/uVsHuuIUnHCl+HlGH99YE/jV0rGDmC4hf1nQ4Pqkq9uO3ueTYa8d2hG4CAotqmr/VFeyeiex87Tq3JqL2+kp2G/7N7OYk9bTt3D2YZJM/Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMF89quz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=qJbGamARTcaXqXcn1DzMCX0xOZ1E5o+4sD+CQZ25sBqFMFN9VeGNfVyPdF1x4juH2iv5URBAQYE7St0AJHBl1cLWKyS1LmpXwevhQnN8hTXa1lHxOdMRflxR6bSZW+Slv7ECQKv221ysfJTRleST/GfEVfkLOlqyr4yDT+Io3Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cd9Kgyoo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMF89quz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 257FEC4CED1;
-	Fri,  7 Feb 2025 14:14:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cd9Kgyoo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744D8C4CED1;
+	Fri,  7 Feb 2025 14:31:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738937655;
-	bh=9Q6k4uezwb7VUfhzCeqFc7EI03BM8d56WV2+2oon0wI=;
+	s=k20201202; t=1738938676;
+	bh=/bdZkHErgILPEkVIX2FXQXXH8tSX/nUwUyOjCUkNomY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IMF89quzHiFrKbQeJHgRxksbqXc9XkoxNrvT4Vj7bLc+hgfn5RNEvgTCJqnnTR1YS
-	 kAko3RZPqpqae8Bv6Ihm0sLPDl0jWbiT8mdSKu3S+t/bpssPkv9PT/1kS0XbAVTAEK
-	 pLnQSly3b6TW08GNd1+fUeoTvNEAR50ADA2berl9oD5yWrmKdUYKiGEXN33ZYuv+Dw
-	 fuMwofG15M746zvxM0xZ25aNR6P9SIPjE4WbzzzE0f9WiSLPw+qlaTWOY+HC5j8Gim
-	 K7KwJIFrWBPMjnYrrPzZXHR7UrL5aLDMLulGiPIBwzIbxEDLxZtBWXe274foZSy5N5
-	 RknoWtjXrRSEA==
+	b=cd9KgyooPdgHUX3sz3/Fj4LEiL6q/tkZTrlTbJvxQ1PxpqJrYHEZPcp8Z+/sFQMNw
+	 phT7PJvRvCZcKMy+CIkOQKEdl7H5oFZNTQyYosAN99+G+CaWvDgTe84ld3boNdsZku
+	 wnhFjKotpTAVqY+MlikcP1U7GqyY1BsSCZv2agg4zewlCI42nzmqCGc2aLChEEMc7l
+	 b/xxM/1MylpCJ3BLMPhhnQWkfntoWzl4wBnFKukutK+FRbn4+nKo289Qk6fWi3B/L1
+	 Xx1i5jEAHt4EEz78b/xYJLF8NwG4gMBFvT1CKAUeRhB5cQ8BYBE+sr+SxCmPqSuqVK
+	 MbBbmHknrW3Xg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tgP7U-001eJU-VB;
-	Fri, 07 Feb 2025 14:14:13 +0000
-Date: Fri, 07 Feb 2025 14:14:12 +0000
-Message-ID: <86ikplu9jf.wl-maz@kernel.org>
+	id 1tgPNx-001efz-RS;
+	Fri, 07 Feb 2025 14:31:13 +0000
+Date: Fri, 07 Feb 2025 14:31:12 +0000
+Message-ID: <86h655u8r3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
 	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
 	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com,
-	shahuang@redhat.com,
+	will@kernel.org,
 	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com
-Subject: Re: [PATCH 14/15] arm/cpu: Add sysreg generation scripts
-In-Reply-To: <20250207110248.1580465-15-cohuck@redhat.com>
-References: <20250207110248.1580465-1-cohuck@redhat.com>
-	<20250207110248.1580465-15-cohuck@redhat.com>
+	cohuck@redhat.com,
+	eric.auger@redhat.com,
+	sebott@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com,
+	anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	linuxarm@huawei.com
+Subject: Re: [PATCH v6 4/4] arm64: paravirt: Enable errata based on implementation CPUs
+In-Reply-To: <Z6YT7GxVKGKcnYmL@arm.com>
+References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
+	<20250205132222.55816-5-shameerali.kolothum.thodi@huawei.com>
+	<Z6YT7GxVKGKcnYmL@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,55 +65,57 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com, sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 07 Feb 2025 11:02:47 +0000,
-Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> From: Eric Auger <eric.auger@redhat.com>
-> 
-> Introduce scripts that automate the generation of system register
-> definitions from a given linux source tree arch/arm64/tools/sysreg.
-> 
-> Invocation of
-> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
-> in scripts directory do generate 2 qemu files:
-> - target/arm/cpu-sysreg-properties.c
-> - target/arm/cpu-sysregs.h.inc
-> 
-> cpu-sysregs.h.inc creates defines for all system registers.
-> However cpu-sysreg-properties.c only cares about feature ID registers.
-> 
-> update-aarch64-sysreg-code.sh calls two awk scripts.
-> gen-cpu-sysreg-properties.awk is inherited from kernel
-> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
-> the original author of this script.
-> 
-> [CH: update to handle current kernel sysregs structure, and to emit
->      the re-worked register structures]
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++++++++++++++++
->  scripts/gen-cpu-sysregs-header.awk    |  70 ++++++
->  scripts/update-aarch64-sysreg-code.sh |  30 +++
->  3 files changed, 425 insertions(+)
->  create mode 100755 scripts/gen-cpu-sysreg-properties.awk
->  create mode 100755 scripts/gen-cpu-sysregs-header.awk
->  create mode 100755 scripts/update-aarch64-sysreg-code.sh
+On Fri, 07 Feb 2025 14:08:44 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+>=20
+> On Wed, Feb 05, 2025 at 01:22:22PM +0000, Shameer Kolothum wrote:
+> >  static inline bool is_midr_in_range(struct midr_range const *range)
+> >  {
+> > -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> > -				       range->rv_min, range->rv_max);
+> > +	int i;
+> > +
+> > +	if (!target_impl_cpu_num)
+> > +		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> > +					       range->rv_min, range->rv_max);
+> > +
+> > +	for (i =3D 0; i < target_impl_cpu_num; i++) {
+> > +		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
+> > +					    range->model,
+> > +					    range->rv_min, range->rv_max))
+> > +			return true;
+> > +	}
+> > +	return false;
+> >  }
+>=20
+> It's a interesting approach but how does this work in practice if an
+> erratum requires a firmware counterpart? Do we expect firmwares on all
+> machines involved to have workarounds for the other machines? Or is KVM
+> going to intercept those SMCs and pretend the EL3 counterpart is there?
 
-Shameless plug:
+KVM already traps SMCs, and could do something on behalf of the guest
+(such as pretending that the mitigation has happened if not on the
+correct host) *IF* the mitigation is architected (=C3=A0 la WA{1,2,3}).
 
-https://lore.kernel.org/r/20250102144339.1564778-1-maz@kernel.org
+If it is implementation specific, then we can immediately stop
+pretending that a guest running on those systems can be migrated.
 
-You could use (something like) this to generate the sysreg file itself
-from the architecture data, or another representation as required.
+The only thing it helps a bit is big-little.
+
+Overall, this isn't meant to be foolproof at all. It is only giving
+people enough ammunition to make it plain that the cross-platform
+story is a bit of a sad joke right now.
+
+Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
