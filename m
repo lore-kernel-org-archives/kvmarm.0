@@ -1,128 +1,120 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D6610E5
-	for <kvmarm@lists.linux.dev>; Fri,  7 Feb 2025 19:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6A01448D5
+	for <kvmarm@lists.linux.dev>; Sat,  8 Feb 2025 02:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738955313; cv=none; b=IA2RMUSPjrQuV8B6EH86IxSDPed3PW0lio/LQySVajNGpg7+a2Hg20ShDNHVKD2CfK07ZnCK6Hbnw7vcYV0f1Z13HZ/BiaBy6Yo5EZ7qNDYclZsXxPhA1ygqXPKmqB5u5uB1FUNiSDVrKmsJjd4iiWzEKpxfiz68iQa6v66lKi8=
+	t=1738980086; cv=none; b=F0VaACsULiT7T/J/IGmn7fdGZT7xQyEng/As1ej0NtsuC2PLxp1rCfeT3r75Jdgu/hejyUVmCrErZRb/kgAo5xEtOX+1MFPimNH4teupZoaybBSh4SIIlyU/WmDJpoDZUJiFtWkfdHQyIGtEOZYGzy9VoqmrTFWya+e9SiJNxhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738955313; c=relaxed/simple;
-	bh=IRIdsHo2f6s+8U6OjOmHN3XuXiXtRoErFCPo7YRIvzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMzqkHgAKm/V9zeuh4qxCCV8YcJkSQ6iHc9qk3+WgY6YtyfW2AAfEXrWOR/4BN+P+48iI+D/hKa6Y0Sc/7QEK/1mw75LcFesR2VGf9yiGw9e5c2c5R+1wGVUGT6OIIG6osQOJyT2t/v4Sa/kZRR+LjgeJchq9kSDFkfa8zSKyCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SMDXcW6C; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1738980086; c=relaxed/simple;
+	bh=+qAoXvS6xc+m3hsF9w5PjnIq4aq3I0ctOVpDSrBl1Js=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uAQvDAYgU4zujfJ+tSC8iGagcOrCRatkhMtZGAi0XHcFz3vRIfH/dkEjC9GZgw/SCYun79xXQOoPgoZAYA2btNLZoBJPdczECaidz+wnlmcNfOAomrbMBxHjpJrfHqFjwKQrHUUBw2w/A8gxrjyvTXlLPFiBgsU4W9JWqJ6pGG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=saFmnvKi; arc=none smtp.client-ip=209.85.166.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SMDXcW6C"
-Date: Fri, 7 Feb 2025 11:08:17 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738955303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U0hzUnHzdhCo2y6/Zd0m67AYnch7xq5CWs11SS1frqA=;
-	b=SMDXcW6C8ljTR21eTp2x0+eWZlmxR3qfLrtZHahBQAHzrBnFfq/SeM0H+atDZAAsjOQz5m
-	gXSxkybAbiEROU7ZuFuiPPPJcVIrzEGMDZeEwHZws+N1vazLNlfHjfMA51O7DjjTQyfAbD
-	sMKNHNGEWC9UK9SMaK7BSzbXZqLU/DI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Eric Auger <eauger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org,
-	catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com,
-	yuzenghui@huawei.com, darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If
- timer expired
-Message-ID: <Z6ZaIVtZ2k798Dn0@linux.dev>
-References: <4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
- <2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
- <152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
- <86h661wje4.wl-maz@kernel.org>
- <4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
- <86cygpwfy0.wl-maz@kernel.org>
- <b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
- <86frkptzr6.wl-maz@kernel.org>
- <Z6ZMdv8jJUvYwQzT@linux.dev>
- <86bjvdtxb5.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="saFmnvKi"
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-84f543c55dcso500601639f.0
+        for <kvmarm@lists.linux.dev>; Fri, 07 Feb 2025 18:01:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738980084; x=1739584884; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4O4akjcxYhNwCefv175mmgU5vTvI8B0CXOe+M7wmIh8=;
+        b=saFmnvKioWhCagW2XTlRUn/xCELfuIBKXHXew1/uS8D0xhDjfdFR/x1lyQtX3wOgS+
+         uU30IYUv9FnLuwJOegmxe8SJxHHai65v68MP9luwmLHNhXo4Wast6NKokj/MpdvIarzW
+         Ysylo3ENxeUQ4r8sh9x3xgvlfsQFNSz2M6uYDEzqSp82nTwh8Spqmept65xUlHdLVGRn
+         257qqNyhzrEVifdiJDDR1v9vLy5j03/moCHSAJ7il2CpmaKmGU4uxhiz/aVzowHwW/D/
+         PHjvlF17QNdLDKdHmKKqTr3w+1shnYvdrA+/JWBI4wI1slBKMNuVPasnYx5eeU+hmvBP
+         /ZoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738980084; x=1739584884;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4O4akjcxYhNwCefv175mmgU5vTvI8B0CXOe+M7wmIh8=;
+        b=h1fWNC7JF4/4vbkm9fQbl+gjAz51dUmo0r4eajcQX58NDTfGdpqdHnKR5xxaX8cE/U
+         G1YRzS+4xkFw+lR6fFzqt7E5fIgeBQTU/NpNR82ixXE//C5GSBSvYjvB8bbZhEScUrHB
+         UAFEE5YEgPkys4F8FFL4k7dSS1XMBk/g3hY9ZquiGmYpDFaM8gcPDUTl3g8Bt0QT7TtR
+         wVdnrejnP23zqHB3f+xKv1LESbNML+UFkqV0+0B63UvTaT0xKpvtvAEoCWOPEwBXbZ9y
+         nZXUMub6BPoWeBr7PvhQZ3S6gsMeD5FFxwxz6IFO1tYYSBjXZWyc8Qb1vSi+DjXhaI1P
+         SKGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEpD7IKtVpTHd4dpkH4398QfKUoYKI4Uyoj2ptZQM+deunGAmIjC0DBFuLzOc6Vlw9meb1P6o=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yychlu3pSIarAMTFN7KAQN7gGAZUlWp6Bvt3KCZruE5tG7FkF6V
+	C7cXgyYJ1Y/akdMwWtJZkbP52SfFo4Ra85vpes8Py1h422IEIooM6xF5yILaAz0s10Hmt035Fmi
+	0f7kFn2YpwJVgeH7rgKKdWA==
+X-Google-Smtp-Source: AGHT+IGWeZpc2qa1ckU4PjgV51Y7Hx9W1wQ1TYRDVmT/vQly3n2guK7Orb67xhImPnqLeWrkenED8+oum8nOVfQ3mw==
+X-Received: from ilbee27.prod.google.com ([2002:a05:6e02:491b:b0:3ce:69d1:ce53])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:17ce:b0:3d0:1bc4:77a0 with SMTP id e9e14a558f8ab-3d13da22469mr48897165ab.0.1738980083677;
+ Fri, 07 Feb 2025 18:01:23 -0800 (PST)
+Date: Sat,  8 Feb 2025 02:01:08 +0000
+In-Reply-To: <20250208020111.2068239-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86bjvdtxb5.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250208020111.2068239-1-coltonlewis@google.com>
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250208020111.2068239-2-coltonlewis@google.com>
+Subject: [RFC PATCH v2 1/4] perf: arm_pmuv3: Generalize counter bitmasks
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 07, 2025 at 06:38:22PM +0000, Marc Zyngier wrote:
-> On Fri, 07 Feb 2025 18:09:58 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Hey,
-> > 
-> > On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
-> > > I found at least one issue that could fail the migration. Before the
-> > > VM starts running, we limit the feature set to the subset we actually
-> > > support with NV.
-> > > 
-> > > By doing this, we also change the value of IDreg fields that are not
-> > > writable, because they describe features that we don't support.
-> > > Obviously, that fails on restore.
-> > > 
-> > > I need to have a think...
-> > 
-> > We spoke about this a while ago (and I forgot til now), but I was
-> > wondering if we could use vCPU feature flags to describe NV, including
-> > the selection between FEAT_E2H0 and FEAT_VHE.
-> > 
-> > I think this might match userspace expectations a bit more closely where
-> > the state of the ID registers after init gives the actual feature set
-> > supported by the VM.
-> 
-> I'm not sure that's enough. Let me give you an example:
-> 
-> My host has FEAT_XNX, described in ID_AA64MMFR1_EL1.XNX. For whatever
-> reason, we don't allow this field to be written to, even out of NV
-> context. This is odd, because for an EL1 VM, this field means nothing
-> at all.
-> 
-> However, we don't yet support FEAT_XNX with NV (it requires some extra
-> surgery in the S2 walker, in the S2 shadowing code and in AT).
-> 
-> How would you manage this field if you had a vcpu flag saying E2H0 or
-> not? I don't think it helps, at least not in that particular case. It
-> may help for some things, but not all.
-> 
-> It feels that we need to define the field limit (and what is writable
-> or not) based on the NV/!NV support, and maybe E2H0/VHE as well.
+These bitmasks are valid for enable and interrupt registers as well as
+overflow registers. Generalize the names.
 
-I think we're both aiming in the right direction, I just didn't make my
-point clear.
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ include/linux/perf/arm_pmuv3.h | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-The ID registers we make visible to userspace after KVM_ARM_VCPU_INIT
-*must* describe a feature set we will actually honor for the VM. No late
-masking of features (i.e. first KVM_RUN), since it pretty much
-guarantees userspace won't be able to save/restore correctly.
-
-While we describe NV up front, we've been talking about allowing
-userspace to make the E2H0 v. VHE selection through the ID registers as
-well. My suggestion is that we have userspace select the flavor of NV
-it wants (E2H0 v. VHE) up front and completely nuke from orbit the idea
-of late feature fixups.
-
-This would solve your example of XNX, as we'd apply NV enforcement early
-and not expose the feature. Same would also hold for VHE-only features,
-such as recursive NV.
-
-Hopefully I made more sense this time around :)
-
+diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
+index d698efba28a2..c2448477c37f 100644
+--- a/include/linux/perf/arm_pmuv3.h
++++ b/include/linux/perf/arm_pmuv3.h
+@@ -223,16 +223,23 @@
+ 				 ARMV8_PMU_PMCR_X | ARMV8_PMU_PMCR_DP | \
+ 				 ARMV8_PMU_PMCR_LC | ARMV8_PMU_PMCR_LP)
+ 
++/*
++ * Counter bitmask layouts for overflow, enable, and interrupts
++ */
++#define ARMV8_PMU_CNT_MASK_P		GENMASK(30, 0)
++#define ARMV8_PMU_CNT_MASK_C		BIT(31)
++#define ARMV8_PMU_CNT_MASK_F		BIT_ULL(32) /* arm64 only */
++#define ARMV8_PMU_CNT_MASK_ALL		(ARMV8_PMU_CNT_MASK_P | \
++					 ARMV8_PMU_CNT_MASK_C | \
++					 ARMV8_PMU_CNT_MASK_F)
+ /*
+  * PMOVSR: counters overflow flag status reg
+  */
+-#define ARMV8_PMU_OVSR_P		GENMASK(30, 0)
+-#define ARMV8_PMU_OVSR_C		BIT(31)
+-#define ARMV8_PMU_OVSR_F		BIT_ULL(32) /* arm64 only */
++#define ARMV8_PMU_OVSR_P		ARMV8_PMU_CNT_MASK_P
++#define ARMV8_PMU_OVSR_C		ARMV8_PMU_CNT_MASK_C
++#define ARMV8_PMU_OVSR_F		ARMV8_PMU_CNT_MASK_F
+ /* Mask for writable bits is both P and C fields */
+-#define ARMV8_PMU_OVERFLOWED_MASK	(ARMV8_PMU_OVSR_P | ARMV8_PMU_OVSR_C | \
+-					ARMV8_PMU_OVSR_F)
+-
++#define ARMV8_PMU_OVERFLOWED_MASK	ARMV8_PMU_CNT_MASK_ALL
+ /*
+  * PMXEVTYPER: Event selection reg
+  */
 -- 
-Thanks,
-Oliver
+2.48.1.502.g6dc24dfdaf-goog
+
