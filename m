@@ -1,139 +1,337 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A537B154BFE
-	for <kvmarm@lists.linux.dev>; Sat,  8 Feb 2025 02:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE0617597
+	for <kvmarm@lists.linux.dev>; Sat,  8 Feb 2025 15:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738980089; cv=none; b=OMz9EdvsYOQf4BOY1KhEgJyLEyvAE/tD/7INTshgeekHsNkud3bgXjYDeWLQtc9weVk/5m0ddI8o//9HiNuW1Db0s/PqwXFVVnB9OUuuEj6ArVO9HnUcPd+bgkgFwCE5+1rn2OQHHZ5eeSPPRrGHh31/f/6tE3kFe8JgZ3gYL8U=
+	t=1739027743; cv=none; b=BQSmVlLy04PNXs/wtl8BJwacfM8rKodEoCEUkGuPp0bG0/cJPCdQhDLDzb4lo1Lx9DCnHCC5TV+8TKxQgAsunyYQLWULaLUnrLOpp1hmce/NlKdzzEeAf3Z/xirhvCjbnmJ3Usmdvc878nG6zE/12hfaUt2llZ8f58b+36GMZLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738980089; c=relaxed/simple;
-	bh=LQBYMp4KmUXKjINd8GkhcF2qurugv4q68hUcGJQNnjI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JhiViZfHhYbbyHSaxRDMjvzDvjZhQTsw4e+BXyYLnUgX9/cYlt658fAJDBsZ1Ckud193Hwqi5rhKEvgpdk25KFA6t/PpOpzPwyGnKCKdXRnOOMG7MtyzEfMNgfVEsk3x8xb0u4hV5bw1umtrwAFnYq4O88XXgyaFkhR6wRifv9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g8BqK9Qm; arc=none smtp.client-ip=209.85.166.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1739027743; c=relaxed/simple;
+	bh=wdP0504YlRUWUyWOccPQNOpnfwbi8oiLivi7ml3EBiM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F1n7UPH4Nhbdpa/UwosHOBIqB2s5aS+p+vL8JQHYiBafSDWWb8butGFiSQa21AAz0z4+04tIUgmi/rGIjdkloy7TytyP2nFZWGqH+akXSzKnQXRPqqJYR35XQOEH5nfodHwCFjiY9uQ4PUTAvN2y9HJ8jRFdSTDUYSZt6oSHbiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABIwaQ5Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g8BqK9Qm"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-844d5c4a27fso534352139f.0
-        for <kvmarm@lists.linux.dev>; Fri, 07 Feb 2025 18:01:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738980087; x=1739584887; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TJ0ITpSot12bWRIgUxfFL1nJMNuEe3fyU4TCb+rHvco=;
-        b=g8BqK9QmJU01siBpxfpT72GFkaR8m5WHkID6sM0oVbw6CTyNYK6CmKVkihbDK9JR4g
-         WEQ+PSmkYMNzJufBZOntu41jc48zjTVAwfdRLaXvB4zw9Q4Ox2WuXTwiyFXLVbou7qZx
-         gywQCbQRez+WnkTzzCMUGYSpTkX6DUgDEElGfD0T1Qb6zMlRHRI4aNL4GMFw/MmvqYUN
-         A2elXoymUMx/gf25ZTvBrDhLEmsdhGv2VVYqJpl67tioIeRonkAee27zjqwKVR16yjcT
-         9iTB3RMSbnvs0KiTB/2bY+fVM8wT5t9emCiTB68+uCAvnKooLo5HEvjGl7V3T2F1GuB4
-         qwGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738980087; x=1739584887;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TJ0ITpSot12bWRIgUxfFL1nJMNuEe3fyU4TCb+rHvco=;
-        b=vbiMzDXxHK3YZ2Qa0+k9gQfGc1s9yq0fDAKbSFnKeC3BOflWUO00a2XMcqjIrg2HxC
-         cV90d50RdE8OIoOpLoq2fKNtzc8TV+df/JQbxniC0PvgNF+AIiWR7bESt549+enbZcOe
-         q7jsd6NdE3uzPsX6PhAGBder5xuVeLOo8PItQQcmPITDfL1Xj5tSIZAixGOmBKeae1KK
-         BAx2aCkW5TaMji0RBLyq6mHTHRSxq5M5oBLMcE4ebUgevnIW0Y7SZctzH5zt8QdawlS4
-         HMJUTUPKnMUia4laYu0+9hdI6RS8M1GVtQLTBL6pObXFaXaXfrb11HqU0TZ2vOWXE0x0
-         PXdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKPN3GCBM2PXHxA1GoZGVAmfHct+SiZxdN/cXaHwmB29nLagdxanwXUpFn3wSv9CqCEjErkkw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyI7woj6Stk4E7sUE9b2So+czHZInaC6GotD+6vZizCCeQs+Nvb
-	GdEy/Ap5UgESch2at7lw8L2o1Od/omuBcESfRfSbAZcUSsMOQLPPP3aXdoc9Awf8kpOnetu55nN
-	CmpmnXljP7ew1gDL4E4gyvA==
-X-Google-Smtp-Source: AGHT+IHGzAbpz5Gck/2Rf7WgkWKxzSWHxb28Hylkb71d1eO6uNKmPJkkI+3L+zJwZvOSJQqcK2g9jZxrFbjtaCAz6g==
-X-Received: from ilbeh24.prod.google.com ([2002:a05:6e02:4c18:b0:3d0:499b:8e3d])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:20c9:b0:3cf:cdb8:78fb with SMTP id e9e14a558f8ab-3d13df0fb5fmr49647775ab.16.1738980086868;
- Fri, 07 Feb 2025 18:01:26 -0800 (PST)
-Date: Sat,  8 Feb 2025 02:01:11 +0000
-In-Reply-To: <20250208020111.2068239-1-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABIwaQ5Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A329FC4CED6;
+	Sat,  8 Feb 2025 15:15:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739027742;
+	bh=wdP0504YlRUWUyWOccPQNOpnfwbi8oiLivi7ml3EBiM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ABIwaQ5QuavP8mEch/mGlEm85IFJMqXyX7l1XLiJKhpPzQgT6BHnRHCK86wNS9zaN
+	 /g0QJL6ej9eqBJL8MzpUgwXselHObzDaqeXpWUMcQy3vpyj9jxivMQT7c3jhEv3WNu
+	 +RFo6S87RDj98ZW7wYWixhq37ydtF6bAIUuY5ov6F6EF2fqYe749rJuAsvVzPawyxj
+	 hINRwmoDduB5G5WY635Xi1He4kBTMWttxx8JJk/+KB9ZXxIc+SqYdUlzfgauZxNj0o
+	 GPWRw7xOVGvMTYmnDfOiT8gmCGAbMjL8a5IF5lYvnib9dK0dULHKALvWGRJnIUu7e4
+	 rpNUBSR7XDWWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tgmYV-001zCr-WE;
+	Sat, 08 Feb 2025 15:15:40 +0000
+Date: Sat, 08 Feb 2025 15:15:39 +0000
+Message-ID: <86a5awtqlg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Alexander Potapenko <glider@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Assorted vgic fixes for 6.14
+In-Reply-To: <Z6ZV-JHDSSLKEah-@linux.dev>
+References: <20250206152100.1107909-1-maz@kernel.org>
+	<Z6ZLC1v5KU-zzbQR@linux.dev>
+	<86ed09tyl2.wl-maz@kernel.org>
+	<Z6ZV-JHDSSLKEah-@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250208020111.2068239-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250208020111.2068239-5-coltonlewis@google.com>
-Subject: [RFC PATCH v2 4/4] KVM: arm64: Make guests see only counters they can access
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, glider@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ARM architecture specifies that when MDCR_EL2.HPMN is set, EL1 and
-EL0, which includes KVM guests, should read that value for PMCR.N.
+On Fri, 07 Feb 2025 18:50:32 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+>=20
+> On Fri, Feb 07, 2025 at 06:10:49PM +0000, Marc Zyngier wrote:
+> > On Fri, 07 Feb 2025 18:03:55 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >=20
+> > > On Thu, Feb 06, 2025 at 03:20:57PM +0000, Marc Zyngier wrote:
+> > > > Alexander, while fuzzing KVM/arm64, found an annoying set of proble=
+ms,
+> > > > all stemming from the fact that the vgic can be destroyed in parall=
+el
+> > > > with the rest of the guest still being live.
+> > > >=20
+> > > > Yes, this is annoying.
+> > > >=20
+> > > > Fixing this is not going to happen overnight (though I have some
+> > > > ideas), but we can make what we have today a bit more robust.
+> > > >=20
+> > > > This is what patch #2 is doing. Patch #1 is just removing a loud
+> > > > WARN_ON() that serves little purpose, and patch #3 fixes the actual
+> > > > bug that Alex reported.
+> > > >=20
+> > > > Hopefully, none of that is controversial...
+> > >=20
+> > > I'm a bit grumbly about slapping bandaids on the problem, but given t=
+he
+> > > fact that glider reported all of this a while ago and we still haven't
+> > > fixed it is enough to justify these patches. So:
+> >=20
+> > Yeah, same here. I'm starting to think that we need to either prevent
+> > the vgic from being asynchronously destroyed, or start refcounting all
+> > IRQs just like LPIs. Which is very annoying since we don't have a
+> > global namespace for SGIs and PPIs.
+> >=20
+> > But maybe simply refcounting the vgic itself would be enough.
+> > Thoughts?
+>=20
+> So would we refcount on the owning structure for a particular IRQ? i.e.
+> private IRQs are counted against the owning vCPU and SPIs against the
+> distributor?
+>=20
+> Adding a vgic_put_vcpu_irq() could help disambiguate private IRQs too.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
+Having slept (yay!) on it, I don't think this is enough.
+
+The observation is that a lot of the issues we have are triggered by
+the private interrupt array being allocated on demand on VGIC
+creation. We had way fewer problems when the private interrupts were
+directly part of struct vcpu, which really was hiding the basic
+problem.
+
+We have an annoying discrepancy between knowing that a GIC is present
+(VM-wide state) and the interrupts for a vcpu being allocated (vcpu
+state). This is what Alexander's fuzzing is all about (create a vcpu,
+init it, and while this is happening, create/destroy a vgic).
+
+So it isn't just destruction, but also creation that is problematic,
+and I'm not sure that refcounting is the correct solution anymore.
+
+Now, for the issue that this series is trying to fix, I came up with
+an alternative approach, based on the above epiphany. We currently
+allocate private interrupts in two locations:
+
+- at vcpu creation time *if* a vgic has already been created
+
+- from vgic_init(), which is itself called on:
+
+  - KVM_DEV_ARM_VGIC_CTRL_INIT for the modern stuff,
+
+  - or lazily for anything old and specific to GICv2 (huh).
+
+Crucially, there is a gaping window between the creation of a vgic
+*after* a vcpu has been created, and its initialisation. Anything that
+checks for irqchip_in_kernel() during that interval may assume that
+private interrupts are allocated, because this is what it used to be.
+Waiting for vgic_init() to mop-up the "early" vcpus is what creates
+the issue.
+
+Given that, the solution is obvious: hoist the early vcpu mop-up from
+vgic_init() into kvm_vgic_create(). This guarantees that any vcpu
+observing irqchip_in_kernel() being true will also see its private
+interrupts.
+
+The patch below fixes it for me (tested with kvmtool, qemu, and Alex's
+tickling reproducer).
+
+Thoughts?
+
+	M.
+
+=46rom c150c2300d5b8918909ad46a769aae864a58025f Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sat, 8 Feb 2025 14:58:43 +0000
+Subject: [PATCH] KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to
+ kvm_create_vgic()
+
+If userspace creates vcpus, then a vgic, we end-up in a situation
+where irqchip_in_kernel() will return true, but no private interrupt
+has been allocated for these vcpus. This situation will continue
+until userspace initialises the vgic, at which point we fix the
+early vcpus. Should a vcpu run or be initialised in the interval,
+bad things may happen.
+
+An obvious solution is to move this fix-up phase to the point where
+the vgic is created. This ensures that from that point onwards,
+all vcpus have their private interrupts, as new vcpus will directly
+allocate them.
+
+With that, we have the invariant that when irqchip_in_kernel() is
+true, all vcpus have their private interrupts.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/debug.c                                  | 3 +--
- arch/arm64/kvm/pmu-emul.c                               | 8 +++++++-
- tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 2 +-
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c | 74 ++++++++++++++++-----------------
+ 1 file changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 0e4c805e7e89..7c04db00bf6c 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -36,8 +36,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
- 	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
- 	 * to disable guest access to the profiling and trace buffers
- 	 */
--	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
--					 *host_data_ptr(nr_event_counters));
-+	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, read_mdcr());
- 	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
- 				MDCR_EL2_TPMS |
- 				MDCR_EL2_TTRF |
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 6c5950b9ceac..052ce8c721fe 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -993,12 +993,18 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
- u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
- {
- 	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
-+	u8 limit;
-+
-+	if (arm_pmu->partitioned)
-+		limit = arm_pmu->hpmn - 1;
-+	else
-+		limit = ARMV8_PMU_MAX_GENERAL_COUNTERS;
- 
- 	/*
- 	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
- 	 * Ignore those and return only the general-purpose counters.
- 	 */
--	return bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-+	return bitmap_weight(arm_pmu->cntr_mask, limit);
- }
- 
- static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-index f16b3b27e32e..b5bc18b7528d 100644
---- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-@@ -609,7 +609,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-ini=
+t.c
+index c7a82bd0c276d..1f33e71c2a731 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -34,9 +34,9 @@
+  *
+  * CPU Interface:
+  *
+- * - kvm_vgic_vcpu_init(): initialization of static data that
+- *   doesn't depend on any sizing information or emulation type. No
+- *   allocation is allowed there.
++ * - kvm_vgic_vcpu_init(): initialization of static data that doesn't depe=
+nd
++ *   on any sizing information. Private interrupts are allocated if not
++ *   already allocated at vgic-creation time.
   */
- static void run_error_test(uint64_t pmcr_n)
+=20
+ /* EARLY INIT */
+@@ -58,6 +58,8 @@ void kvm_vgic_early_init(struct kvm *kvm)
+=20
+ /* CREATION */
+=20
++static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 ty=
+pe);
++
+ /**
+  * kvm_vgic_create: triggered by the instantiation of the VGIC device by
+  * user space, either through the legacy KVM_CREATE_IRQCHIP ioctl (v2 only)
+@@ -112,6 +114,22 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 		goto out_unlock;
+ 	}
+=20
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		ret =3D vgic_allocate_private_irqs_locked(vcpu, type);
++		if (ret)
++			break;
++	}
++
++	if (ret) {
++		kvm_for_each_vcpu(i, vcpu, kvm) {
++			struct vgic_cpu *vgic_cpu =3D &vcpu->arch.vgic_cpu;
++			kfree(vgic_cpu->private_irqs);
++			vgic_cpu->private_irqs =3D NULL;
++		}
++
++		goto out_unlock;
++	}
++
+ 	kvm->arch.vgic.in_kernel =3D true;
+ 	kvm->arch.vgic.vgic_model =3D type;
+=20
+@@ -201,7 +219,7 @@ int kvm_vgic_vcpu_nv_init(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
+=20
+-static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu)
++static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 ty=
+pe)
  {
--	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
-+	pr_debug("Error test with pmcr_n %lu (larger than the host allows)\n", pmcr_n);
- 
- 	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
- 	destroy_vpmu_vm();
--- 
-2.48.1.502.g6dc24dfdaf-goog
+ 	struct vgic_cpu *vgic_cpu =3D &vcpu->arch.vgic_cpu;
+ 	int i;
+@@ -239,17 +257,28 @@ static int vgic_allocate_private_irqs_locked(struct k=
+vm_vcpu *vcpu)
+ 			/* PPIs */
+ 			irq->config =3D VGIC_CONFIG_LEVEL;
+ 		}
++
++		switch (type) {
++		case KVM_DEV_TYPE_ARM_VGIC_V3:
++			irq->group =3D 1;
++			irq->mpidr =3D kvm_vcpu_get_mpidr_aff(vcpu);
++			break;
++		case KVM_DEV_TYPE_ARM_VGIC_V2:
++			irq->group =3D 0;
++			irq->targets =3D BIT(vcpu->vcpu_id);
++			break;
++		}
+ 	}
+=20
+ 	return 0;
+ }
+=20
+-static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu)
++static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu, u32 type)
+ {
+ 	int ret;
+=20
+ 	mutex_lock(&vcpu->kvm->arch.config_lock);
+-	ret =3D vgic_allocate_private_irqs_locked(vcpu);
++	ret =3D vgic_allocate_private_irqs_locked(vcpu, type);
+ 	mutex_unlock(&vcpu->kvm->arch.config_lock);
+=20
+ 	return ret;
+@@ -279,7 +308,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	if (!irqchip_in_kernel(vcpu->kvm))
+ 		return 0;
+=20
+-	ret =3D vgic_allocate_private_irqs(vcpu);
++	ret =3D vgic_allocate_private_irqs(vcpu, dist->vgic_model);
+ 	if (ret)
+ 		return ret;
+=20
+@@ -316,7 +345,7 @@ int vgic_init(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist =3D &kvm->arch.vgic;
+ 	struct kvm_vcpu *vcpu;
+-	int ret =3D 0, i;
++	int ret =3D 0;
+ 	unsigned long idx;
+=20
+ 	lockdep_assert_held(&kvm->arch.config_lock);
+@@ -336,35 +365,6 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
+=20
+-	/* Initialize groups on CPUs created before the VGIC type was known */
+-	kvm_for_each_vcpu(idx, vcpu, kvm) {
+-		ret =3D vgic_allocate_private_irqs_locked(vcpu);
+-		if (ret)
+-			goto out;
+-
+-		for (i =3D 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
+-			struct vgic_irq *irq =3D vgic_get_vcpu_irq(vcpu, i);
+-
+-			switch (dist->vgic_model) {
+-			case KVM_DEV_TYPE_ARM_VGIC_V3:
+-				irq->group =3D 1;
+-				irq->mpidr =3D kvm_vcpu_get_mpidr_aff(vcpu);
+-				break;
+-			case KVM_DEV_TYPE_ARM_VGIC_V2:
+-				irq->group =3D 0;
+-				irq->targets =3D 1U << idx;
+-				break;
+-			default:
+-				ret =3D -EINVAL;
+-			}
+-
+-			vgic_put_irq(kvm, irq);
+-
+-			if (ret)
+-				goto out;
+-		}
+-	}
+-
+ 	/*
+ 	 * If we have GICv4.1 enabled, unconditionally request enable the
+ 	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
+--=20
+2.39.2
 
+
+--=20
+Without deviation from the norm, progress is not possible.
