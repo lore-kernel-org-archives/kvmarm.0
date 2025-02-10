@@ -1,192 +1,166 @@
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4ECE25B696
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 23:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8550626461E
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 23:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739228894; cv=none; b=p4aSYGJ5aDjRY5Mb80L5NFCm1rH2G2HFkd4HPcR+yVxSdoxJY2q2QETMTAnUAd6e/qtAIrCbqGHy+bWcBGUXzJ/ve+crJRo86jb+bmcMAQ2CyC7944c8mQrjROS0ihHepslx4FujzXks+Vu9kyPG/OM35K/w9cxefEfKqEqU7eQ=
+	t=1739231584; cv=none; b=axZO9gLEpxgyGHgY7VkfnnWyWshx4DpG/XeX/q56xZC46dCl1vAD21eUfHTuA4NKIGFkz6Jvl5Gmo/vehdSL/P3cVZlFCzddFf6HLvZrv+okz3E5gybYpzWg3xk5bBVjQz26N6JDlpwrM47a1KGNKOmNbLeUI0qn9h6rgQKiXq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739228894; c=relaxed/simple;
-	bh=s/ssfNn4b7bCXjP2GKwiQQgiKWJx78QfbpNKZtSS6Q4=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=nYcKPMmut0EZm8A3n3jMwpXWj3LaUd89g/kkXHq0TYcJHpA7Y37KcnTVqDXkHvS/YGij2WQorFFvyGynIyiEhFDhfp2u5+IK5Rse2yLKy/fviJHAoy6Nnp20BhVJRlkbNb1oTmtAB5PRPr3nq5pLa1hEdRgTBLqFz2NkkKfmfME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gOBL93eF; arc=none smtp.client-ip=209.85.166.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1739231584; c=relaxed/simple;
+	bh=wNE5B9eXHB/bYEdSpLcv8dqqcXrPyBqu/E3BTd03jYs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CtsxosV5XDkUviRMxZsqanJ2tSW1LtGgSH50ZJMyCHzGh9QBV1YLj6A4tlVCqRrtfDa6bWITdU4waUaqjO6k9GuK8IKo5ZPAjXuxsAJXh505HKAc6dU9y4GaS7mtNh2wbxehA+Dprp7rB5Fl3ETnekU5iHIQ3MsJw6xNWw27Bkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KuRa2UgS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gOBL93eF"
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3d1466cbaddso24471885ab.0
-        for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:08:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739228892; x=1739833692; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CXinvutFgPziM7RxPNDr3Edga1bpxeAp0Ov8Puttle0=;
-        b=gOBL93eFNHNq8ilJPLbzRAAbCfbnBTAypDB+S+/LeazqjuuLOsNe0Gu1CYhxtencp9
-         b1geFbfe62u4zGlJS3OVyHqfkBkhB8m5/7LyAI2dXv6k8Jr3+mAEWJ6LBELInwEvSCUn
-         sVJwF7sxKIm59k0U0LsAU5idTpY564oZGlBOypN4SVr9COHXu0A19MoImZ7YQHPg80rs
-         5knFvSs/X3YsZy2z6ZJ0VNxVjUJkNnU9+AC/0u2B9F8+UsfaFJcF3S9GWjfuJQIXVABY
-         BspQOTFcPJ8lpz1iJkHS3oPuI3gUpKYmApnmN9+cdBcsX3qwx7ozNGJc+dyh2oqKbL5x
-         HZyQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KuRa2UgS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739231581;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9n9MHUuomJDgMTr67ZouKycRR+Nts+RHOLWpDNWTuDE=;
+	b=KuRa2UgSxDni+pglcmWn2BoJAUkdJSYYUl686JwCwxwl3aBt2RrE9f2Bn6UQYfUhXN7jbF
+	FzxjfiSpFl9L6bxNcc0Kb5KRtGg76hOvMRp8bV2JcIVASBHFDZr+r890gys0wKbfXVP1f6
+	fcTvJjOx7syzM84zWW64GoiDT81bYaI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-464-Ouf0OFcQOCuIlZ0dX2vyFQ-1; Mon, 10 Feb 2025 18:53:00 -0500
+X-MC-Unique: Ouf0OFcQOCuIlZ0dX2vyFQ-1
+X-Mimecast-MFC-AGG-ID: Ouf0OFcQOCuIlZ0dX2vyFQ
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e4434d797fso160929126d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:53:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739228892; x=1739833692;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CXinvutFgPziM7RxPNDr3Edga1bpxeAp0Ov8Puttle0=;
-        b=breovK0+g2EdmRIVrgJalnIQ4pc2O9qmFXipNJfLIJvm7lm+sbhqyC/L6UUJCnPAnE
-         aenK82TZg4DUKf6hyojm00SvycTNMEQoXnEJjrirMU5g0MqfUFIB1DmnKAgMMDP0v55b
-         sJvteZLpnnbCp9o35Cvh1cvdlU27ym8VWHLCaJSrYOIs2WMnjP+okRRaWWwsKX51Q1ED
-         qeGD0S/UAIAlHxZX8DtcyCXLTO9sp3CjImNzUiEKD7M8LcZJ+BV0dwpF9iAZ6Oj75jyQ
-         YGtvATXLH/JETMLcfKDEGNUmwenv1YNLy662jc94I0XEvDV6WJ+gqZ/gQIdde0Gkkv5t
-         y1zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXPmnyn9Fx8xGyr0Avs8qNwXDhNRT1EBPMPdvQ49PTKz4XAKei+dpl+4gm53OrNx9KAkGVY90M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YypDcNMl+x1zguxZnB6MlMqm3hR4Kj9cC+ndEEz5wOYxNBN7KTy
-	G9R/xhZxKpHVlkIOHLQOZNRx/3TahdyDEIGUJKRimtsLLgtgA2ue90w6KRqFhBpdHefXV7Am5k7
-	+Oic6jbqJqIGjNvPyCi9BxA==
-X-Google-Smtp-Source: AGHT+IFUZhu2OwBm9Xl4P9gAhtgSkcN1rVy5kcIM68xBXK4rcWyV4/0jaNvjvAieMThFeK6tg2McyqvG5JOCTsu70Q==
-X-Received: from ilbec1.prod.google.com ([2002:a05:6e02:4701:b0:3d1:3d59:434b])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:1c01:b0:3d0:f2ca:65aa with SMTP id e9e14a558f8ab-3d16f40b648mr9951285ab.4.1739228891849;
- Mon, 10 Feb 2025 15:08:11 -0800 (PST)
-Date: Mon, 10 Feb 2025 23:08:11 +0000
-In-Reply-To: <Z6msyUG0HWM2EImQ@linux.dev> (message from Oliver Upton on Sun, 9
- Feb 2025 23:37:45 -0800)
+        d=1e100.net; s=20230601; t=1739231580; x=1739836380;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9n9MHUuomJDgMTr67ZouKycRR+Nts+RHOLWpDNWTuDE=;
+        b=vROwzfAyzGKSbwFkxkPDCTi9ZLdjVyHhaBqlV9goRVZ4Rxtqm81T2i7wyK+y9NANDT
+         2SQPzfVCV96oepflCMhgHdNKLQ3zo+B4vXoLYnJTMpHCF1A/nhRm9Ay7b0tJwwG9NTML
+         kq2ktl+kVPA9yCbBVxx9vZIgY8f9GRnGtd+Cfcus+AO4KuCILK7kHuPNWTEiC8YOfJit
+         vywNnRvj3jXJDayKp+zWD31mE5cTbA3ixwE3/U3nXYmHGiFagyWxmU1qAz61abTxGp8D
+         9xRv9E/aRtF+qw3zlwmrh5pGNXW4YxiSUlhzEb7xTLJjtaflG+jr9YAK4H+C7A5PLgq3
+         rDJw==
+X-Gm-Message-State: AOJu0YyJeYD0K618Woijeqncpm2KW3kU85o2un+DkiZ15LS6k/pyKF3J
+	QNlDhV+Pg/hvifHJWbDEu4b7iNh0CZajCE6mlkTlVzzjcK+YxKm7+sTcRNA59XK59lHLPiZcIZ5
+	/Ir90krZJs4GpCcsGMdhgDCgoNvMBI8NgtLr9Dcjcvf7Nvb9YVK2rZQ==
+X-Gm-Gg: ASbGncvG4lEltCqpBVgK0vtJx9Y1wiG5RCkYXA0kb4RGv5LGZSCeOb1DaKCAsOhdI2u
+	w0Le1J+KWl8ofxmiK7GM8kf0goQXUVjELTrfbwBfoiUr93jQ7Xezw1LDgIYIOM+2614MDfc+zey
+	1OjQWfCXbxCwLlnKx3caP3Y2i7zsdYoaXHSIofmda2PbcmKqoMtW77PJMZUlsaJmN5hnyrSwGjG
+	dBA+Atme6mwJrbqCEUlxXLmLT3m5E/YcfOj1HTV+oQbH8Vj+9foHWEE0TBqZ8P4FJ6eQTDSCWzG
+	wMrO
+X-Received: by 2002:ad4:5f48:0:b0:6d4:1ea3:981d with SMTP id 6a1803df08f44-6e44577a219mr188090396d6.43.1739231579796;
+        Mon, 10 Feb 2025 15:52:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGTZs5MDqcyEc7mfn8O43N7j152nBww16Om22OeV9BNEnRQ5CHfvHC/RIVx9CYDICeE4ROxPQ==
+X-Received: by 2002:ad4:5f48:0:b0:6d4:1ea3:981d with SMTP id 6a1803df08f44-6e44577a219mr188090196d6.43.1739231579424;
+        Mon, 10 Feb 2025 15:52:59 -0800 (PST)
+Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43bad5a7bsm52714786d6.119.2025.02.10.15.52.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 15:52:59 -0800 (PST)
+Message-ID: <2673d55d596afff0b8241ccc806e437e2cf9d3e3.camel@redhat.com>
+Subject: Re: Question about lock_all_vcpus
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Date: Mon, 10 Feb 2025 18:52:58 -0500
+In-Reply-To: <864j11u70x.wl-maz@kernel.org>
+References: <dd333b6d05e2757daf0dffa17ae9af5eb3498e05.camel@redhat.com>
+	 <864j11u70x.wl-maz@kernel.org>
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsnted051jqc.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [RFC PATCH v2 4/4] KVM: arm64: Make guests see only counters they
- can access
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com, 
-	shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: TK9sMMZtKgXTeIZu-A1ZE5CMQJOUJ6qxrQOzhXpTj7E_1739231580
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-Hi Oliver, thanks for the review.
+On Mon, 2025-02-10 at 15:57 +0000, Marc Zyngier wrote:
+> On Thu, 06 Feb 2025 20:08:10 +0000,
+> Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > Hi!
+> > 
+> > KVM on ARM has this function, and it seems to be only used in a couple of places, mostly for
+> > initialization.
+> > 
+> > We recently noticed a CI failure roughly like that:
+> 
+> Did you only recently noticed because you only recently started
+> testing with lockdep? As far as I remember this has been there
+> forever.
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+Hi,
 
-> On Sat, Feb 08, 2025 at 02:01:11AM +0000, Colton Lewis wrote:
->> The ARM architecture specifies that when MDCR_EL2.HPMN is set, EL1 and
->> EL0, which includes KVM guests, should read that value for PMCR.N.
+I also think that this is something old, I guess our CI started to
+test aarch64 kernels with debug lags enabled or something like that.
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   arch/arm64/kvm/debug.c                                  | 3 +--
->>   arch/arm64/kvm/pmu-emul.c                               | 8 +++++++-
->>   tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 2 +-
->>   3 files changed, 9 insertions(+), 4 deletions(-)
+> 
+> > [  328.171264] BUG: MAX_LOCK_DEPTH too low!
+> > [  328.175227] turning off the locking correctness validator.
+> > [  328.180726] Please attach the output of /proc/lock_stat to the bug report
+> > [  328.187531] depth: 48  max: 48!
+> > [  328.190678] 48 locks held by qemu-kvm/11664:
+> > [  328.194957]  #0: ffff800086de5ba0 (&kvm->lock){+.+.}-{3:3}, at: kvm_ioctl_create_device+0x174/0x5b0
+> > [  328.204048]  #1: ffff0800e78800b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > [  328.212521]  #2: ffff07ffeee51e98 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > [  328.220991]  #3: ffff0800dc7d80b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > [  328.229463]  #4: ffff07ffe0c980b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > [  328.237934]  #5: ffff0800a3883c78 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > [  328.246405]  #6: ffff07fffbe480b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > 
+> > 
+> > ..
+> > ..
+> > ..
+> > ..
+> > 
+> > 
+> > As far as I see currently MAX_LOCK_DEPTH is 48 and the number of
+> > vCPUs can easily be hundreds.
+> 
+> 512 exactly. Both of which are pretty arbitrary limits.
+> 
+> > Do you think that it's possible? or know if there were any efforts
+> > to get rid of lock_all_vcpus to avoid this problem? If not possible,
+> > maybe we can exclude the lock_all_vcpus from the lockdep validator?
+> 
+> I'd be very wary of excluding any form of locking from being checked
+> by lockdep, and I'd rather we bump MAX_LOCK_DEPTH up if KVM is enabled
+> on arm64. it's not like anyone is going to run that in production
+> anyway. task_struct may not be happy about that though.
+> 
+> The alternative is a full stop_machine(), and I don't think that will
+> fly either.
+> 
+> > AFAIK, on x86 most of the similar cases where lock_all_vcpus could
+> > be used are handled by assuming and enforcing that userspace will
+> > call these functions prior to first vCPU is created an/or run, thus
+> > the need for such locking doesn't exist.
+> 
+> This assertion doesn't hold on arm64, as this ordering requirement
+> doesn't exist. We already have a bunch of established VMMs doing
+> things in random orders (QEMU being the #1 offender), and the sad
+> reality of the Linux ABI means this needs to be supported forever.
 
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 0e4c805e7e89..7c04db00bf6c 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -36,8 +36,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu  
->> *vcpu)
->>   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
->>   	 * to disable guest access to the profiling and trace buffers
->>   	 */
->> -	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
->> -					 *host_data_ptr(nr_event_counters));
->> +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, read_mdcr());
+Understood.
 
-> Please avoid unnecessary accesses to MDCR_EL2 at all costs. This is a
-> guaranteed trap to EL2 with nested virt.
+Best regards,
+	Maxim Levitsky
 
-I thought it was necessary when I wrote this, but I see it's not after
-thinking about it for a while.
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
-The intended value is accessible from vcpu->kvm->arch.arm_pmu.hpmn as
-written, but could be somewhere else after addressing your suggestion to
-lift all MDCR handling into KVM.
 
->>   	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
->>   				MDCR_EL2_TPMS |
->>   				MDCR_EL2_TTRF |
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index 6c5950b9ceac..052ce8c721fe 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -993,12 +993,18 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int  
->> irq)
->>   u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
->>   {
->>   	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
->> +	u8 limit;
->> +
->> +	if (arm_pmu->partitioned)
->> +		limit = arm_pmu->hpmn - 1;
->> +	else
->> +		limit = ARMV8_PMU_MAX_GENERAL_COUNTERS;
-
->>   	/*
->>   	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
->>   	 * Ignore those and return only the general-purpose counters.
->>   	 */
->> -	return bitmap_weight(arm_pmu->cntr_mask,  
->> ARMV8_PMU_MAX_GENERAL_COUNTERS);
->> +	return bitmap_weight(arm_pmu->cntr_mask, limit);
->>   }
-
-> This isn't necessary and is likely to regress the existing behavior.
-
-> When the architecture says the lower ELs should see PMCR_EL0.N have the
-> same value as MDCR_EL2.HPMN, what it really means is direct reads from
-> hardware will return the value.
-
-> So my expectation would be that a VM using the partitioned PMU
-> implementation would never reach any of the *emulated* PMU handlers, as
-> we would've disabled the associated traps.
-
-Understood. The change was here to see be able to read PMCR_EL0.N from
-inside a VM since I haven't disabled the associated traps yet.
-
-It shouldn't be in this patch.
-
-> The partitioned PMU will not replace the emulated vPMU implementation in
-> KVM, so it'd be good to refactor what we have today to make room for
-> your work. I think that'd be along the lines of:
-
->   - Shared code for event filter enforcement and handling of the vPMU
->     overflow IRQ.
-
->   - Emulated PMU implementation that provides trap handlers for all PMUv3
->     registers and backs into host perf
-
->   - Partitioned PMU implementation that doesn't rely on traps and instead
->     saves / restores a portion of the PMU that contains the guest
->     context.
-
-> These should be done in separate files, i.e. I do not want to see a
-> bunch of inline handling to cope with emulated v. partitioned PMUs.
-
-Agreed.
-
->>   static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
->> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c  
->> b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
->> index f16b3b27e32e..b5bc18b7528d 100644
->> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
->> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
->> @@ -609,7 +609,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
->>    */
->>   static void run_error_test(uint64_t pmcr_n)
->>   {
->> -	pr_debug("Error test with pmcr_n %lu (larger than the host)\n",  
->> pmcr_n);
->> +	pr_debug("Error test with pmcr_n %lu (larger than the host allows)\n",  
->> pmcr_n);
-
-> NBD for an RFC, but in the future please do selftests changes in a
-> separate patch.
-
-Ok, I'll do that in the future.
