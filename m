@@ -1,42 +1,48 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC0E2500DA
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 18:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBFB1BBBEA
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 18:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739210681; cv=none; b=HjAcfxF3W6mh1KCCLTk4QW5wTdtJrNMrcjf2/ZsCl623lgIyWuXmhd+R9ZdGXjNAk1krwS/itaLhTll6HWUhPhq+Icbf0T9u4jSxouF7PwGecykCzLT5liQIJJiHIQtxBED5WEWRhNZ0r7zLrSNSyoG3a8qENSeKvLlNm0Q7tSg=
+	t=1739211157; cv=none; b=H+B04aLE7/wxPGLsbVCn0apO5XCqF/JaHgs5EPKYlbmgAFwzakx6PAIkFEm2b3CzXI9YI9X/ROSG9ZG77ptHWCIJaWP3uYiEvW3Kt6bpag5rdQWjJNj5Of+Zy46XX7VKwRnXG1xz82AhuSqoKBJpxDnhnVqP7fFwqHZt3+Rky6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739210681; c=relaxed/simple;
-	bh=ksvS5XX7xX64IlxGvydgg2Jy1f9U1hAJdVFTbzlcyK0=;
+	s=arc-20240116; t=1739211157; c=relaxed/simple;
+	bh=KGU94NB2q4RwCucjukyrOb4T3rjEuQVWP0ukifA0Kxw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SjWCVwdIroDaIB0Vd3TehsC50KWKYW/tL8b7mukqCcp1Jub7cIC9Bbql06aDk6nSqJs/bAQHoshegAaeD52Js9EcDUO4o3U7r0bst8mG7yzTDlTNZzRhnt7uBgScsq4DOsmiKi01yejsWvLjUwlxKuOpGrxElzohJTn/SVcslqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D671B1477;
-	Mon, 10 Feb 2025 10:04:58 -0800 (PST)
-Received: from arm.com (e134078.arm.com [10.1.26.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58DAB3F58B;
-	Mon, 10 Feb 2025 10:04:32 -0800 (PST)
-Date: Mon, 10 Feb 2025 18:04:29 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 03/18] scripts: Refuse to run the tests
- if not configured for qemu
-Message-ID: <Z6o/rbweZttGReir@arm.com>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-4-alexandru.elisei@arm.com>
- <20250121-45faf6a9a9681c7c9ece5f44@orel>
- <Z6nX8YC8ZX9jFiLb@arm.com>
- <20250210-640ff37c16a0dbccb69f08ea@orel>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLp/NmLy8Wk/YV25bjXlQHl5AGN3UZksfmwbcXFi06ykR+NEa/CwvILOFIJO2xzKSx7v7Fn2hjNSOmpVJVm++8LwtGl++EP+RhWowMeO4avrSJ2156MQP92LyccUEKcQFwaIjU/TzEod/jKEHnvQ03gsJuwd4AI0kedHsdBiQrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TVf+uKDD; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TVf+uKDD"
+Date: Mon, 10 Feb 2025 10:12:07 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739211143;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oLebe+jzGLux7DSpw2Ptd+bTvs2CJro4ymjhGMecT2s=;
+	b=TVf+uKDDvKnu/oeSc93C892wJYH60SLMrlWI3XwVY0HrADEZScMSzN8qkJz96sq1PHBhYk
+	UfaZKCjoDAr0sYpQKz9CChwj3KLaQZQKZMTvW6A2WVjgpmt/aGVdRvxcyp0er5maX+DqrJ
+	V+9T5NjYbngj+ESa2xauSK9bopNaUSk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] KVM: arm64: Allow userspace to change MIDR_EL1
+Message-ID: <Z6pBd0XgEvrMoLcS@linux.dev>
+References: <20250210154953.27002-1-sebott@redhat.com>
+ <20250210154953.27002-2-sebott@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,89 +51,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250210-640ff37c16a0dbccb69f08ea@orel>
+In-Reply-To: <20250210154953.27002-2-sebott@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Drew,
+Hi Sebastian,
 
-On Mon, Feb 10, 2025 at 02:56:25PM +0100, Andrew Jones wrote:
-> On Mon, Feb 10, 2025 at 10:41:53AM +0000, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > On Tue, Jan 21, 2025 at 03:48:55PM +0100, Andrew Jones wrote:
-> > > On Mon, Jan 20, 2025 at 04:43:01PM +0000, Alexandru Elisei wrote:
-> > <snip>
-> > > > ---
-> > > >  arm/efi/run             | 8 ++++++++
-> > > >  arm/run                 | 9 +++++++++
-> > > >  run_tests.sh            | 8 ++++++++
-> > > >  scripts/mkstandalone.sh | 8 ++++++++
-> > > >  4 files changed, 33 insertions(+)
-> > <snip>
-> > > > +case "$TARGET" in
-> > > > +qemu)
-> > > > +    ;;
-> > > > +*)
-> > > > +    echo "'$TARGET' not supported for standlone tests"
-> > > > +    exit 2
-> > > > +esac
-> > > 
-> > > I think we could put the check in a function in scripts/arch-run.bash and
-> > > just use the same error message for all cases.
-> > 
-> > Coming back to the series.
-> > 
-> > arm/efi/run and arm/run source scripts/arch-run.bash; run_tests.sh and
-> > scripts/mkstandalone.sh don't source scripts/arch-run.bash. There doesn't
-> > seem to be a common file that is sourced by all of them.
-> 
-> scripts/mkstandalone.sh uses arch-run.bash, see generate_test().
+On Mon, Feb 10, 2025 at 04:49:50PM +0100, Sebastian Ott wrote:
+> Enable VMMs to write MIDR_EL1 by treating it as a VM ID register.
+> Since MIDR_EL1 is not handled as a proper arm64_ftr_reg apply only
+> a sanity check against the writable mask to ensure the reserved
+> bits are 0.
 
-Are you referring to this bit:
+How exactly does the VMM's MIDR_EL1 find its way to the guest? VPIDR_EL2
+is still set to the hardware value.
 
-generate_test ()
-{
-	<snip>
-        (echo "#!/usr/bin/env bash"
-         cat scripts/arch-run.bash "$TEST_DIR/run")
+> @@ -2021,7 +2037,11 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		return ret;
+>  	}
+>  
+> -	ret = arm64_check_features(vcpu, rd, val);
+> +	if (skip_feature_check(id))
+> +		ret = arm64_check_mask(rd, val);
+> +	else
+> +		ret = arm64_check_features(vcpu, rd, val);
+> +
 
-I think scripts/arch-run.bash would need to be sourced for any functions defined
-there to be usable in mkstandalone.sh.
+Can you add a new implementation of ->set_user() for MIDR/REVIDR/AIDR
+instead?
 
-What I was thinking is something like this:
+> @@ -2542,6 +2571,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_DBGVCR32_EL2), undef_access, reset_val, DBGVCR32_EL2, 0 },
+>  
+> +	{ ID_DESC(MIDR_EL1), .set_user = set_id_reg, .visibility = id_visibility,
+> +	  .reset = reset_midr_el1, .val = (u32)-1 },
 
-if ! vmm_supported $TARGET; then
-	echo "$0 does not support '$TARGET'"
-	exit 2
-fi
+nit: GENMASK() instead of truncation by casting.
 
-Were you thinking of something else?
-
-I think mkstandalone should error at the top level (when you do make
-standalone), and not rely on the individual scripts to error if the VMM is
-not supported. That's because I think creating the test files, booting a
-machine and copying the files only to find out that kvm-unit-tests was
-misconfigured is a pretty suboptimal experience.
-
-> run_tests.sh doesn't, but I'm not sure it needs to validate TARGET
-> since it can leave that to the lower-level scripts.
-
-I put the check in arm/run, and removed it from run_tests.sh, and this is
-what I got:
-
-$ ./run_tests.sh selftest-setup
-SKIP selftest-setup (./arm/run does not supported 'kvmtool')
-
-which looks good to me.
-
-> 
-> > 
-> > How about creating a new file in scripts (vmm.bash?) with only this
-> > function?
-> 
-> If we need a new file, then we can add one, but I'd try using
-> arch-run.bash or common.bash first.
-
-common.bash seems to work (and the name fits), so I'll give that a go.
-
+-- 
 Thanks,
-Alex
+Oliver
