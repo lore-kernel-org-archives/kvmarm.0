@@ -1,99 +1,92 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC40322E406
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 13:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3414935972
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739195797; cv=none; b=nf63dcPOQUhjjVr/Ylr0g6lN9IPJlxuQDpwsybNcEIXS35t2BV/nYP23CucXiejNC9ih9zvgyzrZcJdoEOZKqJlao+NEtSJVRO4TBN90pm+w8aOd6akwRpJOCU24CWWcC9fU0Z5CRVege7gFPytQrmK0m1AUY/5OphctIJEg8Qs=
+	t=1739200842; cv=none; b=j5xU6bLgpH2cvz+tN1ee3iddx01rzwuZPxaGfZ4Ny/ry1/BMa7akCG+hbwj90itxIIV0XhwOQx/gG/dQ1tcs71SKoVq9lesJxnavhjYXYOD3LeToPyNg35xjFgU9jtchmd6crOwX44zZb0KiZp90EkB4sMknIdaHnxIY6JqLM1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739195797; c=relaxed/simple;
-	bh=L3c+pkpXw+gXIF9C7FZIKafYnFt2uPDJMIqArs/uIoA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ekVHxwruXhYd/RdPMtKEmhISd+qxuLTr6ZIEo9pOaqU5ya48/pHex74gtzYm4RpF2YKea6pX+3d/gXp3XVised14eebA0j1DMMsu1PsHlZArqjYQucCO4pf44sNdor9Ymj3EfX15/aqJcKdr2rlM+AM9ubUPWGEVCotf+6xyDFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dIuJ8mBP; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1739200842; c=relaxed/simple;
+	bh=L5OT+59C3iT4MQ/lC2n03E8ed7rGkqDhCwJBIDscTR8=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=bn5VFj8ORB4BfnVY5vUceDEwLOQ75X87efpoSttI/Xef3k6UVHgQD5qOiuPDUjQCLeSRz6ED+E4aDfPoOOKph+3KB/1a0YG5YkQ+fzsMlhs1GeUIz7ZEwpNviimTk1Ahx6VNhcnrhJ8ewriGLL7dK0AyezoSQF3lMpHkcRaj3gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EQiTcuHC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dIuJ8mBP"
-Date: Mon, 10 Feb 2025 14:56:25 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739195793;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQiTcuHC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739200840;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6QxzYCLsT1iF2vEH4te1D9LwJ9LeHeBIIOwbWx7d42w=;
-	b=dIuJ8mBPN9XRylpd0pPPFZlnRPzIyaQDOvW0+7vWIUtPOd2ArfJa0ls/kBVEdV/3K7OzxY
-	+z4sIcp3tfj6ipAoTidGAq1+R2gNDZyi7Hqj9GfQB/u73/sfLMykVg9BonbVXgeJjsK9Ck
-	4n33sBQo2Qlb3R1Ld27i0JM9Q6o2hus=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 03/18] scripts: Refuse to run the tests
- if not configured for qemu
-Message-ID: <20250210-640ff37c16a0dbccb69f08ea@orel>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-4-alexandru.elisei@arm.com>
- <20250121-45faf6a9a9681c7c9ece5f44@orel>
- <Z6nX8YC8ZX9jFiLb@arm.com>
+	bh=l+1vKWq8tav0v5vOrEs4bMdzd3ftwt2N0noMcIDxK+A=;
+	b=EQiTcuHCGLK2iUoaOgNxAp6gav4BRR7x1Tlu8F1KwWKsEyttULskewPpEXhQnUlCgPMkLL
+	VZw3zmeHrzpIG964Y1k7fuZ33bXwbl3ej/x2UV3iMFcSz+nuYb67C81CI87Bh7T9HVBgPc
+	ll52WZKZCxnDyetkSIw2XJ0jewSkG1A=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-523-dgWwLAmSMn2f19JyAWRGdQ-1; Mon,
+ 10 Feb 2025 10:20:36 -0500
+X-MC-Unique: dgWwLAmSMn2f19JyAWRGdQ-1
+X-Mimecast-MFC-AGG-ID: dgWwLAmSMn2f19JyAWRGdQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA59D19560B1;
+	Mon, 10 Feb 2025 15:20:31 +0000 (UTC)
+Received: from localhost (unknown [10.45.225.231])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F032D30001AB;
+	Mon, 10 Feb 2025 15:20:30 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 15/15] arm/cpu: Add generated files
+In-Reply-To: <f5878231-79b8-4e29-bfb0-f9a57ac3f6a4@linaro.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20250207110248.1580465-1-cohuck@redhat.com>
+ <20250207110248.1580465-16-cohuck@redhat.com>
+ <f5878231-79b8-4e29-bfb0-f9a57ac3f6a4@linaro.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 10 Feb 2025 16:20:28 +0100
+Message-ID: <874j117rnn.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6nX8YC8ZX9jFiLb@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Feb 10, 2025 at 10:41:53AM +0000, Alexandru Elisei wrote:
-> Hi Drew,
-> 
-> On Tue, Jan 21, 2025 at 03:48:55PM +0100, Andrew Jones wrote:
-> > On Mon, Jan 20, 2025 at 04:43:01PM +0000, Alexandru Elisei wrote:
-> <snip>
-> > > ---
-> > >  arm/efi/run             | 8 ++++++++
-> > >  arm/run                 | 9 +++++++++
-> > >  run_tests.sh            | 8 ++++++++
-> > >  scripts/mkstandalone.sh | 8 ++++++++
-> > >  4 files changed, 33 insertions(+)
-> <snip>
-> > > +case "$TARGET" in
-> > > +qemu)
-> > > +    ;;
-> > > +*)
-> > > +    echo "'$TARGET' not supported for standlone tests"
-> > > +    exit 2
-> > > +esac
-> > 
-> > I think we could put the check in a function in scripts/arch-run.bash and
-> > just use the same error message for all cases.
-> 
-> Coming back to the series.
-> 
-> arm/efi/run and arm/run source scripts/arch-run.bash; run_tests.sh and
-> scripts/mkstandalone.sh don't source scripts/arch-run.bash. There doesn't
-> seem to be a common file that is sourced by all of them.
+On Fri, Feb 07 2025, Richard Henderson <richard.henderson@linaro.org> wrote:
 
-scripts/mkstandalone.sh uses arch-run.bash, see generate_test().
-run_tests.sh doesn't, but I'm not sure it needs to validate TARGET
-since it can leave that to the lower-level scripts.
+> On 2/7/25 03:02, Cornelia Huck wrote:
+>> And switch to using the generated definitions.
+>> 
+>> Generated against Linux 6.14-rc1.
+>> 
+>> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
+>> ---
+>>   target/arm/cpu-sysreg-properties.c | 716 ++++++++++++++++++++++++++++-
+>>   target/arm/cpu-sysregs.h           | 116 +----
+>>   target/arm/cpu-sysregs.h.inc       | 164 +++++++
+>>   3 files changed, 860 insertions(+), 136 deletions(-)
+>>   create mode 100644 target/arm/cpu-sysregs.h.inc
+>
+> Why are we committing generated files and not generating them at build-time?
 
-> 
-> How about creating a new file in scripts (vmm.bash?) with only this
-> function?
+We'd either have to carry a copy of Linux' sysregs file, or generate a
+build dependency on Linux. I think we should handle this similar to the
+Linux headers update, where we do an explicit update and check for
+anything unexpected that might have crept in. (Same applies if we switch
+to any other external source for register definitions.)
 
-If we need a new file, then we can add one, but I'd try using
-arch-run.bash or common.bash first.
-
-Thanks,
-drew
