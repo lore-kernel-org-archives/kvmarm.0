@@ -1,155 +1,165 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CDC1A4F22
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4261CF284
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 10:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739173079; cv=none; b=PphT8kG2TNe+TY2AlYsi6kFvCNDiMaRguwSTxl3W+dXfHw4NNWaLxpVQ4kvx9nF2QUxIyByy5Sm8kn46WQvAFMhoJaKwCOaphFQ6jr0iPK8uv/cP0wGDimu1ovlKs87oap64aDbZWk3/THKL175JAera7h0Jn1BUQkKnxYabajA=
+	t=1739183775; cv=none; b=qV9H9BlRZ5KZhLq5MSgO4/vf/CPpJMrqQMiUTZgkkosVFgg140ckrw3Gm+B7j20rkzUBIn2MWbUKlKrADPM/Bx30P34ywGFLOagFDXKlh/RTOg0dW4vsE6NCD4Bmy7w9K1yAU1JaE3Ml3V/SA0kMe6BE9ZS/Oilfybatfo95/pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739173079; c=relaxed/simple;
-	bh=TaXGkoKUS8R+zFSCLF80h16FwvqPvX+aex6ojMA0n/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bYk0Z+5ZMVjzn9krN0SODjftxbB+rYj2Cjhrv4MRDRq+Qsln3DRYbuZ6W0JxMrn0QRW63gtYpdZsc3JQ3ODDb75XNq9twxyzP3TGLGYIbqe9bwkfKWVSvJX9zZmV5D7GUOglpOZXMJY0yqIEiXDtqWPLkObsRW1dJBCyp5ZATWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vE+uFLIC; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vE+uFLIC"
-Date: Sun, 9 Feb 2025 23:37:45 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739173074;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZOcYg4xLzinXROvIPIR5xsQLZpAtozt5q5hAITBaMhs=;
-	b=vE+uFLICHjimFS+ICMuI/HAxyfSAu4mZ77bZ828qh8f1L3qfRfmo59IMZeBXvGqrssiFNy
-	fCDND8KVpd50CISMkA7uHWCg7qYodaAjGO7IKKFCD9XIxPUn6IH9CRdkFsXbLsLOLX8lhP
-	OfDwEiCmz/G8voMwdIN56pm3FuFnd8I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH v2 4/4] KVM: arm64: Make guests see only counters
- they can access
-Message-ID: <Z6msyUG0HWM2EImQ@linux.dev>
-References: <20250208020111.2068239-1-coltonlewis@google.com>
- <20250208020111.2068239-5-coltonlewis@google.com>
+	s=arc-20240116; t=1739183775; c=relaxed/simple;
+	bh=nJs8bPD5D60gNMzABgmLigIviGqKayf0jc6QEG3QgZo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gKnHVVB0ldhSTcaQ7Kzga+Ty3xrvE3ZZcPkC8nIOIXC68oEuzYiQ79qBfiiHqVXQaYqHB4yVnr1211oAxUKitUQKOXMo4FqUqRS30xmoMLBTrlLjk2chfl0v8qGDinIe466SEoli39EODayLp0CqmsNNZjz0DB/R1opppDSpTv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Ys1Bz6p1cz6M4fX;
+	Mon, 10 Feb 2025 18:33:47 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1FD0E140B33;
+	Mon, 10 Feb 2025 18:36:10 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ frapeml500005.china.huawei.com (7.182.85.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 10 Feb 2025 11:36:09 +0100
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Mon, 10 Feb 2025 11:36:09 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
+	<maz@kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>, "mark.rutland@arm.com"
+	<mark.rutland@arm.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "sebott@redhat.com"
+	<sebott@redhat.com>, yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)"
+	<wangzhou1@hisilicon.com>, jiangkunkun <jiangkunkun@huawei.com>, "Jonathan
+ Cameron" <jonathan.cameron@huawei.com>, Anthony Jebson
+	<anthony.jebson@huawei.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
+Subject: RE: [PATCH v6 3/4] KVM: arm64: Report all the KVM/arm64-specific
+ hypercalls
+Thread-Topic: [PATCH v6 3/4] KVM: arm64: Report all the KVM/arm64-specific
+ hypercalls
+Thread-Index: AQHbd9qkSPWoOMhcC0iA+ywSQ0mcwrM8GZ0AgAAA3QCABEAz0A==
+Date: Mon, 10 Feb 2025 10:36:09 +0000
+Message-ID: <a9a696009f8e47e0bac9e2d9289ebb0d@huawei.com>
+References: <20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com>
+ <20250205132222.55816-4-shameerali.kolothum.thodi@huawei.com>
+ <Z6ZPDml0JKuSjLIO@linux.dev> <Z6ZPyKK7HLHTtxYu@linux.dev>
+In-Reply-To: <Z6ZPyKK7HLHTtxYu@linux.dev>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250208020111.2068239-5-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Sat, Feb 08, 2025 at 02:01:11AM +0000, Colton Lewis wrote:
-> The ARM architecture specifies that when MDCR_EL2.HPMN is set, EL1 and
-> EL0, which includes KVM guests, should read that value for PMCR.N.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arch/arm64/kvm/debug.c                                  | 3 +--
->  arch/arm64/kvm/pmu-emul.c                               | 8 +++++++-
->  tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 2 +-
->  3 files changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 0e4c805e7e89..7c04db00bf6c 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -36,8 +36,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->  	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
->  	 * to disable guest access to the profiling and trace buffers
->  	 */
-> -	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> -					 *host_data_ptr(nr_event_counters));
-> +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, read_mdcr());
 
-Please avoid unnecessary accesses to MDCR_EL2 at all costs. This is a
-guaranteed trap to EL2 with nested virt.
 
->  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
->  				MDCR_EL2_TPMS |
->  				MDCR_EL2_TTRF |
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 6c5950b9ceac..052ce8c721fe 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -993,12 +993,18 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
->  {
->  	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
-> +	u8 limit;
-> +
-> +	if (arm_pmu->partitioned)
-> +		limit = arm_pmu->hpmn - 1;
-> +	else
-> +		limit = ARMV8_PMU_MAX_GENERAL_COUNTERS;
->  
->  	/*
->  	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
->  	 * Ignore those and return only the general-purpose counters.
->  	 */
-> -	return bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-> +	return bitmap_weight(arm_pmu->cntr_mask, limit);
->  }
+> -----Original Message-----
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Sent: Friday, February 7, 2025 6:24 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvmarm@lists.linux.dev; maz@kernel.org; catalin.marinas@arm.com;
+> will@kernel.org; mark.rutland@arm.com; cohuck@redhat.com;
+> eric.auger@redhat.com; sebott@redhat.com; yuzenghui
+> <yuzenghui@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>;
+> jiangkunkun <jiangkunkun@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Anthony Jebson
+> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
+> Linuxarm <linuxarm@huawei.com>
+> Subject: Re: [PATCH v6 3/4] KVM: arm64: Report all the KVM/arm64-specific
+> hypercalls
+>=20
+> On Fri, Feb 07, 2025 at 10:21:13AM -0800, Oliver Upton wrote:
+> > On Wed, Feb 05, 2025 at 01:22:21PM +0000, Shameer Kolothum wrote:
+> > > Currently ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID returns
+> the
+> > > bitmap corresponding to KVM_REG_ARM_VENDOR_HYP_BMAP and it
+> only
+> > > returns _KVM_FEATURES_FUNC_ID and _KVM_PTP_FUNC_ID. Change
+> that
+> > > to return all the KVM/arm64-specific hypercalls exposed by
+> > > KVM/arm64 to guest operating systems.
+> > >
+> > > Signed-off-by: Shameer Kolothum
+> <shameerali.kolothum.thodi@huawei.com>
+> > > ---
+> > >  arch/arm64/kvm/hypercalls.c | 6 +++++-
+> > >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.=
+c
+> > > index 27ce4cb44904..5cef2590ffdf 100644
+> > > --- a/arch/arm64/kvm/hypercalls.c
+> > > +++ b/arch/arm64/kvm/hypercalls.c
+> > > @@ -359,7 +359,11 @@ int kvm_smccc_call_handler(struct kvm_vcpu
+> *vcpu)
+> > >  		val[3] =3D ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
+> > >  		break;
+> > >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+> > > -		val[0] =3D smccc_feat->vendor_hyp_bmap;
+> > > +		val[0] =3D GENMASK(ARM_SMCCC_KVM_FUNC_PTP,
+> > > +				 ARM_SMCCC_KVM_FUNC_FEATURES);
+> > > +		/* Function numbers 2-63 are reserved for pKVM for now */
+> > > +		val[2] =3D
+> GENMASK((ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS - 64),
+> > > +
+> (ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER - 64));
+> > >  		break;
+> >
+> > This isn't right, vendor_hyp_bmap is very much load bearing. We have a
+> > documented UAPI that allows userspace to control the hypercalls exposed
+> > to the guest.
+> >
+> > The idea being a user wants kernel rollback safety and doesn't expose
+> > hypercalls that could potentially be revoked.
+> >
+> > https://docs.kernel.org/virt/kvm/arm/fw-pseudo-registers.html#bitmap-
+> feature-firmware-registers
+>=20
+> To add:
+>=20
+> KVM cannot advertise the DISCOVER_IMPL* stuff unconditionally, since the
+> expectation is that userspace implements these hypercalls. These bits
+> may need to be writable from userspace but have a reset value of 0.
+>=20
 
-This isn't necessary and is likely to regress the existing behavior.
+Ok. So IIUC, vendor_hyp_bmap actually holds the information which Vendor Hy=
+p
+services  are available to the user space and can be get/set using GET/SET =
+_ONE_REG
+interfaces.
 
-When the architecture says the lower ELs should see PMCR_EL0.N have the
-same value as MDCR_EL2.HPMN, what it really means is direct reads from
-hardware will return the value.
+Currently this bitmap is a 64 bit one and if we have to have a one to one m=
+apping
+between these bitmap and the hypercall function numbers, then that requires
+some changes.
 
-So my expectation would be that a VM using the partitioned PMU
-implementation would never reach any of the *emulated* PMU handlers, as
-we would've disabled the associated traps.
+Because function numbers 2-63 are now reserved for pKVM and the new ones
+introduced in this series take 64 & 65.
 
-The partitioned PMU will not replace the emulated vPMU implementation in
-KVM, so it'd be good to refactor what we have today to make room for
-your work. I think that'd be along the lines of:
+May be we can have KVM_REG_ARM_VENDOR_HYP_BMAP_2  which represents
+64-127?
 
- - Shared code for event filter enforcement and handling of the vPMU
-   overflow IRQ.
+Or can we take the next available bits(2 & 3) for KVM_REG_ARM_VENDOR_HYP_BM=
+AP
+and then map it to the function number appropriately (64 & 65) when
+ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID is handled?
 
- - Emulated PMU implementation that provides trap handlers for all PMUv3
-   registers and backs into host perf
+Thoughts?
 
- - Partitioned PMU implementation that doesn't rely on traps and instead
-   saves / restores a portion of the PMU that contains the guest
-   context.
-
-These should be done in separate files, i.e. I do not want to see a
-bunch of inline handling to cope with emulated v. partitioned PMUs.
-
->  static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> index f16b3b27e32e..b5bc18b7528d 100644
-> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> @@ -609,7 +609,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
->   */
->  static void run_error_test(uint64_t pmcr_n)
->  {
-> -	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
-> +	pr_debug("Error test with pmcr_n %lu (larger than the host allows)\n", pmcr_n);
-
-NBD for an RFC, but in the future please do selftests changes in a
-separate patch.
-
--- 
 Thanks,
-Oliver
+Shameer
+
+
+
