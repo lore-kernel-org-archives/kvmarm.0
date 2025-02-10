@@ -1,93 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2247B15F41F;
-	Sun,  9 Feb 2025 10:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB2119993D
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739096503; cv=none; b=PtRCaF6VOGGZOysyP4xthG+f/Lsv/fi64U2Iu44m+k3mx5qU+fanuQ3BgjgqmJpVebsr8cSX0xuJ9RrKC695LyJuBhSSoJLegKTTTBuxlDON0O2lWnXAVSeqk4GDjGcRIrz0g9PYtZPVvqRqsgy+Tlkw/a8v8wefCAoiKKOpi9o=
+	t=1739172335; cv=none; b=YFeR+Gzrk+iWrgiBai2SFqQzzq4tcnl6M0dEKq/4LS3M1nO1KJje+ULVS4sATta/opdI288+hzpvPA6P/vuMQV9XnZ1OwOFTObiF2zOZ0ufbD0Grrc3uY58DbAGfm9etSGqXMMAJP8jophBJS7VsAvqAHKLoMmbzWddrgJDMhBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739096503; c=relaxed/simple;
-	bh=ljE5yUYKD7VORy12kAg7aDzprFkq/ZEsUxC+fJE/JKw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i9nVhI8d2iKyCuagigsfwrcvjvOXO4uHA7dACyAcOGy+B8q4H4RI6c5OtsuiVNHQtvGGiV2os27Id8E33GBDgFM/4yvE3ZD70ON4i1gSklLMAvyNUZs635bQsWRmqZOi3Q2GXDF744kRioaUPwCoQivEyaQbg1U88WoeIghWPpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcOx08Jc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739172335; c=relaxed/simple;
+	bh=WEi94AOxFT0BGKWJYlk93RgBEivYtkgEu7vcoa48KDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ox5al1iCDLHiaVm9X8UgjoT+DuFMIHFCDh5ZXHRflbapFFDVeqt3pD0vy6d1pjYhT4fFi0Pd/RnYcJbSIaDgiTOWGKJaDDudWWqiA4KbIMdFQdwVoGbPMdFDSB/jF06Zj89sPCOxrWAmr0Z9S1SFCOzfK6uVDbunBBcGFH7Vdx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kXBzap/g; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jcOx08Jc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 932D6C4CEDD;
-	Sun,  9 Feb 2025 10:21:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739096502;
-	bh=ljE5yUYKD7VORy12kAg7aDzprFkq/ZEsUxC+fJE/JKw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jcOx08JcDQwd/5MPhSO5Me7KQAI6EDSijqvqQAb+Ga00Cd1eZFfYBIxLr1pR7tS32
-	 eNFzyH8DMqHA14LFKNe/5I29sWf4VBMLhPo+uA55qGdlKvINLqcISmKrdf/wia5RzC
-	 4+4Iaul0PXoqN2/fVYj0FKQuyT5CthpRALR3EHtQny1ABMAVMyelZnpfdAEr7UiLBE
-	 Qc9nmiijGeOgF2BWyXbYwYt6IrKjl1AvO6RtWJsUlwB+7f43ZnHL+M2+Vcu3gOu1Dq
-	 mh/mu4Al8vhQEWSQPKU4RYAqMOAtOyxMTTuSOb12AzVipiGjAXj3JZM3bdehzTx9EX
-	 IQGD5RihQ+CqQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1th4RW-0029ai-4E;
-	Sun, 09 Feb 2025 10:21:39 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kXBzap/g"
+Date: Sun, 9 Feb 2025 23:25:20 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739172327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hwD1lIdtcJvdTFhSGkZrNjpxJv3lx+G0x/gy4Oqkqlg=;
+	b=kXBzap/gTr4HWJcRXQDm7DOBGfeTNHMzoNaXlGUNiV7By6TX5/ld3/RKw3r36+uzamfZRI
+	9kgaxEmEWNycuEOd4PYpqoSR5TDvsEOojoBeDhe2bivBUMSPju67z9EPUaf4pn2VbQBK1g
+	p83LqS1ZQhg3kef6BQ6B20f6CBvi5hs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] Fixes for pKVM NP-guest support
-Date: Sun,  9 Feb 2025 10:21:33 +0000
-Message-Id: <173909647948.1598393.13009014212384755720.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250207145438.1333475-1-qperret@google.com>
-References: <20250207145438.1333475-1-qperret@google.com>
+	Mark Rutland <mark.rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH v2 2/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+Message-ID: <Z6mp4NeklzORJg5y@linux.dev>
+References: <20250208020111.2068239-1-coltonlewis@google.com>
+ <20250208020111.2068239-3-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, tabba@google.com, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250208020111.2068239-3-coltonlewis@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 07 Feb 2025 14:54:36 +0000, Quentin Perret wrote:
-> Here are two patches to deal with a race between the handling of
-> permission faults and MMU notifiers with pKVM that I found by
-> inspection. Specifically, pKVM gets thoroughly confused when it doesn't
-> find a page mapped in its relax_perm path, while standard KVM deals
-> with that trivially thanks to the -EAGAIN special case in
-> user_mem_abort(). The second patch addresses the problem by simplifying
-> the implementation of multiple pKVM hypercalls, which also has the nice
-> side effect of improving locking by not taking the global host stage-2
-> lock as much.
+Hi Colton,
+
+On Sat, Feb 08, 2025 at 02:01:09AM +0000, Colton Lewis wrote:
+> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+> allowed, EL0 while counters HPMN..N are only accessible by EL2.
 > 
-> [...]
+> Introduce a module parameter in the PMUv3 driver to set this
+> register. The name reserved_host_counters reflects the intent to
+> reserve some counters for the host so the guest may eventually be
+> allowed direct access to a subset of PMU functionality for increased
+> performance.
+> 
+> Track HPMN and whether the pmu is partitioned in struct arm_pmu
+> because KVM will need to know that to handle guests correctly.
+> 
+> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
+> specifically disallows that case because it's not useful given the
+> intention to allow guests access to their own counters.
 
-Applied to fixes, thanks!
+Quite the contrary.
 
-[1/2] KVM: arm64: Improve error handling from check_host_shared_guest()
-      commit: c53fbdb60fb61fd6bda2bc0dc89837966625c5dc
-[2/2] KVM: arm64: Simplify np-guest hypercalls
-      commit: eabc7aaef7a553b64bf6e631ce04526af6c8d104
+FEAT_HPMN0 is useful if userspace wants to provide a vPMU that has a
+fixed cycle counter w/o event counters. Certain OSes refuse to boot
+without it...
 
-Cheers,
+> static inline u32 read_mdcr(void)
+> {
+> 	return read_sysreg(HDCR);
+> }
+> 
+> static inline void write_mdcr(u32 val)
+> {
+> 	write_sysreg(val, HDCR);
+> }
+> 
 
-	M.
+Hmm... While this fixes the 32bit compilation issues, it opens a new can
+of worms.
+
+VHE is a 64bit only feature, so you're *guaranteed* that these accessors
+will undef (running at EL1).
+
+> +static void armv8pmu_partition(u8 hpmn)
+> +{
+> +	u64 mdcr = armv8pmu_mdcr_read();
+> +
+> +	mdcr &= ~ARMV8_PMU_MDCR_HPMN;
+> +	mdcr |= FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
+> +	/* Prevent guest counters counting at EL2 */
+> +	mdcr |= ARMV8_PMU_MDCR_HPMD;
+> +
+> +	armv8pmu_mdcr_write(mdcr);
+> +}
+> +
+
+After giving this a read, I don't think the host PMU driver should care
+about MDCR_EL2 at all. The only time that 'guest' events are loaded into
+the PMU is between vcpu_load() / vcpu_put(), at which point *KVM* has
+reconfigured MDCR_EL2.
+
+I'm not sure if there's much involvement with the host PMU driver beyond
+it pinky-swearing to only use the specified counters. KVM is what
+actually will program HPMN.
+
+That'd alleviate the PMU driver from having VHE awareness or caring
+about MDCR_EL2.
+
 -- 
-Without deviation from the norm, progress is not possible.
-
-
+Thanks,
+Oliver
