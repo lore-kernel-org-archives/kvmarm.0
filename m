@@ -1,116 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467601C5D7A;
-	Mon, 10 Feb 2025 10:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323B51CB31D
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 10:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739183828; cv=none; b=Sc3kWZp0DUMYuULEpxb6Eg4HqRJ9SKHKaGq8kmrqoThBGiP1EI9Jc/LbVBqfUARmdd41P2Zu/e63QfZZO5cGzFnE5DO5Nj91cNeGeMtni3lrMoIcFHPSvpjyfJdsIfI98JsAb4z9HWG2xb/RPCxRg+z5qJA34mThe1ynU1hFKws=
+	t=1739184127; cv=none; b=BlcEW2n1Cgn5wQxUkMH2uarhtGUuUftBPrkGx1J5IRVy5KvboqQG6vOk+ngGjq1LB1TuXvmT7Ms9PGyS5Rbp8tGjLph7FgfzI12UAqOXOx+ovEX36cua488i29ugFvGT9hI+d2j8sy2ib4TM+B/grNWJhx+sELkySKHFZr+nGXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739183828; c=relaxed/simple;
-	bh=pG6Tqs286wmBxiyIrD2niNQiQm0sXRVyX326LKA8yac=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qLRr7Cxhv8UqBywU9POn1o1JBlnC348AVbSZGXqjrqMNDLddm5p+iq+bRzBQET0rIcdyRAj+bLD4hZzniqXLSFYxn+K9IDF9HMMi3Q0zCJRTQikXo7zw5y9tjKNKsP9hW2bqnYJyyuKvjv5Ul+oz3eDgiJzHHSZhjcRez2aIkhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGKkoYP5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGKkoYP5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B843CC4CED1;
-	Mon, 10 Feb 2025 10:37:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739183827;
-	bh=pG6Tqs286wmBxiyIrD2niNQiQm0sXRVyX326LKA8yac=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AGKkoYP5igiaE1J04wDcluloHolkVn+i1DkGIKSRHw/WVHn06EeyuUTTHQFlcTgQy
-	 Zm2jZaJJp3/Sb2nPukzabStV9ktJQBSShcHgxRdx/pYdCh0OoQKxX8S1EZDFMbianH
-	 nMD0yc6gSeonoa+toHfJEHl62XweOaUvAr89dVAMd9oED8Z9kWvVB3nY/lP0GRChw5
-	 uHKRifwfQbB6Odot3TmdJfSssXjOOSSgB+srR7MWDP04Ss3fKsVhqgWJdKcNjLO9v3
-	 w4MqcV9Oo0HWrsMpLTPvN4MFS9bR1TLSpwvj6TVOnldmhDwp5/ZH1dzSxqsLs+6UlH
-	 hJ4EWFlMHmTvA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1thRA1-002VDH-6q;
-	Mon, 10 Feb 2025 10:37:05 +0000
-Date: Mon, 10 Feb 2025 10:37:03 +0000
-Message-ID: <867c5yt7ao.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: kernel test robot <lkp@intel.com>,
-	llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm <kvmarm@lists.linux.dev>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvmarm:fixes 18/18] arch/arm64/kvm/hyp/nvhe/mem_protect.c:1086:9: warning: variable 'ret' is uninitialized when used here
-In-Reply-To: <Z6nKYtyJO2bNycJw@google.com>
-References: <202502100911.8c9DbtKD-lkp@intel.com>
-	<868qqetasm.wl-maz@kernel.org>
-	<Z6nKYtyJO2bNycJw@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1739184127; c=relaxed/simple;
+	bh=jq/HIHgfHgdifwYmPIbidSugf6VXqeVQV7y6gzurIYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MByXasm9wH8tJ+/vbF5/5EFEVOyrEhGjut6tUsy6YjTMFcux/k5+hwsZzso1IRoahB3ylyqSmKA8DVEifl5m/2YbYP8/EalZTaF7rmIHU5PG5k8RJ75CwXacDh5+lQECQVOW3wCC6Vkebzg2g1Cq8s5SR67MjokW1COL7owoFW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35AA11BA8;
+	Mon, 10 Feb 2025 02:42:27 -0800 (PST)
+Received: from arm.com (unknown [10.57.76.200])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 510A33F58B;
+	Mon, 10 Feb 2025 02:41:58 -0800 (PST)
+Date: Mon, 10 Feb 2025 10:41:53 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 03/18] scripts: Refuse to run the tests
+ if not configured for qemu
+Message-ID: <Z6nX8YC8ZX9jFiLb@arm.com>
+References: <20250120164316.31473-1-alexandru.elisei@arm.com>
+ <20250120164316.31473-4-alexandru.elisei@arm.com>
+ <20250121-45faf6a9a9681c7c9ece5f44@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, lkp@intel.com, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250121-45faf6a9a9681c7c9ece5f44@orel>
 
-On Mon, 10 Feb 2025 09:44:02 +0000,
-Quentin Perret <qperret@google.com> wrote:
-> 
-> On Monday 10 Feb 2025 at 09:21:29 (+0000), Marc Zyngier wrote:
-> > On Mon, 10 Feb 2025 01:39:04 +0000,
-> > kernel test robot <lkp@intel.com> wrote:
-> > > 
-> > > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git fixes
-> > > head:   eabc7aaef7a553b64bf6e631ce04526af6c8d104
-> > > commit: eabc7aaef7a553b64bf6e631ce04526af6c8d104 [18/18] KVM: arm64: Simplify np-guest hypercalls
-> > > config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20250210/202502100911.8c9DbtKD-lkp@intel.com/config)
-> > > compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-> > > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250210/202502100911.8c9DbtKD-lkp@intel.com/reproduce)
-> > > 
-> > > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > > the same patch/commit), kindly add following tags
-> > > | Reported-by: kernel test robot <lkp@intel.com>
-> > > | Closes: https://lore.kernel.org/oe-kbuild-all/202502100911.8c9DbtKD-lkp@intel.com/
-> > > 
-> > > All warnings (new ones prefixed by >>):
-> > > 
-> > > >> arch/arm64/kvm/hyp/nvhe/mem_protect.c:1086:9: warning: variable 'ret' is uninitialized when used here [-Wuninitialized]
-> > >     1086 |         return ret;
-> > >          |                ^~~
-> > >    arch/arm64/kvm/hyp/nvhe/mem_protect.c:1076:9: note: initialize the variable 'ret' to silence this warning
-> > >     1076 |         int ret;
-> > >          |                ^
-> > >          |                 = 0
-> > >    1 warning generated.
-> > 
-> > Nice catch. I wish the compiler would warn for these by default...
-> 
-> So do I...
-> 
-> > Quentin, are you happy with the following patch that I can stash on
-> > top of the current set of fixes?
-> 
-> Absolutely, thanks for the patch and sorry the mess!
-> 
->     Reviewed-by: Quentin Perret <qperret@google.com>
+Hi Drew,
 
-Now queued and pushed out.
+On Tue, Jan 21, 2025 at 03:48:55PM +0100, Andrew Jones wrote:
+> On Mon, Jan 20, 2025 at 04:43:01PM +0000, Alexandru Elisei wrote:
+<snip>
+> > ---
+> >  arm/efi/run             | 8 ++++++++
+> >  arm/run                 | 9 +++++++++
+> >  run_tests.sh            | 8 ++++++++
+> >  scripts/mkstandalone.sh | 8 ++++++++
+> >  4 files changed, 33 insertions(+)
+<snip>
+> > +case "$TARGET" in
+> > +qemu)
+> > +    ;;
+> > +*)
+> > +    echo "'$TARGET' not supported for standlone tests"
+> > +    exit 2
+> > +esac
+> 
+> I think we could put the check in a function in scripts/arch-run.bash and
+> just use the same error message for all cases.
 
-LKP people: please fix the mailing address you are using, as it
-changed over two years ago, and you're still using the old one.
+Coming back to the series.
+
+arm/efi/run and arm/run source scripts/arch-run.bash; run_tests.sh and
+scripts/mkstandalone.sh don't source scripts/arch-run.bash. There doesn't
+seem to be a common file that is sourced by all of them.
+
+How about creating a new file in scripts (vmm.bash?) with only this
+function?
 
 Thanks,
+Alex
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Thanks,
+> drew
+> 
+> > 
+> > -- 
+> > kvm-riscv mailing list
+> > kvm-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/kvm-riscv
