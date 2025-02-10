@@ -1,124 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1932441A1
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4F1241114;
+	Mon, 10 Feb 2025 15:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739202605; cv=none; b=leu9XC5vKCwiTAph44vQWxT3P2IrsCA1szjANglw3v4VYCF6R5UbKFX/00PzH62JJAgFsUprKoURsRLel6XbZnQvPwTnkzPSZwrpPSB/+hARpfoTRP2WARv5Mnz3HXXv3CnUZcDapEcKWcqkKcUrtsx89B2OCW3KBNTRVT+pAuQ=
+	t=1739203058; cv=none; b=F8ypmJK+bQQaKfvyxmSW6TJPt063YygA97XGb95TJ3fz1qWu8xCsU/9D/nPO7L/Cpd691qF+HCZ4MmP4X1NccV2nd/c9Y0crUS/RUzik4BWhQTkBv9+ELhMigoTUzf8Wpp7dEuqWrZgqXwHpRQ3+R/YPER8Clx7HL4omg7JNz4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739202605; c=relaxed/simple;
-	bh=JwX0FTJ7E53zMSff4xw/NDJGkvTh/vf9GUmKygpIM2k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=BBI/+cdQBmFdp7fMk90Wc9gBhtHKeFUc8CL7vLCnFpFIOv6d59gHiok8+6CRbbAvnPUbbiyXD9bWeOggnCN9XvsK32JKdoSTBw38ZpX+NO+VmDO7NPwGu2QTds+pU9DVt34HqjJqHoARPfLaHD3XehvNcxQ4+nbIahSl79IveQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZLPuOQFu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739203058; c=relaxed/simple;
+	bh=IUVaMNro/n/NUpJq8hNviZGcAVuVV7Lxbz8xW3JZfE8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hy++7A3u+LorXPeSEonhcNn5PJiN/a1ggYx4kj/HR5Sgs9ouJEHw4xrWdmaPxgK+wXebjhLnWTanWHeKeArHYqOX9IvqyH/K1aXmCibA5UDbavcC5BQxb5dNuukrS0xlulqgo54nLB8RQC5lR1ixqC0UcP33YzbPhlmh/bWkWFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qvf2KvAN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLPuOQFu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739202603;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BLF8Cf/xB+6V3hagRkehtOvA3nhCvcxfhJ41oAzlRW8=;
-	b=ZLPuOQFun7vNbHcb92kiCUxiHUAV9kJ7AoDP1SvAY/3ra1BjvBzkaJ3dHvuAW81PQD11qa
-	4dEFNNAZqC/b/9mwfoh8MWlw+PO/gb8WdPGMb4RP4fhjhvNZDYUSb0RrbP1viSXT1c9bOY
-	nwjExcmKG/Zry+PB+fz6/E14zX0kim0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-575-6PvneRxKNCes7C_pRYfEag-1; Mon, 10 Feb 2025 10:50:01 -0500
-X-MC-Unique: 6PvneRxKNCes7C_pRYfEag-1
-X-Mimecast-MFC-AGG-ID: 6PvneRxKNCes7C_pRYfEag
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43945f32e2dso7753605e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:50:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739202600; x=1739807400;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BLF8Cf/xB+6V3hagRkehtOvA3nhCvcxfhJ41oAzlRW8=;
-        b=E4IKjti7w5FRPeb+SYwqm17I+r78voVyg2cP3tjnTixAvwJPqEizp48lmz1B5watVZ
-         ht6HDzELd2AOxJCRvAspxq0nzoZ9PJrh+gFV0K1hRdL4t2eF9WEe/ySgM1JAMIOJPwef
-         Pv0blDVsGJkd1W+ne/ThwDB8JJUgiyVcJXii4kYtwjsXcKr5I7WFlTIJdmpdnNumFH8w
-         +hM1DbHxiYgNuDsgVDmVPYl+xmfVWnrTVjZ/1156yePb87L0U+Wb3K3/IkaYQrn9X/90
-         UrKKZI3xnmx81l/czEssDtnwZBp4+RZuLg50PqQ1hzw96rMzYIiPk875OcJZZVfuzqCU
-         GpkA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdbFQj7SHeR4OJygvhgbf+2ZX1RPvaNVk90Etbx2l9ZF6xT4hOquSOQHKFC7ezHtLouX/f3lg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxStlHJ+A/8GkWsAAu1i/o9o/gkFqfwlqabt47xA3hF4zWv9LTM
-	1b3u3sSHAVQrQduIF2wlsVodfgS1kZ0X7wP6Ipxhhx/JLYkmnqwvZ5QLIHaDkslbkvgJUfg2jvA
-	pVtTrecZbLTgjeEGjkFX8+hgkl9kwN3SUUtaw6/xQCEQFA6v9to61xg==
-X-Gm-Gg: ASbGncs3GMZAdLCCFuGXgtxI0Z+GBNNQjeKIwU7e10ZmG4ZeNNlsRh0dcJePX2zXNZ8
-	WkBXikzGLkuqB/zRVuL1Q8oeAsHcYfNl3b0nwZYziQQybEpq0m8767xdnpAG3eR+ts+aKe7hrvy
-	lP3ResF7BY/dP/H48VP5dvASRg81NTVfmRpfqyn90fRbRqpLueCsxgxBudDaRRqe9tcOgiknrFJ
-	+D7gWHxLiFbn3Ai9Y1naz4CAuwoSNK4kV6sa6jnmHiO72A9Hmdz/RSHA8d2xVbwuPpFb8qd4I1N
-	CDsBMhcoZmkTSNMwJyiSYvKJH1YrComOekoqMYoMgrzj57tMMMOM4qT4Zb9GXqY2wic=
-X-Received: by 2002:a05:600c:3d06:b0:436:2238:97f6 with SMTP id 5b1f17b1804b1-4392f1b8e78mr67201645e9.1.1739202600503;
-        Mon, 10 Feb 2025 07:50:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHO3zxKwhpNf5G9RIMWhyWsZJwinpmx8lRLWXcdVcXxH5R1Bp8BJUV0bb9Jd4M71qBY3iU3wQ==
-X-Received: by 2002:a05:600c:3d06:b0:436:2238:97f6 with SMTP id 5b1f17b1804b1-4392f1b8e78mr67201305e9.1.1739202600117;
-        Mon, 10 Feb 2025 07:50:00 -0800 (PST)
-Received: from rh.fritz.box (p200300f6af0e4d00dda53016e366575f.dip0.t-ipconnect.de. [2003:f6:af0e:4d00:dda5:3016:e366:575f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da96502sm153559395e9.1.2025.02.10.07.49.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 07:49:59 -0800 (PST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: Cornelia Huck <cohuck@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: arm64: trap guest access for REVIDR_EL1 and AIDR_EL1
-Date: Mon, 10 Feb 2025 16:49:53 +0100
-Message-ID: <20250210154953.27002-5-sebott@redhat.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250210154953.27002-1-sebott@redhat.com>
-References: <20250210154953.27002-1-sebott@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qvf2KvAN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92A22C4CED1;
+	Mon, 10 Feb 2025 15:57:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739203057;
+	bh=IUVaMNro/n/NUpJq8hNviZGcAVuVV7Lxbz8xW3JZfE8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qvf2KvANahCKQixPfrU2EYKluYYQbSmFYrMVshayoWeC0i3RWiHnakhF/F1VlDVQB
+	 zFsXk7cFnBXI3qaW9YFYhD1JAHfeRhmEyZBAPQrDabl3/IeS/V3KlCE6G9PpzE8M+n
+	 Tfw+bWZ2zr7xb0Y0a5zXTZp/zeF4V5ZXC4BkEtrA82nPKQnwvzI2vwtcq7WKmLxN06
+	 ER9mWKm7K6NLKTYwxJraqcvwhL2PWbVxLjtc0iQ7qtQHoAt+T0PmkVEupDJXv1+ITz
+	 Hkb9wF8nJD+WKv83faLjTS2Q2GKjEcKP52utBdHqNLiXYimaFOhbRl3E9PEydlebMd
+	 0nY1vqKJC2WAA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1thWAB-002cIl-9U;
+	Mon, 10 Feb 2025 15:57:35 +0000
+Date: Mon, 10 Feb 2025 15:57:34 +0000
+Message-ID: <864j11u70x.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: Question about lock_all_vcpus
+In-Reply-To: <dd333b6d05e2757daf0dffa17ae9af5eb3498e05.camel@redhat.com>
+References: <dd333b6d05e2757daf0dffa17ae9af5eb3498e05.camel@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: lH6p06FagNgSmT3sv1cP0SwpAsPO0PjxZMUOhAEBskI_1739202600
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mlevitsk@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Setup a trap for guest access of REVIDR_EL1 and AIDR_EL1 when
-the VMs value differs from hardware.
+On Thu, 06 Feb 2025 20:08:10 +0000,
+Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> 
+> Hi!
+> 
+> KVM on ARM has this function, and it seems to be only used in a couple of places, mostly for
+> initialization.
+> 
+> We recently noticed a CI failure roughly like that:
 
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- arch/arm64/kvm/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Did you only recently noticed because you only recently started
+testing with lockdep? As far as I remember this has been there
+forever.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7d588fedb50a..2918872e3d2a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4910,6 +4910,10 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 	else
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
- 
-+	if ((kvm_read_vm_id_reg(kvm, SYS_REVIDR_EL1) != read_sysreg(REVIDR_EL1)) ||
-+	    (kvm_read_vm_id_reg(kvm, SYS_AIDR_EL1) != read_sysreg(AIDR_EL1)))
-+		vcpu->arch.hcr_el2 |= HCR_TID1;
-+
- 	if (vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
- 
+> 
+> [  328.171264] BUG: MAX_LOCK_DEPTH too low!
+> [  328.175227] turning off the locking correctness validator.
+> [  328.180726] Please attach the output of /proc/lock_stat to the bug report
+> [  328.187531] depth: 48  max: 48!
+> [  328.190678] 48 locks held by qemu-kvm/11664:
+> [  328.194957]  #0: ffff800086de5ba0 (&kvm->lock){+.+.}-{3:3}, at: kvm_ioctl_create_device+0x174/0x5b0
+> [  328.204048]  #1: ffff0800e78800b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.212521]  #2: ffff07ffeee51e98 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.220991]  #3: ffff0800dc7d80b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.229463]  #4: ffff07ffe0c980b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.237934]  #5: ffff0800a3883c78 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.246405]  #6: ffff07fffbe480b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> 
+> 
+> ..
+> ..
+> ..
+> ..
+> 
+> 
+> As far as I see currently MAX_LOCK_DEPTH is 48 and the number of
+> vCPUs can easily be hundreds.
+
+512 exactly. Both of which are pretty arbitrary limits.
+
+> 
+> Do you think that it's possible? or know if there were any efforts
+> to get rid of lock_all_vcpus to avoid this problem? If not possible,
+> maybe we can exclude the lock_all_vcpus from the lockdep validator?
+
+I'd be very wary of excluding any form of locking from being checked
+by lockdep, and I'd rather we bump MAX_LOCK_DEPTH up if KVM is enabled
+on arm64. it's not like anyone is going to run that in production
+anyway. task_struct may not be happy about that though.
+
+The alternative is a full stop_machine(), and I don't think that will
+fly either.
+
+> AFAIK, on x86 most of the similar cases where lock_all_vcpus could
+> be used are handled by assuming and enforcing that userspace will
+> call these functions prior to first vCPU is created an/or run, thus
+> the need for such locking doesn't exist.
+
+This assertion doesn't hold on arm64, as this ordering requirement
+doesn't exist. We already have a bunch of established VMMs doing
+things in random orders (QEMU being the #1 offender), and the sad
+reality of the Linux ABI means this needs to be supported forever.
+
+Thanks,
+
+	M.
+
 -- 
-2.42.0
-
+Without deviation from the norm, progress is not possible.
