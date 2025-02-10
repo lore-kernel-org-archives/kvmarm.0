@@ -1,127 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4F1241114;
-	Mon, 10 Feb 2025 15:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC0E2500DA
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 18:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739203058; cv=none; b=F8ypmJK+bQQaKfvyxmSW6TJPt063YygA97XGb95TJ3fz1qWu8xCsU/9D/nPO7L/Cpd691qF+HCZ4MmP4X1NccV2nd/c9Y0crUS/RUzik4BWhQTkBv9+ELhMigoTUzf8Wpp7dEuqWrZgqXwHpRQ3+R/YPER8Clx7HL4omg7JNz4I=
+	t=1739210681; cv=none; b=HjAcfxF3W6mh1KCCLTk4QW5wTdtJrNMrcjf2/ZsCl623lgIyWuXmhd+R9ZdGXjNAk1krwS/itaLhTll6HWUhPhq+Icbf0T9u4jSxouF7PwGecykCzLT5liQIJJiHIQtxBED5WEWRhNZ0r7zLrSNSyoG3a8qENSeKvLlNm0Q7tSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739203058; c=relaxed/simple;
-	bh=IUVaMNro/n/NUpJq8hNviZGcAVuVV7Lxbz8xW3JZfE8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hy++7A3u+LorXPeSEonhcNn5PJiN/a1ggYx4kj/HR5Sgs9ouJEHw4xrWdmaPxgK+wXebjhLnWTanWHeKeArHYqOX9IvqyH/K1aXmCibA5UDbavcC5BQxb5dNuukrS0xlulqgo54nLB8RQC5lR1ixqC0UcP33YzbPhlmh/bWkWFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qvf2KvAN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qvf2KvAN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92A22C4CED1;
-	Mon, 10 Feb 2025 15:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739203057;
-	bh=IUVaMNro/n/NUpJq8hNviZGcAVuVV7Lxbz8xW3JZfE8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qvf2KvANahCKQixPfrU2EYKluYYQbSmFYrMVshayoWeC0i3RWiHnakhF/F1VlDVQB
-	 zFsXk7cFnBXI3qaW9YFYhD1JAHfeRhmEyZBAPQrDabl3/IeS/V3KlCE6G9PpzE8M+n
-	 Tfw+bWZ2zr7xb0Y0a5zXTZp/zeF4V5ZXC4BkEtrA82nPKQnwvzI2vwtcq7WKmLxN06
-	 ER9mWKm7K6NLKTYwxJraqcvwhL2PWbVxLjtc0iQ7qtQHoAt+T0PmkVEupDJXv1+ITz
-	 Hkb9wF8nJD+WKv83faLjTS2Q2GKjEcKP52utBdHqNLiXYimaFOhbRl3E9PEydlebMd
-	 0nY1vqKJC2WAA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1thWAB-002cIl-9U;
-	Mon, 10 Feb 2025 15:57:35 +0000
-Date: Mon, 10 Feb 2025 15:57:34 +0000
-Message-ID: <864j11u70x.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: Question about lock_all_vcpus
-In-Reply-To: <dd333b6d05e2757daf0dffa17ae9af5eb3498e05.camel@redhat.com>
-References: <dd333b6d05e2757daf0dffa17ae9af5eb3498e05.camel@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1739210681; c=relaxed/simple;
+	bh=ksvS5XX7xX64IlxGvydgg2Jy1f9U1hAJdVFTbzlcyK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SjWCVwdIroDaIB0Vd3TehsC50KWKYW/tL8b7mukqCcp1Jub7cIC9Bbql06aDk6nSqJs/bAQHoshegAaeD52Js9EcDUO4o3U7r0bst8mG7yzTDlTNZzRhnt7uBgScsq4DOsmiKi01yejsWvLjUwlxKuOpGrxElzohJTn/SVcslqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D671B1477;
+	Mon, 10 Feb 2025 10:04:58 -0800 (PST)
+Received: from arm.com (e134078.arm.com [10.1.26.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58DAB3F58B;
+	Mon, 10 Feb 2025 10:04:32 -0800 (PST)
+Date: Mon, 10 Feb 2025 18:04:29 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 03/18] scripts: Refuse to run the tests
+ if not configured for qemu
+Message-ID: <Z6o/rbweZttGReir@arm.com>
+References: <20250120164316.31473-1-alexandru.elisei@arm.com>
+ <20250120164316.31473-4-alexandru.elisei@arm.com>
+ <20250121-45faf6a9a9681c7c9ece5f44@orel>
+ <Z6nX8YC8ZX9jFiLb@arm.com>
+ <20250210-640ff37c16a0dbccb69f08ea@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mlevitsk@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210-640ff37c16a0dbccb69f08ea@orel>
 
-On Thu, 06 Feb 2025 20:08:10 +0000,
-Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> 
-> Hi!
-> 
-> KVM on ARM has this function, and it seems to be only used in a couple of places, mostly for
-> initialization.
-> 
-> We recently noticed a CI failure roughly like that:
+Hi Drew,
 
-Did you only recently noticed because you only recently started
-testing with lockdep? As far as I remember this has been there
-forever.
+On Mon, Feb 10, 2025 at 02:56:25PM +0100, Andrew Jones wrote:
+> On Mon, Feb 10, 2025 at 10:41:53AM +0000, Alexandru Elisei wrote:
+> > Hi Drew,
+> > 
+> > On Tue, Jan 21, 2025 at 03:48:55PM +0100, Andrew Jones wrote:
+> > > On Mon, Jan 20, 2025 at 04:43:01PM +0000, Alexandru Elisei wrote:
+> > <snip>
+> > > > ---
+> > > >  arm/efi/run             | 8 ++++++++
+> > > >  arm/run                 | 9 +++++++++
+> > > >  run_tests.sh            | 8 ++++++++
+> > > >  scripts/mkstandalone.sh | 8 ++++++++
+> > > >  4 files changed, 33 insertions(+)
+> > <snip>
+> > > > +case "$TARGET" in
+> > > > +qemu)
+> > > > +    ;;
+> > > > +*)
+> > > > +    echo "'$TARGET' not supported for standlone tests"
+> > > > +    exit 2
+> > > > +esac
+> > > 
+> > > I think we could put the check in a function in scripts/arch-run.bash and
+> > > just use the same error message for all cases.
+> > 
+> > Coming back to the series.
+> > 
+> > arm/efi/run and arm/run source scripts/arch-run.bash; run_tests.sh and
+> > scripts/mkstandalone.sh don't source scripts/arch-run.bash. There doesn't
+> > seem to be a common file that is sourced by all of them.
+> 
+> scripts/mkstandalone.sh uses arch-run.bash, see generate_test().
+
+Are you referring to this bit:
+
+generate_test ()
+{
+	<snip>
+        (echo "#!/usr/bin/env bash"
+         cat scripts/arch-run.bash "$TEST_DIR/run")
+
+I think scripts/arch-run.bash would need to be sourced for any functions defined
+there to be usable in mkstandalone.sh.
+
+What I was thinking is something like this:
+
+if ! vmm_supported $TARGET; then
+	echo "$0 does not support '$TARGET'"
+	exit 2
+fi
+
+Were you thinking of something else?
+
+I think mkstandalone should error at the top level (when you do make
+standalone), and not rely on the individual scripts to error if the VMM is
+not supported. That's because I think creating the test files, booting a
+machine and copying the files only to find out that kvm-unit-tests was
+misconfigured is a pretty suboptimal experience.
+
+> run_tests.sh doesn't, but I'm not sure it needs to validate TARGET
+> since it can leave that to the lower-level scripts.
+
+I put the check in arm/run, and removed it from run_tests.sh, and this is
+what I got:
+
+$ ./run_tests.sh selftest-setup
+SKIP selftest-setup (./arm/run does not supported 'kvmtool')
+
+which looks good to me.
 
 > 
-> [  328.171264] BUG: MAX_LOCK_DEPTH too low!
-> [  328.175227] turning off the locking correctness validator.
-> [  328.180726] Please attach the output of /proc/lock_stat to the bug report
-> [  328.187531] depth: 48  max: 48!
-> [  328.190678] 48 locks held by qemu-kvm/11664:
-> [  328.194957]  #0: ffff800086de5ba0 (&kvm->lock){+.+.}-{3:3}, at: kvm_ioctl_create_device+0x174/0x5b0
-> [  328.204048]  #1: ffff0800e78800b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.212521]  #2: ffff07ffeee51e98 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.220991]  #3: ffff0800dc7d80b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.229463]  #4: ffff07ffe0c980b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.237934]  #5: ffff0800a3883c78 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.246405]  #6: ffff07fffbe480b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> > 
+> > How about creating a new file in scripts (vmm.bash?) with only this
+> > function?
 > 
-> 
-> ..
-> ..
-> ..
-> ..
-> 
-> 
-> As far as I see currently MAX_LOCK_DEPTH is 48 and the number of
-> vCPUs can easily be hundreds.
+> If we need a new file, then we can add one, but I'd try using
+> arch-run.bash or common.bash first.
 
-512 exactly. Both of which are pretty arbitrary limits.
-
-> 
-> Do you think that it's possible? or know if there were any efforts
-> to get rid of lock_all_vcpus to avoid this problem? If not possible,
-> maybe we can exclude the lock_all_vcpus from the lockdep validator?
-
-I'd be very wary of excluding any form of locking from being checked
-by lockdep, and I'd rather we bump MAX_LOCK_DEPTH up if KVM is enabled
-on arm64. it's not like anyone is going to run that in production
-anyway. task_struct may not be happy about that though.
-
-The alternative is a full stop_machine(), and I don't think that will
-fly either.
-
-> AFAIK, on x86 most of the similar cases where lock_all_vcpus could
-> be used are handled by assuming and enforcing that userspace will
-> call these functions prior to first vCPU is created an/or run, thus
-> the need for such locking doesn't exist.
-
-This assertion doesn't hold on arm64, as this ordering requirement
-doesn't exist. We already have a bunch of established VMMs doing
-things in random orders (QEMU being the #1 offender), and the sad
-reality of the Linux ABI means this needs to be supported forever.
+common.bash seems to work (and the name fits), so I'll give that a go.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Alex
