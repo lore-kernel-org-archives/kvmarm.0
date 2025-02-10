@@ -1,152 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB24619D882;
-	Mon, 10 Feb 2025 21:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A9325EF99
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 23:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739223228; cv=none; b=MtyOMKm/mPJFHEaesDpvSdN1RX0XR/iarThu1bGDChwAL9OabNXi7ikCSOBQlvAJLGoUK7FZrc6iFi6P3IuL1JBj6IJ0YJlehi2EMa3PoqSSr2oJEa1U6XWkOh7J2j4neJbTWhemth8tNNfmkASwonNYILDkK04baTe37s8NCps=
+	t=1739228878; cv=none; b=IG07aI51trJn6vnEVjBNVoVXL/MEozp27B+aLxj1zwucWlXPsaS0Rs+1Y/0iR+916UIFP49azNsJxicoGTQnrEWFfcH+MFKLdWtxTN3wrl8/TFWynRax6h+QDuXRbS/OKgIlJZ62F9yTqjcan/7Ioi6CzwKFiUfmT/QMseCDBrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739223228; c=relaxed/simple;
-	bh=1drrGjPU44nrH4vEhvtFt2+xQt61WJAY+SI+N/d+RYI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J0ofohVkBDxVayMIRdLFGe0DCoD2JFbs7FBdeWNYEijp/pDNRJm4yPuKWpjBjDZmROXgClTXi3E6My5LeB30H5d1Tny4f6dywWwAvpOOEj8l8aGldcdMj+DO0mv96bjzIghicXW5v4DIumXz9Qp68zaMGxGkG1XBEXsN947fCYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mmG2C0je; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739228878; c=relaxed/simple;
+	bh=AxQ0BatG3tWnwllw3i3I8ZpefXtmDeo0wa5eJwy1kCw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=R0Pc5m8BcUyctreSQiTakZKnHU3mDxnCLzVVjbwSEFfH8CxbfckEdinFDwAeRmdESPb9qOlvDFu5D7ydpvgyy59tdotAuZZZJQPYSi6pR4tR2Wu0AiZy4uAR9ieVcxcbIZiyEWZySSjlLeOtk4WJ8YO2vbCP8VuC9FmapMG3tHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XrXTcPzV; arc=none smtp.client-ip=209.85.166.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mmG2C0je"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4E3C4CED1;
-	Mon, 10 Feb 2025 21:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739223227;
-	bh=1drrGjPU44nrH4vEhvtFt2+xQt61WJAY+SI+N/d+RYI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=mmG2C0jeXE/CmSjuTtgvhykEJM34pFG7DAzLJHNLh8v+OoLq0J4WFolOo4zcbd3o/
-	 ouefM9vIw85T+xWG2N67yQFZftsZ2mo2hufZ3Hj9fBzWaIYUab6QYSpVwOrgJNjFL9
-	 tDSUyIF2vIWbqkErpzUQlR9rcFke9DGiYXzekLvpTZwEB30yN47RWMrBnRQ4JDT5zN
-	 0L9BK4dnHz/q24yJPrNiKNSGMQ8TNIY+TzUOEWbdJTUsCiOlujdD3n4qFRlKlKa/oK
-	 fHoJz8aJpJDaZgwomMKm5pWiyadmVAJAu0WUCtgavX4Tll802OXKyeLzh9M3GE2tkY
-	 aW41wjqNyqHOA==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 10 Feb 2025 21:33:32 +0000
-Subject: [PATCH v6] KVM: arm64: Fix confusion in documentation for pKVM SME
- assert
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XrXTcPzV"
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3d14a3f812fso64129035ab.3
+        for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:07:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739228875; x=1739833675; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NzOtRn06dmJeLMt6lIohnur0KCLnTsq8EA/pFJWvUPc=;
+        b=XrXTcPzVzawNGZyzgN+hPSlsUCtpo8dzgXFpM84zOXCVnKaEpkUQEF1hdFhOkGBZpm
+         3xTAgDZiuff2MhddHDA7vwolAeZoCx9gfExJJFvdBK/zQCf0SgDvMjDSegoDjBghqbzu
+         j8t/Vkgmcc+LwOTo252O+NPj0STBwkqV2lS+5b/iribGgqxfnhy9BRqZNq4tt+QII/iZ
+         soW06rB5ugIVdj1HBbj5quv3zFOamAOgxzn3FNBV1kPtpULI0aih3mHHfs2IIfXpuhpJ
+         ML/TQNZmsSjwFgYF0lv06Rms7/ipozMDgrkIt57rrv8MEpPp/Zw1GK9EqjqQQuNTY3V/
+         Eytw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739228875; x=1739833675;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NzOtRn06dmJeLMt6lIohnur0KCLnTsq8EA/pFJWvUPc=;
+        b=YkU26I1QaY2L/m9MAQf08IMuGMjpq4CKNn8VGvUNeMTssNQ89L+d9piqrKB/wdwoVp
+         xr4ER2fb8eL2qX9qx4m1dlE/J14CtQQtciYN0RROZtcJtSFkbgyoJF2iAIBK63gJ0mfA
+         Ks+Qo++0bepr13MQID6jZB3E463+MIDdiPVXakLLLB+gcbabNtKSjCRj8Ko1h37xLKMC
+         7Vd+/ypSt6e4s9257gdScxZEdk1w4B6T3tgdHiec4rWFQqQTCXgjm/qReCY0OAdG7uTn
+         GD59mTENJDTF9zvNUDgcq4jmgGu3bViGkVwQUwsas88ByfcNz+wUTShLePsmcdpkKEHX
+         WzoA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1tA3EEwfeeBNZSwFJQRj8j1Wu/dWpFxGPwt5VNoVpg6298JranwWfwhFmqoh5Q3LuvpCixFc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxzxIm13pMoKasaRlSGl7E4vzVgB0ZUluNqfQZmNwpVBqfGbWm9
+	sneG8sq8oww52FaInmA9SIUukLtp7XrzxCaxb1LdQCyrREg9qYvgYRaWTTKldGRv39NP6BmcIK3
+	SgwUZE28DnXpCpdKonTEsJw==
+X-Google-Smtp-Source: AGHT+IEYUiomyuN/bGInuZpdaF2fRRM/BetqkFJjxK+LoWD1u4DPDFiIADjLJWFWyB1MEsSvhotxG42I2ZAf1MOJBQ==
+X-Received: from ilbbn13.prod.google.com ([2002:a05:6e02:338d:b0:3d0:23fd:8ce4])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:481c:b0:3cf:b626:66c2 with SMTP id e9e14a558f8ab-3d13df546c4mr121244895ab.19.1739228875706;
+ Mon, 10 Feb 2025 15:07:55 -0800 (PST)
+Date: Mon, 10 Feb 2025 23:07:54 +0000
+In-Reply-To: <Z6mp4NeklzORJg5y@linux.dev> (message from Oliver Upton on Sun, 9
+ Feb 2025 23:25:20 -0800)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250210-kvm-arm64-sme-assert-v6-1-cc26c46d1b43@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKtwqmcC/4XOTWrDMBAF4KsEraugnxlZyqr3KF3I1jgRqe0iB
- dESfPfIWSQpxnT5Bt735soypUiZHXZXlqjEHKexBvO2Y93Jj0fiMdTMlFAgjAB+LgP3aTDA80D
- c59q/cPShQQxA1htWq9+J+vhzZz8+az7FfJnS732lyOX6D1gklxyDsxpsEKK372dKI33tp3Rki
- 1jUq4IbiloU0E62QmjVw0rRT6XRYkPRVbHGOUAg7Nr1L/BU3KYCVdGdC30jQ2vsWsGHIpXcUrA
- qzmFnQ5BCYftHmef5BiTHWX7RAQAA
-X-Change-ID: 20240604-kvm-arm64-sme-assert-5ad755d4e8a6
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org
-Cc: Fuad Tabba <tabba@google.com>, Mark Brown <broonie@kernel.org>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-X-Mailer: b4 0.15-dev-1b0d6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3413; i=broonie@kernel.org;
- h=from:subject:message-id; bh=1drrGjPU44nrH4vEhvtFt2+xQt61WJAY+SI+N/d+RYI=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnqnC43KKyMdIxyNNobIHVoI2JQC7uPgVNQ/dl5F3p
- CqbB6wOJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ6pwuAAKCRAk1otyXVSH0A53B/
- 4r8V5baaTij1dC0zc+elLFiunWYoPKygp7SljVQVt7tJ6OZ7KAXuWorppwOIG53GLBGoSTmLXWpFfu
- /+cw93KAqqZylfxwmY7gM4UTWb8IelfkUgdiq3kZUz7YaZZMGD3NHr2WUdJZ7ImUHkvyrnC0XIq8++
- vzhkfUlhmU+8x8pAn3+XNTDhnlAI/aEGtlLl/+E0oZrWUZWevnVW8PRPvKeij/VHtBt8ZJaDfkXpWb
- JrCj8ZrKAkg4JA8wUPD/wrmB5Y9YdTc4xP7l+8HiEW/hFr/1KTJ00REz/nLlOppMxDM2biQrwPgigg
- TVDtfubygHXOum7KtekJbAsH6sbibu
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-
-As raised in the review comments for the original patch the assert and
-comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
-disabled in protected mode") are bogus. The comments says that we check
-that we do not have SME enabled for a pKVM guest but the assert actually
-checks to see if the host has anything set in SVCR which is unrelated to
-the guest features or state, regardless of if those guests are protected
-or not. This check is also made in the hypervisor, it will refuse to run
-a guest if the check fails, so it appears that the assert here is
-intended to improve diagnostics.
-
-Update the comment to reflect the check in the code, and to clarify that
-we do actually enforce this in the hypervisor. While we're here also
-update to use a WARN_ON_ONCE() to avoid log spam if this triggers.
-
-Fixes: afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are disabled in protected mode")
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
-This has been sent with v6.10 with only positive review comments after
-the first revision, if there is some issue with the change please share
-it.
-
-To: Marc Zyngier <maz@kernel.org>
+Mime-Version: 1.0
+Message-ID: <gsntfrkl1jqt.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [RFC PATCH v2 2/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-To: James Morse <james.morse@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
----
-Changes in v6:
-- Rebase onto v6.14-rc1.
-- Link to v5: https://lore.kernel.org/r/20241210-kvm-arm64-sme-assert-v5-1-995c8dd1025b@kernel.org
+Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Changes in v5:
-- Rebase onto v6.13-rc1.
-- Link to v4: https://lore.kernel.org/r/20240930-kvm-arm64-sme-assert-v4-1-3c9df71db688@kernel.org
+Hi Oliver, thanks for the review.
 
-Changes in v4:
-- Rebase onto v6.12-rc1
-- Link to v3: https://lore.kernel.org/r/20240730-kvm-arm64-sme-assert-v3-1-8699454e5cb8@kernel.org
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-Changes in v3:
-- Rebase onto v6.11-rc1.
-- Link to v2: https://lore.kernel.org/r/20240605-kvm-arm64-sme-assert-v2-1-54391b0032f4@kernel.org
+> Hi Colton,
 
-Changes in v2:
-- Commit message tweaks.
-- Change the assert to WARN_ON_ONCE().
-- Link to v1: https://lore.kernel.org/r/20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org
----
- arch/arm64/kvm/fpsimd.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+> On Sat, Feb 08, 2025 at 02:01:09AM +0000, Colton Lewis wrote:
+>> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+>> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+>> allowed, EL0 while counters HPMN..N are only accessible by EL2.
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..f3455641e9c8a65470cdeb9d7daba7d59d78748e 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/*
--	 * If normal guests gain SME support, maintain this behavior for pKVM
--	 * guests, which don't support SME.
-+	 * The pKVM hypervisor does not yet understand how to save or
-+	 * restore SME state for the host so double check that if we
-+	 * are running with pKVM we have disabled SME.  The hypervisor
-+	 * enforces this when the guest is run, this check is for
-+	 * clearer diagnostics.
- 	 */
--	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
--		read_sysreg_s(SYS_SVCR));
-+	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
-+		     read_sysreg_s(SYS_SVCR));
- }
- 
- /*
+>> Introduce a module parameter in the PMUv3 driver to set this
+>> register. The name reserved_host_counters reflects the intent to
+>> reserve some counters for the host so the guest may eventually be
+>> allowed direct access to a subset of PMU functionality for increased
+>> performance.
 
----
-base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-change-id: 20240604-kvm-arm64-sme-assert-5ad755d4e8a6
+>> Track HPMN and whether the pmu is partitioned in struct arm_pmu
+>> because KVM will need to know that to handle guests correctly.
 
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
+>> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
+>> specifically disallows that case because it's not useful given the
+>> intention to allow guests access to their own counters.
 
+> Quite the contrary.
+
+> FEAT_HPMN0 is useful if userspace wants to provide a vPMU that has a
+> fixed cycle counter w/o event counters. Certain OSes refuse to boot
+> without it...
+
+Cool. I'll make sure writing 0 is allowed if we have FEAT_HPMN0.
+
+>> static inline u32 read_mdcr(void)
+>> {
+>> 	return read_sysreg(HDCR);
+>> }
+
+>> static inline void write_mdcr(u32 val)
+>> {
+>> 	write_sysreg(val, HDCR);
+>> }
+
+
+> Hmm... While this fixes the 32bit compilation issues, it opens a new can
+> of worms.
+
+> VHE is a 64bit only feature, so you're *guaranteed* that these accessors
+> will undef (running at EL1).
+
+True. I mentioned in the cover letter they aren't intended to actually
+run in the PMU driver because I guard for VHE there.
+
+>> +static void armv8pmu_partition(u8 hpmn)
+>> +{
+>> +	u64 mdcr = armv8pmu_mdcr_read();
+>> +
+>> +	mdcr &= ~ARMV8_PMU_MDCR_HPMN;
+>> +	mdcr |= FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
+>> +	/* Prevent guest counters counting at EL2 */
+>> +	mdcr |= ARMV8_PMU_MDCR_HPMD;
+>> +
+>> +	armv8pmu_mdcr_write(mdcr);
+>> +}
+>> +
+
+> After giving this a read, I don't think the host PMU driver should care
+> about MDCR_EL2 at all. The only time that 'guest' events are loaded into
+> the PMU is between vcpu_load() / vcpu_put(), at which point *KVM* has
+> reconfigured MDCR_EL2.
+
+> I'm not sure if there's much involvement with the host PMU driver beyond
+> it pinky-swearing to only use the specified counters. KVM is what
+> actually will program HPMN.
+
+> That'd alleviate the PMU driver from having VHE awareness or caring
+> about MDCR_EL2.
+
+That does seem like a cleaner solution. I can lift that handling into
+KVM code, but I will still need the variables I introduced in struct
+arm_pmu to be populated so the driver knows what counters to use.
+
+Without looking, I'm concerned there might be an initilization ordering
+issue with that where KVM will get the value for HPMN first because it's
+initialized first but then can't store them somewhere accessible to the
+driver because the driver hasn't been initialized yet. Then the driver
+is initialized and used without knowing HPMN and is now using counters
+we wanted the guest to have.
+
+There is probably an easy way around this, but I'll need to do some
+digging.
