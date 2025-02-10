@@ -1,31 +1,31 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB2119993D
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CDC1A4F22
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739172335; cv=none; b=YFeR+Gzrk+iWrgiBai2SFqQzzq4tcnl6M0dEKq/4LS3M1nO1KJje+ULVS4sATta/opdI288+hzpvPA6P/vuMQV9XnZ1OwOFTObiF2zOZ0ufbD0Grrc3uY58DbAGfm9etSGqXMMAJP8jophBJS7VsAvqAHKLoMmbzWddrgJDMhBA=
+	t=1739173079; cv=none; b=PphT8kG2TNe+TY2AlYsi6kFvCNDiMaRguwSTxl3W+dXfHw4NNWaLxpVQ4kvx9nF2QUxIyByy5Sm8kn46WQvAFMhoJaKwCOaphFQ6jr0iPK8uv/cP0wGDimu1ovlKs87oap64aDbZWk3/THKL175JAera7h0Jn1BUQkKnxYabajA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739172335; c=relaxed/simple;
-	bh=WEi94AOxFT0BGKWJYlk93RgBEivYtkgEu7vcoa48KDE=;
+	s=arc-20240116; t=1739173079; c=relaxed/simple;
+	bh=TaXGkoKUS8R+zFSCLF80h16FwvqPvX+aex6ojMA0n/4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ox5al1iCDLHiaVm9X8UgjoT+DuFMIHFCDh5ZXHRflbapFFDVeqt3pD0vy6d1pjYhT4fFi0Pd/RnYcJbSIaDgiTOWGKJaDDudWWqiA4KbIMdFQdwVoGbPMdFDSB/jF06Zj89sPCOxrWAmr0Z9S1SFCOzfK6uVDbunBBcGFH7Vdx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kXBzap/g; arc=none smtp.client-ip=91.218.175.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=bYk0Z+5ZMVjzn9krN0SODjftxbB+rYj2Cjhrv4MRDRq+Qsln3DRYbuZ6W0JxMrn0QRW63gtYpdZsc3JQ3ODDb75XNq9twxyzP3TGLGYIbqe9bwkfKWVSvJX9zZmV5D7GUOglpOZXMJY0yqIEiXDtqWPLkObsRW1dJBCyp5ZATWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vE+uFLIC; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kXBzap/g"
-Date: Sun, 9 Feb 2025 23:25:20 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vE+uFLIC"
+Date: Sun, 9 Feb 2025 23:37:45 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739172327;
+	t=1739173074;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hwD1lIdtcJvdTFhSGkZrNjpxJv3lx+G0x/gy4Oqkqlg=;
-	b=kXBzap/gTr4HWJcRXQDm7DOBGfeTNHMzoNaXlGUNiV7By6TX5/ld3/RKw3r36+uzamfZRI
-	9kgaxEmEWNycuEOd4PYpqoSR5TDvsEOojoBeDhe2bivBUMSPju67z9EPUaf4pn2VbQBK1g
-	p83LqS1ZQhg3kef6BQ6B20f6CBvi5hs=
+	bh=ZOcYg4xLzinXROvIPIR5xsQLZpAtozt5q5hAITBaMhs=;
+	b=vE+uFLICHjimFS+ICMuI/HAxyfSAu4mZ77bZ828qh8f1L3qfRfmo59IMZeBXvGqrssiFNy
+	fCDND8KVpd50CISMkA7uHWCg7qYodaAjGO7IKKFCD9XIxPUn6IH9CRdkFsXbLsLOLX8lhP
+	OfDwEiCmz/G8voMwdIN56pm3FuFnd8I=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Colton Lewis <coltonlewis@google.com>
@@ -40,11 +40,11 @@ Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH v2 2/4] perf: arm_pmuv3: Introduce module param to
- partition the PMU
-Message-ID: <Z6mp4NeklzORJg5y@linux.dev>
+Subject: Re: [RFC PATCH v2 4/4] KVM: arm64: Make guests see only counters
+ they can access
+Message-ID: <Z6msyUG0HWM2EImQ@linux.dev>
 References: <20250208020111.2068239-1-coltonlewis@google.com>
- <20250208020111.2068239-3-coltonlewis@google.com>
+ <20250208020111.2068239-5-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,76 +53,102 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250208020111.2068239-3-coltonlewis@google.com>
+In-Reply-To: <20250208020111.2068239-5-coltonlewis@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Colton,
-
-On Sat, Feb 08, 2025 at 02:01:09AM +0000, Colton Lewis wrote:
-> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
-> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
-> allowed, EL0 while counters HPMN..N are only accessible by EL2.
+On Sat, Feb 08, 2025 at 02:01:11AM +0000, Colton Lewis wrote:
+> The ARM architecture specifies that when MDCR_EL2.HPMN is set, EL1 and
+> EL0, which includes KVM guests, should read that value for PMCR.N.
 > 
-> Introduce a module parameter in the PMUv3 driver to set this
-> register. The name reserved_host_counters reflects the intent to
-> reserve some counters for the host so the guest may eventually be
-> allowed direct access to a subset of PMU functionality for increased
-> performance.
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm64/kvm/debug.c                                  | 3 +--
+>  arch/arm64/kvm/pmu-emul.c                               | 8 +++++++-
+>  tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 2 +-
+>  3 files changed, 9 insertions(+), 4 deletions(-)
 > 
-> Track HPMN and whether the pmu is partitioned in struct arm_pmu
-> because KVM will need to know that to handle guests correctly.
-> 
-> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
-> specifically disallows that case because it's not useful given the
-> intention to allow guests access to their own counters.
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 0e4c805e7e89..7c04db00bf6c 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -36,8 +36,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+>  	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
+>  	 * to disable guest access to the profiling and trace buffers
+>  	 */
+> -	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
+> -					 *host_data_ptr(nr_event_counters));
+> +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, read_mdcr());
 
-Quite the contrary.
+Please avoid unnecessary accesses to MDCR_EL2 at all costs. This is a
+guaranteed trap to EL2 with nested virt.
 
-FEAT_HPMN0 is useful if userspace wants to provide a vPMU that has a
-fixed cycle counter w/o event counters. Certain OSes refuse to boot
-without it...
-
-> static inline u32 read_mdcr(void)
-> {
-> 	return read_sysreg(HDCR);
-> }
-> 
-> static inline void write_mdcr(u32 val)
-> {
-> 	write_sysreg(val, HDCR);
-> }
-> 
-
-Hmm... While this fixes the 32bit compilation issues, it opens a new can
-of worms.
-
-VHE is a 64bit only feature, so you're *guaranteed* that these accessors
-will undef (running at EL1).
-
-> +static void armv8pmu_partition(u8 hpmn)
-> +{
-> +	u64 mdcr = armv8pmu_mdcr_read();
+>  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
+>  				MDCR_EL2_TPMS |
+>  				MDCR_EL2_TTRF |
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 6c5950b9ceac..052ce8c721fe 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -993,12 +993,18 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+>  u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
+>  {
+>  	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
+> +	u8 limit;
 > +
-> +	mdcr &= ~ARMV8_PMU_MDCR_HPMN;
-> +	mdcr |= FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
-> +	/* Prevent guest counters counting at EL2 */
-> +	mdcr |= ARMV8_PMU_MDCR_HPMD;
-> +
-> +	armv8pmu_mdcr_write(mdcr);
-> +}
-> +
+> +	if (arm_pmu->partitioned)
+> +		limit = arm_pmu->hpmn - 1;
+> +	else
+> +		limit = ARMV8_PMU_MAX_GENERAL_COUNTERS;
+>  
+>  	/*
+>  	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
+>  	 * Ignore those and return only the general-purpose counters.
+>  	 */
+> -	return bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS);
+> +	return bitmap_weight(arm_pmu->cntr_mask, limit);
+>  }
 
-After giving this a read, I don't think the host PMU driver should care
-about MDCR_EL2 at all. The only time that 'guest' events are loaded into
-the PMU is between vcpu_load() / vcpu_put(), at which point *KVM* has
-reconfigured MDCR_EL2.
+This isn't necessary and is likely to regress the existing behavior.
 
-I'm not sure if there's much involvement with the host PMU driver beyond
-it pinky-swearing to only use the specified counters. KVM is what
-actually will program HPMN.
+When the architecture says the lower ELs should see PMCR_EL0.N have the
+same value as MDCR_EL2.HPMN, what it really means is direct reads from
+hardware will return the value.
 
-That'd alleviate the PMU driver from having VHE awareness or caring
-about MDCR_EL2.
+So my expectation would be that a VM using the partitioned PMU
+implementation would never reach any of the *emulated* PMU handlers, as
+we would've disabled the associated traps.
+
+The partitioned PMU will not replace the emulated vPMU implementation in
+KVM, so it'd be good to refactor what we have today to make room for
+your work. I think that'd be along the lines of:
+
+ - Shared code for event filter enforcement and handling of the vPMU
+   overflow IRQ.
+
+ - Emulated PMU implementation that provides trap handlers for all PMUv3
+   registers and backs into host perf
+
+ - Partitioned PMU implementation that doesn't rely on traps and instead
+   saves / restores a portion of the PMU that contains the guest
+   context.
+
+These should be done in separate files, i.e. I do not want to see a
+bunch of inline handling to cope with emulated v. partitioned PMUs.
+
+>  static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index f16b3b27e32e..b5bc18b7528d 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -609,7 +609,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
+>   */
+>  static void run_error_test(uint64_t pmcr_n)
+>  {
+> -	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+> +	pr_debug("Error test with pmcr_n %lu (larger than the host allows)\n", pmcr_n);
+
+NBD for an RFC, but in the future please do selftests changes in a
+separate patch.
 
 -- 
 Thanks,
