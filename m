@@ -1,67 +1,69 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFAB1E32A2
-	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6CD23CEE5
+	for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 15:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739202600; cv=none; b=CXzN7elhNVVXPexPnwmqI/3L9VwL8nuqMpB3vj37j0eJPYSRd3XLKEJlOKDzJ0suskjuIaDL2VZzA53P6U33cJaWDQdExsFRk4dfwgBFZwy3LHG6ppNencC6Oz9EjgvFMqAA5av1SA7c/G6nn0DQyUcagJubwWKGkcSrHVX2gZw=
+	t=1739202603; cv=none; b=Qm2Q3lvRaycVoEivPLRU2GQIf3X3m2jz3liQIqncKfhOMxiSj88HrdUtgpTshMvXEHZ0U1DZsNJ0rzP8nqJZh+7CHtE6MzF8T2X0DMbWaO9neY7oqTtRzqW93CuvYntYkLdtOBA1Ryde5tqfIuiJMertgwxLr2aVFsKuenOJ5eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739202600; c=relaxed/simple;
-	bh=hTF9BBpSp14sdvnM3Qbav0GMODhgNlVIj19eZpklVHo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:content-type; b=q0yoXplL/5b/UazcJfh9FG6UKdi7Y+GNQ3RiDg3ssua3N8cSRQBWGFFLN5BshRa0KfjHKLnuVwr684iouQ6J6XlXD10RVzdSlWwsZgVxHrje8/j18/WoOY/GMXNNFcckq0JZGrq4rz7KVDW1Aln9vj3wfIKXKO9GkXLVk2Lg+L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CtoRWvlF; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1739202603; c=relaxed/simple;
+	bh=0my6NoAsd7P7y9OJgYipp1QVHC1ZbpCJcXEsrlAHxlo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:content-type; b=mJw3iWIq+Dk7Q6QmAz86Yo2IjMan7wXSdJq3GI5vuIdU0VyhtZv5WKGO751qc4NDoGphUekssWgI/nC6jGNs6xi3/nePTRUAFZAxu+lwG/3pfDKDZrm0BuLhVeHaT0Fhu31UDinMvaftJJ6/YwGMtjqEOcx//bNgeUOd6R3UiXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3flciJ5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtoRWvlF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3flciJ5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739202598;
+	s=mimecast20190719; t=1739202600;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XD0KIaPZUowHnH+rhCFRqX97yTDIYw3TwTQ1B3wDB2g=;
-	b=CtoRWvlFMWWc7whG5PaDPWblajSP38tosZyh0XVZ72Qkzwsf55sC6ETw9wZIj2O/T+tAj+
-	1exy7WWvds/P98Se9223YHEzjVX9qoTfOmwtR6vsD366LuSz3zvk6Nv3/SkPpRhdKwmiQz
-	C45qU0WYXFVvifhwR1EbuMoCIx2uxmI=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k5AYcip1WpOMZ4l8MYmRKzKUrzrFcQKu9wKzGyAJc4c=;
+	b=O3flciJ5Yr6KOeZ+eJNJzWaR2Xh9DZ0baQuZ4wvAzfp+vHL/4U9g6RADl+u4T8tjkrTVhD
+	24mp8Rqb3nBsTuvBY10rjIlh9hQmj3+nJRIGX+2G7cY8wG5XUorlD+BcrsFlIHiedOleVg
+	wbaiwYSNzXkHkm94BdBDh0vi6MXvW8k=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-167-LmXqnZhGMHS1v9uOnibtjQ-1; Mon, 10 Feb 2025 10:49:56 -0500
-X-MC-Unique: LmXqnZhGMHS1v9uOnibtjQ-1
-X-Mimecast-MFC-AGG-ID: LmXqnZhGMHS1v9uOnibtjQ
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-438da39bb69so34519725e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:49:56 -0800 (PST)
+ us-mta-496-zXgB6k31MmeXNAYh_VGX5Q-1; Mon, 10 Feb 2025 10:49:59 -0500
+X-MC-Unique: zXgB6k31MmeXNAYh_VGX5Q-1
+X-Mimecast-MFC-AGG-ID: zXgB6k31MmeXNAYh_VGX5Q
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43947979ce8so4581445e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Feb 2025 07:49:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739202596; x=1739807396;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XD0KIaPZUowHnH+rhCFRqX97yTDIYw3TwTQ1B3wDB2g=;
-        b=X4mBQPO0EtYOSgRx3843VvcZUIO1SeZXcKb3RVbGz/BfIPxLr+VJwHQvv9i3GGAqTn
-         nTzP3+pPrNNFrh+XGi1zhQ9KdUr6vdC9Wr400DRQbgmcnKIKDp5gMM19ukug1zY7vPe/
-         KlFZQOLsvZ8ffWlSKfc/cewDHpWIeFewfCJfmqtB5HOZ5LjY1vZ76CMQ13sqgRPAuIEN
-         AkS4gf8iTORMGmSPgDOFQIFV5LYeZM7HoHbV4oAAEc6ixHSp9CDb4HPx7MjzRcFOR073
-         zCAOs3l3/O/9OQGSTUySFftUNkv3MLuIjt1IkkiFCFgjP9Gwr+RJ6gHvB0aUT6OKdbp2
-         b0kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVE90CHAhTckTwE5bBydX5T1nvCJxDVJSVueugDtan6YDa2DSgdjmY+qw4Ixgrkh54piZ9z5t4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUJbnILmOROvDYp9TU41UjVGcqRpOxTpoc7r9svzDuTVsq9jNH
-	1F8uZ1jeeifF1PelP4nLjxiA00pz6h7t5TrgBkA7/e9JyxGbjkydJ8bPxZwqLu6mqpxZ+hdqoLM
-	5UbQMPorT69TRtKzA8oJ4CRngfToEMxr5HYFWkdyerH0xHjyzFbvqug==
-X-Gm-Gg: ASbGncuGHOUrQkgPU7wP5WhN0YDQh/I0PB3s25cJNc1ekrJVTryBXbQwp+lzL3NFwQu
-	TNutP1ZyIzsUvud+is60ukoi0RFzpEsdxtU5ASJBZibZZGlxzgHE8wzD1SP6UNaGSxUT/E1wnAj
-	EVLCdr9fmLlG0LDLygA+9woxGHCfVE7slfrd04bXytUwndExhUxZ5fcJQs/WK+yHsF76XPmUoO8
-	DbP1s004wRmgJKqjbMGEoEJ+WoPrJ77NNuR27a2ju4tktUz3M101repODQ1OeNsdSQHnPdNGbOD
-	lUivd/eC9gnrH827Ecb4qlX6aoSy5O3HVJmPF92fzRLisFUBgwwFSEA2BAoZSRKRQLc=
-X-Received: by 2002:a05:600c:1e25:b0:436:17e4:ad4c with SMTP id 5b1f17b1804b1-43924972ce9mr110358905e9.6.1739202595724;
-        Mon, 10 Feb 2025 07:49:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEOvLjTF4S/WYvn3O6o65yj9aqhnQ/dCaqnHrrF3Js86fWc5irhrJ2sZiow1ffrtpyp0aYWnQ==
-X-Received: by 2002:a05:600c:1e25:b0:436:17e4:ad4c with SMTP id 5b1f17b1804b1-43924972ce9mr110358615e9.6.1739202595321;
-        Mon, 10 Feb 2025 07:49:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739202598; x=1739807398;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k5AYcip1WpOMZ4l8MYmRKzKUrzrFcQKu9wKzGyAJc4c=;
+        b=TIGN85XsS9SZ7BvEM/2wdDbaGbk+29YM19jmdni1vbqVubrSVupWzROhtUTcj3XES8
+         1pcDBOlou9mpuWgV4Kuw/hRWHkjlYxcadrkPzDz/SyNi5GpnHYPON7uTjnx1Y5FZOsJ9
+         x8ArDTJthGe7e9Wt7quzoHQPjzS3EQt1NipXcr5V5XpwywQWYHKQxqQ6ecNr6kT8ePOt
+         k1EXDPOTHFecechPmeZTbQTstCt1ywdnRHD6g0w47WE4znSaQbgeOZtmeklVf9BV63HH
+         jpYIM8cAqWgWJoqbe4Pza3K2Eksi12ybh0dCljIjdqXz3dzQljGzWRjAyvOY3q3R0d8I
+         vypw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOEJ9jCZwdoYcxjxBYzUrzWoDoN1ExwagzfgoWrBF5QGCOuBgvHFXcH1AbEQehAV9riK3Ib1c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwT0mDzxrN7QwpzNJk3t9KUIiN0Nt16SZc5+FI2Qm+QsT+AqtSS
+	LIFOEtCjLU81GkjnjNw9aGUCF7Diwj5T4ugzm3NNNsdNnZjUCa8KpHtA8xAOori1uEtedOu7r8X
+	jR3K2AAZlLrAk/qqKIutx3jnwQWCrmI3evy4+Mc4r0EbYwnaUe8X7cA==
+X-Gm-Gg: ASbGnctbGN/LOQXc8/gmuwClSZPm2z9nb1Rlo4nKRuXyaPfDKmCrfILyF29UQ0rHIuM
+	LMurPZVwLZqW2u1Ij76k4jDdvjOf5W6g+QZKSKivzeu0HqUiinYitUpami5NVrThFZpflK/de41
+	ZVpphDoJpkAtjqG+TVthZ4Yq9rWUo9HOwOAVIcSzV1wD5yfbo/RwNP1AFNtpoemxXNxsB7OqAJM
+	zbLtcWcEOe5j0WVdq0W/GjovnEv6+uPnTmcPNYFubs6PVTMEkMjdWAkdvrOtER60E8o/9+Ovoxc
+	o5+/jaqB8tMe3aFVaSw5aiPIlYf+zoM8IhrvowCPBYiXuJSzfHrW6KL1ZVvHhLPnTLw=
+X-Received: by 2002:a05:600c:cce:b0:434:f131:1e64 with SMTP id 5b1f17b1804b1-4394c815898mr2835295e9.9.1739202597839;
+        Mon, 10 Feb 2025 07:49:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE/gXGeXIZb0aJTYjdY1ZH66XscPhh3eLXFgOg1KHJQ8jUhpcmWvkE0k+kfaiy48I06jOKA8w==
+X-Received: by 2002:a05:600c:cce:b0:434:f131:1e64 with SMTP id 5b1f17b1804b1-4394c815898mr2835065e9.9.1739202597479;
+        Mon, 10 Feb 2025 07:49:57 -0800 (PST)
 Received: from rh.fritz.box (p200300f6af0e4d00dda53016e366575f.dip0.t-ipconnect.de. [2003:f6:af0e:4d00:dda5:3016:e366:575f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da96502sm153559395e9.1.2025.02.10.07.49.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da96502sm153559395e9.1.2025.02.10.07.49.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 07:49:55 -0800 (PST)
+        Mon, 10 Feb 2025 07:49:57 -0800 (PST)
 From: Sebastian Ott <sebott@redhat.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
@@ -76,10 +78,12 @@ Cc: Cornelia Huck <cohuck@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] KVM: arm64: writable MIDR/REVIDR
-Date: Mon, 10 Feb 2025 16:49:49 +0100
-Message-ID: <20250210154953.27002-1-sebott@redhat.com>
+Subject: [PATCH 2/4] KVM: arm64: Allow userspace to change REVIDR_EL1
+Date: Mon, 10 Feb 2025 16:49:51 +0100
+Message-ID: <20250210154953.27002-3-sebott@redhat.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250210154953.27002-1-sebott@redhat.com>
+References: <20250210154953.27002-1-sebott@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -87,31 +91,94 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: RD7q6nEf3ernM4jR9rYmfwgp5dd8FhNiryYtBa4xOHw_1739202596
+X-Mimecast-MFC-PROC-ID: Dxn_KyO0PHhK2Dfsw-aacBryRcU19M-jxvbKKeRtGRM_1739202598
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-Based on prior discussion [1] this series allows VMMs to change
-MIDR/REVIDR to enable migration between machines that differ in
-these registers. Since these are used for errata handling the
-errata management series [2] is a prerequisite for this one.
+Enable VMMs to write REVIDR_EL1 by treating it as a VM ID register.
 
-Note that guest access to MIDR_EL1 is not trapped.
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
+---
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/sys_regs.c         | 11 +++++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-[1] https://lore.kernel.org/kvmarm/20250124151732.6072-1-shameerali.kolothum.thodi@huawei.com/T/#mb855bc51714095a164a7b26bb8bead1606e4b753
-[2] https://lore.kernel.org/kvmarm/20250205132222.55816-1-shameerali.kolothum.thodi@huawei.com/T/
-
-Sebastian Ott (4):
-  KVM: arm64: Allow userspace to change MIDR_EL1
-  KVM: arm64: Allow userspace to change REVIDR_EL1
-  KVM: arm64: Allow userspace to change AIDR_EL1
-  KVM: arm64: trap guest access for REVIDR_EL1 and AIDR_EL1
-
- arch/arm64/include/asm/kvm_host.h |   9 ++
- arch/arm64/kvm/sys_regs.c         | 134 +++++++++++-------------------
- 2 files changed, 56 insertions(+), 87 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3db8c773339e..c8fba4111b77 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -374,6 +374,7 @@ struct kvm_arch {
+ 	u64 id_regs[KVM_ARM_ID_REG_NUM];
+ 
+ 	u64 midr_el1;
++	u64 revidr_el1;
+ 	u64 ctr_el0;
+ 
+ 	/* Masks for VNCR-backed and general EL2 sysregs */
+@@ -1472,6 +1473,8 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
+ 		return &ka->id_regs[IDREG_IDX(reg)];
+ 	case SYS_MIDR_EL1:
+ 		return &ka->midr_el1;
++	case SYS_REVIDR_EL1:
++		return &ka->revidr_el1;
+ 	case SYS_CTR_EL0:
+ 		return &ka->ctr_el0;
+ 	default:
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index cc94bed7299d..0ab2b2c79881 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1666,7 +1666,8 @@ static bool is_feature_id_reg(u32 encoding)
+  */
+ static inline bool is_vm_ftr_id_reg(u32 id)
+ {
+-	if (id == SYS_CTR_EL0 || id == SYS_MIDR_EL1)
++	if (id == SYS_CTR_EL0 || id == SYS_MIDR_EL1 ||
++	    id == SYS_REVIDR_EL1)
+ 		return true;
+ 
+ 	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
+@@ -2001,7 +2002,8 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 
+ static bool skip_feature_check(u32 reg)
+ {
+-	return (reg == SYS_MIDR_EL1);
++	return (reg == SYS_MIDR_EL1) ||
++	       (reg == SYS_REVIDR_EL1);
+ }
+ 
+ /*
+@@ -2521,6 +2523,7 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ FUNCTION_RESET(midr_el1)
++FUNCTION_RESET(revidr_el1)
+ 
+ 
+ /*
+@@ -2574,6 +2577,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ ID_DESC(MIDR_EL1), .set_user = set_id_reg, .visibility = id_visibility,
+ 	  .reset = reset_midr_el1, .val = (u32)-1 },
+ 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
++	{ ID_DESC(REVIDR_EL1), .set_user = set_id_reg, .visibility = id_visibility,
++	  .reset = reset_revidr_el1, .val = -1ULL },
+ 
+ 	/*
+ 	 * ID regs: all ID_SANITISED() entries here must have corresponding
+@@ -4625,12 +4630,10 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+ 		return ((struct sys_reg_desc *)r)->val;			\
+ 	}
+ 
+-FUNCTION_INVARIANT(revidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
+ 
+ /* ->val is filled in by kvm_sys_reg_table_init() */
+ static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
+-	{ SYS_DESC(SYS_REVIDR_EL1), NULL, reset_revidr_el1 },
+ 	{ SYS_DESC(SYS_AIDR_EL1), NULL, reset_aidr_el1 },
+ };
+ 
 -- 
 2.42.0
 
