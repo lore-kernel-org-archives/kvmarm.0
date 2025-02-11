@@ -1,69 +1,69 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B8D250BE9
-	for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 14:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96993250BF3
+	for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 14:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739284761; cv=none; b=b8hKrNAddAKCs+mjbrtuJ+dqUR4hfpyu2D+OjSvCoBsvmoVUyCc/WHdpgPTRtHPG6yv8pcqf4st1Nj0p/+zTe6FciCyu7OPdsenI7kJvParGF/SBb1/Mdxugw+pwjHH9r+mhpYBJ1mfIOyhFSC2OY8flQD5YrYyerhxKGcYzyXI=
+	t=1739284762; cv=none; b=R+HI85qGaI8Wt5dCIsSdOJ33kO3qMl7KIUcfKMsmq+E1z0h3+jq4k0SZ2anLT59q3lvL5Qq1yaAp6m59Vm0OPB4wR3cc5q3ljJS4id+jCeTN7XD3uzQlKjXF70lXddnlpTW9s3WWjlxDxB4sabOAPt53Q/sjeiJzq+UXYnUYmzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739284761; c=relaxed/simple;
-	bh=p9naWnQ0E1iqLvGPEhpxsWFpQ6BgZR017/nN0csyCE0=;
+	s=arc-20240116; t=1739284762; c=relaxed/simple;
+	bh=Xh97xB0t4V0m4yRQ6og3fwpvTr3Hlw3peV8Pp9xA1Vk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=q+6BDgF/Xu0SV5tFi/+3saY5yDhmBdbi5ij94csOeyJ2o+RLcG0/LbhYnyRH/AqcKou1FNbocUcZeXHlZ7h6cXmgBoTr1jcAHTMoaKHdRHkCmQyi00PPsDx7bCEtVFEpwSAtfS5gno6I6xz3GytnXlgOMYtyzadeZcr30yeceOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gFZL1XP+; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:content-type; b=dJdRC6sMVi2cDYYb9CyR+/EeyIpIcQVDDQ8R10ROX1sGlSBMOkX6WjE+9xfpy4CnhgbXEcC9Ypk/Tr5RcQq4ftEd+G3QU9kVnJKXg5RRN0gDigMwW520CBZ5P8CZFqjPbV1usfvFXF6aAh5f/26AFE7tFmbzu+a3osJekDxaKhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QMf85Rff; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gFZL1XP+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMf85Rff"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739284758;
+	s=mimecast20190719; t=1739284759;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XPf5dvcDVGeFg4rp8rzaEx8TRiTLHtjfNYmtCjoBL30=;
-	b=gFZL1XP+VthoEDIaX5m72G3JqC80vmrVfNKYv2n430v/kBsjs08uTFVsKCBzUwJNS9iEYZ
-	p7TuKYiJXdJ0NkVf3pAn9CU4W7IpRudlP0xP4Oxq8kpazkPZb6ypWQFqnEKHkabyWv6N8z
-	ecFgyiZl/6PRbS03soJR1HLOSqwyq9s=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wSVu+15UXFfSOFL1ip9ZLwAcn38zQdv9iDAl5Qkapx0=;
+	b=QMf85RffKE+IHWUA/luVWT5OOYZG6ZD3Vi+zNqIo8xvs34qVy+fYykbdZze/7X7jHN3ttw
+	/WRi08yn4+LR8Uo9ezEVZrQ3R3w+s6rl7aNvVj8gfN0OB0drvBN/XrUO1YCd7QLnAzXpf1
+	H2/TCVn1DUZQk6yl4EQOr2CEYR9+LnE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-478-h5dRAtwsP4ichFBhHTCuxQ-1; Tue, 11 Feb 2025 09:39:17 -0500
-X-MC-Unique: h5dRAtwsP4ichFBhHTCuxQ-1
-X-Mimecast-MFC-AGG-ID: h5dRAtwsP4ichFBhHTCuxQ
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38dd8d11139so117182f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 06:39:17 -0800 (PST)
+ us-mta-312-JP3XwsX_O6GHzOEzUsxK2Q-1; Tue, 11 Feb 2025 09:39:16 -0500
+X-MC-Unique: JP3XwsX_O6GHzOEzUsxK2Q-1
+X-Mimecast-MFC-AGG-ID: JP3XwsX_O6GHzOEzUsxK2Q
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38dca55788eso2450491f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 06:39:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739284756; x=1739889556;
+        d=1e100.net; s=20230601; t=1739284755; x=1739889555;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XPf5dvcDVGeFg4rp8rzaEx8TRiTLHtjfNYmtCjoBL30=;
-        b=vaSHqDclp1G4nWhKkgmk0h9Z8JT6bp9k2B+wYlZOiXkmdNmnAcFZ4dujtZSnasXrfu
-         NCcQpMR1dWFEUUBd1J6DtCS3aVerAxWxs7f4aT+oezlc7LpggUDm424ju3eLM8Y83qJs
-         unKSVT0WudPfiFQ4bLaqHzrFf0Aoh77cCQ9SFq+hQigx0KCespapA0+AcB1gYEZ14Do+
-         k1kO8latAgqV6EfdL/xnyggUQEMHvB3rxI5/eFR8OwZE5CEBIX6beicS41snisD5RoXO
-         lVIJszJhOqSKtbw1ntcWETyMidaERvSrvPYExchvHJA/cu3WGo1eA/6ADeq3ClcOavQw
-         FMZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXgX8uVgX9vZAto51O3uL8eRhHaWbIHM6ND4YQ9lWXBV0aBzmxBpyuwwsvgxnU3mDnDoE/B1So=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxq4prjL8XFvAqS0V2rJ7b997FIDHpaYR4NN8Z/TO4mFDUOuXEw
-	qIry4PzE26XtlGfJPdmzRot2vdebPl6IudY8m+Jp6yemNHVkg1u9/a1AIQ7KgJLINzlJ7mPXg1F
-	2JbgqD/oPfSRmoGJ8X0HH/dyvwASORA2BsFEf3EnWdkLZEZ9xowdNyP9vvFfv1g==
-X-Gm-Gg: ASbGncuxulGlIrL6WPg3U2f21RrIYyfyX77faWnvGbkyujlSWL2+Lgtx4r7rEiRPciw
-	P+G/a3zek0S1AkEPPzHj26lgJnrTHkZxbfgCDv3+U1WG32jpxK2HiiU9HgoesIU7CT2N0BxRWh1
-	wnTD+oq5MtOckYKe7iCZyhWFUM0h1L5tDhW8Yc3/ZzDA0sCQIQmWQjIsxdxqZIp5VGi28rg7qhS
-	8vqjYqQJHRQF63MWe5YprITzSaXqACSn3YkWf1tUCcn9ps7XaPvy83S5HfJCEpYD89+Hp+QpVno
-	Dyu95wj3/FOfVNxVwuuNXW3x64OKV77rG9XAhoN8H0dxG0A6qDn+pueHB/HhOQGxgcE=
-X-Received: by 2002:a05:6000:1548:b0:38d:d3e2:db40 with SMTP id ffacd0b85a97d-38dd3e2dc3amr7819777f8f.17.1739284756324;
-        Tue, 11 Feb 2025 06:39:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFI48MsBZ0xT8yThrymEFgbe5pw/LDZFV6jmWuDquHS5367gme0u5rb2EuyuSeXzwWC2tE8KA==
-X-Received: by 2002:a05:6000:1548:b0:38d:d3e2:db40 with SMTP id ffacd0b85a97d-38dd3e2dc3amr7819754f8f.17.1739284755919;
-        Tue, 11 Feb 2025 06:39:15 -0800 (PST)
+        bh=wSVu+15UXFfSOFL1ip9ZLwAcn38zQdv9iDAl5Qkapx0=;
+        b=jTiFwrAU3pr2mVwanr4aUMOAlK23nQ9uCWVJWsr4G3H5FajskUxI6Kc518+vD86t4K
+         Gaq+2kahMGuD2rH9lJmrzJLMrI6yMWWW3zORdwrChtXIIkQW4if6Ljz/8faJBruk2xor
+         nHhqfSaXPdpkhIEG79tvWz98tHyH3MGPsg/KAe4BmoJXamy91DSt6Q9/GElr/pDixfVp
+         AsnNLlOdrv4hqTQm+fwpGLluQv9bl+VkR4fmiQFP5ZOh8Lxof6XAZvCQUxaC7IOo54cf
+         1XJUvIegdeggCzYXJMdy4Guo/n6/y+VpOzQToWSLNCpPFzf6xcsO5uETkDAj6f6LufXA
+         HLWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcd8NZ/XLopqjk7I7/QDqcDi2WuvaqUALE/kEa3XR8Pb9bVUT8T6pXmf/mx09K3mtUHcJhZ7Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyZExCAJo8TEbUHlhD/3hNrrUCxP52eDXLOeJZFRHpzBqUSaRfv
+	uqpM45F/HR1QXk8Oe8EHohDiVWSKpjmx/PnN1bBBK6FhZbL1MUMcn+DCPphSxK3dmgqO0VQ0KDK
+	PWZvsR85P5+QGrb2yYWfiUECxPh4F6LAgYb1LOebQtVADrR53SP35HQ==
+X-Gm-Gg: ASbGncs8x9t3pxJhpe34oqAVBRAJ2/L/w20ac1MSDRtNxOucFSaoaLPYs4tzjWoMzXb
+	x4VlKheXETjCHZcvKguqaHFLgHBxqyiNv5x7GVvRCK5wXU57pwCeHlvsN8xDhQd+3CTJqNrSi9C
+	tLjAQT79IfdJ2lc1xlNKicyNQu0OpBVW6x9XcAyTEsS0VSCqRNA/oVhNT0lWda9Ld5O69JX7FOO
+	VzMAAZLi9tYuIlQfInlhnQNFVQFRC072e2y234qzwcNRyWAs5/0lPccHQnN0QYNyYwF4Aj5/9CT
+	g21haku+8zG0MWYR6FSUg+obYOQ7+E0o9vLfwfFZTkkw7Aq2mvAOeftJsRGktnZUC2g=
+X-Received: by 2002:adf:ef4c:0:b0:38d:bec9:c8d with SMTP id ffacd0b85a97d-38dc936545bmr10411282f8f.53.1739284754973;
+        Tue, 11 Feb 2025 06:39:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGVlLeeltNgiMbHSqxLznPIfhFN4eDHUttCSHrTtTV0bsdUK3PjmcFdHZ6fTWELMuF2PXz6rg==
+X-Received: by 2002:adf:ef4c:0:b0:38d:bec9:c8d with SMTP id ffacd0b85a97d-38dc936545bmr10411256f8f.53.1739284754577;
+        Tue, 11 Feb 2025 06:39:14 -0800 (PST)
 Received: from rh.fritz.box (p200300f6af0e4d00dda53016e366575f.dip0.t-ipconnect.de. [2003:f6:af0e:4d00:dda5:3016:e366:575f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dcc9bd251sm11745833f8f.9.2025.02.11.06.39.14
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dcc9bd251sm11745833f8f.9.2025.02.11.06.39.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 06:39:15 -0800 (PST)
+        Tue, 11 Feb 2025 06:39:13 -0800 (PST)
 From: Sebastian Ott <sebott@redhat.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
@@ -78,9 +78,9 @@ Cc: Cornelia Huck <cohuck@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/4] KVM: arm64: Allow userspace to change AIDR_EL1
-Date: Tue, 11 Feb 2025 15:39:09 +0100
-Message-ID: <20250211143910.16775-4-sebott@redhat.com>
+Subject: [PATCH v2 2/4] KVM: arm64: Allow userspace to change REVIDR_EL1
+Date: Tue, 11 Feb 2025 15:39:08 +0100
+Message-ID: <20250211143910.16775-3-sebott@redhat.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250211143910.16775-1-sebott@redhat.com>
 References: <20250211143910.16775-1-sebott@redhat.com>
@@ -91,220 +91,95 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: p2Cs5pCeMnrQ7P4YRRMD81fnbPEGcGd1waQoSUOK3rY_1739284757
+X-Mimecast-MFC-PROC-ID: RxeYoWH0xkLA45EbmneoR7CjcHZ8IunIHEdhhivWuRM_1739284755
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-Enable VMMs to write AIDR_EL1 by treating it as a VM ID register.
-Trap guest access of AIDR_EL1 when the VMs value differs from hardware.
-
-Since this was the last invariant register remove all the stuff
-that was needed to handle these.
+Enable VMMs to write REVIDR_EL1 by treating it as a VM ID register.
+Trap guest access of REVIDR_EL1 when the VMs value differs from hardware.
 
 Signed-off-by: Sebastian Ott <sebott@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 ++
- arch/arm64/kvm/sys_regs.c         | 90 +++----------------------------
- 2 files changed, 10 insertions(+), 83 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/sys_regs.c         | 11 ++++++++---
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c8fba4111b77..de735e2ad9ce 100644
+index 3db8c773339e..c8fba4111b77 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -375,6 +375,7 @@ struct kvm_arch {
+@@ -374,6 +374,7 @@ struct kvm_arch {
+ 	u64 id_regs[KVM_ARM_ID_REG_NUM];
  
  	u64 midr_el1;
- 	u64 revidr_el1;
-+	u64 aidr_el1;
++	u64 revidr_el1;
  	u64 ctr_el0;
  
  	/* Masks for VNCR-backed and general EL2 sysregs */
-@@ -1475,6 +1476,8 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
+@@ -1472,6 +1473,8 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
+ 		return &ka->id_regs[IDREG_IDX(reg)];
+ 	case SYS_MIDR_EL1:
  		return &ka->midr_el1;
- 	case SYS_REVIDR_EL1:
- 		return &ka->revidr_el1;
-+	case SYS_AIDR_EL1:
-+		return &ka->aidr_el1;
++	case SYS_REVIDR_EL1:
++		return &ka->revidr_el1;
  	case SYS_CTR_EL0:
  		return &ka->ctr_el0;
  	default:
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 646c0a04e58a..d388594d7b28 100644
+index 7e1c9884f62a..646c0a04e58a 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1667,7 +1667,7 @@ static bool is_feature_id_reg(u32 encoding)
+@@ -1666,7 +1666,8 @@ static bool is_feature_id_reg(u32 encoding)
+  */
  static inline bool is_vm_ftr_id_reg(u32 id)
  {
- 	if (id == SYS_CTR_EL0 || id == SYS_MIDR_EL1 ||
--	    id == SYS_REVIDR_EL1)
-+	    id == SYS_REVIDR_EL1 || id == SYS_AIDR_EL1)
+-	if (id == SYS_CTR_EL0 || id == SYS_MIDR_EL1)
++	if (id == SYS_CTR_EL0 || id == SYS_MIDR_EL1 ||
++	    id == SYS_REVIDR_EL1)
  		return true;
  
  	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-@@ -2544,6 +2544,7 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
+@@ -2542,6 +2543,7 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
+ 	}
  
  FUNCTION_RESET(midr_el1)
- FUNCTION_RESET(revidr_el1)
-+FUNCTION_RESET(aidr_el1)
++FUNCTION_RESET(revidr_el1)
  
  
  /*
-@@ -2870,6 +2871,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
- 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
- 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
-+	{ ID_DESC(AIDR_EL1), .set_user = set_id_reg_non_ftr, .visibility = id_visibility,
-+	  .reset = reset_aidr_el1, .val = -1ULL },
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
- 	ID_FILTERED(CTR_EL0, ctr_el0,
- 		    CTR_EL0_DIC_MASK |
-@@ -4634,61 +4637,6 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
- 	return r;
- }
+@@ -2595,6 +2597,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ ID_DESC(MIDR_EL1), .set_user = set_id_reg_non_ftr, .visibility = id_visibility,
+ 	  .reset = reset_midr_el1, .val = GENMASK_ULL(31, 0) },
+ 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
++	{ ID_DESC(REVIDR_EL1), .set_user = set_id_reg_non_ftr, .visibility = id_visibility,
++	  .reset = reset_revidr_el1, .val = -1ULL },
  
--/*
-- * These are the invariant sys_reg registers: we let the guest see the
-- * host versions of these, so they're part of the guest state.
-- *
-- * A future CPU may provide a mechanism to present different values to
-- * the guest, or a future kvm may trap them.
-- */
--
--#define FUNCTION_INVARIANT(reg)						\
--	static u64 reset_##reg(struct kvm_vcpu *v,			\
--			       const struct sys_reg_desc *r)		\
--	{								\
--		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
--		return ((struct sys_reg_desc *)r)->val;			\
--	}
--
--FUNCTION_INVARIANT(aidr_el1)
--
--/* ->val is filled in by kvm_sys_reg_table_init() */
--static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
--	{ SYS_DESC(SYS_AIDR_EL1), NULL, reset_aidr_el1 },
--};
--
--static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
--{
--	const struct sys_reg_desc *r;
--
--	r = get_reg_by_id(id, invariant_sys_regs,
--			  ARRAY_SIZE(invariant_sys_regs));
--	if (!r)
--		return -ENOENT;
--
--	return put_user(r->val, uaddr);
--}
--
--static int set_invariant_sys_reg(u64 id, u64 __user *uaddr)
--{
--	const struct sys_reg_desc *r;
--	u64 val;
--
--	r = get_reg_by_id(id, invariant_sys_regs,
--			  ARRAY_SIZE(invariant_sys_regs));
--	if (!r)
--		return -ENOENT;
--
--	if (get_user(val, uaddr))
--		return -EFAULT;
--
--	/* This is what we mean by invariant: you can't change it. */
--	if (r->val != val)
--		return -EINVAL;
--
--	return 0;
--}
--
- static int demux_c15_get(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
- {
- 	u32 val;
-@@ -4770,15 +4718,10 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
--	int err;
+ 	/*
+ 	 * ID regs: all ID_SANITISED() entries here must have corresponding
+@@ -4646,12 +4650,10 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+ 		return ((struct sys_reg_desc *)r)->val;			\
+ 	}
  
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
- 		return demux_c15_get(vcpu, reg->id, uaddr);
+-FUNCTION_INVARIANT(revidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
  
--	err = get_invariant_sys_reg(reg->id, uaddr);
--	if (err != -ENOENT)
--		return err;
--
- 	return kvm_sys_reg_get_user(vcpu, reg,
- 				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- }
-@@ -4814,15 +4757,10 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
--	int err;
+ /* ->val is filled in by kvm_sys_reg_table_init() */
+ static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
+-	{ SYS_DESC(SYS_REVIDR_EL1), NULL, reset_revidr_el1 },
+ 	{ SYS_DESC(SYS_AIDR_EL1), NULL, reset_aidr_el1 },
+ };
  
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
- 		return demux_c15_set(vcpu, reg->id, uaddr);
- 
--	err = set_invariant_sys_reg(reg->id, uaddr);
--	if (err != -ENOENT)
--		return err;
--
- 	return kvm_sys_reg_set_user(vcpu, reg,
- 				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- }
-@@ -4911,23 +4849,13 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 
- unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
- {
--	return ARRAY_SIZE(invariant_sys_regs)
--		+ num_demux_regs()
--		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
-+	return num_demux_regs()	+ walk_sys_regs(vcpu, (u64 __user *)NULL);
- }
- 
- int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
--	unsigned int i;
- 	int err;
- 
--	/* Then give them all the invariant registers' indices. */
--	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++) {
--		if (put_user(sys_reg_to_index(&invariant_sys_regs[i]), uindices))
--			return -EFAULT;
--		uindices++;
--	}
--
- 	err = walk_sys_regs(vcpu, uindices);
- 	if (err < 0)
- 		return err;
-@@ -5001,7 +4929,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
+@@ -4999,6 +5001,9 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
  	else
  		vcpu->arch.hcr_el2 |= HCR_TID2;
  
--	if (kvm_read_vm_id_reg(kvm, SYS_REVIDR_EL1) != read_sysreg(REVIDR_EL1))
-+	if ((kvm_read_vm_id_reg(kvm, SYS_REVIDR_EL1) != read_sysreg(REVIDR_EL1)) ||
-+	    (kvm_read_vm_id_reg(kvm, SYS_AIDR_EL1) != read_sysreg(AIDR_EL1)))
- 		vcpu->arch.hcr_el2 |= HCR_TID1;
- 
++	if (kvm_read_vm_id_reg(kvm, SYS_REVIDR_EL1) != read_sysreg(REVIDR_EL1))
++		vcpu->arch.hcr_el2 |= HCR_TID1;
++
  	if (vcpu_el1_is_32bit(vcpu))
-@@ -5156,16 +5085,11 @@ int __init kvm_sys_reg_table_init(void)
- 	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
- 	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
- 	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
--	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
- 	valid &= check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false);
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
  
- 	if (!valid)
- 		return -EINVAL;
- 
--	/* We abuse the reset function to overwrite the table itself. */
--	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
--		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
--
- 	ret = populate_nv_trap_config();
- 
- 	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
 -- 
 2.42.0
 
