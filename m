@@ -1,54 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960C428EA
-	for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 00:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A0A1F12ED;
+	Tue, 11 Feb 2025 09:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739232596; cv=none; b=bHIPmL0qSfAM3fsijcpQYUu5AWPSInhVW3LIL0O2KDJ/n7XTQLJbnz4GEn+CaNfIcukHO5m2GDAJkxXjCBZWUCxiaHqQ6rtzvSsy71AL87H4fxI/1uR5aU1QvmkaXg2IWuE37OfbPfIU0PPbWcaB8SDMVkS6P+Upe92ON7BUxnc=
+	t=1739265905; cv=none; b=mjireCsmNKyvqDlYxTTHgDJYo28c3Ui/2DQ6AsA4tnkrnHtPzXq1T1BzIqKP+bJ8Ab59dsh1dmFKl0dQ8trAoNl/jyTZ/W7MoxfzmP0FZxGsT93K/z12c0dFO42PnOuDDbw7zWYj8yGi+j7EnlJJlQyGKt+PG0DTSJQCQiaTiFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739232596; c=relaxed/simple;
-	bh=t3dqqISyLKzv9/bJKFTaeu9lKpC56B3XEJprW68cUcA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=U1OD+jfHZLMvepb9wALCxHO21w++FoyNaZ9d43cxayKKmBz5Tl9nesidL6aoytXqiCQwZMaQ/VHt+0EhzGvwTpwLqQXwIIP8m7YmhZeiQ8T8PVFxUi4Cf1Ft30WVvrEZg10+EmLIPD5U9J/7lVtNYmfX99pluZJL2SzG3oOjDkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=is57R7QE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739265905; c=relaxed/simple;
+	bh=SR5LwxmHxJbxL8Gifp96GYWy5xT2GbIst98vLDN4fPM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P2S2XNbwVIlam8pjTatyOrxNpI1bxdjHdDrM2Y95qlsfiA1tbI6QxR41a8OkTynPMpVh5bMbWCo6ub1+ucWoB+h6bWYUP3TF8IX0JbtFL0/N/WfdRQHobwb2hWOibAObe3okgPUy7rlld2lV1aQ+Gyky7UHzUZ2cAHySWcALflU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nKQSqQbl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is57R7QE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739232593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yzGbC0ypbw1NU4jMljSKqdqWfQ9LORCBGxC9rZKevfg=;
-	b=is57R7QEsIB0oBMkwzU8f3SX6OL7Fp1Bg6C3LfK1KbBuH4VanLt5q9lnePuG/2lANo6fQp
-	exhSWs0dSmemu7RGtZfJ+alY+gQe4JP3C0TijG8HzGCrJKwHTAf1c4Vl9ivXd/rulaw3aS
-	3VB2R6s8Gb1qbjKiP+rZRYBVtMze+As=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-rxU9z2ZwPoCLLQlMQjJc6g-1; Mon,
- 10 Feb 2025 19:09:48 -0500
-X-MC-Unique: rxU9z2ZwPoCLLQlMQjJc6g-1
-X-Mimecast-MFC-AGG-ID: rxU9z2ZwPoCLLQlMQjJc6g
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BECC31800983;
-	Tue, 11 Feb 2025 00:09:44 +0000 (UTC)
-Received: from starship.lan (unknown [10.22.65.174])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 006BA19560A3;
-	Tue, 11 Feb 2025 00:09:38 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKQSqQbl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA367C4CEDD;
+	Tue, 11 Feb 2025 09:25:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739265904;
+	bh=SR5LwxmHxJbxL8Gifp96GYWy5xT2GbIst98vLDN4fPM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nKQSqQblbizWzWsqck6Hc+bJ/6neD3u0R68/NnK5rihuQCNG77Xa8rUqHiFr6zsvw
+	 uaKplYQY9Mq/jgzYt0q5jiqsb7lU7WgWIOEScwVGVTAcNch+Q+f4I7ZBk0RDjyX0qr
+	 5sKta5E6pe+eqebn+Jk2rhlerAUMmr4GQyf7GrEusSZaOt645nVnyjvmE7hR3ET6dz
+	 teUdrQa7OcInc4drcdmLbmzwL7OqFhVNL5E/KjRg9zBUys3rsFMF5zL6oGZJSj02YP
+	 hp6pnbkEbr9ptXSbTIO07SqrSm068K3hQSrzRfqxQ6oLfetn9pv5Je0vmN0KZvrkSQ
+	 MvZ043GdJFFhQ==
+Received: from [104.132.45.111] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1thmVp-002uM5-Fz;
+	Tue, 11 Feb 2025 09:25:01 +0000
+Date: Tue, 11 Feb 2025 09:24:54 +0000
+Message-ID: <87seok25qx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Randy Dunlap <rdunlap@infradead.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -59,7 +51,6 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-riscv@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Paul Walmsley <paul.walmsley@sifive.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Bjorn Helgaas <bhelgaas@google.com>,
 	Albert Ou <aou@eecs.berkeley.edu>,
@@ -75,93 +66,181 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 3/3] RISC-V: KVM: switch to kvm_lock/unlock_all_vcpus
-Date: Mon, 10 Feb 2025 19:09:17 -0500
-Message-Id: <20250211000917.166856-4-mlevitsk@redhat.com>
-In-Reply-To: <20250211000917.166856-1-mlevitsk@redhat.com>
-References: <20250211000917.166856-1-mlevitsk@redhat.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: switch to using kvm_lock/unlock_all_vcpus
+In-Reply-To: <20250211000917.166856-3-mlevitsk@redhat.com>
+References: <20250211000917.166856-1-mlevitsk@redhat.com>	<20250211000917.166856-3-mlevitsk@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.111
+X-SA-Exim-Rcpt-To: mlevitsk@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com, jingzhangos@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, rdunlap@infradead.org, suzuki.poulose@arm.com, palmer@dabbelt.com, yuzenghui@huawei.com, kvm-riscv@lists.infradead.org, mingo@redhat.com, linux-riscv@lists.infradead.org, joey.gouly@arm.com, paul.walmsley@sifive.com, tglx@linutronix.de, bhelgaas@google.com, aou@eecs.berkeley.edu, kvmarm@lists.linux.dev, glider@google.com, x86@kernel.org, seanjc@google.com, anup@brainfault.org, jiangkunkun@huawei.com, atishp@atishpatra.org, catalin.marinas@arm.com, will@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-use kvm_lock/unlock_all_vcpus instead of riscv's own
-implementation.
+On Tue, 11 Feb 2025 00:09:16 +0000,
+Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> 
+> Switch to kvm_lock/unlock_all_vcpus instead of arm's own
+> version.
+> 
+> This fixes lockdep warning about reaching maximum lock depth:
+> 
+> [  328.171264] BUG: MAX_LOCK_DEPTH too low!
+> [  328.175227] turning off the locking correctness validator.
+> [  328.180726] Please attach the output of /proc/lock_stat to the bug report
+> [  328.187531] depth: 48  max: 48!
+> [  328.190678] 48 locks held by qemu-kvm/11664:
+> [  328.194957]  #0: ffff800086de5ba0 (&kvm->lock){+.+.}-{3:3}, at: kvm_ioctl_create_device+0x174/0x5b0
+> [  328.204048]  #1: ffff0800e78800b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.212521]  #2: ffff07ffeee51e98 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.220991]  #3: ffff0800dc7d80b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.229463]  #4: ffff07ffe0c980b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.237934]  #5: ffff0800a3883c78 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> [  328.246405]  #6: ffff07fffbe480b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+> 
+> No functional change intended.
 
-Note that this does introduce a slight functional change - now vCPUs are
-unlocked in the same order they were locked and not in the opposite order.
+Actually plenty of it. This sort of broad assertion is really an
+indication of the contrary.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/riscv/kvm/aia_device.c | 36 +++---------------------------------
- 1 file changed, 3 insertions(+), 33 deletions(-)
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h     |  3 ---
+>  arch/arm64/kvm/arch_timer.c           |  8 +++----
+>  arch/arm64/kvm/arm.c                  | 32 ---------------------------
+>  arch/arm64/kvm/vgic/vgic-init.c       | 11 +++++----
+>  arch/arm64/kvm/vgic/vgic-its.c        | 18 ++++++++-------
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 21 ++++++++++--------
+>  6 files changed, 33 insertions(+), 60 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cfa024de4e3..bba97ea700ca 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1234,9 +1234,6 @@ int __init populate_sysreg_config(const struct sys_reg_desc *sr,
+>  				  unsigned int idx);
+>  int __init populate_nv_trap_config(void);
+>  
+> -bool lock_all_vcpus(struct kvm *kvm);
+> -void unlock_all_vcpus(struct kvm *kvm);
+> -
+>  void kvm_calculate_traps(struct kvm_vcpu *vcpu);
+>  
+>  /* MMIO helpers */
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 231c0cd9c7b4..3af1da807f9c 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -1769,7 +1769,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+>  
+>  	mutex_lock(&kvm->lock);
+>  
+> -	if (lock_all_vcpus(kvm)) {
+> +	ret = kvm_lock_all_vcpus(kvm);
+> +
+> +	if (!ret) {
+>  		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+>  
+>  		/*
+> @@ -1781,9 +1783,7 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+>  		kvm->arch.timer_data.voffset = offset->counter_offset;
+>  		kvm->arch.timer_data.poffset = offset->counter_offset;
+>  
+> -		unlock_all_vcpus(kvm);
+> -	} else {
+> -		ret = -EBUSY;
+> +		kvm_unlock_all_vcpus(kvm);
+>  	}
 
-diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
-index 39cd26af5a69..32354e47c7d8 100644
---- a/arch/riscv/kvm/aia_device.c
-+++ b/arch/riscv/kvm/aia_device.c
-@@ -12,36 +12,6 @@
- #include <linux/kvm_host.h>
- #include <linux/uaccess.h>
- 
--static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
--{
--	struct kvm_vcpu *tmp_vcpu;
--
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&tmp_vcpu->mutex);
--	}
--}
--
--static void unlock_all_vcpus(struct kvm *kvm)
--{
--	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
--}
--
--static bool lock_all_vcpus(struct kvm *kvm)
--{
--	struct kvm_vcpu *tmp_vcpu;
--	unsigned long c;
--
--	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
--		if (!mutex_trylock(&tmp_vcpu->mutex)) {
--			unlock_vcpus(kvm, c - 1);
--			return false;
--		}
--	}
--
--	return true;
--}
--
- static int aia_create(struct kvm_device *dev, u32 type)
- {
- 	int ret;
-@@ -52,8 +22,8 @@ static int aia_create(struct kvm_device *dev, u32 type)
- 	if (irqchip_in_kernel(kvm))
- 		return -EEXIST;
- 
--	ret = -EBUSY;
--	if (!lock_all_vcpus(kvm))
-+	ret = kvm_lock_all_vcpus(kvm);
-+	if (ret)
- 		return ret;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
-@@ -65,7 +35,7 @@ static int aia_create(struct kvm_device *dev, u32 type)
- 	kvm->arch.aia.in_kernel = true;
- 
- out_unlock:
--	unlock_all_vcpus(kvm);
-+	kvm_unlock_all_vcpus(kvm);
- 	return ret;
- }
- 
+This is a userspace ABI change. This ioctl is documented as being able
+to return -EINVAL or -EBUSY, and nothing else other than 0. Yet the
+new helper returns -EINTR, which you blindly forward to userspace.
+
+>  
+>  	mutex_unlock(&kvm->lock);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 071a7d75be68..f58849c5b4f0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1895,38 +1895,6 @@ static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
+>  	}
+>  }
+>  
+> -void unlock_all_vcpus(struct kvm *kvm)
+> -{
+> -	lockdep_assert_held(&kvm->lock);
+> -
+> -	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
+> -}
+> -
+> -/* Returns true if all vcpus were locked, false otherwise */
+> -bool lock_all_vcpus(struct kvm *kvm)
+> -{
+> -	struct kvm_vcpu *tmp_vcpu;
+> -	unsigned long c;
+> -
+> -	lockdep_assert_held(&kvm->lock);
+> -
+> -	/*
+> -	 * Any time a vcpu is in an ioctl (including running), the
+> -	 * core KVM code tries to grab the vcpu->mutex.
+> -	 *
+> -	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
+> -	 * other VCPUs can fiddle with the state while we access it.
+> -	 */
+> -	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+> -		if (!mutex_trylock(&tmp_vcpu->mutex)) {
+> -			unlock_vcpus(kvm, c - 1);
+> -			return false;
+> -		}
+> -	}
+> -
+> -	return true;
+> -}
+
+The semantics are different.
+
+Other than the return values mentioned above, the new version fails on
+signal delivery, which isn't expected.  The guarantee given to
+userspace is that unless a vcpu thread is currently in KVM, the
+locking will succeed. Not "will succeed unless something that is
+outside of your control happens".
+
+The arm64 version is also built around a mutex_trylock() because we
+don't want to wait forever until the vcpu's mutex is released. We want
+it now, or never. That's consistent with the above requirement on
+userspace.
+
+We can argue whether or not these are good guarantees (or
+requirements) to give to (or demand from) userspace, but that's what
+we have, and I'm not prepared to break any of it.
+
+At the end of the day, the x86 locking serves completely different
+purposes. It wants to gracefully wait for vcpus to exit and is happy
+to replay things, because migration (which is what x86 seems to be
+using this for) is a stupidly long process. Our locking is designed to
+either succeed or fail quickly, because some of the lock paths are on
+the critical path for VM startup and configuration.
+
+So for this series to be acceptable, you'd have to provide the same
+semantics. It is probably doable with a bit of macro magic, at the
+expense of readability.
+
+What I would also like to see is for this primitive to be usable with
+scoped_cond_guard(), which would make the code much more readable.
+
+Thanks,
+
+	M.
+
 -- 
-2.26.3
-
+Without deviation from the norm, progress is not possible.
