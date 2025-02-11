@@ -1,79 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DEA1EEA38;
-	Tue, 11 Feb 2025 11:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B6D1FBEAB
+	for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 12:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739274973; cv=none; b=gws64HvLTNe0gab0Rn062+mussUVgWDUviRQlezSUTqDWDoFm+e3i/82x+ZmbxaXWv1FbyCNkpbykyJsAbZcFEy1bih0RZrusf+m7zLJJf9+PT+SOqndRMUwnG628qJqEUbcsg13bBP6pY+ENdDc7NnohmFCnVYesZa/ZDdAPFM=
+	t=1739276595; cv=none; b=F6mtbuGA01tMVxqshvrMarEzS495OaR0lvNM8MeQfTjitL7EeH4qFDsWVgBa2uhynjZcIZLuQ63sgCH/8ByheVkTVq8A49mATVv5SQ6Owc8MqScHOtNi6B/5/hceiV7WlUieAo5Huo564k0ziedEeo6FjrzmSJRZS9EMoWpfZHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739274973; c=relaxed/simple;
-	bh=vqQ+kZkktSUzfHi4PPu4xV47PiL3v0xitLfIzMdRc4E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ijDMJNIN6ePLdOqyG92uJ+jbntCZXNPSgwuUyEz3CSzP9Nk5cSq7HPF/3x9jC9veE1IyIBeLbuANDAlkqXmi38N9833m+ue62uUkJdwPMvY1fBTlQjZn6Slju5uMRmchdaWtMVuvhKfiaunETE6i+eoqer55R18ihBN/71Yc4Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4h74rka; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4h74rka"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DB4AC4CEE6;
-	Tue, 11 Feb 2025 11:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739274973;
-	bh=vqQ+kZkktSUzfHi4PPu4xV47PiL3v0xitLfIzMdRc4E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m4h74rka0pDTk9QHYyrofCKJegWjerIIfJ0iLB7WMHXMKeoJjUB/SjN1wP211ZICa
-	 7agyAoxb2YO4w44SaHpy62V6tJqZLlX2ZSr822ElNsmR3jtptHmZ5LET2wFiNhv0I0
-	 7YNlaLEytL/qlvmU+HsxWH2pxOWJf8Jw3hHiqMSOgXUCS+3uVGF+3/+WrsB5gHqSRY
-	 7p4SuUou/I1Av8wBH23qGwHJ4FGD9y3WPCA78ZanI/rCipVcBR45sYmTVONNQPyepz
-	 8O+jtR8jq92dT0F+YCeSWztVUJJ3HEpa37Co9Y5rsoC0mcWlfAqno+nJW1e+SXW5/f
-	 B26in/NhMKylw==
-From: Will Deacon <will@kernel.org>
-To: julien.thierry.kdev@gmail.com,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	apatel@ventanamicro.com,
-	andrew.jones@linux.dev,
-	andre.przywara@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH kvmtool v1 0/2] Error handling fixes
-Date: Tue, 11 Feb 2025 11:56:06 +0000
-Message-Id: <173927325831.2097843.13985921488166849200.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20250120161800.30270-1-alexandru.elisei@arm.com>
-References: <20250120161800.30270-1-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1739276595; c=relaxed/simple;
+	bh=WYbPqzeflxnkGcTvDdUhO/YJKcv6y3fF1K7+EzKaJgE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TzjPE1bywRcYF4kyy4j9A9Hf+5W1xI41xyZbWVVQuA70CxvBi8qJjwOTidFdd0MXp86Xi3cH7+YGc9RBhBbWKcMWonmLCR2c4p7k0yighKtDfIiPMpxJ/TIU4GKo/5ySxT2gkbWZlVpSWBFcYceeuKb7g6OI8i6bB2EP80dWDxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 729301424;
+	Tue, 11 Feb 2025 04:23:33 -0800 (PST)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8026A3F6A8;
+	Tue, 11 Feb 2025 04:23:10 -0800 (PST)
+Date: Tue, 11 Feb 2025 12:23:08 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 02/18] arm64: Add syndrome information for trapped
+ LD64B/ST64B{,V,V0}
+Message-ID: <Z6tBLIsEejdCRQKP@J2N7QTR9R3>
+References: <20250210184150.2145093-1-maz@kernel.org>
+ <20250210184150.2145093-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210184150.2145093-3-maz@kernel.org>
 
-On Mon, 20 Jan 2025 16:17:58 +0000, Alexandru Elisei wrote:
-> Two fixes for how kvmtool handles errors, both found while working on
-> integrating kvmtool with the kvm-unit-tests automatic test runner (patches
-> incoming).
+On Mon, Feb 10, 2025 at 06:41:33PM +0000, Marc Zyngier wrote:
+> Provide the architected EC and ISS values for all the FEAT_LS64*
+> instructions.
 > 
-> The first patch is needed so kvm-unit-tests can detect when a test failed.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/esr.h | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> The second is just to make it easier to interpret a particular error message.
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index d1b1a33f9a8b0..d5c2fac21a16c 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -20,7 +20,8 @@
+>  #define ESR_ELx_EC_FP_ASIMD	UL(0x07)
+>  #define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
+>  #define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
+> -/* Unallocated EC: 0x0A - 0x0B */
+> +#define ESR_ELx_EC_LS64B	UL(0x0A)
+
+This EC code has been generalised recently. In the latest ARM ARM (ARM
+DDI 0487 L.a), which can be found at:
+
+  https://developer.arm.com/documentation/ddi0487/la/?lang=en
+
+... the table on page D24-7333 refers to it as:
+
+| Trapped execution of any instruction not covered by other EC values.
+
+... and the corresponding ISS description is named:
+
+| ISS encoding for an exception from any other instruction
+
+... so maybe it makes sense to call it 'ESR_ELx_EC_OTHER_INSN',
+'ESR_ELx_EC_INSN_MISC', or something of that rough shape?
+
+With that, the PSB CSYNC oddity in patch 15 makes a bit more sense,
+though the L.a release of the ARM ARM is still missing the description
+of that.
+
+Mark.
+
+> +/* Unallocated EC: 0x0B */
+>  #define ESR_ELx_EC_CP14_64	UL(0x0C)
+>  #define ESR_ELx_EC_BTI		UL(0x0D)
+>  #define ESR_ELx_EC_ILL		UL(0x0E)
+> @@ -174,6 +175,11 @@
+>  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+>  #define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
+>  
+> +/* ISS definitions for LD64B/ST64B instructions */
+> +#define ESR_ELx_ISS_ST64BV	(0)
+> +#define ESR_ELx_ISS_ST64BV0	(1)
+> +#define ESR_ELx_ISS_LDST64B	(2)
+> +
+>  #define DISR_EL1_IDS		(UL(1) << 24)
+>  /*
+>   * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
+> -- 
+> 2.39.2
 > 
-> [...]
-
-Applied to kvmtool (master), thanks!
-
-[1/2] Propagate the error code from any VCPU thread
-      https://git.kernel.org/will/kvmtool/c/6e0b71815a63
-[2/2] Do not a print a warning on failing host<->guest address translation
-      https://git.kernel.org/will/kvmtool/c/4c4191b113c1
-
-Cheers,
--- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
