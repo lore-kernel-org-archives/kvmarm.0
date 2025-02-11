@@ -1,352 +1,161 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47B71FAC5D
-	for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 15:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5001DDC14;
+	Tue, 11 Feb 2025 19:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739286198; cv=none; b=HzmQ5//hSAlkYnAJsAuzYcTStkjLkL/YsQ8FnVx+B80HTlfYBKPQ88erm/q+mg5wOLQb91sCWNhw9L8gZlkJ1Ttr06V9A3SKFACxibS050Q1O2N38D6EDjTzxJwyaHHH1LfP/0c61x6jJFYE9+dxi3azpmwntzz02x8rqKX/uwk=
+	t=1739301710; cv=none; b=J++FFalIpu2czSXzVYCstRvpmNLJnQA3RowqXWNL1zU7h9HJzWsXFXaOucJNOgQqOCX0qcpAGYXK4+ycsJHDgOMQG3YSDEN9hJqVH3ny9NajVt5hAzkQbOyTgeg4f1wW45FfoymRD1eyWVFmbz7f2sbSkPV7Q6AKKnCAqXMgpyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739286198; c=relaxed/simple;
-	bh=htIKoLIbG6pruKcoY+kpDVuXIre8XcylC6zr5uAcsvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W6cEJmSC0PvvP/xDh+AdkCtu06XETz/0XBrM8NJlG641sGAHdd6EOA2cR6vyKDS5i3kDOFwNfiBt/MxTsxc+2TrSG5c6VYmnxgda/1ETJYnJfEInGHhwJudRPzLxuyc3vKjgODx7smcdfxQIQXmK+iUdt2RUuqzXtxTfG7THnk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49B2213D5;
-	Tue, 11 Feb 2025 07:03:36 -0800 (PST)
-Received: from arm.com (e134078.arm.com [10.1.26.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC4863F5A1;
-	Tue, 11 Feb 2025 07:03:11 -0800 (PST)
-Date: Tue, 11 Feb 2025 15:03:09 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 15/18] Add kvmtool_params to test
- specification
-Message-ID: <Z6tmrX8/+wzeFL1P@arm.com>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-16-alexandru.elisei@arm.com>
- <20250123-bbd289cfd7abfd93e9b67eef@orel>
+	s=arc-20240116; t=1739301710; c=relaxed/simple;
+	bh=029kYh0sxoljCJSf8XQnMO3yhFLYENu21fgjjNO4zf0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j6s+jOaw5FL0d7j47d9IUAZD8h4p51uhXqGWsZ8PQmwdsJ7PXXdUvytqZ7SUI8mDYFh1OLq53xHoiZbbJHIsJaMrqdHrR5xvW/aW2eeS6+jH7cGDn1cv1PZkrO8VxmOPKwN6KLv5inP+oaIm0tdy3nAO2UkjvT9SVskBNAaaiLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IE4TZFG8; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IE4TZFG8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54DD2C4CEDD;
+	Tue, 11 Feb 2025 19:21:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739301709;
+	bh=029kYh0sxoljCJSf8XQnMO3yhFLYENu21fgjjNO4zf0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IE4TZFG8VCwqTprVR79rBXrlMEuWQojFSus87EDhrToPQka/oDW5ezwxFLFYgkFG7
+	 qypTFgYStG0DzenivTrY07/k6FYqA0DI5N6PZHBedQENPdL7F8OCP1rgwRogrU6t42
+	 sGpjLZc9Wyh0IzXokBlMJ/WXNNxWvh9oKUrxgO330taUJrh8BgBIkzPscybK/27nYY
+	 aWjfQeNOtxBhVnCDA7+2pHvsEzZpdLIIk8PtZ4VSLZMcIlbEXpF0i8OL8weLGOQAYI
+	 7mLrtIaxG2uC0iAg3uOgy9sMzVOB7nj//LYRrmLOTnU86kDaNXWLMV+KZASjI+vLM5
+	 7/RmD+PGbbV/w==
+Received: from [82.132.185.192] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1thvpK-0036zW-8k;
+	Tue, 11 Feb 2025 19:21:46 +0000
+Date: Tue, 11 Feb 2025 19:20:08 +0000
+Message-ID: <87r0441e6v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	kvmarm <kvmarm@lists.linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	christoffer.dall@arm.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	coltonlewis@google.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
+In-Reply-To: <8da22249-eedb-477b-98d8-f50dee56f1f7@redhat.com>
+References: <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
+	<86y10osr19.wl-maz@kernel.org>
+	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
+	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
+	<152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
+	<86h661wje4.wl-maz@kernel.org>
+	<4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
+	<86cygpwfy0.wl-maz@kernel.org>
+	<b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
+	<86frkptzr6.wl-maz@kernel.org>
+	<Z6ZMdv8jJUvYwQzT@linux.dev>
+	<86bjvdtxb5.wl-maz@kernel.org>
+	<8da22249-eedb-477b-98d8-f50dee56f1f7@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250123-bbd289cfd7abfd93e9b67eef@orel>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.185.192
+X-SA-Exim-Rcpt-To: eauger@redhat.com, oliver.upton@linux.dev, gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Drew,
-
-On Thu, Jan 23, 2025 at 04:53:29PM +0100, Andrew Jones wrote:
-> On Mon, Jan 20, 2025 at 04:43:13PM +0000, Alexandru Elisei wrote:
-> > arm/arm64 supports running tests under kvmtool, but kvmtool's syntax for
-> > running a virtual machine is different than qemu's. To run tests using the
-> > automated test infrastructure, add a new test parameter, kvmtool_params.
-> > The parameter serves the exact purpose as qemu_params/extra_params, but using
-> > kvmtool's syntax.
+On Mon, 10 Feb 2025 18:26:48 +0000,
+Eric Auger <eauger@redhat.com> wrote:
 > 
-> The need for qemu_params and kvmtool_params makes more sense to me now
-> that I see the use in unittests.cfg (I wonder if we can't rearrange this
-> series to help understand these things up front?). There's a lot of
+> Hi Marc,
+> 
+> On 2/7/25 7:38 PM, Marc Zyngier wrote:
+> > On Fri, 07 Feb 2025 18:09:58 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> >>
+> >> Hey,
+> >>
+> >> On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
+> >>> I found at least one issue that could fail the migration. Before the
+> >>> VM starts running, we limit the feature set to the subset we actually
+> >>> support with NV.
+> >>>
+> >>> By doing this, we also change the value of IDreg fields that are not
+> >>> writable, because they describe features that we don't support.
+> >>> Obviously, that fails on restore.
+> >>>
+> >>> I need to have a think...
+> >>
+> >> We spoke about this a while ago (and I forgot til now), but I was
+> >> wondering if we could use vCPU feature flags to describe NV, including
+> >> the selection between FEAT_E2H0 and FEAT_VHE.
+> >>
+> >> I think this might match userspace expectations a bit more closely where
+> >> the state of the ID registers after init gives the actual feature set
+> >> supported by the VM.
+> > 
+> > I'm not sure that's enough. Let me give you an example:
+> > 
+> > My host has FEAT_XNX, described in ID_AA64MMFR1_EL1.XNX. For whatever
+> > reason, we don't allow this field to be written to, even out of NV
+> > context. This is odd, because for an EL1 VM, this field means nothing
+> > at all.
+> So the curprit fields for me look like
+> 
+> - ID_AA64MMFR1_EL1.XNX
+> - ID_AA64DFR0_EL1.DoubleLock
+> - ID_AA64PFR0_EL1.RAS
 
-Certainly, I'll move it closer to the beginning of the series.
+Right, that more or less matches what I see locally.
 
-> duplication, though, with having two sets of params since the test-
-> specific inputs always have to be duplicated. To avoid the duplication
-> I think we can use extra_params for '-append' and '--params' by
-> parametrizing the option name for "params" (-append / --params) and then
-> create qemu_opts and kvmtool_opts for extra options like --pmu, --mem,
-> and irqchip.
+I adopted the following scheme:
 
-How about something like this (I am using selftest-setup as an example, all the
-other test definitions would be similarly modified):
+- On top of the existing KVM_ARM_VCPU_HAS_EL2, we have a new
+  KVM_ARM_VCPU_HAS_EL2_E2H0, which is only valid when the former is
+  also set, and force the whole VM in E2H==0 mode (that's Oliver's
+  idea above)
 
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 2bdad67d5693..3009305ba2d3 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -15,7 +15,9 @@
- [selftest-setup]
- file = selftest.flat
- smp = 2
--extra_params = -m 256 -append 'setup smp=2 mem=256'
-+test_args = setup smp=2 mem=256
-+qemu_params = -m 256
-+kvmtool_params = --mem 256
- groups = selftest
+- The NV view of the ID registers is enforced at the point where we
+  compute the limit values via the ID reg reset helper, instead of the
+  post-init repainting
 
-I was thinking about using 'test_args' instead of 'extra_params' to avoid any
-confusion between the two, and to match how they are passed to a test
-- they are in the argv main's argument.
+- Neither of ID_AA64MMFR1_EL1.VH or ID_AA64MMFR4_EL1.E2H0 are writable
+  at all
 
-Also, should I change the test definitions for all the other architectures?
-It's not going to be possible for me to test all the changes.
+- Only ID_AA64MMFR4_EL1.NV_frac is writable
+
+The result is fairly small, but is of course quite an ABI breakage,
+and I'm more than happy not to have merged it sooner. Maybe I should
+wait another couple of years! ;-)
+
+> This is still based on your nv-next branch from Jan 9
+> https://github.com/eauger/linux/tree/nv_next_jan9_2025
+
+Yeah, that's getting old now, specially given the nature of the bug
+fixes that have been added.
+
+I'll try to rebase everything on -rc2 with the latest fixes and the
+new ABI by the end of the week, and we will take it from there.
 
 Thanks,
-Alex
 
-> 
-> Thanks,
-> drew
-> 
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  arm/unittests.cfg   | 27 +++++++++++++++++++++++++++
-> >  docs/unittests.txt  |  8 ++++++++
-> >  scripts/common.bash |  4 ++++
-> >  3 files changed, 39 insertions(+)
-> > 
-> > diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> > index 2bdad67d5693..974a5a9e4113 100644
-> > --- a/arm/unittests.cfg
-> > +++ b/arm/unittests.cfg
-> > @@ -16,18 +16,21 @@
-> >  file = selftest.flat
-> >  smp = 2
-> >  extra_params = -m 256 -append 'setup smp=2 mem=256'
-> > +kvmtool_params = --mem 256 --params 'setup smp=2 mem=256'
-> >  groups = selftest
-> >  
-> >  # Test vector setup and exception handling (kernel mode).
-> >  [selftest-vectors-kernel]
-> >  file = selftest.flat
-> >  extra_params = -append 'vectors-kernel'
-> > +kvmtool_params = --params 'vectors-kernel'
-> >  groups = selftest
-> >  
-> >  # Test vector setup and exception handling (user mode).
-> >  [selftest-vectors-user]
-> >  file = selftest.flat
-> >  extra_params = -append 'vectors-user'
-> > +kvmtool_params = --params 'vectors-user'
-> >  groups = selftest
-> >  
-> >  # Test SMP support
-> > @@ -35,6 +38,7 @@ groups = selftest
-> >  file = selftest.flat
-> >  smp = $MAX_SMP
-> >  extra_params = -append 'smp'
-> > +kvmtool_params = --params 'smp'
-> >  groups = selftest
-> >  
-> >  # Test PCI emulation
-> > @@ -47,66 +51,77 @@ groups = pci
-> >  file = pmu.flat
-> >  groups = pmu
-> >  extra_params = -append 'cycle-counter 0'
-> > +kvmtool_params = --pmu --params 'cycle-counter 0'
-> >  
-> >  [pmu-event-introspection]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-event-introspection'
-> > +kvmtool_params = --pmu --params 'pmu-event-introspection'
-> >  
-> >  [pmu-event-counter-config]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-event-counter-config'
-> > +kvmtool_params = --pmu --params 'pmu-event-counter-config'
-> >  
-> >  [pmu-basic-event-count]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-basic-event-count'
-> > +kvmtool_params = --pmu --params 'pmu-basic-event-count'
-> >  
-> >  [pmu-mem-access]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-mem-access'
-> > +kvmtool_params = --pmu --params 'pmu-mem-access'
-> >  
-> >  [pmu-mem-access-reliability]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-mem-access-reliability'
-> > +kvmtool_params = --pmu --params 'pmu-mem-access-reliability'
-> >  
-> >  [pmu-sw-incr]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-sw-incr'
-> > +kvmtool_params = --pmu --params 'pmu-sw-incr'
-> >  
-> >  [pmu-chained-counters]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-chained-counters'
-> > +kvmtool_params = --pmu --params 'pmu-chained-counters'
-> >  
-> >  [pmu-chained-sw-incr]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-chained-sw-incr'
-> > +kvmtool_params = --pmu --params 'pmu-chained-sw-incr'
-> >  
-> >  [pmu-chain-promotion]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-chain-promotion'
-> > +kvmtool_params = --pmu --params 'pmu-chain-promotion'
-> >  
-> >  [pmu-overflow-interrupt]
-> >  file = pmu.flat
-> >  groups = pmu
-> >  arch = arm64
-> >  extra_params = -append 'pmu-overflow-interrupt'
-> > +kvmtool_params = --pmu --params 'pmu-overflow-interrupt'
-> >  
-> >  # Test PMU support (TCG) with -icount IPC=1
-> >  #[pmu-tcg-icount-1]
-> > @@ -127,48 +142,56 @@ extra_params = -append 'pmu-overflow-interrupt'
-> >  file = gic.flat
-> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
-> >  extra_params = -machine gic-version=2 -append 'ipi'
-> > +kvmtool_params = --irqchip=gicv2 --params 'ipi'
-> >  groups = gic
-> >  
-> >  [gicv2-mmio]
-> >  file = gic.flat
-> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
-> >  extra_params = -machine gic-version=2 -append 'mmio'
-> > +kvmtool_params = --irqchip=gicv2 --params 'mmio'
-> >  groups = gic
-> >  
-> >  [gicv2-mmio-up]
-> >  file = gic.flat
-> >  smp = 1
-> >  extra_params = -machine gic-version=2 -append 'mmio'
-> > +kvmtool_params = --irqchip=gicv2 --params 'mmio'
-> >  groups = gic
-> >  
-> >  [gicv2-mmio-3p]
-> >  file = gic.flat
-> >  smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
-> >  extra_params = -machine gic-version=2 -append 'mmio'
-> > +kvmtool_params = --irqchip=gicv2 --params 'mmio'
-> >  groups = gic
-> >  
-> >  [gicv3-ipi]
-> >  file = gic.flat
-> >  smp = $MAX_SMP
-> >  extra_params = -machine gic-version=3 -append 'ipi'
-> > +kvmtool_params = --irqchip=gicv3 --params 'ipi'
-> >  groups = gic
-> >  
-> >  [gicv2-active]
-> >  file = gic.flat
-> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
-> >  extra_params = -machine gic-version=2 -append 'active'
-> > +kvmtool_params = --irqchip=gicv2 --params 'active'
-> >  groups = gic
-> >  
-> >  [gicv3-active]
-> >  file = gic.flat
-> >  smp = $MAX_SMP
-> >  extra_params = -machine gic-version=3 -append 'active'
-> > +kvmtool_params = --irqchip=gicv3 --params 'active'
-> >  groups = gic
-> >  
-> >  [its-introspection]
-> >  file = gic.flat
-> >  smp = $MAX_SMP
-> >  extra_params = -machine gic-version=3 -append 'its-introspection'
-> > +kvmtool_params = --irqchip=gicv3-its --params 'its-introspection'
-> >  groups = its
-> >  arch = arm64
-> >  
-> > @@ -176,6 +199,7 @@ arch = arm64
-> >  file = gic.flat
-> >  smp = $MAX_SMP
-> >  extra_params = -machine gic-version=3 -append 'its-trigger'
-> > +kvmtool_params = --irqchip=gicv3-its --params 'its-trigger'
-> >  groups = its
-> >  arch = arm64
-> >  
-> > @@ -232,6 +256,7 @@ groups = cache
-> >  file = debug.flat
-> >  arch = arm64
-> >  extra_params = -append 'bp'
-> > +kvmtool_params = --params 'bp'
-> >  groups = debug
-> >  
-> >  [debug-bp-migration]
-> > @@ -244,6 +269,7 @@ groups = debug migration
-> >  file = debug.flat
-> >  arch = arm64
-> >  extra_params = -append 'wp'
-> > +kvmtool_params = --params 'wp'
-> >  groups = debug
-> >  
-> >  [debug-wp-migration]
-> > @@ -256,6 +282,7 @@ groups = debug migration
-> >  file = debug.flat
-> >  arch = arm64
-> >  extra_params = -append 'ss'
-> > +kvmtool_params = --params 'ss'
-> >  groups = debug
-> >  
-> >  [debug-sstep-migration]
-> > diff --git a/docs/unittests.txt b/docs/unittests.txt
-> > index 3e1a9e563016..ebb6994cab77 100644
-> > --- a/docs/unittests.txt
-> > +++ b/docs/unittests.txt
-> > @@ -69,6 +69,14 @@ extra_params
-> >  Alias for 'qemu_params', supported for compatibility purposes. Use
-> >  'qemu_params' for new tests.
-> >  
-> > +kvmtool_params
-> > +--------------
-> > +Extra parameters supplied to the kvmtool process. Works similarly to
-> > +qemu_params and extra_params, but uses kvmtool's syntax for command line
-> > +arguments. The example for qemu_params, applied to kvmtool, would be:
-> > +
-> > +kvmtool_params = --mem 256 --params 'smp=2'
-> > +
-> >  groups
-> >  ------
-> >  groups = <group_name1> <group_name2> ...
-> > diff --git a/scripts/common.bash b/scripts/common.bash
-> > index 1b5e0d667841..f54ffbd7a87b 100644
-> > --- a/scripts/common.bash
-> > +++ b/scripts/common.bash
-> > @@ -67,6 +67,10 @@ function for_each_unittest()
-> >  			qemu_opts=$(parse_opts ${BASH_REMATCH[2]}$'\n' $fd)
-> >  		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
-> >  			qemu_opts=${BASH_REMATCH[2]}
-> > +		elif [[ $line =~ ^kvmtool_params\ *=\ *'"""'(.*)$ ]]; then
-> > +			kvmtool_opts=$(parse_opts ${BASH_REMATCH[1]}$'\n' $fd)
-> > +		elif [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
-> > +			kvmtool_opts=${BASH_REMATCH[1]}
-> >  		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
-> >  			groups=${BASH_REMATCH[1]}
-> >  		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> > -- 
-> > 2.47.1
-> > 
-> > 
-> > -- 
-> > kvm-riscv mailing list
-> > kvm-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/kvm-riscv
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
