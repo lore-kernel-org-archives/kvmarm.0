@@ -1,246 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A0A1F12ED;
-	Tue, 11 Feb 2025 09:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1121F9A90
+	for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 10:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739265905; cv=none; b=mjireCsmNKyvqDlYxTTHgDJYo28c3Ui/2DQ6AsA4tnkrnHtPzXq1T1BzIqKP+bJ8Ab59dsh1dmFKl0dQ8trAoNl/jyTZ/W7MoxfzmP0FZxGsT93K/z12c0dFO42PnOuDDbw7zWYj8yGi+j7EnlJJlQyGKt+PG0DTSJQCQiaTiFg=
+	t=1739270448; cv=none; b=IqmHXG0b7wAppJr31ZHzz/xOLT2gw7wznn17yMbnqnCIkZwEj6f6I4GgnOhBecQeaP4jgTH6tdrsbGnCbczpgF8RvwluHvGdG6HNykmEXUdX9RGqYILqeOxSXzVRuooDuKZYs4OMjbo/ITwz9W+fyr0EoIxdd/PcTDyuW5weSV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739265905; c=relaxed/simple;
-	bh=SR5LwxmHxJbxL8Gifp96GYWy5xT2GbIst98vLDN4fPM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P2S2XNbwVIlam8pjTatyOrxNpI1bxdjHdDrM2Y95qlsfiA1tbI6QxR41a8OkTynPMpVh5bMbWCo6ub1+ucWoB+h6bWYUP3TF8IX0JbtFL0/N/WfdRQHobwb2hWOibAObe3okgPUy7rlld2lV1aQ+Gyky7UHzUZ2cAHySWcALflU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nKQSqQbl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739270448; c=relaxed/simple;
+	bh=btgsMkB+KatSBhW2xvQ/HbfeImWKcXqMZC5wzTOtkqg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QteYQI7H1ZNK8a0m/og106FvKmzqmUVa+f7u3hMh5nafwNP/bvEz665aXEr0wGyVS/+5P7zumpPbld0jJbiRJvhGChf0h0HVmnx0hYMnk/AglOSBZc4UzYQfxUOAhG1mkwoa3DP6tnZ7XESlR5PYJxaYsGPq/sIsUYqZibnRWp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ErD4E/RU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKQSqQbl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA367C4CEDD;
-	Tue, 11 Feb 2025 09:25:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739265904;
-	bh=SR5LwxmHxJbxL8Gifp96GYWy5xT2GbIst98vLDN4fPM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nKQSqQblbizWzWsqck6Hc+bJ/6neD3u0R68/NnK5rihuQCNG77Xa8rUqHiFr6zsvw
-	 uaKplYQY9Mq/jgzYt0q5jiqsb7lU7WgWIOEScwVGVTAcNch+Q+f4I7ZBk0RDjyX0qr
-	 5sKta5E6pe+eqebn+Jk2rhlerAUMmr4GQyf7GrEusSZaOt645nVnyjvmE7hR3ET6dz
-	 teUdrQa7OcInc4drcdmLbmzwL7OqFhVNL5E/KjRg9zBUys3rsFMF5zL6oGZJSj02YP
-	 hp6pnbkEbr9ptXSbTIO07SqrSm068K3hQSrzRfqxQ6oLfetn9pv5Je0vmN0KZvrkSQ
-	 MvZ043GdJFFhQ==
-Received: from [104.132.45.111] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1thmVp-002uM5-Fz;
-	Tue, 11 Feb 2025 09:25:01 +0000
-Date: Tue, 11 Feb 2025 09:24:54 +0000
-Message-ID: <87seok25qx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm-riscv@lists.infradead.org,
-	Ingo Molnar <mingo@redhat.com>,
-	linux-riscv@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	kvmarm@lists.linux.dev,
-	Alexander Potapenko <glider@google.com>,
-	x86@kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 2/3] KVM: arm64: switch to using kvm_lock/unlock_all_vcpus
-In-Reply-To: <20250211000917.166856-3-mlevitsk@redhat.com>
-References: <20250211000917.166856-1-mlevitsk@redhat.com>	<20250211000917.166856-3-mlevitsk@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErD4E/RU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739270445;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=btgsMkB+KatSBhW2xvQ/HbfeImWKcXqMZC5wzTOtkqg=;
+	b=ErD4E/RU1arsLGEYQdfZ5+w7z/KhLH5ynMEcM7nlnSg49gRVbMJ5bVJLxhKKzUhWjPdQ31
+	qA4+ym/KEkSn2Upjl9Jg0XI//z6gsZ9F15PM5BEPR3eRih1QPpKa53z1/4P7S7QFtqcCdo
+	JnUDqPkyb5rr3n4YS7qtP7byxiDV1z0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-56-MTJckh0aMkq5nlDg_xHcOQ-1; Tue, 11 Feb 2025 05:40:44 -0500
+X-MC-Unique: MTJckh0aMkq5nlDg_xHcOQ-1
+X-Mimecast-MFC-AGG-ID: MTJckh0aMkq5nlDg_xHcOQ_1739270443
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4394c0a58e7so7839725e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 11 Feb 2025 02:40:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739270443; x=1739875243;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=btgsMkB+KatSBhW2xvQ/HbfeImWKcXqMZC5wzTOtkqg=;
+        b=Nma6tVIOw+MiDpEMWeYqioSTjv96gU1M1ZmoHTrQPUCfWagJLb0uDntLB4lYuNqFM1
+         4lZRNn64E970QK6J0SZFTSOfJSwpu5LvnTJQPZ7rUC3ikwn3rHUoizqtQcMy6SCqEbvu
+         XplTAsIxIJlI7W7toT33sSs4IrGXYddw80Tyd+uWcyL76/uMQraKZwbrr/o06gssRrBX
+         gjvb+QvL3xYEGJ9wnOyInwM+7592YYE3LL6/4njo9EOFLdtceB88FQfaowchrZfTcZip
+         cWWJ1oOB499eu0RLwKubZD4hRspaVlBzby00rcqSJbGWzjkaBqHv+xP6lxLAsqILmx46
+         AvkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUt5gChZLSSec0hBkC5CsGm4eGlqo8O5DuaH7b7FrcATYMVp8WzNvGnm53lEzep6Cswh77y5kg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzBQtzmoEb++eUSqu0DO19smvAyKeulgAerU0sjGjPXQ+zH04DK
+	X8YJBb+2NXghqyBievGlabmWXgXnCP1MhBrO7j4VzWtwTfKyJ0TEy9zSTCaoeMw8u9aurMpm7J6
+	igF1pl/T/DQtJ9W0HJshEYijG+K/FRfpX4LeH+heBgtB1nnOqUwX9dRN5M+8HCAxe8UA7UmIGfW
+	bLFng2T7pA969xCsNb7U14sFzotAH6
+X-Gm-Gg: ASbGnct4jx2ZU8hMhl+XWzA9rkSMvsOdo5mGaTeyLXBE5nlP+cPRWSVlVwyeRrPX4am
+	Be1Y9zxKZX9D40g1eawz45w9xyoSD3HMIH7K5/wT+7OsPPXVc6xrs3KpjYsC4
+X-Received: by 2002:a05:600c:c07:b0:439:4832:325f with SMTP id 5b1f17b1804b1-43948323427mr44529235e9.1.1739270442745;
+        Tue, 11 Feb 2025 02:40:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGbumiPynQJLdfXR/hK61jc+qEpAs+mRfIkPjt8BvK5dw/XkyvYRl2OENNVY4nN2HiUviGg5p2QXMZIr5RQ2vU=
+X-Received: by 2002:a05:600c:c07:b0:439:4832:325f with SMTP id
+ 5b1f17b1804b1-43948323427mr44528985e9.1.1739270442437; Tue, 11 Feb 2025
+ 02:40:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.45.111
-X-SA-Exim-Rcpt-To: mlevitsk@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com, jingzhangos@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, rdunlap@infradead.org, suzuki.poulose@arm.com, palmer@dabbelt.com, yuzenghui@huawei.com, kvm-riscv@lists.infradead.org, mingo@redhat.com, linux-riscv@lists.infradead.org, joey.gouly@arm.com, paul.walmsley@sifive.com, tglx@linutronix.de, bhelgaas@google.com, aou@eecs.berkeley.edu, kvmarm@lists.linux.dev, glider@google.com, x86@kernel.org, seanjc@google.com, anup@brainfault.org, jiangkunkun@huawei.com, atishp@atishpatra.org, catalin.marinas@arm.com, will@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250211000917.166856-1-mlevitsk@redhat.com> <20250211000917.166856-3-mlevitsk@redhat.com>
+ <87seok25qx.wl-maz@kernel.org>
+In-Reply-To: <87seok25qx.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 11 Feb 2025 11:40:29 +0100
+X-Gm-Features: AWEUYZnT1g0RdyJqMZtSUMcVn2SB8z3GSQjhvL_omNqa0pSFmSAU_EQ9poyWn3Q
+Message-ID: <CABgObfa6DGM4X5HKb6FHoeiitTp4ddVaUGLRqK+Z=a-JLc9Bzw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: switch to using kvm_lock/unlock_all_vcpus
+To: Marc Zyngier <maz@kernel.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	Jing Zhang <jingzhangos@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Randy Dunlap <rdunlap@infradead.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, 
+	Ingo Molnar <mingo@redhat.com>, linux-riscv@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev, 
+	Alexander Potapenko <glider@google.com>, x86@kernel.org, Sean Christopherson <seanjc@google.com>, 
+	Anup Patel <anup@brainfault.org>, Kunkun Jiang <jiangkunkun@huawei.com>, 
+	Atish Patra <atishp@atishpatra.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Th63VxeCbSbGwv4_R7l0sYaiAhDcVs7P9VOgdqL7swY_1739270443
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 11 Feb 2025 00:09:16 +0000,
-Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> 
-> Switch to kvm_lock/unlock_all_vcpus instead of arm's own
-> version.
-> 
-> This fixes lockdep warning about reaching maximum lock depth:
-> 
-> [  328.171264] BUG: MAX_LOCK_DEPTH too low!
-> [  328.175227] turning off the locking correctness validator.
-> [  328.180726] Please attach the output of /proc/lock_stat to the bug report
-> [  328.187531] depth: 48  max: 48!
-> [  328.190678] 48 locks held by qemu-kvm/11664:
-> [  328.194957]  #0: ffff800086de5ba0 (&kvm->lock){+.+.}-{3:3}, at: kvm_ioctl_create_device+0x174/0x5b0
-> [  328.204048]  #1: ffff0800e78800b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.212521]  #2: ffff07ffeee51e98 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.220991]  #3: ffff0800dc7d80b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.229463]  #4: ffff07ffe0c980b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.237934]  #5: ffff0800a3883c78 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> [  328.246405]  #6: ffff07fffbe480b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-> 
-> No functional change intended.
+On Tue, Feb 11, 2025 at 10:25=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+> > No functional change intended.
+>
+> Actually plenty of it.
 
-Actually plenty of it. This sort of broad assertion is really an
-indication of the contrary.
+Yes, definitely. That's not "no functional change intended", it's "no
+breakage of sane userspace intended" which is pretty much the
+opposite.
 
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h     |  3 ---
->  arch/arm64/kvm/arch_timer.c           |  8 +++----
->  arch/arm64/kvm/arm.c                  | 32 ---------------------------
->  arch/arm64/kvm/vgic/vgic-init.c       | 11 +++++----
->  arch/arm64/kvm/vgic/vgic-its.c        | 18 ++++++++-------
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 21 ++++++++++--------
->  6 files changed, 33 insertions(+), 60 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cfa024de4e3..bba97ea700ca 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1234,9 +1234,6 @@ int __init populate_sysreg_config(const struct sys_reg_desc *sr,
->  				  unsigned int idx);
->  int __init populate_nv_trap_config(void);
->  
-> -bool lock_all_vcpus(struct kvm *kvm);
-> -void unlock_all_vcpus(struct kvm *kvm);
-> -
->  void kvm_calculate_traps(struct kvm_vcpu *vcpu);
->  
->  /* MMIO helpers */
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 231c0cd9c7b4..3af1da807f9c 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1769,7 +1769,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
->  
->  	mutex_lock(&kvm->lock);
->  
-> -	if (lock_all_vcpus(kvm)) {
-> +	ret = kvm_lock_all_vcpus(kvm);
-> +
-> +	if (!ret) {
->  		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
->  
->  		/*
-> @@ -1781,9 +1783,7 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
->  		kvm->arch.timer_data.voffset = offset->counter_offset;
->  		kvm->arch.timer_data.poffset = offset->counter_offset;
->  
-> -		unlock_all_vcpus(kvm);
-> -	} else {
-> -		ret = -EBUSY;
-> +		kvm_unlock_all_vcpus(kvm);
->  	}
+> Yet the new helper returns -EINTR, which you blindly forward to userspace=
+.
 
-This is a userspace ABI change. This ioctl is documented as being able
-to return -EINVAL or -EBUSY, and nothing else other than 0. Yet the
-new helper returns -EINTR, which you blindly forward to userspace.
+It won't quite reach userspace, since the task won't survive
+mutex_lock_killable(). With your current code the kill will arrive
+just after the ioctl returns to userspace, so there's no change in
+behavior there. The -EBUSY change is the one that matters.
 
->  
->  	mutex_unlock(&kvm->lock);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 071a7d75be68..f58849c5b4f0 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1895,38 +1895,6 @@ static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
->  	}
->  }
->  
-> -void unlock_all_vcpus(struct kvm *kvm)
-> -{
-> -	lockdep_assert_held(&kvm->lock);
-> -
-> -	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
-> -}
-> -
-> -/* Returns true if all vcpus were locked, false otherwise */
-> -bool lock_all_vcpus(struct kvm *kvm)
-> -{
-> -	struct kvm_vcpu *tmp_vcpu;
-> -	unsigned long c;
-> -
-> -	lockdep_assert_held(&kvm->lock);
-> -
-> -	/*
-> -	 * Any time a vcpu is in an ioctl (including running), the
-> -	 * core KVM code tries to grab the vcpu->mutex.
-> -	 *
-> -	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
-> -	 * other VCPUs can fiddle with the state while we access it.
-> -	 */
-> -	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
-> -		if (!mutex_trylock(&tmp_vcpu->mutex)) {
-> -			unlock_vcpus(kvm, c - 1);
-> -			return false;
-> -		}
-> -	}
-> -
-> -	return true;
-> -}
+> At the end of the day, the x86 locking serves completely different
+> purposes. It wants to gracefully wait for vcpus to exit and is happy
+> to replay things, because migration (which is what x86 seems to be
+> using this for) is a stupidly long process.
 
-The semantics are different.
+No, it's not using it for the whole length of migration. It serves the
+same exact purpose as ARM: do some stuff on something that spans a
+whole struct kvm. The only difference is the behavior on contended
+mutex, where x86 simply says don't do it.
 
-Other than the return values mentioned above, the new version fails on
-signal delivery, which isn't expected.  The guarantee given to
-userspace is that unless a vcpu thread is currently in KVM, the
-locking will succeed. Not "will succeed unless something that is
-outside of your control happens".
+> Our locking is designed to
+> either succeed or fail quickly, because some of the lock paths are on
+> the critical path for VM startup and configuration.
 
-The arm64 version is also built around a mutex_trylock() because we
-don't want to wait forever until the vcpu's mutex is released. We want
-it now, or never. That's consistent with the above requirement on
-userspace.
+The only long-running vCPU ioctl is KVM_RUN and you don't have that
+during VM startup and configuration. The interesting case is
+snapshotting, i.e. reading attributes.
 
-We can argue whether or not these are good guarantees (or
-requirements) to give to (or demand from) userspace, but that's what
-we have, and I'm not prepared to break any of it.
+Failing quickly when reading attributes makes sense, and I'd be
+rightly wary of changing it. I know that QEMU is doing them only when
+it knows CPUs are stopped, but it does seem to affect crosvm and
+Firecracker more, for snapshotting more than startup/configuration.
+The GIC snapshotting code in crosvm returns an anyhow::Result and ends
+up logging an error with println!, Firecracker is similar as it also
+propagates the error. So neither crosvm nor Firecracker have
+particularly sophisticated error handling but they do seem to want to
+fail their RPCs quickly.
 
-At the end of the day, the x86 locking serves completely different
-purposes. It wants to gracefully wait for vcpus to exit and is happy
-to replay things, because migration (which is what x86 seems to be
-using this for) is a stupidly long process. Our locking is designed to
-either succeed or fail quickly, because some of the lock paths are on
-the critical path for VM startup and configuration.
+Failing quickly when creating the device or setting attributes makes
+less sense (Firecracker for one does an unwrap() there). But anyhow
+the change would have to be a separate patch, certainly not one
+applied through the generic KVM tree; and if you decide that you're
+stuck with it, that would be more than understandable.
 
-So for this series to be acceptable, you'd have to provide the same
-semantics. It is probably doable with a bit of macro magic, at the
-expense of readability.
+> So for this series to be acceptable, you'd have to provide the same
+> semantics. It is probably doable with a bit of macro magic, at the
+> expense of readability.
 
-What I would also like to see is for this primitive to be usable with
-scoped_cond_guard(), which would make the code much more readable.
+Or it can be just an extra bool argument, plus wrappers.
+
+For RISC-V it's only used at device creation time, and the ioctl fails
+if the vCPU ran at least once. Removing the "try" in trylock is
+totally feasible there, however it must be documented in the commit
+message.
 
 Thanks,
 
-	M.
+Paolo
 
--- 
-Without deviation from the norm, progress is not possible.
+> What I would also like to see is for this primitive to be usable with
+> scoped_cond_guard(), which would make the code much more readable.
+
