@@ -1,258 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66963134A8
-	for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 13:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCE52063CD;
+	Wed, 12 Feb 2025 14:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739367663; cv=none; b=OBytLfDkcmTk1VryNWh8DVS7t5vBBvWRtdAm109NYtRLGRNpjAYvCu79gMhVjBM48+S07GRyFCiqalAIb9qV6Z2IYIa1UftrB0xHz/dlrd2v+om/9uiiDqEXD0jjPTJHxxe0xu3GBC+Fkd9XMhc7lduTIWM6vIbawHNb8z6lC7Q=
+	t=1739368834; cv=none; b=VKvuspOxHk7rBx/koowNAH7/AK3MezBBycrpZ8ZQXwjd3f7umjuJJGX3uv9MNcHuekrrGPLU5EpD4NGGD/kt9hHzvzOoLZBol1ssOxKtzjOc7HhEHndrUhQ1TLYP5GZfoHOB9tmj8PTfywJsfOV/zi1n3bPHdYYgzgCrTKEXUSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739367663; c=relaxed/simple;
-	bh=65Xyr7rhnhOTAKinkPNhdZsbca6ULRvLHCrkC6R+N34=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GBng57d0r2VhxWPZiG7U0csL0tOUYcNNz0aljTjNSaoLzFReVjo7YXZ59X6GEVC3T0fxMCsjGBfSpJXZQeeg6kPw+nMlevJwnHQb76z4YIkqOxDCbIaP7DePHgG+Yqw0DSIm4oas53i06hiuQMzVRqAaIhEW4s4XYA6PobQdrnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F53A12FC;
-	Wed, 12 Feb 2025 05:41:20 -0800 (PST)
-Received: from arm.com (e134078.arm.com [10.1.26.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47B593F58B;
-	Wed, 12 Feb 2025 05:40:55 -0800 (PST)
-Date: Wed, 12 Feb 2025 13:40:51 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 04/18] run_tests: Introduce unittest
- parameter 'qemu_params'
-Message-ID: <Z6yk48JpsYKHwFye@arm.com>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-5-alexandru.elisei@arm.com>
- <20250121-82874afe4e52c828d21e7da2@orel>
+	s=arc-20240116; t=1739368834; c=relaxed/simple;
+	bh=ldu5Hug0iWK7d3nKUXsHU/BLDd11OVchE/dle+jdsu0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dY3MUuqI6cF8th4lrcgtd3w0cj21GzTg5NtrjsiPheYHzEjb3+VLT0SrGtX3w5huulWtjDKCVXVKUB6imaMNnu73OXhPIRLTvLkreuktaKKORn9RdZBpuGCrs3CTYr1H4Rqeq3Ih53Uvn0RwInwxCC9kwqTpcUKw40rKBw4xH5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VE8ttz/g; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VE8ttz/g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57979C4CEDF;
+	Wed, 12 Feb 2025 14:00:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739368833;
+	bh=ldu5Hug0iWK7d3nKUXsHU/BLDd11OVchE/dle+jdsu0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VE8ttz/g5kqAa2Z3NE9FsT/CQeN6jTNDvS0YE/U/ohrpJ/oI9ufmW6iJ1f42i7aEU
+	 RlaeIxfNXa+SOQ3E3f0zhZAzmg0yRIcxEDqZTVTvGEt3zfuFhHzT0qJPkbnf/YQBQs
+	 b2bIZ4w1lvO/YN7lVdI9zneqaVqCxYCYQTuhD/2NZ15b+iv5lbv8Hq0s5FGyrpweQ5
+	 +2eSsy5j1atKS1s2mhQpLvomkuaEw9syJaTZrjDU4A10dzRaPLjrCJQ6krnDNI+XaA
+	 Audgze1EnkQvkcNTFLtKRFCOha9zAA5rJRWTwRMnWlyAKscP01LZuPDFjuEtfUuvkr
+	 oSj7PK5uUaXOw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tiDHy-003MNw-UQ;
+	Wed, 12 Feb 2025 14:00:31 +0000
+Date: Wed, 12 Feb 2025 14:00:30 +0000
+Message-ID: <86wmdvs1oh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>,
+	kvmarm@lists.linux.dev,
+	Linux ARM <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	virtualization@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Aishwarya TCV <Aishwarya.TCV@arm.com>
+Subject: Re: kvm: nVHE hyp panic at: __kvm_nvhe_kvm_hyp_handle_sysre
+In-Reply-To: <3902208d-8814-46fe-ba98-3db833b9a886@stanley.mountain>
+References: <CA+G9fYt6Cuu6=OO9w80yhJbZB77Q0qf7nzYdvjbgDbgAw6t1jw@mail.gmail.com>
+	<8634gku30g.wl-maz@kernel.org>
+	<3902208d-8814-46fe-ba98-3db833b9a886@stanley.mountain>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250121-82874afe4e52c828d21e7da2@orel>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dan.carpenter@linaro.org, naresh.kamboju@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, broonie@kernel.org, catalin.marinas@arm.com, arnd@arndb.de, anders.roxell@linaro.org, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Drew,
-
-On Tue, Jan 21, 2025 at 04:46:24PM +0100, Andrew Jones wrote:
-> On Mon, Jan 20, 2025 at 04:43:02PM +0000, Alexandru Elisei wrote:
-> > Tests for the arm and arm64 architectures can also be run with kvmtool, and
-> > work is under way to have it supported by the run_tests.sh test runner. Not
-> > suprisingly, kvmtool has a different syntax than qemu when configuring and
-> > running a virtual machine.
-> > 
-> > Add a new unittest parameter, 'qemu_params', with the goal to add a similar
-> > parameter for each virtual machine manager that run_tests.sh supports.
-> > 
-> > 'qemu_params' and 'extra_params' are interchangeable, but it is expected
-> > that going forward new tests will use 'qemu_params'. A test should have
-> > only one of the two parameters.
-> > 
-> > While we're at it, rename the variable opts to qemu_opts to match the new
-> > unit configuration name, and to make it easier to distinguish from the
-> > kvmtool parameters when they'll be added.
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  docs/unittests.txt   | 17 +++++++++-----
-> >  scripts/common.bash  | 53 ++++++++++++++++++++++++++------------------
-> >  scripts/runtime.bash | 10 ++++-----
-> >  3 files changed, 47 insertions(+), 33 deletions(-)
-> > 
-> > diff --git a/docs/unittests.txt b/docs/unittests.txt
-> > index dbc2c11e3b59..3e1a9e563016 100644
-> > --- a/docs/unittests.txt
-> > +++ b/docs/unittests.txt
-> > @@ -24,9 +24,9 @@ param = value format.
-> >  
-> >  Available parameters
-> >  ====================
-> > -Note! Some parameters like smp and extra_params modify how a test is run,
-> > -while others like arch and accel restrict the configurations in which the
-> > -test is run.
-> > +Note! Some parameters like smp and qemu_params/extra_params modify how a
-> > +test is run, while others like arch and accel restrict the configurations
-> > +in which the test is run.
-> >  
-> >  file
-> >  ----
-> > @@ -56,13 +56,18 @@ smp = <number>
-> >  Optional, the number of processors created in the machine to run the test.
-> >  Defaults to 1. $MAX_SMP can be used to specify the maximum supported.
-> >  
-> > -extra_params
-> > -------------
-> > +qemu_params
-> > +-----------
-> >  These are extra parameters supplied to the QEMU process. -append '...' can
-> >  be used to pass arguments into the test case argv. Multiple parameters can
-> >  be added, for example:
-> >  
-> > -extra_params = -m 256 -append 'smp=2'
-> > +qemu_params = -m 256 -append 'smp=2'
-> > +
-> > +extra_params
-> > +------------
-> > +Alias for 'qemu_params', supported for compatibility purposes. Use
-> > +'qemu_params' for new tests.
-> >  
-> >  groups
-> >  ------
-> > diff --git a/scripts/common.bash b/scripts/common.bash
-> > index 3aa557c8c03d..a40c28121b6a 100644
-> > --- a/scripts/common.bash
-> > +++ b/scripts/common.bash
-> > @@ -1,5 +1,28 @@
-> >  source config.mak
-> >  
-> > +function parse_opts()
-> > +{
-> > +	local opts="$1"
-> > +	local fd="$2"
-> > +
-> > +	while read -r -u $fd; do
-> > +		#escape backslash newline, but not double backslash
-> > +		if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
-> > +			if (( ${#BASH_REMATCH[1]} % 2 == 1 )); then
-> > +				opts=${opts%\\$'\n'}
-> > +			fi
-> > +		fi
-> > +		if [[ "$REPLY" =~ ^(.*)'"""'[:blank:]*$ ]]; then
-> > +			opts+=${BASH_REMATCH[1]}
-> > +			break
-> > +		else
-> > +			opts+=$REPLY$'\n'
-> > +		fi
-> > +	done
-> > +
-> > +	echo "$opts"
-> > +}
-> > +
-> >  function for_each_unittest()
-> >  {
-> >  	local unittests="$1"
-> > @@ -7,7 +30,7 @@ function for_each_unittest()
-> >  	local testname
-> >  	local smp
-> >  	local kernel
-> > -	local opts
-> > +	local qemu_opts
-> >  	local groups
-> >  	local arch
-> >  	local machine
-> > @@ -22,12 +45,12 @@ function for_each_unittest()
-> >  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
-> >  			rematch=${BASH_REMATCH[1]}
-> >  			if [ -n "${testname}" ]; then
-> > -				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
-> > +				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$qemu_opts" "$arch" "$machine" "$check" "$accel" "$timeout"
-> >  			fi
-> >  			testname=$rematch
-> >  			smp=1
-> >  			kernel=""
-> > -			opts=""
-> > +			qemu_opts=""
-> >  			groups=""
-> >  			arch=""
-> >  			machine=""
-> > @@ -38,24 +61,10 @@ function for_each_unittest()
-> >  			kernel=$TEST_DIR/${BASH_REMATCH[1]}
-> >  		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
-> >  			smp=${BASH_REMATCH[1]}
-> > -		elif [[ $line =~ ^extra_params\ *=\ *'"""'(.*)$ ]]; then
-> > -			opts=${BASH_REMATCH[1]}$'\n'
-> > -			while read -r -u $fd; do
-> > -				#escape backslash newline, but not double backslash
-> > -				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
-> > -					if (( ${#BASH_REMATCH[1]} % 2 == 1 )); then
-> > -						opts=${opts%\\$'\n'}
-> > -					fi
-> > -				fi
-> > -				if [[ "$REPLY" =~ ^(.*)'"""'[:blank:]*$ ]]; then
-> > -					opts+=${BASH_REMATCH[1]}
-> > -					break
-> > -				else
-> > -					opts+=$REPLY$'\n'
-> > -				fi
-> > -			done
-> > -		elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> > -			opts=${BASH_REMATCH[1]}
-> > +		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
-> > +			qemu_opts=$(parse_opts ${BASH_REMATCH[2]}$'\n' $fd)
-> > +		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
-> > +			qemu_opts=${BASH_REMATCH[2]}
-> >  		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
-> >  			groups=${BASH_REMATCH[1]}
-> >  		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> > @@ -71,7 +80,7 @@ function for_each_unittest()
-> >  		fi
-> >  	done
-> >  	if [ -n "${testname}" ]; then
-> > -		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
-> > +		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$qemu_opts" "$arch" "$machine" "$check" "$accel" "$timeout"
-> >  	fi
-> >  	exec {fd}<&-
-> >  }
-> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> > index 4b9c7d6b7c39..e5d661684ceb 100644
-> > --- a/scripts/runtime.bash
-> > +++ b/scripts/runtime.bash
-> > @@ -34,7 +34,7 @@ premature_failure()
-> >  get_cmdline()
-> >  {
-> >      local kernel=$1
-> > -    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-> > +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $qemu_opts"
-> >  }
-> >  
-> >  skip_nodefault()
-> > @@ -80,7 +80,7 @@ function run()
-> >      local groups="$2"
-> >      local smp="$3"
-> >      local kernel="$4"
-> > -    local opts="$5"
-> > +    local qemu_opts="$5"
-> >      local arch="$6"
-> >      local machine="$7"
-> >      local check="${CHECK:-$8}"
-> > @@ -179,9 +179,9 @@ function run()
-> >          echo $cmdline
-> >      fi
-> >  
-> > -    # extra_params in the config file may contain backticks that need to be
-> > -    # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
-> > -    # preserve the exit status.
-> > +    # qemu_params/extra_params in the config file may contain backticks that
-> > +    # need to be expanded, so use eval to start qemu.  Use "> >(foo)" instead of
-> > +    # a pipe to preserve the exit status.
-> >      summary=$(eval "$cmdline" 2> >(RUNTIME_log_stderr $testname) \
-> >                               > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
-> >      ret=$?
-> > -- 
-> > 2.47.1
-> >
+On Wed, 12 Feb 2025 11:41:38 +0000,
+Dan Carpenter <dan.carpenter@linaro.org> wrote:
 > 
-> Hmm, I'll keep reading the series, but it seems like we should be choosing
-> generic names like 'extra_params' and 'opts' that we plan to use for both
-> QEMU and kvmtool since they both have the concepts of "options" and "extra
-> params".
+> On Tue, Feb 11, 2025 at 11:36:31AM +0000, Marc Zyngier wrote:
+> > For the crash at hand, which clearly shows nVHE, can you report
+> > whether the following hack fixes it for you?
+> > 
+> > 	M.
+> 
+> No luck, I'm afraid.  It still crashes the same way.
 
-I'm afraid I don't follow you. 'qemu_params' was chosen because it uses
-qemu-specific syntax. Same for 'kvmtool_params', introduced later in the
-series. Are you referring to unittests.cfg or to something else?
+Right. It was one level deeper. The following change fixes it for
+me. YMMV.
 
-Thanks,
-Alex
+	M.
+
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index f838a45665f26..b899d815d272f 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -501,9 +501,22 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
+ 
++/* Open-coded version of timer_get_offset() to allow for kern_hyp_va() */
++static inline u64 hyp_timer_get_offset(struct arch_timer_context *ctxt)
++{
++	u64 offset = 0;
++
++	if (ctxt->offset.vm_offset)
++		offset += *kern_hyp_va(ctxt->offset.vm_offset);
++	if (ctxt->offset.vcpu_offset)
++		offset += *kern_hyp_va(ctxt->offset.vcpu_offset);
++
++	return offset;
++}
++
+ static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
+ {
+-	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
++	return arch_timer_read_cntpct_el0() - hyp_timer_get_offset(ctxt);
+ }
+ 
+ static bool kvm_handle_cntxct(struct kvm_vcpu *vcpu)
+
+-- 
+Without deviation from the norm, progress is not possible.
