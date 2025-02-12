@@ -1,115 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCE52063CD;
-	Wed, 12 Feb 2025 14:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B316D20B801
+	for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 15:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739368834; cv=none; b=VKvuspOxHk7rBx/koowNAH7/AK3MezBBycrpZ8ZQXwjd3f7umjuJJGX3uv9MNcHuekrrGPLU5EpD4NGGD/kt9hHzvzOoLZBol1ssOxKtzjOc7HhEHndrUhQ1TLYP5GZfoHOB9tmj8PTfywJsfOV/zi1n3bPHdYYgzgCrTKEXUSM=
+	t=1739375348; cv=none; b=J+cdPqoE1Gqorqbp2PFWZCbNEFBHS1oI8AZR7+XpMgtz96HX83xC19l6ZllMGoOkHJx8/D6rvmXiP3NfFF/dHLr1ZcQ0aopVjc8AVn/aTmQMy8DNAEdYOrV9wfWFnIkBHM9/20IFZSUvAB00VFp11j7/rNvyrH/3DrmO7tQ95MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739368834; c=relaxed/simple;
-	bh=ldu5Hug0iWK7d3nKUXsHU/BLDd11OVchE/dle+jdsu0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dY3MUuqI6cF8th4lrcgtd3w0cj21GzTg5NtrjsiPheYHzEjb3+VLT0SrGtX3w5huulWtjDKCVXVKUB6imaMNnu73OXhPIRLTvLkreuktaKKORn9RdZBpuGCrs3CTYr1H4Rqeq3Ih53Uvn0RwInwxCC9kwqTpcUKw40rKBw4xH5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VE8ttz/g; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739375348; c=relaxed/simple;
+	bh=OxkzckJ894uEJz7kftdcKxjWCvJaHuQolxSxlT36+AE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hUbZkejSO7MXI1iS67817uI0jGqTvfEzDIyU2ONq5POUL/xc4BX5PPA17E8+dJnObzi98CGCoRgVa6574oIdzhXikHX8VY71ixlsBe1C6bhdCYKLuQdu93OU/E1j9b4BLyxNw02inVzxE6SIknTj74pK+Rtj3TQ149za5eM17yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c/OgCsn7; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VE8ttz/g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57979C4CEDF;
-	Wed, 12 Feb 2025 14:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739368833;
-	bh=ldu5Hug0iWK7d3nKUXsHU/BLDd11OVchE/dle+jdsu0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VE8ttz/g5kqAa2Z3NE9FsT/CQeN6jTNDvS0YE/U/ohrpJ/oI9ufmW6iJ1f42i7aEU
-	 RlaeIxfNXa+SOQ3E3f0zhZAzmg0yRIcxEDqZTVTvGEt3zfuFhHzT0qJPkbnf/YQBQs
-	 b2bIZ4w1lvO/YN7lVdI9zneqaVqCxYCYQTuhD/2NZ15b+iv5lbv8Hq0s5FGyrpweQ5
-	 +2eSsy5j1atKS1s2mhQpLvomkuaEw9syJaTZrjDU4A10dzRaPLjrCJQ6krnDNI+XaA
-	 Audgze1EnkQvkcNTFLtKRFCOha9zAA5rJRWTwRMnWlyAKscP01LZuPDFjuEtfUuvkr
-	 oSj7PK5uUaXOw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tiDHy-003MNw-UQ;
-	Wed, 12 Feb 2025 14:00:31 +0000
-Date: Wed, 12 Feb 2025 14:00:30 +0000
-Message-ID: <86wmdvs1oh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>,
-	kvmarm@lists.linux.dev,
-	Linux ARM <linux-arm-kernel@lists.infradead.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	virtualization@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Aishwarya TCV <Aishwarya.TCV@arm.com>
-Subject: Re: kvm: nVHE hyp panic at: __kvm_nvhe_kvm_hyp_handle_sysre
-In-Reply-To: <3902208d-8814-46fe-ba98-3db833b9a886@stanley.mountain>
-References: <CA+G9fYt6Cuu6=OO9w80yhJbZB77Q0qf7nzYdvjbgDbgAw6t1jw@mail.gmail.com>
-	<8634gku30g.wl-maz@kernel.org>
-	<3902208d-8814-46fe-ba98-3db833b9a886@stanley.mountain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c/OgCsn7"
+Date: Wed, 12 Feb 2025 16:48:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739375333;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vmg0L/g3+q0yTaB9LWuHIF8QkwBzZd4h117MfIen5LQ=;
+	b=c/OgCsn7kQs98DTIPDKyRY9IWuczp96fsZXGkUJNCxyBQ3Vuz6s8GWJ62djGUbxKpC1yWk
+	I7zWfhyo8zlAy4AiQFrkZVib9LGSyoTypCUCRw8hliUvQPNi40nHB0vTSXQqKFW9IEIjL8
+	Z5yFO3yLd2b9eklxpPjom4HHbQciLf4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
+	andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 04/18] run_tests: Introduce unittest
+ parameter 'qemu_params'
+Message-ID: <20250212-8427334ce25d709f70c4053c@orel>
+References: <20250120164316.31473-1-alexandru.elisei@arm.com>
+ <20250120164316.31473-5-alexandru.elisei@arm.com>
+ <20250121-82874afe4e52c828d21e7da2@orel>
+ <Z6yk48JpsYKHwFye@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan.carpenter@linaro.org, naresh.kamboju@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, broonie@kernel.org, catalin.marinas@arm.com, arnd@arndb.de, anders.roxell@linaro.org, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6yk48JpsYKHwFye@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 12 Feb 2025 11:41:38 +0000,
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> 
-> On Tue, Feb 11, 2025 at 11:36:31AM +0000, Marc Zyngier wrote:
-> > For the crash at hand, which clearly shows nVHE, can you report
-> > whether the following hack fixes it for you?
+On Wed, Feb 12, 2025 at 01:40:51PM +0000, Alexandru Elisei wrote:
+...
+> > > @@ -80,7 +80,7 @@ function run()
+> > >      local groups="$2"
+> > >      local smp="$3"
+> > >      local kernel="$4"
+> > > -    local opts="$5"
+> > > +    local qemu_opts="$5"
+> > >      local arch="$6"
+> > >      local machine="$7"
+> > >      local check="${CHECK:-$8}"
+> > > @@ -179,9 +179,9 @@ function run()
+> > >          echo $cmdline
+> > >      fi
+> > >  
+> > > -    # extra_params in the config file may contain backticks that need to be
+> > > -    # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
+> > > -    # preserve the exit status.
+> > > +    # qemu_params/extra_params in the config file may contain backticks that
+> > > +    # need to be expanded, so use eval to start qemu.  Use "> >(foo)" instead of
+> > > +    # a pipe to preserve the exit status.
+> > >      summary=$(eval "$cmdline" 2> >(RUNTIME_log_stderr $testname) \
+> > >                               > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
+> > >      ret=$?
+> > > -- 
+> > > 2.47.1
+> > >
 > > 
-> > 	M.
+> > Hmm, I'll keep reading the series, but it seems like we should be choosing
+> > generic names like 'extra_params' and 'opts' that we plan to use for both
+> > QEMU and kvmtool since they both have the concepts of "options" and "extra
+> > params".
 > 
-> No luck, I'm afraid.  It still crashes the same way.
+> I'm afraid I don't follow you. 'qemu_params' was chosen because it uses
+> qemu-specific syntax. Same for 'kvmtool_params', introduced later in the
+> series. Are you referring to unittests.cfg or to something else?
+>
 
-Right. It was one level deeper. The following change fixes it for
-me. YMMV.
+I didn't like the renaming of opts to qemu_opts since both kvmtool and
+qemu have "options", so it seems like we should be generalizing variable
+names rather than making them more specific. I see later how there may
+be a need for qemu_options, kvmtool_options, and unit test
+cmdline_options in the unittests.cfg, though. However, here, it seems
+like we could still use 'opts' for the variable and just use another
+variable to determine if we parse qemu_options or kvmtool_options, since
+there shouldn't be a need to parse both.
 
-	M.
-
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f838a45665f26..b899d815d272f 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -501,9 +501,22 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+/* Open-coded version of timer_get_offset() to allow for kern_hyp_va() */
-+static inline u64 hyp_timer_get_offset(struct arch_timer_context *ctxt)
-+{
-+	u64 offset = 0;
-+
-+	if (ctxt->offset.vm_offset)
-+		offset += *kern_hyp_va(ctxt->offset.vm_offset);
-+	if (ctxt->offset.vcpu_offset)
-+		offset += *kern_hyp_va(ctxt->offset.vcpu_offset);
-+
-+	return offset;
-+}
-+
- static inline u64 compute_counter_value(struct arch_timer_context *ctxt)
- {
--	return arch_timer_read_cntpct_el0() - timer_get_offset(ctxt);
-+	return arch_timer_read_cntpct_el0() - hyp_timer_get_offset(ctxt);
- }
- 
- static bool kvm_handle_cntxct(struct kvm_vcpu *vcpu)
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+drew
