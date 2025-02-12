@@ -1,227 +1,292 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F70025D53F
-	for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 18:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15BB25B689
+	for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 18:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739384764; cv=none; b=JOXYnHh6TwA+wutyFeCUiO8b5j2KBPNhfBVDg7+4Z+Pe2NDAJUs4zS+uBO1Wfbv0Yai3HGnr8xcFdeyP41FUaLzEMkD29fm608Sa+4ZIapT4tEsHhEN4cCm23qoh1DV4mv9vi0ARbPtS0JakGXYrRhP/zKZ/ZixZ2RjLfXXUTtc=
+	t=1739386355; cv=none; b=Ce5UVO+qooNZbEEkEbZh/gQqJAeecKfPoxJA9lDS2n/RCrptZCpR3DpjrqoQHFNDWL8W/mxnJDfgX1X5GtBSWwni8YAzng+obmLOiJhfbJ9MsIim5ZXO1XPUP9p0/jzUYMl9Fwc/nhUnbIs2sZi7hGf8CS4NdSwBkE/0xETTl9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739384764; c=relaxed/simple;
-	bh=yuI+PECZbLFotsavzZF231/Cmz0gJvhWqdNSzbk7BQA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JnwP+FZa/aShTMQZYxk2GTzyYx3XkmrLfvG2BteJeeCm48lwM2PzAXkE4Xb/fAmLUH6xxjpXjpbDG+goXNCoIZwugV26K8zY/hcmDC7zb+G+t2ybssBdbOQxPeu2J76kTxrbrR7EOoHZK0abcQwkiGlN/6DRBWuWTG+GuymVDwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8gMpc6+; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8gMpc6+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10A54C4CEE4;
-	Wed, 12 Feb 2025 18:26:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739384764;
-	bh=yuI+PECZbLFotsavzZF231/Cmz0gJvhWqdNSzbk7BQA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t8gMpc6+yMelKvFPQcDMCiiTNada/vjQOPGhftZ0hJImn0PuC8Eae0EaU/mumS0Sx
-	 pH2Yxp7MJWz3vcYKCJrsaan7ygKbRcxgvTMNy4pENIYRl6nC2qIR0eGFg8gE5ziSvw
-	 knqysUmFkqa7xl4vKsILig0+KVoiHlOr9W3GWIvuJI9urXJIySmuygcg4y7lgCxDEZ
-	 CIQNHf2hfTOrs0LuYSkhH8OILdlFN8j4xwgiKAyAQc04+J7+Y2on0G2gcSuXhJv8+B
-	 71MUmyhapiksUjXwQUefxu49cbxnKrGOT3WXG0nmmQ6274a87Sg1CAgVkwZSC6Re06
-	 aYX6kWeeofMqw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tiHQw-003RQt-0Q;
-	Wed, 12 Feb 2025 18:26:02 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Alexander Potapenko <glider@google.com>,
+	s=arc-20240116; t=1739386355; c=relaxed/simple;
+	bh=ZQz2wDiHbpxEQ/ba2T+aRTX+dXIYHn4rkX+/YB/MagY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kqs7TVjiUzYqzE8H8xdRsQ1o7Mqt8H/NCb/0cPSgrpnmtFykZi2ANhuFTgFADi0yMAO907MSL47bbw3uJVRumG89VdWJkUUu6Q6BD0OAsK28IpY7mOQx3OgA/xgz48BoJzAHwlnbJUVcXDtTvPYsfWjQXbriQNk5Ls2OYt9GBtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA44E12FC;
+	Wed, 12 Feb 2025 10:52:53 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8007A3F58B;
+	Wed, 12 Feb 2025 10:52:32 -0800 (PST)
+Date: Wed, 12 Feb 2025 18:52:27 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 2/2] KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to kvm_create_vgic()
-Date: Wed, 12 Feb 2025 18:25:58 +0000
-Message-Id: <20250212182558.2865232-3-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250212182558.2865232-1-maz@kernel.org>
-References: <20250212182558.2865232-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v19 11/11] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+Message-ID: <20250212185227.GC235556@e132581.arm.com>
+References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-11-1c1300802385@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, glider@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250202-arm-brbe-v19-v19-11-1c1300802385@kernel.org>
 
-If userspace creates vcpus, then a vgic, we end-up in a situation
-where irqchip_in_kernel() will return true, but no private interrupt
-has been allocated for these vcpus. This situation will continue
-until userspace initialises the vgic, at which point we fix the
-early vcpus. Should a vcpu run or be initialised in the interval,
-bad things may happen.
+On Sun, Feb 02, 2025 at 06:43:05PM -0600, Rob Herring (Arm) wrote:
+> 
+> From: Anshuman Khandual <anshuman.khandual@arm.com>
+> 
+> The ARMv9.2 architecture introduces the optional Branch Record Buffer
+> Extension (BRBE), which records information about branches as they are
+> executed into set of branch record registers. BRBE is similar to x86's
+> Last Branch Record (LBR) and PowerPC's Branch History Rolling Buffer
+> (BHRB).
 
-An obvious solution is to move this fix-up phase to the point where
-the vgic is created. This ensures that from that point onwards,
-all vcpus have their private interrupts, as new vcpus will directly
-allocate them.
+[...]
 
-With that, we have the invariant that when irqchip_in_kernel() is
-true, all vcpus have their private interrupts.
+> diff --git a/drivers/perf/arm_brbe.c b/drivers/perf/arm_brbe.c
+> new file mode 100644
+> index 000000000000..18eb9bfa1f9c
+> --- /dev/null
+> +++ b/drivers/perf/arm_brbe.c
+> @@ -0,0 +1,794 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Branch Record Buffer Extension Driver.
+> + *
+> + * Copyright (C) 2022-2025 ARM Limited
+> + *
+> + * Author: Anshuman Khandual <anshuman.khandual@arm.com>
+> + */
+> +#include <linux/types.h>
+> +#include <linux/bitmap.h>
+> +#include <linux/perf/arm_pmu.h>
+> +#include "arm_brbe.h"
+> +
+> +#define BRBFCR_EL1_BRANCH_FILTERS (BRBFCR_EL1_DIRECT   | \
+> +                                  BRBFCR_EL1_INDIRECT | \
+> +                                  BRBFCR_EL1_RTN      | \
+> +                                  BRBFCR_EL1_INDCALL  | \
+> +                                  BRBFCR_EL1_DIRCALL  | \
+> +                                  BRBFCR_EL1_CONDDIR)
+> +
+> +/*
+> + * BRBTS_EL1 is currently not used for branch stack implementation
+> + * purpose but BRBCR_ELx.TS needs to have a valid value from all
+> + * available options. BRBCR_ELx_TS_VIRTUAL is selected for this.
+> + */
+> +#define BRBCR_ELx_DEFAULT_TS      FIELD_PREP(BRBCR_ELx_TS_MASK, BRBCR_ELx_TS_VIRTUAL)
+> +
+> +/*
+> + * BRBE Buffer Organization
+> + *
+> + * BRBE buffer is arranged as multiple banks of 32 branch record
+> + * entries each. An individual branch record in a given bank could
+> + * be accessed, after selecting the bank in BRBFCR_EL1.BANK and
+> + * accessing the registers i.e [BRBSRC, BRBTGT, BRBINF] set with
+> + * indices [0..31].
+> + *
+> + * Bank 0
+> + *
+> + *     ---------------------------------       ------
+> + *     | 00 | BRBSRC | BRBTGT | BRBINF |       | 00 |
+> + *     ---------------------------------       ------
+> + *     | 01 | BRBSRC | BRBTGT | BRBINF |       | 01 |
+> + *     ---------------------------------       ------
+> + *     | .. | BRBSRC | BRBTGT | BRBINF |       | .. |
+> + *     ---------------------------------       ------
+> + *     | 31 | BRBSRC | BRBTGT | BRBINF |       | 31 |
+> + *     ---------------------------------       ------
+> + *
+> + * Bank 1
+> + *
+> + *     ---------------------------------       ------
+> + *     | 32 | BRBSRC | BRBTGT | BRBINF |       | 00 |
+> + *     ---------------------------------       ------
+> + *     | 33 | BRBSRC | BRBTGT | BRBINF |       | 01 |
+> + *     ---------------------------------       ------
+> + *     | .. | BRBSRC | BRBTGT | BRBINF |       | .. |
+> + *     ---------------------------------       ------
+> + *     | 63 | BRBSRC | BRBTGT | BRBINF |       | 31 |
+> + *     ---------------------------------       ------
+> + */
+> +#define BRBE_BANK_MAX_ENTRIES  32
+> +#define BRBE_MAX_BANK          2
+> +#define BRBE_MAX_ENTRIES       (BRBE_BANK_MAX_ENTRIES * BRBE_MAX_BANK)
 
-Reported-by: Alexander Potapenko <glider@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic/vgic-init.c | 74 ++++++++++++++++-----------------
- 1 file changed, 37 insertions(+), 37 deletions(-)
+BRBE_MAX_BANK and BRBE_MAX_ENTRIES are not used.  Should remove them?
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index bc7e22ab5d812..775461cf2d2db 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -34,9 +34,9 @@
-  *
-  * CPU Interface:
-  *
-- * - kvm_vgic_vcpu_init(): initialization of static data that
-- *   doesn't depend on any sizing information or emulation type. No
-- *   allocation is allowed there.
-+ * - kvm_vgic_vcpu_init(): initialization of static data that doesn't depend
-+ *   on any sizing information. Private interrupts are allocated if not
-+ *   already allocated at vgic-creation time.
-  */
- 
- /* EARLY INIT */
-@@ -58,6 +58,8 @@ void kvm_vgic_early_init(struct kvm *kvm)
- 
- /* CREATION */
- 
-+static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type);
-+
- /**
-  * kvm_vgic_create: triggered by the instantiation of the VGIC device by
-  * user space, either through the legacy KVM_CREATE_IRQCHIP ioctl (v2 only)
-@@ -112,6 +114,22 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		goto out_unlock;
- 	}
- 
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		ret = vgic_allocate_private_irqs_locked(vcpu, type);
-+		if (ret)
-+			break;
-+	}
-+
-+	if (ret) {
-+		kvm_for_each_vcpu(i, vcpu, kvm) {
-+			struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+			kfree(vgic_cpu->private_irqs);
-+			vgic_cpu->private_irqs = NULL;
-+		}
-+
-+		goto out_unlock;
-+	}
-+
- 	kvm->arch.vgic.in_kernel = true;
- 	kvm->arch.vgic.vgic_model = type;
- 
-@@ -180,7 +198,7 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
- 	return 0;
- }
- 
--static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu)
-+static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	int i;
-@@ -218,17 +236,28 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu)
- 			/* PPIs */
- 			irq->config = VGIC_CONFIG_LEVEL;
- 		}
-+
-+		switch (type) {
-+		case KVM_DEV_TYPE_ARM_VGIC_V3:
-+			irq->group = 1;
-+			irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-+			break;
-+		case KVM_DEV_TYPE_ARM_VGIC_V2:
-+			irq->group = 0;
-+			irq->targets = BIT(vcpu->vcpu_id);
-+			break;
-+		}
- 	}
- 
- 	return 0;
- }
- 
--static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu)
-+static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu, u32 type)
- {
- 	int ret;
- 
- 	mutex_lock(&vcpu->kvm->arch.config_lock);
--	ret = vgic_allocate_private_irqs_locked(vcpu);
-+	ret = vgic_allocate_private_irqs_locked(vcpu, type);
- 	mutex_unlock(&vcpu->kvm->arch.config_lock);
- 
- 	return ret;
-@@ -258,7 +287,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return 0;
- 
--	ret = vgic_allocate_private_irqs(vcpu);
-+	ret = vgic_allocate_private_irqs(vcpu, dist->vgic_model);
- 	if (ret)
- 		return ret;
- 
-@@ -295,7 +324,7 @@ int vgic_init(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct kvm_vcpu *vcpu;
--	int ret = 0, i;
-+	int ret = 0;
- 	unsigned long idx;
- 
- 	lockdep_assert_held(&kvm->arch.config_lock);
-@@ -315,35 +344,6 @@ int vgic_init(struct kvm *kvm)
- 	if (ret)
- 		goto out;
- 
--	/* Initialize groups on CPUs created before the VGIC type was known */
--	kvm_for_each_vcpu(idx, vcpu, kvm) {
--		ret = vgic_allocate_private_irqs_locked(vcpu);
--		if (ret)
--			goto out;
--
--		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
--			struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, i);
--
--			switch (dist->vgic_model) {
--			case KVM_DEV_TYPE_ARM_VGIC_V3:
--				irq->group = 1;
--				irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
--				break;
--			case KVM_DEV_TYPE_ARM_VGIC_V2:
--				irq->group = 0;
--				irq->targets = 1U << idx;
--				break;
--			default:
--				ret = -EINVAL;
--			}
--
--			vgic_put_irq(kvm, irq);
--
--			if (ret)
--				goto out;
--		}
--	}
--
- 	/*
- 	 * If we have GICv4.1 enabled, unconditionally request enable the
- 	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
--- 
-2.39.2
+> +
+> +struct brbe_regset {
+> +       unsigned long brbsrc;
+> +       unsigned long brbtgt;
+> +       unsigned long brbinf;
 
+Explicitly define as 'u64' type for 64-bit registers.
+
+> +};
+> +
+> +#define PERF_BR_ARM64_MAX (PERF_BR_MAX + PERF_BR_NEW_MAX)
+> +
+> +struct brbe_hw_attr {
+> +       int     brbe_version;
+> +       int     brbe_cc;
+> +       int     brbe_nr;
+> +       int     brbe_format;
+> +};
+> +
+> +#define BRBE_REGN_CASE(n, case_macro) \
+> +       case n: case_macro(n); break
+> +
+> +#define BRBE_REGN_SWITCH(x, case_macro)                                \
+> +       do {                                                    \
+> +               switch (x) {                                    \
+> +               BRBE_REGN_CASE(0, case_macro);                  \
+> +               BRBE_REGN_CASE(1, case_macro);                  \
+> +               BRBE_REGN_CASE(2, case_macro);                  \
+> +               BRBE_REGN_CASE(3, case_macro);                  \
+> +               BRBE_REGN_CASE(4, case_macro);                  \
+> +               BRBE_REGN_CASE(5, case_macro);                  \
+> +               BRBE_REGN_CASE(6, case_macro);                  \
+> +               BRBE_REGN_CASE(7, case_macro);                  \
+> +               BRBE_REGN_CASE(8, case_macro);                  \
+> +               BRBE_REGN_CASE(9, case_macro);                  \
+> +               BRBE_REGN_CASE(10, case_macro);                 \
+> +               BRBE_REGN_CASE(11, case_macro);                 \
+> +               BRBE_REGN_CASE(12, case_macro);                 \
+> +               BRBE_REGN_CASE(13, case_macro);                 \
+> +               BRBE_REGN_CASE(14, case_macro);                 \
+> +               BRBE_REGN_CASE(15, case_macro);                 \
+> +               BRBE_REGN_CASE(16, case_macro);                 \
+> +               BRBE_REGN_CASE(17, case_macro);                 \
+> +               BRBE_REGN_CASE(18, case_macro);                 \
+> +               BRBE_REGN_CASE(19, case_macro);                 \
+> +               BRBE_REGN_CASE(20, case_macro);                 \
+> +               BRBE_REGN_CASE(21, case_macro);                 \
+> +               BRBE_REGN_CASE(22, case_macro);                 \
+> +               BRBE_REGN_CASE(23, case_macro);                 \
+> +               BRBE_REGN_CASE(24, case_macro);                 \
+> +               BRBE_REGN_CASE(25, case_macro);                 \
+> +               BRBE_REGN_CASE(26, case_macro);                 \
+> +               BRBE_REGN_CASE(27, case_macro);                 \
+> +               BRBE_REGN_CASE(28, case_macro);                 \
+> +               BRBE_REGN_CASE(29, case_macro);                 \
+> +               BRBE_REGN_CASE(30, case_macro);                 \
+> +               BRBE_REGN_CASE(31, case_macro);                 \
+> +               default: WARN(1, "Invalid BRB* index %d\n", x); \
+> +               }                                               \
+> +       } while (0)
+> +
+> +#define RETURN_READ_BRBSRCN(n) \
+> +       return read_sysreg_s(SYS_BRBSRC_EL1(n))
+> +static inline u64 get_brbsrc_reg(int idx)
+> +{
+> +       BRBE_REGN_SWITCH(idx, RETURN_READ_BRBSRCN);
+> +       return 0;
+> +}
+> +
+> +#define RETURN_READ_BRBTGTN(n) \
+> +       return read_sysreg_s(SYS_BRBTGT_EL1(n))
+> +static u64 get_brbtgt_reg(int idx)
+> +{
+> +       BRBE_REGN_SWITCH(idx, RETURN_READ_BRBTGTN);
+> +       return 0;
+> +}
+> +
+> +#define RETURN_READ_BRBINFN(n) \
+> +       return read_sysreg_s(SYS_BRBINF_EL1(n))
+> +static u64 get_brbinf_reg(int idx)
+> +{
+> +       BRBE_REGN_SWITCH(idx, RETURN_READ_BRBINFN);
+> +       return 0;
+> +}
+> +
+> +static u64 brbe_record_valid(u64 brbinf)
+> +{
+> +       return FIELD_GET(BRBINFx_EL1_VALID_MASK, brbinf);
+> +}
+> +
+> +static bool brbe_invalid(u64 brbinf)
+> +{
+> +       return brbe_record_valid(brbinf) == BRBINFx_EL1_VALID_NONE;
+> +}
+> +
+> +static bool brbe_record_is_complete(u64 brbinf)
+> +{
+> +       return brbe_record_valid(brbinf) == BRBINFx_EL1_VALID_FULL;
+> +}
+> +
+> +static bool brbe_record_is_source_only(u64 brbinf)
+> +{
+> +       return brbe_record_valid(brbinf) == BRBINFx_EL1_VALID_SOURCE;
+> +}
+> +
+> +static bool brbe_record_is_target_only(u64 brbinf)
+> +{
+> +       return brbe_record_valid(brbinf) == BRBINFx_EL1_VALID_TARGET;
+> +}
+> +
+> +static int brbinf_get_in_tx(u64 brbinf)
+> +{
+> +       return FIELD_GET(BRBINFx_EL1_T_MASK, brbinf);
+> +}
+> +
+> +static int brbinf_get_mispredict(u64 brbinf)
+> +{
+> +       return FIELD_GET(BRBINFx_EL1_MPRED_MASK, brbinf);
+> +}
+
+I would expect the naming of brbinf_get_mispredict() will cause
+confusion.  When the function returns 1, it means "Branch was
+incorrectly predicted".
+
+Maybe consider to use '!FIELD_GET(...)' for a reversed value?
+
+> +
+> +static int brbinf_get_lastfailed(u64 brbinf)
+> +{
+> +       return FIELD_GET(BRBINFx_EL1_LASTFAILED_MASK, brbinf);
+> +}
+> +
+> +static u16 brbinf_get_cycles(u64 brbinf)
+> +{
+> +       u32 exp, mant, cycles;
+> +       /*
+> +        * Captured cycle count is unknown and hence
+> +        * should not be passed on to userspace.
+> +        */
+> +       if (brbinf & BRBINFx_EL1_CCU)
+> +               return 0;
+> +
+> +       exp = FIELD_GET(BRBINFx_EL1_CC_EXP_MASK, brbinf);
+> +       mant = FIELD_GET(BRBINFx_EL1_CC_MANT_MASK, brbinf);
+> +
+> +       if (!exp)
+> +               return mant;
+> +
+> +       cycles = (mant | 0x100) << (exp - 1);
+> +
+> +       return (cycles > U16_MAX) ? U16_MAX : cycles;
+
+min(cycles, (u32)U16_MAX);
+
+Please expect more comments in my tomorrow.
+
+Thanks,
+Leo
