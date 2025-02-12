@@ -1,37 +1,76 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC86F209F5F
-	for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 11:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D35820AF6D
+	for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 11:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739358671; cv=none; b=SvbM7i4OLdixHYxBgjHxqlxRKDXu7bRqpyOxTyc6hdT9Wf/Ek6059syV+FWqhc/ygrIXrGrZwDl10ggdMJfTHJtxayhwK+SoteKdTu15BLLmtdw8u4snRBxc75XnA7kEdwPFGE/mnpCYXWGoJquR6r/px5O+IPjUvjx3+PQQ3pI=
+	t=1739359898; cv=none; b=YZ2TixHoVBy2Faz6HhZ4De9/Q22EeKtXf60OA2DqSxwCVLTmB27Z5OZ92jiyY1T5hkeaFY5vvogg+KEHPeyDLIWnvynu3b5xwk3WYrZph2poaQ7RwxgnrjA4CqgtknB75WEGMmjr4PufaxV2cXgAeHpQpSsmNSBu8IP8mtIjxnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739358671; c=relaxed/simple;
-	bh=xET6YkcH2j0vaisNGf0x3m2n2EEuhFREA0JODlbMwCw=;
+	s=arc-20240116; t=1739359898; c=relaxed/simple;
+	bh=e2KfzgLwmzk5l1JnDBTAAKAkzVrUhAernehT+CJYXpw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mLnu2uRE3lkPhE5lQ5YVteBTiM9RMkcECPjhAoxlsuPklGHJ9lnpscA8tizAhU9OCRnF9sC/8ZaqLoQE6wYwIUpz0rOdyxOWp3khIUwVipJ7F5xnRzQ4ji2KU70dfCzA/zhHbv8UFCrDDCGkoKgXhQzwMcdOBkC5JxtK8vS93ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A91C106F;
-	Wed, 12 Feb 2025 03:11:30 -0800 (PST)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1436B3F6A8;
-	Wed, 12 Feb 2025 03:11:06 -0800 (PST)
-Date: Wed, 12 Feb 2025 11:11:04 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=q7CvgaZbqJINoqWjs64YsHAf8tMVplutmTpR0fKMNFEys42F6X5hU3ii+BBlPnhcpT+Wmw6bHKY+7hPecaFBiqcVF9mj9/gPVG2cZ+C69Gmd9LUZYt7eCoyWnJ2h+jyaxw+EojUmpFTRslFuU40vL7Cs5IWJzGiVlSQg3R31qYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sMucV67X; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sMucV67X"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7f860a9c6so79600366b.0
+        for <kvmarm@lists.linux.dev>; Wed, 12 Feb 2025 03:31:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739359894; x=1739964694; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6IY7v4Zi/Fu9rYdLW7DVELcSJJEpH68M/8w+jya2QF0=;
+        b=sMucV67XeTf8E5m4o9ILnaf0NHjq9dhqkPnQeg1yc3lxHUJloSIm1nJzxfJzBuRXp5
+         1yXi5eT1TuS8IRAumQpl1MZJiOv8esRfJTrBJ68MnNGAJQ7ZP+qvv7siTWGqlc3WcJFz
+         5ymvlNnAFckXo6qqonlxcvGRCWqevnfW0dWnj5R7Kb139qCzek3ZFMEhTYrwc8jezSAT
+         HDQ054lrHc15xBeacO2Mo0d1qUtPw4rs1marQI87y/GYbiisqbVT04NDRuSgMOs6h5Z4
+         f1DqrCmbV+BDtLmn3IbUuGTX5LEQJVsWcB04TYlgEz7F1gTahAbnG5zuipqp7MequaEj
+         qt8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739359894; x=1739964694;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6IY7v4Zi/Fu9rYdLW7DVELcSJJEpH68M/8w+jya2QF0=;
+        b=wvPyAP2M8Hm8Kx8ppllp67LGv3lO3jWeQaFf1O2afN9EBnD649CmX2tSfEr4J0MxVQ
+         aouYNDVTbIzN+854RVuzpg26OBdqt00KtPRup4BONNqKY+i5kmIvc1bvQvDlutMGHruB
+         JgdWaG/Ehsybm7iuSHz1kM9EvhqWDc52IFT7Vq5oI6Hl2gW1PoUVIsUXkowuhbfS9m/x
+         PDK0r9RGa1IsSUahFY76ztQ+mi82Hu8vHqwBcL0piW6XenVO0s1IvayBbuJ+KeNBSQBc
+         PHST6ks9crB/rvkY+ITQXPyYJk/elXn4q0gUqmY2YfGAUCL7f34yjAzfg4xBqTdOhK8I
+         M+fA==
+X-Forwarded-Encrypted: i=1; AJvYcCWtW/t9iWl/qPRjhThyhxoMajqAVp+wj24/5VPDMbR4NGDWN+tvCXSLBY3X0nMTqeIBAvnmNB8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxY7t7XkXp7oNr38t8ANbM3hScMnSkwkDWX58C0tgXabdNY+eiW
+	pJ+Vl58hMNU9TahWCE9aj9/xMLDjExvTJg1Nv17aNAcR/L7kxesCAuRgdfmYzAU=
+X-Gm-Gg: ASbGncuqBApBDfca/tvRmSZA0JRnKjtqxJ3wV2fwMxVGxNUL21ZnfNP6QtalOv5Gys2
+	YTKK+IYwE9uhRi/F3n3p4TF/05/1K7j0WomLylqOvyTTEj0npz/fVfrJZOHJh81+QfNdL9zRbBb
+	T/D1aDNOB9mBqSwAMFtGUsApJy02IfcNs1+cDJ9zXgqm3zbTJR31cg7RvU1Z/mM3ZB/4h0eC+Qf
+	+vVx1cdaZcGr+69M+Y4TvS4OSWl4PLvd3blBbYpPCW3gNnClYvZavF5g8jfSmcLloqI/7XfG9Ss
+	S2OuwUf0Xh0LYgrqoTiv
+X-Google-Smtp-Source: AGHT+IE8r3Uu976/b0hVMNfiMuo5JA7dISIXfDl7r2E96RTKYYYlUfjyoNpZXPWOU+uynrV2OZsf0Q==
+X-Received: by 2002:a17:906:6a0b:b0:ab6:b9a6:a9e6 with SMTP id a640c23a62f3a-ab7f34a11a2mr214687166b.46.1739359894370;
+        Wed, 12 Feb 2025 03:31:34 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ab7c3aef933sm570929466b.120.2025.02.12.03.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2025 03:31:33 -0800 (PST)
+Date: Wed, 12 Feb 2025 14:31:30 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, kvmarm@lists.linux.dev,
+	Linux ARM <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	virtualization@lists.linux.dev, Mark Brown <broonie@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7] KVM: arm64: Fix confusion in documentation for pKVM
- SME assert
-Message-ID: <Z6yByMUBPDUyEWOr@J2N7QTR9R3>
-References: <20250212-kvm-arm64-sme-assert-v7-1-0f786db838d3@kernel.org>
+	Arnd Bergmann <arnd@arndb.de>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Aishwarya TCV <Aishwarya.TCV@arm.com>
+Subject: Re: kvm: nVHE hyp panic at: __kvm_nvhe_kvm_hyp_handle_sysre
+Message-ID: <6b7780ee-6dbe-4e2a-8d7f-4057e83c767e@stanley.mountain>
+References: <CA+G9fYt6Cuu6=OO9w80yhJbZB77Q0qf7nzYdvjbgDbgAw6t1jw@mail.gmail.com>
+ <8634gku30g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,107 +79,26 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250212-kvm-arm64-sme-assert-v7-1-0f786db838d3@kernel.org>
+In-Reply-To: <8634gku30g.wl-maz@kernel.org>
 
-On Wed, Feb 12, 2025 at 12:44:57AM +0000, Mark Brown wrote:
-> As raised in the review comments for the original patch the assert and
-> comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
-> disabled in protected mode") are bogus. The comments says that we check
-> that we do not have SME enabled for a pKVM guest but the assert actually
-> checks to see if the host has anything set in SVCR which is unrelated to
-> the guest features or state, regardless of if those guests are protected
-> or not. This check is also made in the hypervisor, it will refuse to run
-> a guest if the check fails, so it appears that the assert here is
-> intended to improve diagnostics.
+On Tue, Feb 11, 2025 at 11:36:31AM +0000, Marc Zyngier wrote:
+> On Tue, 11 Feb 2025 11:24:06 +0000,
+> Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+> > 
+> > Regression on rk3399-rock-pi-4b while running kvm-unit-tests with
+> > nvhe, protected and vhe mode with virtualization enabled.
 > 
-> Update the comment to reflect the check in the code, and to clarify that
-> we do actually enforce this in the hypervisor. While we're here also
-> update to use a WARN_ON_ONCE() to avoid log spam if this triggers.
+> I do not buy this. RK3399 only has ARMv8.0 cores, which by definition
+> do not have VHE.
 > 
-> Fixes: afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are disabled in protected mode")
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
-> This has been sent with v6.10 with only positive review comments after
-> the first revision, if there is some issue with the change please share
-> it.
-> 
-> To: Marc Zyngier <maz@kernel.org>
-> To: Oliver Upton <oliver.upton@linux.dev>
-> To: James Morse <james.morse@arm.com>
-> To: Suzuki K Poulose <suzuki.poulose@arm.com>
-> To: Catalin Marinas <catalin.marinas@arm.com>
-> To: Will Deacon <will@kernel.org>
-> To: Fuad Tabba <tabba@google.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> ---
-> Changes in v7:
-> - Reword the comment.
-> - Link to v6: https://lore.kernel.org/r/20250210-kvm-arm64-sme-assert-v6-1-cc26c46d1b43@kernel.org
-> 
-> Changes in v6:
-> - Rebase onto v6.14-rc1.
-> - Link to v5: https://lore.kernel.org/r/20241210-kvm-arm64-sme-assert-v5-1-995c8dd1025b@kernel.org
-> 
-> Changes in v5:
-> - Rebase onto v6.13-rc1.
-> - Link to v4: https://lore.kernel.org/r/20240930-kvm-arm64-sme-assert-v4-1-3c9df71db688@kernel.org
-> 
-> Changes in v4:
-> - Rebase onto v6.12-rc1
-> - Link to v3: https://lore.kernel.org/r/20240730-kvm-arm64-sme-assert-v3-1-8699454e5cb8@kernel.org
-> 
-> Changes in v3:
-> - Rebase onto v6.11-rc1.
-> - Link to v2: https://lore.kernel.org/r/20240605-kvm-arm64-sme-assert-v2-1-54391b0032f4@kernel.org
-> 
-> Changes in v2:
-> - Commit message tweaks.
-> - Change the assert to WARN_ON_ONCE().
-> - Link to v1: https://lore.kernel.org/r/20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org
-> ---
->  arch/arm64/kvm/fpsimd.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..e37e53883c357093ff4455f5afdaec90e662d744 100644
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
->  	}
->  
->  	/*
-> -	 * If normal guests gain SME support, maintain this behavior for pKVM
-> -	 * guests, which don't support SME.
-> +	 * Protected and non-protected KVM modes require that
-> +	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> +	 * host/guest SME state needs to be saved/restored by hyp code.
-> +	 *
-> +	 * In protected mode, hyp code will verify this later.
->  	 */
-> -	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
-> -		read_sysreg_s(SYS_SVCR));
-> +	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
-> +		     read_sysreg_s(SYS_SVCR));
 
-As I mentioned on the last round, we can drop the is_protected_kvm_enabled()
-check, i.e. have:
+The links to the dmesg are at the bottom of the email.  It does seem to
+be a RK3399 with ARMv8.0 cores though as you say...
 
-	/*
-	 * Protected and non-protected KVM modes require that
-	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-	 * host/guest SME state needs to be saved/restored by hyp code.
-	 *
-	 * In protected mode, hyp code will verify this later.
-	 */
-	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+https://lkft.validation.linaro.org/scheduler/job/8117232#L1395
 
-Either way:
+We'll test the patch.
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+regards,
+dan carpenter
 
-Marc, are you happy to queue this atop the recent fixes from me? Those
-try to ensure SVCR.{SM,ZA} == {0,0} regardless of whether KVM is in
-protected mode.
-
-Mark.
