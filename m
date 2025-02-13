@@ -1,190 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6731820D510;
-	Thu, 13 Feb 2025 08:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE5B202C27
+	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 09:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739436956; cv=none; b=ekJyEuEpG+g5QUMUVrnFnfxQHYPqsgp3eBOEOBGEEuD4qE4bUdNhJhrDtkM7T1EPgxOm3WdxAM9Th1h9iPCVi12kH8ofGjWbIFyZjTwh5m7BHsp4PLg3x7/1X7lzEgZMz3dl+7rQ5mbk0slap95x6sOqOLA8DnivtwvP/NoRhCA=
+	t=1739438673; cv=none; b=YrpmfbU7mpij2RuA6sv3i6qk2tW+5xCHUUPdG40VV95DT7mlRuyXM5TxIi28JiX/MlwEPnzuJ5nlEyoOftGVdIXMT/uIx4J7M+TTQp2QbUPyr867wZeQvpMb3texBjMCbwBzr+uNfuLI700ZDhSO2Q5eV+8lLQooKsBktpqH8Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739436956; c=relaxed/simple;
-	bh=IOPMin/Lc5WunXnzEYcyj9XzsrWnvgg3E0AxmkqaTmI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pxjJNOKIldTr+ROGeigI9uhaI4azG2Q+xr33ke6THz+aeYUOnR96wiRaVcY1CLpsSUOHgaRCD5Tbp6WaD/ZUfZf4sl4qHTEtl2+o+leu08sNCN/YKZ936vJ1BsDt9Pko5gdGGSKv+OOVIJdmEjp7eU+hhqLyedl/+eFzn4zlmt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LctM41cZ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LctM41cZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF6D9C4CEE2;
-	Thu, 13 Feb 2025 08:55:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739436954;
-	bh=IOPMin/Lc5WunXnzEYcyj9XzsrWnvgg3E0AxmkqaTmI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LctM41cZaQpOgGFyR4yaVnRHOglEmsj1vxHUK2Abf8tFgM8RJSRUUTB16t8OwY7TP
-	 yq0xilekRyINqV8yiHBuMHrmEGNpLRMfc23cQRR/FE7HyAzgsxU+JtWWTrqYGX/GAN
-	 n9iJUfv9ycsTaTB8jUjq3rtE9xNf8/qzSz27D7r9W/urwM9aPQ66IymdP7QtPbQOxF
-	 hglMXhZWkfjrTwv9I2Sq3r7vZsnvME9mfQIlUDATLmpYFHH5JBa04n15KGZbvn9IjD
-	 c56UYjT88K5+B+EW7pxM36cZeLQqLMWZM6p1hdr9zDuXxdERt3J5AsVB2yjB3NllV5
-	 v36Y7oNeTikug==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tiV0i-003bb5-Fo;
-	Thu, 13 Feb 2025 08:55:52 +0000
-Date: Thu, 13 Feb 2025 08:55:52 +0000
-Message-ID: <86tt8yrzon.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Mark Brown <broonie@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1739438673; c=relaxed/simple;
+	bh=iqZX9vlmTh8Gz3IOozatDHf855QCyukvJ48qmfrPENU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ucvQ5qkLaP5baeKPL8h3BW+jsAIaM2SekDpTm/4w7ONiWFGgS7P0pHZCqh+O6uEjP39Iln3eMZZC0XSq2OEzIij5HixkpheY00wYQxE+0ROZLvIdwhwPBdeTYCzY6UvBozJzmRGdlncEmv/l8cXC5tW3hLd8ICXzkAZezoFgeBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE7BE16F3;
+	Thu, 13 Feb 2025 01:24:51 -0800 (PST)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77FCF3F58B;
+	Thu, 13 Feb 2025 01:24:29 -0800 (PST)
+Date: Thu, 13 Feb 2025 09:24:22 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7] KVM: arm64: Fix confusion in documentation for pKVM SME assert
-In-Reply-To: <Z6yByMUBPDUyEWOr@J2N7QTR9R3>
+Subject: Re: [PATCH v7] KVM: arm64: Fix confusion in documentation for pKVM
+ SME assert
+Message-ID: <Z626RqzA3HMskwJd@J2N7QTR9R3>
 References: <20250212-kvm-arm64-sme-assert-v7-1-0f786db838d3@kernel.org>
-	<Z6yByMUBPDUyEWOr@J2N7QTR9R3>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <Z6yByMUBPDUyEWOr@J2N7QTR9R3>
+ <86tt8yrzon.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, broonie@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86tt8yrzon.wl-maz@kernel.org>
 
-On Wed, 12 Feb 2025 11:11:04 +0000,
-Mark Rutland <mark.rutland@arm.com> wrote:
+On Thu, Feb 13, 2025 at 08:55:52AM +0000, Marc Zyngier wrote:
+> On Wed, 12 Feb 2025 11:11:04 +0000,
+> Mark Rutland <mark.rutland@arm.com> wrote:
+> > On Wed, Feb 12, 2025 at 12:44:57AM +0000, Mark Brown wrote:
+> > > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> > > index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..e37e53883c357093ff4455f5afdaec90e662d744 100644
+> > > --- a/arch/arm64/kvm/fpsimd.c
+> > > +++ b/arch/arm64/kvm/fpsimd.c
+> > > @@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> > >  	}
+> > >  
+> > >  	/*
+> > > -	 * If normal guests gain SME support, maintain this behavior for pKVM
+> > > -	 * guests, which don't support SME.
+> > > +	 * Protected and non-protected KVM modes require that
+> > > +	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
+> > > +	 * host/guest SME state needs to be saved/restored by hyp code.
+> > > +	 *
+> > > +	 * In protected mode, hyp code will verify this later.
+> > >  	 */
+> > > -	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
+> > > -		read_sysreg_s(SYS_SVCR));
+> > > +	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
+> > > +		     read_sysreg_s(SYS_SVCR));
+> > 
+> > As I mentioned on the last round, we can drop the is_protected_kvm_enabled()
+> > check, i.e. have:
+> > 
+> > 	/*
+> > 	 * Protected and non-protected KVM modes require that
+> > 	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
+> > 	 * host/guest SME state needs to be saved/restored by hyp code.
+> > 	 *
+> > 	 * In protected mode, hyp code will verify this later.
+> > 	 */
+> > 	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+> > 
+> > Either way:
+> > 
+> > Acked-by: Mark Rutland <mark.rutland@arm.com>
+> > 
+> > Marc, are you happy to queue this atop the recent fixes from me? Those
+> > try to ensure SVCR.{SM,ZA} == {0,0} regardless of whether KVM is in
+> > protected mode.
 > 
-> On Wed, Feb 12, 2025 at 12:44:57AM +0000, Mark Brown wrote:
-> > As raised in the review comments for the original patch the assert and
-> > comment added in afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are
-> > disabled in protected mode") are bogus. The comments says that we check
-> > that we do not have SME enabled for a pKVM guest but the assert actually
-> > checks to see if the host has anything set in SVCR which is unrelated to
-> > the guest features or state, regardless of if those guests are protected
-> > or not. This check is also made in the hypervisor, it will refuse to run
-> > a guest if the check fails, so it appears that the assert here is
-> > intended to improve diagnostics.
-> > 
-> > Update the comment to reflect the check in the code, and to clarify that
-> > we do actually enforce this in the hypervisor. While we're here also
-> > update to use a WARN_ON_ONCE() to avoid log spam if this triggers.
-> > 
-> > Fixes: afb91f5f8ad7 ("KVM: arm64: Ensure that SME controls are disabled in protected mode")
-> > Reviewed-by: Fuad Tabba <tabba@google.com>
-> > Signed-off-by: Mark Brown <broonie@kernel.org>
-> > ---
-> > This has been sent with v6.10 with only positive review comments after
-> > the first revision, if there is some issue with the change please share
-> > it.
-> > 
-> > To: Marc Zyngier <maz@kernel.org>
-> > To: Oliver Upton <oliver.upton@linux.dev>
-> > To: James Morse <james.morse@arm.com>
-> > To: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > To: Catalin Marinas <catalin.marinas@arm.com>
-> > To: Will Deacon <will@kernel.org>
-> > To: Fuad Tabba <tabba@google.com>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > ---
-> > Changes in v7:
-> > - Reword the comment.
-> > - Link to v6: https://lore.kernel.org/r/20250210-kvm-arm64-sme-assert-v6-1-cc26c46d1b43@kernel.org
-> > 
-> > Changes in v6:
-> > - Rebase onto v6.14-rc1.
-> > - Link to v5: https://lore.kernel.org/r/20241210-kvm-arm64-sme-assert-v5-1-995c8dd1025b@kernel.org
-> > 
-> > Changes in v5:
-> > - Rebase onto v6.13-rc1.
-> > - Link to v4: https://lore.kernel.org/r/20240930-kvm-arm64-sme-assert-v4-1-3c9df71db688@kernel.org
-> > 
-> > Changes in v4:
-> > - Rebase onto v6.12-rc1
-> > - Link to v3: https://lore.kernel.org/r/20240730-kvm-arm64-sme-assert-v3-1-8699454e5cb8@kernel.org
-> > 
-> > Changes in v3:
-> > - Rebase onto v6.11-rc1.
-> > - Link to v2: https://lore.kernel.org/r/20240605-kvm-arm64-sme-assert-v2-1-54391b0032f4@kernel.org
-> > 
-> > Changes in v2:
-> > - Commit message tweaks.
-> > - Change the assert to WARN_ON_ONCE().
-> > - Link to v1: https://lore.kernel.org/r/20240604-kvm-arm64-sme-assert-v1-1-5d98348d00f8@kernel.org
-> > ---
-> >  arch/arm64/kvm/fpsimd.c | 11 +++++++----
-> >  1 file changed, 7 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> > index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..e37e53883c357093ff4455f5afdaec90e662d744 100644
-> > --- a/arch/arm64/kvm/fpsimd.c
-> > +++ b/arch/arm64/kvm/fpsimd.c
-> > @@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-> >  	}
-> >  
-> >  	/*
-> > -	 * If normal guests gain SME support, maintain this behavior for pKVM
-> > -	 * guests, which don't support SME.
-> > +	 * Protected and non-protected KVM modes require that
-> > +	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> > +	 * host/guest SME state needs to be saved/restored by hyp code.
-> > +	 *
-> > +	 * In protected mode, hyp code will verify this later.
-> >  	 */
-> > -	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
-> > -		read_sysreg_s(SYS_SVCR));
-> > +	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
-> > +		     read_sysreg_s(SYS_SVCR));
+> In all honesty, I find that at this stage, the comment just gets in
+> the way and is over-describing what is at stake here.
 > 
-> As I mentioned on the last round, we can drop the is_protected_kvm_enabled()
-> check, i.e. have:
+> The
 > 
-> 	/*
-> 	 * Protected and non-protected KVM modes require that
-> 	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> 	 * host/guest SME state needs to be saved/restored by hyp code.
-> 	 *
-> 	 * In protected mode, hyp code will verify this later.
-> 	 */
-> 	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+>  	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
 > 
-> Either way:
+> is really the only thing that matters. It perfectly shows what we are
+> checking for, and doesn't need an exegesis.
 > 
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> 
-> Marc, are you happy to queue this atop the recent fixes from me? Those
-> try to ensure SVCR.{SM,ZA} == {0,0} regardless of whether KVM is in
-> protected mode.
+> As for the Fixes: tag, and given the magnitude of the actual fixes
+> that are already queued, I don't think we need it.
 
-In all honesty, I find that at this stage, the comment just gets in
-the way and is over-describing what is at stake here.
+That's fair; if you haven't spun a patch for that already, I guess we're
+after the following?
 
-The
+Mark.
 
- 	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+---->8----
+From 4d05f6dd6d39c747c175782b7b44daa775251994 Mon Sep 17 00:00:00 2001
+From: Mark Rutland <mark.rutland@arm.com>
+Date: Thu, 13 Feb 2025 09:15:31 +0000
+Subject: [PATCH] KVM: arm64: Simplify warning in kvm_arch_vcpu_load_fp()
 
-is really the only thing that matters. It perfectly shows what we are
-checking for, and doesn't need an exegesis.
+At the end of kvm_arch_vcpu_load_fp() we check that no bits are set in
+SVCR. We only check this for protected mode despite this mattering
+equally for non-protected mode, and the comment above this is confusing.
 
-As for the Fixes: tag, and given the magnitude of the actual fixes
-that are already queued, I don't think we need it.
+Remove the comment and simplify the check, moving from WARN_ON() to
+WARN_ON_ONCE() to avoid spamming the log.
 
-Thanks,
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+---
+ arch/arm64/kvm/fpsimd.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 3cbb999419af7..7f6e43d256915 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -65,12 +65,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ 	fpsimd_save_and_flush_cpu_state();
+ 	*host_data_ptr(fp_owner) = FP_STATE_FREE;
+ 
+-	/*
+-	 * If normal guests gain SME support, maintain this behavior for pKVM
+-	 * guests, which don't support SME.
+-	 */
+-	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
+-		read_sysreg_s(SYS_SVCR));
++	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+ }
+ 
+ /*
 -- 
-Without deviation from the norm, progress is not possible.
+2.30.2
+
