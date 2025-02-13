@@ -1,110 +1,79 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67068270ECB;
-	Thu, 13 Feb 2025 16:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43631145348
+	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 17:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739463493; cv=none; b=CZl1QjFbmH3e3c3vyWSL2flaDlFykFmMVv+CmllkLafCqqhKSlfpPFj0Mk+ZdhuiQeC8FwGTf7xFhJXwJJgMtAvJvbDey+b+dUFU3l7Pm5unqsCB3yF8yDo+xcqnd1O7zVQvvaFUUNqodJleFl/iYorI8XZFN53DE5kEgNQThJw=
+	t=1739466203; cv=none; b=I6RJ0TNBrLqqkCBk+v29nG0/4uB0kyZea9Glf14hUFHgunMpb/V2A3FdXmu1CDXj9BMzpRNN90XRmvSUQ0XoadxFVvzQOAphinvfOj26m906FhBEDegIVHKzhG+SQ27MjoUCZCVJ843iJOfFJUUjXVV6+3Vmlu0NAFrgSqjUAhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739463493; c=relaxed/simple;
-	bh=AI55fZuPVUZGp2C0JL68eLNSM71xTAytlCMCsAaP3qo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ai2MKlaBXgnnhJShwng7jN4/Wrb2FWyrrd0+1L+ZzlWOeXUpZWXwG5QWJty8RJ0kM1qSuRtvD6TzXGMX6eItDdwYYoigcCnTp0EOMdbZSY00TvFqYd/cW6IM8ltw5chGSA2J3FVDaVp0Kt1p0IrvZcWL+7ii03slVnlZ9GTiTVE=
+	s=arc-20240116; t=1739466203; c=relaxed/simple;
+	bh=vnxnylEp+XKENV3z/9ZNHoQdEM/a7qJdlV6rCttjW9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MXMJrKIv0YjTofx22YmE0IzQ5aUSBWKqQscruI66nzXdaOuRNcCYTb3VLHmlIm2Xig/8LhtiDIwPyM2ABel17AQ0szCiZc5ncosGk+CswhhifnSZCFYzB6w6mRKB/4UEnoLr0HGmvHWzhPFYBG8pSeoPLnNUyx2rTVNtGuxULYE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BC2226BA;
-	Thu, 13 Feb 2025 08:18:31 -0800 (PST)
-Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.32.44])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 180C73F6A8;
-	Thu, 13 Feb 2025 08:18:06 -0800 (PST)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 429B3113E;
+	Thu, 13 Feb 2025 09:03:42 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C4D83F6A8;
+	Thu, 13 Feb 2025 09:03:21 -0800 (PST)
+Date: Thu, 13 Feb 2025 17:03:16 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: [PATCH v7 45/45] WIP: Enable support for PAGE_SIZE>4k
-Date: Thu, 13 Feb 2025 16:14:25 +0000
-Message-ID: <20250213161426.102987-46-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250213161426.102987-1-steven.price@arm.com>
-References: <20250213161426.102987-1-steven.price@arm.com>
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v19 10/11] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Message-ID: <20250213170316.GG235556@e132581.arm.com>
+References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-10-1c1300802385@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250202-arm-brbe-v19-v19-10-1c1300802385@kernel.org>
 
-We now support host page sizes greater than 4k. For this to work
-reliably the guest must be enlightened enough to make sharing requests
-at a granule at least as big as the host. Which today means the guests
-PAGE_SIZE must be equal or greater than the host.
+On Sun, Feb 02, 2025 at 06:43:04PM -0600, Rob Herring (Arm) wrote:
 
-Note that RTT tables are still allocated using the host's page size, so
-most of the page will be wasted as only the first 4k are actually
-delegated to the RMM. This is the main reason why this is still WIP - I
-haven't yet implemented an appropriate allocator for this.
+[...]
 
-Large page sizes are also only very minimally tested, so expect bugs!
+> +static void __debug_save_brbe(u64 *brbcr_el1)
+> +{
+> +       *brbcr_el1 = 0;
+> +
+> +       /* Check if the BRBE is enabled */
+> +       if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+> +               return;
+> +
+> +       /*
+> +        * Prohibit branch record generation while we are in guest.
+> +        * Since access to BRBCR_EL1 is trapped, the guest can't
+> +        * modify the filtering set by the host.
+> +        */
+> +       *brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
+> +       write_sysreg_el1(0, SYS_BRBCR);
+> +}
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
-New patch for v7
----
- arch/arm64/kvm/rme.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Should flush branch record and use isb() before exit host kernel?
 
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index a3eddf6917ad..4ae348ee9376 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -144,6 +144,7 @@ static int find_map_level(struct realm *realm,
- 	return level;
- }
- 
-+/* FIXME: This conflates pages and granules */
- static phys_addr_t alloc_delegated_granule(struct kvm_mmu_memory_cache *mc)
- {
- 	phys_addr_t phys = PHYS_ADDR_MAX;
-@@ -171,6 +172,7 @@ static phys_addr_t alloc_delegated_granule(struct kvm_mmu_memory_cache *mc)
- 	return phys;
- }
- 
-+/* FIXME: This conflates pages and granules */
- static void free_delegated_granule(phys_addr_t phys)
- {
- 	if (WARN_ON(rmi_granule_undelegate(phys))) {
-@@ -1694,10 +1696,6 @@ int kvm_init_realm_vm(struct kvm *kvm)
- 
- void kvm_init_rme(void)
- {
--	if (PAGE_SIZE != SZ_4K)
--		/* Only 4k page size on the host is supported */
--		return;
--
- 	if (rmi_check_version())
- 		/* Continue without realm support */
- 		return;
--- 
-2.43.0
+I see inconsistence between the function above and BRBE's disable
+function. Here it clears E0BRE / ExBRE bits for disabling BRBE, but the
+BRBE driver sets the PAUSED bit in BRBFCR_EL1 for disabling BRBE.
 
+Thanks,
+Leo
