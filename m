@@ -1,149 +1,95 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE5B202C27
-	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 09:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5B1202C31
+	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 09:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739438673; cv=none; b=YrpmfbU7mpij2RuA6sv3i6qk2tW+5xCHUUPdG40VV95DT7mlRuyXM5TxIi28JiX/MlwEPnzuJ5nlEyoOftGVdIXMT/uIx4J7M+TTQp2QbUPyr867wZeQvpMb3texBjMCbwBzr+uNfuLI700ZDhSO2Q5eV+8lLQooKsBktpqH8Vo=
+	t=1739440790; cv=none; b=n/ZPDfakwoO4GrX03CrtO29WPszBJXRi77b5DNohZSP7dDxFUJvobggmvjb7E4dyCSwWDPimszSoYBHVHCHof6fyrXJ9ySJO3TapBiBAotg5pcMcat7HYatFeHsyrJMVc+BFtGGKNXpKj17VymYnHEDHZeDKsXJxrxV4S028Y3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739438673; c=relaxed/simple;
-	bh=iqZX9vlmTh8Gz3IOozatDHf855QCyukvJ48qmfrPENU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ucvQ5qkLaP5baeKPL8h3BW+jsAIaM2SekDpTm/4w7ONiWFGgS7P0pHZCqh+O6uEjP39Iln3eMZZC0XSq2OEzIij5HixkpheY00wYQxE+0ROZLvIdwhwPBdeTYCzY6UvBozJzmRGdlncEmv/l8cXC5tW3hLd8ICXzkAZezoFgeBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE7BE16F3;
-	Thu, 13 Feb 2025 01:24:51 -0800 (PST)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 77FCF3F58B;
-	Thu, 13 Feb 2025 01:24:29 -0800 (PST)
-Date: Thu, 13 Feb 2025 09:24:22 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7] KVM: arm64: Fix confusion in documentation for pKVM
- SME assert
-Message-ID: <Z626RqzA3HMskwJd@J2N7QTR9R3>
-References: <20250212-kvm-arm64-sme-assert-v7-1-0f786db838d3@kernel.org>
- <Z6yByMUBPDUyEWOr@J2N7QTR9R3>
- <86tt8yrzon.wl-maz@kernel.org>
+	s=arc-20240116; t=1739440790; c=relaxed/simple;
+	bh=COJNGekBErJDtHN053nWkTAoSgTTSoO9L+cYR+Xqxy4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a+si32QnkAKcZYilpkl5r53FsS5x/w/KO+1xCqQPAbFgoH/lB+i6u340jJOlmp2+5QiUx76WxiBPOM2IdjxJbGR3sX/As3FOimNuRVqs1Lu9y7/J6r2U0Fgq7jijQZxegB2WAAnOc1a6/GjU1+SVhQvrHEvhWdutA1VRzWlcaWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GKhJNr4p; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GKhJNr4p"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6e4289e83ddso189216d6.3
+        for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 01:59:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739440788; x=1740045588; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=COJNGekBErJDtHN053nWkTAoSgTTSoO9L+cYR+Xqxy4=;
+        b=GKhJNr4pR8Cea3ZBAdGNUREkXQ0Wq35vl3Zq68feONcqf3YC6bLbvShEt+/ywEDL5/
+         2MU4xpbfu4j9m1l/MGocKOi74SUuxH2RJmBU7C7rIn3Ei4O6YlnjAhY0U1iJj41gyyvE
+         UYfV+ZYB+x9iW/YXzfkY8nOgN14gjORMYiTMG6MCXohwzKC/TyDu1JNxiwMF34NChgG0
+         v86IH7T+ggTIGZjva8JKFH28af4qQt0/sd+BiQfpkbrdpEU6G+Oq1Ihy2upSvOA+2Wv1
+         mm4T1Ovvo2mmcxO10A6qBQr3EygNDuFzpQNxMX0xjUEV4OpktBZs9oeJrdLXo/3HaASt
+         Se9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739440788; x=1740045588;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=COJNGekBErJDtHN053nWkTAoSgTTSoO9L+cYR+Xqxy4=;
+        b=ELpMSyrVeqU79SpxDO+Pi29J12ZbGgDBKJer2dYkpbNnWBD3HoZPn6A4hs/dRthtna
+         odAm7MaJ/GMmHWE3aUjK7kCsLTVyB//PZMt1IKZ5aLOjQDLvs8t5NO03IEFXHzXwo8/E
+         iX7jYH3ajOtGthXSNRfr55v10OVYFju16N6pVqrHNMLXifTrXinduo48TtAZZv9vauEG
+         t/fk+MG/n9TzIU0+S2cfsHy9rp5DdgyrxmtTUNdVao0Q9ORKuX6oe9ZRx4cQs7ArGu3U
+         uqo+1sFYNQ6DVEpJYhMLBo8fCpL7f7zjqeOQwbL1q+uwH5B/O2uhMVprCZfEwaE2Ky9b
+         wQLA==
+X-Gm-Message-State: AOJu0YxDLLnUh1s1IB/9BdLOq0QV648En/ZkGdAdLk7kJoSDj9hDwvPZ
+	T0E+QjYpqdr04HIczlxn7bazrYBZAgzmsLKrLFAmmE5JV0pKZXy4cc4GW50Yq/+yAqbDPRk5waH
+	nKEBw0YPCG3QbBCO5c9TLAW8VPNNJKlZheUV3Xg==
+X-Gm-Gg: ASbGncsGhwNeaFuDnKSEGRnUMw/CoS41+4zKaE2HcvtoXrHm88BktbmLCcleyoY4peS
+	2DwKS0jeKzlg+UK6Y+1E40NG6WXhVryPqdHnnGSz0ReDgyTBSDRnaK0OiMaGyHSdWu60wWtSB
+X-Google-Smtp-Source: AGHT+IHjST43iJQwKlW8MuHT3YKNmk3TJzkB+3qglLpmrJHxoQ21YjQ7p9lFzVWUi5QoVF1/vD6V21s991LiGcWOuME=
+X-Received: by 2002:a05:6214:cc8:b0:6e4:2975:ce54 with SMTP id
+ 6a1803df08f44-6e46ed7f367mr40769266d6.3.1739440787956; Thu, 13 Feb 2025
+ 01:59:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86tt8yrzon.wl-maz@kernel.org>
+References: <20250212173454.2864462-1-maz@kernel.org>
+In-Reply-To: <20250212173454.2864462-1-maz@kernel.org>
+From: Anders Roxell <anders.roxell@linaro.org>
+Date: Thu, 13 Feb 2025 10:59:36 +0100
+X-Gm-Features: AWEUYZnv3GWn0jzFu3uoM9Lo2WH4CAyE-PhoCt0q0vIYbO78Rx1ocXlr_cZpyFs
+Message-ID: <CADYN=9KWdAm4iKYNN16Uz68XPViDLXGar3uhrM2e2+Dharaosw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Convert timer offset VA when accessed in HYP code
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 13, 2025 at 08:55:52AM +0000, Marc Zyngier wrote:
-> On Wed, 12 Feb 2025 11:11:04 +0000,
-> Mark Rutland <mark.rutland@arm.com> wrote:
-> > On Wed, Feb 12, 2025 at 12:44:57AM +0000, Mark Brown wrote:
-> > > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> > > index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..e37e53883c357093ff4455f5afdaec90e662d744 100644
-> > > --- a/arch/arm64/kvm/fpsimd.c
-> > > +++ b/arch/arm64/kvm/fpsimd.c
-> > > @@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-> > >  	}
-> > >  
-> > >  	/*
-> > > -	 * If normal guests gain SME support, maintain this behavior for pKVM
-> > > -	 * guests, which don't support SME.
-> > > +	 * Protected and non-protected KVM modes require that
-> > > +	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> > > +	 * host/guest SME state needs to be saved/restored by hyp code.
-> > > +	 *
-> > > +	 * In protected mode, hyp code will verify this later.
-> > >  	 */
-> > > -	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
-> > > -		read_sysreg_s(SYS_SVCR));
-> > > +	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
-> > > +		     read_sysreg_s(SYS_SVCR));
-> > 
-> > As I mentioned on the last round, we can drop the is_protected_kvm_enabled()
-> > check, i.e. have:
-> > 
-> > 	/*
-> > 	 * Protected and non-protected KVM modes require that
-> > 	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> > 	 * host/guest SME state needs to be saved/restored by hyp code.
-> > 	 *
-> > 	 * In protected mode, hyp code will verify this later.
-> > 	 */
-> > 	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
-> > 
-> > Either way:
-> > 
-> > Acked-by: Mark Rutland <mark.rutland@arm.com>
-> > 
-> > Marc, are you happy to queue this atop the recent fixes from me? Those
-> > try to ensure SVCR.{SM,ZA} == {0,0} regardless of whether KVM is in
-> > protected mode.
-> 
-> In all honesty, I find that at this stage, the comment just gets in
-> the way and is over-describing what is at stake here.
-> 
-> The
-> 
->  	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
-> 
-> is really the only thing that matters. It perfectly shows what we are
-> checking for, and doesn't need an exegesis.
-> 
-> As for the Fixes: tag, and given the magnitude of the actual fixes
-> that are already queued, I don't think we need it.
+On Wed, 12 Feb 2025 at 18:35, 'Marc Zyngier' via lkft <lkft@linaro.org> wrote:
+>
+> Now that EL2 has gained some early timer emulation, it accesses
+> the offsets pointed to by the timer structure, both of which
+> live in the KVM structure.
+>
+> Of course, these are *kernel* pointers, so the dereferencing
+> of these pointers in non-kernel code must be itself be offset.
+>
+> Given switch.h its own version of timer_get_offset() and use that
+> instead.
+>
+> Fixes: b86fc215dc26d ("KVM: arm64: Handle counter access early in non-HYP context")
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-That's fair; if you haven't spun a patch for that already, I guess we're
-after the following?
+Tested-by: Anders Roxell <anders.roxell@linaro.org>
 
-Mark.
+Build this patch ontop of next-20250212 and ran kvm-unit-tests on a rockpi4.
+And it ran fine without any kernel panic.
 
----->8----
-From 4d05f6dd6d39c747c175782b7b44daa775251994 Mon Sep 17 00:00:00 2001
-From: Mark Rutland <mark.rutland@arm.com>
-Date: Thu, 13 Feb 2025 09:15:31 +0000
-Subject: [PATCH] KVM: arm64: Simplify warning in kvm_arch_vcpu_load_fp()
-
-At the end of kvm_arch_vcpu_load_fp() we check that no bits are set in
-SVCR. We only check this for protected mode despite this mattering
-equally for non-protected mode, and the comment above this is confusing.
-
-Remove the comment and simplify the check, moving from WARN_ON() to
-WARN_ON_ONCE() to avoid spamming the log.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
----
- arch/arm64/kvm/fpsimd.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 3cbb999419af7..7f6e43d256915 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -65,12 +65,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	fpsimd_save_and_flush_cpu_state();
- 	*host_data_ptr(fp_owner) = FP_STATE_FREE;
- 
--	/*
--	 * If normal guests gain SME support, maintain this behavior for pKVM
--	 * guests, which don't support SME.
--	 */
--	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
--		read_sysreg_s(SYS_SVCR));
-+	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
- }
- 
- /*
--- 
-2.30.2
-
+Cheers,
+Anders
