@@ -1,107 +1,88 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3143B156237
-	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 17:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E07206F0C;
+	Thu, 13 Feb 2025 18:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739468737; cv=none; b=s88xKOU8JNZn9S51wk8zZ319klsom3bnAKjMybnJY+lrwCH/hNh/VKO4HCUhBGdJqCOPbRjP/oLDM1XF2ndl867Q8MjD9yMkYR+kM10ujpk73phgvvMSCMVAnN20/Q7SS1j90c2G/Puv//h20lFzojh4gdDK/eIxEVJiXS9BbyA=
+	t=1739469761; cv=none; b=OQ5qthzbp/qm9SG1IoELkpRQkqJwUDfLVteeArRjphsRO0wgfdRk8nFjvlFFFjUfdC1LHXVXLNdlqlChxwZwqAmW2dwnHmnnnUj3rQ1Wm/9T1aHN9crT/SUOCfFol5Rm5YN3wrF4yVxU3N1mKf89Ocq23lF6jTN3aqVkFxVVvEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739468737; c=relaxed/simple;
-	bh=sukV6k51DNSlBKIQdTonT1QfJeZstAGnIOitdYPlDMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DG1aEljg5AkcfuMxtfPjDOekprq3QVtfm+Rr4PqPA/Em7COYbkE0QcJglSiZxMa9DNLga2uQXROcB6cu2dUw7sBr+k+HKpIpXiy5ULgQaIaJN9icRUMtyrsPmfgzB7zxXE3mmdv9mnelBsHcuXZ1m/lapLYXPq9PcH4fGkPZYOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C1FC113E;
-	Thu, 13 Feb 2025 09:45:56 -0800 (PST)
-Received: from localhost (e132581.arm.com [10.2.76.71])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17F2A3F5A1;
-	Thu, 13 Feb 2025 09:45:34 -0800 (PST)
-Date: Thu, 13 Feb 2025 17:45:30 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1739469761; c=relaxed/simple;
+	bh=KCXWCt1tfCPrXneMgT2CusbMh3K2XAvWCZTxxW+kCs4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o0m3ZTt/6UxCs4Hhxq/E2/vlEbKGazKfv84uurcAXWosRnMOdFPolYn80s8sYIGk3/Tx2XtLupw5o+sIZIe+xPps669GBZ7oJKNq4frYSU5+rhVngW5Tcr3IboWzuDf5PMHzkgrJpZJStZMB33sy925/yxgicTwGZYiMjTSLndU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C4TlgEEz; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C4TlgEEz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ACAFC4CED1;
+	Thu, 13 Feb 2025 18:02:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739469760;
+	bh=KCXWCt1tfCPrXneMgT2CusbMh3K2XAvWCZTxxW+kCs4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=C4TlgEEz2SIOtgFa6lO18TAdRvksbF9Wc6+oD9Vqpiq7bGnLbTTqagyvRr/dKeLo7
+	 BapSmWlLvzEwd/0rNdVKBe2fGvEdR+XzfCEyQZkZKYDwMMil5tN8KsqHuruLCEZcJt
+	 AQhlkfgRcAU6pB1r6hLJXO7YYbAXtsf20wMFMivmYg+WpqrihiEEOf2XbQoeh7FBjI
+	 aPNKbj24qU4yUPWTXs31yTsPNDce6S+8ELHefezrbMwh4PrIOKfNnZBQTSLef00XKX
+	 CJrdbasTp6zPEnxO/XqPeTmRnlt1WnIHsQ1IrM5nwcpFoI3CSpacR+OBlYMU2XViIZ
+	 4jn3k0D2mhbbg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tidXq-003nWM-1J;
+	Thu, 13 Feb 2025 18:02:38 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>
+Cc: Keir Fraser <keirf@google.com>,
+	Ben Simner <ben.simner@cl.cam.ac.uk>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v19 11/11] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-Message-ID: <20250213174530.GH235556@e132581.arm.com>
-References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
- <20250202-arm-brbe-v19-v19-11-1c1300802385@kernel.org>
- <20250213161628.GF235556@e132581.arm.com>
- <CAL_Jsq+VmfibMVdh+9DxqU5Axiv_zMiznAh8_umFB1J2y8reig@mail.gmail.com>
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix alignment of kvm_hyp_memcache allocations
+Date: Thu, 13 Feb 2025 18:02:35 +0000
+Message-Id: <173946974570.2974684.11799250388121421778.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250213153615.3642515-1-qperret@google.com>
+References: <20250213153615.3642515-1-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL_Jsq+VmfibMVdh+9DxqU5Axiv_zMiznAh8_umFB1J2y8reig@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, keirf@google.com, ben.simner@cl.cam.ac.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 13, 2025 at 11:13:49AM -0600, Rob Herring wrote:
-
-[...]
-
-> > > +void brbe_enable(const struct arm_pmu *arm_pmu)
-> > > +{
-> > > +       struct pmu_hw_events *cpuc = this_cpu_ptr(arm_pmu->hw_events);
-> > > +       u64 brbfcr = 0, brbcr = 0;
-> > > +
-> > > +       /*
-> > > +        * Merge the permitted branch filters of all events.
-> > > +        */
-> > > +       for (int i = 0; i < ARMPMU_MAX_HWEVENTS; i++) {
-> > > +               struct perf_event *event = cpuc->events[i];
-> > > +
-> > > +               if (event && has_branch_stack(event)) {
-> > > +                       brbfcr |= event->hw.branch_reg.config;
-> > > +                       brbcr |= event->hw.extra_reg.config;
-> > > +               }
-> > > +       }
-> > > +
-> > > +       /*
-> > > +        * If the record buffer contains any branches, we've already read them
-> > > +        * out and don't want to read them again.
-> > > +        * No need to sync as we're already stopped.
-> > > +        */
-> > > +       brbe_invalidate_nosync();
-> > > +       isb(); // Make sure invalidate takes effect before enabling
-> > > +
-> > > +       /*
-> > > +        * In VHE mode with MDCR_EL2.HPMN set to PMCR_EL0.N, the counters are
-> > > +        * controlled by BRBCR_EL1 rather than BRBCR_EL2 (which writes to
-> > > +        * BRBCR_EL1 are redirected to). Use the same value for both register
-> > > +        * except keep EL1 and EL0 recording disabled in guests.
-> > > +        */
-> > > +       if (is_kernel_in_hyp_mode())
-> > > +               write_sysreg_s(brbcr & ~(BRBCR_ELx_ExBRE | BRBCR_ELx_E0BRE), SYS_BRBCR_EL12);
-> > > +       write_sysreg_s(brbcr, SYS_BRBCR_EL1);
-> > > +       isb(); // Ensure BRBCR_ELx settings take effect before unpausing
-> > > +
-> > > +       write_sysreg_s(brbfcr, SYS_BRBFCR_EL1);
-> >
-> > Seems to me, it is weird that first enable recording (BRBCR), then set
-> > control register BRBFCR.  And the writing SYS_BRBFCR_EL1 not guarded
-> > by a barrier is also a bit concerned.
+On Thu, 13 Feb 2025 15:36:14 +0000, Quentin Perret wrote:
+> When allocating guest stage-2 page-table pages at EL2, pKVM can consume
+> pages from the host-provided kvm_hyp_memcache. As pgtable.c expects
+> zeroed pages, guest_s2_zalloc_page() actively implements this zeroing
+> with a PAGE_SIZE memset. Unfortunately, we don't check the page
+> alignment of the host-provided address before doing so, which could
+> lead to the memset overrunning the page if the host was malicious.
 > 
-> We are always disabled (paused) when we enter brbe_enable(). So the
-> last thing we do is unpause. The only ordering we care about after
-> writing SYS_BRBFCR_EL1 is writing PMCR which has an isb before it is
-> written.
+> [...]
 
-Maybe it is good to add a comment to record the info.
+Applied to fixes, thanks!
 
-Thanks,
-Leo
+[1/1] KVM: arm64: Fix alignment of kvm_hyp_memcache allocations
+      commit: b938731ed2d4eea8e268a27bfc600581fedae2a9
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
