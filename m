@@ -1,95 +1,102 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5B1202C31
-	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 09:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4F541C6A
+	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 10:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739440790; cv=none; b=n/ZPDfakwoO4GrX03CrtO29WPszBJXRi77b5DNohZSP7dDxFUJvobggmvjb7E4dyCSwWDPimszSoYBHVHCHof6fyrXJ9ySJO3TapBiBAotg5pcMcat7HYatFeHsyrJMVc+BFtGGKNXpKj17VymYnHEDHZeDKsXJxrxV4S028Y3A=
+	t=1739442590; cv=none; b=L0bgvJJfO27OTVfv2vDRaVuF4XNwoen8/BGmGDC5bjn5X60yFKFfo9JzwrPr/19OYirwjOqRwP7u2/po+msaPd/XO1y3xjUFjsCSGRwqKBLHADeeA7wOz7PlWV8c5y/qv3I4xF91X0iWDUxa47KbF4iP5Hlfwd40WNfqAh7C/LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739440790; c=relaxed/simple;
-	bh=COJNGekBErJDtHN053nWkTAoSgTTSoO9L+cYR+Xqxy4=;
+	s=arc-20240116; t=1739442590; c=relaxed/simple;
+	bh=iDH2mAPI1dc+oNCI+jprC1LnlVjmBy3U7iiSh3qJEe0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a+si32QnkAKcZYilpkl5r53FsS5x/w/KO+1xCqQPAbFgoH/lB+i6u340jJOlmp2+5QiUx76WxiBPOM2IdjxJbGR3sX/As3FOimNuRVqs1Lu9y7/J6r2U0Fgq7jijQZxegB2WAAnOc1a6/GjU1+SVhQvrHEvhWdutA1VRzWlcaWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GKhJNr4p; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=ZE4BhArp736iLWO/MMhL54ogpsoQBXKDKZOjh3E9PcpUMwBoeu/137UlpjVDAIotoAXvk3I0qLMD4/RCTpzOa+7rxmQxSSUr5jTrn4JWhJK+1SGjPyVXFiqakw/8Z8lQs0qjnnHf2gpavZNK5jy5VUkLjPZU1J+jINDDBdPIID4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XiuZR5oQ; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GKhJNr4p"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6e4289e83ddso189216d6.3
-        for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 01:59:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XiuZR5oQ"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e45dbf15c7so5342436d6.2
+        for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 02:29:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739440788; x=1740045588; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=COJNGekBErJDtHN053nWkTAoSgTTSoO9L+cYR+Xqxy4=;
-        b=GKhJNr4pR8Cea3ZBAdGNUREkXQ0Wq35vl3Zq68feONcqf3YC6bLbvShEt+/ywEDL5/
-         2MU4xpbfu4j9m1l/MGocKOi74SUuxH2RJmBU7C7rIn3Ei4O6YlnjAhY0U1iJj41gyyvE
-         UYfV+ZYB+x9iW/YXzfkY8nOgN14gjORMYiTMG6MCXohwzKC/TyDu1JNxiwMF34NChgG0
-         v86IH7T+ggTIGZjva8JKFH28af4qQt0/sd+BiQfpkbrdpEU6G+Oq1Ihy2upSvOA+2Wv1
-         mm4T1Ovvo2mmcxO10A6qBQr3EygNDuFzpQNxMX0xjUEV4OpktBZs9oeJrdLXo/3HaASt
-         Se9w==
+        d=google.com; s=20230601; t=1739442587; x=1740047387; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iDH2mAPI1dc+oNCI+jprC1LnlVjmBy3U7iiSh3qJEe0=;
+        b=XiuZR5oQOlQOuIyXBuFAeT08womwnOPLwGbp8Ops56Ylx9utsBvjgajXBUYkx55CIZ
+         d9GSlqJAi3mlCC9QvsBMyyNcA6VMJ7A8eis4AJs3UgsQxVh3wxSgbjI7Ft+jirijx8Gv
+         vWC+Jof/ut+2a179ZaKeRT7bV0Na7hAfTHfBal5rIwMRmJYelShDf4LAJJ8t4TlUbl/V
+         r+Wb/pPpouBoUxz8JyxOFoFgRKCAAzGNfXzM9PiJaJDNiZja6RTX6N20j59+dDrH1zCA
+         WJ2LMxJeG0daw3o3X3KhjBxAxzLUlZ0zkMYigPWMDHl3UERWHou7v2tjcAC7lt9yqY14
+         7rFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739440788; x=1740045588;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=COJNGekBErJDtHN053nWkTAoSgTTSoO9L+cYR+Xqxy4=;
-        b=ELpMSyrVeqU79SpxDO+Pi29J12ZbGgDBKJer2dYkpbNnWBD3HoZPn6A4hs/dRthtna
-         odAm7MaJ/GMmHWE3aUjK7kCsLTVyB//PZMt1IKZ5aLOjQDLvs8t5NO03IEFXHzXwo8/E
-         iX7jYH3ajOtGthXSNRfr55v10OVYFju16N6pVqrHNMLXifTrXinduo48TtAZZv9vauEG
-         t/fk+MG/n9TzIU0+S2cfsHy9rp5DdgyrxmtTUNdVao0Q9ORKuX6oe9ZRx4cQs7ArGu3U
-         uqo+1sFYNQ6DVEpJYhMLBo8fCpL7f7zjqeOQwbL1q+uwH5B/O2uhMVprCZfEwaE2Ky9b
-         wQLA==
-X-Gm-Message-State: AOJu0YxDLLnUh1s1IB/9BdLOq0QV648En/ZkGdAdLk7kJoSDj9hDwvPZ
-	T0E+QjYpqdr04HIczlxn7bazrYBZAgzmsLKrLFAmmE5JV0pKZXy4cc4GW50Yq/+yAqbDPRk5waH
-	nKEBw0YPCG3QbBCO5c9TLAW8VPNNJKlZheUV3Xg==
-X-Gm-Gg: ASbGncsGhwNeaFuDnKSEGRnUMw/CoS41+4zKaE2HcvtoXrHm88BktbmLCcleyoY4peS
-	2DwKS0jeKzlg+UK6Y+1E40NG6WXhVryPqdHnnGSz0ReDgyTBSDRnaK0OiMaGyHSdWu60wWtSB
-X-Google-Smtp-Source: AGHT+IHjST43iJQwKlW8MuHT3YKNmk3TJzkB+3qglLpmrJHxoQ21YjQ7p9lFzVWUi5QoVF1/vD6V21s991LiGcWOuME=
-X-Received: by 2002:a05:6214:cc8:b0:6e4:2975:ce54 with SMTP id
- 6a1803df08f44-6e46ed7f367mr40769266d6.3.1739440787956; Thu, 13 Feb 2025
- 01:59:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739442587; x=1740047387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iDH2mAPI1dc+oNCI+jprC1LnlVjmBy3U7iiSh3qJEe0=;
+        b=O61w+gTGmTNqz0A5JiAztmzbyjAJM4JX94Wp1rzJ19r21Md41Nu4QzUx9Il/dp35In
+         GfDXDr+1CzrY0IVnTcaOA9NQAUhWJ0Z+yxakcbpiAVJzSrrFctWynaGwF4ZWpYm+1gqY
+         O4hYfONQYOTMgxB87WlDU4j8y6CcZ6GDNMklEpAbVp/YAC87XP8x+iGVZuHqfSh+1IcG
+         VBmkndjzBGGkxhI2ByK1qEHZsGcjN2RT7VCsIWyF2CkZ5gh0odwpiEpNMLyB1kR0WF0o
+         /D0f16cmmhT3mmHDgL8onyKMRfnClTup0nC6QNKjOJsJDdW7K3VxwPbmS5P1WjLw3mKw
+         MDcg==
+X-Forwarded-Encrypted: i=1; AJvYcCUm+TNYi9OIwm6pESk0P7qpdJhE7UkXpLx7z0q17QjE+TYL8ygnxPt0Gb5AsxUL0MdKX89TWpw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyCuzESC8FOu0PpSyDoWsyq5suQKa8/q73mn+5+OBVWPwn/58+q
+	8H81mbHih0pdTbiXhcrAtL4GE9NDDcM4zvjO5so5v2pGj/eyVfEyUoEkH+Pq6k2l3Oy7OuJKlb9
+	CDnx9e0hCVPA6mcQltGkuzJDsgVkLIikQHqG7
+X-Gm-Gg: ASbGncvm4eJRp4o4A6pJgYCPdFK0OTGtsNz01kMEqVuYbe0wdZwu+tUlb1bFJz4YmCm
+	4B4okh4s9X8QVPogihJVH6wWBFf/baXQIFd+1W+91hLcqMPrOCtCs6/pbUnUqBsCn0Nng1qo7lr
+	15j7SAyMH+ifBxtAc2NXzrJd8s+Fk=
+X-Google-Smtp-Source: AGHT+IFSuewblnxjgj5HnSVadvSSuC/qdEmqFfvr9Q9PXwmIlT3F19JHVcIhx52HuK/by84c3/uhvL7P/3cNQ+kC7m4=
+X-Received: by 2002:a05:6214:f61:b0:6e4:269f:60fe with SMTP id
+ 6a1803df08f44-6e65bf1a860mr53983996d6.10.1739442587576; Thu, 13 Feb 2025
+ 02:29:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250212173454.2864462-1-maz@kernel.org>
-In-Reply-To: <20250212173454.2864462-1-maz@kernel.org>
-From: Anders Roxell <anders.roxell@linaro.org>
-Date: Thu, 13 Feb 2025 10:59:36 +0100
-X-Gm-Features: AWEUYZnv3GWn0jzFu3uoM9Lo2WH4CAyE-PhoCt0q0vIYbO78Rx1ocXlr_cZpyFs
-Message-ID: <CADYN=9KWdAm4iKYNN16Uz68XPViDLXGar3uhrM2e2+Dharaosw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Convert timer offset VA when accessed in HYP code
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Linux Kernel Functional Testing <lkft@linaro.org>
+References: <20250212182558.2865232-1-maz@kernel.org> <Z618Rd__s7g8xWNP@linux.dev>
+In-Reply-To: <Z618Rd__s7g8xWNP@linux.dev>
+From: Alexander Potapenko <glider@google.com>
+Date: Thu, 13 Feb 2025 11:29:11 +0100
+X-Gm-Features: AWEUYZlpJcerqPZRSnhliHHFx2Y2i8XCh23BYfHNVZxojxkfWkjFhjBvxm-zDpI
+Message-ID: <CAG_fn=VYXBce+0S7=ZuggNKvn4-b7awWVtq4v9B14U9ivRimkw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: Assorted vgic fixes for 6.14
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 12 Feb 2025 at 18:35, 'Marc Zyngier' via lkft <lkft@linaro.org> wrote:
+On Thu, Feb 13, 2025 at 5:59=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
 >
-> Now that EL2 has gained some early timer emulation, it accesses
-> the offsets pointed to by the timer structure, both of which
-> live in the KVM structure.
+> On Wed, Feb 12, 2025 at 06:25:56PM +0000, Marc Zyngier wrote:
+> > Alexander, while fuzzing KVM/arm64, found an annoying set of problems,
+> > all stemming from the fact that the vgic can be initialised or
+> > destroyed in parallel with the rest of the guest still being live.
+> >
+> > Yes, this is annoying.
+> >
+> > This second version takes a different approach at the problem,
+> > plugging the glaring hole we have between vgic creation and private
+> > interrupt allocation.
+> >
+> > Although this is more invasive, I'm more confident about this one than
+> > the initial version I posted a week ago.
 >
-> Of course, these are *kernel* pointers, so the dereferencing
-> of these pointers in non-kernel code must be itself be offset.
+> Much better place now! Here's to the next pile of syzkaller bugs :)
 >
-> Given switch.h its own version of timer_get_offset() and use that
-> instead.
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 >
-> Fixes: b86fc215dc26d ("KVM: arm64: Handle counter access early in non-HYP context")
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Alex, I'd very much appreciate your testing on this.
+>
+> I too would like to see the tires kicked before we pick this up, if it
+> isn't too much trouble Alex.
 
-Tested-by: Anders Roxell <anders.roxell@linaro.org>
-
-Build this patch ontop of next-20250212 and ran kvm-unit-tests on a rockpi4.
-And it ran fine without any kernel panic.
-
-Cheers,
-Anders
+I am on it, will report back today or tomorrow.
