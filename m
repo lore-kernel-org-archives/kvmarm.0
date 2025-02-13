@@ -1,103 +1,221 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A914C1CBEAA
-	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 15:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA1E200BB7;
+	Thu, 13 Feb 2025 16:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739460980; cv=none; b=roe528L++/zrudPTlnaPl1hZIOlylr0Vp7IO3HgB2J+NQAkak4ttPIYx2HuhHazRgp8yPkgESLVMtT2/a7FNYnv36ZdzVnBoYLW6gFqNXoQieWSoJc++DhjIQP/Inyiz2cYtpllrOWcy+t41It5O88y9R3ogvq49tM07aDxnMBs=
+	t=1739463287; cv=none; b=Dl82/aKaBmM3CWy/4JHBx/vxrfyUgMz+HE8bD1EVhzkcfjI/k5stQeW173p9cjRDIf0hOWbVKX3LvRsCRDBuU2AdfWDS4aPDtM58Uj8089sq43A8nMFgJNrzfq4TU81ufgLAv+ldVELROCHJ8Uef5LiD7qA+7QdvXx4zJs2jln4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739460980; c=relaxed/simple;
-	bh=rUUmr1qKa0raoRIrehordGqRHzgfGvgm6PX24wnH2XI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QzPCKRbmISuwbgcklsXavIxHt1ivGG2IBa4OhXGiB7BV8kN0UiqKU+SljJxTWrVIlcAhKEMls3y/8Dtfhl0izEXVSGBLUkx00XV7pXuJ7VvCgcCBvSR9Mdbe7hqGXT8N+cheNSVSZCRDhhVVxssWz6vocvxJSnikYGD+GYWTpkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SSH6PIdN; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SSH6PIdN"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-ab7e9f7381cso116844366b.2
-        for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 07:36:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739460977; x=1740065777; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yY1niH8bXpIvQxfdtYMW2hEB9nSt1maMeFqvo9y07nE=;
-        b=SSH6PIdN/cH8G/sWiY6yUAFrXSKWyrujpcNzZ+qRZgx2xHRuEm8lEiKaZoUY0n3rL9
-         l/N7Au+SLAKZbwzTCJn+Sd/ENQ2K+z9GK84u0hvfQeW4t6Neslje0+jQKPTFuDA6ajY8
-         g3MomVKM7R3aLH3hLkMnhefHRAzaeaWXSnz/4fryeaTDo1JwbHcCVqfyWCVtD9IeGGLf
-         kPHDajottu7oNUBn/lDMyvko8stkFU8XezEHiXuysnWjbkC5kH28O+m1xryVDPCs8Cy1
-         3RbaTZFcfxO+ZkowJUFyGuotTMFhy3jRcnBOiRGvWUKVYb9DdukTTQ6KuB8ZBHs4hWmJ
-         3Qbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739460977; x=1740065777;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yY1niH8bXpIvQxfdtYMW2hEB9nSt1maMeFqvo9y07nE=;
-        b=iS5GA+z7I15pr7dKNT8qYFN3ZDLJKJcwdoMnhMo87WtCZ/tUIxR8AKkWZPGXzOothQ
-         Q6uFSvzacs7ru2rqiKEV91wR7+UHHjXgvLzLs9TVnYbCyX/bQKSIPbr18SrujstizCYf
-         Wj13KBs6PsnuhZM28iv8UCXX+O0aWT71f5CYZ8eFkMtwkfwtOwHb5pybBHFqoFDN0KPa
-         FbonTMzKU5lNWxwEQ43i8hrCAdRnlob0xgD+PwctKGQqHLuQhVZECdC48suk8EitPQCx
-         uto24K8CJhLmu/pV6qfb3DnnbHcZ5rRwvYPdcvLN3az2FR9e9Vg//Vc3vvSQ5l/EYUe5
-         SEdg==
-X-Forwarded-Encrypted: i=1; AJvYcCUK3d1RAPwiJbbA78DFPN0zMv4c70iCM/yHPzCV2zsNclaQlS6woHUvVDrLIYSQd7F+bcy6Ndg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyCnXKjjqvHWpNac4icLvohLYaUA9GD4yVeqZQgC3sdR+uyNKHB
-	33XDx0txRe8X8xHMP0bL++AaxP4OeMCtDETOn64hiSzClApeLRfaBacQnijPWbcfTr1nA8dY6ys
-	7aew7jA==
-X-Google-Smtp-Source: AGHT+IGNnBpl+X2qDDZkAqsl1W2uWg0qrWcC8MQ3Hvm0c9bsOTfUcxx6R0kvEkmQWiyS31Y+rdhEd3ntyWG8
-X-Received: from ejkk8.prod.google.com ([2002:a17:906:32c8:b0:ab7:bfda:26f5])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:730f:b0:aae:fd36:f511
- with SMTP id a640c23a62f3a-aba501a9d85mr376452566b.47.1739460976992; Thu, 13
- Feb 2025 07:36:16 -0800 (PST)
-Date: Thu, 13 Feb 2025 15:36:14 +0000
+	s=arc-20240116; t=1739463287; c=relaxed/simple;
+	bh=cMqkENu/ZOxocimQK5jA1C0TnU51He0yJud7qqZnxT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LZ/6maVNOgsXAeuO1gKNRyzIWGRGiv26ncvgbArWZcZaJPwHs48MUOgk8jy8g2T+4IDcGUS9n4wKgaPP+GvLpWsFdRWDTxj1997ddNkrPP1P+8HkaMHYYNJe29vcsVDfkdDRHrFeo7tlyQNXKA9WilmabqmlUVXsrO2uX7uYgGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 660F8106F;
+	Thu, 13 Feb 2025 08:15:05 -0800 (PST)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.32.44])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 569483F6A8;
+	Thu, 13 Feb 2025 08:14:40 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v7 00/45] arm64: Support for Arm CCA in KVM
+Date: Thu, 13 Feb 2025 16:13:40 +0000
+Message-ID: <20250213161426.102987-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250213153615.3642515-1-qperret@google.com>
-Subject: [PATCH] KVM: arm64: Fix alignment of kvm_hyp_memcache allocations
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Cc: Keir Fraser <keirf@google.com>, Ben Simner <ben.simner@cl.cam.ac.uk>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-When allocating guest stage-2 page-table pages at EL2, pKVM can consume
-pages from the host-provided kvm_hyp_memcache. As pgtable.c expects
-zeroed pages, guest_s2_zalloc_page() actively implements this zeroing
-with a PAGE_SIZE memset. Unfortunately, we don't check the page
-alignment of the host-provided address before doing so, which could
-lead to the memset overrunning the page if the host was malicious.
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-Fix this by simply force-aligning all kvm_hyp_memcache allocations to
-page boundaries.
+The related guest support was merged for v6.14-rc1 so you no longer need
+that separately.
 
-Fixes: 60dfe093ec13 ("KVM: arm64: Instantiate guest stage-2 page-tables at EL2")
-Reported-by: Ben Simner <ben.simner@cl.cam.ac.uk>
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+There are several changes since v6, many thanks for the review
+comments. The highlights are below, and individual patches have a changelog.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e3..d9db6dfbad09 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -100,7 +100,7 @@ static inline void push_hyp_memcache(struct kvm_hyp_memcache *mc,
- static inline void *pop_hyp_memcache(struct kvm_hyp_memcache *mc,
- 				     void *(*to_va)(phys_addr_t phys))
- {
--	phys_addr_t *p = to_va(mc->head);
-+	phys_addr_t *p = to_va(mc->head & PAGE_MASK);
- 
- 	if (!mc->nr_pages)
- 		return NULL;
+ * Separation of the concepts of RMM granule size and PAGE_SIZE. It's
+   now possible to run with a host PAGE_SIZE larger than 4k (but see
+   below).
+
+ * Return with -EFAULT error for KVM_EXIT_MEMORY_FAULT as per the
+   documentation.
+
+ * Return -EPERM rather than -EINVAL in cases where a realm function is
+   performed on a non-realm guest.
+
+ * Several improvements to names of functions/defines and other minor
+   changes following review feedback - thanks!
+
+Things to note:
+
+ * You will need an updated kvmtool because of the KVM_EXIT_MEMORY_FAULT
+   change mentioned above. See below for a link.
+
+ * KVM_VCPU_MAX_FEATURES is incremented. *NOTE*: This effectively
+   exposes the nested virtualisation feature. So this series as it
+   stands has a dependency on that being finished before it can be
+   merged. See [2] for more details.
+
+ * The final patch enables the host's page size to be larger than 4k.
+   The support is all in the previous patches, but there is more work to
+   do before I consider this ready, specifically:
+
+   - The code to allocate RTTs (stage 2 page tables) for the RMM still
+     conflates pages and granules. This means that for every RTT an
+     entire host page is allocated potentially using 16x the required
+     memory for the RTTs.
+
+   - Having the guest's page size smaller than the host's currently
+     doesn't work. The issue is the guest needs to know what granulatity
+     it can transition pages between shared and private.  Exactly how
+     this should work is an open area of discussion.
+
+   - This configuration isn't well tested, I would be unsurprised if
+     there are major bugs! ;) But a simple Linux guest of the same page
+     size works.
+
+The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
+
+This series is based on v6.14-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v7
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v5
+
+[1] https://developer.arm.com/documentation/den0137/1-0rel0/
+[2] https://lore.kernel.org/r/a7011738-a084-46fa-947f-395d90b37f8b%40arm.com
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: rme: allow userspace to inject aborts
+  arm64: rme: support RSI_HOST_CALL
+
+Sean Christopherson (1):
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+
+Steven Price (32):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  arm64: kvm: Allow passing machine type in KVM creation
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  KVM: arm64: vgic: Provide helper for number of list registers
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: rme: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: rme: Enable PMU support with a realm guest
+  kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
+  arm64: kvm: Expose support for private memory
+  KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+  KVM: arm64: Allow activating realms
+  WIP: Enable support for PAGE_SIZE>4k
+
+Suzuki K Poulose (3):
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Expose debug HW register numbers for Realm
+  arm64: rme: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |    3 +
+ arch/arm64/include/asm/kvm_emulate.h |   40 +
+ arch/arm64/include/asm/kvm_host.h    |   17 +-
+ arch/arm64/include/asm/kvm_rme.h     |  128 ++
+ arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  259 ++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   45 +-
+ arch/arm64/kvm/arm.c                 |  173 ++-
+ arch/arm64/kvm/guest.c               |  104 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    5 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  199 ++-
+ arch/arm64/kvm/pmu-emul.c            |    6 +
+ arch/arm64/kvm/psci.c                |   30 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  199 +++
+ arch/arm64/kvm/rme.c                 | 1710 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   79 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    5 +
+ arch/arm64/kvm/vgic/vgic.c           |   54 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/kvm_host.h             |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   31 +-
+ virt/kvm/kvm_main.c                  |    7 +
+ 35 files changed, 3658 insertions(+), 104 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
+
 -- 
-2.48.1.502.g6dc24dfdaf-goog
+2.43.0
 
