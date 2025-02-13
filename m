@@ -1,102 +1,141 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4F541C6A
-	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 10:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264B3190477;
+	Thu, 13 Feb 2025 10:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739442590; cv=none; b=L0bgvJJfO27OTVfv2vDRaVuF4XNwoen8/BGmGDC5bjn5X60yFKFfo9JzwrPr/19OYirwjOqRwP7u2/po+msaPd/XO1y3xjUFjsCSGRwqKBLHADeeA7wOz7PlWV8c5y/qv3I4xF91X0iWDUxa47KbF4iP5Hlfwd40WNfqAh7C/LA=
+	t=1739444186; cv=none; b=hLkAg2XhEIaZYNjvblJHidhEtc7dfqE7B9wM330/oNjl0eX9GJcr6Ws0l3LY3C1Q7oz5Ayh5Z9gULwwa9lPY2yPmoDRHBgJRpB6l3pSh3LnmsHvHhlwRsoZoKR+A99/ayOVGRT/P1rVD4DMwIK4/Ryxu7DurJ1zlOT6guukllt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739442590; c=relaxed/simple;
-	bh=iDH2mAPI1dc+oNCI+jprC1LnlVjmBy3U7iiSh3qJEe0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZE4BhArp736iLWO/MMhL54ogpsoQBXKDKZOjh3E9PcpUMwBoeu/137UlpjVDAIotoAXvk3I0qLMD4/RCTpzOa+7rxmQxSSUr5jTrn4JWhJK+1SGjPyVXFiqakw/8Z8lQs0qjnnHf2gpavZNK5jy5VUkLjPZU1J+jINDDBdPIID4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XiuZR5oQ; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1739444186; c=relaxed/simple;
+	bh=AWQ9Pe1GOHo90EUe82d6uyA1a+MiIOWdBo0xg647hR4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gtK1Jygaa+Pfgz0LYL8g/DiKdH+dgHNTjESIfoPDkLoJSbBjlDP3WsEHdQVe3Ht5Uyaa/5xHYD6zE/E8itvcCOYYtbXFqYmPI6ecOwxluJRTiW520RfdGfQjWGAv4v7Pvqrv7r75COW3KlloueX+LT5FBgsauhySH8GPy/8k/Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+u3coxc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XiuZR5oQ"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e45dbf15c7so5342436d6.2
-        for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 02:29:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739442587; x=1740047387; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iDH2mAPI1dc+oNCI+jprC1LnlVjmBy3U7iiSh3qJEe0=;
-        b=XiuZR5oQOlQOuIyXBuFAeT08womwnOPLwGbp8Ops56Ylx9utsBvjgajXBUYkx55CIZ
-         d9GSlqJAi3mlCC9QvsBMyyNcA6VMJ7A8eis4AJs3UgsQxVh3wxSgbjI7Ft+jirijx8Gv
-         vWC+Jof/ut+2a179ZaKeRT7bV0Na7hAfTHfBal5rIwMRmJYelShDf4LAJJ8t4TlUbl/V
-         r+Wb/pPpouBoUxz8JyxOFoFgRKCAAzGNfXzM9PiJaJDNiZja6RTX6N20j59+dDrH1zCA
-         WJ2LMxJeG0daw3o3X3KhjBxAxzLUlZ0zkMYigPWMDHl3UERWHou7v2tjcAC7lt9yqY14
-         7rFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739442587; x=1740047387;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iDH2mAPI1dc+oNCI+jprC1LnlVjmBy3U7iiSh3qJEe0=;
-        b=O61w+gTGmTNqz0A5JiAztmzbyjAJM4JX94Wp1rzJ19r21Md41Nu4QzUx9Il/dp35In
-         GfDXDr+1CzrY0IVnTcaOA9NQAUhWJ0Z+yxakcbpiAVJzSrrFctWynaGwF4ZWpYm+1gqY
-         O4hYfONQYOTMgxB87WlDU4j8y6CcZ6GDNMklEpAbVp/YAC87XP8x+iGVZuHqfSh+1IcG
-         VBmkndjzBGGkxhI2ByK1qEHZsGcjN2RT7VCsIWyF2CkZ5gh0odwpiEpNMLyB1kR0WF0o
-         /D0f16cmmhT3mmHDgL8onyKMRfnClTup0nC6QNKjOJsJDdW7K3VxwPbmS5P1WjLw3mKw
-         MDcg==
-X-Forwarded-Encrypted: i=1; AJvYcCUm+TNYi9OIwm6pESk0P7qpdJhE7UkXpLx7z0q17QjE+TYL8ygnxPt0Gb5AsxUL0MdKX89TWpw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyCuzESC8FOu0PpSyDoWsyq5suQKa8/q73mn+5+OBVWPwn/58+q
-	8H81mbHih0pdTbiXhcrAtL4GE9NDDcM4zvjO5so5v2pGj/eyVfEyUoEkH+Pq6k2l3Oy7OuJKlb9
-	CDnx9e0hCVPA6mcQltGkuzJDsgVkLIikQHqG7
-X-Gm-Gg: ASbGncvm4eJRp4o4A6pJgYCPdFK0OTGtsNz01kMEqVuYbe0wdZwu+tUlb1bFJz4YmCm
-	4B4okh4s9X8QVPogihJVH6wWBFf/baXQIFd+1W+91hLcqMPrOCtCs6/pbUnUqBsCn0Nng1qo7lr
-	15j7SAyMH+ifBxtAc2NXzrJd8s+Fk=
-X-Google-Smtp-Source: AGHT+IFSuewblnxjgj5HnSVadvSSuC/qdEmqFfvr9Q9PXwmIlT3F19JHVcIhx52HuK/by84c3/uhvL7P/3cNQ+kC7m4=
-X-Received: by 2002:a05:6214:f61:b0:6e4:269f:60fe with SMTP id
- 6a1803df08f44-6e65bf1a860mr53983996d6.10.1739442587576; Thu, 13 Feb 2025
- 02:29:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+u3coxc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84B18C4CED1;
+	Thu, 13 Feb 2025 10:56:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739444185;
+	bh=AWQ9Pe1GOHo90EUe82d6uyA1a+MiIOWdBo0xg647hR4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X+u3coxc8I8AO5CVa23DSr3lHAzSa2nGrfJOg2QM+FG+j261Z3D5lhIJLUbE6JeTB
+	 vTgLsKL7HnHlQ7B4Wzm2dqvvS5Pd5aZjjEyHu98M7HYFLqDZcyUxGOrBsiFiU+118C
+	 yKrlFCWrTRRCkjn9UDvee07GVuWz+7T32CkpdMPFrvbPIexF7oi5Yy7hJe/E8ltlum
+	 uq75zhqkP7WkPqRhx+0na1IE14xIekfL50odCkvQkiBOP4jP40Q2FDyP8b7XiRT21e
+	 53IXHDUoB12kyEOWvjbDiQ8ss0LM/F+VptTDm6HmHdFciA7Ug0jl54ZNY8CHTuN1LB
+	 oxGvSfPDcrRSQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tiWtK-003e0Q-Sv;
+	Thu, 13 Feb 2025 10:56:22 +0000
+Date: Thu, 13 Feb 2025 10:56:22 +0000
+Message-ID: <86seoiru3t.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Mark Brown <broonie@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v7] KVM: arm64: Fix confusion in documentation for pKVM SME assert
+In-Reply-To: <Z626RqzA3HMskwJd@J2N7QTR9R3>
+References: <20250212-kvm-arm64-sme-assert-v7-1-0f786db838d3@kernel.org>
+	<Z6yByMUBPDUyEWOr@J2N7QTR9R3>
+	<86tt8yrzon.wl-maz@kernel.org>
+	<Z626RqzA3HMskwJd@J2N7QTR9R3>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250212182558.2865232-1-maz@kernel.org> <Z618Rd__s7g8xWNP@linux.dev>
-In-Reply-To: <Z618Rd__s7g8xWNP@linux.dev>
-From: Alexander Potapenko <glider@google.com>
-Date: Thu, 13 Feb 2025 11:29:11 +0100
-X-Gm-Features: AWEUYZlpJcerqPZRSnhliHHFx2Y2i8XCh23BYfHNVZxojxkfWkjFhjBvxm-zDpI
-Message-ID: <CAG_fn=VYXBce+0S7=ZuggNKvn4-b7awWVtq4v9B14U9ivRimkw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Assorted vgic fixes for 6.14
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, broonie@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 13, 2025 at 5:59=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Wed, Feb 12, 2025 at 06:25:56PM +0000, Marc Zyngier wrote:
-> > Alexander, while fuzzing KVM/arm64, found an annoying set of problems,
-> > all stemming from the fact that the vgic can be initialised or
-> > destroyed in parallel with the rest of the guest still being live.
-> >
-> > Yes, this is annoying.
-> >
-> > This second version takes a different approach at the problem,
-> > plugging the glaring hole we have between vgic creation and private
-> > interrupt allocation.
-> >
-> > Although this is more invasive, I'm more confident about this one than
-> > the initial version I posted a week ago.
->
-> Much better place now! Here's to the next pile of syzkaller bugs :)
->
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
->
-> > Alex, I'd very much appreciate your testing on this.
->
-> I too would like to see the tires kicked before we pick this up, if it
-> isn't too much trouble Alex.
+On Thu, 13 Feb 2025 09:24:22 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
+> 
+> On Thu, Feb 13, 2025 at 08:55:52AM +0000, Marc Zyngier wrote:
+> > On Wed, 12 Feb 2025 11:11:04 +0000,
+> > Mark Rutland <mark.rutland@arm.com> wrote:
+> > > On Wed, Feb 12, 2025 at 12:44:57AM +0000, Mark Brown wrote:
+> > > > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> > > > index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..e37e53883c357093ff4455f5afdaec90e662d744 100644
+> > > > --- a/arch/arm64/kvm/fpsimd.c
+> > > > +++ b/arch/arm64/kvm/fpsimd.c
+> > > > @@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> > > >  	}
+> > > >  
+> > > >  	/*
+> > > > -	 * If normal guests gain SME support, maintain this behavior for pKVM
+> > > > -	 * guests, which don't support SME.
+> > > > +	 * Protected and non-protected KVM modes require that
+> > > > +	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
+> > > > +	 * host/guest SME state needs to be saved/restored by hyp code.
+> > > > +	 *
+> > > > +	 * In protected mode, hyp code will verify this later.
+> > > >  	 */
+> > > > -	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
+> > > > -		read_sysreg_s(SYS_SVCR));
+> > > > +	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
+> > > > +		     read_sysreg_s(SYS_SVCR));
+> > > 
+> > > As I mentioned on the last round, we can drop the is_protected_kvm_enabled()
+> > > check, i.e. have:
+> > > 
+> > > 	/*
+> > > 	 * Protected and non-protected KVM modes require that
+> > > 	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
+> > > 	 * host/guest SME state needs to be saved/restored by hyp code.
+> > > 	 *
+> > > 	 * In protected mode, hyp code will verify this later.
+> > > 	 */
+> > > 	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+> > > 
+> > > Either way:
+> > > 
+> > > Acked-by: Mark Rutland <mark.rutland@arm.com>
+> > > 
+> > > Marc, are you happy to queue this atop the recent fixes from me? Those
+> > > try to ensure SVCR.{SM,ZA} == {0,0} regardless of whether KVM is in
+> > > protected mode.
+> > 
+> > In all honesty, I find that at this stage, the comment just gets in
+> > the way and is over-describing what is at stake here.
+> > 
+> > The
+> > 
+> >  	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
+> > 
+> > is really the only thing that matters. It perfectly shows what we are
+> > checking for, and doesn't need an exegesis.
+> > 
+> > As for the Fixes: tag, and given the magnitude of the actual fixes
+> > that are already queued, I don't think we need it.
+> 
+> That's fair; if you haven't spun a patch for that already, I guess we're
+> after the following?
 
-I am on it, will report back today or tomorrow.
+Yup. Applied to fixes.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
