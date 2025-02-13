@@ -1,33 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7737204684;
-	Thu, 13 Feb 2025 16:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A602919AD93;
+	Thu, 13 Feb 2025 16:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739463291; cv=none; b=UlGCQNIO0Y+bGOKQpnjFisxNgSnpPWRSbwSGNMRm/+sQj3wlCbZnGGQDZYtG+J+W8jJNVJUMSlFynIPtBi7P3arzibCO8R+zGNMK1S8Td0PXlHeneKSiLUfEKRSU94WbpM20WCiah4uKe1m4pmakX9RmV3ab3p9zIW3UVqvx37k=
+	t=1739463296; cv=none; b=Tz2UfKVwV8Ez6iySaWMzIvjjTzAfivHkD9crO//K4M7K8nUHaoCm/0HiNJo632K+dWFUqmPOzRX0NnbLIM2h/dMiiDpuYbjUGhmEtpZQY8p5yACXLjZiKVTjNe5MsV+jRxAjPnpXeDmgTrJmSgxsa2MkdQeLv8siiJLlFdfbByw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739463291; c=relaxed/simple;
-	bh=LRn91Pq6eXWqVDz4cNAF85edhh9rk8ZHTZNwOkHcYvE=;
+	s=arc-20240116; t=1739463296; c=relaxed/simple;
+	bh=7m20aCCgerrJy3QszTf2ti98MRdpZJwsUfKoaCHrb8k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NHOgmjCnum9xHMrrtTZrhAzHNCDDMAMuuHUti4qj8rUucjyNko8dHMZ9MReTicfjVw5PeRozTYcFVguoA6DTzcA9OpWCKdBnDFMrS7GK6QsGmXljrCEno1LWpD6HolMAPEV+QWxrm4DudyxrwCQTBgPHA4LYNDKSNCnueGC/GNY=
+	 MIME-Version:Content-Type; b=BhdpGgCyYrtT+cIZTgnw5s+Y9EzWkYQ/4BMZrG5faKM3JAlexyaWn0xAFjR70mw6v3VaCxs1BSF0N848lCyGh14fsl/6udtacpgOg7P9ZLHocTQcekeBkb8C2TYHYWRz7a3I0dRzBm3s8Ju39BtqoJQn3eRfBG4Fdhjt//noPMw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05E2D1756;
-	Thu, 13 Feb 2025 08:15:10 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA4F6106F;
+	Thu, 13 Feb 2025 08:15:14 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.32.44])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EAF23F6A8;
-	Thu, 13 Feb 2025 08:14:44 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B84373F6A8;
+	Thu, 13 Feb 2025 08:14:49 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Sean Christopherson <seanjc@google.com>,
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -42,9 +41,9 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v7 01/45] KVM: Prepare for handling only shared mappings in mmu_notifier events
-Date: Thu, 13 Feb 2025 16:13:41 +0000
-Message-ID: <20250213161426.102987-2-steven.price@arm.com>
+Subject: [PATCH v7 02/45] kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+Date: Thu, 13 Feb 2025 16:13:42 +0000
+Message-ID: <20250213161426.102987-3-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250213161426.102987-1-steven.price@arm.com>
 References: <20250213161426.102987-1-steven.price@arm.com>
@@ -54,58 +53,41 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <seanjc@google.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Add flags to "struct kvm_gfn_range" to let notifier events target only
-shared and only private mappings, and write up the existing mmu_notifier
-events to be shared-only (private memory is never associated with a
-userspace virtual address, i.e. can't be reached via mmu_notifiers).
+Fix a potential build error (like below, when asm/kvm_emulate.h gets
+included after the kvm/arm_psci.h) by including the missing header file
+in kvm/arm_psci.h:
 
-Add two flags so that KVM can handle the three possibilities (shared,
-private, and shared+private) without needing something like a tri-state
-enum.
+./include/kvm/arm_psci.h: In function ‘kvm_psci_version’:
+./include/kvm/arm_psci.h:29:13: error: implicit declaration of function
+   ‘vcpu_has_feature’; did you mean ‘cpu_have_feature’? [-Werror=implicit-function-declaration]
+   29 |         if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2)) {
+	         |             ^~~~~~~~~~~~~~~~
+			       |             cpu_have_feature
 
-Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- include/linux/kvm_host.h | 2 ++
- virt/kvm/kvm_main.c      | 7 +++++++
- 2 files changed, 9 insertions(+)
+ include/kvm/arm_psci.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3cb9a32a6330..0de1e485452c 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -266,6 +266,8 @@ struct kvm_gfn_range {
- 	gfn_t end;
- 	union kvm_mmu_notifier_arg arg;
- 	enum kvm_gfn_range_filter attr_filter;
-+	bool only_private;
-+	bool only_shared;
- 	bool may_block;
- };
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index faf10671eed2..4f0136094fac 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -593,6 +593,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- 			 * the second or later invocation of the handler).
- 			 */
- 			gfn_range.arg = range->arg;
+diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+index cbaec804eb83..38dab7add79b 100644
+--- a/include/kvm/arm_psci.h
++++ b/include/kvm/arm_psci.h
+@@ -10,6 +10,8 @@
+ #include <linux/kvm_host.h>
+ #include <uapi/linux/psci.h>
+ 
++#include <asm/kvm_emulate.h>
 +
-+			/*
-+			 * HVA-based notifications aren't relevant to private
-+			 * mappings as they don't have a userspace mapping.
-+			 */
-+			gfn_range.only_private = false;
-+			gfn_range.only_shared = true;
- 			gfn_range.may_block = range->may_block;
- 			/*
- 			 * HVA-based notifications aren't relevant to private
+ #define KVM_ARM_PSCI_0_1	PSCI_VERSION(0, 1)
+ #define KVM_ARM_PSCI_0_2	PSCI_VERSION(0, 2)
+ #define KVM_ARM_PSCI_1_0	PSCI_VERSION(1, 0)
 -- 
 2.43.0
 
