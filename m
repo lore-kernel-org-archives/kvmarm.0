@@ -1,141 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264B3190477;
-	Thu, 13 Feb 2025 10:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9687E2144AF
+	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 11:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739444186; cv=none; b=hLkAg2XhEIaZYNjvblJHidhEtc7dfqE7B9wM330/oNjl0eX9GJcr6Ws0l3LY3C1Q7oz5Ayh5Z9gULwwa9lPY2yPmoDRHBgJRpB6l3pSh3LnmsHvHhlwRsoZoKR+A99/ayOVGRT/P1rVD4DMwIK4/Ryxu7DurJ1zlOT6guukllt4=
+	t=1739444771; cv=none; b=YI66Qporql8OZA3xB1JX+MyEw35M7WsuhcUuEToV6ZPaUuaFbUJknxxDEwbw7UPJ9geDWhyONcAGQONoSSbdrQSd2r44o1h4zG/ujBoSGdu6vBR1vqbFMixAZbf2GuXzyY6erExt3Dl0/68/nXtO1gM8K2mZC5tT9I9MgQR2JXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739444186; c=relaxed/simple;
-	bh=AWQ9Pe1GOHo90EUe82d6uyA1a+MiIOWdBo0xg647hR4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gtK1Jygaa+Pfgz0LYL8g/DiKdH+dgHNTjESIfoPDkLoJSbBjlDP3WsEHdQVe3Ht5Uyaa/5xHYD6zE/E8itvcCOYYtbXFqYmPI6ecOwxluJRTiW520RfdGfQjWGAv4v7Pvqrv7r75COW3KlloueX+LT5FBgsauhySH8GPy/8k/Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+u3coxc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739444771; c=relaxed/simple;
+	bh=vzJhRKbm7doJ1xKI3GNgdwCsFtvU+/qRlVqY+hygGro=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=If8FJ2V0z1nUgZFfvEaw9yVyCTyTgLEY1Vh8X25fHVg7IdCKkXxKTWoeGdRY+eaadtrv6g0Pa/TfvTWVCLm4CPhXyHdbWqzAL+lCRnBtDPOP1Pc3i+y4OyDWcRPRmzNcXFwI8ZlnwqIm8VDld9XORCliZdbXM9W3qEQZo5U+cuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iglMK53L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+u3coxc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84B18C4CED1;
-	Thu, 13 Feb 2025 10:56:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iglMK53L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B965C4CED1;
+	Thu, 13 Feb 2025 11:06:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739444185;
-	bh=AWQ9Pe1GOHo90EUe82d6uyA1a+MiIOWdBo0xg647hR4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X+u3coxc8I8AO5CVa23DSr3lHAzSa2nGrfJOg2QM+FG+j261Z3D5lhIJLUbE6JeTB
-	 vTgLsKL7HnHlQ7B4Wzm2dqvvS5Pd5aZjjEyHu98M7HYFLqDZcyUxGOrBsiFiU+118C
-	 yKrlFCWrTRRCkjn9UDvee07GVuWz+7T32CkpdMPFrvbPIexF7oi5Yy7hJe/E8ltlum
-	 uq75zhqkP7WkPqRhx+0na1IE14xIekfL50odCkvQkiBOP4jP40Q2FDyP8b7XiRT21e
-	 53IXHDUoB12kyEOWvjbDiQ8ss0LM/F+VptTDm6HmHdFciA7Ug0jl54ZNY8CHTuN1LB
-	 oxGvSfPDcrRSQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1739444771;
+	bh=vzJhRKbm7doJ1xKI3GNgdwCsFtvU+/qRlVqY+hygGro=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iglMK53LnkSTqT+T9DhbWoF5uTSfMXJn2hxzXp/YgtSTvr0LdqIwPizvDhy6HAKh9
+	 kD4QhKGc7sg9RhDHCw2J90OO/0Gvfo5HeG1UamBIkMTco9LY5Hjw9AA+0qpk+viJ6N
+	 kkxqQDXD9oOvoaEl4/YRQE6ybU84RCeMURXRd5zQHct/MPvDx+4ENyQxbLaDXmbOzG
+	 vA3pfXJH69AR9nfnFjdsEXIt1GbQ7XFRGJ8q2ov9hTO9RezG8yVIGmONVh82qQSCX5
+	 70RqrLiVz249B4lzJL+azphYwGKY0aad6RJQVnrZuTmOTZURde7m55fq4zyuC71vfx
+	 GDHIz6L8J62Gg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tiWtK-003e0Q-Sv;
-	Thu, 13 Feb 2025 10:56:22 +0000
-Date: Thu, 13 Feb 2025 10:56:22 +0000
-Message-ID: <86seoiru3t.wl-maz@kernel.org>
+	id 1tiX2m-003eD6-G0;
+	Thu, 13 Feb 2025 11:06:08 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Mark Brown <broonie@kernel.org>,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7] KVM: arm64: Fix confusion in documentation for pKVM SME assert
-In-Reply-To: <Z626RqzA3HMskwJd@J2N7QTR9R3>
-References: <20250212-kvm-arm64-sme-assert-v7-1-0f786db838d3@kernel.org>
-	<Z6yByMUBPDUyEWOr@J2N7QTR9R3>
-	<86tt8yrzon.wl-maz@kernel.org>
-	<Z626RqzA3HMskwJd@J2N7QTR9R3>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: Convert timer offset VA when accessed in HYP code
+Date: Thu, 13 Feb 2025 11:06:04 +0000
+Message-Id: <173944474879.2872565.11761069838298587953.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250212173454.2864462-1-maz@kernel.org>
+References: <20250212173454.2864462-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, broonie@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, lkft@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 13 Feb 2025 09:24:22 +0000,
-Mark Rutland <mark.rutland@arm.com> wrote:
+On Wed, 12 Feb 2025 17:34:54 +0000, Marc Zyngier wrote:
+> Now that EL2 has gained some early timer emulation, it accesses
+> the offsets pointed to by the timer structure, both of which
+> live in the KVM structure.
 > 
-> On Thu, Feb 13, 2025 at 08:55:52AM +0000, Marc Zyngier wrote:
-> > On Wed, 12 Feb 2025 11:11:04 +0000,
-> > Mark Rutland <mark.rutland@arm.com> wrote:
-> > > On Wed, Feb 12, 2025 at 12:44:57AM +0000, Mark Brown wrote:
-> > > > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> > > > index 4d3d1a2eb157047b4b2488e9c4ffaabc6f5a0818..e37e53883c357093ff4455f5afdaec90e662d744 100644
-> > > > --- a/arch/arm64/kvm/fpsimd.c
-> > > > +++ b/arch/arm64/kvm/fpsimd.c
-> > > > @@ -93,11 +93,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-> > > >  	}
-> > > >  
-> > > >  	/*
-> > > > -	 * If normal guests gain SME support, maintain this behavior for pKVM
-> > > > -	 * guests, which don't support SME.
-> > > > +	 * Protected and non-protected KVM modes require that
-> > > > +	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> > > > +	 * host/guest SME state needs to be saved/restored by hyp code.
-> > > > +	 *
-> > > > +	 * In protected mode, hyp code will verify this later.
-> > > >  	 */
-> > > > -	WARN_ON(is_protected_kvm_enabled() && system_supports_sme() &&
-> > > > -		read_sysreg_s(SYS_SVCR));
-> > > > +	WARN_ON_ONCE(is_protected_kvm_enabled() && system_supports_sme() &&
-> > > > +		     read_sysreg_s(SYS_SVCR));
-> > > 
-> > > As I mentioned on the last round, we can drop the is_protected_kvm_enabled()
-> > > check, i.e. have:
-> > > 
-> > > 	/*
-> > > 	 * Protected and non-protected KVM modes require that
-> > > 	 * SVCR.{SM,ZA} == {0,0} when entering a guest so that no
-> > > 	 * host/guest SME state needs to be saved/restored by hyp code.
-> > > 	 *
-> > > 	 * In protected mode, hyp code will verify this later.
-> > > 	 */
-> > > 	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
-> > > 
-> > > Either way:
-> > > 
-> > > Acked-by: Mark Rutland <mark.rutland@arm.com>
-> > > 
-> > > Marc, are you happy to queue this atop the recent fixes from me? Those
-> > > try to ensure SVCR.{SM,ZA} == {0,0} regardless of whether KVM is in
-> > > protected mode.
-> > 
-> > In all honesty, I find that at this stage, the comment just gets in
-> > the way and is over-describing what is at stake here.
-> > 
-> > The
-> > 
-> >  	WARN_ON_ONCE(system_supports_sme() && read_sysreg_s(SYS_SVCR));
-> > 
-> > is really the only thing that matters. It perfectly shows what we are
-> > checking for, and doesn't need an exegesis.
-> > 
-> > As for the Fixes: tag, and given the magnitude of the actual fixes
-> > that are already queued, I don't think we need it.
+> Of course, these are *kernel* pointers, so the dereferencing
+> of these pointers in non-kernel code must be itself be offset.
 > 
-> That's fair; if you haven't spun a patch for that already, I guess we're
-> after the following?
+> [...]
 
-Yup. Applied to fixes.
+Applied to fixes, thanks!
 
-Thanks,
+[1/1] KVM: arm64: Convert timer offset VA when accessed in HYP code
+      commit: 18ec0be672a4a27aa045cf692eeb1e180a202e0c
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
