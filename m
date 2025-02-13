@@ -1,132 +1,103 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404C02659DA
-	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 13:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A914C1CBEAA
+	for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 15:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739455167; cv=none; b=GiKJ7YGrFKpR9ISa8SoGlPvtloiuoOh9dRgOcBz5Y46e5DvBgNSNHmYFDcPWGwrX1fwzfDqY+kX8F+u1FLn0BAMp6q3hoMfY5n1kIgarAYxTcFF6vXN651/Dcz413QXPcV4ZGI25xxB6bYEJzlDDfXxrWwgXC7DQf4uoSz0CT/c=
+	t=1739460980; cv=none; b=roe528L++/zrudPTlnaPl1hZIOlylr0Vp7IO3HgB2J+NQAkak4ttPIYx2HuhHazRgp8yPkgESLVMtT2/a7FNYnv36ZdzVnBoYLW6gFqNXoQieWSoJc++DhjIQP/Inyiz2cYtpllrOWcy+t41It5O88y9R3ogvq49tM07aDxnMBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739455167; c=relaxed/simple;
-	bh=cDbU7M3nb3YVSOukISqyiklXkeydmb+/cAbnL3ACgMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W/gZmcUtqFBqe5xt7CbooyqWCeQI2W3klytVcuGBsIv7EtChheW6zgYlS28sxltUCFcx6FhMYUaK6Gxsx0fzYRd4t6J2YozQSGjLHoVCcjiMegyTbyy84agE24NWGks9b+LOSafuV5df9p95pp4ZiSox9KsUdIz4eFWE1tIMCIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oxL4AOv2; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1739460980; c=relaxed/simple;
+	bh=rUUmr1qKa0raoRIrehordGqRHzgfGvgm6PX24wnH2XI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QzPCKRbmISuwbgcklsXavIxHt1ivGG2IBa4OhXGiB7BV8kN0UiqKU+SljJxTWrVIlcAhKEMls3y/8Dtfhl0izEXVSGBLUkx00XV7pXuJ7VvCgcCBvSR9Mdbe7hqGXT8N+cheNSVSZCRDhhVVxssWz6vocvxJSnikYGD+GYWTpkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SSH6PIdN; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oxL4AOv2"
-Date: Thu, 13 Feb 2025 14:59:19 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739455163;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=quCNt3rENXxq12lVNZV7KFjjQFYvI9uo2HoGXNuB/os=;
-	b=oxL4AOv2PByqQJRmy2LV/aaLcm7zlaNJBU3a6mZ4KiT1XwSVG9tf4Z3GzbapebfxcHiqJx
-	A7DPMUZTuDaWda9Ms+5FMzarxZGNtmgIgBHFlsikf73RqRVlrke009F2yKj0xwukbdTbKX
-	kTUfgGhAYWnCki1zK3SlWOvzxZvLrdU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 15/18] Add kvmtool_params to test
- specification
-Message-ID: <20250213-a6741ec8fd32c34500327176@orel>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-16-alexandru.elisei@arm.com>
- <20250123-bbd289cfd7abfd93e9b67eef@orel>
- <Z6tmrX8/+wzeFL1P@arm.com>
- <20250212-77a312138f8b5931553ece38@orel>
- <Z6zNpF6mi5GgeDFE@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SSH6PIdN"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-ab7e9f7381cso116844366b.2
+        for <kvmarm@lists.linux.dev>; Thu, 13 Feb 2025 07:36:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739460977; x=1740065777; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yY1niH8bXpIvQxfdtYMW2hEB9nSt1maMeFqvo9y07nE=;
+        b=SSH6PIdN/cH8G/sWiY6yUAFrXSKWyrujpcNzZ+qRZgx2xHRuEm8lEiKaZoUY0n3rL9
+         l/N7Au+SLAKZbwzTCJn+Sd/ENQ2K+z9GK84u0hvfQeW4t6Neslje0+jQKPTFuDA6ajY8
+         g3MomVKM7R3aLH3hLkMnhefHRAzaeaWXSnz/4fryeaTDo1JwbHcCVqfyWCVtD9IeGGLf
+         kPHDajottu7oNUBn/lDMyvko8stkFU8XezEHiXuysnWjbkC5kH28O+m1xryVDPCs8Cy1
+         3RbaTZFcfxO+ZkowJUFyGuotTMFhy3jRcnBOiRGvWUKVYb9DdukTTQ6KuB8ZBHs4hWmJ
+         3Qbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739460977; x=1740065777;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yY1niH8bXpIvQxfdtYMW2hEB9nSt1maMeFqvo9y07nE=;
+        b=iS5GA+z7I15pr7dKNT8qYFN3ZDLJKJcwdoMnhMo87WtCZ/tUIxR8AKkWZPGXzOothQ
+         Q6uFSvzacs7ru2rqiKEV91wR7+UHHjXgvLzLs9TVnYbCyX/bQKSIPbr18SrujstizCYf
+         Wj13KBs6PsnuhZM28iv8UCXX+O0aWT71f5CYZ8eFkMtwkfwtOwHb5pybBHFqoFDN0KPa
+         FbonTMzKU5lNWxwEQ43i8hrCAdRnlob0xgD+PwctKGQqHLuQhVZECdC48suk8EitPQCx
+         uto24K8CJhLmu/pV6qfb3DnnbHcZ5rRwvYPdcvLN3az2FR9e9Vg//Vc3vvSQ5l/EYUe5
+         SEdg==
+X-Forwarded-Encrypted: i=1; AJvYcCUK3d1RAPwiJbbA78DFPN0zMv4c70iCM/yHPzCV2zsNclaQlS6woHUvVDrLIYSQd7F+bcy6Ndg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyCnXKjjqvHWpNac4icLvohLYaUA9GD4yVeqZQgC3sdR+uyNKHB
+	33XDx0txRe8X8xHMP0bL++AaxP4OeMCtDETOn64hiSzClApeLRfaBacQnijPWbcfTr1nA8dY6ys
+	7aew7jA==
+X-Google-Smtp-Source: AGHT+IGNnBpl+X2qDDZkAqsl1W2uWg0qrWcC8MQ3Hvm0c9bsOTfUcxx6R0kvEkmQWiyS31Y+rdhEd3ntyWG8
+X-Received: from ejkk8.prod.google.com ([2002:a17:906:32c8:b0:ab7:bfda:26f5])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:730f:b0:aae:fd36:f511
+ with SMTP id a640c23a62f3a-aba501a9d85mr376452566b.47.1739460976992; Thu, 13
+ Feb 2025 07:36:16 -0800 (PST)
+Date: Thu, 13 Feb 2025 15:36:14 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6zNpF6mi5GgeDFE@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250213153615.3642515-1-qperret@google.com>
+Subject: [PATCH] KVM: arm64: Fix alignment of kvm_hyp_memcache allocations
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Keir Fraser <keirf@google.com>, Ben Simner <ben.simner@cl.cam.ac.uk>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 12, 2025 at 04:34:44PM +0000, Alexandru Elisei wrote:
-> Hi Drew,
-> 
-> On Wed, Feb 12, 2025 at 04:56:42PM +0100, Andrew Jones wrote:
-> > On Tue, Feb 11, 2025 at 03:03:09PM +0000, Alexandru Elisei wrote:
-> > > Hi Drew,
-> > > 
-> > > On Thu, Jan 23, 2025 at 04:53:29PM +0100, Andrew Jones wrote:
-> > > > On Mon, Jan 20, 2025 at 04:43:13PM +0000, Alexandru Elisei wrote:
-> > > > > arm/arm64 supports running tests under kvmtool, but kvmtool's syntax for
-> > > > > running a virtual machine is different than qemu's. To run tests using the
-> > > > > automated test infrastructure, add a new test parameter, kvmtool_params.
-> > > > > The parameter serves the exact purpose as qemu_params/extra_params, but using
-> > > > > kvmtool's syntax.
-> > > > 
-> > > > The need for qemu_params and kvmtool_params makes more sense to me now
-> > > > that I see the use in unittests.cfg (I wonder if we can't rearrange this
-> > > > series to help understand these things up front?). There's a lot of
-> > > 
-> > > Certainly, I'll move it closer to the beginning of the series.
-> > > 
-> > > > duplication, though, with having two sets of params since the test-
-> > > > specific inputs always have to be duplicated. To avoid the duplication
-> > > > I think we can use extra_params for '-append' and '--params' by
-> > > > parametrizing the option name for "params" (-append / --params) and then
-> > > > create qemu_opts and kvmtool_opts for extra options like --pmu, --mem,
-> > > > and irqchip.
-> > > 
-> > > How about something like this (I am using selftest-setup as an example, all the
-> > > other test definitions would be similarly modified):
-> > > 
-> > > diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> > > index 2bdad67d5693..3009305ba2d3 100644
-> > > --- a/arm/unittests.cfg
-> > > +++ b/arm/unittests.cfg
-> > > @@ -15,7 +15,9 @@
-> > >  [selftest-setup]
-> > >  file = selftest.flat
-> > >  smp = 2
-> > > -extra_params = -m 256 -append 'setup smp=2 mem=256'
-> > > +test_args = setup smp=2 mem=256
-> > > +qemu_params = -m 256
-> > > +kvmtool_params = --mem 256
-> > >  groups = selftest
-> > > 
-> > > I was thinking about using 'test_args' instead of 'extra_params' to avoid any
-> > > confusion between the two, and to match how they are passed to a test
-> > > - they are in the argv main's argument.
-> > 
-> > Yes, this looks good and test_args is better than my suggestion in the
-> > other mail of 'cmdline_options' since "cmdline" would be ambiguous with
-> > the test's cmdline and the vmm's cmdline.
-> > 
-> > > 
-> > > Also, should I change the test definitions for all the other architectures?
-> > > It's not going to be possible for me to test all the changes.
-> > 
-> > We should be safe with an s/extra_params/qemu_params/ change for all
-> > architectures and CI is pretty good, so we'd have good confidence
-> > if it passes, but, I think we should keep extra_params as a qemu_params
-> > alias anyway since it's possible that people have wrapped kvm-unit-tests
-> > in test harnesses which generate unittests.cfg files.
-> 
-> Sounds good, split extra_params into test_args and qemu_params in all
-> unittests.cfg files, and keep extra_params as an alias for qemu_params.
-> 
-> I was thinking that maybe I should send that as a separate patch, to make
-> sure it gets the visibility it deserves from the other maintainers, instead
-> of it being buried in a 18 patch series. What do you think?
+When allocating guest stage-2 page-table pages at EL2, pKVM can consume
+pages from the host-provided kvm_hyp_memcache. As pgtable.c expects
+zeroed pages, guest_s2_zalloc_page() actively implements this zeroing
+with a PAGE_SIZE memset. Unfortunately, we don't check the page
+alignment of the host-provided address before doing so, which could
+lead to the memset overrunning the page if the host was malicious.
 
-Sounds good.
+Fix this by simply force-aligning all kvm_hyp_memcache allocations to
+page boundaries.
 
-Thanks,
-drew
+Fixes: 60dfe093ec13 ("KVM: arm64: Instantiate guest stage-2 page-tables at EL2")
+Reported-by: Ben Simner <ben.simner@cl.cam.ac.uk>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7cfa024de4e3..d9db6dfbad09 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -100,7 +100,7 @@ static inline void push_hyp_memcache(struct kvm_hyp_memcache *mc,
+ static inline void *pop_hyp_memcache(struct kvm_hyp_memcache *mc,
+ 				     void *(*to_va)(phys_addr_t phys))
+ {
+-	phys_addr_t *p = to_va(mc->head);
++	phys_addr_t *p = to_va(mc->head & PAGE_MASK);
+ 
+ 	if (!mc->nr_pages)
+ 		return NULL;
+-- 
+2.48.1.502.g6dc24dfdaf-goog
+
