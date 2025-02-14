@@ -1,137 +1,145 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864F8268C45
-	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 18:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C391C84D9
+	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 23:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739557574; cv=none; b=Iy5qxZxLVnLmVhyxYVMI/v5XH1QeEMW3DeYpF1jOtp4W78Pnjau6g8gemE58jF7YnfiLoQMQsC5y0ERZACih8/LXd3DJVV65P6hQecZetppwpmkfmvxYYjl5xgb+UpF1f1VT5oeTI0BjUAQVLIoeosZLxGQNmqYF9olaCMgCrZM=
+	t=1739576146; cv=none; b=iq+JdoBIx+IbAOCHvjc4n7aDiOhEZR5oJVWCkYuIctmcTNNNXKu2MdEB3+Mdo/qkASrvSznpDmnHgE/nswzxOBzsFY85qhcnLcm6MvxpGL4hxOjqEt0SmFvQVZ6AmxOt1U+Kr4XvQdM8/nW1SrnJZ4Dkjb+3qMvlY3OCxwRKfvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739557574; c=relaxed/simple;
-	bh=8/DTlY3pk3a6G5GXzvpYerG+E5kgBFJPd3Pov9X0qd0=;
+	s=arc-20240116; t=1739576146; c=relaxed/simple;
+	bh=h1p8m3cbA4dXXHkyCCV7Dsuyby91lpU0uZs5UgVRQrM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=efE9oC65P00ZDal3pg7MrB0SB/QF5gB6xmlg2HPD7mWRaMaIH6mb0gh7dmAP0sz9IqrrMUBkM5f18Z9o3Y/G5EHdjfMqZ9SBXwObmnLarKy/fmRv6Bs65qOKDa9OPDYE48OymOIz2uh5Sf4JKXU4qRb7Qxi2lSwfNAaPL8b52BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ARQd3heW; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=CcSRy/sQoQ3KXGqksGzSYFUFO7x62qPw2QwE9/PhIWerOjcGrMZ8ykZob3CTr9hE4cVhzrNu5gp5IAGC2hUgIsqExT06iYmLZy0GGdLpBHXQ/aHo3Gwj1EbRJqyCyreZyzPep1XNDincyDujxUebFQ3vEX5JDzQI3R6JJDK445g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=arupsSGx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ARQd3heW"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e1b11859a7so12813156d6.1
-        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 10:26:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739557571; x=1740162371; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8/DTlY3pk3a6G5GXzvpYerG+E5kgBFJPd3Pov9X0qd0=;
-        b=ARQd3heWPsY99JEICLvLWbaCptcPQrsIjEiSgiiJwXf8hrWxn5743Bf93f0iBqjPXg
-         ycdoaAt50PgO1x1uyKf82xISko0JvE4jOj3NppDYYQMYMBLRYgG7BG8Lvt+hVqdmrKWl
-         Gq43tLfMvHCnBmPnzLsZnFTQZjq/mwk5ereR6krd5AUcePvNf3zMwgpyQ/6KPkpz9IDz
-         C1jiDQFgGvURZxfyTxQ5kXkDc9jZjQhHry1rlIQl0yjUio8dfoxj4J0u1h4sPjgKV1aS
-         I6cMrjawZqyymeluNb9xTvoTsGP9JXKdkdgrAcJbXUAVQtZauoGHMJ1l6EOC6vufYOvE
-         T5AA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="arupsSGx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739576143;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T3QaL47zgHLdcs5EkgRrAkLY9U+KKlkChilDN7QnXbQ=;
+	b=arupsSGxIsN39X2NPbGZ3b/DVoGNDtKzjVJXxkj9QZkc3wgCiUQh4KpVP7hgqJ/XbPdsIU
+	NsAbfHZl8GeucG3S8UkL2Qwq1y51J6Aw9yBRascsRDpNobVne3E/6yU4oqO/24gp4nZp6M
+	99WxlLBVSrq4z/8Vwxj3IYH96wN1/PU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-332-9e78FC5qO-qn5RKyQErczw-1; Fri, 14 Feb 2025 18:35:42 -0500
+X-MC-Unique: 9e78FC5qO-qn5RKyQErczw-1
+X-Mimecast-MFC-AGG-ID: 9e78FC5qO-qn5RKyQErczw_1739576141
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dd533dad0so2245324f8f.0
+        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 15:35:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739557571; x=1740162371;
+        d=1e100.net; s=20230601; t=1739576141; x=1740180941;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8/DTlY3pk3a6G5GXzvpYerG+E5kgBFJPd3Pov9X0qd0=;
-        b=vdfSvoUk3I5LaQ1COQ1JRIqDmKgEgP9/9Psv6+PfscQ/4nkmtJDOunqZ9FktvtdpIj
-         H3voS4Kgj8sA2GPQylWR9/lfeXm29bBLGS9UPfA4zFIuYKfEB0d5vXE4OXYrBVKeYOeX
-         cr0rb9m3ZPy6FEc9fwpD/bbgM9ePCD5UMewYuTE2az1/2kBhd6QjX9NBezJgLa6lpFHj
-         BMcUzdoaZX10M+D55eZjkbmbFzlgfm4iLzA8OOrzVRUFgbS2V1Oa3NaOenkxx/WMAPzR
-         PBx1e1iIIrqxjDNLIC2tk+UFtQlr9fS9EuFrge+ShfEmq874w1THNmpbeX7kb+OJMzvG
-         77lA==
-X-Forwarded-Encrypted: i=1; AJvYcCWM5tIImimI2MZ85IXkD3B74cC6cMYlGVohkyF05pvf4oJcJCdXDpaw4GcG4NC0nuI4EEacwCE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxF6Jef+3Sls/5B02BFpsSCq6xB8hWwAejZ44/VbTSMfvEFiAHV
-	IolZJw36I5KTNRK67W+oP3lgF60mTURksxjkgegwmuyMXeNM1jcresjdlWXdeLwrymL+JVM+3oO
-	A4GLuDXmsdMngjzm5LnIwtUFRmPo+XrKHn2nw
-X-Gm-Gg: ASbGncvqEKT3yrOU1AF8Hc+ljatpdZXsPttvavc+/NRLHaA3ZE3O4maJEHt+eAK5LJi
-	DxPsredZGBMeGdg9GwKftM3yW/kxXUr9cDYDsMwbbJi8c300HrSzSIAeOpnhPgLZIgTZE0587ow
-	==
-X-Google-Smtp-Source: AGHT+IGahO+EoJpVHDz9mbFwHtAtBgh2jW//CnO6047oFzoeAKzVdEu897lF5sKUl3q6+qKe1aK2ZHZslrcLAQtD1ro=
-X-Received: by 2002:ad4:5e8d:0:b0:6e6:5d61:4f01 with SMTP id
- 6a1803df08f44-6e66ccb10aamr4166886d6.8.1739557571225; Fri, 14 Feb 2025
- 10:26:11 -0800 (PST)
+        bh=T3QaL47zgHLdcs5EkgRrAkLY9U+KKlkChilDN7QnXbQ=;
+        b=hymZiTQl+5yKZKnfLaM04uBRKaA91dLF5T5amx+hWvY0Cm7o+DPtL+YdDi/9JnU/9r
+         wrOCPQIbOFqHk0MaRUE4KRsL5ivw/yF5DA1yq46anBh2pNmxhSHLNkgQUboWhhpwLQxl
+         xVlLJs/z9I6EpMc1i1m2xqnKlZe/v267BMHfio66nPWhEoJpGVlCFy9pyzSWGVz7wyaE
+         WNkOjco56zKVOo4xCvm2zRo5Lfp3lXueNFjCO0QpCeLeUWWpD9nwFAZ+N5Mz4UN+4gFM
+         uWEZrSsy/8f/PRvGuB2IDxQOQkPhSSVmoOku/92kQMAswHW8IHh7wTmLY34WQPvJB70a
+         Hsew==
+X-Forwarded-Encrypted: i=1; AJvYcCXM90HU+zouANcFoo9SA83aOwlHU5SmdRCjxPwC6BSinNLZxCAuj6jjzdNit4q4+IcAxUXAXm0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy07Cd+D4oO5OyAi/EwCC1YB/ZMWAUfzusw931VayFGTsNC9Esu
+	pyFrRMxIgD+w/adpYp6Bsky5VgkQtEvTFWvVsLfJhw3OLTZ6OyzrwBl6gTwr/UHrcvF3G14mith
+	94lECbtbz7ZndD3T3wSzLFMDHgyE09z7KDY5nlkJMs5eeMahcOXeeovN8E6Oi7NI6qPgx9GDg/C
+	44eOhYARtAluzYyPm3TukTMttm3L2p
+X-Gm-Gg: ASbGncsyrf3d9d9LK7Jz30wOGKPhv/wpLNp0wJQ9Sd5zcWmIUhqu3ThdvTpa2estffv
+	et1uX5c6QC+uQ50SUztfi7+C5PEXKCkoDSzBmrrrZS9c/IS1wrN2aQLRMVyu9oH8z
+X-Received: by 2002:a5d:5f4d:0:b0:38d:de92:adab with SMTP id ffacd0b85a97d-38f33f34cc8mr1062571f8f.29.1739576140902;
+        Fri, 14 Feb 2025 15:35:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRPUHm4YOOqYgdpQa1/Abpu1FH+JFzeebiyjLQPAuWs6N1wd0ZHNkh1THgVdQ28g3L0vPQ1rQihV3c/JaDpbc=
+X-Received: by 2002:a5d:5f4d:0:b0:38d:de92:adab with SMTP id
+ ffacd0b85a97d-38f33f34cc8mr1062544f8f.29.1739576140537; Fri, 14 Feb 2025
+ 15:35:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250212182558.2865232-1-maz@kernel.org> <Z618Rd__s7g8xWNP@linux.dev>
- <CAG_fn=VYXBce+0S7=ZuggNKvn4-b7awWVtq4v9B14U9ivRimkw@mail.gmail.com>
-In-Reply-To: <CAG_fn=VYXBce+0S7=ZuggNKvn4-b7awWVtq4v9B14U9ivRimkw@mail.gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Fri, 14 Feb 2025 19:25:34 +0100
-X-Gm-Features: AWEUYZkxugIvEIapXiq7ONrYCsVBhyQwzdKS6SZSHOx5KJD3E1IzJKN9kjxUoow
-Message-ID: <CAG_fn=W0_ra0waM4ur-ADmaNqHC1JXP--sp3eaP3xivgsdfxuA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Assorted vgic fixes for 6.14
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20250214115608.2986061-1-maz@kernel.org>
+In-Reply-To: <20250214115608.2986061-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 15 Feb 2025 00:35:28 +0100
+X-Gm-Features: AWEUYZmbJK9XoDAa1oF2aoN2h1YAezNxqJci3v-I9zFt7JUER3UJjYZD2898x9w
+Message-ID: <CABgObfb4sLa70-_1_+XQ87Uy8Jo7GXc=ta2FaoM1K-q4YOE9Dw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.14, take #2
+To: Marc Zyngier <maz@kernel.org>
+Cc: Alexander Potapenko <glider@google.com>, Anders Roxell <anders.roxell@linaro.org>, 
+	Ben Simner <ben.simner@cl.cam.ac.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Eric Auger <eric.auger@redhat.com>, Florian Weimer <fweimer@redhat.com>, 
+	Fuad Tabba <tabba@google.com>, Jeremy Linton <jeremy.linton@arm.com>, 
+	kernel test robot <lkp@intel.com>, Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Quentin Perret <qperret@google.com>, 
+	Wilco Dijkstra <wilco.dijkstra@arm.com>, Will Deacon <will@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: lKOWrLTajKSzSGnzowybQgPNe8VJ7BZq2CSlGho1Dyk_1739576141
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 13, 2025 at 11:29=E2=80=AFAM Alexander Potapenko <glider@google=
-.com> wrote:
+On Fri, Feb 14, 2025 at 12:56=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
+e:
 >
-> On Thu, Feb 13, 2025 at 5:59=E2=80=AFAM Oliver Upton <oliver.upton@linux.=
-dev> wrote:
-> >
-> > On Wed, Feb 12, 2025 at 06:25:56PM +0000, Marc Zyngier wrote:
-> > > Alexander, while fuzzing KVM/arm64, found an annoying set of problems=
-,
-> > > all stemming from the fact that the vgic can be initialised or
-> > > destroyed in parallel with the rest of the guest still being live.
-> > >
-> > > Yes, this is annoying.
-> > >
-> > > This second version takes a different approach at the problem,
-> > > plugging the glaring hole we have between vgic creation and private
-> > > interrupt allocation.
-> > >
-> > > Although this is more invasive, I'm more confident about this one tha=
-n
-> > > the initial version I posted a week ago.
-> >
-> > Much better place now! Here's to the next pile of syzkaller bugs :)
-> >
-> > Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> >
-> > > Alex, I'd very much appreciate your testing on this.
-> >
-> > I too would like to see the tires kicked before we pick this up, if it
-> > isn't too much trouble Alex.
+> Paolo,
 >
-> I am on it, will report back today or tomorrow.
+> Here's the second batch of KVM/arm64 fixes for 6.14.
+>
+> The most noticeable item here is a rather large rework of our
+> FP/SIMD/SVE/SME handling, mostly removing a bunch of fairly pointless
+> and not-quite-thought-out optimisations. This fixes a bunch of
+> failures reported in the wild, and makes the code far more
+> maintainable. Thanks to Mark Rutland for doing all the hard work.
+>
+> The rest is mostly a bunch of fixes cleanups after the merge window
+> (timers, vgic, pKVM...).
+>
+> Please pull,
 
-I am seeing the following crashes, do you think these could be related
-to your changes?
+>
+> The following changes since commit 0e459810285503fb354537e84049e212c5917c=
+33:
+>
+>   KVM: arm64: timer: Don't adjust the EL2 virtual timer offset (2025-02-0=
+4 15:10:38 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.14-2
+>
+> for you to fetch changes up to b3aa9283c0c505b5cfd25f7d6cfd720de2adc807:
+>
+>   KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to kvm_create_vg=
+ic() (2025-02-13 18:03:54 +0000)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.14, take #2
+>
+> - Large set of fixes for vector handling, specially in the interactions
+>   between host and guest state. This fixes a number of bugs affecting
+>   actual deployments, and greatly simplifies the FP/SIMD/SVE handling.
+>   Thanks to Mark Rutland for dealing with this thankless task.
+>
+> - Fix an ugly race between vcpu and vgic creation/init, resulting in
+>   unexpected behaviours.
+>
+> - Fix use of kernel VAs at EL2 when emulating timers with nVHE.
+>
+> - Small set of pKVM improvements and cleanups.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-BUG: KASAN: null-ptr-deref in _raw_spin_lock_irqsave+0xa8/0x174
-include/linux/instrumented.h:96
-Write of size 4 at addr 0000000000000d20 by task syz.3.8387/5166
+Done, thanks,
 
-CPU: 1 UID: 0 PID: 5166 Comm: syz.3.8387 Not tainted
-6.14.0-rc2-00002-g4b305a8c5b85 #159
-Hardware name: linux,dummy-virt (DT)
-Call trace:
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:466 (C)
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x94/0xc0 lib/dump_stack.c:120
- print_report+0xf8/0x7d4 mm/kasan/report.c:492
- kasan_report+0xcc/0x128 mm/kasan/report.c:602
- kasan_check_range+0x264/0x2a4
- __kasan_check_write+0x20/0x30 mm/kasan/shadow.c:37
- _raw_spin_lock_irqsave+0xa8/0x174 include/linux/instrumented.h:96
- kvm_vgic_set_owner+0x15c/0x23c arch/arm64/kvm/vgic/vgic.c:611
- kvm_timer_enable+0x174/0x5b0 arch/arm64/kvm/arch_timer.c:1574
- kvm_arch_vcpu_run_pid_change+0x184/0x28c arch/arm64/kvm/arm.c:824
- kvm_vcpu_ioctl+0xa94/0xba8 virt/kvm/kvm_main.c:4366
- __do_sys_ioctl fs/ioctl.c:51 [inline]
-...
+Paolo
+
