@@ -1,110 +1,153 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2C124503E
-	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 09:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC45275408;
+	Fri, 14 Feb 2025 11:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739526926; cv=none; b=DCN7i+UMPt68rmwq/SVWs44jY40nLq+B/kZIcYFJQ1lNbcYbCfnhd5wBMeZYLVlURlt0yRUWaLtUCdosKyQzyDJlz9/DCiHLs+wWDY+t302SQpuckKiMavhn63eWQfyAiYOltySagRYdIGwABJxuBPgi9WGDYT40w0dh4aQiW30=
+	t=1739534192; cv=none; b=q0YjkuNGV5DqHX7yzY47XvnOCzkK5yE+i/lQ3ybFm3r3R+JjiFiHflFIbJrNp++JKgFPc+wNH+8Ct/KbFTFSYWYHW8FFmEkwJ2kaz29DfefU86fPpvA1VZ2qSFrZGmcqwqXkSDmzgsOLijkpY+lsS6c3s13UEpGNpYAACbcBup8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739526926; c=relaxed/simple;
-	bh=OLmOhFPQmOFsK0TNWHCEK+PAnV5VzbU646k1Y+lVG6U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SY8s7yIgr3rosWdYoWLk+5aE+FjTaFpGjs0w1kqeukgKlBum3Y5S6YFb6WwRFYazwrS2gAP9Zsst1W6VUW1BEjJQ1/43RYY/BWpvIQjIWYqEWoco5kvRThs9xScVmMsQKAw/H//zqI4prwqAL8TWzFglREys/QISklJ0pFvee9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B95C113E;
-	Fri, 14 Feb 2025 01:55:38 -0800 (PST)
-Received: from localhost (e132581.arm.com [10.2.76.71])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 43AEF3F6A8;
-	Fri, 14 Feb 2025 01:55:17 -0800 (PST)
-Date: Fri, 14 Feb 2025 09:55:12 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	s=arc-20240116; t=1739534192; c=relaxed/simple;
+	bh=G2ROVBu5b+JAdTaOkWugsekPMRCegXPQ+zbKkmapIF8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IolLAKB6DM6APPS/JCSC5Atytv6jl3lSOCkG1vMeJDhcXdXA2Hr2UFBGWcF34nbExCGhVTHeBEkSxhMBfiC3G4wMpAalk0QdWRJbC09j6U0L2/1lIyfVS5KIJM+s+ofcn5S/ClK321xn+NAbe696bqQqVYilVoAWwOc24B8TFag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hChw4ib1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hChw4ib1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B15DC4CED1;
+	Fri, 14 Feb 2025 11:56:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739534191;
+	bh=G2ROVBu5b+JAdTaOkWugsekPMRCegXPQ+zbKkmapIF8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hChw4ib1wzFjnSheB50wsKRlt0AMG9/OBJve9zorJIKOVo7Z8RtHLK5BOLH3ckyyV
+	 BlzKYsmALZSUUaJozET+t8DP5gPwqdju12qywFSOEwrefUGLGOvWhdlS0vZi1yKwbu
+	 wXJAJNtQZEuTBbepTu6nofiPlw7DED4JyBGuq5HPhvMuLHRAuHk5lAz8dVXuQTKX+p
+	 y8g4XVRQZro3t7+pM2Z1jtGNivffbzvuVF+0v/nI/JeTIyKUKzMAV3WwjS9zc8n31r
+	 Hya56uxXHf5cdQ987/MVFJc3GBgTSIVABUWt0NhKqeNLalmqydVStcJt/My/wCXp7j
+	 4RoVALVFTpyuA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tiuJ3-0043Rj-HF;
+	Fri, 14 Feb 2025 11:56:29 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Ben Simner <ben.simner@cl.cam.ac.uk>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>,
+	Fuad Tabba <tabba@google.com>,
+	Jeremy Linton <jeremy.linton@arm.com>,
+	kernel test robot <lkp@intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	Quentin Perret <qperret@google.com>,
+	Wilco Dijkstra <wilco.dijkstra@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v19 10/11] KVM: arm64: nvhe: Disable branch generation in
- nVHE guests
-Message-ID: <20250214095512.GI235556@e132581.arm.com>
-References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
- <20250202-arm-brbe-v19-v19-10-1c1300802385@kernel.org>
- <20250213170316.GG235556@e132581.arm.com>
- <CAL_JsqLG4gu6c6=x_wG6XT0WaCC_ahH5eWHk3K9RcF0ZQrDR=A@mail.gmail.com>
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #2
+Date: Fri, 14 Feb 2025 11:56:08 +0000
+Message-Id: <20250214115608.2986061-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL_JsqLG4gu6c6=x_wG6XT0WaCC_ahH5eWHk3K9RcF0ZQrDR=A@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, anders.roxell@linaro.org, ben.simner@cl.cam.ac.uk, catalin.marinas@arm.com, eric.auger@redhat.com, fweimer@redhat.com, tabba@google.com, jeremy.linton@arm.com, lkp@intel.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, qperret@google.com, wilco.dijkstra@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 13, 2025 at 05:16:45PM -0600, Rob Herring wrote:
+Paolo,
 
-[...]
+Here's the second batch of KVM/arm64 fixes for 6.14.
 
-> > > +static void __debug_save_brbe(u64 *brbcr_el1)
-> > > +{
-> > > +       *brbcr_el1 = 0;
-> > > +
-> > > +       /* Check if the BRBE is enabled */
-> > > +       if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-> > > +               return;
-> > > +
-> > > +       /*
-> > > +        * Prohibit branch record generation while we are in guest.
-> > > +        * Since access to BRBCR_EL1 is trapped, the guest can't
-> > > +        * modify the filtering set by the host.
-> > > +        */
-> > > +       *brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
-> > > +       write_sysreg_el1(0, SYS_BRBCR);
-> > > +}
-> >
-> > Should flush branch record and use isb() before exit host kernel?
-> 
-> I don't think so. The isb()'s in the other cases appear to be related
-> to ordering WRT memory buffers. BRBE is just registers. I would assume
-> that there's some barrier before we switch to the guest.
+The most noticeable item here is a rather large rework of our
+FP/SIMD/SVE/SME handling, mostly removing a bunch of fairly pointless
+and not-quite-thought-out optimisations. This fixes a bunch of
+failures reported in the wild, and makes the code far more
+maintainable. Thanks to Mark Rutland for doing all the hard work.
 
-Given BRBCR is a system register, my understanding is the followd ISB
-can ensure the writing BRBCR has finished and take effect.  As a result,
-it is promised that the branch record has been stopped.
+The rest is mostly a bunch of fixes cleanups after the merge window
+(timers, vgic, pKVM...).
 
-However, with isb() it is not necessarily to say the branch records have
-been flushed to the buffer.  The purpose at here is just to stop record.
-The BRBE driver will take care the flush issue when it reads records.
+Please pull,
 
-I agreed that it is likely barriers in the followed switch flow can assure
-the writing BRBCR to take effect.  It might be good to add a comment for
-easier maintenance.
+	M.
 
-> > I see inconsistence between the function above and BRBE's disable
-> > function. Here it clears E0BRE / ExBRE bits for disabling BRBE, but the
-> > BRBE driver sets the PAUSED bit in BRBFCR_EL1 for disabling BRBE.
-> 
-> Indeed. This works, but the enabled check won't work. I'm going to add
-> clearing BRBCR to brbe_disable(), and this part will stay the same.
+The following changes since commit 0e459810285503fb354537e84049e212c5917c33:
 
-Seems to me, a right logic would be:
+  KVM: arm64: timer: Don't adjust the EL2 virtual timer offset (2025-02-04 15:10:38 +0000)
 
-- In BRBE driver, the brbe_disable() function should clear E0BRE and
-  ExBRE bits in BRBCR.  It can make sure the BRBE is totally disabled
-  when a perf session is terminated.
+are available in the Git repository at:
 
-- For a kvm context switching, it is good to use PAUSED bit.  If a host
-  is branch record enabled, this is a light way for temporarily pause
-  branch record for the switched VM.
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-2
 
-Thanks,
-Leo
+for you to fetch changes up to b3aa9283c0c505b5cfd25f7d6cfd720de2adc807:
+
+  KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to kvm_create_vgic() (2025-02-13 18:03:54 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.14, take #2
+
+- Large set of fixes for vector handling, specially in the interactions
+  between host and guest state. This fixes a number of bugs affecting
+  actual deployments, and greatly simplifies the FP/SIMD/SVE handling.
+  Thanks to Mark Rutland for dealing with this thankless task.
+
+- Fix an ugly race between vcpu and vgic creation/init, resulting in
+  unexpected behaviours.
+
+- Fix use of kernel VAs at EL2 when emulating timers with nVHE.
+
+- Small set of pKVM improvements and cleanups.
+
+----------------------------------------------------------------
+Marc Zyngier (4):
+      KVM: arm64: Fix __pkvm_host_mkyoung_guest() return value
+      KVM: arm64: Convert timer offset VA when accessed in HYP code
+      KVM: arm64: timer: Drop warning on failed interrupt signalling
+      KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to kvm_create_vgic()
+
+Mark Rutland (9):
+      KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
+      KVM: arm64: Remove host FPSIMD saving for non-protected KVM
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN
+      KVM: arm64: Refactor CPTR trap deactivation
+      KVM: arm64: Refactor exit handlers
+      KVM: arm64: Mark some header functions as inline
+      KVM: arm64: Eagerly switch ZCR_EL{1,2}
+      KVM: arm64: Simplify warning in kvm_arch_vcpu_load_fp()
+
+Quentin Perret (3):
+      KVM: arm64: Improve error handling from check_host_shared_guest()
+      KVM: arm64: Simplify np-guest hypercalls
+      KVM: arm64: Fix alignment of kvm_hyp_memcache allocations
+
+ arch/arm64/include/asm/kvm_emulate.h    |  42 ---------
+ arch/arm64/include/asm/kvm_host.h       |  24 ++----
+ arch/arm64/kernel/fpsimd.c              |  25 ------
+ arch/arm64/kvm/arch_timer.c             |  16 ++--
+ arch/arm64/kvm/arm.c                    |   8 --
+ arch/arm64/kvm/fpsimd.c                 | 107 ++---------------------
+ arch/arm64/kvm/hyp/entry.S              |   5 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 148 ++++++++++++++++++++++++--------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  15 ++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  76 ++++++++--------
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  89 +++++++++----------
+ arch/arm64/kvm/hyp/vhe/switch.c         |  33 ++++---
+ arch/arm64/kvm/vgic/vgic-init.c         |  74 ++++++++--------
+ 13 files changed, 287 insertions(+), 375 deletions(-)
