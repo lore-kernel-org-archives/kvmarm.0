@@ -1,164 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F124227BAB;
-	Fri, 14 Feb 2025 09:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2C124503E
+	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 09:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739525047; cv=none; b=jtqUjNH0hWLs96cfhU7bVzeq8QfpnwQ/+DN/XsXC/w2Ux2rwysXmbJ+ORF7rhYqq/WxxqhToQJ+Gy2c0MlmGNG+CR1x/HEAkTxcbQn5deIVhM+K8FoiI1d+RfdGQRS358Bshs7O2H2g6dEMnbDQ6daXLMF0Qkrc9+NkDOrmKze0=
+	t=1739526926; cv=none; b=DCN7i+UMPt68rmwq/SVWs44jY40nLq+B/kZIcYFJQ1lNbcYbCfnhd5wBMeZYLVlURlt0yRUWaLtUCdosKyQzyDJlz9/DCiHLs+wWDY+t302SQpuckKiMavhn63eWQfyAiYOltySagRYdIGwABJxuBPgi9WGDYT40w0dh4aQiW30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739525047; c=relaxed/simple;
-	bh=Mfy+ddENg5qvhmHKsXDrCIS3v98wZceAIoRgJrBPpiE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uma7oPVlQuxsQWFm/3LOe517wE8k5qjV2Rt3WJ6iogv5usc+P5oEhf/62sguAcVOqOmlHtwKDh7hsFj2uHEWsphvYVrefMNWmzjjQ3SqXVNfzDJrV8lK5eU8X3NDQUDuMJ02t4XG4ZKgo4gRDjcUjqSDkkT3je9dkLopKuIijFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDWIymUw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDWIymUw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F31C4CED1;
-	Fri, 14 Feb 2025 09:24:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739525046;
-	bh=Mfy+ddENg5qvhmHKsXDrCIS3v98wZceAIoRgJrBPpiE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QDWIymUw7wH10bLW2shWeKckkb0k5SLz7UsvShpl02/TVwsNy+jWlkSE9VZIPeB+O
-	 6DQe7BXlahbQY5v4V9BCdhnXBUfrbwbzO7GsYsHNXeIYlSNWlcWkP1M+4ML/fzfPv4
-	 LSkqE1iD/nLQI5ZIuu7p174UBm4WINc9D37mgl73PgRR6ddnAI66xzkpgskmsYqmIB
-	 CHuqLZJslaE+wQ13WMoMH7eLgKQ5Cl1hnjPzyDNllLEuVf6Yhv6YxvEvz6D+gD94Rg
-	 lXjC7ou10W7jkPVjsQSFjXekuaZkk7UZ6qrVHb5iBsiA2XIYLW3oK9Ezc2lLimq1wb
-	 DZJsROpGN5toA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tirvX-00412s-VH;
-	Fri, 14 Feb 2025 09:24:04 +0000
-Date: Fri, 14 Feb 2025 09:24:03 +0000
-Message-ID: <86pljkswuk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1739526926; c=relaxed/simple;
+	bh=OLmOhFPQmOFsK0TNWHCEK+PAnV5VzbU646k1Y+lVG6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SY8s7yIgr3rosWdYoWLk+5aE+FjTaFpGjs0w1kqeukgKlBum3Y5S6YFb6WwRFYazwrS2gAP9Zsst1W6VUW1BEjJQ1/43RYY/BWpvIQjIWYqEWoco5kvRThs9xScVmMsQKAw/H//zqI4prwqAL8TWzFglREys/QISklJ0pFvee9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B95C113E;
+	Fri, 14 Feb 2025 01:55:38 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 43AEF3F6A8;
+	Fri, 14 Feb 2025 01:55:17 -0800 (PST)
+Date: Fri, 14 Feb 2025 09:55:12 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Dave Martin <Dave.Martin@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in non-protected guests
-In-Reply-To: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
-References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v19 10/11] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Message-ID: <20250214095512.GI235556@e132581.arm.com>
+References: <20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org>
+ <20250202-arm-brbe-v19-v19-10-1c1300802385@kernel.org>
+ <20250213170316.GG235556@e132581.arm.com>
+ <CAL_JsqLG4gu6c6=x_wG6XT0WaCC_ahH5eWHk3K9RcF0ZQrDR=A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqLG4gu6c6=x_wG6XT0WaCC_ahH5eWHk3K9RcF0ZQrDR=A@mail.gmail.com>
 
-On Fri, 14 Feb 2025 01:57:43 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> I've removed the RFC tag from this version of the series, but the items
-> that I'm looking for feedback on remains the same:
-> 
->  - The userspace ABI, in particular:
->   - The vector length used for the SVE registers, access to the SVE
->     registers and access to ZA and (if available) ZT0 depending on
->     the current state of PSTATE.{SM,ZA}.
->   - The use of a single finalisation for both SVE and SME.
-> 
->  - The addition of control for enabling fine grained traps in a similar
->    manner to FGU but without the UNDEF, I'm not clear if this is desired
->    at all and at present this requires symmetric read and write traps like
->    FGU. That seemed like it might be desired from an implementation
->    point of view but we already have one case where we enable an
->    asymmetric trap (for ARM64_WORKAROUND_AMPERE_AC03_CPU_38) and it
->    seems generally useful to enable asymmetrically.
-> 
-> This series implements support for SME use in non-protected KVM guests.
+On Thu, Feb 13, 2025 at 05:16:45PM -0600, Rob Herring wrote:
 
 [...]
 
-Just to be clear: I do not intend to review a series that doesn't
-cover the full gamut of KVM from day 1. Protected mode is an absolute
-requirement. It is the largest KVM deployment, and Android phones the
-only commonly available platform with SME. If CCA gets merged prior to
-SME support, supporting it will also be a requirement.
-
-> Much of this is very similar to SVE, the main additional challenge that
-> SME presents is that it introduces a new vector length similar to the
-> SVE vector length and two new controls which change the registers seen
-> by guests:
+> > > +static void __debug_save_brbe(u64 *brbcr_el1)
+> > > +{
+> > > +       *brbcr_el1 = 0;
+> > > +
+> > > +       /* Check if the BRBE is enabled */
+> > > +       if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+> > > +               return;
+> > > +
+> > > +       /*
+> > > +        * Prohibit branch record generation while we are in guest.
+> > > +        * Since access to BRBCR_EL1 is trapped, the guest can't
+> > > +        * modify the filtering set by the host.
+> > > +        */
+> > > +       *brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
+> > > +       write_sysreg_el1(0, SYS_BRBCR);
+> > > +}
+> >
+> > Should flush branch record and use isb() before exit host kernel?
 > 
->  - PSTATE.ZA enables the ZA matrix register and, if SME2 is supported,
->    the ZT0 LUT register.
->  - PSTATE.SM enables streaming mode, a new floating point mode which
->    uses the SVE register set with the separately configured SME vector
->    length.  In streaming mode implementation of the FFR register is
->    optional.
-> 
-> It is also permitted to build systems which support SME without SVE, in
-> this case when not in streaming mode no SVE registers or instructions
-> are available.  Further, there is no requirement that there be any
-> overlap in the set of vector lengths supported by SVE and SME in a
-> system, this is expected to be a common situation in practical systems.
-> 
-> Since there is a new vector length to configure we introduce a new
-> feature parallel to the existing SVE one with a new pseudo register for
-> the streaming mode vector length.  Due to the overlap with SVE caused by
-> streaming mode rather than finalising SME as a separate feature we use
-> the existing SVE finalisation to also finalise SME, a new define
-> KVM_ARM_VCPU_VEC is provided to help make user code clearer.  Finalising
-> SVE and SME separately would introduce complication with register access
-> since finalising SVE makes the SVE regsiters writeable by userspace and
-> doing multiple finalisations results in an error being reported.
-> Dealing with a state where the SVE registers are writeable due to one of
-> SVE or SME being finalised but may have their VL changed by the other
-> being finalised seems like needless complexity with minimal practical
-> utility, it seems clearer to just express directly that only one
-> finalisation can be done in the ABI.
->
-> Access to the floating point registers follows the architecture:
-> 
->  - When both SVE and SME are present:
->    - If PSTATE.SM == 0 the vector length used for the Z and P registers
->      is the SVE vector length.
->    - If PSTATE.SM == 1 the vector length used for the Z and P registers
->      is the SME vector length.
->  - If only SME is present:
->    - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
->      floating point state accessed via the encodings for the V registers. 
->    - If PSTATE.SM == 1 the vector length used for the Z and P registers
->  - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
-> 
-> The VMM must understand this, in particular when loading state SVCR
-> should be configured before other state.
+> I don't think so. The isb()'s in the other cases appear to be related
+> to ordering WRT memory buffers. BRBE is just registers. I would assume
+> that there's some barrier before we switch to the guest.
 
-Why SVCR? This isn't a register, just an architected accessor to
-PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
-don't understand this requirement.
+Given BRBCR is a system register, my understanding is the followd ISB
+can ensure the writing BRBCR has finished and take effect.  As a result,
+it is promised that the branch record has been stopped.
 
-Isn't it that there is simply a dependency between restoring PSTATE
-and any of the vector stuff? Also, how do you preserve the current ABI
-that do not have this requirement?
+However, with isb() it is not necessarily to say the branch records have
+been flushed to the buffer.  The purpose at here is just to stop record.
+The BRBE driver will take care the flush issue when it reads records.
 
-	M.
+I agreed that it is likely barriers in the followed switch flow can assure
+the writing BRBCR to take effect.  It might be good to add a comment for
+easier maintenance.
 
--- 
-Without deviation from the norm, progress is not possible.
+> > I see inconsistence between the function above and BRBE's disable
+> > function. Here it clears E0BRE / ExBRE bits for disabling BRBE, but the
+> > BRBE driver sets the PAUSED bit in BRBFCR_EL1 for disabling BRBE.
+> 
+> Indeed. This works, but the enabled check won't work. I'm going to add
+> clearing BRBCR to brbe_disable(), and this part will stay the same.
+
+Seems to me, a right logic would be:
+
+- In BRBE driver, the brbe_disable() function should clear E0BRE and
+  ExBRE bits in BRBCR.  It can make sure the BRBE is totally disabled
+  when a perf session is terminated.
+
+- For a kvm context switching, it is good to use PAUSED bit.  If a host
+  is branch record enabled, this is a light way for temporarily pause
+  branch record for the switched VM.
+
+Thanks,
+Leo
