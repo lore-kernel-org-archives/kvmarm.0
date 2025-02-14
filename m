@@ -1,153 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC45275408;
-	Fri, 14 Feb 2025 11:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7542677102;
+	Fri, 14 Feb 2025 13:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739534192; cv=none; b=q0YjkuNGV5DqHX7yzY47XvnOCzkK5yE+i/lQ3ybFm3r3R+JjiFiHflFIbJrNp++JKgFPc+wNH+8Ct/KbFTFSYWYHW8FFmEkwJ2kaz29DfefU86fPpvA1VZ2qSFrZGmcqwqXkSDmzgsOLijkpY+lsS6c3s13UEpGNpYAACbcBup8=
+	t=1739538597; cv=none; b=m3Cdc4zeVx+u70uusoFAuVGvXIm6OfxkXdQepOXwn9QOISABRop3VTVh3uDJofVb/+3YK3oSUjPvCuOTFOPLLr+2oail+8NmNR722cTK9GcGq2bdsjZZjW0DouJptT5r2mUgj+M0zia/khwYf51l15f5fjq/QJ9Zf9mOuafiFd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739534192; c=relaxed/simple;
-	bh=G2ROVBu5b+JAdTaOkWugsekPMRCegXPQ+zbKkmapIF8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IolLAKB6DM6APPS/JCSC5Atytv6jl3lSOCkG1vMeJDhcXdXA2Hr2UFBGWcF34nbExCGhVTHeBEkSxhMBfiC3G4wMpAalk0QdWRJbC09j6U0L2/1lIyfVS5KIJM+s+ofcn5S/ClK321xn+NAbe696bqQqVYilVoAWwOc24B8TFag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hChw4ib1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739538597; c=relaxed/simple;
+	bh=Vrd2PQQb0NRk/ZiGaKxhtfp+UzgmaQxFr0hfRHPz/jA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fRB3xmd9kpYtnOzM5GqLCKxorlYKXPbLcxMLyclzVmNrnWQ0DHiwyB3eo9DNuNLtyR1oGlgPNjJSaeb7dd8Y5Xvi03ziIHUVmKummn6qMDgV1qocCVhxS3UQDf1vymQuZFzuMGOcYe2vzpCQN3IeL6tyWb7weLnUc7WSdariIfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JVLzYB0Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hChw4ib1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B15DC4CED1;
-	Fri, 14 Feb 2025 11:56:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JVLzYB0Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09DAC4CED1;
+	Fri, 14 Feb 2025 13:09:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739534191;
-	bh=G2ROVBu5b+JAdTaOkWugsekPMRCegXPQ+zbKkmapIF8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hChw4ib1wzFjnSheB50wsKRlt0AMG9/OBJve9zorJIKOVo7Z8RtHLK5BOLH3ckyyV
-	 BlzKYsmALZSUUaJozET+t8DP5gPwqdju12qywFSOEwrefUGLGOvWhdlS0vZi1yKwbu
-	 wXJAJNtQZEuTBbepTu6nofiPlw7DED4JyBGuq5HPhvMuLHRAuHk5lAz8dVXuQTKX+p
-	 y8g4XVRQZro3t7+pM2Z1jtGNivffbzvuVF+0v/nI/JeTIyKUKzMAV3WwjS9zc8n31r
-	 Hya56uxXHf5cdQ987/MVFJc3GBgTSIVABUWt0NhKqeNLalmqydVStcJt/My/wCXp7j
-	 4RoVALVFTpyuA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tiuJ3-0043Rj-HF;
-	Fri, 14 Feb 2025 11:56:29 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Potapenko <glider@google.com>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Ben Simner <ben.simner@cl.cam.ac.uk>,
+	s=k20201202; t=1739538596;
+	bh=Vrd2PQQb0NRk/ZiGaKxhtfp+UzgmaQxFr0hfRHPz/jA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=JVLzYB0YjKDsqbGXroz9+cez2JO7fR0RS7SHsaH5eDJmOdVWNfnCKMDRCBar09B5u
+	 Yh8mTg8p+foaEAJ0FXtSZS89AGf9nhfuc3XfU+PgiNeOkDNZlmWU2s98a3VYU2x2r2
+	 7g8es20LHJwJN/hsCYwYOcGlrWSusrghBjplTpPX3uXkDZp1zfnjoA5ASMTfgjfTbG
+	 fchGumDOFK9rj94cLOOvuvOxppNeqC5Vjwi1sAYAAptVvg7bs76EO7PiNLgT3NZa/8
+	 FI0KIZcHtjGusptXMZ8OViUe/JkAKIFhMydhW6UwaYjJO0d+oU8baonVXx9c5wsW1k
+	 eWJqOrX5yOsbg==
+X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jeremy Linton <jeremy.linton@arm.com>,
-	kernel test robot <lkp@intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>,
-	Wilco Dijkstra <wilco.dijkstra@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #2
-Date: Fri, 14 Feb 2025 11:56:08 +0000
-Message-Id: <20250214115608.2986061-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v7 07/45] arm64: RME: Define the user ABI
+In-Reply-To: <20250213161426.102987-8-steven.price@arm.com>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-8-steven.price@arm.com>
+Date: Fri, 14 Feb 2025 18:39:45 +0530
+Message-ID: <yq5aldu8wu3q.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, anders.roxell@linaro.org, ben.simner@cl.cam.ac.uk, catalin.marinas@arm.com, eric.auger@redhat.com, fweimer@redhat.com, tabba@google.com, jeremy.linton@arm.com, lkp@intel.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, qperret@google.com, wilco.dijkstra@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain
 
-Paolo,
+Steven Price <steven.price@arm.com> writes:
 
-Here's the second batch of KVM/arm64 fixes for 6.14.
+....
 
-The most noticeable item here is a rather large rework of our
-FP/SIMD/SVE/SME handling, mostly removing a bunch of fairly pointless
-and not-quite-thought-out optimisations. This fixes a bunch of
-failures reported in the wild, and makes the code far more
-maintainable. Thanks to Mark Rutland for doing all the hard work.
+> +/* Available with KVM_CAP_ARM_RME, only for VMs with KVM_VM_TYPE_ARM_REALM  */
+> +struct kvm_arm_rmm_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +};
+> +
+> +/* FIXME: Update nr (0xd2) when merging */
+> +#define KVM_ARM_VCPU_RMM_PSCI_COMPLETE	_IOW(KVMIO, 0xd2, struct kvm_arm_rmm_psci_complete)
+> +
 
-The rest is mostly a bunch of fixes cleanups after the merge window
-(timers, vgic, pKVM...).
+This needs an update?
 
-Please pull,
-
-	M.
-
-The following changes since commit 0e459810285503fb354537e84049e212c5917c33:
-
-  KVM: arm64: timer: Don't adjust the EL2 virtual timer offset (2025-02-04 15:10:38 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-2
-
-for you to fetch changes up to b3aa9283c0c505b5cfd25f7d6cfd720de2adc807:
-
-  KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to kvm_create_vgic() (2025-02-13 18:03:54 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.14, take #2
-
-- Large set of fixes for vector handling, specially in the interactions
-  between host and guest state. This fixes a number of bugs affecting
-  actual deployments, and greatly simplifies the FP/SIMD/SVE handling.
-  Thanks to Mark Rutland for dealing with this thankless task.
-
-- Fix an ugly race between vcpu and vgic creation/init, resulting in
-  unexpected behaviours.
-
-- Fix use of kernel VAs at EL2 when emulating timers with nVHE.
-
-- Small set of pKVM improvements and cleanups.
-
-----------------------------------------------------------------
-Marc Zyngier (4):
-      KVM: arm64: Fix __pkvm_host_mkyoung_guest() return value
-      KVM: arm64: Convert timer offset VA when accessed in HYP code
-      KVM: arm64: timer: Drop warning on failed interrupt signalling
-      KVM: arm64: vgic: Hoist SGI/PPI alloc from vgic_init() to kvm_create_vgic()
-
-Mark Rutland (9):
-      KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
-      KVM: arm64: Remove host FPSIMD saving for non-protected KVM
-      KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
-      KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN
-      KVM: arm64: Refactor CPTR trap deactivation
-      KVM: arm64: Refactor exit handlers
-      KVM: arm64: Mark some header functions as inline
-      KVM: arm64: Eagerly switch ZCR_EL{1,2}
-      KVM: arm64: Simplify warning in kvm_arch_vcpu_load_fp()
-
-Quentin Perret (3):
-      KVM: arm64: Improve error handling from check_host_shared_guest()
-      KVM: arm64: Simplify np-guest hypercalls
-      KVM: arm64: Fix alignment of kvm_hyp_memcache allocations
-
- arch/arm64/include/asm/kvm_emulate.h    |  42 ---------
- arch/arm64/include/asm/kvm_host.h       |  24 ++----
- arch/arm64/kernel/fpsimd.c              |  25 ------
- arch/arm64/kvm/arch_timer.c             |  16 ++--
- arch/arm64/kvm/arm.c                    |   8 --
- arch/arm64/kvm/fpsimd.c                 | 107 ++---------------------
- arch/arm64/kvm/hyp/entry.S              |   5 ++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 148 ++++++++++++++++++++++++--------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  15 ++--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  76 ++++++++--------
- arch/arm64/kvm/hyp/nvhe/switch.c        |  89 +++++++++----------
- arch/arm64/kvm/hyp/vhe/switch.c         |  33 ++++---
- arch/arm64/kvm/vgic/vgic-init.c         |  74 ++++++++--------
- 13 files changed, 287 insertions(+), 375 deletions(-)
+-aneesh
