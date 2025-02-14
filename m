@@ -1,128 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f74.google.com (mail-lf1-f74.google.com [209.85.167.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AB62139A8
-	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 13:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3790F3595C
+	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 15:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739540249; cv=none; b=qD/jUFjrLx7ejQOGId0eUHsHTxvsDv2jtJqFTNhUm2yrWLOSGI+izeeehf7+L6Gf+9fujDVdANV/B/mbB29IbZY35z/Q++MzWv2bXM2FTqw+oP/Dgwji5XVjYYuqceqG4gfEyzcbzHwACkEAjvZVysnarbtT8eZOUQeFK6ziXV4=
+	t=1739545383; cv=none; b=IVTrhF+BnInYuuhxl4GBJ8LReYfax1clBISqvVkfeQ4trZZt9NV7BSUNWPDKiWSY09y+o7UQYmzwJbv0ZgtGtUpUBipF9/d1B0zA0kBSM/06+ra3uNCHbTwiHlOOOYbegXmyXMJPC4il078kr2ZOlz4EI8mgIEGdfehfy/EhIjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739540249; c=relaxed/simple;
-	bh=U4x9WKqLXQ5Tvglt8O1CbvzqfZ5+NYMLWfEWNektUw4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GZTarPehAl3tEyi10ijbI93JTHftYuCPi5v81TVOiie8/3U4k6jD9dlvEELjKxdH5YCUl4qaolnYWo8oezrnDwqVFl2NJEqSlaUniBmfQyfioe83inSic80Z9KadC2qzohUCg3sDEAAllI929gpoOQ6W0GvedOeCgTTkhaVYZvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ht4VykWz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739545383; c=relaxed/simple;
+	bh=IbMtes0KyE2mYY0b6Zruddbxdfb2o975s33q39s7vuk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NJ7P33FpvYXS69jpRG7pCI235pL6D0c1zJg42ik8fuZHKLO2mgww2IjRNJizEZSXxw/hpLUqKuxlDEw4uRc9u81j2KKm1BdesfCy2audP2GSQ7BcG0TkPkQ5ZPKuBHy7dsDyrbXCz+fNnxhut3dKVQNWIHxrFLy/Zn7OEgEP+UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bB8qF0h1; arc=none smtp.client-ip=209.85.167.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ht4VykWz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E11C4CED1;
-	Fri, 14 Feb 2025 13:37:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739540248;
-	bh=U4x9WKqLXQ5Tvglt8O1CbvzqfZ5+NYMLWfEWNektUw4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Ht4VykWzrJodsCc4bsbSXg1NuO7BmD5Fu0H3zQeXRfwnF8k2cy7ALXwv7SOPr9grA
-	 o1IBr3oVRpLRTPPHEfxkTgbyLV4Tj20zQcmdSQ1ml/q6At12fAycJWcIwwv5hoMnsx
-	 QFLvNqXB+mUkFa6Zv8jo4wGn7byIzvmrHJgWYIS1F9ECyWgA52A7e6DnFgYZLunlLZ
-	 V5NQFlDoWflp9pDULqwiJCk4cZX8Ox8AgoWSREvQ8t98yAHe1wD3YLTSRJTPylEGzN
-	 7HOXN6rVTHEImnshiZA1bIXRg4TtkkVJ0kx613TDgk7tokHEfvY1ISZS9TjQ9/Pvmg
-	 7Cn3iu+6L/qTQ==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: Fix tcr_el2 initialisation in hVHE mode
-Date: Fri, 14 Feb 2025 13:37:24 +0000
-Message-Id: <20250214133724.13179-1-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bB8qF0h1"
+Received: by mail-lf1-f74.google.com with SMTP id 2adb3069b0e04-54508fa5d1cso1273543e87.0
+        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 07:03:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739545380; x=1740150180; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MuT0SdK7xXa7okOPanhG6y+T08LdgnDw3LDNbKyKy/0=;
+        b=bB8qF0h1q+c0pXeADrYX/SuLRJx9YbcziDhkhXCEz7GT89YcftLcMwxg82mfrcn5uh
+         zAIwTTHdycFyjK6TgGlkF2z/ErhOFfV/YyWtMcrcyvjOkqk0s6fnjnBrOA2linvOvfqW
+         ylPdFuk/ZqmueH50eH1SWXn7eJNPMz+dO8uxu8D4BgCgJhnOaoxhcuCPUw1IfVjABVtz
+         BQQf42FRshyS1FOtZMk1MxvqSRqXAxWWikTUmyjesAP82DsuU0VnCw3sIYCeZdyM69ad
+         hP9g5rMwW6josOHAdgD8QHDw58iePQPq7PcbJBZ21HKmWew1PDVliDhGEksCjol+DFLG
+         IXqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739545380; x=1740150180;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MuT0SdK7xXa7okOPanhG6y+T08LdgnDw3LDNbKyKy/0=;
+        b=j+TzPximpnL7EKoCOXWujQInooTOtUtV9dYscy5rS0yAi9hoZQeEfmp0d18BSFjzFa
+         zY75/q2WiW+gD98aiMiJVwuqgrD4zqiCUeS9XCtRayv3AG5FOl2X2hdNnfHsxEpsj+KB
+         +FfzhMRUabNAXCUmoc3InZ4Zg415iLgJjegaKef8C5sv/Rnnlsag7jbW1RpIbuMnxVAe
+         a9zIrlp7xBu2KylfZg37pQM/ARaptzmgMPoEiqKNTxaDglaKE05EkmBCdTdkSIbJ2J89
+         o4oFeiXv8Ay3iVCIpc5YkYF8l+5Yw0NMAr6agraJs72QLps746/dO5adJBLDKw8CYlDa
+         YoSQ==
+X-Gm-Message-State: AOJu0Yyow1KrcsCWKkkfp42oj+uS+j83MMJhtnXupAJ5h3AkQoAiP8wh
+	+KCTPabYaTLHtARziT8zfE2NnMU9FQOgmzWcM0au16Lex9cOVlAeSIlBYY9dV4DjTufsIzCgjB5
+	lTaY17mwLw3WYErpcN/4zKKK7H5zTzcpe0Iw5v7kpCMOWcjGfNCQa6s4tQOOZwVDo+gPAx9vx3W
+	yolXngx2fhTEjMvZZlbnUTtKoL+8k=
+X-Google-Smtp-Source: AGHT+IFw/r/gkZ/iRvXxaWP0G3NSL8AKpEXKuIDGJ2LZhDVuSFi7uIxQ5P1CupiTBcuVqdIzWFwpe/DwoA==
+X-Received: from wmbbi19.prod.google.com ([2002:a05:600c:3d93:b0:439:5529:c5a])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6512:1048:b0:545:1193:1256
+ with SMTP id 2adb3069b0e04-5451dd84c89mr2102659e87.1.1739545380225; Fri, 14
+ Feb 2025 07:03:00 -0800 (PST)
+Date: Fri, 14 Feb 2025 15:02:55 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250214150258.464798-1-tabba@google.com>
+Subject: [PATCH v1 0/3] KVM: arm64: Fix initializing HCRX_EL2 and other traps
+ in pKVM
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com, 
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
+	qperret@google.com, vdonnefort@google.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-When not running in VHE mode, cpu_prepare_hyp_mode() computes the value
-of TCR_EL2 using the host's TCR_EL1 settings as a starting point. For
-nVHE, this amounts to masking out everything apart from the TG0, SH0,
-ORGN0, IRGN0 and T0SZ fields before setting the RES1 bits, shifting the
-IPS field down to the PS field and setting DS if LPA2 is enabled.
+Since the introduction of initializing and setting HCRX_EL2 traps
+in KVM, we haven't updated the pKVM code upstream do the same for
+the hyp view.
 
-Unfortunately, for hVHE, things go slightly wonky: EPD1 is correctly set
-to disable walks via TTBR1_EL2 but then the T1SZ and IPS fields are
-corrupted when we mistakenly attempt to initialise the PS and DS fields
-in their E2H=0 positions. Furthermore, many fields are retained from
-TCR_EL1 which should not be propagated to TCR_EL2. Notably, this means
-we can end up with A1 set despite not initialising TTBR1_EL2 at all.
-This has been shown to cause unexpected translation faults at EL2 with
-pKVM due to TLB invalidation not taking effect when running with a
-non-zero ASID.
+Additionally, the current behavior of pKVM is to initialize the
+hyp view of the vm and of _all_ its vcpus when the _first_ vcpu
+is run. However, with the introduction of kvm_calculate_traps()
+[*], some of the host trap values are not calculated until the
+corresponding vcpu is run for the first time. This causes pKVM to
+get the wrong view of some of the system registers, e.g.,
+HCRX_EL2, for vcpus other than the first run vcpu, since it uses
+the host's version as a starting point --- particularly for
+non-protected vms. Because of these issues, it's might not be
+possible to run a non-protected VM when certain features (e.g.,
+MOPS) are supported by the system.
 
-Fix the TCR_EL2 initialisation code to set PS and DS only when E2H=0,
-masking out HD, HA and A1 when E2H=1.
+This series initializes HCRX_EL2 for VMs in protected mode. It
+also initializes the hyp view of each vcpu after its
+corresponding host vcpu has been fully initialized, i.e., run for
+the first time.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Fixes: ad744e8cb346 ("arm64: Allow arm64_sw.hvhe on command line")
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/arm.c             | 15 +++++++--------
- 2 files changed, 8 insertions(+), 9 deletions(-)
+This series is based on Linux 6.14-rc2.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 8d94a6c0ed5c..c2417a424b98 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -119,7 +119,7 @@
- #define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
- #define TCR_EL2_T0SZ_MASK	0x3f
- #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
--			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
-+			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
- 
- /* VTCR_EL2 Registers bits */
- #define VTCR_EL2_DS		TCR_EL2_DS
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 646e806c6ca6..d498edf88f05 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1980,7 +1980,7 @@ static int kvm_init_vector_slots(void)
- static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
- {
- 	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
--	unsigned long tcr, ips;
-+	unsigned long tcr;
- 
- 	/*
- 	 * Calculate the raw per-cpu offset without a translation from the
-@@ -1994,19 +1994,18 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
- 	params->mair_el2 = read_sysreg(mair_el1);
- 
- 	tcr = read_sysreg(tcr_el1);
--	ips = FIELD_GET(TCR_IPS_MASK, tcr);
- 	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-+		tcr &= ~(TCR_HD | TCR_HA | TCR_A1 | TCR_T0SZ_MASK);
- 		tcr |= TCR_EPD1_MASK;
- 	} else {
-+		unsigned long ips = FIELD_GET(TCR_IPS_MASK, tcr);
-+
- 		tcr &= TCR_EL2_MASK;
--		tcr |= TCR_EL2_RES1;
-+		tcr |= TCR_EL2_RES1 | FIELD_PREP(TCR_EL2_PS_MASK, ips);
-+		if (lpa2_is_enabled())
-+			tcr |= TCR_EL2_DS;
- 	}
--	tcr &= ~TCR_T0SZ_MASK;
- 	tcr |= TCR_T0SZ(hyp_va_bits);
--	tcr &= ~TCR_EL2_PS_MASK;
--	tcr |= FIELD_PREP(TCR_EL2_PS_MASK, ips);
--	if (lpa2_is_enabled())
--		tcr |= TCR_EL2_DS;
- 	params->tcr_el2 = tcr;
- 
- 	params->pgd_pa = kvm_mmu_get_httbr();
+Cheers,
+/fuad
+
+[*] Commit f1ff3fc5209a ("KVM: arm64: unify code to prepare traps")
+
+Fuad Tabba (3):
+  KVM: arm64: Initialize HCRX_EL2 traps in pKVM
+  KVM: arm64: Factor out pkvm hyp vcpu creation to separate function
+  KVM: arm64: Create each pKVM hyp vcpu after its corresponding host
+    vcpu
+
+ arch/arm64/include/asm/kvm_host.h      |   2 +
+ arch/arm64/include/asm/kvm_pkvm.h      |   1 +
+ arch/arm64/kvm/arm.c                   |   4 +
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   6 --
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 100 +++++++++++++++++++------
+ arch/arm64/kvm/pkvm.c                  |  70 +++++++++--------
+ 6 files changed, 118 insertions(+), 65 deletions(-)
+
+
+base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
 -- 
 2.48.1.601.g30ceb7b040-goog
 
