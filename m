@@ -1,64 +1,66 @@
-Received: from mail-lf1-f74.google.com (mail-lf1-f74.google.com [209.85.167.74])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3790F3595C
-	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 15:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E55264A63
+	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 15:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739545383; cv=none; b=IVTrhF+BnInYuuhxl4GBJ8LReYfax1clBISqvVkfeQ4trZZt9NV7BSUNWPDKiWSY09y+o7UQYmzwJbv0ZgtGtUpUBipF9/d1B0zA0kBSM/06+ra3uNCHbTwiHlOOOYbegXmyXMJPC4il078kr2ZOlz4EI8mgIEGdfehfy/EhIjI=
+	t=1739545385; cv=none; b=RjN01361odUww6/Hx3a2glW/NfaIHVvzReGn0yUNt7cSRY1RJUAQrp9eyRLqdxaQqLrZjRoBIqqJOOfXTQ1/bF0yQbpSrcRWafdC5oupTCRnUTgZaAVacKVLWaI0wHaSWhjZ0VfnxeU+KH4mEgk3zCZEURzuI36wIQO0C1IJfwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739545383; c=relaxed/simple;
-	bh=IbMtes0KyE2mYY0b6Zruddbxdfb2o975s33q39s7vuk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NJ7P33FpvYXS69jpRG7pCI235pL6D0c1zJg42ik8fuZHKLO2mgww2IjRNJizEZSXxw/hpLUqKuxlDEw4uRc9u81j2KKm1BdesfCy2audP2GSQ7BcG0TkPkQ5ZPKuBHy7dsDyrbXCz+fNnxhut3dKVQNWIHxrFLy/Zn7OEgEP+UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bB8qF0h1; arc=none smtp.client-ip=209.85.167.74
+	s=arc-20240116; t=1739545385; c=relaxed/simple;
+	bh=TPcD74ZppgZCJTNOYQ69WPGGQiuDlvZF1GVBrIWEISc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=G/1+orvfImye94zTbEenNz/PJqGh2PacPtvYLfclz/aJCb1cp43yvTCBIsNvI0pS7x+77W2Pj9cq5q4kDlm0z4gFuouXE/noJoqSQ5+yVdUrUJxInHMdeuvMDWpENJY5CYHSIZ6X9W62fXu8fCtSzT4vJZ/NQtuZ0gLmIxFm7mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jJ0A8TbS; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bB8qF0h1"
-Received: by mail-lf1-f74.google.com with SMTP id 2adb3069b0e04-54508fa5d1cso1273543e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 07:03:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jJ0A8TbS"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43935bcec0aso17782765e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 07:03:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739545380; x=1740150180; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MuT0SdK7xXa7okOPanhG6y+T08LdgnDw3LDNbKyKy/0=;
-        b=bB8qF0h1q+c0pXeADrYX/SuLRJx9YbcziDhkhXCEz7GT89YcftLcMwxg82mfrcn5uh
-         zAIwTTHdycFyjK6TgGlkF2z/ErhOFfV/YyWtMcrcyvjOkqk0s6fnjnBrOA2linvOvfqW
-         ylPdFuk/ZqmueH50eH1SWXn7eJNPMz+dO8uxu8D4BgCgJhnOaoxhcuCPUw1IfVjABVtz
-         BQQf42FRshyS1FOtZMk1MxvqSRqXAxWWikTUmyjesAP82DsuU0VnCw3sIYCeZdyM69ad
-         hP9g5rMwW6josOHAdgD8QHDw58iePQPq7PcbJBZ21HKmWew1PDVliDhGEksCjol+DFLG
-         IXqw==
+        d=google.com; s=20230601; t=1739545382; x=1740150182; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y42OaWjgB0rg7blG3Pk/mPM5kBIbWAmK/8gVhR7spnU=;
+        b=jJ0A8TbSvfLHcltkAw7ZFbaFPCdQ7VNTLVZCNyICHZpZbj1dWB6a3+UYwRBBGKp3hB
+         wjm7k5Go2CXp0PCBWOQIPkodERkPFN4nBkUUu76xFDaTRsJ65HqkKwZCFQPn4QB/ddw9
+         U/qCF8y/UL/Q6F3Mb1oo6vFYO3v1VxzKQCAv9GdvFbxnqIlYbPOl0digMj3uaEEtC7lw
+         FjIhw/U1yIF2yA3n8n1EjD57+f3icnI+ZMXnYWzMgaU1H2oUB1E1sKPBm4yKN0jLhHKd
+         io60WjO4IUDzf4JxdP91Tcbw1Hyy87hOCTBxx9huo7dwYXj73Aa7+k66vS3DqZE6MsSe
+         0Hqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739545380; x=1740150180;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MuT0SdK7xXa7okOPanhG6y+T08LdgnDw3LDNbKyKy/0=;
-        b=j+TzPximpnL7EKoCOXWujQInooTOtUtV9dYscy5rS0yAi9hoZQeEfmp0d18BSFjzFa
-         zY75/q2WiW+gD98aiMiJVwuqgrD4zqiCUeS9XCtRayv3AG5FOl2X2hdNnfHsxEpsj+KB
-         +FfzhMRUabNAXCUmoc3InZ4Zg415iLgJjegaKef8C5sv/Rnnlsag7jbW1RpIbuMnxVAe
-         a9zIrlp7xBu2KylfZg37pQM/ARaptzmgMPoEiqKNTxaDglaKE05EkmBCdTdkSIbJ2J89
-         o4oFeiXv8Ay3iVCIpc5YkYF8l+5Yw0NMAr6agraJs72QLps746/dO5adJBLDKw8CYlDa
-         YoSQ==
-X-Gm-Message-State: AOJu0Yyow1KrcsCWKkkfp42oj+uS+j83MMJhtnXupAJ5h3AkQoAiP8wh
-	+KCTPabYaTLHtARziT8zfE2NnMU9FQOgmzWcM0au16Lex9cOVlAeSIlBYY9dV4DjTufsIzCgjB5
-	lTaY17mwLw3WYErpcN/4zKKK7H5zTzcpe0Iw5v7kpCMOWcjGfNCQa6s4tQOOZwVDo+gPAx9vx3W
-	yolXngx2fhTEjMvZZlbnUTtKoL+8k=
-X-Google-Smtp-Source: AGHT+IFw/r/gkZ/iRvXxaWP0G3NSL8AKpEXKuIDGJ2LZhDVuSFi7uIxQ5P1CupiTBcuVqdIzWFwpe/DwoA==
-X-Received: from wmbbi19.prod.google.com ([2002:a05:600c:3d93:b0:439:5529:c5a])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6512:1048:b0:545:1193:1256
- with SMTP id 2adb3069b0e04-5451dd84c89mr2102659e87.1.1739545380225; Fri, 14
- Feb 2025 07:03:00 -0800 (PST)
-Date: Fri, 14 Feb 2025 15:02:55 +0000
+        d=1e100.net; s=20230601; t=1739545382; x=1740150182;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y42OaWjgB0rg7blG3Pk/mPM5kBIbWAmK/8gVhR7spnU=;
+        b=ioEhlO9XIS+D/0kG1+Sq1K5AtOq8xda6kBsOGKL5CtiNQxaqanV50ggMX3EYEYFLhu
+         4rVoOWUoVIqzDvopBsO48dpCfyzB9Pgrdriu8bwCjOUZjyYw9U01lu7RYFv9125nPUJl
+         xXGr5U593SRBhXGOgCahGlgBxglgkwB1dFwOUGctyuKITHuLs4QLWKYbbk6JCeFPT1Dc
+         8ObNEVoBu6kBC5Nb5++IAW8hLXtxfzF0Dvy5Hq4Bj78uRYdxHpKYC5TcoKdXIfYVdzzn
+         Y+LMmT2gy6If+xgKm7EAgN2/8pXbQCekU5Kr6kQwOZtFO2b6jUhCSwCDMe3CvskLL8/M
+         OGSA==
+X-Gm-Message-State: AOJu0YwbV6tLvO+vqILm80pTCMdgrW9iJnOOnwOI3a18EEPliBa2ZUkr
+	leeFNd4WYPUklZUh9SXCU2RGZako/VWQclDMN95UlZq+wZ9kiyIystFOCLOtKJ+tPEBamOrQNZN
+	RsMBdPqENZSlF+Sw7gMdfYr+bgdTNZgHZ7INM4GaUOk7KNi7WOC5yJ2nKjEwi0rvr3dflf+j1vb
+	Hf8BbKDbTRBJ/bugAPvscPxBMyXO8=
+X-Google-Smtp-Source: AGHT+IF62UW0ZAUqxob5YZZPd/L0FZ9/3SweMzcmTIEF6W/RKtm+jgMe9LQ3g7afaCYpLDIDmocY+1lPOw==
+X-Received: from wmqb9.prod.google.com ([2002:a05:600c:4e09:b0:439:6217:c147])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3d9b:b0:439:5aa1:1efb
+ with SMTP id 5b1f17b1804b1-4396018a96bmr139269315e9.11.1739545382155; Fri, 14
+ Feb 2025 07:03:02 -0800 (PST)
+Date: Fri, 14 Feb 2025 15:02:56 +0000
+In-Reply-To: <20250214150258.464798-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250214150258.464798-1-tabba@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250214150258.464798-1-tabba@google.com>
-Subject: [PATCH v1 0/3] KVM: arm64: Fix initializing HCRX_EL2 and other traps
- in pKVM
+Message-ID: <20250214150258.464798-2-tabba@google.com>
+Subject: [PATCH v1 1/3] KVM: arm64: Initialize HCRX_EL2 traps in pKVM
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com, 
@@ -67,50 +69,92 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com,
 	qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Since the introduction of initializing and setting HCRX_EL2 traps
-in KVM, we haven't updated the pKVM code upstream do the same for
-the hyp view.
+Initialize and set the traps controlled by the HCRX_EL2 in pKVM
+when the register is supported by the system.
 
-Additionally, the current behavior of pKVM is to initialize the
-hyp view of the vm and of _all_ its vcpus when the _first_ vcpu
-is run. However, with the introduction of kvm_calculate_traps()
-[*], some of the host trap values are not calculated until the
-corresponding vcpu is run for the first time. This causes pKVM to
-get the wrong view of some of the system registers, e.g.,
-HCRX_EL2, for vcpus other than the first run vcpu, since it uses
-the host's version as a starting point --- particularly for
-non-protected vms. Because of these issues, it's might not be
-possible to run a non-protected VM when certain features (e.g.,
-MOPS) are supported by the system.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 46 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-This series initializes HCRX_EL2 for VMs in protected mode. It
-also initializes the hyp view of each vcpu after its
-corresponding host vcpu has been fully initialized, i.e., run for
-the first time.
-
-This series is based on Linux 6.14-rc2.
-
-Cheers,
-/fuad
-
-[*] Commit f1ff3fc5209a ("KVM: arm64: unify code to prepare traps")
-
-Fuad Tabba (3):
-  KVM: arm64: Initialize HCRX_EL2 traps in pKVM
-  KVM: arm64: Factor out pkvm hyp vcpu creation to separate function
-  KVM: arm64: Create each pKVM hyp vcpu after its corresponding host
-    vcpu
-
- arch/arm64/include/asm/kvm_host.h      |   2 +
- arch/arm64/include/asm/kvm_pkvm.h      |   1 +
- arch/arm64/kvm/arm.c                   |   4 +
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   6 --
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 100 +++++++++++++++++++------
- arch/arm64/kvm/pkvm.c                  |  70 +++++++++--------
- 6 files changed, 118 insertions(+), 65 deletions(-)
-
-
-base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 3927fe52a3dd..668ebec27f1b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -58,6 +58,30 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 |= HCR_ATA;
+ }
+ 
++static void pkvm_vcpu_reset_hcrx(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
++	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
++
++	if (!cpus_have_final_cap(ARM64_HAS_HCX))
++		return;
++
++	/*
++	 * In general, all HCRX_EL2 bits are gated by a feature.
++	 * The only reason we can set SMPME without checking any
++	 * feature is that its effects are not directly observable
++	 * from the guest.
++	 */
++	vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
++
++	/*
++	 * For non-protected VMs, the host is responsible for the guest's
++	 * features, so use the remaining host HCRX_EL2 bits.
++	 */
++	if ((!pkvm_hyp_vcpu_is_protected(hyp_vcpu)))
++		vcpu->arch.hcrx_el2 |= host_vcpu->arch.hcrx_el2;
++}
++
+ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -92,6 +116,26 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.hcr_el2 = val;
+ }
+ 
++static void pvm_init_traps_hcrx(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = vcpu->kvm;
++	u64 hcrx_set = 0;
++
++	if (!cpus_have_final_cap(ARM64_HAS_HCX))
++		return;
++
++	if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
++		hcrx_set |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
++
++	if (kvm_has_feat(kvm, ID_AA64MMFR3_EL1, TCRX, IMP))
++		hcrx_set |= HCRX_EL2_TCR2En;
++
++	if (kvm_has_fpmr(kvm))
++		hcrx_set |= HCRX_EL2_EnFPM;
++
++	vcpu->arch.hcrx_el2 |= hcrx_set;
++}
++
+ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -165,6 +209,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	vcpu->arch.mdcr_el2 = 0;
+ 
+ 	pkvm_vcpu_reset_hcr(vcpu);
++	pkvm_vcpu_reset_hcrx(hyp_vcpu);
+ 
+ 	if ((!pkvm_hyp_vcpu_is_protected(hyp_vcpu)))
+ 		return 0;
+@@ -174,6 +219,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 		return ret;
+ 
+ 	pvm_init_traps_hcr(vcpu);
++	pvm_init_traps_hcrx(vcpu);
+ 	pvm_init_traps_mdcr(vcpu);
+ 
+ 	return 0;
 -- 
 2.48.1.601.g30ceb7b040-goog
 
