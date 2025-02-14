@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E55264A63
-	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 15:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE652264A61
+	for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 15:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739545385; cv=none; b=RjN01361odUww6/Hx3a2glW/NfaIHVvzReGn0yUNt7cSRY1RJUAQrp9eyRLqdxaQqLrZjRoBIqqJOOfXTQ1/bF0yQbpSrcRWafdC5oupTCRnUTgZaAVacKVLWaI0wHaSWhjZ0VfnxeU+KH4mEgk3zCZEURzuI36wIQO0C1IJfwQ=
+	t=1739545387; cv=none; b=ISTFTSZ07XPSrAuvZcFNSeJ9FIzcGmvII3FruH8NirzZQ0rzFl44txTjXhLv65HZz4BjkFWtR3wYgFSNhc2KRJPFd3NCTmyRhtA2LFqzoG6JPlaDlS0+/Xg0yAGva+iwdK17dtFmztTvL6tE9IkCeA8J8qQj8nKj48MXB59A5qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739545385; c=relaxed/simple;
-	bh=TPcD74ZppgZCJTNOYQ69WPGGQiuDlvZF1GVBrIWEISc=;
+	s=arc-20240116; t=1739545387; c=relaxed/simple;
+	bh=nyUcA4QgHqNAzCJJzzq9GnzlxEuhzEDEV44OGGmB/h8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G/1+orvfImye94zTbEenNz/PJqGh2PacPtvYLfclz/aJCb1cp43yvTCBIsNvI0pS7x+77W2Pj9cq5q4kDlm0z4gFuouXE/noJoqSQ5+yVdUrUJxInHMdeuvMDWpENJY5CYHSIZ6X9W62fXu8fCtSzT4vJZ/NQtuZ0gLmIxFm7mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jJ0A8TbS; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=s8+R/O/J2oOlYfo+uC0rX83dAKUPe828UvSrTqFfa7ivM/z0OFpxn39x8hXrAidtOGvXnYIHWRlsar5Qvr3kaDBIQJDOj9fNKzeMOE/UuXDmuFwGJ6h00d+vGMUR+mF25qg13wtNhSOn0AUSgAAThse10NREZkPhQUYZzprn7+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KD0A+BUw; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jJ0A8TbS"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43935bcec0aso17782765e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 07:03:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KD0A+BUw"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4393ed818ccso19353015e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 14 Feb 2025 07:03:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739545382; x=1740150182; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1739545384; x=1740150184; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y42OaWjgB0rg7blG3Pk/mPM5kBIbWAmK/8gVhR7spnU=;
-        b=jJ0A8TbSvfLHcltkAw7ZFbaFPCdQ7VNTLVZCNyICHZpZbj1dWB6a3+UYwRBBGKp3hB
-         wjm7k5Go2CXp0PCBWOQIPkodERkPFN4nBkUUu76xFDaTRsJ65HqkKwZCFQPn4QB/ddw9
-         U/qCF8y/UL/Q6F3Mb1oo6vFYO3v1VxzKQCAv9GdvFbxnqIlYbPOl0digMj3uaEEtC7lw
-         FjIhw/U1yIF2yA3n8n1EjD57+f3icnI+ZMXnYWzMgaU1H2oUB1E1sKPBm4yKN0jLhHKd
-         io60WjO4IUDzf4JxdP91Tcbw1Hyy87hOCTBxx9huo7dwYXj73Aa7+k66vS3DqZE6MsSe
-         0Hqg==
+        bh=tRj6n4bTixP89CvsI9ePKxiWL1iNoVj4jU65kUD8C5I=;
+        b=KD0A+BUwawAu0dN+OwPy74tE8w6kg/ZP37cAQFgiJgKHVP889PX/DBuM0j8SJT95yI
+         8NQkh1VMrfWsDTtPO1eSQT8BUfG9Bh4kI0RugiDs//FJ97n7xvRWQYmkNMEE4QwsE36l
+         KiOu7S85igew0zWSZq2YLRwChGu2sKI/L4hqRgguAPl+ahIaag84FKUh3XvolgxGFnLm
+         v817vQzFuWUYPvVaECbJFVrb5rsmOAo/WCVIofBryEccfxQbSsOCONSrWWEsBgEBBHR6
+         KG+bGLJMxCObT3p1U+fCq3+Jr6rnN4ezGXi/sSj0/B7EpdmHPnUdEf95Hctg6lt9XYJ0
+         ximw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739545382; x=1740150182;
+        d=1e100.net; s=20230601; t=1739545384; x=1740150184;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y42OaWjgB0rg7blG3Pk/mPM5kBIbWAmK/8gVhR7spnU=;
-        b=ioEhlO9XIS+D/0kG1+Sq1K5AtOq8xda6kBsOGKL5CtiNQxaqanV50ggMX3EYEYFLhu
-         4rVoOWUoVIqzDvopBsO48dpCfyzB9Pgrdriu8bwCjOUZjyYw9U01lu7RYFv9125nPUJl
-         xXGr5U593SRBhXGOgCahGlgBxglgkwB1dFwOUGctyuKITHuLs4QLWKYbbk6JCeFPT1Dc
-         8ObNEVoBu6kBC5Nb5++IAW8hLXtxfzF0Dvy5Hq4Bj78uRYdxHpKYC5TcoKdXIfYVdzzn
-         Y+LMmT2gy6If+xgKm7EAgN2/8pXbQCekU5Kr6kQwOZtFO2b6jUhCSwCDMe3CvskLL8/M
-         OGSA==
-X-Gm-Message-State: AOJu0YwbV6tLvO+vqILm80pTCMdgrW9iJnOOnwOI3a18EEPliBa2ZUkr
-	leeFNd4WYPUklZUh9SXCU2RGZako/VWQclDMN95UlZq+wZ9kiyIystFOCLOtKJ+tPEBamOrQNZN
-	RsMBdPqENZSlF+Sw7gMdfYr+bgdTNZgHZ7INM4GaUOk7KNi7WOC5yJ2nKjEwi0rvr3dflf+j1vb
-	Hf8BbKDbTRBJ/bugAPvscPxBMyXO8=
-X-Google-Smtp-Source: AGHT+IF62UW0ZAUqxob5YZZPd/L0FZ9/3SweMzcmTIEF6W/RKtm+jgMe9LQ3g7afaCYpLDIDmocY+1lPOw==
-X-Received: from wmqb9.prod.google.com ([2002:a05:600c:4e09:b0:439:6217:c147])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3d9b:b0:439:5aa1:1efb
- with SMTP id 5b1f17b1804b1-4396018a96bmr139269315e9.11.1739545382155; Fri, 14
- Feb 2025 07:03:02 -0800 (PST)
-Date: Fri, 14 Feb 2025 15:02:56 +0000
+        bh=tRj6n4bTixP89CvsI9ePKxiWL1iNoVj4jU65kUD8C5I=;
+        b=pZFbWIxg1Xq6bx4i/JIQoDr6CKM+S8W5rKwp4ud0uxCIFZV5dz5fRebfNx1BsQSAJX
+         dFA5bX9f4N3Y38nrq1Fn2bIFQdg+FsX8XNQar4eQ4SquHKQT+OTOVCjgsuRfjKL9BDSh
+         Hxme89fVTrwJt9eASfZ6/8fHiqC8AcxqMYtUSPlP/rzk6KHZi4hlf7g5VRzUSo5uxvAN
+         2CWoG/8FpKi1Hi2+7g59g7j6Xqy1Kgyqx4zqQdxA5mVji9W//l5mopDMQhRrafvaUjm7
+         4uU/r4L5ZadF14lW9k9d/qiMg5mQiLf5C3vUF1BHNOw0ZNCLzToxVseHW1N2jRk5IKES
+         Yxhw==
+X-Gm-Message-State: AOJu0YzxhlbVc4FQibuDNlm2JVlqfxIXrjA/Mc/asg9nNlx7lWB38uZo
+	2vZ7BzvJaj/caMJI7vWA+Lxk2cTaegpQJVxfRw+kWjNGqQN5Bns6hZUloZgq3vbY+bSZOkkujdd
+	GtvbiTUu5YpjSzeQZlYh04wc9B73CTheOxRN5bAgb7CjCC4lirPHcaFfbnbcrhf00C1H+7QgtMF
+	BIfYYRgyHGDaR1vu/rUyZUaY6wmGE=
+X-Google-Smtp-Source: AGHT+IEglSW2EtsSFVf9fcOIM3+3aUm0nM7Eie3OCOuC5Vt/mpe6XmW6SWFeotwZzhcO5dPAfS5CWFuKYw==
+X-Received: from wmbfk5.prod.google.com ([2002:a05:600c:cc5:b0:439:62f3:846e])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:5489:b0:439:6dba:adfa
+ with SMTP id 5b1f17b1804b1-4396dbaaf94mr4872045e9.19.1739545384118; Fri, 14
+ Feb 2025 07:03:04 -0800 (PST)
+Date: Fri, 14 Feb 2025 15:02:57 +0000
 In-Reply-To: <20250214150258.464798-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250214150258.464798-1-tabba@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250214150258.464798-2-tabba@google.com>
-Subject: [PATCH v1 1/3] KVM: arm64: Initialize HCRX_EL2 traps in pKVM
+Message-ID: <20250214150258.464798-3-tabba@google.com>
+Subject: [PATCH v1 2/3] KVM: arm64: Factor out pkvm hyp vcpu creation to
+ separate function
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com, 
@@ -69,90 +70,90 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com,
 	qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Initialize and set the traps controlled by the HCRX_EL2 in pKVM
-when the register is supported by the system.
+Move the code that creates and initializes the hyp view of a vcpu
+in pKVM to its own function. This is meant to make the transition
+to initializing every vcpu individually clearer.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 46 ++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ arch/arm64/kvm/pkvm.c | 48 ++++++++++++++++++++-----------------------
+ 1 file changed, 22 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 3927fe52a3dd..668ebec27f1b 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -58,6 +58,30 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 |= HCR_ATA;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 930b677eb9b0..06665cf221bf 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -113,6 +113,24 @@ static void __pkvm_destroy_hyp_vm(struct kvm *host_kvm)
+ 	free_hyp_memcache(&host_kvm->arch.pkvm.teardown_mc);
  }
  
-+static void pkvm_vcpu_reset_hcrx(struct pkvm_hyp_vcpu *hyp_vcpu)
++static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
++	size_t hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
++	pkvm_handle_t handle = vcpu->kvm->arch.pkvm.handle;
++	void *hyp_vcpu;
++	int ret;
 +
-+	if (!cpus_have_final_cap(ARM64_HAS_HCX))
-+		return;
++	hyp_vcpu = alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
++	if (!hyp_vcpu)
++		return -ENOMEM;
 +
-+	/*
-+	 * In general, all HCRX_EL2 bits are gated by a feature.
-+	 * The only reason we can set SMPME without checking any
-+	 * feature is that its effects are not directly observable
-+	 * from the guest.
-+	 */
-+	vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
++	ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, vcpu, hyp_vcpu);
++	if (ret)
++		free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
 +
-+	/*
-+	 * For non-protected VMs, the host is responsible for the guest's
-+	 * features, so use the remaining host HCRX_EL2 bits.
-+	 */
-+	if ((!pkvm_hyp_vcpu_is_protected(hyp_vcpu)))
-+		vcpu->arch.hcrx_el2 |= host_vcpu->arch.hcrx_el2;
++	return ret;
 +}
 +
- static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
+ /*
+  * Allocates and donates memory for hypervisor VM structs at EL2.
+  *
+@@ -125,9 +143,8 @@ static void __pkvm_destroy_hyp_vm(struct kvm *host_kvm)
+  */
+ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
  {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -92,6 +116,26 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr_el2 = val;
- }
+-	size_t pgd_sz, hyp_vm_sz, hyp_vcpu_sz;
++	size_t pgd_sz, hyp_vm_sz;
+ 	struct kvm_vcpu *host_vcpu;
+-	pkvm_handle_t handle;
+ 	void *pgd, *hyp_vm;
+ 	unsigned long idx;
+ 	int ret;
+@@ -161,33 +178,12 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+ 	if (ret < 0)
+ 		goto free_vm;
  
-+static void pvm_init_traps_hcrx(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 hcrx_set = 0;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_HCX))
-+		return;
-+
-+	if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
-+		hcrx_set |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
-+
-+	if (kvm_has_feat(kvm, ID_AA64MMFR3_EL1, TCRX, IMP))
-+		hcrx_set |= HCRX_EL2_TCR2En;
-+
-+	if (kvm_has_fpmr(kvm))
-+		hcrx_set |= HCRX_EL2_EnFPM;
-+
-+	vcpu->arch.hcrx_el2 |= hcrx_set;
-+}
-+
- static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -165,6 +209,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	vcpu->arch.mdcr_el2 = 0;
+-	handle = ret;
++	WRITE_ONCE(host_kvm->arch.pkvm.handle, ret);
  
- 	pkvm_vcpu_reset_hcr(vcpu);
-+	pkvm_vcpu_reset_hcrx(hyp_vcpu);
- 
- 	if ((!pkvm_hyp_vcpu_is_protected(hyp_vcpu)))
- 		return 0;
-@@ -174,6 +219,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
- 		return ret;
- 
- 	pvm_init_traps_hcr(vcpu);
-+	pvm_init_traps_hcrx(vcpu);
- 	pvm_init_traps_mdcr(vcpu);
+-	host_kvm->arch.pkvm.handle = handle;
+-
+-	/* Donate memory for the vcpus at hyp and initialize it. */
+-	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
+ 	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
+-		void *hyp_vcpu;
+-
+-		/* Indexing of the vcpus to be sequential starting at 0. */
+-		if (WARN_ON(host_vcpu->vcpu_idx != idx)) {
+-			ret = -EINVAL;
+-			goto destroy_vm;
+-		}
+-
+-		hyp_vcpu = alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
+-		if (!hyp_vcpu) {
+-			ret = -ENOMEM;
+-			goto destroy_vm;
+-		}
+-
+-		ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, host_vcpu,
+-					hyp_vcpu);
+-		if (ret) {
+-			free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
++		ret = __pkvm_create_hyp_vcpu(host_vcpu);
++		if (ret)
+ 			goto destroy_vm;
+-		}
+ 	}
  
  	return 0;
 -- 
