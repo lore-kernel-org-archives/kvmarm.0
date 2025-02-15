@@ -1,305 +1,102 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88DA19E7ED
-	for <kvmarm@lists.linux.dev>; Sat, 15 Feb 2025 10:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C28F151991;
+	Sat, 15 Feb 2025 15:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739614433; cv=none; b=Vc1ODvoJzDucvx7Fg1LNdKJauCrg0zdCtE5uJGPl98l7Li3VqUj/HXFz2+z63eTk5XyfaRvunRtVNHVgHdOtZvoAbnB5357vubs+8fGGFzJiKTPu7s+OOX216h2h+Kx8nqkJbS7wTTYdef7bAPSZsxftx3oaUY9TsCVC4dzuvRY=
+	t=1739631723; cv=none; b=e3u7ix7YdsfHSPNWtHpLbxR5oFYGmm8Aa+ns6zuT9K2L//4yKqCwuEyeh3cL4uSDiuGdaCXsAL5QOUYrFQD/uaYGdOyIxVgL1t3WauaQgCUDPHCfCwNbUtccUIwAkXN1Icl9pf8iWs18KORKl2d5HAxqWqJPvBTc4rYt6HZsCag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739614433; c=relaxed/simple;
-	bh=MQm7BH+3HDxolqvajl41IzAtVc3dFvt8yipGo/g6mms=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YXw3tyXvyhHD5krdeR2RfUCHJ0yEJYAtYttEtLqjriCq4j1BjP+Cz985hiQ7yqgXzfilg/Pl1XmbHXjd/E8U09wUpFOjaCkyw0sq/8rVhqy4xoGegEoxMjMyHxFSoSPJWO3RJeaHL2pGMCrRcNoHzYiZTvhYSdaAbpfcldrnXUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=klUcepXr; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1739631723; c=relaxed/simple;
+	bh=L6EHvmUXku+zPzqhvJf7wREo7z6WQPXzllEkBP1EVWU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=srFRhJMsNLlC+J/7h+AdOUYec5HeYxx6A38hTox+sOIqXOcmQxycrlwDux5ol154RxQXj419k5h6aSD0EKyIEBAPE4h51BzJzPpLFwKrgfRbZsjS2vqMLdAC6wp+2GuTBmOPUECPHYqeFNR7yKhj9DwHVgtDA40/GMykfkBIEcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBLgBNiu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="klUcepXr"
-Date: Sat, 15 Feb 2025 02:13:29 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739614418;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dy3olq3E5jadbVfjBXT4DnMOc2rqSKWH12ClnJamJeA=;
-	b=klUcepXrGPatRwl2AXtl0bWN9JAoryVIFhLxFMxGnWDwrsEtMnXNlRWeJADSGvBay9alA8
-	zRbnkTpmelJPLy/LrCWo16ViUB5Y0ymEqkzZygMaEC+hYm1nBwFPG7ucWsbYfcO1poTh5R
-	HhTBPS0wQ7H2Zo5a7iWmj6Gdnfu9Ijw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBLgBNiu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F435C4CEE7;
+	Sat, 15 Feb 2025 15:02:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739631722;
+	bh=L6EHvmUXku+zPzqhvJf7wREo7z6WQPXzllEkBP1EVWU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nBLgBNiuTLicbb+jpgK5xvLTiH6BdAdE4hReHFznoGu/xvUZMvCss1mnaZ9QtjIhl
+	 eiiXFu85fT2oS92HgqnzGaRteEFiJKZcFTKSKIgQXWfi/k26JgvRnfrlkql/Psvy1U
+	 ENfwRtKMY1GACFcXzhzH4MDR47+eHNRqARwqM22iB1gCchK6xrnuzYz9WFlOKrhR3K
+	 HJs3Xdmkv6DFrBFawE86DT5Cbeo+k99A/1jZdNk2DOvFQ2nf6vk+8CPx7R5gt4Iu4h
+	 FY6e4i8ErvlviAZrS/XwKsUiXAyiXVe+Wx39zWL3IqAZFHgbuQ2VPqArO3SBBKll8W
+	 GO5jnR8cdexHg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tjJg8-004Nz6-D1;
+	Sat, 15 Feb 2025 15:02:00 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Allow userspace to change MIDR_EL1
-Message-ID: <Z7BoydkyT_h0gwOV@linux.dev>
-References: <20250211143910.16775-1-sebott@redhat.com>
- <20250211143910.16775-2-sebott@redhat.com>
+	Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH 01/14] arm64: sysreg: Add layout for VNCR_EL2
+Date: Sat, 15 Feb 2025 15:01:21 +0000
+Message-Id: <20250215150134.3765791-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250215150134.3765791-1-maz@kernel.org>
+References: <20250215150134.3765791-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250211143910.16775-2-sebott@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Sebastian,
+Now that we're about to emulate VNCR_EL2, we need its full layout.
+Add it to the sysreg file.
 
-On Tue, Feb 11, 2025 at 03:39:07PM +0100, Sebastian Ott wrote:
-> +static int set_id_reg_non_ftr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +			      u64 val)
-> +{
-> +	u32 id = reg_to_encoding(rd);
-> +	int ret;
-> +
-> +	mutex_lock(&vcpu->kvm->arch.config_lock);
-
-There's quite a few early outs, guard() might be a better fit than
-explicitly dropping the lock.
-
-> +	/*
-> +	 * Since guest access to MIDR_EL1 is not trapped
-> +	 * set up VPIDR_EL2 to hold the MIDR_EL1 value.
-> +	 */
-> +	if (id == SYS_MIDR_EL1)
-> +		write_sysreg(val, vpidr_el2);
-
-This is problematic for a couple reasons:
-
- - If the kernel isn't running at EL2, VPIDR_EL2 is undefined
-
- - VPIDR_EL2 needs to be handled as part of the vCPU context, not
-   written to without a running vCPU. What would happen if two vCPUs
-   have different MIDR values?
-
-Here's a new diff with some hacks thrown in to handle VPIDR_EL2
-correctly. Very lightly tested :)
-
-Thanks,
-Oliver
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e3..3db8c773339e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -373,6 +373,7 @@ struct kvm_arch {
- #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
- 	u64 id_regs[KVM_ARM_ID_REG_NUM];
+ arch/arm64/include/asm/sysreg.h | 1 -
+ arch/arm64/tools/sysreg         | 6 ++++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 05ea5223d2d55..0a18279dc4dfe 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -521,7 +521,6 @@
+ #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
  
-+	u64 midr_el1;
- 	u64 ctr_el0;
+-#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+ #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+ #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 762ee084b37c5..e8dd641e7625c 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2868,6 +2868,12 @@ Sysreg	SMCR_EL2	3	4	1	2	6
+ Fields	SMCR_ELx
+ EndSysreg
  
- 	/* Masks for VNCR-backed and general EL2 sysregs */
-@@ -1469,6 +1470,8 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
- 	switch (reg) {
- 	case sys_reg(3, 0, 0, 1, 0) ... sys_reg(3, 0, 0, 7, 7):
- 		return &ka->id_regs[IDREG_IDX(reg)];
-+	case SYS_MIDR_EL1:
-+		return &ka->midr_el1;
- 	case SYS_CTR_EL0:
- 		return &ka->ctr_el0;
- 	default:
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 76ff095c6b6e..866411621a39 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -168,9 +168,11 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- }
- 
- static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
--					      u64 mpidr)
-+					      u64 midr, u64 mpidr)
- {
--	write_sysreg(mpidr,				vmpidr_el2);
-+	write_sysreg(midr, vpidr_el2);
-+	write_sysreg(mpidr, vmpidr_el2);
++Sysreg	VNCR_EL2	3	4	2	2	0
++Field	63:57	RESS
++Field	56:12	BADDR
++Res0	11:0
++EndSysreg
 +
- 
- 	if (has_vhe() ||
- 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-index dba101565de3..a01be1add5ad 100644
---- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-@@ -28,7 +28,15 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 
- void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
-+	u64 midr;
-+
-+	if (ctxt_is_guest(ctxt))
-+		midr = kvm_read_vm_id_reg(kern_hyp_va(ctxt_to_vcpu(ctxt)->kvm),
-+					  SYS_MIDR_EL1);
-+	else
-+		midr = read_cpuid_id();
-+
-+	__sysreg_restore_el1_state(ctxt, midr, ctxt_sys_reg(ctxt, MPIDR_EL1));
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 90b018e06f2c..1d4b9597eb29 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -87,11 +87,12 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
- 	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
- 	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
- 
--	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
--	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
--	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
--	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
--	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
-+	write_sysreg(kvm_read_vm_id_reg(vcpu->kvm, SYS_MIDR_EL1),	vpidr_el2);
-+	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),			vmpidr_el2);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),		SYS_MAIR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),		SYS_VBAR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),		SYS_CONTEXTIDR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),		SYS_AMAIR);
- 
- 	if (vcpu_el2_e2h_is_set(vcpu)) {
- 		/*
-@@ -191,7 +192,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
--	u64 mpidr;
-+	u64 midr, mpidr;
- 
- 	host_ctxt = host_data_ptr(host_ctxt);
- 	__sysreg_save_user_state(host_ctxt);
-@@ -222,10 +223,9 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- 		if (vcpu_has_nv(vcpu)) {
- 			/*
- 			 * Use the guest hypervisor's VPIDR_EL2 when in a
--			 * nested state. The hardware value of MIDR_EL1 gets
--			 * restored on put.
-+			 * nested state.
- 			 */
--			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
-+			midr = ctxt_sys_reg(guest_ctxt, VPIDR_EL2);
- 
- 			/*
- 			 * As we're restoring a nested guest, set the value
-@@ -233,10 +233,11 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- 			 */
- 			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
- 		} else {
-+			midr = kvm_read_vm_id_reg(vcpu->kvm, SYS_MIDR_EL1);
- 			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
- 		}
- 
--		__sysreg_restore_el1_state(guest_ctxt, mpidr);
-+		__sysreg_restore_el1_state(guest_ctxt, midr, mpidr);
- 	}
- 
- 	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
-@@ -271,9 +272,5 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
- 	/* Restore host user state */
- 	__sysreg_restore_user_state(host_ctxt);
- 
--	/* If leaving a nesting guest, restore MIDR_EL1 default view */
--	if (vcpu_has_nv(vcpu))
--		write_sysreg(read_cpuid_id(),	vpidr_el2);
--
- 	vcpu_clear_flag(vcpu, SYSREGS_ON_CPU);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f6cd1ea7fb55..aa1a0443dc6a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1656,7 +1656,7 @@ static bool is_feature_id_reg(u32 encoding)
-  */
- static inline bool is_vm_ftr_id_reg(u32 id)
- {
--	if (id == SYS_CTR_EL0)
-+	if (id == SYS_CTR_EL0 || id == SYS_MIDR_EL1)
- 		return true;
- 
- 	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-@@ -1989,6 +1989,34 @@ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	return 0;
- }
- 
-+static int set_id_reg_non_ftr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-+			      u64 val)
-+{
-+	u32 id = reg_to_encoding(rd);
-+
-+	guard(mutex)(&vcpu->kvm->arch.config_lock);
-+
-+	/*
-+	 * Once the VM has started the ID registers are immutable. Reject any
-+	 * write that does not match the final register value.
-+	 */
-+	if (kvm_vm_has_ran_once(vcpu->kvm)) {
-+		if (val != read_id_reg(vcpu, rd))
-+			return -EBUSY;
-+
-+		return 0;
-+	}
-+
-+	/*
-+	 * For non ftr regs do a limited test against the writable mask only.
-+	 */
-+	if ((rd->val & val) != val)
-+		return -EINVAL;
-+
-+	kvm_set_vm_id_reg(vcpu->kvm, id, val);
-+	return 0;
-+}
-+
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      u64 val)
- {
-@@ -2483,6 +2511,15 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+#define FUNCTION_RESET(reg)						\
-+	static u64 reset_##reg(struct kvm_vcpu *v,			\
-+			       const struct sys_reg_desc *r)		\
-+	{								\
-+		return read_sysreg(reg);				\
-+	}
-+
-+FUNCTION_RESET(midr_el1)
-+
- 
- /*
-  * Architected system registers.
-@@ -2532,6 +2569,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_DBGVCR32_EL2), undef_access, reset_val, DBGVCR32_EL2, 0 },
- 
-+	{ ID_DESC(MIDR_EL1), .set_user = set_id_reg_non_ftr, .visibility = id_visibility,
-+	  .reset = reset_midr_el1, .val = GENMASK_ULL(31, 0) },
- 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
- 
- 	/*
-@@ -4584,13 +4623,11 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
- 		return ((struct sys_reg_desc *)r)->val;			\
- 	}
- 
--FUNCTION_INVARIANT(midr_el1)
- FUNCTION_INVARIANT(revidr_el1)
- FUNCTION_INVARIANT(aidr_el1)
- 
- /* ->val is filled in by kvm_sys_reg_table_init() */
- static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
--	{ SYS_DESC(SYS_MIDR_EL1), NULL, reset_midr_el1 },
- 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, reset_revidr_el1 },
- 	{ SYS_DESC(SYS_AIDR_EL1), NULL, reset_aidr_el1 },
- };
+ Sysreg	GCSCR_EL2	3	4	2	5	0
+ Fields	GCSCR_ELx
+ EndSysreg
+-- 
+2.39.2
+
