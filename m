@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1AD1E5B94;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE4E1FC0E7;
 	Sat, 15 Feb 2025 17:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739641104; cv=none; b=PhWMMqA85sY2gHYUTL3BxJvplzat2O1ifnqV6Ugi/6wvKHapq/e5zms2UCS5r30RhEVyZG94AReVDcHKasFnc4M/VKmkZZ1eLZ11ZwF7pXf4/4bBSQ8AokjVMhPJ2bavplyA8i8hFP8WSrW7misvBioVoLsy4ZrCmRHSlclZAsQ=
+	t=1739641104; cv=none; b=XyIaS7OtkER+tWbSFp2sxQrP2l//P+zeYVzEJwXzeoKdHIcezfc3dGwTTHUQmunS1p8whSqRYVOKoIRShu7NiIkexgUkbPvcBdUpxDba7g7rGbfVdBynnFyEkIRgRR02bYWcrCin6Eu+yPJOC9zBWx2iK342J8L4V/kT5XlXonQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739641104; c=relaxed/simple;
-	bh=l6/K3TgHqFMCERF5V5TBAO9LtyJHG0zZIRxuUinA74M=;
+	bh=XrR6EufsQEHc3su339NPCgvj8egd8HG9nLlDbIZ7ZzI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tJcMzNnLVGrdf5WDcDeCYtEbXskXzW5Q6Mg9RjSDvhjfTdr/v9oFuIn7gsn55FmFSjJq+pjePDHRjvAV+40tqKMvY4HGwpHmvHhwIkxCtHeFkTL4+IS1xOrn6WvJ2EYr0hQGDkOVttFmloUXqYg5QOwSBwBI5d7E44DXzo9lQOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccLo+p3D; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=lNI0fIzdXf2hKWQJnA4odAPHazsvgGMWYNiysm2U/SsyPe2vun/fyxVZDwdrouMlnfEkguG1b20rCr0gNTw/j8sUoy/Nvxt81iBHbH4MRLCCaqLusSI6j+whn17QKC0rvqJKANrVeP6HmQmNtKbNxGZR6qVxpp27jKCgwF87Ib0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CYYw7Lp/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ccLo+p3D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56BF8C4CEF2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CYYw7Lp/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A029AC4CEE9;
 	Sat, 15 Feb 2025 17:38:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739641104;
-	bh=l6/K3TgHqFMCERF5V5TBAO9LtyJHG0zZIRxuUinA74M=;
+	bh=XrR6EufsQEHc3su339NPCgvj8egd8HG9nLlDbIZ7ZzI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ccLo+p3DqEQCuREatieqYtX4+1e3lMiYepqpQomKJ1107yhfwX+gbA9NWI4sLXFq9
-	 wt2KhTmzojLKVGfMmeluUAkOHEfU9HYVD15zr0N71LKcQCcv+7SPgDjj17bbpldnvW
-	 Bxtz6ts8f4apxuZh4lIEJil5wbuc9o/VG2Owb7pvKlrcS0DRjBP7iRpmmFsdnEeIF8
-	 /7ynVofi2rsezg5USRPl/eBtQRbrt6UQxRnY6DtjrXg15UoKoK9sTplt6swTRhQ1rt
-	 zUsPZJjwBy5p+PsJDai9aJy2Y3T7DWW1YwcPSz3Ur9TUwRXHFF7vj2LSIp+pp1owLT
-	 syJa1Z0iskJSw==
+	b=CYYw7Lp/tf67yV7SEf83U0rIspum+TG0z1f4OhgFLMZ6wUcvVW1hBu38dL++/0LE9
+	 HRLyNZam6lqIL1bBNq39v8tDuScFrdzOl/bz3/3onca9CPEYyDvDKkxvEYNBQa7jf6
+	 hd8DJ+WOF7clwPxF3oitOITZhL3TvdtnkvEMPXmoyDZtQPbGicP0rA/L5HuyRz9Qpv
+	 WskQ/FHaOH2baw65NqwycoaueeHxttg9gtk3GKMM2cu1kPhL3trQm71P6dMeV1gBFr
+	 6hXhMD4Se0mBA2CNSwC0By36J2jr9OfDvU+2oUxMlmsNZyfU1K9nmE4zT2W4p533Mt
+	 Tx0ER+w01i6Uw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tjM7S-004Pqp-Jx;
-	Sat, 15 Feb 2025 17:38:22 +0000
+	id 1tjM7T-004Pqp-0P;
+	Sat, 15 Feb 2025 17:38:23 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 12/14] KVM: arm64: Advertise FEAT_ECV when possible
-Date: Sat, 15 Feb 2025 17:38:14 +0000
-Message-Id: <20250215173816.3767330-13-maz@kernel.org>
+Subject: [PATCH 14/14] KVM: arm64: Document NV caps and vcpu flags
+Date: Sat, 15 Feb 2025 17:38:16 +0000
+Message-Id: <20250215173816.3767330-15-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250215173816.3767330-1-maz@kernel.org>
 References: <20250215173816.3767330-1-maz@kernel.org>
@@ -59,40 +59,46 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We can advertise support for FEAT_ECV if supported on the HW as
-long as we limit it to the basic trap bits, and not advertise
-CNTPOFF_EL2 support, even if the host has it (the short story
-being that CNTPOFF_EL2 is not virtualisable).
+Describe the two new vcpu flags that control NV, together with
+the capabilities that advertise them.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/api.rst | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 5ec5acb6310e9..d55c296fcb27a 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -848,14 +848,16 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 		break;
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 2b52eb77e29cb..2d7b516ae408d 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3456,7 +3456,8 @@ The initial values are defined as:
+ 	- FPSIMD/NEON registers: set to 0
+ 	- SVE registers: set to 0
+ 	- System registers: Reset to their architecturally defined
+-	  values as for a warm reset to EL1 (resp. SVC)
++	  values as for a warm reset to EL1 (resp. SVC) or EL2 (in the
++	  case of EL2 being enabled).
  
- 	case SYS_ID_AA64MMFR0_EL1:
--		/* Hide ECV, ExS, Secure Memory */
--		val &= ~(ID_AA64MMFR0_EL1_EVC		|
--			 ID_AA64MMFR0_EL1_EXS		|
-+		/* Hide ExS, Secure Memory */
-+		val &= ~(ID_AA64MMFR0_EL1_EXS		|
- 			 ID_AA64MMFR0_EL1_TGRAN4_2	|
- 			 ID_AA64MMFR0_EL1_TGRAN16_2	|
- 			 ID_AA64MMFR0_EL1_TGRAN64_2	|
- 			 ID_AA64MMFR0_EL1_SNSMEM);
+ Note that because some registers reflect machine topology, all vcpus
+ should be created before this ioctl is invoked.
+@@ -3523,6 +3524,17 @@ Possible features:
+ 	      - the KVM_REG_ARM64_SVE_VLS pseudo-register is immutable, and can
+ 	        no longer be written using KVM_SET_ONE_REG.
  
-+		/* Hide CNTPOFF if present */
-+		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR0_EL1, ECV, IMP);
++	- KVM_ARM_VCPU_HAS_EL2: Enable Nested Virtualisation support,
++	  booting the guest from EL2 instead of EL1.
++	  Depends on KVM_CAP_ARM_EL2.
++	  The VM is running with HCR_EL2.E2H being RES1 (VHE) unless
++	  KVM_ARM_VCPU_HAS_EL2_E2H0 is also set.
 +
- 		/* Disallow unsupported S2 page sizes */
- 		switch (PAGE_SIZE) {
- 		case SZ_64K:
++	- KVM_ARM_VCPU_HAS_EL2_E2H0: Restrict Nested Virtualisation
++	  support to HCR_EL2.E2H being RES0 (non-VHE).
++	  Depends on KVM_CAP_ARM_EL2_E2H0.
++	  KVM_ARM_VCPU_HAS_EL2 must also be set.
++
+ 4.83 KVM_ARM_PREFERRED_TARGET
+ -----------------------------
+ 
 -- 
 2.39.2
 
