@@ -1,121 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7081FC109;
-	Sat, 15 Feb 2025 17:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0452E14A088;
+	Sat, 15 Feb 2025 17:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739641104; cv=none; b=ke8d75J9P39PS1N92uHW4MysZHp6Hz7qUjgnWM8pVLcsBHIuqlLg9dNEUHdmQAJKJijR6/vx0dI15cfBCo3g3tYomeItpQP6tP7c4P1rIxgdnQuZ4+6vD34baarNw08dVA1x3i5mwLoECXuAjd14/kvi0ByS3oMvPa1tlLF4jRQ=
+	t=1739641812; cv=none; b=iBM9+F7DXxHEmnckB8f8i2IWrS1dOM1/N0TPgruj9Ghhd9zkqAvv5hMNObY8vNrgs1r/zs8JrSCziVjsLvoRJeqpfz3l/TCKNiyBvBMN1D6VJaf3KPlO0EQTfc0E9ps3s6Dm8rO8EUtU0ZG7ELfi2bNUDmiYT2VDn+1io/Znb8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739641104; c=relaxed/simple;
-	bh=CL/9quSdT/4WkdKxdC8OB8oLAC8r+jS/LhcwV8O3nUI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=daEwodrTSaWRyUq90O5PALsUy/IRlGMgz4xcGjEoXQVBRE8t89jf1l5UJ+5/2FguFS9+134V1V2FnaSkwrhuTg+YIAtun4zWuW3WWdidbqCqYmjwQgTt8vGXXZq5x071zac9wPcofsJ0X/wOk0PPNX6najs9tQHL4iAyqjatPI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlJ8LWvq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739641812; c=relaxed/simple;
+	bh=A51e6JcDqBBxxRkVKA0V/7fSn5jRxsBs2bLls+VWRiM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pv++ELIXQQy7g2dwNA3qaRgGZ+e2uM0FhHsRWlnJhwmFb5laH14ukZ+CIcEsh4WvOIGp1Pds/E+WxvOH6nFJyZjm3up2ugOfnWcTm2CsRzoayRuWVGan+TNrgzJDl5SIUo63tveLAwUe5xm4cDy7aV0O/lBg6L7CNjsNMZX72hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KR0sWtiQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlJ8LWvq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 892FFC4CEEA;
-	Sat, 15 Feb 2025 17:38:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KR0sWtiQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2459C4CEDF;
+	Sat, 15 Feb 2025 17:50:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739641104;
-	bh=CL/9quSdT/4WkdKxdC8OB8oLAC8r+jS/LhcwV8O3nUI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qlJ8LWvqArerfAe90+kHAHuKR6bt2MdYr7xQ/Gdc/JZ3fT5Ij2ed5s0lc3GiTqIWV
-	 0PGwBCEvfzr2ciN4y1097VWGswxGwvnyO5jKNZRHL7KOf7WleH0DbgGRZIBknBQBmm
-	 CLMqvzsTaOcyc+Owkde7sXUmFLqTsBjCTuZOtjjRm71OmMHyl/jtPk8VMtCZB+rqy7
-	 lg0FQMeV0cOon680vQ3YRCtcTO8V9zfYwF09MlBrgXISBSfHoYEvX/C7lpVQPneByt
-	 Cthq96XVcagSESNDsXhgk5KcRoluw/vJvvm9FyNbOmWwxSy/OT9w3j0z1wjnK5QxMJ
-	 d9UfoW759E2lg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1739641811;
+	bh=A51e6JcDqBBxxRkVKA0V/7fSn5jRxsBs2bLls+VWRiM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KR0sWtiQJ8yi1gvD8QbU/Ul+R+dVqgW9Lgrlrmn10gIwmG4Z9n9fDJcEx6W1vqO9k
+	 Qhte3SQxCB2TJzESKDHloaaaqGJKoNTS0S0l90UoUxBLu9eFEFhOG+OQNkAFtmQufp
+	 NVkw+h3zackvyxC/nx+4VNk9qsNkXgohPIKNgpUBvoKulT4womsv38bqgwJ7by9cyB
+	 IaKYA/ApU+40w7d0XOM6qCoP1rUVSqNkiaxXV1gQtqyaiEEtlqgKXruc7EhBNtjNt8
+	 3nYI0rRdjFz3O0bsfYM6vfgtjmMkM7y9FVQWEpfM9MQL67Qt07eLXDwGw3KZ08eLJI
+	 SeJ9v0TdmHGJw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tjM7S-004Pqp-QH;
-	Sat, 15 Feb 2025 17:38:22 +0000
+	id 1tjMIr-004Q9y-PA;
+	Sat, 15 Feb 2025 17:50:09 +0000
+Date: Sat, 15 Feb 2025 17:50:09 +0000
+Message-ID: <87tt8v14j2.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 13/14] KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
-Date: Sat, 15 Feb 2025 17:38:15 +0000
-Message-Id: <20250215173816.3767330-14-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250215173816.3767330-1-maz@kernel.org>
-References: <20250215173816.3767330-1-maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	kvmarm <kvmarm@lists.linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	christoffer.dall@arm.com,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	coltonlewis@google.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	darren@os.amperecomputing.com,
+	vishnu@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
+In-Reply-To: <8da22249-eedb-477b-98d8-f50dee56f1f7@redhat.com>
+References: <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
+	<86y10osr19.wl-maz@kernel.org>
+	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
+	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
+	<152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
+	<86h661wje4.wl-maz@kernel.org>
+	<4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
+	<86cygpwfy0.wl-maz@kernel.org>
+	<b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
+	<86frkptzr6.wl-maz@kernel.org>
+	<Z6ZMdv8jJUvYwQzT@linux.dev>
+	<86bjvdtxb5.wl-maz@kernel.org>
+	<8da22249-eedb-477b-98d8-f50dee56f1f7@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Rcpt-To: eauger@redhat.com, oliver.upton@linux.dev, gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Since we're (almost) feature complete, let's allow userspace to
-request KVM_ARM_VCPU_EL2* by bumping KVM_VCPU_MAX_FEATURES up.
+On Mon, 10 Feb 2025 18:26:48 +0000,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2/7/25 7:38 PM, Marc Zyngier wrote:
+> > On Fri, 07 Feb 2025 18:09:58 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> >>
+> >> Hey,
+> >>
+> >> On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
+> >>> I found at least one issue that could fail the migration. Before the
+> >>> VM starts running, we limit the feature set to the subset we actually
+> >>> support with NV.
+> >>>
+> >>> By doing this, we also change the value of IDreg fields that are not
+> >>> writable, because they describe features that we don't support.
+> >>> Obviously, that fails on restore.
+> >>>
+> >>> I need to have a think...
+> >>
+> >> We spoke about this a while ago (and I forgot til now), but I was
+> >> wondering if we could use vCPU feature flags to describe NV, including
+> >> the selection between FEAT_E2H0 and FEAT_VHE.
+> >>
+> >> I think this might match userspace expectations a bit more closely where
+> >> the state of the ID registers after init gives the actual feature set
+> >> supported by the VM.
+> > 
+> > I'm not sure that's enough. Let me give you an example:
+> > 
+> > My host has FEAT_XNX, described in ID_AA64MMFR1_EL1.XNX. For whatever
+> > reason, we don't allow this field to be written to, even out of NV
+> > context. This is odd, because for an EL1 VM, this field means nothing
+> > at all.
+> So the curprit fields for me look like
+> 
+> - ID_AA64MMFR1_EL1.XNX
+> - ID_AA64DFR0_EL1.DoubleLock
+> - ID_AA64PFR0_EL1.RAS
+> 
+> This is still based on your nv-next branch from Jan 9
+> https://github.com/eauger/linux/tree/nv_next_jan9_2025
 
-We also now advertise the features to userspace with a new capabilities.
+I have now pushed out a new nv-next branch with the new and improved
+UAPI. I expect migration to work a bit better, or at least not to
+explode on ID register restore. You will notice that things have
+changed a bit (extra flag and cap for FEAT_E2H0), but nothing really
+major.
 
-It's going to be great...
+Thanks,
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/arm.c              | 6 ++++++
- include/uapi/linux/kvm.h          | 2 ++
- 3 files changed, 9 insertions(+), 1 deletion(-)
+	M.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e34..2a9ab9abf0f81 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -39,7 +39,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_MAX_FEATURES 9
- #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
- 
- #define KVM_REQ_SLEEP \
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4746c6cace2a8..6554379cdcada 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -359,6 +359,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_EL1_32BIT:
- 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
- 		break;
-+	case KVM_CAP_ARM_EL2:
-+		r = cpus_have_final_cap(ARM64_HAS_NESTED_VIRT);
-+		break;
-+	case KVM_CAP_ARM_EL2_E2H0:
-+		r = cpus_have_final_cap(ARM64_HAS_HCR_NV1);
-+		break;
- 	case KVM_CAP_GUEST_DEBUG_HW_BPS:
- 		r = get_num_brps();
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 45e6d8fca9b99..9a6674f51b8be 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -929,6 +929,8 @@ struct kvm_enable_cap {
- #define KVM_CAP_PRE_FAULT_MEMORY 236
- #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
- #define KVM_CAP_X86_GUEST_MODE 238
-+#define KVM_CAP_ARM_EL2 239
-+#define KVM_CAP_ARM_EL2_E2H0 240
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
