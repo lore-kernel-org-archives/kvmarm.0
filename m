@@ -1,120 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BE61624CA;
-	Sat, 15 Feb 2025 16:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD723D531;
+	Sat, 15 Feb 2025 17:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739637721; cv=none; b=H+Ac8kgpVYjbCER70ofIFrc4AoFsIw6Jy6j3HKVYkcevyyjMqMTeGo4amYSBQXMthJF5cmuVhjsNptMNsXHiq8r0ClnOQJ/0UiBYiWrcFXZ0bAoK/j6LhAea9FdKAebQTlsaiT6oL0aW1k9FqXU94Lj40FWQ1nRbntmZs7GEJxM=
+	t=1739641102; cv=none; b=gcImpDEyHqDBeRcrx9UAs43llLr3B6jfM65Mgw9OZ/Ky6CmDotSJXlZ6aOoQ9SzgKnSNo+9081qFv5kXEUvQMsZmf/7Rp2PiB7J1nz2S0oiWIP6XDItzH2Nh6SeAZ/dP2SKrtzmgMpK7Cd1SszelbDagMD9DcsHuL7DKh3BYVUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739637721; c=relaxed/simple;
-	bh=MBdSKSQl5qKoLwg1wjEtWvk67McJc5SXlc6YFBBxgZI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jBzf0cBwDia9DySQmHgQ05rFNIAfUMhGCoUlarUzl/pz2L01ZrS97ZzCvDbTCNKmQx3yWrBz+yBSLj0y/O763pPjCH95TbI+ffYUzywChcGkUbwQ3pNNGyIE0boIHv3apt2Xe4kBzrLMyldRxSoCDBYpMEIyiYMocAFCe+bclLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2iVQKjq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739641102; c=relaxed/simple;
+	bh=AJT8qxgsg2wv2xaOJePXhd+BAHpS30iXL1eJZnfSyzc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dEezNlWHbPnXsP8gf3QgMROVzfTKsctMND6gftuIs995/i3zBFc9mVgX1TpR1PfhvCR0k42vT3nv2VYUmRZgF+OiA08zzXeafRzRkpJMzjBdwnFG0XG5xpy+bHX/PvtH5AwcanpsouFBrxkMUItX4i7hlR+xL/CKk4r9LHuMovM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jbUZ26Pc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2iVQKjq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18EB0C4CEDF;
-	Sat, 15 Feb 2025 16:42:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jbUZ26Pc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 349C9C4CEDF;
+	Sat, 15 Feb 2025 17:38:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739637721;
-	bh=MBdSKSQl5qKoLwg1wjEtWvk67McJc5SXlc6YFBBxgZI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W2iVQKjqSoa88iXkUmC/QsqLJbTtY+g+QAwHNR1pZBhxKmxqkjnWjDPt2GrnxiDWf
-	 0kZ84IMg2EYQWnsebOIkmU8gBwChNpzvYue9sNIH92DMCafy6fFd0Qpgn6X2kRIHCA
-	 NsGCY5tVI9fhqIuvqQbVYMQ9mi9gQV0f3bj6gKaD2syFQItwqa1b9286FZ7061j+Qt
-	 roJSOZ7r/WKkY/uOm2qB5I9eUIBwOQk/FBlZh7JDASb7kWp8QQA6nbJ54qKv35neXh
-	 vdu0e7JgQRImjIdO7xb+se/fr6jchAHtneHu3ZwyspIdcBLovOAmm1hjbTuKmmo0R3
-	 aUOfWz+3uAG7A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	s=k20201202; t=1739641102;
+	bh=AJT8qxgsg2wv2xaOJePXhd+BAHpS30iXL1eJZnfSyzc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jbUZ26PcqxSK5rCoxyV5ZorVcqDHolmwDLQ1earciXtzvt8t4DFtx4/u22plQap4Z
+	 D1/WnLCXkTFiIT2qSit37mxR+dgQ9F0Kxrgluzi7i/XdTjAJfERrnMBizpboCwv7OZ
+	 3oekOQnKOpRITxTAhHuj2H0oaQ4Wyro0JSxoP8h4aJnvx5z6D3NIKmRPtcS1exQJeR
+	 DuR3XkSW5fp0aqr1YTPoOT+eriJWzqZdXzZTZhkFzcCnXSEWdp9wjEImHXNmcgGi7O
+	 pcuefQ4aYnmpD2w1eftyQ1IGBDgokj1Y71v1WN5XAmd0lYmB6T660haEC1Ub04qRds
+	 qzBI4N5IQt+zg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tjLEs-004PKM-Vc;
-	Sat, 15 Feb 2025 16:41:59 +0000
-Date: Sat, 15 Feb 2025 16:41:55 +0000
-Message-ID: <87v7tb17os.wl-maz@kernel.org>
+	id 1tjM7Q-004Pqp-66;
+	Sat, 15 Feb 2025 17:38:20 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: luoyonggang@gmail.com
-Cc: Oliver Upton <oliver.upton@linux.dev>,	Sebastian Ott <sebott@redhat.com>,	Joey Gouly <joey.gouly@arm.com>,	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will Deacon <will@kernel.org>,	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,	Cornelia Huck <cohuck@redhat.com>,	Eric Auger <eric.auger@redhat.com>,	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Allow userspace to change MIDR_EL1
-In-Reply-To: <CAE2XoE_8ihJZQF856w-_F+cgJW7fLWGz7M7Ztoxzw2vE51_m1A@mail.gmail.com>
-References: <20250211143910.16775-1-sebott@redhat.com>
-	<20250211143910.16775-2-sebott@redhat.com>
-	<Z7BoydkyT_h0gwOV@linux.dev>
-	<CAE2XoE_8ihJZQF856w-_F+cgJW7fLWGz7M7Ztoxzw2vE51_m1A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH 00/14] KVM: arm64: NV userspace ABI
+Date: Sat, 15 Feb 2025 17:38:02 +0000
+Message-Id: <20250215173816.3767330-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: luoyonggang@gmail.com, oliver.upton@linux.dev, sebott@redhat.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, shameerali.kolothum.thodi@huawei.com, cohuck@redhat.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 15 Feb 2025 16:16:44 +0000,
-"=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)" <luoyonggang@gmail.com> wrote:
->=20
-> On Sat, Feb 15, 2025 at 6:15=E2=80=AFPM Oliver Upton <oliver.upton@linux.=
-dev> wrote:
-> >
-> > Hi Sebastian,
-> >
-> > On Tue, Feb 11, 2025 at 03:39:07PM +0100, Sebastian Ott wrote:
-> > > +static int set_id_reg_non_ftr(struct kvm_vcpu *vcpu, const struct sy=
-s_reg_desc *rd,
-> > > +                           u64 val)
-> > > +{
-> > > +     u32 id =3D reg_to_encoding(rd);
-> > > +     int ret;
-> > > +
-> > > +     mutex_lock(&vcpu->kvm->arch.config_lock);
-> >
-> > There's quite a few early outs, guard() might be a better fit than
-> > explicitly dropping the lock.
-> >
-> > > +     /*
-> > > +      * Since guest access to MIDR_EL1 is not trapped
-> > > +      * set up VPIDR_EL2 to hold the MIDR_EL1 value.
-> > > +      */
-> > > +     if (id =3D=3D SYS_MIDR_EL1)
-> > > +             write_sysreg(val, vpidr_el2);
-> >
-> > This is problematic for a couple reasons:
-> >
-> >  - If the kernel isn't running at EL2, VPIDR_EL2 is undefined
-> >
-> >  - VPIDR_EL2 needs to be handled as part of the vCPU context, not
-> >    written to without a running vCPU. What would happen if two vCPUs
-> >    have different MIDR values?
-> >
-> > Here's a new diff with some hacks thrown in to handle VPIDR_EL2
-> > correctly. Very lightly tested :)
->=20
-> Thans, I am also faced this issue, but other than this, I am also
-> facing a issue, after updating
-> MIDR_EL1, The CP15 register MIDR for aarch32 not updated.
-> The instruction is `MRC p15,0,<Rt>,c0,c0,0    ; Read CP15 Main ID Registe=
-r` from
-> https://developer.arm.com/documentation/ddi0406/b/System-Level-Architectu=
-re/Protected-Memory-System-Architecture--PMSA-/CP15-registers-for-a-PMSA-im=
-plementation/c0--Main-ID-Register--MIDR-
->=20
-> The value of this instruction is not updated
+Since the previous incarnation of the ABI was proved to be subtly
+wrong, I have reworked it to be more in line with the current way KVM
+operates.
 
-How do you determine that MIDR isn't updated? How do you update the
-userspace view?
+No more late NV-specific adjustment nor writable ID_AA64MMFR0_EL1.VH.
+The NV configuration is now entirely selected from the vcpu flags.
+I've preserved the KVM_ARM_VCPU_EL2 flag which enables NV with VHE,
+and added KVM_ARM_VCPU_EL2_E2H0 which alters the NV behaviour to only
+allow nVHE guests without recursive NV support.
 
-Thanks,
+This series is actually very little new code. The bulk of it is
+converting the feature downgrade to be per-idreg, essentially going
+back to the state before 44241f34fac96 ("KVM: arm64: nv: Use accessors
+for modifying ID registers"), only slightly modernised. This then
+becomes part of the reset value computing.
 
-	M.
+The rest is simply what you'd expect in terms of being able to write
+the ID_AA64MMFR4_EL1.NV_frac field, making the correct bits RES0 when
+needed, probing for capabilities and handling the init flags.
 
---=20
-Without deviation from the norm, progress is not possible.
+Patches on top of -rc2, with the integration branch at the usual
+location.
+
+Marc Zyngier (14):
+  arm64: cpufeature: Handle NV_frac as a synonym of NV2
+  KVM: arm64: Hide ID_AA64MMFR2_EL1.NV from guest and userspace
+  KVM: arm64: Mark HCR.EL2.E2H RES0 when ID_AA64MMFR1_EL1.VH is zero
+  KVM: arm64: Mark HCR.EL2.{NV*,AT} RES0 when ID_AA64MMFR4_EL1.NV_frac
+    is 0
+  KVM: arm64: Advertise NV2 in the boot messages
+  KVM: arm64: Consolidate idreg reset method
+  KVM: arm64: Make ID_REG_LIMIT_FIELD_ENUM() more widely available
+  KVM: arm64: Enforce NV limits on a per-idregs basis
+  KVM: arm64: Move NV-specific capping to idreg sanitisation
+  KVM: arm64: Allow userspace to limit NV support to nVHE
+  KVM: arm64: Make ID_AA64MMFR4_EL1.NV_frac writable
+  KVM: arm64: Advertise FEAT_ECV when possible
+  KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
+  KVM: arm64: Document NV caps and vcpu flags
+
+ Documentation/virt/kvm/api.rst      |  14 +-
+ arch/arm64/include/asm/kvm_host.h   |   2 +-
+ arch/arm64/include/asm/kvm_nested.h |   1 +
+ arch/arm64/include/uapi/asm/kvm.h   |   1 +
+ arch/arm64/kernel/cpufeature.c      |  15 +-
+ arch/arm64/kvm/arm.c                |  11 +-
+ arch/arm64/kvm/nested.c             | 285 +++++++++++++++-------------
+ arch/arm64/kvm/sys_regs.c           |  25 +--
+ arch/arm64/kvm/sys_regs.h           |  10 +
+ include/uapi/linux/kvm.h            |   2 +
+ 10 files changed, 209 insertions(+), 157 deletions(-)
+
+-- 
+2.39.2
+
