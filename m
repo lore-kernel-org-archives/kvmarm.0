@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8200C1DE4D6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9687C1DF27F;
 	Sat, 15 Feb 2025 15:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739631723; cv=none; b=u9NoVt9Ps40TFRpHuTp44FiQ1iJoLnZaC56GgzwkqE84+LahgbNY/d2Yk/ZEz3+a7O30xtIcVe04oHLyr9Iu/MTg8+UgDbMuW7t6X9jC1x54kvvmUO5Q2iCMFaZoM6OadalpZxXHbZhwKVkzchQJY7LgCn8cvGdby8kl+L5HbMU=
+	t=1739631723; cv=none; b=JPto519AS3K9vYKUVzwk+OZFJ3K2WCtuBi+ESgKZjxyAAYoCgIWDjs1aUw1mU2Obtz99uSQ0tROZt+Gk69zD+8pvwlf2BQ9i2kWIdB3qK/4m0T/g7z3mlsLgOoKbkq3glbmRZ4f0S+4JQB4TBNN8egUDfFoR4j4ZhMaap1tNWc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739631723; c=relaxed/simple;
-	bh=DZqWgyeVUqaZBKtUHoe9HapFKZfsw/9ajICg4MC0T0Q=;
+	bh=zkHr3vkzDC1kIdGLI1aElkjYHYfjk/IsB6KkkSw5XXM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tAG47P4p59HpJsM4N2xHQrd54Uyh90VJFKpexeoX6Y5CMxVxJrUCthr/rEZ/qA/JtSDoTzRz7vn9AM3cbE30YtJcDlupDTunaqRq8kRiR9gKiQEh0sfduv0sMGPfruphBr4Ud40GvH0gmmAe6hmt8g6aV2Q4iQNwYMe73Rog8IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O4FtqBhj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=I5sJ6b+nzP0wJd6xJHDdkudh/4XbyP+hLSExwB4yw8+N8/guj/F8reKdc1WdikY3Facm0ZXDLgROGHKFD22yFJnqDtJnHiJzViH30gnGMmcY7u7fDbNK2YzkGEs0UTw6iqqa07u+nYU5Qs29PJZXLYCOw0UySD14hzl9jdUl55Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nrUd42Oy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4FtqBhj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25564C4CEE8;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nrUd42Oy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77A8AC4CEE9;
 	Sat, 15 Feb 2025 15:02:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739631723;
-	bh=DZqWgyeVUqaZBKtUHoe9HapFKZfsw/9ajICg4MC0T0Q=;
+	bh=zkHr3vkzDC1kIdGLI1aElkjYHYfjk/IsB6KkkSw5XXM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O4FtqBhj0JS/ProY5LuKkzSoMfEa+jFZR9jxIKjGcsFWssgAKB1SEQw3uJTOrrz1b
-	 FUavgPXFzXTFC7UYsPQsqwD6KW41EmtNi8jYix6qh0mUtqHKb2TUPkmJcy2pP6T+dR
-	 L892Y43ZIKzWhlH21Q/0aw73Jm+wCnxEtyq7itapSUpfzZte/fgNUP03KHjMe8ncLz
-	 wiCXw7n+yclZJjRnig7oqvmkDKNVdv/KMSu/O9O1i6UrKM6ynzsfcvpx3H2jXn19uW
-	 HWYewjztBS8m0+bth/hvyJsvfmgq13YZ8n61lnX5CIYv8qgWWE9gYxnfKvFq2VEeIl
-	 Uw1a2JFtwr52g==
+	b=nrUd42OyfvCH1SC3wCEszYBngm0+i3DA9zYt4hGbMtC7fjSETBHv0m+6lVKJoHGVG
+	 cPxsQSv1Z9LGKCob2niUx6AhNCFj4Pbrpell6ZUENOPCpdhnCQgK55Ix5LOM4lJ2/O
+	 ZVtxj1WZzR4DEujiGCixM3MWBG2d7dSlSFlrJmp4uJVzZ4MF9KKzNuXoYSiz/l/WSQ
+	 1fxhWnPWv3CIwf+drsXxnb42G/sv5MYEDo+LIPDqWdklRgbjwd1vH63COLRKhTvpSg
+	 XeTEMgmW0qQZpcwoICNscctf/Wg4m8GC/D771W2Lpm6P/wfQYaMuL6Ly6CESBrbCqc
+	 rV7+uMKi/wMvA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tjJg9-004Nz6-4W;
+	id 1tjJg9-004Nz6-Om;
 	Sat, 15 Feb 2025 15:02:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -41,9 +41,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 05/14] KVM: arm64: nv: Move TLBI range decoding to a helper
-Date: Sat, 15 Feb 2025 15:01:25 +0000
-Message-Id: <20250215150134.3765791-6-maz@kernel.org>
+Subject: [PATCH 08/14] KVM: arm64: nv: Add userspace and guest handling of VNCR_EL2
+Date: Sat, 15 Feb 2025 15:01:28 +0000
+Message-Id: <20250215150134.3765791-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250215150134.3765791-1-maz@kernel.org>
 References: <20250215150134.3765791-1-maz@kernel.org>
@@ -59,101 +59,100 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we are about to expand out TLB invalidation capabilities to support
-recursive virtualisation, move the decoding of a TLBI by range into
-a helper that returns the base, the range and the ASID.
+Plug VNCR_EL2 in the vcpu_sysreg enum, define its RES0/RES1 bits,
+and make it accessible to userspace when the VM is configured to
+support FEAT_NV2.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 32 +++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           | 24 ++--------------------
- 2 files changed, 34 insertions(+), 22 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/nested.c           |  3 +++
+ arch/arm64/kvm/sys_regs.c         | 24 +++++++++++++++---------
+ 3 files changed, 20 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 2bd315a59f283..cc1302cb7929f 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -230,6 +230,38 @@ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
- 		shift;							\
- 	})
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index dd287ccaffdb7..9b91a9e97cdce 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -551,6 +551,8 @@ enum vcpu_sysreg {
+ 	VNCR(HDFGWTR_EL2),
+ 	VNCR(HAFGRTR_EL2),
  
-+static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
-+{
-+	u64 base, tg, num, scale;
-+	int shift;
++	VNCR(VNCR_EL2),
 +
-+	tg	= FIELD_GET(GENMASK(47, 46), val);
+ 	VNCR(CNTVOFF_EL2),
+ 	VNCR(CNTV_CVAL_EL0),
+ 	VNCR(CNTV_CTL_EL0),
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 6ae5ec43ddeaa..aed25a003750d 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1371,6 +1371,9 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 		res0 |= GENMASK(11, 8);
+ 	set_sysreg_masks(kvm, CNTHCTL_EL2, res0, res1);
+ 
++	/* VNCR_EL2 */
++	set_sysreg_masks(kvm, VNCR_EL2, VNCR_EL2_RES0, VNCR_EL2_RES1);
 +
-+	switch(tg) {
-+	case 1:
-+		shift = 12;
-+		break;
-+	case 2:
-+		shift = 14;
-+		break;
-+	case 3:
-+	default:		/* IMPDEF: handle tg==0 as 64k */
-+		shift = 16;
-+		break;
-+	}
-+
-+	base	= (val & GENMASK(36, 0)) << shift;
-+
-+	if (asid)
-+		*asid = FIELD_GET(TLBIR_ASID_MASK, val);
-+
-+	scale	= FIELD_GET(GENMASK(45, 44), val);
-+	num	= FIELD_GET(GENMASK(43, 39), val);
-+	*range	= __TLBI_RANGE_PAGES(num, scale) << shift;
-+
-+	return base;
-+}
-+
- static inline unsigned int ps_to_output_size(unsigned int ps)
- {
- 	switch (ps) {
+ out:
+ 	for (enum vcpu_sysreg sr = __SANITISED_REG_START__; sr < NR_SYS_REGS; sr++)
+ 		(void)__vcpu_sys_reg(vcpu, sr);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 82430c1e1dd02..24eaff9379e75 100644
+index 24eaff9379e75..cf1243dd04548 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -3304,8 +3304,7 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
- 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--	u64 base, range, tg, num, scale;
--	int shift;
-+	u64 base, range;
+@@ -2234,15 +2234,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ 			"trap of EL2 register redirected to EL1");
+ }
  
- 	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding))
- 		return undef_access(vcpu, p, r);
-@@ -3315,26 +3314,7 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	 * of the guest's S2 (different base granule size, for example), we
- 	 * decide to ignore TTL and only use the described range.
- 	 */
--	tg	= FIELD_GET(GENMASK(47, 46), p->regval);
--	scale	= FIELD_GET(GENMASK(45, 44), p->regval);
--	num	= FIELD_GET(GENMASK(43, 39), p->regval);
--	base	= p->regval & GENMASK(36, 0);
+-#define EL2_REG(name, acc, rst, v) {		\
+-	SYS_DESC(SYS_##name),			\
+-	.access = acc,				\
+-	.reset = rst,				\
+-	.reg = name,				\
+-	.visibility = el2_visibility,		\
+-	.val = v,				\
+-}
 -
--	switch(tg) {
--	case 1:
--		shift = 12;
--		break;
--	case 2:
--		shift = 14;
--		break;
--	case 3:
--	default:		/* IMPDEF: handle tg==0 as 64k */
--		shift = 16;
--		break;
--	}
--
--	base <<= shift;
--	range = __TLBI_RANGE_PAGES(num, scale) << shift;
-+	base = decode_range_tlbi(p->regval, &range, NULL);
+ #define EL2_REG_FILTERED(name, acc, rst, v, filter) {	\
+ 	SYS_DESC(SYS_##name),			\
+ 	.access = acc,				\
+@@ -2252,6 +2243,9 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ 	.val = v,				\
+ }
  
- 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
- 				   &(union tlbi_info) {
++#define EL2_REG(name, acc, rst, v)			\
++	EL2_REG_FILTERED(name, acc, rst, v, el2_visibility)
++
+ #define EL2_REG_VNCR(name, rst, v)	EL2_REG(name, bad_vncr_trap, rst, v)
+ #define EL2_REG_REDIR(name, rst, v)	EL2_REG(name, bad_redir_trap, rst, v)
+ 
+@@ -2407,6 +2401,16 @@ static unsigned int sve_el2_visibility(const struct kvm_vcpu *vcpu,
+ 	return __el2_visibility(vcpu, rd, sve_visibility);
+ }
+ 
++static unsigned int vncr_el2_visibility(const struct kvm_vcpu *vcpu,
++					const struct sys_reg_desc *rd)
++{
++	if (el2_visibility(vcpu, rd) == 0 &&
++	    kvm_has_feat(vcpu->kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY))
++		return 0;
++
++	return REG_HIDDEN;
++}
++
+ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+@@ -3054,6 +3058,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 			 tcr2_el2_visibility),
+ 	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
+ 	EL2_REG_VNCR(VTCR_EL2, reset_val, 0),
++	EL2_REG_FILTERED(VNCR_EL2, bad_vncr_trap, reset_val, 0,
++			 vncr_el2_visibility),
+ 
+ 	{ SYS_DESC(SYS_DACR32_EL2), undef_access, reset_unknown, DACR32_EL2 },
+ 	EL2_REG_VNCR(HDFGRTR_EL2, reset_val, 0),
 -- 
 2.39.2
 
