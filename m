@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3C01C6FE2;
-	Sat, 15 Feb 2025 15:02:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FAE1DE4D3;
+	Sat, 15 Feb 2025 15:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739631723; cv=none; b=H4ezON5cs/9WhIuPQa6/b9uJWeCydfclHpvF4W+G3DibYX/o4PVBT1VnnLUilt4oimHKm7mRToSHz+2h09rOjjPvcFEhdmFVCjrJDd86fy72gHKMxfb6EBJ3e4QpUDt6SSLPHpimUhtUS7+Bis/BGHZE+WgjjBNy25P/TgN16d0=
+	t=1739631723; cv=none; b=e5rP6g61y7mE7+82dpfid/Eu8w0vCJrMC/XXPnlw03Uf7idIcJ+vdNrPB7jH4kO4PmG3/Bi635Omavu/ptI0NUeXdZ+YnR3qU3pKiDiAFh/t/5tnxOLur8e2qu/N/Q3Eh5Di3xAy8ygAeddDyOFkyWQ1e8XkYOD8P5hE8AfDmiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739631723; c=relaxed/simple;
-	bh=migc+/Y2aJXFVZi166UkMK87POYOQpgx2NfW5hQSCSk=;
+	bh=D49Oij77kNU/TzhivA/5mv71aVXgtxyHWjzVWpPaFPg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kbRg1b9z063dEuDcVRTYjeuFc1wqoKVyw90XBS6DurRPeK3VOfkAt+X7k0eBahNG5K3zdtv3YoXMh4a6NP7EVTl2/VhvkKC/INmsWZewftNUgkj/fgZzGVhTlDG62N8esEYcs2GqUm4GK4svtkqFUy6QW5Tl3CRHSUwtDdlTi6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E+wxmMx9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=j1FDxPMPFcUkk089u1i83RxWouwgDerHr9NcBq9BZSJG1PP8t1E1KGUiyggYCHxcHc0DfaDTublTSz7ljDgDOoC4MKUuDRpKejnZPiCMUC7HnIIV1L/XXjRGRWHT6gP8yW91AswZcWa36uC8I8Qvs0yJYUZl3XUDv4QYuWEXAHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YUNeio6+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E+wxmMx9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 929B7C4CEE6;
-	Sat, 15 Feb 2025 15:02:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YUNeio6+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29D6AC4CEEA;
+	Sat, 15 Feb 2025 15:02:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739631722;
-	bh=migc+/Y2aJXFVZi166UkMK87POYOQpgx2NfW5hQSCSk=;
+	s=k20201202; t=1739631723;
+	bh=D49Oij77kNU/TzhivA/5mv71aVXgtxyHWjzVWpPaFPg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=E+wxmMx9gMnxeSPyOc1vymSvsXablzAlkd/Qh4EM88UWpN9RIgIOC9NLXhITxeKwr
-	 C9zDcZ9+u1Q5MEEacPfc4TwFaRiCimSKRhs2zTTQ7K5qcHeB04nLqVWQ56SEK1Stoy
-	 U1IFCLjIo3dTP4fJppi/fsLZ4UL0CaBeqTNRUilG3xfmFdNVORTS1fozxbGIyBAh4b
-	 c6rC0NBfuQ51fblKIR6OjxCjHYFshQ33WKyfSn3wdoCB2Re+WwuQOuJOFDxq2aUZBv
-	 Lv54yPbcKBUmlwfC1JsrL3eEIPg6IgJWceaJ9DCwSELTzItwrPR0QUaRxmydUxR4NF
-	 h+BFLWjdalpZQ==
+	b=YUNeio6+OKWilLjwqsM5XeXfzwT8TxHTvAa9vHJCwqBs+z3/HKcRBZIUceNBYhhYn
+	 TC/dd1kA1X4bHH4m9fu4J0cb86oC+owM7PU8HluLZBpaVvdLdZ5uaysMwBfmUsudHq
+	 KbNJDtiqWAdEtn0fu3DZ66G0b6tdS5zFTic1OP/x5Mvhzk2e75XEx9sKmPXCheIfQD
+	 z0KUc+4KdKrvnYqhbGCqGCdxJbrtRPrCFW75E59sNsBm645SnEz8cH3/eE3C8io+yJ
+	 zRbC0rQjN5fGR6a7rSR+4achHwZ/zQ4PukCYj7dCEtaw0BuGzFDnMWo/CiGpXywNF0
+	 Z2fTAJKrlvq3w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tjJg8-004Nz6-Im;
-	Sat, 15 Feb 2025 15:02:00 +0000
+	id 1tjJg8-004Nz6-V0;
+	Sat, 15 Feb 2025 15:02:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 02/14] KVM: arm64: nv: Allocate VNCR page when required
-Date: Sat, 15 Feb 2025 15:01:22 +0000
-Message-Id: <20250215150134.3765791-3-maz@kernel.org>
+Subject: [PATCH 04/14] KVM: arm64: nv: Snapshot S1 ASID tagging information during walk
+Date: Sat, 15 Feb 2025 15:01:24 +0000
+Message-Id: <20250215150134.3765791-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250215150134.3765791-1-maz@kernel.org>
 References: <20250215150134.3765791-1-maz@kernel.org>
@@ -59,55 +59,72 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If running a NV guest on an ARMv8.4-NV capable system, let's
-allocate an additional page that will be used by the hypervisor
-to fulfill system register accesses.
+We currently completely ignore any sort of ASID tagging during a S1
+walk, as AT doesn't care about it.
+
+However, such information is required if we are going to create
+anything that looks like a TLB from this walk.
+
+Let's capture it both the nG and ASID information while walking
+the page tables.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 9 +++++++++
- arch/arm64/kvm/reset.c  | 1 +
- 2 files changed, 10 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h |  2 ++
+ arch/arm64/kvm/at.c                 | 27 +++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 0c9387d2f5070..952a1558f5214 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -54,6 +54,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 	struct kvm_s2_mmu *tmp;
- 	int num_mmus, ret = 0;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 43162f1dc4993..2bd315a59f283 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -273,6 +273,8 @@ struct s1_walk_result {
+ 			u64	pa;
+ 			s8	level;
+ 			u8	APTable;
++			bool	nG;
++			u16	asid;
+ 			bool	UXNTable;
+ 			bool	PXNTable;
+ 			bool	uwxn;
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index cded013587178..382847ce0c9b7 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -410,6 +410,33 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	wr->pa = desc & GENMASK(47, va_bottom);
+ 	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
  
-+	if (!vcpu->arch.ctxt.vncr_array)
-+		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
++	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
++	if (wr->nG) {
++		u64 asid_ttbr, tcr;
 +
-+	if (!vcpu->arch.ctxt.vncr_array)
-+		return -ENOMEM;
++		switch (wi->regime) {
++		case TR_EL10:
++			tcr = vcpu_read_sys_reg(vcpu, TCR_EL1);
++			asid_ttbr = ((tcr & TCR_A1) ?
++				     vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
++				     vcpu_read_sys_reg(vcpu, TTBR0_EL1));
++			break;
++		case TR_EL20:
++			tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
++			asid_ttbr = ((tcr & TCR_A1) ?
++				     vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
++				     vcpu_read_sys_reg(vcpu, TTBR0_EL2));
++			break;
++		default:
++			BUG();
++		}
 +
- 	/*
- 	 * Let's treat memory allocation failures as benign: If we fail to
- 	 * allocate anything, return an error and keep the allocated array
-@@ -84,6 +90,9 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 		for (int i = kvm->arch.nested_mmus_size; i < num_mmus; i++)
- 			kvm_free_stage2_pgd(&kvm->arch.nested_mmus[i]);
- 
-+		free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
-+		vcpu->arch.ctxt.vncr_array = NULL;
++		wr->asid = FIELD_GET(TTBR_ASID_MASK, asid_ttbr);
++		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
++		    !(tcr & TCR_ASID16))
++			wr->asid &= GENMASK(7, 0);
++	}
 +
- 		return ret;
- 	}
+ 	return 0;
  
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 803e11b0dc8f5..3c48527aef360 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -158,6 +158,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	if (sve_state)
- 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
- 	kfree(sve_state);
-+	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
- 	kfree(vcpu->arch.ccsidr);
- }
- 
+ addrsz:
 -- 
 2.39.2
 
