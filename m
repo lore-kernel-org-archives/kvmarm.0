@@ -1,113 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7CC17E4;
-	Sun, 16 Feb 2025 19:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F15942A96
+	for <kvmarm@lists.linux.dev>; Mon, 17 Feb 2025 04:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739732799; cv=none; b=r/UVHvm/f7oAx0I6g/Q/L6oOw9TJHh1BPBIwWwFFb+Pj5DNvuEpX0AfHkCJtguBK5DuKAN/Bpu2YbQQF/s8Kd99nC2wczG1pRv7nOkxxCik3Jv6Nh/9fOidPBg/O06hpXtngfewvy8xoTL8t72O/VEa645qFO66eoqeubUZnAHs=
+	t=1739766159; cv=none; b=LAX4EcKxP8Ltda6U5S5GrDu0kmin3imVXRNSzW/vka9RAg5gpk0z2BgARrottwXAzYYiUXXaLhTEsU1yXfMiky54kIXriafwgUiicsjAelQQOwzMpZoFIMsM/YvsDE0I7vVagQfimPzyk7d/XRYeadIf1ZwGdUrnnwvEbawrF4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739732799; c=relaxed/simple;
-	bh=O7NSxWzoeuFuIw1UPCPgZKMMHrar2/KGCtVfAJv3L4k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jgj8tG4vjPVh2iD1HiIKgg9wrprMQcOCr9KOlFXKw71INwMmS9fAfMvwkk1IHzAq4tPKHTCmksIvZzK2ZsJNdlD0OcRjpNOtg9bJvENHm2tK3sM5edXKKJH+sLlKXQ1hQ2toi6eJJIf60W/K0HsC4vFBygnYoFMDTs09+TSe7oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jd84Zb3U; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jd84Zb3U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D7DC4CEDD;
-	Sun, 16 Feb 2025 19:06:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739732798;
-	bh=O7NSxWzoeuFuIw1UPCPgZKMMHrar2/KGCtVfAJv3L4k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Jd84Zb3UF85llvUO8w/ChFisdlVk2JJiY4XicELTLblzQ0oTaMnn6JaMT7FkaaYAM
-	 BGikJ/njek2u+/qQ5XFs4YixT/ZpzZKjcH8FW2KUGM67M42DXTDQ3aJ4FDzzdjatRP
-	 xB00eyFHBfFBR7rljQRNrTj0SQRNQctdwzDT+P7IVLjbRnbgEEfh3FEfWplAD1wCdU
-	 JWVnKgIvm3xmMgMYmaGV3s2FbbS6aYYDj3RcDITQw6IXB1CW3tkHsVnuTVj4QuQYSm
-	 QmYX3FwZ00QjDODkWtBxvKHX2SjaqVefQFuS9aT8VTkbJLqMeQghiFObEBZC+q7rgv
-	 QHEwEZSIYurRw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tjjyO-004cDp-Cp;
-	Sun, 16 Feb 2025 19:06:36 +0000
-Date: Sun, 16 Feb 2025 19:06:36 +0000
-Message-ID: <87pljh1zgj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: luoyonggang@gmail.com
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Sebastian Ott <sebott@redhat.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1739766159; c=relaxed/simple;
+	bh=s0rzw+ZkXrpCuWf2kihPfwbrbzTX/Rb/M4+NMoo5fhs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CWkXrXktpOfT3AF5p+RQnzoE/A2XhdXxbVgKtxacXy2j/1jI8t6Nh2mRoKhLeO/YYCsH2mxBrE5AEioo/pNWbwwwv8QwtLahVgEXHzB+Dbw3722bAR7GcK5y2o7drbMO356bDca4tixPw8i/cQcu4LiBLP4IDdghlhK98okfgG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B2F21063;
+	Sun, 16 Feb 2025 20:22:48 -0800 (PST)
+Received: from a077893.blr.arm.com (unknown [10.162.16.135])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 473943F59E;
+	Sun, 16 Feb 2025 20:22:25 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-mm@kvack.org
+Cc: steven.price@arm.com,
+	christophe.leroy@csgroup.eu,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Allow userspace to change MIDR_EL1
-In-Reply-To: <CAE2XoE8i=jPgSea5jXY0eOxas9Y_2pa7QheqS1xuw2qeTQDNyw@mail.gmail.com>
-References: <20250211143910.16775-1-sebott@redhat.com>
-	<20250211143910.16775-2-sebott@redhat.com>
-	<Z7BoydkyT_h0gwOV@linux.dev>
-	<CAE2XoE_8ihJZQF856w-_F+cgJW7fLWGz7M7Ztoxzw2vE51_m1A@mail.gmail.com>
-	<87v7tb17os.wl-maz@kernel.org>
-	<CAE2XoE9=hjP+qpsy+FcYcSDectDajiXjtcMCVpacSo4cFOo=tQ@mail.gmail.com>
-	<86jz9psqwd.wl-maz@kernel.org>
-	<CAE2XoE8i=jPgSea5jXY0eOxas9Y_2pa7QheqS1xuw2qeTQDNyw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: [PATCH V2 0/5] mm: Rework generic PTDUMP configs
+Date: Mon, 17 Feb 2025 09:52:15 +0530
+Message-Id: <20250217042220.32920-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: luoyonggang@gmail.com, oliver.upton@linux.dev, sebott@redhat.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, shameerali.kolothum.thodi@huawei.com, cohuck@redhat.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sun, 16 Feb 2025 18:55:23 +0000,
-"=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)" <luoyonggang@gmail.com> wrote:
->=20
-> On Mon, Feb 17, 2025 at 2:09=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Sat, 15 Feb 2025 19:04:20 +0000,
-> > "=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)" <luoyonggang@gmail.com> wro=
-te:
-> > >
-> > > According to this, the MIDR EL1 is updated properly, but the MIDR for
-> > > aarch32 is not updated, and I don't know how to hook the update for
-> > > MIDR for aarch32
-> >
-> > It is the same thing. The AArch32 view is configured the same way as
-> > the AArch64 view, and there is nothing to do at all (that's what
-> > VPIDR_EL2 is all about).
-> >
-> > With Oliver's change, I'm correctly getting a different MIDR using a
-> > hacked up kvmtool, see below. I suspect you're not running with the
-> > correct patch applied.
-> >
-> The applied patch is V2, with writing vpidr_el2 disabled, Is that the cau=
-se?
-> The branch is here
-> https://github.com/lygstate/linux/tree/main
-> I am not applying your patch
+The series reworks generic PTDUMP configs before eventually renaming them
+after some basic clean ups first. This is derived after splitting changes
+from the following patch.
 
-Well, there is no magic. If you don't write to VPIDR_EL2, not much
-will happen. You need to apply Oliver's change instead of the first
-patch in this series.
+https://lore.kernel.org/all/20250205050039.1506377-1-anshuman.khandual@arm.com/
 
-	M.
+This series applies on v6.14-rc3 and has been tested on arm64. Although it
+also builds on other platforms as well.
 
---=20
-Without deviation from the norm, progress is not possible.
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-riscv@lists.infradead.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: linux-kernel@vger.kernel.org
+
+Changes in V2:
+
+- Dropped the patch "mm: Make GENERIC_PTDUMP dependent on MMU"
+- Dropped GENERIC_PTDUMP from mpc885_ads_defconfig
+- Dropped PTDUMP config options from ptdump.rst
+
+Changes in V1:
+
+https://lore.kernel.org/all/20250213040934.3245750-1-anshuman.khandual@arm.com/
+
+Anshuman Khandual (5):
+  configs: Drop GENERIC_PTDUMP from debug.config
+  arch/powerpc: Drop GENERIC_PTDUMP from mpc885_ads_defconfig
+  docs: arm64: Drop PTDUMP config options from ptdump.rst
+  mm: Make DEBUG_WX depdendent on GENERIC_PTDUMP
+  mm: Rename GENERIC_PTDUMP and PTDUMP_CORE
+
+ Documentation/arch/arm64/ptdump.rst       |  2 --
+ arch/arm64/Kconfig                        |  2 +-
+ arch/arm64/include/asm/ptdump.h           |  4 ++--
+ arch/arm64/kvm/Kconfig                    |  4 ++--
+ arch/arm64/mm/Makefile                    |  2 +-
+ arch/powerpc/Kconfig                      |  2 +-
+ arch/powerpc/configs/mpc885_ads_defconfig |  1 -
+ arch/powerpc/mm/Makefile                  |  2 +-
+ arch/riscv/Kconfig                        |  2 +-
+ arch/riscv/mm/Makefile                    |  2 +-
+ arch/s390/Kconfig                         |  2 +-
+ arch/s390/mm/Makefile                     |  2 +-
+ arch/x86/Kconfig                          |  2 +-
+ arch/x86/Kconfig.debug                    |  2 +-
+ arch/x86/mm/Makefile                      |  2 +-
+ kernel/configs/debug.config               |  1 -
+ mm/Kconfig.debug                          | 11 ++++++-----
+ mm/Makefile                               |  2 +-
+ 18 files changed, 22 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
