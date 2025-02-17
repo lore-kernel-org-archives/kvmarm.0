@@ -1,124 +1,200 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9748018F2C3
-	for <kvmarm@lists.linux.dev>; Mon, 17 Feb 2025 06:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC61F155316;
+	Mon, 17 Feb 2025 09:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739774466; cv=none; b=ZuN152DYdWLqynwvZDyR9tI0mKAo1ND7BelXh/Ku89weuNFgz98sFflBRGf9c03v3S7o1O29XhxGMJgjapPdgOgmVceao6VYvcLT7lCOyS6rPzmB09HnFxz4z8U/Is1eu1udXnioufqAD3qxm+SCV5b+p8o4bdMlOC8mTCOH4D0=
+	t=1739785050; cv=none; b=eOF57wjaWMud+R4I8GvA+yfMyNkrVfsCUOG6HniS3v7yzZ0Qy+ZK3y1wu60UFNrYVspc2OFWnc8uirjvDGt/slQKHr3Poo6kljfgS0VURWhOWVm4CCSScWbA5OTYHqU5n9JAqo99vkskuryHKP+rV4efEA5J5AxxCJKMIhACTAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739774466; c=relaxed/simple;
-	bh=QyVtFU0xdpInEPYan+aOJEYUTEb5vp2F9nMoL/TtoMQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rNggD819tVBySihiM9PcKx+9G6knhm04BLMVskUBTW1rzCXsyJSI8xbtQH39tp7FnReHu7aYdWMJd5Fa8wXiYCAhtTVt112rEgVfzD3t6iUiKJXGSjwm4nAu9g+NDeDn9krxIYRYKcd1fxfTifaTuDOS/ODu22GlFE+7djV4X/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lsf9tekV; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739785050; c=relaxed/simple;
+	bh=AZCs5g8Mralms5Xjea2hMqxAgz+/0HZ4sntHHhpsj9s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=en1YhjzqeLj/lQXy1IEnSLUv/WjdvMeHQd/A3O0FCY90x+3vJndO6y9PuLORmxh+dp9vrFEo084no5JoJTr+mV7lWfGvps1yQjOL9C1+IKo3pWySoJMUycQCllC6KuUWt+41vbet5DsGFq3V1aNIBvTnx9L+9b3XeIXZdyqFuSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RH6llmNi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lsf9tekV"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-abb79af88afso262896166b.1
-        for <kvmarm@lists.linux.dev>; Sun, 16 Feb 2025 22:41:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739774463; x=1740379263; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9BlNWjMvH32bt0VwRarRhttzzRaU06jOP281HprHsXs=;
-        b=Lsf9tekVpbvPMR+Ep1dkfC6jgk/URCWvRuIrgpwvglrNyI6apVevb64m7RtChZN3nO
-         LgkISnO79F31sG5UR2FQ1YLVyOF7IrZA2zMkXvemTI4tD7EcqrFLsdtrVTt0kdXTPGp8
-         QewzYHkRoJ7GnM3PRAyC0DRB8Swx90PERZAADOM9Q7aQvvIPjgbIPAt0e73nSUvEl/It
-         /5u/orEIdZ85mXCgem5WCJYz7qAK4swh0MEKtJ/wI3UO03WJ+GEl758NyWqIStLccWMo
-         pKo0xcLuI7iwhXRXIJTN5blSicv2cDdTRGnViXwUMWlfRfrDq1VB1FAwzJZsvm2Wy88D
-         QDTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739774463; x=1740379263;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9BlNWjMvH32bt0VwRarRhttzzRaU06jOP281HprHsXs=;
-        b=PMMKcxJS81ip1C+zXOD21iCBJ5kI67iG/8faRdMGXKe20H6DNZprhCGB1DMmEHIqLB
-         uqkXThlz535FOc6debiFxj5STEC4LWHOaoMcwBYkhPFZltk7eFAigxjJUzDKYpvrq4h8
-         VzcXvWFVlC7EaM9UsihWz4Rz8eNzly2VMcBTmzzEO/DRbiagYa3gfelKDahk5qoOezKI
-         dNk95acfF+XimbsF2dbuG5LA/lEnGJXfyBLam8VNtPJwfq0B+mzGxPFESKrOHNvxfLoU
-         WXuhcz4CFEluBCS7J8J59QEb6oC58/6/ZhXIaxakPCX7LlZejx2g1h1Xy7RcEEUToJ2z
-         Up+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVd8hTpMyRF8l9tsxuennwRXZb1Or3hbfTDmH/AjUMlHZObFdRrYeCxmgYLlbyQFgxS5NcgUPc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw0gKSKlDzR11kzEsf7kJYqGkCZ8vfa740Y9UHOTWFCLaPvnIrW
-	TkqKboQuQ9oQxub77qW0qAEqxUmNKc0XGJ3hVNBas7IGr73lvzwKO6XGwesEB416g/gOPPMjE8W
-	nTmyP+EqewMMJz+HGhyVF6tzYs68=
-X-Gm-Gg: ASbGncvLFRF0TERis0kPyFmhvxkaEu8Lh6IS+akhJGdU4bbHaNLx6x3rHLGDdmwUzW+
-	HFG3Fz3KRZqXRkNpMEqrX8YfANeJ4ZQU9tsC/hhagg22utL8jAHK9EuXk0rzhV6chU4zFNfLP
-X-Google-Smtp-Source: AGHT+IHEblpWy0E8o/GwtXXK/ARtPn4+t2mJ/jkAoJv43EWaA0zUoUZ//XGdmh3n9p1/b1WAK7vkij5W6JHPpq2qDSI=
-X-Received: by 2002:a17:906:7312:b0:ab7:6c4b:920a with SMTP id
- a640c23a62f3a-abb70a7a67emr862003466b.6.1739774462705; Sun, 16 Feb 2025
- 22:41:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RH6llmNi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 258C1C4CED1;
+	Mon, 17 Feb 2025 09:37:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739785049;
+	bh=AZCs5g8Mralms5Xjea2hMqxAgz+/0HZ4sntHHhpsj9s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RH6llmNifW/GIp1YLSH29+A+9o7u8I2E0W3EyKFXLU1MKdiVZlTSttctViCPDEaJo
+	 MSIIzZbfDvaacMB1GK9oIeii0mbPtrcxYzLiAZOaZRSZdWUnyLm4ByZd3t4CH+U7CU
+	 gsoVw7xBdahqHquX6A0YTxXvsgT5mSVnTGO5uyb0C+aqHQtt8njJ8vi+P6XBxPbAkR
+	 3dgdnwqQ2dQ3CXZDE9IHiEV50BsIu6jt2W/y2pWE6six45KfPb7KAShqDFWq6JNn2L
+	 zlKe+Av4bNn/RPTMlp6lUbfdyMM0xMJxjueXRziyc6atx+8Ki923PlfQ97JSRVrDI7
+	 gl3zTX1ukcHkA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tjxZ8-004zmI-N1;
+	Mon, 17 Feb 2025 09:37:26 +0000
+Date: Mon, 17 Feb 2025 09:37:26 +0000
+Message-ID: <86h64ssyi1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in non-protected guests
+In-Reply-To: <Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
+References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
+	<86pljkswuk.wl-maz@kernel.org>
+	<Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250211143910.16775-1-sebott@redhat.com> <20250211143910.16775-2-sebott@redhat.com>
- <Z7BoydkyT_h0gwOV@linux.dev> <CAE2XoE_8ihJZQF856w-_F+cgJW7fLWGz7M7Ztoxzw2vE51_m1A@mail.gmail.com>
- <87v7tb17os.wl-maz@kernel.org> <CAE2XoE9=hjP+qpsy+FcYcSDectDajiXjtcMCVpacSo4cFOo=tQ@mail.gmail.com>
- <86jz9psqwd.wl-maz@kernel.org> <CAE2XoE8i=jPgSea5jXY0eOxas9Y_2pa7QheqS1xuw2qeTQDNyw@mail.gmail.com>
- <87pljh1zgj.wl-maz@kernel.org>
-In-Reply-To: <87pljh1zgj.wl-maz@kernel.org>
-Reply-To: luoyonggang@gmail.com
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 17 Feb 2025 14:40:51 +0800
-X-Gm-Features: AWEUYZnfZwhUG_EoRZ2LP7nC3OQtiJSnvldFjppzrrBppJQq32TWm_4wX3cJYI4
-Message-ID: <CAE2XoE9Xc0CeNiRZnwANU2Q9Mbg6f0hCOyrkNA+h5Jp-2mrsBA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Allow userspace to change MIDR_EL1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Sebastian Ott <sebott@redhat.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
-	Cornelia Huck <cohuck@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-> Well, there is no magic. If you don't write to VPIDR_EL2, not much
-> will happen. You need to apply Oliver's change instead of the first
-> patch in this series.
+On Fri, 14 Feb 2025 15:13:52 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Fri, Feb 14, 2025 at 09:24:03AM +0000, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> > Just to be clear: I do not intend to review a series that doesn't
+> > cover the full gamut of KVM from day 1. Protected mode is an absolute
+> > requirement. It is the largest KVM deployment, and Android phones the
+> > only commonly available platform with SME. If CCA gets merged prior to
+> > SME support, supporting it will also be a requirement.
+> 
+> OK, no problem.  This is a new requirement and I'd been trying to
+> balance the concerns people have with the size of serieses like this
+> with the need to get everything in, my plan had been to follow up as
+> soon as possible with pKVM.
 
-Thanks, after applying Oliver's change, it's working, my concern post
-at the beginning is to ask if
- Oliver's can resolve the issue:)
-Now after testing Oliver's change, it's working, thanks
-Sebastian,Oliver and Marc Zyngier:)
+If size is an issue, split the UAPI from the core code. But don't
+fragment the overall world switch and exception handling, because
+that's a sure way to end-up with the same sort of problems we ended up
+fixing in SVE. pKVM has a direct influence on what you track, where
+you track it, and implementing it as an afterthought is a very bad
+idea.
 
-My test result now is:
-```
-/home/lygstate/work/qemu/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/us=
-r/bin:/sbin:/bin
-/home/lygstate/work/qemu/build/qemu-system-aarch64
-+ qemu-system-aarch64 -cpu host,aarch64=3Doff -accel kvm -m 1024M -smp 1
--M virt,gic-version=3D3,midr=3D0x412fd050 -nographic -monitor none -serial
-stdio -kernel /home/lygstate/work/debian/arm64-kvm-hello-world/bare-metal-a=
-arch32-qemu/hello_world.elf
-Get MIDR EL1 origin:0x410fd083
-Set MIDR EL1:0x412fd050
-Get MIDR EL1:0x412fd050
-Hello World midr:0x412fd050
-```
+> 
+> > > Access to the floating point registers follows the architecture:
+> 
+> > >  - When both SVE and SME are present:
+> > >    - If PSTATE.SM == 0 the vector length used for the Z and P registers
+> > >      is the SVE vector length.
+> > >    - If PSTATE.SM == 1 the vector length used for the Z and P registers
+> > >      is the SME vector length.
+> > >  - If only SME is present:
+> > >    - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
+> > >      floating point state accessed via the encodings for the V registers. 
+> > >    - If PSTATE.SM == 1 the vector length used for the Z and P registers
+> > >  - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
+> 
+> > > The VMM must understand this, in particular when loading state SVCR
+> > > should be configured before other state.
+> 
+> > Why SVCR? This isn't a register, just an architected accessor to
+> > PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
+> > don't understand this requirement.
+> 
+> Could you be more explicit as to what you mean by direct access to
+> PSTATE here?  The direct access to these PSTATE fields is in the form of
+> SVCR register accesses, or writes via SMSTART or SMSTOP instructions
+> when executing code - is there another access mechanism I'm not aware of
+> here?  They don't appear in SPSR.  Or is this a terminology issue with
+> referring to SVCR as the mechanism for configuring PSTATE.{SM,ZA}
+> without explicitly calling out that that's what's happening?
 
+I'm painfully aware of the architecture limitations.
+
+However, I don't get your mention of SPSR here. The architecture is
+quite clear that PSTATE is where these bits are held, that they are
+not propagated anywhere else, and that's where userspace should expect
+to find them.
+
+The fact that SW must use SVCR to alter PSTATE.{ZA,SM} doesn't matter.
+We save/restore registers, not accessors. If this means we need to
+play a dance when the VMM accesses PSTATE to reconciliate KVM's
+internal view with the userspace view, so be it.
+
+It probably means you need to obtain a clarification of the
+architecture to define *where* these bits are stored in PSTATE,
+because that's not currently defined.
 
 >
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> > Isn't it that there is simply a dependency between restoring PSTATE
+> > and any of the vector stuff? Also, how do you preserve the current ABI
+> > that do not have this requirement?
+> 
+> Yes, that's the dependency - I'm spelling out explicitly what changes in
+> the register view when PSTATE.{SM,ZA} are restored.  This ABI is what
+> you appeared to be asking for the last time we discussed this.
+> Previously I had also proposed either:
+> 
+>  - Exposing the streaming mode view of the register state as separate
+>    registers, selecting between the standard and streaming views for
+>    load/save based on the mode when the guest runs and clearing the
+>    inactive registers on userspace access.
+> 
+>  - Always presenting userspace with the largest available vector length,
+>    zero padding when userspace reads and discarding unused high bits
+>    when loading into the registers for the guest.  This ends up
+>    requiring rewriting between VLs, or to/from FPSIMD format, around
+>    periods of userspace access since when normally executing and context
+>    switching the guest we want to store the data in the native format
+>    for the current PSTATE.SM for performance.
+> 
+> both of which largely avoid the ordering requirements but add complexity
+> to the implementation, and memory overhead in the first case.  I'd
+> originally implemented the second case, that seems the best of the
+> available options to me.  You weren't happy with these options and said
+> that we should not translate register formats and always use the current
+> mode for the vCPU, but given that changing PSTATE.SM changes the
+> register sizes that ends up creating an ordering requirement.  You
+> seemed to agree that it was reasonable to have an ordering requirement
+> with PSTATE.SM so long as it only came when SME had been explicitly
+> enabled.
+> 
+> Would you prefer:
+> 
+>  - Changing the register view based on the current value of PSTATE.SM.
+>  - Exposing streaming mode Z and P as separate registers.
+>  - Exposing the existing Z and P registers with the maximum S?E VL.
+> 
+> or some other option?
 
+My take on this hasn't changed. I want to see something that behaves
+*exactly* like the architecture defines the expected behaviour of a
+CPU.
 
+But you still haven't answered my question: How is the *current* ABI
+preserved? Does it require *not* selecting SME? Does it require
+anything else? I'm expecting simple answers to simple questions, not a
+wall of text describing something that is not emulating the
+architecture.
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
