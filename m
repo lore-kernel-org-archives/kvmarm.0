@@ -1,109 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6382421773E
-	for <kvmarm@lists.linux.dev>; Mon, 17 Feb 2025 11:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A48148832
+	for <kvmarm@lists.linux.dev>; Mon, 17 Feb 2025 15:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739791459; cv=none; b=r62SK9IgPMk211ynF61vuvi8sli/mHWMa8JpiskQ5Qiyaoo2kEz/VgchFfT9hNHlKTIf9IpJJ5Q5/WZKwOgBQsVSQDTZCZe0vVvuKNx/YhmSkv13eaCUUywD6mjOYJktE647P/k5Me51cXCCAx6YZ4qdYx9WL0gE+R3gYesoQPE=
+	t=1739804783; cv=none; b=AhrkKFbvj6QalSriHxSRh5lReY72n8Iw98p+EbCYrujqYGUPkULr0dbO4+cwPgT7UKWJ3xQYH2eATOS8HF2uyo3YNLcp3O9vbkxxTkDLAnyEPdXG/XqpQDDDXk3SFeGKHJYNH08M2TevaddoWpNuWHgQT3EOe+xbpRlTsMmHQFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739791459; c=relaxed/simple;
-	bh=/biC/eqcOUoVMy3qZKQSnx5pVvZiHxABcWjEY3QBkbc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lHWV8zRFm9+5cncXl5XztDbfncZaKLcRCRZg1jy3uNhI/NuePYFyIlecJ+CJL5OpZsE39QgGi8qKy2pdNzaBsOz+Vf1LwJMdkME+IL7sxJFU8R/36ofZI30giyAYcZcZCmMgcR1bnSivysJ4KsZ1kWi0Ot9TSxjPrs5/E8GsXqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbqfxHrm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739804783; c=relaxed/simple;
+	bh=INWds5QQuqynn3QPpkRTgci6yvzjpymnUwqXmd6yz5k=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=p5PzoLNprNh4jcoS16LEjWnRrkkr5clTr0r+S9am721Zmax5lM58i1MoY2WJaxGtjeA7XMO/bhh0sjVVz2k4dvv3b3iAz+aR7U83hoVd//lXGVGs8kiA/6nfYC1xdaud6M8FQhhtwSOKiia2RAgktNaNkeGTeG7PlppN7ODrMQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JR8wWPic; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbqfxHrm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A81C4CED1;
-	Mon, 17 Feb 2025 11:24:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739791458;
-	bh=/biC/eqcOUoVMy3qZKQSnx5pVvZiHxABcWjEY3QBkbc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tbqfxHrmf0TOXfFVgtSmwzLA/tcyzE7tEqQ4PYUYqCJPjJ8SCRugxWnSEzE6gxE8s
-	 TcI5I7MdzoDRAKJ+GGVuTuRF1RI1P9njj+6c2pB72ow2xHnMA6b7Frzg22JWpTlZjy
-	 Ew1aWOsiwdHJbk4R5MnMF/jIAMxciw17hz3CQyglLZj6sTrsrVEbg2c7ctUhtP9hRi
-	 /kulcNhPH7BJzuCjR+8S5SPZpBu8Egn95yRbv2W7Blamoo99w1+QuM2uy2yJ3wKVlp
-	 bl4Jgp+v8X2ZZUi1gUu7bBXHrTM3/Ae6hKZKoPZZx4dXtXKmIAVbO90S00mGR6Da4X
-	 AYyZZib4jdUXg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tjzEX-0052DP-4q;
-	Mon, 17 Feb 2025 11:24:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/2] KVM: arm64: Contextualise the handling of PMCR_EL0.P writes
-Date: Mon, 17 Feb 2025 11:24:12 +0000
-Message-Id: <20250217112412.3963324-3-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250217112412.3963324-1-maz@kernel.org>
-References: <20250217112412.3963324-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JR8wWPic"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739804781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cIhN0R5QlN5gfMPD8y/C9Ok4w/DGGUuFXTQ4OChy43E=;
+	b=JR8wWPic3TySoWxnOWoSu1KnHpro9Z5373oWQpE0wO3fk/8qAtdP49Tm2huVW530m2D9Jf
+	KFmUSrDKV6RHEPKbLO8L0XnfiQTM7QbyMR0oBqoybWaBvPRS1sNLQDlymdhEQnx0M0CjZ8
+	4a++msOXHqrjaqTppAmmZfQS5eVGXVw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-KL5B8tjMPWyp70lFDhZnqA-1; Mon, 17 Feb 2025 10:06:19 -0500
+X-MC-Unique: KL5B8tjMPWyp70lFDhZnqA-1
+X-Mimecast-MFC-AGG-ID: KL5B8tjMPWyp70lFDhZnqA_1739804779
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4393535043bso25682705e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Feb 2025 07:06:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739804778; x=1740409578;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cIhN0R5QlN5gfMPD8y/C9Ok4w/DGGUuFXTQ4OChy43E=;
+        b=jyZK8IecqfB8ocYWKGj++/IRuFSJ4GRxWGy/pZbfvviLNuM0okkuRzl6eM7mzDcdm3
+         53kQVttGfnTW8gtsP5dZhVZ2XzGctvzY6ZQ0mVLtUJZDCkmxUFSlmhOfaqjLsZAU7ZB+
+         L6JxUFe2Go9HLJGzZxtcCRxgxpMq0H1uLKhYLGlKFka2HxkaITuG6IFr8aHaqFNrgtfV
+         J494QHSVwZlPw+bB2S3nBoQ53WLWOzEBviGNjVCuqX004QXu2ujlO4YxdoI60ir3EqkW
+         wXG2vApBcS81tmc4dqRcXS7rAMAjFOLkObHK3/GQi37ti83RgYvZ8iNDbcM5qvaaSw9v
+         Ho3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXr6u0wj/DW67Ur0OhHalLSuSmgxAx59m/UCH8D3+ZygxDt/bkPdZW2OAjOBNkzCMFBw+puwF8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyvjJY4YLvcszfmqE1mM1Od3LpC42Wi+1/2RUb1Pg6V5cT2Mh4L
+	wvo+XTHuHiONPVXyHY5Ap4uct3KhEiVJsjyd8rMyP4xRlsIuNm9CTUCLaivR8xmNcHoHO/5uCn5
+	PmZ6OtyiMNmlI6bOj6mQU/gxzh6QYP3Lbg2IKxgIec3jTTvvp6jlyfg==
+X-Gm-Gg: ASbGncuLool5zNxm/P3aR2m0WEUd4R6OFAqS7LtGSHjUfmdiWgRr7s6ooEchNUI9TtI
+	vfZ4w1laHcIKsc36Npn+jnFquBvXvdRghOA1fWqkOmEkLcVen7cAON2Xc+eCN7OaiSVLltCYCFA
+	y5gg+fXIIKqaROX3PMJjQo75mm7Cb6GdkvUmQ0tENLsUVwMMJX9uBOZwbOsYRa9XG/kijx9P6YT
+	tOmr8plnnDtBSyC6gK9aOrj4sozhTlyJlBVYcFe+np4G/UT6DW6IE3JlElwlznMae5GsBUYXOhI
+	hwWsi/jvbYZcp/RJS/q4qOOd4VVmgUW1TNej/rrTvmGJyMLWh8W4IQ==
+X-Received: by 2002:a05:600c:1784:b0:439:5fa1:af56 with SMTP id 5b1f17b1804b1-43960bbfd9fmr182694385e9.2.1739804778572;
+        Mon, 17 Feb 2025 07:06:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEVu6DcpgSOODbx4M+M3zf9KaHfo6c0Pz4pVxnIXGaBPyQrP1BWzFL6eAilUcGtKBfEe91Usw==
+X-Received: by 2002:a05:600c:1784:b0:439:5fa1:af56 with SMTP id 5b1f17b1804b1-43960bbfd9fmr182693755e9.2.1739804778154;
+        Mon, 17 Feb 2025 07:06:18 -0800 (PST)
+Received: from rh (p200300f6af0e4d00dda53016e366575f.dip0.t-ipconnect.de. [2003:f6:af0e:4d00:dda5:3016:e366:575f])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259d5c29sm12533867f8f.72.2025.02.17.07.06.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2025 07:06:17 -0800 (PST)
+Date: Mon, 17 Feb 2025 16:06:16 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Zenghui Yu <yuzenghui@huawei.com>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+    Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
+    Cornelia Huck <cohuck@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
+    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Allow userspace to change MIDR_EL1
+In-Reply-To: <Z7BoydkyT_h0gwOV@linux.dev>
+Message-ID: <afac82bb-2d7d-66d0-cdb8-d8e3471a2bed@redhat.com>
+References: <20250211143910.16775-1-sebott@redhat.com> <20250211143910.16775-2-sebott@redhat.com> <Z7BoydkyT_h0gwOV@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: gwlsz-wADaABMMhDCnViBGPMVNxSs-lSy5TfVE-_0sM_1739804779
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-Contrary to what the comment says in kvm_pmu_handle_pmcr(),
-writing PMCR_EL0.P==1 has the following effects:
+Hello Oliver,
 
-<quote>
-The event counters affected by this field are:
-  * All event counters in the first range.
-  * If any of the following are true, all event counters in the second
-    range:
-    - EL2 is disabled or not implemented in the current Security state.
-    - The PE is executing at EL2 or EL3.
-</quote>
+On Sat, 15 Feb 2025, Oliver Upton wrote:
+> On Tue, Feb 11, 2025 at 03:39:07PM +0100, Sebastian Ott wrote:
+>> +static int set_id_reg_non_ftr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>> +			      u64 val)
+>> +{
+>> +	u32 id = reg_to_encoding(rd);
+>> +	int ret;
+>> +
+>> +	mutex_lock(&vcpu->kvm->arch.config_lock);
+>
+> There's quite a few early outs, guard() might be a better fit than
+> explicitly dropping the lock.
 
-where the "first range" represent the counters in the [0..HPMN-1]
-range, and the "second range" the counters in the [HPMN..MAX] range.
+Yea, I thought about that too but most of the other functions in that file
+use the classic lock primitives. But you're right - it looks cleaner.
 
-It so appears that writing P from EL2 should nuke all counters,
-and not just the "guest" view. Just do that, and nuke the misleading
-comment.
+>
+>> +	/*
+>> +	 * Since guest access to MIDR_EL1 is not trapped
+>> +	 * set up VPIDR_EL2 to hold the MIDR_EL1 value.
+>> +	 */
+>> +	if (id == SYS_MIDR_EL1)
+>> +		write_sysreg(val, vpidr_el2);
+>
+> This is problematic for a couple reasons:
+>
+> - If the kernel isn't running at EL2, VPIDR_EL2 is undefined
+>
+> - VPIDR_EL2 needs to be handled as part of the vCPU context, not
+>   written to without a running vCPU. What would happen if two vCPUs
+>   have different MIDR values?
 
-Reported-by: Joey Gouly <joey.gouly@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/pmu-emul.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+Indeed. Sry, I hadn't thought about that. That makes much more sense now.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 5a71c3744c4d7..636cae89310cd 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -617,14 +617,12 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
- 
- 	if (val & ARMV8_PMU_PMCR_P) {
--		/*
--		 * Unlike other PMU sysregs, the controls in PMCR_EL0 always apply
--		 * to the 'guest' range of counters and never the 'hyp' range.
--		 */
- 		unsigned long mask = kvm_pmu_implemented_counter_mask(vcpu) &
--				     ~kvm_pmu_hyp_counter_mask(vcpu) &
- 				     ~BIT(ARMV8_PMU_CYCLE_IDX);
- 
-+		if (!vcpu_is_el2(vcpu))
-+			mask &= ~kvm_pmu_hyp_counter_mask(vcpu);
-+
- 		for_each_set_bit(i, &mask, 32)
- 			kvm_pmu_set_pmc_value(kvm_vcpu_idx_to_pmc(vcpu, i), 0, true);
- 	}
--- 
-2.39.2
+> Here's a new diff with some hacks thrown in to handle VPIDR_EL2
+> correctly. Very lightly tested :)
+
+Thank you very much! I've integrated that and currently run some tests
+with it.
+
+Sebastian
 
