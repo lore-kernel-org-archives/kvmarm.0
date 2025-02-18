@@ -1,112 +1,151 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16D51ADC81
-	for <kvmarm@lists.linux.dev>; Tue, 18 Feb 2025 07:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5B922FADE
+	for <kvmarm@lists.linux.dev>; Tue, 18 Feb 2025 09:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739864458; cv=none; b=Mm6Wxkpv5TjAOysB6D6rWvwmJSWQr4ztCXwLr1+BpH/uXjd6X0rhqY2vsInsSp6GPbGe1J2F2j3z9wXhD5VaOu/2n6yk27u8fDYfVDKk2bv+Nhhk2hisVo2tk9GdrQJRgEv3GtN8dx11G/5PnEZYKOlA1OUsaVpFHwI4/d8CAis=
+	t=1739870833; cv=none; b=ufPHwBc21skFG4qWrTDjkGyTts2QgjJcSr5p2ZagVGK4O/zzgV2pqcrArYur8iZUDwzxl1HRl/D4zOHvOkBt++m8IsL6y+OuYUnnHtcI1KOw2e5moH4P14PooM6tqsnLtliEDkY+XPqOXdnNMgu9gE9+AxiC6gTtigphp+T0PLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739864458; c=relaxed/simple;
-	bh=NU3The1APhQsLBU7n9+PEhO2idSxzQOTpZ79T4UM9+4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nL7Y/x+PSOfFbj1KxcK6Bx+bvV5F2DtLvycw+HaAUTNPdxikHAl4XzE+U6tyYYt2EgwB2CvC7eSUSW9pXkN5He68XBUIx5U+659vJb2/CEt65LNjgQ51906tFIgY5oKoCLwvQfclRzd05wpm75BbLr0SvcjAoJWPawE8RwcwIGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Yxrwj6pG9z6M4Rv;
-	Tue, 18 Feb 2025 15:38:13 +0800 (CST)
-Received: from frapeml100007.china.huawei.com (unknown [7.182.85.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id 45E66140B2F;
-	Tue, 18 Feb 2025 15:40:48 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml100007.china.huawei.com (7.182.85.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 18 Feb 2025 08:40:47 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Tue, 18 Feb 2025 08:40:47 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>, "cohuck@redhat.com"
-	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
-	yuzenghui <yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-	jiangkunkun <jiangkunkun@huawei.com>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH v7 4/5] smccc/kvm_guest: Enable errata based on
- implementation CPUs
-Thread-Topic: [PATCH v7 4/5] smccc/kvm_guest: Enable errata based on
- implementation CPUs
-Thread-Index: AQHbfvRxSJOyGnvtKEOdLroufJhHY7NG57AAgAAIvwCABcIT8A==
-Date: Tue, 18 Feb 2025 07:40:47 +0000
-Message-ID: <0557f193756f45daac4349c30d8f2f8f@huawei.com>
-References: <20250214151343.61348-1-shameerali.kolothum.thodi@huawei.com>
-	<20250214151343.61348-5-shameerali.kolothum.thodi@huawei.com>
-	<10831a79-a21f-dc40-a374-81b300d26dac@redhat.com>
- <86mseoscif.wl-maz@kernel.org>
-In-Reply-To: <86mseoscif.wl-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1739870833; c=relaxed/simple;
+	bh=JrYbhojwammNTDB88kS1BUeIuQnP9/YVGBIojkvxi2I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B9b9NGX2IDZOkq74Sou/VXpdYoMSIdeVz49s113zBLzi7Z14LNzLTNDczNTRJOZKBKX/uUTkBtL43IvXwr+wcmfS9aVKu9EmFmb6hv4Wn+K/hV0xVaRrHtwlBltmSm0r05T2bwNsXbCjMVXJ+/5mMjITq7oXt03+zuT83SZvs+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ma/AH0zR; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ma/AH0zR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C550C4CEE2;
+	Tue, 18 Feb 2025 09:27:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739870832;
+	bh=JrYbhojwammNTDB88kS1BUeIuQnP9/YVGBIojkvxi2I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ma/AH0zRhGFf9Ao4DzuLTR+VTa/9xUo0Nve+1JDMxuL9EML4AHklxkuVG39To+fV2
+	 qOvhwMCK+IffyMXbnN0c02EylqqY3jewSaVCmo89zTTs0x7onPC1ECHRrOD1VADyBm
+	 r7xOF5Y6huD6AWm1LXU1d0/qeDMGapXJbpWhplZJxo+rpfGsuGJCb4Hh1T8qWosTYP
+	 v9YtuqgpNo6eh7wRxzwh5pMjz8zvjDsUXA69Dan7I50goAl1Oe588Ucu6+4Kz9jKRk
+	 QPvNTYOjZypRU6WFoBFYbBSP8GQ3nGbh5X6/Vx824Z27OOXvUL7w+2MP8m4oqesmC7
+	 nANU4/nDoi29Q==
+Date: Tue, 18 Feb 2025 09:27:06 +0000
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Create each pKVM hyp vcpu after its
+ corresponding host vcpu
+Message-ID: <20250218092705.GA17030@willie-the-truck>
+References: <20250214150258.464798-1-tabba@google.com>
+ <20250214150258.464798-4-tabba@google.com>
+ <20250217153031.GA16398@willie-the-truck>
+ <CA+EHjTyOk_VpcTaD-VsH9X7KjpPKWu-HyVE3EEV+rzhnHar84A@mail.gmail.com>
+ <CA+EHjTzLW1HiiPr+=vStMYJcYEHUBFcEy_YMT3uJuLRA3zDzEw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTzLW1HiiPr+=vStMYJcYEHUBFcEy_YMT3uJuLRA3zDzEw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-
-
-> -----Original Message-----
-> From: Marc Zyngier <maz@kernel.org>
-> Sent: Friday, February 14, 2025 4:43 PM
-> To: Sebastian Ott <sebott@redhat.com>
-> Cc: Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; kvmarm@lists.linux.dev;
-> oliver.upton@linux.dev; catalin.marinas@arm.com; will@kernel.org;
-> mark.rutland@arm.com; cohuck@redhat.com; eric.auger@redhat.com;
-> yuzenghui <yuzenghui@huawei.com>; Wangzhou (B)
-> <wangzhou1@hisilicon.com>; jiangkunkun <jiangkunkun@huawei.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Anthony Jebson
-> <anthony.jebson@huawei.com>; linux-arm-kernel@lists.infradead.org;
-> Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [PATCH v7 4/5] smccc/kvm_guest: Enable errata based on
-> implementation CPUs
->=20
-> On Fri, 14 Feb 2025 16:12:02 +0000,
-> Sebastian Ott <sebott@redhat.com> wrote:
-> >
-> > On Fri, 14 Feb 2025, Shameer Kolothum wrote:
-> > > +++ b/arch/arm64/kernel/cpu_errata.c
-> > > @@ -14,6 +14,9 @@
-> > > #include <asm/kvm_asm.h>
-> > > #include <asm/smp_plat.h>
+On Mon, Feb 17, 2025 at 03:56:53PM +0000, Fuad Tabba wrote:
+> On Mon, 17 Feb 2025 at 15:41, Fuad Tabba <tabba@google.com> wrote:
+> > On Mon, 17 Feb 2025 at 15:30, Will Deacon <will@kernel.org> wrote:
 > > >
-> > > +u32 target_impl_cpu_num;
-> > > +struct target_impl_cpu *target_impl_cpus;
+> > > On Fri, Feb 14, 2025 at 03:02:58PM +0000, Fuad Tabba wrote:
+> > > > Instead of creating and initializing _all_ hyp vcpus in pKVM when
+> > > > the first host vcpu runs for the first time, initialize _each_
+> > > > hyp vcpu in conjunction with its corresponding host vcpu.
+> > > >
+> > > > Some of the host vcpu state (e.g., system registers and traps
+> > > > values) are not initialized until the first time the host vcpu is
+> > > > run. Therefore, initializing a hyp vcpu before its corresponding
+> > > > host vcpu has run for the first time might not view the complete
+> > > > host state of these vcpus.
+> > > >
+> > > > Additionally, this behavior is inline with non-protected modes.
+> > > >
+> > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_host.h      |  2 +
+> > > >  arch/arm64/include/asm/kvm_pkvm.h      |  1 +
+> > > >  arch/arm64/kvm/arm.c                   |  4 ++
+> > > >  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
+> > > >  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 54 +++++++++++++++-----------
+> > > >  arch/arm64/kvm/pkvm.c                  | 28 ++++++-------
+> > > >  6 files changed, 53 insertions(+), 42 deletions(-)
+> > >
+> > > [...]
+> > >
+> > > >  static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
+> > > >                             struct pkvm_hyp_vm *hyp_vm,
+> > > > -                           struct kvm_vcpu *host_vcpu,
+> > > > -                           unsigned int vcpu_idx)
+> > > > +                           struct kvm_vcpu *host_vcpu)
+> > > >  {
+> > > >       int ret = 0;
+> > > >
+> > > >       if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
+> > > >               return -EBUSY;
+> > > >
+> > > > -     if (host_vcpu->vcpu_idx != vcpu_idx) {
+> > > > -             ret = -EINVAL;
+> > > > -             goto done;
+> > > > -     }
+> > > > -
+> > > >       hyp_vcpu->host_vcpu = host_vcpu;
+> > > >
+> > > >       hyp_vcpu->vcpu.kvm = &hyp_vm->kvm;
+> > > >       hyp_vcpu->vcpu.vcpu_id = READ_ONCE(host_vcpu->vcpu_id);
+> > > > -     hyp_vcpu->vcpu.vcpu_idx = vcpu_idx;
+> > > > +     hyp_vcpu->vcpu.vcpu_idx = READ_ONCE(host_vcpu->vcpu_idx);
+> > > >
+> > > >       hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
+> > > >       hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
+> > > > @@ -687,27 +689,28 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
+> > > >               goto unlock;
+> > > >       }
+> > > >
+> > > > -     idx = hyp_vm->nr_vcpus;
+> > > > +     ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu);
+> > > > +     if (ret)
+> > > > +             goto unlock;
+> > > > +
+> > > > +     idx = hyp_vcpu->vcpu.vcpu_idx;
+> > > >       if (idx >= hyp_vm->kvm.created_vcpus) {
+> > > >               ret = -EINVAL;
+> > > >               goto unlock;
+> > > >       }
+> > > >
+> > > > -     ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu, idx);
+> > > > -     if (ret)
+> > > > +     if (hyp_vm->vcpus[idx]) {
+> > > > +             ret = -EINVAL;
+> > > >               goto unlock;
+> > > > +     }
+> > >
+> > > I'm not sure how much we care at EL2, but it looks like there's a
+> > > potential spectre gadget here given that 'idx' is now untrusted.
+> > > Perhaps chuck something like:
+> > >
+> > >         idx = array_index_nospec(idx, hyp_vm->kvm.created_vcpus);
+> > >
+> > > before indexing into 'hyp_vm->vcpus[]'?
 > >
-> > These should be exported (for configs using
-> > CONFIG_CORESIGHT_SOURCE_ETM4X=3Dm)
+> > I'll add that when I respin.
+> 
+> pKVM is riddled with these kinds of accesses (e.g.,
+> get_vm_by_handle(). It might be better if I address this in a separate
+> series.
 
-Thanks Sebastian. I missed that.
+Yeah, makes sense to me. Like I said, I'm not entirely sure how much we
+care about spectre at EL2, given that it's using a separate translation
+regime, but having a series to fix up some of the potential issues might
+provide a useful basis for discussion.
 
->=20
-> It might be better to make is_midr_in_range() out of line, and export
-> that. This could allow making the data static (by implementing a
-> couple of additional accessors).
-
-Ok. I will give it a go.
-
-Thanks,
-Shameer
-
-
+Will
