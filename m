@@ -1,234 +1,182 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728781C861A;
-	Tue, 18 Feb 2025 21:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930811D8A0D;
+	Tue, 18 Feb 2025 22:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739913859; cv=none; b=PBOqveyS0U3Sg25q7dBU+B6JkQacS5jL4xnCx06J+rVmXjpQFVfX9qW6SxxAFWc3uAbicQEoeOKK37mMJZWUyEMUYLSQ5j7iTLN/0D9rVZTGyhJacWl7iWV287YlehnEi00mB4mNcDoJbe1XwofVt/wpObUjL2rNZHprPtLWmrs=
+	t=1739919301; cv=none; b=kbLCz0MTw9i4aK2RbcNaskftyB7Eb5Pypv7jpT8mTOFZnr141vuqt4erjQOHV0SLQHLJ+lwVaTZgOz46MqH40X2mC4b0JRQ29ZZXh3aTT70l8xYY8+j6TCi0pOLOOFIrQKomhlIy7cvqGGXTQ4VariEDJ94Cbnj+8gRArYp+WHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739913859; c=relaxed/simple;
-	bh=wx7D8VpPf7IjLab4q2shP+SjBbJcxvKfZvq8kyxl2Gk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cyy4mT4yvLC6f0YhFFa1wN10XwkQxF+HSaAiVUky7lIsLfUOErEHgi1zjH500kQIm2IO7z5UVJHrfArhfyY3FdpTZkqwi/JLuB+V9ukjeeIC+BeGKbUlYC7b6zgU15lm5DE7KnV7vW30Kqs8D5fWuMh7Ta1wW6mBa1p/G2QtrGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cnFH17Lk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739919301; c=relaxed/simple;
+	bh=JfZZ5wVAOe/Y1NihNftjYuYbwLi7XmW8eEZlPrqPMd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AtgLHhWS2qFYesAWal7ExFsAez1OBW0cB1j2SQvKVZCUuTaKFT+IW9DhOw+tGXpqgbmc4Zyqdim5rsGBDwa+09ctw+aDDKCfksoBg8ng1nObxQAWwMQWeIk2045a6WD22wq0nQ636c1L2roOs/ctLY+aTEn4GLpTMZl/bxomZl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiOZcO7g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cnFH17Lk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEEDEC4CEE2;
-	Tue, 18 Feb 2025 21:24:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiOZcO7g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F80C4CEE2;
+	Tue, 18 Feb 2025 22:55:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739913858;
-	bh=wx7D8VpPf7IjLab4q2shP+SjBbJcxvKfZvq8kyxl2Gk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cnFH17Lk1g/+oi9wQQ55O48Kl6n5U4RnvyVh0gfxeObrmCk8hy7Y8cD8j/JzfYw69
-	 TrhXY0WJoiglBCHAKTrOXpe5LYABp8smOgtkn4MBWOptkCMw/hGY4IG9yldVqsw3hb
-	 FauCOON+agE5mjDFH8WYBh6fYq1R2HkSnE+Zo6a+4fDnhRHvUvyh91q3wMKaeEb2DQ
-	 1w5QWtfnr7evr2nJJ0JbsgniTQDNPwPT1qMnnAHSWOF5g7qwzm7SytvDH0xMIhXd/G
-	 ev4Z4h9oBSVdIB05hTb+aaVvBPb6K5qHeVX9hQ6o/WGXJq4IGgEIzTAdbf+2axo6+l
-	 4Jh36CISPbzHg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tkV4i-005bzR-Gy;
-	Tue, 18 Feb 2025 21:24:16 +0000
-Date: Tue, 18 Feb 2025 21:24:16 +0000
-Message-ID: <86cyffrlof.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Eric Auger <eauger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm <kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	christoffer.dall@arm.com,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	coltonlewis@google.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	darren@os.amperecomputing.com,
-	vishnu@os.amperecomputing.com
-Subject: Re: [PATCH] KVM: arm64: nv: Set ISTATUS for emulated timers, If timer expired
-In-Reply-To: <1a19dacc-72ca-4631-bce8-7426b3de0b47@os.amperecomputing.com>
-References: <bcb4289b-507c-4ea1-afc7-6febd34d88db@redhat.com>
-	<86y10osr19.wl-maz@kernel.org>
-	<4d443db1-85b1-4071-acd5-3187deb9cb17@redhat.com>
-	<2f6b2cb1-3d32-480a-9801-9b993ae74e2d@os.amperecomputing.com>
-	<152d262e-641d-4bb1-9656-a13e049d62c4@redhat.com>
-	<86h661wje4.wl-maz@kernel.org>
-	<4a9fbdd9-ad23-44bc-8ba5-399f08068db4@redhat.com>
-	<86cygpwfy0.wl-maz@kernel.org>
-	<b22d5916-8b55-43bc-a256-2136d66ad25f@redhat.com>
-	<86frkptzr6.wl-maz@kernel.org>
-	<Z6ZMdv8jJUvYwQzT@linux.dev>
-	<86bjvdtxb5.wl-maz@kernel.org>
-	<8da22249-eedb-477b-98d8-f50dee56f1f7@redhat.com>
-	<87tt8v14j2.wl-maz@kernel.org>
-	<1a19dacc-72ca-4631-bce8-7426b3de0b47@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1739919301;
+	bh=JfZZ5wVAOe/Y1NihNftjYuYbwLi7XmW8eEZlPrqPMd4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aiOZcO7gz+YKbzy7UfmkDhU3tc1GP77KXGgqZvo8QBWC5vgpTgTrmRki8TY27KEG9
+	 8HqF/60pEH5UBgtSchm3Se6wqh0dZaDowr6l0b6r0YUl+j0tajI/QC2mEqdWnL1GnL
+	 LiqABVRTk5NWk1BgguBFuStYX4r6uCiugCD746iyvxydi45/2eBqxBVJGd1AGnfWRG
+	 ylD6MnyNRCoHpbpVjxW/FVxP8oPsdm4slgSekZk/4aRmRIPRkFjtlJborqm0BF8/oW
+	 GCSKlZDlRTb1JiQ+9Nn3ndwQV91qYjgd4h0D3IG0l3MLO6jxlYtY1qBAyD9YDZ6pGA
+	 E6dhuaXIuBhyA==
+Date: Tue, 18 Feb 2025 22:54:57 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in
+ non-protected guests
+Message-ID: <Z7UPwXVqkaKZDtGk@finisterre.sirena.org.uk>
+References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
+ <86pljkswuk.wl-maz@kernel.org>
+ <Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
+ <86h64ssyi1.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, coltonlewis@google.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, vishnu@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="S0+W34M0g75qMnHY"
+Content-Disposition: inline
+In-Reply-To: <86h64ssyi1.wl-maz@kernel.org>
+X-Cookie: Editing is a rewording activity.
 
-On Tue, 18 Feb 2025 07:33:11 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> Hi Marc,
-> 
-> On 15-02-2025 11:20 pm, Marc Zyngier wrote:
-> > On Mon, 10 Feb 2025 18:26:48 +0000,
-> > Eric Auger <eauger@redhat.com> wrote:
-> >> 
-> >> Hi Marc,
-> >> 
-> >> On 2/7/25 7:38 PM, Marc Zyngier wrote:
-> >>> On Fri, 07 Feb 2025 18:09:58 +0000,
-> >>> Oliver Upton <oliver.upton@linux.dev> wrote:
-> >>>> 
-> >>>> Hey,
-> >>>> 
-> >>>> On Fri, Feb 07, 2025 at 05:45:33PM +0000, Marc Zyngier wrote:
-> >>>>> I found at least one issue that could fail the migration. Before the
-> >>>>> VM starts running, we limit the feature set to the subset we actually
-> >>>>> support with NV.
-> >>>>> 
-> >>>>> By doing this, we also change the value of IDreg fields that are not
-> >>>>> writable, because they describe features that we don't support.
-> >>>>> Obviously, that fails on restore.
-> >>>>> 
-> >>>>> I need to have a think...
-> >>>> 
-> >>>> We spoke about this a while ago (and I forgot til now), but I was
-> >>>> wondering if we could use vCPU feature flags to describe NV, including
-> >>>> the selection between FEAT_E2H0 and FEAT_VHE.
-> >>>> 
-> >>>> I think this might match userspace expectations a bit more closely where
-> >>>> the state of the ID registers after init gives the actual feature set
-> >>>> supported by the VM.
-> >>> 
-> >>> I'm not sure that's enough. Let me give you an example:
-> >>> 
-> >>> My host has FEAT_XNX, described in ID_AA64MMFR1_EL1.XNX. For whatever
-> >>> reason, we don't allow this field to be written to, even out of NV
-> >>> context. This is odd, because for an EL1 VM, this field means nothing
-> >>> at all.
-> >> So the curprit fields for me look like
-> >> 
-> >> - ID_AA64MMFR1_EL1.XNX
-> >> - ID_AA64DFR0_EL1.DoubleLock
-> >> - ID_AA64PFR0_EL1.RAS
-> >> 
-> >> This is still based on your nv-next branch from Jan 9
-> >> https://github.com/eauger/linux/tree/nv_next_jan9_2025
-> > 
-> > I have now pushed out a new nv-next branch with the new and improved
-> > UAPI. I expect migration to work a bit better, or at least not to
-> > explode on ID register restore. You will notice that things have
-> > changed a bit (extra flag and cap for FEAT_E2H0), but nothing really
-> > major.
-> > 
-> 
-> Tried nv-next branch and it is breaking(kernel Oops) for normal VM
-> boot itself with qemu. Looks like this is happening since qemu is
-> trying to write to ID_UNALLOCATED mapped registers as part of
-> save-restore of registers.
 
-My take on this problem ends up being more consolidation, and make
-sure that the individual macros only override the default callbacks
-for idregs.
+--S0+W34M0g75qMnHY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Additionally, ID_UNALLOCATED gets a name matching the architectural
-encoding.
+On Mon, Feb 17, 2025 at 09:37:26AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Fri, Feb 14, 2025 at 09:24:03AM +0000, Marc Zyngier wrote:
 
-	M.
+> > > Why SVCR? This isn't a register, just an architected accessor to
+> > > PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
+> > > don't understand this requirement.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e6f4599dca48e..2e14562b5841f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2261,24 +2261,26 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
-  * from userspace.
-  */
- 
--#define ID_DESC(name)				\
--	SYS_DESC(SYS_##name),			\
-+#define ID_DESC_DEFAULT_CALLBACKS		\
- 	.access	= access_id_reg,		\
- 	.get_user = get_id_reg,			\
-+	.set_user = set_id_reg,			\
-+	.visibility = id_visibility,		\
- 	.reset = kvm_read_sanitised_id_reg
- 
-+#define ID_DESC(name)				\
-+	SYS_DESC(SYS_##name),			\
-+	ID_DESC_DEFAULT_CALLBACKS
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define ID_SANITISED(name) {			\
- 	ID_DESC(name),				\
--	.set_user = set_id_reg,			\
--	.visibility = id_visibility,		\
- 	.val = 0,				\
- }
- 
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define AA32_ID_SANITISED(name) {		\
- 	ID_DESC(name),				\
--	.set_user = set_id_reg,			\
- 	.visibility = aa32_id_visibility,	\
- 	.val = 0,				\
- }
-@@ -2286,8 +2288,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
- /* sys_reg_desc initialiser for writable ID registers */
- #define ID_WRITABLE(name, mask) {		\
- 	ID_DESC(name),				\
--	.set_user = set_id_reg,			\
--	.visibility = id_visibility,		\
- 	.val = mask,				\
- }
- 
-@@ -2295,7 +2295,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
- #define ID_FILTERED(sysreg, name, mask) {	\
- 	ID_DESC(sysreg),				\
- 	.set_user = set_##name,				\
--	.visibility = id_visibility,			\
- 	.val = (mask),					\
- }
- 
-@@ -2305,10 +2304,9 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
-  * (1 <= crm < 8, 0 <= Op2 < 8).
-  */
- #define ID_UNALLOCATED(crm, op2) {			\
-+	.name = "S3_0_0_" #crm "_" #op2,		\
- 	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
--	.access = access_id_reg,			\
--	.get_user = get_id_reg,				\
--	.set_user = set_id_reg,				\
-+	ID_DESC_DEFAULT_CALLBACKS,			\
- 	.visibility = raz_visibility,			\
- 	.val = 0,					\
- }
-@@ -2320,7 +2318,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
-  */
- #define ID_HIDDEN(name) {			\
- 	ID_DESC(name),				\
--	.set_user = set_id_reg,			\
- 	.visibility = raz_visibility,		\
- 	.val = 0,				\
- }
+> > Could you be more explicit as to what you mean by direct access to
+> > PSTATE here?  The direct access to these PSTATE fields is in the form of
 
--- 
-Without deviation from the norm, progress is not possible.
+> I'm painfully aware of the architecture limitations.
+
+> However, I don't get your mention of SPSR here. The architecture is
+> quite clear that PSTATE is where these bits are held, that they are
+> not propagated anywhere else, and that's where userspace should expect
+> to find them.
+
+> The fact that SW must use SVCR to alter PSTATE.{ZA,SM} doesn't matter.
+> We save/restore registers, not accessors. If this means we need to
+> play a dance when the VMM accesses PSTATE to reconciliate KVM's
+> internal view with the userspace view, so be it.
+
+Could you please clarify what you're referring to as the VMM accessing
+PSTATE here?  The KVM API documentation defines it's concept of PSTATE
+as:
+
+ 0x6030 0000 0010 0042 PSTATE      64  regs.pstate
+
+in api.rst but does not futher elaborate.  Looking at the code the
+values that appear there seem to be mapped fairly directly to SPSR
+values, this is why I was talking about them above.
+
+It's not clear to me that PSTATE in the architecture is a register
+exactly.  DDI0487 L.a D1.4 defines the PSTATE bits as being stored in a
+ProcState pseudocode structure (ProcState is defined in J1.3.3.457, the
+pseudocode maps PSTATE in J1.3.3.454) but has an explicit comment that
+"There is no significace in the field order".  I can't seem to locate an
+architectural definition of the layout of PSTATE as a whole.  I also
+can't find any direct observability of PSTATE as a whole which would
+require a layout definition for PSTATE itself from the architecture. =20
+
+There *is* a statement in R_DQXFW that "The contents of PSTATE
+immediately before the exception was taken are written to SPSR_ELx"
+which is somewhat in conflict with the absence of SM and ZA fields in
+any of SPSR_ELx.  There's also R_BWCFK similarly for exception return,
+though that also already has some additional text for PSTATE.{IT,T} for
+returns to AArch32.  If everything in PSTATE ends up getting written to
+SPSR then we can use SPSR as our representation of PSTATE.
+
+> It probably means you need to obtain a clarification of the
+> architecture to define *where* these bits are stored in PSTATE,
+> because that's not currently defined.
+
+I will raise the issue with R_DQXFW and friends with the architects but
+I'm not convinced that at this point the clarification wouldn't be an
+adjustment to those rules rather than the addition of fields for SM and
+ZA in the SPSRs.  Without any additions the only access we have is via
+SVCR.
+
+> > > Isn't it that there is simply a dependency between restoring PSTATE
+> > > and any of the vector stuff? Also, how do you preserve the current ABI
+> > > that do not have this requirement?
+
+> > Yes, that's the dependency - I'm spelling out explicitly what changes in
+> > the register view when PSTATE.{SM,ZA} are restored.  This ABI is what
+> > you appeared to be asking for the last time we discussed this.
+
+=2E..
+
+> > Would you prefer:
+
+> >  - Changing the register view based on the current value of PSTATE.SM.
+> >  - Exposing streaming mode Z and P as separate registers.
+> >  - Exposing the existing Z and P registers with the maximum S?E VL.
+
+> > or some other option?
+
+> My take on this hasn't changed. I want to see something that behaves
+> *exactly* like the architecture defines the expected behaviour of a
+> CPU.
+
+> But you still haven't answered my question: How is the *current* ABI
+> preserved? Does it require *not* selecting SME? Does it require
+> anything else? I'm expecting simple answers to simple questions, not a
+
+Yes, it requires not selecting SME and only that.  If the VMM does not
+enable SME then it should see no change.
+
+> wall of text describing something that is not emulating the
+> architecture.
+
+I'm not clear what you're referring to as not emulating the architecture
+here, I *think* it's the issues with PSTATE.{SM,ZA} not appearing in
+SPSR_ELx and hence KVM's pstate?
+
+Your general style of interaction means that it is not always altogether
+clear when your intent is to just ask a simple question or when it is to
+point out some problem you have seen.
+
+--S0+W34M0g75qMnHY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAme1D8EACgkQJNaLcl1U
+h9Ag7Af9FSno1GEtP2DysLSKInBllL4rhNcN+6z7D0oMeZYX+CbjmeedfMLNVwdd
+quEjDrrV5PN76cyP3s35ABkWOUUUWyrUMYt3sP6vVesfNuMhjb54DETOj71CTEaW
+wt8TicvFuN6erEuz85tgB5CPng+CEGwJRhu6STP7/gBEfPou7y/9dH6xj++i/ueD
+Affm1jdtJAtdk6lDgtqjF0K9Tkawu8SM/0MkoITsCRK3R05LpSLBiCvr3S0e/rUv
+r616LswXOvPnYxuJ3Cr2phgx5ZTGgSo+IH/KQUOdK9lM1E6YkqXDtNQtw5qXldu+
+NYjTRYepfepTBCUZ6GVhkP7IEmi+tQ==
+=qowg
+-----END PGP SIGNATURE-----
+
+--S0+W34M0g75qMnHY--
