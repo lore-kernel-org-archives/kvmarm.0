@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764DB1DFE22;
-	Wed, 19 Feb 2025 16:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874381FDE12;
+	Wed, 19 Feb 2025 16:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739982158; cv=none; b=a9YkIOIVHB+ncPOst8CVC+r7lNTVV4qaFbC8rSPnOKRqJX9+/D+IywUzhUG/d1Snv4BwCc/RqLAOPOMHwBS1BM28cT/58gYQzY0GvB5OzxcuY9nAKp5VI9ugomsUcFDKB9QdJALfaDPYFE/aFwdhW1WETKbYwbLnXUQ+X4HTftE=
+	t=1739983079; cv=none; b=LiePf6fHFTfmgpY34z/B4MYPBDMCtikruEjxeidSDNA8BjpmZfUExjiMbe/ZxzFTsHeZ65JEDWsSb4f1hQbPLN6VD0X4mpX8R+yckrU0HCFbjEA1PnNrG9Il49GXfjbrsDMFKYwYkNa5PxyS7Y/7ij3mzvvbxus4yhY3dtGjxOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739982158; c=relaxed/simple;
-	bh=+BlKhVXGeiezjeGrHAuLK/twb425aHVJCEUYJtYaH1s=;
+	s=arc-20240116; t=1739983079; c=relaxed/simple;
+	bh=zioUkanDxHPR6vNqtgV7v27+nHpYpX9hIMY9zLaK/MI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qtgckqRRqQ7jvEOM88K0Vy6izCf/s+JBwQUcJrCNudebPv4mJxqHCTRQtLCw36269NWWLh3kKsxYi5cLpTEtx6jVts9HpDhyXbxZl94yMDwANpfg075g7VjIZKiTZ0mQBX3kLwIuWu3qZ7rm+afaTnmZ1bzink0Z7RVD3BTkE5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8qISNlj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=E/enil9IefiTdY8ve9FpeySckIdNCg5Va1L5zi0V2JHEEmZznexQqeK77YLHKAMJy8DT+HraodZ+OL17yxzrkN2T+nigZqukna3oaLdNcdTh1qf05FiAS00yGtadA8+Fg7/uFj8cQe7lDaQ4Lv6WuiOrWn9cBbCRjFRAPJKptsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmDZpBqV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8qISNlj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7411C4CED1;
-	Wed, 19 Feb 2025 16:22:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmDZpBqV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6D65C4CED1;
+	Wed, 19 Feb 2025 16:37:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739982158;
-	bh=+BlKhVXGeiezjeGrHAuLK/twb425aHVJCEUYJtYaH1s=;
+	s=k20201202; t=1739983078;
+	bh=zioUkanDxHPR6vNqtgV7v27+nHpYpX9hIMY9zLaK/MI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r8qISNljlZ8kPTwo5/KE82yeb93xT17PEwdHDCI7JBTq26CuAIf5w7/q79L0LnJVa
-	 uJMF+us3dA+7TS8Wngrj4QokXtoZ7FWzrsp+IRDwfKHgqX8m3PFKGRxysiA3cYK3NG
-	 608HgQokUzdL3XkJNGLilgsE7TY1qFsamiPNS7pHPL8c5kAXgBd3Px/G0FeXcfMWlY
-	 fBmRYsN9j+GabDk6GnAXaPF2h4SZbT/b/yMnpEyCz7KxDt1vGhg7g0FaZB4PuRPZGd
-	 PA3vJfxua05bAvpG95UCcx+hh+q2uvyLvtIckZhEZdDOsXxeDrILWclQLx/NBh7hoH
-	 hCikICrII0vqA==
+	b=OmDZpBqVgqaYGBWTpeZEO5oDQmEUIVp2gaY6mlfXoWLnDflb+ktH9/VCXBJaGmsfc
+	 RQxoU00FJMJClVDHf9myP3G0WVUyvON7PSKU7vPjAzS8GD4HBQN03BmcWPTh+jeUvE
+	 KvrNpLdZG642xBHru+0MTGOxASROKt4E+flniykp/SZi6yE+1pcA1VwSdqru5cJ0yz
+	 Xb2TQLKdRPZWUTF/V/2sLsElDFzLNcMMZKplK+54lTdKTv5998AIVCqOLI+QBtuWzG
+	 65TRFAxTvASMlrdC049rkQFQY0q5LE6d/9mSDNgDL54qajKLXHe4tnCrMDgUqDjh2a
+	 3xzBK/yujG7IA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tkmqH-005tUr-BB;
-	Wed, 19 Feb 2025 16:22:33 +0000
-Date: Wed, 19 Feb 2025 16:22:32 +0000
-Message-ID: <868qq1sy47.wl-maz@kernel.org>
+	id 1tkn5A-005tju-Dm;
+	Wed, 19 Feb 2025 16:37:56 +0000
+Date: Wed, 19 Feb 2025 16:37:56 +0000
+Message-ID: <867c5lsxej.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -49,10 +49,10 @@ Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Janne Grunau <j@jannau.net>
-Subject: Re: [PATCH v2 01/14] drivers/perf: apple_m1: Refactor event select/filter configuration
-In-Reply-To: <20250203183111.191519-2-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 03/14] drivers/perf: apple_m1: Provide helper for mapping PMUv3 events
+In-Reply-To: <20250203183111.191519-4-oliver.upton@linux.dev>
 References: <20250203183111.191519-1-oliver.upton@linux.dev>
-	<20250203183111.191519-2-oliver.upton@linux.dev>
+	<20250203183111.191519-4-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,38 +68,115 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 03 Feb 2025 18:30:58 +0000,
+On Mon, 03 Feb 2025 18:31:00 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Supporting guest mode events will necessitate programming two event
-> filters. Prepare by splitting up the programming of the event selector +
-> event filter into separate headers.
-
-s/headers/helpers/ ?
-
+> Apple M* parts carry some IMP DEF traps for guest accesses to PMUv3
+> registers, even though the underlying hardware doesn't implement PMUv3.
+> This means it is possible to virtualize PMUv3 for KVM guests.
 > 
-> Opportunistically replace RMW patterns with sysreg_clear_set_s().
+> Add a helper for mapping common PMUv3 event IDs onto hardware event IDs,
+> keeping the implementation-specific crud in the PMU driver rather than
+> KVM proper.
 > 
 > Tested-by: Janne Grunau <j@jannau.net>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/apple_m1_pmu.h |  1 +
->  drivers/perf/apple_m1_cpu_pmu.c       | 52 ++++++++++++++++-----------
->  2 files changed, 33 insertions(+), 20 deletions(-)
+>  drivers/perf/apple_m1_cpu_pmu.c | 35 +++++++++++++++++++++++++++++++++
+>  include/linux/perf/arm_pmu.h    |  1 +
+>  2 files changed, 36 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/apple_m1_pmu.h b/arch/arm64/include/asm/apple_m1_pmu.h
-> index 99483b19b99f..02e05d05851f 100644
-> --- a/arch/arm64/include/asm/apple_m1_pmu.h
-> +++ b/arch/arm64/include/asm/apple_m1_pmu.h
-> @@ -37,6 +37,7 @@
->  #define PMCR0_PMI_ENABLE_8_9	GENMASK(45, 44)
+> diff --git a/drivers/perf/apple_m1_cpu_pmu.c b/drivers/perf/apple_m1_cpu_pmu.c
+> index d6d4ff6da862..0e54d3f900a7 100644
+> --- a/drivers/perf/apple_m1_cpu_pmu.c
+> +++ b/drivers/perf/apple_m1_cpu_pmu.c
+> @@ -12,6 +12,7 @@
 >  
->  #define SYS_IMP_APL_PMCR1_EL1	sys_reg(3, 1, 15, 1, 0)
-> +#define SYS_IMP_APL_PMCR1_EL12	sys_reg(3, 1, 15, 7, 2)
+>  #include <linux/of.h>
+>  #include <linux/perf/arm_pmu.h>
+> +#include <linux/perf/arm_pmuv3.h>
+>  #include <linux/platform_device.h>
+>  
+>  #include <asm/apple_m1_pmu.h>
+> @@ -174,6 +175,17 @@ static const unsigned m1_pmu_perf_map[PERF_COUNT_HW_MAX] = {
+>  	[PERF_COUNT_HW_BRANCH_MISSES]		= M1_PMU_PERFCTR_BRANCH_MISPRED_NONSPEC,
+>  };
+>  
+> +#define M1_PMUV3_EVENT_MAP(pmuv3_event, m1_event)							\
+> +	[ARMV8_PMUV3_PERFCTR_##pmuv3_event]			= M1_PMU_PERFCTR_##m1_event
+> +
+> +static const unsigned int m1_pmu_pmceid_map[ARMV8_PMUV3_MAX_COMMON_EVENTS] = {
 
-nit: this should be moved to the following patch.
+nit: M1_PMU_PERFCTR* are limited to 8bit quantities, and
+HW_OP_UNSUPPORTED is a 16bit constant. Probably worth changing the
+type to u16 and save a whole 128 bytes! ;-)
 
-Otherwise looks good to me.
+> +	[0 ... ARMV8_PMUV3_MAX_COMMON_EVENTS - 1]	= HW_OP_UNSUPPORTED,
+> +	M1_PMUV3_EVENT_MAP(INST_RETIRED,	INST_ALL),
+> +	M1_PMUV3_EVENT_MAP(CPU_CYCLES,		CORE_ACTIVE_CYCLE),
+> +	M1_PMUV3_EVENT_MAP(BR_RETIRED,		INST_BRANCH),
+> +	M1_PMUV3_EVENT_MAP(BR_MIS_PRED_RETIRED,	BRANCH_MISPRED_NONSPEC),
+> +};
+> +
+>  /* sysfs definitions */
+>  static ssize_t m1_pmu_events_sysfs_show(struct device *dev,
+>  					struct device_attribute *attr,
+> @@ -558,6 +570,26 @@ static int m2_pmu_map_event(struct perf_event *event)
+>  	return armpmu_map_event(event, &m1_pmu_perf_map, NULL, M1_PMU_CFG_EVENT);
+>  }
+>  
+> +static int m1_pmu_map_pmuv3_event(unsigned int eventsel)
+> +{
+> +	int m1_event = HW_OP_UNSUPPORTED;
+
+unsigned?
+
+> +
+> +	if (eventsel < ARMV8_PMUV3_MAX_COMMON_EVENTS)
+> +		m1_event = m1_pmu_pmceid_map[eventsel];
+> +
+> +	return m1_event == HW_OP_UNSUPPORTED ? -EOPNOTSUPP : m1_event;
+> +}
+> +
+> +static void m1_pmu_init_pmceid(struct arm_pmu *pmu)
+> +{
+> +	unsigned int event;
+> +
+> +	for (event = 0; event < ARMV8_PMUV3_MAX_COMMON_EVENTS; event++) {
+> +		if (m1_pmu_map_pmuv3_event(event) >= 0)
+> +			set_bit(event, pmu->pmceid_bitmap);
+> +	}
+> +}
+> +
+>  static void m1_pmu_reset(void *info)
+>  {
+>  	int i;
+> @@ -618,6 +650,9 @@ static int m1_pmu_init(struct arm_pmu *cpu_pmu, u32 flags)
+>  	cpu_pmu->reset		  = m1_pmu_reset;
+>  	cpu_pmu->set_event_filter = m1_pmu_set_event_filter;
+>  
+> +	cpu_pmu->map_pmuv3_event  = m1_pmu_map_pmuv3_event;
+> +	m1_pmu_init_pmceid(cpu_pmu);
+> +
+>  	bitmap_set(cpu_pmu->cntr_mask, 0, M1_PMU_NR_COUNTERS);
+>  	cpu_pmu->attr_groups[ARMPMU_ATTR_GROUP_EVENTS] = &m1_pmu_events_attr_group;
+>  	cpu_pmu->attr_groups[ARMPMU_ATTR_GROUP_FORMATS] = &m1_pmu_format_attr_group;
+> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+> index 4b5b83677e3f..35f3778ae20e 100644
+> --- a/include/linux/perf/arm_pmu.h
+> +++ b/include/linux/perf/arm_pmu.h
+> @@ -100,6 +100,7 @@ struct arm_pmu {
+>  	void		(*stop)(struct arm_pmu *);
+>  	void		(*reset)(void *);
+>  	int		(*map_event)(struct perf_event *event);
+> +	int		(*map_pmuv3_event)(unsigned int eventsel);
+>  	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
+>  	bool		secure_access; /* 32-bit ARM only */
+>  #define ARMV8_PMUV3_MAX_COMMON_EVENTS		0x40
+
+I think it may be more logical to introduce this new callback first,
+with its usage in KVM, and only then plug it in the PMU driver. Not a
+big deal though.
 
 	M.
 
