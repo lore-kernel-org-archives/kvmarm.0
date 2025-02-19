@@ -1,25 +1,64 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5841F1522;
-	Wed, 19 Feb 2025 14:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340F71F9410
+	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 16:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739975438; cv=none; b=Qz43uT3MCmVlk1adU+d09LAXk/bz6LLxDtP9ZX+t/I6EU3Bi6gTmWYCUAnDumnEHi2EswTuivNKDHw4qq4xTkw6Mz0wTjlENlVkUMyzQf63J6Exz1B2pOZif1C0g1Yz1eiGiFKY+p568xnbvBhrMbYmbhlbmtiSmK/LK5rJZ3Wk=
+	t=1739981373; cv=none; b=FLN7BaUBuRKjsAhsJ1AIT/xm8KZIz6QPLABnvGDcXCb6iJGYLAqRojIWBL9zinyiBN59aF9ogB3ThemkbP7r6tF4QajxV1+cKkeotu3COsogZqC9PiHzzVywB2BhXfS/VBzgP6PCK3thFWjuVhuFAvNQh2M+ZyQdQ8tgCUQ+39M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739975438; c=relaxed/simple;
-	bh=g1/2wPLaewjbx4uyxyoD+nP5/AK0RWw0EsXYYA2h/bc=;
+	s=arc-20240116; t=1739981373; c=relaxed/simple;
+	bh=/lekqJfKGMjw1dQxyTeqadS7uFPIGjGMoohx7NzndQY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LDzTvVj3pem0U7su1FCt8g/9WlFpJDzFYTLSVIIRNU10wpHhuUZ6tTHh7YnetaflljhKYAizpnoi/L6ghfiipHYWHmzbcBJcbyiHtZxe8HOkXigTolLAzJt91BGrznEznnvzQ6gjzENln3bmgTppUQxJCRFmy0IDvbT7Kt5LK+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C040312FC;
-	Wed, 19 Feb 2025 06:30:53 -0800 (PST)
-Received: from [10.57.84.90] (unknown [10.57.84.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 523213F59E;
-	Wed, 19 Feb 2025 06:30:31 -0800 (PST)
-Message-ID: <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
-Date: Wed, 19 Feb 2025 14:30:28 +0000
+	 In-Reply-To:Content-Type; b=RiMgEC8DuzCJDzcyX7c259HoeAXC4ryFdSeWgnvjo8l3kTwn44RIbLnY53Gueb1B+7jtl0RauOODNMZuHiVFPDRlH5nn5bgm1szlcJl+cgfzqWMP55w15M/OuDYVhR7FRKcfgsdOcWvlJf4fhpMjbrcEN6jlZxmaIrfenBLGR00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nxg36v2l; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nxg36v2l"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-439a1e8ba83so824785e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 08:09:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739981370; x=1740586170; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EdBoFnuhqMD4bPK9q59QOYbccPf40KzMHKr/84iucLw=;
+        b=nxg36v2lJ97/Xgk04kGx9CV+M51uu6/oUQNJ35C2tDkSnM3nkP+BXq744GAGfZQMPf
+         7Nwp/TJUSSLpOyyvhaG/BFq7f9jUkeD4awz0oMFc62JzsD6RH2v4cMiKi9dTZ4eTGP2L
+         mSvUNt76OkWYDq49p638xrWu2u2hghYnAC525zwu2i2MUHUtD7ti6maMLVu4BKEf1kad
+         aol2nCn6noZg+m+FH3y1us/n9IDkJGd3otCzCka8YVd4gibuQNX4GOCKjkfrxcJJTQVl
+         eqN5SG3WlEk+ZVZO9hs/Br7vATLAJiYMhLPxTyy1MD97LyKOzw1D/MyKDYj2RnOLUnKC
+         MwIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739981370; x=1740586170;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EdBoFnuhqMD4bPK9q59QOYbccPf40KzMHKr/84iucLw=;
+        b=REMCcWIr5y9NXCLF6FA6A8+Oe8zeBS2obNO9yurecG178ACGc+zMYp323ny+gku5+K
+         AYwwjZfoHYPJ51FXNRa9IZN74NnqoW6lhcwSbI913D6YGQ1j+5SDu9w316gxb9L/rZOD
+         O7DRdQTJz+V/GmVlAUGZwNJnfljmStTuVQ7d8iWD3dEeoRzfFMRbA69vdSBoUOFRfeG1
+         OIbmBnilByb3Lmfiztd9Gdm3CUmJtOs5GeMD1szK0Q8gartk0MPfb318ffoONVwygtAy
+         2Btu2LwW4/APGrzyCof1iJFHg7p/+qupFai69Hz5RM5aXPw1SAH2XezPjNFOTHS2pLvC
+         33rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGt0j56Zcjwe1T1CHP+1aWmlGzDePYerPvwysIBgCjExI/s7Qy0IEi86v2OhHvur55whmxAIA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzw4WumzT8IFi2i3PjERmYyI3apxa/QfGrOIg5r2hzcWJFf3NSX
+	noWfRMlfxikrhW+1JlzAQI9rlAV9m7F9h7snqv0rMnfclWDqlTtpj3lsK10vFwI=
+X-Gm-Gg: ASbGncsoCv3PJpWGzwErH+9r0EA9yP/0BMhFNXfYf833ABa2Wsur/ypbaRHGUR+/1BA
+	Cq3yQDytBMJjw1/Zh7zoC6An8MyupRDmNpKOImxAbhFXFuzQL+tnZ7T7Q+CezxCMo9I1fZtqqjW
+	qXDxayngShOhqPe4n9rKqHJS6EoFUXkmVne8bU6oTXc5cck4VWSbqFbtzYfCuELM/ro/VCYCDzW
+	eJbHWsOHMufDp70lKYpFtXDz4VzZccgE9ZlcK5qhTwiwy8TJq8Tz7MVKM6YUnCPKVYr47Rn/g9z
+	/9ta5q/hcZ35rxzDTmGXD/QWiA==
+X-Google-Smtp-Source: AGHT+IG87mSbuSo594YlU8iwWTPKAQqVV2chSBKXzyuZ7LJ3HKDzFEKHoFoqCd1APAlb8lVP4Vl8fQ==
+X-Received: by 2002:a5d:64a3:0:b0:38f:50bd:ad11 with SMTP id ffacd0b85a97d-38f50bdadd5mr6657402f8f.5.1739981370330;
+        Wed, 19 Feb 2025 08:09:30 -0800 (PST)
+Received: from [192.168.68.163] ([145.224.90.202])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f561bee3esm3617686f8f.21.2025.02.19.08.09.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2025 08:09:29 -0800 (PST)
+Message-ID: <f8f5b7bc-0219-4891-9ffd-f54102b90b45@linaro.org>
+Date: Wed, 19 Feb 2025 16:09:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,144 +66,65 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
-To: "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Will Deacon <will@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-References: <20241017131434.40935-1-steven.price@arm.com>
- <20241017131434.40935-10-steven.price@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20241017131434.40935-10-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v20 00/11] arm64/perf: Enable branch stack sampling
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 17/10/2024 14:14, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+
+On 18/02/2025 8:39 pm, Rob Herring (Arm) wrote:
+> This series enables perf branch stack sampling support on arm64 via a
+> v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
+> on BRBE can be found in the Arm ARM[1] chapter D18.
 > 
-> Use the memory encryption APIs to trigger a RSI call to request a
-> transition between protected memory and shared memory (or vice versa)
-> and updating the kernel's linear map of modified pages to flip the top
-> bit of the IPA. This requires that block mappings are not used in the
-> direct map for realm guests.
+> I've picked up this series from Anshuman. v19 and v20 versions have been
+> reworked quite a bit by Mark and myself. The bulk of those changes are
+> in patch 11.
 > 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Co-developed-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-[...]
-> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-> index 547a9e0b46c2..6ae6ae806454 100644
-> --- a/arch/arm64/mm/pageattr.c
-> +++ b/arch/arm64/mm/pageattr.c
-> @@ -5,10 +5,12 @@
->  #include <linux/kernel.h>
->  #include <linux/mm.h>
->  #include <linux/module.h>
-> +#include <linux/mem_encrypt.h>
->  #include <linux/sched.h>
->  #include <linux/vmalloc.h>
->  
->  #include <asm/cacheflush.h>
-> +#include <asm/pgtable-prot.h>
->  #include <asm/set_memory.h>
->  #include <asm/tlbflush.h>
->  #include <asm/kfence.h>
-> @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
->  bool can_set_direct_map(void)
->  {
->  	/*
-> -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
-> -	 * mapped at page granularity, so that it is possible to
-> +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
-> +	 * map to be mapped at page granularity, so that it is possible to
->  	 * protect/unprotect single pages.
->  	 *
->  	 * KFENCE pool requires page-granular mapping if initialized late.
-> +	 *
-> +	 * Realms need to make pages shared/protected at page granularity.
->  	 */
->  	return rodata_full || debug_pagealloc_enabled() ||
-> -	       arm64_kfence_can_set_direct_map();
-> +		arm64_kfence_can_set_direct_map() || is_realm_world();
->  }
+> Patches 1-7 are new clean-ups/prep which stand on their own. They
+> were previously posted here[2]. Please pick them up if there's no issues
+> with them.
+> 
+> Patches 8-11 add BRBE support with the actual support in patch 11.
+> 
+> A git branch is here[3].
+> 
+> [1] https://developer.arm.com/documentation/ddi0487/latest/
+> [2] https://lore.kernel.org/all/20250107-arm-pmu-cleanups-v1-v1-0-313951346a25@kernel.org/
+> [3] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git arm/brbe-v20
+> 
+> v20:
+>   - Added back some of the arm64 specific exception types. The x86 IRQ
+>     branches also include other exceptions like page faults. On arm64, we
+>     can distinguish the exception types, so we do. Also, to better
+>     align with x86, we convert 'call' branches which are user to kernel
+>     to 'syscall'.
+>   - Only enable exceptions and exception returns if recording kernel
+>     branches (matching x86)
+>   - Drop requiring event and branch privileges to match
+>   - Add "branches" caps sysfs attribute like x86
+>   - Reword comment about FZP and MDCR_EL2.HPMN interaction
+>   - Rework BRBE invalidation to avoid invalidating in interrupt handler
+>     when no handled events capture the branch stack (i.e. when there are
+>     multiple users).
+>   - Also clear BRBCR_ELx bits in brbe_disable(). This is for KVM nVHE
+>     checks if BRBE is enabled.
+>   - Document that MDCR_EL3.SBRBE can be 0b01 also
+> 
 
-Aneesh pointed out that this call to is_realm_world() is now too early 
-since the decision to delay the RSI detection. The upshot is that a 
-realm guest which doesn't have page granularity forced for other reasons 
-will fail to share pages with the host.
-
-At the moment I can think of a couple of options:
-
-(1) Make rodata_full a requirement for realm guests. 
-    CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
-    isn't a big ask.
-
-(2) Revisit the idea of detecting when running as a realm guest early. 
-    This has the advantage of also "fixing" earlycon (no need to 
-    manually specify the shared-alias of an unprotected UART).
-
-I'm currently leaning towards (1) because it's the default anyway. But 
-if we're going to need to fix earlycon (or indeed find other similar 
-issues) then (2) would obviously make sense.
-
-Any thoughts on the best option here.
-
-Untested patch for (1) below. Although updating the docs would be
-probably be a good idea too ;)
-
-Thanks,
-Steve
-
-----8<---
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index ce4778141ec7..48a6ef0f401c 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -126,6 +126,10 @@ void __init arm64_rsi_init(void)
- 		return;
- 	if (!rsi_version_matches())
- 		return;
-+	if (!can_set_direct_map()) {
-+		pr_err("rodata_full disabled, unable to run as a realm guest. Please enable CONFIG_RODATA_FULL_DEFAULT_ENABLED\n");
-+		return;
-+	}
- 	if (WARN_ON(rsi_get_realm_config(&config)))
- 		return;
- 	prot_ns_shared = BIT(config.ipa_bits - 1);
-diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-index 39fd1f7ff02a..f8fd8a3816fb 100644
---- a/arch/arm64/mm/pageattr.c
-+++ b/arch/arm64/mm/pageattr.c
-@@ -25,16 +25,14 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
- bool can_set_direct_map(void)
- {
- 	/*
--	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
--	 * map to be mapped at page granularity, so that it is possible to
-+	 * rodata_full, DEBUG_PAGEALLOC require linear map to be
-+	 * mapped at page granularity, so that it is possible to
- 	 * protect/unprotect single pages.
- 	 *
- 	 * KFENCE pool requires page-granular mapping if initialized late.
--	 *
--	 * Realms need to make pages shared/protected at page granularity.
- 	 */
- 	return rodata_full || debug_pagealloc_enabled() ||
--		arm64_kfence_can_set_direct_map() || is_realm_world();
-+		arm64_kfence_can_set_direct_map();
- }
- 
- static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
+Tested-by: James Clark <james.clark@linaro.org>
 
