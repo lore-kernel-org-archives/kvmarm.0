@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA462144CF;
-	Wed, 19 Feb 2025 17:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA171215044;
+	Wed, 19 Feb 2025 18:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739987102; cv=none; b=iqozSCvvvFwMGMPp5DEShpKKQflaaFBivgP4/olEHCAsLR5EJn6gL7NrqAdaZAYJgiyMio/RAlXPTMwLzZWPfQcQiVvxjV3YYI4RlFShZQqLlF0724VeMt/BZcF0HWutMw9vaxY3sNze+jgrbU31erfKJGG19HD+oEUP6trBLJ4=
+	t=1739989024; cv=none; b=OkyLoCjALbeDThRA1I7I/lkzJKxYnNX15XZ1jCdN5BM/SZ1LKmquXjlXeb9iQgiwwTEduB6qWyXG1JNBHQuEbIetEJ0MlCUaJBVdGoz4J1+Ni4E23s/qiE6W9/HmInGzUNu/8g3DXotQ9EeH1wHWuWJHaPEjhMWGG7QDMYqQEiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739987102; c=relaxed/simple;
-	bh=9DDQSRBXojYKs3E7l0ZcCaT7BmSFwinEFa+8YID+AY0=;
+	s=arc-20240116; t=1739989024; c=relaxed/simple;
+	bh=DsGGofnDzKUQbDmEHUxv9uMf75t8hgC8FbDUK8smE60=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pBcE4vYr1FhYv4N5Ph71acGfG0+9eilxiHnMeWn5ti+B8RKbxW0cR6bUYoL8pUp9DxuLoBpVAgi81ymSau6VMvl9U2cVb5fNvL4OiGxUZM2uHITr43WcVgz9eL7Bp5iocP3zRqnGMD34wMr61YsvdleSxu3/43YGDL/Yt+LdbBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GzI76u01; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Q+ZNui8Ob8cCJcgpwxA6aHmw+QFEPLOzvxk0XiuNn0XZFm8RMIZFKQfuHvFQx10xaZ0kW6jyedxlZLZ740dlKj8yd2zvdnsGr4OvdQ13tmoW8mAOHFL+7TJ9n74liD+cK3DBvajmI9iUB+qWxkkGMScUzVMPBOS9UA/55Edle4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SIaHwZEi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GzI76u01"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E56B1C4CED1;
-	Wed, 19 Feb 2025 17:45:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SIaHwZEi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33978C4CED1;
+	Wed, 19 Feb 2025 18:17:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739987102;
-	bh=9DDQSRBXojYKs3E7l0ZcCaT7BmSFwinEFa+8YID+AY0=;
+	s=k20201202; t=1739989024;
+	bh=DsGGofnDzKUQbDmEHUxv9uMf75t8hgC8FbDUK8smE60=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GzI76u01W+GuItG8twFKvac3xBV8lqEt2O70ZlQ9ECAM7mn4PvY6B6m3dFVNeoSJF
-	 bAZxgh30RdMRUzQZLDVLSZOCrIsIbWzdIvS33u09PTY07HDgLbMXmj9W6psLwIPzV0
-	 RRdB7by9dMs04GOCMFsJFA3aNWTLPeTIY3MtUfRUk7iI1rZlLhg6o8YHzQk6Y1myQG
-	 +vh8xwegNiTBcoB2O13Kb55jz5H6cBYN5tTbvKe6Xv5pKDYLJPngZcOJg79IpF7r1H
-	 9Fe0p6n8xuhg2RWvpbnx4SRy/p+ijK15Cn73A1hkbadJEXNaZqwemj4H/B/dHrvYY/
-	 i6Rd5VZq9xLKg==
+	b=SIaHwZEieT201WAL6Zk7NSYy7kj/ZnVkCqLA7vWQgDoXC/fx7GtDC6ohFzJatO4uj
+	 pz6eAx9/QPSV+jB+l87OzEnnG3nvlT8nR+spUptocIrUtqbcp0y431D3/KLkXWPn8c
+	 haE3dICihF53YjJ74YnU69bbFa+6jMRABfNzFGhcGblC/k2rAAw5jmYANWTVCK5e05
+	 YVm1c7TCBkAp4tFCIPYDTm6kX4l0JWP45o1CbUAwcIBLJVFyjxbus61QMONd+Q9Rlm
+	 HkEkpc34O1/Od1PWYzI2knIwJVAnxxKXDQspcziUX7+4JLUI/iyRRbBboeY61fBQ8r
+	 u6Fn453tm7DxA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tko83-005ud8-MR;
-	Wed, 19 Feb 2025 17:44:59 +0000
-Date: Wed, 19 Feb 2025 17:44:59 +0000
-Message-ID: <864j0psuas.wl-maz@kernel.org>
+	id 1tkod4-005v6y-0h;
+	Wed, 19 Feb 2025 18:17:02 +0000
+Date: Wed, 19 Feb 2025 18:17:00 +0000
+Message-ID: <861pvtsstf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -49,10 +49,10 @@ Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Janne Grunau <j@jannau.net>
-Subject: Re: [PATCH v2 07/14] KVM: arm64: Use a cpucap to determine if system supports FEAT_PMUv3
-In-Reply-To: <20250203183111.191519-8-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 10/14] KVM: arm64: Move PMUVer filtering into KVM code
+In-Reply-To: <20250203183111.191519-11-oliver.upton@linux.dev>
 References: <20250203183111.191519-1-oliver.upton@linux.dev>
-	<20250203183111.191519-8-oliver.upton@linux.dev>
+	<20250203183111.191519-11-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,102 +68,39 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 03 Feb 2025 18:31:04 +0000,
+On Mon, 03 Feb 2025 18:31:07 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> KVM is about to learn some new tricks to virtualize PMUv3 on IMPDEF
-> hardware. As part of that, we now need to differentiate host support
-> from guest support for PMUv3.
-> 
-> Add a cpucap to determine if an architectural PMUv3 is present to guard
-> host usage of PMUv3 controls.
+> The supported guest PMU version on a particular platform is ultimately a
+> KVM decision. Move PMUVer filtering into KVM code.
 > 
 > Tested-by: Janne Grunau <j@jannau.net>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/cpufeature.h     |  5 +++++
->  arch/arm64/kernel/cpufeature.c          | 19 +++++++++++++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
->  arch/arm64/kvm/pmu.c                    | 10 +++++-----
->  arch/arm64/tools/cpucaps                |  1 +
->  include/kvm/arm_pmu.h                   |  2 +-
->  6 files changed, 33 insertions(+), 8 deletions(-)
+>  arch/arm64/include/asm/cpufeature.h | 23 -----------------------
+>  arch/arm64/kvm/pmu-emul.c           | 15 +++++++++------
+>  2 files changed, 9 insertions(+), 29 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index e0e4478f5fb5..0eff048848b8 100644
+> index 0eff048848b8..c4326f1cb917 100644
 > --- a/arch/arm64/include/asm/cpufeature.h
 > +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -866,6 +866,11 @@ static __always_inline bool system_supports_mpam_hcr(void)
->  	return alternative_has_cap_unlikely(ARM64_MPAM_HCR);
+> @@ -525,29 +525,6 @@ cpuid_feature_extract_unsigned_field(u64 features, int field)
+>  	return cpuid_feature_extract_unsigned_field_width(features, field, 4);
 >  }
 >  
-> +static inline bool system_supports_pmuv3(void)
-> +{
-> +	return cpus_have_final_cap(ARM64_HAS_PMUV3);
-> +}
-> +
->  int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
->  bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
->  
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 4eb7c6698ae4..6886d2875fac 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1898,6 +1898,19 @@ static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
->  }
->  #endif
->  
-> +static bool has_pmuv3(const struct arm64_cpu_capabilities *entry, int scope)
-> +{
-> +	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> +	unsigned int pmuver;
-> +
-> +	pmuver = cpuid_feature_extract_unsigned_field(dfr0,
-> +						      ID_AA64DFR0_EL1_PMUVer_SHIFT);
-> +	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-> +		return false;
-> +
-> +	return pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP;
+> -/*
+> - * Fields that identify the version of the Performance Monitors Extension do
+> - * not follow the standard ID scheme. See ARM DDI 0487E.a page D13-2825,
+> - * "Alternative ID scheme used for the Performance Monitors Extension version".
+> - */
+> -static inline u64 __attribute_const__
+> -cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+> -{
+> -	u64 val = cpuid_feature_extract_unsigned_field(features, field);
 
-Given that PMUVer is a signed field, how about using
-cpuid_feature_extract_signed_field() and do a signed comparison instead?
-
-> +}
-> +
->  #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
->  #define KPTI_NG_TEMP_VA		(-(1UL << PMD_SHIFT))
->  
-> @@ -2999,6 +3012,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		ARM64_CPUID_FIELDS(ID_AA64PFR1_EL1, GCS, IMP)
->  	},
->  #endif
-> +	{
-> +		.desc = "PMUv3",
-> +		.capability = ARM64_HAS_PMUV3,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.matches = has_pmuv3,
-> +	},
-
-This cap is probed unconditionally (without any configuration
-dependency)...
-
->  	{},
->  };
->  
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index f838a45665f2..0edc7882bedb 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -244,7 +244,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->  	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
->  	 * EL1 instead of being trapped to EL2.
->  	 */
-> -	if (kvm_arm_support_pmu_v3()) {
-> +	if (system_supports_pmuv3()) {
-
-... but kvm_arm_support_pmu_v3() is conditional on
-CONFIG_HW_PERF_EVENTS.  Doesn't this create some sort of new code path
-that we didn't expect?
+I guess this is where this idiom is coming from. I think it'd be worth
+revisiting it here as well as in the last patch.
 
 Thanks,
 
