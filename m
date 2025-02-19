@@ -1,119 +1,170 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC41F1EEA34
-	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 14:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5841F1522;
+	Wed, 19 Feb 2025 14:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739973833; cv=none; b=QRS7+zk4Xm+KXVKDLgLeFY0f6naamdnE+27T9J/uhB2JA2tz1yD8QcymY3K+Kbqk1rkPO10a/8GD4MEnx8BixW0cQk1K1Ve2Rxet4SXAhJ0jLEhD/pAswJILaVY73ACoox6QcqAaY7IPHC2R4quwcv3d+M+8cQZOoEIHTvIDDIM=
+	t=1739975438; cv=none; b=Qz43uT3MCmVlk1adU+d09LAXk/bz6LLxDtP9ZX+t/I6EU3Bi6gTmWYCUAnDumnEHi2EswTuivNKDHw4qq4xTkw6Mz0wTjlENlVkUMyzQf63J6Exz1B2pOZif1C0g1Yz1eiGiFKY+p568xnbvBhrMbYmbhlbmtiSmK/LK5rJZ3Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739973833; c=relaxed/simple;
-	bh=ftok8XYsXfdKDvQpA7AdcEM4jDXUpULUx2D5Ds2zRGY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WUT7Kxbwtpkz9Z81l6mOHpHyqvkreDsJUDRj208fkyjJcjWBPh8k8gzbuEORKq6ia5yHMC8ZbOjzZebiC/0pmn3OIc2Iec7ZS+an0hvLUhme9Jksg2D0RWI67BS8K9gcGArO8ifHo2fpckxaGa1jLqbcdgCSGgp77dHANjCLfGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPCYG2on; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPCYG2on"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51053C4CED6;
-	Wed, 19 Feb 2025 14:03:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739973832;
-	bh=ftok8XYsXfdKDvQpA7AdcEM4jDXUpULUx2D5Ds2zRGY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uPCYG2ondSqrYPXZfrcTeozeeM/2BVb2y2hV7gY544ZqF+IrSx5Qm2MJhLEOTt0Fm
-	 +gvSkp0EyXWoFp0LRhmIOIHjiq8FlaBaiKmeeQ5juW+gus25Dm5ezP/NWkLxtZafYa
-	 fBLZkFCkmi2p8YWX+RPnC8ttZq23fHq9y9EDS2T8FxGjOKhoUCpM1etktvVHkqXO3+
-	 K90393X1uXFgdHkZCi5JHcQtxI/q6wz7eWOERdhMw+RMvpA2+Cr1/+fNpudPvonev8
-	 BAvOEdP6EwrmivHrh57htUNzFuql0/KxP05T/+z64Sxizw93G7K1EG6TrpTOdSL5Kc
-	 uh0x3HcCG/bgg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tkkg1-005qpn-Tb;
-	Wed, 19 Feb 2025 14:03:50 +0000
-Date: Wed, 19 Feb 2025 14:03:49 +0000
-Message-ID: <86a5airpyy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix MDCR_EL2.HPMN reset value
-In-Reply-To: <Z7OFvp7LMcOvWziA@linux.dev>
-References: <20250217112412.3963324-1-maz@kernel.org>
-	<20250217112412.3963324-2-maz@kernel.org>
-	<Z7OFvp7LMcOvWziA@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1739975438; c=relaxed/simple;
+	bh=g1/2wPLaewjbx4uyxyoD+nP5/AK0RWw0EsXYYA2h/bc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LDzTvVj3pem0U7su1FCt8g/9WlFpJDzFYTLSVIIRNU10wpHhuUZ6tTHh7YnetaflljhKYAizpnoi/L6ghfiipHYWHmzbcBJcbyiHtZxe8HOkXigTolLAzJt91BGrznEznnvzQ6gjzENln3bmgTppUQxJCRFmy0IDvbT7Kt5LK+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C040312FC;
+	Wed, 19 Feb 2025 06:30:53 -0800 (PST)
+Received: from [10.57.84.90] (unknown [10.57.84.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 523213F59E;
+	Wed, 19 Feb 2025 06:30:31 -0800 (PST)
+Message-ID: <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
+Date: Wed, 19 Feb 2025 14:30:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
+To: "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Will Deacon <will@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+References: <20241017131434.40935-1-steven.price@arm.com>
+ <20241017131434.40935-10-steven.price@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20241017131434.40935-10-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 17 Feb 2025 18:53:50 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On 17/10/2024 14:14, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> Hey,
+> Use the memory encryption APIs to trigger a RSI call to request a
+> transition between protected memory and shared memory (or vice versa)
+> and updating the kernel's linear map of modified pages to flip the top
+> bit of the IPA. This requires that block mappings are not used in the
+> direct map for realm guests.
 > 
-> On Mon, Feb 17, 2025 at 11:24:11AM +0000, Marc Zyngier wrote:
-> > The MDCR_EL2 documentation indicates that the HPMN field has
-> > the following behaviour:
-> > 
-> > "On a Warm reset, this field resets to the expression NUM_PMU_COUNTERS."
-> > 
-> > However, it appears we reset it to zero, which is not very useful.
-> > 
-> > Add a reset helper for MDCR_EL2, and handle the case where userspace
-> > changes the target PMU, which may force us to change HPMN again.
-> > 
-> > Reported-by: Joey Gouly <joey.gouly@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> The existing ABI expectations are that writes to PMCR_EL0.N constrain
-> the number of counters, so that should have a similar effect on
-> MDCR_EL2.HPMN.
-> 
-> At the same time, I get the feeling that we should throw out this whole
-> behavior of writing N to change the shape of the PMU, because it
-> complete breaks down for NV. PMCR_EL0.N is another one of those fields
-> that change behavior based on EL and isn't a global source of truth on
-> the shape of the PMU.
-> 
-> What do you think about adding a new vCPU attribute for selecting the
-> number of counters for a VM? We can allow non-nested VMs to use the
-> 'old' method of writing PMCR_EL0.N and force nested VMs to use the
-> attribute.
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Co-developed-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+[...]
+> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
+> index 547a9e0b46c2..6ae6ae806454 100644
+> --- a/arch/arm64/mm/pageattr.c
+> +++ b/arch/arm64/mm/pageattr.c
+> @@ -5,10 +5,12 @@
+>  #include <linux/kernel.h>
+>  #include <linux/mm.h>
+>  #include <linux/module.h>
+> +#include <linux/mem_encrypt.h>
+>  #include <linux/sched.h>
+>  #include <linux/vmalloc.h>
+>  
+>  #include <asm/cacheflush.h>
+> +#include <asm/pgtable-prot.h>
+>  #include <asm/set_memory.h>
+>  #include <asm/tlbflush.h>
+>  #include <asm/kfence.h>
+> @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
+>  bool can_set_direct_map(void)
+>  {
+>  	/*
+> -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
+> -	 * mapped at page granularity, so that it is possible to
+> +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
+> +	 * map to be mapped at page granularity, so that it is possible to
+>  	 * protect/unprotect single pages.
+>  	 *
+>  	 * KFENCE pool requires page-granular mapping if initialized late.
+> +	 *
+> +	 * Realms need to make pages shared/protected at page granularity.
+>  	 */
+>  	return rodata_full || debug_pagealloc_enabled() ||
+> -	       arm64_kfence_can_set_direct_map();
+> +		arm64_kfence_can_set_direct_map() || is_realm_world();
+>  }
 
-VCPU attribute? or PMU attribute? I'm really not keen on the former,
-but the latter is probably workable, as it is VM-wide, similar to the
-way we keep track of pmcr_n.
+Aneesh pointed out that this call to is_realm_world() is now too early 
+since the decision to delay the RSI detection. The upshot is that a 
+realm guest which doesn't have page granularity forced for other reasons 
+will fail to share pages with the host.
 
-> We can then enforce ordering on the attribute and prevent it from being
-> used after vCPU reset.
+At the moment I can think of a couple of options:
 
-How would that work? Do you really want to mandate the PMU selection
-(with its counter capping) to strictly occur between vcpu creation and
-init?
+(1) Make rodata_full a requirement for realm guests. 
+    CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
+    isn't a big ask.
 
-This would, for example, break kvmtool which has these two operations
-back-to-back, and sneaking new device-specific actions in the middle
-is a bit unpalatable (there is a split between VM-wide and per-vcpu
-actions).
+(2) Revisit the idea of detecting when running as a realm guest early. 
+    This has the advantage of also "fixing" earlycon (no need to 
+    manually specify the shared-alias of an unprotected UART).
 
-Any idea?
+I'm currently leaning towards (1) because it's the default anyway. But 
+if we're going to need to fix earlycon (or indeed find other similar 
+issues) then (2) would obviously make sense.
 
-	M.
+Any thoughts on the best option here.
 
--- 
-Without deviation from the norm, progress is not possible.
+Untested patch for (1) below. Although updating the docs would be
+probably be a good idea too ;)
+
+Thanks,
+Steve
+
+----8<---
+diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+index ce4778141ec7..48a6ef0f401c 100644
+--- a/arch/arm64/kernel/rsi.c
++++ b/arch/arm64/kernel/rsi.c
+@@ -126,6 +126,10 @@ void __init arm64_rsi_init(void)
+ 		return;
+ 	if (!rsi_version_matches())
+ 		return;
++	if (!can_set_direct_map()) {
++		pr_err("rodata_full disabled, unable to run as a realm guest. Please enable CONFIG_RODATA_FULL_DEFAULT_ENABLED\n");
++		return;
++	}
+ 	if (WARN_ON(rsi_get_realm_config(&config)))
+ 		return;
+ 	prot_ns_shared = BIT(config.ipa_bits - 1);
+diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
+index 39fd1f7ff02a..f8fd8a3816fb 100644
+--- a/arch/arm64/mm/pageattr.c
++++ b/arch/arm64/mm/pageattr.c
+@@ -25,16 +25,14 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
+ bool can_set_direct_map(void)
+ {
+ 	/*
+-	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
+-	 * map to be mapped at page granularity, so that it is possible to
++	 * rodata_full, DEBUG_PAGEALLOC require linear map to be
++	 * mapped at page granularity, so that it is possible to
+ 	 * protect/unprotect single pages.
+ 	 *
+ 	 * KFENCE pool requires page-granular mapping if initialized late.
+-	 *
+-	 * Realms need to make pages shared/protected at page granularity.
+ 	 */
+ 	return rodata_full || debug_pagealloc_enabled() ||
+-		arm64_kfence_can_set_direct_map() || is_realm_world();
++		arm64_kfence_can_set_direct_map();
+ }
+ 
+ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
+
