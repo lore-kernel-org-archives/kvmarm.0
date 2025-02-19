@@ -1,375 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC04B2580E7
-	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 21:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144111B4F21
+	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 22:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740001893; cv=none; b=OhKvZJ+G3mNB+nZz6uCftjcNsvtbq0Hy372/1GtaQoU61OGs/Hdq1diF1RR+vnetyXjQJkRHqXZ7K/yNAnSoALh3o7kEb8hrJX1YAm8VbU36KJRRve02XW8KPNIXiqH5WQDy+cX2co5pbC94lkwPT+8tqLK+RYyVpwvSaLAZPPM=
+	t=1740002872; cv=none; b=XEloiGcfxFJNlTBn1ClcAQHgsnGxhU+7dHFhrpTLUG/GdXpo09wA6N4RYW3QRRRys18h84Qgjq6O58IGXI1e+x8v9y5BV3eutYw0YI6V5x0rgXzMAHgPC7fufaRAZ8VEKwFOQr3l0rdp4GskDCQPvL0bPJsIaOLoWgfPAFNoPls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740001893; c=relaxed/simple;
-	bh=BwuZlVH7hL1B2MxeFHe9i1MfYEloGvyYsfT0M9Gz7hM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I82MoLXry+Dbd8wjJEntxJzL1VqtzzHTJJGZMrpJng+sW3vQxgDblKLo+cOKGBsbV8V7MAsaAFU+1nhwZNwIyn3DuKs2Arm24ubtP6raRdM6JAXace5nSgkdFuOr361kYhyG87OWMFdTCx3S7s+BHKqynwR1FFRcnN35+i5l1o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJ8I7/yM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740002872; c=relaxed/simple;
+	bh=hEITRrgieNv/Ub1OlYS/X9nUC2LTusnvXfgFsRzkzgM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eFbrhGyVN3EZCcjJKwJz/0tBdkarCkkzWmCGQB4RRI3DOhpc2xgcDpLlGsl7QMIedZnSWyZjq4woSlTUEwhES92GEcO+QkZAxs4S9ljbh92dK9jY7dFKcTUTDw8eHTt2rI+DxNYfzDRfzbdmQvmVpt/RXD02WGFdZOTGG1JLY/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nafVRmno; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJ8I7/yM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0780AC4CED1;
-	Wed, 19 Feb 2025 21:51:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740001893;
-	bh=BwuZlVH7hL1B2MxeFHe9i1MfYEloGvyYsfT0M9Gz7hM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NJ8I7/yMNkBb228KpwFbVRmub7d/CCVHwva/+6La5kzlnid30X3a1PeIXCLqVeouQ
-	 8/+zYgRlwUIjCKVrzAE+7JKeyx9IxL2SCeruGI5n/UftcIXLhB6l1JXl291Np2nGwj
-	 iHpicNBhRxfTbV981YzJquQdUE2izhfHoXy/8inMLw0DQ+cwH4zQ3QvfUz2M6mw4Ax
-	 j6OhbuuNoQmmKCvunKX8UROBPcIU1h5hXNL7nCoU4laAO2vfRnOqYjIb4A7CskVbbH
-	 Tzn+vm/jh1nQUzL6cdm6yVd/g2Z0QXsoQ/j047yAzyPFMXom49TfYJ03KYdGy80XsA
-	 DPPMNL1TIL/Cg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tkryc-005yq7-Va;
-	Wed, 19 Feb 2025 21:51:31 +0000
-Date: Wed, 19 Feb 2025 21:51:30 +0000
-Message-ID: <86wmdlr4bh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nafVRmno"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740002867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ow+fKK+YhM2bEIFRB+vXisHYGskL142HuAanS/Q7uf0=;
+	b=nafVRmnoCkdVZuoVmj57PK3/KOT07X29H8wWFSKJMtCbrpCHqXarwzPzZhO0j3WwszTPxI
+	q3r6BhbJYJvfHlS8dfoVqMqKn0Jc+FsgF4/ENVFRKI8S63k9nsZoDD+V8FCFzf8vRPkfUw
+	1peQ34oS9FXwkxGJWv9HhLCYoxeN3M4=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v1] KVM: arm64: vgic-its: Add debugfs interface to expose ITS tables
-In-Reply-To: <20250214020258.2436469-1-jingzhangos@google.com>
-References: <20250214020258.2436469-1-jingzhangos@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	stable@vger.kernel.org,
+	Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: [PATCH] KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
+Date: Wed, 19 Feb 2025 14:07:37 -0800
+Message-Id: <20250219220737.130842-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 14 Feb 2025 02:02:58 +0000,
-Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> This commit introduces a debugfs interface to display the contents of the
-> VGIC Interrupt Translation Service (ITS) tables.
-> 
-> The ITS tables map Device/Event IDs to Interrupt IDs and target processors.
-> Exposing this information through debugfs allows for easier inspection and
-> debugging of the interrupt routing configuration.
-> 
-> The debugfs interface presents the ITS table data in a tabular format:
-> 
->   Device ID: 0, Event ID Range: [0 - 65535]
->   EVENT_ID    INTID  HWINTID   TARGET   COL_ID HW
->   -----------------------------------------------
->          0       32        0        0        0  0
->          1       33        0        0        0  0
->          2       34        0        0        0  0
+Vladimir reports that a race condition to attach a VMID to a stage-2 MMU
+sometimes results in a vCPU entering the guest with a VMID of 0:
 
-Is this an actual output? INTID 32 as the LPI number is pretty creative.
+| CPU1                                            |   CPU2
+|                                                 |
+|                                                 | kvm_arch_vcpu_ioctl_run
+|                                                 |   vcpu_load             <= load VTTBR_EL2
+|                                                 |                            kvm_vmid->id = 0
+|                                                 |
+| kvm_arch_vcpu_ioctl_run                         |
+|   vcpu_load             <= load VTTBR_EL2       |
+|                            with kvm_vmid->id = 0|
+|   kvm_arm_vmid_update   <= allocates fresh      |
+|                            kvm_vmid->id and     |
+|                            reload VTTBR_EL2     |
+|                                                 |
+|                                                 |   kvm_arm_vmid_update <= observes that kvm_vmid->id
+|                                                 |                          already allocated,
+|                                                 |                          skips reload VTTBR_EL2
 
->        ...      ...      ...      ...      ... ..
-> 
-> The output is generated using the seq_file interface, allowing for efficient
-> handling of potentially large ITS tables.
-> 
-> This interface is read-only and does not allow modification of the ITS
-> tables. It is intended for debugging and informational purposes only.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
-> rfc -> v1:
->  - Rebase on to v6.14-rc2.
->  - Retained only the debugfs interface patch from the original RFC [1].
-> 
-> [1] https://lore.kernel.org/all/20250113193128.1533449-1-jingzhangos@google.com
-> ---
->  arch/arm64/kvm/Makefile              |   2 +-
->  arch/arm64/kvm/vgic/vgic-its-debug.c | 234 +++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-its.c       |  39 +----
->  arch/arm64/kvm/vgic/vgic.h           |  33 ++++
->  4 files changed, 276 insertions(+), 32 deletions(-)
->  create mode 100644 arch/arm64/kvm/vgic/vgic-its-debug.c
-> 
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 3cf7adb2b5038..b1e7b9c29589c 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,7 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 vgic/vgic-v3.o vgic/vgic-v4.o \
->  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
-> -	 vgic/vgic-its.o vgic/vgic-debug.o
-> +	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-its-debug.o
+Oh yeah, it's as bad as it looks. Remember that VHE loads the stage-2
+MMU eagerly but a VMID only gets attached to the MMU later on in the
+KVM_RUN loop.
 
-I'd rather you keep the vgic debugging stuff in vgic-debug.c. This is
-positively tiny, and we don't need to spread the debugging around.
+Even in the "best case" where VTTBR_EL2 correctly gets reprogrammed
+before entering the EL1&0 regime, there is a period of time where
+hardware is configured with VMID 0. That's completely insane. So, rather
+than decorating the 'late' binding with another hack, just allocate the
+damn thing up front.
 
->  
->  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> diff --git a/arch/arm64/kvm/vgic/vgic-its-debug.c b/arch/arm64/kvm/vgic/vgic-its-debug.c
-> new file mode 100644
-> index 0000000000000..1ff0dd0137939
-> --- /dev/null
-> +++ b/arch/arm64/kvm/vgic/vgic-its-debug.c
-> @@ -0,0 +1,234 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * vgic-its-debug.c - Debugfs interface for exposing VGIC ITS tables.
-> + *
-> + * Copyright (C) 2025 Google
-> + *
-> + * This file provides a debugfs interface to display the contents of the
-> + * VGIC Interrupt Translation Service (ITS) tables. This allows for
-> + * inspection of the mapping between Event IDs, Interrupt IDs, and target
-> + * processors. The information is presented in a tabular format through a
-> + * seq_file interface.
-> + */
-> +
-> +#include <linux/debugfs.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/seq_file.h>
-> +#include <kvm/arm_vgic.h>
-> +#include "vgic.h"
-> +
-> +/**
-> + * struct vgic_its_iter - Iterator for traversing VGIC ITS tables.
-> + * @dev: Pointer to the current its_device being processed.
-> + * @ite: Pointer to the current its_ite within the device being processed.
-> + *
-> + * This structure is used to maintain the current position during iteration
-> + * over the ITS tables. It holds pointers to both the current device and the
-> + * current ITE within that device.
+Attaching a VMID from vcpu_load() is still rollover safe since
+(surprise!) it'll always get called after a vCPU was preempted.
 
-Which tables? You only seem to consider the device table. If that's
-all you need to consider, then call it out in the comment.
+Excuse me while I go find a brown paper bag.
 
-> + */
-> +struct vgic_its_iter {
-> +	struct its_device *dev;
-> +	struct its_ite *ite;
-> +};
-> +
-> +/**
-> + * end_of_iter - Checks if the iterator has reached the end of the ITS tables.
-> + * @iter: The iterator to check.
-> + *
-> + * Return: True if the iterator is at the end, false otherwise.
+Cc: stable@vger.kernel.org
+Fixes: 934bf871f011 ("KVM: arm64: Load the stage-2 MMU context in kvm_vcpu_load_vhe()")
+Reported-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kvm/arm.c              | 22 ++++++++++------------
+ arch/arm64/kvm/vmid.c             | 11 +++--------
+ 3 files changed, 14 insertions(+), 21 deletions(-)
 
-The end of what?
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7cfa024de4e3..e6e8b8970caa 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1271,7 +1271,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+ extern unsigned int __ro_after_init kvm_arm_vmid_bits;
+ int __init kvm_arm_vmid_alloc_init(void);
+ void __init kvm_arm_vmid_alloc_free(void);
+-bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
++void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
+ void kvm_arm_vmid_clear_active(void);
+ 
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 646e806c6ca6..fafe42755031 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -559,6 +559,16 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	mmu = vcpu->arch.hw_mmu;
+ 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
+ 
++	/*
++	 * Ensure a VMID is allocated for the MMU before programming VTTBR_EL2,
++	 * which happens eagerly in VHE.
++	 *
++	 * Also, the VMID allocator only preserves VMIDs that are active at the
++	 * time of rollover, so KVM might need to grab a new VMID for the MMU if
++	 * this is called from kvm_sched_in().
++	 */
++	kvm_arm_vmid_update(&mmu->vmid);
++
+ 	/*
+ 	 * We guarantee that both TLBs and I-cache are private to each
+ 	 * vcpu. If detecting that a vcpu from the same VM has
+@@ -1138,18 +1148,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 */
+ 		preempt_disable();
+ 
+-		/*
+-		 * The VMID allocator only tracks active VMIDs per
+-		 * physical CPU, and therefore the VMID allocated may not be
+-		 * preserved on VMID roll-over if the task was preempted,
+-		 * making a thread's VMID inactive. So we need to call
+-		 * kvm_arm_vmid_update() in non-premptible context.
+-		 */
+-		if (kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid) &&
+-		    has_vhe())
+-			__load_stage2(vcpu->arch.hw_mmu,
+-				      vcpu->arch.hw_mmu->arch);
+-
+ 		kvm_pmu_flush_hwstate(vcpu);
+ 
+ 		local_irq_disable();
+diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+index 806223b7022a..7fe8ba1a2851 100644
+--- a/arch/arm64/kvm/vmid.c
++++ b/arch/arm64/kvm/vmid.c
+@@ -135,11 +135,10 @@ void kvm_arm_vmid_clear_active(void)
+ 	atomic64_set(this_cpu_ptr(&active_vmids), VMID_ACTIVE_INVALID);
+ }
+ 
+-bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
++void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ {
+ 	unsigned long flags;
+ 	u64 vmid, old_active_vmid;
+-	bool updated = false;
+ 
+ 	vmid = atomic64_read(&kvm_vmid->id);
+ 
+@@ -157,21 +156,17 @@ bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
+ 	    0 != atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
+ 					  old_active_vmid, vmid))
+-		return false;
++		return;
+ 
+ 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
+ 
+ 	/* Check that our VMID belongs to the current generation. */
+ 	vmid = atomic64_read(&kvm_vmid->id);
+-	if (!vmid_gen_match(vmid)) {
++	if (!vmid_gen_match(vmid))
+ 		vmid = new_vmid(kvm_vmid);
+-		updated = true;
+-	}
+ 
+ 	atomic64_set(this_cpu_ptr(&active_vmids), vmid);
+ 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
+-
+-	return updated;
+ }
+ 
+ /*
 
-> + */
-> +static inline bool end_of_iter(struct vgic_its_iter *iter)
-> +{
-> +	return !iter->dev && !iter->ite;
-> +}
-> +
-> +/**
-> + * iter_next - Advances the iterator to the next entry in the ITS tables.
-> + * @its: The VGIC ITS structure.
-> + * @iter: The iterator to advance.
-> + *
-> + * This function moves the iterator to the next ITE within the current device,
-> + * or to the first ITE of the next device if the current ITE is the last in
-> + * the device. If the current device is the last device, the iterator is set
-> + * to indicate the end of iteration.
-> + */
-> +static void iter_next(struct vgic_its *its, struct vgic_its_iter *iter)
-> +{
-> +	struct its_device *dev = iter->dev;
-> +	struct its_ite *ite = iter->ite;
-> +
-> +	if (!ite || list_is_last(&ite->ite_list, &dev->itt_head)) {
-> +		if (list_is_last(&dev->dev_list, &its->device_list)) {
-> +			dev = NULL;
-> +			ite = NULL;
-> +		} else {
-> +			dev = list_next_entry(dev, dev_list);
-> +			ite = list_first_entry_or_null(&dev->itt_head,
-> +						       struct its_ite,
-> +						       ite_list);
-> +		}
-> +	} else {
-> +		ite = list_next_entry(ite, ite_list);
-> +	}
-> +
-> +	iter->dev = dev;
-> +	iter->ite = ite;
-> +}
-> +
-> +/**
-> + * vgic_its_debug_start - Start function for the seq_file interface.
-> + * @s: The seq_file structure.
-> + * @pos: The starting position (offset).
-> + *
-> + * This function initializes the iterator to the beginning of the ITS tables
-> + * and advances it to the specified position. It acquires the its_lock mutex
-> + * to protect shared data.
-> + *
-> + * Return: An iterator pointer on success, NULL if no devices are found or
-> + *         the end of the list is reached, or ERR_PTR(-ENOMEM) on memory
-> + *         allocation failure.
-> + */
-> +static void *vgic_its_debug_start(struct seq_file *s, loff_t *pos)
-> +{
-> +	struct vgic_its *its = s->private;
-> +	struct vgic_its_iter *iter;
-> +	struct its_device *dev;
-> +	loff_t offset = *pos;
-> +
-> +	mutex_lock(&its->its_lock);
-> +
-> +	dev = list_first_entry_or_null(&its->device_list,
-> +				       struct its_device, dev_list);
-> +	if (!dev)
-> +		return NULL;
-> +
-> +	iter = kmalloc(sizeof(*iter), GFP_KERNEL);
-> +	if (!iter)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	iter->dev = dev;
-> +	iter->ite = list_first_entry_or_null(&dev->itt_head,
-> +					     struct its_ite, ite_list);
-> +
-> +	while (!end_of_iter(iter) && offset--)
-> +		iter_next(its, iter);
-> +
-> +	if (end_of_iter(iter)) {
-> +		kfree(iter);
-> +		return NULL;
-> +	}
-> +
-> +	return iter;
-> +}
-> +
-> +/**
-> + * vgic_its_debug_next - Next function for the seq_file interface.
-> + * @s: The seq_file structure.
-> + * @v: The current iterator.
-> + * @pos: The current position (offset).
-> + *
-> + * This function advances the iterator to the next entry and increments the
-> + * position.
-> + *
-> + * Return: An iterator pointer on success, or NULL if the end of the list is
-> + *         reached.
-> + */
-> +static void *vgic_its_debug_next(struct seq_file *s, void *v, loff_t *pos)
-> +{
-> +	struct vgic_its *its = s->private;
-> +	struct vgic_its_iter *iter = v;
-> +
-> +	++*pos;
-> +	iter_next(its, iter);
-> +
-> +	if (end_of_iter(iter)) {
-> +		kfree(iter);
-> +		return NULL;
-> +	}
-> +	return iter;
-> +}
-> +
-> +/**
-> + * vgic_its_debug_stop - Stop function for the seq_file interface.
-> + * @s: The seq_file structure.
-> + * @v: The current iterator.
-> + *
-> + * This function frees the iterator and releases the its_lock mutex.
-> + */
-> +static void vgic_its_debug_stop(struct seq_file *s, void *v)
-> +{
-> +	struct vgic_its *its = s->private;
-> +	struct vgic_its_iter *iter = v;
-> +
-> +	if (!IS_ERR_OR_NULL(iter))
-> +		kfree(iter);
-> +	mutex_unlock(&its->its_lock);
-> +}
-> +
-> +/**
-> + * vgic_its_debug_show - Show function for the seq_file interface.
-> + * @s: The seq_file structure.
-> + * @v: The current iterator.
-> + *
-> + * This function formats and prints the ITS table entry information to the
-> + * seq_file output.
-> + *
-> + * Return: 0 on success.
-> + */
-> +static int vgic_its_debug_show(struct seq_file *s, void *v)
-> +{
-> +	struct vgic_its_iter *iter = v;
-> +	struct its_device *dev = iter->dev;
-> +	struct its_ite *ite = iter->ite;
-> +
-> +	if (list_is_first(&ite->ite_list, &dev->itt_head)) {
-> +		seq_printf(s, "\n");
-> +		seq_printf(s, "Device ID: %u, Event ID Range: [0 - %llu]\n",
-> +			   dev->device_id, BIT_ULL(dev->num_eventid_bits) - 1);
-
-nit: DevIDs are usually expressed in hex, because they tend to encode
-the bus topology.
-
-> +		seq_printf(s, "EVENT_ID    INTID  HWINTID   TARGET   COL_ID HW\n");
-> +		seq_printf(s, "-----------------------------------------------\n");
-> +	}
-> +
-> +	if (ite && ite->irq && ite->collection) {
-> +		seq_printf(s, "%8u %8u %8u %8u %8u %2d\n",
-> +			   ite->event_id, ite->irq->intid, ite->irq->hwintid,
-> +			   ite->collection->target_addr,
-> +			   ite->collection->collection_id, ite->irq->hw);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct seq_operations vgic_its_debug_sops = {
-> +	.start = vgic_its_debug_start,
-> +	.next  = vgic_its_debug_next,
-> +	.stop  = vgic_its_debug_stop,
-> +	.show  = vgic_its_debug_show
-> +};
-> +
-> +DEFINE_SEQ_ATTRIBUTE(vgic_its_debug);
-> +
-> +/**
-> + * vgic_its_debug_init - Initializes the debugfs interface for VGIC ITS.
-> + * @dev: The KVM device structure.
-> + *
-> + * This function creates a debugfs file named "vgic-its-state@%its_base"
-> + * to expose the ITS table information.
-> + *
-> + * Return: 0 on success.
-> + */
-> +int vgic_its_debug_init(struct kvm_device *dev)
-> +{
-> +	struct vgic_its *its = dev->private;
-> +	char name[32];
-> +
-> +	snprintf(name, sizeof(name), "vgic-its-state@%llx", (u64)its->vgic_its_base);
-
-This is very fragile. How about using kasprintf() instead, even if it
-is a short lived allocation?
-
-Thanks,
-
-	M.
-
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
