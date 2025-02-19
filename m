@@ -1,31 +1,31 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD581CAA65
-	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 23:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3062123E259
+	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 23:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740007158; cv=none; b=pRI0YxCfXNsmz3efRFzvvYF80MnzqU4F7lO54eWNTQE4G/6louO2FDdd8w5zgayoGotAIAvyzbl3m/kDDuiT9kyVZSG+abYhmCwsGYaeYWyeVfDxsjpsdY6CBoRVHMhQKXgdJ4CwnoLes/KEY697AxUd5Gu/MsiF+dj7Ts1q4Nk=
+	t=1740007183; cv=none; b=nLNMLFkc5M5vm3KThGh0fSrkmb9JRY03xHvlkt2gws3XObK8cPb9E7woqRz7wT0+Zjjm6oE49MNDsMKjXUzuR//7wlKSSb9THzHElTwcwfZ0s2b5+YhzmJuYtqJEha0RCf2TbkTmnx6wNPvlChrxlyuvjJPJWxKyGlY9uDaluHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740007158; c=relaxed/simple;
-	bh=SwVIv3Wq+khucr35x1I00QEauKzA1nGVYUlz47Jo98Y=;
+	s=arc-20240116; t=1740007183; c=relaxed/simple;
+	bh=O07bv4al2lH3D6yFE3t26uKbSZTZGVw79c0MQqtfdWQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B9hgvaUPsKh7t5ri04bNLHP7pKYx6Jtf6L1QXSM2pRjngnDkbBUUs1pa/imzpHZE0gtw7th5nWJQv7OjyhfNqM7HaSHziTUePDviwRoHavan0j5+ZxQU57ZqQuwjGxSsq6Ar8zIDs1k9GXnYXW8QuiIIfUwq02z0IROjbaZIAgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Oo+3Vg/G; arc=none smtp.client-ip=95.215.58.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=HJcZSyj2MnjXa83w6JJwE+sz+PwV6Xdv0k+aNrGL69pEthwzNj+GB9YHTxg7VISxZikbtJ8n9EgMUvYVdPApxb8g+cuWTv/YYdfIspSw1eFOi9Bmc1LoaxK5OC5gBw7vC1SEOmIhGDdr2SaoGwycZL0ezq5ZtRcbSP1CXorbGZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gk7kc1I1; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Oo+3Vg/G"
-Date: Wed, 19 Feb 2025 15:19:06 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gk7kc1I1"
+Date: Wed, 19 Feb 2025 15:19:35 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740007151;
+	t=1740007179;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fETwu0L8tuv2gAhj94uky1reANW9J8SOc983NJCn42o=;
-	b=Oo+3Vg/GkwMMP6P5U1rzYe+IcwpjTIyuFeGqIgKcvt0Ivu48GQwydujT3JBpRYxJN44xiq
-	RpRLrC1JuWy2u6suu6NUAMjAAbLktGpYQTO1TsVY2F7C6rN02twpucUGoyS4yrN3shOtmz
-	DKvOcQ7/VItsXMkwEVzyvQgrr7AmpfU=
+	bh=KagvglZHupqGniUWXLUyr/N9cxv5t/e8DpCYVteqRYo=;
+	b=gk7kc1I1O6oTn0eCT9zJmnuPN7tg+wSNX0oO/dv6TRU7OKCSIhapie8D7sPw0A922JNEr5
+	xzEFD36nCDkGbUQYa7kQc4wh6VcJWlXWtpKP8DuRDFy63FxfU1kuVz3+BUqTA2R+SYh+8k
+	rCDYlcapj2cry4xUSAlqmazWSQwRk0Y=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -35,11 +35,10 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 13/14] KVM: arm64: Allow userspace to request
- KVM_ARM_VCPU_EL2*
-Message-ID: <Z7Zm6ryZ126gMLZ2@linux.dev>
+Subject: Re: [PATCH 14/14] KVM: arm64: Document NV caps and vcpu flags
+Message-ID: <Z7ZnB2z6psLcbfRZ@linux.dev>
 References: <20250215173816.3767330-1-maz@kernel.org>
- <20250215173816.3767330-14-maz@kernel.org>
+ <20250215173816.3767330-15-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,16 +47,12 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250215173816.3767330-14-maz@kernel.org>
+In-Reply-To: <20250215173816.3767330-15-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Sat, Feb 15, 2025 at 05:38:15PM +0000, Marc Zyngier wrote:
-> Since we're (almost) feature complete, let's allow userspace to
-> request KVM_ARM_VCPU_EL2* by bumping KVM_VCPU_MAX_FEATURES up.
-> 
-> We also now advertise the features to userspace with a new capabilities.
-> 
-> It's going to be great...
+On Sat, Feb 15, 2025 at 05:38:16PM +0000, Marc Zyngier wrote:
+> Describe the two new vcpu flags that control NV, together with
+> the capabilities that advertise them.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
