@@ -1,191 +1,89 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144111B4F21
-	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 22:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5621C3F04
+	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 22:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740002872; cv=none; b=XEloiGcfxFJNlTBn1ClcAQHgsnGxhU+7dHFhrpTLUG/GdXpo09wA6N4RYW3QRRRys18h84Qgjq6O58IGXI1e+x8v9y5BV3eutYw0YI6V5x0rgXzMAHgPC7fufaRAZ8VEKwFOQr3l0rdp4GskDCQPvL0bPJsIaOLoWgfPAFNoPls=
+	t=1740003106; cv=none; b=ALraAlUUsing1o6NfNPjj/P6ohweIGlb3NeCHbB6hnackwwF64qNz47Ybahb+4BvXZLNupVkzBfG1OC7pUyl4CmNOoPYOIlbVJXMAH6m7MFGTj2x2pBT9+uVyQP9y0Q8W86HmwH1Wbz/3YW4+ihX+ZMGifusvTiU7iJizu359Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740002872; c=relaxed/simple;
-	bh=hEITRrgieNv/Ub1OlYS/X9nUC2LTusnvXfgFsRzkzgM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eFbrhGyVN3EZCcjJKwJz/0tBdkarCkkzWmCGQB4RRI3DOhpc2xgcDpLlGsl7QMIedZnSWyZjq4woSlTUEwhES92GEcO+QkZAxs4S9ljbh92dK9jY7dFKcTUTDw8eHTt2rI+DxNYfzDRfzbdmQvmVpt/RXD02WGFdZOTGG1JLY/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nafVRmno; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1740003106; c=relaxed/simple;
+	bh=dZyIn3+mJ3vnANHwYSZe/NwWp//PvNFWn3w/6m5Atxg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TbHOXyZ+PBoEx56hmz6WS9K4ZXkzxmOQ3YJQoFBjfrhfFNKCE3XaS/oydpVHUnTrJK5l4pV48Bh26NfUpozZUCm5qqPvmGKUJTHEO+CfpkzARngoQQ0/XK/X+sQx4TBm4o/cUWZevpSSe/8pIC8dNgOjSsPQmRx8buyJei0gsWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWdUaRWW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nafVRmno"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740002867;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ow+fKK+YhM2bEIFRB+vXisHYGskL142HuAanS/Q7uf0=;
-	b=nafVRmnoCkdVZuoVmj57PK3/KOT07X29H8wWFSKJMtCbrpCHqXarwzPzZhO0j3WwszTPxI
-	q3r6BhbJYJvfHlS8dfoVqMqKn0Jc+FsgF4/ENVFRKI8S63k9nsZoDD+V8FCFzf8vRPkfUw
-	1peQ34oS9FXwkxGJWv9HhLCYoxeN3M4=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	stable@vger.kernel.org,
-	Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH] KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
-Date: Wed, 19 Feb 2025 14:07:37 -0800
-Message-Id: <20250219220737.130842-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWdUaRWW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C9EFC4CED1;
+	Wed, 19 Feb 2025 22:11:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740003106;
+	bh=dZyIn3+mJ3vnANHwYSZe/NwWp//PvNFWn3w/6m5Atxg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GWdUaRWWkN7u/XVvl76z7LF+/W9dJl32hpLYgoRV03/xud0VwajoKJhKmEAfxue8A
+	 8U/i8V82GDdusExHr2lFgiQAH3qZgZyQuL6+tcAEMENBo9xn5gunplxyEF1TtVMGTe
+	 g4nTmRBpkwQOfWe1bNhR7uxMdvpa+NEMSsZV8Tyh99wVdInTKnWNIrV3K8dBcyhhG/
+	 FrPQK+qEz590c2POkLp1YOFPzFcKnLhNHq1S8eczJEXhYuKgbhlPKUyHO6lpHs8vNo
+	 ErLbrZJ859VcxuqEz/sgoRnLSx3SGDI000CsrANPJdFQQORlWE9OnJ9X1dADj/ZBxu
+	 Ps0BxWJmXA45w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tksIB-005zA8-Qj;
+	Wed, 19 Feb 2025 22:11:43 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH] KVM: arm64: Fix tcr_el2 initialisation in hVHE mode
+Date: Wed, 19 Feb 2025 22:11:38 +0000
+Message-Id: <174000308842.546972.9338900665339093067.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250214133724.13179-1-will@kernel.org>
+References: <20250214133724.13179-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, will@kernel.org, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Vladimir reports that a race condition to attach a VMID to a stage-2 MMU
-sometimes results in a vCPU entering the guest with a VMID of 0:
+On Fri, 14 Feb 2025 13:37:24 +0000, Will Deacon wrote:
+> When not running in VHE mode, cpu_prepare_hyp_mode() computes the value
+> of TCR_EL2 using the host's TCR_EL1 settings as a starting point. For
+> nVHE, this amounts to masking out everything apart from the TG0, SH0,
+> ORGN0, IRGN0 and T0SZ fields before setting the RES1 bits, shifting the
+> IPS field down to the PS field and setting DS if LPA2 is enabled.
+> 
+> Unfortunately, for hVHE, things go slightly wonky: EPD1 is correctly set
+> to disable walks via TTBR1_EL2 but then the T1SZ and IPS fields are
+> corrupted when we mistakenly attempt to initialise the PS and DS fields
+> in their E2H=0 positions. Furthermore, many fields are retained from
+> TCR_EL1 which should not be propagated to TCR_EL2. Notably, this means
+> we can end up with A1 set despite not initialising TTBR1_EL2 at all.
+> This has been shown to cause unexpected translation faults at EL2 with
+> pKVM due to TLB invalidation not taking effect when running with a
+> non-zero ASID.
+> 
+> [...]
 
-| CPU1                                            |   CPU2
-|                                                 |
-|                                                 | kvm_arch_vcpu_ioctl_run
-|                                                 |   vcpu_load             <= load VTTBR_EL2
-|                                                 |                            kvm_vmid->id = 0
-|                                                 |
-| kvm_arch_vcpu_ioctl_run                         |
-|   vcpu_load             <= load VTTBR_EL2       |
-|                            with kvm_vmid->id = 0|
-|   kvm_arm_vmid_update   <= allocates fresh      |
-|                            kvm_vmid->id and     |
-|                            reload VTTBR_EL2     |
-|                                                 |
-|                                                 |   kvm_arm_vmid_update <= observes that kvm_vmid->id
-|                                                 |                          already allocated,
-|                                                 |                          skips reload VTTBR_EL2
+Applied to fixes, thanks!
 
-Oh yeah, it's as bad as it looks. Remember that VHE loads the stage-2
-MMU eagerly but a VMID only gets attached to the MMU later on in the
-KVM_RUN loop.
+[1/1] KVM: arm64: Fix tcr_el2 initialisation in hVHE mode
+      commit: 102c51c50db88aedd00a318b7708ad60dbec2e95
 
-Even in the "best case" where VTTBR_EL2 correctly gets reprogrammed
-before entering the EL1&0 regime, there is a period of time where
-hardware is configured with VMID 0. That's completely insane. So, rather
-than decorating the 'late' binding with another hack, just allocate the
-damn thing up front.
+Cheers,
 
-Attaching a VMID from vcpu_load() is still rollover safe since
-(surprise!) it'll always get called after a vCPU was preempted.
-
-Excuse me while I go find a brown paper bag.
-
-Cc: stable@vger.kernel.org
-Fixes: 934bf871f011 ("KVM: arm64: Load the stage-2 MMU context in kvm_vcpu_load_vhe()")
-Reported-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              | 22 ++++++++++------------
- arch/arm64/kvm/vmid.c             | 11 +++--------
- 3 files changed, 14 insertions(+), 21 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e3..e6e8b8970caa 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1271,7 +1271,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
- extern unsigned int __ro_after_init kvm_arm_vmid_bits;
- int __init kvm_arm_vmid_alloc_init(void);
- void __init kvm_arm_vmid_alloc_free(void);
--bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
-+void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
- void kvm_arm_vmid_clear_active(void);
- 
- static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 646e806c6ca6..fafe42755031 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -559,6 +559,16 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	mmu = vcpu->arch.hw_mmu;
- 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
- 
-+	/*
-+	 * Ensure a VMID is allocated for the MMU before programming VTTBR_EL2,
-+	 * which happens eagerly in VHE.
-+	 *
-+	 * Also, the VMID allocator only preserves VMIDs that are active at the
-+	 * time of rollover, so KVM might need to grab a new VMID for the MMU if
-+	 * this is called from kvm_sched_in().
-+	 */
-+	kvm_arm_vmid_update(&mmu->vmid);
-+
- 	/*
- 	 * We guarantee that both TLBs and I-cache are private to each
- 	 * vcpu. If detecting that a vcpu from the same VM has
-@@ -1138,18 +1148,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		preempt_disable();
- 
--		/*
--		 * The VMID allocator only tracks active VMIDs per
--		 * physical CPU, and therefore the VMID allocated may not be
--		 * preserved on VMID roll-over if the task was preempted,
--		 * making a thread's VMID inactive. So we need to call
--		 * kvm_arm_vmid_update() in non-premptible context.
--		 */
--		if (kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid) &&
--		    has_vhe())
--			__load_stage2(vcpu->arch.hw_mmu,
--				      vcpu->arch.hw_mmu->arch);
--
- 		kvm_pmu_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
-diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
-index 806223b7022a..7fe8ba1a2851 100644
---- a/arch/arm64/kvm/vmid.c
-+++ b/arch/arm64/kvm/vmid.c
-@@ -135,11 +135,10 @@ void kvm_arm_vmid_clear_active(void)
- 	atomic64_set(this_cpu_ptr(&active_vmids), VMID_ACTIVE_INVALID);
- }
- 
--bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
-+void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
- {
- 	unsigned long flags;
- 	u64 vmid, old_active_vmid;
--	bool updated = false;
- 
- 	vmid = atomic64_read(&kvm_vmid->id);
- 
-@@ -157,21 +156,17 @@ bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
- 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
- 	    0 != atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
- 					  old_active_vmid, vmid))
--		return false;
-+		return;
- 
- 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
- 
- 	/* Check that our VMID belongs to the current generation. */
- 	vmid = atomic64_read(&kvm_vmid->id);
--	if (!vmid_gen_match(vmid)) {
-+	if (!vmid_gen_match(vmid))
- 		vmid = new_vmid(kvm_vmid);
--		updated = true;
--	}
- 
- 	atomic64_set(this_cpu_ptr(&active_vmids), vmid);
- 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
--
--	return updated;
- }
- 
- /*
-
-base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+	M.
 -- 
-2.39.5
+Without deviation from the norm, progress is not possible.
+
 
