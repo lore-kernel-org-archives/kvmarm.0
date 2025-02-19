@@ -1,60 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B54184F;
-	Wed, 19 Feb 2025 19:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362941C1F21
+	for <kvmarm@lists.linux.dev>; Wed, 19 Feb 2025 21:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739993711; cv=none; b=n99jTwULFDD0W/Eio7b81c65ANhydJMIsACb/BeN3MyIwar+/MhYiTpogSHbYqPrcCwvGSrjRUBl+uogvdZx8oIgZ4r2iOKQq+Ts/CJcvNY/ingLIUj7/DOLiDPo3qgr8iwSLTasE2MmCSivDSPYJT7AeRl+WFzqCLAZq8CaWko=
+	t=1739999444; cv=none; b=EZxX/rUXUARFlJrbQdgEleIS4cy93cCW40wVB3J5H+nJKAeghO/FNsWBzpPlH9MOFTE+5s8IUiQHZXM5Q9FX2rt8F4P8juudR976GvZCe6bWj/enFn22FjhYfq+0a2HUK/pT+xySsPQU9H3nD6jLc/7ZIpwla6KQIopcrw9Oyf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739993711; c=relaxed/simple;
-	bh=Fn3wSAWM9ieh5UpaveCtIUFgMyNxAkN0r0CDO0Ag7jA=;
+	s=arc-20240116; t=1739999444; c=relaxed/simple;
+	bh=Bl/XmhLLo3M0VopZhsvdhY/jPR1HVnDC4/gumowxn+A=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cW2fA5SCZclYM4C0S5BpHhSI4AEJP1Qjzd95qXee5jL7z1RmIil5U3B5JWi8XPmkUoFyPRclK04B0dQcwXnfl0yRIr1ToEqkrx2jJuVEb4jDVggI1h/VgV7JbnDbPdK9EurHmsZjf1zuG4uYc5IYEJpeMPibofCLbgKBVYWDuUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJQiBSs/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=BAIUaDAaw0yyEzZe8Ev5UyLf6uGds578jEauLM3EiG9fy4h8XcO/Ar7E1fiqETCGWsJ1r3QkfUMorYkKO18GEydeJ31HKaQiTMHmqCAZ6hwUr0lXyBLn9WhtLnRqEr/Wqphgk2HVA9Baamql/aXyLS5mb2trHkfWWcyR460/MjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qx+cJgnQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJQiBSs/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD18AC4CED1;
-	Wed, 19 Feb 2025 19:35:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qx+cJgnQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE431C4CED1;
+	Wed, 19 Feb 2025 21:10:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739993710;
-	bh=Fn3wSAWM9ieh5UpaveCtIUFgMyNxAkN0r0CDO0Ag7jA=;
+	s=k20201202; t=1739999444;
+	bh=Bl/XmhLLo3M0VopZhsvdhY/jPR1HVnDC4/gumowxn+A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IJQiBSs/OxkI/b/fg3rkPfPtMCLTTVv1+aG2xhowPUN9D3oLnDGftbbGSRQhDcK7u
-	 ZcLPs7QbUi6hex3dZHv8ZcTTuYKe43MQKKJEJWI6m0L3rWuOoNs19gDePjWsUlv9IK
-	 4K1LrljQSvq2sWmYBMnJi78pR2ljKq5KuEn276r+zUpVGwHckYGN+eBBfGWyyxB9WW
-	 dy+lPHI0chP9BpNAf8WDxzQvRHBCHdsmYSjLZRRUniZ73Y0JyFgip+ImP0B+4vsZdi
-	 uQnRrAP+xenUMjLuMYizDAacCwiWVMd2z3BWAyMj2XCfTToNKZ76q1Jhu5+GoFRkh/
-	 c0S8kF2n00l1Q==
+	b=qx+cJgnQ0cx4K5BelrN75HVBn65UwNhUNcdYgrDYnAPs103pLXQx1kLB4tZ4TtUr3
+	 7B8eEDnsnFHdDqmwVD/SJWd9ACERZlI9Sd8Vig8Ykbyr1ANVzaWHc/S0xC4a8OnD5N
+	 4xFwBtmfdujf6wcpWdWADPKceqds5CL9zbr6HHecUW9LEcrKwnuS/qcWhyDichDHdH
+	 o4TKMzD1RXKHZCcTo69aVq8FAVFRaVUz1wVkjOozl2wlqXK+nbn7WxvaVez8fs95sq
+	 iIoRb5jP+pLQ3muycu1pYx6tj6CVcz/IU2bkNRTCuzACA6Zvw54DZDKEOZOBFznBxG
+	 q3ILsfiA/1O+A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tkpqe-005wOm-Se;
-	Wed, 19 Feb 2025 19:35:08 +0000
-Date: Wed, 19 Feb 2025 19:35:08 +0000
-Message-ID: <86zfihramr.wl-maz@kernel.org>
+	id 1tkrL7-005yDS-Os;
+	Wed, 19 Feb 2025 21:10:41 +0000
+Date: Wed, 19 Feb 2025 21:10:41 +0000
+Message-ID: <86y0y1r67i.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Janne Grunau <j@jannau.net>
-Subject: Re: [PATCH v2 07/14] KVM: arm64: Use a cpucap to determine if system supports FEAT_PMUv3
-In-Reply-To: <Z7YvkHpm3w__HnkO@linux.dev>
-References: <20250203183111.191519-1-oliver.upton@linux.dev>
-	<20250203183111.191519-8-oliver.upton@linux.dev>
-	<864j0psuas.wl-maz@kernel.org>
-	<Z7YvkHpm3w__HnkO@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix MDCR_EL2.HPMN reset value
+In-Reply-To: <Z7YrLMz49_f14MRs@linux.dev>
+References: <20250217112412.3963324-1-maz@kernel.org>
+	<20250217112412.3963324-2-maz@kernel.org>
+	<Z7OFvp7LMcOvWziA@linux.dev>
+	<86a5airpyy.wl-maz@kernel.org>
+	<Z7YrLMz49_f14MRs@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,35 +59,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mizhang@google.com, coltonlewis@google.com, rananta@google.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, j@jannau.net
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 19 Feb 2025 19:22:56 +0000,
+On Wed, 19 Feb 2025 19:04:12 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Wed, Feb 19, 2025 at 05:44:59PM +0000, Marc Zyngier wrote:
-> > > +static bool has_pmuv3(const struct arm64_cpu_capabilities *entry, int scope)
-> > > +{
-> > > +	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > > +	unsigned int pmuver;
-> > > +
-> > > +	pmuver = cpuid_feature_extract_unsigned_field(dfr0,
-> > > +						      ID_AA64DFR0_EL1_PMUVer_SHIFT);
-> > > +	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-> > > +		return false;
-> > > +
-> > > +	return pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP;
+> On Wed, Feb 19, 2025 at 02:03:49PM +0000, Marc Zyngier wrote:
+> > On Mon, 17 Feb 2025 18:53:50 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > What do you think about adding a new vCPU attribute for selecting the
+> > > number of counters for a VM? We can allow non-nested VMs to use the
+> > > 'old' method of writing PMCR_EL0.N and force nested VMs to use the
+> > > attribute.
 > > 
-> > Given that PMUVer is a signed field, how about using
-> > cpuid_feature_extract_signed_field() and do a signed comparison instead?
+> > VCPU attribute? or PMU attribute? I'm really not keen on the former,
+> > but the latter is probably workable, as it is VM-wide, similar to the
+> > way we keep track of pmcr_n.
 > 
-> I'm happy to include a comment, but the PMUVer field is not signed. Any value
-> other than 0xF is meant to be treated as an unsigned quantity.
-> 
-> DDI047L.a D24.1.3.2 is where this is coming from.
+> Well the _existing_ PMU attributes are actually vCPU attributes. I do
+> agree that accessing them as a VM attribute makes more sense, but that's
+> the UAPI we already have...
 
-Duh, you're of course correct. Ignore me.
+Gah, I remember now. Someone please take the API to the backyard...
+
+> 
+> > > We can then enforce ordering on the attribute and prevent it from being
+> > > used after vCPU reset.
+> > 
+> > How would that work? Do you really want to mandate the PMU selection
+> > (with its counter capping) to strictly occur between vcpu creation and
+> > init?
+> > 
+> > This would, for example, break kvmtool which has these two operations
+> > back-to-back, and sneaking new device-specific actions in the middle
+> > is a bit unpalatable (there is a split between VM-wide and per-vcpu
+> > actions).
+> > 
+> > Any idea?
+> 
+> If we want to do this the 'right' way, we should provide VM attributes
+> for selecting the PMU implementation / configuring the event filter
+> to complement an attribute for setting the number of event counters.
+> 
+> I don't want to have a mix-and-match approach where vPMU attributes are
+> scattered between the vCPU and the VM since it requires a similar amount
+> of gymnastics in userspace to set crap up.
+
+I agree on not mixing vCPU and VM scoped attributes, even if that
+amounts to the same thing in the back-end. But freezing the number of
+counters on vcpu reset is something that should be considered very
+carefully, and I fear it breaks existing models -- specially given
+that this is yet another one-off.
+
+I wonder if we should instead make use of the KVM_ARM_VCPU_FINALIZE
+ioctl just like we do for SVE, passing KVM_ARM_VCPU_PMU_V3 instead.
+This would make use of an existing mechanism and lock the PMU for good
+(implementation, IRQ, number of counters...).
 
 	M.
 
