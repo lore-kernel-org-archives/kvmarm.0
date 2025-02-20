@@ -1,118 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE42212B0A
-	for <kvmarm@lists.linux.dev>; Thu, 20 Feb 2025 17:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA6021324F;
+	Thu, 20 Feb 2025 17:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740073004; cv=none; b=SxblaMuxXqOViMcaKATeMiKr7XkFqljdYbCZeIusQtpF/1UdLGh7QsPKCcKLrhZYW39yJi8gV4QreEl+PzY4cjqyv5pQSwF2BVBkhbCin7NpnjTt9necfhFAhqKWIIyyaAcU+MQ3DsbrD292fG+cCLdyCVTkRAzguZvFb6QAFPU=
+	t=1740073460; cv=none; b=Br5d3Kte2M6mnlXhXi4yW8GO2kg+GgXptGlqEPytlAYa3d9HxHmeVxWO0Z4vX0Tfl3lnI79XJlKkOcFOxW5niIPHF4N5AhscBcAnE8rzGszw3JMJjiOuUjGquX9GNFl926Z8QO1R2K7OiQFwuZRssOLFb/3dvGvYJ/krriH/8RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740073004; c=relaxed/simple;
-	bh=kwe+tQSoGJcdPaF0wgLIDSLqOxgh5pk6T6ef3Yy9nVQ=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Arn2txEg5NjlEENNwmTlYk7WgoKiyVGBR3rxepB6wsykRSUu0hHm1w+oFSOoRsf1DX/M8QMNfo6WRGvBHlmNRQPdUKfkI7rWWmbZiF6+gS7bhOjROQaphZm8Cai7gt1kdUfajfbUfzYELg5oBCjAdTAHYYujWbWLPG3DI+TxyAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MYyvorWm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1740073460; c=relaxed/simple;
+	bh=JG9qAobTzeeNJhvrxW9wlpTi2Gx0CaoQMhNmfQShIEA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZMdSX3jLgf5jPQ6QZ/4JptuE+7jbO+htz0lYsko59lL9BGpbx8AkHAJtWh62aTpN/leM1rXGWF+XSl4qgclJMKX4GofHRsByss9UZ/1oc3uNY3XyP46xyQl7CEJHDyuDy1H9We8paNWyCOXx0SwMPUW+ZedFO6RMTIH7Ed1d6HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uk2jw35O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MYyvorWm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740073000;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n15bf8E4w81YIQXcbn52KewH85spv07PWBoufUb1/Zw=;
-	b=MYyvorWmWManwk1iS1Z/eBaLHsRdX/RoNBHai/2bZKkW0n8tNb6pD8WHlN3Hsx+luK6BsC
-	oz42lZA1vzLXayeEFYChp7vg9WkdElbef2cqlJsjZ8PsetMUASfu6nyIRCRtBjA152hfuE
-	MeGkqLOv/ZOkOimLe20PsELQ6uQ8Qs8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-464-XUVJz5qoNu6fuc-l__JFHw-1; Thu, 20 Feb 2025 12:36:38 -0500
-X-MC-Unique: XUVJz5qoNu6fuc-l__JFHw-1
-X-Mimecast-MFC-AGG-ID: XUVJz5qoNu6fuc-l__JFHw_1740072998
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4399c5baac3so8800415e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 20 Feb 2025 09:36:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740072997; x=1740677797;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n15bf8E4w81YIQXcbn52KewH85spv07PWBoufUb1/Zw=;
-        b=ZflR6y8VrRKtwldnwpBXGxBlz90fO7hUrq2koxQ3wVE0VkTjBCsUAilYmTiU5MhTwi
-         15uoVXGYyPDcq0r+J+MVCX57NQLZTKint1fmu9EWkt1XcouuOqUkc/3M59vZavBu3egE
-         KW+bQRf1jUa3vHzrM4QuBOtrD09aCgABlNrC2pjsgI0CYOSJ8A1vAANlfDPzRY7ErAPv
-         bL1CBIkMlisCaE/1/qxLnkYJt9Z6LU3mSOGmswte0W5DE9BDKmBHuTAiXsjpWzwmrx8b
-         4VazQSqHU2IsGWxwpvS4x4+efFaqtACjM8GhHiM9u3vl+fxui4ksLrHWNNWbZpzUaLyr
-         XcBA==
-X-Gm-Message-State: AOJu0YxCLiDpA3HmcfiY9WfoFegNofU+3nqcG1iR9pPUqR5OMxAugeGy
-	6luMYmyQyZKGEihVH5T9ZHyEJ5bx5O/1HEmetCgm3YDZGMCSc8sevcwqi0b5H6CRwNKmSFj7Ztj
-	N4BcyWo43OL3xtG4uzk8rujXds994mAZoj1DNQwzfMr16WRetmYcPbg==
-X-Gm-Gg: ASbGnctDbuJyNjcb4qxutEL1Cyjd2Wlo3u7FFtjiYAlEeufHABDOr1uOydFqrl2z15q
-	uaZ6KxqPqgT/yG4EAMH6nQyigcy0TfpztlJt1Lfm5ZC6NEItfJWvD2kYRygGeOD1PQgU/pMsiUa
-	qn5vOAujDjXOhSrMJlv92PoNvQXz58YTHag9mapb2x1MCKwuSSDeGbm/hUaAwtsErrZdk/A/xa/
-	sbc4BmUj0DMSxNCeodjcUxp96uxb82AxC4Mg3vGIMpe1mNeE07KM2WT1et7BuLu86bjjqN+XyIf
-	hqubwtw08MXncWVWz3EmgfbRDT/u0+oMV78Px0Dt7ZSeTR/k/nnnaw==
-X-Received: by 2002:a05:600c:4e8d:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-439ae189b90mr2045305e9.0.1740072997621;
-        Thu, 20 Feb 2025 09:36:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHy5FnqR/8AjjY8RLPAgdr+NGtk75Kqe0crbyEx5UtstYLGj4EGzUk8OPNUhCk+6xcuGov9Tw==
-X-Received: by 2002:a05:600c:4e8d:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-439ae189b90mr2044905e9.0.1740072997264;
-        Thu, 20 Feb 2025 09:36:37 -0800 (PST)
-Received: from rh (p200300f6af0e4d00dda53016e366575f.dip0.t-ipconnect.de. [2003:f6:af0e:4d00:dda5:3016:e366:575f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4398872fa85sm117119635e9.28.2025.02.20.09.36.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 09:36:36 -0800 (PST)
-Date: Thu, 20 Feb 2025 18:36:35 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-    linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-    Eric Auger <eric.auger@redhat.com>, gankulkarni@os.amperecomputing.com
-Subject: Re: [PATCH v2 02/14] KVM: arm64: Hide ID_AA64MMFR2_EL1.NV from guest
- and userspace
-In-Reply-To: <20250220134907.554085-3-maz@kernel.org>
-Message-ID: <af16f5bc-4300-54d3-b480-c559ec070a44@redhat.com>
-References: <20250220134907.554085-1-maz@kernel.org> <20250220134907.554085-3-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uk2jw35O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D8DC4CED1;
+	Thu, 20 Feb 2025 17:44:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740073459;
+	bh=JG9qAobTzeeNJhvrxW9wlpTi2Gx0CaoQMhNmfQShIEA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Uk2jw35ObtTTcxrptF2N88WVGFylhY2GEZlmBKieFMZC8RHGgcmyLDvZ8E05TlDjx
+	 ZEFwUacTcTMXzvoYTkd+xqv2v6mG9o7IVQEjcVJNme+iDErOrMNDrT8EWo3E2UqjGL
+	 ghzzM3LLFHaA02J676iF8uKFoQSk479xKBDiOw1jE3PNsq3pXkdV9pIb99hynzq+V+
+	 pwmTlOszNT4vtYc3PmwxYhZbM1qgn+nkGXW49jGiGEU+m+j3UhTII6c+QJebY1ygB6
+	 aaG5LbXp1O6RMuNLxE+JU4GFIf9Gki5b2XPmqsBvFC/LpnoFlJIuC0E16ySSCeTWgF
+	 HAZJ1ixyiS26Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tlAau-006J9w-EF;
+	Thu, 20 Feb 2025 17:44:17 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #3
+Date: Thu, 20 Feb 2025 17:44:06 +0000
+Message-Id: <20250220174406.749490-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: wRJubcgLp5VhxO18zCq-ve4xt9XDrmEFO5LnPWV3_Qk_1740072998
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, vladimir.murzin@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Paolo,
 
-On Thu, 20 Feb 2025, Marc Zyngier wrote:
-> Since our take on FEAT_NV is to only support FEAT_NV2, we should
-> never expose ID_AA64MMFR2_EL1.NV to a guest nor userspace.
->
-> Make sure we mask this field for good.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
-> arch/arm64/kvm/sys_regs.c | 1 +
-> 1 file changed, 1 insertion(+)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 82430c1e1dd02..9f10dbd26e348 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1627,6 +1627,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
-> 		break;
-> 	case SYS_ID_AA64MMFR2_EL1:
-> 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
-> +		val &= ~ID_AA64MMFR2_EL1_NV;
-> 		break;
+Another week, another set of fixes.
 
-This would cause issues when you update the host kernel while keeping the
-guests register state. Could we allow to write (but ignore) the previously
-valid value? Like it was handled in:
- 	6685f5d572c2 KVM: arm64: Disable MPAM visibility by default and ignore VMM writes
+This time around, we have a focus on MMU bugs, with one bug affecting
+hVHE EL2 stage-1 and picking the ASID from the wrong register, while
+the other affects VHE and allows it to run with a stale VMID value.
 
-Sebastian
+Either way, this is ugly.
 
+Please pull,
+
+	M.
+
+The following changes since commit 0ad2507d5d93f39619fc42372c347d6006b64319:
+
+  Linux 6.14-rc3 (2025-02-16 14:02:44 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-3
+
+for you to fetch changes up to fa808ed4e199ed17d878eb75b110bda30dd52434:
+
+  KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2 (2025-02-20 16:29:28 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.14, take #3
+
+- Fix TCR_EL2 configuration to not use the ASID in TTBR1_EL2
+  and not mess-up T1SZ/PS by using the HCR_EL2.E2H==0 layout.
+
+- Bring back the VMID allocation to the vcpu_load phase, ensuring
+  that we only setup VTTBR_EL2 once on VHE. This cures an ugly
+  race that would lead to running with an unallocated VMID.
+
+----------------------------------------------------------------
+Oliver Upton (1):
+      KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
+
+Will Deacon (1):
+      KVM: arm64: Fix tcr_el2 initialisation in hVHE mode
+
+ arch/arm64/include/asm/kvm_arm.h  |  2 +-
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kvm/arm.c              | 37 +++++++++++++++++--------------------
+ arch/arm64/kvm/vmid.c             | 11 +++--------
+ 4 files changed, 22 insertions(+), 30 deletions(-)
