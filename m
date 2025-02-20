@@ -1,265 +1,95 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2125.outbound.protection.outlook.com [40.107.96.125])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A931F4614
-	for <kvmarm@lists.linux.dev>; Thu, 20 Feb 2025 15:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.125
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740066248; cv=fail; b=P4hhKRza9mYG7SECocicycPXiYZCmpJIc/2EmMPdVTolKMtaITt2634CBQgFopiDZ8rPdBsh3JaulB3keIITlrguWgt3c2RG2nSUTLQkGrUVB8LDdJSGjUMBoDEKzlGHj6xYTl9RvPDnDcQ0P4QywuAU3fodVWHIB1Qwc5HMCPo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740066248; c=relaxed/simple;
-	bh=A282GYeLBUTeOKpr0M5x4lUwrnc/h1enogUFn762DkU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=naPLZn3yCNF71FgX09NKpM4FsBPqPYX6igjpr3nhYIZfL4/H1ahZCpABj8O6SOtnnyY4uPGq/98YJfnCBKzQNz+VKCOa7iYH5wDW3AmcMg3eESWcS08ogV8foipYv91myopqZiqlWxBLMrZgMzsSi9cLgmQXmD5YcYZTPtYKvAU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=qpiKUEaj; arc=fail smtp.client-ip=40.107.96.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3DB20E718;
+	Thu, 20 Feb 2025 16:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740069780; cv=none; b=Q9NJl1GEgNXWslGKf33Ra8Dt9ZnAXTnPl5lALCtQ3vf41jMMzg58GxnRI3KxGLT3v6EvYQHPi36oUd9HUFPy46TMeuMoSCB0DsEVwHqanqpPBNY4XuT1qbOCHsJOBvuRO3hebDmR2d5FwpC6uMjHTE0DtZNbTbzamENxxLbcDx4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740069780; c=relaxed/simple;
+	bh=xoszGfeQD/BBXn5mUBjcDckmqNtdwyHV3ywQG9RpC8M=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gT4FdY0K+xH7nV80Kj4x6CE9UbRdnqp3d/5clEzmv+Q2hk5Jirgn9pj2gs/gkXDcnpRVWBbrtpqRCntIuVKpNAmewxGG6u9xC1EqX26SrakvUf+KEzFUKQr/jTjrwKxfb7s187cHGI0vZQzsSp8lKuRmvOeOLzqQkSomE/jZSsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFqokkF1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="qpiKUEaj"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A5+9YArGIV4xqKLPFQctHbrH2EWmpqM3Nb3Q7g5Dz6zJIsggFzYRC6T18tOet0c98rtv1cU/QZzvm1VcsBvlhi7NbhTe0GiAmVdZzQgyT8deYhAVHuzIB/PKVtgBoakz+XhRn5pdpE1kH9TXIoaXrzST8Hbr0cyHO8gX/M3wTBoRD9VNfp1Gimfqnl/ZKYZPd5qQc04260nig6y8FjzlXeHMzQ3CuiZOPZ15r6UrWBkTh9d15yVSUei6qET4RiegSsurTo2tR2MojdzLvmibx99WP6HoW69uOLI+Xm1VhsI/2LSALlCTOqBJ4WL4mEj5jndBRzvPzXv6lYWXA0TRkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MfmWVw439cC9tNoofyFTf85q3d/+gHkqKQeUqSgeCPY=;
- b=bBFL2U/RrTjKcs+OJ3NlIgf5i+vntLhuHAYzqPkjU8sVG0sMZYp/WpW6/UL+jjPzr3pqfewaOaywNMWFNNhtvjxEa7yUVkqwU/puR0xbAQFKHyYxO65iHcf7117oFFGbdN6TgBgNz5YVGXJoIVnM54W/Egstdhr0tzI1Rh0HsYTtb3M7fEaPgBZ73iBgUbtmqc8m7rZnYl//oOIDwgO08g/p13GT7IcA2NZ7hV5qNzTSokcCGpPdNkM3rtg8Z4zneDi2NKzfjdNakpnaP21wY9qDxlc3j5Ih+WQILilc7dycZybWgnZ0PB+bfmSdc52HqozaXgnA8Z3RBiyk+nBDIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MfmWVw439cC9tNoofyFTf85q3d/+gHkqKQeUqSgeCPY=;
- b=qpiKUEajCdX2owgURSReak+hr7dCHs3DtIX0wwtghuTlqVwQ5FPCnkG21i1+FVCeRom5XnLphzEIXyjNI+xxrUMfoHOibtWXtvuWy3dxJIukYKdj9Xfc7P7PQYLunBRkbLJqN2Xz4MQI/VTpSB9bxHQ3Cw9MeFCR4TQJnuIycHI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
- LV2PR01MB7839.prod.exchangelabs.com (2603:10b6:408:14f::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8466.14; Thu, 20 Feb 2025 15:44:02 +0000
-Received: from SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::292:6d9c:eb9a:95c9%4]) with mapi id 15.20.8466.009; Thu, 20 Feb 2025
- 15:44:02 +0000
-Message-ID: <c663be4c-87b3-43e0-9669-1d18f1a2998d@os.amperecomputing.com>
-Date: Thu, 20 Feb 2025 21:13:55 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/14] KVM: arm64: Consolidate idreg callbacks
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>
-References: <20250220134907.554085-1-maz@kernel.org>
- <20250220134907.554085-7-maz@kernel.org>
-Content-Language: en-US
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20250220134907.554085-7-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA1PR01CA0173.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:d::14) To SJ2PR01MB8101.prod.exchangelabs.com
- (2603:10b6:a03:4f6::10)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFqokkF1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443F9C4CEDD;
+	Thu, 20 Feb 2025 16:43:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740069780;
+	bh=xoszGfeQD/BBXn5mUBjcDckmqNtdwyHV3ywQG9RpC8M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nFqokkF1Ym6xjnfDhFQGElT6/OqTuN9JEVX0mK99Qi6oW6ce6P/zB0HKyl4IQ0na+
+	 u2OvSoh62Eda1t814xKVwn6whhphf+Ok8UfCULF+v+dg22RWAdaxWgo0XwNS4mFC4t
+	 /386pdCHPlw9MhvRTbnSzfGdcZ8hh0ZeGlVAQ7Iaq13SaPWO0yu+6BeA+CGItmm9Xp
+	 VGzZ2U3/C/BpVWBVdPlYy49U91rBJUh6SGqT3CoLKbwWmQbwrfBcPoJBJY5JYYPRSQ
+	 ie6wRwGHsRWad9ILB57KbQywwysZoZKRfB2ogNpaWJbzjaq7PdpRpWrYvsNcH9EdI/
+	 3xOucnOZL5OzA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tl9da-006Hgd-Ao;
+	Thu, 20 Feb 2025 16:42:58 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	stable@vger.kernel.org,
+	Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
+Date: Thu, 20 Feb 2025 16:42:54 +0000
+Message-Id: <174006975563.555960.15085833159215599018.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250219220737.130842-1-oliver.upton@linux.dev>
+References: <20250219220737.130842-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|LV2PR01MB7839:EE_
-X-MS-Office365-Filtering-Correlation-Id: d049eee2-6eaa-479d-285a-08dd51c5662f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VkpSSkVwL08rdlR3UnBGbWptMU0yREdjWmFTQ090eEVONFZ2Z0FjM2NHQVlG?=
- =?utf-8?B?WktvT2p0OWxOUTcwRUxNMEpvRGk5Z2FwSlp5bDhYenBlWjI4WVc2KytXUEdk?=
- =?utf-8?B?NGFGRTREZVNJaVBPcWhRUEhSTE1IQjZkNUtRYWdlejZheXN6bTNOVkcyZ21O?=
- =?utf-8?B?enNLK09LdzNVck5OUEhrSnY5Uko0alM5L2VvKy9RN0EvMGVIRm1PanY2cEJk?=
- =?utf-8?B?b3FwUG56OW5xUHFFMElwMkU0c2NzWGYzcHIyK1ljTEhGb0tvcEVobnpOU2pq?=
- =?utf-8?B?NnNxVlVzV2Q2U0QxRUxaelhiUjR2MGZ0bXRlazRxSDFEK0xRbW9NdmRkWVFM?=
- =?utf-8?B?Zmx5RnhEd2xoRS96ZWRDRVhMQU9jSjN1aEFRdDZMOEtUUkt5aFdPUWZpMnhk?=
- =?utf-8?B?QllObFRUajJrRzUxbExiODlJbWplZlpObjgwVEFPQlY2MW9MaVFxMG1pZDZN?=
- =?utf-8?B?TU5iOTZhcW9LM1A2OUFGTWN1QnFqMzE2VWYwOXM5K2VOYkhSLzJwb3pUVWlz?=
- =?utf-8?B?NjgydjJuNXNuUS9WVitML2lOc0ZDTGNLUzl4TitqUG9hS1NaQ0RudEdqdTN4?=
- =?utf-8?B?YTk4ZVFDY3V3Z2J5ZGR6WUQwWURWSnFYR1RQcjFOcUwwdUFpUzVXV1RWZkYz?=
- =?utf-8?B?YllWc0Y5b0RjR0FERTFkUytwdVVTekFqMUJRRklZMUpPaHkwdEhpN1poUTNz?=
- =?utf-8?B?a2pTZnVFVnNxd3A0RGxQNHYrbFIvdWlQRXZGS3Q2bkRqM0RzRjRTOURHZjg0?=
- =?utf-8?B?K1JLT1NoR2plQWQ3MVZkV3Jzbm1YV0kvU2RWTFVMMDUzSUQ5emVocERwYU5t?=
- =?utf-8?B?ZnNTM0VSMjFVUXVQdEw0VVl1Yk1vRk51c1hOV2FZVWRoSXg0VklidTR0T3VO?=
- =?utf-8?B?Q2w3ZWxzMTN6NUpwM09KWU9CUmZzamE3cHdWQ2RtOVhrbmY0K3M5RUdZL21l?=
- =?utf-8?B?S0d2Q28yL05vckxZSHhNcGdIeWpsWkRRWUV5cEozODl1MnY4VklTMlduREF4?=
- =?utf-8?B?U3ZyL2d2ZFBFZHhCMkxmMGhvVFhnN1ZpWHpIN1dYS2FWVjkvWTdRY2d1T2tM?=
- =?utf-8?B?bW9VWXRUTXliL201cjlxMFQyait3amUwa3M3SXpkY2x6c0pkQ3grY0lCWHQx?=
- =?utf-8?B?dzVMWHpvNnZ0TVQyQWJHazg4S0x0N0VhS0xoZ2lac1ZjTHlldWNWdnRSUjRx?=
- =?utf-8?B?S25ZQVRPbGZRajNsV1NOL0J0dmdxamM1dVMyUUMzQWczeGNjdzFxejV0Mlg3?=
- =?utf-8?B?TkxBR3I4RW1Ia3QrQStVdVJNK2NDL0JaWjRBMFBaTVM1YnB0N0pNMGpzSWRO?=
- =?utf-8?B?bU5YQjVQQk94UW1QVFdkZXRLTDUxSzJhdE5JelNKa1NlT21HR1B6dVBqemha?=
- =?utf-8?B?ZTV1dmpMQXdqNTRsdW5QdFJ4ZmtXcXh3eW1ld2Q3Vk81Q25RNFVCeEhFK1Z4?=
- =?utf-8?B?aHdDRnArMU1SMlhIaGlQTWFvUndxTStsTy82a2RkQSsxc0hlODJXeXgrMWV4?=
- =?utf-8?B?VVFodk9aQi9zSkdBU2VmTE44N0djNHUxWCtZOEZEOFppbTVPK0hOWGZEWlAy?=
- =?utf-8?B?T3g1eUdxck85TmRabVNVU0FmV0RpNnlhVDdydEo1WFZBMHhHazRDV0ZoeGlh?=
- =?utf-8?B?bE90TnkvY29Xc0dsaEd4TFd5K2lJSDUwZ1dqMS8yUHp2MUZlb3d3cDV0dElp?=
- =?utf-8?B?azdGQnVvOG9HSjBSNDBDNG5BekNOMXFxWWtRNHVCZ214Qis0RzJpUWFMMDdo?=
- =?utf-8?B?ZWx1MlE3cHEwTDdxQ21pRFVHTmUxaUFwWjNvUHNHaVlRS1kzc3JCMmpYTURr?=
- =?utf-8?B?U3dRNWhRTmE5QlJid3RwOTFVYlprTjhGckVlUkU5aWEvaWJBT1VuY0FZa3ZO?=
- =?utf-8?Q?1fGzbetCyOvi1?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Z1RzRlBZVzRDT1dxK09RT05RZzhhcGxpcU5UcnpjUE1FRUlraVE3Q25MbUkr?=
- =?utf-8?B?aEhnSUxxcCtsWHhtUGlKZ092bTRxVGUwbTcvTzArb1VxV2N1N2hwTGhMVjF6?=
- =?utf-8?B?SVJSTFY5QWliZTJBc0NIRHozQ1FzalNTNS90U1JBKzFQVUFieWh4ZGsrbWhH?=
- =?utf-8?B?NWJaUWZDNVRqOFpTaWd2NFVZeklGSDhlUXN5NjVpdFgxVmlYM044RFp3VXVn?=
- =?utf-8?B?eVU4Ny9ySTk0TGxFZ2FaZXdhUW9lRmlyQ04rdHVVMTJiQWQ5VWRwektOZG5U?=
- =?utf-8?B?Q293Y093OGpwQlN3bkZxWkVrdHllMHRaWTFkeDh4djlKL0hjRkJiUjlibjVO?=
- =?utf-8?B?NzR5a2h3Z2VsbFd4bi9BY0tWc0VpYTc4RlQ4bkVmWlIveFpONFZqWFYrdDNQ?=
- =?utf-8?B?S2FNOGlqNTd5Z2l4cFFYampWcFphMENKaXVKaTBaMk1hRnpJVUk5azFSMlVu?=
- =?utf-8?B?K0J4b3liRGsxRGNUQjhBS2ErRk9XeTV2anJFRHppOFNId1IzUGNuUkc3ZERj?=
- =?utf-8?B?YjBDRmF1V1U5dVlvSEJvV3lKQmpObjZQQTFLUVB2TkN1Rk9ENTlvblhFZTBN?=
- =?utf-8?B?cnVXN043UlZFMWdqcE1UemU5RDZaNnA4TmtpUVRXQnRpeEt2MjlackNTalZG?=
- =?utf-8?B?eXZib1I3TElkRlJmLy9CM0swRW1DVTBOWll1cGpDaU9VUXFEb1p0QzJDc0o2?=
- =?utf-8?B?WEJkVndPK3U3bnY4SmVJL280enhlZVdMNFJkdWNiOUduaWNFNythSjExQ1Qy?=
- =?utf-8?B?aEM4QzErM0RFQTlNMTVJbjQ5WThmclNMMEE4M3cydEp3c2JwZXF6WGdWTzNP?=
- =?utf-8?B?MUx4VzFXWGR3WFRkM3BFMy9tdjNzZ2dOb2FScTZHdGhqQkVPNytHRkRXYThj?=
- =?utf-8?B?MnBxM3ZpdHNGZGNOczZCM29IdDl5TEo2K1lDMVdCaTJKeGJMdGR2Nkd5Ty9a?=
- =?utf-8?B?aE5qK3BhSG0vc2piMER2VGxhNno5Sml0OTFHNlN3Nkt0TW9BN1czTFYxQzRs?=
- =?utf-8?B?U0VzdCs4cXF2ZE00dzR1NE5ITnZ5WFJtZSsvSThVRjBQQkNadU1DeVN2aCtl?=
- =?utf-8?B?T1RBQlc1aHJMYnZtVlZXR2UzTkZGZ1c1OUIxcEZIaFVNLzdoOXkybjc1Ujhp?=
- =?utf-8?B?b1dPZWhTVTZPRTcraUo1NURYZkFpSlFvMFhTaTJUOCtOSCtuNDd3Ni9XUW9P?=
- =?utf-8?B?Mlk4V1U4SGVnMjBxaGczdGtoSm51WkZNWndzZ2MwaFp0TGRUWnRWV2tvUCtY?=
- =?utf-8?B?YW9JNWRSL3lkWnZMb3NhSXJlQ2daY0R3MmFDc1dFdnpVeVY2aHJxQmFrK3Jk?=
- =?utf-8?B?K29iUWxNbTJwV01MOTlmcmhsUitrSGpIWXlyWHhOQkFLUFY1dklpbVpxbExs?=
- =?utf-8?B?Z2FTeTVYUEpFY3RyclUzdjVVN3pxc1RPdnk1VHJXU2U0d0FhQ3lGdFdJYWZZ?=
- =?utf-8?B?dEx4bXAzR0xQdVVVSE9JKzg2NlpiMEVROUtTbkY2YjhieFR3VUZvZ1VUdXZR?=
- =?utf-8?B?YnljRlc4N2hPOHd2TGFYTExzLzNXYmg0ZXBHa1p4cUtVTndFMThOYm5jU1Ra?=
- =?utf-8?B?K2tRZjlGTWhkN1Q1QU93S2pzVS9KUzd5dlFQUGpQVDlnbjBiRzg4RmJCbm5R?=
- =?utf-8?B?STdvYjlZV0ttQUJRNytaTTNOWXVKenR2cXJsVjgxUkpYeU0rUWRDTkxOejZD?=
- =?utf-8?B?azZKMlVyWDRTMFFhK3M5VGZQY0d4b1UzUmdySUtxQnd1L2dvRXVSZkNyMXJL?=
- =?utf-8?B?Vmt0Y0dUUGo4VWI4a0FCL1ZTOFFNbVFtNU9HdGtaRjJ2Zk5MTnVMa1YyZVBo?=
- =?utf-8?B?L3VFM0ROMXp4anNjZzFWNXBVL1pSQnRKb2pHYS9SR0hJd2RDTzF2SElDMUln?=
- =?utf-8?B?OFZ6ejlGWGRDZ09oRUlPNkV1bjBmU2xlanpVVGJucCtCcE5JamxhbXlURHN5?=
- =?utf-8?B?U01xbEJkMk1FWUdQM0xJeUlRTTNHdnZoS3ppWHMrdmNZZ0locTRRZUdINDBP?=
- =?utf-8?B?ZGJOS3Bxb1NFcURpaVozOGx2L2xpYjlOT0ZOM2M3eDJmd0ZHVlBkbUF1SWYr?=
- =?utf-8?B?eXR3MDdVajNWQ1hQZm0zME1OSWxQT3dQVk81Zmp2cm1vNjM3aGVQSzc4U2xx?=
- =?utf-8?B?OVBZUmxxeXFSRFFQQUVoV3NCSDFDcWxpYnlmNzhydFlSbW1hWlJ3RU9qQU5x?=
- =?utf-8?Q?Bga+IoYXSXMBQ8520FJLTvI=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d049eee2-6eaa-479d-285a-08dd51c5662f
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 15:44:02.2519
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WSLFte/mAn9sUVN2pP0/lNh+720orYvYgut01rvGGQ6JSEzPiGDp2lG9J3vE8URoji/KEQTHLbyIf7zVniNQcvdiJXFQ4fExIE07i1tq8soTHaXyNFoVBZLfJlF9of9+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR01MB7839
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, stable@vger.kernel.org, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 20-02-2025 07:18 pm, Marc Zyngier wrote:
-> Most of the ID_DESC() users use the same callbacks, with only a few
-> overrides. Consolidate the common callbacks in a macro, and consistently
-> use it everywhere.
+On Wed, 19 Feb 2025 14:07:37 -0800, Oliver Upton wrote:
+> Vladimir reports that a race condition to attach a VMID to a stage-2 MMU
+> sometimes results in a vCPU entering the guest with a VMID of 0:
 > 
-> Whilst we're at it, give ID_UNALLOCATED() a .name string, so that we can
-> easily decode traces.
+> | CPU1                                            |   CPU2
+> |                                                 |
+> |                                                 | kvm_arch_vcpu_ioctl_run
+> |                                                 |   vcpu_load             <= load VTTBR_EL2
+> |                                                 |                            kvm_vmid->id = 0
+> |                                                 |
+> | kvm_arch_vcpu_ioctl_run                         |
+> |   vcpu_load             <= load VTTBR_EL2       |
+> |                            with kvm_vmid->id = 0|
+> |   kvm_arm_vmid_update   <= allocates fresh      |
+> |                            kvm_vmid->id and     |
+> |                            reload VTTBR_EL2     |
+> |                                                 |
+> |                                                 |   kvm_arm_vmid_update <= observes that kvm_vmid->id
+> |                                                 |                          already allocated,
+> |                                                 |                          skips reload VTTBR_EL2
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/kvm/sys_regs.c | 28 ++++++++++------------------
->   1 file changed, 10 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9f10dbd26e348..678213dc15513 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2267,35 +2267,33 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
->    * from userspace.
->    */
->   
-> +#define ID_DESC_DEFAULT_CALLBACKS		\
-> +	.access	= access_id_reg,		\
-> +	.get_user = get_id_reg,			\
-> +	.set_user = set_id_reg,			\
-> +	.visibility = id_visibility,		\
-> +	.reset = kvm_read_sanitised_id_reg
-> +
->   #define ID_DESC(name)				\
->   	SYS_DESC(SYS_##name),			\
-> -	.access	= access_id_reg,		\
-> -	.get_user = get_id_reg			\
-> +	ID_DESC_DEFAULT_CALLBACKS
->   
->   /* sys_reg_desc initialiser for known cpufeature ID registers */
->   #define ID_SANITISED(name) {			\
->   	ID_DESC(name),				\
-> -	.set_user = set_id_reg,			\
-> -	.visibility = id_visibility,		\
-> -	.reset = kvm_read_sanitised_id_reg,	\
->   	.val = 0,				\
->   }
->   
->   /* sys_reg_desc initialiser for known cpufeature ID registers */
->   #define AA32_ID_SANITISED(name) {		\
->   	ID_DESC(name),				\
-> -	.set_user = set_id_reg,			\
->   	.visibility = aa32_id_visibility,	\
-> -	.reset = kvm_read_sanitised_id_reg,	\
->   	.val = 0,				\
->   }
->   
->   /* sys_reg_desc initialiser for writable ID registers */
->   #define ID_WRITABLE(name, mask) {		\
->   	ID_DESC(name),				\
-> -	.set_user = set_id_reg,			\
-> -	.visibility = id_visibility,		\
-> -	.reset = kvm_read_sanitised_id_reg,	\
->   	.val = mask,				\
->   }
->   
-> @@ -2303,8 +2301,6 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
->   #define ID_FILTERED(sysreg, name, mask) {	\
->   	ID_DESC(sysreg),				\
->   	.set_user = set_##name,				\
-> -	.visibility = id_visibility,			\
-> -	.reset = kvm_read_sanitised_id_reg,		\
->   	.val = (mask),					\
->   }
->   
-> @@ -2314,12 +2310,10 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
->    * (1 <= crm < 8, 0 <= Op2 < 8).
->    */
->   #define ID_UNALLOCATED(crm, op2) {			\
-> +	.name = "S3_0_0_" #crm "_" #op2,		\
->   	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
-> -	.access = access_id_reg,			\
-> -	.get_user = get_id_reg,				\
-> -	.set_user = set_id_reg,				\
-> +	ID_DESC_DEFAULT_CALLBACKS,			\
->   	.visibility = raz_visibility,			\
-> -	.reset = kvm_read_sanitised_id_reg,		\
->   	.val = 0,					\
->   }
->   
-> @@ -2330,9 +2324,7 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
->    */
->   #define ID_HIDDEN(name) {			\
->   	ID_DESC(name),				\
-> -	.set_user = set_id_reg,			\
->   	.visibility = raz_visibility,		\
-> -	.reset = kvm_read_sanitised_id_reg,	\
->   	.val = 0,				\
->   }
->   
+> [...]
 
-Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Applied to fixes, thanks!
 
+[1/1] KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2
+      commit: fa808ed4e199ed17d878eb75b110bda30dd52434
+
+Cheers,
+
+	M.
 -- 
-Thanks,
-Ganapat/GK
+Without deviation from the norm, progress is not possible.
+
 
