@@ -1,62 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825AD1F1501
-	for <kvmarm@lists.linux.dev>; Thu, 20 Feb 2025 10:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B121F7060;
+	Thu, 20 Feb 2025 13:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740048279; cv=none; b=BkOrb73sLCEslc6K30fCMwqLNkJJUeQBD0YOB4sfGT3MLuUY4Ng0YRU+OxZFxyvCDJJ+n4/bu80hP1t3B4/1RyOWh4ZkK4s+O4Ia+XPTXMC4sEOljvrhI4Eyikbm5QFFJ0kwDdpAefKnPld//V6VPJfk1sCTwodc4hoBVDtuqso=
+	t=1740056867; cv=none; b=VLhBpX9q7tbutHPI/RwoTC6XdJu5/jPL1RzuoVp2ASByWlzZVAT9D5GG9hddkP7lN+Pn2d6aNS2VWWcaWIiY3YitAtEsecuXPQTmAM8XxHVL3j+A0XEpMF0pKFzzAvnw60x4xG5bDiP50mKeL7fzZrr5+k8ueDFf8BWmYizmhio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740048279; c=relaxed/simple;
-	bh=Fb86F/s98TMvJ4cUg1/PPyhGm3sTGbln1z8pzYDMHiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R3LsEGXphTZvXXYtMQh9Po64iVNyrHojWMYJlhPutsy9dps8XCR7IoIegzLliOTrHVKmlBi/0a4xyQJnSmLPBmxJGAYvkpD8sY7UyiNIYtTMwXgHPYLtXRY8BVfQJ+uvZJC3+wIrPwd9+vJsH7Ev1AGOWaCwhKK0GAUDM60eonM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA6D916A3;
-	Thu, 20 Feb 2025 02:44:54 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 882E73F59E;
-	Thu, 20 Feb 2025 02:44:35 -0800 (PST)
-Date: Thu, 20 Feb 2025 10:44:19 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1740056867; c=relaxed/simple;
+	bh=3phxBuPQl5IUqfsL5Bd0aEC9fruBA7I5u9sq4ctskxE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f3Y+UO+GqWAE0TZeWCLHJOmx6K8/gmRF0JM30Sz6OZCzk5GWVYQyXl5J23Sn6T+mRUElX4Unf9+/4w2OqLh2R37+hguDlIzoBrKK7Hk2ky/XoxgRCLABFYY3ZFXHcMN8e3GigF4xXY42Fgc7pxDTOni5XXDagE8rEIW9u1h/Jvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfii3kW8; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfii3kW8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80C50C4CED1;
+	Thu, 20 Feb 2025 13:07:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740056866;
+	bh=3phxBuPQl5IUqfsL5Bd0aEC9fruBA7I5u9sq4ctskxE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hfii3kW8/0vshJPsTE+wkZxwjJtaIZlTEqiJM7ICrdaSR6troIiL4Cq+KFY+PY9OA
+	 9yfVhYpoY4s1ak4pD+m2UbF+TwZQIlU2LlJlEOqanRHiVdu0JcP/xctki+F7WLRKbK
+	 lymCEnTOd5qzT+Ri6BkVf3a+5qp/8cVKXleRsfC9qJ7AhwK23rn0BmpLMuAkKdO2yg
+	 zcVnkod0cXzKKcfeNqpK3mwCzC79IAnucXI9L6c02Tyl8mUqprr/bix5z5ZG9Gpf9F
+	 eXkY0lwbdzyR5NIDLUZXiPf/vqrIKtzkK3yczVmmHjFTvY1ZKg/uKbJU7qFFpz7SBm
+	 EjjUhGOS6Ah9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tl6HI-006Cfk-7T;
+	Thu, 20 Feb 2025 13:07:44 +0000
+Date: Thu, 20 Feb 2025 13:07:43 +0000
+Message-ID: <86v7t4rcgw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: EL2 PMU reset handling fixes
-Message-ID: <20250220104419.GA2511466@e124191.cambridge.arm.com>
-References: <20250217112412.3963324-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH 00/14] KVM: arm64: NV userspace ABI
+In-Reply-To: <Z7Zmi0WAkudX5h0h@linux.dev>
+References: <20250215173816.3767330-1-maz@kernel.org>
+	<Z7Zmi0WAkudX5h0h@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250217112412.3963324-1-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Feb 17, 2025 at 11:24:10AM +0000, Marc Zyngier wrote:
-> Joey reports that some of his PMU tests do not behave quite as
-> expected:
+On Wed, 19 Feb 2025 23:17:31 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> - MDCR_EL2.HPMN is set to 0 out of reset
+> On Sat, Feb 15, 2025 at 05:38:02PM +0000, Marc Zyngier wrote:
+> > Since the previous incarnation of the ABI was proved to be subtly
+> > wrong, I have reworked it to be more in line with the current way KVM
+> > operates.
+> > 
+> > No more late NV-specific adjustment nor writable ID_AA64MMFR0_EL1.VH.
+> > The NV configuration is now entirely selected from the vcpu flags.
+> > I've preserved the KVM_ARM_VCPU_EL2 flag which enables NV with VHE,
+> > and added KVM_ARM_VCPU_EL2_E2H0 which alters the NV behaviour to only
+> > allow nVHE guests without recursive NV support.
+> > 
+> > This series is actually very little new code. The bulk of it is
+> > converting the feature downgrade to be per-idreg, essentially going
+> > back to the state before 44241f34fac96 ("KVM: arm64: nv: Use accessors
+> > for modifying ID registers"), only slightly modernised. This then
+> > becomes part of the reset value computing.
+> > 
+> > The rest is simply what you'd expect in terms of being able to write
+> > the ID_AA64MMFR4_EL1.NV_frac field, making the correct bits RES0 when
+> > needed, probing for capabilities and handling the init flags.
+> > 
+> > Patches on top of -rc2, with the integration branch at the usual
+> > location.
 > 
-> - PMCR_EL0.P should reset all the counters when written from EL2
-> 
-> These couple of patches attempt to remedy the situation. Note that
-> they have only been compile-tested.
-> 
-> Marc Zyngier (2):
->   KVM: arm64: Fix MDCR_EL2.HPMN reset value
->   KVM: arm64: Contextualise the handling of PMCR_EL0.P writes
-> 
->  arch/arm64/kvm/pmu-emul.c | 21 ++++++++++++++++-----
->  arch/arm64/kvm/sys_regs.c |  7 ++++++-
->  2 files changed, 22 insertions(+), 6 deletions(-)
+> This all looks reasonable to me. NV won't be ready for the limelight
+> this time around so unless someone shouts I plan on taking the first 12
+> patches of this series in 6.15.
 
-I see you're discussing the API around this, but this does fix the PMU tests, so:
+Let me repost it first, as I fixed an embarrassing bug that led to
+mishandling of ID_UNALLOCATED() registers (solved by consolidating the
+ID_DESC() macro maze a bit further).
 
-Tested-by: Joey Gouly <joey.gouly@arm.com>
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
