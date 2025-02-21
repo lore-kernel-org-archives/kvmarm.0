@@ -1,140 +1,99 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81882267B86
-	for <kvmarm@lists.linux.dev>; Thu, 20 Feb 2025 23:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265411CD1E1
+	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 04:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740094211; cv=none; b=APWDUNTPuUDE9nT7ODgktvKTzo52wUQLoEfgRoT+JV7v6JVpctbimDLLzokhf7Aka+1hKq7k2DSvH54+ePMlr/1FvkZKMCVQQM62cst3yOIMXNo4+GBUgULP7LlAsAKtgLAxN0ilKYuo5SqjJsVjRJCMC8UH/9j1g926mRjR3Ts=
+	t=1740112963; cv=none; b=P5KIvCixjVV/32TbIzNsrMxmkcdw0pnbSzNRamth9VNrQzvIIcugugi2h1q1EstWsw9e4fa59F2+os5t2NOih6CHaMAtIl4Gnlr/ENVKxZjI5qMPuGWMWimhewvzW2ZJVHy1AP7eopS8hNPam16VPzF5Otw8KbUe27aeZsYV6jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740094211; c=relaxed/simple;
-	bh=mWRk++/bQqQgZy4LEk1jYBf4PCsHJwDN0tHvqsBCXpE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=esDbRNO1IWsCPqHS9d7s0fpbxfyRlLrIFN9nLwaBa9wCDHzyeFeSvc0CAy1N9pnyH7OBIKmlDXGeCMylsZL16wd45Up/S4G045lkfAp0ZPFEA6zqD0dCf5eMrvf/pYclBSWOY1ujsDeg4R2EMJknZEKOAwZB8PnYgac+EV2FVP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=biB16Umv; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="biB16Umv"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc404aaed5so4983678a91.3
-        for <kvmarm@lists.linux.dev>; Thu, 20 Feb 2025 15:30:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740094208; x=1740699008; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZY+qAPOicOUq8p2LK8IeikgixBi4lx8HxmpqAWAHnA=;
-        b=biB16UmvF6nhZoqjdd8GG/f9mV5Av75cApSQpFPXcL+erFEP8StHGzA7/7yjhVPKkk
-         KdeHp+/3tBPBBJUxtrP7fMZjSVkY8wODX50jCP1WSWh0mevm6BOAiA4B1EQLGkGP3YdT
-         aQ4ESlvW4AwQPchBSCdhy5GBl2/ukROOhXoGXoUAetQwCaIeoWnyWol0Sjk1wi2LLLfL
-         2hWU7MXu9J83Vj2dVgswQMEfwsL8Nho4PkqC1pIoIOdQh6Qn3aZI++vR6WdYavLFKh/S
-         qCzl7Q+ljRzgOE10Qc3PyD1Cl7kyxidSvEGFODjLNFzkmMZEUd60grVfCgHVBqCiWk75
-         fAvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740094208; x=1740699008;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZY+qAPOicOUq8p2LK8IeikgixBi4lx8HxmpqAWAHnA=;
-        b=bFJpOG311J8We/bqsToSAENHJcImD+64Ds2MPgZgRFz2OAUuxn0SpwiKDAxJ8r1XcT
-         LQXID1Naww85VVtuXLlcHsbMWqppA/zrtSFdbNzkEiTk1RVSunGlxeDE8tb5hx8PBpIB
-         M/FhaSlbOHhXGSllYtC8m/4JNxb5aoBIO1JC6wEkhiV5IJNWjpS43Ktvmgu0WStpCj8V
-         8rOl/dnMDPtJDRgAg8BOxpyq4js0w0JbZkiaa+UGUy8sLjMKc1p02hVjXEeNCX8zRlCL
-         yMAetjcjaawnCGs5Mf1ahfk3GKd9kojphm+vfdzy74z2rike+oqVJHdA8zKU8017ulYO
-         Entg==
-X-Forwarded-Encrypted: i=1; AJvYcCW6IIGH1e7b6giYXxrjIapF+vlWDuUu//mXD3giwamuhzcuIzwQltJFcki/kX+lrTOiMAMxPLM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzgWdZwlsEvyLK4IKURnbuxjT229iTFW0qBJ2jOAmCM0mHmbRdt
-	OdwkS+WXYY67gYGriCZFNeg2mDq2ivkp3zZuSZJWpavP4AGduXP3sEWb3wdgQOYZQKzExxHtoOH
-	6dCGyRVoi1g==
-X-Google-Smtp-Source: AGHT+IEBaG/uVrgEVEadJS5uoF6GF3zEvxqFSthLZ+KCQQjV/E6qlAa7wWQxBxQYuGn6ZWD8KVd4x5+IgTERjw==
-X-Received: from pjbpt3.prod.google.com ([2002:a17:90b:3d03:b0:2fc:13d6:b4cb])
- (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2e4f:b0:2fc:b40:339a with SMTP id 98e67ed59e1d1-2fce78a95d5mr1872440a91.10.1740094207918;
- Thu, 20 Feb 2025 15:30:07 -0800 (PST)
-Date: Thu, 20 Feb 2025 23:29:59 +0000
-In-Reply-To: <20250220232959.247600-1-jiaqiyan@google.com>
+	s=arc-20240116; t=1740112963; c=relaxed/simple;
+	bh=GGb906K2VWG+4OalnI6S/0sqpalmaz8Ltc5IL4C3t5o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OUWuc14AOlUeFGjVTMRCamJ28bC+/j7r1GkeK9LwsCbhT7lmUsFraSIz+/I6kk2O60cLzL3mhANTNNxnP/YKmtNVgWDKLHcRFkZJpPhmrXm4Skprbbrgm2ceCGbyeevdUHSgq0XeqJ5v9qR04ixv0opE3y3WDgbbz2JqMW9+Sg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 174BE1C01;
+	Thu, 20 Feb 2025 20:42:58 -0800 (PST)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.40.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8167F3F6A8;
+	Thu, 20 Feb 2025 20:42:35 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: arm-kernel@lists.infradead.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V2 0/8] arm64/mm: Drop PXD_TABLE_BIT
+Date: Fri, 21 Feb 2025 10:12:19 +0530
+Message-Id: <20250221044227.1145393-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250220232959.247600-1-jiaqiyan@google.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250220232959.247600-3-jiaqiyan@google.com>
-Subject: [RFC PATCH v3 3/3] Documentation: kvm: new UAPI when arm64 guest
- consumes UER
-From: Jiaqi Yan <jiaqiyan@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, duenwen@google.com, rananta@google.com, 
-	jthoughton@google.com, Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Add the documentation for new UAPI when guest consumes uncorrectable
-but recoverable memory error (UER). This new UAPI enables userspace
-to inject SEA into the guest.
+Remove the PXX_TABLE_BIT definitions and instead rely on PXX_TYPE_MASK,
+PXX_TYPE_SECT and PXX_TYPE_TABLE. The latter versions are more abstract
+and also include the PTE_VALID bit.
 
-Tested: make htmldocs and proofreading
+This abstraction is valuable for the impending D128 page table support,
+which doesn't have a single page table bit to determine table vs block.
+Instead it has the skip level (SKL) field, where it will consider 0 to
+mean table and any other value to mean a block entry. So PXX_TABLE_BIT
+therefore doesn't fit into the D128 model well, but the type fields do.
 
-Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
----
- Documentation/virt/kvm/api.rst | 38 +++++++++++++++++++++++++++-------
- 1 file changed, 31 insertions(+), 7 deletions(-)
+This series applies on v6.14-rc3.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 2b52eb77e29cb..20c7049508484 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1288,16 +1288,40 @@ ARM64:
- 
- User space may need to inject several types of events to the guest.
- 
-+Inject SError
-+~~~~~~~~~~~~~
-+
- Set the pending SError exception state for this VCPU. It is not possible to
- 'cancel' an Serror that has been made pending.
- 
--If the guest performed an access to I/O memory which could not be handled by
--userspace, for example because of missing instruction syndrome decode
--information or because there is no device mapped at the accessed IPA, then
--userspace can ask the kernel to inject an external abort using the address
--from the exiting fault on the VCPU. It is a programming error to set
--ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO or
--KVM_EXIT_ARM_NISV. This feature is only available if the system supports
-+Inject SEA
-+~~~~~~~~~~
-+
-+- If the guest performed an access to I/O memory which could not be handled by
-+  userspace, for example because of missing instruction syndrome decode
-+  information or because there is no device mapped at the accessed IPA, then
-+  userspace can ask the kernel to inject an external abort using the address
-+  from the exiting fault on the VCPU.
-+
-+- If the guest consumed an uncorrectable memory error, and RAS extension in
-+  Trusted Firmware choosed to notify PE with SEA, KVM and core kernel may have
-+  to handle the memory poison consumption when host APEI was unable to claim
-+  the SEA. For the following type of faults, KVM sends SIGBUS to current thread
-+  (i.e. VMM in EL0) with si_code=BUS_OBJERR:
-+
-+  - Synchronous external abort
-+
-+  - Synchronous parity or ECC error on memory access
-+
-+  If the memory error's physical address is available, si_addr will be the
-+  error's host virtual address in VM's memory space; otherwise si_addr is zero.
-+  When userspace vCPU thread is interrupted by such SIGBUS, it can ask KVM to
-+  replay an external abort into guest.
-+
-+It is a programming error to set ext_dabt_pending after an exit which was not
-+KVM_EXIT_MMIO, not KVM_EXIT_ARM_NISV, and not interrupted by BUS_OBJERR SIGBUS.
-+
-+This feature is only available if the system supports
- KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which provides commonality in
- how userspace reports accesses for the above cases to guests, across different
- userspace implementations. Nevertheless, userspace can still emulate all Arm
+Changes in V2:
+
+- Changed pmd_mkhuge() and pud_mkhuge() implementation
+- Changed pud_bad() implementation with an additional patch
+
+Changes in V1:
+
+https://lore.kernel.org/all/20241005123824.1366397-1-anshuman.khandual@arm.com/
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+
+Anshuman Khandual (6):
+  KVM: arm64: ptdump: Test PMD_TYPE_MASK for block mapping
+  arm64/ptdump: Test PMD_TYPE_MASK for block mapping
+  arm64/mm: Clear PXX_TYPE_MASK in mk_[pmd|pud]_sect_prot()
+  arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
+  arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
+  arm64/mm: Drop PXD_TABLE_BIT
+
+Ryan Roberts (2):
+  arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
+  arm64/mm: Check pmd_table() in pmd_trans_huge()
+
+ arch/arm64/include/asm/pgtable-hwdef.h |  5 --
+ arch/arm64/include/asm/pgtable.h       | 65 ++++++++++++++++++--------
+ arch/arm64/kvm/ptdump.c                |  4 +-
+ arch/arm64/mm/ptdump.c                 |  4 +-
+ 4 files changed, 50 insertions(+), 28 deletions(-)
+
 -- 
-2.48.1.658.g4767266eb4-goog
+2.25.1
 
