@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5931FBE88
-	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 04:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FE41FBE87
+	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 04:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740112982; cv=none; b=OR3KPJ0jQy61kv3w8P3rQy5wu5aI4fzvHwrdVLnhQN5RuiVkWRCR/rRsfk898/B5ZbT9WpA3WJKsG+Z7I+h024D0g/WhZuG78KJJppQ1H7GUpjD65WzMJpOLxnXfa+Alv7+a2kuLr7Z7hVSgjBHFCDEKFqzaH+tyB+kFb5ncKT8=
+	t=1740112989; cv=none; b=PawZuIAehaEzYgfJpULeyoXOVw3Mhw2SxocHEcZ5UightQzIMwtjemrX3yWnp7Kw983KT0LDdk9csEM5M0qRAsEqxNMDbWmrEm6rAl7+zuJ62YW7Bq/MGO0ASOWJZZG1uqDkZw7+kR1cxzo+TuwB2llp0huLq0MsSwbtV84TuZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740112982; c=relaxed/simple;
-	bh=w12RmaK2E7AsICmm7r1Zy5+t5NgzhGpim7OZ2dRKUyA=;
+	s=arc-20240116; t=1740112989; c=relaxed/simple;
+	bh=0PX5MVDBSGVG2PGxKPjhBBIhYbfxharACAP4e3x6TKA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V6p2RKWo8x+I6x/of8Uu/wGNpJfCYIGKFPKUbl9gdnJRfFXqnqorBavFjlCNW0yK5vvaiCtSDK9eq61fYYRV/DRZ+XqHwCbVrdA0nfj4EyBPqP9xnI/70yX7GV6H366r5C9kZ8YthUsjiE5VfsN4wW+IN2caVUS9eyz4H4vr+GM=
+	 MIME-Version; b=Nc8Ja/yWZI7nPWAOIMhHvsh2UIakqOrLutbEvu7xhzHuBAkb1n/D4FLvyNafgeQvSuWYBidj0Te4EwRiQ+QwL9qBrPIDQ+ZoLMLz2UHrdmHu0EV0nMDsWkC1//de2RHjCulwbnyeS+lmrhY529FUVxgZjRmP6rLDbgZndL8KckI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBB601C01;
-	Thu, 20 Feb 2025 20:43:18 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF2B01C01;
+	Thu, 20 Feb 2025 20:43:23 -0800 (PST)
 Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.40.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 808E03F6A8;
-	Thu, 20 Feb 2025 20:42:56 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B72703F6A8;
+	Thu, 20 Feb 2025 20:43:01 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -32,9 +32,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH V2 4/8] arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
-Date: Fri, 21 Feb 2025 10:12:23 +0530
-Message-Id: <20250221044227.1145393-5-anshuman.khandual@arm.com>
+Subject: [PATCH V2 5/8] arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
+Date: Fri, 21 Feb 2025 10:12:24 +0530
+Message-Id: <20250221044227.1145393-6-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250221044227.1145393-1-anshuman.khandual@arm.com>
 References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
@@ -46,10 +46,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Clear PXX_TYPE_MASK in [pmd|pud]_mkhuge() while creating section mappings
-instead of just the PXX_TABLE_BIT and also set PXD_TYPE_SECT. Also ensure
-PTE_VALID does not get modified in these helpers, because present-invalid
-entries should preserve their state across.
+Check page table entries against PXD_TYPE_TABLE on PXD_TYPE_MASK mask bits
+in [p4d|pgd]_bad() while determining a table entry instead of just checking
+only for PXD_TABLE_BIT.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
@@ -60,53 +59,35 @@ Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/pgtable.h | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pgtable.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index c16e9e74e309..4485ecdffd8a 100644
+index 4485ecdffd8a..0c1691979c14 100644
 --- a/arch/arm64/include/asm/pgtable.h
 +++ b/arch/arm64/include/asm/pgtable.h
-@@ -585,7 +585,18 @@ static inline int pmd_trans_huge(pmd_t pmd)
+@@ -918,7 +918,9 @@ static inline bool mm_pud_folded(const struct mm_struct *mm)
+ 	pr_err("%s:%d: bad pud %016llx.\n", __FILE__, __LINE__, pud_val(e))
  
- #define pmd_write(pmd)		pte_write(pmd_pte(pmd))
+ #define p4d_none(p4d)		(pgtable_l4_enabled() && !p4d_val(p4d))
+-#define p4d_bad(p4d)		(pgtable_l4_enabled() && !(p4d_val(p4d) & P4D_TABLE_BIT))
++#define p4d_bad(p4d)		(pgtable_l4_enabled() && \
++				((p4d_val(p4d) & P4D_TYPE_MASK) != \
++				 P4D_TYPE_TABLE))
+ #define p4d_present(p4d)	(!p4d_none(p4d))
  
--#define pmd_mkhuge(pmd)		(__pmd(pmd_val(pmd) & ~PMD_TABLE_BIT))
-+static inline pmd_t pmd_mkhuge(pmd_t pmd)
-+{
-+	/*
-+	 * It's possible that the pmd is present-invalid on entry
-+	 * and in that case it needs to remain present-invalid on
-+	 * exit. So ensure the VALID bit does not get modified.
-+	 */
-+	pmdval_t mask = PMD_TYPE_MASK & ~PTE_VALID;
-+	pmdval_t val = PMD_TYPE_SECT & ~PTE_VALID;
-+
-+	return __pmd((pmd_val(pmd) & ~mask) | val);
-+}
+ static inline void set_p4d(p4d_t *p4dp, p4d_t p4d)
+@@ -1045,7 +1047,9 @@ static inline bool mm_p4d_folded(const struct mm_struct *mm)
+ 	pr_err("%s:%d: bad p4d %016llx.\n", __FILE__, __LINE__, p4d_val(e))
  
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
- #define pmd_devmap(pmd)		pte_devmap(pmd_pte(pmd))
-@@ -613,7 +624,18 @@ static inline pmd_t pmd_mkspecial(pmd_t pmd)
- #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
- #define pud_write(pud)		pte_write(pud_pte(pud))
+ #define pgd_none(pgd)		(pgtable_l5_enabled() && !pgd_val(pgd))
+-#define pgd_bad(pgd)		(pgtable_l5_enabled() && !(pgd_val(pgd) & PGD_TABLE_BIT))
++#define pgd_bad(pgd)		(pgtable_l5_enabled() && \
++				((pgd_val(pgd) & PGD_TYPE_MASK) != \
++				 PGD_TYPE_TABLE))
+ #define pgd_present(pgd)	(!pgd_none(pgd))
  
--#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
-+static inline pud_t pud_mkhuge(pud_t pud)
-+{
-+	/*
-+	 * It's possible that the pud is present-invalid on entry
-+	 * and in that case it needs to remain present-invalid on
-+	 * exit. So ensure the VALID bit does not get modified.
-+	 */
-+	pudval_t mask = PUD_TYPE_MASK & ~PTE_VALID;
-+	pudval_t val = PUD_TYPE_SECT & ~PTE_VALID;
-+
-+	return __pud((pud_val(pud) & ~mask) | val);
-+}
- 
- #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
- #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
+ static inline void set_pgd(pgd_t *pgdp, pgd_t pgd)
 -- 
 2.25.1
 
