@@ -1,29 +1,29 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7EA15530C
-	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 14:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42D020E306
+	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 14:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740146952; cv=none; b=D1XzHm2UW2SigIWHDbD+r5C0isHJ3t1EsFFPkmQjwa9I6ilFtJ/pBJJHUL0Frg/hq2pIKx6TxM7CKVWbiO8fch2WsNAz4FhT6E6Xy0MODgqUmwmeysqszb62IfOZsn9RZlvnN0ILnBwIBUNqAux20CbbbW4+bMDoq5gPX/atsiE=
+	t=1740146963; cv=none; b=r3nRJ6p619WhiK9Jv4d7n0seno5W5bgUlKrsWw6L+H6kmY6qmo4755/lfiq6QgbITOfCyH7/nlLq5DSiJPKsAb4kGnJ+7hzo/n148LFqjx8vDgqyxdHr97tLxZ+PHqVBoaLZtHwfHqNTyINZX6DUL6hWKnl30C23MmEVyQRm7LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740146952; c=relaxed/simple;
-	bh=RFSaFNbVpLZ24mrmjSBDzFs8e+Hs0O+4h4ZuTCc2HQU=;
+	s=arc-20240116; t=1740146963; c=relaxed/simple;
+	bh=DwiQc8oyM6HH4qc42quf5H3P9xA4m3oJzlX265AyJ1c=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jCLSrqogGeFNuXjIVVgT/jlPUXCX4LFZp/MKiHB2uNr4ArIqA/0wVkwIS25q7+1syk3dFF71ffrMUU/R9P3htbApYV4gHl/4q6/MG4WJC+2ZkHJdoOCxUsTgPJtDUlX/f/BbmRaMhZ7rcBG09hZzJmiyKBTdgm+sNJwpBHjraws=
+	 MIME-Version:Content-Type; b=kZmfZcYsV60CqcLAjxaGsw4tYqBJy+0FatS0WqBR+ZGnyRV0WSl5iz0JWc7lV1I93L/DwjHtlCpOpCi3QJjqyN1MUHzFV/dCQ3pRj5NitLt4t+Uc2w/MIXbw2hBBgDFqKl5Ro4LD6PSc4vgrihXIvT4I9j14WeAhlqmEtjO0JxA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YzsPJ35j8z6L6xq;
-	Fri, 21 Feb 2025 22:06:28 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YzsQf13k0z6HJhS;
+	Fri, 21 Feb 2025 22:07:38 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 93E151406AD;
-	Fri, 21 Feb 2025 22:09:07 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 97FBB140B30;
+	Fri, 21 Feb 2025 22:09:19 +0800 (CST)
 Received: from A2303104131.china.huawei.com (10.203.177.241) by
  frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 21 Feb 2025 15:09:00 +0100
+ 15.1.2507.39; Fri, 21 Feb 2025 15:09:12 +0100
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <kvmarm@lists.linux.dev>, <maz@kernel.org>, <oliver.upton@linux.dev>
 CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
@@ -31,9 +31,9 @@ CC: <catalin.marinas@arm.com>, <will@kernel.org>, <mark.rutland@arm.com>,
 	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <jiangkunkun@huawei.com>,
 	<jonathan.cameron@huawei.com>, <anthony.jebson@huawei.com>,
 	<linux-arm-kernel@lists.infradead.org>, <linuxarm@huawei.com>
-Subject: [PATCH v8 1/6] arm64: Modify _midr_range() functions to read MIDR/REVIDR internally
-Date: Fri, 21 Feb 2025 14:02:24 +0000
-Message-ID: <20250221140229.12588-2-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v8 2/6] KVM: arm64: Introduce hypercall support for retrieving target implementations
+Date: Fri, 21 Feb 2025 14:02:25 +0000
+Message-ID: <20250221140229.12588-3-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
 References: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
@@ -47,288 +47,122 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  frapeml500008.china.huawei.com (7.182.85.71)
 
-These changes lay the groundwork for adding support for guest kernels,
-allowing them to leverage target CPU implementations provided by the
-VMM.
+If the Guest requires migration to multiple targets, these hypercalls
+will provide a way to retrieve the target CPU implementations from
+the user space VMM.
 
-No functional changes intended.
+Subsequent patch will use this to enable the associated errata.
 
 Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Sebastian Ott <sebott@redhat.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- arch/arm64/include/asm/cputype.h              | 28 +++++++++----------
- arch/arm64/include/asm/mmu.h                  |  3 +-
- arch/arm64/kernel/cpu_errata.c                | 23 ++++++++-------
- arch/arm64/kernel/cpufeature.c                |  6 ++--
- arch/arm64/kernel/proton-pack.c               | 17 ++++++-----
- arch/arm64/kvm/vgic/vgic-v3.c                 |  2 +-
- drivers/clocksource/arm_arch_timer.c          |  2 +-
- .../coresight/coresight-etm4x-core.c          |  2 +-
- 8 files changed, 42 insertions(+), 41 deletions(-)
+ Documentation/virt/kvm/arm/hypercalls.rst | 59 +++++++++++++++++++++++
+ include/linux/arm-smccc.h                 | 15 ++++++
+ 2 files changed, 74 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index 6f3f4142e214..2a76f0e30006 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -231,6 +231,16 @@
- 
- #define read_cpuid(reg)			read_sysreg_s(SYS_ ## reg)
- 
-+/*
-+ * The CPU ID never changes at run time, so we might as well tell the
-+ * compiler that it's constant.  Use this function to read the CPU ID
-+ * rather than directly reading processor_id or read_cpuid() directly.
-+ */
-+static inline u32 __attribute_const__ read_cpuid_id(void)
-+{
-+	return read_cpuid(MIDR_EL1);
-+}
+diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
+index af7bc2c2e0cb..7400a89aabf8 100644
+--- a/Documentation/virt/kvm/arm/hypercalls.rst
++++ b/Documentation/virt/kvm/arm/hypercalls.rst
+@@ -142,3 +142,62 @@ region is equal to the memory protection granule advertised by
+ |                     |          |    +---------------------------------------------+
+ |                     |          |    | ``INVALID_PARAMETER (-3)``                  |
+ +---------------------+----------+----+---------------------------------------------+
 +
- /*
-  * Represent a range of MIDR values for a given CPU model and a
-  * range of variant/revision values.
-@@ -266,31 +276,21 @@ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
- 	return _model == model && rv >= rv_min && rv <= rv_max;
- }
- 
--static inline bool is_midr_in_range(u32 midr, struct midr_range const *range)
-+static inline bool is_midr_in_range(struct midr_range const *range)
- {
--	return midr_is_cpu_model_range(midr, range->model,
-+	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
- 				       range->rv_min, range->rv_max);
- }
- 
- static inline bool
--is_midr_in_range_list(u32 midr, struct midr_range const *ranges)
-+is_midr_in_range_list(struct midr_range const *ranges)
- {
- 	while (ranges->model)
--		if (is_midr_in_range(midr, ranges++))
-+		if (is_midr_in_range(ranges++))
- 			return true;
- 	return false;
- }
- 
--/*
-- * The CPU ID never changes at run time, so we might as well tell the
-- * compiler that it's constant.  Use this function to read the CPU ID
-- * rather than directly reading processor_id or read_cpuid() directly.
-- */
--static inline u32 __attribute_const__ read_cpuid_id(void)
--{
--	return read_cpuid(MIDR_EL1);
--}
--
- static inline u64 __attribute_const__ read_cpuid_mpidr(void)
- {
- 	return read_cpuid(MPIDR_EL1);
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index 662471cfc536..30a29e88994b 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -101,8 +101,7 @@ static inline bool kaslr_requires_kpti(void)
- 	if (IS_ENABLED(CONFIG_CAVIUM_ERRATUM_27456)) {
- 		extern const struct midr_range cavium_erratum_27456_cpus[];
- 
--		if (is_midr_in_range_list(read_cpuid_id(),
--					  cavium_erratum_27456_cpus))
-+		if (is_midr_in_range_list(cavium_erratum_27456_cpus))
- 			return false;
- 	}
- 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 7ce555862895..99b55893fc4e 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -15,30 +15,34 @@
- #include <asm/smp_plat.h>
- 
- static bool __maybe_unused
--is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
-+__is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
-+			 u32 midr, u32 revidr)
- {
- 	const struct arm64_midr_revidr *fix;
--	u32 midr = read_cpuid_id(), revidr;
--
--	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
--	if (!is_midr_in_range(midr, &entry->midr_range))
-+	if (!is_midr_in_range(&entry->midr_range))
- 		return false;
- 
- 	midr &= MIDR_REVISION_MASK | MIDR_VARIANT_MASK;
--	revidr = read_cpuid(REVIDR_EL1);
- 	for (fix = entry->fixed_revs; fix && fix->revidr_mask; fix++)
- 		if (midr == fix->midr_rv && (revidr & fix->revidr_mask))
- 			return false;
--
- 	return true;
- }
- 
-+static bool __maybe_unused
-+is_affected_midr_range(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
-+	return __is_affected_midr_range(entry, read_cpuid_id(),
-+					read_cpuid(REVIDR_EL1));
-+}
++``ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID``
++-------------------------------------------------------
++Request the target CPU implementation version information and the number of target
++implementations for the Guest VM.
 +
- static bool __maybe_unused
- is_affected_midr_range_list(const struct arm64_cpu_capabilities *entry,
- 			    int scope)
- {
- 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
--	return is_midr_in_range_list(read_cpuid_id(), entry->midr_range_list);
-+	return is_midr_in_range_list(entry->midr_range_list);
- }
+++---------------------+-------------------------------------------------------------+
++| Presence:           | Optional;  KVM/ARM64 Guests only                            |
+++---------------------+-------------------------------------------------------------+
++| Calling convention: | HVC64                                                       |
+++---------------------+----------+--------------------------------------------------+
++| Function ID:        | (uint32) | 0xC6000040                                       |
+++---------------------+----------+--------------------------------------------------+
++| Arguments:          | None                                                        |
+++---------------------+----------+----+---------------------------------------------+
++| Return Values:      | (int64)  | R0 | ``SUCCESS (0)``                             |
++|                     |          |    +---------------------------------------------+
++|                     |          |    | ``NOT_SUPPORTED (-1)``                      |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R1 | Bits [63:32] Reserved/Must be zero          |
++|                     |          |    +---------------------------------------------+
++|                     |          |    | Bits [31:16] Major version                  |
++|                     |          |    +---------------------------------------------+
++|                     |          |    | Bits [15:0] Minor version                   |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R2 | Number of target implementations            |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R3 | Reserved / Must be zero                     |
+++---------------------+----------+----+---------------------------------------------+
++
++``ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID``
++-------------------------------------------------------
++
++Request the target CPU implementation information for the Guest VM. The Guest kernel
++will use this information to enable the associated errata.
++
+++---------------------+-------------------------------------------------------------+
++| Presence:           | Optional;  KVM/ARM64 Guests only                            |
+++---------------------+-------------------------------------------------------------+
++| Calling convention: | HVC64                                                       |
+++---------------------+----------+--------------------------------------------------+
++| Function ID:        | (uint32) | 0xC6000041                                       |
+++---------------------+----------+----+---------------------------------------------+
++| Arguments:          | (uint64) | R1 | selected implementation index               |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R2 | Reserved / Must be zero                     |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R3 | Reserved / Must be zero                     |
+++---------------------+----------+----+---------------------------------------------+
++| Return Values:      | (int64)  | R0 | ``SUCCESS (0)``                             |
++|                     |          |    +---------------------------------------------+
++|                     |          |    | ``INVALID_PARAMETER (-3)``                  |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R1 | MIDR_EL1 of the selected implementation     |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R2 | REVIDR_EL1 of the selected implementation   |
++|                     +----------+----+---------------------------------------------+
++|                     | (uint64) | R3 | AIDR_EL1  of the selected implementation    |
+++---------------------+----------+----+---------------------------------------------+
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 67f6fdf2e7cd..f19be5754090 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -179,6 +179,9 @@
+ #define ARM_SMCCC_KVM_FUNC_PKVM_RESV_62		62
+ #define ARM_SMCCC_KVM_FUNC_PKVM_RESV_63		63
+ /* End of pKVM hypercall range */
++#define ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER	64
++#define ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS	65
++
+ #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+ #define ARM_SMCCC_KVM_NUM_FUNCS			128
  
- static bool __maybe_unused
-@@ -186,12 +190,11 @@ static bool __maybe_unused
- has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
- 				int scope)
- {
--	u32 midr = read_cpuid_id();
- 	bool has_dic = read_cpuid_cachetype() & BIT(CTR_EL0_DIC_SHIFT);
- 	const struct midr_range range = MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N1);
+@@ -225,6 +228,18 @@
+ 			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+ 			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD)
  
- 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
--	return is_midr_in_range(midr, &range) && has_dic;
-+	return is_midr_in_range(&range) && has_dic;
- }
- 
- #ifdef CONFIG_ARM64_WORKAROUND_REPEAT_TLBI
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 4eb7c6698ae4..72e876f37cd4 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1792,7 +1792,7 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
- 	char const *str = "kpti command line option";
- 	bool meltdown_safe;
- 
--	meltdown_safe = is_midr_in_range_list(read_cpuid_id(), kpti_safe_list);
-+	meltdown_safe = is_midr_in_range_list(kpti_safe_list);
- 
- 	/* Defer to CPU feature registers */
- 	if (has_cpuid_feature(entry, scope))
-@@ -1862,7 +1862,7 @@ static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
- 
- 	return (__system_matches_cap(ARM64_HAS_NESTED_VIRT) &&
- 		!(has_cpuid_feature(entry, scope) ||
--		  is_midr_in_range_list(read_cpuid_id(), nv1_ni_list)));
-+		  is_midr_in_range_list(nv1_ni_list)));
- }
- 
- #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
-@@ -2045,7 +2045,7 @@ static bool cpu_has_broken_dbm(void)
- 		{},
- 	};
- 
--	return is_midr_in_range_list(read_cpuid_id(), cpus);
-+	return is_midr_in_range_list(cpus);
- }
- 
- static bool cpu_can_use_dbm(const struct arm64_cpu_capabilities *cap)
-diff --git a/arch/arm64/kernel/proton-pack.c b/arch/arm64/kernel/proton-pack.c
-index da53722f95d4..a573fa40d4b6 100644
---- a/arch/arm64/kernel/proton-pack.c
-+++ b/arch/arm64/kernel/proton-pack.c
-@@ -172,7 +172,7 @@ static enum mitigation_state spectre_v2_get_cpu_hw_mitigation_state(void)
- 		return SPECTRE_UNAFFECTED;
- 
- 	/* Alternatively, we have a list of unaffected CPUs */
--	if (is_midr_in_range_list(read_cpuid_id(), spectre_v2_safe_list))
-+	if (is_midr_in_range_list(spectre_v2_safe_list))
- 		return SPECTRE_UNAFFECTED;
- 
- 	return SPECTRE_VULNERABLE;
-@@ -331,7 +331,7 @@ bool has_spectre_v3a(const struct arm64_cpu_capabilities *entry, int scope)
- 	};
- 
- 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
--	return is_midr_in_range_list(read_cpuid_id(), spectre_v3a_unsafe_list);
-+	return is_midr_in_range_list(spectre_v3a_unsafe_list);
- }
- 
- void spectre_v3a_enable_mitigation(const struct arm64_cpu_capabilities *__unused)
-@@ -475,7 +475,7 @@ static enum mitigation_state spectre_v4_get_cpu_hw_mitigation_state(void)
- 		{ /* sentinel */ },
- 	};
- 
--	if (is_midr_in_range_list(read_cpuid_id(), spectre_v4_safe_list))
-+	if (is_midr_in_range_list(spectre_v4_safe_list))
- 		return SPECTRE_UNAFFECTED;
- 
- 	/* CPU features are detected first */
-@@ -878,13 +878,13 @@ u8 spectre_bhb_loop_affected(int scope)
- 			{},
- 		};
- 
--		if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k32_list))
-+		if (is_midr_in_range_list(spectre_bhb_k32_list))
- 			k = 32;
--		else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k24_list))
-+		else if (is_midr_in_range_list(spectre_bhb_k24_list))
- 			k = 24;
--		else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k11_list))
-+		else if (is_midr_in_range_list(spectre_bhb_k11_list))
- 			k = 11;
--		else if (is_midr_in_range_list(read_cpuid_id(), spectre_bhb_k8_list))
-+		else if (is_midr_in_range_list(spectre_bhb_k8_list))
- 			k =  8;
- 
- 		max_bhb_k = max(max_bhb_k, k);
-@@ -926,8 +926,7 @@ static bool is_spectre_bhb_fw_affected(int scope)
- 		MIDR_ALL_VERSIONS(MIDR_CORTEX_A75),
- 		{},
- 	};
--	bool cpu_in_list = is_midr_in_range_list(read_cpuid_id(),
--					 spectre_bhb_firmware_mitigated_list);
-+	bool cpu_in_list = is_midr_in_range_list(spectre_bhb_firmware_mitigated_list);
- 
- 	if (scope != SCOPE_LOCAL_CPU)
- 		return system_affected;
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index d7233ab982d0..87a8a96c7a41 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -633,7 +633,7 @@ static const struct midr_range broken_seis[] = {
- static bool vgic_v3_broken_seis(void)
- {
- 	return ((kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK) &&
--		is_midr_in_range_list(read_cpuid_id(), broken_seis));
-+		is_midr_in_range_list(broken_seis));
- }
- 
- /**
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index 808f259781fd..981a578043a5 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -842,7 +842,7 @@ static u64 __arch_timer_check_delta(void)
- 		{},
- 	};
- 
--	if (is_midr_in_range_list(read_cpuid_id(), broken_cval_midrs)) {
-+	if (is_midr_in_range_list(broken_cval_midrs)) {
- 		pr_warn_once("Broken CNTx_CVAL_EL1, using 31 bit TVAL instead.\n");
- 		return CLOCKSOURCE_MASK(31);
- 	}
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-index 2c1a60577728..3d98e3371fff 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-@@ -1216,7 +1216,7 @@ static void etm4_fixup_wrong_ccitmin(struct etmv4_drvdata *drvdata)
- 	 * recorded value for 'drvdata->ccitmin' to workaround
- 	 * this problem.
- 	 */
--	if (is_midr_in_range_list(read_cpuid_id(), etm_wrong_ccitmin_cpus)) {
-+	if (is_midr_in_range_list(etm_wrong_ccitmin_cpus)) {
- 		if (drvdata->ccitmin == 256)
- 			drvdata->ccitmin = 4;
- 	}
++#define ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS)
++
+ /* ptp_kvm counter type ID */
+ #define KVM_PTP_VIRT_COUNTER			0
+ #define KVM_PTP_PHYS_COUNTER			1
 -- 
 2.47.0
 
