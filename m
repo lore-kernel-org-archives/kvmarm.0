@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FE41FBE87
-	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 04:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4031FBEAA
+	for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 04:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740112989; cv=none; b=PawZuIAehaEzYgfJpULeyoXOVw3Mhw2SxocHEcZ5UightQzIMwtjemrX3yWnp7Kw983KT0LDdk9csEM5M0qRAsEqxNMDbWmrEm6rAl7+zuJ62YW7Bq/MGO0ASOWJZZG1uqDkZw7+kR1cxzo+TuwB2llp0huLq0MsSwbtV84TuZI=
+	t=1740112993; cv=none; b=CIntvsrr2Xxs8vuI018YqfmcwBs8kTS3dZzyIXDlMruVwedN6hVgdFJ9WAkurQG7/bdelK/L115znlhxsHA6s5rymbcFYGX1pYMPWjbXK5oQ4X6dHe1Qy3gqzbBly3Ds4CTmzJKhvXqdFv+PYdDr3W5wMA1GlzIoMjLpc6blV1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740112989; c=relaxed/simple;
-	bh=0PX5MVDBSGVG2PGxKPjhBBIhYbfxharACAP4e3x6TKA=;
+	s=arc-20240116; t=1740112993; c=relaxed/simple;
+	bh=S77b++vPhAM9w69z2S5XUCUrpjXKuwTVoLA5kTrEL8k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Nc8Ja/yWZI7nPWAOIMhHvsh2UIakqOrLutbEvu7xhzHuBAkb1n/D4FLvyNafgeQvSuWYBidj0Te4EwRiQ+QwL9qBrPIDQ+ZoLMLz2UHrdmHu0EV0nMDsWkC1//de2RHjCulwbnyeS+lmrhY529FUVxgZjRmP6rLDbgZndL8KckI=
+	 MIME-Version; b=IPeCz2BRL6eeHYzYjmLoVhpd6R/2CFDAdLvIOhI4nHGotdyla8BuFJBokc6On1fwyvUHYAJ9NC09JiFjrbBHXso7mDqW1cTGjgqZa+RisOFrRPEbELmcjHzSBGxTMHDfS8bnM2893vIrT59f98LB7vBKrFmoBwgLQdRjgZ3zYQs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF2B01C01;
-	Thu, 20 Feb 2025 20:43:23 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 094C71C01;
+	Thu, 20 Feb 2025 20:43:29 -0800 (PST)
 Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.40.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B72703F6A8;
-	Thu, 20 Feb 2025 20:43:01 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A1BFE3F6A8;
+	Thu, 20 Feb 2025 20:43:06 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -32,9 +32,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH V2 5/8] arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
-Date: Fri, 21 Feb 2025 10:12:24 +0530
-Message-Id: <20250221044227.1145393-6-anshuman.khandual@arm.com>
+Subject: [PATCH V2 6/8] arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
+Date: Fri, 21 Feb 2025 10:12:25 +0530
+Message-Id: <20250221044227.1145393-7-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250221044227.1145393-1-anshuman.khandual@arm.com>
 References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
@@ -46,9 +46,15 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Check page table entries against PXD_TYPE_TABLE on PXD_TYPE_MASK mask bits
-in [p4d|pgd]_bad() while determining a table entry instead of just checking
-only for PXD_TABLE_BIT.
+From: Ryan Roberts <ryan.roberts@arm.com>
+
+pud_bad() is currently defined in terms of pud_table(). Although for some
+configs, pud_table() is hard-coded to true i.e. when using 64K base pages
+or when page table levels are less than 3.
+
+pud_bad() is intended to check that the pud is configured correctly. Hence
+let's open-code the same check that the full version of pud_table() uses
+into pud_bad(). Then it always performs the check regardless of the config.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
@@ -57,37 +63,26 @@ Cc: Ryan Roberts <ryan.roberts@arm.com>
 Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/pgtable.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pgtable.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 4485ecdffd8a..0c1691979c14 100644
+index 0c1691979c14..d16f514bde0f 100644
 --- a/arch/arm64/include/asm/pgtable.h
 +++ b/arch/arm64/include/asm/pgtable.h
-@@ -918,7 +918,9 @@ static inline bool mm_pud_folded(const struct mm_struct *mm)
- 	pr_err("%s:%d: bad pud %016llx.\n", __FILE__, __LINE__, pud_val(e))
+@@ -827,7 +827,8 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
+ 	pr_err("%s:%d: bad pmd %016llx.\n", __FILE__, __LINE__, pmd_val(e))
  
- #define p4d_none(p4d)		(pgtable_l4_enabled() && !p4d_val(p4d))
--#define p4d_bad(p4d)		(pgtable_l4_enabled() && !(p4d_val(p4d) & P4D_TABLE_BIT))
-+#define p4d_bad(p4d)		(pgtable_l4_enabled() && \
-+				((p4d_val(p4d) & P4D_TYPE_MASK) != \
-+				 P4D_TYPE_TABLE))
- #define p4d_present(p4d)	(!p4d_none(p4d))
- 
- static inline void set_p4d(p4d_t *p4dp, p4d_t p4d)
-@@ -1045,7 +1047,9 @@ static inline bool mm_p4d_folded(const struct mm_struct *mm)
- 	pr_err("%s:%d: bad p4d %016llx.\n", __FILE__, __LINE__, p4d_val(e))
- 
- #define pgd_none(pgd)		(pgtable_l5_enabled() && !pgd_val(pgd))
--#define pgd_bad(pgd)		(pgtable_l5_enabled() && !(pgd_val(pgd) & PGD_TABLE_BIT))
-+#define pgd_bad(pgd)		(pgtable_l5_enabled() && \
-+				((pgd_val(pgd) & PGD_TYPE_MASK) != \
-+				 PGD_TYPE_TABLE))
- #define pgd_present(pgd)	(!pgd_none(pgd))
- 
- static inline void set_pgd(pgd_t *pgdp, pgd_t pgd)
+ #define pud_none(pud)		(!pud_val(pud))
+-#define pud_bad(pud)		(!pud_table(pud))
++#define pud_bad(pud)		((pud_val(pud) & PUD_TYPE_MASK) != \
++				 PUD_TYPE_TABLE)
+ #define pud_present(pud)	pte_present(pud_pte(pud))
+ #ifndef __PAGETABLE_PMD_FOLDED
+ #define pud_leaf(pud)		(pud_present(pud) && !pud_table(pud))
 -- 
 2.25.1
 
