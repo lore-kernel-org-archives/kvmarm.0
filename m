@@ -1,1135 +1,795 @@
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A97678F30
-	for <kvmarm@lists.linux.dev>; Sat, 22 Feb 2025 00:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB174A05
+	for <kvmarm@lists.linux.dev>; Sat, 22 Feb 2025 01:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740185993; cv=none; b=eQQyQGrFx2ZeAc4DZddE7yx8f9Yuk5HAFYc/lEUE/I0CjrT6oh7VUVkl13YCubHyEmtMoP8l97X+rLPj9WEMsPP4CNasdnKmGoJRKLqkm/AWtRd+6Nz2UgTlJfiTXbZqou9qiQl2oX/gbzM9edm/1O0rcCOjeMh4XTO9rx9X8uc=
+	t=1740188732; cv=none; b=OZaouaIOQnfwnkQi8pM4JHX/N13dwsTlkDFZiHHs21shBuzS6ZCGzdPh7Wbs+gLoZTwC/8CJKOe8oevQX3HUfI7G/uSNH5Grc6U7lkG1ke3OWnnuZOQZu9rcLscVq/DOcjTGVTF1DoSjvxAR/cTH7zUXAGJ8RkZL7HPX4LWH50M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740185993; c=relaxed/simple;
-	bh=FvqStzAiaVwU2F7DNsUjBqjlZnMdxJC/snePuO2CLyQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XNra+UBUgg1alRE/XTOyoXxXfEt4YmO+v0Gpwtieu8B/CBVGfs2KbuuWQNR7qrzV+MHbHLoYg2McXzSi7nmvGfEvJ++iAVpHli1k9tfPO2pcVHt1Wpcfk3rU67jlhfhcUzrRtC5VVhFp8nO2XGC2G1mg3B7l0CLbLramq86cd14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zo0q37Hc; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1740188732; c=relaxed/simple;
+	bh=XXQPN58OSLE+26qfCsOictW/CR9V7HUcUc7LhFi6vHM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Z7xsrEHFI/tQAkED8h12oESqawAHIGCY9gbC6X7BVByCRqxuTSthyGEo3U9DoZet2avhZRuwfYpP8Vqj0QMHrGJowvkYww5tA2bWEHrBy+eWl5z0GagMkpmDPrSj/H6vyq8PUCIQ4Fjd4uI3Jj+O5vU2jxM1koGHOOjPmqEbPlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j9TDQF8O; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zo0q37Hc"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fce2954a10so5997482a91.1
-        for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 16:59:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j9TDQF8O"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc5888c192so5318210a91.0
+        for <kvmarm@lists.linux.dev>; Fri, 21 Feb 2025 17:45:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740185989; x=1740790789; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rwc5UgLSNB0rCKaTqIsv//Y8qy92qRjDNyJOu6eJkJo=;
-        b=zo0q37Hcu3aGnwYdW59NWKAx2CqB2WN3GaLF3dbXNigcS7rfX1qiD91xmenUXTyJDr
-         XRAbOSXMpgr0GkEld6vMTQsfy/LNFP4oo2BywIa0v4RnWCajvvgEk2SGrOJIgv2aO8hY
-         nBNE/LpBifCy+tNtpqVDkKf6CDMJRc/sCB8FhL/rVogPyGktwleHdJKe4YBOJspUth0e
-         NvIMvZii6fqL3V5vIEYK5gnjNkej0EpV2MiV5kNlzahHzaxrV4FoXfyxRO14DGkxGhFH
-         rSAOltoOeZFkyUe4HJsBM1vw8SJgpK32JXUAuY6gOfnXgTtX48xoyrEGQD4vwvOESMsM
-         d+VA==
+        d=google.com; s=20230601; t=1740188729; x=1740793529; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pmPD/HrfnLi2sNsvWl/3G9VECFjeZEVyXK4whWeoIMg=;
+        b=j9TDQF8OVfKvzKFirqSEa3dRRak/ZuBJtv00e+AgcI3GVQlKiu5rOrff0Yk/bjA0bm
+         Me2Nko4xgXqN4A2Zyw0hoVnlTEfMecMBcY/1y/+8HEn0Rr2Py5JqTOsjFlyHNBEsEZ5z
+         INAFcE+Y/uiAmXh2xyMN9ELi8XAEXzvbUHjy7i91+C/gpVH+bGusDJ7Gzf9J2HFT9Z1Y
+         QsEwvBjXD4l8riT0jfjx+NyyeN0FryLjq4ih+KPxEPY4IDc+Cu6BfNb0s8qYNyrrlqeZ
+         YocTwAiK1J8eyNEz6ag1zPBw3PkIj5lhbb11uRrhdXfAUhpXXVD1Dm4jaQyLXiEVwXDg
+         i5Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740185989; x=1740790789;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rwc5UgLSNB0rCKaTqIsv//Y8qy92qRjDNyJOu6eJkJo=;
-        b=BRDrbPEyU4MThBzBEUpgylS1Yx1lqkvACni8xzCQ1WHtA/Y6YV5SSfXQkSWbplaDGw
-         MlBVeQaVQvRpahPeB3T8gr4ZewCik9BkurlgudQ7oCiZ3cPcu1RVyTkqYekairJpnzgm
-         wKRUoYNiYf0e9xxQV1p8vfi/miFpU/t9HhwJSrN0Fvx6UaH4nOthg41z4jAtU5Crnl8U
-         XZ/1Mgeda6YZH9IFymlDnXt72syD97BJt7d+l+Y1KG62iVxGlZMZ0/4sXF5fs1eBZ7Pc
-         Nci8dCFL4DIGqD3eoAu0sPXUZ+O1mNuXpq6Rhkf/7syHiVOOCF0NLAaKknX6ZrSuz6+j
-         R7sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSM1JfpOT88ZbJ9rg5YO7eZ/6KcjtMI+mXL0xZcmLnAjfup3QR9N6jd9BcrWv0hvMhXMvXQgY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzTX4Vk3yEN1wcKvtal01aaNVOTh1SnxY07nYpKaKylA2IV4tTz
-	yelFLTOR/G09RTdmuIsHLQn5qk1m3WY0Oht8o3zivNEVfd8NewT5v8KHOQjQnkS2LOv+Vg0CI9i
-	tU4BAxw==
-X-Google-Smtp-Source: AGHT+IGNw3vBtvKGAnXqQcACuCpStqcQs8o6tpm+/7wavPlua4cZR0oxD3jZeJsnU1fVIuj0SFAwv9f8LXZK
-X-Received: from pjg16.prod.google.com ([2002:a17:90b:3f50:b0:2e0:915d:d594])
- (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c84:b0:2fc:c262:ef4b
- with SMTP id 98e67ed59e1d1-2fce86cf0e0mr9177588a91.18.1740185989582; Fri, 21
- Feb 2025 16:59:49 -0800 (PST)
-Date: Fri, 21 Feb 2025 16:59:29 -0800
-In-Reply-To: <20250222005943.3348627-1-vipinsh@google.com>
+        d=1e100.net; s=20230601; t=1740188729; x=1740793529;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pmPD/HrfnLi2sNsvWl/3G9VECFjeZEVyXK4whWeoIMg=;
+        b=ARviWJXaIBnbKnP5Gec2eVoGHnbcTv//kMtC73ylOMTC3EjymwlA0c4w1dbzvTZJBh
+         K5TxrKz2g9DQNhFXsN2Z1TMGKUGSxA4rfaRXgC1FgHWg6NxF6uEklBwghKBPCx5VtpXz
+         +I5ECo7RxU7dIpjpFwFJE7ZlTDKLaZdlrnrlOhpchpyiw9yaV5axlAis2B+QBTRGOSGP
+         8xWHX4z9Yl8esT6hQT+IO4UTY5YXXi3sh5SQs5WL4FVZPHJ8jjwLLDtxu+1l7o531M+V
+         AzJQrMEIunh0M3YUEpROxmbiioZbs4xbnB6tKL0MSMtOXBX4cbm7Syo7sl69eqIODgpJ
+         V4TQ==
+X-Gm-Message-State: AOJu0Ywfxm3Ao2/HdFQ/awbNUtBIiImaFvQ+WONhXO8JxNw6nmM8IUhT
+	pICwDs6T4BaTQ1RL3MPJTGYetqjwkKZzC8+JDAOzZfE1rr+VC26seaBY7piBQ071b+rE0ScVCyP
+	SEw==
+X-Google-Smtp-Source: AGHT+IEPuNW28N5AWxvZ/P27xQeUcG6Q4FhSwmpHrm/jYaK7EtGafhEp4dzKNdq68R9j0yTESbwMkERjcQs=
+X-Received: from pjboe12.prod.google.com ([2002:a17:90b:394c:b0:2fa:1fac:2695])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1344:b0:2fc:a3b7:10a2
+ with SMTP id 98e67ed59e1d1-2fce78cb879mr10231690a91.17.1740188729538; Fri, 21
+ Feb 2025 17:45:29 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 21 Feb 2025 17:45:26 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250222005943.3348627-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250222005943.3348627-2-vipinsh@google.com>
-Subject: [PATCH 1/2] KVM: selftests: Add default testfiles for KVM selftests runner
-From: Vipin Sharma <vipinsh@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org
-Cc: seanjc@google.com, pbonzini@redhat.com, anup@brainfault.org, 
-	borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, Vipin Sharma <vipinsh@google.com>
+Message-ID: <20250222014526.2302653-1-seanjc@google.com>
+Subject: [RFC kvm-unit-tests PATCH] lib: Use __ASSEMBLER__ instead of __ASSEMBLY__
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Jones <andrew.jones@linux.dev>, Laurent Vivier <lvivier@redhat.com>, 
+	Thomas Huth <thuth@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Create a root "testcases" folder in KVM selftests directory. Add test
-files for all of the KVM selftests across all of the supported
-platforms.  Write only default test execution command in the test files.
-Commands written in the test files will be ran by KVM selftest runner.
+Convert all non-x86 #ifdefs from __ASSEMBLY__ to __ASSEMBLER__, and remove
+all manual __ASSEMBLY__ #defines.  __ASSEMBLY_ was inherited blindly from
+the Linux kernel, and must be manually defined, e.g. through build rules
+or with the aforementioned explicit #defines in assembly code.
 
-Test files are organized based following rules:
-1. All test files resides in "testcases" directory.
-2. Test files should have .test extension. This is needed so that
-   git doesn't ignore the test file changes.
-3. Each KVM selftest resides in a folder in "testcases" directory.
-   It follows the path of KVM selftests directory. For example,
-   kvm/x86_64/vmx_msrs_test.c will be in
-   kvm/testcases/x86_64/vmx_msrs_tests directory.
-4. default.test name is reserved for the default command to execute the
-   test.
-5. Different configuration of the tests should reside in their own test
-   files under the same test directory. For example dirty_log_perf_test
-   can have:
-   - testcases/dirty_log_perf_test/default.test
-   - testcases/dirty_log_perf_test/hugetlb1g.test
-   - testcases/dirty_log_perf_test/disable_dirty_log_manual.test
-6. If there is an arch specific option of a common test then it should
-   be specified under an arch name directory in the test directory. This
-   will avoid test runner to execute the common test or its option on
-   unsupported machine. For example:
-   testcases/memslot_modification_stress_test/x86_64/disable_slot_zap_quirk.test
+__ASSEMBLER__ on the other hand is automatically defined by the compiler
+when preprocessing assembly, i.e. doesn't require manually #defines for
+the code to function correctly.
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Ignore x86, as x86 doesn't actually rely on __ASSEMBLY__ at the moment,
+and is undergoing a parallel cleanup.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore                         | 3 ++-
- .../kvm/testcases/aarch64/aarch32_id_regs/default.test         | 1 +
- .../selftests/kvm/testcases/aarch64/arch_timer/default.test    | 1 +
- .../kvm/testcases/aarch64/arch_timer_edge_cases/default.test   | 1 +
- .../kvm/testcases/aarch64/debug-exceptions/default.test        | 1 +
- .../selftests/kvm/testcases/aarch64/get-reg-list/default.test  | 1 +
- .../selftests/kvm/testcases/aarch64/hypercalls/default.test    | 1 +
- .../selftests/kvm/testcases/aarch64/no-vgic-v3/default.test    | 1 +
- .../kvm/testcases/aarch64/page_fault_test/default.test         | 1 +
- .../selftests/kvm/testcases/aarch64/psci_test/default.test     | 1 +
- .../selftests/kvm/testcases/aarch64/set_id_regs/default.test   | 1 +
- .../selftests/kvm/testcases/aarch64/smccc_filter/default.test  | 1 +
- .../kvm/testcases/aarch64/vcpu_width_config/default.test       | 1 +
- .../selftests/kvm/testcases/aarch64/vgic_init/default.test     | 1 +
- .../selftests/kvm/testcases/aarch64/vgic_irq/default.test      | 1 +
- .../kvm/testcases/aarch64/vgic_lpi_stress/default.test         | 1 +
- .../kvm/testcases/aarch64/vpmu_counter_access/default.test     | 1 +
- .../kvm/testcases/access_tracking_perf_test/default.test       | 1 +
- .../selftests/kvm/testcases/coalesced_io_test/default.test     | 1 +
- .../selftests/kvm/testcases/demand_paging_test/default.test    | 1 +
- .../selftests/kvm/testcases/dirty_log_perf_test/default.test   | 1 +
- .../selftests/kvm/testcases/dirty_log_test/default.test        | 1 +
- .../selftests/kvm/testcases/guest_memfd_test/default.test      | 1 +
- .../selftests/kvm/testcases/guest_print_test/default.test      | 1 +
- .../selftests/kvm/testcases/hardware_disable_test/default.test | 1 +
- .../selftests/kvm/testcases/kvm_binary_stats_test/default.test | 1 +
- .../selftests/kvm/testcases/kvm_create_max_vcpus/default.test  | 1 +
- .../selftests/kvm/testcases/kvm_page_table_test/default.test   | 1 +
- .../selftests/kvm/testcases/max_guest_memory_test/default.test | 1 +
- .../testcases/memslot_modification_stress_test/default.test    | 1 +
- .../selftests/kvm/testcases/memslot_perf_test/default.test     | 1 +
- .../selftests/kvm/testcases/pre_fault_memory_test/default.test | 1 +
- .../selftests/kvm/testcases/riscv/arch_timer/default.test      | 1 +
- .../selftests/kvm/testcases/riscv/ebreak_test/default.test     | 1 +
- .../selftests/kvm/testcases/riscv/get-reg-list/default.test    | 1 +
- .../selftests/kvm/testcases/riscv/sbi_pmu_test/default.test    | 1 +
- tools/testing/selftests/kvm/testcases/rseq_test/default.test   | 1 +
- .../selftests/kvm/testcases/s390x/cmma_test/default.test       | 1 +
- .../selftests/kvm/testcases/s390x/debug_test/default.test      | 1 +
- tools/testing/selftests/kvm/testcases/s390x/memop/default.test | 1 +
- .../testing/selftests/kvm/testcases/s390x/resets/default.test  | 1 +
- .../kvm/testcases/s390x/shared_zeropage_test/default.test      | 1 +
- .../selftests/kvm/testcases/s390x/sync_regs_test/default.test  | 1 +
- tools/testing/selftests/kvm/testcases/s390x/tprot/default.test | 1 +
- .../selftests/kvm/testcases/s390x/ucontrol_test/default.test   | 1 +
- .../kvm/testcases/set_memory_region_test/default.test          | 1 +
- tools/testing/selftests/kvm/testcases/steal_time/default.test  | 1 +
- .../kvm/testcases/system_counter_offset_test/default.test      | 1 +
- .../selftests/kvm/testcases/x86_64/amx_test/default.test       | 1 +
- .../kvm/testcases/x86_64/apic_bus_clock_test/default.test      | 1 +
- .../selftests/kvm/testcases/x86_64/cpuid_test/default.test     | 1 +
- .../kvm/testcases/x86_64/cr4_cpuid_sync_test/default.test      | 1 +
- .../selftests/kvm/testcases/x86_64/debug_regs/default.test     | 1 +
- .../x86_64/dirty_log_page_splitting_test/default.test          | 1 +
- .../x86_64/exit_on_emulation_failure_test/default.test         | 1 +
- .../kvm/testcases/x86_64/feature_msrs_test/default.test        | 1 +
- .../kvm/testcases/x86_64/fix_hypercall_test/default.test       | 1 +
- .../selftests/kvm/testcases/x86_64/hwcr_msr_test/default.test  | 1 +
- .../selftests/kvm/testcases/x86_64/hyperv_clock/default.test   | 1 +
- .../selftests/kvm/testcases/x86_64/hyperv_cpuid/default.test   | 1 +
- .../selftests/kvm/testcases/x86_64/hyperv_evmcs/default.test   | 1 +
- .../testcases/x86_64/hyperv_extended_hypercalls/default.test   | 1 +
- .../kvm/testcases/x86_64/hyperv_features/default.test          | 1 +
- .../selftests/kvm/testcases/x86_64/hyperv_ipi/default.test     | 1 +
- .../kvm/testcases/x86_64/hyperv_svm_test/default.test          | 1 +
- .../kvm/testcases/x86_64/hyperv_tlb_flush/default.test         | 1 +
- .../selftests/kvm/testcases/x86_64/kvm_clock_test/default.test | 1 +
- .../selftests/kvm/testcases/x86_64/kvm_pv_test/default.test    | 1 +
- .../kvm/testcases/x86_64/max_vcpuid_cap_test/default.test      | 1 +
- .../kvm/testcases/x86_64/monitor_mwait_test/default.test       | 1 +
- .../kvm/testcases/x86_64/nested_exceptions_test/default.test   | 1 +
- .../kvm/testcases/x86_64/nx_huge_pages_test/default.test       | 1 +
- .../kvm/testcases/x86_64/platform_info_test/default.test       | 1 +
- .../kvm/testcases/x86_64/pmu_counters_test/default.test        | 1 +
- .../kvm/testcases/x86_64/pmu_event_filter_test/default.test    | 1 +
- .../testcases/x86_64/private_mem_conversions_test/default.test | 1 +
- .../testcases/x86_64/private_mem_kvm_exits_test/default.test   | 1 +
- .../kvm/testcases/x86_64/recalc_apic_map_test/default.test     | 1 +
- .../kvm/testcases/x86_64/set_boot_cpu_id/default.test          | 1 +
- .../selftests/kvm/testcases/x86_64/set_sregs_test/default.test | 1 +
- .../kvm/testcases/x86_64/sev_init2_tests/default.test          | 1 +
- .../kvm/testcases/x86_64/sev_migrate_tests/default.test        | 1 +
- .../selftests/kvm/testcases/x86_64/sev_smoke_test/default.test | 1 +
- .../x86_64/smaller_maxphyaddr_emulation_test/default.test      | 1 +
- .../selftests/kvm/testcases/x86_64/smm_test/default.test       | 1 +
- .../selftests/kvm/testcases/x86_64/state_test/default.test     | 1 +
- .../kvm/testcases/x86_64/svm_int_ctl_test/default.test         | 1 +
- .../kvm/testcases/x86_64/svm_nested_shutdown_test/default.test | 1 +
- .../testcases/x86_64/svm_nested_soft_inject_test/default.test  | 1 +
- .../kvm/testcases/x86_64/svm_vmcall_test/default.test          | 1 +
- .../selftests/kvm/testcases/x86_64/sync_regs_test/default.test | 1 +
- .../kvm/testcases/x86_64/triple_fault_event_test/default.test  | 1 +
- .../selftests/kvm/testcases/x86_64/tsc_msrs_test/default.test  | 1 +
- .../kvm/testcases/x86_64/tsc_scaling_sync/default.test         | 1 +
- .../kvm/testcases/x86_64/ucna_injection_test/default.test      | 1 +
- .../kvm/testcases/x86_64/userspace_io_test/default.test        | 1 +
- .../kvm/testcases/x86_64/userspace_msr_exit_test/default.test  | 1 +
- .../kvm/testcases/x86_64/vmx_apic_access_test/default.test     | 1 +
- .../testcases/x86_64/vmx_close_while_nested_test/default.test  | 1 +
- .../kvm/testcases/x86_64/vmx_dirty_log_test/default.test       | 1 +
- .../x86_64/vmx_exception_with_invalid_guest_state/default.test | 1 +
- .../x86_64/vmx_invalid_nested_guest_state/default.test         | 1 +
- .../selftests/kvm/testcases/x86_64/vmx_msrs_test/default.test  | 1 +
- .../testcases/x86_64/vmx_nested_tsc_scaling_test/default.test  | 1 +
- .../kvm/testcases/x86_64/vmx_pmu_caps_test/default.test        | 1 +
- .../testcases/x86_64/vmx_preemption_timer_test/default.test    | 1 +
- .../testcases/x86_64/vmx_set_nested_state_test/default.test    | 1 +
- .../kvm/testcases/x86_64/vmx_tsc_adjust_test/default.test      | 1 +
- .../selftests/kvm/testcases/x86_64/xapic_ipi_test/default.test | 1 +
- .../kvm/testcases/x86_64/xapic_state_test/default.test         | 1 +
- .../kvm/testcases/x86_64/xcr0_cpuid_test/default.test          | 1 +
- .../kvm/testcases/x86_64/xen_shinfo_test/default.test          | 1 +
- .../kvm/testcases/x86_64/xen_vmcall_test/default.test          | 1 +
- .../selftests/kvm/testcases/x86_64/xss_msr_test/default.test   | 1 +
- 114 files changed, 115 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/arch_timer/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/arch_timer_edge_cases/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/debug-exceptions/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/get-reg-list/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/hypercalls/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/no-vgic-v3/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/page_fault_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/psci_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/set_id_regs/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/smccc_filter/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/vcpu_width_config/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/vgic_init/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/vgic_irq/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/vgic_lpi_stress/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/aarch64/vpmu_counter_access/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/access_tracking_perf_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/coalesced_io_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/demand_paging_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/dirty_log_perf_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/dirty_log_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/guest_memfd_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/guest_print_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/hardware_disable_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/kvm_binary_stats_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/kvm_create_max_vcpus/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/kvm_page_table_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/max_guest_memory_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/memslot_modification_stress_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/memslot_perf_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/pre_fault_memory_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/riscv/arch_timer/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/riscv/ebreak_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/riscv/get-reg-list/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/riscv/sbi_pmu_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/rseq_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/cmma_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/debug_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/memop/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/resets/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/shared_zeropage_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/sync_regs_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/tprot/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/s390x/ucontrol_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/set_memory_region_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/steal_time/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/system_counter_offset_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/amx_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/apic_bus_clock_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/cpuid_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/cr4_cpuid_sync_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/debug_regs/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/dirty_log_page_splitting_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/exit_on_emulation_failure_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/feature_msrs_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/fix_hypercall_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hwcr_msr_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_clock/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_cpuid/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_evmcs/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_extended_hypercalls/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_features/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_ipi/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_svm_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/hyperv_tlb_flush/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/kvm_clock_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/kvm_pv_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/max_vcpuid_cap_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/monitor_mwait_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/nested_exceptions_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/nx_huge_pages_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/platform_info_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/pmu_counters_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/pmu_event_filter_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/private_mem_conversions_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/private_mem_kvm_exits_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/recalc_apic_map_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/set_boot_cpu_id/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/set_sregs_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/sev_init2_tests/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/sev_migrate_tests/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/sev_smoke_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/smaller_maxphyaddr_emulation_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/smm_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/state_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/svm_int_ctl_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/svm_nested_shutdown_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/svm_nested_soft_inject_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/svm_vmcall_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/sync_regs_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/triple_fault_event_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/tsc_msrs_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/tsc_scaling_sync/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/ucna_injection_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/userspace_io_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/userspace_msr_exit_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_apic_access_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_close_while_nested_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_dirty_log_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_exception_with_invalid_guest_state/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_invalid_nested_guest_state/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_msrs_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_nested_tsc_scaling_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_pmu_caps_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_preemption_timer_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_set_nested_state_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/vmx_tsc_adjust_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/xapic_ipi_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/xapic_state_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/xcr0_cpuid_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/xen_shinfo_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/xen_vmcall_test/default.test
- create mode 100644 tools/testing/selftests/kvm/testcases/x86_64/xss_msr_test/default.test
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 1d41a046a7bf..550b7c2b4a0c 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -9,4 +9,5 @@
- !config
- !settings
- !Makefile
--!Makefile.kvm
-\ No newline at end of file
-+!Makefile.kvm
-+!*.test
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
-new file mode 100644
-index 000000000000..5db8723f554f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
-@@ -0,0 +1 @@
-+./aarch64/aarch32_id_regs
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/arch_timer/default.test b/tools/testing/selftests/kvm/testcases/aarch64/arch_timer/default.test
-new file mode 100644
-index 000000000000..4eabd25b1c88
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/arch_timer/default.test
-@@ -0,0 +1 @@
-+./aarch64/arch_timer
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/arch_timer_edge_cases/default.test b/tools/testing/selftests/kvm/testcases/aarch64/arch_timer_edge_cases/default.test
-new file mode 100644
-index 000000000000..c2c17884d6ff
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/arch_timer_edge_cases/default.test
-@@ -0,0 +1 @@
-+./aarch64/arch_timer_edge_cases
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/debug-exceptions/default.test b/tools/testing/selftests/kvm/testcases/aarch64/debug-exceptions/default.test
-new file mode 100644
-index 000000000000..3dd50672ea2a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/debug-exceptions/default.test
-@@ -0,0 +1 @@
-+./aarch64/debug-exceptions
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/get-reg-list/default.test b/tools/testing/selftests/kvm/testcases/aarch64/get-reg-list/default.test
-new file mode 100644
-index 000000000000..a7656ab23faa
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/get-reg-list/default.test
-@@ -0,0 +1 @@
-+./aarch64/get-reg-list
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/hypercalls/default.test b/tools/testing/selftests/kvm/testcases/aarch64/hypercalls/default.test
-new file mode 100644
-index 000000000000..c206440ad0e4
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/hypercalls/default.test
-@@ -0,0 +1 @@
-+./aarch64/hypercalls
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/no-vgic-v3/default.test b/tools/testing/selftests/kvm/testcases/aarch64/no-vgic-v3/default.test
-new file mode 100644
-index 000000000000..2dc6002ec63b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/no-vgic-v3/default.test
-@@ -0,0 +1 @@
-+./aarch64/no-vgic-v3
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/page_fault_test/default.test b/tools/testing/selftests/kvm/testcases/aarch64/page_fault_test/default.test
-new file mode 100644
-index 000000000000..90d59bf94b53
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/page_fault_test/default.test
-@@ -0,0 +1 @@
-+./aarch64/page_fault_test
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/psci_test/default.test b/tools/testing/selftests/kvm/testcases/aarch64/psci_test/default.test
-new file mode 100644
-index 000000000000..55342f569e9e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/psci_test/default.test
-@@ -0,0 +1 @@
-+./aarch64/psci_test
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/set_id_regs/default.test b/tools/testing/selftests/kvm/testcases/aarch64/set_id_regs/default.test
-new file mode 100644
-index 000000000000..ffabfceae569
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/set_id_regs/default.test
-@@ -0,0 +1 @@
-+./aarch64/set_id_regs
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/smccc_filter/default.test b/tools/testing/selftests/kvm/testcases/aarch64/smccc_filter/default.test
-new file mode 100644
-index 000000000000..e4ae3145f15e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/smccc_filter/default.test
-@@ -0,0 +1 @@
-+./aarch64/smccc_filter
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/vcpu_width_config/default.test b/tools/testing/selftests/kvm/testcases/aarch64/vcpu_width_config/default.test
-new file mode 100644
-index 000000000000..489c20dc6cf0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/vcpu_width_config/default.test
-@@ -0,0 +1 @@
-+./aarch64/vcpu_width_config
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/vgic_init/default.test b/tools/testing/selftests/kvm/testcases/aarch64/vgic_init/default.test
-new file mode 100644
-index 000000000000..b8e1a8a7cfb6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/vgic_init/default.test
-@@ -0,0 +1 @@
-+./aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/vgic_irq/default.test b/tools/testing/selftests/kvm/testcases/aarch64/vgic_irq/default.test
-new file mode 100644
-index 000000000000..308c12aa5f13
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/vgic_irq/default.test
-@@ -0,0 +1 @@
-+./aarch64/vgic_irq
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/vgic_lpi_stress/default.test b/tools/testing/selftests/kvm/testcases/aarch64/vgic_lpi_stress/default.test
-new file mode 100644
-index 000000000000..b33c45fb8998
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/vgic_lpi_stress/default.test
-@@ -0,0 +1 @@
-+./aarch64/vgic_lpi_stress
-diff --git a/tools/testing/selftests/kvm/testcases/aarch64/vpmu_counter_access/default.test b/tools/testing/selftests/kvm/testcases/aarch64/vpmu_counter_access/default.test
-new file mode 100644
-index 000000000000..cd3ef4c21274
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/aarch64/vpmu_counter_access/default.test
-@@ -0,0 +1 @@
-+./aarch64/vpmu_counter_access
-diff --git a/tools/testing/selftests/kvm/testcases/access_tracking_perf_test/default.test b/tools/testing/selftests/kvm/testcases/access_tracking_perf_test/default.test
-new file mode 100644
-index 000000000000..e940543be193
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/access_tracking_perf_test/default.test
-@@ -0,0 +1 @@
-+./access_tracking_perf_test
-diff --git a/tools/testing/selftests/kvm/testcases/coalesced_io_test/default.test b/tools/testing/selftests/kvm/testcases/coalesced_io_test/default.test
-new file mode 100644
-index 000000000000..08dfcbb4fcd0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/coalesced_io_test/default.test
-@@ -0,0 +1 @@
-+./coalesced_io_test
-diff --git a/tools/testing/selftests/kvm/testcases/demand_paging_test/default.test b/tools/testing/selftests/kvm/testcases/demand_paging_test/default.test
-new file mode 100644
-index 000000000000..26043696d095
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/demand_paging_test/default.test
-@@ -0,0 +1 @@
-+./demand_paging_test
-diff --git a/tools/testing/selftests/kvm/testcases/dirty_log_perf_test/default.test b/tools/testing/selftests/kvm/testcases/dirty_log_perf_test/default.test
-new file mode 100644
-index 000000000000..8968bf6eb881
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/dirty_log_perf_test/default.test
-@@ -0,0 +1 @@
-+./dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/testcases/dirty_log_test/default.test b/tools/testing/selftests/kvm/testcases/dirty_log_test/default.test
-new file mode 100644
-index 000000000000..87bc10443ff9
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/dirty_log_test/default.test
-@@ -0,0 +1 @@
-+./dirty_log_test
-diff --git a/tools/testing/selftests/kvm/testcases/guest_memfd_test/default.test b/tools/testing/selftests/kvm/testcases/guest_memfd_test/default.test
-new file mode 100644
-index 000000000000..4bba43fcca8d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/guest_memfd_test/default.test
-@@ -0,0 +1 @@
-+./guest_memfd_test
-diff --git a/tools/testing/selftests/kvm/testcases/guest_print_test/default.test b/tools/testing/selftests/kvm/testcases/guest_print_test/default.test
-new file mode 100644
-index 000000000000..2b7d376d6b09
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/guest_print_test/default.test
-@@ -0,0 +1 @@
-+./guest_print_test
-diff --git a/tools/testing/selftests/kvm/testcases/hardware_disable_test/default.test b/tools/testing/selftests/kvm/testcases/hardware_disable_test/default.test
-new file mode 100644
-index 000000000000..e960b290d00a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/hardware_disable_test/default.test
-@@ -0,0 +1 @@
-+./hardware_disable_test
-diff --git a/tools/testing/selftests/kvm/testcases/kvm_binary_stats_test/default.test b/tools/testing/selftests/kvm/testcases/kvm_binary_stats_test/default.test
-new file mode 100644
-index 000000000000..a8c0240251ce
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/kvm_binary_stats_test/default.test
-@@ -0,0 +1 @@
-+./kvm_binary_stats_test
-diff --git a/tools/testing/selftests/kvm/testcases/kvm_create_max_vcpus/default.test b/tools/testing/selftests/kvm/testcases/kvm_create_max_vcpus/default.test
-new file mode 100644
-index 000000000000..a23226454cdc
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/kvm_create_max_vcpus/default.test
-@@ -0,0 +1 @@
-+./kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/testcases/kvm_page_table_test/default.test b/tools/testing/selftests/kvm/testcases/kvm_page_table_test/default.test
-new file mode 100644
-index 000000000000..0efb9a150562
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/kvm_page_table_test/default.test
-@@ -0,0 +1 @@
-+./kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/testcases/max_guest_memory_test/default.test b/tools/testing/selftests/kvm/testcases/max_guest_memory_test/default.test
-new file mode 100644
-index 000000000000..85c43b0a0f74
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/max_guest_memory_test/default.test
-@@ -0,0 +1 @@
-+./max_guest_memory_test
-diff --git a/tools/testing/selftests/kvm/testcases/memslot_modification_stress_test/default.test b/tools/testing/selftests/kvm/testcases/memslot_modification_stress_test/default.test
-new file mode 100644
-index 000000000000..4a4bb75db039
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/memslot_modification_stress_test/default.test
-@@ -0,0 +1 @@
-+./memslot_modification_stress_test
-diff --git a/tools/testing/selftests/kvm/testcases/memslot_perf_test/default.test b/tools/testing/selftests/kvm/testcases/memslot_perf_test/default.test
-new file mode 100644
-index 000000000000..70889328cea3
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/memslot_perf_test/default.test
-@@ -0,0 +1 @@
-+./memslot_perf_test
-diff --git a/tools/testing/selftests/kvm/testcases/pre_fault_memory_test/default.test b/tools/testing/selftests/kvm/testcases/pre_fault_memory_test/default.test
-new file mode 100644
-index 000000000000..2b7c896d7c54
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/pre_fault_memory_test/default.test
-@@ -0,0 +1 @@
-+./pre_fault_memory_test
-diff --git a/tools/testing/selftests/kvm/testcases/riscv/arch_timer/default.test b/tools/testing/selftests/kvm/testcases/riscv/arch_timer/default.test
-new file mode 100644
-index 000000000000..c16ee2797869
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/riscv/arch_timer/default.test
-@@ -0,0 +1 @@
-+./riscv/arch_timer
-diff --git a/tools/testing/selftests/kvm/testcases/riscv/ebreak_test/default.test b/tools/testing/selftests/kvm/testcases/riscv/ebreak_test/default.test
-new file mode 100644
-index 000000000000..8415f42d391a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/riscv/ebreak_test/default.test
-@@ -0,0 +1 @@
-+./riscv/ebreak_test
-diff --git a/tools/testing/selftests/kvm/testcases/riscv/get-reg-list/default.test b/tools/testing/selftests/kvm/testcases/riscv/get-reg-list/default.test
-new file mode 100644
-index 000000000000..0238b91deecd
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/riscv/get-reg-list/default.test
-@@ -0,0 +1 @@
-+./riscv/get-reg-list
-diff --git a/tools/testing/selftests/kvm/testcases/riscv/sbi_pmu_test/default.test b/tools/testing/selftests/kvm/testcases/riscv/sbi_pmu_test/default.test
-new file mode 100644
-index 000000000000..efa41caabe3e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/riscv/sbi_pmu_test/default.test
-@@ -0,0 +1 @@
-+./riscv/sbi_pmu_test
-diff --git a/tools/testing/selftests/kvm/testcases/rseq_test/default.test b/tools/testing/selftests/kvm/testcases/rseq_test/default.test
-new file mode 100644
-index 000000000000..6098cd71bd56
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/rseq_test/default.test
-@@ -0,0 +1 @@
-+./rseq_test
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/cmma_test/default.test b/tools/testing/selftests/kvm/testcases/s390x/cmma_test/default.test
-new file mode 100644
-index 000000000000..b36736b053dc
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/cmma_test/default.test
-@@ -0,0 +1 @@
-+./s390x/cmma_test
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/debug_test/default.test b/tools/testing/selftests/kvm/testcases/s390x/debug_test/default.test
-new file mode 100644
-index 000000000000..56eadb53ff96
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/debug_test/default.test
-@@ -0,0 +1 @@
-+./s390x/debug_test
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/memop/default.test b/tools/testing/selftests/kvm/testcases/s390x/memop/default.test
-new file mode 100644
-index 000000000000..b80932431521
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/memop/default.test
-@@ -0,0 +1 @@
-+./s390x/memop
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/resets/default.test b/tools/testing/selftests/kvm/testcases/s390x/resets/default.test
-new file mode 100644
-index 000000000000..7e116efaf6e3
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/resets/default.test
-@@ -0,0 +1 @@
-+./s390x/resets
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/shared_zeropage_test/default.test b/tools/testing/selftests/kvm/testcases/s390x/shared_zeropage_test/default.test
-new file mode 100644
-index 000000000000..d7ed954a5d87
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/shared_zeropage_test/default.test
-@@ -0,0 +1 @@
-+./s390x/shared_zeropage_test
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/sync_regs_test/default.test b/tools/testing/selftests/kvm/testcases/s390x/sync_regs_test/default.test
-new file mode 100644
-index 000000000000..fb5a97dc1a60
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/sync_regs_test/default.test
-@@ -0,0 +1 @@
-+./s390x/sync_regs_test
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/tprot/default.test b/tools/testing/selftests/kvm/testcases/s390x/tprot/default.test
-new file mode 100644
-index 000000000000..16476e6f7fe7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/tprot/default.test
-@@ -0,0 +1 @@
-+./s390x/tprot
-diff --git a/tools/testing/selftests/kvm/testcases/s390x/ucontrol_test/default.test b/tools/testing/selftests/kvm/testcases/s390x/ucontrol_test/default.test
-new file mode 100644
-index 000000000000..1a9a32db0d99
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/s390x/ucontrol_test/default.test
-@@ -0,0 +1 @@
-+./s390x/ucontrol_test
-diff --git a/tools/testing/selftests/kvm/testcases/set_memory_region_test/default.test b/tools/testing/selftests/kvm/testcases/set_memory_region_test/default.test
-new file mode 100644
-index 000000000000..356c31e88471
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/set_memory_region_test/default.test
-@@ -0,0 +1 @@
-+./set_memory_region_test
-diff --git a/tools/testing/selftests/kvm/testcases/steal_time/default.test b/tools/testing/selftests/kvm/testcases/steal_time/default.test
-new file mode 100644
-index 000000000000..10a490246d2d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/steal_time/default.test
-@@ -0,0 +1 @@
-+./steal_time
-diff --git a/tools/testing/selftests/kvm/testcases/system_counter_offset_test/default.test b/tools/testing/selftests/kvm/testcases/system_counter_offset_test/default.test
-new file mode 100644
-index 000000000000..a35557a85f79
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/system_counter_offset_test/default.test
-@@ -0,0 +1 @@
-+./system_counter_offset_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/amx_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/amx_test/default.test
-new file mode 100644
-index 000000000000..9328a4997849
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/amx_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/amx_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/apic_bus_clock_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/apic_bus_clock_test/default.test
-new file mode 100644
-index 000000000000..71dc5be7a4de
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/apic_bus_clock_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/apic_bus_clock_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/cpuid_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/cpuid_test/default.test
-new file mode 100644
-index 000000000000..f9f518c76732
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/cpuid_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/cpuid_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/cr4_cpuid_sync_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/cr4_cpuid_sync_test/default.test
-new file mode 100644
-index 000000000000..a7ebd6d37523
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/cr4_cpuid_sync_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/cr4_cpuid_sync_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/debug_regs/default.test b/tools/testing/selftests/kvm/testcases/x86_64/debug_regs/default.test
-new file mode 100644
-index 000000000000..972e16d8ae80
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/debug_regs/default.test
-@@ -0,0 +1 @@
-+./x86_64/debug_regs
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/dirty_log_page_splitting_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/dirty_log_page_splitting_test/default.test
-new file mode 100644
-index 000000000000..5e5eedb125fb
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/dirty_log_page_splitting_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/dirty_log_page_splitting_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/exit_on_emulation_failure_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/exit_on_emulation_failure_test/default.test
-new file mode 100644
-index 000000000000..5e8d932a985a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/exit_on_emulation_failure_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/exit_on_emulation_failure_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/feature_msrs_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/feature_msrs_test/default.test
-new file mode 100644
-index 000000000000..a7f2bbf4bf56
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/feature_msrs_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/feature_msrs_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/fix_hypercall_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/fix_hypercall_test/default.test
-new file mode 100644
-index 000000000000..e14c80fa8f45
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/fix_hypercall_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/fix_hypercall_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hwcr_msr_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hwcr_msr_test/default.test
-new file mode 100644
-index 000000000000..62edde1e311d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hwcr_msr_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/hwcr_msr_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_clock/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_clock/default.test
-new file mode 100644
-index 000000000000..f636d01c1c04
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_clock/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_clock
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_cpuid/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_cpuid/default.test
-new file mode 100644
-index 000000000000..eafad0b1579e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_cpuid/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_cpuid
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_evmcs/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_evmcs/default.test
-new file mode 100644
-index 000000000000..851add3c6e81
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_evmcs/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_evmcs
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_extended_hypercalls/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_extended_hypercalls/default.test
-new file mode 100644
-index 000000000000..f66c5faa362b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_extended_hypercalls/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_extended_hypercalls
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_features/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_features/default.test
-new file mode 100644
-index 000000000000..fbf677334f30
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_features/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_features
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_ipi/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_ipi/default.test
-new file mode 100644
-index 000000000000..5e080d57c89a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_ipi/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_ipi
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_svm_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_svm_test/default.test
-new file mode 100644
-index 000000000000..4d10b12513cb
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_svm_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/hyperv_tlb_flush/default.test b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_tlb_flush/default.test
-new file mode 100644
-index 000000000000..0eb679f846e7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/hyperv_tlb_flush/default.test
-@@ -0,0 +1 @@
-+./x86_64/hyperv_tlb_flush
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/kvm_clock_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/kvm_clock_test/default.test
-new file mode 100644
-index 000000000000..7d448d089a65
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/kvm_clock_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/kvm_clock_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/kvm_pv_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/kvm_pv_test/default.test
-new file mode 100644
-index 000000000000..fb71a5fd8544
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/kvm_pv_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/kvm_pv_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/max_vcpuid_cap_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/max_vcpuid_cap_test/default.test
-new file mode 100644
-index 000000000000..cc83f9b0224a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/max_vcpuid_cap_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/max_vcpuid_cap_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/monitor_mwait_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/monitor_mwait_test/default.test
-new file mode 100644
-index 000000000000..b863c909f6c6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/monitor_mwait_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/monitor_mwait_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/nested_exceptions_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/nested_exceptions_test/default.test
-new file mode 100644
-index 000000000000..bc326f0a4607
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/nested_exceptions_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/nested_exceptions_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/nx_huge_pages_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/nx_huge_pages_test/default.test
-new file mode 100644
-index 000000000000..7195b59fe8a5
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/nx_huge_pages_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/nx_huge_pages_test.sh
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/platform_info_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/platform_info_test/default.test
-new file mode 100644
-index 000000000000..d8e9803516ae
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/platform_info_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/platform_info_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/pmu_counters_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/pmu_counters_test/default.test
-new file mode 100644
-index 000000000000..08f30fffe000
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/pmu_counters_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/pmu_counters_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/pmu_event_filter_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/pmu_event_filter_test/default.test
-new file mode 100644
-index 000000000000..58f0afe0af50
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/pmu_event_filter_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/pmu_event_filter_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/private_mem_conversions_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/private_mem_conversions_test/default.test
-new file mode 100644
-index 000000000000..8bb591b63967
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/private_mem_conversions_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/private_mem_conversions_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/private_mem_kvm_exits_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/private_mem_kvm_exits_test/default.test
-new file mode 100644
-index 000000000000..9c624949de95
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/private_mem_kvm_exits_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/private_mem_kvm_exits_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/recalc_apic_map_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/recalc_apic_map_test/default.test
-new file mode 100644
-index 000000000000..441e3bea8b71
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/recalc_apic_map_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/recalc_apic_map_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/set_boot_cpu_id/default.test b/tools/testing/selftests/kvm/testcases/x86_64/set_boot_cpu_id/default.test
-new file mode 100644
-index 000000000000..80d5156f0623
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/set_boot_cpu_id/default.test
-@@ -0,0 +1 @@
-+./x86_64/set_boot_cpu_id
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/set_sregs_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/set_sregs_test/default.test
-new file mode 100644
-index 000000000000..83531913d381
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/set_sregs_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/set_sregs_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/sev_init2_tests/default.test b/tools/testing/selftests/kvm/testcases/x86_64/sev_init2_tests/default.test
-new file mode 100644
-index 000000000000..9c356b1d7717
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/sev_init2_tests/default.test
-@@ -0,0 +1 @@
-+./x86_64/sev_init2_tests
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/sev_migrate_tests/default.test b/tools/testing/selftests/kvm/testcases/x86_64/sev_migrate_tests/default.test
-new file mode 100644
-index 000000000000..f0e2742cf6b4
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/sev_migrate_tests/default.test
-@@ -0,0 +1 @@
-+./x86_64/sev_migrate_tests
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/sev_smoke_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/sev_smoke_test/default.test
-new file mode 100644
-index 000000000000..56733d3d47d5
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/sev_smoke_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/sev_smoke_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/smaller_maxphyaddr_emulation_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/smaller_maxphyaddr_emulation_test/default.test
-new file mode 100644
-index 000000000000..52f6dcebe18e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/smaller_maxphyaddr_emulation_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/smaller_maxphyaddr_emulation_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/smm_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/smm_test/default.test
-new file mode 100644
-index 000000000000..bd50d1fe0e39
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/smm_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/smm_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/state_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/state_test/default.test
-new file mode 100644
-index 000000000000..e2f261ecb141
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/state_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/state_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/svm_int_ctl_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/svm_int_ctl_test/default.test
-new file mode 100644
-index 000000000000..51c2b1a4d7ea
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/svm_int_ctl_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/svm_int_ctl_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/svm_nested_shutdown_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/svm_nested_shutdown_test/default.test
-new file mode 100644
-index 000000000000..aa1320afb235
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/svm_nested_shutdown_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/svm_nested_shutdown_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/svm_nested_soft_inject_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/svm_nested_soft_inject_test/default.test
-new file mode 100644
-index 000000000000..75ffe38b0246
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/svm_nested_soft_inject_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/svm_nested_soft_inject_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/svm_vmcall_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/svm_vmcall_test/default.test
-new file mode 100644
-index 000000000000..415f8112e873
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/svm_vmcall_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/svm_vmcall_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/sync_regs_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/sync_regs_test/default.test
-new file mode 100644
-index 000000000000..26f1e3c00208
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/sync_regs_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/sync_regs_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/triple_fault_event_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/triple_fault_event_test/default.test
-new file mode 100644
-index 000000000000..86709ec1af57
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/triple_fault_event_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/triple_fault_event_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/tsc_msrs_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/tsc_msrs_test/default.test
-new file mode 100644
-index 000000000000..e7eca5c5425b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/tsc_msrs_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/tsc_msrs_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/tsc_scaling_sync/default.test b/tools/testing/selftests/kvm/testcases/x86_64/tsc_scaling_sync/default.test
-new file mode 100644
-index 000000000000..75cec395980e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/tsc_scaling_sync/default.test
-@@ -0,0 +1 @@
-+./x86_64/tsc_scaling_sync
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/ucna_injection_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/ucna_injection_test/default.test
-new file mode 100644
-index 000000000000..991ab4b35376
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/ucna_injection_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/ucna_injection_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/userspace_io_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/userspace_io_test/default.test
-new file mode 100644
-index 000000000000..3401aa68ec4f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/userspace_io_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/userspace_io_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/userspace_msr_exit_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/userspace_msr_exit_test/default.test
-new file mode 100644
-index 000000000000..25d34dbb542d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/userspace_msr_exit_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/userspace_msr_exit_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_apic_access_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_apic_access_test/default.test
-new file mode 100644
-index 000000000000..970ce4a87b69
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_apic_access_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_apic_access_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_close_while_nested_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_close_while_nested_test/default.test
-new file mode 100644
-index 000000000000..97b5c9bc2385
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_close_while_nested_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_close_while_nested_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_dirty_log_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_dirty_log_test/default.test
-new file mode 100644
-index 000000000000..dbbc6771830d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_dirty_log_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_dirty_log_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_exception_with_invalid_guest_state/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_exception_with_invalid_guest_state/default.test
-new file mode 100644
-index 000000000000..d9cb4e720d2b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_exception_with_invalid_guest_state/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_exception_with_invalid_guest_state
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_invalid_nested_guest_state/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_invalid_nested_guest_state/default.test
-new file mode 100644
-index 000000000000..396253417646
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_invalid_nested_guest_state/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_invalid_nested_guest_state
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_msrs_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_msrs_test/default.test
-new file mode 100644
-index 000000000000..5eb96a67bc3a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_msrs_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_msrs_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_nested_tsc_scaling_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_nested_tsc_scaling_test/default.test
-new file mode 100644
-index 000000000000..9ffd06d52cce
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_nested_tsc_scaling_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_nested_tsc_scaling_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_pmu_caps_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_pmu_caps_test/default.test
-new file mode 100644
-index 000000000000..e7bbc34d0d98
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_pmu_caps_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_pmu_caps_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_preemption_timer_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_preemption_timer_test/default.test
-new file mode 100644
-index 000000000000..08432fd3071a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_preemption_timer_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_preemption_timer_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_set_nested_state_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_set_nested_state_test/default.test
-new file mode 100644
-index 000000000000..58b2bc65f767
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_set_nested_state_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_set_nested_state_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/vmx_tsc_adjust_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/vmx_tsc_adjust_test/default.test
-new file mode 100644
-index 000000000000..3ec7560cab11
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/vmx_tsc_adjust_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/vmx_tsc_adjust_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/xapic_ipi_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/xapic_ipi_test/default.test
-new file mode 100644
-index 000000000000..2cbd6b12f6e3
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/xapic_ipi_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/xapic_ipi_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/xapic_state_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/xapic_state_test/default.test
-new file mode 100644
-index 000000000000..649e0268d6fd
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/xapic_state_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/xapic_state_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/xcr0_cpuid_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/xcr0_cpuid_test/default.test
-new file mode 100644
-index 000000000000..d5ea6a4e2b20
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/xcr0_cpuid_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/xcr0_cpuid_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/xen_shinfo_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/xen_shinfo_test/default.test
-new file mode 100644
-index 000000000000..79423b5a11e1
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/xen_shinfo_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/xen_shinfo_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/xen_vmcall_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/xen_vmcall_test/default.test
-new file mode 100644
-index 000000000000..32ba7eb9d7e9
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/xen_vmcall_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/xen_vmcall_test
-diff --git a/tools/testing/selftests/kvm/testcases/x86_64/xss_msr_test/default.test b/tools/testing/selftests/kvm/testcases/x86_64/xss_msr_test/default.test
-new file mode 100644
-index 000000000000..c61ac639825b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/testcases/x86_64/xss_msr_test/default.test
-@@ -0,0 +1 @@
-+./x86_64/xss_msr_test
+Completely untested.  This is essentially a "rage" patch after spending
+way, way too much time trying to understand why I couldn't include some
+__ASSEMBLY__ protected headers in x86 assembly files.
+ 
+ arm/cstart.S                | 1 -
+ arm/cstart64.S              | 1 -
+ lib/arm/asm/arch_gicv3.h    | 4 ++--
+ lib/arm/asm/assembler.h     | 2 +-
+ lib/arm/asm/gic-v2.h        | 4 ++--
+ lib/arm/asm/gic-v3.h        | 4 ++--
+ lib/arm/asm/gic.h           | 4 ++--
+ lib/arm/asm/page.h          | 4 ++--
+ lib/arm/asm/ptrace.h        | 4 ++--
+ lib/arm/asm/sysreg.h        | 4 ++--
+ lib/arm/asm/thread_info.h   | 4 ++--
+ lib/arm/asm/timer.h         | 4 ++--
+ lib/arm64/asm/arch_gicv3.h  | 4 ++--
+ lib/arm64/asm/assembler.h   | 2 +-
+ lib/arm64/asm/page.h        | 4 ++--
+ lib/arm64/asm/processor.h   | 4 ++--
+ lib/arm64/asm/ptrace.h      | 4 ++--
+ lib/arm64/asm/sysreg.h      | 4 ++--
+ lib/asm-generic/page.h      | 4 ++--
+ lib/auxinfo.h               | 2 +-
+ lib/libcflat.h              | 4 ++--
+ lib/libfdt/fdt.h            | 2 +-
+ lib/linux/compiler.h        | 4 ++--
+ lib/linux/const.h           | 2 +-
+ lib/powerpc/asm/hcall.h     | 4 ++--
+ lib/powerpc/asm/processor.h | 4 ++--
+ lib/powerpc/asm/rtas.h      | 4 ++--
+ lib/ppc64/asm/page.h        | 4 ++--
+ lib/ppc64/asm/ptrace.h      | 4 ++--
+ lib/ppc64/asm/vpa.h         | 4 ++--
+ lib/riscv/asm/bug.h         | 2 +-
+ lib/riscv/asm/csr.h         | 4 ++--
+ lib/riscv/asm/page.h        | 4 ++--
+ lib/riscv/asm/sbi.h         | 4 ++--
+ lib/riscv/setjmp.S          | 1 -
+ powerpc/cstart64.S          | 1 -
+ riscv/sbi-asm.S             | 1 -
+ 37 files changed, 58 insertions(+), 63 deletions(-)
+
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 29961c37..60c135fb 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -5,7 +5,6 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+-#define __ASSEMBLY__
+ #include <auxinfo.h>
+ #include <asm/assembler.h>
+ #include <asm/thread_info.h>
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index b480a552..dd0cce4b 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -5,7 +5,6 @@
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.
+  */
+-#define __ASSEMBLY__
+ #include <auxinfo.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/assembler.h>
+diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
+index 45b60968..0acb22b4 100644
+--- a/lib/arm/asm/arch_gicv3.h
++++ b/lib/arm/asm/arch_gicv3.h
+@@ -8,7 +8,7 @@
+ #ifndef _ASMARM_ARCH_GICV3_H_
+ #define _ASMARM_ARCH_GICV3_H_
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <libcflat.h>
+ #include <asm/sysreg.h>
+ #include <asm/barrier.h>
+@@ -61,5 +61,5 @@ static inline u64 gicv3_read_typer(const volatile void __iomem *addr)
+ 	return val;
+ }
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_ARCH_GICV3_H_ */
+diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+index 4200252d..5158de8c 100644
+--- a/lib/arm/asm/assembler.h
++++ b/lib/arm/asm/assembler.h
+@@ -4,7 +4,7 @@
+  * arch/arm/mm/proc-v7.S.
+  */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #error "Only include this from assembly code"
+ #endif
+ 
+diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
+index ff11afb1..f58d8b6d 100644
+--- a/lib/arm/asm/gic-v2.h
++++ b/lib/arm/asm/gic-v2.h
+@@ -17,7 +17,7 @@
+ #define GICC_ENABLE			0x1
+ #define GICC_IAR_INT_ID_MASK		0x3ff
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <cpumask.h>
+ 
+ struct gicv2_data {
+@@ -38,5 +38,5 @@ extern void gicv2_write_eoir(u32 irqstat);
+ extern void gicv2_ipi_send_single(int irq, int cpu);
+ extern void gicv2_ipi_send_mask(int irq, const cpumask_t *dest);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_GIC_V2_H_ */
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index a1cc62a2..85520e3e 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -66,7 +66,7 @@
+ 
+ #include <asm/arch_gicv3.h>
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <cpumask.h>
+ #include <asm/setup.h>
+ #include <asm/processor.h>
+@@ -153,5 +153,5 @@ static inline u64 mpidr_uncompress(u32 compressed)
+ 
+ #define gicv3_lpi_get_config(intid) (gicv3_data.lpi_prop[LPI_OFFSET(intid)])
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_GIC_V3_H_ */
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index dc8cc18c..e6ba77e4 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -46,7 +46,7 @@
+ #define PPI(irq)			((irq) + 16)
+ #define SPI(irq)			((irq) + GIC_FIRST_SPI)
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <cpumask.h>
+ 
+ enum gic_irq_state {
+@@ -88,5 +88,5 @@ void gic_irq_set_clr_enable(int irq, bool enable);
+ #define gic_enable_irq(irq) gic_irq_set_clr_enable(irq, true)
+ #define gic_disable_irq(irq) gic_irq_set_clr_enable(irq, false)
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/asm/page.h b/lib/arm/asm/page.h
+index 8eb4a883..f2847e98 100644
+--- a/lib/arm/asm/page.h
++++ b/lib/arm/asm/page.h
+@@ -12,7 +12,7 @@
+ #define PAGE_SIZE		(_AC(1,UL) << PAGE_SHIFT)
+ #define PAGE_MASK		(~(PAGE_SIZE-1))
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #define PAGE_ALIGN(addr)	ALIGN(addr, PAGE_SIZE)
+ 
+@@ -49,5 +49,5 @@ extern unsigned long __phys_to_virt(phys_addr_t addr);
+ 
+ extern void *__ioremap(phys_addr_t phys_addr, size_t size);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_PAGE_H_ */
+diff --git a/lib/arm/asm/ptrace.h b/lib/arm/asm/ptrace.h
+index 02bb2ccb..6f6a7a41 100644
+--- a/lib/arm/asm/ptrace.h
++++ b/lib/arm/asm/ptrace.h
+@@ -52,7 +52,7 @@
+ #define PSR_IT_MASK	0x0600fc00	/* If-Then execution state mask */
+ #define PSR_ENDIAN_MASK	0x00000200	/* Endianness state mask */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <libcflat.h>
+ 
+ struct pt_regs {
+@@ -100,5 +100,5 @@ static inline unsigned long regs_get_register(struct pt_regs *regs,
+ 	return *(unsigned long *)((unsigned long)regs + offset);
+ }
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_PTRACE_H_ */
+diff --git a/lib/arm/asm/sysreg.h b/lib/arm/asm/sysreg.h
+index 96843386..7827f8ea 100644
+--- a/lib/arm/asm/sysreg.h
++++ b/lib/arm/asm/sysreg.h
+@@ -38,7 +38,7 @@
+ #define CR_AFE	(1 << 29)	/* Access flag enable			*/
+ #define CR_TE	(1 << 30)	/* Thumb exception enable		*/
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <libcflat.h>
+ 
+ #define __ACCESS_CP15(CRn, Op1, CRm, Op2)			\
+@@ -60,6 +60,6 @@
+ 
+ #define __write_sysreg(v, r, w, c, t)   asm volatile(w " " c : : "r" ((t)(v)))
+ #define write_sysreg(v, ...)            __write_sysreg(v, __VA_ARGS__)
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ 
+ #endif /* _ASMARM_SYSREG_H_ */
+diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
+index eaa72582..be5a060b 100644
+--- a/lib/arm/asm/thread_info.h
++++ b/lib/arm/asm/thread_info.h
+@@ -22,7 +22,7 @@
+ #define THREAD_ALIGNMENT	THREAD_SIZE
+ #endif
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <asm/processor.h>
+ #include <alloc.h>
+ 
+@@ -73,5 +73,5 @@ static inline struct thread_info *current_thread_info(void)
+ 
+ extern void thread_info_init(struct thread_info *ti, unsigned int flags);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_THREAD_INFO_H_ */
+diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
+index aaf839fc..fd8f7796 100644
+--- a/lib/arm/asm/timer.h
++++ b/lib/arm/asm/timer.h
+@@ -10,7 +10,7 @@
+ #define ARCH_TIMER_CTL_IMASK   (1 << 1)
+ #define ARCH_TIMER_CTL_ISTATUS (1 << 2)
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ struct timer_state {
+ 	struct {
+@@ -29,5 +29,5 @@ extern struct timer_state __timer_state;
+ 
+ void timer_save_state(void);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM_TIMER_H_ */
+diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
+index fdee4de1..3ea3ce9e 100644
+--- a/lib/arm64/asm/arch_gicv3.h
++++ b/lib/arm64/asm/arch_gicv3.h
+@@ -10,7 +10,7 @@
+ 
+ #include <asm/sysreg.h>
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #include <libcflat.h>
+ #include <asm/barrier.h>
+@@ -54,5 +54,5 @@ static inline void gicv3_write_grpen1(u32 val)
+ 
+ #define gicv3_read_typer(c) readq(c)
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM64_ARCH_GICV3_H_ */
+diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+index aa8c65a2..388cf09a 100644
+--- a/lib/arm64/asm/assembler.h
++++ b/lib/arm64/asm/assembler.h
+@@ -8,7 +8,7 @@
+  * Copyright (C) 2012 ARM Ltd.
+  */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #error "Only include this from assembly code"
+ #endif
+ 
+diff --git a/lib/arm64/asm/page.h b/lib/arm64/asm/page.h
+index d0fac6ea..c0b723e9 100644
+--- a/lib/arm64/asm/page.h
++++ b/lib/arm64/asm/page.h
+@@ -37,7 +37,7 @@
+ #define PGTABLE_LEVELS \
+ 	(((VA_BITS - PAGE_SHIFT) + ((PAGE_SHIFT - 3) - 1)) / (PAGE_SHIFT - 3))
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #define PAGE_ALIGN(addr)	ALIGN(addr, PAGE_SIZE)
+ 
+@@ -74,5 +74,5 @@ extern unsigned long __phys_to_virt(phys_addr_t addr);
+ 
+ extern void *__ioremap(phys_addr_t phys_addr, size_t size);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM64_PAGE_H_ */
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index e5b0ad10..32ddc1b3 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -6,7 +6,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <asm/ptrace.h>
+ #include <asm/esr.h>
+ #include <asm/sysreg.h>
+@@ -173,5 +173,5 @@ static inline bool system_supports_rndr(void)
+ 	return ((id_aa64isar0_el1 >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf) != 0;
+ }
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM64_PROCESSOR_H_ */
+diff --git a/lib/arm64/asm/ptrace.h b/lib/arm64/asm/ptrace.h
+index ccb38dc6..1949f097 100644
+--- a/lib/arm64/asm/ptrace.h
++++ b/lib/arm64/asm/ptrace.h
+@@ -48,7 +48,7 @@
+ #define PSR_x		0x0000ff00	/* Extension            */
+ #define PSR_c		0x000000ff	/* Control              */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <libcflat.h>
+ 
+ struct user_pt_regs {
+@@ -95,5 +95,5 @@ struct pt_regs {
+ #define fast_interrupts_enabled(regs) \
+ 	(!((regs)->pstate & PSR_F_BIT))
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMARM64_PTRACE_H_ */
+diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+index f214a4f0..2b76aed9 100644
+--- a/lib/arm64/asm/sysreg.h
++++ b/lib/arm64/asm/sysreg.h
+@@ -13,7 +13,7 @@
+ #define sys_reg(op0, op1, crn, crm, op2) \
+ 	((((op0)&3)<<19)|((op1)<<16)|((crn)<<12)|((crm)<<8)|((op2)<<5))
+ 
+-#ifdef __ASSEMBLY__
++#ifdef __ASSEMBLER__
+ 	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
+ 	.equ	.L__reg_num_x\num, \num
+ 	.endr
+@@ -71,7 +71,7 @@ asm(
+ "	.inst	0xd5000000|(\\sreg)|(.L__reg_num_\\rt)\n"
+ "	.endm\n"
+ );
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ 
+ #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
+ 
+diff --git a/lib/asm-generic/page.h b/lib/asm-generic/page.h
+index 2ed77f4c..74f4751a 100644
+--- a/lib/asm-generic/page.h
++++ b/lib/asm-generic/page.h
+@@ -15,7 +15,7 @@
+ #define PAGE_SIZE		(_AC(1,UL) << PAGE_SHIFT)
+ #define PAGE_MASK		(~(PAGE_SIZE-1))
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #define PAGE_ALIGN(addr)	ALIGN(addr, PAGE_SIZE)
+ 
+@@ -26,6 +26,6 @@
+ #define virt_to_pfn(kaddr)	(__pa(kaddr) >> PAGE_SHIFT)
+ #define pfn_to_virt(pfn)	__va((pfn) << PAGE_SHIFT)
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ 
+ #endif /* _ASM_GENERIC_PAGE_H_ */
+diff --git a/lib/auxinfo.h b/lib/auxinfo.h
+index a46a1e6f..877f13d8 100644
+--- a/lib/auxinfo.h
++++ b/lib/auxinfo.h
+@@ -7,7 +7,7 @@
+ 
+ #define AUXINFO_MMU_OFF (1 << 0)
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ struct auxinfo {
+ 	const char *progname;
+ 	unsigned long flags;
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index b4110b9e..261f7486 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -20,7 +20,7 @@
+ #ifndef _LIBCFLAT_H_
+ #define _LIBCFLAT_H_
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #include <linux/compiler.h>
+ #include <stdarg.h>
+@@ -155,7 +155,7 @@ do {									\
+ void binstr(unsigned long x, char out[BINSTR_SZ]);
+ void print_binstr(unsigned long x);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ 
+ #define SZ_256			(1 << 8)
+ #define SZ_4K			(1 << 12)
+diff --git a/lib/libfdt/fdt.h b/lib/libfdt/fdt.h
+index f2e68807..57fe5663 100644
+--- a/lib/libfdt/fdt.h
++++ b/lib/libfdt/fdt.h
+@@ -7,7 +7,7 @@
+  * Copyright 2012 Kim Phillips, Freescale Semiconductor.
+  */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ struct fdt_header {
+ 	fdt32_t magic;			 /* magic word FDT_MAGIC */
+diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
+index bf3313bd..8e62aae0 100644
+--- a/lib/linux/compiler.h
++++ b/lib/linux/compiler.h
+@@ -6,7 +6,7 @@
+ #ifndef __LINUX_COMPILER_H
+ #define __LINUX_COMPILER_H
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #define GCC_VERSION (__GNUC__ * 10000           \
+ 		     + __GNUC_MINOR__ * 100     \
+@@ -121,5 +121,5 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
+ 	__u.__val;					\
+ })
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* !__LINUX_COMPILER_H */
+diff --git a/lib/linux/const.h b/lib/linux/const.h
+index f622fa85..c92ba549 100644
+--- a/lib/linux/const.h
++++ b/lib/linux/const.h
+@@ -12,7 +12,7 @@
+  * leave it unchanged in asm.
+  */
+ 
+-#if defined(__ASSEMBLY__) || defined(__ASSEMBLER__)
++#ifdef __ASSEMBLER__
+ #define _AC(X,Y)	X
+ #define _AT(T,X)	X
+ #define __ASM_STR(X)	X
+diff --git a/lib/powerpc/asm/hcall.h b/lib/powerpc/asm/hcall.h
+index 3b44dd20..642e4aa7 100644
+--- a/lib/powerpc/asm/hcall.h
++++ b/lib/powerpc/asm/hcall.h
+@@ -34,7 +34,7 @@
+ #define KVMPPC_HCALL_BASE	0xf000
+ #define KVMPPC_H_RTAS		(KVMPPC_HCALL_BASE + 0x0)
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ /*
+  * hcall_have_broken_sc1 checks if we're on a host with a broken sc1.
+  * Returns 0 if we're not.
+@@ -49,5 +49,5 @@ extern int hcall_have_broken_sc1(void);
+  */
+ extern unsigned long hcall(unsigned long nr, ...);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMPOWERPC_HCALL_H_ */
+diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
+index 9609c9c6..153126fe 100644
+--- a/lib/powerpc/asm/processor.h
++++ b/lib/powerpc/asm/processor.h
+@@ -5,10 +5,10 @@
+ #include <asm/ptrace.h>
+ #include <asm/reg.h>
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ void handle_exception(int trap, void (*func)(struct pt_regs *, void *), void *);
+ void do_handle_exception(struct pt_regs *regs);
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ 
+ extern bool host_is_tcg;
+ extern bool host_is_kvm;
+diff --git a/lib/powerpc/asm/rtas.h b/lib/powerpc/asm/rtas.h
+index 364bf935..989b21bd 100644
+--- a/lib/powerpc/asm/rtas.h
++++ b/lib/powerpc/asm/rtas.h
+@@ -6,7 +6,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #include <libcflat.h>
+ 
+@@ -27,7 +27,7 @@ extern int rtas_call_unlocked(struct rtas_args *args, int token, int nargs, int
+ 
+ extern void rtas_power_off(void);
+ extern void rtas_stop_self(void);
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ 
+ #define RTAS_MSR_MASK 0xfffffffffffffffe
+ 
+diff --git a/lib/ppc64/asm/page.h b/lib/ppc64/asm/page.h
+index c497d86b..4a7ac9ec 100644
+--- a/lib/ppc64/asm/page.h
++++ b/lib/ppc64/asm/page.h
+@@ -24,7 +24,7 @@
+ #endif
+ #define PAGE_MASK		(~(PAGE_SIZE-1))
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #define PAGE_ALIGN(addr)	ALIGN(addr, PAGE_SIZE)
+ 
+@@ -61,5 +61,5 @@ extern unsigned long __phys_to_virt(phys_addr_t addr);
+ 
+ extern void *__ioremap(phys_addr_t phys_addr, size_t size);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMPPC64_PAGE_H_ */
+diff --git a/lib/ppc64/asm/ptrace.h b/lib/ppc64/asm/ptrace.h
+index db263a59..133ad2f9 100644
+--- a/lib/ppc64/asm/ptrace.h
++++ b/lib/ppc64/asm/ptrace.h
+@@ -4,7 +4,7 @@
+ #define KERNEL_REDZONE_SIZE	288
+ #define STACK_FRAME_OVERHEAD    112     /* size of minimum stack frame */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #include <asm/reg.h>
+ 
+@@ -36,6 +36,6 @@ static inline void regs_advance_insn(struct pt_regs *regs)
+ #define STACK_INT_FRAME_SIZE    (sizeof(struct pt_regs) + \
+ 				 STACK_FRAME_OVERHEAD + KERNEL_REDZONE_SIZE)
+ 
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ 
+ #endif /* _ASMPPC64_PTRACE_H_ */
+diff --git a/lib/ppc64/asm/vpa.h b/lib/ppc64/asm/vpa.h
+index 11dde018..2afa3fff 100644
+--- a/lib/ppc64/asm/vpa.h
++++ b/lib/ppc64/asm/vpa.h
+@@ -4,7 +4,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ struct vpa {
+ 	uint32_t	descriptor;
+@@ -57,6 +57,6 @@ struct vpa {
+ 	uint8_t		reserved10[96];
+ };
+ 
+-#endif /* __ASSEMBLY__ */
++#endif /* __ASSEMBLER__ */
+ 
+ #endif /* _ASMPOWERPC_VPA_H_ */
+diff --git a/lib/riscv/asm/bug.h b/lib/riscv/asm/bug.h
+index a6f4136b..8a24e0f4 100644
+--- a/lib/riscv/asm/bug.h
++++ b/lib/riscv/asm/bug.h
+@@ -2,7 +2,7 @@
+ #ifndef _ASMRISCV_BUG_H_
+ #define _ASMRISCV_BUG_H_
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ static inline void bug(void)
+ {
+diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+index 16f5ddd7..c7fc87a9 100644
+--- a/lib/riscv/asm/csr.h
++++ b/lib/riscv/asm/csr.h
+@@ -56,7 +56,7 @@
+ 
+ #define IP_TIP			IE_TIE
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ #define csr_swap(csr, val)					\
+ ({								\
+@@ -118,5 +118,5 @@
+ 				: "memory");			\
+ })
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMRISCV_CSR_H_ */
+diff --git a/lib/riscv/asm/page.h b/lib/riscv/asm/page.h
+index 07b482f7..26f6b8ab 100644
+--- a/lib/riscv/asm/page.h
++++ b/lib/riscv/asm/page.h
+@@ -2,7 +2,7 @@
+ #ifndef _ASMRISCV_PAGE_H_
+ #define _ASMRISCV_PAGE_H_
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ 
+ typedef unsigned long pgd_t;
+ typedef unsigned long pte_t;
+@@ -14,7 +14,7 @@ typedef unsigned long pteval_t;
+ #define __pte(x)		((pte_t)(x))
+ #define __pgprot(x)		((pgprot_t)(x))
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ 
+ #include <asm-generic/page.h>
+ 
+diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+index 98a9b097..2af1208a 100644
+--- a/lib/riscv/asm/sbi.h
++++ b/lib/riscv/asm/sbi.h
+@@ -12,7 +12,7 @@
+ #define SBI_ERR_ALREADY_STARTED		-7
+ #define SBI_ERR_ALREADY_STOPPED		-8
+ 
+-#ifndef __ASSEMBLY__
++#ifndef __ASSEMBLER__
+ #include <cpumask.h>
+ 
+ enum sbi_ext_id {
+@@ -92,5 +92,5 @@ struct sbiret sbi_send_ipi_broadcast(void);
+ struct sbiret sbi_set_timer(unsigned long stime_value);
+ long sbi_probe(int ext);
+ 
+-#endif /* !__ASSEMBLY__ */
++#endif /* !__ASSEMBLER__ */
+ #endif /* _ASMRISCV_SBI_H_ */
+diff --git a/lib/riscv/setjmp.S b/lib/riscv/setjmp.S
+index 38b0f1ca..7d3fa9ab 100644
+--- a/lib/riscv/setjmp.S
++++ b/lib/riscv/setjmp.S
+@@ -1,5 +1,4 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+-#define __ASSEMBLY__
+ #include <asm/asm.h>
+ 
+ .section .text
+diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+index b4eb7069..86dfc7fc 100644
+--- a/powerpc/cstart64.S
++++ b/powerpc/cstart64.S
+@@ -5,7 +5,6 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+-#define __ASSEMBLY__
+ #include <asm/hcall.h>
+ #include <asm/ppc_asm.h>
+ #include <asm/rtas.h>
+diff --git a/riscv/sbi-asm.S b/riscv/sbi-asm.S
+index 923c2cec..f4185496 100644
+--- a/riscv/sbi-asm.S
++++ b/riscv/sbi-asm.S
+@@ -4,7 +4,6 @@
+  *
+  * Copyright (C) 2024, James Raphael Tiovalen <jamestiotio@gmail.com>
+  */
+-#define __ASSEMBLY__
+ #include <asm/asm.h>
+ #include <asm/csr.h>
+ 
+
+base-commit: f77fb696cfd0e4a5562cdca189be557946bf522f
 -- 
 2.48.1.601.g30ceb7b040-goog
 
