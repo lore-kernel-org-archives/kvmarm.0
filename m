@@ -1,135 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABA22571AD;
-	Mon, 24 Feb 2025 12:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D0E1802AB
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 12:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740399859; cv=none; b=fbvhMZxmXaiFpQ7VjZDPRuLcbrSfS4GhPCGCtOXh/tTZvmdD06y0V0nOVJsr2SVSAt8tqAhAlgi6IsIGowf7D8bi/socqpd3AlP8QC6lFH0e9Kl3qphvDweaIUgYV9MDlGnH3hGuSdm1OVMdeQv02upAN6aQaua3U6WcjlF//RQ=
+	t=1740399915; cv=none; b=LAoC4qLrkCMHXEycmfJhE+HG0FFN6t3aYdPsCyU1b9lZ9BoVKK14BnYrRN12lG8wHADP5qIrZn4QIPbN+pE1xpClFfkVoggb/YcLmsstkgWZRI6WgYW7pHQLdNNia2TXjZ0/HNF6SOnoKq3VdGNEP5WJhUu1dF2DdF99L8sLRLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740399859; c=relaxed/simple;
-	bh=/4N5BAlR11AdIiOaTPowhjfUjTUrZG9kLoHB5dK9oSQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qS/DcMQs6FUYSQvO70cIP41Vd/M8CGH8pRM2hxeY8XHZCNHixtelz8H2Tt2tuvq+nOADESVjYCaxAl7VzgNJkRZ5h27ZCx2DIwnOk/wHsV3n1lYsbw9gHcYWjOUPAQkV/sr7O3UYliqi+o6BZn6HSEzMXgT//dMkl+ush7fKzwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GjptI8Jw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GjptI8Jw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D26EAC4CEE6;
-	Mon, 24 Feb 2025 12:24:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740399858;
-	bh=/4N5BAlR11AdIiOaTPowhjfUjTUrZG9kLoHB5dK9oSQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GjptI8Jw1to8DKOHJBwodYcm7HAs1WUo7VZKrBC4iaWEDkrqRLLGaffMjxPEh6hVi
-	 APYACGbm2SpKWrynD1Q3KCk0XP7hpuR3UCGkqHKtTlMbby7RCav+eZVdkqTm0eSBU6
-	 iIL0FNumV/1pTEfVjBU/QK8EDnWjwRDp65c2Da0JU7qCGwj+RBxnbNd/FptmZu1VOw
-	 mUTo1nmQ/aXQ6HdlBs9zDtOWl6K8iT3611UP2ZJqieBA+5dBTGkjT/UvfHT2B1si/c
-	 YqhNJJwcLpA+JNnKOd8Msq7pDRaLpMRl8u9qgQxHcUSNp04mKIfnNaC6IeqegvTR43
-	 DchckWgRrB/kw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tmXVP-007K9l-PQ;
-	Mon, 24 Feb 2025 12:24:16 +0000
-Date: Mon, 24 Feb 2025 12:24:14 +0000
-Message-ID: <86ldtvr0nl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-Cc:	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	s=arc-20240116; t=1740399915; c=relaxed/simple;
+	bh=5zHGTUn4fkkasmwO6qty3ScPi7UAKOnweB9YZ7sD3Eg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fu0BcerUz3jjxnY1HPVYTJ9D9CRyayTZmO60gqKi7YrqFKiZHmPpJTkClyNp9yhyXx84yZ/4CIYslBGQi+p+CSXllqN6SYcI0/b95JHAeUGCHX80BQgaM7iPPXm9/VFxXPFcJ8PLwIhx0ncHaydANA27etUsGoP28VnJVfMCjgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE2BC497;
+	Mon, 24 Feb 2025 04:25:29 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A35A43F6A8;
+	Mon, 24 Feb 2025 04:25:12 -0800 (PST)
+Date: Mon, 24 Feb 2025 12:25:07 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Peter Collingbourne <pcc@google.com>
-Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot creation
-In-Reply-To: <Z7xSfVME4z2ComUm@arm.com>
-References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
-	<Z7xSfVME4z2ComUm@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+Message-ID: <20250224122507.GE8144@e132581.arm.com>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+ <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, will@kernel.org, Suzuki.Poulose@arm.com, steven.price@arm.com, pcc@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org>
 
-On Mon, 24 Feb 2025 11:05:33 +0000,
-Catalin Marinas <catalin.marinas@arm.com> wrote:
+On Tue, Feb 18, 2025 at 02:40:06PM -0600, Rob Herring (Arm) wrote:
 > 
-> On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> > Before commit d89585fbb308 ("KVM: arm64: unify the tests for VMAs in
-> > memslots when MTE is enabled"), kvm_arch_prepare_memory_region() only
-> > rejected a memory slot if VM_SHARED was set. This commit unified the
-> > checking with user_mem_abort(), with slots being rejected if either
-> > VM_MTE_ALLOWED is not set or VM_SHARED set. A subsequent commit
-> > c911f0d46879 ("KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE
-> > enabled") dropped the VM_SHARED check, so we ended up with memory slots
-> > being rejected if VM_MTE_ALLOWED is not set. This wasn't the case before
-> > the commit d89585fbb308. The rejection of the memory slot with VM_SHARED
-> > set was done to avoid a race condition with the test/set of the
-> > PG_mte_tagged flag. Before Commit d77e59a8fccd ("arm64: mte: Lock a page
-> > for MTE tag initialization") the kernel avoided allowing MTE with shared
-> > pages, thereby preventing two tasks sharing a page from setting up the
-> > PG_mte_tagged flag racily.
-> > 
-> > Commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag
-> > initialization") further updated the locking so that the kernel
-> > allows VM_SHARED mapping with MTE. With this commit, we can enable
-> > memslot creation with VM_SHARED VMA mapping.
-> > 
-> > This patch results in a minor tweak to the ABI. We now allow creating
-> > memslots that don't have the VM_MTE_ALLOWED flag set.
-> 
-> As I commented here:
-> 
-> https://lore.kernel.org/r/Z4e04P1bQlFBDHo7@arm.com
-> 
-> I'm fine with the change, we basically go back to the original ABI prior
-> to relaxing this for VM_SHARED.
-> 
-> > If the guest uses
-> > such a memslot with Allocation Tags, the kernel will generate -EFAULT.
-> > ie, instead of failing early, we now fail later during KVM_RUN.
-> 
-> Nit: more like the kernel "will return -EFAULT" to the VMM rather than
-> "generate".
-> 
-> > This change is needed because, without it, users are not able to use MTE
-> > with VFIO passthrough (currently the mapping is either Device or
-> > NonCacheable for which tag access check is not applied.), as shown
-> > below (kvmtool VMM).
-> 
-> Another nit: "users are not able to user VFIO passthrough when MTE is
-> enabled". At a first read, the above sounded to me like one wants to
-> enable MTE for VFIO passthrough mappings.
+> From: Anshuman Khandual <anshuman.khandual@arm.com>
 
-What the commit message doesn't spell out is how MTE and VFIO are
-interacting here. I also don't understand the reference to Device or
-NC memory here.
+[...]
 
-Isn't the issue that DMA doesn't check/update tags, and therefore it
-makes little sense to prevent non-tagged memory being associated with
-a memslot?
+> BRBE records are invalidated whenever events are reconfigured, a new
+> task is scheduled in, or after recording is paused (and the records
+> have been recorded for the event). The architecture allows branch
+> records to be invalidated by the PE under implementation defined
+> conditions. It is expected that these conditions are rare.
 
-My other concern is that this gives pretty poor consistency to the
-guest, which cannot know what can be tagged and what cannot, and
-breaks a guarantee that the guest should be able to rely on.
+[...]
+
+> +static void armv8pmu_sched_task(struct perf_event_pmu_context *pmu_ctx, bool sched_in)
+> +{
+> +       struct arm_pmu *armpmu = *this_cpu_ptr(&cpu_armpmu);
+> +       struct pmu_hw_events *hw_events = this_cpu_ptr(armpmu->hw_events);
+> +
+> +       if (!hw_events->branch_users)
+> +               return;
+> +
+> +       if (sched_in)
+> +               brbe_invalidate();
+> +}
+
+Just a minor concern.  I don't see any handling for task migration.
+E.g., for a task is migrated from one CPU to another CPU, I expect we
+need to save and restore branch records based on BRBE injection.  So
+far, the driver simply invalidates all records.
+
+I think this topic is very likely discussed before.  If this is the
+case, please ignore my comment.  Except this, the code looks good
+to me.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Leo
