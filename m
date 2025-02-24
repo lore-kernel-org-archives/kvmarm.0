@@ -1,43 +1,34 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19102566C3
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 10:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786C42586D1;
+	Mon, 24 Feb 2025 11:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740393713; cv=none; b=ttlZ4KOCruE0jrh40PksTiMmUCSKxFv4AfItuKLusPinGocRrEqpYYqwm6Ul6SrOwm8Xmq0686sswUe1DnEE0EjA9rPNIO8//b2UzFa0YcPQ3YfTQpWk5PDPIPxIsuax7zJRAfaQeLJDb0DgUBCfD6oEesV2qW2yS4buyjBI0WE=
+	t=1740395138; cv=none; b=rEF19az24OjawYTVHDK6yQbiBe8/UREGk3467blb7L3lCzjjEJrD9iR/gy0IJys6AczvmMq735CSSjdVnM4yjksh0eFjLO+8yXL4zopN5aKlWxV9gnFK6QHhBwYaeDGJ7wV5ptox2bQV7+b8BExravTffEkNeVNhpo7u3QynlmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740393713; c=relaxed/simple;
-	bh=3Y3ZOO9s+/mYUog6IBL0uyGuQRaI25SQd5ojDRezSZ0=;
+	s=arc-20240116; t=1740395138; c=relaxed/simple;
+	bh=Psyn/KQl59WzsnG7eUbev1bYnOJ/uewhEhWQ4K6vZMM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d/VDbFpbSjBjJNSoyW3eYf34BkmtXzOLB4+HI7VhLq0o+dS+OUeL/Pf6U0/4hT+tH1J9RxjGWPo1qcFCRbJAX9ZXXnojksiVPX7R55BPOZ6JXVSW19Zx+RDrRMPsx0Bc+Adk/BqXU7H3QFgzu7qvIi/mUlR0ucuQud3tMAGdWgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 07D9D1FCD;
-	Mon, 24 Feb 2025 02:42:07 -0800 (PST)
-Received: from localhost (e132581.arm.com [10.2.76.71])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB8713F673;
-	Mon, 24 Feb 2025 02:41:49 -0800 (PST)
-Date: Mon, 24 Feb 2025 10:41:47 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=AKoiAgPyBmk05queSN4piBY7wvS3wzuaeUYUU3kjc+xo73ZJC3fQYP6TAA7xQvDnoUUp4gTKTyqMOSXxMePK7OGloA/wTZXTnvMRkDIqmL8aaXEMLyvMUKVKztk7c4Eh7jP7ATZg1tOj0zXzpIV8mOYMA+sVQsoa2WNr7V6+sbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 551EBC4CEE6;
+	Mon, 24 Feb 2025 11:05:36 +0000 (UTC)
+Date: Mon, 24 Feb 2025 11:05:33 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v20 10/11] KVM: arm64: nvhe: Disable branch generation in
- nVHE guests
-Message-ID: <20250224104147.GD8144@e132581.arm.com>
-References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
- <20250218-arm-brbe-v19-v20-10-4e9922fc2e8e@kernel.org>
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot
+ creation
+Message-ID: <Z7xSfVME4z2ComUm@arm.com>
+References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,40 +37,84 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250218-arm-brbe-v19-v20-10-4e9922fc2e8e@kernel.org>
+In-Reply-To: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
 
-On Tue, Feb 18, 2025 at 02:40:05PM -0600, Rob Herring (Arm) wrote:
+On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> Before commit d89585fbb308 ("KVM: arm64: unify the tests for VMAs in
+> memslots when MTE is enabled"), kvm_arch_prepare_memory_region() only
+> rejected a memory slot if VM_SHARED was set. This commit unified the
+> checking with user_mem_abort(), with slots being rejected if either
+> VM_MTE_ALLOWED is not set or VM_SHARED set. A subsequent commit
+> c911f0d46879 ("KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE
+> enabled") dropped the VM_SHARED check, so we ended up with memory slots
+> being rejected if VM_MTE_ALLOWED is not set. This wasn't the case before
+> the commit d89585fbb308. The rejection of the memory slot with VM_SHARED
+> set was done to avoid a race condition with the test/set of the
+> PG_mte_tagged flag. Before Commit d77e59a8fccd ("arm64: mte: Lock a page
+> for MTE tag initialization") the kernel avoided allowing MTE with shared
+> pages, thereby preventing two tasks sharing a page from setting up the
+> PG_mte_tagged flag racily.
 > 
-> From: Anshuman Khandual <anshuman.khandual@arm.com>
+> Commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag
+> initialization") further updated the locking so that the kernel
+> allows VM_SHARED mapping with MTE. With this commit, we can enable
+> memslot creation with VM_SHARED VMA mapping.
 > 
-> While BRBE can record branches within guests, the host recording
-> branches in guests is not supported by perf (though events are).
-> Support for BRBE in guests will supported by providing direct access
-> to BRBE within the guests. That is how x86 LBR works for guests.
-> Therefore, BRBE needs to be disabled on guest entry and restored on
-> exit.
-> 
-> For nVHE, this requires explicit handling for guests. Before
-> entering a guest, save the BRBE state and disable the it. When
-> returning to the host, restore the state.
-> 
-> For VHE, it is not necessary. We initialize
-> BRBCR_EL1.{E1BRE,E0BRE}=={0,0} at boot time, and HCR_EL2.TGE==1 while
-> running in the host. We configure BRBCR_EL2.{E2BRE,E0HBRE} to enable
-> branch recording in the host. When entering the guest, we set
-> HCR_EL2.TGE==0 which means BRBCR_EL1 is used instead of BRBCR_EL2.
-> Consequently for VHE, BRBE recording is disabled at EL1 and EL0 when
-> running a guest.
-> 
-> Should recording in guests (by the host) ever be desired, the perf ABI
-> will need to be extended to distinguish guest addresses (struct
-> perf_branch_entry.priv) for starters. BRBE records would also need to be
-> invalidated on guest entry/exit as guest/host EL1 and EL0 records can't
-> be distinguished.
-> 
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Co-developed-by: Rob Herring (Arm) <robh@kernel.org>
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> This patch results in a minor tweak to the ABI. We now allow creating
+> memslots that don't have the VM_MTE_ALLOWED flag set.
 
-Reviewed-by: Leo Yan <leo.yan@arm.com>
+As I commented here:
+
+https://lore.kernel.org/r/Z4e04P1bQlFBDHo7@arm.com
+
+I'm fine with the change, we basically go back to the original ABI prior
+to relaxing this for VM_SHARED.
+
+> If the guest uses
+> such a memslot with Allocation Tags, the kernel will generate -EFAULT.
+> ie, instead of failing early, we now fail later during KVM_RUN.
+
+Nit: more like the kernel "will return -EFAULT" to the VMM rather than
+"generate".
+
+> This change is needed because, without it, users are not able to use MTE
+> with VFIO passthrough (currently the mapping is either Device or
+> NonCacheable for which tag access check is not applied.), as shown
+> below (kvmtool VMM).
+
+Another nit: "users are not able to user VFIO passthrough when MTE is
+enabled". At a first read, the above sounded to me like one wants to
+enable MTE for VFIO passthrough mappings.
+
+> [  617.921030] vfio-pci 0000:01:00.0: resetting
+> [  618.024719] vfio-pci 0000:01:00.0: reset done
+>   Error: 0000:01:00.0: failed to register region with KVM
+>   Warning: [0abc:aced] Error activating emulation for BAR 0
+>   Error: 0000:01:00.0: failed to configure regions
+>   Warning: Failed init: vfio__init
+> 
+>   Fatal: Initialisation failed
+> 
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 5 -----
+>  1 file changed, 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index ef53af6df6de..1f1b5aa43d2d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2178,11 +2178,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>  		if (!vma)
+>  			break;
+>  
+> -		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+> -			ret = -EINVAL;
+> -			break;
+> -		}
+> -
+>  		if (vma->vm_flags & VM_PFNMAP) {
+>  			/* IO region dirty page logging not allowed */
+>  			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
