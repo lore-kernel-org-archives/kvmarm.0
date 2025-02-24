@@ -1,94 +1,135 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CF1233730
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 12:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABA22571AD;
+	Mon, 24 Feb 2025 12:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740399612; cv=none; b=rJhcCfA/gSVmZcb6ASSRR0JGnh/c4gp2UI//eCxj2Z1KPuaH6R2r+LsGrFbDR2HBmZNYAxvXqFBuD5+6lymA34oAIyy9wM6iWODRIlQhAibrz36N5ekSe4qpsEMifc2Gsw7pV7W4bTKZ4blPhf3Lsz3zyblcs7oh75o5H1mTe1A=
+	t=1740399859; cv=none; b=fbvhMZxmXaiFpQ7VjZDPRuLcbrSfS4GhPCGCtOXh/tTZvmdD06y0V0nOVJsr2SVSAt8tqAhAlgi6IsIGowf7D8bi/socqpd3AlP8QC6lFH0e9Kl3qphvDweaIUgYV9MDlGnH3hGuSdm1OVMdeQv02upAN6aQaua3U6WcjlF//RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740399612; c=relaxed/simple;
-	bh=5BAuLMhC6Rqt1wdGAns8uutdl/iqePryxlBpJEjYAtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=khJPvbhkw7ilm3eWtZubCQrQep2rcdV1VIpD6SwdAwrz27snFhLaaGU7ndyRsZGq1Q1M1jwz5XoQu4BHTmLF5Wa5P9/RPZXyeiDjgf8eZGOzSEH4PnaytnCXoKYRQafDYSLS8sPyKCVqbG3RXAZWgmkxhSSJLmt70WG3KTmqGK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Z1fY56pPJz9sSK;
-	Mon, 24 Feb 2025 13:04:25 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jmjW4wRXcRyZ; Mon, 24 Feb 2025 13:04:25 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Z1fY55w83z9sSC;
-	Mon, 24 Feb 2025 13:04:25 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id B37438B765;
-	Mon, 24 Feb 2025 13:04:25 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id lGRMugV4dhlW; Mon, 24 Feb 2025 13:04:25 +0100 (CET)
-Received: from [10.25.207.138] (unknown [10.25.207.138])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7A6868B763;
-	Mon, 24 Feb 2025 13:04:25 +0100 (CET)
-Message-ID: <93e96586-13a2-4800-9dc7-5b35177a328e@csgroup.eu>
-Date: Mon, 24 Feb 2025 13:04:25 +0100
+	s=arc-20240116; t=1740399859; c=relaxed/simple;
+	bh=/4N5BAlR11AdIiOaTPowhjfUjTUrZG9kLoHB5dK9oSQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qS/DcMQs6FUYSQvO70cIP41Vd/M8CGH8pRM2hxeY8XHZCNHixtelz8H2Tt2tuvq+nOADESVjYCaxAl7VzgNJkRZ5h27ZCx2DIwnOk/wHsV3n1lYsbw9gHcYWjOUPAQkV/sr7O3UYliqi+o6BZn6HSEzMXgT//dMkl+ush7fKzwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GjptI8Jw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GjptI8Jw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D26EAC4CEE6;
+	Mon, 24 Feb 2025 12:24:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740399858;
+	bh=/4N5BAlR11AdIiOaTPowhjfUjTUrZG9kLoHB5dK9oSQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GjptI8Jw1to8DKOHJBwodYcm7HAs1WUo7VZKrBC4iaWEDkrqRLLGaffMjxPEh6hVi
+	 APYACGbm2SpKWrynD1Q3KCk0XP7hpuR3UCGkqHKtTlMbby7RCav+eZVdkqTm0eSBU6
+	 iIL0FNumV/1pTEfVjBU/QK8EDnWjwRDp65c2Da0JU7qCGwj+RBxnbNd/FptmZu1VOw
+	 mUTo1nmQ/aXQ6HdlBs9zDtOWl6K8iT3611UP2ZJqieBA+5dBTGkjT/UvfHT2B1si/c
+	 YqhNJJwcLpA+JNnKOd8Msq7pDRaLpMRl8u9qgQxHcUSNp04mKIfnNaC6IeqegvTR43
+	 DchckWgRrB/kw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tmXVP-007K9l-PQ;
+	Mon, 24 Feb 2025 12:24:16 +0000
+Date: Mon, 24 Feb 2025 12:24:14 +0000
+Message-ID: <86ldtvr0nl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
+Cc:	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot creation
+In-Reply-To: <Z7xSfVME4z2ComUm@arm.com>
+References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
+	<Z7xSfVME4z2ComUm@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 2/5] arch/powerpc: Drop GENERIC_PTDUMP from
- mpc885_ads_defconfig
-To: Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org
-Cc: steven.price@arm.com, Andrew Morton <akpm@linux-foundation.org>,
- Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-References: <20250217042220.32920-1-anshuman.khandual@arm.com>
- <20250217042220.32920-3-anshuman.khandual@arm.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20250217042220.32920-3-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, will@kernel.org, Suzuki.Poulose@arm.com, steven.price@arm.com, pcc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-Le 17/02/2025 à 05:22, Anshuman Khandual a écrit :
-> GENERIC_PTDUMP gets selected on powerpc explicitly and hence can be dropped
-> off from mpc885_ads_defconfig.
+On Mon, 24 Feb 2025 11:05:33 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Just wondering - Should CONFIG_PTDUMP_DEBUGFS be added instead ?
-
-Yes please do that as a fix to commit e084728393a5 ("powerpc/ptdump: 
-Convert powerpc to GENERIC_PTDUMP")
-
+> On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> > Before commit d89585fbb308 ("KVM: arm64: unify the tests for VMAs in
+> > memslots when MTE is enabled"), kvm_arch_prepare_memory_region() only
+> > rejected a memory slot if VM_SHARED was set. This commit unified the
+> > checking with user_mem_abort(), with slots being rejected if either
+> > VM_MTE_ALLOWED is not set or VM_SHARED set. A subsequent commit
+> > c911f0d46879 ("KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE
+> > enabled") dropped the VM_SHARED check, so we ended up with memory slots
+> > being rejected if VM_MTE_ALLOWED is not set. This wasn't the case before
+> > the commit d89585fbb308. The rejection of the memory slot with VM_SHARED
+> > set was done to avoid a race condition with the test/set of the
+> > PG_mte_tagged flag. Before Commit d77e59a8fccd ("arm64: mte: Lock a page
+> > for MTE tag initialization") the kernel avoided allowing MTE with shared
+> > pages, thereby preventing two tasks sharing a page from setting up the
+> > PG_mte_tagged flag racily.
+> > 
+> > Commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag
+> > initialization") further updated the locking so that the kernel
+> > allows VM_SHARED mapping with MTE. With this commit, we can enable
+> > memslot creation with VM_SHARED VMA mapping.
+> > 
+> > This patch results in a minor tweak to the ABI. We now allow creating
+> > memslots that don't have the VM_MTE_ALLOWED flag set.
 > 
->   arch/powerpc/configs/mpc885_ads_defconfig | 1 -
->   1 file changed, 1 deletion(-)
+> As I commented here:
 > 
-> diff --git a/arch/powerpc/configs/mpc885_ads_defconfig b/arch/powerpc/configs/mpc885_ads_defconfig
-> index 77306be62e9e..ea6f836407d2 100644
-> --- a/arch/powerpc/configs/mpc885_ads_defconfig
-> +++ b/arch/powerpc/configs/mpc885_ads_defconfig
-> @@ -78,4 +78,3 @@ CONFIG_DEBUG_VM_PGTABLE=y
->   CONFIG_DETECT_HUNG_TASK=y
->   CONFIG_BDI_SWITCH=y
->   CONFIG_PPC_EARLY_DEBUG=y
-> -CONFIG_GENERIC_PTDUMP=y
+> https://lore.kernel.org/r/Z4e04P1bQlFBDHo7@arm.com
+> 
+> I'm fine with the change, we basically go back to the original ABI prior
+> to relaxing this for VM_SHARED.
+> 
+> > If the guest uses
+> > such a memslot with Allocation Tags, the kernel will generate -EFAULT.
+> > ie, instead of failing early, we now fail later during KVM_RUN.
+> 
+> Nit: more like the kernel "will return -EFAULT" to the VMM rather than
+> "generate".
+> 
+> > This change is needed because, without it, users are not able to use MTE
+> > with VFIO passthrough (currently the mapping is either Device or
+> > NonCacheable for which tag access check is not applied.), as shown
+> > below (kvmtool VMM).
+> 
+> Another nit: "users are not able to user VFIO passthrough when MTE is
+> enabled". At a first read, the above sounded to me like one wants to
+> enable MTE for VFIO passthrough mappings.
 
+What the commit message doesn't spell out is how MTE and VFIO are
+interacting here. I also don't understand the reference to Device or
+NC memory here.
+
+Isn't the issue that DMA doesn't check/update tags, and therefore it
+makes little sense to prevent non-tagged memory being associated with
+a memslot?
+
+My other concern is that this gives pretty poor consistency to the
+guest, which cannot know what can be tagged and what cannot, and
+breaks a guarantee that the guest should be able to rely on.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
