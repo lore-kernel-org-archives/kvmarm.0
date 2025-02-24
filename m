@@ -1,106 +1,154 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBCB13F43A
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 14:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A312571C9;
+	Mon, 24 Feb 2025 15:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740407966; cv=none; b=OUoDRlKt5naTuR7Rynly6LfZjEDXCRp3tg2onOiNUX1w/TfgqU+KDOa9st3zbZqvUye4UYu40HZ8G7U8SXdkFhYKE0WZcrDgRa74YSP5EWQgx0i5/jVckbs7ze/5Ah16jtsPsRORhV0VxvNCY/GvYNSxyP7/a+b/7HvkLRgbEc8=
+	t=1740409365; cv=none; b=dzm4bKqMXeQXgG/AqYyvsaSkKyYFvinvIAy5dEzgslGgFLXOmqYY8JPIt858HdPHs8EQEzDdjPc5fr5Re+HHV648FuOE6vxjtb7umNuuyebXlAWLdU85TOWzGMIijLdolA0eDf9EsjdnxfLdMHChOP0ZjyS4OiKp+52AnoPjhOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740407966; c=relaxed/simple;
-	bh=sCxDiVNbZjf7WMYy8fcgHxFMaXVXy0syheMXmm8C+dE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s58+nNkTlA4l+bhR11AewHG4EN/VqWbNBpdfFRs8uhe/FuM003UMnDGI0ZkiIJx3cuGSRFjU9ee6osEwSEtHn1YElIqSaqt9Duis6tgHzs/e5QdKWnG6f/RjACmxHnWRSq8b5Qpa5g7H+SnlpHQbKg6HNzRjm4hIh6r5f77WUu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98972152B;
-	Mon, 24 Feb 2025 06:39:37 -0800 (PST)
-Received: from arm.com (unknown [10.1.32.142])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D2C03F5A1;
-	Mon, 24 Feb 2025 06:39:19 -0800 (PST)
-Date: Mon, 24 Feb 2025 14:39:16 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1740409365; c=relaxed/simple;
+	bh=rTiFJlSpCk0AZrdTPRKm2xyTNCPY81YJmzaN9bEB8TY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L9KrILyMbUkVoKLTss/iqDs3dqHu7s9l5NNNXUFTZol5iv2zVxrvyc7H1UnrDZF0F4J90K7uNDiVPzLsfv2wtLsP7QaOtcns13QsEWcwsxSqG57xjA5PF1vTqF9Ng7q8Yn7rpepx+NIhamoNd6NxaeGhrr2XK/IW5SKxqU4Ykw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBdozJLP; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBdozJLP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 225DDC4CED6;
+	Mon, 24 Feb 2025 15:02:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740409365;
+	bh=rTiFJlSpCk0AZrdTPRKm2xyTNCPY81YJmzaN9bEB8TY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hBdozJLPOJPdd1TKsAXPeYy34sqOELWPceH3WQmR6puP78MelKnf0DXIaftco2ymE
+	 RDFmZDLl5iGz+t6ouH2S9eMmdmVeEyRscgcYSRFv6dgKp70JpphiiAXFnMkAaxGn5H
+	 vYl+YOa/+YdlcJd2IcWLoiw+0OY48jdh27I62wZqE287/iChnU1/tDl6xGPuxIE3Ua
+	 L+vCdC3He5FkPwUqhh6UJtwsZEegFvQUUVMrP+/kTl1YOq1/+bj9NcmycuPKQvB8M4
+	 4wWyNlLck23MqK8qT5KrpMm5aH/3CGc51gN0FXE5Xmy6i1sXP1g0Elp0OCVk/jTPOR
+	 WtZfWtmUOSHNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tmZyj-007PrC-4N;
+	Mon, 24 Feb 2025 15:02:42 +0000
+Date: Mon, 24 Feb 2025 15:02:39 +0000
+Message-ID: <86jz9fqtbk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Steven Price <steven.price@arm.com>,
 	Peter Collingbourne <pcc@google.com>
-Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot
- creation
-Message-ID: <Z7yElHKrJGn8XuPS@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot creation
+In-Reply-To: <Z7yElHKrJGn8XuPS@arm.com>
 References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
- <Z7xSfVME4z2ComUm@arm.com>
- <86ldtvr0nl.wl-maz@kernel.org>
+	<Z7xSfVME4z2ComUm@arm.com>
+	<86ldtvr0nl.wl-maz@kernel.org>
+	<Z7yElHKrJGn8XuPS@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ldtvr0nl.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, aneesh.kumar@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, will@kernel.org, Suzuki.Poulose@arm.com, steven.price@arm.com, pcc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Feb 24, 2025 at 12:24:14PM +0000, Marc Zyngier wrote:
-> On Mon, 24 Feb 2025 11:05:33 +0000,
-> Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> > > This change is needed because, without it, users are not able to use MTE
-> > > with VFIO passthrough (currently the mapping is either Device or
-> > > NonCacheable for which tag access check is not applied.), as shown
-> > > below (kvmtool VMM).
-> > 
-> > Another nit: "users are not able to user VFIO passthrough when MTE is
-> > enabled". At a first read, the above sounded to me like one wants to
-> > enable MTE for VFIO passthrough mappings.
+On Mon, 24 Feb 2025 14:39:16 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> What the commit message doesn't spell out is how MTE and VFIO are
-> interacting here. I also don't understand the reference to Device or
-> NC memory here.
+> On Mon, Feb 24, 2025 at 12:24:14PM +0000, Marc Zyngier wrote:
+> > On Mon, 24 Feb 2025 11:05:33 +0000,
+> > Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> > > > This change is needed because, without it, users are not able to use MTE
+> > > > with VFIO passthrough (currently the mapping is either Device or
+> > > > NonCacheable for which tag access check is not applied.), as shown
+> > > > below (kvmtool VMM).
+> > > 
+> > > Another nit: "users are not able to user VFIO passthrough when MTE is
+> > > enabled". At a first read, the above sounded to me like one wants to
+> > > enable MTE for VFIO passthrough mappings.
+> > 
+> > What the commit message doesn't spell out is how MTE and VFIO are
+> > interacting here. I also don't understand the reference to Device or
+> > NC memory here.
+> 
+> I guess it's saying that the guest cannot turn MTE on (Normal Tagged)
+> for these ranges anyway since Stage 2 is Device or Normal NC. So we
+> don't break any use-case specific to VFIO.
+>
+> > Isn't the issue that DMA doesn't check/update tags, and therefore it
+> > makes little sense to prevent non-tagged memory being associated with
+> > a memslot?
+> 
+> The issue is that some MMIO memory range that does not support MTE
+> (well, all MMIO) could be mapped by the guest as Normal Tagged and we
+> have no clue what the hardware does as tag accesses, hence we currently
+> prevent it altogether. It's not about DMA.
+> 
+> This patch still prevents such MMIO+MTE mappings but moves the decision
+> to user_mem_abort() and it's slightly more relaxed - only rejecting it
+> if !VM_MTE_ALLOWED _and_ the Stage 2 is cacheable. The side-effect is
+> that it allows device assignment into the guest since Stage 2 is not
+> Normal Cacheable (at least for now, we have some patches Ankit but they
+> handle the MTE case).
 
-I guess it's saying that the guest cannot turn MTE on (Normal Tagged)
-for these ranges anyway since Stage 2 is Device or Normal NC. So we
-don't break any use-case specific to VFIO.
+The other side effect is that it also allows non-tagged cacheable
+memory to be given to the MTE-enabled guest, and the guest has no way
+to distinguish between what is tagged and what's not.
 
-> Isn't the issue that DMA doesn't check/update tags, and therefore it
-> makes little sense to prevent non-tagged memory being associated with
-> a memslot?
+> 
+> > My other concern is that this gives pretty poor consistency to the
+> > guest, which cannot know what can be tagged and what cannot, and
+> > breaks a guarantee that the guest should be able to rely on.
+> 
+> The guest should not set Normal Tagged on anything other than what it
+> gets as standard RAM. We are not changing this here. KVM than needs to
+> prevent a broken/malicious guest from setting MTE on other (physical)
+> ranges that don't support MTE. Currently it can only do this by forcing
+> Device or Normal NC (or disable MTE altogether). Later we'll add
+> FEAT_MTE_PERM to permit Stage 2 Cacheable but trap on tag accesses.
+> 
+> The ABI change is just for the VMM, the guest shouldn't be aware as
+> long as it sticks to the typical recommendations for MTE - only enable
+> on standard RAM.
 
-The issue is that some MMIO memory range that does not support MTE
-(well, all MMIO) could be mapped by the guest as Normal Tagged and we
-have no clue what the hardware does as tag accesses, hence we currently
-prevent it altogether. It's not about DMA.
+See above. You fall into the same trap with standard memory, since you
+now allow userspace to mix things at will, and only realise something
+has gone wrong on access (and -EFAULT is not very useful).
 
-This patch still prevents such MMIO+MTE mappings but moves the decision
-to user_mem_abort() and it's slightly more relaxed - only rejecting it
-if !VM_MTE_ALLOWED _and_ the Stage 2 is cacheable. The side-effect is
-that it allows device assignment into the guest since Stage 2 is not
-Normal Cacheable (at least for now, we have some patches Ankit but they
-handle the MTE case).
+>
+> Does any VMM rely on the memory slot being rejected on registration if
+> it does not support MTE? After this change, we'd get an exit to the VMM
+> on guest access with MTE turned on (even if it's not mapped as such at
+> Stage 1).
 
-> My other concern is that this gives pretty poor consistency to the
-> guest, which cannot know what can be tagged and what cannot, and
-> breaks a guarantee that the guest should be able to rely on.
+I really don't know what userspace expects w.r.t. mixing tagged and
+non-tagged memory. But I don't expect anything good to come out of it,
+given that we provide zero information about the fault context.
 
-The guest should not set Normal Tagged on anything other than what it
-gets as standard RAM. We are not changing this here. KVM than needs to
-prevent a broken/malicious guest from setting MTE on other (physical)
-ranges that don't support MTE. Currently it can only do this by forcing
-Device or Normal NC (or disable MTE altogether). Later we'll add
-FEAT_MTE_PERM to permit Stage 2 Cacheable but trap on tag accesses.
+Honestly, if we are going to change this, then let's make sure we give
+enough information for userspace to go and fix the mess. Not just "it
+all went wrong".
 
-The ABI change is just for the VMM, the guest shouldn't be aware as
-long as it sticks to the typical recommendations for MTE - only enable
-on standard RAM.
+Thanks,
 
-Does any VMM rely on the memory slot being rejected on registration if
-it does not support MTE? After this change, we'd get an exit to the VMM
-on guest access with MTE turned on (even if it's not mapped as such at
-Stage 1).
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
