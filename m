@@ -1,64 +1,68 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE9F20C01B
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 23:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58C120C48E
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 23:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740441347; cv=none; b=XwsZs+UlcPVpCIUX9NBE0/sLWxC+XI/Zb4vAVwjh2xiXVO1GyaOzl7dp+rinPHE9/b4XHd3VHQCqVQQ63yRiWAAG1fp3VBZUFQbmE9+fH+sz1LUTXk9lHM2i6O464vZI9bikMmRAr7nsEa9buja0y3W2T2VfqY5cD1kGFc8aOio=
+	t=1740441350; cv=none; b=u/hYFAQ45L1568J83+OBa+PDE302QFvSGNtEXjfkPga/za/0wGPLseVQQnoyF1ElUJDhpI2/OmXpdwRY/QHdAMvmUGuuRHx7J/XI3psymIFumi/Lg7PtVgaPLP6cbBCj2AP6kJF+tMRL0UtGtJLJwzp8/4rC+KOwNz1h92PjFQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740441347; c=relaxed/simple;
-	bh=fpVjeXd5rg+V58pvlPmJutDsFmmNiVg4yf0bC+o5Rnk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VqegLohUkaKbKvaQRqwAoq5HB+SyUShHOQNdGmXj4NWOUpeGX/SIFbGBc4Bf3oaFz20H2DsJ2rTIHkoHwmfXW2aN2hqz1icjDnTpkn0tDhjiYqYd/Srn/cio9wVnlTNaVLqDTOVo6l5ELIx7jLnbvfaiFh2mbVEPhXQh1vuWxS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CwYEWALl; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1740441350; c=relaxed/simple;
+	bh=eD5WSaoS4BIVKcmvcj9oK2wOfjdwtX85NN6YC8D+ij0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=l9/bLcQpMhxq9dviK38O5ayahVLGsdClKymuSR29suiWFUnGB+/Xo46VS6fvH8al8zQGZPCelzdhiZzS+L+yAjftauL4nVc0VdTDqNBs2MmHP0ARtiG0I8GCYzyfmmfXlgfP/IeBhA1jlI7TH57p4O/GOpsob2NZkqOvpBbFO5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=emjhZb6q; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CwYEWALl"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc1eadf5a8so10741794a91.3
-        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 15:55:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="emjhZb6q"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc46431885so16479497a91.2
+        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 15:55:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740441345; x=1741046145; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G4yv5E3Df19Io1ieaPGo0Ai9BtJpUzyQSBdyF3aMs18=;
-        b=CwYEWALlDCmZvP7D4YkiKY//1HvpXSxPmlDgm09AA1o9tbBfCUxrwlqjcruHoJLXnS
-         wBi/PLD1wKPwPKHfo5XksfEtXn9hjRyTb0G8IJ8HmqVrTZqLsqagHWtxNaP+GeNyzYV3
-         750+MJR1baB2v0IzKB6Iq2Ymzsf2qNQcaEj2x62laxAIpfs+FQ9P3hyOACr/LMPH68aQ
-         ckioDDSgSWSeaYpomATsygs31jr4GChkrly1YYrvktnrno2HRxxwGTM8IXTpABu90Wo1
-         wOR3vF5KjMxxVtqaOBHzFMj4CMHENidcShIMV+MR/KUxmAyQoEZ2IEBKA9YwXOyIXWMA
-         NTvA==
+        d=google.com; s=20230601; t=1740441347; x=1741046147; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=VUFWBiQUtkyxtQjLqO6VHI65Q9aVoo/tjEK11vAPqoc=;
+        b=emjhZb6quvu6AVAdWRR6HTTRaSkG+u/e+Y7Vfs9mr9ieuHAUKnDw4mH+xGyQn9PjzD
+         32VTf2nwFtDccFhb5EzUmoavw4Iw/LCLp13TqSyTusx7J+TH1RL70luF5RFwhs+Lqocf
+         cg4yHcOwp6DkN8JBNvsk+aRnfp1e2Cozwm+uiFF3SS7XVV/lRqeYZclr7QQf4Etdo42C
+         zWBfGYYOgN03nLHO/6hisPbCT7VruGqzOtQ9QSKPflvJVWfb/esg0imBlU81HYEAe8fX
+         jmIcjwj3R1eT0yxC+tuZiqf59d8jn/Ns1VhOdUGIAARCJbVBjd6hmbu7sv1f2e6m2/Mf
+         K3fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740441345; x=1741046145;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G4yv5E3Df19Io1ieaPGo0Ai9BtJpUzyQSBdyF3aMs18=;
-        b=vO6YWtOJdhIdvDc4Ku6gpOr35oqJ5QwpBns6vORZy+etCcbTYsVBifFmwoJn8GvSDM
-         KTW7vtY8aGZ+429WnuMbm612eV88FAtku+H1hDiRL3VLlrm0hAF4hhULqOlKPAwXMFSy
-         PgWo3c8a3p214eoTNthvANINMz6R4C7qKy+qcJKpMN1TRtfXsuazIk/KIjONS+cxvkSY
-         JU9fQLx1v1EntvvSJiE1KxV9aZSS0Bg1PjVB/r0bzV03mkMIH7NxlACeRrfRn7MmNS61
-         nWPOOicgctWE4jV59aY6l9g66m+nx0WNu6CxuzIJ7hjuTiVVq//Zp27mIAQgT1tHKmvD
-         ZPRg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4vfwHSbmWozrGUQ3z2pXptlu+MbA8CKcOs5u/0sOP2irRMp+rSxq2JcCAbEjE1L8uo6d1fEQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzOwRM+6RmnAGEsojG50YrpXI/TwVahV6gYqLu7ampyxdgqaFy3
-	S8J2bLZVpGBf52bA7ANJF0Zbls8gCKEMToHchNtK2c8Fs3wHetrzeFvNW7C61i3XjRoeHl+DZFn
-	aqw==
-X-Google-Smtp-Source: AGHT+IF6C3DtzvfIloHEkiuLmfsYJNF5ywoI3G+Dg7xZ6ws28dsFaD6h16rXeHiPC/2N2WbxQdNYNz9BqGc=
-X-Received: from pjbsd8.prod.google.com ([2002:a17:90b:5148:b0:2ea:5613:4d5d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5292:b0:2ee:7c65:ae8e
- with SMTP id 98e67ed59e1d1-2fce77a638fmr26853663a91.11.1740441345356; Mon, 24
- Feb 2025 15:55:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740441347; x=1741046147;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VUFWBiQUtkyxtQjLqO6VHI65Q9aVoo/tjEK11vAPqoc=;
+        b=oNP0L8T3YB9Rckgs8ksD3kfC3CpCqId6EVSqxzrcX8EJTe997R0tTXjRdTyGH2I1J6
+         FGdPo1Rz/qwjGGr9547Y+Oc3HJXTSI6Q8VBLwYpKcCeVDURIlzQ86O1Hzxxo/jIDI7xt
+         VvtA4MOo1AVz6iDDuGUg5yh27XVrtA2lQEWegt1CaH1g2VHkwyUoimiL3Crqg7ijZ3U9
+         M875zxf9eEUbOb8cPvuvTWnWVAnSYAZplLcCL3m/SOQJFe3aP3aL7B9SWeOSmdQ3s58a
+         c0nmtneHWTuh76utcY71ZT4x9dGgsFtb47wBfQlRPht3jkq/sXplLCotzSdmiKrQuWZE
+         br4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVCXFCz7f10+CajsKsX7e8o5BZyTvSUODSEr362dH9V8yGja4yJsPGTEsXK9cWqp4paD6QyCa4=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzs+4wF11MhLqbmEpo35Mue2/J9WxKbCordxxVw7bMacrfs6E11
+	7V11YVLFIZLkThoX5/2IZome6NwobcnEHkY89yt/LnMjxCmax/d+MWazxM4LHAGE2lUke/pNcuS
+	Rlg==
+X-Google-Smtp-Source: AGHT+IEskcg8NGcMgI3lzGvHxN+7n9pLx0XcpaLq7IsEpPM2kCgPZOpZWimEzcKRut1Ut1sQ02q7DWsQk2M=
+X-Received: from pjuw11.prod.google.com ([2002:a17:90a:d60b:b0:2fa:1771:e276])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e18c:b0:2ea:bf1c:1e3a
+ with SMTP id 98e67ed59e1d1-2fce86ae2cbmr28015424a91.12.1740441347216; Mon, 24
+ Feb 2025 15:55:47 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 24 Feb 2025 15:55:35 -0800
+Date: Mon, 24 Feb 2025 15:55:36 -0800
+In-Reply-To: <20250224235542.2562848-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250224235542.2562848-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250224235542.2562848-1-seanjc@google.com>
-Subject: [PATCH 0/7] KVM: x86: nVMX IRQ fix and VM teardown cleanups
+Message-ID: <20250224235542.2562848-2-seanjc@google.com>
+Subject: [PATCH 1/7] KVM: x86: Free vCPUs before freeing VM state
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -77,51 +81,86 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This was _supposed_ to be a tiny one-off patch to fix a nVMX bug where KVM
-fails to detect that, after nested VM-Exit, L1 has a pending IRQ (or NMI).
-But because x86's nested teardown flows are garbage (KVM simply forces a
-nested VM-Exit to put the vCPU back into L1), that simple fix snowballed.
+Free vCPUs before freeing any VM state, as both SVM and VMX may access
+VM state when "freeing" a vCPU that is currently "in" L2, i.e. that needs
+to be kicked out of nested guest mode.
 
-The immediate issue is that checking for a pending interrupt accesses the
-legacy PIC, and x86's kvm_arch_destroy_vm() currently frees the PIC before
-destroying vCPUs, i.e. checking for IRQs during the forced nested VM-Exit
-results in a NULL pointer deref (or use-after-free if KVM didn't nullify
-the PIC pointer).  That's patch 1.
+Commit 6fcee03df6a1 ("KVM: x86: avoid loading a vCPU after .vm_destroy was
+called") partially fixed the issue, but for unknown reasons only moved the
+MMU unloading before VM destruction.  Complete the change, and free all
+vCPU state prior to destroying VM state, as nVMX accesses even more state
+than nSVM.
 
-Patch 2 is the original nVMX fix.
+In addition to the AVIC, KVM can hit a use-after-free on MSR filters:
 
-The remaining patches attempt to bring a bit of sanity to x86's VM
-teardown code, which has accumulated a lot of cruft over the years.  E.g.
-KVM currently unloads each vCPU's MMUs in a separate operation from
-destroying vCPUs, all because when guest SMP support was added, KVM had a
-kludgy MMU teardown flow that broken when a VM had more than one 1 vCPU.
-And that oddity lived on, for 18 years...
+  kvm_msr_allowed+0x4c/0xd0
+  __kvm_set_msr+0x12d/0x1e0
+  kvm_set_msr+0x19/0x40
+  load_vmcs12_host_state+0x2d8/0x6e0 [kvm_intel]
+  nested_vmx_vmexit+0x715/0xbd0 [kvm_intel]
+  nested_vmx_free_vcpu+0x33/0x50 [kvm_intel]
+  vmx_free_vcpu+0x54/0xc0 [kvm_intel]
+  kvm_arch_vcpu_destroy+0x28/0xf0
+  kvm_vcpu_destroy+0x12/0x50
+  kvm_arch_destroy_vm+0x12c/0x1c0
+  kvm_put_kvm+0x263/0x3c0
+  kvm_vm_release+0x21/0x30
 
-Sean Christopherson (7):
-  KVM: x86: Free vCPUs before freeing VM state
-  KVM: nVMX: Process events on nested VM-Exit if injectable IRQ or NMI
-    is pending
-  KVM: Assert that a destroyed/freed vCPU is no longer visible
-  KVM: x86: Don't load/put vCPU when unloading its MMU during teardown
-  KVM: x86: Unload MMUs during vCPU destruction, not before
-  KVM: x86: Fold guts of kvm_arch_sync_events() into
-    kvm_arch_pre_destroy_vm()
-  KVM: Drop kvm_arch_sync_events() now that all implementations are nops
+and an upcoming fix to process injectable interrupts on nested VM-Exit
+will access the PIC:
 
- arch/arm64/include/asm/kvm_host.h     |  2 --
- arch/loongarch/include/asm/kvm_host.h |  1 -
- arch/mips/include/asm/kvm_host.h      |  1 -
- arch/powerpc/include/asm/kvm_host.h   |  1 -
- arch/riscv/include/asm/kvm_host.h     |  2 --
- arch/s390/include/asm/kvm_host.h      |  1 -
- arch/x86/kvm/vmx/nested.c             | 11 +++++++
- arch/x86/kvm/x86.c                    | 42 ++++++++++-----------------
- include/linux/kvm_host.h              |  1 -
- virt/kvm/kvm_main.c                   |  9 +++++-
- 10 files changed, 34 insertions(+), 37 deletions(-)
+  BUG: kernel NULL pointer dereference, address: 0000000000000090
+  #PF: supervisor read access in kernel mode
+  #PF: error_code(0x0000) - not-present page
+  CPU: 23 UID: 1000 PID: 2658 Comm: kvm-nx-lpage-re
+  RIP: 0010:kvm_cpu_has_extint+0x2f/0x60 [kvm]
+  Call Trace:
+   <TASK>
+   kvm_cpu_has_injectable_intr+0xe/0x60 [kvm]
+   nested_vmx_vmexit+0x2d7/0xdf0 [kvm_intel]
+   nested_vmx_free_vcpu+0x40/0x50 [kvm_intel]
+   vmx_vcpu_free+0x2d/0x80 [kvm_intel]
+   kvm_arch_vcpu_destroy+0x2d/0x130 [kvm]
+   kvm_destroy_vcpus+0x8a/0x100 [kvm]
+   kvm_arch_destroy_vm+0xa7/0x1d0 [kvm]
+   kvm_destroy_vm+0x172/0x300 [kvm]
+   kvm_vcpu_release+0x31/0x50 [kvm]
 
+Inarguably, both nSVM and nVMX need to be fixed, but punt on those
+cleanups for the moment.  Conceptually, vCPUs should be freed before VM
+state.  Assets like the I/O APIC and PIC _must_ be allocated before vCPUs
+are created, so it stands to reason that they must be freed _after_ vCPUs
+are destroyed.
 
-base-commit: fed48e2967f402f561d80075a20c5c9e16866e53
+Reported-by: Aaron Lewis <aaronlewis@google.com>
+Closes: https://lore.kernel.org/all/20240703175618.2304869-2-aaronlewis@google.com
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 58b82d6fd77c..045c61cc7e54 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12890,11 +12890,11 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 		mutex_unlock(&kvm->slots_lock);
+ 	}
+ 	kvm_unload_vcpu_mmus(kvm);
++	kvm_destroy_vcpus(kvm);
+ 	kvm_x86_call(vm_destroy)(kvm);
+ 	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+ 	kvm_pic_destroy(kvm);
+ 	kvm_ioapic_destroy(kvm);
+-	kvm_destroy_vcpus(kvm);
+ 	kvfree(rcu_dereference_check(kvm->arch.apic_map, 1));
+ 	kfree(srcu_dereference_check(kvm->arch.pmu_event_filter, &kvm->srcu, 1));
+ 	kvm_mmu_uninit_vm(kvm);
 -- 
 2.48.1.658.g4767266eb4-goog
 
