@@ -1,120 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786C42586D1;
-	Mon, 24 Feb 2025 11:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018A126FA5F
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 11:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740395138; cv=none; b=rEF19az24OjawYTVHDK6yQbiBe8/UREGk3467blb7L3lCzjjEJrD9iR/gy0IJys6AczvmMq735CSSjdVnM4yjksh0eFjLO+8yXL4zopN5aKlWxV9gnFK6QHhBwYaeDGJ7wV5ptox2bQV7+b8BExravTffEkNeVNhpo7u3QynlmI=
+	t=1740396006; cv=none; b=pBeHiOgeBbhpC5/JjCIm3Sht/bG5ka8xLjfjt5d74fOqmuC/6RXqe8JyW9mNPQdjXFJoFpoaz3OcjoTBVWoMpAoMXNajB8c8rl43J2XnOi7bfUkEOPpPE1pRi7AHHQNgZxx1FSBodVdKdDppr22bvYGYrsRSXK+0qwXf70X3OjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740395138; c=relaxed/simple;
-	bh=Psyn/KQl59WzsnG7eUbev1bYnOJ/uewhEhWQ4K6vZMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AKoiAgPyBmk05queSN4piBY7wvS3wzuaeUYUU3kjc+xo73ZJC3fQYP6TAA7xQvDnoUUp4gTKTyqMOSXxMePK7OGloA/wTZXTnvMRkDIqmL8aaXEMLyvMUKVKztk7c4Eh7jP7ATZg1tOj0zXzpIV8mOYMA+sVQsoa2WNr7V6+sbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 551EBC4CEE6;
-	Mon, 24 Feb 2025 11:05:36 +0000 (UTC)
-Date: Mon, 24 Feb 2025 11:05:33 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Peter Collingbourne <pcc@google.com>
-Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot
- creation
-Message-ID: <Z7xSfVME4z2ComUm@arm.com>
-References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
+	s=arc-20240116; t=1740396006; c=relaxed/simple;
+	bh=vn+aZ0yf4f2bCr9xVqGeBGVY/4biDA25C2YfH+UeOJA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=elUdUWY1timHMHVLuaGHjHV6vZKRNwE/2vb43UcZoH6JTCiG/zNqaXE9E2s9vBq8uLckxCVIKHt/GGhjfCaLQ19mmde441cWJJuIhcvWRR6VKWx51sjec+6pjLdLsVgVI3K4k6H6wQWIL83XNbZ67dtr3OrGZ/g2CN0xvqU7hXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4Z1dQg35xWz9sSq;
+	Mon, 24 Feb 2025 12:13:47 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id reeUmV24E4zC; Mon, 24 Feb 2025 12:13:47 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4Z1dQg2BZFz9sSp;
+	Mon, 24 Feb 2025 12:13:47 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 2FFAC8B765;
+	Mon, 24 Feb 2025 12:13:47 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id kefUlrU39Hz9; Mon, 24 Feb 2025 12:13:47 +0100 (CET)
+Received: from [10.25.207.138] (unknown [10.25.207.138])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id C903F8B763;
+	Mon, 24 Feb 2025 12:13:46 +0100 (CET)
+Message-ID: <5e8a4dd9-50a8-4080-8d63-dbb8c7241b98@csgroup.eu>
+Date: Mon, 24 Feb 2025 12:13:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] mm: Rename GENERIC_PTDUMP and PTDUMP_CORE
+To: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Steven Price <steven.price@arm.com>, linux-mm@kvack.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org
+References: <20250213040934.3245750-1-anshuman.khandual@arm.com>
+ <20250213040934.3245750-5-anshuman.khandual@arm.com>
+ <8e75c5ff-a97b-4a6f-9c8b-ac2598eafe60@arm.com>
+ <6e1201a1-60c1-40a3-951f-d603b6341a11@csgroup.eu>
+ <03b042ec-1cb7-4419-8741-c65e74e49d51@arm.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <03b042ec-1cb7-4419-8741-c65e74e49d51@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> Before commit d89585fbb308 ("KVM: arm64: unify the tests for VMAs in
-> memslots when MTE is enabled"), kvm_arch_prepare_memory_region() only
-> rejected a memory slot if VM_SHARED was set. This commit unified the
-> checking with user_mem_abort(), with slots being rejected if either
-> VM_MTE_ALLOWED is not set or VM_SHARED set. A subsequent commit
-> c911f0d46879 ("KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE
-> enabled") dropped the VM_SHARED check, so we ended up with memory slots
-> being rejected if VM_MTE_ALLOWED is not set. This wasn't the case before
-> the commit d89585fbb308. The rejection of the memory slot with VM_SHARED
-> set was done to avoid a race condition with the test/set of the
-> PG_mte_tagged flag. Before Commit d77e59a8fccd ("arm64: mte: Lock a page
-> for MTE tag initialization") the kernel avoided allowing MTE with shared
-> pages, thereby preventing two tasks sharing a page from setting up the
-> PG_mte_tagged flag racily.
+
+
+Le 14/02/2025 à 08:26, Anshuman Khandual a écrit :
 > 
-> Commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag
-> initialization") further updated the locking so that the kernel
-> allows VM_SHARED mapping with MTE. With this commit, we can enable
-> memslot creation with VM_SHARED VMA mapping.
 > 
-> This patch results in a minor tweak to the ABI. We now allow creating
-> memslots that don't have the VM_MTE_ALLOWED flag set.
-
-As I commented here:
-
-https://lore.kernel.org/r/Z4e04P1bQlFBDHo7@arm.com
-
-I'm fine with the change, we basically go back to the original ABI prior
-to relaxing this for VM_SHARED.
-
-> If the guest uses
-> such a memslot with Allocation Tags, the kernel will generate -EFAULT.
-> ie, instead of failing early, we now fail later during KVM_RUN.
-
-Nit: more like the kernel "will return -EFAULT" to the VMM rather than
-"generate".
-
-> This change is needed because, without it, users are not able to use MTE
-> with VFIO passthrough (currently the mapping is either Device or
-> NonCacheable for which tag access check is not applied.), as shown
-> below (kvmtool VMM).
-
-Another nit: "users are not able to user VFIO passthrough when MTE is
-enabled". At a first read, the above sounded to me like one wants to
-enable MTE for VFIO passthrough mappings.
-
-> [  617.921030] vfio-pci 0000:01:00.0: resetting
-> [  618.024719] vfio-pci 0000:01:00.0: reset done
->   Error: 0000:01:00.0: failed to register region with KVM
->   Warning: [0abc:aced] Error activating emulation for BAR 0
->   Error: 0000:01:00.0: failed to configure regions
->   Warning: Failed init: vfio__init
+> On 2/13/25 17:19, Christophe Leroy wrote:
+>>
+>>
+>> Le 13/02/2025 à 12:23, Steven Price a écrit :
+>>> On 13/02/2025 04:09, Anshuman Khandual wrote:
+>>>> Platforms subscribe into generic ptdump implementation via GENERIC_PTDUMP.
+>>>> But generic ptdump gets enabled via PTDUMP_CORE. These configs combination
+>>>> is confusing as they sound very similar and does not differentiate between
+>>>> platform's feature subscription and feature enablement for ptdump. Rename
+>>>> the configs as ARCH_HAS_PTDUMP and PTDUMP making it more clear and improve
+>>>> readability.
+>>>
+>>> [...]
+>>>> diff --git a/arch/powerpc/configs/mpc885_ads_defconfig b/arch/powerpc/configs/mpc885_ads_defconfig
+>>>> index 77306be62e9e..db005618690b 100644
+>>>> --- a/arch/powerpc/configs/mpc885_ads_defconfig
+>>>> +++ b/arch/powerpc/configs/mpc885_ads_defconfig
+>>>> @@ -78,4 +78,4 @@ CONFIG_DEBUG_VM_PGTABLE=y
+>>>>    CONFIG_DETECT_HUNG_TASK=y
+>>>>    CONFIG_BDI_SWITCH=y
+>>>>    CONFIG_PPC_EARLY_DEBUG=y
+>>>> -CONFIG_GENERIC_PTDUMP=y
+>>>> +CONFIG_PTDUMP=y
+>>>
+>>> I'd suggest dropp this from the defconfig too, just like patch 1 dropped
+>>> it from debug.config.
+>>>
+>>
+>> Thanks for spotting that.
+>>
+>> That one is wrong. Was introduced by commit d210ee3fdfe8 ("powerpc/configs: Update config files for removed/renamed symbols") which aimed at fixing commit e084728393a5 ("powerpc/ptdump: Convert powerpc to GENERIC_PTDUMP") but it did it wrong.
+>>
+>> It is CONFIG_PTDUMP_DEBUGFS that is wanted.
 > 
->   Fatal: Initialisation failed
-> 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 5 -----
->  1 file changed, 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index ef53af6df6de..1f1b5aa43d2d 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2178,11 +2178,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  		if (!vma)
->  			break;
->  
-> -		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
-> -			ret = -EINVAL;
-> -			break;
-> -		}
-> -
->  		if (vma->vm_flags & VM_PFNMAP) {
->  			/* IO region dirty page logging not allowed */
->  			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> Should this replacement be done in the series or would you like it
+> to be handled in powerpc later ?
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Yes I think you should do the replacement.
