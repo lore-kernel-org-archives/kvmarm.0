@@ -1,54 +1,54 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94764221F08
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 12:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968D9221F22
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 12:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740399331; cv=none; b=cb+hMpCzLR9leQ3tGQQuQJeJwiYDPXmpczvUBIshUg2LC95tOu5PVaVZ/++6SR9AxDaLK9KMKtRMrmr88s3zEQNTP5YN5XYh77uZWjqhDXQw68WziM4o7BHHgPIZGO1nLjW91yJpljgkZ8b031ufUWEfuiL/XXjxCfXZW0Han34=
+	t=1740399333; cv=none; b=UUmK8naoCDhpTkd5MoVKvkIecZYyqnRlt6nFjwwcKYJC3kM78tDPjab+0NbPTmjmbWafO02yl98E0FbsSOYX9uXtU7sS3aX0V1zFTToHPhCypniPtUSXe87eBebJ41jpfmjtQVsTlbdsPSw7RJkXMVOp1hmEtad1QUkwMNPw2uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740399331; c=relaxed/simple;
-	bh=gOKOc8qU4yci0EBbwJI0GDOjXP0apsGjcg24lGurQ98=;
+	s=arc-20240116; t=1740399333; c=relaxed/simple;
+	bh=F56QYlJoDZJ+5vN4/HPXUDdjBW0FdSUoL0+uYMqsb5Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rimHmcUyli7iAxK1cnIAR3O4Tq+5blDf7vfdg6DMwkJO8JATVfGRcOD545m1rawVFFE4eir+7/7ZDJyDr+S7gITL23qJuVwvy8LnfRgBOZ7S44+OEdvx9yth7lkw75EuajOgUSYxixzRguYPTcbsuMzHUP2c0vlqLeM6gTr+97c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VKqdbyt2; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=ZYBAErKmD9d805i9O0TPn4FJXIP3ao81xcQYcGOFAgSlacAQe6GCyvSX/SxPFPu5KOlUwnotWuc9YOLIJ5EsbNqnH+scZBFVXuwlhRg5Wo3sZ283GDOAoh1v9rDdqjU9LxTxZqJYzH2Zwi97B7nme4JffMucHGOHfjZ9Flv2GZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EQaTXGyt; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VKqdbyt2"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-438da39bb69so32878595e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 04:15:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EQaTXGyt"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43947a0919aso33704865e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 04:15:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740399328; x=1741004128; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1740399330; x=1741004130; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OOWK+ThY516lMh047e8qidZAr1KsboApKQXs49+vyHs=;
-        b=VKqdbyt2jZ4td73PYpi3FwEJ0/JIEc+UmBac78eoXX5UT4hvvPQ8iRCwpsClBQeT6x
-         b8IcvAAOTw0wBJAPSZmJhic8hGRlzZpIQ6M9DruGaQAWZukyYEmAYn+AaFwF5c1+Qy3Z
-         cieewAtapmGXLpiz/C5wFMPaG7lmbWa+qmRa3aeARI0A9FTDaIjoOS5m3yfR6BgCnt+G
-         qnfjBWa6uCz2PP4bYOXrr3N7pSLJv6et9RoyHuesSljG4cWbNlxSfJU5uv7pJO33xh9T
-         KSJC2bTrj5ybZsvtT4yFJPJ/XKfm+QhgQEPL/EsDYXOj3HeQXY38A6l+O6T6QnnUaM9u
-         Llyg==
+        bh=boWUnC75AglyvSxymfq6WOxHhiCHfMqe3a7p6Cadurk=;
+        b=EQaTXGytVa4cwjIr1ntF9OD6u5zPeFs/yZ9M/Z9LsSbSgWzsEjQZn9JvuyTxNO0xzK
+         GxOJLPTHrO8cU/1LmZfPoXo/rHiFR868xsx2WBlUKsL7vJ/udWZ8ipGNxAlBJqDCF9qA
+         4mxMJDESyrzGvZ4kguUtu+T1B86lQvGjwfsdR1AvKAV8F+Ij8ltQufqZSTt9t51k8tBj
+         JcwhmE4sjE0URHMwx/ogZWIWyyVnItOSmFpEXY6cfB0NUv8+o01eRHdqTNoZw3tOJa7m
+         6CvC/mSY2GsYIZSkHhCVSAN7iDafpPpNyqpTTDVtNkz5JkmuHrJjNDj2IUl3AcLtZ36c
+         Oxxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740399328; x=1741004128;
+        d=1e100.net; s=20230601; t=1740399330; x=1741004130;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OOWK+ThY516lMh047e8qidZAr1KsboApKQXs49+vyHs=;
-        b=X1zqc5qTO4uD3eEBxlb0ACHbG2OkqaSZ5LTj7YKKgLdj+pStf5+X3dbpkGiRxgT/ZG
-         l15SgbMyAOv/CDELDSru8Q1U8mXAaD4unc4rdVtvCzxy1csWtz581CmfeGyeB6d34GUu
-         D9mD/sqJq3P//6JiYeuMK3bAfJjIMpQeU/CmijYGskCzX/0GfNxVTWHqD25iDrj6IbMx
-         8B3JWX9wF4nMDvbB52JXV14TwjUoz1JR0lgoQIy0pTy7gMYwF6C3htLHePTyiO9+ysaL
-         B2qaTBxbMiD9Ra4jK90BA79HsHVUIfd4dadjVqOsZZl45yuDGslpBuYgG3jXplRVwwGY
-         YgkQ==
-X-Gm-Message-State: AOJu0Yxiou1lmZAOmsK9LzAEn0AO8gJK14G+TFQniYQG8HR+vrwuWOXd
-	NkkA8YeFy0JyYzkTnhAnSYclR9603GXyEXYTW13jjBiPrMS66bSdvr+uWks/hwDVIF8TFT/jY7+
-	7Wa5rgogSfE+Gqkaz4A==
-X-Google-Smtp-Source: AGHT+IFhLM25JrhF91PI/1xl0Ucx2pu2bGxwHFlKnZCcYx2J0q55kmjIHyBfWwosFL87FFfcYtOKkEve+OiYyvpF
-X-Received: from wmbfk5.prod.google.com ([2002:a05:600c:cc5:b0:439:7c0b:a4c9])
+        bh=boWUnC75AglyvSxymfq6WOxHhiCHfMqe3a7p6Cadurk=;
+        b=kO/OZUpHxeAAxjcK2xroC3iWFJTiN+B7jx2Ih3mhD7uy+ruaTFFvuQRGgkgjpYRrAW
+         U1yfNfln4obAbHDEqz+RsrreYqgI5YUxHpxZuV499KXCvorAuyY8HQeIna4qGBLRJUQE
+         onYqtP/wSOd6gTUk4Nku+BSD8mfmr9GHza86tkB0BaasCrIzO9Lifhh9uS1tllUMjHal
+         R2NwD8puIEWHGHspGt2BNOl247fLVtJ8Pa289WITRD0IQgBcIZQ0SYdviO8aFFzZ5SIf
+         mNczzkB0oW4//CBeZqnafFcXy5zS2e6rPZ56Dk7COuTeE8BRz7aBXes33EUm/oVciVGP
+         JWFQ==
+X-Gm-Message-State: AOJu0YywiWWH7q//BKeNgoEc43kUsgFFaR0D0s4zfLiu90ZGszIS3JD1
+	7NE4+3+0G8ANwL+j2Qz8rNDlYmD+mj9iPbIRVlcdUMKfwDAzsDwI5S5bo5BoJ84N5L/hho7gZyj
+	J/9QzVIiKbV5exb68mg==
+X-Google-Smtp-Source: AGHT+IEZCk3oy+HQSHrsEDAqwXlupd0xHmeS8IuL0N9dhMMAdmGlo9OyR+iiK51V+OKl7+wJfLEr+VwrJuInfXQr
+X-Received: from wmbjg14.prod.google.com ([2002:a05:600c:a00e:b0:439:4366:35c2])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b08:b0:439:5da7:8e0 with SMTP id 5b1f17b1804b1-439ae1f30dbmr129078825e9.16.1740399328153;
- Mon, 24 Feb 2025 04:15:28 -0800 (PST)
-Date: Mon, 24 Feb 2025 12:13:44 +0000
+ 2002:a05:600c:4f88:b0:439:96aa:e502 with SMTP id 5b1f17b1804b1-439ae1e6a2fmr119293615e9.12.1740399330189;
+ Mon, 24 Feb 2025 04:15:30 -0800 (PST)
+Date: Mon, 24 Feb 2025 12:13:45 +0000
 In-Reply-To: <20250224121353.98697-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250224121353.98697-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250224121353.98697-3-vdonnefort@google.com>
-Subject: [PATCH 02/11] ring-buffer: Expose buffer_data_page material
+Message-ID: <20250224121353.98697-4-vdonnefort@google.com>
+Subject: [PATCH 03/11] KVM: arm64: Support unaligned fixmap in the nVHE hyp
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,155 +70,24 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-In preparation for allowing the write of ring-buffer compliant pages
-outside of ring_buffer.c, move to the header, struct buffer_data_page and
-timestamp encoding functions into the publicly available ring_buffer.h.
+Return the fixmap VA with the page offset, instead of the page base
+address.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/include/linux/ring_buffer.h b/include/linux/ring_buffer.h
-index 2a1330a65edb..75cd0cb46768 100644
---- a/include/linux/ring_buffer.h
-+++ b/include/linux/ring_buffer.h
-@@ -3,8 +3,10 @@
- #define _LINUX_RING_BUFFER_H
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index f41c7440b34b..720cc3b36596 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -240,7 +240,7 @@ void *hyp_fixmap_map(phys_addr_t phys)
+ 	WRITE_ONCE(*ptep, pte);
+ 	dsb(ishst);
  
- #include <linux/mm.h>
--#include <linux/seq_file.h>
- #include <linux/poll.h>
-+#include <linux/seq_file.h>
-+
-+#include <asm/local.h>
- 
- #include <uapi/linux/trace_mmap.h>
- 
-@@ -20,6 +22,8 @@ struct ring_buffer_event {
- 	u32		array[];
- };
- 
-+#define RB_EVNT_HDR_SIZE (offsetof(struct ring_buffer_event, array))
-+
- /**
-  * enum ring_buffer_type - internal ring buffer types
-  *
-@@ -61,11 +65,50 @@ enum ring_buffer_type {
- 	RINGBUF_TYPE_TIME_STAMP,
- };
- 
-+#define TS_SHIFT        27
-+#define TS_MASK         ((1ULL << TS_SHIFT) - 1)
-+#define TS_DELTA_TEST   (~TS_MASK)
-+
-+/*
-+ * We need to fit the time_stamp delta into 27 bits.
-+ */
-+static inline bool test_time_stamp(u64 delta)
-+{
-+	return !!(delta & TS_DELTA_TEST);
-+}
-+
- unsigned ring_buffer_event_length(struct ring_buffer_event *event);
- void *ring_buffer_event_data(struct ring_buffer_event *event);
- u64 ring_buffer_event_time_stamp(struct trace_buffer *buffer,
- 				 struct ring_buffer_event *event);
- 
-+#define BUF_PAGE_HDR_SIZE offsetof(struct buffer_data_page, data)
-+
-+/* Max payload is BUF_PAGE_SIZE - header (8bytes) */
-+#define BUF_MAX_DATA_SIZE (BUF_PAGE_SIZE - (sizeof(u32) * 2))
-+
-+#define BUF_PAGE_SIZE (PAGE_SIZE - BUF_PAGE_HDR_SIZE)
-+
-+#define RB_ALIGNMENT		4U
-+#define RB_MAX_SMALL_DATA	(RB_ALIGNMENT * RINGBUF_TYPE_DATA_TYPE_LEN_MAX)
-+#define RB_EVNT_MIN_SIZE	8U	/* two 32bit words */
-+
-+#ifndef CONFIG_HAVE_64BIT_ALIGNED_ACCESS
-+# define RB_FORCE_8BYTE_ALIGNMENT	0
-+# define RB_ARCH_ALIGNMENT		RB_ALIGNMENT
-+#else
-+# define RB_FORCE_8BYTE_ALIGNMENT	1
-+# define RB_ARCH_ALIGNMENT		8U
-+#endif
-+
-+#define RB_ALIGN_DATA		__aligned(RB_ARCH_ALIGNMENT)
-+
-+struct buffer_data_page {
-+	u64		 time_stamp;	/* page time stamp */
-+	local_t		 commit;	/* write committed index */
-+	unsigned char	 data[] RB_ALIGN_DATA;	/* data of buffer page */
-+};
-+
- /*
-  * ring_buffer_discard_commit will remove an event that has not
-  *   been committed yet. If this is used, then ring_buffer_unlock_commit
-diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
-index c27516a384a8..e70f39e0adb1 100644
---- a/kernel/trace/ring_buffer.c
-+++ b/kernel/trace/ring_buffer.c
-@@ -152,23 +152,6 @@ int ring_buffer_print_entry_header(struct trace_seq *s)
- /* Used for individual buffers (after the counter) */
- #define RB_BUFFER_OFF		(1 << 20)
- 
--#define BUF_PAGE_HDR_SIZE offsetof(struct buffer_data_page, data)
--
--#define RB_EVNT_HDR_SIZE (offsetof(struct ring_buffer_event, array))
--#define RB_ALIGNMENT		4U
--#define RB_MAX_SMALL_DATA	(RB_ALIGNMENT * RINGBUF_TYPE_DATA_TYPE_LEN_MAX)
--#define RB_EVNT_MIN_SIZE	8U	/* two 32bit words */
--
--#ifndef CONFIG_HAVE_64BIT_ALIGNED_ACCESS
--# define RB_FORCE_8BYTE_ALIGNMENT	0
--# define RB_ARCH_ALIGNMENT		RB_ALIGNMENT
--#else
--# define RB_FORCE_8BYTE_ALIGNMENT	1
--# define RB_ARCH_ALIGNMENT		8U
--#endif
--
--#define RB_ALIGN_DATA		__aligned(RB_ARCH_ALIGNMENT)
--
- /* define RINGBUF_TYPE_DATA for 'case RINGBUF_TYPE_DATA:' */
- #define RINGBUF_TYPE_DATA 0 ... RINGBUF_TYPE_DATA_TYPE_LEN_MAX
- 
-@@ -311,10 +294,6 @@ EXPORT_SYMBOL_GPL(ring_buffer_event_data);
- #define for_each_online_buffer_cpu(buffer, cpu)		\
- 	for_each_cpu_and(cpu, buffer->cpumask, cpu_online_mask)
- 
--#define TS_SHIFT	27
--#define TS_MASK		((1ULL << TS_SHIFT) - 1)
--#define TS_DELTA_TEST	(~TS_MASK)
--
- static u64 rb_event_time_stamp(struct ring_buffer_event *event)
- {
- 	u64 ts;
-@@ -333,12 +312,6 @@ static u64 rb_event_time_stamp(struct ring_buffer_event *event)
- 
- #define RB_MISSED_MASK		(3 << 30)
- 
--struct buffer_data_page {
--	u64		 time_stamp;	/* page time stamp */
--	local_t		 commit;	/* write committed index */
--	unsigned char	 data[] RB_ALIGN_DATA;	/* data of buffer page */
--};
--
- struct buffer_data_read_page {
- 	unsigned		order;	/* order of the page */
- 	struct buffer_data_page	*data;	/* actual data, stored in this page */
-@@ -397,14 +370,6 @@ static void free_buffer_page(struct buffer_page *bpage)
- 	kfree(bpage);
+-	return (void *)slot->addr;
++	return (void *)slot->addr + offset_in_page(phys);
  }
  
--/*
-- * We need to fit the time_stamp delta into 27 bits.
-- */
--static inline bool test_time_stamp(u64 delta)
--{
--	return !!(delta & TS_DELTA_TEST);
--}
--
- struct rb_irq_work {
- 	struct irq_work			work;
- 	wait_queue_head_t		waiters;
+ static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
 -- 
 2.48.1.601.g30ceb7b040-goog
 
