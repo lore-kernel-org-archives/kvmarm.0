@@ -1,101 +1,89 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7AAA95C
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 19:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4541C8607
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 22:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740426786; cv=none; b=D3/Ue8EWZdTP4yUayLFh8c09GFzGfv1RVmSbB+OL3SOlUFv4LTLB58cWhojM9/zvdxU3Vqpvj2f7wkV25ITKqiCSzoFkYXV1hrvDoOj6tEcyfDCwEFWZDfuW3rGLY6WF7/uxNcRFBYzMGi5zIXdhUPE9YCPHnlxFBhI9jA0ujfE=
+	t=1740435799; cv=none; b=UZYR9S2zdGy2yOp/RbbX/OKHRJZTaBkHHywJw3YjbTce0QN+H7KMCVmE/8LYuy7BMK4kV4LIturj3SKZAie/Sflm9me1sRPg5tTZXnvIS3BvTwF8ZXmOcjehDDHuJQuaHeSCwxBhCg6Q075MbY3pNEOGSTZLqMLRu8PMQkFnfpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740426786; c=relaxed/simple;
-	bh=QPNXldP8/aXCfk0xXpeMkBJumd7LGA27Zao1AHKS6zI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tp+O+y7p3IHuF+yLgMyF5bH18g3OS9dlXQABj0RwmQPPqG9G1Ycqk0SID+XToHsj39eKQmQMjaGYmtGbR3ozI9oSqnQHyIKeiffxHqIE+Yuk8KxXHIzUKBckKBDDPeBZ+PID3qo3YgkFtpt4DEu/IoRRbTxPjTWtSmjjrCnw+Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aN0tE1Pd; arc=none smtp.client-ip=95.215.58.170
+	s=arc-20240116; t=1740435799; c=relaxed/simple;
+	bh=qmooO3AxZOs0ohQpJ4yo5y4Yi0jidhmcv0CFom4ARm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t3jyFZt39ErfaBVWtGm+lOVPYy+5OdKvhEiF+GkworLLTuz+GIWIgccONP+NhTk9jMj/o6GwD65G0urNSXAg/wFOc/ABQfh/ipXYorWOYncXcWRITbBlHYrlZMtZkICb3V9z1pxXLIbkFjGC7wtd3ELPluGtoh3npHsyCkx924I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=maOIQzSv; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aN0tE1Pd"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="maOIQzSv"
+Date: Mon, 24 Feb 2025 14:23:05 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740426782;
+	t=1740435794;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7Xh1+d4+0/2s7r35AQ1iEnqkZSbg7dbv/TfdOk1/Ssg=;
-	b=aN0tE1Pd1MEvzE4n+wYxC+wbOBiJbdoTQwM05uEvYofjAXAPxnfokLf1kAfI9sWOuqxmp8
-	hhsHxyhQr/nWZPPkewHxSc9EC8AH5L8F7zz3RIfJnceWkFkmSz3C2J52Frot0hhPBuWoXj
-	cFWZwESFmcvtbDmYJQ662pddCSqOVuo=
+	bh=MytlJ2KGkzQ+RhdKVpvDJ1qR08yPF+KOv8QGFyqerQs=;
+	b=maOIQzSvuUUmYk2SXkgSfup4ufEe8vHbBJ1FJO81wU3bAJfRUFrahN1yRRh9znIPT/o5TV
+	WoB9p4K7A8zLUuGiNJ6GriZ8DtNyq3pPrqY+zl2aOneRbzq2EQxRQ9awhbiIE8t+IhjSRU
+	HIruwKqVpJtTTT00ZjwDqRmDWWixvoY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Cornelia Huck <cohuck@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
-	gankulkarni@os.amperecomputing.com
-Subject: Re: (subset) [PATCH v2 00/14] KVM: arm64: NV userspace ABI
-Date: Mon, 24 Feb 2025 11:52:52 -0800
-Message-Id: <174042670061.586392.7441716091084012083.b4-ty@linux.dev>
-In-Reply-To: <20250220134907.554085-1-maz@kernel.org>
-References: <20250220134907.554085-1-maz@kernel.org>
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] KVM: arm64: writable MIDR/REVIDR
+Message-ID: <Z7zxSdW5b6rqe2bt@linux.dev>
+References: <20250218163443.32836-1-sebott@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218163443.32836-1-sebott@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, 20 Feb 2025 13:48:53 +0000, Marc Zyngier wrote:
-> Since the previous incarnation of the ABI was proved to be subtly
-> wrong, I have reworked it to be more in line with the current way KVM
-> operates.
+Hi Sebastian,
+
+On Tue, Feb 18, 2025 at 05:34:39PM +0100, Sebastian Ott wrote:
+> Based on prior discussion [1] this series allows VMMs to change
+> MIDR/REVIDR to enable migration between machines that differ in
+> these registers. Since these are used for errata handling the
+> errata management series [2] is a prerequisite for this one.
 > 
-> No more late NV-specific adjustment nor writable ID_AA64MMFR0_EL1.VH.
-> The NV configuration is now entirely selected from the vcpu flags.
-> I've preserved the KVM_ARM_VCPU_EL2 flag which enables NV with VHE,
-> and added KVM_ARM_VCPU_EL2_E2H0 which alters the NV behaviour to only
-> allow nVHE guests without recursive NV support.
-> 
-> [...]
+> changes for V3:
+> * handle VPIDR_EL2 as part of vcpu ctxt - thanks Oliver!
 
-I fixed up the typos, including the one that breaks bisection. Can
-always back this out if anything is out of place.
+Thanks for respinning. While your changes are looking good, as I got
+ready to apply this series I wound up peeling the onion a bit further
+and have a few more concerns:
 
-Applied to next, thanks!
+ - Current KVM allows guests to read SMIDR_EL1 despite the fact that we
+   do not support SME (this is part of TID1 traps)
 
-[01/14] arm64: cpufeature: Handle NV_frac as a synonym of NV2
-        https://git.kernel.org/kvmarm/kvmarm/c/88aea41b9bc5
-[02/14] KVM: arm64: Hide ID_AA64MMFR2_EL1.NV from guest and userspace
-        https://git.kernel.org/kvmarm/kvmarm/c/9d6745572899
-[03/14] KVM: arm64: Mark HCR.EL2.E2H RES0 when ID_AA64MMFR1_EL1.VH is zero
-        https://git.kernel.org/kvmarm/kvmarm/c/d9f943f76506
-[04/14] KVM: arm64: Mark HCR.EL2.{NV*,AT} RES0 when ID_AA64MMFR4_EL1.NV_frac is 0
-        https://git.kernel.org/kvmarm/kvmarm/c/8f8d6084f5b5
-[05/14] KVM: arm64: Advertise NV2 in the boot messages
-        https://git.kernel.org/kvmarm/kvmarm/c/2cd9542a375a
-[06/14] KVM: arm64: Consolidate idreg callbacks
-        https://git.kernel.org/kvmarm/kvmarm/c/57e7de2650c8
-[07/14] KVM: arm64: Make ID_REG_LIMIT_FIELD_ENUM() more widely available
-        https://git.kernel.org/kvmarm/kvmarm/c/179fd7e30f04
-[08/14] KVM: arm64: Enforce NV limits on a per-idregs basis
-        https://git.kernel.org/kvmarm/kvmarm/c/e7ef6ed4583e
-[09/14] KVM: arm64: Move NV-specific capping to idreg sanitisation
-        https://git.kernel.org/kvmarm/kvmarm/c/94f296dcd6d9
-[10/14] KVM: arm64: Allow userspace to limit NV support to nVHE
-        https://git.kernel.org/kvmarm/kvmarm/c/f83c41fb3ddd
-[11/14] KVM: arm64: Make ID_AA64MMFR4_EL1.NV_frac writable
-        https://git.kernel.org/kvmarm/kvmarm/c/642c23ea8b45
-[12/14] KVM: arm64: Advertise FEAT_ECV when possible
-        https://git.kernel.org/kvmarm/kvmarm/c/8b0b98ebf34d
+ - The "invariant" values that KVM presents to userspace originate from
+   the boot CPU, not the CPU that resets the ID registers for a VM
 
---
-Best,
+ - A VMM that wants to present big-little can do so on current KVM by
+   affining vCPUs, but cannot with this series
+
+All of this is to say, I think your series is going to collide with
+the pre-existing pile of crap we have. I'm going to pick up these
+changes and rework them so we can send a fix for #1 to stable trees and
+(hopefully) avoid breaking the old "invariant" behavior.
+
+I'll post what I have as soon as I test it, hopefully we can get this
+shaped up for 6.15.
+
+Thanks,
 Oliver
