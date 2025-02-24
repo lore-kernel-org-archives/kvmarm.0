@@ -1,38 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C8725A65E;
-	Mon, 24 Feb 2025 18:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BDF26618F
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 18:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740420011; cv=none; b=NiB1mnbf9XBZYnXBuwZKsImGi7tb4120O4PXCZYk5nid41E4Qb4PaRK2nTmSNrVsDW4cMQvn6JpHMqDmlbiWIkkCqm3/WaLFyhJB7L1EfQilcLwyIpb5J3Qb0I1NWk6JMgUaKd8tpP2VK2t6N6hKa+AVsxMzgIC26tT8vdjtu0s=
+	t=1740420189; cv=none; b=HHS3qDYB8Wt7RaNNEe2dK5hitLlJvIr/T5ulcOAgEOuIq4C8MELz7llkYntZX1y1Id+DM4GOx591px5rGn9RpbZTXCjHGxYKrvafmmn3gu/60jvdxVIbspEHOVZvzOjIkzHjQnBkxo9CRNjHWlPsA6I8MNHAOr3xPLu9AWZvriQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740420011; c=relaxed/simple;
-	bh=tA4pjJKyXz0WIXl6n/u+RZCAIV+PamQtXiL3sbzu3TY=;
+	s=arc-20240116; t=1740420189; c=relaxed/simple;
+	bh=rUE/hQROradH9urjwJ+EoCG+n0ZEi4vngN2fnKmbyOg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZKzOTgzBGH7ArmQ+fpeRtZ+UuejlKd/LlCASZ26kgvZkb7lK6y92o/LjWydFOCkuj4KpKSJntqwFQEO/AeWAHhu7fkbQDAUmsQWT7zjR5ajB09tn6NBv4sszTiY+fugQ4K/OJkVw/eX3n2Uj6hbwCKfFirTOfQsKGfoNe0RGyXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C54EC4CED6;
-	Mon, 24 Feb 2025 18:00:08 +0000 (UTC)
-Date: Mon, 24 Feb 2025 18:00:05 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Peter Collingbourne <pcc@google.com>
-Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot
- creation
-Message-ID: <Z7yzpeIKcYiw6q5a@arm.com>
-References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
- <Z7xSfVME4z2ComUm@arm.com>
- <86ldtvr0nl.wl-maz@kernel.org>
- <Z7yElHKrJGn8XuPS@arm.com>
- <86jz9fqtbk.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LvxtVtmIqcda6U3Jw+eAu00UlzjFolPB/81wpKxUFNe9uEqdAWqQYR6oNPqeGWPqHvbrN+DjJkctcAK4NMH0CFY8o+CVCioHOb4HGiPJsKQQJ6qcxzKF1/vnyt7EbYL9dDIn+XJcAeHOb9/cPe/AXIFTQIRlwvooXtlLV9kBk+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A498152B;
+	Mon, 24 Feb 2025 10:03:23 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 654EE3F5A1;
+	Mon, 24 Feb 2025 10:03:06 -0800 (PST)
+Date: Mon, 24 Feb 2025 18:03:01 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Rob Herring <robh@kernel.org>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+Message-ID: <20250224180301.GI8144@e132581.arm.com>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+ <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org>
+ <20250224122507.GE8144@e132581.arm.com>
+ <CAL_Jsq+0fZ2uasgAam7qGTdCeDBQxXeyL-J1_suyxy6GE_ERTg@mail.gmail.com>
+ <20250224140317.GF8144@e132581.arm.com>
+ <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,70 +50,116 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86jz9fqtbk.wl-maz@kernel.org>
+In-Reply-To: <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
 
-On Mon, Feb 24, 2025 at 03:02:39PM +0000, Marc Zyngier wrote:
-> On Mon, 24 Feb 2025 14:39:16 +0000,
-> Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > This patch still prevents such MMIO+MTE mappings but moves the decision
-> > to user_mem_abort() and it's slightly more relaxed - only rejecting it
-> > if !VM_MTE_ALLOWED _and_ the Stage 2 is cacheable. The side-effect is
-> > that it allows device assignment into the guest since Stage 2 is not
-> > Normal Cacheable (at least for now, we have some patches Ankit but they
-> > handle the MTE case).
+On Mon, Feb 24, 2025 at 04:05:43PM +0000, Mark Rutland wrote:
+
+[...]
+
+> > > > Just a minor concern.  I don't see any handling for task migration.
+> > > > E.g., for a task is migrated from one CPU to another CPU, I expect we
+> > > > need to save and restore branch records based on BRBE injection.  So
+> > > > far, the driver simply invalidates all records.
+> > > >
+> > > > I think this topic is very likely discussed before.  If this is the
+> > > > case, please ignore my comment.  Except this, the code looks good
+> > > > to me.
+> > > 
+> > > Not really discussed on the list, but that was present in v18 (though
+> > > not functional because .sched_task() hook wasn't actually enabled) and
+> > > Mark removed it. His work is here[1].The only comment was:
+> > > 
+> > > Note: saving/restoring at context-switch doesn't interact well with
+> > > event rotation (e.g. if filters change)
+> > 
+> > In the brbe_enable() function, it "Merge the permitted branch filters
+> > of all events".  Based on current implementation, all events share the
+> > same branch filter.
 > 
-> The other side effect is that it also allows non-tagged cacheable
-> memory to be given to the MTE-enabled guest, and the guest has no way
-> to distinguish between what is tagged and what's not.
+> Critically, the brbe_enable() function merges the filters of all
+> *active* events which have been installed into hardware. It does not
+> track all events which can be rotated, and the resulting filter is not
+> the same -- it can change as a result of rotation.
 
-It can distinguish in the same way as the host does it, e.g. based on
-the firmware tables it gets - only assume the standard RAM can be
-tagged. Any device in its IPA space does not support tagging and, if
-mapped incorrectly, can trigger external aborts etc. But it's the
-responsibility of the VMM to set up the memory slots correctly. If those
-non-MTE slots are only used for device assignment, we'd not get any
--EFAULT returns.
+In a perf session has multiple events, and events have different branch
+filters, seems to me, a simple way is to return error for this case.
 
-Having the requirement that all address ranges assigned to a guest
-support MTE makes MTE and device assignment exclusive. FEAT_MTE_PERM
-doesn't help either, it only allows cacheable MMIO into guests safely
-(from an SError/random accesses perspective).
+I would argue BRBE is an IP for recording branches per CPU wise, it does
+not support recording for event wise.  If we can unify branch filter
+within a perf session, would this be much easier for handling?
 
-Anyway, I think I get what you mean. For those memory slots potentially
-mapped as cacheable at Stage 2 (e.g. a file mmap()), you'd rather block
-them upfront than confusing a potentially buggy VMM later with the
--EFAULT (or some other error).
+> > When event rotation happens, if without context switch, in theory we
+> > should can directly use the branch record (no invalidation, no injection)
+> > for all events.
+> 
+> No; that only works in *some* cases, and will produce incorrect results
+> in others.
+> 
+> For example, consider filtering. Imagine a PMU with a single counter,
+> and two events, where event-A filters for calls-and-returns and event-B
+> filters for calls-only. When switching from event-A to event-B, it's
+> theoretically possible to keep the existing records around, knowing that
+> the returns can be filtered out later. When switching from event-B to
+> event-A we cannot keep the existing records, since there are gaps
+> whenever a return should have been recorded.
 
-Do we have another way to tell in kvm_arch_prepare_memory_region()
-whether the memory is going to be mapped as Device/NC at Stage 2 or
-whether later we'll have FEAT_MTE_PERM set for it? We don't have any
-physical address at this point. However, we have vma->vm_page_prot but I
-was a big fan of this. Ankit's series for Cacheable VFIO is relying on
-this IIRC.
+Seems to me, the problem is not caused by event rotation.  We need to
+calculate a correct filter in the first place - the BRBE driver should
+calculate a superset for all filters of events for a session.  Then,
+generate branch record based event's specific filter.
 
-For VFIO specifically, we could do something like below. It won't
-trigger any -EFAULT exists. I think it's safe for VM_PFNMAP as well
-since these would not be mapped as Cacheable at Stage 2 AFAICT but we
-could add some additional checks.
+> There are a number of cases of that shape given the set of configurable
+> filters. In theory it's possible to retain those in some cases, but I
+> don't think that the complexity is justified.
+> 
+> Similarly, whenever kernel branches are recorded it's necessary to drop
+> the stale branches whenever branch recording is paused, as there's
+> necessarily a blackout period and hence a gap in the records.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1f55b0c7b11d..c48382567f2f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2184,7 +2184,12 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		if (!vma)
- 			break;
- 
--		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
-+		/*
-+		 * VM_ALLOW_ANY_UNCACHED vmas will be mapped as Normal
-+		 * NonCacheable at Stage 2 and safe with MTE in guests.
-+		 */
-+		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma) &&
-+		    !(vma->vm_flags & VM_ALLOW_ANY_UNCACHED)) {
- 			ret = -EINVAL;
- 			break;
- 		}
+If we save BRBE record when a process is switched out and then restore
+the record when a process is switched in, should we can keep a decent
+branch record for performance profiling?
 
--- 
-Catalin
+I understand it might be many things happen in the middle of a task
+switching or migration, but it is fine for not recording branches during
+the blackout period.  The missed branch records are not very helpful for
+forming a flow for a profiled program itself, especially, if we
+consider we will optimize userspace program in many cases.
+
+> Do you think that you have a case where losing branches across rotation
+> *really* matters?
+
+I agreed that event rotation case might be rare and complex.  Please see
+a comment below.
+
+> > For a context-switch case, we need to save and re-inject branch record.
+> > BRBE record sticks to a process context, no matter what events have been
+> > enabled.
+> 
+> I had originally wanted to keep per-event records around, but it doesn't
+> work in all cases. One reason events get discarded at context-switch
+> time is that CPU-bound events can sample branches, and would
+> mis-attribute stale userspace branches to the wrong context when
+> switching tasks. There are explicit comments about this in
+> amd_pmu_brs_sched_task() and intel_pmu_lbr_sched_task().
+> 
+> Given we discard records when reprogramming events, we *could* try to
+> preserve events in some cases, but I suspect that as with the rotation
+> case this'll be a lot of complexity for little gain. Note that as we
+> discard events when enabling the PMU, we'd throw some task-bound records
+> away anyway, and practically the gain would be limited to cpu-bound
+> records.
+> 
+> Do you have a reason why you think we *must* keep events around?
+
+Here I am really concerned are cases when a process is preempted or
+migrated.  The driver doesn't save and restore branch records for these
+cases, it just invalidates all records when a task is scheduled in.
+
+As a result, if an event overflow is close to context switch, it is
+likely to capture incomplete branch records.  For a userspace-only
+tracing, it is risk to capture empty branch record after preemption
+and migrations.
+
+Thanks,
+Leo
