@@ -1,57 +1,57 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DEF20D4F8
-	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 23:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3305C20C492
+	for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 23:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740441351; cv=none; b=mVwSUUmgCisuh9YlJM3CRzDk64cZjWE44Pj7oIFQNE7TGN8n/aFPOZMMqmr0GxBrPXeLmrRLzFnURsMONe2rgldrkldCBQJ+2j3USZBoJUN11qJmnnHEmE09WTHlHOoLCnujJpu4JtSFn5u3AMI3Atj0tOh1J00mPUmyzvKDwnQ=
+	t=1740441353; cv=none; b=bYZmwLV8GO+QtQCGxwBY8DEatzyD2kxb9rhHC017coGXVIEBgk5dxzRQ8gPHao3fRsgBHN3J37D/wxtF3XAKl4oErAKL79fr3fXp3MWJEo5gs38+Fojp5oih66Ufw8J9/ighHja8LdoH5JtnkziiLwW8ar8nJe72LRUoYGj+Z10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740441351; c=relaxed/simple;
-	bh=Pgnsnfhe7JEsCHeo8nxgfh9t3AoyozrxKe/Nn1f4YRk=;
+	s=arc-20240116; t=1740441353; c=relaxed/simple;
+	bh=4XGt0AThhPQKODAnl6NTLZpfJZyUD3zLteURrvwSqiE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OrjwXcGVjeMKbQhwYjmpZ1briQZarEd1A1zfwQeuJrPqQZ8xY2SwwFu5OzdgmC8wEj+XY7oJtc7U8mV0Wxkq23NzR9S+rpwVog/2k0Rkun57ACbgZd/J6Ugjit4UiYY4ECKEuQi/SL+stL8HsCdiijajX5xVYqqtHce5bY655k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MOArCPgr; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=cyMwqRvha0yL2OCLlwJX3ZmeMrh/6Z8IVzn/6v+NzUtrt0i5gmBlVhWETf/87vBmueJhteSIs67q72iILIQwVIyQjAPai7seZqjGVBFk842eaBLhs0q9bKiI/7BFYRkutiEo67r2kYWYo6UaaSGLK5gS5xs6cqH0vrEPat7DjIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QxoekT/c; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MOArCPgr"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f83e54432dso16611815a91.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 15:55:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QxoekT/c"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220cb5924a4so49385895ad.2
+        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 15:55:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740441349; x=1741046149; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1740441350; x=1741046150; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=TGU0ybTwy223eIpDzZVLI/W8vnqy8rZ9uLMIqzhcN/c=;
-        b=MOArCPgr112C91pIrtdQg9v+yxPZTkMwPqWi4DXQS65aIe2J7U27KrZFPvAfRHVcVY
-         RMGGzeEJaioqrvTl9zBwh6emM1G4O74iyura6zS7Nbxp1lkXx2WcVT6A3YfW3T8atF93
-         HKp2C21Dozpe+d8BY7CYoZ8a/6eB0MhDFUsLxlhiTV6iu9Fjd41IsVDO1/nBVeBLik8N
-         Tsc96Abe7Cvq6wbm6XRvEuD00RDla5C3NBh0XcOuIU4XGwii6+JS6Xw0FIAHbEp4mzgz
-         z/d3J1AW16WEKJezN0h6ZoxDO3biTi5Lj0QXm2aJSZ2PReyAuyuuKtqUZ/FNsvlQTc1P
-         bbAg==
+        bh=cX82JgrIVLcCgP8NY5WI6d8YhxJG+M3Mihkk6f4MOJg=;
+        b=QxoekT/cO6HbZ7oAQdqAxsAHDbKEMxWKm6NaG8aWmh/NW0Ff6fnmH7hGmeRRVdUq4t
+         56/YwKxBRd4MEjIBJXK/6UiiFOIHBUJV249aOd/ghzg+2/ka1vYMXu2FiYxEorD0vpcB
+         D7XHc3Hmo7R2CRFzLCIAkDeKXvgHvLzLt8raOnsYF+UWj3DG3zfC3ReGx3djaVjnxXRk
+         nThVCQhRIPTeuafKj7kMSUXhHDaBvxhy4DuKg6mvWDoR9wWTkAqHadeu3UCyHQkIagTB
+         mDgiEIT+lxKeUaqhvzEnOXIXU+ey9vzi9MLlqjsuoHeNzz2bMdCTxrqHX1xwEa3NFmnG
+         xb0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740441349; x=1741046149;
+        d=1e100.net; s=20230601; t=1740441350; x=1741046150;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TGU0ybTwy223eIpDzZVLI/W8vnqy8rZ9uLMIqzhcN/c=;
-        b=Kvd1cbWDMpPUXmISfwC61z2U0/LOEXNeILa3z9NWp66p3yctQiDJf/fzV9RvzqB3Ft
-         CcY83D2crqcSb1KYUU9FohBLdIzmCznxOC+3jJBa0JzsBeDjlYnU0qEXeBxzAAU9WQdK
-         FGIklHFse3xd6fnxdO8sKnBdfiM2/egrwsTdNtzRph2Yp+QaPezYLMgiAGoMskcNs27f
-         04EJp4Qq3IzIr1Onct+18YZk7PXugeyV1wXX8KJM4PiRqNdt8IriajFR/KbXmKaKf+2o
-         lrf6EHxM5BTDvwz1+whRAfsIw3N4XnzoFAZcjqrvfMsMq5Pj3R6RoJ0x9mP6+fYOU0Gb
-         pljg==
-X-Forwarded-Encrypted: i=1; AJvYcCWgExjvyZ3K8yHkSTAVeYtVK/D+APFPjunEQBc1Nu797V/wIbiV97rot/JC9P4SOCfcTBxAy9A=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx9soMroA8etWaa3QFFC/lSLIYOLwMkVLeUehZbb6fJk/fDs8Gj
-	WiEUR5owVkLoD6KXrABuzCCPtDcCs/3MlEzNDZ/5PhRfXHbHTlUJy49CNQS3GkHsfUZHN7NBKuL
-	bxg==
-X-Google-Smtp-Source: AGHT+IHcos0szxLwYcsW2Q/WbhHjoZ/1wFjhF3Xa+8fw1kzKNZT2q6/VDS58iA2uFYrVe3USusRDS/R8AlY=
-X-Received: from pjbnb15.prod.google.com ([2002:a17:90b:35cf:b0:2fc:b544:749e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7cd:b0:2fa:17d2:166
- with SMTP id 98e67ed59e1d1-2fce7b40077mr23992311a91.31.1740441348957; Mon, 24
- Feb 2025 15:55:48 -0800 (PST)
+        bh=cX82JgrIVLcCgP8NY5WI6d8YhxJG+M3Mihkk6f4MOJg=;
+        b=poqYH7L/8P9aYcCHoW83Z59vfuFYwppzBtYVdX+Ljzmc2GxsRpNp0xxTfjjje0MWOK
+         gICHcFshIELo6eJGb1CjRTLQyP+NGGJyrR9S8JIvN59KaSoyr18MXrHZB7lQ12ocsgUO
+         tTE5wgaXmf6iUOYidCKKsRPAmQyLAobT8kf3QFMubHfzSug9KTdhQMvkXQ+xFxcsDDme
+         TcaPw44608bTl35kYihYTaKH3Ldr6XdEs69tsueU7G9/ONtGPSvmVyb8OjXLABl6zvIz
+         7uvduqsIKxM5jzL5zKRssChzz8bLgPtvBp0jEn2pYocrZGlVqVUOCCSDKlNMeko5C/pO
+         6GVw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVGgNDJ6Rq/rAY9nYJgQO0Mn2Vbe0xRTlCAxGg0Z+AR5Qyk84AmgUHKNS1h8RB3xF8Plk8hiU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxcuMUCgGzG6fM8L3phTdzVGZIbxD/34Dp2CXk8sHpnRs2pswXF
+	xHyrgFwXSXG0AYzOiZ66+XZzixZ5Accfzziktbq0hV3HOFAgvHUoxYLtjLErbJM0GSsFIwMS44l
+	TLw==
+X-Google-Smtp-Source: AGHT+IGsyGC9C+MeujnUnW2nPba4jsQ7IgXXOkNko0b7VAiFOZ5bP8OY6ummej4/xlJQLwWUr2RcXaF45Ig=
+X-Received: from pjbse14.prod.google.com ([2002:a17:90b:518e:b0:2ef:78ff:bc3b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2f8d:b0:220:d81d:f521
+ with SMTP id d9443c01a7336-22307e72198mr15100345ad.51.1740441350608; Mon, 24
+ Feb 2025 15:55:50 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 24 Feb 2025 15:55:37 -0800
+Date: Mon, 24 Feb 2025 15:55:38 -0800
 In-Reply-To: <20250224235542.2562848-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250224235542.2562848-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250224235542.2562848-3-seanjc@google.com>
-Subject: [PATCH 2/7] KVM: nVMX: Process events on nested VM-Exit if injectable
- IRQ or NMI is pending
+Message-ID: <20250224235542.2562848-4-seanjc@google.com>
+Subject: [PATCH 3/7] KVM: Assert that a destroyed/freed vCPU is no longer visible
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -82,46 +81,43 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Process pending events on nested VM-Exit if the vCPU has an injectable IRQ
-or NMI, as the event may have become pending while L2 was active, i.e. may
-not be tracked in the context of vmcs01.  E.g. if L1 has passed its APIC
-through to L2 and an IRQ arrives while L2 is active, then KVM needs to
-request an IRQ window prior to running L1, otherwise delivery of the IRQ
-will be delayed until KVM happens to process events for some other reason.
+After freeing a vCPU, assert that it is no longer reachable, and that
+kvm_get_vcpu() doesn't return garbage or a pointer to some other vCPU.
+While KVM obviously shouldn't be attempting to access a freed vCPU, it's
+all too easy for KVM to make a VM-wide request, e.g. via KVM_BUG_ON() or
+kvm_flush_remote_tlbs().
 
-The missed failure is detected by vmx_apic_passthrough_tpr_threshold_test
-in KVM-Unit-Tests, but has effectively been masked due to a flaw in KVM's
-PIC emulation that causes KVM to make spurious KVM_REQ_EVENT requests (and
-apparently no one ever ran the test with split IRQ chips).
+Alternatively, KVM could short-circuit problematic paths if the VM's
+refcount has gone to zero, e.g. in kvm_make_all_cpus_request(), or KVM
+could try disallow making global requests during teardown.  But given that
+deleting the vCPU from the array Just Works, adding logic to the requests
+path is unnecessary, and trying to make requests illegal during teardown
+would be a fool's errand.
 
-Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ virt/kvm/kvm_main.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bca2575837ce..8220b09e91ce 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5084,6 +5084,17 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 
- 		load_vmcs12_host_state(vcpu, vmcs12);
- 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 201c14ff476f..991e8111e88b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -489,6 +489,14 @@ void kvm_destroy_vcpus(struct kvm *kvm)
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		kvm_vcpu_destroy(vcpu);
+ 		xa_erase(&kvm->vcpu_array, i);
++
 +		/*
-+		 * Process events if an injectable IRQ or NMI is pending, even
-+		 * if the event is blocked (RFLAGS.IF is cleared on VM-Exit).
-+		 * If an event became pending while L2 was active, KVM needs to
-+		 * either inject the event or request an IRQ/NMI window.  SMIs
-+		 * don't need to be processed as SMM is mutually exclusive with
-+		 * non-root mode.  INIT/SIPI don't need to be checked as INIT
-+		 * is blocked post-VMXON, and SIPIs are ignored.
++		 * Assert that the vCPU isn't visible in any way, to ensure KVM
++		 * doesn't trigger a use-after-free if destroying vCPUs results
++		 * in VM-wide request, e.g. to flush remote TLBs when tearing
++		 * down MMUs, or to mark the VM dead if a KVM_BUG_ON() fires.
 +		 */
-+		if (kvm_cpu_has_injectable_intr(vcpu) || vcpu->arch.nmi_pending)
-+			kvm_make_request(KVM_REQ_EVENT, vcpu);
- 		return;
++		WARN_ON_ONCE(xa_load(&kvm->vcpu_array, i) || kvm_get_vcpu(kvm, i));
  	}
  
+ 	atomic_set(&kvm->online_vcpus, 0);
 -- 
 2.48.1.658.g4767266eb4-goog
 
