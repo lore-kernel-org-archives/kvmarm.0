@@ -1,186 +1,203 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A18199396
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 19:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CAC1DC9BB
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 19:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740510255; cv=none; b=ssWpGk5demdvSjxD+HPpoyb3tRzqoTnnSKlqkqcVtQU0zcNcg7K2wwOpGUt4Q65BMA/xthYfY5EfoDivL+X+75oeIbawbSsEz4ilmp2K8vxCrgi79Sf2lCZYsWACJzQFij96Ip2i+ngd/zni7L6v0D7OkVQLKy0zTA44j86L2Tc=
+	t=1740512820; cv=none; b=E64W+4OvYk9X5AfcV14NveQlbiZNPFSupJEGWLZgHxffoDLAzWmmNg7a5uxh1fR7Jaj3N7Pkgxkg3Lt7xBnstqQjZQBBC2CL/DsShXhIAdtjFhNUQa8D6Z1Ijf4/96FnTZihDQ8Q298u8PZy+2P218y3iVmGLmO2NBjwrL0UXpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740510255; c=relaxed/simple;
-	bh=wx9QBU6tAnYYzEaE8trWwMY6LtChTs+QPBWHOskxTn4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E283zmpT1SN9ov7jkzw2yumN81lBQzP0fdb/yyKa7ukXzr6KXIrZpeTzkW2xafKBZmXQnNDrVbMYRyhvmibSHP8WmZ19qDBhP699n6f12wjOT2isawrAxMDZ4QrLxf+Npqi7JMZUMWl1MU2DLTay1dSWg472ChrhGfKdN42oDK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuK41+cu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuK41+cu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC81C4CEDD
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 19:04:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740510255;
-	bh=wx9QBU6tAnYYzEaE8trWwMY6LtChTs+QPBWHOskxTn4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=NuK41+cuisBhgv68qrrFTmegIiuQQ4fGmRPyXfR1HhatqCON8eIfYmFhej6MHWORk
-	 +Q95vz/0opiqOtIBbycCpiKUjLgCIFrHSXG+EjiiuOosxHz6SvZlqP0guZ5s1j7dG0
-	 0e35f0SqSFh7hnLinpSEnO9UhaU2+cdXthav/tetooLdYdeZlHTX25mfF4fiuI8vzm
-	 NSazbjJQwKMFn8oYWFN2wx4z1SBDYt8C8nZrtjk8+mYcTzFynuzZ7Yz+ocKdRNFjlE
-	 tkx1vQbIAAET5yYzIlKqG2GGMDFSSVQtZoNUHdqicOzwrIiWnQ7i1ZbTJ+rDGlJkq9
-	 diELxR40MH/Hw==
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abbae92be71so655114466b.2
-        for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 11:04:15 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXOXKRqo2BwpmGh9axVmYCvDgcwvkWrZxTnk6QkJuULAzgQUOf0l4CQuK8lu91gZQRXizsFp7U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxM5Bi0wu42gleNGHJQjnqVcHe5VmJZZ/aguGgUfhqfys7Y14+6
-	6IXvUS2dki27cH4AAwjaMRS9kGIMXAHN5Nau8W1AhdjhJ1yEBFYcxFuDGJFNbxl/1O3C001ahGW
-	u34rBYnJkqDjG35u63PWNn+NwDg==
-X-Google-Smtp-Source: AGHT+IFar3mUfJFrfU/deMFPxUePXViU9VyVdcqCg6mKkuZ0S3VY/6Gk/ZI9rjPALypohCRcts86IPwkHDA1LjRRrSA=
-X-Received: by 2002:a05:6402:34d5:b0:5e0:82a0:50ce with SMTP id
- 4fb4d7f45d1cf-5e44ba424d9mr10074864a12.27.1740510253810; Tue, 25 Feb 2025
- 11:04:13 -0800 (PST)
+	s=arc-20240116; t=1740512820; c=relaxed/simple;
+	bh=Yzp6lKg+7SjzmD6dfCLSBo9k8WYw3TmI0cYZCPNUKn4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LAQx0WVU+yob1lyR5qo3j2wKiViHK2CP+mP3BEJh065W6kosYryYFPx4al+fKHNOu+TchjPCDAheS2LTT0VY6j51uzI4AhsEnbsc6TWfS+BLBL32b4aqLpuy+gGKhtLgGYpM7xzQAlcGaq2wnBYkfrzjSfuGWTwKCe5rWuy6kJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43906152B;
+	Tue, 25 Feb 2025 11:47:14 -0800 (PST)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E65263F5A1;
+	Tue, 25 Feb 2025 11:46:55 -0800 (PST)
+Date: Tue, 25 Feb 2025 19:46:53 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Leo Yan <leo.yan@arm.com>
+Cc: Rob Herring <robh@kernel.org>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+Message-ID: <Z74eLRTcVym4sMqh@J2N7QTR9R3.cambridge.arm.com>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+ <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org>
+ <20250224122507.GE8144@e132581.arm.com>
+ <CAL_Jsq+0fZ2uasgAam7qGTdCeDBQxXeyL-J1_suyxy6GE_ERTg@mail.gmail.com>
+ <20250224140317.GF8144@e132581.arm.com>
+ <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
+ <20250224180301.GI8144@e132581.arm.com>
+ <CAL_JsqKNad6eEBerUOco=SDWxdp6dgRD3FDrSt5OpGQYwwstSg@mail.gmail.com>
+ <20250225123813.GA1821331@e132581.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
- <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org> <20250224122507.GE8144@e132581.arm.com>
- <CAL_Jsq+0fZ2uasgAam7qGTdCeDBQxXeyL-J1_suyxy6GE_ERTg@mail.gmail.com>
- <20250224140317.GF8144@e132581.arm.com> <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
- <20250224180301.GI8144@e132581.arm.com> <Z72xMLsd37I6X_5-@J2N7QTR9R3> <20250225174803.GB1821331@e132581.arm.com>
-In-Reply-To: <20250225174803.GB1821331@e132581.arm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 25 Feb 2025 13:04:01 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqKyiUYXLBxr_5kKyojXLsdkoRivtntmzPq-kjWv2V+Y=w@mail.gmail.com>
-X-Gm-Features: AQ5f1Jp6KAiLK5EIt7HxRu_fbcAPSrUpDqbcWrQjPWGul4dbIwchehQ5jnZ8SKs
-Message-ID: <CAL_JsqKyiUYXLBxr_5kKyojXLsdkoRivtntmzPq-kjWv2V+Y=w@mail.gmail.com>
-Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-To: Leo Yan <leo.yan@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	James Clark <james.clark@linaro.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250225123813.GA1821331@e132581.arm.com>
 
-On Tue, Feb 25, 2025 at 11:48=E2=80=AFAM Leo Yan <leo.yan@arm.com> wrote:
->
-> On Tue, Feb 25, 2025 at 12:01:52PM +0000, Mark Rutland wrote:
->
+On Tue, Feb 25, 2025 at 12:38:13PM +0000, Leo Yan wrote:
+> On Mon, Feb 24, 2025 at 07:31:52PM -0600, Rob Herring wrote:
+> 
 > [...]
->
-> > > > Critically, the brbe_enable() function merges the filters of all
-> > > > *active* events which have been installed into hardware. It does no=
-t
-> > > > track all events which can be rotated, and the resulting filter is =
-not
-> > > > the same -- it can change as a result of rotation.
+> 
+> > > > > When event rotation happens, if without context switch, in theory we
+> > > > > should can directly use the branch record (no invalidation, no injection)
+> > > > > for all events.
+> > > >
+> > > > No; that only works in *some* cases, and will produce incorrect results
+> > > > in others.
+> > > >
+> > > > For example, consider filtering. Imagine a PMU with a single counter,
+> > > > and two events, where event-A filters for calls-and-returns and event-B
+> > > > filters for calls-only. When switching from event-A to event-B, it's
+> > > > theoretically possible to keep the existing records around, knowing that
+> > > > the returns can be filtered out later. When switching from event-B to
+> > > > event-A we cannot keep the existing records, since there are gaps
+> > > > whenever a return should have been recorded.
 > > >
-> > > In a perf session has multiple events, and events have different bran=
-ch
-> > > filters, seems to me, a simple way is to return error for this case.
-> >
-> > FWIW, I'd generally prefer to do that since it avoids a number of
-> > horrible edge-cases and gets rid of the need to do SW filtering, which
-> > falls somewhere between "tricky" and "not entirely possible". However,
-> > that's not what LBR and others do, which is why we went with filter
-> > merging.
-> >
-> > If folk on the tools side are happy with the kernel rejecting
-> > conflicting events, then I'd be more than happy to do that. What I don'=
-t
-> > want is that we start off with that approach and people immediately
-> > start to complain that the BRBE driver rejects events that the LBR
-> > driver accepts.
-> >
-> > See the last time this came up.
->
-> Thanks for the shared links.  Based on the info, let's say we can have tw=
-o
-> cases:
->
->   Case 1: set different branch filters in a single perf session:
->
->     perf record -e armv8_pmuv3_0/r03,branch_type=3Dany_call/u \
->                 -e armv8_pmuv3_0/r04,branch_type=3Dany_ret/k ...
->
->   Case 2: set different branch filters in multiple perf sessions:
->
->     perf record -e armv8_pmuv3_0/r03,branch_type=3Dany_call/u ...
->
->     perf record -e armv8_pmuv3_0/r04,branch_type=3Dany_ret/k ...
->
-> In my previous reply, I was suggesting that we should reject the case 1.
+> > > Seems to me, the problem is not caused by event rotation.  We need to
+> > > calculate a correct filter in the first place - the BRBE driver should
+> > > calculate a superset for all filters of events for a session.  Then,
+> > > generate branch record based event's specific filter.
+> > 
+> > The driver doesn't have enough information. If it is told to schedule
+> > event A, it doesn't know anything about event B. It could in theory
+> > try to remember event B if event B had already been scheduled, but it
+> > never knows when event B is gone.
+> 
+> E.g., I tried below command for enabling 10 events in a perf session:
+> 
+>   perf record -e armv9_nevis/r04/ -e armv9_nevis/r05/ \
+>               -e armv9_nevis/r06/ -e armv9_nevis/r07/ \
+>               -e armv9_nevis/r08/ -e armv9_nevis/r09/ \
+>               -e armv9_nevis/r10/ -e armv9_nevis/r11/ \
+>               -e armv9_nevis/r12/ -e armv9_nevis/r13/ \
+>               -- sleep 1
+> 
+> For Arm PMU, the flow below is invoked for every event on every
+> affinied CPU in initialization phase:
+> 
+>   armpmu_event_init() {
+>     armv8pmu_set_event_filter();
+>   }
+> 
+> Shouldn't we calculate a superset branch filter for all events, store
+> it into a per-CPU data structure and then apply the filter on BRBE?
 
-The driver cannot distinguish those 2 cases.
+Should we? No.
 
-> IMO, it is not quite useful to configure different filters for events in
-> the same session, especially if this leads complexity in the driver due
-> to the hardware limitation.
->
-> For case 2, when create a new session, if the perf tool can read out the
-> current branch filter setting (e.g. via sysfs node) and give suggestion
-> what branch filter is compabile with existed sessions, seems to me, this
-> is a feasible solution.  My understanding this is a rare case, and a
-> clear guidance for users would be sufficient if this happens.  (Maybe
-> we can give recommendation for how to use BRBE in the perf doc).
+*NONE* of the events in your example are CPU-bound, and the call to
+armpmu_event_init() can happen on an arbitrary CPU which the relevant
+event never actually runs on, while other unrelated events may run on
+that CPU.
 
-First, I don't think anything currently in sysfs for PMU changes based
-on current PMU usage. It is all static features. So you just added a
-2nd control interface in addition to the syscall/ioctl interface. It
-is also totally racy. As soon as you read sysfs, the information could
-be out of date because an event was added or removed.
+It makes no sense for armv8pmu_set_event_filter() to write to a per-cpu
+structure. That's purely there to determine what the filters *should* be
+when *that specific event* is programmed into hardware.
 
-Second, that is completely different from how x86 works. Folks don't
-want to know how to use BRBE. They want to do perf branch stack
-recording like they already do on existing platforms. That's what has
-been implemented here with the behavior as close as possible even for
-corner cases that seem questionable. For the userspace counter access
-support, folks were upset that it has to be explicitly enabled (in
-sysctl) and requested (in a configX bit) when you don't on x86. People
-notice and care if the behavior is different.
+As Rob and I have pointed out already, the *only* thing that can be
+relevant to deciding the configuration of HW filtering is the set of
+events which are *active* on that CPU.
 
-> To be clear, an important factor is the trace modes with modifier 'u'
-> (user) and 'k' (kernel) should be supported for different events and for
-> different sessions.  In a mixed cases (some events are userspace only
-> and some are kernel only), the BRBE driver needs to filter out branch
-> records for specific mode when taking a sample.
->
-> > > If we can unify branch filter within a perf session, would this be
-> > > much easier for handling?
-> >
-> > Do you mean if the perf tool ensured that all events in a given session
-> > had the same filter? From the kernel's PoV there's no such thing as a
-> > "perf session", and I'm not sure whether you're suggesting doing that i=
-n
-> > userspace or withing the kernel.
->
-> My understanding is this would be not difficult to do such kind checking
-> in the tool.  E.g., the perf tool can iterate every event and check the
-> branch filter and detect incompabile issue.
+> > > > There are a number of cases of that shape given the set of configurable
+> > > > filters. In theory it's possible to retain those in some cases, but I
+> > > > don't think that the complexity is justified.
+> > > >
+> > > > Similarly, whenever kernel branches are recorded it's necessary to drop
+> > > > the stale branches whenever branch recording is paused, as there's
+> > > > necessarily a blackout period and hence a gap in the records.
+> > >
+> > > If we save BRBE record when a process is switched out and then restore
+> > > the record when a process is switched in, should we can keep a decent
+> > > branch record for performance profiling?
+> > 
+> > Keep in mind that there's only 64 branches recorded at most. How many
+> > branches in a context switch plus reconfiguring the PMU? Not a small
+> > percentage of 64 I think. In traces where freeze on overflow was not
+> > working (there's an example in v18), just the interrupt entry until
+> > BRBE was stopped was a significant part of the trace. A context switch
+> > is going to be similar.
+> 
+> That is true for kernel mode enabled tracing.  But we will have no
+> such kind noises for userspace only mode tracing.
 
-You could detect that in perf tool, but you can never do it in every
-tool because anyone can write their own.
+As mentioned elsewhere, it's not a problem for x86, so why is it
+magically a problem for arm64?
 
-> > Doing that in the perf tool would certianly make a stronger argument fo=
-r
-> > the kernel taking the "reject conflicting branch filters" option.
-> >
-> > Doing that within the kernel isn't really possible.
->
-> As said above, if the BRBE driver can provide a knob in sysfs to indicate
-> what is the current branch filter in the existed sessions, this would be
-> helpful for the tool to do the checking and remind users.
->
-> I haven't done any experiments for this. If you think this is the way
-> to move forward, I might do a prototype and get back to you to ensure we
-> don't run into any unexpected issues.
+> > > > Do you have a reason why you think we *must* keep events around?
+> > >
+> > > Here I am really concerned are cases when a process is preempted or
+> > > migrated.  The driver doesn't save and restore branch records for these
+> > > cases, it just invalidates all records when a task is scheduled in.
+> > >
+> > > As a result, if an event overflow is close to context switch, it is
+> > > likely to capture incomplete branch records.  For a userspace-only
+> > > tracing, it is risk to capture empty branch record after preemption
+> > > and migrations.
+> > 
+> > There's the same risk if something else is recording kernel branches
+> > when you are recording userspace only. I think the user has to be
+> > aware if other things like context switches are perturbing their data.
+> 
+> I am confused for the decription above.  Does it refer to branch
+> recording cross different sessions?  It is fine for me that the branch
+> data is interleaved by different sessions (e.g. one is global tracing
+> and another is only per-thread tracing).
 
-I don't think anyone does. I think this whole discussion has gone into
-the weeds.
+Imagine that there's an existing process with some pid ${PID}, and
+concurrently, the following commands are run, either by the same user or
+different users with appropriate permissions:
 
-Rob
+	# Trying to record user branches only
+	perf record -j any,u -e cycles -p ${PID}
+
+	# Trying to record kernel branches only
+	perf record -j any,k -e cycles -p ${PID}
+
+Whatever you do, the task trying to record user branches only will lose
+some records:
+
+* If we make the events mutually exclusive, the branches will only be
+  recorded when the user event is installed.
+
+* If we merge the HW filters and later apply a SW filter, it's very
+  likely that kernel branches taken after exception entry have filled
+  all the records, and there are no user branches left to sample.
+
+> We might need to consider an intact branch record for the single perf
+> session case.  E.g. if userspace program calls:
+> 
+>     func_a -> func_b -> func_c
+> 
+> In a case for only userspace tracing, we will have no chance to preserve
+> the call sequence of these functions after the program is switched out.
+
+If those functions are small, it's very likely that they'll all be in
+the branch history. If they're so large that they're not executed in one
+scheduling quantum, do you expect them to fall within the same event
+period?
+
+I think that you're making a big deal out of an edge case that doesn't
+matter much in practice.
+
+Mark.
