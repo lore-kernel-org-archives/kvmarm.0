@@ -1,32 +1,32 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382FE440C
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 00:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C9E31A89
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 00:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740444858; cv=none; b=MqWwoPRzqONALXEgoEELKASTHmAjpGG6GZriVY6skPPZXLsCOi+jkGX8oaNsjepgbyEC/lRv5GU53u3besR50oHtyWN/VVBMmciicTW62rGwXBza9ybzp/Q1yRERrf+58w1SReCry8ahWmB6fJcUgWCYZgXLMvfCoJhstSMwXAU=
+	t=1740444860; cv=none; b=SN15RNXbu5XqVjv9fZ19rv8491yWXtygcH8VwcOHnMag3qmOOFEyk+MpHOQctN2Tf/78t6E3ktycL6ayzpS0AawxsmuQyfwn9nuA4WZ0mXGbBcVzNAA2YgK3xzqBR0imtlJcygrMz+gR+18FTAPrmVWBVjpTACtEty3Rim5bDVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740444858; c=relaxed/simple;
-	bh=kn3KSikc4OQ6YMQFjkSXdqIfqtGHl/n7MT62OoYTVNg=;
+	s=arc-20240116; t=1740444860; c=relaxed/simple;
+	bh=kbzVxBHERXhmFA4rPaD5Ciic7+4ApQfi1QHxFauMj54=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sBhrZXMioV+oFT39J2ktMnCdmr9DjO2A3litO/EHjx0+gLrCiE3zqjV9i3idbI8iX9za52aiZYguBjyDABfECP2oGIPNhMI3/c7arevWm0m5UtelY1cRf5xa/BRUnUgHJvWNYm/mCtk0YblsNB1kO2JolV1AI1vbzCIe4oAEzFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=utuZWnCr; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version; b=okaNOGtEs5R3Z5XHXLY/JlKtUc3J0RvADiuwMSRqT1f/SoYKN2dcZ6gI24GYCIXnmz4/DM9w8ILu7rgPqU4GraXw99ld/yQkvWGr6q+4CplkSM8lIVdcm741MPcP5XjUAhkn1nMK5rwniYHeR9folluIezWgczSRU3Vjjx4aIJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aZywtJQc; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="utuZWnCr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aZywtJQc"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740444855;
+	t=1740444857;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/uyGg2C6XpYRON4kpdzxQ7BFVLsGm/sKldropUoIp7w=;
-	b=utuZWnCrKZU953SzEdqJCLBu7mpDzeIknEBhOnTuNiUHhMC38Ma7tB9+cYvTtWGMQpUZVJ
-	XlNHyTEMIMApdxBocpc6CsjRzOXvMEiW8VB/CTAzw3zHuLzXCIGq+p+/SizpnoOuQBUR4n
-	hcJ15DqHLeLoqNChnqHkrsPupUpYxkc=
+	bh=4u5aO5ixUbcJsSky7y8P7F36pro8YcVt4SzFHlfx2p8=;
+	b=aZywtJQcyDqj2CyV27W5tDaCqSZdZd8dsmkgpkeifHAepeh31B02PVNNPbXBcyH5D0IlNc
+	K2vxXSUFSVKsJ6LU27cAv/xqX5N6M1ZVyYp+u1HmToFVjgUY/mlnMjSkv1U/p0V3TGOhqK
+	cH/XWDABxzSafUvJjLoLsceLXW2umdI=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Sebastian Ott <sebott@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 2/5] KVM: arm64: Maintain per-VM copy of implementation ID regs
-Date: Mon, 24 Feb 2025 16:53:58 -0800
-Message-Id: <20250225005401.679536-3-oliver.upton@linux.dev>
+Subject: [PATCH v4 3/5] KVM: arm64: Load VPIDR_EL2 with the VM's MIDR_EL1 value
+Date: Mon, 24 Feb 2025 16:53:59 -0800
+Message-Id: <20250225005401.679536-4-oliver.upton@linux.dev>
 In-Reply-To: <20250225005401.679536-1-oliver.upton@linux.dev>
 References: <20250225005401.679536-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,133 +48,130 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Sebastian Ott <sebott@redhat.com>
+Userspace will soon be able to change the value of MIDR_EL1. Prepare by
+loading VPIDR_EL2 with the guest value for non-nested VMs.
 
-Get ready to allow changes to the implementation ID registers by
-tracking the VM-wide values.
+Since VPIDR_EL2 is set for any VM, get rid of the NV-specific cleanup of
+reloading the hardware value on vcpu_put(). And for nVHE, load the
+hardware value before switching to the host.
 
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h |  9 +++++++
- arch/arm64/kvm/sys_regs.c         | 43 ++++++++++++++++---------------
- 2 files changed, 31 insertions(+), 21 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  8 ++++++-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |  4 +++-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 28 ++++++++--------------
+ 3 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cfa024de4e3..bc5e8a5620ac 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -373,6 +373,9 @@ struct kvm_arch {
- #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
- 	u64 id_regs[KVM_ARM_ID_REG_NUM];
- 
-+	u64 midr_el1;
-+	u64 revidr_el1;
-+	u64 aidr_el1;
- 	u64 ctr_el0;
- 
- 	/* Masks for VNCR-backed and general EL2 sysregs */
-@@ -1471,6 +1474,12 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
- 		return &ka->id_regs[IDREG_IDX(reg)];
- 	case SYS_CTR_EL0:
- 		return &ka->ctr_el0;
-+	case SYS_MIDR_EL1:
-+		return &ka->midr_el1;
-+	case SYS_REVIDR_EL1:
-+		return &ka->revidr_el1;
-+	case SYS_AIDR_EL1:
-+		return &ka->aidr_el1;
- 	default:
- 		WARN_ON_ONCE(1);
- 		return NULL;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f25a157622e3..de66ffab3a2b 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1653,15 +1653,24 @@ static bool is_feature_id_reg(u32 encoding)
-  * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
-  * (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8, which is the range of ID
-  * registers KVM maintains on a per-VM basis.
-+ *
-+ * Additionally, the implementation ID registers and CTR_EL0 are handled as
-+ * per-VM registers.
-  */
- static inline bool is_vm_ftr_id_reg(u32 id)
- {
--	if (id == SYS_CTR_EL0)
-+	switch (id) {
-+	case SYS_CTR_EL0:
-+	case SYS_MIDR_EL1:
-+	case SYS_REVIDR_EL1:
-+	case SYS_AIDR_EL1:
- 		return true;
-+	default:
-+		return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-+			sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-+			sys_reg_CRm(id) < 8);
- 
--	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
--		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
--		sys_reg_CRm(id) < 8);
-+	}
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 76ff095c6b6e..6e6d13580377 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -43,6 +43,11 @@ static inline u64 *ctxt_mdscr_el1(struct kvm_cpu_context *ctxt)
+ 	return &ctxt_sys_reg(ctxt, MDSCR_EL1);
  }
  
- static inline bool is_vcpu_ftr_id_reg(u32 id)
-@@ -2530,36 +2539,27 @@ static void init_imp_id_regs(void)
- 	boot_cpu_aidr_val = read_sysreg(aidr_el1);
++static inline u64 ctxt_midr_el1(struct kvm_cpu_context *ctxt)
++{
++	return read_cpuid_id();
++}
++
+ static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ {
+ 	*ctxt_mdscr_el1(ctxt)	= read_sysreg(mdscr_el1);
+@@ -168,8 +173,9 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
  }
  
--static int get_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
--			  u64 *val)
-+static u64 reset_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+-					      u64 mpidr)
++					      u64 midr, u64 mpidr)
  {
- 	switch (reg_to_encoding(r)) {
- 	case SYS_MIDR_EL1:
--		*val = boot_cpu_midr_val;
--		break;
-+		return boot_cpu_midr_val;
- 	case SYS_REVIDR_EL1:
--		*val = boot_cpu_revidr_val;
--		break;
-+		return boot_cpu_revidr_val;
- 	case SYS_AIDR_EL1:
--		*val = boot_cpu_aidr_val;
--		break;
-+		return boot_cpu_aidr_val;
- 	default:
--		WARN_ON_ONCE(1);
--		return -EINVAL;
-+		KVM_BUG_ON(1, vcpu->kvm);
-+		return 0;
- 	}
++	write_sysreg(midr,				vpidr_el2);
+ 	write_sysreg(mpidr,				vmpidr_el2);
+ 
+ 	if (has_vhe() ||
+diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+index dba101565de3..3cc613cce5f5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+@@ -28,7 +28,9 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
+ 
+ void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
++	u64 midr = ctxt_midr_el1(ctxt);
++
++	__sysreg_restore_el1_state(ctxt, midr, ctxt_sys_reg(ctxt, MPIDR_EL1));
+ 	__sysreg_restore_common_state(ctxt);
+ 	__sysreg_restore_user_state(ctxt);
+ 	__sysreg_restore_el2_return_state(ctxt);
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index 90b018e06f2c..3814b0b2c937 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -87,11 +87,12 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+ 	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
+ 	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
+ 
+-	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
+-	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
+-	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
+-	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
+-	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
++	write_sysreg(ctxt_midr_el1(&vcpu->arch.ctxt),			vpidr_el2);
++	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),			vmpidr_el2);
++	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),		SYS_MAIR);
++	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),		SYS_VBAR);
++	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),		SYS_CONTEXTIDR);
++	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),		SYS_AMAIR);
+ 
+ 	if (vcpu_el2_e2h_is_set(vcpu)) {
+ 		/*
+@@ -191,7 +192,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+ 	struct kvm_cpu_context *host_ctxt;
+-	u64 mpidr;
++	u64 midr, mpidr;
+ 
+ 	host_ctxt = host_data_ptr(host_ctxt);
+ 	__sysreg_save_user_state(host_ctxt);
+@@ -220,23 +221,18 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+ 		__sysreg_restore_vel2_state(vcpu);
+ 	} else {
+ 		if (vcpu_has_nv(vcpu)) {
+-			/*
+-			 * Use the guest hypervisor's VPIDR_EL2 when in a
+-			 * nested state. The hardware value of MIDR_EL1 gets
+-			 * restored on put.
+-			 */
+-			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
 -
--	return 0;
+ 			/*
+ 			 * As we're restoring a nested guest, set the value
+ 			 * provided by the guest hypervisor.
+ 			 */
++			midr = ctxt_sys_reg(guest_ctxt, VPIDR_EL2);
+ 			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
+ 		} else {
++			midr = ctxt_midr_el1(guest_ctxt);
+ 			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
+ 		}
+ 
+-		__sysreg_restore_el1_state(guest_ctxt, mpidr);
++		__sysreg_restore_el1_state(guest_ctxt, midr, mpidr);
+ 	}
+ 
+ 	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
+@@ -271,9 +267,5 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
+ 	/* Restore host user state */
+ 	__sysreg_restore_user_state(host_ctxt);
+ 
+-	/* If leaving a nesting guest, restore MIDR_EL1 default view */
+-	if (vcpu_has_nv(vcpu))
+-		write_sysreg(read_cpuid_id(),	vpidr_el2);
+-
+ 	vcpu_clear_flag(vcpu, SYSREGS_ON_CPU);
  }
- 
- static int set_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
- 			  u64 val)
- {
- 	u64 expected;
--	int ret;
- 
--	ret = get_imp_id_reg(vcpu, r, &expected);
--	if (ret)
--		return ret;
-+	expected = read_id_reg(vcpu, r);
- 
- 	return (expected == val) ? 0 : -EINVAL;
- }
-@@ -2567,8 +2567,9 @@ static int set_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
- #define IMPLEMENTATION_ID(reg) {			\
- 	SYS_DESC(SYS_##reg),				\
- 	.access = access_imp_id_reg,			\
--	.get_user = get_imp_id_reg,			\
-+	.get_user = get_id_reg,				\
- 	.set_user = set_imp_id_reg,			\
-+	.reset = reset_imp_id_reg,			\
- }
- 
- /*
 -- 
 2.39.5
 
