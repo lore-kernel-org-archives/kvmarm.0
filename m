@@ -1,184 +1,228 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C659D2F50
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 19:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70405235BE5
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 23:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740513505; cv=none; b=cpNE5Y+vgqb/YOVvmQCUFNIrHGxTaAKI/a1Wz42L0Br7iotb1Od1MwygkF5yGfWk58TaH/fkOjCbDU3+bzc7jEw/DfP3iymu8y6KmkijbMErcBtwo+GK9+YADcEWhPYeQURn1MySzcTtC/fpSfVItReajT9BO4eQG9yKBdjaMTM=
+	t=1740527263; cv=none; b=Na+R00/7CRnLOnzF+cATR8te3E7afRgQH3YqTcRn1R0xi5jGGfd0WpQWV9AKdI0msKwEUj192T1GkSYPwvbeT6bYrJjdDgnPFIj7TxL3bIDRIf+uAtpnbe90t+VO/o0N0Bcx0ExTFbFND7zdIWr4x2CdNZXtj5lBjySBU+4fRb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740513505; c=relaxed/simple;
-	bh=TauguYtmPWqQDsCynGgZIXK+z1cbbQZwXFdW9dEVRF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eLSn1UgxhDAmvSoRTjAHpgFQAxC1D25bsHHptqi2GroKSw2IFdScxXs/B9GhJMRUK6K3TK9HSaO+2eJJEP9jQswwl7/IdgHNK+Z3z4qX8SnMapSC7yqH0lZE0K9FFAD14ODPUsaVZJtvfUf1PFY/LrsvDZApOsqgDvAzCDPP3OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 427E6152B;
-	Tue, 25 Feb 2025 11:58:39 -0800 (PST)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD9303F6A8;
-	Tue, 25 Feb 2025 11:58:20 -0800 (PST)
-Date: Tue, 25 Feb 2025 19:58:18 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Leo Yan <leo.yan@arm.com>
-Cc: Rob Herring <robh@kernel.org>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-Message-ID: <Z74g2vUT9-KtlIvo@J2N7QTR9R3.cambridge.arm.com>
-References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
- <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org>
- <20250224122507.GE8144@e132581.arm.com>
- <CAL_Jsq+0fZ2uasgAam7qGTdCeDBQxXeyL-J1_suyxy6GE_ERTg@mail.gmail.com>
- <20250224140317.GF8144@e132581.arm.com>
- <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
- <20250224180301.GI8144@e132581.arm.com>
- <Z72xMLsd37I6X_5-@J2N7QTR9R3>
- <20250225174803.GB1821331@e132581.arm.com>
+	s=arc-20240116; t=1740527263; c=relaxed/simple;
+	bh=6gdTWoo4iKiGpYTU7tcySz9K2NdvD0doJkMV1DoKvZM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XD6jmsKDsXbaI00IZ6Enfpeh33H11YziO1PzkO9f/kd1XDomJOdH8OWL4RV9Vr9hDzYIWuaOdjoThajzmMEAmvYPxaIeP7c4yiwbuM2mSFrqePGWykt6TgPvZhGeX7PSbJjSSh68+/8t8oCokO3j9xMh5qbIezHpmKINt2LhEAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fWpgf11d; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fWpgf11d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740527260;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=I+5VgZvS5RLhaGwFZILFRfiBrL6y7Ik6GC5bOnzJSKo=;
+	b=fWpgf11dF3u6njmTeuoUM+8sZ0DwjiSZ2WkPxl3QnkS8sXS4mAruu8Uby6LZmjGkayaMRe
+	s3hOTLUcybtE13FtfM1dbVZdt+wlaZd9zGegu/RcXM1KQh6suFYI9yLYnUPL+DqTRS90tW
+	ZJmLUnrfYd2D6/m63bo3TbUfjEqvCyE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-155-aT76JTc9Ml6iZ8sjZFJG7g-1; Tue, 25 Feb 2025 18:47:38 -0500
+X-MC-Unique: aT76JTc9Ml6iZ8sjZFJG7g-1
+X-Mimecast-MFC-AGG-ID: aT76JTc9Ml6iZ8sjZFJG7g_1740527257
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5dec9d39295so9625055a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 15:47:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740527257; x=1741132057;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I+5VgZvS5RLhaGwFZILFRfiBrL6y7Ik6GC5bOnzJSKo=;
+        b=h7X+/AKnY/9OSjdiuqmf7A0yn2FbWwAzbbIQgnox1dcy2LG7fQEK2xD+EnIFkXSMAK
+         tDfyRHRfXb3ROcVjzMoGa5Y/aB8jiXtLJbteByB7+vJiJWLc1LY/rMa7So3nU2VxohV+
+         9WaaLxwb60+LKU+Yegn5shHy6/0vHI9Ubnry7TIWM8rzDE6FddyoCyfyxepDmjiYFoBw
+         AXpabd1+I00c0voA49HVbRKOJdpu8mp0a1uomrQ0lqz0mpKXQcn1HoLAQppc1iy/sLgZ
+         doB6leq7wtgnt9O7E0htE4mPbuFRQ69KeemE3EVAKFZDigBdPq+VrKK17CzwkzGuknlS
+         PVdw==
+X-Forwarded-Encrypted: i=1; AJvYcCVP2rn/5jUw3BjxMVs5XXVys5WeS+TJEuSITOzJhA3aLEGjEh201DUxoTRlEKeOQKjPRl540EA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyjjc009rDFbC6T0kQIv1a0QoYxQBheNotiqkhCFHBck+b0B6YL
+	W3chOUJWR1NGsEeUFsaHwqBZjj0aKueHZ/5TULETk/be37nR/I5UJWD091IZXPYVTVC+DlDfCZ5
+	22wAgr2iyS+4RXnTnduNCe3ken6aKt2Cx8VUT97FT09+COKLZFk5beg==
+X-Gm-Gg: ASbGncsPv+1RgtOjg6Cd/0wW3Y/u/3YwK01PsgnSY/jMlBDez0b2QR7xVIabzgfnNic
+	q007gT5TAStX47JWJhQ4vGvDiu2CH4D83Tzjr9ByEXfUyC+ldO9spifSrUG00iW8cJH+B1sY6Vf
+	sUiOQa2V9IXaV9Oov/SDd1hpTd9m4QIo4SpM+hOKqY6jR8owOi0l/hAO6koeFd7jD8E/Y7vz85p
+	lgi7HrAiiCXZ/PLQwp9fRqYr5Vv5uapuFYAEk1DGUG8J4D4eJqWAQtao4zMxE0STLjg/cT42SPV
+	bkDAceWzbDSjU14q4E2h
+X-Received: by 2002:a05:6402:35d1:b0:5e0:750a:5c30 with SMTP id 4fb4d7f45d1cf-5e4a0dfc708mr1644329a12.20.1740527256950;
+        Tue, 25 Feb 2025 15:47:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGIdTNjyooRvOwtF86c7hT5C/AWZUuE2nxzDPKhqPyR/bEqM/yRWSn2G4IdfhjgLnOUUDk8gQ==
+X-Received: by 2002:a05:6402:35d1:b0:5e0:750a:5c30 with SMTP id 4fb4d7f45d1cf-5e4a0dfc708mr1644299a12.20.1740527256453;
+        Tue, 25 Feb 2025 15:47:36 -0800 (PST)
+Received: from [192.168.10.81] ([176.206.102.52])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5e460ff8629sm1891405a12.59.2025.02.25.15.47.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2025 15:47:35 -0800 (PST)
+Message-ID: <6475f9c7-304a-4e0b-8000-3dc5c8e718e9@redhat.com>
+Date: Wed, 26 Feb 2025 00:47:33 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225174803.GB1821331@e132581.arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] KVM: x86: Free vCPUs before freeing VM state
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Aaron Lewis <aaronlewis@google.com>, Jim Mattson <jmattson@google.com>,
+ Yan Zhao <yan.y.zhao@intel.com>,
+ Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+ Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20250224235542.2562848-1-seanjc@google.com>
+ <20250224235542.2562848-2-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20250224235542.2562848-2-seanjc@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: BVJfHzFKxtTBoXzkfCN_9YIHXxSo59W7H5-QQnPx1zA_1740527257
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 25, 2025 at 05:48:03PM +0000, Leo Yan wrote:
-> On Tue, Feb 25, 2025 at 12:01:52PM +0000, Mark Rutland wrote:
+On 2/25/25 00:55, Sean Christopherson wrote:
+> Free vCPUs before freeing any VM state, as both SVM and VMX may access
+> VM state when "freeing" a vCPU that is currently "in" L2, i.e. that needs
+> to be kicked out of nested guest mode.
 > 
-> [...]
+> Commit 6fcee03df6a1 ("KVM: x86: avoid loading a vCPU after .vm_destroy was
+> called") partially fixed the issue, but for unknown reasons only moved the
+> MMU unloading before VM destruction.  Complete the change, and free all
+> vCPU state prior to destroying VM state, as nVMX accesses even more state
+> than nSVM.
+
+I applied this to kvm-coco-queue, I will place it in kvm/master too 
+unless you shout.
+
+Paolo
+
+> In addition to the AVIC, KVM can hit a use-after-free on MSR filters:
 > 
-> > > > Critically, the brbe_enable() function merges the filters of all
-> > > > *active* events which have been installed into hardware. It does not
-> > > > track all events which can be rotated, and the resulting filter is not
-> > > > the same -- it can change as a result of rotation.
-> > > 
-> > > In a perf session has multiple events, and events have different branch
-> > > filters, seems to me, a simple way is to return error for this case.
-> > 
-> > FWIW, I'd generally prefer to do that since it avoids a number of
-> > horrible edge-cases and gets rid of the need to do SW filtering, which
-> > falls somewhere between "tricky" and "not entirely possible". However,
-> > that's not what LBR and others do, which is why we went with filter
-> > merging.
-> > 
-> > If folk on the tools side are happy with the kernel rejecting
-> > conflicting events, then I'd be more than happy to do that. What I don't
-> > want is that we start off with that approach and people immediately
-> > start to complain that the BRBE driver rejects events that the LBR
-> > driver accepts.
-> > 
-> > See the last time this came up.
+>    kvm_msr_allowed+0x4c/0xd0
+>    __kvm_set_msr+0x12d/0x1e0
+>    kvm_set_msr+0x19/0x40
+>    load_vmcs12_host_state+0x2d8/0x6e0 [kvm_intel]
+>    nested_vmx_vmexit+0x715/0xbd0 [kvm_intel]
+>    nested_vmx_free_vcpu+0x33/0x50 [kvm_intel]
+>    vmx_free_vcpu+0x54/0xc0 [kvm_intel]
+>    kvm_arch_vcpu_destroy+0x28/0xf0
+>    kvm_vcpu_destroy+0x12/0x50
+>    kvm_arch_destroy_vm+0x12c/0x1c0
+>    kvm_put_kvm+0x263/0x3c0
+>    kvm_vm_release+0x21/0x30
 > 
-> Thanks for the shared links.  Based on the info, let's say we can have two
-> cases:
+> and an upcoming fix to process injectable interrupts on nested VM-Exit
+> will access the PIC:
 > 
->   Case 1: set different branch filters in a single perf session:
+>    BUG: kernel NULL pointer dereference, address: 0000000000000090
+>    #PF: supervisor read access in kernel mode
+>    #PF: error_code(0x0000) - not-present page
+>    CPU: 23 UID: 1000 PID: 2658 Comm: kvm-nx-lpage-re
+>    RIP: 0010:kvm_cpu_has_extint+0x2f/0x60 [kvm]
+>    Call Trace:
+>     <TASK>
+>     kvm_cpu_has_injectable_intr+0xe/0x60 [kvm]
+>     nested_vmx_vmexit+0x2d7/0xdf0 [kvm_intel]
+>     nested_vmx_free_vcpu+0x40/0x50 [kvm_intel]
+>     vmx_vcpu_free+0x2d/0x80 [kvm_intel]
+>     kvm_arch_vcpu_destroy+0x2d/0x130 [kvm]
+>     kvm_destroy_vcpus+0x8a/0x100 [kvm]
+>     kvm_arch_destroy_vm+0xa7/0x1d0 [kvm]
+>     kvm_destroy_vm+0x172/0x300 [kvm]
+>     kvm_vcpu_release+0x31/0x50 [kvm]
 > 
->     perf record -e armv8_pmuv3_0/r03,branch_type=any_call/u \
->                 -e armv8_pmuv3_0/r04,branch_type=any_ret/k ...
+> Inarguably, both nSVM and nVMX need to be fixed, but punt on those
+> cleanups for the moment.  Conceptually, vCPUs should be freed before VM
+> state.  Assets like the I/O APIC and PIC _must_ be allocated before vCPUs
+> are created, so it stands to reason that they must be freed _after_ vCPUs
+> are destroyed.
 > 
->   Case 2: set different branch filters in multiple perf sessions:
+> Reported-by: Aaron Lewis <aaronlewis@google.com>
+> Closes: https://lore.kernel.org/all/20240703175618.2304869-2-aaronlewis@google.com
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Yan Zhao <yan.y.zhao@intel.com>
+> Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+> Cc: Kai Huang <kai.huang@intel.com>
+> Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/x86.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->     perf record -e armv8_pmuv3_0/r03,branch_type=any_call/u ...
-> 
->     perf record -e armv8_pmuv3_0/r04,branch_type=any_ret/k ...
-> 
-> In my previous reply, I was suggesting that we should reject the case 1.
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 58b82d6fd77c..045c61cc7e54 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12890,11 +12890,11 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>   		mutex_unlock(&kvm->slots_lock);
+>   	}
+>   	kvm_unload_vcpu_mmus(kvm);
+> +	kvm_destroy_vcpus(kvm);
+>   	kvm_x86_call(vm_destroy)(kvm);
+>   	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+>   	kvm_pic_destroy(kvm);
+>   	kvm_ioapic_destroy(kvm);
+> -	kvm_destroy_vcpus(kvm);
+>   	kvfree(rcu_dereference_check(kvm->arch.apic_map, 1));
+>   	kfree(srcu_dereference_check(kvm->arch.pmu_event_filter, &kvm->srcu, 1));
+>   	kvm_mmu_uninit_vm(kvm);
 
-Do you mean that the kernel should reject that, or that userspace should
-reject that.
-
-As mentioned earlier, I am ok with the idea that we reject *scheduling*
-events with mismatched filters, as we do for other resource conflicts.
-That would necessarily mean rejecting *groups* of events with
-inconsistent filters at open time.
-
-However, I do not think that we should reject indepenent events which
-happen to have mismatched filters, regardless of whether they're opened
-by the same "session".
-
-> IMO, it is not quite useful to configure different filters for events in
-> the same session, especially if this leads complexity in the driver due
-> to the hardware limitation.
-
-I generally agree, but IIRC userspace does this today.
-
-> For case 2, when create a new session, if the perf tool can read out the
-> current branch filter setting (e.g. via sysfs node) and give suggestion
-> what branch filter is compabile with existed sessions, seems to me, this
-> is a feasible solution.  My understanding this is a rare case, and a
-> clear guidance for users would be sufficient if this happens.  (Maybe
-> we can give recommendation for how to use BRBE in the perf doc).
-
-No. We are not going to expose *dynamic* information about the PMU
-hardware via sysfs. This is not as simple as you make it out to be.
-At any point in time there can be an arbitrary number of events open,
-and some arbitrary subset currently scheduled.
-
-I agree that ideally this should be rare, though, and hence either of
-the two options I have suggested thus far should handle that acceptably.
-
-> To be clear, an important factor is the trace modes with modifier 'u'
-> (user) and 'k' (kernel) should be supported for different events and for
-> different sessions.  In a mixed cases (some events are userspace only
-> and some are kernel only), the BRBE driver needs to filter out branch
-> records for specific mode when taking a sample.
-
-I hate to repeat myself, but the driver has *no concept whatsoever* of a
-"session". It only knows:
-
-* Which events are currently active in hardware.
-
-* Which events have been grouped together.
-
-* Which events have been opened for a given task or CPU context.
-
-... and *NONE* of those correspond directly to a "session" managed by
-the userspace perf tool.
-
-> > > If we can unify branch filter within a perf session, would this be
-> > > much easier for handling?
-> > 
-> > Do you mean if the perf tool ensured that all events in a given session
-> > had the same filter? From the kernel's PoV there's no such thing as a
-> > "perf session", and I'm not sure whether you're suggesting doing that in
-> > userspace or withing the kernel.
-> 
-> My understanding is this would be not difficult to do such kind checking
-> in the tool.  E.g., the perf tool can iterate every event and check the
-> branch filter and detect incompabile issue.
-
-Cool, sounds like we could do that then!
-
-> > Doing that in the perf tool would certianly make a stronger argument for
-> > the kernel taking the "reject conflicting branch filters" option.
-> > 
-> > Doing that within the kernel isn't really possible.
-> 
-> As said above, if the BRBE driver can provide a knob in sysfs to indicate
-> what is the current branch filter in the existed sessions, this would be
-> helpful for the tool to do the checking and remind users.
-
-Sorry, as above, that is not going to happen. It is not practical and
-will cause many other problems.
-
-> I haven't done any experiments for this. If you think this is the way
-> to move forward, I might do a prototype and get back to you to ensure we
-> don't run into any unexpected issues.
-
-What specifically are you proposing to prototype?
-
-Mark.
