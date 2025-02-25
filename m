@@ -1,217 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6279B2571C0
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 01:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAA5768FD
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 01:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740447125; cv=none; b=RHqROmJpffURQ3viUOBsUx8UMSKSWol5qHpKYq2NNqprL40mQ8vRj7vYa8gAxjzcA+BVyvyO0/S/cxhZioCIEO0dE8oc2DDwPIRpfI8VZ66qX72auPWi9B0pbR0KB6s6fT3hBOUmF4eF8NDpY5F9rS42u803Bue98cTbctrX7Q0=
+	t=1740448412; cv=none; b=q0Pfac7+73E0TSUHUQDy9aMtNzTKLT39hOMDsUngRRhTxsMV3RYvwMg7yoLFC/cru5icNik0/y0Mx4ycQb3XbbaJNGwEIArvFHWvo9TfBFLWkNsf3W2In1JhJJHM75JYRCC3kUDaQWyN3DeUgi5tqqHRjFKzzCETJ7PkqEWw2V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740447125; c=relaxed/simple;
-	bh=oNFRiRu3B+1F4rETWzHu87g8+8lxN2QQ/bwEbS8L5/E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DQZaBROrzrtOqAGbz1rrmnI/Ru6DbniiLlr5oEozyWSwC2rImPQ47uytIzxhGaFbFu0UpsRlWsx/oIVPiDvk9x0SItsh1B7R853Tm/HwaFXk6wHcMsbF3NMDo3Kh5UNfHpqVaaewK3fWs0qowkL6/BfkTRv38T24x0fuutwlgIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbxO/luO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740448412; c=relaxed/simple;
+	bh=lDnDEm+dSfaeSLN9szJPpAcWhldP+uIqITh9ILIqPuo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lK2n4msK+yotI7S6te1oO9nAamEfvCQ4ozZRMUfpEtDMDX1xPm6hW6c6MBlf0Sqpx+L0xCqpC7pxGwHbaC3vhaXwnla+4x1xUi0AJ7kBTn+CC1clBPbHzr0fuySQI+PWtWq9uDkP2kKglaXwOCl0n9gCBQba6dL4zos4DR7/NEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YyrK3FVn; arc=none smtp.client-ip=209.85.208.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbxO/luO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D550EC4CED6
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 01:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740447124;
-	bh=oNFRiRu3B+1F4rETWzHu87g8+8lxN2QQ/bwEbS8L5/E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=bbxO/luOYTPR1YgMrZi0dz+o/Ag9v3NdrvsC1/fabzUkPRMuQbWnqBQyw09RuDZLw
-	 n7hqUskxHaGVIDXX491Yk9EVkngF+m116C06SoiPpZ9aCQc/dgdDYxxWjhFHH4WVbZ
-	 c2Tymn9RJVoc7HM9AsJeJL+3tALxsDOOdzwfoyK326E+jLSQszg71owGshnIY7ZTIP
-	 5xy65PXhjBi7MAfFRQE4sE1wYyUDDbJUEaNzwZELEzsKDfCC9Z/JVi0MWjBr/U6cZ+
-	 cd7S3GS8HTcclu0WIwF4/Q+PoJi/OQKqzUlAWtan0BFT9Wo711jV23OdjFCGq/UsLJ
-	 JOXweqkByieTg==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e05780509dso7212884a12.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 17:32:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUcK7syEyAMCJwnGsUhLtXldVavhykJL+cCsVRRI97I/sEsIUft2tu2ODo7khZzulGzcAPFlPg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YysdE/VvP489xocgCgpSEyq8z3DzWxtkU63Grm44CWFSn5nxsdq
-	WugWZ+WuMttsP8E6L6YhqiB2zLrZ3HDrEtlNSXXitRmX6dg4Pi345wSK9GhbjqcuQS5CmTz5kWI
-	/Em53Z3N3OLe37L1l78QHegnVlg==
-X-Google-Smtp-Source: AGHT+IF0oZCxiK/ZFsFb1hIDiizkSgWxjFTx6kKn+fuvN2qWJh20NtQly1HcVhyy6wmhgmp9semm1fTOfMZcyER0TDM=
-X-Received: by 2002:a05:6402:440b:b0:5de:aa54:dc30 with SMTP id
- 4fb4d7f45d1cf-5e444481387mr1053029a12.5.1740447123387; Mon, 24 Feb 2025
- 17:32:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YyrK3FVn"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-5dedd23cdecso5459482a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 17:53:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740448409; x=1741053209; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AH9Y+qk/plKTRCQ8rdCbOXUmRPqvAGtJ+mP7kh2bkjA=;
+        b=YyrK3FVnwKfY3BCt1a/xHfbvcMUQVBk6TqqU9GDAZ50IRW9ctBQ8wV05R6gyTPQ51n
+         iRZkcX/a/2Z/3DVc1FdGDXITBhNvQFTWPZz3S9KItAqpOky2M2tD4ZucmNef5+wW5QvX
+         wH4EL9aGvjATspYBokFXIFQZOU8GZBvr+fR2xfnA9FnI2Ar3hvyb9lmotHrgfa0x2YkK
+         nuAm25aeKoaNow05ep8B8wzMrb+oCv7NCNAdCBTaTUOovfkMkRqPHx2hyVH02Mhifyx6
+         M4hUc4WBn5cH7zBO4xq+SmcjaECylEUNgD2Bs2rw2JX+OhebQG5OXgrkxCTHJaz1kaC8
+         BrJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740448409; x=1741053209;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AH9Y+qk/plKTRCQ8rdCbOXUmRPqvAGtJ+mP7kh2bkjA=;
+        b=HDnHUP2tS0b7SbZtjVlRceo6EZkVCjwHCRZSeysM5TXI+82xzaI0ziPuqoK4UVVGV4
+         7cgZDTuU+1Jna2fREeUeW4EGKS/Poxg/GjzPIxnitNnDg/seES8r/lzzn0/VcNMWpQZY
+         /4Iec7JC1mC9UedB2buYZTl5MEmtkbsmpA2LQjKULoHxx8UyJ3V6DrtrhKbaRxJ+hzOx
+         JUnQs51keL3TRw5hcUAKnYEtXlLSRg7ZIyylGRjL0OSFBxEeBuPYmYCPUqySIkDi32Qg
+         jNqxu0Ao36GfbILx/uRRsEGzFSwdvJT6RWiVpj6RwqZ7ERFa74jbXK4OcUUWJhkoR5Kw
+         ZQAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOYDPySR7pB4n9XDlM1hXSu7l2VyVEDXKsrYzDPfLHEWPtV8XNWDSzDSyuFEsgzAI1KKCWuYI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyt6x6kZ0abKbSlkVgFP7GoFcxcqVHPIK91RyFAM8cMUm5nre31
+	rxNj0h4NIAEXTENSX8lPA7KiGUfQ200c6SjP77Yfg6GdtVtI5ZhAWsQzR/J6JXJGtRX6kVmSN/J
+	f3peD8Q==
+X-Google-Smtp-Source: AGHT+IHJKOHeegcslTQv6gGnIpceJABRkLrMUljBH8OEUmqvgitKR+e8++1jZBdKvqfUQIxfPe64opEc23yp
+X-Received: from edbig12.prod.google.com ([2002:a05:6402:458c:b0:5de:bbcb:2c3])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:2113:b0:5e0:8ab6:65fa
+ with SMTP id 4fb4d7f45d1cf-5e4469daaa1mr1165847a12.19.1740448409709; Mon, 24
+ Feb 2025 17:53:29 -0800 (PST)
+Date: Tue, 25 Feb 2025 01:53:23 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
- <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org> <20250224122507.GE8144@e132581.arm.com>
- <CAL_Jsq+0fZ2uasgAam7qGTdCeDBQxXeyL-J1_suyxy6GE_ERTg@mail.gmail.com>
- <20250224140317.GF8144@e132581.arm.com> <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
- <20250224180301.GI8144@e132581.arm.com>
-In-Reply-To: <20250224180301.GI8144@e132581.arm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 24 Feb 2025 19:31:52 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqKNad6eEBerUOco=SDWxdp6dgRD3FDrSt5OpGQYwwstSg@mail.gmail.com>
-X-Gm-Features: AQ5f1JpZnmkKohlVKFAFaoTDPyBucm92D6dTQtNc_f9Z3M6ImuFJVuDiTExv_eA
-Message-ID: <CAL_JsqKNad6eEBerUOco=SDWxdp6dgRD3FDrSt5OpGQYwwstSg@mail.gmail.com>
-Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-To: Leo Yan <leo.yan@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	James Clark <james.clark@linaro.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvmarm@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+Message-ID: <20250225015327.3708420-1-qperret@google.com>
+Subject: [PATCH v2 0/4] Selftest for pKVM ownership transitions
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, qperret@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 24, 2025 at 12:03=E2=80=AFPM Leo Yan <leo.yan@arm.com> wrote:
->
-> On Mon, Feb 24, 2025 at 04:05:43PM +0000, Mark Rutland wrote:
->
-> [...]
->
-> > > > > Just a minor concern.  I don't see any handling for task migratio=
-n.
-> > > > > E.g., for a task is migrated from one CPU to another CPU, I expec=
-t we
-> > > > > need to save and restore branch records based on BRBE injection. =
- So
-> > > > > far, the driver simply invalidates all records.
-> > > > >
-> > > > > I think this topic is very likely discussed before.  If this is t=
-he
-> > > > > case, please ignore my comment.  Except this, the code looks good
-> > > > > to me.
-> > > >
-> > > > Not really discussed on the list, but that was present in v18 (thou=
-gh
-> > > > not functional because .sched_task() hook wasn't actually enabled) =
-and
-> > > > Mark removed it. His work is here[1].The only comment was:
-> > > >
-> > > > Note: saving/restoring at context-switch doesn't interact well with
-> > > > event rotation (e.g. if filters change)
-> > >
-> > > In the brbe_enable() function, it "Merge the permitted branch filters
-> > > of all events".  Based on current implementation, all events share th=
-e
-> > > same branch filter.
-> >
-> > Critically, the brbe_enable() function merges the filters of all
-> > *active* events which have been installed into hardware. It does not
-> > track all events which can be rotated, and the resulting filter is not
-> > the same -- it can change as a result of rotation.
->
-> In a perf session has multiple events, and events have different branch
-> filters, seems to me, a simple way is to return error for this case.
->
-> I would argue BRBE is an IP for recording branches per CPU wise, it does
-> not support recording for event wise.  If we can unify branch filter
-> within a perf session, would this be much easier for handling?
+Hi all,
 
-And the PMU is an IP for recording events per CPU, but that is not
-perf (only)...
+This is the v2 of the pKVM selftest originally posted here [1].
 
->
-> > > When event rotation happens, if without context switch, in theory we
-> > > should can directly use the branch record (no invalidation, no inject=
-ion)
-> > > for all events.
-> >
-> > No; that only works in *some* cases, and will produce incorrect results
-> > in others.
-> >
-> > For example, consider filtering. Imagine a PMU with a single counter,
-> > and two events, where event-A filters for calls-and-returns and event-B
-> > filters for calls-only. When switching from event-A to event-B, it's
-> > theoretically possible to keep the existing records around, knowing tha=
-t
-> > the returns can be filtered out later. When switching from event-B to
-> > event-A we cannot keep the existing records, since there are gaps
-> > whenever a return should have been recorded.
->
-> Seems to me, the problem is not caused by event rotation.  We need to
-> calculate a correct filter in the first place - the BRBE driver should
-> calculate a superset for all filters of events for a session.  Then,
-> generate branch record based event's specific filter.
+Changes since v1:
+ - added support for testing NP guest transitions;
+ - added .data section in pKVM to allow using non-zero globals (needed
+   for previous point);
+ - dropped superfluous WARN() from __pkvm_host_share_guest() which is a
+   pain for testing;
+ - updated assertions for hyp/host transitions according to the
+   discussion on v1.
 
-The driver doesn't have enough information. If it is told to schedule
-event A, it doesn't know anything about event B. It could in theory
-try to remember event B if event B had already been scheduled, but it
-never knows when event B is gone.
+Patches based on v6.14-rc4, tested on Qemu.
 
-> > There are a number of cases of that shape given the set of configurable
-> > filters. In theory it's possible to retain those in some cases, but I
-> > don't think that the complexity is justified.
-> >
-> > Similarly, whenever kernel branches are recorded it's necessary to drop
-> > the stale branches whenever branch recording is paused, as there's
-> > necessarily a blackout period and hence a gap in the records.
->
-> If we save BRBE record when a process is switched out and then restore
-> the record when a process is switched in, should we can keep a decent
-> branch record for performance profiling?
+[1] https://lore.kernel.org/kvmarm/20241129125800.992468-1-qperret@google.com/
 
-Keep in mind that there's only 64 branches recorded at most. How many
-branches in a context switch plus reconfiguring the PMU? Not a small
-percentage of 64 I think. In traces where freeze on overflow was not
-working (there's an example in v18), just the interrupt entry until
-BRBE was stopped was a significant part of the trace. A context switch
-is going to be similar.
+David Brazdil (1):
+  KVM: arm64: Add .hyp.data section
 
-> I understand it might be many things happen in the middle of a task
-> switching or migration, but it is fine for not recording branches during
-> the blackout period.  The missed branch records are not very helpful for
-> forming a flow for a profiled program itself, especially, if we
-> consider we will optimize userspace program in many cases.
+Quentin Perret (3):
+  KVM: arm64: Don't WARN from __pkvm_host_share_guest()
+  KVM: arm64: Selftest for pKVM transitions
+  KVM: arm64: Extend pKVM selftest for np-guests
 
-We can't really not record during a blackout period. The only way we
-can is with freeze on overflow.
+ arch/arm64/include/asm/kvm_pkvm.h             |   6 +
+ arch/arm64/include/asm/sections.h             |   1 +
+ arch/arm64/kernel/image-vars.h                |   2 +
+ arch/arm64/kernel/vmlinux.lds.S               |  18 +-
+ arch/arm64/kvm/Kconfig                        |  10 +
+ arch/arm64/kvm/arm.c                          |   7 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   6 +
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |   2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 198 +++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  12 ++
+ arch/arm64/kvm/pkvm.c                         |   2 +
+ 11 files changed, 260 insertions(+), 4 deletions(-)
 
-> > Do you think that you have a case where losing branches across rotation
-> > *really* matters?
->
-> I agreed that event rotation case might be rare and complex.  Please see
-> a comment below.
->
-> > > For a context-switch case, we need to save and re-inject branch recor=
-d.
-> > > BRBE record sticks to a process context, no matter what events have b=
-een
-> > > enabled.
-> >
-> > I had originally wanted to keep per-event records around, but it doesn'=
-t
-> > work in all cases. One reason events get discarded at context-switch
-> > time is that CPU-bound events can sample branches, and would
-> > mis-attribute stale userspace branches to the wrong context when
-> > switching tasks. There are explicit comments about this in
-> > amd_pmu_brs_sched_task() and intel_pmu_lbr_sched_task().
-> >
-> > Given we discard records when reprogramming events, we *could* try to
-> > preserve events in some cases, but I suspect that as with the rotation
-> > case this'll be a lot of complexity for little gain. Note that as we
-> > discard events when enabling the PMU, we'd throw some task-bound record=
-s
-> > away anyway, and practically the gain would be limited to cpu-bound
-> > records.
-> >
-> > Do you have a reason why you think we *must* keep events around?
->
-> Here I am really concerned are cases when a process is preempted or
-> migrated.  The driver doesn't save and restore branch records for these
-> cases, it just invalidates all records when a task is scheduled in.
->
-> As a result, if an event overflow is close to context switch, it is
-> likely to capture incomplete branch records.  For a userspace-only
-> tracing, it is risk to capture empty branch record after preemption
-> and migrations.
+-- 
+2.48.1.658.g4767266eb4-goog
 
-There's the same risk if something else is recording kernel branches
-when you are recording userspace only. I think the user has to be
-aware if other things like context switches are perturbing their data.
-
-Rob
