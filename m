@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA4E20F065;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F3320F079;
 	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504588; cv=none; b=detYsJcAbo8xZ5e5+fDpIzMLmbML0ihW+pPBqSv3cuByj6vrjMc2zCMs3S8McxB5LnLK5WhJenBEYry0JyJNKeDrU4JiofdMrckuSHYHnPYF17XKXY2wO4tH1v35+QxXFMvSbntEDxJ/BskNZ7bhcRNIl8lF/zmA9B3KScOOybw=
+	t=1740504588; cv=none; b=K0qZXKEsSSHlKpO5vTW89MIFRg4oWRX6wqQOl5adliGdAAhoHunABpjscl9G+Q5zs/zE7xaddzDGGjzGhoDFqbxMPvhwaUKCczVBZz4xy6pN85bqAVkbuVBH3sV80/FRKXy/7QGHRDPxnoeYwzfbHLswBUjRB0JMWPIOqjULmUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740504588; c=relaxed/simple;
-	bh=Za1PNQ3sjrTQ/q3busy2dbutshSkyGMY6U7X8BZk2rs=;
+	bh=EcrOufC+9HluOly/HaFks9e5qYg1mD0Q7YaQCzKYfj8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H9vtCHJXnmm5oTuWtnaWPXIBl6EPmQl0LfsIeyPdon5PAlDHvmHw/sma0yqDyL+yzFXgyb0UP7poX/JTE2Z5a2Ju7DuPEnolYlFunyMo3fy2P2vbphUoSgRmsEFfM2e8V3VYqiltRxqIsX3X/BODjc7CJ8ybSmfJHo+881BoJmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ACY99rcK; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=rw9Lrg5DTgyzfc52bubGG+G9ayOUfos3WAGBXXogDvxEEI/cb0Vz/Zf5K5UfaloC5TwNRwxd0+jv00eyVd5qT7NF6H05sBJJE26W7o7C4BGhsknWizPTOk1rJbVGj/IWiagLG8VSCltyK4iWyCUVlnYdNsZMU2sCJsrc6wkT8t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s26eJsZ4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ACY99rcK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061EAC4CEDD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s26eJsZ4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99ECAC4CEE8;
 	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740504588;
-	bh=Za1PNQ3sjrTQ/q3busy2dbutshSkyGMY6U7X8BZk2rs=;
+	bh=EcrOufC+9HluOly/HaFks9e5qYg1mD0Q7YaQCzKYfj8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ACY99rcK0DuGRZdtniydEASmz/sbtD0XRaQPdoI39jrPhAM2ZHnX0YgyFEO77oZ+i
-	 GTh3HXD9PejDK1ZBVZhKboApxIvqKGEsQso/za2qSTnQpk+XrKNzcgb44TafePyK/d
-	 OVhObh5rH7A9P5P+9DD7CNq5Y+j2CB5vEtzVwEU0P6Dbkyuc7FBskZV6t7IVKrqh9L
-	 zSgx/YMVaJz7xV1qPQyrdqqpMWAejTj6+/+r2KTWFnYZxnu6HsmzxBBHKp1w+dVNCO
-	 eMTGKePFb9yzHDgnMfZH8OHbJJoyvbwjBSF3kOytWfyKDleWS2fANZWpxqmXq5nBG2
-	 IIPNnlTLbf0hA==
+	b=s26eJsZ4ZCkUr40JDqjXSQMziL3UsOHOVQ1WIuizgLPCCHPydJaq+ImDk7P25+99M
+	 RmVA4tATAqADohH0lvgld1cpUd9UVhhbkcKo+/tRnzxj6JrSl2C4LvPLcUA6dBvSLB
+	 rpRwDNFFME4tffYzvNENvm4Vnm6y98isqRBY3HHO+ultJHcIqgehxvhv+pEUzkpnKZ
+	 +y0GRXw5YbRdJGv6v6rZEI2GGCJro/gDMfjEBiGwN3SFNi6wWOehbwToC7FgpkVj7k
+	 Fb53GYm6pHdMaH4ipVI4l0E55hYZO1WedMutCe4IjppDq7rsY3UWTz30nSlsgkq8bF
+	 hDj7mZ0BARaLg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmykc-007rKs-AL;
+	id 1tmykc-007rKs-TI;
 	Tue, 25 Feb 2025 17:29:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 13/16] KVM: arm64: nv: Propagate used_lrs between L1 and L0 contexts
-Date: Tue, 25 Feb 2025 17:29:27 +0000
-Message-Id: <20250225172930.1850838-14-maz@kernel.org>
+Subject: [PATCH v4 16/16] KVM: arm64: nv: Fail KVM init if asking for NV without GICv3
+Date: Tue, 25 Feb 2025 17:29:30 +0000
+Message-Id: <20250225172930.1850838-17-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -60,54 +60,39 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We have so far made sure that L1 and L0 vgic contexts were
-totally independent. There is however one spot of bother with
-this approach, and that's in the GICv3 emulation code required by
-our fruity friends.
+Although there is nothing in NV that is fundamentally incompatible
+with the lack of GICv3, there is no HW implementation without one,
+at least on the virtual side (yes, even fruits have some form of
+vGICv3).
 
-The issue is that the emulation code needs to know how many LRs
-are in flight. And while it is easy to reach the L0 version through
-the vcpu pointer, doing so for the L1 is much more complicated,
-as these structures are private to the nested code.
-
-We could simply expose that structure and pick one or the other
-depending on the context, but this seems extra complexity for not
-much benefit.
-
-Instead, just propagate the number of used LRs from the nested code
-into the L0 context, and be done with it. Should this become a burden,
-it can be easily rectified.
+We therefore make the decision to require GICv3, which will only
+affect models such as QEMU. Booting with a GICv2 or something
+even more exotic while asking for NV will result in KVM being
+disabled.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 7 +++++++
+ arch/arm64/kvm/arm.c | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e72be14d99d55..643bd8a8e0669 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -323,6 +323,12 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- 	__vgic_v3_activate_traps(cpu_if);
- 
- 	__vgic_v3_restore_state(cpu_if);
-+
-+	/*
-+	 * Propagate the number of used LRs for the benefit of the HYP
-+	 * GICv3 emulation code. Yes, this is a pretty sorry hack.
-+	 */
-+	vcpu->arch.vgic_cpu.vgic_v3.used_lrs = cpu_if->used_lrs;
- }
- 
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-@@ -358,6 +364,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index dc27eb66d4e90..cae93fac60703 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2321,6 +2321,13 @@ static int __init init_subsystems(void)
+ 		goto out;
  	}
  
- 	shadow_if->lr_map = 0;
-+	vcpu->arch.vgic_cpu.vgic_v3.used_lrs = 0;
- }
- 
- /*
++	if (kvm_mode == KVM_MODE_NV &&
++	   !(vgic_present && kvm_vgic_global_state.type == VGIC_V3)) {
++		kvm_err("NV support requires GICv3, giving up\n");
++		err = -EINVAL;
++		goto out;
++	}
++
+ 	/*
+ 	 * Init HYP architected timer support
+ 	 */
 -- 
 2.39.2
 
