@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E013620E317;
-	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACB20E6FB;
+	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504588; cv=none; b=c/xTilzl7pg5sASEHPab3ohJDf95mLAme3UOHNt33pOzXloc4LMhN+zdljdDPVhfHY7pddTEFifdoS5PBzlIu7WKwfsNlUAbytdMVA7F0MAyhkzk99bkIgnXCBvn5ENjaIL8FvlwIhaIdoaKJOQEGtwuY9eIr0iCPeJlH8exRVA=
+	t=1740504588; cv=none; b=D01Qjkd3RHsjmP9DJUVPLvkgenTW+GhwyPrflGHLZBM9Ls9RAOMKZvQb0MAL42DhXSE4+hINlgKevAjVUKwtRmADiH1uoogjHwg3OeqXn6albRRYxOCHT/s5JlcJ/TBYG84m8dM+5udd3kyqD6V0syuIg03jRHkp0Fp1/BLrQXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740504588; c=relaxed/simple;
-	bh=X1ouQwIM1LuKv3rYNR+JevvdRSlVzOdYhPiP43piFsc=;
+	bh=ScLfH9JCdakxFSIYbsxrMFuSUWUanHf/RQHVMVBJ67Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ua2uF9t+P9EcO4p6dCzyLyfNATIbcJkUxA7PAUBKi2k1NNbxUL25yHpxPQE8ThJcumbBJCP4gUaAWS1HVYGd5BEomPFCOYOoZcglcjrok7NNDP91ejEK/mstRzfIHdWhYBuYJ6Oo/nKOQgXoAGBG3IIPvnplkvO8Bo2Vf5w0heE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qljzcvIE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RyuINoB3kvOaf0JCouxbCDdXlQMkG0V8bYu5iolQ1CSn7gQ5bLNoZ4pbC/Bham9GxQ1EIGNKoYytozX99G6B65PR6A1KVpyM1rjrVkUFQSUGpTLNY1C/EB7COK6fsp1WMWwu2Ut2rl8fGUjqmcrDoMb5wbsaGWy/JhEXFl5eOdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9/vMZGV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qljzcvIE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3246C4CEE7;
-	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9/vMZGV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3238FC4CEE8;
+	Tue, 25 Feb 2025 17:29:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740504587;
-	bh=X1ouQwIM1LuKv3rYNR+JevvdRSlVzOdYhPiP43piFsc=;
+	s=k20201202; t=1740504588;
+	bh=ScLfH9JCdakxFSIYbsxrMFuSUWUanHf/RQHVMVBJ67Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qljzcvIEYj9E+SQzDIl6zyMMKnGiBs21m9RFBbrHZ4C2GBJacRvK0lf+ErvcuRtxL
-	 zqMMT3Hse408k1pIqQNbtrxhP5JP+hI49JYlDuKEs7NvxveSZRHW9mBNe+cTBBIwaH
-	 5lNRehd9Q33QTL6/fHHxGVcrVRNHOFC24qg4jzFnenokYUKfuZiviIhSsncFECu8Xp
-	 zudL5O1k+7J9JNzu6EiGXy3eQrfCOhPZ+STNf0QGCqoS2yngYssOehlxWBSsvfLUPf
-	 SRpRcuweIwA5N1kbzWEUM/enz6w59JE3vCWe5zY+7NLnsS2m+2Xqbzo6mteBQckEfI
-	 e91utl4/s/1bQ==
+	b=L9/vMZGVMRvIX5vSwF20iBu3E/4YII6Nlt3AevDzdXbQTZ3E2qT31LPhj78ipCK8q
+	 J0WKT5E9KxAiz4bFiA9Md5cHS6zXep6hRNTCE+DUlmQE56Eo6cZkryBcZz8kjquQZq
+	 OIwvecw8yXDh1mDEi0EUJw2lcka9VC5lcip6NFDQOQrb25xQksO+zbbpbnEVtoNQhM
+	 u9aMf/EGk2JEAeR/guAwA+lIMWGLpaYV1ijBH2VGaGjPSlfXOq61wLL0CTUfJ3Fw76
+	 3bjI2US53Tzv8FBlH655gW1K15rb3rmiCkoef9kJQpcpPX69PiG0VoiAC8ZonNz9Mf
+	 +pOucL4l+3MdQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmykc-007rKs-3s;
+	id 1tmykc-007rKs-Fj;
 	Tue, 25 Feb 2025 17:29:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 12/16] KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
-Date: Tue, 25 Feb 2025 17:29:26 +0000
-Message-Id: <20250225172930.1850838-13-maz@kernel.org>
+Subject: [PATCH v4 14/16] KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+Date: Tue, 25 Feb 2025 17:29:28 +0000
+Message-Id: <20250225172930.1850838-15-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -60,105 +60,76 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Oliver Upton <oliver.upton@linux.dev>
+Popular HW that is able to use NV also has a broken vgic implementation
+that requires trapping.
 
-Running an L2 guest with GICv4 enabled goes absolutely nowhere, and gets
-into a vicious cycle of nested ERET followed by nested exception entry
-into the L1.
+On such HW, propagate the host trap bits into the guest's shadow
+ICH_HCR_EL2 register, making sure we don't allow an L2 guest to bring
+the system down.
 
-When KVM does a put on a runnable vCPU, it marks the vPE as nonresident
-but does not request a doorbell IRQ. Behind the scenes in the ITS
-driver's view of the vCPU, its_vpe::pending_last gets set to true to
-indicate that context is still runnable.
+This involves a bit of tweaking so that the emulation code correctly
+poicks up the shadow state as needed, and to only partially sync
+ICH_HCR_EL2 back with the guest state to capture EOIcount.
 
-This comes to a head when doing the nested ERET into L2. The vPE doesn't
-get scheduled on the redistributor as it is exclusively part of the L1's
-VGIC context. kvm_vgic_vcpu_pending_irq() returns true because the vPE
-appears runnable, and KVM does a nested exception entry into the L1
-before L2 ever gets off the ground.
-
-This issue can be papered over by requesting a doorbell IRQ when
-descheduling a vPE as part of a nested ERET. KVM needs this anyway to
-kick the vCPU out of the L2 when an IRQ becomes pending for the L1.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Link: https://lore.kernel.org/r/20240823212703.3576061-4-oliver.upton@linux.dev
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/emulate-nested.c   |  2 ++
- arch/arm64/kvm/vgic/vgic-v4.c     | 18 +++++++++++++++++-
- 3 files changed, 21 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 86519a73971ed..74be23236aaca 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -946,6 +946,8 @@ struct kvm_vcpu_arch {
- #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(5))
- /* WFI instruction trapped */
- #define IN_WFI			__vcpu_single_flag(sflags, BIT(6))
-+/* KVM is currently emulating a nested ERET */
-+#define IN_NESTED_ERET		__vcpu_single_flag(sflags, BIT(7))
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 643bd8a8e0669..5350a4650b7a5 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -296,9 +296,19 @@ static void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu,
+ 					struct vgic_v3_cpu_if *s_cpu_if)
+ {
+ 	struct vgic_v3_cpu_if *host_if = &vcpu->arch.vgic_cpu.vgic_v3;
++	u64 val = 0;
+ 	int i;
  
+-	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
++	/*
++	 * If we're on a system with a broken vgic that requires
++	 * trapping, propagate the trapping requirements.
++	 *
++	 * Ah, the smell of rotten fruits...
++	 */
++	if (static_branch_unlikely(&vgic_v3_cpuif_trap))
++		val = host_if->vgic_hcr & (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
++					   ICH_HCR_EL2_TC | ICH_HCR_EL2_TDIR);
++	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) | val;
+ 	s_cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
+ 	s_cpu_if->vgic_sre = host_if->vgic_sre;
  
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 9986bb88c2597..834c587500699 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2503,6 +2503,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+@@ -335,6 +345,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct shadow_if *shadow_if = get_shadow_if();
+ 	struct vgic_v3_cpu_if *s_cpu_if = &shadow_if->cpuif;
++	u64 val;
+ 	int i;
+ 
+ 	__vgic_v3_save_vmcr_aprs(s_cpu_if);
+@@ -345,7 +356,10 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	 * Translate the shadow state HW fields back to the virtual ones
+ 	 * before copying the shadow struct back to the nested one.
+ 	 */
+-	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = s_cpu_if->vgic_hcr;
++	val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
++	val &= ~ICH_HCR_EL2_EOIcount_MASK;
++	val |= (s_cpu_if->vgic_hcr & ICH_HCR_EL2_EOIcount_MASK);
++	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = val;
+ 	__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = s_cpu_if->vgic_vmcr;
+ 
+ 	for (i = 0; i < 4; i++) {
+@@ -354,7 +368,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
  	}
  
- 	preempt_disable();
-+	vcpu_set_flag(vcpu, IN_NESTED_ERET);
- 	kvm_arch_vcpu_put(vcpu);
+ 	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
+-		u64 val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
++		val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
  
- 	if (!esr_iss_is_eretax(esr))
-@@ -2514,6 +2515,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	*vcpu_cpsr(vcpu) = spsr;
- 
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+	vcpu_clear_flag(vcpu, IN_NESTED_ERET);
- 	preempt_enable();
- 
- 	kvm_pmu_nested_transition(vcpu);
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index eedecbbbcf31b..0d9fb235c0180 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -336,6 +336,22 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
- 
-+static inline bool vgic_v4_want_doorbell(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu_get_flag(vcpu, IN_WFI))
-+		return true;
-+
-+	if (likely(!vcpu_has_nv(vcpu)))
-+		return false;
-+
-+	/*
-+	 * GICv4 hardware is only ever used for the L1. Mark the vPE (i.e. the
-+	 * L1 context) nonresident and request a doorbell to kick us out of the
-+	 * L2 when an IRQ becomes pending.
-+	 */
-+	return vcpu_get_flag(vcpu, IN_NESTED_ERET);
-+}
-+
- int vgic_v4_put(struct kvm_vcpu *vcpu)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-@@ -343,7 +359,7 @@ int vgic_v4_put(struct kvm_vcpu *vcpu)
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
-+	return its_make_vpe_non_resident(vpe, vgic_v4_want_doorbell(vcpu));
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
+ 		val &= ~ICH_LR_STATE;
+ 		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
 -- 
 2.39.2
 
