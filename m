@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D27199FD0;
-	Tue, 25 Feb 2025 17:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE8B20D510;
+	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504587; cv=none; b=Fmxm7NbL4KBq+G0Pwm+2FhjcT16hE1WGgEv5xe8GKFvWo87HMy7EQ9KuFt9guZFSV9wDmljVz8m6jMy6eioSfJkmJ/Q5c/eF6BgPJywbGZb5gcqQhNHbBpi+ATQ21j2XSU+Nzw/OI6lpCMUu4yfB+Qffy42Gvs2bIdnNTahQqMI=
+	t=1740504587; cv=none; b=tUEOgCtmOWMNgs9ymgPSEmVGrnLM/9+1zRRr0zCGHQFV84jNo6Ys4saYxLxpgtZs6zSWM/ulKZRq5DdfhCU4gjoCt29ksltJGbaqLmuV5pdJahXMk9dgsSTwGEdDx2gxH7ANDM8VY72uzEyLncfUB7tketH4JjvP+YP5cDJ8C00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740504587; c=relaxed/simple;
-	bh=xRpO2zj0gHFpycFMnNKG7Uh812YDKZ2YV9mcceXqpxY=;
+	bh=e8LpeF2ClqwJ/XkkP8Drhi20EQrQ3/FY1EIo8+fWROY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uTqUtMsCA50l9xCX0C25lQC+EbnSqudU52CziMqIU5Z1DpmhkA8wxu/TL8qGwoLvMb8iAV3Yy3JlgVPn5+w4voTXSZnkbRoL7YxSjkK26K91bdFTZQsdXpD/w6jIIJ1J8Of6css1dUdmtzGD4lDZ8Cv51u7FIqcon6gRvze681s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDnRM3Ix; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=o5UsKHBQzJeeCkBCxtUNFS9xJ/m5hcqcpYpEASxm2BVSqH5uKP7fAsQVE60qxDfpuA3+Wy8o7lRHlVaEdVVHR7NzSSUCdxRVANyOZ6maFkqN67id17yDgxexYwDcCtaPDzPd2zVIhjZPhaKOgl8gVED29b2c+CxIFllUAneTWyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rAlW4o2r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDnRM3Ix"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F384C4CEEB;
-	Tue, 25 Feb 2025 17:29:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rAlW4o2r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA41C4CEDD;
+	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740504586;
-	bh=xRpO2zj0gHFpycFMnNKG7Uh812YDKZ2YV9mcceXqpxY=;
+	s=k20201202; t=1740504587;
+	bh=e8LpeF2ClqwJ/XkkP8Drhi20EQrQ3/FY1EIo8+fWROY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BDnRM3IxjEJkeVQOBdCG4E8RMlRe1FBA8A71/YjD77XhbNWeYmpnhEksILDooMi7o
-	 prlzTkZTndR3SXYKZZIiHty2XCUGV12rvNJSCT4WtL8mPK7fhsRXfwj7easx/UKoXG
-	 p0wOx9Z4jdIigb3ACJrIsYX86gnLDltRp9qPwS7M5u+7/wcaHQTwNTg5OOlQ79EgPX
-	 sD/CwrP74cyve3HYKvzSBrd/bT2Q1wts/7PzopMbtbkmrA/fO/AiY/bC/VuMd15Fni
-	 For6uW8jAHc2QT1ZCypsLhT9urRSzGWJ4LEAdHbE8EllsQi0tNdzWvjhMJb+rK+QnF
-	 KmznHTwFMbJKw==
+	b=rAlW4o2raaxriI+YB9CwkVCitPQrYeKwufttCbnCpIrX6/v/lpIrsqobrp3/2LPCP
+	 tZUhTOo7Vmfhgz5+1vMdZ2Qk6+ErQdI5E36M+9FDG67B4w6yhqG3hu25xMldbnMJam
+	 iKzF/DI/Ddvs1HQCD6Ypq7kEw9g8OrPfJXOICum8O9O0bio+Nc5e1k0APt4teUEcn5
+	 g45S5Y6eQ/29qrrqwxdjqStDczxByz5WgRRyB+t4aSlJqp1pI3Uimm9A331cUz6/4S
+	 o5OuQBZ0QHm2nbOGEkmNY/yGReTlalyNEved9vU5uZClDNswXTFvTd2ck8axaqnFWu
+	 5ox7cbA4i2aKA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmyka-007rKs-N5;
-	Tue, 25 Feb 2025 17:29:44 +0000
+	id 1tmykb-007rKs-4t;
+	Tue, 25 Feb 2025 17:29:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 05/16] KVM: arm64: nv: Add ICH_*_EL2 registers to vpcu_sysreg
-Date: Tue, 25 Feb 2025 17:29:19 +0000
-Message-Id: <20250225172930.1850838-6-maz@kernel.org>
+Subject: [PATCH v4 07/16] KVM: arm64: nv: Sanitise ICH_HCR_EL2 accesses
+Date: Tue, 25 Feb 2025 17:29:21 +0000
+Message-Id: <20250225172930.1850838-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -60,54 +60,37 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_NV2 comes with a bunch of register-to-memory redirection
-involving the ICH_*_EL2 registers (LRs, APRs, VMCR, HCR).
-
-Adds them to the vcpu_sysreg enumeration.
+As ICH_HCR_EL2 is a VNCR accessor when runnintg NV, add some
+sanitising to what gets written. Crucially, mark TDIR as RES0
+if the HW doesn't support it (unlikely, but hey...), as well
+as anything GICv4 related, since we only expose a GICv3 to the
+uest.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/arm64/kvm/nested.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3a7ec98ef1238..7e0dc6b4cb99e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -557,7 +557,33 @@ enum vcpu_sysreg {
- 	VNCR(CNTP_CVAL_EL0),
- 	VNCR(CNTP_CTL_EL0),
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 0c9387d2f5070..7c8f39070a503 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1290,6 +1290,15 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 		res0 |= GENMASK(11, 8);
+ 	set_sysreg_masks(kvm, CNTHCTL_EL2, res0, res1);
  
-+	VNCR(ICH_LR0_EL2),
-+	VNCR(ICH_LR1_EL2),
-+	VNCR(ICH_LR2_EL2),
-+	VNCR(ICH_LR3_EL2),
-+	VNCR(ICH_LR4_EL2),
-+	VNCR(ICH_LR5_EL2),
-+	VNCR(ICH_LR6_EL2),
-+	VNCR(ICH_LR7_EL2),
-+	VNCR(ICH_LR8_EL2),
-+	VNCR(ICH_LR9_EL2),
-+	VNCR(ICH_LR10_EL2),
-+	VNCR(ICH_LR11_EL2),
-+	VNCR(ICH_LR12_EL2),
-+	VNCR(ICH_LR13_EL2),
-+	VNCR(ICH_LR14_EL2),
-+	VNCR(ICH_LR15_EL2),
++	/* ICH_HCR_EL2 */
++	res0 = ICH_HCR_EL2_RES0;
++	res1 = ICH_HCR_EL2_RES1;
++	if (!(kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_EL2_TDS))
++		res0 |= ICH_HCR_EL2_TDIR;
++	/* No GICv4 is presented to the guest */
++	res0 |= ICH_HCR_EL2_DVIM | ICH_HCR_EL2_vSGIEOICount;
++	set_sysreg_masks(kvm, ICH_HCR_EL2, res0, res1);
 +
-+	VNCR(ICH_AP0R0_EL2),
-+	VNCR(ICH_AP0R1_EL2),
-+	VNCR(ICH_AP0R2_EL2),
-+	VNCR(ICH_AP0R3_EL2),
-+	VNCR(ICH_AP1R0_EL2),
-+	VNCR(ICH_AP1R1_EL2),
-+	VNCR(ICH_AP1R2_EL2),
-+	VNCR(ICH_AP1R3_EL2),
- 	VNCR(ICH_HCR_EL2),
-+	VNCR(ICH_VMCR_EL2),
- 
- 	NR_SYS_REGS	/* Nothing after this line! */
- };
+ out:
+ 	for (enum vcpu_sysreg sr = __SANITISED_REG_START__; sr < NR_SYS_REGS; sr++)
+ 		(void)__vcpu_sys_reg(vcpu, sr);
 -- 
 2.39.2
 
