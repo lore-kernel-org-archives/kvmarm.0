@@ -1,51 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9B2267735;
-	Tue, 25 Feb 2025 11:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413ED1C84B1
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 11:19:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740481772; cv=none; b=BhNqO34pQbuD/1EcB9rGcj1FfuBmFHk+xbE7jVwSGUExRdKZwnYFWlnywRbv5r0FfLx6vs+KzsVAxCZKligMRsXEWakCGL4G15NQ9NFxV3Nr/hsvFzdsCRpHI4xo61H6D/2AGFcXVxD4GXAImYVBXUaVUeCjz4NJbYYXRSdEx4M=
+	t=1740482371; cv=none; b=OyGklxHLs5ExcC5NddT066irMuox+gvI8iZgCdXke/6zLiCe75J1koGhyZFN1oqjOShf481XeR9lb1rIFiQvcIdUSg7Ax0xdN6fxWsxAOmkq3Jkv2RQv8bjqnYHDvHsAlZsnP0nspeYRSzC09NnijJqoWfNbcnsYZQk1lt93u8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740481772; c=relaxed/simple;
-	bh=t9qneLykygfAbID/WX0+KCumjhrXOkT2wxUtSWsbx2w=;
+	s=arc-20240116; t=1740482371; c=relaxed/simple;
+	bh=B3TgZBsAiBcZvqlhdb7CHczCunKDrMTsOuzpJdkxlX4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G789qiVbHlPtxfi22A3gF4TF+6j+gyW5LOSxxrbffdb8JAmtyIGjSFBapgv8NAnH4vKyl1gDAIXX5ZEowbsLOKkQwmKv5A1cl9CINh5ZF8bluyrTzru+oEE/O1BSmIZwzaM7ajPnrrWsM6/+jUcjkVBJN9U9tA8EMM3glXs03is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sLxyZl6r; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=gysA6O/ojn7BoJiYZmX2NJerYGK47QwrHPSKTUr2sy7SFxE+9Gm/hy8+i2DH6f480sqksRVKNDerg9l4Kw+cXSsbMuOsSBJxl+QLjSOndJc8mCtDXHUNThNChKvdwP18Zw3whNXtTEwFfaPY25B9n+k/2TAM4V+HMTcTPNmk3CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cdOLZHmb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sLxyZl6r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A069EC4CEDD;
-	Tue, 25 Feb 2025 11:09:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cdOLZHmb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6589C4CEE6;
+	Tue, 25 Feb 2025 11:19:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740481771;
-	bh=t9qneLykygfAbID/WX0+KCumjhrXOkT2wxUtSWsbx2w=;
+	s=k20201202; t=1740482370;
+	bh=B3TgZBsAiBcZvqlhdb7CHczCunKDrMTsOuzpJdkxlX4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sLxyZl6r8i5Lk65IXR51iqFnQyGz8UidZHli3Rua9KW3hMMzYjCNgdJfIu9AXjjxG
-	 52jML8H+93kMsBWHBO/me8Mu0zFde+YNgFgqUxLQte4+W9aT7UiRbhQ1UT1whUn/7r
-	 9gBa9o/WWeIoY38EmdwCnm7ZJJVzjpe57n/V+H9M85+wpK8jnwJmAqZkHPlygQhyre
-	 0BIjpFk+HQFrbhuwJoYoYDwty1dr5newkRGZtOkBT1C+0wNEKfcVEDO1cE3PQMUvsX
-	 p2yNgUvwaLXswXB5bS0iz/o3xbcXyjmwB4aLM57dbgY1Vsah6ORxgzbACQg2lGlqmR
-	 NFp4zmL/X3YFw==
+	b=cdOLZHmb73vW4OHMUKgoGadhjhUm/oZhHKHmluNY3AjG1wURkR6bdn53Q7fSNXh4N
+	 bXTB9fB1wpFfG+fMrYGQUZOXDlwEVujXruCwk9vTOMaA+vXBsmsU6swTNcdtQzOBmo
+	 AtO9WLBS4t+KZdyzoC8Jih2WtTcU8sfDpFZ245fa73a8jeASWpJiJIy3NjRtp1ZwJc
+	 PJBoSTxvHJoabfnx2UNxGytrZcvzhr3w+TUOzxBqiQKm8t6Fk3E1WP0JvK+s5dNJlN
+	 BLcPhYPO0hDOIjxEBzZ6V+pGWwZU+wOH06mHY1AiHGSOlA+941FEGMCJym933VKY6m
+	 H+yOitOv9X6OA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmsoa-007jON-Kh;
-	Tue, 25 Feb 2025 11:09:29 +0000
-Date: Tue, 25 Feb 2025 11:09:27 +0000
-Message-ID: <86h64iqo0o.wl-maz@kernel.org>
+	id 1tmsyG-007jfi-GG;
+	Tue, 25 Feb 2025 11:19:28 +0000
+Date: Tue, 25 Feb 2025 11:19:28 +0000
+Message-ID: <86frk2qnjz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Mark Brown <broonie@kernel.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v4 1/5] KVM: arm64: Set HCR_EL2.TID1 unconditionally
-In-Reply-To: <20250225005401.679536-2-oliver.upton@linux.dev>
+	Sebastian Ott <sebott@redhat.com>
+Subject: Re: [PATCH v4 4/5] KVM: arm64: Allow userspace to change the implementation ID registers
+In-Reply-To: <20250225005401.679536-5-oliver.upton@linux.dev>
 References: <20250225005401.679536-1-oliver.upton@linux.dev>
-	<20250225005401.679536-2-oliver.upton@linux.dev>
+	<20250225005401.679536-5-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,183 +55,74 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, sebott@redhat.com, broonie@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, sebott@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 25 Feb 2025 00:53:57 +0000,
+On Tue, 25 Feb 2025 00:54:00 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> commit 90807748ca3a ("KVM: arm64: Hide SME system registers from
-> guests") added trap handling for SMIDR_EL1, treating it as UNDEFINED as
-> KVM does not support SME. This is right for the most part, however KVM
-> needs to set HCR_EL2.TID1 to _actually_ trap the register.
+> From: Sebastian Ott <sebott@redhat.com>
 > 
-> Unfortunately, this comes with some collateral damage as TID1 forces
-> REVIDR_EL1 and AIDR_EL1 to trap as well. KVM has long treated these
-> registers as "invariant" which is an awful term for the following:
+> KVM's treatment of the ID registers that describe the implementation
+> (MIDR, REVIDR, and AIDR) is interesting, to say the least. On the
+> userspace-facing end of it, KVM presents the values of the boot CPU on
+> all vCPUs and treats them as invariant. On the guest side of things KVM
+> presents the hardware values of the local CPU, which can change during
+> CPU migration in a big-little system.
 > 
->  - Userspace sees the boot CPU values on all vCPUs
+> While one may call this fragile, there is at least some degree of
+> predictability around it. For example, if a VMM wanted to present
+> big-little to a guest, it could affine vCPUs accordingly to the correct
+> clusters.
 > 
->  - The guest sees the hardware values of the CPU on which a vCPU is
->    scheduled
+> All of this makes a giant mess out of adding support for making these
+> implementation ID registers writable. Avoid breaking the rather subtle
+> ABI around the old way of doing things by requiring opt-in from
+> userspace to make the registers writable.
 > 
-> Keep the plates spinning by adding trap handling for the affected
-> registers and repaint all of the "invariant" crud into terms of
-> identifying an implementation. Yes, at this point we only need to
-> set TID1 on SME hardware, but REVIDR_EL1 and AIDR_EL1 are about to
-> become mutable anyway.
+> When the cap is enabled, allow userspace to set MIDR, REVIDR, and AIDR
+> to any non-reserved value and present those values consistently across
+> all vCPUs.
 > 
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: stable@vger.kernel.org
-> Fixes: 90807748ca3a ("KVM: arm64: Hide SME system registers from guests")
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> [oliver: changelog, capability]
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_arm.h |   4 +-
->  arch/arm64/kvm/sys_regs.c        | 175 ++++++++++++++++---------------
->  2 files changed, 94 insertions(+), 85 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 8d94a6c0ed5c..b01c01e55de5 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -92,12 +92,12 @@
->   * SWIO:	Turn set/way invalidates into set/way clean+invalidate
->   * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
->   * TID3:	Trap EL1 reads of group 3 ID registers
-> - * TID2:	Trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and CSSELR_EL1
-> + * TID1:	Trap REVIDR_EL1, AIDR_EL1, and SMIDR_EL1
->   */
->  #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
->  			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
->  			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
-> -			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3)
-> +			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
->  #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
->  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
->  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f6cd1ea7fb55..f25a157622e3 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2483,6 +2483,93 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +/*
-> + * For historical (ahem ABI) reasons, KVM treats MIDR_EL1, REVIDR_EL1, and
-> + * AIDR_EL1 as "invariant" registers, meaning userspace cannot change them.
+>  Documentation/virt/kvm/api.rst             | 18 +++++++++
+>  arch/arm64/include/asm/kvm_host.h          |  2 +
+>  arch/arm64/kvm/arm.c                       |  9 +++++
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  8 +++-
+>  arch/arm64/kvm/sys_regs.c                  | 45 +++++++++++++++++++---
+>  include/uapi/linux/kvm.h                   |  1 +
+>  6 files changed, 77 insertions(+), 6 deletions(-)
+>
 
-For consistency, using the past tense would make a lot more sense.
+[...]
 
-> + * The values made visible to userspace were the register values of the boot
-> + * CPU.
-> + *
-> + * At the same time, reads from these registers at EL1 previously were not
-> + * trapped, allowing the guest to read the actual hardware value. On big-little
-> + * machines, this means the VM can see different values depending on where a
-> + * given vCPU got scheduled.
-> + *
-> + * These registers are now trapped as collateral damage from SME, and what
-> + * follows attempts to give a user / guest view consistent with the existing
-> + * ABI.
-> + */
-> +static bool access_imp_id_reg(struct kvm_vcpu *vcpu,
-> +			      struct sys_reg_params *p,
-> +			      const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		return write_to_read_only(vcpu, p, r);
-> +
-> +	switch (reg_to_encoding(r)) {
-> +	case SYS_REVIDR_EL1:
-> +		p->regval = read_sysreg(revidr_el1);
-> +		break;
-> +	case SYS_AIDR_EL1:
-> +		p->regval = read_sysreg(aidr_el1);
-> +		break;
-> +	default:
-> +		WARN_ON_ONCE(1);
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static u64 __ro_after_init boot_cpu_midr_val;
-> +static u64 __ro_after_init boot_cpu_revidr_val;
-> +static u64 __ro_after_init boot_cpu_aidr_val;
-> +
-> +static void init_imp_id_regs(void)
-> +{
-> +	boot_cpu_midr_val = read_sysreg(midr_el1);
-> +	boot_cpu_revidr_val = read_sysreg(revidr_el1);
-> +	boot_cpu_aidr_val = read_sysreg(aidr_el1);
-> +}
-> +
-> +static int get_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> +			  u64 *val)
-> +{
-> +	switch (reg_to_encoding(r)) {
-> +	case SYS_MIDR_EL1:
-> +		*val = boot_cpu_midr_val;
-> +		break;
-> +	case SYS_REVIDR_EL1:
-> +		*val = boot_cpu_revidr_val;
-> +		break;
-> +	case SYS_AIDR_EL1:
-> +		*val = boot_cpu_aidr_val;
-> +		break;
-> +	default:
-> +		WARN_ON_ONCE(1);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int set_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> +			  u64 val)
-> +{
-> +	u64 expected;
-> +	int ret;
-> +
-> +	ret = get_imp_id_reg(vcpu, r, &expected);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return (expected == val) ? 0 : -EINVAL;
-> +}
-> +
-> +#define IMPLEMENTATION_ID(reg) {			\
-> +	SYS_DESC(SYS_##reg),				\
-> +	.access = access_imp_id_reg,			\
-> +	.get_user = get_imp_id_reg,			\
-> +	.set_user = set_imp_id_reg,			\
-> +}
->  
->  /*
->   * Architected system registers.
-> @@ -2532,7 +2619,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> @@ -2620,9 +2655,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
 >  
 >  	{ SYS_DESC(SYS_DBGVCR32_EL2), undef_access, reset_val, DBGVCR32_EL2, 0 },
 >  
-> +	IMPLEMENTATION_ID(MIDR_EL1),
+> -	IMPLEMENTATION_ID(MIDR_EL1),
+> +	IMPLEMENTATION_ID(MIDR_EL1, GENMASK_ULL(31, 0)),
 >  	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
-> +	IMPLEMENTATION_ID(REVIDR_EL1),
+> -	IMPLEMENTATION_ID(REVIDR_EL1),
+> +	IMPLEMENTATION_ID(REVIDR_EL1, -1),
+
+nit: using GENMASK_ULL() would be much nicer.
+
 >  
 >  	/*
 >  	 * ID regs: all ID_SANITISED() entries here must have corresponding
-> @@ -2804,6 +2893,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> @@ -2894,7 +2929,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
 >  	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
 >  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
 >  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
-> +	IMPLEMENTATION_ID(AIDR_EL1),
->  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
->  	ID_FILTERED(CTR_EL0, ctr_el0,
->  		    CTR_EL0_DIC_MASK |
+> -	IMPLEMENTATION_ID(AIDR_EL1),
+> +	IMPLEMENTATION_ID(AIDR_EL1, -1),
 
-I don't think this is enough. You also need to augment the cp15[]
-table to handle trapping for the 32bit versions of REVIDR/AIDR.
+Same thing here.
 
 Thanks,
 
