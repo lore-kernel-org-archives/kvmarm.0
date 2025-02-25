@@ -1,129 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DD2271273
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 13:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB26280A31
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 14:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740491655; cv=none; b=ttOitYY2DSXXBkhd/h2EKBYGIdWU5RVjQlKrliS4zkThOtlVG3zYzbtzP9H3PZtS/xSqhmSmSBUgTOpMTIvBnpI2/zsjvQrE5tkW/fCo+3ygFN+hPr2slDZEIxa9UBo8XIsUajDUE9AlC03YxU8Q2XhTwFXtTCpDVa4IVj87AHI=
+	t=1740494146; cv=none; b=iR5KEkHc85Nv8SKZ2R7cEPwT5iRkt0QwX6pzFunp5w1Ix50kJhx1iTTzxeSYtrcjFDTHiqq+qX/PhXbdlDJoPXPDhn7ckwn6VOFtURQvTZahMk/jhOEDBgCUsrCMIlWN4CErciASFR3p/Y9ECbEglj+FK2QqKNQqYOFPNlaNvh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740491655; c=relaxed/simple;
-	bh=sJBgf6JH/KGP3h5jphfCZqiK68MtmDr8IYCTk/ysiwg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fYCUI5swFCSlbLyxkI9TAfn5jAQsanla2D5GfGsmNBeXgRtLUP3MoOpfhuKwEQMUDuV2VUvS2Un+8e7FdYGDXK0ltBYHpyQZANJkeDPFfWRXUa2DhplVm5zchPLo6Wrby9WQD0uil6NrCN9cd6qPJxEZ9b1EPpJ7QVpdNe18eB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXVVHd3V; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740494146; c=relaxed/simple;
+	bh=9hyuXWtcrt6qYFRuvHO0bnjXrHF/CkXG7yP6ynsJrjs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Wl4eTqBaZO9jivNwzAFxduDUCfbAGw6c7lx2GtezBE0eN4zMXKir6VnlZqHmLYW8f/BatPgCxEimP9OwLCVDpsm82JPm8p1w/VN3LMBHJ5837tEP/zAa+SbIC+11otbYvzNHCd7zvG0qRaPBVotl6LpKXtS86dv09ul/ev5u130=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ImWW0go4; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXVVHd3V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E20AAC4CEE6;
-	Tue, 25 Feb 2025 13:54:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740491654;
-	bh=sJBgf6JH/KGP3h5jphfCZqiK68MtmDr8IYCTk/ysiwg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PXVVHd3VAEPCaVnUa0Z1/sOww3WzxmVzcfTR/QsnCSApnvyKcXduFK5Jyyf+OqF+x
-	 4u+RtSvshEx+m/oGOxRTkUO7TVQArYFx53RIXw5AfexzpvifFUr+j1KLI6rjniA4y6
-	 TX+jhu6yVgNOp7ox3DZtdB5pIbw0iCVVFGYN2v7aElmQGo2hJTjEDhpkJPMpIUDHFg
-	 /BgOu+O54ulwwFlvzzfz0PcfKj2KT0sbmbNRH8SE7hzraNHh0wI28uWLlOwfQT0bOU
-	 YUD7S78TDhh3+fv4ojwV4xciWpOEyvx6cWUY1Jv5PPQ+BGsLoPwHGenqAC1fXdLRUV
-	 0ulLb3exVH0Vw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tmvO0-007mfR-Rw;
-	Tue, 25 Feb 2025 13:54:13 +0000
-Date: Tue, 25 Feb 2025 13:54:12 +0000
-Message-ID: <86eczmqge3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sebastian Ott <sebott@redhat.com>
-Subject: Re: [PATCH v4 0/5] KVM: arm64: Writable MIDR/REVIDR (and associated baggage)
-In-Reply-To: <20250225005401.679536-1-oliver.upton@linux.dev>
-References: <20250225005401.679536-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ImWW0go4"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fbff6426f5so11862435a91.3
+        for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 06:35:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740494142; x=1741098942; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u3OyWMfMyDgx+55Ind0kZ2lpQA8/mHOXTjN2aQVmO4M=;
+        b=ImWW0go4TVyEeKkEKttwrx21bw/Ea3fX/27yW6yLqshxquoqMqY2YQuF3DrDqay+Jf
+         lSybz76gSG4SUATFMdSbOizbvKLM1BuOO+V0ZtmTzhc2/FYpT4PssZ6fpB7GXhjPQlnl
+         VeI/o1lKKwx7oFXXDduQ0ZlJKC62265/busPlOOV+8lnajeuPyVIOSAHQ1+6+pLWAAKE
+         m0Qb/Wr+tqnGUJEGftHa4grnfSY0fIOfMxDJwhvUm86LzDpXhmCPSi/wf4qUBSK6lwSy
+         8RG68soYVwC7EOphY+qrzIwuLQIvWxYgHZL1/MG0690iVMkV54Q27dp2fr4kV6nEnAL0
+         sVkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740494142; x=1741098942;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u3OyWMfMyDgx+55Ind0kZ2lpQA8/mHOXTjN2aQVmO4M=;
+        b=mDt1xzx74RiS9bshFGVYEGNC4jkG4L6SDwe++g3/JH+Wsbx1DcN970r7T93o32CBWk
+         IL6uYHC9EkWQsJ30cvL4MgiKU7EVsYD0f2rfymxlW+SgAQfkL0CahM57qNaCgtTpZfYC
+         qXkyR4pu2tqFTczpiqulpIIn0XFd1sMNwjdZZx/XTg8JbG9Ir2r9z0mZs4nR4sxfmNkX
+         iSomL9ntSwg0QPGX2SUCfIHsj+fyEceSyQMKrju2n6e3vhw/AqZyhw+XqKkucFHSNdeI
+         Hri3axTmy1U/Xg8eOcDzL36cbM9KdtD24KJmsnVr+WCFModG4k9WvcogTtNVyWs0Vw+M
+         YKHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgLjAmTMGKKfn8G0+ED1wI+Dg4zpa8k1GsEFoHjx8KgEgQ1Sz+xRBDnzZOoas/GH01KUkHqGI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxGFno3eDaOLlRO1VF3E5WJNa4lN9kcGDs6pXoE+pcFSZjfjmq/
+	/gROi6xuJydzdm8/R0CdiUP9bo9Gk8/0BKDDMrl4vOZ+luc3kujwOzncuRt4OOdqSOKu+MkR8bT
+	YqQ==
+X-Google-Smtp-Source: AGHT+IFXh/XOoHWCgjyYmqDQFrw6VQ+lwV1XpaGwsHvB9OE+S78BXcvOxN0p4LNeKFLBgsLwKA4Y+N0kitA=
+X-Received: from pjbdj6.prod.google.com ([2002:a17:90a:d2c6:b0:2fa:1fac:269c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8e:b0:2ee:c9b6:c26a
+ with SMTP id 98e67ed59e1d1-2fe68ada3bemr5889698a91.11.1740494141828; Tue, 25
+ Feb 2025 06:35:41 -0800 (PST)
+Date: Tue, 25 Feb 2025 06:35:40 -0800
+In-Reply-To: <Z71sOEu7/ewnWZU2@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, sebott@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250224235542.2562848-1-seanjc@google.com> <20250224235542.2562848-4-seanjc@google.com>
+ <Z71sOEu7/ewnWZU2@yzhao56-desk.sh.intel.com>
+Message-ID: <Z73U38mSuk_tOpqT@google.com>
+Subject: Re: [PATCH 3/7] KVM: Assert that a destroyed/freed vCPU is no longer visible
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Aaron Lewis <aaronlewis@google.com>, Jim Mattson <jmattson@google.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 25 Feb 2025 00:53:56 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> This is hopefully the last take on the writable MIDR/REVIDR/AIDR series.
-> 
-> I've restructured things in order to work around the existing
-> shortcomings, have a stable-worthy backport for SMIDR_EL1, and avoid
-> breaking ABI.
-> 
-> I personally hate using a capability for this, but given the subtlety of
-> the issue (and our habit of breaking save/restore) it is probably best
-> to put userspace in the driver's seat.
-> 
-> v3: https://lore.kernel.org/kvmarm/20250218163443.32836-1-sebott@redhat.com/
-> 
-> v3 -> v4:
->  - Trap SMIDR_EL1 accesses so they actually UNDEF
->  - Snapshot MIDR, REVIDR, and AIDR from the boot CPU
->  - Require buy-in from userspace to make ID registers writable
+On Tue, Feb 25, 2025, Yan Zhao wrote:
+> On Mon, Feb 24, 2025 at 03:55:38PM -0800, Sean Christopherson wrote:
+> > After freeing a vCPU, assert that it is no longer reachable, and that
+> > kvm_get_vcpu() doesn't return garbage or a pointer to some other vCPU.
+> > While KVM obviously shouldn't be attempting to access a freed vCPU, it's
+> > all too easy for KVM to make a VM-wide request, e.g. via KVM_BUG_ON() or
+> > kvm_flush_remote_tlbs().
+> > 
+> > Alternatively, KVM could short-circuit problematic paths if the VM's
+> > refcount has gone to zero, e.g. in kvm_make_all_cpus_request(), or KVM
+> > could try disallow making global requests during teardown.  But given that
+> > deleting the vCPU from the array Just Works, adding logic to the requests
+> > path is unnecessary, and trying to make requests illegal during teardown
+> > would be a fool's errand.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 201c14ff476f..991e8111e88b 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -489,6 +489,14 @@ void kvm_destroy_vcpus(struct kvm *kvm)
+> >  	kvm_for_each_vcpu(i, vcpu, kvm) {
+> >  		kvm_vcpu_destroy(vcpu);
+> >  		xa_erase(&kvm->vcpu_array, i);
+> > +
+> > +		/*
+> > +		 * Assert that the vCPU isn't visible in any way, to ensure KVM
+> > +		 * doesn't trigger a use-after-free if destroying vCPUs results
+> > +		 * in VM-wide request, e.g. to flush remote TLBs when tearing
+> > +		 * down MMUs, or to mark the VM dead if a KVM_BUG_ON() fires.
+> > +		 */
+> > +		WARN_ON_ONCE(xa_load(&kvm->vcpu_array, i) || kvm_get_vcpu(kvm, i));
+> As xa_erase() says "After this function returns, loading from @index will return
+> %NULL", is this checking of xa_load() necessary?
 
-Here's what I added to the series in order to handle AIDR/REVIDR. Not
-exactly pretty, but it does the job (tested on my Synquacker running a
-hand-crafted guest).
+None of this is "necessary".  My goal with the assert is to (a) document that KVM
+relies the vCPU to be NULL/unreachable and (b) to help ensure that doesn't change
+in the future.  Checking xa_load() is mostly about (a).
 
-Feel free to squash it into patch #1.
-
-Thanks,
-
-	M.
-
-From: Marc Zyngier <maz@kernel.org>
-Date: Tue, 25 Feb 2025 13:46:55 +0000
-Subject: [PATCH] KVM: arm64: Map AArch32 AIDR/REVIDR to their AArch64
- counterpart
-
-In order to handle AIDR/REVIDR traps from an AArch32 guest, add
-some ugly handling to kvm_handle_cp15_32().
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c1727fe6c8cb0..1ceaec61796c9 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4398,9 +4398,13 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu)
- 	 * Certain AArch32 ID registers are handled by rerouting to the AArch64
- 	 * system register table. Registers in the ID range where CRm=0 are
- 	 * excluded from this scheme as they do not trivially map into AArch64
--	 * system register encodings.
-+	 * system register encodings, except for AIDR/REVIDR.
- 	 */
--	if (params.Op1 == 0 && params.CRn == 0 && params.CRm)
-+	if (params.Op1 == 0 && params.CRn == 0 &&
-+	    (params.CRm || params.Op2 == 6 /* REVIDR */))
-+		return kvm_emulate_cp15_id_reg(vcpu, &params);
-+	if (params.Op1 == 1 && params.CRn == 0 &&
-+	    params.CRm == 0 && params.Op2 == 7 /* AIDR */)
- 		return kvm_emulate_cp15_id_reg(vcpu, &params);
- 
- 	return kvm_handle_cp_32(vcpu, &params, cp15_regs, ARRAY_SIZE(cp15_regs));
--- 
-2.39.2
-
-
--- 
-Without deviation from the norm, progress is not possible.
+That said, I agree checking xa_load() is more than a bit gratuitous.  I have no
+objection to checking only kvm_get_vcpu().
