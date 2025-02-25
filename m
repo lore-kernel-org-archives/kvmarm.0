@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEE820D513;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9175A195B1A;
 	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504587; cv=none; b=I/3A7iB4yIxdrXxyLFHf0NVUbxKwPqMUUEYKiAht+1FWueHKcOmnVQ14sJp+w4hSAcUBiuWpuF/4te45mdFJZ6hIHrs4OrFdzviNlc50UR7pTcygcQ9IN71Ir/OytJ44+5v9Vrb8rlDpYD18g5RAVbCTmjKvUnKHq943OzSnd18=
+	t=1740504587; cv=none; b=qECs76yEW0hbynDyuyQPplkSnEKFFylOcbhYl1XKA7D9l/iaotartZSEu2GXHJ1UPDgtXnYqMs0hGiucMNpt5aMNKQ2+GuDXBrPLRPCAwW3mDqT9hde4V13Z6ybxMzvYtG+TKpKyX0ftSaNTiQEHkE1OvHS0+9d/h34myXTMsQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740504587; c=relaxed/simple;
-	bh=9CjdniUMCErzrsUtghZUxDDK7vywe6Gk03WGF/J/BjA=;
+	bh=6hR4ZppiRWc63QZUOa75WISQi7w7DTy4cOWTy0wiTo4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dTWOqfSKJhiI0rnOBCwt+gL4gcp8j1IiiX6YOXB3Kbej0z+ywqW4pXeUQu8FxR71TVVYyyCf5P04DHxU4izJv/Rj43dRIIp/oRKcnaGDjxijYOIxu7BCLwP68QLxcwwJnCF83KX3S0PVd6qUHYj5snp3FFOxcSKurgc8VMeeXco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ArRHrcIu; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=e9X6y1LIQVSBRW6yTPa8zKisy/mXPLUqB+RladFsZ7tmn4yq7opek39zkQAF2AqYhYDJowBUgl3W2aznvHdBn+qMSNkI2l9lNhsIO/+CfInqvWi9nNhe9kNeU6Mp/Ql8V3HJ9KZ74Fkv9uFCSQLRzeGGyhr83+tUCbCA7/yF7p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A2yJXzd+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ArRHrcIu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA574C4CEEA;
-	Tue, 25 Feb 2025 17:29:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2yJXzd+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52881C4CEE8;
+	Tue, 25 Feb 2025 17:29:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740504586;
-	bh=9CjdniUMCErzrsUtghZUxDDK7vywe6Gk03WGF/J/BjA=;
+	s=k20201202; t=1740504587;
+	bh=6hR4ZppiRWc63QZUOa75WISQi7w7DTy4cOWTy0wiTo4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ArRHrcIuh6Y8kX37HXIE2dxHq94cbU9hSJLhLHUtR9zJpXhbhyzjy//w2xR0BsH2s
-	 iyM5w7kyvA9SCCu8ABETGjdRkFF9sjMOjxwsRul5K9aI3KlrxGV/mON0j7TOrpra7u
-	 GjnU8B27yyGAOlmiZrtzjvbD0EyXrbGyWHgthY7uqNdh/2PDE05xXXRx+T/jW/aHwp
-	 Sw6AKU68Jzb3t/dgnCLhK3p29p8dIpfj9ZRrClTEqC+aukJK+uY8AWWLqQncg1zU3g
-	 QpXzpocyCVcD5jP1PQdpAeVusZDfviooo8Z01faOyqVasO8y49o4/t4kqVvj5PV49O
-	 N/+EeRaPz0PFQ==
+	b=A2yJXzd+LCPapJyg4J13nIdi+gApgi3CRQdq5n4ssahFYum3oN3+H4i/rD0meglRe
+	 5ShLrbMGLB6GQPUSVujMEPLo6l0ELphMi8RmAEfFsy41DKUXmskeLRtMG/by5EGkIk
+	 WLTMYgmytLm7R+LEG8Ca+cAZlDb+50ADkiCxISomIQvj3Nq55pO3EKZzMgIEdlQ3bf
+	 NoTAZOXvti4uGP53J93ezuByAKfMLpLIl7PvAC0SFtORnsg8vkpTvtgHWqyGkTl9bY
+	 5vy4VkW1erhuDvne263mknH3bjtIayeFzdwTg7+OkYZc3P6hECUjr+5tWqLSPqPfER
+	 XeNEut8ySnMHg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tmyka-007rKs-T3;
-	Tue, 25 Feb 2025 17:29:44 +0000
+	id 1tmykb-007rKs-AL;
+	Tue, 25 Feb 2025 17:29:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 06/16] KVM: arm64: nv: Plumb handling of GICv3 EL2 accesses
-Date: Tue, 25 Feb 2025 17:29:20 +0000
-Message-Id: <20250225172930.1850838-7-maz@kernel.org>
+Subject: [PATCH v4 08/16] KVM: arm64: nv: Nested GICv3 emulation
+Date: Tue, 25 Feb 2025 17:29:22 +0000
+Message-Id: <20250225172930.1850838-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250225172930.1850838-1-maz@kernel.org>
 References: <20250225172930.1850838-1-maz@kernel.org>
@@ -60,306 +60,377 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Wire the handling of all GICv3 EL2 registers, and provide emulation
-for all the non memory-backed registers (ICC_SRE_EL2, ICH_VTR_EL2,
-ICH_MISR_EL2, ICH_ELRSR_EL2, and ICH_EISR_EL2).
+When entering a nested VM, we set up the hypervisor control interface
+based on what the guest hypervisor has set. Especially, we investigate
+each list register written by the guest hypervisor whether HW bit is
+set.  If so, we translate hw irq number from the guest's point of view
+to the real hardware irq number if there is a mapping.
 
+Co-developed-by: Jintack Lim <jintack@cs.columbia.edu>
+Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+[Christoffer: Redesigned execution flow around vcpu load/put]
+Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: Rewritten to support GICv3 instead of GICv2, NV2 support]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/sys_regs.c            |  95 +++++++++++++++++++-
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 125 +++++++++++++++++++++++++++
- include/kvm/arm_vgic.h               |   4 +
- 4 files changed, 224 insertions(+), 2 deletions(-)
- create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+ arch/arm64/include/asm/kvm_hyp.h     |   2 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |   2 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 218 +++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3.c        |  11 ++
+ arch/arm64/kvm/vgic/vgic.c           |   6 +
+ arch/arm64/kvm/vgic/vgic.h           |   4 +
+ include/kvm/arm_vgic.h               |   2 +
+ 7 files changed, 244 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 3cf7adb2b5038..209bc76263f10 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -23,7 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
- 	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
- 	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
--	 vgic/vgic-its.o vgic/vgic-debug.o
-+	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index c838309e4ec47..e6be1f5d0967f 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -76,6 +76,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
- kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 82430c1e1dd02..84248fabd418c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -17,6 +17,7 @@
- #include <linux/mm.h>
- #include <linux/printk.h>
- #include <linux/uaccess.h>
-+#include <linux/irqchip/arm-gic-v3.h>
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
  
- #include <asm/arm_pmuv3.h>
- #include <asm/cacheflush.h>
-@@ -531,7 +532,13 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return ignore_write(vcpu, p);
++u64 __gic_v3_get_lr(unsigned int lr);
++
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index b47dede973b3c..ed363aa3027e5 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -18,7 +18,7 @@
+ #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
+ #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
  
--	p->regval = vcpu->arch.vgic_cpu.vgic_v3.vgic_sre;
-+	if (p->Op1 == 4) {	/* ICC_SRE_EL2 */
-+		p->regval = (ICC_SRE_EL2_ENABLE | ICC_SRE_EL2_SRE |
-+			     ICC_SRE_EL1_DIB | ICC_SRE_EL1_DFB);
-+	} else {		/* ICC_SRE_EL1 */
-+		p->regval = vcpu->arch.vgic_cpu.vgic_v3.vgic_sre;
-+	}
-+
- 	return true;
- }
- 
-@@ -2426,6 +2433,59 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
- 	vq = SYS_FIELD_GET(ZCR_ELx, LEN, p->regval) + 1;
- 	vq = min(vq, vcpu_sve_max_vq(vcpu));
- 	vcpu_write_sys_reg(vcpu, vq - 1, ZCR_EL2);
-+
-+	return true;
-+}
-+
-+static bool access_gic_vtr(struct kvm_vcpu *vcpu,
-+			   struct sys_reg_params *p,
-+			   const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	p->regval = kvm_vgic_global_state.ich_vtr_el2;
-+	p->regval &= ~(ICH_VTR_EL2_DVIM 	|
-+		       ICH_VTR_EL2_A3V		|
-+		       ICH_VTR_EL2_IDbits);
-+	p->regval |= ICH_VTR_EL2_nV4;
-+
-+	return true;
-+}
-+
-+static bool access_gic_misr(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	p->regval = vgic_v3_get_misr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool access_gic_eisr(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	p->regval = vgic_v3_get_eisr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool access_gic_elrsr(struct kvm_vcpu *vcpu,
-+			     struct sys_reg_params *p,
-+			     const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	p->regval = vgic_v3_get_elrsr(vcpu);
-+
- 	return true;
- }
- 
-@@ -3102,7 +3162,40 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
- 	{ SYS_DESC(SYS_RMR_EL2), undef_access },
- 
-+	EL2_REG_VNCR(ICH_AP0R0_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP0R1_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP0R2_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP0R3_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP1R0_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP1R1_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP1R2_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_AP1R3_EL2, reset_val, 0),
-+
-+	{ SYS_DESC(SYS_ICC_SRE_EL2), access_gic_sre },
-+
- 	EL2_REG_VNCR(ICH_HCR_EL2, reset_val, 0),
-+	{ SYS_DESC(SYS_ICH_VTR_EL2), access_gic_vtr },
-+	{ SYS_DESC(SYS_ICH_MISR_EL2), access_gic_misr },
-+	{ SYS_DESC(SYS_ICH_EISR_EL2), access_gic_eisr },
-+	{ SYS_DESC(SYS_ICH_ELRSR_EL2), access_gic_elrsr },
-+	EL2_REG_VNCR(ICH_VMCR_EL2, reset_val, 0),
-+
-+	EL2_REG_VNCR(ICH_LR0_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR1_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR2_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR3_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR4_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR5_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR6_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR7_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR8_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR9_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR10_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR11_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR12_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR13_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR14_EL2, reset_val, 0),
-+	EL2_REG_VNCR(ICH_LR15_EL2, reset_val, 0),
- 
- 	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
+-static u64 __gic_v3_get_lr(unsigned int lr)
++u64 __gic_v3_get_lr(unsigned int lr)
+ {
+ 	switch (lr & 0xf) {
+ 	case 0:
 diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-new file mode 100644
-index 0000000000000..48bfd2f556a36
---- /dev/null
+index 48bfd2f556a36..3d80bfb37de00 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
 +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -0,0 +1,125 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/cpu.h>
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <linux/interrupt.h>
-+#include <linux/io.h>
-+#include <linux/uaccess.h>
-+
-+#include <kvm/arm_vgic.h>
-+
-+#include <asm/kvm_arm.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_nested.h>
-+
-+#include "vgic.h"
-+
-+#define ICH_LRN(n)	(ICH_LR0_EL2 + (n))
-+
-+struct mi_state {
-+	u16	eisr;
-+	u16	elrsr;
-+	bool	pend;
+@@ -16,6 +16,8 @@
+ #include "vgic.h"
+ 
+ #define ICH_LRN(n)	(ICH_LR0_EL2 + (n))
++#define ICH_AP0RN(n)	(ICH_AP0R0_EL2 + (n))
++#define ICH_AP1RN(n)	(ICH_AP1R0_EL2 + (n))
+ 
+ struct mi_state {
+ 	u16	eisr;
+@@ -23,9 +25,54 @@ struct mi_state {
+ 	bool	pend;
+ };
+ 
++/*
++ * The shadow registers loaded to the hardware when running a L2 guest
++ * with the virtual IMO/FMO bits set.
++ */
++struct shadow_if {
++	struct vgic_v3_cpu_if	cpuif;
++	unsigned long		lr_map;
 +};
 +
-+/*
-+ * Nesting GICv3 support
-+ *
-+ * System register emulation:
-+ *
-+ * We get two classes of registers:
-+ *
-+ * - those backed by memory (LRs, APRs, HCR, VMCR): L1 can freely access
-+ *   them, and L0 doesn't see a thing.
-+ *
-+ * - those that always trap (ELRSR, EISR, MISR): these are status registers
-+ *   that are built on the fly based on the in-memory state.
-+ *
-+ * Only L1 can access the ICH_*_EL2 registers. A non-NV L2 obviously cannot,
-+ * and a NV L2 would either access the VNCR page provided by L1 (memory
-+ * based registers), or see the access redirected to L1 (registers that
-+ * trap) thanks to NV being set by L1.
-+ */
++static DEFINE_PER_CPU(struct shadow_if, shadow_if);
 +
-+static bool lr_triggers_eoi(u64 lr)
+ /*
+  * Nesting GICv3 support
+  *
++ * On a non-nesting VM (only running at EL0/EL1), the host hypervisor
++ * completely controls the interrupts injected via the list registers.
++ * Consequently, most of the state that is modified by the guest (by ACK-ing
++ * and EOI-ing interrupts) is synced by KVM on each entry/exit, so that we
++ * keep a semi-consistent view of the interrupts.
++ *
++ * This still applies for a NV guest, but only while "InHost" (either
++ * running at EL2, or at EL0 with HCR_EL2.{E2H.TGE}=={1,1}.
++ *
++ * When running a L2 guest ("not InHost"), things are radically different,
++ * as the L1 guest is in charge of provisioning the interrupts via its own
++ * view of the ICH_LR*_EL2 registers, which conveniently live in the VNCR
++ * page.  This means that the flow described above does work (there is no
++ * state to rebuild in the L0 hypervisor), and that most things happed on L2
++ * load/put:
++ *
++ * - on L2 load: move the in-memory L1 vGIC configuration into a shadow,
++ *   per-CPU data structure that is used to populate the actual LRs. This is
++ *   an extra copy that we could avoid, but life is short. In the process,
++ *   we remap any interrupt that has the HW bit set to the mapped interrupt
++ *   on the host, should the host consider it a HW one. This allows the HW
++ *   deactivation to take its course, such as for the timer.
++ *
++ * - on L2 put: perform the inverse transformation, so that the result of L2
++ *   running becomes visible to L1 in the VNCR-accessible registers.
++ *
++ * - there is nothing to do on L2 entry, as everything will have happenned
++ *   on load. However, this is the point where we detect that an interrupt
++ *   targeting L1 and prepare the grand switcheroo.
++ *
++ * - on L2 exit: emulate the HW bit, and deactivate corresponding the L1
++ *   interrupt. The L0 active state will be cleared by the HW if the L1
++ *   interrupt was itself backed by a HW interrupt.
++ *
+  * System register emulation:
+  *
+  * We get two classes of registers:
+@@ -42,6 +89,26 @@ struct mi_state {
+  * trap) thanks to NV being set by L1.
+  */
+ 
++bool vgic_state_is_nested(struct kvm_vcpu *vcpu)
 +{
-+	return !(lr & (ICH_LR_STATE | ICH_LR_HW)) && (lr & ICH_LR_EOI);
++	u64 xmo;
++
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
++		xmo = __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_IMO | HCR_FMO);
++		WARN_ONCE(xmo && xmo != (HCR_IMO | HCR_FMO),
++			  "Separate virtual IRQ/FIQ settings not supported\n");
++
++		return !!xmo;
++	}
++
++	return false;
 +}
 +
-+static void vgic_compute_mi_state(struct kvm_vcpu *vcpu, struct mi_state *mi_state)
++static struct shadow_if *get_shadow_if(void)
 +{
-+	u16 eisr = 0, elrsr = 0;
-+	bool pend = false;
++	return this_cpu_ptr(&shadow_if);
++}
++
+ static bool lr_triggers_eoi(u64 lr)
+ {
+ 	return !(lr & (ICH_LR_STATE | ICH_LR_HW)) && (lr & ICH_LR_EOI);
+@@ -123,3 +190,154 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
+ 
+ 	return reg;
+ }
++
++/*
++ * For LRs which have HW bit set such as timer interrupts, we modify them to
++ * have the host hardware interrupt number instead of the virtual one programmed
++ * by the guest hypervisor.
++ */
++static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
++				     struct vgic_v3_cpu_if *s_cpu_if)
++{
++	unsigned long lr_map = 0;
++	int index = 0;
 +
 +	for (int i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
 +		u64 lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
++		struct vgic_irq *irq;
 +
-+		if (lr_triggers_eoi(lr))
-+			eisr |= BIT(i);
 +		if (!(lr & ICH_LR_STATE))
-+			elrsr |= BIT(i);
-+		pend |= (lr & ICH_LR_PENDING_BIT);
++			lr = 0;
++
++		if (!(lr & ICH_LR_HW))
++			goto next;
++
++		/* We have the HW bit set, check for validity of pINTID */
++		irq = vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
++		if (!irq || !irq->hw || irq->intid > VGIC_MAX_SPI ) {
++			/* There was no real mapping, so nuke the HW bit */
++			lr &= ~ICH_LR_HW;
++			if (irq)
++				vgic_put_irq(vcpu->kvm, irq);
++			goto next;
++		}
++
++		/* It is illegal to have the EOI bit set with HW */
++		lr &= ~ICH_LR_EOI;
++
++		/* Translate the virtual mapping to the real one */
++		lr &= ~ICH_LR_PHYS_ID_MASK;
++		lr |= FIELD_PREP(ICH_LR_PHYS_ID_MASK, (u64)irq->hwintid);
++
++		vgic_put_irq(vcpu->kvm, irq);
++
++next:
++		s_cpu_if->vgic_lr[index] = lr;
++		if (lr) {
++			lr_map |= BIT(i);
++			index++;
++		}
 +	}
 +
-+	mi_state->eisr	= eisr;
-+	mi_state->elrsr	= elrsr;
-+	mi_state->pend	= pend;
++	container_of(s_cpu_if, struct shadow_if, cpuif)->lr_map = lr_map;
++	s_cpu_if->used_lrs = index;
 +}
 +
-+u16 vgic_v3_get_eisr(struct kvm_vcpu *vcpu)
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
 +{
-+	struct mi_state mi_state;
++	struct shadow_if *shadow_if = get_shadow_if();
++	int i, index = 0;
 +
-+	vgic_compute_mi_state(vcpu, &mi_state);
-+	return mi_state.eisr;
++	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
++		u64 lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
++		struct vgic_irq *irq;
++
++		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++			goto next;
++
++		/*
++		 * If we had a HW lr programmed by the guest hypervisor, we
++		 * need to emulate the HW effect between the guest hypervisor
++		 * and the nested guest.
++		 */
++		irq = vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
++		if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
++			goto next;
++
++		lr = __gic_v3_get_lr(index);
++		if (!(lr & ICH_LR_STATE))
++			irq->active = false;
++
++		vgic_put_irq(vcpu->kvm, irq);
++	next:
++		index++;
++	}
 +}
 +
-+u16 vgic_v3_get_elrsr(struct kvm_vcpu *vcpu)
++static void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu,
++					struct vgic_v3_cpu_if *s_cpu_if)
 +{
-+	struct mi_state mi_state;
++	struct vgic_v3_cpu_if *host_if = &vcpu->arch.vgic_cpu.vgic_v3;
++	int i;
 +
-+	vgic_compute_mi_state(vcpu, &mi_state);
-+	return mi_state.elrsr;
-+}
++	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
++	s_cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
++	s_cpu_if->vgic_sre = host_if->vgic_sre;
 +
-+u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
-+{
-+	struct mi_state mi_state;
-+	u64 reg = 0, hcr, vmcr;
-+
-+	hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-+	vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
-+
-+	vgic_compute_mi_state(vcpu, &mi_state);
-+
-+	if (mi_state.eisr)
-+		reg |= ICH_MISR_EL2_EOI;
-+
-+	if (__vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_UIE) {
-+		int used_lrs = kvm_vgic_global_state.nr_lr;
-+
-+		used_lrs -= hweight16(mi_state.elrsr);
-+		reg |= (used_lrs <= 1) ? ICH_MISR_EL2_U : 0;
++	for (i = 0; i < 4; i++) {
++		s_cpu_if->vgic_ap0r[i] = __vcpu_sys_reg(vcpu, ICH_AP0RN(i));
++		s_cpu_if->vgic_ap1r[i] = __vcpu_sys_reg(vcpu, ICH_AP1RN(i));
 +	}
 +
-+	if ((hcr & ICH_HCR_EL2_LRENPIE) && FIELD_GET(ICH_HCR_EL2_EOIcount_MASK, hcr))
-+		reg |= ICH_MISR_EL2_LRENP;
-+
-+	if ((hcr & ICH_HCR_EL2_NPIE) && !mi_state.pend)
-+		reg |= ICH_MISR_EL2_NP;
-+
-+	if ((hcr & ICH_HCR_EL2_VGrp0EIE) && (vmcr & ICH_VMCR_ENG0_MASK))
-+		reg |= ICH_MISR_EL2_VGrp0E;
-+
-+	if ((hcr & ICH_HCR_EL2_VGrp0DIE) && !(vmcr & ICH_VMCR_ENG0_MASK))
-+		reg |= ICH_MISR_EL2_VGrp0D;
-+
-+	if ((hcr & ICH_HCR_EL2_VGrp1EIE) && (vmcr & ICH_VMCR_ENG1_MASK))
-+		reg |= ICH_MISR_EL2_VGrp1E;
-+
-+	if ((hcr & ICH_HCR_EL2_VGrp1DIE) && !(vmcr & ICH_VMCR_ENG1_MASK))
-+		reg |= ICH_MISR_EL2_VGrp1D;
-+
-+	return reg;
++	vgic_v3_create_shadow_lr(vcpu, s_cpu_if);
 +}
++
++void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
++{
++	struct shadow_if *shadow_if = get_shadow_if();
++	struct vgic_v3_cpu_if *cpu_if = &shadow_if->cpuif;
++
++	BUG_ON(!vgic_state_is_nested(vcpu));
++
++	vgic_v3_create_shadow_state(vcpu, cpu_if);
++
++	__vgic_v3_restore_vmcr_aprs(cpu_if);
++	__vgic_v3_activate_traps(cpu_if);
++
++	__vgic_v3_restore_state(cpu_if);
++}
++
++void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
++{
++	struct shadow_if *shadow_if = get_shadow_if();
++	struct vgic_v3_cpu_if *s_cpu_if = &shadow_if->cpuif;
++	int i;
++
++	__vgic_v3_save_vmcr_aprs(s_cpu_if);
++	__vgic_v3_deactivate_traps(s_cpu_if);
++	__vgic_v3_save_state(s_cpu_if);
++
++	/*
++	 * Translate the shadow state HW fields back to the virtual ones
++	 * before copying the shadow struct back to the nested one.
++	 */
++	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = s_cpu_if->vgic_hcr;
++	__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = s_cpu_if->vgic_vmcr;
++
++	for (i = 0; i < 4; i++) {
++		__vcpu_sys_reg(vcpu, ICH_AP0RN(i)) = s_cpu_if->vgic_ap0r[i];
++		__vcpu_sys_reg(vcpu, ICH_AP1RN(i)) = s_cpu_if->vgic_ap1r[i];
++	}
++
++	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
++		u64 val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
++
++		val &= ~ICH_LR_STATE;
++		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
++
++		__vcpu_sys_reg(vcpu, ICH_LRN(i)) = val;
++		s_cpu_if->vgic_lr[i] = 0;
++	}
++
++	shadow_if->lr_map = 0;
++}
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 51f0c7451817d..73a8a7df4bd23 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -734,6 +734,12 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+ 
++	/* If the vgic is nested, perform the full state loading */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_load_nested(vcpu);
++		return;
++	}
++
+ 	if (likely(!is_protected_kvm_enabled()))
+ 		kvm_call_hyp(__vgic_v3_restore_vmcr_aprs, cpu_if);
+ 
+@@ -747,6 +753,11 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+ 
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_put_nested(vcpu);
++		return;
++	}
++
+ 	if (likely(!is_protected_kvm_enabled()))
+ 		kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
+ 	WARN_ON(vgic_v4_put(vcpu));
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index cc8c6b9b5dd8b..324c547e1b4d8 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -872,6 +872,12 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	int used_lrs;
+ 
++	/* If nesting, emulate the HW effect from L0 to L1 */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_sync_nested(vcpu);
++		return;
++	}
++
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+ 		return;
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 122d95b4e2845..cf0c084e5d347 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -353,4 +353,8 @@ static inline bool kvm_has_gicv3(struct kvm *kvm)
+ 	return kvm_has_feat(kvm, ID_AA64PFR0_EL1, GIC, IMP);
+ }
+ 
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
++void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
++void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
++
+ #endif
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 3a8ccfda34d29..5017fcc71e604 100644
+index 5017fcc71e604..1b373cb870fe4 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -389,6 +389,10 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
+@@ -437,6 +437,8 @@ int vgic_v4_load(struct kvm_vcpu *vcpu);
+ void vgic_v4_commit(struct kvm_vcpu *vcpu);
+ int vgic_v4_put(struct kvm_vcpu *vcpu);
  
-+u16 vgic_v3_get_eisr(struct kvm_vcpu *vcpu);
-+u16 vgic_v3_get_elrsr(struct kvm_vcpu *vcpu);
-+u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu);
++bool vgic_state_is_nested(struct kvm_vcpu *vcpu);
 +
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	((k)->arch.vgic.initialized)
- #define vgic_ready(k)		((k)->arch.vgic.ready)
+ /* CPU HP callbacks */
+ void kvm_vgic_cpu_up(void);
+ void kvm_vgic_cpu_down(void);
 -- 
 2.39.2
 
