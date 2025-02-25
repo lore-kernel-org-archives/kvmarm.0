@@ -1,345 +1,269 @@
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2313814A635
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 01:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD7F256C7D
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 06:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740448423; cv=none; b=f7relfszcra1Gyxcpn/0etPhk9dX0FlaybFXvcwSmH+LbxQslBWsLmS0VgLCHtGlw4qDHEt8+e4wf/nwHEtwc+LZMedYpmwSn4cjneoTh0bvmK45Yh6cz2FB0BHQj07N3zcvmnyJVD3dXj0u5XnxLe/+LLfEgft41NXAKE+fgj4=
+	t=1740464250; cv=none; b=IrEHwfR7zorsJD76ukbBDkEsZn0EL5IMtlR+kXX8d4i9xViW94D9TNMrUOn/H57yYDJJ7NXW5LT+egJe60qepD9UjG0Ej9YGUGmD9iQTfg9IohIe8CK8G1fKmW96luZofj+hXKg/ISgiDvXLlTFRuNGa9PJG6+s/jKMy28vYOfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740448423; c=relaxed/simple;
-	bh=G4kbwapJ8xN308f+p/Fax6Gc5PoYYSkhHYuE1MyjKho=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F+kwD0tXsmd5dWkEoPDHJ7O8kx1kDJzrpHb08avKoEhek/YoCvQ3psJyqXO5ivGIGIZ1+N99nbIoX0lC+eV/UOK2nTVEYe7rn3NNwZAOejYA8pNNpyjLXg9nL3RuRhlKXRNEUFjdhqbHbp03FH965fODRWAbLr4/FcOH9xEU8sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rbUGkR3C; arc=none smtp.client-ip=209.85.208.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rbUGkR3C"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5e0bff433cbso2983486a12.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Feb 2025 17:53:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740448418; x=1741053218; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m7dZmTdaF5BfvE12HLbTKAM/qU/qgzQacpIdfJS89lM=;
-        b=rbUGkR3CiGFD3qtFBHXm1kAuQt+TozJhnvYAun6lUGq1yGPq9aYSPKzbTOfYiP6sIx
-         vxfAKqC08sZi2S63sl/sCNaUl5lK6MroS8xVNhjxLbG+UZ95QJxfF6BOkuZzMpzED75D
-         iGs7R6I0swu/B8KLGVnnk1udjyX1UvdJyUjp9gFGLfMsavmTqZ2N5JEebGK9AMC4gg/L
-         mvv9prGo3a6qnxPg0f9PA1Ei8mfygJ/nZH22Cp+hmpxVDHuf7nYRct/hN9gXcB3ipZQQ
-         ljfxvMGw1iOdYKwE7ehJMO+JmHhrD24kjvaP5DKo7YpU5IWcVQJUXQITrysVkpCz3Njh
-         HlbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740448418; x=1741053218;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m7dZmTdaF5BfvE12HLbTKAM/qU/qgzQacpIdfJS89lM=;
-        b=gR6tFle998ZhFNpUI6Hge8wCLsSFe1CEkMJS54Wac78v45x/avfdU1nTVk3FUNSjX4
-         cOo+c+OkC5CJUt8kASujrtfFhjA/YTtk2CVUKAb+gydndY3/ZmNbb7o2PYz1Mi0RsyGF
-         tETWvs60WnMvLOTrrHWDL5WdoRb/2OJYrpHhO3/1grktxtFHiIlNYNzVFBKtbwt8tKQK
-         /CdLJTmCZrY/9FexiSK6n+1RztLbIGCZI9Fd3JdAfJMpHsu1Srmmvnd0Su5OnTwTnRco
-         micAsIyr7Ieq2E7Nyh/Gjk1kLzxzKhFw8ikukLdsTdHte2yjNysXJNXNLBv31/jZJbU3
-         fjig==
-X-Forwarded-Encrypted: i=1; AJvYcCVpUalp2QZEc9fsWf75/qECJCnXMf2TtAsFCHok/rXJqxHWQGW0KhLlHRh6ylCC0qqzHYOA2DM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyeKFkEW2GzcsEQPcBGJ/H2z/7iCwH3jJaxIVoyqfq8SP2bas2W
-	iWw21QralgUil0pK8dQTdxBlSKQXvQjfTPGbgM/giPXKF0Y08Q7L1xSAfLdkW3/3t9llUChfuW/
-	4RRpYFA==
-X-Google-Smtp-Source: AGHT+IGwggas76Qq6nVnBY8hQptDHcF9hAdQuXod8zicSSA+dENSbfVyJVzhiJxQLNjNL2CSji69tgz9i4oD
-X-Received: from edbig12.prod.google.com ([2002:a05:6402:458c:b0:5de:6e72:c13b])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:42c5:b0:5e0:87fb:72fb
- with SMTP id 4fb4d7f45d1cf-5e0b70b707dmr17770196a12.6.1740448418641; Mon, 24
- Feb 2025 17:53:38 -0800 (PST)
-Date: Tue, 25 Feb 2025 01:53:27 +0000
-In-Reply-To: <20250225015327.3708420-1-qperret@google.com>
+	s=arc-20240116; t=1740464250; c=relaxed/simple;
+	bh=2shgGogTgLVnF/xDRmIJLUbUkEMcbxDsqRJUV2lIt5s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lPycRBfWzlnnr3to+5r/Xw43/Qm4P/T2TZnW6gk7UqJ17z484bXWtAtWpaAZ0+8UhkcZBVU1mJr0tAUGZk2E9unMm355MjRU952jNIQ93jhQ2Yh5f1SNTxjwS08yaUb+o7QgDKiTtkw7XE6Svrm+Q3T8vhfKkXYYE60CVDP9ydc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 731C0152B;
+	Mon, 24 Feb 2025 22:17:36 -0800 (PST)
+Received: from [10.162.40.21] (a077893.blr.arm.com [10.162.40.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C42A73F673;
+	Mon, 24 Feb 2025 22:17:15 -0800 (PST)
+Message-ID: <2ca1dc13-cd5a-4597-9733-2343e05f53b3@arm.com>
+Date: Tue, 25 Feb 2025 11:47:12 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250225015327.3708420-1-qperret@google.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250225015327.3708420-5-qperret@google.com>
-Subject: [PATCH v2 4/4] KVM: arm64: Extend pKVM selftest for np-guests
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 7/7] arm64/boot: Enable EL2 requirements for
+ FEAT_PMUv3p9
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
+ Mark Brown <robh@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Jonathan Corbet <corbet@lwn.net>, Eric Auger <eric.auger@redhat.com>,
+ kvmarm@lists.linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250203050828.1049370-1-anshuman.khandual@arm.com>
+ <20250203050828.1049370-8-anshuman.khandual@arm.com>
+ <Z7x-EDH9QP7g4lC6@J2N7QTR9R3.cambridge.arm.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <Z7x-EDH9QP7g4lC6@J2N7QTR9R3.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The pKVM selftest intends to test as many memory 'transitions' as
-possible, so extend it to cover sharing pages with non-protected guests,
-including in the case of multi-sharing.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/include/asm/kvm_pkvm.h             |  6 ++
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  4 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 90 ++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/setup.c               |  8 +-
- arch/arm64/kvm/pkvm.c                         |  1 +
- 5 files changed, 104 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index eb65f12e81d9..104b6b5ab6f5 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -134,6 +134,12 @@ static inline unsigned long host_s2_pgtable_pages(void)
- 	return res;
- }
- 
-+#ifdef CONFIG_PKVM_SELFTESTS
-+static inline unsigned long pkvm_selftest_pages(void) { return 32; }
-+#else
-+static inline unsigned long pkvm_selftest_pages(void) { return 0; }
-+#endif
-+
- #define KVM_FFA_MBOX_NR_PAGES	1
- 
- static inline unsigned long hyp_ffa_proxy_pages(void)
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 31a3f2cdf242..dd53af947a58 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -69,8 +69,8 @@ static __always_inline void __load_host_stage2(void)
- }
- 
- #ifdef CONFIG_PKVM_SELFTESTS
--void pkvm_ownership_selftest(void);
-+void pkvm_ownership_selftest(void *base);
- #else
--static inline void pkvm_ownership_selftest(void) { }
-+static inline void pkvm_ownership_selftest(void *base) { }
- #endif
- #endif /* __KVM_NVHE_MEM_PROTECT__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 46f3f4aeecc5..a03a2665e234 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -1088,16 +1088,60 @@ int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu)
- struct pkvm_expected_state {
- 	enum pkvm_page_state host;
- 	enum pkvm_page_state hyp;
-+	enum pkvm_page_state guest[2]; /* [ gfn, gfn + 1 ] */
- };
- 
- static struct pkvm_expected_state selftest_state;
- static struct hyp_page *selftest_page;
- 
-+static struct pkvm_hyp_vm selftest_vm = {
-+	.kvm = {
-+		.arch = {
-+			.mmu = {
-+				.arch = &selftest_vm.kvm.arch,
-+				.pgt = &selftest_vm.pgt,
-+			},
-+		},
-+	},
-+};
-+
-+static struct pkvm_hyp_vcpu selftest_vcpu = {
-+	.vcpu = {
-+		.arch = {
-+			.hw_mmu = &selftest_vm.kvm.arch.mmu,
-+		},
-+		.kvm = &selftest_vm.kvm,
-+	},
-+};
-+
-+static void init_selftest_vm(void *virt)
-+{
-+	struct hyp_page *p = hyp_virt_to_page(virt);
-+	int i;
-+
-+	selftest_vm.kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
-+	WARN_ON(kvm_guest_prepare_stage2(&selftest_vm, virt));
-+
-+	for (i = 0; i < pkvm_selftest_pages(); i++) {
-+		if (p[i].refcount)
-+			continue;
-+		p[i].refcount = 1;
-+		hyp_put_page(&selftest_vm.pool, hyp_page_to_virt(&p[i]));
-+	}
-+}
-+
-+static u64 selftest_ipa(void)
-+{
-+	return BIT(selftest_vm.pgt.ia_bits - 1);
-+}
-+
- static void assert_page_state(void)
- {
- 	void *virt = hyp_page_to_virt(selftest_page);
- 	u64 size = PAGE_SIZE << selftest_page->order;
-+	struct pkvm_hyp_vcpu *vcpu = &selftest_vcpu;
- 	u64 phys = hyp_virt_to_phys(virt);
-+	u64 ipa[2] = { selftest_ipa(), selftest_ipa() + PAGE_SIZE };
- 
- 	host_lock_component();
- 	WARN_ON(__host_check_page_state_range(phys, size, selftest_state.host));
-@@ -1106,6 +1150,11 @@ static void assert_page_state(void)
- 	hyp_lock_component();
- 	WARN_ON(__hyp_check_page_state_range((u64)virt, size, selftest_state.hyp));
- 	hyp_unlock_component();
-+
-+	guest_lock_component(&selftest_vm);
-+	WARN_ON(__guest_check_page_state_range(vcpu, ipa[0], size, selftest_state.guest[0]));
-+	WARN_ON(__guest_check_page_state_range(vcpu, ipa[1], size, selftest_state.guest[1]));
-+	guest_unlock_component(&selftest_vm);
- }
- 
- #define assert_transition_res(res, fn, ...)		\
-@@ -1114,21 +1163,27 @@ static void assert_page_state(void)
- 		assert_page_state();			\
- 	} while (0)
- 
--void pkvm_ownership_selftest(void)
-+void pkvm_ownership_selftest(void *base)
- {
-+	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_RWX;
- 	void *virt = hyp_alloc_pages(&host_s2_pool, 0);
--	u64 phys, size, pfn;
-+	struct pkvm_hyp_vcpu *vcpu = &selftest_vcpu;
-+	struct pkvm_hyp_vm *vm = &selftest_vm;
-+	u64 phys, size, pfn, gfn;
- 
- 	WARN_ON(!virt);
- 	selftest_page = hyp_virt_to_page(virt);
- 	selftest_page->refcount = 0;
-+	init_selftest_vm(base);
- 
- 	size = PAGE_SIZE << selftest_page->order;
- 	phys = hyp_virt_to_phys(virt);
- 	pfn = hyp_phys_to_pfn(phys);
-+	gfn = hyp_phys_to_pfn(selftest_ipa());
- 
- 	selftest_state.host = PKVM_NOPAGE;
- 	selftest_state.hyp = PKVM_PAGE_OWNED;
-+	selftest_state.guest[0] = selftest_state.guest[1] = PKVM_NOPAGE;
- 	assert_page_state();
- 	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-@@ -1136,6 +1191,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 
- 	selftest_state.host = PKVM_PAGE_OWNED;
- 	selftest_state.hyp = PKVM_NOPAGE;
-@@ -1143,6 +1200,7 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
- 
- 	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
-@@ -1152,6 +1210,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 
- 	assert_transition_res(0,	hyp_pin_shared_mem, virt, virt + size);
- 	assert_transition_res(0,	hyp_pin_shared_mem, virt, virt + size);
-@@ -1162,6 +1222,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 
- 	hyp_unpin_shared_mem(virt, virt + size);
- 	assert_page_state();
-@@ -1179,6 +1241,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
- 
- 	selftest_state.host = PKVM_PAGE_OWNED;
-@@ -1186,6 +1250,28 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(0,	__pkvm_host_unshare_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
- 
-+	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
-+	selftest_state.guest[0] = PKVM_PAGE_SHARED_BORROWED;
-+	assert_transition_res(0,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-+	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
-+	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
-+
-+	selftest_state.guest[1] = PKVM_PAGE_SHARED_BORROWED;
-+	assert_transition_res(0,	__pkvm_host_share_guest, pfn, gfn + 1, vcpu, prot);
-+	WARN_ON(hyp_virt_to_page(virt)->host_share_guest_count != 2);
-+
-+	selftest_state.guest[0] = PKVM_NOPAGE;
-+	assert_transition_res(0,	__pkvm_host_unshare_guest, gfn, vm);
-+
-+	selftest_state.guest[1] = PKVM_NOPAGE;
-+	selftest_state.host = PKVM_PAGE_OWNED;
-+	assert_transition_res(0,	__pkvm_host_unshare_guest, gfn + 1, vm);
-+
- 	selftest_state.host = PKVM_NOPAGE;
- 	selftest_state.hyp = PKVM_PAGE_OWNED;
- 	assert_transition_res(0,	__pkvm_host_donate_hyp, pfn, 1);
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 54006f959e1b..814548134a83 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -28,6 +28,7 @@ static void *vmemmap_base;
- static void *vm_table_base;
- static void *hyp_pgt_base;
- static void *host_s2_pgt_base;
-+static void *selftest_base;
- static void *ffa_proxy_pages;
- static struct kvm_pgtable_mm_ops pkvm_pgtable_mm_ops;
- static struct hyp_pool hpool;
-@@ -38,6 +39,11 @@ static int divide_memory_pool(void *virt, unsigned long size)
- 
- 	hyp_early_alloc_init(virt, size);
- 
-+	nr_pages = pkvm_selftest_pages();
-+	selftest_base = hyp_early_alloc_contig(nr_pages);
-+	if (nr_pages && !selftest_base)
-+		return -ENOMEM;
-+
- 	nr_pages = hyp_vmemmap_pages(sizeof(struct hyp_page));
- 	vmemmap_base = hyp_early_alloc_contig(nr_pages);
- 	if (!vmemmap_base)
-@@ -309,7 +315,7 @@ void __noreturn __pkvm_init_finalise(void)
- 
- 	pkvm_hyp_vm_table_init(vm_table_base);
- 
--	pkvm_ownership_selftest();
-+	pkvm_ownership_selftest(selftest_base);
- out:
- 	/*
- 	 * We tail-called to here from handle___pkvm_init() and will not return,
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 5a75f9554e57..728ae5f44da3 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -79,6 +79,7 @@ void __init kvm_hyp_reserve(void)
- 	hyp_mem_pages += host_s2_pgtable_pages();
- 	hyp_mem_pages += hyp_vm_table_pages();
- 	hyp_mem_pages += hyp_vmemmap_pages(STRUCT_HYP_PAGE_SIZE);
-+	hyp_mem_pages += pkvm_selftest_pages();
- 	hyp_mem_pages += hyp_ffa_proxy_pages();
- 
- 	/*
--- 
-2.48.1.658.g4767266eb4-goog
+On 2/24/25 19:41, Mark Rutland wrote:
+> On Mon, Feb 03, 2025 at 10:38:28AM +0530, Anshuman Khandual wrote:
+>> FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
+>> access from EL1 requires appropriate EL2 fine grained trap configuration
+>> via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
+>> Otherwise such register accesses will result in traps into EL2.
+>>
+>> Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
+>> grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
+>> bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
+>> PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
+>>
+>> Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
+>> based registers to be accessible in EL2.
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Rob Herring <robh@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-doc@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Cc: kvmarm@lists.linux.dev
+>> Tested-by: Rob Herring (Arm) <robh@kernel.org>
+>> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  Documentation/arch/arm64/booting.rst | 18 ++++++++++++++++++
+>>  arch/arm64/include/asm/el2_setup.h   | 25 +++++++++++++++++++++++++
+>>  2 files changed, 43 insertions(+)
+> 
+> Three things to note here:
+> 
+> (1) I think this is missing some other necessary register configuration.
+> 
+>     From a quick scan, we also require MDCR_EL3.EnPM2 (bit [7]) to be
+>     configured, which is not described in mainline nor here. If that
 
+Will update the Documentation/arch/arm64/booting.rst.
+
+>     resets to 0, then EL{2,1,0} accesses to a number of registers such
+>     as PMUACR_EL1 may trap to EL3> 
+>     AFAICT the boot-wrapper resets that bit to 0, so have we actually
+>     tested all of this with the boot-wrapper? Does TF-A set this bit?
+
+Right, boot wrapper resets the bit to 0. We will need the following changes
+to set that up when PMUv3p9 is available. MDCR_EL3.EnPM2 also needs to be
+set when FEAT_SPMU, FEAT_EBEP, FEAT_PMUv3_SS or FEAT_SPMU2 are implemented.
+Should those features be checked here as well ?
+
+--- a/arch/aarch64/include/asm/cpu.h
++++ b/arch/aarch64/include/asm/cpu.h
+@@ -56,6 +56,7 @@
+ #define MDCR_EL3_SBRBE_NOTRAP_NOPROHIBIT       (UL(3) << 32)
+ #define MDCR_EL3_ENPMSN                                BIT(36)
+ #define MDCR_EL3_EBWE                          BIT(43)
++#define MDCR_EL3_EnPM2                         BIT(7)
+ 
+ #define SCR_EL3_RES1                   BITS(5, 4)
+ #define SCR_EL3_NS                     BIT(0)
+@@ -87,6 +88,7 @@
+ #define ID_AA64DFR0_EL1_PMSVER         BITS(35, 32)
+ #define ID_AA64DFR0_EL1_TRACEBUFFER    BITS(47, 44)
+ #define ID_AA64DFR0_EL1_BRBE           BITS(55, 52)
++#define ID_AA64DFR0_EL1_PMUVER         BITS(11, 8)
+ #define ID_AA64DFR0_EL1_DEBUGVER       BITS(3, 0)
+ 
+ #define ID_AA64ISAR0_EL1_TME           BITS(27, 24)
+diff --git a/arch/aarch64/init.c b/arch/aarch64/init.c
+index 54e4cc4..fe7ed5f 100644
+--- a/arch/aarch64/init.c
++++ b/arch/aarch64/init.c
+@@ -152,6 +152,9 @@ static void cpu_init_el3(void)
+        if (mrs_field(ID_AA64DFR0_EL1, DEBUGVER) >= 11)
+                mdcr |= MDCR_EL3_EBWE;
+ 
++       if (mrs_field(ID_AA64DFR0_EL1, PMUVER) >= 0b1001)
++               mdcr |= MDCR_EL3_EnPM2;
++
+        msr(MDCR_EL3, mdcr);
+ 
+        if (mrs_field(ID_AA64PFR0_EL1, SVE)) {
+
+MDCR_EL2.EnPM2 does not seem to be set on TFA either, will double check and
+get it enabled.
+
+> 
+>     Are we sure we've cpatured *all* requirements for FEAT_PMUv3p9? i.e.
+>     is there anything else that we've missed?
+
+
+> 
+> (2) This is a fix for !VHE support for PMUACR and ICNTR, where the host
+>     may run at EL1 and consequently will be affected by fine grained
+>     traps.
+> 
+>     So this probably needs a CC stable and/or fixes tag, and backport.
+
+Fixes: 0bbff9ed8165 ("perf/arm_pmuv3: Add PMUv3.9 per counter EL0 access control")
+Fixes: d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter")
+Cc: stable@vger.kernel.org
+
+But is there a particular stable tree this patch should be addressed ?
+
+> 
+> (3) As there's no KVM changes, this is only safe provided that the
+>     registers affected by these fine grained traps are already
+>     unconditionally trapped by other traps when running a vCPU.
+> 
+>     It looks like PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 are all
+>     trapped by MDCR_EL2.TPM, so that should work as long as we emulate
+>     the PMU. For direct access, FGT2 support will be a prerequisite.
+> 
+> Ideally, we'd have added support for FGT2 before the PMU functionality
+> that implicitly depends upon it. We should pay more attention to trap
+> controls in future.
+> 
+> Given (1) and (2) I think someone needs to look into this a bit more and
+> figure out if this needs a fixup or a respin.
+
+To summarize
+
+- Update arm64/booting.rst regarding MDCR_EL3.EnPM2
+- Add above mentioned "Fixes:" tag and "CC: stable"
+- But should respin this patch or send a fix up instead ?
+
+- Boot wrapper patch setting MDCR_EL3.EnPM2
+- TFA patch setting MDCR_EL3.EnPM2
+
+Is there anything else missing ?
+
+> 
+> Mark.
+> 
+>> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+>> index cad6fdc96b98..04d97a1d5ffa 100644
+>> --- a/Documentation/arch/arm64/booting.rst
+>> +++ b/Documentation/arch/arm64/booting.rst
+>> @@ -288,6 +288,12 @@ Before jumping into the kernel, the following conditions must be met:
+>>  
+>>      - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
+>>  
+>> +  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
+>> +
+>> +  - If EL3 is present and the kernel is entered at EL2:
+>> +
+>> +    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
+>> +
+>>    For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
+>>  
+>>    - If EL3 is present and the kernel is entered at EL2:
+>> @@ -382,6 +388,18 @@ Before jumping into the kernel, the following conditions must be met:
+>>  
+>>      - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
+>>  
+>> +  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
+>> +
+>> + - If the kernel is entered at EL1 and EL2 is present:
+>> +
+>> +    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
+>> +    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
+>> +    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
+>> +
+>> +    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
+>> +    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
+>> +    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
+>> +
+>>    For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+>>  
+>>    - If the kernel is entered at EL1 and EL2 is present:
+>> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+>> index 25e162651750..1a0071faf57e 100644
+>> --- a/arch/arm64/include/asm/el2_setup.h
+>> +++ b/arch/arm64/include/asm/el2_setup.h
+>> @@ -233,6 +233,30 @@
+>>  .Lskip_fgt_\@:
+>>  .endm
+>>  
+>> +.macro __init_el2_fgt2
+>> +	mrs	x1, id_aa64mmfr0_el1
+>> +	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
+>> +	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
+>> +	b.lt	.Lskip_fgt2_\@
+>> +
+>> +	mov	x0, xzr
+>> +	mrs	x1, id_aa64dfr0_el1
+>> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
+>> +	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
+>> +	b.lt	.Lskip_pmuv3p9_\@
+>> +
+>> +	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
+>> +	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
+>> +	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
+>> +.Lskip_pmuv3p9_\@:
+>> +	msr_s   SYS_HDFGRTR2_EL2, x0
+>> +	msr_s   SYS_HDFGWTR2_EL2, x0
+>> +	msr_s   SYS_HFGRTR2_EL2, xzr
+>> +	msr_s   SYS_HFGWTR2_EL2, xzr
+>> +	msr_s   SYS_HFGITR2_EL2, xzr
+>> +.Lskip_fgt2_\@:
+>> +.endm
+>> +
+>>  .macro __init_el2_gcs
+>>  	mrs_s	x1, SYS_ID_AA64PFR1_EL1
+>>  	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
+>> @@ -283,6 +307,7 @@
+>>  	__init_el2_nvhe_idregs
+>>  	__init_el2_cptr
+>>  	__init_el2_fgt
+>> +	__init_el2_fgt2
+>>          __init_el2_gcs
+>>  .endm
+>>  
+>> -- 
+>> 2.25.1
+>>
