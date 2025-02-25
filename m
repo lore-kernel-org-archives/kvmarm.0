@@ -1,214 +1,158 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF4018C332;
-	Tue, 25 Feb 2025 12:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A63266B40
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 12:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740485161; cv=none; b=Uah+Ny4NjKnsTZV82ZlURKGuWF6zlLKoJh0yaFex+v6EV+qo3OsHRiRNot6EyFQgBIvwWVJkCAuEL0bDupFQ495NqXO2uS9xhlRlw8SQ+tYRlaOd7rFWVnNIAjxE+WS5IZqgV28nXrbhIjAjIKuog2SVGQtUAsKYoFGwghIFz+s=
+	t=1740487101; cv=none; b=vFhJPzNweFVgaYAwfDxnvj+XpoNNG7FjPCXbxEf60AScgpBKvyVKK999prgzdSGFkfbgo0KCwdOA1yd+tENMgO9Ldz1Q8SltZ5RdcdzYISXFPtsCMaDXfcRDMJsDeYFNE12s5cUkLKhnTx9gCE4xoFJYGoRaJXczoYQOwv3YSko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740485161; c=relaxed/simple;
-	bh=EEuB2YaIPUj/UxArsmC8/amUg4t4q12dcUIwBRFTpUU=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HPaehtcCHb2rdRiqT11uc2OVl6P1nsi0QBe7jqgb1jKWFbliBYcTD6IK/rGgK8QyCWXpe+7GuZJRJlvulyzwykp/HYFjDUtXP9b7R8HeyeV7qCKtWsa9tAdbEvp6BPEcy6QxkWWmS7xL/sYPfIgW9Eo9h9yiBK1P4kMvX97AeLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxbKwhsr1ntReCAA--.26689S3;
-	Tue, 25 Feb 2025 20:05:53 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMBxXsUdsr1nweUnAA--.16387S3;
-	Tue, 25 Feb 2025 20:05:51 +0800 (CST)
-Subject: Re: [PATCH 7/7] KVM: Drop kvm_arch_sync_events() now that all
- implementations are nops
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- Aaron Lewis <aaronlewis@google.com>, Jim Mattson <jmattson@google.com>,
- Yan Zhao <yan.y.zhao@intel.com>,
- Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20250224235542.2562848-1-seanjc@google.com>
- <20250224235542.2562848-8-seanjc@google.com>
-From: bibo mao <maobibo@loongson.cn>
-Message-ID: <49df2315-4c79-e0c0-6163-4f53b80afa55@loongson.cn>
-Date: Tue, 25 Feb 2025 20:05:14 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1740487101; c=relaxed/simple;
+	bh=cJZ5YmdR1SNkMG2yDAirWyRRhI6uMk/du0JqcX+TaQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bAdKAfB3mDAkz3iK6ORhPH+xIoKXeuuvi8afqLkhYF/Wg6ZFnAp53q1aGcOvReEwGzCc0JdQTW+aoGyHZ/taJTYdHdDR8iZKIBPal2ma0y6RxKP9bROYuvN7JqJhDBH3oFmCajFVg7Lch+cGpfqPz8bR5ExiMQyneimF9GRDoeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3FAB3152B;
+	Tue, 25 Feb 2025 04:38:35 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 813053F6A8;
+	Tue, 25 Feb 2025 04:38:18 -0800 (PST)
+Date: Tue, 25 Feb 2025 12:38:13 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v20 11/11] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+Message-ID: <20250225123813.GA1821331@e132581.arm.com>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+ <20250218-arm-brbe-v19-v20-11-4e9922fc2e8e@kernel.org>
+ <20250224122507.GE8144@e132581.arm.com>
+ <CAL_Jsq+0fZ2uasgAam7qGTdCeDBQxXeyL-J1_suyxy6GE_ERTg@mail.gmail.com>
+ <20250224140317.GF8144@e132581.arm.com>
+ <Z7yY19UtSnND5KTl@J2N7QTR9R3.cambridge.arm.com>
+ <20250224180301.GI8144@e132581.arm.com>
+ <CAL_JsqKNad6eEBerUOco=SDWxdp6dgRD3FDrSt5OpGQYwwstSg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20250224235542.2562848-8-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMBxXsUdsr1nweUnAA--.16387S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxtF47XrykXrWUKw17WFW7trc_yoWxJryxpa
-	sxAF4kGw4fKry8Ka47Jr4q934fXws5Gw1ak342grW5JFnxtr1DJFWkCr1DJFn8J3y093WS
-	kFW3KF1rWF4qvwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q6rW5
-	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
-	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUtVW8ZwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr
-	0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jCMKZUUUUU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqKNad6eEBerUOco=SDWxdp6dgRD3FDrSt5OpGQYwwstSg@mail.gmail.com>
 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+On Mon, Feb 24, 2025 at 07:31:52PM -0600, Rob Herring wrote:
 
-On 2025/2/25 上午7:55, Sean Christopherson wrote:
-> Remove kvm_arch_sync_events() now that x86 no longer uses it (no other
-> arch has ever used it).
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/arm64/include/asm/kvm_host.h     | 2 --
->   arch/loongarch/include/asm/kvm_host.h | 1 -
->   arch/mips/include/asm/kvm_host.h      | 1 -
->   arch/powerpc/include/asm/kvm_host.h   | 1 -
->   arch/riscv/include/asm/kvm_host.h     | 2 --
->   arch/s390/include/asm/kvm_host.h      | 1 -
->   arch/x86/kvm/x86.c                    | 5 -----
->   include/linux/kvm_host.h              | 1 -
->   virt/kvm/kvm_main.c                   | 1 -
->   9 files changed, 15 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cfa024de4e3..40897bd2b4a3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1346,8 +1346,6 @@ static inline bool kvm_system_needs_idmapped_vectors(void)
->   	return cpus_have_final_cap(ARM64_SPECTRE_V3A);
->   }
->   
-> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-> -
->   void kvm_init_host_debug_data(void);
->   void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu);
->   void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu);
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-> index 590982cd986e..ab5b7001e2ff 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -320,7 +320,6 @@ static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
->   
->   /* Misc */
->   static inline void kvm_arch_hardware_unsetup(void) {}
-> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->   static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
->   static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> index f7222eb594ea..c14b10821817 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -886,7 +886,6 @@ extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
->   extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
->   			     struct kvm_mips_interrupt *irq);
->   
-> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->   static inline void kvm_arch_free_memslot(struct kvm *kvm,
->   					 struct kvm_memory_slot *slot) {}
->   static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 6e1108f8fce6..2d139c807577 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -902,7 +902,6 @@ struct kvm_vcpu_arch {
->   #define __KVM_HAVE_ARCH_WQP
->   #define __KVM_HAVE_CREATE_DEVICE
->   
-> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->   static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
->   static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
->   static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index cc33e35cd628..0e9c2fab6378 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -301,8 +301,6 @@ static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
->   	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
->   }
->   
-> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-> -
->   #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
->   
->   void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 9a367866cab0..424f899d8163 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -1056,7 +1056,6 @@ bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
->   extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
->   extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
->   
-> -static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->   static inline void kvm_arch_free_memslot(struct kvm *kvm,
->   					 struct kvm_memory_slot *slot) {}
->   static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ea445e6579f1..454fd6b8f3db 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12770,11 +12770,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	return ret;
->   }
->   
-> -void kvm_arch_sync_events(struct kvm *kvm)
-> -{
-> -
-> -}
-> -
->   /**
->    * __x86_set_memory_region: Setup KVM internal memory slot
->    *
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index c28a6aa1f2ed..5438a1b446a6 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1747,7 +1747,6 @@ static inline void kvm_unregister_perf_callbacks(void) {}
->   
->   int kvm_arch_init_vm(struct kvm *kvm, unsigned long type);
->   void kvm_arch_destroy_vm(struct kvm *kvm);
-> -void kvm_arch_sync_events(struct kvm *kvm);
->   
->   int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 991e8111e88b..55153494ac70 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1271,7 +1271,6 @@ static void kvm_destroy_vm(struct kvm *kvm)
->   	kvm_destroy_pm_notifier(kvm);
->   	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
->   	kvm_destroy_vm_debugfs(kvm);
-> -	kvm_arch_sync_events(kvm);
->   	mutex_lock(&kvm_lock);
->   	list_del(&kvm->vm_list);
->   	mutex_unlock(&kvm_lock);
-> 
+[...]
 
+> > > > When event rotation happens, if without context switch, in theory we
+> > > > should can directly use the branch record (no invalidation, no injection)
+> > > > for all events.
+> > >
+> > > No; that only works in *some* cases, and will produce incorrect results
+> > > in others.
+> > >
+> > > For example, consider filtering. Imagine a PMU with a single counter,
+> > > and two events, where event-A filters for calls-and-returns and event-B
+> > > filters for calls-only. When switching from event-A to event-B, it's
+> > > theoretically possible to keep the existing records around, knowing that
+> > > the returns can be filtered out later. When switching from event-B to
+> > > event-A we cannot keep the existing records, since there are gaps
+> > > whenever a return should have been recorded.
+> >
+> > Seems to me, the problem is not caused by event rotation.  We need to
+> > calculate a correct filter in the first place - the BRBE driver should
+> > calculate a superset for all filters of events for a session.  Then,
+> > generate branch record based event's specific filter.
+> 
+> The driver doesn't have enough information. If it is told to schedule
+> event A, it doesn't know anything about event B. It could in theory
+> try to remember event B if event B had already been scheduled, but it
+> never knows when event B is gone.
+
+E.g., I tried below command for enabling 10 events in a perf session:
+
+  perf record -e armv9_nevis/r04/ -e armv9_nevis/r05/ \
+              -e armv9_nevis/r06/ -e armv9_nevis/r07/ \
+              -e armv9_nevis/r08/ -e armv9_nevis/r09/ \
+              -e armv9_nevis/r10/ -e armv9_nevis/r11/ \
+              -e armv9_nevis/r12/ -e armv9_nevis/r13/ \
+              -- sleep 1
+
+For Arm PMU, the flow below is invoked for every event on every
+affinied CPU in initialization phase:
+
+  armpmu_event_init() {
+    armv8pmu_set_event_filter();
+  }
+
+Shouldn't we calculate a superset branch filter for all events, store
+it into a per-CPU data structure and then apply the filter on BRBE?
+
+> > > There are a number of cases of that shape given the set of configurable
+> > > filters. In theory it's possible to retain those in some cases, but I
+> > > don't think that the complexity is justified.
+> > >
+> > > Similarly, whenever kernel branches are recorded it's necessary to drop
+> > > the stale branches whenever branch recording is paused, as there's
+> > > necessarily a blackout period and hence a gap in the records.
+> >
+> > If we save BRBE record when a process is switched out and then restore
+> > the record when a process is switched in, should we can keep a decent
+> > branch record for performance profiling?
+> 
+> Keep in mind that there's only 64 branches recorded at most. How many
+> branches in a context switch plus reconfiguring the PMU? Not a small
+> percentage of 64 I think. In traces where freeze on overflow was not
+> working (there's an example in v18), just the interrupt entry until
+> BRBE was stopped was a significant part of the trace. A context switch
+> is going to be similar.
+
+That is true for kernel mode enabled tracing.  But we will have no
+such kind noises for userspace only mode tracing.
+
+[...]
+
+> > > Do you have a reason why you think we *must* keep events around?
+> >
+> > Here I am really concerned are cases when a process is preempted or
+> > migrated.  The driver doesn't save and restore branch records for these
+> > cases, it just invalidates all records when a task is scheduled in.
+> >
+> > As a result, if an event overflow is close to context switch, it is
+> > likely to capture incomplete branch records.  For a userspace-only
+> > tracing, it is risk to capture empty branch record after preemption
+> > and migrations.
+> 
+> There's the same risk if something else is recording kernel branches
+> when you are recording userspace only. I think the user has to be
+> aware if other things like context switches are perturbing their data.
+
+I am confused for the decription above.  Does it refer to branch
+recording cross different sessions?  It is fine for me that the branch
+data is interleaved by different sessions (e.g. one is global tracing
+and another is only per-thread tracing).
+
+We might need to consider an intact branch record for the single perf
+session case.  E.g. if userspace program calls:
+
+    func_a -> func_b -> func_c
+
+In a case for only userspace tracing, we will have no chance to preserve
+the call sequence of these functions after the program is switched out.
+
+Thanks,
+Leo
