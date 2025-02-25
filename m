@@ -1,32 +1,32 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADD0440C
-	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 00:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CC42571B5
+	for <kvmarm@lists.linux.dev>; Tue, 25 Feb 2025 00:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740444862; cv=none; b=tvTiQYRu8Xo6C3QdOlCbr5Tzx6/dV39yPbCR7hnoaYUuTFHlFcXf4lxl7D5OPBJQqmGvzec4RInl4kA1FvLI9i4EcKtUjWjoU+9DY5JdpjfbhqHqQ+dqHxSXFKVr5nsdLncRKEd1A9SFYhaf/Rz7Lkwa8lbNLCxyhLUec+lEqYA=
+	t=1740444863; cv=none; b=inAP9typyfxccLFj5GchMasqk+meD9hYfkJqBUlblNbMo1HlbQ/R1q5lmPGv00rHejxOnRyd6LhdyUuWalaNVMc0G8uFOKL2UUXJBfHm0e/Ar1VhdqriD31wGWIpK06Yf3SJnyGo2u0GowlYbyq6/OfRzyQ4GfKMaygU6JZEgRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740444862; c=relaxed/simple;
-	bh=zkSbVYunDTm5OIIqVIaghGbQZ29bUPn8CayLVyTbb6g=;
+	s=arc-20240116; t=1740444863; c=relaxed/simple;
+	bh=btRXhUbfY3VnoB1bkk/xk0XngXNGC/dCb+wVjook21I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fV3mWp7w2P4XWmXwtQGnqox9hZUvSyThEw49whQSfO5g0d8RcuZSmo42mu/gubIX85dADPMdHTKVn3QWdJCFCdC1/WXRmyCnt16hsc1uJ6Sp8VF7HtdExeDKMOK4cTKZkI/Pzo81pmfp722MzF2lAThJGtgw1Isa6Uv0//2Jw0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OsDJdlhy; arc=none smtp.client-ip=91.218.175.173
+	 MIME-Version; b=TIHlcKIRUX7/HPf3e7gXxX5i+DKfJqB4RzXsJvVEKYfD8RDIn8+TmkKUVWbph/5dmSHWe+Nr/YDqjCf94Oyh6m6caNw0gYNltzQZmh7Zh7k28eV10ZfAJUwEkzyw9CfuWc/2Bst6nKfjt37BaujbGz8F9AHQpApF7K/zbKseX/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EPgCFlpm; arc=none smtp.client-ip=91.218.175.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OsDJdlhy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EPgCFlpm"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740444858;
+	t=1740444860;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0zP9aSZl/AvFyY1K668vlptpj6RVQyHI/SgO0wgt1rU=;
-	b=OsDJdlhygqHMQjtG2gYoxeDwRuJkLV1K2kJwZMWPF5cye31K+H1NmY4s7wZl+H/6BhbJdB
-	Cw26HqaHd57QzlChmtgo5R8yJYRix0W2/Iws/CYup78wTKsB6pIVtDygq+le+6id892iFq
-	knD/wd/+2msvIwp7zirXOs9GOUBo4pA=
+	bh=XqnBPTVa00M/qISjZis1yNBtPJ8pQAiKf7EYsfZTJFk=;
+	b=EPgCFlpmrOpyQkKyyf1jBDw1X6iF6h1QCACIDU0OMJ2k+/rqCanehaJoGdO9V88iiDkZyw
+	D95nzmrnJuv5RF3H4n3EaM93H87A2f5RDcZ58Yjjux8KnNBn4yZSWhgUJ+dhDJ14+jxpqw
+	KHQXDhIdyFI3GW/at7Dz3jmJexbaBbk=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Sebastian Ott <sebott@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 4/5] KVM: arm64: Allow userspace to change the implementation ID registers
-Date: Mon, 24 Feb 2025 16:54:00 -0800
-Message-Id: <20250225005401.679536-5-oliver.upton@linux.dev>
+Subject: [PATCH v4 5/5] KVM: selftests: arm64: Test writes to MIDR,REVIDR,AIDR
+Date: Mon, 24 Feb 2025 16:54:01 -0800
+Message-Id: <20250225005401.679536-6-oliver.upton@linux.dev>
 In-Reply-To: <20250225005401.679536-1-oliver.upton@linux.dev>
 References: <20250225005401.679536-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -50,228 +50,106 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Sebastian Ott <sebott@redhat.com>
 
-KVM's treatment of the ID registers that describe the implementation
-(MIDR, REVIDR, and AIDR) is interesting, to say the least. On the
-userspace-facing end of it, KVM presents the values of the boot CPU on
-all vCPUs and treats them as invariant. On the guest side of things KVM
-presents the hardware values of the local CPU, which can change during
-CPU migration in a big-little system.
-
-While one may call this fragile, there is at least some degree of
-predictability around it. For example, if a VMM wanted to present
-big-little to a guest, it could affine vCPUs accordingly to the correct
-clusters.
-
-All of this makes a giant mess out of adding support for making these
-implementation ID registers writable. Avoid breaking the rather subtle
-ABI around the old way of doing things by requiring opt-in from
-userspace to make the registers writable.
-
-When the cap is enabled, allow userspace to set MIDR, REVIDR, and AIDR
-to any non-reserved value and present those values consistently across
-all vCPUs.
+Assert that MIDR_EL1, REVIDR_EL1, AIDR_EL1 are writable from userspace,
+that the changed values are visible to guests, and that they are
+preserved across a vCPU reset.
 
 Signed-off-by: Sebastian Ott <sebott@redhat.com>
-[oliver: changelog, capability]
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- Documentation/virt/kvm/api.rst             | 18 +++++++++
- arch/arm64/include/asm/kvm_host.h          |  2 +
- arch/arm64/kvm/arm.c                       |  9 +++++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  8 +++-
- arch/arm64/kvm/sys_regs.c                  | 45 +++++++++++++++++++---
- include/uapi/linux/kvm.h                   |  1 +
- 6 files changed, 77 insertions(+), 6 deletions(-)
+ .../testing/selftests/kvm/arm64/set_id_regs.c | 37 +++++++++++++++----
+ 1 file changed, 30 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 0d1c3a820ce6..718e67373809 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8258,6 +8258,24 @@ KVM exits with the register state of either the L1 or L2 guest
- depending on which executed at the time of an exit. Userspace must
- take care to differentiate between these cases.
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index 217541fe6536..1d65f4a09e6f 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -230,6 +230,9 @@ static void guest_code(void)
+ 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
+ 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
+ 	GUEST_REG_SYNC(SYS_CTR_EL0);
++	GUEST_REG_SYNC(SYS_MIDR_EL1);
++	GUEST_REG_SYNC(SYS_REVIDR_EL1);
++	GUEST_REG_SYNC(SYS_AIDR_EL1);
  
-+7.37 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
-+-------------------------------------
-+
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: None
-+:Returns: 0 on success, -EBUSY if vCPUs have been created before enabling this
-+          capability.
-+
-+This capability changes the behavior of the registers that identify a PE
-+implementation of the Arm architecture: MIDR_EL1, REVIDR_EL1, and AIDR_EL1.
-+By default, these registers are visible to userspace but treated as invariant.
-+
-+When this capability is enabled, KVM allows userspace to change the
-+aforementioned registers before the first KVM_RUN. These registers are VM
-+scoped, meaning that the same set of values are presented on all vCPUs in a
-+given VM.
-+
- 8. Other capabilities.
- ======================
+ 	GUEST_DONE();
+ }
+@@ -609,18 +612,31 @@ static void test_ctr(struct kvm_vcpu *vcpu)
+ 	test_reg_vals[encoding_to_range_idx(SYS_CTR_EL0)] = ctr;
+ }
  
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bc5e8a5620ac..8cb9d824fdb3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -334,6 +334,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_FGU_INITIALIZED			8
- 	/* SVE exposed to guest */
- #define KVM_ARCH_FLAG_GUEST_HAS_SVE			9
-+	/* MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are writable from userspace */
-+#define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS		10
- 	unsigned long flags;
- 
- 	/* VM-wide vCPU feature set */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 646e806c6ca6..e32b1a622937 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -125,6 +125,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		}
- 		mutex_unlock(&kvm->slots_lock);
- 		break;
-+	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
-+		mutex_lock(&kvm->lock);
-+		if (!kvm->created_vcpus) {
-+			r = 0;
-+			set_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &kvm->arch.flags);
-+		}
-+		mutex_unlock(&kvm->lock);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -313,6 +321,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 	case KVM_CAP_IRQFD_RESAMPLE:
- 	case KVM_CAP_COUNTER_OFFSET:
-+	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 6e6d13580377..b9cff893bbe0 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -45,7 +45,13 @@ static inline u64 *ctxt_mdscr_el1(struct kvm_cpu_context *ctxt)
- 
- static inline u64 ctxt_midr_el1(struct kvm_cpu_context *ctxt)
+-static void test_vcpu_ftr_id_regs(struct kvm_vcpu *vcpu)
++static void test_id_reg(struct kvm_vcpu *vcpu, u32 id)
  {
--	return read_cpuid_id();
-+	struct kvm *kvm = kern_hyp_va(ctxt_to_vcpu(ctxt)->kvm);
+ 	u64 val;
+ 
++	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(id));
++	val++;
++	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(id), val);
++	test_reg_vals[encoding_to_range_idx(id)] = val;
++}
 +
-+	if (!(ctxt_is_guest(ctxt) &&
-+	      test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &kvm->arch.flags)))
-+		return read_cpuid_id();
++static void test_vcpu_ftr_id_regs(struct kvm_vcpu *vcpu)
++{
+ 	test_clidr(vcpu);
+ 	test_ctr(vcpu);
+ 
+-	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1));
+-	val++;
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), val);
++	test_id_reg(vcpu, SYS_MPIDR_EL1);
++	ksft_test_result_pass("%s\n", __func__);
++}
 +
-+	return kvm_read_vm_id_reg(kvm, SYS_MIDR_EL1);
++static void test_vcpu_non_ftr_id_regs(struct kvm_vcpu *vcpu)
++{
++	test_id_reg(vcpu, SYS_MIDR_EL1);
++	test_id_reg(vcpu, SYS_REVIDR_EL1);
++	test_id_reg(vcpu, SYS_AIDR_EL1);
+ 
+-	test_reg_vals[encoding_to_range_idx(SYS_MPIDR_EL1)] = val;
+ 	ksft_test_result_pass("%s\n", __func__);
  }
  
- static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index de66ffab3a2b..a83fd8a86e98 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2514,6 +2514,17 @@ static bool access_imp_id_reg(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
+@@ -647,6 +663,9 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
+ 	test_assert_id_reg_unchanged(vcpu, SYS_MPIDR_EL1);
+ 	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1);
+ 	test_assert_id_reg_unchanged(vcpu, SYS_CTR_EL0);
++	test_assert_id_reg_unchanged(vcpu, SYS_MIDR_EL1);
++	test_assert_id_reg_unchanged(vcpu, SYS_REVIDR_EL1);
++	test_assert_id_reg_unchanged(vcpu, SYS_AIDR_EL1);
  
-+	/*
-+	 * Return the VM-scoped implementation ID register values if userspace
-+	 * has made them writable.
-+	 */
-+	if (test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &vcpu->kvm->arch.flags))
-+		return access_id_reg(vcpu, p, r);
-+
-+	/*
-+	 * Otherwise, fall back to the old behavior of returning the value of
-+	 * the current CPU.
-+	 */
- 	switch (reg_to_encoding(r)) {
- 	case SYS_REVIDR_EL1:
- 		p->regval = read_sysreg(revidr_el1);
-@@ -2557,19 +2568,43 @@ static u64 reset_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- static int set_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
- 			  u64 val)
- {
-+	struct kvm *kvm = vcpu->kvm;
- 	u64 expected;
- 
-+	guard(mutex)(&kvm->arch.config_lock);
-+
- 	expected = read_id_reg(vcpu, r);
-+	if (expected == val)
-+		return 0;
- 
--	return (expected == val) ? 0 : -EINVAL;
-+	if (!test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &kvm->arch.flags))
-+		return -EINVAL;
-+
-+	/*
-+	 * Once the VM has started the ID registers are immutable. Reject the
-+	 * write if userspace tries to change it.
-+	 */
-+	if (kvm_vm_has_ran_once(kvm))
-+		return -EBUSY;
-+
-+	/*
-+	 * Any value is allowed for the implementation ID registers so long as
-+	 * it is within the writable mask.
-+	 */
-+	if ((val & r->val) != val)
-+		return -EINVAL;
-+
-+	kvm_set_vm_id_reg(kvm, reg_to_encoding(r), val);
-+	return 0;
+ 	ksft_test_result_pass("%s\n", __func__);
  }
+@@ -660,8 +679,11 @@ int main(void)
+ 	int test_cnt;
  
--#define IMPLEMENTATION_ID(reg) {			\
-+#define IMPLEMENTATION_ID(reg, mask) {			\
- 	SYS_DESC(SYS_##reg),				\
- 	.access = access_imp_id_reg,			\
- 	.get_user = get_id_reg,				\
- 	.set_user = set_imp_id_reg,			\
- 	.reset = reset_imp_id_reg,			\
-+	.val = mask,					\
- }
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_WRITABLE_IMP_ID_REGS));
  
- /*
-@@ -2620,9 +2655,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	vm = vm_create(1);
++	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
++	vcpu = vm_vcpu_add(vm, 0, guest_code);
  
- 	{ SYS_DESC(SYS_DBGVCR32_EL2), undef_access, reset_val, DBGVCR32_EL2, 0 },
+ 	/* Check for AARCH64 only system */
+ 	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+@@ -675,13 +697,14 @@ int main(void)
+ 		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
+ 		   ARRAY_SIZE(ftr_id_aa64pfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1) +
+ 		   ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1) +
+-		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 2 +
++		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 3 +
+ 		   MPAM_IDREG_TEST;
  
--	IMPLEMENTATION_ID(MIDR_EL1),
-+	IMPLEMENTATION_ID(MIDR_EL1, GENMASK_ULL(31, 0)),
- 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
--	IMPLEMENTATION_ID(REVIDR_EL1),
-+	IMPLEMENTATION_ID(REVIDR_EL1, -1),
+ 	ksft_set_plan(test_cnt);
  
- 	/*
- 	 * ID regs: all ID_SANITISED() entries here must have corresponding
-@@ -2894,7 +2929,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
- 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
- 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
--	IMPLEMENTATION_ID(AIDR_EL1),
-+	IMPLEMENTATION_ID(AIDR_EL1, -1),
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
- 	ID_FILTERED(CTR_EL0, ctr_el0,
- 		    CTR_EL0_DIC_MASK |
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 45e6d8fca9b9..b6ae8ad8934b 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -929,6 +929,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_PRE_FAULT_MEMORY 236
- #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
- #define KVM_CAP_X86_GUEST_MODE 238
-+#define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
+ 	test_vm_ftr_id_regs(vcpu, aarch64_only);
+ 	test_vcpu_ftr_id_regs(vcpu);
++	test_vcpu_non_ftr_id_regs(vcpu);
+ 	test_user_set_mpam_reg(vcpu);
  
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
+ 	test_guest_reg_read(vcpu);
 -- 
 2.39.5
 
