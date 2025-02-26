@@ -1,64 +1,67 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFF71E1E01
-	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 21:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DB01E1E01
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 21:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740606926; cv=none; b=DFOj31v2ROCBjvXRx6hI+6vcch1fwLAbQ7XCe0xYgFeJbjrNKze8HuOogeQ+vuO6cJOm84Cqo9uAjc7Zunp+pf74y7oraPxox7l0fP++JkmrV1VTXS1HBeiNEHIn2sf0DiAUyhZXRojbBPoGfj8IGZcFJPcSF82e4VjIRACqBvU=
+	t=1740606928; cv=none; b=abXDHTqfpCiiEPJwytWrOy7zIH5iysT4Dbf8HxZhMJfkr2czKpQBORnItjKY1tt93xEcxhzD1O+Ce3PKjQwhwxaZPNFRDxYaTZMqPLh3RuW/YdMvuNlxH5E3g+ByodsuodfLJayc5+yaxKo3wTD3K6rimxdguJrpX8hAJ59eRSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740606926; c=relaxed/simple;
-	bh=r0XmNteGt4vJ15q9L6ZRVhHnN8azCu0DEQ8uQYRjKwA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Wm/b9IhSVq17UEOyluRrfyQDFl7Tvffae5x07kNVOmVazAQjW4jJkzAiNwo+zUdiL+IZw/teGMky3fMS7xIfHAVmP56I7Onwo0vPujIgyAjS+/IDzCXKVxGphzus9dagJO0lMOprW8fYoO8LLq6RVtKu4cdlxRr60f8RJmwGnPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fxGXW2Cy; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1740606928; c=relaxed/simple;
+	bh=dTGJXEGqyvih7AYaO0814xceTdvdB0k2puWiJupbvDg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=d4fUunblydelJxHm0sBRuSipfm/CXPJNGrXBEy1MEoH1MY5t5vmVrOb+6p+2O3R8l+kyIk7KqJ9+f+lgZHGY94NAR45CbBuNMLjb8w4BgEX5lxcVzfdmsPOp+iSc58F34/pdcavNz0iIT0Rd8oRB244Yok1ODEUgn0B3ov+9nNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TI1ZVGcO; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fxGXW2Cy"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4399c5ba9e4so1209235e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 13:55:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TI1ZVGcO"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38f4156f3daso162018f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 13:55:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740606923; x=1741211723; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7IvPw5iGc/k53b4/rPiCRpRIXAnRcZkrel3cZcM0Zew=;
-        b=fxGXW2Cy+1bx+aN2v6bvZQ7F3lt30gso/HECZWwIYGMWRNoGNPS3xDaTcqekkQIqC8
-         oYkqgqA9t094Yx01rIbT8S9T1u0gIt3ASj9qOgfa+eiZkWK9mg6PIqc3y7EbYIxoxhp+
-         E8VJFgevzywmdkGKxvQ67cROlLJhYpscDxPu3TNlEcJk6u6uGJWt88P09YSvpD3Oj02/
-         cerWAnrlAV3AGNl+LlNxLt0Y79ewE3DR/DTFgjbDFSsgzJSlGftfFeuXWo2fcjTukhrq
-         qGVyCaMfeyeiiiwJp07VDWRZtV2YaktntJM1QgE8wgsgxWCcAc5jFHf5kDvNr6+WyUfH
-         fiyA==
+        d=google.com; s=20230601; t=1740606925; x=1741211725; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMoANj4p5EHkRVZCluw47mqWJPi0FfnC4TlDJfr4IcM=;
+        b=TI1ZVGcOLghMwYjPJqcL88vQD6SYZb4jSy86R8V9+Hmm7wWSTHdz/0LoRIgJIpT8fr
+         cI6LWtqZDE9VRGMX0VkuQxQiJeUIjdtZHXZT2Kgtha1aUxQ9vadKjn0Alc/ytvmvIgjo
+         8c836ju6batkbZpB1eCXMY9k7CzUITyJ/QGBUnWgHeC/7P1SVQf4fsPJQspjJ8Dff32U
+         c8QpjrVG4Sr/ISb1YbBTpeSyrNZEOUxfQj6WxJ2hjjhTx/6jFYV20JE/AKugwQVCewOJ
+         rTyPjPfU2I9gLn2Ormr3/XKhhna5AfDdEBfYYTevjaS9vvsAsuFLg+iv7oCnHHP7Bbcx
+         U/bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740606923; x=1741211723;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7IvPw5iGc/k53b4/rPiCRpRIXAnRcZkrel3cZcM0Zew=;
-        b=nP75KuLmDBcJq1gwvzG/E47z8X2seF9xBW+t0IIpyn/lblvQ6Pb4wgUi5u1pvL8IRz
-         vNDS7RMBlAIsK8wR2hY5ftZ6irRo/F9v45eCo+ErSqMDUNaY2xK7SE7g9Fcq8P/guuMJ
-         2V/Z9JUfzss0ur3QbjYyd8DSp/8jlJCt17p9vKb9U6SjuTKTr0EacrizMzzLkUx9qpzP
-         JMelc9RMAiJdxFCErGvSbRrGa6ozqY6+Xq9fgik+tLfA7MWwKuoezRfjiu354j2hYNs0
-         zuXbwt5IQhCUq3QMQ8eLcVPOWsW1YHFktxffSl8HO6UZiRp4I3SFhsu/BQLz9NgeYeAG
-         aixg==
-X-Gm-Message-State: AOJu0Yz+55nVquzP9qIhUHoRBnXDDRnnW8xXUn28P2Voqn278+XjGm1J
-	6F8qwaqYUh1jqGzvVHRWzPr5jO/M7sdAjNKDJukwGRK0gkNggzfsnSK9NPXB9rzvk6abhs0DEWP
-	jxa0ioR2IiKqSaPs13HOw5osGA1QgStRXbvDZfZ6/GcOroUVL5N5ylPTacRADXkUdLa7LRhP6ZQ
-	UtqmRvzPrRihskrice+KFIY9XyTnM=
-X-Google-Smtp-Source: AGHT+IGXlbqPAwAa2eKU5tILxiLuRG281n0weT0i//QObTL7/xbiqPS0o5r4y1I8zjQNvEu6szJcKMd1wA==
-X-Received: from wmbg8.prod.google.com ([2002:a05:600c:a408:b0:439:88bc:d27d])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:588b:0:b0:38c:5dcb:312e
- with SMTP id ffacd0b85a97d-390cc3aff06mr7754343f8f.0.1740606922779; Wed, 26
- Feb 2025 13:55:22 -0800 (PST)
-Date: Wed, 26 Feb 2025 21:55:16 +0000
+        d=1e100.net; s=20230601; t=1740606925; x=1741211725;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMoANj4p5EHkRVZCluw47mqWJPi0FfnC4TlDJfr4IcM=;
+        b=gMEHM/zavOWITI9Mk/3Slyx9uieXeRilbVq3mLIDRibwoI22MwRCX4rfl/Ky6bgHkx
+         fN/U6lPJqr8g0JqCZw6DbccMgzw+YwmC69D2xMrEit3erSV906IYo/FbpcQoaiLw90Ap
+         3RHA3T/wU8LdrzOKHBLb9KGOZun8tLriN7zNWJNoF4V39YOSrjzysdSnH10jdtiz+PfJ
+         fsn0/SlfTD5gJcMc3b4GQI0rnboFGUQeGKyb0FHOpEn/zL0GQV3eZvuO0EgvvVA/na4x
+         Ym96zstF/K9B0vXgW0tZ/hbrPnJEkDOLPqMqfJyDMz0LzAVVMmcd41VzaYP5iHVuNzQV
+         4YoA==
+X-Gm-Message-State: AOJu0YzVrHxrIBiQJxLhlM1UPduf4SXP0R3iJb+NpZ0Shj4Gkd5/6Z0v
+	Vmfa3d/hRMwVUjnhoBVfWc0VhWjQvglOwbHYACltl1ijrftOBbZNZ2wlaoDpuLetxujXYAS5+xB
+	acbiHGF5uYIzjNqpcqlucesB4ptzxN6rvqSeucD3Qk7RzypJrwZEbBEq+nrnp0oyok1jroqVDkx
+	pFyrINqsm7G7h2vjcVpFf9eNpiLjg=
+X-Google-Smtp-Source: AGHT+IEm+deGA2n4ENvCjeg0FnRMCCHXrVIT4UaweA5DEki0464Z4e8+WEQzh+GM4v+3iZ8npegFP/EaEw==
+X-Received: from wroa1.prod.google.com ([2002:adf:ed01:0:b0:38f:3703:662f])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1845:b0:390:d82d:6d4f
+ with SMTP id ffacd0b85a97d-390d82d71cemr4013404f8f.52.1740606925196; Wed, 26
+ Feb 2025 13:55:25 -0800 (PST)
+Date: Wed, 26 Feb 2025 21:55:17 +0000
+In-Reply-To: <20250226215520.1759218-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250226215520.1759218-1-tabba@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250226215520.1759218-1-tabba@google.com>
-Subject: [PATCH v2 0/4] KVM: arm64: Fix initializing HCRX_EL2 and other traps
- in pKVM
+Message-ID: <20250226215520.1759218-2-tabba@google.com>
+Subject: [PATCH v2 1/4] KVM: arm64: Factor out setting HCRX_EL2 traps into
+ separate function
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com, 
@@ -67,37 +70,82 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com,
 	qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Changes since v1 [*]:
-- Factor out setting HCRX_EL2 traps into a separate function and
-share logic between protected and non-protected modes
-- Rebase on Linux 6.14-rc4
+Factor out the code for setting a vcpu's HCRX_EL2 traps in to a
+separate inline function. This allows us to share the logic with
+pKVM when setting the traps in protected mode.
 
-For context, please refer to v1 [*].
+No functional change intended.
 
-Cheers,
-/fuad
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/include/asm/kvm_emulate.h | 24 ++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            | 20 +-------------------
+ 2 files changed, 25 insertions(+), 19 deletions(-)
 
-[*] https://lore.kernel.org/all/20250214150258.464798-1-tabba@google.com/
-
-Fuad Tabba (4):
-  KVM: arm64: Factor out setting HCRX_EL2 traps into separate function
-  KVM: arm64: Initialize HCRX_EL2 traps in pKVM
-  KVM: arm64: Factor out pKVM hyp vcpu creation to separate function
-  KVM: arm64: Create each pKVM hyp vcpu after its corresponding host
-    vcpu
-
- arch/arm64/include/asm/kvm_emulate.h   | 24 +++++++++
- arch/arm64/include/asm/kvm_host.h      |  2 +
- arch/arm64/include/asm/kvm_pkvm.h      |  1 +
- arch/arm64/kvm/arm.c                   |  4 ++
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 62 ++++++++++++++---------
- arch/arm64/kvm/pkvm.c                  | 70 +++++++++++++-------------
- arch/arm64/kvm/sys_regs.c              | 20 +-------
- 8 files changed, 104 insertions(+), 85 deletions(-)
-
-
-base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 78ec1ef2cfe8..31c8497372d0 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -649,4 +649,28 @@ static inline bool guest_hyp_sve_traps_enabled(const struct kvm_vcpu *vcpu)
+ {
+ 	return __guest_hyp_cptr_xen_trap_enabled(vcpu, ZEN);
+ }
++
++static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = vcpu->kvm;
++
++	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
++		/*
++		 * In general, all HCRX_EL2 bits are gated by a feature.
++		 * The only reason we can set SMPME without checking any
++		 * feature is that its effects are not directly observable
++		 * from the guest.
++		 */
++		vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
++
++		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
++			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
++
++		if (kvm_has_tcr2(kvm))
++			vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
++
++		if (kvm_has_fpmr(kvm))
++			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
++	}
++}
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 82430c1e1dd0..16ce5f584e7c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4971,25 +4971,7 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 	mutex_lock(&kvm->arch.config_lock);
+ 	vcpu_set_hcr(vcpu);
+ 	vcpu_set_ich_hcr(vcpu);
+-
+-	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+-		/*
+-		 * In general, all HCRX_EL2 bits are gated by a feature.
+-		 * The only reason we can set SMPME without checking any
+-		 * feature is that its effects are not directly observable
+-		 * from the guest.
+-		 */
+-		vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
+-
+-		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
+-			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
+-
+-		if (kvm_has_tcr2(kvm))
+-			vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
+-
+-		if (kvm_has_fpmr(kvm))
+-			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
+-	}
++	vcpu_set_hcrx(vcpu);
+ 
+ 	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+ 		goto out;
 -- 
 2.48.1.711.g2feabab25a-goog
 
