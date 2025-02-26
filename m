@@ -1,39 +1,44 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7E023535B
-	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 18:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0ED027455
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 18:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740594709; cv=none; b=fnCw05MLIweVXzjl/FYEteY+iig61DGkoN/lVwHA2XhH2XdDJXRQkHT1+Cpm+NDcDRHfs8l1TVirC/YoCdRdIVnF3A6whZQMeVx3o/18cLt6OaFBIHtssZ0QMCGmxeC65MRb1i91k1UnS/MVQnSrO7Uh8DaWJ0x+TDzPJpMX8+8=
+	t=1740594709; cv=none; b=lO6/VcGEvysLM+kcMJ1crjwHb8aIfVDV3K2mTjyzX6GAGHiPw+CMmv6zZ+Itx/ktNwJpJq77pXzqT+fu/KksJG6lggegp9RyD6bU5sy9oEey7nDY4EV2/z4RvOrZYrcdQ1u2/n1aENysR6ZuTUx36dTfPbVKkJn3FM7k3m9iGfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740594709; c=relaxed/simple;
-	bh=LuT7YV+ZviBUX2szwiifoDMkkoAYzA3CJn2r9kBDmhQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xb+IjIFY70V68fzHwHcEUqM+iEJGcdd/DA0PDpSuWJB9/XPdUOAdrXUBMRSBishdNEp7EV2j9YRHQltUPq+ckhdnU1kBtpNlZdcYjn7dOykReZEt5BVWjcI+KZNWoclXGh4feWVaWcL098Wc8CsL1NH1BI+lLPOkJQ9hgQNE1X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=diMkGb0+; arc=none smtp.client-ip=95.215.58.176
+	bh=Lfegny3eOvT9N4YkPMOyNnXEF3zYlaMY4eVuISdwuRc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KnAc7RWfY3wCHwvGqa8mWGyYVWLzOKk7fc+E3AaPkOec/UqSpVZKbqJYEjSlRoC2+ApoQPvyGbwuEJSR3xTb6N+yUZqMcDkXIJ+YRbDTU591/eYW+UK3esMOxe4bza50rj2awyItphs2+qYffeUg+rcfchUGMfptgs/FN4yO0C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CgxhSXPe; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="diMkGb0+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CgxhSXPe"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740594704;
+	t=1740594706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=DCJw5GZkNA01tIfCSBttJ+HoDOu+nwstVV9jEwB65MA=;
-	b=diMkGb0+Zt1olyMQVp9+4P6FlJwHcWqwmVGjSfoE0Dr0cqLu3c7kEFAm9Jzq8Nb/bOEhzH
-	JgKW4QnMF76k8XYaFyfCHtL/wgqvM0JY5V+A+mdlchVkdrdsSeq17jLOSVnFidbM5mdtz8
-	ENWZznZt0IlWTyQ9336FQUEownD8JLc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HQp9xw3jhZFuSFur9PI/lmhmLUzzxpA+QzeC0vql340=;
+	b=CgxhSXPehSnjpZQ/E35Q/3Arac8hhoQ6KUEi8c2qqfgydI/VRSREwPqbmGXNEWYqqAY6Oq
+	/XLwgNlaeYOJGIoqXUExBbwvHZ/mMv9x99N8vvkwpVUsLP0b/fXCXzJZVmQ2b4YlG55r39
+	PPlmEpKVvwQGVFWC2+ts0Ox0Xn0inlA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 0/4] KVM: arm64: Fixes/clarification for GICv4 vLPI injection
-Date: Wed, 26 Feb 2025 10:31:20 -0800
-Message-Id: <20250226183124.82094-1-oliver.upton@linux.dev>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sudheer Dantuluri <dantuluris@google.com>
+Subject: [PATCH 1/4] KVM: arm64: vgic-v4: Only attempt vLPI mapping for actual MSIs
+Date: Wed, 26 Feb 2025 10:31:21 -0800
+Message-Id: <20250226183124.82094-2-oliver.upton@linux.dev>
+In-Reply-To: <20250226183124.82094-1-oliver.upton@linux.dev>
+References: <20250226183124.82094-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,39 +48,64 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Small batch of fixes for vLPI injection issues that can happen when
-userspace is being mean:
+Some 'creative' VMMs out there may assign a VFIO MSI eventfd to an SPI
+routing entry.
 
- - MSI interrupt sources could be mapped to non-MSI GSI routing entries.
-   KVM doesn't account for the routing type and blindly attempts to map
-   a vLPI.
+And yes, I can already hear you shouting about possibly driving a level
+interrupt with an edge-sensitive one. You know who you are.
 
- - KVM_IRQFD mappings could be installed before the ITS has been
-   restored, leading to kvm_vgic_v4_set_forwarding() failing due to the
-   missing guest translation
+This works for the most part, and interrupt injection winds up taking
+the software path. However, when running on GICv4-enabled hardware, KVM
+erroneously attempts to setup LPI forwarding, even though the KVM
+routing isn't an MSI.
 
-Prevent userspace from triggering a WARN() because of these issues and
-gracefully fall back to software vLPI routing/injection should irqbypass
-fail.
+Thanks to misuse of a union, the MSI destination is unlikely to match any
+ITS in the VM and kvm_vgic_v4_set_forwarding() bails early. Later on when
+the VM is being torn down, this half-configured state triggers the
+WARN_ON() in kvm_vgic_v4_unset_forwarding() due to the fact that no HW
+IRQ was ever assigned.
 
-I've thrown in some documentation on the restore ordering necessary to get
-GICv4 vLPI injection working correctly as well.
+Avoid the whole mess by preventing SPI routing entries from getting into
+the LPI forwarding helpers.
 
-Marc, I'm planning to take these for 6.15.
+Reported-by: Sudheer Dantuluri <dantuluris@google.com>
+Tested-by: Sudheer Dantuluri <dantuluris@google.com>
+Fixes: 196b136498b3 ("KVM: arm/arm64: GICv4: Wire mapping/unmapping of VLPIs in VFIO irq bypass")
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/arm.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Oliver Upton (4):
-  KVM: arm64: vgic-v4: Only attempt vLPI mapping for actual MSIs
-  KVM: arm64: vgic-v4: Only WARN for HW IRQ mismatch when unmapping vLPI
-  KVM: arm64: vgic-v4: Fall back to software irqbypass if LPI not found
-  KVM: arm64: Document ordering requirements for irqbypass
-
- Documentation/virt/kvm/devices/arm-vgic-its.rst |  5 ++++-
- arch/arm64/kvm/arm.c                            | 12 ++++++++++++
- arch/arm64/kvm/vgic/vgic-v4.c                   | 17 +++++++++++------
- 3 files changed, 27 insertions(+), 7 deletions(-)
-
-
-base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b8e55a441282..36d8dd80b431 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2717,6 +2717,14 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ {
+ 	struct kvm_kernel_irqfd *irqfd =
+ 		container_of(cons, struct kvm_kernel_irqfd, consumer);
++	struct kvm_kernel_irq_routing_entry *irq_entry = &irqfd->irq_entry;
++
++	/*
++	 * The only thing we have a chance of directly-injecting is LPIs. Maybe
++	 * one day...
++	 */
++	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
++		return 0;
+ 
+ 	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+ 					  &irqfd->irq_entry);
+@@ -2726,6 +2734,10 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+ {
+ 	struct kvm_kernel_irqfd *irqfd =
+ 		container_of(cons, struct kvm_kernel_irqfd, consumer);
++	struct kvm_kernel_irq_routing_entry *irq_entry = &irqfd->irq_entry;
++
++	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
++		return;
+ 
+ 	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
+ 				     &irqfd->irq_entry);
 -- 
 2.39.5
 
