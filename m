@@ -1,99 +1,90 @@
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7753D21D5AE
-	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 18:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8784121D5AE
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 18:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740596190; cv=none; b=savRafudg7nwdW7BZ+z4xX0VXCEKGbia5kT57HyPG0cdT4OeaAI8dLPyUU8rDIdMEEFUxSWZz2atk57Jp+7BJDYRH62haS74yjPVdD8LAx5VJVHYEhb+DT7YaX0drB1vE3OFaA3otP1cOiAtLSckBxY9ZPEkl6OhB1n1+f5GzMo=
+	t=1740596335; cv=none; b=pEgDguZu4N6UeMaB3xvjb4CKMe6JU6VAP42K2w1otac3n3+UTjIdT6dpSkPh2Kh7bh71t5zNgfjvYoSngFXpIuKwa3pOLA5PHceKyfrEYuwVbyX8d5VcN8prKa4FujXzsiSvJzTen0L6a5+zXOMwsZKyIFK+SyvVUMLAiTE1ce8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740596190; c=relaxed/simple;
-	bh=EUlIfdeF1pzupry08mNxqfWtBGYYyvkzaYg8I7GMfQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uce8qilppa8rwugnZPDS/djzPhcQqX06sNDNpg29N8/MCIPfVJzZqICtoRWchbeeB9RFhJw0BdZUMYTinR98SBFcayeKarvxwx1U17QlrEcv2b1JLAWq6f+9Vp190PKAveHuBX/O4DkAwmsg2fhpdu1YzY93RE9te2dnh84fTxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DTrVl07I; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1740596335; c=relaxed/simple;
+	bh=qYUiwdCA5X+JoCTrBOTaytW2dcp+reoA3o1dWdtDpzE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JAGvJmzqlmor6GEQ1GOlXUtoZiNA4Y53MZZ1DgtHlnhMFdXUCJCLVeaKmyyryDTklXW+6wt0HboJfy9M9dDk6OaOSHS4oAUH0TtlaaD9iWXjhqqEQ8mZ9UDOLEIlsoPs1ouuhVgiKqRUFt/kCy98JKkVoLyPDj13ZE1iOzGwqw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q7XwCNnW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DTrVl07I"
-Date: Wed, 26 Feb 2025 10:56:21 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740596186;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BSZAKZJBtmXPfCIzyN+pyGhW+GDpOa1dgPvIqwhe5V4=;
-	b=DTrVl07ICp5qpVt9MAbJRYr2jB6odrQGw25//j+jiz92ZneaTgdDrKxpiezmpU/LqmQ43I
-	JALYeNQ0rzYI+D5/Kg7jn9ve6YZsWTOq2pUMBN/fF/SjaKuW4hlJPRhK+IMYGRaD01KVOD
-	/BMsU7qHDH6aVQa/frsYmyPqUVcg77s=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] KVM: arm64: writable MIDR/REVIDR
-Message-ID: <Z79j1ckWLx_Hwqct@linux.dev>
-References: <20250218163443.32836-1-sebott@redhat.com>
- <Z7zxSdW5b6rqe2bt@linux.dev>
- <b2b015de-569b-2cdd-8ec3-8c8690ff950b@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q7XwCNnW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11B77C4CED6;
+	Wed, 26 Feb 2025 18:58:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740596334;
+	bh=qYUiwdCA5X+JoCTrBOTaytW2dcp+reoA3o1dWdtDpzE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=q7XwCNnW4T8dsNywxyJvzoZhrChJCwFB4dpy13Z7xFA1FG4CWz3y2wcrre7tvjHuW
+	 WkHG0EuCUuD+JwizfBfVOUXtMTpLxIIYXKV4YxWmE4gVkZ7U8mxDBeG98gIhXpTuvG
+	 zTH1ewdBZvVit+ZgxKVOp6Orj7uwV1lTgcvvhUPiHfGjGhsj9pRq9L3ZA03UMSJ60W
+	 smH6fvZYnFOjnIDv5yBMDusunBc3Pa6bynkM+s4s7Puc19hGI6y+S7fd4qIzja4TY2
+	 a9FUX0/jSF5CKSG+pE3FJM+roPW7EyrWpKQpQ0vzq6qMyIzi0lr/YzweDxZncDegiP
+	 cat8LHudiMLog==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tnMcN-008Oe4-Sa;
+	Wed, 26 Feb 2025 18:58:51 +0000
+Date: Wed, 26 Feb 2025 18:58:51 +0000
+Message-ID: <864j0gr0r8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 0/4] KVM: arm64: Fixes/clarification for GICv4 vLPI injection
+In-Reply-To: <20250226183124.82094-1-oliver.upton@linux.dev>
+References: <20250226183124.82094-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2b015de-569b-2cdd-8ec3-8c8690ff950b@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Feb 26, 2025 at 05:47:53PM +0100, Sebastian Ott wrote:
-> On Mon, 24 Feb 2025, Oliver Upton wrote:
-> > On Tue, Feb 18, 2025 at 05:34:39PM +0100, Sebastian Ott wrote:
-> > > Based on prior discussion [1] this series allows VMMs to change
-> > > MIDR/REVIDR to enable migration between machines that differ in
-> > > these registers. Since these are used for errata handling the
-> > > errata management series [2] is a prerequisite for this one.
-> > > 
-> > > changes for V3:
-> > > * handle VPIDR_EL2 as part of vcpu ctxt - thanks Oliver!
-> > 
-> > Thanks for respinning. While your changes are looking good, as I got
-> > ready to apply this series I wound up peeling the onion a bit further
-> > and have a few more concerns:
-> > 
-> > - Current KVM allows guests to read SMIDR_EL1 despite the fact that we
-> >   do not support SME (this is part of TID1 traps)
-> > 
-> > - The "invariant" values that KVM presents to userspace originate from
-> >   the boot CPU, not the CPU that resets the ID registers for a VM
-> > 
-> > - A VMM that wants to present big-little can do so on current KVM by
-> >   affining vCPUs, but cannot with this series
-> > 
-> > All of this is to say, I think your series is going to collide with
-> > the pre-existing pile of crap we have. I'm going to pick up these
-> > changes and rework them so we can send a fix for #1 to stable trees and
-> > (hopefully) avoid breaking the old "invariant" behavior.
-> > 
-> > I'll post what I have as soon as I test it, hopefully we can get this
-> > shaped up for 6.15.
+On Wed, 26 Feb 2025 18:31:20 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Sry, for the additional work I've caused. I gave what you have in next a
-> spin and it looks good so far.
-> Thank you very much!
+> Small batch of fixes for vLPI injection issues that can happen when
+> userspace is being mean:
+> 
+>  - MSI interrupt sources could be mapped to non-MSI GSI routing entries.
+>    KVM doesn't account for the routing type and blindly attempts to map
+>    a vLPI.
+> 
+>  - KVM_IRQFD mappings could be installed before the ITS has been
+>    restored, leading to kvm_vgic_v4_set_forwarding() failing due to the
+>    missing guest translation
+> 
+> Prevent userspace from triggering a WARN() because of these issues and
+> gracefully fall back to software vLPI routing/injection should irqbypass
+> fail.
+> 
+> I've thrown in some documentation on the restore ordering necessary to get
+> GICv4 vLPI injection working correctly as well.
+> 
+> Marc, I'm planning to take these for 6.15.
 
-Don't apologize -- it isn't your fault what we had already was a mess! :)
+Go for it.
 
-Thanks for kicking the tires.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-Best,
-Oliver
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
