@@ -1,133 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786DE15C0;
-	Wed, 26 Feb 2025 18:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FFB23535C
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 18:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740592960; cv=none; b=NdF0XSmzxcIlY/D4hvBbFJlNMuSe0JDSevf2H0gRqXCtGmeaMdCG7E1/xEzteVQK8FkpkVE1VZ3uBJ04XAcuJGQZaSvbYGQ5auBs3iJRtgn+GP00RmDn0+PZVpakdkgjH6NmmiKFB/XAk7eaMqpd60DayS7M0ZjgR6sHdv5Uevk=
+	t=1740593455; cv=none; b=Gpuaac11pbs7otZMOVsybSDJz7IwgvZxg84jenjv76r2xfQMv5HLyjQfUgYyAvC0vpVQxHSqNHwHy926Wz29eEHQDFBbIZ5Q5AWXJeyFT6RKvo3OgJPz2R7ttX22qaxydGD9DPqG3xzjdac4RN4tVWK0sNmnIao0SHX9PIvCpn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740592960; c=relaxed/simple;
-	bh=+RJYxKc0WbneuRstiscX8xX/ABP7qF0Tpk0DF+AQtQU=;
+	s=arc-20240116; t=1740593455; c=relaxed/simple;
+	bh=EbaACQr0vW701BtG20JwXpLEEwmHg6MVq+JFkWjYS7w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gqcbqv8aVCZ2LOpEEutofemyFaIfMAc2he6KoSMMoMOf6cUogs6/VNDhJNUZESM0Yc+r2dvm8E2G2M3RbM0NPvwi7mXW6pl55I0PFdEjdxAL6s3J2Fu7vZxEDAJjQetfekyQmNwHKLeudusDGM5/xsUhGmLPY4E/KhMFY8R9wdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D889FC4CEE7;
-	Wed, 26 Feb 2025 18:02:37 +0000 (UTC)
-Date: Wed, 26 Feb 2025 18:02:35 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Peter Collingbourne <pcc@google.com>
-Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot
- creation
-Message-ID: <Z79XOyjWOSvVGIfM@arm.com>
-References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
- <Z7xSfVME4z2ComUm@arm.com>
- <86ldtvr0nl.wl-maz@kernel.org>
- <Z7yElHKrJGn8XuPS@arm.com>
- <86jz9fqtbk.wl-maz@kernel.org>
- <yq5aseo3gund.fsf@kernel.org>
- <86ikozqmsl.wl-maz@kernel.org>
- <yq5a8qptauyl.fsf@kernel.org>
- <Z786ODqxlYNpj40l@arm.com>
- <yq5a1pvkbqju.fsf@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WVdryFpUd3fY0XR1sU91C674L1zm1Wkbmt+clYIj59CHRPUE8XvOEXz0Yd71CV8CrmYVanrK9gCKmiSqVxveCln+qFB8IBeTN5Z2xNbPf4/TvxUbjPFuNFdZ/TzVJEWHJG8nBJX4pJtl4uTQ1go15yKV5g58SVQ5Vi2MpIcPFNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=neqMUtey; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="neqMUtey"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e0373c7f55so7956a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 10:10:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740593452; x=1741198252; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V/V8Jj9rYZChtFzsP4NciMXPlW80o7eEp6Sp5AawXIs=;
+        b=neqMUteyl/wO0zgEkAn9MCTK7z5urbKrsMvKbvPyKqELy7Fb3Bns5epuZz8f+TOBRb
+         FnGmjxPYJhJ+G8cTit+vpV1NQ5RhLvCeI0gtqHglfrTkxDByXGLymkXQygiezGFKR3a2
+         A7D3hXw/JOp1MXTf2xs9SBX4jA+2lNHQJClTxCMR2urkCUSCquZE2vFn/MQYH9fmFt7o
+         698dqcFukbguLyx3qy7JIQWI2f21OEWscst2/eIc2xQb7NTQErcYvvjvUO1GVdPqpmz3
+         9DDK0i9ihxazvgnZ4XUN/ZWn1sHF+WftsCNjV8n+ulKwqOLx4hcwzpvlMX1/xqzGLdh3
+         6wKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740593452; x=1741198252;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V/V8Jj9rYZChtFzsP4NciMXPlW80o7eEp6Sp5AawXIs=;
+        b=CddaUoGH/g2+hNnHxpAqViVrIzCXm1ilUDbuB9mMrsNW2l+yyVcCWJ4PZf6RsHi3B5
+         BFIErHzwqLQmjXeN3IsQfc3reWHMzMfuyfuHn9DXqcK+hz6SthibRmeYYd4teLRZ2uL8
+         504ehwcluIStRnFsB5kQGXJ/bs0yaoFbOLT5qNiKAsEoKEsjB7qcr5k37UYVkJ0Ejg0P
+         50xCFa/XEGNQi1kJaVXQGWeW9XgWsBx6NqdngSgU+Nu7s1Pv6G3BbQ8mKbaT4O0MjMSs
+         KxtikwzHR/WT/IKw5PLMzHy7aIo6e7YNiCrfR40RDOYCFkew+U7LexaKGKUlQ1yB9whw
+         6utg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhUu4K46H69vSnqRFSKzt7EHWLxzfJ3oAXmhStN106s0JulZR/AbCDtAYa+hUkRMFl2UpGRgE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwwzyiKUJqU+tkh69EWSk5EGjz8yqjJQSApg27ndznL9rYERumW
+	mfCNtM3RUwbLnEZFnlo/acq2myDV+1CF2lH5diHf4RX9vLgYFZQF68l59lchpA==
+X-Gm-Gg: ASbGncvpCXDp3FEDq05fgDS27TtN+0A0BO2atZFA7bQqj5hdXLNcq+eMBrGwhMfqhSB
+	m6G+nxWEeKGaOhtx6W6tyaY17/1HjGPjCTJ5TamvBD0nO51F54Gt0vQoXtJVtfLiYVNftjXQNxx
+	cgvIv0mlje152iPD84HK4N6hwDt+B/ZCXSV/wHtfK+u8mp4YgIkCnNUklKKOraitliyfX9TtNQg
+	gE1ygwVwJDTRp52ZgEnIBust0eM3lzcxooIA5nFOw1SHggw4037ov7UuZWhGg4Hr2Cs0SjwXHi0
+	/etzyX6aGKQO5h+fxGvEp/xGq9Ceyp/sdIdSqBJeddO0oxwtV5vaEkL92LqrCeo=
+X-Google-Smtp-Source: AGHT+IFSemQuFVxhcR1OJIBHEWyJQf2Hjrc2hP3J/LbxvQX6+WX1I3uywZ6yJMAv4hfkJ2aaAYgxNQ==
+X-Received: by 2002:a05:6402:501a:b0:5de:a6a8:5ecc with SMTP id 4fb4d7f45d1cf-5e4a0d490aamr5970613a12.5.1740593451852;
+        Wed, 26 Feb 2025 10:10:51 -0800 (PST)
+Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e45a8b8c4esm3155601a12.26.2025.02.26.10.10.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 10:10:50 -0800 (PST)
+Date: Wed, 26 Feb 2025 18:10:45 +0000
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Selftest for pKVM transitions
+Message-ID: <Z79ZJVOHtNu6YsVt@google.com>
+References: <20250225015327.3708420-1-qperret@google.com>
+ <20250225015327.3708420-4-qperret@google.com>
+ <867c5crd2j.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <yq5a1pvkbqju.fsf@kernel.org>
+In-Reply-To: <867c5crd2j.wl-maz@kernel.org>
 
-On Wed, Feb 26, 2025 at 10:18:21PM +0530, Aneesh Kumar K.V wrote:
-> Catalin Marinas <catalin.marinas@arm.com> writes:
-> > On Wed, Feb 26, 2025 at 03:28:26PM +0530, Aneesh Kumar K.V wrote:
-> >> Marc Zyngier <maz@kernel.org> writes:
-> >> > On Mon, 24 Feb 2025 16:44:06 +0000,
-> >> > Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
-> >> >> >> On Mon, Feb 24, 2025 at 12:24:14PM +0000, Marc Zyngier wrote:
-> >> >> >> > > On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> >> >> >> > > > This change is needed because, without it, users are not able to use MTE
-> >> >> >> > > > with VFIO passthrough (currently the mapping is either Device or
-> >> >> >> > > > NonCacheable for which tag access check is not applied.), as shown
-> >> >> >> > > > below (kvmtool VMM).
-> > [...]
-> >> >> >> > My other concern is that this gives pretty poor consistency to the
-> >> >> >> > guest, which cannot know what can be tagged and what cannot, and
-> >> >> >> > breaks a guarantee that the guest should be able to rely on.
-> > [...]
-> >> >> What if we trigger a memory fault exit with the TAGACCESS flag, allowing
-> >> >> the VMM to use the GPA to retrieve additional details and print extra
-> >> >> information to aid in analysis? BTW, we will do this on the first fault
-> >> >> in cacheable, non-tagged memory even if there is no tagaccess in that
-> >> >> region. This can be further improved using the NoTagAccess series I
-> >> >> posted earlier, which ensures the memory fault exit occurs only on
-> >> >> actual tag access
-> >> >> 
-> >> >> Something like below?
-> >> >
-> >> > Something like that, only with:
-> >> >
-> >> > - a capability informing userspace of this behaviour
-> >> >
-> >> > - a per-VM (or per-VMA) flag as a buy-in for that behaviour
-> >> 
-> >> If we’re looking for a capability based control, could we tie that up to
-> >> FEAT_MTE_PERM? That’s what I did here:
-> >> 
-> >> https://lore.kernel.org/all/20250110110023.2963795-1-aneesh.kumar@kernel.org
-> >> 
-> >> That patch set also addresses the issue mentioned here. Let me know if
-> >> you think this is a better approach
-> >
-> > From the patch linked above:
-> >
-> > | @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> > |  		if (!vma)
-> > |  			break;
-> > | 
-> > | -		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
-> > | +		if (kvm_has_mte(kvm) &&
-> > | +		    !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) {
-> > |  			ret = -EINVAL;
-> > |  			break;
-> > |  		}
-> >
-> > we also have the same ABI change every time FEAT_MTE_PERM is present.
-> > TBH, I'd rather have it from the start as per the patch in this thread,
-> > irrespective of FEAT_MTE_PERM. I'm fine, however, with better exit to
-> > VMM information though.
+On Wednesday 26 Feb 2025 at 14:32:52 (+0000), Marc Zyngier wrote:
+> On Tue, 25 Feb 2025 01:53:26 +0000,
+> Quentin Perret <qperret@google.com> wrote:
+> > 
+> > We have recently found a bug [1] in the pKVM memory ownership
+> > transitions by code inspection, but it could have been caught with a
+> > test.
+> > 
+> > Introduce a boot-time selftest exercising all the known pKVM memory
+> > transitions and importantly checks the rejection of illegal transitions.
+> > 
+> > The new test is hidden behind a new Kconfig option separate from
+> > CONFIG_EL2_NVHE_DEBUG on purpose as that has side effects on the
+> > transition checks ([1] doesn't reproduce with EL2 debug enabled).
 > 
-> The patch also does:
-> 
-> #define kvm_has_mte_perm(kvm)					\
-> 	(system_supports_notagaccess() &&				\
-> 	 test_bit(KVM_ARCH_FLAG_MTE_PERM_ENABLED, &(kvm)->arch.flags))
-> 
-> That is it depends on userspace to drive the behavior and also relies on the
-> FEAT_MTE_PERM hardware feature.
+> That's a bit annoying, isn't it? Without EL2_DEBUG selected, you won't
+> get any stacktrace, and the WARN_ON()s are a guaranteed panic. Yes,
+> this is better than nothing, but I'm a bit worried this is going to be
+> hard to use.
 
-Ah, ok, so the VMM needs to explicitly opt in to FEAT_MTE_PERM and the
-slight ABI change.
+Right, so you _can_ enable EL2_DEBUG on top of the selftest stuff, and
+if you're not hitting one of those hard-to-find bugs described in the
+commit message above, then you're golden. In practice I suspect that if
+enabling the selftest alone leads to a panic, the next logical step is
+to enable EL2_DEBUG and see what you get. If enabling EL2_DEBUG makes
+the issue go away, then that'll require digging a bit deeper, but that
+should be pretty rare I presume.
 
-> I was considering whether, if we're
-> introducing this capability, should we also include FEAT_MTE_PERM? since
-> adding FEAT_MTE_PERM would also require a capability to handle VM
-> migration
+> Is there a way to reduce the impact the EL2 debug has on the rest of
+> the code? It feels like it is more invasive than it should be...
 
-Fine by me to tie this to FEAT_MTE_PERM. However, ignoring VM migration,
-we really only need FEAT_MTE_PERM if we have a cacheable device memory
-assigned into the guest.
+Turns out I have a WiP series that moves the hypervisor ownership state
+to the hyp_vmemmap, similar to what we did for the host ownership. A
+nice property of that is that hyp state lookups become really cheap, no
+page-table walks required. So we could probably afford to drop the
+EL2_DEBUG ifdefery in host_share_hyp() and friends, and just
+unconditionally cross-check the hyp state on all transitions where it is
+involved. And with that we should probably just fold the pkvm selftest
+under EL2_DEBUG and call it a day. Would that work?
 
--- 
-Catalin
+Thanks,
+Quentin
