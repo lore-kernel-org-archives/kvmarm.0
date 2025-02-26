@@ -1,97 +1,129 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8224C1DC997
-	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 10:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5752E258CF4
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 10:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740564489; cv=none; b=NgR8t7BXtT5lgrKkORpD+qDa/qR5UzZxKrfPBGVy1ojc4tGduMxaLvphLFAzmtoP1iZFt/Vm7UU9a5gaLb13Qzh+FBZ9EtlfK0pvnZpH5WZH/3S8yNDGUkdDzPeDWmYZXdbzFNdhGKG4NJdWJUofRQZL53MfY+HsxmyP8A3Ka7s=
+	t=1740566735; cv=none; b=aTY05wbDLxfCrEBRYLyD6I2oXiSde5tpeKY4RxNSZACT0PHpkfD00eeAosIUHk0Ur1wuepO0Oqdj/35VupxNZgicy51IyC2Vbvnbesa3/QFqvtSgGCu41JspEX7WlEQNb1/kYedYiFyznkXKr1z68FRl+zMgCPCM2CUBa3qsvuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740564489; c=relaxed/simple;
-	bh=0tJumjnptvV8j42pULj/TSUErToqBkozF6Z5A15hMnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PBfcOtCzcYwWPG/99xwZQLQ0qOgwrQIoM93D2/T7evSVf6G0jRvSIq2kNCo5ZX0QTV6AT1gIwaG6WK+B5kGbmjTWDPLLndRtZOdkOn8rWdYnRasYCBO9QhhlVe1RVJLXXZMWMwUk1ylcgpk2ojF+Trw3/bA/TQnpqa26KPXMvRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v3oArvu0; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1740566735; c=relaxed/simple;
+	bh=Aoyk5i039i3K4vSIZbUYee6SquXrsZNgAvYyy1nF94M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y6wSmY6jJDZRW4JtBi4SazxlddDg24U0P+mtMNnsaz5PWrZK15RMp8NsfgaqBMK6Nm3Jlg0EaFK/raKlyhqWzYpzI7kDt2l2r9sV15rJPl8AgchSFdAzJV0NhCaW5xqOTqp6DkmLxagd/2p26eg7zCcltGgAkokYNsZ8Jxugvwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwhR3/+6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v3oArvu0"
-Date: Wed, 26 Feb 2025 02:07:56 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740564485;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5i64C+XznY5VpwulJeuZ+fGDTRMIkf91taLlh/OqCYg=;
-	b=v3oArvu02FM6YGN1u5zf71hgLXwsJiDLOoixvpr0JJxGDToNzSws1vy6oss7NnNd8QLMuf
-	jXOClnDeec7Zloq5DQ06f6pJ3TgqLvLP5eJvRdYELi7pYpaQVAMLQhW4x/74A5DLZUYbf6
-	buE2h0UDSplp4UTtyq26wCWwcbHcCmM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, mark.rutland@arm.com, will@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwhR3/+6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA8F1C4CED6;
+	Wed, 26 Feb 2025 10:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740566734;
+	bh=Aoyk5i039i3K4vSIZbUYee6SquXrsZNgAvYyy1nF94M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dwhR3/+6ZQkmtrXmXNnvXov2VWi1mX3a6pUI28+6Qvgv7PiCNvbVtZHXHGBBSml3E
+	 TJXzHB3RZSU9B8kwKMBmh15CbqZvIje9VWz8JvOpxuBZ8FiFfKED8ajjuW7TKW2xDA
+	 iH0MwNUXBxiMhnxUbn+SHLnO4qBKAnOkW08ASvjNmGgVy+HhrEGMSSUyOmIm2JUyIT
+	 LAUI7084abOp6bsD6wlb+eO0sMllVgUoh56u6XOrCGMAzDXh9C1h+xxtYB7X5TIIIQ
+	 2sjAP+qWLhsoepRaeVgXQrtjilOYOAM+LQWZlFSKfzwJZdB3VCnIuAwv8Mpbkq2mNM
+	 2qz3b7NmNP8Ww==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tnEuy-0088gP-Dc;
+	Wed, 26 Feb 2025 10:45:32 +0000
+Date: Wed, 26 Feb 2025 10:45:32 +0000
+Message-ID: <86a5a9q90z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	mark.rutland@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	broonie@kernel.org,
+	qperret@google.com,
 	vdonnefort@google.com
 Subject: Re: [PATCH v1 1/3] KVM: arm64: Initialize HCRX_EL2 traps in pKVM
-Message-ID: <Z77n_Gv0X0bolONW@linux.dev>
+In-Reply-To: <Z77n_Gv0X0bolONW@linux.dev>
 References: <20250214150258.464798-1-tabba@google.com>
- <20250214150258.464798-2-tabba@google.com>
+	<20250214150258.464798-2-tabba@google.com>
+	<Z77n_Gv0X0bolONW@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250214150258.464798-2-tabba@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, vdonnefort@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Fuad,
-
-Series LGTM overall, one comment:
-
-On Fri, Feb 14, 2025 at 03:02:56PM +0000, Fuad Tabba wrote:
-> Initialize and set the traps controlled by the HCRX_EL2 in pKVM
-> when the register is supported by the system.
+On Wed, 26 Feb 2025 10:07:56 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c | 46 ++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
+> Hi Fuad,
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 3927fe52a3dd..668ebec27f1b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -58,6 +58,30 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_ATA;
->  }
->  
-> +static void pkvm_vcpu_reset_hcrx(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> +	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
-> +
-> +	if (!cpus_have_final_cap(ARM64_HAS_HCX))
-> +		return;
-> +
-> +	/*
-> +	 * In general, all HCRX_EL2 bits are gated by a feature.
-> +	 * The only reason we can set SMPME without checking any
-> +	 * feature is that its effects are not directly observable
-> +	 * from the guest.
-> +	 */
-> +	vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
-> +
+> Series LGTM overall, one comment:
+> 
+> On Fri, Feb 14, 2025 at 03:02:56PM +0000, Fuad Tabba wrote:
+> > Initialize and set the traps controlled by the HCRX_EL2 in pKVM
+> > when the register is supported by the system.
+> > 
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/pkvm.c | 46 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 46 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index 3927fe52a3dd..668ebec27f1b 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -58,6 +58,30 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> >  		vcpu->arch.hcr_el2 |= HCR_ATA;
+> >  }
+> >  
+> > +static void pkvm_vcpu_reset_hcrx(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> > +	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
+> > +
+> > +	if (!cpus_have_final_cap(ARM64_HAS_HCX))
+> > +		return;
+> > +
+> > +	/*
+> > +	 * In general, all HCRX_EL2 bits are gated by a feature.
+> > +	 * The only reason we can set SMPME without checking any
+> > +	 * feature is that its effects are not directly observable
+> > +	 * from the guest.
+> > +	 */
+> > +	vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
+> > +
+> 
+> The comment isn't wrong, but we don't support SME at all in KVM at this
+> point.
 
-The comment isn't wrong, but we don't support SME at all in KVM at this
-point.
+This is a copy/paste of what we have in kvm_calculate_traps(), and the
+result of the removal of the dreaded HCRX_GUEST_FLAGS.
 
-Any objection to dropping this bit? I can fix it when applying the
-series, no need to respin.
+> Any objection to dropping this bit? I can fix it when applying the
+> series, no need to respin.
+
+Whatever we do, I think we should keep the two side of the trap
+configuration in sync, as this is otherwise a cause of bugs.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
