@@ -1,147 +1,114 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D482422D4C9
-	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 15:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF6D21C191;
+	Wed, 26 Feb 2025 15:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740583705; cv=none; b=s6xkAV432Gh12xqiCMdHf9du7cZYoEgCdbjC3WTrZHPb2HPZe4Aejwlk1V6sjT5wy+KA7WOlLp6Oxc+xNF8zI5OJZW8P5COoD6qtXDaUht/cdoCFwEzRpmxg6fGmN0elohvL9WOdz1Ma1R+Lzacp76HBt8bM4VqE7viJ6HXfw7U=
+	t=1740585533; cv=none; b=lEuDsPwu/P1JZji/QKiPNT/5IujAN0xiMbFVNZcN/UbQQxmghOBaJnxCsqLNAAd6CdId2djBE+utEEq48kRxbRdyYOv+ANcZrdf1jr1oTecUgON81uqyiPW7geuhYx56ocjErPASK8pJDZETIcS0dFHYe/vMMhonSH2a3lAxZr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740583705; c=relaxed/simple;
-	bh=H6QFppNoLPP0F59QyjvNjPfY7kEdjEWciYi4Y+OHehU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uBu7S1OJ2MiH+HwpH83znda6f6H2ahAyEU3wDvVJtSTWNxeejl/hLRI8iN4WL06SnREbbZh++K2fgvbxP3l2O70E/8N+Gq/tcdE7ye28jWbDOesyehQimCRouIbcp7+V7wAP3ovR3QIlM7f3RXPRiE3pGLPvJpRVSOwu3SPL9j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CUQdjENW; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CUQdjENW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C061C4CED6;
-	Wed, 26 Feb 2025 15:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740583705;
-	bh=H6QFppNoLPP0F59QyjvNjPfY7kEdjEWciYi4Y+OHehU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CUQdjENW6BawMLA8c76zIkAuNtcvFwO59BgSRaDAyva992mruC23nndQepgLsBolk
-	 tqEkxZZuYF97EAjz1uicGcWI4DTUfqQwsEa0Bjma0j1wyh95uSvX7fSBTt80vcUZha
-	 o+vSK1uQIsgzTrqk5CUK0ju9Oj84lh42PU9DcmejpcEVHiPRFem7yvJqXA7m6kJC7v
-	 9ybNckZdP4qGB17Wu8u3W7dn6SopSGAB/LBIbLCoF2HGNkVQUof4tyqOxeMDLrQP8s
-	 iIYk1RXObnDbJXSqXLWkLjUlS/KewBqR6qY0g9ABknQknTiQ9vgnka0NNnjtskyd1Y
-	 nbk59oL3GYyzg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tnJKh-008EWj-Aj;
-	Wed, 26 Feb 2025 15:28:23 +0000
-Date: Wed, 26 Feb 2025 15:28:22 +0000
-Message-ID: <865xkwrai1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	mark.rutland@arm.com,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	broonie@kernel.org,
-	qperret@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v1 1/3] KVM: arm64: Initialize HCRX_EL2 traps in pKVM
-In-Reply-To: <CA+EHjTwRNj6z_TTCXR8UNiB0ty=85_VKWDVsFOLke31UGnBE7A@mail.gmail.com>
-References: <20250214150258.464798-1-tabba@google.com>
-	<20250214150258.464798-2-tabba@google.com>
-	<Z77n_Gv0X0bolONW@linux.dev>
-	<86a5a9q90z.wl-maz@kernel.org>
-	<CA+EHjTwRNj6z_TTCXR8UNiB0ty=85_VKWDVsFOLke31UGnBE7A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1740585533; c=relaxed/simple;
+	bh=Hk22wqSp4Sd+L0X28JuoHUj1gIOiWKF0tEycajqDzIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qYxszSEXg8SvS2Rl5ld8fEAwx6f54YvCfqzYhgMStX8ut0GA1bt6wBkLmivBtppv1c0S+JQgR66KQTLONGvr4Z2xdJGWuitmEHzyS9uHm7zMF21oi9KhbP58gJi3l1gXQ5gUqrHl+e8pnricCZmBu4KxPIzxZDMTGcGvhwaSLo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22248C4CED6;
+	Wed, 26 Feb 2025 15:58:50 +0000 (UTC)
+Date: Wed, 26 Feb 2025 15:58:48 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH] KVM: arm64: Drop mte_allowed check during memslot
+ creation
+Message-ID: <Z786ODqxlYNpj40l@arm.com>
+References: <20250224093938.3934386-1-aneesh.kumar@kernel.org>
+ <Z7xSfVME4z2ComUm@arm.com>
+ <86ldtvr0nl.wl-maz@kernel.org>
+ <Z7yElHKrJGn8XuPS@arm.com>
+ <86jz9fqtbk.wl-maz@kernel.org>
+ <yq5aseo3gund.fsf@kernel.org>
+ <86ikozqmsl.wl-maz@kernel.org>
+ <yq5a8qptauyl.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, vdonnefort@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <yq5a8qptauyl.fsf@kernel.org>
 
-On Wed, 26 Feb 2025 12:44:49 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Wed, 26 Feb 2025 at 02:45, Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Feb 26, 2025 at 03:28:26PM +0530, Aneesh Kumar K.V wrote:
+> Marc Zyngier <maz@kernel.org> writes:
+> > On Mon, 24 Feb 2025 16:44:06 +0000,
+> > Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+> >> >> On Mon, Feb 24, 2025 at 12:24:14PM +0000, Marc Zyngier wrote:
+> >> >> > > On Mon, Feb 24, 2025 at 03:09:38PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> >> >> > > > This change is needed because, without it, users are not able to use MTE
+> >> >> > > > with VFIO passthrough (currently the mapping is either Device or
+> >> >> > > > NonCacheable for which tag access check is not applied.), as shown
+> >> >> > > > below (kvmtool VMM).
+[...]
+> >> >> > My other concern is that this gives pretty poor consistency to the
+> >> >> > guest, which cannot know what can be tagged and what cannot, and
+> >> >> > breaks a guarantee that the guest should be able to rely on.
+[...]
+> >> What if we trigger a memory fault exit with the TAGACCESS flag, allowing
+> >> the VMM to use the GPA to retrieve additional details and print extra
+> >> information to aid in analysis? BTW, we will do this on the first fault
+> >> in cacheable, non-tagged memory even if there is no tagaccess in that
+> >> region. This can be further improved using the NoTagAccess series I
+> >> posted earlier, which ensures the memory fault exit occurs only on
+> >> actual tag access
+> >> 
+> >> Something like below?
 > >
-> > On Wed, 26 Feb 2025 10:07:56 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >
-> > > Hi Fuad,
-> > >
-> > > Series LGTM overall, one comment:
-> > >
-> > > On Fri, Feb 14, 2025 at 03:02:56PM +0000, Fuad Tabba wrote:
-> > > > Initialize and set the traps controlled by the HCRX_EL2 in pKVM
-> > > > when the register is supported by the system.
-> > > >
-> > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/nvhe/pkvm.c | 46 ++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 46 insertions(+)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > > index 3927fe52a3dd..668ebec27f1b 100644
-> > > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > > @@ -58,6 +58,30 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> > > >             vcpu->arch.hcr_el2 |= HCR_ATA;
-> > > >  }
-> > > >
-> > > > +static void pkvm_vcpu_reset_hcrx(struct pkvm_hyp_vcpu *hyp_vcpu)
-> > > > +{
-> > > > +   struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> > > > +   struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
-> > > > +
-> > > > +   if (!cpus_have_final_cap(ARM64_HAS_HCX))
-> > > > +           return;
-> > > > +
-> > > > +   /*
-> > > > +    * In general, all HCRX_EL2 bits are gated by a feature.
-> > > > +    * The only reason we can set SMPME without checking any
-> > > > +    * feature is that its effects are not directly observable
-> > > > +    * from the guest.
-> > > > +    */
-> > > > +   vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
-> > > > +
-> > >
-> > > The comment isn't wrong, but we don't support SME at all in KVM at this
-> > > point.
+> > Something like that, only with:
 > >
-> > This is a copy/paste of what we have in kvm_calculate_traps(), and the
-> > result of the removal of the dreaded HCRX_GUEST_FLAGS.
+> > - a capability informing userspace of this behaviour
 > >
-> > > Any objection to dropping this bit? I can fix it when applying the
-> > > series, no need to respin.
-> >
-> > Whatever we do, I think we should keep the two side of the trap
-> > configuration in sync, as this is otherwise a cause of bugs.
+> > - a per-VM (or per-VMA) flag as a buy-in for that behaviour
 > 
-> I could take the initialization of hcrx part from
-> kvm_calculate_traps() and place it in an inline function in
-> kvm_emulate.h. This then would be called by kvm_calculate_traps() and
-> pkvm_vcpu_init_traps().
+> If we’re looking for a capability based control, could we tie that up to
+> FEAT_MTE_PERM? That’s what I did here:
 > 
-> What do you think?
+> https://lore.kernel.org/all/20250110110023.2963795-1-aneesh.kumar@kernel.org
+> 
+> That patch set also addresses the issue mentioned here. Let me know if
+> you think this is a better approach
 
-That could be a good option indeed, irrespective of the fate of SMPME.
+From the patch linked above:
 
-Thanks,
+| @@ -2152,7 +2162,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+|  		if (!vma)
+|  			break;
+| 
+| -		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
+| +		if (kvm_has_mte(kvm) &&
+| +		    !kvm_has_mte_perm(kvm) && !kvm_vma_mte_allowed(vma)) {
+|  			ret = -EINVAL;
+|  			break;
+|  		}
 
-	M.
+we also have the same ABI change every time FEAT_MTE_PERM is present.
+TBH, I'd rather have it from the start as per the patch in this thread,
+irrespective of FEAT_MTE_PERM. I'm fine, however, with better exit to
+VMM information though.
+
+If we don't want to confuse the VMMs, we could skip the
+kvm_vma_mte_allowed() check only for VM_ALLOW_ANY_UNCACHED and
+VM_PFNMAP vmas, maybe the latter only with FEAT_MTE_PERM. I don't think
+the VMM would get it wrong here since a VFIO mmap() would not support
+MTE anyway.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
