@@ -1,120 +1,103 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1337261398
-	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 21:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFF71E1E01
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 21:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740606547; cv=none; b=b++v1dZdLGmtExtwHyrTqH52FRSsTYPKPG3UCfkEf4lNCZFhLw4xnc2OAURycqaubxur0R0OKt6w6WQpJiUsJMTJi9Ul7Dhc84EeIgR/yxnd4K4D4XCjGBYwPiLBF+rRH1cFWLgLUW/3hzqNv6kmeP/e7J2J43c7VsuicgWBLWM=
+	t=1740606926; cv=none; b=DFOj31v2ROCBjvXRx6hI+6vcch1fwLAbQ7XCe0xYgFeJbjrNKze8HuOogeQ+vuO6cJOm84Cqo9uAjc7Zunp+pf74y7oraPxox7l0fP++JkmrV1VTXS1HBeiNEHIn2sf0DiAUyhZXRojbBPoGfj8IGZcFJPcSF82e4VjIRACqBvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740606547; c=relaxed/simple;
-	bh=FR9O3f+FzonphJjEwi5+VpVYgFi8WH7raVXQy1pKg8k=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZjCtJo3FELf5gYkFvHjsR6rRanI0ZfRWfhchC1acUMSEmIayn3y8AtApaRlZtThLf4bBIeuwzRcB32aiOh0sWzM6cyNBF8qJA/0bAT016LN1i3NgiXC9VyGRO1trO4t3jm6YU/JV38c1Dd468yTAITuDBkOWKfsk/lxMLFJwHT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=etX/tlmL; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1740606926; c=relaxed/simple;
+	bh=r0XmNteGt4vJ15q9L6ZRVhHnN8azCu0DEQ8uQYRjKwA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Wm/b9IhSVq17UEOyluRrfyQDFl7Tvffae5x07kNVOmVazAQjW4jJkzAiNwo+zUdiL+IZw/teGMky3fMS7xIfHAVmP56I7Onwo0vPujIgyAjS+/IDzCXKVxGphzus9dagJO0lMOprW8fYoO8LLq6RVtKu4cdlxRr60f8RJmwGnPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fxGXW2Cy; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="etX/tlmL"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43ab5baf62cso2511335e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 13:49:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fxGXW2Cy"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4399c5ba9e4so1209235e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 13:55:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740606544; x=1741211344; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jElUUP1cXmmGkWA/+GnRTo6wT5X97muVU936DPVGfcc=;
-        b=etX/tlmLYyNHdDmNu5ffVcR1madX2y+UNrwpqm9QlyQl2CFi7IxW+F3+CwmPzbD2qr
-         h2goiZkB6d6p3md6JjcdJrZ+WSoannKtYTgzQeMQweZot/4O8ks0Zjp93uPKjuDVlRHZ
-         Z2CB7Ii+9ZD3hO2gJWaPu1Sww11gpEMp5JvS2u9+bvzVb4mG2r1Lb+y0LPAFTxoE6hXb
-         o4hESJkvWiTcPzP1cNSRNy2Iuu8PcAtt/nCsiKLj/a0vLAfk6CR5IjD41rLFrxPSyvhi
-         ABos6wmWWROroBZP2jOZxCca/iFPo0jK9rT914U0sKRgsilOetI0OlQctLoFPCvA5uGe
-         Istg==
+        d=google.com; s=20230601; t=1740606923; x=1741211723; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7IvPw5iGc/k53b4/rPiCRpRIXAnRcZkrel3cZcM0Zew=;
+        b=fxGXW2Cy+1bx+aN2v6bvZQ7F3lt30gso/HECZWwIYGMWRNoGNPS3xDaTcqekkQIqC8
+         oYkqgqA9t094Yx01rIbT8S9T1u0gIt3ASj9qOgfa+eiZkWK9mg6PIqc3y7EbYIxoxhp+
+         E8VJFgevzywmdkGKxvQ67cROlLJhYpscDxPu3TNlEcJk6u6uGJWt88P09YSvpD3Oj02/
+         cerWAnrlAV3AGNl+LlNxLt0Y79ewE3DR/DTFgjbDFSsgzJSlGftfFeuXWo2fcjTukhrq
+         qGVyCaMfeyeiiiwJp07VDWRZtV2YaktntJM1QgE8wgsgxWCcAc5jFHf5kDvNr6+WyUfH
+         fiyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740606544; x=1741211344;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jElUUP1cXmmGkWA/+GnRTo6wT5X97muVU936DPVGfcc=;
-        b=nCKqJbGT+dv0LVPC8uxBwe2TaFJ+R36LNg174PF3XVuJFzGgRhLdyQ/ISnKpCUOF/L
-         V/dSjrDnOEEUV3/NZGLRwX2y4ix6b1VOUYqa9QRas333fzz1VttcmaAqhjEY9om5r+gE
-         1ihqw+g2PM0/TffuDnOm8QCe5Yoo0hx/HnuButVqMsgTusBUvpKYXhakQnZDSWbOOg3B
-         IdLKXjllxLXtVCOFwS4dEnsiEMwfazq8bzaTzqXoijyglTRZz4kK3Hct0/Gr8BWkmVDV
-         XO86AyYeHxYoGDLSPONQLrzmUWFE2bVzcE3+xTJqj0GcOKg0BcrHusvO5hdsIBDeiArE
-         ulyw==
-X-Gm-Message-State: AOJu0YwngnRl9A6dBjopTj4zqLkiU5cDvvsMJ5sRQ5K6vQetqwG8C8V/
-	5MXQ2G0JPRd+J31pru2VdSSGgTMtH6++T+qpw0sVQ/Vt7cAJdjvfG1mkP3hXPLka/P+gzIb/ElO
-	gWQie+G2YBqAumfAKcFUYFz+deQ==
-X-Google-Smtp-Source: AGHT+IFMNilNm63tpaGE1Thx+63/zfmAmfVfjbx1vaV84Aa8shwCpD7h0mmGQaUHETfocmAdjgNyNEVh/DYceyRboA4=
-X-Received: from wmbfm16.prod.google.com ([2002:a05:600c:c10:b0:439:850b:8080])
- (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3506:b0:439:6dba:adf2 with SMTP id 5b1f17b1804b1-43ab8fe7734mr46217465e9.15.1740606544357;
- Wed, 26 Feb 2025 13:49:04 -0800 (PST)
-Date: Wed, 26 Feb 2025 21:48:53 +0000
-In-Reply-To: <20250226214853.3267057-1-sebastianene@google.com>
+        d=1e100.net; s=20230601; t=1740606923; x=1741211723;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7IvPw5iGc/k53b4/rPiCRpRIXAnRcZkrel3cZcM0Zew=;
+        b=nP75KuLmDBcJq1gwvzG/E47z8X2seF9xBW+t0IIpyn/lblvQ6Pb4wgUi5u1pvL8IRz
+         vNDS7RMBlAIsK8wR2hY5ftZ6irRo/F9v45eCo+ErSqMDUNaY2xK7SE7g9Fcq8P/guuMJ
+         2V/Z9JUfzss0ur3QbjYyd8DSp/8jlJCt17p9vKb9U6SjuTKTr0EacrizMzzLkUx9qpzP
+         JMelc9RMAiJdxFCErGvSbRrGa6ozqY6+Xq9fgik+tLfA7MWwKuoezRfjiu354j2hYNs0
+         zuXbwt5IQhCUq3QMQ8eLcVPOWsW1YHFktxffSl8HO6UZiRp4I3SFhsu/BQLz9NgeYeAG
+         aixg==
+X-Gm-Message-State: AOJu0Yz+55nVquzP9qIhUHoRBnXDDRnnW8xXUn28P2Voqn278+XjGm1J
+	6F8qwaqYUh1jqGzvVHRWzPr5jO/M7sdAjNKDJukwGRK0gkNggzfsnSK9NPXB9rzvk6abhs0DEWP
+	jxa0ioR2IiKqSaPs13HOw5osGA1QgStRXbvDZfZ6/GcOroUVL5N5ylPTacRADXkUdLa7LRhP6ZQ
+	UtqmRvzPrRihskrice+KFIY9XyTnM=
+X-Google-Smtp-Source: AGHT+IGXlbqPAwAa2eKU5tILxiLuRG281n0weT0i//QObTL7/xbiqPS0o5r4y1I8zjQNvEu6szJcKMd1wA==
+X-Received: from wmbg8.prod.google.com ([2002:a05:600c:a408:b0:439:88bc:d27d])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:588b:0:b0:38c:5dcb:312e
+ with SMTP id ffacd0b85a97d-390cc3aff06mr7754343f8f.0.1740606922779; Wed, 26
+ Feb 2025 13:55:22 -0800 (PST)
+Date: Wed, 26 Feb 2025 21:55:16 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250226214853.3267057-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250226214853.3267057-4-sebastianene@google.com>
-Subject: [PATCH 3/3] KVM: arm64: Release the ownership of the hyp rx buffer to Trustzone
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org, 
-	oliver.upton@linux.dev, sebastianene@google.com, snehalreddy@google.com, 
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com, 
-	will@kernel.org, yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Andrei Homescu <ahomescu@google.com>
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250226215520.1759218-1-tabba@google.com>
+Subject: [PATCH v2 0/4] KVM: arm64: Fix initializing HCRX_EL2 and other traps
+ in pKVM
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com, 
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
+	qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Introduce the release FF-A call to notify Trustzone that the hypervisor
-has finished copying the data from the buffer shared with Trustzone to
-the non-secure partition.
+Changes since v1 [*]:
+- Factor out setting HCRX_EL2 traps into a separate function and
+share logic between protected and non-protected modes
+- Rebase on Linux 6.14-rc4
 
-Reported-by: Andrei Homescu <ahomescu@google.com>
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+For context, please refer to v1 [*].
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 861f24de97cb..7da0203f1ee9 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -725,6 +725,7 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
- 	DECLARE_REG(u32, uuid3, ctxt, 4);
- 	DECLARE_REG(u32, flags, ctxt, 5);
- 	u32 count, partition_sz, copy_sz;
-+	struct arm_smccc_res _res;
- 
- 	hyp_spin_lock(&host_buffers.lock);
- 	if (!host_buffers.rx) {
-@@ -741,7 +742,7 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
- 
- 	count = res->a2;
- 	if (!count)
--		goto out_unlock;
-+		goto release_rx;
- 
- 	if (hyp_ffa_version > FFA_VERSION_1_0) {
- 		/* Get the number of partitions deployed in the system */
-@@ -757,10 +758,12 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
- 	copy_sz = partition_sz * count;
- 	if (copy_sz > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
- 		ffa_to_smccc_res(res, FFA_RET_ABORTED);
--		goto out_unlock;
-+		goto release_rx;
- 	}
- 
- 	memcpy(host_buffers.rx, hyp_buffers.rx, copy_sz);
-+release_rx:
-+	ffa_rx_release(&_res);
- out_unlock:
- 	hyp_spin_unlock(&host_buffers.lock);
- }
+Cheers,
+/fuad
+
+[*] https://lore.kernel.org/all/20250214150258.464798-1-tabba@google.com/
+
+Fuad Tabba (4):
+  KVM: arm64: Factor out setting HCRX_EL2 traps into separate function
+  KVM: arm64: Initialize HCRX_EL2 traps in pKVM
+  KVM: arm64: Factor out pKVM hyp vcpu creation to separate function
+  KVM: arm64: Create each pKVM hyp vcpu after its corresponding host
+    vcpu
+
+ arch/arm64/include/asm/kvm_emulate.h   | 24 +++++++++
+ arch/arm64/include/asm/kvm_host.h      |  2 +
+ arch/arm64/include/asm/kvm_pkvm.h      |  1 +
+ arch/arm64/kvm/arm.c                   |  4 ++
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 62 ++++++++++++++---------
+ arch/arm64/kvm/pkvm.c                  | 70 +++++++++++++-------------
+ arch/arm64/kvm/sys_regs.c              | 20 +-------
+ 8 files changed, 104 insertions(+), 85 deletions(-)
+
+
+base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
 -- 
-2.48.1.658.g4767266eb4-goog
+2.48.1.711.g2feabab25a-goog
 
