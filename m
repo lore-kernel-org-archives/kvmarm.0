@@ -1,67 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E0221B192;
-	Wed, 26 Feb 2025 19:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071EC2571A9
+	for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 21:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740599601; cv=none; b=D7sI/4kOxWAClUnuiGd6907DHtshxndJwjDqqpZ8ON4AAHB0zWz2dKAuRpUFZcIfzTewbCPDcEhpoxwcsijAILLb5PK0wawtFkNtOgdRSvqgFb3QTnFqJgENAVUTdh/Os1quabIjpssRr90zBYZ1H95Urh2z+OVLOL+CU8lINQI=
+	t=1740605262; cv=none; b=Lf6yKl4MNlyeimdaTeecTHctNiFWvPL+2mmuHadMSeTwGP5WA1+Fy83gzak6gS1JZegBLY7CPP2MbM9RP8HtR5bvBliHlZdNvrBo87XFmGYDpsXNuk0lF/0M2ebK8mn+Gvhx1aR8RiaHbA1xkF0419/IktRfQRynqvs4FkltKaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740599601; c=relaxed/simple;
-	bh=yMWz6moEgRjlkMd5jFnex7P2z8dKHRE0Vn23vCnj+4s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jnaOKTZ76z/J4ZdjWQig8NOn/MALPBQwF2aRCW3RtEZz+QNqDomGvyGnf/4+mM8rui2enB+imuFpThUhZ5XtQSWuNFnLNfUtlHNir8pTv41w5IaInBF5W2b+2xIc++0gPZ+sY6JMRgTnZBVNb88I6xQx80IwVocklzgTmvfTUhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52EDBC4CED6;
-	Wed, 26 Feb 2025 19:53:17 +0000 (UTC)
-Date: Wed, 26 Feb 2025 19:53:15 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH V3 5/5] mm: Rename GENERIC_PTDUMP and PTDUMP_CORE
-Message-ID: <Z79xK3xJWm0vH5jH@arm.com>
-References: <20250226122404.1927473-1-anshuman.khandual@arm.com>
- <20250226122404.1927473-6-anshuman.khandual@arm.com>
+	s=arc-20240116; t=1740605262; c=relaxed/simple;
+	bh=zG7o87npr70YDPPc621lHMTGJSM3DLc8E6eb0iwDoBg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pMTxAM3qjIPr7KYDc+SCe2c83prPagQF1y5a1CMKyWukg3gZSELcVTc+diVTHbc01CDWy9uhMZCwASt7BfD35LmuYqhLDx3ypHmrEIIoc+22oTrlHHAnoWGTEwzx2KRx5s67YGm7TNPSDjM4HHQftthkpeouNXs6IKgChh59TiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YdDtKS3A; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YdDtKS3A"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740605258;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WQupw5lqPe3UBVt0VJ7EozeP/RmEXFaUJZzA9xr85no=;
+	b=YdDtKS3APzBbLGdUXCJnyjBkTSD74uvkbxvIhRShXnNVaC0EJI/4V2pjG8ePcgC9KN2kXf
+	xZNuKzwFxrOyj/t3oQ3XSBdzPjd1Tpsl9k9hxuJckm/ash/OMYOnxXjDzTNLWFU9DzrmSL
+	VAvjb8QHTwEQ9SR8GuUcAsfesJUfwF4=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 0/4] KVM: arm64: Fixes/clarification for GICv4 vLPI injection
+Date: Wed, 26 Feb 2025 13:27:28 -0800
+Message-Id: <174060523514.126155.10581342803638978418.b4-ty@linux.dev>
+In-Reply-To: <20250226183124.82094-1-oliver.upton@linux.dev>
+References: <20250226183124.82094-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250226122404.1927473-6-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Feb 26, 2025 at 05:54:04PM +0530, Anshuman Khandual wrote:
-> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-> index 6cf4aae05219..b2931d1ae0fb 100644
-> --- a/arch/arm64/include/asm/ptdump.h
-> +++ b/arch/arm64/include/asm/ptdump.h
-> @@ -7,7 +7,7 @@
->  
->  #include <linux/ptdump.h>
->  
-> -#ifdef CONFIG_PTDUMP_CORE
-> +#ifdef CONFIG_PTDUMP
+On Wed, 26 Feb 2025 10:31:20 -0800, Oliver Upton wrote:
+> Small batch of fixes for vLPI injection issues that can happen when
+> userspace is being mean:
+> 
+>  - MSI interrupt sources could be mapped to non-MSI GSI routing entries.
+>    KVM doesn't account for the routing type and blindly attempts to map
+>    a vLPI.
+> 
+> [...]
 
-Do we need this #ifdef at all? I haven't tried but usually, if the
-feature is not enabled, the header file on its own should be harmless.
+Applied to next, thanks!
 
-For arm64:
+[1/4] KVM: arm64: vgic-v4: Only attempt vLPI mapping for actual MSIs
+      https://git.kernel.org/kvmarm/kvmarm/c/a0d7e2fc61ab
+[2/4] KVM: arm64: vgic-v4: Only WARN for HW IRQ mismatch when unmapping vLPI
+      https://git.kernel.org/kvmarm/kvmarm/c/d0b79563fd60
+[3/4] KVM: arm64: vgic-v4: Fall back to software irqbypass if LPI not found
+      https://git.kernel.org/kvmarm/kvmarm/c/5c57533eb8c1
+[4/4] KVM: arm64: Document ordering requirements for irqbypass
+      https://git.kernel.org/kvmarm/kvmarm/c/d766d87cf4a0
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+--
+Best,
+Oliver
