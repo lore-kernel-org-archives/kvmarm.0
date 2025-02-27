@@ -1,527 +1,117 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2793423535E
-	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 15:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BB71B4151
+	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 16:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740669776; cv=none; b=VAJManB9a9Stf5fOE9ieIIhgGx6/FRZlzFDIXQX6EKmDQvYMdKdvhB57Adi3TTwlxoYP4SkXxA8hh56d5jK049F32w/m+JQuTUlkKlwkhtlyuh/boI6OGzUlWDL8YAIkuHc39KxxXxFrdukjuXIQztDad2SicCHw/x5Z5n2+QvM=
+	t=1740675206; cv=none; b=RVmdL8vLE9DkzrKRKFWoUh2JsfymjTZCr5oc0YXLHjUdmscyI5ZkexhHJtMsyxzqtlqJHiGUl+SRePnG1q6WxXAd0AS/6PXm914bEuM1bY+XwozJXKuq4cqtAiD165Wv561Fh2hwT3fEn8prBJGpscIoBJjnvobP1JXBLm5TgX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740669776; c=relaxed/simple;
-	bh=1cTEn/rP7u+bmxFULzGJ58W3z3PvCS5p3XoE3gQf75E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CwTZp6GMu0lpoyo0/NBvLBnKlW541tF9lklMUuz3XD3x45+m8NfLxNt2CmgFpABos2Z/+t6D9zrKwLze9a6SE4AMm7576RknQcVDYs2ZrRUzT5yE8xNJAgxaN9tHN1ZL3xL9+WZBwo3q6gqqrsC13eA1TB6+wuxcAbe1kaV1fBg=
+	s=arc-20240116; t=1740675206; c=relaxed/simple;
+	bh=sP92n0yPsaHv8z3vFtzWYf7oj36PRK8d/7Oa57GRapI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZL9yFiY1a239SG1AQtK1Okepbo+REW7BFRojNU7xRpA9HX9MTZr5Nby2RMNHjMNh7b7x/pYTdXiCdHuAGcM4hPxsSs+hVcGvfukS7X1F7dsC6rvfMMhlwjBTg2A894phUUKL3Rz4rQHGnqie1i83BYqBDRUpGTvZbJP2UPMSdnc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CAB5A15A1;
-	Thu, 27 Feb 2025 07:23:08 -0800 (PST)
-Received: from login2.euhpc.arm.com (login2.euhpc.arm.com [10.6.38.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8BBBB3F5A1;
-	Thu, 27 Feb 2025 07:22:52 -0800 (PST)
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com,
-	nikos.nikoleris@arm.com,
-	andrew.jones@linux.dev,
-	eric.auger@redhat.com
-Subject: [PATCH v4] arm64: Add basic MTE test
-Date: Thu, 27 Feb 2025 15:22:40 +0000
-Message-Id: <20250227152240.118721-1-vladimir.murzin@arm.com>
-X-Mailer: git-send-email 2.24.0
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F066A1424;
+	Thu, 27 Feb 2025 08:53:38 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 674763F5A1;
+	Thu, 27 Feb 2025 08:53:22 -0800 (PST)
+Date: Thu, 27 Feb 2025 16:53:15 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v1 1/7] arm64: drop to EL1 if booted at EL2
+Message-ID: <Z8CYeyKrFoglWWSp@raptor>
+References: <20250220141354.2565567-1-joey.gouly@arm.com>
+ <20250220141354.2565567-2-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250220141354.2565567-2-joey.gouly@arm.com>
 
-Test tag storage access and tag mismatch for different MTE modes.
+Hi Joey,
 
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- arm/Makefile.arm64            |   8 +
- arm/cstart64.S                |   4 +-
- arm/mte.c                     | 313 ++++++++++++++++++++++++++++++++++
- arm/unittests.cfg             |  19 +++
- lib/arm64/asm/mmu.h           |   1 +
- lib/arm64/asm/pgtable-hwdef.h |   3 +
- lib/arm64/asm/sysreg.h        |  14 ++
- 7 files changed, 361 insertions(+), 1 deletion(-)
- create mode 100644 arm/mte.c
+On Thu, Feb 20, 2025 at 02:13:48PM +0000, Joey Gouly wrote:
+> EL2 is not currently supported, drop to EL1 to conitnue booting.
+> 
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> ---
+>  arm/cstart64.S | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index b480a552..3a305ad0 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -57,14 +57,25 @@ start:
+>  	add     x6, x6, :lo12:reloc_end
+>  1:
+>  	cmp	x5, x6
+> -	b.hs	1f
+> +	b.hs	reloc_done
+>  	ldr	x7, [x5]			// r_offset
+>  	ldr	x8, [x5, #16]			// r_addend
+>  	add	x8, x8, x4			// val = base + r_addend
+>  	str	x8, [x4, x7]			// base[r_offset] = val
+>  	add	x5, x5, #24
+>  	b	1b
+> -
+> +reloc_done:
+> +	mrs	x4, CurrentEL
+> +	cmp	x4, CurrentEL_EL2
+> +	b.ne	1f
+> +drop_to_el1:
+> +	mov	x4, 4
+> +	msr	spsr_el2, x4
+> +	adrp	x4, 1f
+> +	add	x4, x4, :lo12:1f
+> +	msr	elr_el2, x4
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 3b9034e3..fbf11c98 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -17,6 +17,13 @@ ifneq ($(strip $(sve_flag)),)
- CFLAGS += -DCC_HAS_SVE
- endif
- 
-+mte_flag := $(call cc-option, -march=armv8.5-a+memtag, "")
-+ifneq ($(strip $(mte_flag)),)
-+# MTE is supported by the compiler, generate MTE instructions
-+CFLAGS += -DCC_HAS_MTE
-+endif
-+
-+
- mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
- CFLAGS += $(mno_outline_atomics)
- CFLAGS += -DCONFIG_RELOC
-@@ -57,6 +64,7 @@ tests += $(TEST_DIR)/micro-bench.$(exe)
- tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
- tests += $(TEST_DIR)/fpu.$(exe)
-+tests += $(TEST_DIR)/mte.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index b480a552..b9d7a446 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -242,6 +242,7 @@ halt:
-  *   NORMAL             100     11111111
-  *   NORMAL_WT          101     10111011
-  *   DEVICE_nGRE        110     00001000
-+ *   NORMAL_TAGGED      111     11110000
-  */
- #define MAIR(attr, mt) ((attr) << ((mt) * 8))
- 
-@@ -275,7 +276,8 @@ asm_mmu_enable:
- 		     MAIR(0x44, MT_NORMAL_NC) |		\
- 		     MAIR(0xff, MT_NORMAL) |	        \
- 		     MAIR(0xbb, MT_NORMAL_WT) |         \
--		     MAIR(0x08, MT_DEVICE_nGRE)
-+		     MAIR(0x08, MT_DEVICE_nGRE) |       \
-+		     MAIR(0xf0, MT_NORMAL_TAGGED)
- 	msr	mair_el1, x1
- 
- 	/* TTBR0 */
-diff --git a/arm/mte.c b/arm/mte.c
-new file mode 100644
-index 00000000..f32203ce
---- /dev/null
-+++ b/arm/mte.c
-@@ -0,0 +1,313 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2024 Arm Limited.
-+ * All rights reserved.
-+ */
-+
-+#include <libcflat.h>
-+#include <alloc_page.h>
-+#include <stdlib.h>
-+
-+#include <asm/mmu.h>
-+#include <asm/pgtable-hwdef.h>
-+#include <asm/processor.h>
-+#include <asm/sysreg.h>
-+#include <asm/thread_info.h>
-+
-+
-+/* Tag Check Faults cause a synchronous exception */
-+#define MTE_TCF_SYNC	0b01
-+/* Tag Check Faults are asynchronously accumulated */
-+#define MTE_TCF_ASYNC	0b10
-+/*
-+ * Tag Check Faults cause a synchronous exception on reads,
-+ * and are asynchronously accumulated on writes
-+ */
-+#define MTE_TCF_ASYMM	0b11
-+
-+#define MTE_GRANULE_SIZE        UL(16)
-+#define MTE_GRANULE_MASK        (~(MTE_GRANULE_SIZE - 1))
-+#define MTE_TAG_SHIFT           56
-+
-+#define untagged(p)									\
-+({											\
-+	unsigned long __in = (unsigned long)(p);					\
-+	typeof(p) __out = (typeof(p))(__in & ~(MTE_GRANULE_MASK << MTE_TAG_SHIFT));	\
-+											\
-+	__out;										\
-+})
-+
-+#define tagged(p, t)							\
-+({									\
-+	unsigned long __in = (unsigned long)(untagged(p));		\
-+	unsigned long __tag = (unsigned long)(t) << MTE_TAG_SHIFT;	\
-+	typeof(p) __out = (typeof(p))(__in | __tag);			\
-+									\
-+	__out;								\
-+})
-+
-+/*
-+ * If we use a normal (non hand coded inline assembly) load or store
-+ * to access a tagged address, the compiler will reasonably assume
-+ * that the access succeeded, and the next instruction may do
-+ * something based on that assumption.
-+ *
-+ * But a test might want the tagged access to fail on purpose, and if
-+ * we advance the PC to the next instruction, the one added by the
-+ * compiler, we might leave the program in an unexpected state.
-+ */
-+static inline void mem_read(unsigned int *addr, unsigned int *res)
-+{
-+	unsigned int r;
-+
-+	asm volatile ("ldr %0,[%1]\n"
-+		      "str %0,[%2]\n"
-+		      : "=&r" (r)
-+		      : "r" (addr), "r" (res) : "memory");
-+}
-+
-+static inline void mem_write(unsigned int *addr, unsigned int val)
-+{
-+	/* The NOP allows the same exception handler as mem_read() to be used. */
-+	asm volatile ("str %0,[%1]\n"
-+		      "nop\n"
-+		      :
-+		      : "r" (val), "r" (addr)
-+		      : "memory");
-+}
-+
-+static volatile bool mte_exception;
-+
-+static void mte_fault_handler(struct pt_regs *regs, unsigned int esr)
-+{
-+	unsigned int dfsc = esr & GENMASK(5, 0);
-+	unsigned int fnv = esr & BIT(10);
-+
-+	if (dfsc == 0b010001) {
-+		if (fnv)
-+			report_info("Unexpected non-zero FnV");
-+		mte_exception = true;
-+	}
-+
-+	/*
-+	 * mem_read() reads the value from the tagged pointer, then
-+	 * stores this value in the untagged 'res' pointer. The
-+	 * function that called mem_read() will want to check that the
-+	 * initial value of 'res' hasn't changed if a tag check fault
-+	 * is reported. Skip over two instructions so 'res' isn't
-+	 * overwritten.
-+	 */
-+	regs->pc += 8;
-+}
-+
-+static inline void mmu_set_tagged(pgd_t *pgtable, unsigned long vaddr)
-+{
-+	pteval_t *p_pte = follow_pte(pgtable, untagged(vaddr));
-+
-+	if (p_pte) {
-+		pteval_t entry = *p_pte;
-+
-+		entry &= ~PTE_ATTRINDX_MASK;
-+		entry |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
-+
-+		WRITE_ONCE(*p_pte, entry);
-+		flush_tlb_page(vaddr);
-+	} else {
-+		report_abort("Cannot find PTE");
-+	}
-+}
-+
-+static void mte_init(void)
-+{
-+	unsigned long sctlr = read_sysreg(sctlr_el1);
-+	unsigned long tcr = read_sysreg(tcr_el1);
-+
-+	sctlr &= ~SCTLR_EL1_TCF_MASK;
-+	sctlr |= SCTLR_EL1_ATA;
-+
-+	tcr &= ~TCR_TCMA0;
-+	tcr |= TCR_TBI0;
-+
-+	write_sysreg(sctlr, sctlr_el1);
-+	write_sysreg(tcr, tcr_el1);
-+
-+	isb();
-+	flush_tlb_all();
-+}
-+
-+static inline unsigned long mte_set_tcf(unsigned long tcf)
-+{
-+	unsigned long sctlr = read_sysreg(sctlr_el1);
-+	unsigned long old = (sctlr & SCTLR_EL1_TCF_MASK) >> SCTLR_EL1_TCF_SHIFT;
-+
-+	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
-+	sctlr |= (tcf << SCTLR_EL1_TCF_SHIFT) & SCTLR_EL1_TCF_MASK;
-+
-+	write_sysreg(sctlr, sctlr_el1);
-+	write_sysreg_s(0, TFSR_EL1);
-+	isb();
-+
-+	return old;
-+}
-+
-+
-+static inline void mte_set_tag(void *addr, size_t size, unsigned int tag)
-+{
-+#ifdef CC_HAS_MTE
-+	unsigned long in = (unsigned long)untagged(addr);
-+	unsigned long start = ALIGN_DOWN(in, 16);
-+	unsigned long end = ALIGN(in + size, 16);
-+
-+	for (unsigned long ptr = start; ptr < end; ptr += 16) {
-+		asm volatile(".arch   armv8.5-a+memtag\n"
-+			     "stg %0, [%0]"
-+			     :
-+			     : "r"(tagged(ptr, tag))
-+			     : "memory");
-+	}
-+#endif
-+}
-+
-+static inline unsigned long get_clear_tfsr(void)
-+{
-+	unsigned long r;
-+
-+	dsb(nsh);
-+	isb();
-+
-+	r = read_sysreg_s(TFSR_EL1);
-+	write_sysreg_s(0, TFSR_EL1);
-+
-+	return r;
-+}
-+
-+static void mte_sync_test(void)
-+{
-+	unsigned int *mem = tagged(alloc_page(), 1);
-+	unsigned int val = 0;
-+
-+	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
-+	mte_set_tag(mem, PAGE_SIZE, 1);
-+	memset(mem, 0xff, PAGE_SIZE);
-+	mte_set_tcf(MTE_TCF_SYNC);
-+
-+	mte_exception = false;
-+
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
-+
-+	mem_read(tagged(mem, 2), &val);
-+
-+	report((val == 0) && mte_exception && (get_clear_tfsr() == 0), "read");
-+
-+	mte_exception = false;
-+
-+	mem_write(tagged(mem, 3), 0xbbbbbbbb);
-+
-+	report((*mem == 0xffffffff) && mte_exception && (get_clear_tfsr() == 0), "write");
-+
-+	free_page(untagged(mem));
-+}
-+
-+static void mte_asymm_test(void)
-+{
-+	unsigned int *mem = tagged(alloc_page(), 2);
-+	unsigned int val = 0;
-+
-+	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
-+	mte_set_tag(mem, PAGE_SIZE, 2);
-+	memset(mem, 0xff, PAGE_SIZE);
-+	mte_set_tcf(MTE_TCF_ASYMM);
-+	mte_exception = false;
-+
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
-+
-+	mem_read(tagged(mem, 3), &val);
-+	report((val == 0) && mte_exception && (get_clear_tfsr() == 0), "read");
-+
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
-+
-+	mem_write(tagged(mem, 4), 0xaaaaaaaa);
-+	report((*mem == 0xaaaaaaaa) && (get_clear_tfsr() == TFSR_EL1_TF0), "write");
-+
-+	free_page(untagged(mem));
-+}
-+
-+static void mte_async_test(void)
-+{
-+	unsigned int *mem = tagged(alloc_page(), 3);
-+	unsigned int val = 0;
-+
-+	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
-+	mte_set_tag(mem, PAGE_SIZE, 3);
-+	memset(mem, 0xff, PAGE_SIZE);
-+	mte_set_tcf(MTE_TCF_ASYNC);
-+
-+	mem_read(tagged(mem, 4), &val);
-+	report((val == 0xffffffff) && (get_clear_tfsr() == TFSR_EL1_TF0), "read");
-+
-+	mem_write(tagged(mem, 5), 0xcccccccc);
-+	report((*mem == 0xcccccccc) && (get_clear_tfsr() == TFSR_EL1_TF0), "write");
-+
-+	free_page(untagged(mem));
-+}
-+
-+
-+static unsigned int mte_version(void)
-+{
-+#ifdef CC_HAS_MTE
-+	uint64_t r;
-+
-+	asm volatile("mrs %x0, id_aa64pfr1_el1" : "=r"(r));
-+
-+	return (r >> ID_AA64PFR1_EL1_MTE_SHIFT) & 0b1111;
-+#else
-+	report_info("Compiler lack MTE support");
-+	return 0;
-+#endif
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+
-+	unsigned int version = mte_version();
-+
-+	if (version < 2) {
-+		report_skip("No MTE support, skip...\n");
-+		return report_summary();
-+	}
-+
-+	if (argc < 2)
-+		report_abort("no test specified");
-+
-+	report_prefix_push("mte");
-+
-+	mte_init();
-+
-+	if (strcmp(argv[1], "sync") == 0) {
-+		report_prefix_push(argv[1]);
-+		mte_sync_test();
-+		report_prefix_pop();
-+	} else if (strcmp(argv[1], "async") == 0) {
-+		report_prefix_push(argv[1]);
-+		if (version < 3) {
-+			report_skip("No MTE async, skip...\n");
-+			return report_summary();
-+		}
-+		mte_async_test();
-+		report_prefix_pop();
-+
-+	} else if (strcmp(argv[1], "asymm") == 0) {
-+		report_prefix_push(argv[1]);
-+		if (version < 3) {
-+			report_skip("No MTE asymm, skip...\n");
-+			return report_summary();
-+		}
-+		mte_asymm_test();
-+		report_prefix_pop();
-+
-+	} else {
-+		report_abort("Unknown sub-test '%s'", argv[1]);
-+	}
-+
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 2bdad67d..fe101145 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -271,3 +271,22 @@ smp = 2
- groups = nodefault
- accel = kvm
- arch = arm64
-+
-+# MTE tests
-+[mte-sync]
-+file = mte.flat
-+groups = mte
-+extra_params = -machine mte=on -append 'sync'
-+arch = arm64
-+
-+[mte-async]
-+file = mte.flat
-+groups = mte
-+extra_params = -machine mte=on -append 'async'
-+arch = arm64
-+
-+[mte-asymm]
-+file = mte.flat
-+groups = mte
-+extra_params = -machine mte=on -append 'asymm'
-+arch = arm64
-diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
-index 5c27edb2..9aedd09a 100644
---- a/lib/arm64/asm/mmu.h
-+++ b/lib/arm64/asm/mmu.h
-@@ -10,6 +10,7 @@
- #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
- #define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
- #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
-+#define PTE_TAGGED		PTE_ATTRINDX(MT_NORMAL_TAGGED)
- 
- static inline void flush_tlb_all(void)
- {
-diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
-index 8c41fe12..08a2e91c 100644
---- a/lib/arm64/asm/pgtable-hwdef.h
-+++ b/lib/arm64/asm/pgtable-hwdef.h
-@@ -145,6 +145,8 @@
- #define TCR_TG1_64K		(UL(3) << 30)
- #define TCR_ASID16		(UL(1) << 36)
- #define TCR_TBI0		(UL(1) << 37)
-+#define TCR_TBI1		(UL(1) << 38)
-+#define TCR_TCMA0		(UL(1) << 57)
- 
- /*
-  * Memory types available.
-@@ -156,5 +158,6 @@
- #define MT_NORMAL		4
- #define MT_NORMAL_WT		5
- #define MT_DEVICE_nGRE		6
-+#define MT_NORMAL_TAGGED	7
- 
- #endif /* _ASMARM64_PGTABLE_HWDEF_H_ */
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index f214a4f0..b8d3d66e 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -28,6 +28,7 @@
- 	.endm
- #else
- #include <libcflat.h>
-+#include <bitops.h>
- 
- #define read_sysreg(r) ({					\
- 	u64 __val;						\
-@@ -74,6 +75,7 @@ asm(
- #endif /* __ASSEMBLY__ */
- 
- #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
-+#define ID_AA64PFR1_EL1_MTE_SHIFT	8
- 
- #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
- #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
-@@ -81,7 +83,13 @@ asm(
- #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
- #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
- 
-+#define TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
-+#define TFSR_EL1_TF0                    _BITULL(0)
-+#define TFSR_EL1_TF1                    _BITULL(1)
-+
- /* System Control Register (SCTLR_EL1) bits */
-+#define SCTLR_EL1_ATA		_BITULL(43)
-+#define SCTLR_EL1_ATA0		_BITULL(42)
- #define SCTLR_EL1_LSMAOE	_BITULL(29)
- #define SCTLR_EL1_NTLSMD	_BITULL(28)
- #define SCTLR_EL1_EE		_BITULL(25)
-@@ -99,6 +107,12 @@ asm(
- #define SCTLR_EL1_A		_BITULL(1)
- #define SCTLR_EL1_M		_BITULL(0)
- 
-+#define SCTLR_EL1_TCF_SHIFT	40
-+#define SCTLR_EL1_TCF_MASK	GENMASK_ULL(41, 40)
-+
-+#define SCTLR_EL1_TCF0_SHIFT	38
-+#define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
-+
- #define INIT_SCTLR_EL1_MMU_OFF	\
- 			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
- 			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
--- 
-2.25.1
+I'm going to assume this works because KVM is nice enough to initialise the
+EL2 registers that affect execution at EL1 to some sane defaults. Is that
+something that can be relied on going forward?
 
+What about UEFI?
+
+I was expecting some kind of initialization of the registers that affect
+EL1.
+
+Thanks,
+Alex
+
+> +	isb
+> +	eret
+>  1:
+>  	/* zero BSS */
+>  	adrp	x4, bss
+> @@ -186,6 +197,18 @@ get_mmu_off:
+>  
+>  .globl secondary_entry
+>  secondary_entry:
+> +	mrs	x0, CurrentEL
+> +	cmp	x0, CurrentEL_EL2
+> +	b.ne	1f
+> +drop_to_el1_secondary:
+> +	mov	x0, 4
+> +	msr	spsr_el2, x0
+> +	adrp	x0, 1f
+> +	add	x0, x0, :lo12:1f
+> +	msr	elr_el2, x0
+> +	isb
+> +	eret
+> +1:
+>  	/* enable FP/ASIMD and SVE */
+>  	mov	x0, #(3 << 20)
+>  	orr	x0, x0, #(3 << 16)
+> -- 
+> 2.25.1
+> 
