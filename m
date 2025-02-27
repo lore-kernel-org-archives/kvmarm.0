@@ -1,79 +1,111 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667C2196
-	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 00:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB926A47;
+	Thu, 27 Feb 2025 00:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740614795; cv=none; b=KDgFylJJ0INcmwtz20TaGHKDOo2JNKrg8zzm3TLn8tVhI0JasAjwePZrxzlGoCtSvYiZ15j1Q/TdbeOiSqCFXon3HXTxGI13KC4bpX6yDS97B7p2bGGUT3xjrXGrnkFfMiucWiOr7B/v2KO/aCMTUyGI4fYBSwjQU3uVaieIR+o=
+	t=1740615819; cv=none; b=C8A6QN000qp6vcC3jd8GhCiqX2UbdoiUCT0VmmyQwBGe1t0oKVwHO6ko/CNyn2Bc01uYDauMdJ1JdYN+vgPdi5H/TiZ+GwR8eO/B5PQWigkfEfTyXIqqCFr1YabZFTn63oEZKZB93RFpFQmgpI5YTJFLk1GRQPhGpgMDPDx9B3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740614795; c=relaxed/simple;
-	bh=ZV07Gpz815P4h6/dASi/XClt914gSIOcYIvsY0gmk7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bl6kZixHzwvRR49Yibtd8tUbQzOp1k8Bu8TO/duWVo4TDsdMyoY1xeqAjWNFN36lccRaKZyvzz7F1+4n3lXX8xdJwhc0La/4fIuGLWJphvLDp68HTS3tBMx5CE7iRvZOPgPQJqN9sZfCWqqUEl5Ayqdnq4LtwiE62qSWDoqNNL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5564812FC;
-	Wed, 26 Feb 2025 16:06:48 -0800 (PST)
-Received: from [10.163.39.237] (unknown [10.163.39.237])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F2DD63F5A1;
-	Wed, 26 Feb 2025 16:06:25 -0800 (PST)
-Message-ID: <39986b7d-7a82-4f28-9289-5620a2bec2b5@arm.com>
-Date: Thu, 27 Feb 2025 05:36:25 +0530
+	s=arc-20240116; t=1740615819; c=relaxed/simple;
+	bh=arZMEBXiCeOAemtlaMD2whA3gu7IqKG3QKa02itcVOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ct1419r43mslC0blzX6OXIPuTiXVNFfJlPURZaP9biX3RN7zSa4rhZ7ulpIT3w/9ziCd3UEBt+pTn0rKC6Q+VYgdFpdBiAoo/INEzXN7/iKeCW9yuY4wTNgxHA1LyfUM39qe/IJC0pxIW67EcYrveipfylEMZhNEduyuGpemk4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2xqihso; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2xqihso"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD563C4CED6;
+	Thu, 27 Feb 2025 00:23:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740615818;
+	bh=arZMEBXiCeOAemtlaMD2whA3gu7IqKG3QKa02itcVOg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r2xqihsoUtx0mnh8RLLIjEAjPgloTP001LONjPAwoV/xeiJy8u+h01ej7a1b68K+7
+	 jUWOnoHeJxZDumCmTj/ZzoZaZG9ydutU8FnLZBzWkpQMicwuNBvJXS2zrYCAs4X0PK
+	 9kteFfAcP9iTwJz0s6ulQ9jOb9Lt2ihSF97X8Vw3k+vC3npgDNha5RcKi1axciDgWl
+	 bQ11PamfREIi44x+J2k4VjfstgeKYqFPYJi2np1bifjKJWgWJtGvY9/9IF2ysvlNd/
+	 vbi3gA4SceTDZaht2tDFNVSpwr3sVxPgE21Im3ifhTnJ3VD2AkKkqxicmsGA5ts9Yd
+	 gDhpiL5fqcsDw==
+Date: Thu, 27 Feb 2025 00:23:31 +0000
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Steven Price <steven.price@arm.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
+Message-ID: <20250227002330.GA24899@willie-the-truck>
+References: <20241017131434.40935-1-steven.price@arm.com>
+ <20241017131434.40935-10-steven.price@arm.com>
+ <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
+ <Z79lZdYqWINaHfrp@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 5/5] mm: Rename GENERIC_PTDUMP and PTDUMP_CORE
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>
-References: <20250226122404.1927473-1-anshuman.khandual@arm.com>
- <20250226122404.1927473-6-anshuman.khandual@arm.com>
- <Z79xK3xJWm0vH5jH@arm.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Z79xK3xJWm0vH5jH@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z79lZdYqWINaHfrp@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
- 
-
-On 2/27/25 01:23, Catalin Marinas wrote:
-> On Wed, Feb 26, 2025 at 05:54:04PM +0530, Anshuman Khandual wrote:
->> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
->> index 6cf4aae05219..b2931d1ae0fb 100644
->> --- a/arch/arm64/include/asm/ptdump.h
->> +++ b/arch/arm64/include/asm/ptdump.h
->> @@ -7,7 +7,7 @@
->>  
->>  #include <linux/ptdump.h>
->>  
->> -#ifdef CONFIG_PTDUMP_CORE
->> +#ifdef CONFIG_PTDUMP
+On Wed, Feb 26, 2025 at 07:03:01PM +0000, Catalin Marinas wrote:
+> On Wed, Feb 19, 2025 at 02:30:28PM +0000, Steven Price wrote:
+> > > @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
+> > >  bool can_set_direct_map(void)
+> > >  {
+> > >  	/*
+> > > -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
+> > > -	 * mapped at page granularity, so that it is possible to
+> > > +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
+> > > +	 * map to be mapped at page granularity, so that it is possible to
+> > >  	 * protect/unprotect single pages.
+> > >  	 *
+> > >  	 * KFENCE pool requires page-granular mapping if initialized late.
+> > > +	 *
+> > > +	 * Realms need to make pages shared/protected at page granularity.
+> > >  	 */
+> > >  	return rodata_full || debug_pagealloc_enabled() ||
+> > > -	       arm64_kfence_can_set_direct_map();
+> > > +		arm64_kfence_can_set_direct_map() || is_realm_world();
+> > >  }
+> > 
+> > Aneesh pointed out that this call to is_realm_world() is now too early 
+> > since the decision to delay the RSI detection. The upshot is that a 
+> > realm guest which doesn't have page granularity forced for other reasons 
+> > will fail to share pages with the host.
+> > 
+> > At the moment I can think of a couple of options:
+> > 
+> > (1) Make rodata_full a requirement for realm guests. 
+> >     CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
+> >     isn't a big ask.
+> > 
+> > (2) Revisit the idea of detecting when running as a realm guest early. 
+> >     This has the advantage of also "fixing" earlycon (no need to 
+> >     manually specify the shared-alias of an unprotected UART).
+> > 
+> > I'm currently leaning towards (1) because it's the default anyway. But 
+> > if we're going to need to fix earlycon (or indeed find other similar 
+> > issues) then (2) would obviously make sense.
 > 
-> Do we need this #ifdef at all? I haven't tried but usually, if the
-> feature is not enabled, the header file on its own should be harmless.
+> I'd go with (1) since the end result is the same even if we implemented
+> (2) - i.e. we still avoid block mappings in realms.
 
-With or without the #ifdef CONFIG_PTDUMP in place here, this does not cause
-any build warnings even without CONFIG_PTDUMP enabled. But dropping #ifdef
-while renaming the config option itself, might have caused unrelated code
-churn. So probably if required we could drop this later on.
+Is it, though? The config option is about the default behaviour but there's
+still an "rodata=" option on the command-line.
 
-> 
-> For arm64:
-> 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Will
