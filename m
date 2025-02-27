@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED693234963
-	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 14:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CB723816C
+	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 14:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740665619; cv=none; b=qzE3bZ2B5Yjh0Lt+zcdQOOLnB4Ece3/ESCEG4InaN+pK6jVsuSROJdbej1aJu73xHVU/78ydJshdvs9pvDGtAsoW2/hZGjZbgcKRWWrmeosKR93TIO28S1oMk0qSyV6wivYlVEsYTOxdbBAUSXMg0cz0murthC0Dxnm9+8I2Nno=
+	t=1740665643; cv=none; b=Xo6dyGIhjYFgOz/yn+B4fm4t6Jr3/7Ah0/Zt8oO6z1ma/LDOZpudp0gY6ASob1Le3F12Gw/b83WABModNl5k3nxNIK5ZRSvgeLlizwa9ymxnSQkdIym/rizPImMxl4t2BqgTn9U5HKSCqEvp/Q4DENehcUyR1+SWrj2GGhiJYGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740665619; c=relaxed/simple;
-	bh=+WL4i4M70cixQtfVOqasrx2YZsATDRdbQJ50oP28uBg=;
+	s=arc-20240116; t=1740665643; c=relaxed/simple;
+	bh=Fl1mW4a9yaufHwlEcm4v98DFsEtChO1FWA0a8FKEScU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ll4dKgPFExbMbmb629tBR2tEsAh7Ly+t9cw0sW59yJ8NBd7CYfgRRUCP+EENbMHIznCxA3CIl1iisVGgBv24ZfdiFIMbKKhXr8UHHG/9+2UHAGHNl+VGh1oSHgWOJrD/NOyzgELWVmDtbX86IheRoczIx3Mgr+TAqpaWkFBFLfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0zwJIto; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Qi7nrAIoGnw7R7mQOWAOBODQ+YAT7oByWaUgIea6CULQ5b3apNZTgXqb0cuAmBCFD0ain53PPX4lne0ElRT8m0pFYQgoIqXz+xHJvdUiBzDDM4SzPT2+sdfE3jatfnMMz60o6r0Hk6M1DcAVaAnTRduegKUVB3hqxaKjhpK7QkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HKkx26x7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0zwJIto"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C563C4CEE6;
-	Thu, 27 Feb 2025 14:13:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HKkx26x7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEFB3C4CEDD;
+	Thu, 27 Feb 2025 14:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740665618;
-	bh=+WL4i4M70cixQtfVOqasrx2YZsATDRdbQJ50oP28uBg=;
+	s=k20201202; t=1740665642;
+	bh=Fl1mW4a9yaufHwlEcm4v98DFsEtChO1FWA0a8FKEScU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X0zwJItoqRhi7lEJY4Q2GanbVK3A1fJrvOSGFGQwK/JLVHGsVjp3UkJjExYZO0N9i
-	 f9BQr9/vf/pcmxccOqna+/XerooPb64600s5kshTujVP7UWT1RbbNtx2kkoPrIUOqg
-	 AaWhRhoyCZ+fU03cinWE9fAdUfnrTOxDu0z7QIGMy6fH+Jaa80mzzGPDBnCzmKc4OM
-	 VxvEi6JRPLrtebBE0OipCxip5XjXzbG4WHSnCW3dTNYtRhHNzG0rbxmVWG1ZAegHr/
-	 mXXq5iLD+no+l/lny1xAIO/zkxYcjYNf9K8jE38n8YoexZTFFNg19E5Jj8vuJr0Ms0
-	 fdQe4quJQRRVA==
+	b=HKkx26x79Pu3kxbnGnLGfYeMX9o+PjWrQAg/FNlLP9ZisQiLt5sk2ok+ufzM1fnwu
+	 tcCngpb4XsOrRYyDuAmdcZ7YN01cs0r5E36ES2u1BvtZat1+rITQxcsG6ciWNiLRdE
+	 EQFoYAdkhyp4BnaH9iv91YCfBn2b/99RU6yTNkmwvU2JnO+pFzc8RzQkcgzkrhM1+B
+	 lu/967uRC83VFa5loIIzUFnS70lPP6Vy+xoKhDlljIAvVkFDW8SW6XUHkXXJnMUItV
+	 oQBGFoGoshn0QCfrBvWgcdB5cQSoHpP9k/J7ylkmj1ryQ7vvw4um8gVFnVO4U/VT6e
+	 C2lrr04rSJwug==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tnedr-008gqC-Mz;
-	Thu, 27 Feb 2025 14:13:35 +0000
-Date: Thu, 27 Feb 2025 14:13:34 +0000
-Message-ID: <861pvjqxv5.wl-maz@kernel.org>
+	id 1tneeG-008gqi-Bv;
+	Thu, 27 Feb 2025 14:14:00 +0000
+Date: Thu, 27 Feb 2025 14:13:59 +0000
+Message-ID: <86zfi7pja0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -48,12 +48,9 @@ Cc: kvmarm@lists.linux.dev,
 	broonie@kernel.org,
 	qperret@google.com,
 	vdonnefort@google.com
-Subject: Re: [PATCH v2 4/4] KVM: arm64: Create each pKVM hyp vcpu after its corresponding host vcpu
-In-Reply-To: <CA+EHjTzPH_K1BUrNW9EkaFWj3qCdr4uwJS1pZhCYYfi2Uecu=Q@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix initializing HCRX_EL2 and other traps in pKVM
+In-Reply-To: <20250226215520.1759218-1-tabba@google.com>
 References: <20250226215520.1759218-1-tabba@google.com>
-	<20250226215520.1759218-5-tabba@google.com>
-	<8634fzr3m1.wl-maz@kernel.org>
-	<CA+EHjTzPH_K1BUrNW9EkaFWj3qCdr4uwJS1pZhCYYfi2Uecu=Q@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,129 +66,42 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-On Thu, 27 Feb 2025 12:47:16 +0000,
+On Wed, 26 Feb 2025 21:55:16 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Hi Marc,
+> Changes since v1 [*]:
+> - Factor out setting HCRX_EL2 traps into a separate function and
+> share logic between protected and non-protected modes
+> - Rebase on Linux 6.14-rc4
 > 
-> On Thu, 27 Feb 2025 at 04:09, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Wed, 26 Feb 2025 21:55:20 +0000,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > Instead of creating and initializing _all_ hyp vcpus in pKVM when
-> > > the first host vcpu runs for the first time, initialize _each_
-> > > hyp vcpu in conjunction with its corresponding host vcpu.
-> > >
-> > > Some of the host vcpu state (e.g., system registers and traps
-> > > values) is not initialized until the first time the host vcpu is
-> > > run. Therefore, initializing a hyp vcpu before its corresponding
-> > > host vcpu has run for the first time might not view the complete
-> > > host state of these vcpus.
-> > >
-> > > Additionally, this behavior is inline with non-protected modes.
-> > >
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h      |  2 +
-> > >  arch/arm64/include/asm/kvm_pkvm.h      |  1 +
-> > >  arch/arm64/kvm/arm.c                   |  4 ++
-> > >  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
-> > >  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 54 +++++++++++++++-----------
-> > >  arch/arm64/kvm/pkvm.c                  | 28 ++++++-------
-> > >  6 files changed, 53 insertions(+), 42 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 3a7ec98ef123..4a0e522f6001 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -869,6 +869,8 @@ struct kvm_vcpu_arch {
-> > >  #define VCPU_INITIALIZED     __vcpu_single_flag(cflags, BIT(0))
-> > >  /* SVE config completed */
-> > >  #define VCPU_SVE_FINALIZED   __vcpu_single_flag(cflags, BIT(1))
-> > > +/* pKVM VCPU setup completed */
-> > > +#define VCPU_PKVM_FINALIZED  __vcpu_single_flag(cflags, BIT(2))
-> > >
-> > >  /* Exception pending */
-> > >  #define PENDING_EXCEPTION    __vcpu_single_flag(iflags, BIT(0))
-> > > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > > index eb65f12e81d9..abd693ce5b93 100644
-> > > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > > @@ -19,6 +19,7 @@
-> > >  int pkvm_init_host_vm(struct kvm *kvm);
-> > >  int pkvm_create_hyp_vm(struct kvm *kvm);
-> > >  void pkvm_destroy_hyp_vm(struct kvm *kvm);
-> > > +int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
-> > >
-> > >  /*
-> > >   * This functions as an allow-list of protected VM capabilities.
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index b8e55a441282..cd7a808eeb64 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -833,6 +833,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-> > >               ret = pkvm_create_hyp_vm(kvm);
-> > >               if (ret)
-> > >                       return ret;
-> > > +
-> > > +             ret = pkvm_create_hyp_vcpu(vcpu);
-> > > +             if (ret)
-> > > +                     return ret;
-> > >       }
-> > >
-> > >       mutex_lock(&kvm->arch.config_lock);
-> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> > > index e42bf68c8848..ce31d3b73603 100644
-> > > --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> > > @@ -43,12 +43,6 @@ struct pkvm_hyp_vm {
-> > >       struct hyp_pool pool;
-> > >       hyp_spinlock_t lock;
-> > >
-> > > -     /*
-> > > -      * The number of vcpus initialized and ready to run.
-> > > -      * Modifying this is protected by 'vm_table_lock'.
-> > > -      */
-> > > -     unsigned int nr_vcpus;
-> > > -
-> > >       /* Array of the hyp vCPU structures for this VM. */
-> > >       struct pkvm_hyp_vcpu *vcpus[];
-> > >  };
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > index 6efb9bf56180..4ef3748dc660 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > @@ -245,10 +245,12 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-> > >
-> > >       hyp_spin_lock(&vm_table_lock);
-> > >       hyp_vm = get_vm_by_handle(handle);
-> > > -     if (!hyp_vm || hyp_vm->nr_vcpus <= vcpu_idx)
-> > > +     if (!hyp_vm || hyp_vm->kvm.created_vcpus <= vcpu_idx)
-> >
-> > Why is it reasonable to trust kvm.created_vcpus here? It looks like
-> > something that is under direct control of the host, and that could be
-> > arbitrarily changed to allow dereferencing the vcpus[] array past its
-> > actual boundaries.
-> >
-> > What guarantees that it is stable at load-time?
-> >
-> > I have similar misgivings about the init and teardown paths.
+> For context, please refer to v1 [*].
 > 
-> This is the hypervisor's view of created_vcpus
-> (hyp_vm->kvm.created_vcpus), i.e., not the host's (not
-> host_kvm->created_vcpus). We read it once from the host at
-> __pkvm_init_vm(). We should know that it wouldn't overflow the vcpus
-> array since it's the value of created_vcpus (nr_vcpus) we use when we
-> calculate the vm_size in __pkvm_init_vm(), and try to map the
-> corresponding amount of donated memory for the hyp_vm (all in
-> __pkvm_init_vm()).
+> Cheers,
+> /fuad
 > 
-> Since it's all hyp values, it should be fine, right?
+> [*] https://lore.kernel.org/all/20250214150258.464798-1-tabba@google.com/
+> 
+> Fuad Tabba (4):
+>   KVM: arm64: Factor out setting HCRX_EL2 traps into separate function
+>   KVM: arm64: Initialize HCRX_EL2 traps in pKVM
+>   KVM: arm64: Factor out pKVM hyp vcpu creation to separate function
+>   KVM: arm64: Create each pKVM hyp vcpu after its corresponding host
+>     vcpu
+> 
+>  arch/arm64/include/asm/kvm_emulate.h   | 24 +++++++++
+>  arch/arm64/include/asm/kvm_host.h      |  2 +
+>  arch/arm64/include/asm/kvm_pkvm.h      |  1 +
+>  arch/arm64/kvm/arm.c                   |  4 ++
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 62 ++++++++++++++---------
+>  arch/arm64/kvm/pkvm.c                  | 70 +++++++++++++-------------
+>  arch/arm64/kvm/sys_regs.c              | 20 +-------
+>  8 files changed, 104 insertions(+), 85 deletions(-)
+> 
+> 
+> base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
 
-Ah, I got confused between the host_kvm and kvm fields. Apologies for
-the noise, this looks fine indeed.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
