@@ -1,138 +1,175 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498CEC2C9
-	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 00:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FF1270031
+	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 03:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740616408; cv=none; b=TpAQfb8ggITNbZZAgTOr8ByTX5XopVJbJHjoIoKDkndyZTEtXC4X6jH1ODSMoNqEvEF7dT18PnJ2DHTbQnHtoGJqrJw0riOITdyuhbRD53U9Alh70Fiw2Z9wX/WqYEEqsBcG6MyqQ8L+SgcYznsqrpcAGORjJQGvw3GXolG2/yg=
+	t=1740628299; cv=none; b=nKlr8CuBaisKzf1pASEmdvcYqdEZRW1xDSIq1HJtS+wVMQ7+WkU2Rj3J5r4bFgxsFYDlkNHSl3q7d5WGll/jB2wTQwlOeAHTqHxxyBL+hP/TdcH9cO5fVi1nZAhEeQhmUKmjQUT8KKwvI3JQ8snaYrJYVTJX65DyNBtZsg8nGs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740616408; c=relaxed/simple;
-	bh=rp3IDhVnxkQh03oSaa4+o9TnUw4DyqtAF5BOWHgKtFI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LJzo+17gh4n4hbLD/C3fJAYgHT/kB7h64yI6SkpUG8Auqd6gIV2ojpfRs7nylUoj7dLyaJXQ1YkSYhG9dwKtbMtXYKRrec5u95Sqky8eI/fzoLwlIdzstTyjPhxrF/jgG1ii4H2UOG72EtPEOLayOiz8ubp0v46Dph5cimle9gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wf/vwghF; arc=none smtp.client-ip=209.85.208.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wf/vwghF"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-5dc5beb5eb0so207214a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 16:33:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740616405; x=1741221205; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=go/rSw9bkr3V2Z7S0UpAa5FZKtjaGuIC5hzD90cfQFg=;
-        b=wf/vwghFf+yF9nIMNl1r2fRhCoVR16dlDTnSqbxDDQO5xfSN84TItaeCUuQ+YhCOx5
-         8//B9aDR4fvOdmCA76UGC/3bYyWhWQJj8fbyXcZ1ELmelIfyT4ekmE9HvUrcFuvDdrJD
-         mcqB+KNjdMh5+xKbtwvkhmQ8b7hBMwYllySEgP3tA3Zdd5KAiDPlbylYQAPOlvT8/XeK
-         fxoRIQevSb4dwbD/KNL8rA/KEENAwKHuiAheuxr1euIjfrd2D32zEvtfxY7Zg7j185bi
-         nKzzaRJ3/mNvQ/+ijYtWhOfW9Y1u4s3rH5NGKYjD6d02LKoASeCnm5y/3ylVk6LyLxA5
-         5bmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740616405; x=1741221205;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=go/rSw9bkr3V2Z7S0UpAa5FZKtjaGuIC5hzD90cfQFg=;
-        b=CVkZFUPT7N6BS3eRPcYMRyiPTF86EmHheDy5sPbk2GPqTGfwrJQleP9Xoi56QDzg+m
-         5RAYDOHlPxGbw4TEf+5wy6VX5quENsuaHC6Gwfdj+O3uS1EnGOvuhicLhCvnnnO0nt5m
-         UjMg2vSItnA7LwrtfHqov9aYo8zvh8DlEXaNhvdKUN03LdkCMJxZTjGwQIsOSYjqZ6c3
-         UYIOGbMyKsRgNVfHTlh5pm/Vrini/p0thEbD/DWqkd2vMuLY1QK6PXuxSCos+azjpKjm
-         68EyuSbjc6WZf0vHfDc9vRALAt0OV9GpAap3sNERzpkFhWQLU8vhnmWuzRsmd2QH0b1X
-         svsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXBDSCTpVRw4aPfik0cqLPI4bNq7kWhWAXCJ7z8BabVO4wFKGZ6opq+LzcriUk0VH2fW2CoF8M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyqBxlFMzLUKXs1OJnTMq40t4F8FJrM7ytcc3LGu99hIbN9Dq5f
-	Q+/xqiLszI9Tolv+6ntpJ7Kz7dhHupG/8kTvNDIgQ1SDOjRWbuX8VDW8lnQ59IzoJn20elozQqi
-	6khDxqQ==
-X-Google-Smtp-Source: AGHT+IHoE0D/+VTxFu9mBffqWU8TmUIEm77P7VHQouobm1YsZoARZri0ZIO8rfS0b5y60ajdzwb57L0Mwq80
-X-Received: from ejclm3.prod.google.com ([2002:a17:907:18c3:b0:abb:9896:c72f])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:5202:b0:5e0:8c55:4fa
- with SMTP id 4fb4d7f45d1cf-5e444853ef4mr25783357a12.6.1740616405565; Wed, 26
- Feb 2025 16:33:25 -0800 (PST)
-Date: Thu, 27 Feb 2025 00:33:10 +0000
-In-Reply-To: <20250227003310.367350-1-qperret@google.com>
+	s=arc-20240116; t=1740628299; c=relaxed/simple;
+	bh=3oh9lEpSsnhMJBwfR+eU55Pw3Lvex7Rob+/9aI21bmA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tEYnqkNEwYkifibfo/M/4cs0xL/AZBNLYWhavUSkRUe/ESlDeLKrsXVGxnhOF7bxjuKYWEzkfUUSeQC/EGspiVR5uj2L+cDyw8MKjRn3TA8+VeTGD7IYO94i5CWiLyT2nfFDWkgzVm/nZ42zFI4JmqnOiSsmOj9+Z3Gp5TCdvnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 078241515;
+	Wed, 26 Feb 2025 19:51:51 -0800 (PST)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.40.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AEA443F6A8;
+	Wed, 26 Feb 2025 19:51:30 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com,
+	robh@kernel.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: [PATCH V3] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+Date: Thu, 27 Feb 2025 09:21:19 +0530
+Message-Id: <20250227035119.2025171-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250227003310.367350-1-qperret@google.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250227003310.367350-7-qperret@google.com>
-Subject: [PATCH 6/6] KVM: arm64: Unconditionally cross check hyp state
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Now that the hypervisor's state is stored in the hyp_vmemmap, we no
-longer need an expensive page-table walk to read it. This means we can
-now afford to cross check the hyp-state during all memory ownership
-transitions where the hyp is involved unconditionally, hence avoiding
-problems such as [1].
+FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
+access from EL1 requires appropriate EL2 fine grained trap configuration
+via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
+Otherwise such register accesses will result in traps into EL2.
 
-[1] https://lore.kernel.org/kvmarm/20241128154406.602875-1-qperret@google.com/
+Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
+grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
+bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
+PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
+Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
+based registers to be accessible in EL2.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Fixes: 0bbff9ed8165 ("perf/arm_pmuv3: Add PMUv3.9 per counter EL0 access control")
+Fixes: d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter")
+Cc: stable@vger.kernel.org
+Tested-by: Rob Herring (Arm) <robh@kernel.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 24 +++++++++---------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
+Changes in V3:
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index ae39d74be1f2..22a906c7973a 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -695,11 +695,9 @@ int __pkvm_host_share_hyp(u64 pfn)
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (ret)
- 		goto unlock;
--	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
--		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
--		if (ret)
--			goto unlock;
--	}
-+	ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
+- Added 'MDCR_EL3.EnPM2 = 0b1' as a booting requirement per Mark
+- Added 'Fixes:' and 'CC: stable' tags per Mark
+
+Changes in V2:
+
+https://lore.kernel.org/all/20250203050828.1049370-8-anshuman.khandual@arm.com/
+
+ Documentation/arch/arm64/booting.rst | 22 ++++++++++++++++++++++
+ arch/arm64/include/asm/el2_setup.h   | 25 +++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+index cad6fdc96b98..dee7b6de864f 100644
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -288,6 +288,12 @@ Before jumping into the kernel, the following conditions must be met:
  
- 	__hyp_set_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
- 	WARN_ON(__host_set_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED));
-@@ -755,11 +753,9 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (ret)
- 		goto unlock;
--	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
--		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
--		if (ret)
--			goto unlock;
--	}
-+	ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
+     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
  
- 	__hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
-@@ -785,11 +781,9 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- 	ret = __hyp_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (ret)
- 		goto unlock;
--	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
--		ret = __host_check_page_state_range(phys, size, PKVM_NOPAGE);
--		if (ret)
--			goto unlock;
--	}
-+	ret = __host_check_page_state_range(phys, size, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
++  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
++
++  - If EL3 is present and the kernel is entered at EL2:
++
++    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
++
+   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
  
- 	__hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
- 	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) != size);
+   - If EL3 is present and the kernel is entered at EL2:
+@@ -382,6 +388,22 @@ Before jumping into the kernel, the following conditions must be met:
+ 
+     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
+ 
++  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
++
++ - If EL3 is present:
++
++    - MDCR_EL3.EnPM2 (bit 7) must be initialised to 0b1.
++
++ - If the kernel is entered at EL1 and EL2 is present:
++
++    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
++    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
++    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++
++    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++
+   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+ 
+   - If the kernel is entered at EL1 and EL2 is present:
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index 25e162651750..1a0071faf57e 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -233,6 +233,30 @@
+ .Lskip_fgt_\@:
+ .endm
+ 
++.macro __init_el2_fgt2
++	mrs	x1, id_aa64mmfr0_el1
++	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
++	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
++	b.lt	.Lskip_fgt2_\@
++
++	mov	x0, xzr
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
++	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
++	b.lt	.Lskip_pmuv3p9_\@
++
++	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
++	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
++	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
++.Lskip_pmuv3p9_\@:
++	msr_s   SYS_HDFGRTR2_EL2, x0
++	msr_s   SYS_HDFGWTR2_EL2, x0
++	msr_s   SYS_HFGRTR2_EL2, xzr
++	msr_s   SYS_HFGWTR2_EL2, xzr
++	msr_s   SYS_HFGITR2_EL2, xzr
++.Lskip_fgt2_\@:
++.endm
++
+ .macro __init_el2_gcs
+ 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
+ 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
+@@ -283,6 +307,7 @@
+ 	__init_el2_nvhe_idregs
+ 	__init_el2_cptr
+ 	__init_el2_fgt
++	__init_el2_fgt2
+         __init_el2_gcs
+ .endm
+ 
 -- 
-2.48.1.658.g4767266eb4-goog
+2.25.1
 
