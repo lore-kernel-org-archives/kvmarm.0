@@ -1,109 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CB723816C
-	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 14:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C2B22FACE
+	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 14:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740665643; cv=none; b=Xo6dyGIhjYFgOz/yn+B4fm4t6Jr3/7Ah0/Zt8oO6z1ma/LDOZpudp0gY6ASob1Le3F12Gw/b83WABModNl5k3nxNIK5ZRSvgeLlizwa9ymxnSQkdIym/rizPImMxl4t2BqgTn9U5HKSCqEvp/Q4DENehcUyR1+SWrj2GGhiJYGs=
+	t=1740666563; cv=none; b=HXqxO00haPvBVDqKSlBhwHoJFmUE7lV9GyXi+uiSMRuS+SQiATbrzL7TsF8jBrU4ioLF5D/7ShxIAVTF3e1zaYb/wZEVVeylSjLtZfaoVsYf5yzNKwArntFxpkIcsmx6k8jkQYYQAp8UMMnInIVG65uMutYEj2bLB1B+QVAvdjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740665643; c=relaxed/simple;
-	bh=Fl1mW4a9yaufHwlEcm4v98DFsEtChO1FWA0a8FKEScU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qi7nrAIoGnw7R7mQOWAOBODQ+YAT7oByWaUgIea6CULQ5b3apNZTgXqb0cuAmBCFD0ain53PPX4lne0ElRT8m0pFYQgoIqXz+xHJvdUiBzDDM4SzPT2+sdfE3jatfnMMz60o6r0Hk6M1DcAVaAnTRduegKUVB3hqxaKjhpK7QkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HKkx26x7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740666563; c=relaxed/simple;
+	bh=XsTe43ksNQ5ndq6iiWJQEJUCi6bHdDQhKJAodTgeBj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PUtjxK41dfINwDmf+GP02KRtdVvzE86YdzrA33tRHCYfTdbwi0HSgcFcSsv/GnGmY9uB8IRaZEFF5ewY3sEPzgVyxN6vTRL2bHGfpq6BGICu49EwtaKLtxvBUaKUqavXykNjTRmj4t0crOClL4AjLLPpEqQVJRzF8oYF8FNQQBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lWoNuJRX; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HKkx26x7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEFB3C4CEDD;
-	Thu, 27 Feb 2025 14:14:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740665642;
-	bh=Fl1mW4a9yaufHwlEcm4v98DFsEtChO1FWA0a8FKEScU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HKkx26x79Pu3kxbnGnLGfYeMX9o+PjWrQAg/FNlLP9ZisQiLt5sk2ok+ufzM1fnwu
-	 tcCngpb4XsOrRYyDuAmdcZ7YN01cs0r5E36ES2u1BvtZat1+rITQxcsG6ciWNiLRdE
-	 EQFoYAdkhyp4BnaH9iv91YCfBn2b/99RU6yTNkmwvU2JnO+pFzc8RzQkcgzkrhM1+B
-	 lu/967uRC83VFa5loIIzUFnS70lPP6Vy+xoKhDlljIAvVkFDW8SW6XUHkXXJnMUItV
-	 oQBGFoGoshn0QCfrBvWgcdB5cQSoHpP9k/J7ylkmj1ryQ7vvw4um8gVFnVO4U/VT6e
-	 C2lrr04rSJwug==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tneeG-008gqi-Bv;
-	Thu, 27 Feb 2025 14:14:00 +0000
-Date: Thu, 27 Feb 2025 14:13:59 +0000
-Message-ID: <86zfi7pja0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	broonie@kernel.org,
-	qperret@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix initializing HCRX_EL2 and other traps in pKVM
-In-Reply-To: <20250226215520.1759218-1-tabba@google.com>
-References: <20250226215520.1759218-1-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lWoNuJRX"
+Date: Thu, 27 Feb 2025 15:29:17 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740666559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XsTe43ksNQ5ndq6iiWJQEJUCi6bHdDQhKJAodTgeBj8=;
+	b=lWoNuJRXtex0qyuDgB5xJCIRgOu7FTrGWtUehMR0mWIvN6CEHMBectu5nJi+ZD/EmlX3Wy
+	G7mId45aBr+bSyK/IAoGvE2wiL48BuJoYbyPDrI+0FwLU8QAOmLWZworBvuK/ismAJPfDH
+	jOPguMMKuA1+Sob/Ht/yM1OBw7B8hnU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.linux.dev, 
+	nikos.nikoleris@arm.com, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3] arm64: Add basic MTE test
+Message-ID: <20250227-b48587a0c6e38bff00a30934@orel>
+References: <20250102111020.130788-1-vladimir.murzin@arm.com>
+ <Z4aHBrpgiyWNXac2@arm.com>
+ <53d73ed1-567a-4428-b4ac-3c4741218ce3@arm.com>
+ <Z8BvUkBIETJvRiln@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, mark.rutland@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, vdonnefort@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8BvUkBIETJvRiln@raptor>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 26 Feb 2025 21:55:16 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Changes since v1 [*]:
-> - Factor out setting HCRX_EL2 traps into a separate function and
-> share logic between protected and non-protected modes
-> - Rebase on Linux 6.14-rc4
-> 
-> For context, please refer to v1 [*].
-> 
-> Cheers,
-> /fuad
-> 
-> [*] https://lore.kernel.org/all/20250214150258.464798-1-tabba@google.com/
-> 
-> Fuad Tabba (4):
->   KVM: arm64: Factor out setting HCRX_EL2 traps into separate function
->   KVM: arm64: Initialize HCRX_EL2 traps in pKVM
->   KVM: arm64: Factor out pKVM hyp vcpu creation to separate function
->   KVM: arm64: Create each pKVM hyp vcpu after its corresponding host
->     vcpu
-> 
->  arch/arm64/include/asm/kvm_emulate.h   | 24 +++++++++
->  arch/arm64/include/asm/kvm_host.h      |  2 +
->  arch/arm64/include/asm/kvm_pkvm.h      |  1 +
->  arch/arm64/kvm/arm.c                   |  4 ++
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 62 ++++++++++++++---------
->  arch/arm64/kvm/pkvm.c                  | 70 +++++++++++++-------------
->  arch/arm64/kvm/sys_regs.c              | 20 +-------
->  8 files changed, 104 insertions(+), 85 deletions(-)
-> 
-> 
-> base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+On Thu, Feb 27, 2025 at 01:57:38PM +0000, Alexandru Elisei wrote:
+...
+> But yeah, since most of the tests don't check for a NULL return value from
+> the page allocator I guess it doesn't happen too often. This test is really
+> useful and it has been on the list for quite some time, so I don't consider
+> this a blocker.
+>
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+I'm happy to merge this if it's ready. Will there be a v4?
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+drew
