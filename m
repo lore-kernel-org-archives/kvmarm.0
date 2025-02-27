@@ -1,111 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB926A47;
-	Thu, 27 Feb 2025 00:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE26A4A24
+	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 00:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740615819; cv=none; b=C8A6QN000qp6vcC3jd8GhCiqX2UbdoiUCT0VmmyQwBGe1t0oKVwHO6ko/CNyn2Bc01uYDauMdJ1JdYN+vgPdi5H/TiZ+GwR8eO/B5PQWigkfEfTyXIqqCFr1YabZFTn63oEZKZB93RFpFQmgpI5YTJFLk1GRQPhGpgMDPDx9B3g=
+	t=1740616395; cv=none; b=dejnftrCrbQWqigVMMISiaxdmXuamUKXL72jz1OLAZ6OxSusq2gnMEYZcxqbGfOJxgGFAhZ/LkT3ObVJUDU2pwWv/0LKT9EIdr6KOFM/npb8r01IhAAmQLN+sc1eA02k2ttbhhMGbyBPR/eRMCZ6r79kIgk5dGYbyxtdC501jAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740615819; c=relaxed/simple;
-	bh=arZMEBXiCeOAemtlaMD2whA3gu7IqKG3QKa02itcVOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ct1419r43mslC0blzX6OXIPuTiXVNFfJlPURZaP9biX3RN7zSa4rhZ7ulpIT3w/9ziCd3UEBt+pTn0rKC6Q+VYgdFpdBiAoo/INEzXN7/iKeCW9yuY4wTNgxHA1LyfUM39qe/IJC0pxIW67EcYrveipfylEMZhNEduyuGpemk4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2xqihso; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740616395; c=relaxed/simple;
+	bh=be/ZUGnpm8e7dztLvliWBuYLZBElJlzpV2+69nHUWIo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=c1RdcONbCSGfDnBikG5Ppm4qtxHh0tWk/CMJERz4nCazfWqHa30Y8O42zV+ZW54QI2opQ+lG3AzFHwKGjFzxCFkAU4eEXdn9hlwxZD/WpoSjkhQ6jNl1mOLftz83xJYJ76qbqCVxoOpJFB1R3y/kuPtHoWcFRjkoxHcAQB1JiQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c+5OJqP2; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2xqihso"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD563C4CED6;
-	Thu, 27 Feb 2025 00:23:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740615818;
-	bh=arZMEBXiCeOAemtlaMD2whA3gu7IqKG3QKa02itcVOg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r2xqihsoUtx0mnh8RLLIjEAjPgloTP001LONjPAwoV/xeiJy8u+h01ej7a1b68K+7
-	 jUWOnoHeJxZDumCmTj/ZzoZaZG9ydutU8FnLZBzWkpQMicwuNBvJXS2zrYCAs4X0PK
-	 9kteFfAcP9iTwJz0s6ulQ9jOb9Lt2ihSF97X8Vw3k+vC3npgDNha5RcKi1axciDgWl
-	 bQ11PamfREIi44x+J2k4VjfstgeKYqFPYJi2np1bifjKJWgWJtGvY9/9IF2ysvlNd/
-	 vbi3gA4SceTDZaht2tDFNVSpwr3sVxPgE21Im3ifhTnJ3VD2AkKkqxicmsGA5ts9Yd
-	 gDhpiL5fqcsDw==
-Date: Thu, 27 Feb 2025 00:23:31 +0000
-From: Will Deacon <will@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Steven Price <steven.price@arm.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
-Message-ID: <20250227002330.GA24899@willie-the-truck>
-References: <20241017131434.40935-1-steven.price@arm.com>
- <20241017131434.40935-10-steven.price@arm.com>
- <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
- <Z79lZdYqWINaHfrp@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c+5OJqP2"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5e4c2618332so336529a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 26 Feb 2025 16:33:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740616392; x=1741221192; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wMaRPzN9DtDhFSXMETT7W68/dj5OM7TC62vNvIpIxu0=;
+        b=c+5OJqP2VnEYpDaa07HDeoqeGFdapjT0z6hzd285QGO67AeoPiuNubWOjnUkNq4034
+         IQbOaRcoWydVS1IlBJg/H8IRtAtapP2R/BbNuCbb5nxj1z+JZ52JqbSFeFdvcLEFgnkq
+         3OlnfnkPy3RhixMk8NrOkm1JUOrC61JDXeoGsYHEjJgo+XbAwFBSzhXnOK6VKc71aQCc
+         Kvlg61nZ0RuTIV+7Lz+NV5+2GXjd7BDF/pmz5soL/9mybxXM7xAhJqdck+UI6qaWYwTi
+         fTLsO+7sGVe2F7muqrRY3ufe+zjBiD+UbE2jVi+Gf2bu6tzyWcWqn2qgAXXzsUK7oVW2
+         xszQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740616392; x=1741221192;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wMaRPzN9DtDhFSXMETT7W68/dj5OM7TC62vNvIpIxu0=;
+        b=mYHE/FwYiK3u3et9soSFRsk9jZj9jnVKKw7fJ1J0w3lr30TbZWOjULAMjDBcqWumB2
+         iHw5OLqW5Akyt21m9rUvQJ+0Dt+2s3OSsUmlfjjyVL2K+MZ+1+oD2EwItsbqxd53jZ7Z
+         IGZ0/Fqp+hdAb0sLslM6LZj34fL0kLnI17V08oz78/S1946uvYUdQDmZMBcHEBDA5/BY
+         07yOARc+pTTjROG6TdzPW99OqCNAHzggR/Uh8U1UapbX3EkFipMoa97D2r6NaE5XrO08
+         M/yW56zTsm+yIQXFhgIBWZOCJda1On7/J8rQJbc5N2KGkg/HjSyV5GhJOg/i4jVp0OtY
+         YorA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbmkC0NyZuHm7U/9pmA7YkTz+zD1h8haUWEq8IRnWUbMKUhwxRpQOdg3rqSkUiTC9sCB0jQkk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzZjUv1sXz5mHg85aPRG3FL5uamkWGmTqem3dtlEnSVjUVWa6pQ
+	nf1Tv7Vo1LzkrYGayEGF1X9yv9l12YgW3saRASdapPCJmooxMbCfWt0dk8XObEKtgsmDM6BR5Ac
+	NjLi6jA==
+X-Google-Smtp-Source: AGHT+IGS4fdHxE39pl3VbWkoYw/QY5aHCxMCm+ank2eEa2pcJSljLByRM9MEI79KT3OUTeH5ozYKhW5tXaC8
+X-Received: from edbev24.prod.google.com ([2002:a05:6402:5418:b0:5e4:b657:188e])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:50ca:b0:5e0:9269:f54e
+ with SMTP id 4fb4d7f45d1cf-5e4a0d72136mr7684875a12.14.1740616392345; Wed, 26
+ Feb 2025 16:33:12 -0800 (PST)
+Date: Thu, 27 Feb 2025 00:33:04 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z79lZdYqWINaHfrp@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+Message-ID: <20250227003310.367350-1-qperret@google.com>
+Subject: [PATCH 0/6] Move pKVM ownership state to hyp_vmemmap
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 26, 2025 at 07:03:01PM +0000, Catalin Marinas wrote:
-> On Wed, Feb 19, 2025 at 02:30:28PM +0000, Steven Price wrote:
-> > > @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
-> > >  bool can_set_direct_map(void)
-> > >  {
-> > >  	/*
-> > > -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
-> > > -	 * mapped at page granularity, so that it is possible to
-> > > +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
-> > > +	 * map to be mapped at page granularity, so that it is possible to
-> > >  	 * protect/unprotect single pages.
-> > >  	 *
-> > >  	 * KFENCE pool requires page-granular mapping if initialized late.
-> > > +	 *
-> > > +	 * Realms need to make pages shared/protected at page granularity.
-> > >  	 */
-> > >  	return rodata_full || debug_pagealloc_enabled() ||
-> > > -	       arm64_kfence_can_set_direct_map();
-> > > +		arm64_kfence_can_set_direct_map() || is_realm_world();
-> > >  }
-> > 
-> > Aneesh pointed out that this call to is_realm_world() is now too early 
-> > since the decision to delay the RSI detection. The upshot is that a 
-> > realm guest which doesn't have page granularity forced for other reasons 
-> > will fail to share pages with the host.
-> > 
-> > At the moment I can think of a couple of options:
-> > 
-> > (1) Make rodata_full a requirement for realm guests. 
-> >     CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
-> >     isn't a big ask.
-> > 
-> > (2) Revisit the idea of detecting when running as a realm guest early. 
-> >     This has the advantage of also "fixing" earlycon (no need to 
-> >     manually specify the shared-alias of an unprotected UART).
-> > 
-> > I'm currently leaning towards (1) because it's the default anyway. But 
-> > if we're going to need to fix earlycon (or indeed find other similar 
-> > issues) then (2) would obviously make sense.
-> 
-> I'd go with (1) since the end result is the same even if we implemented
-> (2) - i.e. we still avoid block mappings in realms.
+Hi all,
 
-Is it, though? The config option is about the default behaviour but there's
-still an "rodata=" option on the command-line.
+This series moves the hypervisor's ownership state to the hyp_vmemmap,
+as discussed in [1]. The two main benefits are:
 
-Will
+ 1. much cheaper hyp state lookups, since we can avoid the hyp stage-1
+    page-table walk;
+
+ 2. de-correlates the hyp state from the presence of a mapping in the
+    linear map range of the hypervisor; which enables a bunch of
+    clean-ups in the existing code and will simplify the introduction of
+    other features in the future (hyp tracing, ...)
+
+Patch 01 is a self-sufficient cleanup that I found thanks to patch 05.
+Patches 02-04 implement the aforementioned migration of the hyp state
+to the vmemmap. Patches 05 and 06 are cleanups enabled by that
+migration.
+
+Patches based on 6.14-rc4, tested on Qemu.
+
+Thanks!
+Quentin
+
+[1] https://lore.kernel.org/kvmarm/Z79ZJVOHtNu6YsVt@google.com/
+
+Fuad Tabba (1):
+  KVM: arm64: Track SVE state in the hypervisor vcpu structure
+
+Quentin Perret (5):
+  KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
+  KVM: arm64: Introduce {get,set}_host_state() helpers
+  KVM: arm64: Move hyp state to hyp_vmemmap
+  KVM: arm64: Defer EL2 stage-1 mapping on share
+  KVM: arm64: Unconditionally cross check hyp state
+
+ arch/arm64/include/asm/kvm_host.h        |  12 +--
+ arch/arm64/kvm/hyp/include/nvhe/memory.h |  35 ++++++--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c       |   4 -
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 106 ++++++++++++-----------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c           |  54 ++++++++++--
+ arch/arm64/kvm/hyp/nvhe/setup.c          |  10 ++-
+ 6 files changed, 147 insertions(+), 74 deletions(-)
+
+-- 
+2.48.1.658.g4767266eb4-goog
+
