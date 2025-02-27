@@ -1,107 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E421DC997;
-	Thu, 27 Feb 2025 10:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F036122F145
+	for <kvmarm@lists.linux.dev>; Thu, 27 Feb 2025 12:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740653706; cv=none; b=W9y3VVhZ9SFeBgbbSuZ7HWMBXLWyoFJOtBEG+N4v8LwMWvkok4YQ86um2ToxtgmVW8HwxM9djj8YlGjLDYz/GMw3kPjlBq9qeNW6vyFk9pT7muRnOegWzfAgxxFI456ynS7E6nX7fIFwknZbaNV6GjnisM5bd59R8GjX0SCbfwk=
+	t=1740658171; cv=none; b=AVs0r0llPZCzC3PeNvj7GpivLDxFW9cPAwuCLiDUPA/KmR4K7bvudP/xqNiICoQwGWLB9UTPu8SV7CQ1rT+q/7sYxRdSF6fGSrAGYjV+kJYj68mocP1Sxj4QEZTNf7eNNEG8qyOb/ROVey6X9MaaNYiknWywcb51ykQhizptFCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740653706; c=relaxed/simple;
-	bh=au2uGxWas7Tjk9gJv8TRw03CCJBiNltN8pVoM9Agk/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oWTuHc+OIty/b8Nrs0WuA4ea0coQa29T67/tmw9lb4lmVXauoUHCNVg1NooAmRzNwQFXH+0ETKh0d2ckNqhu/14xeEo/OEQR7lLoAnho6awiTL0M5P6ykRKSFE3KHDiGnoHn+K2MIXxbJaNkQopWcdHKljK83a5YzD1kvJxBxDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0075C4CEDD;
-	Thu, 27 Feb 2025 10:55:02 +0000 (UTC)
-Date: Thu, 27 Feb 2025 10:55:00 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Steven Price <steven.price@arm.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v7 09/11] arm64: Enable memory encrypt for Realms
-Message-ID: <Z8BEhK8P7FXgG11f@arm.com>
-References: <20241017131434.40935-1-steven.price@arm.com>
- <20241017131434.40935-10-steven.price@arm.com>
- <5aeb6f47-12be-40d5-be6f-847bb8ddc605@arm.com>
- <Z79lZdYqWINaHfrp@arm.com>
- <20250227002330.GA24899@willie-the-truck>
+	s=arc-20240116; t=1740658171; c=relaxed/simple;
+	bh=G7OYmP83uCOxk0GNDtJTIP3KHR+x4Nusplzuy5PFMAA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Azt4uXpOdmPUFULCECW2KfASQ1Ai8kUaSPH0eRLaVPf7aUQngzIS/rbDsuacpGZ6pT+zbsiHB0J+F4lBgTKzzAfi6dRLHFzqQ8B4ZsfYTskGz0sNbXd3FpMy3WOOePjEktiY4UlUZXPzzd1d4YN3IA+IY/IorEJ24zqrfNS2cLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=crqBnHTM; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="crqBnHTM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A103C4CEDD;
+	Thu, 27 Feb 2025 12:09:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740658170;
+	bh=G7OYmP83uCOxk0GNDtJTIP3KHR+x4Nusplzuy5PFMAA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=crqBnHTM8g+VTtjkj+5N0k/zYdWsqQFODvA7dUA6hOXngQEn5Yl+uCIHncQVqEAaj
+	 URk5nSY+uffDGcCcRrZGKF15QQym/Zo3xtpQXiYqIQzkMoYRMo5phYolE1U2IC9NYl
+	 Y4xt6HIz/XoAuYvxvEYzWL9tUzIc21+VjyeKD6QxxElo60hSVtfMSbWwe8eF4i6Hv/
+	 xDy5uE9HoURygUznlZYBCfW4j/bNIfNVYUV8mCIvw/tDR6t7AdbUi6knucGm2Hr8Fc
+	 nx2j7TRz34CaxSU+HNqZiVjWMApwgha7ryoqUUMTmOUTiQAoysxfvk0UAyj0b3ONmo
+	 CC1SQvKiUxYew==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tnchi-008eDD-UQ;
+	Thu, 27 Feb 2025 12:09:27 +0000
+Date: Thu, 27 Feb 2025 12:09:26 +0000
+Message-ID: <8634fzr3m1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	broonie@kernel.org,
+	qperret@google.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Create each pKVM hyp vcpu after its corresponding host vcpu
+In-Reply-To: <20250226215520.1759218-5-tabba@google.com>
+References: <20250226215520.1759218-1-tabba@google.com>
+	<20250226215520.1759218-5-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250227002330.GA24899@willie-the-truck>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, mark.rutland@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, qperret@google.com, vdonnefort@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 27, 2025 at 12:23:31AM +0000, Will Deacon wrote:
-> On Wed, Feb 26, 2025 at 07:03:01PM +0000, Catalin Marinas wrote:
-> > On Wed, Feb 19, 2025 at 02:30:28PM +0000, Steven Price wrote:
-> > > > @@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
-> > > >  bool can_set_direct_map(void)
-> > > >  {
-> > > >  	/*
-> > > > -	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
-> > > > -	 * mapped at page granularity, so that it is possible to
-> > > > +	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
-> > > > +	 * map to be mapped at page granularity, so that it is possible to
-> > > >  	 * protect/unprotect single pages.
-> > > >  	 *
-> > > >  	 * KFENCE pool requires page-granular mapping if initialized late.
-> > > > +	 *
-> > > > +	 * Realms need to make pages shared/protected at page granularity.
-> > > >  	 */
-> > > >  	return rodata_full || debug_pagealloc_enabled() ||
-> > > > -	       arm64_kfence_can_set_direct_map();
-> > > > +		arm64_kfence_can_set_direct_map() || is_realm_world();
-> > > >  }
-> > > 
-> > > Aneesh pointed out that this call to is_realm_world() is now too early 
-> > > since the decision to delay the RSI detection. The upshot is that a 
-> > > realm guest which doesn't have page granularity forced for other reasons 
-> > > will fail to share pages with the host.
-> > > 
-> > > At the moment I can think of a couple of options:
-> > > 
-> > > (1) Make rodata_full a requirement for realm guests. 
-> > >     CONFIG_RODATA_FULL_DEFAULT_ENABLED is already "default y" so this 
-> > >     isn't a big ask.
-> > > 
-> > > (2) Revisit the idea of detecting when running as a realm guest early. 
-> > >     This has the advantage of also "fixing" earlycon (no need to 
-> > >     manually specify the shared-alias of an unprotected UART).
-> > > 
-> > > I'm currently leaning towards (1) because it's the default anyway. But 
-> > > if we're going to need to fix earlycon (or indeed find other similar 
-> > > issues) then (2) would obviously make sense.
-> > 
-> > I'd go with (1) since the end result is the same even if we implemented
-> > (2) - i.e. we still avoid block mappings in realms.
+On Wed, 26 Feb 2025 21:55:20 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Is it, though? The config option is about the default behaviour but there's
-> still an "rodata=" option on the command-line.
+> Instead of creating and initializing _all_ hyp vcpus in pKVM when
+> the first host vcpu runs for the first time, initialize _each_
+> hyp vcpu in conjunction with its corresponding host vcpu.
+> 
+> Some of the host vcpu state (e.g., system registers and traps
+> values) is not initialized until the first time the host vcpu is
+> run. Therefore, initializing a hyp vcpu before its corresponding
+> host vcpu has run for the first time might not view the complete
+> host state of these vcpus.
+> 
+> Additionally, this behavior is inline with non-protected modes.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h      |  2 +
+>  arch/arm64/include/asm/kvm_pkvm.h      |  1 +
+>  arch/arm64/kvm/arm.c                   |  4 ++
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 54 +++++++++++++++-----------
+>  arch/arm64/kvm/pkvm.c                  | 28 ++++++-------
+>  6 files changed, 53 insertions(+), 42 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3a7ec98ef123..4a0e522f6001 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -869,6 +869,8 @@ struct kvm_vcpu_arch {
+>  #define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
+>  /* SVE config completed */
+>  #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
+> +/* pKVM VCPU setup completed */
+> +#define VCPU_PKVM_FINALIZED	__vcpu_single_flag(cflags, BIT(2))
+>  
+>  /* Exception pending */
+>  #define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index eb65f12e81d9..abd693ce5b93 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -19,6 +19,7 @@
+>  int pkvm_init_host_vm(struct kvm *kvm);
+>  int pkvm_create_hyp_vm(struct kvm *kvm);
+>  void pkvm_destroy_hyp_vm(struct kvm *kvm);
+> +int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
+>  
+>  /*
+>   * This functions as an allow-list of protected VM capabilities.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index b8e55a441282..cd7a808eeb64 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -833,6 +833,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  		ret = pkvm_create_hyp_vm(kvm);
+>  		if (ret)
+>  			return ret;
+> +
+> +		ret = pkvm_create_hyp_vcpu(vcpu);
+> +		if (ret)
+> +			return ret;
+>  	}
+>  
+>  	mutex_lock(&kvm->arch.config_lock);
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> index e42bf68c8848..ce31d3b73603 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> @@ -43,12 +43,6 @@ struct pkvm_hyp_vm {
+>  	struct hyp_pool pool;
+>  	hyp_spinlock_t lock;
+>  
+> -	/*
+> -	 * The number of vcpus initialized and ready to run.
+> -	 * Modifying this is protected by 'vm_table_lock'.
+> -	 */
+> -	unsigned int nr_vcpus;
+> -
+>  	/* Array of the hyp vCPU structures for this VM. */
+>  	struct pkvm_hyp_vcpu *vcpus[];
+>  };
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 6efb9bf56180..4ef3748dc660 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -245,10 +245,12 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
+>  
+>  	hyp_spin_lock(&vm_table_lock);
+>  	hyp_vm = get_vm_by_handle(handle);
+> -	if (!hyp_vm || hyp_vm->nr_vcpus <= vcpu_idx)
+> +	if (!hyp_vm || hyp_vm->kvm.created_vcpus <= vcpu_idx)
 
-Yeah, that's why I suggested the pr_err() to only state that it cannot
-set the direct map and consider rodata=full rather than a config option.
-We already force CONFIG_STRICT_KERNEL_RWX.
+Why is it reasonable to trust kvm.created_vcpus here? It looks like
+something that is under direct control of the host, and that could be
+arbitrarily changed to allow dereferencing the vcpus[] array past its
+actual boundaries.
 
-But we can also revisit the decision not to probe the RSI early.
+What guarantees that it is stable at load-time?
+
+I have similar misgivings about the init and teardown paths.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
