@@ -1,102 +1,121 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DCB25EFBA
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AB125A334
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740737658; cv=none; b=dfrdfNC1/CDxDq+KpSN3rLcOuJCoGBrSs/LGvJIrHBagEz9yJVnA7V2xrMASXebK6CeTrHNW132A9f3+6ySpjNFCFOSnGxdbuR50DGI9X+Vi0H3DSrfkl900dLCaumDqNLfXlFeuo3Q2dxMU+PFYDJ3tvA9qDF/uUOG7IiTpF+k=
+	t=1740738042; cv=none; b=b9ugsVrBzd7xmz6mhcJJdTxBpr4gZEF8lc3YxDITsFXdieIqt5f+/5j56VD2oA0TV+GW0Ax0NqI6Dg6wsUrL6SB384mGUcZN9zAjJ/XO5Tg4jAgxa+3ZOsA1Ec9m95VdHgO8jsVnWIVwjdMD/eHqybXF3WAyUiS03MegWbPCaoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740737658; c=relaxed/simple;
-	bh=1wHUJlnA2J9ceqlZpRg96NnodH22XjBdYrS2WJ/LA5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DzC5WwBfTw3GgCv/dlvJ/dEemtEXM+xkwyfW0NvJIry9WBTU0Nh8cAmnyzvF3j6ZYycBhccK9fMPp5xdI/bSaGz/DEVyS6v8e1VXCrWpGnj6yH+lA2eL0mq1eRPXf2KRdIdA3yToHx7dXLFaJKlbWwdgJKETXOYKWr/fBkLh5v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C51D1688;
-	Fri, 28 Feb 2025 02:14:31 -0800 (PST)
-Received: from localhost (e132581.arm.com [10.2.76.71])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F29493F6A8;
-	Fri, 28 Feb 2025 02:14:15 -0800 (PST)
-Date: Fri, 28 Feb 2025 10:14:11 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, ahmed.genidi@arm.com,
-	ben.horgan@arm.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev, will@kernel.org
+	s=arc-20240116; t=1740738042; c=relaxed/simple;
+	bh=DlrJyqGlbTlAASX6CvC8BEd+irS6odxJiqxBLjq07Z0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ifz5jPMbp8xAmMPoO2LCArFkXXwYzK0bQA1Epp4M8YENIxoY6m1N12HqxWy58DitEX8PK0AdP1kDAm+4IueZghxub5oN0AVtHS/yeg8jVkyj8I280B1KjD6zaScxouW+vPmYmzKRShf9HMkKB99iTNT5hElwVYFX475mCbd4KQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcg1g2AH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jcg1g2AH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA8AC4CED6;
+	Fri, 28 Feb 2025 10:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740738041;
+	bh=DlrJyqGlbTlAASX6CvC8BEd+irS6odxJiqxBLjq07Z0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jcg1g2AHGiEdiXGgfXC0+bi/U+Jxfj958eyETbbOIqfm/WKA8ONpbhGOQgjwFRVKD
+	 ld3jt349EQ1hHerN/1TqqaJh1YK1v5G9po0XxavY3T8iIR2T7T+zLzz5gfFqUI/P+5
+	 wFj6M1rcqBRO5N6jrGgxTcAoynImxWDvsyxB3DdOqd7lHhRaTKSCOMlQEd//8EjHmv
+	 Lip1nMdJA8UDoaq8jlc+ZHBvP2vwXoEkoEe7lqQpQ6JSSJIYw1x4Q33q9Dqf1G5Wu+
+	 aAKZwOU42Kx1V618QDAdd1R/vblhD7qDN463jlvCrG76mTAIUAWC0SRJAO+Hhh3a4N
+	 Q0p1tV9YxGcAA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tnxTz-0090Qy-66;
+	Fri, 28 Feb 2025 10:20:39 +0000
+Date: Fri, 28 Feb 2025 10:20:38 +0000
+Message-ID: <86v7supdzd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Leo Yan <leo.yan@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	ahmed.genidi@arm.com,
+	ben.horgan@arm.com,
+	catalin.marinas@arm.com,
+	kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	will@kernel.org
 Subject: Re: [PATCH 1/2] KVM: arm64: Initialize HCR_EL2.E2H early
-Message-ID: <20250228101411.GE2157064@e132581.arm.com>
+In-Reply-To: <Z8GHclusYN3CX5m2@J2N7QTR9R3>
 References: <20250227180526.1204723-1-mark.rutland@arm.com>
- <20250227180526.1204723-2-mark.rutland@arm.com>
- <20250228092955.GC2157064@e132581.arm.com>
- <86y0xqpfpj.wl-maz@kernel.org>
+	<20250227180526.1204723-2-mark.rutland@arm.com>
+	<20250228092955.GC2157064@e132581.arm.com>
+	<86y0xqpfpj.wl-maz@kernel.org>
+	<Z8GHclusYN3CX5m2@J2N7QTR9R3>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86y0xqpfpj.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, leo.yan@arm.com, linux-arm-kernel@lists.infradead.org, ahmed.genidi@arm.com, ben.horgan@arm.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 28, 2025 at 09:43:20AM +0000, Marc Zyngier wrote:
-
-[...]
-
-> On Fri, 28 Feb 2025 09:29:55 +0000,
-> Leo Yan <leo.yan@arm.com> wrote:
-> >
-> > Hi Mark,
-> >
-> > On Thu, Feb 27, 2025 at 06:05:25PM +0000, Mark Rutland wrote:
-> >
-> > [...]
-> >
-> > > +.macro init_el2_hcr        val
-> > > +   mov_q   x0, \val
-> > > +
-> > > +   /*
-> > > +    * Compliant CPUs advertise their VHE-onlyness with
-> > > +    * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
-> > > +    * can reset into an UNKNOWN state and might not read as 1 until it has
-> > > +    * been initialized explicitly.
-> >
-> > For ID_AA64MMFR4_EL1.E2H0 < 0 case, the code actually clears the
-> > HCR_EL2.E2H bit.
-> >
-> > Hence, the comment should be corrected as: "... it can reset into an
-> > UNKNOWN state and might not read as 0 until it has been initialized
-> > explicitly".
+On Fri, 28 Feb 2025 09:52:50 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
 > 
-> The comment is just fine. It is the code that is wrong, as it avoids
-> setting E2H when E2H0 < 0 while we want the exact opposite behaviour.
+> On Fri, Feb 28, 2025 at 09:43:20AM +0000, Marc Zyngier wrote:
+> > On Fri, 28 Feb 2025 09:29:55 +0000,
+> > Leo Yan <leo.yan@arm.com> wrote:
+> > > 
+> > > Hi Mark,
+> > > 
+> > > On Thu, Feb 27, 2025 at 06:05:25PM +0000, Mark Rutland wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > +.macro init_el2_hcr	val
+> > > > +	mov_q	x0, \val
+> > > > +
+> > > > +	/*
+> > > > +	 * Compliant CPUs advertise their VHE-onlyness with
+> > > > +	 * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
+> > > > +	 * can reset into an UNKNOWN state and might not read as 1 until it has
+> > > > +	 * been initialized explicitly.
+> > > 
+> > > For ID_AA64MMFR4_EL1.E2H0 < 0 case, the code actually clears the
+> > > HCR_EL2.E2H bit.
+> > >
+> > > Hence, the comment should be corrected as: "... it can reset into an
+> > > UNKNOWN state and might not read as 0 until it has been initialized
+> > > explicitly".
+> > 
+> > The comment is just fine. It is the code that is wrong, as it avoids
+> > setting E2H when E2H0 < 0 while we want the exact opposite behaviour.
+> > 
+> > As a result, 'b.lt' really should be a 'b.ge'. Or the original code
+> > kept as is.
 > 
-> As a result, 'b.lt' really should be a 'b.ge'. Or the original code
-> kept as is.
-
-Thanks for correcting.
-
-> > > +    *
-> > > +    * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
-> > > +    * don't advertise it (they predate this relaxation).
-> > > +    *
-> > > +    * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
-> > > +    * indicating whether the CPU is running in E2H mode.
-> > > +    */
-> >
-> > I think it is even better to clear the HCR_E2H bit first. This can
-> > avoid any dependency on the passed parameter 'val'.
+> Ugh, yes. I got confused and got the condition backwards.
 > 
-> What are you trying to avoid? A random value passed as a parameter to
-> the macro?
+> Either works. Using 'b.ge' is closer to my intention -- I found the
+> 'tbz' of the sign bit somewhat surprising and that needed a longer line
+> after the lable name changed.
+> 
+> Would you like me to respin, or would you be hapy to fix up when
+> applying?
 
-Yes, an unexpected value passed to the macro is a concern.
-
-If the intentaion here is only to set the HCR_EL2.E2H bit when E2H0 < 0,
-we don't need to cosndier other configurations and current code is just
-fine?
+I can fix it on the fly, but it needs retesting, as I don't understand
+how things could work in this state.
 
 Thanks,
-Leo
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
