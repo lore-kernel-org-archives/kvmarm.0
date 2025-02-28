@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2A625F792
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C46225DCFA
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740738357; cv=none; b=HGGkKWQwWX3Q5P7obIhJjLdTqU2zJNTbPghfjjCYpzzaT++OAI/gKzwPGnqkTtN+qwjc4FZrR6/QGNuG+ogIzO8MH6g5wz/idHw7slj+5RTSw97LOtrxcPEW4M6a74fFd7+qFSR6MoE25PBUpaceJ9dbEUjrucnLP9OaAC9IuKE=
+	t=1740738360; cv=none; b=eHaI1T76qEg+JofKa0/lv9A4nGNm3LPdfS/MevA126Jp7zag56g7P/0+9Qk926R1Od/kKUfjCimBChhfXF2V0XuO6URgxvgHrafNSpJGr9zYEOe1yvc13jnPC5fwzgx4OHHvQK8JiXmSCAZcoLAu+6JcLfGAky2KiC8zsCOKvMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740738357; c=relaxed/simple;
-	bh=KYdo1+rj2avzQ2fdLRDheaWLEoeWhVviPVR/ZB7+cYw=;
+	s=arc-20240116; t=1740738360; c=relaxed/simple;
+	bh=dLvFoqofzAEa6PQSM8vjKile6zyR+h6YQTiUH51xsaI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g4QwqMr7AYv8Ds/jlQVl7adqQgEqOrd5S/v5SeSy1p8XlLBSnvFJ2zc4aZc++y9263Gf+HGxP+wsZalx+WLVi0A4WjG+oa1e93yZR3lz66Q9e/179ciCH22n+YuYZ55jHyn6ChHfZ98881B2/z3GT1XegLrL5J0XGuOTgY8Ogl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aILPTQ3Y; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=otfJgTbdo02EmCW6bF1tYrruEuwON3QADRRDOJrNaiRc3ckwVR0h4MdXOZvcNk/uEKoUN7Fc+b9WFoTR+NtzlZhBAix5DEkaM+/rCQdHlZC35V/wCENFeXTE84GRP/iwPe9JpacELymeMTyzPtrUsTefJJXGkru6EE/t4GtuKto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MGplQQUS; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aILPTQ3Y"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43ba50406fbso11646855e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 02:25:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MGplQQUS"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4394c747c72so8299915e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 02:25:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740738353; x=1741343153; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1740738356; x=1741343156; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mthpUBcuFXcir4pSjUd/6TiIbqiuZjMcArsC605TwA=;
-        b=aILPTQ3YnRF7nM7L5ogZ0XQzFDDDqdlmgkBs5bWAmtPSeqM4zwfATmtaBP7E4vaOZ4
-         HiXBcxcIapPTuw5tVu555f8xdGdiN3FVWgGWFfsdHqxhSq2JxxmqzIp2J/JiDCHBf3uK
-         dWfJRAz2XCIOJPWxUXMDEz5bf1HAOm+701qhw0WFmgt7MIGtJ9cI18zx85VXsIbForeS
-         9i7hiYdqPTO+qohGLi2uuYWiCibzlLIs+wpz3nZjQNS8DqIU1R1QXGe5xmWayEQtESN9
-         TYQw24PtrOYHlxgX9qx7btu6q4jV8ANwjUGpEVFzvXiYPdHTmnoyy/bHo1TpkJBsjB5p
-         7J3Q==
+        bh=8zWSnyntzQ7MpNLtBXWTtAnb7hKIjHG4nXvkifYINGs=;
+        b=MGplQQUSHfngODXu2P1Z9sK0NzFiaCmzoFBB4SxJP//vzZz2z0DJYpWHRdf/2J4QB8
+         kh5bAtr5ihCELu0I0xXYKzq0TKxuO1I+QBR7LUTbAC1KwaIOdtoGuWAIcR987Kocbs0b
+         q3zCWZhomPcwvStfGFY51UcEYrRZYEn/5hSQxqg/fvabTLH/YuGrafAtg5+6ZowcQjLg
+         74xRziQqJuJKGrfbqddJi7/JIo8wH2oN2I7q00MsLEtId0sTxL0UN7B75CWeowkxq957
+         eU8Uqck5S2ntaLLMYhbnrcJZRF8ifg3Q/lUCQVDp+ZHoSzvY0RjoeCQfY6kdfnoA5SYe
+         2EJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740738353; x=1741343153;
+        d=1e100.net; s=20230601; t=1740738356; x=1741343156;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mthpUBcuFXcir4pSjUd/6TiIbqiuZjMcArsC605TwA=;
-        b=phYn/U2cCt5xnrB/K5CEUj8MIqaH2fGJ0CRpYVlCNgFgC5NL2piiMeooMZdM150G3b
-         w0lTuP6KhBGMm63W96tO0uyx9R1bRfiPj4DEWpyLE7V4R1j18D3Elh90MGgJgRMgQZGb
-         F73rJ4sZuqlmED7ILi5MsAuX+4NfLitjE+p/wbONySJUAvMQIoXKe0f5H7jSS+JQeFCV
-         lJqhQ7i6mYSAnKGHJumhY+C/P28pRhx85AVclHjCXzvp38WBmDArtpc0UiucMPAzEsjy
-         FYXH4L+ObhpEl9GashUV5r3CjaxDM6H4jCKugrwzc3C7Y7RDGHaO2mEzV6oyyC7Gvbfu
-         /jJA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6J5Jvu7BjHPYE4e70ucXOowJaGDJe09baHLeZJT21QhxEk6PAIw9RieQSMgq1tTuBjYwwgHA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzm0aDAZd0Qn7xNuqKJrNaOcSLGBrin+ddM5XXkDp6Mc9GwuySG
-	0W3plBYddQZRwyDWQ80+yQ/diEfJdHeAoTNv9st2oEZKa83x2KKG+IxalMRzSEuTCOqPXGLCnnE
-	FD7lhq0E6ei9j7CxmRQ==
-X-Google-Smtp-Source: AGHT+IHtP/oHqzhg0ASQAq95RZF5lYANl+I3P8Vxk+cLo0Dh2BmKOXowoVEPz/OhfN0g9+f+h5G4M/hs2XzAvpfv
-X-Received: from wmsp28.prod.google.com ([2002:a05:600c:1d9c:b0:439:47d8:90a7])
+        bh=8zWSnyntzQ7MpNLtBXWTtAnb7hKIjHG4nXvkifYINGs=;
+        b=YScgZ2bdYJx4icbXOefY4KM/JhXqkchKWMQ0CuJpc7QG8yEAywCHcMBZXAlYJpIHrn
+         8llXFFAWtfhYS0m1D2iVottqoi+A4/dFEBbifUYB1P3GEaNuZcnmdxtuHujdNk+fUIfg
+         QBp7uyybrAgK/WZt5pcdNx5adHvQXAp1X+enQi2uaYLdgXZRI6WNk6GJKamU/XcQ8572
+         szD+a2sRryVrwtODD5+WIMxWjbrEygAyXOGFoD2naL1M/qRlmpukb7QvetPjksZkqR5z
+         uacbZGk2fWM5RT9mEt2lfbBXW5zlv/FhSivKV6JYl27CpbK/3Q3TkwOoMD4m5qy6oLKu
+         yF7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWc3nmQkzgY//A7j690kaNLWpDucEufZX4ejvAir3QPZiiFgdFVfDUq4edM5MNo1uhjq7KARE0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyWRFLp5BWpK+AUoCURPR5+TJ6ucaI0jRpTvHjbDIzqfFm4xkMq
+	mh3NL0Lu8DZJxPmJhI4jj9dkEAR5kxwjLk87OMov2r5mB5XvrKFCwgTwetdrowCDOlUOKw7p6Wg
+	p6gcgb/Joppa8FE1XtA==
+X-Google-Smtp-Source: AGHT+IGFfXZf9aSaeJPV477b4zEwtmOKtPxpHM8dC1bwi3UuUWA6YfdIpTZg2yxh9oaFGqD0evxL8K6AQkOEvAO4
+X-Received: from wmbfl25.prod.google.com ([2002:a05:600c:b99:b0:439:98eb:28cd])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1d0f:b0:43b:a397:345f with SMTP id 5b1f17b1804b1-43baa2c14e7mr14416685e9.11.1740738353821;
- Fri, 28 Feb 2025 02:25:53 -0800 (PST)
-Date: Fri, 28 Feb 2025 10:25:20 +0000
+ 2002:a05:600c:35cb:b0:439:98b0:f911 with SMTP id 5b1f17b1804b1-43ba66e6d13mr21948505e9.10.1740738355942;
+ Fri, 28 Feb 2025 02:25:55 -0800 (PST)
+Date: Fri, 28 Feb 2025 10:25:21 +0000
 In-Reply-To: <20250228102530.1229089-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250228102530.1229089-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250228102530.1229089-5-vdonnefort@google.com>
-Subject: [PATCH 3/9] KVM: arm64: Add a range to __pkvm_host_unshare_guest()
+Message-ID: <20250228102530.1229089-6-vdonnefort@google.com>
+Subject: [PATCH 3/9] KVM: arm64: Add range to __pkvm_host_unshare_guest()
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -71,9 +71,7 @@ Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org,
 Content-Type: text/plain; charset="UTF-8"
 
 In preparation for supporting stage-2 huge mappings for np-guest. Add a
-nr_pages argument to the __pkvm_host_unshare_guest hypercall. This range
-supports only two values: 1 or PMD_SIZE / PAGE_SIZE (that is 512 on a
-4K-pages system).
+nr_pages argument to the __pkvm_host_unshare_guest hypercall.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
