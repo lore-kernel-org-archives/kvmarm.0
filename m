@@ -1,55 +1,55 @@
 Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA70526036F
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACD4260397
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740738361; cv=none; b=q9hd7a5UPh6hZ7a0Hhcci5yogdtVUX/RLuDOdKEygR0H4x8m1VpO1VmMQPv5im31x+8WCwcfwhCIbVSy/HziTDJ4B/Ky1keFQe80o6+cwk1P9ijw2JVHxIkPOPFBnmOy4r8j1CCLaWrnVjcVCPDDUIgm9GmJdOTtp7vjGQvqjkc=
+	t=1740738363; cv=none; b=UrL81Aq98aPHeoHWQMLpaWe6M0DM09jON3kfIuukvhRn/URe1Q1DBgViNfYix6QCh++I+Q0J1juMmiNji+t8KOoGpmXnr/rQNbTnW7KAiu/l6UW/o0SejbJ+RH1NExtzvF57s//Jkp/u+z+ymLWQALOGpjKXwrFi6vMn8P9NmJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740738361; c=relaxed/simple;
+	s=arc-20240116; t=1740738363; c=relaxed/simple;
 	bh=V3sh8gApqApSpROZm8Y3S5+uQsT2toDeMKPrZxJsqoo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ei9lL9yAYTXyULDcdm3KuHW75FdaGvW9B6FJI1M1KPd4he2GoJNifHEgDAdkiZXjUqG4PVREWxiZNyyA3Chedaq8BwVhr70DR0yEN7si95g7UtofvClX2RUwksxxzt8vxheEI6NIjREt5RTlwSIPrvcXlGJUU0EcRDv9zojYyqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fiNfwEqQ; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=jd/damsJEf3sDMg/ElKCFyE+k5hZ2TaLVjQHM0akmmozEnw/OoLn2upK40Sit7m+mSn0QMhHh8+zZzxK9atZ0A03j9h14GuV47LLpEhMqqmD5yswQ++LTlBYZb7RbpprpIxIqcx3tpPtRMaAKo23+AHtdiVlwx05vj7LbXVxq7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ls1Y2MSk; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fiNfwEqQ"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-390ddebcbd1so1140545f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 02:25:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ls1Y2MSk"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-38f55ccb04bso1178369f8f.3
+        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 02:26:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740738358; x=1741343158; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1740738360; x=1741343160; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
         bh=l5JzOHIWm+Qn+D56CTs6MBaFzEo9/026iUTyI0pXPjg=;
-        b=fiNfwEqQjkICwVdbITA4wtWP4N1WWL+xJxs8n2HHpHn5e0/86UisZqjULBFOm10Z40
-         CeWDh1/2m92L0wclKEuFo0Ov7yE67OPGMrSKa0+c2YqMoG44ZzviUh4sXDdHSPhV/g4g
-         u8OxwszBdHi65CH/2n15/YcMUGwybolt3q4CUSoiIGltpGZUGDhuHUJGqYi7+4zppEPo
-         URtGvCvbC17fwWgG7kybG1a4OUNu14oEFKZlbhFgv/Xb+Nx8dNiwtsXjevTLXOoz9FDd
-         9t3QkxwQkD/Ja5FWM7dL4SpDOKPFfPmFAoP4bVMRCUYm/NHvzIy+JuRzxdsTsPbpCrxT
-         TmOA==
+        b=Ls1Y2MSkkkijE3p5NZO7NwqCkh45p3YWPsXGcs+gjra5o3H/GMaIQRh7SINcoU0XlE
+         wiWJhyUiJ8ljVmWE2b2hlsrWkpBj84XSd4Ve7CtHzAPnWPTWh/ucUbsTZLoD15dWE/lx
+         2v2pmnfcSeywY7T4XjliqNiUEi0STpbrFfUpT5fwwk/4ZEFZcpgYUo8/sZfZ319B3Df/
+         aoEylTYIxVJ/Z9aN5FDLOx+sPkAlj03RXp+lZzyILDYpl4DucajVnynl/e1andzMl5NY
+         5C/ab2lYc6+g+hge+l1uyzUlx6ks6gXKpheS3H4ZhVkdVITKL46RVbHXdGlEKKwu+BAa
+         uwmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740738358; x=1741343158;
+        d=1e100.net; s=20230601; t=1740738360; x=1741343160;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=l5JzOHIWm+Qn+D56CTs6MBaFzEo9/026iUTyI0pXPjg=;
-        b=QCzeWr1voObKziuqxQvSDANJaPbsuqHIuL/lzofYxBRZK6Fk6eZNFXMtwa/ObwfnXD
-         vvI6Rjmtfk/32Dwtfmj6Nz1ElP1dZOlCK6g7BeEJAw3DZo2fcUv1OS2YD3NuMpKisQpS
-         ePF0MIHfo9E96j8rHaJW3Gyl9e0z9+FpiA89aJHk3D/Ury+EuQUoyAQijflHWVeScC8U
-         4gWTR68nTTweLKoTffo9VO8mhcV3DI2E9a/NC35ojM0zuY1EpG0O6duVyTnTi6xlilKB
-         BkWnZKz89nt/r+wiNsabEGU3VMaUKTW+jVWM4zHq/3UV6bKgimsJeh3Vay3i6O+HmYro
-         c69A==
-X-Forwarded-Encrypted: i=1; AJvYcCVk7FOs/LIetKHYLOZURiv3gIqj0cZjFZXPBMAHRAf2yhGNsgPfgV4F7583L8Heseh7gz0vwco=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyw+RvjDf6dc8gM6Zpv/2cv3WoytJx4Km3aJEMB9Z8ko20KhxPK
-	5esyB6kj3OIXJxoBAHHsFUKAkuBKRKYa21AFmC3UpsGfrWHoq7CsauyuBL647rzFEmGsX0eZqI6
-	HPot6m+YNbH/4HYR+zA==
-X-Google-Smtp-Source: AGHT+IGc36H3jkruTF0XKWyqw/7fJ4jy+lnOLdRAHV8wJRsfUXrjOVQj1smZ2A50z4LIQhr1dOWCMFS3Os99bjd5
-X-Received: from wmbec10.prod.google.com ([2002:a05:600c:610a:b0:439:804a:4a89])
+        b=M3CXfra33S/kNpI7ZIt3mtsmicTYj6FaI5xlPg/R58cXV9Yjn51X9UNl79iPf10hCN
+         WuwCtamFE1E1nIu8akXi/yZExHb2aGxl1NN6U1QjF5rI4oN57l5Lm7BME3egtzhONOvQ
+         vOMjOIlw84Zi9nRTnr81QHV0EhhoPd3tLuNqCBxhNZrUTSz0EDLcIHxUxQGG5o8Iwc9/
+         zYGyeAxJL2Xp+sq/NhLhrPrxExZJQsaeoazHLFRV9HpiS7MmNu2mwFZyrEe0Hcawoy+K
+         27sCZWAbTglsZpG3Eg0w8ZvawTosLdBBtOgny3XQQ+CbRMiHG9cO4Pe+uYI24lZ9h3My
+         XO7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVWAMgrx9Mk0kv4EMMDgzz/svYP7hQSoBYw1gn/i+4CntokdmGDjpjDrejM80NwCkE81nufim0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwdU2EMapR2nrQM5b8hHz+ifHeNajqyodyDvnG6brNSobNMFv5/
+	Yva1u9+EMtZTPbYETe9Yws/4GhhN8nwyfNcqHQ1L4AZhKIrh30m7EHfWvLo5yaXO4LIPmy3BQDs
+	LIjY/EsN68UdW7vjoQw==
+X-Google-Smtp-Source: AGHT+IE9cThuvOOumrDkSe/98JreOfmfuPXx+pald6vYIRYqluFVSVbBGpBAnMTTmkIPGHEwkSM8h/iEIfVJ0+p/
+X-Received: from wrbfy7.prod.google.com ([2002:a05:6000:2d87:b0:38f:3b93:aead])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:6da3:0:b0:38d:b325:471f with SMTP id ffacd0b85a97d-390ec7cc89dmr2470457f8f.15.1740738358111;
- Fri, 28 Feb 2025 02:25:58 -0800 (PST)
-Date: Fri, 28 Feb 2025 10:25:22 +0000
+ 2002:a5d:5f91:0:b0:38f:3c8a:4bf4 with SMTP id ffacd0b85a97d-390ec7cd27fmr2181164f8f.6.1740738360083;
+ Fri, 28 Feb 2025 02:26:00 -0800 (PST)
+Date: Fri, 28 Feb 2025 10:25:23 +0000
 In-Reply-To: <20250228102530.1229089-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250228102530.1229089-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250228102530.1229089-7-vdonnefort@google.com>
-Subject: [PATCH 4/9] KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
+Message-ID: <20250228102530.1229089-8-vdonnefort@google.com>
+Subject: [PATCH 4/9] KVM: arm64: Add range to __pkvm_host_wrprotect_guest()
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
