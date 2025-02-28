@@ -1,119 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285DD1EF38F
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 15:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E130927701A
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 18:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740756759; cv=none; b=en4KRDEBSi2kARU8fgZhvDZvg46+Tewt36gdG8ZfjRQie9sFg1QGEPG08OS7txu7AsnSMIsDcLNnGvM4BN/0sCZ2Ha0ErhvEpEgbjuDni6SQXfWTlMDXOj3mxtBKxlNSFfYNOHwUz99Y60++L9dgwPSvE3kvz7vjdpZL1auqkC0=
+	t=1740768888; cv=none; b=XooGfhJKvUAPK8k2qIP5nL5OfAmOsPgAaO0+haNljSGf5IvHRbSnTnK72rRay5zmVZKtOqYK0A0rnVI5VgblXOHPOKLvXnuv94iS0IBUxfyG+YeyRTCY5V6rsfktjEg3MH9h+3dqLPR5ebw2ybUxlpjA2j/wcynQQR3DpE88VKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740756759; c=relaxed/simple;
-	bh=qVmyXvzIJJsl8HgB675jC4uABINWt4XEGa0kFziWnhw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jDtx8NKypvAR2k6j57/n92WcrroHBzznCa3eCw+MF2cmG0dV2QZBduN/uO5kwofcBakKrb/PRDk4kE/pWaWYvryjhaGHfvyRGhO/OfP+Jo/gISjRkoxe92X3PTehC6r+rUi8fDullvgd5R+6EjcsaMEM8nGx3OWQrqcFGOjIRm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 908311515;
-	Fri, 28 Feb 2025 07:32:52 -0800 (PST)
-Received: from [10.57.85.134] (unknown [10.57.85.134])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E1173F5A1;
-	Fri, 28 Feb 2025 07:32:35 -0800 (PST)
-Message-ID: <aa71c6ed-8ff2-4b52-b8f7-49147c7769ba@arm.com>
-Date: Fri, 28 Feb 2025 15:32:33 +0000
+	s=arc-20240116; t=1740768888; c=relaxed/simple;
+	bh=TYvRxcLgN1IYxafXpxrr2T3Ke1WemjDAQaAfqYgyWxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fi1OhhHp6AP/o9A4kDxSmYyQmO5B1VyEOBokG4vS48++96kohPZ029Fr2/Jfpslv1m2KPqNelG2x1yWjWl61bm7PXVEAKTkwF6Wl0CkRedv1VUWLaq4TAEdJiiexS2aI4rGEdC9jEGU0VqtqgMMVZgHeFpL74bLs9qJVONtdnqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v/kWvAU5; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v/kWvAU5"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so474260866b.3
+        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:54:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740768885; x=1741373685; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ppwxYptxUoJTBAvtQNONLY3e8TNhsTgMXgKzmUOztsk=;
+        b=v/kWvAU5r77EnWKPh3WVLNnmblrcp19rPUntsySBsLqIutYj2zFWzcbt7RrNBQymsy
+         jmRDUUxVgijipatpwjbbn4S4Z4523/XUU4rmCb6oQqOqZvzJzVspa09UkopQWtDk5NAQ
+         Y3snq1oZN+/x3JSW78lxaF/HNZA28hvXji53AgTFaIHUsJTRz0p5A2XExiuPexINkjIf
+         Mt9sUWFuZ7jWbhcAwYxCQ+nm0eUfMVfKEBULRbf+UzGYNBvlXhhItFvR0eWaAjLYWF1m
+         iYBogcMOz7FWLmeCBmNvCRk+tRxrIa/g9jZxA/VSDj4gMG5Y5nc+RYYktH4du0C3vWd6
+         oaIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740768885; x=1741373685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ppwxYptxUoJTBAvtQNONLY3e8TNhsTgMXgKzmUOztsk=;
+        b=cGrPDz/O5ENg+B2u7aMSQ3A2qk15KPYu19/sAcmCnqrf0YxUO/2tEGzZ8l5X7r5Ioz
+         fffNAlIsi7AbCyxCHlAoScTV0WEDVFdQQwrBNm2ifj4K3ajCvElgWm1jVnNrlRvzfsX6
+         MatrakMSgHaDxzqg10yDOlNsORCYWzXGjiy7Zp6YrOTAfnMqDgYJmsSFCSW8qNpmZaAB
+         fqjXdRgTZ+nUzNxOVorTsKzu/QNO/Y1t2WpTtVKutH9YVvR6vfvgL8HrBhdUaV1VPYVd
+         yVQ2TtKImS2dfuigO3q5H/otAg0kHtMJ/FpJ/L3U/+dqE0Xwgft1w+kzuLHVZ6u8yyV7
+         vh2g==
+X-Forwarded-Encrypted: i=1; AJvYcCULZaC61Evvrzjn+aaaQHqo5lanz+BdUpxY/rBeCqFFPEoyQKyPZKo3aGyGo/xPR7tuT5aU7Hk=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yww1n3uKCOjSZT47WqoMDlqEnLjZDmwCoDGVZos2pkuDt1v5oYr
+	SNSISlTdGV3+jUmF3QGOZmRO2NcKYCrcGftXAm+D0T8PA1OYpLVtzqfqYVYjXA==
+X-Gm-Gg: ASbGncvHgdqBKLsKA/lmpPdQJr6f42azAPME0/KzJKwQgleKudvysZ6kTnoMoqOLP0C
+	lgdv0wBY6RJG5Yb3mDSw4yhu4A0W35dC9Qukp1eoaeau57qsJzZaHL7Bw/hE/wSG6nQoxX9Q72M
+	VhydkJ0Qu7e04TXcpv0tmTW8Rq76GDyb1heE7/HCf2bSyaXQj17Ml1P1sxBVHpzDZcb4kPtySqY
+	AaPh4S/9ovYbzV3X3UEWu3Cl7gpvBBnGCUjMf3Zhwxe6edtoMIZprzKKOoxLe7lkCVsWtl+FdWU
+	n5zMHcDN8Fzxip8q/UsGvqpamjhviWK7R1cxLiMKl66FbRsZRgQwepYyBFCUtmo=
+X-Google-Smtp-Source: AGHT+IGRZqJXTWPcNybDnAZQX/clH2G/w7qq2Cr5221PpPPsrD4hU6+CM6oIxOZll7K724ZB2dG1Dg==
+X-Received: by 2002:a17:907:7f94:b0:ab7:be66:792f with SMTP id a640c23a62f3a-abf26837d32mr566881466b.49.1740768884775;
+        Fri, 28 Feb 2025 10:54:44 -0800 (PST)
+Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c0ba408sm331183566b.37.2025.02.28.10.54.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 10:54:43 -0800 (PST)
+Date: Fri, 28 Feb 2025 18:54:40 +0000
+From: Quentin Perret <qperret@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH 1/9] KVM: arm64: Handle huge mappings for np-guest CMOs
+Message-ID: <Z8IGcA6h6hZx7ujh@google.com>
+References: <20250228102530.1229089-1-vdonnefort@google.com>
+ <20250228102530.1229089-2-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 0/8] arm64/mm: Drop PXD_TABLE_BIT
-Content-Language: en-GB
-To: Anshuman Khandual <anshuman.khandual@arm.com>,
- arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <20250221044227.1145393-1-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250228102530.1229089-2-vdonnefort@google.com>
 
-On 21/02/2025 04:42, Anshuman Khandual wrote:
-> Remove the PXX_TABLE_BIT definitions and instead rely on PXX_TYPE_MASK,
-> PXX_TYPE_SECT and PXX_TYPE_TABLE. The latter versions are more abstract
-> and also include the PTE_VALID bit.
-> 
-> This abstraction is valuable for the impending D128 page table support,
-> which doesn't have a single page table bit to determine table vs block.
-> Instead it has the skip level (SKL) field, where it will consider 0 to
-> mean table and any other value to mean a block entry. So PXX_TABLE_BIT
-> therefore doesn't fit into the D128 model well, but the type fields do.
+On Friday 28 Feb 2025 at 10:25:17 (+0000), Vincent Donnefort wrote:
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 19c3c631708c..a796e257c41f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -219,14 +219,24 @@ static void guest_s2_put_page(void *addr)
+>  
+>  static void clean_dcache_guest_page(void *va, size_t size)
+>  {
+> -	__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+> -	hyp_fixmap_unmap();
+> +	while (size) {
 
-All the patches look logically correct to me and I agree with the intention of
-removing PXX_TABLE_BIT. But personally I'd prefer to see a single patch that
-just does everything that's required to remove PXX_TABLE_BIT. And then a second
-patch for the pud_bad() fix/improvement (currently patch 6) which is orthogonal
-to the removal of PXX_TABLE_BIT.
+Nit: not a problem at the moment, but this makes me mildly worried if
+size ever became non-page-aligned, could we make the code robust to
+that?
 
-That would make it much easier to review IMHO, and would also allow for writing
-a single commit log which provides the justification for the change. I find the
-current set of 7 commit logs to not be hugely helpful.
-
-But I wrote the original patches and wrote them as I'm suggesting, so I would
-say that :)
-
-I'm guessing I shouldn't provide a Reviewed-By here, given I wrote the code
-originally...
-
-Thanks,
-Ryan
-
-
+> +		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> +					  PAGE_SIZE);
+> +		hyp_fixmap_unmap();
+> +		va += PAGE_SIZE;
+> +		size -= PAGE_SIZE;
+> +	}
+>  }
+>  
+>  static void invalidate_icache_guest_page(void *va, size_t size)
+>  {
+> -	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+> -	hyp_fixmap_unmap();
+> +	while (size) {
+> +		__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> +					       PAGE_SIZE);
+> +		hyp_fixmap_unmap();
+> +		va += PAGE_SIZE;
+> +		size -= PAGE_SIZE;
+> +	}
+>  }
+>  
+>  int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
+> -- 
+> 2.48.1.711.g2feabab25a-goog
 > 
-> This series applies on v6.14-rc3.
-> 
-> Changes in V2:
-> 
-> - Changed pmd_mkhuge() and pud_mkhuge() implementation
-> - Changed pud_bad() implementation with an additional patch
-> 
-> Changes in V1:
-> 
-> https://lore.kernel.org/all/20241005123824.1366397-1-anshuman.khandual@arm.com/
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Ryan Roberts <ryan.roberts@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> 
-> Anshuman Khandual (6):
->   KVM: arm64: ptdump: Test PMD_TYPE_MASK for block mapping
->   arm64/ptdump: Test PMD_TYPE_MASK for block mapping
->   arm64/mm: Clear PXX_TYPE_MASK in mk_[pmd|pud]_sect_prot()
->   arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
->   arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
->   arm64/mm: Drop PXD_TABLE_BIT
-> 
-> Ryan Roberts (2):
->   arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
->   arm64/mm: Check pmd_table() in pmd_trans_huge()
-> 
->  arch/arm64/include/asm/pgtable-hwdef.h |  5 --
->  arch/arm64/include/asm/pgtable.h       | 65 ++++++++++++++++++--------
->  arch/arm64/kvm/ptdump.c                |  4 +-
->  arch/arm64/mm/ptdump.c                 |  4 +-
->  4 files changed, 50 insertions(+), 28 deletions(-)
-> 
-
