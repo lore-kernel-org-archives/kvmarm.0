@@ -1,98 +1,85 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C5F191F72
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 03:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318292580DB
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 09:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740714174; cv=none; b=nhgLHw/Xz2AKe8xeS2cfOYCJrQvs8vf3QU0sCavQRemjk1YNQob4iMrHyJ4k+qJkzxRyB9EV/qCbZYJI47JZHYpDGKpieACyWIk5fx3yp1pt12ZxFvMEnybINWnaRuhvw6zttupDVUntkmcd99HB9ko2gcM1ppDrh8eA7t+F7hI=
+	t=1740735003; cv=none; b=Su/hyM5+hDWGc3GnRU4DWQTmWvkOTkYPHsLjcu+XML0P+QOk0t+N1Jdqx88/ieFAMpeqecMpWn+xz4dEXYjKUVMG+mMl2R+2vcjeOqAem7B2a+4eNRvwJoknl2BXYwbhDUYcWxw9AH/k68lznUHeUhaD2ETxgnDqTscOHyIj0YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740714174; c=relaxed/simple;
-	bh=TCBAffphN5Vd25xw6/XwG6SOhGD9Ey9T0bjna/8WfEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oz73Pk6VBCL8DkkyjYCua+Y1NNlrABczGHZp62I3pJp4mWFNPMxPm8ci5618t+g/ww/ZqlFGZEhrvQgjwVdOjzvzPkbn5S1tpxv0MdJHFzmDm4/ly7T/M3tlx0rurrQiE26SzJpKKuU3Z8jmwy86Bu13kAiOj00JScbOjKWo53Y=
+	s=arc-20240116; t=1740735003; c=relaxed/simple;
+	bh=d0SuwmOKo/XBggeb/NDKybGU1Dc1X3o4zx0/1EssuJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nQ6loqRJ7BRUZLKDgkp8ezu2k2EoAd2CmcxgYvWwkIq+/EZ9FsTGnG0cloSt2Ni3S09Jq4lJQ0YhWinmR++Wn51lFQrsjlVn1EIHo8iTKCjZxKYUUNjSBq+R9uPc1zLkCt0jnLmC74MYKUGQjpt3UyX0l4vMEY80I9OYkkRO/nw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8747A12FC;
-	Thu, 27 Feb 2025 19:43:06 -0800 (PST)
-Received: from [10.163.40.184] (unknown [10.163.40.184])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6F033F6A8;
-	Thu, 27 Feb 2025 19:42:45 -0800 (PST)
-Message-ID: <ccbe751d-9022-4c66-b894-73b3788f7050@arm.com>
-Date: Fri, 28 Feb 2025 09:12:38 +0530
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79A751515;
+	Fri, 28 Feb 2025 01:30:15 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC9783F673;
+	Fri, 28 Feb 2025 01:29:59 -0800 (PST)
+Date: Fri, 28 Feb 2025 09:29:55 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, ahmed.genidi@arm.com,
+	ben.horgan@arm.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Initialize HCR_EL2.E2H early
+Message-ID: <20250228092955.GC2157064@e132581.arm.com>
+References: <20250227180526.1204723-1-mark.rutland@arm.com>
+ <20250227180526.1204723-2-mark.rutland@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 0/8] arm64/mm: Drop PXD_TABLE_BIT
-To: arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250221044227.1145393-1-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250227180526.1204723-2-mark.rutland@arm.com>
 
-On 2/21/25 10:12, Anshuman Khandual wrote:
-> Remove the PXX_TABLE_BIT definitions and instead rely on PXX_TYPE_MASK,
-> PXX_TYPE_SECT and PXX_TYPE_TABLE. The latter versions are more abstract
-> and also include the PTE_VALID bit.
-> 
-> This abstraction is valuable for the impending D128 page table support,
-> which doesn't have a single page table bit to determine table vs block.
-> Instead it has the skip level (SKL) field, where it will consider 0 to
-> mean table and any other value to mean a block entry. So PXX_TABLE_BIT
-> therefore doesn't fit into the D128 model well, but the type fields do.
-> 
-> This series applies on v6.14-rc3.
-> 
-> Changes in V2:
-> 
-> - Changed pmd_mkhuge() and pud_mkhuge() implementation
-> - Changed pud_bad() implementation with an additional patch
-> 
-> Changes in V1:
-> 
-> https://lore.kernel.org/all/20241005123824.1366397-1-anshuman.khandual@arm.com/
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Ryan Roberts <ryan.roberts@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> 
-> Anshuman Khandual (6):
->   KVM: arm64: ptdump: Test PMD_TYPE_MASK for block mapping
->   arm64/ptdump: Test PMD_TYPE_MASK for block mapping
->   arm64/mm: Clear PXX_TYPE_MASK in mk_[pmd|pud]_sect_prot()
->   arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
->   arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
->   arm64/mm: Drop PXD_TABLE_BIT
-> 
-> Ryan Roberts (2):
->   arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
->   arm64/mm: Check pmd_table() in pmd_trans_huge()
-> 
->  arch/arm64/include/asm/pgtable-hwdef.h |  5 --
->  arch/arm64/include/asm/pgtable.h       | 65 ++++++++++++++++++--------
->  arch/arm64/kvm/ptdump.c                |  4 +-
->  arch/arm64/mm/ptdump.c                 |  4 +-
->  4 files changed, 50 insertions(+), 28 deletions(-)
-> 
+Hi Mark,
 
-Gentle ping, just wondering any updates on the series.
+On Thu, Feb 27, 2025 at 06:05:25PM +0000, Mark Rutland wrote:
+
+[...]
+
+> +.macro init_el2_hcr	val
+> +	mov_q	x0, \val
+> +
+> +	/*
+> +	 * Compliant CPUs advertise their VHE-onlyness with
+> +	 * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
+> +	 * can reset into an UNKNOWN state and might not read as 1 until it has
+> +	 * been initialized explicitly.
+
+For ID_AA64MMFR4_EL1.E2H0 < 0 case, the code actually clears the
+HCR_EL2.E2H bit.
+
+Hence, the comment should be corrected as: "... it can reset into an
+UNKNOWN state and might not read as 0 until it has been initialized
+explicitly".
+
+> +	 *
+> +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
+> +	 * don't advertise it (they predate this relaxation).
+> +	 *
+> +	 * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
+> +	 * indicating whether the CPU is running in E2H mode.
+> +	 */
+
+I think it is even better to clear the HCR_E2H bit first. This can
+avoid any dependency on the passed parameter 'val'.
+
+        bic     x0, x0, #HCR_E2H
+
+> +	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
+> +	sbfx	x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
+> +	cmp	x1, #0
+> +	b.lt	.LnVHE_\@
+> +
+> +	orr	x0, x0, #HCR_E2H
+> +.LnVHE_\@:
+> +	msr	hcr_el2, x0
+> +	isb
+> +.endm
