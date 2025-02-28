@@ -1,73 +1,73 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C4C1F09A2
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 19:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2701230BDA
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 19:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740769614; cv=none; b=i1ujjBhA0QXhRe17zsxSFi0p9UuItr2kLDkY+Pbl12VEBAr6DLRZYKoI/GSSm7t9rcD3TFCPUO0/u313c53+H46VxqxcUMV0TOSOrAhX9IL57KZTlHrLic39iqviekaC4asm/VGDIae3j7b69hL7SIxArB8eFsuTP+NwSqZSRr0=
+	t=1740771895; cv=none; b=oT0snxY5NbAwAr9Ag2xEFV29xHcsX+EMjOpcwOEQMfz8XcSCQWtHL7gfJjDlgKK0QI0/u7x/KjjZ/FhXr2AS7VCSVFnRSlyk+mDYMArYQabJdBC10tVHiehsrlLMPbfsPbyAiKcQ0p/2yR4o14eYX7CP+dANEhHflwsuiWpLCjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740769614; c=relaxed/simple;
-	bh=OCN3u5wSjbvOGv3cYLmLbEn4K1fJZqzIx2HUAFJtftw=;
+	s=arc-20240116; t=1740771895; c=relaxed/simple;
+	bh=u9IIQkzUQEGboqOAA4jL0YNDhIcYZQ2UdKipOy/Sj3c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jbfXL6JA4O/Gb86YN/1h0xOvY43qqzqdd5dY1CvNRzlzDLiN5p4LInbLBkV8dB8056ElduGvWs8Vf/I6j+6iOosl8PkhEJMiRoqEgJuNJMomSzxn9iBR3OJR0MwCbproFaz8zM42bWHIuc4SaMZaFwOlo1EgxOTu91wtcsmnNHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WUe3sl1c; arc=none smtp.client-ip=209.85.218.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEYXPztVdKSkJx0q5y0sty3OdQTKtw9dy0fhB6kewGWUU2Ai6V0E6yYSroenwuTjyHocnJ6Z0hNcvHR+eEEms69Ks3NATxqYWIbuhKwRxXwbpSmVmw9yjYtWP/eXRW+dHWxfIlmy+9EqUWR4jm+8Jlwwd5pJg+FNHQn1/QwHsTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tq5hAZn3; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WUe3sl1c"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abb79af88afso456557866b.1
-        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 11:06:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tq5hAZn3"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abbda4349e9so348564466b.0
+        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 11:44:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740769611; x=1741374411; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1740771892; x=1741376692; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ea7ysfoGL0hxym9kuH3xIfg8V89PAft4k8+18YntGKQ=;
-        b=WUe3sl1cBUhPXZdJROsLFpF1tUzSJDYcEadsY3lDE0+Czw/hyhvGI0kuYRodRIaU2T
-         uEgoRV5JwbwJ8Nw8/a8tQXIfxBuJquotXiSZZY6ifvrDwoj/GF1MWDfcJUXbk9qbREQr
-         66GpjsPEvTQ26YqZhAikOs2Psd2FRa5tLckXEL6ScXPyxh5WQMk+zCr19i8TfJdNma86
-         wMXkai85WxunlAc+ZcKn+XYeNHAg99wqAJm6M131j+5EOlfkYSIbLEY5ev0Qf1B+kPPC
-         PGiSt/pEWEr9AymgXZERTsIh2UkkjLG/XBGtECuZv265cO1ywxyIMCBvzPc6DX5OXDWi
-         oLzg==
+        bh=GrxfhSQDPSEzY9FwMiMP3kLRUycgWmI45Gcv8VcIec8=;
+        b=tq5hAZn3lcDXC8/jhcf2Psiur1lk5MtNrwwYXDicqHwN5O34QNAyj6YUCNNEP/nEb9
+         aAvpQaTRs35OeveGcB09gEpbCQha47Wqsm8JSlpiGKjgHm85j5MNS0GzIrA7tXL+2SUx
+         OrQaSRFR6H8zhm/U9ssd5DzkufCy30ujqsejvSeY0UIEY0zySEGENDrrpT6SLALFFtNn
+         D34QEFiEn5stFszYenVV3A4XL4q6DDdXr4TX5xOnjtJunYI0BOHVLJAHIqmLkeFpes5K
+         JqMIJGQCRwZVfM45DyJY6lGHYBHBbhNS8O0vMSkSBybdYiYgAO4R7hQrriw+l5VL97fQ
+         UScw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740769611; x=1741374411;
+        d=1e100.net; s=20230601; t=1740771892; x=1741376692;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ea7ysfoGL0hxym9kuH3xIfg8V89PAft4k8+18YntGKQ=;
-        b=a+QGb106wFTKmQwS7zJDuucObE89jc0TuDA6PSuMV2hg0mPrJWiYyAfKoU/5gd8sJU
-         Y+pSpyHmOtrS8HUlKADuA/qo6b56wURzO9btsaVcQVwWi/sKqEsa7OTXQ9kotY+iGxOo
-         +utZtm17Z4hOqjvwjZ5jq2RE5cyOqpI58+gSc7NSK21Vx3Wub7zP+uWFyxzakoUS9qo6
-         vvH8jPu5Y8uE6dUq16Pw0sdDICwEw4wSvwdH9OO6bPfA/H0YgDHUOVzogiOcASHFQBcm
-         3AHNh6EPoRqL2xOmOB7lndNLTBtUv5+qBoAa2ErOUG6I5hO8sz7hkH0WGrcWDNBsGomC
-         WaCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXuLEojiW1p9P7eoE49ozs+EepbYBXh8boot9CyNZUXBf3dDrh6V8awD9GGO5gRYlvxxrfct5c=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzrrkcH8i6T2XrTU8qgaGDSPIy/dkzhmQZ3DnawV/c34jTD9bXR
-	9szHxSI+TYvC5PWMpABvvzqyfttu7Cd/FHWHfVDQE+7fT1lmsm+SRf2nLcS8kw==
-X-Gm-Gg: ASbGncsGzMNBtgrQ+I+9tAMqY9l/fqO9nnBQcEnRdANVFR8COlJdC6HF/V2scnFKuBK
-	FqSOWTSKBDmUelV2zs3Maz5BQ8k2sz2MK+pqEYHxgUTnvGFubL6jnvOXs1zhATUm7zycqS75qZs
-	wu2IfDBzY5JO/oJXJ9wOdlKEROW1fkRDssc9djKBuK0Vt+FkOO/s9iVIqL/QbjEpd5OJ1F8+7o1
-	vWc7eWz5f30zrscDsedJV5YQ0PeFpAjsxU7GD6j3nf+SRTaEAO74YGuXHe4VNnEUGehFsjnoTIC
-	QdgrEGbMmEoDeu1V5CEgeNPonUubkkohojse9F64f1Yzto8S1UzXm/7W4VqI4E0=
-X-Google-Smtp-Source: AGHT+IHwpQw241bZAJUNRa/tRbDYtqAe8cu3t+94vTg5nA3MIoSIYj/LClqOfEXXyyELcdm0kfuXLg==
-X-Received: by 2002:a17:907:7f0f:b0:ab6:b9c0:1ea2 with SMTP id a640c23a62f3a-abf261f2529mr471016666b.25.1740769611173;
-        Fri, 28 Feb 2025 11:06:51 -0800 (PST)
+        bh=GrxfhSQDPSEzY9FwMiMP3kLRUycgWmI45Gcv8VcIec8=;
+        b=vxAnfac8JwkfyKdSGu4E0DinTmHga+me2wC6M4pJV5wnRtwbXAQWqSevf1ExJr+b7t
+         L4M+QDWznUv+q1bKo28mmoODSFtQ5nrFnnW1wY2UvthU7W4oRubO3tudvsmBITAoHkJ+
+         jr6aQyC1DUHmIKa2gj/FDGZo2nyWbam67v6LmS1lkFONvPlsUgsTfQjhi5THs84p3Bwu
+         3RK3exRvs96CiknxI7yqrNYzxUjE5O197NuuME7B6WTMseArZUDJmWu81GXowlFjdA6I
+         dtFqtg8z56Tg754BY5Dh8h+K1WJqDNoqbIT7pfc9eXk3B1c9u/qP1jJjuJ9Qc3OecDp7
+         Dw1A==
+X-Gm-Message-State: AOJu0Ywu5p7KN4qT5/2bJ4fOjOPHfeZ87Si8kCYjPS6lPjaNUqvcIBka
+	tQUvj7fdKH47r9zel/qfXiAzr23FFS7EHUtvmYibgh3yFEpg/+F+xYTzwB4tkQ==
+X-Gm-Gg: ASbGncvnyE7WxMB80/MTwdWx391LppAxBJbTEOugD446GlnFHo1jSkR/riU/jEt7s+v
+	A2uk+P+bYRv0BtyrLFRCkFlT41HbDwc/Ha+u05GnYvjXn/1e6p1v1tz2Wygi11/EEa6GT5vaTGK
+	3L8vrTMNZnuK5OZpxjX/F3fGCwCUMA3C1s4OHjuH4zOWG7OCyRighMoBZy9p1teJhqWJYzStkwD
+	800vE0x5DkrZe9Qn4LpBw7EQbpBL/Mj7enxc0LpbBNdwWNOIicxnmQzpTPbMP9jpqqrJZYXnsC9
+	APO2LdFGaKbWocrhk51Eq9GkBTud2g2gC8J2niB2LmgmLuTJIUUnu1c5kkSDZzk=
+X-Google-Smtp-Source: AGHT+IHTdYieiZ2Aj4ze6pa8HY7tXwIhYVqJDu+daMOyke7B6a6VZw8tHVhi3y8YmBfQzTjNAAk15w==
+X-Received: by 2002:a17:907:9484:b0:abb:b136:a402 with SMTP id a640c23a62f3a-abf26424829mr475325566b.18.1740771891977;
+        Fri, 28 Feb 2025 11:44:51 -0800 (PST)
 Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c1165e7sm333069566b.82.2025.02.28.11.06.50
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c7c18a3sm335218866b.185.2025.02.28.11.44.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 11:06:50 -0800 (PST)
-Date: Fri, 28 Feb 2025 19:06:46 +0000
+        Fri, 28 Feb 2025 11:44:51 -0800 (PST)
+Date: Fri, 28 Feb 2025 19:44:47 +0000
 From: Quentin Perret <qperret@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 2/9] KVM: arm64: Add a range to __pkvm_host_share_guest()
-Message-ID: <Z8IJRpoQUoGazLku@google.com>
-References: <20250228102530.1229089-1-vdonnefort@google.com>
- <20250228102530.1229089-3-vdonnefort@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com,
+	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org,
+	vdonnefort@google.com
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Factor out pKVM hyp vcpu creation to
+ separate function
+Message-ID: <Z8ISLxQRcsx2uuHw@google.com>
+References: <20250226215520.1759218-1-tabba@google.com>
+ <20250226215520.1759218-4-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,94 +76,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250228102530.1229089-3-vdonnefort@google.com>
+In-Reply-To: <20250226215520.1759218-4-tabba@google.com>
 
-On Friday 28 Feb 2025 at 10:25:18 (+0000), Vincent Donnefort wrote:
-> +int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
->  			    enum kvm_pgtable_prot prot)
+On Wednesday 26 Feb 2025 at 21:55:19 (+0000), Fuad Tabba wrote:
+>  static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
 >  {
->  	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
->  	u64 phys = hyp_pfn_to_phys(pfn);
->  	u64 ipa = hyp_pfn_to_phys(gfn);
->  	struct hyp_page *page;
-> +	u64 size;
+> -	size_t pgd_sz, hyp_vm_sz, hyp_vcpu_sz;
+> +	size_t pgd_sz, hyp_vm_sz;
+>  	struct kvm_vcpu *host_vcpu;
+> -	pkvm_handle_t handle;
+>  	void *pgd, *hyp_vm;
+>  	unsigned long idx;
 >  	int ret;
+> @@ -161,33 +178,12 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+>  	if (ret < 0)
+>  		goto free_vm;
 >  
->  	if (prot & ~KVM_PGTABLE_PROT_RWX)
->  		return -EINVAL;
->  
-> -	ret = check_range_allowed_memory(phys, phys + PAGE_SIZE);
+> -	handle = ret;
+> +	WRITE_ONCE(host_kvm->arch.pkvm.handle, ret);
 
-I'm not sure it is safe to drop this check here, see below.
+What's the reason to make this a WRITE_ONCE? Does it mean we should
+update the readers to be READ_ONCE()?
 
-> +	ret = __guest_check_transition_size(phys, ipa, nr_pages, &size);
->  	if (ret)
->  		return ret;
->  
->  	host_lock_component();
->  	guest_lock_component(vm);
->  
-> -	ret = __guest_check_page_state_range(vcpu, ipa, PAGE_SIZE, PKVM_NOPAGE);
-> +	ret = __guest_check_page_state_range(vm, ipa, size, PKVM_NOPAGE);
->  	if (ret)
->  		goto unlock;
->  
->  	page = hyp_phys_to_page(phys);
-
-Phys really needs to be a valid memory address here for 'page' to be
-present in the vmemma -- dereference right below. So we can't rely on
-the check in __host_check_page_state_range() sadly ...
-
-> +	ret = __host_check_page_state_range(phys, size, page->host_state);
-> +	if (ret)
-> +		goto unlock;
-> +
->  	switch (page->host_state) {
->  	case PKVM_PAGE_OWNED:
-> -		WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_OWNED));
-> +		WARN_ON(__host_set_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED));
->  		break;
->  	case PKVM_PAGE_SHARED_OWNED:
-> -		if (page->host_share_guest_count)
-> -			break;
-> -		/* Only host to np-guest multi-sharing is tolerated */
-> -		WARN_ON(1);
-> -		fallthrough;
-> +		for_each_hyp_page(phys, size, page) {
-> +			/* Only host to np-guest multi-sharing is tolerated */
-> +			if (WARN_ON(!page->host_share_guest_count)) {
-> +				ret = -EPERM;
-> +				goto unlock;
-> +			}
-> +		}
-> +		break;
->  	default:
->  		ret = -EPERM;
->  		goto unlock;
+> -	host_kvm->arch.pkvm.handle = handle;
+> -
+> -	/* Donate memory for the vcpus at hyp and initialize it. */
+> -	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
+>  	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
+> -		void *hyp_vcpu;
+> -
+> -		/* Indexing of the vcpus to be sequential starting at 0. */
+> -		if (WARN_ON(host_vcpu->vcpu_idx != idx)) {
+> -			ret = -EINVAL;
+> -			goto destroy_vm;
+> -		}
+> -
+> -		hyp_vcpu = alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
+> -		if (!hyp_vcpu) {
+> -			ret = -ENOMEM;
+> -			goto destroy_vm;
+> -		}
+> -
+> -		ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, host_vcpu,
+> -					hyp_vcpu);
+> -		if (ret) {
+> -			free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
+> +		ret = __pkvm_create_hyp_vcpu(host_vcpu);
+> +		if (ret)
+>  			goto destroy_vm;
+> -		}
 >  	}
 >  
-> -	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
-> +	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, size, phys,
->  				       pkvm_mkstate(prot, PKVM_PAGE_SHARED_BORROWED),
->  				       &vcpu->vcpu.arch.pkvm_memcache, 0));
-> -	page->host_share_guest_count++;
-> +	__host_update_share_guest_count(phys, size, true);
->  
->  unlock:
->  	guest_unlock_component(vm);
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 930b677eb9b0..00fd9a524bf7 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -361,7 +361,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  		return -EINVAL;
->  
->  	lockdep_assert_held_write(&kvm->mmu_lock);
-> -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_guest, pfn, gfn, prot);
-> +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_guest, pfn, gfn, 1, prot);
->  	if (ret) {
->  		/* Is the gfn already mapped due to a racing vCPU? */
->  		if (ret == -EPERM)
+>  	return 0;
 > -- 
 > 2.48.1.711.g2feabab25a-goog
 > 
