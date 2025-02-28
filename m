@@ -1,121 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AB125A334
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E584C25BAC0
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740738042; cv=none; b=b9ugsVrBzd7xmz6mhcJJdTxBpr4gZEF8lc3YxDITsFXdieIqt5f+/5j56VD2oA0TV+GW0Ax0NqI6Dg6wsUrL6SB384mGUcZN9zAjJ/XO5Tg4jAgxa+3ZOsA1Ec9m95VdHgO8jsVnWIVwjdMD/eHqybXF3WAyUiS03MegWbPCaoo=
+	t=1740738348; cv=none; b=RLqE6LOI+L8uf5by1N0Q36pqyri9VH9ww96zuh8w9ZdTiKvs3Dn6ZewQ6tWwJF+OihSreOqDeEv1KVxgjWxqSREKGoDOHBBFvbTH84aD98X9t+yspsCx1UD7STnvcSQTWu0GPiEaE4FC7OJbTBJPicMBoS4cg+oc238sDYhmWfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740738042; c=relaxed/simple;
-	bh=DlrJyqGlbTlAASX6CvC8BEd+irS6odxJiqxBLjq07Z0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ifz5jPMbp8xAmMPoO2LCArFkXXwYzK0bQA1Epp4M8YENIxoY6m1N12HqxWy58DitEX8PK0AdP1kDAm+4IueZghxub5oN0AVtHS/yeg8jVkyj8I280B1KjD6zaScxouW+vPmYmzKRShf9HMkKB99iTNT5hElwVYFX475mCbd4KQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcg1g2AH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740738348; c=relaxed/simple;
+	bh=BWZCnyWZRcFFgGDc2fMhBTLM/sH8dFOBJJTpn5YiH3M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N2BVWhZOrOX9kg/vsD0ZNdQkLUbC/O3Y7MHZCPmBVoBroUspcmM9dFXxDzC8EOHsrpL1Z8OSHCmjSOeHFKeHr2fFxD0wZ10azw5vKTGn3gFrsQvG4ywgRkNvn+fDLfDCq47/PAUzhzEFq8I0CzdQH4BozQgJYlTwiQoCTrZeX+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QLkDDINP; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jcg1g2AH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA8AC4CED6;
-	Fri, 28 Feb 2025 10:20:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740738041;
-	bh=DlrJyqGlbTlAASX6CvC8BEd+irS6odxJiqxBLjq07Z0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jcg1g2AHGiEdiXGgfXC0+bi/U+Jxfj958eyETbbOIqfm/WKA8ONpbhGOQgjwFRVKD
-	 ld3jt349EQ1hHerN/1TqqaJh1YK1v5G9po0XxavY3T8iIR2T7T+zLzz5gfFqUI/P+5
-	 wFj6M1rcqBRO5N6jrGgxTcAoynImxWDvsyxB3DdOqd7lHhRaTKSCOMlQEd//8EjHmv
-	 Lip1nMdJA8UDoaq8jlc+ZHBvP2vwXoEkoEe7lqQpQ6JSSJIYw1x4Q33q9Dqf1G5Wu+
-	 aAKZwOU42Kx1V618QDAdd1R/vblhD7qDN463jlvCrG76mTAIUAWC0SRJAO+Hhh3a4N
-	 Q0p1tV9YxGcAA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tnxTz-0090Qy-66;
-	Fri, 28 Feb 2025 10:20:39 +0000
-Date: Fri, 28 Feb 2025 10:20:38 +0000
-Message-ID: <86v7supdzd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Leo Yan <leo.yan@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	ahmed.genidi@arm.com,
-	ben.horgan@arm.com,
-	catalin.marinas@arm.com,
-	kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev,
-	will@kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Initialize HCR_EL2.E2H early
-In-Reply-To: <Z8GHclusYN3CX5m2@J2N7QTR9R3>
-References: <20250227180526.1204723-1-mark.rutland@arm.com>
-	<20250227180526.1204723-2-mark.rutland@arm.com>
-	<20250228092955.GC2157064@e132581.arm.com>
-	<86y0xqpfpj.wl-maz@kernel.org>
-	<Z8GHclusYN3CX5m2@J2N7QTR9R3>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QLkDDINP"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4394c489babso10872955e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 02:25:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740738344; x=1741343144; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yZiixOEWYaq9wXDNP/eyMuN3kYA78c0bj/N2a/BCkL0=;
+        b=QLkDDINPgZsLe4J9j9RT1Cu9LjunmjwN8awDd4OVoxtbJYkUSvekYtMYjczHZWfBIT
+         u2Rw8qTmAqEpfgvu0Hb19NYfuZGJDsFbfH5XZFID7fOvxVlYVayyxIARVlIZ1H0OTNql
+         DNsc580nVJWBhi2rc3Qq8YRbwnusYOFsnpQGBogTwbYi44LMzL2/I3CbaQoaDxIt+vno
+         LBsFd0L5D8peOBAjUKWXEcki0WDrcPsPa79zNn9qNfRiuT4mcg1E4zMp5iViro/NO3Ix
+         ph25thROl1iq1bGdpaCXZU3x8KLbMT9D6tIP0AsHf/1GPf+0hNTyUP0HUeFldMo3L+3t
+         AuGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740738344; x=1741343144;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yZiixOEWYaq9wXDNP/eyMuN3kYA78c0bj/N2a/BCkL0=;
+        b=ZKWnoPPRSoZt/u6M09H3MrEuWJMyu3UhtQKvMfgWZt6Gc67TfpLz5VptY7FtA02SP4
+         FlAY3mx9/g+58lJnZZqqOgSpRRbDiOYaAt31VCt+iSX0WUPn3EyOSAHloT7DwVOfeYwz
+         tLd/Wvy4JCXXg6z63A5+yQ8d86q9W1/Ig9Ub9ey3AaZ2fgfSktTAUeTTX+5Pl6VGBi7r
+         nhxkDmwTjgc85XLeJS0cdwXG9cHu7mawNQveIWH/YwoA41rvGZFtrhxpjwJ543c5nRAG
+         S/VcVkeLARnzgQy8hJL80gLc1aFx+JXlscKx0b1Ke2opRdvvQqf0Vzwt4nHRTgIBr8DB
+         CARA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhUbhFIJszZXq87YZmoIVuBYKLaDrrI7vR2kOzO/JqXxPX/OAzOtoqIaUxFwdCyqMf8wZnN0c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxhXQJy7Wi6Q/X6ysIle+883cQijBw8hgYOt9cGysItuj2Qq6YX
+	KYiH9/02z6IxR/np3pvnpgzI74jA1vCeZ4Vr53wqav6UHqJR7Fisj/JyEARTJXnRkYSI+UB41Rr
+	OQW95Ilarriz7LrMqQQ==
+X-Google-Smtp-Source: AGHT+IHep39Sd5eGh94BVx9flL1lcXtt9eAIYrt+u2ImlSXt8vPoiGgYIDF5HPduTl3nT7mvrQjfLoUwEOlBu9qB
+X-Received: from wmbec10.prod.google.com ([2002:a05:600c:610a:b0:439:804a:4a89])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:1551:b0:439:9f12:1809 with SMTP id 5b1f17b1804b1-43ba6766c16mr20538485e9.20.1740738344390;
+ Fri, 28 Feb 2025 02:25:44 -0800 (PST)
+Date: Fri, 28 Feb 2025 10:25:16 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, leo.yan@arm.com, linux-arm-kernel@lists.infradead.org, ahmed.genidi@arm.com, ben.horgan@arm.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250228102530.1229089-1-vdonnefort@google.com>
+Subject: [PATCH 0/9] Stage-2 huge mappings for pKVM np-guests
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 28 Feb 2025 09:52:50 +0000,
-Mark Rutland <mark.rutland@arm.com> wrote:
-> 
-> On Fri, Feb 28, 2025 at 09:43:20AM +0000, Marc Zyngier wrote:
-> > On Fri, 28 Feb 2025 09:29:55 +0000,
-> > Leo Yan <leo.yan@arm.com> wrote:
-> > > 
-> > > Hi Mark,
-> > > 
-> > > On Thu, Feb 27, 2025 at 06:05:25PM +0000, Mark Rutland wrote:
-> > > 
-> > > [...]
-> > > 
-> > > > +.macro init_el2_hcr	val
-> > > > +	mov_q	x0, \val
-> > > > +
-> > > > +	/*
-> > > > +	 * Compliant CPUs advertise their VHE-onlyness with
-> > > > +	 * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
-> > > > +	 * can reset into an UNKNOWN state and might not read as 1 until it has
-> > > > +	 * been initialized explicitly.
-> > > 
-> > > For ID_AA64MMFR4_EL1.E2H0 < 0 case, the code actually clears the
-> > > HCR_EL2.E2H bit.
-> > >
-> > > Hence, the comment should be corrected as: "... it can reset into an
-> > > UNKNOWN state and might not read as 0 until it has been initialized
-> > > explicitly".
-> > 
-> > The comment is just fine. It is the code that is wrong, as it avoids
-> > setting E2H when E2H0 < 0 while we want the exact opposite behaviour.
-> > 
-> > As a result, 'b.lt' really should be a 'b.ge'. Or the original code
-> > kept as is.
-> 
-> Ugh, yes. I got confused and got the condition backwards.
-> 
-> Either works. Using 'b.ge' is closer to my intention -- I found the
-> 'tbz' of the sign bit somewhat surprising and that needed a longer line
-> after the lable name changed.
-> 
-> Would you like me to respin, or would you be hapy to fix up when
-> applying?
+Hi all,
 
-I can fix it on the fly, but it needs retesting, as I don't understand
-how things could work in this state.
+This series adds support for stage-2 huge mappings (PMD_SIZE) to pKVM
+np-guests, that is installing PMD-level mappings in the stage-2,
+whenever the stage-1 is backed by either Hugetlbfs or THPs.
 
-Thanks,
+The last patch of that series is an optimization for CMOs using a shared
+PMD_SIZE fixmap.
 
-	M.
+--
+Vincent
 
+Quentin Perret (2):
+  KVM: arm64: Convert pkvm_mappings to interval tree
+  KVM: arm64: Add a range to pkvm_mappings
+
+Vincent Donnefort (7):
+  KVM: arm64: Handle huge mappings for np-guest CMOs
+  KVM: arm64: Add a range to __pkvm_host_share_guest()
+  KVM: arm64: Add a range to __pkvm_host_unshare_guest()
+  KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
+  KVM: arm64: Add a range to __pkvm_host_test_clear_young_guest()
+  KVM: arm64: Stage-2 huge mappings for np-guests
+  KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+
+ arch/arm64/include/asm/kvm_pgtable.h          |   7 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |   2 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  16 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 218 +++++++++++++-----
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  86 ++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   2 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |   6 -
+ arch/arm64/kvm/mmu.c                          |   5 +-
+ arch/arm64/kvm/pkvm.c                         | 129 +++++------
+ 11 files changed, 326 insertions(+), 157 deletions(-)
+
+
+base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
 -- 
-Without deviation from the norm, progress is not possible.
+2.48.1.711.g2feabab25a-goog
+
