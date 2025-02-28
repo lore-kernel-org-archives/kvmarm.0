@@ -1,94 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68CC267B95;
-	Fri, 28 Feb 2025 10:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DCB25EFBA
+	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 10:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740737362; cv=none; b=UjALymiJ/SSZygXKiFSLvfQXjvZ3kIP4za1pQdVDhn6ILLcQhTttOrY0rMtp/W3txgvix5jVEvuaHClJM53MESL8/Q+3umrYI2YDcpWE5sk26uDp6Q00GX2M89fVQW+BPd4KGk3+2pdg6PRsB8b9TDQ5URmlKTCaXiMuyXCW1OY=
+	t=1740737658; cv=none; b=dfrdfNC1/CDxDq+KpSN3rLcOuJCoGBrSs/LGvJIrHBagEz9yJVnA7V2xrMASXebK6CeTrHNW132A9f3+6ySpjNFCFOSnGxdbuR50DGI9X+Vi0H3DSrfkl900dLCaumDqNLfXlFeuo3Q2dxMU+PFYDJ3tvA9qDF/uUOG7IiTpF+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740737362; c=relaxed/simple;
-	bh=Facr8VMl5LemScuPD1UT8Mysu0cASXw1D4/knrpfQ/E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UWj4Pod1Nw3iSdb14JYle3A5LgmnTvL0nBJWN6xij2TytNf9YTzl7xtjHugNDfpSc4Uygadfa5ooHHXpDl4PcxJQGfG4HSwXwlxgiBSRdvMU3a4Cd1tNxacqh7f2ubs2ytapzfdEPxdqGy+9lKN7wxaOpG5N6PLZvpYcWUPUunc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pGZ6jfWf; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pGZ6jfWf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4566AC4CED6;
-	Fri, 28 Feb 2025 10:09:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740737362;
-	bh=Facr8VMl5LemScuPD1UT8Mysu0cASXw1D4/knrpfQ/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pGZ6jfWfjp5VEMwxsFenQbjnxdbKFtsnJASYWGB+Cg4RrwPQumnMynOlMyDiRLiVX
-	 cj2M5YAMaV8wLcebFF/iONmrfzJ7dhjUHoUCU0enaDhb3wwO6mtdJCOah0eu/lvjtc
-	 bTP5laVTDIT6W8qFZB8fnaDMkHRec62BgF0LZdAO/nvp5ilxXYalgbXuEQMAePOR7T
-	 7Fx7GlnGrRtP8M8FJ9+VXTeB4i2ADGQgFidKyPTjr+VF5AkWNH20hOUtmVtKp5SJgQ
-	 yqeg+Xbyx2WNPsX0IHMskWjh0Qmv12n3nveJXRlccL+WTfQSgUDF15Hii8ftNzA9Lx
-	 jlP76S20/DSZQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tnxJ1-00904q-Ru;
-	Fri, 28 Feb 2025 10:09:19 +0000
-Date: Fri, 28 Feb 2025 10:09:19 +0000
-Message-ID: <86wmdapei8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Sudeep Holla <sudeep.holla@arm.com>,
-	catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	oliver.upton@linux.dev,
-	snehalreddy@google.com,
-	suzuki.poulose@arm.com,
-	vdonnefort@google.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v2 2/4] KVM: arm64: Move the ffa_to_linux definition to the ffa header
-In-Reply-To: <Z8DxZY-09R6lwEW3@google.com>
-References: <20250227181750.3606372-1-sebastianene@google.com>
-	<20250227181750.3606372-3-sebastianene@google.com>
-	<20250227202557.d3fd6ylzbaho4pvx@bogus>
-	<Z8DxZY-09R6lwEW3@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1740737658; c=relaxed/simple;
+	bh=1wHUJlnA2J9ceqlZpRg96NnodH22XjBdYrS2WJ/LA5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DzC5WwBfTw3GgCv/dlvJ/dEemtEXM+xkwyfW0NvJIry9WBTU0Nh8cAmnyzvF3j6ZYycBhccK9fMPp5xdI/bSaGz/DEVyS6v8e1VXCrWpGnj6yH+lA2eL0mq1eRPXf2KRdIdA3yToHx7dXLFaJKlbWwdgJKETXOYKWr/fBkLh5v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C51D1688;
+	Fri, 28 Feb 2025 02:14:31 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.2.76.71])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F29493F6A8;
+	Fri, 28 Feb 2025 02:14:15 -0800 (PST)
+Date: Fri, 28 Feb 2025 10:14:11 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, ahmed.genidi@arm.com,
+	ben.horgan@arm.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev, will@kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Initialize HCR_EL2.E2H early
+Message-ID: <20250228101411.GE2157064@e132581.arm.com>
+References: <20250227180526.1204723-1-mark.rutland@arm.com>
+ <20250227180526.1204723-2-mark.rutland@arm.com>
+ <20250228092955.GC2157064@e132581.arm.com>
+ <86y0xqpfpj.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, sudeep.holla@arm.com, catalin.marinas@arm.com, joey.gouly@arm.com, oliver.upton@linux.dev, snehalreddy@google.com, suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86y0xqpfpj.wl-maz@kernel.org>
 
-On Thu, 27 Feb 2025 23:12:37 +0000,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Fri, Feb 28, 2025 at 09:43:20AM +0000, Marc Zyngier wrote:
+
+[...]
+
+> On Fri, 28 Feb 2025 09:29:55 +0000,
+> Leo Yan <leo.yan@arm.com> wrote:
+> >
+> > Hi Mark,
+> >
+> > On Thu, Feb 27, 2025 at 06:05:25PM +0000, Mark Rutland wrote:
+> >
+> > [...]
+> >
+> > > +.macro init_el2_hcr        val
+> > > +   mov_q   x0, \val
+> > > +
+> > > +   /*
+> > > +    * Compliant CPUs advertise their VHE-onlyness with
+> > > +    * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
+> > > +    * can reset into an UNKNOWN state and might not read as 1 until it has
+> > > +    * been initialized explicitly.
+> >
+> > For ID_AA64MMFR4_EL1.E2H0 < 0 case, the code actually clears the
+> > HCR_EL2.E2H bit.
+> >
+> > Hence, the comment should be corrected as: "... it can reset into an
+> > UNKNOWN state and might not read as 0 until it has been initialized
+> > explicitly".
 > 
-> On Thu, Feb 27, 2025 at 08:25:57PM +0000, Sudeep Holla wrote:
-> > On Thu, Feb 27, 2025 at 06:17:47PM +0000, Sebastian Ene wrote:
-> > > Keep the ffa_to_linux error map in the header and move it away
-> > > from the arm ffa driver to make it accessible for other components.
-> > 
-> > Do you plan to push/target these changes for v6.15 ? If not, I can take
-> > this patch with other FF-A changes in my tree for v6.15. Otherwise, it
-> > is must go along with other changes.
-> > 
+> The comment is just fine. It is the code that is wrong, as it avoids
+> setting E2H when E2H0 < 0 while we want the exact opposite behaviour.
 > 
-> Yes, feel free to pick them with your changes and we can push them
-> later.
+> As a result, 'b.lt' really should be a 'b.ge'. Or the original code
+> kept as is.
 
-So this series is not a 6.15 candidate?
+Thanks for correcting.
 
-	M.
+> > > +    *
+> > > +    * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
+> > > +    * don't advertise it (they predate this relaxation).
+> > > +    *
+> > > +    * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
+> > > +    * indicating whether the CPU is running in E2H mode.
+> > > +    */
+> >
+> > I think it is even better to clear the HCR_E2H bit first. This can
+> > avoid any dependency on the passed parameter 'val'.
+> 
+> What are you trying to avoid? A random value passed as a parameter to
+> the macro?
 
--- 
-Without deviation from the norm, progress is not possible.
+Yes, an unexpected value passed to the macro is a concern.
+
+If the intentaion here is only to set the HCR_EL2.E2H bit when E2H0 < 0,
+we don't need to cosndier other configurations and current code is just
+fine?
+
+Thanks,
+Leo
