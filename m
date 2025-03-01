@@ -1,133 +1,99 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2701230BDA
-	for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 19:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F894156861;
+	Sat,  1 Mar 2025 07:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740771895; cv=none; b=oT0snxY5NbAwAr9Ag2xEFV29xHcsX+EMjOpcwOEQMfz8XcSCQWtHL7gfJjDlgKK0QI0/u7x/KjjZ/FhXr2AS7VCSVFnRSlyk+mDYMArYQabJdBC10tVHiehsrlLMPbfsPbyAiKcQ0p/2yR4o14eYX7CP+dANEhHflwsuiWpLCjo=
+	t=1740812737; cv=none; b=Mh631iPbjJhaI7RKIZDFRJn8DMcteSxYfIjV0nI232s+VdrKj+P74p+f29TdgXvDlAl3ij/ClIpLIbJ4ZLd4oAId0C5GOVWUQX0HDDw1d5rKynIrRC0LjZQgdP0+Kl6+RaXfaaUb0oUgs60TPt2N3jMrQzIhASoojNhWWwuy75I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740771895; c=relaxed/simple;
-	bh=u9IIQkzUQEGboqOAA4jL0YNDhIcYZQ2UdKipOy/Sj3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QEYXPztVdKSkJx0q5y0sty3OdQTKtw9dy0fhB6kewGWUU2Ai6V0E6yYSroenwuTjyHocnJ6Z0hNcvHR+eEEms69Ks3NATxqYWIbuhKwRxXwbpSmVmw9yjYtWP/eXRW+dHWxfIlmy+9EqUWR4jm+8Jlwwd5pJg+FNHQn1/QwHsTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tq5hAZn3; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1740812737; c=relaxed/simple;
+	bh=+fhqb2OIeApH9GqBSR9/bHlgcwJ4dCJAUctYxXvGHYg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pxiMo1dmkmEBYkKtLkEb/PW+1oxAWT2JUrofIPgRGEl/m241xhM0VJeQNssioiAhAKVAjN2SO9ZzwHYF1K7bA0bmJqmNMcMgeD8YMdtwXfxb8yK49Vf7Nmb3LxuEfIGO4OuB6x/5IqEKfELyc2YnbYAYkrq/pRCEniz2MwB2Pwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZtZgzDe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tq5hAZn3"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abbda4349e9so348564466b.0
-        for <kvmarm@lists.linux.dev>; Fri, 28 Feb 2025 11:44:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740771892; x=1741376692; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GrxfhSQDPSEzY9FwMiMP3kLRUycgWmI45Gcv8VcIec8=;
-        b=tq5hAZn3lcDXC8/jhcf2Psiur1lk5MtNrwwYXDicqHwN5O34QNAyj6YUCNNEP/nEb9
-         aAvpQaTRs35OeveGcB09gEpbCQha47Wqsm8JSlpiGKjgHm85j5MNS0GzIrA7tXL+2SUx
-         OrQaSRFR6H8zhm/U9ssd5DzkufCy30ujqsejvSeY0UIEY0zySEGENDrrpT6SLALFFtNn
-         D34QEFiEn5stFszYenVV3A4XL4q6DDdXr4TX5xOnjtJunYI0BOHVLJAHIqmLkeFpes5K
-         JqMIJGQCRwZVfM45DyJY6lGHYBHBbhNS8O0vMSkSBybdYiYgAO4R7hQrriw+l5VL97fQ
-         UScw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740771892; x=1741376692;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GrxfhSQDPSEzY9FwMiMP3kLRUycgWmI45Gcv8VcIec8=;
-        b=vxAnfac8JwkfyKdSGu4E0DinTmHga+me2wC6M4pJV5wnRtwbXAQWqSevf1ExJr+b7t
-         L4M+QDWznUv+q1bKo28mmoODSFtQ5nrFnnW1wY2UvthU7W4oRubO3tudvsmBITAoHkJ+
-         jr6aQyC1DUHmIKa2gj/FDGZo2nyWbam67v6LmS1lkFONvPlsUgsTfQjhi5THs84p3Bwu
-         3RK3exRvs96CiknxI7yqrNYzxUjE5O197NuuME7B6WTMseArZUDJmWu81GXowlFjdA6I
-         dtFqtg8z56Tg754BY5Dh8h+K1WJqDNoqbIT7pfc9eXk3B1c9u/qP1jJjuJ9Qc3OecDp7
-         Dw1A==
-X-Gm-Message-State: AOJu0Ywu5p7KN4qT5/2bJ4fOjOPHfeZ87Si8kCYjPS6lPjaNUqvcIBka
-	tQUvj7fdKH47r9zel/qfXiAzr23FFS7EHUtvmYibgh3yFEpg/+F+xYTzwB4tkQ==
-X-Gm-Gg: ASbGncvnyE7WxMB80/MTwdWx391LppAxBJbTEOugD446GlnFHo1jSkR/riU/jEt7s+v
-	A2uk+P+bYRv0BtyrLFRCkFlT41HbDwc/Ha+u05GnYvjXn/1e6p1v1tz2Wygi11/EEa6GT5vaTGK
-	3L8vrTMNZnuK5OZpxjX/F3fGCwCUMA3C1s4OHjuH4zOWG7OCyRighMoBZy9p1teJhqWJYzStkwD
-	800vE0x5DkrZe9Qn4LpBw7EQbpBL/Mj7enxc0LpbBNdwWNOIicxnmQzpTPbMP9jpqqrJZYXnsC9
-	APO2LdFGaKbWocrhk51Eq9GkBTud2g2gC8J2niB2LmgmLuTJIUUnu1c5kkSDZzk=
-X-Google-Smtp-Source: AGHT+IHTdYieiZ2Aj4ze6pa8HY7tXwIhYVqJDu+daMOyke7B6a6VZw8tHVhi3y8YmBfQzTjNAAk15w==
-X-Received: by 2002:a17:907:9484:b0:abb:b136:a402 with SMTP id a640c23a62f3a-abf26424829mr475325566b.18.1740771891977;
-        Fri, 28 Feb 2025 11:44:51 -0800 (PST)
-Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c7c18a3sm335218866b.185.2025.02.28.11.44.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 11:44:51 -0800 (PST)
-Date: Fri, 28 Feb 2025 19:44:47 +0000
-From: Quentin Perret <qperret@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com,
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org,
-	vdonnefort@google.com
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Factor out pKVM hyp vcpu creation to
- separate function
-Message-ID: <Z8ISLxQRcsx2uuHw@google.com>
-References: <20250226215520.1759218-1-tabba@google.com>
- <20250226215520.1759218-4-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZtZgzDe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A97C4CEE5;
+	Sat,  1 Mar 2025 07:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740812736;
+	bh=+fhqb2OIeApH9GqBSR9/bHlgcwJ4dCJAUctYxXvGHYg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DZtZgzDeox7blJGzCTytvlYuN5NP0CFoYki+ophtf02ztIfhu/1AKHYqsWYIX2cxm
+	 Pmar+FfLsz6PzA/fxnXx7TimQN9YnfriWup5AChiRqpZObzVJ5sOEicRyNSm51W1id
+	 5bdDX+Znij/+CYescJwwOr+GEU2yrwc1AryFBAKf8mOryLBvFARkvBh9fC2uB4Wnwf
+	 zpFJFhCobDOZqSjO56dd1RNLIEcCnDD6br/mHEddETFd6u9kwQsxHwUe76tx0TAS+l
+	 vYX7rTUlSg0iroXbbpOhUzq8nGWWY21upMM+nL+rGjsXxdIeoWjGOv+gt2fMF0VUmR
+	 Qwccz0LEaUWMA==
+From: Will Deacon <will@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Leo Yan <leo.yan@arm.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v20 00/11] arm64/perf: Enable branch stack sampling
+Date: Sat,  1 Mar 2025 07:05:24 +0000
+Message-Id: <174080569248.3208873.17639032755999041028.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250226215520.1759218-4-tabba@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wednesday 26 Feb 2025 at 21:55:19 (+0000), Fuad Tabba wrote:
->  static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
->  {
-> -	size_t pgd_sz, hyp_vm_sz, hyp_vcpu_sz;
-> +	size_t pgd_sz, hyp_vm_sz;
->  	struct kvm_vcpu *host_vcpu;
-> -	pkvm_handle_t handle;
->  	void *pgd, *hyp_vm;
->  	unsigned long idx;
->  	int ret;
-> @@ -161,33 +178,12 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
->  	if (ret < 0)
->  		goto free_vm;
->  
-> -	handle = ret;
-> +	WRITE_ONCE(host_kvm->arch.pkvm.handle, ret);
-
-What's the reason to make this a WRITE_ONCE? Does it mean we should
-update the readers to be READ_ONCE()?
-
-> -	host_kvm->arch.pkvm.handle = handle;
-> -
-> -	/* Donate memory for the vcpus at hyp and initialize it. */
-> -	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
->  	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
-> -		void *hyp_vcpu;
-> -
-> -		/* Indexing of the vcpus to be sequential starting at 0. */
-> -		if (WARN_ON(host_vcpu->vcpu_idx != idx)) {
-> -			ret = -EINVAL;
-> -			goto destroy_vm;
-> -		}
-> -
-> -		hyp_vcpu = alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
-> -		if (!hyp_vcpu) {
-> -			ret = -ENOMEM;
-> -			goto destroy_vm;
-> -		}
-> -
-> -		ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, host_vcpu,
-> -					hyp_vcpu);
-> -		if (ret) {
-> -			free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
-> +		ret = __pkvm_create_hyp_vcpu(host_vcpu);
-> +		if (ret)
->  			goto destroy_vm;
-> -		}
->  	}
->  
->  	return 0;
-> -- 
-> 2.48.1.711.g2feabab25a-goog
+On Tue, 18 Feb 2025 14:39:55 -0600, Rob Herring (Arm) wrote:
+> This series enables perf branch stack sampling support on arm64 via a
+> v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
+> on BRBE can be found in the Arm ARM[1] chapter D18.
 > 
+> I've picked up this series from Anshuman. v19 and v20 versions have been
+> reworked quite a bit by Mark and myself. The bulk of those changes are
+> in patch 11.
+> 
+> [...]
+
+Applied cleanups to will (for-next/perf), thanks!
+
+[01/11] perf: arm_pmuv3: Call kvm_vcpu_pmu_resync_el0() before enabling counters
+        https://git.kernel.org/will/c/04bd15c4cbc3
+[02/11] perf: arm_pmu: Don't disable counter in armpmu_add()
+        https://git.kernel.org/will/c/dcca27bc1ecc
+[03/11] perf: arm_pmuv3: Don't disable counter in armv8pmu_enable_event()
+        https://git.kernel.org/will/c/4b0567ad0be5
+[04/11] perf: arm_v7_pmu: Drop obvious comments for enabling/disabling counters and interrupts
+        https://git.kernel.org/will/c/7a5387748215
+[05/11] perf: arm_v7_pmu: Don't disable counter in (armv7|krait_|scorpion_)pmu_enable_event()
+        https://git.kernel.org/will/c/7bf1001e0d91
+[06/11] perf: apple_m1: Don't disable counter in m1_pmu_enable_event()
+        https://git.kernel.org/will/c/c2e793da59fc
+[07/11] perf: arm_pmu: Move PMUv3-specific data
+        https://git.kernel.org/will/c/dc4d58a752ea
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
