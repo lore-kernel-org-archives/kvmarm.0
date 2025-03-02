@@ -1,71 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B341D63F0
-	for <kvmarm@lists.linux.dev>; Sun,  2 Mar 2025 23:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7131EF094
+	for <kvmarm@lists.linux.dev>; Sun,  2 Mar 2025 23:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740959052; cv=none; b=ClRfP7p0WyTAj3lQSBncx58u/rqX/Qn/7eo8kGI3JTA5n1zIoqoI//5ExglO4c+2E7oGaxXQrCLvVisrjXg6+3lzYt0NVSKo/sHmElae0VItXjq0YbksII8FE4fNFI3XWSez5JhA6A7nd4NIbycDnygCt4encBkW4jQHv3g5jM8=
+	t=1740959554; cv=none; b=FKlcYc7L9l8U0Wm4KwPO+/oLManQLgd0fyX5gHGDrQ6EI26wwdT9N4zz9rZ/e+mO7PhXU+itGxIbaB7BDZMeGnaogUMdOWDHjJV+tgDsf3kAgJY53C6Qu+/j3iVJQIpx0tWjZB0IZyBX0SV3IivHNqpboCyf+zsKIPq4Du5Nj0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740959052; c=relaxed/simple;
-	bh=sTCLWPm34augivVf+k+p8TpTc7zDld5RdFOwiFSrPQY=;
+	s=arc-20240116; t=1740959554; c=relaxed/simple;
+	bh=ZCHiDYAhlovsWxCqC+x+dRnRzJjE1HzBfBSQe8cnIkU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h9YTLfAlwcn+LiExx8Yc5la6ZSffYqhOkQkJiiymV55Dny9FkOtC6PVKLLd7Ybs8dwYQxrPQnAdEBZNz/csBIu76YwEJ8PMpcP4TT+WVoJwdiYvYfG9zny2EqgcZk8Vy6vqVlNDYd18s9B33lwWtOj8mAwGOnnM7d/Vw8CWM6Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Df6jXvrj; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Oj/5BzOhffCp3PAgzjFNrAjpFGqnevXlLaltRxmThVLnXSQcFWGG5M2y0DnxqsdEHgU0Qf9mm5Zcelu+SauwdEU9QJc4sU3Tt7Nd0fB9TsSnckgUdl/a2a8/hP55oC5BiBjBYHuzWKS0ClQbVNhOPsRgACjOY34LIx5QU08LfKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Doz5BwjL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Df6jXvrj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Doz5BwjL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740959048;
+	s=mimecast20190719; t=1740959551;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=apls3JT829ifJDsJne75u3rNFMkdEv5XlW99N9rTPso=;
-	b=Df6jXvrjNDQhgqOT9ofv/P/pA9aHYE+poC2u4WOBDkFTXGelav5mzV6/GJOVHk+3n9HAwE
-	aAaDy9nnWWgCbgYku62i1aesZeNifyAkbP2R0K3HYNRSk8JN1a6TD7hOok+JrtLKTd1Xs8
-	eBtuC+9ggwfLj5Lid9ftX71CUCEo3Hs=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nYg5YEi6qBDiPq4yW7kt5bdYtpCwTDMo82ocwV6poUo=;
+	b=Doz5BwjLsIwfzUhtqcTusDh4gUdrgsnnkGYAqURwTKf6RJ+VMbtdaA8xF729/GDa2APeEF
+	jJRLoDCZFUhKtvKIdKRkLRsyYSz+faudXU0eVPZs+WDB8lvaJdTvH+ShfoWPKza/uKbRJ1
+	U2qafmIdtg/p5NtYRXVcYZItmQcXSTI=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-267-7qyd0PCuOKO7uwBWzYQCLg-1; Sun, 02 Mar 2025 18:44:02 -0500
-X-MC-Unique: 7qyd0PCuOKO7uwBWzYQCLg-1
-X-Mimecast-MFC-AGG-ID: 7qyd0PCuOKO7uwBWzYQCLg_1740959042
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-223551ee0a3so89572395ad.1
-        for <kvmarm@lists.linux.dev>; Sun, 02 Mar 2025 15:44:02 -0800 (PST)
+ us-mta-619-fRd3_ubEN2mkN8-D9Z-iRA-1; Sun, 02 Mar 2025 18:52:15 -0500
+X-MC-Unique: fRd3_ubEN2mkN8-D9Z-iRA-1
+X-Mimecast-MFC-AGG-ID: fRd3_ubEN2mkN8-D9Z-iRA_1740959534
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2feb4648d4dso10756373a91.1
+        for <kvmarm@lists.linux.dev>; Sun, 02 Mar 2025 15:52:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740959041; x=1741563841;
+        d=1e100.net; s=20230601; t=1740959534; x=1741564334;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=apls3JT829ifJDsJne75u3rNFMkdEv5XlW99N9rTPso=;
-        b=Dc7qwaISIFgLvWH9ytph+BW0OmR1vwuuEbvDuoM52eh8WcJLZf1gbtMGnWG3ttE+zR
-         Uu+wkZ4wSnWj6qZYOpYUlNrKEIJ7qZa3HH9beBCdFXNFV1VFJ/GZjbnHAUl+TlGhz5we
-         HKxJD1fEd9aej322ekO9QLa/FndPgUSbTpBbBjAbASSzAV97I2jtrpR4NxAsGPOuDn77
-         BMB4LCOtlfVXE3uVkT+5R1U/TE+VMmHhGuvUycbICbJWget0dZnj2pe2k0M/B0bgM+dR
-         jE4iX7Hh0xg61XrKytcAMRoDE7oshnUh9oSl9w4IrXiMis4mHBdDyQCFs77vjK5A1I5N
-         vX3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWXbblwvYOyw59oMRHtKTBH17BniDW4dKGEZDG436CB/pU9cY/1iPLcYZ90zRm7PESHWvxeoi8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyW32CJeT0DCqqGY/vxVtcrQPoDMfqslciiETu5bKjlB8+UI8ag
-	QwwNxnEhZUiFawm2c1J8OuyjIufYxiPSW8+Jh/9o5GQoh+QvruuegNaNWN0bV+Du6kqfbSCw+h4
-	BDop9ShPXXHlARBjnGxWTszg2jsauzTvy10quDkredoZ3yTpA5UTaXg==
-X-Gm-Gg: ASbGncsmJWQayDqemzhwjo6BgOXig3xPd0X8uI2sHmOCbk+ENQMaxfhHAKQY50Gi94X
-	AEIFpw63wKoq7MADUboLoTUeJPShcE9A/aPdgolRyOrhGnyZmibCviGQi9KUpE75UehzStnJaIt
-	fsUPKhfHyUNBAzN3IrRTEHxm3JSzcQZTvCBcrCZIaSB1amsDr7FUDo5guzUp7wEiaAk9X/icUiO
-	R1GS2r662OgBEvcSw9kGJD4SXj5zh13uEGtjDwKK3T8vxTZIoc0c+4MiL9IHCsnmrJjInpvBIer
-	01bbWA/JaCHRGQnrkQ==
-X-Received: by 2002:a17:903:1252:b0:223:26da:4b6f with SMTP id d9443c01a7336-22368f74891mr183107385ad.14.1740959041707;
-        Sun, 02 Mar 2025 15:44:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGFYssys7UGoPXMBxe9bSswsi7jbUP9yKeJMmGxQGuBfHCIW8f2mxFgGu/EUcQbiuyd2gk6SQ==
-X-Received: by 2002:a17:903:1252:b0:223:26da:4b6f with SMTP id d9443c01a7336-22368f74891mr183107165ad.14.1740959041447;
-        Sun, 02 Mar 2025 15:44:01 -0800 (PST)
+        bh=nYg5YEi6qBDiPq4yW7kt5bdYtpCwTDMo82ocwV6poUo=;
+        b=fb9fqE9gIt7pKEQEipJCDv+rvi4DYJib//ew5xkya+AMRglbGQKymafwWmdr0kBtOs
+         xKznu3wA+7yMEqjJpqKpvtia2NhSXioP7vm1Eh8bYncrEjkTvJVrJV6EiA9U8aijgTJg
+         DuXmaggqRDNEtVpHQUQmRkLEP5BMGiIX4RDLuU2ZhcirPEKBtv9vuQvIBEffZvXxzyrZ
+         uTeD4j0+Ps63NWMU99Qz1MhJCyfFJCn26dVZs2RHJl/9t4+VfSIiZVlheTqaesJp36uR
+         W6HGsneMqSVlYWCq+IJULNq+7DvU4b+aVS7+a+fLlwfLqeCn2UNjpfo0bsA1qDFN+o6K
+         j2KA==
+X-Forwarded-Encrypted: i=1; AJvYcCWwbW0DJYcHc0A80C/IwRspCamvxyuo2GqJBNG6YqJymPCJRrOaOMYwxUSy0i3B4CsQkxvGUvU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzqPM71sTFJ5yaQl2ClNGbmzB7q+irN9xk0vQ3xi4v7ZWZ61arE
+	WdW9++u4266HWuy0bKezMB78ChrdUxAjoChaFuWXK9H62LDRIDoyOd5NS8GgwqimemNnXzBMz/i
+	G2uEb+HxdAYFgZG4LXEAZMUA25/YDAmqyjv12r7dR+2D3e/F/Due4GQ==
+X-Gm-Gg: ASbGncsdVe+b5oM6aVs3x64Wo1smCRttrAUoR/JdjNSzmaXoghCoGbBcATY7M+da/9S
+	YRNeKzxOmFgyHSS0rtjtsOS+O2Y0a1RolPc0S8lW4aShX5lWeL3Rpn3bS0WXWa2AlH1wadQ2c+O
+	tZ6lItNgy5u5nTxBXouPEuU9IZzPiKHhtd5ot3LK9hhFuQ0YaJKYLf+kykZT7HfLwC12SzqZ9Tt
+	Ry65naEUYycWL3o4dS9k3/7YDD0BcyMqmEF+rIs0Yv3TEWiiCbagZPVAe2R3o/+gmNnn6WwpuJw
+	TsoFTqEAwIad14aXDg==
+X-Received: by 2002:aa7:8589:0:b0:736:2f20:9d1 with SMTP id d2e1a72fcca58-7362f200c33mr9917261b3a.23.1740959534556;
+        Sun, 02 Mar 2025 15:52:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGKlHkk3X/xMjFSbabboBMi1iDhPso9R9B1xGAoC3vDIC/hJIAYOgl7Zpu+TUw2ZN+RUI7UGA==
+X-Received: by 2002:aa7:8589:0:b0:736:2f20:9d1 with SMTP id d2e1a72fcca58-7362f200c33mr9917245b3a.23.1740959534256;
+        Sun, 02 Mar 2025 15:52:14 -0800 (PST)
 Received: from [192.168.68.55] ([180.233.125.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501fd28dsm65811695ad.94.2025.03.02.15.43.54
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-734a003ec7esm7554622b3a.153.2025.03.02.15.52.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Mar 2025 15:44:00 -0800 (PST)
-Message-ID: <9dbebd7b-b441-405d-8c45-0dfa4d3df9e3@redhat.com>
-Date: Mon, 3 Mar 2025 09:43:52 +1000
+        Sun, 02 Mar 2025 15:52:13 -0800 (PST)
+Message-ID: <7c217ce9-588e-4e4a-b395-2cd5d014487e@redhat.com>
+Date: Mon, 3 Mar 2025 09:52:05 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 03/45] arm64: RME: Handle Granule Protection Faults
- (GPFs)
+Subject: Re: [PATCH v7 04/45] arm64: RME: Add SMC definitions for calling the
+ RMM
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -90,36 +90,88 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-4-steven.price@arm.com>
+ <20250213161426.102987-5-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250213161426.102987-4-steven.price@arm.com>
+In-Reply-To: <20250213161426.102987-5-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: HorzmspG-Vb0f447qvNcmysOVc_QaKGhT_IYO3wThGU_1740959042
+X-Mimecast-MFC-PROC-ID: yzpUZGpQxpz7xnUZV1WdPN-5D8JAShpUxITWSZf-uXM_1740959534
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2/14/25 2:13 AM, Steven Price wrote:
-> If the host attempts to access granules that have been delegated for use
-> in a realm these accesses will be caught and will trigger a Granule
-> Protection Fault (GPF).
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
 > 
-> A fault during a page walk signals a bug in the kernel and is handled by
-> oopsing the kernel. A non-page walk fault could be caused by user space
-> having access to a page which has been delegated to the kernel and will
-> trigger a SIGBUS to allow debugging why user space is trying to access a
-> delegated page.
+> The SMC definitions are based on DEN0137[1] version 1.0-rel0
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
+> Changes since v6:
+>   * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>     these are flag values.
+> Changes since v5:
+>   * Sorted the SMC #defines by value.
+>   * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>     RMI calls.
+>   * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>     number of available list registers could be lower.
+>   * Provided a define for the reserved fields of FeatureRegister0.
+>   * Fix inconsistent names for padding fields.
+> Changes since v4:
+>   * Update to point to final released RMM spec.
+>   * Minor rearrangements.
+> Changes since v3:
+>   * Update to match RMM spec v1.0-rel0-rc1.
 > Changes since v2:
->   * Include missing "Granule Protection Fault at level -1"
+>   * Fix specification link.
+>   * Rename rec_entry->rec_enter to match spec.
+>   * Fix size of pmu_ovf_status to match spec.
 > ---
->   arch/arm64/mm/fault.c | 31 +++++++++++++++++++++++++------
->   1 file changed, 25 insertions(+), 6 deletions(-)
+>   arch/arm64/include/asm/rmi_smc.h | 259 +++++++++++++++++++++++++++++++
+>   1 file changed, 259 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
 > 
 
+One nitpick below, with it addressed:
+
 Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> new file mode 100644
+> index 000000000000..f85a82072337
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_smc.h
+> @@ -0,0 +1,259 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2023-2024 ARM Ltd.
+> + *
+> + * The values and structures in this file are from the Realm Management Monitor
+> + * specification (DEN0137) version 1.0-rel0:
+> + * https://developer.arm.com/documentation/den0137/1-0rel0/
+> + */
+> +
+> +#ifndef __ASM_RME_SMC_H
+> +#define __ASM_RME_SMC_H
+> +
+
+#ifndef __ASM_RMI_SMC_H
+#define __ASM_RMI_SMC_H
+
+
+[...]
+
+> +
+> +struct rec_run {
+> +	struct rec_enter enter;
+> +	struct rec_exit exit;
+> +};
+> +
+> +#endif
+
+#endif /* __ASM_RMI_SMC_H */
 
