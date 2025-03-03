@@ -1,63 +1,63 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D351D9A5F
-	for <kvmarm@lists.linux.dev>; Mon,  3 Mar 2025 09:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B239F1EF370
+	for <kvmarm@lists.linux.dev>; Mon,  3 Mar 2025 09:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740992597; cv=none; b=Fz8EUs+UlETwr4EgJA6p1WwxKHnPsk+5dniA3mYBxt+g6shWTBYDvjtOYXPKFLYA+IuSoduEwbd7kjROolh0eqvuX+1+fXfDbTl6UR2Z8kBAQ3hwFM2Zsi3b+HISiLyFv3nDUMC7094b8gPXiBbykUfvbXNHbWcVcS8iA1SVz7U=
+	t=1740992938; cv=none; b=aYLe4VElYarByaVbDcR4fHLv0BhtV7+v8/51cyoGU1vgXP/wzrvb2owlOgT7vLK5nkQYMhdYLYtw5KybU+V1Ur1dON6dwmQw5HD77aJ2fKoKDEWv//tE3/+Us9iP4jeigj/hXDARCH2WdOICT4rw4wKhT8k3u/+mhYR1O4119Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740992597; c=relaxed/simple;
-	bh=idc8/NACOix78GnnSHuzlC9mQg3lcaqnvWb9GYuGSuU=;
+	s=arc-20240116; t=1740992938; c=relaxed/simple;
+	bh=5qkLkijq1aHVBAJe+pKnmmcboRU43L52rr+dVfewpTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UorEGdrEg/8dONsKmKZhzpg65Hfeac8PhPuBtWJG31YJ5Q7mfqr3S5I01XnsoI5rTZ5lb16g/PHd15b8WnGANNBVXr2nd+U/K6eFDO7IN67+N/vJdBbPvCl/HO38SAxKwmTh/hnbw4hn90thndcygViRa+NgBQhfqc6VJPiZL8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IIYVb5Up; arc=none smtp.client-ip=209.85.128.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=WIcJgsDboe8UUn2XknllOzP9JnO9sFPEcS0hCvbegMU8Le3C5+drPt7Tn5gujQJQ3Et4YjrHJuRd/tHcOk2Fwz/hPzhAJF+55Yg2uLLFr+KOzxc21/c25Xr2VdwP0tyCQKRkqL4iTu28j57OcpitKEoKrDbFzsv9ubQB/5IU05w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iUZpmqDB; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IIYVb5Up"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-439a1e8ba83so39389175e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 03 Mar 2025 01:03:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iUZpmqDB"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38dcac27bcbso3535296f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 03 Mar 2025 01:08:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740992594; x=1741597394; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1740992935; x=1741597735; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fnE1WKL8B2Bxfl1xiklk44H12/SEhBZrUiboyYR/TqM=;
-        b=IIYVb5UpP6ms0YH+Ni9C8hYPKC1KTKgKqwKFULVEakMzZsIATsGYe6AX65t7amvLkc
-         HgYAOmjZKLMIANHwWe/uXd8hC9Ze/49xfrov5Hd1mB0VUBvIZSCGanSfsxkGdJzLn/pi
-         +LgmCIihkzb5lYDYk+3JwBQYJyIvNU1GFGRgQUw1d0xqVB+GKwv7OwjTeZ5iytKXyAXx
-         /3/XicFd1ShMYXyZvyYuWaduhhd/ewInLOFYyqHg7HyiuAx+WGspHHX6vGtdiojxSs/d
-         glNgv+G0ZCOKieTx6JaGS2Xwd4EgoNb+cXnluYpNF7tsLa2x5X0rwUGoUhcGTBy9YCcf
-         L3QA==
+        bh=73r+pPBFPmA5vexT3Ec5rGd49/E5Soa5Y1/Qzc7kIO4=;
+        b=iUZpmqDB0WHVSlNczOIp8ukDSyLkVv+P+nqfWd4QIYFpxafQAksdvO/2HohMCHOMIU
+         JdAO8ikTJlgu1N2DTLIukO1VeRB6LpnGu4nPzlR2bJr6YsgtvdshjJHifI4tfZptRdal
+         MQYzCeR73zmTASRJ2iT8WIXkCzp4Uzuj67tekyTZyrsvidGJp9KUaUASBLt9gmBhTEUF
+         zeDmkJR/JzraChgog8O8RfvETNa+4693js9aoUgtGZojANW368zwtLhVJkzuuVOK2WFh
+         6+A1LwIdZx4knmqGJztTScUnDPieOYfYs4RFkLsCzbF8oVtPxgav+ZEiOoz/GQ3oLC4C
+         5nxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740992594; x=1741597394;
+        d=1e100.net; s=20230601; t=1740992935; x=1741597735;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fnE1WKL8B2Bxfl1xiklk44H12/SEhBZrUiboyYR/TqM=;
-        b=sWmQLdiLpBvhaQV2Y6ntdOb40v7h01bUVP/qgbsPLPMskIRJx5C9QATggMviTm9dWU
-         56Wny38DkqWaxgTMTZKgg3Sfelu0fvCuPwJZWLd46j9G5MJvsl2xDijY5ccoVIH20qAg
-         519OZWJb6Mn8+u0iX1Upp3yW6tD4YllLcYHSd8pxLM9LcuBLItx247Kv5/lz67lpADRn
-         +WVsUoXO0Ncqdrm6ijUi+KdY+ERxAtwL6BmCYxw3dCIF3lXJzOPsHXe8pWhRAPfBPELW
-         GsJrBCtQRdw/GvS4P3FlovnAabsARTtBP8AmPGpN1ipnvEsphbhWUBbMnRp4LMEYS47c
-         4BEA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNVHJZ/7ynlFM06IrJMJxDv3WdC56ALqvmZWZmDJjuAlKvoexMo3bnv8rz+0HKpBUdC/31DjI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxy5LoVCea92XVPCl1+ZW+DVljXSzVwYgG/jf0tg+kj+BoUKCI8
-	nNuW5qgcxR4F1s69oOfEmpq1eody91XQrwJeUYvVuWQLU1aZZz9TNbtxBI1v5Q==
-X-Gm-Gg: ASbGncuI1JiHeHQ2gLMuqUhutv9yo71idRXs0VF2rWjKr5TYwmqmv1eEhdOU7GxOGs2
-	C8d1r0Tolmpe4cjmb3IeyUg3yMtIiTQUWC1QS/R0a8Kyvw/JUTiYDhZvhRS0r2jiezexYpj5hsL
-	kGVYzzNwoa8jpnpOFz/G0epkHL5R8/+qhhbqSCHzTBKwj10iPOlNscp7d1EvmYy4g1VrmLyxTqf
-	4qkccwr8pmOBxeeX2LPwQjMLpjow1JuU0RRyxOjuCq80K8vzCcXZLdhG/77KkrZfsfWD/24jC2C
-	oJC3o/2OskTddJQo5tAAuYewimZuI3TkWhRvbmMi9bmZmkDIm4Cgqijn3L0W+WmiO6R236DxVcE
-	Cfm/1yX4kh6YU
-X-Google-Smtp-Source: AGHT+IGmAnvr5WwwGoSHGFphkhVZV6m70wz82I4YVRSVF548RcAtlCMZxGhqjzzDdhfLipt7qPEkPw==
-X-Received: by 2002:a05:600c:a45:b0:439:9537:e96b with SMTP id 5b1f17b1804b1-43bb60464acmr37468755e9.14.1740992593951;
-        Mon, 03 Mar 2025 01:03:13 -0800 (PST)
+        bh=73r+pPBFPmA5vexT3Ec5rGd49/E5Soa5Y1/Qzc7kIO4=;
+        b=Ry8xJRCvux56tYRj0P4keaYdisfAB5OHUBCwknoVu3KJFVokJTtnhhAHgc+VTH6jOZ
+         5Mmhz5G6kcDEaDixhGBTzHhPyij2SKxD1Amk5qe0+mpRpgF30ihs8Ev4wgrzdp+wKdPw
+         PyfX6DbR15upPTaaHdQvwuzGTkhhnaNhjHqQ4IU5HTfOa0EX44WEMYZggFj5565DF1M8
+         plPW3XuHncaprclSZ+U61oQsWlxDhutbn/1E+yB7WNb67v/72l2kV0mByegx3p8BUo02
+         2Ar2rYxocGC/gowT+Vje/6R7r02hWevmIqgCOKEw8wSKrVASukOXJMQQTJrQ+SKLdTHv
+         5/AQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4FrdPUZhu3C45WX4mPacLz9nVfFacsDlx5ZmUOkXjj2mQKyOn4vH0g8he4yH/+9kcU1ykHIw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyaVuXsMy3dslwH2lsCQW0Xxo5NgMrInHrJSao1k4CooEjImp5F
+	CPgxowJsJPCyuc77M5MuBiy34UJXHEiwUZaKnWFVHDalOUAkYmXVfUWVEc3PgA==
+X-Gm-Gg: ASbGncsAcK7U5WbFi7BRW8ZXRJXv/NZZm9TeEFb0XK15sgY/do0ByjhDkaaSeG/50p6
+	Vm5m3pGEoaZa1jVykazNWaICdCd5u2PHSAswgBb1rag8viZVGOadRxf8iCMJq+bZCDblatR2pWG
+	Sx4/JQIyEwrta+egBtM9KdSai5XlqexdRBxJHU7NDlaqosd00g7kyfTZucXgO+joTKEBJUgEoU3
+	pW4BElI/a250FawbdaTd8xBJKIjgvsg12VIi+4312owlrVwxtN6I1b2YniA+9/4b+AutEzX7o/S
+	iKQE6YzWyoN83HS1mwLC4fsY/IqxDQ6TRjzvI/RN2smNWq8Rz7XAgKsrclDkkYeXPzuJNJxu6K5
+	89aKK8Q3K229V
+X-Google-Smtp-Source: AGHT+IFulJGyYMQXTykjX7NCa+Iy43Ll73kEXzRosIE/q2QvgywumoNWk3nbePvrLXe4q9Ef14rB/g==
+X-Received: by 2002:a5d:64cf:0:b0:38d:b12f:60d1 with SMTP id ffacd0b85a97d-390ec16ad09mr11136503f8f.26.1740992934969;
+        Mon, 03 Mar 2025 01:08:54 -0800 (PST)
 Received: from google.com (105.168.195.35.bc.googleusercontent.com. [35.195.168.105])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43aba58713bsm186635635e9.34.2025.03.03.01.03.13
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e47b7a73sm14106715f8f.50.2025.03.03.01.08.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 01:03:13 -0800 (PST)
-Date: Mon, 3 Mar 2025 09:03:09 +0000
+        Mon, 03 Mar 2025 01:08:54 -0800 (PST)
+Date: Mon, 3 Mar 2025 09:08:50 +0000
 From: Vincent Donnefort <vdonnefort@google.com>
 To: Quentin Perret <qperret@google.com>
 Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
@@ -65,11 +65,11 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	catalin.marinas@arm.com, will@kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 2/9] KVM: arm64: Add a range to __pkvm_host_share_guest()
-Message-ID: <Z8VwTf8nMvRNjgU_@google.com>
+Subject: Re: [PATCH 1/9] KVM: arm64: Handle huge mappings for np-guest CMOs
+Message-ID: <Z8VxotNAW9CLogum@google.com>
 References: <20250228102530.1229089-1-vdonnefort@google.com>
- <20250228102530.1229089-3-vdonnefort@google.com>
- <Z8IJRpoQUoGazLku@google.com>
+ <20250228102530.1229089-2-vdonnefort@google.com>
+ <Z8IGcA6h6hZx7ujh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,52 +78,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8IJRpoQUoGazLku@google.com>
+In-Reply-To: <Z8IGcA6h6hZx7ujh@google.com>
 
-On Fri, Feb 28, 2025 at 07:06:46PM +0000, Quentin Perret wrote:
-> On Friday 28 Feb 2025 at 10:25:18 (+0000), Vincent Donnefort wrote:
-> > +int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
-> >  			    enum kvm_pgtable_prot prot)
+On Fri, Feb 28, 2025 at 06:54:40PM +0000, Quentin Perret wrote:
+> On Friday 28 Feb 2025 at 10:25:17 (+0000), Vincent Donnefort wrote:
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 19c3c631708c..a796e257c41f 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -219,14 +219,24 @@ static void guest_s2_put_page(void *addr)
+> >  
+> >  static void clean_dcache_guest_page(void *va, size_t size)
 > >  {
-> >  	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
-> >  	u64 phys = hyp_pfn_to_phys(pfn);
-> >  	u64 ipa = hyp_pfn_to_phys(gfn);
-> >  	struct hyp_page *page;
-> > +	u64 size;
-> >  	int ret;
-> >  
-> >  	if (prot & ~KVM_PGTABLE_PROT_RWX)
-> >  		return -EINVAL;
-> >  
-> > -	ret = check_range_allowed_memory(phys, phys + PAGE_SIZE);
+> > -	__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+> > -	hyp_fixmap_unmap();
+> > +	while (size) {
 > 
-> I'm not sure it is safe to drop this check here, see below.
-> 
-> > +	ret = __guest_check_transition_size(phys, ipa, nr_pages, &size);
-> >  	if (ret)
-> >  		return ret;
-> >  
-> >  	host_lock_component();
-> >  	guest_lock_component(vm);
-> >  
-> > -	ret = __guest_check_page_state_range(vcpu, ipa, PAGE_SIZE, PKVM_NOPAGE);
-> > +	ret = __guest_check_page_state_range(vm, ipa, size, PKVM_NOPAGE);
-> >  	if (ret)
-> >  		goto unlock;
-> >  
-> >  	page = hyp_phys_to_page(phys);
-> 
-> Phys really needs to be a valid memory address here for 'page' to be
-> present in the vmemma -- dereference right below. So we can't rely on
-> the check in __host_check_page_state_range() sadly ...
+> Nit: not a problem at the moment, but this makes me mildly worried if
+> size ever became non-page-aligned, could we make the code robust to
+> that?
 
-Haaa you're right. Sad to have this double check. Perhaps I won't use
-__host_check_page_state_range() then.
+The fixmap doesn't handle !ALIGNED adresses. (I have a patch in the tracing
+series to cover that though). So wonder if that really makes sense to handle
+unaligned size while it wouldn't work with unaligned va anyway?
+
+Perhaps just a WARN_ON() then?
 
 > 
-> > +	ret = __host_check_page_state_range(phys, size, page->host_state);
-> > +	if (ret)
-> > +		goto unlock;
-> > +
-
-[...]
+> > +		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> > +					  PAGE_SIZE);
+> > +		hyp_fixmap_unmap();
+> > +		va += PAGE_SIZE;
+> > +		size -= PAGE_SIZE;
+> > +	}
+> >  }
+> >  
+> >  static void invalidate_icache_guest_page(void *va, size_t size)
+> >  {
+> > -	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+> > -	hyp_fixmap_unmap();
+> > +	while (size) {
+> > +		__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> > +					       PAGE_SIZE);
+> > +		hyp_fixmap_unmap();
+> > +		va += PAGE_SIZE;
+> > +		size -= PAGE_SIZE;
+> > +	}
+> >  }
+> >  
+> >  int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
+> > -- 
+> > 2.48.1.711.g2feabab25a-goog
+> > 
