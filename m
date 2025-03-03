@@ -1,292 +1,100 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82017214A8A;
-	Mon,  3 Mar 2025 18:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D21C217F40
+	for <kvmarm@lists.linux.dev>; Mon,  3 Mar 2025 19:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741024983; cv=none; b=Cfp2EJx53hgLSEDTwsWaN8G7mUJzNbo7jGh5KYSXV9amlgPEJIvFN/aN9PzAhGlwynP5SHgINTZaESgQBugBhWkHTIwZCYqVQsE6AaLihmQqVl344Wt+dnPi6iQGNrHr3SAPUghqbv8KXsDrhbcDFWkhfdFmxcdig1/U7bUFlC8=
+	t=1741029499; cv=none; b=moO1DU9eJdZM96CX53UpAzgvI1SEWruZjqzW7RyY5BiTT1rCi+3YxnvoZdbyw8OAAMpChKxuCNTf/lYE7ixo+LsOeDSOEHdbgBh1FTL38E6A1/sRCB7dkrydqW/Unq0tCYV+Shv4MU4wmdR3ySEf3/0dezUUUbvqPKJKeqR22m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741024983; c=relaxed/simple;
-	bh=mgRL3HyqLWU5AzgennCHg4W7U29GH2XuXFK+qAFAGH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nZGRUt42uIsEriGlA9/YUcsmEpHiaqHPSxUPfZjoOhhHV/8y8tWn8f0jcVDUkZ/yIC1oBPxCNmb96nEVgssZrU006ZKIgDRnN2q9Gi4Utt5AtPt/4H9S3nQm9kieSIgEYITWCIoBon8BCOQ34KkEmcL8X9XP7D/QmpQ0sESOIzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE804106F;
-	Mon,  3 Mar 2025 10:03:14 -0800 (PST)
-Received: from [10.57.37.67] (unknown [10.57.37.67])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 32E5E3F5A1;
-	Mon,  3 Mar 2025 10:02:57 -0800 (PST)
-Message-ID: <6a7bf3ea-6f9b-4f8f-aa23-9a75a7c2e190@arm.com>
-Date: Mon, 3 Mar 2025 18:02:56 +0000
+	s=arc-20240116; t=1741029499; c=relaxed/simple;
+	bh=Vg/2VuaawTLlMnp2NzzvT8YzOf8Czwrf1poIJiGpqqI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iqzTLCrD99WxBl/JMGPHn1gHZGIUX9nn96SEnGX62AbE18g7DLDkLfcmsUMYNZzN6bDXhHfoQDRi14r/IADWfuQiHBvaWOFlkETyF3A4DJS9+0jsIqBozOlDk/i/yuzqPz5iJ9C5Q4Da8DmSk+O9bDz/QQxsdJLnIgCbdpxHBWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRVnXtrJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRVnXtrJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD033C4CED6;
+	Mon,  3 Mar 2025 19:18:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741029499;
+	bh=Vg/2VuaawTLlMnp2NzzvT8YzOf8Czwrf1poIJiGpqqI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rRVnXtrJnlrgRsLrO9TGTZLe50ESltIbfTGcEudZwgeL9oCCckHNN41yquyDdnUiI
+	 4ffOEpOrqa1N6rV0eJn0Y/IuC8wLzMGJTy19O6/GzHBRs8J6FpSLRogZKI3+qMY0fx
+	 S16HdyLEEnxgPLz/IvK3lF3rO+Y/w7X2Bg1mMBUhs7vi0bmIE1Wj85XtEM0gR64K/D
+	 KiKsuARv24cFfG607vxBFQBNoyBj4uma6Rrpi3jrreAhr4jjv9HIaks6tbJO8qVlhu
+	 pme30VYiKza+nlwOkWDmtPq7nSgPpTsrSA3KoZMV4l1s8aNYT4ALT01l2hSXkLuEtT
+	 62XB5ShLnHXXQ==
+Date: Mon, 3 Mar 2025 19:18:13 +0000
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	oliver.upton@linux.dev, mark.rutland@arm.com, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, broonie@kernel.org, vdonnefort@google.com
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Factor out pKVM hyp vcpu creation to
+ separate function
+Message-ID: <20250303191811.GA30361@willie-the-truck>
+References: <20250226215520.1759218-1-tabba@google.com>
+ <20250226215520.1759218-4-tabba@google.com>
+ <Z8ISLxQRcsx2uuHw@google.com>
+ <CA+EHjTympdi0wei2Qx=hF2cYvHpzE0sWto2ypcJB3ddmonTROg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 14/45] arm64: RME: Support for the VGIC in realms
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-15-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250213161426.102987-15-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTympdi0wei2Qx=hF2cYvHpzE0sWto2ypcJB3ddmonTROg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 13/02/2025 16:13, Steven Price wrote:
-> The RMM provides emulation of a VGIC to the realm guest but delegates
-> much of the handling to the host. Implement support in KVM for
-> saving/restoring state to/from the REC structure.
+On Mon, Mar 03, 2025 at 07:57:00AM +0000, Fuad Tabba wrote:
+> On Fri, 28 Feb 2025 at 19:44, Quentin Perret <qperret@google.com> wrote:
+> >
+> > On Wednesday 26 Feb 2025 at 21:55:19 (+0000), Fuad Tabba wrote:
+> > >  static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+> > >  {
+> > > -     size_t pgd_sz, hyp_vm_sz, hyp_vcpu_sz;
+> > > +     size_t pgd_sz, hyp_vm_sz;
+> > >       struct kvm_vcpu *host_vcpu;
+> > > -     pkvm_handle_t handle;
+> > >       void *pgd, *hyp_vm;
+> > >       unsigned long idx;
+> > >       int ret;
+> > > @@ -161,33 +178,12 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+> > >       if (ret < 0)
+> > >               goto free_vm;
+> > >
+> > > -     handle = ret;
+> > > +     WRITE_ONCE(host_kvm->arch.pkvm.handle, ret);
+> >
+> > What's the reason to make this a WRITE_ONCE? Does it mean we should
+> > update the readers to be READ_ONCE()?
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes from v5:
->   * Handle RMM providing fewer GIC LRs than the hardware supports.
-> ---
->   arch/arm64/include/asm/kvm_rme.h |  1 +
->   arch/arm64/kvm/arm.c             | 16 +++++++++---
->   arch/arm64/kvm/rme.c             |  5 ++++
->   arch/arm64/kvm/vgic/vgic-init.c  |  2 +-
->   arch/arm64/kvm/vgic/vgic-v3.c    |  5 ++++
->   arch/arm64/kvm/vgic/vgic.c       | 43 ++++++++++++++++++++++++++++++--
->   6 files changed, 66 insertions(+), 6 deletions(-)
+> I don't remember the original reason, to be honest. In this case, it
+> was to make it consistent with downstream code in Android. That said,
+> I plan on revising all of these soon and fixing this (and related
+> code) in light of Will's comment regarding potential specter gadgets:
 > 
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index 5db377943db4..2e319db9a05f 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -83,6 +83,7 @@ struct realm_rec {
->   
->   void kvm_init_rme(void);
->   u32 kvm_realm_ipa_limit(void);
-> +u32 kvm_realm_vgic_nr_lr(void);
->   
->   int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->   int kvm_init_realm_vm(struct kvm *kvm);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a6a3034a2f50..a2bc86b3798f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -672,19 +672,24 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->   		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
->   	}
->   
-> +	kvm_timer_vcpu_put(vcpu);
-> +	kvm_vgic_put(vcpu);
-> +
-> +	vcpu->cpu = -1;
-> +
-> +	if (vcpu_is_rec(vcpu))
-> +		return;
-> +
->   	kvm_vcpu_put_debug(vcpu);
->   	kvm_arch_vcpu_put_fp(vcpu);
->   	if (has_vhe())
->   		kvm_vcpu_put_vhe(vcpu);
-> -	kvm_timer_vcpu_put(vcpu);
-> -	kvm_vgic_put(vcpu);
->   	kvm_vcpu_pmu_restore_host(vcpu);
->   	if (vcpu_has_nv(vcpu))
->   		kvm_vcpu_put_hw_mmu(vcpu);
->   	kvm_arm_vmid_clear_active();
->   
->   	vcpu_clear_on_unsupported_cpu(vcpu);
-> -	vcpu->cpu = -1;
->   }
->   
->   static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
-> @@ -889,6 +894,11 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->   			return ret;
->   	}
->   
-> +	if (!irqchip_in_kernel(kvm) && kvm_is_realm(vcpu->kvm)) {
-> +		/* Userspace irqchip not yet supported with Realms */
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->   	mutex_lock(&kvm->arch.config_lock);
->   	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
->   	mutex_unlock(&kvm->arch.config_lock);
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 0aa1f29b0610..195390a66bc4 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -77,6 +77,11 @@ u32 kvm_realm_ipa_limit(void)
->   	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
->   }
->   
-> +u32 kvm_realm_vgic_nr_lr(void)
-> +{
-> +	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS);
-> +}
-> +
->   static int get_start_level(struct realm *realm)
->   {
->   	return 4 - ((realm->ia_bits - 8) / (RMM_PAGE_SHIFT - 3));
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index bc7e22ab5d81..0ec9f6f62e86 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -79,7 +79,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->   	 * the proper checks already.
->   	 */
->   	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
-> -		!kvm_vgic_global_state.can_emulate_gicv2)
-> +	    (!kvm_vgic_global_state.can_emulate_gicv2 || kvm_is_realm(kvm)))
->   		return -ENODEV;
->   
->   	/* Must be held to avoid race with vCPU creation */
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index d7233ab982d0..41c3de063e72 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -8,9 +8,11 @@
->   #include <linux/kvm_host.h>
->   #include <linux/string_choices.h>
->   #include <kvm/arm_vgic.h>
-> +#include <asm/kvm_emulate.h>
->   #include <asm/kvm_hyp.h>
->   #include <asm/kvm_mmu.h>
->   #include <asm/kvm_asm.h>
-> +#include <asm/rmi_smc.h>
->   
->   #include "vgic.h"
->   
-> @@ -748,6 +750,9 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
->   {
->   	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
->   
-> +	if (vcpu_is_rec(vcpu))
-> +		cpu_if->vgic_vmcr = vcpu->arch.rec.run->exit.gicv3_vmcr;
-> +
+> https://lore.kernel.org/all/20250218092705.GA17030@willie-the-truck/
 
+I'm not sure the spectre stuff changes the concurrency aspects here, so
+Quentin's question presumably still stands even after that.
 
->   	if (likely(!is_protected_kvm_enabled()))
+Looking at the Android code, this WRITE_ONCE() pairs with a READ_ONCE()
+in pkvm_is_hyp_created() which is called without the config_lock held
+by kvm_arch_prepare_memory_region(). However, given that
+pkvm_is_hyp_created() is only testing against 0, I don't think the
+_ONCE() accessors are doing anything useful in that case.
 
-	else if (likely(...)) ?
+The more confusing stuff is where 'kvm->arch.pkvm.handle' is read
+directly without the 'config_lock' held. The MMU notifiers look like
+they can do that, so I wonder if there's a theoretical race where they
+can race with first run and issue TLB invalidation with the wrong handle?
+That would apply equally to the upstream code, I think.
 
->   		kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
-
-Otherwise, the VMCR could be rewritten from what we set above and 
-pointless APR saves ?
-
-Rest looks good to me.
-
-Suzuki
-
->   	WARN_ON(vgic_v4_put(vcpu));
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1077fab2df4b..4218de3ea9da 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -10,7 +10,9 @@
->   #include <linux/list_sort.h>
->   #include <linux/nospec.h>
->   
-> +#include <asm/kvm_emulate.h>
->   #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_rme.h>
->   
->   #include "vgic.h"
->   
-> @@ -23,6 +25,8 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
->   
->   static inline int kvm_vcpu_vgic_nr_lr(struct kvm_vcpu *vcpu)
->   {
-> +	if (unlikely(vcpu_is_rec(vcpu)))
-> +		return kvm_realm_vgic_nr_lr();
->   	return kvm_vgic_global_state.nr_lr;
->   }
->   
-> @@ -864,10 +868,23 @@ static inline bool can_access_vgic_from_kernel(void)
->   	return !static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
->   }
->   
-> +static inline void vgic_rmm_save_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> +	int i;
-> +
-> +	for (i = 0; i < kvm_vcpu_vgic_nr_lr(vcpu); i++) {
-> +		cpu_if->vgic_lr[i] = vcpu->arch.rec.run->exit.gicv3_lrs[i];
-> +		vcpu->arch.rec.run->enter.gicv3_lrs[i] = 0;
-> +	}
-> +}
-> +
->   static inline void vgic_save_state(struct kvm_vcpu *vcpu)
->   {
->   	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->   		vgic_v2_save_state(vcpu);
-> +	else if (vcpu_is_rec(vcpu))
-> +		vgic_rmm_save_state(vcpu);
->   	else
->   		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
->   }
-> @@ -894,10 +911,28 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->   	vgic_prune_ap_list(vcpu);
->   }
->   
-> +static inline void vgic_rmm_restore_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> +	int i;
-> +
-> +	for (i = 0; i < kvm_vcpu_vgic_nr_lr(vcpu); i++) {
-> +		vcpu->arch.rec.run->enter.gicv3_lrs[i] = cpu_if->vgic_lr[i];
-> +		/*
-> +		 * Also populate the rec.run->exit copies so that a late
-> +		 * decision to back out from entering the realm doesn't cause
-> +		 * the state to be lost
-> +		 */
-> +		vcpu->arch.rec.run->exit.gicv3_lrs[i] = cpu_if->vgic_lr[i];
-> +	}
-> +}
-> +
->   static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
->   {
->   	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->   		vgic_v2_restore_state(vcpu);
-> +	else if (vcpu_is_rec(vcpu))
-> +		vgic_rmm_restore_state(vcpu);
->   	else
->   		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
->   }
-> @@ -938,7 +973,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->   
->   void kvm_vgic_load(struct kvm_vcpu *vcpu)
->   {
-> -	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
-> +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
-> +		     !vgic_initialized(vcpu->kvm) ||
-> +		     vcpu_is_rec(vcpu))) {
->   		if (has_vhe() && static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->   			__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
->   		return;
-> @@ -952,7 +989,9 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu)
->   
->   void kvm_vgic_put(struct kvm_vcpu *vcpu)
->   {
-> -	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
-> +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
-> +		     !vgic_initialized(vcpu->kvm) ||
-> +		     vcpu_is_rec(vcpu))) {
->   		if (has_vhe() && static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->   			__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
->   		return;
-
+Will
