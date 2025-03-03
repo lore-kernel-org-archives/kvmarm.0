@@ -1,119 +1,147 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F05153598
-	for <kvmarm@lists.linux.dev>; Mon,  3 Mar 2025 09:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DE61D63F7
+	for <kvmarm@lists.linux.dev>; Mon,  3 Mar 2025 10:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740995275; cv=none; b=V7/Mqocxr0FKbCMzvH1/L91HDYH0EEcTrmlP0k5973derJlGMe6sXWZ/5gf7dil7TytZuN/TuY+nQ39RFa0BXQnI9Dav5GgE7e3bHBUvkWwFCcWyAWzmph/k5kgRtWMXW7iww/dxrzCEBA2r/OaYhNIyG5nrwJTs3wnLpVNHvTQ=
+	t=1740997423; cv=none; b=mJxNNc9SozBRN78FijRQ42KuBgRiv9IHMetXnaUTnNqhXjBG5FBpcaMhjIxhWyQRovhB75ZrduVm17tiqUIBcBUfdOj1PD2IETIEmayiQ7Vr11bfrPGWMmQzwf4gFM3+SL2tLShtGGA5mU6nS3VOBKXwE+duIVdMWcz78onA5/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740995275; c=relaxed/simple;
-	bh=sSIGCV1NJMucwdo63O6AoWB/mxERMptnXw9CEzSBXF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jWVzsVcRd31Xv2VO6NdwEs3cCrrxYoAviguvRdWMhYtVEpE5V5vVNMGnf0mVO8mbl/JTDWHNs6RaDZmHKq6WgNslEldGn/ynxVqVnpu6qUbz1unP6mfUU0LM2GLBAtQqBrlIVtqrGm1oIhYNwUn1vmufFHrzPCgsZSQIaWEz1jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rup4ZMg2; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rup4ZMg2"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-390df0138beso2215834f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 03 Mar 2025 01:47:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740995272; x=1741600072; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CKA+Otx0H3SSzEwciVvwkw/A8oV7+p3SzrtXzaI0oPU=;
-        b=Rup4ZMg2++mp2G715CwHexjzloWUMZpSesHCDIyOojcvMN3thMV3uhU2qXbyCaq08v
-         1DaBlE/qJkYNpl0233Shm07TVRryN4nOyIjVjUxdX6Cmc8qiqmV/pHEhwxa0PCFbLnX9
-         d597FRv2CjOAU5Wg6yUSq2q5JCIG7zjwiQJZ7HKN0dEIbrQGKN3XDsr7joybAWqX19Ca
-         IFh6sxMVMRrDKAO+14Eks067fMfPeSKJhDuSviS5LxPuFwU93XkiJ61Pi+hAHh5SCkLv
-         wCxWHQbP5PF/eFHdXaKctmfNk56BDaAyJa9CmiNQYZAFsjJs6vk1lbreEc7XF5he0B3/
-         62bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740995272; x=1741600072;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CKA+Otx0H3SSzEwciVvwkw/A8oV7+p3SzrtXzaI0oPU=;
-        b=ih38+hH7u1SRiV5DDf/Q6oihYJP34RSVwc/i4eL1Bf1Bpx0Vbf58sECVVxcDOE+2PR
-         XbHror9vgcS3VFLv5Iuokyxc/0qXUA6WnbqoAgM48njBgaDoR6Q9boX6nKFWP67Mz7YI
-         LKHFHiQlAu4LeplHhAUWZ1UrWkw+zAzVahYNneIaUnDo+awZq4QV7zvfBIM8kUW3zznN
-         SIDrut+irwctCikrOzCpnzQ+g4r/L0wn7gFRfsGvhZ28OUIpPIM6qe0Gb4UNGxKfVSk5
-         i337YruQxmGXgft2uNMV1n3ohXadvJSSddOKlz0I/KAYByvMYs2UfHZAqvePm3xz+6Ue
-         T8sA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBDTdEBbJdYJzZRl5F79AouyDc2nChKb+EohfzFTePpN9RWFiLlrHyaveGWbEfu4U3P+JNlxU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxu2tYBWmr/0qH7OW9ezkuErmFAuOkeQ3ngz+TLEaFSXIc8WfM8
-	aoRIO022HZw2dVu2pcBnMudMkJtc5PoYmxfqkPfpxbWeqGmEpHKK7GlB1a1pmA==
-X-Gm-Gg: ASbGncsncxqxdv8JOpX4dcFSx8q36tGrZSJz4UMG70UAtplW36DUoicXlc726EOHjIp
-	Rmad3CUsJ5ZNrPiUkJbtO7cZ/gMjwNaYLSqAY241nMm9xkm94t9kT8KoZ3JmKHxDFyuKB+uZ543
-	igv34mQ/l0vNEdqtd+Npk3H9o5PtB1KWOjvW9CNYVazDg7SaX71q2uQr1CGiaxIxJrs4Bb1MASB
-	UbcIq8JWjgxE2wkW+WOPnCJUTUTLEcuFcjPUU1I0Ek5fNydg2toi4s7/6fD/21tmtXszD9W2mY2
-	IVekIEq09cyLKWKup3nBxdBXEOJihWMW497POMscC+j8IJ8zzoROJK3NG6Ng/7qV3AAOkVt9dzm
-	7A35MVKSKq6VM
-X-Google-Smtp-Source: AGHT+IGZadExtmq2ZKN18m9L/PK1JThIrBLdkTgdsuEaaAEPwP3+f2+949dpjiKHv0jHI9BGV6sDlw==
-X-Received: by 2002:a05:6000:2ce:b0:390:f9d0:5e3 with SMTP id ffacd0b85a97d-390f9d0075cmr4936619f8f.1.1740995272497;
-        Mon, 03 Mar 2025 01:47:52 -0800 (PST)
-Received: from google.com (105.168.195.35.bc.googleusercontent.com. [35.195.168.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4796051sm14170400f8f.12.2025.03.03.01.47.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 01:47:52 -0800 (PST)
-Date: Mon, 3 Mar 2025 09:47:48 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
-Message-ID: <Z8V6xOVCPp7OOX6g@google.com>
-References: <20250227003310.367350-1-qperret@google.com>
- <20250227003310.367350-5-qperret@google.com>
+	s=arc-20240116; t=1740997423; c=relaxed/simple;
+	bh=HMYFcT1D/Mq/XIZ0zFhB6ymz6wEqEq1zIq2vANNrofo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EJGrWbRbiCCWF8ku42qZB77I2J45KTqmKC/0c0Ee13oxX10CcF6N/aosDzThhQqk0Ag211IU37md+LjmPbHtDoEkdYyvsFKQzwqJOzOZRWRKMs9QoFFwIsNN58GY+FMkJqgvMDbFyp29T2LUncXm/P7UoisoCN8NjIf+GJL0AGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6491F12FC;
+	Mon,  3 Mar 2025 02:23:55 -0800 (PST)
+Received: from [10.1.26.155] (XHFQ2J9959.cambridge.arm.com [10.1.26.155])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 814F63F66E;
+	Mon,  3 Mar 2025 02:23:39 -0800 (PST)
+Message-ID: <9dd8e02c-9abb-47e6-92df-cf7af6cda99c@arm.com>
+Date: Mon, 3 Mar 2025 10:23:37 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250227003310.367350-5-qperret@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 0/8] arm64/mm: Drop PXD_TABLE_BIT
+Content-Language: en-GB
+To: Anshuman Khandual <anshuman.khandual@arm.com>,
+ arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
+ <aa71c6ed-8ff2-4b52-b8f7-49147c7769ba@arm.com>
+ <a9600c92-bef0-4dd1-95d4-c696d686da18@arm.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <a9600c92-bef0-4dd1-95d4-c696d686da18@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-[...]
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 1a414288fe8c..955c431af5d0 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -194,16 +194,20 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  
->  	/*
->  	 * Adjust the host stage-2 mappings to match the ownership attributes
-> -	 * configured in the hypervisor stage-1.
-> +	 * configured in the hypervisor stage-1, and make sure to propagate them
-> +	 * to the hyp_vmemmap state.
->  	 */
->  	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
->  	switch (state) {
->  	case PKVM_PAGE_OWNED:
-> +		set_hyp_state(phys, PKVM_PAGE_OWNED);
->  		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
->  	case PKVM_PAGE_SHARED_OWNED:
-> +		set_hyp_state(phys, PKVM_PAGE_SHARED_OWNED);
->  		set_host_state(phys, PKVM_PAGE_SHARED_BORROWED);
->  		break;
->  	case PKVM_PAGE_SHARED_BORROWED:
-> +		set_hyp_state(phys, PKVM_PAGE_SHARED_BORROWED);
->  		set_host_state(phys, PKVM_PAGE_SHARED_OWNED);
->  		break;
->  	default:
-
-Are the SHARED_OWNED/SHARED_BORROWED still relevant since the introduction of
-"KVM: arm64: Don't map 'kvm_vgic_global_state' at EL2 with pKVM"? It doesn't
-seem we have any !OWNED pages in the hyp anymore at setup, do we?
-
-> -- 
-> 2.48.1.658.g4767266eb4-goog
+On 03/03/2025 05:02, Anshuman Khandual wrote:
 > 
+> 
+> On 2/28/25 21:02, Ryan Roberts wrote:
+>> On 21/02/2025 04:42, Anshuman Khandual wrote:
+>>> Remove the PXX_TABLE_BIT definitions and instead rely on PXX_TYPE_MASK,
+>>> PXX_TYPE_SECT and PXX_TYPE_TABLE. The latter versions are more abstract
+>>> and also include the PTE_VALID bit.
+>>>
+>>> This abstraction is valuable for the impending D128 page table support,
+>>> which doesn't have a single page table bit to determine table vs block.
+>>> Instead it has the skip level (SKL) field, where it will consider 0 to
+>>> mean table and any other value to mean a block entry. So PXX_TABLE_BIT
+>>> therefore doesn't fit into the D128 model well, but the type fields do.
+>>
+>> All the patches look logically correct to me and I agree with the intention of
+>> removing PXX_TABLE_BIT. But personally I'd prefer to see a single patch that
+>> just does everything that's required to remove PXX_TABLE_BIT. And then a second
+>> patch for the pud_bad() fix/improvement (currently patch 6) which is orthogonal
+>> to the removal of PXX_TABLE_BIT.
+>>
+>> That would make it much easier to review IMHO, and would also allow for writing
+>> a single commit log which provides the justification for the change. I find the
+>> current set of 7 commit logs to not be hugely helpful.
+> 
+> Dropping PXX_TABLE_BIT from individual functional components which stand on their
+> own progressively leads to its complete removal from the tree. Even though goal
+> is PXX_TABLE_BIT mask's complete removal, each patch here could be justified on
+> its own improving consistent reasoning around various section mapping creation
+> and identification while keeping the functionality unchanged and also improving
+> code readability as well.
+> 
+>>
+>> But I wrote the original patches and wrote them as I'm suggesting, so I would
+>> say that :)
+> 
+> I can understand :) Although it also follows and expands on the previous attempt
+> in removing this mask that formed a patch series instead.
+> 
+> https://lore.kernel.org/all/20241005123824.1366397-1-anshuman.khandual@arm.com/
+> 
+> TBH this is not a big deal. I can merge all but last one into a single patch as
+> you have suggested if that's a general consensus. Although I would prefer the
+> current logically progressive series based approach but that's just me.
+
+I guess leave as is for now and see what others say.
+
+> 
+>>
+>> I'm guessing I shouldn't provide a Reviewed-By here, given I wrote the code
+>> originally...
+>>
+>> Thanks,
+>> Ryan
+>>
+>>
+>>>
+>>> This series applies on v6.14-rc3.
+>>>
+>>> Changes in V2:
+>>>
+>>> - Changed pmd_mkhuge() and pud_mkhuge() implementation
+>>> - Changed pud_bad() implementation with an additional patch
+>>>
+>>> Changes in V1:
+>>>
+>>> https://lore.kernel.org/all/20241005123824.1366397-1-anshuman.khandual@arm.com/
+>>>
+>>> Cc: Marc Zyngier <maz@kernel.org>
+>>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>>> Cc: James Morse <james.morse@arm.com>
+>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>> Cc: Will Deacon <will@kernel.org>
+>>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>>> Cc: Ryan Roberts <ryan.roberts@arm.com>
+>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>> Cc: kvmarm@lists.linux.dev
+>>> Cc: linux-arm-kernel@lists.infradead.org
+>>> Cc: linux-kernel@vger.kernel.org
+>>>
+>>> Anshuman Khandual (6):
+>>>   KVM: arm64: ptdump: Test PMD_TYPE_MASK for block mapping
+>>>   arm64/ptdump: Test PMD_TYPE_MASK for block mapping
+>>>   arm64/mm: Clear PXX_TYPE_MASK in mk_[pmd|pud]_sect_prot()
+>>>   arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
+>>>   arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
+>>>   arm64/mm: Drop PXD_TABLE_BIT
+>>>
+>>> Ryan Roberts (2):
+>>>   arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
+>>>   arm64/mm: Check pmd_table() in pmd_trans_huge()
+>>>
+>>>  arch/arm64/include/asm/pgtable-hwdef.h |  5 --
+>>>  arch/arm64/include/asm/pgtable.h       | 65 ++++++++++++++++++--------
+>>>  arch/arm64/kvm/ptdump.c                |  4 +-
+>>>  arch/arm64/mm/ptdump.c                 |  4 +-
+>>>  4 files changed, 50 insertions(+), 28 deletions(-)
+>>>
+>>
+
