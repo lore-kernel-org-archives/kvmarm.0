@@ -1,172 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFF61FCFF8
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 11:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0995202F96
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 12:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741089100; cv=none; b=DcNNbtamTewErxWieu3f5chzdO8hsde62pEhx59xAf8BZUIrU9ReuCE/a2LCclJ11WeXT9DQumCOxUsHwEsCS4RwNNJJshAUBsvFCr0bzJKOsfW4Mjx0X4jEjfZSbopP9oi+TuA5h9uq534yksu/gExSNViJQlC4avBIx9r/9K0=
+	t=1741091647; cv=none; b=D0MSHTi8vyKuzmR5laoEwz0LBwkmHwCD+/l9cbXoc9QKEXxVCy4xpdCaGCsWspEKjiaDVo7MBCfr9r5rcfrzBrRvY5iLDDUgnC6kWsNsAR5gPONCghCkFF6g3uohtL0aPc7qX9/g2xxvPB8O6SDzWkiTfsfTWBJnYtZcFBeGrU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741089100; c=relaxed/simple;
-	bh=yWbmFnDDcW7+/qnqF0tm/sx+AWkJjTYVTQwvn5TuuzI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=glKW65BFkI1O3RowPyyf9SmYlUylxKsdt2Mi7w/XbSEe5Ow584q9n58MIrPhBFZfhFwrXGaRkBKFP+hScTsznyn+iRGlfvOd5VSsqyo4d3uwFn/2la/oNBJ3tvmvNeXDGM3+LTdZOVYnj0Wh4ie6Bj8xIW6ZpGkbRo74pXo2DjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YNvLCemJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741091647; c=relaxed/simple;
+	bh=6eaSD8OTca9wJGHukn8L+aK3G6J7ybysiiuzv7kiYpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cpz7+fRxQgTqcZqm/RqA2lFt5xwyJyZOmflJAggbJ8OpRs5VLs1ZzNCC1WgEjHPI+1NwywfqhmZpPe38zETKpHOTzMDTUGChb51z4OuKi3mNtHHdZCs/T9Zu0ZFsdf4kDEPFyDUwv9l5/cyWYky+FclM5h7xo60En3G9rJE0RFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E9b9Jz5M; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YNvLCemJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741089097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9SvHiAzkhpGOwKIBXJW3ZvTlN3vuL1LXpAI2oO3MJds=;
-	b=YNvLCemJTRA8RCZdFg7mYgXMDzdtp7Ca5LEuaGUwgibWL3m4zNcT67tUHK8ihToPVNBYnN
-	76C+0WJgu0Ujhwztl7de/4DHXbiYtePKRwWIMyElXcfllnRfRPZpQnm0FDba4Prds/Arug
-	RALTztKxBkNQ6bMMa4i9h62asxoFeJI=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-22-38o4Bm2TNU6hrWTMMWS4Ww-1; Tue, 04 Mar 2025 06:51:36 -0500
-X-MC-Unique: 38o4Bm2TNU6hrWTMMWS4Ww-1
-X-Mimecast-MFC-AGG-ID: 38o4Bm2TNU6hrWTMMWS4Ww_1741089095
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-223725aa321so7029355ad.2
-        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 03:51:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E9b9Jz5M"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-474fdb3212aso216981cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 04:34:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741091644; x=1741696444; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4LJRch3g6p8/qLpu/3lOk7LZ1OdHfNWmv1WKY/EEqh0=;
+        b=E9b9Jz5MR+VYV9UNM/9vb500M/9rRlBoGwYcTyNimKp/PbehvLk8i2mWcRW4KW5emF
+         t58WGFVU0E87ynZ02ItB9mgc60UyHrpAjml1mhZimGVzlYzd3GNE3mdzFOBd3vNEnCKX
+         0eT6J3WhDyrjDv0vg/wQS/a54TOikzOlbNL5XVhwtDlzsmeM6AdAKsm7MKLnvPJ610DU
+         vY5Qj5RHSIXC9Q32XSEXUp1rsypd6rB1cl3jdRrglU/rlMycgdHjWHcUfFSo/80LZRQ1
+         HdhTYZSa65yFooqwZtuAgGosa5LDyIKD/cploeYkk/GpadY74JKQ18QPbaTfQPjJe+Pd
+         wxug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741089095; x=1741693895;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9SvHiAzkhpGOwKIBXJW3ZvTlN3vuL1LXpAI2oO3MJds=;
-        b=bLtCL/RWLBe4wQ/qni39rW4i/SujNFN3pf/4LjveoKva40hArsRUSy+F/YbU8Qez93
-         zOEsqd/Gcmf1sbAMk6n8lhdYhJiX74Nu5EfFqjfIZ7Oxw/2Ymak9RwjIX+DeGWEGc/sv
-         zEn03Nov7BMfmBVlo3BIQ+wNv6zp8ERvh1Msq5FTvhZ2F0xP1guEuoWcZ6iJvXagsjJd
-         /YaHJPf70k1ehpMqXTw3IABS1TwkWa1TsFS7aEtKRbnW5fXBmkh8J6YIPKx6UMTE4oND
-         H8vHcGb+7/kX621p8t1LoLjYRFGLDnvZZtfLOwWgf3Iiw3uVtQ1UWM1pdTP5vWf+UE93
-         H9Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrXt62aqKayhQhK1IHz9qfBOtKnx8bglqQdr6MGn7SVLSiCosl5dPhr8QTlVF0lBDQccxOPIc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzzGaRPnl+qlNZKcors5ozdyZoMPws9UCsUYrc0aTOMyoFo7qhZ
-	mQSjgfBrq8bEcCyj5/T2BRkEIcqIrdY298B7nmgNEvEKXJyad3KU/CSb5Xs4ivZqlvCWHVrprRt
-	HZ8RsP4GNkCBTXWTBt6mbO/N9+OGJC6Rc0UDUECZ8PTEbz4rgxy3cDw==
-X-Gm-Gg: ASbGncup3xwW79gyC19r8/oZOOk0tfRkesdMuKIyRT9LjsWZtEzq4BYUXeRmkE+eKsJ
-	+3kbgAqG6DwRu46wQwRo096KaerPCVRKe/Xnbv3m5KBvBganQWElijTjigmbj6INZ3F5Bjz96sO
-	AoPuH/si5NbJQrXvjH0eaztJ/zH1ZFOgrN1dqS3EJTqzsRcNpmnRjeJQ+HUrT28ofYaBcUwiUWG
-	pcjRHJyGFKIfEgY4bInoNsTotYEGr5kDrVPam5CUaRK+lxF1GDbXZJtJ6hpLHZ8jGFjTuAZwkBG
-	Gtg4EaImOim/0PoH2Q==
-X-Received: by 2002:a17:902:d48f:b0:220:c164:6ee1 with SMTP id d9443c01a7336-2236924786cmr286756945ad.32.1741089095301;
-        Tue, 04 Mar 2025 03:51:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqkDc//0lhtuEEGTLRirsOl+2zU34lz3XcWjEj6faC+59ETLrTC0850jV9RLUFK6Nc4S9jqg==
-X-Received: by 2002:a17:902:d48f:b0:220:c164:6ee1 with SMTP id d9443c01a7336-2236924786cmr286756495ad.32.1741089094965;
-        Tue, 04 Mar 2025 03:51:34 -0800 (PST)
-Received: from [192.168.68.55] ([180.233.125.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235052beaasm93466525ad.233.2025.03.04.03.51.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 03:51:34 -0800 (PST)
-Message-ID: <32a09a27-f131-44dd-8959-abb63b2089a8@redhat.com>
-Date: Tue, 4 Mar 2025 21:51:26 +1000
+        d=1e100.net; s=20230601; t=1741091644; x=1741696444;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4LJRch3g6p8/qLpu/3lOk7LZ1OdHfNWmv1WKY/EEqh0=;
+        b=hyiyJtQne6GIfvnUGbj+oKcIkTKJpVvpw+yytXiCn2gtDyEsfIIGVkmJyW5XAkVClG
+         LhKVyoLnpFQ+mRDyjYul/Ofe71wAO9l+IMgjKOSHm5k/gRKsAHHWHTLv4nWGzmgYvLZD
+         CdxYeI+ivfY3gda46PklyoLOv+T1mKV74X6OZi++m2z381g0fkWBPpG+bn/SC5sHfDkD
+         VKKDw9AaKVzRfZFj4JMAklBL0wzHviR1v7IGY6DuPTtxlopIrZqFzoWCOMmEknHbVM8v
+         NGGU63psx2VPwEJg6foxE0Mfreqw6C5DaBKVvGbLLDvz0qDjlfkIcqVvQOfrdLWGBtPa
+         gNew==
+X-Forwarded-Encrypted: i=1; AJvYcCWJV8/H3eEpxDi6MhxDaME8PINWrVTuP2fBNkqm7cru0jJyCIsLuCyJROVx9BCRquqX37P41cI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzk7vJF9BuxeMKOOJn4fguitgsDy4q8Df7ToCN8/rWV+lFg13AV
+	Wwt8OZOG1PYwS2dk4gDEf+NWM+tr7c7LEkX2x//VTyUEBjKy7PkZ4eewMZzD14+joe88rxC92bb
+	L+nFDzn5Wz81fS9PzhRWHTyzSY4yMPwHK4Di5iGdq3fuoFo/fAw==
+X-Gm-Gg: ASbGncvnJPhgffyHN6F/Ll13l2tGRlLG2sN4UT/Cv4D8kUPZ65f3d/Dwy1PILKx7OZj
+	VY8WNtSN+C1HR10gng1nDmAi2u+BjkM9l2JcAklfBMUTJUTbaMscFPUyf1vVFyDyrRZ2QoHr0Kf
+	ZEklYfOHKJXz+ugAdqiGrt3PXagcLyk+FX2S7MXw8L4mEof8wQf/CRODQ=
+X-Google-Smtp-Source: AGHT+IG1wmb/E6zAyXf4gMbux2A/gpA3lOEtVh4lPWuPnUJ8LGWx86QRVEpJ7fTHwzq0tK63uaGZr22OB+UQPL1UizY=
+X-Received: by 2002:a05:622a:654:b0:474:cd63:940d with SMTP id
+ d75a77b69052e-474fc3ab73bmr4600141cf.0.1741091644342; Tue, 04 Mar 2025
+ 04:34:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 34/45] kvm: rme: Hide KVM_CAP_READONLY_MEM for realm
- guests
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-35-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250213161426.102987-35-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: Qgk5dD-omg5rC1YLtcrVAsN8LC49oi_IblMTHfKEveQ_1741089095
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250226215520.1759218-1-tabba@google.com> <20250226215520.1759218-4-tabba@google.com>
+ <Z8ISLxQRcsx2uuHw@google.com> <CA+EHjTympdi0wei2Qx=hF2cYvHpzE0sWto2ypcJB3ddmonTROg@mail.gmail.com>
+ <20250303191811.GA30361@willie-the-truck> <CA+EHjTySqDHDpOy=Vix5ZaNKWg61coySvV3Yk=+i0p8vg3mXTQ@mail.gmail.com>
+ <20250303214947.GA30619@willie-the-truck>
+In-Reply-To: <20250303214947.GA30619@willie-the-truck>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Mar 2025 12:33:27 +0000
+X-Gm-Features: AQ5f1JqOSOB-yVZxEjRDtO7BCysCBkkK48aeNEIBsUlYTe__dZnJkeRCsaRBrIQ
+Message-ID: <CA+EHjTzZQ6UnOdaqpZ86JNiY=Gr_UoBAjZxk4CS3Q6nMJYdV2w@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Factor out pKVM hyp vcpu creation to
+ separate function
+To: Will Deacon <will@kernel.org>
+Cc: Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oliver.upton@linux.dev, 
+	mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
+	vdonnefort@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/14/25 2:14 AM, Steven Price wrote:
-> For protected memory read only isn't supported. While it may be possible
-> to support read only for unprotected memory, this isn't supported at the
-> present time.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->   arch/arm64/kvm/arm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+Hi Will,
 
-It's worthy to explain why KVM_CAP_READONLY_MEM isn't supported and its
-negative impact. It's something to be done in the future if I'm correct.
+On Mon, 3 Mar 2025 at 21:49, Will Deacon <will@kernel.org> wrote:
+>
+> On Mon, Mar 03, 2025 at 07:21:33PM +0000, Fuad Tabba wrote:
+> > On Mon, 3 Mar 2025 at 19:18, Will Deacon <will@kernel.org> wrote:
+> > > On Mon, Mar 03, 2025 at 07:57:00AM +0000, Fuad Tabba wrote:
+> > > > On Fri, 28 Feb 2025 at 19:44, Quentin Perret <qperret@google.com> wrote:
+> > > > > On Wednesday 26 Feb 2025 at 21:55:19 (+0000), Fuad Tabba wrote:
+> > > > > >  static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+> > > > > >  {
+> > > > > > -     size_t pgd_sz, hyp_vm_sz, hyp_vcpu_sz;
+> > > > > > +     size_t pgd_sz, hyp_vm_sz;
+> > > > > >       struct kvm_vcpu *host_vcpu;
+> > > > > > -     pkvm_handle_t handle;
+> > > > > >       void *pgd, *hyp_vm;
+> > > > > >       unsigned long idx;
+> > > > > >       int ret;
+> > > > > > @@ -161,33 +178,12 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+> > > > > >       if (ret < 0)
+> > > > > >               goto free_vm;
+> > > > > >
+> > > > > > -     handle = ret;
+> > > > > > +     WRITE_ONCE(host_kvm->arch.pkvm.handle, ret);
+> > > > >
+> > > > > What's the reason to make this a WRITE_ONCE? Does it mean we should
+> > > > > update the readers to be READ_ONCE()?
+> > > >
+> > > > I don't remember the original reason, to be honest. In this case, it
+> > > > was to make it consistent with downstream code in Android. That said,
+> > > > I plan on revising all of these soon and fixing this (and related
+> > > > code) in light of Will's comment regarding potential specter gadgets:
+> > > >
+> > > > https://lore.kernel.org/all/20250218092705.GA17030@willie-the-truck/
+> > >
+> > > I'm not sure the spectre stuff changes the concurrency aspects here, so
+> > > Quentin's question presumably still stands even after that.
+> > >
+> > > Looking at the Android code, this WRITE_ONCE() pairs with a READ_ONCE()
+> > > in pkvm_is_hyp_created() which is called without the config_lock held
+> > > by kvm_arch_prepare_memory_region(). However, given that
+> > > pkvm_is_hyp_created() is only testing against 0, I don't think the
+> > > _ONCE() accessors are doing anything useful in that case.
+> > >
+> > > The more confusing stuff is where 'kvm->arch.pkvm.handle' is read
+> > > directly without the 'config_lock' held. The MMU notifiers look like
+> > > they can do that, so I wonder if there's a theoretical race where they
+> > > can race with first run and issue TLB invalidation with the wrong handle?
+> > > That would apply equally to the upstream code, I think.
+> >
+> > Would using _ONCE accessors with the MMU notifiers be enough to avoid
+> > the race, or do we need to reconsider the lock protecting the handle
+> > and apply it to the notifiers?
+>
+> I'm not entirely sure... if we used _ONCE() then we'd get either the
+> correct handle or zero, but we presumably need to order that against the
+> page-table somehow. The 'mmu_lock' looks like it gives us that, but I
+> don't think the notifiers are expecting an uninitialised handle in the
+> case where the page-table is empty (i.e. if they fire before first run).
+>
+> Given that the handle is necessary for TLB invalidation, I'd be inclined
+> to make sure that the handle is allocated and published _before_ the
+> kvm_pgtable pointer checked by the notifiers is set, but that means
+> moving the handle allocation into kvm_arch_init_vm(). Is that do-able?
 
- From QEMU's perspective, all ROM data, which is populated by it, can
-be written. It conflicts to the natural limit: all ROM data should be
-read-only.
+It is doable, but it won't be a simple patch. Up until now, the
+creation of the hyp view of a vm is associated with the first run of
+the vm, rather than its allocation at the host. Part of the reason for
+that is that much of the vm state (mainly the vcpu state) isn't
+finalized until then.
 
-QEMU
-====
-rom_add_blob
-   rom_set_mr
-     memory_region_set_readonly
-       memory_region_transaction_commit
-         kvm_region_commit
-           kvm_set_phys_mem
-             kvm_mem_flags                                    // flag KVM_MEM_READONLY is missed
-             kvm_set_user_memory_region
-               kvm_vm_ioctl(KVM_SET_USER_MEMORY_REGION2)
+This patch series fixes this in part, by decoupling the initialization
+of the individual vcpus from the vm. Because of that, it would be
+doable, but it might be better as another patch series that we could
+test and analyze separately.
 
-non-secure host
-===============
-rec_exit_sync_dabt
-   kvm_handle_guest_abort
-     user_mem_abort
-       __kvm_faultin_pfn					   // writable == true
-         realm_map_ipa
-           WARN_ON(!(prot & KVM_PGTABLE_PROT_W)
+If you agree, I could whip up something and send it soon.
 
-non-secure host
-===============
-kvm_realm_enable_cap(KVM_CAP_ARM_RME_POPULATE_REALM)
-   kvm_populate_realm
-     __kvm_faultin_pfn					  // writable == true
-       realm_create_protected_data_page
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1f3674e95f03..0f1d65f87e2b 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -348,7 +348,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_ONE_REG:
->   	case KVM_CAP_ARM_PSCI:
->   	case KVM_CAP_ARM_PSCI_0_2:
-> -	case KVM_CAP_READONLY_MEM:
->   	case KVM_CAP_MP_STATE:
->   	case KVM_CAP_IMMEDIATE_EXIT:
->   	case KVM_CAP_VCPU_EVENTS:
-> @@ -362,6 +361,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_COUNTER_OFFSET:
->   		r = 1;
->   		break;
-> +	case KVM_CAP_READONLY_MEM:
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   		r = !kvm_is_realm(kvm);
->   		break;
-
-Thanks,
-Gavin
-
+Cheers,
+/fuad
+> Will
