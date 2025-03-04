@@ -1,76 +1,43 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF971FE478
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 09:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427DC1FC7C1
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 09:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741079014; cv=none; b=oYF9byxGZbEfntep84L2GIH4PAr/wqR4T/ordbhvdkgmocGsyHIr5L1f/tGj74oAiC5yH2igMD5A3tzUGR+6RArVsGufckJZ0X7LDi4P9dms1g9quCzMDRHcUNPCCBMEmE4+TThBJZyKpnZfVz3k4Y6uH77PoranAq9p6TbFxdQ=
+	t=1741079572; cv=none; b=pvo7B5Cy9j8vQ0mB4Dtne81TAbtX0X1obESbKAX+iAhqJKXAO6k9QS7LelnEyA8YSqG7PkREthCZHTWxPJOH7MDxz5qc8reFKTr6VsnM8UT4WuVvCGdZUWPwPW/OZeG+EqMvyobb6RW971chY/eX2y8plDLp5Ic6q1hPbvf37dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741079014; c=relaxed/simple;
-	bh=pD2QlyVVHGAg8ptt/VjbZEKq6kOGSccucp9idXzSK1U=;
+	s=arc-20240116; t=1741079572; c=relaxed/simple;
+	bh=XPRBYEJ9HrMmBJW36quaoU86TLjoYLweTXE4Fm9vuwc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d+Tee8BqTd2iAOwxRVF7ChWeSfMoL3NjwMeRkagSfUxbPdw1KCpJ3ycq+pXMbZSsmOHqDoCx2H+fM4hGxkM9FRxkRu9ZzsBNPHET9lZQ9f4CujCSoNTqkWGkw5VYa1x7tBgenA5tnh6pOQW3buhGIdD4z/163dhB9LkdBxc5t7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U19dlO1t; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQv57KQMKzhK2rbsYqfM0V6TiHtomHMom+UucVrhX6sy3yq6NT3uCKmx5FvPuUJNhv8UPGLoILilqqQrrAQ3bbKF35A/z12xbeSA6SBho9W/nWNantYnE5Ow4m/MxY+oDZvXxlZnBb2bb4cZPD6Goh/WbcwnZ5oQxiBzU9esEDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sQPkZud9; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U19dlO1t"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-438a39e659cso36317275e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 01:03:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741079011; x=1741683811; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c/pyfoaR/eT3J3WSzi9ciqMZLn3faPQuYj0+Pv+ikCU=;
-        b=U19dlO1tdnx4XeZKLQAGvEsjkmzYvI8MTHex11OW9rl88ziyC4P505oDsXn8v/rtSc
-         RT8vJ60yk7zJeOWwIDhjc5LFlxwkIzHFsGA5gMF8Op4oaQXpnQQYoKNSR8mLwzSr+glB
-         YS4C/ZW/A+odk81dSv6n2wZNIEI0o75s9wfEfLL3K4k77naDGqhjSvslZq8F7fY+pwkH
-         xy5hhXx1nPd8olDj3zwvimE745YlnDhvWSvz4gJt+EBMee0rKlvYHd5LOTH9zC+Tamus
-         fzUruriMjPdOISMdNM1NQrrMm3yHHTQzbpdwR9eikswZqOa5Uc/AvGHCrwOIfygOZsaF
-         hBtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741079011; x=1741683811;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c/pyfoaR/eT3J3WSzi9ciqMZLn3faPQuYj0+Pv+ikCU=;
-        b=qD7Jddcrc1IDUQCmJOEWLgfe9BBrlUibDJaj1hykhzHtsaw/U29NpBTLjkJhbgK/AD
-         I5C95Wm5ey302h3Ef2x28NfNAnXiavRoTSyRPiU78LTiES64FiZ6rEk5Wq0Lh8IkqMAJ
-         2aYFyuqZ5WlkVHHNZlSPCi6tEbNspkX+u9YRjS+TXUOIvOwM8yAOcmZFmpuzNllCffk4
-         EU8J7drdo0OVWVUCrDt+iYk5oIM2WKqCb3chkb8o9zodaMs6knuwA6xmuHz/F+FRiq/1
-         i0D6TjtN5+51LOBYc6bPe0hPPLbqqP4ifo8ZwaiV+HkHvw6dZLRbOeTnmdHT0It1mcox
-         ZOIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDKZT5XYacjg3177nrSVgmB7NQZOmwudIBEtRwiSwd0Hms9K2TMoRODbhJ6YrlYttwTfP/XJc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwiPMcu1K/i8hiCShbnIkpD3aAVxk1naC0AKGEjiZZ/P8y9Jwmm
-	L/hYjnfs8PBDbvqZsg0L1F7TThcQsfV0q0w/GylGpY5KJr8rSz0+gmO2/IK4TTIMvPTyH5j8mGn
-	rpQ==
-X-Gm-Gg: ASbGnctx2kkN239sIyL46YE7B+WIvJdFnJs9Y1Iz/YrP0SyyjaYg6rG70C8otetqAeo
-	RfbZrux3a+GCPynrAvWGx620iCYKZIZ5fDycasVGqVr+IkxyB7paW+lj6Y+TvNwqCu074n9uGO8
-	F9rgQl061ZfTINeKRB8cJeMA3ESYj/F09B+24tHuugwTBvXTRUCEEytM/XYcgup4hiDqUeeaaNJ
-	bdcDeKuy2ixeAuW5m1RPx/dvMhJRGR5aKm3VV8Pgap5i5J4cTqQZkHizBeZOZYxq6AEKvmsOdzB
-	1JuIQ5iTO0TqV0NQ7WZombP4ot4exltSji8JTUrBkrvPVZHcWKH3eajI3epyl/65EAPq5UR7jbm
-	wNMsoJiFE07W+
-X-Google-Smtp-Source: AGHT+IG+qNv3nEuovxtZ4Kh1LW4uAVYUbOr45A5k0T9kpCaFC9wlZiiNL+99xr4j/zMeBCPF6NNn8w==
-X-Received: by 2002:a05:600c:3ba0:b0:43b:cbe2:ec0c with SMTP id 5b1f17b1804b1-43bcbe2efa9mr11724355e9.27.1741079010911;
-        Tue, 04 Mar 2025 01:03:30 -0800 (PST)
-Received: from google.com (105.168.195.35.bc.googleusercontent.com. [35.195.168.105])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bcb96b0c5sm18735925e9.19.2025.03.04.01.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 01:03:30 -0800 (PST)
-Date: Tue, 4 Mar 2025 09:03:26 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	qperret@google.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Count pKVM stage-2 usage in secondary
- pagetable stats
-Message-ID: <Z8bB3sr7X4RRV0CN@google.com>
-References: <20250228121355.1377891-1-vdonnefort@google.com>
- <Z8Ycq3d7O8_3fozk@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sQPkZud9"
+Date: Tue, 4 Mar 2025 10:12:30 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741079558;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yk65YCoknZT+htaDe9nqwacdmrTmjKV45m85/3fsFhE=;
+	b=sQPkZud9kSyo2eP4UHsTl0mo8Gijg6SRFTEvSNzOPWxVZ19igT2P901QlPfY1Uc1Xu/aAm
+	hmLNfw82SZlsDeYmKz/xB1QShkteULXP2sYggBN8gJfbIkYeaNr8A7a7Dv65HmgZ//hHTe
+	8TmwryZlyMbq+tdY/72ICKmL89aUX34=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, atishp@rivosinc.com, 
+	cleger@rivosinc.com, pbonzini@redhat.com, thuth@redhat.com, 
+	Andrew Jones <ajones@ventanamicro.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] configure: Allow earlycon for all
+ architectures
+Message-ID: <20250304-4e2ee456d30819f9a38239c8@orel>
+References: <20250221162753.126290-4-andrew.jones@linux.dev>
+ <20250221162753.126290-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -79,33 +46,170 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8Ycq3d7O8_3fozk@linux.dev>
+In-Reply-To: <20250221162753.126290-5-andrew.jones@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 03, 2025 at 01:18:35PM -0800, Oliver Upton wrote:
-> On Fri, Feb 28, 2025 at 12:13:55PM +0000, Vincent Donnefort wrote:
-> > Count the pages used by pKVM for the guest stage-2 in memory stats under
-> > secondary pagetable stats, similarly to what the VHE mode does.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 1f55b0c7b11d..c2e022c41313 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1088,12 +1088,18 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
-> >  
-> >  static void hyp_mc_free_fn(void *addr, void *unused)
-> >  {
-> > +	kvm_account_pgtable_pages(addr, -1);
-> >  	free_page((unsigned long)addr);
-> >  }
+On Fri, Feb 21, 2025 at 05:27:55PM +0100, Andrew Jones wrote:
+> From: Andrew Jones <ajones@ventanamicro.com>
 > 
-> Don't we drain more than just stage-2 page tables into the teardown_mc
-> (e.g. vcpu structs)?
-
-Sigh, yes we do. I've left behind some changes we have in our Android branches.
-Let me respin a proper version :-\ 
-
+> earlycon could be used by any architecture so check it outside the
+> arm block and apply it to riscv right away.
 > 
-> Thanks,
-> Oliver
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  configure | 88 +++++++++++++++++++++++++++----------------------------
+>  1 file changed, 43 insertions(+), 45 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 86cf1da36467..7e462aaf1190 100755
+> --- a/configure
+> +++ b/configure
+> @@ -78,10 +78,9 @@ usage() {
+>  	                           4k [default], 16k, 64k for arm64.
+>  	                           4k [default], 64k for ppc64.
+>  	    --earlycon=EARLYCON
+> -	                           Specify the UART name, type and address (optional, arm and
+> -	                           arm64 only). The specified address will overwrite the UART
+> -	                           address set by the --target option. EARLYCON can be one of
+> -	                           (case sensitive):
+> +				   Specify the UART name, type and address (optional).
+> +	                           The specified address will overwrite the UART address set by
+> +	                           the --target option. EARLYCON can be one of (case sensitive):
+
+I'll add
+                                   (arm/arm64 and riscv32/riscv64 only)
+
+since no other architecture is paying attention to the parameter at this
+time.
+
+Thanks,
+drew
+
+>  	               uart[8250],mmio,ADDR
+>  	                           Specify an 8250 compatible UART at address ADDR. Supported
+>  	                           register stride is 8 bit only.
+> @@ -283,6 +282,41 @@ else
+>      fi
+>  fi
+>  
+> +if [ "$earlycon" ]; then
+> +    IFS=, read -r name type_addr addr <<<"$earlycon"
+> +    if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] && [ "$name" != "pl011" ]; then
+> +        echo "unknown earlycon name: $name"
+> +        usage
+> +    fi
+> +
+> +    if [ "$name" = "pl011" ]; then
+> +        if [ -z "$addr" ]; then
+> +            addr=$type_addr
+> +        else
+> +            if [ "$type_addr" != "mmio32" ]; then
+> +                echo "unknown $name earlycon type: $type_addr"
+> +                usage
+> +            fi
+> +        fi
+> +    else
+> +        if [ "$type_addr" != "mmio" ]; then
+> +            echo "unknown $name earlycon type: $type_addr"
+> +            usage
+> +        fi
+> +    fi
+> +
+> +    if [ -z "$addr" ]; then
+> +        echo "missing $name earlycon address"
+> +        usage
+> +    fi
+> +    if [[ $addr =~ ^0(x|X)[0-9a-fA-F]+$ ]] || [[ $addr =~ ^[0-9]+$ ]]; then
+> +        uart_early_addr=$addr
+> +    else
+> +        echo "invalid $name earlycon address: $addr"
+> +        usage
+> +    fi
+> +fi
+> +
+>  [ -z "$processor" ] && processor="$arch"
+>  
+>  if [ "$processor" = "arm64" ]; then
+> @@ -296,51 +330,14 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+>  elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>      testdir=arm
+>      if [ "$target" = "qemu" ]; then
+> -        arm_uart_early_addr=0x09000000
+> +        : "${uart_early_addr:=0x9000000}"
+>      elif [ "$target" = "kvmtool" ]; then
+> -        arm_uart_early_addr=0x1000000
+> +        : "${uart_early_addr:=0x1000000}"
+>          errata_force=1
+>      else
+>          echo "--target must be one of 'qemu' or 'kvmtool'!"
+>          usage
+>      fi
+> -
+> -    if [ "$earlycon" ]; then
+> -        IFS=, read -r name type_addr addr <<<"$earlycon"
+> -        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
+> -                [ "$name" != "pl011" ]; then
+> -            echo "unknown earlycon name: $name"
+> -            usage
+> -        fi
+> -
+> -        if [ "$name" = "pl011" ]; then
+> -            if [ -z "$addr" ]; then
+> -                addr=$type_addr
+> -            else
+> -                if [ "$type_addr" != "mmio32" ]; then
+> -                    echo "unknown $name earlycon type: $type_addr"
+> -                    usage
+> -                fi
+> -            fi
+> -        else
+> -            if [ "$type_addr" != "mmio" ]; then
+> -                echo "unknown $name earlycon type: $type_addr"
+> -                usage
+> -            fi
+> -        fi
+> -
+> -        if [ -z "$addr" ]; then
+> -            echo "missing $name earlycon address"
+> -            usage
+> -        fi
+> -        if [[ $addr =~ ^0(x|X)[0-9a-fA-F]+$ ]] ||
+> -                [[ $addr =~ ^[0-9]+$ ]]; then
+> -            arm_uart_early_addr=$addr
+> -        else
+> -            echo "invalid $name earlycon address: $addr"
+> -            usage
+> -        fi
+> -    fi
+>  elif [ "$arch" = "ppc64" ]; then
+>      testdir=powerpc
+>      firmware="$testdir/boot_rom.bin"
+> @@ -351,6 +348,7 @@ elif [ "$arch" = "ppc64" ]; then
+>  elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+>      testdir=riscv
+>      arch_libdir=riscv
+> +    : "${uart_early_addr:=0x10000000}"
+>  elif [ "$arch" = "s390x" ]; then
+>      testdir=s390x
+>  else
+> @@ -491,7 +489,7 @@ EOF
+>  if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>  cat <<EOF >> lib/config.h
+>  
+> -#define CONFIG_UART_EARLY_BASE ${arm_uart_early_addr}
+> +#define CONFIG_UART_EARLY_BASE ${uart_early_addr}
+>  #define CONFIG_ERRATA_FORCE ${errata_force}
+>  
+>  EOF
+> @@ -506,7 +504,7 @@ EOF
+>  elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+>  cat <<EOF >> lib/config.h
+>  
+> -#define CONFIG_UART_EARLY_BASE 0x10000000
+> +#define CONFIG_UART_EARLY_BASE ${uart_early_addr}
+>  
+>  EOF
+>  fi
+> -- 
+> 2.48.1
+> 
