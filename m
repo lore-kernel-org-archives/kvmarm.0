@@ -1,69 +1,85 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89514201024
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 09:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B0B1FCFDF
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 09:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741080722; cv=none; b=pKzQ6dHtXaGajQaUKFHH2M602bPlW7cD3PI2IxNrUl1lFRKJi2OdLCl14wecvl2btkJqIV0yCLlCjh5ANlVWAbugdFbZEi2qDQZt0ACzlVxD/LOoqEdQro2h/uShg99zjlIviSXzd85jqlQCdvx0zOjxil1hlUE8GJ0vgqhEI2s=
+	t=1741082080; cv=none; b=lEUT97CAc50Xu5Fms1vSYwpYwSiGdgHtWyOwD3tA83XyLpSeVqkOGSwV7euhDfjiSH6Uf3ko4n9GvkARb7wFOkggiQuJjBlgnkIC7Zp7sgIZKRGro6qe6XlmKPi/2OUdBgb6clYcsnBthpkdB45qHxhlYQJuTKCvVWIxgg4oPw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741080722; c=relaxed/simple;
-	bh=IDjvk94rKZybQAlhAUWNC+KfSiGavH/5iMMsf+FGg0k=;
+	s=arc-20240116; t=1741082080; c=relaxed/simple;
+	bh=aAAx0WCfVD9Yht0Hjqf+5lQdm3MbQGouHvs42YNXPAI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KditSEcExSt/cmLOi5+gPgfsaKUsVQOXAunusspWnWxfUbo/AYu6Q46qw16coDDNIV37sxMs6v456ssUWjrfDgxPlH/EZJlIeS+r3gf0RzU4nMj1Y4SWpF7yajwCSDj3X+wgzqCvFbXeIDBaxoAzQmZmh5JOxPwFNdhxO0vv/1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T6gtLt1Q; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T6gtLt1Q"
-Date: Tue, 4 Mar 2025 10:31:48 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741080717;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p2F44jkdAl5d6Y7W7SiN0NSgO/b81SC9eWu/a3vDhv8=;
-	b=T6gtLt1QOFeEE+xiGaE5fT9BfkFnXkZjtrFCpSRIz5I+0Kbjbwr+M403yWzs0UdhcFYNYn
-	+jNkPtjr2ZPefO3qneSJblMV0G3yuxYulb7MdKorexIth3k+ZEKBVmVmIXxyTXE+tcs5As
-	+snjIIVds315bfFuOpuW0SFaw22nYnQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, atishp@rivosinc.com, 
-	cleger@rivosinc.com, pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 0/2] riscv: Run with other QEMU models
-Message-ID: <20250304-47806ddca2d868f97d63de6b@orel>
-References: <20250221162753.126290-4-andrew.jones@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ANtvmURu1ah1OxKaPXadOVwtY8SWzUHUpWpd4mjSplZz628FvgOJJ188y4nNhOKc6Haa1zEqYlyh5x3/nI+ovpGpA5COlI4QGi4w/GfZ3f128YkWkjO6MJRIZSORhvZkeNNLz/Dvbz/xl8U83f9N4d+S4O7gqMPcMJwbNWVW24o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9EBE9FEC;
+	Tue,  4 Mar 2025 01:54:51 -0800 (PST)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 676D93F5A1;
+	Tue,  4 Mar 2025 01:54:35 -0800 (PST)
+Date: Tue, 4 Mar 2025 09:54:32 +0000
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ene <sebastianene@google.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, catalin.marinas@arm.com,
+	joey.gouly@arm.com, oliver.upton@linux.dev, snehalreddy@google.com,
+	suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH v2 2/4] KVM: arm64: Move the ffa_to_linux definition to
+ the ffa header
+Message-ID: <Z8bN2MI5GYdVtGyE@bogus>
+References: <20250227181750.3606372-1-sebastianene@google.com>
+ <20250227181750.3606372-3-sebastianene@google.com>
+ <20250227202557.d3fd6ylzbaho4pvx@bogus>
+ <Z8DxZY-09R6lwEW3@google.com>
+ <86wmdapei8.wl-maz@kernel.org>
+ <20250303234426.GB30749@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250221162753.126290-4-andrew.jones@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250303234426.GB30749@willie-the-truck>
 
-On Fri, Feb 21, 2025 at 05:27:54PM +0100, Andrew Jones wrote:
-> Provide a couple patches allowing a QEMU machine model other than 'virt'
-> to be used. We just need to be able to override 'virt' in the command
-> line and it's also nice to be able to specify a different UART address
-> for any early (pre DT parsing) outputs. 
-> 
-> Andrew Jones (2):
->   configure: Allow earlycon for all architectures
->   riscv: Introduce MACHINE_OVERRIDE
-> 
->  configure | 88 +++++++++++++++++++++++++++----------------------------
->  riscv/run |  6 ++--
->  2 files changed, 47 insertions(+), 47 deletions(-)
-> 
-> -- 
-> 2.48.1
+On Mon, Mar 03, 2025 at 11:44:28PM +0000, Will Deacon wrote:
+> On Fri, Feb 28, 2025 at 10:09:19AM +0000, Marc Zyngier wrote:
+> > On Thu, 27 Feb 2025 23:12:37 +0000,
+> > Sebastian Ene <sebastianene@google.com> wrote:
+> > >
+> > > On Thu, Feb 27, 2025 at 08:25:57PM +0000, Sudeep Holla wrote:
+> > > > On Thu, Feb 27, 2025 at 06:17:47PM +0000, Sebastian Ene wrote:
+> > > > > Keep the ffa_to_linux error map in the header and move it away
+> > > > > from the arm ffa driver to make it accessible for other components.
+> > > >
+> > > > Do you plan to push/target these changes for v6.15 ? If not, I can take
+> > > > this patch with other FF-A changes in my tree for v6.15. Otherwise, it
+> > > > is must go along with other changes.
+> > > >
+> > >
+> > > Yes, feel free to pick them with your changes and we can push them
+> > > later.
+> >
+> > So this series is not a 6.15 candidate?
+>
+> I think this is 6.15 stuff once it's been reviewed. Sudeep's message is
+> a little confusing as it refers to 6.15 twice (I guess he meant 6.14 the
+> first time?).
+>
 
-Merged.
+No I meant v6.15 both times 😉. Since not much time before v6.15, I was
+thinking if this is not v6.15 material, I can just take the driver change
+for v6.15 itself via my tree. Now that, you have clarified, I will leave
+it to you. I think it doesn't conflict with any of driver changes in -next.
 
-Thanks,
-drew
+In short, just to avoid any further confusion, please take it via arm64/kvm
+tree.
+
+--
+Regards,
+Sudeep
