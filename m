@@ -1,71 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3E01F427D
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 05:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3441F3B8C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 05:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741066732; cv=none; b=IuWDx5skftkef3A/dlvZ5kWE7iJ+nh1ZxHsIX3MSQbCwoGJ2NL1sIW6zNzdjLHzUCZqasiB32Nzf/ZonhNtO3E0X3emOA92lau8fUk3/wXDhiyZJB3F1elyddP+zrAAO9aKsyaYsvG905HXm9yWAfR6ElK9lC/LNFx5toUZrnfA=
+	t=1741066807; cv=none; b=mA2B67FlLfJSu0GbE93VqW2+U9A1CuxaNMU2hFfMC1DxLm0PRsZsMSHWYaumM78XRtiJwPXyl8xcsvvYftskz6laEf0x7zNcXOklgWp3lPawVs0nulc7xwyWZfm1YgkopCZf0aqrhdcHby2tumuqI2LSMZaB8uBJwZTNhdUw0oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741066732; c=relaxed/simple;
-	bh=bq1rEvMgUCO+z9mqMh3toWqnhddFvqq5Jt040KPfC+8=;
+	s=arc-20240116; t=1741066807; c=relaxed/simple;
+	bh=m1IRZ6JWrGXWz0hUht2VZ4u/oJafs19LSlUBPTVVrj0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Om4rjM+zEH2BkwVXgTYXvsUHmdmUw5DzxRDpjoqnajH5/xtuGwxhvoVGLDO+09EmLbQPpurmPqM3sOwyGae6GnhlY9ukBB3LPjr41Ieoz0lRRhJZePXENbdsd60lTNLfnNCbGfMGHj5mmG0+ffv03GuL/hIQ9gBip/zSJw+sEuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzlxiAK9; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=u8E0iYHn5rOimGzXlYvqyHVWbu3JSELCAqgSdETf1HZLvSar1plmz0ltwVxvcE2SfpwJ5svEhnnZuPGvnOtXKlybJy13x966HLCuak2p0OPvSLHLlxg+NwkcGrYOSB4x/7hTMYw7l3yZcNtppAXJs/azj7kIHYpS+bWXcWmzd7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K/haH+6C; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzlxiAK9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/haH+6C"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741066729;
+	s=mimecast20190719; t=1741066804;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rhnvguDUl9b0lKjHpwaAt3YEx23OG5Tvc8nGcNEISp4=;
-	b=gzlxiAK9RV/b+N3lo8EvEqs6UxqLfIdBIosqoj6ZfCFN8bfpyTQ7bnhIKnhL5/G/2UCK2n
-	xcDKeqQrTZSVeYM8MGNJryDyN08dTRz/aW1Bx96h0NqbQNqnowBNTeax9EdDnVm43/c+a1
-	pI5C/cx9GMXTXttzMHtYK6RQPQyo6Pw=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=lnsiIq7MCp7MkWvaBWDURZ2QmGy76WgJakR0X9oQlAA=;
+	b=K/haH+6C2ENfas9qAoDsoj2q/UOB3vy06k1DByPERwkoi1Jk9/+6HzICsyYTq1KmvAAtTi
+	1XDJwOnj+jUlx7NTiWE7b30uzGFQ1Wb7FI4cGA94IA7Kyu6whE15NlcpwLz0mlBYNykqcC
+	+qXuLhkUQ4ex16o1UdtHW85TQGs9gY4=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-vCAiu01WNjWCGiJ0CNYoNA-1; Tue, 04 Mar 2025 00:38:38 -0500
-X-MC-Unique: vCAiu01WNjWCGiJ0CNYoNA-1
-X-Mimecast-MFC-AGG-ID: vCAiu01WNjWCGiJ0CNYoNA_1741066717
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2fe98fad333so10461769a91.2
-        for <kvmarm@lists.linux.dev>; Mon, 03 Mar 2025 21:38:38 -0800 (PST)
+ us-mta-515-SbUJ8rReOZet7ik03rnnLw-1; Tue, 04 Mar 2025 00:40:01 -0500
+X-MC-Unique: SbUJ8rReOZet7ik03rnnLw-1
+X-Mimecast-MFC-AGG-ID: SbUJ8rReOZet7ik03rnnLw_1741066800
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2feda472a7bso4815343a91.3
+        for <kvmarm@lists.linux.dev>; Mon, 03 Mar 2025 21:40:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741066717; x=1741671517;
+        d=1e100.net; s=20230601; t=1741066800; x=1741671600;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rhnvguDUl9b0lKjHpwaAt3YEx23OG5Tvc8nGcNEISp4=;
-        b=lM8se6MBjuUqW9/gsnES1lyG6yq1tnTATmCHuduW/XrLelFYtBFkA2uT8LMVUN7t4g
-         RecG5qsZpBCMBXH2l+mrE4FVKt/HmQC/g0caRmYdIeFiUm0tj2yH/ttCMN2HSEQjFldg
-         StSpJoZbQH+8/CS70Tzrmm//Hb/nqx+OPBwzZjyOVazuECkep23y7ynWV53NjdF+BwFF
-         C+HPG8t8JcI0yN24y/5BNYkVLyU9n1OhkJpU7DUDDuwm+9wv+/YfSYIZ5kY/3KupzCU4
-         U/kA9IuXwBCVAdJJBO85PiCJ2lfB5Sbkl0cp3OqqVBKYY89UCSEU/fi7CtLBoT6dP/5f
-         tdEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSUJP7ytkygxrEGKEwVkJCj6ELm9awfndBnKjB5Z+h56Y2viDt0RaracDoIAAIfwZC6hUTCvY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxBqTbJ8mpvITAMju7iSF31KAnsjOzOGV7EYjKUTBT5NH7rm5Sc
-	wtgNXeod7+HJTRxj0lBd8/s0UD/Tv8uqZ/4pSH0l1cnKXmWqauxbeHv/GTlfezh2+VZ80UzvKbD
-	xsfzBXhMt7wUDa2Ctaro1NP9eVl+CGbTTl6JgetfZXeyfArScvrUshRA2GlDHAg==
-X-Gm-Gg: ASbGncu8ckZdyG1kcc7fQqPLQy4gYIqcCFG3Q01h7IQputWynnTf63cTJidP3HeSHQP
-	JA+StEZRFCOJViX58RgddPhsuEeoG2llyHsHerJ56nBAmZJn1aAI9b3BGZCSeInRejL9Qn2JXxN
-	2np4Tw0iPI5edvNuFNrDDL8VKNZpK5WSvZ3Md/e3tKgAK2kzvlldYRAggGoHhA3uJMFjW8iJyDD
-	Tf566U23HvHF97X41NGnB9WvKKjjce2SOp5Q7ULVZkHhZPdsQze1/o5tGoj9GwqHZMvdryWDYQh
-	B+/O+rmCOuS4JRvt8Q==
-X-Received: by 2002:a17:90b:2f8d:b0:2fa:228d:5af2 with SMTP id 98e67ed59e1d1-2febab6c68emr25331681a91.15.1741066716879;
-        Mon, 03 Mar 2025 21:38:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF612ZxdojGbx89Aqh0mhvbM65hIZPcepIXHF98wxNJcpuaTGS26LwyEfOvsNmDG1/FgXRbOg==
-X-Received: by 2002:a17:90b:2f8d:b0:2fa:228d:5af2 with SMTP id 98e67ed59e1d1-2febab6c68emr25331658a91.15.1741066716552;
-        Mon, 03 Mar 2025 21:38:36 -0800 (PST)
+        bh=lnsiIq7MCp7MkWvaBWDURZ2QmGy76WgJakR0X9oQlAA=;
+        b=Y7bJx+KDC3PBg7aYolnq1ChN8Qvq/7g2Kys55pyaB3OdFy8fAGFEsY9OpKU5nLEvpG
+         4MocKUPFdVj7N2FwjanfU/onhS2ldybssOraFv6d0BHt/O1tXr4OoWJKaU3/sVgwReLy
+         QzRQOCrRhHy7g1xFj+a1xtYaJeBWwkZEW5c6SaAayprGp7/9Nb3ijbm8We1zkR93hm7q
+         jinlZVRNId5VkwtUBCxVfBrMtwdDrkg3fh1UYsJu57yviV49bHHUK4c25tN/9vq8MzYY
+         JddxVXO5SlNWcchKLWWVGkh8Nztb8ca2eQecdsdt/a/xeMheACvDpcexRSEmw2KTp97V
+         xOQw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+6i2eK8EgofFNurNip0yPAtV9c3f5TQdICyoeet0d5prG5Yg+VxcDMBQFCm28XjFTbns8siA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxCcxUcEhpqH83c3ZIHrXbaUcbsyfF3ZbZNbVr1knKN2qBES8dM
+	XCtvO0IfcQSjukyZcyVT38JqVS0s3kgLO219tWD+xsGYe5a/8L9SSVLNupY0Qgdua0YjaGa+dt1
+	x1Mc3ysCRhCV+Y51QtbvbHbEgfvzKXnkQNXe8DHA/aqT+C0mvkk+IlQ==
+X-Gm-Gg: ASbGnculJUGXXbfgIGtaIRpZ08SE/L8o2onFDvpccgefeo5DDtdWcdgeXjdl1sB3EDH
+	wkxNgvzVXmZWJRnrbmagVoyi389pXBzPE6Kq+7za0wz/Z1npy/TLeUc9uv3mn99Zmy9EpxI5XeT
+	fRqw1Ck9boUI0KpFBoCILP0nd/9c6cz3R/pfRuGE23mL0MTrkJtgRfYzspeKZeEQOhToEY2tHfB
+	ozhGZaEoSUuO4I2+a9psVomXCy1plyrQAQkNZHLkEOs8GSSiCiNlLIGsItwLS0BRil8rRb7lIne
+	llbA1R4XQ1CgKcQIRQ==
+X-Received: by 2002:a05:6a00:1e0f:b0:736:41ec:aaad with SMTP id d2e1a72fcca58-73641ecaf3cmr9917211b3a.14.1741066800344;
+        Mon, 03 Mar 2025 21:40:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGLv+2IvaT9lpwd7y3NyeB6C4SRMHYy3586SBjSpdbcGPeX0DUdvbJ57X14h7Gm8kD4TRZ84g==
+X-Received: by 2002:a05:6a00:1e0f:b0:736:41ec:aaad with SMTP id d2e1a72fcca58-73641ecaf3cmr9917181b3a.14.1741066799979;
+        Mon, 03 Mar 2025 21:39:59 -0800 (PST)
 Received: from [192.168.68.55] ([180.233.125.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235050d7c1sm87354825ad.198.2025.03.03.21.38.29
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7365bb4090csm2607097b3a.35.2025.03.03.21.39.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Mar 2025 21:38:35 -0800 (PST)
-Message-ID: <5008db08-c153-48c0-90b3-39fa0297ba1e@redhat.com>
-Date: Tue, 4 Mar 2025 15:38:27 +1000
+        Mon, 03 Mar 2025 21:39:59 -0800 (PST)
+Message-ID: <bf568862-5435-4c88-9364-0190f30a3d9a@redhat.com>
+Date: Tue, 4 Mar 2025 15:39:51 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,7 +73,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 24/45] KVM: arm64: Handle Realm PSCI requests
+Subject: Re: [PATCH v7 25/45] KVM: arm64: WARN on injected undef exceptions
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -89,34 +89,27 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-25-steven.price@arm.com>
+ <20250213161426.102987-26-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250213161426.102987-25-steven.price@arm.com>
+In-Reply-To: <20250213161426.102987-26-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: l5qI4-d9dpb_1XYn3IgpCP6Y1esrT5KAqmNgz2-U0IA_1741066717
+X-Mimecast-MFC-PROC-ID: RLqVa7M-Rv1w7O4pUmyw0Unl1nbDwAgtyK1-BDRXJ-4_1741066800
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2/14/25 2:14 AM, Steven Price wrote:
-> The RMM needs to be informed of the target REC when a PSCI call is made
-> with an MPIDR argument. Expose an ioctl to the userspace in case the PSCI
-> is handled by it.
+> The RMM doesn't allow injection of a undefined exception into a realm
+> guest. Add a WARN to catch if this ever happens.
 > 
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
 > Changes since v6:
->   * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
->   * Minor renaming/formatting fixes.
+>   * if (x) WARN(1, ...) makes no sense, just WARN(x, ...)!
 > ---
->   arch/arm64/include/asm/kvm_rme.h |  3 +++
->   arch/arm64/kvm/arm.c             | 25 +++++++++++++++++++++++++
->   arch/arm64/kvm/psci.c            | 30 ++++++++++++++++++++++++++++++
->   arch/arm64/kvm/rme.c             | 14 ++++++++++++++
->   4 files changed, 72 insertions(+)
+>   arch/arm64/kvm/inject_fault.c | 1 +
+>   1 file changed, 1 insertion(+)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
