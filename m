@@ -1,165 +1,138 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E582980A8
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 17:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEB024EAA0;
+	Tue,  4 Mar 2025 17:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109891; cv=none; b=Nu9HXjFMTZ1xMcozjx2FsULIyNNzGguM0YImcgx2jQFGaozATntUXq68li2qsQc9j/ODNg71Igf/xwpHWd0xrfpV0FX7DjoWK6bwrGZEMAVS4WWzCB+JiAsrM0nMgg00GW3sMBSB4anBf5Nicsn3dacGWdmscrpkJE8bFumuD54=
+	t=1741111168; cv=none; b=f5h/UaMkg3u96j3YHwctE8WQE7GjAaKm+H/6qBKaPdEc6Z95pzcB5ATezUGnF7u4rStcIDwYhAUpsaPU+mR7iANvVp/O7TMDrBSzjhp6GSsM3F93rx4yxBWQJUFC8eTWGrM3Hk1DyWwvKlE/Yj+E113GlHSDrwLWXfYOayhYA8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109891; c=relaxed/simple;
-	bh=YBkjs7x4M5DA1yV1fs8+DwMnIWeKn75JE8veC9jpzm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W2ivoSVNiLkwT+gwn7mW9TVTx0TUCNdNYcJFoP0jCfkoAI50v7zcTIFpu+Lnj148n/bYUbuV3gnnwxFwKx57prRHqAjqZYKR/IZhCvEMJtZwQ3g5SII34L5pXiGCkXyuuAwLwFD+Ed3EW21E0hnm6RWHVonJNOQrE0SDCRbHjxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iyp8wdAa; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iyp8wdAa"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4393ee912e1so62645e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 09:38:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741109885; x=1741714685; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hL600D2Vd4+7j33RPgiVpKbsOkzk21To6aEbWxtha+U=;
-        b=iyp8wdAatVBl5KTr6pY9aTJqtlXEg6KoII8n7OW7JstPo70VQD8NRqbsjVxlOo0G2z
-         klJHzBWUtINnBJ4syMd9+Q8B+1ptQLa4ZkC00u1RXZQw+/B7b/VwHgHiQqLBeZG353FY
-         iJNaIoR5vu+oca+PvdpJEyDEif2Ig8wMZKSl5hVe8R/tFndc4FmOrUv31L/KlFJPtEJo
-         dLel8bETnTP+z+A4gP3bGWSVkSJqJS8ZCf4UJ0atAR1PaiJfwlVHEi+YTiz/Q9vFO0fZ
-         uBr9qVaTj3HtE3oeQP81/tp5odokWQ1biSVacF/7MchZF4WRwjG3kf2ptQK9yUN16sA8
-         XzOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741109885; x=1741714685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hL600D2Vd4+7j33RPgiVpKbsOkzk21To6aEbWxtha+U=;
-        b=EnWsmiDIFM8SHbtoglSXIvGyHYupcD88ylSHv0ogi8itPy8XJQKt7DZTZ0SdGYY2rb
-         fmQ5NIAjTsM8oTbNQjXydj4x5He03a3MbH4eBb4AQHrPRpoGMPj3XpD01FVzMue2DFEJ
-         9+RlWcUUl2NsnsQLQgke3JRhUxiPJjA6o9GbXUtBGFCKZ/fVNIPpVc4X5f6OkFVAV8w1
-         Ml70uRuKU9o0o/t8qrgcRLluiR/z1mS/9W/NlWQEYPrkPbU0399AKR2ByKbZyV/aLOe7
-         xiLBkkSKkiE9nnpVnC3td4pKX/A9Hbt9oL7WIbXu7En6MMyIBPQ2H0XAyOeW3eSjepas
-         y9QA==
-X-Forwarded-Encrypted: i=1; AJvYcCXa2m3l7LIuRpmeuBwfgUTfgvFXjD30VLbDHaRPpK8UrHkObY8bj1rQI38F2Z1mT0/eRq9CyaM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVF7Jvaow018Yk9hGV9dccQmRb4+LqiveDdjZQt0cjSKtDTPRR
-	XXjQH2A6z0atPHRIBYaChGgD2FsbKzK4BtD4u6i+eZikQ5vaJtjmtuQUfwgO4w==
-X-Gm-Gg: ASbGncvEk0qm5xDFL4wR/lHH7ZDsd5rBVJbRxlvUI+MUusoCeMtNUKK4t1Y2WUs0p29
-	pG+LjiF6LsDPAqzioXu3H5rLnsk5JX3FOMRkl7U3JYRuvNGBmNuIMN2oXHoS7ERxRsJJA8gS7Dd
-	AlyktSxjKxoCnjkyQm3ahieIwFJDBEf4ICBwynW0WJ1EKVSXJ8o97Qz004sDidSrVwHVBWzTDk4
-	pXr2T7ffd+warycekro0BzXP4Zjjiv+OzPTUDvKdwQ7cMgSihOqvXs4gM+Tvm9NmsbwV2wbVIP0
-	T86QK7wL0NWmZFzs/xQEKq1+UScpRnINmHydgPzZlwEhj7Ztns4d89fgQuTaQELI14TxKF7BwxG
-	J+JdvZXBzep4E
-X-Google-Smtp-Source: AGHT+IEpl5KnI/AmOBYa3wPD1FFPvleHPCRAbMj/fSXQ1+Q66fw7eWALywPcXdmGSME1S33/iyh4Iw==
-X-Received: by 2002:a05:600c:329b:b0:439:9434:1b6c with SMTP id 5b1f17b1804b1-43bd15f3ffamr165995e9.3.1741109885428;
-        Tue, 04 Mar 2025 09:38:05 -0800 (PST)
-Received: from google.com (100.235.22.34.bc.googleusercontent.com. [34.22.235.100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e485d906sm18464176f8f.90.2025.03.04.09.38.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 09:38:04 -0800 (PST)
-Date: Tue, 4 Mar 2025 17:38:02 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org,
-	oliver.upton@linux.dev, snehalreddy@google.com,
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Map the hypervisor FF-A buffers on
- ffa init
-Message-ID: <Z8c6enoolJe7Zeqk@google.com>
-References: <20250227181750.3606372-1-sebastianene@google.com>
- <20250227181750.3606372-4-sebastianene@google.com>
- <20250303234259.GA30749@willie-the-truck>
- <Z8ZPBZF7J-qKdb_i@google.com>
- <20250304015633.GA30882@willie-the-truck>
+	s=arc-20240116; t=1741111168; c=relaxed/simple;
+	bh=oVD1GE3NzUYwD56omqTkMkV8FxpM5ALoGZ32XZaFoUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mh7d/LNATevCBubYPglKDSabDqlJZ4iAn9d5qpdTN8lMZMZYgUocmjA95aTE6Y4D1nD6XQ10DCgPMG21dkrl1QPbVAWd2BLqkKYse9m1tiw2IEbsKl1U3Qhg3GiglUO2U/2uI6HNtMBZeKxh27DqpTC5/stlsIV1BZURb2v4Zvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23A042F;
+	Tue,  4 Mar 2025 09:59:38 -0800 (PST)
+Received: from [10.57.39.179] (unknown [10.57.39.179])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E329B3F5A1;
+	Tue,  4 Mar 2025 09:59:20 -0800 (PST)
+Message-ID: <d3181dde-1070-4101-a5f7-7e42d0ec2f99@arm.com>
+Date: Tue, 4 Mar 2025 17:59:19 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250304015633.GA30882@willie-the-truck>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 15/45] KVM: arm64: Support timers in realm RECs
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-16-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250213161426.102987-16-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 04, 2025 at 01:56:35AM +0000, Will Deacon wrote:
-> On Tue, Mar 04, 2025 at 12:53:25AM +0000, Sebastian Ene wrote:
-> > On Mon, Mar 03, 2025 at 11:43:03PM +0000, Will Deacon wrote:
-> > > On Thu, Feb 27, 2025 at 06:17:48PM +0000, Sebastian Ene wrote:
-> > > > Map the hypervisor's buffers irrespective to the host and return
-> > > > a linux error code from the FF-A error code on failure. Remove
-> > > > the unmap ff-a buffers calls from the hypervisor as it will
-> > > > never be called.
-> > > > Prevent the host from using FF-A directly with Trustzone
-> > > > if the hypervisor could not map its own buffers.
-> > > > 
-> > > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 46 +++++++++++++----------------------
-> > > >  1 file changed, 17 insertions(+), 29 deletions(-)
-> > > 
-> > > [...]
-> > > 
-> > > > @@ -861,6 +842,7 @@ int hyp_ffa_init(void *pages)
-> > > >  {
-> > > >  	struct arm_smccc_res res;
-> > > >  	void *tx, *rx;
-> > > > +	int ret;
-> > > >  
-> > > >  	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
-> > > >  		return 0;
-> > > > @@ -911,5 +893,11 @@ int hyp_ffa_init(void *pages)
-> > > >  		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
-> > > >  	};
-> > > >  
-> > > > +	/* Map our hypervisor buffers into the SPMD */
-> > > > +	ret = ffa_map_hyp_buffers();
-> > > > +	if (ret)
-> > > > +		return ret;
-> > > 
-> > > Doesn't calling RXTX_MAP here undo the fix from c9c012625e12 ("KVM:
-> > > arm64: Trap FFA_VERSION host call in pKVM") where we want to allow for
-> > > the host to negotiate the version lazily?
-> > 
-> > We still have the same behaviour where we don't allow memory
-> > sharing to happen until the version is negotiated but this
-> > separates the hypervisor buffer mapping part from the host.
+On 13/02/2025 16:13, Steven Price wrote:
+> The RMM keeps track of the timer while the realm REC is running, but on
+> exit to the normal world KVM is responsible for handling the timers.
 > 
-> Sadly, the spec doesn't restrict this to the memory sharing calls:
+> A later patch adds the support for propagating the timer values from the
+> exit data structure and calling kvm_realm_timers_update().
 > 
->   | [...] negotiation of the version must happen before an invocation of
->   | any other FF-A ABI
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   arch/arm64/kvm/arch_timer.c  | 45 ++++++++++++++++++++++++++++++++----
+>   include/kvm/arm_arch_timer.h |  2 ++
+>   2 files changed, 43 insertions(+), 4 deletions(-)
 > 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index d3d243366536..06b68bcd244f 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -148,6 +148,13 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+>   
+>   static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+>   {
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	if (kvm_is_realm(vcpu->kvm)) {
+> +		WARN_ON(offset);
+> +		return;
+> +	}
+> +
+>   	if (!ctxt->offset.vm_offset) {
+>   		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+>   		return;
+> @@ -464,6 +471,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>   	}
+>   }
+>   
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
+> +	int i;
+> +
+> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
+> +		struct arch_timer_context *timer = &arch_timer->timers[i];
+> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
+> +		bool level = kvm_timer_irq_can_fire(timer) && status;
+> +
+> +		if (level != timer->irq.level)
+> +			kvm_timer_update_irq(vcpu, level, timer);
+> +	}
+> +}
+> +
+>   /* Only called for a fully emulated timer */
+>   static void timer_emulate(struct arch_timer_context *ctx)
+>   {
+> @@ -889,6 +911,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>   	if (unlikely(!timer->enabled))
+>   		return;
+>   
+> +	kvm_timer_unblocking(vcpu);
+> +
+>   	get_timer_map(vcpu, &map);
+>   
+>   	if (static_branch_likely(&has_gic_active_state)) {
+> @@ -902,8 +926,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>   		kvm_timer_vcpu_load_nogic(vcpu);
+>   	}
+>   
+> -	kvm_timer_unblocking(vcpu);
+> -
+>   	timer_restore_state(map.direct_vtimer);
+>   	if (map.direct_ptimer)
+>   		timer_restore_state(map.direct_ptimer);
+> @@ -1094,7 +1116,9 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>   
+>   	ctxt->vcpu = vcpu;
+>   
+> -	if (timerid == TIMER_VTIMER)
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		ctxt->offset.vm_offset = NULL;
+> +	else if (timerid == TIMER_VTIMER)
+>   		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
 
-We do that, as the hypervisor negotiates its own version in
-hyp_ffa_init. I think the host shouldn't be allowed to overwrite the
-hyp_ffa_version obtained from _init, this feels wrong as you
-can have a driver that forcefully downgrades the hypervisor to an old
-version.
+I think we need to disable the KVM_CAP_COUNTER_OFFSET for Realms and
+also deny KVM_ARM_SET_COUNTER_OFFSET vm_ioctl.
 
-We need to do three things, Sudeep & Will please correct me if I am
-wrong, but this is how I see it:
+Suzuki
 
-- the hypervisor should act as a separate entity (it has a different ID and
-in the current implementation we don't do a distinction between host/hyp) and
-it should be able to lock its own version from init.
-- keep a separate version negotiated for the host
-- trap FFA_ID_GET from the host and return ID=1 because
-  currently we forward the call to the TZ and it returns the same ID
-  as the (hypervisor == 0).
 
-> We're also probing the minimum rxtx size in hyp_ffa_post_init() so doing
-> this here is doubly wrong.
-> 
-
-Those operations should happen before the current ffa_map_hyp_buffers()
-call, I agree.
-
-Thanks,
-Sebastian
-
-> So I think we should probably just drop this patch.
-> 
-> Will
