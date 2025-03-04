@@ -1,269 +1,133 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BE627D77B
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 16:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D46293451
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 17:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107390; cv=none; b=uROFZoDSLX9/29Nd08r4YZdM8+Og5HUcRCBwZrCgpwCzv5OSnvGlEhndnRIshGmiWj900nDPrxc8gJRaaEu82b424RBItDaHEiJXzmo7twYtUtvHk+xJEkDFKzXAmkQziiqPjglyW0tuaehemx/WvFpjHz8JTHtiMrV7+YMCMvI=
+	t=1741107739; cv=none; b=biYAFpd9QpCBCfbl4Y6oSMmKxMWvF/oZxyQjDsps30e1A+LaafhTFQ8EaSNMSL4VBr26jSkp4qtie7JGeavEFwLqaOl1qbkrOkODjlWHRK36ZM5WfCwMMzsgTXiMgIA4v3kkmxKSHdVGAghkuNSPU+BydANIz/ydwvnqM3Kwa0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107390; c=relaxed/simple;
-	bh=i8jamBfI+P0eeepl+Uhp4JL8/Pr1Lgs5TPF4k0VKrP0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JuXBJIpMbwOcs/eZyKcEmk6HgXrN2jpnLmPU1kLcva2WYX5k6el8LTb7ItFNdT+bFONuQfIotjCcL3TBvqDgSiAS+OpmuLoX5hdW4d74xCkwWVws/XM20nETq5MlsZFgaBzeTowpZocmDIjlEb/zIzn3TX93/OX9dkPcOiyxmQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GjI+Fweb; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GjI+Fweb"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-474e1b8c935so446911cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 08:56:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741107388; x=1741712188; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9DtRkP6CYCN2VX6LAP0NMel2JbBrN6HKmyX2jA5Yc7E=;
-        b=GjI+Fweb3M3xkOoGXEXMp0cWrkfueFtAFD0/7ubsZ7T8L/9KV4HwaBCUASlAgfZiR7
-         wfA32+dEsOJ84IDeGE7SJa+oFXBpPCa/hYnnvz2ba+okFEI2MvXSRwIZ+0NQPKatgPYH
-         MPeMhX9+cIJCM3F4eq+HyXlfKh+PWsB84qHwQoOO/W3OcmiV8ahJDIo9BnU0/GMxcKNc
-         rzpzSPy7oLheEqPe2L5BL64GAp8mRZwkuylSTk96xFQsBXxUTc2T/xSh0FMIxZilVLJY
-         bpgpRUotD0qYHoC5+8bwLeCd606426XtAZxsEraGtlacMMXhs4QJOhZWz1lHGWSQdg4r
-         LQ2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741107388; x=1741712188;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9DtRkP6CYCN2VX6LAP0NMel2JbBrN6HKmyX2jA5Yc7E=;
-        b=XtuXjMpYl7qH8qv7XIHJLSm/M8Tj7ILhibhcpgT6poBIsKwK5LGS4TAdvppUdU4+Kl
-         5VBOUfBwIwZOZodo5/OcTArxa09QSAde+OG6SxJdbbcyxQqdxDtgaTaFckdRhn+T2eXj
-         eXDp4R5CcvX95LIFFslgkhcd90yKldkmtx9rEd5myDXXIXjFSwVpXDBcwKb5FEOqRFVR
-         VpAZUfIY5w12ZbHa2gXcHq7DAACwqtqKCHM6HwEnlSdrVIInjQg4umJt8aa7if12smVn
-         qP+Is7no5NjfbXovG8QG8w3TvQ+/SzykPXjhgmVQi7odtCUbn1J9kVQBo3DQ5Hl4oSvI
-         WVcA==
-X-Gm-Message-State: AOJu0YwpVq5Hlh0y3qSnFYVsCrF0fdYGcyOAu7NJuSPZJExKYstgXZAT
-	F4uI0Rs62xvIjoLyZ++uEkuqRr0md/cIpg3CCKj1CgsjWR41e+N586ezjBGGwXI6s9NRrF5et83
-	HO/AUj33UXz354Lk6EdQM70XYqX1IKibiw41/
-X-Gm-Gg: ASbGncvJvhVzMD3sE3r5he46w9/gXiuf9Ae/ggYn5x2kNtORq9El6t16SyCQtcFOoOF
-	zeAhr764jBsxEoan5zzkzuObHto5e/sk1Qw73W+tYGVjQdHtJj1n3/kQfR0ef82Fu7pSUhkSU+t
-	tvNgmd/7iyXMDU1ll9/ZvwGTgpeDzftzqXbo4Nz2OASms1YxFuw4axjg==
-X-Google-Smtp-Source: AGHT+IF23vzPgXJFq7laGxxdPorzVUnziNDjwTEtrDs+9M/YfHZweGHZAZN5eGiioteQmHR0kHXdQj+z0gs3Xcfs9rk=
-X-Received: by 2002:a05:622a:48e:b0:474:cbac:a983 with SMTP id
- d75a77b69052e-4750a4d1015mr307611cf.6.1741107387427; Tue, 04 Mar 2025
- 08:56:27 -0800 (PST)
+	s=arc-20240116; t=1741107739; c=relaxed/simple;
+	bh=EFjtBnt19Ojd3dLx40oDXftpn2X9SiAs1wVQcHBfI6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FmzfM5W7iQHBspybFGrZaB3I5MXg5weJx72q2YPuLjgbacG+RLnnkdv91R0dWeTuqbjWzd/uPcSWEpUPKoOfIoU2er14cpUanVaGjEu243S4BbzTM3RRDshmw2OoKbx3glL/3BVVteq1g84zFCpbDIYHlwWMN8ynIZ0FCW+uKIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D6252F;
+	Tue,  4 Mar 2025 09:02:31 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F54A3F5A1;
+	Tue,  4 Mar 2025 09:02:16 -0800 (PST)
+Date: Tue, 4 Mar 2025 17:02:13 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v1 1/7] arm64: drop to EL1 if booted at EL2
+Message-ID: <20250304170213.GB1553498@e124191.cambridge.arm.com>
+References: <20250220141354.2565567-1-joey.gouly@arm.com>
+ <20250220141354.2565567-2-joey.gouly@arm.com>
+ <Z8CYeyKrFoglWWSp@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250210184150.2145093-1-maz@kernel.org> <20250210184150.2145093-8-maz@kernel.org>
-In-Reply-To: <20250210184150.2145093-8-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 4 Mar 2025 16:55:50 +0000
-X-Gm-Features: AQ5f1JpeNlKdk-l5r71vf2tqDSYKeajf6KLHiNZ0LiUdyjmTYrSWEAH6GprWQ2A
-Message-ID: <CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
-Subject: Re: [PATCH 07/18] KVM: arm64: Compute FGT masks from KVM's own FGT tables
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8CYeyKrFoglWWSp@raptor>
 
-Hi Marc,
+Hi,
 
-On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
->
-> In the process of decoupling KVM's view of the FGT bits from the
-> wider architectural state, use KVM's own FGT tables to build
-> a synthitic view of what is actually known.
+On Thu, Feb 27, 2025 at 04:53:15PM +0000, Alexandru Elisei wrote:
+> Hi Joey,
+> 
+> On Thu, Feb 20, 2025 at 02:13:48PM +0000, Joey Gouly wrote:
+> > EL2 is not currently supported, drop to EL1 to conitnue booting.
+> > 
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > ---
+> >  arm/cstart64.S | 27 +++++++++++++++++++++++++--
+> >  1 file changed, 25 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > index b480a552..3a305ad0 100644
+> > --- a/arm/cstart64.S
+> > +++ b/arm/cstart64.S
+> > @@ -57,14 +57,25 @@ start:
+> >  	add     x6, x6, :lo12:reloc_end
+> >  1:
+> >  	cmp	x5, x6
+> > -	b.hs	1f
+> > +	b.hs	reloc_done
+> >  	ldr	x7, [x5]			// r_offset
+> >  	ldr	x8, [x5, #16]			// r_addend
+> >  	add	x8, x8, x4			// val = base + r_addend
+> >  	str	x8, [x4, x7]			// base[r_offset] = val
+> >  	add	x5, x5, #24
+> >  	b	1b
+> > -
+> > +reloc_done:
+> > +	mrs	x4, CurrentEL
+> > +	cmp	x4, CurrentEL_EL2
+> > +	b.ne	1f
+> > +drop_to_el1:
+> > +	mov	x4, 4
+> > +	msr	spsr_el2, x4
+> > +	adrp	x4, 1f
+> > +	add	x4, x4, :lo12:1f
+> > +	msr	elr_el2, x4
+> 
+> I'm going to assume this works because KVM is nice enough to initialise the
+> EL2 registers that affect execution at EL1 to some sane defaults. Is that
+> something that can be relied on going forward?
 
-synthitic -> synthetic
+I was just trying to keep the changes minimal.
 
+> 
+> What about UEFI?
 
-> This allows for some checking along the way.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h  |   4 ++
->  arch/arm64/include/asm/kvm_host.h |  14 ++++
->  arch/arm64/kvm/emulate-nested.c   | 102 ++++++++++++++++++++++++++++++
->  3 files changed, 120 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 8d94a6c0ed5c4..e424085f2aaca 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -359,6 +359,10 @@
->  #define __HAFGRTR_EL2_MASK     (GENMASK(49, 17) | GENMASK(4, 0))
->  #define __HAFGRTR_EL2_nMASK    ~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
->
-> +/* Because the sysreg file mixes R and W... */
-> +#define HFGRTR_EL2_RES0                HFGxTR_EL2_RES0 (0)
-> +#define HFGWTR_EL2_RES0                (HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
+Haven't tested it yet.
 
-__HFGRTR_ONLY_MASK is a hand-crafted bitmask. The only bit remaining
-in HFGxTR_EL2 that is RES0 is bit 51. If that were to be used as an
-HFGRTR-only bit without __HFGRTR_ONLY_MASK getting updated, then
-aggregate_fgt() below would set its bit in hfgwtr_masks. Could this be
-a problem if this happens and the polarity of this bit ends up being
-negative, thereby setting the corresponding nmask bit?
+> 
+> I was expecting some kind of initialization of the registers that affect
+> EL1.
 
-Cheers,
-/fuad
+I'll look into it.
 
-> +
->  /* Similar definitions for HCRX_EL2 */
->  #define __HCRX_EL2_RES0         HCRX_EL2_RES0
->  #define __HCRX_EL2_MASK                (BIT(6))
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cfa024de4e34..4e67d4064f409 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -569,6 +569,20 @@ struct kvm_sysreg_masks {
->         } mask[NR_SYS_REGS - __SANITISED_REG_START__];
->  };
->
-> +struct fgt_masks {
-> +       const char      *str;
-> +       u64             mask;
-> +       u64             nmask;
-> +       u64             res0;
-> +};
-> +
-> +extern struct fgt_masks hfgrtr_masks;
-> +extern struct fgt_masks hfgwtr_masks;
-> +extern struct fgt_masks hfgitr_masks;
-> +extern struct fgt_masks hdfgrtr_masks;
-> +extern struct fgt_masks hdfgwtr_masks;
-> +extern struct fgt_masks hafgrtr_masks;
-> +
->  struct kvm_cpu_context {
->         struct user_pt_regs regs;       /* sp = sp_el0 */
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 607d37bab70b4..bbfe89c37a86e 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2033,6 +2033,101 @@ static u32 encoding_next(u32 encoding)
->         return sys_reg(op0 + 1, 0, 0, 0, 0);
->  }
->
-> +#define FGT_MASKS(__n, __m)                                            \
-> +       struct fgt_masks __n = { .str = #__m, .res0 = __m, }
-> +
-> +FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
-> +FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
-> +FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
-> +FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
-> +FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
-> +FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
-> +
-> +static __init bool aggregate_fgt(union trap_config tc)
-> +{
-> +       struct fgt_masks *rmasks, *wmasks;
-> +
-> +       switch (tc.fgt) {
-> +       case HFGxTR_GROUP:
-> +               rmasks = &hfgrtr_masks;
-> +               wmasks = &hfgwtr_masks;
-> +               break;
-> +       case HDFGRTR_GROUP:
-> +               rmasks = &hdfgrtr_masks;
-> +               wmasks = &hdfgwtr_masks;
-> +               break;
-> +       case HAFGRTR_GROUP:
-> +               rmasks = &hafgrtr_masks;
-> +               wmasks = NULL;
-> +               break;
-> +       case HFGITR_GROUP:
-> +               rmasks = &hfgitr_masks;
-> +               wmasks = NULL;
-> +               break;
-> +       }
-> +
-> +       /*
-> +        * A bit can be reserved in either the R or W register, but
-> +        * not both.
-> +        */
-> +       if ((BIT(tc.bit) & rmasks->res0) &&
-> +           (!wmasks || (BIT(tc.bit) & wmasks->res0)))
-> +               return false;
-> +
-> +       if (tc.pol)
-> +               rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
-> +       else
-> +               rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
-> +
-> +       if (wmasks) {
-> +               if (tc.pol)
-> +                       wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
-> +               else
-> +                       wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
-> +       }
-> +
-> +       return true;
-> +}
-> +
-> +static __init int check_fgt_masks(struct fgt_masks *masks)
-> +{
-> +       unsigned long duplicate = masks->mask & masks->nmask;
-> +       u64 res0 = masks->res0;
-> +       int ret = 0;
-> +
-> +       if (duplicate) {
-> +               int i;
-> +
-> +               for_each_set_bit(i, &duplicate, 64) {
-> +                       kvm_err("%s[%d] bit has both polarities\n",
-> +                               masks->str, i);
-> +               }
-> +
-> +               ret = -EINVAL;
-> +       }
-> +
-> +       masks->res0 = ~(masks->mask | masks->nmask);
-> +       if (masks->res0 != res0)
-> +               kvm_info("Implicit %s = %016llx, expecting %016llx\n",
-> +                        masks->str, masks->res0, res0);
-> +
-> +       return ret;
-> +}
-> +
-> +static __init int check_all_fgt_masks(int ret)
-> +{
-> +       int err = 0;
-> +
-> +       err |= check_fgt_masks(&hfgrtr_masks);
-> +       err |= check_fgt_masks(&hfgwtr_masks);
-> +       err |= check_fgt_masks(&hfgitr_masks);
-> +       err |= check_fgt_masks(&hdfgrtr_masks);
-> +       err |= check_fgt_masks(&hdfgwtr_masks);
-> +       err |= check_fgt_masks(&hafgrtr_masks);
-> +
-> +       return ret ?: err;
-> +}
-> +
->  int __init populate_nv_trap_config(void)
->  {
->         int ret = 0;
-> @@ -2097,8 +2192,15 @@ int __init populate_nv_trap_config(void)
->                         ret = xa_err(prev);
->                         print_nv_trap_error(fgt, "Failed FGT insertion", ret);
->                 }
-> +
-> +               if (!aggregate_fgt(tc)) {
-> +                       ret = -EINVAL;
-> +                       print_nv_trap_error(fgt, "FGT bit is reserved", ret);
-> +               }
->         }
->
-> +       ret = check_all_fgt_masks(ret);
-> +
->         kvm_info("nv: %ld fine grained trap handlers\n",
->                  ARRAY_SIZE(encoding_to_fgt));
->
-> --
-> 2.39.2
->
+Thanks,
+Joey
+
+> 
+> Thanks,
+> Alex
+> 
+> > +	isb
+> > +	eret
+> >  1:
+> >  	/* zero BSS */
+> >  	adrp	x4, bss
+> > @@ -186,6 +197,18 @@ get_mmu_off:
+> >  
+> >  .globl secondary_entry
+> >  secondary_entry:
+> > +	mrs	x0, CurrentEL
+> > +	cmp	x0, CurrentEL_EL2
+> > +	b.ne	1f
+> > +drop_to_el1_secondary:
+> > +	mov	x0, 4
+> > +	msr	spsr_el2, x0
+> > +	adrp	x0, 1f
+> > +	add	x0, x0, :lo12:1f
+> > +	msr	elr_el2, x0
+> > +	isb
+> > +	eret
+> > +1:
+> >  	/* enable FP/ASIMD and SVE */
+> >  	mov	x0, #(3 << 20)
+> >  	orr	x0, x0, #(3 << 16)
+> > -- 
+> > 2.25.1
+> > 
