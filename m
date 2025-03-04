@@ -1,141 +1,216 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27059204879
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 13:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B4923A98C
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 14:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741095840; cv=none; b=nmjJkNT7YZBrlEswzi6SEreX2C2TearYttjq52EzTuCH+01IyjpK0+ZvcIo5XrNNHleoGGJcoIL6V6z21xAZD8fTFDl6DuxrrdvVvRUdbn+boruHKRXrWSetNMO46UCC5CtS58jZqXube8iw4lN2uiDbG+Twsx25R3MA/v7q8tY=
+	t=1741099018; cv=none; b=ga98of5wpwpi9hd1AsRhKFVXM2ZdnMjmanrnAL4LvNIhLplNcUnlAcPLywsg0LMHiqshwoBAqOcHFOvERFFSIFR4oUkGrICucruUFnDK1yvEXJ3r3W1qErGY3/7Us853+7oxNacAN+su8MW7dD3EpcfUycAfrj4desf0h8zLdvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741095840; c=relaxed/simple;
-	bh=TtDaAc80G3uF6Qy8Dx8fbtAtbyeSJL7qw00QyGEAccU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oSXI38eHSGfWESf56nUHhsb0ZAYsSpS6uMiu1T1oUGAYv1phmnGeKrZ/6B0Xs+H5v0lGOqP1y96Y7saBe2OAesbzhmW9nJeg5gxMEF8NY0/A0lErSuxVLQMWk0czCec/19Nz5WT7Js7KZDPlcLmQqQMpKdm+qQ37RuoFDCAjNwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=04nxE/Vg; arc=none smtp.client-ip=209.85.221.73
+	s=arc-20240116; t=1741099018; c=relaxed/simple;
+	bh=QxDMqoc0xID44HaESYXc7yWWzMeYF/JbxGeoRjff/Jw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qvL5PVVu2rRw+JT4ZUKlPQLlIFC3tfNAbWzpYGUGX6Wi5PYtQov656VBpQcYk19XsHXLPvg0aPIeW83vC/h3C6b771H1UYHugMFWfoT2nbxDvLEFk53KRncyusZqtXJr4glBpcFcz1u5nTDt7zF8lOioFTAKBmXWa3SWsx5wVIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ekRjN9uW; arc=none smtp.client-ip=209.85.160.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="04nxE/Vg"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-390e271517fso3329094f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 05:43:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ekRjN9uW"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-472098e6e75so214391cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 06:36:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741095837; x=1741700637; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nOQyJ57ni6L+J8E7B8owB1YjEi2kSEAuov44m6pse38=;
-        b=04nxE/VgvsaMuX0Load/ahcrJU0Cf9tm5DM6kBK2CG8rsa0+LX6qh0I3ct5MgrH8jL
-         LiXRgToRgE9wDS9MDPlgNFKpxPZh4pOMBw3hzTL2Ut3VoQlICwU/TCGDkvTDEjD+Ybiv
-         wIajvjtPyVU9GJ0M9CcRedvXsEa53B3M47/d06nE08jIYJC1G0dvHtM9m0WNJNGj6crx
-         07nD+ExIOJBnlwercQmv47gcPA1qgrm0tHn0bKvUkO2wxwOacxFJuzL9PWCFT/2zncz4
-         h1Oxe+nf1lNWGIGFQX+kPG+eflScQ9Bj967anUyZzT1+ag18yJgt/anN+UTheP3mKWmG
-         Yj0Q==
+        d=google.com; s=20230601; t=1741099016; x=1741703816; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ygttRTKf7i4hHwUkxbYRbNGqV7dr+gxLZlkMmtHeME=;
+        b=ekRjN9uWUz20ifqjVWmbtgFDbhBpkGjktIaOwohMEvvKEW/UPST0b12BGpY6JAliXt
+         Bd+qPnRM+ad74pZouUbRQSU79Y7FbxYfV1yq7tYifTbPiELEcbONKI2JYJbUzZkttu0U
+         OsPdTWB2ifvvykIBjG66S6zcinrj1nnmD5rQ1AIpqFBtwjNrH+rtiJ7KFJkuo1JIKlhP
+         2L7qVLOznWvcuvsKvNHzxS4x1QtzZAms9U2OCjOTR+YxXJ/9FAvzxbnzKevsy75+t+Qa
+         mjJ9w25JUyqGK0KhpJeBCWlb2RcaW2EXOMBpTH24CO5tS24PTs1FNcAEhid7fq+lyywI
+         Z4BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741095837; x=1741700637;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nOQyJ57ni6L+J8E7B8owB1YjEi2kSEAuov44m6pse38=;
-        b=vzfRIeYgwvMbtTrgz1KpBBvwWb9NcUF54l8OCD4fqjJMxBWgdNz9qRTUikYiUcvHQ6
-         7Db1tgzE7th4OdOByH2PiVOXxmUS78NbFUg460TDp0/SddPVJ7EQnum63VIsEYzj0C9P
-         4HKhd+JP48hcf4GDhtU4WVplngO2+UkhVr2O4U7ln7rX81Rr09fiyP4LydwQiOmouhAn
-         4KYp1IlTnnfnup4tJorFlRz5OkQ41D/tGqyUDCqqsLE85NUmMiuYvqo1R1F5Is2rqZmO
-         c6Ns0GrVNns2rZDB8Cy1MPzlZ2NVgLdwdyLhwMBNudOuAwA9Uj7Xb95P7yxowzGthngT
-         kU+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUP9aYxWMDRVwKsI5vEreAXLw7KApR0/EEAFtACz44ybOcGt1i2LN8i/MngNImNC+xVXq/T7Wk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz5SCizJtDkpbKkXaRtujjSFBVHl5GN3LPMnr0/JbGTfJLEWnuB
-	hbL4aLREK6FQ3PXUA7Qe/9rr6657Z+G1LjGADQNIOVbxRv5FRwO16owXeH9vD6IQbMOtIYdBMNM
-	8PRenNAiUU0Kx52X0FA==
-X-Google-Smtp-Source: AGHT+IEFMhEaRI/rg8Se9LHpsnXPQyKb7X7zdX+0i//MGRw5LE5hwf7vaICZu9T6cB0TCPM/wkm9G80CRMo3IsJ2
-X-Received: from wmbbe7.prod.google.com ([2002:a05:600c:1e87:b0:43b:c6a4:89a0])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:418a:b0:38f:32a7:b6f3 with SMTP id ffacd0b85a97d-390eca41867mr10968930f8f.40.1741095837446;
- Tue, 04 Mar 2025 05:43:57 -0800 (PST)
-Date: Tue,  4 Mar 2025 13:43:46 +0000
-In-Reply-To: <20250304134347.369854-1-vdonnefort@google.com>
+        d=1e100.net; s=20230601; t=1741099016; x=1741703816;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+ygttRTKf7i4hHwUkxbYRbNGqV7dr+gxLZlkMmtHeME=;
+        b=XSqBP7z9FZl8NMgAf63qDLf2WQqELiXKetRbEacL6el++dC2+ed2uheCkpf3PVPa56
+         r0iI411QBGN8byU7tsWj8n3Tk3XbPFm9TwQgYv8IRqjsbqsGIpG2W4OPXis2t9omMtsG
+         v0R1WmGKpnyVgEJKP7rjuvOKBZ8LraX4Q2lMHygPDQcu3iV8ZhNcCqfSwVljc2XPCtHZ
+         ZbPRwyCZ/DwF4KzJPdyDqcVrMkWx45sQkDypQ36uQQD7CUT26dvSDaewGH8myrP/pcpq
+         NnbbKDs1BpFksvBOHndeP8K1WoaLwzEFZa4rn4qdc6N8NQznl5ilw+Ltsvbyc+s7ATCP
+         qyJA==
+X-Gm-Message-State: AOJu0YzoFDjcQ79PiQkudE06r5uW3KFyo2q4dyBMtMeGKefbEGO/szLt
+	0IUwP28qV/kY247EkJ7gYybhvlbKMmg2/XKSFAz3EHUJjjLPLHX6mBbq07NHnwrYhovXK3A1f06
+	W14KqLL17zbkIY5OcJUvNbbuHuHfs7e3u06Bu
+X-Gm-Gg: ASbGncsDyBvrg+YPztx2ZrSOXWnYW0VnGOZTICDbUOMTNti/cZJ3o3NENFW4gKTh2+C
+	6lQd2rNnCL6aj/zL2LxFHfJWSERFV5fXH5tC4T1ZdbaWQA1fPm11nOC5wQzM3Y4O8hFIQEzCcfR
+	amj1cKPD1Al3nM5XEq/2ZkwvnKEonRerOIqZ9EgHhnOEOToBL16zUinwY=
+X-Google-Smtp-Source: AGHT+IFeNCEP0siRwcGFMhDyxTwUgN/q4ESl7wZnSThP1BZE2VnPVYxln59ocl0tbMWx93FWKB2s5IMnvCUEO374htw=
+X-Received: by 2002:ac8:7e86:0:b0:471:939c:a304 with SMTP id
+ d75a77b69052e-474fc4f486bmr4445741cf.8.1741099015479; Tue, 04 Mar 2025
+ 06:36:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250304134347.369854-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250304134347.369854-4-vdonnefort@google.com>
-Subject: [PATCH v2 3/3] KVM: arm64: Count pKVM stage-2 usage in secondary
- pagetable stats
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org
-Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Vincent Donnefort <vdonnefort@google.com>
+MIME-Version: 1.0
+References: <20250210184150.2145093-1-maz@kernel.org> <20250210184150.2145093-4-maz@kernel.org>
+In-Reply-To: <20250210184150.2145093-4-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Mar 2025 14:36:19 +0000
+X-Gm-Features: AQ5f1Jo68p3yb9_4_jDKr_EIPn09Ol_E9D3YE9a_TVB0qWSEdbu-YNoM1obqL94
+Message-ID: <CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
+Subject: Re: [PATCH 03/18] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Count the pages used by pKVM for the guest stage-2 in memory stats under
-secondary pagetable stats, similarly to what the VHE mode does.
+Hi Marc,
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+>
+> We generally don't expect FEAT_LS64* instructions to trap, unless
+> they are trapped by a guest hypervisor.
+>
+> Otherwise, this is just the guest playing tricks on us by using
+> an instruction that isn't advertised, which we handle with a well
+> deserved UNDEF.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 64 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 512d152233ff2..4f8354bf7dc5f 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -294,6 +294,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+>         return 1;
+>  }
+>
+> +static int handle_ls64b(struct kvm_vcpu *vcpu)
+> +{
+> +       struct kvm *kvm = vcpu->kvm;
+> +       u64 esr = kvm_vcpu_get_esr(vcpu);
+> +       u64 iss = ESR_ELx_ISS(esr);
+> +       bool allowed;
+> +
+> +       switch (iss) {
+> +       case ESR_ELx_ISS_ST64BV:
+> +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
+> +               break;
+> +       case ESR_ELx_ISS_ST64BV0:
+> +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+> +               break;
+> +       case ESR_ELx_ISS_LDST64B:
+> +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
+> +               break;
+> +       default:
+> +               /* Clearly, we're missing something. */
+> +               goto unknown_trap;
+> +       }
+> +
+> +       if (!allowed)
+> +               goto undef;
+> +
+> +       if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> +               u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> +               bool fwd;
+> +
+> +               switch (iss) {
+> +               case ESR_ELx_ISS_ST64BV:
+> +                       fwd = !(hcrx & HCRX_EL2_EnASR);
+> +                       break;
+> +               case ESR_ELx_ISS_ST64BV0:
+> +                       fwd = !(hcrx & HCRX_EL2_EnAS0);
+> +                       break;
+> +               case ESR_ELx_ISS_LDST64B:
+> +                       fwd = !(hcrx & HCRX_EL2_EnALS);
+> +                       break;
+> +               default:
+> +                       /* We don't expect to be here */
+> +                       fwd = false;
+> +               }
+> +
+> +               if (fwd) {
+> +                       kvm_inject_nested_sync(vcpu, esr);
+> +                       return 1;
+> +               }
+> +       }
+> +
+> +unknown_trap:
+> +       /*
+> +        * If we land here, something must be very wrong, because we
+> +        * have no idea why we trapped at all. Warn and undef as a
+> +        * fallback.
+> +        */
+> +       WARN_ON(1);
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ace3969e8106..51754a354b7a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -86,6 +86,8 @@ struct kvm_hyp_memcache {
- 	phys_addr_t head;
- 	unsigned long nr_pages;
- 	struct pkvm_mapping *mapping; /* only used from EL1 */
-+
-+#define	HYP_MEMCACHE_ACCOUNT_STAGE2	BIT(1)
- 	unsigned long flags;
- };
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 68d99baa76c2..85d739fbddb8 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1088,12 +1088,20 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 
- static void hyp_mc_free_fn(void *addr, void *flags)
- {
-+	if ((unsigned long)flags & HYP_MEMCACHE_ACCOUNT_STAGE2)
-+		kvm_account_pgtable_pages(addr, -1);
-+
- 	free_page((unsigned long)addr);
- }
- 
- static void *hyp_mc_alloc_fn(void *flags)
- {
--	return (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+	void *addr = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+
-+	if (addr && (unsigned long)flags & HYP_MEMCACHE_ACCOUNT_STAGE2)
-+		kvm_account_pgtable_pages(addr, 1);
-+
-+	return addr;
- }
- 
- void free_hyp_memcache(struct kvm_hyp_memcache *mc)
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 19921ca407c6..7e6e3b0518f8 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -165,12 +165,16 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
- 	handle = ret;
- 
- 	host_kvm->arch.pkvm.handle = handle;
-+	host_kvm->arch.pkvm.stage2_teardown_mc.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
-+	kvm_account_pgtable_pages(pgd, PAGE_ALIGN(pgd_sz) >> PAGE_SHIFT);
- 
- 	/* Donate memory for the vcpus at hyp and initialize it. */
- 	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
- 	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
- 		void *hyp_vcpu;
- 
-+		host_vcpu->arch.pkvm_memcache.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
-+
- 		/* Indexing of the vcpus to be sequential starting at 0. */
- 		if (WARN_ON(host_vcpu->vcpu_idx != idx)) {
- 			ret = -EINVAL;
--- 
-2.48.1.711.g2feabab25a-goog
+nit: should this be WARN_ONCE() instead?
 
+> +
+> +undef:
+> +       kvm_inject_undefined(vcpu);
+> +       return 1;
+> +}
+
+I'm wondering if this can be simplified by having one switch()
+statement that toggles both allowed and fwd (or maybe even only fwd),
+and then inject depending on that, e.g.,
+
++static int handle_ls64b(struct kvm_vcpu *vcpu)
++{
++    struct kvm *kvm = vcpu->kvm;
++    bool is_nv = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
++    u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
++    u64 esr = kvm_vcpu_get_esr(vcpu);
++    u64 iss = ESR_ELx_ISS(esr);
++    bool fwd = false;
++
++    switch (iss) {
++    case ESR_ELx_ISS_ST64BV:
++         fwd = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V) &&
++                   !(hcrx & HCRX_EL2_EnASR)
++         break;
+...
++    default:
++        WARN_ONCE(1);
++ }
++
++    if (is_nv && fwd) {
++        kvm_inject_nested_sync(vcpu, esr);
++    else
++        kvm_inject_undefined(vcpu);
++
++    return 1;
++}
+
+I think this has the same effect as the code above.
+
+Cheers,
+/fuad
+
+
+
+> +
+>  static exit_handle_fn arm_exit_handlers[] = {
+>         [0 ... ESR_ELx_EC_MAX]  = kvm_handle_unknown_ec,
+>         [ESR_ELx_EC_WFx]        = kvm_handle_wfx,
+> @@ -303,6 +366,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+>         [ESR_ELx_EC_CP14_LS]    = kvm_handle_cp14_load_store,
+>         [ESR_ELx_EC_CP10_ID]    = kvm_handle_cp10_id,
+>         [ESR_ELx_EC_CP14_64]    = kvm_handle_cp14_64,
+> +       [ESR_ELx_EC_LS64B]      = handle_ls64b,
+>         [ESR_ELx_EC_HVC32]      = handle_hvc,
+>         [ESR_ELx_EC_SMC32]      = handle_smc,
+>         [ESR_ELx_EC_HVC64]      = handle_hvc,
+> --
+> 2.39.2
+>
