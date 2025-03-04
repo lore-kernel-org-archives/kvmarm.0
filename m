@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A066A27C851;
-	Tue,  4 Mar 2025 15:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96F424C084;
+	Tue,  4 Mar 2025 15:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741101931; cv=none; b=SjNOszI184lDHu61iZ7AzzQrNhGtnXNE5ygNaUwEX1SP93CubTkjYYyJyV2fJxxi65+lx5V/br8PRs2Zb/dMdkFB5kpiBqa74V1O9zknKd6Zb6TCPkE+Vl1/n6ncBhOyU4K+HgFUtgVlpfwzXfo2oWRvDXVr0H2GgVywRGY2/XI=
+	t=1741103234; cv=none; b=ZuWdu902W5Lx+VQ91k7SfE1c0kU1iLV5GekFdmGy+6Zp8mhruus5PPlSyhPvk55BNY53WbJV7aVskwi5Mqerw2qCQzctdy283PstjU+RMCZ7lM1qotwIOcQ5zNojodm/AQM7GUL3n8+YIvIxIsd+wJvfRBk8flriybfBlJEKSPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741101931; c=relaxed/simple;
-	bh=Q3MX4rkE4OTeTa/jKAc1daOdke8WhwOrg3oQElBMyBI=;
+	s=arc-20240116; t=1741103234; c=relaxed/simple;
+	bh=CzgKvgWWn9VItc2I3f+jV1mLlblrc3SXMV7PgF63HnU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hM+Y1Rm5D38/aUsQH0NyYDsQymuTmurzxWrLd48UCZw6p8eHaJqwLsHV8J7ajjhu3kfy8Ln+L/w7Cft32iVzMiZ/Ez0EQhlh1XPb7jEn96RBqRILJ0r9ygj9sL5KvGO1cZoFArSvZekvxzODH/HFxxdSkigLw8lArA/qmYLeFmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ochd6w06; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=sbNNTIgRy2he1B2FO4STByYSyOFnEb701PXonj43Y38KxiMBvtyMOpCi4KrL+aFvxBX0YNKy8J/ZjJ6MORs/xktazYYqjggJ+MpumbrP3L4jNCykVh9H1/FnQ/qnoYc4cYMlfH5oT6kdZojQvY2SSbg+pQFkJx6diTosTcy9BIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYIhp1+R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ochd6w06"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B05C4CEE5;
-	Tue,  4 Mar 2025 15:25:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYIhp1+R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C875C4CEE5;
+	Tue,  4 Mar 2025 15:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741101931;
-	bh=Q3MX4rkE4OTeTa/jKAc1daOdke8WhwOrg3oQElBMyBI=;
+	s=k20201202; t=1741103234;
+	bh=CzgKvgWWn9VItc2I3f+jV1mLlblrc3SXMV7PgF63HnU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ochd6w06w2ZkuDI3gJgfDWEZAlMwLfvaOSP+Wp4+GDsolwX4NxSeF+OYTX7Gy4uwo
-	 7bMS/G7TgXyclh+c/cRhO8xVOnQv7i4+2m5hrMM7o7pyjUYP7/JLLtmLpqAtWCN048
-	 JTt6qLBduehqTXwMjboEXQvpb/YBcCi0mNTghujFDvc8VYk2KU9gdhm41nt98Ou2xL
-	 DeTY39HMi641ZAPySmps05l0RGTg72Cu4t/FX3oObi4bzhGwwAN3U78sBxToOg57vv
-	 BrR4UA4xwlR0uBFWQ/vW0/atfHnH/UU2y1/jETtQeysgfREG3I/nnIuimAQ34ieYM3
-	 NsuBwvN1sNRQA==
+	b=eYIhp1+R5Fy8beCFpYaMRbWBGZHuOJdZwA5KaEoymQlBSNBd9iHALGfkIADKGKV2c
+	 WxnvuhV3XMZ2RaqbeYWdSRYDQC2I8ex6+huJDHDCoSHD2KSjqC4qS+G4PwsIGBqaN1
+	 IKpD3KgkkEWTuxuhsZKgQS5Y7RoSBy/PkW6hEEhuP3p3HgAQqLv2evoUm2Wt9M4HrI
+	 rLNE5E6WJuk0o/0bFdGoMyXme/+tMSCvBPoP8SmafMpfi05YumCh6/cYUHSL4xb2FA
+	 jj3jpmAN9jjk4UcyFneZ5n0ArrM4LG/0dGpdwnhf2CC7S0jmdcGolBYMDK0oCNhjOp
+	 WXRB44edK67ag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tpU9A-00AIEh-SR;
-	Tue, 04 Mar 2025 15:25:28 +0000
-Date: Tue, 04 Mar 2025 15:25:28 +0000
-Message-ID: <86frjsq0lz.wl-maz@kernel.org>
+	id 1tpUUB-00AIzw-QM;
+	Tue, 04 Mar 2025 15:47:12 +0000
+Date: Tue, 04 Mar 2025 15:47:11 +0000
+Message-ID: <86eczcpzls.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -63,8 +63,6 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-
-Hi Fuad,
 
 On Tue, 04 Mar 2025 14:36:19 +0000,
 Fuad Tabba <tabba@google.com> wrote:
@@ -176,32 +174,16 @@ Fuad Tabba <tabba@google.com> wrote:
 > +    case ESR_ELx_ISS_ST64BV:
 > +         fwd = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V) &&
 > +                   !(hcrx & HCRX_EL2_EnASR)
-> +         break;
-> ...
-> +    default:
-> +        WARN_ONCE(1);
-> + }
-> +
-> +    if (is_nv && fwd) {
-> +        kvm_inject_nested_sync(vcpu, esr);
-> +    else
-> +        kvm_inject_undefined(vcpu);
-> +
-> +    return 1;
-> +}
-> 
-> I think this has the same effect as the code above.
 
-Yeah, I think something like that could work. I initially was trying
-to handle all 4 states (allowed, fwd), but obviously some states do
-not exist (you don't forward something that isn't allowed).
+Ah, I know what I dislike about this approach: If your L1 guest runs
+at EL2, HCRX_EL2 doesn't apply (it is only for an L2 guest). Yet we
+evaluate it.
 
-My only concern here is that we don't have clear rules on the init of
-EL2 guest registers such as HCRX_EL2 when !NV, but that's something
-that can be easily done (or even worked around locally).
+I think this still works because you shouldn't have HCRX_EL2.EnASR
+clear on the host if LS64V is advertised to the guest, but it feels a
+bit fragile.
 
-Maybe we should introduce the dreaded notion of "effective value" for
-EL2 registers when NV is not enabled...
+I'll have another think at refactoring that code.
 
 Thanks,
 
