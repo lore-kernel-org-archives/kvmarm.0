@@ -1,63 +1,66 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CAB2040A7
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 13:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95F8204685
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 13:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741095834; cv=none; b=oXp0wUXLx9ITehJwu74lVSHK+3FPgnrnAvP8b67kl4kkfKb6oMpBK4yozJCaGAraEBfzp6FTE6EhUJ5eRoKfCI1v6aHYrHTC+JBvnax44V/OgDRfGptUmjzIJISUfy5V4N/aC3GNS+WtcEmiu9spF4NH8xOH9In1SCFwqY0CEuQ=
+	t=1741095836; cv=none; b=DyDq7dSG2nsP8srAkl3EVeoXQIsY0rD61qFm2uNBOQ5OitT+Xe581A0jTC5brdB3lqfoqrUEokyT8qoMhDgb8AJE1z9n48o1bDXLNW+U+jo8V4XOIyswZMJaOwSMVzXsnB1H1bQBLRhCdu4ZsY0E7mG0zzDUj189D0lzSghtgBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741095834; c=relaxed/simple;
-	bh=80+eCrT6Rmn5Jg/jRx7FsLXSYZEFXC8qPz/qSbLB/YA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nG9u9qGPKLxrYBmbpN18NgAy5dJZ5/r+LrqpKn0Q6QZK0K9r9af9oPUlQASzkdpB2dhgnuM859mDJllUtNoqk+t9dL/o4tZ5OTEuh7D3lCIK23T6Mgbjb8Ji9X72jGNIx2G9AIpyQFnK4Ab+SZlnXO3Uiz0kF8GJoBTmnqJTT3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HcBjHu3r; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1741095836; c=relaxed/simple;
+	bh=Mgo4/DO8OD8GZn9j7UQxKW6LhjTLRQV1hFx41dH7LJM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QhIePQcUBESbwuNk2/eZeoPSVQn58cj/bywLKX9TDeFDHnzkKt5jAmF6EdJqpjp2sQDwoN8kWz3Eh4VWDtnQfP4B7aqufJ73MDXASJygNftIgePp0mk5rN3xz00A5NRPY0XfDAAD+JaEMHJ5CO3PhMUBj/M4ZlXiYtzmZnf+DdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PiyVEexy; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HcBjHu3r"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4393e89e910so31194675e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 05:43:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PiyVEexy"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4393e89e910so31194865e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 05:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741095831; x=1741700631; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uj43tHXd4oUvGh93mFvuqSAi4hbUgB5iGKnK2cXXgbo=;
-        b=HcBjHu3rAzRC4Lpz6GQQnfSVvCOHcp194352jcC4s/r+UUgwO784hGgPGlEjXV/j1e
-         0yIhER1ARZB/fVxm3nPhus4uzCCwf/tKotEkAfrbspNUzoHLEuxmjFv7qrgemAQjriON
-         gcKzndoTaPT+8YvPjZIa6/fdj0H/5SrLnzUylAVbCAmiBeomjgW++vz6zIZsO6asF7Id
-         Qk6MFL91GPZhbXjj4t4LS/6qgG9aQpyuK0q6rd1SKCLZUrOuFlJVXRgaDIOSqXQt2AxX
-         dnpjce1aI7y1bcTWy8ctkCZrLkYZ0dFIYrnH/1deVVqmqNs1n063qOsf3mrpxPJ4YA6o
-         vgtQ==
+        d=google.com; s=20230601; t=1741095833; x=1741700633; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ciUEmziHwKoR8EZ15kFmNQQUeftjWJUBtJzEaxlx9Y=;
+        b=PiyVEexyF3+U4HfpaTZDdclZB+yBugU+axD+72rASvwuu9VlGxbh0UlkTU5/Irdvaa
+         TIC066YlUqaDb69K/hjjUOHsxPsymOAzM/3JQOLDqyqvZlRsSZZuWMwgsIWe06qNrrKJ
+         WsGybz7oEelkHxBIGi1UGfrvpMGAZ8pJNbO0WCjXssZC2u3Eo/yBhPqsYEu+EgWYMVDB
+         EgmhEh7j8zlzRdVY0uoeBwBfo7PGIDtwXkFB/i4epIttCy2FMAVdGurwN1j43q4Gm0St
+         B9IEn3KOowvPJ0VdWRLU59W445XmexY9eJ5HsLE1a7pzd6TRjsfKKV1jg6KESQPtdI4Z
+         aByw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741095831; x=1741700631;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uj43tHXd4oUvGh93mFvuqSAi4hbUgB5iGKnK2cXXgbo=;
-        b=hHJ05tx5Uu6TUXoo5cSQFNHEnA7sP2LhhQmnDKKnqcghFtA0l5xZmRBU6cQEBG/CV2
-         ZCvSUL1oBg0fwXQTCbmlkyn4t59gYK9PS4IVugf2XAeeRJ87O+BGh1stHp/qJBd9eXSi
-         P/iTvctPM4RyFWElH4P3siSH8B/obXobIp6f9dFAGniTd8ni4yahRafljFKuAe62o5Ui
-         PKB+50lqG8X9uPqmzbOtxruDyj2KlIr90vAkxI715sHUafsiDpxDeoE+GE5T5O6ztNt2
-         4cVLtyU/xWrO8f19zjqegxcxNqbw6IXqWTFi25JOw7ojPuSVa9x3zVUk1n9RQxGj936x
-         EmQw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+Mj0GD9ERMbZF0ppxTrnnxFYQBs3pQFNZtPtiOBxQa2Qm7sk1l9zAFDRqn0VHTlZ8AiXCWyQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx4Nb1BOmewwvLuP4r5jYKLya9ljolG5TksBlsJ8hSJURGjFX8b
-	SLmhK33PVdKu89dVZmQCcDB/GUzKYH+AXtsH2kZr67fixYQsZJCmB29hBvRatS5VOaDrEIkYZyD
-	mHZACdTtThr7+X0k45w==
-X-Google-Smtp-Source: AGHT+IFG5YXAtgs7Ad4x4+52R1NyxCiNTd9hIFuV0gbUB92z2vGjINs/6+xkAMSQEv2wr8uDuVNZWAe24g0ESfG4
-X-Received: from wmij20.prod.google.com ([2002:a05:600c:4114:b0:43b:cacd:235e])
+        d=1e100.net; s=20230601; t=1741095833; x=1741700633;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ciUEmziHwKoR8EZ15kFmNQQUeftjWJUBtJzEaxlx9Y=;
+        b=bZlVgGjq3K5yH5HztTigcrpPlzGDHHIEKlB5NhDu5OUB+8jCGT3TOmOtT280NRJT6B
+         RTurc5/ChNDUBE7R6ScwIQ08iTdLLi5fJ48raZ1UoKmfHQmnSv08XY+xCR3ZsbbFfvXk
+         ZPKy0YY09mOMtOY11DcrbfBAFz1qhztJRHxNCYgDhxixYTqmH8FzPaOWihwTfj+lMiO5
+         QSKBjb8uO1TKEOIQ5oo0RzJIZRi7asMZIfkZahw2+Ks1IemoHicdHSXn1cxsfyNaP57z
+         mWGMmgFhof/PkFi0yUFuFCK5r8zZvBT8icpk4TIv5fpq/WZFsi0/GNMjMh+M1mTfwrIe
+         18LQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWapUKLys580LXsK/QCpf3A9AswYW8iGLU7U/Um37UXSpvJBiLPVNH6sS7Q8atxxWaZqa6PhU0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyxj/366xHWJ8p3ZP2/gBj6o7LeSuzxU+Zd1I7uoS3Y5TEmF/fa
+	xrq9/5KHpqXaTCywWk97CxHSr+hrlxsik0LDbFfRXA42aUhNCenoWj6Nid4CQqNvIfHItWeEJ/5
+	tuTNCnhhOXacce+B62Q==
+X-Google-Smtp-Source: AGHT+IFHZt3BnQxTnjrinSVy1JtKhEMHkRg+LEokGOtmOBZxYSPyEETqTBFJckhElghvkIX1hmSvWSCVF9ljT4k9
+X-Received: from wmsp7.prod.google.com ([2002:a05:600c:1d87:b0:439:88bc:d27d])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1c8c:b0:439:98ef:5d6 with SMTP id 5b1f17b1804b1-43ba6766cddmr131565855e9.22.1741095831304;
- Tue, 04 Mar 2025 05:43:51 -0800 (PST)
-Date: Tue,  4 Mar 2025 13:43:43 +0000
+ 2002:a05:600c:4f86:b0:43b:ca39:6c7d with SMTP id 5b1f17b1804b1-43bca3972efmr32164545e9.3.1741095833346;
+ Tue, 04 Mar 2025 05:43:53 -0800 (PST)
+Date: Tue,  4 Mar 2025 13:43:44 +0000
+In-Reply-To: <20250304134347.369854-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250304134347.369854-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250304134347.369854-1-vdonnefort@google.com>
-Subject: [PATCH v2 0/3] Count pKVM stage-2 usage in secondary pagetable stat
+Message-ID: <20250304134347.369854-2-vdonnefort@google.com>
+Subject: [PATCH v2 1/3] KVM: arm64: Add flags to kvm_hyp_memcache
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -67,27 +70,61 @@ Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series allows to count stage-2 related memory when using pKVM. The
-value can be found in the /proc/meminfo field SecPageTables.
+Add flags to kvm_hyp_memcache and propagate them up to the allocation
+and free callbacks. This will later allow to account for memory, based
+on the memcache configuration.
 
-Changes since v1: https://lore.kernel.org/all/20250228121355.1377891-1-vdonnefort@google.com/
-  - Flags to kvm_hyp_memcache
-  - Separate stage-2 memcache
-  - Account for PGD
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-Vincent Donnefort (3):
-  KVM: arm64: Add flags to kvm_hyp_memcache
-  KVM: arm64: Distinct pKVM teardown memcache for stage-2
-  KVM: arm64: Count pKVM stage-2 usage in secondary pagetable stats
-
- arch/arm64/include/asm/kvm_host.h |  4 ++++
- arch/arm64/kvm/hyp/nvhe/pkvm.c    |  7 ++++---
- arch/arm64/kvm/mmu.c              | 18 +++++++++++++-----
- arch/arm64/kvm/pkvm.c             |  5 +++++
- 4 files changed, 26 insertions(+), 8 deletions(-)
-
-
-base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3a7ec98ef123..12691ae23d4c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -86,6 +86,7 @@ struct kvm_hyp_memcache {
+ 	phys_addr_t head;
+ 	unsigned long nr_pages;
+ 	struct pkvm_mapping *mapping; /* only used from EL1 */
++	unsigned long flags;
+ };
+ 
+ static inline void push_hyp_memcache(struct kvm_hyp_memcache *mc,
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1f55b0c7b11d..68d99baa76c2 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1086,12 +1086,12 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 	}
+ }
+ 
+-static void hyp_mc_free_fn(void *addr, void *unused)
++static void hyp_mc_free_fn(void *addr, void *flags)
+ {
+ 	free_page((unsigned long)addr);
+ }
+ 
+-static void *hyp_mc_alloc_fn(void *unused)
++static void *hyp_mc_alloc_fn(void *flags)
+ {
+ 	return (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
+ }
+@@ -1102,7 +1102,7 @@ void free_hyp_memcache(struct kvm_hyp_memcache *mc)
+ 		return;
+ 
+ 	kfree(mc->mapping);
+-	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, NULL);
++	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, (void *)mc->flags);
+ }
+ 
+ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
+@@ -1117,7 +1117,7 @@ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
+ 	}
+ 
+ 	return __topup_hyp_memcache(mc, min_pages, hyp_mc_alloc_fn,
+-				    kvm_host_pa, NULL);
++				    kvm_host_pa, (void *)mc->flags);
+ }
+ 
+ /**
 -- 
 2.48.1.711.g2feabab25a-goog
 
