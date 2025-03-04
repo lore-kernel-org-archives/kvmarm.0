@@ -1,104 +1,151 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E86E2780E4
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 16:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42EB2BF3E8
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 16:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741105550; cv=none; b=gLZftnlK0Y3i/Lx4UWIwVnEuBHGOuHnfw2uacVLB91DyH/ojo97/JLC4IodKCp9zdtVxVz/NfcLJnJP8aS5+FidNZrd/fQC4YZ/tTUk0AAZRpb1wn8OInV0iNqpQz3FXBB/yjWJRHG0B9OgBumPZ8y+W834lIIEVW4OFAVsfH6Y=
+	t=1741107375; cv=none; b=VY5hZAaMfPe9v47J//0kt+mSDfA5U8xiQifKLxsIix0lEB6ckgbTbQ7vEltJ4wpIcmzM5F1BvvkT9wztrI3nd6OjboUymZTCTDRMHLX90Ep12IHGgPtfd3UZ9TzIh1ZLk1a9o7qlFcr2JLZvU95ly6qtwUWmr4uZuZAg9UR4jjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741105550; c=relaxed/simple;
-	bh=7joMoRPYn7I+O+FHoWsTud02cmpn2zlQxRxktM9D2Kk=;
+	s=arc-20240116; t=1741107375; c=relaxed/simple;
+	bh=WHEjj5DtUU4Uq63k9XAObiVLYSnUPqAM+Bsk2qbyMkI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m8z+tUhLR0QxYpCwLsed9Qg9c2Ql+pJzcwVtXUspFRRVftRQNl2iiZ/5KgP9oKSeFHzl9IEqhOYTYIiTAIdGjm9kKtgu4KpahCmIbWXeKAsUaw/ZNGsBUW1NFzDdbXAQJFmr6T7Bmx7Qr4uq+xt+QWseuOPF8hojpnFrEwiKT+A=
+	 Content-Type:Content-Disposition:In-Reply-To; b=upC6uP8iGGO/oSsqytu6q7dHyzaM18oAht3DWfRZQE9lc/Mb7Mg6eoVKt7TX+Ny7EZpELFhQWrdfHjdZ76KmStkR8eX3Dq7XQs0xvjX9lwnbsjLajDCQift3PN/rZETIJaMWkl5cFowP6Lfk9E7SILDjn96lQ1hwvZe3yN4uHbU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A8CF497;
-	Tue,  4 Mar 2025 08:26:01 -0800 (PST)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09DB23F5A1;
-	Tue,  4 Mar 2025 08:25:44 -0800 (PST)
-Date: Tue, 4 Mar 2025 16:25:38 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Rob Herring <robh@kernel.org>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Leo Yan <leo.yan@arm.com>, kernel-team@android.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v20 00/11] arm64/perf: Enable branch stack sampling
-Message-ID: <Z8cpgsxG4RrDoTKR@J2N7QTR9R3.cambridge.arm.com>
-References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
- <174080569248.3208873.17639032755999041028.b4-ty@kernel.org>
- <CAL_JsqLijFG1PFkqKk7hXzC=aj70OLQsXwC280QsCO=PnCVZYg@mail.gmail.com>
- <Z8bjEm_neWdMBNYv@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A22BF2F;
+	Tue,  4 Mar 2025 08:56:24 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D45703F5A1;
+	Tue,  4 Mar 2025 08:56:09 -0800 (PST)
+Date: Tue, 4 Mar 2025 16:56:04 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v1 6/7] arm64: pmu: count EL2 cycles
+Message-ID: <20250304165604.GA1553498@e124191.cambridge.arm.com>
+References: <20250220141354.2565567-1-joey.gouly@arm.com>
+ <20250220141354.2565567-7-joey.gouly@arm.com>
+ <Z8CaT5Qe5X4t4Kzg@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z8bjEm_neWdMBNYv@arm.com>
+In-Reply-To: <Z8CaT5Qe5X4t4Kzg@raptor>
 
-On Tue, Mar 04, 2025 at 11:25:06AM +0000, Catalin Marinas wrote:
-> On Mon, Mar 03, 2025 at 10:44:21AM -0600, Rob Herring wrote:
-> > On Sat, Mar 1, 2025 at 1:05 AM Will Deacon <will@kernel.org> wrote:
-> > > On Tue, 18 Feb 2025 14:39:55 -0600, Rob Herring (Arm) wrote:
-> > > > This series enables perf branch stack sampling support on arm64 via a
-> > > > v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
-> > > > on BRBE can be found in the Arm ARM[1] chapter D18.
-> > > >
-> > > > I've picked up this series from Anshuman. v19 and v20 versions have been
-> > > > reworked quite a bit by Mark and myself. The bulk of those changes are
-> > > > in patch 11.
-> > > >
-> > > > [...]
-> > >
-> > > Applied cleanups to will (for-next/perf), thanks!
-> > >
-> > > [01/11] perf: arm_pmuv3: Call kvm_vcpu_pmu_resync_el0() before enabling counters
-> > >         https://git.kernel.org/will/c/04bd15c4cbc3
-> > > [02/11] perf: arm_pmu: Don't disable counter in armpmu_add()
-> > >         https://git.kernel.org/will/c/dcca27bc1ecc
-> > > [03/11] perf: arm_pmuv3: Don't disable counter in armv8pmu_enable_event()
-> > >         https://git.kernel.org/will/c/4b0567ad0be5
-> > > [04/11] perf: arm_v7_pmu: Drop obvious comments for enabling/disabling counters and interrupts
-> > >         https://git.kernel.org/will/c/7a5387748215
-> > > [05/11] perf: arm_v7_pmu: Don't disable counter in (armv7|krait_|scorpion_)pmu_enable_event()
-> > >         https://git.kernel.org/will/c/7bf1001e0d91
-> > > [06/11] perf: apple_m1: Don't disable counter in m1_pmu_enable_event()
-> > >         https://git.kernel.org/will/c/c2e793da59fc
-> > > [07/11] perf: arm_pmu: Move PMUv3-specific data
-> > >         https://git.kernel.org/will/c/dc4d58a752ea
-> > 
-> > I don't know if you looked at the thread on patch 11 and said "long
-> > discussion, I'll assume a new version is coming. Next!" because that's
-> > what I would do. In this case though, there's not any changes.
+Hi Alexandru,
+
+On Thu, Feb 27, 2025 at 05:01:03PM +0000, Alexandru Elisei wrote:
+> Hi Joey,
 > 
-> I do this as well ;). But I think Will is waiting for Mark R to look at
-> the rest of the series.
+> On Thu, Feb 20, 2025 at 02:13:53PM +0000, Joey Gouly wrote:
+> > Count EL2 cycles if that's the EL kvm-unit-tests is running at!
+> > 
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > ---
+> >  arm/pmu.c | 21 ++++++++++++++++++---
+> >  1 file changed, 18 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arm/pmu.c b/arm/pmu.c
+> > index 2dc0822b..238e4628 100644
+> > --- a/arm/pmu.c
+> > +++ b/arm/pmu.c
+> > @@ -206,6 +206,8 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
+> >  #define ID_DFR0_PMU_V3_8_5	0b0110
+> >  #define ID_DFR0_PMU_IMPDEF	0b1111
+> >  
+> > +#define PMCCFILTR_EL0_NSH	BIT(27)
+> > +
+> >  static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
+> >  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
+> >  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
+> > @@ -247,7 +249,7 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+> >  #define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+> >  
+> >  #define PMEVTYPER_EXCLUDE_EL1 BIT(31)
+> 
+> I think you can drop the macro. I was expecting to see an exclude EL2 macro
+> used in its place when the test is running at EL2, but it seems
+> PMEVTYPER_EXCLUDE_EL1 is not used anywhere. Unless I'm missing something here.
 
-Sorry for the delay there.
+I will drop it.
 
-I'm happy with the structure of this; my only remaining concern is the
-filtering logic, as it is surprisingly subtle, and when I was last
-working on that it wasn't clear to me whether we could alwways filter
-appropriately (or whether it'd be better to reject scheduling of events
-with mismatched filters).
+> 
+> > -#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
+> > +#define PMEVTYPER_EXCLUDE_EL0 BIT(30) | BIT(27)
+> 
+> I'm not really sure what that's supposed to achieve - if the test is
+> running at EL2, and events from both EL0 and EL2 are excluded, what's left
+> to count?
 
-I'll try to page that in and properly attack that soon, but aside from
-that concern the series as a whole looks good to me.
+bit 27 of PMEVTYPER is the NSH bit, when it is 1 the events are not filtered.
+This is the opposite polarity to the U (bit 30) and P (bit 31) bits. When they
+are 1, the events are filtered.
+
+> 
+> I also don't understand what PMEVTYPER_EXCLUDE_EL0 does in the non-nested
+> virt case (when kvm-unit-tests boots at El1). The tests run at EL1, so not
+> counting events at EL0 shouldn't affect anything. Am I missing something
+> obvious here?
+
+I don't know why it's like that. AFAICT, it doesn't run anything at EL0.
+
+> 
+> >  
+> >  static bool is_event_supported(uint32_t n, bool warn)
+> >  {
+> > @@ -1059,11 +1061,18 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> >  static bool check_cycles_increase(void)
+> >  {
+> >  	bool success = true;
+> > +	u64 pmccfiltr = 0;
+> >  
+> >  	/* init before event access, this test only cares about cycle count */
+> >  	pmu_reset();
+> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
+> > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> > +
+> > +#if defined(__aarch64__)
+> > +	if (current_level() == CurrentEL_EL2)
+> > +		// include EL2 cycle counts
+> > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
+> > +#endif
+> > +	set_pmccfiltr(pmccfiltr);
+> >  
+> >  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
+> >  	isb();
+> > @@ -1114,11 +1123,17 @@ static void measure_instrs(int num, uint32_t pmcr)
+> >  static bool check_cpi(int cpi)
+> >  {
+> >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
+> > +	u64 pmccfiltr = 0;
+> >  
+> >  	/* init before event access, this test only cares about cycle count */
+> >  	pmu_reset();
+> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
+> > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> > +#if defined(__aarch64__)
+> > +	if (current_level() == CurrentEL_EL2)
+> > +		// include EL2 cycle counts
+> > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
+> > +#endif
+> 
+> It's called twice, so it could be abstracted in a function.
+> 
+> Also, I find it interesting that for PMCCFILTR_EL0 you set the NSH bit
+> based on current exception level, but for PMEVTYPER you set it
+> unconditionally. Why the different approaches? For convenience of is there
+> something more?
+
+No real reason. I don't really know about the PMU, just did some changes to get
+this test working.  I'll look into if setting NSH always is fine too, then I'll
+unconditionally do it.
 
 Thanks,
-Mark.
+Joey
