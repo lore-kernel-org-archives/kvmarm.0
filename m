@@ -1,151 +1,269 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42EB2BF3E8
-	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 16:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BE627D77B
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 16:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107375; cv=none; b=VY5hZAaMfPe9v47J//0kt+mSDfA5U8xiQifKLxsIix0lEB6ckgbTbQ7vEltJ4wpIcmzM5F1BvvkT9wztrI3nd6OjboUymZTCTDRMHLX90Ep12IHGgPtfd3UZ9TzIh1ZLk1a9o7qlFcr2JLZvU95ly6qtwUWmr4uZuZAg9UR4jjA=
+	t=1741107390; cv=none; b=uROFZoDSLX9/29Nd08r4YZdM8+Og5HUcRCBwZrCgpwCzv5OSnvGlEhndnRIshGmiWj900nDPrxc8gJRaaEu82b424RBItDaHEiJXzmo7twYtUtvHk+xJEkDFKzXAmkQziiqPjglyW0tuaehemx/WvFpjHz8JTHtiMrV7+YMCMvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107375; c=relaxed/simple;
-	bh=WHEjj5DtUU4Uq63k9XAObiVLYSnUPqAM+Bsk2qbyMkI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upC6uP8iGGO/oSsqytu6q7dHyzaM18oAht3DWfRZQE9lc/Mb7Mg6eoVKt7TX+Ny7EZpELFhQWrdfHjdZ76KmStkR8eX3Dq7XQs0xvjX9lwnbsjLajDCQift3PN/rZETIJaMWkl5cFowP6Lfk9E7SILDjn96lQ1hwvZe3yN4uHbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A22BF2F;
-	Tue,  4 Mar 2025 08:56:24 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D45703F5A1;
-	Tue,  4 Mar 2025 08:56:09 -0800 (PST)
-Date: Tue, 4 Mar 2025 16:56:04 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 6/7] arm64: pmu: count EL2 cycles
-Message-ID: <20250304165604.GA1553498@e124191.cambridge.arm.com>
-References: <20250220141354.2565567-1-joey.gouly@arm.com>
- <20250220141354.2565567-7-joey.gouly@arm.com>
- <Z8CaT5Qe5X4t4Kzg@raptor>
+	s=arc-20240116; t=1741107390; c=relaxed/simple;
+	bh=i8jamBfI+P0eeepl+Uhp4JL8/Pr1Lgs5TPF4k0VKrP0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JuXBJIpMbwOcs/eZyKcEmk6HgXrN2jpnLmPU1kLcva2WYX5k6el8LTb7ItFNdT+bFONuQfIotjCcL3TBvqDgSiAS+OpmuLoX5hdW4d74xCkwWVws/XM20nETq5MlsZFgaBzeTowpZocmDIjlEb/zIzn3TX93/OX9dkPcOiyxmQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GjI+Fweb; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GjI+Fweb"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-474e1b8c935so446911cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 04 Mar 2025 08:56:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741107388; x=1741712188; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9DtRkP6CYCN2VX6LAP0NMel2JbBrN6HKmyX2jA5Yc7E=;
+        b=GjI+Fweb3M3xkOoGXEXMp0cWrkfueFtAFD0/7ubsZ7T8L/9KV4HwaBCUASlAgfZiR7
+         wfA32+dEsOJ84IDeGE7SJa+oFXBpPCa/hYnnvz2ba+okFEI2MvXSRwIZ+0NQPKatgPYH
+         MPeMhX9+cIJCM3F4eq+HyXlfKh+PWsB84qHwQoOO/W3OcmiV8ahJDIo9BnU0/GMxcKNc
+         rzpzSPy7oLheEqPe2L5BL64GAp8mRZwkuylSTk96xFQsBXxUTc2T/xSh0FMIxZilVLJY
+         bpgpRUotD0qYHoC5+8bwLeCd606426XtAZxsEraGtlacMMXhs4QJOhZWz1lHGWSQdg4r
+         LQ2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741107388; x=1741712188;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9DtRkP6CYCN2VX6LAP0NMel2JbBrN6HKmyX2jA5Yc7E=;
+        b=XtuXjMpYl7qH8qv7XIHJLSm/M8Tj7ILhibhcpgT6poBIsKwK5LGS4TAdvppUdU4+Kl
+         5VBOUfBwIwZOZodo5/OcTArxa09QSAde+OG6SxJdbbcyxQqdxDtgaTaFckdRhn+T2eXj
+         eXDp4R5CcvX95LIFFslgkhcd90yKldkmtx9rEd5myDXXIXjFSwVpXDBcwKb5FEOqRFVR
+         VpAZUfIY5w12ZbHa2gXcHq7DAACwqtqKCHM6HwEnlSdrVIInjQg4umJt8aa7if12smVn
+         qP+Is7no5NjfbXovG8QG8w3TvQ+/SzykPXjhgmVQi7odtCUbn1J9kVQBo3DQ5Hl4oSvI
+         WVcA==
+X-Gm-Message-State: AOJu0YwpVq5Hlh0y3qSnFYVsCrF0fdYGcyOAu7NJuSPZJExKYstgXZAT
+	F4uI0Rs62xvIjoLyZ++uEkuqRr0md/cIpg3CCKj1CgsjWR41e+N586ezjBGGwXI6s9NRrF5et83
+	HO/AUj33UXz354Lk6EdQM70XYqX1IKibiw41/
+X-Gm-Gg: ASbGncvJvhVzMD3sE3r5he46w9/gXiuf9Ae/ggYn5x2kNtORq9El6t16SyCQtcFOoOF
+	zeAhr764jBsxEoan5zzkzuObHto5e/sk1Qw73W+tYGVjQdHtJj1n3/kQfR0ef82Fu7pSUhkSU+t
+	tvNgmd/7iyXMDU1ll9/ZvwGTgpeDzftzqXbo4Nz2OASms1YxFuw4axjg==
+X-Google-Smtp-Source: AGHT+IF23vzPgXJFq7laGxxdPorzVUnziNDjwTEtrDs+9M/YfHZweGHZAZN5eGiioteQmHR0kHXdQj+z0gs3Xcfs9rk=
+X-Received: by 2002:a05:622a:48e:b0:474:cbac:a983 with SMTP id
+ d75a77b69052e-4750a4d1015mr307611cf.6.1741107387427; Tue, 04 Mar 2025
+ 08:56:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8CaT5Qe5X4t4Kzg@raptor>
+References: <20250210184150.2145093-1-maz@kernel.org> <20250210184150.2145093-8-maz@kernel.org>
+In-Reply-To: <20250210184150.2145093-8-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Mar 2025 16:55:50 +0000
+X-Gm-Features: AQ5f1JpeNlKdk-l5r71vf2tqDSYKeajf6KLHiNZ0LiUdyjmTYrSWEAH6GprWQ2A
+Message-ID: <CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
+Subject: Re: [PATCH 07/18] KVM: arm64: Compute FGT masks from KVM's own FGT tables
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Alexandru,
+Hi Marc,
 
-On Thu, Feb 27, 2025 at 05:01:03PM +0000, Alexandru Elisei wrote:
-> Hi Joey,
-> 
-> On Thu, Feb 20, 2025 at 02:13:53PM +0000, Joey Gouly wrote:
-> > Count EL2 cycles if that's the EL kvm-unit-tests is running at!
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > ---
-> >  arm/pmu.c | 21 ++++++++++++++++++---
-> >  1 file changed, 18 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 2dc0822b..238e4628 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -206,6 +206,8 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
-> >  #define ID_DFR0_PMU_V3_8_5	0b0110
-> >  #define ID_DFR0_PMU_IMPDEF	0b1111
-> >  
-> > +#define PMCCFILTR_EL0_NSH	BIT(27)
-> > +
-> >  static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
-> >  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
-> >  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
-> > @@ -247,7 +249,7 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
-> >  #define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
-> >  
-> >  #define PMEVTYPER_EXCLUDE_EL1 BIT(31)
-> 
-> I think you can drop the macro. I was expecting to see an exclude EL2 macro
-> used in its place when the test is running at EL2, but it seems
-> PMEVTYPER_EXCLUDE_EL1 is not used anywhere. Unless I'm missing something here.
+On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+>
+> In the process of decoupling KVM's view of the FGT bits from the
+> wider architectural state, use KVM's own FGT tables to build
+> a synthitic view of what is actually known.
 
-I will drop it.
+synthitic -> synthetic
 
-> 
-> > -#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
-> > +#define PMEVTYPER_EXCLUDE_EL0 BIT(30) | BIT(27)
-> 
-> I'm not really sure what that's supposed to achieve - if the test is
-> running at EL2, and events from both EL0 and EL2 are excluded, what's left
-> to count?
 
-bit 27 of PMEVTYPER is the NSH bit, when it is 1 the events are not filtered.
-This is the opposite polarity to the U (bit 30) and P (bit 31) bits. When they
-are 1, the events are filtered.
+> This allows for some checking along the way.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h  |   4 ++
+>  arch/arm64/include/asm/kvm_host.h |  14 ++++
+>  arch/arm64/kvm/emulate-nested.c   | 102 ++++++++++++++++++++++++++++++
+>  3 files changed, 120 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 8d94a6c0ed5c4..e424085f2aaca 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -359,6 +359,10 @@
+>  #define __HAFGRTR_EL2_MASK     (GENMASK(49, 17) | GENMASK(4, 0))
+>  #define __HAFGRTR_EL2_nMASK    ~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
+>
+> +/* Because the sysreg file mixes R and W... */
+> +#define HFGRTR_EL2_RES0                HFGxTR_EL2_RES0 (0)
+> +#define HFGWTR_EL2_RES0                (HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
 
-> 
-> I also don't understand what PMEVTYPER_EXCLUDE_EL0 does in the non-nested
-> virt case (when kvm-unit-tests boots at El1). The tests run at EL1, so not
-> counting events at EL0 shouldn't affect anything. Am I missing something
-> obvious here?
+__HFGRTR_ONLY_MASK is a hand-crafted bitmask. The only bit remaining
+in HFGxTR_EL2 that is RES0 is bit 51. If that were to be used as an
+HFGRTR-only bit without __HFGRTR_ONLY_MASK getting updated, then
+aggregate_fgt() below would set its bit in hfgwtr_masks. Could this be
+a problem if this happens and the polarity of this bit ends up being
+negative, thereby setting the corresponding nmask bit?
 
-I don't know why it's like that. AFAICT, it doesn't run anything at EL0.
+Cheers,
+/fuad
 
-> 
-> >  
-> >  static bool is_event_supported(uint32_t n, bool warn)
-> >  {
-> > @@ -1059,11 +1061,18 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >  static bool check_cycles_increase(void)
-> >  {
-> >  	bool success = true;
-> > +	u64 pmccfiltr = 0;
-> >  
-> >  	/* init before event access, this test only cares about cycle count */
-> >  	pmu_reset();
-> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> > +
-> > +#if defined(__aarch64__)
-> > +	if (current_level() == CurrentEL_EL2)
-> > +		// include EL2 cycle counts
-> > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
-> > +#endif
-> > +	set_pmccfiltr(pmccfiltr);
-> >  
-> >  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
-> >  	isb();
-> > @@ -1114,11 +1123,17 @@ static void measure_instrs(int num, uint32_t pmcr)
-> >  static bool check_cpi(int cpi)
-> >  {
-> >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
-> > +	u64 pmccfiltr = 0;
-> >  
-> >  	/* init before event access, this test only cares about cycle count */
-> >  	pmu_reset();
-> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> > +#if defined(__aarch64__)
-> > +	if (current_level() == CurrentEL_EL2)
-> > +		// include EL2 cycle counts
-> > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
-> > +#endif
-> 
-> It's called twice, so it could be abstracted in a function.
-> 
-> Also, I find it interesting that for PMCCFILTR_EL0 you set the NSH bit
-> based on current exception level, but for PMEVTYPER you set it
-> unconditionally. Why the different approaches? For convenience of is there
-> something more?
-
-No real reason. I don't really know about the PMU, just did some changes to get
-this test working.  I'll look into if setting NSH always is fine too, then I'll
-unconditionally do it.
-
-Thanks,
-Joey
+> +
+>  /* Similar definitions for HCRX_EL2 */
+>  #define __HCRX_EL2_RES0         HCRX_EL2_RES0
+>  #define __HCRX_EL2_MASK                (BIT(6))
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cfa024de4e34..4e67d4064f409 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -569,6 +569,20 @@ struct kvm_sysreg_masks {
+>         } mask[NR_SYS_REGS - __SANITISED_REG_START__];
+>  };
+>
+> +struct fgt_masks {
+> +       const char      *str;
+> +       u64             mask;
+> +       u64             nmask;
+> +       u64             res0;
+> +};
+> +
+> +extern struct fgt_masks hfgrtr_masks;
+> +extern struct fgt_masks hfgwtr_masks;
+> +extern struct fgt_masks hfgitr_masks;
+> +extern struct fgt_masks hdfgrtr_masks;
+> +extern struct fgt_masks hdfgwtr_masks;
+> +extern struct fgt_masks hafgrtr_masks;
+> +
+>  struct kvm_cpu_context {
+>         struct user_pt_regs regs;       /* sp = sp_el0 */
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 607d37bab70b4..bbfe89c37a86e 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2033,6 +2033,101 @@ static u32 encoding_next(u32 encoding)
+>         return sys_reg(op0 + 1, 0, 0, 0, 0);
+>  }
+>
+> +#define FGT_MASKS(__n, __m)                                            \
+> +       struct fgt_masks __n = { .str = #__m, .res0 = __m, }
+> +
+> +FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
+> +FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
+> +FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
+> +FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
+> +FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
+> +FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
+> +
+> +static __init bool aggregate_fgt(union trap_config tc)
+> +{
+> +       struct fgt_masks *rmasks, *wmasks;
+> +
+> +       switch (tc.fgt) {
+> +       case HFGxTR_GROUP:
+> +               rmasks = &hfgrtr_masks;
+> +               wmasks = &hfgwtr_masks;
+> +               break;
+> +       case HDFGRTR_GROUP:
+> +               rmasks = &hdfgrtr_masks;
+> +               wmasks = &hdfgwtr_masks;
+> +               break;
+> +       case HAFGRTR_GROUP:
+> +               rmasks = &hafgrtr_masks;
+> +               wmasks = NULL;
+> +               break;
+> +       case HFGITR_GROUP:
+> +               rmasks = &hfgitr_masks;
+> +               wmasks = NULL;
+> +               break;
+> +       }
+> +
+> +       /*
+> +        * A bit can be reserved in either the R or W register, but
+> +        * not both.
+> +        */
+> +       if ((BIT(tc.bit) & rmasks->res0) &&
+> +           (!wmasks || (BIT(tc.bit) & wmasks->res0)))
+> +               return false;
+> +
+> +       if (tc.pol)
+> +               rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
+> +       else
+> +               rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
+> +
+> +       if (wmasks) {
+> +               if (tc.pol)
+> +                       wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
+> +               else
+> +                       wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+> +static __init int check_fgt_masks(struct fgt_masks *masks)
+> +{
+> +       unsigned long duplicate = masks->mask & masks->nmask;
+> +       u64 res0 = masks->res0;
+> +       int ret = 0;
+> +
+> +       if (duplicate) {
+> +               int i;
+> +
+> +               for_each_set_bit(i, &duplicate, 64) {
+> +                       kvm_err("%s[%d] bit has both polarities\n",
+> +                               masks->str, i);
+> +               }
+> +
+> +               ret = -EINVAL;
+> +       }
+> +
+> +       masks->res0 = ~(masks->mask | masks->nmask);
+> +       if (masks->res0 != res0)
+> +               kvm_info("Implicit %s = %016llx, expecting %016llx\n",
+> +                        masks->str, masks->res0, res0);
+> +
+> +       return ret;
+> +}
+> +
+> +static __init int check_all_fgt_masks(int ret)
+> +{
+> +       int err = 0;
+> +
+> +       err |= check_fgt_masks(&hfgrtr_masks);
+> +       err |= check_fgt_masks(&hfgwtr_masks);
+> +       err |= check_fgt_masks(&hfgitr_masks);
+> +       err |= check_fgt_masks(&hdfgrtr_masks);
+> +       err |= check_fgt_masks(&hdfgwtr_masks);
+> +       err |= check_fgt_masks(&hafgrtr_masks);
+> +
+> +       return ret ?: err;
+> +}
+> +
+>  int __init populate_nv_trap_config(void)
+>  {
+>         int ret = 0;
+> @@ -2097,8 +2192,15 @@ int __init populate_nv_trap_config(void)
+>                         ret = xa_err(prev);
+>                         print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+>                 }
+> +
+> +               if (!aggregate_fgt(tc)) {
+> +                       ret = -EINVAL;
+> +                       print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+> +               }
+>         }
+>
+> +       ret = check_all_fgt_masks(ret);
+> +
+>         kvm_info("nv: %ld fine grained trap handlers\n",
+>                  ARRAY_SIZE(encoding_to_fgt));
+>
+> --
+> 2.39.2
+>
