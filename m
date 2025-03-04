@@ -1,193 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96F424C084;
-	Tue,  4 Mar 2025 15:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E86E2780E4
+	for <kvmarm@lists.linux.dev>; Tue,  4 Mar 2025 16:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741103234; cv=none; b=ZuWdu902W5Lx+VQ91k7SfE1c0kU1iLV5GekFdmGy+6Zp8mhruus5PPlSyhPvk55BNY53WbJV7aVskwi5Mqerw2qCQzctdy283PstjU+RMCZ7lM1qotwIOcQ5zNojodm/AQM7GUL3n8+YIvIxIsd+wJvfRBk8flriybfBlJEKSPs=
+	t=1741105550; cv=none; b=gLZftnlK0Y3i/Lx4UWIwVnEuBHGOuHnfw2uacVLB91DyH/ojo97/JLC4IodKCp9zdtVxVz/NfcLJnJP8aS5+FidNZrd/fQC4YZ/tTUk0AAZRpb1wn8OInV0iNqpQz3FXBB/yjWJRHG0B9OgBumPZ8y+W834lIIEVW4OFAVsfH6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741103234; c=relaxed/simple;
-	bh=CzgKvgWWn9VItc2I3f+jV1mLlblrc3SXMV7PgF63HnU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sbNNTIgRy2he1B2FO4STByYSyOFnEb701PXonj43Y38KxiMBvtyMOpCi4KrL+aFvxBX0YNKy8J/ZjJ6MORs/xktazYYqjggJ+MpumbrP3L4jNCykVh9H1/FnQ/qnoYc4cYMlfH5oT6kdZojQvY2SSbg+pQFkJx6diTosTcy9BIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYIhp1+R; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYIhp1+R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C875C4CEE5;
-	Tue,  4 Mar 2025 15:47:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741103234;
-	bh=CzgKvgWWn9VItc2I3f+jV1mLlblrc3SXMV7PgF63HnU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eYIhp1+R5Fy8beCFpYaMRbWBGZHuOJdZwA5KaEoymQlBSNBd9iHALGfkIADKGKV2c
-	 WxnvuhV3XMZ2RaqbeYWdSRYDQC2I8ex6+huJDHDCoSHD2KSjqC4qS+G4PwsIGBqaN1
-	 IKpD3KgkkEWTuxuhsZKgQS5Y7RoSBy/PkW6hEEhuP3p3HgAQqLv2evoUm2Wt9M4HrI
-	 rLNE5E6WJuk0o/0bFdGoMyXme/+tMSCvBPoP8SmafMpfi05YumCh6/cYUHSL4xb2FA
-	 jj3jpmAN9jjk4UcyFneZ5n0ArrM4LG/0dGpdwnhf2CC7S0jmdcGolBYMDK0oCNhjOp
-	 WXRB44edK67ag==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tpUUB-00AIzw-QM;
-	Tue, 04 Mar 2025 15:47:12 +0000
-Date: Tue, 04 Mar 2025 15:47:11 +0000
-Message-ID: <86eczcpzls.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1741105550; c=relaxed/simple;
+	bh=7joMoRPYn7I+O+FHoWsTud02cmpn2zlQxRxktM9D2Kk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m8z+tUhLR0QxYpCwLsed9Qg9c2Ql+pJzcwVtXUspFRRVftRQNl2iiZ/5KgP9oKSeFHzl9IEqhOYTYIiTAIdGjm9kKtgu4KpahCmIbWXeKAsUaw/ZNGsBUW1NFzDdbXAQJFmr6T7Bmx7Qr4uq+xt+QWseuOPF8hojpnFrEwiKT+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A8CF497;
+	Tue,  4 Mar 2025 08:26:01 -0800 (PST)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09DB23F5A1;
+	Tue,  4 Mar 2025 08:25:44 -0800 (PST)
+Date: Tue, 4 Mar 2025 16:25:38 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Rob Herring <robh@kernel.org>, Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 03/18] KVM: arm64: Handle trapping of FEAT_LS64* instructions
-In-Reply-To: <CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
-References: <20250210184150.2145093-1-maz@kernel.org>
-	<20250210184150.2145093-4-maz@kernel.org>
-	<CA+EHjTwkX+sy1wuS8LvGM+=m_S-h-=xUUXOyMapnoLiHt0XpOw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Leo Yan <leo.yan@arm.com>, kernel-team@android.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v20 00/11] arm64/perf: Enable branch stack sampling
+Message-ID: <Z8cpgsxG4RrDoTKR@J2N7QTR9R3.cambridge.arm.com>
+References: <20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org>
+ <174080569248.3208873.17639032755999041028.b4-ty@kernel.org>
+ <CAL_JsqLijFG1PFkqKk7hXzC=aj70OLQsXwC280QsCO=PnCVZYg@mail.gmail.com>
+ <Z8bjEm_neWdMBNYv@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z8bjEm_neWdMBNYv@arm.com>
 
-On Tue, 04 Mar 2025 14:36:19 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Tue, Mar 04, 2025 at 11:25:06AM +0000, Catalin Marinas wrote:
+> On Mon, Mar 03, 2025 at 10:44:21AM -0600, Rob Herring wrote:
+> > On Sat, Mar 1, 2025 at 1:05 AM Will Deacon <will@kernel.org> wrote:
+> > > On Tue, 18 Feb 2025 14:39:55 -0600, Rob Herring (Arm) wrote:
+> > > > This series enables perf branch stack sampling support on arm64 via a
+> > > > v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
+> > > > on BRBE can be found in the Arm ARM[1] chapter D18.
+> > > >
+> > > > I've picked up this series from Anshuman. v19 and v20 versions have been
+> > > > reworked quite a bit by Mark and myself. The bulk of those changes are
+> > > > in patch 11.
+> > > >
+> > > > [...]
+> > >
+> > > Applied cleanups to will (for-next/perf), thanks!
+> > >
+> > > [01/11] perf: arm_pmuv3: Call kvm_vcpu_pmu_resync_el0() before enabling counters
+> > >         https://git.kernel.org/will/c/04bd15c4cbc3
+> > > [02/11] perf: arm_pmu: Don't disable counter in armpmu_add()
+> > >         https://git.kernel.org/will/c/dcca27bc1ecc
+> > > [03/11] perf: arm_pmuv3: Don't disable counter in armv8pmu_enable_event()
+> > >         https://git.kernel.org/will/c/4b0567ad0be5
+> > > [04/11] perf: arm_v7_pmu: Drop obvious comments for enabling/disabling counters and interrupts
+> > >         https://git.kernel.org/will/c/7a5387748215
+> > > [05/11] perf: arm_v7_pmu: Don't disable counter in (armv7|krait_|scorpion_)pmu_enable_event()
+> > >         https://git.kernel.org/will/c/7bf1001e0d91
+> > > [06/11] perf: apple_m1: Don't disable counter in m1_pmu_enable_event()
+> > >         https://git.kernel.org/will/c/c2e793da59fc
+> > > [07/11] perf: arm_pmu: Move PMUv3-specific data
+> > >         https://git.kernel.org/will/c/dc4d58a752ea
+> > 
+> > I don't know if you looked at the thread on patch 11 and said "long
+> > discussion, I'll assume a new version is coming. Next!" because that's
+> > what I would do. In this case though, there's not any changes.
 > 
-> Hi Marc,
-> 
-> On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > We generally don't expect FEAT_LS64* instructions to trap, unless
-> > they are trapped by a guest hypervisor.
-> >
-> > Otherwise, this is just the guest playing tricks on us by using
-> > an instruction that isn't advertised, which we handle with a well
-> > deserved UNDEF.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 64 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > index 512d152233ff2..4f8354bf7dc5f 100644
-> > --- a/arch/arm64/kvm/handle_exit.c
-> > +++ b/arch/arm64/kvm/handle_exit.c
-> > @@ -294,6 +294,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
-> >         return 1;
-> >  }
-> >
-> > +static int handle_ls64b(struct kvm_vcpu *vcpu)
-> > +{
-> > +       struct kvm *kvm = vcpu->kvm;
-> > +       u64 esr = kvm_vcpu_get_esr(vcpu);
-> > +       u64 iss = ESR_ELx_ISS(esr);
-> > +       bool allowed;
-> > +
-> > +       switch (iss) {
-> > +       case ESR_ELx_ISS_ST64BV:
-> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
-> > +               break;
-> > +       case ESR_ELx_ISS_ST64BV0:
-> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
-> > +               break;
-> > +       case ESR_ELx_ISS_LDST64B:
-> > +               allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
-> > +               break;
-> > +       default:
-> > +               /* Clearly, we're missing something. */
-> > +               goto unknown_trap;
-> > +       }
-> > +
-> > +       if (!allowed)
-> > +               goto undef;
-> > +
-> > +       if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-> > +               u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
-> > +               bool fwd;
-> > +
-> > +               switch (iss) {
-> > +               case ESR_ELx_ISS_ST64BV:
-> > +                       fwd = !(hcrx & HCRX_EL2_EnASR);
-> > +                       break;
-> > +               case ESR_ELx_ISS_ST64BV0:
-> > +                       fwd = !(hcrx & HCRX_EL2_EnAS0);
-> > +                       break;
-> > +               case ESR_ELx_ISS_LDST64B:
-> > +                       fwd = !(hcrx & HCRX_EL2_EnALS);
-> > +                       break;
-> > +               default:
-> > +                       /* We don't expect to be here */
-> > +                       fwd = false;
-> > +               }
-> > +
-> > +               if (fwd) {
-> > +                       kvm_inject_nested_sync(vcpu, esr);
-> > +                       return 1;
-> > +               }
-> > +       }
-> > +
-> > +unknown_trap:
-> > +       /*
-> > +        * If we land here, something must be very wrong, because we
-> > +        * have no idea why we trapped at all. Warn and undef as a
-> > +        * fallback.
-> > +        */
-> > +       WARN_ON(1);
-> 
-> nit: should this be WARN_ONCE() instead?
-> 
-> > +
-> > +undef:
-> > +       kvm_inject_undefined(vcpu);
-> > +       return 1;
-> > +}
-> 
-> I'm wondering if this can be simplified by having one switch()
-> statement that toggles both allowed and fwd (or maybe even only fwd),
-> and then inject depending on that, e.g.,
-> 
-> +static int handle_ls64b(struct kvm_vcpu *vcpu)
-> +{
-> +    struct kvm *kvm = vcpu->kvm;
-> +    bool is_nv = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
-> +    u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
-> +    u64 esr = kvm_vcpu_get_esr(vcpu);
-> +    u64 iss = ESR_ELx_ISS(esr);
-> +    bool fwd = false;
-> +
-> +    switch (iss) {
-> +    case ESR_ELx_ISS_ST64BV:
-> +         fwd = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V) &&
-> +                   !(hcrx & HCRX_EL2_EnASR)
+> I do this as well ;). But I think Will is waiting for Mark R to look at
+> the rest of the series.
 
-Ah, I know what I dislike about this approach: If your L1 guest runs
-at EL2, HCRX_EL2 doesn't apply (it is only for an L2 guest). Yet we
-evaluate it.
+Sorry for the delay there.
 
-I think this still works because you shouldn't have HCRX_EL2.EnASR
-clear on the host if LS64V is advertised to the guest, but it feels a
-bit fragile.
+I'm happy with the structure of this; my only remaining concern is the
+filtering logic, as it is surprisingly subtle, and when I was last
+working on that it wasn't clear to me whether we could alwways filter
+appropriately (or whether it'd be better to reject scheduling of events
+with mismatched filters).
 
-I'll have another think at refactoring that code.
+I'll try to page that in and properly attack that soon, but aside from
+that concern the series as a whole looks good to me.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Mark.
