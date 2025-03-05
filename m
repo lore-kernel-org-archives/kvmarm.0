@@ -1,396 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0BB2517AF
-	for <kvmarm@lists.linux.dev>; Wed,  5 Mar 2025 16:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133AB16426
+	for <kvmarm@lists.linux.dev>; Wed,  5 Mar 2025 18:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741192958; cv=none; b=WCBNI0LOpOB2XjSPcBbkLuruPARBJfv8EARxG1tfU9L0hMaKai5CxXJeXAbGGqxofVjCHtRvBElw23ska8CK+EQYaocKkDaXTjuuNrlAthshf+lxMnHpgtOiVVMUXlmAT14Mme8OCciK5w8CycromImZakiFioA7m/1jZXtxgWo=
+	t=1741199768; cv=none; b=LKxaAccXLol98MuF98hkiIhAOp48QmYQwuO8dHtIKfg7pDBu4wJgHMr58QtaZN0UL2YCiHayUvdQu0V4fUX1ETNtNiVpztJJg3ATGxprKbAnibZPajp7IHGmIDVPCis18QxnTya2oxNBQm3Ana0G4vVChV5Xskglp8HcjVWdEJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741192958; c=relaxed/simple;
-	bh=xWfKtodQDkcZ7NLEzQfqs0PRFXwuRBEPhtJr+oE/jOU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=jkGRHeQhdYALqv+fPIk2gAh771VOpzOu5da9NxvEH2YE/B0Ga9B1v0SvCs/zEs6TA5iZ0Sp4udgzij3VN2KUYGbvv+qHuvJvhzuFWNrKmlufQbhwFDBJXUb3lEFm4B4pU/nKJObS1M3r4LOpZuv+szCpBFp+ckzpEIzkERYhLuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=buPA8CYn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741199768; c=relaxed/simple;
+	bh=jWgHSsvysebCfA2IEKJdsbWxkPfFdu8pzBR+/gIGIoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hx5UXrCiV5/g18vts1Jkz+bqdyCnzSGpFFCr/xGvH3dkbQd/lHZKP9avFRlRxwHEETcamb7sBrExlhkQpE0HEC9I4ia6JVnTNdOcCYgR/xDP8GRae6nBzpCIapQG0sOqLd5P/GKR/3NI2W74OFPbL5KRMlh5NDtoTbpq93KjqlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JFR1AeB1; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="buPA8CYn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741192955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RnclmN74HTl3Tg3O8yHBiRcH3fZb18iLB6RZpAFmyvI=;
-	b=buPA8CYnFnNil17i2SkhCUCC1ZrybH0ZLp95RYJpE/eJNtjOmeOBsIL6ch1h4345IT5KPe
-	bAle0Qr2/cBpzfc2ZhOILIe89H7O30O3wfM0pxXDLe/Nq5L6e94Y2jcbIRLwK6xwst7Q7L
-	BDrj60d157BKQiI+KRB2HtscKikvC8k=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-7-GmwD5RQxNv2yt9VQwdL2Mw-1; Wed,
- 05 Mar 2025 11:42:33 -0500
-X-MC-Unique: GmwD5RQxNv2yt9VQwdL2Mw-1
-X-Mimecast-MFC-AGG-ID: GmwD5RQxNv2yt9VQwdL2Mw_1741192951
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F88F1828A80;
-	Wed,  5 Mar 2025 16:42:31 +0000 (UTC)
-Received: from gondolin.redhat.com (unknown [10.67.24.9])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D91C31956095;
-	Wed,  5 Mar 2025 16:42:15 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com,
-	agraf@csgraf.de
-Cc: shahuang@redhat.com,
-	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v2 14/14] arm/cpu: Add generated files
-Date: Wed,  5 Mar 2025 17:38:19 +0100
-Message-ID: <20250305163819.2477553-15-cohuck@redhat.com>
-In-Reply-To: <20250305163819.2477553-1-cohuck@redhat.com>
-References: <20250305163819.2477553-1-cohuck@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JFR1AeB1"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43ba8a87643so5775e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 05 Mar 2025 10:36:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741199764; x=1741804564; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=a2OFT2OoedTJTEmeRVIN9FPGz/gwRD13KVUXjlzrTxU=;
+        b=JFR1AeB1F2C7ClUlmnXHtjq5k0CZcI5QCxLyIiAWnaVL1ABCP2+U9QyZaF/ieKjbbw
+         vyEztd0cNx7Sf/pIikHk1cu8PZULNSI7/1iU19iJ9W0BkqVpYsZ4J6+L09OhladeSK4n
+         y280svr6OyoXa1EWf8qb6fmMRFxspgCPG9GUKF4h1DbQkGE87qpYB5DVxW2ClP8KDqXc
+         148pcNMn0iaq1riIkXjuo3xagdgy801MkhkMOqqk8TyoAcwoQdSjjrHBsA9KkDpArAQ9
+         0jcN27kty0sEC9YswSneK/AfJptY3rGiM81IacDXaLknvml7tPPPcF/3CeSNRGxT/yQ+
+         fddg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741199764; x=1741804564;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a2OFT2OoedTJTEmeRVIN9FPGz/gwRD13KVUXjlzrTxU=;
+        b=uqDtrSv9mvDInFPpFvFviGelZje12x9HWoQvbpL3PxvQCcdP8bsvWBiakMfmmxx2VF
+         E8eYYFvfcsLefMOZP+y95BoJbQlG2rx8UnnvHPIqD4ynrjMmSwf9M1+NvRJ2Rhzzm1Gg
+         gML2g+Qd/8DsLs8A9Q7KG3O0ZrxuL9j9h41Oby23S4iqLFPtzGHqEylMQedezrplkQ5p
+         1GT0HzPrE7vbsS0eMjpvglks6miFL4HH/HJ0Qf/4hXEU5KOzOFvcd2O/FBiKJv4fFFPZ
+         64J+jIX0++0FalDI0favyB22NL3IY+c3l5zIwjcmjuhGRW7Si7Pzlj0Xg+RL7Le5SpNO
+         9Awg==
+X-Forwarded-Encrypted: i=1; AJvYcCWcSEUeCc/sBlEfKAdV4g/rUWtGGUkakxUbPhIVXiyBXMmESnROIx66ee9cMP38mWz8G9Tal4M=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwaLESXu+XTasFWC9WB3fPmvl6sn1R3m4tokbxgWev7SagR1SNP
+	AWQ0t9wTB25hGP8wNotwVQxo6TqirTYBVY6TW/qAXAcVZtVsirKY+Sx3mdeUDg==
+X-Gm-Gg: ASbGncsTey6zBCKlbBwG2jav0MXpRJnLXTBrkOeb8LlcaxPeyozPtpJiFaZzy5f4KfA
+	2Veb6mGGMDSUP2Tm6xdcs4JAF7GK9lYUxwf1sV3bttvvYIyti30wqvxq8j0/8eJCqUGvNMOLr86
+	NVlZwNt7x0JSJ57Jmkp9sdBijAmdrkZaQ7gf7MVr0B8tHjihJO/za2z994fwQo5C3QJlTuGM4dw
+	0cw8HyvJysYH2i0+WGNBivF/AWdJ7+clOtbFyLfX0pIvVQcXw12CEd9oM2z1boo10YmSBqNkHXd
+	cGnDErrPwemOKym65UToo46BELVLcd3aEFso49wAFe2LUKrW2cTZfzzpZA+ndtPXArT3lya5Uir
+	oL4tS/EL2RVUc
+X-Google-Smtp-Source: AGHT+IGuoCdVlssAi/H3pLNOEjzh/d6m6UEnCFgp+MZSf4rv9zgHb14AznLZkDz+7g00rolvyanVzA==
+X-Received: by 2002:a05:600c:22d0:b0:43b:bfe6:d898 with SMTP id 5b1f17b1804b1-43bdbac5f6dmr43995e9.0.1741199763997;
+        Wed, 05 Mar 2025 10:36:03 -0800 (PST)
+Received: from google.com (100.235.22.34.bc.googleusercontent.com. [34.22.235.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4796600sm21673887f8f.20.2025.03.05.10.36.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 10:36:03 -0800 (PST)
+Date: Wed, 5 Mar 2025 18:36:01 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org,
+	oliver.upton@linux.dev, snehalreddy@google.com,
+	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com,
+	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Map the hypervisor FF-A buffers on
+ ffa init
+Message-ID: <Z8iZkQHknZfY7mpn@google.com>
+References: <20250227181750.3606372-1-sebastianene@google.com>
+ <20250227181750.3606372-4-sebastianene@google.com>
+ <20250303234259.GA30749@willie-the-truck>
+ <Z8ZPBZF7J-qKdb_i@google.com>
+ <20250304015633.GA30882@willie-the-truck>
+ <Z8c6enoolJe7Zeqk@google.com>
+ <20250305003808.GA31667@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305003808.GA31667@willie-the-truck>
 
-And switch to using the generated definitions.
+On Wed, Mar 05, 2025 at 12:38:08AM +0000, Will Deacon wrote:
+> On Tue, Mar 04, 2025 at 05:38:02PM +0000, Sebastian Ene wrote:
+> > On Tue, Mar 04, 2025 at 01:56:35AM +0000, Will Deacon wrote:
+> > > On Tue, Mar 04, 2025 at 12:53:25AM +0000, Sebastian Ene wrote:
+> > > > On Mon, Mar 03, 2025 at 11:43:03PM +0000, Will Deacon wrote:
+> > > > > On Thu, Feb 27, 2025 at 06:17:48PM +0000, Sebastian Ene wrote:
+> > > > > > Map the hypervisor's buffers irrespective to the host and return
+> > > > > > a linux error code from the FF-A error code on failure. Remove
+> > > > > > the unmap ff-a buffers calls from the hypervisor as it will
+> > > > > > never be called.
+> > > > > > Prevent the host from using FF-A directly with Trustzone
+> > > > > > if the hypervisor could not map its own buffers.
+> > > > > > 
+> > > > > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > > > > > ---
+> > > > > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 46 +++++++++++++----------------------
+> > > > > >  1 file changed, 17 insertions(+), 29 deletions(-)
+> > > > > 
+> > > > > [...]
+> > > > > 
+> > > > > > @@ -861,6 +842,7 @@ int hyp_ffa_init(void *pages)
+> > > > > >  {
+> > > > > >  	struct arm_smccc_res res;
+> > > > > >  	void *tx, *rx;
+> > > > > > +	int ret;
+> > > > > >  
+> > > > > >  	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
+> > > > > >  		return 0;
+> > > > > > @@ -911,5 +893,11 @@ int hyp_ffa_init(void *pages)
+> > > > > >  		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
+> > > > > >  	};
+> > > > > >  
+> > > > > > +	/* Map our hypervisor buffers into the SPMD */
+> > > > > > +	ret = ffa_map_hyp_buffers();
+> > > > > > +	if (ret)
+> > > > > > +		return ret;
+> > > > > 
+> > > > > Doesn't calling RXTX_MAP here undo the fix from c9c012625e12 ("KVM:
+> > > > > arm64: Trap FFA_VERSION host call in pKVM") where we want to allow for
+> > > > > the host to negotiate the version lazily?
+> > > > 
+> > > > We still have the same behaviour where we don't allow memory
+> > > > sharing to happen until the version is negotiated but this
+> > > > separates the hypervisor buffer mapping part from the host.
+> > > 
+> > > Sadly, the spec doesn't restrict this to the memory sharing calls:
+> > > 
+> > >   | [...] negotiation of the version must happen before an invocation of
+> > >   | any other FF-A ABI
+> > > 
+> > 
+> > We do that, as the hypervisor negotiates its own version in
+> > hyp_ffa_init.
+> 
+> hyp_ffa_init() only issues FFA_VERSION afaict, which is the one call
+> that you're allowed to make during negotiation. So the existing code is
+> fine.
+> 
+> > I think the host shouldn't be allowed to overwrite the
+> > hyp_ffa_version obtained from _init, this feels wrong as you
+> > can have a driver that forcefully downgrades the hypervisor to an old
+> > version.
+> 
+> I think that's also fine. The FFA code in the hypervisor exists solely
+> to proxy requests from the host; it's not used for anything else and so,
+> from the host's persective, FFA should behave identically to the case in
+> which the proxy is not present (e.g. if we were just using VHE). That
+> means that we're doing the right thing by deferring to the host for
+> version negotation.
+> 
+> Are you saying there's a bug in the current code if the host negotiates
+> the downgrade?
 
-Generated against Linux 6.14-rc1.
+It is an issue *only* for doing guest-ffa (which isn't posted here yet).
+If we allow the host to dictate the version & there is an issue with TZ
+FF-A dispatcher in that version => the guests will be affected by this
+as well.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/arm/cpu-sysregs.h     | 116 +-----------------------
- target/arm/cpu-sysregs.h.inc | 167 +++++++++++++++++++++++++++++++++++
- 2 files changed, 169 insertions(+), 114 deletions(-)
- create mode 100644 target/arm/cpu-sysregs.h.inc
+> 
+> > We need to do three things, Sudeep & Will please correct me if I am
+> > wrong, but this is how I see it:
+> > 
+> > - the hypervisor should act as a separate entity (it has a different ID and
+> > in the current implementation we don't do a distinction between host/hyp) and
+> > it should be able to lock its own version from init.
+> 
+> I strongly disagree with that. The hypervisor isn't using FFA for
+> anything other than proxying the host and so we don't need to negotiate
+> a separate version.
+> 
+> What would we gain by doing this? Is there a bug with what we're doing
+> at the moment?
 
-diff --git a/target/arm/cpu-sysregs.h b/target/arm/cpu-sysregs.h
-index 54a4fadbf0c1..6074516c6d2c 100644
---- a/target/arm/cpu-sysregs.h
-+++ b/target/arm/cpu-sysregs.h
-@@ -13,120 +13,8 @@
-      ((crm) << CP_REG_ARM64_SYSREG_CRM_SHIFT) |         \
-      ((op2) << CP_REG_ARM64_SYSREG_OP2_SHIFT))
- 
--typedef enum ARMIDRegisterIdx {
--    ID_AA64PFR0_EL1_IDX,
--    ID_AA64PFR1_EL1_IDX,
--    ID_AA64SMFR0_EL1_IDX,
--    ID_AA64DFR0_EL1_IDX,
--    ID_AA64DFR1_EL1_IDX,
--    ID_AA64ISAR0_EL1_IDX,
--    ID_AA64ISAR1_EL1_IDX,
--    ID_AA64ISAR2_EL1_IDX,
--    ID_AA64MMFR0_EL1_IDX,
--    ID_AA64MMFR1_EL1_IDX,
--    ID_AA64MMFR2_EL1_IDX,
--    ID_AA64MMFR3_EL1_IDX,
--    ID_PFR0_EL1_IDX,
--    ID_PFR1_EL1_IDX,
--    ID_DFR0_EL1_IDX,
--    ID_MMFR0_EL1_IDX,
--    ID_MMFR1_EL1_IDX,
--    ID_MMFR2_EL1_IDX,
--    ID_MMFR3_EL1_IDX,
--    ID_ISAR0_EL1_IDX,
--    ID_ISAR1_EL1_IDX,
--    ID_ISAR2_EL1_IDX,
--    ID_ISAR3_EL1_IDX,
--    ID_ISAR4_EL1_IDX,
--    ID_ISAR5_EL1_IDX,
--    ID_MMFR4_EL1_IDX,
--    ID_ISAR6_EL1_IDX,
--    MVFR0_EL1_IDX,
--    MVFR1_EL1_IDX,
--    MVFR2_EL1_IDX,
--    ID_PFR2_EL1_IDX,
--    ID_DFR1_EL1_IDX,
--    ID_MMFR5_EL1_IDX,
--    ID_AA64ZFR0_EL1_IDX,
--    CTR_EL0_IDX,
--    NUM_ID_IDX,
--} ARMIDRegisterIdx;
--
--typedef enum ARMSysRegs {
--    SYS_ID_AA64PFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 0),
--    SYS_ID_AA64PFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 1),
--    SYS_ID_AA64SMFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 5),
--    SYS_ID_AA64DFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 0),
--    SYS_ID_AA64DFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 1),
--    SYS_ID_AA64ISAR0_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 0),
--    SYS_ID_AA64ISAR1_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 1),
--    SYS_ID_AA64ISAR2_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 2),
--    SYS_ID_AA64MMFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 0),
--    SYS_ID_AA64MMFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 1),
--    SYS_ID_AA64MMFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 2),
--    SYS_ID_AA64MMFR3_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 3),
--    SYS_ID_PFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 0),
--    SYS_ID_PFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 1),
--    SYS_ID_DFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 2),
--    SYS_ID_MMFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 4),
--    SYS_ID_MMFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 5),
--    SYS_ID_MMFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 6),
--    SYS_ID_MMFR3_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 7),
--    SYS_ID_ISAR0_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 0),
--    SYS_ID_ISAR1_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 1),
--    SYS_ID_ISAR2_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 2),
--    SYS_ID_ISAR3_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 3),
--    SYS_ID_ISAR4_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 4),
--    SYS_ID_ISAR5_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 5),
--    SYS_ID_MMFR4_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 6),
--    SYS_ID_ISAR6_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 7),
--    SYS_MVFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 0),
--    SYS_MVFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 1),
--    SYS_MVFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 2),
--    SYS_ID_PFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 4),
--    SYS_ID_DFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 5),
--    SYS_ID_MMFR5_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 6),
--    SYS_ID_AA64ZFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 4),
--    SYS_CTR_EL0 = ENCODE_ID_REG(3, 3, 0, 0, 1),
--} ARMSysRegs;
--
--static const uint32_t id_register_sysreg[NUM_ID_IDX] = {
--    [ID_AA64PFR0_EL1_IDX] = SYS_ID_AA64PFR0_EL1,
--    [ID_AA64PFR1_EL1_IDX] = SYS_ID_AA64PFR1_EL1,
--    [ID_AA64SMFR0_EL1_IDX] = SYS_ID_AA64SMFR0_EL1,
--    [ID_AA64DFR0_EL1_IDX] = SYS_ID_AA64DFR0_EL1,
--    [ID_AA64DFR1_EL1_IDX] = SYS_ID_AA64DFR1_EL1,
--    [ID_AA64ISAR0_EL1_IDX] = SYS_ID_AA64ISAR0_EL1,
--    [ID_AA64ISAR1_EL1_IDX] = SYS_ID_AA64ISAR1_EL1,
--    [ID_AA64ISAR2_EL1_IDX] = SYS_ID_AA64ISAR2_EL1,
--    [ID_AA64MMFR0_EL1_IDX] = SYS_ID_AA64MMFR0_EL1,
--    [ID_AA64MMFR1_EL1_IDX] = SYS_ID_AA64MMFR1_EL1,
--    [ID_AA64MMFR2_EL1_IDX] = SYS_ID_AA64MMFR2_EL1,
--    [ID_AA64MMFR3_EL1_IDX] = SYS_ID_AA64MMFR3_EL1,
--    [ID_PFR0_EL1_IDX] = SYS_ID_PFR0_EL1,
--    [ID_PFR1_EL1_IDX] = SYS_ID_PFR1_EL1,
--    [ID_DFR0_EL1_IDX] = SYS_ID_DFR0_EL1,
--    [ID_MMFR0_EL1_IDX] = SYS_ID_MMFR0_EL1,
--    [ID_MMFR1_EL1_IDX] = SYS_ID_MMFR1_EL1,
--    [ID_MMFR2_EL1_IDX] = SYS_ID_MMFR2_EL1,
--    [ID_MMFR3_EL1_IDX] = SYS_ID_MMFR3_EL1,
--    [ID_ISAR0_EL1_IDX] = SYS_ID_ISAR0_EL1,
--    [ID_ISAR1_EL1_IDX] = SYS_ID_ISAR1_EL1,
--    [ID_ISAR2_EL1_IDX] = SYS_ID_ISAR2_EL1,
--    [ID_ISAR3_EL1_IDX] = SYS_ID_ISAR3_EL1,
--    [ID_ISAR4_EL1_IDX] = SYS_ID_ISAR4_EL1,
--    [ID_ISAR5_EL1_IDX] = SYS_ID_ISAR5_EL1,
--    [ID_MMFR4_EL1_IDX] = SYS_ID_MMFR4_EL1,
--    [ID_ISAR6_EL1_IDX] = SYS_ID_ISAR6_EL1,
--    [MVFR0_EL1_IDX] = SYS_MVFR0_EL1,
--    [MVFR1_EL1_IDX] = SYS_MVFR1_EL1,
--    [MVFR2_EL1_IDX] = SYS_MVFR2_EL1,
--    [ID_PFR2_EL1_IDX] = SYS_ID_PFR2_EL1,
--    [ID_DFR1_EL1_IDX] = SYS_ID_DFR1_EL1,
--    [ID_MMFR5_EL1_IDX] = SYS_ID_MMFR5_EL1,
--    [ID_AA64ZFR0_EL1_IDX] = SYS_ID_AA64ZFR0_EL1,
--    [CTR_EL0_IDX] = SYS_CTR_EL0,
--};
-+/* include generated definitions */
-+#include "cpu-sysregs.h.inc"
- 
- int get_sysreg_idx(ARMSysRegs sysreg);
- uint64_t idregs_sysreg_to_kvm_reg(ARMSysRegs sysreg);
-diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
-new file mode 100644
-index 000000000000..9236c36696df
---- /dev/null
-+++ b/target/arm/cpu-sysregs.h.inc
-@@ -0,0 +1,167 @@
-+/* GENERATED FILE -- DO NOT EDIT */
-+#ifndef ARCH_ARM_CPU_SYSREGS_H_INC
-+#define ARCH_ARM_CPU_SYSREGS_H_INC
-+
-+typedef enum ARMIDRegisterIdx {
-+    ID_PFR0_EL1_IDX,
-+    ID_PFR1_EL1_IDX,
-+    ID_DFR0_EL1_IDX,
-+    ID_AFR0_EL1_IDX,
-+    ID_MMFR0_EL1_IDX,
-+    ID_MMFR1_EL1_IDX,
-+    ID_MMFR2_EL1_IDX,
-+    ID_MMFR3_EL1_IDX,
-+    ID_ISAR0_EL1_IDX,
-+    ID_ISAR1_EL1_IDX,
-+    ID_ISAR2_EL1_IDX,
-+    ID_ISAR3_EL1_IDX,
-+    ID_ISAR4_EL1_IDX,
-+    ID_ISAR5_EL1_IDX,
-+    ID_ISAR6_EL1_IDX,
-+    ID_MMFR4_EL1_IDX,
-+    MVFR0_EL1_IDX,
-+    MVFR1_EL1_IDX,
-+    MVFR2_EL1_IDX,
-+    ID_PFR2_EL1_IDX,
-+    ID_DFR1_EL1_IDX,
-+    ID_MMFR5_EL1_IDX,
-+    ID_AA64PFR0_EL1_IDX,
-+    ID_AA64PFR1_EL1_IDX,
-+    ID_AA64PFR2_EL1_IDX,
-+    ID_AA64ZFR0_EL1_IDX,
-+    ID_AA64SMFR0_EL1_IDX,
-+    ID_AA64FPFR0_EL1_IDX,
-+    ID_AA64DFR0_EL1_IDX,
-+    ID_AA64DFR1_EL1_IDX,
-+    ID_AA64DFR2_EL1_IDX,
-+    ID_AA64AFR0_EL1_IDX,
-+    ID_AA64AFR1_EL1_IDX,
-+    ID_AA64ISAR0_EL1_IDX,
-+    ID_AA64ISAR1_EL1_IDX,
-+    ID_AA64ISAR2_EL1_IDX,
-+    ID_AA64ISAR3_EL1_IDX,
-+    ID_AA64MMFR0_EL1_IDX,
-+    ID_AA64MMFR1_EL1_IDX,
-+    ID_AA64MMFR2_EL1_IDX,
-+    ID_AA64MMFR3_EL1_IDX,
-+    ID_AA64MMFR4_EL1_IDX,
-+    CCSIDR_EL1_IDX,
-+    CLIDR_EL1_IDX,
-+    CCSIDR2_EL1_IDX,
-+    GMID_EL1_IDX,
-+    SMIDR_EL1_IDX,
-+    CSSELR_EL1_IDX,
-+    CTR_EL0_IDX,
-+    DCZID_EL0_IDX,
-+    NUM_ID_IDX,
-+} ARMIDRegisterIdx;
-+
-+
-+typedef enum ARMSysRegs {
-+    SYS_ID_PFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 0),
-+    SYS_ID_PFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 1),
-+    SYS_ID_DFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 2),
-+    SYS_ID_AFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 3),
-+    SYS_ID_MMFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 4),
-+    SYS_ID_MMFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 5),
-+    SYS_ID_MMFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 6),
-+    SYS_ID_MMFR3_EL1 = ENCODE_ID_REG(3, 0, 0, 1, 7),
-+    SYS_ID_ISAR0_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 0),
-+    SYS_ID_ISAR1_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 1),
-+    SYS_ID_ISAR2_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 2),
-+    SYS_ID_ISAR3_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 3),
-+    SYS_ID_ISAR4_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 4),
-+    SYS_ID_ISAR5_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 5),
-+    SYS_ID_ISAR6_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 7),
-+    SYS_ID_MMFR4_EL1 = ENCODE_ID_REG(3, 0, 0, 2, 6),
-+    SYS_MVFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 0),
-+    SYS_MVFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 1),
-+    SYS_MVFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 2),
-+    SYS_ID_PFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 4),
-+    SYS_ID_DFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 5),
-+    SYS_ID_MMFR5_EL1 = ENCODE_ID_REG(3, 0, 0, 3, 6),
-+    SYS_ID_AA64PFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 0),
-+    SYS_ID_AA64PFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 1),
-+    SYS_ID_AA64PFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 2),
-+    SYS_ID_AA64ZFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 4),
-+    SYS_ID_AA64SMFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 5),
-+    SYS_ID_AA64FPFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 4, 7),
-+    SYS_ID_AA64DFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 0),
-+    SYS_ID_AA64DFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 1),
-+    SYS_ID_AA64DFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 2),
-+    SYS_ID_AA64AFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 4),
-+    SYS_ID_AA64AFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 5, 5),
-+    SYS_ID_AA64ISAR0_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 0),
-+    SYS_ID_AA64ISAR1_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 1),
-+    SYS_ID_AA64ISAR2_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 2),
-+    SYS_ID_AA64ISAR3_EL1 = ENCODE_ID_REG(3, 0, 0, 6, 3),
-+    SYS_ID_AA64MMFR0_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 0),
-+    SYS_ID_AA64MMFR1_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 1),
-+    SYS_ID_AA64MMFR2_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 2),
-+    SYS_ID_AA64MMFR3_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 3),
-+    SYS_ID_AA64MMFR4_EL1 = ENCODE_ID_REG(3, 0, 0, 7, 4),
-+    SYS_CCSIDR_EL1 = ENCODE_ID_REG(3, 1, 0, 0, 0),
-+    SYS_CLIDR_EL1 = ENCODE_ID_REG(3, 1, 0, 0, 1),
-+    SYS_CCSIDR2_EL1 = ENCODE_ID_REG(3, 1, 0, 0, 2),
-+    SYS_GMID_EL1 = ENCODE_ID_REG(3, 1, 0, 0, 4),
-+    SYS_SMIDR_EL1 = ENCODE_ID_REG(3, 1, 0, 0, 6),
-+    SYS_CSSELR_EL1 = ENCODE_ID_REG(3, 2, 0, 0, 0),
-+    SYS_CTR_EL0 = ENCODE_ID_REG(3, 3, 0, 0, 1),
-+    SYS_DCZID_EL0 = ENCODE_ID_REG(3, 3, 0, 0, 7),
-+} ARMSysRegs;
-+
-+
-+static const uint32_t id_register_sysreg[NUM_ID_IDX] = {
-+    [ID_PFR0_EL1_IDX] = SYS_ID_PFR0_EL1,
-+    [ID_PFR1_EL1_IDX] = SYS_ID_PFR1_EL1,
-+    [ID_DFR0_EL1_IDX] = SYS_ID_DFR0_EL1,
-+    [ID_AFR0_EL1_IDX] = SYS_ID_AFR0_EL1,
-+    [ID_MMFR0_EL1_IDX] = SYS_ID_MMFR0_EL1,
-+    [ID_MMFR1_EL1_IDX] = SYS_ID_MMFR1_EL1,
-+    [ID_MMFR2_EL1_IDX] = SYS_ID_MMFR2_EL1,
-+    [ID_MMFR3_EL1_IDX] = SYS_ID_MMFR3_EL1,
-+    [ID_ISAR0_EL1_IDX] = SYS_ID_ISAR0_EL1,
-+    [ID_ISAR1_EL1_IDX] = SYS_ID_ISAR1_EL1,
-+    [ID_ISAR2_EL1_IDX] = SYS_ID_ISAR2_EL1,
-+    [ID_ISAR3_EL1_IDX] = SYS_ID_ISAR3_EL1,
-+    [ID_ISAR4_EL1_IDX] = SYS_ID_ISAR4_EL1,
-+    [ID_ISAR5_EL1_IDX] = SYS_ID_ISAR5_EL1,
-+    [ID_ISAR6_EL1_IDX] = SYS_ID_ISAR6_EL1,
-+    [ID_MMFR4_EL1_IDX] = SYS_ID_MMFR4_EL1,
-+    [MVFR0_EL1_IDX] = SYS_MVFR0_EL1,
-+    [MVFR1_EL1_IDX] = SYS_MVFR1_EL1,
-+    [MVFR2_EL1_IDX] = SYS_MVFR2_EL1,
-+    [ID_PFR2_EL1_IDX] = SYS_ID_PFR2_EL1,
-+    [ID_DFR1_EL1_IDX] = SYS_ID_DFR1_EL1,
-+    [ID_MMFR5_EL1_IDX] = SYS_ID_MMFR5_EL1,
-+    [ID_AA64PFR0_EL1_IDX] = SYS_ID_AA64PFR0_EL1,
-+    [ID_AA64PFR1_EL1_IDX] = SYS_ID_AA64PFR1_EL1,
-+    [ID_AA64PFR2_EL1_IDX] = SYS_ID_AA64PFR2_EL1,
-+    [ID_AA64ZFR0_EL1_IDX] = SYS_ID_AA64ZFR0_EL1,
-+    [ID_AA64SMFR0_EL1_IDX] = SYS_ID_AA64SMFR0_EL1,
-+    [ID_AA64FPFR0_EL1_IDX] = SYS_ID_AA64FPFR0_EL1,
-+    [ID_AA64DFR0_EL1_IDX] = SYS_ID_AA64DFR0_EL1,
-+    [ID_AA64DFR1_EL1_IDX] = SYS_ID_AA64DFR1_EL1,
-+    [ID_AA64DFR2_EL1_IDX] = SYS_ID_AA64DFR2_EL1,
-+    [ID_AA64AFR0_EL1_IDX] = SYS_ID_AA64AFR0_EL1,
-+    [ID_AA64AFR1_EL1_IDX] = SYS_ID_AA64AFR1_EL1,
-+    [ID_AA64ISAR0_EL1_IDX] = SYS_ID_AA64ISAR0_EL1,
-+    [ID_AA64ISAR1_EL1_IDX] = SYS_ID_AA64ISAR1_EL1,
-+    [ID_AA64ISAR2_EL1_IDX] = SYS_ID_AA64ISAR2_EL1,
-+    [ID_AA64ISAR3_EL1_IDX] = SYS_ID_AA64ISAR3_EL1,
-+    [ID_AA64MMFR0_EL1_IDX] = SYS_ID_AA64MMFR0_EL1,
-+    [ID_AA64MMFR1_EL1_IDX] = SYS_ID_AA64MMFR1_EL1,
-+    [ID_AA64MMFR2_EL1_IDX] = SYS_ID_AA64MMFR2_EL1,
-+    [ID_AA64MMFR3_EL1_IDX] = SYS_ID_AA64MMFR3_EL1,
-+    [ID_AA64MMFR4_EL1_IDX] = SYS_ID_AA64MMFR4_EL1,
-+    [CCSIDR_EL1_IDX] = SYS_CCSIDR_EL1,
-+    [CLIDR_EL1_IDX] = SYS_CLIDR_EL1,
-+    [CCSIDR2_EL1_IDX] = SYS_CCSIDR2_EL1,
-+    [GMID_EL1_IDX] = SYS_GMID_EL1,
-+    [SMIDR_EL1_IDX] = SYS_SMIDR_EL1,
-+    [CSSELR_EL1_IDX] = SYS_CSSELR_EL1,
-+    [CTR_EL0_IDX] = SYS_CTR_EL0,
-+    [DCZID_EL0_IDX] = SYS_DCZID_EL0,
-+};
-+
-+#endif /* ARCH_ARM_CPU_SYSREGS_H_INC */
--- 
-2.48.1
+I think we need to make a distinction between the host and the
+hypervisor when we are adding support for guest-ffa. We currently have
+the same id (== 0) for both of them.
 
+> 
+> > - keep a separate version negotiated for the host
+> > - trap FFA_ID_GET from the host and return ID=1 because
+> >   currently we forward the call to the TZ and it returns the same ID
+> >   as the (hypervisor == 0).
+> 
+> Why is this beneficial? It just looks like complexity at EL2 for no gain
+> to me, but maybe I'm missing something.
+>
+
+Because the host can impersonate the hypervisor using ff-a direct calls atm.
+and we are in a position to restrict the host from playing nasty games
+with TZ.
+
+> Will
+
+Thanks,
+Sebastian
