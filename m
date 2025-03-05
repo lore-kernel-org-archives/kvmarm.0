@@ -1,32 +1,32 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C1825B688
-	for <kvmarm@lists.linux.dev>; Wed,  5 Mar 2025 20:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F7925B69E
+	for <kvmarm@lists.linux.dev>; Wed,  5 Mar 2025 20:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741206442; cv=none; b=Dz8dnC4KAEm9Pcx1TkIYKInarbbzndxW26dGARKR4eXpkcH4qrjJfjdHoxfTpo7nTHOZc8cIiT4kv0qhHh1aCDKBv9pWWn58IkpNAaj7SYC09+vrSX96MbrembkEQc8x0VOALbeHTorL+VNHQ4+TssA6mAz5cTUoHJ8RwHeqg6Q=
+	t=1741206445; cv=none; b=LrIYV657aj9G+BDxF/bmFqnCxoldfxJWVSlFobA/njs85V5/E7tCIy/Y2+x8wMu+T+6JRZvH/SgIkW2F8vGnmiMSe3xiTpMvlPoyQ1ueIX7yCG/ozVGIa/lZuvfli7SbmXf4CLDKinuZOZDf4Dr7nii9GLjMUSg8FiNHubZ0Ko8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741206442; c=relaxed/simple;
-	bh=rBIoMuBetC+kOmxpkc17nhmNZBGock7zouwraEBxcws=;
+	s=arc-20240116; t=1741206445; c=relaxed/simple;
+	bh=GC/kPK2o5Iy4ZMHRJiFDZYeASry/Ev0ZVY2Ee5fyVbQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WI/mizNkpDm59fiDSgt8yfW3kxwt9PuwiKudkSAn50zO3OnO6SqAKpeSD79dQ38ArotGy1jRBmbfUSi0CoZUSkOHBnrQucGqdIjdNCo7yT91ov75HPk8w8n3yIn75Qhtk+Y3NqHbsj9EJ3dvIFC5buVRpLkUttR9/NywIQCIsnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AJ2201s8; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=UPUEpvufKVtptRcOJcNX7Spqccdf3xC1R7kxSamnNhjI8CloZXIhooJWcTLD7Yvs+eeiromxCHAOFSFgG/F21gyu6gsWwOcDeJ64iZvHNDUAFF9Fj1PyBzaIDwe60g11yb6tg7A/nuQ4Rg6pn/JIuA3iyHjaMNfzrQMShO2neas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XwifhcXh; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AJ2201s8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XwifhcXh"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741206439;
+	t=1741206442;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=C7mXQcLDFG9vHyngvUWroV3baipxBj22XKUDjf7cxlY=;
-	b=AJ2201s8OwXe9Gjt+6JP1qVqCwmY1b18pQx6CafRuCltGonKRzPTP8FA/rek6WxuiCI2Df
-	4JWLJjg5GdSgvPDOieomvgtgnNQGYriJQtCY9Ej0T3hyrCpZZGcMAs+WgUX+xmK5peVbPM
-	1+pfGEHTfmBkawBbz8iYtYDjQuEd+fs=
+	bh=BbQEaC+v/OfD76ZIrdkqZKUQeWDyxNh6/G9RBIyydaQ=;
+	b=XwifhcXhLMkukfucgBCxxonsngMxyv540XGuYHeAyygl3BZUBAIsx/LpE/7Eo/ztYwF6XY
+	l9s+ksdcl37bgs1WorwD2MyjvgcYtymIqTIVlmpuVui6UjjR+YYSu7vBKK2vbe1z+7xo9S
+	OE9RTYwi8r+Gj7xxV+z1EE20+60f4VQ=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -43,9 +43,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Janne Grunau <j@jannau.net>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 08/14] KVM: arm64: Move PMUVer filtering into KVM code
-Date: Wed,  5 Mar 2025 12:26:35 -0800
-Message-Id: <20250305202641.428114-9-oliver.upton@linux.dev>
+Subject: [PATCH v3 09/14] KVM: arm64: Compute synthetic sysreg ESR for Apple PMUv3 traps
+Date: Wed,  5 Mar 2025 12:26:36 -0800
+Message-Id: <20250305202641.428114-10-oliver.upton@linux.dev>
 In-Reply-To: <20250305202641.428114-1-oliver.upton@linux.dev>
 References: <20250305202641.428114-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -57,77 +57,72 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The supported guest PMU version on a particular platform is ultimately a
-KVM decision. Move PMUVer filtering into KVM code.
+Apple M* CPUs provide an IMPDEF trap for PMUv3 sysregs, where ESR_EL2.EC
+is a reserved value (0x3F) and a sysreg-like ISS is reported in
+AFSR1_EL2.
+
+Compute a synthetic ESR for these PMUv3 traps, giving the illusion of
+something architectural to the rest of KVM.
 
 Tested-by: Janne Grunau <j@jannau.net>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/cpufeature.h | 23 -----------------------
- arch/arm64/kvm/pmu-emul.c           | 15 +++++++++------
- 2 files changed, 9 insertions(+), 29 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 22 ++++++++++++++++++++++
+ arch/arm64/tools/cpucaps        |  1 +
+ 2 files changed, 23 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 0eff048848b8..c4326f1cb917 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -525,29 +525,6 @@ cpuid_feature_extract_unsigned_field(u64 features, int field)
- 	return cpuid_feature_extract_unsigned_field_width(features, field, 4);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 647737d6e8d0..731a0378ed13 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -527,6 +527,25 @@ static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return kvm_hyp_handle_sysreg(vcpu, exit_code);
  }
  
--/*
-- * Fields that identify the version of the Performance Monitors Extension do
-- * not follow the standard ID scheme. See ARM DDI 0487E.a page D13-2825,
-- * "Alternative ID scheme used for the Performance Monitors Extension version".
-- */
--static inline u64 __attribute_const__
--cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
--{
--	u64 val = cpuid_feature_extract_unsigned_field(features, field);
--	u64 mask = GENMASK_ULL(field + 3, field);
--
--	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
--	if (val == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
--		val = 0;
--
--	if (val > cap) {
--		features &= ~mask;
--		features |= (cap << field) & mask;
--	}
--
--	return features;
--}
--
- static inline u64 arm64_ftr_mask(const struct arm64_ftr_bits *ftrp)
- {
- 	return (u64)GENMASK(ftrp->shift + ftrp->width - 1, ftrp->shift);
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index fee3d0003d54..0a2023aabe18 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -1226,13 +1226,16 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 
- u8 kvm_arm_pmu_get_pmuver_limit(void)
- {
--	u64 tmp;
-+	unsigned int pmuver;
- 
--	tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--	tmp = cpuid_feature_cap_perfmon_field(tmp,
--					      ID_AA64DFR0_EL1_PMUVer_SHIFT,
--					      ID_AA64DFR0_EL1_PMUVer_V3P5);
--	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
-+	pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer,
-+			       read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1));
++static bool kvm_hyp_handle_impdef(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	u64 iss;
 +
-+	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
-+	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-+		return 0;
++	if (!cpus_have_final_cap(ARM64_WORKAROUND_PMUV3_IMPDEF_TRAPS))
++		return false;
 +
-+	return min(pmuver, ID_AA64DFR0_EL1_PMUVer_V3P5);
- }
++	/*
++	 * Compute a synthetic ESR for a sysreg trap. Conveniently, AFSR1_EL2
++	 * is populated with a correct ISS for a sysreg trap. These fruity
++	 * parts are 64bit only, so unconditionally set IL.
++	 */
++	iss = ESR_ELx_ISS(read_sysreg_s(SYS_AFSR1_EL2));
++	vcpu->arch.fault.esr_el2 = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SYS64) |
++				   FIELD_PREP(ESR_ELx_ISS_MASK, iss) |
++				   ESR_ELx_IL;
++	return false;
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+@@ -538,6 +557,9 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_watchpt_low,
+ 	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
+ 	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
++
++	/* Apple shenanigans */
++	[0x3F]				= kvm_hyp_handle_impdef,
+ };
  
- /**
+ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index ee4316cb3690..772c1b008e43 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -105,6 +105,7 @@ WORKAROUND_CAVIUM_TX2_219_TVM
+ WORKAROUND_CLEAN_CACHE
+ WORKAROUND_DEVICE_LOAD_ACQUIRE
+ WORKAROUND_NVIDIA_CARMEL_CNP
++WORKAROUND_PMUV3_IMPDEF_TRAPS
+ WORKAROUND_QCOM_FALKOR_E1003
+ WORKAROUND_QCOM_ORYON_CNTVOFF
+ WORKAROUND_REPEAT_TLBI
 -- 
 2.39.5
 
