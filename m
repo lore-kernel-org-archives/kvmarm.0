@@ -1,49 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DF711712
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 00:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6C753A7
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 00:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741220733; cv=none; b=OdnJEJN+lvIjcbYbY8xIobelkspFX27WaDHlZ7GmJQgYkLzIZI7drq38fL8LC8SDbkQqhIigpvn0VbwuYsjCUbY2zD/3quOK/Z7+qtjIS5Wkaf4aV7lkpHNxtUSWlbqh+T/oRH+JhTZMgqUtOR04jFaAhA1L6BbyidbWjbHzOLg=
+	t=1741220796; cv=none; b=anqxMa9fDQs1Cfy+6CtT733FGflpq+TTp13lqySwcrbuddEEEGQAK3tszc6BX8nMm0FsvDOQAEWlP9k2qehjPRaurqyKPuuc6gnnaZVRD/MLc1gMc9wE3CaJFyvlIyl6w2qRjVIRyPYkng+xyJOkJXCnI+5GuSM6HnTV+BqH62s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741220733; c=relaxed/simple;
-	bh=D/fiXgEjdmCC9Y7tYTOJ1uMBCTo6+YPKrNGDQwrWvOo=;
+	s=arc-20240116; t=1741220796; c=relaxed/simple;
+	bh=qUQ8Z5zspdkcANQize0hQv++Pfmq9uXbjBmYzq4i1Oo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g8TRWaFEiqSumsqIk9LqGe6z1LHoiLmKVIGHfpoO4hJYD7L/m7P5G0qkryr7S7RG1mVWo6ffaEojZsqKIo0hQdhD/tR6NXhaAXY1/kWA5MhDVKJNoXnUxsd5gXqSAbdvDCapthZviMO+G3AFgAh3rJ/S0oGQ7ryzs6PWuaCdnO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbQH5Mjx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=drPaE/ybxWm5SJXhgtIK0twZaeawPAk59gWjMlePhrTZ4tUPu7nZcq8xDxlqbJDLfSCgpAaY5tvp1SmIT9dkR99ztjj2ffTVjm701auqsaSK09dYErTTfqB/G4qPnCee84V5oRc9TbeQXT2F7tDlf+JPX6wUnUiudvIWNbGCbDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ndYw2dpN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbQH5Mjx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6CBC4CED1;
-	Thu,  6 Mar 2025 00:25:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ndYw2dpN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55165C4CED1;
+	Thu,  6 Mar 2025 00:26:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741220732;
-	bh=D/fiXgEjdmCC9Y7tYTOJ1uMBCTo6+YPKrNGDQwrWvOo=;
+	s=k20201202; t=1741220796;
+	bh=qUQ8Z5zspdkcANQize0hQv++Pfmq9uXbjBmYzq4i1Oo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hbQH5MjxDr0ojvgmQcef21FP+i4fjWiqmFBl9WbD8AqY+0IHhzgTYoP0FW9nN7OPw
-	 z+v4TTFh+1MLfTijlPbN59DspE57cD3hvPeRykGqiaYCUt6B3/Yhlepf1VFbnVgeVI
-	 qT4FyL9Qti8KJpHpP/4QmKJsWTkL8xP6Cd0czK2u9aojV2C6NNkZTNk0u3Hp1hF0/k
-	 rEs803OGXhFrreTnrFEf/bXjfW8fL45cOUrYthcAg2VZaKyQNKAnsElgAAU8feq8fS
-	 jE3ZKPSgoFgDHP/CxM1XdoCsWPM3uyxxJ8wCxNYkUhFLItvWX9651UDqoScOxUtQHE
-	 USLPLYdeo7uRg==
+	b=ndYw2dpNBROjqXQJsJ9dPrsoPaBpQD0aaTBl5jZq9AOSGL/QD1h4rU0J6w5OCed8g
+	 sRv6d8s3gfKMLyxS69CP4TuHkJxLicUDkckwJV8FXAbwRJwnR4CdyUwvU7bq/u2Niu
+	 TDabXYYS+glOX46bOin3yb7bM+uTJaz/t4WnjKMBnX8Hibg1ys4e0u/IdZ40k8FhR4
+	 FOrmqC+c2L+2NZaBWW4u7Zlt8APiWDFVOd9YN4Mclwq3RyPp5Wc8X52mNU72tGTTCo
+	 dwVU9JivaOnSBh7Ovy/RjGs8l9UiONtGZxUgwpgLw87Er1sADI8KnM/S7RrPyaISsd
+	 thdFRzRB6qR/A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tpz3K-00ArOB-IS;
-	Thu, 06 Mar 2025 00:25:30 +0000
-Date: Thu, 06 Mar 2025 00:25:30 +0000
-Message-ID: <86cyevovid.wl-maz@kernel.org>
+	id 1tpz4M-00ArOr-5v;
+	Thu, 06 Mar 2025 00:26:34 +0000
+Date: Thu, 06 Mar 2025 00:26:33 +0000
+Message-ID: <86bjufovgm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Sebastian Ott <sebott@redhat.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Copy guest CTR_EL0 into hyp VM
-In-Reply-To: <20250305230825.484091-2-oliver.upton@linux.dev>
+Subject: Re: [PATCH 0/3] KVM: arm64: Fixes for 'writable' ID registers in protected mode
+In-Reply-To: <20250305230825.484091-1-oliver.upton@linux.dev>
 References: <20250305230825.484091-1-oliver.upton@linux.dev>
-	<20250305230825.484091-2-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,51 +58,31 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 05 Mar 2025 23:08:23 +0000,
+On Wed, 05 Mar 2025 23:08:22 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Since commit 2843cae26644 ("KVM: arm64: Treat CTR_EL0 as a VM feature
-> ID register") KVM has allowed userspace to configure the VM-wide view of
-> CTR_EL0, falling back to trap-n-emulate if the value doesn't match
-> hardware. It appears that this has worked by chance in protected-mode
-> for some time, and on systems with FEAT_EVT protected-mode
-> unconditionally sets TID4 (i.e. TID2 traps sans CTR_EL0).
+> Address a few issues with ID register handling in protected mode:
 > 
-> Forward the guest CTR_EL0 value through to the hyp VM and align the
-> TID2/TID4 configuration with the non-protected setup.
+>  - CTR_EL0 isn't trapped on FEAT_EVT systems if userspace changed the
+>    guest value
 > 
-> Fixes: 2843cae26644 ("KVM: arm64: Treat CTR_EL0 as a VM feature ID register")
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  - VPIDR_EL2 is set to 0 if userspace enabled writable 'implementation
+>    ID' registers
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 3927fe52a3dd..2e2975248cd3 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -46,7 +46,8 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_FWB;
->  
->  	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
-> -	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
-> +	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE) &&
-> +	    kvm_read_vm_id_reg(vcpu->kvm, SYS_CTR_EL0) == read_cpuid(CTR_EL0))
->  		vcpu->arch.hcr_el2 |= HCR_TID4;
->  	else
->  		vcpu->arch.hcr_el2 |= HCR_TID2;
-> @@ -374,6 +375,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
->  	hyp_vm->kvm.arch.pkvm.enabled = READ_ONCE(host_kvm->arch.pkvm.enabled);
->  	hyp_vm->kvm.arch.flags = 0;
->  	pkvm_init_features_from_host(hyp_vm, host_kvm);
-> +	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
+>  - Fix in capability documentation
+> 
+> Oliver Upton (3):
+>   KVM: arm64: Copy guest CTR_EL0 into hyp VM
+>   KVM: arm64: Copy MIDR_EL1 into hyp VM when it is writable
+>   KVM: arm64: Fix documentation for KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
+> 
+>  Documentation/virt/kvm/api.rst | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c | 7 ++++++-
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 
-Maybe it'd be better to stick this into pkvm_init_features_from_host()
-in order to keep all the "inherit stuff from host" together?
+Irrespective of the comments for the first two patches:
 
-Same thing for the following patch.
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
