@@ -1,36 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D89D38DE0
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 15:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACE720B1E4
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 15:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741276384; cv=none; b=TBjOAVvJijCAaY2KIf28JLtcjdNQHTkN7acZwjZ37lCfMn+XhgcvEFnECO0hWDC8Hb9Ygh+hIRTn2Z7g+bGe2f+d9nDfKy+UNY9Efat7BG0PCYkVjAn1U/B5GtQBOL+J4YB+rTPDhMyRVQWFZLRtRdRhPVF8U3W7WjoOOkwpb+I=
+	t=1741276721; cv=none; b=ilIjEfBTy2FZ0grBpiwox8md6cBjaQ6sJNpf1LVmeL3/wV5K0jOrkzmIuFgzLtONGhDxcV1D9SF6Kg8bfwfHlayEwUOI0tmkqhVUmQyR+fHq4xSY+rE6PUAnmyEL6IfnQdBEsETp7DHNJLWx1zBIsOrO6Pgy1B+vkIiW/an7t+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741276384; c=relaxed/simple;
-	bh=Sm+9+2YIU2uoB3CewLYcbRHvxwNjlIaG7ZSfmA4hoGY=;
+	s=arc-20240116; t=1741276721; c=relaxed/simple;
+	bh=ecU63b4V1UD6DKMPqTQBfWsQFmloCZdxkNGiIuQ1hs8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m4l9/9dPyB5mxEMi9vMrzfb4TU8JrADeJEBT2JAklMu4v5IKvuXKItXlH4FnkBqKD51xthVcFneomwiLd7XH26Dvwkv0UjmVstqbvn1xXksdF1YiKnlO5XKRAM8ZdRSMRlw4di/cb/cW+kWThBdw6rXFeJ0XixnGgxNGOVeQVW8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=DsRrB27Lx0qeN5YBUXJKruvXPSpl8ll1HPLFp4Y3pXIJeoaOvJNB7rbV07BtCCmoIIDrxQHO7V4VBNfSEWlBfTOngKQf3sLZMVoNbGp3XRuC1cYS4MTF9k/4omEosizdYsqv1o4k/xgHVcl8Owj36y7d9Usyiq7YnSmDaYe0k/Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 906121007;
-	Thu,  6 Mar 2025 07:53:13 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AAAA81007;
+	Thu,  6 Mar 2025 07:58:51 -0800 (PST)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 87D703F673;
-	Thu,  6 Mar 2025 07:52:59 -0800 (PST)
-Date: Thu, 6 Mar 2025 15:52:56 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 417DA3F673;
+	Thu,  6 Mar 2025 07:58:35 -0800 (PST)
+Date: Thu, 6 Mar 2025 15:58:31 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
 	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 2/7] arm64: timer: use hypervisor
- timers when at EL2
-Message-ID: <Z8nE2P1JvOhB0WGv@raptor>
+Subject: Re: [kvm-unit-tests PATCH v1 6/7] arm64: pmu: count EL2 cycles
+Message-ID: <Z8nGJ07Dlg-0Z6mg@raptor>
 References: <20250220141354.2565567-1-joey.gouly@arm.com>
- <20250220141354.2565567-3-joey.gouly@arm.com>
- <Z8CYwU7cfxEMnEUL@raptor>
- <20250304170503.GC1553498@e124191.cambridge.arm.com>
+ <20250220141354.2565567-7-joey.gouly@arm.com>
+ <Z8CaT5Qe5X4t4Kzg@raptor>
+ <20250304165604.GA1553498@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,171 +38,126 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250304170503.GC1553498@e124191.cambridge.arm.com>
+In-Reply-To: <20250304165604.GA1553498@e124191.cambridge.arm.com>
 
 Hi Joey,
 
-On Tue, Mar 04, 2025 at 05:05:03PM +0000, Joey Gouly wrote:
-> On Thu, Feb 27, 2025 at 04:55:26PM +0000, Alexandru Elisei wrote:
+On Tue, Mar 04, 2025 at 04:56:04PM +0000, Joey Gouly wrote:
+> Hi Alexandru,
+> 
+> On Thu, Feb 27, 2025 at 05:01:03PM +0000, Alexandru Elisei wrote:
 > > Hi Joey,
 > > 
-> > On Thu, Feb 20, 2025 at 02:13:49PM +0000, Joey Gouly wrote:
-> > > At EL2, with VHE:
-> > >   - CNTP_CVAL_EL0 is forwarded to CNTHP_CVAL_EL0
-> > >   - CNTV_CVAL_EL0 is forwarded to CNTHP_CVAL_EL0
-> > 
-> > CNTH*V*_CVAL_EL0, right?
-> 
-> Fixed.
-> 
-> > 
-> > It also happens for the other two registers for the physical and virtual
-> > timers (CNT{P,V}_{TVAL,CTL}_EL0). Just nitpicking here.
-> 
-> I'll write it like that, thanks!
-> 
-> > 
-> > > 
-> > > Save the hypervisor physical and virtual timer IRQ numbers from the DT/ACPI.
+> > On Thu, Feb 20, 2025 at 02:13:53PM +0000, Joey Gouly wrote:
+> > > Count EL2 cycles if that's the EL kvm-unit-tests is running at!
 > > > 
 > > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > > > ---
-> > >  arm/timer.c         | 10 ++++++++--
-> > >  lib/acpi.h          |  2 ++
-> > >  lib/arm/asm/timer.h | 11 +++++++++++
-> > >  lib/arm/timer.c     | 19 +++++++++++++++++--
-> > >  4 files changed, 38 insertions(+), 4 deletions(-)
+> > >  arm/pmu.c | 21 ++++++++++++++++++---
+> > >  1 file changed, 18 insertions(+), 3 deletions(-)
 > > > 
-> > > diff --git a/arm/timer.c b/arm/timer.c
-> > > index 2cb80518..c6287ca7 100644
-> > > --- a/arm/timer.c
-> > > +++ b/arm/timer.c
-> > > @@ -347,8 +347,14 @@ static void test_ptimer(void)
-> > >  static void test_init(void)
-> > >  {
-> > >  	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
-> It's still there ^^
-> > > -	ptimer_info.irq = TIMER_PTIMER_IRQ;
-> > > -	vtimer_info.irq = TIMER_VTIMER_IRQ;
-> > > +	if (current_level() == CurrentEL_EL1) {
-> > > +		ptimer_info.irq = TIMER_PTIMER_IRQ;
-> > > +		vtimer_info.irq = TIMER_VTIMER_IRQ;
+> > > diff --git a/arm/pmu.c b/arm/pmu.c
+> > > index 2dc0822b..238e4628 100644
+> > > --- a/arm/pmu.c
+> > > +++ b/arm/pmu.c
+> > > @@ -206,6 +206,8 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
+> > >  #define ID_DFR0_PMU_V3_8_5	0b0110
+> > >  #define ID_DFR0_PMU_IMPDEF	0b1111
+> > >  
+> > > +#define PMCCFILTR_EL0_NSH	BIT(27)
+> > > +
+> > >  static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
+> > >  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
+> > >  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
+> > > @@ -247,7 +249,7 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+> > >  #define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+> > >  
+> > >  #define PMEVTYPER_EXCLUDE_EL1 BIT(31)
 > > 
-> > You dropped the assert for TIMER_{P,V}TIMER_IRQ.
+> > I think you can drop the macro. I was expecting to see an exclude EL2 macro
+> > used in its place when the test is running at EL2, but it seems
+> > PMEVTYPER_EXCLUDE_EL1 is not used anywhere. Unless I'm missing something here.
 > 
-> The assertion is still there!
+> I will drop it.
+> 
+> > 
+> > > -#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
+> > > +#define PMEVTYPER_EXCLUDE_EL0 BIT(30) | BIT(27)
+> > 
+> > I'm not really sure what that's supposed to achieve - if the test is
+> > running at EL2, and events from both EL0 and EL2 are excluded, what's left
+> > to count?
+> 
+> bit 27 of PMEVTYPER is the NSH bit, when it is 1 the events are not filtered.
+> This is the opposite polarity to the U (bit 30) and P (bit 31) bits. When they
+> are 1, the events are filtered.
 
-Yeah, my bad, sorry for that.
+Aaah, I was reading the Arm ARM backwards. yeah, bit NSH needs to be set to
+allow counting of events at EL2, my bad.
+
+> 
+> > 
+> > I also don't understand what PMEVTYPER_EXCLUDE_EL0 does in the non-nested
+> > virt case (when kvm-unit-tests boots at El1). The tests run at EL1, so not
+> > counting events at EL0 shouldn't affect anything. Am I missing something
+> > obvious here?
+> 
+> I don't know why it's like that. AFAICT, it doesn't run anything at EL0.
+
+Ok, just wanted to make sure I'm not missing anything.
+
+> 
+> > 
+> > >  
+> > >  static bool is_event_supported(uint32_t n, bool warn)
+> > >  {
+> > > @@ -1059,11 +1061,18 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> > >  static bool check_cycles_increase(void)
+> > >  {
+> > >  	bool success = true;
+> > > +	u64 pmccfiltr = 0;
+> > >  
+> > >  	/* init before event access, this test only cares about cycle count */
+> > >  	pmu_reset();
+> > >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
+> > > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> > > +
+> > > +#if defined(__aarch64__)
+> > > +	if (current_level() == CurrentEL_EL2)
+> > > +		// include EL2 cycle counts
+> > > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
+> > > +#endif
+> > > +	set_pmccfiltr(pmccfiltr);
+> > >  
+> > >  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
+> > >  	isb();
+> > > @@ -1114,11 +1123,17 @@ static void measure_instrs(int num, uint32_t pmcr)
+> > >  static bool check_cpi(int cpi)
+> > >  {
+> > >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
+> > > +	u64 pmccfiltr = 0;
+> > >  
+> > >  	/* init before event access, this test only cares about cycle count */
+> > >  	pmu_reset();
+> > >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
+> > > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> > > +#if defined(__aarch64__)
+> > > +	if (current_level() == CurrentEL_EL2)
+> > > +		// include EL2 cycle counts
+> > > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
+> > > +#endif
+> > 
+> > It's called twice, so it could be abstracted in a function.
+> > 
+> > Also, I find it interesting that for PMCCFILTR_EL0 you set the NSH bit
+> > based on current exception level, but for PMEVTYPER you set it
+> > unconditionally. Why the different approaches? For convenience of is there
+> > something more?
+> 
+> No real reason. I don't really know about the PMU, just did some changes to get
+> this test working.  I'll look into if setting NSH always is fine too, then I'll
+> unconditionally do it.
+
+Cool, thanks.
 
 Alex
-
-> 
-> > 
-> > Otherwise, looks good to me:
-> > 
-> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> Thanks!
-> 
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > > +	} else {
-> > > +		assert(TIMER_HPTIMER_IRQ != -1 && TIMER_HVTIMER_IRQ != -1);
-> > > +		ptimer_info.irq = TIMER_HPTIMER_IRQ;
-> > > +		vtimer_info.irq = TIMER_HVTIMER_IRQ;
-> > > +	}
-> > >  
-> > >  	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
-> > >  	ptimer_info.read_ctl();
-> > > diff --git a/lib/acpi.h b/lib/acpi.h
-> > > index c330c877..66e3062d 100644
-> > > --- a/lib/acpi.h
-> > > +++ b/lib/acpi.h
-> > > @@ -290,6 +290,8 @@ struct acpi_table_gtdt {
-> > >  	u64 counter_read_block_address;
-> > >  	u32 platform_timer_count;
-> > >  	u32 platform_timer_offset;
-> > > +	u32 virtual_el2_timer_interrupt;
-> > > +	u32 virtual_el2_timer_flags;
-> > >  };
-> > >  
-> > >  /* Reset to default packing */
-> > > diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
-> > > index aaf839fc..7dda0f4f 100644
-> > > --- a/lib/arm/asm/timer.h
-> > > +++ b/lib/arm/asm/timer.h
-> > > @@ -21,12 +21,23 @@ struct timer_state {
-> > >  		u32 irq;
-> > >  		u32 irq_flags;
-> > >  	} vtimer;
-> > > +	struct {
-> > > +		u32 irq;
-> > > +		u32 irq_flags;
-> > > +	} hptimer;
-> > > +	struct {
-> > > +		u32 irq;
-> > > +		u32 irq_flags;
-> > > +	} hvtimer;
-> > >  };
-> > >  extern struct timer_state __timer_state;
-> > >  
-> > >  #define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
-> > >  #define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
-> > >  
-> > > +#define TIMER_HPTIMER_IRQ (__timer_state.hptimer.irq)
-> > > +#define TIMER_HVTIMER_IRQ (__timer_state.hvtimer.irq)
-> > > +
-> > >  void timer_save_state(void);
-> > >  
-> > >  #endif /* !__ASSEMBLY__ */
-> > > diff --git a/lib/arm/timer.c b/lib/arm/timer.c
-> > > index ae702e41..57f504e2 100644
-> > > --- a/lib/arm/timer.c
-> > > +++ b/lib/arm/timer.c
-> > > @@ -38,10 +38,11 @@ static void timer_save_state_fdt(void)
-> > >  	 *      secure timer irq
-> > >  	 *      non-secure timer irq            (ptimer)
-> > >  	 *      virtual timer irq               (vtimer)
-> > > -	 *      hypervisor timer irq
-> > > +	 *      hypervisor timer irq            (hptimer)
-> > > +	 *      hypervisor virtual timer irq    (hvtimer)
-> > >  	 */
-> > >  	prop = fdt_get_property(fdt, node, "interrupts", &len);
-> > > -	assert(prop && len == (4 * 3 * sizeof(u32)));
-> > > +	assert(prop && len >= (4 * 3 * sizeof(u32)));
-> > >  
-> > >  	data = (u32 *) prop->data;
-> > >  	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */ );
-> > > @@ -50,6 +51,14 @@ static void timer_save_state_fdt(void)
-> > >  	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */ );
-> > >  	__timer_state.vtimer.irq = PPI(fdt32_to_cpu(data[7]));
-> > >  	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
-> > > +	if (len == (5 * 3 * sizeof(u32))) {
-> > > +		assert(fdt32_to_cpu(data[9]) == 1 /* PPI */ );
-> > > +		__timer_state.hptimer.irq = PPI(fdt32_to_cpu(data[10]));
-> > > +		__timer_state.hptimer.irq_flags = fdt32_to_cpu(data[11]);
-> > > +		assert(fdt32_to_cpu(data[12]) == 1 /* PPI */ );
-> > > +		__timer_state.hvtimer.irq = PPI(fdt32_to_cpu(data[13]));
-> > > +		__timer_state.hvtimer.irq_flags = fdt32_to_cpu(data[14]);
-> > > +	}
-> > >  }
-> > >  
-> > >  #ifdef CONFIG_EFI
-> > > @@ -72,6 +81,12 @@ static void timer_save_state_acpi(void)
-> > >  
-> > >  	__timer_state.vtimer.irq = gtdt->virtual_timer_interrupt;
-> > >  	__timer_state.vtimer.irq_flags = gtdt->virtual_timer_flags;
-> > > +
-> > > +	__timer_state.hptimer.irq = gtdt->non_secure_el2_interrupt;
-> > > +	__timer_state.hptimer.irq_flags = gtdt->non_secure_el2_flags;
-> > > +
-> > > +	__timer_state.hvtimer.irq = gtdt->virtual_el2_timer_interrupt;
-> > > +	__timer_state.hvtimer.irq_flags = gtdt->virtual_el2_timer_flags;
-> > >  }
-> > >  
-> > >  #else
-> > > -- 
-> > > 2.25.1
-> > > 
