@@ -1,382 +1,542 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066D320C02D
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 11:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44EE18A6AF
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 14:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741258867; cv=none; b=QGM++ostvlEPjBVF6B7kAhCkg8FM2SlIrbA4iUv5CjrxSciYwS1mXqIrrAlgNumYpcKQdVTjdnR/j/eBamqVWigb6uikkotQk+vsNIwRpqpn6/+X7PvOhIlx+Sg+/4ykyE0dD6FVJjMUVvFKX83DKMGCF5Ownm6qJxYghNwvUrc=
+	t=1741270296; cv=none; b=gYpAu411MFjDCL2936INd0gtxQW1PhFXmAeI6dWn363w8NPBXrhyLK8Q6ux43j1c6Ht3a6xOHbtpNzzEwOglmEn0J9YUZSb6NJzy3NSji49Jcr81c3UUAaLQeU9ixoVODjiMzKUmmvmp2uzZJLnZGHjUBWWCx7jtJbx9cLu+QWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741258867; c=relaxed/simple;
-	bh=FfMTIa3423P7AwMqodFt9CUbjsjLi1UM0xifhA3SfW4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tMGljkylZbGsIHm4BT8upPq5nfCJAiRBIgA0G8qaIORWYVWsF6oxwbQZAcr1iIqlNuZP/lN0EjHw26mrNY61zlAv0Dk/7g9QRZZqiWWCs80uKKwSCcq5GJpwAPgPTHDtZXjjA9CQJx1xulsgEDlCp3+bGxnHmtTTt3/e1mnjWNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iTXc+8ky; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iTXc+8ky"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-438e180821aso2117795e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 06 Mar 2025 03:01:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741258864; x=1741863664; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cvc2qCSEoHcInumCsCUHzJOPxNrN7pZm1b9N0GuNels=;
-        b=iTXc+8kygQ/gvCCuK7eGgtcdq89LOt2uO5FLwh5g4e7lvkUUNTF1PKU3GNOBChmp4l
-         PlUvY+0hgp+RZmkaAuOtHd7bEWNCSv8O6adHH94uP489RIR5ybi5R3529fG9x0VLIOgk
-         0/57KKrMWkvn40Jx3HH1W5n0BtkE8BYshXbo1RAKelle0XepsKfzQdyaP3n7q1cr79cM
-         Ru4FGkP19PRH03EYDMoJ4gX818fHsNTx/adNfrTcc/zZlfk1ml8ZIUEm7I7zfqTT0K8c
-         OdvtQLFoIL6LY/Z2CEfNI/KMA7D+TKeE+ZOf0tfbpwgKy2041VGNzZu7W590x/cUI/yJ
-         iGQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741258864; x=1741863664;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cvc2qCSEoHcInumCsCUHzJOPxNrN7pZm1b9N0GuNels=;
-        b=KOlnEFSCEYnOm4fVvScOv4KH1JWhj5yxNKQhwFJCtfS7XFykkC1q6qmELdhR84Urao
-         VUj4yrptSL+YmIYLnBTtOWVzFoo3RJwzy/t5a0EFIT9L2WcfmrpPpIeHFsWP5woM5Zog
-         YOaQAva8a9fKaWhzJYpshVsBIMJWpQkhgUVzXJyO8mymoYmJ0jEXVaWpVDlSxVLbF6Y1
-         GiP7Qv4TnTcjy9NchLtjgw+yIU+qHVtph78whZ46dqbNOsBek2bem1BDH0w3ndiEefnC
-         iTX1UXtsBC1rVfPXnEWg3Q8wOuBDwK6LBmpCITaoqzczPxDosClmGX+cb2nCoc4JYULz
-         q7OA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIjdrd2FB9DxxJPC2ymSccn7c+oXe7Q62tpPk2KMtooqup6+/eQLSTAWNBTbpUSprmrgLgoQA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxo1EtuhD6iqDCmSimuSXkjI7Nl9vgR/8pG4Am7W7dziNw5/Ss5
-	py+1bh06IuV2ggZX4RBye14NZvbUDV1MRhGKt5IFjjRa6zjGrhXBuqBtacs+yVO4lfCPM49DdkF
-	NHuzELGRpm3ETcifF0g==
-X-Google-Smtp-Source: AGHT+IHEXjKh7uYAxIDUZT7+S3GCsAIurCSRFsj7/bmhTfFhgEBZjfPhhhAzv3sciVIkINBKdc3gwmpKNB2CG4iV
-X-Received: from wmbeu10.prod.google.com ([2002:a05:600c:81ca:b0:43b:bec3:e552])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1c95:b0:439:9b3f:2de1 with SMTP id 5b1f17b1804b1-43bd29ad100mr55221025e9.15.1741258864402;
- Thu, 06 Mar 2025 03:01:04 -0800 (PST)
-Date: Thu,  6 Mar 2025 11:00:38 +0000
-In-Reply-To: <20250306110038.3733649-1-vdonnefort@google.com>
+	s=arc-20240116; t=1741270296; c=relaxed/simple;
+	bh=Kkm16z7uR+GMNfrmQBYX9l0TFAQe5uCBIh6m4xea3WM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s0Kwh67RgcG5+alGI31YGK7KRMP6N82YUy2aR8VcYjJJixy+BTTCh5/3xp55NhfF+y2CcGSboUsFndjo/87LYdl9QyXnbH1Z59EXW5k2vFRasNrmZmAgoVVaHoHbKnsUF5RtwcLFJuRVG7yr5tcCsjd4IptazewZ0pDj1AgmSJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCA3D1007;
+	Thu,  6 Mar 2025 06:11:46 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA7943F66E;
+	Thu,  6 Mar 2025 06:11:32 -0800 (PST)
+Date: Thu, 6 Mar 2025 14:11:30 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: kvmarm@lists.linux.dev, nikos.nikoleris@arm.com, andrew.jones@linux.dev,
+	eric.auger@redhat.com
+Subject: Re: [PATCH v4] arm64: Add basic MTE test
+Message-ID: <Z8mtEoFuuAGJ_91v@raptor>
+References: <20250227152240.118721-1-vladimir.murzin@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250306110038.3733649-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250306110038.3733649-10-vdonnefort@google.com>
-Subject: [PATCH v2 9/9] KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org
-Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250227152240.118721-1-vladimir.murzin@arm.com>
 
-With the introduction of stage-2 huge mappings in the pKVM hypervisor,
-guest pages CMO is needed for PMD_SIZE size. Fixmap only supports
-PAGE_SIZE and iterating over the huge-page is time consuming (mostly due
-to TLBI on hyp_fixmap_unmap) which is a problem for EL2 latency.
+Hi Vladimir,
 
-Introduce a shared PMD_SIZE fixmap (hyp_fixblock_map/hyp_fixblock_unmap)
-to improve guest page CMOs when stage-2 huge mappings are installed.
+Thank you for writing the test, looks good to me:
 
-On a Pixel6, the iterative solution resulted in a latency of ~700us,
-while the PMD_SIZE fixmap reduces it to ~100us.
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Because of the horrendous private range allocation that would be
-necessary, this is disabled for 64KiB pages systems.
+@Drew: I'm trying to make time for the --qemu-cpu series. I have the first few
+patches, the ones that implement ./configure --processor for arm64, I can send
+those separately if you want.
 
-Suggested-by: Quentin Perret <qperret@google.com>
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-Signed-off-by: Quentin Perret <qperret@google.com>
+Thanks,
+Alex
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 1b43bcd2a679..2888b5d03757 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -59,6 +59,11 @@ typedef u64 kvm_pte_t;
- 
- #define KVM_PHYS_INVALID		(-1ULL)
- 
-+#define KVM_PTE_TYPE			BIT(1)
-+#define KVM_PTE_TYPE_BLOCK		0
-+#define KVM_PTE_TYPE_PAGE		1
-+#define KVM_PTE_TYPE_TABLE		1
-+
- #define KVM_PTE_LEAF_ATTR_LO		GENMASK(11, 2)
- 
- #define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX	GENMASK(4, 2)
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 230e4f2527de..b0c72bc2d5ba 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -13,9 +13,11 @@
- extern struct kvm_pgtable pkvm_pgtable;
- extern hyp_spinlock_t pkvm_pgd_lock;
- 
--int hyp_create_pcpu_fixmap(void);
-+int hyp_create_fixmap(void);
- void *hyp_fixmap_map(phys_addr_t phys);
- void hyp_fixmap_unmap(void);
-+void *hyp_fixblock_map(phys_addr_t phys);
-+void hyp_fixblock_unmap(void);
- 
- int hyp_create_idmap(u32 hyp_va_bits);
- int hyp_map_vectors(void);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index b7a995a1d70b..5710c97cafb0 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -220,17 +220,53 @@ static void guest_s2_put_page(void *addr)
- 	hyp_put_page(&current_vm->pool, addr);
- }
- 
-+static void *__fixmap_guest_page(void *va, size_t *size)
-+{
-+	if (IS_ALIGNED(*size, PMD_SIZE)) {
-+		void *addr = hyp_fixblock_map(__hyp_pa(va));
-+
-+		if (addr)
-+			return addr;
-+
-+		*size = PAGE_SIZE;
-+	}
-+
-+	if (IS_ALIGNED(*size, PAGE_SIZE))
-+		return hyp_fixmap_map(__hyp_pa(va));
-+
-+	WARN_ON(1);
-+
-+	return NULL;
-+}
-+
-+static void __fixunmap_guest_page(size_t size)
-+{
-+	switch (size) {
-+	case PAGE_SIZE:
-+		hyp_fixmap_unmap();
-+		break;
-+	case PMD_SIZE:
-+		hyp_fixblock_unmap();
-+		break;
-+	default:
-+		WARN_ON(1);
-+	}
-+}
-+
- static void clean_dcache_guest_page(void *va, size_t size)
- {
- 	if (WARN_ON(!PAGE_ALIGNED(size)))
- 		return;
- 
- 	while (size) {
--		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
--					  PAGE_SIZE);
--		hyp_fixmap_unmap();
--		va += PAGE_SIZE;
--		size -= PAGE_SIZE;
-+		size_t fixmap_size = size == PMD_SIZE ? size : PAGE_SIZE;
-+		void *addr = __fixmap_guest_page(va, &fixmap_size);
-+
-+		__clean_dcache_guest_page(addr, fixmap_size);
-+		__fixunmap_guest_page(fixmap_size);
-+
-+		size -= fixmap_size;
-+		va += fixmap_size;
- 	}
- }
- 
-@@ -240,11 +276,14 @@ static void invalidate_icache_guest_page(void *va, size_t size)
- 		return;
- 
- 	while (size) {
--		__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
--					       PAGE_SIZE);
--		hyp_fixmap_unmap();
--		va += PAGE_SIZE;
--		size -= PAGE_SIZE;
-+		size_t fixmap_size = size == PMD_SIZE ? size : PAGE_SIZE;
-+		void *addr = __fixmap_guest_page(va, &fixmap_size);
-+
-+		__invalidate_icache_guest_page(addr, fixmap_size);
-+		__fixunmap_guest_page(fixmap_size);
-+
-+		size -= fixmap_size;
-+		va += fixmap_size;
- 	}
- }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index f41c7440b34b..e3b1bece8504 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -229,9 +229,8 @@ int hyp_map_vectors(void)
- 	return 0;
- }
- 
--void *hyp_fixmap_map(phys_addr_t phys)
-+static void *fixmap_map_slot(struct hyp_fixmap_slot *slot, phys_addr_t phys)
- {
--	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
- 	kvm_pte_t pte, *ptep = slot->ptep;
- 
- 	pte = *ptep;
-@@ -243,10 +242,21 @@ void *hyp_fixmap_map(phys_addr_t phys)
- 	return (void *)slot->addr;
- }
- 
-+void *hyp_fixmap_map(phys_addr_t phys)
-+{
-+	return fixmap_map_slot(this_cpu_ptr(&fixmap_slots), phys);
-+}
-+
- static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
- {
- 	kvm_pte_t *ptep = slot->ptep;
- 	u64 addr = slot->addr;
-+	u32 level;
-+
-+	if (FIELD_GET(KVM_PTE_TYPE, *ptep) == KVM_PTE_TYPE_PAGE)
-+		level = KVM_PGTABLE_LAST_LEVEL;
-+	else
-+		level = KVM_PGTABLE_LAST_LEVEL - 1; /* create_fixblock() guarantees PMD level */
- 
- 	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
- 
-@@ -260,7 +270,7 @@ static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
- 	 * https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/T/#mf10dfbaf1eaef9274c581b81c53758918c1d0f03
- 	 */
- 	dsb(ishst);
--	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), KVM_PGTABLE_LAST_LEVEL);
-+	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), level);
- 	dsb(ish);
- 	isb();
- }
-@@ -273,9 +283,9 @@ void hyp_fixmap_unmap(void)
- static int __create_fixmap_slot_cb(const struct kvm_pgtable_visit_ctx *ctx,
- 				   enum kvm_pgtable_walk_flags visit)
- {
--	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)ctx->arg);
-+	struct hyp_fixmap_slot *slot = (struct hyp_fixmap_slot *)ctx->arg;
- 
--	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_LAST_LEVEL)
-+	if (!kvm_pte_valid(ctx->old) || (ctx->end - ctx->start) != kvm_granule_size(ctx->level))
- 		return -EINVAL;
- 
- 	slot->addr = ctx->addr;
-@@ -296,13 +306,73 @@ static int create_fixmap_slot(u64 addr, u64 cpu)
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= __create_fixmap_slot_cb,
- 		.flags	= KVM_PGTABLE_WALK_LEAF,
--		.arg = (void *)cpu,
-+		.arg = (void *)per_cpu_ptr(&fixmap_slots, cpu),
- 	};
- 
- 	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
- }
- 
--int hyp_create_pcpu_fixmap(void)
-+#ifndef CONFIG_ARM64_64K_PAGES
-+static struct hyp_fixmap_slot hyp_fixblock_slot;
-+static DEFINE_HYP_SPINLOCK(hyp_fixblock_lock);
-+
-+void *hyp_fixblock_map(phys_addr_t phys)
-+{
-+	hyp_spin_lock(&hyp_fixblock_lock);
-+	return fixmap_map_slot(&hyp_fixblock_slot, phys);
-+}
-+
-+void hyp_fixblock_unmap(void)
-+{
-+	fixmap_clear_slot(&hyp_fixblock_slot);
-+	hyp_spin_unlock(&hyp_fixblock_lock);
-+}
-+
-+static int create_fixblock(void)
-+{
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= __create_fixmap_slot_cb,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
-+		.arg = (void *)&hyp_fixblock_slot,
-+	};
-+	unsigned long addr;
-+	phys_addr_t phys;
-+	int ret, i;
-+
-+	/* Find a RAM phys address, PMD aligned */
-+	for (i = 0; i < hyp_memblock_nr; i++) {
-+		phys = ALIGN(hyp_memory[i].base, PMD_SIZE);
-+		if (phys + PMD_SIZE < (hyp_memory[i].base + hyp_memory[i].size))
-+			break;
-+	}
-+
-+	if (i >= hyp_memblock_nr)
-+		return -EINVAL;
-+
-+	hyp_spin_lock(&pkvm_pgd_lock);
-+	addr = ALIGN(__io_map_base, PMD_SIZE);
-+	ret = __pkvm_alloc_private_va_range(addr, PMD_SIZE);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PMD_SIZE, phys, PAGE_HYP);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = kvm_pgtable_walk(&pkvm_pgtable, addr, PMD_SIZE, &walker);
-+
-+unlock:
-+	hyp_spin_unlock(&pkvm_pgd_lock);
-+
-+	return ret;
-+}
-+#else
-+void hyp_fixblock_unmap(void) { WARN_ON(1); }
-+void *hyp_fixblock_map(phys_addr_t phys) { return NULL; }
-+static int create_fixblock(void) { return 0; }
-+#endif
-+
-+int hyp_create_fixmap(void)
- {
- 	unsigned long addr, i;
- 	int ret;
-@@ -322,7 +392,7 @@ int hyp_create_pcpu_fixmap(void)
- 			return ret;
- 	}
- 
--	return 0;
-+	return create_fixblock();
- }
- 
- int hyp_create_idmap(u32 hyp_va_bits)
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index d62bcb5634a2..fb69cf5e6ea8 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -295,7 +295,7 @@ void __noreturn __pkvm_init_finalise(void)
- 	if (ret)
- 		goto out;
- 
--	ret = hyp_create_pcpu_fixmap();
-+	ret = hyp_create_fixmap();
- 	if (ret)
- 		goto out;
- 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index df5cc74a7dd0..c351b4abd5db 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -11,12 +11,6 @@
- #include <asm/kvm_pgtable.h>
- #include <asm/stage2_pgtable.h>
- 
--
--#define KVM_PTE_TYPE			BIT(1)
--#define KVM_PTE_TYPE_BLOCK		0
--#define KVM_PTE_TYPE_PAGE		1
--#define KVM_PTE_TYPE_TABLE		1
--
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable_walker	*walker;
- 
--- 
-2.48.1.711.g2feabab25a-goog
-
+On Thu, Feb 27, 2025 at 03:22:40PM +0000, Vladimir Murzin wrote:
+> Test tag storage access and tag mismatch for different MTE modes.
+> 
+> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> ---
+>  arm/Makefile.arm64            |   8 +
+>  arm/cstart64.S                |   4 +-
+>  arm/mte.c                     | 313 ++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg             |  19 +++
+>  lib/arm64/asm/mmu.h           |   1 +
+>  lib/arm64/asm/pgtable-hwdef.h |   3 +
+>  lib/arm64/asm/sysreg.h        |  14 ++
+>  7 files changed, 361 insertions(+), 1 deletion(-)
+>  create mode 100644 arm/mte.c
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 3b9034e3..fbf11c98 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -17,6 +17,13 @@ ifneq ($(strip $(sve_flag)),)
+>  CFLAGS += -DCC_HAS_SVE
+>  endif
+>  
+> +mte_flag := $(call cc-option, -march=armv8.5-a+memtag, "")
+> +ifneq ($(strip $(mte_flag)),)
+> +# MTE is supported by the compiler, generate MTE instructions
+> +CFLAGS += -DCC_HAS_MTE
+> +endif
+> +
+> +
+>  mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+>  CFLAGS += $(mno_outline_atomics)
+>  CFLAGS += -DCONFIG_RELOC
+> @@ -57,6 +64,7 @@ tests += $(TEST_DIR)/micro-bench.$(exe)
+>  tests += $(TEST_DIR)/cache.$(exe)
+>  tests += $(TEST_DIR)/debug.$(exe)
+>  tests += $(TEST_DIR)/fpu.$(exe)
+> +tests += $(TEST_DIR)/mte.$(exe)
+>  
+>  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+>  
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index b480a552..b9d7a446 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -242,6 +242,7 @@ halt:
+>   *   NORMAL             100     11111111
+>   *   NORMAL_WT          101     10111011
+>   *   DEVICE_nGRE        110     00001000
+> + *   NORMAL_TAGGED      111     11110000
+>   */
+>  #define MAIR(attr, mt) ((attr) << ((mt) * 8))
+>  
+> @@ -275,7 +276,8 @@ asm_mmu_enable:
+>  		     MAIR(0x44, MT_NORMAL_NC) |		\
+>  		     MAIR(0xff, MT_NORMAL) |	        \
+>  		     MAIR(0xbb, MT_NORMAL_WT) |         \
+> -		     MAIR(0x08, MT_DEVICE_nGRE)
+> +		     MAIR(0x08, MT_DEVICE_nGRE) |       \
+> +		     MAIR(0xf0, MT_NORMAL_TAGGED)
+>  	msr	mair_el1, x1
+>  
+>  	/* TTBR0 */
+> diff --git a/arm/mte.c b/arm/mte.c
+> new file mode 100644
+> index 00000000..f32203ce
+> --- /dev/null
+> +++ b/arm/mte.c
+> @@ -0,0 +1,313 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2024 Arm Limited.
+> + * All rights reserved.
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <alloc_page.h>
+> +#include <stdlib.h>
+> +
+> +#include <asm/mmu.h>
+> +#include <asm/pgtable-hwdef.h>
+> +#include <asm/processor.h>
+> +#include <asm/sysreg.h>
+> +#include <asm/thread_info.h>
+> +
+> +
+> +/* Tag Check Faults cause a synchronous exception */
+> +#define MTE_TCF_SYNC	0b01
+> +/* Tag Check Faults are asynchronously accumulated */
+> +#define MTE_TCF_ASYNC	0b10
+> +/*
+> + * Tag Check Faults cause a synchronous exception on reads,
+> + * and are asynchronously accumulated on writes
+> + */
+> +#define MTE_TCF_ASYMM	0b11
+> +
+> +#define MTE_GRANULE_SIZE        UL(16)
+> +#define MTE_GRANULE_MASK        (~(MTE_GRANULE_SIZE - 1))
+> +#define MTE_TAG_SHIFT           56
+> +
+> +#define untagged(p)									\
+> +({											\
+> +	unsigned long __in = (unsigned long)(p);					\
+> +	typeof(p) __out = (typeof(p))(__in & ~(MTE_GRANULE_MASK << MTE_TAG_SHIFT));	\
+> +											\
+> +	__out;										\
+> +})
+> +
+> +#define tagged(p, t)							\
+> +({									\
+> +	unsigned long __in = (unsigned long)(untagged(p));		\
+> +	unsigned long __tag = (unsigned long)(t) << MTE_TAG_SHIFT;	\
+> +	typeof(p) __out = (typeof(p))(__in | __tag);			\
+> +									\
+> +	__out;								\
+> +})
+> +
+> +/*
+> + * If we use a normal (non hand coded inline assembly) load or store
+> + * to access a tagged address, the compiler will reasonably assume
+> + * that the access succeeded, and the next instruction may do
+> + * something based on that assumption.
+> + *
+> + * But a test might want the tagged access to fail on purpose, and if
+> + * we advance the PC to the next instruction, the one added by the
+> + * compiler, we might leave the program in an unexpected state.
+> + */
+> +static inline void mem_read(unsigned int *addr, unsigned int *res)
+> +{
+> +	unsigned int r;
+> +
+> +	asm volatile ("ldr %0,[%1]\n"
+> +		      "str %0,[%2]\n"
+> +		      : "=&r" (r)
+> +		      : "r" (addr), "r" (res) : "memory");
+> +}
+> +
+> +static inline void mem_write(unsigned int *addr, unsigned int val)
+> +{
+> +	/* The NOP allows the same exception handler as mem_read() to be used. */
+> +	asm volatile ("str %0,[%1]\n"
+> +		      "nop\n"
+> +		      :
+> +		      : "r" (val), "r" (addr)
+> +		      : "memory");
+> +}
+> +
+> +static volatile bool mte_exception;
+> +
+> +static void mte_fault_handler(struct pt_regs *regs, unsigned int esr)
+> +{
+> +	unsigned int dfsc = esr & GENMASK(5, 0);
+> +	unsigned int fnv = esr & BIT(10);
+> +
+> +	if (dfsc == 0b010001) {
+> +		if (fnv)
+> +			report_info("Unexpected non-zero FnV");
+> +		mte_exception = true;
+> +	}
+> +
+> +	/*
+> +	 * mem_read() reads the value from the tagged pointer, then
+> +	 * stores this value in the untagged 'res' pointer. The
+> +	 * function that called mem_read() will want to check that the
+> +	 * initial value of 'res' hasn't changed if a tag check fault
+> +	 * is reported. Skip over two instructions so 'res' isn't
+> +	 * overwritten.
+> +	 */
+> +	regs->pc += 8;
+> +}
+> +
+> +static inline void mmu_set_tagged(pgd_t *pgtable, unsigned long vaddr)
+> +{
+> +	pteval_t *p_pte = follow_pte(pgtable, untagged(vaddr));
+> +
+> +	if (p_pte) {
+> +		pteval_t entry = *p_pte;
+> +
+> +		entry &= ~PTE_ATTRINDX_MASK;
+> +		entry |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
+> +
+> +		WRITE_ONCE(*p_pte, entry);
+> +		flush_tlb_page(vaddr);
+> +	} else {
+> +		report_abort("Cannot find PTE");
+> +	}
+> +}
+> +
+> +static void mte_init(void)
+> +{
+> +	unsigned long sctlr = read_sysreg(sctlr_el1);
+> +	unsigned long tcr = read_sysreg(tcr_el1);
+> +
+> +	sctlr &= ~SCTLR_EL1_TCF_MASK;
+> +	sctlr |= SCTLR_EL1_ATA;
+> +
+> +	tcr &= ~TCR_TCMA0;
+> +	tcr |= TCR_TBI0;
+> +
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	write_sysreg(tcr, tcr_el1);
+> +
+> +	isb();
+> +	flush_tlb_all();
+> +}
+> +
+> +static inline unsigned long mte_set_tcf(unsigned long tcf)
+> +{
+> +	unsigned long sctlr = read_sysreg(sctlr_el1);
+> +	unsigned long old = (sctlr & SCTLR_EL1_TCF_MASK) >> SCTLR_EL1_TCF_SHIFT;
+> +
+> +	sctlr &= ~(SCTLR_EL1_TCF_MASK | SCTLR_EL1_TCF0_MASK);
+> +	sctlr |= (tcf << SCTLR_EL1_TCF_SHIFT) & SCTLR_EL1_TCF_MASK;
+> +
+> +	write_sysreg(sctlr, sctlr_el1);
+> +	write_sysreg_s(0, TFSR_EL1);
+> +	isb();
+> +
+> +	return old;
+> +}
+> +
+> +
+> +static inline void mte_set_tag(void *addr, size_t size, unsigned int tag)
+> +{
+> +#ifdef CC_HAS_MTE
+> +	unsigned long in = (unsigned long)untagged(addr);
+> +	unsigned long start = ALIGN_DOWN(in, 16);
+> +	unsigned long end = ALIGN(in + size, 16);
+> +
+> +	for (unsigned long ptr = start; ptr < end; ptr += 16) {
+> +		asm volatile(".arch   armv8.5-a+memtag\n"
+> +			     "stg %0, [%0]"
+> +			     :
+> +			     : "r"(tagged(ptr, tag))
+> +			     : "memory");
+> +	}
+> +#endif
+> +}
+> +
+> +static inline unsigned long get_clear_tfsr(void)
+> +{
+> +	unsigned long r;
+> +
+> +	dsb(nsh);
+> +	isb();
+> +
+> +	r = read_sysreg_s(TFSR_EL1);
+> +	write_sysreg_s(0, TFSR_EL1);
+> +
+> +	return r;
+> +}
+> +
+> +static void mte_sync_test(void)
+> +{
+> +	unsigned int *mem = tagged(alloc_page(), 1);
+> +	unsigned int val = 0;
+> +
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 1);
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_set_tcf(MTE_TCF_SYNC);
+> +
+> +	mte_exception = false;
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+> +
+> +	mem_read(tagged(mem, 2), &val);
+> +
+> +	report((val == 0) && mte_exception && (get_clear_tfsr() == 0), "read");
+> +
+> +	mte_exception = false;
+> +
+> +	mem_write(tagged(mem, 3), 0xbbbbbbbb);
+> +
+> +	report((*mem == 0xffffffff) && mte_exception && (get_clear_tfsr() == 0), "write");
+> +
+> +	free_page(untagged(mem));
+> +}
+> +
+> +static void mte_asymm_test(void)
+> +{
+> +	unsigned int *mem = tagged(alloc_page(), 2);
+> +	unsigned int val = 0;
+> +
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 2);
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_set_tcf(MTE_TCF_ASYMM);
+> +	mte_exception = false;
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, mte_fault_handler);
+> +
+> +	mem_read(tagged(mem, 3), &val);
+> +	report((val == 0) && mte_exception && (get_clear_tfsr() == 0), "read");
+> +
+> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
+> +
+> +	mem_write(tagged(mem, 4), 0xaaaaaaaa);
+> +	report((*mem == 0xaaaaaaaa) && (get_clear_tfsr() == TFSR_EL1_TF0), "write");
+> +
+> +	free_page(untagged(mem));
+> +}
+> +
+> +static void mte_async_test(void)
+> +{
+> +	unsigned int *mem = tagged(alloc_page(), 3);
+> +	unsigned int val = 0;
+> +
+> +	mmu_set_tagged(current_thread_info()->pgtable, (unsigned long)mem);
+> +	mte_set_tag(mem, PAGE_SIZE, 3);
+> +	memset(mem, 0xff, PAGE_SIZE);
+> +	mte_set_tcf(MTE_TCF_ASYNC);
+> +
+> +	mem_read(tagged(mem, 4), &val);
+> +	report((val == 0xffffffff) && (get_clear_tfsr() == TFSR_EL1_TF0), "read");
+> +
+> +	mem_write(tagged(mem, 5), 0xcccccccc);
+> +	report((*mem == 0xcccccccc) && (get_clear_tfsr() == TFSR_EL1_TF0), "write");
+> +
+> +	free_page(untagged(mem));
+> +}
+> +
+> +
+> +static unsigned int mte_version(void)
+> +{
+> +#ifdef CC_HAS_MTE
+> +	uint64_t r;
+> +
+> +	asm volatile("mrs %x0, id_aa64pfr1_el1" : "=r"(r));
+> +
+> +	return (r >> ID_AA64PFR1_EL1_MTE_SHIFT) & 0b1111;
+> +#else
+> +	report_info("Compiler lack MTE support");
+> +	return 0;
+> +#endif
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +
+> +	unsigned int version = mte_version();
+> +
+> +	if (version < 2) {
+> +		report_skip("No MTE support, skip...\n");
+> +		return report_summary();
+> +	}
+> +
+> +	if (argc < 2)
+> +		report_abort("no test specified");
+> +
+> +	report_prefix_push("mte");
+> +
+> +	mte_init();
+> +
+> +	if (strcmp(argv[1], "sync") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		mte_sync_test();
+> +		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "async") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		if (version < 3) {
+> +			report_skip("No MTE async, skip...\n");
+> +			return report_summary();
+> +		}
+> +		mte_async_test();
+> +		report_prefix_pop();
+> +
+> +	} else if (strcmp(argv[1], "asymm") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		if (version < 3) {
+> +			report_skip("No MTE asymm, skip...\n");
+> +			return report_summary();
+> +		}
+> +		mte_asymm_test();
+> +		report_prefix_pop();
+> +
+> +	} else {
+> +		report_abort("Unknown sub-test '%s'", argv[1]);
+> +	}
+> +
+> +	return report_summary();
+> +}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 2bdad67d..fe101145 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -271,3 +271,22 @@ smp = 2
+>  groups = nodefault
+>  accel = kvm
+>  arch = arm64
+> +
+> +# MTE tests
+> +[mte-sync]
+> +file = mte.flat
+> +groups = mte
+> +extra_params = -machine mte=on -append 'sync'
+> +arch = arm64
+> +
+> +[mte-async]
+> +file = mte.flat
+> +groups = mte
+> +extra_params = -machine mte=on -append 'async'
+> +arch = arm64
+> +
+> +[mte-asymm]
+> +file = mte.flat
+> +groups = mte
+> +extra_params = -machine mte=on -append 'asymm'
+> +arch = arm64
+> diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
+> index 5c27edb2..9aedd09a 100644
+> --- a/lib/arm64/asm/mmu.h
+> +++ b/lib/arm64/asm/mmu.h
+> @@ -10,6 +10,7 @@
+>  #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
+>  #define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
+>  #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
+> +#define PTE_TAGGED		PTE_ATTRINDX(MT_NORMAL_TAGGED)
+>  
+>  static inline void flush_tlb_all(void)
+>  {
+> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
+> index 8c41fe12..08a2e91c 100644
+> --- a/lib/arm64/asm/pgtable-hwdef.h
+> +++ b/lib/arm64/asm/pgtable-hwdef.h
+> @@ -145,6 +145,8 @@
+>  #define TCR_TG1_64K		(UL(3) << 30)
+>  #define TCR_ASID16		(UL(1) << 36)
+>  #define TCR_TBI0		(UL(1) << 37)
+> +#define TCR_TBI1		(UL(1) << 38)
+> +#define TCR_TCMA0		(UL(1) << 57)
+>  
+>  /*
+>   * Memory types available.
+> @@ -156,5 +158,6 @@
+>  #define MT_NORMAL		4
+>  #define MT_NORMAL_WT		5
+>  #define MT_DEVICE_nGRE		6
+> +#define MT_NORMAL_TAGGED	7
+>  
+>  #endif /* _ASMARM64_PGTABLE_HWDEF_H_ */
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index f214a4f0..b8d3d66e 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -28,6 +28,7 @@
+>  	.endm
+>  #else
+>  #include <libcflat.h>
+> +#include <bitops.h>
+>  
+>  #define read_sysreg(r) ({					\
+>  	u64 __val;						\
+> @@ -74,6 +75,7 @@ asm(
+>  #endif /* __ASSEMBLY__ */
+>  
+>  #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
+> +#define ID_AA64PFR1_EL1_MTE_SHIFT	8
+>  
+>  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+>  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+> @@ -81,7 +83,13 @@ asm(
+>  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+>  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+>  
+> +#define TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+> +#define TFSR_EL1_TF0                    _BITULL(0)
+> +#define TFSR_EL1_TF1                    _BITULL(1)
+> +
+>  /* System Control Register (SCTLR_EL1) bits */
+> +#define SCTLR_EL1_ATA		_BITULL(43)
+> +#define SCTLR_EL1_ATA0		_BITULL(42)
+>  #define SCTLR_EL1_LSMAOE	_BITULL(29)
+>  #define SCTLR_EL1_NTLSMD	_BITULL(28)
+>  #define SCTLR_EL1_EE		_BITULL(25)
+> @@ -99,6 +107,12 @@ asm(
+>  #define SCTLR_EL1_A		_BITULL(1)
+>  #define SCTLR_EL1_M		_BITULL(0)
+>  
+> +#define SCTLR_EL1_TCF_SHIFT	40
+> +#define SCTLR_EL1_TCF_MASK	GENMASK_ULL(41, 40)
+> +
+> +#define SCTLR_EL1_TCF0_SHIFT	38
+> +#define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+> +
+>  #define INIT_SCTLR_EL1_MMU_OFF	\
+>  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+>  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+> -- 
+> 2.25.1
+> 
