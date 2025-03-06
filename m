@@ -1,87 +1,123 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5799419F438
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 09:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7416753BE
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 10:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741254051; cv=none; b=tn7mLLZvVi3UOS68iM12prWiLuKaTEtNgfHhQn3YQnyByOuymOIow2AfN5QCS/P45esMFw5eHzBebUMQuCjIY5KP0B10Cu44u55DoGRWg/Gv5RkAge/EWsabJJbAICthr+CScFrUA6vxxxxmmQDYV3JBGwgzorGhcaDBiNC5MMI=
+	t=1741258350; cv=none; b=Hx0BSOnbKYDfew3CHejTbl2Gyc2YzxZyirg21UrbmkXjoqUI5IqmMeFQjLnwXJ2rgpnUn9gNMFgE/M/cf9UXpL8rKIelcpj99QPpiXp7w+T5QdeanQRJJ3t21utgbAo5UZYSVafGjj5jsHw6vemka804JbglD1mNx7hyFMTgpfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741254051; c=relaxed/simple;
-	bh=lHzQ/pK6Ei8uZQYcKUxRemCcZhkOdbNoDAUoz5W3/GI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VqHze4uso23HHcsjt2Hah81dHbIokWh6tNFBhwKjAFJL7xRn29vWEGmbFVbUXlVczRwpSTZO3pNryCI43dQJ3b01YpOOYHMm20Ys9n7El9w+ygQCy6uVrexNx+/NWqDIzSb6VOaXC8aWuHNuU+zg6B9NPiVERMMyiS1F9bUBZNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44C30FEC;
-	Thu,  6 Mar 2025 01:41:02 -0800 (PST)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CA433F673;
-	Thu,  6 Mar 2025 01:40:46 -0800 (PST)
-Date: Thu, 6 Mar 2025 09:40:43 +0000
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Sebastian Ene <sebastianene@google.com>, catalin.marinas@arm.com,
-	Sudeep Holla <sudeep.holla@arm.com>, joey.gouly@arm.com,
-	maz@kernel.org, oliver.upton@linux.dev, snehalreddy@google.com,
-	suzuki.poulose@arm.com, vdonnefort@google.com, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	Andrei Homescu <ahomescu@google.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: Release the ownership of the hyp rx
- buffer to Trustzone
-Message-ID: <Z8ltm55D1jrv8QtX@bogus>
-References: <20250227181750.3606372-1-sebastianene@google.com>
- <20250227181750.3606372-5-sebastianene@google.com>
- <20250305004522.GC31667@willie-the-truck>
- <20250305094104.vctshdtgdukno2aj@bogus>
- <20250305193425.GA32246@willie-the-truck>
+	s=arc-20240116; t=1741258350; c=relaxed/simple;
+	bh=xNN68TsoHbzLWy6HVfjss4orjPSDGafBkOo4Pbm5GHQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=C3Y5YQjz9dfVK5tT5CYdSr9nq6ojTYZeoCwaANE+LQ1pTlfUPrn9J3DiUFvFszpYvuMQRA1qepC3N41Do8+1E84oMDgSAKvj3m+XpiQHJ6408jTPxyCJp2I/nSvWbUIIGBkKc04NaBfOQoALytYjoEA/Ozi7VWQGRpY+uNe1fmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eS24Wq+G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eS24Wq+G"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741258347;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bzHbDsjqw0csLRfE011QXaM8Dt0kPd4HEXCq5kIGsvA=;
+	b=eS24Wq+GRUqNC/H163PFVa8KLsjvLKB8Q4BPkmVMVArNMSd9Pwcqyc6i3nP2J/aYPGCLpA
+	A4o0N7I2HMUGqX7uHSUliq5dS5bidP3bzWE8VxMtroiu7Zp4nV0IR00R5MMMc6iybfM3on
+	vWyfSdZPdsLo5AQEH3buw4ktrXrFgKw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-65-fGpxeoSSMnadqViD-b0__Q-1; Thu, 06 Mar 2025 05:52:24 -0500
+X-MC-Unique: fGpxeoSSMnadqViD-b0__Q-1
+X-Mimecast-MFC-AGG-ID: fGpxeoSSMnadqViD-b0__Q_1741258343
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-390f6aa50c5so322756f8f.2
+        for <kvmarm@lists.linux.dev>; Thu, 06 Mar 2025 02:52:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741258343; x=1741863143;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bzHbDsjqw0csLRfE011QXaM8Dt0kPd4HEXCq5kIGsvA=;
+        b=Z9v5/Ab9W9lAnXyJvBkznd8U5aMCZY7RGTo/pWTdP6kalgPpIG5waUK464rT6jmRVn
+         24y7qyJLcYlLUdQmYQuP9L/Av+MQzrkX5YH7ZwhLcjRA9r2jZqYAorNXYTPUyctpUct5
+         K8txk6h3WwFXWvwTQmmAIklcONKkGUwyfBAyaDUkOM7eMY5Lhih/lYisAfnY1HlMWvR2
+         IfJHlgcyrSvXtCNxrgDXGBSk9oRcg907/EIZnGAtbPBdK9Sa9OlZA6aQ5hQHaopmDiaq
+         pQG+6tF1D9OEUrQ9AP6zSTaPNFP/xj4gtyfXMOfMEt+Q5QOFVZPqXUsGMCGnzofJ+Aid
+         uekg==
+X-Gm-Message-State: AOJu0Yw9jTaO/rJa20iXc6O4iczPE6K+jkoNDC27w8I0CIB7D7xswmNV
+	lj1U8Pf/LxT2sHqM0DuARn+lBd1XGCACfkJKdb98e4uPakVrgBTfRTgIGuN7CbLsKcJY4Bce1bJ
+	7AH8gVKqXawJXKGIZx7jc8v1TfJLJN+qfBaH9rCkzF1+BZnHULudw/Q==
+X-Gm-Gg: ASbGncs9oxf8KD4SE+vPZrqS1izCLH+9/wbzS/GUjCSl88EiPiF5rurzqe+KNarHZdQ
+	kp7eQRiyaoPGTY3rGlnYdUexstVQNJLIpvVV9RLOqr3WBRSi1Pxlg9gPs3AdYnyt+Zfv3FC9NKK
+	Ul9yCsVVsY24XJEH4kDCo2Y+XN+Lk9VBiRzgnTE8423t+9FFmXfzsbeYn9WKsW4YtnBymE7tF/o
+	kgeraz87q+SOd+TO1AbUd9u7P6z+T3ig5nqETO9sdMtOD3cQBf4A/RRTL7JGVDSqcjFVbeMlKSd
+	WNR1djXK9dr1kpc+kJ6PabY3/uVZ3JR+paApKGVhw6fA8EzxSUB39uvO/tVrbQkS
+X-Received: by 2002:a5d:5889:0:b0:390:f745:bbfb with SMTP id ffacd0b85a97d-3911f74256dmr5721166f8f.26.1741258342830;
+        Thu, 06 Mar 2025 02:52:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXycTTQgETYnX1IKYBRw0+Ro2kebi3WrMMhzYsXSafw8QcrmEQAMKu5FphBCpZVnpsBBhkDg==
+X-Received: by 2002:a5d:5889:0:b0:390:f745:bbfb with SMTP id ffacd0b85a97d-3911f74256dmr5721146f8f.26.1741258342463;
+        Thu, 06 Mar 2025 02:52:22 -0800 (PST)
+Received: from rh (p200300f6af284000f9ca1328aeaacdd4.dip0.t-ipconnect.de. [2003:f6:af28:4000:f9ca:1328:aeaa:cdd4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd4292b06sm46218315e9.14.2025.03.06.02.52.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 02:52:22 -0800 (PST)
+Date: Thu, 6 Mar 2025 11:52:21 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+    Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 2/3] KVM: arm64: Copy MIDR_EL1 into hyp VM when it is
+ writable
+In-Reply-To: <20250305230825.484091-3-oliver.upton@linux.dev>
+Message-ID: <b63660c7-53e6-f2d3-bd4d-b9ef67987397@redhat.com>
+References: <20250305230825.484091-1-oliver.upton@linux.dev> <20250305230825.484091-3-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250305193425.GA32246@willie-the-truck>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: jZ4wVexMbKAl-o-__5Iv41QjWdzYYqOJgPDWnBZWkTk_1741258343
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Wed, Mar 05, 2025 at 07:34:26PM +0000, Will Deacon wrote:
-> On Wed, Mar 05, 2025 at 09:41:04AM +0000, Sudeep Holla wrote:
-> > On Wed, Mar 05, 2025 at 12:45:23AM +0000, Will Deacon wrote:
-> > > Hmm, the FFA spec is characteristically unclear as to whether or not we
-> > > need to release the rx buffer in the case that the flags indicate use of
-> > > the rx buffer but the returned partition count is 0.
-> > > 
-> > > Sudeep -- do you know what we should be doing in that case?
-> > > 
-> > 
-> > We need to call RX_RELEASE here. I went back to the spec to confirm the
-> > same again.
-> > 
-> > v1.2 EAC0 spec Section 7.2.2.4.2 Transfer of buffer ownership
-> > (Or just look for the section title in any version of the spec)
-> > "
-> > 2. Ownership transfer for the RX buffer takes place as follows.
-> >     2. For a framework message,
-> >        1. Completion of the FFA_PARTITION_INFO_GET ABI transfers the ownership
-> >        of the caller’s RX buffer from the Producer to the Consumer.
-> > 3. For both types of messages, an invocation of the following FF-A ABIs
-> >     transfers the ownership from the Consumer to the Producer.
-> >        1. FFA_MSG_WAIT ...
-> >        2. FFA_RX_RELEASE.
-> > "
-> > 
-> > Hope that helps, can dig deeper if there are any ambiguities around this.
-> 
-> Thanks Sudeep, but that also makes it sound like we need the RX_RELEASE
-> even if we're not using the RX buffer per the input flags. :/
-> 
+On Wed, 5 Mar 2025, Oliver Upton wrote:
+> KVM recently added a capability that allows userspace to override the
+> 'implementation ID' registers presented to the VM. MIDR_EL1 is a special
+> example, where the hypervisor can directly set the value when read from
+> EL1 using VPIDR_EL2.
+>
+> Copy the VM-wide value for MIDR_EL1 into the hyp VM for non-protected
+> guests when the capability is enabled so VPIDR_EL2 gets set up
+> correctly.
+>
+> Reported-by: Mark Brown <broonie@kernel.org>
+> Closes: https://lore.kernel.org/kvmarm/ac594b9c-4bbb-46c8-9391-e7a68ce4de5b@sirena.org.uk/
+> Fixes: 3adaee783061 ("KVM: arm64: Allow userspace to change the implementation ID registers")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+> arch/arm64/kvm/hyp/nvhe/pkvm.c | 3 +++
+> 1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 2e2975248cd3..afc1b5c403c9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -376,6 +376,9 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+> 	hyp_vm->kvm.arch.flags = 0;
+> 	pkvm_init_features_from_host(hyp_vm, host_kvm);
+> 	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
+> +
+> +	if (test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &hyp_vm->kvm.arch.flags))
+> +		hyp_vm->kvm.arch.midr_el1 = host_kvm->arch.midr_el1;
+> }
 
-Good spot, I had forgotten about the input flags that can avoid using the
-buffer. I will see if we can improve the spec in that regards.
+Oh, I didn't even think that all that's missing was to update the trusted
+kvm instance ... I was looking on where to set VPIDR_EL2 for pkvm.
 
--- 
-Regards,
-Sudeep
+Thanks for the fix, I guess I'll have some more code reading todo...
+
+Sebastian
+
