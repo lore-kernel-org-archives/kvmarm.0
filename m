@@ -1,123 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7416753BE
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 10:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D1C2E339F
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 11:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741258350; cv=none; b=Hx0BSOnbKYDfew3CHejTbl2Gyc2YzxZyirg21UrbmkXjoqUI5IqmMeFQjLnwXJ2rgpnUn9gNMFgE/M/cf9UXpL8rKIelcpj99QPpiXp7w+T5QdeanQRJJ3t21utgbAo5UZYSVafGjj5jsHw6vemka804JbglD1mNx7hyFMTgpfQ=
+	t=1741258848; cv=none; b=u8KHDw0eCjRnuFvqUd7qpTP8Zx1nOmgUnH3a4v32vrkcjSZ8LoEYupcDU4+DUeci67H71c57Fs/LG+VqogU7JkVZM8WKzRVvWPbK9uGm4Yqk83WzylKTfm8QwTToqDXTru05cO3L9ZpbPj3I5Jbxvv3jqtOyEaOxI0wJE8kSBHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741258350; c=relaxed/simple;
-	bh=xNN68TsoHbzLWy6HVfjss4orjPSDGafBkOo4Pbm5GHQ=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=C3Y5YQjz9dfVK5tT5CYdSr9nq6ojTYZeoCwaANE+LQ1pTlfUPrn9J3DiUFvFszpYvuMQRA1qepC3N41Do8+1E84oMDgSAKvj3m+XpiQHJ6408jTPxyCJp2I/nSvWbUIIGBkKc04NaBfOQoALytYjoEA/Ozi7VWQGRpY+uNe1fmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eS24Wq+G; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741258848; c=relaxed/simple;
+	bh=cXOUGzXJisDnk0/ye+2VvQdHhCVvaIPyZYsa3alQEpw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GWnfjgd/qemGA0z2BVnqC6mgajq9oJeEdp+wp1Dmo3GxrKTEE4QDG6+wgL42wWtG1QGJVvEwnfCVD7+rm1CfYBS/ol9uqJ4llCXqWgswIheiIJbF80fAlJ+xhBzBUyFJlXkFAMeW7S0m8tnTo0Bvq9PgE/PjlFINUdb8Vvfqjdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uPczNifK; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eS24Wq+G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741258347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bzHbDsjqw0csLRfE011QXaM8Dt0kPd4HEXCq5kIGsvA=;
-	b=eS24Wq+GRUqNC/H163PFVa8KLsjvLKB8Q4BPkmVMVArNMSd9Pwcqyc6i3nP2J/aYPGCLpA
-	A4o0N7I2HMUGqX7uHSUliq5dS5bidP3bzWE8VxMtroiu7Zp4nV0IR00R5MMMc6iybfM3on
-	vWyfSdZPdsLo5AQEH3buw4ktrXrFgKw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-65-fGpxeoSSMnadqViD-b0__Q-1; Thu, 06 Mar 2025 05:52:24 -0500
-X-MC-Unique: fGpxeoSSMnadqViD-b0__Q-1
-X-Mimecast-MFC-AGG-ID: fGpxeoSSMnadqViD-b0__Q_1741258343
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-390f6aa50c5so322756f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 06 Mar 2025 02:52:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uPczNifK"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4394c747c72so1942245e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 06 Mar 2025 03:00:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741258845; x=1741863645; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PvJOjZ7gASzBfvYGoJZPS5obCWwIrSTS1iwOGHLb12c=;
+        b=uPczNifK2QqU3qhDZ8hfLwokQ4GKJgIf++3uxaj4uhBVXhjtu+SnWPs3NtiShmlkJ0
+         tbawPvDggEmc5+IJAtm+N1fuxQSgPnZqaRV9+Wb2aSePNWfS8pOJyhcCc4b4S/o+8F9V
+         asU10doMMzLgXYthfUcNABAGyp6/Ge5JlQCBEOoA6Ef09rbcLMtTkkKtQTSZdWezWw1+
+         HE0Gr1yvbQ6oBTte/jFdn08HkTzfnmXrBAYr8wr3OS3IgyTSLNHyWuJAYyK4uucRyRwh
+         NTIdb/3uEWu3T/ZXKhuuz/SB5IJfFQTNRuYDFdqSX0EGExbJ4txCCPxw+RhXDQBfyPnA
+         GyjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741258343; x=1741863143;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bzHbDsjqw0csLRfE011QXaM8Dt0kPd4HEXCq5kIGsvA=;
-        b=Z9v5/Ab9W9lAnXyJvBkznd8U5aMCZY7RGTo/pWTdP6kalgPpIG5waUK464rT6jmRVn
-         24y7qyJLcYlLUdQmYQuP9L/Av+MQzrkX5YH7ZwhLcjRA9r2jZqYAorNXYTPUyctpUct5
-         K8txk6h3WwFXWvwTQmmAIklcONKkGUwyfBAyaDUkOM7eMY5Lhih/lYisAfnY1HlMWvR2
-         IfJHlgcyrSvXtCNxrgDXGBSk9oRcg907/EIZnGAtbPBdK9Sa9OlZA6aQ5hQHaopmDiaq
-         pQG+6tF1D9OEUrQ9AP6zSTaPNFP/xj4gtyfXMOfMEt+Q5QOFVZPqXUsGMCGnzofJ+Aid
-         uekg==
-X-Gm-Message-State: AOJu0Yw9jTaO/rJa20iXc6O4iczPE6K+jkoNDC27w8I0CIB7D7xswmNV
-	lj1U8Pf/LxT2sHqM0DuARn+lBd1XGCACfkJKdb98e4uPakVrgBTfRTgIGuN7CbLsKcJY4Bce1bJ
-	7AH8gVKqXawJXKGIZx7jc8v1TfJLJN+qfBaH9rCkzF1+BZnHULudw/Q==
-X-Gm-Gg: ASbGncs9oxf8KD4SE+vPZrqS1izCLH+9/wbzS/GUjCSl88EiPiF5rurzqe+KNarHZdQ
-	kp7eQRiyaoPGTY3rGlnYdUexstVQNJLIpvVV9RLOqr3WBRSi1Pxlg9gPs3AdYnyt+Zfv3FC9NKK
-	Ul9yCsVVsY24XJEH4kDCo2Y+XN+Lk9VBiRzgnTE8423t+9FFmXfzsbeYn9WKsW4YtnBymE7tF/o
-	kgeraz87q+SOd+TO1AbUd9u7P6z+T3ig5nqETO9sdMtOD3cQBf4A/RRTL7JGVDSqcjFVbeMlKSd
-	WNR1djXK9dr1kpc+kJ6PabY3/uVZ3JR+paApKGVhw6fA8EzxSUB39uvO/tVrbQkS
-X-Received: by 2002:a5d:5889:0:b0:390:f745:bbfb with SMTP id ffacd0b85a97d-3911f74256dmr5721166f8f.26.1741258342830;
-        Thu, 06 Mar 2025 02:52:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFXycTTQgETYnX1IKYBRw0+Ro2kebi3WrMMhzYsXSafw8QcrmEQAMKu5FphBCpZVnpsBBhkDg==
-X-Received: by 2002:a5d:5889:0:b0:390:f745:bbfb with SMTP id ffacd0b85a97d-3911f74256dmr5721146f8f.26.1741258342463;
-        Thu, 06 Mar 2025 02:52:22 -0800 (PST)
-Received: from rh (p200300f6af284000f9ca1328aeaacdd4.dip0.t-ipconnect.de. [2003:f6:af28:4000:f9ca:1328:aeaa:cdd4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd4292b06sm46218315e9.14.2025.03.06.02.52.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 02:52:22 -0800 (PST)
-Date: Thu, 6 Mar 2025 11:52:21 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
-    Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Copy MIDR_EL1 into hyp VM when it is
- writable
-In-Reply-To: <20250305230825.484091-3-oliver.upton@linux.dev>
-Message-ID: <b63660c7-53e6-f2d3-bd4d-b9ef67987397@redhat.com>
-References: <20250305230825.484091-1-oliver.upton@linux.dev> <20250305230825.484091-3-oliver.upton@linux.dev>
+        d=1e100.net; s=20230601; t=1741258845; x=1741863645;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PvJOjZ7gASzBfvYGoJZPS5obCWwIrSTS1iwOGHLb12c=;
+        b=AY2AqxSZNueul/me4zihrtt8pMSsiyYrvevf6QHPZ8r8X0rMkvyYWNe2vmOhF37sF1
+         UH9NfXyS5UWo5qtH/f3cvijO3lRJIBgHMghCDzTbSezkSsIG0Onbxc90PadEbHD2NaOp
+         NMNWm4pIOCnXjbWaiCN0YYhxUTLdJp7LHz51m8Wm086c+Inc8t+zw7IqtjyP+yD0mJPh
+         3+RKrwnTC+pXIizmqBdq4OHfaGDB0Laj1Z4XiTi5rvp+vyqVnVGEHriFUWQYo8D2h5N2
+         vrBZuNqix8NhcS5Nx0w0QEJA7N/0tzb2PmHHb9QzMFkJTzMpvEhQScZgAWx8cVCTcVFx
+         mC/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXYTFVzvBhpPrkQnz6PKIoonGRM71LbbDjyRiaoPzrUS21QxCYXy+DMTpS60dLWlYIJ81MJTyg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzzjjQEQVfDXDT7K095SQ49KXWbEsG4+yUUSC0zMYoC/Yefnfwn
+	NxTvT9JtFVc2DSKkzCFLlRAvCktP8k7tPGahE+0DcyAlMSksbFXYBgS91dLKgttQhJ+eEHQ6w2N
+	VUUsxiRfRb3GMG7SP5A==
+X-Google-Smtp-Source: AGHT+IEGIm+qxrHFi7YMwd4v2mWCai/lo65N8Xe9xbdmYtOuCPL/1azW8IfDSK4oVWN0pRfPGkpSLhGS4zv1Dg9I
+X-Received: from wmbet7.prod.google.com ([2002:a05:600c:8187:b0:43b:c6a4:89a0])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:190f:b0:43b:b756:f0a9 with SMTP id 5b1f17b1804b1-43bd295286dmr61943825e9.11.1741258845390;
+ Thu, 06 Mar 2025 03:00:45 -0800 (PST)
+Date: Thu,  6 Mar 2025 11:00:29 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: jZ4wVexMbKAl-o-__5Iv41QjWdzYYqOJgPDWnBZWkTk_1741258343
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250306110038.3733649-1-vdonnefort@google.com>
+Subject: [PATCH v2 0/9] Stage-2 huge mappings for pKVM np-guests
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 5 Mar 2025, Oliver Upton wrote:
-> KVM recently added a capability that allows userspace to override the
-> 'implementation ID' registers presented to the VM. MIDR_EL1 is a special
-> example, where the hypervisor can directly set the value when read from
-> EL1 using VPIDR_EL2.
->
-> Copy the VM-wide value for MIDR_EL1 into the hyp VM for non-protected
-> guests when the capability is enabled so VPIDR_EL2 gets set up
-> correctly.
->
-> Reported-by: Mark Brown <broonie@kernel.org>
-> Closes: https://lore.kernel.org/kvmarm/ac594b9c-4bbb-46c8-9391-e7a68ce4de5b@sirena.org.uk/
-> Fixes: 3adaee783061 ("KVM: arm64: Allow userspace to change the implementation ID registers")
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
-> arch/arm64/kvm/hyp/nvhe/pkvm.c | 3 +++
-> 1 file changed, 3 insertions(+)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 2e2975248cd3..afc1b5c403c9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -376,6 +376,9 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
-> 	hyp_vm->kvm.arch.flags = 0;
-> 	pkvm_init_features_from_host(hyp_vm, host_kvm);
-> 	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
-> +
-> +	if (test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &hyp_vm->kvm.arch.flags))
-> +		hyp_vm->kvm.arch.midr_el1 = host_kvm->arch.midr_el1;
-> }
+Hi all,
 
-Oh, I didn't even think that all that's missing was to update the trusted
-kvm instance ... I was looking on where to set VPIDR_EL2 for pkvm.
+This series adds support for stage-2 huge mappings (PMD_SIZE) to pKVM
+np-guests, that is installing PMD-level mappings in the stage-2,
+whenever the stage-1 is backed by either Hugetlbfs or THPs.
 
-Thanks for the fix, I guess I'll have some more code reading todo...
+The last patch of that series is an optimization for CMOs using a shared
+PMD_SIZE fixmap.
 
-Sebastian
+Changes since v1: https://lore.kernel.org/all/20250228102530.1229089-1-vdonnefort@google.com/
+
+  - WARN_ON() on !PAGE_ALIGNED size for guest CMOs (Quentin)
+  - check_range_allowed_memory() before accessing the Vmemmap (Quentin)
+
+Quentin Perret (2):
+  KVM: arm64: Convert pkvm_mappings to interval tree
+  KVM: arm64: Add a range to pkvm_mappings
+
+Vincent Donnefort (7):
+  KVM: arm64: Handle huge mappings for np-guest CMOs
+  KVM: arm64: Add a range to __pkvm_host_share_guest()
+  KVM: arm64: Add a range to __pkvm_host_unshare_guest()
+  KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
+  KVM: arm64: Add a range to __pkvm_host_test_clear_young_guest()
+  KVM: arm64: Stage-2 huge mappings for np-guests
+  KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+
+ arch/arm64/include/asm/kvm_pgtable.h          |   7 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |   2 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  16 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 236 +++++++++++++-----
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  86 ++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   2 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |   6 -
+ arch/arm64/kvm/mmu.c                          |   5 +-
+ arch/arm64/kvm/pkvm.c                         | 129 +++++-----
+ 11 files changed, 342 insertions(+), 159 deletions(-)
+
+
+base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+-- 
+2.48.1.711.g2feabab25a-goog
 
