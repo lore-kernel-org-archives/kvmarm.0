@@ -1,95 +1,111 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98B7207A3A
-	for <kvmarm@lists.linux.dev>; Wed,  5 Mar 2025 23:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DF711712
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 00:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741219158; cv=none; b=V5hNmZt3+IRB3eM6RUVDeSo+6x+b5Cp8woCzmeSoBmpKwkOPRjv9f7e9a5fL5IvDymM93xyjBglzBPfxBQZZvWkKoOA3a+ci/g6E/CVnLBlyw2psNDNZj5efhquF4NZH0XlJB44wVm+iCY5lvTKdPI0z40653l9vy8+RW/8UWPM=
+	t=1741220733; cv=none; b=OdnJEJN+lvIjcbYbY8xIobelkspFX27WaDHlZ7GmJQgYkLzIZI7drq38fL8LC8SDbkQqhIigpvn0VbwuYsjCUbY2zD/3quOK/Z7+qtjIS5Wkaf4aV7lkpHNxtUSWlbqh+T/oRH+JhTZMgqUtOR04jFaAhA1L6BbyidbWjbHzOLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741219158; c=relaxed/simple;
-	bh=wFMNEISFqXyKpipTOXblyR2Mf8x4ED7rUaIhnVOa60k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HGxnN2tBKYqjj5N6WDUr//2pL5WIHtb2FdyZtTt9Dw8glv420+5ozpnxP8r5L6TbI5b3QDrI9mQBQ1XqDllASauNZ0fILGG5plXt1EvX9tDL4cYCVSv8edJNMT1BRa4XcCdS/7Naya1oIvzYKBk+6PjYvrq5w4/56nQkiI0IXsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g+fwP1vV; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1741220733; c=relaxed/simple;
+	bh=D/fiXgEjdmCC9Y7tYTOJ1uMBCTo6+YPKrNGDQwrWvOo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g8TRWaFEiqSumsqIk9LqGe6z1LHoiLmKVIGHfpoO4hJYD7L/m7P5G0qkryr7S7RG1mVWo6ffaEojZsqKIo0hQdhD/tR6NXhaAXY1/kWA5MhDVKJNoXnUxsd5gXqSAbdvDCapthZviMO+G3AFgAh3rJ/S0oGQ7ryzs6PWuaCdnO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbQH5Mjx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g+fwP1vV"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741219150;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qo71ZpEWjiEuvLYpOm6cAQgKCLTzQJocq3h05KhJ4+Q=;
-	b=g+fwP1vVUZCiSK3tA3+HTbZuRMGqSIym7xip6ti4nJpm1G6mEk0M86mhjE/vpR2pHEd9+E
-	E68cTE/B8DuevphtzeOPhYpsPhm7dJdakl13OJ8DPeTR53caffF/jKYtLMQJNDPeLFVFKm
-	TfS5DP7TKpjBghTLTJ9PxQsj6az55jI=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	cohuck@redhat.com,
-	eric.auger@redhat.com,
-	sebott@redhat.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	jiangkunkun@huawei.com,
-	jonathan.cameron@huawei.com,
-	anthony.jebson@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	linuxarm@huawei.com
-Subject: Re: [PATCH v8 0/6] KVM: arm64: Errata management for VM Live migration
-Date: Wed,  5 Mar 2025 15:58:56 -0800
-Message-Id: <174121899987.513001.15032119490654823649.b4-ty@linux.dev>
-In-Reply-To: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
-References: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbQH5Mjx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6CBC4CED1;
+	Thu,  6 Mar 2025 00:25:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741220732;
+	bh=D/fiXgEjdmCC9Y7tYTOJ1uMBCTo6+YPKrNGDQwrWvOo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hbQH5MjxDr0ojvgmQcef21FP+i4fjWiqmFBl9WbD8AqY+0IHhzgTYoP0FW9nN7OPw
+	 z+v4TTFh+1MLfTijlPbN59DspE57cD3hvPeRykGqiaYCUt6B3/Yhlepf1VFbnVgeVI
+	 qT4FyL9Qti8KJpHpP/4QmKJsWTkL8xP6Cd0czK2u9aojV2C6NNkZTNk0u3Hp1hF0/k
+	 rEs803OGXhFrreTnrFEf/bXjfW8fL45cOUrYthcAg2VZaKyQNKAnsElgAAU8feq8fS
+	 jE3ZKPSgoFgDHP/CxM1XdoCsWPM3uyxxJ8wCxNYkUhFLItvWX9651UDqoScOxUtQHE
+	 USLPLYdeo7uRg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tpz3K-00ArOB-IS;
+	Thu, 06 Mar 2025 00:25:30 +0000
+Date: Thu, 06 Mar 2025 00:25:30 +0000
+Message-ID: <86cyevovid.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sebastian Ott <sebott@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Copy guest CTR_EL0 into hyp VM
+In-Reply-To: <20250305230825.484091-2-oliver.upton@linux.dev>
+References: <20250305230825.484091-1-oliver.upton@linux.dev>
+	<20250305230825.484091-2-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, sebott@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 21 Feb 2025 14:02:23 +0000, Shameer Kolothum wrote:
-> v7-->v8
-> https://lore.kernel.org/kvmarm/20250214151343.61348-1-shameerali.kolothum.thodi@huawei.com/
+On Wed, 05 Mar 2025 23:08:23 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Changes:
->  -Fixed the compile error issue due to CONFIG_CORESIGHT_SOURCE_ETM4X=m
->   (Thanks to Sebastian for checking that config)- patch #4
->  -Added R-by tags.
+> Since commit 2843cae26644 ("KVM: arm64: Treat CTR_EL0 as a VM feature
+> ID register") KVM has allowed userspace to configure the VM-wide view of
+> CTR_EL0, falling back to trap-n-emulate if the value doesn't match
+> hardware. It appears that this has worked by chance in protected-mode
+> for some time, and on systems with FEAT_EVT protected-mode
+> unconditionally sets TID4 (i.e. TID2 traps sans CTR_EL0).
 > 
-> [...]
+> Forward the guest CTR_EL0 value through to the hyp VM and align the
+> TID2/TID4 configuration with the non-protected setup.
+> 
+> Fixes: 2843cae26644 ("KVM: arm64: Treat CTR_EL0 as a VM feature ID register")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 3927fe52a3dd..2e2975248cd3 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -46,7 +46,8 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  		vcpu->arch.hcr_el2 |= HCR_FWB;
+>  
+>  	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
+> -	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
+> +	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE) &&
+> +	    kvm_read_vm_id_reg(vcpu->kvm, SYS_CTR_EL0) == read_cpuid(CTR_EL0))
+>  		vcpu->arch.hcr_el2 |= HCR_TID4;
+>  	else
+>  		vcpu->arch.hcr_el2 |= HCR_TID2;
+> @@ -374,6 +375,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+>  	hyp_vm->kvm.arch.pkvm.enabled = READ_ONCE(host_kvm->arch.pkvm.enabled);
+>  	hyp_vm->kvm.arch.flags = 0;
+>  	pkvm_init_features_from_host(hyp_vm, host_kvm);
+> +	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
 
-The feature branch for all of this can be found here should the need arise.
+Maybe it'd be better to stick this into pkvm_init_features_from_host()
+in order to keep all the "inherit stuff from host" together?
 
-git://git.kernel.org/pub/scm/linux/kernel/git/oupton/linux.git kvm-arm64/pv-cpuid
+Same thing for the following patch.
 
-Applied to next, thanks!
+Thanks,
 
-[1/6] arm64: Modify _midr_range() functions to read MIDR/REVIDR internally
-      https://git.kernel.org/kvmarm/kvmarm/c/e3121298c7fc
-[2/6] KVM: arm64: Introduce hypercall support for retrieving target implementations
-      https://git.kernel.org/kvmarm/kvmarm/c/57e5cc9b8a39
-[3/6] KVM: arm64: Introduce KVM_REG_ARM_VENDOR_HYP_BMAP_2
-      https://git.kernel.org/kvmarm/kvmarm/c/c0000e58c74e
-[4/6] arm64: Make _midr_in_range_list() an exported function
-      https://git.kernel.org/kvmarm/kvmarm/c/c8c2647e69be
-[5/6] smccc/kvm_guest: Enable errata based on implementation CPUs
-      https://git.kernel.org/kvmarm/kvmarm/c/86edf6bdcf05
-[6/6] KVM: selftests: Add test for KVM_REG_ARM_VENDOR_HYP_BMAP_2
-      https://git.kernel.org/kvmarm/kvmarm/c/f69656656fa7
+	M.
 
---
-Best,
-Oliver
+-- 
+Without deviation from the norm, progress is not possible.
