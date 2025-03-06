@@ -1,136 +1,159 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0032B2566F3
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 17:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5260A26B966
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 18:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741281106; cv=none; b=b5cQBlee7loVhbtm84pZ9Kk9JiNYBLGGm5rk1csCISh7FPgvvZieB0qwG+JgdsngRcetSopB/Wp773SAGgctRVOAsIV5KrtiCfAMzcpY1Wn/B25LO0BFnUs403iisKm5ZBflgF7Dg9mi5Smg54zTxxMqjvrUS305nwiG2wFg9JA=
+	t=1741286421; cv=none; b=R3nY6HonUTySrvmL7lei0Eq1UQWkjgEZsfSHEMePofBmA6HQDb6TtuygAyfiNJHV8LvJp4iGAqrhQTytrNt4i8/reSzBPmmriHPojjl99oGlCOfYX23YjoWGENpSfvDLXHnBLo6JWPeqbfWuyBqIz76mNyVihJ9qMOz1BtEmM88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741281106; c=relaxed/simple;
-	bh=kGCpOEGL3Tirr//OuqVzApvuKlaut62A5BIUyFPKU1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TKDWSSPZjlz4TiZP2nvFH+mNluieXAikAX3TWUnRESTlkNM+XvB+t3sEKNE3uYqgOnX/LoCUSGh0mzi6412ib23mKP9XMMTc1KvpHXku2EWyETC5TpiWPy9XzofYd4kRNmrXrB+LzDf5cbvmzDIpIhr4gnqwiPpnZa8L5ZTGvjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23BB11007;
-	Thu,  6 Mar 2025 09:11:52 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16AF03F5A1;
-	Thu,  6 Mar 2025 09:11:33 -0800 (PST)
-Date: Thu, 6 Mar 2025 17:11:20 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.linux.dev,
-	nikos.nikoleris@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH v4] arm64: Add basic MTE test
-Message-ID: <Z8nXOBGxEGS5il3N@raptor>
-References: <20250227152240.118721-1-vladimir.murzin@arm.com>
- <20250306-e90b77df70c0a9be913a4e08@orel>
+	s=arc-20240116; t=1741286421; c=relaxed/simple;
+	bh=LkKR288RE+h611Y9F4OQZCS2oNAv31ZfvfnKlmFsXKM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:content-type; b=jqSHqpFx1c4TF6FqYpHbVNT6D8PD4Istmwv2v+y+oxUhnq37xejrFm+SEmrmS6K9vpUPJ+FrCzEeD9vE8ledxCySowg6I5ejbRzvVS06V0sHnP15kkYwHM7uhoBwikv33Xr66Kz4wbMhr1/RgTL5H1ulMXVZdKH+zLUfAWRBrfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UVFBFxO9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UVFBFxO9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741286417;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9Lmst4VUAQQ3LJJdXWEWRCBJzpFOzVT70uwpvEP3i+I=;
+	b=UVFBFxO9xTJDT13it9EXLNgb3Vi9xPXnlrE0DOgAqQqY2/hnjOZ6DIz4l34FKlD+wJ4EIj
+	4E5rlTNLcFr1dQRcZdKKq5+zdJmmWyOg/mFV15R8QRb3kNSkPFrGOPpFhBwFYh5jGsoI0U
+	IF2ujfJ/Q3gXvfCnAcPuFyMkHioZHtM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-JNpwo9LNMOmbopNBEVFOJw-1; Thu, 06 Mar 2025 13:40:16 -0500
+X-MC-Unique: JNpwo9LNMOmbopNBEVFOJw-1
+X-Mimecast-MFC-AGG-ID: JNpwo9LNMOmbopNBEVFOJw_1741286415
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3912e4e2033so485256f8f.0
+        for <kvmarm@lists.linux.dev>; Thu, 06 Mar 2025 10:40:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741286415; x=1741891215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9Lmst4VUAQQ3LJJdXWEWRCBJzpFOzVT70uwpvEP3i+I=;
+        b=jdi/49S6CnY/GDSEuBSH4Q7BpkxS8WAePLvg9khJEz8ixshGbe6QcSqDeCM4AKwSjP
+         KXkdXPwcztZV3k89y75tsJEX/OZGFh6mIVwvfSNNgAWzhAdQPMRFd4ERVPNpVeFNbkwj
+         wehapUMly5t+RlzeP9oWO/He8jvAM+zx9V5FxIDfeNKfoXGR9KqrR4qfH4fF3Iu3r0F/
+         JQcttW6OrroXdt4VGHJ4splEJ7Gd3OrDVWXMv111uBBWtdQcj5BavjDqLnJzM5rDep5t
+         +5O5gPVsAm26h6cyg/ZXZITSqXg/bjg8MHOQ5FFrIDXkzh5Xg+PSzH8OtDwxtBoLwZYQ
+         Wq6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUFMJIZgKjhaJDsGT0zmr123+6tieBeennW3+Fuo5Zd7mU+4HNtvPjpXAeLlblKiLVP5jSUR+k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YygXLeIGL/aT4JrsVwNNMC4DCn2eirjRd16VSaeNgGEKoZ+Efbm
+	a16p0odmkV7N4Dw1nsGQJEKuVWL+4tEPsRCkxPqO7VCIvVw9iHt6gTcfmcMkGMq6/fIAVvctthe
+	Z0enHYizvVAuE89l8zvTdRo/gwzrNBZMxFup5VPEtuo8D0atwvLQ+eg==
+X-Gm-Gg: ASbGncsYBC7osj4kIs7w9XVCpEU2dCrDpEZ2q+jwfOH8KX0zTCj0T7dKpv5Ghzdv1E1
+	kSBfk0/8Ib5oNKl0nkE9FSakR+0zY1LyODvJ5MEWwQFl0uE4xrSQqHj0M057GlhenbZPa30/f5S
+	Fw84vg0q7k6jCgEF4+QkS9GDK70ok6lh7S9AglG4ePBHcxxkRTwSd8WZP3Hp+OGb4JUGu7l5Rww
+	Mr0QgCbtuM7k7DC78adJL2NOW8OoDC2hpHatU0WxwGf5reaNWqh2u/SW1410cV6ix5MyJPS2ZH7
+	zO61XU7BTv9dP0Hdgv53LWpgkqnuCCQ/ZLvKgeiQ/bGo3cx0PYjFE3AOlIkmkk970bj5cSxAaGA
+	X8A==
+X-Received: by 2002:a5d:47a2:0:b0:391:3150:96fb with SMTP id ffacd0b85a97d-39132d6325bmr200930f8f.23.1741286415178;
+        Thu, 06 Mar 2025 10:40:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG+PIlhHHUzNDRAUatrj6r8bLMc9x2BjUmkvzjVG8Z/wDAKyIEVDRSOx3ZM1Q7ROAl8MR6S/Q==
+X-Received: by 2002:a5d:47a2:0:b0:391:3150:96fb with SMTP id ffacd0b85a97d-39132d6325bmr200910f8f.23.1741286414795;
+        Thu, 06 Mar 2025 10:40:14 -0800 (PST)
+Received: from rh.fritz.box (p200300f6af284000f9ca1328aeaacdd4.dip0.t-ipconnect.de. [2003:f6:af28:4000:f9ca:1328:aeaa:cdd4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfdfcdasm2767640f8f.23.2025.03.06.10.40.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 10:40:14 -0800 (PST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Writable TGRAN*_2
+Date: Thu,  6 Mar 2025 19:40:13 +0100
+Message-ID: <20250306184013.30008-1-sebott@redhat.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306-e90b77df70c0a9be913a4e08@orel>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: VDtwo1H1fKu5H4Wx0K5nDcTXAHE6gk3CfZhKT6yToO0_1741286415
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+content-type: text/plain; charset="US-ASCII"; x-default=true
 
-Hi Drew,
+Allow userspace to write the safe (NI) value for ID_AA64MMFR0_EL1.TGRAN*_2.
+Disallow to change these fields for NV since kvm provides a sanitized view
+for them based on the PAGE_SIZE.
+Also add these bits to the set_id_regs selftest.
 
-On Thu, Mar 06, 2025 at 04:45:06PM +0100, Andrew Jones wrote:
-> On Thu, Feb 27, 2025 at 03:22:40PM +0000, Vladimir Murzin wrote:
-> > Test tag storage access and tag mismatch for different MTE modes.
-> > 
-> > Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> > ---
-> >  arm/Makefile.arm64            |   8 +
-> >  arm/cstart64.S                |   4 +-
-> >  arm/mte.c                     | 313 ++++++++++++++++++++++++++++++++++
-> >  arm/unittests.cfg             |  19 +++
-> >  lib/arm64/asm/mmu.h           |   1 +
-> >  lib/arm64/asm/pgtable-hwdef.h |   3 +
-> >  lib/arm64/asm/sysreg.h        |  14 ++
-> >  7 files changed, 361 insertions(+), 1 deletion(-)
-> >  create mode 100644 arm/mte.c
-> >
-> 
-> Unfortunately this is failing builds with clang.
-> 
-> arm/mte.c:65:18: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
->    65 |                       : "=&r" (r)
->       |                                ^
-> arm/mte.c:63:21: note: use constraint modifier "w"
->    63 |         asm volatile ("ldr %0,[%1]\n"
->       |                            ^~
->       |                            %w0
-> arm/mte.c:65:18: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
->    65 |                       : "=&r" (r)
->       |                                ^
-> arm/mte.c:64:14: note: use constraint modifier "w"
->    64 |                       "str %0,[%2]\n"
->       |                            ^~
->       |                            %w0
-> arm/mte.c:75:16: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
->    75 |                       : "r" (val), "r" (addr)
->       |                              ^
-> arm/mte.c:72:21: note: use constraint modifier "w"
->    72 |         asm volatile ("str %0,[%1]\n"
->       |                            ^~
->       |                            %w0
-> 
-> Thanks,
-> drew
-> 
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
+---
+ arch/arm64/kvm/sys_regs.c                     | 21 +++++++++++++++----
+ .../testing/selftests/kvm/arm64/set_id_regs.c |  3 +++
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-That's unfortunate, I think it's because %0 specifies a 64bit register, but
-the variable is declared as an unsigned int, which is 32 bits.
-
-Can you give this a go:
-
-diff --git a/arm/mte.c b/arm/mte.c
-index f32203ce275a..9c266fcced5f 100644
---- a/arm/mte.c
-+++ b/arm/mte.c
-@@ -60,8 +60,8 @@ static inline void mem_read(unsigned int *addr, unsigned int *res)
- {
-        unsigned int r;
-
--       asm volatile ("ldr %0,[%1]\n"
--                     "str %0,[%2]\n"
-+       asm volatile ("ldr %w0,[%1]\n"
-+                     "str %w0,[%2]\n"
-                      : "=&r" (r)
-                      : "r" (addr), "r" (res) : "memory");
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 14faf213d483..0730ed8314d0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1948,6 +1948,21 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
+ 	return set_id_reg(vcpu, rd, user_val);
  }
-@@ -69,7 +69,7 @@ static inline void mem_read(unsigned int *addr, unsigned int *res)
- static inline void mem_write(unsigned int *addr, unsigned int val)
+ 
++static int set_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
++				const struct sys_reg_desc *rd, u64 user_val)
++{
++	u64 sanitized_val = kvm_read_sanitised_id_reg(vcpu, rd);
++	u64 tgran2_mask = ID_AA64MMFR0_EL1_TGRAN4_2_MASK |
++			  ID_AA64MMFR0_EL1_TGRAN16_2_MASK |
++			  ID_AA64MMFR0_EL1_TGRAN64_2_MASK;
++
++	if (vcpu_has_nv(vcpu) &&
++	    ((sanitized_val & tgran2_mask) != (user_val & tgran2_mask)))
++		return -EINVAL;
++
++	return set_id_reg(vcpu, rd, user_val);
++}
++
+ static int set_id_aa64mmfr2_el1(struct kvm_vcpu *vcpu,
+ 				const struct sys_reg_desc *rd, u64 user_val)
  {
-        /* The NOP allows the same exception handler as mem_read() to be used. */
--       asm volatile ("str %0,[%1]\n"
-+       asm volatile ("str %w0,[%1]\n"
-                      "nop\n"
-                      :
-                      : "r" (val), "r" (addr)
-
-It compiles and works with gcc; with clang it compiles, but I cannot run
-the test because kvm-unit-tests doesn't detect MTE support in the compiler.
-
-$ ./configure --arch=arm64 --cc=clang --cross-prefix=aarch64-linux-gnu- --cflags='--target=aarch64-linux -march=armv8.5-a+memtag'
-$ make -j32 clean && make -j32
-$ ./run_tests.sh -g mte
-config.mak: line 13: -march=armv8.5-a+memtag: command not found
-config.mak: line 13: -march=armv8.5-a+memtag: command not found
-SKIP mte-sync (1 tests, 1 skipped)
-SKIP mte-async (1 tests, 1 skipped)
-SKIP mte-asymm (1 tests, 1 skipped)
-
-(the error I suppose it's because configure doesn't wrap CFLAGS in quotes
-when writing config.mak).
-
-Do you have any hints about enabling MTE in clang?
-
-Thanks,
-Alex
+@@ -2787,10 +2802,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(6,7),
+ 
+ 	/* CRm=7 */
+-	ID_WRITABLE(ID_AA64MMFR0_EL1, ~(ID_AA64MMFR0_EL1_RES0 |
+-					ID_AA64MMFR0_EL1_TGRAN4_2 |
+-					ID_AA64MMFR0_EL1_TGRAN64_2 |
+-					ID_AA64MMFR0_EL1_TGRAN16_2 |
++	ID_FILTERED(ID_AA64MMFR0_EL1, id_aa64mmfr0_el1,
++				      ~(ID_AA64MMFR0_EL1_RES0 |
+ 					ID_AA64MMFR0_EL1_ASIDBITS)),
+ 	ID_WRITABLE(ID_AA64MMFR1_EL1, ~(ID_AA64MMFR1_EL1_RES0 |
+ 					ID_AA64MMFR1_EL1_HCX |
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index 1d65f4a09e6f..322b9d3b0125 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -146,6 +146,9 @@ static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
+ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
++	REG_FTR_BITS(FTR_EXACT, ID_AA64MMFR0_EL1, TGRAN4_2, 1),
++	REG_FTR_BITS(FTR_EXACT, ID_AA64MMFR0_EL1, TGRAN64_2, 1),
++	REG_FTR_BITS(FTR_EXACT, ID_AA64MMFR0_EL1, TGRAN16_2, 1),
+ 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, TGRAN4, 0),
+ 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, TGRAN64, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, TGRAN16, 0),
+-- 
+2.42.0
 
