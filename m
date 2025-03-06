@@ -1,39 +1,35 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EA4148FF5
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 15:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465B81FF7CC
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 15:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741275935; cv=none; b=VntZdGjDEJeBHNVIrN0AB3l8LbuOW8FZzpt17/2390LTD5iQ8hTqb4uKhLqsiODg3Y+qjacuUFWyUyzGgew87zsrIpwcHooX7bKUejT3FaMwwUJNxO+ZJcE0pKXbvTitmrfW8J+6TeVOZws4ZDEzY1AyNbvcfel0CFcOfiKQgrI=
+	t=1741276357; cv=none; b=dkiLuU3ByaGoEKZSJGR1heV5pRgn0+e7v08DviDgbaMTITFYF0WexH1CAcw3N01ukHj5beG5nXWuvn64FDZb9a5lZFvvFJz7m2q4Nzl6wHpYAitR4CbO6VnhBzVI99r4C1wk1CK2uG2oIsL7+El8B0wScMH0Y+m6R1lbi8gUAAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741275935; c=relaxed/simple;
-	bh=oJb31Hzwm1uhNBur0riNFahQXXOghZuPxLTmnyDpTNE=;
+	s=arc-20240116; t=1741276357; c=relaxed/simple;
+	bh=+sWXptzDc1NDYG+YfJbpFHs9I/j/rOKy2TkxpVnN5Y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9eg/zC10OVVRKG1je4YgF1GuP+/JXHp/HrDYSyf6k3OQR9RLoiu1vHCU1t45fi08ZkN8T+RNUTlLSpULbQj1EmNiJWcLRH+o1y3wOL5hN2xDIjRUlp3WFno19DXEY2IM4+uu5LluiA6QlgJ6W3zGrhQR3WDuZA0ruXUIFdrTpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ivsvJTx+; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ivsvJTx+"
-Date: Thu, 6 Mar 2025 16:45:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741275931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eCeSCVrjKevx8njgqni78iIcFR3H8Z+fRmIiAdymOKg=;
-	b=ivsvJTx+XTpYKudqDTI//7KpiYur9SxzZb9VaMKOusv7h3wpn7DtK24SjgWZylmWjHodqe
-	cU/vYR/GnOdsBbUAq22IfnL5yDmYG6IDFaTubObZbq5T0QVhuu68nONrZLFfV2zc1NdfRY
-	zUeBEwncwrO87NH9/HxOCd6OFd2OiRs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: kvmarm@lists.linux.dev, alexandru.elisei@arm.com, 
-	nikos.nikoleris@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH v4] arm64: Add basic MTE test
-Message-ID: <20250306-e90b77df70c0a9be913a4e08@orel>
-References: <20250227152240.118721-1-vladimir.murzin@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=an83zn9RVUxDpbKniVR2mYw3reOlHr8Io5xqDaN0R6MUf8478uuIFpitF4gIlow/3Gn6gf7PUkEnDqyU68mTaxllbo/LXp4kNI5wGn3CDIdNvix3kx6OCZGHp4mYT1idP3cTBy8cv3HlDkOvB+PqN4dCnBwXcjFxFRBMglKURLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5788F1007;
+	Thu,  6 Mar 2025 07:52:48 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B3983F673;
+	Thu,  6 Mar 2025 07:52:34 -0800 (PST)
+Date: Thu, 6 Mar 2025 15:52:31 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v1 1/7] arm64: drop to EL1 if booted at EL2
+Message-ID: <Z8nEv17KEXFCHoAi@raptor>
+References: <20250220141354.2565567-1-joey.gouly@arm.com>
+ <20250220141354.2565567-2-joey.gouly@arm.com>
+ <Z8CYeyKrFoglWWSp@raptor>
+ <20250304170213.GB1553498@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,48 +38,81 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250227152240.118721-1-vladimir.murzin@arm.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250304170213.GB1553498@e124191.cambridge.arm.com>
 
-On Thu, Feb 27, 2025 at 03:22:40PM +0000, Vladimir Murzin wrote:
-> Test tag storage access and tag mismatch for different MTE modes.
+Hi Joey,
+
+On Tue, Mar 04, 2025 at 05:02:13PM +0000, Joey Gouly wrote:
+> Hi,
 > 
-> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> ---
->  arm/Makefile.arm64            |   8 +
->  arm/cstart64.S                |   4 +-
->  arm/mte.c                     | 313 ++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg             |  19 +++
->  lib/arm64/asm/mmu.h           |   1 +
->  lib/arm64/asm/pgtable-hwdef.h |   3 +
->  lib/arm64/asm/sysreg.h        |  14 ++
->  7 files changed, 361 insertions(+), 1 deletion(-)
->  create mode 100644 arm/mte.c
->
+> On Thu, Feb 27, 2025 at 04:53:15PM +0000, Alexandru Elisei wrote:
+> > Hi Joey,
+> > 
+> > On Thu, Feb 20, 2025 at 02:13:48PM +0000, Joey Gouly wrote:
+> > > EL2 is not currently supported, drop to EL1 to conitnue booting.
+> > > 
+> > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > > ---
+> > >  arm/cstart64.S | 27 +++++++++++++++++++++++++--
+> > >  1 file changed, 25 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > > index b480a552..3a305ad0 100644
+> > > --- a/arm/cstart64.S
+> > > +++ b/arm/cstart64.S
+> > > @@ -57,14 +57,25 @@ start:
+> > >  	add     x6, x6, :lo12:reloc_end
+> > >  1:
+> > >  	cmp	x5, x6
+> > > -	b.hs	1f
+> > > +	b.hs	reloc_done
+> > >  	ldr	x7, [x5]			// r_offset
+> > >  	ldr	x8, [x5, #16]			// r_addend
+> > >  	add	x8, x8, x4			// val = base + r_addend
+> > >  	str	x8, [x4, x7]			// base[r_offset] = val
+> > >  	add	x5, x5, #24
+> > >  	b	1b
+> > > -
+> > > +reloc_done:
+> > > +	mrs	x4, CurrentEL
+> > > +	cmp	x4, CurrentEL_EL2
+> > > +	b.ne	1f
+> > > +drop_to_el1:
+> > > +	mov	x4, 4
+> > > +	msr	spsr_el2, x4
+> > > +	adrp	x4, 1f
+> > > +	add	x4, x4, :lo12:1f
+> > > +	msr	elr_el2, x4
+> > 
+> > I'm going to assume this works because KVM is nice enough to initialise the
+> > EL2 registers that affect execution at EL1 to some sane defaults. Is that
+> > something that can be relied on going forward?
+> 
+> I was just trying to keep the changes minimal.
 
-Unfortunately this is failing builds with clang.
+Sure, I appreciate that, and the series looks nice and small because of it, but
+in the absence of an ABI from KVM, the reset values for the EL2 registers that
+affect execution at EL1 are just an implemention choice that KVM made at a
+particular point in time. I don't think robust software should rely on it.
 
-arm/mte.c:65:18: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
-   65 |                       : "=&r" (r)
-      |                                ^
-arm/mte.c:63:21: note: use constraint modifier "w"
-   63 |         asm volatile ("ldr %0,[%1]\n"
-      |                            ^~
-      |                            %w0
-arm/mte.c:65:18: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
-   65 |                       : "=&r" (r)
-      |                                ^
-arm/mte.c:64:14: note: use constraint modifier "w"
-   64 |                       "str %0,[%2]\n"
-      |                            ^~
-      |                            %w0
-arm/mte.c:75:16: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
-   75 |                       : "r" (val), "r" (addr)
-      |                              ^
-arm/mte.c:72:21: note: use constraint modifier "w"
-   72 |         asm volatile ("str %0,[%1]\n"
-      |                            ^~
-      |                            %w0
+> 
+> > 
+> > What about UEFI?
+> 
+> Haven't tested it yet.
+
+Ok, I saw you made changes to the UEFI code so I had assumed to tested them.
+
+> 
+> > 
+> > I was expecting some kind of initialization of the registers that affect
+> > EL1.
+> 
+> I'll look into it.
+
+Great, thanks. I think arch/arm64/incluse/asm/el2_setup.h might be a useful
+starting point. You can put the initialization code in a macro and use it
+for the primary and secondaries CPUs, like Marc suggested.
 
 Thanks,
-drew
+Alex
