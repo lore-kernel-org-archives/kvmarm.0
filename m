@@ -1,35 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACE720B1E4
-	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 15:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0032B2566F3
+	for <kvmarm@lists.linux.dev>; Thu,  6 Mar 2025 17:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741276721; cv=none; b=ilIjEfBTy2FZ0grBpiwox8md6cBjaQ6sJNpf1LVmeL3/wV5K0jOrkzmIuFgzLtONGhDxcV1D9SF6Kg8bfwfHlayEwUOI0tmkqhVUmQyR+fHq4xSY+rE6PUAnmyEL6IfnQdBEsETp7DHNJLWx1zBIsOrO6Pgy1B+vkIiW/an7t+I=
+	t=1741281106; cv=none; b=b5cQBlee7loVhbtm84pZ9Kk9JiNYBLGGm5rk1csCISh7FPgvvZieB0qwG+JgdsngRcetSopB/Wp773SAGgctRVOAsIV5KrtiCfAMzcpY1Wn/B25LO0BFnUs403iisKm5ZBflgF7Dg9mi5Smg54zTxxMqjvrUS305nwiG2wFg9JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741276721; c=relaxed/simple;
-	bh=ecU63b4V1UD6DKMPqTQBfWsQFmloCZdxkNGiIuQ1hs8=;
+	s=arc-20240116; t=1741281106; c=relaxed/simple;
+	bh=kGCpOEGL3Tirr//OuqVzApvuKlaut62A5BIUyFPKU1c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DsRrB27Lx0qeN5YBUXJKruvXPSpl8ll1HPLFp4Y3pXIJeoaOvJNB7rbV07BtCCmoIIDrxQHO7V4VBNfSEWlBfTOngKQf3sLZMVoNbGp3XRuC1cYS4MTF9k/4omEosizdYsqv1o4k/xgHVcl8Owj36y7d9Usyiq7YnSmDaYe0k/Y=
+	 Content-Type:Content-Disposition:In-Reply-To; b=TKDWSSPZjlz4TiZP2nvFH+mNluieXAikAX3TWUnRESTlkNM+XvB+t3sEKNE3uYqgOnX/LoCUSGh0mzi6412ib23mKP9XMMTc1KvpHXku2EWyETC5TpiWPy9XzofYd4kRNmrXrB+LzDf5cbvmzDIpIhr4gnqwiPpnZa8L5ZTGvjc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AAAA81007;
-	Thu,  6 Mar 2025 07:58:51 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23BB11007;
+	Thu,  6 Mar 2025 09:11:52 -0800 (PST)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 417DA3F673;
-	Thu,  6 Mar 2025 07:58:35 -0800 (PST)
-Date: Thu, 6 Mar 2025 15:58:31 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16AF03F5A1;
+	Thu,  6 Mar 2025 09:11:33 -0800 (PST)
+Date: Thu, 6 Mar 2025 17:11:20 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvm@vger.kernel.org, drjones@redhat.com, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 6/7] arm64: pmu: count EL2 cycles
-Message-ID: <Z8nGJ07Dlg-0Z6mg@raptor>
-References: <20250220141354.2565567-1-joey.gouly@arm.com>
- <20250220141354.2565567-7-joey.gouly@arm.com>
- <Z8CaT5Qe5X4t4Kzg@raptor>
- <20250304165604.GA1553498@e124191.cambridge.arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.linux.dev,
+	nikos.nikoleris@arm.com, eric.auger@redhat.com
+Subject: Re: [PATCH v4] arm64: Add basic MTE test
+Message-ID: <Z8nXOBGxEGS5il3N@raptor>
+References: <20250227152240.118721-1-vladimir.murzin@arm.com>
+ <20250306-e90b77df70c0a9be913a4e08@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,126 +35,102 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250304165604.GA1553498@e124191.cambridge.arm.com>
+In-Reply-To: <20250306-e90b77df70c0a9be913a4e08@orel>
 
-Hi Joey,
+Hi Drew,
 
-On Tue, Mar 04, 2025 at 04:56:04PM +0000, Joey Gouly wrote:
-> Hi Alexandru,
-> 
-> On Thu, Feb 27, 2025 at 05:01:03PM +0000, Alexandru Elisei wrote:
-> > Hi Joey,
+On Thu, Mar 06, 2025 at 04:45:06PM +0100, Andrew Jones wrote:
+> On Thu, Feb 27, 2025 at 03:22:40PM +0000, Vladimir Murzin wrote:
+> > Test tag storage access and tag mismatch for different MTE modes.
 > > 
-> > On Thu, Feb 20, 2025 at 02:13:53PM +0000, Joey Gouly wrote:
-> > > Count EL2 cycles if that's the EL kvm-unit-tests is running at!
-> > > 
-> > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > ---
-> > >  arm/pmu.c | 21 ++++++++++++++++++---
-> > >  1 file changed, 18 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arm/pmu.c b/arm/pmu.c
-> > > index 2dc0822b..238e4628 100644
-> > > --- a/arm/pmu.c
-> > > +++ b/arm/pmu.c
-> > > @@ -206,6 +206,8 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
-> > >  #define ID_DFR0_PMU_V3_8_5	0b0110
-> > >  #define ID_DFR0_PMU_IMPDEF	0b1111
-> > >  
-> > > +#define PMCCFILTR_EL0_NSH	BIT(27)
-> > > +
-> > >  static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
-> > >  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
-> > >  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
-> > > @@ -247,7 +249,7 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
-> > >  #define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
-> > >  
-> > >  #define PMEVTYPER_EXCLUDE_EL1 BIT(31)
-> > 
-> > I think you can drop the macro. I was expecting to see an exclude EL2 macro
-> > used in its place when the test is running at EL2, but it seems
-> > PMEVTYPER_EXCLUDE_EL1 is not used anywhere. Unless I'm missing something here.
+> > Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> > ---
+> >  arm/Makefile.arm64            |   8 +
+> >  arm/cstart64.S                |   4 +-
+> >  arm/mte.c                     | 313 ++++++++++++++++++++++++++++++++++
+> >  arm/unittests.cfg             |  19 +++
+> >  lib/arm64/asm/mmu.h           |   1 +
+> >  lib/arm64/asm/pgtable-hwdef.h |   3 +
+> >  lib/arm64/asm/sysreg.h        |  14 ++
+> >  7 files changed, 361 insertions(+), 1 deletion(-)
+> >  create mode 100644 arm/mte.c
+> >
 > 
-> I will drop it.
+> Unfortunately this is failing builds with clang.
 > 
-> > 
-> > > -#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
-> > > +#define PMEVTYPER_EXCLUDE_EL0 BIT(30) | BIT(27)
-> > 
-> > I'm not really sure what that's supposed to achieve - if the test is
-> > running at EL2, and events from both EL0 and EL2 are excluded, what's left
-> > to count?
+> arm/mte.c:65:18: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>    65 |                       : "=&r" (r)
+>       |                                ^
+> arm/mte.c:63:21: note: use constraint modifier "w"
+>    63 |         asm volatile ("ldr %0,[%1]\n"
+>       |                            ^~
+>       |                            %w0
+> arm/mte.c:65:18: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>    65 |                       : "=&r" (r)
+>       |                                ^
+> arm/mte.c:64:14: note: use constraint modifier "w"
+>    64 |                       "str %0,[%2]\n"
+>       |                            ^~
+>       |                            %w0
+> arm/mte.c:75:16: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>    75 |                       : "r" (val), "r" (addr)
+>       |                              ^
+> arm/mte.c:72:21: note: use constraint modifier "w"
+>    72 |         asm volatile ("str %0,[%1]\n"
+>       |                            ^~
+>       |                            %w0
 > 
-> bit 27 of PMEVTYPER is the NSH bit, when it is 1 the events are not filtered.
-> This is the opposite polarity to the U (bit 30) and P (bit 31) bits. When they
-> are 1, the events are filtered.
+> Thanks,
+> drew
+> 
 
-Aaah, I was reading the Arm ARM backwards. yeah, bit NSH needs to be set to
-allow counting of events at EL2, my bad.
+That's unfortunate, I think it's because %0 specifies a 64bit register, but
+the variable is declared as an unsigned int, which is 32 bits.
 
-> 
-> > 
-> > I also don't understand what PMEVTYPER_EXCLUDE_EL0 does in the non-nested
-> > virt case (when kvm-unit-tests boots at El1). The tests run at EL1, so not
-> > counting events at EL0 shouldn't affect anything. Am I missing something
-> > obvious here?
-> 
-> I don't know why it's like that. AFAICT, it doesn't run anything at EL0.
+Can you give this a go:
 
-Ok, just wanted to make sure I'm not missing anything.
+diff --git a/arm/mte.c b/arm/mte.c
+index f32203ce275a..9c266fcced5f 100644
+--- a/arm/mte.c
++++ b/arm/mte.c
+@@ -60,8 +60,8 @@ static inline void mem_read(unsigned int *addr, unsigned int *res)
+ {
+        unsigned int r;
 
-> 
-> > 
-> > >  
-> > >  static bool is_event_supported(uint32_t n, bool warn)
-> > >  {
-> > > @@ -1059,11 +1061,18 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> > >  static bool check_cycles_increase(void)
-> > >  {
-> > >  	bool success = true;
-> > > +	u64 pmccfiltr = 0;
-> > >  
-> > >  	/* init before event access, this test only cares about cycle count */
-> > >  	pmu_reset();
-> > >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> > > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> > > +
-> > > +#if defined(__aarch64__)
-> > > +	if (current_level() == CurrentEL_EL2)
-> > > +		// include EL2 cycle counts
-> > > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
-> > > +#endif
-> > > +	set_pmccfiltr(pmccfiltr);
-> > >  
-> > >  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
-> > >  	isb();
-> > > @@ -1114,11 +1123,17 @@ static void measure_instrs(int num, uint32_t pmcr)
-> > >  static bool check_cpi(int cpi)
-> > >  {
-> > >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
-> > > +	u64 pmccfiltr = 0;
-> > >  
-> > >  	/* init before event access, this test only cares about cycle count */
-> > >  	pmu_reset();
-> > >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> > > -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> > > +#if defined(__aarch64__)
-> > > +	if (current_level() == CurrentEL_EL2)
-> > > +		// include EL2 cycle counts
-> > > +		pmccfiltr |= PMCCFILTR_EL0_NSH;
-> > > +#endif
-> > 
-> > It's called twice, so it could be abstracted in a function.
-> > 
-> > Also, I find it interesting that for PMCCFILTR_EL0 you set the NSH bit
-> > based on current exception level, but for PMEVTYPER you set it
-> > unconditionally. Why the different approaches? For convenience of is there
-> > something more?
-> 
-> No real reason. I don't really know about the PMU, just did some changes to get
-> this test working.  I'll look into if setting NSH always is fine too, then I'll
-> unconditionally do it.
+-       asm volatile ("ldr %0,[%1]\n"
+-                     "str %0,[%2]\n"
++       asm volatile ("ldr %w0,[%1]\n"
++                     "str %w0,[%2]\n"
+                      : "=&r" (r)
+                      : "r" (addr), "r" (res) : "memory");
+ }
+@@ -69,7 +69,7 @@ static inline void mem_read(unsigned int *addr, unsigned int *res)
+ static inline void mem_write(unsigned int *addr, unsigned int val)
+ {
+        /* The NOP allows the same exception handler as mem_read() to be used. */
+-       asm volatile ("str %0,[%1]\n"
++       asm volatile ("str %w0,[%1]\n"
+                      "nop\n"
+                      :
+                      : "r" (val), "r" (addr)
 
-Cool, thanks.
+It compiles and works with gcc; with clang it compiles, but I cannot run
+the test because kvm-unit-tests doesn't detect MTE support in the compiler.
 
+$ ./configure --arch=arm64 --cc=clang --cross-prefix=aarch64-linux-gnu- --cflags='--target=aarch64-linux -march=armv8.5-a+memtag'
+$ make -j32 clean && make -j32
+$ ./run_tests.sh -g mte
+config.mak: line 13: -march=armv8.5-a+memtag: command not found
+config.mak: line 13: -march=armv8.5-a+memtag: command not found
+SKIP mte-sync (1 tests, 1 skipped)
+SKIP mte-async (1 tests, 1 skipped)
+SKIP mte-asymm (1 tests, 1 skipped)
+
+(the error I suppose it's because configure doesn't wrap CFLAGS in quotes
+when writing config.mak).
+
+Do you have any hints about enabling MTE in clang?
+
+Thanks,
 Alex
+
