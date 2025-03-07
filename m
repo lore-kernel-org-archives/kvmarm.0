@@ -1,143 +1,97 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62224213250
-	for <kvmarm@lists.linux.dev>; Fri,  7 Mar 2025 10:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB85149C50
+	for <kvmarm@lists.linux.dev>; Fri,  7 Mar 2025 11:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741344951; cv=none; b=jVokKCuffrro8rlGzuR4zCVgqkVTVV4bQny1LPj2WhqEgO/CMzLUTe5dwCKi5pqp/lvrmm11+E2Q1KrMXjfnazaM/dsm7rUNgvACVnEqinDN4Nz1kmmGHocOGjbJjZAtZY36sHUzypTdoh5T90VS5VZPAexhwwMMy9+RX3tk9J4=
+	t=1741347261; cv=none; b=mLEwkX1PPWg3nUJoJvOo2lFoPR5oJ6Hds11VXWuFhSh29LSEp/ZHY4/JcWMMrvznuyoRwsFgjeYupkFcuL5AeYSI8SbRgo7NPHbjJmYkiVNQLuXeN9OnFsEPVf2LFPUUF0quxSSObSWgbuozmpiVjuNO8Ta9iuSusOoEcn5HgXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741344951; c=relaxed/simple;
-	bh=YkK0gICK/vMLYgGrmG2Il3cIUNO5rmXo9eTXUuoDgdE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZWQHS8KQOazX54K5FojLNgeHLjcruzKPzXpsSCm2wtOBDtjRQHEFAkslzDneAjmRe4eZ+P+r4CvrtZktfHxEZCE1ynBpX0sjgqd81UKX4ga7HsIJCAYL6kNEt3+zSXJgjAewSbaWtyFqLYD1UG6CL60ses8nw9IuutMQeBYwl3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=wh4JCz77; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+	s=arc-20240116; t=1741347261; c=relaxed/simple;
+	bh=mc8GdzR9S6fQkS0ghgXW9r2iwc49GNMDkYndkVxx+To=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HUjR2G8maA4K0VCYvd3xTNjXVLTZx3GemAoFR6lQSH3sUk5JaMbOaWR/4UUxW3IFh8Bd/oW87xKMCE1dDm0ko4cw2cJ/iGGEnikHqqDIZP+7EoX6dqP9XCj00qxp1JurouA1TGathpqI9oj7v5Wyw/e4YIffu7S7JeKVS9GX3hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rXj4ihgi; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="wh4JCz77"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223594b3c6dso29389235ad.2
-        for <kvmarm@lists.linux.dev>; Fri, 07 Mar 2025 02:55:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rXj4ihgi"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43bcde3f887so11875765e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 07 Mar 2025 03:34:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741344947; x=1741949747; darn=lists.linux.dev;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=84BQ3xuE/YOejwCkRVmGYfJqvNZTn+GmxFcneIOkJqE=;
-        b=wh4JCz779MjJYWI2OwELkaxIKJdUQjKtPICPUTYTKylH65OyXXOJtyb5CAI5EADjkf
-         IZEcw75TbdzXZaOPnx68FBKavm8oz94dpvM+yOBqpdsBf47hlwfIh8TDlupGewkqPQ7P
-         eV3fJRWlJ7rf/XeoMNSNyM+R6fk1JwsnyErjGVn2zM3l+CrbAyIkDB+OzQzsK2LNeDsh
-         bzNYok2/ExSvNrEta8uGhbN75HBzOiojx7Az4ZU86chdOrvteBZKyqk62j3tGhQP1YrP
-         NIS963IiIo+TzjULkBhyC3CUYaSlKeTvCOkURlGLPP+ROznQP97rbCBFIc88gJg2nEw4
-         Y7jA==
+        d=google.com; s=20230601; t=1741347257; x=1741952057; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gWRrS3x4cauUfBmtdb7CWhXFgQlJhhYmJ5IHCDodbtg=;
+        b=rXj4ihgi7URoDQCafT6++u+M0A2PhGCfd3qBfc10YoiK4UtCZkDxdTO2Jj8b8b2EcU
+         /5ZtzsyTZas1U6fDjHLgTuTWpMyGCRmDHXLBGsYw3694zXdgiZ2SZHuCW+A/U9jYBmOQ
+         o585fQx1sJFJQtdPnYWRfb1gvgJYZ55cfHsR+qgD27PpSJ2Klb8KuOPJWFS6164frSQI
+         KDDKs8g+U1sod9Ol4YlpL9OBE5Hnf2YQyA8F0aYnkSwsP8SMGqMoHmQ2HbVA5Y2w/Lly
+         AkjbUZzzqRsfCLVW812cXbmCS8znbxH8fEjxwbovp1QXE1Ay3ztX+xSXZUIbLcZnvqsR
+         HUiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741344947; x=1741949747;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=84BQ3xuE/YOejwCkRVmGYfJqvNZTn+GmxFcneIOkJqE=;
-        b=WBQRJvD6XRWEwadgaa/szo1xeHigPTe7EHwVDzv5kgU2J/BJATK+Yaed7WRBNS6O0d
-         BHk4/Z79YPczTdgyoPww8cj8VDpPdeZh8VlZdDxbIqJXO1xpZ/vBG9Mve37Z7wyUyPiX
-         ufwUYE3s4dKzsoxBy4mcB31IB4olgAp/Q6ML5WKY5nyMhNpT4pkO6pmobNHWIF+6MndI
-         heFUK8WF3h4ryNys6kto7oNtdlfMiTZJdCR5ufzukrXKK/0QeBwLldb5M0bpgKa2+qx7
-         9VhF8LR/TkEq+hro2ZjZS6am93wjeBKICgC74Am4r6chcPkNYNUZLY8MTgJ6WUuEGiux
-         JJnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfDs+ZTvoJHUXJmTnclRThImXG1BD793TqAx7BNNX8MzRi21Pt71KCdU/R216uKPm5Ok1qiA0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw3W6MjsdivirGJ7wgew9/bGvI+g1yQOXA/RrFZpZxj2f5DpVqG
-	uvRRNJG+i8Ztq8dTpaiX+g4Hc677ZQiGcEB/BxF92Vi6pzzSy4nTSzEAoQQC4y4=
-X-Gm-Gg: ASbGnctoQVUL+zjjiC3OhMjn9L3cBAlt6vIjAK5lRf88LJkkqD81ojd+AGQM0nPAXK3
-	7OX4ODfXDOWlM2Q3OOkM8Go6dWRybqoVZgMWRzzeorlF16Dy34ETxQ/08mnTabPTGLm3SLiJYLQ
-	iYB26E0yzen1nrZVmxojpfnuaEiVXBRQ7Zad7M8OqKyK+4eeJUdoEE49JOaoCGRzy3u8zlFzOqx
-	j5AElaSTffzF83K0GUkkCAZFvqruyF7Xx7Amtol33dTT/4pt3h26P1Aq01gZlAx/foZ3YUzFkYf
-	c+s//JjSX8dz86fxtQSnw9hIQ8wz5I/hXYa02xs+SxvVjtU8
-X-Google-Smtp-Source: AGHT+IF+CLimdfiOZ0VORULGUWByolFc/6pJXp6pWb1JSm9n2C2SEbnZP1Xs53CSe+DMcCSm/ABWvA==
-X-Received: by 2002:a05:6a00:174b:b0:736:6ac4:d204 with SMTP id d2e1a72fcca58-736aaa0f48amr3972025b3a.11.1741344947618;
-        Fri, 07 Mar 2025 02:55:47 -0800 (PST)
-Received: from localhost ([157.82.205.237])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-736985191cfsm3016761b3a.145.2025.03.07.02.55.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Mar 2025 02:55:47 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Fri, 07 Mar 2025 19:55:30 +0900
-Subject: [PATCH v2 3/3] KVM: arm64: PMU: Set raw values from user to
- PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
+        d=1e100.net; s=20230601; t=1741347257; x=1741952057;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gWRrS3x4cauUfBmtdb7CWhXFgQlJhhYmJ5IHCDodbtg=;
+        b=dkH3P7rwbDg9LCqxjcuLHSL9CXglVwZaigLggnYA/14HH/93uhi9/yDWARwK61yChh
+         qd9mjLvk41BEUnl4tMZ2bHnc1ToUHVxQgFtjXW+mlBdlrEzzjHw+0N7omrvS8qPZiweo
+         zqqoE0Y7Wj3zfERaxdmIv11sZJA2QULH3kMhQKHIAHgDOU1q5z88UCzzVLaFI+JYhrXr
+         8Rpf2wzt0e8S+8XUlIPV/8ILfGM9CkpXFvUElXpToGLdZJ7YGPQpjUiF2mHH3vayMKZ+
+         iuzLj9lKEBLScmyE1ho75kkuN11pj/6JjSjxDfyPUolpWuMc3d4a7lV0zHyCdrG72Y5x
+         ZGLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVffW8NVl8YxwlqazvcG1pQIYLZKEAh20bDBGWqOQN7F6Njrb1YRQSL56iymkvDnD1yBw4VCGw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxz48cR+5dMtK3lIUIzTonrSyh3Wq7tG4XJr3AU38c9B9oLYSjo
+	7OAmZuQ4s4A+cWS/rNtmJUsfjGtknq4wbkmN1YyOwGlKUtAlit9evSIpTFiQRU7uRBz71ueKLd3
+	nTdvBROowJX9R2G5NdQ==
+X-Google-Smtp-Source: AGHT+IHPB/BavFeiIuU4jP5ze2ourrXrXM89F+RxMJStp6R8CgJywz72d2FJ/8Pyx4rbvot/9rkDeqVmllP9YyEi
+X-Received: from wmbhc25.prod.google.com ([2002:a05:600c:8719:b0:43b:d212:f974])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:198f:b0:439:6101:5440 with SMTP id 5b1f17b1804b1-43c5a5f7050mr20681135e9.8.1741347257113;
+ Fri, 07 Mar 2025 03:34:17 -0800 (PST)
+Date: Fri,  7 Mar 2025 11:34:08 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250307-pmc-v2-3-6c3375a5f1e4@daynix.com>
-References: <20250307-pmc-v2-0-6c3375a5f1e4@daynix.com>
-In-Reply-To: <20250307-pmc-v2-0-6c3375a5f1e4@daynix.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, devel@daynix.com, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14.2
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
+Message-ID: <20250307113411.469018-1-vdonnefort@google.com>
+Subject: [PATCH v3 0/3] Count pKVM stage-2 usage in secondary pagetable stat
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Commit a45f41d754e0 ("KVM: arm64: Add {get,set}_user for
-PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}") changed KVM_SET_ONE_REG to update
-the mentioned registers in a way matching with the behavior of guest
-register writes. This is a breaking change of a UAPI though the new
-semantics looks cleaner and VMMs are not prepared for this.
+This series allows to count stage-2 related memory when using pKVM. The
+value can be found in the /proc/meminfo field SecPageTables.
 
-Firecracker, QEMU, and crosvm perform migration by listing registers
-with KVM_GET_REG_LIST, getting their values with KVM_GET_ONE_REG and
-setting them with KVM_SET_ONE_REG. This algorithm assumes
-KVM_SET_ONE_REG restores the values retrieved with KVM_GET_ONE_REG
-without any alteration. However, bit operations added by the earlier
-commit do not preserve the values retried with KVM_GET_ONE_REG and
-potentially break migration.
+Changes since v2: https://lore.kernel.org/all/20250304134347.369854-1-vdonnefort@google.com/
+  - Pass a pointer to kvm_hyp_memcache instead of just the flags
+    (Oliver)
 
-Remove the bit operations that alter the values retrieved with
-KVM_GET_ONE_REG.
+Changes since v1: https://lore.kernel.org/all/20250228121355.1377891-1-vdonnefort@google.com/
+  - Flags to kvm_hyp_memcache
+  - Separate stage-2 memcache
+  - Account for PGD
 
-Fixes: a45f41d754e0 ("KVM: arm64: Add {get,set}_user for PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}")
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- arch/arm64/kvm/sys_regs.c | 21 +--------------------
- 1 file changed, 1 insertion(+), 20 deletions(-)
+Vincent Donnefort (3):
+  KVM: arm64: Add flags to kvm_hyp_memcache
+  KVM: arm64: Distinct pKVM teardown memcache for stage-2
+  KVM: arm64: Count pKVM stage-2 usage in secondary pagetable stats
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 51054b7befc0b4bd822cecf717ee4a4740c4a685..2f44d4d4f54112787683dd75ea93fd60e92dd31f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1142,26 +1142,7 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 val)
- {
--	bool set;
--
--	val &= kvm_pmu_valid_counter_mask(vcpu);
--
--	switch (r->reg) {
--	case PMOVSSET_EL0:
--		/* CRm[1] being set indicates a SET register, and CLR otherwise */
--		set = r->CRm & 2;
--		break;
--	default:
--		/* Op2[0] being set indicates a SET register, and CLR otherwise */
--		set = r->Op2 & 1;
--		break;
--	}
--
--	if (set)
--		__vcpu_sys_reg(vcpu, r->reg) |= val;
--	else
--		__vcpu_sys_reg(vcpu, r->reg) &= ~val;
--
-+	__vcpu_sys_reg(vcpu, r->reg) = val & kvm_pmu_valid_counter_mask(vcpu);
- 	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
- 
- 	return 0;
+ arch/arm64/include/asm/kvm_host.h |  4 ++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    |  7 ++++---
+ arch/arm64/kvm/mmu.c              | 22 +++++++++++++++++-----
+ arch/arm64/kvm/pkvm.c             |  5 +++++
+ 4 files changed, 30 insertions(+), 8 deletions(-)
 
+
+base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
 -- 
-2.48.1
+2.49.0.rc0.332.g42c0ae87b1-goog
 
