@@ -1,106 +1,250 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C760238173;
-	Fri,  7 Mar 2025 16:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E3F1A9B24
+	for <kvmarm@lists.linux.dev>; Fri,  7 Mar 2025 22:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741364310; cv=none; b=mL6kTsRUtrhJ14n/s+UKhJT/sBua9OrLux9yWx2Vr02uw2PkYjORHrzCl0+nFCNeXiwbawF0ZxWNDeBM/nbi53rQjvlvBmf2iKzz5hc7XS8h/i+yO/dPB2Zhf6v2BdyrE5fj9zhEsiEmsFfu0GJo7kDckDpusnHiXg+SCKltLQk=
+	t=1741384988; cv=none; b=eg7ESpLYaK1rIql5SBEN/1ykf+/3606fiZfhEgFD7HOIrghT3XM6EdWQdCVIcxPdEQHe5OJ1ruo42HCYSVLLv0GCkgoMmxwldkzaMBQTwbNUjn/94023OxvHAapjOb3Keqk87KALHjPeHSWWA3GSoF3L4zINbIV4iBEpTMmoCl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741364310; c=relaxed/simple;
-	bh=dou9LxTbjCg/TK9bz3v6nlT4kc6yvpg0t7FYG2dWH3o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lzt/d0pbqhRLGn8bcr1SNuUFBjJPfsnu8mAyLIzG2H6d8U6in/BK/1P3EnkPwLLNdtl12Gj4/tFDro660hLFb+hOKQG1LXE6csA8ih76Qrr9NqC390MQmroqzjGIAPFwlKucocd5iA4p+e75b6ZupuzGOB2++PwtLUOyCMIFTNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJeSkNOa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741384988; c=relaxed/simple;
+	bh=ZDs+cWHaRdXvWL+LMMPPCUTQZBuKmfGOqfAfVjkDFFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rlVCVuXUUl5Bh17X/MerINhbCrefSH4goiG35siYfpV2ioGfHc/g3dPyGSC7UPQmYENqWlNyMUyusFR6elk3n2EB3jRQZx55IDMwnJyPJ+7RlXihOU/Y5WJXRYUEpZ3SfTAyS0lVYd3wwIDcHNslejwFpavJRAItPHq5juK0/aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qiwmXZCF; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJeSkNOa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 624BBC4CED1;
-	Fri,  7 Mar 2025 16:18:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741364309;
-	bh=dou9LxTbjCg/TK9bz3v6nlT4kc6yvpg0t7FYG2dWH3o=;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qiwmXZCF"
+Received: from romank-3650.corp.microsoft.com (unknown [131.107.160.188])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 7B05B2038F3C;
+	Fri,  7 Mar 2025 14:03:05 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7B05B2038F3C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1741384985;
+	bh=cXsPWlsFIKON2Ovcl69jG4G92FuWlywnN/41uzlgDrk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=lJeSkNOaWizpe65670I85HU9y6eg0HmOUp4LJ+c5Y05gNDJQFLl++Ag1xmLpkkdIo
-	 xefmR/NR+AJyD58NKDuyPZxLOj8QSjmrwavVFdSIXQMpIVT/sKylb3tO2zh5p6g6uI
-	 SGuIHVc+gQQVC7skzekT+0WroizhwoPhZrDFh3F2XU1dyCcdoIMAue2FPWCY5isglZ
-	 JASfYBN8YpD71Ny9frSiw5P7qToxQQ6ZkV96iWFwZxjm1k08O8YESkUT8d+2CiJ29F
-	 4kEhpHAuELMF3O/FI5zPsjubMBxFAIh0yzgawNFAtjaBvzrcVq1Yo/e6nSUkaFkuIk
-	 MOnzUIn91yKUQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tqaP4-00BT9x-Uf;
-	Fri, 07 Mar 2025 16:18:27 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ahmed Genidi <ahmed.genidi@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Leo Yan <leo.yan@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	b=qiwmXZCFlJqOEz+JF5NsPOhlXckCMqFJAZyTX35zIBxX4atVC9/atIyskhWvzVBkB
+	 Rlx8A+5is7B7uDVAW93hMjtwBmnOq111KZwq/xrYehH6UQ+PnnNvZ8Z+DqRYsJw2jv
+	 20y9J5OVqBDRU9Lqb9EviPx/P8TZtnUX+x/ypR0U=
+From: Roman Kisel <romank@linux.microsoft.com>
+To: arnd@arndb.de,
+	bhelgaas@google.com,
+	bp@alien8.de,
+	catalin.marinas@arm.com,
+	conor+dt@kernel.org,
+	dave.hansen@linux.intel.com,
+	decui@microsoft.com,
+	haiyangz@microsoft.com,
+	hpa@zytor.com,
+	joey.gouly@arm.com,
+	krzk+dt@kernel.org,
+	kw@linux.com,
+	kys@microsoft.com,
+	lenb@kernel.org,
+	lpieralisi@kernel.org,
+	manivannan.sadhasivam@linaro.org,
+	mark.rutland@arm.com,
+	maz@kernel.org,
+	mingo@redhat.com,
+	oliver.upton@linux.dev,
+	rafael@kernel.org,
+	robh@kernel.org,
+	ssengar@linux.microsoft.com,
+	sudeep.holla@arm.com,
+	suzuki.poulose@arm.com,
+	tglx@linutronix.de,
+	wei.liu@kernel.org,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	devicetree@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #4
-Date: Fri,  7 Mar 2025 16:18:24 +0000
-Message-Id: <20250307161824.2373079-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	x86@kernel.org
+Cc: apais@microsoft.com,
+	benhill@microsoft.com,
+	bperkins@microsoft.com,
+	sunilmut@microsoft.com
+Subject: [PATCH hyperv-next v5 00/11] arm64: hyperv: Support Virtual Trust Level Boot
+Date: Fri,  7 Mar 2025 14:02:52 -0800
+Message-ID: <20250307220304.247725-1-romank@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, ahmed.genidi@arm.com, ben.horgan@arm.com, catalin.marinas@arm.com, leo.yan@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+This patch set allows the Hyper-V code to boot on ARM64 inside a Virtual Trust
+Level. These levels are a part of the Virtual Secure Mode documented in the
+Top-Level Functional Specification available at
+https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/vsm.
 
-Here's what I hope to be the last set of 6.14 fixes for
-KVM/arm64. This time, two patches addressing the two side of the same
-bug, where pKVM's PSCI relay wasn't correctly setting up the CPUs when
-in the hVHE mode. Thanks to Ahmed and Mark for fixing it.
+The OpenHCL paravisor https://github.com/microsoft/openvmm/tree/main/openhcl
+can serve as a practical application of these patches on ARM64.
 
-Please pull,
+For validation, I built kernels for the {x86_64, ARM64} x {VTL0, VTL2} set with
+a small initrd embedded into the kernel and booted VMs managed by Hyper-V and
+OpenVMM off of that.
 
-	M.
+Starting from V5, the patch series includes a non-functional change to KVM on
+arm64 which I tested as well.
 
-The following changes since commit fa808ed4e199ed17d878eb75b110bda30dd52434:
+[V5]
+    - Provide and use a common SMCCC-based infra for the arm64 hypervisor guests
+      to detect hypervisor presence.
+    ** Thank you, Arnd! **
 
-  KVM: arm64: Ensure a VMID is allocated before programming VTTBR_EL2 (2025-02-20 16:29:28 +0000)
+    - Fix line wraps to follow the rest of the code.
+    - Open-code getting IRQ domain parent in the ACPI case to make the code
+      better.
+    ** Thank you, Bjorn! **
 
-are available in the Git repository at:
+    - Test the binding with the latest dtschema.
+    - Clean up the commit title and description.
+    - Use proper defines for known constants.
+    ** Thank you, Krzysztof! **
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-4
+    - Extend comment on why ACPI v6 is checked for.
+    - Reorder patches to make sure that even with partial series application
+      the compilation succeeds.
+    - Report VTL the kernel runs in.
+    - Use "X86_64" in Kconfig rather than "X86".
+    - Extract a non-functional change for hv_get_vmbus_root_device() into
+      a separate patch.
+    ** Thank you, Michael! **
 
-for you to fetch changes up to 3855a7b91d42ebf3513b7ccffc44807274978b3d:
+[V4]
+    https://lore.kernel.org/linux-hyperv/20250212014321.1108840-1-romank@linux.microsoft.com/
+    - Fixed wording to match acronyms defined in the "Terms and Abbreviations"
+      section of the SMCCC specification throughout the patch series.
+      **Thank you, Michael!**
 
-  KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu() (2025-03-02 08:36:52 +0000)
+    - Replaced the hypervisor ID containing ASCII with an UUID as
+      required by the specification.
+      **Thank you, Michael!**
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.14, take #4
+    - Added an explicit check for `SMCCC_RET_NOT_SUPPORTED` when discovering the
+      hypervisor presence to make the backward compatibility obvious.
+      **Thank you, Saurabh!**
 
-- Fix a couple of bugs affecting pKVM's PSCI relay implementation
-  when running in the hVHE mode, resulting in the host being entered
-  with the MMU in an unknown state, and EL2 being in the wrong mode.
+    - Split the fix for `get_vtl(void)` out to make it easier to backport.
+    - Refactored the configuration options as requested to eliminate the risk
+      of building non-functional kernels with randomly selected options.
+      **Thank you, Michael!**
 
-----------------------------------------------------------------
-Ahmed Genidi (1):
-      KVM: arm64: Initialize SCTLR_EL1 in __kvm_hyp_init_cpu()
+    - Refactored the changes not to introduce an additional file with
+      a one-line function.
+      **Thank you, Wei!**
 
-Mark Rutland (1):
-      KVM: arm64: Initialize HCR_EL2.E2H early
+    - Fixed change description for the VMBus DeviceTree changes, used
+      `scripts/get_maintainers.pl` on the latest kernel to get the up-to-date list
+      of maintainers as requested.
+      **Thank you, Krzysztof!**
 
- arch/arm64/include/asm/el2_setup.h   | 31 ++++++++++++++++++++++++++-----
- arch/arm64/kernel/head.S             | 22 +++-------------------
- arch/arm64/kvm/hyp/nvhe/hyp-init.S   | 10 +++++++---
- arch/arm64/kvm/hyp/nvhe/psci-relay.c |  3 +++
- 4 files changed, 39 insertions(+), 27 deletions(-)
+    - Removed the added (paranoidal+superfluous) checks for DMA coherence in the
+      VMBus driver and instead relied on the DMA and the OF subsystem code.
+      **Thank you, Arnd, Krzysztof, Michael!**
+
+    - Used another set of APIs for discovering the hardware interrupt number
+      in the VMBus driver to be able to build the driver as a module.
+      **Thank you, Michael, Saurabh!**
+
+    - Renamed the newly introduced `get_vmbus_root_device(void)` function to
+      `hv_get_vmbus_root_device(void)` as requested.
+      **Thank you, Wei!**
+
+    - Applied the suggested small-scale refactoring to simplify changes to the Hyper-V
+      PCI driver. Taking the offered liberty of doing the large scale refactoring
+      in another patch series.
+      **Thank you, Michael!**
+
+    - Added a fix for the issue discovered internally where the CPU would not
+      get the interrupt from a PCI device attached to VTL2 as the shared peripheral
+      interrupt number (SPI) was not offset by 32 (the first valid SPI number).
+      **Thank you, Brian!**
+
+[V3]
+    https://lore.kernel.org/lkml/20240726225910.1912537-1-romank@linux.microsoft.com/
+    - Employed the SMCCC function recently implemented in the Microsoft Hyper-V
+      hypervisor to detect running on Hyper-V/arm64. No dependence on ACPI/DT is
+      needed anymore although the source code still falls back to ACPI as the new
+      hypervisor might be available only in the Windows Insiders channel just
+      yet.
+    - As a part of the above, refactored detecting the hypervisor via ACPI FADT.
+    - There was a suggestion to explore whether it is feasible or not to express
+      that ACPI must be absent for the VTL mode and present for the regular guests
+      in the Hyper-V Kconfig file.
+      My current conclusion is that this will require refactoring in many places.
+      That becomes especially convoluted on x86_64 due to the MSI and APIC
+      dependencies. I'd ask to let us tackle that in another patch series (or chalk
+      up to nice-have's rather than fires to put out) to separate concerns and
+      decrease chances of breakage.
+    - While refactoring `get_vtl(void)` and the related code, fixed the hypercall
+      output address not to overlap with the input as the Hyper-V TLFS mandates:
+      "The input and output parameter lists cannot overlap or cross page boundaries."
+      See https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/hypercall-interface
+      for more.
+      Some might argue that should've been a topic for a separate patch series;
+      I'd counter that the change is well-contained (one line), has no dependencies,
+      and makes the code legal.
+    - Made the VTL boot code (c)leaner as was suggested.
+    - Set DMA cache coherency for the VMBus.
+    - Updated DT bindings in the VMBus documentation (separated out into a new patch).
+    - Fixed `vmbus_set_irq` to use the API that works both for the ACPI and OF.
+    - Reworked setting up the vPCI MSI IRQ domain in the non-ACPI case. The logic
+      looks a bit fiddly/ad-hoc as I couldn't find the API that would fit the bill.
+      Added comments to explain myself.
+
+[V2]
+    https://lore.kernel.org/all/20240514224508.212318-1-romank@linux.microsoft.com/
+    - Decreased number of #ifdef's
+    - Updated the wording in the commit messages to adhere to the guidlines
+    - Sending to the correct set of maintainers and mail lists
+
+[V1]
+    https://lore.kernel.org/all/20240510160602.1311352-1-romank@linux.microsoft.com/
+
+Roman Kisel (11):
+  arm64: kvm, smccc: Introduce and use API for detectting hypervisor
+    presence
+  arm64: hyperv: Use SMCCC to detect hypervisor presence
+  Drivers: hv: Enable VTL mode for arm64
+  Drivers: hv: Provide arch-neutral implementation of get_vtl()
+  arm64: hyperv: Initialize the Virtual Trust Level field
+  arm64, x86: hyperv: Report the VTL the system boots in
+  dt-bindings: microsoft,vmbus: Add interrupts and DMA coherence
+  Drivers: hv: vmbus: Get the IRQ number from DeviceTree
+  Drivers: hv: vmbus: Introduce hv_get_vmbus_root_device()
+  ACPI: irq: Introduce acpi_get_gsi_dispatcher()
+  PCI: hv: Get vPCI MSI IRQ domain from DeviceTree
+
+ .../bindings/bus/microsoft,vmbus.yaml         |  8 +-
+ arch/arm64/hyperv/mshyperv.c                  | 46 +++++++++--
+ arch/arm64/kvm/hypercalls.c                   |  5 +-
+ arch/x86/hyperv/hv_init.c                     | 34 --------
+ arch/x86/hyperv/hv_vtl.c                      |  2 +-
+ drivers/acpi/irq.c                            | 14 +++-
+ drivers/firmware/smccc/kvm_guest.c            | 10 +--
+ drivers/firmware/smccc/smccc.c                | 19 +++++
+ drivers/hv/Kconfig                            | 10 ++-
+ drivers/hv/hv_common.c                        | 31 ++++++++
+ drivers/hv/vmbus_drv.c                        | 59 ++++++++++++--
+ drivers/pci/controller/pci-hyperv.c           | 79 +++++++++++++++++--
+ include/asm-generic/mshyperv.h                |  6 ++
+ include/hyperv/hvgdk_mini.h                   |  2 +-
+ include/linux/acpi.h                          |  5 +-
+ include/linux/arm-smccc.h                     | 55 ++++++++++++-
+ include/linux/hyperv.h                        |  2 +
+ 17 files changed, 308 insertions(+), 79 deletions(-)
+
+
+base-commit: 3a7f7785eae7cf012af128ca9e383c91e4955354
+-- 
+2.43.0
+
