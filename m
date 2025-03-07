@@ -1,30 +1,30 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C50C2586EC
-	for <kvmarm@lists.linux.dev>; Fri,  7 Mar 2025 22:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39466259C98
+	for <kvmarm@lists.linux.dev>; Fri,  7 Mar 2025 22:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741384990; cv=none; b=fsmYfXS3OlIl8SDMuZpDejJvdSewpLxiU4ABQ3tVPmneJJDgWYRBcB+cxGuNit9eoyQdYdOD1ivvqTlcLaeAkUm1fRWobY4owHJDSWkMxsdjgE1NiHWM5OHEl0qwsEvqatcCcC/kzWnUxbnhfQ0g4W/4V1N5WbZZMEZz8MDT37s=
+	t=1741384991; cv=none; b=jEsxm8twdW9rUshJRl+I4qpYIZ98vuiumN4cKWIw9Jpys1OyVuuuTvZ6z9TnmWQZifg3RrKvisLsOy6GzvU6dqxmH9GXvT2ChoG/a+SZaBEevE+BBRW5JNo8eynQdulvN6AYLT8v/BXPeyWKXc46impmwb0j6KCg/4T3UUvCIyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741384990; c=relaxed/simple;
-	bh=79aHzr8RUR8X0QjS0Nutfo1COTiyDYExxJNO3oOJY7A=;
+	s=arc-20240116; t=1741384991; c=relaxed/simple;
+	bh=mXjcVxS6yhJ7Be6C5xFnfTQiQKB5EKMcoKN9jqGsmlg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CY7hPYZhDo8MFCoc2WpPBQhUB7gso74JnCixJrJrtfR6+l51R0WA+TmGzVFE42ICWjxTbtfSaDZ6BQABiO6UsM5SSsLgQPECfOx855SIbG7sZy7jZZyzQLFqHReDu19WpSB6tZdIrJBgAHB+sCLDhpYgudQ00Zs4RufMRky+PuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IpqejOvo; arc=none smtp.client-ip=13.77.154.182
+	 MIME-Version; b=MeLtifIi8OzH+pvLJ0ezLkfHU6HL4XsyyBO7/cJUUwBzivNsUxMLzfhgd/Vg1VWy3h56sWLCS86MNvoGeMziPx9Xbo0pb+3J4IdYWmAFwljswT/fqxSiS+a2j0CFqAEm5xb1P1S3NXqp622V6+dDC8/gKAVT8TJh2qHoz4lnxnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=OS0h5GSd; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IpqejOvo"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="OS0h5GSd"
 Received: from romank-3650.corp.microsoft.com (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6F4FE2038F42;
-	Fri,  7 Mar 2025 14:03:07 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6F4FE2038F42
+	by linux.microsoft.com (Postfix) with ESMTPSA id 869FD2038F48;
+	Fri,  7 Mar 2025 14:03:08 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 869FD2038F48
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741384987;
-	bh=6ejp9VKGmkMNi+YMzNEKy938J5ilfGRLZaNcUOciZXc=;
+	s=default; t=1741384988;
+	bh=aR5FsxsIycmRcn42PG+oTQzQG5IybM8JAOJ2uJYYZWk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IpqejOvogwQq7fkkJFIx5UBw258yMNgVwiwVKJvbpy7zSfNJoFCESKEOdRtEsRVzU
-	 KtEBac0X5rQj0SiRXp2qHjP14FGW3zGctOmx//BDA18H70eNtXBrxpaTt9aPiUX8DM
-	 nM3PNV8Mzyu/hfO+lGVVs4oJe5vB/dYj7w9l6J10=
+	b=OS0h5GSdSB83+eNsI9lehhfII7iCqqXhVnSvJ/hbLXpRQzaqZfooB0Vzd+4V8oTk6
+	 i26BmsHR2wCE6ElhQM5dcmfdZVOjl4nsRhp6ZKiSYY8qb4iAGpBMXT4fZHiUUwFHGM
+	 lHsypdTC78wxPh3kC8K/061cp7wmt0we2hrq4iZY=
 From: Roman Kisel <romank@linux.microsoft.com>
 To: arnd@arndb.de,
 	bhelgaas@google.com,
@@ -68,9 +68,9 @@ Cc: apais@microsoft.com,
 	benhill@microsoft.com,
 	bperkins@microsoft.com,
 	sunilmut@microsoft.com
-Subject: [PATCH hyperv-next v5 05/11] arm64: hyperv: Initialize the Virtual Trust Level field
-Date: Fri,  7 Mar 2025 14:02:57 -0800
-Message-ID: <20250307220304.247725-6-romank@linux.microsoft.com>
+Subject: [PATCH hyperv-next v5 08/11] Drivers: hv: vmbus: Get the IRQ number from DeviceTree
+Date: Fri,  7 Mar 2025 14:03:00 -0800
+Message-ID: <20250307220304.247725-9-romank@linux.microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250307220304.247725-1-romank@linux.microsoft.com>
 References: <20250307220304.247725-1-romank@linux.microsoft.com>
@@ -82,29 +82,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Various parts of the hyperv code need to know what VTL
-the kernel runs at, most notably VMBus needs that to
-establish communication with the host.
+The VMBus driver uses ACPI for interrupt assignment on
+arm64 hence it won't function in the VTL mode where only
+DeviceTree can be used.
 
-Initialize the Virtual Trust Level field to enable
-booting in the Virtual Trust Level.
+Update the VMBus driver to discover interrupt configuration
+from DT.
 
 Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
+Reviewed-by: Michael Kelley <mhklinux@outlook.com>
 ---
- arch/arm64/hyperv/mshyperv.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/hv/vmbus_drv.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
-index c647db56fd6b..a7db03f5413d 100644
---- a/arch/arm64/hyperv/mshyperv.c
-+++ b/arch/arm64/hyperv/mshyperv.c
-@@ -107,6 +107,7 @@ static int __init hyperv_init(void)
+diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
+index 75eb1390b45c..c8474b48dcd2 100644
+--- a/drivers/hv/vmbus_drv.c
++++ b/drivers/hv/vmbus_drv.c
+@@ -2345,6 +2345,36 @@ static int vmbus_acpi_add(struct platform_device *pdev)
+ }
+ #endif
  
- 	if (ms_hyperv.priv_high & HV_ACCESS_PARTITION_ID)
- 		hv_get_partition_id();
-+	ms_hyperv.vtl = get_vtl();
++static int __maybe_unused vmbus_set_irq(struct platform_device *pdev)
++{
++	struct irq_data *data;
++	int irq;
++	irq_hw_number_t hwirq;
++
++	irq = platform_get_irq(pdev, 0);
++	if (irq == 0) {
++		pr_err("VMBus interrupt mapping failure\n");
++		return -EINVAL;
++	}
++	if (irq < 0) {
++		pr_err("VMBus interrupt data can't be read from DeviceTree, error %d\n", irq);
++		return irq;
++	}
++
++	data = irq_get_irq_data(irq);
++	if (!data) {
++		pr_err("No interrupt data for VMBus virq %d\n", irq);
++		return -ENODEV;
++	}
++	hwirq = irqd_to_hwirq(data);
++
++	vmbus_irq = irq;
++	vmbus_interrupt = hwirq;
++	pr_debug("VMBus virq %d, hwirq %d\n", vmbus_irq, vmbus_interrupt);
++
++	return 0;
++}
++
+ static int vmbus_device_add(struct platform_device *pdev)
+ {
+ 	struct resource **cur_res = &hyperv_mmio;
+@@ -2359,6 +2389,12 @@ static int vmbus_device_add(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
  
- 	ms_hyperv_late_init();
++#ifndef HYPERVISOR_CALLBACK_VECTOR
++	ret = vmbus_set_irq(pdev);
++	if (ret)
++		return ret;
++#endif
++
+ 	for_each_of_range(&parser, &range) {
+ 		struct resource *res;
  
 -- 
 2.43.0
