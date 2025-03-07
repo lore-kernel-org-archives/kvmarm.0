@@ -1,104 +1,180 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29647211276
-	for <kvmarm@lists.linux.dev>; Fri,  7 Mar 2025 11:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88C721D5BB;
+	Fri,  7 Mar 2025 15:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741347322; cv=none; b=AbuSJMBWNyGWwMHaC5VdijtsJUSmjt+DLShdtAtFs+g8Ic6oloDVsw/pzxd795nIoK9X6SYEDOnAe/kZNhjHFZe1Wf93s2w9cWmZsVMXby+ZwEYmTPRU2Ljf3NTD5e3QicR5o7uTyvy1Nwmuop6f53hwDxL+slPswl6rDnhNFtM=
+	t=1741362240; cv=none; b=fs9TawiypTj6h39eIne70LEXe5d8zKZUn9sjj3T5EZ31IbTNZLqX/BuQg7K3lqOE1CN2nDgYvajiWoiXJlF1LDYYuclPfWdCMr7H1CDrmCRBJJm3r6HhIm6emDdRVsALw7WmcJAylYm7Gtbz42PcPxckHGduk+NMnB39qxp26uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741347322; c=relaxed/simple;
-	bh=IoVuQEdepfRvzlxrsClyF2IYX1axCE/yG9AQE63tqvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bJf3DSAoidUd146IxVmMRR523bhPekIKvw5DEEwgmYXEfeveh3P1KQxndOReArfQFJQzISk5dILeR2KWeGgvX9icNgNJPc+qeJ1CESPvFODHIyGwCDSPEAvqOuHefXi1JT8T9tLsheuT1DfdtV6muQpEecAull65lbBLhrgvE0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hdNo69VN; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hdNo69VN"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43bccfa7b89so14415275e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 07 Mar 2025 03:35:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741347318; x=1741952118; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BNAp1guL3DdfnvorYMboaljiCgvGEgEmNmgxMM62RUY=;
-        b=hdNo69VNeIxDIduk27DNGpojo50ku+TRvEPVcGpsR3hiq//JeLk4prA9ikG69bBE8M
-         btMD3v/DuvXrPxln44VMCLKiVdhNifa77sDIluymLV/qvp0ZrNzgPjyjB9QkBwx+0t4R
-         MAFZJafceXlqICwnd91utHM+4o42ui2WjxgcahlSOAgfFKkGd8v0fwG+u5xP1qEUfX+Y
-         4XQPsqalmeRbGKFjw1BsjZWdwAatYJDh2hIVbUzjvyg0MjzpJRrsOd3ZyhaZJQQ2e6om
-         Txe1MoUzvOEH3PnL/m/NhpPn1qvdadoDHYVuTu6L+/fihJ2FcuP3WZh1lVNTnUk6HfuO
-         du9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741347318; x=1741952118;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNAp1guL3DdfnvorYMboaljiCgvGEgEmNmgxMM62RUY=;
-        b=ZKL/AyKHN0vR5lxjUJ8rEfjtdMMm1+Dgz1j2xdskH2ihmN22F8fe75VSubT6lKOgul
-         PCgXECECFblxePW13qBjzq+bVkqNnYnP8WwSeMcSkbDeu+dm4H/4yf0/AC1oUcgN1F67
-         VU5v06mskGEhRj7qf/lPOJzdTVPZZu3r1AqeKBiKl3FUfJMdHmMwi6xswOKp60XjMeeY
-         uGPJ0G97OL8l3TsBsMQB5PHIYxHxuMauDvKSh9lNCmNeHRJeXw9dYMCsH/aHWt3EeIi9
-         VDm0whcsyRZL/C4GU0tiKtcgxJG5n4nAbIrubJHH1NB2woPmOo8K8JnKLZP/D3YH+kCK
-         64Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCWmoTY1yHMKwmDXXIUSrPgcXM/2t6vUOhvKIwqAflfUO/TFez2K+HFIkGwCiSIFdZ1qCStwDyI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwKjh6tZPrlcus7WFiXMBaZ99oOQrFmYvvd4GSM0UrPuE7pkG8l
-	fZTRcDZEWFKZjGvlYxSMtxeLZrMwwknIgZvgEXvjWHf5W1OfUIsddynF2I9Y3w==
-X-Gm-Gg: ASbGnctllC8fz+GfuLWfog0xX4Ud5aaAIj+goZSXWu9aSIkeu2bGG+KsX0V/M5xbMBy
-	tKoZzXGznEFDAcdt7zpCPOCybGsXygDhgNr97BWuBSkbsTx75oXudbm4m5HEKVDHLIpkIPOrOgn
-	5czrqwO+37xWTMDpcExuf1ypatvPvKmw+yttnnmtNqcUxXCX66h8928GnF6WjACEvcZVEhfRdAW
-	u2yl1O9NWupWmxIdf+wFP9vp74T26IeJaV0db4XvYYqAvek6syi3Eo2sgUjTyZdgNO/sxjRGy+e
-	qFYWGz/Y8GWItFhR4TVeGDgzRVuYdGYJxbcndEFUtI39gyzE9xgfEhG1AEVuWnQE+3GVKMEU7SY
-	sJaZtWDfGJF7W
-X-Google-Smtp-Source: AGHT+IGjS32YvEDJ0dggC62JcymX/iPFtuS61I6Hr817oYxnTdUEtKfb2H4jSY7/r9bkym5Nc7UyVQ==
-X-Received: by 2002:a05:600c:1c92:b0:43b:c284:5bc2 with SMTP id 5b1f17b1804b1-43c54a13899mr24034885e9.0.1741347318291;
-        Fri, 07 Mar 2025 03:35:18 -0800 (PST)
-Received: from google.com (105.168.195.35.bc.googleusercontent.com. [35.195.168.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c01957csm5051720f8f.47.2025.03.07.03.35.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 03:35:17 -0800 (PST)
-Date: Fri, 7 Mar 2025 11:35:13 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	qperret@google.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Add flags to kvm_hyp_memcache
-Message-ID: <Z8rZ8bBnSllaZCEs@google.com>
-References: <20250304134347.369854-1-vdonnefort@google.com>
- <20250304134347.369854-2-vdonnefort@google.com>
- <Z8qeIPfTOJU6w_8l@linux.dev>
+	s=arc-20240116; t=1741362240; c=relaxed/simple;
+	bh=WYGYqIE7tjs3Ndvg97TJgF3DQFNARamHvv9Sv/QBZgk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n4iv38oeRDTuRf9W0G/qhxjusx31CyjAXoVmCatO8PEIaT5okw1M77StDOO3PvjYGkNLf6VISYHO0LPowAhc6XWn62B9jjLj9VKIpA4NNMvtuQb/J8r59ju8S/LhK3C4vYTBjud2Pp4jNoPyg+rRTQ0ZCTLrP8ODMslHXK2QLRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8239C1477;
+	Fri,  7 Mar 2025 07:44:10 -0800 (PST)
+Received: from [10.1.35.22] (e122027.cambridge.arm.com [10.1.35.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D558B3F66E;
+	Fri,  7 Mar 2025 07:43:53 -0800 (PST)
+Message-ID: <4566d2d1-1f59-49e3-ad75-45c27ac4dfda@arm.com>
+Date: Fri, 7 Mar 2025 15:43:51 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8qeIPfTOJU6w_8l@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 12/45] arm64: RME: Allocate/free RECs to match vCPUs
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-13-steven.price@arm.com>
+ <7639eca7-8fd8-491c-90bd-1be084fbd710@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <7639eca7-8fd8-491c-90bd-1be084fbd710@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 06, 2025 at 11:20:00PM -0800, Oliver Upton wrote:
-> Hi Vincent,
+Hi Gavin,
+
+On 03/03/2025 07:08, Gavin Shan wrote:
+> On 2/14/25 2:13 AM, Steven Price wrote:
+>> The RMM maintains a data structure known as the Realm Execution Context
+>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+>> virtual CPUs. KVM must delegate memory and request the structures are
+>> created when vCPUs are created, and suitably tear down on destruction.
+>>
+>> RECs must also be supplied with addition pages - auxiliary (or AUX)
+>> granules - for storing the larger registers state (e.g. for SVE). The
+>> number of AUX granules for a REC depends on the parameters with which
+>> the Realm was created - the RMM makes this information available via the
+>> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
+>> (RD).
+>>
+>> Note that only some of register state for the REC can be set by KVM, the
+>> rest is defined by the RMM (zeroed). The register state then cannot be
+>> changed by KVM after the REC is created (except when the guest
+>> explicitly requests this e.g. by performing a PSCI call). The RMM also
+>> requires that the VMM creates RECs in ascending order of the MPIDR.
+>>
+>> See Realm Management Monitor specification (DEN0137) for more
+>> information:
+>> https://developer.arm.com/documentation/den0137/
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v6:
+>>   * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
+>>     realm guest.
+>>   * Support host page size being larger than RMM's granule size when
+>>     allocating/freeing aux granules.
+>> Changes since v5:
+>>   * Separate the concept of vcpu_is_rec() and
+>>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>>     the indication that the VCPU is a REC.
+>> Changes since v2:
+>>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
+>> patches.
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>>   arch/arm64/include/asm/kvm_host.h    |   3 +
+>>   arch/arm64/include/asm/kvm_rme.h     |  18 +++
+>>   arch/arm64/kvm/arm.c                 |  13 +-
+>>   arch/arm64/kvm/reset.c               |  11 ++
+>>   arch/arm64/kvm/rme.c                 | 179 +++++++++++++++++++++++++++
+>>   6 files changed, 229 insertions(+), 2 deletions(-)
+>>
 > 
-> On Tue, Mar 04, 2025 at 01:43:44PM +0000, Vincent Donnefort wrote:
-> > Add flags to kvm_hyp_memcache and propagate them up to the allocation
-> > and free callbacks. This will later allow to account for memory, based
-> > on the memcache configuration.
+> With the following one comment addressed:
 > 
-> It seems slightly more obvious to me if we pass a pointer to the
-> memcache instead, but that's just a minor nit.
-
-That sounds good!
-
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 > 
-> Unless you have a preference on this, I can change it when I apply the
-> patch.
-
-I have just sent a v3 to save you the trouble.
-
+> [...]
 > 
-> Thanks,
-> Oliver
+>>     /*
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> index 698bb48a8ae1..5db377943db4 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -6,6 +6,7 @@
+>>   #ifndef __ASM_KVM_RME_H
+>>   #define __ASM_KVM_RME_H
+>>   +#include <asm/rmi_smc.h>
+>>   #include <uapi/linux/kvm.h>
+>>     /**
+>> @@ -65,6 +66,21 @@ struct realm {
+>>       unsigned int ia_bits;
+>>   };
+>>   +/**
+>> + * struct realm_rec - Additional per VCPU data for a Realm
+>> + *
+>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
+>> this VCPU
+>> + * @rec_page: Kernel VA of the RMM's private page for this REC
+>> + * @aux_pages: Additional pages private to the RMM for this REC
+>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+>> + */
+>> +struct realm_rec {
+>> +    unsigned long mpidr;
+>> +    void *rec_page;
+>> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+>> +    struct rec_run *run;
+>> +};
+>> +
+> 
+> REC_PARAMS_AUX_GRANULES represents the maximal number of the auxiliary
+> granules.
+> Since the base page size is always larger than or equal to granule size
+> (4KB).
+> The capacity of array @aux_pages[] needs to be REC_PARAMS_AUX_GRANULES.
+> Ideally,
+> the array's size can be computed dynamically and it's allocated in
+> kvm_create_rec().
+
+This is indeed another example of where pages and granules have got
+mixed. The RMM specification provides a maximum number of granules (and
+there's a similar array in struct rec_params). Here the use of
+REC_PARAMS_AUX_GRANULES is just to keep the structure more simple (no
+dynamic allocation) with the cost of ~128bytes. Obviously if
+PAGE_SIZE>4k then this array could be smaller.
+
+> Alternatively, to keep the code simple, a comment is needed here to
+> explain why
+> the array's size has been set to REC_PARAMS_AUX_GRANULES.
+
+Definitely a valid point - this could do with a comment explaining the
+situation.
+
+> An relevant question: Do we plan to support differentiated sizes between
+> page
+> and granule? I had the assumption this feature will be supported in the
+> future
+> after the base model (equal page and granule size) gets merged first.
+
+Yes I do plan to support it. This series actually has the basic support
+in it already, with an experimental patch at the end enabling that
+support. It "works" but I haven't tested it well and I think some of the
+error handling isn't quite right yet.
+
+But there's also a bunch more work to be done (like here) to avoid
+over-allocating memory when PAGE_SIZE>4k. E.g. RTTs need an
+sub-allocator so that we don't waste an entire (larger) page on each RTT.
+
+Steve
+
