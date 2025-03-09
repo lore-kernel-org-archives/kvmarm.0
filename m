@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC402556E;
-	Sun,  9 Mar 2025 18:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B50D528;
+	Sun,  9 Mar 2025 19:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741546205; cv=none; b=Ac3FQrEWfNiyCUj5LUS6kSdGl4Bd8eTXy2njyLg6AVTK6/KYgdLalLyOAWs275Ypm6V2Bpd3VurDPl/gXTx7JoLHeF6tYmyDrX3aXPzEw17uQ12GxYehV1Sosp4tNTmJxaAIQd8jW0dtBFUQskuxi+wLeHGQ2PEyvxh53LfEv1I=
+	t=1741546869; cv=none; b=ms5+LNc4wBinkfr7b8c2A3cP9eixu3hJcCJvG/+t/6AQZcJM0iGZ8Wg1OBIGreaAKV17BgmMiu471UIqpa2dp7eFUFkUV36zdButPVVkaXjBrdopVS+v614aixjBVeUkA0l5aDgMwVRYjWsMjvbzBkVul1ezObLc+t/xM5pzFJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741546205; c=relaxed/simple;
-	bh=m0QHM1obKJOTDhSTGRvOLOHGJZreyLnqsXZwaNVPN5Y=;
+	s=arc-20240116; t=1741546869; c=relaxed/simple;
+	bh=kH5JdLfYUUDkMU6DKgUeLSwXtGrR71Mgz2D16I88pkU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=spsHfnc7Qci4APWJUW1GrKYGcmC4Xc0HS4kgTd+r7aoOPkDTnefDweCmYcs9E07UKoQL80ixmVFNSle7vSEoTvIVCBhysZq5v69hhZANAsnpIRa2YqAffh7JH9KWKWBWM91h3vv4E+BkFf1MmsM2usB34riN2MoKfthJQQ6YRlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eKp+SrHP; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=MwtKXdaYc8p7m8qlcgh/Gr/RNHJhcmAooc4YLvRAXhugBwNesSg/ebbjm3sj5Zl6rCl5mYWI2ncB0fCxowGGeW2H6/jPYVRcV/BBEKYLWJOkhb70rAba5YU9h8YeMKTc7vVhbNu+v/4UhAm+RRNMzacYon1hibrlvoCNyj722r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUDSBA8Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eKp+SrHP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57896C4CEE3;
-	Sun,  9 Mar 2025 18:50:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUDSBA8Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 661E5C4CEE3;
+	Sun,  9 Mar 2025 19:01:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741546205;
-	bh=m0QHM1obKJOTDhSTGRvOLOHGJZreyLnqsXZwaNVPN5Y=;
+	s=k20201202; t=1741546868;
+	bh=kH5JdLfYUUDkMU6DKgUeLSwXtGrR71Mgz2D16I88pkU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eKp+SrHPEUa5HlrtyrVt8ASL9i+Tk6zdasrtWolJAoHe/W9dXTsv900KnUtC+B0zy
-	 ISgoRoNcmINzYSePTr6NzzI+eJp+/2VPXmbkmmdckc9T6tX36GceqPXe1iQhsDvUB8
-	 yk7La1zLw6rEEiik2GykOMmgFvMJaXuZ+gMPEY3FeJLGm1oBNgixGoHNQa+J8LT1gc
-	 2xcDvknQ5pbqKaA0XJInllYTayuTC71e6gGH3ZaNYjUryyGW+nvHcreEPHsJU1tNSC
-	 vjm/kYk+bpreQkc6gx/1jJ8tfEXjfDyoP9jAz53XNFDwkQa+l2L6nsP2UGMqujHuD/
-	 o73avuLoeFKUA==
+	b=nUDSBA8QYKj4ib20a3S0gzNzWPwUXQt5HPtjgFPa9psXoTr6RhK9erJQDi8sH2xAQ
+	 CJ8Nq6I6tPx27GzYGUBlIIUISD8I0Q2ORxaoLJNzGHrqZz/92qzYOyDsSlFW0MCwlX
+	 tlw0L69rvsptL+078lnlCHn725mVxmdOW1wfi/phzTe7UVzAwtDRoD+qL5wmun1rUJ
+	 GT5Bf8mH/JduCeYEkUVsuVqTQWjwa4+YRVINd7rvlfdcbtW4aTjF7r+AY5Dbgk86jO
+	 wZ8Sif6RHVVQevmi0EAleR9w8jAtgB/h/aju8GsdTfNCIpeLPcE4BENTdB9oJa27Mz
+	 fyH3qk+/qY1dQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trLit-00By7j-5w;
-	Sun, 09 Mar 2025 18:50:03 +0000
-Date: Sun, 09 Mar 2025 18:50:02 +0000
-Message-ID: <865xkiox7p.wl-maz@kernel.org>
+	id 1trLta-00ByG4-3R;
+	Sun, 09 Mar 2025 19:01:06 +0000
+Date: Sun, 09 Mar 2025 19:01:05 +0000
+Message-ID: <864j02owpa.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Akihiko Odaki <akihiko.odaki@daynix.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -42,15 +42,15 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
+	Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	devel@daynix.com
-Subject: Re: [PATCH v2 2/3] KVM: arm64: PMU: Reload when user modifies registers
-In-Reply-To: <20250307-pmc-v2-2-6c3375a5f1e4@daynix.com>
+Subject: Re: [PATCH v2 3/3] KVM: arm64: PMU: Set raw values from user to PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
+In-Reply-To: <20250307-pmc-v2-3-6c3375a5f1e4@daynix.com>
 References: <20250307-pmc-v2-0-6c3375a5f1e4@daynix.com>
-	<20250307-pmc-v2-2-6c3375a5f1e4@daynix.com>
+	<20250307-pmc-v2-3-6c3375a5f1e4@daynix.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,74 +62,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, andrew.jones@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, devel@daynix.com
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, andrew.jones@linux.dev, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, devel@daynix.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-[dropping Shannon  from the list, as his Linaro email has been
-bouncing for about 10 years, and updating Andrew's email]
-
-On Fri, 07 Mar 2025 10:55:29 +0000,
+On Fri, 07 Mar 2025 10:55:30 +0000,
 Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> Commit d0c94c49792c ("KVM: arm64: Restore PMU configuration on first
-> run") added the code to reload the PMU configuration on first run.
-> Trigger the code when a user modifies a PMU register instead so that
-> PMU configuration changes made by users will be applied also after the
-> first run.
+> Commit a45f41d754e0 ("KVM: arm64: Add {get,set}_user for
+> PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}") changed KVM_SET_ONE_REG to update
+> the mentioned registers in a way matching with the behavior of guest
+> register writes. This is a breaking change of a UAPI though the new
+> semantics looks cleaner and VMMs are not prepared for this.
 > 
+> Firecracker, QEMU, and crosvm perform migration by listing registers
+> with KVM_GET_REG_LIST, getting their values with KVM_GET_ONE_REG and
+> setting them with KVM_SET_ONE_REG. This algorithm assumes
+> KVM_SET_ONE_REG restores the values retrieved with KVM_GET_ONE_REG
+> without any alteration. However, bit operations added by the earlier
+> commit do not preserve the values retried with KVM_GET_ONE_REG and
+> potentially break migration.
+> 
+> Remove the bit operations that alter the values retrieved with
+> KVM_GET_ONE_REG.
+> 
+> Fixes: a45f41d754e0 ("KVM: arm64: Add {get,set}_user for PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}")
 > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 > ---
->  arch/arm64/kvm/pmu-emul.c | 3 ---
->  arch/arm64/kvm/sys_regs.c | 5 +++++
->  2 files changed, 5 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 21 +--------------------
+>  1 file changed, 1 insertion(+), 20 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 1402cce5625bffa706aabe5e6121d1f3817a0aaf..04eb3856b96576fad5afc8927c8916ff9738f9d7 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -888,9 +888,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->  		   return -EINVAL;
->  	}
->  
-> -	/* One-off reload of the PMU on first run */
-> -	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> -
->  	return 0;
->  }
->  
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 27418dac791df9a89124f867879e899db175e506..51054b7befc0b4bd822cecf717ee4a4740c4a685 100644
+> index 51054b7befc0b4bd822cecf717ee4a4740c4a685..2f44d4d4f54112787683dd75ea93fd60e92dd31f 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1162,6 +1162,8 @@ static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 va
->  	else
->  		__vcpu_sys_reg(vcpu, r->reg) &= ~val;
+> @@ -1142,26 +1142,7 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 >  
-> +	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> +
+>  static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 val)
+>  {
+> -	bool set;
+> -
+> -	val &= kvm_pmu_valid_counter_mask(vcpu);
+> -
+> -	switch (r->reg) {
+> -	case PMOVSSET_EL0:
+> -		/* CRm[1] being set indicates a SET register, and CLR otherwise */
+> -		set = r->CRm & 2;
+> -		break;
+> -	default:
+> -		/* Op2[0] being set indicates a SET register, and CLR otherwise */
+> -		set = r->Op2 & 1;
+> -		break;
+> -	}
+> -
+> -	if (set)
+> -		__vcpu_sys_reg(vcpu, r->reg) |= val;
+> -	else
+> -		__vcpu_sys_reg(vcpu, r->reg) &= ~val;
+> -
+> +	__vcpu_sys_reg(vcpu, r->reg) = val & kvm_pmu_valid_counter_mask(vcpu);
+>  	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
+>  
 >  	return 0;
->  }
->  
-> @@ -1322,6 +1324,8 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  		val |= ARMV8_PMU_PMCR_LC;
->  
->  	__vcpu_sys_reg(vcpu, r->reg) = val;
-> +	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> +
->  	return 0;
->  }
->  
-> @@ -4276,6 +4280,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->  	}
->  
->  	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
-> +	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
+> 
 
-This should be restricted to cases where a PMU is actually available.
+Yup, this code was definitely a brain fart. Thanks for spotting it.
+One of the big mistake was to expose both CLR and SET registers to
+userspace (one of the two should have been hidden).
 
-But I also wonder what the motivation is to move this from first run
-to reset? Nothing explains it in the commit message.
+This requires a Cc to stable@vger.kernel.org so that this can be
+backported to anything from 6.12. It would also help if you put this
+patch at the head of the series, before adding the PMU request (it is
+then likely to be very easy to backport).
+
+With that,
+
+Acked-by: Marc Zyngier <maz@kernel.org>
 
 Thanks,
 
