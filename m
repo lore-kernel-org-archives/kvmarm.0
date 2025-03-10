@@ -1,71 +1,72 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25653221729
-	for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 13:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4FF1F956
+	for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 13:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741614157; cv=none; b=iZI073GAzFNQRsLaed7wtDj1Qtrx7RgK/d/p+QNwrEbhlCjQXrlrzQljxTMF7Wed/GPlKLiyU4y/V/5/sNR82vdVOUZRcTWhjURm5YS4jC1PkPIaaUfwEqnlnLd+E5QS1/e4/5ziurScjGkatbqRq9T3gjnVZNl3V1N2nnig5k4=
+	t=1741614334; cv=none; b=cE485TzxX1XuCdQlUyS7j32h89FbDMLzE6GTmb/wfiNffk2fQu2G4Gweh73QZ1H4yNM8PQaZeeNJph+FKjbkIeBG71BJoS/JlCIAphCJHM10OKFVy3noZrugUxTuwwQ5aXysnUnfZ7pG1PEmuvQv3j+kvIgrDQkNotcpQDQ0RZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741614157; c=relaxed/simple;
-	bh=9JX3XY9vPoVhLHV2mTUB+zf5fX4dLzA4Gt+vcTFbIqg=;
+	s=arc-20240116; t=1741614334; c=relaxed/simple;
+	bh=PrA7rfUbhe2Pewgr5X93FRTG1RoQPZ5lbvHmNEd0rGI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=csFH83GvxwqUMaWCg+qIwgcvS9r2Hk+K/QIITdEn5WgYT4AFwbyCDsmeXtX4hSgtcbs3DkS8KNFELwERm2EwuzHrMFsajWqBUr3RzNjqaVWpvdp2jdrRVV1Jfrdz2j5VTx5YWVLOEDk7nwCc7YBzFzkYn8dsam1Z5wc86tlPlg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDL+VEnX; arc=none smtp.client-ip=209.85.218.44
+	 To:Cc:Content-Type; b=ogdNTOSqAIIhRGX4t6AC2yn+iID3HHxcNWkqx6lbVOP/nR/WVDphdCMqn3+e5w7TuKV+iBvBm3bVDnnX513BLQmvXWPG2QNhigwNuFAAhMarMf3j3mHK51y5EcmhTePfyn4qmK1sGqNKIJWYDMHt8dDmp1wSrmI7Qij3tCLYUms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bn0o13h0; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDL+VEnX"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ac2a81e41e3so148720566b.1
-        for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 06:42:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bn0o13h0"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac28e66c0e1so203051666b.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 06:45:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741614154; x=1742218954; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1741614332; x=1742219132; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pvsHojGzktqIc1mRDfrH3Tw28TialK1JD2DdtffnVRo=;
-        b=RDL+VEnX4Ge6dSk3LIfnBBTAiVoaL02dXQWgUXLK2MBFq7X73b37Pa6ZJ3DS4YMNR+
-         lOAPa2d8rNaOC32tzryOTT16xc7C9l9sCi1JDVxz91vqL5PnMh0uc8gnuU2EnJrmJGD3
-         dMaeDalrDrkhDqfwnJq+kVjZscQgRpNkn3FeQUczUGvXwTqzFZzYUksfar5cszchUYKP
-         +zeXj3KtMZUSC43vy/mQCGpY4PhdDTxHtydGBhXpMV/rS6YuLBJQPHYkhjzOeTFC5dvM
-         gOYuiWSjTHtIQhOAaSK5WV4E+rmZk4Sj3z35oRTDjecGnBW64SAJ/TOzFe0NE4nix3Ud
-         8cOQ==
+        bh=PrA7rfUbhe2Pewgr5X93FRTG1RoQPZ5lbvHmNEd0rGI=;
+        b=bn0o13h0yr6kATOj8J4zGbPLOP/dDKR/J/ErtBrR3iC5vzCPgO5F9NbcEwbEKXTglQ
+         WbCCP6KDLHOSYqtohd6+uOY2W8rh2Q1nwwrD8LPmPtUWM0KumrjMj01ZdK1Xz113RWZK
+         vguzY3KXXLRJL/hn8jlToH8hIU82+w0Lr7XbcTFNMsV1eqOUazgIBxq1XXisLOWOiDnJ
+         p5oorkuOonRzQ4VLjECjS4palXS5bnQAeHF/y9WWigstz7HOGAeF/xcFlAdruWi3zJMT
+         i+SEQKYcZ7ox7ZH+o3GO0dkSBs9cln/ozsbwEpPCyt0E+ENN8UtcjWhCb3/8kP8LoIns
+         Ei9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741614154; x=1742218954;
+        d=1e100.net; s=20230601; t=1741614332; x=1742219132;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pvsHojGzktqIc1mRDfrH3Tw28TialK1JD2DdtffnVRo=;
-        b=hgoLPav9mP48qDv727CxteFHdpIiGaKjnqjiJS/srd857NS4i7uA6egCaEjmERVvew
-         /WS2hTspR24fJtXK6ic+Bk+NANzo6mvu47dhXkhzHrU8CKMl/TDNpOllpEROjAh54xiA
-         uLiJGt+bnTpd7S/CL/Q3iSkmPBooX+LW0socMU3QPOyyjTVJGKWSMQS51AiJhbpp24aS
-         B7uSw6pDczF+Vitu5TNQxPruhdiodaaywoWVND7AeZ2UWW0Hrj/iY+hGI3tllesJEEOs
-         ZRNh5GtSWxXDAeMCStXC02qxTV37Czf+DNSR8jsA6FpJK2qwwySw7XeH3+Utr44pietM
-         /HLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVS8x5dllcow9gHHSo2LeezgSATYTyofpFo6FT/i3TzBBWFNK90+Qm/ZDbKiZde6DYaSslteEc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzEXLq6LYIpQ9gMp52s+mnYZu3G4MYDPyR7W50imtBa6k+YhwIB
-	o7Vu9Iwry7Ns+FsyDQxkXTGRUKWs07yec3wa/bfwVeFag/TxOLgHKW95YTc2VcyiAWSD7gpSAei
-	2Adgk9S0aSOjZl+Xz6LgmCpm6OEc=
-X-Gm-Gg: ASbGncvZWkLWiqe9MkH09gnyVTF5JTmgJtb6MzRywjEcLmuHw3AACUEQwT30NUUgBOQ
-	/0Oe/OeXW+WajRMqxbI+DmKcpRQdylSAhCCeJire5ZSUIdXbS3SIKO16ksbtOLBM8WI7kZZ5rXH
-	piX0pn3DxjPLk1AyBZkzE5aVqu6iPw1uCOxwGIWiqdr1CW
-X-Google-Smtp-Source: AGHT+IFUfaQlQuaPqqkcPWFR+Uc30OuqKeGBgv4UhgRVglMXjxzsUDhKEonas+ed+S1TKw+FHpP1oVa0jMVOpi7ix8c=
-X-Received: by 2002:a17:907:9691:b0:aa6:b63a:4521 with SMTP id
- a640c23a62f3a-ac252a886dbmr1424178866b.15.1741614154071; Mon, 10 Mar 2025
- 06:42:34 -0700 (PDT)
+        bh=PrA7rfUbhe2Pewgr5X93FRTG1RoQPZ5lbvHmNEd0rGI=;
+        b=uh/oElF7XDXAuF67Go2iQMnmIs2W48Dke02M8XSTZzwtBDfBAIqO5m9DPD0KrPkiLY
+         IUGPXwfRBPY8WR5y+fOgjI/LapsAnan3mhSYfdt/jeKGWt+hADPyjKtp2C8bvsEvjJoU
+         JoF7Lf/Y/6Qy3hTzSNNb9OwhL3fGwfY1sbdviE1kxPIBF6x9L/i6RnZsA2XpCbvOij6n
+         Tf59/uJU+5+0oGfvPuaUqV50ZpKYZvjocsm4phlWuxhjCvyWA+LP7nc9oHLDsMSRKhZu
+         gGyHKrWSBULMjJAhf3nk5Pe3rBmqyh+X9T4Z+ur0qKeBS+gtScoQpycHYhnvpgV8xpZ0
+         m5yg==
+X-Forwarded-Encrypted: i=1; AJvYcCU62eafGUXnZEdQ0cgKRcL21aSTshgmd8n1HKz2KyCHEHIaz/1VXQts5+lCdyJCkA9r93va6qQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyW4LJnXAYYLlJQdy2W0VAiuT5McsAGDj0y6GRpuFDrUY57Xj9Q
+	F1EOr0lAOOJxTt8764wKdM+gvcoF86rDQ2s5gjSlHKCiOrwv9qgRmYUrIqMyoqmEEp3GizWZnZX
+	Q6dRYCvXJsGsH5uvsczOu0jIV/wI=
+X-Gm-Gg: ASbGncsEIFaGP2SmpA+flJR3aTjekMvqCE6GZZDhNv5YfZOX2q3NhQ5y/QX7qEdr/bx
+	KFL+9YPC1LDXBSqi0e0kjdtniPHxy78jotAznPrMOKOe8ngTT7spVHF2ZMfx6/BMAxXy0X+jB4p
+	xvYisEPInTaZElLgO4WOWgJhOdzLDyHHQas4WEEsb4H7yA1ysNUzuvPuc=
+X-Google-Smtp-Source: AGHT+IFrlV+UOZmk75f6ffZGqWNA8kEVBO9qwi1sfylUDo7SOrHnrhelQqcwKfQa9tx5Jczcf/SvJhuAPzOyWJApbV0=
+X-Received: by 2002:a17:906:33db:b0:ac2:7b8a:7a24 with SMTP id
+ a640c23a62f3a-ac27b8aa77emr821669466b.3.1741614331525; Mon, 10 Mar 2025
+ 06:45:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250307220304.247725-1-romank@linux.microsoft.com> <20250307220304.247725-10-romank@linux.microsoft.com>
-In-Reply-To: <20250307220304.247725-10-romank@linux.microsoft.com>
+References: <20250307220304.247725-1-romank@linux.microsoft.com> <20250307220304.247725-5-romank@linux.microsoft.com>
+In-Reply-To: <20250307220304.247725-5-romank@linux.microsoft.com>
 From: Tianyu Lan <ltykernel@gmail.com>
-Date: Mon, 10 Mar 2025 21:41:57 +0800
-X-Gm-Features: AQ5f1JrFNYOkTeGrjIoQMzNLPYhLnbwrDYGfCpL3y-Ny919xFrzmZmgmS7VWREs
-Message-ID: <CAMvTesCFZ6sxQp7qqSDjD9idRjVHxh96Sp4betomgFH-OFLZ3Q@mail.gmail.com>
-Subject: Re: [PATCH hyperv-next v5 09/11] Drivers: hv: vmbus: Introduce hv_get_vmbus_root_device()
+Date: Mon, 10 Mar 2025 21:44:55 +0800
+X-Gm-Features: AQ5f1JqLOmSVWjJdyk8kWYqh8Q05Ls-ycUphJL8s1J0KBJmCwQzJ1qeS4exHJxg
+Message-ID: <CAMvTesC+McATYa-xsi0omJ0LnFUUUooBk_r+oYSHYimyXPz5ZA@mail.gmail.com>
+Subject: Re: [PATCH hyperv-next v5 04/11] Drivers: hv: Provide arch-neutral
+ implementation of get_vtl()
 To: Roman Kisel <romank@linux.microsoft.com>
 Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de, catalin.marinas@arm.com, 
 	conor+dt@kernel.org, dave.hansen@linux.intel.com, decui@microsoft.com, 
@@ -84,142 +85,21 @@ Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de, catalin.marinas@arm.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 8, 2025 at 6:05=E2=80=AFAM Roman Kisel <romank@linux.microsoft.=
+On Sat, Mar 8, 2025 at 6:04=E2=80=AFAM Roman Kisel <romank@linux.microsoft.=
 com> wrote:
 >
-> The ARM64 PCI code for hyperv needs to know the VMBus root
-> device, and it is private.
+> To run in the VTL mode, Hyper-V drivers have to know what
+> VTL the system boots in, and the arm64/hyperv code does not
+> have the means to compute that.
 >
-> Provide a function that returns it. Rename it from "hv_dev"
-> as "hv_dev" as a symbol is very overloaded. No functional
-> changes.
+> Refactor the code to hoist the function that detects VTL,
+> make it arch-neutral to be able to employ it to get the VTL
+> on arm64.
 >
 > Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
-
-Why change all device's parent to vmbus_root_device?
-
-The ARM64 platform uses the device tree to enumerate vmbus
-devices..  Can we find the root device via device tree? vmbus
-code on the x86 use ACPI and it seems to work via ACPI.
-
-
+> Reviewed-by: Michael Kelley <mhklinux@outlook.com>
 > ---
->  drivers/hv/vmbus_drv.c | 23 +++++++++++++++--------
->  include/linux/hyperv.h |  2 ++
->  2 files changed, 17 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-> index c8474b48dcd2..7bfafe702963 100644
-> --- a/drivers/hv/vmbus_drv.c
-> +++ b/drivers/hv/vmbus_drv.c
-> @@ -45,7 +45,8 @@ struct vmbus_dynid {
->         struct hv_vmbus_device_id id;
->  };
->
-> -static struct device  *hv_dev;
-> +/* VMBus Root Device */
-> +static struct device  *vmbus_root_device;
->
->  static int hyperv_cpuhp_online;
->
-> @@ -80,9 +81,15 @@ static struct resource *fb_mmio;
->  static struct resource *hyperv_mmio;
->  static DEFINE_MUTEX(hyperv_mmio_lock);
->
-> +struct device *hv_get_vmbus_root_device(void)
-> +{
-> +       return vmbus_root_device;
-> +}
-> +EXPORT_SYMBOL_GPL(hv_get_vmbus_root_device);
-> +
->  static int vmbus_exists(void)
->  {
-> -       if (hv_dev =3D=3D NULL)
-> +       if (vmbus_root_device =3D=3D NULL)
->                 return -ENODEV;
->
->         return 0;
-> @@ -861,7 +868,7 @@ static int vmbus_dma_configure(struct device *child_d=
-evice)
->          * On x86/x64 coherence is assumed and these calls have no effect=
-.
->          */
->         hv_setup_dma_ops(child_device,
-> -               device_get_dma_attr(hv_dev) =3D=3D DEV_DMA_COHERENT);
-> +               device_get_dma_attr(vmbus_root_device) =3D=3D DEV_DMA_COH=
-ERENT);
->         return 0;
->  }
->
-> @@ -1930,7 +1937,7 @@ int vmbus_device_register(struct hv_device *child_d=
-evice_obj)
->                      &child_device_obj->channel->offermsg.offer.if_instan=
-ce);
->
->         child_device_obj->device.bus =3D &hv_bus;
-> -       child_device_obj->device.parent =3D hv_dev;
-> +       child_device_obj->device.parent =3D vmbus_root_device;
->         child_device_obj->device.release =3D vmbus_device_release;
->
->         child_device_obj->device.dma_parms =3D &child_device_obj->dma_par=
-ms;
-> @@ -2292,7 +2299,7 @@ static int vmbus_acpi_add(struct platform_device *p=
-dev)
->         struct acpi_device *ancestor;
->         struct acpi_device *device =3D ACPI_COMPANION(&pdev->dev);
->
-> -       hv_dev =3D &device->dev;
-> +       vmbus_root_device =3D &device->dev;
->
->         /*
->          * Older versions of Hyper-V for ARM64 fail to include the _CCA
-> @@ -2383,7 +2390,7 @@ static int vmbus_device_add(struct platform_device =
-*pdev)
->         struct device_node *np =3D pdev->dev.of_node;
->         int ret;
->
-> -       hv_dev =3D &pdev->dev;
-> +       vmbus_root_device =3D &pdev->dev;
->
->         ret =3D of_range_parser_init(&parser, np);
->         if (ret)
-> @@ -2702,7 +2709,7 @@ static int __init hv_acpi_init(void)
->         if (ret)
->                 return ret;
->
-> -       if (!hv_dev) {
-> +       if (!vmbus_root_device) {
->                 ret =3D -ENODEV;
->                 goto cleanup;
->         }
-> @@ -2733,7 +2740,7 @@ static int __init hv_acpi_init(void)
->
->  cleanup:
->         platform_driver_unregister(&vmbus_platform_driver);
-> -       hv_dev =3D NULL;
-> +       vmbus_root_device =3D NULL;
->         return ret;
->  }
->
-> diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
-> index 7f4f8d8bdf43..1f0851fde041 100644
-> --- a/include/linux/hyperv.h
-> +++ b/include/linux/hyperv.h
-> @@ -1333,6 +1333,8 @@ static inline void *hv_get_drvdata(struct hv_device=
- *dev)
->         return dev_get_drvdata(&dev->device);
->  }
->
-> +struct device *hv_get_vmbus_root_device(void);
-> +
->  struct hv_ring_buffer_debug_info {
->         u32 current_interrupt_mask;
->         u32 current_read_index;
-> --
-> 2.43.0
->
->
-
+Reviewed-by: Tianyu Lan <tiala@microsoft.com>
 
 --=20
 Thanks
