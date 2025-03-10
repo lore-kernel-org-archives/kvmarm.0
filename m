@@ -1,65 +1,69 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010017.outbound.protection.outlook.com [52.103.2.17])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2106.outbound.protection.outlook.com [40.92.40.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234171E1C1F
-	for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 22:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.2.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A952A1F4CA8
+	for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 23:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.40.106
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741645106; cv=fail; b=VK0OhkiQ3XIPbpBgh/eE5EV7/azscN5riS5WkJhQPpDNWcB3Xs2dyv94lFbFnev7gD01hdgsJTfn976RQhYezWjO0CBzLkQL2musvDjfZo3jZK7BOK8WJURq03K/K33bykC4rje5Fht92touW9ouBIzZBswVssJVcnc/wfUAvOg=
+	t=1741648036; cv=fail; b=jCHy4c+THdMcJjHXyfQCjjyOs+zNtW5rnsGXVo4v7gz+kH/0DGydpD+SZKH1826PKbGmzFydvf5lLy23U9fIOub0d4T04Rqwla1LuQ72tIrGF/ZmtYQnE5Z5L4llrqJwIWcdO6f948+8QYc90WKW/L37SUpyryeg8Gmqeje30qc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741645106; c=relaxed/simple;
-	bh=9eGqY5/Z664Kf3KxRPY9+JHj29spOpfkdVABajqn47Y=;
+	s=arc-20240116; t=1741648036; c=relaxed/simple;
+	bh=EltUzxYJdZeAS1luLMpkJHEs8ObohUZT1rbgPPCvqI0=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qHdDvWjpHFyJSMbf9kYSV9zFEuTD8hFj0PMmFCghaoRHxflsIzGGwcsDIqEg4bBY/5MER++W1p3dy9/VxfJU+kD0fMRQVGHeiVEFeemwWDof9PthPjqpXMEAIPUkVkMm/6CNR5dHdvWWQvl55rtitszUC0tF6KPTJv7iK1UuFvk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=hsQ57vAi; arc=fail smtp.client-ip=52.103.2.17
+	 Content-Type:MIME-Version; b=ro/Ebqj4pMz0tY8RdRZW94BqzD5CDxssZ9G1pi3mhBsbOkAyWGx1X0/cAe1a8sGSJE8YipjAVggG0roRxyYUy3Xusa9f/gYM7kDmfydaN6CRFFbn1Y3QOL2fbIlq3nop2sMilNvzQ6pgzngq9K1yEba2jL5wsYYGlMD1E/1SoD0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=jdRI+SnV; arc=fail smtp.client-ip=40.92.40.106
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="hsQ57vAi"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="jdRI+SnV"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cjVf0cE5mMb105e+SqRA0Mu09UPLnmPwHmBx5LJ/KF+OL28OAiohJZNTIAD7M5ykZ1Gyc4BuMk+tdTT7x5AXgGwsCgtv3sHXR59OJfiJvQiqmXQep490ox4GNz5ZQiuonXNM/DDodRl76F+rK6Jv4uVNUE1wjjBA99FuyxolEYT4cHDOTJgvhVIseseGZva+DFDRk4w7dqOZXSpKsr4nTo8XD48UjP1HKCtJdaqp+i/4aQAhgii8nqRrXzMUVtefFgt851mgWJj3J34ilFssWtJIBVquuf7dGJVFA6qncZMUnw0w5z/dd06gd+/Rk9P4G143zjzL7jeE1FZ2Jf4UBQ==
+ b=Uf2suMQqxffvWUekH/WpStkxnA8KVEx9T1/faIwFwH/sAfOTR5dfOQFT+rI33ZIIBQ5H4VimRvdDseoSFC64g7lOZlgx4GdLcKDy8PppeGSeTllctLvdi2MpNx5pXgb5yObDRCR40F0lyZsO/fL67rbx4DzeW1Fx90QNM8qHir0FzhxfrogaC2GvzneFBIUhsHgRlpv8HVmcXJeRRsfwW+/6wCES1e7WNetiqWHcqoOeG/TgIhuX+PF3P7Ep9ECSUc1mDGaUXZdJ0Qhnuyrytka0Z8ONkKRqqBQ1azji9fSuJV9jY1XdBFGd3yHyAgZjWslqqDHLoua1SS+R1uC91g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SQB4EgUL9Tfr/pQZMuSyyXj6MaBdtJZJb/qBrYALqkw=;
- b=ArnpzOkOPeLHYBun3iui2+LPCAVA7e7D5RRkDIGc5a5Lr3y5vGaicoXxMVaSJYYuyou609zQuGeSU5ytMFCQoSEHfw7j2lK/ln32lSPGJAznpurxc02F0BrAHd+FZmdPxH8jVeXYRhDDW8NtrVN7jeQTL3fZrso+XSRZ+UmXzM35qO0SA1MGQxEGiuVuaZms7nrxxInIG+Q1NTZ4lSdbhtb/OFlQ4NB19UaNvygoTN8lFpu2JDlYSwuHrWnbDUv8jAeA6xxfXrNzJeBxIT1NPa8TeHKZyGRZc3CcFqbOMxIgzvSr1ZAQAH3eqPD8eCEpF/NVeWA9o1I9K61/yasrJA==
+ bh=pEGoFeJlORz7BWSNlKAGOT0i91fm3KbuA4xg0SIjOkQ=;
+ b=i9hZmYMzN0GnGU76aS3QomLD8u+Bt1aHReyJgdcOMtG1JKDtc5PvbxoJxhnaWddD5chTD16t1mWA2nGXJcrqlzk2oo1jgtq4wnM0wi1cFtPZ0AA7fwqCu4m3P2rg8PXzcHMg5UI2oCAi4hjSw88jeH2MpPl05VHfKycs9TIMqqGdR6zY3qP9bQNwDkqmc0/bznwwhspWEV3kUumjWJWKkPki5eysfYVj/IXECIwbhbPDQZbrqGnKMA4v/UKo48kfXK7HXG1qayGh5ZQKgM9ZiLLJpv5Tr5o71eKIDTgzLs2yubzLxB8FUUPefPZzV+DjzXJArAdSglAf8G2y+1ivMw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SQB4EgUL9Tfr/pQZMuSyyXj6MaBdtJZJb/qBrYALqkw=;
- b=hsQ57vAiRqkoznXqjBKOA8YVFuT2AQUoFXLNHWuldMBPonuZTW5Mvh2WeBfRKr2Vrbth+wz3hi+ac/28AZy/nR1ZSdBnPcZoCIOqtZUrasjwWw0I8SywlFwgwU3+XKzAqir/BcdDB7cBcn6UeolGFZLGA/XlVw6iZCAB+MLIFMZStwsZBcqZ/8jcUtHcfHXYsbGbZKa5WoYmOABKQHrV/filxvFUB85b2TTWqdhe9OM1tH2OhbQ4rvsAreaqGXzjNuMxrmSPEML0oHEp0pBwudjV2mX9MdUhpI8kRipM45es2SSk4Sj/zE10K/vkaC/Tfuc1OgA+IgNzMZqhuEpegg==
-Received: from BN7PR02MB4148.namprd02.prod.outlook.com (2603:10b6:406:f6::17)
- by PH7PR02MB8929.namprd02.prod.outlook.com (2603:10b6:510:1fb::7) with
+ bh=pEGoFeJlORz7BWSNlKAGOT0i91fm3KbuA4xg0SIjOkQ=;
+ b=jdRI+SnVKJT0kTrHZIsg7SHOKpI5ajqc7wV9FsxXx25pQFSs5T5wm29aiZ9YdC2fh9/9OKr+9URhY+boNps6ZvZFuaXNrm7zSJm8moqgpe0S2RdND3l98rqTzs2TGP1HU5OtoXaCRlI5qeE6hSgZj+QCl1dXj0a8YA1g+jBakIlcMqeHInHGTmqCQAiOuI2ZmLBJbSiWR0g9k8z900WdbZVnudltIu6xXBZQgE1nmtkmRbCXtEVEpR7R8A/tmgJ6UVlwYEmMFBWDACSMitP4qVZJbWH8h4fnQqht6gpDijJ4RRzNpe/E0soD/+cya5PpkSx0eVUCngiC1nOp9kOh9A==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by BN0PR02MB7965.namprd02.prod.outlook.com (2603:10b6:408:166::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.26; Mon, 10 Mar
- 2025 22:18:20 +0000
-Received: from BN7PR02MB4148.namprd02.prod.outlook.com
- ([fe80::1c3a:f677:7a85:4911]) by BN7PR02MB4148.namprd02.prod.outlook.com
- ([fe80::1c3a:f677:7a85:4911%4]) with mapi id 15.20.8511.026; Mon, 10 Mar 2025
- 22:18:20 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Mon, 10 Mar
+ 2025 23:07:10 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%3]) with mapi id 15.20.8511.026; Mon, 10 Mar 2025
+ 23:07:10 +0000
 From: Michael Kelley <mhklinux@outlook.com>
-To: Arnd Bergmann <arnd@arndb.de>, Roman Kisel <romank@linux.microsoft.com>,
-	"bhelgaas@google.com" <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>,
-	Catalin Marinas <catalin.marinas@arm.com>, Conor Dooley
-	<conor+dt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, Dexuan Cui
-	<decui@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, "H. Peter
- Anvin" <hpa@zytor.com>, Joey Gouly <joey.gouly@arm.com>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, =?iso-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>, Len Brown <lenb@kernel.org>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, Manivannan Sadhasivam
-	<manivannan.sadhasivam@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Marc
- Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>, Oliver Upton
-	<oliver.upton@linux.dev>, "Rafael J . Wysocki" <rafael@kernel.org>, Rob
- Herring <robh@kernel.org>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, Sudeep Holla <sudeep.holla@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Wei
- Liu <wei.liu@kernel.org>, Will Deacon <will@kernel.org>, Zenghui Yu
-	<yuzenghui@huawei.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-acpi@vger.kernel.org"
-	<linux-acpi@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>,
+To: Roman Kisel <romank@linux.microsoft.com>, "arnd@arndb.de" <arnd@arndb.de>,
+	"bhelgaas@google.com" <bhelgaas@google.com>, "bp@alien8.de" <bp@alien8.de>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "decui@microsoft.com" <decui@microsoft.com>,
+	"haiyangz@microsoft.com" <haiyangz@microsoft.com>, "hpa@zytor.com"
+	<hpa@zytor.com>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "kw@linux.com" <kw@linux.com>,
+	"kys@microsoft.com" <kys@microsoft.com>, "lenb@kernel.org" <lenb@kernel.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>,
+	"mark.rutland@arm.com" <mark.rutland@arm.com>, "maz@kernel.org"
+	<maz@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "rafael@kernel.org"
+	<rafael@kernel.org>, "robh@kernel.org" <robh@kernel.org>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"sudeep.holla@arm.com" <sudeep.holla@arm.com>, "suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "will@kernel.org"
+	<will@kernel.org>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
 	"linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "linux-hyperv@vger.kernel.org"
 	<linux-hyperv@vger.kernel.org>, "linux-kernel@vger.kernel.org"
@@ -68,75 +72,70 @@ To: Arnd Bergmann <arnd@arndb.de>, Roman Kisel <romank@linux.microsoft.com>,
 CC: "apais@microsoft.com" <apais@microsoft.com>, "benhill@microsoft.com"
 	<benhill@microsoft.com>, "bperkins@microsoft.com" <bperkins@microsoft.com>,
 	"sunilmut@microsoft.com" <sunilmut@microsoft.com>
-Subject: RE: [PATCH hyperv-next v5 03/11] Drivers: hv: Enable VTL mode for
- arm64
-Thread-Topic: [PATCH hyperv-next v5 03/11] Drivers: hv: Enable VTL mode for
- arm64
-Thread-Index: AQHbj6zpmH+gYA9h/kGlfIiTOb0OO7NpvEQAgAMg+bCAAAf2gIAAB/GQ
-Date: Mon, 10 Mar 2025 22:18:20 +0000
+Subject: RE: [PATCH hyperv-next v5 05/11] arm64: hyperv: Initialize the
+ Virtual Trust Level field
+Thread-Topic: [PATCH hyperv-next v5 05/11] arm64: hyperv: Initialize the
+ Virtual Trust Level field
+Thread-Index: AQHbj60CE5hauCaflkaSB574if5JUbNtAp6Q
+Date: Mon, 10 Mar 2025 23:07:09 +0000
 Message-ID:
- <BN7PR02MB4148FC15ADF0E49327262B92D4D62@BN7PR02MB4148.namprd02.prod.outlook.com>
+ <SN6PR02MB4157DD69C232F25FDBA7594CD4D62@SN6PR02MB4157.namprd02.prod.outlook.com>
 References: <20250307220304.247725-1-romank@linux.microsoft.com>
- <20250307220304.247725-4-romank@linux.microsoft.com>
- <e0f81049-688e-4f53-a002-5d246281bf8d@app.fastmail.com>
- <BN7PR02MB41488C06B7E42830C700318DD4D62@BN7PR02MB4148.namprd02.prod.outlook.com>
- <119cfb59-d68b-4718-b7cb-90cba67827e8@app.fastmail.com>
-In-Reply-To: <119cfb59-d68b-4718-b7cb-90cba67827e8@app.fastmail.com>
+ <20250307220304.247725-6-romank@linux.microsoft.com>
+In-Reply-To: <20250307220304.247725-6-romank@linux.microsoft.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN7PR02MB4148:EE_|PH7PR02MB8929:EE_
-x-ms-office365-filtering-correlation-id: b77af9fd-4164-4f0d-810f-08dd602176ee
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|BN0PR02MB7965:EE_
+x-ms-office365-filtering-correlation-id: f932bc66-bbd0-4eca-855f-08dd60284943
 x-microsoft-antispam:
- BCL:0;ARA:14566002|15080799006|461199028|8062599003|8060799006|19110799003|10035399004|440099028|102099032|3412199025|56899033;
+ BCL:0;ARA:14566002|8062599003|461199028|19110799003|15080799006|8060799006|3412199025|440099028|102099032;
 x-microsoft-antispam-message-info:
- =?iso-8859-2?Q?yQQILi6VrGtjaEFxoQlcm5yFV+3l9N/wrgIbOe8R4J+2fc/iwPSfrjuzGz?=
- =?iso-8859-2?Q?e7v3zYaMkdlRBGbepzGtbWon7m1DcNAo01yfxiKPGBWF2b9dLs6gZgIsMa?=
- =?iso-8859-2?Q?XzipWcGORnugvegdJq7uGDEfYKyXw2cDkcITiFmf0Rbdq58mIvGVjCrbvN?=
- =?iso-8859-2?Q?3Qer4rVipGfvXiAywuaVC6tIaeiRNeJqBjo8sECMgizLTRrrtLrT8ZsJp1?=
- =?iso-8859-2?Q?g6nFbNsFFNrWDN2MYashzQLhk0RciSbjv7kKOOWsvMd2/R7HoCxQsKR0Q8?=
- =?iso-8859-2?Q?7WCmybNOb9N6PCR0fNpkXiZgKD7PcakVXvDuXPRBlfIDPayc8TJfBFaOH/?=
- =?iso-8859-2?Q?UNISnO3Sn40YuiKRZ+eI19zcmElsuJT5Lyt0EotqbEP5tNWUjDtNZZHcEQ?=
- =?iso-8859-2?Q?1/6mt+LXXZgoEtQDhW7T01iTnYCdUoSDBe6SQQAYIbjYf7+cjz92pqhu56?=
- =?iso-8859-2?Q?M62LHAznkNy8a7Y8iYKlPTFsl/lV4JZu5iEf78W689iwJX88zareyruvlA?=
- =?iso-8859-2?Q?ho0rgHHhgwUR8COcMyws7tOfaclp33bMx7H8kdSU7QUwJxcP2BiJgWq4/X?=
- =?iso-8859-2?Q?fH1FLa/Im3NDNsT0GCy69R/+PgekBtVKkWMdiBZmKXn8gaePwbvZ87lX9n?=
- =?iso-8859-2?Q?4M97UxE3UiPSRdukF7GeX7jNTQkVwsFlG7173KIwLqBwhzKBMU3YhvhweE?=
- =?iso-8859-2?Q?ExqfW49Cl/GxUecwhI22ccILwqjk8nqRZjP090vtHJJwI5z/BKnYr/vSIl?=
- =?iso-8859-2?Q?IiUATMCPh3nWr1ofnEDqouvsgkYOh3xZ4l/g6BrgoMefnaeRchpg3yJqP6?=
- =?iso-8859-2?Q?HAQRztXck4ovk3SN3yYa763LUaYYsJ7tsbOHs2khong6UAq9gO0T6TxGdz?=
- =?iso-8859-2?Q?DVVWUPBHO3qRcUJt+GavY+owX8g4WZw2o3uwhz9jBDM3MZqJrEr7hj7pvZ?=
- =?iso-8859-2?Q?BVb0TRcduZDul5Pr+oZvxIgCGQO1YGsYMoTG4rTRmyVqohczchkxbb5cwq?=
- =?iso-8859-2?Q?nZlj52g7heOIlpPQ1WceTqTBSWe6t52EoCCzmE+xQdn2ydcfbXmFgYJ8Vh?=
- =?iso-8859-2?Q?2f6xnIVYv5Vud2u49+jsTuxQT2uLeURazh5fJuulOUSQwZzSSVmJX5k0OK?=
- =?iso-8859-2?Q?8SNIV7e5mPcCp1uddOXDNU8wr6RRM=3D?=
+ =?us-ascii?Q?e7tmQryE11nlPEtc1j81nd2/B15ty9gsDDosAzafr1ApoAuVIj+iJxJqxYm1?=
+ =?us-ascii?Q?J+D8oxlLFB2R400Y6ZhUVdZs6W/dKt207KiJaHTS+kBSFF42uJ5sYWj/MMZz?=
+ =?us-ascii?Q?f2LBbLgfhkdFZlFnSf47KA5APNdsHPDdUZhZ63c6kRWB+1I3+oGkXsUfN3Lt?=
+ =?us-ascii?Q?6oc2zweFTwYcDt9gVaF0RHaPfDQpKqnmkkJsaLhWiOx2/wcJc3mD8q7cfddJ?=
+ =?us-ascii?Q?t8tfWtGCW9qoy8BTAkwmKpHn6T0FnMj6iG9eCGLJW3RtupTa9eHlwl7TliCa?=
+ =?us-ascii?Q?hMI9FBIspJoIotAgMeCV+C0PsHqYsfKNwWMQ945ERLxnLdit7EILTx2DJKKV?=
+ =?us-ascii?Q?M9ItejQDL7NQEF59J/Bd+ySZ0+rCHzhFG4BM5TfA9ZlmLyHV1wcZEJMWJSwI?=
+ =?us-ascii?Q?pfT2ks00uI9pBcONnX0M7VGNNX1cO9r0wWpMoZ/p4HM/YgAHsj2sbmZ0I0oD?=
+ =?us-ascii?Q?6j1KaXVw4+uEa4ga2c84+kJz7WyRn49gxHxBX6s9mlvxHCt5XHvXRBXIpTDn?=
+ =?us-ascii?Q?FMIGmlVI/RfABsdSrnZscpd7TQnH/xyjoSWlXthjtQfN67CDLPJRJul+OitH?=
+ =?us-ascii?Q?BjP19INgFFHPjB47cMhITz91PBikXSOc72WvfyH7qK6eEXyWbpiajXz5mQBa?=
+ =?us-ascii?Q?K08Q1DP2Juqjapr4WZVrhG2+or4WYMHlu/sxgT2cyYSLrBrWqgwTWhxgExco?=
+ =?us-ascii?Q?XU+C1j36Ww3AC3J7JuAuq0bNTxC3sYk5u8koAU/DEbDqB6ScvS1eXOzHY/pt?=
+ =?us-ascii?Q?8pcYWrS1xMfbAB6Bp5lTySqsFLgxzpLQ2YUJotaQdm38itpiJnOOKKcmlV4u?=
+ =?us-ascii?Q?6XFxTHCWLOEvRYA3bI3hEu+flsDVYQSujzIglCgiaw4/+Gd3HhpsR4x+dWZe?=
+ =?us-ascii?Q?YetYbG2W/y4eQqnZ74vgMWV6PRIeVfDQYJ6hNa2iC1lzQsTSDLlPYGOtI83M?=
+ =?us-ascii?Q?5Lx0IkUXQLMgnGDcpTt7e3hqSdTbCiRtQFZrWVRvun7Kya41Fz73jPJQQwsq?=
+ =?us-ascii?Q?guIc6NwZ9JE4sOTu1I8QOy+bNhd588SOf6BAttxMfnz1KbA=3D?=
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-2?Q?DCstKJ9DzABdmuSpaUca+ctZ0ZsQukkvlQiWmEwxr/1atttSFFWytQ3ZAz?=
- =?iso-8859-2?Q?+tslEj6O+lNDvR2caPzKhia03smqL2+vk9Nr8PCKZA5ruZQnO2x3ICMJva?=
- =?iso-8859-2?Q?uffVOlPvNoEKFUQJ+y7jfgwdE7caWkf74Pkk+ZysES6CvvzWmRoChUpruA?=
- =?iso-8859-2?Q?7MfWE2gB3YEXRrkj/1HxW/iKK4AsWC7XLYkP7YGOqkmwBPTOT4umQdOra1?=
- =?iso-8859-2?Q?UbhpiKTgvWUKNKKQp/Rz2C+i5om46V1UxgAUarInKx4SzYjUCyjUknGa7n?=
- =?iso-8859-2?Q?nIgncTZIeiRidGRLmRpyzAA05ARsZcYmq20o0kSeSw7NBv6ANwou7OkxMh?=
- =?iso-8859-2?Q?0iEo9HIpNufauuXQfsVpfhMf96KqaugEgtfT6KnBpZa2+3dkCMGfuUBqkS?=
- =?iso-8859-2?Q?KEGzm+nKeHaeSu8/pU7h20MUWJiipBiN36MA32+MBTGlnRFuHyJzI4O1aL?=
- =?iso-8859-2?Q?t7gdyzLN7kZLcq2/vg9x+sxFWHg4726EZbqK3B5/V7hR8RTGuf/RlQU0vi?=
- =?iso-8859-2?Q?aSILwICVHIeNZd+sBTAcxSQROUXNOEWvMGskvquWztZGKpa3dE3ZMLo2ep?=
- =?iso-8859-2?Q?5mM6Pg7W7/avzWx2vit+yy5QWMyJIaI1parcDF5bxoUkZYlsiXd4A4ko9R?=
- =?iso-8859-2?Q?pCC0KwX7DKH05PSPyZXa7z6+h1lfuD21ZAn4FrAix4C3gfi1RM2wYDV+O5?=
- =?iso-8859-2?Q?QtuxIrayv21oS6mNnih/wPJ5t7iJSlCKAoFAH88vsv6GedUCgIzRU9eVN4?=
- =?iso-8859-2?Q?tJUQOwu+8hqYBqPbAAXzfs+38ZH0DOcpdpPY5J8oXIlLLBSRqIrdFLuqNC?=
- =?iso-8859-2?Q?LBUt2yULR9gRfoFA4643pFV+UOQq3eNY8TmtpQ5KtQS/w87aQM+AOKUSNA?=
- =?iso-8859-2?Q?9UlmzFhZbNu1DomNb3w+U41sUPNpLiRX2UKltBGjYqILqy//kJHKgKUJM9?=
- =?iso-8859-2?Q?WRX3VleGpKsbnC0Q4i/RVBbuy76Jdhc15wBr/pOHF77UzE8H3pnahU6y3K?=
- =?iso-8859-2?Q?PJrMsp8G7VtJ0+/dibjpySMe7EAnPlVfrl7XwNnxaucl19OCUfDHXCkB/e?=
- =?iso-8859-2?Q?xN1pQYMHg4EAK+UfmmPPDV4ZSxyXCDZyhNn96j1Kq/EyPifck/Up+MWuHZ?=
- =?iso-8859-2?Q?8SlYJqtLGLZgFN5b6SyN182j7ZIRbo21gOm+w9pQuhR0zyogEeQx6ORjZV?=
- =?iso-8859-2?Q?H6D7MU2hMFZhqqtgmzAI89n5tsC8FsXpaXPK2hFElMJbH2h/MwOnk8snjq?=
- =?iso-8859-2?Q?hqok0TyX2vERt+eY7BndHUumf7Hr2/Yom5FSW7jeg=3D?=
-Content-Type: text/plain; charset="iso-8859-2"
+ =?us-ascii?Q?QcfUvr2MbXkwdpIM+FYRAQOkHCgqQENJi2IkrERxDqImOfkOH4uZ4rIyVjY3?=
+ =?us-ascii?Q?TqnRSJblc2/jhpOGfGpmTaX+t7Nm3zMeD1tKLTA/il/tNi6yOV9M83JzURt7?=
+ =?us-ascii?Q?XPlnHZNrvEW5voGUK1xVgG6oTHT5IdV9/aiws4cHH9zFKS6la/fI6fzgkGKy?=
+ =?us-ascii?Q?V/v0N6htWP55/0kjuWdwCHGoo50BGOD7gj5D8Z4FpdEKt7Y7DO9nK0CByisl?=
+ =?us-ascii?Q?uaYYrGq4wtFNSnKqAIPoFja0RgEOGUOiYM9OQaBDklLI9dtfbpjqk1l+dZdJ?=
+ =?us-ascii?Q?xaSuuiJQOSN/+n4luO2bbq0NWszl5H/3bLSKQN6hwnGnA6ppVulUu2HYF1HH?=
+ =?us-ascii?Q?nbBJEaJYaKBg3Ew4qdgrUfMmk0Lbd81aIqUocA3hlcaU+7i89Fy4nuS0/IBD?=
+ =?us-ascii?Q?XUwNpyHCn1D37l+H/mj0oLimtFiu8a9gMnh7UFUBrQ3Lc/TIYlY+b/vMxrAg?=
+ =?us-ascii?Q?cLbZ50epYnxxk0jtbKK+1kExSzXP8yM1Pzx5bLzkLfsKRkj45pLTNHR/VGC1?=
+ =?us-ascii?Q?p8IRAKJq4CA1Tkzyo8I8jplQ9mMEfzkp7uzQ+0VN2ccJQZWj79bB4JG0MNJa?=
+ =?us-ascii?Q?RozQgKjdkOstyz40s6X43Iq9LQuIK6AMZOPGeHtNRSVKD2sFNxAevOh05QXK?=
+ =?us-ascii?Q?UFmBtrSufbtL6LhW7qykyL/tMl8iDgHwROOYIYGil4m0kWDh7EaW0Q2dHSSX?=
+ =?us-ascii?Q?xdQ/4lQdxNLPI/5lHwm7W+E7z5MHpQFeiBvnBz7vq59spVUJqpBEvFN4vLz0?=
+ =?us-ascii?Q?xaM2eyEaxFybcGWMZTmSCsa8a4JR4YSdcXdEICIy6KMArwnZmIspdaz0Bc2N?=
+ =?us-ascii?Q?3BKhWSoD9HmNrQ/0cRYyO/YRli7JSaIp1FYuoCkeWuwRraPe+3Pco8QXAKrK?=
+ =?us-ascii?Q?hYWdkmckXTbTdPIgCcv2y+65mpv4dah0Xlh98pocurtjl694TxAMrMI7KM73?=
+ =?us-ascii?Q?/JVcqkkjNcYnRpbihK8Ao9u17kUWjXIGbaBlaLjbaF9auptjcTg2AoUngdG8?=
+ =?us-ascii?Q?vgHHStMGvSeVSBomqT6m4WAL8Y4TWYOli6Ujr2tLeT0cHdWc6na8DZdIwR/L?=
+ =?us-ascii?Q?/vLPfpuvD+fg7ELqlEazaeAUYOkfRy+QF+B3HTr7PPfdwttILLNOwh6ysb7e?=
+ =?us-ascii?Q?j3RHHI1q6rC+faDgugEBAPEA3QPIIsoytyJ6meW+Z62O9FhmGBDgXvmby1pl?=
+ =?us-ascii?Q?8a1HWWd6OhSLjJEpK+OZvvMWlWj80xnfid7WT45NHcadsfL5LFnZCWwmSbE?=
+ =?us-ascii?Q?=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -146,94 +145,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-OriginatorOrg: outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN7PR02MB4148.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: b77af9fd-4164-4f0d-810f-08dd602176ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Mar 2025 22:18:20.1557
+X-MS-Exchange-CrossTenant-Network-Message-Id: f932bc66-bbd0-4eca-855f-08dd60284943
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Mar 2025 23:07:10.0056
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
 X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR02MB8929
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR02MB7965
 
-From: Arnd Bergmann <arnd@arndb.de> Sent: Monday, March 10, 2025 2:21 PM
+From: Roman Kisel <romank@linux.microsoft.com> Sent: Friday, March 7, 2025 =
+2:03 PM
 >=20
-> On Mon, Mar 10, 2025, at 22:01, Michael Kelley wrote:
-> > From: Arnd Bergmann <arnd@arndb.de> Sent: Saturday, March 8, 2025 1:05 =
-PM
-> >> >  config HYPERV_VTL_MODE
-> >> >  	bool "Enable Linux to boot in VTL context"
-> >> > -	depends on X86_64 && HYPERV
-> >> > +	depends on (X86_64 || ARM64)
-> >> >  	depends on SMP
-> >> > +	select OF_EARLY_FLATTREE
-> >> > +	select OF
-> >> >  	default n
-> >> >  	help
-> >>
-> >> Having the dependency below the top-level Kconfig entry feels a little
-> >> counterintuitive. You could flip that back as it was before by doing
-> >>
-> >>       select HYPERV_VTL_MODE if !ACPI
-> >>       depends on ACPI || SMP
-> >>
-> >> in the HYPERV option, leaving the dependency on HYPERV in
-> >> HYPERV_VTL_MODE.
-> >
-> > I would argue that we don't ever want to implicitly select
-> > HYPERV_VTL_MODE because of some other config setting or
-> > lack thereof.  VTL mode is enough of a special case that it should
-> > only be explicitly selected. If someone omits ACPI, then HYPERV
-> > should not be selectable unless HYPERV_VTL_MODE is explicitly
-> > selected.
-> >
-> > The last line of the comment for HYPERV_VTL_MODE says
-> > "A kernel built with this option must run at VTL2, and will not run
-> > as a normal guest."  In other words, don't choose this unless you
-> > 100% know that VTL2 is what you want.
+> Various parts of the hyperv code need to know what VTL
+> the kernel runs at, most notably VMBus needs that to
+> establish communication with the host.
 >=20
-> It sounds like the latter is the real problem: enabling a feature
-> should never prevent something else from working. Can you describe
-> what VTL context is and why it requires an exception to a rather
-> fundamental rule here? If you build a kernel that runs on every
-> single piece of arm64 hardware and every hypervisor, why can't
-> you add HYPERV_VTL_MODE to that as an option?
+> Initialize the Virtual Trust Level field to enable
+> booting in the Virtual Trust Level.
+>=20
+> Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
+> ---
+>  arch/arm64/hyperv/mshyperv.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
+> index c647db56fd6b..a7db03f5413d 100644
+> --- a/arch/arm64/hyperv/mshyperv.c
+> +++ b/arch/arm64/hyperv/mshyperv.c
+> @@ -107,6 +107,7 @@ static int __init hyperv_init(void)
+>=20
+>  	if (ms_hyperv.priv_high & HV_ACCESS_PARTITION_ID)
+>  		hv_get_partition_id();
+> +	ms_hyperv.vtl =3D get_vtl();
+>=20
+>  	ms_hyperv_late_init();
+>=20
+> --
+> 2.43.0
 >=20
 
-VTL =3D Virtual Trust Level, and VSM =3D Virtual Secure Mode, are Hyper-V's
-terminology for offering multiple execution environments with
-hierarchical trust in the context of a single VM. A normal guest
-operating system runs at VTL 0, and there are no other VTLs in use.
-But in some environments, additional software may run as a paravisor
-layer between the normal guest OS and the hypervisor. This software
-runs at some other VTL > 0, and has a higher privilege level within
-the VM than software running at VTL 0 (which is the lowest privilege).
-VTL 2 is used today in the Azure cloud with CoCo VMs to run a
-paravisor, and there may be other uses in the future. See [1] if you
-want more details on VSM and VTLs. Also [2] for the CoCo VM use
-case.
+Reviewed-by: Michael Kelley <mhklinux@outlook.com>
 
-Ideally, a Linux kernel image could detect at runtime what VTL it is
-running at, and "do the right thing". Unfortunately, on x86 Linux this
-has proved difficult (or perhaps impossible) because the amount of
-boot-time setup required to ask the question about the current VTL
-is significant. The idiosyncrasies and historical baggage of x86 requires
-that Linux do some x86-specific initialization steps for VTL > 0
-before the question can be asked. Hence the introduction of
-CONFIG_HYPERV_VTL_MODE, and the behavior that when it is
-selected, the kernel image won't run normally in VTL 0.
-
-I'll go out on a limb and say that I suspect on arm64 a runtime
-determination based on querying the VTL *could* be made (though
-I'm not the person writing the code). But taking advantage of that
-on arm64 produces an undesirable dichotomy with x86.
-
-Roman may have further thoughts on the topic, but that's
-what I know about how we got here.
-
-Michael
-
-[1] https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlf=
-s/vsm
-[2] https://techcommunity.microsoft.com/blog/windowsosplatform/openhcl-the-=
-new-open-source-paravisor/4273172
