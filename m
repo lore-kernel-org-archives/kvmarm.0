@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4D2226CE6;
-	Mon, 10 Mar 2025 12:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BD2226CFD;
+	Mon, 10 Mar 2025 12:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609513; cv=none; b=OfmyDsPtSwqLXbDmkkskS9SD8m/O4GnWWEa4649GDNPRpm9MpXO23Yf/BrCRj7nbzwq+K6Okd43PIDfzydhTrA/Kp92W6M3unkC6jhgJW9Yl804AVgQMgr4NVXoo8XFehaYBaY6XUAThLBApkDG+uJWMXSad/syF2XELdQ8AUqQ=
+	t=1741609513; cv=none; b=Xj0la3h6pkvhnYLs0LB85DHwxnIZ3fmSu1iEcyksswZlwdrs3qXELj3DDpDUwzdJLySH2sRnocmFXAmaZ3/zxUI1eAEYsosMlOJwKvri68/TCtaejbp7BPFXvol11NY1QJCl+9vhc7x2JovdHgLlC0djs2OFt3UfDFB0c/+ErvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741609513; c=relaxed/simple;
-	bh=nANChlgvXq6Ho7EA9CsgTK6VxHa4Lr3IZqCf6g7TMzk=;
+	bh=ZE+hPenVOTQeFf5J4FOVNMdUmE/JU4Ov7Z3QusKsApo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SaikQw/4dOE+ryjD5Q/lLypTxyqmCG84pw5XM+ZfyWDqTIA9qyrI/eaI9VmMJujZkjLhfmz/Utc0glXwk7cNHim8xQzHCshyo1RrpERFH1VnepylQJMSrLOzCMED64mj2KpZQ/2ps4pKaKQJrNMrgrvbL+q6SynCbeC4RwFal9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMWSWd9A; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=roBXqzZ2yyhDsegob0yR2d1iIX/pvw4227UtPnEbXWZlm4GpLazM767LEfrnQeauehK9ZC7EwS4q3+IyjPzx6IBM4OeyymamJc7inCV5l5O6ljZLROE5YSVEwDrLsz8wm3dYDVSCyNnMlk+fbI0C+Mjh7zoQreDlptbEhPGj6MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJMLbB4a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMWSWd9A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A78EC4CEEE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJMLbB4a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF181C4CEE5;
 	Mon, 10 Mar 2025 12:25:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741609512;
-	bh=nANChlgvXq6Ho7EA9CsgTK6VxHa4Lr3IZqCf6g7TMzk=;
+	s=k20201202; t=1741609513;
+	bh=ZE+hPenVOTQeFf5J4FOVNMdUmE/JU4Ov7Z3QusKsApo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LMWSWd9Ay1WquI6PR65BfgLrvGdrlN3uVB3qD/ssHswfZCWTjA+pTx/E1kG/Q5Ybz
-	 vK7pEDUHpSan5h93n5xNBa5lI8iYPUvFM08QiluotqzxobaZW9VIZGytpiY4uB3mrM
-	 zkeYNSEPCxVY6DD32k/VZWRKO/9WDB6Lewpo2g3I9trQ6oqAu714WRQt4S87De5Sxv
-	 FlV8Gom+IpuQEbUdlpjkmUawR5DLX9nk12Whi9RjYuiipBiWDT147Bir7RV1B1fRQm
-	 bTG0MPOM0p0Ox1TIxdGGoPNn+p0X7iXVFrDEgjlSTPfd7ei92CDliaZo7X42yi8k7O
-	 IlUYY6cOy7Nkw==
+	b=FJMLbB4aRKh9jqihjUFkpSDFLKFZuKQP3mB4upMU0FgfICdxwxE+7sVf5FfYhVSQq
+	 /w5cbBlaiF7hBqWNT3b0fc9linVJyeMVReGP3AqhEPmPr+TNAiSbJOojyTV9zDnQgx
+	 lxocuL3zPm1XZ4qmx8o4LNMvJlz4Df6JSm6AquxNgYmRWwWH8pQPEG8zAtltGheVYV
+	 cFPJzajIItaQ+cmHu6KJQJqHgTp3OaAY30k3imhGxcIdir+RwuWjP1UxcQLXPEEkMP
+	 b7ayWiCj7zByKKH6aoFP7ZTYVvvaaJPTT0mRdkumxv0LyaSDwEDZCbv9BDI/pYLUTr
+	 EbafbL85S0FUw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trcBy-00CAea-IU;
-	Mon, 10 Mar 2025 12:25:10 +0000
+	id 1trcBz-00CAea-3H;
+	Mon, 10 Mar 2025 12:25:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 03/23] arm64: sysreg: Add layout for HCR_EL2
-Date: Mon, 10 Mar 2025 12:24:45 +0000
-Message-Id: <20250310122505.2857610-4-maz@kernel.org>
+Subject: [PATCH v2 05/23] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+Date: Mon, 10 Mar 2025 12:24:47 +0000
+Message-Id: <20250310122505.2857610-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250310122505.2857610-1-maz@kernel.org>
 References: <20250310122505.2857610-1-maz@kernel.org>
@@ -60,234 +60,92 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add HCR_EL2 to the sysreg file, more or less directly generated
-from the JSON file.
+We generally don't expect FEAT_LS64* instructions to trap, unless
+they are trapped by a guest hypervisor.
 
-Since the generated names significantly differ from the existing
-naming, express the old names in terms of the new one. One day, we'll
-fix this mess, but I'm not in any hurry.
+Otherwise, this is just the guest playing tricks on us by using
+an instruction that isn't advertised, which we handle with a well
+deserved UNDEF.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h | 125 ++++++++++++++++---------------
- arch/arm64/tools/sysreg          |  68 +++++++++++++++++
- 2 files changed, 132 insertions(+), 61 deletions(-)
+ arch/arm64/kvm/handle_exit.c | 56 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 8d94a6c0ed5c4..52bd4abc2a85d 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -12,67 +12,70 @@
- #include <asm/sysreg.h>
- #include <asm/types.h>
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 512d152233ff2..b2d11cd0447c1 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -294,6 +294,61 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
  
--/* Hyp Configuration Register (HCR) bits */
--
--#define HCR_TID5	(UL(1) << 58)
--#define HCR_DCT		(UL(1) << 57)
--#define HCR_ATA_SHIFT	56
--#define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
--#define HCR_TTLBOS	(UL(1) << 55)
--#define HCR_TTLBIS	(UL(1) << 54)
--#define HCR_ENSCXT	(UL(1) << 53)
--#define HCR_TOCU	(UL(1) << 52)
--#define HCR_AMVOFFEN	(UL(1) << 51)
--#define HCR_TICAB	(UL(1) << 50)
--#define HCR_TID4	(UL(1) << 49)
--#define HCR_FIEN	(UL(1) << 47)
--#define HCR_FWB		(UL(1) << 46)
--#define HCR_NV2		(UL(1) << 45)
--#define HCR_AT		(UL(1) << 44)
--#define HCR_NV1		(UL(1) << 43)
--#define HCR_NV		(UL(1) << 42)
--#define HCR_API		(UL(1) << 41)
--#define HCR_APK		(UL(1) << 40)
--#define HCR_TEA		(UL(1) << 37)
--#define HCR_TERR	(UL(1) << 36)
--#define HCR_TLOR	(UL(1) << 35)
--#define HCR_E2H		(UL(1) << 34)
--#define HCR_ID		(UL(1) << 33)
--#define HCR_CD		(UL(1) << 32)
--#define HCR_RW_SHIFT	31
--#define HCR_RW		(UL(1) << HCR_RW_SHIFT)
--#define HCR_TRVM	(UL(1) << 30)
--#define HCR_HCD		(UL(1) << 29)
--#define HCR_TDZ		(UL(1) << 28)
--#define HCR_TGE		(UL(1) << 27)
--#define HCR_TVM		(UL(1) << 26)
--#define HCR_TTLB	(UL(1) << 25)
--#define HCR_TPU		(UL(1) << 24)
--#define HCR_TPC		(UL(1) << 23) /* HCR_TPCP if FEAT_DPB */
--#define HCR_TSW		(UL(1) << 22)
--#define HCR_TACR	(UL(1) << 21)
--#define HCR_TIDCP	(UL(1) << 20)
--#define HCR_TSC		(UL(1) << 19)
--#define HCR_TID3	(UL(1) << 18)
--#define HCR_TID2	(UL(1) << 17)
--#define HCR_TID1	(UL(1) << 16)
--#define HCR_TID0	(UL(1) << 15)
--#define HCR_TWE		(UL(1) << 14)
--#define HCR_TWI		(UL(1) << 13)
--#define HCR_DC		(UL(1) << 12)
--#define HCR_BSU		(3 << 10)
--#define HCR_BSU_IS	(UL(1) << 10)
--#define HCR_FB		(UL(1) << 9)
--#define HCR_VSE		(UL(1) << 8)
--#define HCR_VI		(UL(1) << 7)
--#define HCR_VF		(UL(1) << 6)
--#define HCR_AMO		(UL(1) << 5)
--#define HCR_IMO		(UL(1) << 4)
--#define HCR_FMO		(UL(1) << 3)
--#define HCR_PTW		(UL(1) << 2)
--#define HCR_SWIO	(UL(1) << 1)
--#define HCR_VM		(UL(1) << 0)
--#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
-+/*
-+ * Because I'm terribly lazy and that repainting the whole of the KVM
-+ * code with the proper names is a pain, use a helper to map the names
-+ * inherited from AArch32 with the new fancy nomenclature. One day...
-+ */
-+#define	__HCR(x)	HCR_EL2_##x
++static int handle_other(struct kvm_vcpu *vcpu)
++{
++	bool is_l2 = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
++	u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	u64 iss = ESR_ELx_ISS(esr);
++	struct kvm *kvm = vcpu->kvm;
++	bool allowed, fwd = false;
 +
-+#define HCR_TID5	__HCR(TID5)
-+#define HCR_DCT		__HCR(DCT)
-+#define HCR_ATA_SHIFT	__HCR(ATA_SHIFT)
-+#define HCR_ATA		__HCR(ATA)
-+#define HCR_TTLBOS	__HCR(TTLBOS)
-+#define HCR_TTLBIS	__HCR(TTLBIS)
-+#define HCR_ENSCXT	__HCR(EnSCXT)
-+#define HCR_TOCU	__HCR(TOCU)
-+#define HCR_AMVOFFEN	__HCR(AMVOFFEN)
-+#define HCR_TICAB	__HCR(TICAB)
-+#define HCR_TID4	__HCR(TID4)
-+#define HCR_FIEN	__HCR(FIEN)
-+#define HCR_FWB		__HCR(FWB)
-+#define HCR_NV2		__HCR(NV2)
-+#define HCR_AT		__HCR(AT)
-+#define HCR_NV1		__HCR(NV1)
-+#define HCR_NV		__HCR(NV)
-+#define HCR_API		__HCR(API)
-+#define HCR_APK		__HCR(APK)
-+#define HCR_TEA		__HCR(TEA)
-+#define HCR_TERR	__HCR(TERR)
-+#define HCR_TLOR	__HCR(TLOR)
-+#define HCR_E2H		__HCR(E2H)
-+#define HCR_ID		__HCR(ID)
-+#define HCR_CD		__HCR(CD)
-+#define HCR_RW		__HCR(RW)
-+#define HCR_TRVM	__HCR(TRVM)
-+#define HCR_HCD		__HCR(HCD)
-+#define HCR_TDZ		__HCR(TDZ)
-+#define HCR_TGE		__HCR(TGE)
-+#define HCR_TVM		__HCR(TVM)
-+#define HCR_TTLB	__HCR(TTLB)
-+#define HCR_TPU		__HCR(TPU)
-+#define HCR_TPC		__HCR(TPCP)
-+#define HCR_TSW		__HCR(TSW)
-+#define HCR_TACR	__HCR(TACR)
-+#define HCR_TIDCP	__HCR(TIDCP)
-+#define HCR_TSC		__HCR(TSC)
-+#define HCR_TID3	__HCR(TID3)
-+#define HCR_TID2	__HCR(TID2)
-+#define HCR_TID1	__HCR(TID1)
-+#define HCR_TID0	__HCR(TID0)
-+#define HCR_TWE		__HCR(TWE)
-+#define HCR_TWI		__HCR(TWI)
-+#define HCR_DC		__HCR(DC)
-+#define HCR_BSU		__HCR(BSU)
-+#define HCR_BSU_IS	__HCR(BSU_IS)
-+#define HCR_FB		__HCR(FB)
-+#define HCR_VSE		__HCR(VSE)
-+#define HCR_VI		__HCR(VI)
-+#define HCR_VF		__HCR(VF)
-+#define HCR_AMO		__HCR(AMO)
-+#define HCR_IMO		__HCR(IMO)
-+#define HCR_FMO		__HCR(FMO)
-+#define HCR_PTW		__HCR(PTW)
-+#define HCR_SWIO	__HCR(SWIO)
-+#define HCR_VM		__HCR(VM)
- 
- /*
-  * The bits we set in HCR:
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 3598ddd84942d..1cf9a07cce522 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2529,6 +2529,74 @@ Field	1	AFSR1_EL1
- Field	0	AFSR0_EL1
- EndSysregFields
- 
-+Sysreg	HCR_EL2		3	4	1	1	0
-+Field	63:60	TWEDEL
-+Field	59	TWEDEn
-+Field	58	TID5
-+Field	57	DCT
-+Field	56	ATA
-+Field	55	TTLBOS
-+Field	54	TTLBIS
-+Field	53	EnSCXT
-+Field	52	TOCU
-+Field	51	AMVOFFEN
-+Field	50	TICAB
-+Field	49	TID4
-+Field	48	GPF
-+Field	47	FIEN
-+Field	46	FWB
-+Field	45	NV2
-+Field	44	AT
-+Field	43	NV1
-+Field	42	NV
-+Field	41	API
-+Field	40	APK
-+Field	39	TME
-+Field	38	MIOCNCE
-+Field	37	TEA
-+Field	36	TERR
-+Field	35	TLOR
-+Field	34	E2H
-+Field	33	ID
-+Field	32	CD
-+Field	31	RW
-+Field	30	TRVM
-+Field	29	HCD
-+Field	28	TDZ
-+Field	27	TGE
-+Field	26	TVM
-+Field	25	TTLB
-+Field	24	TPU
-+Field	23	TPCP
-+Field	22	TSW
-+Field	21	TACR
-+Field	20	TIDCP
-+Field	19	TSC
-+Field	18	TID3
-+Field	17	TID2
-+Field	16	TID1
-+Field	15	TID0
-+Field	14	TWE
-+Field	13	TWI
-+Field	12	DC
-+UnsignedEnum	11:10	BSU
-+	0b00	NONE
-+	0b01	IS
-+	0b10	OS
-+	0b11	FS
-+EndEnum
-+Field	9	FB
-+Field	8	VSE
-+Field	7	VI
-+Field	6	VF
-+Field	5	AMO
-+Field	4	IMO
-+Field	3	FMO
-+Field	2	PTW
-+Field	1	SWIO
-+Field	0	VM
-+EndSysreg
++	/*
++	 * We only trap for two reasons:
++	 *
++	 * - the feature is disabled, and the only outcome is to
++	 *   generate an UNDEF.
++	 *
++	 * - the feature is enabled, but a NV guest wants to trap the
++	 *   feature used my its L2 guest. We forward the exception in
++	 *   this case.
++	 *
++	 * What we don't expect is to end-up here if the guest is
++	 * expected be be able to directly use the feature, hence the
++	 * WARN_ON below.
++	 */
++	switch (iss) {
++	case ESR_ELx_ISS_OTHER_ST64BV:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
++		if (is_l2)
++			fwd = !(hcrx & HCRX_EL2_EnASR);
++		break;
++	case ESR_ELx_ISS_OTHER_ST64BV0:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
++		if (is_l2)
++			fwd = !(hcrx & HCRX_EL2_EnAS0);
++		break;
++	case ESR_ELx_ISS_OTHER_LDST64B:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
++		if (is_l2)
++			fwd = !(hcrx & HCRX_EL2_EnALS);
++		break;
++	default:
++		/* Clearly, we're missing something. */
++		WARN_ON_ONCE(1);
++		allowed = false;
++	}
 +
- Sysreg MDCR_EL2		3	4	1	1	1
- Res0	63:51
- Field	50	EnSTEPOP
++	WARN_ON_ONCE(allowed && !fwd);
++
++	if (allowed && fwd)
++		kvm_inject_nested_sync(vcpu, esr);
++	else
++		kvm_inject_undefined(vcpu);
++
++	return 1;
++}
++
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -303,6 +358,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+ 	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
+ 	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
++	[ESR_ELx_EC_OTHER]	= handle_other,
+ 	[ESR_ELx_EC_HVC32]	= handle_hvc,
+ 	[ESR_ELx_EC_SMC32]	= handle_smc,
+ 	[ESR_ELx_EC_HVC64]	= handle_hvc,
 -- 
 2.39.2
 
