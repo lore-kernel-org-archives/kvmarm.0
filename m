@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD8F22B594;
-	Mon, 10 Mar 2025 12:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5225922B5B1;
+	Mon, 10 Mar 2025 12:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609518; cv=none; b=a3KKffhIe43Kk7CNWe3rJSc+Ue16LyBu7wVl1jt8BK9+QXH7dF9UNBNrtXhXm/MsYTEG72Bj/OyUZyBWxtO/RnrlEMZqq/sBCiixtv+Rlg2F9fJQolhuzeM1TrdVhRHHYxUC/Lx6Rp4qfs92s0MAsSxlw3iiKq6Zr0NTvhOHWac=
+	t=1741609518; cv=none; b=QlJb6711MyHkq0d3ulObLSdbBfoKS7AThg2Q7rKhqOpY+EbtOrKIt9EpWXsrK9iPBbZld95g4/dhdfI+hrA8EY1QH/tycg5s1TwkLl6SDoTkvgDPPg+qb2IUNHvUtZZmiU4gfRi6GZ8DeFTm+xdFHVbYccvi3fxH1S7mPtFshQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741609518; c=relaxed/simple;
-	bh=ne64BQyhsk+KcVvzIQyD/bMPuLxgslvEtWY9d1eApyo=;
+	bh=4XFGhRWkQDOPRGMVZlsmG9ZzN+/teYymVctEWzRfFpo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uvV+Dfh8uahTFZsI9XLax/WGaffAvXXq2SlrGgu/Ig6MOPKSbtUTCRCx7oOSZsmxf8UxDUIkp7+KPZgv2sFj93ZaEHCjC9JO3ZGMiYbB0UtJy6dhjN4T7HKXuFf/lG5eyk+fHP9R2t7iawAnc7DZnh7st7UMSOgFLwRF5oOZxvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sb8iO9sQ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TfSWsJWEQ8vRu/CHTPTeT6qaQegfq5IXgxLLNS0oLmzMnoch3Xl7SDvAO2yFdU+k/zVQ4o1koeCdRUFImjO6yDFKe5pOx+GI1XfpUoTP7t0huRgVivwhgbc/pLprAo+Et1Q9+B0c0JW4K4FHSEqodVKpwkPI5SsqtZu8NC3FW84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMQnBx/t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sb8iO9sQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E501C4CEEE;
-	Mon, 10 Mar 2025 12:25:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMQnBx/t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11728C4CEF1;
+	Mon, 10 Mar 2025 12:25:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741609517;
-	bh=ne64BQyhsk+KcVvzIQyD/bMPuLxgslvEtWY9d1eApyo=;
+	s=k20201202; t=1741609518;
+	bh=4XFGhRWkQDOPRGMVZlsmG9ZzN+/teYymVctEWzRfFpo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Sb8iO9sQsI6GRCGf16a6/575Q472xXlGF9yuVg+gCCYsDghxlT1lCYxy74H/RFa+p
-	 t0faNCiXJHRTLwkdUHeS9MVTQpbF7O1Px3jWuPjd08C9aL+bJMARzZmT5sic5MZpo5
-	 78+X8htECHBmxAyGsJQxu+r5WCZTCgrO/55MsGpX3CrOIa3LG5IFeg7AEqqjjBF+8T
-	 Ja9tRfDrnYNaRNjLTve9sBzEdMIuq94hDQbKab1tx5/7qWEGo/Fbrc61A7aZwLl0I9
-	 5jqxoSTgLou1dYX/suPC/D/TJD2yLarEfbq3qI9bSs2ES679t7UQPpJnepIYH7ee+q
-	 Nl/LPoaSplKYQ==
+	b=LMQnBx/t9iQpHq5ONdRbSmVRS+xXEk9B1O4tS56YJT3hz7AX32yaWyAuC9yIVfOyK
+	 g+6XORk7dCoodpnWWKI9tSsHO8WIkLVEVplMF1tnyapTOVW5ROdhpWYBIkfdo9GTSi
+	 L5/X8iOrkhuw8dM7jgF/+nZos5dJ9aif3ebr0zUCW8U31IQzYeHWh2LvrKT6HUPK2B
+	 QCcV8uBGFR1UqTF5X+MXAVkbCeZWA2Qfx+L4kPWAziGH5OrPZRtFqUpFigwjxv+Epm
+	 9YEfFAcNSx0cqlFB4U3RV/RWYZAK/fwNN5ay646RWTHUzKW7SEwPslIJsQy3n/qEs6
+	 QazkDJspRo6jw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trcC3-00CAea-BJ;
-	Mon, 10 Mar 2025 12:25:15 +0000
+	id 1trcC4-00CAea-6v;
+	Mon, 10 Mar 2025 12:25:16 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 20/23] KVM: arm64: Use FGT feature maps to drive RES0 bits
-Date: Mon, 10 Mar 2025 12:25:02 +0000
-Message-Id: <20250310122505.2857610-21-maz@kernel.org>
+Subject: [PATCH v2 23/23] KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
+Date: Mon, 10 Mar 2025 12:25:05 +0000
+Message-Id: <20250310122505.2857610-24-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250310122505.2857610-1-maz@kernel.org>
 References: <20250310122505.2857610-1-maz@kernel.org>
@@ -60,231 +60,283 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Another benefit of mapping bits to features is that it becomes trivial
-to define which bits should be handled as RES0.
+Similarly to other registers, describe which HCR_EL2 bit depends
+on which feature, and use this to compute the RES0 status of these
+bits.
 
-Let's apply this principle to the guest's view of the FGT registers.
+An additional complexity stems from the status of some bits such
+as E2H and RW, which do not had a RESx status, but still take
+a fixed value due to implementation choices in KVM.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |   1 +
- arch/arm64/kvm/config.c           |  46 +++++++++++
- arch/arm64/kvm/nested.c           | 129 +++---------------------------
- 3 files changed, 57 insertions(+), 119 deletions(-)
+ arch/arm64/kvm/config.c | 149 ++++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/nested.c |  35 +---------
+ 2 files changed, 150 insertions(+), 34 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c98f7eed68142..9bac3c6800294 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1565,6 +1565,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
- 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
- 
- void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
-+void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64*res1);
- void check_feature_map(void);
- 
- #endif /* __ARM64_KVM_HOST_H__ */
 diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index d39f1f14e3dc4..f88783bd9a2f1 100644
+index 15ec8bdc57055..120464c6dee1c 100644
 --- a/arch/arm64/kvm/config.c
 +++ b/arch/arm64/kvm/config.c
-@@ -616,3 +616,49 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
- 
- 	kvm->arch.fgu[fgt] = val;
- }
+@@ -69,7 +69,10 @@ struct reg_bits_to_feat_map {
+ #define FEAT_TRBE		ID_AA64DFR0_EL1, TraceBuffer, IMP
+ #define FEAT_DoubleLock		ID_AA64DFR0_EL1, DoubleLock, IMP
+ #define FEAT_TRF		ID_AA64DFR0_EL1, TraceFilt, IMP
++#define FEAT_AA32EL0		ID_AA64PFR0_EL1, EL0, AARCH32
++#define FEAT_AA32EL1		ID_AA64PFR0_EL1, EL1, AARCH32
+ #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
++#define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
+ #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+ #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+ #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+@@ -92,6 +95,7 @@ struct reg_bits_to_feat_map {
+ #define FEAT_PAN2		ID_AA64MMFR1_EL1, PAN, PAN2
+ #define FEAT_DPB2		ID_AA64ISAR1_EL1, DPB, DPB2
+ #define FEAT_AMUv1		ID_AA64PFR0_EL1, AMU, IMP
++#define FEAT_AMUv1p1		ID_AA64PFR0_EL1, AMU, V1P1
+ #define FEAT_CMOW		ID_AA64MMFR1_EL1, CMOW, IMP
+ #define FEAT_D128		ID_AA64MMFR3_EL1, D128, IMP
+ #define FEAT_DoubleFault2	ID_AA64PFR1_EL1, DF2, IMP
+@@ -102,6 +106,31 @@ struct reg_bits_to_feat_map {
+ #define FEAT_SYSREG128		ID_AA64ISAR2_EL1, SYSREG_128, IMP
+ #define FEAT_TCR2		ID_AA64MMFR3_EL1, TCRX, IMP
+ #define FEAT_XS			ID_AA64ISAR1_EL1, XS, IMP
++#define FEAT_EVT		ID_AA64MMFR2_EL1, EVT, IMP
++#define FEAT_EVT_TTLBxS		ID_AA64MMFR2_EL1, EVT, TTLBxS
++#define FEAT_MTE2		ID_AA64PFR1_EL1, MTE, MTE2
++#define FEAT_RME		ID_AA64PFR0_EL1, RME, IMP
++#define FEAT_S2FWB		ID_AA64MMFR2_EL1, FWB, IMP
++#define FEAT_TME		ID_AA64ISAR0_EL1, TME, IMP
++#define FEAT_TWED		ID_AA64MMFR1_EL1, TWED, IMP
++#define FEAT_E2H0		ID_AA64MMFR4_EL1, E2H0, IMP
 +
-+void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1)
++static bool not_feat_aa64el3(struct kvm *kvm)
 +{
-+	switch (reg) {
-+	case HFGRTR_EL2:
-+		*res0 = compute_res0_bits(kvm, hfgrtr_feat_map,
-+					  ARRAY_SIZE(hfgrtr_feat_map), 0, 0);
-+		*res0 |= hfgrtr_masks.res0;
-+		*res1 = HFGxTR_EL2_RES1;
-+		break;
-+	case HFGWTR_EL2:
-+		*res0 = compute_res0_bits(kvm, hfgwtr_feat_map,
-+					  ARRAY_SIZE(hfgwtr_feat_map), 0, 0);
-+		*res0 |= hfgwtr_masks.res0;
-+		*res1 = HFGxTR_EL2_RES1;
-+		break;
-+	case HFGITR_EL2:
-+		*res0 = compute_res0_bits(kvm, hfgitr_feat_map,
-+					  ARRAY_SIZE(hfgitr_feat_map), 0, 0);
-+		*res0 |= hfgitr_masks.res0;
-+		*res1 = HFGITR_EL2_RES1;
-+		break;
-+	case HDFGRTR_EL2:
-+		*res0 = compute_res0_bits(kvm, hdfgrtr_feat_map,
-+					  ARRAY_SIZE(hdfgrtr_feat_map), 0, 0);
-+		*res0 |= hdfgrtr_masks.res0;
-+		*res1 = HDFGRTR_EL2_RES1;
-+		break;
-+	case HDFGWTR_EL2:
-+		*res0 = compute_res0_bits(kvm, hdfgwtr_feat_map,
-+					  ARRAY_SIZE(hdfgwtr_feat_map), 0, 0);
-+		*res0 |= hdfgwtr_masks.res0;
-+		*res1 = HDFGWTR_EL2_RES1;
-+		break;
-+	case HAFGRTR_EL2:
-+		*res0 = compute_res0_bits(kvm, hafgrtr_feat_map,
-+					  ARRAY_SIZE(hafgrtr_feat_map), 0, 0);
-+		*res0 |= hafgrtr_masks.res0;
-+		*res1 = HAFGRTR_EL2_RES1;
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		*res0 = *res1 = 0;
-+		break;
-+	}
++	return !kvm_has_feat(kvm, FEAT_AA64EL3);
 +}
++
++static bool feat_nv2(struct kvm *kvm)
++{
++	return ((kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY) &&
++		 kvm_has_feat_enum(kvm, ID_AA64MMFR2_EL1, NV, NI)) ||
++		kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, NV2));
++}
++
++static bool feat_nv2_e2h0_ni(struct kvm *kvm)
++{
++	return feat_nv2(kvm) && !kvm_has_feat(kvm, FEAT_E2H0);
++}
+ 
+ static bool feat_rasv1p1(struct kvm *kvm)
+ {
+@@ -151,6 +180,31 @@ static bool feat_sme_smps(struct kvm *kvm)
+ 		(read_sysreg_s(SYS_SMIDR_EL1) & SMIDR_EL1_SMPS));
+ }
+ 
++static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
++{
++	/* This is purely academic: AArch32 and NV are mutually exclusive */
++	if (bits) {
++		if (kvm_has_feat(kvm, FEAT_AA32EL1))
++			*bits &= ~HCR_EL2_RW;
++		else
++			*bits |= HCR_EL2_RW;
++	}
++
++	return true;
++}
++
++static bool compute_hcr_e2h(struct kvm *kvm, u64 *bits)
++{
++	if (bits) {
++		if (kvm_has_feat(kvm, FEAT_E2H0))
++			*bits &= ~HCR_EL2_E2H;
++		else
++			*bits |= HCR_EL2_E2H;
++	}
++
++	return true;
++}
++
+ static struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
+ 	NEEDS_FEAT(HFGxTR_EL2_nAMAIR2_EL1	|
+ 		   HFGxTR_EL2_nMAIR2_EL1,
+@@ -564,6 +618,77 @@ static struct reg_bits_to_feat_map hcrx_feat_map[] = {
+ 	NEEDS_FEAT(HCRX_EL2_EnAS0, FEAT_LS64_ACCDATA),
+ };
+ 
++static struct reg_bits_to_feat_map hcr_feat_map[] = {
++	NEEDS_FEAT(HCR_EL2_TID0, FEAT_AA32EL0),
++	NEEDS_FEAT_FIXED(HCR_EL2_RW, compute_hcr_rw),
++	NEEDS_FEAT(HCR_EL2_HCD, not_feat_aa64el3),
++	NEEDS_FEAT(HCR_EL2_AMO		|
++		   HCR_EL2_BSU		|
++		   HCR_EL2_CD		|
++		   HCR_EL2_DC		|
++		   HCR_EL2_FB		|
++		   HCR_EL2_FMO		|
++		   HCR_EL2_ID		|
++		   HCR_EL2_IMO		|
++		   HCR_EL2_MIOCNCE	|
++		   HCR_EL2_PTW		|
++		   HCR_EL2_SWIO		|
++		   HCR_EL2_TACR		|
++		   HCR_EL2_TDZ		|
++		   HCR_EL2_TGE		|
++		   HCR_EL2_TID1		|
++		   HCR_EL2_TID2		|
++		   HCR_EL2_TID3		|
++		   HCR_EL2_TIDCP	|
++		   HCR_EL2_TPCP		|
++		   HCR_EL2_TPU		|
++		   HCR_EL2_TRVM		|
++		   HCR_EL2_TSC		|
++		   HCR_EL2_TSW		|
++		   HCR_EL2_TTLB		|
++		   HCR_EL2_TVM		|
++		   HCR_EL2_TWE		|
++		   HCR_EL2_TWI		|
++		   HCR_EL2_VF		|
++		   HCR_EL2_VI		|
++		   HCR_EL2_VM		|
++		   HCR_EL2_VSE,
++		   FEAT_AA64EL1),
++	NEEDS_FEAT(HCR_EL2_AMVOFFEN, FEAT_AMUv1p1),
++	NEEDS_FEAT(HCR_EL2_EnSCXT, feat_csv2_2_csv2_1p2),
++	NEEDS_FEAT(HCR_EL2_TICAB	|
++		   HCR_EL2_TID4		|
++		   HCR_EL2_TOCU,
++		   FEAT_EVT),
++	NEEDS_FEAT(HCR_EL2_TTLBIS	|
++		   HCR_EL2_TTLBOS,
++		   FEAT_EVT_TTLBxS),
++	NEEDS_FEAT(HCR_EL2_TLOR, FEAT_LOR),
++	NEEDS_FEAT(HCR_EL2_ATA		|
++		   HCR_EL2_DCT		|
++		   HCR_EL2_TID5,
++		   FEAT_MTE2),
++	NEEDS_FEAT(HCR_EL2_AT		| /* Ignore the original FEAT_NV */
++		   HCR_EL2_NV2		|
++		   HCR_EL2_NV,
++		   feat_nv2),
++	NEEDS_FEAT(HCR_EL2_NV1, feat_nv2_e2h0_ni), /* Missing from JSON */
++	NEEDS_FEAT(HCR_EL2_API		|
++		   HCR_EL2_APK,
++		   feat_pauth),
++	NEEDS_FEAT(HCR_EL2_TEA		|
++		   HCR_EL2_TERR,
++		   FEAT_RAS),
++	NEEDS_FEAT(HCR_EL2_FIEN, feat_rasv1p1),
++	NEEDS_FEAT(HCR_EL2_GPF, FEAT_RME),
++	NEEDS_FEAT(HCR_EL2_FWB, FEAT_S2FWB),
++	NEEDS_FEAT(HCR_EL2_TME, FEAT_TME),
++	NEEDS_FEAT(HCR_EL2_TWEDEL	|
++		   HCR_EL2_TWEDEn,
++		   FEAT_TWED),
++	NEEDS_FEAT_FIXED(HCR_EL2_E2H, compute_hcr_e2h),
++};
++
+ static void __init check_feat_map(struct reg_bits_to_feat_map *map,
+ 				  int map_size, u64 res0, const char *str)
+ {
+@@ -593,6 +718,8 @@ void __init check_feature_map(void)
+ 		       hafgrtr_masks.res0, hafgrtr_masks.str);
+ 	check_feat_map(hcrx_feat_map, ARRAY_SIZE(hcrx_feat_map),
+ 		       __HCRX_EL2_RES0, "HCRX_EL2");
++	check_feat_map(hcr_feat_map, ARRAY_SIZE(hcr_feat_map),
++		       HCR_EL2_RES0, "HCR_EL2");
+ }
+ 
+ static bool idreg_feat_match(struct kvm *kvm, struct reg_bits_to_feat_map *map)
+@@ -651,6 +778,17 @@ static u64 compute_res0_bits(struct kvm *kvm,
+ 				    require, exclude | FIXED_VALUE);
+ }
+ 
++static u64 compute_fixed_bits(struct kvm *kvm,
++			      struct reg_bits_to_feat_map *map,
++			      int map_size,
++			      u64 *fixed_bits,
++			      unsigned long require,
++			      unsigned long exclude)
++{
++	return __compute_fixed_bits(kvm, map, map_size, fixed_bits,
++				    require | FIXED_VALUE, exclude);
++}
++
+ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
+ {
+ 	u64 val = 0;
+@@ -691,6 +829,8 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
+ 
+ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1)
+ {
++	u64 fixed = 0, mask;
++
+ 	switch (reg) {
+ 	case HFGRTR_EL2:
+ 		*res0 = compute_res0_bits(kvm, hfgrtr_feat_map,
+@@ -734,6 +874,15 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+ 		*res0 |= __HCRX_EL2_RES0;
+ 		*res1 = __HCRX_EL2_RES1;
+ 		break;
++	case HCR_EL2:
++		mask = compute_fixed_bits(kvm, hcr_feat_map,
++					  ARRAY_SIZE(hcr_feat_map), &fixed,
++					  0, 0);
++		*res0 = compute_res0_bits(kvm, hcr_feat_map,
++					  ARRAY_SIZE(hcr_feat_map), 0, 0);
++		*res0 |= HCR_EL2_RES0 | (mask & ~fixed);
++		*res1 = HCR_EL2_RES1 | (mask & fixed);
++		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		*res0 = *res1 = 0;
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 48b8a700de457..74df066f9ab3f 100644
+index 984940781a4cf..07fa8c3f89df7 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -1081,132 +1081,23 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
- 	set_sysreg_masks(kvm, HCRX_EL2, res0, res1);
+@@ -1002,40 +1002,7 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 	set_sysreg_masks(kvm, VMPIDR_EL2, res0, res1);
  
- 	/* HFG[RW]TR_EL2 */
--	res0 = res1 = 0;
--	if (!(kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
--	      kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
--		res0 |= (HFGxTR_EL2_APDAKey | HFGxTR_EL2_APDBKey |
--			 HFGxTR_EL2_APGAKey | HFGxTR_EL2_APIAKey |
--			 HFGxTR_EL2_APIBKey);
--	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
--		res0 |= (HFGxTR_EL2_LORC_EL1 | HFGxTR_EL2_LOREA_EL1 |
--			 HFGxTR_EL2_LORID_EL1 | HFGxTR_EL2_LORN_EL1 |
--			 HFGxTR_EL2_LORSA_EL1);
+ 	/* HCR_EL2 */
+-	res0 = BIT(48);
+-	res1 = HCR_RW;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, TWED, IMP))
+-		res0 |= GENMASK(63, 59);
+-	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, MTE2))
+-		res0 |= (HCR_TID5 | HCR_DCT | HCR_ATA);
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, TTLBxS))
+-		res0 |= (HCR_TTLBIS | HCR_TTLBOS);
 -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, CSV2, CSV2_2) &&
 -	    !kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2))
--		res0 |= (HFGxTR_EL2_SCXTNUM_EL1 | HFGxTR_EL2_SCXTNUM_EL0);
--	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, GIC, IMP))
--		res0 |= HFGxTR_EL2_ICC_IGRPENn_EL1;
--	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
--		res0 |= (HFGxTR_EL2_ERRIDR_EL1 | HFGxTR_EL2_ERRSELR_EL1 |
--			 HFGxTR_EL2_ERXFR_EL1 | HFGxTR_EL2_ERXCTLR_EL1 |
--			 HFGxTR_EL2_ERXSTATUS_EL1 | HFGxTR_EL2_ERXMISCn_EL1 |
--			 HFGxTR_EL2_ERXPFGF_EL1 | HFGxTR_EL2_ERXPFGCTL_EL1 |
--			 HFGxTR_EL2_ERXPFGCDN_EL1 | HFGxTR_EL2_ERXADDR_EL1);
--	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
--		res0 |= HFGxTR_EL2_nACCDATA_EL1;
--	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
--		res0 |= (HFGxTR_EL2_nGCS_EL0 | HFGxTR_EL2_nGCS_EL1);
--	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP))
--		res0 |= (HFGxTR_EL2_nSMPRI_EL1 | HFGxTR_EL2_nTPIDR2_EL0);
--	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
--		res0 |= HFGxTR_EL2_nRCWMASK_EL1;
--	if (!kvm_has_s1pie(kvm))
--		res0 |= (HFGxTR_EL2_nPIRE0_EL1 | HFGxTR_EL2_nPIR_EL1);
--	if (!kvm_has_s1poe(kvm))
--		res0 |= (HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nPOR_EL1);
--	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
--		res0 |= HFGxTR_EL2_nS2POR_EL1;
--	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
--		res0 |= (HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nAMAIR2_EL1);
--	set_sysreg_masks(kvm, HFGRTR_EL2, res0 | hfgrtr_masks.res0, res1);
--	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | hfgwtr_masks.res0, res1);
-+	get_reg_fixed_bits(kvm, HFGRTR_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HFGRTR_EL2, res0, res1);
-+	get_reg_fixed_bits(kvm, HFGWTR_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HFGWTR_EL2, res0, res1);
- 
- 	/* HDFG[RW]TR_EL2 */
--	res0 = res1 = 0;
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DoubleLock, IMP))
--		res0 |= HDFGRTR_EL2_OSDLR_EL1;
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
--		res0 |= (HDFGRTR_EL2_PMEVCNTRn_EL0 | HDFGRTR_EL2_PMEVTYPERn_EL0 |
--			 HDFGRTR_EL2_PMCCFILTR_EL0 | HDFGRTR_EL2_PMCCNTR_EL0 |
--			 HDFGRTR_EL2_PMCNTEN | HDFGRTR_EL2_PMINTEN |
--			 HDFGRTR_EL2_PMOVS | HDFGRTR_EL2_PMSELR_EL0 |
--			 HDFGRTR_EL2_PMMIR_EL1 | HDFGRTR_EL2_PMUSERENR_EL0 |
--			 HDFGRTR_EL2_PMCEIDn_EL0);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, IMP))
--		res0 |= (HDFGRTR_EL2_PMBLIMITR_EL1 | HDFGRTR_EL2_PMBPTR_EL1 |
--			 HDFGRTR_EL2_PMBSR_EL1 | HDFGRTR_EL2_PMSCR_EL1 |
--			 HDFGRTR_EL2_PMSEVFR_EL1 | HDFGRTR_EL2_PMSFCR_EL1 |
--			 HDFGRTR_EL2_PMSICR_EL1 | HDFGRTR_EL2_PMSIDR_EL1 |
--			 HDFGRTR_EL2_PMSIRR_EL1 | HDFGRTR_EL2_PMSLATFR_EL1 |
--			 HDFGRTR_EL2_PMBIDR_EL1);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceVer, IMP))
--		res0 |= (HDFGRTR_EL2_TRC | HDFGRTR_EL2_TRCAUTHSTATUS |
--			 HDFGRTR_EL2_TRCAUXCTLR | HDFGRTR_EL2_TRCCLAIM |
--			 HDFGRTR_EL2_TRCCNTVRn | HDFGRTR_EL2_TRCID |
--			 HDFGRTR_EL2_TRCIMSPECn | HDFGRTR_EL2_TRCOSLSR |
--			 HDFGRTR_EL2_TRCPRGCTLR | HDFGRTR_EL2_TRCSEQSTR |
--			 HDFGRTR_EL2_TRCSSCSRn | HDFGRTR_EL2_TRCSTATR |
--			 HDFGRTR_EL2_TRCVICTLR);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
--		res0 |= (HDFGRTR_EL2_TRBBASER_EL1 | HDFGRTR_EL2_TRBIDR_EL1 |
--			 HDFGRTR_EL2_TRBLIMITR_EL1 | HDFGRTR_EL2_TRBMAR_EL1 |
--			 HDFGRTR_EL2_TRBPTR_EL1 | HDFGRTR_EL2_TRBSR_EL1 |
--			 HDFGRTR_EL2_TRBTRG_EL1);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
--		res0 |= (HDFGRTR_EL2_nBRBIDR | HDFGRTR_EL2_nBRBCTL |
--			 HDFGRTR_EL2_nBRBDATA);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2))
--		res0 |= HDFGRTR_EL2_nPMSNEVFR_EL1;
--	set_sysreg_masks(kvm, HDFGRTR_EL2, res0 | hdfgrtr_masks.res0, res1);
--
--	/* Reuse the bits from the read-side and add the write-specific stuff */
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
--		res0 |= (HDFGWTR_EL2_PMCR_EL0 | HDFGWTR_EL2_PMSWINC_EL0);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceVer, IMP))
--		res0 |= HDFGWTR_EL2_TRCOSLAR;
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceFilt, IMP))
--		res0 |= HDFGWTR_EL2_TRFCR_EL1;
--	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | hdfgwtr_masks.res0, res1);
-+	get_reg_fixed_bits(kvm, HDFGRTR_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HDFGRTR_EL2, res0, res1);
-+	get_reg_fixed_bits(kvm, HDFGWTR_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HDFGWTR_EL2, res0, res1);
- 
- 	/* HFGITR_EL2 */
--	res0 = hfgitr_masks.res0;
--	res1 = HFGITR_EL2_RES1;
--	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, DPB, DPB2))
--		res0 |= HFGITR_EL2_DCCVADP;
--	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
--		res0 |= (HFGITR_EL2_ATS1E1RP | HFGITR_EL2_ATS1E1WP);
--	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
--		res0 |= (HFGITR_EL2_TLBIRVAALE1OS | HFGITR_EL2_TLBIRVALE1OS |
--			 HFGITR_EL2_TLBIRVAAE1OS | HFGITR_EL2_TLBIRVAE1OS |
--			 HFGITR_EL2_TLBIVAALE1OS | HFGITR_EL2_TLBIVALE1OS |
--			 HFGITR_EL2_TLBIVAAE1OS | HFGITR_EL2_TLBIASIDE1OS |
--			 HFGITR_EL2_TLBIVAE1OS | HFGITR_EL2_TLBIVMALLE1OS);
--	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
--		res0 |= (HFGITR_EL2_TLBIRVAALE1 | HFGITR_EL2_TLBIRVALE1 |
--			 HFGITR_EL2_TLBIRVAAE1 | HFGITR_EL2_TLBIRVAE1 |
--			 HFGITR_EL2_TLBIRVAALE1IS | HFGITR_EL2_TLBIRVALE1IS |
--			 HFGITR_EL2_TLBIRVAAE1IS | HFGITR_EL2_TLBIRVAE1IS |
--			 HFGITR_EL2_TLBIRVAALE1OS | HFGITR_EL2_TLBIRVALE1OS |
--			 HFGITR_EL2_TLBIRVAAE1OS | HFGITR_EL2_TLBIRVAE1OS);
--	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, SPECRES, IMP))
--		res0 |= (HFGITR_EL2_CFPRCTX | HFGITR_EL2_DVPRCTX |
--			 HFGITR_EL2_CPPRCTX);
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
--		res0 |= (HFGITR_EL2_nBRBINJ | HFGITR_EL2_nBRBIALL);
--	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
--		res0 |= (HFGITR_EL2_nGCSPUSHM_EL1 | HFGITR_EL2_nGCSSTR_EL1 |
--			 HFGITR_EL2_nGCSEPP);
--	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX))
--		res0 |= HFGITR_EL2_COSPRCTX;
--	if (!kvm_has_feat(kvm, ID_AA64ISAR2_EL1, ATS1A, IMP))
--		res0 |= HFGITR_EL2_ATS1E1A;
-+	get_reg_fixed_bits(kvm, HFGITR_EL2, &res0, &res1);
- 	set_sysreg_masks(kvm, HFGITR_EL2, res0, res1);
- 
- 	/* HAFGRTR_EL2 - not a lot to see here */
--	res0 = hafgrtr_masks.res0;
--	res1 = HAFGRTR_EL2_RES1;
+-		res0 |= HCR_ENSCXT;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, IMP))
+-		res0 |= (HCR_TOCU | HCR_TICAB | HCR_TID4);
 -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
--		res0 |= ~(res0 | res1);
-+	get_reg_fixed_bits(kvm, HAFGRTR_EL2, &res0, &res1);
- 	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
+-		res0 |= HCR_AMVOFFEN;
+-	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
+-		res0 |= HCR_FIEN;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, FWB, IMP))
+-		res0 |= HCR_FWB;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, NV2))
+-		res0 |= HCR_NV2;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, IMP))
+-		res0 |= (HCR_AT | HCR_NV1 | HCR_NV);
+-	if (!(kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
+-	      kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
+-		res0 |= (HCR_API | HCR_APK);
+-	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TME, IMP))
+-		res0 |= BIT(39);
+-	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
+-		res0 |= (HCR_TEA | HCR_TERR);
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
+-		res0 |= HCR_TLOR;
+-	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, IMP))
+-		res1 |= HCR_E2H;
++	get_reg_fixed_bits(kvm, HCR_EL2, &res0, &res1);
+ 	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
  
- 	/* TCR2_EL2 */
+ 	/* HCRX_EL2 */
 -- 
 2.39.2
 
