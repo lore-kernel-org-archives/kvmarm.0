@@ -1,113 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7345A632;
-	Mon, 10 Mar 2025 00:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571721B6CE9
+	for <kvmarm@lists.linux.dev>; Mon, 10 Mar 2025 06:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741566666; cv=none; b=EcKsYhqweNz3jBxfLSC2TzGc4rNev7cPBJmWVUqnayKeiOeyBbRFl3o0OtQOgdlHJOjZ11yPcWAMysOX7qtJjXdVB4F7+Uu8bge7+no8C5bJdw0Yw7CfCCZSq6oR4Kz4Z95MO0nA63SZabFrQy7dgIE1NtYkBvPt78sa/nmBJK0=
+	t=1741588723; cv=none; b=lewy6fYhm04OenNxNg8dScrO2GFRbswml38ppXWOqAvRESE2C1PfCAVy7bWt//4OFU+HDnXaCUiLPXg6F9oygeTlmrOFAEJ7K3t1wwWOnNEO2JpLrEacnyIA9iE3fAHFjeS26XKJcBPtTgmsR7KRC0uk1RjxOHvTpM2t6FtWw1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741566666; c=relaxed/simple;
-	bh=127U7j9Ed6A/U+MTwMIn2yifTZmeLRlUzJiRx4bf5Qg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2OeRBwqIShIwGgie66OoX3Ywi7XacK2QVIo0phYbVAM/KKw5L4EQB4rjvshqZKrYqPwlBCF1JnQMrUADlpVCM0Bkeo4jofTBtFt0HDscfbxTUURILzqkS864Q+LCLOsOZ4qmoD9k9klged1Pa3E81e7Wi7aJVkwNWUiViNBO3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eneyuQA7; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eneyuQA7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF5BC4CEE3;
-	Mon, 10 Mar 2025 00:31:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741566665;
-	bh=127U7j9Ed6A/U+MTwMIn2yifTZmeLRlUzJiRx4bf5Qg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eneyuQA7ykopq6S8UEKfLVTAcoh47yfGIyP+jGj+MeeDBzaNFNhxvkIPnaRvDW4GR
-	 3ElSa1Rcld7O5AzJkk8twIU5lFCgWiBf5vNLPutmhvohsLYdekOvuQxlcATOOmNSOL
-	 oy+78DKZe/m1Q8ZxkYJJvGoPrVwC1BrNfuxgULZNHz65IH/M/37K/rifMBJJpuVcom
-	 N+TobUAr9cPgkoULGmReb1NG5sZjys6iojuvRBPAwPXGsncjJKQ2ONRM5aUK0ykDOe
-	 yCd+V0vOGqXO+XPoZw9/6/ZJu0a+v7uQNA+ckeDwo4Su72E7JnlkAVup+KFU6O2u9D
-	 /UkG5nAGdv14g==
-Date: Mon, 10 Mar 2025 00:31:04 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Roman Kisel <romank@linux.microsoft.com>
-Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de,
-	catalin.marinas@arm.com, conor+dt@kernel.org,
-	dave.hansen@linux.intel.com, decui@microsoft.com,
-	haiyangz@microsoft.com, hpa@zytor.com, joey.gouly@arm.com,
-	krzk+dt@kernel.org, kw@linux.com, kys@microsoft.com,
-	lenb@kernel.org, lpieralisi@kernel.org,
-	manivannan.sadhasivam@linaro.org, mark.rutland@arm.com,
-	maz@kernel.org, mingo@redhat.com, oliver.upton@linux.dev,
-	rafael@kernel.org, robh@kernel.org, ssengar@linux.microsoft.com,
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, tglx@linutronix.de,
-	wei.liu@kernel.org, will@kernel.org, yuzenghui@huawei.com,
-	devicetree@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	x86@kernel.org, apais@microsoft.com, benhill@microsoft.com,
-	bperkins@microsoft.com, sunilmut@microsoft.com
-Subject: Re: [PATCH hyperv-next v5 06/11] arm64, x86: hyperv: Report the VTL
- the system boots in
-Message-ID: <Z84yyAqkqJ2ZyAd-@liuwe-devbox-ubuntu-v2.lamzopl0uupeniq2etz1fddiyg.xx.internal.cloudapp.net>
-References: <20250307220304.247725-1-romank@linux.microsoft.com>
- <20250307220304.247725-7-romank@linux.microsoft.com>
+	s=arc-20240116; t=1741588723; c=relaxed/simple;
+	bh=GcUQaczN2hMHgbVRjK+6slnDE3ztZsb62TwjLId28Ck=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gFyVyFjDMM6pZWTDWW2FA9fKE1dTvM9VPmxk1grz5tN6Zyfmqo8446C17f8+JEEGttXHw1sM1tBNCzZ2nq9sZeGMQD6L1IUXu8onRBqGg4FgA7AfrpV/S1DCZUFUIy0wfjvVcvlEWS81iBENS7vRG+rfafDsSCEWacpdrxEmlZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A3DC15A1;
+	Sun,  9 Mar 2025 23:38:52 -0700 (PDT)
+Received: from [10.163.42.69] (unknown [10.163.42.69])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A4AF43F673;
+	Sun,  9 Mar 2025 23:38:36 -0700 (PDT)
+Message-ID: <aae26951-3409-476c-b31d-1738cafe730a@arm.com>
+Date: Mon, 10 Mar 2025 12:08:36 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250307220304.247725-7-romank@linux.microsoft.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 0/8] arm64/mm: Drop PXD_TABLE_BIT
+To: arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20250221044227.1145393-1-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 07, 2025 at 02:02:58PM -0800, Roman Kisel wrote:
-> The hyperv guest code might run in various Virtual Trust Levels.
+On 2/21/25 10:12, Anshuman Khandual wrote:
+> Remove the PXX_TABLE_BIT definitions and instead rely on PXX_TYPE_MASK,
+> PXX_TYPE_SECT and PXX_TYPE_TABLE. The latter versions are more abstract
+> and also include the PTE_VALID bit.
 > 
-> Report the level when the kernel boots in the non-default (0)
-> one.
+> This abstraction is valuable for the impending D128 page table support,
+> which doesn't have a single page table bit to determine table vs block.
+> Instead it has the skip level (SKL) field, where it will consider 0 to
+> mean table and any other value to mean a block entry. So PXX_TABLE_BIT
+> therefore doesn't fit into the D128 model well, but the type fields do.
 > 
-> Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
-> ---
->  arch/arm64/hyperv/mshyperv.c | 2 ++
->  arch/x86/hyperv/hv_vtl.c     | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> This series applies on v6.14-rc3.
 > 
-> diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
-> index a7db03f5413d..3bc16dbee758 100644
-> --- a/arch/arm64/hyperv/mshyperv.c
-> +++ b/arch/arm64/hyperv/mshyperv.c
-> @@ -108,6 +108,8 @@ static int __init hyperv_init(void)
->  	if (ms_hyperv.priv_high & HV_ACCESS_PARTITION_ID)
->  		hv_get_partition_id();
->  	ms_hyperv.vtl = get_vtl();
-> +	if (ms_hyperv.vtl > 0) /* non default VTL */
-
-"non-default".
-
-> +		pr_info("Linux runs in Hyper-V Virtual Trust Level %d\n", ms_hyperv.vtl);
->  
->  	ms_hyperv_late_init();
->  
-> diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
-> index 4e1b1e3b5658..c21bee7e8ff3 100644
-> --- a/arch/x86/hyperv/hv_vtl.c
-> +++ b/arch/x86/hyperv/hv_vtl.c
-> @@ -24,7 +24,7 @@ static bool __init hv_vtl_msi_ext_dest_id(void)
->  
->  void __init hv_vtl_init_platform(void)
->  {
-> -	pr_info("Linux runs in Hyper-V Virtual Trust Level\n");
-> +	pr_info("Linux runs in Hyper-V Virtual Trust Level %d\n", ms_hyperv.vtl);
-
-Where isn't there a check for ms_hyperv.vtl > 0 here?
-
-Please be consistent across different architectures.
-
->  
->  	x86_platform.realmode_reserve = x86_init_noop;
->  	x86_platform.realmode_init = x86_init_noop;
-> -- 
-> 2.43.0
+> Changes in V2:
 > 
+> - Changed pmd_mkhuge() and pud_mkhuge() implementation
+> - Changed pud_bad() implementation with an additional patch
 > 
+> Changes in V1:
+> 
+> https://lore.kernel.org/all/20241005123824.1366397-1-anshuman.khandual@arm.com/
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Ryan Roberts <ryan.roberts@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> 
+> Anshuman Khandual (6):
+>   KVM: arm64: ptdump: Test PMD_TYPE_MASK for block mapping
+>   arm64/ptdump: Test PMD_TYPE_MASK for block mapping
+>   arm64/mm: Clear PXX_TYPE_MASK in mk_[pmd|pud]_sect_prot()
+>   arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
+>   arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
+>   arm64/mm: Drop PXD_TABLE_BIT
+> 
+> Ryan Roberts (2):
+>   arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
+>   arm64/mm: Check pmd_table() in pmd_trans_huge()
+> 
+>  arch/arm64/include/asm/pgtable-hwdef.h |  5 --
+>  arch/arm64/include/asm/pgtable.h       | 65 ++++++++++++++++++--------
+>  arch/arm64/kvm/ptdump.c                |  4 +-
+>  arch/arm64/mm/ptdump.c                 |  4 +-
+>  4 files changed, 50 insertions(+), 28 deletions(-)
+>
+
+Gentle ping again. Does this series look okay or is there any objection ?
