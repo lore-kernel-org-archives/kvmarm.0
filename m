@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC52227EAE;
-	Mon, 10 Mar 2025 12:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF967229B13;
+	Mon, 10 Mar 2025 12:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609513; cv=none; b=XcOzbbG726Ja9D4coQFDn/77ITBH4bQ+Kvv7/ydvTK/ZCvSXXaq2NiOokiDLg5LCE8u7tBbMEBiptuITyHUYm9guyPCWOVLq69TZsKe/Vi/0an9dXvhSZUnR4T6eo89iAGRiFSagpDRqcNIMjociNNZNQe8hxSwetmz0G064Wlc=
+	t=1741609514; cv=none; b=T9i3tH6KvDZrBIQHGbDGtNU7ff2ZX7CTBS21BavfnNz1I03GxxSoGNKUCND1EqGvRFSbMfTBszvpeGR5k/1Br7hK0auXHDOwO8/NGt1flpwcowhBKP7+u8elcfXMEJ8vDBk5TqiE9jzzIqbKrGE+xS4GiPe6qEHc4xmDLy5DldU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741609513; c=relaxed/simple;
-	bh=ZD1y0xgxzq9f9Jo/IS2k524ME5JZt65ppnEfB//OQRw=;
+	s=arc-20240116; t=1741609514; c=relaxed/simple;
+	bh=rU2TYcrSVmMfGkQ4GYq3i+DtVe9z7lqhLE7D+KpN5Fs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qJv9qCzrFe1MLJm1FjETR1q6MniioHtEQDbq79w3nAzyJ5Na/j1+I8pDUsGsOE81S9XFT6V7qL/e5k0+FZyfDQa+xn5hXTrcmndm8wiR4+D0mnWGwLdldXb7nuqu1XkJwhSMcmOlwr7fM1Q9ejWT38Nt/cImRXIwNsUnLLrsEOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KdXfaTcv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=WB/wNS+yZS94XW/WTQ+G8Cm+fH6PmPjx2ebDLxCm3S9H9DYc9b8Z+PVfFpzcbi43OFzK3d2f5yrPaoJT88bHI9wxIEI/lQVZvjAI+qEzhP8Mzx9GSyDO/BPdmPS7Lu8so3ruSQf7C/jvWJomssEBs+6zQqT1DNZ+KTVgOm8ZLiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XOX0xq0V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KdXfaTcv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBE1EC4CEF7;
-	Mon, 10 Mar 2025 12:25:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XOX0xq0V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D4AEC4CEF0;
+	Mon, 10 Mar 2025 12:25:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741609513;
-	bh=ZD1y0xgxzq9f9Jo/IS2k524ME5JZt65ppnEfB//OQRw=;
+	s=k20201202; t=1741609514;
+	bh=rU2TYcrSVmMfGkQ4GYq3i+DtVe9z7lqhLE7D+KpN5Fs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KdXfaTcvnr3wgA4J0AlNItmJ/J8Dx0y/I5wcxDwVuSfE2TOtXEq3pi93vgr3cdxm7
-	 zPM+cDb3SvpwlN//TAIgbH79aUx8zfSI4xWl4Bfva4hhzCxGk+WeA4xuK05aUV53B0
-	 HG+I29XUOnDY2Us/dykGu4e2Qhhq48233dEFH5o8eLGRR28woJgi/RuBMWHoSPT/92
-	 KEgoOolhmdKSwfWbEb8E0JPDaEVIMLe+SF0BQXbRd4RPJcQqVu5F0nEzc3f74FVt6S
-	 LUaEoJSFxJCqYxK0nZ2BNNUr2XZyU/C7ZEJyByOpX+BTRZGyHX4/Ondm3P5YEJ6pv+
-	 4iauqUiOfgOMw==
+	b=XOX0xq0VG3Bkc2YxuIcfGsSY0K5xxSuMTXtpv7nBJ87QqysHsQkkTvpzBNQp+W0e9
+	 kVxs/z5tesntMfVksAsfBkbv4p61Yp6x/LmnZ3I4nE8dFWgOjx7IqPsIFQQcjKzLXz
+	 C7+LMqykXZdyJcHSWrpUo2xvMMU3YOGUpdDjRgVAfkux9LvgmR99u0ucbFlXN+TsYh
+	 TQC6LptqwFqwdkotcoIvOIwz9HFhKgvhQfzgT3dnx77QFNVjMg5tmj769kfovc2IpO
+	 ojhjqJrS6hQngSeg6pKD+ydGtgjmt8nEPUil34NuD+r8RdL7sCHocTuQEJyPFyAsd4
+	 yGPOihE8EI3WQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trcBz-00CAea-TO;
-	Mon, 10 Mar 2025 12:25:11 +0000
+	id 1trcC0-00CAea-Pm;
+	Mon, 10 Mar 2025 12:25:12 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 08/23] KVM: arm64: Plug FEAT_GCS handling
-Date: Mon, 10 Mar 2025 12:24:50 +0000
-Message-Id: <20250310122505.2857610-9-maz@kernel.org>
+Subject: [PATCH v2 11/23] KVM: arm64: Use computed masks as sanitisers for FGT registers
+Date: Mon, 10 Mar 2025 12:24:53 +0000
+Message-Id: <20250310122505.2857610-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250310122505.2857610-1-maz@kernel.org>
 References: <20250310122505.2857610-1-maz@kernel.org>
@@ -60,64 +60,60 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We don't seem to be handling the GCS-specific exception class.
-Handle it by delivering an UNDEF to the guest, and populate the
-relevant trap bits.
+Now that we have computed RES0 bits, use them to sanitise the
+guest view of FGT registers.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 11 +++++++++++
- arch/arm64/kvm/sys_regs.c    |  8 ++++++++
- 2 files changed, 19 insertions(+)
+ arch/arm64/kvm/nested.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index b2d11cd0447c1..bf08c44491b4a 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -294,6 +294,16 @@ static int handle_svc(struct kvm_vcpu *vcpu)
- 	return 1;
- }
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 0c9387d2f5070..63fe1595f318d 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1118,8 +1118,8 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 		res0 |= HFGxTR_EL2_nS2POR_EL1;
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
+ 		res0 |= (HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nAMAIR2_EL1);
+-	set_sysreg_masks(kvm, HFGRTR_EL2, res0 | __HFGRTR_EL2_RES0, res1);
+-	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | __HFGWTR_EL2_RES0, res1);
++	set_sysreg_masks(kvm, HFGRTR_EL2, res0 | hfgrtr_masks.res0, res1);
++	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | hfgwtr_masks.res0, res1);
  
-+static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
-+{
-+	/* We don't expect GCS, so treat it with contempt */
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-+		WARN_ON_ONCE(1);
-+
-+	kvm_inject_undefined(vcpu);
-+	return 1;
-+}
-+
- static int handle_other(struct kvm_vcpu *vcpu)
- {
- 	bool is_l2 = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
-@@ -376,6 +386,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
- 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
-+	[ESR_ELx_EC_GCS]	= kvm_handle_gcs,
- };
+ 	/* HDFG[RW]TR_EL2 */
+ 	res0 = res1 = 0;
+@@ -1157,7 +1157,7 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 			 HDFGRTR_EL2_nBRBDATA);
+ 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2))
+ 		res0 |= HDFGRTR_EL2_nPMSNEVFR_EL1;
+-	set_sysreg_masks(kvm, HDFGRTR_EL2, res0 | HDFGRTR_EL2_RES0, res1);
++	set_sysreg_masks(kvm, HDFGRTR_EL2, res0 | hdfgrtr_masks.res0, res1);
  
- static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 18721c773475d..2ecd0d51a2dae 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5056,6 +5056,14 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 						HFGITR_EL2_nBRBIALL);
- 	}
+ 	/* Reuse the bits from the read-side and add the write-specific stuff */
+ 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
+@@ -1166,10 +1166,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 		res0 |= HDFGWTR_EL2_TRCOSLAR;
+ 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceFilt, IMP))
+ 		res0 |= HDFGWTR_EL2_TRFCR_EL1;
+-	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | HDFGWTR_EL2_RES0, res1);
++	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | hdfgwtr_masks.res0, res1);
  
-+	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP)) {
-+		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nGCS_EL0 |
-+						HFGxTR_EL2_nGCS_EL1);
-+		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nGCSPUSHM_EL1 |
-+						HFGITR_EL2_nGCSSTR_EL1 |
-+						HFGITR_EL2_nGCSEPP);
-+	}
-+
- 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
+ 	/* HFGITR_EL2 */
+-	res0 = HFGITR_EL2_RES0;
++	res0 = hfgitr_masks.res0;
+ 	res1 = HFGITR_EL2_RES1;
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, DPB, DPB2))
+ 		res0 |= HFGITR_EL2_DCCVADP;
+@@ -1203,7 +1203,7 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 	set_sysreg_masks(kvm, HFGITR_EL2, res0, res1);
+ 
+ 	/* HAFGRTR_EL2 - not a lot to see here */
+-	res0 = HAFGRTR_EL2_RES0;
++	res0 = hafgrtr_masks.res0;
+ 	res1 = HAFGRTR_EL2_RES1;
+ 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
+ 		res0 |= ~(res0 | res1);
 -- 
 2.39.2
 
