@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A9F22FF22;
-	Tue, 11 Mar 2025 09:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A5823906A;
+	Tue, 11 Mar 2025 10:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741687193; cv=none; b=QhI5odKsuc9Ezt4KDBBgYM0PQ1DuzThyKRGG9F6Cn+s20dtlFYQxqibnaAcgixwdoJdQ42s+LFH90PK4p6SmF1/Ax4ogkX5f1Jivic35lUM5px3JPxINyfBl8yX9PA0r5iDSiwrgEN2d/dfE12DzrFyqhr0FiuC80yzVoDoUDoE=
+	t=1741689282; cv=none; b=VuFg6JEdh2nPaMKCkUI0R+TStwe4m9QEAmh2jcHR9/x3rZqrKkRi18p3oMkshJahngpYP5ZgZJ1/4wwpuvZ6J+qIYaEEwS5WWrF3HXcCp+F95gcvMukYQl4XssH/eoSM/mU0qRLDm8ShLAbyn60YmaDN54TE6klhpyKAqTR3Tco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741687193; c=relaxed/simple;
-	bh=zsOBPexXIma9FbHuX3ibpi1OjULOqW0uLKONM/kuVVU=;
+	s=arc-20240116; t=1741689282; c=relaxed/simple;
+	bh=g5WrytiDfToUzuULW5k3QtsxNddrCwlXzxuLcthP2D0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nPbrx35R88dEMn2ka12NXXUYi2YdQCnVr6eBFs3QpKAm3f4gw5uSd+sawdyzRNaO3V4cIYuIa+b7yPeT6hCXdr7dzy9EIiNJx/vM29u3b63W61Q2VgxDtV/A3ietGcuJx7JZRucA1dXfyeORmcQPeYGz2olohwvZUtrQnMfWFBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VG+tVE2G; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=tkfrXsbQovzDP1jB53il8bceA2Bcwzlw6Umv9B74KLF/mf9lzkCl5/L2DecWDUVrINyqBHVcTBsqtDF1oCplpLvfJodPU9rMxkqiyOX5W/357HTzWKqjsFjNcSQCgG+gg/vfAwCSzl2Js1vRmgoB076yjbwM41E5jDUIRAaz0cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8FCq85X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VG+tVE2G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BDADC4CEE9;
-	Tue, 11 Mar 2025 09:59:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8FCq85X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57F47C4CEE9;
+	Tue, 11 Mar 2025 10:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741687193;
-	bh=zsOBPexXIma9FbHuX3ibpi1OjULOqW0uLKONM/kuVVU=;
+	s=k20201202; t=1741689281;
+	bh=g5WrytiDfToUzuULW5k3QtsxNddrCwlXzxuLcthP2D0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VG+tVE2GzVsRb2JLul75HRtiRbXVhMMo4dxouYOHV1ATfkBNftFJxqRlhNgGrt4Bg
-	 8vXYNEQkZEHXksDzgCVF/Yyx8hIt91AxQNxWIk89I5AqHIGU4eJhD3Pq53mR/y341v
-	 UYHr2jy1GiMEAPviiRXQLPCUWgZRLBHH9GFNhH+S0hl1qMwW2pQ75WmAq2zxa7BoRc
-	 HRdcHfn4o6MLMcknCGBnQ8umntBPefnWVLRwMF2suzzgDNx4UCGvuSZ1XOzPE2s4sN
-	 KDke/58ap/xklW+Bl71/yrmJriKNh4CjEL0i4lfQ6viZOLUgeFrHfGY01Gmg8LN0o9
-	 MAaKmoA2pBEMA==
+	b=p8FCq85X5f02i8T5VUb5KvLi2wdt319XykQnPPZ85XN40ytu0+7ED46RY1qBAIIEt
+	 O//QtuPP7M/TtSDQQz3xcrLxsTPGSESCs4QRl3avMHs4SpiGe8oqI6+3KCrzjAkdLO
+	 Z+Us6U0HNCn6EmPALxtJPkuq1456fNp/HmKEtQk6oCc8/HJPqRyV3zZ4ubXH0qskbP
+	 Ff3zmw9s9oODMO0TNgvhsXMvSTmuuoZ4/lUA78aayRvcARGExdTM4NGFGtBg+Rr4fi
+	 pR9YCbMcdbfyf/IBS6GX/hVGoyWUNa14iGJ5Zi+WIJhdUrYQ4A6zkhpOB12CyC7FOR
+	 14PpUOmO4eY3w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trwOt-00CTwt-2K;
-	Tue, 11 Mar 2025 09:59:51 +0000
-Date: Tue, 11 Mar 2025 09:59:50 +0000
-Message-ID: <86tt7zopk9.wl-maz@kernel.org>
+	id 1trwwY-00CUjL-Op;
+	Tue, 11 Mar 2025 10:34:38 +0000
+Date: Tue, 11 Mar 2025 10:34:38 +0000
+Message-ID: <86senjony9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Zhenyu Ye <yezhenyu2@huawei.com>
 Cc: <yuzenghui@huawei.com>,
@@ -48,10 +48,10 @@ Cc: <yuzenghui@huawei.com>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<kvm@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v1 3/5] arm64/kvm: using ioctl to enable/disable the HDBSS feature
-In-Reply-To: <20250311040321.1460-4-yezhenyu2@huawei.com>
+Subject: Re: [PATCH v1 4/5] arm64/kvm: support to handle the HDBSSF event
+In-Reply-To: <20250311040321.1460-5-yezhenyu2@huawei.com>
 References: <20250311040321.1460-1-yezhenyu2@huawei.com>
-	<20250311040321.1460-4-yezhenyu2@huawei.com>
+	<20250311040321.1460-5-yezhenyu2@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,33 +67,164 @@ X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, yuzenghui@huawei.com, will@kernel.org, 
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-+1 on everything Oliver said. Additionally:
-
-On Tue, 11 Mar 2025 04:03:19 +0000,
+On Tue, 11 Mar 2025 04:03:20 +0000,
 Zhenyu Ye <yezhenyu2@huawei.com> wrote:
 > 
+> From: eillon <yezhenyu2@huawei.com>
+> 
+> Updating the dirty bitmap based on the HDBSS buffer. Similar
+> to the implementation of the x86 pml feature, KVM flushes the
+> buffers on all VM-Exits, thus we only need to kick running
+> vCPUs to force a VM-Exit.
+> 
+> Signed-off-by: eillon <yezhenyu2@huawei.com>
+> ---
+>  arch/arm64/kvm/arm.c         | 10 ++++++++
+>  arch/arm64/kvm/handle_exit.c | 47 ++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/mmu.c         |  7 ++++++
+>  3 files changed, 64 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 825cfef3b1c2..fceceeead011 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1845,7 +1845,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  
+>  void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>  {
+> +	/*
+> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+> +	 * before reporting dirty_bitmap to userspace.  KVM flushes the buffers
+> +	 * on all VM-Exits, thus we only need to kick running vCPUs to force a
+> +	 * VM-Exit.
+> +	 */
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+>  
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		kvm_vcpu_kick(vcpu);
+
+We don't need this outside of HDBSS. Why impose it on everyone else?
+
+I'm also perplexed by the requirement to flush on all exits. Why can't
+this be deferred to vcpu_put() only? Specially given that I don't see
+any use of this stuff outside of a VHE system.
+
+>  }
+>  
+>  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 512d152233ff..db9d7e1f72bf 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -330,6 +330,50 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+>  	return arm_exit_handlers[esr_ec];
+>  }
+>  
+> +#define HDBSS_ENTRY_VALID_SHIFT 0
+> +#define HDBSS_ENTRY_VALID_MASK (1UL << HDBSS_ENTRY_VALID_SHIFT)
+> +#define HDBSS_ENTRY_IPA_SHIFT 12
+> +#define HDBSS_ENTRY_IPA_MASK GENMASK_ULL(55, HDBSS_ENTRY_IPA_SHIFT)
+
+This has no place here. Move this stuff somewhere else. And rewrite in
+a more concise way:
+
+#define HDBSS_ENTRY_VALID	BIT(0)
+#define HDBSS_ENTRY_IPA		GENMASK(55, 12)
+
+> +
+> +static void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+> +{
+> +	int idx, curr_idx;
+> +	u64 *hdbss_buf;
+> +
+> +	if (!vcpu->kvm->enable_hdbss)
+
+This control is odd. You track the logging per-VM, but dump the
+buffers per-vcpu.
+
+> +		return;
+> +
+> +	dsb(sy);
+> +	isb();
+> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+> +
+> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+> +	if (curr_idx == 0 || vcpu->arch.hdbss.br_el2 == 0)
+> +		return;
+> +
+> +	hdbss_buf = page_address(phys_to_page(HDBSSBR_BADDR(vcpu->arch.hdbss.br_el2)));
+
+Do you see why it is silly to keep the raw value of the register? It'd
+be far better to just keep the VA (and maybe the PA as well), and
+build the register value as required.
+
+> +	if (!hdbss_buf) {
+> +		kvm_err("Enter flush hdbss buffer with buffer == NULL!");
+> +		return;
+> +	}
+> +
+> +	for (idx = 0; idx < curr_idx; idx++) {
+> +		u64 gpa;
+> +
+> +		gpa = hdbss_buf[idx];
+> +		if (!(gpa & HDBSS_ENTRY_VALID_MASK))
+> +			continue;
+> +
+> +		gpa = gpa & HDBSS_ENTRY_IPA_MASK;
+> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+
+Isn't there a requirement to hold a lock of some sort here?
+
+> +	}
+> +
+> +	/* reset HDBSS index */
+> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+> +	dsb(sy);
+
+Where is the DSB(SY) requirement coming from if the logging is
+per-vcpu and that each vcpu gets its own buffer?
+
+> +	isb();
+
+And you want to do that on each exit? How will userspace intercept
+this? Frankly, this should be moved to put-time, and only be
+guaranteed  to be visible to userspace when the vcpus are outside of
+the kernel.
+
+> +}
+> +
+>  /*
+>   * We may be single-stepping an emulated instruction. If the emulation
+>   * has been completed in the kernel, we can return to userspace with a
+> @@ -365,6 +409,9 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+>  {
+>  	struct kvm_run *run = vcpu->run;
+>  
+> +	if (vcpu->kvm->enable_hdbss)
+> +		kvm_flush_hdbss_buffer(vcpu);
+> +
+>  	if (ARM_SERROR_PENDING(exception_index)) {
+>  		/*
+>  		 * The SError is handled by handle_exit_early(). If the guest
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1f55b0c7b11d..9c11e2292b1e 100644
+> index 9c11e2292b1e..3e0781ae0ae1 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1703,6 +1703,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (writable)
->  		prot |= KVM_PGTABLE_PROT_W;
+> @@ -1790,6 +1790,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+>  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
 >  
-> +	if (kvm->enable_hdbss && logging_active)
-> +		prot |= KVM_PGTABLE_PROT_DBM;
+> +	/*
+> +	 * HDBSS buffer already flushed when enter handle_trap_exceptions().
+> +	 * Nothing to do here.
+> +	 */
+> +	if (ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
+> +		return 1;
 > +
 
-This looks totally wrong. If the page is defined as R/O
-(KVM_PGTABLE_PROT_W not being set), setting the DBM flag makes it
-writable anyway (the W bit is the Dirty bit). Hello, memory
-corruption?
-
-overall, this patch is a total mess, and needs to be split to have the
-runtime logic on one side, and the userspace API on the other. Don't
-mix the two.
-
-Thanks,
+Can this happen on an instruction abort? Also, you seem to be ignoring
+any type of *faults*. Nothing can fail at all?
 
 	M.
 
