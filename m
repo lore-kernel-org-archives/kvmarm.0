@@ -1,69 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFDA1925AF;
-	Tue, 11 Mar 2025 17:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F58A2620DF
+	for <kvmarm@lists.linux.dev>; Tue, 11 Mar 2025 17:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741713459; cv=none; b=jAUhohSt2dPCAWEK5MNudfiBjwrwmVcwdl/N7Mqps5k3hRWUDH8+2hbCZbJD29QHQm+vaaEGDc+2tcTp3UrSMqYaYau/i3aMlnqGEVvrvmpxPQvXii3GWPUlzCXGjykwogMKw2pkmf2tcPRg8eTVaqyaVwp3WYEAfgVnf24Fz7s=
+	t=1741714838; cv=none; b=A774JogDnnjTPFLPdfvNDps+u05jHQie8mLdVbcko+dxn/Gm7M6gdDBtLHUhhdPo4vh6rjJaOpqZtPeuBinxv+orAUqeOl0oDMrIPfTfPWeh6DyCYXNxUCP5rlzqW/+C1kB3fhGZDwWspeQpZybD/1aEKsCh21Mm0+0LPI/1UkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741713459; c=relaxed/simple;
-	bh=d2MUZCjy8ry37cjCWkBKe3JtYOwSxUPPNJthsOU6ecc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KmPWsZR4ZGKnjt4qbtDlG7NdTt7J0wE2ESe6epQmmKGRzstwJZSKbNTpADrk3Kibixu0AIsnvzZvcnibXIbohU2pmyKAqbcbQwsAWP6ghFASDKqVW0QofdIaDz9rEDPIVbzjM7EPMUW/QvzWOXKIrqFfgU/93lMq7BgEU31p/ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B55EBC4CEE9;
-	Tue, 11 Mar 2025 17:17:36 +0000 (UTC)
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	mark.rutland@arm.com,
-	robh@kernel.org,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH V3] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-Date: Tue, 11 Mar 2025 17:17:34 +0000
-Message-Id: <174171335999.3659520.16613654046629962007.b4-ty@arm.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250227035119.2025171-1-anshuman.khandual@arm.com>
-References: <20250227035119.2025171-1-anshuman.khandual@arm.com>
+	s=arc-20240116; t=1741714838; c=relaxed/simple;
+	bh=fJoSgtJei61Vv1IRCa8Xzx03ffV9RuFjSgTUQ60+Pf4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IQW7F+t1A98fQyzu7PKFTv0WvfBXKmnnEwatCzDZJMXnfwb0ytzGWZiAK0n3QIh/ORFo4/J6WeD6yhkWKq8UiavbNg5qinDs4+1wTERp1ZUAb07LJzROvTtGZSn4uu55EKSqLVGA2WPd3uoUgAPpuyb9166U+8WUsDU3OHk8Ehg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=x2TA1Z5r; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x2TA1Z5r"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22580c9ee0aso36846865ad.2
+        for <kvmarm@lists.linux.dev>; Tue, 11 Mar 2025 10:40:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741714836; x=1742319636; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fJoSgtJei61Vv1IRCa8Xzx03ffV9RuFjSgTUQ60+Pf4=;
+        b=x2TA1Z5rTHHn45AWYNtdEfzMEcdGG55Q7fgepxjRsk2C3A3PFQs+Iy09a84oXqYipx
+         22hLLbVLUrNn4xwEAu+/N1g4Nsdm5R3XP4EbAj8+Yt5J8eVMNEouQRA+KQB9E45i9QVP
+         p9N9EvTzcZojASf0OFd+XTwi3CLc3DfmM80Yn6EELfCkBxAbldFVaZTe8ns0hTETlDh/
+         32Fkedft6rVzy/dGW3vC1Iuz7ezXHbR76nqLF5vB+WNZ80FMa++Q2+vsNtgi2jSx69qP
+         sD54rOx4n1sIbO0SM4EfGVWAJn+d3T7IsiHNprYaJm/Fs1eN8dINyXqeQgSGgXSmt9ng
+         QHDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741714836; x=1742319636;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fJoSgtJei61Vv1IRCa8Xzx03ffV9RuFjSgTUQ60+Pf4=;
+        b=IyNOKvWjO8hif4GC53gla/O5Kuj8DDSzXNSgo+XXeTnTIDw/POzJgvIacyYAhPoDLA
+         Xs+3esBeJ2ee8e6T0Cq0inTCZSP81AId129VKip05nnT738yPrAGfVgezadIsJuWBq89
+         y2Ja4HsEDKSXr0Trx/R//e4sADLBGyzWjeLr2hUu93GfrOZF4sbIYfzLGwhhKhc9qy3v
+         eJA7VJR3bsrDiu/V2ut/PiPJWOK6ssM6HlvGa/Qu3UtF1e1Oo9K5mnvlvS5dAoRofqog
+         P7jYp+Jjx4RSiHUhV1MnVtP+Cv7Y+lGIr03BIOfGhGJvYLH54vpfgagz9rq17zyaynfN
+         GSfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFEmFptvHfHCeCF2EF/zV0RC5xBAC0dhQMG8z4gJV1WHMelJWqN8CeIq/l0Qd6heKYHfVYemo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyz8oR1m062JRZ6OuLkGPil+vD4Mi572ePs4ajLnF1cFECPEiLW
+	iDKEDb5dj0B34XKyK/G4rUD2sdRZnsbjuxbIdg9p0JoCbkvpLLkTX31BofP+vSQ=
+X-Gm-Gg: ASbGncuXJt00R2+5US6aIi4bR8rKtHOCXc1XuliIorKD+62A3Dguw2SODAd6ngiaZdX
+	/pGq00j/1J8XhdKxU6NaKjzfgTeueky99dL14IwNHYdQYfE6vKJt827IpZX0lX2Qe4Im+rc6J/f
+	61iUW663JmWGbKFtWHWiZny2L0Z12gp0cvPuAc4QhzB3FCUsSyz9Ve0uSjAT0JrH7m43/Wxq+Mo
+	e/00KSQdQncRcNtMNs4uw41kV3L01Z4/XuwEBv8Bpvtv2bo9wCrm92lb8ubhZnEJJ2ObtR+DoHo
+	qhU1wsBq3PolJAOz2HHFOzeotavIbHrxvYpB67hQg7hQI/tXam0FoWHG/rQRAvMDrOmRyCpYXY2
+	0Y/jz5jNv
+X-Google-Smtp-Source: AGHT+IGlaR9HwjrPVHTQyRxHtXjUtcHCgPfmVSkbp3ZKMt8nZvn1Cdbu6c7wfGboStIgwisDcZkQ2w==
+X-Received: by 2002:a05:6a21:164a:b0:1f5:60fb:8d9 with SMTP id adf61e73a8af0-1f560fb098fmr18554773637.33.1741714836477;
+        Tue, 11 Mar 2025 10:40:36 -0700 (PDT)
+Received: from [192.168.0.4] (174-21-74-48.tukw.qwest.net. [174.21.74.48])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af52f391035sm3669478a12.77.2025.03.11.10.40.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Mar 2025 10:40:36 -0700 (PDT)
+Message-ID: <37fd4871-f3c5-43bc-9dd5-1c0f72dcd392@linaro.org>
+Date: Tue, 11 Mar 2025 10:40:34 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/14] arm/kvm: add accessors for storing host features
+ into idregs
+To: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
+ eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, peter.maydell@linaro.org, alex.bennee@linaro.org,
+ maz@kernel.org, oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+ agraf@csgraf.de
+Cc: shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
+ pbonzini@redhat.com
+References: <20250311162824.199721-1-cohuck@redhat.com>
+ <20250311162824.199721-3-cohuck@redhat.com>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250311162824.199721-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Feb 2025 09:21:19 +0530, Anshuman Khandual wrote:
-> FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
-> access from EL1 requires appropriate EL2 fine grained trap configuration
-> via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
-> Otherwise such register accesses will result in traps into EL2.
-> 
-> Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
-> grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
-> bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
-> PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
-> 
-> [...]
+On 3/11/25 09:28, Cornelia Huck wrote:
+> +/* read a sysreg value and store it in the idregs */
+> +static int get_host_cpu_reg(int fd, ARMHostCPUFeatures *ahcf, ARMIDRegisterIdx index)
 
-Applied to arm64 (for-next/el2-enable-feat-pmuv3p9), thanks!
+This still isn't used, and so must Werror.
 
-[1/1] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-      https://git.kernel.org/arm64/c/858c7bfcb35e
 
-I removed Cc: stable since, if it gets backported automatically, it will
-miss the sysreg updates and break the build. Please send it to stable
-directly once it lands upstream, together with the dependencies.
-
--- 
-Catalin
-
+r~
