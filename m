@@ -1,139 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C59262D32;
-	Tue, 11 Mar 2025 19:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472521F4CB6
+	for <kvmarm@lists.linux.dev>; Tue, 11 Mar 2025 23:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741720218; cv=none; b=WbT2ux0SzH3SlQekhft8mFvN0K43GpHLNOKNiwMC6S/FS8ekfMDWFCCW8xRN0tdUBvPSab9nf7rROJ+VugLpDLtqrpRsplIfpAjlSS+CxMhdfOPho4KBkDsYeWOPiHdNgpAOveOUi340qexeYjkGTT4ZuBeC7ncO0z6Q5htfMAo=
+	t=1741736686; cv=none; b=TDSvizETUUXniVIrAmeZ49DGQumjEii2lTeiEtNb4ltEmZ4yNDc00Yzz8sAnwkSvzWRsWbvxjBEqZB8XboOhLH62Pv/d1xhh2xTNTNmMwe3Ra3KqBCE6rNfeNig0HsZvh7kWDTTNcjjurq/OY+l0rTR3/wEGKgdrHUPHFIBgWFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741720218; c=relaxed/simple;
-	bh=99llKZilnJT4E48a+3LamgB6gGoSVPp37FNJyrkf0Kg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OCVbtQdfGU4uaQu8x8pWm5f6+EX/Cz0Vi73GBsh70KF5C2BBZeEe9TP0/Ga016Xy0nj9Thot+svx5jTEcbzlPXullfDDHwvFMiCHGKWPHmz6PHaFzLf7c4nH9OnZdhoBXIqpGZL8VZciNkOY5LfX/0VMamUsaGD+Cb9ZZBLxAes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLJbEYRG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741736686; c=relaxed/simple;
+	bh=b51MerqZisIu4CsCLrU2raVfXD7bPut63futlnMslx0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tenJHVL2u0glg1bnMeaMrDD3CFO9Oj5ejPuiK1PuZ4VA0gVbZNFzJr++FoCEhyv6Fi+Zd7xvDUEwy9hK5Jp/FomD6w/BPGxW2kKk1mqUZp3Rcpr+qxhh4I3FYfL/+d05GXPwMo7xZzT+3E4MTQCC3bfKSj76oSJUNmZPh1XLDwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oSMS2P3i; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLJbEYRG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC3AC4CEE9;
-	Tue, 11 Mar 2025 19:10:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741720216;
-	bh=99llKZilnJT4E48a+3LamgB6gGoSVPp37FNJyrkf0Kg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PLJbEYRG4EeWGAuA9hC0NNMyistSYTBPThKkYGpYGldf7MG+l9BssZSuQInQXLkCN
-	 FzkJ2UMDsqloXvKn5QYwff0zQ3/A4VZL+zHUZNLX9zQTBZ1hH3LNdJYtUi//v0tgjc
-	 lqOKwDEC7NE4u8Xfsr+lq2zSy+5NfjtcRd4JsLGwkblxFSV+cRenG+6Osocidgo5O8
-	 l5kOHGrzSDFyPbt3tXVNA+4jW9+i3pDCwT2yQWOHdwE4UWFVbub+JDbtw1WJM1q2SR
-	 S649RQbvOJeGbTxuRpbvz4AB5ypaXX1QoCvMeri6WCX1axQnOpdpXi+vDWIK+g4gnm
-	 g0SD1MzaFXNdw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ts4zW-00Cf5J-BY;
-	Tue, 11 Mar 2025 19:10:14 +0000
-Date: Tue, 11 Mar 2025 19:10:14 +0000
-Message-ID: <86o6y7o02x.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oSMS2P3i"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741736680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oi1BLbE7r5Jv82rbxY9jzsh/6odGMKYOpVA/m+ctSAs=;
+	b=oSMS2P3iID7v+wiMAoAinih2NDgr8K39BTILgxvDMNQ4bTMlDqOjbO4ZVovP48XrnBdkxd
+	qMhQiTAjEyPSTOPvpeWC04oEh1iQ30UvNMzRSjX2lcYdOHVBoAYM0aW32Rh6EdNNdo26ZW
+	Zq23OYzylV5zqv+GXg9OYrajB7Bxy4U=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 07/18] KVM: arm64: Compute FGT masks from KVM's own FGT tables
-In-Reply-To: <CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
-References: <20250210184150.2145093-1-maz@kernel.org>
-	<20250210184150.2145093-8-maz@kernel.org>
-	<CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Mingwei Zhang <mizhang@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Janne Grunau <j@jannau.net>
+Subject: Re: [PATCH v3 00/14] KVM: arm64: FEAT_PMUv3 on Apple hardware
+Date: Tue, 11 Mar 2025 16:44:26 -0700
+Message-Id: <174173663466.1065484.5411031116504311230.b4-ty@linux.dev>
+In-Reply-To: <20250305202641.428114-1-oliver.upton@linux.dev>
+References: <20250305202641.428114-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 04 Mar 2025 16:55:50 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Wed, 05 Mar 2025 12:26:27 -0800, Oliver Upton wrote:
+> Hopefully close to the last spin, this time addressing Marc's comments
+> on v2.
 > 
-> Hi Marc,
+> Full details found in the v1 cover letter.
 > 
-> On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > In the process of decoupling KVM's view of the FGT bits from the
-> > wider architectural state, use KVM's own FGT tables to build
-> > a synthitic view of what is actually known.
+> v1: https://lore.kernel.org/kvmarm/20241217212048.3709204-1-oliver.upton@linux.dev/
+> v2: https://lore.kernel.org/kvmarm/20250203183111.191519-1-oliver.upton@linux.dev/
 > 
-> synthitic -> synthetic
+> [...]
 
-Ah, I missed that one earlier. Will fix.
+Applied to next, thanks!
 
-> 
-> 
-> > This allows for some checking along the way.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h  |   4 ++
-> >  arch/arm64/include/asm/kvm_host.h |  14 ++++
-> >  arch/arm64/kvm/emulate-nested.c   | 102 ++++++++++++++++++++++++++++++
-> >  3 files changed, 120 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index 8d94a6c0ed5c4..e424085f2aaca 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -359,6 +359,10 @@
-> >  #define __HAFGRTR_EL2_MASK     (GENMASK(49, 17) | GENMASK(4, 0))
-> >  #define __HAFGRTR_EL2_nMASK    ~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
-> >
-> > +/* Because the sysreg file mixes R and W... */
-> > +#define HFGRTR_EL2_RES0                HFGxTR_EL2_RES0 (0)
-> > +#define HFGWTR_EL2_RES0                (HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
-> 
-> __HFGRTR_ONLY_MASK is a hand-crafted bitmask. The only bit remaining
-> in HFGxTR_EL2 that is RES0 is bit 51. If that were to be used as an
-> HFGRTR-only bit without __HFGRTR_ONLY_MASK getting updated, then
-> aggregate_fgt() below would set its bit in hfgwtr_masks. Could this be
-> a problem if this happens and the polarity of this bit ends up being
-> negative, thereby setting the corresponding nmask bit?
+[01/14] drivers/perf: apple_m1: Refactor event select/filter configuration
+        https://git.kernel.org/kvmarm/kvmarm/c/75ecffc361bb
+[02/14] drivers/perf: apple_m1: Support host/guest event filtering
+        https://git.kernel.org/kvmarm/kvmarm/c/46573d944f00
+[03/14] KVM: arm64: Compute PMCEID from arm_pmu's event bitmaps
+        https://git.kernel.org/kvmarm/kvmarm/c/93b01528586b
+[04/14] KVM: arm64: Always support SW_INCR PMU event
+        https://git.kernel.org/kvmarm/kvmarm/c/ed335722b457
+[05/14] KVM: arm64: Use a cpucap to determine if system supports FEAT_PMUv3
+        https://git.kernel.org/kvmarm/kvmarm/c/6f34024d185e
+[06/14] KVM: arm64: Drop kvm_arm_pmu_available static key
+        https://git.kernel.org/kvmarm/kvmarm/c/a38b67d15183
+[07/14] KVM: arm64: Use guard() to cleanup usage of arm_pmus_lock
+        https://git.kernel.org/kvmarm/kvmarm/c/3d6d9172128e
+[08/14] KVM: arm64: Move PMUVer filtering into KVM code
+        https://git.kernel.org/kvmarm/kvmarm/c/56290316a443
+[09/14] KVM: arm64: Compute synthetic sysreg ESR for Apple PMUv3 traps
+        https://git.kernel.org/kvmarm/kvmarm/c/2c433f70dccc
+[10/14] KVM: arm64: Advertise PMUv3 if IMPDEF traps are present
+        https://git.kernel.org/kvmarm/kvmarm/c/bed9b8ec8c71
+[11/14] KVM: arm64: Remap PMUv3 events onto hardware
+        https://git.kernel.org/kvmarm/kvmarm/c/1e7dcbfa4b7c
+[12/14] drivers/perf: apple_m1: Provide helper for mapping PMUv3 events
+        https://git.kernel.org/kvmarm/kvmarm/c/2d00cab849be
+[13/14] KVM: arm64: Provide 1 event counter on IMPDEF hardware
+        https://git.kernel.org/kvmarm/kvmarm/c/1b92e65f5006
+[14/14] arm64: Enable IMP DEF PMUv3 traps on Apple M*
+        https://git.kernel.org/kvmarm/kvmarm/c/e1231aacb065
 
-So I ended up doing exactly what I threatened to do, which is to
-completely get rid of the HFGxTR nonsense, and bring HFG{R,W}TR to
-their full glory.
-
-The diffstat is a bit annoying:
-
- arch/arm64/include/asm/el2_setup.h      |  14 +--
- arch/arm64/include/asm/kvm_arm.h        |   4 +-
- arch/arm64/include/asm/kvm_host.h       |   3 +-
- arch/arm64/kvm/emulate-nested.c         | 154 ++++++++++++-------------
- arch/arm64/kvm/hyp/include/hyp/switch.h |   4 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c         |   8 +-
- arch/arm64/kvm/nested.c                 |  42 +++----
- arch/arm64/kvm/sys_regs.c               |  20 ++--
- arch/arm64/tools/sysreg                 | 194 ++++++++++++++++++++------------
- 9 files changed, 250 insertions(+), 193 deletions(-)
-
-but at least it puts all registers in the same bucket, and we don't
-assume anything anymore.
-
-I'll repost the series on Monday, once I'm on holiday.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Best,
+Oliver
