@@ -1,80 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B782925C6FF;
-	Tue, 11 Mar 2025 18:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3717625C6FF
+	for <kvmarm@lists.linux.dev>; Tue, 11 Mar 2025 18:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741716635; cv=none; b=c57IfkVFHKQrY+LWvZizdA1EAqgCoA4vLa3K4tjRhMO8DhVOkDKo80VpmTz9JrQXTdvIgDaxrzXmE7P+kC7GS9GIiu4h4gjgPsxQljZIwm1gWrKyiUnwrASZOGQqIcnEG0caH/Ez4fKX69st9e8OSC6iOS1uhs9JhftVC0DYlzM=
+	t=1741716730; cv=none; b=jiPQn0hMlDMBy6Gj0QaA3MnbokDKZRh5Qk1dZWV+6Am1pY+dsJuz+WpfEAiuXnn+N144ROlFvCQqA+vZQlc1XpKwWg2GDvKDBs4cV4kWS6qfDEByZnS1Q5Y82kH4FEkcbJK+KtPJtAchlefNEpIFZP/8xsvxOv4zn6hoq6pXsVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741716635; c=relaxed/simple;
-	bh=D6hN+Qkvta6a2s58a8zh/7uUSxWvPtoQAir/dtSg3TY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A4alsh0I06OWnUZyECvxVSA9s9uxKyN+xp6d49AKE1Zq9sd2hooeJybfSAZmVLn3JAkonYjSjSMJQup1cu/zGxBjJWlmHjsfncgmCsNzGEb1yV5ifeEujNFelMOQV58USxn3J/uk9cyvcc2EH0Y999HX9ptAs9pYM1qQAzQxi10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF88C4CEE9;
-	Tue, 11 Mar 2025 18:10:33 +0000 (UTC)
-Date: Tue, 11 Mar 2025 18:10:31 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 1/8] KVM: arm64: ptdump: Test PMD_TYPE_MASK for block
- mapping
-Message-ID: <Z9B8lyYEtL62ZzVb@arm.com>
-References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
- <20250221044227.1145393-2-anshuman.khandual@arm.com>
+	s=arc-20240116; t=1741716730; c=relaxed/simple;
+	bh=2KUwTYwOhimsfuIGFbZxKncN8lCRZnq98ZApD7bvfzM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=peP0cEfGsiRsurG4B35JJHTxJjSDbLi+IvKhJIaonYcmtcZtNYpkZACXYSCpjt7T0QPMT4dXRJI2jN9qVt11sGML10lcNo2jUw2JuigIR3SHiz2hoplxhM64dALeLkQvi/s73fYaRMd4gknRnB9Itipcx08jRMOzDV2KDf4VHKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BE7Krrxi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BE7Krrxi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE107C4CEE9;
+	Tue, 11 Mar 2025 18:12:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741716729;
+	bh=2KUwTYwOhimsfuIGFbZxKncN8lCRZnq98ZApD7bvfzM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BE7KrrxiQMbIp4x4B1cQun00wuBEq7U9Oc0cQ1grW1eduaiXKmVJ+5yVB/7qKAcxk
+	 bPdx9Hr2Qmh0mOF/VxR2WpbP27oWXtxIS881HIBI2D7DQJ04yeZ0xMM146jfsu749Z
+	 MKEQEdhkY90qnIGrNFt6IhupRkpLLnsiLTgLFauCf4gyLESvk1Ya6PnihIkzjbuKKL
+	 SPv4nfR6bomUtJlQaXAaw01/NSZtxdeibtRli5crey35sRJAShMrxzJytKD7OGdrSd
+	 Lxb/4ix7+/29ZvUV7tDG+Yw1MQ85Ws+ki9M1m7pLEX8dEvsWHI2g3yWrLY+zpePuWv
+	 TmqKXTIj0qBiA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ts45G-00CduK-Oe;
+	Tue, 11 Mar 2025 18:12:06 +0000
+Date: Tue, 11 Mar 2025 18:12:05 +0000
+Message-ID: <86plino2ru.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com,
+	agraf@csgraf.de,
+	shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v3 00/14] arm: rework id register storage
+In-Reply-To: <20250311162824.199721-1-cohuck@redhat.com>
+References: <20250311162824.199721-1-cohuck@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250221044227.1145393-2-anshuman.khandual@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: cohuck@redhat.com, eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org, richard.henderson@linaro.org, alex.bennee@linaro.org, oliver.upton@linux.dev, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 21, 2025 at 10:12:20AM +0530, Anshuman Khandual wrote:
-> Test given page table entries against PMD_TYPE_SECT on PMD_TYPE_MASK mask
-> bits for identifying block mappings in stage 2 page tables.
+On Tue, 11 Mar 2025 16:28:10 +0000,
+Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
->  arch/arm64/kvm/ptdump.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index e4a342e903e2..098416d7e5c2 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -52,8 +52,8 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
->  		.set	= "AF",
->  		.clear	= "  ",
->  	}, {
-> -		.mask	= PTE_TABLE_BIT | PTE_VALID,
-> -		.val	= PTE_VALID,
-> +		.mask	= PMD_TYPE_MASK,
-> +		.val	= PMD_TYPE_SECT,
->  		.set	= "BLK",
->  		.clear	= "   ",
->  	},
+>   - I'm open to changing the source of the definitions from the sysregs
+>     file to the JSON definitions published by Arm; however, I first wanted
+>     to get the code using it right -- we can switch out the code generating
+>     the file to use a different source easily later on, and I'd also like
+>     to steal parts of the script from Linux once integrated (which I think
+>     hasn't happened yet?)
 
-Marc, Oliver - are you ok with this patch going in through the arm64
-tree?
+I don't think there is a real appetite to have that script merged in
+the kernel. My current plan is to maintain it separately.
 
-Thanks.
+But by any mean, take it and do whatever you want with it.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
