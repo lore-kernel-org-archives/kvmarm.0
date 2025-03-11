@@ -1,57 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A5823906A;
-	Tue, 11 Mar 2025 10:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51B529A1;
+	Tue, 11 Mar 2025 11:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741689282; cv=none; b=VuFg6JEdh2nPaMKCkUI0R+TStwe4m9QEAmh2jcHR9/x3rZqrKkRi18p3oMkshJahngpYP5ZgZJ1/4wwpuvZ6J+qIYaEEwS5WWrF3HXcCp+F95gcvMukYQl4XssH/eoSM/mU0qRLDm8ShLAbyn60YmaDN54TE6klhpyKAqTR3Tco=
+	t=1741691925; cv=none; b=JrRipWJXSK/KgpHNlMg6Nnopk4pCmlXprv/I8YL8bZdoZ4ukCK1A2m3noge9MPDBD5BPJP+Y7WLQU9n/OWWPxWRClnXV2e201EQbPn+01SUxVnl1XwElo0E/u9pzKmKDQIKlszrwlDzGJTe5itHxYKt0fn7Qdw/VqXZOSbc4Llk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741689282; c=relaxed/simple;
-	bh=g5WrytiDfToUzuULW5k3QtsxNddrCwlXzxuLcthP2D0=;
+	s=arc-20240116; t=1741691925; c=relaxed/simple;
+	bh=eV1Ot+6YRrZcBA7zWzuNDm7nIRQcDW2LUambjbhiAhs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tkfrXsbQovzDP1jB53il8bceA2Bcwzlw6Umv9B74KLF/mf9lzkCl5/L2DecWDUVrINyqBHVcTBsqtDF1oCplpLvfJodPU9rMxkqiyOX5W/357HTzWKqjsFjNcSQCgG+gg/vfAwCSzl2Js1vRmgoB076yjbwM41E5jDUIRAaz0cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8FCq85X; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FRt5hCiCnAm8tAa5BtoCsO4nYaFgFWChOyYtK0xOyvuuqPmsqzqP9UTBpg7dh+INHyVo6BGOJ5LbYRP3BDd0WYcFlhdMsXK+7dIB1gEtcb3iiszwS7Hvyw4deDL0AalEggtY7z63bAkc6T5VrffWnzNtPbWPzdiFGJgMADZySAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aR5Xv+JX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8FCq85X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57F47C4CEE9;
-	Tue, 11 Mar 2025 10:34:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aR5Xv+JX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC84C4CEE9;
+	Tue, 11 Mar 2025 11:18:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741689281;
-	bh=g5WrytiDfToUzuULW5k3QtsxNddrCwlXzxuLcthP2D0=;
+	s=k20201202; t=1741691925;
+	bh=eV1Ot+6YRrZcBA7zWzuNDm7nIRQcDW2LUambjbhiAhs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p8FCq85X5f02i8T5VUb5KvLi2wdt319XykQnPPZ85XN40ytu0+7ED46RY1qBAIIEt
-	 O//QtuPP7M/TtSDQQz3xcrLxsTPGSESCs4QRl3avMHs4SpiGe8oqI6+3KCrzjAkdLO
-	 Z+Us6U0HNCn6EmPALxtJPkuq1456fNp/HmKEtQk6oCc8/HJPqRyV3zZ4ubXH0qskbP
-	 Ff3zmw9s9oODMO0TNgvhsXMvSTmuuoZ4/lUA78aayRvcARGExdTM4NGFGtBg+Rr4fi
-	 pR9YCbMcdbfyf/IBS6GX/hVGoyWUNa14iGJ5Zi+WIJhdUrYQ4A6zkhpOB12CyC7FOR
-	 14PpUOmO4eY3w==
+	b=aR5Xv+JXW/OGpjkpBu6OK786z2RKa6Uftin8rPAQP29jmSSBS7ZZSdyHN0j1A5RIO
+	 KopJBmyosJTsEE8bck5mz6EKpGpxitwM6TLjkSfHGP2IjlPunbngwds6yIFPkNo9yq
+	 b2+QqXvJ9g7mV+9ZnlLbH9O2pejE0Cj8b9Dt0n5lW9PthEqBPXTDQw1qNxha32mm4K
+	 wexs1y1c72xFIlrENyFXdBemKuVmVPsM3pwtNn2+o/w5DK3zY11vswz+QFWG1yBRlb
+	 NUfpjSoD8h+3WmMwAKrHJQoqLsaYfPlXMShejU/4CewkdungRFrJcRgIQbeRobBZVh
+	 m+MFd1Dd7nYYQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1trwwY-00CUjL-Op;
-	Tue, 11 Mar 2025 10:34:38 +0000
-Date: Tue, 11 Mar 2025 10:34:38 +0000
-Message-ID: <86senjony9.wl-maz@kernel.org>
+	id 1trxdB-00CVMK-Ga;
+	Tue, 11 Mar 2025 11:18:42 +0000
+Date: Tue, 11 Mar 2025 11:18:40 +0000
+Message-ID: <86r033olwv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Zhenyu Ye <yezhenyu2@huawei.com>
-Cc: <yuzenghui@huawei.com>,
-	<will@kernel.org>,
+To: Ankit Agrawal <ankita@nvidia.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	"oliver.upton@linux.dev"
 	<oliver.upton@linux.dev>,
-	<catalin.marinas@arm.com>,
-	<joey.gouly@arm.com>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com"
+	<david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>,
+	Neo Jia
+	<cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta\
+ (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>,
+	Andy
+ Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John
+ Hubbard <jhubbard@nvidia.com>,
+	Dan Williams <danw@nvidia.com>,
+	Zhi Wang
+	<zhiw@nvidia.com>,
+	Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke
+	<udhoke@nvidia.com>,
+	Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju
+	<kjaju@nvidia.com>,
+	"alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>,
+	"sebastianene@google.com"
+	<sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com"
+	<yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com"
+	<gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com"
+	<tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org"
 	<linux-kernel@vger.kernel.org>,
-	<xiexiangyou@huawei.com>,
-	<zhengchuan@huawei.com>,
-	<wangzhou1@hisilicon.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v1 4/5] arm64/kvm: support to handle the HDBSSF event
-In-Reply-To: <20250311040321.1460-5-yezhenyu2@huawei.com>
-References: <20250311040321.1460-1-yezhenyu2@huawei.com>
-	<20250311040321.1460-5-yezhenyu2@huawei.com>
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using VMA flags
+In-Reply-To: <SA1PR12MB7199DD985C45943A663E7003B0D12@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20250310103008.3471-1-ankita@nvidia.com>
+	<20250310103008.3471-2-ankita@nvidia.com>
+	<861pv5p0c3.wl-maz@kernel.org>
+	<SA1PR12MB7199DD985C45943A663E7003B0D12@SA1PR12MB7199.namprd12.prod.outlook.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,172 +111,93 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, yuzenghui@huawei.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, joey.gouly@arm.com, linux-kernel@vger.kernel.org, xiexiangyou@huawei.com, zhengchuan@huawei.com, wangzhou1@hisilicon.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ryan.roberts@arm.com, shahuang@redhat.com, lpieralisi@kernel.org, david@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, zhiw@nvidia.com, mochs@nvidia.com, udhoke@nvidia.com, dnigam@nvidia.com, kjaju@nvidia.com, alex.williamson@redhat.com, sebastianene@google.com, coltonlewis@google.com, kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, linux-mm@kvack.org, ddutile@redhat.com, tabba@google.com, qperret@google.com, seanjc@google.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 11 Mar 2025 04:03:20 +0000,
-Zhenyu Ye <yezhenyu2@huawei.com> wrote:
-> 
-> From: eillon <yezhenyu2@huawei.com>
-> 
-> Updating the dirty bitmap based on the HDBSS buffer. Similar
-> to the implementation of the x86 pml feature, KVM flushes the
-> buffers on all VM-Exits, thus we only need to kick running
-> vCPUs to force a VM-Exit.
-> 
-> Signed-off-by: eillon <yezhenyu2@huawei.com>
-> ---
->  arch/arm64/kvm/arm.c         | 10 ++++++++
->  arch/arm64/kvm/handle_exit.c | 47 ++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/mmu.c         |  7 ++++++
->  3 files changed, 64 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 825cfef3b1c2..fceceeead011 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1845,7 +1845,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  
->  void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
->  {
-> +	/*
-> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
-> +	 * before reporting dirty_bitmap to userspace.  KVM flushes the buffers
-> +	 * on all VM-Exits, thus we only need to kick running vCPUs to force a
-> +	 * VM-Exit.
-> +	 */
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
->  
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		kvm_vcpu_kick(vcpu);
+On Tue, 11 Mar 2025 03:42:23 +0000,
+Ankit Agrawal <ankita@nvidia.com> wrote:
+>=20
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0 /*
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 When FWB is unsupported KVM ne=
+eds to do cache flushes
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 (via dcache_clean_inval_poc())=
+ of the underlying memory. This is
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 only possible if the memory is=
+ already mapped into the kernel map.
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 Outright reject as the cacheab=
+le device memory is not present in
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0 the kernel map and not suitabl=
+e for cache management.
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0 if (cacheable_devmem && !stage2_has_fwb(pgt)=
+) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ret =3D -EINVAL;
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 goto out_unlock;
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> +
+> >
+> > These new error reasons should at least be complemented by an
+> > equivalent check at the point where the memslot is registered. It
+>=20
+> Understood. I can add such check in kvm_arch_prepare_memory_region().
+>=20
+>=20
+> > maybe OK to blindly return an error at fault time (because userspace
+> > has messed with the mapping behind our back), but there should at
+> > least be something telling a well behaved userspace that there is a
+> > bunch of combination we're unwilling to support.
+>=20
+> How about WARN_ON() or BUG() for the faulty situation?
 
-We don't need this outside of HDBSS. Why impose it on everyone else?
+Absolutely not. Do you really want any user to randomly crash the
+kernel because they flip a mapping, which they can do anytime they
+want?
 
-I'm also perplexed by the requirement to flush on all exits. Why can't
-this be deferred to vcpu_put() only? Specially given that I don't see
-any use of this stuff outside of a VHE system.
+The way KVM works is that we return to userspace for the VMM to fix
+things. Either by emulating something we can't do in the kernel, or by
+fixing things so that the kernel can replay the fault and sort it out.
 
->  }
->  
->  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 512d152233ff..db9d7e1f72bf 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -330,6 +330,50 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->  	return arm_exit_handlers[esr_ec];
->  }
->  
-> +#define HDBSS_ENTRY_VALID_SHIFT 0
-> +#define HDBSS_ENTRY_VALID_MASK (1UL << HDBSS_ENTRY_VALID_SHIFT)
-> +#define HDBSS_ENTRY_IPA_SHIFT 12
-> +#define HDBSS_ENTRY_IPA_MASK GENMASK_ULL(55, HDBSS_ENTRY_IPA_SHIFT)
+Either way, this requires some form of fault syndrome so that usespace
+has a chance of understanding WTF is going on.
 
-This has no place here. Move this stuff somewhere else. And rewrite in
-a more concise way:
+> > Which brings me to the next point: FWB is not discoverable from
+> > userspace. How do you expect a VMM to know what it can or cannot do?
+>=20
+> Good point. I am not sure if it can. I suppose you are concerned about er=
+ror
+> during fault handling when !FWB without VMM having any clear indications
+> of the cause?
 
-#define HDBSS_ENTRY_VALID	BIT(0)
-#define HDBSS_ENTRY_IPA		GENMASK(55, 12)
+No, I'm concerned that a well established API (populating a memslot)
+works in some case and doesn't work in another without a clear
+indication of *why* we have this behaviour.
 
-> +
-> +static void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
-> +{
-> +	int idx, curr_idx;
-> +	u64 *hdbss_buf;
-> +
-> +	if (!vcpu->kvm->enable_hdbss)
+To me, this indicates that userspace needs to buy in this new
+behaviour, and that behaviour needs to be advertised by a capability,
+which is in turn conditional on FWB.
 
-This control is odd. You track the logging per-VM, but dump the
-buffers per-vcpu.
+> Perhaps we can gracefully fall back to the default device mapping
+> in such case? But that would cause VM to crash as soon as it makes some
+> access violating DEVICE_nGnRE.
 
-> +		return;
-> +
-> +	dsb(sy);
-> +	isb();
-> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
-> +
-> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
-> +	if (curr_idx == 0 || vcpu->arch.hdbss.br_el2 == 0)
-> +		return;
-> +
-> +	hdbss_buf = page_address(phys_to_page(HDBSSBR_BADDR(vcpu->arch.hdbss.br_el2)));
+Which would now be a regression...
 
-Do you see why it is silly to keep the raw value of the register? It'd
-be far better to just keep the VA (and maybe the PA as well), and
-build the register value as required.
+My take is that this cacheable PNFMAP contraption must only be exposed
+to a guest if FWB is available. We can't prevent someone to do an
+mmap() behind our back, but we can at least:
 
-> +	if (!hdbss_buf) {
-> +		kvm_err("Enter flush hdbss buffer with buffer == NULL!");
-> +		return;
-> +	}
-> +
-> +	for (idx = 0; idx < curr_idx; idx++) {
-> +		u64 gpa;
-> +
-> +		gpa = hdbss_buf[idx];
-> +		if (!(gpa & HDBSS_ENTRY_VALID_MASK))
-> +			continue;
-> +
-> +		gpa = gpa & HDBSS_ENTRY_IPA_MASK;
-> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-
-Isn't there a requirement to hold a lock of some sort here?
-
-> +	}
-> +
-> +	/* reset HDBSS index */
-> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
-> +	dsb(sy);
-
-Where is the DSB(SY) requirement coming from if the logging is
-per-vcpu and that each vcpu gets its own buffer?
-
-> +	isb();
-
-And you want to do that on each exit? How will userspace intercept
-this? Frankly, this should be moved to put-time, and only be
-guaranteed  to be visible to userspace when the vcpus are outside of
-the kernel.
-
-> +}
-> +
->  /*
->   * We may be single-stepping an emulated instruction. If the emulation
->   * has been completed in the kernel, we can return to userspace with a
-> @@ -365,6 +409,9 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
->  {
->  	struct kvm_run *run = vcpu->run;
->  
-> +	if (vcpu->kvm->enable_hdbss)
-> +		kvm_flush_hdbss_buffer(vcpu);
-> +
->  	if (ARM_SERROR_PENDING(exception_index)) {
->  		/*
->  		 * The SError is handled by handle_exit_early(). If the guest
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9c11e2292b1e..3e0781ae0ae1 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1790,6 +1790,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
->  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
->  
-> +	/*
-> +	 * HDBSS buffer already flushed when enter handle_trap_exceptions().
-> +	 * Nothing to do here.
-> +	 */
-> +	if (ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
-> +		return 1;
-> +
-
-Can this happen on an instruction abort? Also, you seem to be ignoring
-any type of *faults*. Nothing can fail at all?
+- tell userspace whether this is supported
+- only handle the fault if userspace has bought in this mode
+- report the fault to userspace for it to fix things otherwise
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
