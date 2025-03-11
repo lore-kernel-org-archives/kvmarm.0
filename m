@@ -1,112 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D3478F5D;
-	Tue, 11 Mar 2025 18:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C59262D32;
+	Tue, 11 Mar 2025 19:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741717333; cv=none; b=fE7+J2ZHvVX+8dbNxQD9qigeMnSTheARK3LrNpTNHG6ZwIHCvUkIbimwePuyvAQwH44mvW4Mn77EKOFh/oIAna1Tw1SwDL/pVH/ggq9g7wqdlI3Ka9rNgX90q1hlIi0Yc2oQCaQQtFUEguN0Qao8EoNZ8IJHQktPWCcZFmh9xHo=
+	t=1741720218; cv=none; b=WbT2ux0SzH3SlQekhft8mFvN0K43GpHLNOKNiwMC6S/FS8ekfMDWFCCW8xRN0tdUBvPSab9nf7rROJ+VugLpDLtqrpRsplIfpAjlSS+CxMhdfOPho4KBkDsYeWOPiHdNgpAOveOUi340qexeYjkGTT4ZuBeC7ncO0z6Q5htfMAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741717333; c=relaxed/simple;
-	bh=twBnHx5MxmQiJsuf5M4X8oH5jsM0d98je1kAJCezQRc=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=V4ezzyUpAg/aQTbq9/YybkrRx40JHfh+sUSSfhIEI/z+yh+Rkr2481L0s6chS5gxphhMiywhrrthwla1tBWD3u5bVZCDZ4EY4lgPFdVUW+5NbrcipnMwKIiat8PaY8Y/fiBRasdvWyPwXitKkC6zYdG9cSS7XKh3ijDXlTQZUs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiSdc+/u; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741720218; c=relaxed/simple;
+	bh=99llKZilnJT4E48a+3LamgB6gGoSVPp37FNJyrkf0Kg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OCVbtQdfGU4uaQu8x8pWm5f6+EX/Cz0Vi73GBsh70KF5C2BBZeEe9TP0/Ga016Xy0nj9Thot+svx5jTEcbzlPXullfDDHwvFMiCHGKWPHmz6PHaFzLf7c4nH9OnZdhoBXIqpGZL8VZciNkOY5LfX/0VMamUsaGD+Cb9ZZBLxAes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLJbEYRG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiSdc+/u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24A4AC4CEE9;
-	Tue, 11 Mar 2025 18:22:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLJbEYRG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC3AC4CEE9;
+	Tue, 11 Mar 2025 19:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741717333;
-	bh=twBnHx5MxmQiJsuf5M4X8oH5jsM0d98je1kAJCezQRc=;
+	s=k20201202; t=1741720216;
+	bh=99llKZilnJT4E48a+3LamgB6gGoSVPp37FNJyrkf0Kg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aiSdc+/unKajtealI06ykugefgVZcMCiFo47wIxDcaoT17jRxCFqaSQxZpmcVtR7U
-	 9hXlu6BKOnmmFAqgNaD0dzPhdyNZa3pZk3XMHk8Rw6iyjN7Ru0XKoa2Ic2MV8I2aOK
-	 q31II4o92W4aBpvDg4xVZ3w7M+cm/F8q2tSAbJnAFbA3q5H2TFbYeDP1LbNbkvqNsc
-	 TwQQbEfpemoj2ec04SeAvuKvNlAOPZjTsUqqgzjBLruVHMdchJMvcx/4/JPmSxbWgu
-	 21uWULjuZJ2LgEM6qlL4xQzkYb7mnjt2Qvh0kZx7c2433MH0hjhLDX+c/vF17VA/mH
-	 78wY9P7AXwDEA==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	b=PLJbEYRG4EeWGAuA9hC0NNMyistSYTBPThKkYGpYGldf7MG+l9BssZSuQInQXLkCN
+	 FzkJ2UMDsqloXvKn5QYwff0zQ3/A4VZL+zHUZNLX9zQTBZ1hH3LNdJYtUi//v0tgjc
+	 lqOKwDEC7NE4u8Xfsr+lq2zSy+5NfjtcRd4JsLGwkblxFSV+cRenG+6Osocidgo5O8
+	 l5kOHGrzSDFyPbt3tXVNA+4jW9+i3pDCwT2yQWOHdwE4UWFVbub+JDbtw1WJM1q2SR
+	 S649RQbvOJeGbTxuRpbvz4AB5ypaXX1QoCvMeri6WCX1axQnOpdpXi+vDWIK+g4gnm
+	 g0SD1MzaFXNdw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ts4F0-00CeC6-Ni;
-	Tue, 11 Mar 2025 18:22:10 +0000
+	id 1ts4zW-00Cf5J-BY;
+	Tue, 11 Mar 2025 19:10:14 +0000
+Date: Tue, 11 Mar 2025 19:10:14 +0000
+Message-ID: <86o6y7o02x.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 07/18] KVM: arm64: Compute FGT masks from KVM's own FGT tables
+In-Reply-To: <CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
+References: <20250210184150.2145093-1-maz@kernel.org>
+	<20250210184150.2145093-8-maz@kernel.org>
+	<CA+EHjTwm4CosWDGcaH_tnLU7zMNCq8twDyEcKd7-V0Lu7b-LcA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Date: Tue, 11 Mar 2025 18:22:10 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Anshuman Khandual
- <anshuman.khandual@arm.com>, arm-kernel@lists.infradead.org, James Morse
- <james.morse@arm.com>, Will Deacon <will@kernel.org>, Ard Biesheuvel
- <ardb@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>, Mark Rutland
- <mark.rutland@arm.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 1/8] KVM: arm64: ptdump: Test PMD_TYPE_MASK for block
- mapping
-In-Reply-To: <Z9B8lyYEtL62ZzVb@arm.com>
-References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
- <20250221044227.1145393-2-anshuman.khandual@arm.com>
- <Z9B8lyYEtL62ZzVb@arm.com>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <43e4dd905ebc6424511bd230ceb47ac1@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, oliver.upton@linux.dev, anshuman.khandual@arm.com, arm-kernel@lists.infradead.org, james.morse@arm.com, will@kernel.org, ardb@kernel.org, ryan.roberts@arm.com, mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025-03-11 18:10, Catalin Marinas wrote:
-> On Fri, Feb 21, 2025 at 10:12:20AM +0530, Anshuman Khandual wrote:
->> Test given page table entries against PMD_TYPE_SECT on PMD_TYPE_MASK 
->> mask
->> bits for identifying block mappings in stage 2 page tables.
->> 
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/kvm/ptdump.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
->> index e4a342e903e2..098416d7e5c2 100644
->> --- a/arch/arm64/kvm/ptdump.c
->> +++ b/arch/arm64/kvm/ptdump.c
->> @@ -52,8 +52,8 @@ static const struct ptdump_prot_bits 
->> stage2_pte_bits[] = {
->>  		.set	= "AF",
->>  		.clear	= "  ",
->>  	}, {
->> -		.mask	= PTE_TABLE_BIT | PTE_VALID,
->> -		.val	= PTE_VALID,
->> +		.mask	= PMD_TYPE_MASK,
->> +		.val	= PMD_TYPE_SECT,
->>  		.set	= "BLK",
->>  		.clear	= "   ",
->>  	},
+On Tue, 04 Mar 2025 16:55:50 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Marc, Oliver - are you ok with this patch going in through the arm64
-> tree?
+> Hi Marc,
+> 
+> On Mon, 10 Feb 2025 at 18:42, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > In the process of decoupling KVM's view of the FGT bits from the
+> > wider architectural state, use KVM's own FGT tables to build
+> > a synthitic view of what is actually known.
+> 
+> synthitic -> synthetic
 
-Yup, looks OK to me.
+Ah, I missed that one earlier. Will fix.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+> 
+> 
+> > This allows for some checking along the way.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h  |   4 ++
+> >  arch/arm64/include/asm/kvm_host.h |  14 ++++
+> >  arch/arm64/kvm/emulate-nested.c   | 102 ++++++++++++++++++++++++++++++
+> >  3 files changed, 120 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 8d94a6c0ed5c4..e424085f2aaca 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -359,6 +359,10 @@
+> >  #define __HAFGRTR_EL2_MASK     (GENMASK(49, 17) | GENMASK(4, 0))
+> >  #define __HAFGRTR_EL2_nMASK    ~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
+> >
+> > +/* Because the sysreg file mixes R and W... */
+> > +#define HFGRTR_EL2_RES0                HFGxTR_EL2_RES0 (0)
+> > +#define HFGWTR_EL2_RES0                (HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
+> 
+> __HFGRTR_ONLY_MASK is a hand-crafted bitmask. The only bit remaining
+> in HFGxTR_EL2 that is RES0 is bit 51. If that were to be used as an
+> HFGRTR-only bit without __HFGRTR_ONLY_MASK getting updated, then
+> aggregate_fgt() below would set its bit in hfgwtr_masks. Could this be
+> a problem if this happens and the polarity of this bit ends up being
+> negative, thereby setting the corresponding nmask bit?
 
-         M.
+So I ended up doing exactly what I threatened to do, which is to
+completely get rid of the HFGxTR nonsense, and bring HFG{R,W}TR to
+their full glory.
+
+The diffstat is a bit annoying:
+
+ arch/arm64/include/asm/el2_setup.h      |  14 +--
+ arch/arm64/include/asm/kvm_arm.h        |   4 +-
+ arch/arm64/include/asm/kvm_host.h       |   3 +-
+ arch/arm64/kvm/emulate-nested.c         | 154 ++++++++++++-------------
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   4 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         |   8 +-
+ arch/arm64/kvm/nested.c                 |  42 +++----
+ arch/arm64/kvm/sys_regs.c               |  20 ++--
+ arch/arm64/tools/sysreg                 | 194 ++++++++++++++++++++------------
+ 9 files changed, 250 insertions(+), 193 deletions(-)
+
+but at least it puts all registers in the same bucket, and we don't
+assume anything anymore.
+
+I'll repost the series on Monday, once I'm on holiday.
+
+Thanks,
+
+	M.
+
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
