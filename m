@@ -1,29 +1,29 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CD8259C
-	for <kvmarm@lists.linux.dev>; Tue, 11 Mar 2025 04:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217011EB182
+	for <kvmarm@lists.linux.dev>; Tue, 11 Mar 2025 04:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741665821; cv=none; b=Zg6Nn7+9fdqrCbCBNB3GJhhCBGk2mpS2eeAGtp4tHo2h6b8Xx13EG69HhuvOXNBrv9854UEekyJPA2OA4V1emcAPeBwyIXes6fawdzCPmAId80nNcioKLm+JPU6kRvaA57DHhgi0GY83ciRjxUFP1kMby+/YsRMmi5B3qN8vuEc=
+	t=1741665825; cv=none; b=UamiRSsammttw4Z/Qj+3ALFzQk0qyIoPYwI33q4E5SFN9OabC5nCsOOUzscN87lu/64/vn7WXVZH1BmYA8Yaz31ZZ6TxEGVjC8RED2UENDCY30gbfqcEf8o14lEsHq4A2m10Ig8I4CfrHR69Y3/gCPamluFHqohIL3SBu3VYDbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741665821; c=relaxed/simple;
-	bh=lKUtWeeuuNv/3bGyvIabAKg3vG9/yt8By6iM12+PVJM=;
+	s=arc-20240116; t=1741665825; c=relaxed/simple;
+	bh=W2fjiz10uTkl6epLzqjMqom8vKAEYUI9EDrH25MkceU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fHmDDI2UyOsEM8KIsfQlEcl1DasaDqLfn0GYj1LcojhEmeh9ffr2lTeC5GMi62uTSmkkKr5yJv2CgZuqW4wBmAUi+d+orVn8326XC//xMyFLwRwQ+AJX2c9vOHEHPBA3hXyNcyTdshWX/9mi2oNrZu760q86i6fkjluINzZHT9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+	 MIME-Version:Content-Type; b=Mxj/57ryMLV0rmxCVt2zr/eBnAz7YOyifBiYIbDKVdPTbaSd+d95FRWZVuV42pHkx6KQ1P2M31VyV2wP3CdNp9DdSEANQxAV08DTk+kYj7nTPK9UopPTs0zohqcqsfEVPj54Z/UEtdbOlOfR6R1K+Uhz/DmGSTuOci5Ui1iWyUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4ZBgB24Y5cz27gBD;
-	Tue, 11 Mar 2025 12:04:10 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZBg9N59TJz1cyWs;
+	Tue, 11 Mar 2025 12:03:36 +0800 (CST)
 Received: from kwepemj500003.china.huawei.com (unknown [7.202.194.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id D9D2C1A016C;
-	Tue, 11 Mar 2025 12:03:35 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 8BFB01800CD;
+	Tue, 11 Mar 2025 12:03:39 +0800 (CST)
 Received: from DESKTOP-KKJBAGG.huawei.com (10.174.178.32) by
  kwepemj500003.china.huawei.com (7.202.194.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 11 Mar 2025 12:03:34 +0800
+ 15.2.1544.11; Tue, 11 Mar 2025 12:03:38 +0800
 From: Zhenyu Ye <yezhenyu2@huawei.com>
 To: <maz@kernel.org>, <yuzenghui@huawei.com>, <will@kernel.org>,
 	<oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <joey.gouly@arm.com>
@@ -31,9 +31,9 @@ CC: <linux-kernel@vger.kernel.org>, <yezhenyu2@huawei.com>,
 	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <wangzhou1@hisilicon.com>,
 	<linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH v1 2/5] arm64/kvm: support set the DBM attr during memory abort
-Date: Tue, 11 Mar 2025 12:03:18 +0800
-Message-ID: <20250311040321.1460-3-yezhenyu2@huawei.com>
+Subject: [PATCH v1 4/5] arm64/kvm: support to handle the HDBSSF event
+Date: Tue, 11 Mar 2025 12:03:20 +0800
+Message-ID: <20250311040321.1460-5-yezhenyu2@huawei.com>
 X-Mailer: git-send-email 2.22.0.windows.1
 In-Reply-To: <20250311040321.1460-1-yezhenyu2@huawei.com>
 References: <20250311040321.1460-1-yezhenyu2@huawei.com>
@@ -50,60 +50,123 @@ X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
 
 From: eillon <yezhenyu2@huawei.com>
 
-Since the ARMv8, the page entry has supported the DBM attribute.
-Support set the attr during user_mem_abort().
+Updating the dirty bitmap based on the HDBSS buffer. Similar
+to the implementation of the x86 pml feature, KVM flushes the
+buffers on all VM-Exits, thus we only need to kick running
+vCPUs to force a VM-Exit.
 
 Signed-off-by: eillon <yezhenyu2@huawei.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 3 +++
- arch/arm64/kvm/hyp/pgtable.c         | 6 ++++++
- 2 files changed, 9 insertions(+)
+ arch/arm64/kvm/arm.c         | 10 ++++++++
+ arch/arm64/kvm/handle_exit.c | 47 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c         |  7 ++++++
+ 3 files changed, 64 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 6b9d274052c7..35648d7f08f5 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -86,6 +86,8 @@ typedef u64 kvm_pte_t;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 825cfef3b1c2..fceceeead011 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1845,7 +1845,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
  
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
+ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ {
++	/*
++	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
++	 * before reporting dirty_bitmap to userspace.  KVM flushes the buffers
++	 * on all VM-Exits, thus we only need to kick running vCPUs to force a
++	 * VM-Exit.
++	 */
++	struct kvm_vcpu *vcpu;
++	unsigned long i;
  
-+#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_vcpu_kick(vcpu);
+ }
+ 
+ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 512d152233ff..db9d7e1f72bf 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -330,6 +330,50 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ 	return arm_exit_handlers[esr_ec];
+ }
+ 
++#define HDBSS_ENTRY_VALID_SHIFT 0
++#define HDBSS_ENTRY_VALID_MASK (1UL << HDBSS_ENTRY_VALID_SHIFT)
++#define HDBSS_ENTRY_IPA_SHIFT 12
++#define HDBSS_ENTRY_IPA_MASK GENMASK_ULL(55, HDBSS_ENTRY_IPA_SHIFT)
 +
- #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
- 
- #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-@@ -252,6 +254,7 @@ enum kvm_pgtable_prot {
- 
- 	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
- 	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
-+	KVM_PGTABLE_PROT_DBM			= BIT(5),
- 
- 	KVM_PGTABLE_PROT_SW0			= BIT(55),
- 	KVM_PGTABLE_PROT_SW1			= BIT(56),
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index df5cc74a7dd0..3ea6bdbc02a0 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -700,6 +700,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
- 	if (prot & KVM_PGTABLE_PROT_W)
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
- 
-+	if (prot & KVM_PGTABLE_PROT_DBM)
-+		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
++static void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
++{
++	int idx, curr_idx;
++	u64 *hdbss_buf;
 +
- 	if (!kvm_lpa2_is_enabled())
- 		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
- 
-@@ -1309,6 +1312,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	if (prot & KVM_PGTABLE_PROT_W)
- 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
- 
-+	if (prot & KVM_PGTABLE_PROT_DBM)
-+		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
++	if (!vcpu->kvm->enable_hdbss)
++		return;
 +
- 	if (prot & KVM_PGTABLE_PROT_X)
- 		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
++	dsb(sy);
++	isb();
++	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
++
++	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
++	if (curr_idx == 0 || vcpu->arch.hdbss.br_el2 == 0)
++		return;
++
++	hdbss_buf = page_address(phys_to_page(HDBSSBR_BADDR(vcpu->arch.hdbss.br_el2)));
++	if (!hdbss_buf) {
++		kvm_err("Enter flush hdbss buffer with buffer == NULL!");
++		return;
++	}
++
++	for (idx = 0; idx < curr_idx; idx++) {
++		u64 gpa;
++
++		gpa = hdbss_buf[idx];
++		if (!(gpa & HDBSS_ENTRY_VALID_MASK))
++			continue;
++
++		gpa = gpa & HDBSS_ENTRY_IPA_MASK;
++		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
++	}
++
++	/* reset HDBSS index */
++	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
++	dsb(sy);
++	isb();
++}
++
+ /*
+  * We may be single-stepping an emulated instruction. If the emulation
+  * has been completed in the kernel, we can return to userspace with a
+@@ -365,6 +409,9 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+ {
+ 	struct kvm_run *run = vcpu->run;
  
++	if (vcpu->kvm->enable_hdbss)
++		kvm_flush_hdbss_buffer(vcpu);
++
+ 	if (ARM_SERROR_PENDING(exception_index)) {
+ 		/*
+ 		 * The SError is handled by handle_exit_early(). If the guest
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9c11e2292b1e..3e0781ae0ae1 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1790,6 +1790,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+ 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
++	/*
++	 * HDBSS buffer already flushed when enter handle_trap_exceptions().
++	 * Nothing to do here.
++	 */
++	if (ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
++		return 1;
++
+ 	if (esr_fsc_is_translation_fault(esr)) {
+ 		/* Beyond sanitised PARange (which is the IPA limit) */
+ 		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
 -- 
 2.39.3
 
