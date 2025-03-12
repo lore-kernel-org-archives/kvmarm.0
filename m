@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D10B1DE3A4;
-	Wed, 12 Mar 2025 08:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712B322A7E9;
+	Wed, 12 Mar 2025 08:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741768728; cv=none; b=sDw+bZz2sDEBWuc8C1DPki1d68+Y99IDleejVBMwR9b1bY4L6MmQkobaTdiTWwsz7Is+zpa1HNd7Sa0N5p1qOPD6lJpDlJJIdyXpRRG8ok3Qg8FsAh04Z0X43iRZY+cmHVQWZywgcoZ8bNWErdq8sFFCrN0J5KEPRUTUxxxTEzs=
+	t=1741769960; cv=none; b=OPZG0Fy1l0/j0KfF+YtVPMfvNnrfzhGNB3q0tyAZcJaHhpox/ibZHhkezKEED1/hZ94Movtv3McnB4FpyZyWQkqt+y/Ne6MawwJhfhSiOf7IjzbnmIPSsva1yzwysob/xTCySpHjQgSt/c9EGzp/C/LKI4dqTQnJcRGW6rBxnaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741768728; c=relaxed/simple;
-	bh=aoRSn+Ge+OFGhJG+BqVTYAMNvaYrTDa2lkYMIa9r1Go=;
+	s=arc-20240116; t=1741769960; c=relaxed/simple;
+	bh=IKNcjZBYeAxkRhWSJBPJs/lzHdI4VhmT0PC6QU1clQM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pRvwog/GKOW/txbHE5frNvvDMA0k0Gtl1GJQJ/FPHS58CTVpODQedJFhj9PBi1SnfUv/e+0sdus672LARj8j636/TmHMMfJ7mnLqOTfuvSqqoQBLyKTiavHSJNAgvU7eK8LT/xojyInawfb2kuR91mH+r0CSHJjJKwedlcTjXxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMisL0Al; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CKV38BImq43gF5R6NVgxOCrfcbTElU9SlLj8cgMLINvmvVnJ5Kzcd9OSxo4zvus89HmT5zMCCQWy7nLEGMKUUagzuOUTKemMp56oSMF+4ZJamJVy/fWQOAmlRusJGUYdMcme7Foi7YmF+iacx/ZKmLAQpACY1im4+1Jp23hthKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IrW9BSEU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nMisL0Al"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 211B7C4CEE3;
-	Wed, 12 Mar 2025 08:38:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrW9BSEU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 469C2C4CEE3;
+	Wed, 12 Mar 2025 08:59:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741768728;
-	bh=aoRSn+Ge+OFGhJG+BqVTYAMNvaYrTDa2lkYMIa9r1Go=;
+	s=k20201202; t=1741769960;
+	bh=IKNcjZBYeAxkRhWSJBPJs/lzHdI4VhmT0PC6QU1clQM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nMisL0Alo24OqfZs5DJsP7fMNYMn/y6s+lb+FUpIiJLNx8Y/vM8nboxVqWeM+VMdZ
-	 HowqnCvj4GoEdZ82v6YBjeAV43CFNO4ubGTbWp4WoMsLhdyT8pvyYIa5ygUkk5DSCH
-	 FXgI+Lqj/338K21275pV3Fnnj6e/uTWuKdBipCB7T7Ri+7IZGQ3mhbjJo+9XDZTwOI
-	 Wo6wNinEYQJ2NtLPyZ5zD4ZfTDM//0qfjzmlVheT0vkFjQ37qdovA3qr3xJi7ECE+B
-	 o9Khei00taruEW78qBahhRq1jXdcoGS4mHpfeFh8aF1xvS3ME9HlBlcznqvMKBgD8C
-	 XV1zRsw/Lhzaw==
+	b=IrW9BSEUC0TxrcsoX4eyTdLHK7QIQR26/ltW1TImz/p7JSKfD9wrAPp95B/ITF7RP
+	 dZf7pwGzPpVgwaRI4Dri5tnP5UfzKDp7iNGKxYqUOVoRhD4MrrLTtXx+H9benf8tbb
+	 Yn8bMyXrhNpd1VBs4M/l0N6Dn/WEeOUzto2ssBPWL4+jIt/ag1Mm+yAQl1qTWtFBD8
+	 +iDwpuooGCpAD/nnc8Vv8xfFVofjoCSLmpAOX70sUni9EZQuwhGUOpPIGZhXrXkn3G
+	 saQAvwbbiMd2NbHSqmslOugPhGMu9wGXoDo8G72vjW25LXDE7xKNk8VpBkNewEBd0Q
+	 KbMbDow1lxS2Q==
 Received: from 82-132-232-216.dab.02.net ([82.132.232.216] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tsHbx-00CnRd-QC;
-	Wed, 12 Mar 2025 08:38:46 +0000
-Date: Wed, 12 Mar 2025 08:38:43 +0000
-Message-ID: <87r0327iek.wl-maz@kernel.org>
+	id 1tsHvp-00Cnoj-Sg;
+	Wed, 12 Mar 2025 08:59:18 +0000
+Date: Wed, 12 Mar 2025 08:59:15 +0000
+Message-ID: <87plim7hgc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: oliver.upton@linux.dev,
@@ -47,10 +47,10 @@ Cc: oliver.upton@linux.dev,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v3 1/3] KVM: arm64: Add flags to kvm_hyp_memcache
-In-Reply-To: <20250307113411.469018-2-vdonnefort@google.com>
+Subject: Re: [PATCH v3 2/3] KVM: arm64: Distinct pKVM teardown memcache for stage-2
+In-Reply-To: <20250307113411.469018-3-vdonnefort@google.com>
 References: <20250307113411.469018-1-vdonnefort@google.com>
-	<20250307113411.469018-2-vdonnefort@google.com>
+	<20250307113411.469018-3-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,66 +66,49 @@ X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 07 Mar 2025 11:34:09 +0000,
+On Fri, 07 Mar 2025 11:34:10 +0000,
 Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Add flags to kvm_hyp_memcache and propagate the latter to the allocation
-> and free callbacks. This will later allow to account for memory, based
-> on the memcache configuration.
+> In order to account for memory dedicated to the stage-2 page-tables, use
+> a separated memcache when tearing down the VM.
 > 
 > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3a7ec98ef123..12691ae23d4c 100644
+> index 12691ae23d4c..ace3969e8106 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -86,6 +86,7 @@ struct kvm_hyp_memcache {
->  	phys_addr_t head;
->  	unsigned long nr_pages;
->  	struct pkvm_mapping *mapping; /* only used from EL1 */
-> +	unsigned long flags;
+> @@ -246,6 +246,7 @@ typedef unsigned int pkvm_handle_t;
+>  struct kvm_protected_vm {
+>  	pkvm_handle_t handle;
+>  	struct kvm_hyp_memcache teardown_mc;
+> +	struct kvm_hyp_memcache stage2_teardown_mc;
+>  	bool enabled;
 >  };
 >  
->  static inline void push_hyp_memcache(struct kvm_hyp_memcache *mc,
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1f55b0c7b11d..c01ad4430729 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1086,12 +1086,12 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->  	}
->  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 3927fe52a3dd..15f8d5315959 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -678,7 +678,7 @@ teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
 >  
-> -static void hyp_mc_free_fn(void *addr, void *unused)
-> +static void hyp_mc_free_fn(void *addr, void *mc)
+>  int __pkvm_teardown_vm(pkvm_handle_t handle)
 >  {
->  	free_page((unsigned long)addr);
->  }
+> -	struct kvm_hyp_memcache *mc;
+> +	struct kvm_hyp_memcache *mc, *stage2_mc;
+>  	struct pkvm_hyp_vm *hyp_vm;
+>  	struct kvm *host_kvm;
+>  	unsigned int idx;
+> @@ -706,7 +706,8 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
 >  
-> -static void *hyp_mc_alloc_fn(void *unused)
-> +static void *hyp_mc_alloc_fn(void *mc)
->  {
->  	return (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
->  }
-> @@ -1102,7 +1102,7 @@ void free_hyp_memcache(struct kvm_hyp_memcache *mc)
->  		return;
->  
->  	kfree(mc->mapping);
-> -	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, NULL);
-> +	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, (void *)mc);
+>  	/* Reclaim guest pages (including page-table pages) */
+>  	mc = &host_kvm->arch.pkvm.teardown_mc;
+> -	reclaim_guest_pages(hyp_vm, mc);
+> +	stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
+> +	reclaim_guest_pages(hyp_vm, stage2_mc);
 
-Why the cast? It looks superfluous to me.
-
->  }
->  
->  int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
-> @@ -1117,7 +1117,7 @@ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
->  	}
->  
->  	return __topup_hyp_memcache(mc, min_pages, hyp_mc_alloc_fn,
-> -				    kvm_host_pa, NULL);
-> +				    kvm_host_pa, (void *)mc);
-
-Same here.
+This looks odd. What counts as stage-2 pages here? Or is it that
+reclaim_guest_pages() is very badly named?
 
 Thanks,
 
