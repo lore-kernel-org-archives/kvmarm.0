@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC051F4285;
-	Wed, 12 Mar 2025 23:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543BC1F4C98;
+	Wed, 12 Mar 2025 23:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741823384; cv=none; b=mfMHKlCRBo3dWS2NMvaTmTynvY7lD+uI/esNBWYJRccMssJ5kTH2YyZWb+U9wHBFCzNDBt4Cp3IZlmYaoumz9/FJO8J7Vw9YX5sjO7TkPZ1v3gIM/r3XUbzjbzetdmWUI2ZhJG7YcGIrszJneFjIdkOsl+yjz3gjVEr79nCxERc=
+	t=1741823387; cv=none; b=R4/e5dIwpqalREbQQ6w1QybLqMvMqriC2TeZYEedoBPlRUjzDNfInaDwb+MfnE5yCjJrujWP32ld3q1P7kC1UbH387YbCHCkgkQ6FbcAX48dlks9xStB50cUNn4TEkGgwcf0fra2RjM9qGe0nzSrIpQV1WSE/Rc8nBvm6nFGuKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741823384; c=relaxed/simple;
-	bh=bw43+XI1pckdNtniIOtil4SJwIekSgoH7HvyZXHg1qA=;
+	s=arc-20240116; t=1741823387; c=relaxed/simple;
+	bh=bMLnYcxgDsVfl3qf2t/7K2GT/5Ad6vn5A2AXrFSvN4Y=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RQdz0dynjDZk3rzrmd3IDqIvNz68plW5KNd/DMZh21tpr39Yq8yhvaVfG7Ue5sJMEioN17bgWWyF6YAnz+Lynk1Ibbx6ssdo8ZZJRuBmjFd36nuNs4394cHP8EeuUMCDmGHMz5EEppY8v/MZKQOm6f+3kVccSX4Q4cUFw0C5WYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bdFkonU+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=DXRRCCnITDyXbgW6/+YmFewVuyDByaEYEB0uNPCJZDngmsnY2uQaixu0il2y40A/0qe+/apMJGHfwDdbqE1rWgp1Hy1JBXy6wSqZqhs7MQ7Kwbpb5UjlTN9ek7mM2JIjT1lvSbrfmXY7UXd69s9OfK3qyTR6z+76znpFp0B24j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLB/s12T; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bdFkonU+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406E7C4CEF3;
-	Wed, 12 Mar 2025 23:49:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLB/s12T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 414D0C4CEDD;
+	Wed, 12 Mar 2025 23:49:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741823383;
-	bh=bw43+XI1pckdNtniIOtil4SJwIekSgoH7HvyZXHg1qA=;
+	s=k20201202; t=1741823386;
+	bh=bMLnYcxgDsVfl3qf2t/7K2GT/5Ad6vn5A2AXrFSvN4Y=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=bdFkonU+eFGeH4XxXn/AAJI1Vp+IkWzmg8GuzVf/ZeK7rstuANf9lCWMKO9SGc8q6
-	 3peHAPLvRSkHbzTeDNi1EqRXNYo1NJrCv+lvFcLci33nyH7xROgZ6eRa43s4jENAx5
-	 Ag3NZxLoNj/i9+dWPkKYcYt4oOYdQOnBZzU/LxUMDE6fSBYlgAEqG4zrktclkyZiCe
-	 tTQYurCNkB9tIFD1vABS9fReQZOJlv3UTul3IjNmME5wBShHnHygwAXD56jXbHK/0+
-	 EQNkzxltzSblSanzC8HedodZFaznoB9uL95XMfCCJh7Vre50C5hkfNImeYEMNtyfkc
-	 CffX2cSEbe2XA==
+	b=oLB/s12T5VnQcj/0cya2H7+nVZ44HKdzQg0/uTzo1I05lyprkN2m6xxs5wq55Ysy4
+	 Lf1qVgbZ8PSgwjK1QpFUYMGA7P/CrRijiScSu/SRaabF7OG1VmMPtYxS7gt8QOlOMe
+	 9VMug+/EAnyHijwQ8M9xF+K7kAyuGRAtxeUenMINGjuhQu0nmxMUuEc294jhEafVMI
+	 tx29bQ+yF5D/RXBCf4HqsBbSWo7Pbe3/3DpZcrZHmRigVUMT4XZUcCeMZ7EyuYlfsM
+	 M5EGx1Xd4zT1UDxJD5+33yeRowVpTxAgRrla5IPobu65NK0cKD+VmiqOdb53RNrvYN
+	 wQGcToIodKjtw==
 From: Mark Brown <broonie@kernel.org>
-Date: Wed, 12 Mar 2025 23:49:13 +0000
-Subject: [PATCH 6.13 5/8] KVM: arm64: Remove VHE host restore of
- CPACR_EL1.SMEN
+Date: Wed, 12 Mar 2025 23:49:14 +0000
+Subject: [PATCH 6.13 6/8] KVM: arm64: Refactor exit handlers
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250312-stable-sve-6-13-v1-5-c7ba07a6f4f7@kernel.org>
+Message-Id: <20250312-stable-sve-6-13-v1-6-c7ba07a6f4f7@kernel.org>
 References: <20250312-stable-sve-6-13-v1-0-c7ba07a6f4f7@kernel.org>
 In-Reply-To: <20250312-stable-sve-6-13-v1-0-c7ba07a6f4f7@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
@@ -50,60 +49,43 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
  Fuad Tabba <tabba@google.com>
 X-Mailer: b4 0.15-dev-1b0d6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4631; i=broonie@kernel.org;
- h=from:subject:message-id; bh=KPO0pMf/f4hzNo7O+4ORc0iTjEcZ2saBRPtDAXpQPO0=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBn0h2A/65oMgXdTlzTELH3m7o/ficdNkjYKZsDy5hO
- 325yjbSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ9IdgAAKCRAk1otyXVSH0IuRB/
- 95u8vSWCUuBWfwUtDOZk1juFTCoJue5FRBg/ZqCBjOw4IvGOT4IOZBZYQtGidLOI2zGAPfgXOXeylF
- 2TgQmwmNB2P34RRYq8pHMG/bVLztQeNPR/FgdmE0rdf2FcmVkkLMXpdscEzZuAUIFatoJ70R6gVVLf
- YcbLcyeZEjgo3gjUQQsuTU/28ZdhA0RGv9MkYJcVWNVNLz19Rv8O9wh3rTC0OfDFP09t6jOHjBClxo
- /FXPBl+t5P7ZF+mqpHk8cBW0zqPNM0mq/ZpGJfYWX4uqt9+JXY2h0gIQ6zUUZTC3THsxCUyBn3InGn
- AOpiJpmezDaf3JBvovcAWvM5RkSUXQ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7922; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=6xhOZwhy4sZC07gnsUDXIpLu9KPK9C1sLl6G9nAD0Xk=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBn0h2Bt1mWJqX4urn81kdPK/kLo+M++7Mn79JM9frs
+ 5kCXpQSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ9IdgQAKCRAk1otyXVSH0KrFB/
+ 96Pa7JezB0beMFfjG0skPJskU+dO/o6sp9o1JuHHF8aeWmbkHm3g6ZCPrVglTC8QroEWbnG0m7CJVQ
+ /Lq1kCQiHGE5XSmhm7oSXPcf99m/Gv5Gt42meIvxNWYys/+vvrPVc1WAVSgvim73LEvusnizfRmfCt
+ l9ZfdU3itTlHHeR8BAH34pf8O2vHvqfREOJzUnNbuO6I9YFNyfKjSuyNqxFFhxegjv5xrdsL154vTV
+ 0Jxm59bEUKQhTZnHMqqglGuCY49cGqtED2V2fH4Aej5pyZi48rct8nekA7FeCAtT53GTkrtAiEE9kn
+ /xG5Ey+66nuq9fEFLsRRfxROMyfGyN
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-[ Upstream commit 407a99c4654e8ea65393f412c421a55cac539f5b ]
+[ Upstream commit 9b66195063c5a145843547b1d692bd189be85287 ]
 
-When KVM is in VHE mode, the host kernel tries to save and restore the
-configuration of CPACR_EL1.SMEN (i.e. CPTR_EL2.SMEN when HCR_EL2.E2H=1)
-across kvm_arch_vcpu_load_fp() and kvm_arch_vcpu_put_fp(), since the
-configuration may be clobbered by hyp when running a vCPU. This logic
-has historically been broken, and is currently redundant.
+The hyp exit handling logic is largely shared between VHE and nVHE/hVHE,
+with common logic in arch/arm64/kvm/hyp/include/hyp/switch.h. The code
+in the header depends on function definitions provided by
+arch/arm64/kvm/hyp/vhe/switch.c and arch/arm64/kvm/hyp/nvhe/switch.c
+when they include the header.
 
-This logic was originally introduced in commit:
+This is an unusual header dependency, and prevents the use of
+arch/arm64/kvm/hyp/include/hyp/switch.h in other files as this would
+result in compiler warnings regarding missing definitions, e.g.
 
-  861262ab86270206 ("KVM: arm64: Handle SME host state when running guests")
+| In file included from arch/arm64/kvm/hyp/nvhe/hyp-main.c:8:
+| ./arch/arm64/kvm/hyp/include/hyp/switch.h:733:31: warning: 'kvm_get_exit_handler_array' used but never defined
+|   733 | static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu);
+|       |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+| ./arch/arm64/kvm/hyp/include/hyp/switch.h:735:13: warning: 'early_exit_filter' used but never defined
+|   735 | static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code);
+|       |             ^~~~~~~~~~~~~~~~~
 
-At the time, the VHE hyp code would reset CPTR_EL2.SMEN to 0b00 when
-returning to the host, trapping host access to SME state. Unfortunately,
-this was unsafe as the host could take a softirq before calling
-kvm_arch_vcpu_put_fp(), and if a softirq handler were to use kernel mode
-NEON the resulting attempt to save the live FPSIMD/SVE/SME state would
-result in a fatal trap.
-
-That issue was limited to VHE mode. For nVHE/hVHE modes, KVM always
-saved/restored the host kernel's CPACR_EL1 value, and configured
-CPTR_EL2.TSM to 0b0, ensuring that host usage of SME would not be
-trapped.
-
-The issue above was incidentally fixed by commit:
-
-  375110ab51dec5dc ("KVM: arm64: Fix resetting SME trap values on reset for (h)VHE")
-
-That commit changed the VHE hyp code to configure CPTR_EL2.SMEN to 0b01
-when returning to the host, permitting host kernel usage of SME,
-avoiding the issue described above. At the time, this was not identified
-as a fix for commit 861262ab86270206.
-
-Now that the host eagerly saves and unbinds its own FPSIMD/SVE/SME
-state, there's no need to save/restore the state of the EL0 SME trap.
-The kernel can safely save/restore state without trapping, as described
-above, and will restore userspace state (including trap controls) before
-returning to userspace.
-
-Remove the redundant logic.
+Refactor the logic such that the header doesn't depend on anything from
+the C files. There should be no functional change as a result of this
+patch.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Reviewed-by: Mark Brown <broonie@kernel.org>
@@ -114,67 +96,154 @@ Cc: Fuad Tabba <tabba@google.com>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Link: https://lore.kernel.org/r/20250210195226.1215254-5-mark.rutland@arm.com
+Link: https://lore.kernel.org/r/20250210195226.1215254-7-mark.rutland@arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-[Update for rework of flags storage -- broonie]
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 --
- arch/arm64/kvm/fpsimd.c           | 21 ---------------------
- 2 files changed, 23 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 30 ++++++------------------------
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++++++++++------------
+ arch/arm64/kvm/hyp/vhe/switch.c         |  9 ++++-----
+ 3 files changed, 26 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index fe25d411d3d8efbe19d5ffba8ea23bf98eb06c38..06e3cfc9a73b8c95712580b13b926b6471a16be7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -902,8 +902,6 @@ struct kvm_vcpu_arch {
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 7601d741bc2ae77ca9f359e4901926a5feac48b9..e330a7825b56f14ccb144810bc0d31f7f400fb22 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -666,23 +666,16 @@ static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
  
--/* SME enabled for EL0 */
--#define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
- /* Physical CPU not in supported_cpus */
- #define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
- /* WFIT instruction trapped */
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 4127abfd319c2c683d2281efa52a6abe5fac67ee..f64724197958e0d8a4ec17deb1f9826ce3625eb7 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -65,12 +65,6 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	fpsimd_save_and_flush_cpu_state();
- 	*host_data_ptr(fp_owner) = FP_STATE_FREE;
+ typedef bool (*exit_handler_fn)(struct kvm_vcpu *, u64 *);
  
--	if (system_supports_sme()) {
--		vcpu_clear_flag(vcpu, HOST_SME_ENABLED);
--		if (read_sysreg(cpacr_el1) & CPACR_EL1_SMEN_EL0EN)
--			vcpu_set_flag(vcpu, HOST_SME_ENABLED);
--	}
+-static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu);
 -
- 	/*
- 	 * If normal guests gain SME support, maintain this behavior for pKVM
- 	 * guests, which don't support SME.
-@@ -141,21 +135,6 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+-static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code);
+-
+ /*
+  * Allow the hypervisor to handle the exit with an exit handler if it has one.
+  *
+  * Returns true if the hypervisor handled the exit, and control should go back
+  * to the guest, or false if it hasn't.
+  */
+-static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
++				       const exit_handler_fn *handlers)
+ {
+-	const exit_handler_fn *handlers = kvm_get_exit_handler_array(vcpu);
+-	exit_handler_fn fn;
+-
+-	fn = handlers[kvm_vcpu_trap_get_class(vcpu)];
+-
++	exit_handler_fn fn = handlers[kvm_vcpu_trap_get_class(vcpu)];
+ 	if (fn)
+ 		return fn(vcpu, exit_code);
  
- 	local_irq_save(flags);
- 
+@@ -712,20 +705,9 @@ static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu, u64 *exit_code
+  * the guest, false when we should restore the host state and return to the
+  * main run loop.
+  */
+-static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool __fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
++				      const exit_handler_fn *handlers)
+ {
 -	/*
--	 * If we have VHE then the Hyp code will reset CPACR_EL1 to
--	 * the default value and we need to reenable SME.
+-	 * Save PSTATE early so that we can evaluate the vcpu mode
+-	 * early on.
 -	 */
--	if (has_vhe() && system_supports_sme()) {
--		/* Also restore EL0 state seen on entry */
--		if (vcpu_get_flag(vcpu, HOST_SME_ENABLED))
--			sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_SMEN);
--		else
--			sysreg_clear_set(CPACR_EL1,
--					 CPACR_EL1_SMEN_EL0EN,
--					 CPACR_EL1_SMEN_EL1EN);
--		isb();
--	}
+-	synchronize_vcpu_pstate(vcpu, exit_code);
 -
- 	if (guest_owns_fp_regs()) {
- 		if (vcpu_has_sve(vcpu)) {
- 			u64 zcr = read_sysreg_el1(SYS_ZCR);
+-	/*
+-	 * Check whether we want to repaint the state one way or
+-	 * another.
+-	 */
+-	early_exit_filter(vcpu, exit_code);
+-
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+ 
+@@ -755,7 +737,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		goto exit;
+ 
+ 	/* Check if there's an exit handler and allow it to handle the exit. */
+-	if (kvm_hyp_handle_exit(vcpu, exit_code))
++	if (kvm_hyp_handle_exit(vcpu, exit_code, handlers))
+ 		goto guest;
+ exit:
+ 	/* Return to the host kernel and handle the exit */
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 3ce16f90fe6af7be21bc7b84a9d8b3905b8b08a7..ee74006c47bc44ca1d9bdf1ce7d4d8a41cf8e494 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -224,19 +224,21 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+ 	return hyp_exit_handlers;
+ }
+ 
+-/*
+- * Some guests (e.g., protected VMs) are not be allowed to run in AArch32.
+- * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
+- * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
+- * hypervisor spots a guest in such a state ensure it is handled, and don't
+- * trust the host to spot or fix it.  The check below is based on the one in
+- * kvm_arch_vcpu_ioctl_run().
+- *
+- * Returns false if the guest ran in AArch32 when it shouldn't have, and
+- * thus should exit to the host, or true if a the guest run loop can continue.
+- */
+-static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
++	const exit_handler_fn *handlers = kvm_get_exit_handler_array(vcpu);
++
++	synchronize_vcpu_pstate(vcpu, exit_code);
++
++	/*
++	 * Some guests (e.g., protected VMs) are not be allowed to run in
++	 * AArch32.  The ARMv8 architecture does not give the hypervisor a
++	 * mechanism to prevent a guest from dropping to AArch32 EL0 if
++	 * implemented by the CPU. If the hypervisor spots a guest in such a
++	 * state ensure it is handled, and don't trust the host to spot or fix
++	 * it.  The check below is based on the one in
++	 * kvm_arch_vcpu_ioctl_run().
++	 */
+ 	if (unlikely(vcpu_is_protected(vcpu) && vcpu_mode_is_32bit(vcpu))) {
+ 		/*
+ 		 * As we have caught the guest red-handed, decide that it isn't
+@@ -249,6 +251,8 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		*exit_code &= BIT(ARM_EXIT_WITH_SERROR_BIT);
+ 		*exit_code |= ARM_EXCEPTION_IL;
+ 	}
++
++	return __fixup_guest_exit(vcpu, exit_code, handlers);
+ }
+ 
+ /* Switch to the guest for legacy non-VHE systems */
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index e7ca0424107adec2371ae4553ebab9857c60b6d9..46c1f5caf007331cdbbc806a184e9b4721042fc0 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -423,13 +423,10 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
+ };
+ 
+-static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+-	return hyp_exit_handlers;
+-}
++	synchronize_vcpu_pstate(vcpu, exit_code);
+ 
+-static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+-{
+ 	/*
+ 	 * If we were in HYP context on entry, adjust the PSTATE view
+ 	 * so that the usual helpers work correctly.
+@@ -449,6 +446,8 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
+ 		*vcpu_cpsr(vcpu) |= mode;
+ 	}
++
++	return __fixup_guest_exit(vcpu, exit_code, hyp_exit_handlers);
+ }
+ 
+ /* Switch to the guest for VHE systems running in EL2 */
 
 -- 
 2.39.5
