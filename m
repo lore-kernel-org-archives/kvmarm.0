@@ -1,107 +1,84 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 937CF1E9B3E
-	for <kvmarm@lists.linux.dev>; Wed, 12 Mar 2025 21:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C643C1EF096
+	for <kvmarm@lists.linux.dev>; Wed, 12 Mar 2025 21:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741814469; cv=none; b=cGAviIYC1IsJOHuoFVQMe1Yhy2o9ZzKzf5nb6Rp7VvoL6tCwATT2C3ttcTLZ1T5V2tEYHsUeHlvUrpEAl4rphYkXdlHGtS3sBm/MslPan/Png3bFBGLTrh0/32uqGB89Gw/UVoPbgww5Xb349WgikWN2Zaketzhp+m0m58X2uXU=
+	t=1741814606; cv=none; b=kbFDFsZXxl26L+YrXeXIpVM6gnH1tAtiZ6kVQCNRyvoBCi2vLdI1PNcbYYIPdL3l1GzPKptRIHHto9TEuo6HssP5qH9ZzCXoxm8UBCw8kAqQ3mjoq94ZSpXzuPBNfon03CVIY8Ets2CPd7KVoj+WWWlb8oaZV6B5ub+pegudzVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741814469; c=relaxed/simple;
-	bh=8lk79mDnF9WAaI75FvC+bpLneGj3wkxAcWyHOCuXSjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sn1icaooGdDxTQ4oYenIt4BEOal7b9MJ+jxTjMKaHWxKHotlEiF+PQsy+EEyKg6rUP0PpxmzeXuJlUqq+uYjK5aVDDPlqh7eVbw9J2zINRFd6Fh6r3EiFHeQQGyIHO5+vqyMs/XBGjw1Xibd+CzSYrJ9tZ2LT02kDy1e11cpkIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pm3SSAYs; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1741814606; c=relaxed/simple;
+	bh=2m2bVFSu5ILkd+xnMLHcPH3KQqSjmXv4J+SuPqMNwwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EgL1e4zyJi9mwH4GwJyJoJVptIkSvoQJZZcqKrzDQrPbDME3xMSoJF4G5E+dwxDCWbE9xZrCKQOAbSSTbQnmk3VOjuwpk9joe9NsFXjqxhEW7fzrE/FXxXa2+Jru9Y8XZAFGeONTuzp/GTobOK9JZv84bFZA80diN2xQHnRvapw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TtVPrJCZ; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pm3SSAYs"
-Received: from [10.137.184.60] (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 86B37210B157;
-	Wed, 12 Mar 2025 14:21:07 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 86B37210B157
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741814467;
-	bh=MgNM2rD8/EOf05M0lP85WV+gCmyNEYHLXXzpOfe5KVE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pm3SSAYshDZ0/J9DAnDCCWIg7IAiMKcF9WebEeevzy98VYIaLbtZxz8W0R4oz5bs3
-	 bx8W1PNJ4LBZ4FkX6cjdoD9OOn1KNZkGtH27nqPcPfkJxVFnXRqfUmYBYdXIJxg7dQ
-	 dkyAwa4NZs8ZWgWM4ZixgLD18JrAFkhBHsI7/1wQ=
-Message-ID: <996deaab-e1d1-4f04-ba31-c0dcab2d5e1d@linux.microsoft.com>
-Date: Wed, 12 Mar 2025 14:21:07 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TtVPrJCZ"
+Date: Wed, 12 Mar 2025 14:23:17 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741814602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nDTuzwNOrfnRWzb35HLSmzXt08GEKPQgr4fYc5Z/ZD4=;
+	b=TtVPrJCZGys80899AIs26b1+F9CgqiQotdcfYeWFwylBeD++8Wl5es4XbkJ2ve2pvh4JEx
+	BnqZEhXeqdU2VXDiiP1Jz0CsyTJHB40ppG97regrCRFek3z/LJkIDyJgN0DecQsGYmbaAi
+	p57J3CTrLudNMoOntMTJlWajGndLhNk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Andrew Jones <drjones@redhat.com>,
+	Shannon Zhao <shannon.zhao@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, devel@daynix.com
+Subject: Re: [PATCH v3 6/6] KVM: arm64: Reload PMCNTENSET_EL0
+Message-ID: <Z9H7RYEI_cPwNe7h@linux.dev>
+References: <20250312-pmc-v3-0-0411cab5dc3d@daynix.com>
+ <20250312-pmc-v3-6-0411cab5dc3d@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH hyperv-next v5 03/11] Drivers: hv: Enable VTL mode for
- arm64
-To: Arnd Bergmann <arnd@arndb.de>, Michael Kelley <mhklinux@outlook.com>,
- "bhelgaas@google.com" <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>,
- Catalin Marinas <catalin.marinas@arm.com>, Conor Dooley
- <conor+dt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- Dexuan Cui <decui@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Joey Gouly <joey.gouly@arm.com>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>, Len Brown <lenb@kernel.org>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Rafael J . Wysocki" <rafael@kernel.org>, Rob Herring <robh@kernel.org>,
- "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
- Sudeep Holla <sudeep.holla@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Wei Liu <wei.liu@kernel.org>,
- Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
- Linux-Arch <linux-arch@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "x86@kernel.org" <x86@kernel.org>
-Cc: "apais@microsoft.com" <apais@microsoft.com>,
- "benhill@microsoft.com" <benhill@microsoft.com>,
- "bperkins@microsoft.com" <bperkins@microsoft.com>,
- "sunilmut@microsoft.com" <sunilmut@microsoft.com>
-References: <20250307220304.247725-1-romank@linux.microsoft.com>
- <20250307220304.247725-4-romank@linux.microsoft.com>
- <e0f81049-688e-4f53-a002-5d246281bf8d@app.fastmail.com>
- <BN7PR02MB41488C06B7E42830C700318DD4D62@BN7PR02MB4148.namprd02.prod.outlook.com>
- <119cfb59-d68b-4718-b7cb-90cba67827e8@app.fastmail.com>
- <BN7PR02MB4148FC15ADF0E49327262B92D4D62@BN7PR02MB4148.namprd02.prod.outlook.com>
- <caa0d793-3f05-4d7c-88d0-224ec0503cfb@linux.microsoft.com>
- <45171fb1-7533-449f-83d4-066d038c839f@app.fastmail.com>
-Content-Language: en-US
-From: Roman Kisel <romank@linux.microsoft.com>
-In-Reply-To: <45171fb1-7533-449f-83d4-066d038c839f@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250312-pmc-v3-6-0411cab5dc3d@daynix.com>
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 3/12/2025 1:25 PM, Arnd Bergmann wrote:
-> On Wed, Mar 12, 2025, at 19:33, Roman Kisel wrote:
->> On 3/10/2025 3:18 PM, Michael Kelley wrote:
->>
->> That's a minimal extension, its surprise factor is very low. It has not
->> been seen to cause issues. If no one has strong opinions against that,
->> I'd send that in V6.
->>
+On Wed, Mar 12, 2025 at 08:56:00PM +0900, Akihiko Odaki wrote:
+> Disable counters that are no longer included in PMCNTENSET_EL0. It is
+> not necessary to enable counters included in PMCNTENSET_EL0 because
+> kvm_pmu_handle_pmcr() does so if appropriate.
 > 
-> Works for me. Thanks for your detailed explanations.
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 2d19c6048091..b14655dda6db 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -831,6 +831,8 @@ void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+>  
+> +	kvm_pmu_disable_counter_mask(vcpu, ~__vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+> +
 
-Thank you for your review very much!
+Just so this function appears consistent, can we move this after the
+point where the mask is applied?
 
->         Arnd
+There's no functional impact of course since PMCR_EL0.N can only be
+changed before the VM is started, i.e. not possible to have running
+counters >= N.
 
--- 
-Thank you,
-Roman
-
+Thanks,
+Oliver
