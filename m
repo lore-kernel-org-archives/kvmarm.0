@@ -1,116 +1,79 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3885A156C62
-	for <kvmarm@lists.linux.dev>; Wed, 12 Mar 2025 17:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6311118FDAB;
+	Wed, 12 Mar 2025 18:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741800796; cv=none; b=UMzMAeIi+UIcGoJoYAl4BpHB7bfRwYsKd1VhALS94pqYxvWAY+lG7Zz+cFlq5EKA2IGv4tsHsPl5R+XBIJe5Qv616wwjPSW5b+yeS6Cwo9yp4m0Zw/UaabNZ8nPUOM480UvsPF/iOBBAhiVedjCWGGtKDigLqxWEyT1Cp85WMAk=
+	t=1741802966; cv=none; b=gUxuTEtXnF0xXBUg/FCXkeZ0u6GQKPW30f7F1+v6UZaZJD+Bw/Aso/B3ecQF7bRuS/YlsjQaDqcBKOYEY0XfQhexBuxsBzNrGiIZhLjH4mpzauvjOCaBaqmArwq/xgzLuokZFBu3VcMKWFD/zOsNRz29UxDj6Ai30rlBtOj+ZFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741800796; c=relaxed/simple;
-	bh=dvyJrdPXem/t9rhGc0og2q57i3iOEHExNGrbOAeLIoQ=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=PBSO6eAZfz/YqripWJc+MUIzvc2baXcrFrT/0x9QtStZIg6Dk3WeYGLyYzooTKWtSv/EaFxSNX6xqvO1xwg4bhJVE0EBFXhrU4ZXTmpcF8/+LuzcwfnV4SpIRfIcAAe1pa1VmAH3Z5M/p+uuIZlZk+RlXGHvSjC7/xJ9s11QlMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GtIyhi0V; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtIyhi0V"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741800794;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dvyJrdPXem/t9rhGc0og2q57i3iOEHExNGrbOAeLIoQ=;
-	b=GtIyhi0VVeMCSNwOxLSXImqvhY2DDP2xOGcudci47exK8eYEANsNH5V0e31Zh2XA+8oYXN
-	wKcR9I+2MhD3/V5C3MN2kVLE1apylmYZMzX3JTrpFTcXkixCCJKaGCs8TOX6JPHa2z6TZ0
-	7kYgfJ9pH87/hTpKKrODF1HX/A7zjEI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-m3RbBi0YPbKhkrK9jmr3lg-1; Wed, 12 Mar 2025 13:33:12 -0400
-X-MC-Unique: m3RbBi0YPbKhkrK9jmr3lg-1
-X-Mimecast-MFC-AGG-ID: m3RbBi0YPbKhkrK9jmr3lg_1741800792
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43bd8fd03a2so206285e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 12 Mar 2025 10:33:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741800792; x=1742405592;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dvyJrdPXem/t9rhGc0og2q57i3iOEHExNGrbOAeLIoQ=;
-        b=dLxoNuEKNndvP3WYit2L7+J7sJw1gMuGwBbnGVoVs1HXr3Do/dPZ5ItRnDjN94/axf
-         +q3xR/S0nt1B4fYDp/9ySSFWGJVMaN2tlChuFQ0nKTDfQiDMfgh5QSh8m6gFA0ycwvnC
-         woiHYhg+uCkM2d01fUTVKYd1pr1Hmw6A/7GrbAHQLqJGnGv46hZ3q7YsUWgNySibCjEz
-         NH16T08Kf6F+8zbVUEbuVNq8HCtisxk3NE8448KpfrbUoCzRf44FldV5/hY6USOI3t8j
-         J9YBpOhM9FI7d7QtfHpqJSW8esjrqwHJtj+OFwuKQN5xD6R8fonVJ9t3uAUWKqvo4h2g
-         bj4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVxgGh9/rrdvqhYmRKlW7k49jDrdxDMs9e7gjcYRLnbwXXMG9YO10iR90K05Xcj4MFrSCD06z4=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzmfq/xqU5kF/mg4sRjXqnOPGTAnOMJ0ANp85dH1lXzOqRwPyMg
-	nMeNCtcMFs2XJcPAGFTOjqFbSbh9b/DxAy/5Pfl/xrvkb6s+QvXZGkfxR5ySBjZTVHsIAl1QAcr
-	GFlvmHg1+fuxFlEXNF/UiVJd4FgG+ocDeAkWTJkuiVOmaWpBiXlXlRg==
-X-Gm-Gg: ASbGncvqBRqY+5ZxcfjmesOF0V5guzsttJOwecNaTqZJb0qIAXGcrcMsTQyS3mVTTS3
-	LIqxTkjgHpX2QU91aTxroLeJ9l/0lDCbUBpWLiVMggIpnUuKg0IZM3Frg6L3NkTFG0IsgjIjoCk
-	QXTVvN7nkKW11tMNvKfRasV9jiQGwVDg/AMGgMoPb/VX8nSCgW3DHb6ZkfqT3WqFKekyxfqUamq
-	8+u4og9/woDI53El+jjZ61efYOpiPZnK6HrnnyAIPA0Rq9hPQp00qazDC1TiQDyEnj6/AbAbjO1
-	hvB3Ot066C/9vhuI5vzF4omhPtFzdHbnG2v9EETsCTz9Ee2/4s+AAIbeaKAFemyq
-X-Received: by 2002:a05:600c:190c:b0:43c:ea40:ae4a with SMTP id 5b1f17b1804b1-43cea40af7amr151794735e9.31.1741800791742;
-        Wed, 12 Mar 2025 10:33:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkDaxroZKHcALMxZZ+BxRIhiOexx6MlAPp0LIXP7yGXSlrtMMJvV8WhA2IxMPpSEUR5gjapA==
-X-Received: by 2002:a05:600c:190c:b0:43c:ea40:ae4a with SMTP id 5b1f17b1804b1-43cea40af7amr151794565e9.31.1741800791436;
-        Wed, 12 Mar 2025 10:33:11 -0700 (PDT)
-Received: from rh (p200300f6af11ec00f9928575aec32536.dip0.t-ipconnect.de. [2003:f6:af11:ec00:f992:8575:aec3:2536])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d0a74b699sm27660235e9.10.2025.03.12.10.33.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 10:33:10 -0700 (PDT)
-Date: Wed, 12 Mar 2025 18:33:09 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Zenghui Yu <yuzenghui@huawei.com>, 
-    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Writable TGRAN*_2
-In-Reply-To: <Z9HCQ40LxShzL4nj@linux.dev>
-Message-ID: <eb045be7-69ca-fe71-0333-086b71bb624f@redhat.com>
-References: <20250306184013.30008-1-sebott@redhat.com> <Z9HCQ40LxShzL4nj@linux.dev>
+	s=arc-20240116; t=1741802966; c=relaxed/simple;
+	bh=zzZm4bP51vRe5DLXMdXQZoptqAsANoUXE7ZtekgeWz4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PyvFOVv+qakL7avF/hZgW7CH8p6OVTulNJt2W0eUTS7exPyqp0hp+Sugbat6drB+kimclxVXjDkOveh6UJsgH8sX9GiwKJOqFUSFrr6ELgekxjpAsld47WFVEKnsdErMxGH2tsRyc0otwQd9LsXK0aWBIK7J/qcFuJCLi6uoT70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C21CC4CEDD;
+	Wed, 12 Mar 2025 18:09:23 +0000 (UTC)
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: arm-kernel@lists.infradead.org,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 0/8] arm64/mm: Drop PXD_TABLE_BIT
+Date: Wed, 12 Mar 2025 18:09:21 +0000
+Message-Id: <174180295545.4162360.4956385573664588446.b4-ty@arm.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250221044227.1145393-1-anshuman.khandual@arm.com>
+References: <20250221044227.1145393-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: cK_Nj5dKxIXYtYT_gIk08jP1XlIybfgnlIDNnjDD6rs_1741800792
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Oliver,
+On Fri, 21 Feb 2025 10:12:19 +0530, Anshuman Khandual wrote:
+> Remove the PXX_TABLE_BIT definitions and instead rely on PXX_TYPE_MASK,
+> PXX_TYPE_SECT and PXX_TYPE_TABLE. The latter versions are more abstract
+> and also include the PTE_VALID bit.
+> 
+> This abstraction is valuable for the impending D128 page table support,
+> which doesn't have a single page table bit to determine table vs block.
+> Instead it has the skip level (SKL) field, where it will consider 0 to
+> mean table and any other value to mean a block entry. So PXX_TABLE_BIT
+> therefore doesn't fit into the D128 model well, but the type fields do.
+> 
+> [...]
 
-On Wed, 12 Mar 2025, Oliver Upton wrote:
-> Hi Sebastian,
->
-> On Thu, Mar 06, 2025 at 07:40:13PM +0100, Sebastian Ott wrote:
->> Allow userspace to write the safe (NI) value for ID_AA64MMFR0_EL1.TGRAN*_2.
->> Disallow to change these fields for NV since kvm provides a sanitized view
->> for them based on the PAGE_SIZE.
->> Also add these bits to the set_id_regs selftest.
->>
->> Signed-off-by: Sebastian Ott <sebott@redhat.com>
->
-> I can't tell what you've based this patch on, it certainly doesn't apply
-> on a 6.14 rc. Consider telling git to include the base commit next time
-> you generate a patch.
+Applied to arm64 (for-next/drop-pxd_table_bit), thanks!
 
-Ok, I'll keep it in mind for next time.
-(It was kvm-arm64/next + 2 pkvm series from the list that I applied
-manually.)
+[1/8] KVM: arm64: ptdump: Test PMD_TYPE_MASK for block mapping
+      https://git.kernel.org/arm64/c/0b626b245c57
+[2/8] arm64/ptdump: Test PMD_TYPE_MASK for block mapping
+      https://git.kernel.org/arm64/c/f5e93819e2cc
+[3/8] arm64/mm: Clear PXX_TYPE_MASK in mk_[pmd|pud]_sect_prot()
+      https://git.kernel.org/arm64/c/dba954801004
+[4/8] arm64/mm: Clear PXX_TYPE_MASK and set PXD_TYPE_SECT in [pmd|pud]_mkhuge()
+      https://git.kernel.org/arm64/c/1601df9e366e
+[5/8] arm64/mm: Check PXD_TYPE_TABLE in [p4d|pgd]_bad()
+      https://git.kernel.org/arm64/c/4fa8a9c0fc99
+[6/8] arm64/mm: Check PUD_TYPE_TABLE in pud_bad()
+      https://git.kernel.org/arm64/c/bfb1d2b9021c
+[7/8] arm64/mm: Check pmd_table() in pmd_trans_huge()
+      https://git.kernel.org/arm64/c/d1770e909898
+[8/8] arm64/mm: Drop PXD_TABLE_BIT
+      https://git.kernel.org/arm64/c/50c2726654bb
 
-> Please do selftests changes in a separate patch.
->
-> Don't worry about respinning, I'll fix this up and queue it in a moment.
-
-Thanks!
-Sebastian
+-- 
+Catalin
 
