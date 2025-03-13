@@ -1,72 +1,77 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E824B1531C1
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 19:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA8D1F1927
+	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 19:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741892908; cv=none; b=IVLXhfe0zF9J6loFdCqMVKJsSXAtBwQYEtjPC98cq0f6o6u9G9WAjIQX6Ey7uF9CkN4vCkg+Qgao+aryjQtXFwnOXHQnR+du0UgAIoe3sca7bvOqrwNCzgxH4yW9wTTwkaFTqI5An2jqEr4F+y82NZ36/YqAdaOcvo5f+BaKPUM=
+	t=1741893203; cv=none; b=b/ZGzk4o7Wi7D2oLr+eGPdv9tWT/sYJx5Gl2Ld9JVITHSteREjaHw7LF53T1y8Gg+tpfRxc0OYpGA7h8Tjg6frpH2XBG34wOct+HTZHq3Ci5vQ4GTEooubc8yvFGCWB8CR/yhL/eqE9udCUfmPj1i6yuigYC6WvJlNyJGkzRjyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741892908; c=relaxed/simple;
-	bh=zebU4/k/EeqtjpAsS6Cj6e8OZa3BjJTLbL/wQkDK6t4=;
+	s=arc-20240116; t=1741893203; c=relaxed/simple;
+	bh=FtUI3xUhxfCo5TgFRn1lRnA7XfmVSLNMqAj1tPGSaBw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=do+hxqmmqq58tehuFL4L38VJEP5urZb88NvmPTt6OLAPjaeYaeWXi5D4B3qn6VV81i+y5MPV5XxjC16fcBwbkP/SFh8VckipPPx7q1+dbiquF6+9I+EYjFslVeoDacCLELe3V1Gwd8Hi5Ut239zMXbWvhvGbtHubMSor5hlx8Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bzjjle+Y; arc=none smtp.client-ip=209.85.218.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=g911rdwa570j29o56vHR/IxcLQ1opN2+NN/0TbkMnIlQRwyLYATb5Z9V4WGLJYVDpJOSSugKdbR+cujW8Iiu1HQ9IkQBkKmOc1IKsLuqzxuIn9bKwPouTivWOTBT5IvAJd5iQ7c9/PfUVN48KV91qG30J82F2OhacL6yHbiAp4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K4QNtLGa; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bzjjle+Y"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac29fd22163so229373066b.3
-        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 12:08:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4QNtLGa"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ac25d2b2354so232074966b.1
+        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 12:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741892905; x=1742497705; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1741893199; x=1742497999; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v8INpOFDdy6zgQZNj++IeYTATBDv20/pe9DlHWL5cZs=;
-        b=bzjjle+YltrvwEzPaQ/nIfIGias2mZ7q/2d9WdxlAU5YHfWT33LzxThGy0GzkPPGSO
-         xxchSyaFt8D7Q9OcbCQZDbj6vxPqZxi/vZuLH2rMszPjX6u0O+W559oRvIaiAuJkSJDG
-         Ek+9h6s9xCReI4mdN+DMHFs3QDAbv2yZXJGUK64DW0/m2LijvUVbPaGDoihHkkvd5wjp
-         EoEDxNqPAROHtJBf4l/u/rwqhlah4D/qS9jZF/+s+2wiPnIAG5yRccyC3exaZ5PNdSc1
-         QAkhZp88at0Voxry8x26z9cALYWmBS74kDwabIcGNg5PzYus9Ty/xdA/9MIJ6H7vQlSw
-         20dw==
+        bh=L3F+szF2XQGRywilPjvawnmOy3jehJGbZVMLTgFQTJw=;
+        b=K4QNtLGaIxohAWaIsBtxgq/xw969YzhNHbNFNL/4xHxPlNTrm7WRNKGHB90qRhFijR
+         EGsqyOCQUBxmFar8pZMSm3QuzaTHMVE8u0k/XWPs4X0zG84h9XNmozWOSMGUAbZdpTee
+         noXqdCEzpUcGDxbEEnSdK8dh6sFcDgh9AT7wa5Te2ZlWoiNSepF7iVI5jj0wM1BLpxxA
+         jHHJYQTVoE1dkFzzf6rIr6EOmu+PqQzL+bw6PYaIMOo1zdSssHARIHdvczFH9zAyfSwZ
+         Dxqfy6U1z9AgoYMCj8pw7eSd+NLWPQ01gXzpNzOTcISgObZ4JCOd81AGpbKC777t7Vtf
+         7hrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741892905; x=1742497705;
+        d=1e100.net; s=20230601; t=1741893199; x=1742497999;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v8INpOFDdy6zgQZNj++IeYTATBDv20/pe9DlHWL5cZs=;
-        b=lJtWIgQTD6i32kEHHG9gVdEUzoG8SIiOsaZovardvY85iB7/3pK/tR7mwcTglJuLUf
-         iyhDXgLN1cit5ifsCrTacQeroOWcxu+wxdnVkETNKpcAGTm5Vke/xXhBB2uKb4NBJlnz
-         q4Gacfof0W5KKtpK9OIdZ7k+GW8tWF5V8xswx+RnXo6mLao/V1HHxQJwIvE8IMj7iJIp
-         qvrtKL/j+ftxKf6F8TQPHBHXoUrqHoqj2w/IV3RkVyzMox+uOTVIKq110+8MRrdWWuVy
-         18CxlkM85Tfm5UMHB+9QTIa+waVL/PECGntHBjUr6r3oQ0CWyyMyouZSdxuJ8ibbJaDU
-         ZdOg==
-X-Gm-Message-State: AOJu0YxDu2S1xFGm1hVCYdlzu7EPg4jKB5rIf06da1PuQ4/kZSis4TG4
-	6PZMcy0p4nnqfJyiJQehpWT/043Fj9wEoi31teht6eyFaknGxZR5cLqaKiBhqA==
-X-Gm-Gg: ASbGnct5nYTPblDAf22SCGivdXDpX7nsRt6Mbb5QFwv3655TDr88NAUj2gp1vbULenN
-	b4SBKQmKYHehS8zTtDwQaPhwPrvGedjlIYD+fxH9VF7gVMEfXRmiElBD9caJLWiwNPrhf40IwXQ
-	mr0I/iG0Ch4NzHgx6ce2GCNvhhvkAaURb+T5R+PHvnbs6769sGOuerIKY1PW6PJ+11NziVaTqyS
-	sKxwd48+tesuvCuY8k1oDdcGI/+SNsLcAAus41wkXCvSK6uXL40S6YZpOLcqQwcpW06gDHQowXF
-	EvyR71/HvHW/NPdy8JC/vhkn0GEr+ieMFiTX4aKVD2diooNqtZzom3jDTqRVx2xeTzoA1oYRBpa
-	46FlBvLSc8wfRCw==
-X-Google-Smtp-Source: AGHT+IFa00JtzqukTdU3WMYr5CjZc1RVh7xO3wiZcNVvi/pVcZene2/D4xio0rZGpWde7c+HTNy7zQ==
-X-Received: by 2002:a17:907:9452:b0:ac2:bde9:22af with SMTP id a640c23a62f3a-ac3290943a7mr61434466b.13.1741892905085;
-        Thu, 13 Mar 2025 12:08:25 -0700 (PDT)
+        bh=L3F+szF2XQGRywilPjvawnmOy3jehJGbZVMLTgFQTJw=;
+        b=wMVSc1zGvxkr1LJTzZKYv4R2jqUd3whYeeF4QtFtYM6jPbTFKNvp1AJFfnKG8hOjXd
+         sVRd9ZLZH8wrXnqxJcQ+wqUbVtTZnR8qqBZUSdIErFxnZk+bpmyFc2EYnFx8bk2v2Mo2
+         chErCbnvuSxOZM/LfGP3XWFNONz9PNU+pkhdNwOnpWrqgPLgTLQUT+N791wqgjkuYfxo
+         dJgzlBk9BKQ069bHeR4hHLoKMnSRty5NoGPV4Fa2OowYs8l3Wc5l9usD8tbkmPMkLy04
+         OSgne5a2rclY0Li+sURwvX2wYGHvLVHtpLGUTpqU7h0I40fotglWULPaAzZb2/ZcCPC8
+         NTNg==
+X-Forwarded-Encrypted: i=1; AJvYcCWj4FCRagJgcm9cX5FuHJiDMEVIiekQcT4Dh+aB5gmkvluj8nLd5RKTTCxCMcCdvbSJN9vzbHk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzyQuc5VDz8KDMsEIzXLY1w2Obdt9jztqC5nz6GWE8Gm/ueQL3e
+	xWi6Hikp+Rni7F5nyp1NeBEkInCzEHuLFCoVXM0mkFuEH09zKRs7Gs2gK8iWCw==
+X-Gm-Gg: ASbGncumiUqsObCjOz8Fn95dGZEw872AlA+kJCE4tN0eeCDAOeepcUMCh5H7gEJMGmu
+	vn1+D+jU4eawtG+FXgY5VjUFKIaWleLKklkEZxq15EY6mhMxi1MpHwzUfVBt5AZx41l26yAMS6j
+	tk7wmDxGFiTk3Rdd5CdoyP2uA6XfgdF4cBLmEfG2Mjpbxpd5T0gHSx4xXsDWBg6s0gRnV3IctaH
+	zW5fL1HkLggVCIYxNAgOELjUMUnPFMHeQK68mUcbWs1HucPUg47MAQ5F1RhUYPQ3yixhUoPWBMO
+	Mkshqdy0FnGynf0/R/LsYusG08yjjr7lkvieIfDpXQBR3LU/EOSQ4wW6fNswQ0KidyiwrDUCGG6
+	Swg1v5iqs/EtwOA==
+X-Google-Smtp-Source: AGHT+IEanomM0uBClXIAdabeKJSIm41T83oGDtOVqnFsMRhIN+NlCFIyaB46i6op0dkiYwNIf1+dsA==
+X-Received: by 2002:a17:907:9718:b0:abf:c20d:501a with SMTP id a640c23a62f3a-ac3290b6383mr73370666b.16.1741893198827;
+        Thu, 13 Mar 2025 12:13:18 -0700 (PDT)
 Received: from google.com (140.20.91.34.bc.googleusercontent.com. [34.91.20.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3149cfb96sm112178066b.119.2025.03.13.12.08.24
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3149ced82sm113262066b.123.2025.03.13.12.13.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 12:08:24 -0700 (PDT)
-Date: Thu, 13 Mar 2025 19:08:20 +0000
+        Thu, 13 Mar 2025 12:13:18 -0700 (PDT)
+Date: Thu, 13 Mar 2025 19:13:14 +0000
 From: Quentin Perret <qperret@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	shan.gavin@gmail.com
-Subject: Re: [PATCH] KVM: arm64: Drop sort_memblock_regions()
-Message-ID: <Z9MtJPNm1pLATGo7@google.com>
-References: <20250311043718.91004-1-gshan@redhat.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
+Message-ID: <Z9MuSsOQuTy1kAwK@google.com>
+References: <20250227003310.367350-1-qperret@google.com>
+ <20250227003310.367350-5-qperret@google.com>
+ <Z8V6xOVCPp7OOX6g@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,23 +80,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250311043718.91004-1-gshan@redhat.com>
+In-Reply-To: <Z8V6xOVCPp7OOX6g@google.com>
 
-On Tuesday 11 Mar 2025 at 14:37:18 (+1000), Gavin Shan wrote:
-> Drop sort_memblock_regions() and avoid sorting the copied memory
-> regions to be ascending order on their base addresses, because the
-> source memory regions should have been sorted correctly when they
-> are added by memblock_add() or its variants.
+On Monday 03 Mar 2025 at 09:47:48 (+0000), Vincent Donnefort wrote:
+> [...]
 > 
-> This is generally reverting commit a14307f5310c ("KVM: arm64: Sort
-> the hypervisor memblocks"). No functional changes intended.
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > index 1a414288fe8c..955c431af5d0 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> > @@ -194,16 +194,20 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> >  
+> >  	/*
+> >  	 * Adjust the host stage-2 mappings to match the ownership attributes
+> > -	 * configured in the hypervisor stage-1.
+> > +	 * configured in the hypervisor stage-1, and make sure to propagate them
+> > +	 * to the hyp_vmemmap state.
+> >  	 */
+> >  	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
+> >  	switch (state) {
+> >  	case PKVM_PAGE_OWNED:
+> > +		set_hyp_state(phys, PKVM_PAGE_OWNED);
+> >  		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
+> >  	case PKVM_PAGE_SHARED_OWNED:
+> > +		set_hyp_state(phys, PKVM_PAGE_SHARED_OWNED);
+> >  		set_host_state(phys, PKVM_PAGE_SHARED_BORROWED);
+> >  		break;
+> >  	case PKVM_PAGE_SHARED_BORROWED:
+> > +		set_hyp_state(phys, PKVM_PAGE_SHARED_BORROWED);
+> >  		set_host_state(phys, PKVM_PAGE_SHARED_OWNED);
+> >  		break;
+> >  	default:
+> 
+> Are the SHARED_OWNED/SHARED_BORROWED still relevant since the introduction of
+> "KVM: arm64: Don't map 'kvm_vgic_global_state' at EL2 with pKVM"? It doesn't
+> seem we have any !OWNED pages in the hyp anymore at setup, do we?
 
-I think this was originally introduced in an early version of the code
-where the reserved regions were also registered, hence requiring
-sorting. But yes, with the code as it is today I can't see what would
-break without it, so:
-
-  Reviewed-by: Quentin Perret <qperret@google.com>
+That's a good point. I personally don't hate that we have this code here
+for completeness though -- it's simple enough that maintaining it isn't
+too bad, and if we were to add shared pages in the future it would 'just
+work'. But no strong opinion. I guess we could also remove this code as
+a separate clean-up, this isn't specific to this series.
 
 Thanks!
 Quentin
