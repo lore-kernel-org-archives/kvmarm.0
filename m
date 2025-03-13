@@ -1,171 +1,189 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2593D1FCCF8
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 06:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFA81FC7DF
+	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 07:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741849110; cv=none; b=tXsbpPW0HFBNJ1pLZKjpMWuFkx6yTfic7AfcSl/fiI2G3rHA16vxiFRXoEb1VDe7deSrUtTztA4rLbtxCnU4njARSUI8fvUhc7XTqHgVtlViGRclnuLzM+I1IskeNNJ7StDzmaivYkUmGzbCv1vSO6WmH6KPnYFfAdYUAR/heDQ=
+	t=1741852225; cv=none; b=I1CWTqRZoweFBcSGDWR+HRPFk/SCDAGa5CEKSx0u6eNxev6RfAvOoLfbEPWlUz1saBbRpqDEjU1v4uuwamTBPGKlB5kzb77/xjBtZIIROVeLH2LGtl2HmfhI+vnBaQI24KoZ039gFUf8wuMHadDfyTZjEqqTRZUgrhTmjpG/+0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741849110; c=relaxed/simple;
-	bh=UG93/JN+C4uzEWrf1epKiCm9PjOLeEr0WUFlntrYe/o=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=atghY3Aw1UBYs1T307HbNPXCxo0zfYcoh16IVV65padAyWyURXIpq+rB97yZsIOs2i6OLI6HGgMRSCenFxxAq0h1G5GvC9s5WlJzku2i/znBKOBM5IKMhGG8+x26WKbTBsp8CTiNgdCc4r0C3XuOumImmuRBbSAvH3gNJWelQ8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=TdV4u0vb; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+	s=arc-20240116; t=1741852225; c=relaxed/simple;
+	bh=DE9V5qFXirrrDlZ2J0gaGeV+rEDW1f1V+Rz06kgDHxI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GbuBAlZyn/0jxFPiPVpT0E9h4iGgBvRTqHlJHa5M0CTjO3t6rUVS7dlNrNd/EfI9lsz2nsxcUH2S1Py77fTHPiWzD2aSt2/eEmQ9PdLTJUhucVs9BR1GLOmRMpRtelnBQZ4ZLaLmIUbNw46aLCB5TejXAub050MTuVgyREwupY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iP4ZO2xl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="TdV4u0vb"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22580c9ee0aso10638015ad.2
-        for <kvmarm@lists.linux.dev>; Wed, 12 Mar 2025 23:58:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741849108; x=1742453908; darn=lists.linux.dev;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x7fhBUFv13S4cZKboUgbYf/t6ZbQKDXA1phxFoEaqP4=;
-        b=TdV4u0vbFEHGVaDcE4YOe8xCa/MbX0ftaHs1Wm3DmWBENmnFVO1Yv49DgWr2OWQ6Pm
-         ZTWNKn+TBGwJDuZmIWbDFixPUN+LzGOEK4VhIUlCqlpUYl6Ob2lMFplGjs/wcbxm8U4H
-         AUBIpbUVr+v08vBzO4MUE5cUC334mlJ1oVWcZNju7hhCi9m+vSrAqPkk1m/8GrZrtvFx
-         rlLp4IuCiZM7m49LOplsLNJqY1RwUhSl9HiHfhTa0tQs3dzThL5G3MWaIlhfoEI2+6y0
-         o9loGBVOxFXH0ggbwwYFyLbzFr3um5meGAuP1fE7ntfnbx3JCLwLMyViIU/H09Nv1m5A
-         A0xQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iP4ZO2xl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741852222;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=MK8zU8BVCYnjzSS/b6+zVESpZfkVHFlkYo1MXlvFt+w=;
+	b=iP4ZO2xlpzm5TFSus4KnfrxYw8z8Wg4a5CKw+wpuZFqfVL327bK8hGwxGaasPLLHvbDvdD
+	sokxVBcHrhctHTRGOFM4XgOeLNA6FyehzzV2Zt6EEOf7i3XejfFA4GMs+CEXv/HY+vBTqQ
+	yxL6bSBhREQgemrKDl/F3uBHTmhhd/g=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-326-I1m4BJpyMm25TMnMTe9G4A-1; Thu, 13 Mar 2025 03:50:18 -0400
+X-MC-Unique: I1m4BJpyMm25TMnMTe9G4A-1
+X-Mimecast-MFC-AGG-ID: I1m4BJpyMm25TMnMTe9G4A_1741852217
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d025a52c2so3047485e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 00:50:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741849108; x=1742453908;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x7fhBUFv13S4cZKboUgbYf/t6ZbQKDXA1phxFoEaqP4=;
-        b=l90h8WuSTb56S2fXMQYKkt0DuAgaX7HSeygN/wNOjM0QxmzitAh/4NxyEeraW4oD0J
-         GAnOvVVW0OUOnqRHnkhH5w4bW/Zpw1myHfLZpNH1/riMegrsD58AQ35h693ek6nBTPoS
-         C61XVns1+tEZx932DBm5PmRzL6JGsE9dI00vOdBjGQzyCuVHEizlQ/+QImuY4Vl7M/uf
-         YtMlcE0tQqW89a4r9FcuWomWthUArvP0p695TSz6cSQEC541RV/tMyH0GCUwi7lGaolH
-         fCPiAA/KXAYch9o4AhQmSS2n/jgm7yGg0YNJx5sYI8gDwoFqINEBKO0Yq7nvMbdc+ebF
-         gN2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVwBYsWxi8/C6vqX3aPUB3lR0rcUmWpOe8lDxk5n2kd/rbNB4xY2vBQXFmk/xJk+cc245Nsu3k=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwMl7ZSF90IbaBH+WCZpg6XSNoJDXTa5+CbndysK8HbCsRUlF2D
-	hDsEMSyygX6gvBVeBtI9boZoC+hYMldlJ0ZNLRsr7cML5FgKmP1FMLO8fJ4tIuY=
-X-Gm-Gg: ASbGncur1DEVi3fzr7DGy9iVGsSLL17fUo0ja4y20sahxFGpq0GObnal0/kI7QV9m/o
-	pqFDXboYOg/VZdQH6nWNmqtDCPweDkuo4NFETygrs0V/xfO7Ialw+HTi8/T0C08O0hUDdCrl8Uy
-	el4nlAaKkfiW3h7nWv+8sO8RtW82KzmcewKjhVwSK/8psMlQlqm3wwiMuJ5c7jFq/vnIis22NFD
-	7AlF0UEukgNBsdvE3G/APVkL8zut0Hclem7zWTLBGRA1ChS7DaX/lSCW06CxnUmKTw9Jdxs7LwZ
-	nkk7+PwwdE1vK+sOm4fb9oa2Fw0ou4QPziG28RoJCFbiTlRT
-X-Google-Smtp-Source: AGHT+IF+TgNoMe5M/byYKEN+EBcKDv/E4YdTnk5/x7Qy9/IKHZJiaku/6SW8IuLAbysNFNl6dwBYew==
-X-Received: by 2002:a17:902:ec91:b0:223:5e54:c521 with SMTP id d9443c01a7336-22428407e93mr350878545ad.0.1741849108400;
-        Wed, 12 Mar 2025 23:58:28 -0700 (PDT)
-Received: from localhost ([157.82.205.237])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-225c6bd4dabsm6447105ad.233.2025.03.12.23.58.25
+        d=1e100.net; s=20230601; t=1741852217; x=1742457017;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MK8zU8BVCYnjzSS/b6+zVESpZfkVHFlkYo1MXlvFt+w=;
+        b=lxUrvvRB8kbn91qI1qCUEjJX+HMRqEPVjwumR/A9Nhwen25Goe3iB4Grn+wDV8v6rN
+         K5fVZmfUVfie5XyFql9GOCTrVlytP7K5D3vxu4fVrd601d2rWeGbgYjF3h1qz+tUsCBa
+         WKb4m+GG14JYNJ2Tmk7tMo+H4Wt+oa10OrYSHrm/B6xc0MNKpFq1/50KqYL64Dr5+uxb
+         oTo/SO2t5/6BQlrFkobvKveRB9QjDGoaSezZ0KCfLFdovZ1/AEXXyBsNlvUZql+GzHc2
+         F0hez7jT8lczQZcnOENcl7RJdRpEaIonGC2n/l2xwlgph2K8hZOCyA7JMz3dqKRjyZGf
+         BKPA==
+X-Forwarded-Encrypted: i=1; AJvYcCWuPG9t960giV0i+Mf3AiMD9TV45iPStVXcrL461QLET+SrBY8Cb4Q9qD6MBRAgFHj2XdZ0QF8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyubtK8iMEAwFYQ6YTuS5H30pdRw2oU3N5yrQ/GgeomB9veavYV
+	sksl452HEWyGhxGdHGKqZU+C8t2KyWDIgzWPjEZClJKpWgchjkjU+K+CzmSNUhfB8zGV0sK1dh/
+	pBX3tsvdgdCUJruhjJ+EIr4Yivkc3Tr0z9MbtIWGPHrpbH+pyUA5EnQ==
+X-Gm-Gg: ASbGncvHkZosVNvypGg3an1Mcnlfh7vHZW9DtYKSUOCkgIjJL0cr1oLYTBdcSpHmnVn
+	zMfRCRMGG6N+rLjWD8BEgCAbe7W0oHZ+YMVB7FFGpUUCZkq3Hqh/mb9zVMWKfoJGdb3l7Guqs+g
+	/RMDEf4JKcpAl4bL/fUXeCdiaVHflW4AQo0PM599BG9cqPhnp0Ccf6BVifQU/ob0K7JFwFuT8kW
+	EwlE3iwZ6fb8SvU4+tneKv61hCn6ACUtM06nmcgnPe9tAzd9A7XHub8pn6JkZeJf6HyhwWJSYEN
+	jWJjUiNPL8cOHsbOqixUhodGdB6pTeaDsNuAG4YSnN5tl8I=
+X-Received: by 2002:a05:600c:1d09:b0:43c:efed:732b with SMTP id 5b1f17b1804b1-43cefed78bcmr155422005e9.5.1741852217425;
+        Thu, 13 Mar 2025 00:50:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFwegUed+fQ9ljIYT2+ReraOGwFw7qJPttYdCzfqNHOxAXgAxI15SBvV5/+7QXKHcBvWKjG5A==
+X-Received: by 2002:a05:600c:1d09:b0:43c:efed:732b with SMTP id 5b1f17b1804b1-43cefed78bcmr155421735e9.5.1741852217063;
+        Thu, 13 Mar 2025 00:50:17 -0700 (PDT)
+Received: from [192.168.0.7] (ip-109-42-51-207.web.vodafone.de. [109.42.51.207])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c8e43244sm1218116f8f.60.2025.03.13.00.50.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Mar 2025 23:58:28 -0700 (PDT)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Thu, 13 Mar 2025 15:57:48 +0900
-Subject: [PATCH v4 7/7] KVM: arm64: PMU: Reload when resetting
+        Thu, 13 Mar 2025 00:50:16 -0700 (PDT)
+Message-ID: <0019ac7e-b190-4b1d-9c8d-f5f039cd53ba@redhat.com>
+Date: Thu, 13 Mar 2025 08:50:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2] Makefile: Use CFLAGS in cc-option
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
+ lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+ nrb@linux.ibm.com
+References: <20250307091828.57933-2-andrew.jones@linux.dev>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20250307091828.57933-2-andrew.jones@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: PG0oxf7EIJ-M9yvyaZUBmk4WVXGVYwCmxeG8VBXvUOQ_1741852217
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250313-pmc-v4-7-2c976827118c@daynix.com>
-References: <20250313-pmc-v4-0-2c976827118c@daynix.com>
-In-Reply-To: <20250313-pmc-v4-0-2c976827118c@daynix.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Andrew Jones <andrew.jones@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, devel@daynix.com, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.15-dev-edae6
 
-Replace kvm_pmu_vcpu_reset() with the generic PMU reloading mechanism to
-ensure the consistency with system registers and to reduce code size.
+On 07/03/2025 10.18, Andrew Jones wrote:
+> When cross compiling with clang we need to specify the target in
+> CFLAGS and cc-option will fail to recognize target-specific options
+> without it. Add CFLAGS to the CC invocation in cc-option.
+> 
+> The introduction of the realmode_bits variable is necessary to
+> avoid make failing to build x86 due to CFLAGS referencing itself.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+> v2:
+>   - Fixed x86 builds with the realmode_bits variable
+> 
+>   Makefile            | 2 +-
+>   x86/Makefile.common | 3 ++-
+>   2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 78352fced9d4..9dc5d2234e2a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -21,7 +21,7 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+>   
+>   # cc-option
+>   # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+> +cc-option = $(shell if $(CC) $(CFLAGS) -Werror $(1) -S -o /dev/null -xc /dev/null \
+>                 > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+>   
+>   libcflat := lib/libcflat.a
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index 0b7f35c8de85..e97464912e28 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -98,6 +98,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
+>   ifneq ($(CONFIG_EFI),y)
+>   tests-common += $(TEST_DIR)/realmode.$(exe) \
+>   		$(TEST_DIR)/la57.$(exe)
+> +realmode_bits := $(if $(call cc-option,-m16,""),16,32)
+>   endif
+>   
+>   test_cases: $(tests-common) $(tests)
+> @@ -108,7 +109,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
+>   	$(LD) -m elf_i386 -nostdlib -o $@ \
+>   	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+>   
+> -$(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
+> +$(TEST_DIR)/realmode.o: bits = $(realmode_bits)
+>   
+>   $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
+>   
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- arch/arm64/kvm/pmu-emul.c | 14 --------------
- arch/arm64/kvm/reset.c    |  3 ---
- arch/arm64/kvm/sys_regs.c |  3 +++
- include/kvm/arm_pmu.h     |  2 --
- 4 files changed, 3 insertions(+), 19 deletions(-)
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index dfa7048a3e2a..62b1deba9856 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -248,20 +248,6 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
- 		pmu->pmc[i].idx = i;
- }
- 
--/**
-- * kvm_pmu_vcpu_reset - reset pmu state for cpu
-- * @vcpu: The vcpu pointer
-- *
-- */
--void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
--{
--	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
--	int i;
--
--	for_each_set_bit(i, &mask, 32)
--		kvm_pmu_stop_counter(kvm_vcpu_idx_to_pmc(vcpu, i));
--}
--
- /**
-  * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
-  * @vcpu: The vcpu pointer
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 0b0ae5ae7bc2..7f44539bc822 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -201,9 +201,6 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	vcpu->arch.reset_state.reset = false;
- 	spin_unlock(&vcpu->arch.mp_state_lock);
- 
--	/* Reset PMU outside of the non-preemptible section */
--	kvm_pmu_vcpu_reset(vcpu);
--
- 	preempt_disable();
- 	loaded = (vcpu->cpu != -1);
- 	if (loaded)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 11718c635e2f..307ce37d0434 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4262,6 +4262,9 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- 	}
- 
- 	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
-+
-+	if (kvm_vcpu_has_pmu(vcpu))
-+		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
- }
- 
- /**
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 9c062756ebfa..8ec6296c5917 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -45,7 +45,6 @@ void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu, u64 select_idx, u64 v
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
- u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1);
- void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu);
--void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
-@@ -108,7 +107,6 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- static inline void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu) {}
--static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
-
--- 
-2.48.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
