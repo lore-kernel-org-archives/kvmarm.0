@@ -1,138 +1,123 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688501F12F2;
-	Thu, 13 Mar 2025 12:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA172676E0;
+	Thu, 13 Mar 2025 12:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741867472; cv=none; b=EV3o9sDkqw1PeCZ348Cn9wL+/RFL2/wXZBPoSvXeTvTVsTR0PDocjVRA30iWF3qZuMDFA+WLYnooRgDBZF4aLYXBpYagrKiJ+SlvITjhfWKj4XpW2GW3s++bapT/LgIur8Sx3+iryPk5M9dosZQhYOpZivfLx849dFKpuYWydu0=
+	t=1741868166; cv=none; b=C6BecevUwwyT756xVfSJG9U1Bdh4G4tR6qEtzjRJc7IdD3W+fk31CBMhNnWJJe50o8Kh6mJVNKGtbrkIDcoh7fDH9Ej2Byhn8CkHFUZyxub02zQ2/8P96jS+sCRgHWZHCy+vX1rLRFmciaRgjuAEpqTc+5glzTRMt9iZYpF+f7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741867472; c=relaxed/simple;
-	bh=8xSatFqW6rNQRg2ui1Hv5/Ccru9q7nKvNSRlZwWl5L8=;
+	s=arc-20240116; t=1741868166; c=relaxed/simple;
+	bh=ZWHDQFZydgFLF+pZhM5zaTgB/SRGh95yQ/J43duDfo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u6FidkqMNKIaC2336buTEw3XAegKbgC4kcH0E1q2EENyq4FtoPG9Rx/9md6NgqmU5EFgJyAx8TmWZnZWggf/VAf/jWWY0/Ymnm4kB05DYuZ62LSq4hHuw7U6fMb+oDEuJAp4OnwC+XXGDgtAay64ECULnlddolaTyi39nG3+UKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=laX+XLbl; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=AXoEr+5Q6tn5F2KwLPCIu75cSCkOK/TSixJdSyNnTeIWlDaVWsn51HKFbcNXOf8DnHJX4lImBobwHAKAmP0NvBSWHKG+vcVAH4nFSWOONzXw491UMYfhgelgG5Skjyy97XOhxZ3PIz+H4FHnYiI+qBQZqIgmAr2URM+eHGxijSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvpnul61; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="laX+XLbl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63084C4CEDD;
-	Thu, 13 Mar 2025 12:04:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvpnul61"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBAEC4CEEB;
+	Thu, 13 Mar 2025 12:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741867470;
-	bh=8xSatFqW6rNQRg2ui1Hv5/Ccru9q7nKvNSRlZwWl5L8=;
+	s=k20201202; t=1741868166;
+	bh=ZWHDQFZydgFLF+pZhM5zaTgB/SRGh95yQ/J43duDfo4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=laX+XLblooglk5nBQ2OLuWGhtqj6qrkClKYXRqLBhPW0lc/doJ6OVCdrBiPC/mTg3
-	 ypllpZEyEwH1ZbJzgDmhfoLX3y2MLs0YZrWb+QyiKz5xxK1jEYFyTd9UKk1REzAwA8
-	 R/d1CxybPiNxrCUnCouHJpBqv5ItV/PRF6qtbE+mOgG6K0BSG6kPtEvtqd4+TQOIOi
-	 qFC9lieHIU8DcOyk/fWQduHA0ZcfKs3vux9ZjxFIecAZ+oC7p/RQoDadjYIfTJVoWc
-	 AilbK0CyDNeNEKUsz4aHgixCNVndewaZqO/0AKyFWEkNbO3ETwosS1fdTQFuEZN3XQ
-	 pj8pCpmOSW1Ew==
-Date: Thu, 13 Mar 2025 12:04:25 +0000
+	b=mvpnul617r3+1dJblDjuGGF3ygGimnd4POqbjFo4+O44NuhkG8MrwnO4J7SN96WfS
+	 Eg2ju52wMFzIKWlWGxAafV0lhzgdgNg3/4R12d/n1OI8YH+hBSdjITulP9baWQf1g7
+	 4ZNcfDFOO0YoabVlIfJpBV+8WdB92DhaHXXo3V8zGi0tZ2915gd6CIV0IYwkxMB3ZD
+	 9XjHE9QsRB9AD+dEhS4KMrTYEYUC67YyOfo5ocyJ/0nUmdq0UYBhih2r1skkSY6IOK
+	 k6HV4X3z21S4/yKifPdRROwdqOsixPHowbEuoo66WoObj7bk9GHrVEsvCz/CcMVB9i
+	 1ECWlKglNYubQ==
+Date: Thu, 13 Mar 2025 12:15:59 +0000
 From: Will Deacon <will@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org,
-	oliver.upton@linux.dev, snehalreddy@google.com,
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: Sebastian Ene <sebastianene@google.com>, catalin.marinas@arm.com,
+	joey.gouly@arm.com, maz@kernel.org, oliver.upton@linux.dev,
+	snehalreddy@google.com, suzuki.poulose@arm.com,
+	vdonnefort@google.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Map the hypervisor FF-A buffers on
- ffa init
-Message-ID: <20250313120424.GA7356@willie-the-truck>
+	kernel-team@android.com, Andrei Homescu <ahomescu@google.com>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Release the ownership of the hyp rx
+ buffer to Trustzone
+Message-ID: <20250313121559.GB7356@willie-the-truck>
 References: <20250227181750.3606372-1-sebastianene@google.com>
- <20250227181750.3606372-4-sebastianene@google.com>
- <20250303234259.GA30749@willie-the-truck>
- <Z8ZPBZF7J-qKdb_i@google.com>
- <20250304015633.GA30882@willie-the-truck>
- <Z8c6enoolJe7Zeqk@google.com>
- <20250305003808.GA31667@willie-the-truck>
- <Z8iZkQHknZfY7mpn@google.com>
+ <20250227181750.3606372-5-sebastianene@google.com>
+ <20250305004522.GC31667@willie-the-truck>
+ <20250305094104.vctshdtgdukno2aj@bogus>
+ <20250305193425.GA32246@willie-the-truck>
+ <Z8ltm55D1jrv8QtX@bogus>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z8iZkQHknZfY7mpn@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z8ltm55D1jrv8QtX@bogus>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Wed, Mar 05, 2025 at 06:36:01PM +0000, Sebastian Ene wrote:
-> On Wed, Mar 05, 2025 at 12:38:08AM +0000, Will Deacon wrote:
-> > On Tue, Mar 04, 2025 at 05:38:02PM +0000, Sebastian Ene wrote:
-> > > On Tue, Mar 04, 2025 at 01:56:35AM +0000, Will Deacon wrote:
-> > > >   | [...] negotiation of the version must happen before an invocation of
-> > > >   | any other FF-A ABI
+On Thu, Mar 06, 2025 at 09:40:43AM +0000, Sudeep Holla wrote:
+> On Wed, Mar 05, 2025 at 07:34:26PM +0000, Will Deacon wrote:
+> > On Wed, Mar 05, 2025 at 09:41:04AM +0000, Sudeep Holla wrote:
+> > > On Wed, Mar 05, 2025 at 12:45:23AM +0000, Will Deacon wrote:
+> > > > Hmm, the FFA spec is characteristically unclear as to whether or not we
+> > > > need to release the rx buffer in the case that the flags indicate use of
+> > > > the rx buffer but the returned partition count is 0.
+> > > > 
+> > > > Sudeep -- do you know what we should be doing in that case?
 > > > > 
 > > > 
-> > > We do that, as the hypervisor negotiates its own version in
-> > > hyp_ffa_init.
-> > 
-> > hyp_ffa_init() only issues FFA_VERSION afaict, which is the one call
-> > that you're allowed to make during negotiation. So the existing code is
-> > fine.
-> > 
-> > > I think the host shouldn't be allowed to overwrite the
-> > > hyp_ffa_version obtained from _init, this feels wrong as you
-> > > can have a driver that forcefully downgrades the hypervisor to an old
-> > > version.
-> > 
-> > I think that's also fine. The FFA code in the hypervisor exists solely
-> > to proxy requests from the host; it's not used for anything else and so,
-> > from the host's persective, FFA should behave identically to the case in
-> > which the proxy is not present (e.g. if we were just using VHE). That
-> > means that we're doing the right thing by deferring to the host for
-> > version negotation.
-> > 
-> > Are you saying there's a bug in the current code if the host negotiates
-> > the downgrade?
-> 
-> It is an issue *only* for doing guest-ffa (which isn't posted here yet).
-> If we allow the host to dictate the version & there is an issue with TZ
-> FF-A dispatcher in that version => the guests will be affected by this
-> as well.
-
-When we get to guests doing FF-A, I still think the host should be
-responsible for the version negotiation and guests should just be given
-whatever has been negotiated. We could extend the hypervisor to marshall
-between different versions, but I'd rather do that only if we actually
-need it.
-
-> > > We need to do three things, Sudeep & Will please correct me if I am
-> > > wrong, but this is how I see it:
+> > > We need to call RX_RELEASE here. I went back to the spec to confirm the
+> > > same again.
 > > > 
-> > > - the hypervisor should act as a separate entity (it has a different ID and
-> > > in the current implementation we don't do a distinction between host/hyp) and
-> > > it should be able to lock its own version from init.
+> > > v1.2 EAC0 spec Section 7.2.2.4.2 Transfer of buffer ownership
+> > > (Or just look for the section title in any version of the spec)
+> > > "
+> > > 2. Ownership transfer for the RX buffer takes place as follows.
+> > >     2. For a framework message,
+> > >        1. Completion of the FFA_PARTITION_INFO_GET ABI transfers the ownership
+> > >        of the caller’s RX buffer from the Producer to the Consumer.
+> > > 3. For both types of messages, an invocation of the following FF-A ABIs
+> > >     transfers the ownership from the Consumer to the Producer.
+> > >        1. FFA_MSG_WAIT ...
+> > >        2. FFA_RX_RELEASE.
+> > > "
+> > > 
+> > > Hope that helps, can dig deeper if there are any ambiguities around this.
 > > 
-> > I strongly disagree with that. The hypervisor isn't using FFA for
-> > anything other than proxying the host and so we don't need to negotiate
-> > a separate version.
+> > Thanks Sudeep, but that also makes it sound like we need the RX_RELEASE
+> > even if we're not using the RX buffer per the input flags. :/
 > > 
-> > What would we gain by doing this? Is there a bug with what we're doing
-> > at the moment?
 > 
-> I think we need to make a distinction between the host and the
-> hypervisor when we are adding support for guest-ffa. We currently have
-> the same id (== 0) for both of them.
+> Good spot, I had forgotten about the input flags that can avoid using the
+> buffer. I will see if we can improve the spec in that regards.
 
-Right, and we currently don't support guest-ffa, so no problem :)
+Thanks. In the meantime, what do you think is the correct behaviour in that
+case? I guess _not_ doing the release when the flags don't request the RX
+buffer? In other words:
 
-> > > - keep a separate version negotiated for the host
-> > > - trap FFA_ID_GET from the host and return ID=1 because
-> > >   currently we forward the call to the TZ and it returns the same ID
-> > >   as the (hypervisor == 0).
-> > 
-> > Why is this beneficial? It just looks like complexity at EL2 for no gain
-> > to me, but maybe I'm missing something.
-> >
-> 
-> Because the host can impersonate the hypervisor using ff-a direct calls atm.
-> and we are in a position to restrict the host from playing nasty games
-> with TZ.
 
-Can you give a specific example of why impersonating a direct call is a
-problem? I agree that it sounds bad, but the hypervisor is still in the
-middle and so it can check what the call is requesting.
+	if (flags & PARTITION_INFO_GET_RETURN_COUNT_ONLY)
+		goto out_unlock;
+
+	if (!count)
+		goto release_rx;
+
+	[...]
+
+	if (copy_sz > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
+		ffa_to_smccc_res(res, FFA_RET_ABORTED);
+		goto release_rx;
+	}
+
+	memcpy(host_buffers.rx, hyp_buffers.rx, copy_sz);
+release_rx:
+	ffa_rx_release(&_res);
+out_unlock:
+	hyp_spin_unlock(&host_buffers.lock);
+}
+
+
+What do you reckon?
 
 Will
