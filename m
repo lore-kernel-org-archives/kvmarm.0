@@ -1,145 +1,138 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31DE267387
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 11:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688501F12F2;
+	Thu, 13 Mar 2025 12:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741866057; cv=none; b=jM5VWvLsF4wRxGQbHu/4OuuwMINTGlTh0n32eIh4eJ/xlxiLm5JOzwyhQvO97b5BkpuoxnQqa7nPceVEshxOnuTfPB+r+doyqguU27spsiTUkAC3SYCPuO6RiqFNYGrFH54J+LjyXSOqBJb4JaQdCPRoYwhc5f6lo/eHA/HhaOw=
+	t=1741867472; cv=none; b=EV3o9sDkqw1PeCZ348Cn9wL+/RFL2/wXZBPoSvXeTvTVsTR0PDocjVRA30iWF3qZuMDFA+WLYnooRgDBZF4aLYXBpYagrKiJ+SlvITjhfWKj4XpW2GW3s++bapT/LgIur8Sx3+iryPk5M9dosZQhYOpZivfLx849dFKpuYWydu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741866057; c=relaxed/simple;
-	bh=xQw7CCkIa/tItrTgXKvKC4t9RKukRRO3SkH3BuVk0FY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=l8HCuOsvzDp1wfDoR2GSLPximtuyyie1M3wRvyTKs4FUYyEbSHeumpFqWlH5nFBo3L1hE7FSQyYIT8GJc5+Yg37uOWPEXylWhj1qw82MGSt6Chp3HT9MGfpk7K5SS3Jxq1cFHyML3s/+aKJ5ssntJhDSsfH/z/tiLACHTgLK2BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XoSDQis6; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1741867472; c=relaxed/simple;
+	bh=8xSatFqW6rNQRg2ui1Hv5/Ccru9q7nKvNSRlZwWl5L8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6FidkqMNKIaC2336buTEw3XAegKbgC4kcH0E1q2EENyq4FtoPG9Rx/9md6NgqmU5EFgJyAx8TmWZnZWggf/VAf/jWWY0/Ymnm4kB05DYuZ62LSq4hHuw7U6fMb+oDEuJAp4OnwC+XXGDgtAay64ECULnlddolaTyi39nG3+UKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=laX+XLbl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XoSDQis6"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3912b54611dso563710f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 04:40:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741866054; x=1742470854; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fp6lx89NDYaCWj8yztXIUiroS+BazPKE4hbafizh3a4=;
-        b=XoSDQis6mu1AXuMNGcaELdiQkPSiuAPijy2BjdyKogxdn0JaSnAQcrnFSQfjr6w5vz
-         iXXolkcwkdWHqYidvgK6cHvllRJMhwnUl4RmGY2+KUGOb4GRR3+jb1bUC8O1vL1KJzcG
-         AFa29ePyL3Q3CpzFxCrJeJHR3APdHIJqnxmMnNcU3jn1USKxILcIk9UNdLODE5rknCRx
-         bXL5d06Mi+u4Jw0xNC513aOoe4zl7fTNPM9zMudY5i/AaheuXW78j2TEteUfoB4oTWC+
-         X3lq8rrLVroJM9unnif52WhR9Tk/vF9aYosPAGYDPkZAaVfLHgNEXjySQAfpcM3AzD8E
-         LqWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741866054; x=1742470854;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fp6lx89NDYaCWj8yztXIUiroS+BazPKE4hbafizh3a4=;
-        b=EYdfjY1pV/JxKXovZzaWyfxbbT6FYd8l3C7pxcwpIHr8XbltEbkMCpbhtaTr2hYuKa
-         xbQdJMfolNSMreJakaKPW2fs2Qe10j/D+gC2IW3khMvQM6y64tQFzWhdErKpRch+EVAq
-         vkEh39dm1HkhOZOwm5JowjtFSNwWhsveErL1qJvfNpKVbhNUypoLxYdXvqZIAHsbDDsS
-         csHqGpAmVpnA+NuWlNwHjwNYRE1j32t8i0hN9vzSC+ECRYD/7bv8MZFgmioEHpW+Z049
-         uIRKhQkDHUm+SfYQBGUzpBf7h2zjfMcNjaKKj2OVYZgvsJovrZcrN4J+UhhrrGl/HQgR
-         TbiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAM3xmDbA1wfqiA4cCGupEUjU2mRRz6aRwZOPSrIPnG6gkjtlo5xLjktOBH8Ad3qsxgsx995Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwE4H6jXaWP6AWnwdGZK9Y6kgJF/7fZMNARGyyNb0mkdk1F2lOb
-	s0pTf2FyCZxeX4Qwu0QCi+zTSrvmDjiyrZlT4lKJ+D1CHTNEZyn9I0OJBuH/p0aqOXG+FTVrxxC
-	ofI3pKMKgbyhklb3IyA==
-X-Google-Smtp-Source: AGHT+IFt9bxBQ+OiJ6M9T42VJJBXQ3dgE7XPDiGETKJiQhO61thf8YCecySsYum/tlZhh/1oFpOYkgivgvMyU5WF
-X-Received: from wryv4.prod.google.com ([2002:a5d:59c4:0:b0:391:3be0:78cb])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:1a87:b0:391:1923:5a91 with SMTP id ffacd0b85a97d-39132dc4395mr17764441f8f.55.1741866054357;
- Thu, 13 Mar 2025 04:40:54 -0700 (PDT)
-Date: Thu, 13 Mar 2025 11:40:38 +0000
-In-Reply-To: <20250313114038.1502357-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="laX+XLbl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63084C4CEDD;
+	Thu, 13 Mar 2025 12:04:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741867470;
+	bh=8xSatFqW6rNQRg2ui1Hv5/Ccru9q7nKvNSRlZwWl5L8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=laX+XLblooglk5nBQ2OLuWGhtqj6qrkClKYXRqLBhPW0lc/doJ6OVCdrBiPC/mTg3
+	 ypllpZEyEwH1ZbJzgDmhfoLX3y2MLs0YZrWb+QyiKz5xxK1jEYFyTd9UKk1REzAwA8
+	 R/d1CxybPiNxrCUnCouHJpBqv5ItV/PRF6qtbE+mOgG6K0BSG6kPtEvtqd4+TQOIOi
+	 qFC9lieHIU8DcOyk/fWQduHA0ZcfKs3vux9ZjxFIecAZ+oC7p/RQoDadjYIfTJVoWc
+	 AilbK0CyDNeNEKUsz4aHgixCNVndewaZqO/0AKyFWEkNbO3ETwosS1fdTQFuEZN3XQ
+	 pj8pCpmOSW1Ew==
+Date: Thu, 13 Mar 2025 12:04:25 +0000
+From: Will Deacon <will@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org,
+	oliver.upton@linux.dev, snehalreddy@google.com,
+	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com,
+	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Map the hypervisor FF-A buffers on
+ ffa init
+Message-ID: <20250313120424.GA7356@willie-the-truck>
+References: <20250227181750.3606372-1-sebastianene@google.com>
+ <20250227181750.3606372-4-sebastianene@google.com>
+ <20250303234259.GA30749@willie-the-truck>
+ <Z8ZPBZF7J-qKdb_i@google.com>
+ <20250304015633.GA30882@willie-the-truck>
+ <Z8c6enoolJe7Zeqk@google.com>
+ <20250305003808.GA31667@willie-the-truck>
+ <Z8iZkQHknZfY7mpn@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250313114038.1502357-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
-Message-ID: <20250313114038.1502357-4-vdonnefort@google.com>
-Subject: [PATCH v4 3/3] KVM: arm64: Count pKVM stage-2 usage in secondary
- pagetable stats
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org
-Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8iZkQHknZfY7mpn@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Count the pages used by pKVM for the guest stage-2 in memory stats under
-secondary pagetable, similarly to what the VHE mode does.
+On Wed, Mar 05, 2025 at 06:36:01PM +0000, Sebastian Ene wrote:
+> On Wed, Mar 05, 2025 at 12:38:08AM +0000, Will Deacon wrote:
+> > On Tue, Mar 04, 2025 at 05:38:02PM +0000, Sebastian Ene wrote:
+> > > On Tue, Mar 04, 2025 at 01:56:35AM +0000, Will Deacon wrote:
+> > > >   | [...] negotiation of the version must happen before an invocation of
+> > > >   | any other FF-A ABI
+> > > > 
+> > > 
+> > > We do that, as the hypervisor negotiates its own version in
+> > > hyp_ffa_init.
+> > 
+> > hyp_ffa_init() only issues FFA_VERSION afaict, which is the one call
+> > that you're allowed to make during negotiation. So the existing code is
+> > fine.
+> > 
+> > > I think the host shouldn't be allowed to overwrite the
+> > > hyp_ffa_version obtained from _init, this feels wrong as you
+> > > can have a driver that forcefully downgrades the hypervisor to an old
+> > > version.
+> > 
+> > I think that's also fine. The FFA code in the hypervisor exists solely
+> > to proxy requests from the host; it's not used for anything else and so,
+> > from the host's persective, FFA should behave identically to the case in
+> > which the proxy is not present (e.g. if we were just using VHE). That
+> > means that we're doing the right thing by deferring to the host for
+> > version negotation.
+> > 
+> > Are you saying there's a bug in the current code if the host negotiates
+> > the downgrade?
+> 
+> It is an issue *only* for doing guest-ffa (which isn't posted here yet).
+> If we allow the host to dictate the version & there is an issue with TZ
+> FF-A dispatcher in that version => the guests will be affected by this
+> as well.
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+When we get to guests doing FF-A, I still think the host should be
+responsible for the version negotiation and guests should just be given
+whatever has been negotiated. We could extend the hypervisor to marshall
+between different versions, but I'd rather do that only if we actually
+need it.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ace3969e8106..51754a354b7a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -86,6 +86,8 @@ struct kvm_hyp_memcache {
- 	phys_addr_t head;
- 	unsigned long nr_pages;
- 	struct pkvm_mapping *mapping; /* only used from EL1 */
-+
-+#define	HYP_MEMCACHE_ACCOUNT_STAGE2	BIT(1)
- 	unsigned long flags;
- };
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6107a3c8ccf6..2feb6c6b63af 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1088,12 +1088,24 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 
- static void hyp_mc_free_fn(void *addr, void *mc)
- {
-+	struct kvm_hyp_memcache *memcache = mc;
-+
-+	if (memcache->flags & HYP_MEMCACHE_ACCOUNT_STAGE2)
-+		kvm_account_pgtable_pages(addr, -1);
-+
- 	free_page((unsigned long)addr);
- }
- 
- static void *hyp_mc_alloc_fn(void *mc)
- {
--	return (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+	struct kvm_hyp_memcache *memcache = mc;
-+	void *addr;
-+
-+	addr = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+	if (addr && memcache->flags & HYP_MEMCACHE_ACCOUNT_STAGE2)
-+		kvm_account_pgtable_pages(addr, 1);
-+
-+	return addr;
- }
- 
- void free_hyp_memcache(struct kvm_hyp_memcache *mc)
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 19921ca407c6..4409a10d02b6 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -165,12 +165,16 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
- 	handle = ret;
- 
- 	host_kvm->arch.pkvm.handle = handle;
-+	host_kvm->arch.pkvm.stage2_teardown_mc.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
-+	kvm_account_pgtable_pages(pgd, pgd_sz / PAGE_SIZE);
- 
- 	/* Donate memory for the vcpus at hyp and initialize it. */
- 	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
- 	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
- 		void *hyp_vcpu;
- 
-+		host_vcpu->arch.pkvm_memcache.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
-+
- 		/* Indexing of the vcpus to be sequential starting at 0. */
- 		if (WARN_ON(host_vcpu->vcpu_idx != idx)) {
- 			ret = -EINVAL;
--- 
-2.49.0.rc0.332.g42c0ae87b1-goog
+> > > We need to do three things, Sudeep & Will please correct me if I am
+> > > wrong, but this is how I see it:
+> > > 
+> > > - the hypervisor should act as a separate entity (it has a different ID and
+> > > in the current implementation we don't do a distinction between host/hyp) and
+> > > it should be able to lock its own version from init.
+> > 
+> > I strongly disagree with that. The hypervisor isn't using FFA for
+> > anything other than proxying the host and so we don't need to negotiate
+> > a separate version.
+> > 
+> > What would we gain by doing this? Is there a bug with what we're doing
+> > at the moment?
+> 
+> I think we need to make a distinction between the host and the
+> hypervisor when we are adding support for guest-ffa. We currently have
+> the same id (== 0) for both of them.
 
+Right, and we currently don't support guest-ffa, so no problem :)
+
+> > > - keep a separate version negotiated for the host
+> > > - trap FFA_ID_GET from the host and return ID=1 because
+> > >   currently we forward the call to the TZ and it returns the same ID
+> > >   as the (hypervisor == 0).
+> > 
+> > Why is this beneficial? It just looks like complexity at EL2 for no gain
+> > to me, but maybe I'm missing something.
+> >
+> 
+> Because the host can impersonate the hypervisor using ff-a direct calls atm.
+> and we are in a position to restrict the host from playing nasty games
+> with TZ.
+
+Can you give a specific example of why impersonating a direct call is a
+problem? I agree that it sounds bad, but the hypervisor is still in the
+middle and so it can check what the call is requesting.
+
+Will
