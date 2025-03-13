@@ -1,114 +1,136 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1032725FA09
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 09:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6793E230BC2;
+	Thu, 13 Mar 2025 09:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741857399; cv=none; b=mF91R3OJfkRSN+/Y3yeLzT/I9h1hEOXRVWmlTORcmq21buvOct7ESsXEKMAoDIgYHcC29HrQ4UZzktoZYAa0ddfypRdmG6KgGy9Qzu6oyjYwlTI1njB7sWVmDiGgU57UxCO+PNGU/qr38cxmy9V+zia5GspFYo6TwJJ4oN248sk=
+	t=1741858307; cv=none; b=dJCOl+53fm8sDNm/kXJu0uO7vb7p2f2xCSI2ljLwiOi0KlDfC3ersOFcFAmJz4GKuRyVCwRg9+FxDoAUYEBdxWiiqsiEpgCSaU8T/q0CRdr8MQQqaoTXeu8monWUc3oL7p+mxrfpekbeeK8cjVUwhxi6Gk3SEwIFvH1cmKIw1VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741857399; c=relaxed/simple;
-	bh=vnGU6xsEnDEuWbgq4Zq5jcvdO7OIoOn4KRQG+0RDXz0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=muizIOEhkEtnwwpx/c1xsdwfaymath+Xu9MuJhckaKk/yO49LYH3pCTMMOF+Hu1X3GUNchYQyVmEQz3A11vgV3xU/rR6ZdlBmbbdsPKYeWTfOhqS41iVwwmX3sZ5l/2cuMMqhQXQ+Db+YV9z6zS9D2RSrLbve7u5gkRZYJOmKjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ehmn3cfd; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1741858307; c=relaxed/simple;
+	bh=ZFal1PorS7FN5mIR5+RpX5+LwPo3ePM/RhlKItAsH2M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LhIjCWhE7eoCnKK2BgUOBz90LY2h6n/b+1Ie34rbqeEGvKsaLgHdg/p2GVb2UJCRZfQk8HH0W5R60x8Kp0PS5NppgIwNjlrIF9aCW+vKkMamzB0JsuHyQRusyqGdXSKeYHqKSvYkdbit7zcmSkt3vGldMZUpXe3BLBBbx96VS/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8nJ+V0y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ehmn3cfd"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3914aba1ce4so547763f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 02:16:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741857395; x=1742462195; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxWaN40Gu0y4wmPgUEJqr+nQuSXPrmjIwZFj0rXa2nA=;
-        b=ehmn3cfduCPOv1hXDebi4N8Yk4JyIVxq2eDmJsu3i7XPQr9TrwobVIBaXcstOgEjI5
-         3aNLnlelAnUPSjsL2dRMnES24gUa8QI3aUuk3Es8hrLPOMmA8UauaETfU4wKPqdFuC6n
-         Gx4blr4JsmKgiUFZSK+a/bs09REQTPkDTNs7pFP+qSpu/kO2/0O8mrbDrCuUHCuFZpRx
-         bht3Kbt8yxJy/50MmjTRzwgNp4WFIfD5fl3dALs3qVm14YsNmNHIu6H/zq44VO/TdaT5
-         yc5i6jwxKYdMHBngZ74HX6iP+PehLNH4D7/UFLMRVQ5tNbxk0ZkFn7Y9rjM8dW9oTMnW
-         qhSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741857395; x=1742462195;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fxWaN40Gu0y4wmPgUEJqr+nQuSXPrmjIwZFj0rXa2nA=;
-        b=LRMpDKHoISMD420XUnBY2zKuTs/BPA6QVL30RNZb/ybNzVsmgYBKUvEPd3Y0bd0qO6
-         5cWo0wbSxfUmYwVVLbSpIbLOLHO10zEtJfm7us7VxWNQOf3vKCWaNhML6XuVC+st1k9n
-         uukljygVzJ0Uhr+sbyWH+MY6FsUJxqpqgkv0uewnYGShhz6e6cuiSByxXcTKJvOQ9Gg9
-         dHhxAN7mRfGX9FIu/pRsurxiVK1fPxkMhJuCQvijfE/ZBLBUWCCq/LQ/nkGCamiLWsXQ
-         lEFIR3ETGAr9TZBEeImg2lEI9fywDTthGFNDBoDoC33iVQr8n2ga2cYBn+p4ApPHBUkX
-         i3Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAfQ2SJczEBPsVQ6z4qzTvCpgI/kx04Xm5odUnsguKvO9AOQDj2C0d63Po4yJVG6hNhsZoIKw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxls+RdYiMdhxo8Ti4VRYBSRf3rOnd7R7P6a+ByLC3d9ncaQCB2
-	Vby3Xw+Vo2S4iyPhBe+LqMLkBT3QDp5SyvFzqgGIY2mq1RYPMMTWBYKArKF4DA==
-X-Gm-Gg: ASbGncvWOkHL4drZI1OYQCQyvhk8ZbeAt4f2oif8NN+5gat/Ss7g7LlZ//96bCLhoa7
-	sMRgtiKwLgUqXkFjebOKU+WwASxWvqLozFFLWO9t1feDjUvQfNgDQ8LPFc4LJSGDkAKD4qna/aQ
-	PGfE+FCl/utrqF2m4/PpsbElH4S0bu2Cko2RJ5VhmVvDZpUtR1rqrcKJNMzOVwIXuT99Cw1QpDp
-	4e5+c7foG38X1aompuzD0NgdBv0hkPMufTnrcugTc9I+yVBrCtuxVCCERcmcaHBKebTjp+uurO7
-	GYYLbqdxDiCxoVSBJt2frMBwlwMzIaVR+j3yOibBxNzzV/w3P1/psnf767BdFBaRkCvlavwjWge
-	8i2c7ccQKqJ1N
-X-Google-Smtp-Source: AGHT+IHyTZmg9ER74S1drTjoF85PA6dZOdC3TWCeZ2nKybqjldE81KW9q1fSH09TLkfQNscM9Dnofg==
-X-Received: by 2002:a5d:5f45:0:b0:38d:ca55:76c3 with SMTP id ffacd0b85a97d-39132d2ac3amr18093999f8f.11.1741857394994;
-        Thu, 13 Mar 2025 02:16:34 -0700 (PDT)
-Received: from google.com (105.168.195.35.bc.googleusercontent.com. [35.195.168.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7eb8c2sm1397573f8f.85.2025.03.13.02.16.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 02:16:34 -0700 (PDT)
-Date: Thu, 13 Mar 2025 09:16:30 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	qperret@google.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8nJ+V0y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B139CC4CEDD;
+	Thu, 13 Mar 2025 09:31:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741858306;
+	bh=ZFal1PorS7FN5mIR5+RpX5+LwPo3ePM/RhlKItAsH2M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q8nJ+V0yU6v0nv73l9v7xk3ZR5ABxP6P6/BsaaTakdWOvduHpaq974h+yi8m/OkhX
+	 48QME9QLMn63k1pFQvN3IY0h7tow97UozCQTPiapuoJv2bvywpd8BPuV6dvQcC7iTq
+	 k4d0MoWso/Eju1wfVLY07YNKT1nIib5hS9D/2w/TZBcVxw4zzeWDpYgapR29E8lmvR
+	 42ylYRVRB4eBn7fF/Mb0PaTbJ3ft8S4b4CeO30+FIu43uoXORwxTBwfgnQJXdQMBLT
+	 YJffLnxMVWIEB0azsRzkZH9yjk5NqceitY8ysfWE61NkOGGJ3o/t29zU893l2iWx24
+	 +jgIkvlsxSWIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tseul-00D8pq-JK;
+	Thu, 13 Mar 2025 09:31:44 +0000
+Date: Thu, 13 Mar 2025 09:31:42 +0000
+Message-ID: <86ldt9nuo1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	qperret@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v3 1/3] KVM: arm64: Add flags to kvm_hyp_memcache
-Message-ID: <Z9KiboTJy9A6qvbK@google.com>
+Subject: Re: [PATCH v3 2/3] KVM: arm64: Distinct pKVM teardown memcache for stage-2
+In-Reply-To: <Z9KhybW0J2WIX1eU@google.com>
 References: <20250307113411.469018-1-vdonnefort@google.com>
- <20250307113411.469018-2-vdonnefort@google.com>
- <87r0327iek.wl-maz@kernel.org>
+	<20250307113411.469018-3-vdonnefort@google.com>
+	<87plim7hgc.wl-maz@kernel.org>
+	<Z9KhybW0J2WIX1eU@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87r0327iek.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-[...]
+On Thu, 13 Mar 2025 09:13:45 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
+> On Wed, Mar 12, 2025 at 08:59:15AM +0000, Marc Zyngier wrote:
+> > On Fri, 07 Mar 2025 11:34:10 +0000,
+> > Vincent Donnefort <vdonnefort@google.com> wrote:
+> > > 
+> > > In order to account for memory dedicated to the stage-2 page-tables, use
+> > > a separated memcache when tearing down the VM.
+> > > 
+> > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 12691ae23d4c..ace3969e8106 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -246,6 +246,7 @@ typedef unsigned int pkvm_handle_t;
+> > >  struct kvm_protected_vm {
+> > >  	pkvm_handle_t handle;
+> > >  	struct kvm_hyp_memcache teardown_mc;
+> > > +	struct kvm_hyp_memcache stage2_teardown_mc;
+> > >  	bool enabled;
+> > >  };
+> > >  
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > index 3927fe52a3dd..15f8d5315959 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > @@ -678,7 +678,7 @@ teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
+> > >  
+> > >  int __pkvm_teardown_vm(pkvm_handle_t handle)
+> > >  {
+> > > -	struct kvm_hyp_memcache *mc;
+> > > +	struct kvm_hyp_memcache *mc, *stage2_mc;
+> > >  	struct pkvm_hyp_vm *hyp_vm;
+> > >  	struct kvm *host_kvm;
+> > >  	unsigned int idx;
+> > > @@ -706,7 +706,8 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+> > >  
+> > >  	/* Reclaim guest pages (including page-table pages) */
+> > >  	mc = &host_kvm->arch.pkvm.teardown_mc;
+> > > -	reclaim_guest_pages(hyp_vm, mc);
+> > > +	stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
+> > > +	reclaim_guest_pages(hyp_vm, stage2_mc);
+> > 
+> > This looks odd. What counts as stage-2 pages here? Or is it that
+> > reclaim_guest_pages() is very badly named?
+> 
+> Yes, this is a naming issue here. How about 
+> 
+>   reclaim_pgtable_pages(hyp_vm, stage2_mc);
 
-> > @@ -1102,7 +1102,7 @@ void free_hyp_memcache(struct kvm_hyp_memcache *mc)
-> >  		return;
-> >  
-> >  	kfree(mc->mapping);
-> > -	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, NULL);
-> > +	__free_hyp_memcache(mc, hyp_mc_free_fn, kvm_host_va, (void *)mc);
-> 
-> Why the cast? It looks superfluous to me.
-
-Ha yes it is now I pass mc and not mc->flags.
+LGTM.
 
 > 
-> >  }
-> >  
-> >  int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
-> > @@ -1117,7 +1117,7 @@ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
-> >  	}
-> >  
-> >  	return __topup_hyp_memcache(mc, min_pages, hyp_mc_alloc_fn,
-> > -				    kvm_host_pa, NULL);
-> > +				    kvm_host_pa, (void *)mc);
-> 
-> Same here.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> Then I can probably drop that /* Push the metadata pages to the teardown
+> memcache */  comment as it is clear what is pgtable and what is meta-data?
+
+Yeah, the comments are actively getting in the way.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
