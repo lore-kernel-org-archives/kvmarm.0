@@ -1,136 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6793E230BC2;
-	Thu, 13 Mar 2025 09:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FACF25FA25
+	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 10:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741858307; cv=none; b=dJCOl+53fm8sDNm/kXJu0uO7vb7p2f2xCSI2ljLwiOi0KlDfC3ersOFcFAmJz4GKuRyVCwRg9+FxDoAUYEBdxWiiqsiEpgCSaU8T/q0CRdr8MQQqaoTXeu8monWUc3oL7p+mxrfpekbeeK8cjVUwhxi6Gk3SEwIFvH1cmKIw1VM=
+	t=1741860671; cv=none; b=SDSaXOhSYMyaasKninBSh7j+XBeB91AD5V5nHTHIFg4fn/cPnCyvc9BxWIEa0bV4bp4oJRCDiYK2yZh0LLeMENcoI9H9p6buOQidWSo6WKEmTOemSfUU3J9xjEtZPiX7D/4PwJqtsdyUhGfcs0byONbHGG6Nx8C0KAPkgTwEul0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741858307; c=relaxed/simple;
-	bh=ZFal1PorS7FN5mIR5+RpX5+LwPo3ePM/RhlKItAsH2M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LhIjCWhE7eoCnKK2BgUOBz90LY2h6n/b+1Ie34rbqeEGvKsaLgHdg/p2GVb2UJCRZfQk8HH0W5R60x8Kp0PS5NppgIwNjlrIF9aCW+vKkMamzB0JsuHyQRusyqGdXSKeYHqKSvYkdbit7zcmSkt3vGldMZUpXe3BLBBbx96VS/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8nJ+V0y; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8nJ+V0y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B139CC4CEDD;
-	Thu, 13 Mar 2025 09:31:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741858306;
-	bh=ZFal1PorS7FN5mIR5+RpX5+LwPo3ePM/RhlKItAsH2M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q8nJ+V0yU6v0nv73l9v7xk3ZR5ABxP6P6/BsaaTakdWOvduHpaq974h+yi8m/OkhX
-	 48QME9QLMn63k1pFQvN3IY0h7tow97UozCQTPiapuoJv2bvywpd8BPuV6dvQcC7iTq
-	 k4d0MoWso/Eju1wfVLY07YNKT1nIib5hS9D/2w/TZBcVxw4zzeWDpYgapR29E8lmvR
-	 42ylYRVRB4eBn7fF/Mb0PaTbJ3ft8S4b4CeO30+FIu43uoXORwxTBwfgnQJXdQMBLT
-	 YJffLnxMVWIEB0azsRzkZH9yjk5NqceitY8ysfWE61NkOGGJ3o/t29zU893l2iWx24
-	 +jgIkvlsxSWIA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tseul-00D8pq-JK;
-	Thu, 13 Mar 2025 09:31:44 +0000
-Date: Thu, 13 Mar 2025 09:31:42 +0000
-Message-ID: <86ldt9nuo1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	qperret@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v3 2/3] KVM: arm64: Distinct pKVM teardown memcache for stage-2
-In-Reply-To: <Z9KhybW0J2WIX1eU@google.com>
-References: <20250307113411.469018-1-vdonnefort@google.com>
-	<20250307113411.469018-3-vdonnefort@google.com>
-	<87plim7hgc.wl-maz@kernel.org>
-	<Z9KhybW0J2WIX1eU@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1741860671; c=relaxed/simple;
+	bh=UYe2qQTQ9lBItsA3rokh/UNh0MMugdSzu7HPH94YTD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bC5JoWyjgVpHN/3y05vCmd1NhZTs7oryxnP9ppg3zBH2NebzWi6VJxh3UO6XaC49d4mlvxntELRLx0wobXpsCX+NKb8ACLEsdE3sLrqSI52dtFQoCx7D/w6xL2Yw2NjhEjPhhT3Qw5ysCFDg5brjrYuUoQML2a4fa7KMZiY8E3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C44E41516;
+	Thu, 13 Mar 2025 03:11:18 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6112F3F694;
+	Thu, 13 Mar 2025 03:11:06 -0700 (PDT)
+Date: Thu, 13 Mar 2025 10:11:03 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
+	eric.auger@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2] Makefile: Use CFLAGS in cc-option
+Message-ID: <Z9KvNzQnkFSTvmoE@raptor>
+References: <20250307091828.57933-2-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307091828.57933-2-andrew.jones@linux.dev>
 
-On Thu, 13 Mar 2025 09:13:45 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> On Wed, Mar 12, 2025 at 08:59:15AM +0000, Marc Zyngier wrote:
-> > On Fri, 07 Mar 2025 11:34:10 +0000,
-> > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > 
-> > > In order to account for memory dedicated to the stage-2 page-tables, use
-> > > a separated memcache when tearing down the VM.
-> > > 
-> > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 12691ae23d4c..ace3969e8106 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -246,6 +246,7 @@ typedef unsigned int pkvm_handle_t;
-> > >  struct kvm_protected_vm {
-> > >  	pkvm_handle_t handle;
-> > >  	struct kvm_hyp_memcache teardown_mc;
-> > > +	struct kvm_hyp_memcache stage2_teardown_mc;
-> > >  	bool enabled;
-> > >  };
-> > >  
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > index 3927fe52a3dd..15f8d5315959 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > > @@ -678,7 +678,7 @@ teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
-> > >  
-> > >  int __pkvm_teardown_vm(pkvm_handle_t handle)
-> > >  {
-> > > -	struct kvm_hyp_memcache *mc;
-> > > +	struct kvm_hyp_memcache *mc, *stage2_mc;
-> > >  	struct pkvm_hyp_vm *hyp_vm;
-> > >  	struct kvm *host_kvm;
-> > >  	unsigned int idx;
-> > > @@ -706,7 +706,8 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
-> > >  
-> > >  	/* Reclaim guest pages (including page-table pages) */
-> > >  	mc = &host_kvm->arch.pkvm.teardown_mc;
-> > > -	reclaim_guest_pages(hyp_vm, mc);
-> > > +	stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
-> > > +	reclaim_guest_pages(hyp_vm, stage2_mc);
-> > 
-> > This looks odd. What counts as stage-2 pages here? Or is it that
-> > reclaim_guest_pages() is very badly named?
-> 
-> Yes, this is a naming issue here. How about 
-> 
->   reclaim_pgtable_pages(hyp_vm, stage2_mc);
+Hi Drew,
 
-LGTM.
+Thank you for debugging this. I tested the patch by compiling the MTE test
+from Vladimir with clang and it works now:
 
-> 
-> Then I can probably drop that /* Push the metadata pages to the teardown
-> memcache */  comment as it is clear what is pgtable and what is meta-data?
-
-Yeah, the comments are actively getting in the way.
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
+Alex
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+On Fri, Mar 07, 2025 at 10:18:29AM +0100, Andrew Jones wrote:
+> When cross compiling with clang we need to specify the target in
+> CFLAGS and cc-option will fail to recognize target-specific options
+> without it. Add CFLAGS to the CC invocation in cc-option.
+> 
+> The introduction of the realmode_bits variable is necessary to
+> avoid make failing to build x86 due to CFLAGS referencing itself.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+> v2:
+>  - Fixed x86 builds with the realmode_bits variable
+> 
+>  Makefile            | 2 +-
+>  x86/Makefile.common | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 78352fced9d4..9dc5d2234e2a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -21,7 +21,7 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+>  
+>  # cc-option
+>  # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+> +cc-option = $(shell if $(CC) $(CFLAGS) -Werror $(1) -S -o /dev/null -xc /dev/null \
+>                > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+>  
+>  libcflat := lib/libcflat.a
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index 0b7f35c8de85..e97464912e28 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -98,6 +98,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
+>  ifneq ($(CONFIG_EFI),y)
+>  tests-common += $(TEST_DIR)/realmode.$(exe) \
+>  		$(TEST_DIR)/la57.$(exe)
+> +realmode_bits := $(if $(call cc-option,-m16,""),16,32)
+>  endif
+>  
+>  test_cases: $(tests-common) $(tests)
+> @@ -108,7 +109,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
+>  	$(LD) -m elf_i386 -nostdlib -o $@ \
+>  	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+>  
+> -$(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
+> +$(TEST_DIR)/realmode.o: bits = $(realmode_bits)
+>  
+>  $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
+>  
+> -- 
+> 2.48.1
+> 
