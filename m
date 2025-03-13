@@ -1,95 +1,97 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9B51DDC3B
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 18:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E824B1531C1
+	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 19:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741891621; cv=none; b=oMmTayKdTDJdHloUjobSKFk7h5cVSUhTHL8K6fAWrL6vcJZfWSRJLS9xxXLHeKeQb2EXIBKh7VbhVMdGiRxzZlzurmIlH33KK81zh5u7AMRq09pCQgV7abrnbl/wZsLtoOdyLz39xdyIOAcIobZm0lDeOng3FJWrC5GcERh5SDE=
+	t=1741892908; cv=none; b=IVLXhfe0zF9J6loFdCqMVKJsSXAtBwQYEtjPC98cq0f6o6u9G9WAjIQX6Ey7uF9CkN4vCkg+Qgao+aryjQtXFwnOXHQnR+du0UgAIoe3sca7bvOqrwNCzgxH4yW9wTTwkaFTqI5An2jqEr4F+y82NZ36/YqAdaOcvo5f+BaKPUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741891621; c=relaxed/simple;
-	bh=0pcwQ9vLas23Kk5/y+wVBp5txvPs/bUozChqyYxLVOY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q6pReY6t3Bp8Rctmf6xFrD2hI9Xniki3bTvcYbb9Oj1c0ztKzzfI+6l2wol+nCJCIlbkBQ2aEcik1sQFwt75DhDG5wbqwtSizM2ue0Ht680MNevAMip+Z5jiSZ8w0XpGPtx9NmdWFxFCoVeyzdxmILTftCcka4Kgq8JtSweWrQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=c029q20h; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1741892908; c=relaxed/simple;
+	bh=zebU4/k/EeqtjpAsS6Cj6e8OZa3BjJTLbL/wQkDK6t4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=do+hxqmmqq58tehuFL4L38VJEP5urZb88NvmPTt6OLAPjaeYaeWXi5D4B3qn6VV81i+y5MPV5XxjC16fcBwbkP/SFh8VckipPPx7q1+dbiquF6+9I+EYjFslVeoDacCLELe3V1Gwd8Hi5Ut239zMXbWvhvGbtHubMSor5hlx8Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bzjjle+Y; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="c029q20h"
-Received: from [10.137.184.60] (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id EE024203342A;
-	Thu, 13 Mar 2025 11:46:58 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EE024203342A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741891619;
-	bh=nt8jkVfaRzuUqauG7agUplFqSQ7P9hL/iQtfhXt7daM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c029q20hO7p9pMytBoFbb4lvO9ZDTqP8ojMLWrK9hbwLYNc57V4N0Aa6gWzzJFcHr
-	 esb6o3L0vE8YHyp+7RG+sJdxsuqky6Zy4qUPq4udmjKBOq899yOQu3eWe+Mhi7Jmax
-	 CS5/4KC7mWI6F/acsg68bV6b8QdxWShafCvHoxSA=
-Message-ID: <81612b52-a47b-4d9c-9d50-c74ad66286d9@linux.microsoft.com>
-Date: Thu, 13 Mar 2025 11:46:58 -0700
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bzjjle+Y"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac29fd22163so229373066b.3
+        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 12:08:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741892905; x=1742497705; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v8INpOFDdy6zgQZNj++IeYTATBDv20/pe9DlHWL5cZs=;
+        b=bzjjle+YltrvwEzPaQ/nIfIGias2mZ7q/2d9WdxlAU5YHfWT33LzxThGy0GzkPPGSO
+         xxchSyaFt8D7Q9OcbCQZDbj6vxPqZxi/vZuLH2rMszPjX6u0O+W559oRvIaiAuJkSJDG
+         Ek+9h6s9xCReI4mdN+DMHFs3QDAbv2yZXJGUK64DW0/m2LijvUVbPaGDoihHkkvd5wjp
+         EoEDxNqPAROHtJBf4l/u/rwqhlah4D/qS9jZF/+s+2wiPnIAG5yRccyC3exaZ5PNdSc1
+         QAkhZp88at0Voxry8x26z9cALYWmBS74kDwabIcGNg5PzYus9Ty/xdA/9MIJ6H7vQlSw
+         20dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741892905; x=1742497705;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v8INpOFDdy6zgQZNj++IeYTATBDv20/pe9DlHWL5cZs=;
+        b=lJtWIgQTD6i32kEHHG9gVdEUzoG8SIiOsaZovardvY85iB7/3pK/tR7mwcTglJuLUf
+         iyhDXgLN1cit5ifsCrTacQeroOWcxu+wxdnVkETNKpcAGTm5Vke/xXhBB2uKb4NBJlnz
+         q4Gacfof0W5KKtpK9OIdZ7k+GW8tWF5V8xswx+RnXo6mLao/V1HHxQJwIvE8IMj7iJIp
+         qvrtKL/j+ftxKf6F8TQPHBHXoUrqHoqj2w/IV3RkVyzMox+uOTVIKq110+8MRrdWWuVy
+         18CxlkM85Tfm5UMHB+9QTIa+waVL/PECGntHBjUr6r3oQ0CWyyMyouZSdxuJ8ibbJaDU
+         ZdOg==
+X-Gm-Message-State: AOJu0YxDu2S1xFGm1hVCYdlzu7EPg4jKB5rIf06da1PuQ4/kZSis4TG4
+	6PZMcy0p4nnqfJyiJQehpWT/043Fj9wEoi31teht6eyFaknGxZR5cLqaKiBhqA==
+X-Gm-Gg: ASbGnct5nYTPblDAf22SCGivdXDpX7nsRt6Mbb5QFwv3655TDr88NAUj2gp1vbULenN
+	b4SBKQmKYHehS8zTtDwQaPhwPrvGedjlIYD+fxH9VF7gVMEfXRmiElBD9caJLWiwNPrhf40IwXQ
+	mr0I/iG0Ch4NzHgx6ce2GCNvhhvkAaURb+T5R+PHvnbs6769sGOuerIKY1PW6PJ+11NziVaTqyS
+	sKxwd48+tesuvCuY8k1oDdcGI/+SNsLcAAus41wkXCvSK6uXL40S6YZpOLcqQwcpW06gDHQowXF
+	EvyR71/HvHW/NPdy8JC/vhkn0GEr+ieMFiTX4aKVD2diooNqtZzom3jDTqRVx2xeTzoA1oYRBpa
+	46FlBvLSc8wfRCw==
+X-Google-Smtp-Source: AGHT+IFa00JtzqukTdU3WMYr5CjZc1RVh7xO3wiZcNVvi/pVcZene2/D4xio0rZGpWde7c+HTNy7zQ==
+X-Received: by 2002:a17:907:9452:b0:ac2:bde9:22af with SMTP id a640c23a62f3a-ac3290943a7mr61434466b.13.1741892905085;
+        Thu, 13 Mar 2025 12:08:25 -0700 (PDT)
+Received: from google.com (140.20.91.34.bc.googleusercontent.com. [34.91.20.140])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3149cfb96sm112178066b.119.2025.03.13.12.08.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Mar 2025 12:08:24 -0700 (PDT)
+Date: Thu, 13 Mar 2025 19:08:20 +0000
+From: Quentin Perret <qperret@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	shan.gavin@gmail.com
+Subject: Re: [PATCH] KVM: arm64: Drop sort_memblock_regions()
+Message-ID: <Z9MtJPNm1pLATGo7@google.com>
+References: <20250311043718.91004-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH hyperv-next v5 08/11] Drivers: hv: vmbus: Get the IRQ
- number from DeviceTree
-To: Rob Herring <robh@kernel.org>
-Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de,
- catalin.marinas@arm.com, conor+dt@kernel.org, dave.hansen@linux.intel.com,
- decui@microsoft.com, haiyangz@microsoft.com, hpa@zytor.com,
- joey.gouly@arm.com, krzk+dt@kernel.org, kw@linux.com, kys@microsoft.com,
- lenb@kernel.org, lpieralisi@kernel.org, manivannan.sadhasivam@linaro.org,
- mark.rutland@arm.com, maz@kernel.org, mingo@redhat.com,
- oliver.upton@linux.dev, rafael@kernel.org, ssengar@linux.microsoft.com,
- sudeep.holla@arm.com, suzuki.poulose@arm.com, tglx@linutronix.de,
- wei.liu@kernel.org, will@kernel.org, yuzenghui@huawei.com,
- devicetree@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org,
- apais@microsoft.com, benhill@microsoft.com, bperkins@microsoft.com,
- sunilmut@microsoft.com
-References: <20250307220304.247725-1-romank@linux.microsoft.com>
- <20250307220304.247725-9-romank@linux.microsoft.com>
- <CAL_JsqLmS4EEoPkOmaH6F_0XtQu5wkM-WEfxFvjLA=bJroEUVw@mail.gmail.com>
-Content-Language: en-US
-From: Roman Kisel <romank@linux.microsoft.com>
-In-Reply-To: <CAL_JsqLmS4EEoPkOmaH6F_0XtQu5wkM-WEfxFvjLA=bJroEUVw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311043718.91004-1-gshan@redhat.com>
 
-
-
-On 3/13/2025 11:44 AM, Rob Herring wrote:
-> On Fri, Mar 7, 2025 at 4:03 PM Roman Kisel <romank@linux.microsoft.com> wrote:
-
-[...]
-
->> +       irq = platform_get_irq(pdev, 0);
->> +       if (irq == 0) {
->> +               pr_err("VMBus interrupt mapping failure\n");
->> +               return -EINVAL;
->> +       }
->> +       if (irq < 0) {
->> +               pr_err("VMBus interrupt data can't be read from DeviceTree, error %d\n", irq);
->> +               return irq;
->> +       }
+On Tuesday 11 Mar 2025 at 14:37:18 (+1000), Gavin Shan wrote:
+> Drop sort_memblock_regions() and avoid sorting the copied memory
+> regions to be ascending order on their base addresses, because the
+> source memory regions should have been sorted correctly when they
+> are added by memblock_add() or its variants.
 > 
-> I don't think why you couldn't get the interrupt is important. Just
-> check for (irq <= 0) and be done with it. I'm not even sure if
-> returning 0 is possible now. There's a long history to that and
-> NO_IRQ.
-> 
+> This is generally reverting commit a14307f5310c ("KVM: arm64: Sort
+> the hypervisor memblocks"). No functional changes intended.
 
-That will certainly make the code look much better!
-Thank you very much for the idea!
+I think this was originally introduced in an early version of the code
+where the reserved regions were also registered, hence requiring
+sorting. But yes, with the code as it is today I can't see what would
+break without it, so:
 
-> Rob
+  Reviewed-by: Quentin Perret <qperret@google.com>
 
--- 
-Thank you,
-Roman
-
+Thanks!
+Quentin
