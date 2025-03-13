@@ -1,189 +1,142 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFA81FC7DF
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 07:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E232641F4
+	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 09:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741852225; cv=none; b=I1CWTqRZoweFBcSGDWR+HRPFk/SCDAGa5CEKSx0u6eNxev6RfAvOoLfbEPWlUz1saBbRpqDEjU1v4uuwamTBPGKlB5kzb77/xjBtZIIROVeLH2LGtl2HmfhI+vnBaQI24KoZ039gFUf8wuMHadDfyTZjEqqTRZUgrhTmjpG/+0k=
+	t=1741857234; cv=none; b=EFAObQ+nNCBx+Ii168nNxYB0I2TeCAklKuMhOZGt0FuyOJGoK18Q5sX75mzQOIHKUPm70UTXZ0S7B9kc1UFL5GQsx3yogV2cmHSQWjgb+2fCwwZG7fXdv2nquDCBBe4ZPElsumqIVSX1ueENBXMTUjEJSyibkLLIrIqeI8AAZXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741852225; c=relaxed/simple;
-	bh=DE9V5qFXirrrDlZ2J0gaGeV+rEDW1f1V+Rz06kgDHxI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GbuBAlZyn/0jxFPiPVpT0E9h4iGgBvRTqHlJHa5M0CTjO3t6rUVS7dlNrNd/EfI9lsz2nsxcUH2S1Py77fTHPiWzD2aSt2/eEmQ9PdLTJUhucVs9BR1GLOmRMpRtelnBQZ4ZLaLmIUbNw46aLCB5TejXAub050MTuVgyREwupY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iP4ZO2xl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741857234; c=relaxed/simple;
+	bh=ydB9bTeNot+OE1Xz0uP/spOJpO+hHXQWfxo/NKrFah0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i6am8Bi1KeYTO/Ssw17q6lafJn9oAZeu2nEATSSToUyi9HyiEu1TUdCuJDXCLkBaYyavk9q5x3eF0VJIJcL1CemrmYVhGgOSItN9drTwOOPoLVtAaT8tnrBefiOcZvBYb152MQXMLLqJTsJZVjx8RYSeKiSbzku0bBdP3q5ulKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=No8IbcU9; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iP4ZO2xl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741852222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=MK8zU8BVCYnjzSS/b6+zVESpZfkVHFlkYo1MXlvFt+w=;
-	b=iP4ZO2xlpzm5TFSus4KnfrxYw8z8Wg4a5CKw+wpuZFqfVL327bK8hGwxGaasPLLHvbDvdD
-	sokxVBcHrhctHTRGOFM4XgOeLNA6FyehzzV2Zt6EEOf7i3XejfFA4GMs+CEXv/HY+vBTqQ
-	yxL6bSBhREQgemrKDl/F3uBHTmhhd/g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-326-I1m4BJpyMm25TMnMTe9G4A-1; Thu, 13 Mar 2025 03:50:18 -0400
-X-MC-Unique: I1m4BJpyMm25TMnMTe9G4A-1
-X-Mimecast-MFC-AGG-ID: I1m4BJpyMm25TMnMTe9G4A_1741852217
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d025a52c2so3047485e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 00:50:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="No8IbcU9"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso4017635e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 02:13:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741857230; x=1742462030; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A1vA9sHgurzlxpNTPQ3LIOp8IB6esizGYotCRKHRMvg=;
+        b=No8IbcU9wYtxSYykeJHH9wVY7+UPIdYkUw2s7Mqq2ODsIPRDWjaDMrPJXNQSSOrAZo
+         HyB5PiGgeYtk5aPhYiPgJKGq3SOZYuxVIiaK34FBomObBKakqEAcW0PMCoyRvjLY7i8v
+         KPppIz1MxV/ngIKFgMFkWwGX66uNkBSdiyZ6LbTd/bj5cdTo2UfejAJ0pUD4LwI29yhh
+         oYfkGUaYI0TmSXBU3KWHlYoNwWP6TO6NQwDz9NQj3W8XRvrS+Wa549yocRUYbjl5dYvG
+         yzbXbFMYMtoF7jMOL7o8/9NL1VCKyMmN4rY3H9/OkJDjkwLr1J2F0iaMtSLaEJDvK/de
+         aWWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741852217; x=1742457017;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MK8zU8BVCYnjzSS/b6+zVESpZfkVHFlkYo1MXlvFt+w=;
-        b=lxUrvvRB8kbn91qI1qCUEjJX+HMRqEPVjwumR/A9Nhwen25Goe3iB4Grn+wDV8v6rN
-         K5fVZmfUVfie5XyFql9GOCTrVlytP7K5D3vxu4fVrd601d2rWeGbgYjF3h1qz+tUsCBa
-         WKb4m+GG14JYNJ2Tmk7tMo+H4Wt+oa10OrYSHrm/B6xc0MNKpFq1/50KqYL64Dr5+uxb
-         oTo/SO2t5/6BQlrFkobvKveRB9QjDGoaSezZ0KCfLFdovZ1/AEXXyBsNlvUZql+GzHc2
-         F0hez7jT8lczQZcnOENcl7RJdRpEaIonGC2n/l2xwlgph2K8hZOCyA7JMz3dqKRjyZGf
-         BKPA==
-X-Forwarded-Encrypted: i=1; AJvYcCWuPG9t960giV0i+Mf3AiMD9TV45iPStVXcrL461QLET+SrBY8Cb4Q9qD6MBRAgFHj2XdZ0QF8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyubtK8iMEAwFYQ6YTuS5H30pdRw2oU3N5yrQ/GgeomB9veavYV
-	sksl452HEWyGhxGdHGKqZU+C8t2KyWDIgzWPjEZClJKpWgchjkjU+K+CzmSNUhfB8zGV0sK1dh/
-	pBX3tsvdgdCUJruhjJ+EIr4Yivkc3Tr0z9MbtIWGPHrpbH+pyUA5EnQ==
-X-Gm-Gg: ASbGncvHkZosVNvypGg3an1Mcnlfh7vHZW9DtYKSUOCkgIjJL0cr1oLYTBdcSpHmnVn
-	zMfRCRMGG6N+rLjWD8BEgCAbe7W0oHZ+YMVB7FFGpUUCZkq3Hqh/mb9zVMWKfoJGdb3l7Guqs+g
-	/RMDEf4JKcpAl4bL/fUXeCdiaVHflW4AQo0PM599BG9cqPhnp0Ccf6BVifQU/ob0K7JFwFuT8kW
-	EwlE3iwZ6fb8SvU4+tneKv61hCn6ACUtM06nmcgnPe9tAzd9A7XHub8pn6JkZeJf6HyhwWJSYEN
-	jWJjUiNPL8cOHsbOqixUhodGdB6pTeaDsNuAG4YSnN5tl8I=
-X-Received: by 2002:a05:600c:1d09:b0:43c:efed:732b with SMTP id 5b1f17b1804b1-43cefed78bcmr155422005e9.5.1741852217425;
-        Thu, 13 Mar 2025 00:50:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFwegUed+fQ9ljIYT2+ReraOGwFw7qJPttYdCzfqNHOxAXgAxI15SBvV5/+7QXKHcBvWKjG5A==
-X-Received: by 2002:a05:600c:1d09:b0:43c:efed:732b with SMTP id 5b1f17b1804b1-43cefed78bcmr155421735e9.5.1741852217063;
-        Thu, 13 Mar 2025 00:50:17 -0700 (PDT)
-Received: from [192.168.0.7] (ip-109-42-51-207.web.vodafone.de. [109.42.51.207])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c8e43244sm1218116f8f.60.2025.03.13.00.50.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Mar 2025 00:50:16 -0700 (PDT)
-Message-ID: <0019ac7e-b190-4b1d-9c8d-f5f039cd53ba@redhat.com>
-Date: Thu, 13 Mar 2025 08:50:14 +0100
+        d=1e100.net; s=20230601; t=1741857230; x=1742462030;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A1vA9sHgurzlxpNTPQ3LIOp8IB6esizGYotCRKHRMvg=;
+        b=CPcLqHyNzuK8P7z9phWc5YI7JrIAgdEeE+wY6mUIvf/pUgRNxnGPE9xYanFeUdT8K3
+         PdKNDec8CQeP+Y7teB1J0gTviuhba28XUN9j5VsRmqBXVcpyDumPQPSnamHoWjygL6Fv
+         Qe3sq0TtIBMQ7+oBrhpk5RoFBsU/A1DcX4P+iGhsMaZQDfATcrHr+4MVjmcAhTQr/HUS
+         tBtebbJi9nLAQqZJvG2PZ+d8OlJlCGticau1JzFJftyPZzBLu84Fsf4Kxn/Eideuu3oK
+         NWHDYWucnLq0+31058jR6Yq1cGVm4kkDKAogSjgioK0GJRdFh7J6lEtwMEbUNMaFSWMr
+         6Gjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVgUgERmsIdfXkR4LDphtTywTSWDakyaUAxkOv0MClNKStv46IxbumTxb3/uDCyfdyJV1O/X0U=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy8NwrywnCTc9NHsW8LeGdb1yJfxDOaQc+xdZ8Afr8MS9rCMYar
+	tK1JWYITCVga0NpqJU9ZP0nSROzUTjTnTr//yDkQtr8gdq7EmIFPJj3eIExqxA==
+X-Gm-Gg: ASbGnctr2qGwa+P9ZjEP35/XhX2tPkGrWA3lBQ259gWG9TsshPbH53GgmOYRzIjenEo
+	nUIYeCO3P2nCF0Fsy93dknBaE2i6ZIX2zJUlqQHSKH7CMaNR5fwxHSsgxg5N8R+PdQYd0j73ucF
+	lAaOtlES+1rP+Vty4TGJR7VLTlFWtqNDbDZgWEaLjNiDFX3T/geEmScz32xwp7SD9YfP4ciGmXL
+	yYAytfT/pA9fc4rDL3eBxngafwVicS9Z1W1steH0kX14Y1/gMFj0qpnHBbXkZ0ZRi0XfWVTRF4b
+	sZTziVzpSohpXZzhCE7p7RgeaAnDmbzmnmVSuTFB5z2PULNMXO1GqFWzaiE4y1/RFF4cqHUEPZq
+	cockfxZWep9GX
+X-Google-Smtp-Source: AGHT+IE8nhdSI8oCc7HhvHZ8FNICrr82pSWj5KiIjJGm0gYMIEOr9ifulYDK2iTUrARjY9lcII5V5Q==
+X-Received: by 2002:a05:600c:3591:b0:43c:f16a:641e with SMTP id 5b1f17b1804b1-43cf16a6b0cmr139569915e9.6.1741857230356;
+        Thu, 13 Mar 2025 02:13:50 -0700 (PDT)
+Received: from google.com (105.168.195.35.bc.googleusercontent.com. [35.195.168.105])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d188affdbsm13931305e9.7.2025.03.13.02.13.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Mar 2025 02:13:49 -0700 (PDT)
+Date: Thu, 13 Mar 2025 09:13:45 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	qperret@google.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v3 2/3] KVM: arm64: Distinct pKVM teardown memcache for
+ stage-2
+Message-ID: <Z9KhybW0J2WIX1eU@google.com>
+References: <20250307113411.469018-1-vdonnefort@google.com>
+ <20250307113411.469018-3-vdonnefort@google.com>
+ <87plim7hgc.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2] Makefile: Use CFLAGS in cc-option
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
- linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
-Cc: pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
- lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
- nrb@linux.ibm.com
-References: <20250307091828.57933-2-andrew.jones@linux.dev>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20250307091828.57933-2-andrew.jones@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: PG0oxf7EIJ-M9yvyaZUBmk4WVXGVYwCmxeG8VBXvUOQ_1741852217
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87plim7hgc.wl-maz@kernel.org>
 
-On 07/03/2025 10.18, Andrew Jones wrote:
-> When cross compiling with clang we need to specify the target in
-> CFLAGS and cc-option will fail to recognize target-specific options
-> without it. Add CFLAGS to the CC invocation in cc-option.
+On Wed, Mar 12, 2025 at 08:59:15AM +0000, Marc Zyngier wrote:
+> On Fri, 07 Mar 2025 11:34:10 +0000,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
+> > In order to account for memory dedicated to the stage-2 page-tables, use
+> > a separated memcache when tearing down the VM.
+> > 
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 12691ae23d4c..ace3969e8106 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -246,6 +246,7 @@ typedef unsigned int pkvm_handle_t;
+> >  struct kvm_protected_vm {
+> >  	pkvm_handle_t handle;
+> >  	struct kvm_hyp_memcache teardown_mc;
+> > +	struct kvm_hyp_memcache stage2_teardown_mc;
+> >  	bool enabled;
+> >  };
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index 3927fe52a3dd..15f8d5315959 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -678,7 +678,7 @@ teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
+> >  
+> >  int __pkvm_teardown_vm(pkvm_handle_t handle)
+> >  {
+> > -	struct kvm_hyp_memcache *mc;
+> > +	struct kvm_hyp_memcache *mc, *stage2_mc;
+> >  	struct pkvm_hyp_vm *hyp_vm;
+> >  	struct kvm *host_kvm;
+> >  	unsigned int idx;
+> > @@ -706,7 +706,8 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+> >  
+> >  	/* Reclaim guest pages (including page-table pages) */
+> >  	mc = &host_kvm->arch.pkvm.teardown_mc;
+> > -	reclaim_guest_pages(hyp_vm, mc);
+> > +	stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
+> > +	reclaim_guest_pages(hyp_vm, stage2_mc);
 > 
-> The introduction of the realmode_bits variable is necessary to
-> avoid make failing to build x86 due to CFLAGS referencing itself.
-> 
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> ---
-> v2:
->   - Fixed x86 builds with the realmode_bits variable
-> 
->   Makefile            | 2 +-
->   x86/Makefile.common | 3 ++-
->   2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 78352fced9d4..9dc5d2234e2a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -21,7 +21,7 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
->   
->   # cc-option
->   # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-> +cc-option = $(shell if $(CC) $(CFLAGS) -Werror $(1) -S -o /dev/null -xc /dev/null \
->                 > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
->   
->   libcflat := lib/libcflat.a
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 0b7f35c8de85..e97464912e28 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -98,6 +98,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
->   ifneq ($(CONFIG_EFI),y)
->   tests-common += $(TEST_DIR)/realmode.$(exe) \
->   		$(TEST_DIR)/la57.$(exe)
-> +realmode_bits := $(if $(call cc-option,-m16,""),16,32)
->   endif
->   
->   test_cases: $(tests-common) $(tests)
-> @@ -108,7 +109,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
->   	$(LD) -m elf_i386 -nostdlib -o $@ \
->   	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
->   
-> -$(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
-> +$(TEST_DIR)/realmode.o: bits = $(realmode_bits)
->   
->   $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
->   
+> This looks odd. What counts as stage-2 pages here? Or is it that
+> reclaim_guest_pages() is very badly named?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Yes, this is a naming issue here. How about 
 
+  reclaim_pgtable_pages(hyp_vm, stage2_mc);
+
+Then I can probably drop that /* Push the metadata pages to the teardown
+memcache */  comment as it is clear what is pgtable and what is meta-data?
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
