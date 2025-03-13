@@ -1,34 +1,41 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FACF25FA25
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 10:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10614264FBD;
+	Thu, 13 Mar 2025 11:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741860671; cv=none; b=SDSaXOhSYMyaasKninBSh7j+XBeB91AD5V5nHTHIFg4fn/cPnCyvc9BxWIEa0bV4bp4oJRCDiYK2yZh0LLeMENcoI9H9p6buOQidWSo6WKEmTOemSfUU3J9xjEtZPiX7D/4PwJqtsdyUhGfcs0byONbHGG6Nx8C0KAPkgTwEul0=
+	t=1741865227; cv=none; b=eMVFtxOPy9ny6una0h5VMuhA2nybx9BEpn7bVZXQWSVcggTRgwBsT7Qbl5lJVfdTyzYkjvfu2Rf71g9jRHBdPHNQqxb/0e7zcFfHC/O+W2IJTgUmSNyuO616C7nfVEDqyLMUAqSDou6AIJtbJ3+np4xwiB2nUY4le+94mXzQKVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741860671; c=relaxed/simple;
-	bh=UYe2qQTQ9lBItsA3rokh/UNh0MMugdSzu7HPH94YTD4=;
+	s=arc-20240116; t=1741865227; c=relaxed/simple;
+	bh=H3Sm9drDYVSjHR0XGaZA7OInsYmljvw1bNb0smU/DtA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bC5JoWyjgVpHN/3y05vCmd1NhZTs7oryxnP9ppg3zBH2NebzWi6VJxh3UO6XaC49d4mlvxntELRLx0wobXpsCX+NKb8ACLEsdE3sLrqSI52dtFQoCx7D/w6xL2Yw2NjhEjPhhT3Qw5ysCFDg5brjrYuUoQML2a4fa7KMZiY8E3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C44E41516;
-	Thu, 13 Mar 2025 03:11:18 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6112F3F694;
-	Thu, 13 Mar 2025 03:11:06 -0700 (PDT)
-Date: Thu, 13 Mar 2025 10:11:03 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
-	eric.auger@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2] Makefile: Use CFLAGS in cc-option
-Message-ID: <Z9KvNzQnkFSTvmoE@raptor>
-References: <20250307091828.57933-2-andrew.jones@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=C3rr1Kx8fQkmtjio3PlSKyIdOMsMmctgMWnw8RNSiN0b81mKWQML6fuyPWCd3ycmd4NVAeBk2JhAs/UMCPzoSh2//RXYen0GHuTMeQkGbZfsVf8rO+GvQhwA7M159GmHg5VfLoHkjHU+gU5PwA9oLPKYtJEL0Ka5bNuVZ4HEcEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLlLZEPG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLlLZEPG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7018DC4CEE5;
+	Thu, 13 Mar 2025 11:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741865225;
+	bh=H3Sm9drDYVSjHR0XGaZA7OInsYmljvw1bNb0smU/DtA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eLlLZEPGuZaF+vWTcpzYAFYzGPShEx7NHj0ul2aaX1eN0GGEx+pM8w7xCEVwvrcMh
+	 4xP8Yo2MEciS0wVCgHYmkDOqptKjIJnc5OubeOlWxl+0KxkiGhhu9teq1h+nNY30qa
+	 PGFR8KOXWKdaDFWv+PB/H5+V8oTywOB2O6t3+acetjNzx5zVJvwvVEkqdxGz95rLXV
+	 v9vn7Pthz+whbfRTcL/t103RZxIzl0hNMiEBBCcxjA0XV7gC6AqOrxsrtdGzwHUQWj
+	 6vt3EJ6TMV8oWviZ+XfRWCbskhtGTCOLlrOvJwkHPsj984E1qsxvM9wk60n4Wpa22D
+	 nV2MlVBPgtQ4g==
+Date: Thu, 13 Mar 2025 11:26:59 +0000
+From: Will Deacon <will@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, qperret@google.com, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, shan.gavin@gmail.com
+Subject: Re: [PATCH] KVM: arm64: Drop sort_memblock_regions()
+Message-ID: <20250313112659.GA7223@willie-the-truck>
+References: <20250311043718.91004-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,69 +44,27 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250307091828.57933-2-andrew.jones@linux.dev>
+In-Reply-To: <20250311043718.91004-1-gshan@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi Drew,
-
-Thank you for debugging this. I tested the patch by compiling the MTE test
-from Vladimir with clang and it works now:
-
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
-On Fri, Mar 07, 2025 at 10:18:29AM +0100, Andrew Jones wrote:
-> When cross compiling with clang we need to specify the target in
-> CFLAGS and cc-option will fail to recognize target-specific options
-> without it. Add CFLAGS to the CC invocation in cc-option.
+On Tue, Mar 11, 2025 at 02:37:18PM +1000, Gavin Shan wrote:
+> Drop sort_memblock_regions() and avoid sorting the copied memory
+> regions to be ascending order on their base addresses, because the
+> source memory regions should have been sorted correctly when they
+> are added by memblock_add() or its variants.
 > 
-> The introduction of the realmode_bits variable is necessary to
-> avoid make failing to build x86 due to CFLAGS referencing itself.
+> This is generally reverting commit a14307f5310c ("KVM: arm64: Sort
+> the hypervisor memblocks"). No functional changes intended.
 > 
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
-> v2:
->  - Fixed x86 builds with the realmode_bits variable
-> 
->  Makefile            | 2 +-
->  x86/Makefile.common | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 78352fced9d4..9dc5d2234e2a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -21,7 +21,7 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
->  
->  # cc-option
->  # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-> +cc-option = $(shell if $(CC) $(CFLAGS) -Werror $(1) -S -o /dev/null -xc /dev/null \
->                > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
->  
->  libcflat := lib/libcflat.a
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 0b7f35c8de85..e97464912e28 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -98,6 +98,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
->  ifneq ($(CONFIG_EFI),y)
->  tests-common += $(TEST_DIR)/realmode.$(exe) \
->  		$(TEST_DIR)/la57.$(exe)
-> +realmode_bits := $(if $(call cc-option,-m16,""),16,32)
->  endif
->  
->  test_cases: $(tests-common) $(tests)
-> @@ -108,7 +109,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
->  	$(LD) -m elf_i386 -nostdlib -o $@ \
->  	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
->  
-> -$(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
-> +$(TEST_DIR)/realmode.o: bits = $(realmode_bits)
->  
->  $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
->  
-> -- 
-> 2.48.1
-> 
+>  arch/arm64/kvm/pkvm.c | 19 -------------------
+>  1 file changed, 19 deletions(-)
+
+It's not especially obvious from the memblock API that the memblocks
+are sorted and so for_each_mem_region() will traverse the regions in
+order. But it does appear to be true, so I suppose this is fine:
+
+Acked-by: Will Deacon <will@kernel.org>
+
+Will
