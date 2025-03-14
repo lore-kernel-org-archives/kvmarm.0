@@ -1,126 +1,103 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA8D1F1927
-	for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 19:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA4A2E338F;
+	Fri, 14 Mar 2025 00:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741893203; cv=none; b=b/ZGzk4o7Wi7D2oLr+eGPdv9tWT/sYJx5Gl2Ld9JVITHSteREjaHw7LF53T1y8Gg+tpfRxc0OYpGA7h8Tjg6frpH2XBG34wOct+HTZHq3Ci5vQ4GTEooubc8yvFGCWB8CR/yhL/eqE9udCUfmPj1i6yuigYC6WvJlNyJGkzRjyI=
+	t=1741912532; cv=none; b=Qv8txPUsoUABY/Efg9oivaAxRHFHiy77lqiqnkkEg40ziNEqzPCCA/Hm/76pTRA+k75yvWVEy/83FOpo2q9yIVo3l9x8z0oVeIFXNnj13nal1x4RvQrg2/OJc/T8dvVa31pHwhONewJJf2+5kkfnMhSAZUdwkBzgj38X+hMwd9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741893203; c=relaxed/simple;
-	bh=FtUI3xUhxfCo5TgFRn1lRnA7XfmVSLNMqAj1tPGSaBw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g911rdwa570j29o56vHR/IxcLQ1opN2+NN/0TbkMnIlQRwyLYATb5Z9V4WGLJYVDpJOSSugKdbR+cujW8Iiu1HQ9IkQBkKmOc1IKsLuqzxuIn9bKwPouTivWOTBT5IvAJd5iQ7c9/PfUVN48KV91qG30J82F2OhacL6yHbiAp4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K4QNtLGa; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1741912532; c=relaxed/simple;
+	bh=VyNq+KGq1MvIt8wiPP9z3NWuSyZC8HNFid8j1ag0ziU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eSwFh+wbO3uedB3Js4W7RC85ZjNdPnoQRnda6nCGfyy1qfm+eEQ5ORaMde0WxwvqVxxQy1u+qT3cPgdOyrs/s08LA5dTHpQbPpv7+rJ00DMZsjhiluCspv56WSE/wPT3gBaqvitd4FyaXvFGyq84a7FTl6SpkxFAGPzIG61hmpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYmhn1lR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4QNtLGa"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ac25d2b2354so232074966b.1
-        for <kvmarm@lists.linux.dev>; Thu, 13 Mar 2025 12:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741893199; x=1742497999; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L3F+szF2XQGRywilPjvawnmOy3jehJGbZVMLTgFQTJw=;
-        b=K4QNtLGaIxohAWaIsBtxgq/xw969YzhNHbNFNL/4xHxPlNTrm7WRNKGHB90qRhFijR
-         EGsqyOCQUBxmFar8pZMSm3QuzaTHMVE8u0k/XWPs4X0zG84h9XNmozWOSMGUAbZdpTee
-         noXqdCEzpUcGDxbEEnSdK8dh6sFcDgh9AT7wa5Te2ZlWoiNSepF7iVI5jj0wM1BLpxxA
-         jHHJYQTVoE1dkFzzf6rIr6EOmu+PqQzL+bw6PYaIMOo1zdSssHARIHdvczFH9zAyfSwZ
-         Dxqfy6U1z9AgoYMCj8pw7eSd+NLWPQ01gXzpNzOTcISgObZ4JCOd81AGpbKC777t7Vtf
-         7hrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741893199; x=1742497999;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L3F+szF2XQGRywilPjvawnmOy3jehJGbZVMLTgFQTJw=;
-        b=wMVSc1zGvxkr1LJTzZKYv4R2jqUd3whYeeF4QtFtYM6jPbTFKNvp1AJFfnKG8hOjXd
-         sVRd9ZLZH8wrXnqxJcQ+wqUbVtTZnR8qqBZUSdIErFxnZk+bpmyFc2EYnFx8bk2v2Mo2
-         chErCbnvuSxOZM/LfGP3XWFNONz9PNU+pkhdNwOnpWrqgPLgTLQUT+N791wqgjkuYfxo
-         dJgzlBk9BKQ069bHeR4hHLoKMnSRty5NoGPV4Fa2OowYs8l3Wc5l9usD8tbkmPMkLy04
-         OSgne5a2rclY0Li+sURwvX2wYGHvLVHtpLGUTpqU7h0I40fotglWULPaAzZb2/ZcCPC8
-         NTNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWj4FCRagJgcm9cX5FuHJiDMEVIiekQcT4Dh+aB5gmkvluj8nLd5RKTTCxCMcCdvbSJN9vzbHk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzyQuc5VDz8KDMsEIzXLY1w2Obdt9jztqC5nz6GWE8Gm/ueQL3e
-	xWi6Hikp+Rni7F5nyp1NeBEkInCzEHuLFCoVXM0mkFuEH09zKRs7Gs2gK8iWCw==
-X-Gm-Gg: ASbGncumiUqsObCjOz8Fn95dGZEw872AlA+kJCE4tN0eeCDAOeepcUMCh5H7gEJMGmu
-	vn1+D+jU4eawtG+FXgY5VjUFKIaWleLKklkEZxq15EY6mhMxi1MpHwzUfVBt5AZx41l26yAMS6j
-	tk7wmDxGFiTk3Rdd5CdoyP2uA6XfgdF4cBLmEfG2Mjpbxpd5T0gHSx4xXsDWBg6s0gRnV3IctaH
-	zW5fL1HkLggVCIYxNAgOELjUMUnPFMHeQK68mUcbWs1HucPUg47MAQ5F1RhUYPQ3yixhUoPWBMO
-	Mkshqdy0FnGynf0/R/LsYusG08yjjr7lkvieIfDpXQBR3LU/EOSQ4wW6fNswQ0KidyiwrDUCGG6
-	Swg1v5iqs/EtwOA==
-X-Google-Smtp-Source: AGHT+IEanomM0uBClXIAdabeKJSIm41T83oGDtOVqnFsMRhIN+NlCFIyaB46i6op0dkiYwNIf1+dsA==
-X-Received: by 2002:a17:907:9718:b0:abf:c20d:501a with SMTP id a640c23a62f3a-ac3290b6383mr73370666b.16.1741893198827;
-        Thu, 13 Mar 2025 12:13:18 -0700 (PDT)
-Received: from google.com (140.20.91.34.bc.googleusercontent.com. [34.91.20.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3149ced82sm113262066b.123.2025.03.13.12.13.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 12:13:18 -0700 (PDT)
-Date: Thu, 13 Mar 2025 19:13:14 +0000
-From: Quentin Perret <qperret@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
-Message-ID: <Z9MuSsOQuTy1kAwK@google.com>
-References: <20250227003310.367350-1-qperret@google.com>
- <20250227003310.367350-5-qperret@google.com>
- <Z8V6xOVCPp7OOX6g@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYmhn1lR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B9CCC4CEDD;
+	Fri, 14 Mar 2025 00:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741912532;
+	bh=VyNq+KGq1MvIt8wiPP9z3NWuSyZC8HNFid8j1ag0ziU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=TYmhn1lReFx7HqpHz7FNDUatxOYRkovryGt6eytl6lix7lIv5n6uIpOJmOr+ye0av
+	 1gqtfvkezEa65puhBHAxJNsT+IuV2KMwFSTQDuSLTxa1Spx+Z1jlf4+Rc9gWS7U4mF
+	 2C/LgGLz4bMeC7ttf79wfv76zaa7UCtGkRGa4f/IHQQ7aiH7jI4r92ajtKgFlISjuB
+	 12KtrSgl/2UHfo1hhJx+/nekZJ4ZP6ezlimWaJF52b1lc7PrRgcvRtKCBiH1/nPxZP
+	 0UkgqCvf+buMXnw2163qrVZIjqooFH6HuTg9T+uMo6R7Hl/rInvjMEcmENfy+vSmYh
+	 eEE/3LgSFuOPA==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 6.12 0/8] KVM: arm64: Backport of SVE fixes to v6.12
+Date: Fri, 14 Mar 2025 00:35:12 +0000
+Message-Id: <20250314-stable-sve-6-12-v1-0-ddc16609d9ba@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8V6xOVCPp7OOX6g@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMB502cC/x2M0QpAQBAAf0X7bOW2HPkVeTjssSV0q0vJvzvmb
+ R5mblAOwgptdkPgKCr7lsTkGYyL22ZGmZIDlVSVRDXq6YaVUSOjRUNYfzRuosYPkKojsJfrP3Z
+ gC0PQP88LKyV13GcAAAA=
+X-Change-ID: 20250227-stable-sve-6-12-777778ad28fb
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>, Fuad Tabba <tabba@google.com>, 
+ James Clark <james.clark@linaro.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Eric Auger <eauger@redhat.com>, Wilco Dijkstra <wilco.dijkstra@arm.com>, 
+ Eric Auger <eric.auger@redhat.com>, Florian Weimer <fweimer@redhat.com>, 
+ Jeremy Linton <jeremy.linton@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: b4 0.15-dev-1b0d6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1489; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=VyNq+KGq1MvIt8wiPP9z3NWuSyZC8HNFid8j1ag0ziU=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBn03nI3rQ4drECSXEBo2LN0vtyTJ1f6g66RUTjVnPy
+ wNOvBvyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ9N5yAAKCRAk1otyXVSH0NKZB/
+ 9dOhtBrW+mr33/W9jdpsdEIw5mqmE2blfsMLfBq4tSa5siK11+owL5BRRUIgZZPfsG65cK9chUQh4i
+ 2IoPq23ynTiVbKG2kfmO6DGHlQss1tvINsdvYfHUSkyJ/awIKBueb+XWdsxG00daKgw7CcQd3A98vN
+ zoUXD2XCitYM6znjQGCZSiPZ+5c8e0LKj1bQe6dteUR2h0tk6Ojx8FHeYM8NxW6aX/zLNteZTFIJ1Y
+ jJb6Ll/vhUjmD2uZMO39pulqDXwbDwe9i4cqu4r/JRdXPAj4GDrkzQpoyH0UskWThr1tTlSUqGYMpW
+ L6Ql7o+bczEt6GNBCXeapnmRtcAaWD
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Monday 03 Mar 2025 at 09:47:48 (+0000), Vincent Donnefort wrote:
-> [...]
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > index 1a414288fe8c..955c431af5d0 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> > @@ -194,16 +194,20 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> >  
-> >  	/*
-> >  	 * Adjust the host stage-2 mappings to match the ownership attributes
-> > -	 * configured in the hypervisor stage-1.
-> > +	 * configured in the hypervisor stage-1, and make sure to propagate them
-> > +	 * to the hyp_vmemmap state.
-> >  	 */
-> >  	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
-> >  	switch (state) {
-> >  	case PKVM_PAGE_OWNED:
-> > +		set_hyp_state(phys, PKVM_PAGE_OWNED);
-> >  		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
-> >  	case PKVM_PAGE_SHARED_OWNED:
-> > +		set_hyp_state(phys, PKVM_PAGE_SHARED_OWNED);
-> >  		set_host_state(phys, PKVM_PAGE_SHARED_BORROWED);
-> >  		break;
-> >  	case PKVM_PAGE_SHARED_BORROWED:
-> > +		set_hyp_state(phys, PKVM_PAGE_SHARED_BORROWED);
-> >  		set_host_state(phys, PKVM_PAGE_SHARED_OWNED);
-> >  		break;
-> >  	default:
-> 
-> Are the SHARED_OWNED/SHARED_BORROWED still relevant since the introduction of
-> "KVM: arm64: Don't map 'kvm_vgic_global_state' at EL2 with pKVM"? It doesn't
-> seem we have any !OWNED pages in the hyp anymore at setup, do we?
+This series backports some recent fixes for SVE/KVM interactions from
+Mark Rutland to v6.12.
 
-That's a good point. I personally don't hate that we have this code here
-for completeness though -- it's simple enough that maintaining it isn't
-too bad, and if we were to add shared pages in the future it would 'just
-work'. But no strong opinion. I guess we could also remove this code as
-a separate clean-up, this isn't specific to this series.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Fuad Tabba (1):
+      KVM: arm64: Calculate cptr_el2 traps on activating traps
 
-Thanks!
-Quentin
+Mark Rutland (7):
+      KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
+      KVM: arm64: Remove host FPSIMD saving for non-protected KVM
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN
+      KVM: arm64: Refactor exit handlers
+      KVM: arm64: Mark some header functions as inline
+      KVM: arm64: Eagerly switch ZCR_EL{1,2}
+
+ arch/arm64/include/asm/kvm_host.h       |  25 ++----
+ arch/arm64/kernel/fpsimd.c              |  25 ------
+ arch/arm64/kvm/arm.c                    |   9 ---
+ arch/arm64/kvm/fpsimd.c                 | 100 ++----------------------
+ arch/arm64/kvm/hyp/entry.S              |   5 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 133 ++++++++++++++++++++++---------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  15 ++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  29 -------
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 134 ++++++++++++++++++--------------
+ arch/arm64/kvm/hyp/vhe/switch.c         |  21 ++---
+ 10 files changed, 204 insertions(+), 292 deletions(-)
+---
+base-commit: e9cc806c0152fa9993f817cebf42989a3e2530bb
+change-id: 20250227-stable-sve-6-12-777778ad28fb
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
