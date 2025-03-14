@@ -1,41 +1,41 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74F420550F
-	for <kvmarm@lists.linux.dev>; Fri, 14 Mar 2025 22:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D131D1EF0B7
+	for <kvmarm@lists.linux.dev>; Fri, 14 Mar 2025 22:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741991683; cv=none; b=cvvIE2nWzQ4YGgGjA6Ignd8c2CppWKHX+FWq4gKK5QH9OcS8lUHfLZoMj0FdnHF+8lgS60iqF0VLZWY9H7IMqoo/qJadZtBjtozaZoqPXmdAW5ZvYPNqlUG3fFem9UXF/R+qMUOlzgNhNsITQghiWwWhYSPeoSi3J967fEDolDA=
+	t=1741991684; cv=none; b=BfbWJL3XR4zpPcMek3fJnLwHrE0s46hK15hYEfbWKa8edkDPgc/R0+CHmOPOt96EQAvgBWaCdUXLqm9Zjb/CngPxhHauLYsFFiglVWJr7lnbEEs9+CrW8+xTef7rfOxXCeG3zjg427uwsrI0NmoJf3L+Ojq3hBQiI46n97FnRFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741991683; c=relaxed/simple;
-	bh=nr18M0ApcYyzJwa9HfncxSoeNNznBh8CgzSXR+/UJns=;
+	s=arc-20240116; t=1741991684; c=relaxed/simple;
+	bh=PI3qpl/Os+oDiKonnhdp5LSgH4uy+R7Wr6DL0QZM0kg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Uv/G3osZK8BicF6S9KVaAeT0sHQ/yEdlXKtvtzUmv/5+m0TZxLl4pS8I0nKZLnDBfcFxF3ufkYE5M0aBTMCiYF1O1iEW8y/REy6mhutmouRuH7x0rgcmrU4WX/73ezjEV/ZFEfHv7DIV+M5+CXMAtfCDkhaUIXdbqA6go0DfuaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TKrzERJK; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=ZpZr39mneq7zemFdVRvHUsME6ZWb4WHHPzF65kJ+enIjyMD+8uXLZmfih0+wuUyRBsUF/qeQlFImJp0sR4moY6EkpbJgCj2QlzzHd9nj00ywuEgshDW/ChDZm+o+fnA/+YAYAd2fvS/FdFsNuNynwHRqa4oxosKleQk/NHS7/ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hyxCfitb; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TKrzERJK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hyxCfitb"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741991679;
+	t=1741991676;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jS7GnXS57Xs/azpQBXOhcxeHSWhp2577+Gf5EPDZT7g=;
-	b=TKrzERJKVosBm5GH1navXAiL5WZi5eVkteb0CikapFuMoAX7evPfentk60yQIrPFswKM3l
-	NPUnhDtZxxhfjwjtfI6JCueKEznGAt8yBGAwfmaSGdq4kIBTUfbnM2aIFxWSWL0JluC0TX
-	sdUW2hahNpFC51P2O2PSNw6qpc/BVug=
+	bh=z8ht/DCn7aPa+Qq2t7+UlM5jrTFYFcOoFzFNyBPpZzM=;
+	b=hyxCfitby4M6F14nzoyGMnbi19xMaH68kRxIMQ4Xn5lSOKekANDqh4dMoiIbAVQOnPQaYP
+	C8Te820LUFmwOajdWNTiXnHHdbW5Ofy+ovEfgRXeqT6+LB3/0a1ODCjsDwkxc0Pkfw6XR0
+	6ZquAjSk2MhLrp8lu0zgwicQu70vfqQ=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
 	Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [RFC kvmtool 8/9] arm64: Rename top-level directory
-Date: Fri, 14 Mar 2025 15:25:15 -0700
-Message-Id: <20250314222516.1302429-9-oliver.upton@linux.dev>
+Subject: [RFC kvmtool 6/9] arm64: Move remaining kvm/* headers
+Date: Fri, 14 Mar 2025 15:25:13 -0700
+Message-Id: <20250314222516.1302429-7-oliver.upton@linux.dev>
 In-Reply-To: <20250314222516.1302429-1-oliver.upton@linux.dev>
 References: <20250314222516.1302429-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -47,194 +47,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-As a finishing touch, align the top-level arch directory name with the
-kernel's naming scheme.
+Move the remaining kvm/* headers into the top-level ARM include path.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- Makefile                                     | 24 ++++++++++----------
- {arm => arm64}/arm-cpu.c                     |  0
- {arm => arm64}/fdt.c                         |  0
- {arm => arm64}/gic.c                         |  0
- {arm => arm64}/gicv2m.c                      |  0
- {arm => arm64}/include/arm-common/gic.h      |  0
- {arm => arm64}/include/arm-common/pci.h      |  0
- {arm => arm64}/include/arm-common/timer.h    |  0
- {arm => arm64}/include/asm/image.h           |  0
- {arm => arm64}/include/asm/kernel.h          |  0
- {arm => arm64}/include/asm/kvm.h             |  0
- {arm => arm64}/include/asm/pmu.h             |  0
- {arm => arm64}/include/asm/sve_context.h     |  0
- {arm => arm64}/include/kvm/barrier.h         |  0
- {arm => arm64}/include/kvm/fdt-arch.h        |  0
- {arm => arm64}/include/kvm/kvm-arch.h        |  0
- {arm => arm64}/include/kvm/kvm-config-arch.h |  0
- {arm => arm64}/include/kvm/kvm-cpu-arch.h    |  0
- {arm => arm64}/ioport.c                      |  0
- {arm => arm64}/kvm-cpu.c                     |  0
- {arm => arm64}/kvm.c                         |  0
- {arm => arm64}/pci.c                         |  0
- {arm => arm64}/pmu.c                         |  0
- {arm => arm64}/pvtime.c                      |  0
- {arm => arm64}/timer.c                       |  0
- 25 files changed, 12 insertions(+), 12 deletions(-)
- rename {arm => arm64}/arm-cpu.c (100%)
- rename {arm => arm64}/fdt.c (100%)
- rename {arm => arm64}/gic.c (100%)
- rename {arm => arm64}/gicv2m.c (100%)
- rename {arm => arm64}/include/arm-common/gic.h (100%)
- rename {arm => arm64}/include/arm-common/pci.h (100%)
- rename {arm => arm64}/include/arm-common/timer.h (100%)
- rename {arm => arm64}/include/asm/image.h (100%)
- rename {arm => arm64}/include/asm/kernel.h (100%)
- rename {arm => arm64}/include/asm/kvm.h (100%)
- rename {arm => arm64}/include/asm/pmu.h (100%)
- rename {arm => arm64}/include/asm/sve_context.h (100%)
- rename {arm => arm64}/include/kvm/barrier.h (100%)
- rename {arm => arm64}/include/kvm/fdt-arch.h (100%)
- rename {arm => arm64}/include/kvm/kvm-arch.h (100%)
- rename {arm => arm64}/include/kvm/kvm-config-arch.h (100%)
- rename {arm => arm64}/include/kvm/kvm-cpu-arch.h (100%)
- rename {arm => arm64}/ioport.c (100%)
- rename {arm => arm64}/kvm-cpu.c (100%)
- rename {arm => arm64}/kvm.c (100%)
- rename {arm => arm64}/pci.c (100%)
- rename {arm => arm64}/pmu.c (100%)
- rename {arm => arm64}/pvtime.c (100%)
- rename {arm => arm64}/timer.c (100%)
+ arm/aarch64/include/kvm/fdt-arch.h         | 6 ------
+ arm/{aarch64 => }/include/kvm/barrier.h    | 0
+ arm/include/{arm-common => kvm}/fdt-arch.h | 0
+ 3 files changed, 6 deletions(-)
+ delete mode 100644 arm/aarch64/include/kvm/fdt-arch.h
+ rename arm/{aarch64 => }/include/kvm/barrier.h (100%)
+ rename arm/include/{arm-common => kvm}/fdt-arch.h (100%)
 
-diff --git a/Makefile b/Makefile
-index 3085609..60e551f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -169,19 +169,19 @@ endif
- # ARM64
- ifeq ($(ARCH), arm64)
- 	DEFINES		+= -DCONFIG_ARM64
--	OBJS		+= arm/fdt.o
--	OBJS		+= arm/gic.o
--	OBJS		+= arm/gicv2m.o
--	OBJS		+= arm/ioport.o
--	OBJS		+= arm/kvm.o
--	OBJS		+= arm/kvm-cpu.o
--	OBJS		+= arm/pci.o
--	OBJS		+= arm/timer.o
-+	OBJS		+= arm64/fdt.o
-+	OBJS		+= arm64/gic.o
-+	OBJS		+= arm64/gicv2m.o
-+	OBJS		+= arm64/ioport.o
-+	OBJS		+= arm64/kvm.o
-+	OBJS		+= arm64/kvm-cpu.o
-+	OBJS		+= arm64/pci.o
-+	OBJS		+= arm64/timer.o
- 	OBJS		+= hw/serial.o
--	OBJS		+= arm/arm-cpu.o
--	OBJS		+= arm/pvtime.o
--	OBJS		+= arm/pmu.o
--	ARCH_INCLUDE	:= arm/include
-+	OBJS		+= arm64/arm-cpu.o
-+	OBJS		+= arm64/pvtime.o
-+	OBJS		+= arm64/pmu.o
-+	ARCH_INCLUDE	:= arm64/include
- 
- 	ARCH_WANT_LIBFDT := y
- 	ARCH_HAS_FLASH_MEM := y
-diff --git a/arm/arm-cpu.c b/arm64/arm-cpu.c
+diff --git a/arm/aarch64/include/kvm/fdt-arch.h b/arm/aarch64/include/kvm/fdt-arch.h
+deleted file mode 100644
+index e448bf1..0000000
+diff --git a/arm/aarch64/include/kvm/barrier.h b/arm/include/kvm/barrier.h
 similarity index 100%
-rename from arm/arm-cpu.c
-rename to arm64/arm-cpu.c
-diff --git a/arm/fdt.c b/arm64/fdt.c
+rename from arm/aarch64/include/kvm/barrier.h
+rename to arm/include/kvm/barrier.h
+diff --git a/arm/include/arm-common/fdt-arch.h b/arm/include/kvm/fdt-arch.h
 similarity index 100%
-rename from arm/fdt.c
-rename to arm64/fdt.c
-diff --git a/arm/gic.c b/arm64/gic.c
-similarity index 100%
-rename from arm/gic.c
-rename to arm64/gic.c
-diff --git a/arm/gicv2m.c b/arm64/gicv2m.c
-similarity index 100%
-rename from arm/gicv2m.c
-rename to arm64/gicv2m.c
-diff --git a/arm/include/arm-common/gic.h b/arm64/include/arm-common/gic.h
-similarity index 100%
-rename from arm/include/arm-common/gic.h
-rename to arm64/include/arm-common/gic.h
-diff --git a/arm/include/arm-common/pci.h b/arm64/include/arm-common/pci.h
-similarity index 100%
-rename from arm/include/arm-common/pci.h
-rename to arm64/include/arm-common/pci.h
-diff --git a/arm/include/arm-common/timer.h b/arm64/include/arm-common/timer.h
-similarity index 100%
-rename from arm/include/arm-common/timer.h
-rename to arm64/include/arm-common/timer.h
-diff --git a/arm/include/asm/image.h b/arm64/include/asm/image.h
-similarity index 100%
-rename from arm/include/asm/image.h
-rename to arm64/include/asm/image.h
-diff --git a/arm/include/asm/kernel.h b/arm64/include/asm/kernel.h
-similarity index 100%
-rename from arm/include/asm/kernel.h
-rename to arm64/include/asm/kernel.h
-diff --git a/arm/include/asm/kvm.h b/arm64/include/asm/kvm.h
-similarity index 100%
-rename from arm/include/asm/kvm.h
-rename to arm64/include/asm/kvm.h
-diff --git a/arm/include/asm/pmu.h b/arm64/include/asm/pmu.h
-similarity index 100%
-rename from arm/include/asm/pmu.h
-rename to arm64/include/asm/pmu.h
-diff --git a/arm/include/asm/sve_context.h b/arm64/include/asm/sve_context.h
-similarity index 100%
-rename from arm/include/asm/sve_context.h
-rename to arm64/include/asm/sve_context.h
-diff --git a/arm/include/kvm/barrier.h b/arm64/include/kvm/barrier.h
-similarity index 100%
-rename from arm/include/kvm/barrier.h
-rename to arm64/include/kvm/barrier.h
-diff --git a/arm/include/kvm/fdt-arch.h b/arm64/include/kvm/fdt-arch.h
-similarity index 100%
-rename from arm/include/kvm/fdt-arch.h
-rename to arm64/include/kvm/fdt-arch.h
-diff --git a/arm/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
-similarity index 100%
-rename from arm/include/kvm/kvm-arch.h
-rename to arm64/include/kvm/kvm-arch.h
-diff --git a/arm/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-similarity index 100%
-rename from arm/include/kvm/kvm-config-arch.h
-rename to arm64/include/kvm/kvm-config-arch.h
-diff --git a/arm/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
-similarity index 100%
-rename from arm/include/kvm/kvm-cpu-arch.h
-rename to arm64/include/kvm/kvm-cpu-arch.h
-diff --git a/arm/ioport.c b/arm64/ioport.c
-similarity index 100%
-rename from arm/ioport.c
-rename to arm64/ioport.c
-diff --git a/arm/kvm-cpu.c b/arm64/kvm-cpu.c
-similarity index 100%
-rename from arm/kvm-cpu.c
-rename to arm64/kvm-cpu.c
-diff --git a/arm/kvm.c b/arm64/kvm.c
-similarity index 100%
-rename from arm/kvm.c
-rename to arm64/kvm.c
-diff --git a/arm/pci.c b/arm64/pci.c
-similarity index 100%
-rename from arm/pci.c
-rename to arm64/pci.c
-diff --git a/arm/pmu.c b/arm64/pmu.c
-similarity index 100%
-rename from arm/pmu.c
-rename to arm64/pmu.c
-diff --git a/arm/pvtime.c b/arm64/pvtime.c
-similarity index 100%
-rename from arm/pvtime.c
-rename to arm64/pvtime.c
-diff --git a/arm/timer.c b/arm64/timer.c
-similarity index 100%
-rename from arm/timer.c
-rename to arm64/timer.c
+rename from arm/include/arm-common/fdt-arch.h
+rename to arm/include/kvm/fdt-arch.h
 -- 
 2.39.5
 
