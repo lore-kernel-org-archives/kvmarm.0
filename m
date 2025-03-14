@@ -1,44 +1,46 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539C61E86E;
-	Fri, 14 Mar 2025 05:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBC9193435
+	for <kvmarm@lists.linux.dev>; Fri, 14 Mar 2025 08:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741930369; cv=none; b=oAq5LbL/XvXAE7exWKk9Gzv0BdLckShlDm9SaGHrFYjITIsOer/Vnk8/HLYZfakaDOB4h7iKr458ultMGtFiK+xEJ9PCNcNLgIdX1Lh5TOYozD3ctzTWumw3srjXr6zGb4J0WafgOOSUvsozBcLeeoFdmlOsU5OxiDyaeDAPqqc=
+	t=1741939866; cv=none; b=HbkdbukY83QB5UJfvzyVM8whLUf0BCbT0sZ17QhivNgB6XKDlFudhtw+s47HqhJaEUgIH6c8qun7uyhz+M5Q+8mp7U2ia3NAKiVuxsUXYgmFRhPb9ooUAESw9dJsf8bbDcRzLBqfaelzt9QLSQhUSGFQRn4PgtyZROBuzZcx6jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741930369; c=relaxed/simple;
-	bh=Gqip2u1dKZM5ihrffxMctAlWaVDbG4jUMPKuit18Zpk=;
+	s=arc-20240116; t=1741939866; c=relaxed/simple;
+	bh=pO7tTO1rV95NIoQMWhWLdGMcS+ijoaLqtx251avqfLs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cfp7Cj2EXUJRCTihtpYTGON6k+HrlIf5BuKp00yi5+dml6iSWzWDie+xUhUuhVLzP+5W+uYw14FfG0azqH2JFZq2a69ctREbNyJZwtxn7IHcpbt0r9pfp5PtBiDdtPAp/NVgs7wWPNfBjojY7qbhbJ012nbuOofHAlFAyatb4y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RfQoWP7U; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q4Rg03A4Lay7qLQX0jE/cuYmhjk7KQQaTujJBumYW4P2iXGOr7SmGYyOQvanhszUHO5yCJDCalT8wRm6ikX/L2H+67U+Z04uQJh6Tg3gkLJT2C4ujUIObmD7G08FsV83wLtBn6R5+Oshb6HEn8TpLOa4PJTpNuJ54BhasWX8Xv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kFiYHKvF; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RfQoWP7U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D9B6C4CEE3;
-	Fri, 14 Mar 2025 05:32:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1741930368;
-	bh=Gqip2u1dKZM5ihrffxMctAlWaVDbG4jUMPKuit18Zpk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RfQoWP7UNXyhVa14p9u5HeB1t3Ss4Pk8U9FROmk/VakXRN9O8U43W9QH75Ya2wT0P
-	 oecQf01nK6rnaGaQBWjE1efeNDTDt4CZkqvC+mG6/7Jwo+l78UF6rMpxXT11zZYTZP
-	 wSz3x4mxwDPsCW/CP1BR6Xhh9H/pvZdF/Tcpkl4Q=
-Date: Fri, 14 Mar 2025 06:32:45 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kFiYHKvF"
+Date: Fri, 14 Mar 2025 01:10:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741939858;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pO7tTO1rV95NIoQMWhWLdGMcS+ijoaLqtx251avqfLs=;
+	b=kFiYHKvFgG2Jjgo9l3Rdp1qidd2k9Mv7b/wF/TKi73ClvF+zfwzJn3EIbeGIuVKkuoOjHJ
+	uZhkeU9N0XONZQDPvyXiJxn1Ce4rR6QlheSzBz/g1OXa9P6wgVN2ciaZ70+MYt2q+o5Zxh
+	zvp3pp+6WtTaaAP4I8APYTnMXLq3I5A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 6.12 3/8] KVM: arm64: Remove host FPSIMD saving for
- non-protected KVM
-Message-ID: <2025031427-yiddish-unrented-2bc2@gregkh>
-References: <20250314-stable-sve-6-12-v1-0-ddc16609d9ba@kernel.org>
- <20250314-stable-sve-6-12-v1-3-ddc16609d9ba@kernel.org>
+	Will Deacon <will@kernel.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, devel@daynix.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v4 0/7] KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
+Message-ID: <Z9PkchMNGN1cdLgJ@linux.dev>
+References: <20250313-pmc-v4-0-2c976827118c@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,40 +49,18 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314-stable-sve-6-12-v1-3-ddc16609d9ba@kernel.org>
+In-Reply-To: <20250313-pmc-v4-0-2c976827118c@daynix.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 14, 2025 at 12:35:15AM +0000, Mark Brown wrote:
-> From: Mark Rutland <mark.rutland@arm.com>
-> 
-> Now that the host eagerly saves its own FPSIMD/SVE/SME state,
-> non-protected KVM never needs to save the host FPSIMD/SVE/SME state,
-> and the code to do this is never used. Protected KVM still needs to
-> save/restore the host FPSIMD/SVE state to avoid leaking guest state to
-> the host (and to avoid revealing to the host whether the guest used
-> FPSIMD/SVE/SME), and that code needs to be retained.
-> 
-> Remove the unused code and data structures.
-> 
-> To avoid the need for a stub copy of kvm_hyp_save_fpsimd_host() in the
-> VHE hyp code, the nVHE/hVHE version is moved into the shared switch
-> header, where it is only invoked when KVM is in protected mode.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Tested-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Will Deacon <will@kernel.org>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Fuad Tabba <tabba@google.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> Link: https://lore.kernel.org/r/20250210195226.1215254-3-mark.rutland@arm.com
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
+Hi Akihiko,
 
-What is the upstream git id for this on?
+On Thu, Mar 13, 2025 at 03:57:41PM +0900, Akihiko Odaki wrote:
+> base-commit: da2f480cb24d39d480b1e235eda0dd2d01f8765b
 
-thanks,
+I don't have this commit, what did you base this series on?
 
-greg k-h
+FWIW, the patches do not apply to a 6.14-rc* and seem to use something
+older.
+
+Thanks,
+Oliver
