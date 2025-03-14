@@ -1,339 +1,209 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6E778C9C
-	for <kvmarm@lists.linux.dev>; Fri, 14 Mar 2025 11:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED0A1FA851;
+	Fri, 14 Mar 2025 11:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741951127; cv=none; b=qTDdMX7AY+E7EiV2uLc6m9dfTYxCw4WtEEO8c7RVFdoNhdjE7MZLtJSRuGYML9RbVAbGsih6XwPyAicDE7JsfDfpuGjgHud1Oi9uRz6jBnz29Z51F29xsxgYgs3rvHufypUJ80X/HL4GvXd80WP0CBi1StRUagdsbW++8hA5Jsw=
+	t=1741951899; cv=none; b=sg+2B0ZELY0oyHMSOSRQgKnQjuVtma3oLN8/pmEKSXyC2ukqZVHenthgE02mS770yRPBVkdXAW6rzg5219wx4MX3eWyl4FWLdZjcDAXMPxhaCsKWF/x5Sy2HuHNMIjysw855SQA8bmiLvTvpVnSX7pjXX8ZgGTO/4wx+9sJi32o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741951127; c=relaxed/simple;
-	bh=6ssYBDToyqvawCjJntyfnIUtZC8yoDBML56bhiWOljM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EV8pQisdQXuovEZY7JhCs5tJgLci2d4kUyWWJVWMzrm+eXkftIXmRlm/A5/nhgUGjZl7SnEvAqHkZO9pAMkWCcn7iM8jdE2IAYaN/X6FFVpdqgErZ+ZvnIJ8bNKoC/Has74LRUMc8+U8AuF7n0AG3mojqt9D37HwlkQekHEaqQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H2GymVTD; arc=none smtp.client-ip=209.85.221.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1741951899; c=relaxed/simple;
+	bh=DGJHNwI3HJHy6/8KAf2cH/+W9kLO7caGDy1t4fpZLfA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QVi5pw48eeu3T5FueX/AV0PHYI7H8fdNVKHJuzfeB3kkhROeQOrcIg/79LLMU7KpibkZpKgoCAIIhPmlEZpKZJ3DxgcKL642OlWqJrKP+KmT0MFGuMjEA+uiNOCdGXL0KCuA2klHRamdEqRRtx397M3xpvK8C0Jh/ZH81DDenm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rs0srUy6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H2GymVTD"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-39135d31ca4so1096990f8f.1
-        for <kvmarm@lists.linux.dev>; Fri, 14 Mar 2025 04:18:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741951124; x=1742555924; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQHS6edakeTMkoUtKqh0HQvA5buiRQWe1WYXeTlyIUk=;
-        b=H2GymVTD0xWtwikseoiAhTZn21AsJoFZNXbyU3UL5k9yx2/3mKgMzc4CYlJLj3kG5D
-         jfEY5gf4nbomQCHRDMJMBscATSG1bX40Wnuuyfm9Jow6sWe6eZwqDqLGQQagq5gQkz+y
-         8Xuz0MQjXYKQjhmXguDBkNixBes4Odvn/T6GWOYYJbAIyzebOUMsT4fmPv1KSoi1EowF
-         cOc5/wCc416yrgZB/72nN7RypVnozBCT5ePkltNrOtT0dMl7iCWBlcLKisNcIXEdPwk6
-         FXzPi4NtfsskqZO528nRJcVJ6QFkYk0nQQhCphxU1wqfVY5RY7ixQMvnjFjX9HqQ0eb+
-         uNvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741951124; x=1742555924;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQHS6edakeTMkoUtKqh0HQvA5buiRQWe1WYXeTlyIUk=;
-        b=KdcTt4yxF3QT3dC0njabTyHV7hvQRAZ9Jgr+03Iiv0sEMITaFb2tpaKL82YU92rIET
-         XRLhIcb5iNNSyNouAhcybv5355oIYacGeWeX/dBewPslAOtHIROZhHgEgMWWNwwANBG+
-         +u7Vez6p2J1lGB3fyX3BeTG/uwbqJ5AMaBq1Wdz4D3ObIlm4HONhhGzSUKbQSnD5vYpO
-         GvlYIdjJa+w65EWjmYWgNjD+soOejULtk1pF+41N81wUnet8U+2CkBYQw22h7Ej+LI+s
-         VyaW2Ahww72nvNFBR3yVpbw1+XWqKnljUVxXWfyF6WzV1Tlkr6Ic/CS4iagflJ3xc5Og
-         /3Pw==
-X-Gm-Message-State: AOJu0YwMKosrBUl3Hg47oUlK82XotUg+B1Pxx4NPaFGAWpyt3W2/vvIT
-	Nsv/gJOw1iBQurfDQDZi5sayQvo9Te769ymvMswyHXEujHoicDB0hM3/AA5YqsXPHgI8sqAtzpY
-	gc8jd+UZ/cxEuJD5Ol9bG9iHyWpoPtzfj+NDFlTDQyxNWQ1bVi1N+RnAZUiclgSIwa+6ufKyzX/
-	ll4OtTGDpmpCJE2XM0416HJUrkGkw=
-X-Google-Smtp-Source: AGHT+IFYtQOOphKfLoOaQyXRnKRzCcMMNh/zGKLdmVfOk340KK97aCzghkWNQExmuTK4+Cq9Ck3MWM7VWg==
-X-Received: from wmrn15.prod.google.com ([2002:a05:600c:500f:b0:43c:f03d:18aa])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:4026:b0:391:a74:d7e2
- with SMTP id ffacd0b85a97d-395b9b10d93mr6955810f8f.26.1741951124121; Fri, 14
- Mar 2025 04:18:44 -0700 (PDT)
-Date: Fri, 14 Mar 2025 11:18:32 +0000
-In-Reply-To: <20250314111832.4137161-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rs0srUy6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6E9C4CEE3;
+	Fri, 14 Mar 2025 11:31:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741951899;
+	bh=DGJHNwI3HJHy6/8KAf2cH/+W9kLO7caGDy1t4fpZLfA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Rs0srUy6sSifnXSbrqc0OO6qUWq/kxM86oPPFhUczWqxwncNcy5S5RvafohnEhCUa
+	 KByRMuBcU7D9ClmjhzPOzddPuKxin30KqSDJwBaoKcSuQGPsH4703UIewszLHFHU3g
+	 yuRlZexwP5B6fi1ijsXJ9RVYJOAy4ymBpCidojHu9S3L7ay0ckdCF6SXwe+b4MAHz7
+	 yGrowb1ZWafhxYWJbNNOnICMbP/r8mvQ4/0suGTVdpy0qEmBZfbZoHpkcUrSo8bENl
+	 7La7+DP9z2HqbXirjVqmjgRxkqi5xIp0BMdRwIbhch11KnWHI46T7ryj9bIamtTfAP
+	 hubQVUanhpzlw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tt3GK-00DXQI-PO;
+	Fri, 14 Mar 2025 11:31:37 +0000
+Date: Fri, 14 Mar 2025 11:31:36 +0000
+Message-ID: <86bju3onl3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
+In-Reply-To: <20250227003310.367350-5-qperret@google.com>
+References: <20250227003310.367350-1-qperret@google.com>
+	<20250227003310.367350-5-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250314111832.4137161-1-tabba@google.com>
-X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
-Message-ID: <20250314111832.4137161-5-tabba@google.com>
-Subject: [PATCH v3 4/4] KVM: arm64: Create each pKVM hyp vcpu after its
- corresponding host vcpu
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, mark.rutland@arm.com, 
-	will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
-	qperret@google.com, vdonnefort@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Instead of creating and initializing _all_ hyp vcpus in pKVM when
-the first host vcpu runs for the first time, initialize _each_
-hyp vcpu in conjunction with its corresponding host vcpu.
+On Thu, 27 Feb 2025 00:33:08 +0000,
+Quentin Perret <qperret@google.com> wrote:
+> 
+> Tracking the hypervisor's ownership state into struct hyp_page has
+> several benefits, including allowing far more efficient lookups (no
+> page-table walk needed) and de-corelating the state from the presence
+> of a mapping. This will later allow to map pages into EL2 stage-1 less
+> proactively which is generally a good thing for security. And in the
+> future this will help with tracking the state of pages mapped into the
+> hypervisor's private range without requiring an alias into the 'linear
+> map' range.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h | 20 +++++++++-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 51 ++++++++++++------------
+>  arch/arm64/kvm/hyp/nvhe/setup.c          |  6 ++-
+>  3 files changed, 49 insertions(+), 28 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index 4a3c55d26ef3..cc4c01158368 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -22,6 +22,7 @@ enum pkvm_page_state {
+>  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
+>  	PKVM_NOPAGE			= BIT(0) | BIT(1),
+>  };
+> +#define PKVM_PAGE_STATE_MASK		(BIT(0) | BIT(1))
+>  
+>  #define PKVM_PAGE_STATE_PROT_MASK	(KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
+>  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+> @@ -42,7 +43,14 @@ struct hyp_page {
+>  	u8 order;
+>  
+>  	/* Host (non-meta) state. Guarded by the host stage-2 lock. */
+> -	unsigned __host_state : 8;
+> +	unsigned __host_state : 4;
+> +
+> +	/*
+> +	 * Complement of the hyp (non-meta) state. Guarded by the hyp stage-1 lock. We use the
+> +	 * complement so that the initial 0 in __hyp_state_comp (due to the entire vmemmap starting
+> +	 * off zeroed) encodes PKVM_NOPAGE.
+> +	 */
+> +	unsigned __hyp_state_comp : 4;
+>  
+>  	u32 host_share_guest_count;
+>  };
+> @@ -89,6 +97,16 @@ static inline void set_host_state(phys_addr_t phys, enum pkvm_page_state state)
+>  	hyp_phys_to_page(phys)->__host_state = state;
+>  }
+>  
+> +static inline enum pkvm_page_state get_hyp_state(phys_addr_t phys)
+> +{
+> +	return hyp_phys_to_page(phys)->__hyp_state_comp ^ PKVM_PAGE_STATE_MASK;
+> +}
+> +
+> +static inline void set_hyp_state(phys_addr_t phys, enum pkvm_page_state state)
+> +{
+> +	hyp_phys_to_page(phys)->__hyp_state_comp = state ^ PKVM_PAGE_STATE_MASK;
+> +}
+> +
+>  /*
+>   * Refcounting for 'struct hyp_page'.
+>   * hyp_pool::lock must be held if atomic access to the refcount is required.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index a45ffdec7612..3ab8c81500c2 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -642,24 +642,24 @@ static int __host_set_page_state_range(u64 addr, u64 size,
+>  	return 0;
+>  }
+>  
+> -static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte, u64 addr)
+> +static void __hyp_set_page_state_range(phys_addr_t phys, u64 size, enum pkvm_page_state state)
+>  {
+> -	if (!kvm_pte_valid(pte))
+> -		return PKVM_NOPAGE;
+> +	phys_addr_t end = phys + size;
+>  
+> -	return pkvm_getstate(kvm_pgtable_hyp_pte_prot(pte));
+> +	for (; phys < end; phys += PAGE_SIZE)
+> +		set_hyp_state(phys, state);
+>  }
+>  
+> -static int __hyp_check_page_state_range(u64 addr, u64 size,
+> -					enum pkvm_page_state state)
+> +static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_page_state state)
+>  {
+> -	struct check_walk_data d = {
+> -		.desired	= state,
+> -		.get_page_state	= hyp_get_page_state,
+> -	};
+> +	phys_addr_t end = phys + size;
+> +
+> +	for (; phys < end; phys += PAGE_SIZE) {
+> +		if (get_hyp_state(phys) != state)
+> +			return -EPERM;
+> +	}
+>  
+> -	hyp_assert_lock_held(&pkvm_pgd_lock);
+> -	return check_page_state_range(&pkvm_pgtable, addr, size, &d);
+> +	return 0;
+>  }
+>  
+>  static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte, u64 addr)
+> @@ -687,7 +687,6 @@ int __pkvm_host_share_hyp(u64 pfn)
+>  {
+>  	u64 phys = hyp_pfn_to_phys(pfn);
+>  	void *virt = __hyp_va(phys);
+> -	enum kvm_pgtable_prot prot;
+>  	u64 size = PAGE_SIZE;
+>  	int ret;
+>  
+> @@ -698,13 +697,13 @@ int __pkvm_host_share_hyp(u64 pfn)
+>  	if (ret)
+>  		goto unlock;
+>  	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
+> -		ret = __hyp_check_page_state_range((u64)virt, size, PKVM_NOPAGE);
+> +		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
 
-Some of the host vcpu state (e.g., system registers and traps
-values) is not initialized until the first time the host vcpu is
-run. Therefore, initializing a hyp vcpu before its corresponding
-host vcpu has run for the first time might not view the complete
-host state of these vcpus.
+OK, I think I finally clicked here. Does it mean that all the tracking
+is now done in terms of PAs instead of VAs?
 
-Additionally, this behavior is inline with non-protected modes.
+>  		if (ret)
+>  			goto unlock;
+>  	}
+>  
+> -	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
+> -	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, prot));
+> +	__hyp_set_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
+> +	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
 
-Acked-by: Will Deacon <will@kernel.org>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/include/asm/kvm_host.h      |  2 +
- arch/arm64/include/asm/kvm_pkvm.h      |  1 +
- arch/arm64/kvm/arm.c                   |  4 ++
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  6 ---
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 54 +++++++++++++++-----------
- arch/arm64/kvm/pkvm.c                  | 28 ++++++-------
- 6 files changed, 53 insertions(+), 42 deletions(-)
+And this is the split between the state now being kept in the on a PA
+base and the actual mapping that is now only takes the page attributes
+and no SW bits?
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d919557af5e5..31b21cf8118a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -869,6 +869,8 @@ struct kvm_vcpu_arch {
- #define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
- /* SVE config completed */
- #define VCPU_SVE_FINALIZED	__vcpu_single_flag(cflags, BIT(1))
-+/* pKVM VCPU setup completed */
-+#define VCPU_PKVM_FINALIZED	__vcpu_single_flag(cflags, BIT(2))
- 
- /* Exception pending */
- #define PENDING_EXCEPTION	__vcpu_single_flag(iflags, BIT(0))
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index eb65f12e81d9..abd693ce5b93 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -19,6 +19,7 @@
- int pkvm_init_host_vm(struct kvm *kvm);
- int pkvm_create_hyp_vm(struct kvm *kvm);
- void pkvm_destroy_hyp_vm(struct kvm *kvm);
-+int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
- 
- /*
-  * This functions as an allow-list of protected VM capabilities.
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 0160b4924351..6acd8b924210 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -843,6 +843,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 		ret = pkvm_create_hyp_vm(kvm);
- 		if (ret)
- 			return ret;
-+
-+		ret = pkvm_create_hyp_vcpu(vcpu);
-+		if (ret)
-+			return ret;
- 	}
- 
- 	mutex_lock(&kvm->arch.config_lock);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index e42bf68c8848..ce31d3b73603 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -43,12 +43,6 @@ struct pkvm_hyp_vm {
- 	struct hyp_pool pool;
- 	hyp_spinlock_t lock;
- 
--	/*
--	 * The number of vcpus initialized and ready to run.
--	 * Modifying this is protected by 'vm_table_lock'.
--	 */
--	unsigned int nr_vcpus;
--
- 	/* Array of the hyp vCPU structures for this VM. */
- 	struct pkvm_hyp_vcpu *vcpus[];
- };
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 6efb9bf56180..4ef3748dc660 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -245,10 +245,12 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
- 
- 	hyp_spin_lock(&vm_table_lock);
- 	hyp_vm = get_vm_by_handle(handle);
--	if (!hyp_vm || hyp_vm->nr_vcpus <= vcpu_idx)
-+	if (!hyp_vm || hyp_vm->kvm.created_vcpus <= vcpu_idx)
- 		goto unlock;
- 
- 	hyp_vcpu = hyp_vm->vcpus[vcpu_idx];
-+	if (!hyp_vcpu)
-+		goto unlock;
- 
- 	/* Ensure vcpu isn't loaded on more than one cpu simultaneously. */
- 	if (unlikely(hyp_vcpu->loaded_hyp_vcpu)) {
-@@ -367,8 +369,14 @@ static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
- {
- 	int i;
- 
--	for (i = 0; i < nr_vcpus; i++)
--		unpin_host_vcpu(hyp_vcpus[i]->host_vcpu);
-+	for (i = 0; i < nr_vcpus; i++) {
-+		struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vcpus[i];
-+
-+		if (!hyp_vcpu)
-+			continue;
-+
-+		unpin_host_vcpu(hyp_vcpu->host_vcpu);
-+	}
- }
- 
- static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
-@@ -392,24 +400,18 @@ static void pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *
- 
- static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 			      struct pkvm_hyp_vm *hyp_vm,
--			      struct kvm_vcpu *host_vcpu,
--			      unsigned int vcpu_idx)
-+			      struct kvm_vcpu *host_vcpu)
- {
- 	int ret = 0;
- 
- 	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
- 		return -EBUSY;
- 
--	if (host_vcpu->vcpu_idx != vcpu_idx) {
--		ret = -EINVAL;
--		goto done;
--	}
--
- 	hyp_vcpu->host_vcpu = host_vcpu;
- 
- 	hyp_vcpu->vcpu.kvm = &hyp_vm->kvm;
- 	hyp_vcpu->vcpu.vcpu_id = READ_ONCE(host_vcpu->vcpu_id);
--	hyp_vcpu->vcpu.vcpu_idx = vcpu_idx;
-+	hyp_vcpu->vcpu.vcpu_idx = READ_ONCE(host_vcpu->vcpu_idx);
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
- 	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
-@@ -647,27 +649,28 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 		goto unlock;
- 	}
- 
--	idx = hyp_vm->nr_vcpus;
-+	ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu);
-+	if (ret)
-+		goto unlock;
-+
-+	idx = hyp_vcpu->vcpu.vcpu_idx;
- 	if (idx >= hyp_vm->kvm.created_vcpus) {
- 		ret = -EINVAL;
- 		goto unlock;
- 	}
- 
--	ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu, idx);
--	if (ret)
-+	if (hyp_vm->vcpus[idx]) {
-+		ret = -EINVAL;
- 		goto unlock;
-+	}
- 
- 	hyp_vm->vcpus[idx] = hyp_vcpu;
--	hyp_vm->nr_vcpus++;
- unlock:
- 	hyp_spin_unlock(&vm_table_lock);
- 
--	if (ret) {
-+	if (ret)
- 		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
--		return ret;
--	}
--
--	return 0;
-+	return ret;
- }
- 
- static void
-@@ -713,12 +716,17 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
- 	/* Reclaim guest pages (including page-table pages) */
- 	mc = &host_kvm->arch.pkvm.teardown_mc;
- 	reclaim_guest_pages(hyp_vm, mc);
--	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->nr_vcpus);
-+	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->kvm.created_vcpus);
- 
- 	/* Push the metadata pages to the teardown memcache */
--	for (idx = 0; idx < hyp_vm->nr_vcpus; ++idx) {
-+	for (idx = 0; idx < hyp_vm->kvm.created_vcpus; ++idx) {
- 		struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vm->vcpus[idx];
--		struct kvm_hyp_memcache *vcpu_mc = &hyp_vcpu->vcpu.arch.pkvm_memcache;
-+		struct kvm_hyp_memcache *vcpu_mc;
-+
-+		if (!hyp_vcpu)
-+			continue;
-+
-+		vcpu_mc = &hyp_vcpu->vcpu.arch.pkvm_memcache;
- 
- 		while (vcpu_mc->nr_pages) {
- 			void *addr = pop_hyp_memcache(vcpu_mc, hyp_phys_to_virt);
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 74cf5d87e77b..fc6b5df309dd 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -125,7 +125,9 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
- 		return -ENOMEM;
- 
- 	ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, vcpu, hyp_vcpu);
--	if (ret)
-+	if (!ret)
-+		vcpu_set_flag(vcpu, VCPU_PKVM_FINALIZED);
-+	else
- 		free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
- 
- 	return ret;
-@@ -144,9 +146,7 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
- static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
- {
- 	size_t pgd_sz, hyp_vm_sz;
--	struct kvm_vcpu *host_vcpu;
- 	void *pgd, *hyp_vm;
--	unsigned long idx;
- 	int ret;
- 
- 	if (host_kvm->created_vcpus < 1)
-@@ -180,17 +180,7 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
- 
- 	host_kvm->arch.pkvm.handle = ret;
- 
--	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
--		ret = __pkvm_create_hyp_vcpu(host_vcpu);
--		if (ret)
--			goto destroy_vm;
--	}
--
- 	return 0;
--
--destroy_vm:
--	__pkvm_destroy_hyp_vm(host_kvm);
--	return ret;
- free_vm:
- 	free_pages_exact(hyp_vm, hyp_vm_sz);
- free_pgd:
-@@ -210,6 +200,18 @@ int pkvm_create_hyp_vm(struct kvm *host_kvm)
- 	return ret;
- }
- 
-+int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&vcpu->kvm->arch.config_lock);
-+	if (!vcpu_get_flag(vcpu, VCPU_PKVM_FINALIZED))
-+		ret = __pkvm_create_hyp_vcpu(vcpu);
-+	mutex_unlock(&vcpu->kvm->arch.config_lock);
-+
-+	return ret;
-+}
-+
- void pkvm_destroy_hyp_vm(struct kvm *host_kvm)
- {
- 	mutex_lock(&host_kvm->arch.config_lock);
+Thanks,
+
+	M.
+
 -- 
-2.49.0.rc1.451.g8f38331e32-goog
-
+Without deviation from the norm, progress is not possible.
