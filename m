@@ -1,209 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED0A1FA851;
-	Fri, 14 Mar 2025 11:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027AF1FF5EB;
+	Fri, 14 Mar 2025 13:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741951899; cv=none; b=sg+2B0ZELY0oyHMSOSRQgKnQjuVtma3oLN8/pmEKSXyC2ukqZVHenthgE02mS770yRPBVkdXAW6rzg5219wx4MX3eWyl4FWLdZjcDAXMPxhaCsKWF/x5Sy2HuHNMIjysw855SQA8bmiLvTvpVnSX7pjXX8ZgGTO/4wx+9sJi32o=
+	t=1741959265; cv=none; b=KUyNzneOXop+M7jLl2ANeobEy3fjv/Kwjpr84X82v1Y88rvJvEQ6vojY+um4G1YlNSlMmexsOFwBA4WQ/3al+h993cRTcD85C1KlFp5QfqcLY1lO14jfQ5YbEeNSUMETCL9JnXLJgOwprD14AKjkR5vsqBKumCvki9j2kUhnIpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741951899; c=relaxed/simple;
-	bh=DGJHNwI3HJHy6/8KAf2cH/+W9kLO7caGDy1t4fpZLfA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QVi5pw48eeu3T5FueX/AV0PHYI7H8fdNVKHJuzfeB3kkhROeQOrcIg/79LLMU7KpibkZpKgoCAIIhPmlEZpKZJ3DxgcKL642OlWqJrKP+KmT0MFGuMjEA+uiNOCdGXL0KCuA2klHRamdEqRRtx397M3xpvK8C0Jh/ZH81DDenm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rs0srUy6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741959265; c=relaxed/simple;
+	bh=Nh5wUl4x9u8EMy8wWXBvkYp2HpGM28PTwr1jqa491Ek=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WcZI1/LwFK3ldOpApkMHWeV7S2CfFb8IdRTHEvGFULZHrXUgwAq+33lSqnVLftZKjlofBqa0IbyEQfKz3IivfRMWtWc1CUKFphYKURGduWhGq9cStZY3crSNfFchBB92C8p7VkC8WZsc3kHJo4hVaQIMJf8tB9uFqLzYYAlZeFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spcca3v5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rs0srUy6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6E9C4CEE3;
-	Fri, 14 Mar 2025 11:31:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spcca3v5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D00EC4CEE3;
+	Fri, 14 Mar 2025 13:34:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741951899;
-	bh=DGJHNwI3HJHy6/8KAf2cH/+W9kLO7caGDy1t4fpZLfA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rs0srUy6sSifnXSbrqc0OO6qUWq/kxM86oPPFhUczWqxwncNcy5S5RvafohnEhCUa
-	 KByRMuBcU7D9ClmjhzPOzddPuKxin30KqSDJwBaoKcSuQGPsH4703UIewszLHFHU3g
-	 yuRlZexwP5B6fi1ijsXJ9RVYJOAy4ymBpCidojHu9S3L7ay0ckdCF6SXwe+b4MAHz7
-	 yGrowb1ZWafhxYWJbNNOnICMbP/r8mvQ4/0suGTVdpy0qEmBZfbZoHpkcUrSo8bENl
-	 7La7+DP9z2HqbXirjVqmjgRxkqi5xIp0BMdRwIbhch11KnWHI46T7ryj9bIamtTfAP
-	 hubQVUanhpzlw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tt3GK-00DXQI-PO;
-	Fri, 14 Mar 2025 11:31:37 +0000
-Date: Fri, 14 Mar 2025 11:31:36 +0000
-Message-ID: <86bju3onl3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+	s=k20201202; t=1741959264;
+	bh=Nh5wUl4x9u8EMy8wWXBvkYp2HpGM28PTwr1jqa491Ek=;
+	h=From:To:Cc:Subject:Date:From;
+	b=spcca3v5SutSp2uGX31Y9pVTWxuWKbNyywVCiV+txSk9catfchEKY1vB/6eYIh8m9
+	 wnLJ3tjygr+CJfFMRyJKfdzttIG+XJw91bjPc+20WEDXngA59JbYB5K27p6WWh++Jp
+	 //jEOhG991TB3niUsqCMaOW09XDdKYeSxSjyG+sYnGyCDk0LYr3rSUJ67GBmVmBSXE
+	 OqCtSk4GnGeWOELqd1cs1Vo9xwJFxTFh1SbsEDlsKzVRj0zJHzfQakEPYnGFUoE2ZS
+	 chi+fvuPP49C+5iDwHkt647fsHAPUEupNKzwpgZJSnv4Xa9vXMQAiqI9+Z0nKam76z
+	 W3ewsm5PT7FoA==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
 	Will Deacon <will@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
-In-Reply-To: <20250227003310.367350-5-qperret@google.com>
-References: <20250227003310.367350-1-qperret@google.com>
-	<20250227003310.367350-5-qperret@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	stable@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Quentin Perret <qperret@google.com>
+Subject: [PATCH] KVM: arm64: Tear down vGIC on failed vCPU creation
+Date: Fri, 14 Mar 2025 13:34:09 +0000
+Message-Id: <20250314133409.9123-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 27 Feb 2025 00:33:08 +0000,
-Quentin Perret <qperret@google.com> wrote:
-> 
-> Tracking the hypervisor's ownership state into struct hyp_page has
-> several benefits, including allowing far more efficient lookups (no
-> page-table walk needed) and de-corelating the state from the presence
-> of a mapping. This will later allow to map pages into EL2 stage-1 less
-> proactively which is generally a good thing for security. And in the
-> future this will help with tracking the state of pages mapped into the
-> hypervisor's private range without requiring an alias into the 'linear
-> map' range.
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/memory.h | 20 +++++++++-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 51 ++++++++++++------------
->  arch/arm64/kvm/hyp/nvhe/setup.c          |  6 ++-
->  3 files changed, 49 insertions(+), 28 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> index 4a3c55d26ef3..cc4c01158368 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> @@ -22,6 +22,7 @@ enum pkvm_page_state {
->  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
->  	PKVM_NOPAGE			= BIT(0) | BIT(1),
->  };
-> +#define PKVM_PAGE_STATE_MASK		(BIT(0) | BIT(1))
->  
->  #define PKVM_PAGE_STATE_PROT_MASK	(KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
->  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
-> @@ -42,7 +43,14 @@ struct hyp_page {
->  	u8 order;
->  
->  	/* Host (non-meta) state. Guarded by the host stage-2 lock. */
-> -	unsigned __host_state : 8;
-> +	unsigned __host_state : 4;
-> +
-> +	/*
-> +	 * Complement of the hyp (non-meta) state. Guarded by the hyp stage-1 lock. We use the
-> +	 * complement so that the initial 0 in __hyp_state_comp (due to the entire vmemmap starting
-> +	 * off zeroed) encodes PKVM_NOPAGE.
-> +	 */
-> +	unsigned __hyp_state_comp : 4;
->  
->  	u32 host_share_guest_count;
->  };
-> @@ -89,6 +97,16 @@ static inline void set_host_state(phys_addr_t phys, enum pkvm_page_state state)
->  	hyp_phys_to_page(phys)->__host_state = state;
->  }
->  
-> +static inline enum pkvm_page_state get_hyp_state(phys_addr_t phys)
-> +{
-> +	return hyp_phys_to_page(phys)->__hyp_state_comp ^ PKVM_PAGE_STATE_MASK;
-> +}
-> +
-> +static inline void set_hyp_state(phys_addr_t phys, enum pkvm_page_state state)
-> +{
-> +	hyp_phys_to_page(phys)->__hyp_state_comp = state ^ PKVM_PAGE_STATE_MASK;
-> +}
-> +
->  /*
->   * Refcounting for 'struct hyp_page'.
->   * hyp_pool::lock must be held if atomic access to the refcount is required.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index a45ffdec7612..3ab8c81500c2 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -642,24 +642,24 @@ static int __host_set_page_state_range(u64 addr, u64 size,
->  	return 0;
->  }
->  
-> -static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte, u64 addr)
-> +static void __hyp_set_page_state_range(phys_addr_t phys, u64 size, enum pkvm_page_state state)
->  {
-> -	if (!kvm_pte_valid(pte))
-> -		return PKVM_NOPAGE;
-> +	phys_addr_t end = phys + size;
->  
-> -	return pkvm_getstate(kvm_pgtable_hyp_pte_prot(pte));
-> +	for (; phys < end; phys += PAGE_SIZE)
-> +		set_hyp_state(phys, state);
->  }
->  
-> -static int __hyp_check_page_state_range(u64 addr, u64 size,
-> -					enum pkvm_page_state state)
-> +static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_page_state state)
->  {
-> -	struct check_walk_data d = {
-> -		.desired	= state,
-> -		.get_page_state	= hyp_get_page_state,
-> -	};
-> +	phys_addr_t end = phys + size;
-> +
-> +	for (; phys < end; phys += PAGE_SIZE) {
-> +		if (get_hyp_state(phys) != state)
-> +			return -EPERM;
-> +	}
->  
-> -	hyp_assert_lock_held(&pkvm_pgd_lock);
-> -	return check_page_state_range(&pkvm_pgtable, addr, size, &d);
-> +	return 0;
->  }
->  
->  static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte, u64 addr)
-> @@ -687,7 +687,6 @@ int __pkvm_host_share_hyp(u64 pfn)
->  {
->  	u64 phys = hyp_pfn_to_phys(pfn);
->  	void *virt = __hyp_va(phys);
-> -	enum kvm_pgtable_prot prot;
->  	u64 size = PAGE_SIZE;
->  	int ret;
->  
-> @@ -698,13 +697,13 @@ int __pkvm_host_share_hyp(u64 pfn)
->  	if (ret)
->  		goto unlock;
->  	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
-> -		ret = __hyp_check_page_state_range((u64)virt, size, PKVM_NOPAGE);
-> +		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
+If kvm_arch_vcpu_create() fails to share the vCPU page with the
+hypervisor, we propagate the error back to the ioctl but leave the
+vGIC vCPU data initialised. Note only does this leak the corresponding
+memory when the vCPU is destroyed but it can also lead to use-after-free
+if the redistributor device handling tries to walk into the vCPU.
 
-OK, I think I finally clicked here. Does it mean that all the tracking
-is now done in terms of PAs instead of VAs?
+Add the missing cleanup to kvm_arch_vcpu_create(), ensuring that the
+vGIC vCPU structures are destroyed on error.
 
->  		if (ret)
->  			goto unlock;
->  	}
->  
-> -	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
-> -	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, prot));
-> +	__hyp_set_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
-> +	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
+Cc: <stable@vger.kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+---
 
-And this is the split between the state now being kept in the on a PA
-base and the actual mapping that is now only takes the page attributes
-and no SW bits?
+It's hard to come up with a "Fixes:" tag for this. Prior to 3f868e142c0b
+("KVM: arm64: Introduce kvm_share_hyp()"), create_hyp_mappings() could
+still have failed, although if you go back before 66c57edd3bc7 ("KVM:
+arm64: Restrict EL2 stage-1 changes in protected mode") then it's
+vanishingly unlikely.
 
-Thanks,
+ arch/arm64/kvm/arm.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-	M.
-
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b8e55a441282..fa71cee02faa 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -466,7 +466,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (err)
+ 		return err;
+ 
+-	return kvm_share_hyp(vcpu, vcpu + 1);
++	err = kvm_share_hyp(vcpu, vcpu + 1);
++	if (err)
++		kvm_vgic_vcpu_destroy(vcpu);
++
++	return err;
+ }
+ 
+ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
 -- 
-Without deviation from the norm, progress is not possible.
+2.49.0.rc1.451.g8f38331e32-goog
+
