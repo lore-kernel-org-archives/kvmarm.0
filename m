@@ -1,66 +1,110 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBC9193435
-	for <kvmarm@lists.linux.dev>; Fri, 14 Mar 2025 08:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7041B1A5B82;
+	Fri, 14 Mar 2025 11:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741939866; cv=none; b=HbkdbukY83QB5UJfvzyVM8whLUf0BCbT0sZ17QhivNgB6XKDlFudhtw+s47HqhJaEUgIH6c8qun7uyhz+M5Q+8mp7U2ia3NAKiVuxsUXYgmFRhPb9ooUAESw9dJsf8bbDcRzLBqfaelzt9QLSQhUSGFQRn4PgtyZROBuzZcx6jo=
+	t=1741950424; cv=none; b=bSJCtiPdPzX2KATHIAcb7HWb322homDiMuYibMYSsXBYFQU21o0Fi7p04n6PAJvgjRrozK8aRVnLGA7h7jX6AuGY2zeogNJ5vj0UFE+YeVetjxcKhW2+s/G9Z7DRmp6bS9TEt89gGOrQjyEwV6Ip1lPyOcrSLoJ9s4ojtyeKIcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741939866; c=relaxed/simple;
-	bh=pO7tTO1rV95NIoQMWhWLdGMcS+ijoaLqtx251avqfLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4Rg03A4Lay7qLQX0jE/cuYmhjk7KQQaTujJBumYW4P2iXGOr7SmGYyOQvanhszUHO5yCJDCalT8wRm6ikX/L2H+67U+Z04uQJh6Tg3gkLJT2C4ujUIObmD7G08FsV83wLtBn6R5+Oshb6HEn8TpLOa4PJTpNuJ54BhasWX8Xv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kFiYHKvF; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1741950424; c=relaxed/simple;
+	bh=ebSXBKJQxoM/5pHbw/m81faONgALiALCEATQNZ03LzM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XaV3kdsZYopDMOuIiP5t98ASkarOIofSQXJJwCwcGJVl5MUrl5ZvmOT0HlcRNfFHZ7HHVoHIh32QdXavz70MaUkf4TCe2Y2gy0wyrVVQ/+ezaQlPxTegk/RFwZSWQjpVt6kfGWLLjaApo6GkU85dzH1w3xD3MMQfd9n6gPM+qBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X19Qnj3r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kFiYHKvF"
-Date: Fri, 14 Mar 2025 01:10:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741939858;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pO7tTO1rV95NIoQMWhWLdGMcS+ijoaLqtx251avqfLs=;
-	b=kFiYHKvFgG2Jjgo9l3Rdp1qidd2k9Mv7b/wF/TKi73ClvF+zfwzJn3EIbeGIuVKkuoOjHJ
-	uZhkeU9N0XONZQDPvyXiJxn1Ce4rR6QlheSzBz/g1OXa9P6wgVN2ciaZ70+MYt2q+o5Zxh
-	zvp3pp+6WtTaaAP4I8APYTnMXLq3I5A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X19Qnj3r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1430C4CEE3;
+	Fri, 14 Mar 2025 11:07:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741950423;
+	bh=ebSXBKJQxoM/5pHbw/m81faONgALiALCEATQNZ03LzM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X19Qnj3rhxkaLAlGJniaeRTT0/l/BH2UbT5Bp/MhvNAVFfdN/8JVs48Bft/YbvNqo
+	 ogMcq5Y47H94ZQORaL9TSHXGtnCuzEltJO/xIyDnmPqYrumFCCkiT6GT9hl7aRRnju
+	 uBkaKbgmYxb+wQnEsqkHJFnXLmejTloNoCdrmo+ye1wDx6Regzlqk93Wm5jYwnduVf
+	 YU3RJ6t8LXKCad60sIjBfdpZKucVPSt2je1bvwjoVv6jSqWGPMeKV1ywGcE4Qn61Yw
+	 WncJrPBygzsTMayf5g5x/bR6T1Kpfm+WQm+1GcuIb+4XKBWIlgPb/24x733h8du265
+	 FjL3JP9WWeHqw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tt2sX-00DWpC-H8;
+	Fri, 14 Mar 2025 11:07:01 +0000
+Date: Fri, 14 Mar 2025 11:07:01 +0000
+Message-ID: <86cyejooq2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, devel@daynix.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v4 0/7] KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
-Message-ID: <Z9PkchMNGN1cdLgJ@linux.dev>
-References: <20250313-pmc-v4-0-2c976827118c@daynix.com>
+	Vincent Donnefort <vdonnefort@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/6] KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
+In-Reply-To: <20250227003310.367350-3-qperret@google.com>
+References: <20250227003310.367350-1-qperret@google.com>
+	<20250227003310.367350-3-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250313-pmc-v4-0-2c976827118c@daynix.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Akihiko,
+On Thu, 27 Feb 2025 00:33:06 +0000,
+Quentin Perret <qperret@google.com> wrote:
+> 
+> The page ownership state encoded as 0b11 is currently considered
+> reserved for future use, and PKVM_NOPAGE uses bit 2. In order to
+> simplify the relocation of the hyp ownership state into the
+> vmemmap in later patches, let's use the 'reserved' encoding for
+> the PKVM_NOPAGE state. The struct hyp_page layout isn't guaranteed
+> stable at all, so there is no real reason to have 'reserved' encodings.
+> 
+> No functional changes intended.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index 34233d586060..642b5e05fe77 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -13,18 +13,15 @@
+>   *   01: The page is owned by the page-table owner, but is shared
+>   *       with another entity.
+>   *   10: The page is shared with, but not owned by the page-table owner.
+> - *   11: Reserved for future use (lending).
+>   */
+>  enum pkvm_page_state {
+>  	PKVM_PAGE_OWNED			= 0ULL,
+>  	PKVM_PAGE_SHARED_OWNED		= BIT(0),
+>  	PKVM_PAGE_SHARED_BORROWED	= BIT(1),
+> -	__PKVM_PAGE_RESERVED		= BIT(0) | BIT(1),
+>  
+>  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
+> -	PKVM_NOPAGE			= BIT(2),
+> +	PKVM_NOPAGE			= BIT(0) | BIT(1),
 
-On Thu, Mar 13, 2025 at 03:57:41PM +0900, Akihiko Odaki wrote:
-> base-commit: da2f480cb24d39d480b1e235eda0dd2d01f8765b
+Isn't this comment stale now?
 
-I don't have this commit, what did you base this series on?
+	M.
 
-FWIW, the patches do not apply to a 6.14-rc* and seem to use something
-older.
-
-Thanks,
-Oliver
+-- 
+Without deviation from the norm, progress is not possible.
