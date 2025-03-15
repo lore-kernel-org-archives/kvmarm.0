@@ -1,30 +1,30 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D33FB9C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC386487BF
 	for <kvmarm@lists.linux.dev>; Sat, 15 Mar 2025 00:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741997978; cv=none; b=cbpEgXHVIqchXLl0t2HEwLH2xrxNoiSPCkDnruupmKVdT7yrXpXvyFT9FcwgF+tmTQtSCJfEf6SBnUaSW9UdDb5aZAvKEgSB/w5OHakGT+acpC0dBFph8yUOAoSXRL7uy8dFyOlyaoNjW75k8pnN+TUjvhRVqF/JtjnwK6tQCCY=
+	t=1741997979; cv=none; b=CqiH12D3yxQE4ay5kNiwGh1i8zs18crIJ8DFSimRHGp3rYX8FRw9jODfBsTQCo7KBBF7m2h0WTAnBv+hULPfhwGtWGX+2SbzFAgvC2zX88FuLF7d2HbhGtOPC/yRF4gkmaXVkOInyHZdR8MZuejQhiuSIPBGLaedpDUhND9thGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741997978; c=relaxed/simple;
-	bh=cra/GNuyMQV91GFqsW8dQ9HbAggpcs6Io/tZ112UIh0=;
+	s=arc-20240116; t=1741997979; c=relaxed/simple;
+	bh=QUapfEldpyCw648cR7hTfLhDYfYdHNw9I24sIY3wewA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kD1AS9q68oQ5ddREK3p/lVnKHoGZfhjuRwxsz7b6CboIFAQFw0LuJhQog/xiLqohv1XAxf+EJFhZDM85NEVV/2tAAe2LtiAsyjKmHm3bibMrrbiA0A/iIoa0j5Gw7cjI+UzCyYl2FwJglwV95O1UozPF1Nu5pSUhrn+iuZRK188=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=cac0nYhW; arc=none smtp.client-ip=13.77.154.182
+	 MIME-Version; b=B/pfeNCoorsF7D+a0E359WXo3f8ZOSlpQdHs/vOeDv9TjinNnWF/H6G4mcxUUC4EIRczOm03bStqYFeOX9dYTsYObSFqLJ7peT5H4AiOiXieOonAzfSnu52FHmXb2DryvSiYi4XbUHaLUPhtluKkEEYzcF7nvQYmQ2yU+Ipfaj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Os6o5XJE; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="cac0nYhW"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Os6o5XJE"
 Received: from romank-3650.corp.microsoft.com (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 9B8D02038A52;
-	Fri, 14 Mar 2025 17:19:35 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9B8D02038A52
+	by linux.microsoft.com (Postfix) with ESMTPSA id 64D98203345E;
+	Fri, 14 Mar 2025 17:19:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 64D98203345E
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741997975;
-	bh=NIRoaJMzXhRU+FEOMF0AnLyeJ+Xl1dVpfnO4TXIokQU=;
+	s=default; t=1741997976;
+	bh=k4K++fqiP84qacsZ/10/m3tNXa1bo+IGgMpwd09KRMY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cac0nYhWonKSodrgcm22k2UaS9TFPGH2L0yKUnuRyCzzIt1EGqE45j6m5xxZikYmV
-	 +jClSCydm9Z5xvpZQhb2vydLjRj1mcNwjNPciHvS+6BCTf+fYeG1Hhm/ZQqaLCAKs8
-	 LmtpfXtoSxYjfIiPMlAI1f/38L4NWn5yQ+6QcIqM=
+	b=Os6o5XJEUqFmk0cEU1prfpmSEvi8J0J1SMLVoL1B2wsQF8hhRX0nhbJ4vbU6l/+8k
+	 7evvtXPnRoZHlBNxnvUp8RiH1JMArPoMnvOWMK/I/xbe7zadktk0i6JVl7L1IE6o8+
+	 dGUm+h9+2bmkj/U+ywtCVNoDhpOGYSRUQpkiciU8=
 From: Roman Kisel <romank@linux.microsoft.com>
 To: arnd@arndb.de,
 	bhelgaas@google.com,
@@ -69,9 +69,9 @@ Cc: apais@microsoft.com,
 	benhill@microsoft.com,
 	bperkins@microsoft.com,
 	sunilmut@microsoft.com
-Subject: [PATCH hyperv-next v6 07/11] dt-bindings: microsoft,vmbus: Add interrupt and DMA coherence properties
-Date: Fri, 14 Mar 2025 17:19:27 -0700
-Message-ID: <20250315001931.631210-8-romank@linux.microsoft.com>
+Subject: [PATCH hyperv-next v6 09/11] Drivers: hv: vmbus: Introduce hv_get_vmbus_root_device()
+Date: Fri, 14 Mar 2025 17:19:29 -0700
+Message-ID: <20250315001931.631210-10-romank@linux.microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250315001931.631210-1-romank@linux.microsoft.com>
 References: <20250315001931.631210-1-romank@linux.microsoft.com>
@@ -83,70 +83,118 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To boot in the VTL mode, VMBus on arm64 needs interrupt description
-which the binding documentation lacks. The transactions on the bus are
-DMA coherent which is not mentioned as well.
+The ARM64 PCI code for hyperv needs to know the VMBus root
+device, and it is private.
 
-Add the interrupt property and the DMA coherence property to the VMBus
-binding. Update the example to match that. Fix typos.
+Provide a function that returns it. Rename it from "hv_dev"
+as "hv_dev" as a symbol is very overloaded. No functional
+changes.
 
 Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
+Reviewed-by: Michael Kelley <mhklinux@outlook.com>
 ---
- .../bindings/bus/microsoft,vmbus.yaml           | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ drivers/hv/vmbus_drv.c | 23 +++++++++++++++--------
+ include/linux/hyperv.h |  2 ++
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/bus/microsoft,vmbus.yaml b/Documentation/devicetree/bindings/bus/microsoft,vmbus.yaml
-index a8d40c766dcd..ca288ea54b34 100644
---- a/Documentation/devicetree/bindings/bus/microsoft,vmbus.yaml
-+++ b/Documentation/devicetree/bindings/bus/microsoft,vmbus.yaml
-@@ -10,8 +10,8 @@ maintainers:
-   - Saurabh Sengar <ssengar@linux.microsoft.com>
+diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
+index e8f2c3e92d1f..df18b4070b01 100644
+--- a/drivers/hv/vmbus_drv.c
++++ b/drivers/hv/vmbus_drv.c
+@@ -45,7 +45,8 @@ struct vmbus_dynid {
+ 	struct hv_vmbus_device_id id;
+ };
  
- description:
--  VMBus is a software bus that implement the protocols for communication
--  between the root or host OS and guest OSs (virtual machines).
-+  VMBus is a software bus that implements the protocols for communication
-+  between the root or host OS and guest OS'es (virtual machines).
+-static struct device  *hv_dev;
++/* VMBus Root Device */
++static struct device  *vmbus_root_device;
  
- properties:
-   compatible:
-@@ -25,9 +25,17 @@ properties:
-   '#size-cells':
-     const: 1
+ static int hyperv_cpuhp_online;
  
-+  dma-coherent: true
+@@ -80,9 +81,15 @@ static struct resource *fb_mmio;
+ static struct resource *hyperv_mmio;
+ static DEFINE_MUTEX(hyperv_mmio_lock);
+ 
++struct device *hv_get_vmbus_root_device(void)
++{
++	return vmbus_root_device;
++}
++EXPORT_SYMBOL_GPL(hv_get_vmbus_root_device);
 +
-+  interrupts:
-+    maxItems: 1
-+    description: |
-+      This interrupt is used to report a message from the host.
+ static int vmbus_exists(void)
+ {
+-	if (hv_dev == NULL)
++	if (vmbus_root_device == NULL)
+ 		return -ENODEV;
+ 
+ 	return 0;
+@@ -861,7 +868,7 @@ static int vmbus_dma_configure(struct device *child_device)
+ 	 * On x86/x64 coherence is assumed and these calls have no effect.
+ 	 */
+ 	hv_setup_dma_ops(child_device,
+-		device_get_dma_attr(hv_dev) == DEV_DMA_COHERENT);
++		device_get_dma_attr(vmbus_root_device) == DEV_DMA_COHERENT);
+ 	return 0;
+ }
+ 
+@@ -1930,7 +1937,7 @@ int vmbus_device_register(struct hv_device *child_device_obj)
+ 		     &child_device_obj->channel->offermsg.offer.if_instance);
+ 
+ 	child_device_obj->device.bus = &hv_bus;
+-	child_device_obj->device.parent = hv_dev;
++	child_device_obj->device.parent = vmbus_root_device;
+ 	child_device_obj->device.release = vmbus_device_release;
+ 
+ 	child_device_obj->device.dma_parms = &child_device_obj->dma_parms;
+@@ -2292,7 +2299,7 @@ static int vmbus_acpi_add(struct platform_device *pdev)
+ 	struct acpi_device *ancestor;
+ 	struct acpi_device *device = ACPI_COMPANION(&pdev->dev);
+ 
+-	hv_dev = &device->dev;
++	vmbus_root_device = &device->dev;
+ 
+ 	/*
+ 	 * Older versions of Hyper-V for ARM64 fail to include the _CCA
+@@ -2378,7 +2385,7 @@ static int vmbus_device_add(struct platform_device *pdev)
+ 	struct device_node *np = pdev->dev.of_node;
+ 	int ret;
+ 
+-	hv_dev = &pdev->dev;
++	vmbus_root_device = &pdev->dev;
+ 
+ 	ret = of_range_parser_init(&parser, np);
+ 	if (ret)
+@@ -2696,7 +2703,7 @@ static int __init hv_acpi_init(void)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (!hv_dev) {
++	if (!vmbus_root_device) {
+ 		ret = -ENODEV;
+ 		goto cleanup;
+ 	}
+@@ -2727,7 +2734,7 @@ static int __init hv_acpi_init(void)
+ 
+ cleanup:
+ 	platform_driver_unregister(&vmbus_platform_driver);
+-	hv_dev = NULL;
++	vmbus_root_device = NULL;
+ 	return ret;
+ }
+ 
+diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
+index 675959fb97ba..1f310fbbc4f9 100644
+--- a/include/linux/hyperv.h
++++ b/include/linux/hyperv.h
+@@ -1277,6 +1277,8 @@ static inline void *hv_get_drvdata(struct hv_device *dev)
+ 	return dev_get_drvdata(&dev->device);
+ }
+ 
++struct device *hv_get_vmbus_root_device(void);
 +
- required:
-   - compatible
-   - ranges
-+  - interrupts
-   - '#address-cells'
-   - '#size-cells'
- 
-@@ -35,6 +43,8 @@ additionalProperties: false
- 
- examples:
-   - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-     soc {
-         #address-cells = <2>;
-         #size-cells = <1>;
-@@ -49,6 +59,9 @@ examples:
-                 #address-cells = <2>;
-                 #size-cells = <1>;
-                 ranges = <0x0f 0xf0000000 0x0f 0xf0000000 0x10000000>;
-+                dma-coherent;
-+                interrupt-parent = <&gic>;
-+                interrupts = <GIC_PPI 2 IRQ_TYPE_EDGE_RISING>;
-             };
-         };
-     };
+ struct hv_ring_buffer_debug_info {
+ 	u32 current_interrupt_mask;
+ 	u32 current_read_index;
 -- 
 2.43.0
 
