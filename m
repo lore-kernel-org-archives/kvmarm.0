@@ -1,30 +1,30 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D4DA94F
-	for <kvmarm@lists.linux.dev>; Sat, 15 Mar 2025 00:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6688F8828
+	for <kvmarm@lists.linux.dev>; Sat, 15 Mar 2025 00:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741997977; cv=none; b=bZbAL+nAk+Ar2zOHOy3NIZLca2IYBJWkQ7/L0IhaKqKfPuxK7udhV3tiN4h8IYwgdBZZYSjbdQ8a549x3wBOoJGtQVP83usjBym7V9A+SJLUIt1xYh5t/rssEMWoMCeUTqCJqSOGWjIl1Ifmetj9kOPDAwmFqrwGEGFaDmX7Dq8=
+	t=1741997977; cv=none; b=BRGth5eQN4U4EiwP3PfOOgzP+PFvLUSIMWy0+AQdbQbc/KlgRNUnJIb4xxxX0FySVTIsDTCQ2wYAyGzdhHavI8Slf3OEZPSfeetuBhSb9l1ZZI11aJfU0YnNgr8ye527MOXoG4n7amwFgiw0ZNuDr6Sk99mh/nw/1FEpBhcPASE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741997977; c=relaxed/simple;
-	bh=NTRjJa0+oq8vkzF7LDSFIwuywP1qxG/KnYw58NwUMS8=;
+	bh=JAPVJXwRAdnTfGOW4xEg4L12PyYxnoNmcs7P4kAbqyw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=awJXmNocb0I/qv5+YyE4FCySInk+DhJl0cbHo2eYvTvBjoHr/lAZWB1bbOIlzH8kYA3YbkEvU2u6+109UQ2BR6Eqitd1C9THLc+oqUXVdwRK7ai7WwUCWEJBsT/aE0QIKjwwRUIcsF7K+qTYQvQeHinZG7ImfG8c5YUU5cfPTtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=eYNdIcdd; arc=none smtp.client-ip=13.77.154.182
+	 MIME-Version; b=IRsknfLoXyO/+l9wH4UqMjXRaPu0wwVgSW9z/OTrqUWUxWtqAZUeddSUdJ+2UpFcWdb/u9BnJLNYLNcDuEpKO/jwO+VIRZo4hDvHcV3dpgn6iBQQi1xtYWuIEldxVAP2d4iFEBrUFW5tbvolhoDXK2qJH200oNgU559d0w1qHJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Uz81xrgO; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eYNdIcdd"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Uz81xrgO"
 Received: from romank-3650.corp.microsoft.com (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6C627203345C;
-	Fri, 14 Mar 2025 17:19:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6C627203345C
+	by linux.microsoft.com (Postfix) with ESMTPSA id 42809203345B;
+	Fri, 14 Mar 2025 17:19:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 42809203345B
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741997974;
-	bh=ia718RA/ZkBkSuI2P9xg0SvLu7OKhbBAqnVb29di5Sc=;
+	s=default; t=1741997973;
+	bh=aql5r+qoxxmeaa5n+o0/Ssl6ac0GgBlAhM7f7Q3glr8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eYNdIcdduH9s5OWxVGADQiwPXSSkJ0LldfV0hWzyeATTS4TnhOQUWsOJPCeHlhLsK
-	 FjWyPLzxBLlbB8vZUA1CjiGPlyCH6eQMTmhvCvTD9W6mrtnIbL8wQMUtQEBqE//dMy
-	 SAzGvr8sBz6jF/RxejsJVvXbHQd12x0EwOWDRFGs=
+	b=Uz81xrgO/miBAtyqNCUSuH+fm3WMwxzvu4Vc2poacr5p/Ae/6bkQ3EXgmuENFjJJP
+	 6jZdGqez7yKNEwKkpS/iEuYOwpAKEQodmdYZP9DDVddGr4fVmnzgbv37xd8KxGMgpe
+	 yGL5PcDmxcU6D9PAte4nmAEp8Ms+c05KH1A4erKk=
 From: Roman Kisel <romank@linux.microsoft.com>
 To: arnd@arndb.de,
 	bhelgaas@google.com,
@@ -69,9 +69,9 @@ Cc: apais@microsoft.com,
 	benhill@microsoft.com,
 	bperkins@microsoft.com,
 	sunilmut@microsoft.com
-Subject: [PATCH hyperv-next v6 04/11] Drivers: hv: Provide arch-neutral implementation of get_vtl()
-Date: Fri, 14 Mar 2025 17:19:24 -0700
-Message-ID: <20250315001931.631210-5-romank@linux.microsoft.com>
+Subject: [PATCH hyperv-next v6 01/11] arm64: kvm, smccc: Introduce and use API for detecting hypervisor presence
+Date: Fri, 14 Mar 2025 17:19:21 -0700
+Message-ID: <20250315001931.631210-2-romank@linux.microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250315001931.631210-1-romank@linux.microsoft.com>
 References: <20250315001931.631210-1-romank@linux.microsoft.com>
@@ -83,139 +83,176 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To run in the VTL mode, Hyper-V drivers have to know what
-VTL the system boots in, and the arm64/hyperv code does not
-have the means to compute that.
+The KVM/arm64 uses SMCCC to detect hypervisor presence. That code is
+private, and it follows the SMCCC specification. Other existing and
+emerging hypervisor guest implementations can and should use that
+standard approach as well.
 
-Refactor the code to hoist the function that detects VTL,
-make it arch-neutral to be able to employ it to get the VTL
-on arm64.
+Factor out a common infrastructure that the guests can use, update KVM
+to employ the new API. The central notion of the SMCCC method is the
+UUID of the hypervisor, and the API follows that.
+
+No functional changes. Validated with a KVM/arm64 guest.
 
 Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
-Reviewed-by: Michael Kelley <mhklinux@outlook.com>
-Reviewed-by: Tianyu Lan <tiala@microsoft.com>
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/x86/hyperv/hv_init.c      | 34 ----------------------------------
- drivers/hv/hv_common.c         | 31 +++++++++++++++++++++++++++++++
- include/asm-generic/mshyperv.h |  6 ++++++
- include/hyperv/hvgdk_mini.h    |  2 +-
- 4 files changed, 38 insertions(+), 35 deletions(-)
+ arch/arm64/kvm/hypercalls.c        |  5 +--
+ drivers/firmware/smccc/kvm_guest.c | 10 ++----
+ drivers/firmware/smccc/smccc.c     | 19 +++++++++++
+ include/linux/arm-smccc.h          | 55 +++++++++++++++++++++++++++---
+ 4 files changed, 73 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-index ddeb40930bc8..3b569291dfed 100644
---- a/arch/x86/hyperv/hv_init.c
-+++ b/arch/x86/hyperv/hv_init.c
-@@ -390,40 +390,6 @@ static void __init hv_stimer_setup_percpu_clockev(void)
- 		old_setup_percpu_clockev();
- }
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 27ce4cb44904..92b9bc1ea8e8 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -353,10 +353,7 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
+ 			val[0] = gpa;
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
+-		val[0] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0;
+-		val[1] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1;
+-		val[2] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2;
+-		val[3] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
++		UUID_TO_SMCCC_RES(ARM_SMCCC_VENDOR_HYP_UID_KVM, val);
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = smccc_feat->vendor_hyp_bmap;
+diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
+index f3319be20b36..b5084b309ea0 100644
+--- a/drivers/firmware/smccc/kvm_guest.c
++++ b/drivers/firmware/smccc/kvm_guest.c
+@@ -14,17 +14,11 @@ static DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) __ro_afte
  
--#if IS_ENABLED(CONFIG_HYPERV_VTL_MODE)
--static u8 __init get_vtl(void)
--{
--	u64 control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_REGISTERS;
--	struct hv_input_get_vp_registers *input;
--	struct hv_output_get_vp_registers *output;
--	unsigned long flags;
--	u64 ret;
--
--	local_irq_save(flags);
--	input = *this_cpu_ptr(hyperv_pcpu_input_arg);
--	output = *this_cpu_ptr(hyperv_pcpu_output_arg);
--
--	memset(input, 0, struct_size(input, names, 1));
--	input->partition_id = HV_PARTITION_ID_SELF;
--	input->vp_index = HV_VP_INDEX_SELF;
--	input->input_vtl.as_uint8 = 0;
--	input->names[0] = HV_REGISTER_VSM_VP_STATUS;
--
--	ret = hv_do_hypercall(control, input, output);
--	if (hv_result_success(ret)) {
--		ret = output->values[0].reg8 & HV_X64_VTL_MASK;
--	} else {
--		pr_err("Failed to get VTL(error: %lld) exiting...\n", ret);
--		BUG();
--	}
--
--	local_irq_restore(flags);
--	return ret;
--}
--#else
--static inline u8 get_vtl(void) { return 0; }
--#endif
--
- /*
-  * This function is to be invoked early in the boot sequence after the
-  * hypervisor has been detected.
-diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
-index 9804adb4cc56..dce4b34e293b 100644
---- a/drivers/hv/hv_common.c
-+++ b/drivers/hv/hv_common.c
-@@ -304,6 +304,37 @@ void __init hv_get_partition_id(void)
- 		pr_err("Hyper-V: failed to get partition ID: %#x\n",
- 		       hv_result(status));
- }
-+#if IS_ENABLED(CONFIG_HYPERV_VTL_MODE)
-+u8 __init get_vtl(void)
-+{
-+	u64 control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_REGISTERS;
-+	struct hv_input_get_vp_registers *input;
-+	struct hv_output_get_vp_registers *output;
-+	unsigned long flags;
-+	u64 ret;
-+
-+	local_irq_save(flags);
-+	input = *this_cpu_ptr(hyperv_pcpu_input_arg);
-+	output = *this_cpu_ptr(hyperv_pcpu_output_arg);
-+
-+	memset(input, 0, struct_size(input, names, 1));
-+	input->partition_id = HV_PARTITION_ID_SELF;
-+	input->vp_index = HV_VP_INDEX_SELF;
-+	input->input_vtl.as_uint8 = 0;
-+	input->names[0] = HV_REGISTER_VSM_VP_STATUS;
-+
-+	ret = hv_do_hypercall(control, input, output);
-+	if (hv_result_success(ret)) {
-+		ret = output->values[0].reg8 & HV_VTL_MASK;
-+	} else {
-+		pr_err("Failed to get VTL(error: %lld) exiting...\n", ret);
-+		BUG();
-+	}
-+
-+	local_irq_restore(flags);
-+	return ret;
-+}
-+#endif
- 
- int __init hv_common_init(void)
+ void __init kvm_init_hyp_services(void)
  {
-diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
-index b13b0cda4ac8..c5150a2b12d6 100644
---- a/include/asm-generic/mshyperv.h
-+++ b/include/asm-generic/mshyperv.h
-@@ -348,4 +348,10 @@ static inline int hv_call_create_vp(int node, u64 partition_id, u32 vp_index, u3
- }
- #endif /* CONFIG_MSHV_ROOT */
++	uuid_t kvm_uuid = ARM_SMCCC_VENDOR_HYP_UID_KVM;
+ 	struct arm_smccc_res res;
+ 	u32 val[4];
  
-+#if IS_ENABLED(CONFIG_HYPERV_VTL_MODE)
-+u8 __init get_vtl(void);
-+#else
-+static inline u8 get_vtl(void) { return 0; }
+-	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_HVC)
+-		return;
+-
+-	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
+-	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
+-	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
+-	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
+-	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
++	if (!arm_smccc_hyp_present(&kvm_uuid))
+ 		return;
+ 
+ 	memset(&res, 0, sizeof(res));
+diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
+index a74600d9f2d7..7399f27d58e5 100644
+--- a/drivers/firmware/smccc/smccc.c
++++ b/drivers/firmware/smccc/smccc.c
+@@ -67,6 +67,25 @@ s32 arm_smccc_get_soc_id_revision(void)
+ }
+ EXPORT_SYMBOL_GPL(arm_smccc_get_soc_id_revision);
+ 
++bool arm_smccc_hyp_present(const uuid_t *hyp_uuid)
++{
++	struct arm_smccc_res res = {};
++
++	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_HVC)
++		return false;
++	arm_smccc_1_1_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
++	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
++		return false;
++
++	return ({
++		const uuid_t uuid = SMCCC_RES_TO_UUID(res.a0, res.a1, res.a2, res.a3);
++		const bool present = uuid_equal(&uuid, hyp_uuid);
++
++		present;
++	});
++}
++EXPORT_SYMBOL_GPL(arm_smccc_hyp_present);
++
+ static int __init smccc_devices_init(void)
+ {
+ 	struct platform_device *pdev;
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 67f6fdf2e7cd..726f18221f1c 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -7,6 +7,11 @@
+ 
+ #include <linux/args.h>
+ #include <linux/init.h>
++
++#ifndef __ASSEMBLER__
++#include <linux/uuid.h>
 +#endif
 +
- #endif
-diff --git a/include/hyperv/hvgdk_mini.h b/include/hyperv/hvgdk_mini.h
-index 58895883f636..98aa64e8844c 100644
---- a/include/hyperv/hvgdk_mini.h
-+++ b/include/hyperv/hvgdk_mini.h
-@@ -1202,7 +1202,7 @@ struct hv_send_ipi {	 /* HV_INPUT_SEND_SYNTHETIC_CLUSTER_IPI */
- 	u64 cpu_mask;
- } __packed;
+ #include <uapi/linux/const.h>
  
--#define	HV_X64_VTL_MASK			GENMASK(3, 0)
-+#define	HV_VTL_MASK			GENMASK(3, 0)
+ /*
+@@ -107,10 +112,10 @@
+ 			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
  
- /* Hyper-V memory host visibility */
- enum hv_mem_host_visibility {
+ /* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
+-#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+-#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+-#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+-#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM UUID_INIT(\
++	0xb66fb428, 0xc52e, 0xe911, \
++	0xa9, 0xca, 0x4b, 0x56, \
++	0x4d, 0x00, 0x3a, 0x74)
+ 
+ /* KVM "vendor specific" services */
+ #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+@@ -333,6 +338,48 @@ s32 arm_smccc_get_soc_id_version(void);
+  */
+ s32 arm_smccc_get_soc_id_revision(void);
+ 
++#ifndef __ASSEMBLER__
++
++/**
++ * arm_smccc_hyp_present(const uuid_t *hyp_uuid)
++ *
++ * Returns `true` if the hypervisor advertises its presence via SMCCC.
++ *
++ * When the function returns `false`, the caller shall not assume that
++ * there is no hypervisor running. Instead, the caller must fall back to
++ * other approaches if any are available.
++ */
++bool arm_smccc_hyp_present(const uuid_t *hyp_uuid);
++
++#define SMCCC_RES_TO_UUID(r0, r1, r2, r3) \
++	UUID_INIT( \
++		cpu_to_le32(lower_32_bits(r0)), \
++		cpu_to_le32(lower_32_bits(r1)) & 0xffff, \
++		cpu_to_le32(lower_32_bits(r1)) >> 16, \
++		cpu_to_le32(lower_32_bits(r2)) & 0xff, \
++		(cpu_to_le32(lower_32_bits(r2)) >> 8) & 0xff, \
++		(cpu_to_le32(lower_32_bits(r2)) >> 16) & 0xff, \
++		(cpu_to_le32(lower_32_bits(r2)) >> 24) & 0xff, \
++		cpu_to_le32(lower_32_bits(r3)) & 0xff, \
++		(cpu_to_le32(lower_32_bits(r3)) >> 8) & 0xff, \
++		(cpu_to_le32(lower_32_bits(r3)) >> 16) & 0xff, \
++		(cpu_to_le32(lower_32_bits(r3)) >> 24) & 0xff \
++	)
++
++#define UUID_TO_SMCCC_RES(uuid_init, regs) do { \
++		const uuid_t uuid = uuid_init; \
++		(regs)[0] = le32_to_cpu((u32)uuid.b[0] | (uuid.b[1] << 8) | \
++						((uuid.b[2]) << 16) | ((uuid.b[3]) << 24)); \
++		(regs)[1] = le32_to_cpu((u32)uuid.b[4] | (uuid.b[5] << 8) | \
++						((uuid.b[6]) << 16) | ((uuid.b[7]) << 24)); \
++		(regs)[2] = le32_to_cpu((u32)uuid.b[8] | (uuid.b[9] << 8) | \
++						((uuid.b[10]) << 16) | ((uuid.b[11]) << 24)); \
++		(regs)[3] = le32_to_cpu((u32)uuid.b[12] | (uuid.b[13] << 8) | \
++						((uuid.b[14]) << 16) | ((uuid.b[15]) << 24)); \
++	} while (0)
++
++#endif /* !__ASSEMBLER__ */
++
+ /**
+  * struct arm_smccc_res - Result from SMC/HVC call
+  * @a0-a3 result values from registers 0 to 3
 -- 
 2.43.0
 
