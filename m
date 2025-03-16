@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20AA1A00ED;
-	Sun, 16 Mar 2025 11:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDDD18DB26;
+	Sun, 16 Mar 2025 11:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742122987; cv=none; b=OBbNKTBeBTyUICcJMFG1riDDRdSfjrNUlzrKfz0248F75AQHeM20nn4h/kUo97EUkDNmQKxJNvEkOih2fkZdkMM5KAjR1d+DNNlEixO+jOoeTj1P2grUyyKiuHbePadFAPX4a92LRPipTnH1bxO8im2aPHZA/kcnHxEKzu7vrGs=
+	t=1742123290; cv=none; b=SD03f1UgAeD0QOQT+bjqxeL2MhEU3hTZu0UlZKbbXJjAw8j3Pj3wXmY/zz5/zCZep7S2etMI/MJZZWNJCIi4x6BnrVTOlIfZItMhvam0ZEmt1AvCzejJSOF4ThzfbciuuGfxfAkjkSXTXaeOEZVZRTIRIQTwEOVq3ZvDBM1EHNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742122987; c=relaxed/simple;
-	bh=sVHjaUDH8uCiBrDHHW/8jZXGlx5rWV9vWdbICLdRKLM=;
+	s=arc-20240116; t=1742123290; c=relaxed/simple;
+	bh=NBzY1wPmskDl9cnCIedvm7cu6kUE8imKPYGTjUERKcE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sJ/3YoYmTvy+nggM2lH9bFlMq662hkfYlj6R/DwA6dTo06TGdYEmpXOJA7mqR28Fj9cHF13kIEE0SNu3h4tLcuYiVEM9wa1slmnjBEvZ0PyOqV+BxLdnvGAluNroRAlfEnyvUsn8noKPu8O8lPecpKQhu3NjIX2HARdBYni5L5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZPCW/zI; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=XrCUxE7eHw9dngmBRaJ6BDfnh8UNPhpEjthphFA6ljSJgMviJhxFVun5tFfmyv1Xw1VasU3IdlABVACocIGLnE2Yx5LAndab+hOVFvvh864KkqXOAlvq6a4cCAwNCWx3aTMBDWD2mbq93DtSyT9jqp0scvF7YWuCvmf2BO6y7/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULXG1b7T; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZPCW/zI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9109BC4CEDD;
-	Sun, 16 Mar 2025 11:03:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULXG1b7T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F91C4CEDD;
+	Sun, 16 Mar 2025 11:08:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742122987;
-	bh=sVHjaUDH8uCiBrDHHW/8jZXGlx5rWV9vWdbICLdRKLM=;
+	s=k20201202; t=1742123290;
+	bh=NBzY1wPmskDl9cnCIedvm7cu6kUE8imKPYGTjUERKcE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tZPCW/zIgzZ56V0kbeNbO+VF17LIyVFRZ6eda4wdDcnJ4djG2xIvzY5ygpX2sfq7Q
-	 Ri4/iI2B6W8Iz7MWtRuaERoJbh/CBI/kXmBitKAGiEJzODK8sFuRfumAx/kZdRXfSD
-	 UvotfrIeGfRsd/BHsfyYMWkn0DdA3wH5eZGVcgdvXsLlmu2chosRNZe3Q4ZaoFO4h5
-	 /NU46HWYUqH9JHQFonwHbZcGIjDuwQJNxfWLt+g7nkaoX87r+RPplMOleeOImEsSmU
-	 BDZngPD4+rAzKKQSPCvt+CckY8mJLgGoRkkDH6Pr7Bc4MFfgAgO2IGLPH03zr3obsq
-	 2x225PDxG8KBA==
+	b=ULXG1b7TIrcR2/kS1cAnQcp2cr+CTaakEWygYDzP0MoDR5pWybAMDvMrLKnX12gNi
+	 JHRB+l4XPhcfvAYMBBZUBJwLEyS3F7zY9YHObZOa21M04kJTbpOhisbLQ8kRyoABqt
+	 QMudRWLKALfzfoicm0wGfleRXUGugW+RIoIXiLtSY3oDh6rj6LmRcI5zUig5VFAI7n
+	 egyzTvBocHDhpki6AbZh1jCxd7MRRPR6mpCNAo3xTL+5eDU4naD9US41Aw3hRQ+3gE
+	 oyj7v12vels3V9EqmtaSwlkMkqmdtC82XviHesiB7E6mXkz2IFCm6FGHokRJDCQXUw
+	 4SAMa4Ujurfog==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ttllp-00DyMQ-Ag;
-	Sun, 16 Mar 2025 11:03:05 +0000
-Date: Sun, 16 Mar 2025 11:03:05 +0000
-Message-ID: <867c4pnspi.wl-maz@kernel.org>
+	id 1ttlqh-00DyQJ-Sm;
+	Sun, 16 Mar 2025 11:08:07 +0000
+Date: Sun, 16 Mar 2025 11:08:06 +0000
+Message-ID: <865xk9nsh5.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -46,12 +46,12 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/6] KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
-In-Reply-To: <Z9Q5k5C50Meeog9q@google.com>
+Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
+In-Reply-To: <Z9Q3-FM-QwiIn9gh@google.com>
 References: <20250227003310.367350-1-qperret@google.com>
-	<20250227003310.367350-3-qperret@google.com>
-	<86cyejooq2.wl-maz@kernel.org>
-	<Z9Q5k5C50Meeog9q@google.com>
+	<20250227003310.367350-5-qperret@google.com>
+	<86bju3onl3.wl-maz@kernel.org>
+	<Z9Q3-FM-QwiIn9gh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,69 +67,55 @@ X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.co
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 14 Mar 2025 14:13:39 +0000,
+On Fri, 14 Mar 2025 14:06:48 +0000,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> On Friday 14 Mar 2025 at 11:07:01 (+0000), Marc Zyngier wrote:
-> > On Thu, 27 Feb 2025 00:33:06 +0000,
+> On Friday 14 Mar 2025 at 11:31:36 (+0000), Marc Zyngier wrote:
+> > On Thu, 27 Feb 2025 00:33:08 +0000,
 > > Quentin Perret <qperret@google.com> wrote:
-> > > 
-> > > The page ownership state encoded as 0b11 is currently considered
-> > > reserved for future use, and PKVM_NOPAGE uses bit 2. In order to
-> > > simplify the relocation of the hyp ownership state into the
-> > > vmemmap in later patches, let's use the 'reserved' encoding for
-> > > the PKVM_NOPAGE state. The struct hyp_page layout isn't guaranteed
-> > > stable at all, so there is no real reason to have 'reserved' encodings.
-> > > 
-> > > No functional changes intended.
-> > > 
-> > > Signed-off-by: Quentin Perret <qperret@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/include/nvhe/memory.h | 5 +----
-> > >  1 file changed, 1 insertion(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > index 34233d586060..642b5e05fe77 100644
-> > > --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > @@ -13,18 +13,15 @@
-> > >   *   01: The page is owned by the page-table owner, but is shared
-> > >   *       with another entity.
-> > >   *   10: The page is shared with, but not owned by the page-table owner.
-> > > - *   11: Reserved for future use (lending).
-> > >   */
-> > >  enum pkvm_page_state {
-> > >  	PKVM_PAGE_OWNED			= 0ULL,
-> > >  	PKVM_PAGE_SHARED_OWNED		= BIT(0),
-> > >  	PKVM_PAGE_SHARED_BORROWED	= BIT(1),
-> > > -	__PKVM_PAGE_RESERVED		= BIT(0) | BIT(1),
-> > >  
-> > >  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
-> > > -	PKVM_NOPAGE			= BIT(2),
-> > > +	PKVM_NOPAGE			= BIT(0) | BIT(1),
+> > > @@ -698,13 +697,13 @@ int __pkvm_host_share_hyp(u64 pfn)
+> > >  	if (ret)
+> > >  		goto unlock;
+> > >  	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
+> > > -		ret = __hyp_check_page_state_range((u64)virt, size, PKVM_NOPAGE);
+> > > +		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
 > > 
-> > Isn't this comment stale now?
+> > OK, I think I finally clicked here. Does it mean that all the tracking
+> > is now done in terms of PAs instead of VAs?
 > 
-> I believe it still applies to guest stage-2 page-tables as the three
-> other states above are still stored into PTE SW bits (well, sort of,
-> only SHARED_BORROWED is at the moment as we don't supported protected
-> VMs, but OWNED and SHARED_OWNED will be a thing for protected). NOPAGE
-> is still the only one that is a bit different and doesn't go there.
->
-> With that said, the comment could be made more explicit about that and
-> explain this is now guest s2 only. Happy to spin another version of the
-> series with that changed if that helps.
+> Yep, that's exactly that. The hyp_vmemmap is indexed by pfn, so I felt
+> that the conversion to a PA-based tracking made sense. That also make it
+> clear that the 'hyp state' is not a property of a mapping, but really of
+> the underlying physical page.
 
-Right. It is slightly misleading that we end-up with two notions of
-state:
+It indeed makes sense. It is just that it took me some time to realise
+the extent of the change.
 
-- the per-mapping state encoded in the PTs
-- the per-page state encoded in the vmemmap
+> 
+> > >  		if (ret)
+> > >  			goto unlock;
+> > >  	}
+> > >  
+> > > -	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
+> > > -	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, prot));
+> > > +	__hyp_set_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
+> > > +	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
+> > 
+> > And this is the split between the state now being kept in the on a PA
+> > base and the actual mapping that is now only takes the page attributes
+> > and no SW bits?
+> 
+> Precisely, and the next patch in this series takes advantage of the
+> fact that we're now de-correlating the hyp state from the presence of a
+> hyp s1 mapping in the linear map range. In the future there'll be more
+> use-cases for this I think (e.g. the hyp allocator where we'll have
+> pages owned by the hypervisor but only mapped in the 'private' range,
+> things like that).
 
-The two are obviously related, but it is all a bit confusing for the
-unsuspecting reader. There is no urgency to address this, but maybe
-it'd be good to clarify this aspect in the future (no need to respin
-on that account).
+Yup, that's probably the correct direction of travel. The hypervisor
+shouldn't need to map everything -- quite the opposite actually.
+
+Thanks,
 
 	M.
 
