@@ -1,49 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB09C1624E5;
-	Sun, 16 Mar 2025 10:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20AA1A00ED;
+	Sun, 16 Mar 2025 11:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742121506; cv=none; b=QQ4B0d6Nv1FqXnMcyfpjIS8zJXU7Z9HFyfZXlyPCB2rCminwWBdD2fT8NLReWEYbNhcH29D3eSDXI0DP1NDccvnujHEJoFCIAwgTNehSwMXHf0TeBI9lg2ouHaf5BTvFFELMftUB/9+9HRRf80+1yRmxCT02KzqmM7LEZ4ceExU=
+	t=1742122987; cv=none; b=OBbNKTBeBTyUICcJMFG1riDDRdSfjrNUlzrKfz0248F75AQHeM20nn4h/kUo97EUkDNmQKxJNvEkOih2fkZdkMM5KAjR1d+DNNlEixO+jOoeTj1P2grUyyKiuHbePadFAPX4a92LRPipTnH1bxO8im2aPHZA/kcnHxEKzu7vrGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742121506; c=relaxed/simple;
-	bh=ucfDcVDXjcWOKkPOItkoGktnegmxA36i+Qi8b/Jl410=;
+	s=arc-20240116; t=1742122987; c=relaxed/simple;
+	bh=sVHjaUDH8uCiBrDHHW/8jZXGlx5rWV9vWdbICLdRKLM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ucj5LjbIrpYUqi4CsJyvgOXeKBZPakYEXfqLld9Nze9lJ87yYCN1LYp6TkyDDo4E660041vOj3z5YSVufk6YOefDJSh62FGxN6KSRmInDie1Z1bxSjXB6SWqxa/oDV9U369sXzSPClyfH4B3vsd/DqKcxdStOAgt1e9W3l5pndU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tzoUnGUJ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=sJ/3YoYmTvy+nggM2lH9bFlMq662hkfYlj6R/DwA6dTo06TGdYEmpXOJA7mqR28Fj9cHF13kIEE0SNu3h4tLcuYiVEM9wa1slmnjBEvZ0PyOqV+BxLdnvGAluNroRAlfEnyvUsn8noKPu8O8lPecpKQhu3NjIX2HARdBYni5L5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZPCW/zI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tzoUnGUJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52991C4CEDD;
-	Sun, 16 Mar 2025 10:38:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZPCW/zI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9109BC4CEDD;
+	Sun, 16 Mar 2025 11:03:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742121505;
-	bh=ucfDcVDXjcWOKkPOItkoGktnegmxA36i+Qi8b/Jl410=;
+	s=k20201202; t=1742122987;
+	bh=sVHjaUDH8uCiBrDHHW/8jZXGlx5rWV9vWdbICLdRKLM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tzoUnGUJYmLLjkfW4T7p2RLqA4jzYzCkibx3MtvizJlWr+Cxzm9P761vIPHs9POf4
-	 ROTqpgwo0dXDjhaL0X2n3UekeGmt6n9kb7nzDztHvHcMatY+u+ttLRxecE//YGLa8R
-	 mylic3yWL5yS8fW78Q2hu2wHs0CPIqdztq6iHYrGmpv4Av0Ma6fSqMXg3rwzG4J/1b
-	 x6xNBqM+A+YchzEStpg+E4lC8ARnUVkKO1z+H/aL63GBm2mtRahe4pMcxAhCW/VDgh
-	 9GmdnZqGO/hDHq7qRJICGglt2PsRUbnhfPYwza60Z0Z1uRB+cHq8QWQE3YMFscOGeC
-	 dKIq8SYq61cIQ==
+	b=tZPCW/zIgzZ56V0kbeNbO+VF17LIyVFRZ6eda4wdDcnJ4djG2xIvzY5ygpX2sfq7Q
+	 Ri4/iI2B6W8Iz7MWtRuaERoJbh/CBI/kXmBitKAGiEJzODK8sFuRfumAx/kZdRXfSD
+	 UvotfrIeGfRsd/BHsfyYMWkn0DdA3wH5eZGVcgdvXsLlmu2chosRNZe3Q4ZaoFO4h5
+	 /NU46HWYUqH9JHQFonwHbZcGIjDuwQJNxfWLt+g7nkaoX87r+RPplMOleeOImEsSmU
+	 BDZngPD4+rAzKKQSPCvt+CckY8mJLgGoRkkDH6Pr7Bc4MFfgAgO2IGLPH03zr3obsq
+	 2x225PDxG8KBA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ttlNv-00Dy89-3i;
-	Sun, 16 Mar 2025 10:38:23 +0000
-Date: Sun, 16 Mar 2025 10:38:21 +0000
-Message-ID: <868qp5ntuq.wl-maz@kernel.org>
+	id 1ttllp-00DyMQ-Ag;
+	Sun, 16 Mar 2025 11:03:05 +0000
+Date: Sun, 16 Mar 2025 11:03:05 +0000
+Message-ID: <867c4pnspi.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev,
+To: Quentin Perret <qperret@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
 	linux-arm-kernel@lists.infradead.org,
-	stable@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH] KVM: arm64: Tear down vGIC on failed vCPU creation
-In-Reply-To: <20250314133409.9123-1-will@kernel.org>
-References: <20250314133409.9123-1-will@kernel.org>
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/6] KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
+In-Reply-To: <Z9Q5k5C50Meeog9q@google.com>
+References: <20250227003310.367350-1-qperret@google.com>
+	<20250227003310.367350-3-qperret@google.com>
+	<86cyejooq2.wl-maz@kernel.org>
+	<Z9Q5k5C50Meeog9q@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,57 +63,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, oliver.upton@linux.dev, qperret@google.com
+X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 14 Mar 2025 13:34:09 +0000,
-Will Deacon <will@kernel.org> wrote:
+On Fri, 14 Mar 2025 14:13:39 +0000,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> If kvm_arch_vcpu_create() fails to share the vCPU page with the
-> hypervisor, we propagate the error back to the ioctl but leave the
-> vGIC vCPU data initialised. Note only does this leak the corresponding
-> memory when the vCPU is destroyed but it can also lead to use-after-free
-> if the redistributor device handling tries to walk into the vCPU.
+> On Friday 14 Mar 2025 at 11:07:01 (+0000), Marc Zyngier wrote:
+> > On Thu, 27 Feb 2025 00:33:06 +0000,
+> > Quentin Perret <qperret@google.com> wrote:
+> > > 
+> > > The page ownership state encoded as 0b11 is currently considered
+> > > reserved for future use, and PKVM_NOPAGE uses bit 2. In order to
+> > > simplify the relocation of the hyp ownership state into the
+> > > vmemmap in later patches, let's use the 'reserved' encoding for
+> > > the PKVM_NOPAGE state. The struct hyp_page layout isn't guaranteed
+> > > stable at all, so there is no real reason to have 'reserved' encodings.
+> > > 
+> > > No functional changes intended.
+> > > 
+> > > Signed-off-by: Quentin Perret <qperret@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/include/nvhe/memory.h | 5 +----
+> > >  1 file changed, 1 insertion(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> > > index 34233d586060..642b5e05fe77 100644
+> > > --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> > > @@ -13,18 +13,15 @@
+> > >   *   01: The page is owned by the page-table owner, but is shared
+> > >   *       with another entity.
+> > >   *   10: The page is shared with, but not owned by the page-table owner.
+> > > - *   11: Reserved for future use (lending).
+> > >   */
+> > >  enum pkvm_page_state {
+> > >  	PKVM_PAGE_OWNED			= 0ULL,
+> > >  	PKVM_PAGE_SHARED_OWNED		= BIT(0),
+> > >  	PKVM_PAGE_SHARED_BORROWED	= BIT(1),
+> > > -	__PKVM_PAGE_RESERVED		= BIT(0) | BIT(1),
+> > >  
+> > >  	/* Meta-states which aren't encoded directly in the PTE's SW bits */
+> > > -	PKVM_NOPAGE			= BIT(2),
+> > > +	PKVM_NOPAGE			= BIT(0) | BIT(1),
+> > 
+> > Isn't this comment stale now?
 > 
-> Add the missing cleanup to kvm_arch_vcpu_create(), ensuring that the
-> vGIC vCPU structures are destroyed on error.
-> 
-> Cc: <stable@vger.kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
-> 
-> It's hard to come up with a "Fixes:" tag for this. Prior to 3f868e142c0b
-> ("KVM: arm64: Introduce kvm_share_hyp()"), create_hyp_mappings() could
-> still have failed, although if you go back before 66c57edd3bc7 ("KVM:
-> arm64: Restrict EL2 stage-1 changes in protected mode") then it's
-> vanishingly unlikely.
-> 
->  arch/arm64/kvm/arm.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index b8e55a441282..fa71cee02faa 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -466,7 +466,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	if (err)
->  		return err;
->  
-> -	return kvm_share_hyp(vcpu, vcpu + 1);
-> +	err = kvm_share_hyp(vcpu, vcpu + 1);
-> +	if (err)
-> +		kvm_vgic_vcpu_destroy(vcpu);
-> +
-> +	return err;
->  }
->  
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+> I believe it still applies to guest stage-2 page-tables as the three
+> other states above are still stored into PTE SW bits (well, sort of,
+> only SHARED_BORROWED is at the moment as we don't supported protected
+> VMs, but OWNED and SHARED_OWNED will be a thing for protected). NOPAGE
+> is still the only one that is a bit different and doesn't go there.
+>
+> With that said, the comment could be made more explicit about that and
+> explain this is now guest s2 only. Happy to spin another version of the
+> series with that changed if that helps.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Right. It is slightly misleading that we end-up with two notions of
+state:
+
+- the per-mapping state encoded in the PTs
+- the per-page state encoded in the vmemmap
+
+The two are obviously related, but it is all a bit confusing for the
+unsuspecting reader. There is no urgency to address this, but maybe
+it'd be good to clarify this aspect in the future (no need to respin
+on that account).
 
 	M.
 
