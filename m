@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDDD18DB26;
-	Sun, 16 Mar 2025 11:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D1C154BFE;
+	Sun, 16 Mar 2025 11:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742123290; cv=none; b=SD03f1UgAeD0QOQT+bjqxeL2MhEU3hTZu0UlZKbbXJjAw8j3Pj3wXmY/zz5/zCZep7S2etMI/MJZZWNJCIi4x6BnrVTOlIfZItMhvam0ZEmt1AvCzejJSOF4ThzfbciuuGfxfAkjkSXTXaeOEZVZRTIRIQTwEOVq3ZvDBM1EHNw=
+	t=1742123540; cv=none; b=P+RjOXmVavdpPvwXRVlTugd6ILAYps0m4rPdual98oHuUGYBG4l+ZuEKXgg28AcKum5uDR3gMxo3iXDeP9AMEPls4bJcp/J9MgXOEH7giHKtV/QypsxOuphyx9qZogKSOL4fRtzGL8k0nKNRanMz0By5W2ZunyVGlB2iu3moJ10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742123290; c=relaxed/simple;
-	bh=NBzY1wPmskDl9cnCIedvm7cu6kUE8imKPYGTjUERKcE=;
+	s=arc-20240116; t=1742123540; c=relaxed/simple;
+	bh=4ZEEybcIfeZK2o63kdNPHHfyqeq3KgfN4XgVKPtAg0Y=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XrCUxE7eHw9dngmBRaJ6BDfnh8UNPhpEjthphFA6ljSJgMviJhxFVun5tFfmyv1Xw1VasU3IdlABVACocIGLnE2Yx5LAndab+hOVFvvh864KkqXOAlvq6a4cCAwNCWx3aTMBDWD2mbq93DtSyT9jqp0scvF7YWuCvmf2BO6y7/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULXG1b7T; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=kr0MfiWsPFV0RqsEzQlhrxXlRS2uU5BNdtiqhW1SOuOBIWNqu378FbG4W1qJYfvEzZE2pKVJ/fjPVZPhpYT7J8zTvEztIwjp64hbXtwbMPyZstP8GgfSeagzDF4jow3mDzYEsPT9AO0Eu+5kMhCRmAMdwJOAyCF8d7lBwj3Vs9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zy7Nkshr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULXG1b7T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F91C4CEDD;
-	Sun, 16 Mar 2025 11:08:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zy7Nkshr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4255AC4CEDD;
+	Sun, 16 Mar 2025 11:12:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742123290;
-	bh=NBzY1wPmskDl9cnCIedvm7cu6kUE8imKPYGTjUERKcE=;
+	s=k20201202; t=1742123540;
+	bh=4ZEEybcIfeZK2o63kdNPHHfyqeq3KgfN4XgVKPtAg0Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ULXG1b7TIrcR2/kS1cAnQcp2cr+CTaakEWygYDzP0MoDR5pWybAMDvMrLKnX12gNi
-	 JHRB+l4XPhcfvAYMBBZUBJwLEyS3F7zY9YHObZOa21M04kJTbpOhisbLQ8kRyoABqt
-	 QMudRWLKALfzfoicm0wGfleRXUGugW+RIoIXiLtSY3oDh6rj6LmRcI5zUig5VFAI7n
-	 egyzTvBocHDhpki6AbZh1jCxd7MRRPR6mpCNAo3xTL+5eDU4naD9US41Aw3hRQ+3gE
-	 oyj7v12vels3V9EqmtaSwlkMkqmdtC82XviHesiB7E6mXkz2IFCm6FGHokRJDCQXUw
-	 4SAMa4Ujurfog==
+	b=Zy7Nkshr5ieGYILWsYa9Uy1Dmp5VshwsyKYM28vQrc8wFDlTacOYyxQQbdpveKe4v
+	 JauafJ9Qas23rkZ27LmBAuSdfS1Xxt6RYxBmgAwbxQ50WfhAgH082JOuLqn+GsVuP8
+	 z3zzwF31HvjREfcOSTg+HjMkJoFG0spfKp3XZdJz9bo1K0JtPlkLCbgUlh2bkELTKF
+	 +rjv+dKl0XvYXRXfJ0pmPhMC5mgjIoksVwUhMZWFqGxfWvuKGGPZVw8ynZRhgyjtfY
+	 lv/6MK8aSLd+Agi+TrY4I3+j5ticC72ayBGrxRTyZLXTOZybK4jJ92VJKPCWj/oW38
+	 e0LCx6VIH1L8w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ttlqh-00DyQJ-Sm;
-	Sun, 16 Mar 2025 11:08:07 +0000
-Date: Sun, 16 Mar 2025 11:08:06 +0000
-Message-ID: <865xk9nsh5.wl-maz@kernel.org>
+	id 1ttluk-00DyUl-1b;
+	Sun, 16 Mar 2025 11:12:18 +0000
+Date: Sun, 16 Mar 2025 11:12:17 +0000
+Message-ID: <864iztnsa6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -46,12 +46,9 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] KVM: arm64: Move hyp state to hyp_vmemmap
-In-Reply-To: <Z9Q3-FM-QwiIn9gh@google.com>
+Subject: Re: [PATCH 0/6] Move pKVM ownership state to hyp_vmemmap
+In-Reply-To: <20250227003310.367350-1-qperret@google.com>
 References: <20250227003310.367350-1-qperret@google.com>
-	<20250227003310.367350-5-qperret@google.com>
-	<86bju3onl3.wl-maz@kernel.org>
-	<Z9Q3-FM-QwiIn9gh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,55 +64,54 @@ X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.co
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 14 Mar 2025 14:06:48 +0000,
+On Thu, 27 Feb 2025 00:33:04 +0000,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> On Friday 14 Mar 2025 at 11:31:36 (+0000), Marc Zyngier wrote:
-> > On Thu, 27 Feb 2025 00:33:08 +0000,
-> > Quentin Perret <qperret@google.com> wrote:
-> > > @@ -698,13 +697,13 @@ int __pkvm_host_share_hyp(u64 pfn)
-> > >  	if (ret)
-> > >  		goto unlock;
-> > >  	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
-> > > -		ret = __hyp_check_page_state_range((u64)virt, size, PKVM_NOPAGE);
-> > > +		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
-> > 
-> > OK, I think I finally clicked here. Does it mean that all the tracking
-> > is now done in terms of PAs instead of VAs?
+> Hi all,
 > 
-> Yep, that's exactly that. The hyp_vmemmap is indexed by pfn, so I felt
-> that the conversion to a PA-based tracking made sense. That also make it
-> clear that the 'hyp state' is not a property of a mapping, but really of
-> the underlying physical page.
-
-It indeed makes sense. It is just that it took me some time to realise
-the extent of the change.
-
+> This series moves the hypervisor's ownership state to the hyp_vmemmap,
+> as discussed in [1]. The two main benefits are:
 > 
-> > >  		if (ret)
-> > >  			goto unlock;
-> > >  	}
-> > >  
-> > > -	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
-> > > -	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, prot));
-> > > +	__hyp_set_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
-> > > +	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
-> > 
-> > And this is the split between the state now being kept in the on a PA
-> > base and the actual mapping that is now only takes the page attributes
-> > and no SW bits?
+>  1. much cheaper hyp state lookups, since we can avoid the hyp stage-1
+>     page-table walk;
 > 
-> Precisely, and the next patch in this series takes advantage of the
-> fact that we're now de-correlating the hyp state from the presence of a
-> hyp s1 mapping in the linear map range. In the future there'll be more
-> use-cases for this I think (e.g. the hyp allocator where we'll have
-> pages owned by the hypervisor but only mapped in the 'private' range,
-> things like that).
+>  2. de-correlates the hyp state from the presence of a mapping in the
+>     linear map range of the hypervisor; which enables a bunch of
+>     clean-ups in the existing code and will simplify the introduction of
+>     other features in the future (hyp tracing, ...)
+> 
+> Patch 01 is a self-sufficient cleanup that I found thanks to patch 05.
+> Patches 02-04 implement the aforementioned migration of the hyp state
+> to the vmemmap. Patches 05 and 06 are cleanups enabled by that
+> migration.
+> 
+> Patches based on 6.14-rc4, tested on Qemu.
+> 
+> Thanks!
+> Quentin
+> 
+> [1] https://lore.kernel.org/kvmarm/Z79ZJVOHtNu6YsVt@google.com/
+> 
+> Fuad Tabba (1):
+>   KVM: arm64: Track SVE state in the hypervisor vcpu structure
+> 
+> Quentin Perret (5):
+>   KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
+>   KVM: arm64: Introduce {get,set}_host_state() helpers
+>   KVM: arm64: Move hyp state to hyp_vmemmap
+>   KVM: arm64: Defer EL2 stage-1 mapping on share
+>   KVM: arm64: Unconditionally cross check hyp state
+> 
+>  arch/arm64/include/asm/kvm_host.h        |  12 +--
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h |  35 ++++++--
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c       |   4 -
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 106 ++++++++++++-----------
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c           |  54 ++++++++++--
+>  arch/arm64/kvm/hyp/nvhe/setup.c          |  10 ++-
+>  6 files changed, 147 insertions(+), 74 deletions(-)
+> 
 
-Yup, that's probably the correct direction of travel. The hypervisor
-shouldn't need to map everything -- quite the opposite actually.
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
