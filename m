@@ -1,119 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D1C154BFE;
-	Sun, 16 Mar 2025 11:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6F11AA1D9;
+	Sun, 16 Mar 2025 17:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742123540; cv=none; b=P+RjOXmVavdpPvwXRVlTugd6ILAYps0m4rPdual98oHuUGYBG4l+ZuEKXgg28AcKum5uDR3gMxo3iXDeP9AMEPls4bJcp/J9MgXOEH7giHKtV/QypsxOuphyx9qZogKSOL4fRtzGL8k0nKNRanMz0By5W2ZunyVGlB2iu3moJ10=
+	t=1742146618; cv=none; b=oUf4uxszi6xTsMr93KgZTt+MmEnAgfWTrFNGMOTftoyn3OW/OT6qyPEMTGFpkEk6aBNUgPwSI7vATGvv2fTwCb7xovUF1qrlPhHkCwC41p4UQ3zOt0zD3+SP9HoDgxlDJj8qXvWhsGDvT2PdFPZ1sTfvsPY3jf5XIXSLJp0ifsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742123540; c=relaxed/simple;
-	bh=4ZEEybcIfeZK2o63kdNPHHfyqeq3KgfN4XgVKPtAg0Y=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kr0MfiWsPFV0RqsEzQlhrxXlRS2uU5BNdtiqhW1SOuOBIWNqu378FbG4W1qJYfvEzZE2pKVJ/fjPVZPhpYT7J8zTvEztIwjp64hbXtwbMPyZstP8GgfSeagzDF4jow3mDzYEsPT9AO0Eu+5kMhCRmAMdwJOAyCF8d7lBwj3Vs9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zy7Nkshr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742146618; c=relaxed/simple;
+	bh=SykknbCWIe+4iAlW2oyUTP1j/isvxfybnvUnqUuCmXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lREwdNauZxto3qzOfqPctA/g9IaUZntthP1PHirouTNeOAmP6gTORY+PZkAQOq/fqrrL5VZJ+BZ5pZMwjhMqYhRRwkSAVQZYUCOukjHxoRcZzPCJCSgRqbsU7FRH1c7Db9j74TO6LFfDOamZt10NsfV5SJP/eZGARb1daVduMOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u5JfoeYj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zy7Nkshr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4255AC4CEDD;
-	Sun, 16 Mar 2025 11:12:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u5JfoeYj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 754B0C4CEDD;
+	Sun, 16 Mar 2025 17:36:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742123540;
-	bh=4ZEEybcIfeZK2o63kdNPHHfyqeq3KgfN4XgVKPtAg0Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zy7Nkshr5ieGYILWsYa9Uy1Dmp5VshwsyKYM28vQrc8wFDlTacOYyxQQbdpveKe4v
-	 JauafJ9Qas23rkZ27LmBAuSdfS1Xxt6RYxBmgAwbxQ50WfhAgH082JOuLqn+GsVuP8
-	 z3zzwF31HvjREfcOSTg+HjMkJoFG0spfKp3XZdJz9bo1K0JtPlkLCbgUlh2bkELTKF
-	 +rjv+dKl0XvYXRXfJ0pmPhMC5mgjIoksVwUhMZWFqGxfWvuKGGPZVw8ynZRhgyjtfY
-	 lv/6MK8aSLd+Agi+TrY4I3+j5ticC72ayBGrxRTyZLXTOZybK4jJ92VJKPCWj/oW38
-	 e0LCx6VIH1L8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ttluk-00DyUl-1b;
-	Sun, 16 Mar 2025 11:12:18 +0000
-Date: Sun, 16 Mar 2025 11:12:17 +0000
-Message-ID: <864iztnsa6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/6] Move pKVM ownership state to hyp_vmemmap
-In-Reply-To: <20250227003310.367350-1-qperret@google.com>
-References: <20250227003310.367350-1-qperret@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1742146617;
+	bh=SykknbCWIe+4iAlW2oyUTP1j/isvxfybnvUnqUuCmXQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u5JfoeYjXVe72cOJuVO+ZB67RBdb/EnWyoZtxffEL9ivnl+kBKYj2cgGoxJCG0TRb
+	 tZ4xQo1xjYoDIgSiNWmDhxXRAp4PelD2A8D2XXTKnpbRfh9BauM4FPwhYbvrmM9Rls
+	 2sbNaBgDqAf/U4QtCVq20wW9YbRcpT48TALGHWRW/c5muHrjvxmxYonLSX7f5Db5FT
+	 sN1Ggo+/TRsMPZiQH41KpcbQEkRYHDExUCImkK/ok19rHkZ+zi0kagauLhx4CAdTny
+	 Fmn+g8PWEAy1stUZSOeuHdqAwRc9IjUAWwpiO4WI0WWR86yJ50Z3UMjQe7R01UExSQ
+	 wG6u3d7Egwvlw==
+Date: Sun, 16 Mar 2025 18:36:53 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Roman Kisel <romank@linux.microsoft.com>
+Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de, 
+	catalin.marinas@arm.com, conor+dt@kernel.org, dan.carpenter@linaro.org, 
+	dave.hansen@linux.intel.com, decui@microsoft.com, haiyangz@microsoft.com, hpa@zytor.com, 
+	joey.gouly@arm.com, krzk+dt@kernel.org, kw@linux.com, kys@microsoft.com, 
+	lenb@kernel.org, lpieralisi@kernel.org, manivannan.sadhasivam@linaro.org, 
+	mark.rutland@arm.com, maz@kernel.org, mingo@redhat.com, oliver.upton@linux.dev, 
+	rafael@kernel.org, robh@kernel.org, ssengar@linux.microsoft.com, 
+	sudeep.holla@arm.com, suzuki.poulose@arm.com, tglx@linutronix.de, wei.liu@kernel.org, 
+	will@kernel.org, yuzenghui@huawei.com, devicetree@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pci@vger.kernel.org, x86@kernel.org, apais@microsoft.com, benhill@microsoft.com, 
+	bperkins@microsoft.com, sunilmut@microsoft.com
+Subject: Re: [PATCH hyperv-next v6 07/11] dt-bindings: microsoft,vmbus: Add
+ interrupt and DMA coherence properties
+Message-ID: <20250316-versed-trogon-of-serendipity-bf7ea7@krzk-bin>
+References: <20250315001931.631210-1-romank@linux.microsoft.com>
+ <20250315001931.631210-8-romank@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250315001931.631210-8-romank@linux.microsoft.com>
 
-On Thu, 27 Feb 2025 00:33:04 +0000,
-Quentin Perret <qperret@google.com> wrote:
-> 
-> Hi all,
-> 
-> This series moves the hypervisor's ownership state to the hyp_vmemmap,
-> as discussed in [1]. The two main benefits are:
-> 
->  1. much cheaper hyp state lookups, since we can avoid the hyp stage-1
->     page-table walk;
-> 
->  2. de-correlates the hyp state from the presence of a mapping in the
->     linear map range of the hypervisor; which enables a bunch of
->     clean-ups in the existing code and will simplify the introduction of
->     other features in the future (hyp tracing, ...)
-> 
-> Patch 01 is a self-sufficient cleanup that I found thanks to patch 05.
-> Patches 02-04 implement the aforementioned migration of the hyp state
-> to the vmemmap. Patches 05 and 06 are cleanups enabled by that
-> migration.
-> 
-> Patches based on 6.14-rc4, tested on Qemu.
-> 
-> Thanks!
-> Quentin
-> 
-> [1] https://lore.kernel.org/kvmarm/Z79ZJVOHtNu6YsVt@google.com/
-> 
-> Fuad Tabba (1):
->   KVM: arm64: Track SVE state in the hypervisor vcpu structure
-> 
-> Quentin Perret (5):
->   KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
->   KVM: arm64: Introduce {get,set}_host_state() helpers
->   KVM: arm64: Move hyp state to hyp_vmemmap
->   KVM: arm64: Defer EL2 stage-1 mapping on share
->   KVM: arm64: Unconditionally cross check hyp state
-> 
->  arch/arm64/include/asm/kvm_host.h        |  12 +--
->  arch/arm64/kvm/hyp/include/nvhe/memory.h |  35 ++++++--
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c       |   4 -
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 106 ++++++++++++-----------
->  arch/arm64/kvm/hyp/nvhe/pkvm.c           |  54 ++++++++++--
->  arch/arm64/kvm/hyp/nvhe/setup.c          |  10 ++-
->  6 files changed, 147 insertions(+), 74 deletions(-)
-> 
+On Fri, Mar 14, 2025 at 05:19:27PM -0700, Roman Kisel wrote:
+>  
+> +  dma-coherent: true
+> +
+> +  interrupts:
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+> +    maxItems: 1
+> +    description: |
+> +      This interrupt is used to report a message from the host.
 
-	M.
+These could be just two lines:
 
--- 
-Without deviation from the norm, progress is not possible.
+items:
+  - description: Interrupt used to report a message from the host.
+
+(and note that just like we do not use "This" in commit msg, there is
+really no benefit of using it in hardware descruption for simple
+statements)
+
+Regardless:
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
+
