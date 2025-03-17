@@ -1,129 +1,207 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674B354652;
-	Mon, 17 Mar 2025 14:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3581A8407
+	for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 17:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742222968; cv=none; b=d80UBc+UPfOTiFkc1laiDCq5WWX+iqzz2f18fK6ayCi79MYNIwUGI9O7QXb35GxifwBvrZ2X3HfUa+GSe861PZ5UPAXaJoLNy6Ptsj9OMYfwOJUEUHCn5F4Hc8IB4RE0sI7erVUppfvLReqy4giJFXoDsSKXMCu32tQJaV+Bo4Y=
+	t=1742231225; cv=none; b=Oietrk9lBWkm4yi9/m/YASgBp1ABhsNmSu/orC4SCfkjL9Lp21+qK2pkdcjPn7nxdWdljhUT5kiD4kCErdwngbWeguTrf6dnRRg1CW1H0Rrebph5JKoM83nEyxivmmL6XXPMhKlWjbplekrhqNhG9/ndKqsaQUp8KepCESzOMTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742222968; c=relaxed/simple;
-	bh=s8CehdpXkTqOO0ErPHHVLt5yyez+Ks7PrRBqfbCNRVc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xybe82/v5fYemLzWDFNwgOh1f7I4NelR3H/Ju7upF13Y3WYvvTj8P1eBYqyCVsdhwBhpWvWK+l+skdit60LhXE4nRAR+1O4bpqWdjNBs0k8zaGbjtSlnRAyTUgPvJ2c7p6pX9VmIFegoWugQOpEzqWqMGO07AXP2CdYerzyeEbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mhuPfWls; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742231225; c=relaxed/simple;
+	bh=7tPScfD9PU8GwL510NRuJpyMhhbfKbW53uXGSxQrROM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pdA3ehNdmt1Q1c8OvLjRoGUJ1iYWnTc1Dx0CH8nEmObYnmaZ/ijrsiS3uFOdaxjDhdUKuHdujxBGl4gANUBKkcok6iXoOqQOMz52KKhmB+u/jPwx+IAg+35va9TPs5O7D2l4/jLXmw5Fewr2evi9GXACOMnmAjVnLBWuA/tLdy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=MU0M1OS/; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mhuPfWls"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C92CFC4CEE3;
-	Mon, 17 Mar 2025 14:49:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742222967;
-	bh=s8CehdpXkTqOO0ErPHHVLt5yyez+Ks7PrRBqfbCNRVc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mhuPfWlsqazTRYpvIDa7gC+hDui8usQNP3ZO8OPLyucvwyE0ZVVFJWHL4ywTVRv57
-	 2Gw0LV8SGvedmVCfNXvGG7KLTPbDqjE6PHeE81IVIylmhCxUUy9G0aWyAQ0c1D25fA
-	 fh52Txl2pW84GIYvEcyAk48V/i7wefc2xxX6XKRDHVXdEiURyBX2dHpMWtuz5r9faj
-	 xiJh6vfra8WmJf51d3wZ1JSlrWN2aBlAcEQK9DIMPOopREGHudRjPcicgJ5XnJJD7A
-	 kl46n5Ta27Jp0zZo3JxLm5PO204jVJ5eaAhepGbPwaneDeX27LLpDXvfM3zVBR/axc
-	 +pXyz7bIKQwAw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tuBmP-00EL5V-ET;
-	Mon, 17 Mar 2025 14:49:25 +0000
-Date: Mon, 17 Mar 2025 14:49:24 +0000
-Message-ID: <86y0x3n24r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: kernel test robot <lkp@intel.com>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	oe-kbuild-all@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	devel@daynix.com
-Subject: Re: [PATCH v5 3/5] KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
-In-Reply-To: <202503172023.fzyJ3TMB-lkp@intel.com>
-References: <20250315-pmc-v5-3-ecee87dab216@daynix.com>
-	<202503172023.fzyJ3TMB-lkp@intel.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="MU0M1OS/"
+Received: from [10.137.184.60] (unknown [131.107.160.188])
+	by linux.microsoft.com (Postfix) with ESMTPSA id F377E2033444;
+	Mon, 17 Mar 2025 10:07:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F377E2033444
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1742231223;
+	bh=pVVBjR0mSZEIXZn2jj+yPFFn+SpqZ/2BXJvya8/hhRQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MU0M1OS/SvjdiBbQjAOJYZVPoksU5Sb1yCAuzxLUPv37SeuxHwFF7pbmInik5NNNf
+	 ujAGpzMt6UzTDHpp2h9YUMIjgxST9XFEazJyWc/ho17h+5D8kAGPqKrOHOkNjLv0Ub
+	 nO3vFYqx3hqhVWLCI6WxBr/n/WIQUkrc9WLiqbi4=
+Message-ID: <9c3f2492-823e-4548-8ad3-6aeb9c86d528@linux.microsoft.com>
+Date: Mon, 17 Mar 2025 10:07:02 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: lkp@intel.com, akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, andrew.jones@linux.dev, oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, devel@daynix.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH hyperv-next v6 11/11] PCI: hv: Get vPCI MSI IRQ domain
+ from DeviceTree
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de,
+ catalin.marinas@arm.com, conor+dt@kernel.org, dan.carpenter@linaro.org,
+ dave.hansen@linux.intel.com, decui@microsoft.com, haiyangz@microsoft.com,
+ hpa@zytor.com, joey.gouly@arm.com, krzk+dt@kernel.org, kw@linux.com,
+ kys@microsoft.com, lenb@kernel.org, lpieralisi@kernel.org,
+ manivannan.sadhasivam@linaro.org, mark.rutland@arm.com, maz@kernel.org,
+ mingo@redhat.com, oliver.upton@linux.dev, rafael@kernel.org,
+ robh@kernel.org, ssengar@linux.microsoft.com, sudeep.holla@arm.com,
+ suzuki.poulose@arm.com, tglx@linutronix.de, wei.liu@kernel.org,
+ will@kernel.org, yuzenghui@huawei.com, devicetree@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, x86@kernel.org, apais@microsoft.com,
+ benhill@microsoft.com, bperkins@microsoft.com, sunilmut@microsoft.com
+References: <20250315184903.GA848938@bhelgaas>
+Content-Language: en-US
+From: Roman Kisel <romank@linux.microsoft.com>
+In-Reply-To: <20250315184903.GA848938@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 17 Mar 2025 13:02:47 +0000,
-kernel test robot <lkp@intel.com> wrote:
+
+
+On 3/15/2025 11:49 AM, Bjorn Helgaas wrote:
+> On Fri, Mar 14, 2025 at 05:19:31PM -0700, Roman Kisel wrote:
+>> The hyperv-pci driver uses ACPI for MSI IRQ domain configuration on
+>> arm64. It won't be able to do that in the VTL mode where only DeviceTree
+>> can be used.
+>>
+>> Update the hyperv-pci driver to get vPCI MSI IRQ domain in the DeviceTree
+>> case, too.
+>>
+>> Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
 > 
-> Hi Akihiko,
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 > 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on 80e54e84911a923c40d7bee33a34c1b4be148d7a]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Akihiko-Odaki/KVM-arm64-PMU-Set-raw-values-from-user-to-PM-C-I-NTEN-SET-CLR-PMOVS-SET-CLR/20250315-173731
-> base:   80e54e84911a923c40d7bee33a34c1b4be148d7a
-> patch link:    https://lore.kernel.org/r/20250315-pmc-v5-3-ecee87dab216%40daynix.com
-> patch subject: [PATCH v5 3/5] KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
-> config: arm64-randconfig-r122-20250317 (https://download.01.org/0day-ci/archive/20250317/202503172023.fzyJ3TMB-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 14.2.0
-> reproduce: (https://download.01.org/0day-ci/archive/20250317/202503172023.fzyJ3TMB-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202503172023.fzyJ3TMB-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    arch/arm64/kvm/sys_regs.c: In function 'set_pmu_evcntr':
-> >> arch/arm64/kvm/sys_regs.c:975:9: error: implicit declaration of function 'kvm_pmu_set_counter_value_user'; did you mean 'kvm_pmu_set_counter_value'? [-Wimplicit-function-declaration]
->      975 |         kvm_pmu_set_counter_value_user(vcpu, idx, val);
->          |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->          |         kvm_pmu_set_counter_value
-> 
-> 
-> vim +975 arch/arm64/kvm/sys_regs.c
-> 
->    962	
->    963	static int set_pmu_evcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->    964				  u64 val)
->    965	{
->    966		u64 idx;
->    967	
->    968		if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 0)
->    969			/* PMCCNTR_EL0 */
->    970			idx = ARMV8_PMU_CYCLE_IDX;
->    971		else
->    972			/* PMEVCNTRn_EL0 */
->    973			idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
->    974	
->  > 975		kvm_pmu_set_counter_value_user(vcpu, idx, val);
->    976		return 0;
->    977	}
->    978	
+> Looks good to me; trivial whitespace comment below.
 > 
 
-Looks like a case of missing stub definitions when
-CONFIG_HW_PERF_EVENTS isn't selected.
+Thanks a bunch!! I'll fix that the whitespace (and remove the unused
+variable the robot noticed).
 
-	M.
+>> ---
+>>   drivers/pci/controller/pci-hyperv.c | 73 ++++++++++++++++++++++++++---
+>>   1 file changed, 67 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
+>> index 6084b38bdda1..cbff19e8a07c 100644
+>> --- a/drivers/pci/controller/pci-hyperv.c
+>> +++ b/drivers/pci/controller/pci-hyperv.c
+>> @@ -50,6 +50,7 @@
+>>   #include <linux/irqdomain.h>
+>>   #include <linux/acpi.h>
+>>   #include <linux/sizes.h>
+>> +#include <linux/of_irq.h>
+>>   #include <asm/mshyperv.h>
+>>   
+>>   /*
+>> @@ -817,9 +818,17 @@ static int hv_pci_vec_irq_gic_domain_alloc(struct irq_domain *domain,
+>>   	int ret;
+>>   
+>>   	fwspec.fwnode = domain->parent->fwnode;
+>> -	fwspec.param_count = 2;
+>> -	fwspec.param[0] = hwirq;
+>> -	fwspec.param[1] = IRQ_TYPE_EDGE_RISING;
+>> +	if (is_of_node(fwspec.fwnode)) {
+>> +		/* SPI lines for OF translations start at offset 32 */
+>> +		fwspec.param_count = 3;
+>> +		fwspec.param[0] = 0;
+>> +		fwspec.param[1] = hwirq - 32;
+>> +		fwspec.param[2] = IRQ_TYPE_EDGE_RISING;
+>> +	} else {
+>> +		fwspec.param_count = 2;
+>> +		fwspec.param[0] = hwirq;
+>> +		fwspec.param[1] = IRQ_TYPE_EDGE_RISING;
+>> +	}
+>>   
+>>   	ret = irq_domain_alloc_irqs_parent(domain, virq, 1, &fwspec);
+>>   	if (ret)
+>> @@ -887,10 +896,47 @@ static const struct irq_domain_ops hv_pci_domain_ops = {
+>>   	.activate = hv_pci_vec_irq_domain_activate,
+>>   };
+>>   
+>> +#ifdef CONFIG_OF
+>> +
+>> +static struct irq_domain *hv_pci_of_irq_domain_parent(void)
+>> +{
+>> +	struct device_node *parent;
+>> +	struct irq_domain *domain;
+>> +
+>> +	parent = of_irq_find_parent(hv_get_vmbus_root_device()->of_node);
+>> +	if (!parent)
+>> +		return NULL;
+>> +	domain = irq_find_host(parent);
+>> +	of_node_put(parent);
+>> +
+>> +	return domain;
+>> +}
+>> +
+>> +#endif
+>> +
+>> +#ifdef CONFIG_ACPI
+>> +
+>> +static struct irq_domain *hv_pci_acpi_irq_domain_parent(void)
+>> +{
+>> +	struct irq_domain *domain;
+>> +	acpi_gsi_domain_disp_fn gsi_domain_disp_fn;
+>> +
+>> +	if (acpi_irq_model != ACPI_IRQ_MODEL_GIC)
+>> +		return NULL;
+>> +	gsi_domain_disp_fn = acpi_get_gsi_dispatcher();
+>> +	if (!gsi_domain_disp_fn)
+>> +		return NULL;
+>> +	return irq_find_matching_fwnode(gsi_domain_disp_fn(0),
+>> +				     DOMAIN_BUS_ANY);
+>> +}
+>> +
+>> +#endif
+>> +
+>>   static int hv_pci_irqchip_init(void)
+>>   {
+>>   	static struct hv_pci_chip_data *chip_data;
+>>   	struct fwnode_handle *fn = NULL;
+>> +	struct irq_domain *irq_domain_parent = NULL;
+>>   	int ret = -ENOMEM;
+>>   
+>>   	chip_data = kzalloc(sizeof(*chip_data), GFP_KERNEL);
+>> @@ -907,9 +953,24 @@ static int hv_pci_irqchip_init(void)
+>>   	 * way to ensure that all the corresponding devices are also gone and
+>>   	 * no interrupts will be generated.
+>>   	 */
+>> -	hv_msi_gic_irq_domain = acpi_irq_create_hierarchy(0, HV_PCI_MSI_SPI_NR,
+>> -							  fn, &hv_pci_domain_ops,
+>> -							  chip_data);
+>> +#ifdef CONFIG_ACPI
+>> +	if (!acpi_disabled)
+>> +		irq_domain_parent = hv_pci_acpi_irq_domain_parent();
+>> +#endif
+>> +#if defined(CONFIG_OF)
+>> +	if (!irq_domain_parent)
+>> +		irq_domain_parent = hv_pci_of_irq_domain_parent();
+>> +#endif
+>> +	if (!irq_domain_parent) {
+>> +		WARN_ONCE(1, "Invalid firmware configuration for VMBus interrupts\n");
+>> +		ret = -EINVAL;
+>> +		goto free_chip;
+>> +	}
+>> +
+>> +	hv_msi_gic_irq_domain = irq_domain_create_hierarchy(
+>> +		irq_domain_parent, 0, HV_PCI_MSI_SPI_NR,
+>> +		fn, &hv_pci_domain_ops,
+>> +		chip_data);
+> 
+> This is a different style of indenting the parameters than other
+> similar cases in this file, which line up parameters on subsequent
+> lines under the open parenthesis.
+> 
+>>   	if (!hv_msi_gic_irq_domain) {
+>>   		pr_err("Failed to create Hyper-V arm64 vPCI MSI IRQ domain\n");
+>> -- 
+>> 2.43.0
+>>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thank you,
+Roman
+
