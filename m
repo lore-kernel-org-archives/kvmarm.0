@@ -1,253 +1,158 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7E88634E
-	for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 08:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68A4224B12;
+	Mon, 17 Mar 2025 09:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742201619; cv=none; b=F49vKUa0znpwvbxTKYr96XH+vXi+IdBHgxs0FL0P+zTWHIpF16+dPP6fHSpDsIQPFJZ5C9nluk52YbrO6XUVwdcf2wHzTZhLyro2XI51VGWA+qv5d+i2h1Lqarigzn5cRrSDUNa4qSELIvCJP3sAJqx3BOM8q687wVwWcxp8g3M=
+	t=1742203676; cv=none; b=e3zJlDd6pl/ZZ1wkE5Kp2/FO2/Wjys6TC9QBXyAontNDl2NTEBBWuL0OfMmH0H56p/PYNLD5909Kh7UkumfeccROmyqvTtJ4azisl53pRZQvrZdUorLf4yRiCqDLulHuyZoY/SoWxPyo2aXBv/SzRMwrBOaGymGXGPs59p09LRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742201619; c=relaxed/simple;
-	bh=aq2spCsdG3P3lfElF89LUbXKEryZhClx9wsvSo0M+Hk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mBGH6CjrpOkGyyqC6P3soUF6kq4+JaTpkJsCkTUdmQ45lw/+myPSnxwsQw8RPEHa6tSoPDn7VAynDzu3knxNRJDd3VgZp6E2ED7fWQryGRhguQY54f357fL1xknNBdRg6s+CGJkOBoiheKOqrNh2YxXldM8gsTeB/n+9zUr0S98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ovjl4ZGz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1742203676; c=relaxed/simple;
+	bh=xX7lHGFYnpplLSbCZnNB6JktC5keaB3sAg4LSZJ5VdQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sqAsDeAKkXM2t3AylZaQWtf8RGszJyoyJgE42Tdaismegc8xnhF6Mnc5/ovQyoj3hLO/Z2VTN3A/qxzyAnjercu3Z5H5NFE77VbRISTETpgdV5T+9dt7UX2sMnqM6DRKZ3Q1fa2ziG5OKN+ucnL7SLWVNtcBM/NgM403ht3rT/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dJYt/3k0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ovjl4ZGz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742201616;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8Z0UeEMmq83xCl69Q71PKJopRqUbkXECgaGSxsoBFy8=;
-	b=Ovjl4ZGzTzvcdLTJFhEuHTpFC3A/hMUdAOjSvYdnNdm4HOCyjqQZCl1OKx3LjABSP4ubFF
-	YZTk1Yp6DCdOMiFmcj4aFvrbxulfwnvQa06Ane1adcMJROkGvRkujkHcWA7yTcOhMCFACz
-	Hr3NUJ7EKpZQDb7+Fll8Bt7Nsg85OkQ=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-674-ruoBCMWHNjqH8wh3MDqyBw-1; Mon, 17 Mar 2025 04:53:18 -0400
-X-MC-Unique: ruoBCMWHNjqH8wh3MDqyBw-1
-X-Mimecast-MFC-AGG-ID: ruoBCMWHNjqH8wh3MDqyBw_1742201597
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-85b34bd03c4so614463139f.3
-        for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 01:53:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742201597; x=1742806397;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8Z0UeEMmq83xCl69Q71PKJopRqUbkXECgaGSxsoBFy8=;
-        b=GtWzSAghvQT7PibXs6dl5MdCJajKzhAf61zivkClw3vHShZLIKznwT8nSfgyCJ42BG
-         3M06RzmaoojOdb4rPOq1VOEmwrUel33g32ROgHTPlacwKlnhuFOAvQvqqchffL0Hpm3b
-         JiPc8RSV+YER//eUmnXlwip0tcz+cL7RAJ/dUSZJXPrMmbgdUlxFvDD24nDt3l03V83N
-         fduXMK9/bRuMa26ptwGA/4NvbcbFjfFNd7wwvFwe/XCuM6nThDCEtHOF7c3XaXbcH4MP
-         uY6duDPr2gb1SpFcoTD+ZKCBVeqMuQf1NVWk7C3KBWzcH7bQMvzq92xA0tPQm9rIvdDR
-         0bxQ==
-X-Gm-Message-State: AOJu0Yx7mDvNbhAu3sL3xa+1FbKLLI1SocPrzPCzzfpA811xnVIRY1uo
-	lZRIVFn5uDITWtfGKiUEEaPCOUEn6nGTCexmx6SfpWIuFlYNzWC4bCSGAB3lccuQMsEUOvL8GX7
-	8Y8RsllRZVrvpKueYyVdH595jUvVSpWAgQ/I07QnUkdeEUdDGH81qiQ==
-X-Gm-Gg: ASbGnctUIA4jk3ch4xYZzOUcbUU67Gozh8D8b2oZ7aiyRY237v9HfStnZCIJbS/Zxtu
-	HIrOO3e03TEs4Rnib51ABvd1YY1Qm9V/c2yVP8yoG7mpFhQsWeR0gt32mqh28zOab5/j8iF/DSZ
-	zFPBJzmVoX+SoVBspUIXXmZdzABH1n0H6qLF62v/wGn5aqXvan+Q8SpbrKuFChZvlRd4Y/XpdEE
-	Sz0Me88HjG/owktv2+/6FJUaX2K3UIi+8s57rw6BLR7DlWchJt4Lr/kZEomXcgZ2mR9smbsV6fZ
-	dT1n98bGpUyUTMYv8B3+3UlWgBBaja6vGKThXcXTVxyalHXX10YvtvV15I/Qcy4=
-X-Received: by 2002:a05:6602:2cd6:b0:85b:4d28:2aa9 with SMTP id ca18e2360f4ac-85dc4792a8dmr1487055539f.4.1742201597317;
-        Mon, 17 Mar 2025 01:53:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhvA6uoxE9FkDt+/PrcVIKJmkPlXjaFVJVOpZAvngURmdObKJVrgiM4GTTPXD1x6LoFTwjrg==
-X-Received: by 2002:a05:6602:2cd6:b0:85b:4d28:2aa9 with SMTP id ca18e2360f4ac-85dc4792a8dmr1487053639f.4.1742201597020;
-        Mon, 17 Mar 2025 01:53:17 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2638147c9sm2161677173.112.2025.03.17.01.53.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 01:53:16 -0700 (PDT)
-Message-ID: <4ab33998-4d16-4ecb-aa76-3919afcbf2d7@redhat.com>
-Date: Mon, 17 Mar 2025 09:53:12 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dJYt/3k0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A58C4CEE3;
+	Mon, 17 Mar 2025 09:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742203676;
+	bh=xX7lHGFYnpplLSbCZnNB6JktC5keaB3sAg4LSZJ5VdQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dJYt/3k016lB/8vi06XSanBCTpSfH2BWqga6pTd50rbE2MU/A6PFw/OCqXO4lpLe8
+	 glDrZnSBuQ7f4tIJoORMWwOjJqPk/rQefvmcAjcR/+b3UDzghnaBl4sCTkwIF14InH
+	 6hFHFDdDxPBm8D/YkpWbkhI9jgLdrhpFdqfIVTs7JoJ9mAV0xBjHHRyHm/ozfSICup
+	 KR5ykY+MrvkMnTLvNnn/qVQRTDbLRSDVFxGPOiba9ESYDDuN7dT/VCgWY50IG93ITl
+	 PibJq52FsdT0KMmRpkGFWFFPf1wWFVFwRzlwyDBECGzwY7/1SvO8XCkk7BK/3udQn/
+	 yQuGUeiSEUOVA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tu6lE-00EDv5-WB;
+	Mon, 17 Mar 2025 09:27:53 +0000
+Date: Mon, 17 Mar 2025 09:27:52 +0000
+Message-ID: <8634fcnh0n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ankit Agrawal <ankita@nvidia.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	"oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com"
+	<david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>,
+	Neo Jia
+	<cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta\
+ (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>,
+	Andy
+ Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John
+ Hubbard <jhubbard@nvidia.com>,
+	Dan Williams <danw@nvidia.com>,
+	Zhi Wang
+	<zhiw@nvidia.com>,
+	Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke
+	<udhoke@nvidia.com>,
+	Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju
+	<kjaju@nvidia.com>,
+	"alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>,
+	"sebastianene@google.com"
+	<sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com"
+	<yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com"
+	<gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com"
+	<tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using VMA flags
+In-Reply-To: <SA1PR12MB7199B320DAE42A8D7038A78EB0D32@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20250310103008.3471-1-ankita@nvidia.com>
+	<20250310103008.3471-2-ankita@nvidia.com>
+	<861pv5p0c3.wl-maz@kernel.org>
+	<SA1PR12MB7199DD985C45943A663E7003B0D12@SA1PR12MB7199.namprd12.prod.outlook.com>
+	<86r033olwv.wl-maz@kernel.org>
+	<SA1PR12MB7199500A3683B15A64B663D6B0D12@SA1PR12MB7199.namprd12.prod.outlook.com>
+	<87tt7y7j6r.wl-maz@kernel.org>
+	<SA1PR12MB7199B320DAE42A8D7038A78EB0D32@SA1PR12MB7199.namprd12.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 4/5] configure: Add --qemu-cpu option
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>, andrew.jones@linux.dev,
- alexandru.elisei@arm.com
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
-References: <20250314154904.3946484-2-jean-philippe@linaro.org>
- <20250314154904.3946484-6-jean-philippe@linaro.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250314154904.3946484-6-jean-philippe@linaro.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: seHPxkzeThrXczxiX1kQyedX-l1QyyBwQKdXyUI6M-A_1742201597
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ryan.roberts@arm.com, shahuang@redhat.com, lpieralisi@kernel.org, david@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, zhiw@nvidia.com, mochs@nvidia.com, udhoke@nvidia.com, dnigam@nvidia.com, kjaju@nvidia.com, alex.williamson@redhat.com, sebastianene@google.com, coltonlewis@google.com, kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, linux-mm@kvack.org, ddutile@redhat.com, tabba@google.com, qperret@google.com, seanjc@google.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Jean-Philippe,
+On Mon, 17 Mar 2025 05:55:55 +0000,
+Ankit Agrawal <ankita@nvidia.com> wrote:
+> 
+> >> For my education, what is an accepted way to communicate this? Please let
+> >> me know if there are any relevant examples that you may be aware of.
+> >
+> > A KVM capability is what is usually needed.
+> 
+> I see. If IIUC, this would involve a corresponding Qemu (usermode) change
+> to fetch the new KVM cap. Then it could fail in case the FWB is not
+> supported with some additional conditions (so that the currently supported
+> configs with !FWB won't break on usermode). 
+> 
+> The proposed code change is to map in S2 as NORMAL when vma flags
+> has VM_PFNMAP. However, Qemu cannot know that driver is mapping
+> with PFNMAP or not. So how may Qemu decide whether it is okay to
+> fail for !FWB or not?
 
+This is not about FWB as far as userspace is concerned. This is about
+PFNMAP as non-device memory. If the host doesn't have FWB, then the
+"PFNMAP as non-device memory" capability doesn't exist, and userspace
+fails early.
 
-On 3/14/25 4:49 PM, Jean-Philippe Brucker wrote:
-> Add the --qemu-cpu option to let users set the CPU type to run on.
-> At the moment --processor allows to set both GCC -mcpu flag and QEMU
-> -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
-> the TCG features by default, and it could also be nice to let users
-> modify the CPU capabilities by setting extra -cpu options.
-> Since GCC -mcpu doesn't accept "max" or "host", separate the compiler
-> and QEMU arguments.
->
-> `--processor` is now exclusively for compiler options, as indicated by
-> its documentation ("processor to compile for"). So use $QEMU_CPU on
-> RISC-V as well.
->
-> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> ---
->  scripts/mkstandalone.sh |  2 +-
->  arm/run                 | 17 +++++++++++------
->  riscv/run               |  8 ++++----
->  configure               |  7 +++++++
->  4 files changed, 23 insertions(+), 11 deletions(-)
->
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 2318a85f..6b5f725d 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -42,7 +42,7 @@ generate_test ()
->  
->  	config_export ARCH
->  	config_export ARCH_NAME
-> -	config_export PROCESSOR
-> +	config_export QEMU_CPU
->  
->  	echo "echo BUILD_HEAD=$(cat build-head)"
->  
-> diff --git a/arm/run b/arm/run
-> index efdd44ce..561bafab 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source config.mak
->  	source scripts/arch-run.bash
->  fi
-> -processor="$PROCESSOR"
-> +qemu_cpu="$QEMU_CPU"
->  
->  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
->     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
-> @@ -37,12 +37,17 @@ if [ "$ACCEL" = "kvm" ]; then
->  	fi
->  fi
->  
-> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
-> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> -		processor="host"
-> +if [ -z "$qemu_cpu" ]; then
-> +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
-> +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
-> +		qemu_cpu="host"
->  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> -			processor+=",aarch64=off"
-> +			qemu_cpu+=",aarch64=off"
->  		fi
-> +	elif [ "$ARCH" = "arm64" ]; then
-> +		qemu_cpu="cortex-a57"
-> +	else
-> +		qemu_cpu="cortex-a15"
->  	fi
->  fi
->  
-> @@ -71,7 +76,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
->  fi
->  
->  A="-accel $ACCEL$ACCEL_PROPS"
-> -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
-> +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
->  command+=" -display none -serial stdio"
->  command="$(migration_cmd) $(timeout_cmd) $command"
->  
-> diff --git a/riscv/run b/riscv/run
-> index e2f5a922..02fcf0c0 100755
-> --- a/riscv/run
-> +++ b/riscv/run
-> @@ -11,12 +11,12 @@ fi
->  
->  # Allow user overrides of some config.mak variables
->  mach=$MACHINE_OVERRIDE
-> -processor=$PROCESSOR_OVERRIDE
-> +qemu_cpu=$QEMU_CPU_OVERRIDE
->  firmware=$FIRMWARE_OVERRIDE
->  
-> -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
-> +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
->  : "${mach:=virt}"
-> -: "${processor:=$PROCESSOR}"
-> +: "${qemu_cpu:=$QEMU_CPU}"
->  : "${firmware:=$FIRMWARE}"
->  [ "$firmware" ] && firmware="-bios $firmware"
->  
-> @@ -32,7 +32,7 @@ fi
->  mach="-machine $mach"
->  
->  command="$qemu -nodefaults -nographic -serial mon:stdio"
-> -command+=" $mach $acc $firmware -cpu $processor "
-> +command+=" $mach $acc $firmware -cpu $qemu_cpu "
->  command="$(migration_cmd) $(timeout_cmd) $command"
->  
->  if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> diff --git a/configure b/configure
-> index 5306bad3..d25bd23e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -52,6 +52,7 @@ page_size=
->  earlycon=
->  efi=
->  efi_direct=
-> +qemu_cpu=
->  
->  # Enable -Werror by default for git repositories only (i.e. developer builds)
->  if [ -e "$srcdir"/.git ]; then
-> @@ -69,6 +70,8 @@ usage() {
->  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
->  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
->  	    --processor=PROCESSOR  processor to compile for ($processor)
-> +	    --qemu-cpu=CPU         the CPU model to run on. The default depends on
-> +	                           the configuration, usually it is "host" or "max".
-nit: I would remove 'usually it is "host" or "max"'. I don't see any
-consistency check between qemu_cpu and processor in case it is
-explicitly set? Do we care? Eric
+Userspace must also have some knowledge of what device it obtains the
+mapping from, and whether that device requires some extra host
+capability to be assigned to the guest.
 
->  	    --target=TARGET        target platform that the tests will be running on (qemu or
->  	                           kvmtool, default is qemu) (arm/arm64 only)
->  	    --cross-prefix=PREFIX  cross compiler prefix
-> @@ -142,6 +145,9 @@ while [[ $optno -le $argc ]]; do
->          --processor)
->  	    processor="$arg"
->  	    ;;
-> +	--qemu-cpu)
-> +	    qemu_cpu="$arg"
-> +	    ;;
->  	--target)
->  	    target="$arg"
->  	    ;;
-> @@ -464,6 +470,7 @@ ARCH=$arch
->  ARCH_NAME=$arch_name
->  ARCH_LIBDIR=$arch_libdir
->  PROCESSOR=$processor
-> +QEMU_CPU=$qemu_cpu
->  CC=$cc
->  CFLAGS=$cflags
->  LD=$cross_prefix$ld
+You can then check whether the VMA associated with the memslot is
+PFNMAP or not, if the memslot has been enabled for PFNMAP mappings
+(either globally or on a per-memslot basis, I don't really care).
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+	M.
 
-Eric
-
-
+-- 
+Without deviation from the norm, progress is not possible.
