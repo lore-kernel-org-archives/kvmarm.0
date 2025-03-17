@@ -1,97 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF20738DD8;
-	Mon, 17 Mar 2025 10:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F1738DD8;
+	Mon, 17 Mar 2025 11:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742208681; cv=none; b=iOAlkz1w53hh9k0ZfaJgABnud8p99do6PGwhnQz5rBw797+LHXcJtcVS8oxoBRfKLWxUNPpUeVtTnRy47GC4PO8VfI2tqS70w9vrsjfBZ7diqKvKz6uz9G8ValYq85lt4HvUoxzyBClLkdUUgL8RNmKJawsU9S4CnCgq2N72AGE=
+	t=1742210068; cv=none; b=uPhbFnSMCpsJx6CgNlI0mkINQpcgSBfpPce6lOtta3qq8Kc69T00jsYi6GydU7FKJMOdp6NUEQxSC/3XuIKgkK8zIxn7twRMD8E0XfSDzRlyBUeo5LkYTOM6x3c/ptFZpRnKf+i6Md4x6oHhJJguudsjqzpROMvmQKoMqbNP4gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742208681; c=relaxed/simple;
-	bh=UU6EdbDdsspktrWFl8s+AWtJcfBbnfdF1EGP7Mf/Fes=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZZK1nZoHEoR0IV1I3FC7R6aIYhpsj0XAlIRoyrWwXFmDK4+pmGIRUs/WJYC+6F9sw9N1r1Tri6bHsp01V5XAKMM7oA9QnKPIqX/ivVMuhvvcC2mJNOxBzylPzkfD2tKM5A/j5an1Hlt1S3+OpTs0Wg3ila6np8LyYW1ikomWpXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbwDRQ+R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742210068; c=relaxed/simple;
+	bh=olspEIPKk6rcyvIO+w/teEaMf7L+mVlGm6dUa9CeGt0=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=SAaVGtuGmBqntWYu/e1MuKxXMLxltHqWC5gDgTb8VQZbuSK3LLCAUnT6Bb+uZv6Jkbp0R0reR/vQN5d3J/kgh71Y55Zc2QWB6q6VWQ3Po83HFhEmDYGUGHxDtKhqEYUWdsOH54tnvs+Z1sHtyFAojLOHk2y/BKD4BHLAfRR6g70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIS/Ow7G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbwDRQ+R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A3DC4CEE3;
-	Mon, 17 Mar 2025 10:51:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIS/Ow7G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40217C4CEE3;
+	Mon, 17 Mar 2025 11:14:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742208681;
-	bh=UU6EdbDdsspktrWFl8s+AWtJcfBbnfdF1EGP7Mf/Fes=;
+	s=k20201202; t=1742210068;
+	bh=olspEIPKk6rcyvIO+w/teEaMf7L+mVlGm6dUa9CeGt0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mbwDRQ+RcS73GF3oRFI9TU1H+WBWCoAwGYvMS8wQ4s5HCJBaF7z8Tk494E0dILiae
-	 NzCj2U4XgGHIsmXwEMw1pX7x5+aaNoMv5s2RVOXaGAcl0beBO8TzYbELHAlgKqjdW7
-	 o2/bj0BPhZBMoCDuq+2hembVG500r1utCSpUqXRjy5vXhnod4STS2DHFHphC7q/Igv
-	 w5YJF6OOsfqUr/3CRR/JZGzHRMpkN0Y6unWqf1edQYd+SyA5FrXYnf/8XPDjgH33uI
-	 CeO/+SLcgBKpVsfCakWjtMm+PElQ+MdfkhNYlJ4Grg1Fc+JwfnGMfJRt9STqKlO41B
-	 pMrJa71/cLGoQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=tIS/Ow7GXqsWtQyG1cWgOVYafiS9fSXmvDQcK4bT8uIgL0oHGfGRp5lX4Wui9UjcE
+	 YM7TVYFsaA+n9xZ3X22nXGxQ1Zzw18eWH/NMHl6ozjkflHXvMdRWH5R7DdlMCMqVyk
+	 +Z5E7CXvPHVTZpmZLVsXltPw/8ec8EKeWPo4fdIiLEiPNwtWyzEhMhS4VzMy5AFqJH
+	 6kZmcwqjLwLul1cHWLeu49dBpbI9bT4cAUZNZ+NVhH+C74/uxwOqZTCR38E8pGHLC7
+	 SSagaLrNVTpowRIhD0hnHl57hpXlsb/A7HL7QUfsR4qxrUxcvtlHP2epoV125xCAvw
+	 /oNHJOrq5mqhw==
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tu83z-00EFxc-1p;
-	Mon, 17 Mar 2025 10:51:19 +0000
-Date: Mon, 17 Mar 2025 10:51:18 +0000
-Message-ID: <861puwnd5l.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	andre.przywara@arm.com,
-	jean-philippe@linaro.org
-Subject: Re: [RFC kvmtool 0/9] arm: Drop support for 32-bit kvmtool
-In-Reply-To: <Z9f78K-m9h7YlzUr@raptor>
-References: <20250314222516.1302429-1-oliver.upton@linux.dev>
-	<Z9f78K-m9h7YlzUr@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	id 1tu8QM-00EGdc-4o;
+	Mon, 17 Mar 2025 11:14:26 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com, andre.przywara@arm.com, jean-philippe@linaro.org
+MIME-Version: 1.0
+Date: Mon, 17 Mar 2025 11:14:25 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, Will Deacon
+ <will@kernel.org>, Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [RFC kvmtool 0/9] arm: Drop support for 32-bit kvmtool
+In-Reply-To: <20250314222516.1302429-1-oliver.upton@linux.dev>
+References: <20250314222516.1302429-1-oliver.upton@linux.dev>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <a1eb2b0dd3cfe00cce12278ae44b9117@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Mar 2025 10:39:44 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On 2025-03-14 22:25, Oliver Upton wrote:
+> The last stable kernel to support 32-bit KVM/arm is 5.4, which is on
+> track for EOL at the end of this year. Considering this, and the fact
+> that 32-bit KVM never saw much usage in the first place, it is probably
+> time to toss out the coprolite.
+
+coprolithe! :D
+
 > 
-> Hi Oliver,
+> Of course, this has no effect on the support for 32-bit guests on 
+> 64-bit
+> KVM.
 > 
-> I'm CC'ing Marc and Andre (Andre is the only person that I know for a fact
-> that ran 32 bit kvmtool).
-> 
-> Haven't looked at the patches in detail, but as someone who ocassionally
-> contributes to kvmtool, I have to say it's always nice to have fewer things
-> to worry about. I, for one, never used 32 bit kvmtool, I just compiled for
-> 32 bit arm to make sure it doesn't break.
-> 
-> If nobody objects to dropping support for 32 bit kvmtool, I'm planning to
-> review the patches.
+> Oliver Upton (9):
+>   Drop support for 32-bit arm
+>   arm64: Move arm64-only features into main directory
+>   arm64: Combine kvm.c
+>   arm64: Merge kvm-cpu.c
+>   arm64: Combine kvm-config-arch.h
+>   arm64: Move remaining kvm/* headers
+>   arm64: Move asm headers
+>   arm64: Rename top-level directory
+>   arm64: Get rid of the 'arm-common' include directory
 
-Frankly, the removal of 32bit support is long overdue. Every time I
-hack something in kvmtool (at least once a month), I have to wonder
-how to fit that in the 32bit code that I *know* to be dead code.
+FWIW:
 
-We kept it ticking around when the kernel code was removed back in
-5.6, and in the interval I have ran it *once*. These days, I don't
-even have a working 32bit setup.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-In all honesty, someone using 32bit KVM can also use an older build of
-kvmtool (this piece of SW is *done*), and we can happily move on.
-
-Thanks,
-
-	M.
-
+         M.
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz is not dead. It just smells funny...
