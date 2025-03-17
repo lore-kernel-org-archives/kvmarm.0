@@ -1,91 +1,131 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51D213C8F3
-	for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 20:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E198202971
+	for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 21:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742241687; cv=none; b=gW/GQEjPwpe5E6sQJzk//N99Gs0wCN5asLKQ+hZf3rSs0C8I1VLi85futa4VKiTmYXssNVxFhusV1/k03PH/nYi682lX3dqFdZA/ugfRECNqWPWStg5hK2dnFP6eW79fW7BQGvf6HF2nuzDreDwKEzEscwWInx475nwpAuRp/gk=
+	t=1742246778; cv=none; b=Vh6h+V193JtxxwWSGTUFtqSVoaD2U8L/kyYTspvXBLSjH9CfjXwcbv4r+74GgR5j9B3wBrD7gE1LDHPtucZWlF+OiVPrsprS7gqyojadhomUiXDluV4nI+gUuW7H0zZXulCqQU4foV9UqA1JXbEA/PXUNTE9Ee2SUKBJWG5Zlus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742241687; c=relaxed/simple;
-	bh=E/xZ+54KctjZ9m5sKDMSFIYRtt8Xn2G3hsazpBjuQBE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sfAnB15RBcJkIx/hAOlFTouCa8kFv8q/4an8H4Y5bEaH+Zzv53KDyLBuWi1uk5M2dbELRB64+9ZLquY+Mf6eR/cSn9EKsr/LGDR8cbluyQBUyiKDooIFpJgipz8yFhGGLrizNuscLP2EZ1sXQivCgv6fX8Ht485gwBl+qo4t7HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iSqMGIM5; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742246778; c=relaxed/simple;
+	bh=e14NawIhXbX+rpgKdFPfVEzD7XfiMfMMeC3WCU8SXTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GM0eFsa4ZxcdDhIhR5hN7vgwvalwB8qPsKu+vVNo0r+mMmfAll1+uLkQGRKG4mIsoPY82PP/ZdLgJnYn5hPJApDAGLwltADhQFZjGsylq8SVVhK+sZIKdvGip0Tgvp+M+ReIk62ARqPWfLBxqFTIvFUThOBspwGWOupBo3JVzis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMvaMsnb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iSqMGIM5"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742241680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vu17wjBsFBCZ0+3MLyENCrSMY6OUYDwd3aPaG2b678Y=;
-	b=iSqMGIM5dt9iMPdojc31nopo9hKqmXZO6m/dgNFvLRNdYeReE7hDnUkJqKY7bShOAFHp5h
-	DEY80ffWRrxSJCsfjRKiFbxYdTwJK8ck8aMHT+o57UoCcCjsFxx6bjWFwJhXdYFIc/Gg07
-	nheG9vUQcD647tUcUEwt1m88nlV037Y=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	devel@daynix.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v5 0/5] KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
-Date: Mon, 17 Mar 2025 13:01:07 -0700
-Message-Id: <174224155547.1588441.3490436622132208645.b4-ty@linux.dev>
-In-Reply-To: <20250315-pmc-v5-0-ecee87dab216@daynix.com>
-References: <20250315-pmc-v5-0-ecee87dab216@daynix.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMvaMsnb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 153D3C4CEEF;
+	Mon, 17 Mar 2025 21:26:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742246777;
+	bh=e14NawIhXbX+rpgKdFPfVEzD7XfiMfMMeC3WCU8SXTU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JMvaMsnbPJ8uauQ8F3z8KXAnLMkpC+5wZSCYWXdVAbffN+VMLD7kcQ+QymC8RNkBG
+	 LWAtAglEZTtV0IfmJevbJRpwp5DltHIZTT9jYUO30DpV3dltp36ITMp4mA2gAIoDbK
+	 aFPTLhS220mZteiM69TPYxS0EXxAnngA315K/HuWjOSYtpK6tELUkhT8PsC3dX7qdW
+	 Sp4LIUF2EYoOGSo/uvoGPvjB0BD1fcQ1sLlesKrGii7uNBoG6M/agH9NmaPL59/aZW
+	 qPj7efURhvh7DzI7O0Cmp/JJA87UrXUQ+GNsxCUv6Quv4PsDyU9RthOs/WqwTpAP7v
+	 VNE6rrqAz4uOw==
+Date: Mon, 17 Mar 2025 21:26:12 +0000
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>, joey.gouly@arm.com,
+	kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH 0/4] arm64: mitigate CVE-2024-7881 in the absence of
+ firmware mitigation
+Message-ID: <20250317212611.GA12724@willie-the-truck>
+References: <20250128155428.210645-1-mark.rutland@arm.com>
+ <174197730164.734861.6726211221092480832.b4-ty@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <174197730164.734861.6726211221092480832.b4-ty@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Sat, 15 Mar 2025 18:12:09 +0900, Akihiko Odaki wrote:
-> Prepare vPMC registers for user-initiated changes after first run. This
-> is important specifically for debugging Windows on QEMU with GDB; QEMU
-> tries to write back all visible registers when resuming the VM execution
-> with GDB, corrupting the PMU state. Windows always uses the PMU so this
-> can cause adverse effects on that particular OS.
+On Fri, Mar 14, 2025 at 06:37:25PM +0000, Catalin Marinas wrote:
+> On Tue, 28 Jan 2025 15:54:24 +0000, Mark Rutland wrote:
+> > On some CPUs from Arm Ltd, it is possible for unprivileged code to cause
+> > a hardware prefetcher to form an address using the contents of a memory
+> > location which is accessible by privileged accesses in the active
+> > translation regime, potentially leaking the contents of this memory
+> > location via a side channel. This has been assigned CVE-2024-7881:
+> > 
+> >   https://developer.arm.com/Arm%20Security%20Center/Arm%20CPU%20Vulnerability%20CVE-2024-7881
+> > 
+> > [...]
 > 
-> This series also contains patch "KVM: arm64: PMU: Set raw values from
-> user to PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}", which reverts semantic
-> changes made for the mentioned registers in the past. It is necessary
-> to migrate the PMU state properly on Firecracker, QEMU, and crosvm.
+> Applied to arm64 (for-next/leaky-prefetcher), thanks!
 > 
-> [...]
+> There hasn't been much review (thanks Oliver for looking at the KVM
+> bits) and there's some implied work that can go on top of this series.
+> But the patches looked fine to me, so I queued them. Mark or others,
+> please shout if you'd like them dropped, they are on a branch.
 
-Squashed in a fix for CONFIG_HW_PERF_EVENTS=n build.
+I'm really not comfortable with this series and would prefer to see it
+dropped while we continue the discussion, especially as it's causing
+minor conflicts with the KVM/arm64 tree in -next.
 
-Applied to next, thanks!
+The series is pitched a bit like an erratum workaround, but the overall
+problem that a memory-dependent prefetcher can bypass permission checks
+is fairly general and, even if nobody else gets this wrong, I doubt that
+it's the last time Arm will mess it up. So, while the EL3 mitigation may
+be Arm-specific, I don't think the rest of it really is. That's
+especially true given the sorry state of spectre mitigations on
+third-party derivatives of Arm designs, such as the Qualcomm Kryo parts,
+and the fact that we provide userspace with a mechanism today for
+querying the state of those mitigations via sysfs.
 
-[1/5] KVM: arm64: PMU: Set raw values from user to PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
-      https://git.kernel.org/kvmarm/kvmarm/c/f2aeb7bbd574
-[2/5] KVM: arm64: PMU: Assume PMU presence in pmu-emul.c
-      https://git.kernel.org/kvmarm/kvmarm/c/be5ccac3f15e
-[3/5] KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
-      https://git.kernel.org/kvmarm/kvmarm/c/64074ca8ca92
-[4/5] KVM: arm64: PMU: Reload when user modifies registers
-      https://git.kernel.org/kvmarm/kvmarm/c/1db4aaa05589
-[5/5] KVM: arm64: PMU: Reload when resetting
-      https://git.kernel.org/kvmarm/kvmarm/c/fe53538069bb
+The immediate question, then, is whether this broken behaviour is
+prohibited by CSV3. The text in the latest Arm ARM just refers to
+"Data loaded under speculation", so it's not entirely clear whether that
+applies to a prefetcher. If it *does*, then I can see the argument for
+treating this like an erratum, but then we should zap CSV3 and treat
+these parts as being affected by meltdown. On the other hand, if CSV3
+is not intended to cover these prefetchers, then we probably need to
+add a new "CVE-2024-7881" entry to /sys/devices/system/cpu/vulnerabilities.
 
---
-Best,
-Oliver
+As it stands with this patch series, userspace has no way to know about
+the problem. kpti gets silently enabled in dmesg:
+
+  | CPU features: detected: Kernel page table isolation (KPTI)
+
+but the contents of the vulnerabilities directory is pretty misleading:
+
+  gather_data_sampling: Not affected
+  ghostwrite: Not affected
+  itlb_multihit: Not affected
+  l1tf: Not affected
+  mds: Not affected
+  meltdown: Not affected
+  mmio_stale_data: Not affected
+  reg_file_data_sampling: Not affected
+  retbleed: Not affected
+  spec_rstack_overflow: Not affected
+  spec_store_bypass: Mitigation: Speculative Store Bypass disabled via prctl
+  spectre_v1: Mitigation: __user pointer sanitization
+  spectre_v2: Mitigation: CSV2, BHB
+  srbds: Not affected
+  tsx_async_abort: Not affected
+
+The meltdown entry doesn't even mention that KPTI has been enabled.
+
+If we decide to go with a new entry for this, then we also need to
+change the default behaviour along the lines of Doug's Spectre-BHB
+changes queued on for-next/spectre-bhb-assume-vulnerable so that we
+assume vulnerable if we don't know better. To do otherwise will result
+in false assurances to userspace on derivative and third-party
+implementations.
+
+To be clear: I'm not at all against mitigating this problem and
+advertising the status of that mitigation. I *am* against quietly
+handling it like a CPU erratum whilst simultaneously telling userspace
+that meltdown is not a problem regardless of the mitigation state.
+
+Will
