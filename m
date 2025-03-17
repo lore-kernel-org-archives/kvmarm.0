@@ -1,166 +1,97 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75F723315F
-	for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 10:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF20738DD8;
+	Mon, 17 Mar 2025 10:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742207991; cv=none; b=fVAsvDnNCu5dTdddN3owkfhA8qFeAKNNLSHT9ot/v64GHMhEDNGjy3YepD1cwXN4aHyrtewrg/UjGf9ju7PZDHjaT/7X6G4WmEfb5TGMhsh1ELiUVUpBnV6Fhr+VW6tG6XtAeUlQrwUsthRRPjJ3zUggEiJVzAdoRFEgTWNCjs0=
+	t=1742208681; cv=none; b=iOAlkz1w53hh9k0ZfaJgABnud8p99do6PGwhnQz5rBw797+LHXcJtcVS8oxoBRfKLWxUNPpUeVtTnRy47GC4PO8VfI2tqS70w9vrsjfBZ7diqKvKz6uz9G8ValYq85lt4HvUoxzyBClLkdUUgL8RNmKJawsU9S4CnCgq2N72AGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742207991; c=relaxed/simple;
-	bh=XyCaRK2xbCDG6RvfZBAb68Um57+U14d4+B47Thpncvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjO5T+OzW6SQorpoGk56dH4RHaoRSML1Kef5gVfpyFhRE30PATuJK4Bm4WHEJbXTzx/GebrQxuiwZZsismJTKuN1YVP4YfHQed1nKveMf+IXKqB/3h1864loZMqVgyhW77V7NHacK8RxJLotOAIDRh/zkuTs/304dDj2gdndEnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD43413D5;
-	Mon, 17 Mar 2025 03:39:57 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 88C433F63F;
-	Mon, 17 Mar 2025 03:39:47 -0700 (PDT)
-Date: Mon, 17 Mar 2025 10:39:44 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1742208681; c=relaxed/simple;
+	bh=UU6EdbDdsspktrWFl8s+AWtJcfBbnfdF1EGP7Mf/Fes=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZZK1nZoHEoR0IV1I3FC7R6aIYhpsj0XAlIRoyrWwXFmDK4+pmGIRUs/WJYC+6F9sw9N1r1Tri6bHsp01V5XAKMM7oA9QnKPIqX/ivVMuhvvcC2mJNOxBzylPzkfD2tKM5A/j5an1Hlt1S3+OpTs0Wg3ila6np8LyYW1ikomWpXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbwDRQ+R; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbwDRQ+R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A3DC4CEE3;
+	Mon, 17 Mar 2025 10:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742208681;
+	bh=UU6EdbDdsspktrWFl8s+AWtJcfBbnfdF1EGP7Mf/Fes=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mbwDRQ+RcS73GF3oRFI9TU1H+WBWCoAwGYvMS8wQ4s5HCJBaF7z8Tk494E0dILiae
+	 NzCj2U4XgGHIsmXwEMw1pX7x5+aaNoMv5s2RVOXaGAcl0beBO8TzYbELHAlgKqjdW7
+	 o2/bj0BPhZBMoCDuq+2hembVG500r1utCSpUqXRjy5vXhnod4STS2DHFHphC7q/Igv
+	 w5YJF6OOsfqUr/3CRR/JZGzHRMpkN0Y6unWqf1edQYd+SyA5FrXYnf/8XPDjgH33uI
+	 CeO/+SLcgBKpVsfCakWjtMm+PElQ+MdfkhNYlJ4Grg1Fc+JwfnGMfJRt9STqKlO41B
+	 pMrJa71/cLGoQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tu83z-00EFxc-1p;
+	Mon, 17 Mar 2025 10:51:19 +0000
+Date: Mon, 17 Mar 2025 10:51:18 +0000
+Message-ID: <861puwnd5l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	andre.przywara@arm.com, maz@kernel.org, jean-philippe@linaro.org
+	andre.przywara@arm.com,
+	jean-philippe@linaro.org
 Subject: Re: [RFC kvmtool 0/9] arm: Drop support for 32-bit kvmtool
-Message-ID: <Z9f78K-m9h7YlzUr@raptor>
+In-Reply-To: <Z9f78K-m9h7YlzUr@raptor>
 References: <20250314222516.1302429-1-oliver.upton@linux.dev>
+	<Z9f78K-m9h7YlzUr@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250314222516.1302429-1-oliver.upton@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com, andre.przywara@arm.com, jean-philippe@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
+On Mon, 17 Mar 2025 10:39:44 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Oliver,
+> 
+> I'm CC'ing Marc and Andre (Andre is the only person that I know for a fact
+> that ran 32 bit kvmtool).
+> 
+> Haven't looked at the patches in detail, but as someone who ocassionally
+> contributes to kvmtool, I have to say it's always nice to have fewer things
+> to worry about. I, for one, never used 32 bit kvmtool, I just compiled for
+> 32 bit arm to make sure it doesn't break.
+> 
+> If nobody objects to dropping support for 32 bit kvmtool, I'm planning to
+> review the patches.
 
-I'm CC'ing Marc and Andre (Andre is the only person that I know for a fact
-that ran 32 bit kvmtool).
+Frankly, the removal of 32bit support is long overdue. Every time I
+hack something in kvmtool (at least once a month), I have to wonder
+how to fit that in the 32bit code that I *know* to be dead code.
 
-Haven't looked at the patches in detail, but as someone who ocassionally
-contributes to kvmtool, I have to say it's always nice to have fewer things
-to worry about. I, for one, never used 32 bit kvmtool, I just compiled for
-32 bit arm to make sure it doesn't break.
+We kept it ticking around when the kernel code was removed back in
+5.6, and in the interval I have ran it *once*. These days, I don't
+even have a working 32bit setup.
 
-If nobody objects to dropping support for 32 bit kvmtool, I'm planning to
-review the patches.
+In all honesty, someone using 32bit KVM can also use an older build of
+kvmtool (this piece of SW is *done*), and we can happily move on.
 
 Thanks,
-Alex
 
-On Fri, Mar 14, 2025 at 03:25:07PM -0700, Oliver Upton wrote:
-> The last stable kernel to support 32-bit KVM/arm is 5.4, which is on
-> track for EOL at the end of this year. Considering this, and the fact
-> that 32-bit KVM never saw much usage in the first place, it is probably
-> time to toss out the coprolite.
-> 
-> Of course, this has no effect on the support for 32-bit guests on 64-bit
-> KVM.
-> 
-> Oliver Upton (9):
->   Drop support for 32-bit arm
->   arm64: Move arm64-only features into main directory
->   arm64: Combine kvm.c
->   arm64: Merge kvm-cpu.c
->   arm64: Combine kvm-config-arch.h
->   arm64: Move remaining kvm/* headers
->   arm64: Move asm headers
->   arm64: Rename top-level directory
->   arm64: Get rid of the 'arm-common' include directory
-> 
->  INSTALL                                       |   9 +-
->  Makefile                                      |  40 +--
->  arm/aarch32/arm-cpu.c                         |  50 ---
->  arm/aarch32/include/asm/kernel.h              |   8 -
->  arm/aarch32/include/asm/kvm.h                 | 311 ------------------
->  arm/aarch32/include/kvm/barrier.h             |  10 -
->  arm/aarch32/include/kvm/fdt-arch.h            |   6 -
->  arm/aarch32/include/kvm/kvm-arch.h            |  18 -
->  arm/aarch32/include/kvm/kvm-config-arch.h     |   8 -
->  arm/aarch32/include/kvm/kvm-cpu-arch.h        |  24 --
->  arm/aarch32/kvm-cpu.c                         | 132 --------
->  arm/aarch32/kvm.c                             |  14 -
->  arm/aarch64/include/kvm/fdt-arch.h            |   6 -
->  arm/aarch64/include/kvm/kvm-arch.h            |  22 --
->  arm/aarch64/include/kvm/kvm-config-arch.h     |  29 --
->  arm/aarch64/include/kvm/kvm-cpu-arch.h        |  19 --
->  arm/aarch64/kvm.c                             | 212 ------------
->  arm/kvm-cpu.c                                 | 153 ---------
->  {arm/aarch64 => arm64}/arm-cpu.c              |   4 +-
->  {arm => arm64}/fdt.c                          |   4 +-
->  {arm => arm64}/gic.c                          |   2 +-
->  {arm => arm64}/gicv2m.c                       |   2 +-
->  {arm/aarch64 => arm64}/include/asm/image.h    |   0
->  {arm/aarch64 => arm64}/include/asm/kernel.h   |   0
->  {arm/aarch64 => arm64}/include/asm/kvm.h      |   0
->  {arm/aarch64 => arm64}/include/asm/pmu.h      |   0
->  .../include/asm/sve_context.h                 |   0
->  .../arm-common => arm64/include}/gic.h        |   0
->  {arm/aarch64 => arm64}/include/kvm/barrier.h  |   0
->  .../include/kvm}/fdt-arch.h                   |   0
->  .../include/kvm}/kvm-arch.h                   |   6 +-
->  .../include/kvm}/kvm-config-arch.h            |  24 +-
->  .../include/kvm}/kvm-cpu-arch.h               |  10 +-
->  .../arm-common => arm64/include}/pci.h        |   0
->  .../arm-common => arm64/include}/timer.h      |   0
->  {arm => arm64}/ioport.c                       |   0
->  {arm/aarch64 => arm64}/kvm-cpu.c              | 289 ++++++++++++----
->  {arm => arm64}/kvm.c                          | 212 +++++++++++-
->  {arm => arm64}/pci.c                          |   4 +-
->  {arm/aarch64 => arm64}/pmu.c                  |   2 +-
->  {arm/aarch64 => arm64}/pvtime.c               |   0
->  {arm => arm64}/timer.c                        |   4 +-
->  42 files changed, 495 insertions(+), 1139 deletions(-)
->  delete mode 100644 arm/aarch32/arm-cpu.c
->  delete mode 100644 arm/aarch32/include/asm/kernel.h
->  delete mode 100644 arm/aarch32/include/asm/kvm.h
->  delete mode 100644 arm/aarch32/include/kvm/barrier.h
->  delete mode 100644 arm/aarch32/include/kvm/fdt-arch.h
->  delete mode 100644 arm/aarch32/include/kvm/kvm-arch.h
->  delete mode 100644 arm/aarch32/include/kvm/kvm-config-arch.h
->  delete mode 100644 arm/aarch32/include/kvm/kvm-cpu-arch.h
->  delete mode 100644 arm/aarch32/kvm-cpu.c
->  delete mode 100644 arm/aarch32/kvm.c
->  delete mode 100644 arm/aarch64/include/kvm/fdt-arch.h
->  delete mode 100644 arm/aarch64/include/kvm/kvm-arch.h
->  delete mode 100644 arm/aarch64/include/kvm/kvm-config-arch.h
->  delete mode 100644 arm/aarch64/include/kvm/kvm-cpu-arch.h
->  delete mode 100644 arm/aarch64/kvm.c
->  delete mode 100644 arm/kvm-cpu.c
->  rename {arm/aarch64 => arm64}/arm-cpu.c (96%)
->  rename {arm => arm64}/fdt.c (99%)
->  rename {arm => arm64}/gic.c (99%)
->  rename {arm => arm64}/gicv2m.c (99%)
->  rename {arm/aarch64 => arm64}/include/asm/image.h (100%)
->  rename {arm/aarch64 => arm64}/include/asm/kernel.h (100%)
->  rename {arm/aarch64 => arm64}/include/asm/kvm.h (100%)
->  rename {arm/aarch64 => arm64}/include/asm/pmu.h (100%)
->  rename {arm/aarch64 => arm64}/include/asm/sve_context.h (100%)
->  rename {arm/include/arm-common => arm64/include}/gic.h (100%)
->  rename {arm/aarch64 => arm64}/include/kvm/barrier.h (100%)
->  rename {arm/include/arm-common => arm64/include/kvm}/fdt-arch.h (100%)
->  rename {arm/include/arm-common => arm64/include/kvm}/kvm-arch.h (97%)
->  rename {arm/include/arm-common => arm64/include/kvm}/kvm-config-arch.h (54%)
->  rename {arm/include/arm-common => arm64/include/kvm}/kvm-cpu-arch.h (82%)
->  rename {arm/include/arm-common => arm64/include}/pci.h (100%)
->  rename {arm/include/arm-common => arm64/include}/timer.h (100%)
->  rename {arm => arm64}/ioport.c (100%)
->  rename {arm/aarch64 => arm64}/kvm-cpu.c (70%)
->  rename {arm => arm64}/kvm.c (59%)
->  rename {arm => arm64}/pci.c (98%)
->  rename {arm/aarch64 => arm64}/pmu.c (99%)
->  rename {arm/aarch64 => arm64}/pvtime.c (100%)
->  rename {arm => arm64}/timer.c (95%)
-> 
-> 
-> base-commit: e48563f5c4a48fe6a6bc2a98a9a7c84a10f043be
-> -- 
-> 2.39.5
-> 
-> 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
