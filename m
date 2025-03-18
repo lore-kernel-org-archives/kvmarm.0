@@ -1,45 +1,43 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC57156F4A
-	for <kvmarm@lists.linux.dev>; Mon, 17 Mar 2025 22:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0894522EE5
+	for <kvmarm@lists.linux.dev>; Tue, 18 Mar 2025 01:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742251130; cv=none; b=Lm1EHE6gRGmr09r1E/FW5y+T+hJ1VuwTTVFloqnL9DzXsR5dwA2umpa2E+4uJkl8/fWDDoIX4kf9pJ14eTzufTE3J0S4lQLWphZNNow7citLpExNULJvFw9Ig3mGHPGaM3iij1QDPRKLr0A/njKsjL60UQpcK/yFjBrL9sgB3r0=
+	t=1742260236; cv=none; b=fYh9ktN8c4DZDrfIoqcARwHXFNyrwvDqDrpBCN1wSnVFCIpmRIYdsUInXuQoXTc4lG2JEpAFUCl9Y8J8xs1O1teRh6+jVVlOV40l/hBcibY/RZQnIDXGeojKk8gXNVB3KNI6PcKJYXG5jwufQfWbVh2nY5UNlKP4HeSpM+3A36k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742251130; c=relaxed/simple;
-	bh=JPnUf+neTVO1foYCHOPFK/dfIznHCLNcxHqUYvJz9BM=;
+	s=arc-20240116; t=1742260236; c=relaxed/simple;
+	bh=tM3HLjz53VhIBqvCJOALiWTgxizKnX4AgaioCYhWLFE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fw+LmxD/zItAlNBiFoO3S7a/BpUX+/wq19ESbAw5OjZccvJsh3WT0GWQp/S44cDoobMVDbms8xnf5ohTUoIdskeqZnBe2g90aBXlhCqzrSq65lzM8zFlP5qCYzrf5CAHc8vyd8V4n66tpcxMc1UPep7Ie63kI4uPF8l9tUplkfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w73MujJE; arc=none smtp.client-ip=91.218.175.185
+	 Content-Type:Content-Disposition:In-Reply-To; b=DddrJElCy3HRXxFmVusvhvd5Blso2HLKH7ZOyWSUjoiQ9M3mVPzG4jGeNkIREKVEKiP2CEfUAW5WWOpVxgaiweb0JpZ5YAVx6G/qcujwA07qL9PFKYBNgOUa5dkjcgVzBlSwqVPtXebnfhpTs6PyjAp7PkXylo/iJRW2BG5HNDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Csrm2rCG; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w73MujJE"
-Date: Mon, 17 Mar 2025 15:38:34 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Csrm2rCG"
+Date: Mon, 17 Mar 2025 18:10:18 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742251125;
+	t=1742260232;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DuSletg3itwsifS0Pf73fBweBoBSkCY5MMD6bIiKHUM=;
-	b=w73MujJEgi79uE2nYyf1yxCCBii2ix3gfNcfmwc3/fVH3HyAHE0cByR5j5iusSMQ2G7GiS
-	8B7LyLZ3dAKSIiG5/txRwqw05gu8hIOZYvcaAUKRy+J1kMOgV0nJZIdpyqR+xnaw6ceaix
-	8nAdgVfFYFp+GXA4tueRzn5yki05AvQ=
+	bh=D7L5JaSSP7KqK5qtYW4DA5/1ty6PTPAOJlyJZwmruf0=;
+	b=Csrm2rCGWFTdWIezj3W3zZ5fgYba7sjxzjrPa38VV69seaAQVibkYqZ+Wj2UYRMTLERN9I
+	NtjFA9M/wQTXuHzRl4vCGmHEbSVLXUQymtMth568BHR8IBRX5+M/1u0379YJGUpVH0sGLh
+	YrK4HLy5JRY20dGs5FU4035VDclzalk=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>, joey.gouly@arm.com,
-	kvmarm@lists.linux.dev, maz@kernel.org, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH 0/4] arm64: mitigate CVE-2024-7881 in the absence of
- firmware mitigation
-Message-ID: <Z9ikak5AOtDJNVgE@linux.dev>
-References: <20250128155428.210645-1-mark.rutland@arm.com>
- <174197730164.734861.6726211221092480832.b4-ty@arm.com>
- <20250317212611.GA12724@willie-the-truck>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	andre.przywara@arm.com, jean-philippe@linaro.org
+Subject: Re: [RFC kvmtool 0/9] arm: Drop support for 32-bit kvmtool
+Message-ID: <Z9jH-kMh1p0S4g3J@linux.dev>
+References: <20250314222516.1302429-1-oliver.upton@linux.dev>
+ <Z9f78K-m9h7YlzUr@raptor>
+ <861puwnd5l.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,85 +46,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250317212611.GA12724@willie-the-truck>
+In-Reply-To: <861puwnd5l.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 17, 2025 at 09:26:12PM +0000, Will Deacon wrote:
-> On Fri, Mar 14, 2025 at 06:37:25PM +0000, Catalin Marinas wrote:
-> > On Tue, 28 Jan 2025 15:54:24 +0000, Mark Rutland wrote:
-> > > On some CPUs from Arm Ltd, it is possible for unprivileged code to cause
-> > > a hardware prefetcher to form an address using the contents of a memory
-> > > location which is accessible by privileged accesses in the active
-> > > translation regime, potentially leaking the contents of this memory
-> > > location via a side channel. This has been assigned CVE-2024-7881:
-> > > 
-> > >   https://developer.arm.com/Arm%20Security%20Center/Arm%20CPU%20Vulnerability%20CVE-2024-7881
-> > > 
-> > > [...]
+On Mon, Mar 17, 2025 at 10:51:18AM +0000, Marc Zyngier wrote:
+> On Mon, 17 Mar 2025 10:39:44 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > > 
-> > Applied to arm64 (for-next/leaky-prefetcher), thanks!
+> > Hi Oliver,
 > > 
-> > There hasn't been much review (thanks Oliver for looking at the KVM
-> > bits) and there's some implied work that can go on top of this series.
-> > But the patches looked fine to me, so I queued them. Mark or others,
-> > please shout if you'd like them dropped, they are on a branch.
+> > I'm CC'ing Marc and Andre (Andre is the only person that I know for a fact
+> > that ran 32 bit kvmtool).
+
+Thanks Alex, forgot some folks :)
+
+> > Haven't looked at the patches in detail, but as someone who ocassionally
+> > contributes to kvmtool, I have to say it's always nice to have fewer things
+> > to worry about. I, for one, never used 32 bit kvmtool, I just compiled for
+> > 32 bit arm to make sure it doesn't break.
+> > 
+> > If nobody objects to dropping support for 32 bit kvmtool, I'm planning to
+> > review the patches.
 > 
-> I'm really not comfortable with this series and would prefer to see it
-> dropped while we continue the discussion, especially as it's causing
-> minor conflicts with the KVM/arm64 tree in -next.
+> Frankly, the removal of 32bit support is long overdue. Every time I
+> hack something in kvmtool (at least once a month), I have to wonder
+> how to fit that in the 32bit code that I *know* to be dead code.
 
-Catalin, unless you say otherwise, I'm going to assume this will be
-dropped in the interim.
-
-> The series is pitched a bit like an erratum workaround, but the overall
-> problem that a memory-dependent prefetcher can bypass permission checks
-> is fairly general and, even if nobody else gets this wrong, I doubt that
-> it's the last time Arm will mess it up. So, while the EL3 mitigation may
-> be Arm-specific, I don't think the rest of it really is. That's
-> especially true given the sorry state of spectre mitigations on
-> third-party derivatives of Arm designs, such as the Qualcomm Kryo parts,
-> and the fact that we provide userspace with a mechanism today for
-> querying the state of those mitigations via sysfs.
-> 
-> The immediate question, then, is whether this broken behaviour is
-> prohibited by CSV3. The text in the latest Arm ARM just refers to
-> "Data loaded under speculation", so it's not entirely clear whether that
-> applies to a prefetcher.
-
-Hmm, good point. I think prefetchers fall under the ARM ARM glossary
-definition of speculation, which includes:
-
- - Operations generated by the hardware that are not directly generated
-   by any instructions appearing in the Execution stream.
-
-> If we decide to go with a new entry for this, then we also need to
-> change the default behaviour along the lines of Doug's Spectre-BHB
-> changes queued on for-next/spectre-bhb-assume-vulnerable so that we
-> assume vulnerable if we don't know better. To do otherwise will result
-> in false assurances to userspace on derivative and third-party
-> implementations.
-
-Is the idea here that we'd assume any part with FEAT_CSV3 is vulnerable
-to CVE-2024-7881 unless told otherwise by firmware / known good list of
-implementations?
-
-ARCH_WORKAROUND_4 assumes software has already detected an affected
-implementation and doesn't distinguish between "not affected" and "not
-mitigated". So I'd be concerned that we're gonna turn on KPTI for a load
-of unrelated parts for something that hasn't (yet) been defined as a new
-ecosystem bug.
-
-> To be clear: I'm not at all against mitigating this problem and
-> advertising the status of that mitigation. I *am* against quietly
-> handling it like a CPU erratum whilst simultaneously telling userspace
-> that meltdown is not a problem regardless of the mitigation state.
-
-I like your idea of treating this as a broken CSV3 implementation
-instead of an entirely new CPU bug, if only to avoid the 'assume the
-worst' problem.
-
-Either way KVM will need to implement the SMCCC call to the letter, even
-if we wind up nuking CSV3.
+That's pretty much how I arrived at these patches, hacking on something
+for arm64 and getting annoyed with the 32-bit stuff.
 
 Thanks,
 Oliver
