@@ -1,186 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B2012C499
-	for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 14:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE921E32DD
+	for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 14:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742393891; cv=none; b=JWTdCNJuIvQqb/WhoZLSFgOes4pSO8KSnTqB9bCIZPpjzYzuCUv4A4Bvs8XpTRgs/XOCfl7cbm6XpfGcld/lMJIMDoD8KYYA3DaSLF0dtOCTXk03dau26tWKMh7+LcTQV+3a7nRhv8mC4a2D+jv1QPxhqHWFFK8bGPo7BXQMYUc=
+	t=1742395083; cv=none; b=HqQpYD8zlJknU20WW8jlRdHKTQxPU/9kGBhD8mVCP+Q38JKdWE+SbbIt7HBIhvefvIZTuj4fAeCv1Ys63nrF6j5ZQAWfIsfVQUtk6llHI4Eb7Hz/ssTJ460pKgjEbN80h95oaoSHy5HhYbDwrsQw/reTOMGXMKTIiNA+f5XmJwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742393891; c=relaxed/simple;
-	bh=jUrl/975ZQ3roXkjiImKd9VAkQ3S8ElhujNTuWjlkNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jnuODyQsybu0QVlQF13kzMRgXhfffc0xgq/ahGz/NpLTWIw3+aJ4Ltzx3/Iu4korGkH+dwEOa1MKrcFXmOguoKiylin+3q/kFTr7unxt/6HDjIyLp7xkxNBnHrHq/iL0s8n9yKTMQNcTodVet+IMgtReywO4nPArqK6A1NlNvMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49AAB113E;
-	Wed, 19 Mar 2025 07:18:16 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06A7A3F673;
-	Wed, 19 Mar 2025 07:18:06 -0700 (PDT)
-Date: Wed, 19 Mar 2025 14:18:04 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, <kvmarm@lists.linux.dev>,
- <kvm@vger.kernel.org>, Will Deacon <will@kernel.org>, Julien Thierry
- <julien.thierry.kdev@gmail.com>, <maz@kernel.org>,
- <jean-philippe@linaro.org>
-Subject: Re: [RFC kvmtool 0/9] arm: Drop support for 32-bit kvmtool
-Message-ID: <20250319141804.4fee5f5f@donnerap.manchester.arm.com>
-In-Reply-To: <Z9f78K-m9h7YlzUr@raptor>
-References: <20250314222516.1302429-1-oliver.upton@linux.dev>
-	<Z9f78K-m9h7YlzUr@raptor>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1742395083; c=relaxed/simple;
+	bh=SWQiLXz3UQSRH0sgda5pipDAoE1Jf6PULp6wnmA0Nrc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dWW+UcHiCQhuA1i8qlFaGbLkC37yAuLlzDtAiZW6VEJpmm9CaSnRr0QIyynaKkVjRtjEg5XrIE6VxTIYHwq3rsuf0lgCsRNVSqeKJF2AQxqKNOrut28Cm+9syGDgr5Zn/UZd0ZxaVm1i9LrdTlyQKMCrpRr8f3SQha6H7P4O/bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gvQjGWyU; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gvQjGWyU"
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-523ee30e0d4so3337136e0c.2
+        for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 07:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1742395080; x=1742999880; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EAQMc4ueVeym6ao2O+BFRKNQiM2evdanfHeGpELVuW8=;
+        b=gvQjGWyUcLZDixj6lBH240kH6A5J+pgU2Wtqq2bWI9bOJ1maLc6rziNMo0tMquInsk
+         sUsLptjW4UdSe1hjI8N+JmHaNkW/bMbTCN8feb++9U2wA4Z5O17C+F4h1+0nsc92ffCH
+         61txIKXBG5HCEIk1oehLlbQPFHNl9OBbfgOZHWzR1mPCkE3zUDKLbRkHJLe3YcIoi4fc
+         Yp58JVTH48yT0xMA0KdTko6pZp+TuG30FBM/9dhqMVuM3YtIfVG9kfDBkBkwHPJNde8N
+         Cc5Pa3kWhki2wBu3OUXf5B28Cqo9vbk2NrZebOueL8STgojKjuu67fxSsK4pPWvrNsuR
+         f4AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742395080; x=1742999880;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EAQMc4ueVeym6ao2O+BFRKNQiM2evdanfHeGpELVuW8=;
+        b=UG4MJ0SOajRMgd9EDExLHEwREcOA0yoSTsRW4urcFYw5XT+XooYYw8yRiSKEnjCRB9
+         Nf46kvl/aRPz4FmYe8dPwkb3idEdVIE5omZWZi2T0N5RMYLLTROMlnPokDTiXc4Hvleb
+         ci1uMok9y5ErRl0xaQcpq6/uvVZTeVn3oW1IVTY/OImOMWNbsHh5ICDu2qjgAcTVX+mr
+         +zrLVw1nIJ+7PgkAe7lTZ24Lhe5jn265WMtWuucZl+Zu+RmbMVqRA7/+8A0FHC+BzASA
+         dtli5yY/obPl0LsqPV7Unh5fGfvjE+Krx/Rz5Vs/8suZOW8Td4j5rTS+lOelz24qsbhP
+         ephw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ3xffmvKvKCcDIfSIu6hl3ssWh+P/dM+2fyIXehs+wo9PAMSsYVfWxnuZkzLNhyPIVsVH4cc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxt5cq6Ka+7uWXlizl5jdhJDodPCgyo+P4CBmW3ekBAY7nfjEWL
+	byMNisGKe/j384XJtzLcp0Uby11zkKGOmPHa51L2VQbFffgs6BONHENeP7G8RYlCpgk4TeBn9wL
+	K/Sh6lGPkDQRgtoSRb+JvDgiCcpv5i5UuzAIXJA==
+X-Gm-Gg: ASbGncvGEUZ77+ggYEjcCnW2ViP3SXyE9ATC3BgRMGu8g4GhuaRzdLkp7vlMEw+/iGs
+	MHgxYzGsAVAyT44iWxkrJz1swECRoTEFm0fDwZp/L3eeGjoNrvUxRpImEW+tfA1gnj8Jon8SAcU
+	yTREztRvcYIjXfzyuMwEiJJx3YZ4ksyrthuT2nfr45oFwcHWVMC+cCKxw=
+X-Google-Smtp-Source: AGHT+IGxLhVT/ftDT8iYJ5Mr8vDPr54sfBtr7wxTMeJWhsyv6YLFWJHjY8iY8qPGLL2vFTHUSH2SqM4ZK2rC2ioWlfU=
+X-Received: by 2002:a05:6122:1d12:b0:520:997d:d0b4 with SMTP id
+ 71dfb90a1353d-5258918cba1mr2246266e0c.4.1742395080564; Wed, 19 Mar 2025
+ 07:38:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Wed, 19 Mar 2025 20:07:47 +0530
+X-Gm-Features: AQ5f1Jo_Jk6yP8Zz1gP_WLfB-CYzXNkDEG6hUQTy-hEqsCfLQJSmsIGoXWLSd3U
+Message-ID: <CA+G9fYvPu+MQKhYyPZSSDpAn-zhRGmeHQ8hJksT_cdDdxfbB-g@mail.gmail.com>
+Subject: Fast model boot failure with Linux next-20250312
+To: open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Linux ARM <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.linux.dev
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring <robh@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>, 
+	Aishwarya TCV <aishwarya.tcv@arm.com>, Anders Roxell <anders.roxell@linaro.org>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 17 Mar 2025 10:39:44 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+Regressions on the arm64 Fast Model (FVP-AEMvA) caused boot failures starting
+with Linux next-20250312 and persisting through next-20250319.
 
-Hi,
+First seen on the next-20250312
+ Good: next-20250311
+ Bad:  next-20250312 .. next-20250319
 
-> Hi Oliver,
-> 
-> I'm CC'ing Marc and Andre (Andre is the only person that I know for a fact
-> that ran 32 bit kvmtool).
-> 
-> Haven't looked at the patches in detail, but as someone who ocassionally
-> contributes to kvmtool, I have to say it's always nice to have fewer things
-> to worry about. I, for one, never used 32 bit kvmtool, I just compiled for
-> 32 bit arm to make sure it doesn't break.
+Regressions found on FVP:
+ - boot
 
-Well, it's of course always easier to just remove code and features,
-especially if one doesn't have a use for this feature in the first place.
+Regression Analysis:
+ - New regression? Yes
+ - Reproducible? Yes
 
-But I clearly see that 32-bit host support is *very* niche today,
-especially with dropped host kernel support, and that new features like NV
-and RME don't apply for that anyway, and are far more important, so I am
-fine with letting it go. So long, and thanks for all the fish!
+Boot regression: Fast model boot failure with Linux next-20250312
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Cheers,
-Andre
+Anders bisected this to this commit id,
 
-> If nobody objects to dropping support for 32 bit kvmtool, I'm planning to
-> review the patches.
-> 
-> Thanks,
-> Alex
-> 
-> On Fri, Mar 14, 2025 at 03:25:07PM -0700, Oliver Upton wrote:
-> > The last stable kernel to support 32-bit KVM/arm is 5.4, which is on
-> > track for EOL at the end of this year. Considering this, and the fact
-> > that 32-bit KVM never saw much usage in the first place, it is probably
-> > time to toss out the coprolite.
-> > 
-> > Of course, this has no effect on the support for 32-bit guests on 64-bit
-> > KVM.
-> > 
-> > Oliver Upton (9):
-> >   Drop support for 32-bit arm
-> >   arm64: Move arm64-only features into main directory
-> >   arm64: Combine kvm.c
-> >   arm64: Merge kvm-cpu.c
-> >   arm64: Combine kvm-config-arch.h
-> >   arm64: Move remaining kvm/* headers
-> >   arm64: Move asm headers
-> >   arm64: Rename top-level directory
-> >   arm64: Get rid of the 'arm-common' include directory
-> > 
-> >  INSTALL                                       |   9 +-
-> >  Makefile                                      |  40 +--
-> >  arm/aarch32/arm-cpu.c                         |  50 ---
-> >  arm/aarch32/include/asm/kernel.h              |   8 -
-> >  arm/aarch32/include/asm/kvm.h                 | 311 ------------------
-> >  arm/aarch32/include/kvm/barrier.h             |  10 -
-> >  arm/aarch32/include/kvm/fdt-arch.h            |   6 -
-> >  arm/aarch32/include/kvm/kvm-arch.h            |  18 -
-> >  arm/aarch32/include/kvm/kvm-config-arch.h     |   8 -
-> >  arm/aarch32/include/kvm/kvm-cpu-arch.h        |  24 --
-> >  arm/aarch32/kvm-cpu.c                         | 132 --------
-> >  arm/aarch32/kvm.c                             |  14 -
-> >  arm/aarch64/include/kvm/fdt-arch.h            |   6 -
-> >  arm/aarch64/include/kvm/kvm-arch.h            |  22 --
-> >  arm/aarch64/include/kvm/kvm-config-arch.h     |  29 --
-> >  arm/aarch64/include/kvm/kvm-cpu-arch.h        |  19 --
-> >  arm/aarch64/kvm.c                             | 212 ------------
-> >  arm/kvm-cpu.c                                 | 153 ---------
-> >  {arm/aarch64 => arm64}/arm-cpu.c              |   4 +-
-> >  {arm => arm64}/fdt.c                          |   4 +-
-> >  {arm => arm64}/gic.c                          |   2 +-
-> >  {arm => arm64}/gicv2m.c                       |   2 +-
-> >  {arm/aarch64 => arm64}/include/asm/image.h    |   0
-> >  {arm/aarch64 => arm64}/include/asm/kernel.h   |   0
-> >  {arm/aarch64 => arm64}/include/asm/kvm.h      |   0
-> >  {arm/aarch64 => arm64}/include/asm/pmu.h      |   0
-> >  .../include/asm/sve_context.h                 |   0
-> >  .../arm-common => arm64/include}/gic.h        |   0
-> >  {arm/aarch64 => arm64}/include/kvm/barrier.h  |   0
-> >  .../include/kvm}/fdt-arch.h                   |   0
-> >  .../include/kvm}/kvm-arch.h                   |   6 +-
-> >  .../include/kvm}/kvm-config-arch.h            |  24 +-
-> >  .../include/kvm}/kvm-cpu-arch.h               |  10 +-
-> >  .../arm-common => arm64/include}/pci.h        |   0
-> >  .../arm-common => arm64/include}/timer.h      |   0
-> >  {arm => arm64}/ioport.c                       |   0
-> >  {arm/aarch64 => arm64}/kvm-cpu.c              | 289 ++++++++++++----
-> >  {arm => arm64}/kvm.c                          | 212 +++++++++++-
-> >  {arm => arm64}/pci.c                          |   4 +-
-> >  {arm/aarch64 => arm64}/pmu.c                  |   2 +-
-> >  {arm/aarch64 => arm64}/pvtime.c               |   0
-> >  {arm => arm64}/timer.c                        |   4 +-
-> >  42 files changed, 495 insertions(+), 1139 deletions(-)
-> >  delete mode 100644 arm/aarch32/arm-cpu.c
-> >  delete mode 100644 arm/aarch32/include/asm/kernel.h
-> >  delete mode 100644 arm/aarch32/include/asm/kvm.h
-> >  delete mode 100644 arm/aarch32/include/kvm/barrier.h
-> >  delete mode 100644 arm/aarch32/include/kvm/fdt-arch.h
-> >  delete mode 100644 arm/aarch32/include/kvm/kvm-arch.h
-> >  delete mode 100644 arm/aarch32/include/kvm/kvm-config-arch.h
-> >  delete mode 100644 arm/aarch32/include/kvm/kvm-cpu-arch.h
-> >  delete mode 100644 arm/aarch32/kvm-cpu.c
-> >  delete mode 100644 arm/aarch32/kvm.c
-> >  delete mode 100644 arm/aarch64/include/kvm/fdt-arch.h
-> >  delete mode 100644 arm/aarch64/include/kvm/kvm-arch.h
-> >  delete mode 100644 arm/aarch64/include/kvm/kvm-config-arch.h
-> >  delete mode 100644 arm/aarch64/include/kvm/kvm-cpu-arch.h
-> >  delete mode 100644 arm/aarch64/kvm.c
-> >  delete mode 100644 arm/kvm-cpu.c
-> >  rename {arm/aarch64 => arm64}/arm-cpu.c (96%)
-> >  rename {arm => arm64}/fdt.c (99%)
-> >  rename {arm => arm64}/gic.c (99%)
-> >  rename {arm => arm64}/gicv2m.c (99%)
-> >  rename {arm/aarch64 => arm64}/include/asm/image.h (100%)
-> >  rename {arm/aarch64 => arm64}/include/asm/kernel.h (100%)
-> >  rename {arm/aarch64 => arm64}/include/asm/kvm.h (100%)
-> >  rename {arm/aarch64 => arm64}/include/asm/pmu.h (100%)
-> >  rename {arm/aarch64 => arm64}/include/asm/sve_context.h (100%)
-> >  rename {arm/include/arm-common => arm64/include}/gic.h (100%)
-> >  rename {arm/aarch64 => arm64}/include/kvm/barrier.h (100%)
-> >  rename {arm/include/arm-common => arm64/include/kvm}/fdt-arch.h (100%)
-> >  rename {arm/include/arm-common => arm64/include/kvm}/kvm-arch.h (97%)
-> >  rename {arm/include/arm-common => arm64/include/kvm}/kvm-config-arch.h (54%)
-> >  rename {arm/include/arm-common => arm64/include/kvm}/kvm-cpu-arch.h (82%)
-> >  rename {arm/include/arm-common => arm64/include}/pci.h (100%)
-> >  rename {arm/include/arm-common => arm64/include}/timer.h (100%)
-> >  rename {arm => arm64}/ioport.c (100%)
-> >  rename {arm/aarch64 => arm64}/kvm-cpu.c (70%)
-> >  rename {arm => arm64}/kvm.c (59%)
-> >  rename {arm => arm64}/pci.c (98%)
-> >  rename {arm/aarch64 => arm64}/pmu.c (99%)
-> >  rename {arm/aarch64 => arm64}/pvtime.c (100%)
-> >  rename {arm => arm64}/timer.c (95%)
-> > 
-> > 
-> > base-commit: e48563f5c4a48fe6a6bc2a98a9a7c84a10f043be
-> > -- 
-> > 2.39.5
-> > 
-> >   
+# first bad commit:
+  [858c7bfcb35e1100b58bb63c9f562d86e09418d9]
+  arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
 
+NOTE:
+  LKFT is currently running FVP Fast Models version 11.24.
+  Planned upgrade to the Fast Models version 11.28 in this sprint.
+
+## Boot log
+  <No crash log on the console>
+
+## Source
+* Kernel version: 6.14.0-rc7
+* Git tree: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+* Git sha: ff7f9b199e3f4cc7d61df5a9a26a7cbb5c1492e6
+* Git describe: next-20250319
+* Project details:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319
+* DUT: arm64 Fast Model (FVP-AEMvA)
+* Toolchains: gcc-13 and clang-20
+
+## Build
+* Build log: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319/testrun/27675691/suite/boot/test/gcc-13-lkftconfig/log
+* Build history:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319/testrun/27675685/suite/boot/test/gcc-13-lkftconfig/history/
+* Build details:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319/testrun/27675691/suite/boot/test/gcc-13-lkftconfig/
+* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/2uX2EtC2pQdmVZ7ccoyhoi01Yy0/
+* Kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2uX2EtC2pQdmVZ7ccoyhoi01Yy0/config
+
+--
+Linaro LKFT
+https://lkft.linaro.org
