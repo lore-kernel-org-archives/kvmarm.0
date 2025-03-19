@@ -1,28 +1,29 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E84918DF93;
-	Wed, 19 Mar 2025 17:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93C11E0B67;
+	Wed, 19 Mar 2025 17:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742405563; cv=none; b=PJKUq/T17JOVtUrSTIBqbsvV4HzrNcNBaF91aaGKu3xyiIW240uBg/PBXHEp+ahGf6U7WhaX+356XHNmGxLUonr68nSxTQSbu3lSDPoldqKpaW+zMo6Ym3xuJbYSIBePie7fAjGc/0zA2XahPwcrSrKpSlGcYvDh+i1ErdtOnis=
+	t=1742405568; cv=none; b=A3fhzQf2WQ8L99KZSpQicrRrkdHzJ/MVU/SCLljLWZWuzmkf2ko54PJYkG9DC5NoMM8pLP7AB5pPJvch+ZBSNUTABBoc8D/MpN64MNGvcMdOcUZpAViLIIahL6BBTbv3DDbCrS91TsntTPERN8upNq6TWX94YE/5MgU68UlQQzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742405563; c=relaxed/simple;
-	bh=tg2pJBNECZeF8c6n5hBKnp0GypgufHB36EhTIl3JHq4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Lvl5etAKEixvlFh8TQ0V0DzG6/r53Miwv6vwOZxmdAjgUQW5UnxdSLlFwXBD61rn+DlZcsavIjjSZCF/HEb5YRYgJJmil05M/d3rJ3Hif01N5ptST1y+hdZe3j+TR7IaDW4O8qVT+9IYSvRik8+PCvecWLftxBIwisN3F/RgHaA=
+	s=arc-20240116; t=1742405568; c=relaxed/simple;
+	bh=lruBUs8TargZk8ji7uWcRPMidDjMpuRewdFLyywkDxY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NY4Wth9ZjlHke4jP3GwIx4bFV3XWYc4SL6dQili69wSusF3CxTaPZpXlQ7++Ud8ca/sl7N56LWa3dWLXr0AWcuHRnx3RTb4W+ELSpHf+u49FDkzwB8NMznk/aiwPwBihLkgfm+H9r3XMF4waaIN3B9b0PXR3mKNVmA2L+zFBUMo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZHwdT20mwz6L5JL;
-	Thu, 20 Mar 2025 01:27:41 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZHwgt5K67z6K9Fb;
+	Thu, 20 Mar 2025 01:29:46 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8AC831402A5;
-	Thu, 20 Mar 2025 01:32:32 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 5DEEB1409C9;
+	Thu, 20 Mar 2025 01:32:42 +0800 (CST)
 Received: from A2303104131.china.huawei.com (10.203.177.241) by
  frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 19 Mar 2025 18:32:25 +0100
+ 15.1.2507.39; Wed, 19 Mar 2025 18:32:35 +0100
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>,
 	<linux-arm-kernel@lists.infradead.org>
@@ -30,107 +31,175 @@ CC: <linuxarm@huawei.com>, <kevin.tian@intel.com>, <jgg@ziepe.ca>,
 	<alex.williamson@redhat.com>, <maz@kernel.org>, <oliver.upton@linux.dev>,
 	<will@kernel.org>, <robin.murphy@arm.com>, <nicolinc@nvidia.com>,
 	<jean-philippe@linaro.org>, <jonathan.cameron@huawei.com>
-Subject: [RFC PATCH v3 0/5] iommu/arm-smmu-v3: Use pinned KVM VMID for stage 2
-Date: Wed, 19 Mar 2025 17:31:57 +0000
-Message-ID: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC PATCH v3 1/5] KVM: arm64: Introduce support to pin VMIDs
+Date: Wed, 19 Mar 2025 17:31:58 +0000
+Message-ID: <20250319173202.78988-2-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
+References: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  frapeml500008.china.huawei.com (7.182.85.71)
 
-Hi All,
+Introduce kvm_arm_pinned_vmid_get() and kvm_arm_pinned_vmid_put(), to pin
+a VMID associated with a KVM instance. This will guarantee that VMID
+remains the same after a rollover.
 
-Changes from RFCv2[0]
+This is in preparation of introducing support in the SMMUv3 driver to use
+the KVM VMID for S2 stage configuration in nested mode.
 
--Based on feedback received, removed generic KVM APIs for pinned_vmid_
- {get,put}() and are now implemented directly by KVM ARM.
--struct kvm * is now associated with struct iommufd_device and the association
- is established when idev is first allocated during iommufd_device_bind().
--This is now based on Nicolin's recent series[1], which decouples the vmid
- from S2 parent domains and is assigned during viommu/vSMMU alloc time.
--Added additional checks to make sure when BTM is enabled, kvm is mandatory.
--At the moment, kvm_get_kvm_safe()/kvm_put_kvm() is used inside the smmuv3
- driver and not in iommufd as iommufd is not a user of kvm and is just
- passed through.
-
-ToDo:
--May be we need to check both KVM and SMMUv3 has the same number of VMID
-bits supported. Not sure we have systems like that out there.
-
-Why we require this(Thanks to Jean for the nice write-up below):
-
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
-* When enabling BTM in the SMMU, all TLB invalidations to the
-  inner-shareable domain issued by the CPU are taken into account by the
-  SMMU. That includes for example the TLBI IPAS2E1IS from
-  __kvm_tlb_flush_vmid_range().
+ arch/arm64/include/asm/kvm_host.h |  3 ++
+ arch/arm64/kvm/vmid.c             | 76 ++++++++++++++++++++++++++++++-
+ 2 files changed, 78 insertions(+), 1 deletion(-)
 
-* BTM is enabled globally in the SMMU CR2 register. If we enable BTM for
-  host SVA, then it also affects KVM.
-
-* Stage-1 TLB entries in the SMMU have a bit (ASET) saying "this entry
-  is private and does not participate in BTM", which we set for private
-  SMMU address spaces.
-
-  Annoyingly, the stage-2 TLB entries do not have it. With BTM all VMIDs
-  are shared between CPU and SMMU.
-
-* So, if the SMMU driver allocates VMID privately and we enable BTM, then
-  CPU invalidations will remove unrelated SMMU TLB entries. Instead, the
-  SMMU driver needs to coordinate with KVM on VMID allocation.
-
-* Private stage-2 address spaces in the SMMU would need to allocate VMIDs
-  that aren't used by KVM, but that's not a use-case at the moment:
-
-  - For assigning devices to a host process or to a VM, we use private
-    stage-1 mappings. stage-2 will be used to enable nesting translation,
-    and will typically mirror the KVM stage-2 since it pins the guest
-    address space.
-
-  - If the SMMU doesn't support stage-1, the driver falls back to stage-2
-    for private address spaces. For such an implementation we disable BTM.
----
-
-This is sanity tested on a HiSilicon platform and the complete branch is
-available here[2].
-
-Please take a look and let me know your feedback.
-
-Thanks,
-Shameer
-[0] https://lore.kernel.org/kvmarm/20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com/
-[1] https://lore.kernel.org/linux-iommu/cover.1741150594.git.nicolinc@nvidia.com/
-[2] https://github.com/hisilicon/kernel-dev/tree/smmuv3_vmid-v1-with-rmr-vmid-v3-ext
-
-Jean-Philippe Brucker (1):
-  iommu/arm-smmu-v3: Enable broadcast TLB maintenance
-
-Shameer Kolothum (4):
-  KVM: arm64: Introduce support to pin VMIDs
-  iommufd/device: Associate a kvm pointer to iommufd_device
-  iommu/arm-smmu-v3-iommufd: Pass in kvm pointer to viommu_alloc
-  iommu/arm-smmu-v3-iommufd: Use KVM VMID for s2 stage
-
- arch/arm64/include/asm/kvm_host.h             |  3 +
- arch/arm64/kvm/vmid.c                         | 76 ++++++++++++++++++-
- .../arm/arm-smmu-v3/arm-smmu-v3-iommufd.c     | 54 ++++++++++++-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 24 +++++-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  3 +
- drivers/iommu/iommufd/device.c                |  5 +-
- drivers/iommu/iommufd/iommufd_private.h       |  2 +
- drivers/iommu/iommufd/viommu.c                |  3 +-
- drivers/vfio/iommufd.c                        |  2 +-
- include/linux/iommu.h                         |  4 +-
- include/linux/iommufd.h                       |  4 +-
- 11 files changed, 168 insertions(+), 12 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d919557af5e5..b6682f5d1b86 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -142,6 +142,7 @@ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages);
+ 
+ struct kvm_vmid {
+ 	atomic64_t id;
++	refcount_t pinned;
+ };
+ 
+ struct kvm_s2_mmu {
+@@ -1261,6 +1262,8 @@ int __init kvm_arm_vmid_alloc_init(void);
+ void __init kvm_arm_vmid_alloc_free(void);
+ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
+ void kvm_arm_vmid_clear_active(void);
++int kvm_arm_pinned_vmid_get(struct kvm *kvm);
++void kvm_arm_pinned_vmid_put(struct kvm *kvm);
+ 
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+ {
+diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+index 7fe8ba1a2851..7bda189e927c 100644
+--- a/arch/arm64/kvm/vmid.c
++++ b/arch/arm64/kvm/vmid.c
+@@ -25,6 +25,10 @@ static unsigned long *vmid_map;
+ static DEFINE_PER_CPU(atomic64_t, active_vmids);
+ static DEFINE_PER_CPU(u64, reserved_vmids);
+ 
++static unsigned long max_pinned_vmids;
++static unsigned long nr_pinned_vmids;
++static unsigned long *pinned_vmid_map;
++
+ #define VMID_MASK		(~GENMASK(kvm_arm_vmid_bits - 1, 0))
+ #define VMID_FIRST_VERSION	(1UL << kvm_arm_vmid_bits)
+ 
+@@ -47,7 +51,10 @@ static void flush_context(void)
+ 	int cpu;
+ 	u64 vmid;
+ 
+-	bitmap_zero(vmid_map, NUM_USER_VMIDS);
++	if (pinned_vmid_map)
++		bitmap_copy(vmid_map, pinned_vmid_map, NUM_USER_VMIDS);
++	else
++		bitmap_zero(vmid_map, NUM_USER_VMIDS);
+ 
+ 	for_each_possible_cpu(cpu) {
+ 		vmid = atomic64_xchg_relaxed(&per_cpu(active_vmids, cpu), 0);
+@@ -103,6 +110,14 @@ static u64 new_vmid(struct kvm_vmid *kvm_vmid)
+ 			return newvmid;
+ 		}
+ 
++		/*
++		 * If it is pinned, we can keep using it. Note that reserved
++		 * takes priority, because even if it is also pinned, we need to
++		 * update the generation into the reserved_vmids.
++		 */
++		if (refcount_read(&kvm_vmid->pinned))
++			return newvmid;
++
+ 		if (!__test_and_set_bit(vmid2idx(vmid), vmid_map)) {
+ 			atomic64_set(&kvm_vmid->id, newvmid);
+ 			return newvmid;
+@@ -169,6 +184,55 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
+ }
+ 
++int kvm_arm_pinned_vmid_get(struct kvm *kvm)
++{
++	struct kvm_vmid *kvm_vmid;
++	u64 vmid;
++
++	if (!pinned_vmid_map || !kvm)
++		return -EINVAL;
++
++	kvm_vmid = &kvm->arch.mmu.vmid;
++
++	guard(raw_spinlock_irqsave)(&cpu_vmid_lock);
++	vmid = atomic64_read(&kvm_vmid->id);
++
++	if (refcount_inc_not_zero(&kvm_vmid->pinned))
++		return (vmid & ~VMID_MASK);
++
++	if (nr_pinned_vmids >= max_pinned_vmids)
++		return -EINVAL;
++
++	/*
++	 * If we went through one or more rollover since that VMID was
++	 * used, make sure it is still valid, or generate a new one.
++	 */
++	if (!vmid_gen_match(vmid))
++		vmid = new_vmid(kvm_vmid);
++
++	nr_pinned_vmids++;
++	__set_bit(vmid2idx(vmid), pinned_vmid_map);
++	refcount_set(&kvm_vmid->pinned, 1);
++	return (vmid & ~VMID_MASK);
++}
++
++void kvm_arm_pinned_vmid_put(struct kvm *kvm)
++{
++	struct kvm_vmid *kvm_vmid;
++	u64 vmid;
++
++	if (!pinned_vmid_map || !kvm)
++		return;
++
++	kvm_vmid = &kvm->arch.mmu.vmid;
++	vmid = atomic64_read(&kvm_vmid->id);
++	guard(raw_spinlock_irqsave)(&cpu_vmid_lock);
++	if (refcount_dec_and_test(&kvm_vmid->pinned)) {
++		__clear_bit(vmid2idx(vmid), pinned_vmid_map);
++		nr_pinned_vmids--;
++	}
++}
++
+ /*
+  * Initialize the VMID allocator
+  */
+@@ -186,10 +250,20 @@ int __init kvm_arm_vmid_alloc_init(void)
+ 	if (!vmid_map)
+ 		return -ENOMEM;
+ 
++	pinned_vmid_map = bitmap_zalloc(NUM_USER_VMIDS, GFP_KERNEL);
++	nr_pinned_vmids = 0;
++
++	/*
++	 * Ensure we have at least one emty slot available after rollover
++	 * and maximum number of VMIDs are pinned. VMID#0 is reserved.
++	 */
++	max_pinned_vmids = NUM_USER_VMIDS - num_possible_cpus() - 2;
++
+ 	return 0;
+ }
+ 
+ void __init kvm_arm_vmid_alloc_free(void)
+ {
++	bitmap_free(pinned_vmid_map);
+ 	bitmap_free(vmid_map);
+ }
 -- 
 2.47.0
 
