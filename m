@@ -1,144 +1,107 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4086D1E2843;
-	Wed, 19 Mar 2025 17:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2201618D63E;
+	Wed, 19 Mar 2025 18:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742405613; cv=none; b=HIm25DmN9gs9Eh/FLFN7ryvJbWCXMWy4Snpvi3PqWYpqcoZ6x5ZHRx3bg7qb4nfiY1krk42FeBBFWqLj9ApN/bUTwjCbMmWWxNdZd2nlMmxGXN4GB3vr6KZHoxXI8ob4wrbdagf6yA/2vZ4KWiOW2IQfm9ZlvK1x6mrIM3G0E/Q=
+	t=1742407447; cv=none; b=CMa6b3XD3SFyX8/BjNo5s4aAwmGX8190cxsMhfxp5i9rkaM6Ri0Fx685xcF5cxUp9H3QsrBF5QUwVBa5Q5ZUOJOODOfY1Pul1Ueb8MdqyWZCqqqVzFnCQbxW5oN8TNcvaMbmqkxXdmOKNV8m8Idb0aWmkeh1F6k6X6mXeWD9mao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742405613; c=relaxed/simple;
-	bh=l6ySbUYgPrssiksQ+srnwjLdqRgcLvohmfBc1g25Qmg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b74jZ1lXYx6vJNEynSHq1JDq8P417gSXbRfg8/EulyKEoJ7lWm3qcAGx26fHn66Gvo7X7CkH4U0rGAhRw9JsdRjtNtat6XvGMW/LmI0nCoU1qwAZKOCHC+o88UgyaatDtKzsz8yMKDiNWH5e+D7BOoERshNo0K92F2ctZDSch6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZHwhp0BxTz6K9Rq;
-	Thu, 20 Mar 2025 01:30:34 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id A323914050C;
-	Thu, 20 Mar 2025 01:33:29 +0800 (CST)
-Received: from A2303104131.china.huawei.com (10.203.177.241) by
- frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 19 Mar 2025 18:33:22 +0100
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>
-CC: <linuxarm@huawei.com>, <kevin.tian@intel.com>, <jgg@ziepe.ca>,
-	<alex.williamson@redhat.com>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<will@kernel.org>, <robin.murphy@arm.com>, <nicolinc@nvidia.com>,
-	<jean-philippe@linaro.org>, <jonathan.cameron@huawei.com>
-Subject: [RFC PATCH v3 5/5] iommu/arm-smmu-v3: Enable broadcast TLB maintenance
-Date: Wed, 19 Mar 2025 17:32:02 +0000
-Message-ID: <20250319173202.78988-6-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
-References: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
+	s=arc-20240116; t=1742407447; c=relaxed/simple;
+	bh=fCefeQ3q3l7xgH7lRPp3lIYPNhNLIQJnhm+V5ZlhCKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h8n3udgDw3cmG/RJTc0Q/t0DK7ECEnMGRzcUG7nzYacoYsYUhCdKU6nwbmz/bFvri6Tp9BfU1GFerVP+dYjbDtWSH8TcEuLuxt16QZRHo5tMATo7OQ0/UdnpOVsWEMJvge+ZCLreQVnH9lfuetKeFhNYJAxXnc+1zZujWFK/mGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBB44C4CEE4;
+	Wed, 19 Mar 2025 18:03:59 +0000 (UTC)
+Date: Wed, 19 Mar 2025 18:03:57 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Marc Zyngier <maz@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com" <david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Message-ID: <Z9sHDbBgoMt7M-vc@arm.com>
+References: <86r033olwv.wl-maz@kernel.org>
+ <SA1PR12MB7199500A3683B15A64B663D6B0D12@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <87tt7y7j6r.wl-maz@kernel.org>
+ <SA1PR12MB7199B320DAE42A8D7038A78EB0D32@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <8634fcnh0n.wl-maz@kernel.org>
+ <Z9h98RhunemcFhhz@arm.com>
+ <86wmcmn0dp.wl-maz@kernel.org>
+ <20250318125527.GP9311@nvidia.com>
+ <Z9nJH38Em9XEx3U7@arm.com>
+ <20250318231736.GE9311@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250318231736.GE9311@nvidia.com>
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+On Tue, Mar 18, 2025 at 08:17:36PM -0300, Jason Gunthorpe wrote:
+> On Tue, Mar 18, 2025 at 07:27:27PM +0000, Catalin Marinas wrote:
+> > Thinking some more about a KVM capability that the VMM can check, I'm
+> > not sure what it can do with this. The VMM simply maps something from a
+> > device and cannot probe the cacheability 
+> 
+> KVM is mirroring the MM's PTEs to the S2's PTEs.
+> 
+> You can think about this differently - KVM currently has a little bug
+> where the MM's PTE's can say cachable but KVM will mirror it to a S2
+> PTE that is forced non-cachable. KVM will not do any cache flushing to
+> make this safe.
+> 
+> Fundamentally that discrepancy is what is being addressed
+> here. Cachable PTEs in the MM should be mirrored to cachable PTEs in
+> the S2.
 
-The SMMUv3 can handle invalidation targeted at TLB entries with shared
-ASIDs. If the implementation supports broadcast TLB maintenance, enable it
-and keep track of it in a feature bit. The SMMU will then be affected by
-inner-shareable TLB invalidations from other agents.
+If we treat this as a bug (and I agree it's a potential problem if we
+assign devices to the guest that have cacheable VMM mappings), the first
+step would be to reject such memory slots, report some error to the VMM.
+I don't think it's worth attempting to do any cache maintenance to sync
+the aliases.
 
-In order to avoid over invalidation with stage-2 translation contexts,
-enable BTM only when SMMUv3 supports eiher S1 or both S1 & S2 transaltion
-contexts. In this way the default domain will use stage-1 and stage-2 will
-be only used for NESTED Domain setup.
+Subsequently, this can be allowed with on FWB-capable hardware. Whether
+we want to expose such capability to the VMM, I guess it's harmless but
+I doubt the VMM would do anything with it since it doesn't know the
+device mapping attributes anyway.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-[Shameer: Enable BTM only if S1 is supported]
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 24 +++++++++++++++++++--
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  1 +
- 2 files changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index addc6308742b..06a13d78286a 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -4119,11 +4119,14 @@ static int arm_smmu_device_reset(struct arm_smmu_device *smmu)
- 	writel_relaxed(reg, smmu->base + ARM_SMMU_CR1);
- 
- 	/* CR2 (random crap) */
--	reg = CR2_PTM | CR2_RECINVSID;
-+	reg = CR2_RECINVSID;
- 
- 	if (smmu->features & ARM_SMMU_FEAT_E2H)
- 		reg |= CR2_E2H;
- 
-+	if (!(smmu->features & ARM_SMMU_FEAT_BTM))
-+		reg |= CR2_PTM;
-+
- 	writel_relaxed(reg, smmu->base + ARM_SMMU_CR2);
- 
- 	/* Stream table */
-@@ -4289,6 +4292,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- {
- 	u32 reg;
- 	bool coherent = smmu->features & ARM_SMMU_FEAT_COHERENCY;
-+	bool vhe = cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN);
- 
- 	/* IDR0 */
- 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
-@@ -4341,7 +4345,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- 
- 	if (reg & IDR0_HYP) {
- 		smmu->features |= ARM_SMMU_FEAT_HYP;
--		if (cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
-+		if (vhe)
- 			smmu->features |= ARM_SMMU_FEAT_E2H;
- 	}
- 
-@@ -4368,6 +4372,22 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- 
- 	if (reg & IDR0_S2P)
- 		smmu->features |= ARM_SMMU_FEAT_TRANS_S2;
-+	/*
-+	 * If S1 is supported, verify that BTM can be enabled.  If S2 is available
-+	 * and BTM is enabled, S2 will be used exclusively for nested domains,
-+	 * ensuring a KVM VMID is obtained.
-+	 * BTM is beneficial when the CPU shares page tables with SMMUv3 (e.g., vSVA).
-+	 */
-+	if (reg & IDR0_S1P) {
-+		/*
-+		 * If the CPU is using VHE, but the SMMU doesn't support it, the SMMU
-+		 * will create TLB entries for NH-EL1 world and will miss the
-+		 * broadcasted TLB invalidations that target EL2-E2H world. Don't enable
-+		 * BTM in that case.
-+		 */
-+		if (reg & IDR0_BTM && (!vhe || reg & IDR0_HYP))
-+			smmu->features |= ARM_SMMU_FEAT_BTM;
-+	}
- 
- 	if (!(reg & (IDR0_S1P | IDR0_S2P))) {
- 		dev_err(smmu->dev, "no translation support!\n");
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index 5890c233f73b..f554b6aa52c9 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -39,6 +39,7 @@ struct arm_smmu_device;
- #define IDR0_HTTU			GENMASK(7, 6)
- #define IDR0_HTTU_ACCESS		1
- #define IDR0_HTTU_ACCESS_DIRTY		2
-+#define IDR0_BTM			(1 << 5)
- #define IDR0_COHACC			(1 << 4)
- #define IDR0_TTF			GENMASK(3, 2)
- #define IDR0_TTF_AARCH64		2
 -- 
-2.47.0
-
+Catalin
