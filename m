@@ -1,64 +1,65 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F9625486F
-	for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 11:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604C8254B1F
+	for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 11:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742384342; cv=none; b=pN5/lea/ma42k5umboBcweF23K5o3HlRWILb/it9taS0coAZLo0seBIo3p8OEWqZfX+yzNBBLQosoyWTuna9dOIRS84tbJbr+UpqZEJ0SHVW8VmDyoy0D4j+CN56Q4ppy4kO+tw3LFz75hQ16kzX4QYoJiMxPk/zCsOg670zq5g=
+	t=1742384347; cv=none; b=lT+fKazRZXHtaVw/ATDD30dsshHVWvqzB4Mv9Q2e5zZT5A0S8m7isGFYCFzdXrr20YWgG68kKy0e9UWabU2hU+ikLWZOlrJhG3yiKmo74K/sGXvSzIlWY99GCfWDOhcdDo2If76y57Wnlo4lz3KoRj9mZtbIHhOv028pYzXJfhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742384342; c=relaxed/simple;
-	bh=Qvbtm6dfyen457gJvLvjX7P5zwfcn2yAepr9V7TxW98=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=k0j9QhnbbilRtyzWhfzuoL88tcf4+9zJ0mjqvlUjwDv8ikocYf5ftvwJfFS4cbTmKnldTowpwk0n+K9bO2OiaNZ1zA4BDkt0prImAgeRlO73Lw3rZqbywUj+LLiNqOdRGiiF9f8Y9E44/MS7b2dEeCeb2QQrK7nBf4s1FjbYv1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=MU7oltps; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1742384347; c=relaxed/simple;
+	bh=/ViqIW2rQ9pRcpWe1ja+iMw9gioppsGYG5b7wTCDJeo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=jLljZ2AQLQt3Z8qa7ogpXDEsatKAdi+bdF4VqrBTIwNXmgtyn76Aa4vCtjrYS7CUSwHPLcxE4+AdndWOJQKAQX6a0MKA86lv8IqlZsVwjnwYYouiBnp2LQgtuP+7nGz/uGQHQBkX68ld5wNPDqSGziHU7mVdepMdE5bIssnHHjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=VgnPfZnN; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="MU7oltps"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2255003f4c6so119807935ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 04:39:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="VgnPfZnN"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-223a7065ff8so42205535ad.0
+        for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 04:39:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742384340; x=1742989140; darn=lists.linux.dev;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3b2WbG9Dw9w7LVvz8ibLRK4Lkcz47Aas7wt/j6jq4h4=;
-        b=MU7oltps1usFUmD+rHuwCt+6MLtua9evejnsw2v1IU9CRSGmJxIR0/USK11v0tY4DC
-         K6wl9Sx8TebDL6jfu1LxUilDU1hGajC/m84823QETiNeLEsYSw6KQitXdiFsGAtfoFOl
-         PiBPzMS6AcKqfEphY43VZYErZcpKzYRqkI/QsYDcww9TUIvUW3GXyfjG58CVNoj4BKeO
-         NqNw2n4pwz1iSH+/VcXsAdcLq2Z/NPOkd181WkugbBW5P1Ea7Thq1JSxRb3v25Em+4CK
-         Wg+28d3ephS7aKoN1OtVyCTinfmnburEHy+1ftvkRDYRugxqiSbsj9tUiMBjYxWf7yl8
-         QBdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742384340; x=1742989140;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742384344; x=1742989144; darn=lists.linux.dev;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3b2WbG9Dw9w7LVvz8ibLRK4Lkcz47Aas7wt/j6jq4h4=;
-        b=CKjzZkrXkfaDyQbwfkPu+4tkg/LlqorMm4KiC5NjxjRq10OdWPBAYCBwA9MdYM+wkJ
-         skvDXCQ18VcQ6Uco5+ls6mqtrH0UfKJ50LqC9GtgRLWii8GSWuBJYYdKViAxlnDSL1Bs
-         xZk7NNKoE+KuqA/BKm9Mo6TRi2D7CQEr/JlqMcKR1SufrtNWo+hDgXuSX+WntCTmvKoM
-         d6dRwIVAlkasW7QedkqyScN+/tvQwCIFX/vTPVp3CHh8QSEHvwtnKyg9aVMnd4Yff53A
-         iYc63ilOBPtPj7KrAE+T+c3giGQwH+MB0IjmX44yN8Hf8C3JtTKmEoat4z5z026Ueucx
-         RMKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXU62ktyJkXg0Og4NjElHIoiCEzQhkTu6ZlNAoP+CO5pWHnYe9+a+rNXgtrmsG165/7OwJx9VM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwqwmcdzBB4qz+40pfVkxQRKI/aYyWgMKflZ5odKgaxnQ6+NSk1
-	0L0D+fmeLHXu88ibpNIXBlzPxxr2aqtG4oJuqTzKdViUv2m1LNJ0NKnpdI1XtcY=
-X-Gm-Gg: ASbGncuxnnfXISKMohuTXiBfwVBTmkJvQlSmxlJ/t9NjvBoZNIay5mu6M2XXR1EEYxB
-	3454OZLUMcn0GJjoarJgfF14SzZAIUdAg1Zo1/806X51KxxwpJZa1b2Zw4WmRplR1SeFgyzVwOj
-	D6XBdZT/J7C/yjqWVYJhaQmnPnirVg9TglxIT9P7pljqSSPpfdaGft+Wqov/9gi/D27hSQsfCbx
-	xcFCjTFdHw8vMsVGxtUGeahb6mL45lZALLAX8kKcEeyVgpKGD5ZZ5yR4KXR9RlWy5ID645m5snm
-	v6QILDWWb5j4W6dOk9fmw5o4qcvJRw6sI/oW13lpwQgX6id3nndioEw5x3U=
-X-Google-Smtp-Source: AGHT+IHYkRexp+H54sKtCJdj4SxUrr90D/xYbMKs4ypn4d6oGXxC0eDMIKC5k+tCMEC4GAo2sNq6EA==
-X-Received: by 2002:a05:6a00:234c:b0:736:6ecd:8e32 with SMTP id d2e1a72fcca58-7376d6ff2b7mr3715385b3a.21.1742384339843;
-        Wed, 19 Mar 2025 04:38:59 -0700 (PDT)
+        bh=Oc66l7/d0Jjz8FMmOmNrv+ltKHYwWToN6Hiwa3da7k0=;
+        b=VgnPfZnNg5SbrwQgpEkOUVidKSKQD5VIWEP6Dhvno7MSN6GqeSMrz3/iojtM07NyWO
+         xiQgXFIox60ObXxXMGz58NfOay83ropcfFHTFMSJ3w8QIColMV7ZzY19Rff5yxJR3pIK
+         M2gEja1WrynOpl2CBUog/Ma5uKoMma3Rnnn8Yr3fIT1LlLGDtVK93h326QJ1LbGIpoiN
+         PgR8z1IItOkFVGpOzPGOI9mVUsDH04orR621/sSv2r6jwE6nTVm9RHQ/xc29eyIGmBn1
+         HJ4vV+K3H2rb59q0++j/jLAZCUajmALvtbe2pQzboXD/pu1tcdpUcCqbZ0igKq3XD5eY
+         8M+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742384344; x=1742989144;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Oc66l7/d0Jjz8FMmOmNrv+ltKHYwWToN6Hiwa3da7k0=;
+        b=QkRp9p9VKlxpBAXgkwofbn+j0cnIiY7eLuLupv1MvOELiU0wn/5NN8IB6YpPQ8ZY+e
+         BWtyoviS1s+3tXTHUUtnykYMAMDYTdc6MGpJhjBeIrbCTTzgUrhtCrLZIyuXuufq6tLS
+         SNB1592VtZCXATk/d6m/TYu6YeRZ0cCgJZxG6L436pBuY5JjhCW9fE8Vh1ZfGhrESa5L
+         BkrAYS4OWmdN2q3b4JNPuDDSmqkyVMVcrILdfE3ZdKKUoVjQbnKndSyu0vWVtGMcBv68
+         ZVF4Anuc9RnhdutQMCZAfCjhNSCONQWZO7l+lqA/amqsBg9MduVSuT9gbL1bCLcXQsf1
+         8Slg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJDHt1FEdKMGAU6U7GdD9NUn2jFSrk8ppwYSUbidmL5E5BDCGK+iWwSry5VSfqUKQlbJyB37I=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxnURx8wSOSpPu35mTii5kEU5TOYuxgz+7q7mrkgurcLAZtaWPQ
+	jjd4WRN4HDcOLZSxisfxOD8IixVNnH5p9gr4mCgOesoIYOUwz62trp9+Q6u9YkQ=
+X-Gm-Gg: ASbGncu+yvUIanFAnBHPYKRjX3NrHHNHYytITeA4TX2X+51wwykdf+okpucBFzeU7qh
+	LdyrSjJ91exVm42TwsmJLvH+HfwOhVoAuYyv/RBmOtw/LBU680WpRd0ftTflpUwnFnFojGkuZf6
+	hgT+cczVehsZuEZSmzKoUYIjWqiMddtsDND3vixOFtjwx6jiQaAfHbpDeMCOoDAgAq+YhcvqEoD
+	B0mh/NnrY/l/5RKp/8VuJ0KHkXKVNp+1p/SC+yg1jPScQx9fai/mNCAVkszHKkJBsx4Ev2EnQhY
+	u341cDPR0U0zag3aR2CN5XvKTGFAJxlLYuY5nqdHIuCxjkWm
+X-Google-Smtp-Source: AGHT+IGSv0AJ8KwpE6fQl4DpNJB/7VkQwjj59TCcKQRqKU8wam5+t3NXf5mYBQBcpLosGuAKvIYqVA==
+X-Received: by 2002:a17:903:1790:b0:224:283f:a9ef with SMTP id d9443c01a7336-2264981d654mr33063775ad.6.1742384344597;
+        Wed, 19 Mar 2025 04:39:04 -0700 (PDT)
 Received: from localhost ([157.82.207.107])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-737115295dasm11333924b3a.30.2025.03.19.04.38.57
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-225c6bd5ce5sm111657845ad.252.2025.03.19.04.39.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Mar 2025 04:38:59 -0700 (PDT)
+        Wed, 19 Mar 2025 04:39:04 -0700 (PDT)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH 0/2] KVM: arm64: A few trace additions
-Date: Wed, 19 Mar 2025 20:38:54 +0900
-Message-Id: <20250319-trace-v1-0-0fff03204efa@daynix.com>
+Date: Wed, 19 Mar 2025 20:38:55 +0900
+Subject: [PATCH 1/2] KVM: arm64: Trace values with kvm_sys_access
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,10 +68,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAM6s2mcC/yXMQQ6CMBCF4as0s3ZMW5AAVzEsynTUWQA6rcSEc
- HcbWH4vL/8GiVU4QW82UF4lyTIXuIsBeoX5ySixGLz1N1u5DrMGYmwtjW2susieoXzfyg/5HZ3
- 7cFr58y25fI4whsRIyzRJ7s3aXF2NSg0M+/4HaKrISYQAAAA=
-X-Change-ID: 20250319-trace-80cb8d39de2e
+Message-Id: <20250319-trace-v1-1-0fff03204efa@daynix.com>
+References: <20250319-trace-v1-0-0fff03204efa@daynix.com>
+In-Reply-To: <20250319-trace-v1-0-0fff03204efa@daynix.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
  Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
  Zenghui Yu <yuzenghui@huawei.com>, 
@@ -80,24 +80,90 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  Akihiko Odaki <akihiko.odaki@daynix.com>
 X-Mailer: b4 0.15-dev-edae6
 
-These are tracepoints I added during recent debugging. I hope they are
-useful for others too.
+Tracing values written to or read from system registers.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
-Akihiko Odaki (2):
-      KVM: arm64: Trace values with kvm_sys_access
-      KVM: arm64: Trace SMC in a way similar to HVC
-
- arch/arm64/kvm/handle_exit.c       |  3 +++
  arch/arm64/kvm/sys_regs.c          | 24 ++++++++++++++----------
- arch/arm64/kvm/trace_handle_exit.h | 26 ++++++++++++++++++++++++--
- 3 files changed, 41 insertions(+), 12 deletions(-)
----
-base-commit: 8098cf067a7aae92a4f293df03964bf8474faca1
-change-id: 20250319-trace-80cb8d39de2e
+ arch/arm64/kvm/trace_handle_exit.h |  6 ++++--
+ 2 files changed, 18 insertions(+), 12 deletions(-)
 
-Best regards,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 14f66c7a4545..362e2758d101 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3994,23 +3994,27 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *params,
+ 			   const struct sys_reg_desc *r)
+ {
+-	trace_kvm_sys_access(*vcpu_pc(vcpu), params, r);
++	bool skip;
+ 
+ 	/* Check for regs disabled by runtime config */
+ 	if (sysreg_hidden(vcpu, r)) {
+ 		kvm_inject_undefined(vcpu);
+-		return;
++		skip = false;
++	} else {
++		/*
++		 * Not having an accessor means that we have configured a trap
++		 * that we don't know how to handle. This certainly qualifies
++		 * as a gross bug that should be fixed right away.
++		 */
++		BUG_ON(!r->access);
++
++		/* Skip instruction if instructed so */
++		skip = r->access(vcpu, params, r);
+ 	}
+ 
+-	/*
+-	 * Not having an accessor means that we have configured a trap
+-	 * that we don't know how to handle. This certainly qualifies
+-	 * as a gross bug that should be fixed right away.
+-	 */
+-	BUG_ON(!r->access);
++	trace_kvm_sys_access(*vcpu_pc(vcpu), params, r);
+ 
+-	/* Skip instruction if instructed so */
+-	if (likely(r->access(vcpu, params, r)))
++	if (likely(skip))
+ 		kvm_incr_pc(vcpu);
+ }
+ 
+diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
+index f85415db7713..b0308d95304d 100644
+--- a/arch/arm64/kvm/trace_handle_exit.h
++++ b/arch/arm64/kvm/trace_handle_exit.h
+@@ -88,6 +88,7 @@ TRACE_EVENT(kvm_sys_access,
+ 
+ 	TP_STRUCT__entry(
+ 		__field(unsigned long,			vcpu_pc)
++		__field(u64,				regval)
+ 		__field(bool,				is_write)
+ 		__field(const char *,			name)
+ 		__field(u8,				Op0)
+@@ -99,6 +100,7 @@ TRACE_EVENT(kvm_sys_access,
+ 
+ 	TP_fast_assign(
+ 		__entry->vcpu_pc = vcpu_pc;
++		__entry->regval = params->regval;
+ 		__entry->is_write = params->is_write;
+ 		__entry->name = reg->name;
+ 		__entry->Op0 = reg->Op0;
+@@ -109,10 +111,10 @@ TRACE_EVENT(kvm_sys_access,
+ 		__entry->Op2 = reg->Op2;
+ 	),
+ 
+-	TP_printk("PC: %lx %s (%d,%d,%d,%d,%d) %s",
++	TP_printk("PC: %lx %s (%d,%d,%d,%d,%d) %llx %s",
+ 		  __entry->vcpu_pc, __entry->name ?: "UNKN",
+ 		  __entry->Op0, __entry->Op1, __entry->CRn,
+-		  __entry->CRm, __entry->Op2,
++		  __entry->CRm, __entry->Op2, __entry->regval,
+ 		  __entry->is_write ? "write" : "read")
+ );
+ 
+
 -- 
-Akihiko Odaki <akihiko.odaki@daynix.com>
+2.48.1
 
