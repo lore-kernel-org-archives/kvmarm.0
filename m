@@ -1,79 +1,176 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD0324E4CB
-	for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 10:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C248E254B0A;
+	Wed, 19 Mar 2025 11:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742380161; cv=none; b=CGVxLdTlKTQJldMxWjAMtmTVQ5vN014761ruAuAB/XZVLW+eyNUGYev4OQAQLPl7Z4Y8sGOVS/i1pfuw3G6eRT/Ft62gzQzOEDu/ebzhWo2JZvTMMZowmmq9pdACCfcqAQ5h6E646U+5AKy3IxB4KaAqPRxPK+FwFjf9bsKyd5c=
+	t=1742382430; cv=none; b=H2vjmJ43oA3FSI7DxrKo3yAwnu+RYvh7HuiQMWRBclByx8Q6r2KKB3Yjxnf5lzFaJHioO9OKa8S11FSh1ZIzoIi2811ziT+vJ9l8dMtDNQrxk3fjqOryzV6dQTlWrIPH/50pOT67wgt49vFC5FSleH2kJIenKqDnWYkvZCe6ENU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742380161; c=relaxed/simple;
-	bh=qVfF5fC8VPa2jvIi5+vIGvyynDxrHKwWPbHvTNGZ+6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C5q4AMo8AAygFK0GTz6br+MkMLz9+Uo+egOjzaLIGmJnc8nA705WTDy1OH52xBg2mf2wZe7A+uchl+vDZ71fgyKZgKgRWJqebdyVWp2DIybWeBKnFghbogxIEu61GfIFaRu5eIQyvmV71FNRmRnyjOucsah6KmQotSSlQS6wino=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B52412FC;
-	Wed, 19 Mar 2025 03:29:27 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14C713F694;
-	Wed, 19 Mar 2025 03:29:16 -0700 (PDT)
-Date: Wed, 19 Mar 2025 10:29:14 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1742382430; c=relaxed/simple;
+	bh=NGYewGFAoe+wqdt5qJjLt/O2xNzItgc+8v51gZhI0yM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OI0k6NAoD39eay+pqtd06bI2PSJDwwaZpZ5KaSnM5rT1OryfGh/A9cK8UklkWaBRd8iCRvgjna2PVpkXukefqt1hpc4Wl5JlC5UjSJ7pi5X0m/FM/zYz4JAN5jKatriYyRYPFCUsFkVqJtlIllon/3HRL8FaZB3Syf7fgzsSp+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWaC89D9; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWaC89D9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E5D7C4CEEA;
+	Wed, 19 Mar 2025 11:07:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742382429;
+	bh=NGYewGFAoe+wqdt5qJjLt/O2xNzItgc+8v51gZhI0yM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uWaC89D95JcTYDPeq2Hv3aMwogaWlfE5GWVGOm5Qsc+oWambCRHyVhwHdj9g+ViRa
+	 0f+muqMjHQ5VtzcFUlRU7b3wm+O02mBaLK/JYEywHxWw2lbL/C57S4oRCMr2bZrpV/
+	 zaVlbBC4GLZrBTGOY57D9Ej1E/Ak6HuZ3x6uUL/vAj/UQYi7wr3AWkLKGjDCSeGPLw
+	 soxjDmKOxkjNSZnjY/llhsVzY/I16oAs/uy7RzFjJPd+ZbNOFMF3Ucg+l7GrbG/rQM
+	 pSZztDLvGU7QVARq4BySPo+rThFgkZtmH6w1hUvjkHGcNMr3m1maMv6y4TtdqmbXPo
+	 rJ3EATpmeDIaw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1turGM-00F2Ky-DE;
+	Wed, 19 Mar 2025 11:07:06 +0000
+Date: Wed, 19 Mar 2025 11:07:04 +0000
+Message-ID: <86o6xxmg87.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 6.13 8/8] KVM: arm64: Eagerly switch ZCR_EL{1,2}
-Message-ID: <Z9qcem7BVeuRd5XD@J2N7QTR9R3>
-References: <20250312-stable-sve-6-13-v1-0-c7ba07a6f4f7@kernel.org>
- <20250312-stable-sve-6-13-v1-8-c7ba07a6f4f7@kernel.org>
+	Will Deacon <will@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	devel@daynix.com
+Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
+In-Reply-To: <bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
+References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
+	<Z9pze3J2_zrTk_yC@linux.dev>
+	<e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
+	<86plidmjwh.wl-maz@kernel.org>
+	<bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312-stable-sve-6-13-v1-8-c7ba07a6f4f7@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 12, 2025 at 11:49:16PM +0000, Mark Brown wrote:
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 7262983c75fbc18ab44f52753bff1dd9167a68d3..84326765c66087d992a517a19fea94b04c39c994 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -5,6 +5,7 @@
->   */
->  
->  #include <hyp/adjust_pc.h>
-> +#include <hyp/switch.h>
->  
->  #include <asm/pgtable-types.h>
->  #include <asm/kvm_asm.h>
-> @@ -178,8 +179,12 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
->  		sync_hyp_vcpu(hyp_vcpu);
->  		pkvm_put_hyp_vcpu(hyp_vcpu);
->  	} else {
-> +		struct kvm_vcpu *vcpu = kern_hyp_va(host_vcpu);
-> +
->  		/* The host is fully trusted, run its vCPU directly. */
-> -		ret = __kvm_vcpu_run(host_vcpu);
-> +		fpsimd_lazy_switch_to_guest(vcpu);
-> +		ret = __kvm_vcpu_run(vcpu);
-> +		fpsimd_lazy_switch_to_host(vcpu);
->  	}
+On Wed, 19 Mar 2025 10:26:57 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> 
+> >> It should also be the reason why the perf program creates an event for
+> >> each PMU. tools/perf/Documentation/intel-hybrid.txt has more
+> >> descriptions.
+> > 
+> > But perf on non-Intel behaves pretty differently. ARM PMUs behaves
+> > pretty differently, because there is no guarantee of homogeneous
+> > events.
+> 
+> It works in the same manner in this particular aspect (i.e., "perf
+> stat -e cycles -a" creates events for all PMUs).
 
-As Gavin noted [1] for the v6.12 backport, the addition of kern_hyp_va()
-is not correct, since 'host_vcpu' has already been converted to a hyp VA
-at this point.
+But it then becomes a system-wide counter, and that's not what KVM
+needs to do.
 
-[1] https://lore.kernel.org/linux-arm-kernel/019afc2d-b047-4e33-971c-7debbbaec84d@redhat.com/#t
+> >> Allowing to enable more than one counter and/or an event type other
+> >> than the cycle counter is not the goal. Enabling another event type
+> >> may result in a garbage value, but I don't think it's worse than the
+> >> current situation where the count stays zero; please tell me if I miss
+> >> something.
+> >> 
+> >> There is still room for improvement. Returning a garbage value may not
+> >> be worse than returning zero, but counters and event types not
+> >> supported by some cores shouldn't be advertised as available in the
+> >> first place. More concretely:
+> >> 
+> >> - The vCPU should be limited to run only on cores covered by PMUs when
+> >> KVM_ARM_VCPU_PMU_V3 is set.
+> > 
+> > That's userspace's job. Bind to the desired PMU, and run. KVM will
+> > actively prevent you from running on the wrong CPU.
+> > 
+> >> - PMCR_EL0.N advertised to the guest should be the minimum of ones of
+> >> host PMUs.
+> > 
+> > How do you find out? CPUs can be hot-plugged on long after a VM has
+> > started, bringing in a new PMU, with a different number of counters.
+> > 
+> >> - PMCEID0_EL0 and PMCEID1_EL0 advertised to the guest should be the
+> >> result of the AND operations of ones of host PMUs.
+> > 
+> > Same problem.
+> 
+> I guess special-casing the cycle counter is the only option if the
+> kernel is going to deal with this.
 
-Mark.
+Indeed. I think Oliver's idea is the least bad of them all, but man,
+this is really ugly.
+
+> >> Special-casing the cycle counter may make sense if we are going to fix
+> >> the advertised values of PMCR_EL0.N, PMCEID0_EL0, and
+> >> PMCEID1_EL0. PMCR_EL0.N as we can simply return zero for these
+> >> registers. We can also prevent enabling a counter that returns zero or
+> >> a garbage value.
+> >> 
+> >> Do you think it's worth fixing these registers? If so, I'll do that by
+> >> special-casing the cycle counter.
+> > 
+> > I think this is really going in the wrong direction.
+> > 
+> > The whole design of the PMU emulation is that we expose a single,
+> > architecturally correct PMU implementation. This is clearly
+> > documented.
+> > 
+> > Furthermore, userspace is being given all the relevant information to
+> > place vcpus on the correct physical CPUs. Why should we add this sort
+> > of hack in the kernel, creating a new userspace ABI that we will have
+> > to support forever, when usespace can do the correct thing right now?
+> > 
+> > Worse case, this is just a 'taskset' away, and everything will work.
+> 
+> It's surprisingly difficult to do that with libvirt; of course it is a
+> userspace problem though.
+
+Sorry, I must admit I'm completely ignorant of libvirt. I tried it
+years ago, and concluded that 95% of what I needed was adequately done
+with a shell script...
+
+> > Frankly, I'm not prepared to add more hacks to KVM for the sake of the
+> > combination of broken userspace and broken guest.
+> 
+> The only counter argument I have in this regard is that some change is
+> also needed to expose all CPUs to Windows guest even when the
+> userspace does its best. It may result in odd scheduling, but still
+> gives the best throughput.
+
+But that'd be a new ABI, which again would require buy-in from
+userspace.  Maybe there is scope for an all CPUs, cycle-counter only
+PMUv3 exposed to the guest, but that cannot be set automatically, as
+we would otherwise regress existing setups.
+
+At this stage, and given that you need to change userspace, I'm not
+sure what the best course of action is.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
