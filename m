@@ -1,57 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9C8209F32;
-	Wed, 19 Mar 2025 09:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23482566EA;
+	Wed, 19 Mar 2025 09:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742375757; cv=none; b=W/qb/qKsaTZknpFqn9F9sOGJqgQ44BewBlzw1YrGq3RDyFRwOzhJN+m0xb6sqDf/n7zNzGhNVff2JfJV6CQcjdxgHlp7Ur3yN4MV+UuOvozFbNq0t3NLk+QYyYOFQ/R+VS5IOYRQUxYx+3dYHSZ3N26pao6ApBEuK9nfvdvVFKM=
+	t=1742377666; cv=none; b=DYgFwVzMOhaopKLXSqpm8EjSW6kH/efkgYCCwjE5Ai0nC7I3vAmp62q2FbVns1S3kl4IsOngmAW8Rfqb6+cQSnx6ZdteIeM+sa74YbK6KK9X7m5JmtWYVlvzqL0qhTKcuqAIjklEFNqqgb8w4cJQECWMQVUbKDY7ey62+bT4hfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742375757; c=relaxed/simple;
-	bh=VFcDyvuCt7vsiepWpgHUSSaWYSKC23V508SsmP0qre4=;
+	s=arc-20240116; t=1742377666; c=relaxed/simple;
+	bh=Ga6cduPK1BfqQQXpM0waODB2tzqbv9oLz7vtZxZm8aQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JG1hkVY3CF+OI5w/UqXO9Jq4rEg1dn6tQuT1REJfuiCrrYqdnjNi280uql+XcxC2TNdx2nW+NeuaHdH7YcVmw5ZwDAn/9tGRxZ6mV5ajU9E6IMDmVWH76LO3TPX6uSn6rFkapfYgsUHXuV27UsAOPdaSatlKjhDG3dcqqh/KLuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLOT7lcf; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=KGBCBlBTz6JEUGWUYlYWUZAD81oeXENJfh8ekL8uE8fCZXIZsvcs9wp867w0XljfpIphKDz5jlcLz05hsSW2D1AgUtaPOyYEtHbY9wWM2q4PIURQUqV8FeNzzGf+lu235JeHS/u7sShIGaazkgYkXiRGWrtk9RHSG18L4kjhUHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfGVzs7I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLOT7lcf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17242C4CEE9;
-	Wed, 19 Mar 2025 09:15:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfGVzs7I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5636BC4CEE9;
+	Wed, 19 Mar 2025 09:47:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742375757;
-	bh=VFcDyvuCt7vsiepWpgHUSSaWYSKC23V508SsmP0qre4=;
+	s=k20201202; t=1742377665;
+	bh=Ga6cduPK1BfqQQXpM0waODB2tzqbv9oLz7vtZxZm8aQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HLOT7lcfwBmNcUq6yIpkjNGivfFTHjfKPA+fnS/O5DEy/y9kDJ0uI4fC46Nq9AFn7
-	 +03a0nRHPbzHmeVXOZ34ICCWO8Xz0RvMSBwxvUKI7njmmPi2sXccF3YS3dKfAHFR+M
-	 Nj9N25i9iKzlglAz9Tzhxioza/En8gpwYFF+KRbzgznpNh+WUx0NbOfEdNiqiIpfca
-	 l7rTGKW9MX8/b/FcaMf2gGRMMuVPVH6eguCe9NLVFCcVAmJa2e7sIUVbsERDD9u2Hw
-	 cqIuJ0P9NJFJi/lB5AQHoK+cX+Q/d2BGkOKH/zMNqxPiQMoDf8hOVGYofERf/ADOvi
-	 /5afcVh01qMrA==
+	b=gfGVzs7IKAMTErRW/2ZplDVJsHrNvg6XSLRMTgjCg6rx5JQE3N8SWqNxmeWwWy5Sa
+	 yBYIlgGrsINtDKM14KZEWKt6T7c6w95rW82e/MQ62AclsdvfmrfjnAjyyVkrt2zZIb
+	 UYv1BdPPBThNS9NA5ExrYH3hM/n1KLY9+4aoYswLrrt3C0zHTEoTl3Z9Z3z56FBuxc
+	 Hh6E5l2VBWFKf0VCy5ryegzF8IsCHntfktyj1J1pJRqF232egwSuqf2geG+VQ0Pw2d
+	 ULXEjaimy8jrmS7kCDQhA+bMdMwn1uXp6VAVQqG5xTCk2L8WA+c/U/iEZhCMxaEks0
+	 aGrzAStxQ6ZYg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tupWk-00EzPO-L3;
-	Wed, 19 Mar 2025 09:15:54 +0000
-Date: Wed, 19 Mar 2025 09:15:54 +0000
-Message-ID: <86r02tmldh.wl-maz@kernel.org>
+	id 1tuq1W-00F0Nh-Vv;
+	Wed, 19 Mar 2025 09:47:43 +0000
+Date: Wed, 19 Mar 2025 09:47:42 +0000
+Message-ID: <86plidmjwh.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Mark Brown <broonie@kernel.org>, Gavin Shan <gshan@redhat.com>
-Cc: 		Oliver Upton <oliver.upton@linux.dev>,
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 6.12 8/8] KVM: arm64: Eagerly switch ZCR_EL{1,2}
-In-Reply-To: <019afc2d-b047-4e33-971c-7debbbaec84d@redhat.com>
-References: <20250314-stable-sve-6-12-v1-0-ddc16609d9ba@kernel.org>
-	<20250314-stable-sve-6-12-v1-8-ddc16609d9ba@kernel.org>
-	<019afc2d-b047-4e33-971c-7debbbaec84d@redhat.com>
+	linux-hardening@vger.kernel.org,
+	devel@daynix.com
+Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
+In-Reply-To: <e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
+References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
+	<Z9pze3J2_zrTk_yC@linux.dev>
+	<e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,134 +66,134 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, broonie@kernel.org, gshan@redhat.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, stable@vger.kernel.org, mark.rutland@arm.com, tabba@google.com
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 19 Mar 2025 00:26:14 +0000,
-Gavin Shan <gshan@redhat.com> wrote:
+On Wed, 19 Mar 2025 08:37:29 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> Hi Mark,
+> On 2025/03/19 16:34, Oliver Upton wrote:
+> > Hi Akihiko,
+> > 
+> > On Wed, Mar 19, 2025 at 03:33:46PM +0900, Akihiko Odaki wrote:
+> >> Problem
+> >> -------
+> >> 
+> >> arch/arm64/kvm/pmu-emul.c used to have a comment saying the follows:
+> >>> The observant among you will notice that the supported_cpus
+> >>> mask does not get updated for the default PMU even though it
+> >>> is quite possible the selected instance supports only a
+> >>> subset of cores in the system. This is intentional, and
+> >>> upholds the preexisting behavior on heterogeneous systems
+> >>> where vCPUs can be scheduled on any core but the guest
+> >>> counters could stop working.
+> >> 
+> >> Despite the reference manual says counters may not continuously
+> >> incrementing, Windows is not robust enough to handle stopped PMCCNTR_EL0
+> >> and crashes with a division-by-zero error and it also crashes when the
+> >> PMU is not present.
+> >> 
+> >> To avoid such a problem, the userspace should pin the vCPU threads to
+> >> pCPUs supported by one host PMU when initializing the vCPUs or specify
+> >> the host PMU to use with KVM_ARM_VCPU_PMU_V3_SET_PMU after the
+> >> initialization. However, QEMU/libvirt can pin vCPU threads only after the
+> >> vCPUs are initialized. It also limits the pCPUs the guest can use even
+> >> for VMMs that support proper pinning.
+> >> 
+> >> Solution
+> >> --------
+> >> 
+> >> Ideally, Windows should fix the division-by-zero error and QEMU/libvirt
+> >> should support pinning better, but neither of them are going to happen
+> >> anytime soon.
+> >> 
+> >> To allow running Windows on QEMU/libvirt or with heterogeneous cores,
+> >> combine all host PMUs necessary to cover the cores vCPUs can run and
+> >> keep PMCCNTR_EL0 working.
+> > > I'm extremely uneasy about making this a generalized solution. PMUs are
+> > deeply tied to the microarchitecture of a particular implementation, and
+> > that isn't something we can abstract away from the guest in KVM.
+> > 
+> > For example, you could have an event ID that counts on only a subset of
+> > cores, or better yet an event that counts something completely different
+> > depending on where a vCPU lands.> > I do appreciate the issue that you're trying to solve.
+> > 
+> > The good news though is that the fixed PMU cycle counter is the only
+> > thing guaranteed to be present in any PMUv3 implementation. Since
+> > that's the only counter Windows actually needs, perhaps we could
+> > special-case this in KVM.
+> > 
+> > I have the following (completely untested) patch, do you want to give it
+> > a try? There's still going to be observable differences between PMUs
+> > (e.g. CPU frequency) but at least it should get things booting.
 > 
-> On 3/14/25 10:35 AM, Mark Brown wrote:
-> > From: Mark Rutland <mark.rutland@arm.com>
-> > 
-> > [ Upstream commit 59419f10045bc955d2229819c7cf7a8b0b9c5b59 ]
-> > 
-> > In non-protected KVM modes, while the guest FPSIMD/SVE/SME state is live on the
-> > CPU, the host's active SVE VL may differ from the guest's maximum SVE VL:
-> > 
-> > * For VHE hosts, when a VM uses NV, ZCR_EL2 contains a value constrained
-> >    by the guest hypervisor, which may be less than or equal to that
-> >    guest's maximum VL.
-> > 
-> >    Note: in this case the value of ZCR_EL1 is immaterial due to E2H.
-> > 
-> > * For nVHE/hVHE hosts, ZCR_EL1 contains a value written by the guest,
-> >    which may be less than or greater than the guest's maximum VL.
-> > 
-> >    Note: in this case hyp code traps host SVE usage and lazily restores
-> >    ZCR_EL2 to the host's maximum VL, which may be greater than the
-> >    guest's maximum VL.
-> > 
-> > This can be the case between exiting a guest and kvm_arch_vcpu_put_fp().
-> > If a softirq is taken during this period and the softirq handler tries
-> > to use kernel-mode NEON, then the kernel will fail to save the guest's
-> > FPSIMD/SVE state, and will pend a SIGKILL for the current thread.
-> > 
-> > This happens because kvm_arch_vcpu_ctxsync_fp() binds the guest's live
-> > FPSIMD/SVE state with the guest's maximum SVE VL, and
-> > fpsimd_save_user_state() verifies that the live SVE VL is as expected
-> > before attempting to save the register state:
-> > 
-> > | if (WARN_ON(sve_get_vl() != vl)) {
-> > |         force_signal_inject(SIGKILL, SI_KERNEL, 0, 0);
-> > |         return;
-> > | }
-> > 
-> > Fix this and make this a bit easier to reason about by always eagerly
-> > switching ZCR_EL{1,2} at hyp during guest<->host transitions. With this
-> > happening, there's no need to trap host SVE usage, and the nVHE/nVHE
-> > __deactivate_cptr_traps() logic can be simplified to enable host access
-> > to all present FPSIMD/SVE/SME features.
-> > 
-> > In protected nVHE/hVHE modes, the host's state is always saved/restored
-> > by hyp, and the guest's state is saved prior to exit to the host, so
-> > from the host's PoV the guest never has live FPSIMD/SVE/SME state, and
-> > the host's ZCR_EL1 is never clobbered by hyp.
-> > 
-> > Fixes: 8c8010d69c132273 ("KVM: arm64: Save/restore SVE state for nVHE")
-> > Fixes: 2e3cf82063a00ea0 ("KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state")
-> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> > Reviewed-by: Mark Brown <broonie@kernel.org>
-> > Tested-by: Mark Brown <broonie@kernel.org>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Fuad Tabba <tabba@google.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Will Deacon <will@kernel.org>
-> > Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> > Link: https://lore.kernel.org/r/20250210195226.1215254-9-mark.rutland@arm.com
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Mark Brown <broonie@kernel.org>
-> > ---
-> >   arch/arm64/kvm/fpsimd.c                 | 30 -----------------
-> >   arch/arm64/kvm/hyp/entry.S              |  5 +++
-> >   arch/arm64/kvm/hyp/include/hyp/switch.h | 59 +++++++++++++++++++++++++++++++++
-> >   arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 13 ++++----
-> >   arch/arm64/kvm/hyp/nvhe/switch.c        | 33 +++++++++++++++---
-> >   arch/arm64/kvm/hyp/vhe/switch.c         |  4 +++
-> >   6 files changed, 103 insertions(+), 41 deletions(-)
-> > 
+> I don't think it will work, unfortunately. perf_init_event() binds a
+> perf event to a particular PMU so the event will stop working when the
+> thread migrates away.
 > 
-> [...]
+> It should also be the reason why the perf program creates an event for
+> each PMU. tools/perf/Documentation/intel-hybrid.txt has more
+> descriptions.
+
+But perf on non-Intel behaves pretty differently. ARM PMUs behaves
+pretty differently, because there is no guarantee of homogeneous
+events.
+
 > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index 4e757a77322c9efc59cdff501745f7c80d452358..1c8e2ad32e8c396fc4b11d5fec2e86728f2829d9 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -5,6 +5,7 @@
-> >    */
-> >     #include <hyp/adjust_pc.h>
-> > +#include <hyp/switch.h>
-> >     #include <asm/pgtable-types.h>
-> >   #include <asm/kvm_asm.h>
-> > @@ -176,8 +177,12 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
-> >   		sync_hyp_vcpu(hyp_vcpu);
-> >   		pkvm_put_hyp_vcpu(hyp_vcpu);
-> >   	} else {
-> > +		struct kvm_vcpu *vcpu = kern_hyp_va(host_vcpu);
-> > +
-> >   		/* The host is fully trusted, run its vCPU directly. */
-> > -		ret = __kvm_vcpu_run(host_vcpu);
-> > +		fpsimd_lazy_switch_to_guest(vcpu);
-> > +		ret = __kvm_vcpu_run(vcpu);
-> > +		fpsimd_lazy_switch_to_host(vcpu);
-> >   	}
-> >   
+> Allowing to enable more than one counter and/or an event type other
+> than the cycle counter is not the goal. Enabling another event type
+> may result in a garbage value, but I don't think it's worse than the
+> current situation where the count stays zero; please tell me if I miss
+> something.
 > 
-> @host_vcpu should have been hypervisor's linear mapping address in v6.12. It looks
-> incorrect to assume it's a kernel's linear mapping address and convert it (@host_vcpu)
-> to the hypervisor's linear address agin, if I don't miss anything.
+> There is still room for improvement. Returning a garbage value may not
+> be worse than returning zero, but counters and event types not
+> supported by some cores shouldn't be advertised as available in the
+> first place. More concretely:
+> 
+> - The vCPU should be limited to run only on cores covered by PMUs when
+> KVM_ARM_VCPU_PMU_V3 is set.
 
-host_vcpu is passed as a parameter to the hypercall, and is definitely
-a kernel address.
+That's userspace's job. Bind to the desired PMU, and run. KVM will
+actively prevent you from running on the wrong CPU.
 
-However, at this stage, we have *already* converted it to a HYP VA:
+> - PMCR_EL0.N advertised to the guest should be the minimum of ones of
+> host PMUs.
 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/arm64/kvm/hyp/nvhe/hyp-main.c?h=linux-6.12.y#n147
+How do you find out? CPUs can be hot-plugged on long after a VM has
+started, bringing in a new PMU, with a different number of counters.
 
-The result is that this change is turning a perfectly valid HYP VA
-into... something. Odds are that the masking/patching will not mess up
-the address, but this is completely buggy anyway. In general,
-kern_hyp_va() is not an idempotent operation.
+> - PMCEID0_EL0 and PMCEID1_EL0 advertised to the guest should be the
+> result of the AND operations of ones of host PMUs.
 
-Thanks for noticing that something was wrong.
+Same problem.
 
-Broonie, can you please look into this?
+> 
+> Special-casing the cycle counter may make sense if we are going to fix
+> the advertised values of PMCR_EL0.N, PMCEID0_EL0, and
+> PMCEID1_EL0. PMCR_EL0.N as we can simply return zero for these
+> registers. We can also prevent enabling a counter that returns zero or
+> a garbage value.
+>
+> Do you think it's worth fixing these registers? If so, I'll do that by
+> special-casing the cycle counter.
 
-Greg, it may be more prudent to unstage this series from 6.12-stable
-until we know for sure this is the only problem.
+I think this is really going in the wrong direction.
+
+The whole design of the PMU emulation is that we expose a single,
+architecturally correct PMU implementation. This is clearly
+documented.
+
+Furthermore, userspace is being given all the relevant information to
+place vcpus on the correct physical CPUs. Why should we add this sort
+of hack in the kernel, creating a new userspace ABI that we will have
+to support forever, when usespace can do the correct thing right now?
+
+Worse case, this is just a 'taskset' away, and everything will work.
+
+Frankly, I'm not prepared to add more hacks to KVM for the sake of the
+combination of broken userspace and broken guest.
 
 	M.
 
