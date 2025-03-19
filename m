@@ -1,107 +1,132 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7321DF747;
-	Wed, 19 Mar 2025 18:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC15187FEC;
+	Wed, 19 Mar 2025 18:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742407871; cv=none; b=hmBzFo/HsqyeIsz3tOC+hI87SJfdHcALVDUBGz6qYBp/l/E8LsCoUKSe9+gXKCLnSBn2jKxiZlN5QaCU6NXdtr+lIEA1YNcVgAbgUt6jAv5vumW9aqzncTeK40uQdXMBm4Hgg/uv2D+/C/t0+cRMRzefffY+L9tU39b/yzAvFV4=
+	t=1742409522; cv=none; b=slexWZiyV//ERwbEAxJVlP6kKClH7Whb4JnLcNtolr2g1PuHYk5UJtYwfqT0Jnj/TYAFaKVliFOSFX5PwHk2FHQwcLs/lq8gGZQEw0DGywlFWVojiJZ+Yuafg0gfwimo3eXBLZ6OX4Dh82AHYIgO28SsDsXEIELW68sfXomu9AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742407871; c=relaxed/simple;
-	bh=EM+vNe873hc7WJcks8qH/tKBrTh+jdJpimnSyJPkSTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B7ynSoyXujo7G/6LAtBSbvxND2D+MgeDW5Bfzj3NSU72UJfEimEC2iC17j02Q2BzhX8NiJ2iakyMlY3+IRcaKdnTWP+A6l7CVNqKznF6TiY831rhthgJWuSZOHcMGHJAHCU1BTH8cn56Rl6mSh2X9bGU5zCevDdL61OHRZQ5PZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0305C4CEE4;
-	Wed, 19 Mar 2025 18:11:04 +0000 (UTC)
-Date: Wed, 19 Mar 2025 18:11:02 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"david@redhat.com" <david@redhat.com>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	Krishnakant Jaju <kjaju@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"ddutile@redhat.com" <ddutile@redhat.com>,
-	"tabba@google.com" <tabba@google.com>,
-	"qperret@google.com" <qperret@google.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <Z9sItt8BIgvbBY8M@arm.com>
-References: <87tt7y7j6r.wl-maz@kernel.org>
- <SA1PR12MB7199B320DAE42A8D7038A78EB0D32@SA1PR12MB7199.namprd12.prod.outlook.com>
- <8634fcnh0n.wl-maz@kernel.org>
- <Z9h98RhunemcFhhz@arm.com>
- <86wmcmn0dp.wl-maz@kernel.org>
- <20250318125527.GP9311@nvidia.com>
- <Z9nJ42PllG8a7AY7@linux.dev>
- <20250318230909.GD9311@nvidia.com>
- <Z9pryQwy2iwa2bpJ@linux.dev>
- <20250319170429.GK9311@nvidia.com>
+	s=arc-20240116; t=1742409522; c=relaxed/simple;
+	bh=xxc1VsGnvFXqzw9zxTVKLq0ZNRg09z107d4U6coGVOE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eEvyJQTH8VPoUAWSTXnEO5HnImD0Iniarq1AsFNC0ILtiV7G0PgK+ODWd9lqqhQY8en8mzeg9o6TkCjL4hj6o1d/bnTpbYCCdbIUh4mDQJ61FQwrNo5spIoHZ1SNaUhogiijEf0+/lX1JL004S1w5MMcEyio2Nee2vljvu1b96M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cP/s+lF8; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cP/s+lF8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2F4C4CEE4;
+	Wed, 19 Mar 2025 18:38:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742409521;
+	bh=xxc1VsGnvFXqzw9zxTVKLq0ZNRg09z107d4U6coGVOE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cP/s+lF8HISnXacs9ZPUuzigjGTgQ1p+XwdHZHgTAzH9gt3CJUABlgR426eWV4Yw7
+	 KJKH+LG8vUAJzLDYQwCrwRVFrTKjKN/JEcKYuQc8QXtvu7+VOIt72ic+2ePQk/LDr+
+	 dm9AyCDaRdkqQ9AGemNrE/VEawK3KZP+cePFOGWAj7X7eHUhDJtggVFg4Qzy032X4C
+	 pzVMtAtk/EOpX/RWukuuvzZt3LCXbpRrcbd9lN5PfqxIuoLTdFG6tAGSWcG7gTkyCA
+	 e/DAavfGqxgVV1Jxx49/u0qrgU/izRFICLPc5KCtRq9DE5SSF1lDrqBUYFVQYPjiIK
+	 Yd+Rj4Zu08Dww==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tuyJL-00FBqr-6X;
+	Wed, 19 Mar 2025 18:38:39 +0000
+Date: Wed, 19 Mar 2025 18:38:38 +0000
+Message-ID: <86ldt0n9w1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	devel@daynix.com
+Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
+In-Reply-To: <cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
+References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
+	<Z9pze3J2_zrTk_yC@linux.dev>
+	<e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
+	<86plidmjwh.wl-maz@kernel.org>
+	<bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
+	<86o6xxmg87.wl-maz@kernel.org>
+	<aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
+	<86msdhmemw.wl-maz@kernel.org>
+	<cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250319170429.GK9311@nvidia.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 19, 2025 at 02:04:29PM -0300, Jason Gunthorpe wrote:
-> On Wed, Mar 19, 2025 at 12:01:29AM -0700, Oliver Upton wrote:
-> > You have a very good point that KVM is broken for cacheable PFNMAP'd
-> > crap since we demote to something non-cacheable, and maybe that
-> > deserves fixing first. Hopefully nobody notices that we've taken away
-> > the toys...
+On Wed, 19 Mar 2025 11:51:21 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> Fixing it is either faulting all access attempts or mapping it
-> cachable to the S2 (as this series is trying to do)..
-
-As I replied earlier, it might be worth doing both - fault on !FWB
-hardware (or rather reject the memslot creation), cacheable S2
-otherwise.
-
-> > I'm less worried about recovery and more focused on userspace being
-> > able to understand what happened. Otherwise we may get folks complaining
-> > about the ioctl failing "randomly" on certain machines.
+> On 2025/03/19 20:41, Marc Zyngier wrote:
+> > On Wed, 19 Mar 2025 11:26:18 +0000,
+> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >> 
+> >> On 2025/03/19 20:07, Marc Zyngier wrote:
+> >>> On Wed, 19 Mar 2025 10:26:57 +0000,
+> >>>> 
+> >>> But that'd be a new ABI, which again would require buy-in from
+> >>> userspace.  Maybe there is scope for an all CPUs, cycle-counter only
+> >>> PMUv3 exposed to the guest, but that cannot be set automatically, as
+> >>> we would otherwise regress existing setups.
+> >>> 
+> >>> At this stage, and given that you need to change userspace, I'm not
+> >>> sure what the best course of action is.
+> >> 
+> >> Having an explicit flag for the userspace is fine for QEMU, which I
+> >> care. It can flip the flag if and only if threads are not pinned to
+> >> one PMU and the machine is a new setup.
+> >> 
+> >> I also wonder what regression you think setting it automatically causes.
+> > 
+> > The current behaviour is that if you don't specify anything other than
+> > creating a PMUv3 (without KVM_ARM_VCPU_PMU_V3_SET_PMU), you get *some*
+> > PMU, and userspace is responsible for running the vcpu on CPUs that
+> > will implement that PMU. When if does, all the counters, all the
+> > events are valid. If it doesn't, nothing counts, but the
+> > counters/events are still valid.
+> > 
+> > If you now add this flag automatically, the guest doesn't see the full
+> > PMU anymore. Only the cycle counter. That's the regression.
 > 
-> Even today something like qemu doesn't know that VFIO has created a
-> cachable mmap, so it would need a bunch more work to feed everything
-> through as proposed here.
+> What about setting the flag automatically when a user fails to pin
+> vCPUs to CPUs that are covered by one PMU? There would be no change if
+> a user correctly pins vCPUs as it is. Otherwise, they will see a
+> correct feature set advertised to the guest and the cycle counter
+> working.
 
-I came to the same conclusion, qemu wouldn't be able to pass any
-KVM_MEMORY_* flag to request cacheable since it doesn't know what
-attributes it got from VFIO. You need a side-channel communication
-between the host VFIO driver and KVM. With Ankit's proposal, that's the
-Stage 1 MMU attributes for the qemu mapping.
+How do you know that the affinity is "correct"? VCPU affinity can be
+changed at any time. I, for one, do not want my VMs to change
+behaviour because I let the vcpus bounce around as the scheduler sees
+fit.
+
+Honestly, this is not a can of worm I want to open. We already have a
+pretty terrible userspace API for the PMU, let's not add to the
+confusion. *If* we are going down the road of presenting a dumbed-down
+PMU to the guest, it has to be an explicit buy-in from userspace.
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
