@@ -1,213 +1,177 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E511DF98E
-	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 17:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BA5222596;
+	Thu, 20 Mar 2025 17:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742490076; cv=none; b=uieERK3AICpsOklWNMSEXGiIESmTagrUPG5yM9TxnU6eRQ67kn56sO5agCzDDCGZfNToDo0hWW3UeRKNHFSt+FG0N8GZCZjmqeo1MspJfJdtt6uOTdFeMJopTaVlIOtyMdnFMT3KAdd3lgwEO9d/jm88t29mhUq/Usi5n1MUnls=
+	t=1742490891; cv=none; b=NsOmz67Qy7P0cU3/cKQHfUJXPf0llrfn+V6S1xQDSfJ98XZlmPSZiMK3kTAqPX05K6MVmCTB2dYpTmX/fosk9p1joCUUOsVcmNNdfJFWjHIstQi9J2RHzeGi4PdqF3vfLwl5E4pK+E7Fcu3Q90BWztsdzLRRcC0Wo+G9fvsElYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742490076; c=relaxed/simple;
-	bh=oABQ/XlPnfJxcgBcgYWcylpoHsrcIZqcWf6P95xFp2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i806t7g+p2ltC/OlLdwVm6TCPgINl/Yg0LM7zGe7ZetuzzVE3tsspzC58Lj9249xRhFOEPHVZ/x87XsOjL6RiodWot2bPQluYTzZjZYAtxM2H2PmtPiyoav2lLPFrCFzbtjfKdY6Fdh1unbmmd0zXtgk5wEgSK1NwPSBf621gFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64DCC1424;
-	Thu, 20 Mar 2025 10:01:22 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B79A53F673;
-	Thu, 20 Mar 2025 10:01:13 -0700 (PDT)
-Date: Thu, 20 Mar 2025 17:01:11 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1742490891; c=relaxed/simple;
+	bh=ew/lN1IMKa0aN4Z0/QC36U+fh07ns9tUoom4T4BzL1w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Msat+CIxNmo4PmnIbOKKJePb3Xsr/0mq39KIsWaqqid+U2EhL6j2Q5uGmhbkfgnIqTbxLHubxq/zCAEIo3Ccjcp653WaWL2BgFtl0oCCbkUyhj4sbzwUdf+CIdQemjfd8s6M4ZYGvoVennO7dwMFEz4iScJ/iD0T2W2M1AQDnuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCZDSoOi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCZDSoOi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DEA8C4CEDD;
+	Thu, 20 Mar 2025 17:14:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742490891;
+	bh=ew/lN1IMKa0aN4Z0/QC36U+fh07ns9tUoom4T4BzL1w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HCZDSoOi7psL8Pcu5B/ZafcXvbi20EkUJ0p0RiZSbQktauCNAVk3odFQWGV5/ULbo
+	 TiulST5zMSgTkAPgyNHjmFOCXPEXeP2VY5zc/Kt4o91MkETAK36+hNUtWYc7mGWkN/
+	 PakuJe183abPtH17Sk42zYZt52eGxZkHULV9q0WNEHRwF4HKqaEviZqTgbADgI9swP
+	 4K5BkHbcBxznyKU6kvt7M3xGe6s2sNkZz/DH3pjSxoZbMvCWbNyTjt6Rn6Yst2tvsY
+	 uciBIRALwIL6PUiw1ZouhYpjtpvusJJo/hz/TBFJ9GXVynmxqtw6DC9rsAK5zwvPqb
+	 QCuI8F0wko3bQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tvJTk-00FWMt-M2;
+	Thu, 20 Mar 2025 17:14:48 +0000
+Date: Thu, 20 Mar 2025 17:14:48 +0000
+Message-ID: <86cyebmxo7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [RFC kvmtool 9/9] arm64: Get rid of the 'arm-common' include
- directory
-Message-ID: <Z9xJ10c4pwJ-TF3o@raptor>
-References: <20250314222516.1302429-1-oliver.upton@linux.dev>
- <20250314222516.1302429-10-oliver.upton@linux.dev>
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	devel@daynix.com
+Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
+In-Reply-To: <ba9cd6d2-1ee5-478a-8102-42b4dac411ce@daynix.com>
+References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
+	<Z9pze3J2_zrTk_yC@linux.dev>
+	<e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
+	<86plidmjwh.wl-maz@kernel.org>
+	<bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
+	<86o6xxmg87.wl-maz@kernel.org>
+	<aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
+	<86msdhmemw.wl-maz@kernel.org>
+	<cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
+	<86ldt0n9w1.wl-maz@kernel.org>
+	<Z9sSMJAlf7cQ5viu@linux.dev>
+	<0d84bc94-1c65-4737-a2eb-aa7f96a7d1e0@daynix.com>
+	<86iko4m5i4.wl-maz@kernel.org>
+	<ba9cd6d2-1ee5-478a-8102-42b4dac411ce@daynix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250314222516.1302429-10-oliver.upton@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
-
-On Fri, Mar 14, 2025 at 03:25:16PM -0700, Oliver Upton wrote:
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arm64/arm-cpu.c                        | 4 ++--
->  arm64/fdt.c                            | 4 ++--
->  arm64/gic.c                            | 2 +-
->  arm64/gicv2m.c                         | 2 +-
->  arm64/include/{arm-common => }/gic.h   | 0
->  arm64/include/kvm/kvm-arch.h           | 2 +-
->  arm64/include/{arm-common => }/pci.h   | 0
->  arm64/include/{arm-common => }/timer.h | 0
-
-Looking at x86 and riscv, the pattern is to have the header files in
-<arch>/include/kvm, even if they're only used by the arch code.
-
-Do we care about following this pattern?
-
-Thanks,
-Alex
-
->  arm64/kvm.c                            | 2 +-
->  arm64/pci.c                            | 4 ++--
->  arm64/pmu.c                            | 2 +-
->  arm64/timer.c                          | 4 ++--
->  12 files changed, 13 insertions(+), 13 deletions(-)
->  rename arm64/include/{arm-common => }/gic.h (100%)
->  rename arm64/include/{arm-common => }/pci.h (100%)
->  rename arm64/include/{arm-common => }/timer.h (100%)
+On Thu, 20 Mar 2025 09:52:59 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-> index f5c8e1e..b9ca814 100644
-> --- a/arm64/arm-cpu.c
-> +++ b/arm64/arm-cpu.c
-> @@ -3,8 +3,8 @@
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/util.h"
->  
-> -#include "arm-common/gic.h"
-> -#include "arm-common/timer.h"
-> +#include "gic.h"
-> +#include "timer.h"
->  
->  #include "asm/pmu.h"
->  
-> diff --git a/arm64/fdt.c b/arm64/fdt.c
-> index 286ccad..9d93551 100644
-> --- a/arm64/fdt.c
-> +++ b/arm64/fdt.c
-> @@ -4,8 +4,8 @@
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/virtio-mmio.h"
->  
-> -#include "arm-common/gic.h"
-> -#include "arm-common/pci.h"
-> +#include "gic.h"
-> +#include "pci.h"
->  
->  #include <stdbool.h>
->  
-> diff --git a/arm64/gic.c b/arm64/gic.c
-> index 0795e95..d0d8543 100644
-> --- a/arm64/gic.c
-> +++ b/arm64/gic.c
-> @@ -3,7 +3,7 @@
->  #include "kvm/kvm.h"
->  #include "kvm/virtio.h"
->  
-> -#include "arm-common/gic.h"
-> +#include "gic.h"
->  
->  #include <linux/byteorder.h>
->  #include <linux/kernel.h>
-> diff --git a/arm64/gicv2m.c b/arm64/gicv2m.c
-> index b47ada8..e4e7dc8 100644
-> --- a/arm64/gicv2m.c
-> +++ b/arm64/gicv2m.c
-> @@ -5,7 +5,7 @@
->  #include "kvm/kvm.h"
->  #include "kvm/util.h"
->  
-> -#include "arm-common/gic.h"
-> +#include "gic.h"
->  
->  #define GICV2M_MSI_TYPER	0x008
->  #define GICV2M_MSI_SETSPI	0x040
-> diff --git a/arm64/include/arm-common/gic.h b/arm64/include/gic.h
-> similarity index 100%
-> rename from arm64/include/arm-common/gic.h
-> rename to arm64/include/gic.h
-> diff --git a/arm64/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
-> index b55b3bf..a9872a8 100644
-> --- a/arm64/include/kvm/kvm-arch.h
-> +++ b/arm64/include/kvm/kvm-arch.h
-> @@ -10,7 +10,7 @@
->  #include <linux/const.h>
->  #include <linux/types.h>
->  
-> -#include "arm-common/gic.h"
-> +#include "gic.h"
->  
->  /*
->   * The memory map used for ARM guests (not to scale):
-> diff --git a/arm64/include/arm-common/pci.h b/arm64/include/pci.h
-> similarity index 100%
-> rename from arm64/include/arm-common/pci.h
-> rename to arm64/include/pci.h
-> diff --git a/arm64/include/arm-common/timer.h b/arm64/include/timer.h
-> similarity index 100%
-> rename from arm64/include/arm-common/timer.h
-> rename to arm64/include/timer.h
-> diff --git a/arm64/kvm.c b/arm64/kvm.c
-> index 5e7fe77..6ee4c1d 100644
-> --- a/arm64/kvm.c
-> +++ b/arm64/kvm.c
-> @@ -5,7 +5,7 @@
->  #include "kvm/virtio-console.h"
->  #include "kvm/fdt.h"
->  
-> -#include "arm-common/gic.h"
-> +#include "gic.h"
->  
->  #include <linux/byteorder.h>
->  #include <linux/cpumask.h>
-> diff --git a/arm64/pci.c b/arm64/pci.c
-> index 5bd82d4..99bf887 100644
-> --- a/arm64/pci.c
-> +++ b/arm64/pci.c
-> @@ -5,8 +5,8 @@
->  #include "kvm/pci.h"
->  #include "kvm/util.h"
->  
-> -#include "arm-common/pci.h"
-> -#include "arm-common/gic.h"
-> +#include "pci.h"
-> +#include "gic.h"
->  
->  /*
->   * An entry in the interrupt-map table looks like:
-> diff --git a/arm64/pmu.c b/arm64/pmu.c
-> index 5ed4979..52f4256 100644
-> --- a/arm64/pmu.c
-> +++ b/arm64/pmu.c
-> @@ -9,7 +9,7 @@
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/util.h"
->  
-> -#include "arm-common/gic.h"
-> +#include "gic.h"
->  
->  #include "asm/pmu.h"
->  
-> diff --git a/arm64/timer.c b/arm64/timer.c
-> index 6acc50e..b3164f8 100644
-> --- a/arm64/timer.c
-> +++ b/arm64/timer.c
-> @@ -3,8 +3,8 @@
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/util.h"
->  
-> -#include "arm-common/gic.h"
-> -#include "arm-common/timer.h"
-> +#include "gic.h"
-> +#include "timer.h"
->  
->  void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
->  {
-> -- 
-> 2.39.5
+> On 2025/03/20 18:10, Marc Zyngier wrote:
+> > On Thu, 20 Mar 2025 06:03:35 +0000,
+> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >> 
+> >> On 2025/03/20 3:51, Oliver Upton wrote:
+> >>> On Wed, Mar 19, 2025 at 06:38:38PM +0000, Marc Zyngier wrote:
+> >>>> On Wed, 19 Mar 2025 11:51:21 +0000, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >>>>> What about setting the flag automatically when a user fails to pin
+> >>>>> vCPUs to CPUs that are covered by one PMU? There would be no change if
+> >>>>> a user correctly pins vCPUs as it is. Otherwise, they will see a
+> >>>>> correct feature set advertised to the guest and the cycle counter
+> >>>>> working.
+> >>>> 
+> >>>> How do you know that the affinity is "correct"? VCPU affinity can be
+> >>>> changed at any time. I, for one, do not want my VMs to change
+> >>>> behaviour because I let the vcpus bounce around as the scheduler sees
+> >>>> fit.
+> >> 
+> >> Checking the affinity when picking the default PMU; the vCPU affinity
+> >> is the only thing that rules the choice of the default PMU even now.
+> >> 
+> >> Perhaps we may model the API as follows: introduce another "composite"
+> >> PMU that works on any core but only exposes the cycle counter. Robust
+> >> VMMs will choose it or one of hardware PMUs with
+> >> KVM_ARM_VCPU_PMU_V3_SET_PMU. KVM will choose the default PMU according
+> >> to the vCPU affinity at the point of KVM_ARM_VCPU_INIT otherwise. If
+> >> the affinity is covered by one hardware PMU, that PMU will be chosen
+> >> as the default. The "composite" PMU will be the default otherwise.
+> > 
+> > This makes no sense to me. A VCPU is always affine to a PMU, because
+> > we do not support configurations where only some CPUs have a PMU. This
+> > is an all-or-nothing situation.
 > 
+> At least isn't it fine to have the composite PMU with a new value for
+> KVM_ARM_VCPU_PMU_V3_SET_PMU?
+
+Not sure KVM_ARM_VCPU_PMU_V3_SET_PMU is the right hook (it takes a PMU
+'type', which is under control of the perf subsystem). But if we can
+find a value that is guaranteed to be unique, why not.
+
+> > More importantly, you keep suggesting the same "new default", and I
+> > keep saying NO.
+> > 
+> > My position is clear: if you want a *new* behaviour, you *must* add a
+> > new flag that the VMM explicitly provides to enable this CC-only PMU.
+> > No change in default behaviour at all.
+> > 
+> > I'm not going to move from that.
 > 
+> Why not? It will not break anything guaranteed to work in the past.
+
+It doesn't have to be guaranteed. It just has to *exist*. That's the
+Linux ABI for you.
+
+> Currently KVM only guarantees that the emulated PMU correctly counts
+> only when
+> 1) the vCPU affinity is contained by one PMU and
+> 2) it will not expand
+> 
+> Breaking these conditions will make the behavior of the emulated PMU
+> undefined. Now I'm proposing to remove 1).
+
+And I'm saying no to that. I'm also getting tired of arguing the same
+point on and on.
+
+We currently have two different behaviours:
+
+- either you explicitly set a PMU, and the affinity of this PMU
+  constraints the affinity of the vcpus. The vcpus are not allowed to
+  run outside of this affinity. Everything counts all the time.
+
+- or you don't explicitly set a PMU, and a default PMU will be picked
+  from the current affinity of the first vcpu. Your vcpus will be able
+  to run anywhere, but the virtual PMU will *only* count when the
+  vcpus are affine to the default PMU. When the vcpus are not affine
+  to default PMU, *nothing* counts.
+
+These two behaviours are ABI. They are not changing. They don't get
+relaxed, they don't get tightened, they stay just as they are,
+forever.
+
+You want a *third* behaviour, go ahead. Define it the way you want.
+But the behaviours described above will stay unchanged.
+
+I'm looking forward to your patches implementing it, but I am also
+done arguing on it.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
