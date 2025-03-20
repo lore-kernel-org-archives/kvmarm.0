@@ -1,142 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0497F20E32B;
-	Thu, 20 Mar 2025 09:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759331632D9;
+	Thu, 20 Mar 2025 09:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742462347; cv=none; b=A6BWWrJmeCODcGo/7y/YdqmVizJ1GdDIh53OKsUe2sYc+c+kGNk7hWgXyZZUx/wUu9e8ZVUsr2RUht2zxUr/KtOTorOv1e8uA8iam74XCXraWPJH2OyM261LCriH2SkiuFpcRRebNtOlEVSPGD0p+Tl9PLK3jXeaoz4oVHER9UM=
+	t=1742463051; cv=none; b=O11+t8OLBnES0lC+kMV/zgbIqS6N7EYVOl2F7EGmBqFlupu+OJyqHcHjF75KVF2rYQp/43jYWXQblsGgkhWQ84UH1E2/HaLZZv1g2KqZne5+6JFoZA61O7oy5RrqrfoQlsFTOgDY8HEDCzth+Mze3n2ooHTLW35PmPPKr3AWayY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742462347; c=relaxed/simple;
-	bh=DyYZu43SCOG8idqcMJJdyHd71H6vj85HgtLk8md7IhI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SD0Sc4mOx0fhnmaTujHuOdr/x55hTjJaHEqgYxbNCT1Frf2w/rE4LZlyeXxBpIsArkFuwhAcnYYsWHDTouB7q0Wv4W7pDHlDqdYJbGcHcDSXlv9zieeC6VrO9JuC/AbwdZrAE4AzUA9GrNDQOlnnTU8szvTbkGO8UmrU9yjrIGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g9tP5OaB; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g9tP5OaB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77B2AC4CEDD;
-	Thu, 20 Mar 2025 09:19:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742462345;
-	bh=DyYZu43SCOG8idqcMJJdyHd71H6vj85HgtLk8md7IhI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=g9tP5OaBBniNVKx/1th/Dn6r/KXDHr1v6Sn6QKGJfwbuaAnPrH/sIJd6ryyHFW6mD
-	 lXKRAgqhmTQjoin2lcilrtZUBL9zKTtRk4iaOVENNvWYxIXK+eql7BUsnZn3sYnWVX
-	 vwT92yDgc2KsrgfDENuN7Dk+7hezHcQ23+TYgVrYsA5tEI7lmDMp1+l5t1WJu2tTSg
-	 ZGJ3p8kSQHSMdfishJWD0TmTcnopLzmaLi3ElnS1BE0NAifgAVTiKAPf1WnAQSHpRk
-	 GEMHsL5OQMsMuubI5BMr1STWNZ7/rV6ykx4u12zT48FNl7CbYIMjfVl8j9M78Ps8Co
-	 dQiHRgwllnVng==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tvC3K-00FMaU-U3;
-	Thu, 20 Mar 2025 09:19:03 +0000
-Date: Thu, 20 Mar 2025 09:19:02 +0000
-Message-ID: <86h63om54p.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	devel@daynix.com
-Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
-In-Reply-To: <Z9sSMJAlf7cQ5viu@linux.dev>
-References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
-	<Z9pze3J2_zrTk_yC@linux.dev>
-	<e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
-	<86plidmjwh.wl-maz@kernel.org>
-	<bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
-	<86o6xxmg87.wl-maz@kernel.org>
-	<aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
-	<86msdhmemw.wl-maz@kernel.org>
-	<cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
-	<86ldt0n9w1.wl-maz@kernel.org>
-	<Z9sSMJAlf7cQ5viu@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1742463051; c=relaxed/simple;
+	bh=DA1VOI0ouj+wlQCQyp6pnfel/4ZUCju3QtZmwpDK7qE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WJWArcfm7nHR1TVzoLm6kkHXLfrEgmoHz88b5apgHVaZU8dYcSbb8/wfhcZQsFfLZz0TU560B1x1pb3cjqTa1pcYmUXhyvr9qUKlXTVYbig35Bp45z+HaooL5dUOIfqN1gZ+vhWejLpNqdQk5tMmDQ0GsOVEYJvOb1hLhrDNcBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZJKwt1Pmrz6M4Yy;
+	Thu, 20 Mar 2025 17:27:26 +0800 (CST)
+Received: from frapeml500007.china.huawei.com (unknown [7.182.85.172])
+	by mail.maildlp.com (Postfix) with ESMTPS id F1FD41401F3;
+	Thu, 20 Mar 2025 17:30:45 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (7.182.85.71) by
+ frapeml500007.china.huawei.com (7.182.85.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 20 Mar 2025 10:30:45 +0100
+Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
+ frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
+ Thu, 20 Mar 2025 10:30:45 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "will@kernel.org"
+	<will@kernel.org>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"nicolinc@nvidia.com" <nicolinc@nvidia.com>, "jean-philippe@linaro.org"
+	<jean-philippe@linaro.org>, Jonathan Cameron <jonathan.cameron@huawei.com>
+Subject: RE: [RFC PATCH v3 4/5] iommu/arm-smmu-v3-iommufd: Use KVM VMID for s2
+ stage
+Thread-Topic: [RFC PATCH v3 4/5] iommu/arm-smmu-v3-iommufd: Use KVM VMID for
+ s2 stage
+Thread-Index: AQHbmPZBeq6wgyt4V0G2k2xYLylJd7N7DbQAgACsr4A=
+Date: Thu, 20 Mar 2025 09:30:45 +0000
+Message-ID: <f654ae10e55e4142acb83eb926bb80b2@huawei.com>
+References: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
+ <20250319173202.78988-5-shameerali.kolothum.thodi@huawei.com>
+ <20250319233946.GF126678@ziepe.ca>
+In-Reply-To: <20250319233946.GF126678@ziepe.ca>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, akihiko.odaki@daynix.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
 
-On Wed, 19 Mar 2025 18:51:28 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Mar 19, 2025 at 06:38:38PM +0000, Marc Zyngier wrote:
-> > On Wed, 19 Mar 2025 11:51:21 +0000, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> > > What about setting the flag automatically when a user fails to pin
-> > > vCPUs to CPUs that are covered by one PMU? There would be no change if
-> > > a user correctly pins vCPUs as it is. Otherwise, they will see a
-> > > correct feature set advertised to the guest and the cycle counter
-> > > working.
-> > 
-> > How do you know that the affinity is "correct"? VCPU affinity can be
-> > changed at any time. I, for one, do not want my VMs to change
-> > behaviour because I let the vcpus bounce around as the scheduler sees
-> > fit.
-> > 
-> > Honestly, this is not a can of worm I want to open. We already have a
-> > pretty terrible userspace API for the PMU, let's not add to the
-> > confusion. *If* we are going down the road of presenting a dumbed-down
-> > PMU to the guest, it has to be an explicit buy-in from userspace.
-> 
-> I also have a very strong distaste for the crappy UAPI we have around a
-> 'default' PMU. At the same time I do recognize this hurts practical
-> usecases since some VMMs can't be bothered to configure the vPMU / vCPU
-> pinning correctly.
-> 
-> I'm at least willing to plug my nose and do the following:
-> 
->  1) When the VMM does not specify a vPMU type:
-> 
->    - We continue to present the 'default' PMU (including event counters)
->      to the VM
-> 
->    - KVM ensures that the fixed CPU cycle counter works on any PMUv3
->      implementation in the system, even if it is different from the
->      default
-> 
->    - Otherwise, event counters will only count on the default
->      implementation and will not count on different PMUs
 
-I think this is confusing. The CC is counting, but nothing else, and
-people using the cycle counters in conjunction with other events (a
-very common use case) will not be able to correlate things correctly.
-The current behaviour is, for all its sins, at least consistent.
 
-> 
->  2) Implement your suggestion of a UAPI where the VMM can select a PMU
->     that only has the CPU cycle counter and works on any PMUv3
->     implementation.
-> 
-> Either way KVM will need to have some special case handling of the fixed
-> CPU cycle counter. That'd allow users to actually run Windows *now* and
-> provide a clear mechanism for userspace to present a less-broken vPMU if
-> it cares.
+> -----Original Message-----
+> From: Jason Gunthorpe <jgg@ziepe.ca>
+> Sent: Wednesday, March 19, 2025 11:40 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvmarm@lists.linux.dev; iommu@lists.linux.dev; linux-arm-
+> kernel@lists.infradead.org; Linuxarm <linuxarm@huawei.com>;
+> kevin.tian@intel.com; alex.williamson@redhat.com; maz@kernel.org;
+> oliver.upton@linux.dev; will@kernel.org; robin.murphy@arm.com;
+> nicolinc@nvidia.com; jean-philippe@linaro.org; Jonathan Cameron
+> <jonathan.cameron@huawei.com>
+> Subject: Re: [RFC PATCH v3 4/5] iommu/arm-smmu-v3-iommufd: Use KVM
+> VMID for s2 stage
+>=20
+> On Wed, Mar 19, 2025 at 05:32:01PM +0000, Shameer Kolothum wrote:
+> > +static int arm_vsmmu_alloc_vmid(struct arm_smmu_device *smmu,
+> struct kvm *kvm,
+> > +				bool *kvm_used)
+> > +{
+> > +#ifdef CONFIG_KVM
+> > +	/*
+> > +	 * There can only be one allocator for VMIDs active at once. If BTM
+> is
+> > +	 * turned on then KVM's allocator always supplies the VMID, and
+> the
+> > +	 * VMID is matched by CPU invalidation of the KVM S2. Right now
+> there
+> > +	 * is no API to get an unused VMID from KVM so this also means
+> BTM systems
+> > +	 * cannot support S2 without an associated KVM.
+> > +	 */
+> > +	if ((smmu->features & ARM_SMMU_FEAT_BTM)) {
+> > +		int vmid;
+> > +
+> > +		if (!kvm || !kvm_get_kvm_safe(kvm))
+> > +			return -EOPNOTSUPP;
+>=20
+> Isn't kvm_get_kvm_safe() in modular KVM code most of the time? You can't
+> call it like this right?
 
-Honestly, I don't care about one guest or another. My point is that if
-we are changing the behaviour of the PMU to deal with this sort of
-things, then it has to be a userspace buy-in.
+I think it is safe since KVM is not modular for ARM64. And that is one of t=
+he
+reasons I thought I will hold the KVM reference here as we don't have to go
+through the symbol_get/put calls here. Also IOMMUFD is not using the kvm
+pointer at the moment. Probably I should add some comments in IOMMUFD
+to make it clear.
 
-	M.
+However I just realized that in patch #1 I should EXPORT the
+kvm_arm_pinned_vmid_get/put functions as smmuv3 driver can be built
+modular.=20
 
--- 
-Without deviation from the norm, progress is not possible.
+>=20
+> Per my prior comments, I'm a little nervous to make drivers keep track
+> of this refcount instead of the core code but this does seem like it
+> could work..
+>=20
+> I also think you should block using the S2 without a viommu & KVM in
+> BTM mode.. Maybe like this:
+>=20
+> @@ -2938,8 +2938,16 @@ static int arm_smmu_attach_dev(struct
+> iommu_domain *domain, struct device *dev)
+>                 cdptr =3D arm_smmu_alloc_cd_ptr(master, IOMMU_NO_PASID);
+>                 if (!cdptr)
+>                         return -ENOMEM;
+> -       } else if (arm_smmu_ssids_in_use(&master->cd_table))
+> -               return -EBUSY;
+> +       } else {
+> +               if (arm_smmu_ssids_in_use(&master->cd_table))
+> +                       return -EBUSY;
+> +               /*
+> +                * S2 cannot be used when BTM is turned on without a VIOM=
+MU
+> and
+> +                * VMID shared with KVM
+> +                */
+> +               if (smmu->features & ARM_SMMU_FEAT_BTM)
+> +                       return -EOPNOTSUPP;
+> +       }
+>=20
+> That more closely matches how this will eventually work when the VMID
+> allocation is properly made to be local to the viommu.
+
+Ok. Will update.
+
+Thanks,
+Shameer
