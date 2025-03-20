@@ -1,285 +1,159 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFFC1B6CE5
-	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 04:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62D319DF99
+	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 06:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742444993; cv=none; b=HtEsUUMCSwcz8RvW4yDozsEkYkonX6bVBwZe3sbxMNwsorru9GGzxt+pQOjIxd1dEsEBBp3QIrfMY7e10VtFhlkRt/rSN1pyM3Yne2Fh530rj7zQXrrLeOGpV+N64JlK3aEArKrACeSMERWLjLaQ5QtDY35txy6BvgoR1p6A/uc=
+	t=1742450622; cv=none; b=s859SzioOsprJSZyoxvkLRUF6Lgf/zwbreClEw8qQDYxwLXlK8xNaY6PqqSXXFdR9CvR3vgNEaDbr+ebhA3CXssTEEHtTzLp09o547jdg1GkPJnhJWmHiDIJMpeqZvzSg1h4Ud+X8pEeuRSV8t2gS8eQeUxn7yD9XrRfh2Fg8pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742444993; c=relaxed/simple;
-	bh=n09s+HLDJ+ua9v9b0DEeJXaKA5HeZvG8zu53EHpp/TY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QSwIJUHYdN/2CTCyjTwT5i04ac/uvSKv8GAeiGU9+1MdoldwT+pqrwZauG8cmkYca3U5HUdkULRRl2JkyvvYOD865hYnvKVOyPdOVOX9epNvxT+yZhl+EGd9LIGHQ5ueGLxoBqnGXDIi86V7enCHhRT2CVMRpFqMlDVXgmkBiJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aaevQ3nI; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742450622; c=relaxed/simple;
+	bh=oBycr6yoTR/XQt9L743N6Lo8JRUTc8DPHmcT1O2rPO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BuK+WVd16nupLGbYOJxEVoN3q4tpqlXyTu6u6bqGTkryYwhFKs5oe5gfW196jHEwvUCSP94V06ZPYKqi35oYKUVRlaMV/SE3XQznAluPvxhjdUu18z1kLMuEYPd3ziBnLqHzbTAwRznJm798iAe+MkSGFNr8x0RognerekiDuTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=DqgyloBj; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aaevQ3nI"
-Date: Wed, 19 Mar 2025 21:29:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742444978;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=wYfZkkm9jHOgHlHhpUbP6jjEn8Q4xaPj7vdaTDqsQdo=;
-	b=aaevQ3nIXBVBcnpN8k9jyepicA8JLr6CRa0emvNW+gyewVjkKfI+wYhkgCkIv+2OV/oVP3
-	UDfcJtRo8jY2JWyxhYE2wpVtr9ZjoZYjIeTjedniwubfuABo0CWrcN+1dZD62+E6Z5giHz
-	W5HzZU3Y/N1mu2mJj+w20LdvxnkTt3I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Will Deacon <will@kernel.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: [GIT PULL] KVM/arm64 updates for 6.15
-Message-ID: <Z9uZpZKfqWP8ZwH8@linux.dev>
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="DqgyloBj"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22423adf751so5481785ad.2
+        for <kvmarm@lists.linux.dev>; Wed, 19 Mar 2025 23:03:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742450620; x=1743055420; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EUlQy+omekyAlQ/UT0+jDTx9lfmxYWK64YNT4WpuUK4=;
+        b=DqgyloBj+BMXJpJ39DstPj2j8/oYQIDwfhOPidqo1sQ+UnY47BK/Bx6/94ymE/SJBF
+         bf85BNSnnWm7wb/kQPZaA5iBeaYUcAIDfpEPNyfFdPlbyE2y/24MQq6m/Nu/hkgpryqL
+         dadXRtXT20o5KlN8wiT93OPvy7OooWzlnPm3duksP2vZgOkdoOPUGD4kJ+1I96mT93sc
+         SM0R29nmOwptNAOxTEsXi9CKkTBfLnSg9dxUVf3t2RWqn2H0a+MUGbjK8+y7PQoyhxP/
+         UospUFhp3qXj328RymB2OPxfO9byQ4caiwyAlbIkXABPCKQ56TFh1xK1FmOxzlsn1EMm
+         8xew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742450620; x=1743055420;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EUlQy+omekyAlQ/UT0+jDTx9lfmxYWK64YNT4WpuUK4=;
+        b=cA0EAQu4yP9zRYBJ8sN1WlZ8FWmZMU71fAWKLZFUiEkkcYAZ8E2yKl3s8TcIM8LCEu
+         +h+t6QvStfRTTKBwGvUN3op8vCHd9Z9Y6jd/EAQ+ce3wb6ZBTa48CD2+IGsRNOFlJmmh
+         QnBMqMbYGstMe/mqexf2rtW1jn+hOhYqoPY2rlvsiFGh8qlM4jOtlhKDkePftQIHIdrL
+         X6t7+GKo4dgBuKDHcgo4RjFLRnA1gqaqIPlzyHWqR9OIy/kkdpRVr/IvKB19Rjn7Fanu
+         sK8jN4tlGXmyqMv/ew4KcnKizz6Zb0MSBSrZlc9drEj8TjheCoEvcDWNI8Def7pNUM+e
+         dn5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWm6uHPSBgLEG7DK+VzQYO8W9n/z94aR6Fw/8Er83wTEpSBJcTmsJXaXdE/g5XNVsQTu9fd3Nw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0H8D0sse4mAF9/6YRmo4V9nwrs3jftqdAj7mzW0S7+EYQwqGb
+	iY6VnYOtXGyD0LicSShxWYdHV/ktjr/yKVi6eeERXpdAxWe/E+d4ulwWBkS6CxYdjxBDN7NVkaH
+	QlD0=
+X-Gm-Gg: ASbGncvbCEk6xRE7oG/QVIPD5mxh8NayTWpOLajkOWJC/h1yEpu07Gwnxy5bVXMSe2m
+	x6TOBA0gbIgQWGMY+KPXeSw1qJgY+/3W/hMDLVhuTGj451fflSM5qxHDtrZyKlcjUG2hG5Myv4O
+	UXosLJwveyI8qZZ6bF+K1z8T/doZzet14bMIeT+Tbwekuov3M2Zu75FmnEirOG4s0zvwFp3t+WP
+	rTkrs7QRB2CT3fFlPrssLOtUFDNVpLOptsCw7T++BIvYH+FVnoDLp8We8ZtF8fJ/q32LDpsSwYl
+	tks2YZKVah+y2jcZfU8mV4fDGSwuj8ZDsgZ4Mtk8Kdwr75RpQyXWYcP8RQ==
+X-Google-Smtp-Source: AGHT+IFenEJO6TI9Hsl5cc1hX2SStJer0wmUMMpctF1K7VqnKKB8w0l0InlYXp+IwtSylHw5lHcLYg==
+X-Received: by 2002:a17:902:d2cc:b0:224:1c41:a4c0 with SMTP id d9443c01a7336-2264981b59bmr83265325ad.9.1742450620129;
+        Wed, 19 Mar 2025 23:03:40 -0700 (PDT)
+Received: from [157.82.207.107] ([157.82.207.107])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73711557e9fsm13269592b3a.51.2025.03.19.23.03.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 23:03:39 -0700 (PDT)
+Message-ID: <0d84bc94-1c65-4737-a2eb-aa7f96a7d1e0@daynix.com>
+Date: Thu, 20 Mar 2025 15:03:35 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ devel@daynix.com
+References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
+ <Z9pze3J2_zrTk_yC@linux.dev>
+ <e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
+ <86plidmjwh.wl-maz@kernel.org>
+ <bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
+ <86o6xxmg87.wl-maz@kernel.org>
+ <aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
+ <86msdhmemw.wl-maz@kernel.org>
+ <cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
+ <86ldt0n9w1.wl-maz@kernel.org> <Z9sSMJAlf7cQ5viu@linux.dev>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <Z9sSMJAlf7cQ5viu@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Paolo,
+On 2025/03/20 3:51, Oliver Upton wrote:
+> On Wed, Mar 19, 2025 at 06:38:38PM +0000, Marc Zyngier wrote:
+>> On Wed, 19 Mar 2025 11:51:21 +0000, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>> What about setting the flag automatically when a user fails to pin
+>>> vCPUs to CPUs that are covered by one PMU? There would be no change if
+>>> a user correctly pins vCPUs as it is. Otherwise, they will see a
+>>> correct feature set advertised to the guest and the cycle counter
+>>> working.
+>>
+>> How do you know that the affinity is "correct"? VCPU affinity can be
+>> changed at any time. I, for one, do not want my VMs to change
+>> behaviour because I let the vcpus bounce around as the scheduler sees
+>> fit.
 
-Here's the latest pile o' patches for 6.15. The pull is based on a later
--rc than I usually aim for to handle some conflicts with fixes that went
-in 6.14, but all of these patches have had exposure in -next for a good
-while.
+Checking the affinity when picking the default PMU; the vCPU affinity is 
+the only thing that rules the choice of the default PMU even now.
 
-There was a small conflict with the arm perf tree, which was addressed
-by Will pulling a prefix of the M1 PMU branch:
+Perhaps we may model the API as follows: introduce another "composite" 
+PMU that works on any core but only exposes the cycle counter. Robust 
+VMMs will choose it or one of hardware PMUs with 
+KVM_ARM_VCPU_PMU_V3_SET_PMU. KVM will choose the default PMU according 
+to the vCPU affinity at the point of KVM_ARM_VCPU_INIT otherwise. If the 
+affinity is covered by one hardware PMU, that PMU will be chosen as the 
+default. The "composite" PMU will be the default otherwise.
 
-  https://lore.kernel.org/linux-next/20250312201853.0d75d9fe@canb.auug.org.au/
+Regards,
+Akihiko Odaki
 
-Please pull.
+>>
+>> Honestly, this is not a can of worm I want to open. We already have a
+>> pretty terrible userspace API for the PMU, let's not add to the
+>> confusion. *If* we are going down the road of presenting a dumbed-down
+>> PMU to the guest, it has to be an explicit buy-in from userspace.
+> 
+> I also have a very strong distaste for the crappy UAPI we have around a
+> 'default' PMU. At the same time I do recognize this hurts practical
+> usecases since some VMMs can't be bothered to configure the vPMU / vCPU
+> pinning correctly.
+> 
+> I'm at least willing to plug my nose and do the following:
+> 
+>   1) When the VMM does not specify a vPMU type:
+> 
+>     - We continue to present the 'default' PMU (including event counters)
+>       to the VM
+> 
+>     - KVM ensures that the fixed CPU cycle counter works on any PMUv3
+>       implementation in the system, even if it is different from the
+>       default
+> 
+>     - Otherwise, event counters will only count on the default
+>       implementation and will not count on different PMUs
+> 
+>   2) Implement your suggestion of a UAPI where the VMM can select a PMU
+>      that only has the CPU cycle counter and works on any PMUv3
+>      implementation.
+> 
+> Either way KVM will need to have some special case handling of the fixed
+> CPU cycle counter. That'd allow users to actually run Windows *now* and
+> provide a clear mechanism for userspace to present a less-broken vPMU if
+> it cares.
+> 
+> Thanks,
+> Oliver
 
- - Oliver
-
-The following changes since commit 80e54e84911a923c40d7bee33a34c1b4be148d7a:
-
-  Linux 6.14-rc6 (2025-03-09 13:45:25 -1000)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-6.15
-
-for you to fetch changes up to 369c0122682c4468a69f2454614eded71c5348f3:
-
-  Merge branch 'kvm-arm64/pmu-fixes' into kvmarm/next (2025-03-19 14:54:52 -0700)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 6.15
-
- - Nested virtualization support for VGICv3, giving the nested
-   hypervisor control of the VGIC hardware when running an L2 VM
-
- - Removal of 'late' nested virtualization feature register masking,
-   making the supported feature set directly visible to userspace
-
- - Support for emulating FEAT_PMUv3 on Apple silicon, taking advantage
-   of an IMPLEMENTATION DEFINED trap that covers all PMUv3 registers
-
- - Paravirtual interface for discovering the set of CPU implementations
-   where a VM may run, addressing a longstanding issue of guest CPU
-   errata awareness in big-little systems and cross-implementation VM
-   migration
-
- - Userspace control of the registers responsible for identifying a
-   particular CPU implementation (MIDR_EL1, REVIDR_EL1, AIDR_EL1),
-   allowing VMs to be migrated cross-implementation
-
- - pKVM updates, including support for tracking stage-2 page table
-   allocations in the protected hypervisor in the 'SecPageTable' stat
-
- - Fixes to vPMU, ensuring that userspace updates to the vPMU after
-   KVM_RUN are reflected into the backing perf events
-
-----------------------------------------------------------------
-Akihiko Odaki (5):
-      KVM: arm64: PMU: Set raw values from user to PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
-      KVM: arm64: PMU: Assume PMU presence in pmu-emul.c
-      KVM: arm64: PMU: Fix SET_ONE_REG for vPMC regs
-      KVM: arm64: PMU: Reload when user modifies registers
-      KVM: arm64: PMU: Reload when resetting
-
-Andre Przywara (1):
-      KVM: arm64: nv: Allow userland to set VGIC maintenance IRQ
-
-Fuad Tabba (4):
-      KVM: arm64: Factor out setting HCRX_EL2 traps into separate function
-      KVM: arm64: Initialize HCRX_EL2 traps in pKVM
-      KVM: arm64: Factor out pKVM hyp vcpu creation to separate function
-      KVM: arm64: Create each pKVM hyp vcpu after its corresponding host vcpu
-
-Jintack Lim (1):
-      KVM: arm64: nv: Respect virtual HCR_EL2.TWx setting
-
-Marc Zyngier (25):
-      arm64: cpufeature: Handle NV_frac as a synonym of NV2
-      KVM: arm64: Hide ID_AA64MMFR2_EL1.NV from guest and userspace
-      KVM: arm64: Mark HCR.EL2.E2H RES0 when ID_AA64MMFR1_EL1.VH is zero
-      KVM: arm64: Mark HCR.EL2.{NV*,AT} RES0 when ID_AA64MMFR4_EL1.NV_frac is 0
-      KVM: arm64: Advertise NV2 in the boot messages
-      KVM: arm64: Consolidate idreg callbacks
-      KVM: arm64: Make ID_REG_LIMIT_FIELD_ENUM() more widely available
-      KVM: arm64: Enforce NV limits on a per-idregs basis
-      KVM: arm64: Move NV-specific capping to idreg sanitisation
-      KVM: arm64: Allow userspace to limit NV support to nVHE
-      KVM: arm64: Make ID_AA64MMFR4_EL1.NV_frac writable
-      KVM: arm64: Advertise FEAT_ECV when possible
-      arm64: sysreg: Add layout for ICH_HCR_EL2
-      arm64: sysreg: Add layout for ICH_VTR_EL2
-      arm64: sysreg: Add layout for ICH_MISR_EL2
-      KVM: arm64: nv: Load timer before the GIC
-      KVM: arm64: nv: Add ICH_*_EL2 registers to vpcu_sysreg
-      KVM: arm64: nv: Plumb handling of GICv3 EL2 accesses
-      KVM: arm64: nv: Sanitise ICH_HCR_EL2 accesses
-      KVM: arm64: nv: Nested GICv3 emulation
-      KVM: arm64: nv: Handle L2->L1 transition on interrupt injection
-      KVM: arm64: nv: Add Maintenance Interrupt emulation
-      KVM: arm64: nv: Propagate used_lrs between L1 and L0 contexts
-      KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
-      KVM: arm64: nv: Fail KVM init if asking for NV without GICv3
-
-Oliver Upton (32):
-      KVM: arm64: Set HCR_EL2.TID1 unconditionally
-      KVM: arm64: Load VPIDR_EL2 with the VM's MIDR_EL1 value
-      KVM: arm64: vgic-v4: Only attempt vLPI mapping for actual MSIs
-      KVM: arm64: vgic-v4: Only WARN for HW IRQ mismatch when unmapping vLPI
-      KVM: arm64: vgic-v4: Fall back to software irqbypass if LPI not found
-      KVM: arm64: Document ordering requirements for irqbypass
-      KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
-      KVM: arm64: Copy guest CTR_EL0 into hyp VM
-      KVM: arm64: Copy MIDR_EL1 into hyp VM when it is writable
-      KVM: arm64: Fix documentation for KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
-      drivers/perf: apple_m1: Refactor event select/filter configuration
-      drivers/perf: apple_m1: Support host/guest event filtering
-      KVM: arm64: Compute PMCEID from arm_pmu's event bitmaps
-      KVM: arm64: Always support SW_INCR PMU event
-      KVM: arm64: Use a cpucap to determine if system supports FEAT_PMUv3
-      KVM: arm64: Drop kvm_arm_pmu_available static key
-      KVM: arm64: Use guard() to cleanup usage of arm_pmus_lock
-      KVM: arm64: Move PMUVer filtering into KVM code
-      KVM: arm64: Compute synthetic sysreg ESR for Apple PMUv3 traps
-      KVM: arm64: Advertise PMUv3 if IMPDEF traps are present
-      KVM: arm64: Remap PMUv3 events onto hardware
-      drivers/perf: apple_m1: Provide helper for mapping PMUv3 events
-      KVM: arm64: Provide 1 event counter on IMPDEF hardware
-      arm64: Enable IMP DEF PMUv3 traps on Apple M*
-      Merge branch 'kvm-arm64/misc' into kvmarm/next
-      Merge branch 'kvm-arm64/nv-vgic' into kvmarm/next
-      Merge branch 'kvm-arm64/nv-idregs' into kvmarm/next
-      Merge branch 'kvm-arm64/pv-cpuid' into kvmarm/next
-      Merge branch 'kvm-arm64/pmuv3-asahi' into kvmarm/next
-      Merge branch 'kvm-arm64/writable-midr' into kvmarm/next
-      Merge branch 'kvm-arm64/pkvm-6.15' into kvmarm/next
-      Merge branch 'kvm-arm64/pmu-fixes' into kvmarm/next
-
-Sebastian Ott (5):
-      KVM: arm64: Maintain per-VM copy of implementation ID regs
-      KVM: arm64: Allow userspace to change the implementation ID registers
-      KVM: selftests: arm64: Test writes to MIDR,REVIDR,AIDR
-      KVM: arm64: Allow userspace to write ID_AA64MMFR0_EL1.TGRAN*_2
-      KVM: arm64: selftests: Test that TGRAN*_2 fields are writable
-
-Shameer Kolothum (7):
-      arm64: Modify _midr_range() functions to read MIDR/REVIDR internally
-      KVM: arm64: Specify hypercall ABI for retrieving target implementations
-      KVM: arm64: Introduce KVM_REG_ARM_VENDOR_HYP_BMAP_2
-      arm64: Make  _midr_in_range_list() an exported function
-      smccc/kvm_guest: Enable errata based on implementation CPUs
-      KVM: selftests: Add test for KVM_REG_ARM_VENDOR_HYP_BMAP_2
-      smccc: kvm_guest: Fix kernel builds for 32 bit arm
-
-Vincent Donnefort (3):
-      KVM: arm64: Add flags to kvm_hyp_memcache
-      KVM: arm64: Distinct pKVM teardown memcache for stage-2
-      KVM: arm64: Count pKVM stage-2 usage in secondary pagetable stats
-
-Will Deacon (1):
-      KVM: arm64: Tear down vGIC on failed vCPU creation
-
- Documentation/virt/kvm/api.rst                     |  18 +
- Documentation/virt/kvm/arm/fw-pseudo-registers.rst |  15 +-
- Documentation/virt/kvm/arm/hypercalls.rst          |  59 +++
- Documentation/virt/kvm/devices/arm-vgic-its.rst    |   5 +-
- Documentation/virt/kvm/devices/arm-vgic-v3.rst     |  12 +-
- arch/arm64/include/asm/apple_m1_pmu.h              |   1 +
- arch/arm64/include/asm/cpucaps.h                   |   2 +
- arch/arm64/include/asm/cpufeature.h                |  28 +-
- arch/arm64/include/asm/cputype.h                   |  40 +-
- arch/arm64/include/asm/hypervisor.h                |   1 +
- arch/arm64/include/asm/kvm_arm.h                   |   4 +-
- arch/arm64/include/asm/kvm_emulate.h               |  37 ++
- arch/arm64/include/asm/kvm_host.h                  |  65 ++-
- arch/arm64/include/asm/kvm_hyp.h                   |   2 +
- arch/arm64/include/asm/kvm_nested.h                |   1 +
- arch/arm64/include/asm/kvm_pkvm.h                  |   1 +
- arch/arm64/include/asm/mmu.h                       |   3 +-
- arch/arm64/include/asm/sysreg.h                    |  30 --
- arch/arm64/include/uapi/asm/kvm.h                  |  14 +
- arch/arm64/kernel/cpu_errata.c                     | 117 ++++-
- arch/arm64/kernel/cpufeature.c                     |  53 ++-
- arch/arm64/kernel/image-vars.h                     |   6 +-
- arch/arm64/kernel/proton-pack.c                    |  17 +-
- arch/arm64/kvm/Makefile                            |   2 +-
- arch/arm64/kvm/arm.c                               |  76 +++-
- arch/arm64/kvm/emulate-nested.c                    |  24 +-
- arch/arm64/kvm/handle_exit.c                       |   6 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            |   4 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  14 +-
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h      |   2 +-
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h             |   6 -
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   2 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  79 ++--
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c                |   4 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c                    |  16 +-
- arch/arm64/kvm/hyp/vhe/switch.c                    |  22 +
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 |  28 +-
- arch/arm64/kvm/hypercalls.c                        |  13 +
- arch/arm64/kvm/mmu.c                               |  22 +-
- arch/arm64/kvm/nested.c                            | 298 +++++++------
- arch/arm64/kvm/pkvm.c                              |  75 ++--
- arch/arm64/kvm/pmu-emul.c                          | 194 +++++----
- arch/arm64/kvm/pmu.c                               |  10 +-
- arch/arm64/kvm/reset.c                             |   3 -
- arch/arm64/kvm/sys_regs.c                          | 478 ++++++++++++++-------
- arch/arm64/kvm/sys_regs.h                          |  10 +
- arch/arm64/kvm/vgic-sys-reg-v3.c                   |   8 +-
- arch/arm64/kvm/vgic/vgic-init.c                    |  29 ++
- arch/arm64/kvm/vgic/vgic-kvm-device.c              |  29 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c               | 409 ++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3.c                      |  46 +-
- arch/arm64/kvm/vgic/vgic-v4.c                      |  35 +-
- arch/arm64/kvm/vgic/vgic.c                         |  38 ++
- arch/arm64/kvm/vgic/vgic.h                         |   6 +
- arch/arm64/tools/cpucaps                           |   2 +
- arch/arm64/tools/sysreg                            |  48 +++
- drivers/clocksource/arm_arch_timer.c               |   2 +-
- drivers/firmware/smccc/kvm_guest.c                 |  66 +++
- drivers/hwtracing/coresight/coresight-etm4x-core.c |   2 +-
- drivers/irqchip/irq-apple-aic.c                    |   8 +-
- drivers/perf/apple_m1_cpu_pmu.c                    | 101 ++++-
- include/kvm/arm_pmu.h                              |  17 +-
- include/kvm/arm_vgic.h                             |  10 +
- include/linux/arm-smccc.h                          |  15 +
- include/linux/perf/arm_pmu.h                       |   4 +
- include/uapi/linux/kvm.h                           |   1 +
- tools/arch/arm/include/uapi/asm/kvm.h              |   1 +
- tools/arch/arm64/include/asm/sysreg.h              |  30 --
- tools/arch/arm64/include/uapi/asm/kvm.h            |  12 +
- tools/testing/selftests/kvm/arm64/get-reg-list.c   |   1 +
- tools/testing/selftests/kvm/arm64/hypercalls.c     |  46 +-
- tools/testing/selftests/kvm/arm64/set_id_regs.c    |  40 +-
- 72 files changed, 2173 insertions(+), 752 deletions(-)
- create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
