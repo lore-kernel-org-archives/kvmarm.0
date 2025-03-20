@@ -1,151 +1,159 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759331632D9;
-	Thu, 20 Mar 2025 09:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CA11A072A
+	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 09:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742463051; cv=none; b=O11+t8OLBnES0lC+kMV/zgbIqS6N7EYVOl2F7EGmBqFlupu+OJyqHcHjF75KVF2rYQp/43jYWXQblsGgkhWQ84UH1E2/HaLZZv1g2KqZne5+6JFoZA61O7oy5RrqrfoQlsFTOgDY8HEDCzth+Mze3n2ooHTLW35PmPPKr3AWayY=
+	t=1742464385; cv=none; b=c7Vu7yusMKy+nZNGWBsO/QJvzHqkOCzKjqnRl5P6S9vNl9DJ3jIo/j3zItU3OuDy1NlPqK7293YzkyBapttK1c960oQJf/giryJNbS72CW+PjIiQZKQGaB9m8ET14vq4vWyi2bkN6TMIY5wuJcwDMpDI4N7UGPqNDD7jeBo2vFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742463051; c=relaxed/simple;
-	bh=DA1VOI0ouj+wlQCQyp6pnfel/4ZUCju3QtZmwpDK7qE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=WJWArcfm7nHR1TVzoLm6kkHXLfrEgmoHz88b5apgHVaZU8dYcSbb8/wfhcZQsFfLZz0TU560B1x1pb3cjqTa1pcYmUXhyvr9qUKlXTVYbig35Bp45z+HaooL5dUOIfqN1gZ+vhWejLpNqdQk5tMmDQ0GsOVEYJvOb1hLhrDNcBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZJKwt1Pmrz6M4Yy;
-	Thu, 20 Mar 2025 17:27:26 +0800 (CST)
-Received: from frapeml500007.china.huawei.com (unknown [7.182.85.172])
-	by mail.maildlp.com (Postfix) with ESMTPS id F1FD41401F3;
-	Thu, 20 Mar 2025 17:30:45 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml500007.china.huawei.com (7.182.85.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 20 Mar 2025 10:30:45 +0100
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Thu, 20 Mar 2025 10:30:45 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "will@kernel.org"
-	<will@kernel.org>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>, "jean-philippe@linaro.org"
-	<jean-philippe@linaro.org>, Jonathan Cameron <jonathan.cameron@huawei.com>
-Subject: RE: [RFC PATCH v3 4/5] iommu/arm-smmu-v3-iommufd: Use KVM VMID for s2
- stage
-Thread-Topic: [RFC PATCH v3 4/5] iommu/arm-smmu-v3-iommufd: Use KVM VMID for
- s2 stage
-Thread-Index: AQHbmPZBeq6wgyt4V0G2k2xYLylJd7N7DbQAgACsr4A=
-Date: Thu, 20 Mar 2025 09:30:45 +0000
-Message-ID: <f654ae10e55e4142acb83eb926bb80b2@huawei.com>
-References: <20250319173202.78988-1-shameerali.kolothum.thodi@huawei.com>
- <20250319173202.78988-5-shameerali.kolothum.thodi@huawei.com>
- <20250319233946.GF126678@ziepe.ca>
-In-Reply-To: <20250319233946.GF126678@ziepe.ca>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1742464385; c=relaxed/simple;
+	bh=eCS46a9D6IsT0VB7R2DUK7ltce4HrARlbC83vt2uUpI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bGhnCqwQlPiM4b3rv4j8w1/PA+Bn/pL/Aq39Ffn6pLSMMzz8TXorTEVNFhwMbmKvbaZAIa1VAC9IBWGhR64oMFkN69HQjqXVX66x9bf9hjU6YoQiUQPohA5A/2ZDWbT1Tv6qsPB2IT+KrCBIubJJE31DBhFlPoQQQd7uFpthqUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=1jJxMfQS; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="1jJxMfQS"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2239c066347so9908945ad.2
+        for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 02:53:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742464383; x=1743069183; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m7D4rqlmtfwr1EgAb/lUYH/aHJeqF4FrFxKoiXcpfuI=;
+        b=1jJxMfQSs8iHnjQE1j1xgtFxOlmWMOGNoeMW242hCiQjCFreU9bFzgJJQ2DLRsZLsx
+         OEElrl6ZYKK+Odwo84h8ee+a+e+gf1vC4EjUVw31vpcwMbFZobVjC7gXLfkYikgZDt3i
+         /N0HOhRegch+noZ0tBZA1wBEyqDbauYiNkdKUVD905EtOUfm59e4OIf3F3F1Nxa9Mo73
+         1anpRtPabxOtD5ndja0lUFczqb+yLG+glBCu7IqUldnOWPTbGSPnM+Kpl+q5RbclJ5tk
+         OgqKtGHpGFaXdCcXS+p34K0e1lzq8Tc2Iyt7rQvTfKfYBhKiKsiu3AaNVcbAi9LhPo0V
+         lzsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742464383; x=1743069183;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m7D4rqlmtfwr1EgAb/lUYH/aHJeqF4FrFxKoiXcpfuI=;
+        b=Qytq0jRcCkJsQ+4EWTMa6eIcVgUcywAXueM+fn7h0QOSUxsYLQytvL8ggo2DLfPsaA
+         gu6vvIudCGQpsUTww3rBX84ptf8XTP0EjHla77u298fD4tTODRBnC8Qdqgo+7f0ixCyS
+         z+eco9yEPByAo60PqajN9kUBU47wK7N/qtAIimwD1+UoXW+dsOQ9vfprpFOE9fC9+E9/
+         22fDtTuKOMQhdClNAj+1nKFA5rlTzbWbs30egIIngAfxm2nIi5LYCl2YDKjYmoUbtizL
+         UqksU4j2UzIGDeFgOzb1/bkEzuCS1UlTCb6fYQHuSr5x0jFRfeY6T53oS7fsA0uSOIqn
+         zMKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXf8yR9xghGzbRu4pR+i21QSHrmhRHA1miyp6uJQZUKh4/Pbfhs2yNvRnMA9DlqLg6bUhpnp1Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw8casGICuFAIiN3Tb44d5TOdGn1a+UZtA3NoEx1e8U+yAxDgZ6
+	ZF8gomnQ+0uPk/5DAHbcmfwMSzpsfxvDlwXA19YBiwnopW2385Sn7erW9oHM1LI=
+X-Gm-Gg: ASbGncsu/5H3vp+hKSBlxRm2o0BbNzefTjWHuRg87EguUF0CWnc2XhpEJr+4RpqiY2U
+	EBUZtKn3ucUC2rhEO6wC82BsjCsqBa8KXwjp8JIOlYM6lLMCBcvjtpnpml2ITkZD2aJhKYML4a6
+	mCE6v9vrx17VXefuW5/RaNMHmTxXRcHgxUJ3I90MzazIKuoRqsZIflgXXtFP/tAg+jv63CkBbWh
+	aQtHbsPCsXxNG4iRJd6s8ush5fuO+9rSrCntQT63vQo+fEoBUtJoD8sxDOd/SKpkqi2eWI7Nrk6
+	DRdAtFZPoHNq3vpsbtpzpKgmW+SjLITi3DQzOxGnHQpEYhdSXSqv0m8V9g==
+X-Google-Smtp-Source: AGHT+IE3mIGDRFikUIqZ1qqXpt2WAHzRmavgaURSEY1rWIOdBI4jZWh2D1HIB2Ty4Cr8ew7b4T+ofQ==
+X-Received: by 2002:a17:902:e810:b0:223:88af:2c30 with SMTP id d9443c01a7336-22649a30485mr90872845ad.16.1742464383534;
+        Thu, 20 Mar 2025 02:53:03 -0700 (PDT)
+Received: from [157.82.207.107] ([157.82.207.107])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6ba6d52sm130630135ad.116.2025.03.20.02.53.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Mar 2025 02:53:03 -0700 (PDT)
+Message-ID: <ba9cd6d2-1ee5-478a-8102-42b4dac411ce@daynix.com>
+Date: Thu, 20 Mar 2025 18:52:59 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ devel@daynix.com
+References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
+ <Z9pze3J2_zrTk_yC@linux.dev>
+ <e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
+ <86plidmjwh.wl-maz@kernel.org>
+ <bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
+ <86o6xxmg87.wl-maz@kernel.org>
+ <aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
+ <86msdhmemw.wl-maz@kernel.org>
+ <cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
+ <86ldt0n9w1.wl-maz@kernel.org> <Z9sSMJAlf7cQ5viu@linux.dev>
+ <0d84bc94-1c65-4737-a2eb-aa7f96a7d1e0@daynix.com>
+ <86iko4m5i4.wl-maz@kernel.org>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <86iko4m5i4.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 2025/03/20 18:10, Marc Zyngier wrote:
+> On Thu, 20 Mar 2025 06:03:35 +0000,
+> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/03/20 3:51, Oliver Upton wrote:
+>>> On Wed, Mar 19, 2025 at 06:38:38PM +0000, Marc Zyngier wrote:
+>>>> On Wed, 19 Mar 2025 11:51:21 +0000, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>> What about setting the flag automatically when a user fails to pin
+>>>>> vCPUs to CPUs that are covered by one PMU? There would be no change if
+>>>>> a user correctly pins vCPUs as it is. Otherwise, they will see a
+>>>>> correct feature set advertised to the guest and the cycle counter
+>>>>> working.
+>>>>
+>>>> How do you know that the affinity is "correct"? VCPU affinity can be
+>>>> changed at any time. I, for one, do not want my VMs to change
+>>>> behaviour because I let the vcpus bounce around as the scheduler sees
+>>>> fit.
+>>
+>> Checking the affinity when picking the default PMU; the vCPU affinity
+>> is the only thing that rules the choice of the default PMU even now.
+>>
+>> Perhaps we may model the API as follows: introduce another "composite"
+>> PMU that works on any core but only exposes the cycle counter. Robust
+>> VMMs will choose it or one of hardware PMUs with
+>> KVM_ARM_VCPU_PMU_V3_SET_PMU. KVM will choose the default PMU according
+>> to the vCPU affinity at the point of KVM_ARM_VCPU_INIT otherwise. If
+>> the affinity is covered by one hardware PMU, that PMU will be chosen
+>> as the default. The "composite" PMU will be the default otherwise.
+> 
+> This makes no sense to me. A VCPU is always affine to a PMU, because
+> we do not support configurations where only some CPUs have a PMU. This
+> is an all-or-nothing situation.
 
+At least isn't it fine to have the composite PMU with a new value for 
+KVM_ARM_VCPU_PMU_V3_SET_PMU?
 
-> -----Original Message-----
-> From: Jason Gunthorpe <jgg@ziepe.ca>
-> Sent: Wednesday, March 19, 2025 11:40 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvmarm@lists.linux.dev; iommu@lists.linux.dev; linux-arm-
-> kernel@lists.infradead.org; Linuxarm <linuxarm@huawei.com>;
-> kevin.tian@intel.com; alex.williamson@redhat.com; maz@kernel.org;
-> oliver.upton@linux.dev; will@kernel.org; robin.murphy@arm.com;
-> nicolinc@nvidia.com; jean-philippe@linaro.org; Jonathan Cameron
-> <jonathan.cameron@huawei.com>
-> Subject: Re: [RFC PATCH v3 4/5] iommu/arm-smmu-v3-iommufd: Use KVM
-> VMID for s2 stage
->=20
-> On Wed, Mar 19, 2025 at 05:32:01PM +0000, Shameer Kolothum wrote:
-> > +static int arm_vsmmu_alloc_vmid(struct arm_smmu_device *smmu,
-> struct kvm *kvm,
-> > +				bool *kvm_used)
-> > +{
-> > +#ifdef CONFIG_KVM
-> > +	/*
-> > +	 * There can only be one allocator for VMIDs active at once. If BTM
-> is
-> > +	 * turned on then KVM's allocator always supplies the VMID, and
-> the
-> > +	 * VMID is matched by CPU invalidation of the KVM S2. Right now
-> there
-> > +	 * is no API to get an unused VMID from KVM so this also means
-> BTM systems
-> > +	 * cannot support S2 without an associated KVM.
-> > +	 */
-> > +	if ((smmu->features & ARM_SMMU_FEAT_BTM)) {
-> > +		int vmid;
-> > +
-> > +		if (!kvm || !kvm_get_kvm_safe(kvm))
-> > +			return -EOPNOTSUPP;
->=20
-> Isn't kvm_get_kvm_safe() in modular KVM code most of the time? You can't
-> call it like this right?
+> 
+> More importantly, you keep suggesting the same "new default", and I
+> keep saying NO.
+> 
+> My position is clear: if you want a *new* behaviour, you *must* add a
+> new flag that the VMM explicitly provides to enable this CC-only PMU.
+> No change in default behaviour at all.
+> 
+> I'm not going to move from that.
 
-I think it is safe since KVM is not modular for ARM64. And that is one of t=
-he
-reasons I thought I will hold the KVM reference here as we don't have to go
-through the symbol_get/put calls here. Also IOMMUFD is not using the kvm
-pointer at the moment. Probably I should add some comments in IOMMUFD
-to make it clear.
+Why not? It will not break anything guaranteed to work in the past.
 
-However I just realized that in patch #1 I should EXPORT the
-kvm_arm_pinned_vmid_get/put functions as smmuv3 driver can be built
-modular.=20
+Currently KVM only guarantees that the emulated PMU correctly counts 
+only when
+1) the vCPU affinity is contained by one PMU and
+2) it will not expand
 
->=20
-> Per my prior comments, I'm a little nervous to make drivers keep track
-> of this refcount instead of the core code but this does seem like it
-> could work..
->=20
-> I also think you should block using the S2 without a viommu & KVM in
-> BTM mode.. Maybe like this:
->=20
-> @@ -2938,8 +2938,16 @@ static int arm_smmu_attach_dev(struct
-> iommu_domain *domain, struct device *dev)
->                 cdptr =3D arm_smmu_alloc_cd_ptr(master, IOMMU_NO_PASID);
->                 if (!cdptr)
->                         return -ENOMEM;
-> -       } else if (arm_smmu_ssids_in_use(&master->cd_table))
-> -               return -EBUSY;
-> +       } else {
-> +               if (arm_smmu_ssids_in_use(&master->cd_table))
-> +                       return -EBUSY;
-> +               /*
-> +                * S2 cannot be used when BTM is turned on without a VIOM=
-MU
-> and
-> +                * VMID shared with KVM
-> +                */
-> +               if (smmu->features & ARM_SMMU_FEAT_BTM)
-> +                       return -EOPNOTSUPP;
-> +       }
->=20
-> That more closely matches how this will eventually work when the VMID
-> allocation is properly made to be local to the viommu.
+Breaking these conditions will make the behavior of the emulated PMU 
+undefined. Now I'm proposing to remove 1).
 
-Ok. Will update.
+Regards,
+Akihiko Odaki
 
-Thanks,
-Shameer
+> 
+> 	M.
+> 
+
