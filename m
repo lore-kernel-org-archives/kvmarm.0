@@ -1,177 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BA5222596;
-	Thu, 20 Mar 2025 17:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97238224890
+	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 17:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742490891; cv=none; b=NsOmz67Qy7P0cU3/cKQHfUJXPf0llrfn+V6S1xQDSfJ98XZlmPSZiMK3kTAqPX05K6MVmCTB2dYpTmX/fosk9p1joCUUOsVcmNNdfJFWjHIstQi9J2RHzeGi4PdqF3vfLwl5E4pK+E7Fcu3Q90BWztsdzLRRcC0Wo+G9fvsElYA=
+	t=1742491590; cv=none; b=Kk1Dkb/s9nwhAOwKtH4oHj8yTs3aYQlKpX3+yE0X3hu8wyKc5xXx3yp5e6f0UR4nuBrzVEY/xp3ozfy+J2N2bmDF/V0y5qEd8BRurdy4VRGIsmuC8eVOf8CGW6cpkJyf2ikLTlthiMvg60QUFEll46zbfTJ/GeCk6Zu39vR6D8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742490891; c=relaxed/simple;
-	bh=ew/lN1IMKa0aN4Z0/QC36U+fh07ns9tUoom4T4BzL1w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Msat+CIxNmo4PmnIbOKKJePb3Xsr/0mq39KIsWaqqid+U2EhL6j2Q5uGmhbkfgnIqTbxLHubxq/zCAEIo3Ccjcp653WaWL2BgFtl0oCCbkUyhj4sbzwUdf+CIdQemjfd8s6M4ZYGvoVennO7dwMFEz4iScJ/iD0T2W2M1AQDnuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCZDSoOi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742491590; c=relaxed/simple;
+	bh=dbLH2bKRPbpvhbDhyJijYnxIQOvnm4I3EdH+g7kA1QI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Av4tsa5/gvnWmhDjDkuyYsrK7AGBiYmg0jVvCjvmgi8z8LBpZXUFg18iMwz/Zm683zgXssb/oX8rJp0RheqL8yYor1ODwju4wEKwEv4D9Gaqkn16B7BbrWmtknZyQMzLvmX5R3hoKMJ+J/aTXvLmpNnQmahSNz5CFY9K4HLQeKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fClB0avD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCZDSoOi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DEA8C4CEDD;
-	Thu, 20 Mar 2025 17:14:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742490891;
-	bh=ew/lN1IMKa0aN4Z0/QC36U+fh07ns9tUoom4T4BzL1w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HCZDSoOi7psL8Pcu5B/ZafcXvbi20EkUJ0p0RiZSbQktauCNAVk3odFQWGV5/ULbo
-	 TiulST5zMSgTkAPgyNHjmFOCXPEXeP2VY5zc/Kt4o91MkETAK36+hNUtWYc7mGWkN/
-	 PakuJe183abPtH17Sk42zYZt52eGxZkHULV9q0WNEHRwF4HKqaEviZqTgbADgI9swP
-	 4K5BkHbcBxznyKU6kvt7M3xGe6s2sNkZz/DH3pjSxoZbMvCWbNyTjt6Rn6Yst2tvsY
-	 uciBIRALwIL6PUiw1ZouhYpjtpvusJJo/hz/TBFJ9GXVynmxqtw6DC9rsAK5zwvPqb
-	 QCuI8F0wko3bQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tvJTk-00FWMt-M2;
-	Thu, 20 Mar 2025 17:14:48 +0000
-Date: Thu, 20 Mar 2025 17:14:48 +0000
-Message-ID: <86cyebmxo7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	devel@daynix.com
-Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
-In-Reply-To: <ba9cd6d2-1ee5-478a-8102-42b4dac411ce@daynix.com>
-References: <20250319-hybrid-v1-1-4d1ada10e705@daynix.com>
-	<Z9pze3J2_zrTk_yC@linux.dev>
-	<e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
-	<86plidmjwh.wl-maz@kernel.org>
-	<bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
-	<86o6xxmg87.wl-maz@kernel.org>
-	<aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
-	<86msdhmemw.wl-maz@kernel.org>
-	<cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
-	<86ldt0n9w1.wl-maz@kernel.org>
-	<Z9sSMJAlf7cQ5viu@linux.dev>
-	<0d84bc94-1c65-4737-a2eb-aa7f96a7d1e0@daynix.com>
-	<86iko4m5i4.wl-maz@kernel.org>
-	<ba9cd6d2-1ee5-478a-8102-42b4dac411ce@daynix.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fClB0avD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742491587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uUFR6AsD7gUx8Px4BvBzkVDxZQ1SsnbGA0GFylA0Z7k=;
+	b=fClB0avD+gYHlJ30KEEgApwflVV22jf0Y1T+NN/GdEDUP1TSYBUuMt2k5CZkYM1lWt0e+4
+	W8hgN4ZFDMJTmkFLG8akuSe06qtzLRRJ69jxs7/N2FCGkZumzrKwiuuOPdW/GSrisf2Tdm
+	B+tNxFVysT59FvN48sD2LXgBe8zYmL4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-597-fNhtvDUlPKqyVzbrltI73Q-1; Thu, 20 Mar 2025 13:23:35 -0400
+X-MC-Unique: fNhtvDUlPKqyVzbrltI73Q-1
+X-Mimecast-MFC-AGG-ID: fNhtvDUlPKqyVzbrltI73Q_1742491414
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39131851046so470851f8f.0
+        for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 10:23:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742491414; x=1743096214;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uUFR6AsD7gUx8Px4BvBzkVDxZQ1SsnbGA0GFylA0Z7k=;
+        b=EWXk51IeFjJzrsRaOX6ka7P/IO4kCz/mtLTkWngsuJLzxs6jWSgU/feORBWXBbspex
+         9t+M0BRHviFS8aNHyG2V8olIBnhuAlHrDdLVOH2T9xjLv0ZDGStrdqXyVRAG4CY4ZiAm
+         slDiPEN2wBX/rtPoFJysseXabBKg0Klw95V5KUkB5supBQLxrxIOIC8FxxZsBEr03jLq
+         xn2vtHG3YSyvrVPjb0q74mcieyd7TisAndd/FyUveMhGArLKhCQnuUMdEwzaqBFLOFjE
+         0TOZDMKfxKaZe1MxpOSS7g/IRk7bmk52uVKn+hgSOdYRs+AwJCzUBh7ba1PxyBD2KQzL
+         UXmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQEmrwNOUSlAIydvgtI4LUONPicAshSrET7fyiuNmKqRU05I2Zk33RknyyG+G/Iot/0wjMLd0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyr8yHouveYgvSH5GSWGdMCFvneW9fBbF3DQUED2nkGVD4ESwyg
+	9urs3aFWu93L23//pTbMoUnKD0XOKPRdVQIr9cmsNCNMJnxyjpQ0z66InhCreQodIiSktx/89cq
+	4PxsUW5D+QT7/mR56B2Hg4yiZMtEGW/6fwzH67SyWDUJFkfltFRC4oUNUz4OmRRWqgt2wdbwbjc
+	lltYvUw81mPGnbxM/d3OD+9pRBDuec
+X-Gm-Gg: ASbGncs166EZU2cVCQFxhJGjy8wE1O5EqzG5PLBC/NF2oiRoF/v1EVcfMWpfNSB2eXQ
+	/vfW0fLwnnRzw35Jmwiia1i+UusaSmyz8noOkFZjdYvbRSSnswd4/b4nXgqgYH85yHf/JWXTGRQ
+	==
+X-Received: by 2002:a5d:6c61:0:b0:38f:2856:7d96 with SMTP id ffacd0b85a97d-3997f8f605cmr421252f8f.1.1742491414235;
+        Thu, 20 Mar 2025 10:23:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0Iy3+ELXSOcGKqjjNcijqtjRKyZWH2Uy/EbnYOYdMFiTRlvTKJiFQxtAtj3dChuBu4/j+YNjTHeSa0Li9mH4=
+X-Received: by 2002:a5d:6c61:0:b0:38f:2856:7d96 with SMTP id
+ ffacd0b85a97d-3997f8f605cmr421220f8f.1.1742491413842; Thu, 20 Mar 2025
+ 10:23:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kees@kernel.org, gustavoars@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, devel@daynix.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <Z9uZpZKfqWP8ZwH8@linux.dev> <86ecyrn9hf.wl-maz@kernel.org> <Z9wZ8EuChPyJ6PiK@linux.dev>
+In-Reply-To: <Z9wZ8EuChPyJ6PiK@linux.dev>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 20 Mar 2025 18:23:22 +0100
+X-Gm-Features: AQ5f1Jro3DCd-dTgCxYhklGF6-TcO4Lalc6LpGkXTh7aC2K02ARegu6zlLFUsOI
+Message-ID: <CABgObfbHz1iyrH69JiF19RC4SSiYVbRN1P2+KRkFWSEg_2mjbQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.15
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Akihiko Odaki <akihiko.odaki@daynix.com>, Will Deacon <will@kernel.org>, 
+	Vincent Donnefort <vdonnefort@google.com>, Sebastian Ott <sebott@redhat.com>, 
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Fuad Tabba <tabba@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: tEnTeiY82ciIVgKdx2zNMcKsyq0uMHKTswxM4BGWqn4_1742491414
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 20 Mar 2025 09:52:59 +0000,
-Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> 
-> On 2025/03/20 18:10, Marc Zyngier wrote:
-> > On Thu, 20 Mar 2025 06:03:35 +0000,
-> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> >> 
-> >> On 2025/03/20 3:51, Oliver Upton wrote:
-> >>> On Wed, Mar 19, 2025 at 06:38:38PM +0000, Marc Zyngier wrote:
-> >>>> On Wed, 19 Mar 2025 11:51:21 +0000, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> >>>>> What about setting the flag automatically when a user fails to pin
-> >>>>> vCPUs to CPUs that are covered by one PMU? There would be no change if
-> >>>>> a user correctly pins vCPUs as it is. Otherwise, they will see a
-> >>>>> correct feature set advertised to the guest and the cycle counter
-> >>>>> working.
-> >>>> 
-> >>>> How do you know that the affinity is "correct"? VCPU affinity can be
-> >>>> changed at any time. I, for one, do not want my VMs to change
-> >>>> behaviour because I let the vcpus bounce around as the scheduler sees
-> >>>> fit.
-> >> 
-> >> Checking the affinity when picking the default PMU; the vCPU affinity
-> >> is the only thing that rules the choice of the default PMU even now.
-> >> 
-> >> Perhaps we may model the API as follows: introduce another "composite"
-> >> PMU that works on any core but only exposes the cycle counter. Robust
-> >> VMMs will choose it or one of hardware PMUs with
-> >> KVM_ARM_VCPU_PMU_V3_SET_PMU. KVM will choose the default PMU according
-> >> to the vCPU affinity at the point of KVM_ARM_VCPU_INIT otherwise. If
-> >> the affinity is covered by one hardware PMU, that PMU will be chosen
-> >> as the default. The "composite" PMU will be the default otherwise.
-> > 
-> > This makes no sense to me. A VCPU is always affine to a PMU, because
-> > we do not support configurations where only some CPUs have a PMU. This
-> > is an all-or-nothing situation.
-> 
-> At least isn't it fine to have the composite PMU with a new value for
-> KVM_ARM_VCPU_PMU_V3_SET_PMU?
+On Thu, Mar 20, 2025 at 2:37=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hey,
+>
+> On Thu, Mar 20, 2025 at 12:59:40PM +0000, Marc Zyngier wrote:
+> > Paolo,
+> >
+> > On Thu, 20 Mar 2025 04:29:25 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >
+> > > Hi Paolo,
+> > >
+> > > Here's the latest pile o' patches for 6.15. The pull is based on a la=
+ter
+> > > -rc than I usually aim for to handle some conflicts with fixes that w=
+ent
+> > > in 6.14, but all of these patches have had exposure in -next for a go=
+od
+> > > while.
+> > >
+> > > There was a small conflict with the arm perf tree, which was addresse=
+d
+> > > by Will pulling a prefix of the M1 PMU branch:
+> > >
+> > >   https://lore.kernel.org/linux-next/20250312201853.0d75d9fe@canb.auu=
+g.org.au/
+> >
+> > When you merge this, please also apply the patch below to address a
+> > mismerge issue caught by Stephen, which causes a build breakage.
+>
+> The kvmarm-6.15 tag is fine, I caught this immediately when I was doing
+> testing for the pull request but forgot to push the fix to /next in
+> addition to the tag.
 
-Not sure KVM_ARM_VCPU_PMU_V3_SET_PMU is the right hook (it takes a PMU
-'type', which is under control of the perf subsystem). But if we can
-find a value that is guaranteed to be unique, why not.
+Great, pulled now. Thanks!
 
-> > More importantly, you keep suggesting the same "new default", and I
-> > keep saying NO.
-> > 
-> > My position is clear: if you want a *new* behaviour, you *must* add a
-> > new flag that the VMM explicitly provides to enable this CC-only PMU.
-> > No change in default behaviour at all.
-> > 
-> > I'm not going to move from that.
-> 
-> Why not? It will not break anything guaranteed to work in the past.
+Paolo
 
-It doesn't have to be guaranteed. It just has to *exist*. That's the
-Linux ABI for you.
+> Fixing that right now.
+>
+> Thanks,
+> Oliver
+>
 
-> Currently KVM only guarantees that the emulated PMU correctly counts
-> only when
-> 1) the vCPU affinity is contained by one PMU and
-> 2) it will not expand
-> 
-> Breaking these conditions will make the behavior of the emulated PMU
-> undefined. Now I'm proposing to remove 1).
-
-And I'm saying no to that. I'm also getting tired of arguing the same
-point on and on.
-
-We currently have two different behaviours:
-
-- either you explicitly set a PMU, and the affinity of this PMU
-  constraints the affinity of the vcpus. The vcpus are not allowed to
-  run outside of this affinity. Everything counts all the time.
-
-- or you don't explicitly set a PMU, and a default PMU will be picked
-  from the current affinity of the first vcpu. Your vcpus will be able
-  to run anywhere, but the virtual PMU will *only* count when the
-  vcpus are affine to the default PMU. When the vcpus are not affine
-  to default PMU, *nothing* counts.
-
-These two behaviours are ABI. They are not changing. They don't get
-relaxed, they don't get tightened, they stay just as they are,
-forever.
-
-You want a *third* behaviour, go ahead. Define it the way you want.
-But the behaviours described above will stay unchanged.
-
-I'm looking forward to your patches implementing it, but I am also
-done arguing on it.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
