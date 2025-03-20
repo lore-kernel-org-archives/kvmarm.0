@@ -1,113 +1,165 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD9B2253E1
-	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 17:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D291E47C5
+	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 18:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742492664; cv=none; b=VyIEqy5EwLZQ9P6dGL8QfY4NTLYuQ9S8IdxovVWqA1VcPWOKv9BhWfrfzQKfbsIbCeM7UE4U8rlSCGpoB+u2BeExAPMy6js9Rvkff0QFiUuZf1T859CldRtp+1tJ7sZ3Ca+oao43OiW5d6J7U+HAhdFM+Um51f5NYW4V2zfQTw4=
+	t=1742496448; cv=none; b=WibKbz6wfassP8PWgzjV0zLczJYa+xdcgw8J7iuoMwPJs03lluF46hC3T0OGWsh0bi7OSOxOcE6TmLOTGh7kVXPduom3K9cgI1ZpjcFPwple3chq5T0WdlzbypKX1TGhDFgqSb16XgGLbL9VPXDzhK1ItvEQBoazayIG7On5u6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742492664; c=relaxed/simple;
-	bh=kp5gSLLd6PjV+marxwMgoHBh0YDqzC67ywX2X0Na7+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VzVkBZbAqsqCQyH2/M8mjvZ4QdtNBdslTzUmfFKyWMSMZ+bw6cpYg7x97iL7NCUlZySyU+sxB9pxIHhFZB1e673D2S6qBg4u6+jB5Ag6IYlFgJwFdlh04OTWatV4YpO6GlqQEM/0EbMnX0Nkeys7R4Do5Q1EUOwBuSdLs9ADOVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JTCyBZ6m; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742496448; c=relaxed/simple;
+	bh=p7MoLMJgztUeM2mOX1O2C/+yxOVVFon1dqzplcanEj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QzVPYnR0k64XEBGOunxlXuu8HxItst9h8qTWdC+iYb70LIki3wDGu8X25ek9tx1YStPEBhkKOK+cYMKcSpnxJhUbVz47g4AEPeIJfubiVd/DdDp33l/RPGaPblGSJJ0Dofx4P+lWWvdb8vXbkGmpylDMSnxu/7mhPxqQUjjOSWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dGoE1WIY; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JTCyBZ6m"
-Date: Thu, 20 Mar 2025 17:44:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742492660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T+nATEGPwxa2fwpxH+oyQjnjtO3F1E78wE3wcZDa8qM=;
-	b=JTCyBZ6mjiYhZGkv782PMWnYrzrKTbJ3koWgqojfxmL4ewWviXPY0IyXE8HjwsaLSf10Wc
-	NlnV38ZtLi9zY89NSxiMVnXzGuD9xU4Er7f+X8odYLu78qoIK7anhWcMI6CtIv0I/jpVBR
-	ltETHPFcSerr+Yyx7eDLcRRzlzAunQw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com
-Subject: Re: [PATCH RFC] KVM: arm64: PMU: Use multiple host PMUs
-Message-ID: <Z9xT4_fwCgp7VSgC@linux.dev>
-References: <e8324d9d-3756-41cf-a102-28572e302368@daynix.com>
- <86plidmjwh.wl-maz@kernel.org>
- <bd681ec6-0b4c-47d9-8a4a-b7324c0883a6@daynix.com>
- <86o6xxmg87.wl-maz@kernel.org>
- <aabd71eb-286b-475c-a30e-d5cf5c4f2769@daynix.com>
- <86msdhmemw.wl-maz@kernel.org>
- <cd7b4528-34a3-4d87-9711-acc2c2e6f6e1@daynix.com>
- <86ldt0n9w1.wl-maz@kernel.org>
- <Z9sSMJAlf7cQ5viu@linux.dev>
- <86h63om54p.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dGoE1WIY"
+Received: from [10.137.184.60] (unknown [131.107.160.188])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 6483B2116B4D;
+	Thu, 20 Mar 2025 11:47:19 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6483B2116B4D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1742496439;
+	bh=2L2Q31XCa0Xdbd9gsYILKzkM4+b+VTYhlEAF67KZJpE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dGoE1WIYcV3miDSU7tnIjSORwMD3YiiuMtgapwqYs3PxoUrikjyglFZJEbSJEaC1I
+	 qppAONaKxLV3qmJYo7gpaRMBNla6xREmO+/WMeSBr/85MzxtUvCAfKqrGUxvaVfV3z
+	 LX02uwyNNHxgqfnDJgcNePxL4YNOD7FoIVq49fLM=
+Message-ID: <42a1a90b-ae3e-47df-ad6c-500055e69218@linux.microsoft.com>
+Date: Thu, 20 Mar 2025 11:47:18 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86h63om54p.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH hyperv-next v6 02/11] arm64: hyperv: Use SMCCC to detect
+ hypervisor presence
+To: Michael Kelley <mhklinux@outlook.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: "arnd@arndb.de" <arnd@arndb.de>, "bhelgaas@google.com"
+ <bhelgaas@google.com>, "bp@alien8.de" <bp@alien8.de>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>,
+ "dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "hpa@zytor.com" <hpa@zytor.com>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "krzk+dt@kernel.org" <krzk+dt@kernel.org>, "kw@linux.com" <kw@linux.com>,
+ "kys@microsoft.com" <kys@microsoft.com>, "lenb@kernel.org"
+ <lenb@kernel.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ "manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>,
+ "maz@kernel.org" <maz@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "rafael@kernel.org" <rafael@kernel.org>, "robh@kernel.org"
+ <robh@kernel.org>, "ssengar@linux.microsoft.com"
+ <ssengar@linux.microsoft.com>, "sudeep.holla@arm.com"
+ <sudeep.holla@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>, "will@kernel.org"
+ <will@kernel.org>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "x86@kernel.org" <x86@kernel.org>, "apais@microsoft.com"
+ <apais@microsoft.com>, "benhill@microsoft.com" <benhill@microsoft.com>,
+ "bperkins@microsoft.com" <bperkins@microsoft.com>,
+ "sunilmut@microsoft.com" <sunilmut@microsoft.com>
+References: <20250315001931.631210-1-romank@linux.microsoft.com>
+ <20250315001931.631210-3-romank@linux.microsoft.com>
+ <Z9gJlQgV3hm1kxY0@J2N7QTR9R3.cambridge.arm.com>
+ <BN7PR02MB414871F1A3D8EF3809391F2FD4D92@BN7PR02MB4148.namprd02.prod.outlook.com>
+Content-Language: en-US
+From: Roman Kisel <romank@linux.microsoft.com>
+In-Reply-To: <BN7PR02MB414871F1A3D8EF3809391F2FD4D92@BN7PR02MB4148.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 20, 2025 at 09:19:02AM +0000, Marc Zyngier wrote:
-> On Wed, 19 Mar 2025 18:51:28 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > I'm at least willing to plug my nose and do the following:
-> > 
-> >  1) When the VMM does not specify a vPMU type:
-> > 
-> >    - We continue to present the 'default' PMU (including event counters)
-> >      to the VM
-> > 
-> >    - KVM ensures that the fixed CPU cycle counter works on any PMUv3
-> >      implementation in the system, even if it is different from the
-> >      default
-> > 
-> >    - Otherwise, event counters will only count on the default
-> >      implementation and will not count on different PMUs
+
+
+On 3/19/2025 3:11 PM, Michael Kelley wrote:
+> From: Mark Rutland <mark.rutland@arm.com> Sent: Monday, March 17, 2025 4:38 AM
+
+>>
+>> The 'acpi_disabled' variable doesn't exist for !CONFIG_ACPI, so its use
+>> prior to the ifdeffery looks misplaced.
 > 
-> I think this is confusing. The CC is counting, but nothing else, and
-> people using the cycle counters in conjunction with other events (a
-> very common use case) will not be able to correlate things correctly.
-> The current behaviour is, for all its sins, at least consistent.
-
-You of course have a good point. What Windows is doing is definitely an
-outlier.
-
-> > 
-> >  2) Implement your suggestion of a UAPI where the VMM can select a PMU
-> >     that only has the CPU cycle counter and works on any PMUv3
-> >     implementation.
-> > 
-> > Either way KVM will need to have some special case handling of the fixed
-> > CPU cycle counter. That'd allow users to actually run Windows *now* and
-> > provide a clear mechanism for userspace to present a less-broken vPMU if
-> > it cares.
+> FWIW, include/linux/acpi.h has
 > 
-> Honestly, I don't care about one guest or another. My point is that if
-> we are changing the behaviour of the PMU to deal with this sort of
-> things, then it has to be a userspace buy-in.
+> #define acpi_disabled 1
+> 
+> when !CONFIG_ACPI.  But I agree that using a stub is better.
 
-I'm fine with just the user buy-in then. But I still do care about the
-guest compatibility issue, especially since the end user of all this
-crap is unlikely to know/care about the fine details of the
-implementation.
+Thanks, Michael! I didn't "fact-checked" what was suggested indeed.
+Agreed that the stub makes the code look better.
 
-So, Akihiko, I would *greatly* appreciate it if you propose a complete
-solution to the problem, including the KVM and VMM patches to make it
-all work.
+> 
+> Michael
+> 
+>>
+>> Usual codestyle is to avoid ifdeffery if possible, using IS_ENABLED().
+>> Otherwise, use a stub, e.g.
+>>
+>> | #ifdef CONFIG_ACPI
+>> | static bool __init hyperv_detect_via_acpi(void)
+>> | {
+>> | 	if (acpi_disabled)
+>> | 		return false;
+>> |
+>> | 	if (acpi_gbl_FADT.header.revision < 6)
+>> | 		return false;
+>> |
+>> | 	return strncmp((char *)&acpi_gbl_FADT.hypervisor_id, "MsHyperV", 8) == 0;
+>> | }
+>> | #else
+>> | static inline bool hyperv_detect_via_acpi(void) { return false; }
+>> | #endif
+>>
+>> Mark.
+>>
+>>> +static bool __init hyperv_detect_via_smccc(void)
+>>> +{
+>>> +	uuid_t hyperv_uuid = UUID_INIT(
+>>> +		0x4d32ba58, 0x4764, 0xcd24,
+>>> +		0x75, 0x6c, 0xef, 0x8e,
+>>> +		0x24, 0x70, 0x59, 0x16);
+>>> +
+>>> +	return arm_smccc_hyp_present(&hyperv_uuid);
+>>> +}
+>>> +
+>>>   static int __init hyperv_init(void)
+>>>   {
+>>>   	struct hv_get_vp_registers_output	result;
+>>> @@ -35,13 +70,11 @@ static int __init hyperv_init(void)
+>>>
+>>>   	/*
+>>>   	 * Allow for a kernel built with CONFIG_HYPERV to be running in
+>>> -	 * a non-Hyper-V environment, including on DT instead of ACPI.
+>>> +	 * a non-Hyper-V environment.
+>>> +	 *
+>>>   	 * In such cases, do nothing and return success.
+>>>   	 */
+>>> -	if (acpi_disabled)
+>>> -		return 0;
+>>> -
+>>> -	if (strncmp((char *)&acpi_gbl_FADT.hypervisor_id, "MsHyperV", 8))
+>>> +	if (!hyperv_detect_via_acpi() && !hyperv_detect_via_smccc())
+>>>   		return 0;
+>>>
+>>>   	/* Setup the guest ID */
+>>> --
+>>> 2.43.0
+>>>
+> 
 
-Thanks,
-Oliver
+-- 
+Thank you,
+Roman
+
