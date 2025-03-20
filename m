@@ -1,127 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB9E18E2A;
-	Thu, 20 Mar 2025 12:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7848C1388
+	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 13:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742475584; cv=none; b=Kl3lTvfP9kYU5+CZy+bWLNcsbwDLcifFLpoOOEMosjRGGMiq3YznUsWLinAETazX70CuE4zGx6rGsafJlw2Jph9l85LYyEMeoOaEyLck/7ZZ5Xz0CaSx8pNQmX2P9QL/xKP0ITX66bA8Qcl3VxNHfbZ4UzsiSNn55T/Rd5i4xiE=
+	t=1742477818; cv=none; b=gEJrbjNo7qtl7hNrcQvlKniVwFHmKnoNzDO7b181aF/z7OmNxF0yeT+4hTZg26V3qy4+s3SSCiGh5mQlbHYBLrwOSUxX7ax7Il14cf3Vc5qddb5kxMeVyUsF0dAFIEoZWzcLz7c6G9RJiP5m10gUnnM8TETB97wHRdSSjmR6/gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742475584; c=relaxed/simple;
-	bh=MoMgRfEM6hdLd225NMgGUSjwGawBEzvRh/CfoHllb6s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vGD6m3ZbK01cBAbEcAOfBudoYReo3m7txJP7tOAKC94wSPL6JvA+EIJrojH+I0xVgAPfLekrkcZ9fodcJkwyjZOUqZeRQGNWpvmR6eCAXa43XN4gXlAr8ALASE3Uh+w15oDFzGoWNzLpHgVUpXTU+bJGAtDQnX0skMlzScSp2VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j5GGmp8i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742477818; c=relaxed/simple;
+	bh=q4Pf8REeDn6zPTgEzQOUqXBRXxifB7GsTjoQ5IovxH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kriSB58IiNm9dPyuR8+k51bylojmmAu5U88VYqulokCGzyh6dyH6LzvhB39Gm5EC4xTytqZOFB0ciPFax88FbBzqFSYI5K/NtsmVEIavwWh6IK7uZXroe4AMQyfVjSGL+BboM0kBQkox9/nOyY2MWSSEsLvY04JJSxphtHqDto4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RidQTXaN; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j5GGmp8i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B7DC4CEDD;
-	Thu, 20 Mar 2025 12:59:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742475583;
-	bh=MoMgRfEM6hdLd225NMgGUSjwGawBEzvRh/CfoHllb6s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j5GGmp8iMWk0AaP9SujnbuAeYvYQyaKYNbJMoKCsfz2ELczxkZgx6kCymJ3L9MwE6
-	 gWoAgy10kPnfrljivsT1zhPlVnUICe9Rtn1+BOqyQvRlpMvrKRG4rXbp+5exYtue3k
-	 t694oMpOdkY/6jZwvkZd72URrHTNZbFTM8UvvAtDlwlVRPhot9udm/L5ZfhiW8hgXP
-	 yA9CpjWIe2+9wl/U90rsyh8izGwSvbBwMHJZN/IoP0HXP12m4W1COAgwMvRE33agpv
-	 hwbMfhtatuc8mVvtfluQbD/BRepSqnoN+rog6hkrFs1VIX6D7AIwj0uut9O//H+CXi
-	 1q39LBMbcL27g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tvFUq-00FQQl-U5;
-	Thu, 20 Mar 2025 12:59:41 +0000
-Date: Thu, 20 Mar 2025 12:59:40 +0000
-Message-ID: <86ecyrn9hf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Oliver Upton <oliver.upton@linux.dev>
-Cc: 	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RidQTXaN"
+Date: Thu, 20 Mar 2025 06:36:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742477814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J+7q4ucTkuxZ/GIsXuSXHu6HY+R+I2RGDBlvs6omtoI=;
+	b=RidQTXaNn9Rmb4iNyV0F1FcL7J/EEsQvs4Z6jG7mX6put9gPxJ9/l3dpv8DpKPFCbxb9kw
+	iKEXkLwp6JGXPXJYa254lXH0lTxH2sUlHXF3kLpP9ziWGkq+2n/ENagwy0EedbHtPk0WOp
+	215TvQ4sNpkg0+t1glN8329Ze+CjFaQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Akihiko Odaki <akihiko.odaki@daynix.com>,
 	Will Deacon <will@kernel.org>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Sebastian Ott <sebott@redhat.com>,
 	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
 	Fuad Tabba <tabba@google.com>
 Subject: Re: [GIT PULL] KVM/arm64 updates for 6.15
-In-Reply-To: <Z9uZpZKfqWP8ZwH8@linux.dev>
+Message-ID: <Z9wZ8EuChPyJ6PiK@linux.dev>
 References: <Z9uZpZKfqWP8ZwH8@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <86ecyrn9hf.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, akihiko.odaki@daynix.com, will@kernel.org, vdonnefort@google.com, sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ecyrn9hf.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Paolo,
+Hey,
 
-On Thu, 20 Mar 2025 04:29:25 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
->=20
-> Hi Paolo,
->=20
-> Here's the latest pile o' patches for 6.15. The pull is based on a later
-> -rc than I usually aim for to handle some conflicts with fixes that went
-> in 6.14, but all of these patches have had exposure in -next for a good
-> while.
->=20
-> There was a small conflict with the arm perf tree, which was addressed
-> by Will pulling a prefix of the M1 PMU branch:
->=20
->   https://lore.kernel.org/linux-next/20250312201853.0d75d9fe@canb.auug.or=
-g.au/
+On Thu, Mar 20, 2025 at 12:59:40PM +0000, Marc Zyngier wrote:
+> Paolo,
+> 
+> On Thu, 20 Mar 2025 04:29:25 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > Hi Paolo,
+> > 
+> > Here's the latest pile o' patches for 6.15. The pull is based on a later
+> > -rc than I usually aim for to handle some conflicts with fixes that went
+> > in 6.14, but all of these patches have had exposure in -next for a good
+> > while.
+> > 
+> > There was a small conflict with the arm perf tree, which was addressed
+> > by Will pulling a prefix of the M1 PMU branch:
+> > 
+> >   https://lore.kernel.org/linux-next/20250312201853.0d75d9fe@canb.auug.org.au/
+> 
+> When you merge this, please also apply the patch below to address a
+> mismerge issue caught by Stephen, which causes a build breakage.
 
-When you merge this, please also apply the patch below to address a
-mismerge issue caught by Stephen, which causes a build breakage.
+The kvmarm-6.15 tag is fine, I caught this immediately when I was doing
+testing for the pull request but forgot to push the fix to /next in
+addition to the tag.
 
-Thanks, and sorry for the bother.
+Fixing that right now.
 
-	M.
-
-=46rom 6dbd388afc995de867081ea42d67b2630172bb2f Mon Sep 17 00:00:00 2001
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Thu, 20 Mar 2025 20:24:04 +1100
-Subject: [PATCH] KVM: arm64: Fix mismerge of IMPDEF PMU support with PV CPU=
-ID
-
-We missed one of the is_midr_in_range_list() occurences at
-merge time, breaking the build.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20250320203203.1de92b98@canb.auug.org.au
----
- arch/arm64/kernel/cpu_errata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index caac9e10a5bb7..b55f5f7057502 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -276,7 +276,7 @@ static bool has_impdef_pmuv3(const struct arm64_cpu_cap=
-abilities *entry, int sco
- 	if (pmuver !=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
- 		return false;
-=20
--	return is_midr_in_range_list(read_cpuid_id(), impdef_pmuv3_cpus);
-+	return is_midr_in_range_list(impdef_pmuv3_cpus);
- }
-=20
- static void cpu_enable_impdef_pmuv3_traps(const struct arm64_cpu_capabilit=
-ies *__unused)
---=20
-2.39.2
-
-
---=20
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
