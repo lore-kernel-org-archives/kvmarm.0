@@ -1,165 +1,110 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D291E47C5
-	for <kvmarm@lists.linux.dev>; Thu, 20 Mar 2025 18:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0F67E1;
+	Fri, 21 Mar 2025 00:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742496448; cv=none; b=WibKbz6wfassP8PWgzjV0zLczJYa+xdcgw8J7iuoMwPJs03lluF46hC3T0OGWsh0bi7OSOxOcE6TmLOTGh7kVXPduom3K9cgI1ZpjcFPwple3chq5T0WdlzbypKX1TGhDFgqSb16XgGLbL9VPXDzhK1ItvEQBoazayIG7On5u6o=
+	t=1742515839; cv=none; b=oA9IGnNjPGXEfUsVZfzde5cD3+wT2Z98F8swqSzT1xa9h5FlmzK+r90lyCWK9PHKZQjLhxd+svByHkCmcW7W45CfSPuf7OTYLPb5eh4ZXq92I5/oeRaR49azqPhiG0vmBZbBwoh0fX1DN/39Hz70LyHmTOauDYU8DnbepH6bxm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742496448; c=relaxed/simple;
-	bh=p7MoLMJgztUeM2mOX1O2C/+yxOVVFon1dqzplcanEj0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QzVPYnR0k64XEBGOunxlXuu8HxItst9h8qTWdC+iYb70LIki3wDGu8X25ek9tx1YStPEBhkKOK+cYMKcSpnxJhUbVz47g4AEPeIJfubiVd/DdDp33l/RPGaPblGSJJ0Dofx4P+lWWvdb8vXbkGmpylDMSnxu/7mhPxqQUjjOSWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dGoE1WIY; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1742515839; c=relaxed/simple;
+	bh=UnwmEOzkbVYA12kIeylZ6mRzOZdlCojdMzHgIqtEWHg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=iP4OT46Mx2H7YURitOlT71UJrpd4h/IBdDolW7POGsvtYjBvr6fiT4A9oVtNhCutBnjWBksf6ZbCQRtURuKxVL4O3l/PbpfKBkQKfz4aMQUAAXpuQRaDhpl0LOTgJa7q2Q7o8qaDwpUWo+ZabWttYcThEtWySyEvsSN3oEwgGKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h8G17aTX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dGoE1WIY"
-Received: from [10.137.184.60] (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6483B2116B4D;
-	Thu, 20 Mar 2025 11:47:19 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6483B2116B4D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1742496439;
-	bh=2L2Q31XCa0Xdbd9gsYILKzkM4+b+VTYhlEAF67KZJpE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dGoE1WIYcV3miDSU7tnIjSORwMD3YiiuMtgapwqYs3PxoUrikjyglFZJEbSJEaC1I
-	 qppAONaKxLV3qmJYo7gpaRMBNla6xREmO+/WMeSBr/85MzxtUvCAfKqrGUxvaVfV3z
-	 LX02uwyNNHxgqfnDJgcNePxL4YNOD7FoIVq49fLM=
-Message-ID: <42a1a90b-ae3e-47df-ad6c-500055e69218@linux.microsoft.com>
-Date: Thu, 20 Mar 2025 11:47:18 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h8G17aTX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA1F8C4CEDD;
+	Fri, 21 Mar 2025 00:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742515838;
+	bh=UnwmEOzkbVYA12kIeylZ6mRzOZdlCojdMzHgIqtEWHg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=h8G17aTXy7pKB7dyU4WVLaw42gkw94O6XAMEfaS3aQnsrNmFmPTaTor/HkUgy6nFZ
+	 tDzudy0Z/oT3KtveAIGQM/x6igV8OEhQyheHxruDNoGH7DmiB1wyexwZA3iE9SiN9k
+	 QibC0QttzPFh9F5CdTbkNPIPapAQ3UzDQtDdYODq1TdBydkiR07/QqgW26BlSx1soU
+	 yfRVfEvDamE2bM5e64ZrMWkrU7E6Qi+fUtpD8WXcD69etMilrdpQNbitD0I2smoslz
+	 50jGqPQ/JE63txaELirqjPK7NSxu2o8ATN5Ba0WRc5sruJvpM2Xt2JzcqlpD47fRXy
+	 KQiEUywJgPB3w==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 6.13 v2 0/8] KVM: arm64: Backport of SVE fixes to v6.13
+Date: Fri, 21 Mar 2025 00:10:09 +0000
+Message-Id: <20250321-stable-sve-6-13-v2-0-3150e3370c40@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH hyperv-next v6 02/11] arm64: hyperv: Use SMCCC to detect
- hypervisor presence
-To: Michael Kelley <mhklinux@outlook.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: "arnd@arndb.de" <arnd@arndb.de>, "bhelgaas@google.com"
- <bhelgaas@google.com>, "bp@alien8.de" <bp@alien8.de>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "hpa@zytor.com" <hpa@zytor.com>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>, "kw@linux.com" <kw@linux.com>,
- "kys@microsoft.com" <kys@microsoft.com>, "lenb@kernel.org"
- <lenb@kernel.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "rafael@kernel.org" <rafael@kernel.org>, "robh@kernel.org"
- <robh@kernel.org>, "ssengar@linux.microsoft.com"
- <ssengar@linux.microsoft.com>, "sudeep.holla@arm.com"
- <sudeep.holla@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>, "will@kernel.org"
- <will@kernel.org>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "x86@kernel.org" <x86@kernel.org>, "apais@microsoft.com"
- <apais@microsoft.com>, "benhill@microsoft.com" <benhill@microsoft.com>,
- "bperkins@microsoft.com" <bperkins@microsoft.com>,
- "sunilmut@microsoft.com" <sunilmut@microsoft.com>
-References: <20250315001931.631210-1-romank@linux.microsoft.com>
- <20250315001931.631210-3-romank@linux.microsoft.com>
- <Z9gJlQgV3hm1kxY0@J2N7QTR9R3.cambridge.arm.com>
- <BN7PR02MB414871F1A3D8EF3809391F2FD4D92@BN7PR02MB4148.namprd02.prod.outlook.com>
-Content-Language: en-US
-From: Roman Kisel <romank@linux.microsoft.com>
-In-Reply-To: <BN7PR02MB414871F1A3D8EF3809391F2FD4D92@BN7PR02MB4148.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGKu3GcC/2WNwQ6DIBBEf8XsuWtgVWh66n80HsAuSmqwAUPaG
+ P+9hGuPbybz5oDE0XOCW3NA5OyT30IBujQwLSbMjP5ZGEjQIIg0pt3YlTFlRoWyw2Fi43pxtYP
+ TUFbvyM5/qvEBqpUdjCVdfNq3+K03WdauGjtJf8YsUeCkrRHaKNc7fX9xDLy2W5xhPM/zB8DQU
+ Uy1AAAA
+X-Change-ID: 20250227-stable-sve-6-13-5ceaf408b5f7
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>, Fuad Tabba <tabba@google.com>, 
+ James Clark <james.clark@linaro.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Eric Auger <eauger@redhat.com>, Wilco Dijkstra <wilco.dijkstra@arm.com>, 
+ Eric Auger <eric.auger@redhat.com>, Florian Weimer <fweimer@redhat.com>, 
+ Jeremy Linton <jeremy.linton@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: b4 0.15-dev-1b0d6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1702; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=UnwmEOzkbVYA12kIeylZ6mRzOZdlCojdMzHgIqtEWHg=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBn3K5z+OUtTc8Yn+JX7kpLLlAGN05FTJOgpvs9yukl
+ 5RHjDbmJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ9yucwAKCRAk1otyXVSH0IDuB/
+ 9Qx4rfSQv9RPjp4QcG5wJW92CPAHkXG0TJCQuGzbqNllI333pq6rZqHS3xbJBW+tTqBOK2D47PCNLZ
+ TwKkUeEE2V4oXfP9VfSVii7YsX3zgKiNJzmJXccaGRNqZjpdoM6nprl9N/5E/Ypchg0s6XJAk4OLvF
+ zng/O9IcBn6yg5yKu6SDB5O2iCfnZZm+j3LiJDIaYGV9dPBtRDp2KB/uXIBry+dypUiDiI/nanQt27
+ NA+peMIwULuUVSfgw4eaHTE1NWC3C962IKydHWzbhyssLydTRgi6xgusBnry/wSdGSM0OIIqMyzBAF
+ Qkj4F4RPpYiXktijmdIYj1PW6/bD8Z
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
+This series backports some recent fixes for SVE/KVM interactions from
+Mark Rutland to v6.13.
 
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v2:
+- Remove an erronious kern_hyp_va().
+- Move standard cherry pick to stable format in patch 8.
+- Link to v1: https://lore.kernel.org/r/20250312-stable-sve-6-13-v1-0-c7ba07a6f4f7@kernel.org
 
-On 3/19/2025 3:11 PM, Michael Kelley wrote:
-> From: Mark Rutland <mark.rutland@arm.com> Sent: Monday, March 17, 2025 4:38 AM
+---
+Fuad Tabba (1):
+      KVM: arm64: Calculate cptr_el2 traps on activating traps
 
->>
->> The 'acpi_disabled' variable doesn't exist for !CONFIG_ACPI, so its use
->> prior to the ifdeffery looks misplaced.
-> 
-> FWIW, include/linux/acpi.h has
-> 
-> #define acpi_disabled 1
-> 
-> when !CONFIG_ACPI.  But I agree that using a stub is better.
+Mark Rutland (7):
+      KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
+      KVM: arm64: Remove host FPSIMD saving for non-protected KVM
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN
+      KVM: arm64: Refactor exit handlers
+      KVM: arm64: Mark some header functions as inline
+      KVM: arm64: Eagerly switch ZCR_EL{1,2}
 
-Thanks, Michael! I didn't "fact-checked" what was suggested indeed.
-Agreed that the stub makes the code look better.
+ arch/arm64/include/asm/kvm_host.h       |  25 ++----
+ arch/arm64/kernel/fpsimd.c              |  25 ------
+ arch/arm64/kvm/arm.c                    |   9 ---
+ arch/arm64/kvm/fpsimd.c                 | 100 ++----------------------
+ arch/arm64/kvm/hyp/entry.S              |   5 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 133 ++++++++++++++++++++++---------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  11 +--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  30 -------
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 134 ++++++++++++++++++--------------
+ arch/arm64/kvm/hyp/vhe/switch.c         |  21 ++---
+ 10 files changed, 201 insertions(+), 292 deletions(-)
+---
+base-commit: 648e04a805652f513af04b47035cde896addf9b0
+change-id: 20250227-stable-sve-6-13-5ceaf408b5f7
 
-> 
-> Michael
-> 
->>
->> Usual codestyle is to avoid ifdeffery if possible, using IS_ENABLED().
->> Otherwise, use a stub, e.g.
->>
->> | #ifdef CONFIG_ACPI
->> | static bool __init hyperv_detect_via_acpi(void)
->> | {
->> | 	if (acpi_disabled)
->> | 		return false;
->> |
->> | 	if (acpi_gbl_FADT.header.revision < 6)
->> | 		return false;
->> |
->> | 	return strncmp((char *)&acpi_gbl_FADT.hypervisor_id, "MsHyperV", 8) == 0;
->> | }
->> | #else
->> | static inline bool hyperv_detect_via_acpi(void) { return false; }
->> | #endif
->>
->> Mark.
->>
->>> +static bool __init hyperv_detect_via_smccc(void)
->>> +{
->>> +	uuid_t hyperv_uuid = UUID_INIT(
->>> +		0x4d32ba58, 0x4764, 0xcd24,
->>> +		0x75, 0x6c, 0xef, 0x8e,
->>> +		0x24, 0x70, 0x59, 0x16);
->>> +
->>> +	return arm_smccc_hyp_present(&hyperv_uuid);
->>> +}
->>> +
->>>   static int __init hyperv_init(void)
->>>   {
->>>   	struct hv_get_vp_registers_output	result;
->>> @@ -35,13 +70,11 @@ static int __init hyperv_init(void)
->>>
->>>   	/*
->>>   	 * Allow for a kernel built with CONFIG_HYPERV to be running in
->>> -	 * a non-Hyper-V environment, including on DT instead of ACPI.
->>> +	 * a non-Hyper-V environment.
->>> +	 *
->>>   	 * In such cases, do nothing and return success.
->>>   	 */
->>> -	if (acpi_disabled)
->>> -		return 0;
->>> -
->>> -	if (strncmp((char *)&acpi_gbl_FADT.hypervisor_id, "MsHyperV", 8))
->>> +	if (!hyperv_detect_via_acpi() && !hyperv_detect_via_smccc())
->>>   		return 0;
->>>
->>>   	/* Setup the guest ID */
->>> --
->>> 2.43.0
->>>
-> 
-
+Best regards,
 -- 
-Thank you,
-Roman
+Mark Brown <broonie@kernel.org>
 
