@@ -1,122 +1,95 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56296191484
-	for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 14:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C13642A94
+	for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 15:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742567579; cv=none; b=ojaS2SNLNyOtf+Sq9W7fwmS1VbsDEIOB8WtvjCdxXkCxTmwKPhV3dVI0D/j6sp02eX3Bc053GomGhwSks4RwG5Vvi42k2owGa9rUTrjnDwijD30U2Z25oh6RXwkxAeMJJKWCi8m393yVT7WXbWG+DHWkZg7Tmo6WCcIEdYuUjys=
+	t=1742569531; cv=none; b=O9WqKtYseD/kpRBy7t5gwOV7iwGRIAAD7yRLeKBtV7e+FVxsj4NLxgTewfNvff+dofAOrQ7M18+Irak56nLwsRKrxle0hHqDdr7qosFy4fnVXN7JqyAEWbFdTXBwrU2BYhttbbot8rmZtu+ifo6yXwCBWv3DT+eWKO/9DSsG8AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742567579; c=relaxed/simple;
-	bh=+LDlUo8we7HXs412riW2XVXscOex6Sq1qjsJfiM5m7E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=a0gHZOk8a+MeWp7xShIlmKMVOVUqtvJO4F4xbj7cT/dyOlvyi4C0Az8pgFqANovhoHJO6229ZgFN/4tk+C22YUzxLJ4/1/Dj5sLcdmKVEIWyKeMnee2SOfZEMmLrIvh8NRigi7EcXgVo4Wg+qfu3IrfpAzAFDrX3RuHfhUseEQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=A/TcHO1j; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1742569531; c=relaxed/simple;
+	bh=IfRmgRl0xoQ6wXn78HVnBxfM2bC8e91S0S+5O0nvG5M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=gUbk63uf9EA9zAW8mCbVIvbEZ+uz03eyed4/Vg4BuC+0J/zdoPQLgUmE4WS2bUbf7ph5SaizC91vyOzQrK22U2Zkv0kEG4tqKIUmGepgW556bpDnMUaWa1a9HBnnzb2LA1DeLv2oJl1XN1LxMD1uO51zWPv6xyu13E8m7qWNUvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WR5UjkfQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A/TcHO1j"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cfa7e7f54so12816085e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 07:32:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742567575; x=1743172375; darn=lists.linux.dev;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MzFQfhx5F8dx0RL9AvvQYwg76iw5NXa4lMy+vsdeqMg=;
-        b=A/TcHO1jigEyMvHjKJKWb7JPs5viJPN1S1zDDsEwhndzOZ2hlNLfp7Dd8RWzZxqV+G
-         jZJixwojMEaalCRpMFO4H0XZdhrMsZfk7rxMSnJDxQNtGK5vX8zj6USE9wfBvsDgiukA
-         J2KMkQt+ZuPGY9MOjNCjnNV+GaME8UczhrnXUFbQ140CxZL+Qr8FTFbHfzkMcLcfy++n
-         3pVjEL2jy3xTA5GKxqdiGNN7ZWr3LZ9/149lmpH5TPx5b4RAzPH17XO9U4Bw2aLTwhHr
-         as/MlVtTeFRCN2SlpP4q04iz4StS0QuK4ww0bzmTwZItk8CaH/sp9ENab3xlqXpNi5+s
-         3Y0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742567575; x=1743172375;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MzFQfhx5F8dx0RL9AvvQYwg76iw5NXa4lMy+vsdeqMg=;
-        b=o2HsrlrVyh1lfhc9jZYlMiZThayYubfuvcNNanuLoCf3cqh+2/igRhpc/V4HgqwdeK
-         GyNgNkRJUxbHKiDub5ldAbROQNMewyzyVpPhFLUlz1Qy3mzuVVzNNWMYw7dSDc0DIDEG
-         m3HN6UTXOJs69PnVAHJdiY1BeYuDp4FTkEMTo2timqWcOstkrFcsMQlIbENH1vEQcFtO
-         WeEnmWnIT7cdGc2Yz3YeSANlN5WqxJupFIMoLBHbctYifWmyK1TKAdQWLGQCVP1UtrnX
-         jO6VYxlCpyOafBszyrA5LZPfPF/ewOaV0f5G4yYVTC1na5fj73y+DmyCs3KkBDpl4hVe
-         v38A==
-X-Forwarded-Encrypted: i=1; AJvYcCUI1vF65nrd4dOmo2+QsRCv3xALlCltKDv4DL/EqOnDj96LrmBMQwUBqVh6ehqdFUrm1gehUmU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YywO0BkBjpuJMgp0tL150ITvmCKOukZLtbyl+PZtXX96F2eCdna
-	V3+thxWdOlGHFcclVyynHUAui958gyeiBz2XZ1Z7pmDKdswF1UtoniVDpGv/jvA=
-X-Gm-Gg: ASbGncsf73Tlzt0feR05HdZZw40NYPSuIAwnFim/ty/rJy65/9jRwvGUFkX9Z2B8xa6
-	2cqwubMnf8bgQomnHGzDpKK/eizbBbrlZM/qh5oqxf65LtwwcBWjqeZgNV5kGX72LZyskmQi3dG
-	jmBVIj9mzW2TKrNDe/71sRlMMcVuj1qe597jAG0wwPzcrahtqmMpF+mNztokEyUk56q9RDhnYEe
-	1JLChtgDz+CYTIPdIjBLP5cYX8XmeI0bWhGY5Bhc5Atdi/9n9sJUFxEEoRLYLHOwdW6fTd7B0i+
-	BcX593L4D9DwWVygJTlfKtYOPRFpIVYW+h24PsTbPYfByWN53g==
-X-Google-Smtp-Source: AGHT+IFdHgCx4C5nFq7a41Rl1TdfpLB7mC6eqzVe1FxFvJX3eQdkfF3U3LPtyEx8bVlfn1VSsrBleA==
-X-Received: by 2002:a05:600c:1c02:b0:43d:5264:3cf0 with SMTP id 5b1f17b1804b1-43d52a08ed8mr22225315e9.11.1742567575525;
-        Fri, 21 Mar 2025 07:32:55 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43d4fd27980sm28845345e9.21.2025.03.21.07.32.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 07:32:55 -0700 (PDT)
-Date: Fri, 21 Mar 2025 17:32:53 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Andrew Jones <drjones@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] KVM: selftests: Fix a couple "prio" signedness bugs
-Message-ID: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WR5UjkfQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742569528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5R+ajQwnCzOTnEk7/Bcr1/crlPPyRTCprYEV/8jk2A8=;
+	b=WR5UjkfQE/ayQEXSY7NV0YoL3jLhd0Uzr4i0ua2svf3NWZtK3wStFACdEzDNhhZyOM4QH4
+	r8PUuxC+rY/eQ/lzPCMDl/0bA5YlYAf5VPu5JXUajrv8R+2yimvOIgzC8Wv//LbIvaczCg
+	Rekn8QGcGTvvPklWJg//7Umca/sW8Dw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-137-LzjtJHa7P2S4k7YUT17pWg-1; Fri,
+ 21 Mar 2025 11:05:24 -0400
+X-MC-Unique: LzjtJHa7P2S4k7YUT17pWg-1
+X-Mimecast-MFC-AGG-ID: LzjtJHa7P2S4k7YUT17pWg_1742569522
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CC06180AF6C;
+	Fri, 21 Mar 2025 15:05:21 +0000 (UTC)
+Received: from localhost (unknown [10.67.24.51])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 158E81828A83;
+	Fri, 21 Mar 2025 15:05:18 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, alex.bennee@linaro.org,
+ oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+ agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
+ philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [PATCH v3 00/14] arm: rework id register storage
+In-Reply-To: <86plino2ru.wl-maz@kernel.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20250311162824.199721-1-cohuck@redhat.com>
+ <86plino2ru.wl-maz@kernel.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Fri, 21 Mar 2025 16:05:12 +0100
+Message-ID: <871puqv2zb.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-There is an assert which relies on "prio" to be signed.
+On Tue, Mar 11 2025, Marc Zyngier <maz@kernel.org> wrote:
 
-	GUEST_ASSERT(prio >= 0);
+> On Tue, 11 Mar 2025 16:28:10 +0000,
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>> 
+>>   - I'm open to changing the source of the definitions from the sysregs
+>>     file to the JSON definitions published by Arm; however, I first wanted
+>>     to get the code using it right -- we can switch out the code generating
+>>     the file to use a different source easily later on, and I'd also like
+>>     to steal parts of the script from Linux once integrated (which I think
+>>     hasn't happened yet?)
+>
+> I don't think there is a real appetite to have that script merged in
+> the kernel. My current plan is to maintain it separately.
+>
+> But by any mean, take it and do whatever you want with it.
 
-Change the type from uint32_t to int.
-
-Fixes: 728fcc46d2c2 ("KVM: selftests: aarch64: Add test for restoring active IRQs")
-Fixes: 0ad3ff4a6adc ("KVM: selftests: aarch64: Add preemption tests in vgic_irq")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
----
- tools/testing/selftests/kvm/arm64/vgic_irq.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-index f4ac28d53747..e89c0fc5eef3 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-@@ -294,7 +294,8 @@ static void guest_restore_active(struct test_args *args,
- 		uint32_t first_intid, uint32_t num,
- 		kvm_inject_cmd cmd)
- {
--	uint32_t prio, intid, ap1r;
-+	uint32_t intid, ap1r;
-+	int prio;
- 	int i;
- 
- 	/*
-@@ -362,7 +363,8 @@ static void test_inject_preemption(struct test_args *args,
- 		uint32_t first_intid, int num,
- 		kvm_inject_cmd cmd)
- {
--	uint32_t intid, prio, step = KVM_PRIO_STEPS;
-+	uint32_t intid, step = KVM_PRIO_STEPS;
-+	int prio;
- 	int i;
- 
- 	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
--- 
-2.47.2
+Thanks for the info; I'll look at it again once the rest of this series
+here is done.
 
