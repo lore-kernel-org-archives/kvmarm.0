@@ -1,111 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23891DDA09
-	for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 15:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB821D5ADC;
+	Fri, 21 Mar 2025 17:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742571724; cv=none; b=OlRiiqbXXGr+qmRjv6q4NXkWg6E+g/K9gO5uLWjqYJMn7g57/yOVAABSVYkDXoFupXbzBD4prHyCmcT5KXTaOqBTJD7wVOhxrcrhBgoXgxdtYdyw6ZHRBSXecHzrFiznV/IvUpG4eOQeqTHgGQU3C/1a0aPQqrqQ3GRFmtdkmOk=
+	t=1742576674; cv=none; b=IT32SJBGTEBonZYzEmCJi6QJQzGPedqXi0Vv8CxI9fHB0eRchP0XoVA8wquTLGEHnDHi9l8Byb9WJgQJ12QcRHR66RjVMHXdW5eNWRENzaISsA2a5qzgzQHCGhTcf+58gCWopWDau6AhMWVdwoaLbPLXmmADSfoGaQnXFy9JvI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742571724; c=relaxed/simple;
-	bh=7RqH5kytg89sTuOX53+jtbuhFNMPYRR0xwXsuTDnYYM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Rl/SY6TTR/WU69ENotd83MlveAtIIrUAN8pQ4kEGsEMy/rY3CfMQdWBtCODarfjSNYPMWXLWuxm18akBYdbPniQ0m4eVmlp+BXn4bmX1OJ4vKO733g4mkND4dkeDAkqDhZwy37MIvdj6Ums0zbqgdAOvXicTgkVFwudHEEcPkIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IJb6ptRS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1742576674; c=relaxed/simple;
+	bh=4BIhvc3+qX0OSvURR+5GbIbaBgN0H4vLEDwiLUkmYk0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EFqHb+Ag8sl6+ZU2tZWO/aaM3NdBL4bSC1ugsiUfUw1MVWCfsmDfkC1KqJyUlvFo/Y5d3kcOfpwHMEURML5K9QiXPSYR9T5cBTqfFYY/payoQz+VuFlnl3l/iGPVuxvpgC8Lg6AxH7SzA7hCfEIuWMCqJxyq9kD4jaNk/EtMpwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8gXM74F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJb6ptRS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742571721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rLAT+xNg6mpfaUskN/9jAwU3yywlq9mFubt3CKsbvCQ=;
-	b=IJb6ptRSO7DhQ98azllrll4gxCmdBQVIMZtyZJ4tcsyTAyCckrtqVUmO/bYN23vd5nY81P
-	dCP41ghPFySJRbu6NvE9TsjqWRkvrtlXmxJ7iEFCpUBmJidy/fjRgc32S36G1NEc23+WGp
-	sN6W7VhkCBGfJaHujQf/pbhJactD55A=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-616-8FF16d2HNbGhKlCiBp_JZw-1; Fri,
- 21 Mar 2025 11:41:57 -0400
-X-MC-Unique: 8FF16d2HNbGhKlCiBp_JZw-1
-X-Mimecast-MFC-AGG-ID: 8FF16d2HNbGhKlCiBp_JZw_1742571715
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE6B0180AF4D;
-	Fri, 21 Mar 2025 15:41:54 +0000 (UTC)
-Received: from localhost (unknown [10.67.24.51])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 43B16180175A;
-	Fri, 21 Mar 2025 15:41:50 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
- oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com,
- armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
- jdenemar@redhat.com, agraf@csgraf.de, shahuang@redhat.com,
- mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [PATCH v3 13/14] arm/cpu: Add sysreg generation scripts
-In-Reply-To: <17649857-752b-a149-3935-5bcbd5c50627@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20250311162824.199721-1-cohuck@redhat.com>
- <20250311162824.199721-14-cohuck@redhat.com>
- <17649857-752b-a149-3935-5bcbd5c50627@redhat.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Fri, 21 Mar 2025 16:41:44 +0100
-Message-ID: <87pliatmpz.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8gXM74F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D58BC4CEE3;
+	Fri, 21 Mar 2025 17:04:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742576674;
+	bh=4BIhvc3+qX0OSvURR+5GbIbaBgN0H4vLEDwiLUkmYk0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r8gXM74F/+FGR0yRaBVaczuaUVE0HAnVuuKBIGwW1wkvw57XgJlAzu5Txf+qOg1yU
+	 Pm1KKfAGtuXFjrY2VX+79XtObxfKBwV/wCQDl5/J/oiNix0bXDH6oll9RRVBVYK3zk
+	 Wlb6hHOE8FhyDF/V4ggnKrje+iy/YKeb8AVrdDl2JnFBEFIPpYAAWgaRZpHay70pRo
+	 u0noL0xozzR6HommJQd7dnQKAQOhT30qDW891zYRxQPM2tZvNAb+mWzqeJvf2mYBn+
+	 wNmpsGilzTsHBW7YEyPi79Z7T/Bjh+n4vYrQEnNDCzZvGvd+4nzwyGipOFSEKg0MDL
+	 cutBPKbjuLuIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tvfnL-00Frrz-HD;
+	Fri, 21 Mar 2025 17:04:31 +0000
+Date: Fri, 21 Mar 2025 17:04:22 +0000
+Message-ID: <87cyeaqprd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Ricardo Koller <ricarkol@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Andrew Jones <drjones@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Fix a couple "prio" signedness bugs
+In-Reply-To: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
+References: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dan.carpenter@linaro.org, ricarkol@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Mar 20 2025, Sebastian Ott <sebott@redhat.com> wrote:
+Hey Dan,
 
-> On Tue, 11 Mar 2025, Cornelia Huck wrote:
->> +++ b/scripts/gen-cpu-sysregs-header.awk
-> [...]
->> +BEGIN {
->> +    print ""
->> +} END {
->> +    print ""
->> +}
->> +
->> +# skip blank lines and comment lines
->> +/^$/ { next }
->> +/^[\t ]*#/ { next }
->> +
->> +/^Sysreg\t/ || /^Sysreg /{
->> +
->> +	reg = $2
->> +	op0 = $3
->> +	op1 = $4
->> +	crn = $5
->> +	crm = $6
->> +	op2 = $7
->> +
->> +	if (op0 == 3 && (op1>=0 && op1<=3) && crn==0 && (crm>=0 && crm<=7) && (op2>=0 && op2<=7)) {
->> +	    idreg = 1
->> +        } else {
->> +	    idreg = 0
->> +	}
->
-> This doesn't seem to be used. I guess this is in preparation for later
-> usage, when this can do more than just the plain register definition?
+On Fri, 21 Mar 2025 14:32:53 +0000,
+Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> 
+> There is an assert which relies on "prio" to be signed.
+> 
+> 	GUEST_ASSERT(prio >= 0);
+> 
+> Change the type from uint32_t to int.
+> 
+> Fixes: 728fcc46d2c2 ("KVM: selftests: aarch64: Add test for restoring active IRQs")
+> Fixes: 0ad3ff4a6adc ("KVM: selftests: aarch64: Add preemption tests in vgic_irq")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+> ---
+>  tools/testing/selftests/kvm/arm64/vgic_irq.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+> index f4ac28d53747..e89c0fc5eef3 100644
+> --- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+> @@ -294,7 +294,8 @@ static void guest_restore_active(struct test_args *args,
+>  		uint32_t first_intid, uint32_t num,
+>  		kvm_inject_cmd cmd)
+>  {
+> -	uint32_t prio, intid, ap1r;
+> +	uint32_t intid, ap1r;
+> +	int prio;
+>  	int i;
+>  
+>  	/*
+> @@ -362,7 +363,8 @@ static void test_inject_preemption(struct test_args *args,
+>  		uint32_t first_intid, int num,
+>  		kvm_inject_cmd cmd)
+>  {
+> -	uint32_t intid, prio, step = KVM_PRIO_STEPS;
+> +	uint32_t intid, step = KVM_PRIO_STEPS;
+> +	int prio;
+>  	int i;
+>  
+>  	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
 
-In fact, I might have got muddled a bit in my scripts, let me check. (I
-think we should simply skip out-of-range regs.)
+I think this is going in the wrong direction. A GIC priority is an
+unsigned 8bit value as per the architecture definition.
 
+So the type used by the test the first place looks wrong (it is too
+wide), and the assertion is pointless.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
