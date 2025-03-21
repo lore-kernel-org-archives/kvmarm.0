@@ -1,149 +1,122 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DE91F4C9B
-	for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 12:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56296191484
+	for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 14:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742561865; cv=none; b=dEC8iTP1G+NndUjM91hHjUjGmNLral5Hr+xZhMEzOPoKIUEFr7DFEAD9tfCHqsdwMyjSHLC4QX9S3wRj0oQ7wcxyQReuVNjpaT2Ye1QfY+u7eERH/BW7WnbNYLYlv51kDdRSqe9buoTdOVLdwvBFuHzKJSrt/6dMvsKzG2+ELm0=
+	t=1742567579; cv=none; b=ojaS2SNLNyOtf+Sq9W7fwmS1VbsDEIOB8WtvjCdxXkCxTmwKPhV3dVI0D/j6sp02eX3Bc053GomGhwSks4RwG5Vvi42k2owGa9rUTrjnDwijD30U2Z25oh6RXwkxAeMJJKWCi8m393yVT7WXbWG+DHWkZg7Tmo6WCcIEdYuUjys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742561865; c=relaxed/simple;
-	bh=9V5F+5KE+QgZzg0jOhP26TdHasnAHrPxMgAE6T3UHpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H7fGbf7ndgrCF/UEA0xA3TZHRW9/3yOB4LSDxm336xP9rFTF/o/uKXbltmfEVO1AHdtdNLcUGY3z2UUhfcqSgKO5aKjTM0XZU0Gz5XypcALa3YuRgBtoT4MB8lqEb5NUn8zRwntUr5ZIqkHob7/bo20cEpWFMhv9Jl0c37zPWQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 408B5106F;
-	Fri, 21 Mar 2025 05:57:50 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC44A3F63F;
-	Fri, 21 Mar 2025 05:57:40 -0700 (PDT)
-Date: Fri, 21 Mar 2025 12:57:32 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, open list
- <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, Linux ARM
- <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.linux.dev, Anshuman
- Khandual <anshuman.khandual@arm.com>, Rob Herring <robh@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>,
- Aishwarya TCV <aishwarya.tcv@arm.com>, Anders Roxell
- <anders.roxell@linaro.org>, Dan Carpenter <dan.carpenter@linaro.org>, Arnd
- Bergmann <arnd@arndb.de>
-Subject: Re: Fast model boot failure with Linux next-20250312
-Message-ID: <20250321125732.6def5eca@donnerap.manchester.arm.com>
-In-Reply-To: <CA+G9fYuw_jXCz07Dsk46QXQr3+y5-NfkC30ZNh+XmyeWgibQhA@mail.gmail.com>
-References: <CA+G9fYvPu+MQKhYyPZSSDpAn-zhRGmeHQ8hJksT_cdDdxfbB-g@mail.gmail.com>
-	<Z9ra3I2axii2HRVb@J2N7QTR9R3>
-	<CA+G9fYuw_jXCz07Dsk46QXQr3+y5-NfkC30ZNh+XmyeWgibQhA@mail.gmail.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1742567579; c=relaxed/simple;
+	bh=+LDlUo8we7HXs412riW2XVXscOex6Sq1qjsJfiM5m7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=a0gHZOk8a+MeWp7xShIlmKMVOVUqtvJO4F4xbj7cT/dyOlvyi4C0Az8pgFqANovhoHJO6229ZgFN/4tk+C22YUzxLJ4/1/Dj5sLcdmKVEIWyKeMnee2SOfZEMmLrIvh8NRigi7EcXgVo4Wg+qfu3IrfpAzAFDrX3RuHfhUseEQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=A/TcHO1j; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A/TcHO1j"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cfa7e7f54so12816085e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 21 Mar 2025 07:32:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1742567575; x=1743172375; darn=lists.linux.dev;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MzFQfhx5F8dx0RL9AvvQYwg76iw5NXa4lMy+vsdeqMg=;
+        b=A/TcHO1jigEyMvHjKJKWb7JPs5viJPN1S1zDDsEwhndzOZ2hlNLfp7Dd8RWzZxqV+G
+         jZJixwojMEaalCRpMFO4H0XZdhrMsZfk7rxMSnJDxQNtGK5vX8zj6USE9wfBvsDgiukA
+         J2KMkQt+ZuPGY9MOjNCjnNV+GaME8UczhrnXUFbQ140CxZL+Qr8FTFbHfzkMcLcfy++n
+         3pVjEL2jy3xTA5GKxqdiGNN7ZWr3LZ9/149lmpH5TPx5b4RAzPH17XO9U4Bw2aLTwhHr
+         as/MlVtTeFRCN2SlpP4q04iz4StS0QuK4ww0bzmTwZItk8CaH/sp9ENab3xlqXpNi5+s
+         3Y0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742567575; x=1743172375;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MzFQfhx5F8dx0RL9AvvQYwg76iw5NXa4lMy+vsdeqMg=;
+        b=o2HsrlrVyh1lfhc9jZYlMiZThayYubfuvcNNanuLoCf3cqh+2/igRhpc/V4HgqwdeK
+         GyNgNkRJUxbHKiDub5ldAbROQNMewyzyVpPhFLUlz1Qy3mzuVVzNNWMYw7dSDc0DIDEG
+         m3HN6UTXOJs69PnVAHJdiY1BeYuDp4FTkEMTo2timqWcOstkrFcsMQlIbENH1vEQcFtO
+         WeEnmWnIT7cdGc2Yz3YeSANlN5WqxJupFIMoLBHbctYifWmyK1TKAdQWLGQCVP1UtrnX
+         jO6VYxlCpyOafBszyrA5LZPfPF/ewOaV0f5G4yYVTC1na5fj73y+DmyCs3KkBDpl4hVe
+         v38A==
+X-Forwarded-Encrypted: i=1; AJvYcCUI1vF65nrd4dOmo2+QsRCv3xALlCltKDv4DL/EqOnDj96LrmBMQwUBqVh6ehqdFUrm1gehUmU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YywO0BkBjpuJMgp0tL150ITvmCKOukZLtbyl+PZtXX96F2eCdna
+	V3+thxWdOlGHFcclVyynHUAui958gyeiBz2XZ1Z7pmDKdswF1UtoniVDpGv/jvA=
+X-Gm-Gg: ASbGncsf73Tlzt0feR05HdZZw40NYPSuIAwnFim/ty/rJy65/9jRwvGUFkX9Z2B8xa6
+	2cqwubMnf8bgQomnHGzDpKK/eizbBbrlZM/qh5oqxf65LtwwcBWjqeZgNV5kGX72LZyskmQi3dG
+	jmBVIj9mzW2TKrNDe/71sRlMMcVuj1qe597jAG0wwPzcrahtqmMpF+mNztokEyUk56q9RDhnYEe
+	1JLChtgDz+CYTIPdIjBLP5cYX8XmeI0bWhGY5Bhc5Atdi/9n9sJUFxEEoRLYLHOwdW6fTd7B0i+
+	BcX593L4D9DwWVygJTlfKtYOPRFpIVYW+h24PsTbPYfByWN53g==
+X-Google-Smtp-Source: AGHT+IFdHgCx4C5nFq7a41Rl1TdfpLB7mC6eqzVe1FxFvJX3eQdkfF3U3LPtyEx8bVlfn1VSsrBleA==
+X-Received: by 2002:a05:600c:1c02:b0:43d:5264:3cf0 with SMTP id 5b1f17b1804b1-43d52a08ed8mr22225315e9.11.1742567575525;
+        Fri, 21 Mar 2025 07:32:55 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43d4fd27980sm28845345e9.21.2025.03.21.07.32.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 07:32:55 -0700 (PDT)
+Date: Fri, 21 Mar 2025 17:32:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Andrew Jones <drjones@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] KVM: selftests: Fix a couple "prio" signedness bugs
+Message-ID: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On Thu, 20 Mar 2025 16:03:32 +0530
-Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+There is an assert which relies on "prio" to be signed.
 
-Hi,
+	GUEST_ASSERT(prio >= 0);
 
-> On Wed, 19 Mar 2025 at 20:25, Mark Rutland <mark.rutland@arm.com> wrote:
-> >
-> > On Wed, Mar 19, 2025 at 08:07:47PM +0530, Naresh Kamboju wrote:  
-> > > Regressions on the arm64 Fast Model (FVP-AEMvA) caused boot failures starting
-> > > with Linux next-20250312 and persisting through next-20250319.
-> > >
-> > > First seen on the next-20250312
-> > >  Good: next-20250311
-> > >  Bad:  next-20250312 .. next-20250319
-> > >
-> > > Regressions found on FVP:
-> > >  - boot
-> > >
-> > > Regression Analysis:
-> > >  - New regression? Yes
-> > >  - Reproducible? Yes
-> > >
-> > > Boot regression: Fast model boot failure with Linux next-20250312
-> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > >
-> > > Anders bisected this to this commit id,
-> > >
-> > > # first bad commit:
-> > >   [858c7bfcb35e1100b58bb63c9f562d86e09418d9]
-> > >   arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-> > >
-> > > NOTE:
-> > >   LKFT is currently running FVP Fast Models version 11.24.
-> > >   Planned upgrade to the Fast Models version 11.28 in this sprint.  
-> >
-> > What firmware (and version therof) are you running within the model?  
-> 
-> Fast Models [11.24.11 (Nov 29 2023)]
-> Booting Trusted Firmware
-> BL1: v2.9(release):v2.9.0
-> BL2: v2.9(release):v2.9.0
-> BL31: v2.9(release):v2.9.0
-> UEFI firmware (version  built at 22:31:25 on May 26 2023)
-> UEFI v2.70 (EDK II, 0x00010000)
-> 
-> We need to update the firmware version at our end.
+Change the type from uint32_t to int.
 
-Oh yes, please, v2.9.0 is quite old by now, especially for a moving target
-like the FVP, and when enabling new architecture features.
-FWIW, after Anshuman pointed me the problem, I made a patch for TF-A to
-enable PMUv3p9:
-https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/35884
-You would need that for this Linux commit here to work.
-FEAT_FGT2 should be enabled already by default for the FVP.
+Fixes: 728fcc46d2c2 ("KVM: selftests: aarch64: Add test for restoring active IRQs")
+Fixes: 0ad3ff4a6adc ("KVM: selftests: aarch64: Add preemption tests in vgic_irq")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+---
+ tools/testing/selftests/kvm/arm64/vgic_irq.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Please feel free to leave a comment at the TF-A gerrit, stating that you
-need the patch, that should accelerate the upstream process.
-
-Cheers,
-Andre
-
-> > For example, if the EL3 firmware lacks support for FEAT_FGT2 or
-> > FEAT_PMUv3p9, the kernel will trap to EL3 early during boot and die.
-> >
-> > It would be really helpful if you could capture that in the report in
-> > future.
-> >
-> > Mark.
-> >  
-> > >
-> > > ## Boot log
-> > >   <No crash log on the console>
-> > >
-> > > ## Source
-> > > * Kernel version: 6.14.0-rc7
-> > > * Git tree: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-> > > * Git sha: ff7f9b199e3f4cc7d61df5a9a26a7cbb5c1492e6
-> > > * Git describe: next-20250319
-> > > * Project details:
-> > > https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319
-> > > * DUT: arm64 Fast Model (FVP-AEMvA)
-> > > * Toolchains: gcc-13 and clang-20
-> > >
-> > > ## Build
-> > > * Build log: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319/testrun/27675691/suite/boot/test/gcc-13-lkftconfig/log
-> > > * Build history:
-> > > https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319/testrun/27675685/suite/boot/test/gcc-13-lkftconfig/history/
-> > > * Build details:
-> > > https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250319/testrun/27675691/suite/boot/test/gcc-13-lkftconfig/
-> > > * Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/2uX2EtC2pQdmVZ7ccoyhoi01Yy0/
-> > > * Kernel config:
-> > > https://storage.tuxsuite.com/public/linaro/lkft/builds/2uX2EtC2pQdmVZ7ccoyhoi01Yy0/config
-> > >
-> > > --
-> > > Linaro LKFT
-> > > https://lkft.linaro.org
-> > >  
-> 
-> - Naresh
-> 
+diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+index f4ac28d53747..e89c0fc5eef3 100644
+--- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+@@ -294,7 +294,8 @@ static void guest_restore_active(struct test_args *args,
+ 		uint32_t first_intid, uint32_t num,
+ 		kvm_inject_cmd cmd)
+ {
+-	uint32_t prio, intid, ap1r;
++	uint32_t intid, ap1r;
++	int prio;
+ 	int i;
+ 
+ 	/*
+@@ -362,7 +363,8 @@ static void test_inject_preemption(struct test_args *args,
+ 		uint32_t first_intid, int num,
+ 		kvm_inject_cmd cmd)
+ {
+-	uint32_t intid, prio, step = KVM_PRIO_STEPS;
++	uint32_t intid, step = KVM_PRIO_STEPS;
++	int prio;
+ 	int i;
+ 
+ 	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
+-- 
+2.47.2
 
