@@ -1,42 +1,42 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABD21F4E48
-	for <kvmarm@lists.linux.dev>; Sat, 22 Mar 2025 11:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0D213C695
+	for <kvmarm@lists.linux.dev>; Sat, 22 Mar 2025 11:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742641450; cv=none; b=jrz+nQEHHH1zgId+qfJ5HJhpR921r93YGBHX8c6zcQmt8jj3XPQBoLKpbsnl/MzAtfYZY1V3ShF2CmAX76n55vscpVuFOFpx61AHopwSqh1of4+eX+yKH03GryalchH30kbf41lvAVwonfl/W+HcG+NOhomLAjGz5ifKL5MR4UQ=
+	t=1742641693; cv=none; b=EzGC+RgXrAC169MKgS/O8eQr1hVSvEMTs5lTlOsi8pdZp3wlnrmuAQ1xvbHntR/nLaQP1nndLpetuam91XNuJ+lJGOUf7OFBYnjQXgG3h5BVQPZw59KGN9h5Jc1TMfBJr7DfM1VCm5MJuLSRF/NpLrHNB40q1Hn8Z6ybmfYDpRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742641450; c=relaxed/simple;
-	bh=GGzb6Ni/kVEOcYQlnZc4ozY/RS9CVS/Yvb+CG28DI5s=;
+	s=arc-20240116; t=1742641693; c=relaxed/simple;
+	bh=lpBRv6CDQNK5cobIGCaLkKX3Q9wQAbjrmt5PDBshefo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bgnystt9afH3rLm5iQNxTbhkoeGXQDf9t0wFC+6x3P9TZ7WwgFhXZ+iHfSe6N+OT/QbhJ7VTRcWl3syRT3NpZdahngpOx87i0wxkZkUd3xvOPGmpP/p44ffwCSWPfETTR5ajqBHuGt3Ixm+PP26xx4ADbzYSqJ83zK0GEsF4QMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e2Core7/; arc=none smtp.client-ip=91.218.175.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=XbDgxkKTYkEXsyT/Z5UA5343kanYsD05iW9ima+pKyyjfElDZ8sIWVgGMxJhuQEcDiQXtFeAbQfc445hipq8Cvux22Aan9hG3d4Ip2FoBJAk6RUueJCuk1C58snklr+o8tPjt0xsMXRqL+wfHh0ARGNmazrN82keNSrBe4f4Nq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OZSExehV; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e2Core7/"
-Date: Sat, 22 Mar 2025 12:04:00 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OZSExehV"
+Date: Sat, 22 Mar 2025 12:07:55 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742641444;
+	t=1742641677;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3AbPthiG4Ipqd9vExyooLnBvqplgAQmSYPkVfdf03+Y=;
-	b=e2Core7/Axcims5mOpjjqGxzbcxGhawHug2Eeq1hYamx0mrfv4Yxw8mX59gbSevTtscTeN
-	nHmtbx3WdGOrEfSX2WQycGiSgrnb7yoapTLpX8G9AGWVLYVquSh01sFoK55CpHdGhR7R3y
-	QILVzcmDLxHtZS8UMr5+lAgERiJ3gtM=
+	bh=CjtNir/s/35qdSIzvyp6dHUQSm2La3Nl/s11z2mMpvE=;
+	b=OZSExehV3WAbNTvoN9AHSengUjhTW2Buz3OILRVbR4410vdVK+jVvZt8TiUwbJkT6wAJXo
+	PVFYSvf/2nnZy19LtkV2KrylKW5hYQfexcLn14B/A82N0r8FaXW8NGeHqZDyb1wZAbskA3
+	HnPsbqoCSHDE7c4NQKyXJsUytvJzUc0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, 
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
 	vladimir.murzin@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 1/5] configure: arm64: Don't display
- 'aarch64' as the default architecture
-Message-ID: <20250322-4802e87f0e18f0b787adb5fb@orel>
+Subject: Re: [kvm-unit-tests PATCH v2 2/5] configure: arm/arm64: Display the
+ correct default processor
+Message-ID: <20250322-0b1d267fc4717085047e1739@orel>
 References: <20250314154904.3946484-2-jean-philippe@linaro.org>
- <20250314154904.3946484-3-jean-philippe@linaro.org>
+ <20250314154904.3946484-4-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,66 +45,94 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314154904.3946484-3-jean-philippe@linaro.org>
+In-Reply-To: <20250314154904.3946484-4-jean-philippe@linaro.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 14, 2025 at 03:49:01PM +0000, Jean-Philippe Brucker wrote:
+On Fri, Mar 14, 2025 at 03:49:02PM +0000, Jean-Philippe Brucker wrote:
 > From: Alexandru Elisei <alexandru.elisei@arm.com>
 > 
-> --arch=aarch64, intentional or not, has been supported since the initial
-> arm64 support, commit 39ac3f8494be ("arm64: initial drop"). However,
-> "aarch64" does not show up in the list of supported architectures, but
-> it's displayed as the default architecture if doing ./configure --help
-> on an arm64 machine.
-> 
-> Keep everything consistent and make sure that the default value for
-> $arch is "arm64", but still allow --arch=aarch64, in case they are users
-> that use this configuration for kvm-unit-tests.
-> 
-> The help text for --arch changes from:
-> 
->    --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
->                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
-> 
-> to:
-> 
->     --arch=ARCH            architecture to compile for (arm64). ARCH can be one of:
->                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> The help text for the --processor option displays the architecture name as
+> the default processor type. But the default for arm is cortex-a15, and for
+> arm64 is cortex-a57. Teach configure to display the correct default
+> processor type for these two architectures.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  configure | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  configure | 30 ++++++++++++++++++++++--------
+>  1 file changed, 22 insertions(+), 8 deletions(-)
 > 
 > diff --git a/configure b/configure
-> index 06532a89..dc3413fc 100755
+> index dc3413fc..5306bad3 100755
 > --- a/configure
 > +++ b/configure
-> @@ -15,8 +15,9 @@ objdump=objdump
->  readelf=readelf
->  ar=ar
->  addr2line=addr2line
-> -arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
-> -host=$arch
-> +host=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
-> +arch=$host
-> +[ "$arch" = "aarch64" ] && arch="arm64"
+> @@ -5,6 +5,24 @@ if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ] ; then
+>      exit 1
+>  fi
+>  
+> +function get_default_processor()
+> +{
+> +    local arch="$1"
+> +
+> +    case "$arch" in
+> +    "arm")
+> +        default_processor="cortex-a15"
+> +        ;;
+> +    "arm64")
+> +        default_processor="cortex-a57"
+> +        ;;
+> +    *)
+> +        default_processor=$arch
 
-I'd prefer we keep our block of assignments a block of assignments. We can
-put this at the bottom of the block, or, since the whole point of this is
-to make sure help text looks right, then just put it in usage() at the top.
+Missing ';;'
 
-Thanks,
-drew
+> +    esac
+> +
+> +    echo "$default_processor"
+> +}
+> +
+>  srcdir=$(cd "$(dirname "$0")"; pwd)
+>  prefix=/usr/local
+>  cc=gcc
+> @@ -43,13 +61,14 @@ else
+>  fi
+>  
+>  usage() {
+> +    [ -z "$processor" ] && processor=$(get_default_processor $arch)
 
->  cross_prefix=
->  endian=""
->  pretty_print_stacks=yes
+Seeing this convinces me that the additional arch=arm64 from the last
+patch should be done here above this.
+
+>      cat <<-EOF
+>  	Usage: $0 [options]
+>  
+>  	Options include:
+>  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+>  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> -	    --processor=PROCESSOR  processor to compile for ($arch)
+> +	    --processor=PROCESSOR  processor to compile for ($processor)
+>  	    --target=TARGET        target platform that the tests will be running on (qemu or
+>  	                           kvmtool, default is qemu) (arm/arm64 only)
+>  	    --cross-prefix=PREFIX  cross compiler prefix
+> @@ -319,13 +338,8 @@ if [ "$earlycon" ]; then
+>      fi
+>  fi
+>  
+> -[ -z "$processor" ] && processor="$arch"
+> -
+> -if [ "$processor" = "arm64" ]; then
+> -    processor="cortex-a57"
+> -elif [ "$processor" = "arm" ]; then
+> -    processor="cortex-a15"
+> -fi
+> +# $arch will have changed when cross-compiling.
+> +[ -z "$processor" ] && processor=$(get_default_processor $arch)
+>  
+>  if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+>      testdir=x86
 > -- 
 > 2.48.1
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+>
+
+Otherwise,
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
