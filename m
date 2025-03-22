@@ -1,126 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB821D5ADC;
-	Fri, 21 Mar 2025 17:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E700729405
+	for <kvmarm@lists.linux.dev>; Sat, 22 Mar 2025 03:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742576674; cv=none; b=IT32SJBGTEBonZYzEmCJi6QJQzGPedqXi0Vv8CxI9fHB0eRchP0XoVA8wquTLGEHnDHi9l8Byb9WJgQJ12QcRHR66RjVMHXdW5eNWRENzaISsA2a5qzgzQHCGhTcf+58gCWopWDau6AhMWVdwoaLbPLXmmADSfoGaQnXFy9JvI0=
+	t=1742615493; cv=none; b=iSOZlyO9eT8nkuCg/ABl03/BkeQpFOYtVKUfbIWxGRXGfSmYcc2wJbx8DXmI22ZMAjRRLwRvuwqMzrJVwiuDK/8p45I4kICCxKoUKsda0h3Xj5IsUrRDIPkr85WbPhGVurE/7xZFTohQtI+swKInQvoGxIpRWevvxldb61boUvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742576674; c=relaxed/simple;
-	bh=4BIhvc3+qX0OSvURR+5GbIbaBgN0H4vLEDwiLUkmYk0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EFqHb+Ag8sl6+ZU2tZWO/aaM3NdBL4bSC1ugsiUfUw1MVWCfsmDfkC1KqJyUlvFo/Y5d3kcOfpwHMEURML5K9QiXPSYR9T5cBTqfFYY/payoQz+VuFlnl3l/iGPVuxvpgC8Lg6AxH7SzA7hCfEIuWMCqJxyq9kD4jaNk/EtMpwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8gXM74F; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8gXM74F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D58BC4CEE3;
-	Fri, 21 Mar 2025 17:04:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742576674;
-	bh=4BIhvc3+qX0OSvURR+5GbIbaBgN0H4vLEDwiLUkmYk0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r8gXM74F/+FGR0yRaBVaczuaUVE0HAnVuuKBIGwW1wkvw57XgJlAzu5Txf+qOg1yU
-	 Pm1KKfAGtuXFjrY2VX+79XtObxfKBwV/wCQDl5/J/oiNix0bXDH6oll9RRVBVYK3zk
-	 Wlb6hHOE8FhyDF/V4ggnKrje+iy/YKeb8AVrdDl2JnFBEFIPpYAAWgaRZpHay70pRo
-	 u0noL0xozzR6HommJQd7dnQKAQOhT30qDW891zYRxQPM2tZvNAb+mWzqeJvf2mYBn+
-	 wNmpsGilzTsHBW7YEyPi79Z7T/Bjh+n4vYrQEnNDCzZvGvd+4nzwyGipOFSEKg0MDL
-	 cutBPKbjuLuIg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tvfnL-00Frrz-HD;
-	Fri, 21 Mar 2025 17:04:31 +0000
-Date: Fri, 21 Mar 2025 17:04:22 +0000
-Message-ID: <87cyeaqprd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Ricardo Koller <ricarkol@google.com>,
+	s=arc-20240116; t=1742615493; c=relaxed/simple;
+	bh=02WrvHsOfQhcL/BORu8PlTubY86zzCr9LziW66YhE2w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uGbICk8A8kSotcitoDCewSVBaOzu2rlNBLLfPNgeXPK0BmqFcB9hZxw0VrvD0/8pHNm7cYHEHOMF+BsisxcKvF7ZxciSqhgemZIEL6wZnBeYRI2EwFofcLw+Q2Cs+JsHGMUNwg5rNUMEZOuc9XgYnrb8bjOCURDhawZfC/3/bPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 324DD106F;
+	Fri, 21 Mar 2025 20:51:38 -0700 (PDT)
+Received: from entos-yitian-01.. (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 04ADF3F694;
+	Fri, 21 Mar 2025 20:51:26 -0700 (PDT)
+From: Jia He <justin.he@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Andrew Jones <drjones@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
 	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Fix a couple "prio" signedness bugs
-In-Reply-To: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
-References: <ca579322-dc9d-4300-bd74-7e9240e930c7@stanley.mountain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Jia He <justin.he@arm.com>
+Subject: [PATCH] KVM: arm64: pmu: Avoid initializing KVM PMU when KVM is not initialised
+Date: Sat, 22 Mar 2025 03:51:15 +0000
+Message-Id: <20250322035115.118048-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan.carpenter@linaro.org, ricarkol@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hey Dan,
+Currently, `kvm_host_pmu_init()` does not check if KVM has been
+successfully initialized before proceeding. This can lead to unintended
+behavior if the function is called in an environment where KVM is not
+available, e.g., kernel is landed in EL1.
 
-On Fri, 21 Mar 2025 14:32:53 +0000,
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> 
-> There is an assert which relies on "prio" to be signed.
-> 
-> 	GUEST_ASSERT(prio >= 0);
-> 
-> Change the type from uint32_t to int.
-> 
-> Fixes: 728fcc46d2c2 ("KVM: selftests: aarch64: Add test for restoring active IRQs")
-> Fixes: 0ad3ff4a6adc ("KVM: selftests: aarch64: Add preemption tests in vgic_irq")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> ---
->  tools/testing/selftests/kvm/arm64/vgic_irq.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> index f4ac28d53747..e89c0fc5eef3 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> @@ -294,7 +294,8 @@ static void guest_restore_active(struct test_args *args,
->  		uint32_t first_intid, uint32_t num,
->  		kvm_inject_cmd cmd)
->  {
-> -	uint32_t prio, intid, ap1r;
-> +	uint32_t intid, ap1r;
-> +	int prio;
->  	int i;
->  
->  	/*
-> @@ -362,7 +363,8 @@ static void test_inject_preemption(struct test_args *args,
->  		uint32_t first_intid, int num,
->  		kvm_inject_cmd cmd)
->  {
-> -	uint32_t intid, prio, step = KVM_PRIO_STEPS;
-> +	uint32_t intid, step = KVM_PRIO_STEPS;
-> +	int prio;
->  	int i;
->  
->  	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
+Signed-off-by: Jia He <justin.he@arm.com>
+---
+ arch/arm64/kvm/pmu.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-I think this is going in the wrong direction. A GIC priority is an
-unsigned 8bit value as per the architecture definition.
-
-So the type used by the test the first place looks wrong (it is too
-wide), and the assertion is pointless.
-
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index 7169c1a24dd6..e39c48d12b81 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -227,6 +227,13 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+ {
+ 	struct arm_pmu_entry *entry;
+ 
++	/*
++	 * Prevent unintended behavior where KVM is not available or not
++	 * successfully initialised, e.g., kernel is landed in EL1.
++	 */
++	if (!is_kvm_arm_initialised())
++		return;
++
+ 	/*
+ 	 * Check the sanitised PMU version for the system, as KVM does not
+ 	 * support implementations where PMUv3 exists on a subset of CPUs.
 -- 
-Without deviation from the norm, progress is not possible.
+2.34.1
+
