@@ -1,191 +1,223 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F9C1D5CD4;
-	Sat, 22 Mar 2025 14:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4971C860E
+	for <kvmarm@lists.linux.dev>; Sun, 23 Mar 2025 11:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742653322; cv=none; b=b6Bo2I1pt2qIQelbkST5vnfRRtcVtulC8ukd+WAb5MnLwnnGYN9Agk3Ue1OQ9Vbhbg0pgbnp3XLWsOxLHvOi/IPfTYFB1Lj9Z79MkdWc4rT1pDGTZuM8dn1HiQK8UFaOVLLavvQkanEShYhBAb/LNx/EvOcoxFcxQo5L7Q0KOEc=
+	t=1742728587; cv=none; b=DWB/1jU0wVjyW4BNOX5qjKh+byLHf4f9gKg3fXIdNpLb2PF5H7Zhwg0TryFVNuaGEW6sWp4Cng2eD0nMVpicF7owqq1uK/wT6sAT/BjmitSA0MFkuYLQvOw7CTKS2XQYQsAbDMx2liHwd+iL2dhV/hwhwuFTW1IegFORWLrS8Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742653322; c=relaxed/simple;
-	bh=TIu42g6hbijrCcZuE/1tP1wo0BubLGFRertECUWE7Sc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ObSYCsBEnEXZXxx0QQrYUKfjujbLYwvsuVlXq0lXHMcoMnUThYjrvO4XWFqRn7vBAKRLQkMXv2S+nRCmDTBwWbOvJorquET0/tOjNETdc39diLGqfa+iDjMHG4JHqYZyAIq+l7/SX6zkUodEA0FPgxIZWpU234DuxSWeq22w87E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1tyYzkF; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1tyYzkF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7A76C4CEDD;
-	Sat, 22 Mar 2025 14:22:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742653321;
-	bh=TIu42g6hbijrCcZuE/1tP1wo0BubLGFRertECUWE7Sc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p1tyYzkFurPMBJ5WfGDti97Xz1uPdqJvT14/QgesVhBtdPv/I6K5ERDiVIW5eHztK
-	 UGusDr084KFRmpkqC7oHJQnegzcbG8ZNj2ZRCHA1GqoUjJ+iOrsLvykIDPkLTnkIfU
-	 9v7ylu/BlXKjqESOr20cJGuRoSGb1kYqq9GY/oOof5HGAydPj0QRkGdChoA2bfMutB
-	 dNA68QN2vwNDP+BlRwMOseEm4Vtci/QlcyGTCVWu7K1uLM3s6V1jm6/GP96Ff1Cdej
-	 k4mend9OVs0ggZkbfsqgzgETk6P+wybinScXonfPODBcLVX/xQQtnmJ6vt6zo9nxRe
-	 sCR6huekN9VSw==
-Received: from 82-132-213-7.dab.02.net ([82.132.213.7] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tvzjb-00G7Qc-3m;
-	Sat, 22 Mar 2025 14:21:59 +0000
-Date: Sat, 22 Mar 2025 14:21:55 +0000
-Message-ID: <87bjttqh6k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Justin He <Justin.He@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Colton Lewis
-	<coltonlewis@google.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	Will
- Deacon <will@kernel.org>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: arm64: pmu: Avoid initializing KVM PMU when KVM is not initialised
-In-Reply-To: <GV2PR08MB920679CA30617D465B69D79DF7DA2@GV2PR08MB9206.eurprd08.prod.outlook.com>
-References: <20250322035115.118048-1-justin.he@arm.com>
-	<867c4hml8v.wl-maz@kernel.org>
-	<GV2PR08MB920679CA30617D465B69D79DF7DA2@GV2PR08MB9206.eurprd08.prod.outlook.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1742728587; c=relaxed/simple;
+	bh=ajW+PPgrk7z378inHZH2Yyw+A0806f19GqjR1io3ccc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UR070ilFrGjWgDv5MJhnX9/7G2D9jOgBOaJaqzHS69C/hvJ5peejUg3UzmTpVyB652nETO4a42nuBL2LXXrBkBUzg2GjH3lkn3FsDzPmN+QrbpAAFAF5elKNrpMDTFhDjLcc8uMfO8RoRio7kAv4bhlUhPnV8gfeyq7L+5y6h8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74F92106F;
+	Sun, 23 Mar 2025 04:16:30 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A9623F694;
+	Sun, 23 Mar 2025 04:16:22 -0700 (PDT)
+Date: Sun, 23 Mar 2025 11:16:19 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, eric.auger@redhat.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] configure: Add --qemu-cpu option
+Message-ID: <Z9_tg6WhKvIJtBai@raptor>
+References: <20250314154904.3946484-2-jean-philippe@linaro.org>
+ <20250314154904.3946484-6-jean-philippe@linaro.org>
+ <20250322-91a8125ad8651b24246e5799@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 82.132.213.7
-X-SA-Exim-Rcpt-To: Justin.He@arm.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, Joey.Gouly@arm.com, coltonlewis@google.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, Catalin.Marinas@arm.com, will@kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250322-91a8125ad8651b24246e5799@orel>
 
-On Sat, 22 Mar 2025 13:54:17 +0000,
-Justin He <Justin.He@arm.com> wrote:
->=20
-> Hi Marc,
->=20
-> > -----Original Message-----
-> > From: Marc Zyngier <maz@kernel.org>
-> > Sent: Saturday, March 22, 2025 6:08 PM
-> > To: Justin He <Justin.He@arm.com>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>; linux-arm-
-> > kernel@lists.infradead.org; kvmarm@lists.linux.dev; Joey Gouly
-> > <Joey.Gouly@arm.com>; Suzuki Poulose <Suzuki.Poulose@arm.com>;
-> > Zenghui Yu <yuzenghui@huawei.com>; Catalin Marinas
-> > <Catalin.Marinas@arm.com>; Will Deacon <will@kernel.org>; linux-
-> > kernel@vger.kernel.org
-> > Subject: Re: [PATCH] KVM: arm64: pmu: Avoid initializing KVM PMU when
-> > KVM is not initialised
-> >=20
-> > On Sat, 22 Mar 2025 03:51:15 +0000,
-> > Jia He <justin.he@arm.com> wrote:
-> > >
-> > > Currently, `kvm_host_pmu_init()` does not check if KVM has been
-> > > successfully initialized before proceeding. This can lead to
-> > > unintended behavior if the function is called in an environment where
-> > > KVM is not
-> >=20
-> > Which unintended behaviour? Other than the pointless allocation of a ti=
-ny
-> > amount of memory? Does anything really go wrong?
-> >=20
-> Sorry for the confusion --- I should explain more clearly.
-> I noticed the usage of host_data_ptr in Colton Lewis's RFC patch [1]. Aft=
-er
-> applying the patch, the guest VM fails to boot.Upon investigating the root
-> cause, I found that host_data_ptr can trigger a kernel panic if KVM is not
-> initialized.
+Hi Drew,
 
-How relevant is this for upstream?
+On Sat, Mar 22, 2025 at 12:26:59PM +0100, Andrew Jones wrote:
+> On Fri, Mar 14, 2025 at 03:49:04PM +0000, Jean-Philippe Brucker wrote:
+> > Add the --qemu-cpu option to let users set the CPU type to run on.
+> > At the moment --processor allows to set both GCC -mcpu flag and QEMU
+> > -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
+> > the TCG features by default, and it could also be nice to let users
+> > modify the CPU capabilities by setting extra -cpu options.
+> > Since GCC -mcpu doesn't accept "max" or "host", separate the compiler
+> > and QEMU arguments.
+> > 
+> > `--processor` is now exclusively for compiler options, as indicated by
+> > its documentation ("processor to compile for"). So use $QEMU_CPU on
+> > RISC-V as well.
+> > 
+> > Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > ---
+> >  scripts/mkstandalone.sh |  2 +-
+> >  arm/run                 | 17 +++++++++++------
+> >  riscv/run               |  8 ++++----
+> >  configure               |  7 +++++++
+> >  4 files changed, 23 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> > index 2318a85f..6b5f725d 100755
+> > --- a/scripts/mkstandalone.sh
+> > +++ b/scripts/mkstandalone.sh
+> > @@ -42,7 +42,7 @@ generate_test ()
+> >  
+> >  	config_export ARCH
+> >  	config_export ARCH_NAME
+> > -	config_export PROCESSOR
+> > +	config_export QEMU_CPU
+> >  
+> >  	echo "echo BUILD_HEAD=$(cat build-head)"
+> >  
+> > diff --git a/arm/run b/arm/run
+> > index efdd44ce..561bafab 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+> >  	source config.mak
+> >  	source scripts/arch-run.bash
+> >  fi
+> > -processor="$PROCESSOR"
+> > +qemu_cpu="$QEMU_CPU"
+> >  
+> >  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> >     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> > @@ -37,12 +37,17 @@ if [ "$ACCEL" = "kvm" ]; then
+> >  	fi
+> >  fi
+> >  
+> > -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+> > -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+> > -		processor="host"
+> > +if [ -z "$qemu_cpu" ]; then
+> > +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> > +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> > +		qemu_cpu="host"
+> >  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> > -			processor+=",aarch64=off"
+> > +			qemu_cpu+=",aarch64=off"
+> >  		fi
+> > +	elif [ "$ARCH" = "arm64" ]; then
+> > +		qemu_cpu="cortex-a57"
+> > +	else
+> > +		qemu_cpu="cortex-a15"
+> 
+> configure could set this in config.mak as DEFAULT_PROCESSOR, avoiding the
+> need to duplicate it here.
 
->=20
-> [1] https://patchwork.kernel.org/project/kvm/patch/20250213180317.3205285=
--6-coltonlewis@google.com/
-> > > available, e.g., kernel is landed in EL1.
-> >=20
-> > s/landed in/booted from/
-> >=20
-> > >
-> > > Signed-off-by: Jia He <justin.he@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/pmu.c | 7 +++++++
-> > >  1 file changed, 7 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c index
-> > > 7169c1a24dd6..e39c48d12b81 100644
-> > > --- a/arch/arm64/kvm/pmu.c
-> > > +++ b/arch/arm64/kvm/pmu.c
-> > > @@ -227,6 +227,13 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
-> >=20
-> > Huh:
-> >=20
-> > maz@valley-girl:~/hot-poop/arm-platforms$ git grep -l kvm_host_pmu_init
-> > arch/arm64/kvm/pmu-emul.c drivers/perf/arm_pmu.c
-> > include/linux/perf/arm_pmu.h
-> >=20
-> > Amusingly, arch/arm64/kvm/pmu.c is nowhere to be seen in this list.
-> > I have no idea what this patch applies to, but that's neither 6.13, the=
- current
-> > upstream, nor kvmarm/next.
-> Sorry for the mistake, the patch is based on Colton Lewis's series.
-> I=E2=80=99ll need to respin it if you're interested in the fix =F0=9F=98=
-=8A
+That was my first instinct too, having the default value in config.mak seemed
+like the correct solution.
 
-I'm interested in a patch if:
+But the problem with this is that the default -cpu type depends on -accel (set
+via unittests.cfg or as an environment variable), host and test architecture
+combination. All of these variables are known only at runtime.
 
-- the patch applies to an upstream or a kvmarm tag
-- the patch fixes *something* in the upstream code
-- the commit message accurately describes the problem
+Let's say we have DEFAULT_QEMU_CPU=cortex-a57 in config.mak. If we keep the
+above heuristic, arm/run will override it with host,aarch64=off. IMO, having it
+in config.mak, but arm/run using it only under certain conditions is worse than
+not having it at all. arm/run choosing the default value **all the time** is at
+least consistent.
 
-Otherwise, no, thank you.
+We could modify the help text for --qemu-cpu to say something like "If left
+unset, the $ARCH/run script will choose a best value based on the host system
+and test configuration."
 
-> > >  {
-> > >  	struct arm_pmu_entry *entry;
-> > >
-> > > +	/*
-> > > +	 * Prevent unintended behavior where KVM is not available or not
-> > > +	 * successfully initialised, e.g., kernel is landed in EL1.
-> >=20
-> > Same comment here.
-> >=20
-> > > +	 */
-> > > +	if (!is_kvm_arm_initialised())
-> >=20
-> > This is definitely the wrong thing to check for, as it relies on the pr=
-obe
-> > ordering between the PMU drivers and KVM. Relying on that is not
-> > acceptable.
-> >=20
-> Indeed, would is_hyp_mode_available() be a proper replacement for
-> is_kvm_arm_initialised() here?
+Thanks,
+Alex
 
-Looks more appropriate, at least for upstream.
-> Or should we add a prevention condition in host_data_ptr instead?
-
-I can't comment about a series that I haven't reviewed and that is not
-yet targeting upstream. But using host_data_ptr() from outside of KVM
-is plain wrong, as it falls into the same trap as above. Checking for
-random init flags is not going to help with that.
-
-Instead of posting random patches that make no sense for upstream, why
-don't you instead reply to Colton's series outlining your concerns and
-findings? It sounds to me like a more useful way to make progress.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+> 
+> >  	fi
+> >  fi
+> >  
+> > @@ -71,7 +76,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+> >  fi
+> >  
+> >  A="-accel $ACCEL$ACCEL_PROPS"
+> > -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> > +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+> >  command+=" -display none -serial stdio"
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> > diff --git a/riscv/run b/riscv/run
+> > index e2f5a922..02fcf0c0 100755
+> > --- a/riscv/run
+> > +++ b/riscv/run
+> > @@ -11,12 +11,12 @@ fi
+> >  
+> >  # Allow user overrides of some config.mak variables
+> >  mach=$MACHINE_OVERRIDE
+> > -processor=$PROCESSOR_OVERRIDE
+> > +qemu_cpu=$QEMU_CPU_OVERRIDE
+> >  firmware=$FIRMWARE_OVERRIDE
+> >  
+> > -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> > +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+> >  : "${mach:=virt}"
+> > -: "${processor:=$PROCESSOR}"
+> > +: "${qemu_cpu:=$QEMU_CPU}"
+> >  : "${firmware:=$FIRMWARE}"
+> >  [ "$firmware" ] && firmware="-bios $firmware"
+> >  
+> > @@ -32,7 +32,7 @@ fi
+> >  mach="-machine $mach"
+> >  
+> >  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> > -command+=" $mach $acc $firmware -cpu $processor "
+> > +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> >  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> > diff --git a/configure b/configure
+> > index 5306bad3..d25bd23e 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -52,6 +52,7 @@ page_size=
+> >  earlycon=
+> >  efi=
+> >  efi_direct=
+> > +qemu_cpu=
+> >  
+> >  # Enable -Werror by default for git repositories only (i.e. developer builds)
+> >  if [ -e "$srcdir"/.git ]; then
+> > @@ -69,6 +70,8 @@ usage() {
+> >  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+> >  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> >  	    --processor=PROCESSOR  processor to compile for ($processor)
+> > +	    --qemu-cpu=CPU         the CPU model to run on. The default depends on
+> > +	                           the configuration, usually it is "host" or "max".
+> >  	    --target=TARGET        target platform that the tests will be running on (qemu or
+> >  	                           kvmtool, default is qemu) (arm/arm64 only)
+> >  	    --cross-prefix=PREFIX  cross compiler prefix
+> > @@ -142,6 +145,9 @@ while [[ $optno -le $argc ]]; do
+> >          --processor)
+> >  	    processor="$arg"
+> >  	    ;;
+> > +	--qemu-cpu)
+> > +	    qemu_cpu="$arg"
+> > +	    ;;
+> >  	--target)
+> >  	    target="$arg"
+> >  	    ;;
+> > @@ -464,6 +470,7 @@ ARCH=$arch
+> >  ARCH_NAME=$arch_name
+> >  ARCH_LIBDIR=$arch_libdir
+> >  PROCESSOR=$processor
+> > +QEMU_CPU=$qemu_cpu
+> >  CC=$cc
+> >  CFLAGS=$cflags
+> >  LD=$cross_prefix$ld
+> > -- 
+> > 2.48.1
+> >
+> 
+> With the Alex's and Eric's requested changes to the help text,
+> 
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
