@@ -1,286 +1,141 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BA525E47B
-	for <kvmarm@lists.linux.dev>; Mon, 24 Mar 2025 14:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01E733062
+	for <kvmarm@lists.linux.dev>; Mon, 24 Mar 2025 15:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742828036; cv=none; b=EcEmDdvNP95hF6NB9tCCBQgJ01O2jjf5MXQCEw7HTbzmyEJcoyQdagTlPo3lt1nXpCmGsixgM0MRAw8tahKOW9yWciOiIRAmSAFhdWBLwOrhN2zMaQ1pSNfaHUqHSwKiDF8OZMqLId0R8CBbjBp8/BdEP72ThJvVhGiw49bgmm8=
+	t=1742831304; cv=none; b=Dkf4V4h84IATiV6Nwp5IJBBMsxV8SZg9q+QDqpky01nInEqj4UNteAagQ3suwigVjSnFj7tsklCcZfBpJvP8aLAwkDvFl2f/rGLktsRw6DN9gGWpg3KBAUCF0j/BM1WLouMwiA9GZoOzy7sWuzttqaQnS5phrR86AMo5xYYU++A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742828036; c=relaxed/simple;
-	bh=VXjWCYi/FucuhzSs5PTSDrkPnV147MkSBxHinUM3cYQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HIY4VOh4zXfO49HK0e5r9GkWqIPJBvEBQDKQJqI/QiG/y7jcbGlfyLkWltGAj3afmqxQeUFFjl38nBgLn9U50uIYfpCsUPxOXSbO3FgRqYC8/Ca1R8Sxw8REmrzH7Fu4n3PeZ3PVT+/fcz/tkqLpAfe7sZEqXLixprEPjlN7khI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qNE9D3yq; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1742831304; c=relaxed/simple;
+	bh=+wpFTG+SwBnhnvH78ViBaMrd4NWDi/4fRbVDO0SodlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g5abp/RYmrGcSd4vSJScSZL5ycNLHQwFe14rRjgiB3oKBNTXvaehD5zZVfzU37NbaaJ6DeN6SqpAf3XQVLlfyrh2+4fpGwMS88D2km6F7gfoC4VvpKGzW2+EfB1x+PIl8ApmUkdCS7p+NvPz3MrsHdWpmuy2Nkh8WuHPH/1WBV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WQmSpaIj; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qNE9D3yq"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cf848528aso37701065e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 24 Mar 2025 07:53:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WQmSpaIj"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43948021a45so38167905e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 24 Mar 2025 08:48:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742828031; x=1743432831; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UP3A7AzTUdDx2k3cc0G/GBxzIeo6h3cZdgbt8xy+hJE=;
-        b=qNE9D3yqB5pAezRrF6CefSYg7mnbGMN6xSj2JLTt6p1YyIjeW853WDCAGka5hGjIvh
-         0XktXCl+klFjJG+tKmxl9iZt00paCiUTK110scS9UpgQ+mSlPiqFevM/GqVlt+pkESmc
-         qvSXECb2fDhr5RrS4UPkry4dPWz+kslICjRA7dd7zhEbqFcP+1C/qOZOUc/96oIey69L
-         mapwGtrThS+rR/Ao6uYg3HWIHMKjfrmZIFbJ+3DkkE4TDY2kIYgObJlHXdsbN7ewAMmX
-         /2lt5SCnGAx8axny/1/XOU9DXf297n37YDDzcXE37GP+wGT8MFqUc0QegfMKFGvFIkAs
-         Spfw==
+        d=linaro.org; s=google; t=1742831301; x=1743436101; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LrMEg2SBRPufHHPsPTxdKBRIozyqsnf+0fw9wrne1Kw=;
+        b=WQmSpaIj8xhpanJupeyIotCa2lF3OodEP7zCgI2xjrNv3uoL1sCi2M/R2deKWDYNgS
+         BRletR9nD9lA8g8bBq4bWx6+6hIdXogLhHwak8+UbAW1UOjxT2gHG2D5pFmhTSM95Ik3
+         orP0mbgI0JWDfSwjwAmDqY99TKyGIAPbD1Ya9zjV3H3936IvZTynVkNtvHIanS0aVB8m
+         8IYLszjmYu8AL+wYTlG5usg3Vw5CXFhk+A6xqtN62EYIg5WeEWIz3tBD91LDL2q7KZWz
+         t1YQURbDu++kqANkC0rHdXn/1O5qTQoGSAhGhJ5EzqXlSRKaklqVLz9FgYau8vEhs3Rx
+         4pIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742828031; x=1743432831;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UP3A7AzTUdDx2k3cc0G/GBxzIeo6h3cZdgbt8xy+hJE=;
-        b=Yr+UyY7j1ZIbIorYSHlESf7FSylVsegiQaqbrzOB1VWmUyxruG1q2g7WIYt9fP8dwM
-         Q4qG1CXB73DJ/oNZhdG5FOy1Uem/jvDms0STklMb56nD+KGEC8iNzPPjR2aNxOq7os3n
-         Rd7Ny/L1ui7RD5mQ3uu/iBGnQ8+PHFVKGFqf+c3oUXCwDjoBiSW697jMATpmiTBSy/mR
-         wcjAIBpM/7Lx8QjGqUCiPf+I+XcmRhS+mtKfAZftVkKNBOACdK/owcxpe986NUApr7rY
-         JGrSxzwR4cDVITXi2YBnN53YXbYOx3SzO5ORUqXcZvgNiWMdNWqGyd9981/Bh2J/5gmY
-         wgyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPb37klyuIM9Sonaj+EErHjwMjM7trpu9Fe92JP0KWm0cr4l+35it7jIjh4xp+/TGy5yKadhk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwMeCbchI3N3c4zg+5TGJFJ/q83/ChARL+85Z/v4yZCXYIokLED
-	X1W0zHX8DF0/I3DKUVDzwslp/hoHrsMo13tHgr8ChyCygDlq71U1V439Sc1ljt4=
-X-Gm-Gg: ASbGncuaZsPIDZr+uqT4rHtnuPIrYYNizRn83yZgZal0RuJNXD6o/dZW0Z/sigCu54w
-	l3v4Nd5iM7PDVGkfYPvzxlNy2ASQWCNygLHBei09VF/e8szlsYX5QrxL4yJhGl7JeTFD/HFuqtk
-	V+ksl/cpImKirB3YN588l2Hba3c90Ebapo9tlt+TyrDfWEzfJyStg/gl5kuS7ptDw/jlzJtZ7jP
-	qPW+CwjOQzA1QBl1ybYT95oFEwmT9hUPjk92IoFczQMggYeL+vL22SJy/31O/9QhlOoa7rZIvtl
-	acTwKbWL3ncFbjWwbHb0qwcqQS30qGHza6bGmjd3Ol1gQfI1eFvIwQ==
-X-Google-Smtp-Source: AGHT+IERD/lwgktHe1Gj0uOoU3mqIfghEPMcgOZyKwvdtvQ2ECRJ6/LWjoGQZyKkvoSi7h0+Iw8HAg==
-X-Received: by 2002:a05:600c:4503:b0:43c:fa24:873e with SMTP id 5b1f17b1804b1-43d509f4fc0mr119622315e9.13.1742828031427;
-        Mon, 24 Mar 2025 07:53:51 -0700 (PDT)
-Received: from [192.168.1.247] ([145.224.90.136])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d4fd27980sm124839625e9.21.2025.03.24.07.53.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 07:53:51 -0700 (PDT)
-Message-ID: <d018f56a-15c3-4739-b8f4-aea863006765@linaro.org>
-Date: Mon, 24 Mar 2025 14:53:49 +0000
+        d=1e100.net; s=20230601; t=1742831301; x=1743436101;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LrMEg2SBRPufHHPsPTxdKBRIozyqsnf+0fw9wrne1Kw=;
+        b=Z97/i9tHcWH9CY1PMNuI1a77vobf5oSQk3BNeFzqGkka040/6O80ywPhhsxmhgqDMt
+         M4ZI11H4lpzThtiR5Bzw18MM1SBVSiMfaahY6Tz9yKhjqXLSPyuVkQ6oiasn49/CUUC4
+         2SzluvjZ97K1qSm/k6/t/2jkbY32YnAra5nUmd4g4TttSh5rYal5fS7cV2zA9xRWHcCN
+         UZVZueSkV5WJUNlBTcUmqwt1a3hfrhhFzkdg15ydf3GmEgJ2od0zYAJ6jTujIdyn2TT+
+         rtyDFB8GN5aKlt2pGmpXFK0HZhuMyb8LaFlDZ0sHRsJPTlVMH1q0zRhf3JCOPAQAP0t1
+         mlkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzKkaIVPEDtcjL6XFUsd5XNB9hD7D0A1lU2uS/nG3hVkcHF8fNJsJDQmk+Vtwv7qOsCDsWcrU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzFNwVtmh4IipJgIrr8dl9KXOV0NOjjCBv7lfqYelCT3oDNRJxJ
+	H0ZrZlP3p1CVwG7WOLEoJIRfy6UUd9gKdYzBSDkopOOKtHWToSs4TTiq7zA5VmY=
+X-Gm-Gg: ASbGncsIMo3TOCkULcjetNdhspU7LGxsuVFhrqfTpe7bXd3+gdOzR7Gq2USyFD8HhWo
+	2oZtV9Voxe6CdO2rkt0tAD4oFPdSTBPHjsYJdctBQHCloQ4c1r7CxyVRHUPpWyUxfhj/XbIMulS
+	FJsz8YVLGB06OqTXs3Z6IIVtUl9xjHhuYqe7F8VEc0Xn8q7jc8FoqI5vZxXg4DBgHOAWmyQInyA
+	btCLoIx5KfqEmyMGjZ/Zq6OF8/FRW7qZDoB7xEZl2mClj4M4HLTqpY7kqAasAngS/MaohQfb8rZ
+	DG3AroVFJUROVeld+6o7zRlycHunFiNpRbVVrVvVmcLSAoOfLNgEYQ==
+X-Google-Smtp-Source: AGHT+IF4HKRqDp7H68XcsGcdXR2R+pX/n70fM2CJTR1c8n9FwVMwhpldYszXcap+M+tGB315WPIqBA==
+X-Received: by 2002:a05:600c:19d4:b0:43c:fb95:c76f with SMTP id 5b1f17b1804b1-43d509e9eafmr116532925e9.9.1742831300985;
+        Mon, 24 Mar 2025 08:48:20 -0700 (PDT)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d4fd9e960sm123514055e9.29.2025.03.24.08.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 08:48:20 -0700 (PDT)
+Date: Mon, 24 Mar 2025 15:48:19 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: eric.auger@redhat.com
+Cc: andrew.jones@linux.dev, alexandru.elisei@arm.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/5] configure: arm64: Don't display
+ 'aarch64' as the default architecture
+Message-ID: <20250324154819.GA1844993@myrica>
+References: <20250314154904.3946484-2-jean-philippe@linaro.org>
+ <20250314154904.3946484-3-jean-philippe@linaro.org>
+ <1b0233dc-b303-4317-a65d-572cc3582b8a@redhat.com>
+ <fcb7894d-51e5-4376-b32f-4cb9eb94b573@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
- partition the PMU
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250213180317.3205285-1-coltonlewis@google.com>
- <20250213180317.3205285-6-coltonlewis@google.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <20250213180317.3205285-6-coltonlewis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcb7894d-51e5-4376-b32f-4cb9eb94b573@redhat.com>
 
-
-
-On 13/02/2025 6:03 pm, Colton Lewis wrote:
-> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
-> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
-> allowed, EL0 while counters HPMN..N are only accessible by EL2.
+On Mon, Mar 17, 2025 at 09:27:32AM +0100, Eric Auger wrote:
 > 
-> Introduce a module parameter in KVM to set this register. The name
-> reserved_host_counters reflects the intent to reserve some counters
-> for the host so the guest may eventually be allowed direct access to a
-> subset of PMU functionality for increased performance.
 > 
-> Track HPMN and whether the pmu is partitioned in struct arm_pmu
-> because both KVM and the PMUv3 driver will need to know that to handle
-> guests correctly.
+> On 3/17/25 9:19 AM, Eric Auger wrote:
+> > Hi Jean-Philippe,
+> > 
+> > 
+> > On 3/14/25 4:49 PM, Jean-Philippe Brucker wrote:
+> >> From: Alexandru Elisei <alexandru.elisei@arm.com>
+> >>
+> >> --arch=aarch64, intentional or not, has been supported since the initial
+> >> arm64 support, commit 39ac3f8494be ("arm64: initial drop"). However,
+> >> "aarch64" does not show up in the list of supported architectures, but
+> >> it's displayed as the default architecture if doing ./configure --help
+> >> on an arm64 machine.
+> >>
+> >> Keep everything consistent and make sure that the default value for
+> >> $arch is "arm64", but still allow --arch=aarch64, in case they are users
+> > there
+> >> that use this configuration for kvm-unit-tests.
+> >>
+> >> The help text for --arch changes from:
+> >>
+> >>    --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
+> >>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> >>
+> >> to:
+> >>
+> >>     --arch=ARCH            architecture to compile for (arm64). ARCH can be one of:
+> >>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> >>
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >> ---
+> >>  configure | 5 +++--
+> >>  1 file changed, 3 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/configure b/configure
+> >> index 06532a89..dc3413fc 100755
+> >> --- a/configure
+> >> +++ b/configure
+> >> @@ -15,8 +15,9 @@ objdump=objdump
+> >>  readelf=readelf
+> >>  ar=ar
+> >>  addr2line=addr2line
+> >> -arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+> >> -host=$arch
+> >> +host=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+> >> +arch=$host
+> >> +[ "$arch" = "aarch64" ] && arch="arm64"
+> > Looks the same it done again below
 > 
-> Due to the difficulty this feature would create for the driver running
-> at EL1 on the host, partitioning is only allowed in VHE mode. Working
-> on nVHE mode would require a hypercall for every register access
-> because the counters reserved for the host by HPMN are now only
-> accessible to EL2.
+> Ignore this. This is done again after explicit arch setting :-/ Need
+> another coffee
 > 
-> The parameter is only configurable at boot time. Making the parameter
-> configurable on a running system is dangerous due to the difficulty of
-> knowing for sure no counters are in use anywhere so it is safe to
-> reporgram HPMN.
-> 
+> So looks good to me
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Hi Colton,
+Thanks for the review!
 
-For some high level feedback for the RFC, it probably makes sense to 
-include the other half of the feature at the same time. I think there is 
-a risk that it requires something slightly different than what's here 
-and there ends up being some churn.
-
-Other than that I think it looks ok apart from some minor code review nits.
-
-I was also thinking about how BRBE interacts with this. Alex has done 
-some analysis that finds that it's difficult to use BRBE in guests with 
-virtualized counters due to the fact that BRBE freezes on any counter 
-overflow, rather than just guest ones. That leaves the guest with branch 
-blackout windows in the delay between a host counter overflowing and the 
-interrupt being taken and BRBE being restarted.
-
-But with HPMN, BRBE does allow freeze on overflow of only one partition 
-or the other (or both, but I don't think we'd want that) e.g.:
-
-  RNXCWF: If EL2 is implemented, a BRBE freeze event occurs when all of
-  the following are true:
-
-  * BRBCR_EL1.FZP is 1.
-  * Generation of Branch records is not paused.
-  * PMOVSCLR_EL0[(MDCR_EL2.HPMN-1):0] is nonzero.
-  * The PE is in a BRBE Non-prohibited region.
-
-Unfortunately that means we could only let guests use BRBE with a 
-partitioned PMU, which would massively reduce flexibility if hosts have 
-to lose counters just so the guest can use BRBE.
-
-I don't know if this is a stupid idea, but instead of having a fixed 
-number for the partition, wouldn't it be nice if we could trap and 
-increment HPMN on the first guest use of a counter, then decrement it on 
-guest exit depending on what's still in use? The host would always 
-assign its counters from the top down, and guests go bottom up if they 
-want PMU passthrough. Maybe it's too complicated or won't work for 
-various reasons, but because of BRBE the counter partitioning changes go 
-from an optimization to almost a necessity.
-
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->   arch/arm64/include/asm/kvm_pmu.h |  4 +++
->   arch/arm64/kvm/Makefile          |  2 +-
->   arch/arm64/kvm/debug.c           |  9 ++++--
->   arch/arm64/kvm/pmu-part.c        | 47 ++++++++++++++++++++++++++++++++
->   arch/arm64/kvm/pmu.c             |  2 ++
->   include/linux/perf/arm_pmu.h     |  2 ++
->   6 files changed, 62 insertions(+), 4 deletions(-)
->   create mode 100644 arch/arm64/kvm/pmu-part.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
-> index 613cddbdbdd8..174b7f376d95 100644
-> --- a/arch/arm64/include/asm/kvm_pmu.h
-> +++ b/arch/arm64/include/asm/kvm_pmu.h
-> @@ -22,6 +22,10 @@ bool kvm_set_pmuserenr(u64 val);
->   void kvm_vcpu_pmu_resync_el0(void);
->   void kvm_host_pmu_init(struct arm_pmu *pmu);
->   
-> +u8 kvm_pmu_get_reserved_counters(void);
-> +u8 kvm_pmu_hpmn(u8 nr_counters);
-> +void kvm_pmu_partition(struct arm_pmu *pmu);
-> +
->   #else
->   
->   static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 3cf7adb2b503..065a6b804c84 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -25,7 +25,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->   	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
->   	 vgic/vgic-its.o vgic/vgic-debug.o
->   
-> -kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> +kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu-part.o pmu.o
->   kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->   kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
->   
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 7fb1d9e7180f..b5ac5a213877 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -31,15 +31,18 @@
->    */
->   static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->   {
-> +	u8 counters = *host_data_ptr(nr_event_counters);
-> +	u8 hpmn = kvm_pmu_hpmn(counters);
-> +
->   	preempt_disable();
->   
-
-Would you not need to use vcpu->cpu here to access host_data? The 
-preempt_disable() after the access seems suspicious. I think you'll end 
-up with the same issue as here:
-
-https://lore.kernel.org/kvmarm/5edb7c69-f548-4651-8b63-1643c5b13dac@linaro.org/
-
->   	/*
->   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
->   	 * to disable guest access to the profiling and trace buffers
->   	 */
-> -	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> -					 *host_data_ptr(nr_event_counters));
-> -	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
-> +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, hpmn);
-> +	vcpu->arch.mdcr_el2 |= (MDCR_EL2_HPMD |
-> +				MDCR_EL2_TPM |
->   				MDCR_EL2_TPMS |
->   				MDCR_EL2_TTRF |
->   				MDCR_EL2_TPMCR |
-> diff --git a/arch/arm64/kvm/pmu-part.c b/arch/arm64/kvm/pmu-part.c
-> new file mode 100644
-> index 000000000000..e74fecc67e37
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pmu-part.c
-> @@ -0,0 +1,47 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2025 Google LLC
-> + * Author: Colton Lewis <coltonlewis@google.com>
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <linux/perf/arm_pmu.h>
-> +
-> +#include <asm/kvm_pmu.h>
-> +
-> +static u8 reserved_host_counters __read_mostly;
-> +
-> +module_param(reserved_host_counters, byte, 0);
-> +MODULE_PARM_DESC(reserved_host_counters,
-> +		 "Partition the PMU into host and guest counters");
-> +
-> +u8 kvm_pmu_get_reserved_counters(void)
-> +{
-> +	return reserved_host_counters;
-> +}
-> +
-> +u8 kvm_pmu_hpmn(u8 nr_counters)
-> +{
-> +	if (reserved_host_counters >= nr_counters) {
-> +		if (this_cpu_has_cap(ARM64_HAS_HPMN0))
-> +			return 0;
-> +
-> +		return 1;
-> +	}
-> +
-> +	return nr_counters - reserved_host_counters;
-> +}
-> +
-> +void kvm_pmu_partition(struct arm_pmu *pmu)
-> +{
-> +	u8 nr_counters = *host_data_ptr(nr_event_counters);
-> +	u8 hpmn = kvm_pmu_hpmn(nr_counters);
-> +
-> +	if (hpmn < nr_counters) {
-> +		pmu->hpmn = hpmn;
-> +		pmu->partitioned = true;
-
-Looks like Rob's point about pmu->partitioned being duplicate data 
-stands again. On the previous version you mentioned that saving it was 
-to avoid reading PMCR.N, but now it's not based on PMCR.N anymore.
-
-Thanks
-James
-
+Jean
