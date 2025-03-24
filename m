@@ -1,76 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973DF14F98
-	for <kvmarm@lists.linux.dev>; Mon, 24 Mar 2025 02:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B210F18FDA5
+	for <kvmarm@lists.linux.dev>; Mon, 24 Mar 2025 08:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742783742; cv=none; b=V+YYXdirmooHpOQse8jYSjr5jfT3qGFXmvPetrUqIy0f0ANCWkvSPnVXPXJ3ATd6Rp2Jrh4B2mz4/TSRN4rGpN9QbZWnkhryTsRRaeG2GS3wgkxmuHivyJdD66MD/ESykmVedJGQLQ3oGwOgxUkKLcv52HknFkk1cPqzS5EAGcc=
+	t=1742804385; cv=none; b=leEfAXHl6Yh8MaOKFZS7Iz3zzO/JsUry/FHfIa6HmPKh/HVl5W4jybi11fUSfQxJzmRdxa6Pva+7gN2tdHudBvk6yjOK+fCoLh8LQOD7AT6l3EzIUeKQnKKPcrfMn++IBo5IWob4GiL76vs+jwT4ww8rww7q+dXc+YoxrbQRyHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742783742; c=relaxed/simple;
-	bh=WXP6pAWdo0VZuP3UbIqZt/JoWchYvGMkSjCSQIDez5I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dM8RMThVMt6qQbZmSTH1JCCOF+nlGCvNNofHJjfkFgeQqj8iHhmSeX7LnS2D2XGSets5ND9atqCN6QzmFoYGqunFE14H35oDU3qgV4u/jdMrmxF3bOJJsUlxwCNpFm/MuVCxfL83EsYs3FaGdo5w1VsZCgvVbs/yigwEQN6cuoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 175B5106F;
-	Sun, 23 Mar 2025 19:35:45 -0700 (PDT)
-Received: from entos-yitian-01.. (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9AB443F63F;
-	Sun, 23 Mar 2025 19:35:34 -0700 (PDT)
-From: Jia He <justin.he@arm.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Jia He <justin.he@arm.com>
-Subject: [PATCH v2] KVM: arm64: Skip the KVM pmu initialization when hyp is unavailable
-Date: Mon, 24 Mar 2025 02:34:50 +0000
-Message-Id: <20250324023450.109312-1-justin.he@arm.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742804385; c=relaxed/simple;
+	bh=HpC2xZP6pHOQg4gFKaI13BrMJ2BTkRXT+0OmjqNcfyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LfFBH07BCCr37JIdVmhvn6oCoudcj/Wt0q8F9Fz6jfKERax/t21r0DKe9P1/p2mTEPjxp0qRkEQ/IskUZW7kHKJ4uIq/EQrRxSjND6XktWkXc5sTyIAmfu5fkcOLa4O2ua8v5abC5GfowHxY7X8cu8GiMpB+nQk02Cx1CYODDVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ahUaKnIr; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ahUaKnIr"
+Date: Mon, 24 Mar 2025 09:19:27 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742804371;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nT01jyxPvL4ghruc69ok3n46Axe+IpSGm70ZkWQJRI=;
+	b=ahUaKnIrSBCACk4IdyabSmxr/6vgjA5fyJuHRCIrOS/aVRhrf/Z6vuFiwWaQgPFaaMzNnS
+	w0DJsBqj0pJ6a8PjUN5c86WdRA+19FNRqeh7CLwbO623X7su18G8g9fU3jsJbnBCf6JRQg
+	/9jvvbsrvd279KUaiZ4OVIbV6r76tbg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] configure: Add --qemu-cpu option
+Message-ID: <20250324-5d22d8ad79a9db37b1cf6961@orel>
+References: <20250314154904.3946484-2-jean-philippe@linaro.org>
+ <20250314154904.3946484-6-jean-philippe@linaro.org>
+ <20250322-91a8125ad8651b24246e5799@orel>
+ <Z9_tg6WhKvIJtBai@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9_tg6WhKvIJtBai@raptor>
+X-Migadu-Flow: FLOW_OUT
 
-When Hyp mode is unavailable (e.g., the kernel boots from EL1), skip the
-unnecessary KVM pmu initialization.
+On Sun, Mar 23, 2025 at 11:16:19AM +0000, Alexandru Elisei wrote:
+...
+> > > +if [ -z "$qemu_cpu" ]; then
+> > > +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> > > +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> > > +		qemu_cpu="host"
+> > >  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> > > -			processor+=",aarch64=off"
+> > > +			qemu_cpu+=",aarch64=off"
+> > >  		fi
+> > > +	elif [ "$ARCH" = "arm64" ]; then
+> > > +		qemu_cpu="cortex-a57"
+> > > +	else
+> > > +		qemu_cpu="cortex-a15"
+> > 
+> > configure could set this in config.mak as DEFAULT_PROCESSOR, avoiding the
+> > need to duplicate it here.
+> 
+> That was my first instinct too, having the default value in config.mak seemed
+> like the correct solution.
+> 
+> But the problem with this is that the default -cpu type depends on -accel (set
+> via unittests.cfg or as an environment variable), host and test architecture
+> combination. All of these variables are known only at runtime.
+> 
+> Let's say we have DEFAULT_QEMU_CPU=cortex-a57 in config.mak. If we keep the
+> above heuristic, arm/run will override it with host,aarch64=off. IMO, having it
+> in config.mak, but arm/run using it only under certain conditions is worse than
+> not having it at all. arm/run choosing the default value **all the time** is at
+> least consistent.
 
-Signed-off-by: Jia He <justin.he@arm.com>
----
-v2: 
- - Utilize is_hyp_mode_available() for improved accuracy when detecting the
- guest VM case, as it accounts for scenarios where the kernel boots from EL1.
+I think having 'DEFAULT' in the name implies that it will only be used if
+there's nothing better, and we don't require everything in config.mak to
+be used (there's even some s390x-specific stuff in there for all
+architectures...)
 
- arch/arm64/kvm/pmu-emul.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> 
+> We could modify the help text for --qemu-cpu to say something like "If left
+> unset, the $ARCH/run script will choose a best value based on the host system
+> and test configuration."
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 6c5950b9ceac..81b1a84ee1b3 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -779,6 +779,13 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
- {
- 	struct arm_pmu_entry *entry;
- 
-+	/*
-+	 * When Hyp mode is unavailable (e.g., the kernel boots from EL1),
-+	 * skip the unnecessary KVM PMU initialization.
-+	 */
-+	if (!is_hyp_mode_available())
-+		return;
-+
- 	/*
- 	 * Check the sanitised PMU version for the system, as KVM does not
- 	 * support implementations where PMUv3 exists on a subset of CPUs.
--- 
-2.34.1
+This is helpful, so we should add it regardless.
 
+Thanks,
+drew
