@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230701411DE;
-	Mon, 24 Mar 2025 18:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25E01411DE;
+	Mon, 24 Mar 2025 18:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742842681; cv=none; b=YbF3C5NgxhGqqxQ3ARffU2jmqSQXLhyugU30CG38zY5zJ8P5dnnH0IHjIbt/L+jt/p7SRY0cjY//p7JKXF/VhfcA7V6SL3Sduded13I6RqGMWEfVVTgK7APb55V7cbOYG5z+9uIxIejZXA7zbVYaGbM2ATRP7BgNOqfHi0k1A1I=
+	t=1742842683; cv=none; b=V7mxBYSRveC/+H90/QZzcgJdSbTTHfU1q9cKlxndvgXOH+YzMY9MPRYc6V8p1zECpzwOUoUMMDuFR31xec/gDM+OKn15choHwMfq1LFoXNb4O4WhLPDZCJl+tbDzRV4ILfR3MGiNU9zekTfF/vTyq2ToLzfTcmSZDW4go8maKfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742842681; c=relaxed/simple;
-	bh=DiDI0t61kQ5d2i3/Dv2H8mlPbbC9BCq2otde2lyn/94=;
+	s=arc-20240116; t=1742842683; c=relaxed/simple;
+	bh=tLQ+haxE5GxwlSp7z12bIBLekRbhsvHW1ehp19Wg1PA=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=p6Grx+BzVGceP6EcG+DosysxhmLXvy6DHtZj5exVsoRa93LzLfiXT42PKtAoYMViqwZEsJ7V2imjlwbHX7Y1dCIIhjglxJotu17EYFdWMC3ONbKUoCXNMIivsHf+QePWZFR6/9ksskNsySQtaXqnDG+eR5f2T0a47pA3G2gXj6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=C+3mzS1u; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=GZIyZ8gK27XpsT8CnVDINyjqdE9OsHm6zXD4rBw1n1+biMD4HrBrbcvyajMT8340nCqDQj0pXa+LHBwVcrxxFioLV6PGkxJU0gygYr4JbgnWtudGr8l5SNHCzJkrOAH/mTQ1AJrAA/HnxIZDx+JFRabSqIE+3C8RX9xj67wuhL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=i4n9GvWP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="C+3mzS1u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A586C4CEDD;
-	Mon, 24 Mar 2025 18:58:00 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i4n9GvWP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 382A0C4CEDD;
+	Mon, 24 Mar 2025 18:58:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742842680;
-	bh=DiDI0t61kQ5d2i3/Dv2H8mlPbbC9BCq2otde2lyn/94=;
+	s=korg; t=1742842682;
+	bh=tLQ+haxE5GxwlSp7z12bIBLekRbhsvHW1ehp19Wg1PA=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=C+3mzS1uVnm8BJt063+MT0/uh89Nhfk9ZBV3Iq/YXojcE+xesvEmcQlAUBXKiMpoN
-	 3dojjTOFqhN9BBLGTKDuSeb11DV3asyQzF0bBfUkuEt9JZSC5fT/h4eT2b3Ik1110/
-	 oVECFwXPNOXNDs1GndZjEVUp/VUU6k6vd4SREVI4=
-Subject: Patch "KVM: arm64: Mark some header functions as inline" has been added to the 6.13-stable tree
+	b=i4n9GvWP2qbywCX8MCSjseav+AWgSIO5rww4Shq/sqbmoYJX17MzcoeesVeirmew8
+	 9w1nKCrcvqtHqsRVrovZnF6YzRpVMhSTqEAiXpL7q2nVGENDXJ0tmO4Cpdp8PVQ0X2
+	 qZOUqbS1IRsEGDKOet+lyrvseStDtfeA+ZXlBFRA=
+Subject: Patch "KVM: arm64: Refactor exit handlers" has been added to the 6.13-stable tree
 To: broonie@kernel.org,catalin.marinas@arm.com,gregkh@linuxfoundation.org,joey.gouly@arm.com,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oliver.upton@linux.dev,suzuki.poulose@arm.com,tabba@google.com,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
 Date: Mon, 24 Mar 2025 11:56:28 -0700
-In-Reply-To: <20250321-stable-sve-6-13-v2-7-3150e3370c40@kernel.org>
-Message-ID: <2025032428-lubricate-antics-55bb@gregkh>
+In-Reply-To: <20250321-stable-sve-6-13-v2-6-3150e3370c40@kernel.org>
+Message-ID: <2025032428-uncivil-amplify-e3cb@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,60 +44,52 @@ X-Patchwork-Hint: ignore
 
 This is a note to let you know that I've just added the patch titled
 
-    KVM: arm64: Mark some header functions as inline
+    KVM: arm64: Refactor exit handlers
 
 to the 6.13-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
-     kvm-arm64-mark-some-header-functions-as-inline.patch
+     kvm-arm64-refactor-exit-handlers.patch
 and it can be found in the queue-6.13 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
-From stable+bounces-125704-greg=kroah.com@vger.kernel.org Thu Mar 20 17:12:25 2025
+From stable+bounces-125703-greg=kroah.com@vger.kernel.org Thu Mar 20 17:12:07 2025
 From: Mark Brown <broonie@kernel.org>
-Date: Fri, 21 Mar 2025 00:10:16 +0000
-Subject: KVM: arm64: Mark some header functions as inline
+Date: Fri, 21 Mar 2025 00:10:15 +0000
+Subject: KVM: arm64: Refactor exit handlers
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,  Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,  Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,  linux-kernel@vger.kernel.org, stable@vger.kernel.org,  Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>,  Fuad Tabba <tabba@google.com>
-Message-ID: <20250321-stable-sve-6-13-v2-7-3150e3370c40@kernel.org>
+Message-ID: <20250321-stable-sve-6-13-v2-6-3150e3370c40@kernel.org>
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-[ Upstream commit f9dd00de1e53a47763dfad601635d18542c3836d ]
+[ Upstream commit 9b66195063c5a145843547b1d692bd189be85287 ]
 
-The shared hyp switch header has a number of static functions which
-might not be used by all files that include the header, and when unused
-they will provoke compiler warnings, e.g.
+The hyp exit handling logic is largely shared between VHE and nVHE/hVHE,
+with common logic in arch/arm64/kvm/hyp/include/hyp/switch.h. The code
+in the header depends on function definitions provided by
+arch/arm64/kvm/hyp/vhe/switch.c and arch/arm64/kvm/hyp/nvhe/switch.c
+when they include the header.
+
+This is an unusual header dependency, and prevents the use of
+arch/arm64/kvm/hyp/include/hyp/switch.h in other files as this would
+result in compiler warnings regarding missing definitions, e.g.
 
 | In file included from arch/arm64/kvm/hyp/nvhe/hyp-main.c:8:
-| ./arch/arm64/kvm/hyp/include/hyp/switch.h:703:13: warning: 'kvm_hyp_handle_dabt_low' defined but not used [-Wunused-function]
-|   703 | static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
-|       |             ^~~~~~~~~~~~~~~~~~~~~~~
-| ./arch/arm64/kvm/hyp/include/hyp/switch.h:682:13: warning: 'kvm_hyp_handle_cp15_32' defined but not used [-Wunused-function]
-|   682 | static bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
-|       |             ^~~~~~~~~~~~~~~~~~~~~~
-| ./arch/arm64/kvm/hyp/include/hyp/switch.h:662:13: warning: 'kvm_hyp_handle_sysreg' defined but not used [-Wunused-function]
-|   662 | static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
-|       |             ^~~~~~~~~~~~~~~~~~~~~
-| ./arch/arm64/kvm/hyp/include/hyp/switch.h:458:13: warning: 'kvm_hyp_handle_fpsimd' defined but not used [-Wunused-function]
-|   458 | static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
-|       |             ^~~~~~~~~~~~~~~~~~~~~
-| ./arch/arm64/kvm/hyp/include/hyp/switch.h:329:13: warning: 'kvm_hyp_handle_mops' defined but not used [-Wunused-function]
-|   329 | static bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
-|       |             ^~~~~~~~~~~~~~~~~~~
+| ./arch/arm64/kvm/hyp/include/hyp/switch.h:733:31: warning: 'kvm_get_exit_handler_array' used but never defined
+|   733 | static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu);
+|       |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+| ./arch/arm64/kvm/hyp/include/hyp/switch.h:735:13: warning: 'early_exit_filter' used but never defined
+|   735 | static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code);
+|       |             ^~~~~~~~~~~~~~~~~
 
-Mark these functions as 'inline' to suppress this warning. This
-shouldn't result in any functional change.
-
-At the same time, avoid the use of __alias() in the header and alias
-kvm_hyp_handle_iabt_low() and kvm_hyp_handle_watchpt_low() to
-kvm_hyp_handle_memory_fault() using CPP, matching the style in the rest
-of the kernel. For consistency, kvm_hyp_handle_memory_fault() is also
-marked as 'inline'.
+Refactor the logic such that the header doesn't depend on anything from
+the C files. There should be no functional change as a result of this
+patch.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Reviewed-by: Mark Brown <broonie@kernel.org>
@@ -108,77 +100,149 @@ Cc: Fuad Tabba <tabba@google.com>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Link: https://lore.kernel.org/r/20250210195226.1215254-8-mark.rutland@arm.com
+Link: https://lore.kernel.org/r/20250210195226.1215254-7-mark.rutland@arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h |   19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   30 ++++++------------------------
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   28 ++++++++++++++++------------
+ arch/arm64/kvm/hyp/vhe/switch.c         |    9 ++++-----
+ 3 files changed, 26 insertions(+), 41 deletions(-)
 
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -326,7 +326,7 @@ static inline bool __populate_fault_info
- 	return __get_fault_info(vcpu->arch.fault.esr_el2, &vcpu->arch.fault);
- }
+@@ -666,23 +666,16 @@ static bool kvm_hyp_handle_dabt_low(stru
  
--static bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	arm64_mops_reset_regs(vcpu_gp_regs(vcpu), vcpu->arch.fault.esr_el2);
-@@ -404,7 +404,7 @@ static void kvm_hyp_save_fpsimd_host(str
-  * If FP/SIMD is not implemented, handle the trap and inject an undefined
-  * instruction exception to the guest. Similarly for trapped SVE accesses.
+ typedef bool (*exit_handler_fn)(struct kvm_vcpu *, u64 *);
+ 
+-static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu);
+-
+-static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code);
+-
+ /*
+  * Allow the hypervisor to handle the exit with an exit handler if it has one.
+  *
+  * Returns true if the hypervisor handled the exit, and control should go back
+  * to the guest, or false if it hasn't.
   */
--static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+-static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
++				       const exit_handler_fn *handlers)
  {
- 	bool sve_guest;
- 	u8 esr_ec;
-@@ -595,7 +595,7 @@ static bool handle_ampere1_tcr(struct kv
- 	return true;
+-	const exit_handler_fn *handlers = kvm_get_exit_handler_array(vcpu);
+-	exit_handler_fn fn;
+-
+-	fn = handlers[kvm_vcpu_trap_get_class(vcpu)];
+-
++	exit_handler_fn fn = handlers[kvm_vcpu_trap_get_class(vcpu)];
+ 	if (fn)
+ 		return fn(vcpu, exit_code);
+ 
+@@ -712,20 +705,9 @@ static inline void synchronize_vcpu_psta
+  * the guest, false when we should restore the host state and return to the
+  * main run loop.
+  */
+-static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool __fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
++				      const exit_handler_fn *handlers)
+ {
+-	/*
+-	 * Save PSTATE early so that we can evaluate the vcpu mode
+-	 * early on.
+-	 */
+-	synchronize_vcpu_pstate(vcpu, exit_code);
+-
+-	/*
+-	 * Check whether we want to repaint the state one way or
+-	 * another.
+-	 */
+-	early_exit_filter(vcpu, exit_code);
+-
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+ 
+@@ -755,7 +737,7 @@ static inline bool fixup_guest_exit(stru
+ 		goto exit;
+ 
+ 	/* Check if there's an exit handler and allow it to handle the exit. */
+-	if (kvm_hyp_handle_exit(vcpu, exit_code))
++	if (kvm_hyp_handle_exit(vcpu, exit_code, handlers))
+ 		goto guest;
+ exit:
+ 	/* Return to the host kernel and handle the exit */
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -224,19 +224,21 @@ static const exit_handler_fn *kvm_get_ex
+ 	return hyp_exit_handlers;
  }
  
--static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+-/*
+- * Some guests (e.g., protected VMs) are not be allowed to run in AArch32.
+- * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
+- * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
+- * hypervisor spots a guest in such a state ensure it is handled, and don't
+- * trust the host to spot or fix it.  The check below is based on the one in
+- * kvm_arch_vcpu_ioctl_run().
+- *
+- * Returns false if the guest ran in AArch32 when it shouldn't have, and
+- * thus should exit to the host, or true if a the guest run loop can continue.
+- */
+-static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
- 	    handle_tx2_tvm(vcpu))
-@@ -615,7 +615,7 @@ static bool kvm_hyp_handle_sysreg(struct
- 	return false;
++	const exit_handler_fn *handlers = kvm_get_exit_handler_array(vcpu);
++
++	synchronize_vcpu_pstate(vcpu, exit_code);
++
++	/*
++	 * Some guests (e.g., protected VMs) are not be allowed to run in
++	 * AArch32.  The ARMv8 architecture does not give the hypervisor a
++	 * mechanism to prevent a guest from dropping to AArch32 EL0 if
++	 * implemented by the CPU. If the hypervisor spots a guest in such a
++	 * state ensure it is handled, and don't trust the host to spot or fix
++	 * it.  The check below is based on the one in
++	 * kvm_arch_vcpu_ioctl_run().
++	 */
+ 	if (unlikely(vcpu_is_protected(vcpu) && vcpu_mode_is_32bit(vcpu))) {
+ 		/*
+ 		 * As we have caught the guest red-handed, decide that it isn't
+@@ -249,6 +251,8 @@ static void early_exit_filter(struct kvm
+ 		*exit_code &= BIT(ARM_EXIT_WITH_SERROR_BIT);
+ 		*exit_code |= ARM_EXCEPTION_IL;
+ 	}
++
++	return __fixup_guest_exit(vcpu, exit_code, handlers);
  }
  
--static bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
+ /* Switch to the guest for legacy non-VHE systems */
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -423,13 +423,10 @@ static const exit_handler_fn hyp_exit_ha
+ 	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
+ };
+ 
+-static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
- 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
- 	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
-@@ -624,19 +624,18 @@ static bool kvm_hyp_handle_cp15_32(struc
- 	return false;
+-	return hyp_exit_handlers;
+-}
++	synchronize_vcpu_pstate(vcpu, exit_code);
+ 
+-static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+-{
+ 	/*
+ 	 * If we were in HYP context on entry, adjust the PSTATE view
+ 	 * so that the usual helpers work correctly.
+@@ -449,6 +446,8 @@ static void early_exit_filter(struct kvm
+ 		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
+ 		*vcpu_cpsr(vcpu) |= mode;
+ 	}
++
++	return __fixup_guest_exit(vcpu, exit_code, hyp_exit_handlers);
  }
  
--static bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
-+					       u64 *exit_code)
- {
- 	if (!__populate_fault_info(vcpu))
- 		return true;
- 
- 	return false;
- }
--static bool kvm_hyp_handle_iabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
--	__alias(kvm_hyp_handle_memory_fault);
--static bool kvm_hyp_handle_watchpt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
--	__alias(kvm_hyp_handle_memory_fault);
-+#define kvm_hyp_handle_iabt_low		kvm_hyp_handle_memory_fault
-+#define kvm_hyp_handle_watchpt_low	kvm_hyp_handle_memory_fault
- 
--static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	if (kvm_hyp_handle_memory_fault(vcpu, exit_code))
- 		return true;
+ /* Switch to the guest for VHE systems running in EL2 */
 
 
 Patches currently in stable-queue which might be from broonie@kernel.org are
