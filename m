@@ -1,60 +1,62 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9D518CBFB
-	for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 16:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB41819D891
+	for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 16:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742918873; cv=none; b=WKksSxkVa/f+DctTL7tUeH2K8hyFDkVJy9iQ3AGuQNqbWdVEyWtWi+Qdj4p35zxFOwjVKoqaCZCoj9I9l5KzE9BdIIkin7vBxWl6Wp4P1s87PeF3hA4Ygiu2WBMWKGzmAobZw3Kz+CQ+buQ2/wmGWdNI7MBB1rlQMdtsXGJsAuo=
+	t=1742918875; cv=none; b=lY/aoWSRAEK+p25locgx9pY6f0peDeUX9dKFle6Uah4NaUfU+N2vCwYHQMPfHSV9Hv82KAi1AbxMvkkBTmCT58Q3uHV44aACgFhz6cvqhhHkxilwQiKmQXgB008uSaEHr8dvo8P7+IdSQE4sMis6yHi4VRnTPmnqTVBHJmN+uyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742918873; c=relaxed/simple;
-	bh=NbA+n7cBicvkCk21uXZmI/fvdlcThsInEqcdoWNUAtc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hcdeYqmBemaOP+lCGwWZLzhtqinV2rvLEcLmKTLSciMcf9arA+qvNrxRIeL5F1MpwHpAb+oBlbDaz/N00K5XAU/fPDfVw26RnUMahYLvjO+VkvY9mhhOStUBXozEz5fuJxHZLhvFflY0AdTAYAAXdQ9jWvvBl8EZlh1y0FJVsSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=I+SNqhoV; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1742918875; c=relaxed/simple;
+	bh=DjE5lydHNpWSKlp2OS+ArgpAXc20b7JX+EYn2yeg0Pc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dugAEbspg1XpXYCreZ+eXaOZkKn9cWcTd+SGJ35WWiXHap8/PgHHAqTINolXEtIV5PeQ2TthfparrMsKU+7moWaF9C5fjdcknGIwPXh2ayJC9JVuE8dH18BPqT9HUddurPlh2C+I2ZR/NpXluv3OkMq41JcvAnvvRS3/81TA2Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NAhmv4Zk; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I+SNqhoV"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-39143200ddaso3379227f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 09:07:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NAhmv4Zk"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso41065245e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 09:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742918870; x=1743523670; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yQTSPvF1hw0TOBoPMd31WqVvKG9w/U98Z3g9Yg4clUE=;
-        b=I+SNqhoVKUWoaQpDAVDfICBrYoDdYiH0i/LqdLf9jokz+7OHsldJ9RrSr9TrkpRc3u
-         ldHUQHr1VqN7SUlRE08kae/iRRImwG9X0epuMcS/AE/kKEjkGYWltKVI5LzoDziiEnW7
-         0IReMOirBjsTC33sHyNZLDB2wiv3YJs0VdrFNShh9g9lWlW/EMCYeWId1+kL94PA3dET
-         J8EIM2ztWde5OxLaj6aVwgEcGr3hKPYysI4wzB5h3rBgSTtPr+GG30azq6ktdoFNNvey
-         o0GZ5b05Fsns7XIiUoKOCWGUl9Pojmi3Z/uy5NRgd2VhkqIknbr+YxhFvjCC46E5wUbh
-         WvAw==
+        d=linaro.org; s=google; t=1742918871; x=1743523671; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vR6Kj/v7QUx4Q9A4sOPDY+B+4TbUf4f4gjMITODv1GI=;
+        b=NAhmv4ZkRVP3QpZBXd2+CO66pONA3Evgkq5A0NOa8xyaDb2kHBOjZxwNWnAdrhVvQH
+         ckZGAOg5RVUcN18dn4lkNri8ZDLWq114g/glLd4dKc+o9gXO2H0kkjkJ0HZpz0/D5RZG
+         W66EwI/NRa/HeB/qcGRMLnsBawm+OCpCRtwRV/RJz8S0A33AOxmJmC2PQJHJOPHhn6u8
+         RzMpf7RWhyhqdlQpG1HkRWTp7ImqogYgbMH68u1zfFEn4tcEH+FRaJxFuHQcimmogJbL
+         LMaufqmspYgOWNBbm5Acs6+CkB5JIFOfiSCHChHt+rVosS9O9wori8YoteXA7kM1WknI
+         piHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742918870; x=1743523670;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yQTSPvF1hw0TOBoPMd31WqVvKG9w/U98Z3g9Yg4clUE=;
-        b=GqRN39F1goiiNwbeLp27tZZLnCypmdgLcDPy37WdqnBjmfIiYm/GTK6S1z6l/nCqBt
-         vxWXWshGA+LWSganKHJBieDQ+zQMb5ZvKitOF++W6mb3Anx1QuXLQ73FcojobJIb9PwR
-         E7G/Qv38RwYjHFdyq/Oqef0ixVMXlREOEoNlGpIprCMXSuGbpJcVBsmxsGYCuGOOilBh
-         h/fcDkQXIt75H8fv6WpiwC9axhVl28kp+y4QJZEw7Dfw0nuFHWlxUmKGP88qxTBBBlDF
-         5fzieRwXHXs3fgo0p5oIF/ka0JtOulVoeGttxTI4+JKz2MG47VDmO7Ecy6VbFGh4mRDL
-         +fXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSzGbTXKaVzy2PyYE+3kSOxyphhm64dNtMvepy147O3TNPRfdpVF3I790fAiArT+qXdK3GlFU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzrhnT7aecN0500xyPtQ/Eh6t3lsyCO7EslNKAfJLi+MXLrn3p1
-	RUbmonSWju4W2wE+bvBY+iVMoelFelDWnXvizctsRJbhof/AX4fo+LNWrvcLX4o=
-X-Gm-Gg: ASbGncvDJs7LE0GWKdTEPvHeT6qMBedPImG/i04qaWez6o0S2717cUaGR7tcGVSuBEW
-	JHEoXcnwVJALJM5hqfWXrpjBbwd2QlvFvs/yJBcZkLfWvMDFQUlSfV8dGmRli+inad2GUE/wBm6
-	yqWqEuAk/F+pdluP83tRCgzn/LE8IFiRUbhNJg5SWw19oEFMbRflRV2RfxvaUzjmvTnlipchyTb
-	a+u2VKkryDphiP+airtvQPIIZek8jh5akfpnCu1RSoCmcvIgCFwNv+Zb5KKKYUPUJA2XCedJsfG
-	PFXbY1UEd6GUB/HppwP4Pjh1ba5zGiFT0MVtv93ljRbeyfZguexSOaVcBmtY54M=
-X-Google-Smtp-Source: AGHT+IHOT5jOCGHfjXZiwn0hAT2YJ2NpVHcZDDE7JLfDT/x7D7gnwHssedDwTGk0WlzARWAy46l2EQ==
-X-Received: by 2002:a05:6000:184b:b0:390:d796:b946 with SMTP id ffacd0b85a97d-3997f932d65mr17628426f8f.44.1742918869724;
-        Tue, 25 Mar 2025 09:07:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742918871; x=1743523671;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vR6Kj/v7QUx4Q9A4sOPDY+B+4TbUf4f4gjMITODv1GI=;
+        b=xKlWj259gupJNZBQ4BBg7MoBhEIz2SGTfBqtaHhXFuhqM1gKMQ44RpMqITI702Z7gg
+         MLGQYI4zYa7su23VLSZ4ykpUjHHrFOG/LUlarU0bxT8pn+MAJAw0HuzlYGXczbMU11Q2
+         Xf0Gk53n2f16TzJ8qGZOgx11DIaQoNt0s/MrtmaHfFWMuya2xCIXNcsYBeOUvvIpTvkf
+         uvlP5V0LVEYRzGoydqWnHPnZQ33XQxmNuFkctLq4JforEpk7nD5y1TAmwrtx7tTCU3bv
+         6rWvozUCtXGpac5PCK9b6GSl3/GiE5Hd5TwQTlLWuyd5D5o/cuJlltkN5o3OGqv43ioD
+         rJUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUs2Dr3+R0ll7dNwbuWMHFGhyksXYHAoHLXwkc3GvAf1zxc7ar09aaNFcJZ8NgJOpyZiGYWPGI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxAa+kjoQv9I+6BIJl1FEVGz02eId7utWALwvGK4Y/FrXYucbmt
+	69r31xi60ijXcnMJxw4EzhGa9AinuQYGo8UB8sk2O3fkR/u10bpJqEesEGaC6pI=
+X-Gm-Gg: ASbGncu9de0Ujsi0rR4YhwKWHZwmBCQDW/7ifCwnkKI0YSJ7VsadJKV02rCjnqrsjbX
+	npyqLze/teP6HiWEetd70Y6BXRZJIHY4TEXumC6VmxcPmhk6k3Q/epWc97Ox8sPusEmQUXBiyVi
+	ne9IIg82P56kxd6HgsHq+b08n5G0pMcJeABzXyJwe6Tky7m6CFuQlVrTS/hs0bmIFid1UE7lG3N
+	5ambxmOMb0y6R/Q6M0tTqQpSRajhe9nMvLS1H6CgfxzvSj8qWOwjSr4meDRIh4sjnb8Ir7+W/52
+	OXp3sZTQIWj/g+hp/Hd4lUzNfQMrGetw0cpsQ3+CZPK7avx90h+YjzOxN5mONZI=
+X-Google-Smtp-Source: AGHT+IFcVqxqtEj63q0t7fchOfzrlKAVFuDwmZJ4n8qfIqVbAeEYL3vXur/5eNhzGwJap/Peq1YHNA==
+X-Received: by 2002:a05:600c:1e07:b0:43c:f61e:6ea8 with SMTP id 5b1f17b1804b1-43d509e3b14mr173288785e9.2.1742918871445;
+        Tue, 25 Mar 2025 09:07:51 -0700 (PDT)
 Received: from localhost.localdomain ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f43cbasm203972195e9.9.2025.03.25.09.07.49
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f43cbasm203972195e9.9.2025.03.25.09.07.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 09:07:49 -0700 (PDT)
+        Tue, 25 Mar 2025 09:07:51 -0700 (PDT)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: andrew.jones@linux.dev,
 	alexandru.elisei@arm.com
@@ -64,10 +66,12 @@ Cc: eric.auger@redhat.com,
 	kvm-riscv@lists.infradead.org,
 	vladimir.murzin@arm.com,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [kvm-unit-tests PATCH v3 0/5] arm64: Change the default QEMU CPU type to "max"
-Date: Tue, 25 Mar 2025 16:00:28 +0000
-Message-ID: <20250325160031.2390504-3-jean-philippe@linaro.org>
+Subject: [kvm-unit-tests PATCH v3 3/5] arm64: Implement the ./configure --processor option
+Date: Tue, 25 Mar 2025 16:00:31 +0000
+Message-ID: <20250325160031.2390504-6-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250325160031.2390504-3-jean-philippe@linaro.org>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,33 +80,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v3 of the series that cleans up the configure flags and sets the
-default CPU type to "max" on arm64, in order to test the latest Arm
-features.
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Since v2 [1] I moved the CPU selection to ./configure, and improved the
-help text. Unfortunately I couldn't keep most of the Review tags since
-there were small changes all over.
+The help text for the ./configure --processor option says:
 
-[1] https://lore.kernel.org/all/20250314154904.3946484-2-jean-philippe@linaro.org/
+    --processor=PROCESSOR  processor to compile for (cortex-a57)
 
-Alexandru Elisei (3):
-  configure: arm64: Don't display 'aarch64' as the default architecture
-  configure: arm/arm64: Display the correct default processor
-  arm64: Implement the ./configure --processor option
+but, unlike arm, the build system does not pass a -mcpu argument to the
+compiler. Fix it, and bring arm64 at parity with arm.
 
-Jean-Philippe Brucker (2):
-  configure: Add --qemu-cpu option
-  arm64: Use -cpu max as the default for TCG
+Note that this introduces a regression, which is also present on arm: if
+the --processor argument is something that the compiler doesn't understand,
+but qemu does (like 'max'), then compilation fails. This will be fixed in a
+following patch; another fix is to specify a CPU model that gcc implements
+by using --cflags=-mcpu=<cpu>.
 
- scripts/mkstandalone.sh |  3 ++-
- arm/run                 | 15 ++++++-----
- riscv/run               |  8 +++---
- configure               | 55 +++++++++++++++++++++++++++++++++++------
- arm/Makefile.arm        |  1 -
- arm/Makefile.common     |  1 +
- 6 files changed, 63 insertions(+), 20 deletions(-)
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+---
+ arm/Makefile.arm    | 1 -
+ arm/Makefile.common | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index 7fd39f3a..d6250b7f 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -12,7 +12,6 @@ $(error Cannot build arm32 tests as EFI apps)
+ endif
+ 
+ CFLAGS += $(machine)
+-CFLAGS += -mcpu=$(PROCESSOR)
+ CFLAGS += -mno-unaligned-access
+ 
+ ifeq ($(TARGET),qemu)
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index f828dbe0..a5d97bcf 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -25,6 +25,7 @@ AUXFLAGS ?= 0x0
+ # stack.o relies on frame pointers.
+ KEEP_FRAME_POINTER := y
+ 
++CFLAGS += -mcpu=$(PROCESSOR)
+ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+ CFLAGS += -O2
 -- 
 2.49.0
 
