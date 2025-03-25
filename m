@@ -1,63 +1,62 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CD318CBFB
-	for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 16:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C9B25A348
+	for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 16:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742918875; cv=none; b=FSkhHS09sZJ5p28JxpbdgiRlHpajpTM9zg+dAGcKoaWeKNTimtp0qVs/XohXoF3BQ+hVBDVseq+DX+1QzGqrQYgX1vRiYL1Epht5vXluLp7NY9fMQPTCqd3C9Za6txTVqMxlOHD9GwI4uBji825/jQ1vXXwakVCgXsMdoheBJwE=
+	t=1742918877; cv=none; b=IPJ7YwcP3QYY/nkIVZZDSq3/L//Z+cWcs5D7JAWTn7rZ7mdj+MxXXjljD4XVoMiyE/plCduhXs2k9WZTOTFp8Mhz381LPnYDhjfvHudHWw0f1KavNvFTLxMKG4cJC2H4YD/iA/1BNxi+gG/YOhKQKtYYtDkRbm0gtazOpPKR57o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742918875; c=relaxed/simple;
-	bh=deGWWrRabN2BUuESzK6sCMhIniOcxImAkRg9Tz3X9gk=;
+	s=arc-20240116; t=1742918877; c=relaxed/simple;
+	bh=pCZd7GShmFREJQXP8FWM/PwyLDPr3IHAugWyScPUO4s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pU7MzrzrcF6Rt3E8+EAqJ+6SRKPkqS4g8eGjSipDYYorVT+ykZu2c49S4pdmYmRabBeF8MAqWPR7fLgYfw6nk9HGcYWJ8Tq98e9GjDLh5qrFcIFAG/2lzS407yEY/GcypQ9i1/DL/tcsfI9vYF4ecKZo14cGgfRAGtLlrznlYpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Xtm6NHos; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=d/fzO6ZqOdlJwfZnDNek9PI+/OzKlovLP0o/oe7RavRFOfEd1/aVyIPFqM5mEz2CJsoWyv5f15+l0XkHXCNwOS/n0eJxLG8UwYtPnYjvZzLJcQl2rdG/zOcznJS0bcZX3EMapq4FIWboi0CiOI/9Ja8n4TUfgsZKv8pNDfiyO2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Lprdkhis; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xtm6NHos"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf680d351so40766825e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 09:07:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lprdkhis"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3913d45a148so4720817f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 09:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742918872; x=1743523672; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1742918873; x=1743523673; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6v4oWjxs3w2OXtl8okLU3CaHVHPFgAaN27M8fJJ3JPw=;
-        b=Xtm6NHoszIMlGUcPfjmaTrZw0qVMl8lKXOVHFUooiQnPK7YoAHfw47iEl16Tny2YqE
-         oHAnZdrpUJNg98duh2cV3G1CwfDsyFy+guw9LDRUybmoWygmyny/FSkeLp3PEXYzAS60
-         ImkeDypfYDCUFmDIt7vefgfs2Yd4iB4lyRswe44/sj5dY1379PRL63dHwij/JMECQeeL
-         i5q9luHxWnGK1W3sAbQgndyNatB9LyjTURkXtgvTSa4RZg8t1upHN4jBnbUc+tz+YaK8
-         UUe8mDYnLXYxStT+jlzTSCnhYBoFJsjM40+44RnObSrzgD60w7+oMbgIN+R6YHYyAN2V
-         ATmw==
+        bh=Rb9ebUJ9N7Jt+0/wSlKeZDJqEG8Zo62aWudcvmr0rRI=;
+        b=LprdkhiswfHHZPOQYiwBILL0Hm4auUi9dx+d9K3X0Q8tDbHmZY/79HOA+YBhHQ2yC1
+         Pf7yIOzyvxaYBDwKPXcZ1o/+KOlLUK3fI1XnKx719CgyM5sIwrzb+dfTcnEI2GsbVYgU
+         QuomdHJoh6oJsxS4bUwaET+ESkkNXgQUJ/avPZehx3ZUVE1meHnXWwNz+WnL8vQZbMMK
+         vf6Y2BsdN+mIJWIB0eZs60+edQdmbVY48WLkuDo0IaB9tnXUuXXAi4flbjcKle636ZtT
+         zsGByPKPs6ipILScEeE07qHFJoXqCdD/ZpUrLCitdIOmWmesRk7MkpxkK6xwdCC0oYCG
+         v2sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742918872; x=1743523672;
+        d=1e100.net; s=20230601; t=1742918873; x=1743523673;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6v4oWjxs3w2OXtl8okLU3CaHVHPFgAaN27M8fJJ3JPw=;
-        b=NC9+CgHUlYKVjrHAaehVZV4Uk1OX66US7Hx97FYgOzKIN/JLAxSu8ebpDvE6p56uaN
-         H4UU2W18Aoxg3O4rxjMuVgTfu3h5QhTERIxVi3hK0AtGiZLDn03Tnpc83rgjlSUdDLT/
-         KiKUGjGLPAGBH6xMvx5NmNuL4H+hsqJWaKNg916vsdah2iLtAG2QM2ZSWiHnKEKnwS7d
-         7Qg0gC13cNtlUBeIXiAZ0sqB5a/rWooZj0XCWrKxhH8TL8UjhXOxgEP7bMHO0TKXFCKl
-         LVZ3VGgs/F5khwZM0DTQDjpJrq789Y2VmMPBtj3Q5YRknFHMmKb5n5RWoPXDJO4AC2lM
-         GFCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUr5zWJ3QUhU6c2shX0/x8ldomdCugyEl+rq+nA+hBYR/fwY3wESx5o0EbZdkDGdQwB/qo95Xg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyJ+1r6v/WZ0FnJE4SsTaxNaYalYxGBollM+bn/kMM/0Q1vUFrm
-	S+Rub9Ww09KCwtOmDF4hF1XuvcY+9UuA9Qp8tZP8mf5DVxH/t0pgRvzO8PFgkaU=
-X-Gm-Gg: ASbGncv6TU3fl55ukvhFcLcrmnJx+5roEzxDbeI/JYKwRMRMdh4Nge1ixU/ApFyL4Bu
-	41D+K6SWWMv8hVp/jFsPdOkDQE7D5zG8MXSs9QXJhkYM7aQU8b+HpUZBg5VULquOG7U/w2JKQ9G
-	aeMTp6LZr4qsGOOO7gEPTYDpt9SXxf/ci9yh72cBW5f39bzQED3wuHIJHNWtngk/RI/+37Be+tH
-	2uj8Ugz/jPU/K/PpW8vy69xcvKqqSH7h/78AchH57KdAZx211CMHGk6IBzUeMA1SUN2i3Hmo1dQ
-	zQ0KUN/KxR4Jo5OpmTiuIxG9xxdEfTgvTimI5e9eASfSwvIRZ5zMQnC3SvDKB3Ap57g8MHrYIQ=
-	=
-X-Google-Smtp-Source: AGHT+IHMqhvbDDmS/MsUebAwQrnmnrLCj1L6a/nkr+ekAH/NHss4lv/QGFSzm78I2k54eI/LtzmFrw==
-X-Received: by 2002:a05:600c:1d01:b0:439:8878:5029 with SMTP id 5b1f17b1804b1-43d77547ecbmr3550045e9.2.1742918871939;
-        Tue, 25 Mar 2025 09:07:51 -0700 (PDT)
+        bh=Rb9ebUJ9N7Jt+0/wSlKeZDJqEG8Zo62aWudcvmr0rRI=;
+        b=wmXp0kp97Geu8zXI9UuT/0lkEzxm4P8u10k2bKhNcGOLjj6+IkzVMO5wpj1Fch/R3C
+         buDeCcDyxXmU70ISQhGc8JJ6SsMzA+4Q1xx9SF1Uh46xAb6G57iB9BLsUuHECa6qzcSF
+         saCGgP650Jv9v+ymM/UxzHZST5CW+5gIDsCSYG66AuMmURSBQeYjxTy9YHu4TxC6etVK
+         BumVdPpZzkuycTWJDETjoai/+D5KoI4JdTEzfoPuuV2IH+K14UrzKkYp/wuXiuPVEKTX
+         JWdoGfE/j1R4f8VPU6NlMiBz28FaWRpuD+6yMPOsqJ24e1StB7tFJcd/6svQPLiWqN6B
+         bTPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWxrfew5XFWwG4jcLGO+cEoaGE84NeO70Kj4ioqfF67eWhpKLgvhBH30ZEVsMrOMh0qznDeXpQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxwRKZ3jrBZGx61NR0ckr+jhw5AeIWC45I9yyxZ3WiLVWxaiJDM
+	dv37igGu3mSeCMwNVO+jZgjYNlS9urnEMZlbNhAyuC2HxoZMvROA++HOfheO8Aw=
+X-Gm-Gg: ASbGncs98+ClzYeF5e88Y9RNaBbg4O8uOFpcnkxfvsiqGBsSt6YQU98OEVMsYdWCGmY
+	5U5mfNJZPprp+7sgQNeCV5qSC2VL40KeSFJX8X5/iLmfE03jhPTE5WHzGCviElszCt7lmCkaoLI
+	O0jk58Qa61h/oP5Z6MUqZkyB6DK16iSxUrlJ3DWsBl0ZLG6Tdzq39NvHk72AREELNPrqMO2qMcq
+	PIQFTEM06U77YzjK95BSWedr6kp4dSH0phANn9fnc9I4wGZDzNY70ZNOZdTOP48nc1cHIb9W6fD
+	k50smzPiFnW87skvzPwj1QI/hbb8ZvINRie9+WWRMQasvG4fj0UtuE22PkcoO9Y=
+X-Google-Smtp-Source: AGHT+IFI/7tTmUNqF1LFsp9CSF0jzd2wofLTJjRMMtVmsGu6/uq/OnH6WnDOGAESyJFHG7RUegV3gg==
+X-Received: by 2002:a05:6000:2d83:b0:39a:c9ed:8657 with SMTP id ffacd0b85a97d-39ac9ed8663mr1542229f8f.17.1742918870911;
+        Tue, 25 Mar 2025 09:07:50 -0700 (PDT)
 Received: from localhost.localdomain ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f43cbasm203972195e9.9.2025.03.25.09.07.51
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f43cbasm203972195e9.9.2025.03.25.09.07.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 09:07:51 -0700 (PDT)
+        Tue, 25 Mar 2025 09:07:50 -0700 (PDT)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: andrew.jones@linux.dev,
 	alexandru.elisei@arm.com
@@ -67,9 +66,9 @@ Cc: eric.auger@redhat.com,
 	kvm-riscv@lists.infradead.org,
 	vladimir.murzin@arm.com,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
-Date: Tue, 25 Mar 2025 16:00:32 +0000
-Message-ID: <20250325160031.2390504-7-jean-philippe@linaro.org>
+Subject: [kvm-unit-tests PATCH v3 2/5] configure: arm/arm64: Display the correct default processor
+Date: Tue, 25 Mar 2025 16:00:30 +0000
+Message-ID: <20250325160031.2390504-5-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250325160031.2390504-3-jean-philippe@linaro.org>
 References: <20250325160031.2390504-3-jean-philippe@linaro.org>
@@ -81,122 +80,29 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the --qemu-cpu option to let users set the CPU type to run on.
-At the moment --processor allows to set both GCC -mcpu flag and QEMU
--cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
-the TCG features by default, and it could also be nice to let users
-modify the CPU capabilities by setting extra -cpu options.  Since GCC
--mcpu doesn't accept "max" or "host", separate the compiler and QEMU
-arguments.
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-`--processor` is now exclusively for compiler options, as indicated by
-its documentation ("processor to compile for"). So use $QEMU_CPU on
-RISC-V as well.
+The help text for the --processor option displays the architecture name as
+the default processor type. But the default for arm is cortex-a15, and for
+arm64 is cortex-a57. Teach configure to display the correct default
+processor type for these two architectures.
 
-Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- scripts/mkstandalone.sh |  3 ++-
- arm/run                 | 15 +++++++++------
- riscv/run               |  8 ++++----
- configure               | 24 ++++++++++++++++++++++++
- 4 files changed, 39 insertions(+), 11 deletions(-)
+ configure | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-index 2318a85f..9b4f983d 100755
---- a/scripts/mkstandalone.sh
-+++ b/scripts/mkstandalone.sh
-@@ -42,7 +42,8 @@ generate_test ()
- 
- 	config_export ARCH
- 	config_export ARCH_NAME
--	config_export PROCESSOR
-+	config_export QEMU_CPU
-+	config_export DEFAULT_QEMU_CPU
- 
- 	echo "echo BUILD_HEAD=$(cat build-head)"
- 
-diff --git a/arm/run b/arm/run
-index efdd44ce..4675398f 100755
---- a/arm/run
-+++ b/arm/run
-@@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
- 	source config.mak
- 	source scripts/arch-run.bash
- fi
--processor="$PROCESSOR"
-+qemu_cpu="$QEMU_CPU"
- 
- if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
-    [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
-@@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
- 	fi
- fi
- 
--if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
--	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
--		processor="host"
-+if [ -z "$qemu_cpu" ]; then
-+	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
-+	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
-+		qemu_cpu="host"
- 		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
--			processor+=",aarch64=off"
-+			qemu_cpu+=",aarch64=off"
- 		fi
-+	else
-+		qemu_cpu="$DEFAULT_QEMU_CPU"
- 	fi
- fi
- 
-@@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
- fi
- 
- A="-accel $ACCEL$ACCEL_PROPS"
--command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
-+command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
- command+=" -display none -serial stdio"
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
-diff --git a/riscv/run b/riscv/run
-index e2f5a922..02fcf0c0 100755
---- a/riscv/run
-+++ b/riscv/run
-@@ -11,12 +11,12 @@ fi
- 
- # Allow user overrides of some config.mak variables
- mach=$MACHINE_OVERRIDE
--processor=$PROCESSOR_OVERRIDE
-+qemu_cpu=$QEMU_CPU_OVERRIDE
- firmware=$FIRMWARE_OVERRIDE
- 
--[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
-+[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
- : "${mach:=virt}"
--: "${processor:=$PROCESSOR}"
-+: "${qemu_cpu:=$QEMU_CPU}"
- : "${firmware:=$FIRMWARE}"
- [ "$firmware" ] && firmware="-bios $firmware"
- 
-@@ -32,7 +32,7 @@ fi
- mach="-machine $mach"
- 
- command="$qemu -nodefaults -nographic -serial mon:stdio"
--command+=" $mach $acc $firmware -cpu $processor "
-+command+=" $mach $acc $firmware -cpu $qemu_cpu "
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
- if [ "$UEFI_SHELL_RUN" = "y" ]; then
 diff --git a/configure b/configure
-index b4875ef3..b79145a5 100755
+index 010c68ff..b4875ef3 100755
 --- a/configure
 +++ b/configure
-@@ -23,6 +23,21 @@ function get_default_processor()
-     esac
- }
+@@ -5,6 +5,24 @@ if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ] ; then
+     exit 1
+ fi
  
-+# Return the default CPU type to run on
-+function get_default_qemu_cpu()
++# Return the default CPU type to compile for
++function get_default_processor()
 +{
 +    local arch="$1"
 +
@@ -207,49 +113,47 @@ index b4875ef3..b79145a5 100755
 +    "arm64")
 +        echo "cortex-a57"
 +        ;;
++    *)
++        echo "$arch"
++        ;;
 +    esac
 +}
 +
  srcdir=$(cd "$(dirname "$0")"; pwd)
  prefix=/usr/local
  cc=gcc
-@@ -52,6 +67,7 @@ earlycon=
- console=
- efi=
- efi_direct=
-+qemu_cpu=
+@@ -44,13 +62,14 @@ fi
  
- # Enable -Werror by default for git repositories only (i.e. developer builds)
- if [ -e "$srcdir"/.git ]; then
-@@ -70,6 +86,9 @@ usage() {
+ usage() {
+     [ "$arch" = "aarch64" ] && arch="arm64"
++    [ -z "$processor" ] && processor=$(get_default_processor $arch)
+     cat <<-EOF
+ 	Usage: $0 [options]
+ 
+ 	Options include:
  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
- 	    --processor=PROCESSOR  processor to compile for ($processor)
-+	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
-+	                           selects the best value based on the host system and the
-+	                           test configuration.
+-	    --processor=PROCESSOR  processor to compile for ($arch)
++	    --processor=PROCESSOR  processor to compile for ($processor)
  	    --target=TARGET        target platform that the tests will be running on (qemu or
  	                           kvmtool, default is qemu) (arm/arm64 only)
  	    --cross-prefix=PREFIX  cross compiler prefix
-@@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
-         --processor)
- 	    processor="$arg"
- 	    ;;
-+	--qemu-cpu)
-+	    qemu_cpu="$arg"
-+	    ;;
- 	--target)
- 	    target="$arg"
- 	    ;;
-@@ -471,6 +493,8 @@ ARCH=$arch
- ARCH_NAME=$arch_name
- ARCH_LIBDIR=$arch_libdir
- PROCESSOR=$processor
-+QEMU_CPU=$qemu_cpu
-+DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
- CC=$cc
- CFLAGS=$cflags
- LD=$cross_prefix$ld
+@@ -326,13 +345,8 @@ if [ "$earlycon" ]; then
+     fi
+ fi
+ 
+-[ -z "$processor" ] && processor="$arch"
+-
+-if [ "$processor" = "arm64" ]; then
+-    processor="cortex-a57"
+-elif [ "$processor" = "arm" ]; then
+-    processor="cortex-a15"
+-fi
++# $arch will have changed when cross-compiling.
++[ -z "$processor" ] && processor=$(get_default_processor $arch)
+ 
+ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+     testdir=x86
 -- 
 2.49.0
 
