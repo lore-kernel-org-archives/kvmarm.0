@@ -1,32 +1,32 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2121926A08B
-	for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 21:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DFF26A093
+	for <kvmarm@lists.linux.dev>; Tue, 25 Mar 2025 21:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742938806; cv=none; b=Fge+n7MhIvg1tqvRp4CSXG2fC/4lm1hK4rTnxXiHDraSHiT3YOYXzOyiSFDseL1kZtceUmd9a+fnz9G2Qj6o8U0i0ctNlcEKGldwwY/8MgzJPoJw5Tf2I5eu56mNlFUqdbDAcC+ezPTNAHC3WkraAs2zWv4Ik0Q2gieDUEpGGJw=
+	t=1742938810; cv=none; b=uum+6tlpYoPdDxmFPE3whwIdzHmXflAHgYi9mbKeZj4mQbtMEq6HkPF5hvoLLWkAl8FroaQzLKj29zhIRVtCsTT5tXgYsyBk72qK8Fuq/sCoZruW36DjCBPnX169NmSKzqddGGAoefAGxtYynBa4EYnHUAb0v8poda5FPaURvMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742938806; c=relaxed/simple;
-	bh=iQgGYAz+QPP5HbflwSDAvegeWKIlJ4QeMpJW4l9lAGo=;
+	s=arc-20240116; t=1742938810; c=relaxed/simple;
+	bh=ptYRt89sgou4FpaEtUAOMprqib9DDbfe6Q/dbNifWHs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hOPkVp2MD8kmU65Mn8pP4S9JeVl3lw+L2LNP6zFgepVYw67elUizNTzbWyFot4QkBQEFf7g/dDcBVGMzRL2KwKe23v+h1ZRGb7llR3qPQybQMUwQ+hW+uWniofXNnTn8xbP6C5W2pYbS/WOCfs75D1UIhDTE9DTdBFolZJaWOBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TOz65J7e; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=DYBPp39ewODcdaus5Qdd9pULalrXhnLY5YLhnlE4V0PzAlCz3b8qjmMSIYC9P4y8RaEDAOfoFNBMB6tq7Wy7UGB1z4o9dRbtJCT11XsPBVlrTHZwaead/LS0DOqA1Mgny3REgNHyrheMu2Lf5IlaAEHOXmf10JmMtLxr95F9T6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EprJpRog; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TOz65J7e"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EprJpRog"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742938803;
+	t=1742938805;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WnVnLC+BrbTLwQ/rBq8l+CNs17j9rpKS2l4jwwS5bH4=;
-	b=TOz65J7eMMK/K34No8HlsBClhdnf0vJTlCQ9+5UATrr9TSnmptGuFQNHjhJYGuZdWUZ3I3
-	TGkAQ27J0yuVNjMCcVhkwreMfWAnCHf6TnDaAR7cieoWaj681JKnFTHToQTZGY7ElvsS/1
-	0UqSgIrOV6I49dRniEsjh0S2IEGfgkg=
+	bh=xOvg56wudx30L0mZ1KHo5OKQo6JZQ2J4gWt09byKS9Y=;
+	b=EprJpRogyPfdiRVOZrInUodVdDdN+OCvMPf+aa5HBLPlSUpG75jh+71kQCs+e8UjDJcSO1
+	mQwYnQ2DLDiGKTyW8rL9Qf94FKElGe+2nG+XQEYdUwDttWDHv+IMaK3p8kXx8DVvuBWuOR
+	aoUE20HKYB+alrmiDT1Q/CG7mgtonFc=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: kvm@vger.kernel.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Andre Przywara <andre.przywara@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool 6/9] arm64: Move remaining kvm/* headers
-Date: Tue, 25 Mar 2025 14:39:36 -0700
-Message-Id: <20250325213939.2414498-7-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool 7/9] arm64: Move asm headers
+Date: Tue, 25 Mar 2025 14:39:37 -0700
+Message-Id: <20250325213939.2414498-8-oliver.upton@linux.dev>
 In-Reply-To: <20250325213939.2414498-1-oliver.upton@linux.dev>
 References: <20250325213939.2414498-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -50,39 +50,54 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Move the remaining kvm/* headers into the top-level ARM include path.
-
 Acked-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arm/aarch64/include/kvm/fdt-arch.h         | 6 ------
- arm/{aarch64 => }/include/kvm/barrier.h    | 0
- arm/include/{arm-common => kvm}/fdt-arch.h | 0
- 3 files changed, 6 deletions(-)
- delete mode 100644 arm/aarch64/include/kvm/fdt-arch.h
- rename arm/{aarch64 => }/include/kvm/barrier.h (100%)
- rename arm/include/{arm-common => kvm}/fdt-arch.h (100%)
+ Makefile                                    | 1 -
+ arm/{aarch64 => }/include/asm/image.h       | 0
+ arm/{aarch64 => }/include/asm/kernel.h      | 0
+ arm/{aarch64 => }/include/asm/kvm.h         | 0
+ arm/{aarch64 => }/include/asm/pmu.h         | 0
+ arm/{aarch64 => }/include/asm/sve_context.h | 0
+ 6 files changed, 1 deletion(-)
+ rename arm/{aarch64 => }/include/asm/image.h (100%)
+ rename arm/{aarch64 => }/include/asm/kernel.h (100%)
+ rename arm/{aarch64 => }/include/asm/kvm.h (100%)
+ rename arm/{aarch64 => }/include/asm/pmu.h (100%)
+ rename arm/{aarch64 => }/include/asm/sve_context.h (100%)
 
-diff --git a/arm/aarch64/include/kvm/fdt-arch.h b/arm/aarch64/include/kvm/fdt-arch.h
-deleted file mode 100644
-index e448bf1..0000000
---- a/arm/aarch64/include/kvm/fdt-arch.h
-+++ /dev/null
-@@ -1,6 +0,0 @@
--#ifndef KVM__KVM_FDT_H
--#define KVM__KVM_FDT_H
--
--#include "arm-common/fdt-arch.h"
--
--#endif /* KVM__KVM_FDT_H */
-diff --git a/arm/aarch64/include/kvm/barrier.h b/arm/include/kvm/barrier.h
+diff --git a/Makefile b/Makefile
+index 25ee9b0..3085609 100644
+--- a/Makefile
++++ b/Makefile
+@@ -182,7 +182,6 @@ ifeq ($(ARCH), arm64)
+ 	OBJS		+= arm/pvtime.o
+ 	OBJS		+= arm/pmu.o
+ 	ARCH_INCLUDE	:= arm/include
+-	ARCH_INCLUDE	+= -Iarm/aarch64/include
+ 
+ 	ARCH_WANT_LIBFDT := y
+ 	ARCH_HAS_FLASH_MEM := y
+diff --git a/arm/aarch64/include/asm/image.h b/arm/include/asm/image.h
 similarity index 100%
-rename from arm/aarch64/include/kvm/barrier.h
-rename to arm/include/kvm/barrier.h
-diff --git a/arm/include/arm-common/fdt-arch.h b/arm/include/kvm/fdt-arch.h
+rename from arm/aarch64/include/asm/image.h
+rename to arm/include/asm/image.h
+diff --git a/arm/aarch64/include/asm/kernel.h b/arm/include/asm/kernel.h
 similarity index 100%
-rename from arm/include/arm-common/fdt-arch.h
-rename to arm/include/kvm/fdt-arch.h
+rename from arm/aarch64/include/asm/kernel.h
+rename to arm/include/asm/kernel.h
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/include/asm/kvm.h
+similarity index 100%
+rename from arm/aarch64/include/asm/kvm.h
+rename to arm/include/asm/kvm.h
+diff --git a/arm/aarch64/include/asm/pmu.h b/arm/include/asm/pmu.h
+similarity index 100%
+rename from arm/aarch64/include/asm/pmu.h
+rename to arm/include/asm/pmu.h
+diff --git a/arm/aarch64/include/asm/sve_context.h b/arm/include/asm/sve_context.h
+similarity index 100%
+rename from arm/aarch64/include/asm/sve_context.h
+rename to arm/include/asm/sve_context.h
 -- 
 2.39.5
 
