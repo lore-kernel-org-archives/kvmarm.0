@@ -1,82 +1,48 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA1017F7
-	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 18:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4049E137930
+	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 20:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743015158; cv=none; b=KwYZJOnQJgOcG4n/0WfESLbFfCfebrwOO1nGna/uYnNs9k6ykWuXG8K0lpjoiVW3jNtT7K6XEPSH7B2CPYkNRAdCcYStFbMn3Ea33Gw8K9MLXIT+v3Dr2Ur7c8i53+sorMlELWGjjvRXpfN058ki4a0ahIwhtX9jMP5sCsjD+Rk=
+	t=1743021627; cv=none; b=SZXQJVBd7xGyIMdgLCQwV6vg8Rb9MbCnvRCIcVBUypyYePHnXJIvqT34OUI+BTI8ApIrbQaiOg7fVLW0SJDJkp0fhmVDM32NezcBBgaM9+Eyrk+VVyaqjd5L4+nEsFiWKVDCjm+SQxrs07u+o4+y/t8ERMnujkqtRZAfhrBr0qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743015158; c=relaxed/simple;
-	bh=6vdE1VjUaN/BE8xlzoNrjB/cYjmamc20i+gok4Z6EBU=;
+	s=arc-20240116; t=1743021627; c=relaxed/simple;
+	bh=vsDzlSImn7SIlQBYWw98T4RqAX3WL8B/3H0BPKPwr7g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hHrJd8PUyiNoylYpNekWDq7UIdZ1eNFY6Le81UJ1bFJbyiblFSj0Bvh8Cn3E63GKaKudzbZtQqHHcP2gyCAld440SvXaPQ9mEcOYk2wL685ji4OR4R/8zd+bXPIrMLvQTwu9c71e9oBSjxUgQEnZ6gAB6rTMOVzTFWDsVACFffM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LShVKNPZ; arc=none smtp.client-ip=95.215.58.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1f/uiP6P5NYcEFVufuMARi8rFerQkiuaQvhTh5j4G4PLSJIhj9urTiKWu74r0/FJMtFuxzhp/u1Bz3KluBqZ2gu94VYtcbtWjaArEqfT9r2u/UBeczwM5cPzl3DyBhUMd6cX3X5kHfOUvT9jmG/P2gycsblgWzC6OidyvASq0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tiut/nE5; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LShVKNPZ"
-Date: Wed, 26 Mar 2025 11:51:57 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tiut/nE5"
+Date: Wed, 26 Mar 2025 13:40:16 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743015153;
+	t=1743021623;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FSshJQs9r4m1RulgZtk+BVpimPAXm4vtzmVudgOOHPM=;
-	b=LShVKNPZ6tCQ+oRaWLBf37sMD9m9kLZ1yV8CQVogM0OEPbYG6Zx/v0bZJqxgtmr5Tfs8lv
-	GXloeObhq8Mw9QPkel4lZfRvub7HRjUx/bgqZ08AFXisEvRmgzxz2ZRuxTRd0Ac8ppKgZq
-	o9ote564OApjCSKkwU5wEfzbIGHon1M=
+	bh=wg2P5N/lgAa+Pjwmt6Xv30iT0//GYcryM47I3itLJEs=;
+	b=tiut/nE5Sd50+xXN1DOthjMja5xf6A769EkXEIuON8c27ybVj1FLwM/UIPbk4rdmXybG84
+	MMf9m+ycBH8XC+mocUwwkhYuTmxb62uNkK5Q8sdlZMjJf2WeVJy1t7AgzpI1pZFHYMrCT/
+	k9ZPVoxbEfJk42i66cO5qQ4rwyy9WmI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"david@redhat.com" <david@redhat.com>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	Krishnakant Jaju <kjaju@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"ddutile@redhat.com" <ddutile@redhat.com>,
-	"tabba@google.com" <tabba@google.com>,
-	"qperret@google.com" <qperret@google.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <Z-RMzYHOzc36H7yR@linux.dev>
-References: <20250319170429.GK9311@nvidia.com>
- <Z9sItt8BIgvbBY8M@arm.com>
- <20250319192246.GQ9311@nvidia.com>
- <Z9s7r2JocpoM_t-m@arm.com>
- <SA1PR12MB7199C7BD48EB39F536DD34DBB0A62@SA1PR12MB7199.namprd12.prod.outlook.com>
- <Z-QU7qJOf8sEA5R8@google.com>
- <86y0wrlrxt.wl-maz@kernel.org>
- <Z-QnBcE1TKPChQay@google.com>
- <86wmcbllg2.wl-maz@kernel.org>
- <Z-RGYO3QVj5JNjRB@google.com>
+To: James Clark <james.clark@linaro.org>
+Cc: Colton Lewis <coltonlewis@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+	robh@kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com,
+	will@kernel.org, maz@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
+	pbonzini@redhat.com, shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
+ partition the PMU
+Message-ID: <Z-RmMLkTuwsea7Uk@linux.dev>
+References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
+ <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -85,84 +51,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z-RGYO3QVj5JNjRB@google.com>
+In-Reply-To: <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 26, 2025 at 11:24:32AM -0700, Sean Christopherson wrote:
-> > > But I thought the whole problem is that mapping this fancy memory as device is
-> > > unsafe on non-FWB hosts?  If it's safe, then why does KVM needs to reject anything
-> > > in the first place?
+On Wed, Mar 26, 2025 at 05:38:34PM +0000, James Clark wrote:
+> On 25/03/2025 6:32 pm, Colton Lewis wrote:
+> > > I don't know if this is a stupid idea, but instead of having a fixed
+> > > number for the partition, wouldn't it be nice if we could trap and
+> > > increment HPMN on the first guest use of a counter, then decrement it on
+> > > guest exit depending on what's still in use? The host would always
+> > > assign its counters from the top down, and guests go bottom up if they
+> > > want PMU passthrough. Maybe it's too complicated or won't work for
+> > > various reasons, but because of BRBE the counter partitioning changes go
+> > > from an optimization to almost a necessity.
 > > 
-> > I don't know where you got that idea. This is all about what memory
-> > type is exposed to a guest:
+> > This is a cool idea that would enable useful things. I can think of a
+> > few potential problems.
 > > 
-> > - with FWB, no need for CMOs, so cacheable memory is allowed if the
-> >   device supports it (i.e. it actually exposes memory), and device
-> >   otherwise.
+> > 1. Partitioning will give guests direct access to some PMU counter
+> > registers. There is no reliable way for KVM to determine what is in use
+> > from that state. A counter that is disabled guest at exit might only be
+> > so temporarily, which could lead to a lot of thrashing allocating and
+> > deallocating counters.
+
+KVM must always have a reliable way to determine if the PMU is in use.
+If there's any counter in the vPMU for which kvm_pmu_counter_is_enabled()
+is true would do the trick...
+
+Generally speaking, I would like to see the guest/host context switch in
+KVM modeled in a way similar to the debug registers, where the vPMU
+registers are loaded onto hardware lazily if either:
+
+  1) The above definition of an in-use PMU is satisfied
+
+  2) The guest accessed a PMU register since the last vcpu_load()
+
+> > 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
+> > determine how many counters there are. If HPMN starts as a low number,
+> > guests have no way of knowing there are more counters
+> > available. Dynamically changing the counters available could be
+> > confusing for guests.
 > > 
-> > - without FWB, CMOs are required, and we don't have a host mapping for
-> >   these pages. As a fallback, the mapping is device only, as this
-> >   doesn't require any CMO by definition.
-> > 
-> > There is no notion of "safety" here.
 > 
-> Ah, the safety I'm talking about is the CMO requirement.  IIUC, not doing CMOs
-> if the memory is cacheable could result in data corruption, i.e. would be a safety
-> issue for the host.  But I missed that you were proposing that the !FWB behavior
-> would be to force device mappings.
+> Yes I was expecting that PMCR would have to be trapped and N reported to be
+> the number of physical counters rather than how many are in the guest
+> partition.
 
-To Jason's earlier point, you wind up with a security issue the other
-way around.
+I'm not sure this is aligned with the spirit of the feature.
 
-Supposing the host is using a cacheable mapping to, say, zero the $THING
-at the other end of the mapping. Without a way to CMO the $THING we
-cannot make the zeroing visible to a guest with a stage-2 Device-* mapping.
+Colton's aim is to minimize the overheads of trapping the PMU *and*
+relying on the perf subsystem for event scheduling. To do dynamic
+partitioning as you've described, KVM would need to unconditionally trap
+the PMU registers so it can pack the guest counters into the guest
+partition. We cannot assume the VM will allocate counters sequentially.
 
-Marc, I understand that your proposed fallback is aligned to what we
-do today, but I'm actually unconvinced that it provides any reliable/correct
-behavior. We should then wind up with stage-2 memory attribute rules
-like so:
-
- 1) If struct page memory, use a cacheable mapping. CMO for non-FWB.
-
- 2) If cacheable PFNMAP:
-   a) With FWB, use a cacheable mapping
-   b) Without FWB, fail.
-
- 3) If VM_ALLOW_ANY_UNCACHED, use Normal Non-Cacheable mapping
-
- 4) Otherwise, Device-nGnRE
-
-I understand 2b breaks ABI, but the 'typical' VFIO usages fall into (3)
-and (4).
-
-> > > > Importantly, it is *userspace* that is in charge of deciding how the
-> > > > device is mapped at S2. And the memslot flag is the correct
-> > > > abstraction for that.
-> > >  
-> > > I strongly disagree.  Whatever owns the underlying physical memory is in charge,
-> > > not userspace.  For memory that's backed by a VMA, userspace can influence the
-> > > behavior through mmap(), mprotect(), etc., but ultimately KVM needs to pull state
-> > > from mm/, via the VMA.  Or in the guest_memfd case, from guest_memfd.
-> > 
-> > I don't buy that. Userspace needs to know the semantics of the memory
-> > it gives to the guest. Or at least discover that the same device
-> > plugged into to different hosts will have different behaviours. Just
-> > letting things rip is not an acceptable outcome.
-> 
-> Agreed, but that doesn't require a memslot flag.  A capability to enumerate that
-> KVM can do cacheable mappings for PFNMAP memory would suffice.  And if we want to
-> have KVM reject memslots that are cachaeable in the VMA, but would get device in
-> stage-2, then we can provide that functionality through the capability, i.e. let
-> userspace decide if it wants "fallback to device" vs. "error on creation" on a
-> per-VM basis.
-> 
-> What I object to is adding a memslot flag.
-
-A capability that says "I can force cacheable things to be cacheable" is
-useful beyond even PFNMAP stuff. A pedantic but correct live migration /
-snapshotting implementation on non-FWB would need to do CMOs in case the
-VM used a non-WB mapping for memory.
+Dynamic counter allocation can be had with the existing PMU
+implementation. The partitioned PMU is an alternative userspace can
+select, not a replacement for what we already have.
 
 Thanks,
 Oliver
