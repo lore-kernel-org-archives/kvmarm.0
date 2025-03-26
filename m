@@ -1,63 +1,65 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638B41B4139
-	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 11:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F03E1DDC12
+	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 11:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742989148; cv=none; b=mW92a4fIau1wFMX0+nXif1DHuIS945o72IW5ayaz+awRuEy5nrzFAhhbkd718CRekgyII2IiCPjiPhlWCkLAu6j4VLH2ZtJzTPpwrZ5e/I8LBYTWNxfR2jjf7ZtgGW2Tulo6qwP5Scz5xKZgB6S4JnFxmf39dCyEeAQYh1xzo+8=
+	t=1742989150; cv=none; b=tpKZK+XtSBvEjc8NxctcLY/oTdI3Zv6KkYR5Ajf4j/CIYjQ/SxH0US1qgBOvr9tZd4TlVOQEu2a+qwHRINoBEeX8ldI9SplkF3OH5HQnNpGRr2yXddLq/vRLAumYa/ynu3HC1UAyJHpG3/Jmt+vGQoqVxUcYhY+g+d/cgpqRQro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742989148; c=relaxed/simple;
-	bh=IuSEcVY+XQgcWWiKyPKuUnqqYJm+G9BasCoqCLzldog=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KWtWqZgfdDCvMTMEhqg3pBRX8OP8BS7qNgbeWoCkwK1TbCkj80mbaeFjMJskqzVLcX9hisZ8cMCU1h61vP1/W6QtOtNq0SN4qWoMrivd6NK/SE2yTxAV/nD9DstkdTu4/RD+3zKJan8xwzUWSQlOWX5Zb/y0tVWDL4SUZkFkZII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4JTZ9qQj; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1742989150; c=relaxed/simple;
+	bh=suNMKt6I15eicpIrRigEwbTXV0qPPOxVmXKEqjZInKo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mkP4jopD+Cj900pjURtou4jqsfe7wd6y0JlIWDToNvqeDuF0WjIAoVOkwfNkizGwTS+xeigEvwQ+1f74ecE7zCVHCrewRDS8TAPgp3M32G18Kr0H+BK080IZr5ymIiWCN9S6fmsYeplMMc5gbDvDBCWfpKtfw166UBOXm7OWSJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D5dYRAgi; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4JTZ9qQj"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43ab5baf62cso45329645e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 04:39:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D5dYRAgi"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-391315098b2so2715781f8f.2
+        for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 04:39:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742989145; x=1743593945; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fAUrsz9OdOg3wQLEmYa5D4cgvz4ST0mmGNxgNjOcyeU=;
-        b=4JTZ9qQjnb5827zAihTksFiazTxZm1lA2CI5RWSPedNS7v9zBo6hZ/9udO0Sk3Sfv7
-         Gvc2QUs033X9Vf3sx6krbOLFmwwX53yjewsTqPrHGKXImL9wlV7zGn0hw9qke9UoQFhp
-         EhdM6bzAobveVykFD496Y1UeQIDXMK7C3JUT6qW3WprC0PMj7Z9UoYC8E/cCtlaFicWl
-         OhLbzvBB4q9yxeOaqHgpaJhfLtg794GdCEhe53xnOyG4lZaID8YlY4XPiU8zh9PbsZzU
-         h0WSBVywdB1zDu2b9474hBKViYys1dchedHxmRPqvJ7w9qyEQYC69OtzMSsowLvWheGG
-         pFeg==
+        d=google.com; s=20230601; t=1742989147; x=1743593947; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GXpneY+J8yPscOLP7jhAaiNlTKvyhknsIBSzw8J5v1o=;
+        b=D5dYRAgih1gH0f966QKgbmYs+iOUW4dPhKYy5xNKxsrppkhgowK7R83xW5V/CIyWBx
+         rnmCfIhG3jNM1iGj3mFjhZ9mTeSZ9rRXF3RQQSWZ51nDqc8boAeCOua2PmEw38V8kv7z
+         RyCNfYOk/+YCHhA2HZX/A78RMMpBUb+l1taXte68lP6xrGJB9IGvAA/8qZ8jFLgIXL4C
+         cnUZbx3S/VePenrMYBjieWnbVA+zH8jmk49GZFvRgtKdH/VLondpGTc4WEMDflEEj0Aw
+         XlZi9D55K41010m/urZ4Gs+GS7XfvmICaknfNyrvR2XYMPilkHXVR5xlD4NmTnYULKzi
+         5P0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742989145; x=1743593945;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fAUrsz9OdOg3wQLEmYa5D4cgvz4ST0mmGNxgNjOcyeU=;
-        b=Epelskkwkf1W69XDRcoEkrdCHfBwypXJfmQJXzeeiELN5q1cGTj54Y1smxBLUj/395
-         25D/ouWiJkpdvMxARHmMBjOKYMpSwwQ4bOLHe7ph+aahJ7rxm9v94kRE6E7AYQN3Qv8v
-         yd/KKj0dFNBnkhIBfyNl1Q2DbbHjHV0WMcwGbMcNHSf3L54+n1MpbxCBpy1hwsMkeWfD
-         Pwia8h9NArUa6s8/qbcQYUMW7FYpgnm5uoyvhcU2+ga6/WFYmWL0aLW3LaHWHUmxBLvQ
-         1s9kO8+KbkaG+xOZ20KXHMdAUMUZEDT0qVkUC6gzO52OfgDCYpkI+tHJmwc6hIjRfZV/
-         EvXg==
-X-Gm-Message-State: AOJu0Yxq7DKdza+Hk9xDJzlckKxPcYRdA70pOA3ZjtKBcGmHskVdVWQ+
-	W+7B0Nj8bB1wLnpm6yS4a6u7T4qBBr1S7mZXyuVZSX+2YZyjkHjfBHy9cGzjLpsQTVqJKlJR0PV
-	n4Z2MWJvVn3vlUaoF7WuXxYSniQ==
-X-Google-Smtp-Source: AGHT+IGHwZHepscP8ejJ/xKjHvWMmfkRYj/uDkAFERn0R3gk+2OvGbhbfX9XWEWX38kk7ftW0gGcZ4p7ZxAAjcKTqDs=
-X-Received: from wmpz15.prod.google.com ([2002:a05:600c:a0f:b0:43c:ef1f:48d8])
+        d=1e100.net; s=20230601; t=1742989147; x=1743593947;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GXpneY+J8yPscOLP7jhAaiNlTKvyhknsIBSzw8J5v1o=;
+        b=L7aSjnCyyIjRcAPIrHYLjfNCLpYRoPjp13eBtwxVIcdrUCm7YyL/k5dllvcV14E0J7
+         4csJVegUOxwi8jGBfn3pb8I3vGke8WVy+BAyXpV3ypPzUpQZFkgTPwWs69iqdcNnq+rv
+         t2L3JddJtljQqtkSwnzVfrjVeiPQUQdM9XZn6thu7w0sie0kKTot4XXsoOE4fODk2LT1
+         JiFoN948CozxBFtzB/+kzo5Q2zIp6S9BLaEa1Z2ZRKxWJRSV7aYI2gLJvbKe3BZ4Cwzg
+         Wc5IGN5abXkskFYppTAlvhiLpdGvosjZhYrxtoCTwJkcM8OAhdh8gRyiwyl06FIsLSFW
+         i+WA==
+X-Gm-Message-State: AOJu0YwLN3FE3u7vYoGXl1id8eI3Ia26rBDfUsKQtOUT24wSWs7Pfdw2
+	cNNeIM62taiYFzLPFnURxEw/CuaxCiNE11hXx3FgOafOjRVoGHSt57SVVIwjGVqsJg75Tvz5RLF
+	A4hk7yZG16scjmR/i7s2klb2hYA==
+X-Google-Smtp-Source: AGHT+IGmIIwQP0bm2M7IlxhsZXhvvis8SEyv8YAEqMxAp7vxQ4ixz0CF6DGy8JLA3pEu/5AAb31WyHaG1CNXPPwbNdA=
+X-Received: from wrxt15.prod.google.com ([2002:a05:6000:1cf:b0:39a:bf28:66d8])
  (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:5021:b0:43c:ea1a:720c with SMTP id 5b1f17b1804b1-43d509f6307mr221896365e9.18.1742989144752;
- Wed, 26 Mar 2025 04:39:04 -0700 (PDT)
-Date: Wed, 26 Mar 2025 11:38:58 +0000
+ 2002:a5d:59a6:0:b0:390:f6aa:4e72 with SMTP id ffacd0b85a97d-3997f8fabdbmr17862518f8f.18.1742989146887;
+ Wed, 26 Mar 2025 04:39:06 -0700 (PDT)
+Date: Wed, 26 Mar 2025 11:38:59 +0000
+In-Reply-To: <20250326113901.3308804-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250326113901.3308804-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250326113901.3308804-1-sebastianene@google.com>
-Subject: [PATCH v4 0/3] KVM: arm64: Separate the hyp FF-A buffers init from
- the host
+Message-ID: <20250326113901.3308804-2-sebastianene@google.com>
+Subject: [PATCH v4 1/3] KVM: arm64: Use the static initializer for the version lock
 From: Sebastian Ene <sebastianene@google.com>
 To: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org, 
 	oliver.upton@linux.dev, sebastianene@google.com, snehalreddy@google.com, 
@@ -67,48 +69,35 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Replace the definition of the hypervisor version lock
+with a static initializer.
 
-This moves the initialization of the hypervisor FF-A buffers
-away from the host FF-A map calling path. If the hypervisor
-cannot map the buffers with Trustzone, it rejects any FF-A call
-when it runs under protected mode. 
-Other than that it moves the definitions of the ffa_to_linux_err
-map from the arm_ffa driver to the ffa header so that the hyp code
-can make use of it.
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+Acked-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-*** Changelog ***
-
-v3 -> this version:
-
-- moved the definition of PARTITION_INFO_GET_RETURN_COUNT_ONLY from
-  the driver code to the arm_ffa header and dropped the definition
-  from the last patch. 
-
-v2 -> v3:
-
-- dropped the "Map the hypervisor FF-A buffers on ffa init" patch
-- added ack & reviewed-by tags
-- don't release the ownership of the RX buffer if the flag from
- FFA_GET_PARTITION is (1)
-
-v1 -> v2:
-
-Split the patch that maps the ff-a buffers of ffa init and introduce
-"Move the ffa_to_linux definition to the ffa header".
-
-Thanks,
-
-Sebastian Ene (3):
-  KVM: arm64: Use the static initializer for the version lock
-  firmware: arm_ffa: Move the ffa_to_linux definition to the ffa header
-  KVM: arm64: Release the ownership of the hyp rx buffer to Trustzone
-
- arch/arm64/kvm/hyp/nvhe/ffa.c     | 12 +++++++-----
- drivers/firmware/arm_ffa/driver.c | 26 --------------------------
- include/linux/arm_ffa.h           | 27 +++++++++++++++++++++++++++
- 3 files changed, 34 insertions(+), 31 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index e433dfab882a..6df6131f1107 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -69,7 +69,7 @@ static struct kvm_ffa_buffers hyp_buffers;
+ static struct kvm_ffa_buffers host_buffers;
+ static u32 hyp_ffa_version;
+ static bool has_version_negotiated;
+-static hyp_spinlock_t version_lock;
++static DEFINE_HYP_SPINLOCK(version_lock);
+ 
+ static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+ {
+@@ -911,6 +911,5 @@ int hyp_ffa_init(void *pages)
+ 		.lock	= __HYP_SPIN_LOCK_UNLOCKED,
+ 	};
+ 
+-	version_lock = __HYP_SPIN_LOCK_UNLOCKED;
+ 	return 0;
+ }
 -- 
 2.49.0.395.g12beb8f557-goog
 
