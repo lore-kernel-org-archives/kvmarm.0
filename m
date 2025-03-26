@@ -1,149 +1,212 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36ED027456
-	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 16:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547681FECB6
+	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 17:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743007720; cv=none; b=DpHmCHUAvAWcjm5TiwFBD2s8vpnSj7bc9QUt+olCxfgsJElZP66Qgdy8kYlhq/CpaQzpftfZwnqbjxNsk8Ya5XgfgAnw/e31psSNqJILV3H8ho808eOsVIl/wVMyQcxGulymeTRuHPNa9SYTgaYIAbUicuPBQvbxkNQP/n+Onvw=
+	t=1743010675; cv=none; b=YsZSfT5FOvVMKq9c/ZwADzdRgZC6qAmZh6a1ckvBrTyDRuoF0KAJi1sqf3epgclvXEIFb4I6BUvUMFzaLfIiYbw/istS9x1edBf0Cj4S1EQcGVX5rdYuKWijxiIFoQoGrQ/oa1Kzuk5JH3RCf21bSFsR8xCsmVD6qcwTPmWQfF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743007720; c=relaxed/simple;
-	bh=v+AmZUmpN4LDUzxm3w5ft1I/+r4feJlmYE8bhA3zNfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6XYmKHY+OKjBrw2BFFoSFdngKMfZE11lngYvET/WufBVqfjTTXImSUs8oycCErWQA8p6DWjPoxPaWhRxPc81hxVkcouyJUvpemUk/3VzHFHUz8kHA0WPUtoVbsnZI70i1+w7EdFdNo/6ph8EcYTPLtYMWxDaj0gzp2OsFzwsUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iom2ZOL8; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1743010675; c=relaxed/simple;
+	bh=d53bARiwUcBKI+DNwIA2HpZ7b/1a9hiZTCZ3G3hjvvE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=gL06SKb4yjS6p2XhteOfw1Jqs9+KLCzQvi6w1g75uPtJSzqOuW5aVFJHJRGX+ui2axa4iRdFQJf5qriPAemB1M0184L51cnaUWI2UFXl+0fDCMYXYXY5zZH4rEd184trEVH5lcWOj/j5ZFqrPqmUFay+f1pRlHLSPx0xQmJF2YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S7I/uIXw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iom2ZOL8"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e6c18e2c7dso3022a12.3
-        for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 09:48:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743007717; x=1743612517; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xIONhgKygIJfrRbEsZfUKmIHxiah0KpnWCpr3sd5zNk=;
-        b=iom2ZOL8a93eUsdInAZ7Naam3codVevDzt5cwKFKQknFTlpsuiQk7gO9ISjI16/EVW
-         /reH6ERtgeNyNYdv8bbAxuLFSEA/BmiM4FhTcI06SNIM2t6kp//yMlQj/4id1/QM991Q
-         CC8XKaZjlonrmBKlaW9+HoeE6eEszbhHqtuxgMpmagymbkBLtaaM9qgk38/kyGRJ5I2a
-         lxEdceLNEYir7Pk0WfauR2z8mKGdDG1/wSbWwIO/sEm3xye04F9knQ1asZTqz8e+0gui
-         cHyZSatCtiu5rIVFOI04qb2bpjJZpWz34DEsyz8K6SjZAMKRQVFb2fHLT8INMatVtOBk
-         Co3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743007717; x=1743612517;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xIONhgKygIJfrRbEsZfUKmIHxiah0KpnWCpr3sd5zNk=;
-        b=hRTjrSpGXC6cM3Q792u0Z0BGMPavhm6SScedJDjBpHbATyaifw1Dwcdc5vci7Qk32y
-         oDBhGuLRWuf+LXlU/l0QnLc7Jn6aRQMeLj9zk+T/bojvZiRZygvq+2+gTH8xGQTiRKu6
-         PnDeC+8jaNBDRzIGy5s+0WDgrshJSd7km7b2CDfmdbTFocUY+eiE7iKO6H0c+fHpeC9Y
-         k7OvFfqasDsZHivnjNNd2wMeMBtQZQSeiNddD4BmD/oDWwhhRmCDmrErVfZTZzbIIYiF
-         FSOAnIohRSrQZ5tthRCB1U5OC81Tf0+JhInyJCXcr8cr+lNIpZvSANFJg9qgNtorP0UE
-         uOnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkoF85X++35MOW4Mx5KnTh8P4YRl9XzxtwQxNvnvO3coP5qAi7noZnQ5cexC1a4IwugT6N3zw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzSrRKnkuAfJ6SVd4wWwp1B2jS38fKSUOkOo6CD5MZDLpG/TbIb
-	haMxpp9Kbf8EDCe4pJf+vlCdtA68Oj4SjowPA3DohswyVwfOJPb0+uXDLOvrhA==
-X-Gm-Gg: ASbGncs2USz+yX5begELp5WYlksArEoWVsqbcKsOqhvVgnFOO4Aa5bunTMNwhUQj73y
-	h86z79rFbULA4J0gRM5noW3dCLK9IJVPolHPfMxHR/3oVTh098xSSJXL6bP8T/PAWw+YG5CB7lc
-	gqF+z+qH9SDEaV+Bjf3KOnUSrBIBmc0ivOf/jmlrtmQXMegV3k83Z+bIUNGNRL4DcIl9+LgS5MI
-	y+gPp+L8gnLpg0QdHZGRsy6OLVGIniOgM/OSmfxXf/aJ32EmU5zio/DSDKk86A9iB7JKts28trw
-	wgm6DFdhLgXaFd5ld3VjQdUMF0PpYISN4hCIA4dJoLrPX0DuEAByth2cBYPgHqGQagxoQHwu+NP
-	rOnM=
-X-Google-Smtp-Source: AGHT+IELoh1UdGLEoChuBbrPrSJlW3iazs22Tqnm/p66h/kdfAKvlGAngZOzasm3FVG0orud4x07LQ==
-X-Received: by 2002:a17:907:7f86:b0:ac1:e881:89a7 with SMTP id a640c23a62f3a-ac6fae48539mr15547466b.6.1743007717280;
-        Wed, 26 Mar 2025 09:48:37 -0700 (PDT)
-Received: from google.com (140.20.91.34.bc.googleusercontent.com. [34.91.20.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac404959f47sm907950666b.170.2025.03.26.09.48.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 09:48:36 -0700 (PDT)
-Date: Wed, 26 Mar 2025 16:48:33 +0000
-From: Quentin Perret <qperret@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org,
-	oliver.upton@linux.dev, snehalreddy@google.com,
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com,
-	will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com, Andrei Homescu <ahomescu@google.com>
-Subject: Re: [PATCH v4 3/3] KVM: arm64: Release the ownership of the hyp rx
- buffer to Trustzone
-Message-ID: <Z-Qv4b0vgVql2yOb@google.com>
-References: <20250326113901.3308804-1-sebastianene@google.com>
- <20250326113901.3308804-4-sebastianene@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S7I/uIXw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743010672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GoxYL0e5inO/4S8C3FeRtVRqh9nONxsW6KEuR5VNGOI=;
+	b=S7I/uIXweL7Sy7rJYRdEjQCuMl+YpigRzeU5NOJSmbtEqWsWDKpk+lWRp1ofi1u9Fk7SAD
+	ANM1o4iWQeZjrbgedkum5gIOmVgcrvc2Zw1coQZUlV2wJJpci2IZdKyZnmXZpIUUVNp2GG
+	fMq9BVSlXFV9Yz4xXXsvoxMyNOuRe9w=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-620-6-XINHyLPaqQaI86B8urEw-1; Wed,
+ 26 Mar 2025 13:37:51 -0400
+X-MC-Unique: 6-XINHyLPaqQaI86B8urEw-1
+X-Mimecast-MFC-AGG-ID: 6-XINHyLPaqQaI86B8urEw_1743010669
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 506231800267;
+	Wed, 26 Mar 2025 17:37:47 +0000 (UTC)
+Received: from gondolin.redhat.com (unknown [10.67.24.38])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B457B180B486;
+	Wed, 26 Mar 2025 17:37:30 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com,
+	agraf@csgraf.de
+Cc: shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH for-10.1 v4 00/13] arm: rework id register storage
+Date: Wed, 26 Mar 2025 18:37:10 +0100
+Message-ID: <20250326173723.389988-1-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250326113901.3308804-4-sebastianene@google.com>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Wednesday 26 Mar 2025 at 11:39:01 (+0000), Sebastian Ene wrote:
-> Introduce the release FF-A call to notify Trustzone that the hypervisor
-> has finished copying the data from the buffer shared with Trustzone to
-> the non-secure partition.
->
-> Reported-by: Andrei Homescu <ahomescu@google.com>
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 6df6131f1107..ac898ea6274a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -749,6 +749,7 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
->  	DECLARE_REG(u32, uuid3, ctxt, 4);
->  	DECLARE_REG(u32, flags, ctxt, 5);
->  	u32 count, partition_sz, copy_sz;
-> +	struct arm_smccc_res _res;
->  
->  	hyp_spin_lock(&host_buffers.lock);
->  	if (!host_buffers.rx) {
-> @@ -765,11 +766,11 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
->  
->  	count = res->a2;
->  	if (!count)
-> -		goto out_unlock;
-> +		goto release_rx;
->  
->  	if (hyp_ffa_version > FFA_VERSION_1_0) {
->  		/* Get the number of partitions deployed in the system */
-> -		if (flags & 0x1)
-> +		if (flags & PARTITION_INFO_GET_RETURN_COUNT_ONLY)
->  			goto out_unlock;
->  
->  		partition_sz  = res->a3;
-> @@ -781,10 +782,12 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
->  	copy_sz = partition_sz * count;
->  	if (copy_sz > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
->  		ffa_to_smccc_res(res, FFA_RET_ABORTED);
-> -		goto out_unlock;
-> +		goto release_rx;
->  	}
->  
->  	memcpy(host_buffers.rx, hyp_buffers.rx, copy_sz);
-> +release_rx:
-> +	ffa_rx_release(&_res);
+Next iteration of the id register patches; only small changes.
 
-I'm a bit confused about this release call here. In the pKVM FF-A proxy
-model, the hypervisor is essentially 'transparent', so do we not expect
-EL1 to issue that instead? How is EL1 supposed to know that the
-hypervisor has already sent the release call? And isn't EL1 going to be
-confused if the content of the buffer is overridden before is has issued
-the release call itself? What would otherwise prevent that from
-happening?
+Changed from v3:
+- added R-bs (thanks!)
+- added missing SPDX header
+- merged patch introducing accessors for kvm to the first user
+- skip over sysregs outside of the id register range when generating
+  register definitions again
 
-Thanks,
-Quentin
+Also available at
+https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage-v4
 
->  out_unlock:
->  	hyp_spin_unlock(&host_buffers.lock);
->  }
-> -- 
-> 2.49.0.395.g12beb8f557-goog
-> 
+<v3 cover letter>
+Yet another update of the id register series, less changes this time
+around.
+
+Changed from v2:
+- changed generation of the various register defines via the "DEF"
+  magic suggested by Richard
+- some kvm-only code moved to kvm.c; some code potentially useful to
+  non-kvm code stayed out of there (the cpu model code will make use
+  of it, and that one should be extendable outside of kvm -- a
+  revised version of those patches is still in the works, but I'll be
+  off for a few days and rather wanted to get this one out first)
+
+Also available at
+https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage-v3
+
+<v2 cover letter>
+
+Changed from v1:
+- Noticed that we missed the hvf code. Converted, compiled, but not tested
+  as I'm lacking an environment for testing.
+- Hopefully incorporated most of the suggested changes -- if I missed
+  something, it was unintentional unless mentioned below.
+  - fixed repeated inclusion of definitions
+  - hopefully made macros more robust
+  - removed distinction between reading 32/64 values, which was mostly
+    adding churn for little value
+  - postponed generating property definitions to the cpu model patches,
+    where they are actually used
+  - juggled hunks and moved them to the right patches
+  - fixed some typos
+- rebased to a more recent code base
+
+NOT changed from v1:
+- definitions are still generated from the Linux sysregs file
+  - I still think updating the generated files on demand (so that we can
+    double check the result) is the right thing to do
+  - I'm open to changing the source of the definitions from the sysregs
+    file to the JSON definitions published by Arm; however, I first wanted
+    to get the code using it right -- we can switch out the code generating
+    the file to use a different source easily later on, and I'd also like
+    to steal parts of the script from Linux once integrated (which I think
+    hasn't happened yet?)
+
+<v1 cover letter>
+
+[Note: I've kept the cc list from the last round of cpu model patches;
+so if you're confused as to why you're cc:ed here, take it as a
+heads-up that a new cpu model series will come along soon]
+
+This patch series contains patches extracted from the larger cpu model
+series (RFC v2 last posted at
+https://lore.kernel.org/qemu-devel/20241206112213.88394-1-cohuck@redhat.com/)
+and aims at providing a base upon which we can continue with building
+support for cpu models, but which is hopefully already an improvement
+on its own.
+
+Main changes from the patches in that series include:
+- post-pone the changes to handle KVM writable ID registers for cpu models
+  (I have a series including that on top of this one)
+- change how we store the list of ID registers, and access them
+  basically, use an enum for indexing, and an enum doing encodings in a
+  pattern similar to cpregs
+- move some hunks to different patches
+- update the scripts to generate the register descriptions, and run
+  them against a recent Linux sysregs file
+
+What I've kept:
+- generating the register descriptions from the Linux sysregs file
+  I think that file is still our best bet to generate the descriptions
+  easily, and updating the definitions is a manual step that can be checked
+  for unintended changes
+- most of the hard work that Eric had been doing; all new bugs in there
+  are my own :)
+
+</v1 cover letter>
+</v2 cover letter>
+</v3 cover letter>
+
+Cornelia Huck (1):
+  arm/cpu: switch to a generated cpu-sysregs.h.inc
+
+Eric Auger (12):
+  arm/cpu: Add sysreg definitions in cpu-sysregs.h
+  arm/cpu: Store aa64isar0/aa64zfr0 into the idregs arrays
+  arm/cpu: Store aa64isar1/2 into the idregs array
+  arm/cpu: Store aa64pfr0/1 into the idregs array
+  arm/cpu: Store aa64mmfr0-3 into the idregs array
+  arm/cpu: Store aa64dfr0/1 into the idregs array
+  arm/cpu: Store aa64smfr0 into the idregs array
+  arm/cpu: Store id_isar0-7 into the idregs array
+  arm/cpu: Store id_pfr0/1/2 into the idregs array
+  arm/cpu: Store id_dfr0/1 into the idregs array
+  arm/cpu: Store id_mmfr0-5 into the idregs array
+  arm/cpu: Add sysreg generation scripts
+
+ hw/intc/armv7m_nvic.c                 |  27 +-
+ scripts/gen-cpu-sysregs-header.awk    |  35 ++
+ scripts/update-aarch64-sysreg-code.sh |  25 ++
+ target/arm/cpu-features.h             | 317 +++++++++---------
+ target/arm/cpu-sysregs.h              |  46 +++
+ target/arm/cpu-sysregs.h.inc          |  52 +++
+ target/arm/cpu.c                      | 111 +++----
+ target/arm/cpu.h                      |  80 +++--
+ target/arm/cpu64.c                    | 128 +++----
+ target/arm/helper.c                   |  68 ++--
+ target/arm/hvf/hvf.c                  |  36 +-
+ target/arm/internals.h                |   6 +-
+ target/arm/kvm.c                      | 129 ++++----
+ target/arm/ptw.c                      |   6 +-
+ target/arm/tcg/cpu-v7m.c              | 174 +++++-----
+ target/arm/tcg/cpu32.c                | 320 +++++++++---------
+ target/arm/tcg/cpu64.c                | 460 +++++++++++++-------------
+ 17 files changed, 1101 insertions(+), 919 deletions(-)
+ create mode 100755 scripts/gen-cpu-sysregs-header.awk
+ create mode 100755 scripts/update-aarch64-sysreg-code.sh
+ create mode 100644 target/arm/cpu-sysregs.h
+ create mode 100644 target/arm/cpu-sysregs.h.inc
+
+-- 
+2.48.1
+
