@@ -1,40 +1,34 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A4A20CCF4
-	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 09:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457D5191F89
+	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 16:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743068935; cv=none; b=aBmI52c2ZITAgcbRv5X39HYHEvadOHwtyjgZj85VZbiZ5PnN3pxi1z5UdWEyFvu3+42i23QnvPqjDCB+FBcQNw6EzBGTJekdn+NsnXwMfi02PNELjctkyadOSLuEQ8Hu34yBrNIygv4BuvDyTzk2xecefbF3O0l1FeS0NJ6Z0eU=
+	t=1743093166; cv=none; b=H3H7y5eQ/+dmfk6m4I19fbWaQ0QGUrfnuXDjrpL//kAx1lIKFwGmeC+dvfaifMuURoGNF0XH70rR0t6iW4S3r4sCHwQKbY0Tv0wO9jmQYCP3ywDttaVVy7PjIA3dbnJTbP89a18YxHvrlzpWmYVImjlR/E1TeLpTdRziH380S5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743068935; c=relaxed/simple;
-	bh=uSZ3ssY/xlzW1nr2WrEshK+RgrR9LQhRC0rad3D6Jzk=;
+	s=arc-20240116; t=1743093166; c=relaxed/simple;
+	bh=k6iaCCqNNChhLDgPe+S8eDgu4mP4JE7l1YkeGpB1AW8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UcY7ZlKX/W/CC+w+sgTKsFyV8awd4zaoPaRMqb9LbUc+p6n29NP/NayoT3E5/5lHiOAA3+1ZVHVJd+EbeGBDMIHmstFE4YRwGfjJddhIK7LVCgHl/0GD+AGGApiy+WVRnloIXGrDp3VDoHOKoFT/IXY+zMCkyUBaEXCo2/t1uqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=vAvXFlLILTwN+uO/q4GACAiWiBIyujN7ZD2p973Hayk/TejQrVE741r27OOI+Bg9hda6HGv6T4i8zPkTfqaG/W2AVGFO+Jxi8mkCRikjXpgUekwSP1steVdhmdIVbiMj40hNXSLcFqDVzdaHapXk7AAoaT3cyRy41sg/IAObOOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65F99106F;
-	Thu, 27 Mar 2025 02:48:58 -0700 (PDT)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DE9A3F63F;
-	Thu, 27 Mar 2025 02:48:50 -0700 (PDT)
-Date: Thu, 27 Mar 2025 09:48:47 +0000
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Quentin Perret <qperret@google.com>, catalin.marinas@arm.com,
-	Sudeep Holla <sudeep.holla@arm.com>, joey.gouly@arm.com,
-	maz@kernel.org, oliver.upton@linux.dev, snehalreddy@google.com,
-	suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com, Andrei Homescu <ahomescu@google.com>
-Subject: Re: [PATCH v4 3/3] KVM: arm64: Release the ownership of the hyp rx
- buffer to Trustzone
-Message-ID: <20250327-greedy-hopeful-rook-56c6a1@sudeepholla>
-References: <20250326113901.3308804-1-sebastianene@google.com>
- <20250326113901.3308804-4-sebastianene@google.com>
- <Z-Qv4b0vgVql2yOb@google.com>
- <Z-UcW32Hk6f_cuxc@google.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B76001063;
+	Thu, 27 Mar 2025 09:32:48 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 582F43F63F;
+	Thu, 27 Mar 2025 09:32:42 -0700 (PDT)
+Date: Thu, 27 Mar 2025 16:32:39 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool 0/9] arm: Drop support for 32-bit kvmtool
+Message-ID: <Z-V9p1DWZPlDlYYU@raptor>
+References: <20250325213939.2414498-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,108 +37,141 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z-UcW32Hk6f_cuxc@google.com>
+In-Reply-To: <20250325213939.2414498-1-oliver.upton@linux.dev>
 
-On Thu, Mar 27, 2025 at 09:37:31AM +0000, Sebastian Ene wrote:
-> On Wed, Mar 26, 2025 at 04:48:33PM +0000, Quentin Perret wrote:
-> > On Wednesday 26 Mar 2025 at 11:39:01 (+0000), Sebastian Ene wrote:
-> > > Introduce the release FF-A call to notify Trustzone that the hypervisor
-> > > has finished copying the data from the buffer shared with Trustzone to
-> > > the non-secure partition.
-> > >
-> > > Reported-by: Andrei Homescu <ahomescu@google.com>
-> > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 9 ++++++---
-> > >  1 file changed, 6 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > index 6df6131f1107..ac898ea6274a 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > > @@ -749,6 +749,7 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
-> > >  	DECLARE_REG(u32, uuid3, ctxt, 4);
-> > >  	DECLARE_REG(u32, flags, ctxt, 5);
-> > >  	u32 count, partition_sz, copy_sz;
-> > > +	struct arm_smccc_res _res;
-> > >  
-> > >  	hyp_spin_lock(&host_buffers.lock);
-> > >  	if (!host_buffers.rx) {
-> > > @@ -765,11 +766,11 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
-> > >  
-> > >  	count = res->a2;
-> > >  	if (!count)
-> > > -		goto out_unlock;
-> > > +		goto release_rx;
-> > >  
-> > >  	if (hyp_ffa_version > FFA_VERSION_1_0) {
-> > >  		/* Get the number of partitions deployed in the system */
-> > > -		if (flags & 0x1)
-> > > +		if (flags & PARTITION_INFO_GET_RETURN_COUNT_ONLY)
-> > >  			goto out_unlock;
-> > >  
-> > >  		partition_sz  = res->a3;
-> > > @@ -781,10 +782,12 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
-> > >  	copy_sz = partition_sz * count;
-> > >  	if (copy_sz > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-> > >  		ffa_to_smccc_res(res, FFA_RET_ABORTED);
-> > > -		goto out_unlock;
-> > > +		goto release_rx;
-> > >  	}
-> > >  
-> > >  	memcpy(host_buffers.rx, hyp_buffers.rx, copy_sz);
-> > > +release_rx:
-> > > +	ffa_rx_release(&_res);
+Hi Oliver,
+
+On Tue, Mar 25, 2025 at 02:39:30PM -0700, Oliver Upton wrote:
+> The last stable kernel to support 32-bit KVM/arm is 5.4, which is on
+> track for EOL at the end of this year. Considering this, and the fact
+> that 32-bit KVM never saw much usage in the first place, it is probably
+> time to toss out the coprolite.
 > 
-> Hi,
+> Of course, this has no effect on the support for 32-bit guests on 64-bit
+> KVM.
 > 
-> > 
-> > I'm a bit confused about this release call here. In the pKVM FF-A proxy
-> > model, the hypervisor is essentially 'transparent', so do we not expect
-> > EL1 to issue that instead?
+> RFC: https://lore.kernel.org/kvmarm/20250314222516.1302429-1-oliver.upton@linux.dev/
 > 
-> I think the EL1 should also issue this call irrespective of what the
-> hypervisor is doing. Sudeep can correct me here if I am wrong, but this
-> is my take on this.
->
+> RFC -> v1:
+>  - Collected Marc's Acks
+>  - Cleaned up some forgotten references to CONFIG_ARM (Alex)
+>  - Minor nits on includes, defines (Alex)
 
-Indeed, the driver will not know if it is running in EL1 with or without
-FF-A proxy or even at EL2.
+I see that you've kept gic.h, pci.h and timer.h in arm64/include.
 
-> I am looking at this as a way of signaling the availability of the rx
-> buffer across partitions. There are some calls that when invoked, they
-> place the buffer in a 'locked state'.
+The series looks good to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+I've also did some light testing by building kvmtool from each patch in the
+series and booting a Linux guest.
+
+Thanks,
+Alex
+
+> 
+> Oliver Upton (9):
+>   Drop support for 32-bit arm
+>   arm64: Move arm64-only features into main directory
+>   arm64: Combine kvm.c
+>   arm64: Merge kvm-cpu.c
+>   arm64: Combine kvm-config-arch.h
+>   arm64: Move remaining kvm/* headers
+>   arm64: Move asm headers
+>   arm64: Rename top-level directory
+>   arm64: Get rid of the 'arm-common' include directory
+> 
+>  INSTALL                                       |   9 +-
+>  Makefile                                      |  40 +--
+>  arm/aarch32/arm-cpu.c                         |  50 ---
+>  arm/aarch32/include/asm/kernel.h              |   8 -
+>  arm/aarch32/include/asm/kvm.h                 | 311 ------------------
+>  arm/aarch32/include/kvm/barrier.h             |  10 -
+>  arm/aarch32/include/kvm/fdt-arch.h            |   6 -
+>  arm/aarch32/include/kvm/kvm-arch.h            |  18 -
+>  arm/aarch32/include/kvm/kvm-config-arch.h     |   8 -
+>  arm/aarch32/include/kvm/kvm-cpu-arch.h        |  24 --
+>  arm/aarch32/kvm-cpu.c                         | 132 --------
+>  arm/aarch32/kvm.c                             |  14 -
+>  arm/aarch64/include/kvm/fdt-arch.h            |   6 -
+>  arm/aarch64/include/kvm/kvm-arch.h            |  22 --
+>  arm/aarch64/include/kvm/kvm-config-arch.h     |  29 --
+>  arm/aarch64/include/kvm/kvm-cpu-arch.h        |  19 --
+>  arm/aarch64/kvm.c                             | 212 ------------
+>  arm/kvm-cpu.c                                 | 153 ---------
+>  {arm/aarch64 => arm64}/arm-cpu.c              |   4 +-
+>  {arm => arm64}/fdt.c                          |   4 +-
+>  {arm => arm64}/gic.c                          |   2 +-
+>  {arm => arm64}/gicv2m.c                       |   2 +-
+>  {arm/aarch64 => arm64}/include/asm/image.h    |   0
+>  {arm/aarch64 => arm64}/include/asm/kernel.h   |   0
+>  {arm/aarch64 => arm64}/include/asm/kvm.h      |   0
+>  {arm/aarch64 => arm64}/include/asm/pmu.h      |   0
+>  .../include/asm/sve_context.h                 |   0
+>  .../arm-common => arm64/include}/gic.h        |   0
+>  {arm/aarch64 => arm64}/include/kvm/barrier.h  |   0
+>  .../include/kvm}/fdt-arch.h                   |   0
+>  .../include/kvm}/kvm-arch.h                   |   8 +-
+>  .../include/kvm}/kvm-config-arch.h            |  24 +-
+>  .../include/kvm}/kvm-cpu-arch.h               |  10 +-
+>  .../arm-common => arm64/include}/pci.h        |   0
+>  .../arm-common => arm64/include}/timer.h      |   0
+>  {arm => arm64}/ioport.c                       |   0
+>  {arm/aarch64 => arm64}/kvm-cpu.c              | 289 ++++++++++++----
+>  {arm => arm64}/kvm.c                          | 209 +++++++++++-
+>  {arm => arm64}/pci.c                          |   4 +-
+>  {arm/aarch64 => arm64}/pmu.c                  |   2 +-
+>  {arm/aarch64 => arm64}/pvtime.c               |   0
+>  {arm => arm64}/timer.c                        |   4 +-
+>  builtin-run.c                                 |   2 +-
+>  hw/cfi_flash.c                                |   2 +-
+>  hw/rtc.c                                      |   2 +-
+>  hw/serial.c                                   |   2 +-
+>  virtio/core.c                                 |   2 +-
+>  47 files changed, 498 insertions(+), 1145 deletions(-)
+>  delete mode 100644 arm/aarch32/arm-cpu.c
+>  delete mode 100644 arm/aarch32/include/asm/kernel.h
+>  delete mode 100644 arm/aarch32/include/asm/kvm.h
+>  delete mode 100644 arm/aarch32/include/kvm/barrier.h
+>  delete mode 100644 arm/aarch32/include/kvm/fdt-arch.h
+>  delete mode 100644 arm/aarch32/include/kvm/kvm-arch.h
+>  delete mode 100644 arm/aarch32/include/kvm/kvm-config-arch.h
+>  delete mode 100644 arm/aarch32/include/kvm/kvm-cpu-arch.h
+>  delete mode 100644 arm/aarch32/kvm-cpu.c
+>  delete mode 100644 arm/aarch32/kvm.c
+>  delete mode 100644 arm/aarch64/include/kvm/fdt-arch.h
+>  delete mode 100644 arm/aarch64/include/kvm/kvm-arch.h
+>  delete mode 100644 arm/aarch64/include/kvm/kvm-config-arch.h
+>  delete mode 100644 arm/aarch64/include/kvm/kvm-cpu-arch.h
+>  delete mode 100644 arm/aarch64/kvm.c
+>  delete mode 100644 arm/kvm-cpu.c
+>  rename {arm/aarch64 => arm64}/arm-cpu.c (96%)
+>  rename {arm => arm64}/fdt.c (99%)
+>  rename {arm => arm64}/gic.c (99%)
+>  rename {arm => arm64}/gicv2m.c (99%)
+>  rename {arm/aarch64 => arm64}/include/asm/image.h (100%)
+>  rename {arm/aarch64 => arm64}/include/asm/kernel.h (100%)
+>  rename {arm/aarch64 => arm64}/include/asm/kvm.h (100%)
+>  rename {arm/aarch64 => arm64}/include/asm/pmu.h (100%)
+>  rename {arm/aarch64 => arm64}/include/asm/sve_context.h (100%)
+>  rename {arm/include/arm-common => arm64/include}/gic.h (100%)
+>  rename {arm/aarch64 => arm64}/include/kvm/barrier.h (100%)
+>  rename {arm/include/arm-common => arm64/include/kvm}/fdt-arch.h (100%)
+>  rename {arm/include/arm-common => arm64/include/kvm}/kvm-arch.h (96%)
+>  rename {arm/include/arm-common => arm64/include/kvm}/kvm-config-arch.h (54%)
+>  rename {arm/include/arm-common => arm64/include/kvm}/kvm-cpu-arch.h (82%)
+>  rename {arm/include/arm-common => arm64/include}/pci.h (100%)
+>  rename {arm/include/arm-common => arm64/include}/timer.h (100%)
+>  rename {arm => arm64}/ioport.c (100%)
+>  rename {arm/aarch64 => arm64}/kvm-cpu.c (70%)
+>  rename {arm => arm64}/kvm.c (59%)
+>  rename {arm => arm64}/pci.c (98%)
+>  rename {arm/aarch64 => arm64}/pmu.c (99%)
+>  rename {arm/aarch64 => arm64}/pvtime.c (100%)
+>  rename {arm => arm64}/timer.c (95%)
 > 
 > 
-> > How is EL1 supposed to know that the
-> > hypervisor has already sent the release call?
+> base-commit: e48563f5c4a48fe6a6bc2a98a9a7c84a10f043be
+> -- 
+> 2.39.5
 > 
-> It doesn't need to know, it issues the call as there is no hypervisor
-> in-between, why would it need to know ?
-> 
-
-Exactly.
-
-> > And isn't EL1 going to be
-> > confused if the content of the buffer is overridden before is has issued
-> > the release call itself?
-> 
-
-Yes good point. I need to recall the details, but I am assuming FF-A proxy
-in pKVM maps the Tx/Rx buffers with the host in EL2 and maintains another
-Tx/Rx pair with SPMC on the secure side right ?
-
-> The hypervisor should prevent changes to the buffer mapped between the
-> host and itself until the release_rx call is issued from the host.
-
-OK, this sounds like my understand above is indeed correct ?
-
-> If another call that wants to make use of the rx buffer sneaks in, we
-> would have to revoke it with BUSY until rx_release is sent.
->
-
-Sounds good to me.
-
--- 
-Regards,
-Sudeep
