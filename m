@@ -1,113 +1,100 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4049E137930
-	for <kvmarm@lists.linux.dev>; Wed, 26 Mar 2025 20:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9EB1DD88D;
+	Thu, 27 Mar 2025 03:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743021627; cv=none; b=SZXQJVBd7xGyIMdgLCQwV6vg8Rb9MbCnvRCIcVBUypyYePHnXJIvqT34OUI+BTI8ApIrbQaiOg7fVLW0SJDJkp0fhmVDM32NezcBBgaM9+Eyrk+VVyaqjd5L4+nEsFiWKVDCjm+SQxrs07u+o4+y/t8ERMnujkqtRZAfhrBr0qg=
+	t=1743045856; cv=none; b=WJkcPxqK7PiuFt47xsTcp6y+gD+jDiNheBhyZ/3/xp4nAU9ynhuQJ3Tq5RJFRlOdKDxzUj618N2Nq0629+WeivR4b3ynragZRSPOBWNeLjH91vBZqYaoFFkAUhOrqTPZaLG6ZZPvfe+Z9HwhDZPMKYiPpseNM+oHc5MWG8x4IcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743021627; c=relaxed/simple;
-	bh=vsDzlSImn7SIlQBYWw98T4RqAX3WL8B/3H0BPKPwr7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1f/uiP6P5NYcEFVufuMARi8rFerQkiuaQvhTh5j4G4PLSJIhj9urTiKWu74r0/FJMtFuxzhp/u1Bz3KluBqZ2gu94VYtcbtWjaArEqfT9r2u/UBeczwM5cPzl3DyBhUMd6cX3X5kHfOUvT9jmG/P2gycsblgWzC6OidyvASq0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tiut/nE5; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1743045856; c=relaxed/simple;
+	bh=pfieFhDpfQvLevcNm0LMhPf+5kEs/vR8/60fuGlDo/s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MWUg3KC+vpb1mA2mEiAl4uNTPWKWYvxFKF0chFltxnu2w383NExy1+bR3Xj+QRhy2YAe0k/GEWZZeWI4aOOS679ec0igJEtGP4U/n0xYSzEBw3615VqdbqZ4OE1EMAvxeQx0B3phwyiIumUnWSASxbfiWrITtdisW7638jDoWbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQJgvNz2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tiut/nE5"
-Date: Wed, 26 Mar 2025 13:40:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743021623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wg2P5N/lgAa+Pjwmt6Xv30iT0//GYcryM47I3itLJEs=;
-	b=tiut/nE5Sd50+xXN1DOthjMja5xf6A769EkXEIuON8c27ybVj1FLwM/UIPbk4rdmXybG84
-	MMf9m+ycBH8XC+mocUwwkhYuTmxb62uNkK5Q8sdlZMjJf2WeVJy1t7AgzpI1pZFHYMrCT/
-	k9ZPVoxbEfJk42i66cO5qQ4rwyy9WmI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@linaro.org>
-Cc: Colton Lewis <coltonlewis@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-	robh@kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	pbonzini@redhat.com, shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
- partition the PMU
-Message-ID: <Z-RmMLkTuwsea7Uk@linux.dev>
-References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
- <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQJgvNz2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE74C4CEDD;
+	Thu, 27 Mar 2025 03:24:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743045856;
+	bh=pfieFhDpfQvLevcNm0LMhPf+5kEs/vR8/60fuGlDo/s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UQJgvNz2l0z8fqtCdNnyUvqSjVoXL9wFCHHbvvPzybzC9+Gmf923AguCn+7ATs1dB
+	 /l2CeBHujWK+xvCJN0M2aMdsKhViozJInjMMHMHuTHdemgu0HYqp/81iWGeZDsLvzd
+	 rbyEySOqo0DaqGftGgf/4lE5qQCtgsvJfySatQPTo3xdKaI0+H3NF/GPTdd12tdB4i
+	 IkHxpZ5h25C8oY/cPYvhAaPf+y26NAdF9cjddpEqLLo0nWxloMQ5npTdW/W8dkCepw
+	 Jeb7lHih+Mj6k6AsS5KBshhrXBx4thVfrpsR6pUdWrEOLVPz8IvjinOfuk6M3fNFAf
+	 cIwI8TWsAgfcQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFB4380AAFD;
+	Thu, 27 Mar 2025 03:24:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/7] KVM: x86: nVMX IRQ fix and VM teardown cleanups
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <174304589224.1549280.1623157194395422949.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Mar 2025 03:24:52 +0000
+References: <20250224235542.2562848-1-seanjc@google.com>
+In-Reply-To: <20250224235542.2562848-1-seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-riscv@lists.infradead.org, maz@kernel.org, oliver.upton@linux.dev,
+ zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org,
+ maddy@linux.ibm.com, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, pbonzini@redhat.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, aaronlewis@google.com, jmattson@google.com,
+ yan.y.zhao@intel.com, rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ isaku.yamahata@intel.com
 
-On Wed, Mar 26, 2025 at 05:38:34PM +0000, James Clark wrote:
-> On 25/03/2025 6:32 pm, Colton Lewis wrote:
-> > > I don't know if this is a stupid idea, but instead of having a fixed
-> > > number for the partition, wouldn't it be nice if we could trap and
-> > > increment HPMN on the first guest use of a counter, then decrement it on
-> > > guest exit depending on what's still in use? The host would always
-> > > assign its counters from the top down, and guests go bottom up if they
-> > > want PMU passthrough. Maybe it's too complicated or won't work for
-> > > various reasons, but because of BRBE the counter partitioning changes go
-> > > from an optimization to almost a necessity.
-> > 
-> > This is a cool idea that would enable useful things. I can think of a
-> > few potential problems.
-> > 
-> > 1. Partitioning will give guests direct access to some PMU counter
-> > registers. There is no reliable way for KVM to determine what is in use
-> > from that state. A counter that is disabled guest at exit might only be
-> > so temporarily, which could lead to a lot of thrashing allocating and
-> > deallocating counters.
+Hello:
 
-KVM must always have a reliable way to determine if the PMU is in use.
-If there's any counter in the vPMU for which kvm_pmu_counter_is_enabled()
-is true would do the trick...
+This series was applied to riscv/linux.git (for-next)
+by Paolo Bonzini <pbonzini@redhat.com>:
 
-Generally speaking, I would like to see the guest/host context switch in
-KVM modeled in a way similar to the debug registers, where the vPMU
-registers are loaded onto hardware lazily if either:
-
-  1) The above definition of an in-use PMU is satisfied
-
-  2) The guest accessed a PMU register since the last vcpu_load()
-
-> > 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
-> > determine how many counters there are. If HPMN starts as a low number,
-> > guests have no way of knowing there are more counters
-> > available. Dynamically changing the counters available could be
-> > confusing for guests.
-> > 
+On Mon, 24 Feb 2025 15:55:35 -0800 you wrote:
+> This was _supposed_ to be a tiny one-off patch to fix a nVMX bug where KVM
+> fails to detect that, after nested VM-Exit, L1 has a pending IRQ (or NMI).
+> But because x86's nested teardown flows are garbage (KVM simply forces a
+> nested VM-Exit to put the vCPU back into L1), that simple fix snowballed.
 > 
-> Yes I was expecting that PMCR would have to be trapped and N reported to be
-> the number of physical counters rather than how many are in the guest
-> partition.
+> The immediate issue is that checking for a pending interrupt accesses the
+> legacy PIC, and x86's kvm_arch_destroy_vm() currently frees the PIC before
+> destroying vCPUs, i.e. checking for IRQs during the forced nested VM-Exit
+> results in a NULL pointer deref (or use-after-free if KVM didn't nullify
+> the PIC pointer).  That's patch 1.
+> 
+> [...]
 
-I'm not sure this is aligned with the spirit of the feature.
+Here is the summary with links:
+  - [1/7] KVM: x86: Free vCPUs before freeing VM state
+    https://git.kernel.org/riscv/c/17bcd7144263
+  - [2/7] KVM: nVMX: Process events on nested VM-Exit if injectable IRQ or NMI is pending
+    https://git.kernel.org/riscv/c/982caaa11504
+  - [3/7] KVM: Assert that a destroyed/freed vCPU is no longer visible
+    (no matching commit)
+  - [4/7] KVM: x86: Don't load/put vCPU when unloading its MMU during teardown
+    (no matching commit)
+  - [5/7] KVM: x86: Unload MMUs during vCPU destruction, not before
+    (no matching commit)
+  - [6/7] KVM: x86: Fold guts of kvm_arch_sync_events() into kvm_arch_pre_destroy_vm()
+    (no matching commit)
+  - [7/7] KVM: Drop kvm_arch_sync_events() now that all implementations are nops
+    (no matching commit)
 
-Colton's aim is to minimize the overheads of trapping the PMU *and*
-relying on the perf subsystem for event scheduling. To do dynamic
-partitioning as you've described, KVM would need to unconditionally trap
-the PMU registers so it can pack the guest counters into the guest
-partition. We cannot assume the VM will allocate counters sequentially.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Dynamic counter allocation can be had with the existing PMU
-implementation. The partitioned PMU is an alternative userspace can
-select, not a replacement for what we already have.
 
-Thanks,
-Oliver
