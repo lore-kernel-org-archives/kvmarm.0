@@ -1,161 +1,182 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAF01BE23F
-	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 09:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AEC46BF
+	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 09:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743067092; cv=none; b=H8WVegyC69y+MGAirQqCGi9K/pKP59HptF7xB4h3xRh3Jlf3KbTN5dNG+fXty85t7AkHQe0ERX/EXCH7han6xjJFIc4U4WX7iRTHR8zgSnJZPOq3REFa4yJupcMgFM2OA4/iWgvNZPtNMyD5j/5SNeQBdj/VYzGCQ/wDnPgSAXo=
+	t=1743068262; cv=none; b=XRjpFjNc66n0B8Va41GG0XGqsh9FMnHEOfVNuE0FCr8c2KZxi0cNG0tEUCL4EGPCJI7M5iXb/OU9uxT/uxrSqqMTvHmGKzGuYedYLqyHmgv5lcDg5R/c0gMd+xfcxDGc3bEfAS3RK9CM0GgchSRacV9CCBc5sUCgrV9CMGJL6rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743067092; c=relaxed/simple;
-	bh=Ev6op6sM15VCGysaQs2NpJ70AHSnjZnuHWVUWKJfAlQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A+2FoR1ATlKQ7/9ToE9cmg4A2Wi4WIZmhbAYUpsEmwtXjLzqLaSgRc2+dh7yS9qOifr5vOInH8IJmXMBZtCL7ALXhJyMWnM4HD21Md/sB7Lbhywmc5zsP318+N1dMW69qyfu45qdvKmOHzqMKnpzWaxnuoEegpe/ItjJGeDKLpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GmavMxDe; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1743068262; c=relaxed/simple;
+	bh=nO2bts7JVplwiKWYXkIfxfGGR1gvkSX82zQJe0Q40fg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3NGQ578dAGcGiQksaCR+EOqDKwUcF3brMgviXFqW1dGn4hsmtPCKVLheT6S+frGK9X8GvPWZL1ppFOQauSFjeN91S633X8BdfTLNhs9KhQE45fL9cUX+DHoj42En2Re/Oy1uWH+CKjOKbFCgY3/F9shPPIHG7VEi7ZGfl3PPag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O2w3NZS9; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GmavMxDe"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so8046875e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 02:18:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O2w3NZS9"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2242ac37caeso116815ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 02:37:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1743067088; x=1743671888; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AdqOBa0Y+4+hMz6T43UiEMBnLkl2i23ABjw2IJz/f/k=;
-        b=GmavMxDeiO8HSLHgDUYHITPNg+sMDuOj8GoGsnuaN5J1stDssKyrKJe6vIXw9z/lfx
-         KRpRPjXXqPCgAz+qAEhdBia+WZvqQTbGpCI4jYZHKTdLgGgI6QEqLHJt0MjanM6liBnV
-         Gzg37kB/3X+X3IDdFRswTMOGtmYbWkEoNi3JMvnqri5xvtN6dwg8bYzMW5xLBRWlmEjT
-         D/xtGwmYgMAhbqxgzBb+M0K1E1wWMVM+h2Bcz1Yi8zWeYcjtvc8kgcgjbA6g1vWnDtHm
-         P88jjTL5gAlVm1fkthlSnOnnQPfKzQ+SK1gxViwDoduDOHJHAY9wiusrscBwMQEs6CPc
-         Aq7w==
+        d=google.com; s=20230601; t=1743068260; x=1743673060; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UIotJVVBD3/NnOnKPh1r2ow/aFL293MuBe0NVckPSv8=;
+        b=O2w3NZS9qTv3BoaSHLDKBHAL9Y5faMd6FxeDUxrfMmbJMROuK8lcF8n+cGfoLnYalS
+         yy9Xf5raIyxeOnF30KZDqLltknaol8S6Y9pNeHIHd12qxSaxKLmgAhKf+dHFyQRUqg46
+         hEjyBOsHDLUv/+wkLV1ufNF8Uby3Ta9ykHlZmQE0pq6Ky/yNnE4XkJZD4NeJY0Wz+QfB
+         0b+HZvsxZ84/zDCm8yAm4R4pEIcgeaNZ1opAfVt9OsOFuGHJ7itWnCbuhnMs89nc6IDH
+         EyMmsp3LtPg6advs4x3Q0XxDfMBSR7MpYGUG49UL+opTAc1Mry46kh1PXzg0WA+ES03J
+         WSdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743067088; x=1743671888;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AdqOBa0Y+4+hMz6T43UiEMBnLkl2i23ABjw2IJz/f/k=;
-        b=ado2DnTudFkOBmYttt7E+Q0xFRKXqkudzOfcffY7QElQqZmsTZxHpQVrIHfhgUw7jc
-         t/05FFxRexQ9YzvPBdw1CaYzOU3T7sslgDlwKU+iWTpgB6vPcN0gUhyeTwNpa09YZGJQ
-         cZWs99dVTL6mkB0dHnSoSSGUDw1qR7bK8m4y7BIaY5YoUdfToXsV6P8iaVP3H5kv9Df9
-         299BvHMv9pNCDWNV17l6tBcAO2zdQ7/VNG2Y+SAe4NgdCcNtKryICyuoQ8SQrJPTXE+l
-         MCE9Ccidh8EjKLCKScenJyjYf0XpMrqVup8fHDH9PdcN3niJrplPMX81QlM7Tw5NiC12
-         bksQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVmSpDKWQU13zyh9zF4v/SJPuHc+bfNSHSAgXy6xG5OHsHgNEwOB4vgVepsgI7kqCPvIey6PyY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy+41sW8UvdUkZevDgVR2VOC5v81X+1dF+nXchyHu/yMI1Ne0so
-	vBPEBavdlNpi27rBgD8vb13vWJoKzTZ6gocWyb9HL7189cU6nXMYOBnSZxT+cx0=
-X-Gm-Gg: ASbGncsKQblA/y4ghcGKIK1vWaZNA+zaUjeXUIBlN4Uy2Z3dbec0bSEmSjcK7av8sBL
-	VdFQftSTjfjusw48RMGvgqN+NxG1J7bgUBqloupRhDMRtooxa9K7o37J5i3lF90pqWNxW8Xcwht
-	4sQ0jo587gjvsLlPFYgjoMp/H4uPaEIQ75kEvnzfhVw4bKmLNLNwOiE/fvcLz4obwSIHyTlZEDU
-	aUc2ZcKsD8mVNMGoYY3XYl3rWANctTdye31TkaQ39TgAZocurVMzyL9BUWx0rUeiLqD4u7oHgAL
-	gf8dEHFm1KEi64MTOE2SPrIVCbS8jEZOhTEHl/RtrZAk/xThVA==
-X-Google-Smtp-Source: AGHT+IF9q6whwwkhqGN2Pk+AEph3LrTbbtoFFPYNJTAshCFIqJMIeQt7KSSkyJwJU5Ap2Rh/HnzcAg==
-X-Received: by 2002:a05:6000:2cb:b0:39a:c8a8:4fdc with SMTP id ffacd0b85a97d-39ad175c052mr2069156f8f.16.1743067088494;
-        Thu, 27 Mar 2025 02:18:08 -0700 (PDT)
-Received: from [192.168.1.247] ([77.81.75.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d7ae6a319sm30665955e9.0.2025.03.27.02.18.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Mar 2025 02:18:07 -0700 (PDT)
-Message-ID: <ba2c38f1-d686-45dc-ae47-924cc11d15f6@linaro.org>
-Date: Thu, 27 Mar 2025 09:18:06 +0000
+        d=1e100.net; s=20230601; t=1743068260; x=1743673060;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UIotJVVBD3/NnOnKPh1r2ow/aFL293MuBe0NVckPSv8=;
+        b=rtXJvKc3A9VElWIARLNaByXJgE4oyolc4Oa6wCofzXDWljJrSL/P7PWyVmpE4W7vK8
+         sPqlYT4AVDg8jiJhZjGxzSJgz3XRgfuZSmXDIGaxtE4wpmrPe4e13l2M2SWs5hfgWtLF
+         Eks4TYhS9qrUCP2UrcmBtNYe53/aNKeOuk6tNKUiea5ccHSJZ4cpPZsoqV2pvptOYfE4
+         wZpnqvZRZ/y7tYARKKuwCCytgQQOU9MSE0fpBnCafYXWhJAAluupUPJf7aCvVqDhVPHL
+         +g3XfJ3N5s3/9hGrSQsMlN+daE5PY6MdNvFMXq32fDC8Yj+6Vto0Q9tKN4t85FiKQt+c
+         Ax4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWboiUD7IrH811+vdlYdx20fcx7ptdMGJ3sHitNbDLA2wH+j8OswrNxNOXndYNu2zp62k1QL1I=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwAd49WztqQZedL0tki4XjW4yIcOTr76FajdX5sEi3IlBf+IMH+
+	7XMBh5vFxe3iCaX70yUmpj+y1+gFxBmN10/ldfb12NrpSjZlHz3/Ss4zODk7uQ==
+X-Gm-Gg: ASbGncvKvaFG8xolh4iyQmkKiXArxfdSimvbpG7qYU0HNQyC5YHihUh7TWhTK9IiBKW
+	fjloP/bENEZCWDoT692hqw7QojgoPCYMJq01vym6Mgf9yuR/6JeCoIEclSkGOFrHzFAKSV86u0Y
+	u4YMsM73DLcBAD+haaIjabWzZvDeYx+QO59LYNPUQGtsG9liMQv5u+l0ukyXNUGuljhjUC36y0n
+	E0fMaBU61hIL/RO3mXau9AgravhY9rufkRYoXdMxWVBClveb+AkbSloyHPKAiDu3ddNsQU3Md8Z
+	BMhdQL+CcCz4eLWE6ezFP+lPjxuPxmvfZihKNiWxQBEI77sA6WnZx5FAruZ60I0x1jLKHL4NSpl
+	o6/h6gqZJI5xvEmZDSlB2
+X-Google-Smtp-Source: AGHT+IGB0Vi5pWlDgQqZ4uKyMwBPu6nja3HHv+BqBDGefnFIarUTyd7UM+7yrEZbE7LmEsV4/0FJxQ==
+X-Received: by 2002:a17:902:f645:b0:223:f479:3860 with SMTP id d9443c01a7336-22806dd46f8mr2324225ad.18.1743068260152;
+        Thu, 27 Mar 2025 02:37:40 -0700 (PDT)
+Received: from google.com (28.140.38.34.bc.googleusercontent.com. [34.38.140.28])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73907b36bfasm13626302b3a.2.2025.03.27.02.37.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 02:37:39 -0700 (PDT)
+Date: Thu, 27 Mar 2025 09:37:31 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Quentin Perret <qperret@google.com>
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, maz@kernel.org,
+	oliver.upton@linux.dev, snehalreddy@google.com,
+	sudeep.holla@arm.com, suzuki.poulose@arm.com, vdonnefort@google.com,
+	will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel-team@android.com, Andrei Homescu <ahomescu@google.com>
+Subject: Re: [PATCH v4 3/3] KVM: arm64: Release the ownership of the hyp rx
+ buffer to Trustzone
+Message-ID: <Z-UcW32Hk6f_cuxc@google.com>
+References: <20250326113901.3308804-1-sebastianene@google.com>
+ <20250326113901.3308804-4-sebastianene@google.com>
+ <Z-Qv4b0vgVql2yOb@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
- partition the PMU
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Colton Lewis <coltonlewis@google.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
- robh@kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com,
- will@kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com,
- shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
- <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
- <Z-RmMLkTuwsea7Uk@linux.dev>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <Z-RmMLkTuwsea7Uk@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-Qv4b0vgVql2yOb@google.com>
 
+On Wed, Mar 26, 2025 at 04:48:33PM +0000, Quentin Perret wrote:
+> On Wednesday 26 Mar 2025 at 11:39:01 (+0000), Sebastian Ene wrote:
+> > Introduce the release FF-A call to notify Trustzone that the hypervisor
+> > has finished copying the data from the buffer shared with Trustzone to
+> > the non-secure partition.
+> >
+> > Reported-by: Andrei Homescu <ahomescu@google.com>
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index 6df6131f1107..ac898ea6274a 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -749,6 +749,7 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
+> >  	DECLARE_REG(u32, uuid3, ctxt, 4);
+> >  	DECLARE_REG(u32, flags, ctxt, 5);
+> >  	u32 count, partition_sz, copy_sz;
+> > +	struct arm_smccc_res _res;
+> >  
+> >  	hyp_spin_lock(&host_buffers.lock);
+> >  	if (!host_buffers.rx) {
+> > @@ -765,11 +766,11 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
+> >  
+> >  	count = res->a2;
+> >  	if (!count)
+> > -		goto out_unlock;
+> > +		goto release_rx;
+> >  
+> >  	if (hyp_ffa_version > FFA_VERSION_1_0) {
+> >  		/* Get the number of partitions deployed in the system */
+> > -		if (flags & 0x1)
+> > +		if (flags & PARTITION_INFO_GET_RETURN_COUNT_ONLY)
+> >  			goto out_unlock;
+> >  
+> >  		partition_sz  = res->a3;
+> > @@ -781,10 +782,12 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
+> >  	copy_sz = partition_sz * count;
+> >  	if (copy_sz > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
+> >  		ffa_to_smccc_res(res, FFA_RET_ABORTED);
+> > -		goto out_unlock;
+> > +		goto release_rx;
+> >  	}
+> >  
+> >  	memcpy(host_buffers.rx, hyp_buffers.rx, copy_sz);
+> > +release_rx:
+> > +	ffa_rx_release(&_res);
 
-
-On 26/03/2025 8:40 pm, Oliver Upton wrote:
-> On Wed, Mar 26, 2025 at 05:38:34PM +0000, James Clark wrote:
->> On 25/03/2025 6:32 pm, Colton Lewis wrote:
->>>> I don't know if this is a stupid idea, but instead of having a fixed
->>>> number for the partition, wouldn't it be nice if we could trap and
->>>> increment HPMN on the first guest use of a counter, then decrement it on
->>>> guest exit depending on what's still in use? The host would always
->>>> assign its counters from the top down, and guests go bottom up if they
->>>> want PMU passthrough. Maybe it's too complicated or won't work for
->>>> various reasons, but because of BRBE the counter partitioning changes go
->>>> from an optimization to almost a necessity.
->>>
->>> This is a cool idea that would enable useful things. I can think of a
->>> few potential problems.
->>>
->>> 1. Partitioning will give guests direct access to some PMU counter
->>> registers. There is no reliable way for KVM to determine what is in use
->>> from that state. A counter that is disabled guest at exit might only be
->>> so temporarily, which could lead to a lot of thrashing allocating and
->>> deallocating counters.
-> 
-> KVM must always have a reliable way to determine if the PMU is in use.
-> If there's any counter in the vPMU for which kvm_pmu_counter_is_enabled()
-> is true would do the trick...
-> 
-> Generally speaking, I would like to see the guest/host context switch in
-> KVM modeled in a way similar to the debug registers, where the vPMU
-> registers are loaded onto hardware lazily if either:
-> 
->    1) The above definition of an in-use PMU is satisfied
-> 
->    2) The guest accessed a PMU register since the last vcpu_load()
-> 
->>> 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
->>> determine how many counters there are. If HPMN starts as a low number,
->>> guests have no way of knowing there are more counters
->>> available. Dynamically changing the counters available could be
->>> confusing for guests.
->>>
->>
->> Yes I was expecting that PMCR would have to be trapped and N reported to be
->> the number of physical counters rather than how many are in the guest
->> partition.
-> 
-> I'm not sure this is aligned with the spirit of the feature.
-> 
-> Colton's aim is to minimize the overheads of trapping the PMU *and*
-> relying on the perf subsystem for event scheduling. To do dynamic
-> partitioning as you've described, KVM would need to unconditionally trap
-> the PMU registers so it can pack the guest counters into the guest
-> partition. We cannot assume the VM will allocate counters sequentially.
-
-Yeah I agree, requiring cooperation from the guest probably makes it a 
-non starter.
+Hi,
 
 > 
-> Dynamic counter allocation can be had with the existing PMU
-> implementation. The partitioned PMU is an alternative userspace can
-> select, not a replacement for what we already have.
+> I'm a bit confused about this release call here. In the pKVM FF-A proxy
+> model, the hypervisor is essentially 'transparent', so do we not expect
+> EL1 to issue that instead?
+
+I think the EL1 should also issue this call irrespective of what the
+hypervisor is doing. Sudeep can correct me here if I am wrong, but this
+is my take on this.
+
+I am looking at this as a way of signaling the availability of the rx
+buffer across partitions. There are some calls that when invoked, they
+place the buffer in a 'locked state'.
+
+
+> How is EL1 supposed to know that the
+> hypervisor has already sent the release call?
+
+It doesn't need to know, it issues the call as there is no hypervisor
+in-between, why would it need to know ?
+
+> And isn't EL1 going to be
+> confused if the content of the buffer is overridden before is has issued
+> the release call itself?
+
+The hypervisor should prevent changes to the buffer mapped between the
+host and itself until the release_rx call is issued from the host.
+If another call that wants to make use of the rx buffer sneaks in, we
+would have to revoke it with BUSY until rx_release is sent.
+
+>What would otherwise prevent that from
+> happening?
+
 > 
 > Thanks,
-> Oliver
+> Quentin
+>
 
+Thanks,
+Sebastian
 
-It's just a shame that it doesn't look like there's a way to make BRBE 
-work properly in guests with the existing implementation. Maybe we're 
-stuck with only allowing it in a partition for now.
-
-Thanks
-James
-
+> >  out_unlock:
+> >  	hyp_spin_unlock(&host_buffers.lock);
+> >  }
+> > -- 
+> > 2.49.0.395.g12beb8f557-goog
+> > 
