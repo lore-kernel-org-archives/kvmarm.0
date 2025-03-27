@@ -1,100 +1,246 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9EB1DD88D;
-	Thu, 27 Mar 2025 03:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091502054F6
+	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 08:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743045856; cv=none; b=WJkcPxqK7PiuFt47xsTcp6y+gD+jDiNheBhyZ/3/xp4nAU9ynhuQJ3Tq5RJFRlOdKDxzUj618N2Nq0629+WeivR4b3ynragZRSPOBWNeLjH91vBZqYaoFFkAUhOrqTPZaLG6ZZPvfe+Z9HwhDZPMKYiPpseNM+oHc5MWG8x4IcU=
+	t=1743063959; cv=none; b=hts+PhV4tPM/pg13pbw60pzZN8uEZlRgSFG7ALHHU06RmI7blsYJqhOxoQopQ6wfQQh2PWcwn4FX48B73QrkYAuoMt5SOiYAJbrPiIIUuJVt2lOjLTXJA3XU6eYEY0nKfbdSMQxtKL2nKng+8Y8oBc5qdVM9WcybkK8941W0XFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743045856; c=relaxed/simple;
-	bh=pfieFhDpfQvLevcNm0LMhPf+5kEs/vR8/60fuGlDo/s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MWUg3KC+vpb1mA2mEiAl4uNTPWKWYvxFKF0chFltxnu2w383NExy1+bR3Xj+QRhy2YAe0k/GEWZZeWI4aOOS679ec0igJEtGP4U/n0xYSzEBw3615VqdbqZ4OE1EMAvxeQx0B3phwyiIumUnWSASxbfiWrITtdisW7638jDoWbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQJgvNz2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743063959; c=relaxed/simple;
+	bh=u7j5oFuljpMg/DAbe79m2B6lL56FiQSytDN1lTtwevg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HvwYEQbGxJ34DTHU7n85WIsWGxnnCTnXcixxGHf3jHBHBk6d+rnjAbhIFbOuqFV4+uaxA9H4O0x9NADMTveKcaClln5QPDlZhInwn0GGQ+Gm6iz4LCxwEn+IsF5Yl5tuoIrBte5+ZN3YzBi9XRL0k0PgTBAIRy5XZ//ogj4LdJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k0OWUjXy; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQJgvNz2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE74C4CEDD;
-	Thu, 27 Mar 2025 03:24:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743045856;
-	bh=pfieFhDpfQvLevcNm0LMhPf+5kEs/vR8/60fuGlDo/s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UQJgvNz2l0z8fqtCdNnyUvqSjVoXL9wFCHHbvvPzybzC9+Gmf923AguCn+7ATs1dB
-	 /l2CeBHujWK+xvCJN0M2aMdsKhViozJInjMMHMHuTHdemgu0HYqp/81iWGeZDsLvzd
-	 rbyEySOqo0DaqGftGgf/4lE5qQCtgsvJfySatQPTo3xdKaI0+H3NF/GPTdd12tdB4i
-	 IkHxpZ5h25C8oY/cPYvhAaPf+y26NAdF9cjddpEqLLo0nWxloMQ5npTdW/W8dkCepw
-	 Jeb7lHih+Mj6k6AsS5KBshhrXBx4thVfrpsR6pUdWrEOLVPz8IvjinOfuk6M3fNFAf
-	 cIwI8TWsAgfcQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFB4380AAFD;
-	Thu, 27 Mar 2025 03:24:53 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k0OWUjXy"
+Date: Thu, 27 Mar 2025 09:25:42 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743063944;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NEt0aiytcktruPAw6HXBqRFKUOE4nJxqyXPJB1e/qLA=;
+	b=k0OWUjXyssoB8n/xGrlSbPBbPiM9eAyalAfD9ZbQETMOqsbjcwqDHzKpTDW1kV2F+kZBIf
+	gBEaWL/EXxvIM20UTXiBogTvLRN17NnSZ7oHseSS9cx0vho/pseSKoLWBQ+GOJ+2zulMs/
+	bJfxjCBIcS3QbagiFYnO/EKtjlrYRGc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
+Message-ID: <20250327-96bca62a41b4bb0aa44303d4@orel>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
+ <20250325160031.2390504-7-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/7] KVM: x86: nVMX IRQ fix and VM teardown cleanups
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <174304589224.1549280.1623157194395422949.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Mar 2025 03:24:52 +0000
-References: <20250224235542.2562848-1-seanjc@google.com>
-In-Reply-To: <20250224235542.2562848-1-seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-riscv@lists.infradead.org, maz@kernel.org, oliver.upton@linux.dev,
- zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org,
- maddy@linux.ibm.com, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com,
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, pbonzini@redhat.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, aaronlewis@google.com, jmattson@google.com,
- yan.y.zhao@intel.com, rick.p.edgecombe@intel.com, kai.huang@intel.com,
- isaku.yamahata@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325160031.2390504-7-jean-philippe@linaro.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This series was applied to riscv/linux.git (for-next)
-by Paolo Bonzini <pbonzini@redhat.com>:
-
-On Mon, 24 Feb 2025 15:55:35 -0800 you wrote:
-> This was _supposed_ to be a tiny one-off patch to fix a nVMX bug where KVM
-> fails to detect that, after nested VM-Exit, L1 has a pending IRQ (or NMI).
-> But because x86's nested teardown flows are garbage (KVM simply forces a
-> nested VM-Exit to put the vCPU back into L1), that simple fix snowballed.
+On Tue, Mar 25, 2025 at 04:00:32PM +0000, Jean-Philippe Brucker wrote:
+> Add the --qemu-cpu option to let users set the CPU type to run on.
+> At the moment --processor allows to set both GCC -mcpu flag and QEMU
+> -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
+> the TCG features by default, and it could also be nice to let users
+> modify the CPU capabilities by setting extra -cpu options.  Since GCC
+> -mcpu doesn't accept "max" or "host", separate the compiler and QEMU
+> arguments.
 > 
-> The immediate issue is that checking for a pending interrupt accesses the
-> legacy PIC, and x86's kvm_arch_destroy_vm() currently frees the PIC before
-> destroying vCPUs, i.e. checking for IRQs during the forced nested VM-Exit
-> results in a NULL pointer deref (or use-after-free if KVM didn't nullify
-> the PIC pointer).  That's patch 1.
+> `--processor` is now exclusively for compiler options, as indicated by
+> its documentation ("processor to compile for"). So use $QEMU_CPU on
+> RISC-V as well.
 > 
-> [...]
+> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  scripts/mkstandalone.sh |  3 ++-
+>  arm/run                 | 15 +++++++++------
+>  riscv/run               |  8 ++++----
+>  configure               | 24 ++++++++++++++++++++++++
+>  4 files changed, 39 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index 2318a85f..9b4f983d 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -42,7 +42,8 @@ generate_test ()
+>  
+>  	config_export ARCH
+>  	config_export ARCH_NAME
+> -	config_export PROCESSOR
+> +	config_export QEMU_CPU
+> +	config_export DEFAULT_QEMU_CPU
+>  
+>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>  
+> diff --git a/arm/run b/arm/run
+> index efdd44ce..4675398f 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+>  	source config.mak
+>  	source scripts/arch-run.bash
+>  fi
+> -processor="$PROCESSOR"
+> +qemu_cpu="$QEMU_CPU"
+>  
+>  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+>     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> @@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
+>  	fi
+>  fi
+>  
+> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+> -		processor="host"
+> +if [ -z "$qemu_cpu" ]; then
+> +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> +		qemu_cpu="host"
+>  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> -			processor+=",aarch64=off"
+> +			qemu_cpu+=",aarch64=off"
+>  		fi
+> +	else
+> +		qemu_cpu="$DEFAULT_QEMU_CPU"
+>  	fi
+>  fi
+>  
+> @@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+>  fi
+>  
+>  A="-accel $ACCEL$ACCEL_PROPS"
+> -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+>  command+=" -display none -serial stdio"
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+> diff --git a/riscv/run b/riscv/run
+> index e2f5a922..02fcf0c0 100755
+> --- a/riscv/run
+> +++ b/riscv/run
+> @@ -11,12 +11,12 @@ fi
+>  
+>  # Allow user overrides of some config.mak variables
+>  mach=$MACHINE_OVERRIDE
+> -processor=$PROCESSOR_OVERRIDE
+> +qemu_cpu=$QEMU_CPU_OVERRIDE
+>  firmware=$FIRMWARE_OVERRIDE
+>  
+> -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+>  : "${mach:=virt}"
+> -: "${processor:=$PROCESSOR}"
+> +: "${qemu_cpu:=$QEMU_CPU}"
+>  : "${firmware:=$FIRMWARE}"
+>  [ "$firmware" ] && firmware="-bios $firmware"
+>  
+> @@ -32,7 +32,7 @@ fi
+>  mach="-machine $mach"
+>  
+>  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> -command+=" $mach $acc $firmware -cpu $processor "
+> +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+>  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> diff --git a/configure b/configure
+> index b4875ef3..b79145a5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -23,6 +23,21 @@ function get_default_processor()
+>      esac
+>  }
+>  
+> +# Return the default CPU type to run on
+> +function get_default_qemu_cpu()
+> +{
+> +    local arch="$1"
+> +
+> +    case "$arch" in
+> +    "arm")
+> +        echo "cortex-a15"
+> +        ;;
+> +    "arm64")
+> +        echo "cortex-a57"
+> +        ;;
+> +    esac
+> +}
+> +
+>  srcdir=$(cd "$(dirname "$0")"; pwd)
+>  prefix=/usr/local
+>  cc=gcc
+> @@ -52,6 +67,7 @@ earlycon=
+>  console=
+>  efi=
+>  efi_direct=
+> +qemu_cpu=
+>  
+>  # Enable -Werror by default for git repositories only (i.e. developer builds)
+>  if [ -e "$srcdir"/.git ]; then
+> @@ -70,6 +86,9 @@ usage() {
+>  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+>  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+>  	    --processor=PROCESSOR  processor to compile for ($processor)
+> +	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
+> +	                           selects the best value based on the host system and the
+> +	                           test configuration.
 
-Here is the summary with links:
-  - [1/7] KVM: x86: Free vCPUs before freeing VM state
-    https://git.kernel.org/riscv/c/17bcd7144263
-  - [2/7] KVM: nVMX: Process events on nested VM-Exit if injectable IRQ or NMI is pending
-    https://git.kernel.org/riscv/c/982caaa11504
-  - [3/7] KVM: Assert that a destroyed/freed vCPU is no longer visible
-    (no matching commit)
-  - [4/7] KVM: x86: Don't load/put vCPU when unloading its MMU during teardown
-    (no matching commit)
-  - [5/7] KVM: x86: Unload MMUs during vCPU destruction, not before
-    (no matching commit)
-  - [6/7] KVM: x86: Fold guts of kvm_arch_sync_events() into kvm_arch_pre_destroy_vm()
-    (no matching commit)
-  - [7/7] KVM: Drop kvm_arch_sync_events() now that all implementations are nops
-    (no matching commit)
+I'm starting to think we should name this '--target-cpu'. We already have
+'--target' which allows us to change the target to kvmtool and we may
+support other emulators/vmms someday. riscv kvmtool is already gaining
+support for different cpu types[1] and other vmms we add may have that
+support as well. There's no reason to add a separate configure command
+line option for each.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+So let's rename QEMU_CPU to TARGET_CPU, but keep DEFAULT_QEMU_CPU as it
+is, since that's qemu specific. run scripts will need to check TARGET
+is "qemu" to decide if it should use DEFAULT_QEMU_CPU when TARGET_CPU
+isn't set. Since TARGET is currently arm-only we can drop the riscv
+changes from this patch. I can do them with a follow-on series.
 
+[1] https://lore.kernel.org/all/20250326065644.73765-1-apatel@ventanamicro.com/
 
+Thanks,
+drew
+
+>  	    --target=TARGET        target platform that the tests will be running on (qemu or
+>  	                           kvmtool, default is qemu) (arm/arm64 only)
+>  	    --cross-prefix=PREFIX  cross compiler prefix
+> @@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
+>          --processor)
+>  	    processor="$arg"
+>  	    ;;
+> +	--qemu-cpu)
+> +	    qemu_cpu="$arg"
+> +	    ;;
+>  	--target)
+>  	    target="$arg"
+>  	    ;;
+> @@ -471,6 +493,8 @@ ARCH=$arch
+>  ARCH_NAME=$arch_name
+>  ARCH_LIBDIR=$arch_libdir
+>  PROCESSOR=$processor
+> +QEMU_CPU=$qemu_cpu
+> +DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
+>  CC=$cc
+>  CFLAGS=$cflags
+>  LD=$cross_prefix$ld
+> -- 
+> 2.49.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
