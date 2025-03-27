@@ -1,78 +1,98 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63441A707A
-	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 16:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBF4F9FE
+	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 17:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743093497; cv=none; b=gYkeiHXWGEZritb0DlZ6dNhq8q/0+coeJRVBzuMBiONxgnbiCfLDIVv4fMXiqu3bEBqLAnAxL+pTdRgfkd4fXFvzbjukVdI3ODN0UX0wY6qESZ27IuB6jw7NKvxcozmQc4BE1YxD2RUk7B9q++0rBWDStu1Itjpe35CHwMph9Wc=
+	t=1743095490; cv=none; b=FmG7D7RqnAmaGGqoJIMU6iZNePp9yifevWL7/XOV4rAewteP4qbTQM6Ea5Lgoe7epGYpi0Zeq5SzNyGl5CcljlbbG6YvX9Ai+t98tVvahUECLCuwGbg4WS9/n09mVyZxkfhLmLlWM8UKiK4tZnstUw1yOe2QGGkagILKq81/LNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743093497; c=relaxed/simple;
-	bh=ESzt2enLXYt23xY8ttSN/ZcELiO4gL9UAIgPB3r5q/c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TLt+bMuKRZ9H9KYOylUHCek5Yh/7VLlVy2vcETaAHPiOXePrKY79wVR+jlA01/VMhoEBIxgzNsQ0RA/AfE1BMHkFCzON8kwqn2z5rI/+JXHWOM+oBvv878Dz8Lgh+UHXn1DaQoEvlqWbHyW2en7+BQzfeyMwWIH6qxG0qnX22eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gOi6g9wK; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gOi6g9wK"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743093482;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Z51hX2ubcFhMKJ5by2u7YjCKZ3Nzr1b3Lq1PylQ9GKA=;
-	b=gOi6g9wKrGSV5UH/x54wg6WFP3jRV9kCC53qdcKuyEwOYsTNbTvmY/kgEf70GSTgtes9jT
-	RMIMsSF91b+mRVbfbms+jIBn14Dhmv3Skw6Jkb1GSznvz7Zm9v/3dJkyHjEwThs4pylu3s
-	DUepdIINJzrmUGd3pr5cqru3B+DW/LM=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH] smccc: kvm_guest: Align with DISCOVER_IMPL_CPUS ABI
-Date: Thu, 27 Mar 2025 09:36:15 -0700
-Message-Id: <20250327163613.2516073-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1743095490; c=relaxed/simple;
+	bh=BuEIdozODnu8Pi8cV2q1qibFyh11cZdTbxRUiasKPU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HOHWGLi/nf9oKhUJiNT1S6adS29xsB2maikEvD3y9i4lYjokuy2Gn5BcuRgSAANiXAqVI1jDtjKYXVq1i5p36+jbISRP5mRFhpa3V/wfcgz1Xtdgrpohyv88bzsRhSH1KeiLA6hrZ/LUJb2YHam7xkPvV24J6KiWo6OpaQeiMb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BDCD81063;
+	Thu, 27 Mar 2025 10:11:32 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 645FE3F63F;
+	Thu, 27 Mar 2025 10:11:26 -0700 (PDT)
+Date: Thu, 27 Mar 2025 17:11:23 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: andrew.jones@linux.dev, eric.auger@redhat.com, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 1/5] configure: arm64: Don't display
+ 'aarch64' as the default architecture
+Message-ID: <Z-WGuyzy4qxAcJD4@raptor>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
+ <20250325160031.2390504-4-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325160031.2390504-4-jean-philippe@linaro.org>
 
-The ABI of the hypercall requires that R2 and R3 are 0. Explicitly pass
-0 for these parameters.
+Hi Jean-Philippe
 
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Fixes: 86edf6bdcf05 ("smccc/kvm_guest: Enable errata based on implementation CPUs")
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- drivers/firmware/smccc/kvm_guest.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Mar 25, 2025 at 04:00:29PM +0000, Jean-Philippe Brucker wrote:
+> From: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> --arch=aarch64, intentional or not, has been supported since the initial
+> arm64 support, commit 39ac3f8494be ("arm64: initial drop"). However,
+> "aarch64" does not show up in the list of supported architectures, but
+> it's displayed as the default architecture if doing ./configure --help
+> on an arm64 machine.
+> 
+> Keep everything consistent and make sure that the default value for
+> $arch is "arm64", but still allow --arch=aarch64, in case they are users
+> that use this configuration for kvm-unit-tests.
 
-diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
-index 5767aed25cdc..ac2d3cf8a776 100644
---- a/drivers/firmware/smccc/kvm_guest.c
-+++ b/drivers/firmware/smccc/kvm_guest.c
-@@ -95,7 +95,7 @@ void  __init kvm_arm_target_impl_cpu_init(void)
- 
- 	for (i = 0; i < max_cpus; i++) {
- 		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID,
--				     i, &res);
-+				     i, 0, 0, &res);
- 		if (res.a0 != SMCCC_RET_SUCCESS) {
- 			pr_warn("Discovering target implementation CPUs failed\n");
- 			goto mem_free;
+You can drop this paragraph, since the change to the default value for $arch was
+dropped.
 
-base-commit: 369c0122682c4468a69f2454614eded71c5348f3
--- 
-2.39.5
+With this change:
 
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
+
+> 
+> The help text for --arch changes from:
+> 
+>    --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
+>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> 
+> to:
+> 
+>     --arch=ARCH            architecture to compile for (arm64). ARCH can be one of:
+>                            arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  configure | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/configure b/configure
+> index 52904d3a..010c68ff 100755
+> --- a/configure
+> +++ b/configure
+> @@ -43,6 +43,7 @@ else
+>  fi
+>  
+>  usage() {
+> +    [ "$arch" = "aarch64" ] && arch="arm64"
+>      cat <<-EOF
+>  	Usage: $0 [options]
+>  
+> -- 
+> 2.49.0
+> 
