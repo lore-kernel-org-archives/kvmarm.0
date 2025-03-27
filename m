@@ -1,246 +1,161 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091502054F6
-	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 08:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAF01BE23F
+	for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 09:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743063959; cv=none; b=hts+PhV4tPM/pg13pbw60pzZN8uEZlRgSFG7ALHHU06RmI7blsYJqhOxoQopQ6wfQQh2PWcwn4FX48B73QrkYAuoMt5SOiYAJbrPiIIUuJVt2lOjLTXJA3XU6eYEY0nKfbdSMQxtKL2nKng+8Y8oBc5qdVM9WcybkK8941W0XFM=
+	t=1743067092; cv=none; b=H8WVegyC69y+MGAirQqCGi9K/pKP59HptF7xB4h3xRh3Jlf3KbTN5dNG+fXty85t7AkHQe0ERX/EXCH7han6xjJFIc4U4WX7iRTHR8zgSnJZPOq3REFa4yJupcMgFM2OA4/iWgvNZPtNMyD5j/5SNeQBdj/VYzGCQ/wDnPgSAXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743063959; c=relaxed/simple;
-	bh=u7j5oFuljpMg/DAbe79m2B6lL56FiQSytDN1lTtwevg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HvwYEQbGxJ34DTHU7n85WIsWGxnnCTnXcixxGHf3jHBHBk6d+rnjAbhIFbOuqFV4+uaxA9H4O0x9NADMTveKcaClln5QPDlZhInwn0GGQ+Gm6iz4LCxwEn+IsF5Yl5tuoIrBte5+ZN3YzBi9XRL0k0PgTBAIRy5XZ//ogj4LdJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k0OWUjXy; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1743067092; c=relaxed/simple;
+	bh=Ev6op6sM15VCGysaQs2NpJ70AHSnjZnuHWVUWKJfAlQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A+2FoR1ATlKQ7/9ToE9cmg4A2Wi4WIZmhbAYUpsEmwtXjLzqLaSgRc2+dh7yS9qOifr5vOInH8IJmXMBZtCL7ALXhJyMWnM4HD21Md/sB7Lbhywmc5zsP318+N1dMW69qyfu45qdvKmOHzqMKnpzWaxnuoEegpe/ItjJGeDKLpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GmavMxDe; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k0OWUjXy"
-Date: Thu, 27 Mar 2025 09:25:42 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743063944;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NEt0aiytcktruPAw6HXBqRFKUOE4nJxqyXPJB1e/qLA=;
-	b=k0OWUjXyssoB8n/xGrlSbPBbPiM9eAyalAfD9ZbQETMOqsbjcwqDHzKpTDW1kV2F+kZBIf
-	gBEaWL/EXxvIM20UTXiBogTvLRN17NnSZ7oHseSS9cx0vho/pseSKoLWBQ+GOJ+2zulMs/
-	bJfxjCBIcS3QbagiFYnO/EKtjlrYRGc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	vladimir.murzin@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
-Message-ID: <20250327-96bca62a41b4bb0aa44303d4@orel>
-References: <20250325160031.2390504-3-jean-philippe@linaro.org>
- <20250325160031.2390504-7-jean-philippe@linaro.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GmavMxDe"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so8046875e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 27 Mar 2025 02:18:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1743067088; x=1743671888; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AdqOBa0Y+4+hMz6T43UiEMBnLkl2i23ABjw2IJz/f/k=;
+        b=GmavMxDeiO8HSLHgDUYHITPNg+sMDuOj8GoGsnuaN5J1stDssKyrKJe6vIXw9z/lfx
+         KRpRPjXXqPCgAz+qAEhdBia+WZvqQTbGpCI4jYZHKTdLgGgI6QEqLHJt0MjanM6liBnV
+         Gzg37kB/3X+X3IDdFRswTMOGtmYbWkEoNi3JMvnqri5xvtN6dwg8bYzMW5xLBRWlmEjT
+         D/xtGwmYgMAhbqxgzBb+M0K1E1wWMVM+h2Bcz1Yi8zWeYcjtvc8kgcgjbA6g1vWnDtHm
+         P88jjTL5gAlVm1fkthlSnOnnQPfKzQ+SK1gxViwDoduDOHJHAY9wiusrscBwMQEs6CPc
+         Aq7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743067088; x=1743671888;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AdqOBa0Y+4+hMz6T43UiEMBnLkl2i23ABjw2IJz/f/k=;
+        b=ado2DnTudFkOBmYttt7E+Q0xFRKXqkudzOfcffY7QElQqZmsTZxHpQVrIHfhgUw7jc
+         t/05FFxRexQ9YzvPBdw1CaYzOU3T7sslgDlwKU+iWTpgB6vPcN0gUhyeTwNpa09YZGJQ
+         cZWs99dVTL6mkB0dHnSoSSGUDw1qR7bK8m4y7BIaY5YoUdfToXsV6P8iaVP3H5kv9Df9
+         299BvHMv9pNCDWNV17l6tBcAO2zdQ7/VNG2Y+SAe4NgdCcNtKryICyuoQ8SQrJPTXE+l
+         MCE9Ccidh8EjKLCKScenJyjYf0XpMrqVup8fHDH9PdcN3niJrplPMX81QlM7Tw5NiC12
+         bksQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmSpDKWQU13zyh9zF4v/SJPuHc+bfNSHSAgXy6xG5OHsHgNEwOB4vgVepsgI7kqCPvIey6PyY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy+41sW8UvdUkZevDgVR2VOC5v81X+1dF+nXchyHu/yMI1Ne0so
+	vBPEBavdlNpi27rBgD8vb13vWJoKzTZ6gocWyb9HL7189cU6nXMYOBnSZxT+cx0=
+X-Gm-Gg: ASbGncsKQblA/y4ghcGKIK1vWaZNA+zaUjeXUIBlN4Uy2Z3dbec0bSEmSjcK7av8sBL
+	VdFQftSTjfjusw48RMGvgqN+NxG1J7bgUBqloupRhDMRtooxa9K7o37J5i3lF90pqWNxW8Xcwht
+	4sQ0jo587gjvsLlPFYgjoMp/H4uPaEIQ75kEvnzfhVw4bKmLNLNwOiE/fvcLz4obwSIHyTlZEDU
+	aUc2ZcKsD8mVNMGoYY3XYl3rWANctTdye31TkaQ39TgAZocurVMzyL9BUWx0rUeiLqD4u7oHgAL
+	gf8dEHFm1KEi64MTOE2SPrIVCbS8jEZOhTEHl/RtrZAk/xThVA==
+X-Google-Smtp-Source: AGHT+IF9q6whwwkhqGN2Pk+AEph3LrTbbtoFFPYNJTAshCFIqJMIeQt7KSSkyJwJU5Ap2Rh/HnzcAg==
+X-Received: by 2002:a05:6000:2cb:b0:39a:c8a8:4fdc with SMTP id ffacd0b85a97d-39ad175c052mr2069156f8f.16.1743067088494;
+        Thu, 27 Mar 2025 02:18:08 -0700 (PDT)
+Received: from [192.168.1.247] ([77.81.75.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d7ae6a319sm30665955e9.0.2025.03.27.02.18.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Mar 2025 02:18:07 -0700 (PDT)
+Message-ID: <ba2c38f1-d686-45dc-ae47-924cc11d15f6@linaro.org>
+Date: Thu, 27 Mar 2025 09:18:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250325160031.2390504-7-jean-philippe@linaro.org>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 5/8] KVM: arm64: Introduce module param to
+ partition the PMU
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Colton Lewis <coltonlewis@google.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+ robh@kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com,
+ will@kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com,
+ shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <gsnt1pulnepv.fsf@coltonlewis-kvm.c.googlers.com>
+ <f7d543f6-2660-460f-88ac-741dd47ed440@linaro.org>
+ <Z-RmMLkTuwsea7Uk@linux.dev>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <Z-RmMLkTuwsea7Uk@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 25, 2025 at 04:00:32PM +0000, Jean-Philippe Brucker wrote:
-> Add the --qemu-cpu option to let users set the CPU type to run on.
-> At the moment --processor allows to set both GCC -mcpu flag and QEMU
-> -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
-> the TCG features by default, and it could also be nice to let users
-> modify the CPU capabilities by setting extra -cpu options.  Since GCC
-> -mcpu doesn't accept "max" or "host", separate the compiler and QEMU
-> arguments.
+
+
+On 26/03/2025 8:40 pm, Oliver Upton wrote:
+> On Wed, Mar 26, 2025 at 05:38:34PM +0000, James Clark wrote:
+>> On 25/03/2025 6:32 pm, Colton Lewis wrote:
+>>>> I don't know if this is a stupid idea, but instead of having a fixed
+>>>> number for the partition, wouldn't it be nice if we could trap and
+>>>> increment HPMN on the first guest use of a counter, then decrement it on
+>>>> guest exit depending on what's still in use? The host would always
+>>>> assign its counters from the top down, and guests go bottom up if they
+>>>> want PMU passthrough. Maybe it's too complicated or won't work for
+>>>> various reasons, but because of BRBE the counter partitioning changes go
+>>>> from an optimization to almost a necessity.
+>>>
+>>> This is a cool idea that would enable useful things. I can think of a
+>>> few potential problems.
+>>>
+>>> 1. Partitioning will give guests direct access to some PMU counter
+>>> registers. There is no reliable way for KVM to determine what is in use
+>>> from that state. A counter that is disabled guest at exit might only be
+>>> so temporarily, which could lead to a lot of thrashing allocating and
+>>> deallocating counters.
 > 
-> `--processor` is now exclusively for compiler options, as indicated by
-> its documentation ("processor to compile for"). So use $QEMU_CPU on
-> RISC-V as well.
+> KVM must always have a reliable way to determine if the PMU is in use.
+> If there's any counter in the vPMU for which kvm_pmu_counter_is_enabled()
+> is true would do the trick...
 > 
-> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> ---
->  scripts/mkstandalone.sh |  3 ++-
->  arm/run                 | 15 +++++++++------
->  riscv/run               |  8 ++++----
->  configure               | 24 ++++++++++++++++++++++++
->  4 files changed, 39 insertions(+), 11 deletions(-)
+> Generally speaking, I would like to see the guest/host context switch in
+> KVM modeled in a way similar to the debug registers, where the vPMU
+> registers are loaded onto hardware lazily if either:
 > 
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 2318a85f..9b4f983d 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -42,7 +42,8 @@ generate_test ()
->  
->  	config_export ARCH
->  	config_export ARCH_NAME
-> -	config_export PROCESSOR
-> +	config_export QEMU_CPU
-> +	config_export DEFAULT_QEMU_CPU
->  
->  	echo "echo BUILD_HEAD=$(cat build-head)"
->  
-> diff --git a/arm/run b/arm/run
-> index efdd44ce..4675398f 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source config.mak
->  	source scripts/arch-run.bash
->  fi
-> -processor="$PROCESSOR"
-> +qemu_cpu="$QEMU_CPU"
->  
->  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
->     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
-> @@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
->  	fi
->  fi
->  
-> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
-> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> -		processor="host"
-> +if [ -z "$qemu_cpu" ]; then
-> +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
-> +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
-> +		qemu_cpu="host"
->  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> -			processor+=",aarch64=off"
-> +			qemu_cpu+=",aarch64=off"
->  		fi
-> +	else
-> +		qemu_cpu="$DEFAULT_QEMU_CPU"
->  	fi
->  fi
->  
-> @@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
->  fi
->  
->  A="-accel $ACCEL$ACCEL_PROPS"
-> -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
-> +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
->  command+=" -display none -serial stdio"
->  command="$(migration_cmd) $(timeout_cmd) $command"
->  
-> diff --git a/riscv/run b/riscv/run
-> index e2f5a922..02fcf0c0 100755
-> --- a/riscv/run
-> +++ b/riscv/run
-> @@ -11,12 +11,12 @@ fi
->  
->  # Allow user overrides of some config.mak variables
->  mach=$MACHINE_OVERRIDE
-> -processor=$PROCESSOR_OVERRIDE
-> +qemu_cpu=$QEMU_CPU_OVERRIDE
->  firmware=$FIRMWARE_OVERRIDE
->  
-> -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
-> +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
->  : "${mach:=virt}"
-> -: "${processor:=$PROCESSOR}"
-> +: "${qemu_cpu:=$QEMU_CPU}"
->  : "${firmware:=$FIRMWARE}"
->  [ "$firmware" ] && firmware="-bios $firmware"
->  
-> @@ -32,7 +32,7 @@ fi
->  mach="-machine $mach"
->  
->  command="$qemu -nodefaults -nographic -serial mon:stdio"
-> -command+=" $mach $acc $firmware -cpu $processor "
-> +command+=" $mach $acc $firmware -cpu $qemu_cpu "
->  command="$(migration_cmd) $(timeout_cmd) $command"
->  
->  if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> diff --git a/configure b/configure
-> index b4875ef3..b79145a5 100755
-> --- a/configure
-> +++ b/configure
-> @@ -23,6 +23,21 @@ function get_default_processor()
->      esac
->  }
->  
-> +# Return the default CPU type to run on
-> +function get_default_qemu_cpu()
-> +{
-> +    local arch="$1"
-> +
-> +    case "$arch" in
-> +    "arm")
-> +        echo "cortex-a15"
-> +        ;;
-> +    "arm64")
-> +        echo "cortex-a57"
-> +        ;;
-> +    esac
-> +}
-> +
->  srcdir=$(cd "$(dirname "$0")"; pwd)
->  prefix=/usr/local
->  cc=gcc
-> @@ -52,6 +67,7 @@ earlycon=
->  console=
->  efi=
->  efi_direct=
-> +qemu_cpu=
->  
->  # Enable -Werror by default for git repositories only (i.e. developer builds)
->  if [ -e "$srcdir"/.git ]; then
-> @@ -70,6 +86,9 @@ usage() {
->  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
->  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
->  	    --processor=PROCESSOR  processor to compile for ($processor)
-> +	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
-> +	                           selects the best value based on the host system and the
-> +	                           test configuration.
-
-I'm starting to think we should name this '--target-cpu'. We already have
-'--target' which allows us to change the target to kvmtool and we may
-support other emulators/vmms someday. riscv kvmtool is already gaining
-support for different cpu types[1] and other vmms we add may have that
-support as well. There's no reason to add a separate configure command
-line option for each.
-
-So let's rename QEMU_CPU to TARGET_CPU, but keep DEFAULT_QEMU_CPU as it
-is, since that's qemu specific. run scripts will need to check TARGET
-is "qemu" to decide if it should use DEFAULT_QEMU_CPU when TARGET_CPU
-isn't set. Since TARGET is currently arm-only we can drop the riscv
-changes from this patch. I can do them with a follow-on series.
-
-[1] https://lore.kernel.org/all/20250326065644.73765-1-apatel@ventanamicro.com/
-
-Thanks,
-drew
-
->  	    --target=TARGET        target platform that the tests will be running on (qemu or
->  	                           kvmtool, default is qemu) (arm/arm64 only)
->  	    --cross-prefix=PREFIX  cross compiler prefix
-> @@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
->          --processor)
->  	    processor="$arg"
->  	    ;;
-> +	--qemu-cpu)
-> +	    qemu_cpu="$arg"
-> +	    ;;
->  	--target)
->  	    target="$arg"
->  	    ;;
-> @@ -471,6 +493,8 @@ ARCH=$arch
->  ARCH_NAME=$arch_name
->  ARCH_LIBDIR=$arch_libdir
->  PROCESSOR=$processor
-> +QEMU_CPU=$qemu_cpu
-> +DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
->  CC=$cc
->  CFLAGS=$cflags
->  LD=$cross_prefix$ld
-> -- 
-> 2.49.0
+>    1) The above definition of an in-use PMU is satisfied
 > 
+>    2) The guest accessed a PMU register since the last vcpu_load()
 > 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+>>> 2. HPMN affects reads of PMCR_EL0.N, which is the standard way to
+>>> determine how many counters there are. If HPMN starts as a low number,
+>>> guests have no way of knowing there are more counters
+>>> available. Dynamically changing the counters available could be
+>>> confusing for guests.
+>>>
+>>
+>> Yes I was expecting that PMCR would have to be trapped and N reported to be
+>> the number of physical counters rather than how many are in the guest
+>> partition.
+> 
+> I'm not sure this is aligned with the spirit of the feature.
+> 
+> Colton's aim is to minimize the overheads of trapping the PMU *and*
+> relying on the perf subsystem for event scheduling. To do dynamic
+> partitioning as you've described, KVM would need to unconditionally trap
+> the PMU registers so it can pack the guest counters into the guest
+> partition. We cannot assume the VM will allocate counters sequentially.
+
+Yeah I agree, requiring cooperation from the guest probably makes it a 
+non starter.
+
+> 
+> Dynamic counter allocation can be had with the existing PMU
+> implementation. The partitioned PMU is an alternative userspace can
+> select, not a replacement for what we already have.
+> 
+> Thanks,
+> Oliver
+
+
+It's just a shame that it doesn't look like there's a way to make BRBE 
+work properly in guests with the existing implementation. Maybe we're 
+stuck with only allowing it in a partition for now.
+
+Thanks
+James
+
