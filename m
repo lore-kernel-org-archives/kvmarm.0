@@ -1,147 +1,193 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C5A5D477
-	for <kvmarm@lists.linux.dev>; Sat, 29 Mar 2025 08:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFAA29A1
+	for <kvmarm@lists.linux.dev>; Sat, 29 Mar 2025 10:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743237678; cv=none; b=PxJW+IHtf5N5BWTnxQ4YhvmUAo48BfIF4QjZLxaV9yTm2OExa7pNJtHCaEm0amodGGPwgV0z9Dg3BgfLq5Xw7eSYOe637XwMyySzTqajR62C5qSYJKh3eHebgn0/P2kxud234GNHB4pQH0Dsk4BBWzL5iXQzDA+VqMFNmgVLr8w=
+	t=1743244909; cv=none; b=s9DHKreLcVZVGj2VMUVbBXci60TqmbZdiW4FWE6AlkHIUmUzqVW0rQsbBUVeoRU2oIKrHgoupwqHg57/g2xYWlzsupWopi7YpSh86FJ/eHZ9AOBwiLPP6ubl8n9B3piTQVEki+xa53OehDItTH8f189n/ESEttncmjw8orIaaCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743237678; c=relaxed/simple;
-	bh=8b6GKypgIkncu5Gd65V+Btjw9CImKpiHc4FFSTuqn9Y=;
-	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=uVjg3sSDtPTEXo5Ip9yAG3VOINFgHaGihP1Do/L1Z3AxuQx79bk1U1ve4M2jrYuPjVtuQN2p91thdGd3VfnIXM+m/0L0u3qmDAFPolaY6dcASknz03HSfv8hbG0Uhd/96M3b1LINsBVUyhz0dpEZudUvGCasMw7hasGExbLO4M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZPrRG2zpbz1R7Ng;
-	Sat, 29 Mar 2025 16:39:22 +0800 (CST)
-Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0DDB51800B2;
-	Sat, 29 Mar 2025 16:41:11 +0800 (CST)
-Received: from [10.67.121.177] (10.67.121.177) by
- kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Sat, 29 Mar 2025 16:41:10 +0800
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <oliver.upton@linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>,
-	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
-	Yicong Yang <yangyicong@huawei.com>, Linuxarm <linuxarm@huawei.com>
-Subject: Re: [PATCH 2/3] arm64/cpufeature: Add cpucap for HCR_EL2.E2H RES1
- (!FEAT_E2H0)
-To: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1743244909; c=relaxed/simple;
+	bh=R8Ehua1Ddi0UOvOWPaw8MNQK7gNNTZlo2knNcD5hlK0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LgUHoF16PVNJGCZh/dbmU6hkPXQOteK6JSuh0Vyh0H+/NB4glyF+DAqqLv24JozVx6MfI4kpiwzmBmEFAbnAiuqJYmqzAk/6vwiI5liSt2dR1m8HZI+Kcxq45yr9thNlJ6nSbd3KPjWI01QwrwQS50NYazfTsDc7LxdTxi0tyuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nmuTYT2g; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nmuTYT2g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504F5C4CEE2;
+	Sat, 29 Mar 2025 10:41:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743244908;
+	bh=R8Ehua1Ddi0UOvOWPaw8MNQK7gNNTZlo2knNcD5hlK0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nmuTYT2gpwi/s1I376Ijk4EJUC71JUoSC/Z/3qfLz3xuPwOpJyXWWNd2nTfSJMmNz
+	 2Vmt1PPwDuNHamlt8j3auCJiFflid4W3ZL4rzxyJMm/1kvl3ud43in/fH6+p71vAmw
+	 iQcVDZCIwhubGiYixZgUTdr4ahdG99fbyBsLjJ7HAxGrwyAmETG3CesjqAyg975c3i
+	 BQBfprBqQ/c2tj6hvXOzN/G4OEcabK0yUWy81/bn7uiDoQ+r1s8fxElWT2S1sNsavi
+	 sS767fCsBnEkq85w7TlVjnqb80RvliOKbTTKc/+ryST0hJw/QbI2c5ORci8xFcHAi0
+	 ByOmoDMCMDBbQ==
+Received: from 91-161-240-24.subs.proxad.net ([91.161.240.24] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tyTdJ-000YHT-Tu;
+	Sat, 29 Mar 2025 10:41:46 +0000
+Date: Sat, 29 Mar 2025 10:41:46 +0000
+Message-ID: <87r02gyv85.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yicong Yang <yangyicong@huawei.com>
+Cc: <catalin.marinas@arm.com>,
+	<will@kernel.org>,
+	<oliver.upton@linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>,
+	<prime.zeng@hisilicon.com>,
+	<xuwei5@huawei.com>,
+	<yangyicong@hisilicon.com>,
+	Linuxarm <linuxarm@huawei.com>
+Subject: Re: [PATCH 2/3] arm64/cpufeature: Add cpucap for HCR_EL2.E2H RES1 (!FEAT_E2H0)
+In-Reply-To: <75a93cfd-1e1b-3d8a-9ff0-3991b5ef05cc@huawei.com>
 References: <20250329034409.21354-1-yangyicong@huawei.com>
- <20250329034409.21354-3-yangyicong@huawei.com> <87semwz24p.wl-maz@kernel.org>
-From: Yicong Yang <yangyicong@huawei.com>
-Message-ID: <75a93cfd-1e1b-3d8a-9ff0-3991b5ef05cc@huawei.com>
-Date: Sat, 29 Mar 2025 16:41:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+	<20250329034409.21354-3-yangyicong@huawei.com>
+	<87semwz24p.wl-maz@kernel.org>
+	<75a93cfd-1e1b-3d8a-9ff0-3991b5ef05cc@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <87semwz24p.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemd200014.china.huawei.com (7.221.188.8)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 91.161.240.24
+X-SA-Exim-Rcpt-To: yangyicong@huawei.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shameerali.kolothum.thodi@huawei.com, jonathan.cameron@huawei.com, prime.zeng@hisilicon.com, xuwei5@huawei.com, yangyicong@hisilicon.com, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/3/29 16:12, Marc Zyngier wrote:
-> On Sat, 29 Mar 2025 03:44:08 +0000,
-> Yicong Yang <yangyicong@huawei.com> wrote:
->>
->> From: Yicong Yang <yangyicong@hisilicon.com>
->>
->> Arm introduced a "new" feature FEAT_E2H0 indicates that HCR_EL2.E2H can
->> be programmed to the value 0 for legacy hardwares supported VHE. The
->> feature is indicated by ID_AA64MMFR4_EL1.E2H0 == 0. It is needed to
->> detect this feature for KVM mode initialization. Instead of bothering
->> the existed hardwares, introduce a new cpucap HAS_E2H_RES1 to indicate
->> FEAT_E2H0 is not supported. Make this a ARM64_CPUCAP_SYSTEM_FEATURE
->> just like VHE.
->>
->> Introduce cpu_has_e2h_res1() for checking the feature's support
->> which can be used in the early boot stage where CPU capabilities
->> are not initialized.
->>
->> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->> ---
->>  arch/arm64/include/asm/cpufeature.h | 23 +++++++++++++++++++++++
->>  arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
->>  arch/arm64/tools/cpucaps            |  1 +
->>  3 files changed, 36 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index c4326f1cb917..b35d393da28d 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -889,6 +889,29 @@ static inline bool cpu_has_hw_af(void)
->>  						ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
->>  }
->>  
->> +/*
->> + * Check whether FEAT_E2H0 is not supported, in which case HCR_EL2.E2H
->> + * is implemented as RES1.
->> + */
->> +static __always_inline bool cpu_has_e2h_res1(void)
->> +{
->> +	u64 mmfr4;
->> +	u32 val;
->> +
->> +	/*
->> +	 * It's also used for checking the kvm mode cfg in early_param()
->> +	 * where boot capabilities is not initialized. In such case read
->> +	 * mmfr4 directly. This works same after boot stage since
->> +	 * ARM64_HAS_E2H_RES1 is a system feature, the cached sanitised
->> +	 * value keeps same with every single CPU.
->> +	 */
->> +	mmfr4 = read_sysreg_s(SYS_ID_AA64MMFR4_EL1);
+On Sat, 29 Mar 2025 08:41:09 +0000,
+Yicong Yang <yangyicong@huawei.com> wrote:
 > 
-> This will result in traps to EL2 with nested. Are you expecting this
-> to be used on any form of hot paths?
+> On 2025/3/29 16:12, Marc Zyngier wrote:
+> > On Sat, 29 Mar 2025 03:44:08 +0000,
+> > Yicong Yang <yangyicong@huawei.com> wrote:
+> >>
+> >> From: Yicong Yang <yangyicong@hisilicon.com>
+> >>
+> >> Arm introduced a "new" feature FEAT_E2H0 indicates that HCR_EL2.E2H can
+> >> be programmed to the value 0 for legacy hardwares supported VHE. The
+> >> feature is indicated by ID_AA64MMFR4_EL1.E2H0 == 0. It is needed to
+> >> detect this feature for KVM mode initialization. Instead of bothering
+> >> the existed hardwares, introduce a new cpucap HAS_E2H_RES1 to indicate
+> >> FEAT_E2H0 is not supported. Make this a ARM64_CPUCAP_SYSTEM_FEATURE
+> >> just like VHE.
+> >>
+> >> Introduce cpu_has_e2h_res1() for checking the feature's support
+> >> which can be used in the early boot stage where CPU capabilities
+> >> are not initialized.
+> >>
+> >> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+> >> ---
+> >>  arch/arm64/include/asm/cpufeature.h | 23 +++++++++++++++++++++++
+> >>  arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
+> >>  arch/arm64/tools/cpucaps            |  1 +
+> >>  3 files changed, 36 insertions(+)
+> >>
+> >> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> >> index c4326f1cb917..b35d393da28d 100644
+> >> --- a/arch/arm64/include/asm/cpufeature.h
+> >> +++ b/arch/arm64/include/asm/cpufeature.h
+> >> @@ -889,6 +889,29 @@ static inline bool cpu_has_hw_af(void)
+> >>  						ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
+> >>  }
+> >>  
+> >> +/*
+> >> + * Check whether FEAT_E2H0 is not supported, in which case HCR_EL2.E2H
+> >> + * is implemented as RES1.
+> >> + */
+> >> +static __always_inline bool cpu_has_e2h_res1(void)
+> >> +{
+> >> +	u64 mmfr4;
+> >> +	u32 val;
+> >> +
+> >> +	/*
+> >> +	 * It's also used for checking the kvm mode cfg in early_param()
+> >> +	 * where boot capabilities is not initialized. In such case read
+> >> +	 * mmfr4 directly. This works same after boot stage since
+> >> +	 * ARM64_HAS_E2H_RES1 is a system feature, the cached sanitised
+> >> +	 * value keeps same with every single CPU.
+> >> +	 */
+> >> +	mmfr4 = read_sysreg_s(SYS_ID_AA64MMFR4_EL1);
+> > 
+> > This will result in traps to EL2 with nested. Are you expecting this
+> > to be used on any form of hot paths?
+> > 
 > 
+> No. If any use required in the hotpath, check ARM64_HAS_E2H_RES1 by
+> alternative_has_cap* instead. We cannot check the capabilites in
+> the early_param() (in early_kvm_mode_cfg()) since they are not initialized,
+> so we can only rely on the registers directly.
 
-No. If any use required in the hotpath, check ARM64_HAS_E2H_RES1 by
-alternative_has_cap* instead. We cannot check the capabilites in
-the early_param() (in early_kvm_mode_cfg()) since they are not initialized,
-so we can only rely on the registers directly.
-
->> +	val = cpuid_feature_extract_signed_field(mmfr4,
->> +						 ID_AA64MMFR4_EL1_E2H0_SHIFT);
->> +
->> +	return val != ID_AA64MMFR4_EL1_E2H0_IMP;
-> 
-> This is going to break badly on Apple HW, which predate the
-> "!FEAT_E2H0" relaxation and yet have HCR_EL2.E2H RAO/WI and
-> ID_AA64MMFR4_EL1.E2H0==0.
-
-currently maybe only a wrong declaration of HCR_EL2.E2H RES1 and we can have
-a workaround for the apple? considering the only use case of this is in the
-early_kvm_mode_cfg() described below.
+Then I think an explicit comment would help clarifying what is
+expected to be used. I also don't think the __always_inline is
+mandated here. Specially if the helper needs to account for the broken
+Apple stuff.
 
 > 
-> The curent code was carefully designed to *avoid* doing this, because
-> the kernel doesn't really need to know anything about FEAT_E2H0 apart
-> from the very early boot.
+> >> +	val = cpuid_feature_extract_signed_field(mmfr4,
+> >> +						 ID_AA64MMFR4_EL1_E2H0_SHIFT);
+> >> +
+> >> +	return val != ID_AA64MMFR4_EL1_E2H0_IMP;
+> > 
+> > This is going to break badly on Apple HW, which predate the
+> > "!FEAT_E2H0" relaxation and yet have HCR_EL2.E2H RAO/WI and
+> > ID_AA64MMFR4_EL1.E2H0==0.
 > 
-> What do we gain with this?
+> currently maybe only a wrong declaration of HCR_EL2.E2H RES1 and we can have
+> a workaround for the apple? considering the only use case of this is in the
+> early_kvm_mode_cfg() described below.
+
+Indeed, I think you would need to handle the Apple behaviour here.
+
 > 
+> > 
+> > The curent code was carefully designed to *avoid* doing this, because
+> > the kernel doesn't really need to know anything about FEAT_E2H0 apart
+> > from the very early boot.
+> > 
+> > What do we gain with this?
+> > 
+> 
+> Only one usecase introduced in patch 3/3, avoid triggering the warning on
+> !E2H0 platforms when booting with "kvm-arm.mode=nvhe". In such case "nvhe"
+> is inavailable but user has no hint on this, booting with "kvm-arm.mode=nvhe"
+> will trigger the warn [1]. Need to give some hint if user try to boot with
+> "nvhe" mode on !FEAT_E2H0 platforms. But we need a ARM64_CPUCAP_SYSTEM_FEATURE
+> capability to make this feature system wide consistent.
+> 
+> [1] https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm64/kvm/arm.c#n2917
 
-Only one usecase introduced in patch 3/3, avoid triggering the warning on
-!E2H0 platforms when booting with "kvm-arm.mode=nvhe". In such case "nvhe"
-is inavailable but user has no hint on this, booting with "kvm-arm.mode=nvhe"
-will trigger the warn [1]. Need to give some hint if user try to boot with
-"nvhe" mode on !FEAT_E2H0 platforms. But we need a ARM64_CPUCAP_SYSTEM_FEATURE
-capability to make this feature system wide consistent.
+But *why* do we need an extra helper for this only functionnality? If
+we reach the point where early_kvm_mode_cfg() gets called, that we are
+still at EL2, and that the requested mode is "nvhe", then we know, by
+construction, that we couldn't switch to E2H==0.
 
-[1] https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm64/kvm/arm.c#n2917
+That's because idreg-override.c defines this:
 
-Thanks.
+ { "kvm_arm.mode=nvhe",		"arm64_sw.hvhe=0 id_aa64mmfr1.vh=0" },
 
+and "id_aa64mmfr1.vh=0" gets filtered out by mmfr1_vh_filter().
 
+Or am I missing something obvious?
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
