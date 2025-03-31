@@ -1,28 +1,29 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6471DE4FB
-	for <kvmarm@lists.linux.dev>; Mon, 31 Mar 2025 09:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C051DF73C
+	for <kvmarm@lists.linux.dev>; Mon, 31 Mar 2025 09:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743414200; cv=none; b=GFMb6X/A0VGnvmRJsp0840LwSX67O5FVlYfTWq4hwFmAjwUMJm9ayeG7vaYQ5sIwhHk7MK2sBCxwNvVPA0rxYBlib9UFClaLmS6yXXHekM6oLM8mp3KmfoWTjJqOl54eBomsDYcyb3fwsljejo3PpRAMh4FaCNmqvjh/fLEGpGQ=
+	t=1743415155; cv=none; b=eHUjEvBLr6wxRoyeY8ybw3LaLubx7CoYmivn9HLPtKqyjeHaMO1NLAWofWRWIPH6n1ACz4D+PQDonwp7il5rTmdaSQ5cy5RoNqZblfRvSXE+zND3Mq5Cl007cHMybGgi2I/5BSXnLf5YljXruDIp6eA9Aw4RrMTZPWP0ihy2hn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743414200; c=relaxed/simple;
-	bh=WlikCYQ1K2tBVTFx2dvqaliWh+/7j0/Rp8gBJ+kMY6I=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kqzj33zA3SBcd4z1qcFg5qI5AC80SQtC6+KFmWEO9ezRAuD20tIUiSP3eAI8ZJ0O7ueVdDiMlNl6QxvA8G35BHiGA+l5cdxaqTunGnyOHhVzxwiuN9IqRpiYjLS1dKQW7ie3hychCEtmaTucBTZoebNJ205ZydBPCRtYJBUnTGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	s=arc-20240116; t=1743415155; c=relaxed/simple;
+	bh=uy4m4/M92J6R2ojWgHdIk4DB3btveuB6CD280a+JYu8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EquUTdEW7CV93VZKxq7U1iyiPPU4fcW/yvtqFT5UBU8scnzgze0jZrozfrJGL17Xdl9R8LiP4j4t2ONcmbcAT9PI90gap0pQ93QC+RDZF9V8NDSmRxBna+C+KRTB9W6JLQkKHe5Q48Dk/cirwfjBgEOr3IxXRJiU45uCa2sNgQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZR5h54JLJzHrMh;
-	Mon, 31 Mar 2025 17:39:49 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZR5fS4cpSz1f1jg;
+	Mon, 31 Mar 2025 17:38:24 +0800 (CST)
 Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0DB091800E2;
-	Mon, 31 Mar 2025 17:43:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id EF8A91A016C;
+	Mon, 31 Mar 2025 17:43:10 +0800 (CST)
 Received: from localhost.localdomain (10.50.165.33) by
  kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Mon, 31 Mar 2025 17:43:08 +0800
+ 15.2.1748.10; Mon, 31 Mar 2025 17:43:10 +0800
 From: Yicong Yang <yangyicong@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <corbet@lwn.net>,
@@ -33,10 +34,12 @@ CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
 	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
 	<tangchengchang@huawei.com>
-Subject: [PATCH v2 0/6] Add support for FEAT_{LS64, LS64_V} and related tests
-Date: Mon, 31 Mar 2025 17:43:14 +0800
-Message-ID: <20250331094320.35226-1-yangyicong@huawei.com>
+Subject: [PATCH v2 3/6] KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
+Date: Mon, 31 Mar 2025 17:43:17 +0800
+Message-ID: <20250331094320.35226-4-yangyicong@huawei.com>
 X-Mailer: git-send-email 2.31.0
+In-Reply-To: <20250331094320.35226-1-yangyicong@huawei.com>
+References: <20250331094320.35226-1-yangyicong@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,87 +53,31 @@ X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
 
 From: Yicong Yang <yangyicong@hisilicon.com>
 
-Armv8.7 introduces single-copy atomic 64-byte loads and stores
-instructions and its variants named under FEAT_{LS64, LS64_V}.
-Add support for Armv8.7 FEAT_{LS64, LS64_V}:
-- Add identifying and enabling in the cpufeature list
-- Expose the support of these features to userspace through HWCAP3
-  and cpuinfo
-- Add related hwcap test
-- Handle the trap of unsupported memory (normal/uncacheable) access in a VM
+Using FEAT_{LS64, LS64_V} instructions in a guest is also controlled
+by HCRX_EL2.{EnALS, EnASR}. Enable it if guest has related feature.
 
-A real scenario for this feature is that the userspace driver can make use of
-this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
-directly into the hardware.
+Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+---
+ arch/arm64/include/asm/kvm_emulate.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-This patchset also complement with Marc's patchset v2[1] for handling LS64*
-trapped if not advertised for a VM.
-
-[1] https://lore.kernel.org/linux-arm-kernel/20250310122505.2857610-1-maz@kernel.org/
-
-Tested with updated hwcap test:
-On host:
-root@localhost:/tmp# dmesg | grep "All CPU(s) started"
-[    0.504846] CPU: All CPU(s) started at EL2
-root@localhost:/tmp# ./hwcap
-[...]
-# LS64 present
-ok 217 cpuinfo_match_LS64
-ok 218 sigill_LS64
-ok 219 # SKIP sigbus_LS64
-# LS64_V present
-ok 220 cpuinfo_match_LS64_V
-ok 221 sigill_LS64_V
-ok 222 # SKIP sigbus_LS64_V
-# 115 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-# Totals: pass:107 fail:0 xfail:0 xpass:0 skip:115 error:0
-
-On guest:
-root@localhost:/# dmesg | grep "All CPU(s) started"
-[    0.205580] CPU: All CPU(s) started at EL1
-root@localhost:/mnt# ./hwcap
-[...]
-# LS64 present
-ok 217 cpuinfo_match_LS64
-ok 218 sigill_LS64
-ok 219 # SKIP sigbus_LS64
-# LS64_V present
-ok 220 cpuinfo_match_LS64_V
-ok 221 sigill_LS64_V
-ok 222 # SKIP sigbus_LS64_V
-# 115 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-# Totals: pass:107 fail:0 xfail:0 xpass:0 skip:115 error:0
-
-Change since v1:
-- Drop the suppport for LS64_ACCDATA
-- handle the DABT of unsupported memory type after checking the memory attributes
-Link: https://lore.kernel.org/linux-arm-kernel/20241202135504.14252-1-yangyicong@huawei.com/
-
-Yicong Yang (6):
-  arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
-  arm64: Add support for FEAT_{LS64, LS64_V}
-  KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
-  kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
-  arm64: Add ESR.DFSC definition of unsupported exclusive or atomic
-    access
-  KVM: arm64: Handle DABT caused by LS64* instructions on unsupported
-    memory
-
- Documentation/arch/arm64/booting.rst      | 12 +++
- Documentation/arch/arm64/elf_hwcaps.rst   |  6 ++
- arch/arm64/include/asm/el2_setup.h        | 12 ++-
- arch/arm64/include/asm/esr.h              |  8 ++
- arch/arm64/include/asm/hwcap.h            |  2 +
- arch/arm64/include/asm/kvm_emulate.h      |  7 ++
- arch/arm64/include/uapi/asm/hwcap.h       |  2 +
- arch/arm64/kernel/cpufeature.c            | 51 +++++++++++++
- arch/arm64/kernel/cpuinfo.c               |  2 +
- arch/arm64/kvm/inject_fault.c             | 35 +++++++++
- arch/arm64/kvm/mmu.c                      | 37 +++++++++-
- arch/arm64/tools/cpucaps                  |  2 +
- tools/testing/selftests/arm64/abi/hwcap.c | 90 +++++++++++++++++++++++
- 13 files changed, 264 insertions(+), 2 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index d7cf66573aca..9165fcf719ab 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -684,6 +684,12 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_has_fpmr(kvm))
+ 			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
++
++		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64))
++			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnALS;
++
++		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
++			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
+ 	}
+ }
+ #endif /* __ARM64_KVM_EMULATE_H__ */
 -- 
 2.24.0
 
