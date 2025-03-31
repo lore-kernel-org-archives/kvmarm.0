@@ -1,83 +1,260 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C051DF73C
-	for <kvmarm@lists.linux.dev>; Mon, 31 Mar 2025 09:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE42211278
+	for <kvmarm@lists.linux.dev>; Mon, 31 Mar 2025 13:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743415155; cv=none; b=eHUjEvBLr6wxRoyeY8ybw3LaLubx7CoYmivn9HLPtKqyjeHaMO1NLAWofWRWIPH6n1ACz4D+PQDonwp7il5rTmdaSQ5cy5RoNqZblfRvSXE+zND3Mq5Cl007cHMybGgi2I/5BSXnLf5YljXruDIp6eA9Aw4RrMTZPWP0ihy2hn4=
+	t=1743429289; cv=none; b=WZye1Suu/EWzCm68S3n2v7+QTa8R2WvEGevDRcSeQKlGVJJXOggQ3zrJSKVdxhl1bfdiSxyHm181Tu6HYIvS52/BSfOUJ3xklZb55/G7jMh0GRKlqrNpyUkcI+6edySOIZRP7mRByYYxC4NNBRj3VWohw+pwgh6BVALv7IiPXq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743415155; c=relaxed/simple;
-	bh=uy4m4/M92J6R2ojWgHdIk4DB3btveuB6CD280a+JYu8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EquUTdEW7CV93VZKxq7U1iyiPPU4fcW/yvtqFT5UBU8scnzgze0jZrozfrJGL17Xdl9R8LiP4j4t2ONcmbcAT9PI90gap0pQ93QC+RDZF9V8NDSmRxBna+C+KRTB9W6JLQkKHe5Q48Dk/cirwfjBgEOr3IxXRJiU45uCa2sNgQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZR5fS4cpSz1f1jg;
-	Mon, 31 Mar 2025 17:38:24 +0800 (CST)
-Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
-	by mail.maildlp.com (Postfix) with ESMTPS id EF8A91A016C;
-	Mon, 31 Mar 2025 17:43:10 +0800 (CST)
-Received: from localhost.localdomain (10.50.165.33) by
- kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Mon, 31 Mar 2025 17:43:10 +0800
-From: Yicong Yang <yangyicong@huawei.com>
-To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <corbet@lwn.net>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>
-CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
-	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
-	<tangchengchang@huawei.com>
-Subject: [PATCH v2 3/6] KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
-Date: Mon, 31 Mar 2025 17:43:17 +0800
-Message-ID: <20250331094320.35226-4-yangyicong@huawei.com>
-X-Mailer: git-send-email 2.31.0
-In-Reply-To: <20250331094320.35226-1-yangyicong@huawei.com>
-References: <20250331094320.35226-1-yangyicong@huawei.com>
+	s=arc-20240116; t=1743429289; c=relaxed/simple;
+	bh=9zUiklNL0MnwE41sFbosKgDp5LV/LyFsB2buYJgA0zM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VH7hZuwxATT6cYG4KVO1UuEgtYpkyI1Pw1/G//wuP35B7Ws/+OQeRJPvZqcahR0yh4DlB8eFc4Myb6gfvVCe8pp0BIgWmYlq6TTP+YGZFYkw6X4zPXfPRIFNxcGBuPZi1ffPgkqnzk5ZCxxY72ablafcVR++GfEFGOztFbfcckA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qi5NsyOH; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qi5NsyOH"
+Date: Mon, 31 Mar 2025 15:54:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743429284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1pj9Mgf9/7BDpyZNmQYfwtt/XC9QiCZdJQaI7DnM3Ag=;
+	b=qi5NsyOHbHr3uo9gdtAcMDfdJPeSJor7+G2XGFYIkKqnFIZA6bWSLoNVjydDT2xokOGhgj
+	MuyfMjXn9T2GkKz61Pb3O3S+1w7KG5e3oYYNOtzfLio2zMBYlEt1vBqcFqREE+X5OIdS7R
+	VbhS/++zxnrPrXPV1IBV3cf2tCc7NkA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
+Message-ID: <20250331-11789f26d058d11c1aeeaa51@orel>
+References: <20250325160031.2390504-3-jean-philippe@linaro.org>
+ <20250325160031.2390504-7-jean-philippe@linaro.org>
+ <Z-WHf02_ZQKwzQej@raptor>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd200014.china.huawei.com (7.221.188.8)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-WHf02_ZQKwzQej@raptor>
+X-Migadu-Flow: FLOW_OUT
 
-From: Yicong Yang <yangyicong@hisilicon.com>
+On Thu, Mar 27, 2025 at 05:14:39PM +0000, Alexandru Elisei wrote:
+> Hi Jean-Philippe,
+> 
+> On Tue, Mar 25, 2025 at 04:00:32PM +0000, Jean-Philippe Brucker wrote:
+> > Add the --qemu-cpu option to let users set the CPU type to run on.
+> > At the moment --processor allows to set both GCC -mcpu flag and QEMU
+> > -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
+> > the TCG features by default, and it could also be nice to let users
+> > modify the CPU capabilities by setting extra -cpu options.  Since GCC
+> > -mcpu doesn't accept "max" or "host", separate the compiler and QEMU
+> > arguments.
+> > 
+> > `--processor` is now exclusively for compiler options, as indicated by
+> > its documentation ("processor to compile for"). So use $QEMU_CPU on
+> > RISC-V as well.
+> > 
+> > Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > ---
+> >  scripts/mkstandalone.sh |  3 ++-
+> >  arm/run                 | 15 +++++++++------
+> >  riscv/run               |  8 ++++----
+> >  configure               | 24 ++++++++++++++++++++++++
+> >  4 files changed, 39 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> > index 2318a85f..9b4f983d 100755
+> > --- a/scripts/mkstandalone.sh
+> > +++ b/scripts/mkstandalone.sh
+> > @@ -42,7 +42,8 @@ generate_test ()
+> >  
+> >  	config_export ARCH
+> >  	config_export ARCH_NAME
+> > -	config_export PROCESSOR
+> > +	config_export QEMU_CPU
+> > +	config_export DEFAULT_QEMU_CPU
+> >  
+> >  	echo "echo BUILD_HEAD=$(cat build-head)"
+> >  
+> > diff --git a/arm/run b/arm/run
+> > index efdd44ce..4675398f 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
+> >  	source config.mak
+> >  	source scripts/arch-run.bash
+> >  fi
+> > -processor="$PROCESSOR"
+> > +qemu_cpu="$QEMU_CPU"
+> >  
+> >  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> >     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> > @@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
+> >  	fi
+> >  fi
+> >  
+> > -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+> > -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+> > -		processor="host"
+> > +if [ -z "$qemu_cpu" ]; then
+> > +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> > +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> > +		qemu_cpu="host"
+> >  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> > -			processor+=",aarch64=off"
+> > +			qemu_cpu+=",aarch64=off"
+> >  		fi
+> > +	else
+> > +		qemu_cpu="$DEFAULT_QEMU_CPU"
+> >  	fi
+> >  fi
+> >  
+> > @@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
+> >  fi
+> >  
+> >  A="-accel $ACCEL$ACCEL_PROPS"
+> > -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+> > +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+> >  command+=" -display none -serial stdio"
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> > diff --git a/riscv/run b/riscv/run
+> > index e2f5a922..02fcf0c0 100755
+> > --- a/riscv/run
+> > +++ b/riscv/run
+> > @@ -11,12 +11,12 @@ fi
+> >  
+> >  # Allow user overrides of some config.mak variables
+> >  mach=$MACHINE_OVERRIDE
+> > -processor=$PROCESSOR_OVERRIDE
+> > +qemu_cpu=$QEMU_CPU_OVERRIDE
+> >  firmware=$FIRMWARE_OVERRIDE
+> >  
+> > -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
+> > +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+> 
+> If you make DEFAULT_QEMU_CPU=max for riscv, you can use it instead of "max",
+> just like arm/arm64 does. Not sure if it's worth another respin.
 
-Using FEAT_{LS64, LS64_V} instructions in a guest is also controlled
-by HCRX_EL2.{EnALS, EnASR}. Enable it if guest has related feature.
+Yup, we'll also need
 
-Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
----
- arch/arm64/include/asm/kvm_emulate.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+diff --git a/configure b/configure
+index b86ccc0c338b..541b9577a718 100755
+--- a/configure
++++ b/configure
+@@ -32,7 +32,7 @@ function get_default_qemu_cpu()
+     "arm")
+         echo "cortex-a15"
+         ;;
+-    "arm64")
++    "arm64" | "riscv32" | "riscv64")
+         echo "max"
+         ;;
+     esac
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d7cf66573aca..9165fcf719ab 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -684,6 +684,12 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_has_fpmr(kvm))
- 			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
-+
-+		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64))
-+			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnALS;
-+
-+		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
-+			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
- 	}
- }
- #endif /* __ARM64_KVM_EMULATE_H__ */
--- 
-2.24.0
+Thanks,
+drew
 
+> 
+> Otherwise the patch looks good to me.
+> 
+> Thanks,
+> Alex
+> 
+> >  : "${mach:=virt}"
+> > -: "${processor:=$PROCESSOR}"
+> > +: "${qemu_cpu:=$QEMU_CPU}"
+> >  : "${firmware:=$FIRMWARE}"
+> >  [ "$firmware" ] && firmware="-bios $firmware"
+> >  
+> > @@ -32,7 +32,7 @@ fi
+> >  mach="-machine $mach"
+> >  
+> >  command="$qemu -nodefaults -nographic -serial mon:stdio"
+> > -command+=" $mach $acc $firmware -cpu $processor "
+> > +command+=" $mach $acc $firmware -cpu $qemu_cpu "
+> >  command="$(migration_cmd) $(timeout_cmd) $command"
+> >  
+> >  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> > diff --git a/configure b/configure
+> > index b4875ef3..b79145a5 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -23,6 +23,21 @@ function get_default_processor()
+> >      esac
+> >  }
+> >  
+> > +# Return the default CPU type to run on
+> > +function get_default_qemu_cpu()
+> > +{
+> > +    local arch="$1"
+> > +
+> > +    case "$arch" in
+> > +    "arm")
+> > +        echo "cortex-a15"
+> > +        ;;
+> > +    "arm64")
+> > +        echo "cortex-a57"
+> > +        ;;
+> > +    esac
+> > +}
+> > +
+> >  srcdir=$(cd "$(dirname "$0")"; pwd)
+> >  prefix=/usr/local
+> >  cc=gcc
+> > @@ -52,6 +67,7 @@ earlycon=
+> >  console=
+> >  efi=
+> >  efi_direct=
+> > +qemu_cpu=
+> >  
+> >  # Enable -Werror by default for git repositories only (i.e. developer builds)
+> >  if [ -e "$srcdir"/.git ]; then
+> > @@ -70,6 +86,9 @@ usage() {
+> >  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
+> >  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
+> >  	    --processor=PROCESSOR  processor to compile for ($processor)
+> > +	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
+> > +	                           selects the best value based on the host system and the
+> > +	                           test configuration.
+> >  	    --target=TARGET        target platform that the tests will be running on (qemu or
+> >  	                           kvmtool, default is qemu) (arm/arm64 only)
+> >  	    --cross-prefix=PREFIX  cross compiler prefix
+> > @@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
+> >          --processor)
+> >  	    processor="$arg"
+> >  	    ;;
+> > +	--qemu-cpu)
+> > +	    qemu_cpu="$arg"
+> > +	    ;;
+> >  	--target)
+> >  	    target="$arg"
+> >  	    ;;
+> > @@ -471,6 +493,8 @@ ARCH=$arch
+> >  ARCH_NAME=$arch_name
+> >  ARCH_LIBDIR=$arch_libdir
+> >  PROCESSOR=$processor
+> > +QEMU_CPU=$qemu_cpu
+> > +DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
+> >  CC=$cc
+> >  CFLAGS=$cflags
+> >  LD=$cross_prefix$ld
+> > -- 
+> > 2.49.0
+> > 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
