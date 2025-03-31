@@ -1,260 +1,227 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2042.outbound.protection.outlook.com [40.107.223.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE42211278
-	for <kvmarm@lists.linux.dev>; Mon, 31 Mar 2025 13:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743429289; cv=none; b=WZye1Suu/EWzCm68S3n2v7+QTa8R2WvEGevDRcSeQKlGVJJXOggQ3zrJSKVdxhl1bfdiSxyHm181Tu6HYIvS52/BSfOUJ3xklZb55/G7jMh0GRKlqrNpyUkcI+6edySOIZRP7mRByYYxC4NNBRj3VWohw+pwgh6BVALv7IiPXq8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743429289; c=relaxed/simple;
-	bh=9zUiklNL0MnwE41sFbosKgDp5LV/LyFsB2buYJgA0zM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VH7hZuwxATT6cYG4KVO1UuEgtYpkyI1Pw1/G//wuP35B7Ws/+OQeRJPvZqcahR0yh4DlB8eFc4Myb6gfvVCe8pp0BIgWmYlq6TTP+YGZFYkw6X4zPXfPRIFNxcGBuPZi1ffPgkqnzk5ZCxxY72ablafcVR++GfEFGOztFbfcckA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qi5NsyOH; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A65621ADA4
+	for <kvmarm@lists.linux.dev>; Mon, 31 Mar 2025 14:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743432284; cv=fail; b=stMEeaLZ70qsc3zDsn2aHbeQL+WNBVSc67Clio/KHAt3LGMiZp35poPmdrsQeyUQAuMr+PY2JMf+mMNmTFpcSCixR7o1oEDcptdHP8y2sejgwgox8KWY4m4WX+1cMzrqcsrhbRgM9mL0go/GJGGFuHK+FyDN9Tfg8yP6zCUOqVY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743432284; c=relaxed/simple;
+	bh=911AwIb/CLWKdc6DSEnd31NOI5IBzaVagNrnpplTcYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qna5xrq1NewXV+NreM0vJcvW7DVMO6W9ovseQnr9ig7Lh9CAWeX6YEtfJDj06dCHbUuEjc6RL1XrOl76txlHFUFSkBSKeDFkah9sDa1DeKzeWRPTNMWjJv7JtZ+461k0O4Yq28VgePjfDeS83B9zpeafzJA9JU0RQtoQl3eXd+M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WIW8MXqi; arc=fail smtp.client-ip=40.107.223.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qi5NsyOH"
-Date: Mon, 31 Mar 2025 15:54:40 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743429284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1pj9Mgf9/7BDpyZNmQYfwtt/XC9QiCZdJQaI7DnM3Ag=;
-	b=qi5NsyOHbHr3uo9gdtAcMDfdJPeSJor7+G2XGFYIkKqnFIZA6bWSLoNVjydDT2xokOGhgj
-	MuyfMjXn9T2GkKz61Pb3O3S+1w7KG5e3oYYNOtzfLio2zMBYlEt1vBqcFqREE+X5OIdS7R
-	VbhS/++zxnrPrXPV1IBV3cf2tCc7NkA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, vladimir.murzin@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 4/5] configure: Add --qemu-cpu option
-Message-ID: <20250331-11789f26d058d11c1aeeaa51@orel>
-References: <20250325160031.2390504-3-jean-philippe@linaro.org>
- <20250325160031.2390504-7-jean-philippe@linaro.org>
- <Z-WHf02_ZQKwzQej@raptor>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WIW8MXqi"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ahdq2rznK1+Cfhq5XSNcCEsRf7Jeze8vW5aKEAMwoX0aFRQaqca3vPaBKHHTYIUDH7y/Z92FkMRsYTnsUSCqfbNW8w8PU7Q+SZtTgaJgZeHx5fzwqb4HsSlPAEIPPWAfZ3ZMU4+XFzEmf02myCEZzUfH1wyO/uX4Y0aBTAiR32KG082tcSVNdc2CWZK1xU092AZtoTwrGSjrWsZVQkBD4GC37Csj/QjylmcUNik/q5NFQhzPT/f2WcO1RA4ypTAPfyPe6N1xlsjJuJn+PvbYxjDKE6o/2B9/wPYeS8p/nS6NxMlnKsyGrnjc2D8z0/eDOezU8Mf6nvNRcBARVXUE6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NlBal7a6oB4nI+VbN34rcn/mU7YEyIyu9Djj/qwib8I=;
+ b=dyBQdhb0cFkY3965zIZ6DjCWGiR3MF/ezJH7jPvBBrgayzk2ABiTN6277xvgzSxbRg+GLFdEEvY22OUTtWTVKQxuXUw1XnJjiWoJqILBqR9/wzJS6+Kr/bQn6D8ZaQdCUN8u+6Q24QrYGvlVj6tsCcN1enB3Ao9PUhvAmbPn5DmgFulhSmgKP0Ho3ZQ5vWaSXDjTb14vUDEUxrkq53YmijCZ2Jn6X9Dj1LkLV1HD1hwhpJqyJwXw7uLkitdxKURrGdjJq1DM+8SN5A55WChF2ADhWmdHfDobJmk4bYmt5tGyJVoNKKvqLd9yFbmIN+DaucOuWd6FZiH172jy2BZvDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NlBal7a6oB4nI+VbN34rcn/mU7YEyIyu9Djj/qwib8I=;
+ b=WIW8MXqi2+NmLerc6uapQnEwoCGNn9tqwHJfkHr4+rh2S28djUGVX/s/v6/Pj1clNO+4IDD3ULMjqTISGeCPn3BB2H4fsjUy+eZ+VPj5h9stQQg+IJZsAI2pkq997wv6Rx7VAqOfX7McM8PHjIMbP+ffy0/LiKuTu+xv4VJxL96bZT+q2hycHi+Q7J9DBVACMn1IQR8n1vKalbFzwVMPB57cdKvqMKAmRjLQUKLpdfy3/myygqZ6irw9B1Ql7QzyVfaPzuaxour4yFjaH7wB3U6Wryya25oz9pX5EhELk0f8Oc21QnxsJkLpZ4kzQsnvHthVwKrYsL2RpIILnS4cSA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CY8PR12MB7634.namprd12.prod.outlook.com (2603:10b6:930:9d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Mon, 31 Mar
+ 2025 14:44:38 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.043; Mon, 31 Mar 2025
+ 14:44:38 +0000
+Date: Mon, 31 Mar 2025 11:44:37 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com" <david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Message-ID: <20250331144437.GE10839@nvidia.com>
+References: <Z9sItt8BIgvbBY8M@arm.com>
+ <20250319192246.GQ9311@nvidia.com>
+ <Z9s7r2JocpoM_t-m@arm.com>
+ <SA1PR12MB7199C7BD48EB39F536DD34DBB0A62@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <Z-QU7qJOf8sEA5R8@google.com>
+ <86y0wrlrxt.wl-maz@kernel.org>
+ <Z-QnBcE1TKPChQay@google.com>
+ <86wmcbllg2.wl-maz@kernel.org>
+ <Z-RGYO3QVj5JNjRB@google.com>
+ <Z-RMzYHOzc36H7yR@linux.dev>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-RMzYHOzc36H7yR@linux.dev>
+X-ClientProxiedBy: MN2PR16CA0036.namprd16.prod.outlook.com
+ (2603:10b6:208:134::49) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-WHf02_ZQKwzQej@raptor>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CY8PR12MB7634:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17ef912a-c977-40bc-e388-08dd70628fdd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Jzv0yHpBc6AsjT4kMJwf7ZqJARkeKPOaoxbtGwb1qw3TqIEbNe4A//d+Lt6S?=
+ =?us-ascii?Q?J1fZK4YxduGyfVAAJJfVV6W7+Sj+cRV9r2+lZgSX6KeI/adMtQn6vsTjq0UZ?=
+ =?us-ascii?Q?d1VoemI0rx/d/Gy/HOe5He+NFmBir2RFgSfgoegdje12XfpT+MB8n0VmFqTX?=
+ =?us-ascii?Q?Ox6Nu9KxaX4cwQ+lk+tyLJpnZRU6iMXooyPpcOXbLrgh4NNRE6NRmiuEgCHd?=
+ =?us-ascii?Q?VkBljIrXQZzhr66w/mz63ELHTPYpH/z9PCgXrF5mnM8PC37spw3OHYuDMvW6?=
+ =?us-ascii?Q?Uws9bVJLDrTFol36nE6DqnRfK3n8ASJw1ZMHGly7iRGJuJVD8E9F0gpIZlPT?=
+ =?us-ascii?Q?JdW2ypBcgCaq9DmkULELH8xhHwAFHXhPUY+xfSsACKrUyWrBHgY7KMMzkSWD?=
+ =?us-ascii?Q?F8gn8CBReAZoEuhiMKBTZTfg5+UK02Z3/rYhK9KG7LEs1eeKHGkRqz/R3oiP?=
+ =?us-ascii?Q?MriFtTY3Q3uRBTLKb6TRHWOm3szzd0gvgv+6zz6rRkT8EUFYnl/GUeYq2pH5?=
+ =?us-ascii?Q?5DAVMB7yKrWz/Rlht8XylVPjMShO2zgSmTMK686srBvDx5tonG1ztm3t9098?=
+ =?us-ascii?Q?fCyaTkwBx0I333E2rfmY3wGpb3nPOnJntUvefc5AbLn2C/BUdw3BWHr+6dQU?=
+ =?us-ascii?Q?oYjCKTNvmQmIK9Ko9eWj32R59eiykTMMOsHWmj7899oI0gVvbV1cK2vIgBZV?=
+ =?us-ascii?Q?RpKryKTtIDWc2GBXSuXKaDFcFGBA4toU6vG1rZ2aVtCV537LEkIAa4pPidfG?=
+ =?us-ascii?Q?LDiyvrlP6w8ixGzOtcZ2gGGEhUau6+/uT727R0+uDDg2/jtq47GtSx5ZXmdR?=
+ =?us-ascii?Q?fLeSpqQ/MLO43Q46iereABR/kUKi6k7fevN1b/mOd12993W21fOtnMsDNz/y?=
+ =?us-ascii?Q?qmR8q4IMU1xMNFRwgV/9fFu3bQ6JThQCOjD+QLme9ONIRNjnBoiGUeWmU0/g?=
+ =?us-ascii?Q?8MAIpZVFronlkYzMrhuaKc6Dnu6xI05P1Mx9h2+Xa9Xked+AytmtpLxRCKsw?=
+ =?us-ascii?Q?wGEnowS3Lmrtfu4bsUPU56MS922v7dgdpG0zmtQQ3wqPk20G0dGbJAnuS2EN?=
+ =?us-ascii?Q?T6pT4FPAl8S2/IGnKDZL9+plP1toWKcIZzmz/VU2022U7bzX2aRtTfUy4hbJ?=
+ =?us-ascii?Q?QhLP4NTWW3nuD5QSiRoSQ3p4UfcVF3qvqr2ga2rE9b6IfXqAMiD41rr4f7Nj?=
+ =?us-ascii?Q?lrzJdoRY0i1vjJyxEBuwmN1EHOt1L/JGLrpwzUgdLaURn7ndkh4ZuJsvJE42?=
+ =?us-ascii?Q?HInxIN6pkOG3Ikg47wuMhw2hA7wUEMlkJBkNK5NHbU3m8zZCYb1CLgx5imJy?=
+ =?us-ascii?Q?y+g23viPChLJ5At9u2H2Oz5LEX4qjBK9OQzwnovcCb0AM/nhPs8LHD/A73wN?=
+ =?us-ascii?Q?qxlzwO0rxBVHGvLAtFKDHIJFhfEv?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sUA+Xs7NNTx+Iumt7PCqWNYshOqlrmdBq/FOCxZvgtgI2UKXTO5q9rx/3opr?=
+ =?us-ascii?Q?/PSt1HCgj8mz/aLlGfpX5r+lsHEKZZ8uffdbDx0zAbEg1IpUL92bYkRjN+yH?=
+ =?us-ascii?Q?xaxkSnaQWRv3KX4eOEOmrSlzRIktfbEtCb0bkClqma9/zsTXB+sIjjuqZLIs?=
+ =?us-ascii?Q?XA9jrbKK09m/vBJHXYLyVWMVbTlb91yrWShbxsomJVxjnKPy/MLPCcwOGolZ?=
+ =?us-ascii?Q?f4zwtzohsKcHfz5EgzEr5nUX1yt8ywM325bQlfhZ3rLkYJhTECWLNQyfXIY+?=
+ =?us-ascii?Q?44E+NfMMuzis0mbFSAg3vtHFCIIVtZz+9lTQj1bNz4OaJUNkoNSoH7D5K1fc?=
+ =?us-ascii?Q?NbR2y2e6Bahfun9oRHgqOSgg8IAVtXtS/jlKRpPWub36NTbKMwuCXH7++DSu?=
+ =?us-ascii?Q?UL8B4lTlgbQ7+3YRmyc/u0XfDH+TB2lwcdAz5irZ+xgCZHV93gSVbP1P1XlC?=
+ =?us-ascii?Q?qtpAVnsDbq5Hi9h1FbyhKc0jst2pBwG49yj+mdnT2XbDGQKoRkppmVp5lvvY?=
+ =?us-ascii?Q?J/Ko1budhQCNTLHObrJxh5J2bhD3ZvWilSv7YOXeu6fyLFAWvpJ9GDvPpk0l?=
+ =?us-ascii?Q?XYi/rzHMb6MPfzK8f8OsJyB5Fz/SWolHR3AOTjuCkhj0YFMq3TzwgnbpMGqa?=
+ =?us-ascii?Q?cWuqmkD3Gx2Z8AjW96Lb+lg6IWafwdD17NeHQ9CBKCM+YtCBh7pXfGiNL0x9?=
+ =?us-ascii?Q?rB2883aOO6tdOSifLX+9UG7XttKoiVjCJduw1gEo5UaQoccymyuOHJgVs9Pt?=
+ =?us-ascii?Q?X+OLkis25p8Pe2YFQC/G1qIxa6Ept1VEO8TR6KD+qunzGdgHmHFvp8PfSr61?=
+ =?us-ascii?Q?6xEBegZBmFiFaRPqH9ylAdBIU4TSwv8/Ps1uX1bXDNnzLxso79rmTIirxBa7?=
+ =?us-ascii?Q?ea4/V0B1phRuks2pDaiSBwzuphqwKMs/PDapLMpAvG900aNkSf3+fUu+omgW?=
+ =?us-ascii?Q?mBRapxkBcy8FRSadphK+luwoF1TJedqd9Ygkg0+r3MhChMCYDF6WGhywk8xd?=
+ =?us-ascii?Q?xAs3DpkabtC5KRmYh4Q2/EXo8GwCtmjJew88BxGdvuQtSjPJ7nmia1XGMoWt?=
+ =?us-ascii?Q?yy2Oo6kNbzCSiMk/U1aLYkAHLUxYaJrvb8FtcF1b7ih8SldNQGHWfB19hjQZ?=
+ =?us-ascii?Q?WDz8vMmGNlDZ50MBzUYYmTl18ZNO2CXi+8J1BL73mWpnkzb38G1oyz5vFKyU?=
+ =?us-ascii?Q?YjLZnisgyNpko8wlAGvx9Z0SclojZ3PLgh0PNthyHXlWRhKT+K3sMOMbVpbX?=
+ =?us-ascii?Q?y7Pi99BvcnakOLdeGFJLzeGCdsWR9JRlJISMvb1W30WoRQMTKFohWi+T+CHk?=
+ =?us-ascii?Q?A6FSCF/cYLgZsjpesFNgtsQkIzXoaS1nPpXMEaAY6XlQoH3Ef4kmksjx3gft?=
+ =?us-ascii?Q?AEnDGVbdJVBEUDYFpsZ4qePFSyYX+cMSnytmBEVBgK1Swcj8OA62SooFgpoW?=
+ =?us-ascii?Q?oU/Tc5Je74gh0sZ65e/aH1+jiW0BjEMznI272Ry+d0AcNGywz3h19xM3xhYL?=
+ =?us-ascii?Q?/84CFd8h7cqhTLhdfXQ29fKf5V+ujEIqpTGN7ZVBx1INv4PJiELnM/411PIQ?=
+ =?us-ascii?Q?B83LJ74wi/WlJj0brx3GROR7srHT3RxbdEhIkpdr?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17ef912a-c977-40bc-e388-08dd70628fdd
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2025 14:44:38.2991
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6Hzx/bnf3iq7E5OynG529CzyOrd25tTETvVOmwxf6ovkO3NBjK9jPRwbt4umfyC3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7634
 
-On Thu, Mar 27, 2025 at 05:14:39PM +0000, Alexandru Elisei wrote:
-> Hi Jean-Philippe,
+On Wed, Mar 26, 2025 at 11:51:57AM -0700, Oliver Upton wrote:
 > 
-> On Tue, Mar 25, 2025 at 04:00:32PM +0000, Jean-Philippe Brucker wrote:
-> > Add the --qemu-cpu option to let users set the CPU type to run on.
-> > At the moment --processor allows to set both GCC -mcpu flag and QEMU
-> > -cpu. On Arm we'd like to pass `-cpu max` to QEMU in order to enable all
-> > the TCG features by default, and it could also be nice to let users
-> > modify the CPU capabilities by setting extra -cpu options.  Since GCC
-> > -mcpu doesn't accept "max" or "host", separate the compiler and QEMU
-> > arguments.
-> > 
-> > `--processor` is now exclusively for compiler options, as indicated by
-> > its documentation ("processor to compile for"). So use $QEMU_CPU on
-> > RISC-V as well.
-> > 
-> > Suggested-by: Andrew Jones <andrew.jones@linux.dev>
-> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > ---
-> >  scripts/mkstandalone.sh |  3 ++-
-> >  arm/run                 | 15 +++++++++------
-> >  riscv/run               |  8 ++++----
-> >  configure               | 24 ++++++++++++++++++++++++
-> >  4 files changed, 39 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> > index 2318a85f..9b4f983d 100755
-> > --- a/scripts/mkstandalone.sh
-> > +++ b/scripts/mkstandalone.sh
-> > @@ -42,7 +42,8 @@ generate_test ()
-> >  
-> >  	config_export ARCH
-> >  	config_export ARCH_NAME
-> > -	config_export PROCESSOR
-> > +	config_export QEMU_CPU
-> > +	config_export DEFAULT_QEMU_CPU
-> >  
-> >  	echo "echo BUILD_HEAD=$(cat build-head)"
-> >  
-> > diff --git a/arm/run b/arm/run
-> > index efdd44ce..4675398f 100755
-> > --- a/arm/run
-> > +++ b/arm/run
-> > @@ -8,7 +8,7 @@ if [ -z "$KUT_STANDALONE" ]; then
-> >  	source config.mak
-> >  	source scripts/arch-run.bash
-> >  fi
-> > -processor="$PROCESSOR"
-> > +qemu_cpu="$QEMU_CPU"
-> >  
-> >  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
-> >     [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
-> > @@ -37,12 +37,15 @@ if [ "$ACCEL" = "kvm" ]; then
-> >  	fi
-> >  fi
-> >  
-> > -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
-> > -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> > -		processor="host"
-> > +if [ -z "$qemu_cpu" ]; then
-> > +	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
-> > +	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
-> > +		qemu_cpu="host"
-> >  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> > -			processor+=",aarch64=off"
-> > +			qemu_cpu+=",aarch64=off"
-> >  		fi
-> > +	else
-> > +		qemu_cpu="$DEFAULT_QEMU_CPU"
-> >  	fi
-> >  fi
-> >  
-> > @@ -71,7 +74,7 @@ if $qemu $M -device '?' | grep -q pci-testdev; then
-> >  fi
-> >  
-> >  A="-accel $ACCEL$ACCEL_PROPS"
-> > -command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
-> > +command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
-> >  command+=" -display none -serial stdio"
-> >  command="$(migration_cmd) $(timeout_cmd) $command"
-> >  
-> > diff --git a/riscv/run b/riscv/run
-> > index e2f5a922..02fcf0c0 100755
-> > --- a/riscv/run
-> > +++ b/riscv/run
-> > @@ -11,12 +11,12 @@ fi
-> >  
-> >  # Allow user overrides of some config.mak variables
-> >  mach=$MACHINE_OVERRIDE
-> > -processor=$PROCESSOR_OVERRIDE
-> > +qemu_cpu=$QEMU_CPU_OVERRIDE
-> >  firmware=$FIRMWARE_OVERRIDE
-> >  
-> > -[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
-> > +[ -z "$QEMU_CPU" ] && QEMU_CPU="max"
+>  1) If struct page memory, use a cacheable mapping. CMO for non-FWB.
 > 
-> If you make DEFAULT_QEMU_CPU=max for riscv, you can use it instead of "max",
-> just like arm/arm64 does. Not sure if it's worth another respin.
+>  2) If cacheable PFNMAP:
+>    a) With FWB, use a cacheable mapping
+>    b) Without FWB, fail.
+> 
+>  3) If VM_ALLOW_ANY_UNCACHED, use Normal Non-Cacheable mapping
+> 
+>  4) Otherwise, Device-nGnRE
+> 
+> I understand 2b breaks ABI, but the 'typical' VFIO usages fall into (3)
+> and (4).
 
-Yup, we'll also need
++1 (and +1 to Sean's remark about strictly tracking the VMA as well)
 
-diff --git a/configure b/configure
-index b86ccc0c338b..541b9577a718 100755
---- a/configure
-+++ b/configure
-@@ -32,7 +32,7 @@ function get_default_qemu_cpu()
-     "arm")
-         echo "cortex-a15"
-         ;;
--    "arm64")
-+    "arm64" | "riscv32" | "riscv64")
-         echo "max"
-         ;;
-     esac
+IMHO not doing 2b is a "security" bug today. Catalin suggested we fix
+it as a first step to get agreement on this assement and fix. Once
+fixed there is no way for KVM to create a S2 with cachable semantics
+different from the VMA, or to have missing CMOs.
 
-Thanks,
-drew
+That simplifies the discussion of adding 2a to strictly track
+cachable.
 
-> 
-> Otherwise the patch looks good to me.
-> 
-> Thanks,
-> Alex
-> 
-> >  : "${mach:=virt}"
-> > -: "${processor:=$PROCESSOR}"
-> > +: "${qemu_cpu:=$QEMU_CPU}"
-> >  : "${firmware:=$FIRMWARE}"
-> >  [ "$firmware" ] && firmware="-bios $firmware"
-> >  
-> > @@ -32,7 +32,7 @@ fi
-> >  mach="-machine $mach"
-> >  
-> >  command="$qemu -nodefaults -nographic -serial mon:stdio"
-> > -command+=" $mach $acc $firmware -cpu $processor "
-> > +command+=" $mach $acc $firmware -cpu $qemu_cpu "
-> >  command="$(migration_cmd) $(timeout_cmd) $command"
-> >  
-> >  if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> > diff --git a/configure b/configure
-> > index b4875ef3..b79145a5 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -23,6 +23,21 @@ function get_default_processor()
-> >      esac
-> >  }
-> >  
-> > +# Return the default CPU type to run on
-> > +function get_default_qemu_cpu()
-> > +{
-> > +    local arch="$1"
-> > +
-> > +    case "$arch" in
-> > +    "arm")
-> > +        echo "cortex-a15"
-> > +        ;;
-> > +    "arm64")
-> > +        echo "cortex-a57"
-> > +        ;;
-> > +    esac
-> > +}
-> > +
-> >  srcdir=$(cd "$(dirname "$0")"; pwd)
-> >  prefix=/usr/local
-> >  cc=gcc
-> > @@ -52,6 +67,7 @@ earlycon=
-> >  console=
-> >  efi=
-> >  efi_direct=
-> > +qemu_cpu=
-> >  
-> >  # Enable -Werror by default for git repositories only (i.e. developer builds)
-> >  if [ -e "$srcdir"/.git ]; then
-> > @@ -70,6 +86,9 @@ usage() {
-> >  	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
-> >  	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
-> >  	    --processor=PROCESSOR  processor to compile for ($processor)
-> > +	    --qemu-cpu=CPU         the CPU model to run on. If left unset, the run script
-> > +	                           selects the best value based on the host system and the
-> > +	                           test configuration.
-> >  	    --target=TARGET        target platform that the tests will be running on (qemu or
-> >  	                           kvmtool, default is qemu) (arm/arm64 only)
-> >  	    --cross-prefix=PREFIX  cross compiler prefix
-> > @@ -146,6 +165,9 @@ while [[ $optno -le $argc ]]; do
-> >          --processor)
-> >  	    processor="$arg"
-> >  	    ;;
-> > +	--qemu-cpu)
-> > +	    qemu_cpu="$arg"
-> > +	    ;;
-> >  	--target)
-> >  	    target="$arg"
-> >  	    ;;
-> > @@ -471,6 +493,8 @@ ARCH=$arch
-> >  ARCH_NAME=$arch_name
-> >  ARCH_LIBDIR=$arch_libdir
-> >  PROCESSOR=$processor
-> > +QEMU_CPU=$qemu_cpu
-> > +DEFAULT_QEMU_CPU=$(get_default_qemu_cpu $arch)
-> >  CC=$cc
-> >  CFLAGS=$cflags
-> >  LD=$cross_prefix$ld
-> > -- 
-> > 2.49.0
-> > 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+I also don't see a need for a flag here.
+
+> A pedantic but correct live migration / snapshotting implementation
+> on non-FWB would need to do CMOs in case the VM used a non-WB
+> mapping for memory.
+
+From a live migration perspecive, we have already built in a lot of
+things on the VFIO side where a live migration can be attempted and
+then fail because of late-detected HW incompatibilities. We've sort of
+punted this for now to the orchestrator and operator. There is an
+expectation the environment will somehow ensure that live migration
+machine pools are sufficiently uniform when using VFIO. It is much
+more restricted than normal no-VFIO VM live migration.
+
+Given you can't have VM live migration of MMIO backed Cachable memory
+without a VFIO live migration driver, I wouldn't worry too much about
+these fine details from the KVM side. If /proc/cpuinfo shows the FWB
+that would be approximately similar discoverability to all the other
+limitations.
+
+Jason
