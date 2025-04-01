@@ -1,159 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2468B1494DB;
-	Tue,  1 Apr 2025 18:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1772E339C
+	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 20:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743531208; cv=none; b=XOqRIwtQRq3TFuchzoGQsbTsZNoK9/YZQD7pDFbSBZSAWG7O5Qs/4ol/ZiVu9SugpGJ06iC193JpIf+3QvSV7+bB3jcK2BE5hoiY/j5WpTqcYiv0qFWPEr5uR0OIb/nWbWRjGWBKKB9p7jQ7WMA7cHARxhBz1AbHrIL1mqLb8Ng=
+	t=1743540410; cv=none; b=Fuw/oZ/WBl5YD73pMuQSPVmRTefNQkoPE9v0F1Owdzwhho8s9B9IxMK2emXI2+3TSuxGSaEW7ShPVyZsmScmU/gLRcYRwUL79iGOUYoLQC4ETSoJX7tyize5gS22rmRiEEBG+JCM0lHgEWPwU9ES1jrC4YjB8yvBszcZ1Jz3cHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743531208; c=relaxed/simple;
-	bh=qfscOpdl97xcx+eUBTDK1poftkolewKwqxiyrcWA8PE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EHMMfeTA9wYDYAb2AKI00trt/LIPA8uuABZ2ih1C13M4QvuaNp3rLqrHGtS5coBaiWA7E3dSlranr1ZVgp0XDKm95zBkuiPK9tB4/eZ9ytXnYhxLn2opDvnlxP5gelgb2r2qC3o+B3rOMZPDZYOQMh4DZuBF7rc55El3Vrsqklg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RrOigoc9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743540410; c=relaxed/simple;
+	bh=HguwUdRio9Y+H4KEWTlofD2YbvLXz+Jv8pweJItO0h0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ze9I+qMO21xrKHa2EriU0zsB754R+Dfer3P8+TYvRKnT0UdbbabI7wLBEahqEK8Lp29wy/DiZ3nnLtUwjz/EsnSCeqSTuFoTFtG1SvHlr6LKZ321WumzoQ3DQN+iZammnus96uGjfm82SdmjKB7g7eBYj8lZdCH7FdOLYYJF2a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zm74A2BK; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RrOigoc9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 880E0C4CEE4;
-	Tue,  1 Apr 2025 18:13:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743531207;
-	bh=qfscOpdl97xcx+eUBTDK1poftkolewKwqxiyrcWA8PE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RrOigoc9wEJUmINO4d3jnip6ch6Ui5oabvvUL1QFUvkqyKKXNBOpreAOc5FkVo9Ys
-	 d/kyUPNk2r6mSNHTsaRsOAlzs6l1EUb3mU3StnQBaZ99CpsgeIWfePdxqZi6uUjP+s
-	 QLFIz9T9iz8O5rSJ2z47WgUdkw7F+wxbAbPfAi7wLFtfN0R3HccizqFsr5uLhbOWE6
-	 z0rzmNoch07QVBEco/Q2K4P+uNFIA0ctG4vvIbXuUcurybZBEQOPWF/tsz3EPQ0bUG
-	 8NTtHJGkJNqk2mcMmstUhzFnmirK+Dz0iIL52+qySCdfTQ4SFvxn962pXKrESNFynv
-	 QuDGC4p1JtgUQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tzg73-001QkT-4a;
-	Tue, 01 Apr 2025 19:13:25 +0100
-Date: Tue, 01 Apr 2025 19:13:26 +0100
-Message-ID: <87ldsjzr5l.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yuvraj Sakshith <yuvraj.kernel@gmail.com>
-Cc: kvmarm@lists.linux.dev,
-	op-tee@lists.trustedfirmware.org,
-	kvm@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	jens.wiklander@linaro.org,
-	sumit.garg@kernel.org,
-	mark.rutland@arm.com,
-	lpieralisi@kernel.org,
-	sudeep.holla@arm.com,
-	pbonzini@redhat.com,
-	praan@google.com
-Subject: Re: [RFC PATCH 0/7] KVM: optee: Introduce OP-TEE Mediator for exposing secure world to KVM guests
-In-Reply-To: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
-References: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zm74A2BK"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-229668c8659so6677825ad.3
+        for <kvmarm@lists.linux.dev>; Tue, 01 Apr 2025 13:46:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743540408; x=1744145208; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4MHpp6KQzpe5YT4W+dH4Yie0ZZwtXZwZK/jMYGNOWeg=;
+        b=zm74A2BK/6c5hYzTwrOoNzToi6COAsUp/CuJBFbFiv47G4d4ZwBlJphBeKxE0CGs3v
+         cSIXUbH0kNt1h9lgyT8P9Nu+YWeAtl468Pau1YGjoktmT1jsXOG1StAafTnQt8yQToJL
+         5x/0nC7A3qWPCFjUNdRxVbXyvfVyzIMDlImtrzBqyRrZMpZY7O/InVV4Cb43jlptt+I5
+         I6gts0O4O3gHe57fp8LDWwTE4URELKVxg5rRALA1fiKWHFdeC9P1TRwYOUWgoeDstMqv
+         JRprePbho0a1ctYucz/d+7JOVpYZq59e5CxCpa0Y7xSBZuWqvmPLL4H+ay4mQK/CEJv2
+         AjRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743540408; x=1744145208;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4MHpp6KQzpe5YT4W+dH4Yie0ZZwtXZwZK/jMYGNOWeg=;
+        b=Y8acUUCvVzJ9TKSCIrjs9YgR4r//ofP9vkRAsPomn933imJu1ulrypx0yrpdvT6jWo
+         qx57EpdIHuDa5633iKznlIzvuTQfA3z1V6Dnxuf004JacqJdVYV+nwEY1UkJj8ycOMxF
+         5iu4gbo5ckq4LmJTA0pDj3fW/9LX7k26qi9+HAIjWPBIEM5yFvq7fFG8laaeCxO/BLn7
+         LLwncAdh3qOA0URMmdjaFoehPKnmuXXy73edzVZkjp7cXy2Sc77dzqRQ5oHnGdiHltF4
+         8abVNsLN/rhQrxrP4pbfsqPgoGecfRyMLlswv5iiwkC1YtrB+Tz0feuaw1mZnVPRxuqv
+         lGtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXPS9lrDJwbSEPtdb0fNvT9vNcIKJEy+t3KtM1x6OrOGvLRxIq9RGXUrlm+lZfjmUP/Rto9qUM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0h3oGDDYXo6V+1en2fx4KHj7/nwczu1t04KO1e8Wx7Gg92EcR
+	VSBtznghVp+o9RQ8PCsH/g1v4CPG0XUo3JdQs/zhkrVdHIp0fmRJI+4MHmb2Fdo/WgG1L1qU502
+	QLA==
+X-Google-Smtp-Source: AGHT+IHAsBNwKlX/xhMaBjKbVn5TdC1aApjFgyzFqGqs5j7Zym3fz03OLRDWDWGVCV86OCx3ObyBflUf12E=
+X-Received: from pfbls13.prod.google.com ([2002:a05:6a00:740d:b0:737:5ee8:8403])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3d51:b0:739:50c0:b3fe
+ with SMTP id d2e1a72fcca58-73980380c52mr22298727b3a.8.1743540407837; Tue, 01
+ Apr 2025 13:46:47 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue,  1 Apr 2025 13:44:12 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuvraj.kernel@gmail.com, kvmarm@lists.linux.dev, op-tee@lists.trustedfirmware.org, kvm@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jens.wiklander@linaro.org, sumit.garg@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com, pbonzini@redhat.com, praan@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
+Message-ID: <20250401204425.904001-1-seanjc@google.com>
+Subject: [PATCH 00/12] KVM: Make irqfd registration globally unique
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, David Matlack <dmatlack@google.com>, 
+	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, 
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 01 Apr 2025 18:05:20 +0100,
-Yuvraj Sakshith <yuvraj.kernel@gmail.com> wrote:
-> 
-> A KVM guest running on an arm64 machine will not be able to interact with a trusted execution environment
-> (which supports non-secure guests) like OP-TEE in the secure world. This is because, instructions provided
-> by the architecture (such as, SMC)  which switch control to the firmware, are trapped in EL2 when the guest
-> is executes them.
-> 
-> This series adds a feature into the kernel called the TEE mediator abstraction layer, which lets
-> a guest interact with the secure world. Additionally, a OP-TEE specific mediator is also implemented, which
-> hooks itself to the TEE mediator layer and intercepts guest SMCs targetted at OP-TEE.
-> 
-> Overview
-> =========
-> 
-> Essentially, if the kernel wants to interact with OP-TEE, it makes an "smc - secure monitor call instruction",
-> after loading in arguments into CPU registers. What these arguments consists of and how both these entities 
-> communicate can vary. If a guest wants to establish a connection with the secure world, its not possible. 
-> This is because of the fact that "smc" by the guest are trapped by the hypervisor in EL2. This is done by setting
-> the HCR_EL2.TSC bit before entering the guest.
-> 
-> Hence, this feature which I we may call TEE mediator, acts as an intermediary between the guest and OP-TEE.
-> Instead of denying the guest SMC and jumping back into the guest, the mediator forwards the request to
-> OP-TEE.
-> 
-> OP-TEE supports virtualization in the normal world and expects 6 things from the NS-hypervisor:
-> 
-> 1. Notify OP-TEE when a VM is created.
-> 2. Notify OP-TEE when a VM is destroyed.
-> 3. Any SMC to OP-TEE has to contain the VMID in x7. If its the hypervisor sending, then VMID is 0.
-> 4. Hypervisor has to perform IPA->PA translations of the memory addresses sent by guest.
-> 5. Memory shared by the VM to OP-TEE has to remain pinned.
-> 6. The hypervisor has to follow the OP-TEE protocol, so the guest thinks it is directly speaking to OP-TEE.
-> 
-> Its important to note that, if OP-TEE is built with NS-virtualization support, it can only function if there is 
-> a hypervisor with a mediator in normal world.
-> 
-> This implementation has been heavily inspired by Xen's OP-TEE
-> mediator.
+Xen folks, I Cc'd y'all because "sched/wait: Drop WQ_FLAG_EXCLUSIVE from
+add_wait_queue_priority()" changes the behavior of add_wait_queue_priority(),
+which Xen's privcmd uses.  Unless I've misread the code, the Xen behavior
+isn't actually affected, but extra eyeballs and any testing you can provide
+would be much appreciated.
 
-[...]
 
-And I think this inspiration is the source of most of the problems in
-this series.
+Rework KVM's irqfd registration to require that an eventfd is bound to at
+most one irqfd throughout the entire system.  KVM currently disallows
+binding an eventfd to multiple irqfds for a single VM, but doesn't reject
+attempts to bind an eventfd to multiple VMs.
 
-Routing Secure Calls from the guest to whatever is on the secure side
-should not be the kernel's job at all. It should be the VMM's job. All
-you need to do is to route the SMCs from the guest to userspace, and
-we already have all the required infrastructure for that.
+This is obvious an ABI change, but I'm fairly confident that it won't
+break userspace, because binding an eventfd to multiple irqfds hasn't
+truly worked since commit e8dbf19508a1 ("kvm/eventfd: Use priority waitqueue
+to catch events before userspace").  A somewhat undocumented, and perhaps
+even unintentional, side effect of suppressing eventfd notifications for
+userspace is that the priority+exclusive behavior also suppresses eventfd
+notifications for any subsequent waiters, even if they are priority waiters.
+I.e. only the first VM with an irqfd+eventfd binding will get notifications.
 
-It is the VMM that should:
+And for IRQ bypass, a.k.a. device posted interrupts, globally unique
+bindings are a hard requirement (at least on x86; I assume other archs are
+the same).  KVM and the IRQ bypass manager kinda sorta handle this, but in
+the absolute worst way possible (IMO).  Instead of surfacing an error to
+userspace, KVM silently ignores IRQ bypass registration errors.
 
-- signal the TEE of VM creation/teardown
+The motivation for this series is to harden against userspace goofs.  AFAIK,
+we (Google) have never actually had a bug where userspace tries to assign
+an eventfd to multiple VMs, but the possibility has come up in more than one
+bug investigation (our intra-host, a.k.a. copyless, migration scheme
+transfers eventfds from the old to the new VM when updating the host VMM).
 
-- translate between IPAs and host VAs without involving KVM
+Sean Christopherson (12):
+  KVM: Use a local struct to do the initial vfs_poll() on an irqfd
+  KVM: Acquire SCRU lock outside of irqfds.lock during assignment
+  KVM: Initialize irqfd waitqueue callback when adding to the queue
+  KVM: Add irqfd to KVM's list via the vfs_poll() callback
+  KVM: Add irqfd to eventfd's waitqueue while holding irqfds.lock
+  sched/wait: Add a waitqueue helper for fully exclusive priority
+    waiters
+  KVM: Disallow binding multiple irqfds to an eventfd with a priority
+    waiter
+  sched/wait: Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority()
+  KVM: Drop sanity check that per-VM list of irqfds is unique
+  KVM: selftests: Assert that eventfd() succeeds in Xen shinfo test
+  KVM: selftests: Add utilities to create eventfds and do KVM_IRQFD
+  KVM: selftests: Add a KVM_IRQFD test to verify uniqueness requirements
 
-- let the host TEE driver translate between VAs and PAs and deal with
-  the pinning as required, just like it would do for any userspace
-  (without ever using the KVM memslot interface)
+ include/linux/kvm_irqfd.h                     |   1 -
+ include/linux/wait.h                          |   2 +
+ kernel/sched/wait.c                           |  24 +++-
+ tools/testing/selftests/kvm/Makefile.kvm      |   4 +
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  |  12 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  40 ++++++
+ tools/testing/selftests/kvm/irqfd_test.c      | 130 ++++++++++++++++++
+ .../selftests/kvm/x86/xen_shinfo_test.c       |  21 +--
+ virt/kvm/eventfd.c                            | 130 +++++++++++++-----
+ 9 files changed, 299 insertions(+), 65 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/irqfd_test.c
 
-- proxy requests from the guest to the TEE
 
-- in general, bear the complexity of anything related to the TEE
-
-In short, the VMM is just another piece of userspace using the TEE to
-do whatever it wants. The TEE driver on the host must obviously know
-about VMs, but that's about it.
-
-Crucially, KVM should:
-
-- be completely TEE agnostic and never call into something that is
-  TEE-specific
-
-- allow a TEE implementation entirely in userspace, specially for the
-  machines that do not have EL3
-
-As it stands, your design looks completely upside-down. Most of this
-code should be userspace code and live in (or close to) the VMM, with
-the host kernel only providing the basic primitives, most of which
-should already be there.
-
-Thanks,
-
-	M.
-
+base-commit: 782f9feaa9517caf33186dcdd6b50a8f770ed29b
 -- 
-Jazz isn't dead. It just smells funny.
+2.49.0.504.g3bcea36a83-goog
+
