@@ -1,32 +1,32 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC2F212FA7
-	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 22:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB184214A70
+	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 22:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743547371; cv=none; b=KaQo4xHe/PPZPi9Q4Nr3wlVQV5jNuYK9oIHoJwJ8zDqtlfxWHGpYDqBPOQK0vegyybaTMmmbz1Y5OSs0u+f5KKwWuLJsS3uk6mwYbjPbwYTCqja7eYR2JkfJ++idzWNlzDj+4qhs6bBUvT3SN1/hSzKzje+PeqjA93RGdwMB7Rw=
+	t=1743547371; cv=none; b=b+PyjSvZNqBwqTGFAirHtjW8xVUhpU33qDJ0Er+0N6Ioxp3SR0eNo9PFfK+QJ3DJktYyaiXYWayzAcaWSaJJ+Hm5eEHSrWny1a94shOXu3GZJ8jbOHq7xTpEutrMKv2t7283+ecjzf9zJXId83n99K3ziaU2RD8WsxKkUx/L/ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743547371; c=relaxed/simple;
-	bh=8ehPsGz/98r4MEPPh6uUCkJSYumAaxNkAiF9Im2lR9s=;
+	bh=xlWR13vWXmSwq0fxzbaouy0JLIklE+RsbT8ifssUuF8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XkCOyxx+quiEFDLXG4WiMKhkAVrn7eFPdgYxbLFh1DIoiD4C4DjY4NUYoV4vcLmL5hKJ49psQzo5nSYGKvRHm/znr82pJ05kNi2D4yTvqltSQR5a+ClD/ZQqXNtqO3od85Sw3qh7vY3VmGQvD3lyJa9vpgpsJbWMPCqn0mQwMe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lq7vSi1p; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=C6iBarUzWCsGmQqnd+ZFouAvVQccW0K5X8YznXvSmycbAaspC439UlHh7jETjtcCVM/n0Q++lLo4A3sk9w7x4XV6aMf3X5NXV6DoN70jmdmmGD51UIrG86CmvFoW0t7hKsNooMG2+/1qSXuqf4pZ6+fqpozaJ3jeEKwLHXhbzE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GZyNTvEZ; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lq7vSi1p"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GZyNTvEZ"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743547365;
+	t=1743547368;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jai2bWmDberXlCk5zPagDV7rWyhqs4PByckwUJfq6sY=;
-	b=lq7vSi1pctUCMrBqtlyQ/BRBforE4h5AHA4Qt172Aynd6MSx6DQugJOw98n0QPxETvOzoS
-	rrPoozOYD+WHVm2P1ln/tH3snzcBjlpmvsCVB1HLRG9pSXHxdLlNtNTG3b34LTAC4qRpvC
-	J9h08Z1LTghlNGAxzN+yR0GGVgkc1ls=
+	bh=+V7bhrGP24eNgC6K/LafjzOHHi+9pX+4j2cwxRY8fJI=;
+	b=GZyNTvEZ2eBJKxZBDW6DFVw+0tUlGYLUMkj3oCWFbh9PEGiunMnc+fag6wbfolRWpuoc7V
+	xMruvG5HvEmN0EWaeJ7skKH5qvBcJewj9CxA77JteYXFK298m0TMV9gBtILOaQl5hIZUxg
+	yHlZbD1YGgNsP7RqGN/kxM/Ni3zYmk0=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Jiaqi Yan <jiaqiyan@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 1/3] KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
-Date: Tue,  1 Apr 2025 15:42:32 -0700
-Message-Id: <20250401224234.2906739-2-oliver.upton@linux.dev>
+Subject: [PATCH 2/3] arm64: Convert HPFAR_EL2 to sysreg table
+Date: Tue,  1 Apr 2025 15:42:33 -0700
+Message-Id: <20250401224234.2906739-3-oliver.upton@linux.dev>
 In-Reply-To: <20250401224234.2906739-1-oliver.upton@linux.dev>
 References: <20250401224234.2906739-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,97 +48,57 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-KVM's logic for deciding when HPFAR_EL2 is UNKNOWN doesn't align with
-the architecture. Most notably, KVM assumes HPFAR_EL2 contains the
-faulting IPA even in the case of an SEA.
-
-Align the logic with the architecture rather than attempting to
-paraphrase it. Additionally, take the opportunity to improve the
-language around ARM erratum #834220 such that it actually describes the
-bug.
+Switch over to the typical sysreg table for HPFAR_EL2 as we're about to
+start using more fields in the register.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/esr.h           |  1 +
- arch/arm64/kvm/hyp/include/hyp/fault.h | 46 ++++++++++++++++----------
- 2 files changed, 29 insertions(+), 18 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h  | 2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
+ arch/arm64/tools/sysreg               | 7 +++++++
+ 3 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index d1b1a33f9a8b..7b096ed87360 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -121,6 +121,7 @@
- #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
- #define ESR_ELx_FSC_SECC	(0x18)
- #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
-+#define ESR_ELx_FSC_ADDRESS	(0x00)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index d7cf66573aca..5d8c0832acbe 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -305,7 +305,7 @@ static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vc
  
- /* Status codes for individual page table levels */
- #define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
-diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-index 17df94570f03..84d165e17bd0 100644
---- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-@@ -44,31 +44,41 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	return true;
+ static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
+ {
+-	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_MASK) << 8;
++	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_EL2_FIPA) << 8;
  }
  
-+/*
-+ * Checks for the conditions when HPFAR_EL2 is written, per DDI0487L.a D24.2.70.
-+ */
-+static inline bool __hpfar_valid(u64 esr)
-+{
-+	/*
-+	 * CPUs affected by ARM erratum #834220 may incorrectly report a
-+	 * stage-2 translation fault when a stage-1 permission fault occurs.
-+	 *
-+	 * Re-walk the page tables to determine if a stage-1 fault actually
-+	 * occurred.
-+	 */
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_834220) &&
-+	    esr_fsc_is_translation_fault(esr))
-+		return false;
-+
-+	if (esr_fsc_is_translation_fault(esr) || esr_fsc_is_access_flag_fault(esr))
-+		return true;
-+
-+	if ((esr & ESR_ELx_S1PTW) && esr_fsc_is_permission_fault(esr))
-+		return true;
-+
-+	return (esr & ESR_ELx_FSC) == ESR_ELx_FSC_ADDRESS;
-+}
-+
- static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
- {
- 	u64 hpfar, far;
+ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index f34f11c720d7..168893570703 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -578,7 +578,7 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+ 		return;
+ 	}
  
- 	far = read_sysreg_el2(SYS_FAR);
- 
--	/*
--	 * The HPFAR can be invalid if the stage 2 fault did not
--	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
--	 * bit is clear) and one of the two following cases are true:
--	 *   1. The fault was due to a permission fault
--	 *   2. The processor carries errata 834220
--	 *
--	 * Therefore, for all non S1PTW faults where we either have a
--	 * permission fault or the errata workaround is enabled, we
--	 * resolve the IPA using the AT instruction.
--	 */
--	if (!(esr & ESR_ELx_S1PTW) &&
--	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
--	     esr_fsc_is_permission_fault(esr))) {
--		if (!__translate_far_to_hpfar(far, &hpfar))
--			return false;
--	} else {
-+	if (__hpfar_valid(esr))
- 		hpfar = read_sysreg(hpfar_el2);
--	}
-+	else if (!__translate_far_to_hpfar(far, &hpfar))
-+		return false;
- 
- 	fault->far_el2 = far;
- 	fault->hpfar_el2 = hpfar;
+-	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
++	addr = (fault.hpfar_el2 & HPFAR_EL2_FIPA) << 8;
+ 	ret = host_stage2_idmap(addr);
+ 	BUG_ON(ret && ret != -EAGAIN);
+ }
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 2c63662c1a48..31ad9ce2b91c 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -3433,3 +3433,10 @@ Field	5	F
+ Field	4	P
+ Field	3:0	Align
+ EndSysreg
++
++Sysreg	HPFAR_EL2	3	4	6	0	4
++Field	63	NS
++Res0	62:48
++Field	47:4	FIPA
++Res0	3:0
++EndSysreg
 -- 
 2.39.5
 
