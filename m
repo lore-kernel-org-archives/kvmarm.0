@@ -1,57 +1,57 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D720C221566
-	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 20:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F39221729
+	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 20:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743540425; cv=none; b=aSBZuGbDKpBPvx+MHhWTwLEgV5uZfeg6EoHCJLFchTZEW55LxrQSLy4nBMwfcNtt3ypk/LTh1VQ+6ZOxrSDEPM5zTIxfr9hilgkd/BqFBuxgx97Ru9cYmc2Cf01TghnhOcNBKVplMrh2jFlsfO4v+OqLPJsYppZAL6I8HDfoqTM=
+	t=1743540427; cv=none; b=RzJPtPC+EwlRvN26SLuaCvKXLoA/YNPL2/hiRWz63zVNQr+/uSUto3bMaElO8boBo1Pnk7kK885uX8pAgGhfkmWw6tk9siFjBKwIEC8CFbzECTsDw0ofX12CVyv5XcdsRBRfsqaQDRDVmaI28heqIDYjNj4zPitAnnKrs4rl4PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743540425; c=relaxed/simple;
-	bh=p6FosNapp0YaaT9fRT5YA+80ZKTNpXl7IVghKZMWIQo=;
+	s=arc-20240116; t=1743540427; c=relaxed/simple;
+	bh=vPE6Zg+Is0XKaMNp6fIjGpoFx3l5te14lZBJu/kZl5I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QBooQS/ZbxLDTQMRHf1wyer7Ieuw8iQ8ApYxqQSxi1Zuc/DSZh0hwi3nUB+TEoSfPhkGjpOUVzwwAIsSHyKDG/vEyoU6Rjw6XmWPjKPOUKHBXxQaqvnHSmomPg1PyQS62cRX5n6JoxC4wJvoGgUp5sl8PEL06LIVTdBLf0kg7Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NaZpj8DZ; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=NpEQ7cgmUxt57LvNhjDpBFMnmhVK5gbyNcxbbOipLR8Gsb0+qAMgYSGv4v8FugALmPcQmVrZafOQtrTckRONCvrPuHf07EPANjoRbxlFjUBfN+g2F+SCM/DpPAhW5CiogEb4akOYxNRF9qDMMm28L09ihQvVa/hwEw7BX7WTvYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gm+SRKUf; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NaZpj8DZ"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff854a2541so9883692a91.0
-        for <kvmarm@lists.linux.dev>; Tue, 01 Apr 2025 13:47:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gm+SRKUf"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-229170fbe74so89405035ad.2
+        for <kvmarm@lists.linux.dev>; Tue, 01 Apr 2025 13:47:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743540423; x=1744145223; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1743540425; x=1744145225; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=A5N7R+jpPDsp4box9tDn3nxVfOu1tizhXrLdonpwfcQ=;
-        b=NaZpj8DZjwYJ/0u8125j5R2nXsy7FZ9dc93Gjd1yLs5kMmWekHM/j+Nf2RpjrMxTJB
-         Q3kaNwCjd1+GFS9EBgBHtgstw38imRvSqZys6qZkcU5iamQ6chTtkH2ytxdBuR9QTnBp
-         VnZl5c//Noa+Z22YTsAJavSepv3VAIBnNRdiBKKryInSJ2pTJ8VMq0luAzoAhQrVK5Fy
-         GShbalOzYsmhhCzRVrW/4KpKQIkV2iTEp0KpEMIwaJtQohV6uu3ciFs5437K8ch2BesW
-         7EmHr1jXvGTbCIHDGjoMg2LmrWpywgssIyoy3WYiUEg0BUVKjHwsPrKP3VgJVV8lcSWj
-         op+Q==
+        bh=5qKsANY9N47hjadaMZNM56aBAj0f8nczwxZTz9+A9lg=;
+        b=Gm+SRKUfYV5fOIYidQ0iylV1ZxsMLQzOAdej+2/vzo23Kc+FwDczBbvoh9boqgW/u5
+         e2DwHnDzS1a2HIQb7am5u6sqxtYmpL2/5ToWuRQvDOYuk+cjjcrsOZRbDCXlz0gzAKqG
+         GxFwkyFQceEbVqYJmoL2IBShn41l8qMlvZhUzaRZQ9dE1BJLejx5GIpFSxMok1Q+c7Qn
+         DqMknk+rpuU5H4IopUkUtWsyY7Z//WwaaF+UNJdj+nHYRrI3vVWmpyfKr3xF0WJD31VH
+         s4LxecaZ0I3lr115HWjevAeaKBssa59h2u7uQ/mIEs43dLIpOoXfscsjpBiq84WXhQQF
+         0/sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743540423; x=1744145223;
+        d=1e100.net; s=20230601; t=1743540425; x=1744145225;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=A5N7R+jpPDsp4box9tDn3nxVfOu1tizhXrLdonpwfcQ=;
-        b=Kll2emY0Ed0Cb5WxIu8KXbWNTy1vIZGSLnNbjTm5K8ZYocmaWzb5XzUNmigWHy73iu
-         wrr6qBzAfm968NSvmauJIgt+yE2R5z/Fxk8AHlGIAZHmIDRl9R9F5yOCaTlWL3gUcbcc
-         9q7GxbLylmtngYercFW9FM5/9l3kCykYp1BO5Z7NsXrzSb/I9BzhcQsspP+F+o/YTSAF
-         PQx888d3eBPk4Ffpw1pdIg97H8uwOdI7nxz3TDPdax83DngiKh/vg2EyiEhMYrVo/mKQ
-         mbMMhcQqWgoALjqKlU3/Z2MyVH8yHls/JrDiCglZmBMS+JFkE9tkbRi4b+RmIvUM1CSo
-         mY1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWRblV0GbX841xdFvsSFRW/waV3uKTDr4ecH1nNCKutY2Xj4y25dpJ5CvrSC7l2tB5kjl/FvBs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yys7LYFXSya6EoXYTWCbLBEoebZIGqcWGGtn/qEn09ClbSktdg/
-	Oen5ZG+BFXQIJ9ZHENp04a5MBg2mNKRowSqK7Er+6alYLTSkcAHJ+d3OBMQOKLgMfpgz2DvBK5T
-	bmw==
-X-Google-Smtp-Source: AGHT+IFKHrxOrTZORfx3j1Hq3t+F6SZMnVAetLumeoCsiYBPEvhoueJg73+pHzxlFtD9cACElqMRzKov8iQ=
-X-Received: from pjbsg16.prod.google.com ([2002:a17:90b:5210:b0:2ef:9b30:69d3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a4b:b0:2f5:747:cbd
- with SMTP id 98e67ed59e1d1-305320af2bfmr23155973a91.18.1743540423264; Tue, 01
- Apr 2025 13:47:03 -0700 (PDT)
+        bh=5qKsANY9N47hjadaMZNM56aBAj0f8nczwxZTz9+A9lg=;
+        b=Ri0z3x+sffn4dOwDZmqgMi08WCnO+JDfH4lJ2M5jvDw4b0eVkm7VgBFRcuVSKCVFkO
+         ylDZ0dUrqL6VUFCmRxUn0Ci6m9al5/z0pmggx4WDWzYhMRl+jDy0PU+YppxrwApQC1sl
+         0eh75kZ8G+VAe9vBtYMnyRsTNs3oePQLDSbOhkv7H2MZtwu+XXgFqVX5ak7bIsc4Lhd8
+         VsMkOzc3aR5LYo7HkRBIIV064XwCN1bzm3PhSEar8unYb/N3ABYVMXVBgU1i+BDIuSCD
+         SAIcz6CEeluuCRFi9xm9X9JvmFDwnGih91k4oHAYH0YaujDdE9jzDkym3paXUh51EiPk
+         njcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyW4cPuej7Xd1DLq99rPRNFXcdktzHO4eyDwf654FJhXXlCn5hyrM7122vEGJ6p2vkUYmtopQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxHWIO37TvKT/zjq0wJgRUV0ZooE0K2j/mT0X1+a+NY0H/uWwTR
+	IL00ZPWAxYCobmaeU12lq2kANpzwvQ0EP1wRa6HzzwpkIq3FH7B+vwE6189s2TbGGHeoPU9l0jG
+	s7A==
+X-Google-Smtp-Source: AGHT+IFGVv11dt7rUK+obI9Bx4C62kJ/MvcG+5bk3TDAhhA7vlmUxcL80d04RZFegq2L9eKJhwQmELWuf+4=
+X-Received: from pfnz20.prod.google.com ([2002:aa7:85d4:0:b0:730:9951:c9ea])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:84b:b0:736:6279:ca25
+ with SMTP id d2e1a72fcca58-73980463170mr23448772b3a.24.1743540425095; Tue, 01
+ Apr 2025 13:47:05 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  1 Apr 2025 13:44:21 -0700
+Date: Tue,  1 Apr 2025 13:44:22 -0700
 In-Reply-To: <20250401204425.904001-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250401204425.904001-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250401204425.904001-10-seanjc@google.com>
-Subject: [PATCH 09/12] KVM: Drop sanity check that per-VM list of irqfds is unique
+Message-ID: <20250401204425.904001-11-seanjc@google.com>
+Subject: [PATCH 10/12] KVM: selftests: Assert that eventfd() succeeds in Xen
+ shinfo test
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
 	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
@@ -77,44 +78,37 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that the eventfd's waitqueue ensures it has at most one priority
-waiter, i.e. prevents KVM from binding multiple irqfds to one eventfd,
-drop KVM's sanity check that eventfds are unique for a single VM.
+Assert that eventfd() succeeds in the Xen shinfo test instead of skipping
+the associated testcase.  While eventfd() is outside the scope of KVM, KVM
+unconditionally selects EVENTFD, i.e. the syscall should always succeed.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/eventfd.c | 11 -----------
- 1 file changed, 11 deletions(-)
+ tools/testing/selftests/kvm/x86/xen_shinfo_test.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 25c360ed2e1e..d21b956e7daa 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -288,7 +288,6 @@ static void kvm_irqfd_register(struct file *file, wait_queue_head_t *wqh,
- {
- 	struct kvm_irqfd_pt *p = container_of(pt, struct kvm_irqfd_pt, pt);
- 	struct kvm_kernel_irqfd *irqfd = p->irqfd;
--	struct kvm_kernel_irqfd *tmp;
- 	struct kvm *kvm = p->kvm;
+diff --git a/tools/testing/selftests/kvm/x86/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
+index 287829f850f7..34d180cf4eed 100644
+--- a/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
++++ b/tools/testing/selftests/kvm/x86/xen_shinfo_test.c
+@@ -548,14 +548,11 @@ int main(int argc, char *argv[])
  
- 	/*
-@@ -328,16 +327,6 @@ static void kvm_irqfd_register(struct file *file, wait_queue_head_t *wqh,
- 	if (p->ret)
- 		goto out;
+ 	if (do_eventfd_tests) {
+ 		irq_fd[0] = eventfd(0, 0);
++		TEST_ASSERT(irq_fd[0] >= 0, __KVM_SYSCALL_ERROR("eventfd()", irq_fd[0]));
++
+ 		irq_fd[1] = eventfd(0, 0);
++		TEST_ASSERT(irq_fd[1] >= 0, __KVM_SYSCALL_ERROR("eventfd()", irq_fd[1]));
  
--	list_for_each_entry(tmp, &kvm->irqfds.items, list) {
--		if (irqfd->eventfd != tmp->eventfd)
--			continue;
--
--		WARN_ON_ONCE(1);
--		/* This fd is used for another irq already. */
--		p->ret = -EBUSY;
--		goto out;
+-		/* Unexpected, but not a KVM failure */
+-		if (irq_fd[0] == -1 || irq_fd[1] == -1)
+-			do_evtchn_tests = do_eventfd_tests = false;
 -	}
 -
- 	list_add_tail(&irqfd->list, &kvm->irqfds.items);
+-	if (do_eventfd_tests) {
+ 		irq_routes.info.nr = 2;
  
- out:
+ 		irq_routes.entries[0].gsi = 32;
 -- 
 2.49.0.504.g3bcea36a83-goog
 
