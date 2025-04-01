@@ -1,266 +1,70 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A322147E0
-	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 20:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662031EF378
+	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 22:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743540430; cv=none; b=J0GF+VbrVYkkZx7MPqWp0W2nXZTlsYZSEPH6Cz3wDF+x+x+xhE1IQCKxpGxjWKwXt/JPYiFDJL3uJKTzHN9vYHgehwbSC0SuCavY4y6h3YZyU2PAdSG2Kad5RzNWGwIMH7eSt1Jv1yDJJtrGdLarFNwPO//eFfS2MJ5ZsEtidbY=
+	t=1743547369; cv=none; b=pIf5xIptorIjhrlCk4ZLZ9bR4LENzg4Q39Ms4Jqkg3KRCtkEkAmDopOZlagVTSlbqKUZO6Z6hr0+Aga4rD7NvWSXplwY+dmmez4lNycJEELa6/KSZh23Ayol3ELSFHoNWhngdCvHU8HV1D4CEX1t3fgbR8jWj/2FGbmk3eTRIp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743540430; c=relaxed/simple;
-	bh=fUs07VOggshpPVb5iKIZY5UPq/g/qmxhlixbhOP2Vg0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G41/rc+EdTUk8npKFN3Jx2EUG9KxttysCUm3OuIqu7o+0V1tYIRzlP3K6tcDGFr3abXYgebbXrsfYN4QRxsEElMg1psH6Ky2dqCykU2tuqXKi36fu1InAs+7IGYtCo+FImYtnpaq+WhJgKUFkWbr6dEhOOvkYI+6omSYgCoeL0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aFmR8SbK; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1743547369; c=relaxed/simple;
+	bh=dkb4QMKXv9MFMRounFnYMH7scjqFGzOZLHZ3yBBbMgM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AyUMYmbIvKPv1k0Vl75a8srwJV1fvG4sRIPFMvP5UTfC6nKVLYlZaivAvvR60UbfHaDyYGV/EoBBNFAsYuJxHATeVem8f5AzTcW/jC25JREoQBcCtpxaAhv/EQC31k+QPz1MuaPYnlvzlu8Oh+sdQZfNsNRDsb/F6LOig28lhco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PRzzPgEC; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aFmR8SbK"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3032ea03448so11185729a91.2
-        for <kvmarm@lists.linux.dev>; Tue, 01 Apr 2025 13:47:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743540428; x=1744145228; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=m2Nlc70kYoEVZE2tPVykbAae+uvb1zAI7sPIwdhW1oA=;
-        b=aFmR8SbKiR/P1zBsCnDL6HuwDydSkBgoryMCUXgn8AdkaGcAexuzJh1pWHKq0IaepP
-         qAEkRWhjlS831j6qaT5GNTNcmy80cr/4MIOysDdAAb4cGYlp5IjwI/1cipsEKgcsTFGY
-         rpWnkXgPm1cZ/mgHf2GhLP+KB7JWtQtMdQBcptmq7zKzMfmjQLBCa+sovuXL52cSjqMa
-         TFrFyvCFlN9W/Jir38V2UKbqt3UsJTkh7dd/b5opmGwKXbpKt9yIO9K+SKqMbHJHTXrb
-         Tsi08pkieKwTLT1WLh/HJzNNtTO/HmRmQjYNwaT6oclbMPJ5YCHiHk6KsV7RHd9uo7YG
-         we7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743540428; x=1744145228;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m2Nlc70kYoEVZE2tPVykbAae+uvb1zAI7sPIwdhW1oA=;
-        b=A52T1RTDKsIg0dG91Jf90yicb2by9mMooMqumTBNhKSWlP/PikscA0malVFcVRH5sR
-         s8TSmHTj+EoJ7cRGgpdL99dDZ3+IeeqURtv8jmr3WckGvelUy8F/2hjl2Je+WxGHtuz4
-         bDgdsSHWdBmMDitTlC5JfAtzxTy+RA8ImUa2zxQYlvP5pyZJ05tjYyfMHBriZUjfXppK
-         Uf+e07Y6s4H+hEEVzx+0wFC8+k7o6rN2QcjXtZsND1OKwatQc9KhOBpsv+cF7yMnXh/i
-         UngvzGdC491GnHGMBBgClGZ8DJLtgpIro29MJzO0Rmr10rAZ0LaxLNoF04FuxGd7YAYL
-         s2wA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ7XvJ89HcbkgKynNYRiLWE0o6pDFkqsDEKx2llmyLcLE0+oZ16q7qurOpTmrbGKfTGOSrX9w=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwNW4ot9xi4e7+epxmsVeUSYxzc++E5fvVv03FHC7q8VbVhWJOC
-	dw7L/KOgF1qYsbAK5g+NkWMJCvWS0KAvnjyPArlp+pKQRHg+Ptz2HC7nKZ5Fk1wjlw0XNosY/1k
-	OxA==
-X-Google-Smtp-Source: AGHT+IGsvgxu0cKjG5RuKP235RGuqLz8GTYqfRRM08+3tGkeZ2vVqfJM8i9w8mVMsttD6aUmHocD7/45nSY=
-X-Received: from pfbdh1.prod.google.com ([2002:a05:6a00:4781:b0:730:8e17:ed13])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1410:b0:725:96f2:9e63
- with SMTP id d2e1a72fcca58-73980477740mr24146728b3a.24.1743540428601; Tue, 01
- Apr 2025 13:47:08 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  1 Apr 2025 13:44:24 -0700
-In-Reply-To: <20250401204425.904001-1-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PRzzPgEC"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743547364;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=avbj0MhoHrdYUi25n2jo2ySDVXM1cSDhy11R+jdiPho=;
+	b=PRzzPgECcQApcatnysovnR4Jx7tB89KcNX8grczBejY4vR/HseRXKIpSkZDp2fCh/fNU+d
+	f+/2IjMr19kWJoWCIiQJZrVINiYCFxuspQv4gskkzd0hIJI0NY4YuP4hsxjkMET5vm/Aie
+	eWAqPiIw9L4KfKwiExto2QEXXjMjJXk=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jiaqi Yan <jiaqiyan@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/3] KVM: arm64: Fixes for resolving the fault IPA
+Date: Tue,  1 Apr 2025 15:42:31 -0700
+Message-Id: <20250401224234.2906739-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250401204425.904001-1-seanjc@google.com>
-X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250401204425.904001-13-seanjc@google.com>
-Subject: [PATCH 12/12] KVM: selftests: Add a KVM_IRQFD test to verify
- uniqueness requirements
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, David Matlack <dmatlack@google.com>, 
-	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Add a selftest to verify that eventfd+irqfd bindings are globally unique,
-i.e. that KVM doesn't allow multiple irqfds to bind to a single eventfd,
-even across VMs.
+KVM's heuristics for determining the fault IPA are a bit shaky and don't
+necessarily align with the letter of the architecture. On top of that,
+HPFAR_EL2 is UNKNOWN if an SEA occurred during a table walk. Re-walking
+the page tables will replay the SEA at EL2, becoming a panic in the hyp.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm |   4 +
- tools/testing/selftests/kvm/irqfd_test.c | 130 +++++++++++++++++++++++
- 2 files changed, 134 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/irqfd_test.c
+Oliver Upton (3):
+  KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
+  arm64: Convert HPFAR_EL2 to sysreg table
+  KVM: arm64: Don't translate FAR if invalid/unsafe
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index f773f8f99249..9e5128d9f22c 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -125,6 +125,7 @@ TEST_GEN_PROGS_x86 += dirty_log_perf_test
- TEST_GEN_PROGS_x86 += guest_memfd_test
- TEST_GEN_PROGS_x86 += guest_print_test
- TEST_GEN_PROGS_x86 += hardware_disable_test
-+TEST_GEN_PROGS_x86 += irqfd_test
- TEST_GEN_PROGS_x86 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86 += kvm_page_table_test
- TEST_GEN_PROGS_x86 += memslot_modification_stress_test
-@@ -163,6 +164,7 @@ TEST_GEN_PROGS_arm64 += dirty_log_test
- TEST_GEN_PROGS_arm64 += dirty_log_perf_test
- TEST_GEN_PROGS_arm64 += guest_print_test
- TEST_GEN_PROGS_arm64 += get-reg-list
-+TEST_GEN_PROGS_arm64 += irqfd_test
- TEST_GEN_PROGS_arm64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_arm64 += kvm_page_table_test
- TEST_GEN_PROGS_arm64 += memslot_modification_stress_test
-@@ -185,6 +187,7 @@ TEST_GEN_PROGS_s390 += s390/ucontrol_test
- TEST_GEN_PROGS_s390 += demand_paging_test
- TEST_GEN_PROGS_s390 += dirty_log_test
- TEST_GEN_PROGS_s390 += guest_print_test
-+TEST_GEN_PROGS_s390 += irqfd_test
- TEST_GEN_PROGS_s390 += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390 += kvm_page_table_test
- TEST_GEN_PROGS_s390 += rseq_test
-@@ -199,6 +202,7 @@ TEST_GEN_PROGS_riscv += demand_paging_test
- TEST_GEN_PROGS_riscv += dirty_log_test
- TEST_GEN_PROGS_riscv += get-reg-list
- TEST_GEN_PROGS_riscv += guest_print_test
-+TEST_GEN_PROGS_riscv += irqfd_test
- TEST_GEN_PROGS_riscv += kvm_binary_stats_test
- TEST_GEN_PROGS_riscv += kvm_create_max_vcpus
- TEST_GEN_PROGS_riscv += kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/irqfd_test.c b/tools/testing/selftests/kvm/irqfd_test.c
-new file mode 100644
-index 000000000000..286f2b15fde6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/irqfd_test.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <errno.h>
-+#include <pthread.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <stdint.h>
-+#include <sys/sysinfo.h>
-+
-+#include "kvm_util.h"
-+
-+static struct kvm_vm *vm1;
-+static struct kvm_vm *vm2;
-+static int __eventfd;
-+static bool done;
-+
-+/*
-+ * KVM de-assigns based on eventfd *and* GSI, but requires unique eventfds when
-+ * assigning (the API isn't symmetrical).  Abuse the oddity and use a per-task
-+ * GSI base to avoid false failures due to cross-task de-assign, i.e. so that
-+ * the secondary doesn't de-assign the primary's eventfd and cause assign to
-+ * unexpectedly succeed on the primary.
-+ */
-+#define GSI_BASE_PRIMARY	0x20
-+#define GSI_BASE_SECONDARY	0x30
-+
-+static void juggle_eventfd_secondary(struct kvm_vm *vm, int eventfd)
-+{
-+	int r, i;
-+
-+	/*
-+	 * The secondary task can encounter EBADF since the primary can close
-+	 * the eventfd at any time.  And because the primary can recreate the
-+	 * eventfd, at the safe fd in the file table, the secondary can also
-+	 * encounter "unexpected" success, e.g. if the close+recreate happens
-+	 * between the first and second assignments.  The secondary's role is
-+	 * mostly to antagonize KVM, not to detect bugs.
-+	 */
-+	for (i = 0; i < 2; i++) {
-+		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY, eventfd, 0);
-+		TEST_ASSERT(!r || errno == EBUSY || errno == EBADF,
-+			    "Wanted success, EBUSY, or EBADF, r = %d, errno = %d",
-+			    r, errno);
-+
-+		/* De-assign should succeed unless the eventfd was closed. */
-+		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY + i, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+		TEST_ASSERT(!r || errno == EBADF,
-+			    "De-assign should succeed unless the fd was closed");
-+	}
-+}
-+
-+static void *secondary_irqfd_juggler(void *ign)
-+{
-+	while (!READ_ONCE(done)) {
-+		juggle_eventfd_secondary(vm1, READ_ONCE(__eventfd));
-+		juggle_eventfd_secondary(vm2, READ_ONCE(__eventfd));
-+	}
-+
-+	return NULL;
-+}
-+
-+static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
-+{
-+	int r1, r2;
-+
-+	/*
-+	 * At least one of the assigns should fail.  KVM disallows assigning a
-+	 * single eventfd to multiple GSIs (or VMs), so it's possible that both
-+	 * assignments can fail, too.
-+	 */
-+	r1 = __kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, 0);
-+	TEST_ASSERT(!r1 || errno == EBUSY,
-+		    "Wanted success or EBUSY, r = %d, errno = %d", r1, errno);
-+
-+	r2 = __kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, 0);
-+	TEST_ASSERT(r1 || (r2 && errno == EBUSY),
-+		    "Wanted failure (EBUSY), r1 = %d, r2 = %d, errno = %d",
-+		    r1, r2, errno);
-+
-+	/*
-+	 * De-assign should always succeed, even if the corresponding assign
-+	 * failed.
-+	 */
-+	kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	pthread_t racing_thread;
-+	int r, i;
-+
-+	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
-+	vm1 = vm_create(1);
-+	vm2 = vm_create(1);
-+
-+	WRITE_ONCE(__eventfd, kvm_new_eventfd());
-+
-+	kvm_irqfd(vm1, 10, __eventfd, 0);
-+
-+	r = __kvm_irqfd(vm1, 11, __eventfd, 0);
-+	TEST_ASSERT(r && errno == EBUSY,
-+		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
-+
-+	r = __kvm_irqfd(vm2, 12, __eventfd, 0);
-+	TEST_ASSERT(r && errno == EBUSY,
-+		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
-+
-+	kvm_irqfd(vm1, 11, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 12, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 13, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 14, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 10, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+
-+	close(__eventfd);
-+
-+	pthread_create(&racing_thread, NULL, secondary_irqfd_juggler, vm2);
-+
-+	for (i = 0; i < 10000; i++) {
-+		WRITE_ONCE(__eventfd, kvm_new_eventfd());
-+
-+		juggle_eventfd_primary(vm1, __eventfd);
-+		juggle_eventfd_primary(vm2, __eventfd);
-+		close(__eventfd);
-+	}
-+
-+	WRITE_ONCE(done, true);
-+	pthread_join(racing_thread, NULL);
-+}
+ arch/arm64/include/asm/esr.h           | 23 +++++++++
+ arch/arm64/include/asm/kvm_emulate.h   |  7 ++-
+ arch/arm64/include/asm/kvm_ras.h       |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/fault.h | 70 ++++++++++++++++++--------
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c  |  2 +-
+ arch/arm64/kvm/mmu.c                   | 31 +++++++-----
+ arch/arm64/tools/sysreg                |  7 +++
+ 7 files changed, 105 insertions(+), 37 deletions(-)
+
+
+base-commit: 369c0122682c4468a69f2454614eded71c5348f3
 -- 
-2.49.0.504.g3bcea36a83-goog
+2.39.5
 
