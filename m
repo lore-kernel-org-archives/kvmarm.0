@@ -1,76 +1,105 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53CA1917C2
-	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 16:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417452E3366
+	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 17:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743612238; cv=none; b=kyAtEqZZDPZlGbTyxNb7qYt6OOmlWqmJOIz8QjfRf3g+3lSyvtJPkTDHfMrRjkm4bzciBIgXonX9uqKbf13ju1ORnDgjZrjWfSkwFauKSAI62MXxAf+Rm5mTWfepVabH4UY59csjBaGjGba+H1tA60eaqqajcEAMs55fSH6VTxg=
+	t=1743613298; cv=none; b=taNgo6GdEe6P2+7kkXR8tfaJpbt4KxGJAC3e6JqBry/PppRxJDJCu/uWrPXSNB1W4vje935x0SUsLfIka/fQnRJ2+jFHKl+RkhuJhvlZ/X8rGENFXHorHC8BP0pE3ppssqqoZP7rkWUwcxHBvQR2vTVzoA+pK8OsykjVe++zCL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743612238; c=relaxed/simple;
-	bh=0+vjMn6MGe4SGiHigLwAz6N84qzUSCpdnJ+Gv3PVWQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Idmyy5PDOVaih2bhZ231Fm3XMKHCqp2X/V8Crozj5do7C26BnQPU0KLWF4gA41ZtbD7Pf36Yl6druWTccYRMOiSVDGD4HsKSzKOFI/xq2Iz39zZV2PUYb/Aq3r6/l3Sr6lFNoCNEN5Z1O3Y+viqNfJMAC7WLKB9TABzKYOHLyVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QV4LwqRB; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1743613298; c=relaxed/simple;
+	bh=H1gs6XELxgtKn2GQoujx1uDQTiTLwaXCyysqjwnU8PQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p9ZN+iOGD2ookeGOW1PAIZx13YbOLysota4BWn/umfyE/L0Fv4wBtBEfpEjfOnJNEUCzs80JUJCYEb1xaoin5Ek1w/NVsWhSy+A0IwZdOvEHNgflmXOjNmQjlTs+OtQ/fg+3ccLTzjZLhkBQmVDt/+ljDAR0H1ASTzIS8HQPIcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YtlNV7Gu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QV4LwqRB"
-Date: Wed, 2 Apr 2025 09:43:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743612225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dC2BktL2U1qJZpOkA3oSO/rhAVApRNRqpBDF3LmdFzk=;
-	b=QV4LwqRBXE/ZSwab145rZFh2Wh+9zagi8movC6n+xstcXwajIwpREX2Apbkb/XDWXiomdO
-	Xvog9Upf8soPxXuBVSgRYIDNIqdyYyB0pF9fYyUy0nYrTBl8OAigLiFODBzCaoJApVPYv+
-	Q+i1Ib8wS96p36xm0dkeJ7LBnEoUSM0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org,
-	catalin.marinas@arm.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] smccc/kvm_guest: Remove the accidental semicolon
-Message-ID: <Z-1pPLI8HRjg-bSx@linux.dev>
-References: <20250402134401.146156-1-shameerali.kolothum.thodi@huawei.com>
- <20250402-independent-hyrax-of-honor-4515fb@sudeepholla>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YtlNV7Gu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A735AC4CEE5;
+	Wed,  2 Apr 2025 17:01:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743613297;
+	bh=H1gs6XELxgtKn2GQoujx1uDQTiTLwaXCyysqjwnU8PQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YtlNV7Gu6T9TO0iQrYk3ZX5w4XYnDzJYjF7wypVJGHNyRo2C/DbSUTvkgcUh4WHua
+	 5lloBHWcEihJ2UsSuEvHMuVSe5nMGv59PA3NlCpzVZwqdeAC2lJWg5WjHnwASYFe4y
+	 pBWv0crscJwB8frcNGJW5lChbQ4pSpAb/yVLFxjfcmIdfS7icmeDkGk50mrud8vHsZ
+	 5nDtajZCyyQnaaRXr7FSJ8fjiLhx2Ism/tH1u66mSlse+7geDkrTtpdfvV5QVp27xH
+	 pQozPG7Tyeb9bK7e5H6wepR5tDRRvmF6pz5Rwrq5uQc5UBk7702PJ2TvIPyafKwfww
+	 PDYUXxrR6SNVA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u01T5-001jFp-Ix;
+	Wed, 02 Apr 2025 18:01:35 +0100
+Date: Wed, 02 Apr 2025 18:01:37 +0100
+Message-ID: <87ecyazedq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jiaqi Yan <jiaqiyan@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Don't translate FAR if invalid/unsafe
+In-Reply-To: <Z-1n5V5wqDTdXDq-@linux.dev>
+References: <20250401224234.2906739-1-oliver.upton@linux.dev>
+	<20250401224234.2906739-4-oliver.upton@linux.dev>
+	<87friqzrfz.wl-maz@kernel.org>
+	<Z-1n5V5wqDTdXDq-@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250402-independent-hyrax-of-honor-4515fb@sudeepholla>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, jiaqiyan@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Sudeep,
-
-On Wed, Apr 02, 2025 at 02:58:06PM +0100, Sudeep Holla wrote:
-> On Wed, Apr 02, 2025 at 02:44:01PM +0100, Shameer Kolothum wrote:
-> > Fixes cocci reported warning:Unneeded semicolon
+On Wed, 02 Apr 2025 17:37:57 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 2feb6c6b63af..754f2fe0cc67 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1794,9 +1794,28 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> > >  	gfn_t gfn;
+> > >  	int ret, idx;
+> > >  
+> > > +	/* Synchronous External Abort? */
+> > > +	if (kvm_vcpu_abt_issea(vcpu)) {
+> > > +		/*
+> > > +		 * For RAS the host kernel may handle this abort.
+> > > +		 * There is no need to pass the error into the guest.
+> > > +		 */
+> > > +		if (kvm_handle_guest_sea())
+> > > +			kvm_inject_vabt(vcpu);
+> > > +
+> > > +		return 1;
+> > > +	}
+> > > +
 > > 
+> > Maybe add a line to the commit message to indicate that you're moving
+> > this around?
 > 
-> There was similar patch on the list [1] few days ago.
+> I had this:
 > 
-> > Fixes: 86edf6bdcf05 ("smccc/kvm_guest: Enable errata based on implementation CPUs")
+>   Finally, fix up the rest of the abort path by checking for SEAs early
+>   and bugging the VM if we get further along with an UNKNOWN fault IPA.
 > 
-> ^^^ Is this really necessary as they get backported as well ?
+> But I'm happy to expand a bit to make that more clear.
 
-The blamed commit was introduced this release cycle so no concern about
-backports.
-
-> Since, KVM maintainers are in cc-ed, let me know if you guys want to pick
-> this ? Else I can send it as part of my firmware (ffa/scmi) fixes.
-
-I can grab the fix here in a moment, I've already got one queued up [*]
-for the KVM guest driver anyway.
-
-[*]: https://git.kernel.org/kvmarm/kvmarm/c/acfcaf90db1f
+Ah, I somehow glanced over it. No need to change anything then.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
