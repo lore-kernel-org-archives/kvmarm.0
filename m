@@ -1,260 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82E71E1C29
-	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 12:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB9D23A980
+	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 13:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743596369; cv=none; b=MqLarPfsM1AGzb1jfxiRP3x3lzcTYxc//eotS9jw+0NuaRS91/OeIC8RO8+L2DkXjH5jpet8woiTSL17z/vr53WNfB2EBTdXZlLnyDupMLpTpYG+fLwgyLlt9/bblBr5Cy2YPk4CZGVr1LF63iS/HffppIKN1gKEGOhNVJN6YAA=
+	t=1743601508; cv=none; b=soNfq52o2oeJOadyUb+2ige2FC17B8u6X9ktqW/MLuO0txuYJv/6f8XAafx6NHlLa/q97WnxY0hNy8VHfKejHKsctVIkLDJjgm6bZxljaO0SLLt6Z9q/XZTK2mIaR7elh4iwZGwL9kKWfRasutcXiMYKJmtGnCvVCekWovoqhko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743596369; c=relaxed/simple;
-	bh=oaHZGAqgo+OOZIJyFKb1t3oHBUg25BRWCu6+2RtAYgo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lRN5jAFmNgsVf5KPeztZBhr0SaNzIYehA4YL4oEqrsgDHRUrXYR/nHXRb5avbGuq1V1N86UCssoG+kRhUeAShwVrpYjTFvt2oKbnqceShcCiGbCVr/qcJoS/cC1M/86Lo/fZyUEfvDPYQQo7/rT10M35n0yxw0VXIvUpbeXFAaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZ6SsHQc; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZ6SsHQc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD82C4CEDD;
-	Wed,  2 Apr 2025 12:19:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743596369;
-	bh=oaHZGAqgo+OOZIJyFKb1t3oHBUg25BRWCu6+2RtAYgo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mZ6SsHQc1UMzjl5C94+RTB2KtKyxZylzwjeEnJL5BT+x+nNSXBuIY24ao77sTkKry
-	 klLYHl/vVh4GwOrNT0IY3alLP5/uib8krKA8D7X+xDlNN05Zn0iseI83DEGEwKHeu9
-	 Di9wdRlhzP0c0HvTjJ+sWuiMNIl6EONbbRfWJh8N6bnOxAuEBO0GCVU5elNnBeoItZ
-	 Yj0f8ApKUmMlo5zBzx+cIs2m3vxOU+Lfj1QssYt4kpHjRKyj/ParvvSDfk2QXu+J5L
-	 vNhg8pm4rERFvXpaqrWFweeoZyAlgqskCPytz7odrm9+gBTbEGr9lFsYVNYqJFGaMV
-	 iY4pJCJgNeaaQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tzx42-001eQ2-5L;
-	Wed, 02 Apr 2025 13:19:27 +0100
-Date: Wed, 02 Apr 2025 13:19:28 +0100
-Message-ID: <87friqzrfz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jiaqi Yan <jiaqiyan@google.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Don't translate FAR if invalid/unsafe
-In-Reply-To: <20250401224234.2906739-4-oliver.upton@linux.dev>
-References: <20250401224234.2906739-1-oliver.upton@linux.dev>
-	<20250401224234.2906739-4-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1743601508; c=relaxed/simple;
+	bh=sTRLlDut0NE0rxGw8O3zmmuspwpenBHKz76wLbnjUYM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GrXxcqI6c0KeMrA05mAh8jX/lYzMmJbW9Glhw4g49R6VrE9SQrkbEnojhGadGtBpnorAFKFlmBvNnhGCV5+DXvlDcZ5kzoF1ULyEjfgy7MnrV7PPfkzyZcFKNRyJWErvrP9fRZKVjWdRJbU7LwGtddr8/RwOYa4wz5Q57bAQMvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZSQxx275yz6M4lj;
+	Wed,  2 Apr 2025 21:41:25 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2C6391406AD;
+	Wed,  2 Apr 2025 21:45:04 +0800 (CST)
+Received: from A2303104131.china.huawei.com (10.48.153.182) by
+ frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 2 Apr 2025 15:44:59 +0200
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<oliver.upton@linux.dev>
+CC: <maz@kernel.org>, <mark.rutland@arm.com>, <lpieralisi@kernel.org>,
+	<sudeep.holla@arm.com>, <catalin.marinas@arm.com>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH] smccc/kvm_guest: Remove the accidental semicolon
+Date: Wed, 2 Apr 2025 14:44:01 +0100
+Message-ID: <20250402134401.146156-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, jiaqiyan@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Tue, 01 Apr 2025 23:42:34 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Don't re-walk the page tables if an SEA occurred during the faulting
-> page table walk to avoid taking a fatal exception in the hyp.
-> Additionally, check that FAR_EL2 is valid for SEAs not taken on PTW
-> as the architecture doesn't guarantee it contains the fault VA.
-> 
-> Finally, fix up the rest of the abort path by checking for SEAs early
-> and bugging the VM if we get further along with an UNKNOWN fault IPA.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/esr.h           | 22 ++++++++++++++++++
->  arch/arm64/include/asm/kvm_emulate.h   |  7 +++++-
->  arch/arm64/include/asm/kvm_ras.h       |  2 +-
->  arch/arm64/kvm/hyp/include/hyp/fault.h | 26 ++++++++++++++++-----
->  arch/arm64/kvm/mmu.c                   | 31 ++++++++++++++++----------
->  5 files changed, 69 insertions(+), 19 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index 7b096ed87360..4b874ad95f2e 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -465,6 +465,28 @@ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
->  	       (esr == ESR_ELx_FSC_ACCESS_L(0));
->  }
->  
-> +static inline bool esr_fsc_is_sea_ttw(unsigned long esr)
-> +{
-> +	esr = esr & ESR_ELx_FSC;
-> +
-> +	return (esr == ESR_ELx_FSC_SEA_TTW(3)) ||
-> +	       (esr == ESR_ELx_FSC_SEA_TTW(2)) ||
-> +	       (esr == ESR_ELx_FSC_SEA_TTW(1)) ||
-> +	       (esr == ESR_ELx_FSC_SEA_TTW(0)) ||
-> +	       (esr == ESR_ELx_FSC_SEA_TTW(-1));
-> +}
-> +
-> +static inline bool esr_fsc_is_secc_ttw(unsigned long esr)
-> +{
-> +	esr = esr & ESR_ELx_FSC;
-> +
-> +	return (esr == ESR_ELx_FSC_SECC_TTW(3)) ||
-> +	       (esr == ESR_ELx_FSC_SECC_TTW(2)) ||
-> +	       (esr == ESR_ELx_FSC_SECC_TTW(1)) ||
-> +	       (esr == ESR_ELx_FSC_SECC_TTW(0)) ||
-> +	       (esr == ESR_ELx_FSC_SECC_TTW(-1));
-> +}
-> +
->  /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
->  static inline bool esr_iss_is_eretax(unsigned long esr)
->  {
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 5d8c0832acbe..775e200a9be4 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -305,7 +305,12 @@ static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vc
->  
->  static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
->  {
-> -	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_EL2_FIPA) << 8;
-> +	u64 hpfar = vcpu->arch.fault.hpfar_el2;
-> +
-> +	if (unlikely(!(hpfar & HPFAR_EL2_NS)))
-> +		return INVALID_GPA;
+Fixes cocci reported warning:Unneeded semicolon
 
-Eh, why not ;-)
+Fixes: 86edf6bdcf05 ("smccc/kvm_guest: Enable errata based on implementation CPUs")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202504020941.VEeL6nVJ-lkp@intel.com/
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ drivers/firmware/smccc/kvm_guest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +
-> +	return ((phys_addr_t)hpfar & HPFAR_EL2_FIPA) << 8;
-
-nit: as you are reworking this area, I'd rather see
-
-	return FIELD_GET(HPFAR_EL2_FIPA, hpfar) << 12;
-
-as it nicely shows what the FIPA field represents, instead of the
-odd-looking 8 here. The compiler will nicely sort it out anyway.
-
-Same thing in handle_host_mem_abort(), both of which could be fixed in
-the previous patch.
-
->  }
->  
->  static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
-> index 87e10d9a635b..9398ade632aa 100644
-> --- a/arch/arm64/include/asm/kvm_ras.h
-> +++ b/arch/arm64/include/asm/kvm_ras.h
-> @@ -14,7 +14,7 @@
->   * Was this synchronous external abort a RAS notification?
->   * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
->   */
-> -static inline int kvm_handle_guest_sea(phys_addr_t addr, u64 esr)
-> +static inline int kvm_handle_guest_sea(void)
->  {
->  	/* apei_claim_sea(NULL) expects to mask interrupts itself */
->  	lockdep_assert_irqs_enabled();
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> index 84d165e17bd0..1ac9b23a382a 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> @@ -12,6 +12,16 @@
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  
-> +static inline bool __fault_safe_to_translate(u64 esr)
-> +{
-> +	u64 fsc = esr & ESR_ELx_FSC;
-> +
-> +	if (esr_fsc_is_sea_ttw(esr) || esr_fsc_is_secc_ttw(esr))
-> +		return false;
-> +
-> +	return !(fsc == ESR_ELx_FSC_EXTABT && (esr & ESR_ELx_FnV));
-> +}
-
-Ah, neat.
-
-> +
->  static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
->  {
->  	int ret;
-> @@ -71,17 +81,23 @@ static inline bool __hpfar_valid(u64 esr)
->  
->  static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
->  {
-> -	u64 hpfar, far;
-> +	u64 hpfar;
->  
-> -	far = read_sysreg_el2(SYS_FAR);
-> +	fault->far_el2		= read_sysreg_el2(SYS_FAR);
-> +	fault->hpfar_el2	= 0;
->  
->  	if (__hpfar_valid(esr))
->  		hpfar = read_sysreg(hpfar_el2);
-> -	else if (!__translate_far_to_hpfar(far, &hpfar))
-> +	else if (unlikely(!__fault_safe_to_translate(esr)))
-> +		return true;
-
-This may cause some unexpected damage, see below.
-
-> +	else if (!__translate_far_to_hpfar(fault->far_el2, &hpfar))
->  		return false;
->  
-> -	fault->far_el2 = far;
-> -	fault->hpfar_el2 = hpfar;
-> +	/*
-> +	 * Hijack HPFAR_EL2.NS (RES0 in Non-secure) to indicate a valid
-> +	 * HPFAR value.
-> +	 */
-> +	fault->hpfar_el2 = hpfar | HPFAR_EL2_NS;
->  	return true;
->  }
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 2feb6c6b63af..754f2fe0cc67 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1794,9 +1794,28 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  	gfn_t gfn;
->  	int ret, idx;
->  
-> +	/* Synchronous External Abort? */
-> +	if (kvm_vcpu_abt_issea(vcpu)) {
-> +		/*
-> +		 * For RAS the host kernel may handle this abort.
-> +		 * There is no need to pass the error into the guest.
-> +		 */
-> +		if (kvm_handle_guest_sea())
-> +			kvm_inject_vabt(vcpu);
-> +
-> +		return 1;
-> +	}
-> +
-
-Maybe add a line to the commit message to indicate that you're moving
-this around?
-
->  	esr = kvm_vcpu_get_esr(vcpu);
->  
-> +	/*
-> +	 * The fault IPA should be reliable at this point as we're not dealing
-> +	 * with an SEA.
-> +	 */
->  	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> +	if (KVM_BUG_ON(ipa == INVALID_GPA, vcpu->kvm))
-> +		return -EFAULT;
-> +
-
-I think you're missing something similar in handle_host_mem_abort(),
-which will take fault.hpfar_el2 at face value even when it is unsafe
-to translate. At least testing for HPFAR_EL2_NS seems necessary.
-
-Thanks,
-
-	M.
-
+diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
+index 5767aed25cdc..ffe9f3c013df 100644
+--- a/drivers/firmware/smccc/kvm_guest.c
++++ b/drivers/firmware/smccc/kvm_guest.c
+@@ -103,7 +103,7 @@ void  __init kvm_arm_target_impl_cpu_init(void)
+ 		target[i].midr = res.a1;
+ 		target[i].revidr = res.a2;
+ 		target[i].aidr = res.a3;
+-	};
++	}
+ 
+ 	if (!cpu_errata_set_target_impl(max_cpus, target)) {
+ 		pr_warn("Failed to set target implementation CPUs\n");
 -- 
-Jazz isn't dead. It just smells funny.
+2.47.0
+
