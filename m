@@ -1,236 +1,193 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B93A214A8B
-	for <kvmarm@lists.linux.dev>; Tue,  1 Apr 2025 22:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD5F2F5A
+	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 02:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743547375; cv=none; b=dad5yqTYrIgPVAQnpC3ivxZ7Bjeik7nAWa8yfGjkuPyWjrTz+aWvxkq+faSdTmBl3wR2z8954I+XyVO/6pwtAi1hnmASIt+uSU6QUKwgRcD2BTt/57dGGaIXkJ6e90t0qXMuQXkICg3iyKuAiZLhmpCmhn9HaHluriarQOTLSJc=
+	t=1743562738; cv=none; b=MJ5GWGjRBOKOx9nbjN7vDiZjwp3hsQ4x2/lO3LciKoARZjDzWyZcIqNrpP/VKJpwUjVMNEc3HOvk94+1pcJlHfjdtFnGow7BBiqB574qRaVZw/VRbUq5ceCBGI1sEomF40/4quC7RgB+XbTBiJa7ccyrW853tYeOSuSKslagcYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743547375; c=relaxed/simple;
-	bh=SS/bd4Co+OfS4RRo4kMDXvM1QHcg5hipdAn3MhNgawU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HO78r6UcfeYjAVXn/7z+zh32TS38wPUgR6PEq9HaJDsCOoShYgCBz4H5e6N5kZXs8fK9yku86O1qOFhE47o0/KLCMxDRaPEto4CXGuwXd1Eoyohz2SJD4fZoUYrigHRGm/AHhystdbvM2QVVDaNAE8/1CuuThTukLgTWTbfzBPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AuVrROFI; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1743562738; c=relaxed/simple;
+	bh=qSsSqNI+e8H1dkfIdplQvE/uFu9vkRLyjCAZfche5WY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nixczXIT79wuBiPdN18vLiBdYe+7DygEzDyYcOA15Ujg+RgTyhodaXpmuN3JrZkFPyU3GNXX387usAopStpbh6T8SZuaYJJ+R3UpmwR4oKiuoHrxgHyK3MUwRGJAH+TEowmGaA7AJYlGjWfGMGeDfIh4Pw6vT9Va9v3LiQNm31c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N51uRR0P; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AuVrROFI"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743547369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3/7fn2LVj5WBXbBxB19rIfv1mYN9ZDGZFGs8e8/J1vU=;
-	b=AuVrROFId5gfrgtN7EwQEBAO7+FP45RRwVHcnqZ/1BewTAEHr1dODlrJZ9MdWiG+dk5CL1
-	6QemQD2Aw+FdZMCH1x/BT5J1YdW2IHCzrN0JBhSIRB2qys3IlWJtlcvihPBJDFVzTsuch8
-	FxJnT/KY2HDJE+1UdZDIrpODbhRqvBA=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jiaqi Yan <jiaqiyan@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 3/3] KVM: arm64: Don't translate FAR if invalid/unsafe
-Date: Tue,  1 Apr 2025 15:42:34 -0700
-Message-Id: <20250401224234.2906739-4-oliver.upton@linux.dev>
-In-Reply-To: <20250401224234.2906739-1-oliver.upton@linux.dev>
-References: <20250401224234.2906739-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N51uRR0P"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-30572effb26so110230a91.0
+        for <kvmarm@lists.linux.dev>; Tue, 01 Apr 2025 19:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743562736; x=1744167536; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T6wuYXanYjAeKP3cuq4YxBDu/PUjGGMnnNxD1TxjUJY=;
+        b=N51uRR0PtrlzjZhlocEW1SanVH8JntcKOg3yhElV+KZHz5LmyjQfWDHdZ/YsWY3BlF
+         JT1a29k0NWAURQXIi/v0sWptVGvyWquvSm1hyTCHdOTe0kcCudl4fD36UpJxCgissEag
+         1s/ErUvires5G9tzUokBQUtpmK7nhBvzVTPZ/VTyMvwiCrt8HjtzWoxoYTLDxrLS2oJm
+         R8aj2EnigDZMHqQnxycayu89wxOT5uTSj7949fDr2D0XVmadznoJIbAENKuU004b97sP
+         4F9DNJoehYuVphgBpxV1eLujpx2GXPr27pW6jLyTP7Rf9dfM7EbAwQwn3ubT0Hoe5Q57
+         txcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743562736; x=1744167536;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T6wuYXanYjAeKP3cuq4YxBDu/PUjGGMnnNxD1TxjUJY=;
+        b=aUWlDpBACgaoEnPnv21cfV75qmwcb2LXxXhzlb0EUhLLg1gldEf+P9FcXGumSHYDcs
+         /zpWGHbeJErwP9vuZd+1jbYp0AQvN85LJw2QgoLfHwz/mK5nA61HoWMlDJjwSNjRjUaX
+         bkVV/oyuMlhrUZaxyxGaqu3lz1zIcoSFieGWwc4wocSAxELamRgPXgJn+YgPd03QNFJF
+         lwLxc07XwdSiCkKti/jmHrf31Eo2fhHUQ+P+LJy6rvHeujf65XzSXVpIkz8PISJO3dRZ
+         si9zA3o8IvMRcBHTPgQoab35VNfjgQM+0lv19Oxu+bf5lMVLjrufeNTvWLH2dX6oW612
+         0sQg==
+X-Forwarded-Encrypted: i=1; AJvYcCWoAQ4lPh+b6ZZWiW11Swbnfn3vcya6mX9g4+kDIIx/x6xCxK+/E80pjd/WI1EXEe0bg1pfI3c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwngmevXpDzyRbcbNYAXaqm3u7QctX6Jvzp07SvLMhfC79nUPIR
+	4KpAsdAexPSOJDE7qbQvez2xINwdO2Eo1bwqCMJJBZ5tmEdWdl9Q
+X-Gm-Gg: ASbGncu0TWJwF0LRsMhWsJ6IpuXavH8pQ4c9pkSZHQvy0KDAtPDJLXkC3pM1Ype5o17
+	xeMjNUDWeik/W3oyca0J3yyH54SXjYCqs8rL2DJKCHpMyvhCmS8GLoyO/mctCLsNOBUnD7JdIhI
+	cCPZxxM1oK0tjiXbNFA8q4NK6CW63NK7+Ekh9Rz6s919hWVH/CAVPtfvn3Fv74iTwF5On4GAzqO
+	uw6oKSaTb4bLuCND75k/VogF2vbB9O9XUUkPFgK4ZTdVFJdKstxm25T2UwdxLSblLN3c6kIBmcM
+	WGpJ3uRX7gvJhiOLGNH5fTeBLIvOM+Nms5pHtA==
+X-Google-Smtp-Source: AGHT+IHFX1t+j4wZChxTIXjaH746s9fkrxGA5C6ltsvH8PRtH6x9yyt1Z6gB/nQ5xRbdSD25SBLMpA==
+X-Received: by 2002:a05:6a21:4d8f:b0:1f5:882e:60f with SMTP id adf61e73a8af0-200d13a4633mr8293953637.17.1743562736139;
+        Tue, 01 Apr 2025 19:58:56 -0700 (PDT)
+Received: from raj ([103.48.69.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739710ad970sm10081768b3a.148.2025.04.01.19.58.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 19:58:55 -0700 (PDT)
+Date: Wed, 2 Apr 2025 08:28:48 +0530
+From: Yuvraj Sakshith <yuvraj.kernel@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	jens.wiklander@linaro.org, sumit.garg@kernel.org,
+	mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com,
+	pbonzini@redhat.com, kvmarm@lists.linux.dev,
+	op-tee@lists.trustedfirmware.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 0/7] KVM: optee: Introduce OP-TEE Mediator for
+ exposing secure world to KVM guests
+Message-ID: <Z-yn6BdPcuM_aDBX@raj>
+References: <20250401170527.344092-1-yuvraj.kernel@gmail.com>
+ <87ldsjzr5l.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ldsjzr5l.wl-maz@kernel.org>
 
-Don't re-walk the page tables if an SEA occurred during the faulting
-page table walk to avoid taking a fatal exception in the hyp.
-Additionally, check that FAR_EL2 is valid for SEAs not taken on PTW
-as the architecture doesn't guarantee it contains the fault VA.
+On Tue, Apr 01, 2025 at 07:13:26PM +0100, Marc Zyngier wrote:
+> On Tue, 01 Apr 2025 18:05:20 +0100,
+> Yuvraj Sakshith <yuvraj.kernel@gmail.com> wrote:
+> > 
+> > A KVM guest running on an arm64 machine will not be able to interact with a trusted execution environment
+> > (which supports non-secure guests) like OP-TEE in the secure world. This is because, instructions provided
+> > by the architecture (such as, SMC)  which switch control to the firmware, are trapped in EL2 when the guest
+> > is executes them.
+> > 
+> > This series adds a feature into the kernel called the TEE mediator abstraction layer, which lets
+> > a guest interact with the secure world. Additionally, a OP-TEE specific mediator is also implemented, which
+> > hooks itself to the TEE mediator layer and intercepts guest SMCs targetted at OP-TEE.
+> > 
+> > Overview
+> > =========
+> > 
+> > Essentially, if the kernel wants to interact with OP-TEE, it makes an "smc - secure monitor call instruction",
+> > after loading in arguments into CPU registers. What these arguments consists of and how both these entities 
+> > communicate can vary. If a guest wants to establish a connection with the secure world, its not possible. 
+> > This is because of the fact that "smc" by the guest are trapped by the hypervisor in EL2. This is done by setting
+> > the HCR_EL2.TSC bit before entering the guest.
+> > 
+> > Hence, this feature which I we may call TEE mediator, acts as an intermediary between the guest and OP-TEE.
+> > Instead of denying the guest SMC and jumping back into the guest, the mediator forwards the request to
+> > OP-TEE.
+> > 
+> > OP-TEE supports virtualization in the normal world and expects 6 things from the NS-hypervisor:
+> > 
+> > 1. Notify OP-TEE when a VM is created.
+> > 2. Notify OP-TEE when a VM is destroyed.
+> > 3. Any SMC to OP-TEE has to contain the VMID in x7. If its the hypervisor sending, then VMID is 0.
+> > 4. Hypervisor has to perform IPA->PA translations of the memory addresses sent by guest.
+> > 5. Memory shared by the VM to OP-TEE has to remain pinned.
+> > 6. The hypervisor has to follow the OP-TEE protocol, so the guest thinks it is directly speaking to OP-TEE.
+> > 
+> > Its important to note that, if OP-TEE is built with NS-virtualization support, it can only function if there is 
+> > a hypervisor with a mediator in normal world.
+> > 
+> > This implementation has been heavily inspired by Xen's OP-TEE
+> > mediator.
+> 
+> [...]
+> 
+> And I think this inspiration is the source of most of the problems in
+> this series.
+> 
+> Routing Secure Calls from the guest to whatever is on the secure side
+> should not be the kernel's job at all. It should be the VMM's job. All
+> you need to do is to route the SMCs from the guest to userspace, and
+> we already have all the required infrastructure for that.
+>
+Yes, this was an argument at the time of designing this solution.
 
-Finally, fix up the rest of the abort path by checking for SEAs early
-and bugging the VM if we get further along with an UNKNOWN fault IPA.
+> It is the VMM that should:
+> 
+> - signal the TEE of VM creation/teardown
+> 
+> - translate between IPAs and host VAs without involving KVM
+> 
+> - let the host TEE driver translate between VAs and PAs and deal with
+>   the pinning as required, just like it would do for any userspace
+>   (without ever using the KVM memslot interface)
+> 
+> - proxy requests from the guest to the TEE
+> 
+> - in general, bear the complexity of anything related to the TEE
+>
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/esr.h           | 22 ++++++++++++++++++
- arch/arm64/include/asm/kvm_emulate.h   |  7 +++++-
- arch/arm64/include/asm/kvm_ras.h       |  2 +-
- arch/arm64/kvm/hyp/include/hyp/fault.h | 26 ++++++++++++++++-----
- arch/arm64/kvm/mmu.c                   | 31 ++++++++++++++++----------
- 5 files changed, 69 insertions(+), 19 deletions(-)
+Major reason why I went with placing the implementation inside the kernel is,
+	- OP-TEE userspace lib (client) does not support sending SMCs for VM events
+	  and needs modification.
+	- QEMU (or every other VMM)  will have to be modified.
+	- OP-TEE driver is anyways in the kernel. A mediator will just be an addition
+		and not a completely new entity.
+	- (Potential) issues if we would want to mediate requests from VM which has
+	  private mem.
+	- Heavy VM exits if guest makes frequent TOS calls.
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 7b096ed87360..4b874ad95f2e 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -465,6 +465,28 @@ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
- 	       (esr == ESR_ELx_FSC_ACCESS_L(0));
- }
- 
-+static inline bool esr_fsc_is_sea_ttw(unsigned long esr)
-+{
-+	esr = esr & ESR_ELx_FSC;
-+
-+	return (esr == ESR_ELx_FSC_SEA_TTW(3)) ||
-+	       (esr == ESR_ELx_FSC_SEA_TTW(2)) ||
-+	       (esr == ESR_ELx_FSC_SEA_TTW(1)) ||
-+	       (esr == ESR_ELx_FSC_SEA_TTW(0)) ||
-+	       (esr == ESR_ELx_FSC_SEA_TTW(-1));
-+}
-+
-+static inline bool esr_fsc_is_secc_ttw(unsigned long esr)
-+{
-+	esr = esr & ESR_ELx_FSC;
-+
-+	return (esr == ESR_ELx_FSC_SECC_TTW(3)) ||
-+	       (esr == ESR_ELx_FSC_SECC_TTW(2)) ||
-+	       (esr == ESR_ELx_FSC_SECC_TTW(1)) ||
-+	       (esr == ESR_ELx_FSC_SECC_TTW(0)) ||
-+	       (esr == ESR_ELx_FSC_SECC_TTW(-1));
-+}
-+
- /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
- static inline bool esr_iss_is_eretax(unsigned long esr)
- {
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5d8c0832acbe..775e200a9be4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -305,7 +305,12 @@ static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vc
- 
- static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
- {
--	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_EL2_FIPA) << 8;
-+	u64 hpfar = vcpu->arch.fault.hpfar_el2;
-+
-+	if (unlikely(!(hpfar & HPFAR_EL2_NS)))
-+		return INVALID_GPA;
-+
-+	return ((phys_addr_t)hpfar & HPFAR_EL2_FIPA) << 8;
- }
- 
- static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
-index 87e10d9a635b..9398ade632aa 100644
---- a/arch/arm64/include/asm/kvm_ras.h
-+++ b/arch/arm64/include/asm/kvm_ras.h
-@@ -14,7 +14,7 @@
-  * Was this synchronous external abort a RAS notification?
-  * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
-  */
--static inline int kvm_handle_guest_sea(phys_addr_t addr, u64 esr)
-+static inline int kvm_handle_guest_sea(void)
- {
- 	/* apei_claim_sea(NULL) expects to mask interrupts itself */
- 	lockdep_assert_irqs_enabled();
-diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-index 84d165e17bd0..1ac9b23a382a 100644
---- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-@@ -12,6 +12,16 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- 
-+static inline bool __fault_safe_to_translate(u64 esr)
-+{
-+	u64 fsc = esr & ESR_ELx_FSC;
-+
-+	if (esr_fsc_is_sea_ttw(esr) || esr_fsc_is_secc_ttw(esr))
-+		return false;
-+
-+	return !(fsc == ESR_ELx_FSC_EXTABT && (esr & ESR_ELx_FnV));
-+}
-+
- static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
- {
- 	int ret;
-@@ -71,17 +81,23 @@ static inline bool __hpfar_valid(u64 esr)
- 
- static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
- {
--	u64 hpfar, far;
-+	u64 hpfar;
- 
--	far = read_sysreg_el2(SYS_FAR);
-+	fault->far_el2		= read_sysreg_el2(SYS_FAR);
-+	fault->hpfar_el2	= 0;
- 
- 	if (__hpfar_valid(esr))
- 		hpfar = read_sysreg(hpfar_el2);
--	else if (!__translate_far_to_hpfar(far, &hpfar))
-+	else if (unlikely(!__fault_safe_to_translate(esr)))
-+		return true;
-+	else if (!__translate_far_to_hpfar(fault->far_el2, &hpfar))
- 		return false;
- 
--	fault->far_el2 = far;
--	fault->hpfar_el2 = hpfar;
-+	/*
-+	 * Hijack HPFAR_EL2.NS (RES0 in Non-secure) to indicate a valid
-+	 * HPFAR value.
-+	 */
-+	fault->hpfar_el2 = hpfar | HPFAR_EL2_NS;
- 	return true;
- }
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2feb6c6b63af..754f2fe0cc67 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1794,9 +1794,28 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	gfn_t gfn;
- 	int ret, idx;
- 
-+	/* Synchronous External Abort? */
-+	if (kvm_vcpu_abt_issea(vcpu)) {
-+		/*
-+		 * For RAS the host kernel may handle this abort.
-+		 * There is no need to pass the error into the guest.
-+		 */
-+		if (kvm_handle_guest_sea())
-+			kvm_inject_vabt(vcpu);
-+
-+		return 1;
-+	}
-+
- 	esr = kvm_vcpu_get_esr(vcpu);
- 
-+	/*
-+	 * The fault IPA should be reliable at this point as we're not dealing
-+	 * with an SEA.
-+	 */
- 	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+	if (KVM_BUG_ON(ipa == INVALID_GPA, vcpu->kvm))
-+		return -EFAULT;
-+
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 
- 	if (esr_fsc_is_translation_fault(esr)) {
-@@ -1818,18 +1837,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	/* Synchronous External Abort? */
--	if (kvm_vcpu_abt_issea(vcpu)) {
--		/*
--		 * For RAS the host kernel may handle this abort.
--		 * There is no need to pass the error into the guest.
--		 */
--		if (kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_esr(vcpu)))
--			kvm_inject_vabt(vcpu);
--
--		return 1;
--	}
--
- 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
--- 
-2.39.5
+Hence, the thought of making changes to too many entities (libteec, VMM, etc.) was a
+strong reason, although arguable.
 
+> In short, the VMM is just another piece of userspace using the TEE to
+> do whatever it wants. The TEE driver on the host must obviously know
+> about VMs, but that's about it.
+> 
+> Crucially, KVM should:
+> 
+> - be completely TEE agnostic and never call into something that is
+>   TEE-specific
+> 
+> - allow a TEE implementation entirely in userspace, specially for the
+>   machines that do not have EL3
+>
+
+Yes, you're right. Although I believe there still are some changes that need to be made
+to KVM for facilitating this. For example, kvm_smccc_get_action() would deny TOS call.
+
+So, having an implementation completely in VMM without any change in KVM might be challenging,
+any potential solutions are welcome.
+ 
+> As it stands, your design looks completely upside-down. Most of this
+> code should be userspace code and live in (or close to) the VMM, with
+> the host kernel only providing the basic primitives, most of which
+> should already be there.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Jazz isn't dead. It just smells funny.
