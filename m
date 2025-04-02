@@ -1,107 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A7D78F58
-	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 21:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C6A78C91
+	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 21:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743630531; cv=none; b=WG9sHk0oFU4N4K2T6i0LM3zRpxZMEwF9g9lC7osa45dly0oMKbd0K3z79f/RhTMTaxPTYx3lQdtclRPEze8YZoW74BkKd+oegoka6V01IpOKWBZNydG0U2st4ffgu6d/4xBm/pCA9ipa6zfD1uN6N/0tXehKNSt4xviqJPfBEls=
+	t=1743630737; cv=none; b=Mo1dIv6U6DmRUT8jC7598MWn7ZyRFOzLUedWeGc0r0Xk96yfc/O9chJKNHs3gVehYbgctM0DMw0CSCJBSIHE/05Pf3lNP/wP1P1Xf53MeffWaKexlGF2ET3vs0O/gdXhxdkDkXoCTfnuV/cYrRyZyCo7+fczwsBUM3ACeLLwOUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743630531; c=relaxed/simple;
-	bh=U9VZPk4roi4p95hOYSTNPEX5alyLgmzzPau1F9O8biM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AocsWvXLREKZuVh1D1BcKfQ1dVZZyId//Vx4VGEdtQ+YePWRJrl1Q1znkG8ExYrkgMB3G3ZyE85a48ATdE5twbnXRifjluQcBH8J8euodlTQfVO1YEoYy8zfpePw3Y7aem0W2W9YrPnEX4mv8HZFrVguQmr/9D6vc/wj7nLscSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jfYDVshU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743630737; c=relaxed/simple;
+	bh=QSGniL5700SXUi68bJ8CqNAoCK9WIIfz5WKlZw2EHdw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBRey8P9y6IHPNOjuo5SqqnG6Vntb572S6dJocsWwF8R1fjWcOqQpHztl9kCY6apdJrb/LF8cGHTTwx7rLjiPnmU1XEvdQ3cIOjnjrQspUh/q849c/Lq0f3m+YKl3IJ4UULZNlc/8DMasFGSImucZ7VNofpMsWu+eGb3oCxbmKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pv9bPUtC; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jfYDVshU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C5FC4CEDD;
-	Wed,  2 Apr 2025 21:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743630530;
-	bh=U9VZPk4roi4p95hOYSTNPEX5alyLgmzzPau1F9O8biM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jfYDVshU6kzUjVwVjH1OR+ZdbFQRQ99VVdLuqt83x0rbI7ss8nm3/8jNAtrm52i0A
-	 JPp7La1GyoaJqHD97qPlT8yQCQQIHWarFTOKwMUV9hZ4whuZPinKWrtE5XPraw8zT9
-	 zhmZnGA8xqbpBouzdDRvR+Gghhkhq/Nt3PJ5Mnx/cFB2PnKxIYmJS8QUyodUwCe4IB
-	 s93FP0tUL5s7yFtvQpizUjltW6573ZcQp5URoyJ6EWZK43omRt14nf4iF/SORNqpT7
-	 XpvAvBarv9LniACGEnPwDEkDXpVKB2tQF/DjaFEFs50B0I0cRALEpUSN/HYwjxtmrH
-	 ynbHGTJFcMfgQ==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u05x1-001nBO-VZ;
-	Wed, 02 Apr 2025 22:48:48 +0100
-Date: Wed, 02 Apr 2025 22:48:43 +0100
-Message-ID: <87cyduz138.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pv9bPUtC"
+Date: Wed, 2 Apr 2025 14:52:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743630729;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fG1uyfjpSLFrYrWYkzfvmC5Bn1FBsJpGnrK0O5RO8d8=;
+	b=Pv9bPUtCNhx5dxWx0L8YLpxwaLoRNxYGltEHlRRM5WHdKUHDhpN+gsoMbX5YTttJb9lVdF
+	PsWdLFYsEBdKPjoqo3QpV+SDUvdr+MZDAOT59gRCWp6W2CnTVRYe4qupOn6VnKkDQGihn1
+	GUrbuD8kFBgWuNkKXV2BMYqqpSRk1co=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Jiaqi Yan <jiaqiyan@google.com>
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
-In-Reply-To: <20250402201725.2963645-2-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Only read HPFAR_EL2 when value is
+ architecturally valid
+Message-ID: <Z-2xgjsrRAI-sq2G@linux.dev>
 References: <20250402201725.2963645-1-oliver.upton@linux.dev>
-	<20250402201725.2963645-2-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20250402201725.2963645-2-oliver.upton@linux.dev>
+ <87cyduz138.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, jiaqiyan@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87cyduz138.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 02 Apr 2025 21:17:23 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Wed, Apr 02, 2025 at 10:48:43PM +0100, Marc Zyngier wrote:
+> On Wed, 02 Apr 2025 21:17:23 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > KVM's logic for deciding when HPFAR_EL2 is UNKNOWN doesn't align with
+> > the architecture. Most notably, KVM assumes HPFAR_EL2 contains the
+> > faulting IPA even in the case of an SEA.
+> > 
+> > Align the logic with the architecture rather than attempting to
+> > paraphrase it. Additionally, take the opportunity to improve the
+> > language around ARM erratum #834220 such that it actually describes the
+> > bug.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/esr.h           | 22 ++++++++++--
+> >  arch/arm64/kvm/hyp/include/hyp/fault.h | 46 ++++++++++++++++----------
+> >  2 files changed, 48 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > index d1b1a33f9a8b..92fb26e90840 100644
+> > --- a/arch/arm64/include/asm/esr.h
+> > +++ b/arch/arm64/include/asm/esr.h
+> > @@ -121,6 +121,15 @@
+> >  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+> >  #define ESR_ELx_FSC_SECC	(0x18)
+> >  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
+> > +#define ESR_ELx_FSC_ADDRSZ	(0x00)
+> > +
+> > +/*
+> > + * Annoyingly, the negative levels for Address size faults aren't laid out
+> > + * contiguously (or in the desired order)
+> > + */
+> > +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) == -1 ? 0x25 : 0x2C)
+> > +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
+> > +						   (ESR_ELx_FSC_ADDRSZ + (n)))
 > 
-> KVM's logic for deciding when HPFAR_EL2 is UNKNOWN doesn't align with
-> the architecture. Most notably, KVM assumes HPFAR_EL2 contains the
-> faulting IPA even in the case of an SEA.
-> 
-> Align the logic with the architecture rather than attempting to
-> paraphrase it. Additionally, take the opportunity to improve the
-> language around ARM erratum #834220 such that it actually describes the
-> bug.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/esr.h           | 22 ++++++++++--
->  arch/arm64/kvm/hyp/include/hyp/fault.h | 46 ++++++++++++++++----------
->  2 files changed, 48 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index d1b1a33f9a8b..92fb26e90840 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -121,6 +121,15 @@
->  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
->  #define ESR_ELx_FSC_SECC	(0x18)
->  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
-> +#define ESR_ELx_FSC_ADDRSZ	(0x00)
-> +
-> +/*
-> + * Annoyingly, the negative levels for Address size faults aren't laid out
-> + * contiguously (or in the desired order)
-> + */
-> +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) == -1 ? 0x25 : 0x2C)
-> +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
-> +						   (ESR_ELx_FSC_ADDRSZ + (n)))
+> Oh gawd, D128 and its level -2. Do we really want to add this now?
 
-Oh gawd, D128 and its level -2. Do we really want to add this now? I'd
-rather leave it to whoever already lives in th future. Specially given
-that the helper you introduce below doesn't make any use of it.
+I certainly don't want to, but the other FSC level macros (whether
+intentional or not) already cope with D128. So I did the same for the
+sake of consisency.
 
-Otherwise looks OK.
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+Thanks,
+Oliver
