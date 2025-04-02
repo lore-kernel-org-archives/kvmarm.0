@@ -1,32 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6911E3DD0
-	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 20:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8A61C860E
+	for <kvmarm@lists.linux.dev>; Wed,  2 Apr 2025 20:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743625066; cv=none; b=qWT5ow88h7bKZhFA0cXyltljY+8Lnh9KiQN9gekO4SDAjEkuN9bZ/ztTVvP+FoLx4zDJKBTQSydsrkLdkQ01oyHuiio8/8sEMwMQzBTeoxY5inIq+iPfVxlXOLEGREmc5fdxvufwoWRMzFL24VaXiLK8M0HhyhlHnJdjROOR1NI=
+	t=1743625067; cv=none; b=t/K8dBOfT+paNPDjtqVTxKFY69muAquEqG1m4Wz92Yt89iEVM05gdQPONmjfEcCPHAJ4rVzlUBWhEy/ZdO28lVPfwrcMlIqzHEm81P5bt19IQQHNHDG72Se6mHx6nCtCUeWTxX1eok/IphAVhs6QMsIOolM2yUxcGGlg5m4SBrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743625066; c=relaxed/simple;
-	bh=enb34GvY+ErUMelO44pnEhClDaU6Jf+6y2TEJEAii4M=;
+	s=arc-20240116; t=1743625067; c=relaxed/simple;
+	bh=YaXIGlIwG8IxThPZEvDeVr0RVeqp2cqhoLU7iN9ypHE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Y9kPqOQKc7gXvc4SGcCQEsSgYMv0jiwNOR+RDvzxWQeiZ3hXjzx3iEn/QtgHO2UDMogiHyhGVmDXw4MBUDU31giR2vtyZRiHiuC9Kwb6BjjYsppgjHDMOmbTlzdIeDaBhQcYzP5EF2IB3sw8bgRUe1ww5QgJlFj5Tn0syKk0+hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j4vlmS+o; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=h5MXZnQPg4w11cSatv6nlPNQM/oc+VNbKb/L36MmhPvgLpEN5uwfCNvEqyv1yz/fNRH90ENX6qicSuN5j+DNuxyAnojLjEEWlzkQK2rcK0kzHXZxpz6zepe7dbofjLLIsGgCEf2oTS+ZhNVAWUvP49jbuacw9De8wZjSYPuVnNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eXxXv4yz; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j4vlmS+o"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eXxXv4yz"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743625061;
+	t=1743625063;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XRC3qd8fRWL+smjvSz22p4xOo1QgU09ykbhazHH2n3s=;
-	b=j4vlmS+o+213z6i4Ph6dkZfDD03lJyLCZ86fMmDeoBI02NyvIj43FzMp8AuCd30QznPgSt
-	m+iWbJmdBt8yALq094a0tnCfwIu3hyuRRj11ybSQJpoCox9PyYuWPdOwcQ8CS2SetgTfmu
-	3zyxvgrhSci9uqN1wUBm9BaOr4ZNQRU=
+	bh=Sh/D7zGeJ7fQVYnITGhjtlpVF5gfeKZoqjsZ+yDtbVE=;
+	b=eXxXv4yz9+M76LaPOwYI6ISwKsxh9d4vABs9Ze1nhtRfbI7nxw6HJORMQjm7RDOurirhNa
+	3WSX+jCIcvZL/lCweGqR+9sZRTVnmXRX4fFX5Lc/gH6yRkTlkxcgfKbi2TtJ11zavss1MY
+	WL8ELj6M5FviLhu9MoMUIMa8A24bHko=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Jiaqi Yan <jiaqiyan@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 2/3] arm64: Convert HPFAR_EL2 to sysreg table
-Date: Wed,  2 Apr 2025 13:17:24 -0700
-Message-Id: <20250402201725.2963645-3-oliver.upton@linux.dev>
+Subject: [PATCH v2 3/3] KVM: arm64: Don't translate FAR if invalid/unsafe
+Date: Wed,  2 Apr 2025 13:17:25 -0700
+Message-Id: <20250402201725.2963645-4-oliver.upton@linux.dev>
 In-Reply-To: <20250402201725.2963645-1-oliver.upton@linux.dev>
 References: <20250402201725.2963645-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,59 +48,205 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Switch over to the typical sysreg table for HPFAR_EL2 as we're about to
-start using more fields in the register.
+Don't re-walk the page tables if an SEA occurred during the faulting
+page table walk to avoid taking a fatal exception in the hyp.
+Additionally, check that FAR_EL2 is valid for SEAs not taken on PTW
+as the architecture doesn't guarantee it contains the fault VA.
+
+Finally, fix up the rest of the abort path by checking for SEAs early
+and bugging the VM if we get further along with an UNKNOWN fault IPA.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_emulate.h  | 4 +++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
- arch/arm64/tools/sysreg               | 7 +++++++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/esr.h           | 22 ++++++++++++++++++
+ arch/arm64/include/asm/kvm_emulate.h   |  3 +++
+ arch/arm64/include/asm/kvm_ras.h       |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/fault.h | 26 ++++++++++++++++-----
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c  |  7 ++++++
+ arch/arm64/kvm/mmu.c                   | 31 ++++++++++++++++----------
+ 6 files changed, 73 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d7cf66573aca..44e3fc6483c8 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -305,7 +305,9 @@ static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vc
- 
- static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
- {
--	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_MASK) << 8;
-+	u64 hpfar = vcpu->arch.fault.hpfar_el2;
-+
-+	return FIELD_GET(HPFAR_EL2_FIPA, hpfar) << 12;
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 92fb26e90840..e4f77757937e 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -482,6 +482,28 @@ static inline bool esr_fsc_is_addr_sz_fault(unsigned long esr)
+ 	       (esr == ESR_ELx_FSC_ADDRSZ_L(-1));
  }
  
- static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
++static inline bool esr_fsc_is_sea_ttw(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
++
++	return (esr == ESR_ELx_FSC_SEA_TTW(3)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(2)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(1)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(0)) ||
++	       (esr == ESR_ELx_FSC_SEA_TTW(-1));
++}
++
++static inline bool esr_fsc_is_secc_ttw(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
++
++	return (esr == ESR_ELx_FSC_SECC_TTW(3)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(2)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(1)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(0)) ||
++	       (esr == ESR_ELx_FSC_SECC_TTW(-1));
++}
++
+ /* Indicate whether ESR.EC==0x1A is for an ERETAx instruction */
+ static inline bool esr_iss_is_eretax(unsigned long esr)
+ {
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 44e3fc6483c8..bd020fc28aa9 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -307,6 +307,9 @@ static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu
+ {
+ 	u64 hpfar = vcpu->arch.fault.hpfar_el2;
+ 
++	if (unlikely(!(hpfar & HPFAR_EL2_NS)))
++		return INVALID_GPA;
++
+ 	return FIELD_GET(HPFAR_EL2_FIPA, hpfar) << 12;
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
+index 87e10d9a635b..9398ade632aa 100644
+--- a/arch/arm64/include/asm/kvm_ras.h
++++ b/arch/arm64/include/asm/kvm_ras.h
+@@ -14,7 +14,7 @@
+  * Was this synchronous external abort a RAS notification?
+  * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+  */
+-static inline int kvm_handle_guest_sea(phys_addr_t addr, u64 esr)
++static inline int kvm_handle_guest_sea(void)
+ {
+ 	/* apei_claim_sea(NULL) expects to mask interrupts itself */
+ 	lockdep_assert_irqs_enabled();
+diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
+index 59409685c14f..fc573fc767b0 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/fault.h
++++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
+@@ -12,6 +12,16 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ 
++static inline bool __fault_safe_to_translate(u64 esr)
++{
++	u64 fsc = esr & ESR_ELx_FSC;
++
++	if (esr_fsc_is_sea_ttw(esr) || esr_fsc_is_secc_ttw(esr))
++		return false;
++
++	return !(fsc == ESR_ELx_FSC_EXTABT && (esr & ESR_ELx_FnV));
++}
++
+ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ {
+ 	int ret;
+@@ -71,17 +81,23 @@ static inline bool __hpfar_valid(u64 esr)
+ 
+ static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
+ {
+-	u64 hpfar, far;
++	u64 hpfar;
+ 
+-	far = read_sysreg_el2(SYS_FAR);
++	fault->far_el2		= read_sysreg_el2(SYS_FAR);
++	fault->hpfar_el2	= 0;
+ 
+ 	if (__hpfar_valid(esr))
+ 		hpfar = read_sysreg(hpfar_el2);
+-	else if (!__translate_far_to_hpfar(far, &hpfar))
++	else if (unlikely(!__fault_safe_to_translate(esr)))
++		return true;
++	else if (!__translate_far_to_hpfar(fault->far_el2, &hpfar))
+ 		return false;
+ 
+-	fault->far_el2 = far;
+-	fault->hpfar_el2 = hpfar;
++	/*
++	 * Hijack HPFAR_EL2.NS (RES0 in Non-secure) to indicate a valid
++	 * HPFAR value.
++	 */
++	fault->hpfar_el2 = hpfar | HPFAR_EL2_NS;
+ 	return true;
+ }
+ 
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index f34f11c720d7..5ce2230054d9 100644
+index 5ce2230054d9..2a5284f749b4 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -578,7 +578,7 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+@@ -578,7 +578,14 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
  		return;
  	}
  
--	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
-+	addr = FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
++
++	/*
++	 * Yikes, we couldn't resolve the fault IPA. This should reinject an
++	 * abort into the host when we figure out how to do that.
++	 */
++	BUG_ON(!(fault.hpfar_el2 & HPFAR_EL2_NS));
+ 	addr = FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
++
  	ret = host_stage2_idmap(addr);
  	BUG_ON(ret && ret != -EAGAIN);
  }
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 2c63662c1a48..31ad9ce2b91c 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -3433,3 +3433,10 @@ Field	5	F
- Field	4	P
- Field	3:0	Align
- EndSysreg
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 2feb6c6b63af..754f2fe0cc67 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1794,9 +1794,28 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	gfn_t gfn;
+ 	int ret, idx;
+ 
++	/* Synchronous External Abort? */
++	if (kvm_vcpu_abt_issea(vcpu)) {
++		/*
++		 * For RAS the host kernel may handle this abort.
++		 * There is no need to pass the error into the guest.
++		 */
++		if (kvm_handle_guest_sea())
++			kvm_inject_vabt(vcpu);
 +
-+Sysreg	HPFAR_EL2	3	4	6	0	4
-+Field	63	NS
-+Res0	62:48
-+Field	47:4	FIPA
-+Res0	3:0
-+EndSysreg
++		return 1;
++	}
++
+ 	esr = kvm_vcpu_get_esr(vcpu);
+ 
++	/*
++	 * The fault IPA should be reliable at this point as we're not dealing
++	 * with an SEA.
++	 */
+ 	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	if (KVM_BUG_ON(ipa == INVALID_GPA, vcpu->kvm))
++		return -EFAULT;
++
+ 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
+ 	if (esr_fsc_is_translation_fault(esr)) {
+@@ -1818,18 +1837,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
+-	/* Synchronous External Abort? */
+-	if (kvm_vcpu_abt_issea(vcpu)) {
+-		/*
+-		 * For RAS the host kernel may handle this abort.
+-		 * There is no need to pass the error into the guest.
+-		 */
+-		if (kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_esr(vcpu)))
+-			kvm_inject_vabt(vcpu);
+-
+-		return 1;
+-	}
+-
+ 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+ 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 
 -- 
 2.39.5
 
