@@ -1,126 +1,73 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C0624C080
-	for <kvmarm@lists.linux.dev>; Thu,  3 Apr 2025 15:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92BD24E019
+	for <kvmarm@lists.linux.dev>; Thu,  3 Apr 2025 15:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743694315; cv=none; b=oHFscsTDGmV0jdECWOdDxNK4Cbshc+DpwEIgNjRdOIxjsD4hQp5auJdrxOqQAE1Mkt7ASBRsol4KpmRuZZ3p+/aQui4ERbAJX7nIQolNJdVW6+Zq0JektY0gSARkbOMunOEvLn2ZRvAp3htj2ofn6Gl0yr0CyoeuGwm+euSYwrw=
+	t=1743695167; cv=none; b=oZOmOaTEx7T1k1afmzwrqNcQJwH0l0jDCiWTzjEM+iUchsTKeseiNJnrzAr+tujEN+A5TNKmjPwUrbVhYaXMNC23zB0MYjtAlgnjbSDg3j01nLWyQpwiMBkPrOMyAo3735UipaIHCcY8qbOsMOMmUmdkF03W23ViMmZMmbXjenA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743694315; c=relaxed/simple;
-	bh=KPQddjkqY2woTfI2cLtPZbW+MJntKMtuNGsZM5WDnFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T9lpLxeMxQv3NFbkIopqyOgG/yIXBtaen2PE+1tEkrP2GmeIoQkk59nrAL1ady28/opK+atgTf01b336n2J3R4aphq1duHoh/n5OxlDCq0xBwd80Ejg0KaCajMaMRl9KW3HZ3e1tZGAOl95oEhirX0y8EuKSkFJlLpCVm2q+E34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vpy1M60v; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1743695167; c=relaxed/simple;
+	bh=WLh4uxmMbJDh11SO0hrgwI4qi+lHxUe3RbJWTMlCZLY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=shRUgzgktT0udSt6MJNY2AZJPpafrgBVU/KRbX+3SMqybKIyYzDfEzyaEIZw2IcnS5KqDvws5MSLKpOLvZplQuvLiHLYE/Dd65ywABq2n1NK5p192yqUsWMmby1QBQG6yjv1715VYnBwenn6k9GAYlfxx+aDRqcoypI8Udpai8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X+F0bAT8; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vpy1M60v"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e5e22e6ed2so1542961a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 03 Apr 2025 08:31:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743694312; x=1744299112; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2SVexGeljhSdSxj9UAkbIi7n+kiPxQUm8cURRQIGIRA=;
-        b=vpy1M60v/24jx+mdAoEALnK4iDFm47VTuEGJDMB4OX7qHWxP9aAT/LSpCU7GdJqHei
-         ExMPex9LLXrG1SYRwqTDB4KD29BVHceGC4gWpiBZ/Ug6db16Oj5lrHgUG8bUzgdKbXRv
-         7HHuUYYe7OLdErwj1xMSjyMjpZhm2NKRmmlzdLO6VwrmHZlRBInXaYOBe5rtq7KAkVxf
-         I/bC7GlgYfXJoNehwkTKV1gbi8xTWtFbQ+TFyPhqppvpvTCnV167WZK2+RGWDMjqIIHY
-         9alQNMUlo0qG7aUHa8823WpQCd3/KBDkteTaWbgtpWF8upcOgsfwH3sK21UBEuccIUgG
-         gUEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743694312; x=1744299112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2SVexGeljhSdSxj9UAkbIi7n+kiPxQUm8cURRQIGIRA=;
-        b=AR8ED/gBxrOOYK9MrxHyicvaJRdGH5MCL6Ha9J9AwEdyJlLUZw6Oq+h7cY3amQ9NjZ
-         EOh8g5MgB5TuF1NaoNbcf+WDlHADIatXgABGPVuTAo9vLvIpMYKXAkLAt0Aij631h3V2
-         hUFVCJwbR4S3EAYH3i53kxW5uyXn5SGv6XgsgbdRCDhgoJD97d/HTFJk3kDTwlysT6IY
-         9TlAoStITVvGgJ5Rv8D3WN4L9mX3yVTU9/6z6hpjSCTWQf9/9JuQ4Gr2gdYIK4G880l/
-         q9BV9V9wp3NtEhVjHI5zp5+C9QMU/E7TDWyMaoBjCw+4n+2PYUKjUt6DTsD2xCtr/6el
-         JKoA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVtiCQ9q+NJUKTEsL+pcFtqRy+KeoLzwkXm2eL5YHwK40bEqQ6PMC5hydp5indO1NhQWbFp9Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwHBtAKktxxvf0wc9twsWCwx0UGH/xFPivU6WKqX2Ve3zkWtyYi
-	/T3KjbSHeh12Y5Kuh6H1zGZCqpA5Q0+UiQcx9sAznk9OhK+eJZHORCjBOuknUQ==
-X-Gm-Gg: ASbGncs6oTOV7QYJQ1BckUW+AVATokbkWqhfUr3kRJqePUtqU6uRipTGAQ3cmZw5NS+
-	//kqTFpkUjuqYRUiTCPVdXZMMa0+eUNXMXx4CWrKr6F/b24we05zJYBocHQRCBcYkErk4XRUvlQ
-	ol/0D3VixxFMqPdQGpL46Ua8jCE0hKe0fPAsIiUDSUHvtcGQRoka0juh+Z4F9ZN9iU6f+b0ks5Z
-	poOrZJwSf5JLewBIg6Xz0X4f+zxT5RALyEwPJKQAp0fM57VHqNbHnOvrZfAQqxUiI5LlRfPO8Cv
-	e+EEeHBVolbUEDAbWVxcZF7XCGpDVgGaKPD7Ij7NjSl6b4U3e7ChKsov+ftLX78pj5BMzygT7N/
-	Zk66SRcFIX6WSfFT5
-X-Google-Smtp-Source: AGHT+IEGEPfe6jLP9yTD8EczNIfaOYVt4yM5HvzJTIY1ayuEiVqh4iVP20QX+O0oM2W0n9OiZudOCQ==
-X-Received: by 2002:a05:6402:1e8e:b0:5e1:dac1:fa22 with SMTP id 4fb4d7f45d1cf-5edfdafe39dmr16976129a12.21.1743694311816;
-        Thu, 03 Apr 2025 08:31:51 -0700 (PDT)
-Received: from google.com (40.162.204.35.bc.googleusercontent.com. [35.204.162.40])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f0880a4027sm1097010a12.73.2025.04.03.08.31.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 08:31:50 -0700 (PDT)
-Date: Thu, 3 Apr 2025 15:31:47 +0000
-From: Quentin Perret <qperret@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v2 3/9] KVM: arm64: Add a range to
- __pkvm_host_unshare_guest()
-Message-ID: <Z-6p49EcsZKid7L1@google.com>
-References: <20250306110038.3733649-1-vdonnefort@google.com>
- <20250306110038.3733649-4-vdonnefort@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X+F0bAT8"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743695160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EiU6cYR/bj2/g90dtII0uhxK6wbkCA3FpSRFOm8Bd2w=;
+	b=X+F0bAT8DyOsQVx+/xTAoLSPplt6wTqNk6sXXBOWvtNcKxzDBka7UFWIwVOdq1C1LPfNTj
+	XcqhPiAOf8/I32X7NHen2GarperFx3U+z/YUdBiwo5VxmQqA7ObWiHLoIzORPg3MPa8AWV
+	Et9xYK+QmLnan4TRqGYWswzCsQ0xrL0=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jiaqi Yan <jiaqiyan@google.com>
+Subject: Re: [PATCH v2 0/3] KVM: arm64: Fixes for resolving the fault IPA
+Date: Thu,  3 Apr 2025 08:45:50 -0700
+Message-Id: <174369514508.3034362.13165690020799838042.b4-ty@linux.dev>
+In-Reply-To: <20250402201725.2963645-1-oliver.upton@linux.dev>
+References: <20250402201725.2963645-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306110038.3733649-4-vdonnefort@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thursday 06 Mar 2025 at 11:00:32 (+0000), Vincent Donnefort wrote:
-> @@ -1012,51 +1011,52 @@ static int __check_host_shared_guest(struct pkvm_hyp_vm *vm, u64 *__phys, u64 ip
->  		return ret;
->  	if (!kvm_pte_valid(pte))
->  		return -ENOENT;
-> -	if (level != KVM_PGTABLE_LAST_LEVEL)
-> +	if (kvm_granule_size(level) != size)
->  		return -E2BIG;
->  
-> -	state = guest_get_page_state(pte, ipa);
-> -	if (state != PKVM_PAGE_SHARED_BORROWED)
-> -		return -EPERM;
-> +	ret = __guest_check_page_state_range(vm, ipa, size, PKVM_PAGE_SHARED_BORROWED);
-> +	if (ret)
-> +		return ret;
+On Wed, 02 Apr 2025 13:17:22 -0700, Oliver Upton wrote:
+> KVM's heuristics for determining the fault IPA are a bit shaky and don't
+> necessarily align with the letter of the architecture. On top of that,
+> HPFAR_EL2 is UNKNOWN if an SEA occurred during a table walk. Re-walking
+> the page tables will replay the SEA at EL2, becoming a panic in the hyp.
+> 
+> v1: https://lore.kernel.org/kvmarm/20250401224234.2906739-1-oliver.upton@linux.dev/
+> 
+> [...]
 
-Given that hard rely on kvm_granule_size(level) == size above, we should
-be guaranteed that the PTE covers the entire range we're interested in.
-So is there a point in starting a new page-table walk here? Could we
-just keep guest_get_page_state() directly?
+Applied to fixes, thanks!
 
->  
->  	phys = kvm_pte_to_phys(pte);
-> -	ret = check_range_allowed_memory(phys, phys + PAGE_SIZE);
-> +	ret = check_range_allowed_memory(phys, phys + size);
->  	if (WARN_ON(ret))
->  		return ret;
->  
-> -	page = hyp_phys_to_page(phys);
-> -	if (page->host_state != PKVM_PAGE_SHARED_OWNED)
-> -		return -EPERM;
-> -	if (WARN_ON(!page->host_share_guest_count))
-> -		return -EINVAL;
-> +	for_each_hyp_page(phys, size, page) {
-> +		if (page->host_state != PKVM_PAGE_SHARED_OWNED)
-> +			return -EPERM;
-> +		if (WARN_ON(!page->host_share_guest_count))
-> +			return -EINVAL;
-> +	}
->  
->  	*__phys = phys;
->  
->  	return 0;
->  }
+[1/3] KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
+      https://git.kernel.org/kvmarm/kvmarm/c/fb8a3eba9c81
+[2/3] arm64: Convert HPFAR_EL2 to sysreg table
+      https://git.kernel.org/kvmarm/kvmarm/c/1cf3e126f152
+[3/3] KVM: arm64: Don't translate FAR if invalid/unsafe
+      https://git.kernel.org/kvmarm/kvmarm/c/26fbdf369227
+
+--
+Best,
+Oliver
