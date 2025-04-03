@@ -1,75 +1,94 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0E91E5B8B
-	for <kvmarm@lists.linux.dev>; Thu,  3 Apr 2025 09:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69EA24501B
+	for <kvmarm@lists.linux.dev>; Thu,  3 Apr 2025 09:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743670875; cv=none; b=DqrpX8/yS3ANx3xtptYPZnoMuH/fEsVItWCivvAsEDgXz6m1U5E8eojBva/2sFmfUo1NHDNdq5TK2YF5+yYYCkO54zN8OYWADjdkMummZFZbE8Bm1mkaqDbMm/5ahG2Rd68mHPckWFtxf237z5y2i1Z5if8TnkJM9pt3sXgGVPo=
+	t=1743671094; cv=none; b=bLzSVRrzkHxp+R/ALSBrsuEsS1ZpPeRAmAXb+o0fsY9Va+qsoARG8WXhIO/z3Ew5LcAC/CWEGJe58HNc+qjE2kumbvNFSOO2YEJqM+flcrOgpvS3lp8tSgZaDIrbKL3GbQzoogMtcdYsxGnQ8PdercL1M9tJEivgRcgxSV9wVwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743670875; c=relaxed/simple;
-	bh=sxw491Z8LMPDKSO+07agHSEfaaL/qFP44nfZQ2jYKxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=roAjtl/N7JV8gY8SH3nO77P/dxSWIkPSOVt9jNu/NRFn4ZFzbFF+FxKATLNRe5AP9AbxRsRtR46AneiumQXam716WtlmmJZS3YjNscxDsdZ58aa+7fIRKBDhcjOmRlx5kQxgPsz80ZIk4S/DJUs6t3g8iU0kmpRcGFD/0xGurvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+	s=arc-20240116; t=1743671094; c=relaxed/simple;
+	bh=j1Fkw8epdkiaxhLhJzIHl7KWT3KcJ8DBd7ToBVFnEtQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dd8Diz/etbXdslgCMerzBQLq2JlkntWgpY3wpfUUyBHVUN3jNJKS/Ja6mKMUIlAWswBlKYjoFHXS8oRMkp4yGy4knE7AnCyl8YkJ3lBI226FOUrsF9uhUN6yrN+WEsMP64hPAsj7IoFIeseHmPEPbc3D2xgG5+ofq05JNqThhmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2AA17106F;
-	Thu,  3 Apr 2025 02:01:16 -0700 (PDT)
-Received: from bogus (unknown [10.57.41.33])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F51E3F63F;
-	Thu,  3 Apr 2025 02:01:11 -0700 (PDT)
-Date: Thu, 3 Apr 2025 10:01:08 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	mark.rutland@arm.com, lpieralisi@kernel.org,
-	catalin.marinas@arm.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] smccc/kvm_guest: Remove the accidental semicolon
-Message-ID: <20250403-steadfast-bold-puffin-f0d2ed@sudeepholla>
-References: <20250402134401.146156-1-shameerali.kolothum.thodi@huawei.com>
- <20250402-independent-hyrax-of-honor-4515fb@sudeepholla>
- <Z-1pPLI8HRjg-bSx@linux.dev>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E1D12106F;
+	Thu,  3 Apr 2025 02:04:52 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF29A3F63F;
+	Thu,  3 Apr 2025 02:04:47 -0700 (PDT)
+Message-ID: <957ccba4-2ae1-4358-b62d-3b5c44d7f1ca@arm.com>
+Date: Thu, 3 Apr 2025 10:04:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-1pPLI8HRjg-bSx@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/6] arm64: Provide basic EL2 setup for FEAT_{LS64,
+ LS64_V} usage at EL0/1
+To: Yicong Yang <yangyicong@huawei.com>, catalin.marinas@arm.com,
+ will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, corbet@lwn.net,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
+Cc: joey.gouly@arm.com, yuzenghui@huawei.com, shuah@kernel.org,
+ jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+ linuxarm@huawei.com, prime.zeng@hisilicon.com, xuwei5@huawei.com,
+ yangyicong@hisilicon.com, tangchengchang@huawei.com
+References: <20250331094320.35226-1-yangyicong@huawei.com>
+ <20250331094320.35226-2-yangyicong@huawei.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250331094320.35226-2-yangyicong@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 02, 2025 at 09:43:40AM -0700, Oliver Upton wrote:
-> Hi Sudeep,
+On 31/03/2025 10:43, Yicong Yang wrote:
+> From: Yicong Yang <yangyicong@hisilicon.com>
 > 
-> On Wed, Apr 02, 2025 at 02:58:06PM +0100, Sudeep Holla wrote:
-> > On Wed, Apr 02, 2025 at 02:44:01PM +0100, Shameer Kolothum wrote:
-> > > Fixes cocci reported warning:Unneeded semicolon
-> > > 
-> > 
-> > There was similar patch on the list [1] few days ago.
-> > 
-> > > Fixes: 86edf6bdcf05 ("smccc/kvm_guest: Enable errata based on implementation CPUs")
-> > 
-> > ^^^ Is this really necessary as they get backported as well ?
+> Instructions introduced by FEAT_{LS64, LS64_V} is controlled by
+> HCRX_EL2.{EnALS, EnASR}. Configure all of these to allow usage
+> at EL0/1.
 > 
-> The blamed commit was introduced this release cycle so no concern about
-> backports.
+> This doesn't mean these instructions are always available in
+> EL0/1 if provided. The hypervisor still have the control at
+> runtime.
 > 
+> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+> ---
+>   arch/arm64/include/asm/el2_setup.h | 12 +++++++++++-
+>   1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index ebceaae3c749..0259941602c4 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -57,9 +57,19 @@
+>           /* Enable GCS if supported */
+>   	mrs_s	x1, SYS_ID_AA64PFR1_EL1
+>   	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
+> -	cbz	x1, .Lset_hcrx_\@
+> +	cbz	x1, .Lskip_gcs_hcrx_\@
+>   	orr	x0, x0, #HCRX_EL2_GCSEn
+>   
+> +.Lskip_gcs_hcrx_\@:
 
-Ah OK, sorry didn't look at the details.
+minor nit: For consistency, could we rename this "set_ls64", similar to 
+"set_hcrx" ?
 
-> > Since, KVM maintainers are in cc-ed, let me know if you guys want to pick
-> > this ? Else I can send it as part of my firmware (ffa/scmi) fixes.
-> 
-> I can grab the fix here in a moment, I've already got one queued up [*]
-> for the KVM guest driver anyway.
-> 
+> +	/* Enable LS64, LS64_V if supported */
+> +	mrs_s	x1, SYS_ID_AA64ISAR1_EL1
+> +	ubfx	x1, x1, #ID_AA64ISAR1_EL1_LS64_SHIFT, #4
+> +	cbz	x1, .Lset_hcrx_\@
+> +	orr	x0, x0, #HCRX_EL2_EnALS
+> +	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_V
+> +	b.lt	.Lset_hcrx_\@
+> +	orr	x0, x0, #HCRX_EL2_EnASR
+> +
+>   .Lset_hcrx_\@:
+>   	msr_s	SYS_HCRX_EL2, x0
+>   .Lskip_hcrx_\@:
 
-Thanks!
-
--- 
-Regards,
-Sudeep
+Suzuki
