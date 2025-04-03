@@ -1,117 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F6F23ED53
-	for <kvmarm@lists.linux.dev>; Thu,  3 Apr 2025 07:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0E91E5B8B
+	for <kvmarm@lists.linux.dev>; Thu,  3 Apr 2025 09:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743663850; cv=none; b=m1cp9EpAy5aOtxNc0h6zjaH2E0N4CKVC6iyJSIA8p+6lAVTn7/GPCfJ99W1HWGrVBn8Q8BoEq7+NNhXOYE5NHK6NvI9zlfbg4EwUWAuxI27yXT/MO9LLjbDCxcVX2vhbO9wj4LX8PFWj9HUtRGH7QVqimv7KIJe9v3uNcTpTExk=
+	t=1743670875; cv=none; b=DqrpX8/yS3ANx3xtptYPZnoMuH/fEsVItWCivvAsEDgXz6m1U5E8eojBva/2sFmfUo1NHDNdq5TK2YF5+yYYCkO54zN8OYWADjdkMummZFZbE8Bm1mkaqDbMm/5ahG2Rd68mHPckWFtxf237z5y2i1Z5if8TnkJM9pt3sXgGVPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743663850; c=relaxed/simple;
-	bh=hl6lPBFM1k0e/IKS+t0QKCaUoDsDzpZvntTMgsWWCLw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T6KYxFmttU0pCs4+CkBBOfCGmhzJkt9kypCMxSbZnOx20cvi0ldLxAIgXQotR1eTB1IeySqeQa5iHePUinO2gQLs4cR8xlavvPxdY8HSKCjhaEdbtqVbGOIuz08Yro070hgBEoykroNy5l1FMlPLed+14vGY1tbF7GbSBuVpEgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IBf3y+22; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IBf3y+22"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AAE8C4CEE3;
-	Thu,  3 Apr 2025 07:04:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743663849;
-	bh=hl6lPBFM1k0e/IKS+t0QKCaUoDsDzpZvntTMgsWWCLw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IBf3y+22Fh9WObMxLoocDNC4HgEjuTmJziiFknxFQDOQf4zfkN2FTLETwGZfZlfzX
-	 0Jni+v6jlABLuXLnF7ptB9a/RbuJwHQEbpeQNahDMeZNzo/eqhfAVBD6EgGlHydtmF
-	 nw1f2aDnkyQfd+1l7Ii/uCwwLMlEUDiCtRzCdB8XoHcEdJsndNx8043U+/mkve7FZX
-	 ByOqdZQwVNpwKt1/Pa3f381+RykrUx0Et20AMbZtZvoOMjm50l3Tf1Tq9SFxnDaP0S
-	 XLf+FD6nOxcxObcELFJTUXrFrBhzR0En2hYsekVXvHIK/XUKP4alrT9Q9IXXbUDTnK
-	 IiZxNLF6QGoaw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u0EcR-001se4-1L;
-	Thu, 03 Apr 2025 08:04:07 +0100
-Date: Thu, 03 Apr 2025 08:04:08 +0100
-Message-ID: <877c41zpxz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1743670875; c=relaxed/simple;
+	bh=sxw491Z8LMPDKSO+07agHSEfaaL/qFP44nfZQ2jYKxA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=roAjtl/N7JV8gY8SH3nO77P/dxSWIkPSOVt9jNu/NRFn4ZFzbFF+FxKATLNRe5AP9AbxRsRtR46AneiumQXam716WtlmmJZS3YjNscxDsdZ58aa+7fIRKBDhcjOmRlx5kQxgPsz80ZIk4S/DJUs6t3g8iU0kmpRcGFD/0xGurvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2AA17106F;
+	Thu,  3 Apr 2025 02:01:16 -0700 (PDT)
+Received: from bogus (unknown [10.57.41.33])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F51E3F63F;
+	Thu,  3 Apr 2025 02:01:11 -0700 (PDT)
+Date: Thu, 3 Apr 2025 10:01:08 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jiaqi Yan <jiaqiyan@google.com>
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
-In-Reply-To: <Z-2xgjsrRAI-sq2G@linux.dev>
-References: <20250402201725.2963645-1-oliver.upton@linux.dev>
-	<20250402201725.2963645-2-oliver.upton@linux.dev>
-	<87cyduz138.wl-maz@kernel.org>
-	<Z-2xgjsrRAI-sq2G@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	mark.rutland@arm.com, lpieralisi@kernel.org,
+	catalin.marinas@arm.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] smccc/kvm_guest: Remove the accidental semicolon
+Message-ID: <20250403-steadfast-bold-puffin-f0d2ed@sudeepholla>
+References: <20250402134401.146156-1-shameerali.kolothum.thodi@huawei.com>
+ <20250402-independent-hyrax-of-honor-4515fb@sudeepholla>
+ <Z-1pPLI8HRjg-bSx@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, jiaqiyan@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-1pPLI8HRjg-bSx@linux.dev>
 
-On Wed, 02 Apr 2025 22:52:02 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Wed, Apr 02, 2025 at 09:43:40AM -0700, Oliver Upton wrote:
+> Hi Sudeep,
 > 
-> On Wed, Apr 02, 2025 at 10:48:43PM +0100, Marc Zyngier wrote:
-> > On Wed, 02 Apr 2025 21:17:23 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> On Wed, Apr 02, 2025 at 02:58:06PM +0100, Sudeep Holla wrote:
+> > On Wed, Apr 02, 2025 at 02:44:01PM +0100, Shameer Kolothum wrote:
+> > > Fixes cocci reported warning:Unneeded semicolon
 > > > 
-> > > KVM's logic for deciding when HPFAR_EL2 is UNKNOWN doesn't align with
-> > > the architecture. Most notably, KVM assumes HPFAR_EL2 contains the
-> > > faulting IPA even in the case of an SEA.
-> > > 
-> > > Align the logic with the architecture rather than attempting to
-> > > paraphrase it. Additionally, take the opportunity to improve the
-> > > language around ARM erratum #834220 such that it actually describes the
-> > > bug.
-> > > 
-> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > > ---
-> > >  arch/arm64/include/asm/esr.h           | 22 ++++++++++--
-> > >  arch/arm64/kvm/hyp/include/hyp/fault.h | 46 ++++++++++++++++----------
-> > >  2 files changed, 48 insertions(+), 20 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > > index d1b1a33f9a8b..92fb26e90840 100644
-> > > --- a/arch/arm64/include/asm/esr.h
-> > > +++ b/arch/arm64/include/asm/esr.h
-> > > @@ -121,6 +121,15 @@
-> > >  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
-> > >  #define ESR_ELx_FSC_SECC	(0x18)
-> > >  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
-> > > +#define ESR_ELx_FSC_ADDRSZ	(0x00)
-> > > +
-> > > +/*
-> > > + * Annoyingly, the negative levels for Address size faults aren't laid out
-> > > + * contiguously (or in the desired order)
-> > > + */
-> > > +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) == -1 ? 0x25 : 0x2C)
-> > > +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
-> > > +						   (ESR_ELx_FSC_ADDRSZ + (n)))
 > > 
-> > Oh gawd, D128 and its level -2. Do we really want to add this now?
+> > There was similar patch on the list [1] few days ago.
+> > 
+> > > Fixes: 86edf6bdcf05 ("smccc/kvm_guest: Enable errata based on implementation CPUs")
+> > 
+> > ^^^ Is this really necessary as they get backported as well ?
 > 
-> I certainly don't want to, but the other FSC level macros (whether
-> intentional or not) already cope with D128. So I did the same for the
-> sake of consisency.
+> The blamed commit was introduced this release cycle so no concern about
+> backports.
+> 
 
-Ah, fair enough. Let's have it then.
+Ah OK, sorry didn't look at the details.
 
-Thanks,
+> > Since, KVM maintainers are in cc-ed, let me know if you guys want to pick
+> > this ? Else I can send it as part of my firmware (ffa/scmi) fixes.
+> 
+> I can grab the fix here in a moment, I've already got one queued up [*]
+> for the KVM guest driver anyway.
+> 
 
-	M.
+Thanks!
 
 -- 
-Jazz isn't dead. It just smells funny.
+Regards,
+Sudeep
