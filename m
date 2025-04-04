@@ -1,31 +1,31 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEF719CD0B
-	for <kvmarm@lists.linux.dev>; Fri,  4 Apr 2025 22:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC75C188580
+	for <kvmarm@lists.linux.dev>; Fri,  4 Apr 2025 23:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743806787; cv=none; b=dwIFznnaoKQzkQPLUwWx4j2YgtmmbNWbYPJReeDbVSzFeVxC8HKlggQaZG3ufw4kEbBIc/X+9QFeDHsEhDUmZ46DCoXBYYCaq+Km6UJhMR2TXtnIGXrymzTrnU+kbUeSGoA+TfzrtGnoyxzwzeYGw+FREi3T/S5KObS+iG1HmrU=
+	t=1743807685; cv=none; b=Mc7Od/+h8tea2XYXUtNPZQxJtDtao6+yG6A8V1f2wjlCRdGQB/IzOEjNTOcSQsGYfyCwlScDHFbZwyIYXm+WFEjZSD8pyY1MMRytTJZxJz0SVBYkaGIb0snqk+jF2B7uxB4/At1jSGwCl/Yi+oz0vinGijmFcc1aPY/MNo/pRC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743806787; c=relaxed/simple;
-	bh=Q9/i3wbmROUc1yAY0nI7uO6WaZml7TPX/9qDKuqEQtg=;
+	s=arc-20240116; t=1743807685; c=relaxed/simple;
+	bh=8JXCydsPOHzLUEkj6S8pAb7qip648/8JXVPlR/qPOuM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZHrRHTAbdIBPbZjfoypiB+wpYRg0lHHWkRTevZiYtSQj6MUZ2Vl6/gn9MuiuyoujsXbGn0V+UXa5K9mc52d5rclV4PLTmPANGRAl+8zy7rI3Xv8ECY/TcvcZw/KJx7QwWdOe0VsZvuE10j0/CbHKO3aJqhDpb4eilEh9VKqMwmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QRFDrlVX; arc=none smtp.client-ip=95.215.58.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=WfiqPR2wUXZU7jR/gwkw1Y/YYFDiyDG4E89kQtY9fI8vS3+9hFuEHC7x04MBP+hYOvSpCSttjSK784yoLpvFXEJa5HJSR1fXOhnCM+vIbgZr2u0emBOpoeKV0b55TTc4wPH3TA3XcpES6We4nSAYY7B23SnNmlSbc5TFtXFaAio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PyNqoE2/; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QRFDrlVX"
-Date: Fri, 4 Apr 2025 15:46:01 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PyNqoE2/"
+Date: Fri, 4 Apr 2025 16:01:05 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743806772;
+	t=1743807670;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=icbPkrkUd1De4/wRlfQxCHPa3ucnmbOW4BGuGjTGkgM=;
-	b=QRFDrlVXyeKYm2auWsnzd21S31ggUiVTESz37sca/elBzIWiLNknM2FIh5SUSNnCRe54b0
-	sjQO6yUYmITskjDTi/PpqBwTl26+n2loNJ8I11WPulIigWcmGzePbbUy9Cyk3amqBVg/6I
-	BLVUr6+FIXMOnJxuxpCWz5b68q7rF50=
+	bh=7WE4k0gwgTAUdZ3znm9Bphq+twxiG2Hgud2fjJc9JwU=;
+	b=PyNqoE2/uDWdg8j9a/zZA+hEa6IgIfhZnH++GFAzOCUqkD/3MxaMoGETH/bOrsK4RMj0tZ
+	3cuWIXLc2+4QaqYxb/3koglx3rsxd33mzVqIdmCUJ8zXAPn4yta8DhMdtByqfwr7S7d5JV
+	82bM8c0zA8FEttfc3VTH8bcwMH6KGUQ=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Raghavendra Rao Ananta <rananta@google.com>
@@ -33,11 +33,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: arm64: Introduce and use
- hardware-definition macros
-Message-ID: <Z_BhKUAgkLCdeWDB@linux.dev>
+Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Explicitly set the page attrs
+ to Inner-Shareable
+Message-ID: <Z_BksUn4JiPPGc4G@linux.dev>
 References: <20250404220659.1312465-1-rananta@google.com>
- <20250404220659.1312465-2-rananta@google.com>
+ <20250404220659.1312465-3-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,89 +46,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250404220659.1312465-2-rananta@google.com>
+In-Reply-To: <20250404220659.1312465-3-rananta@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Raghu,
-
-On Fri, Apr 04, 2025 at 10:06:58PM +0000, Raghavendra Rao Ananta wrote:
-> The kvm selftest library for arm64 currently configures the hardware
-> fields, such as shift and mask in the page-table entries and registers,
-> directly with numbers. While it add comments at places, it's better to
-> rewrite them with appropriate macros to improve the readability and
-> reduce the risk of errors. Hence, introduce macros to define the
-> hardware fields and use them in the arm64 processor library.
+On Fri, Apr 04, 2025 at 10:06:59PM +0000, Raghavendra Rao Ananta wrote:
+> Atomic instructions such as 'ldset' over (global) variables in the guest
+> is observed to cause an EL1 data abort with FSC 0x35 (IMPLEMENTATION
+> DEFINED fault (Unsupported Exclusive or Atomic access)). The observation
+> was particularly apparent on Neoverse-N3.
 > 
-> Most of the definitions are primary copied from the Linux's header,
-> arch/arm64/include/asm/pgtable-hwdef.h.
+> According to DDI0487L.a C3.2.6 (Single-copy atomic 64-byte load/store),
+> it is implementation defined that a data abort with the mentioned FSC
+> is reported for the first stage of translation that provides an
+> inappropriate memory type. It's likely that the same rule also applies
+> to memory attribute mismatch. When the guest loads the memory location of
+> the variable that was already cached during the host userspace's copying
+> of the ELF into the memory, the core is likely running into a mismatch
+> of memory attrs that's checked in stage-1 itself, and thus causing the
+> abort in EL1.
 
-Thank you for doing this. Having magic numbers all around the shop was a
-complete mess. Just a single comment:
+Sorry, my index of the ARM ARM was trashed when we were discussing this
+before.
 
-> No functional change intended.
-> 
-> Suggested-by: Oliver Upton <oupton@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  tools/arch/arm64/include/asm/sysreg.h         | 38 +++++++++++++
->  .../selftests/kvm/arm64/page_fault_test.c     |  2 +-
->  .../selftests/kvm/include/arm64/processor.h   | 28 +++++++--
->  .../selftests/kvm/lib/arm64/processor.c       | 57 ++++++++++---------
->  4 files changed, 92 insertions(+), 33 deletions(-)
-> 
-> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-> index 150416682e2c..6fcde168f3a6 100644
-> --- a/tools/arch/arm64/include/asm/sysreg.h
-> +++ b/tools/arch/arm64/include/asm/sysreg.h
-> @@ -884,6 +884,44 @@
->  	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
->  	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
->  
-> +/* TCR_EL1 specific flags */
-> +#define TCR_T0SZ_OFFSET	0
-> +#define TCR_T0SZ(x)		((UL(64) - (x)) << TCR_T0SZ_OFFSET)
-> +
-> +#define TCR_IRGN0_SHIFT	8
-> +#define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
-> +#define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
-> +#define TCR_IRGN0_WBWA		(UL(1) << TCR_IRGN0_SHIFT)
-> +#define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
-> +#define TCR_IRGN0_WBnWA	(UL(3) << TCR_IRGN0_SHIFT)
-> +
-> +#define TCR_ORGN0_SHIFT	10
-> +#define TCR_ORGN0_MASK		(UL(3) << TCR_ORGN0_SHIFT)
-> +#define TCR_ORGN0_NC		(UL(0) << TCR_ORGN0_SHIFT)
-> +#define TCR_ORGN0_WBWA		(UL(1) << TCR_ORGN0_SHIFT)
-> +#define TCR_ORGN0_WT		(UL(2) << TCR_ORGN0_SHIFT)
-> +#define TCR_ORGN0_WBnWA	(UL(3) << TCR_ORGN0_SHIFT)
-> +
-> +#define TCR_SH0_SHIFT		12
-> +#define TCR_SH0_MASK		(UL(3) << TCR_SH0_SHIFT)
-> +#define TCR_SH0_INNER		(UL(3) << TCR_SH0_SHIFT)
-> +
-> +#define TCR_TG0_SHIFT		14
-> +#define TCR_TG0_MASK		(UL(3) << TCR_TG0_SHIFT)
-> +#define TCR_TG0_4K		(UL(0) << TCR_TG0_SHIFT)
-> +#define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
-> +#define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
-> +
-> +#define TCR_IPS_SHIFT		32
-> +#define TCR_IPS_MASK		(UL(7) << TCR_IPS_SHIFT)
-> +#define TCR_IPS_52_BITS	(UL(6) << TCR_IPS_SHIFT)
-> +#define TCR_IPS_48_BITS	(UL(5) << TCR_IPS_SHIFT)
-> +#define TCR_IPS_40_BITS	(UL(2) << TCR_IPS_SHIFT)
-> +#define TCR_IPS_36_BITS	(UL(1) << TCR_IPS_SHIFT)
-> +
-> +#define TCR_HA			(UL(1) << 39)
-> +#define TCR_DS			(UL(1) << 59)
-> +
+DDI0487L.a B2.2.6 describes the exact situation you encountered, where
+atomics are only guaranteed to work on Inner/Outer Shareable MT_NORMAL
+memory.
 
-sysreg.h isn't the right home for these definitions since it is meant to
-be a copy of the corresponding kernel header.
+What's a bit more explicit for other memory attribute aborts (like the
+one you've cited) is whether or not the implementation can generate the
+abort solely on the stage-1 attributes vs. the combined stage-1/stage-2
+attributes at the end of translation.
 
-Since KVM selftests are likely the only thing in tools to care about
-setting up page tables, adding this to processor.h seems like a better
-place.
+Either way, let's correct the citation to point at the right section.
 
 Thanks,
 Oliver
