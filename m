@@ -1,125 +1,134 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A2F218ABA
-	for <kvmarm@lists.linux.dev>; Fri,  4 Apr 2025 22:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEF719CD0B
+	for <kvmarm@lists.linux.dev>; Fri,  4 Apr 2025 22:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743804427; cv=none; b=Slr0uD4j3bp74LoOWEZE1hRmz/ougVIeHXz/lUemi5aRAFqtij7ws1GNJGnzN5PEQIhOcWPurvmOURkIqd8b+f3ygbhKt1zo9pQNjr2B6J8dn7zDF2SIG5qwAtnHe3AVCO+xkct5XBzk/qejFiPvWcQQ2AKzN+URIUu8+4YDy1s=
+	t=1743806787; cv=none; b=dwIFznnaoKQzkQPLUwWx4j2YgtmmbNWbYPJReeDbVSzFeVxC8HKlggQaZG3ufw4kEbBIc/X+9QFeDHsEhDUmZ46DCoXBYYCaq+Km6UJhMR2TXtnIGXrymzTrnU+kbUeSGoA+TfzrtGnoyxzwzeYGw+FREi3T/S5KObS+iG1HmrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743804427; c=relaxed/simple;
-	bh=E4YqHNQ4gPeYFwy7PnyB6caqFhd7nH8+voL1clFcF6Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Trqt3gG8noP3qBoP7WH5NEtUDnO3NRB2EgU6MMinxMJ7dkOMgkS9p8sb0GnNskXjM66qakcdq8X0zfEOA9SH2/4DlPWd/nCf4sWLf+5RpkukBcK67BEEX2/zg1QMBUZkVA5NiLjaTNQxoxfuS9X+/lLVpppxwnTJH8B2DPa4o4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2SnLl/yB; arc=none smtp.client-ip=209.85.166.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+	s=arc-20240116; t=1743806787; c=relaxed/simple;
+	bh=Q9/i3wbmROUc1yAY0nI7uO6WaZml7TPX/9qDKuqEQtg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZHrRHTAbdIBPbZjfoypiB+wpYRg0lHHWkRTevZiYtSQj6MUZ2Vl6/gn9MuiuyoujsXbGn0V+UXa5K9mc52d5rclV4PLTmPANGRAl+8zy7rI3Xv8ECY/TcvcZw/KJx7QwWdOe0VsZvuE10j0/CbHKO3aJqhDpb4eilEh9VKqMwmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QRFDrlVX; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2SnLl/yB"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-85dad593342so250249939f.1
-        for <kvmarm@lists.linux.dev>; Fri, 04 Apr 2025 15:07:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743804425; x=1744409225; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pc9BIslmRtbzEaqCHxhWv7mDukpJW925YKmou2T40Cs=;
-        b=2SnLl/yB1e1E/aO3hlNSkyN1dge1C5WarvTbcx2WFDMyccfaAmOxz+faCH1ShA+4lu
-         nlqRq/UBz6yxqSQi8i0zbr/pu8XsXLu97MrMZIb6RvlveuHf5EWU3GJFWLAzWdAKjwI1
-         dSoJW7BVWDXeiJN7Cb1HXywiGYZNc2bkJ5XhifUHQPMFIyBs/slhEix4pTp3Wxc8RNzd
-         ZNjTkwzIeSrNNbr5vR9L7BcXkPTIPQePFkQyuQwDAQ+PkaePaVCMmvY5c8Jr5QiIpv23
-         3gSft9LceKYG5IvBN3RfjGUlCmnizcecg0qrWPx5n3mCSyt4eBEAyn1zLugB04Q8pagZ
-         BkjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743804425; x=1744409225;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pc9BIslmRtbzEaqCHxhWv7mDukpJW925YKmou2T40Cs=;
-        b=S/gF7uYmdL3/9eK2TjzUiultAUQ9jdPp1Flb0WQUuoOzXSWTlmMgS0iB1JjDPCc+sc
-         1EvWef00Q3E5qXs/0PsQGlEM7hdubNVxYtHGo6uey7wT4HY+VZmSpiwyq4gMeOMKds9v
-         6eoK/BualvKQaqwzwlfywurC8IF2o0UgfsisahTgvC0KVJYvs/pa5YseWVYdBF9tMW5A
-         XMGsMZfNi8FB2KXFHThSeQZpqfwAOhaOdR5U3A1utPTjIKM19PbczgGdyNwM3QpaopmA
-         T94nuzOqJKkebTWVI8ocZJcfCuvNU/wt5qXz9Z5gkVY3ryhsE4cimszJoEE5c/+mcQmF
-         KxYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7/sjT6bqwtiaRht3plPZvJ5wFu8K7aZSO9IPhdnAlSo0X9NuwdDZC6r16cBOZyKUN4l3Fwek=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz6+S8WaRhOX+5aoMQKJ5u+0vb9SWc/kaYZr+Z1i0P0PQjjJxR+
-	g7tMioHD1d9OCN+sd8I3aJlzOcRheytKCOctVTNKzRTULKKzup9cuimzpIxQpaBH7hncofenDq3
-	EVZbEnw==
-X-Google-Smtp-Source: AGHT+IHdes02xNhbHRa4hrCg2N+VywWvzx8Vq2+IoHciYVBDcUnJpNkQ4rg+6l0nOZiDn4tZhimhX6EbrE0g
-X-Received: from iobbf5.prod.google.com ([2002:a05:6602:3685:b0:85e:9686:d0f0])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6602:6a46:b0:85b:46d7:1886
- with SMTP id ca18e2360f4ac-8611b49b398mr539039139f.7.1743804425293; Fri, 04
- Apr 2025 15:07:05 -0700 (PDT)
-Date: Fri,  4 Apr 2025 22:06:59 +0000
-In-Reply-To: <20250404220659.1312465-1-rananta@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QRFDrlVX"
+Date: Fri, 4 Apr 2025 15:46:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743806772;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=icbPkrkUd1De4/wRlfQxCHPa3ucnmbOW4BGuGjTGkgM=;
+	b=QRFDrlVXyeKYm2auWsnzd21S31ggUiVTESz37sca/elBzIWiLNknM2FIh5SUSNnCRe54b0
+	sjQO6yUYmITskjDTi/PpqBwTl26+n2loNJ8I11WPulIigWcmGzePbbUy9Cyk3amqBVg/6I
+	BLVUr6+FIXMOnJxuxpCWz5b68q7rF50=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: arm64: Introduce and use
+ hardware-definition macros
+Message-ID: <Z_BhKUAgkLCdeWDB@linux.dev>
+References: <20250404220659.1312465-1-rananta@google.com>
+ <20250404220659.1312465-2-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250404220659.1312465-1-rananta@google.com>
-X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250404220659.1312465-3-rananta@google.com>
-Subject: [PATCH 2/2] KVM: selftests: arm64: Explicitly set the page attrs to Inner-Shareable
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250404220659.1312465-2-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Atomic instructions such as 'ldset' over (global) variables in the guest
-is observed to cause an EL1 data abort with FSC 0x35 (IMPLEMENTATION
-DEFINED fault (Unsupported Exclusive or Atomic access)). The observation
-was particularly apparent on Neoverse-N3.
+Hi Raghu,
 
-According to DDI0487L.a C3.2.6 (Single-copy atomic 64-byte load/store),
-it is implementation defined that a data abort with the mentioned FSC
-is reported for the first stage of translation that provides an
-inappropriate memory type. It's likely that the same rule also applies
-to memory attribute mismatch. When the guest loads the memory location of
-the variable that was already cached during the host userspace's copying
-of the ELF into the memory, the core is likely running into a mismatch
-of memory attrs that's checked in stage-1 itself, and thus causing the
-abort in EL1.
+On Fri, Apr 04, 2025 at 10:06:58PM +0000, Raghavendra Rao Ananta wrote:
+> The kvm selftest library for arm64 currently configures the hardware
+> fields, such as shift and mask in the page-table entries and registers,
+> directly with numbers. While it add comments at places, it's better to
+> rewrite them with appropriate macros to improve the readability and
+> reduce the risk of errors. Hence, introduce macros to define the
+> hardware fields and use them in the arm64 processor library.
+> 
+> Most of the definitions are primary copied from the Linux's header,
+> arch/arm64/include/asm/pgtable-hwdef.h.
 
-Fix this by explicitly setting the memory attribute to Inner-Shareable
-to avoid the mismatch, and by extension, the data abort.
+Thank you for doing this. Having magic numbers all around the shop was a
+complete mess. Just a single comment:
 
-Suggested-by: Oliver Upton <oupton@google.com>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/include/arm64/processor.h | 1 +
- tools/testing/selftests/kvm/lib/arm64/processor.c     | 3 +++
- 2 files changed, 4 insertions(+)
+> No functional change intended.
+> 
+> Suggested-by: Oliver Upton <oupton@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  tools/arch/arm64/include/asm/sysreg.h         | 38 +++++++++++++
+>  .../selftests/kvm/arm64/page_fault_test.c     |  2 +-
+>  .../selftests/kvm/include/arm64/processor.h   | 28 +++++++--
+>  .../selftests/kvm/lib/arm64/processor.c       | 57 ++++++++++---------
+>  4 files changed, 92 insertions(+), 33 deletions(-)
+> 
+> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+> index 150416682e2c..6fcde168f3a6 100644
+> --- a/tools/arch/arm64/include/asm/sysreg.h
+> +++ b/tools/arch/arm64/include/asm/sysreg.h
+> @@ -884,6 +884,44 @@
+>  	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
+>  	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
+>  
+> +/* TCR_EL1 specific flags */
+> +#define TCR_T0SZ_OFFSET	0
+> +#define TCR_T0SZ(x)		((UL(64) - (x)) << TCR_T0SZ_OFFSET)
+> +
+> +#define TCR_IRGN0_SHIFT	8
+> +#define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_WBWA		(UL(1) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
+> +#define TCR_IRGN0_WBnWA	(UL(3) << TCR_IRGN0_SHIFT)
+> +
+> +#define TCR_ORGN0_SHIFT	10
+> +#define TCR_ORGN0_MASK		(UL(3) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_NC		(UL(0) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_WBWA		(UL(1) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_WT		(UL(2) << TCR_ORGN0_SHIFT)
+> +#define TCR_ORGN0_WBnWA	(UL(3) << TCR_ORGN0_SHIFT)
+> +
+> +#define TCR_SH0_SHIFT		12
+> +#define TCR_SH0_MASK		(UL(3) << TCR_SH0_SHIFT)
+> +#define TCR_SH0_INNER		(UL(3) << TCR_SH0_SHIFT)
+> +
+> +#define TCR_TG0_SHIFT		14
+> +#define TCR_TG0_MASK		(UL(3) << TCR_TG0_SHIFT)
+> +#define TCR_TG0_4K		(UL(0) << TCR_TG0_SHIFT)
+> +#define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
+> +#define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
+> +
+> +#define TCR_IPS_SHIFT		32
+> +#define TCR_IPS_MASK		(UL(7) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_52_BITS	(UL(6) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_48_BITS	(UL(5) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_40_BITS	(UL(2) << TCR_IPS_SHIFT)
+> +#define TCR_IPS_36_BITS	(UL(1) << TCR_IPS_SHIFT)
+> +
+> +#define TCR_HA			(UL(1) << 39)
+> +#define TCR_DS			(UL(1) << 59)
+> +
 
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index 691670bbe226..b337a606aac4 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -75,6 +75,7 @@
- #define PMD_TYPE_TABLE		BIT(1)
- #define PTE_TYPE_PAGE		BIT(1)
- 
-+#define PTE_SHARED		(UL(3) << 8) /* SH[1:0], inner shareable */
- #define PTE_AF			BIT(10)
- 
- #define PTE_ADDR_MASK(page_shift)	GENMASK(47, (page_shift))
-diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-index da5802c8a59c..9d69904cb608 100644
---- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-@@ -172,6 +172,9 @@ static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 	}
- 
- 	pg_attr = PTE_AF | PTE_ATTRINDX(attr_idx) | PTE_TYPE_PAGE | PTE_VALID;
-+	if (!use_lpa2_pte_format(vm))
-+		pg_attr |= PTE_SHARED;
-+
- 	*ptep = addr_pte(vm, paddr, pg_attr);
- }
- 
--- 
-2.49.0.504.g3bcea36a83-goog
+sysreg.h isn't the right home for these definitions since it is meant to
+be a copy of the corresponding kernel header.
 
+Since KVM selftests are likely the only thing in tools to care about
+setting up page tables, adding this to processor.h seems like a better
+place.
+
+Thanks,
+Oliver
