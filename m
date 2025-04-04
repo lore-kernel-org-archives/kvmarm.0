@@ -1,146 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A191AF0CE
-	for <kvmarm@lists.linux.dev>; Fri,  4 Apr 2025 09:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDE518D656;
+	Fri,  4 Apr 2025 13:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743759869; cv=none; b=hQpwPwt0kX84HhQMxwSqRV921dBeoUy2FSbPMJlHuO6QViGYcY0MnI07F7TGL5bXmt3MjgzrKvzTSJniE+IdG+44s8ORZprZ8hwfhz+VMVcgDoIgUPTcvqHj4+gvB/A4TPZaupfNcF2gJBjnh+CAGsR2343sOg6dtXr4qC4h5gU=
+	t=1743773246; cv=none; b=XlhBKun127/rZ9xlE9Iz64zPNu8GeG801tYvpwARKt6mXDe7GFWzGxSnDMyXYb8tEAz+7Z8JY+PmvjZFvrYxwVXgwdKrZ+f9kfNAxNzRWmtdfEf4zrrDwVVA9Woo1pprq9EtkmEhB6m7Vll80UdTLy9lrbWRVudedCHS1udjk18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743759869; c=relaxed/simple;
-	bh=f9fYezKx9c+EzFcFbWCCgEz61MqKEZoVC313VdsYY9Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JeT2ylf5g0Tt2z3RiGrbclRHM2+7CMR42rQL4ekjFXS2xZhIWXmZw8hFF+pxBlrPVyn2+zu+/SL9PAgoyMNvCH65W3kcr6h5uCZViqwa41oVLBChIDntIyfRPkchAfE2zhpf/To7aHE6z8uk+tUlj8zprotCuk1HfOmZXJmuWaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2E8D1515;
-	Fri,  4 Apr 2025 02:44:28 -0700 (PDT)
-Received: from [10.162.40.17] (a077893.blr.arm.com [10.162.40.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 40D8C3F59E;
-	Fri,  4 Apr 2025 02:44:23 -0700 (PDT)
-Message-ID: <f0e1ce67-8341-4c44-993c-dac31db00c59@arm.com>
-Date: Fri, 4 Apr 2025 15:14:21 +0530
+	s=arc-20240116; t=1743773246; c=relaxed/simple;
+	bh=dMnezC4ayMJ3IPQofFQCbhpFIaP/JJW0J5RFebyBYdI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NJMW1Nt4N6XgPyEZHT2ktg+L68J8tJfMUu+/QZLrrBHjFRDpWn/jKwXUE41cmgqfVQLJY597dXPzdUYs5MfdylfCQrxSwzF2TzbB9Jy9fNEZT2z8nscJhJmiVEAJmvD7f2+xbHRMJds/Ox9KDTRYojb0UqzwUODAtVPb8jsqMFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gd+jY7RZ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gd+jY7RZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B24C4CEDD;
+	Fri,  4 Apr 2025 13:27:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743773245;
+	bh=dMnezC4ayMJ3IPQofFQCbhpFIaP/JJW0J5RFebyBYdI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=gd+jY7RZUXZ0kOoZ2XiFFPXQP6ZMMDDACnuer+FjZUgdHqHnrqs48zMKgSoskVsZS
+	 wx5B5yZ0lVRHqM3eRu+NPIuCfGNRFqKkA3CY9D4cntQO8duAruDvWJRcGuGnPSofXK
+	 Ep+pQmLlg9mVPMboS+sghyvyMh9SLPbqCkJ4I5dsCbwTYP98+0EQ2jbVTTEPzUAKMt
+	 paAFtm9Izb9YJP1tkO5OgPmdi6hXm2kJLUWGeQ71KERAOIXxvE4QTUUhWq3Rro+r25
+	 kVvfKMWr6wQy3+pVDa6OTHluE2MaUn7tCSEW5JSqVOJMi8IG0ArBa+zRr6vphHCX+I
+	 F/vG3x63VstWQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [6.1 PATCH RESEND 00/12] KVM: arm64: Backport of SVE fixes to v6.1
+Date: Fri, 04 Apr 2025 14:23:33 +0100
+Message-Id: <20250404-stable-sve-6-1-v1-0-cd5c9eb52d49@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] arm64: Expose AIDR_EL1 via sysfs
-To: Oliver Upton <oliver.upton@linux.dev>,
- linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20250403231626.3181116-1-oliver.upton@linux.dev>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250403231626.3181116-1-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Oliver Upton <oliver.upton@linux.dev>, Oleg Nesterov <oleg@redhat.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+ Mark Brown <broonie@kernel.org>, stable@vger.kernel.org, 
+ Mark Rutland <mark.rutland@arm.com>, Eric Auger <eauger@redhat.com>, 
+ Wilco Dijkstra <wilco.dijkstra@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+ Florian Weimer <fweimer@redhat.com>, Fuad Tabba <tabba@google.com>, 
+ Jeremy Linton <jeremy.linton@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ James Clark <james.clark@linaro.org>
+X-Mailer: b4 0.15-dev-c25d1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2157; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=dMnezC4ayMJ3IPQofFQCbhpFIaP/JJW0J5RFebyBYdI=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBn794txXB3OZqTgH/yZx7cbfa487bPc3Liz4ZeFZGa
+ ukIFRhuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ+/eLQAKCRAk1otyXVSH0EYdB/
+ 0cVMQ5Viwd6UigabPwoQZpINzNEs17/eljGRJpuyRiWYmew/Hpi86hN9gu0al+ZIbqBgH6yDai5aEL
+ lcqIBxOmem6lfO9uYSW1Txehoe8kodHHcNMB5zsbkKO1W8V8BUsjDEl6rf2hJyzxXQGrO69SFaYI9Z
+ +52HlEvn1cpQasSWynL85kl6sZPHeyzLNM4ZEKcdk9EBmirzpX0pzluAOUwslexbSwc1olP3qPBckd
+ 8hYtMTgCwtCZ+ldykCJiarv/5l5OZjvFdbOMQlGoEf6eBAQOP4QoHVVt+5Vho7ogJAtfPDSC1ECxGn
+ lXeWW3ZFdGfQ7F9uaymJ/VMRuOZOOm
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On 4/4/25 04:46, Oliver Upton wrote:
-> The KVM PV ABI recently added a feature that allows the VM to discover
-> the set of physical CPU implementations, identified by a tuple of
-> {MIDR_EL1, REVIDR_EL1, AIDR_EL1}. Unlike other KVM PV features, the
-> expectation is that the VMM implements the hypercall instead of KVM as
-> it has the authoritative view of where the VM gets scheduled.
-> 
-> To do this the VMM needs to know the values of these registers on any
-> CPU in the system. While MIDR_EL1 and REVIDR_EL1 are already exposed,
-> AIDR_EL1 is not. Provide it in sysfs along with the other identification
-> registers.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  Documentation/ABI/testing/sysfs-devices-system-cpu |  1 +
->  Documentation/arch/arm64/cpu-feature-registers.rst | 13 +++++++------
->  arch/arm64/include/asm/cpu.h                       |  1 +
->  arch/arm64/kernel/cpuinfo.c                        |  3 +++
->  4 files changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/ABI/testing/sysfs-devices-system-cpu b/Documentation/ABI/testing/sysfs-devices-system-cpu
-> index 206079d3bd5b..9bbf4c27c237 100644
-> --- a/Documentation/ABI/testing/sysfs-devices-system-cpu
-> +++ b/Documentation/ABI/testing/sysfs-devices-system-cpu
-> @@ -485,6 +485,7 @@ What:		/sys/devices/system/cpu/cpuX/regs/
->  		/sys/devices/system/cpu/cpuX/regs/identification/
->  		/sys/devices/system/cpu/cpuX/regs/identification/midr_el1
->  		/sys/devices/system/cpu/cpuX/regs/identification/revidr_el1
-> +		/sys/devices/system/cpu/cpuX/regs/identification/aidr_el1
->  		/sys/devices/system/cpu/cpuX/regs/identification/smidr_el1
->  Date:		June 2016
->  Contact:	Linux ARM Kernel Mailing list <linux-arm-kernel@lists.infradead.org>
-> diff --git a/Documentation/arch/arm64/cpu-feature-registers.rst b/Documentation/arch/arm64/cpu-feature-registers.rst
-> index 253e9743de2f..add66afc7b03 100644
-> --- a/Documentation/arch/arm64/cpu-feature-registers.rst
-> +++ b/Documentation/arch/arm64/cpu-feature-registers.rst
-> @@ -72,14 +72,15 @@ there are some issues with their usage.
->      process could be migrated to another CPU by the time it uses the
->      register value, unless the CPU affinity is set. Hence, there is no
->      guarantee that the value reflects the processor that it is
-> -    currently executing on. The REVIDR is not exposed due to this
-> -    constraint, as REVIDR makes sense only in conjunction with the
-> -    MIDR. Alternately, MIDR_EL1 and REVIDR_EL1 are exposed via sysfs
-> -    at::
-> +    currently executing on. REVIDR and AIDR are not exposed due to this
-> +    constraint, as these registers only make sense in conjunction with
-> +    the MIDR. Alternately, MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are exposed
-> +    via sysfs at::
->  
->  	/sys/devices/system/cpu/cpu$ID/regs/identification/
-> -	                                              \- midr
-> -	                                              \- revidr
-> +	                                              \- midr_el1
-> +	                                              \- revidr_el1
-> +	                                              \- aidr_el1
+This series backports some recent fixes for SVE/KVM interactions from
+Mark Rutland to v6.1.
 
-Right, the existing ones are also marked with _el1 suffix as well.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Fuad Tabba (1):
+      KVM: arm64: Calculate cptr_el2 traps on activating traps
 
->  
->  3. Implementation
->  --------------------
-> diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
-> index 81e4157f92b7..71493b760b83 100644
-> --- a/arch/arm64/include/asm/cpu.h
-> +++ b/arch/arm64/include/asm/cpu.h
-> @@ -44,6 +44,7 @@ struct cpuinfo_arm64 {
->  	u64		reg_dczid;
->  	u64		reg_midr;
->  	u64		reg_revidr;
-> +	u64		reg_aidr;
->  	u64		reg_gmid;
->  	u64		reg_smidr;
->  	u64		reg_mpamidr;
-> diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-> index 285d7d538342..621218d2a991 100644
-> --- a/arch/arm64/kernel/cpuinfo.c
-> +++ b/arch/arm64/kernel/cpuinfo.c
-> @@ -328,11 +328,13 @@ static const struct kobj_type cpuregs_kobj_type = {
->  
->  CPUREGS_ATTR_RO(midr_el1, midr);
->  CPUREGS_ATTR_RO(revidr_el1, revidr);
-> +CPUREGS_ATTR_RO(aidr_el1, aidr);
->  CPUREGS_ATTR_RO(smidr_el1, smidr);
->  
->  static struct attribute *cpuregs_id_attrs[] = {
->  	&cpuregs_attr_midr_el1.attr,
->  	&cpuregs_attr_revidr_el1.attr,
-> +	&cpuregs_attr_aidr_el1.attr,
->  	NULL
->  };
->  
-> @@ -469,6 +471,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
->  	info->reg_dczid = read_cpuid(DCZID_EL0);
->  	info->reg_midr = read_cpuid_id();
->  	info->reg_revidr = read_cpuid(REVIDR_EL1);
-> +	info->reg_aidr = read_cpuid(AIDR_EL1);
->  
->  	info->reg_id_aa64dfr0 = read_cpuid(ID_AA64DFR0_EL1);
->  	info->reg_id_aa64dfr1 = read_cpuid(ID_AA64DFR1_EL1);
-> 
-> base-commit: e8b471285262d1561feb2eb266aab6ebe7094124
+Mark Brown (4):
+      KVM: arm64: Discard any SVE state when entering KVM guests
+      arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE
+      arm64/fpsimd: Have KVM explicitly say which FP registers to save
+      arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
 
-LGTM
+Mark Rutland (7):
+      KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
+      KVM: arm64: Remove host FPSIMD saving for non-protected KVM
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
+      KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN
+      KVM: arm64: Refactor exit handlers
+      KVM: arm64: Mark some header functions as inline
+      KVM: arm64: Eagerly switch ZCR_EL{1,2}
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+ arch/arm64/include/asm/fpsimd.h         |   4 +-
+ arch/arm64/include/asm/kvm_host.h       |  19 +++---
+ arch/arm64/include/asm/kvm_hyp.h        |   1 +
+ arch/arm64/include/asm/processor.h      |   7 +++
+ arch/arm64/kernel/fpsimd.c              |  69 +++++++++++++++------
+ arch/arm64/kernel/process.c             |   2 +
+ arch/arm64/kernel/ptrace.c              |   3 +
+ arch/arm64/kernel/signal.c              |   7 ++-
+ arch/arm64/kvm/arm.c                    |   1 -
+ arch/arm64/kvm/fpsimd.c                 |  92 ++++++++-------------------
+ arch/arm64/kvm/hyp/entry.S              |   5 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 106 +++++++++++++++++++++-----------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |   8 +--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  17 +----
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  91 +++++++++++++++++----------
+ arch/arm64/kvm/hyp/vhe/switch.c         |  12 ++--
+ arch/arm64/kvm/reset.c                  |   3 +
+ 17 files changed, 259 insertions(+), 188 deletions(-)
+---
+base-commit: 344a09659766c83c42cdd4943318deabde89a9c3
+change-id: 20250227-stable-sve-6-1-075c1295b363
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
