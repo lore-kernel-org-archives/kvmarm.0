@@ -1,169 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B941D1C5D7C;
-	Sat,  5 Apr 2025 09:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E621537A7
+	for <kvmarm@lists.linux.dev>; Sun,  6 Apr 2025 18:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743845608; cv=none; b=SPZhaT0h4YGv4Y2CuNre6KsGdxz539yclIhmIB9ruITd+/UgFoFZ8S0CY3MMCbjWg6WWLVHzsbj1y0TSwtXReI7drnsLg3JdcasNOu0l6fICL31VWsILL3SYemwBnC7ZbHV37LV4OZWvkxR53K78tYV58ixMu+4QCP3pw4cZj90=
+	t=1743963389; cv=none; b=Vp74VvC1oadUuwv2Rzae/YKm/de5ACSb8F+hnMsFDuA11CNz+t3OomhBKPs+N76epqsgW2GnhgirxBINEXUwvGMu/OG0+TqeAqTiOLDEcL8jNBs8q4KN/e8ghMDlKjCJixtrJNTESSBAtfPQkCRhybHHL0/HaZAP6Jh8YAEt1Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743845608; c=relaxed/simple;
-	bh=kriz03AnZEeQQvO1jAPNT+Mky6ppncxoMV3q3M6sSRo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IsZwZL+jRCLCf2UCxhNOw/6iSZ0CegpsO7jYAWRM9EosHHOOqVneJh/pBq4mt1Aj5sZ095kYutv0+G0prSf1hFnMTMPXUUcNJsLKDJrrgqzbfF3wG76PSjn0VNiFACzayhH+OISRZ2980MM2aGs9oNp5V+WKmIX18BddX2zRRGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ti+/oISw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743963389; c=relaxed/simple;
+	bh=ksoIiuj6A0MyclOiN9aSsulnJVmUzD7Lz9V6oyIGZ24=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Is4hSZYuGROk6EfLxKrOLS7OXPsmvJIjeYEyadm41s2Ml1amOuxTUO8VeBfAviA/iQ+Q8EdJkv5x8wSzBkshYlFWp0PXJEl9o+og3IhVhhA8etI/R0yLKlYOXeFy3heizv/z8Cvg0BeH+CjTSDkPscH5MQi53h6/Yt3+PxziKxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RI0HJfeh; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ti+/oISw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279DCC4CEE4;
-	Sat,  5 Apr 2025 09:33:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743845608;
-	bh=kriz03AnZEeQQvO1jAPNT+Mky6ppncxoMV3q3M6sSRo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ti+/oISwOwauLDwS0nQMoncUJeCMwNjrfS6t3dHuXPWrwQH0AAyvbqSOh2aJL3As5
-	 ln/1Za6oi7agd2hl3dhzSrmNp9VEMQr5702xR9irXYJ6fQp+xOb+UjhhFS89P0h4nw
-	 8dGM5yX9rYbqSacrDl762Hq70+TznUBdC1J3ebusu0ZeOAfvIAKhBc7BcGRBqRTA/J
-	 VCkKGy1nBHNT/YHB/PuGFpWuew4FLjz9ErEjuZKvY7e1/ZZsH522RYW/yUdSfvIMSO
-	 np2s53T7AKn/9WV0Dfwm0qnFJpVQ3nBaoPBoRrHDtQUAHMvV7843GxtZi5xVxnihip
-	 1DO1yNeDclc2A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u0zu1-002Z6m-Ju;
-	Sat, 05 Apr 2025 10:33:25 +0100
-Date: Sat, 05 Apr 2025 10:33:28 +0100
-Message-ID: <87wmbzx89j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mingwei Zhang <mizhang@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RI0HJfeh"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743963382;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S93UKdhObdvlpcU/FcRzIW0uhpMd7EvcOLuxG0UINpk=;
+	b=RI0HJfehh0GA78yb7DIYDAHCR7yGkWUf90gpLVs40PskfCgXEvxDu97Tm+0pBjoeRnmavN
+	9apFmBWXbLLTIV0I+lC094J0BbdCTA0vQoa5U2TBEO92dL2ag2NkKmYMp76R5cNnwIKCdL
+	hE4/vexq3n9ro30PqCJWSh6C/fbYcxI=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Raghavendra Rao Ananta <rananta@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: selftests: arm64: Explicitly set the page attrs to Inner-Shareable
-In-Reply-To: <CAL715W+v-BgHr5FwgDnct5nQ3RV-FXMkuSaCG7DaDoQVnZeDpg@mail.gmail.com>
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] KVM : selftests: arm64: Explicitly set the page attrs to Inner-Shareable
+Date: Sun,  6 Apr 2025 11:16:13 -0700
+Message-Id: <174396331752.3282387.4731776469161725499.b4-ty@linux.dev>
+In-Reply-To: <20250405001042.1470552-1-rananta@google.com>
 References: <20250405001042.1470552-1-rananta@google.com>
-	<20250405001042.1470552-3-rananta@google.com>
-	<CAL715WKaAHSgUhtMMT3Ztw90mMoHpVLdKUgVM15xx6yoUws9+Q@mail.gmail.com>
-	<Z_CaiKsi42ho8DoK@linux.dev>
-	<CAL715W+v-BgHr5FwgDnct5nQ3RV-FXMkuSaCG7DaDoQVnZeDpg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mizhang@google.com, oliver.upton@linux.dev, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, oupton@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 05 Apr 2025 08:24:30 +0100,
-Mingwei Zhang <mizhang@google.com> wrote:
->=20
-> On Fri, Apr 4, 2025 at 7:51=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
-> >
-> > On Fri, Apr 04, 2025 at 05:31:49PM -0700, Mingwei Zhang wrote:
-> > > On Fri, Apr 4, 2025 at 5:10=E2=80=AFPM Raghavendra Rao Ananta
-> > > <rananta@google.com> wrote:
-> > > >
-> > > > Atomic instructions such as 'ldset' over (global) variables in the =
-guest
-> > > > is observed to cause an EL1 data abort with FSC 0x35 (IMPLEMENTATION
-> > > > DEFINED fault (Unsupported Exclusive or Atomic access)). The observ=
-ation
-> > > > was particularly apparent on Neoverse-N3.
-> > > >
-> > > > According to ARM ARM DDI0487L.a B2.2.6 (Possible implementation
-> > > > restrictions on using atomic instructions), atomic instructions are
-> > > > architecturally guaranteed for Inner Shareable and Outer Shareable
-> > > > attributes. For Non-Shareable attribute, the atomic instructions are
-> > > > not atomic and issuing such an instruction can lead to the FSC
-> > > > mentioned in this case (among other things).
-> > > >
-> > > > Moreover, according to DDI0487L.a C3.2.6 (Single-copy atomic 64-byte
-> > > > load/store), it is implementation defined that a data abort with the
-> > > > mentioned FSC is reported for the first stage of translation that
-> > > > provides an inappropriate memory type. It's likely that Neoverse-N3
-> > > > chose to implement these two and why we see an FSC of 0x35 in EL1 u=
-pon
-> > > > executing atomic instructions.
-> >
-> > Ok, can we please drop this second reference?
-> >
-> > This is talking about something else (FEAT_LS64) that happens to share
-> > the same FSC as an unsupported atomic instruction. I mentioned this to
-> > you internally as an illustration of how different implementations may
-> > behave when determining if the attributes support a particular access,
-> > but it isn't actually relevant to this change.
-> >
-> > > nit: It's likely that Neoverse-N3 chose to implement this option (the
-> > > first option) instead of reporting at the final enabled stage of
-> > > translation
-> >
-> > I would much rather we rely on the language that describes what the
-> > architecture guarantees rather than speculate as to how Neoverse-N3
-> > behaves.
-> >
-> > Mentioning that the breakage was observed on Neoverse-N3 is still useful
-> > to add to the changelog.
-> >
-> > > I have minor question here: The DDI0487L C3.2.6 (Single-copy atomic
-> > > 64-byte load/store) mentioned
-> > >
-> > > """
-> > > When the instructions access a memory type that is not one of the
-> > > following, a data abort for unsupported Exclusive or atomic access is
-> > > generated:
-> > >
-> > > =E2=80=A2 Normal Inner Non-cacheable, Outer Non-cacheable.
-> > > """
-> > >
-> > > So, the above is the "Normal Inner Non-cacheable", but in our case we
-> > > have "Normal and non-shareable" in stage-1 mapping, right? I know it
-> > > is very close, but it seems the situation is still only "one bit" away
-> > > in my understanding...
-> >
-> > This citation relates to FEAT_LS64. If you look at B2.2.6 instead, it
-> > reads:
-> >
-> > """
-> > The memory types for which it is architecturally guaranteed that the
-> > atomic instructions will be atomic are:
-> >
-> >  - Inner Shareable, Inner Write-Back, Outer Write-Back Normal memory
-> >    with Read allocation hints and Write allocation hints and not
-> >    transient.
-> >
-> >  - Outer Shareable, Inner Write-Back, Outer Write-Back Normal memory
-> >    with Read allocation hints and Write allocation hints and not
-> >    transient.
-> > """
->=20
-> Agree that the above should be the right place to cite. C3.2.6 seems
-> to discuss atomic instruction with memory attributes bits(which points
-> to MAIR_EL1 and MAIR_EL2?). In this case, it is more related to
-> shareability bits instead.
+On Sat, 05 Apr 2025 00:10:40 +0000, Raghavendra Rao Ananta wrote:
+> The series fixes a conflict in memory attributes in some
+> implementations,
+> such as Neoverse-N3, that causes a data abort in guest EL1 with FSC
+> 0x35 (IMPLEMENTATION DEFINED fault (Unsupported Exclusive or Atomic
+> access)).
+> 
+> Patch-1 is a cleanup patch that replaces numbers (and comments) to
+> using proper macros for hardware configuration, such as registers and
+> page-table entries.
+> 
+> [...]
 
-Not sure what you mean by this reference to MAIR.
+I cleaned up the changelog on patch 2 per the discussion + added a note
+about the interaction with LPA2.
 
-These constraints apply to any memory access, including those that are
-*not* the direct effect of an instruction.  For example, an atomic
-page table update generated by the HW (AF or DB update) is only
-guaranteed to succeed if the PTW is itself configured to use ISH+WB or
-OSH+WB, and could otherwise result in any of the ill effects described
-in B2.2.6.
+Applied to fixes, thanks!
 
-	M.
+[1/2] KVM: selftests: arm64: Introduce and use hardware-definition macros
+      https://git.kernel.org/kvmarm/kvmarm/c/d8d78398e550
+[2/2] KVM: selftests: arm64: Explicitly set the page attrs to Inner-Shareable
+      https://git.kernel.org/kvmarm/kvmarm/c/c8631ea59b65
 
---=20
-Jazz isn't dead. It just smells funny.
+--
+Best,
+Oliver
