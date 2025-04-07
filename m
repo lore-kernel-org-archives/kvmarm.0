@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF9F20C49B;
-	Mon,  7 Apr 2025 16:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23B920E009;
+	Mon,  7 Apr 2025 16:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744043689; cv=none; b=Obf+AkDUcB/kTjM73jxTtm32TSeBStwYKOW7dYgxUH5z/cMr4ZO5ieuj5ADl+z6MhaxnMPlQVWoQniAmXTxURFjERPvTAXOR2won6/+h2d3egdCnxkaXMw27j/RkaWb25NerP68aPwKgNncc+X1b5zEmTg79b/X4ZnETJu/oTUI=
+	t=1744043700; cv=none; b=rQkkuC1+ouvVYhP0fmuuAeSSEzz1PpjFPkvF4TW/W1sAiyN4ZOafoEJGNKFeySxjXIe5IvGH+W1BH42fIbEnGYoCibzSASQaQsiBW+smBzHgR9WiEF4rrGWIPxTI0CI4E1ZPJJ7yjzjTHLlMwC/ObpWXc8nbB1Jo70TG4qNZd4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744043689; c=relaxed/simple;
-	bh=9qZubxauk9mzSj0tJzP980zYJ0MHrS+RSrLyxtKMBAE=;
+	s=arc-20240116; t=1744043700; c=relaxed/simple;
+	bh=WMuZXN9uPQg0EOQ/19w79o3wWm0fyR5P5/0uwECFBzM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o9i+B+Oy4W1CMRXHXC6C5BSCclvMq1WuuIb1sRWtYWzgt6JB62KcEExqvfyCsB7esVoAIC8H/MPkWajbtI2CH6jql9itCm4MTh3PJdwZkCd08uUaRM8GmeW5z8aY8369qUJx7mAH/PF3H6nmr8JPaegVzpne0Is1lpNtgpehWic=
+	 In-Reply-To:Content-Type; b=nyvnzbOboYh/tt49gle7quwjohOTPWhe2bJU7elHrWt/xOi/wojcVVyGqtNhuneClBspGbYy6AFqcHQNVjUubPajC3Sn8LVKdnj7SlM1G0Lxgiz54lE5RRhXVK+wJNkdYNu4Tughe3ywSoTWZVviKtMpGbb7KGvmV+lQYESukms=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AA4112FC;
-	Mon,  7 Apr 2025 09:34:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 616AC12FC;
+	Mon,  7 Apr 2025 09:34:58 -0700 (PDT)
 Received: from [10.57.17.31] (unknown [10.57.17.31])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD2023F694;
-	Mon,  7 Apr 2025 09:34:43 -0700 (PDT)
-Message-ID: <29103a40-bea4-4e00-a183-83d9c678a935@arm.com>
-Date: Mon, 7 Apr 2025 17:34:43 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 224E73F694;
+	Mon,  7 Apr 2025 09:34:52 -0700 (PDT)
+Message-ID: <d254a8ea-0f02-4826-9af3-4a288efcc90c@arm.com>
+Date: Mon, 7 Apr 2025 17:34:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 30/45] arm64: RME: Always use 4k pages for realms
+Subject: Re: [PATCH v7 34/45] kvm: rme: Hide KVM_CAP_READONLY_MEM for realm
+ guests
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -42,113 +43,98 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-31-steven.price@arm.com>
- <9d32bfed-31f2-49ad-ae43-87e60957ad74@redhat.com>
+ <20250213161426.102987-35-steven.price@arm.com>
+ <32a09a27-f131-44dd-8959-abb63b2089a8@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <9d32bfed-31f2-49ad-ae43-87e60957ad74@redhat.com>
+In-Reply-To: <32a09a27-f131-44dd-8959-abb63b2089a8@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 04/03/2025 06:23, Gavin Shan wrote:
+On 04/03/2025 11:51, Gavin Shan wrote:
 > On 2/14/25 2:14 AM, Steven Price wrote:
->> Always split up huge pages to avoid problems managing huge pages. There
->> are two issues currently:
->>
->> 1. The uABI for the VMM allows populating memory on 4k boundaries even
->>     if the underlying allocator (e.g. hugetlbfs) is using a larger page
->>     size. Using a memfd for private allocations will push this issue onto
->>     the VMM as it will need to respect the granularity of the allocator.
->>
->> 2. The guest is able to request arbitrary ranges to be remapped as
->>     shared. Again with a memfd approach it will be up to the VMM to deal
->>     with the complexity and either overmap (need the huge mapping and add
->>     an additional 'overlapping' shared mapping) or reject the request as
->>     invalid due to the use of a huge page allocator.
->>
->> For now just break everything down to 4k pages in the RMM controlled
->> stage 2.
+>> For protected memory read only isn't supported. While it may be possible
+>> to support read only for unprotected memory, this isn't supported at the
+>> present time.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->>   arch/arm64/kvm/mmu.c | 4 ++++
->>   1 file changed, 4 insertions(+)
+>>   arch/arm64/kvm/arm.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
 > 
-> The change log looks confusing to me. Currently, there are 3 classes of
-> stage2 faults,
-> handled by their corresponding handlers like below.
-> 
-> stage2 fault in the private space: private_memslot_fault()
-> stage2 fault in the MMIO space:    io_mem_abort()
-> stage2 fault in the shared space:  user_mem_abort()
-> 
-> Only the stage2 fault in the private space needs to allocate a 4KB page
-> from guest-memfd.
-> This patch is changing user_mem_abort(), which is all about the stage2
-> fault in the shared
-> space, where a guest-memfd isn't involved. The only intersection between
-> the private/shared
-> space is the stage2 page table. I'm guessing we want to have enforced
-> 4KB page is due to
-> the shared stage2 page table by the private/shared space, or I'm wrong.
-> 
-> What I'm understanding from the change log: it's something to be
-> improved in future due to
-> only 4KB pages can be supported by guest-memfd. Please correct me if I'm
-> wrong.
+> It's worthy to explain why KVM_CAP_READONLY_MEM isn't supported and its
+> negative impact. It's something to be done in the future if I'm correct.
 
-Yes that commit message is confusing - I'll have a go at rewriting.
+I'll add to the commit message:
 
-The issues are:
+    Note that this does mean that e.g. ROM (or flash) data cannot be
+    emulated correctly by the VMM.
 
- 1. The RMM spec (as it stands) says the guest is free to request a
-RIPAS change at 4k granularity.
+> From QEMU's perspective, all ROM data, which is populated by it, can
+> be written. It conflicts to the natural limit: all ROM data should be
+> read-only.
 
- 2. We have no reasonable allocator to allow mapping part of a huge page
-in the protected half of the guest's and the other part in the shared half.
-
-Issue (1) also causes problems with larger page size in the host. We
-have plans for a RHI (Realm Host Interface) to allow the guest to
-discover the host's page size so it can size RIPAS changes appropriately.
-
-Issue (2) is (hopefully) going to be solved by guest_memfd in the
-future. I'm hoping in the future guest_memfd will be able to allocate
-from a suitable allocator (e.g. hugetlbfs) *AND* it allow mmap() of
-pages which are transitioned to shared. The VMM can then provide the
-same physical pages for use in the shared region as were originally
-provided in the protected region. This means a share/unshare sequence
-can get back to a situation where a huge page can once again be used in
-the guest's stage 2 (RTTs in RMM speak).
-
-Without a solution to issue 2 then it's hard for the VMM to get hold of
-memory which is suitably contiguous/aligned and deal with the guest
-potentially wanting to share any portion of it.
-
-When the mmap() support that Fuad has been working on lands it might be
-worth revisiting for an opportunistic support for huge pages. But we
-really also need the integration with a suitable huge page allocator for
-it to work well (i.e. guest_memfd supporting larger page sizes natively).
+Yes this is my understanding of the main impact. I'm not sure how useful
+(shared) ROM/flash emulation is. It can certainly be added in the future
+if needed. Protected read-only memory I don't believe is useful - the
+only sane response I can see from a write fault in that case is killing
+the guest.
 
 Thanks,
 Steve
 
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 994e71cfb358..8c656a0ef4e9 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1641,6 +1641,10 @@ static int user_mem_abort(struct kvm_vcpu
->> *vcpu, phys_addr_t fault_ipa,
->>       if (logging_active || is_protected_kvm_enabled()) {
->>           force_pte = true;
->>           vma_shift = PAGE_SHIFT;
->> +    } else if (vcpu_is_rec(vcpu)) {
->> +        // Force PTE level mappings for realms
->> +        force_pte = true;
->> +        vma_shift = PAGE_SHIFT;
->>       } else {
->>           vma_shift = get_vma_page_shift(vma, hva);
->>       }
+> QEMU
+> ====
+> rom_add_blob
+>   rom_set_mr
+>     memory_region_set_readonly
+>       memory_region_transaction_commit
+>         kvm_region_commit
+>           kvm_set_phys_mem
+>             kvm_mem_flags                                    // flag
+> KVM_MEM_READONLY is missed
+>             kvm_set_user_memory_region
+>               kvm_vm_ioctl(KVM_SET_USER_MEMORY_REGION2)
+> 
+> non-secure host
+> ===============
+> rec_exit_sync_dabt
+>   kvm_handle_guest_abort
+>     user_mem_abort
+>       __kvm_faultin_pfn                       // writable == true
+>         realm_map_ipa
+>           WARN_ON(!(prot & KVM_PGTABLE_PROT_W)
+> 
+> non-secure host
+> ===============
+> kvm_realm_enable_cap(KVM_CAP_ARM_RME_POPULATE_REALM)
+>   kvm_populate_realm
+>     __kvm_faultin_pfn                      // writable == true
+>       realm_create_protected_data_page
+> 
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 1f3674e95f03..0f1d65f87e2b 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -348,7 +348,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>       case KVM_CAP_ONE_REG:
+>>       case KVM_CAP_ARM_PSCI:
+>>       case KVM_CAP_ARM_PSCI_0_2:
+>> -    case KVM_CAP_READONLY_MEM:
+>>       case KVM_CAP_MP_STATE:
+>>       case KVM_CAP_IMMEDIATE_EXIT:
+>>       case KVM_CAP_VCPU_EVENTS:
+>> @@ -362,6 +361,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>       case KVM_CAP_COUNTER_OFFSET:
+>>           r = 1;
+>>           break;
+>> +    case KVM_CAP_READONLY_MEM:
+>>       case KVM_CAP_SET_GUEST_DEBUG:
+>>           r = !kvm_is_realm(kvm);
+>>           break;
 > 
 > Thanks,
 > Gavin
