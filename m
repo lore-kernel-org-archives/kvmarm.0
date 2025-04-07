@@ -1,126 +1,121 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84602236F3
-	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 05:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9420520F087
+	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 08:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744004153; cv=none; b=SXdA3cbW+99rqcL/DjqT22dEBJuwWFOQXHblQwvVxhgRWAeZ3J91B4mEJJzO8H3I2HwAtdVzqUbNU86Jq0QfPvoLURkJedtHJtfRdk1eFzZeXQDPgwooeVRYE9JZLZLCDJmcOVKYDFuzo/6Ptdyb/msE0R3EAeAA0tYpwClWJgs=
+	t=1744014454; cv=none; b=F5/CNswTyJCqdeEmErDv4uCbeIW6N7irKbrBpm4Ht9VRmP54JD701WWmIKDdprud4f7TLE/vLkAMuQdNnVjglGUSmFB+owG9HFlfrLXY03m7vJVd5QUqc6kAhbZUVtLNINt1xoAoUqAWRePCh+TLLTM3dz7j6FdSpqpLha4w3Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744004153; c=relaxed/simple;
-	bh=GdhxnSjy0DInCZdHnnjNeLTcrqCu8hav/hskR37tAW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qyK2IXXIPHKytjXey7KmGSVjETtO9YgSGMgXKxlP+RFQ69U6TIZjvnuqxl3ASTMTtLbXLuT86RpNOZzDXPF7QSIlMltI5RSV+i/dqWh2n7avHXKUmfbR0r+E4ruNUIPa0u2iqBXEoLBWVZv8V2yZ0syzz9bBT7c9jZQVFF/RQhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ho0knh0x; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1744014454; c=relaxed/simple;
+	bh=ZiNq+60xXrp7X+NoT2r6vcJeIPt+ez0IAmeaMobsOWk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uV14iOaw+J9Mr2h7vAyYoaQhgjrj/o+M9mcWgTz3vOSQ900RJtFtFm1r5OnPCxmOIwzMEJGT3V5VOFAAJ1xTAPX1L7Jp/eC2y2FRJw/hnuJgyhxNhuUlHS+Qrp0ehYgJmyZstDUDlwfk7uCjGp+fdztRIiOrue4H+kNn2kycwMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ENRVLOvg; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ho0knh0x"
-Date: Sun, 6 Apr 2025 22:35:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744004138;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RNfyjJ36NwMo27wB3yA4lOZ9U2Fsk9+3dltOkC7RDUE=;
-	b=Ho0knh0xTy/U6S07jKpiwc1tvurITGV4mcne2YhLXL2Rn6cx3FnLTTNaMt27AwnJgeBq6H
-	+TzMKPCaBi/Ke6MgVhhKc9uyOD2BPbMMn3jOQSa5bxoveD0Tb0fYKCBa4KW7K9ohcrUd6O
-	D3h0nI+wvSMyFHJP3zSreSgpZecBsKA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Yicong Yang <yangyicong@huawei.com>
-Cc: yangyicong@hisilicon.com, catalin.marinas@arm.com, will@kernel.org,
-	maz@kernel.org, corbet@lwn.net,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	shuah@kernel.org, jonathan.cameron@huawei.com,
-	shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com,
-	prime.zeng@hisilicon.com, xuwei5@huawei.com,
-	tangchengchang@huawei.com
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Handle DABT caused by LS64*
- instructions on unsupported memory
-Message-ID: <Z_NkHWStDJLo0cmY@linux.dev>
-References: <20250331094320.35226-1-yangyicong@huawei.com>
- <20250331094320.35226-7-yangyicong@huawei.com>
- <Z-wQuJAefT3xNipl@linux.dev>
- <e9674079-9a22-c3cd-3b00-5989f6926303@huawei.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ENRVLOvg"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43d08915f61so22354895e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 07 Apr 2025 01:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744014451; x=1744619251; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fD9COX0Pw17byuPpjCb5FZ4ylgjxa+BidJzcsVb88Zc=;
+        b=ENRVLOvgHnin0VLTIo//Qg0yFKcKfadwlCv2K0DbgqASi9/MdLIY85N/QjrNKJXhij
+         b/5rmtKUhWVEsPR2424Mh0pog1TvvMOlFjvHm7iCaf0jPdA5kWhTsiWJdrp/sV1vA3MS
+         mvjWhnZWL74Q+AQw1SXu0iV3a9qurae+KyXmNJwjOQAn7cuauFfzejBh29BRMsGUfDdA
+         GBiZvPUoYhmNhNtlVhRWiCLSXIrWdW1eKeNDsrtw8bkhweZrQtFYclGwODKt67vaoSkO
+         36/Qyq3148Ygpj0biarx0JVNNrJgpKFvAoPQQedmGiCbly41nZH6qP7soVMLbmC2/ipl
+         gHYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744014451; x=1744619251;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fD9COX0Pw17byuPpjCb5FZ4ylgjxa+BidJzcsVb88Zc=;
+        b=NkjPMOIsWDyKNR4rXUEGQiSiN1sdTR5n48jnYYArolDhPK1y7FCNClZxyZs6zNCHWc
+         Zr7kK0rwK8PXEo5Xd3uuC5IG04kDbDoLuKoXaa6vcMpGBsggqtvYeKjEZUnbZiBwpb3D
+         y+PZR9JXinh9FLiEiFPVDdJJxrkaLgVlI4ZVOQls/KDdh5KEWiRGPWJCHhQwG8/E59SH
+         0Fo8dRzQ3/Qtktvisgxs9vUNRgpmocObr94MzCwF0JRR2tqw7XIxgtZ/pJBpKESyOiF0
+         xqExpBx5FLFiDZ5chOlm9lEpVOmc/vFLCgosQlSBOHfXNrzF2KVrJszYUp0U/QqJAdRV
+         2RnA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUyDlxSjpeeBi4vpWRXrw4XlA1xgy9+ZTpLUyxMIXRGmy23h9tNQjAqbiIOWp09/gDIcA54fs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyciDln3cJiLIiMCDb7zWsuaF5+qCO9Nozhd+hJkcMAwe3xqKmg
+	IKNMD1a5PbWHGI86jOYgFcTl7Kh8f+lEGZY807CccTUJBwQZN7KfoU9V78nP5JuMZK5fR1HzrIy
+	2yNpVR+mAcnNT/cxYKg==
+X-Google-Smtp-Source: AGHT+IGUzsg+5YsqZ1PEyJ2fXUi6r6QPStOWt82YjAv0VQSmQXRC8ZoIubECZXRmtlKWgqNSo2X0aPxjJEzjFARt
+X-Received: from wmcn5.prod.google.com ([2002:a05:600c:c0c5:b0:43c:ec4d:6037])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:46cb:b0:434:fa55:eb56 with SMTP id 5b1f17b1804b1-43ed0b5e180mr92911905e9.7.1744014451027;
+ Mon, 07 Apr 2025 01:27:31 -0700 (PDT)
+Date: Mon,  7 Apr 2025 09:26:57 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e9674079-9a22-c3cd-3b00-5989f6926303@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
+Message-ID: <20250407082706.1239603-1-vdonnefort@google.com>
+Subject: [PATCH v3 0/9] Stage-2 huge mappings for pKVM np-guests
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 07, 2025 at 11:33:01AM +0800, Yicong Yang wrote:
-> On 2025/4/2 0:13, Oliver Upton wrote:
-> > On Mon, Mar 31, 2025 at 05:43:20PM +0800, Yicong Yang wrote:
-> >> @@ -1658,6 +1658,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > Keep in mind that data aborts with DFSC == 0x35 can happen for a lot
-> > more than LS64 instructions, e.g. an atomic on a Device-* mapping.
-> > 
-> 
-> got it. 0x35 should be caused by LS64* or IMPLEMENTATION DEFINED fault, but no
-> further hint to distinguish between these two faults. hope it's also the right
-> behaviour to inject a DABT back for the latter case.
+Hi all,
 
-There isn't exactly a 'right' behavior here. The abort could either be
-due to a bug in the guest (doing an access on something knows it can't)
-or the VMM creating / describing the IPA memory map incorrectly.
+This series adds support for stage-2 huge mappings (PMD_SIZE) to pKVM
+np-guests, that is installing PMD-level mappings in the stage-2,
+whenever the stage-1 is backed by either Hugetlbfs or THPs.
 
-Since KVM can't really work out who's to blame in this situation we should
-probably exit to userspace + provide a way to reinject the abort.
+The last patch of that series is an optimization for CMOs using a shared
+PMD_SIZE fixmap.
 
-> >> @@ -1919,6 +1939,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >>  			goto out_unlock;
-> >>  		}
-> >>  
-> >> +		/*
-> >> +		 * If instructions of FEAT_{LS64, LS64_V} operated on
-> >> +		 * unsupported memory regions, a DABT for unsupported
-> >> +		 * Exclusive or atomic access is generated. It's
-> >> +		 * implementation defined whether the exception will
-> >> +		 * be taken to, a stage-1 DABT or the final enabled
-> >> +		 * stage of translation (stage-2 in this case as we
-> >> +		 * hit here). Inject a DABT to the guest to handle it
-> >> +		 * if it's implemented as a stage-2 DABT.
-> >> +		 */
-> >> +		if (esr_fsc_is_excl_atomic_fault(esr)) {
-> >> +			kvm_inject_dabt_excl_atomic(vcpu, kvm_vcpu_get_hfar(vcpu));
-> >> +			return 1;
-> >> +		}
-> >> +
-> > 
-> > A precondition of taking such a data abort is having a valid mapping at
-> > stage-2. If KVM can't resolve the HVA of the fault then there couldn't
-> > have been a stage-2 mapping.
-> > 
-> 
-> Here's handling the case for emulated mmio, I thought there's no valid stage-2 mapping
-> for the emulated MMIO? so this check is put just before entering io_mem_abort(). should
-> it be put into io_mem_abort() or we just don't handle the emulated case?
+Changes since v2 https://lore.kernel.org/all/20250306110038.3733649-1-vdonnefort@google.com/
 
-Right -- there's no valid stage-2 translation for _most_ MMIO. If KVM
-cannot find an HVA for the fault (look at the condition that gets us
-here) then we know there isn't a stage-2 mapping. How would we know what
-to map?
+  - Fix PUD_SIZE -> PMD_SIZE enforcement (Quentin)
+  - Rework pkvm_host_share_guest() to remove one hyp_page walk (Quentin)
+  - Remove one pgtable walk into __check_host_shared_guest() (Quentin)
+  - Return EBUSY on host_share_guest_count overflow
 
-In that case I would expect to take a Translation fault with instruction
-syndrome that can can be used to construct an exit to the VMM. Marc had
-some patches on list to do exactly that [*].
+Changes since v1 https://lore.kernel.org/all/20250228102530.1229089-1-vdonnefort@google.com/
 
-However, after reading this again there's a rather ugly catch. The KVM
-ABI has it that writes to a RO memlot generate an MMIO exit, so it *is*
-possible to get here w/ a stage-2 mapping. Unfortunately there's no
-instruction syndrome with DFSC = 0x35 so no way to decode the access.
+  - WARN_ON() on !PAGE_ALIGNED size for guest CMOs (Quentin)
+  - check_range_allowed_memory() before accessing the Vmemmap (Quentin)
 
-This is starting to sound similar an nISV MMIO abort...
+Quentin Perret (2):
+  KVM: arm64: Convert pkvm_mappings to interval tree
+  KVM: arm64: Add a range to pkvm_mappings
 
-[*]: https://lore.kernel.org/kvmarm/20240815125959.2097734-1-maz@kernel.org/
+Vincent Donnefort (7):
+  KVM: arm64: Handle huge mappings for np-guest CMOs
+  KVM: arm64: Add a range to __pkvm_host_share_guest()
+  KVM: arm64: Add a range to __pkvm_host_unshare_guest()
+  KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
+  KVM: arm64: Add a range to __pkvm_host_test_clear_young_guest()
+  KVM: arm64: Stage-2 huge mappings for np-guests
+  KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
 
-Thanks,
-Oliver
+ arch/arm64/include/asm/kvm_pgtable.h          |   7 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |   2 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  16 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 224 +++++++++++++-----
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  86 ++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   2 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |   6 -
+ arch/arm64/kvm/mmu.c                          |   5 +-
+ arch/arm64/kvm/pkvm.c                         | 129 +++++-----
+ 11 files changed, 330 insertions(+), 159 deletions(-)
+
+
+base-commit: e48e99b6edf41c69c5528aa7ffb2daf3c59ee105
+-- 
+2.49.0.504.g3bcea36a83-goog
+
