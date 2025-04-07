@@ -1,507 +1,106 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE62158D80
-	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 15:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17261FA177
+	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 15:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744038287; cv=none; b=igjX+TuZ5FsqCkX2kSv2zHaM9DuYo6KsZg/oJR3pXVn3tlNGSflMiWoqvO8WHFWnnJSr6J5Xg0t1Io3jwThd0lYYcUf4up9muh2P4AEQ7wuLQ/dxwwACQLe9cyxERUnHH4xzcdSMG2UiQQOGn59f4xClBXu9hn3W3DDL8IYO2AU=
+	t=1744039213; cv=none; b=j9ZPcrIZOEskYOaSwzhBSiNoYYDcnEJ8vmI5yj/TvYKk5DfUH2roHSQmUugPxfTdm4XH69sHoD1b10uaXMWYwUproisqSMwVEwcr4D9ZrvYpNxHzPbZXmiH4nH5seO1Ezqx0LYlxzcyme4esD0IcTr6pnSxNcqIfV6mS6/vK9KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744038287; c=relaxed/simple;
-	bh=si/HAeASKMwVMe4jysDMPvylshFfyJJu+MA6s1Nfta0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+WyODxwi91fm5rahYB0YOlaOIUXR1tq+AQ2mEHnRn+494ONiGmvsmzQ7A5Rn2MT0v++wh9Mro/LyXmf6mUtNQtOGgLweZb84AEjdQ+FHqz40lpV7Gov4Syv80VXzoR8k9O/X0fg0bZvGAxQbODf73hNndo/mWRlau1CMUbmjew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=VlsqJ07m; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+	s=arc-20240116; t=1744039213; c=relaxed/simple;
+	bh=u/+KVCI1VmXvlYSWB0tmccv0ERLAgE83Zf8S0Xrnhz0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bGgPz4dJIRuCeWZTfI2mQgcewXO1ifeUwO4qBCmwIZgoNej1ryHVg280fukvZsoc+q/azFc5vUTBj1AJUeaHyChemSWmZN+hGiNNRw1IfYHAmVMqywlhkr5q2h6MPyUgcUiZZPGEI6Ui394W+uzNj+sCMGtIGGKyFWKgOxfYELs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ju1R6sum; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="VlsqJ07m"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-227aaa82fafso37824175ad.2
-        for <kvmarm@lists.linux.dev>; Mon, 07 Apr 2025 08:04:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ju1R6sum"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b00aa1f50d1so148409a12.3
+        for <kvmarm@lists.linux.dev>; Mon, 07 Apr 2025 08:20:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1744038283; x=1744643083; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I9kdmTO4tcqMNv0b+m3Ev3puZ8xn/klk3TOQNZ1xzZQ=;
-        b=VlsqJ07m+amWFPNoQHN9ckwskXQnP65/FH1Bpf1urjWxFzl2NMhV5L53qT4G7C7a1/
-         CJFf6pQIWvRRGQVKhc5up5+ylGxjyU7f3ds/H7Keo7EpyYiGTtcXRkfEKagGm1YH+ewX
-         keDMxckec5/hbw5gTwCdmxE84xqNNIgs/7AVPPR2vxO213kozuHUTNKHau5H033Si2h2
-         b44NU04DnDpm9AZWb8Jnfl4q7NLmlQ0EJYSuyGCuCiaOI7oqMUruXhRNUdoG2ghMkJhJ
-         gBI2nGe0ViMVPbyrzouo1mhCutf36YHdCyD4x+VG/y4zxgZURWxAwUqSRNzDR7NyaH9F
-         kFdA==
+        d=google.com; s=20230601; t=1744039211; x=1744644011; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JTNpEax445O2ynSr3XUTtKC9NAWm3dqDTuE2ry3Vens=;
+        b=Ju1R6sumKCOdkHCfxv4b6oew+FyJ1+i1ZV71nWqmJEGFjCOShiWVkZjwqa8G/nrOQk
+         bf1vQPn5Jym6KhVvXGKUsb+JUP3FrHd2E4TBWZIotjAOV3U4MMIZ+EvON7NMjG3TNV2V
+         MH34MEfLXwWE/pdtdClr7Y7LYO8D79DKWY0THqjFlwwW5N0sfmaygSx9KS4WBaXoH0YU
+         HIZff3kXNCkSIriQwIKiEGNEygFq4sonKNtrYl9ai1rqKvTRhwKNy8uNTRCCNeB37EsI
+         gTyR495xJIJ6CwByXeg8D5Hmp+lrzFDZDt4KpxbOojlFCRfNI9bhReG97Z76L6tpMMQX
+         fdBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744038283; x=1744643083;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I9kdmTO4tcqMNv0b+m3Ev3puZ8xn/klk3TOQNZ1xzZQ=;
-        b=m0vi7V0rr8JyFCUtcI7hDCjUV+G/D12GSC+Cs5dzRbOSJ0Zegth9eFG84y0VnS7E2M
-         EPW6Lm/ow1h8tlqgziC1Q5fwx+8TmE9roMMYusA23/9nlfOStJHKU3hMrftZLf4Hp7dc
-         f4F4QWEMAhCSAppNUJeI+c6oApUw9gDPad7MKOtDPlt+eaLY7Ibujvw56f9l+Yj9ZRm/
-         b2IVGz873wUedFVWW06lkxSrMcFSpFqTgM2dSY8CFUoW2XgaCoZtkVQ7e6jTh0eQOSqn
-         OnzpjKjn6QuOoJ2YxwealygoLhuuQk/uzSoMMEF8nPEfNI1IdfV9ukyasfoTjJz+MReu
-         KfGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQpqf+fpfwf09pl6IQ0gUnDn3NKCsuHz1pfsbniSTg9iht6kAxUR/E559rONs+hJuQ1Kjaqlg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyuELdfXHhBT7Mx2tPu0n88Mugm12mgAFmycg2TQRvt89tKmzQz
-	2Xont8cPaIcwrrfSE4W1cV1p+/r7uLC1FLYcbU3JKI50eN5oqv1B1XPsmh9QVQwpRJq+98KEWVv
-	vvKRDJL0QbMsqKrSfY7cqf67Of/Qhzihzrw7WpqJS6D6WHGs=
-X-Gm-Gg: ASbGncslUjhg66bJZPI2bMRhXg0nEKc3Bp4mz2lD5dfHt4EodUnvv8rI5zXlUuWUJ+3
-	IxniXN4mu50r1kT1UyMFKEV9WLfJ4bmaGKAXBwxmf1Q7HxzmEhIQbUnEtA5iuIiwr5uuykvGWuU
-	71VaUCpoPvBPhpp/AeKOEUP0HdFC9SH0m9eUMLMcXOqL0/nQ+mRn1+PUaVLbDUP25Vn/XpQuIQW
-	+PmA7ffc2ip/nzRzUi8M1Ucr5JuaqJoh0hqg56kUwGj3SPH3ADjZn8H9F3QaL3snrXsjqt5kMUy
-	89nofuJGp4fFYgjOg18OOibhiKWPz21CS0X91F0WhbEm0uW4JU8WYKbJsuFoGtQARCVi4BWxbPO
-	VLmtt
-X-Google-Smtp-Source: AGHT+IH2oVXyQ3zs/hUIZ8h7pbZlqmcCBM70vrTswgR9PuCbdJMakAfyi957MMSEaZ9tPm8qDM8Oug==
-X-Received: by 2002:a17:902:ef10:b0:216:53fa:634f with SMTP id d9443c01a7336-22a8a1d4617mr200860295ad.48.1744038282789;
-        Mon, 07 Apr 2025 08:04:42 -0700 (PDT)
-Received: from zenbook (1-162-87-224.dynamic-ip.hinet.net. [1.162.87.224])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229787778efsm81770435ad.259.2025.04.07.08.04.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 08:04:42 -0700 (PDT)
-Date: Mon, 7 Apr 2025 23:06:23 +0800
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, r09922117@csie.ntu.edu.tw
-Subject: Re: [PATCH v7 12/45] arm64: RME: Allocate/free RECs to match vCPUs
-Message-ID: <omfhugkuqmbvijitmlq2tluspjhsh43d32ecvr5uubnnhukapk@up6i7g4nbovb>
-References: <20250213161426.102987-1-steven.price@arm.com>
- <20250213161426.102987-13-steven.price@arm.com>
+        d=1e100.net; s=20230601; t=1744039211; x=1744644011;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JTNpEax445O2ynSr3XUTtKC9NAWm3dqDTuE2ry3Vens=;
+        b=qIHslQsZEDEeRjG7lt+8kA+l50mXj+9HHj5hJthKy49IfvPRLyaoyl5hCfkWYDzYYh
+         tPinxhabUN3KBjmvNs7rUPcmMurmY4fb0wwa9Bzs/o+8nt/53PL7L3KsHB7mkAOvMUWg
+         LjFejYj7ib8Lq+di6VJSTXc52z2PfgtfNBN+HGOwIwl2Mg/3HtmxqABC2ydVD74kYw5R
+         IAgFc6JuQwMUa0BYUiY8lT3BcdZMOpX01K07VWyVls4t3Wbtb+RUsuJRAZNrmkrhTRfv
+         TXj4ATsvX/MOfIn8rBjop5AO5603xjqvZhltWendhyNpL7Hs5WmSZlRaPoJblV1WwHQw
+         SXDw==
+X-Forwarded-Encrypted: i=1; AJvYcCW0NwgBoIxdMTakFILypwxBEWblqW7VzoklS3MqjnQeAaNIZnSyUgkEn4odIbCJotdzini+RG0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwcrLFIJuZowxxyQvL+0jGoIPHZxvS7/ziTE+dSyW5UjVFybBiL
+	KPrhclJ08uaIKus3eXSBKlRRvFTVBm+/GFRABOEpBqdowezm/n334eSCABiD26+jJrocBMeWiJ/
+	7VQ==
+X-Google-Smtp-Source: AGHT+IHFT5IWpb0wEWYBsgf38l3iAGlVDr2qHVuyYE70TQA84d8Gl7Htq0vtNTpBGTTuOvXXCqA42VAV2Ds=
+X-Received: from pfbhg1.prod.google.com ([2002:a05:6a00:8601:b0:736:3d80:706e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3bc8:b0:223:5124:a16e
+ with SMTP id d9443c01a7336-22a8a048ffamr208407455ad.5.1744039210859; Mon, 07
+ Apr 2025 08:20:10 -0700 (PDT)
+Date: Mon, 7 Apr 2025 08:20:09 -0700
+In-Reply-To: <20250331145643.GF10839@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213161426.102987-13-steven.price@arm.com>
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+Mime-Version: 1.0
+References: <Z9sItt8BIgvbBY8M@arm.com> <20250319192246.GQ9311@nvidia.com>
+ <Z9s7r2JocpoM_t-m@arm.com> <SA1PR12MB7199C7BD48EB39F536DD34DBB0A62@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <Z-QU7qJOf8sEA5R8@google.com> <86y0wrlrxt.wl-maz@kernel.org>
+ <Z-QnBcE1TKPChQay@google.com> <86wmcbllg2.wl-maz@kernel.org>
+ <Z-RGYO3QVj5JNjRB@google.com> <20250331145643.GF10839@nvidia.com>
+Message-ID: <Z_PtKWnMPzwPb4sp@google.com>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+From: Sean Christopherson <seanjc@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Marc Zyngier <maz@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "will@kernel.org" <will@kernel.org>, 
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "shahuang@redhat.com" <shahuang@redhat.com>, 
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "david@redhat.com" <david@redhat.com>, 
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, 
+	Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, 
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, 
+	Alistair Popple <apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, 
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>, Uday Dhoke <udhoke@nvidia.com>, 
+	Dheeraj Nigam <dnigam@nvidia.com>, Krishnakant Jaju <kjaju@nvidia.com>, 
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, 
+	"sebastianene@google.com" <sebastianene@google.com>, "coltonlewis@google.com" <coltonlewis@google.com>, 
+	"kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, 
+	"ardb@kernel.org" <ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"gshan@redhat.com" <gshan@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"ddutile@redhat.com" <ddutile@redhat.com>, "tabba@google.com" <tabba@google.com>, 
+	"qperret@google.com" <qperret@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Steven,
-
-On Thu, Feb 13, 2025 at 04:13:52PM +0000, Steven Price wrote:
-> The RMM maintains a data structure known as the Realm Execution Context
-> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
-> virtual CPUs. KVM must delegate memory and request the structures are
-> created when vCPUs are created, and suitably tear down on destruction.
+On Mon, Mar 31, 2025, Jason Gunthorpe wrote:
+> On Wed, Mar 26, 2025 at 11:24:32AM -0700, Sean Christopherson wrote:
+> > > I don't know how you reconcile the lack of host mapping and cache
+> > > maintenance. The latter cannot take place without the former.
+> > 
+> > I assume cache maintenance only requires _a_ mapping to the physical memory.
+> > With guest_memfd, KVM has the pfn (which happens to always be struct page memory
+> > today), and so can establish a VA=>PA mapping as needed.
 > 
-> RECs must also be supplied with addition pages - auxiliary (or AUX)
-> granules - for storing the larger registers state (e.g. for SVE). The
-> number of AUX granules for a REC depends on the parameters with which
-> the Realm was created - the RMM makes this information available via the
-> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor (RD).
-> 
-> Note that only some of register state for the REC can be set by KVM, the
-> rest is defined by the RMM (zeroed). The register state then cannot be
-> changed by KVM after the REC is created (except when the guest
-> explicitly requests this e.g. by performing a PSCI call). The RMM also
-> requires that the VMM creates RECs in ascending order of the MPIDR.
-> 
-> See Realm Management Monitor specification (DEN0137) for more information:
-> https://developer.arm.com/documentation/den0137/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v6:
->  * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
->    realm guest.
->  * Support host page size being larger than RMM's granule size when
->    allocating/freeing aux granules.
-> Changes since v5:
->  * Separate the concept of vcpu_is_rec() and
->    kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
->    the indication that the VCPU is a REC.
-> Changes since v2:
->  * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |   7 ++
->  arch/arm64/include/asm/kvm_host.h    |   3 +
->  arch/arm64/include/asm/kvm_rme.h     |  18 +++
->  arch/arm64/kvm/arm.c                 |  13 +-
->  arch/arm64/kvm/reset.c               |  11 ++
->  arch/arm64/kvm/rme.c                 | 179 +++++++++++++++++++++++++++
->  6 files changed, 229 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 909c5c3b7632..f7b5a78f2e91 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -711,7 +711,14 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
->  
->  static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->  {
-> +	if (static_branch_unlikely(&kvm_rme_is_available))
-> +		return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
->  	return false;
->  }
->  
-> +static inline bool kvm_arm_rec_finalized(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.rec.mpidr != INVALID_HWID;
-> +}
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 992eb2a6f56f..016d0685958d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -803,6 +803,9 @@ struct kvm_vcpu_arch {
->  
->  	/* Per-vcpu CCSIDR override or NULL */
->  	u32 *ccsidr;
-> +
-> +	/* Realm meta data */
-> +	struct realm_rec rec;
->  };
->  
->  /*
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index 698bb48a8ae1..5db377943db4 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -6,6 +6,7 @@
->  #ifndef __ASM_KVM_RME_H
->  #define __ASM_KVM_RME_H
->  
-> +#include <asm/rmi_smc.h>
->  #include <uapi/linux/kvm.h>
->  
->  /**
-> @@ -65,6 +66,21 @@ struct realm {
->  	unsigned int ia_bits;
->  };
->  
-> +/**
-> + * struct realm_rec - Additional per VCPU data for a Realm
-> + *
-> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
-> + * @rec_page: Kernel VA of the RMM's private page for this REC
-> + * @aux_pages: Additional pages private to the RMM for this REC
-> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
-> + */
-> +struct realm_rec {
-> +	unsigned long mpidr;
-> +	void *rec_page;
-> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
-> +	struct rec_run *run;
-> +};
-> +
->  void kvm_init_rme(void);
->  u32 kvm_realm_ipa_limit(void);
->  
-> @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->  int kvm_init_realm_vm(struct kvm *kvm);
->  void kvm_destroy_realm(struct kvm *kvm);
->  void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
-> +int kvm_create_rec(struct kvm_vcpu *vcpu);
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->  
->  static inline bool kvm_realm_is_private_address(struct realm *realm,
->  						unsigned long addr)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 917ee7c674f5..a6a3034a2f50 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -496,6 +496,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	/* Force users to call KVM_ARM_VCPU_INIT */
->  	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->  
-> +	vcpu->arch.rec.mpidr = INVALID_HWID;
-> +
->  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->  
->  	/* Set up the timer */
-> @@ -1433,7 +1435,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  	return -EINVAL;
->  }
->  
-> -static unsigned long system_supported_vcpu_features(void)
-> +static unsigned long system_supported_vcpu_features(struct kvm *kvm)
->  {
->  	unsigned long features = KVM_VCPU_VALID_FEATURES;
->  
-> @@ -1454,6 +1456,9 @@ static unsigned long system_supported_vcpu_features(void)
->  	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
->  		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
->  
-> +	if (!kvm_is_realm(kvm))
-> +		clear_bit(KVM_ARM_VCPU_REC, &features);
-> +
->  	return features;
->  }
->  
-> @@ -1471,7 +1476,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->  			return -ENOENT;
->  	}
->  
-> -	if (features & ~system_supported_vcpu_features())
-> +	if (features & ~system_supported_vcpu_features(vcpu->kvm))
->  		return -EINVAL;
->  
->  	/*
-> @@ -1493,6 +1498,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->  	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
->  		return -EINVAL;
->  
-> +	/* RME is incompatible with AArch32 */
-> +	if (test_bit(KVM_ARM_VCPU_REC, &features))
-> +		return -EINVAL;
-> +
->  	return 0;
->  }
->  
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 803e11b0dc8f..a6423ef20144 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -137,6 +137,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
->  			return -EPERM;
->  
->  		return kvm_vcpu_finalize_sve(vcpu);
-> +	case KVM_ARM_VCPU_REC:
-> +		if (!kvm_is_realm(vcpu->kvm) || !vcpu_is_rec(vcpu))
-> +			return -EINVAL;
-> +
-> +		return kvm_create_rec(vcpu);
->  	}
->  
->  	return -EINVAL;
-> @@ -147,6 +152,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
->  		return false;
->  
-> +	if (kvm_is_realm(vcpu->kvm) &&
-> +	    !(vcpu_is_rec(vcpu) && kvm_arm_rec_finalized(vcpu) &&
-> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
-> +		return false;
-> +
->  	return true;
->  }
->  
-> @@ -159,6 +169,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
->  	kfree(sve_state);
->  	kfree(vcpu->arch.ccsidr);
-> +	kvm_destroy_rec(vcpu);
->  }
->  
->  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index f5d79efee454..0aa1f29b0610 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -474,6 +474,185 @@ void kvm_destroy_realm(struct kvm *kvm)
->  	kvm_free_stage2_pgd(&kvm->arch.mmu);
->  }
->  
-> +static void free_rec_aux(struct page **aux_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	unsigned int i, j;
-> +	unsigned int page_count = 0;
-> +
-> +	for (i = 0; i < num_aux;) {
-> +		struct page *aux_page = aux_pages[page_count++];
-> +		phys_addr_t aux_page_phys = page_to_phys(aux_page);
-> +		bool undelegate_failed = false;
-> +
-> +		for (j = 0; j < PAGE_SIZE && i < num_aux; j += RMM_PAGE_SIZE) {
-> +			if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
-> +				undelegate_failed = true;
-> +			aux_page_phys += RMM_PAGE_SIZE;
-> +			i++;
-> +		}
-> +		if (!undelegate_failed)
-> +			__free_page(aux_page);
-> +	}
-> +}
-> +
+> This is why we are forcing FWB in this work, because we don't have a
+> VA mapping and KVM doesn't have the code to create one on demand.
 
-Just a small stylistic comment:
-I feel it can be slightly clearer if the double negative
-
-bool undelegate_failed = false;
-
-can be just:
-bool undelegate_succeeded = true;
-
-with the other true/false flipped, the if condition also won't need to be
-negated.
-
-Thanks,
-Wei-Lin Chang
-
-> +static int alloc_rec_aux(struct page **aux_pages,
-> +			 u64 *aux_phys_pages,
-> +			 unsigned int num_aux)
-> +{
-> +	struct page *aux_page;
-> +	int page_count = 0;
-> +	unsigned int i, j;
-> +	int ret;
-> +
-> +	for (i = 0; i < num_aux;) {
-> +		phys_addr_t aux_page_phys;
-> +
-> +		aux_page = alloc_page(GFP_KERNEL);
-> +		if (!aux_page) {
-> +			ret = -ENOMEM;
-> +			goto out_err;
-> +		}
-> +
-> +		aux_page_phys = page_to_phys(aux_page);
-> +		for (j = 0; j < PAGE_SIZE && i < num_aux; j += RMM_PAGE_SIZE) {
-> +			if (rmi_granule_delegate(aux_page_phys)) {
-> +				ret = -ENXIO;
-> +				goto err_undelegate;
-> +			}
-> +			aux_phys_pages[i++] = aux_page_phys;
-> +			aux_page_phys += RMM_PAGE_SIZE;
-> +		}
-> +		aux_pages[page_count++] = aux_page;
-> +	}
-> +
-> +	return 0;
-> +err_undelegate:
-> +	while (j > 0) {
-> +		j -= RMM_PAGE_SIZE;
-> +		i--;
-> +		if (WARN_ON(rmi_granule_undelegate(aux_phys_pages[i]))) {
-> +			/* Leak the page if the undelegate fails */
-> +			goto out_err;
-> +		}
-> +	}
-> +	__free_page(aux_page);
-> +out_err:
-> +	free_rec_aux(aux_pages, i);
-> +	return ret;
-> +}
-> +
-> +int kvm_create_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
-> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +	struct rec_params *params;
-> +	int r, i;
-> +
-> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
-> +		return -ENOENT;
-> +
-> +	if (rec->run)
-> +		return -EBUSY;
-> +
-> +	/*
-> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
-> +	 * flag covers v0.2 and onwards.
-> +	 */
-> +	if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_PSCI_0_2))
-> +		return -EINVAL;
-> +
-> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
-> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
-> +
-> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
-> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
-> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
-> +	if (!params || !rec->rec_page || !rec->run) {
-> +		r = -ENOMEM;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
-> +		params->gprs[i] = vcpu_regs->regs[i];
-> +
-> +	params->pc = vcpu_regs->pc;
-> +
-> +	if (vcpu->vcpu_id == 0)
-> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	if (rmi_granule_delegate(rec_page_phys)) {
-> +		r = -ENXIO;
-> +		goto out_free_pages;
-> +	}
-> +
-> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
-> +	if (r)
-> +		goto out_undelegate_rmm_rec;
-> +
-> +	params->num_rec_aux = realm->num_aux;
-> +	params->mpidr = mpidr;
-> +
-> +	if (rmi_rec_create(virt_to_phys(realm->rd),
-> +			   rec_page_phys,
-> +			   virt_to_phys(params))) {
-> +		r = -ENXIO;
-> +		goto out_free_rec_aux;
-> +	}
-> +
-> +	rec->mpidr = mpidr;
-> +
-> +	free_page((unsigned long)params);
-> +	return 0;
-> +
-> +out_free_rec_aux:
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +out_undelegate_rmm_rec:
-> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
-> +		rec->rec_page = NULL;
-> +out_free_pages:
-> +	free_page((unsigned long)rec->run);
-> +	free_page((unsigned long)rec->rec_page);
-> +	free_page((unsigned long)params);
-> +	return r;
-> +}
-> +
-> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	struct realm *realm = &vcpu->kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long rec_page_phys;
-> +
-> +	if (!vcpu_is_rec(vcpu))
-> +		return;
-> +
-> +	if (!rec->run) {
-> +		/* Nothing to do if the VCPU hasn't been finalized */
-> +		return;
-> +	}
-> +
-> +	free_page((unsigned long)rec->run);
-> +
-> +	rec_page_phys = virt_to_phys(rec->rec_page);
-> +
-> +	/*
-> +	 * The REC and any AUX pages cannot be reclaimed until the REC is
-> +	 * destroyed. So if the REC destroy fails then the REC page and any AUX
-> +	 * pages will be leaked.
-> +	 */
-> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-> +		return;
-> +
-> +	free_rec_aux(rec->aux_pages, realm->num_aux);
-> +
-> +	free_delegated_granule(rec_page_phys);
-> +}
-> +
->  int kvm_init_realm_vm(struct kvm *kvm)
->  {
->  	struct realm_params *params;
-> -- 
-> 2.43.0
-> 
+I don't follow.  As it exists today, guest_memfd doesn't touch the direct map,
+i.e. there's already a kernel mapping, KVM doesn't need to create one.
