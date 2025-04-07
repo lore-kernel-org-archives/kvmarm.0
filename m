@@ -1,79 +1,72 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E621537A7
-	for <kvmarm@lists.linux.dev>; Sun,  6 Apr 2025 18:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A488D212B05
+	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 03:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743963389; cv=none; b=Vp74VvC1oadUuwv2Rzae/YKm/de5ACSb8F+hnMsFDuA11CNz+t3OomhBKPs+N76epqsgW2GnhgirxBINEXUwvGMu/OG0+TqeAqTiOLDEcL8jNBs8q4KN/e8ghMDlKjCJixtrJNTESSBAtfPQkCRhybHHL0/HaZAP6Jh8YAEt1Fw=
+	t=1743997831; cv=none; b=XX677kTeShj6EagqZ+DGGEEp34Zt/VHNZBtYUvjJfW0B4tyndamtAKkq2XychRfIh9plk8qhN5GXSppRMRNSPy6H8ryB5ikSqy4cNuDIYwmxmc3+sejjI6HsmB3/geOJJBKo4UBcSJAVMhzxguIz7noXChoTX4bSczh2d6JYKd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743963389; c=relaxed/simple;
-	bh=ksoIiuj6A0MyclOiN9aSsulnJVmUzD7Lz9V6oyIGZ24=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Is4hSZYuGROk6EfLxKrOLS7OXPsmvJIjeYEyadm41s2Ml1amOuxTUO8VeBfAviA/iQ+Q8EdJkv5x8wSzBkshYlFWp0PXJEl9o+og3IhVhhA8etI/R0yLKlYOXeFy3heizv/z8Cvg0BeH+CjTSDkPscH5MQi53h6/Yt3+PxziKxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RI0HJfeh; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RI0HJfeh"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743963382;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S93UKdhObdvlpcU/FcRzIW0uhpMd7EvcOLuxG0UINpk=;
-	b=RI0HJfehh0GA78yb7DIYDAHCR7yGkWUf90gpLVs40PskfCgXEvxDu97Tm+0pBjoeRnmavN
-	9apFmBWXbLLTIV0I+lC094J0BbdCTA0vQoa5U2TBEO92dL2ag2NkKmYMp76R5cNnwIKCdL
-	hE4/vexq3n9ro30PqCJWSh6C/fbYcxI=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] KVM : selftests: arm64: Explicitly set the page attrs to Inner-Shareable
-Date: Sun,  6 Apr 2025 11:16:13 -0700
-Message-Id: <174396331752.3282387.4731776469161725499.b4-ty@linux.dev>
-In-Reply-To: <20250405001042.1470552-1-rananta@google.com>
-References: <20250405001042.1470552-1-rananta@google.com>
+	s=arc-20240116; t=1743997831; c=relaxed/simple;
+	bh=J0JV9o3uvSUkZOj02HE6iD1XPYSAmqALDCBrch3rG4g=;
+	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gtUCBYjbzQ9w1HTjyzimUU4Gr8QcG1N+Q20YzONzRB0qzL/RiCibiXIXO3me0Qg0qnzd+ooLrXOjYl2khbKc4R4TI9Sa6FeczAh+0NjrHIhgrYGfcrCR+hPXcDI85/ZnkhETm48uba5rDzvS21LJ2JLMwfMLGXz2f9KS132fm6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZWFBB5DwFz1R7g7;
+	Mon,  7 Apr 2025 11:31:46 +0800 (CST)
+Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3F2091A0188;
+	Mon,  7 Apr 2025 11:33:39 +0800 (CST)
+Received: from [10.67.121.177] (10.67.121.177) by
+ kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Mon, 7 Apr 2025 11:33:38 +0800
+CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<maz@kernel.org>, <corbet@lwn.net>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <shuah@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>
+Subject: Re: [PATCH v2 5/6] arm64: Add ESR.DFSC definition of unsupported
+ exclusive or atomic access
+To: Oliver Upton <oliver.upton@linux.dev>
+References: <20250331094320.35226-1-yangyicong@huawei.com>
+ <20250331094320.35226-6-yangyicong@huawei.com> <Z-wRGyMrz0Tqh0CO@linux.dev>
+From: Yicong Yang <yangyicong@huawei.com>
+Message-ID: <9bb31e71-aa2b-329d-0d76-112824eb69c9@huawei.com>
+Date: Mon, 7 Apr 2025 11:33:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+In-Reply-To: <Z-wRGyMrz0Tqh0CO@linux.dev>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemd200014.china.huawei.com (7.221.188.8)
 
-On Sat, 05 Apr 2025 00:10:40 +0000, Raghavendra Rao Ananta wrote:
-> The series fixes a conflict in memory attributes in some
-> implementations,
-> such as Neoverse-N3, that causes a data abort in guest EL1 with FSC
-> 0x35 (IMPLEMENTATION DEFINED fault (Unsupported Exclusive or Atomic
-> access)).
+On 2025/4/2 0:15, Oliver Upton wrote:
+> On Mon, Mar 31, 2025 at 05:43:19PM +0800, Yicong Yang wrote:
+>> From: Yicong Yang <yangyicong@hisilicon.com>
+>>
+>> 0x35 indicates IMPLEMENTATION DEFINED fault for Unsupported Exclusive or
+>> Atomic access. Add ESR_ELx_FSC definition and corresponding wrapper.
+>>
+>> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 > 
-> Patch-1 is a cleanup patch that replaces numbers (and comments) to
-> using proper macros for hardware configuration, such as registers and
-> page-table entries.
+> Just squash this into the next patch. Adding a helper w/o any user
+> usually isn't a good idea.
 > 
-> [...]
 
-I cleaned up the changelog on patch 2 per the discussion + added a note
-about the interaction with LPA2.
+sure, will squash this into the next patch.
 
-Applied to fixes, thanks!
+Thanks.
 
-[1/2] KVM: selftests: arm64: Introduce and use hardware-definition macros
-      https://git.kernel.org/kvmarm/kvmarm/c/d8d78398e550
-[2/2] KVM: selftests: arm64: Explicitly set the page attrs to Inner-Shareable
-      https://git.kernel.org/kvmarm/kvmarm/c/c8631ea59b65
-
---
-Best,
-Oliver
