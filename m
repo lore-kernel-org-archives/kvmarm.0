@@ -1,164 +1,76 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1FE1CB51F
-	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 20:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C007A2C9A
+	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 22:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744056830; cv=none; b=AHkQHeMTCEPxkKoCFOeBdmXQpS7UW9U2QetE1HL9Ys1uL04s2zmfKNc0ndTANs2V1UgCjzJqvQH1CsBchnLMUpLuaVQ230C/QwSWgkyReWsIfUB0KcSCszgnzFXkbDko42M0b4bp86AFqpoRlPQ6SpXkFJBolBxMT4D2WbP2gZI=
+	t=1744063682; cv=none; b=J/pgrN33NMrPV/XbHWHFABNlhG75U3u6GcDhk3IwKYr5POMvUtMvok+zU+7c6lGidBPtwrYZgP4hJ9KwVRGRslJhKeuN113k+nU6CmpZFksup4Oc8NkWwweKsYN6f39pTAoqJx3I7wwX3OVPnA7sotrrDcAYFPGL3bGoqgGWiSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744056830; c=relaxed/simple;
-	bh=SKdz72k2NkyXGdqtVsqW7yFxP3EnThWVkZ2UEaRCYAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T2kXP+XwhUIAei//Cznsvohx6R19Y8SCUKwmh/vAxjcrmQ6jl2f1KVw2K96GjxOstc5esxtZc/sR2DXVlR+fk5wfAy1saUwosZ9qbUhEwqqhg9McSPvAjbh0PbQJPwZc89pIUx7CRds1gbuas4tTFdN3eRwnoWExs2k0MU3XLwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=s0doI5BI; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1744063682; c=relaxed/simple;
+	bh=ic3Hi+piyleQea6qrT8lr7zrtZ7cudpB2fvAT4DtmiA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qwM3SmKqfFTDbR9+lVagZF98YgOZI6N4wNdiqsTMn1D1/LczZ7GhK7G2mBgyVZGDpfWBm+8ovqFJ8lUcy1/qOvuWYqvCJ3TvUv3aO6MvzZWV3b2VVRxEX2+lLOisz1xALlh0gTJHS0m6TxF4tpruQsWtUb1POV0PC57PGgLxX4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qfCRSOkM; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="s0doI5BI"
-Received: from romank-3650.corp.microsoft.com (unknown [131.107.160.188])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 1E9C82113E7D;
-	Mon,  7 Apr 2025 13:13:42 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1E9C82113E7D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1744056822;
-	bh=6NhcoKa6JL1NM9sMn3gmj98XuhFiqjkn7M2jrThtdQE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s0doI5BIqSvNh80G4PtEpPG/GcrIH+4KzmJAOUk4cNIarK7Qz7QqL7bK6hmnu9uJf
-	 vUAOcF6S2Chpd1S4F+Kl31SqdwT50lHmnLDhmgf1cFJuXB+MRXi0rUY08gduq48ZrJ
-	 oKPn1dnQodDme1eUILnPzUqDulODD1su5F/LKApQ=
-From: Roman Kisel <romank@linux.microsoft.com>
-To: arnd@arndb.de,
-	bhelgaas@google.com,
-	bp@alien8.de,
-	catalin.marinas@arm.com,
-	conor+dt@kernel.org,
-	dan.carpenter@linaro.org,
-	dave.hansen@linux.intel.com,
-	decui@microsoft.com,
-	haiyangz@microsoft.com,
-	hpa@zytor.com,
-	joey.gouly@arm.com,
-	krzk+dt@kernel.org,
-	kw@linux.com,
-	kys@microsoft.com,
-	lenb@kernel.org,
-	lpieralisi@kernel.org,
-	manivannan.sadhasivam@linaro.org,
-	mark.rutland@arm.com,
-	maz@kernel.org,
-	mingo@redhat.com,
-	oliver.upton@linux.dev,
-	rafael@kernel.org,
-	robh@kernel.org,
-	rafael.j.wysocki@intel.com,
-	ssengar@linux.microsoft.com,
-	sudeep.holla@arm.com,
-	suzuki.poulose@arm.com,
-	tglx@linutronix.de,
-	wei.liu@kernel.org,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	devicetree@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qfCRSOkM"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744063677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XnPScX/NAjyVz6+JEGr5QDMpo7liX3mFdulJgUNodLs=;
+	b=qfCRSOkMECNTiSrLqst2U3rlzfe1jESwhQJ4yfpXCZ7kgIBOOCZKxXYd7lketdl9vRpIyQ
+	qptnoNk3OvZowA8ktf//DR1AEXK0zeXSeuC92EtoimT9QW9LDkxIrSd8I3noDl6c2jxKmo
+	bN4WPHIoZKVMVfH99sMyjkJkbyJj7V0=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	x86@kernel.org
-Cc: apais@microsoft.com,
-	benhill@microsoft.com,
-	bperkins@microsoft.com,
-	sunilmut@microsoft.com
-Subject: [PATCH hyperv-next v7 10/11] ACPI: irq: Introduce acpi_get_gsi_dispatcher()
-Date: Mon,  7 Apr 2025 13:13:35 -0700
-Message-ID: <20250407201336.66913-11-romank@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250407201336.66913-1-romank@linux.microsoft.com>
-References: <20250407201336.66913-1-romank@linux.microsoft.com>
+	Sebastian Ene <sebastianene@google.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Use acquire/release to communicate FF-A version negotiation
+Date: Mon,  7 Apr 2025 15:07:46 -0700
+Message-Id: <174406364625.3332785.16419054127617723958.b4-ty@linux.dev>
+In-Reply-To: <20250407152755.1041-1-will@kernel.org>
+References: <20250407152755.1041-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Using acpi_irq_create_hierarchy() in the cases where the code
-also handles OF leads to code duplication as the ACPI subsystem
-doesn't provide means to compute the IRQ domain parent whereas
-the OF does.
+On Mon, 07 Apr 2025 16:27:55 +0100, Will Deacon wrote:
+> The pKVM FF-A proxy rejects FF-A requests other than FFA_VERSION until
+> version negotiation is complete, which is signalled by setting the
+> global 'has_version_negotiated' variable.
+> 
+> To avoid excessive locking, this variable is checked directly from
+> kvm_host_ffa_handler() in response to an FF-A call, but this can race
+> against another CPU performing the negotiation and potentially lead to
+> reading a torn value (incredibly unlikely for a 'bool') or problematic
+> re-ordering of the accesses to 'has_version_negotiated' and
+> 'hyp_ffa_version' whereby a stale version number could be read by
+> __do_ffa_mem_xfer().
+> 
+> [...]
 
-Introduce acpi_get_gsi_dispatcher() so that the drivers relying
-on both ACPI and OF may use irq_domain_create_hierarchy() in the
-common code paths.
+Applied to fixes, thanks!
 
-No functional changes.
+[1/1] KVM: arm64: Use acquire/release to communicate FF-A version negotiation
+      https://git.kernel.org/kvmarm/kvmarm/c/a344e258acb0
 
-Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
-Reviewed-by: Michael Kelley <mhklinux@outlook.com>
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
----
- drivers/acpi/irq.c   | 16 ++++++++++++++--
- include/linux/acpi.h |  5 ++++-
- 2 files changed, 18 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/acpi/irq.c b/drivers/acpi/irq.c
-index 1687483ff319..76a856c32c4d 100644
---- a/drivers/acpi/irq.c
-+++ b/drivers/acpi/irq.c
-@@ -12,7 +12,7 @@
- 
- enum acpi_irq_model_id acpi_irq_model;
- 
--static struct fwnode_handle *(*acpi_get_gsi_domain_id)(u32 gsi);
-+static acpi_gsi_domain_disp_fn acpi_get_gsi_domain_id;
- static u32 (*acpi_gsi_to_irq_fallback)(u32 gsi);
- 
- /**
-@@ -307,12 +307,24 @@ EXPORT_SYMBOL_GPL(acpi_irq_get);
-  *	for a given GSI
-  */
- void __init acpi_set_irq_model(enum acpi_irq_model_id model,
--			       struct fwnode_handle *(*fn)(u32))
-+			       acpi_gsi_domain_disp_fn fn)
- {
- 	acpi_irq_model = model;
- 	acpi_get_gsi_domain_id = fn;
- }
- 
-+/*
-+ * acpi_get_gsi_dispatcher() - Get the GSI dispatcher function
-+ *
-+ * Return the dispatcher function that computes the domain fwnode for
-+ * a given GSI.
-+ */
-+acpi_gsi_domain_disp_fn acpi_get_gsi_dispatcher(void)
-+{
-+	return acpi_get_gsi_domain_id;
-+}
-+EXPORT_SYMBOL_GPL(acpi_get_gsi_dispatcher);
-+
- /**
-  * acpi_set_gsi_to_irq_fallback - Register a GSI transfer
-  * callback to fallback to arch specified implementation.
-diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-index 4e495b29c640..1917044dea72 100644
---- a/include/linux/acpi.h
-+++ b/include/linux/acpi.h
-@@ -336,8 +336,11 @@ int acpi_register_gsi (struct device *dev, u32 gsi, int triggering, int polarity
- int acpi_gsi_to_irq (u32 gsi, unsigned int *irq);
- int acpi_isa_irq_to_gsi (unsigned isa_irq, u32 *gsi);
- 
-+typedef struct fwnode_handle *(*acpi_gsi_domain_disp_fn)(u32);
-+
- void acpi_set_irq_model(enum acpi_irq_model_id model,
--			struct fwnode_handle *(*)(u32));
-+			acpi_gsi_domain_disp_fn fn);
-+acpi_gsi_domain_disp_fn acpi_get_gsi_dispatcher(void);
- void acpi_set_gsi_to_irq_fallback(u32 (*)(u32));
- 
- struct irq_domain *acpi_irq_create_hierarchy(unsigned int flags,
--- 
-2.43.0
-
+--
+Best,
+Oliver
