@@ -1,106 +1,108 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17261FA177
-	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 15:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB1B1FF7DE
+	for <kvmarm@lists.linux.dev>; Mon,  7 Apr 2025 15:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744039213; cv=none; b=j9ZPcrIZOEskYOaSwzhBSiNoYYDcnEJ8vmI5yj/TvYKk5DfUH2roHSQmUugPxfTdm4XH69sHoD1b10uaXMWYwUproisqSMwVEwcr4D9ZrvYpNxHzPbZXmiH4nH5seO1Ezqx0LYlxzcyme4esD0IcTr6pnSxNcqIfV6mS6/vK9KQ=
+	t=1744039686; cv=none; b=K2nqhrAuynVKqF60mztxb5KsylSQ7v8N4S/kt2GHuBcpnBXaV2JbSdH9pbkBdgnzRMYQxWGPCDbGrzet9hFfrMiRawNDOzrLSxVpfTMflKLdfM81u1ViKK7QWI2kSew2q7QBjpHWWvApyjA9yIHr4K18gLWmlaAxYdNnMSXzoas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744039213; c=relaxed/simple;
-	bh=u/+KVCI1VmXvlYSWB0tmccv0ERLAgE83Zf8S0Xrnhz0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bGgPz4dJIRuCeWZTfI2mQgcewXO1ifeUwO4qBCmwIZgoNej1ryHVg280fukvZsoc+q/azFc5vUTBj1AJUeaHyChemSWmZN+hGiNNRw1IfYHAmVMqywlhkr5q2h6MPyUgcUiZZPGEI6Ui394W+uzNj+sCMGtIGGKyFWKgOxfYELs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ju1R6sum; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1744039686; c=relaxed/simple;
+	bh=n7AuZH2NV6e9SfuaGYDx0Zea6O4ejBD51YJlqGzjX5E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r+d+E3XRdcoTJvFO+YlGlLQQX7lXl6TxbjbACdOyALYFbfAkswQpv6uoN7SJg1W+m+PCNrYq2f9WRiZzqk6dZOW7SdLV9xeD/6n8Cx1Qg0+qgpKm/Mm5z8TCahckjb9md53PF8L+W1B0uPjJJ90jZ+oT1eszIKpaMxbG90ZUfGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LIs5oU82; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ju1R6sum"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b00aa1f50d1so148409a12.3
-        for <kvmarm@lists.linux.dev>; Mon, 07 Apr 2025 08:20:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744039211; x=1744644011; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTNpEax445O2ynSr3XUTtKC9NAWm3dqDTuE2ry3Vens=;
-        b=Ju1R6sumKCOdkHCfxv4b6oew+FyJ1+i1ZV71nWqmJEGFjCOShiWVkZjwqa8G/nrOQk
-         bf1vQPn5Jym6KhVvXGKUsb+JUP3FrHd2E4TBWZIotjAOV3U4MMIZ+EvON7NMjG3TNV2V
-         MH34MEfLXwWE/pdtdClr7Y7LYO8D79DKWY0THqjFlwwW5N0sfmaygSx9KS4WBaXoH0YU
-         HIZff3kXNCkSIriQwIKiEGNEygFq4sonKNtrYl9ai1rqKvTRhwKNy8uNTRCCNeB37EsI
-         gTyR495xJIJ6CwByXeg8D5Hmp+lrzFDZDt4KpxbOojlFCRfNI9bhReG97Z76L6tpMMQX
-         fdBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744039211; x=1744644011;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTNpEax445O2ynSr3XUTtKC9NAWm3dqDTuE2ry3Vens=;
-        b=qIHslQsZEDEeRjG7lt+8kA+l50mXj+9HHj5hJthKy49IfvPRLyaoyl5hCfkWYDzYYh
-         tPinxhabUN3KBjmvNs7rUPcmMurmY4fb0wwa9Bzs/o+8nt/53PL7L3KsHB7mkAOvMUWg
-         LjFejYj7ib8Lq+di6VJSTXc52z2PfgtfNBN+HGOwIwl2Mg/3HtmxqABC2ydVD74kYw5R
-         IAgFc6JuQwMUa0BYUiY8lT3BcdZMOpX01K07VWyVls4t3Wbtb+RUsuJRAZNrmkrhTRfv
-         TXj4ATsvX/MOfIn8rBjop5AO5603xjqvZhltWendhyNpL7Hs5WmSZlRaPoJblV1WwHQw
-         SXDw==
-X-Forwarded-Encrypted: i=1; AJvYcCW0NwgBoIxdMTakFILypwxBEWblqW7VzoklS3MqjnQeAaNIZnSyUgkEn4odIbCJotdzini+RG0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwcrLFIJuZowxxyQvL+0jGoIPHZxvS7/ziTE+dSyW5UjVFybBiL
-	KPrhclJ08uaIKus3eXSBKlRRvFTVBm+/GFRABOEpBqdowezm/n334eSCABiD26+jJrocBMeWiJ/
-	7VQ==
-X-Google-Smtp-Source: AGHT+IHFT5IWpb0wEWYBsgf38l3iAGlVDr2qHVuyYE70TQA84d8Gl7Htq0vtNTpBGTTuOvXXCqA42VAV2Ds=
-X-Received: from pfbhg1.prod.google.com ([2002:a05:6a00:8601:b0:736:3d80:706e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3bc8:b0:223:5124:a16e
- with SMTP id d9443c01a7336-22a8a048ffamr208407455ad.5.1744039210859; Mon, 07
- Apr 2025 08:20:10 -0700 (PDT)
-Date: Mon, 7 Apr 2025 08:20:09 -0700
-In-Reply-To: <20250331145643.GF10839@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LIs5oU82"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14125C4CEDD;
+	Mon,  7 Apr 2025 15:28:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744039685;
+	bh=n7AuZH2NV6e9SfuaGYDx0Zea6O4ejBD51YJlqGzjX5E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LIs5oU82hOs58k3V/F0QMcM04ENZ6yVikRFy1jxLY1jTdOufd3aXIKFo0MgeKqlpo
+	 ZRK6TMU2q+YnYppM0gLXQwDTZeinuRsnXL5oq6/jf32hYk7QrA1f1XGNZRAJ7yEFeY
+	 /8GqXLXOAs01PE5O6x3WY5rBI4eiBMdDEPyr1taI4Qceyjgx0u57xqQaNWsnqRCTxb
+	 OT7ROSjAHhkuH7/yWj4oAm2e1hsfXz1U3k3RSudbHlw+ZyIKkRV2Wid7cfQLQEVEDn
+	 7ijCDZjmqsJ0PDau9zDwrTsJ6NyT7vjH1cDuiGC1SoYDGzgGSJePAHEsSCzxVczYmK
+	 PEKYpHOf3NizA==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
+	Sebastian Ene <sebastianene@google.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>
+Subject: [PATCH] KVM: arm64: Use acquire/release to communicate FF-A version negotiation
+Date: Mon,  7 Apr 2025 16:27:55 +0100
+Message-Id: <20250407152755.1041-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <Z9sItt8BIgvbBY8M@arm.com> <20250319192246.GQ9311@nvidia.com>
- <Z9s7r2JocpoM_t-m@arm.com> <SA1PR12MB7199C7BD48EB39F536DD34DBB0A62@SA1PR12MB7199.namprd12.prod.outlook.com>
- <Z-QU7qJOf8sEA5R8@google.com> <86y0wrlrxt.wl-maz@kernel.org>
- <Z-QnBcE1TKPChQay@google.com> <86wmcbllg2.wl-maz@kernel.org>
- <Z-RGYO3QVj5JNjRB@google.com> <20250331145643.GF10839@nvidia.com>
-Message-ID: <Z_PtKWnMPzwPb4sp@google.com>
-Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Marc Zyngier <maz@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "will@kernel.org" <will@kernel.org>, 
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "shahuang@redhat.com" <shahuang@redhat.com>, 
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "david@redhat.com" <david@redhat.com>, 
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, 
-	Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, 
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, 
-	Alistair Popple <apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, 
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>, Uday Dhoke <udhoke@nvidia.com>, 
-	Dheeraj Nigam <dnigam@nvidia.com>, Krishnakant Jaju <kjaju@nvidia.com>, 
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, 
-	"sebastianene@google.com" <sebastianene@google.com>, "coltonlewis@google.com" <coltonlewis@google.com>, 
-	"kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"gshan@redhat.com" <gshan@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"ddutile@redhat.com" <ddutile@redhat.com>, "tabba@google.com" <tabba@google.com>, 
-	"qperret@google.com" <qperret@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 31, 2025, Jason Gunthorpe wrote:
-> On Wed, Mar 26, 2025 at 11:24:32AM -0700, Sean Christopherson wrote:
-> > > I don't know how you reconcile the lack of host mapping and cache
-> > > maintenance. The latter cannot take place without the former.
-> > 
-> > I assume cache maintenance only requires _a_ mapping to the physical memory.
-> > With guest_memfd, KVM has the pfn (which happens to always be struct page memory
-> > today), and so can establish a VA=>PA mapping as needed.
-> 
-> This is why we are forcing FWB in this work, because we don't have a
-> VA mapping and KVM doesn't have the code to create one on demand.
+The pKVM FF-A proxy rejects FF-A requests other than FFA_VERSION until
+version negotiation is complete, which is signalled by setting the
+global 'has_version_negotiated' variable.
 
-I don't follow.  As it exists today, guest_memfd doesn't touch the direct map,
-i.e. there's already a kernel mapping, KVM doesn't need to create one.
+To avoid excessive locking, this variable is checked directly from
+kvm_host_ffa_handler() in response to an FF-A call, but this can race
+against another CPU performing the negotiation and potentially lead to
+reading a torn value (incredibly unlikely for a 'bool') or problematic
+re-ordering of the accesses to 'has_version_negotiated' and
+'hyp_ffa_version' whereby a stale version number could be read by
+__do_ffa_mem_xfer().
+
+Use acquire/release primitives when writing 'has_version_negotiated'
+with the version lock held and when reading without the lock held.
+
+Cc: Sebastian Ene <sebastianene@google.com>
+Cc: Sudeep Holla <sudeep.holla@arm.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>
+Fixes: c9c012625e12 ("KVM: arm64: Trap FFA_VERSION host call in pKVM")
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+
+Found by code inspection rather than any real issue in practice.
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index e433dfab882a..3369dd0c4009 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -730,10 +730,10 @@ static void do_ffa_version(struct arm_smccc_res *res,
+ 		hyp_ffa_version = ffa_req_version;
+ 	}
+ 
+-	if (hyp_ffa_post_init())
++	if (hyp_ffa_post_init()) {
+ 		res->a0 = FFA_RET_NOT_SUPPORTED;
+-	else {
+-		has_version_negotiated = true;
++	} else {
++		smp_store_release(&has_version_negotiated, true);
+ 		res->a0 = hyp_ffa_version;
+ 	}
+ unlock:
+@@ -809,7 +809,8 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+ 	if (!is_ffa_call(func_id))
+ 		return false;
+ 
+-	if (!has_version_negotiated && func_id != FFA_VERSION) {
++	if (func_id != FFA_VERSION &&
++	    !smp_load_acquire(&has_version_negotiated)) {
+ 		ffa_to_smccc_error(&res, FFA_RET_INVALID_PARAMETERS);
+ 		goto out_handled;
+ 	}
+-- 
+2.49.0.504.g3bcea36a83-goog
+
