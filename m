@@ -1,154 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E19635979;
-	Tue,  8 Apr 2025 07:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F59263F43
+	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 08:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744096007; cv=none; b=I9LyKDYL10YTW235M8J+efPOXq7SYNbHcLGvEVBIwQrYqST+I4QqwoNVCPHVD++m0BiDQVj96ygy4r8GQb1Ymam3FzQVvwiP9c7sA8J/XajVjIku0XmMotmFAz1S+CWd4CWHhiPw3JnZpON8r+dGEzrcMwZjiVwTWqWS43tzlAY=
+	t=1744099905; cv=none; b=MkhA5zfiUmyPFOHxQb3fHrcQ08bXiQUw5GnUeDoDU570S/2uzhIab0q8u3yBTq9ziHGhBFvqTRuYOcm5izWn9Gi4NmJ8J1hGxCpkJK39qDAfDuLfVIsSVtS8ERHqk7shbrZ2BsSJTYIDY69Kir/ujfUibxxCTkUp8XeTpFjCm2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744096007; c=relaxed/simple;
-	bh=b4/HM8+SciHG286LvQnLgT/d3PAh2mnGk8+5TyFZWoU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U6wSqExhdJ2bVMT5SKOA3VbjgrtgNI56C7SgkG5bcKB3OuLmIr0NVk4s1YJhOdVxXohZl33DBuwFlAL00LXN9CFhUQQPSux341Bjr1OMzvuOoT9XmyNuCU99lAhD/hEcXTkFMD2LJ332b5PIFCPndwNCh0nVjbDSl2A/keO0UmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tuNiBJYi; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tuNiBJYi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4448C4CEE5;
-	Tue,  8 Apr 2025 07:06:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744096007;
-	bh=b4/HM8+SciHG286LvQnLgT/d3PAh2mnGk8+5TyFZWoU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tuNiBJYibWOt5+vSOcQ+JRLaGgZWDkwaR5g7lNtcFTYc0eXDRKe6tq4CFJoPxKpIt
-	 5zBNMaoK7dfKeOvGjJHcZC3SgfNhwMciKiHLr3Xj3tBZTIQAQriWeFzCef/7bg1+dE
-	 hyqgZvsEdCEEUnc8kb8ixxAmY0ceVaTbQ/FV/etjY5hzXxF4tmwW+1dePcWZiVahGl
-	 0JA6jU7oJiTCnEF5XrUfeiimXLagzfg43mKERJZSQ+zqZhgvK4Qk5R1p1r9X+bNtjt
-	 Kk9dCK73/RxRciBC9MdW/1HCWKw9hR/5lrex479hCJcM2sa/cq97vi7qhYhnbL+BmN
-	 nEcjjtUmDVjOg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u232h-003JRY-F2;
-	Tue, 08 Apr 2025 08:06:43 +0100
-Date: Tue, 08 Apr 2025 08:06:42 +0100
-Message-ID: <86semjku7x.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Roman Kisel <romank@linux.microsoft.com>
-Cc: arnd@arndb.de,
-	bhelgaas@google.com,
-	bp@alien8.de,
-	catalin.marinas@arm.com,
-	conor+dt@kernel.org,
-	dan.carpenter@linaro.org,
-	dave.hansen@linux.intel.com,
-	decui@microsoft.com,
-	haiyangz@microsoft.com,
-	hpa@zytor.com,
-	joey.gouly@arm.com,
-	krzk+dt@kernel.org,
-	kw@linux.com,
-	kys@microsoft.com,
-	lenb@kernel.org,
-	lpieralisi@kernel.org,
-	manivannan.sadhasivam@linaro.org,
-	mark.rutland@arm.com,
-	mingo@redhat.com,
-	oliver.upton@linux.dev,
-	rafael@kernel.org,
-	robh@kernel.org,
-	rafael.j.wysocki@intel.com,
-	ssengar@linux.microsoft.com,
-	sudeep.holla@arm.com,
-	suzuki.poulose@arm.com,
-	tglx@linutronix.de,
-	wei.liu@kernel.org,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	devicetree@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	x86@kernel.org,
-	apais@microsoft.com,
-	benhill@microsoft.com,
-	bperkins@microsoft.com,
-	sunilmut@microsoft.com
-Subject: Re: [PATCH hyperv-next v7 01/11] arm64: kvm, smccc: Introduce and use API for getting hypervisor UUID
-In-Reply-To: <20250407201336.66913-2-romank@linux.microsoft.com>
-References: <20250407201336.66913-1-romank@linux.microsoft.com>
-	<20250407201336.66913-2-romank@linux.microsoft.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1744099905; c=relaxed/simple;
+	bh=FxYoGDCd/cHFcZ2fsubOHjOGdK9XfaWuBq2wby33psQ=;
+	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=j1rgKzfZKqFrypNsl6MdJtEq/KVnLSF/37tRjtPfYxPX9hl5hdQQaK6Ehqg6IxSqzoMGFpTMlEmRFNMkuLKgivQr53cCBw1wTf0G8NRiGaGmBnFetnZOA+uS802OqwkEwCTn1Qe5e2b4NhKKUMXIYE/2jU1eNBCoBigFlnN8LB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZWzKq25m1z13LWd;
+	Tue,  8 Apr 2025 16:10:55 +0800 (CST)
+Received: from kwepemd200014.china.huawei.com (unknown [7.221.188.8])
+	by mail.maildlp.com (Postfix) with ESMTPS id C0DD51800E4;
+	Tue,  8 Apr 2025 16:11:34 +0800 (CST)
+Received: from [10.67.121.177] (10.67.121.177) by
+ kwepemd200014.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Tue, 8 Apr 2025 16:11:33 +0800
+CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<maz@kernel.org>, <corbet@lwn.net>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <shuah@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>
+Subject: Re: [PATCH v2 6/6] KVM: arm64: Handle DABT caused by LS64*
+ instructions on unsupported memory
+To: Oliver Upton <oliver.upton@linux.dev>
+References: <20250331094320.35226-1-yangyicong@huawei.com>
+ <20250331094320.35226-7-yangyicong@huawei.com> <Z-wQuJAefT3xNipl@linux.dev>
+ <e9674079-9a22-c3cd-3b00-5989f6926303@huawei.com>
+ <Z_NkHWStDJLo0cmY@linux.dev>
+From: Yicong Yang <yangyicong@huawei.com>
+Message-ID: <3355f89a-aecf-6ec7-b8ee-6faf6f1f7106@huawei.com>
+Date: Tue, 8 Apr 2025 16:11:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: romank@linux.microsoft.com, arnd@arndb.de, bhelgaas@google.com, bp@alien8.de, catalin.marinas@arm.com, conor+dt@kernel.org, dan.carpenter@linaro.org, dave.hansen@linux.intel.com, decui@microsoft.com, haiyangz@microsoft.com, hpa@zytor.com, joey.gouly@arm.com, krzk+dt@kernel.org, kw@linux.com, kys@microsoft.com, lenb@kernel.org, lpieralisi@kernel.org, manivannan.sadhasivam@linaro.org, mark.rutland@arm.com, mingo@redhat.com, oliver.upton@linux.dev, rafael@kernel.org, robh@kernel.org, rafael.j.wysocki@intel.com, ssengar@linux.microsoft.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, tglx@linutronix.de, wei.liu@kernel.org, will@kernel.org, yuzenghui@huawei.com, devicetree@vger.kernel.org, kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org, apais@microsoft.com, benhill@microsoft.com, bperkins@microsoft.com, sunilmut@microsoft.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <Z_NkHWStDJLo0cmY@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemd200014.china.huawei.com (7.221.188.8)
 
-On Mon, 07 Apr 2025 21:13:26 +0100,
-Roman Kisel <romank@linux.microsoft.com> wrote:
+On 2025/4/7 13:35, Oliver Upton wrote:
+> On Mon, Apr 07, 2025 at 11:33:01AM +0800, Yicong Yang wrote:
+>> On 2025/4/2 0:13, Oliver Upton wrote:
+>>> On Mon, Mar 31, 2025 at 05:43:20PM +0800, Yicong Yang wrote:
+>>>> @@ -1658,6 +1658,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>> Keep in mind that data aborts with DFSC == 0x35 can happen for a lot
+>>> more than LS64 instructions, e.g. an atomic on a Device-* mapping.
+>>>
+>>
+>> got it. 0x35 should be caused by LS64* or IMPLEMENTATION DEFINED fault, but no
+>> further hint to distinguish between these two faults. hope it's also the right
+>> behaviour to inject a DABT back for the latter case.
 > 
-> The KVM/arm64 uses SMCCC to detect hypervisor presence. That code is
-> private, and it follows the SMCCC specification. Other existing and
-> emerging hypervisor guest implementations can and should use that
-> standard approach as well.
+> There isn't exactly a 'right' behavior here. The abort could either be
+> due to a bug in the guest (doing an access on something knows it can't)
+> or the VMM creating / describing the IPA memory map incorrectly.
 > 
-> Factor out a common infrastructure that the guests can use, update KVM
-> to employ the new API. The central notion of the SMCCC method is the
-> UUID of the hypervisor, and the new API follows that.
+> Since KVM can't really work out who's to blame in this situation we should
+> probably exit to userspace + provide a way to reinject the abort.
 > 
-> No functional changes. Validated with a KVM/arm64 guest.
+
+as mentioned below, maybe the proper way is to handle it like KVM_EXIT_ARM_NISV. In this
+case exit to userspace with KVM_EXIT_ARM_LDST64B, if it's due to the wrong mapping of the
+guestOS then reinject the DABT back to the guest, otherwise the userspace need to check
+whether it's reporting the memory region correctly and handle in its own way.
+
+>>>> @@ -1919,6 +1939,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>>>>  			goto out_unlock;
+>>>>  		}
+>>>>  
+>>>> +		/*
+>>>> +		 * If instructions of FEAT_{LS64, LS64_V} operated on
+>>>> +		 * unsupported memory regions, a DABT for unsupported
+>>>> +		 * Exclusive or atomic access is generated. It's
+>>>> +		 * implementation defined whether the exception will
+>>>> +		 * be taken to, a stage-1 DABT or the final enabled
+>>>> +		 * stage of translation (stage-2 in this case as we
+>>>> +		 * hit here). Inject a DABT to the guest to handle it
+>>>> +		 * if it's implemented as a stage-2 DABT.
+>>>> +		 */
+>>>> +		if (esr_fsc_is_excl_atomic_fault(esr)) {
+>>>> +			kvm_inject_dabt_excl_atomic(vcpu, kvm_vcpu_get_hfar(vcpu));
+>>>> +			return 1;
+>>>> +		}
+>>>> +
+>>>
+>>> A precondition of taking such a data abort is having a valid mapping at
+>>> stage-2. If KVM can't resolve the HVA of the fault then there couldn't
+>>> have been a stage-2 mapping.
+>>>
+>>
+>> Here's handling the case for emulated mmio, I thought there's no valid stage-2 mapping
+>> for the emulated MMIO? so this check is put just before entering io_mem_abort(). should
+>> it be put into io_mem_abort() or we just don't handle the emulated case?
 > 
-> Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
-> ---
->  arch/arm64/kvm/hypercalls.c        | 10 +++--
->  drivers/firmware/smccc/kvm_guest.c | 10 +----
->  drivers/firmware/smccc/smccc.c     | 17 ++++++++
->  include/linux/arm-smccc.h          | 64 ++++++++++++++++++++++++++++--
->  4 files changed, 85 insertions(+), 16 deletions(-)
->
+> Right -- there's no valid stage-2 translation for _most_ MMIO. If KVM
+> cannot find an HVA for the fault (look at the condition that gets us
+> here) then we know there isn't a stage-2 mapping. How would we know what
+> to map?
+> 
+> In that case I would expect to take a Translation fault with instruction
+> syndrome that can can be used to construct an exit to the VMM.
 
-[...]
+you're right, I misunderstand here. If there's no stage-2 mapping we'll have
+a translation fault here rather than an unsupported exclusive or atomic access
+fault. So no need to check and handle it here since we won't have such a fault
+in this case.
 
-> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> index 67f6fdf2e7cd..4bb38f0e3fe2 100644
-> --- a/include/linux/arm-smccc.h
-> +++ b/include/linux/arm-smccc.h
-> @@ -7,6 +7,11 @@
->  
->  #include <linux/args.h>
->  #include <linux/init.h>
-> +
-> +#ifndef __ASSEMBLER__
-> +#include <linux/uuid.h>
-> +#endif
+> Marc had
+> some patches on list to do exactly that [*].
+> 
+> However, after reading this again there's a rather ugly catch. The KVM
+> ABI has it that writes to a RO memlot generate an MMIO exit, so it *is*
+> possible to get here w/ a stage-2 mapping. Unfortunately there's no
+> instruction syndrome with DFSC = 0x35 so no way to decode the access.
+> 
+> This is starting to sound similar an nISV MMIO abort...
+> 
 
-That's a pretty unusual guard in arm64 land. Looking at the current
-state of the kernel:
+yes similiar to nISV MMIO and no ISV as well. Per-spec DABT caused by LS64* has ISV==1
+if it's a Translation fault, Access flag fault, or Permission fault, but not for
+unsupported exclusive or atomic access fault..
 
-$ git grep -w __ASSEMBLER__ arch/arm64/ | wc -l
-2
-$ git grep -w __ASSEMBLY__ arch/arm64/ | wc -l
-122
+> [*]: https://lore.kernel.org/kvmarm/20240815125959.2097734-1-maz@kernel.org/
+> 
 
-I'd suggest the later rather than the former.
+Thanks.
 
-Thanks,
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
