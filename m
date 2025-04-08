@@ -1,60 +1,63 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F3120330
-	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 13:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DF1282F1
+	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 13:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744118465; cv=none; b=nRpkxy6koEdaoKAd6fx/diA2q+XS9d8ZHZcYYQgeX56+SvmzDItg4LdGxXoS4EaOFfpGtx7XftfCO3ayiYCq9FpNpUOJpZOfCnBprjYtxc8P5zkqx3mGGdQTvAG+AaDOmBJ6eL/+9uzIDzXxcPZxSYvu3yPTiBUPDZ7T8wBeGeI=
+	t=1744118466; cv=none; b=mST5x3O+NGAcpdG4IfqCTwUXRDphvr7MiBijmSoi7zpBKCIADibLUa/hnTlHv30SxV0jXJrPVrd1shd3bcOBlAO00vIoELo1OP0jjhvyfZ0C93/A1nxLI0MFLA4Tc02tfm+Z1BmVoB0Dy8uNVmlQeIb/wLjClM1Bsu5Hii29MqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744118465; c=relaxed/simple;
-	bh=KcTfiSOyKCaCnQHcVlRQ6JHTHx9LGVQ9b/cadvjGZ/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sZx6qHBvPM5fYBGn48iJ08bGk45l14UPlGDDgngQ8scg1pfLF63ubdPtqcT5SKYgq/gSbaaHsqxxNc95eDSLeXRhHTFWQzRN5VGHwYbo+X7qLfAuALF60eBqcU7CJQNqEvPT4pmyXwmezMQBd99GocV66MTj+QzVcaeXZbB2jJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ku7q7/s1; arc=none smtp.client-ip=209.85.221.50
+	s=arc-20240116; t=1744118466; c=relaxed/simple;
+	bh=4jPJPXMgY6/GNH/PWCQbZnehb4Ap/K+ZFSF2TYMKD2I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pPHBv7RCH8g+t8pStT2VmBri1GNrEmnj1NcvOK1u2FaVsm9l5S+G769HB2V9sbOSXGbP/dXaQkMOCZnJCGXDxZuLUtdHbclI2r3IhmXkJ5GXUTm79kGR9HzjLNbntXaC9YhrjeTTG9wuTvSSftmFwNYbwaU1UBxE1+ASTGPg718=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IHwrDFrE; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ku7q7/s1"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-39141ffa9fcso6048798f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Apr 2025 06:21:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IHwrDFrE"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so60253315e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 08 Apr 2025 06:21:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744118462; x=1744723262; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tLzGVjfFwFoyJPuo3LFygEBdjW+ximdrgVz6RHGw44k=;
-        b=Ku7q7/s1bt9eA3kuCE2c7lfOclS1jls84DXCPkE+WYVacxUc+jOsAE/xZPVt0iRge2
-         vToUMErQ+gfi8zHX3NMJ4vHiE0jL0v4vhJSjZmyL8a/0DZhClXndyeQp6JnzQTENvuIi
-         D2wkiwwMl5l40swhEroT8eNNtvxSna+vy9d/Y+oClXUcQMiTW+a9XiVe9/KBMnvO7HrY
-         bIzjHoEA4NDfduzpYWXFd2ntvD7iK3xiPXWku2SGOJbtLYWQczC2XQka6w5xQ0RbZihu
-         1grNR828Ohl8Nq52HDUUVmVeANRUbnEj1saLCZELJih17O5N0pftyTDa2scmwS/H/yCa
-         RQ7A==
+        d=linaro.org; s=google; t=1744118463; x=1744723263; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SRH4HHKjDjKZC1O9fqzVBp1Dw5VmTF9lQVHJ5oF2lVI=;
+        b=IHwrDFrEDXYygPwwXKBlJUukBz4mNPyqD5q0VwoiPLJP3I5kc4XX3GGCQP3BhnEvBm
+         72lyBGMs4+O61t27jWJjaG6T8poGFmdf6kDSVWsS4GEErjljGp+UYH2bBIhOSUV8EdFA
+         XCDpzKOzAm3gRA+Py8BlnBTEFSiOR3RLIyHbq5E7rYY2qJ3Eh7eG4GOwUeK/KsAUU3bN
+         qIjKKDwCOKGwlk+4v7g5ovHPTb/eOKrfoUzOrfH31/U9m7fC16igYV39x5vonVBv6K9j
+         fdKH0HI95OBbr+ui48ENUbhopuvt4R/EA9ODgRHGqy56U4UIXv7D8Dgrq17P1JSoJWjm
+         Gcdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744118462; x=1744723262;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tLzGVjfFwFoyJPuo3LFygEBdjW+ximdrgVz6RHGw44k=;
-        b=RnDF4sVhSvBdE+qZzzRX4Gj9agH6bnSz6DRJX19bopzEedA03LgQN7QOCSM06+z6t8
-         SD/ADdCUIyYhSHtJHmPpGMlVjD/AdM4qEVyL6RkVWXgJe2uDUnKv0lWSeM7seZVajB3c
-         +mEoVGCEklL5zgwebl3hZJp+pRBoypDKGPulcPozBllaT8t3ArBK0OZGwTGV6yDAe32c
-         +VAPTl2MSYSdKsvjHrdQkjGujPh8mGNV0b8BT1P3F5xtyCrJMsH+mSmcoyH+/ImJnbVh
-         wMnZ6NgUjsmiIsh4ZgpIdPqgnFSX3SHPlyzR69CA00235kjoSHRS7fBYSu0+zCj98OnR
-         R+YQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWy9DKerrlHPdXuCLUQeiyPEnGDrBNRvxX5UVvVVo5l0ZxJ3Ek0xWHDGqf70oE3rVc2rPzlkME=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywmz3t1mVsaFYHsP3VCeq69SavIX5VSELQCQsrr+USBII7OywWL
-	h4pdo0mKCUkVpK6AMhhcMxarEnev1O00WIh3PNFUcz7fHM8+dX3z0W9Cu21Adk0=
-X-Gm-Gg: ASbGnctJfeyBtCyJ9iuK+EJUwibRhisCN8xaHPbOcS5a8nTMof7O+QXMT+qE9RecDI0
-	FRTGL9OJ9qE+ewnAsSxyD1pgiaK3OnD6qZ9SPT0D+WvhVGqJfX8+0lqHEXQ3rWIQMpT/NKPYqWv
-	9ALperqV1K7U8yAyspbmnrjJB7DgETTKGrzO/qlDcSUCTw3JB0T0YgSHzmQpqUl1MfOdOEO3HEO
-	7uEScg3TgFV1rd+BAJQtRsCQbhKrIabQKTgBqlyCgPdTvQOo0ttFdDPprzZjcNuttoIIVa/Cb8E
-	oEhhol6ajEvbiur4aQ1SCzTs9RIgZhTOsGoI2IyNpqSMQXAhn16/2t3RhvBv/LI=
-X-Google-Smtp-Source: AGHT+IFUXJbj+KVBhVs4CmMtvIJd0GuXCkofSH+KbPfymhQIkFcV7EPYfaSIBB6hI0EIGOuLDwtPXQ==
-X-Received: by 2002:a05:6000:1849:b0:38f:6287:6474 with SMTP id ffacd0b85a97d-39d6fc49319mr11362861f8f.15.1744118461994;
-        Tue, 08 Apr 2025 06:21:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744118463; x=1744723263;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SRH4HHKjDjKZC1O9fqzVBp1Dw5VmTF9lQVHJ5oF2lVI=;
+        b=YXa0D4ZAQzt8yRJXyKT7a/DQu9PDNlehQpYIytoEuOt6x3T2UkpKG4LUQxkE6Jwt0l
+         4QPmIKaMVP6mc8gjzHx8rTT7r5atBJIQH4SAWhsU3cC+dYa6976a64IU9bwV2LL6aGpB
+         NDLNL6n3+xr0eb2YkroqrC6TXKAGgrUx9s3/EQFwf5aAKaP47x3QCHbca9LrCL96BeHq
+         QOVZs6jfmjVpn2DK4FujZ4hb+CbepBLQ6Hz/kpM6Px5RG/ajMAyGOseFPPe2mvCeNLZi
+         uLqhOUo9V3nCQiTcMFp3C+1VdzdXpqzUhZe+RSxO39JvgN/YxPk6wf0f1Gvwmhtb2vhk
+         XFyg==
+X-Forwarded-Encrypted: i=1; AJvYcCWhyUsuMFmzHS1ol9JtcIPaBLVlb9ntyyMrkZXRwUOg3ruvpwwiMy7Aqc3cfwuAqP1z078kHrM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxQ8vHoA8AgDV1eNnS2HFMlhR4bLz4hCtOa4x62D338jC/EnOk5
+	oz4/GjM5fhZBN/g4MmxPPlyR6iO0O6qvgEHy2bPdwNAZ0ZbV9qUYs8sVLQ8duAs=
+X-Gm-Gg: ASbGncscYGmq+qczY05elkEP7XL+4upVZCfXX1DxU++nOWq/Kst87nzR7utV8K1WObO
+	3Ype8aXIha0wMSu7RGdOW2wRH1Rnn8zBEqGkZcuXSh1cm0O8yxdsgc3SaJUhx2uRphMMfJbQHnF
+	vmYjELrS3XyYGD8lLyRIVvJ+YxAPsYuDqNnuDgitAbwyOCMB46H9eKuHoNDtjfcqqSNzpk06UHl
+	JcqcXntfQKjc2OxK88EDLokGcUnwvPIWdwXRTdKJqOfiuWxkFUo9Y+mLoCTaOPiRghf4gnspr8A
+	3txLHsSfAPjPtvFVd0pBYDEDjTf/q+89UpIkkENYt/1ON01t+CTdV4lMVkqRvKitknna0AmSIQ=
+	=
+X-Google-Smtp-Source: AGHT+IGXvBRS2ISmkSgOkaf9NDWmbD8mKXwPO0SBtc5D+QUv2VkxB2qWcK8BGtwXEr2R0/0t367Gpg==
+X-Received: by 2002:a05:600c:4e0e:b0:43c:fda5:41e9 with SMTP id 5b1f17b1804b1-43ed0da5960mr184760875e9.31.1744118462693;
+        Tue, 08 Apr 2025 06:21:02 -0700 (PDT)
 Received: from localhost.localdomain ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec36699e0sm162159705e9.35.2025.04.08.06.21.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec36699e0sm162159705e9.35.2025.04.08.06.21.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 06:21:01 -0700 (PDT)
+        Tue, 08 Apr 2025 06:21:02 -0700 (PDT)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: andrew.jones@linux.dev,
 	alexandru.elisei@arm.com
@@ -64,10 +67,12 @@ Cc: eric.auger@redhat.com,
 	kvm-riscv@lists.infradead.org,
 	vladimir.murzin@arm.com,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [kvm-unit-tests PATCH v4 0/5] arm64: Change the default QEMU CPU type to "max
-Date: Tue,  8 Apr 2025 14:20:49 +0100
-Message-ID: <20250408132053.2397018-2-jean-philippe@linaro.org>
+Subject: [kvm-unit-tests PATCH v4 1/5] configure: arm64: Don't display 'aarch64' as the default architecture
+Date: Tue,  8 Apr 2025 14:20:50 +0100
+Message-ID: <20250408132053.2397018-3-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250408132053.2397018-2-jean-philippe@linaro.org>
+References: <20250408132053.2397018-2-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,33 +81,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v4 of the series that cleans up the configure flags and sets the
-default CPU type to "max" on arm64, in order to test the latest Arm
-features.
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Since v3 [1] I renamed --qemu-cpu to --target-cpu, to prepare for other
-VMMs.
+--arch=aarch64, intentional or not, has been supported since the initial
+arm64 support, commit 39ac3f8494be ("arm64: initial drop"). However,
+"aarch64" does not show up in the list of supported architectures, but
+it's displayed as the default architecture if doing ./configure --help
+on an arm64 machine.
 
-[1] https://lore.kernel.org/all/20250325160031.2390504-3-jean-philippe@linaro.org/
+The help text for --arch changes from:
 
+   --arch=ARCH            architecture to compile for (aarch64). ARCH can be one of:
+                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
 
-Alexandru Elisei (3):
-  configure: arm64: Don't display 'aarch64' as the default architecture
-  configure: arm/arm64: Display the correct default processor
-  arm64: Implement the ./configure --processor option
+to:
 
-Jean-Philippe Brucker (2):
-  configure: Add --target-cpu option
-  arm64: Use -cpu max as the default for TCG
+    --arch=ARCH            architecture to compile for (arm64). ARCH can be one of:
+                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
 
- scripts/mkstandalone.sh |  3 ++-
- arm/run                 | 15 ++++++-----
- riscv/run               |  8 +++---
- configure               | 55 +++++++++++++++++++++++++++++++++++------
- arm/Makefile.arm        |  1 -
- arm/Makefile.common     |  1 +
- 6 files changed, 63 insertions(+), 20 deletions(-)
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/configure b/configure
+index 52904d3a..010c68ff 100755
+--- a/configure
++++ b/configure
+@@ -43,6 +43,7 @@ else
+ fi
+ 
+ usage() {
++    [ "$arch" = "aarch64" ] && arch="arm64"
+     cat <<-EOF
+ 	Usage: $0 [options]
+ 
 -- 
 2.49.0
 
