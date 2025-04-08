@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25172686A8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1916D26983B;
 	Tue,  8 Apr 2025 10:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744109560; cv=none; b=KoDIIsMVY9HY8IlFk7WhL8vE0rnJbAFxKdvBT5eljunRzAzZUe05mECTCnpJZK7294E23/O/GVOvPxxWUaxfPuwRZHs6tE+9azh4vG8AsDQheuOpUrtqwHZwEjoIq5Aor+Rg/GU5C1pXk+TY88BqH+vObb8CqOP0w+hUBIyt350=
+	t=1744109560; cv=none; b=jN0t2JVxE8BrdCklgaHDNiLGZSnOMuMPIL5mwPJZpTX3m0O8mg90ZR8O0KV26iKdE7MrVoV7XmNzuJMm01Xa5Qyq4aXvqlofIluwXtxy/2fXV9gWIFW40C7WpA/BOqZjFOrC9J+KdNKwk5oAQ2705W07FZPbUDq5O4YcalulvtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744109560; c=relaxed/simple;
-	bh=eXvgI10mmaf2ewAwZAKZgJKFqhyv5yx9FJwjuwqxvPg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E7xo1KlU7AWyKzqraweAQgN7WGs28u9SOSdK29t3CpJ8/dtdWt5V9OGawbuIKi8gFKw2rRx22Wq3U+WiUFVHKgOj97mJu48rInE67nplmHdlUEnHOHoM5aFQubsguCh95amUUgE7UgGAKUOFYfXora4HhvxK6Z0LJSvo6DVmAYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbAIpUR4; arc=none smtp.client-ip=10.30.226.201
+	bh=8+XdFyrg3jdFCFbcepfTStu3SnK+HZn4Io5Q3v/8QsQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=UZ6sKhB2rOW1DxycUri5nEni5KumZ3TBB4WzcRv+JTgTIEFLHk4bV/lB/P7WG9ZnC4k7ZVEBh5jKSYSxw4VcOAMDV8oaJh3+5VwCsA8ghTdujC0e3Em4ntOp9DQxN7yXyZrbm/IXXrg5b/SQHKCp5cyM3wphOeZTQmDptzK1gTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prWNdZwG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbAIpUR4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 805B7C4CEEA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prWNdZwG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F77C4CEEE;
 	Tue,  8 Apr 2025 10:52:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744109559;
-	bh=eXvgI10mmaf2ewAwZAKZgJKFqhyv5yx9FJwjuwqxvPg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=WbAIpUR461uXt15y6Vqak43pYY0clt6qZLJEOR4etB4z2i2NhRS0iUhLso+uZjVTa
-	 Xr7jBHxFyIZOm4p9h6QCPBebxRNOZfQa2+5e87UuxEQt6puIjNlZ0yuZVR5SGi/Qt1
-	 3lNOznMk9n76riyAuzmKBthSlP6XmMI2wHTmmAv8n9deC5rFCuRhCV5j7gMkF5hxQl
-	 +8YySSI1fAOPw6PPXWjIfffCX+iiauueRrGPuuNYA9yVsRLSuk7CYzP6Bvj4sKKMpV
-	 bv/KAD7i/sCPZY7L6P+hLsJ2wS8GFqegwt93Sf9GbqWA4IxgDRMHm5wFU5c7eN5fEF
-	 MrV1YNTnyEkvw==
+	bh=8+XdFyrg3jdFCFbcepfTStu3SnK+HZn4Io5Q3v/8QsQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=prWNdZwGLMmLoaEiVn3nCmRUDVoQH2jUYhlgxpkx/pNHurzvqlCdOHgSHrTNvuyCj
+	 qbqjUtz6WTO/+xZOcR6P0Zor83uDJdVR9GAZ17dOHKAaYNEbM4fKJgB0f8ve8dumrA
+	 b51T9n7HpYXcNQEysPoBLvx6ulhBkEtCCn34VJdr0uFkt4V9biYfXA52EFcFfrw5Rb
+	 49i9Pkjc+BDCt8DhAdE+oHBjkxZxYFofyQ2UJ+UmJoBT8uu7AjYuEQxq9By+yaxn2U
+	 gk+LpHdw80PLpxVeUlx5o6ThirvBvIdJao0qs9Hpjj8b07+thJNPGvqfggOI7Sr2e6
+	 YFkfuk+esB3AQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u26ZI-003QX2-UY;
-	Tue, 08 Apr 2025 11:52:37 +0100
+	id 1u26ZK-003QX2-0c;
+	Tue, 08 Apr 2025 11:52:38 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,10 +41,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 00/17] KVM: arm64: Recursive NV support
-Date: Tue,  8 Apr 2025 11:52:08 +0100
-Message-Id: <20250408105225.4002637-1-maz@kernel.org>
+Subject: [PATCH v2 05/17] KVM: arm64: nv: Move TLBI range decoding to a helper
+Date: Tue,  8 Apr 2025 11:52:13 +0100
+Message-Id: <20250408105225.4002637-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250408105225.4002637-1-maz@kernel.org>
+References: <20250408105225.4002637-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,106 +59,101 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM: arm64: Recursive NV support
+As we are about to expand out TLB invalidation capabilities to support
+recursive virtualisation, move the decoding of a TLBI by range into
+a helper that returns the base, the range and the ASID.
 
-This is probably the most interesting bit of the whole NV adventure.
-So far, everything else has been a walk in the park, but this one is
-where the real fun takes place.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_nested.h | 32 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 24 ++--------------------
+ 2 files changed, 34 insertions(+), 22 deletions(-)
 
-With FEAT_NV2, most of the NV support revolves around tricking a guest
-into accessing memory while it tries to access system registers. The
-hypervisor's job is to handle the context switch of the actual
-registers with the state in memory as needed.
-
-This memory (which we shall call the VNCR page henceforth) lives at an
-EL2 VA, and is therefore accessed out of context by the EL1 guest
-hypervisor.
-
-So far, so good. But what does it mean to virtualise VNCR itself?
-
-It means that when L1 has a prepared a VNCR page for L2, we must map
-it in the L0 EL2, and allow L2 to magically access it. Isn't that fun?
-To some extent. But there's more!
-
-Having that L0 mapping on behalf of L1 comes with strings attached. It
-means that we must be prepared for this page to become inaccessible,
-which can happen for a variety of reasons:
-
-- paged out from the host (MMU notifiers)
-
-- unmapped from L1 EL2 stage-1
-
-- permission changes in L1 EL2 stage-1
-
-And in case you're wondering, yes, all of these have TLB invalidation
-in common. That's because performing this mapping is akin to
-allocating a "SW managed" TLB for L1's VNCR page.
-
-This is what the bulk of this series is about: TLB management for VNCR
-pages, and making sure we have the correct page at the right time.
-
-From an implementation perspective, it isn't that complicated, as it
-plugs into the existing NV artillery (TLBI, AT, MMU notifiers). Of
-course, nothing is optimised, because we're not at this stage yet. I
-have plans to make this better (i.e. fewer TLBIs, which implies fewer
-traps when nesting), but that's all future work.
-
-But this is functional enough that I can run an L4 guest on my QC
-box. Slowly.
-
-As an added bonus, this series now includes the last two patches that
-switch the damned thing on. Does it mean this is bug-free? Of course
-not. But we're at a point where NV is no longer a third-rate citizen.
-Only a second-rate one.
-
-Patches on top of v6.15-rc1. The full integration is, as always, in my
-kvm-arm64/nv-next branch.
-
-* From v1:
-
-  - Rebased on 6.15-rc1
-
-  - Picked up the last two patches to enable the full NV shebang
-
-[1] https://lore.kernel.org/r/20250215150134.3765791-10-maz@kernel.org
-
-Marc Zyngier (17):
-  arm64: sysreg: Add layout for VNCR_EL2
-  KVM: arm64: nv: Allocate VNCR page when required
-  KVM: arm64: nv: Extract translation helper from the AT code
-  KVM: arm64: nv: Snapshot S1 ASID tagging information during walk
-  KVM: arm64: nv: Move TLBI range decoding to a helper
-  KVM: arm64: nv: Don't adjust PSTATE.M when L2 is nesting
-  KVM: arm64: nv: Add pseudo-TLB backing VNCR_EL2
-  KVM: arm64: nv: Add userspace and guest handling of VNCR_EL2
-  KVM: arm64: nv: Handle VNCR_EL2-triggered faults
-  KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2
-  KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers
-  KVM: arm64: nv: Program host's VNCR_EL2 to the fixmap address
-  KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2
-  KVM: arm64: nv: Plumb TLBI S1E2 into system instruction dispatch
-  KVM: arm64: nv: Remove dead code from ERET handling
-  KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
-  KVM: arm64: Document NV caps and vcpu flags
-
- Documentation/virt/kvm/api.rst      |  14 +-
- arch/arm64/include/asm/esr.h        |   2 +
- arch/arm64/include/asm/fixmap.h     |   6 +
- arch/arm64/include/asm/kvm_host.h   |  15 +-
- arch/arm64/include/asm/kvm_nested.h | 100 +++++
- arch/arm64/include/asm/sysreg.h     |   1 -
- arch/arm64/kvm/arm.c                |  10 +
- arch/arm64/kvm/at.c                 | 123 +++---
- arch/arm64/kvm/emulate-nested.c     |   7 -
- arch/arm64/kvm/handle_exit.c        |   1 +
- arch/arm64/kvm/hyp/vhe/switch.c     |  46 ++-
- arch/arm64/kvm/nested.c             | 608 +++++++++++++++++++++++++++-
- arch/arm64/kvm/reset.c              |   2 +
- arch/arm64/kvm/sys_regs.c           | 135 +++---
- arch/arm64/tools/sysreg             |   6 +
- include/uapi/linux/kvm.h            |   2 +
- 16 files changed, 940 insertions(+), 138 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 4ba3780cb7806..9d56fd946e5ef 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -231,6 +231,38 @@ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+ 		shift;							\
+ 	})
+ 
++static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
++{
++	u64 base, tg, num, scale;
++	int shift;
++
++	tg	= FIELD_GET(GENMASK(47, 46), val);
++
++	switch(tg) {
++	case 1:
++		shift = 12;
++		break;
++	case 2:
++		shift = 14;
++		break;
++	case 3:
++	default:		/* IMPDEF: handle tg==0 as 64k */
++		shift = 16;
++		break;
++	}
++
++	base	= (val & GENMASK(36, 0)) << shift;
++
++	if (asid)
++		*asid = FIELD_GET(TLBIR_ASID_MASK, val);
++
++	scale	= FIELD_GET(GENMASK(45, 44), val);
++	num	= FIELD_GET(GENMASK(43, 39), val);
++	*range	= __TLBI_RANGE_PAGES(num, scale) << shift;
++
++	return base;
++}
++
+ static inline unsigned int ps_to_output_size(unsigned int ps)
+ {
+ 	switch (ps) {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 005ad28f73068..26e02e1723911 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3546,8 +3546,7 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+ 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-	u64 base, range, tg, num, scale;
+-	int shift;
++	u64 base, range;
+ 
+ 	if (!kvm_supported_tlbi_ipas2_op(vcpu, sys_encoding))
+ 		return undef_access(vcpu, p, r);
+@@ -3557,26 +3556,7 @@ static bool handle_ripas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	 * of the guest's S2 (different base granule size, for example), we
+ 	 * decide to ignore TTL and only use the described range.
+ 	 */
+-	tg	= FIELD_GET(GENMASK(47, 46), p->regval);
+-	scale	= FIELD_GET(GENMASK(45, 44), p->regval);
+-	num	= FIELD_GET(GENMASK(43, 39), p->regval);
+-	base	= p->regval & GENMASK(36, 0);
+-
+-	switch(tg) {
+-	case 1:
+-		shift = 12;
+-		break;
+-	case 2:
+-		shift = 14;
+-		break;
+-	case 3:
+-	default:		/* IMPDEF: handle tg==0 as 64k */
+-		shift = 16;
+-		break;
+-	}
+-
+-	base <<= shift;
+-	range = __TLBI_RANGE_PAGES(num, scale) << shift;
++	base = decode_range_tlbi(p->regval, &range, NULL);
+ 
+ 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
+ 				   &(union tlbi_info) {
 -- 
 2.39.2
 
