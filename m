@@ -1,105 +1,250 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA7ED2FB
-	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 00:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144252063FA
+	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 04:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744072344; cv=none; b=WoXZDjbHbaAtsuKyUY//YhLB9uvMeE1Na6m4VxUeFJNuB1PvqGXgmrO0vJzYnmrLMUtgpjPktUdV196CFQogCv6lCBVbqIhf/Phyaz4zMu/2tnAlqQUPcZYPyMoZ1hx2JdI/6P7FCmYDai1wQvDvkp9Sdby+7gnUOzwmH8xtSqI=
+	t=1744088169; cv=none; b=LDteC4TsKO/TETRuPmUxH/VDcJRLWluW9V+lqiZZUj7lsNGFSAgmHR5/dON+2yQvGNrsi/vFLE2HMWEXGhjRkH3yvHsJy0H0KpfzGLrRAy0Oy9F/64RO5MlhMZ3Y7f+MhGhdk+rNQ9MjA7p+40KUxVlTckadPKBSjaInz5hZq74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744072344; c=relaxed/simple;
-	bh=k0qZyNLY8ZnZaejdK7zNdUB4ts88DmVD2cliAiXr9Ac=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZBe5Sg2R+Fm892RMfcYs+VLplwNqmGsySenwyfp+R3hYzmbgJoV+A0KFHGvG0fsqxbqfNcFkiPs1N/21oqBaLxY2lNRACaBkFmDrRcaOdU+pOtGttEvehG35kY5vANYJzrGiqKjZj0fgKeQGFjqYiaacsWOdJQ8zXbIKNK5XJUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 7 Apr 2025 17:31:40 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>,
-	Will Deacon <will@kernel.org>
-Subject: [GIT PULL] KVM/arm64: First batch of fixes for 6.15
-Message-ID: <Z_RubCEp4h7sAdjz@linux.dev>
+	s=arc-20240116; t=1744088169; c=relaxed/simple;
+	bh=kbIFUgPRmxBM6rMpSRDzsY1WwtHsPMOTaMx3Srpxpww=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=COfqP/wh7KDIoY2YT1iPfeKxeYur7GR8Qea87/DmRkrgOC7qa9bseCaotkpYK8q2UqbvVRLHpQEdMUSiwe695qGoltGAwsDsqEEefw7oKn+ChcsDwvcV2bjg7sduhxsonk4mHas54+ntcWKQG9ITN6D90ByF78Y5ba1N9t4+xQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q1+99HCZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1+99HCZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744088165;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LIjjOoByUI2pIOPhMAIlcgJI8+NphePBM49vRMjEqNQ=;
+	b=Q1+99HCZB1/jFsEyvisRL2kvk/jfRcgyO71/5rI9cldX64vgbKS1WzsY/1WwD06TpIuWRp
+	nWemgOcHOHRCUtPRCjnpMK/8dAqiE7to9LlfVYlonAPqH9JP/b1+Y2TpoDlnTWZkkGeJmK
+	7yapvviAD8TJceTO4/3W7myUh7ND5n8=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-45-8lv_bI4xNrKwgwozVR5uXA-1; Tue, 08 Apr 2025 00:56:02 -0400
+X-MC-Unique: 8lv_bI4xNrKwgwozVR5uXA-1
+X-Mimecast-MFC-AGG-ID: 8lv_bI4xNrKwgwozVR5uXA_1744088161
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-736c135f695so3855665b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 07 Apr 2025 21:56:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744088161; x=1744692961;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LIjjOoByUI2pIOPhMAIlcgJI8+NphePBM49vRMjEqNQ=;
+        b=rBrYbik3sR3t3Ypoa1U44fXQLueOtTyn7JblKoZ4Jy/wvLadq5MpeyqyrBJOYSU/Rx
+         aZQ5itUCbZClGcmJmmUoB1r6YKrE3uJLQhu/xRJczs5jsZUkto3IjocPlmNhYjYWBiAo
+         Ta9mRmS98EJDoqblpxOS1wUfaymKez7BWp/7k8zL+zm+P4yBaM7oHSLP5EXxEtTM1nwZ
+         EbfxVvxMX71VfJqYu/4ZCskgYolm+k5oG3o5wy6zkQAor8Nkj9samNX4ThgREkfEjGQT
+         pfCJ73VDE0rUHtu43emokUgBAJEdyBUnB6dwQ7OhHEEcmGc0NOooAtTIFXa54fxDsREH
+         USNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWAhJlC2OJJTit6oKFrsfGUmsRljAjrBifOP+Yz6kVCeIC2vjzJQ8U5GWU6//Bq/iY65loZFg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwlTOTWG660MkEt1WwBrpZCsfzX0dE8ZNBWk86CWVYNSop99O8Y
+	d4z1JvBPFromB7IXtRz1i63UCYl3Zn7n8UlpA109iQpYybNeCGBxQbO1Ie2ywbsooCldaP0vHnJ
+	R1Z1zPwvwQ7yjOL33MiaZUZDnhHTb0LPo8jH81wrRs/4eGtkDE8sD7g==
+X-Gm-Gg: ASbGncsVV5UNhc/Xl3N/O+3mYMaEvXn1RmnOEwq0FOrX48Gh3yxUxbVcrB3a8DcgITt
+	wlufk1h+8rj7yhri5AxRwJKLboFJ5W4NVa6NoTuBQ1siP+JNrZStO4JfslujSv0s5jmym8820ZR
+	GWLcnxZxvrN0lsoUinTT0yvuKUMoIRXjgut3gf4IopKjydW2djevFR+IFXqElpFllTkLaRpQf15
+	F+DzRE17bnz1loLiPI2wMQQZzq3OV4F2/iPoLfTXubJ5X3JyahZ8VDFeRgF9AHouG4JsTES18yO
+	skRgTa44PkxnwwmO
+X-Received: by 2002:a05:6a20:c89b:b0:1f5:7d57:8309 with SMTP id adf61e73a8af0-2010468efe3mr21310699637.21.1744088161225;
+        Mon, 07 Apr 2025 21:56:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERbmBP4PLZ4lD5fRaruKvT92VMq6IeMtLHrpj4YwtyvzhMXIT9jbuvqEjkQzxoAS5XwcPooA==
+X-Received: by 2002:a05:6a20:c89b:b0:1f5:7d57:8309 with SMTP id adf61e73a8af0-2010468efe3mr21310671637.21.1744088160876;
+        Mon, 07 Apr 2025 21:56:00 -0700 (PDT)
+Received: from [192.168.68.55] ([180.233.125.65])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d9806e9csm9495071b3a.83.2025.04.07.21.55.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Apr 2025 21:56:00 -0700 (PDT)
+Message-ID: <822a348f-46e1-44cb-b475-1b120bf96de4@redhat.com>
+Date: Tue, 8 Apr 2025 14:55:52 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 12/45] arm64: RME: Allocate/free RECs to match vCPUs
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250213161426.102987-1-steven.price@arm.com>
+ <20250213161426.102987-13-steven.price@arm.com>
+ <7639eca7-8fd8-491c-90bd-1be084fbd710@redhat.com>
+ <4566d2d1-1f59-49e3-ad75-45c27ac4dfda@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <4566d2d1-1f59-49e3-ad75-45c27ac4dfda@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: jsYYFBlTZ2c9OLbP3u83LRHvQKRRnD6tLiO_3YmshHY_1744088161
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+Hi Steven,
 
-Here's the first set of fixes for 6.15. The biggest change here is the
-__get_fault_info() rework where KVM could use stale fault information when
-handling a stage-2 abort.
+On 3/8/25 1:43 AM, Steven Price wrote:
+> On 03/03/2025 07:08, Gavin Shan wrote:
+>> On 2/14/25 2:13 AM, Steven Price wrote:
+>>> The RMM maintains a data structure known as the Realm Execution Context
+>>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+>>> virtual CPUs. KVM must delegate memory and request the structures are
+>>> created when vCPUs are created, and suitably tear down on destruction.
+>>>
+>>> RECs must also be supplied with addition pages - auxiliary (or AUX)
+>>> granules - for storing the larger registers state (e.g. for SVE). The
+>>> number of AUX granules for a REC depends on the parameters with which
+>>> the Realm was created - the RMM makes this information available via the
+>>> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
+>>> (RD).
+>>>
+>>> Note that only some of register state for the REC can be set by KVM, the
+>>> rest is defined by the RMM (zeroed). The register state then cannot be
+>>> changed by KVM after the REC is created (except when the guest
+>>> explicitly requests this e.g. by performing a PSCI call). The RMM also
+>>> requires that the VMM creates RECs in ascending order of the MPIDR.
+>>>
+>>> See Realm Management Monitor specification (DEN0137) for more
+>>> information:
+>>> https://developer.arm.com/documentation/den0137/
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> ---
+>>> Changes since v6:
+>>>    * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
+>>>      realm guest.
+>>>    * Support host page size being larger than RMM's granule size when
+>>>      allocating/freeing aux granules.
+>>> Changes since v5:
+>>>    * Separate the concept of vcpu_is_rec() and
+>>>      kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>>>      the indication that the VCPU is a REC.
+>>> Changes since v2:
+>>>    * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
+>>> patches.
+>>> ---
+>>>    arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>>>    arch/arm64/include/asm/kvm_host.h    |   3 +
+>>>    arch/arm64/include/asm/kvm_rme.h     |  18 +++
+>>>    arch/arm64/kvm/arm.c                 |  13 +-
+>>>    arch/arm64/kvm/reset.c               |  11 ++
+>>>    arch/arm64/kvm/rme.c                 | 179 +++++++++++++++++++++++++++
+>>>    6 files changed, 229 insertions(+), 2 deletions(-)
+>>>
+>>
+>> With the following one comment addressed:
+>>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>
+>> [...]
+>>
+>>>      /*
+>>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>>> asm/kvm_rme.h
+>>> index 698bb48a8ae1..5db377943db4 100644
+>>> --- a/arch/arm64/include/asm/kvm_rme.h
+>>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>>> @@ -6,6 +6,7 @@
+>>>    #ifndef __ASM_KVM_RME_H
+>>>    #define __ASM_KVM_RME_H
+>>>    +#include <asm/rmi_smc.h>
+>>>    #include <uapi/linux/kvm.h>
+>>>      /**
+>>> @@ -65,6 +66,21 @@ struct realm {
+>>>        unsigned int ia_bits;
+>>>    };
+>>>    +/**
+>>> + * struct realm_rec - Additional per VCPU data for a Realm
+>>> + *
+>>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
+>>> this VCPU
+>>> + * @rec_page: Kernel VA of the RMM's private page for this REC
+>>> + * @aux_pages: Additional pages private to the RMM for this REC
+>>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+>>> + */
+>>> +struct realm_rec {
+>>> +    unsigned long mpidr;
+>>> +    void *rec_page;
+>>> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+>>> +    struct rec_run *run;
+>>> +};
+>>> +
+>>
+>> REC_PARAMS_AUX_GRANULES represents the maximal number of the auxiliary
+>> granules.
+>> Since the base page size is always larger than or equal to granule size
+>> (4KB).
+>> The capacity of array @aux_pages[] needs to be REC_PARAMS_AUX_GRANULES.
+>> Ideally,
+>> the array's size can be computed dynamically and it's allocated in
+>> kvm_create_rec().
+> 
+> This is indeed another example of where pages and granules have got
+> mixed. The RMM specification provides a maximum number of granules (and
+> there's a similar array in struct rec_params). Here the use of
+> REC_PARAMS_AUX_GRANULES is just to keep the structure more simple (no
+> dynamic allocation) with the cost of ~128bytes. Obviously if
+> PAGE_SIZE>4k then this array could be smaller.
+> 
 
-Rest of the details can be found in the tag. Please pull.
+Exactly. The confusion is caused by the mismatched size between page and granule.
+We're declaring an array of pages and the array's capacity is REC_PARAMS_AUX_GRANULES.
+A comment is needed to explain for now. In long run, I think it's nice to allocate
+them dynamically. The buddy allocator allocates 2^N pages and memory waste will be
+existing without perfect alignment.
+
+>> Alternatively, to keep the code simple, a comment is needed here to
+>> explain why
+>> the array's size has been set to REC_PARAMS_AUX_GRANULES.
+> 
+> Definitely a valid point - this could do with a comment explaining the
+> situation.
+> 
+
+Ack.
+
+>> An relevant question: Do we plan to support differentiated sizes between
+>> page
+>> and granule? I had the assumption this feature will be supported in the
+>> future
+>> after the base model (equal page and granule size) gets merged first.
+> 
+> Yes I do plan to support it. This series actually has the basic support
+> in it already, with an experimental patch at the end enabling that
+> support. It "works" but I haven't tested it well and I think some of the
+> error handling isn't quite right yet.
+> 
+> But there's also a bunch more work to be done (like here) to avoid
+> over-allocating memory when PAGE_SIZE>4k. E.g. RTTs need an
+> sub-allocator so that we don't waste an entire (larger) page on each RTT.
+> 
+
+Ok. Frankly I didn't expect it when I reviewed the first patches of this
+series. I thought it would be an incremental feature, meaning a separate
+series to support it after the base series is accepted. Anyway, it's something
+I need to review on the next respin (v8) if it's going to be supported
+together with the base functionalities :-)
 
 Thanks,
-Oliver
+Gavin
 
-The following changes since commit 369c0122682c4468a69f2454614eded71c5348f3:
-
-  Merge branch 'kvm-arm64/pmu-fixes' into kvmarm/next (2025-03-19 14:54:52 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.15-1
-
-for you to fetch changes up to a344e258acb0a7f0e7ed10a795c52d1baf705164:
-
-  KVM: arm64: Use acquire/release to communicate FF-A version negotiation (2025-04-07 15:03:34 -0700)
-
-----------------------------------------------------------------
-KVM/arm64: First batch of fixes for 6.15
-
- - Rework heuristics for resolving the fault IPA (HPFAR_EL2 v. re-walk
-   stage-1 page tables) to align with the architecture. This avoids
-   possibly taking an SEA at EL2 on the page table walk or using an
-   architecturally UNKNOWN fault IPA.
-
- - Use acquire/release semantics in the KVM FF-A proxy to avoid reading
-   a stale value for the FF-A version.
-
- - Fix KVM guest driver to match PV CPUID hypercall ABI.
-
- - Use Inner Shareable Normal Write-Back mappings at stage-1 in KVM
-   selftests, which is the only memory type for which atomic
-   instructions are architecturally guaranteed to work.
-
-----------------------------------------------------------------
-Chen Ni (1):
-      smccc: kvm_guest: Remove unneeded semicolon
-
-Oliver Upton (4):
-      smccc: kvm_guest: Align with DISCOVER_IMPL_CPUS ABI
-      KVM: arm64: Only read HPFAR_EL2 when value is architecturally valid
-      arm64: Convert HPFAR_EL2 to sysreg table
-      KVM: arm64: Don't translate FAR if invalid/unsafe
-
-Raghavendra Rao Ananta (2):
-      KVM: arm64: selftests: Introduce and use hardware-definition macros
-      KVM: arm64: selftests: Explicitly set the page attrs to Inner-Shareable
-
-Will Deacon (1):
-      KVM: arm64: Use acquire/release to communicate FF-A version negotiation
-
- arch/arm64/include/asm/esr.h                       | 44 +++++++++++++-
- arch/arm64/include/asm/kvm_emulate.h               |  7 ++-
- arch/arm64/include/asm/kvm_ras.h                   |  2 +-
- arch/arm64/kvm/hyp/include/hyp/fault.h             | 70 +++++++++++++++-------
- arch/arm64/kvm/hyp/nvhe/ffa.c                      |  9 +--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |  9 ++-
- arch/arm64/kvm/mmu.c                               | 31 ++++++----
- arch/arm64/tools/sysreg                            |  7 +++
- drivers/firmware/smccc/kvm_guest.c                 |  4 +-
- .../testing/selftests/kvm/arm64/page_fault_test.c  |  2 +-
- .../selftests/kvm/include/arm64/processor.h        | 67 +++++++++++++++++++--
- tools/testing/selftests/kvm/lib/arm64/processor.c  | 60 +++++++++++--------
- 12 files changed, 234 insertions(+), 78 deletions(-)
