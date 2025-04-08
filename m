@@ -1,62 +1,62 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D7E288D6
-	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 13:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D220A20330
+	for <kvmarm@lists.linux.dev>; Tue,  8 Apr 2025 13:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744118466; cv=none; b=tryoUqaL6x43gujpAkLp3qq16jwjFG5gyduRq4s6qbQBYK5Q/8YsZY6Bz5aYk09kcgctdZSxnm7OGSK6+qNoanYKAqgwwzu9XbYADYrZqlRXnqgm99yoGUu6VdYhkSkNrsQkjKEgjWnw7Z1nPY8PFOulNmLgtwHa8mOH7evd+v4=
+	t=1744118467; cv=none; b=jbPjR5bQQmLfq2oRHRiIE6OOTlxewKseJ0H3n+ypSwCwTConqvIwbeGmR4dDqJJ+HhpcNOyYgBSKi6lSeWT1E+0fznLSgCX3zVPehyn2oOH8OBWEVPXBD5uE1XrxybxaxIC24R9d2O974D12DA9zP4c4r1LWVTC+h+KHwmoHlsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744118466; c=relaxed/simple;
-	bh=OSfxs5iCrFQRqvReCu5va442baMyJ2MCQdEE5yR8Qso=;
+	s=arc-20240116; t=1744118467; c=relaxed/simple;
+	bh=DjE5lydHNpWSKlp2OS+ArgpAXc20b7JX+EYn2yeg0Pc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BizaZ+Muo3g0fe+LkWqts1A4W1AKuzHlrzJRXfRa/IxwYdYIEyDxTKJlzPyyVDtbEW8iurGW608D1lpVOEbiOe9t8Tbv0/7AmjTSCWykmuNkEFUxnx5WyR32q6ZTVHf3OMJlzfiqXejftUJW0JAnCzxY6ld/ZxFoQm+lXKRSZoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=njEB1548; arc=none smtp.client-ip=209.85.221.47
+	 MIME-Version; b=dHk0mrPRJVCQz4M76f33O3RbqhL0HT/RlWMwKuzh5SFuiChYal375om8rkOlfLaah/YZgn7Q9UT+0scWh0Z2GQshTGzSCK6Q+QGDqnNR2/2QIqbFDsZYhMcbETYqsRpBM1jXyfunoI1QyoWIinGsk8/QSrVlVZRJiCddl9x/9Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RE3z7G9w; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="njEB1548"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-39c13fa05ebso3210525f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Apr 2025 06:21:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RE3z7G9w"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-39c1efbefc6so3254033f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 08 Apr 2025 06:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744118463; x=1744723263; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1744118464; x=1744723264; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ilwSm1opvpysUjixabDWM8lrwnBUd7ZKRR02fY60WCw=;
-        b=njEB1548oU+moDqNQXDSjL0pwMnt/x4QnjEo6rkOBehPNdhJ5yuJbb2BAcDVF+HUhG
-         av0dehGzIK0SVO6t0xUG2GKUYgRizG/3LVdRArsft20Xsule8He0DRjX8yRK4quGWod9
-         Bf4lpJ68melExRBp82Ly/8fvgiiMS38hYagpOCmxRx3KCTplRRqm5gbyO4SDqqVyBpe8
-         7kLVI3Ay4kOuiaMzyhLU7HxjeizeM840EyDLkGBxQqM3p5usPfzMFqHefct9nCQxqbct
-         YYjUOQ9dnjgvsXT32SsawjnM0M0ZqHWYdjvmvtgdM1RtXB/EB7Nt6nQrtyY1qnCZR3YM
-         4rww==
+        bh=vR6Kj/v7QUx4Q9A4sOPDY+B+4TbUf4f4gjMITODv1GI=;
+        b=RE3z7G9wgvPEm9pUSpe7k6F35N+e/z2QL6+QkVOQlGVBlqU7La1hVNbu8ysVbfYZYn
+         vRtzWu/Mmmif/8ZpkG2gY+nGfUFiROAIq8MM2aC+OPfJ9afwiADN2PlaGerUy/GhJlLw
+         wGdi7EoAthSSLNFUssFiaNwPz2PNuGltdj8FDarfrh2wMt3GG/+fC3YV/26ZK6drVmxj
+         qCo+84TMHlGXX4OOAv0GvQ/lR35o4x5ar55+ws3g31Qg6mydN7t68kX6sld6/+GmTdI7
+         MFDieACpwIlfYl9QimOW7QDoQGU6Y7LSwp8niThTgUAkx9zpZKw2cfj0U5E9lg6RtTXf
+         IrpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744118463; x=1744723263;
+        d=1e100.net; s=20230601; t=1744118464; x=1744723264;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ilwSm1opvpysUjixabDWM8lrwnBUd7ZKRR02fY60WCw=;
-        b=tqm/j+UvHzYiTzKW6eaBPnSgEiin6W58tA4J2dVGyfoc3CqMjpGymBqqghkBUDntfA
-         s7hYerX9zmTZcx2YGD59ddAVUipjjiZ2oBxvnbDvRDP4WygRPEueCsbHN1C/3A7oMAsY
-         xgKwQn3d00HJqzoLbidUHLKbfVan3iv9aMpxam29RSVXUvFrNq9Q9R5M5j15hdVS3c7L
-         xpl7ugnDLIM8imVfzDkbl9XbuqdgLxNk5edBKpNOIGTQ55FPitN8MMF9cPvEcntfKAsO
-         NlDCM+Wt+LA3YIVOvwn2xo3EzZvKGttYahx2x6mFoAjztrxcdEyPicq+qx8aJqEObROj
-         GUCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgRZVtntUoVqfEuZtgJcQKPwOASmrFxdQrYpVoJXdm405AaoyKoZwBjoKgz7/OnrFRlD1eJZ0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyoBVNIf33FGNbBsYRS4zQbLg3BhBw1mG8/Z5FjSvrtsvOJQpKT
-	1JCPz2zz8Ij76dLA6Ppup/BnKJ4QFBBiU+g0gpLANySnHhBi3SpH04Uj/2Pc4z8=
-X-Gm-Gg: ASbGncsrgmCjbUHdUvhvReDG03gdL7MUzpLAIYQSO4R1PujlmVzm3FmuzvdpPRHbP8a
-	AG7u/tNZ2xs2nkCn47Q5dd4t460Gi2ENZBaNulHJs0N6HseSMlxIijedvAUGhLVwQ7Fp8cW8zWb
-	6tAOYeITMHF1cEr7kPopcaqLa4NPchUeNhcGgPFoY0zmHAxJB3vnaaTh2GY+7IUeIjT+iLCAgBr
-	o6GIZ6qERxZLjMf9yDcpK4BXiMAvnwBB23V3r7TCDrvl99877fDDv4NSn0Ldlp+snKv/d6r6pRm
-	48ucXZXXapzlDUjcQGwWOhFM+SzvpdPOX6lHW/Z7MD4hk2Q9QR84AyGKu3Dd3Ug=
-X-Google-Smtp-Source: AGHT+IFNyeSMXRQkAbHJWisVmPMP4/fHS+R5uIOxb+upWzY4DBBeBmZDM0lxIP3xSXgDasJ13TRs/Q==
-X-Received: by 2002:a05:6000:4203:b0:391:3998:2660 with SMTP id ffacd0b85a97d-39cb35759c8mr13486863f8f.7.1744118463310;
-        Tue, 08 Apr 2025 06:21:03 -0700 (PDT)
+        bh=vR6Kj/v7QUx4Q9A4sOPDY+B+4TbUf4f4gjMITODv1GI=;
+        b=s0/WyG1FDQ+3UL69NpXn7OV034ZCF2Stu2DBn/4yDj/KWSOG+IWcfYuDzw7amuyfk3
+         22uXOwcswqsA2EqJVeBn0GLRJBw8kvRSGifjODrP8kT+8ufXv50nHICMamftfOulZtUS
+         ZB4Er+f/r4kbB73AHIDwkhoGf0VFsgGs1dCix4g9DNt+wwewV/vGqZPTEzevCLL4NifJ
+         NR/thI9WGyWj4IkDQKNIRskWiGGY+yJomh/HPUG5kfOyX+DVqGVbF4QO1wEA83jbgc+z
+         ZYIijFcfcUPllHIngJstEK1GdBw+aGRtK16XvKrAVzfc6jTs2MLUjGLYQ5YOgvXFhFzp
+         zc3w==
+X-Forwarded-Encrypted: i=1; AJvYcCX+5uw/w5EHEPJVfZ7AARgXA3V1wCppZTAHwxKpWbbRMNK/2NMe4ETtJWi9IztTCGSOVi3vntk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwNh3RCCu7B2XqdNK9ki4BT5ZUcsWwhy9AakGeVHwaxKYPnF4S7
+	Y3+lKHbgseAb+6n7+Fmc1+U8dm5SvznZaNOmUivHl/IzlpgJj8vmWUHxL491JxA=
+X-Gm-Gg: ASbGncup1qb8oZZNJSye967kmgEV/etXSHm1zX8xY+YI/1UtdqYyh4XXdqbq81SVmKx
+	2bb8Lw9K8rJuWM43iOV9DSXZw4xTVzAAiGvrZnVeveJYPFjerDvDrKsXPE/WZT3luhj7vspPYEB
+	3L2k1LIJkIdcPSitvYPSIzEEOoIEBJDx5XZ8pyE3IvG2m6m1jByCgNPRMkhSz+IYqFon5vUKNqK
+	q8qiZ7Qtk43Izah9OtS/gpDf9iWZD/PGCmk3TWebuXVjAA+k6Qoii/J0XTIDWzVt8jvJbgiEBR/
+	jks/nhCNHo5QcffntodtoOq18b3ehUhdm7T7uu1k2y/x8auiknhkqjl6PF8gxRU=
+X-Google-Smtp-Source: AGHT+IGEYZcVHqPxh9b9iWTJrtArQr/utyYTQwlK58Bu3joqs748+JSADbxOpv7hF62mBqzNbjJDBA==
+X-Received: by 2002:a05:6000:4212:b0:39a:c9d9:84d2 with SMTP id ffacd0b85a97d-39d6fce0eddmr10745293f8f.46.1744118464024;
+        Tue, 08 Apr 2025 06:21:04 -0700 (PDT)
 Received: from localhost.localdomain ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec36699e0sm162159705e9.35.2025.04.08.06.21.02
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec36699e0sm162159705e9.35.2025.04.08.06.21.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 06:21:02 -0700 (PDT)
+        Tue, 08 Apr 2025 06:21:03 -0700 (PDT)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: andrew.jones@linux.dev,
 	alexandru.elisei@arm.com
@@ -66,9 +66,9 @@ Cc: eric.auger@redhat.com,
 	kvm-riscv@lists.infradead.org,
 	vladimir.murzin@arm.com,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [kvm-unit-tests PATCH v4 2/5] configure: arm/arm64: Display the correct default processor
-Date: Tue,  8 Apr 2025 14:20:51 +0100
-Message-ID: <20250408132053.2397018-4-jean-philippe@linaro.org>
+Subject: [kvm-unit-tests PATCH v4 3/5] arm64: Implement the ./configure --processor option
+Date: Tue,  8 Apr 2025 14:20:52 +0100
+Message-ID: <20250408132053.2397018-5-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250408132053.2397018-2-jean-philippe@linaro.org>
 References: <20250408132053.2397018-2-jean-philippe@linaro.org>
@@ -82,79 +82,52 @@ Content-Transfer-Encoding: 8bit
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-The help text for the --processor option displays the architecture name as
-the default processor type. But the default for arm is cortex-a15, and for
-arm64 is cortex-a57. Teach configure to display the correct default
-processor type for these two architectures.
+The help text for the ./configure --processor option says:
 
+    --processor=PROCESSOR  processor to compile for (cortex-a57)
+
+but, unlike arm, the build system does not pass a -mcpu argument to the
+compiler. Fix it, and bring arm64 at parity with arm.
+
+Note that this introduces a regression, which is also present on arm: if
+the --processor argument is something that the compiler doesn't understand,
+but qemu does (like 'max'), then compilation fails. This will be fixed in a
+following patch; another fix is to specify a CPU model that gcc implements
+by using --cflags=-mcpu=<cpu>.
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- configure | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+ arm/Makefile.arm    | 1 -
+ arm/Makefile.common | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 010c68ff..b4875ef3 100755
---- a/configure
-+++ b/configure
-@@ -5,6 +5,24 @@ if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ] ; then
-     exit 1
- fi
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index 7fd39f3a..d6250b7f 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -12,7 +12,6 @@ $(error Cannot build arm32 tests as EFI apps)
+ endif
  
-+# Return the default CPU type to compile for
-+function get_default_processor()
-+{
-+    local arch="$1"
-+
-+    case "$arch" in
-+    "arm")
-+        echo "cortex-a15"
-+        ;;
-+    "arm64")
-+        echo "cortex-a57"
-+        ;;
-+    *)
-+        echo "$arch"
-+        ;;
-+    esac
-+}
-+
- srcdir=$(cd "$(dirname "$0")"; pwd)
- prefix=/usr/local
- cc=gcc
-@@ -44,13 +62,14 @@ fi
+ CFLAGS += $(machine)
+-CFLAGS += -mcpu=$(PROCESSOR)
+ CFLAGS += -mno-unaligned-access
  
- usage() {
-     [ "$arch" = "aarch64" ] && arch="arm64"
-+    [ -z "$processor" ] && processor=$(get_default_processor $arch)
-     cat <<-EOF
- 	Usage: $0 [options]
+ ifeq ($(TARGET),qemu)
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index f828dbe0..a5d97bcf 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -25,6 +25,7 @@ AUXFLAGS ?= 0x0
+ # stack.o relies on frame pointers.
+ KEEP_FRAME_POINTER := y
  
- 	Options include:
- 	    --arch=ARCH            architecture to compile for ($arch). ARCH can be one of:
- 	                           arm, arm64, i386, ppc64, riscv32, riscv64, s390x, x86_64
--	    --processor=PROCESSOR  processor to compile for ($arch)
-+	    --processor=PROCESSOR  processor to compile for ($processor)
- 	    --target=TARGET        target platform that the tests will be running on (qemu or
- 	                           kvmtool, default is qemu) (arm/arm64 only)
- 	    --cross-prefix=PREFIX  cross compiler prefix
-@@ -326,13 +345,8 @@ if [ "$earlycon" ]; then
-     fi
- fi
- 
--[ -z "$processor" ] && processor="$arch"
--
--if [ "$processor" = "arm64" ]; then
--    processor="cortex-a57"
--elif [ "$processor" = "arm" ]; then
--    processor="cortex-a15"
--fi
-+# $arch will have changed when cross-compiling.
-+[ -z "$processor" ] && processor=$(get_default_processor $arch)
- 
- if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
++CFLAGS += -mcpu=$(PROCESSOR)
+ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+ CFLAGS += -O2
 -- 
 2.49.0
 
