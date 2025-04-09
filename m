@@ -1,172 +1,237 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11021135.outbound.protection.outlook.com [52.101.57.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1061AF0C8
-	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 01:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744162940; cv=none; b=L0bOZBj2XDArWV+vX2mFwshjHObv5bWE3RpclZnUCILr4mI302uofP97yFHcPT/lFW9DkJZ1A9nHaHN9ckxW0wook0zlBJEw764Fdzm4DC1pp4GvM8fs8Y39SBrPWrnmT6BUG1iMqkQev6fp7FwwNBS8lxn2IViOh6EqpsZePM8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744162940; c=relaxed/simple;
-	bh=riqkQ1t8/h7MsJZAxC/eXgF19eg6YzSjLsP+88GFCKQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MLcjkkdmSkywI8DFKHFJRrolOoi1rwNMl4dPXlm58xVSHrx2L0YrukvLjxh870dA2H+RVf/wpqEqIC5GtnMKeA7sVz7L2zVALZnRnzsRdYrEL44x1oBnrUJjhrp6eKMC+wZFdz3Wiv7LLG9W7r9rlDCn8ZzQcqhrH8XlNZrWn/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G2Aqornc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614E41D618E
+	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 06:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.135
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744180717; cv=fail; b=JbUiUqJtVRtZFBmQHqPWpqJag2meQGkhjyqlF2I8BlHl2d2wRZqY6qz6SkkKzHno43yvbY353TBdExEO2DoSZKbobkJwLp3rcNp8oKPvn5rkuHxL3x2Q8hLTdjDXsCowf69PBxl0sVCil/1+3bH4HGTliDcyzfSThOGo1Dzi6iw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744180717; c=relaxed/simple;
+	bh=+LNeyPPMAu2K3s6Jnkbq6hxJPOTcEz9Y5j5O7e4GqSE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=B596Q8T79+cjmvUDOMz1vLHGYAdp+PwTei0uYLUBQKV3VcaEqS9WOVOcQ7ryBDLkO3PFrYh6lBf3mH8Nm/ndsuEEEgTCwhR13uU9y6phxORoGLkkO6ClSpDr3tG2eMDaeqhgSg5etDkQn5pAKriwG8f13GdKqbfZVzb4cmBw3oQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=n4WjGcmi; arc=fail smtp.client-ip=52.101.57.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G2Aqornc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744162937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z1kcoAyb5oE1yadCC0yo8lvxmOIeYp6wUMScV/KBS/Y=;
-	b=G2AqorncyqKcYVi1NzLJW4NLFOGRCoUJRNCSiYalmx98FDBcM1po390IR3zvLLHNqFZKml
-	MdNsiBSCXtLnUgHrlw0dsKezhCf/zbc8zP6VExEB/HqmuEk2xOs10wAb6OXsoptHpDCVJ8
-	wo/Z5vlAi+B4tYb2aEMn+tA656aLwGg=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-FfZk7JGCPmS8NemWl-m-0g-1; Tue,
- 08 Apr 2025 21:42:14 -0400
-X-MC-Unique: FfZk7JGCPmS8NemWl-m-0g-1
-X-Mimecast-MFC-AGG-ID: FfZk7JGCPmS8NemWl-m-0g_1744162930
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E85E0180899B;
-	Wed,  9 Apr 2025 01:42:09 +0000 (UTC)
-Received: from starship.lan (unknown [10.22.65.191])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C53151801766;
-	Wed,  9 Apr 2025 01:42:04 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvm-riscv@lists.infradead.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Waiman Long <longman@redhat.com>,
-	x86@kernel.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Will Deacon <will@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	linux-riscv@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sean Christopherson <seanjc@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: [PATCH v2 4/4] RISC-V: KVM: switch to kvm_lock/unlock_all_vcpus
-Date: Tue,  8 Apr 2025 21:41:36 -0400
-Message-Id: <20250409014136.2816971-5-mlevitsk@redhat.com>
-In-Reply-To: <20250409014136.2816971-1-mlevitsk@redhat.com>
-References: <20250409014136.2816971-1-mlevitsk@redhat.com>
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="n4WjGcmi"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=t6bEHmXR4hsKSydf9mMtsLfzD3oJTGRwaakCRHqsDW6IrP0yksFbmTf0+GAKQFq3umSWYJOPbYsrmwZeaY8EEuvWHSQ3Lg6qZ/6Jd/q97M9sNi1GBXJUHht3afkAK/i0DNMtI5W9k7QtxNOECbgO157m1J3oDXsih39W2rlCDGGRbc3c1oGBHYvbsXJRk57rAYLCeh/tza5hHwgVSXINtoWAyYRiRnXSTDUXCyuL06qBatBZ5Wnaulnvs2Zk1BV6TXMuZ49oDv8ssGTJsz0IEBMVLiHUFh8fJDjdO7/rXQo8yGFcC+gFlGMzDkx5j6O5JhFGqULRJau+LXrIGnaiQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qJlH0uCyNdCamX/IUN9/rVRRurzX4p3FPwRZylrB1DA=;
+ b=hMnVXvQveVU6SnsCWC/oIFijUnD3p8psAPQIzypfHPu1pPeHFeCbWIiJi8aNJdzdxjAhCv+0rjuzorsuc/wwlkWu/llv2+J1tKDnEsocBOcwrSxodsaAMJ48/zYOf/mlwt3bHElAQRq45DO3xQ0BxGMy/qpVkxBgfxM10B6lQ869UHh2hPUA590woGqRFwodQt8h9mrRmMawV22NHXY5TAqLv+1DayD9JFqPB0mMgywhRTGnozP4DH4D6EmY7+XccHQiDH1o9iwHuW/e5eQOKS7bVS2En/rCvAPCK+wWtPXrMlB+2Nu0W5FwiJytmYDqSyZQoShBhChGu9QSzvG39w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qJlH0uCyNdCamX/IUN9/rVRRurzX4p3FPwRZylrB1DA=;
+ b=n4WjGcmiJne8QcmtdT+c20Fv6oCcePLh4vSQN4LbtknUxFjD+YL2GkbtbHPRjwHzf/toUaxsH+ufPuaFpTu3Ttli4H1w/m30Jr6b31u19Vzi7zxA5gnPaM5ADi4b+GuJnLjVUPAE63n3C3oPd6MawBHlhKhs5dMg6Jtnbs00OPk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ SN4PR01MB7405.prod.exchangelabs.com (2603:10b6:806:1e8::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8583.46; Wed, 9 Apr 2025 06:38:32 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9%4]) with mapi id 15.20.8583.041; Wed, 9 Apr 2025
+ 06:38:31 +0000
+Message-ID: <7ea61a71-27f9-4b2c-8477-c2067c7219f8@os.amperecomputing.com>
+Date: Wed, 9 Apr 2025 12:08:24 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 16/17] KVM: arm64: Allow userspace to request
+ KVM_ARM_VCPU_EL2*
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>
+References: <20250408105225.4002637-1-maz@kernel.org>
+ <20250408105225.4002637-17-maz@kernel.org>
+Content-Language: en-US
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20250408105225.4002637-17-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0120.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:11d::9) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|SN4PR01MB7405:EE_
+X-MS-Office365-Filtering-Correlation-Id: d41f4bb0-a37d-49c6-66f8-08dd773124c7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?b1R1Wi9tY2R2NjBOSFlweU1pbFRNSStTQ1FHOWREN1owajg2UEtjdHJZSXE3?=
+ =?utf-8?B?eXF3NkVJNGR1YkQ1R1Z3M09IZ29KMHRoVW9DSXpwQUdwMnk5cE1taVVwSUhM?=
+ =?utf-8?B?OGJ4bW5uTVpmUkxzVmt0cE93bTBJRTM4RExnYVZlM0VNQ0ZVRWl2Z3BvM1dy?=
+ =?utf-8?B?MkU3Wk9Zdk9hRStqZmRMU3pMbUFKQUpwc3lOSWRxbzNDRHZQbWlTc1FNaTJN?=
+ =?utf-8?B?dEpPSHRmZFRmRi9kMmEyNDVBblBVa3hlR095R3VBYVFMaEFmS3ZKQTk0REVL?=
+ =?utf-8?B?QVZVQlJvNFpzY29Cc2FnYXYzMDRyZDB5ZGFaeWxPUFlocWZHMDF6aURHUnA0?=
+ =?utf-8?B?c0V4WTFCbklwdFVvWjZEeDl5clFlSm5sM1VwZ2pXeUFUd1FVUlI5R3U1WmVz?=
+ =?utf-8?B?KzVOdy9iMkhGdzZJQlFRVUtqM0s1QnVPWU5IaDUwekJrR0lpOUlSaFVjWmlY?=
+ =?utf-8?B?eFJjN29ObGZJUTdCTFVmOXhmUDRBTlBERklnUXB2TkVBc1lyYUw4c1V3ZEJO?=
+ =?utf-8?B?ckx1TGdBYjlMMWh4NXhwbjcreDdZSTl2Rm8ybzZZVGg2N0ZadUNpWE45My84?=
+ =?utf-8?B?SHJDMzNZbFhtR0FUZmtENVNEdDNFRzdZSC9hOE9Va0ZEemlnOEFiOTcxQSs2?=
+ =?utf-8?B?cG03dHlYbHlNZitjdTR4SkVUbld4RzJVbFo2MSsvTjZzblVUMEJLazNxK1E5?=
+ =?utf-8?B?WFV6dVBlQjNMcnFCYWkvU0hOalpwZVNPdXBXM2MxdTlUeHdTaUNWRW5vbG40?=
+ =?utf-8?B?bExuaWpFU2szNnB3UVJha3JlZHJsRzB2aGFSTUlEM1ZlbW03bStXUkRneThW?=
+ =?utf-8?B?R1c0Ym1rNzRpZmc4N1k2dGlDc2ZmU3dLekNuU3VHejVBUWxjVytXK2U4QTVm?=
+ =?utf-8?B?NnNFblBPeXNPTnZzc3pyY0ZYZWxDMEFjMEN1MnpxSkphYUMyTUNuVUJMZktw?=
+ =?utf-8?B?ZGxmY2p1RkJ6ZXZVM2h6WEloZUdXWHFOdmsweEQ5NUZ2NGhFM3dON2tsbVdQ?=
+ =?utf-8?B?ODI0cG9tWkhYeENCZ2VJZDQ2MWplRjlIalpIVk1RdDdKWmFYSFp3UlpaME05?=
+ =?utf-8?B?RVhKeXdKdkZTUHV1ZFpNNWY4TUN1UXJiUDY4RGdpbW5MU1FEL1QyMUhZZDNJ?=
+ =?utf-8?B?TEtZcGkrVUhKbEFkVEt1aGs2ejRDN1pRY3JFTktORkVHYkxPdy92NDFIZktW?=
+ =?utf-8?B?U1RlS1hKYnZ6TTdRUkdiSmduY3FqREpPK3FvUlFZRmU3Lzl6N0tTdDBPcERT?=
+ =?utf-8?B?WVNYOVJVRmU2bTBidHNRdExFbEpBbnJEWmd2NDNHUERvemluc0dhNlZmaldG?=
+ =?utf-8?B?STE0b3UvZUhhcDh5OUVKMFZRZFQ0Sm5zN3hPcGlLdnE3bWYxUy9hT0JHWUw0?=
+ =?utf-8?B?b002NFdBVXVvU1pnRjJtZDZhc0xPQktjcXl4c1RUaW9waVozNjgzRWlEWi80?=
+ =?utf-8?B?SFNEcmNCbzV4bFVLVnlTOUZQcHlhenplSkZ5bmo3SVRIOUpHMmFuREQrWXZY?=
+ =?utf-8?B?a2pzVTlSTHY2VnQ2TDYrL1NHSDF3SlVhNksyOEd4dTMwTlhGV1piUlJVNS8x?=
+ =?utf-8?B?dXVvM0Zvb252YjhjZUdTcFhrQStDaWNRMGF0dFlGeFdvc3J1NnQ0RzNpSlAv?=
+ =?utf-8?B?UkFaMCtiWTZFVXV0U0t6RDFycVhYcmxEMU51Wlg0clVIdjdYbVRvSjJNWHRB?=
+ =?utf-8?B?SjNCRmx3TXlKZlpjT1lRRHNzVVNrZVViQjFBQUd6MTZSY2dFK3pVSUhuQ0pU?=
+ =?utf-8?B?V004bWk4Vk5iUWdnNHVVMWFTOTRCQXh6ZE5nZWozT0w2U2JIZzhPOGVhUkhw?=
+ =?utf-8?B?bndIR2VBNEs2M294WGRlUlhoSkErcHA5cUQrVm0rNnpLTnF1SllVNjlRZ0Y1?=
+ =?utf-8?Q?nJE9HZTI3+hHN?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MDJzTU1mQ2oyMTlObm5VZ0RQYVV1bkwyMC8ybWZJMlp5MFc0am13WktYWnhH?=
+ =?utf-8?B?bHkzVUw5L1NRWDFEd0pvMDNjaDZ5eisyaXJHejVjSUNVZmw0TGI0VHRnMWVs?=
+ =?utf-8?B?NWdhODFlcnJ3REowTUgzRkF0Z0dZNlVWeTVtMGdmbXN5NnRBMnUwK052OGlE?=
+ =?utf-8?B?N3QrYWxrWXhBOWN5SFg1V1htR1BrYUlzalY4Vmg0N2UwLzlGOUdub2NxRW1j?=
+ =?utf-8?B?a3MzeE02Vkl2QnMyaGx6Y2ZqbmlpUW1sSmlWZGt4Sm81OVNrRkJhMTA1ZEZh?=
+ =?utf-8?B?OUxCL1BSR2dpQXBDK0xNRXQ1cUxxSCt1VUhqSWJSMHhXVWYyelROYUtkRDJs?=
+ =?utf-8?B?dGtYSExjUmhGQzZXb3pxYVZZK0s0Q2QyYjUwNWtlM2doeFI5Y1JBNGJGVWx2?=
+ =?utf-8?B?ME5qUU05WUxRZWdYbStXNUhZZnF4VVpwMUdVd0pmdWlTcFFnUVF5eDY1ekcr?=
+ =?utf-8?B?aURjWE9OYno5Uk9VNzFBOXZ3bGtaUDJPMUkzbVZCZ2xUWEZaRnRWRUtpTWRQ?=
+ =?utf-8?B?T050Q3B4QW96ZXVtc0FLd28rVWtucVhhb3JVZDNoOFBrQ1hrcWlibTJRQWtM?=
+ =?utf-8?B?Zm5vVlZqOHZQNElpaHliNzFzZWgzS1FVL01yWUl0N2dqcDJjVGNNSzU4UnVj?=
+ =?utf-8?B?NVlFZFFkeTNVSWFZSFJ4YWJXU3lWZWllMXZDUllhWGdzSlh1MWlWYVIvM3hM?=
+ =?utf-8?B?dk5TVDJMU0NOdGZldDJMeDExUk5UanRsME8rWFBxQ0trZE9KYldES3FORG5k?=
+ =?utf-8?B?MWdmSGs0d1VRSVZSaGsyNmZiSVJabnQwQVZ1L2pXQnE1Y0tBd3hQamJZc1lG?=
+ =?utf-8?B?dEFQT2NjUjhMV2pXMjlQcEkwbkpsMHp3aGwxVnJxSEZNWEtVcWtNUXBrNUlp?=
+ =?utf-8?B?Z25pSEdLUGtXNnFpS1RxR0Z1K2V1SEN2TDE4a1FnTDhCakg4TG5EeXRpZXZB?=
+ =?utf-8?B?VmEyRDJwR1B1OVNKVnYyNHorWHl0Z0IzZ2ZZNitZellOMDBjT0pXQ2pwREFj?=
+ =?utf-8?B?dHlQVnpDVHhRVGlHbnpGT1JBL0QyRHcwZDZxT20rUGZKT3gzZi9qQm56MThn?=
+ =?utf-8?B?WkF3TXVuQ3dPVEVJWUZzbmxTODh4amxoRHJnY0lBbnJsM1Q2S0J6bUtQb3JM?=
+ =?utf-8?B?ZWNmUWRJNUs1QnROQ3RzRGhjYi9JWk53cjR2a1pEc0JRWGVjckNLZXFnMEdP?=
+ =?utf-8?B?RGJCRFZSQWFGWk4vck9aK1VxTzhkS0piNzE3ZkFoeDA4Y3BOR1hNSVM0ODdy?=
+ =?utf-8?B?RWVCRnhLQkUzaU0wbWFxakhOVVV4dTRLeUtQNjl0SnU0WXgrbGQva0VOdzZC?=
+ =?utf-8?B?cDRHenZ5dGFLNlp1cWFkT2lSNzdLRnBxSFh0eXlNa3JrcExWV3NPUmRXSGRB?=
+ =?utf-8?B?VmZudDlBY25vZVVvTG43N0xIRUZIUVZrdmNpY0hKTldOMHRwV2hJSytSQ0pH?=
+ =?utf-8?B?RGNuS3NKSkNVaHJTcnFNTkF6UEFGL29KdERyMkVWNDNERXA0Rlh5QXc3cU1G?=
+ =?utf-8?B?NCt0b3FUaVR5WE4wNEVRaVZvTTlNaFliZlRqclhodDV4SXpKNjY5Kys3UTlT?=
+ =?utf-8?B?MEVnbWhtRlpzS0NKQ3JaRHRXNGs5ZnpKeVB1am5GYTNDM0hpR3JDTkdHb0Z5?=
+ =?utf-8?B?MDh6czBQOXZjRWM0UmRVSlBha0NHMVZnN1hmQjR0Z3EwUExMTmFPbG0rdTVE?=
+ =?utf-8?B?THNEd2FZZGFMQlpDWXZXdFo2aWpBbG50eVBTeXI0UUk4YWVua1huSUtHdTN4?=
+ =?utf-8?B?SlBHME1rNHBER2s2Z3RYL0Nna2E3dE5jd1ZmSkxaTU15M1J4MlA3UHUxYmdz?=
+ =?utf-8?B?bUhnVGxGSkJEekxUWkkrOENLVVpMZ29oamFBdncyNWZWWmxyZ3pzeWxZMk5S?=
+ =?utf-8?B?SXZySDBTVzFCc2txeGJxNm5QVytMcEYzbUx3MkYyODlUS0FobWJxNjh1SDZr?=
+ =?utf-8?B?NHUzR1lZQlVBa1JmZFh1V2MwRXdibldyK2l0Wk5XK25DZFlMSEttV3d2QTdY?=
+ =?utf-8?B?MlAxaVZlTXpBR3hUcmc4TmNXc1FYK1cyS3RiM21Tc2dRVDB6Sm5VdDRCK3Zy?=
+ =?utf-8?B?RmxJbHVMbFg1TTJiZFNwUFNsT2xBbmhuWnRpWnJmWEdmQXpPRStMY3Zreno0?=
+ =?utf-8?B?SlBIbDJXV29OK0Nvc2IvY0lMUjBiYTg0bktncEc2VlN3WXZZVWpDUWlEamF5?=
+ =?utf-8?Q?f4QfCEaxQWwdEf9Up/ZMUcZUxba1jlnN3LuEUoTCwoEN?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d41f4bb0-a37d-49c6-66f8-08dd773124c7
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 06:38:31.3983
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rUdsFMRlNOdV8x1sQPYXMDLFcimS+ZALEj4U34TL3U6QTa3Wz2R9eWdqIScrPEI7a88WeX4UzE8uGTYP8VhQW4eiX3x4HAQch4WKk9a30cbLx3HAlrBk7FvQyVTzmw1z
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR01MB7405
 
-use kvm_lock/unlock_all_vcpus instead of riscv's own
-implementation.
 
-Note that this does introduce a slight functional change - now vCPUs are
-unlocked in the same order they were locked and not in the opposite order.
+Hi Marc,
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/riscv/kvm/aia_device.c | 34 ++--------------------------------
- 1 file changed, 2 insertions(+), 32 deletions(-)
+On 08-04-2025 04:22 pm, Marc Zyngier wrote:
+> Since we're (almost) feature complete, let's allow userspace to
+> request KVM_ARM_VCPU_EL2* by bumping KVM_VCPU_MAX_FEATURES up.
+> 
+> We also now advertise the features to userspace with new capabilities.
+> 
+> It's going to be great...
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/kvm_host.h | 2 +-
+>   arch/arm64/kvm/arm.c              | 6 ++++++
+>   include/uapi/linux/kvm.h          | 2 ++
+>   3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b2c535036a06b..79e175a16d356 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -39,7 +39,7 @@
+>   
+>   #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+>   
+> -#define KVM_VCPU_MAX_FEATURES 7
+> +#define KVM_VCPU_MAX_FEATURES 9
+>   #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
+>   
+>   #define KVM_REQ_SLEEP \
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 5287435873609..b021ce1e42c5c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -368,6 +368,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ARM_EL1_32BIT:
+>   		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
+>   		break;
+> +	case KVM_CAP_ARM_EL2:
+> +		r = cpus_have_final_cap(ARM64_HAS_NESTED_VIRT);
+> +		break;
+> +	case KVM_CAP_ARM_EL2_E2H0:
+> +		r = cpus_have_final_cap(ARM64_HAS_HCR_NV1);
+> +		break;
+>   	case KVM_CAP_GUEST_DEBUG_HW_BPS:
+>   		r = get_num_brps();
+>   		break;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index b6ae8ad8934b5..c9d4a908976e8 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -930,6 +930,8 @@ struct kvm_enable_cap {
+>   #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+>   #define KVM_CAP_X86_GUEST_MODE 238
+>   #define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
+> +#define KVM_CAP_ARM_EL2 240
+> +#define KVM_CAP_ARM_EL2_E2H0 241
+>   
+>   struct kvm_irq_routing_irqchip {
+>   	__u32 irqchip;
 
-diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
-index 39cd26af5a69..a4599de98c6b 100644
---- a/arch/riscv/kvm/aia_device.c
-+++ b/arch/riscv/kvm/aia_device.c
-@@ -12,36 +12,6 @@
- #include <linux/kvm_host.h>
- #include <linux/uaccess.h>
- 
--static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
--{
--	struct kvm_vcpu *tmp_vcpu;
--
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&tmp_vcpu->mutex);
--	}
--}
--
--static void unlock_all_vcpus(struct kvm *kvm)
--{
--	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
--}
--
--static bool lock_all_vcpus(struct kvm *kvm)
--{
--	struct kvm_vcpu *tmp_vcpu;
--	unsigned long c;
--
--	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
--		if (!mutex_trylock(&tmp_vcpu->mutex)) {
--			unlock_vcpus(kvm, c - 1);
--			return false;
--		}
--	}
--
--	return true;
--}
--
- static int aia_create(struct kvm_device *dev, u32 type)
- {
- 	int ret;
-@@ -53,7 +23,7 @@ static int aia_create(struct kvm_device *dev, u32 type)
- 		return -EEXIST;
- 
- 	ret = -EBUSY;
--	if (!lock_all_vcpus(kvm))
-+	if (kvm_lock_all_vcpus(kvm, true))
- 		return ret;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
-@@ -65,7 +35,7 @@ static int aia_create(struct kvm_device *dev, u32 type)
- 	kvm->arch.aia.in_kernel = true;
- 
- out_unlock:
--	unlock_all_vcpus(kvm);
-+	kvm_unlock_all_vcpus(kvm);
- 	return ret;
- }
- 
+After applying PATCH 16/17 (this patch) and PATCH 2/17 on top of
+6.15-rc1, I could boot L1 then L2.
+Glad to see that the majority of NV patches are merged upstream!!.
+
+Please feel free to add,
+Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+
 -- 
-2.26.3
+Thanks,
+Ganapat/GK
 
