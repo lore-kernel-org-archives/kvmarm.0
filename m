@@ -1,41 +1,68 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136E91E7C20
-	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 20:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF504214223
+	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 20:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744230707; cv=none; b=K8enM+XgQFkMRl65ZOz26I+TlSAkEb4SVCTmiaQ5fSWFEOwMncJnmWYHYONvtWH5ZMprnsLe0oyByuJFWT7zO6rCAzxaP9bbQBWovildYG0ATbduVWdr+OjaMWXS9sZyhBCHOwBx7JRe59qbZMETWdwfjo7v1lwoxhr5yIIzAVY=
+	t=1744231528; cv=none; b=JIPM6c+VfiKKOpjVl8Hdf35/AFq6RShfc5WaGXTf9OaFy/H+809098LVXZ8r79fRyhG1aKBOa+Hq7C9MPw3aSzrXch32a8hmjhPRC91JyITOt1MXbWSwGj2KyLY+TKsZso1hfv8JTsIwvmjzj2ju9jgaTKMvF+zj6pAN/nErlw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744230707; c=relaxed/simple;
-	bh=/Vul5m4Y17mhjN3thkG863AtX9rqqik8TH/QNObL0f4=;
+	s=arc-20240116; t=1744231528; c=relaxed/simple;
+	bh=xOp9DXsMQrw85PtagiwlHyz33EONNax0oXOrZSgcHHk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Krq9E/4hSTqLRKORBxzmxiNwnihgTGiqFtDifLLPNyCA8ZwDnuu2TcIL7OA6UWMWsDFYuOIolOlwBKIGjcH37W8jCD0lrpWDGAdgIvMTPp9vS00KHzuBE2ArcESDLnyVJZBwgv5sss33PsdnJGuarabNRv/ClOBijYdYR6pzosI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uEUF9c5z; arc=none smtp.client-ip=95.215.58.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=e7OSfcHl6dXg8o9jCkcs2TTq/q9YI6RdtFQ4VHcER74Vp7mLlSAKdguNlLw0C3VhvuEGOv9HJ7ym3YHe+1puwPJsEYBKyMgTH+hcUHLnDYl5M9nlk8AqndiW0EUBrsbc0EogafS0botwsCbwbNZUP8PvyTHpMZvTe5M3pvksS40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xC8aSKQf; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uEUF9c5z"
-Date: Wed, 9 Apr 2025 13:31:31 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xC8aSKQf"
+Date: Wed, 9 Apr 2025 13:45:12 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744230704;
+	t=1744231523;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rhw9TvczlbAheyT06wRwF+HH2SWlYEwVk/yXlXJVQrg=;
-	b=uEUF9c5zkX+7RdtwK/w0O4sdsZGGNmkkqqFNHLWnNPdBGMKRyxkobxWJN3Ov84aamXiiub
-	f/UoLB780UMgm5YhkKcdHuhhstUPowErJDYoRvEiQeBwccAhfmDdLE7HowIbB5ltmspM5g
-	U34Igxld3DjndeF0Q7H5Yo93j+CjBcA=
+	bh=ENOcZPIItp2JvszVxj/GE2Qd8ZKfpfM4JflKxCvjNwk=;
+	b=xC8aSKQfjMqodNcjkUTLUjs/zqCFYnuOpjbh5P9WpT5NQV26kzbmBYXpCKWYi7kZGBKsxL
+	gZW41lEMVPwc0O3ZChQyXo3FcMfH90y50iz05hYThAcZmGJ8iVYi08BYw8+X5iWzs50Hx2
+	w3VkprowZiWZQ4RRthwlJQvvZgV2B04=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: EL2 PMU handling fixes
-Message-ID: <Z_bZI5GQh91Vm-6G@linux.dev>
-References: <20250409160106.6445-1-maz@kernel.org>
+	kvm-riscv@lists.infradead.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Waiman Long <longman@redhat.com>, x86@kernel.org,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Anup Patel <anup@brainfault.org>,
+	Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
+	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	Sebastian Ott <sebott@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	linux-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sean Christopherson <seanjc@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH v2 2/4] KVM: x86: move
+ sev_lock/unlock_vcpus_for_migration to kvm_main.c
+Message-ID: <Z_bcWBfhoUZfRzek@linux.dev>
+References: <20250409014136.2816971-1-mlevitsk@redhat.com>
+ <20250409014136.2816971-3-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,40 +71,140 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250409160106.6445-1-maz@kernel.org>
+In-Reply-To: <20250409014136.2816971-3-mlevitsk@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Apr 09, 2025 at 05:01:00PM +0100, Marc Zyngier wrote:
-> Joey reports that some of his PMU tests do not behave quite as
-> expected:
+On Tue, Apr 08, 2025 at 09:41:34PM -0400, Maxim Levitsky wrote:
+> Move sev_lock/unlock_vcpus_for_migration to kvm_main and call the
+> new functions the kvm_lock_all_vcpus/kvm_unlock_all_vcpus
+> and kvm_lock_all_vcpus_nested.
 > 
-> - MDCR_EL2.HPMN is set to 0 out of reset
+> This code allows to lock all vCPUs without triggering lockdep warning
+> about reaching MAX_LOCK_DEPTH depth by coercing the lockdep into
+> thinking that we release all the locks other than vcpu'0 lock
+> immediately after we take them.
 > 
-> - PMCR_EL0.P should reset all the counters when written from EL2
+> No functional change intended.
 > 
-> Oliver points out that setting PMCR_EL0.N from userspace by writing to
-> the register is silly with NV, and that we need a new PMU attribute
-> instead.
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/svm/sev.c   | 65 +++---------------------------------
+>  include/linux/kvm_host.h |  6 ++++
+>  virt/kvm/kvm_main.c      | 71 ++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 81 insertions(+), 61 deletions(-)
 > 
-> On top of that, I figured out that we had a number of little gotchas:
-> 
-> - It is possible for a guest to write an HPMN value that is out of
->   bound, and it seems valuable to limit it
-> 
-> - PMCR_EL0.N should be the maximum number of counters when read from
->   EL2, and MDCR_EL2.HPMN when read from EL0/EL1
-> 
-> - Prevent userspace from updating PMCR_EL0.N when EL2 is available
-> 
-> I haven't added any Cc stable, as NV is not functional upstream yet.
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 0bc708ee2788..7adc54b1f741 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1889,63 +1889,6 @@ enum sev_migration_role {
+>  	SEV_NR_MIGRATION_ROLES,
+>  };
+>  
+> -static int sev_lock_vcpus_for_migration(struct kvm *kvm,
+> -					enum sev_migration_role role)
+> -{
+> -	struct kvm_vcpu *vcpu;
+> -	unsigned long i, j;
+> -
+> -	kvm_for_each_vcpu(i, vcpu, kvm) {
+> -		if (mutex_lock_killable_nested(&vcpu->mutex, role))
+> -			goto out_unlock;
+> -
+> -#ifdef CONFIG_PROVE_LOCKING
+> -		if (!i)
+> -			/*
+> -			 * Reset the role to one that avoids colliding with
+> -			 * the role used for the first vcpu mutex.
+> -			 */
+> -			role = SEV_NR_MIGRATION_ROLES;
+> -		else
+> -			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+> -#endif
+> -	}
+> -
+> -	return 0;
+> -
+> -out_unlock:
+> -
+> -	kvm_for_each_vcpu(j, vcpu, kvm) {
+> -		if (i == j)
+> -			break;
+> -
+> -#ifdef CONFIG_PROVE_LOCKING
+> -		if (j)
+> -			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
+> -#endif
+> -
+> -		mutex_unlock(&vcpu->mutex);
+> -	}
+> -	return -EINTR;
+> -}
+> -
+> -static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
+> -{
+> -	struct kvm_vcpu *vcpu;
+> -	unsigned long i;
+> -	bool first = true;
+> -
+> -	kvm_for_each_vcpu(i, vcpu, kvm) {
+> -		if (first)
+> -			first = false;
+> -		else
+> -			mutex_acquire(&vcpu->mutex.dep_map,
+> -				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
+> -
+> -		mutex_unlock(&vcpu->mutex);
+> -	}
+> -}
+> -
+>  static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+>  {
+>  	struct kvm_sev_info *dst = to_kvm_sev_info(dst_kvm);
+> @@ -2083,10 +2026,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  		charged = true;
+>  	}
+>  
+> -	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
+> +	ret = kvm_lock_all_vcpus_nested(kvm, false, SEV_MIGRATION_SOURCE);
+>  	if (ret)
+>  		goto out_dst_cgroup;
+> -	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
+> +	ret = kvm_lock_all_vcpus_nested(source_kvm, false, SEV_MIGRATION_TARGET);
+>  	if (ret)
+>  		goto out_dst_vcpu;
+>  
+> @@ -2100,9 +2043,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	ret = 0;
+>  
+>  out_source_vcpu:
+> -	sev_unlock_vcpus_for_migration(source_kvm);
+> +	kvm_unlock_all_vcpus(source_kvm);
+>  out_dst_vcpu:
+> -	sev_unlock_vcpus_for_migration(kvm);
+> +	kvm_unlock_all_vcpus(kvm);
+>  out_dst_cgroup:
+>  	/* Operates on the source on success, on the destination on failure.  */
+>  	if (charged)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1dedc421b3e3..30cf28bf5c80 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1015,6 +1015,12 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+>  
+>  void kvm_destroy_vcpus(struct kvm *kvm);
+>  
+> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role);
+> +void kvm_unlock_all_vcpus(struct kvm *kvm);
+> +
+> +#define kvm_lock_all_vcpus(kvm, trylock) \
+> +	kvm_lock_all_vcpus_nested(kvm, trylock, 0)
+> +
 
-Similarly, I don't see a compelling reason for this to go in as a fix
-for 6.15, especially since you're adding new UAPI. Do you mind grabbing
-it for the next merge window?
+Can you instead add lock / trylock variants of this?
 
-With the comments addressed:
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+kvm_trylock_all_vcpus(kvm) seems a bit more obvious in the calling code.
 
 Thanks,
 Oliver
