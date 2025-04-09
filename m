@@ -1,99 +1,288 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3A58C0E
-	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 10:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA301CAA82
+	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 13:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744193663; cv=none; b=AC6+X+XfqIHQ2MsPg9cUbUUddYvOcyb3W+vI6p31npdslacbIw4q7J6Xm3yPWfThR1PYLYvhqggm/hrNc8gg0S2RGvoT8axH5h2+nigfYknr8TnjDFmPmcqxDrwAxTSMtYE3XCIXoC4FdKpEBbXtHPBsCG6sBAPD/kYvMzE7zXE=
+	t=1744206442; cv=none; b=XXQVf3w0RPF7jzObljRix7JzTqqVpvf4OQL5FLpXSj4iA0xjlDkCAavKfdQ5Y3mTsX+oTQDLI2UkAzc+mWi6OXVV9HzalM6ag/cuMViLRwDc8+NmqhIWq2g1sc26mhMoYwvGKkTjaARv6thuA6v177Ijpc8k1pu5Uq8EBA/t8ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744193663; c=relaxed/simple;
-	bh=8b+D5b8jySbK0G+S0uwSSxKFT82ctgNLICAgJyYk3oc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cBMe+y6OUphbV+nZiAzu8oZsPxVJCTFgxjRaJUg+cVnZ+EVmv4jeWZfYXh4DvO5oiWrQo7g1toe9JZcMkdHzag5CJIHllozmHzZe1WJYbCP1MnCciPGGuY9OWoolqvjhq/qY+at8SWwcOXETpbMwt2XWxPj/l70r3Z2G/wKcZy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bFJgoeUe; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1744206442; c=relaxed/simple;
+	bh=qoxX74MayVQT3lo4VHMo/vX7lWgGYrnFT4wmOWYfSqQ=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=pRuJX3Z8rOO+7MulI8V7vglzRP2RB+MG8Z6rbMGDBAT02kizebOUev2TbYctw6cDAXby8MQhkmekjwJtQoGIxNl/mh8pHV/H1wJMg99iH12lJhFcazB9fEUl7z0t+GgQ6XTfTCt81xGU2FVCLa8nJv0GI6sF5lMchjVFeXDvdR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LY//Wrsd; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFJgoeUe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LY//Wrsd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744193661;
+	s=mimecast20190719; t=1744206439;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+/lkyCl8vM9EFCkDS8zkM7kt4Y5/de55KVxrVIc8hfM=;
-	b=bFJgoeUeN/WeZ+9eiIWpWXFZgwACHw+KybKF19M22XO94RKYjvqIgd1KylYr8Qi9v4GltO
-	T4D6WvOax/S07O7/EsU0L0PViHHGbm8VDuWhII41fSN1V2gRzlb1IHWVTCiqqx3HQOHbHO
-	ahyW2r+cPMHXocRFdxO3/bGk4zQOKf0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-596-bKlSA2fpNqG4c5vRinQghQ-1; Wed,
- 09 Apr 2025 06:14:16 -0400
-X-MC-Unique: bKlSA2fpNqG4c5vRinQghQ-1
-X-Mimecast-MFC-AGG-ID: bKlSA2fpNqG4c5vRinQghQ_1744193654
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 486FC1954B39;
-	Wed,  9 Apr 2025 10:14:12 +0000 (UTC)
-Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0EA1A19560AD;
-	Wed,  9 Apr 2025 10:14:09 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
- oliver.upton@linux.dev, sebott@redhat.com,
- shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- agraf@csgraf.de
-Cc: shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
- pbonzini@redhat.com
-Subject: Re: [PATCH for-10.1 v4 04/13] arm/cpu: Store aa64pfr0/1 into the
- idregs array
-In-Reply-To: <20250326173723.389988-5-cohuck@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20250326173723.389988-1-cohuck@redhat.com>
- <20250326173723.389988-5-cohuck@redhat.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Wed, 09 Apr 2025 12:14:07 +0200
-Message-ID: <87bjt5abgw.fsf@redhat.com>
+	bh=C8sFG62uIhWcCDnsK+TitF7g9YvTTNhbdnhc8bS11xU=;
+	b=LY//WrsdjkdAzh9bMRwAeHZLEMxSvcoVBH5cXHb4MxEG1nSkmU65yz+F8ilWqnaVeAkn4Z
+	r5GiHwULexAwq5aKp2ef374g8ZQDUb389ULmaULZJLwC1lxw8JY75Prj8AUXsmdTrr/xCv
+	3NQfso6odaq1sE/PQZ9BviM37LFRTjw=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-172--648D_vwNqCUKq3LeYrLtQ-1; Wed, 09 Apr 2025 09:47:17 -0400
+X-MC-Unique: -648D_vwNqCUKq3LeYrLtQ-1
+X-Mimecast-MFC-AGG-ID: -648D_vwNqCUKq3LeYrLtQ_1744206436
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d6e10f8747so54929085ab.3
+        for <kvmarm@lists.linux.dev>; Wed, 09 Apr 2025 06:47:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744206436; x=1744811236;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C8sFG62uIhWcCDnsK+TitF7g9YvTTNhbdnhc8bS11xU=;
+        b=vOu92w4GMWg5S2mKHe6bxja1HT5xAw+l0v6ou+Y7ihQf7i2q+Qn9yQJmVhaAoXgWr8
+         O0G9MRH09r+Ju3CvQCEWPXKcBxO4pO6Ypl1oT4MczFhgrt+2FVAFk6CqaAxqfyV0C0PO
+         Mu+bE6TUab2Cuv60qVQxsKMbeCYwx9OhHtxbBTj9VcgcJdimG0LMhh3JnNHw18YhImQ/
+         SRurR6hkc8q8E23ihmluiwRZktfTIW6cf8n96tQR92vZlnC9jmq6LkSmTibkJl2QC0s0
+         BTDR6ZU1DsX7SZqZ09rIwJZ6GhTdFMTe9gyoI9Su0KO/Dcc317/tTN17ZhQFCjkGHwe0
+         AZ4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXhfC+7nneYJHduj+KRIgKOafb+12VbrN7DL0kl9BO2ZuWf5SDMzfQMcVvBG5ZaQ51NplFtck4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyFiJKO+0Rw3Iy08cw+X1L/mjtMM2R6xt0/A6R+QeWF/qN5UNo0
+	dr0VhnTGOsQbZVxK0dsYaPpKmA+Y1/sJbu/ireyRkpl3l1LtlCIzlo8HX7aq5veuIzLGFfSxuKq
+	5+0G1bZNBM5P7uTc+AgvwmUOJ/ewQcduqrCoKme1OLFEVACZ3hHjKIQ==
+X-Gm-Gg: ASbGncuse7QVuZVQuLO7nNmhMDnVS28QdTzysacHWg0F0Wpf790B1R1Vdb+cjE+E8zm
+	QXl/ootASVlbc0Js41rd7AY0fi6RL+KfkBiujREm87YfBnCaPjX95C/fHa1/9NEsmrzT0jQrN/w
+	Pqjbp+/hg5AFUWLUD21uTfn/3oFS3CNZl2+C+EqP3YTj+SuhcqeRagjkDYLcfL6OwEWgaFvmDeD
+	vTLB/XyUzwn+53Q8mPsA4cHmRnEB3PAk31j+zZy/+T5bFzrK3jTC9CgOSaC1TCM7T2GxvE0VZEJ
+	u8ClqELhWjJoeQ1zqxYQLv3zVZQf1ZPXYY97wuHAgdYeGtw4PQLMIk7gOA==
+X-Received: by 2002:a05:6e02:1c0e:b0:3d5:dec0:7c03 with SMTP id e9e14a558f8ab-3d77c27fb00mr27400485ab.12.1744206436325;
+        Wed, 09 Apr 2025 06:47:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGY11cU0INBe/qnf4e7hQqyG5TAgNSTBjToXX6S3PDZH7tI5Cb3FdlfnkGTFvFeZrlBBTdq0A==
+X-Received: by 2002:a05:6e02:1c0e:b0:3d5:dec0:7c03 with SMTP id e9e14a558f8ab-3d77c27fb00mr27400065ab.12.1744206435834;
+        Wed, 09 Apr 2025 06:47:15 -0700 (PDT)
+Received: from ?IPV6:2601:188:c100:5710:315f:57b3:b997:5fca? ([2601:188:c100:5710:315f:57b3:b997:5fca])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d7dba85487sm2698105ab.23.2025.04.09.06.47.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Apr 2025 06:47:15 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <b0fe0707-faae-4e0b-b873-9a80e39471fc@redhat.com>
+Date: Wed, 9 Apr 2025 09:47:11 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/4] KVM: x86: move sev_lock/unlock_vcpus_for_migration
+ to kvm_main.c
+To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc: Alexander Potapenko <glider@google.com>, "H. Peter Anvin"
+ <hpa@zytor.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ kvm-riscv@lists.infradead.org, Oliver Upton <oliver.upton@linux.dev>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Jing Zhang <jingzhangos@google.com>, x86@kernel.org,
+ Kunkun Jiang <jiangkunkun@huawei.com>, Boqun Feng <boqun.feng@gmail.com>,
+ Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Zenghui Yu <yuzenghui@huawei.com>, Borislav Petkov <bp@alien8.de>,
+ Alexandre Ghiti <alex@ghiti.fr>,
+ Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+ Sebastian Ott <sebott@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Atish Patra <atishp@atishpatra.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Will Deacon <will@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ linux-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Andre Przywara <andre.przywara@arm.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Sean Christopherson <seanjc@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Bjorn Helgaas <bhelgaas@google.com>
+References: <20250409014136.2816971-1-mlevitsk@redhat.com>
+ <20250409014136.2816971-3-mlevitsk@redhat.com>
+In-Reply-To: <20250409014136.2816971-3-mlevitsk@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: s_SnU4j6oU-rpnPuhbpJEjkwH2h3G5kUXK6mwJH6u_8_1744206436
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 26 2025, Cornelia Huck <cohuck@redhat.com> wrote:
 
-> From: Eric Auger <eric.auger@redhat.com>
+On 4/8/25 9:41 PM, Maxim Levitsky wrote:
+> Move sev_lock/unlock_vcpus_for_migration to kvm_main and call the
+> new functions the kvm_lock_all_vcpus/kvm_unlock_all_vcpus
+> and kvm_lock_all_vcpus_nested.
 >
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Sebastian Ott <sebott@redhat.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> This code allows to lock all vCPUs without triggering lockdep warning
+> about reaching MAX_LOCK_DEPTH depth by coercing the lockdep into
+> thinking that we release all the locks other than vcpu'0 lock
+> immediately after we take them.
+>
+> No functional change intended.
+>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  target/arm/cpu-features.h | 40 ++++++++++++++++-----------------
->  target/arm/cpu.c          | 29 ++++++++----------------
->  target/arm/cpu.h          |  2 --
->  target/arm/cpu64.c        | 14 ++++--------
->  target/arm/helper.c       |  6 ++---
->  target/arm/hvf/hvf.c      |  6 ++---
+>   arch/x86/kvm/svm/sev.c   | 65 +++---------------------------------
+>   include/linux/kvm_host.h |  6 ++++
+>   virt/kvm/kvm_main.c      | 71 ++++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 81 insertions(+), 61 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 0bc708ee2788..7adc54b1f741 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1889,63 +1889,6 @@ enum sev_migration_role {
+>   	SEV_NR_MIGRATION_ROLES,
+>   };
+>   
+> -static int sev_lock_vcpus_for_migration(struct kvm *kvm,
+> -					enum sev_migration_role role)
+> -{
+> -	struct kvm_vcpu *vcpu;
+> -	unsigned long i, j;
+> -
+> -	kvm_for_each_vcpu(i, vcpu, kvm) {
+> -		if (mutex_lock_killable_nested(&vcpu->mutex, role))
+> -			goto out_unlock;
+> -
+> -#ifdef CONFIG_PROVE_LOCKING
+> -		if (!i)
+> -			/*
+> -			 * Reset the role to one that avoids colliding with
+> -			 * the role used for the first vcpu mutex.
+> -			 */
+> -			role = SEV_NR_MIGRATION_ROLES;
+> -		else
+> -			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+> -#endif
+> -	}
+> -
+> -	return 0;
+> -
+> -out_unlock:
+> -
+> -	kvm_for_each_vcpu(j, vcpu, kvm) {
+> -		if (i == j)
+> -			break;
+> -
+> -#ifdef CONFIG_PROVE_LOCKING
+> -		if (j)
+> -			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
+> -#endif
+> -
+> -		mutex_unlock(&vcpu->mutex);
+> -	}
+> -	return -EINTR;
+> -}
+> -
+> -static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
+> -{
+> -	struct kvm_vcpu *vcpu;
+> -	unsigned long i;
+> -	bool first = true;
+> -
+> -	kvm_for_each_vcpu(i, vcpu, kvm) {
+> -		if (first)
+> -			first = false;
+> -		else
+> -			mutex_acquire(&vcpu->mutex.dep_map,
+> -				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
+> -
+> -		mutex_unlock(&vcpu->mutex);
+> -	}
+> -}
+> -
+>   static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+>   {
+>   	struct kvm_sev_info *dst = to_kvm_sev_info(dst_kvm);
+> @@ -2083,10 +2026,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>   		charged = true;
+>   	}
+>   
+> -	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
+> +	ret = kvm_lock_all_vcpus_nested(kvm, false, SEV_MIGRATION_SOURCE);
+>   	if (ret)
+>   		goto out_dst_cgroup;
+> -	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
+> +	ret = kvm_lock_all_vcpus_nested(source_kvm, false, SEV_MIGRATION_TARGET);
+>   	if (ret)
+>   		goto out_dst_vcpu;
+>   
+> @@ -2100,9 +2043,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>   	ret = 0;
+>   
+>   out_source_vcpu:
+> -	sev_unlock_vcpus_for_migration(source_kvm);
+> +	kvm_unlock_all_vcpus(source_kvm);
+>   out_dst_vcpu:
+> -	sev_unlock_vcpus_for_migration(kvm);
+> +	kvm_unlock_all_vcpus(kvm);
+>   out_dst_cgroup:
+>   	/* Operates on the source on success, on the destination on failure.  */
+>   	if (charged)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1dedc421b3e3..30cf28bf5c80 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1015,6 +1015,12 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+>   
+>   void kvm_destroy_vcpus(struct kvm *kvm);
+>   
+> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role);
+> +void kvm_unlock_all_vcpus(struct kvm *kvm);
+> +
+> +#define kvm_lock_all_vcpus(kvm, trylock) \
+> +	kvm_lock_all_vcpus_nested(kvm, trylock, 0)
+> +
+>   void vcpu_load(struct kvm_vcpu *vcpu);
+>   void vcpu_put(struct kvm_vcpu *vcpu);
+>   
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 69782df3617f..71c0d8c35b4b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1368,6 +1368,77 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+>   	return 0;
+>   }
+>   
+> +
+> +/*
+> + * Lock all VM vCPUs.
+> + * Can be used nested (to lock vCPUS of two VMs for example)
+> + */
+> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i, j;
+> +
+> +	lockdep_assert_held(&kvm->lock);
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +
+> +		if (trylock && !mutex_trylock_nested(&vcpu->mutex, role))
+> +			goto out_unlock;
+> +		else if (!trylock && mutex_lock_killable_nested(&vcpu->mutex, role))
+> +			goto out_unlock;
+> +
+> +#ifdef CONFIG_PROVE_LOCKING
+> +		if (!i)
+> +			/*
+> +			 * Reset the role to one that avoids colliding with
+> +			 * the role used for the first vcpu mutex.
+> +			 */
+> +			role = MAX_LOCK_DEPTH - 1;
+> +		else
+> +			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+> +#endif
 
-I just noticed that there's a new line in hvf.c that needs to be
-adapted, I'll respin :/
+Lockdep supports up to 8 subclasses, but MAX_LOCK_DEPTH is 48. I believe 
+it is OK to add a mutex_trylock_nested(), but can you just use 0 and 1 
+for the subclasses?
 
->  target/arm/kvm.c          | 24 +++++++++-----------
->  target/arm/tcg/cpu64.c    | 47 ++++++++++++++++++---------------------
->  8 files changed, 71 insertions(+), 97 deletions(-)
+Cheers,
+Longman
 
