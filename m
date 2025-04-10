@@ -1,210 +1,178 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2117.outbound.protection.outlook.com [40.107.243.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF504214223
-	for <kvmarm@lists.linux.dev>; Wed,  9 Apr 2025 20:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744231528; cv=none; b=JIPM6c+VfiKKOpjVl8Hdf35/AFq6RShfc5WaGXTf9OaFy/H+809098LVXZ8r79fRyhG1aKBOa+Hq7C9MPw3aSzrXch32a8hmjhPRC91JyITOt1MXbWSwGj2KyLY+TKsZso1hfv8JTsIwvmjzj2ju9jgaTKMvF+zj6pAN/nErlw4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744231528; c=relaxed/simple;
-	bh=xOp9DXsMQrw85PtagiwlHyz33EONNax0oXOrZSgcHHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e7OSfcHl6dXg8o9jCkcs2TTq/q9YI6RdtFQ4VHcER74Vp7mLlSAKdguNlLw0C3VhvuEGOv9HJ7ym3YHe+1puwPJsEYBKyMgTH+hcUHLnDYl5M9nlk8AqndiW0EUBrsbc0EogafS0botwsCbwbNZUP8PvyTHpMZvTe5M3pvksS40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xC8aSKQf; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA5918FC75
+	for <kvmarm@lists.linux.dev>; Thu, 10 Apr 2025 07:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.117
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744268893; cv=fail; b=NTsEtx+fQoaqhZVsHIXe9xNhjhfR/OuhDOBjZI+johcDiIgvbCPH2U6p8+t6aMgM+s2bowfkL5D9dp6Zpj/5kw3qieau61W8vdX0gwcO3xJIqgenNtq/jxJt1QPmE+alB7rYeahyPbnJOKTmumoY2V9RourC1mo6BgAH2KVemKo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744268893; c=relaxed/simple;
+	bh=QOQKK61NVpeanjsw/gtXKOBB4VK+zw6zZhWGQ/qQEbs=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=VY6jhGwdQXbtoU0jPP5z97YoSLr93/ABbOZrYTOau4ajG03HHF/Uc9LiZMDZPDmcnnmiFRQPIA+LupkJr3EkhUuW9BuvCbGuNDL5InY87aMoY9TnH2A/OHeBsY3lcKOyEm3X/M8NIdyVkdiDJKG4b1zjvsQPhgpnlhb91/YM1Z4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=S/w0CmhN; arc=fail smtp.client-ip=40.107.243.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xC8aSKQf"
-Date: Wed, 9 Apr 2025 13:45:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744231523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ENOcZPIItp2JvszVxj/GE2Qd8ZKfpfM4JflKxCvjNwk=;
-	b=xC8aSKQfjMqodNcjkUTLUjs/zqCFYnuOpjbh5P9WpT5NQV26kzbmBYXpCKWYi7kZGBKsxL
-	gZW41lEMVPwc0O3ZChQyXo3FcMfH90y50iz05hYThAcZmGJ8iVYi08BYw8+X5iWzs50Hx2
-	w3VkprowZiWZQ4RRthwlJQvvZgV2B04=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Alexander Potapenko <glider@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvm-riscv@lists.infradead.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Waiman Long <longman@redhat.com>, x86@kernel.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Anup Patel <anup@brainfault.org>,
-	Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
-	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	linux-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sean Christopherson <seanjc@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v2 2/4] KVM: x86: move
- sev_lock/unlock_vcpus_for_migration to kvm_main.c
-Message-ID: <Z_bcWBfhoUZfRzek@linux.dev>
-References: <20250409014136.2816971-1-mlevitsk@redhat.com>
- <20250409014136.2816971-3-mlevitsk@redhat.com>
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="S/w0CmhN"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lGfQ1Grvw53Tcu6YzuR4kupSJvVWGLH7BMpQZyKp2nPBoDefER6eyP8bu/FAaba+ALAw7REIQ4XEWffAMcBxj/4c9I+kV5woxEk08OfpAy4FV2pnn7QoL7PVGwr2UTk6rn6FctC3zSvCZaJYSkIgl6NB+rfYvmwDR94lOU1q9q9HQHik0FASBhxFnd+iFRY7wisaBBzSioplTlpFGw04BsJEsz+RyVaqUDok6XTMq1/VzJJwAUybvkpSUL1IB8prb2JNJDMi+MZAGEsVqEOz6TJmWosOwk8qKt58urmQ0/VMV3ZxKa7G+yEv6GLmTjFFTSgKmBRMMBAm2qqw9jGskw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YPh3zTlWjK0J98+eIPEcyG2/MGy3MCDc0gPKQUr56ZY=;
+ b=S4f1O4sQzDsQ4m3zGt/RVwHKMGHT0eM1KffUNBr1EwglY7D4WnAaL2aY59o9/UjahqSfAl1OUDqbiinjZ3rd+d3hZVld7uBXnHKgy90mVF+TuBURHDzMpqz0PAI7jx4by9A/ENGOTnq9q90nIaoRCgWDiOzn0LtZGBL3mfYDVTMQ0BTirqYXiymSu1087cpHuFqlAN+FCDklwdwtfy/QIQuJQJxI/EvD0Vkpx97Yqx8ar28iK4NIhOijeU+S2tJAi/rG8eVRJwU4LJTZRTVyW1TWVBQYuN5uxORbOoNUfCJDmDJ6EURrA/wlh5wQHXQZKOwQGjwLbweeJzSYq13PIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YPh3zTlWjK0J98+eIPEcyG2/MGy3MCDc0gPKQUr56ZY=;
+ b=S/w0CmhNAUlEwgebGtVy6rPTzSYC2zUHGFbB2YGRqDQM4/+00/3hwAT0crgPDs/voTBeCb/Q2+8ORL1DkJQddiReUYWsbZebjAWPCDfnvlTKMYgp6IUeyoMWoTYVrd7T3OOr8uAknxXnzbSLXy4Uij/Hkuik2YrWOsYZp6JIklM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ MW4PR01MB6387.prod.exchangelabs.com (2603:10b6:303:65::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8606.33; Thu, 10 Apr 2025 07:08:07 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9%3]) with mapi id 15.20.8632.024; Thu, 10 Apr 2025
+ 07:08:06 +0000
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	darren@os.amperecomputing.com,
+	gankulkarni@os.amperecomputing.com
+Subject: [PATCH] KVM: arm64: nv: Forward hvc traps if originated from nested VM
+Date: Thu, 10 Apr 2025 00:07:43 -0700
+Message-ID: <20250410070743.1072583-1-gankulkarni@os.amperecomputing.com>
+X-Mailer: git-send-email 2.48.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CYXPR03CA0015.namprd03.prod.outlook.com
+ (2603:10b6:930:d0::10) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409014136.2816971-3-mlevitsk@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|MW4PR01MB6387:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3dafb282-21db-4434-8b9e-08dd77fe714e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?CPZlTWVRpsZkrotxXH+usBLjcHehRiCyPUKGaYHRbpXV4DBRV8YZZN+5E0ue?=
+ =?us-ascii?Q?mz0PHFjhn8kZVh10QuZPmT3StJT2zxIfvEWvwx1jiqaXi0O3Z8ZibqsXev7C?=
+ =?us-ascii?Q?UcnlQRQW79ndGukB30W6TFuZkqSsbihmJZZq1RJokfK8w8dJjWxAThTR/OMX?=
+ =?us-ascii?Q?XTigSq+Rk0jMBZVMTxF1GO3LLEw+LnuYtWSZdb2He4OFIC778J9uZdXD/Xz5?=
+ =?us-ascii?Q?vjvssTYLQgDj4+Bpu3XJr0ZpZtKlz0CyOHcv9owdBR6D1AivAIz2s82Y7dbB?=
+ =?us-ascii?Q?Vagv+hZhMA8Yu73Vnn42DlzF/rd3k2WSIabh7pTAHu42GCgXBm2LtLwbIOXd?=
+ =?us-ascii?Q?FXucOjoWGur6rsn7GLtn4VRFTXfEF/DCzRgKEH5RzJ3o5etMVQHFuIb64QSy?=
+ =?us-ascii?Q?20WHz8EcvBHeEHo3Yx6N3UhTRqJ3kcH0872+jQxbsEvB8INoiG4FVYBGuGrK?=
+ =?us-ascii?Q?coa/TVP5R4PrH442s2oJrz5sYSdHgv1zYMFEPtu9UU3HHsm1qYEZlq8Ley0A?=
+ =?us-ascii?Q?VCUBcQO2OpHz8xbXPY/RYOqDps252LOmcmVPlJQkLlI0EBUXACwKCQdFWplJ?=
+ =?us-ascii?Q?Sbev33uEOEluRtgqDyitN10/Kg4nLfCcu+aaW7XXqHLc3H1l5MJNPW0dw+kZ?=
+ =?us-ascii?Q?QuRnkui2GCSqZIBrqOvJrGLNSxgfm80GP7vC7Q4zUwS6ZEbsA2UVc/F9yfWp?=
+ =?us-ascii?Q?cojxn0Jc8isyqRSJKQHC3h71Y/s2CCeQloTTxq5QXYwXRyySaoa1xHVLWhXx?=
+ =?us-ascii?Q?oJvi4QXnkJrbnSKMSFcvu9et6d3y0ZykzFY5MQE3XTgqf32Q4JdyFQfjL7kv?=
+ =?us-ascii?Q?D3u4IRMrCEqyKlb/Ai0TxPsIuX+/Tm4c0mHkKRYQ9uexlkhVg+yC7Uk+GEtd?=
+ =?us-ascii?Q?mnRz3U3IXWf83xXqfNW7vTXxZtRxXuxYs8kMadK/JusG6zfT3g46mfJylVVz?=
+ =?us-ascii?Q?8E71U8WayVj5O8nFm1v2tQfF7+eYqJM0Wfak//UG1ogSFdsSQ9pJzjcrp0Qo?=
+ =?us-ascii?Q?VInl/5lubuVtbUpGAx5xk7zdo6y8UwwSb7PaLhnfnZZ512Du0wDzDxCrQy12?=
+ =?us-ascii?Q?iSq0J8881xOiBJDpzSXjMakjlsUMIES+anSmoo5Wpj8fwWe5HpzbtPhydNSe?=
+ =?us-ascii?Q?C3Gmr3+0nknbwG8TPiWxePg8Ye39ZQWLyArTrVn1K8L+DYKSU8UsMVl+TMDr?=
+ =?us-ascii?Q?sJwQvHlhiKrW1SoZXs6X3NojZbtdnH1IKQAN1T67JyMxowjcX33n9RKb/F0N?=
+ =?us-ascii?Q?0I1TXLI6/LiXZVR68WQGrg+9aoUhzmvY4qrcgEWZ63gy9Ijgs9Og0nvY/KsL?=
+ =?us-ascii?Q?7WfHJ9odeqVb8VY4vGadQiJf74hUwg21uQvCGCG+Dtjn0ipYK/5kFko4NMjd?=
+ =?us-ascii?Q?58/fe8LJY9DM6mAtaHKDJliIFxVwAlEP5R48HXlNv7eFpalqWon1OXr36dPx?=
+ =?us-ascii?Q?u+BWB8Pcz5LLT+bxmvMqLvtCi4sgCe/P?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?CTCMLepPhQB8E2w7AuAFz6Jr5b3ysfdNO3xyzD+VHHUOeTRD1WNCXckH1EHO?=
+ =?us-ascii?Q?Oxxvfjba+4snTDGHHgmhazqiLN1XUehNXsZdI/h5WMyFiyCgr2oNL5Q0o+CX?=
+ =?us-ascii?Q?HesI73htooqR+/wxw8x1qE0P0CFFgr+WwUh0EyObZNGWaYhb29J9X3LDskmf?=
+ =?us-ascii?Q?5X7SXpgrNHImvOeWV0yviJMOIQbl0NiBE3q9Z8USGf5JqK4Zc69NNDygkSYQ?=
+ =?us-ascii?Q?IUhXK7H6SMn1m29VQleCVzawv21EUx0R5sp1XUiETg9GTcwLKdEh4aOkfngF?=
+ =?us-ascii?Q?tCJVE5ve11SW8+d+HHn2jJ8bKuKfsmUIbrOw15tDaPhGBTbVB/Xi7VB0GOhR?=
+ =?us-ascii?Q?exabV5M61KUhezSQXSKpiJj7xUIuWcvQNMMDoIidS5xqVDtmPCv9xCB3eOKu?=
+ =?us-ascii?Q?ddIB3heM+43o4CdFLI4ncu/6oclhZmV7ZQs7/ckdX/f1sS/dNLw670h2WoXE?=
+ =?us-ascii?Q?0ZbS2W9k1m+11NrMTKqD2EjC8bsqig3JlQGHEFOBTgtVjvXBrBl72crg4Rc7?=
+ =?us-ascii?Q?Z8LPYTJod2NQd+KKc3WbyrbvSyfLaji9gRsDdkMQlwrkhZ+SRsKVFaDsTAVL?=
+ =?us-ascii?Q?vpQ7KWcePuUQGOASHBhNBZo7WCjHrfrblxue5feIiDzP+xLTVVZpCIqTvqRS?=
+ =?us-ascii?Q?r0/amzuEFT5NhxL5iSSJPHVlsJTsUmMTf1ObJNfplvXEJhajfFHtBJQ2fKew?=
+ =?us-ascii?Q?UQps6HDyFX1KC9H7DT07cwXqBlgRAB/vPyi9O9QUEc4CB2fk7kKcIEXI0edE?=
+ =?us-ascii?Q?7yFfXlegTFpVtrycZbm55HNQ5dKAgT4Ea+4Q2XCvrfQQOfjV9uczTLg+E/5Y?=
+ =?us-ascii?Q?9FoA2hQBHTmNWrUwYPnZHXT8L4R3PSoVH1kwb5VLIa1lV9lCUJCCZPE1lxHk?=
+ =?us-ascii?Q?L1j6DJSLpq2o7pomoNIBDo/twtLlGuROrDvyNhyVLcOS54/NiHuyP1TNE7eO?=
+ =?us-ascii?Q?PDWVrUjJSh/nUpmP5xdQUOH/F6klTbifJOIaRiQCC2ag0/ohIosKq3BHolJG?=
+ =?us-ascii?Q?X0wUD8XIrBTrD7C9IJRjomVziTpAY5bMyXqD2K+UevnFS2wvBB+FS9zdwzGP?=
+ =?us-ascii?Q?vAwXW52zAPIMh/ZY3e46md8iGGfJvtTcyjwNx9CyumWqA6HnLLALUfkRUti2?=
+ =?us-ascii?Q?5VfAWNpgWBtvdePYrBzoEf5WBF9Kj8ZwLrfcUzlegdbt9dO2ZY9VHKvh77Er?=
+ =?us-ascii?Q?D0QYVMqhaqkBs65fNiyLoavcHl33dKILPFeh/tAogYPViFZOBsTq4AWj2+h/?=
+ =?us-ascii?Q?p8v+yb6R+MGfRziNc3Ad0FeB814/o92HJz4Ye7GjTnuqlwdqwb6E8v9SkwDX?=
+ =?us-ascii?Q?KDW4Xy7kSr0135eDHy/kN6ZneUSypSZf/uz3WJZstPLJ1jYxX+8+CjejNwtD?=
+ =?us-ascii?Q?gUgKN2QsQwHxI8FkJkcCmpvn1v1I5939F9P3sz0PLbWDNj4PWrIB1gaMcQSp?=
+ =?us-ascii?Q?AH3hK8JcouDcA7XkXcCRIMQX4Rq9WBb7316nfCktdbns15qgx+FG7ujW+z05?=
+ =?us-ascii?Q?KSRTv3c3V1hMssltQ86Tg/BPIRT1xHGqhKhFQXXRDcIAwdj82MFOGf2GRbrX?=
+ =?us-ascii?Q?7BRDCVzLGZCyaLXE4RMsb+cCjsnkNgpBe94emBTsW0Iki3UJKQquHsWAlTQA?=
+ =?us-ascii?Q?KSKWi0EnfVp70/REozwLx1aY9MwkPpbp7S36QKCgLJ0B?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dafb282-21db-4434-8b9e-08dd77fe714e
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 07:08:06.5351
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: djPO5zbwBizllMAK82B9el+pvyHt96Zte/SdEemy1u4mi5WCERaRY7YC2mZNgERL8zTGRYPnDcHSl9xqILEIeQ+/Qh+K+gAYshYO4Ov0px1YEIXQpKwY5R2tSKDL+NMB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR01MB6387
 
-On Tue, Apr 08, 2025 at 09:41:34PM -0400, Maxim Levitsky wrote:
-> Move sev_lock/unlock_vcpus_for_migration to kvm_main and call the
-> new functions the kvm_lock_all_vcpus/kvm_unlock_all_vcpus
-> and kvm_lock_all_vcpus_nested.
-> 
-> This code allows to lock all vCPUs without triggering lockdep warning
-> about reaching MAX_LOCK_DEPTH depth by coercing the lockdep into
-> thinking that we release all the locks other than vcpu'0 lock
-> immediately after we take them.
-> 
-> No functional change intended.
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/svm/sev.c   | 65 +++---------------------------------
->  include/linux/kvm_host.h |  6 ++++
->  virt/kvm/kvm_main.c      | 71 ++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 81 insertions(+), 61 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0bc708ee2788..7adc54b1f741 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1889,63 +1889,6 @@ enum sev_migration_role {
->  	SEV_NR_MIGRATION_ROLES,
->  };
->  
-> -static int sev_lock_vcpus_for_migration(struct kvm *kvm,
-> -					enum sev_migration_role role)
-> -{
-> -	struct kvm_vcpu *vcpu;
-> -	unsigned long i, j;
-> -
-> -	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		if (mutex_lock_killable_nested(&vcpu->mutex, role))
-> -			goto out_unlock;
-> -
-> -#ifdef CONFIG_PROVE_LOCKING
-> -		if (!i)
-> -			/*
-> -			 * Reset the role to one that avoids colliding with
-> -			 * the role used for the first vcpu mutex.
-> -			 */
-> -			role = SEV_NR_MIGRATION_ROLES;
-> -		else
-> -			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
-> -#endif
-> -	}
-> -
-> -	return 0;
-> -
-> -out_unlock:
-> -
-> -	kvm_for_each_vcpu(j, vcpu, kvm) {
-> -		if (i == j)
-> -			break;
-> -
-> -#ifdef CONFIG_PROVE_LOCKING
-> -		if (j)
-> -			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
-> -#endif
-> -
-> -		mutex_unlock(&vcpu->mutex);
-> -	}
-> -	return -EINTR;
-> -}
-> -
-> -static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
-> -{
-> -	struct kvm_vcpu *vcpu;
-> -	unsigned long i;
-> -	bool first = true;
-> -
-> -	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		if (first)
-> -			first = false;
-> -		else
-> -			mutex_acquire(&vcpu->mutex.dep_map,
-> -				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
-> -
-> -		mutex_unlock(&vcpu->mutex);
-> -	}
-> -}
-> -
->  static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
->  {
->  	struct kvm_sev_info *dst = to_kvm_sev_info(dst_kvm);
-> @@ -2083,10 +2026,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
->  		charged = true;
->  	}
->  
-> -	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
-> +	ret = kvm_lock_all_vcpus_nested(kvm, false, SEV_MIGRATION_SOURCE);
->  	if (ret)
->  		goto out_dst_cgroup;
-> -	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
-> +	ret = kvm_lock_all_vcpus_nested(source_kvm, false, SEV_MIGRATION_TARGET);
->  	if (ret)
->  		goto out_dst_vcpu;
->  
-> @@ -2100,9 +2043,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
->  	ret = 0;
->  
->  out_source_vcpu:
-> -	sev_unlock_vcpus_for_migration(source_kvm);
-> +	kvm_unlock_all_vcpus(source_kvm);
->  out_dst_vcpu:
-> -	sev_unlock_vcpus_for_migration(kvm);
-> +	kvm_unlock_all_vcpus(kvm);
->  out_dst_cgroup:
->  	/* Operates on the source on success, on the destination on failure.  */
->  	if (charged)
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 1dedc421b3e3..30cf28bf5c80 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1015,6 +1015,12 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
->  
->  void kvm_destroy_vcpus(struct kvm *kvm);
->  
-> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role);
-> +void kvm_unlock_all_vcpus(struct kvm *kvm);
-> +
-> +#define kvm_lock_all_vcpus(kvm, trylock) \
-> +	kvm_lock_all_vcpus_nested(kvm, trylock, 0)
-> +
+It was discovered while trying selftest(smccc_filter) that the
+hvc trap is getting forwarded to guest hypervisor even if it is
+originated from itself.
 
-Can you instead add lock / trylock variants of this?
+HVC traps from guest hypervisor should be handled by the host
+hypervisor and traps originating from nested VM should be
+forwarded. Adding check to forward only if the hvc is trapped
+from the nested VM.
 
-kvm_trylock_all_vcpus(kvm) seems a bit more obvious in the calling code.
+Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+---
+ arch/arm64/kvm/handle_exit.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-Oliver
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 80218f62773b..894f92693ed9 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -40,8 +40,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+ 			    kvm_vcpu_hvc_get_imm(vcpu));
+ 	vcpu->stat.hvc_exit_stat++;
+ 
+-	/* Forward hvc instructions to the virtual EL2 if the guest has EL2. */
+-	if (vcpu_has_nv(vcpu)) {
++	/* Forward hvc instructions to the virtual EL2, if it is from nested VM. */
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+ 		if (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_HCD)
+ 			kvm_inject_undefined(vcpu);
+ 		else
+-- 
+2.48.1
+
