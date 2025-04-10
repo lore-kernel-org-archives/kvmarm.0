@@ -1,125 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C3F1D88D0;
-	Thu, 10 Apr 2025 15:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6601EE03D
+	for <kvmarm@lists.linux.dev>; Thu, 10 Apr 2025 17:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744299333; cv=none; b=dR/hntuy0AfY3QMLptdNXBFNDIH35WeD1pG1BsItsXQqQ2HtohYAnyg2kB+n7kUAcHKirki2mp9WsHo3Sle0FwUIxRtoU7HmDu6+wU9xcbz56XIe2NMlBalAuA5o/UFJ34APgX9I5AfdDtA6hFMGE4NiGS7fyCybMUdVkDfwk28=
+	t=1744306335; cv=none; b=nnY+7N9E35ami5yJ+e8KYaOCGFY53hWQ9C6CAr1G9M7984ztohzO3bsPXv7ZV//20hzJX+FiCjWF9BDcn9GQ3gs1xVvsHvycQJzVrjbokMYLu0Yc2Nghl4yZNig6BleOw/a9QQxtnEht1J+7kDyAxmYDALPYABTZ3GGVMp1mhDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744299333; c=relaxed/simple;
-	bh=0y4gnFMp8pKcQHp3nb3/Gcb5CV00QdElZjckQWOpCrA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wfz8jZlyfQkyCC6cn4r/KdcwOI2cnZ0v/OhhjDb8caIBdDW/Lh9LWbpmJGaV0y8N4A+hIVJoyc8zJCyBlleMQ2TmwT48GtZvP9pI1zCXDOvhSzVaOH5lcnjFjDpHeC/q2xegOinePr6W2ZNe60DeDYtPJD3rgbD/gR4Vl1mPkE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLOHj+nU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744306335; c=relaxed/simple;
+	bh=o0sL38ZYJOmlgi+WziErMCbewxn1adCrNNO1f2e04xA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZpjFI6scFiojiyhJvRSZn+/6TrUY2al43SSKzzpUmlIZfMS0hwBFSIrvdO6MCqM92HSOwT9WtI36rzRBYmWH40Fn5Tt36EgxrXfSUFEAE3j07KO8D7fuIr39OmyQEo1/+y0f0OyPBvArYC7+6kqojqd/LSKs48S/hzVDx4a3P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nOiU4CeG; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLOHj+nU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88F59C4CEDD;
-	Thu, 10 Apr 2025 15:35:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744299330;
-	bh=0y4gnFMp8pKcQHp3nb3/Gcb5CV00QdElZjckQWOpCrA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cLOHj+nUbI21KS7NP4BXotCDjCsR8thGDgcwBKYzN3HcDddiPWnBvFzR0APfWmknA
-	 Gw9FBzvAyWSd/9AYooMu8lcGvjgPz3jws6d/TnECyoD7cpV43Kh9gvlV9g3pekfNvS
-	 5XZF1cIvo2/BBnlJ0nWlEl/ZZS/BANvnZ6F7fJerqQznzLKKENVxpJYK7rT5P+VQYb
-	 Ap+lPO0Firgk05DtjKM5kVjhGLVqmORltO6r1xfDIKo9OBV5GdZrNxEVvqzTMsktSk
-	 D5wLJmt8tjxpSk8FlwpOxjl/cYrtcB03TXQRrVkVX8ATe6isqE5QkrSPFuEOEvPCAC
-	 xSWlRHC1HuM8w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u2tw7-004HIw-Uw;
-	Thu, 10 Apr 2025 16:35:28 +0100
-Date: Thu, 10 Apr 2025 16:35:27 +0100
-Message-ID: <86h62wkp1c.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: arch_timer_edge_cases failures on ampere-one
-In-Reply-To: <ac1de1d2-ef2b-d439-dc48-8615e121b07b@redhat.com>
-References: <ac1de1d2-ef2b-d439-dc48-8615e121b07b@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nOiU4CeG"
+Date: Thu, 10 Apr 2025 10:31:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744306329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MZ5oOh0zz7StublrYqB04NHmYQEpJz4EGl117RgnK/c=;
+	b=nOiU4CeG/HCKdRnVk2rzbyL1a26TgtN4ID/0kj8PycK0GSez9OR4nXI5Czps2kr/tPX8+q
+	lBFg0gkwx9t5hbklthzPmlTofoD0xxeXZImqFrMBsGzxQtaYuieFWKQz0TSzaHWD6mrPKZ
+	Wa+4EDRSFkvHlHvvFfn6BxW8fFJt/g4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	darren@os.amperecomputing.com
+Subject: Re: [PATCH] KVM: arm64: nv: Forward hvc traps if originated from
+ nested VM
+Message-ID: <Z_gAgixMjKQJsWJg@linux.dev>
+References: <20250410070743.1072583-1-gankulkarni@os.amperecomputing.com>
+ <86mscolc0b.wl-maz@kernel.org>
+ <4d1bdea5-43c3-4ca9-9275-feadf158e86e@os.amperecomputing.com>
+ <86jz7sl25r.wl-maz@kernel.org>
+ <91339d4d-38d7-4512-9fda-339bb4c2a3f4@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebott@redhat.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <91339d4d-38d7-4512-9fda-339bb4c2a3f4@os.amperecomputing.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 10 Apr 2025 16:10:43 +0100,
-Sebastian Ott <sebott@redhat.com> wrote:
+On Thu, Apr 10, 2025 at 06:52:45PM +0530, Ganapatrao Kulkarni wrote:
 > 
-> Hey,
 > 
-> I'm seeing consistent failures for the arch_timer_edge_cases
-> selftest one ampere-one(x):
-> ==== Test Assertion Failure ====
->   arm64/arch_timer_edge_cases.c:170: timer_condition == istatus
->   pid=6277 tid=6277 errno=4 - Interrupted system call
->      1  0x0000000000403bcf: test_run at arch_timer_edge_cases.c:962
->      2  0x0000000000401f1f: main at arch_timer_edge_cases.c:1083
->      3  0x0000ffffa8b2625b: ?? ??:0
->      4  0x0000ffffa8b2633b: ?? ??:0
->      5  0x000000000040202f: _start at ??:?
->   0x1 != 0x0 (timer_condition != istatus)
+> On 10-04-2025 04:22 pm, Marc Zyngier wrote:
+> > On Thu, 10 Apr 2025 11:20:24 +0100,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> > > 
+> > > 
+> > > 
+> > > On 10-04-2025 12:49 pm, Marc Zyngier wrote:
+> > > > On Thu, 10 Apr 2025 08:07:43 +0100,
+> > > > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> > > > > 
+> > > > > It was discovered while trying selftest(smccc_filter) that the
+> > > > > hvc trap is getting forwarded to guest hypervisor even if it is
+> > > > > originated from itself.
+> > > > > 
+> > > > > HVC traps from guest hypervisor should be handled by the host
+> > > > > hypervisor and traps originating from nested VM should be
+> > > > > forwarded. Adding check to forward only if the hvc is trapped
+> > > > > from the nested VM.
+> > > > 
+> > > > I disagree. HVC from EL2 must be routed to the same EL2. HVC from EL1
+> > > > must be routed to the EL2 controlling EL1.
+> > > 
+> > > Thanks, Understood, In NV case, hvc has to be forwarded to L1
+> > > irrespective of it origin (L1 or L2). Need to add hvc handler in the
+> > > smccc_filter.c for the vm (when run as L1), so that it is handled and
+> > > returns with required args set.
+> > 
+> > Why? This test checks under which conditions an HVC/SMC gets routed to
+> > userspace. What does it even mean to test HVC if it doesn't make it
+> > outside of the guest itself?
 > 
-> The (first) test that's failing is from test_timers_in_the_past():
->     /* Set a timer to counter=0 (in the past) */
->     test_timer_cval(timer, 0, wm, true, DEF_CNT);
+> smccc_filter.c has 2 tests (test_filter_denied and test_filter_fwd_to_user),
+> which runs the vm(guest_code).
 > 
-> If I understand this correctly then the timer condition is met, an
-> irq should be raised with the istatus bit from SYS_CNTV_CTL_EL0 set.
+> I was trying to modify test_filter_denied to run in vEL2, which led to this
+> patch/discussion. I agree, it does not makes sense to run this test for
+> vEL2.
 > 
-> What the guest gets for SYS_CNTV_CTL_EL0 is 1 (only the enable bit
-> set). KVM also reads 1 in timer_save_state() via
-> read_sysreg_el0(SYS_CNTV_CTL). Is this a HW/FW issue?
+> test_filter_fwd_to_user is not feasible to run in vEL2.
+> Thanks for the feedback.
+> 
+> BTW, I could add hvc handler and run test_filter_denied in vEL2.
 
-My hunch is that this is related to AC03_CPU_14 in [1] (now archived
-locally for future reference...).
+I would much prefer that the entire test be adapted to consider the EL of
+the guest, only testing the behavior of SMCs for EL2.
 
-> 
-> These machines have FEAT_ECV (as a test I disabled that in the kernel
-> but with the same result).
-> 
-> As a hack I set ARCH_TIMER_CTRL_IT_STAT in timer_save_state() when
-> the timer condition is met and set up traps for the register - this
-> lets the testcase succeed.
-> 
-> All with the current upstream kernel - but this is not new, I saw
-> this a couple of months ago but lost access to the machine before
-> I could debug..
-> 
-> Any hints what to do here?
-
-Not a lot to do, assuming this is the actual cause. Similar things
-happen on my QC box, which has a "remarkable" timer implementation and
-a bunch of terrible hacks to keep it alive.
-
-On the other hand, I'm not even convinced that this test-case is
-legit. It seems to rely on the counter being 64bit wide, which is not
-always the case.
-
-	M.
-
-[1] https://amperecomputing.com/assets/AmpereOne_Developer_ER_v0_80_20240823_28945022f4.pdf
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
