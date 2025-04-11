@@ -1,116 +1,103 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9912853F8
-	for <kvmarm@lists.linux.dev>; Thu, 10 Apr 2025 17:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DC9278E5E
+	for <kvmarm@lists.linux.dev>; Fri, 11 Apr 2025 12:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744306742; cv=none; b=flxG4o8u/UApVj9WJdUgvlnrOwin6sHhy7w5BuuvuJTwaHspDb3UOrLBpdiqtH+G7mY99Hrj1WTw4C7MVJU1rHKFRYN00GsIkCZqlpy826Hsk0kCdPQPAPeXd9aTbvmrA6xeCzqiV//4BvLLjrtXM0g3py1uQThXp8N/9pPkJPs=
+	t=1744372853; cv=none; b=X1d/FlclNyx8xq65Co6a8t6V2rya0cgpWrbjRADeIStOIisTvQQZUdAaf18B5Fw+bvCHBKnPO1QQNFda9Mv48BVbBZGbszfPj52UqRpC/UvoEnQ5kQqOZWiLk0E+8iuLVOXH+QZ8WirZShoVTlxFD03ohh6p0cueSSZp9bBFbxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744306742; c=relaxed/simple;
-	bh=XJONTETz63TVmebRo092Mmjn4mQo3D+J5zYFDvgBxy8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a4M2z7ZSyQgzfEmUUNb9VlfE0HK0tJ28Bumf9mEmvOB6BGAw5n0a4x7Tieqk9x++D1ihgtEZOoIvx/oysnmxrnfjZNxrbAUMOsq/9F4cPMfIK7fKEc+lNd1JNDRGLbYtX6aISzSfDbqZZPThSPyogQaqIvrXhi9uU18rb3VGETQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LDt7/ePO; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1744372853; c=relaxed/simple;
+	bh=3euX4DlHAJTsluPzite/+5LrBYmEck4I41EL+dvmm5A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oCXK+EA8zZ2jqFKbOXE1FDagMFoVRda4LKCrKTIRlP7IqVMyxaCqO6IGgAokvBpALY2T+wgnKEMbqyrC9q3mFI6z8yKl+YtGE1NXQzdMqYPWE1hg7jHnN7JOMFX38tNYRNOROLdDWKWfF/WVP7Fcn0/xIAdocWZwTCtiWJVtG5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daV7/Y03; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LDt7/ePO"
-Date: Thu, 10 Apr 2025 10:38:54 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744306738;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QfyxTMni5BP5SV6CRH9ZSsPLHp0ae+0utnSwwkwnNb4=;
-	b=LDt7/ePOoEvVHqeF3YQCr3fzz5+8/MAM2x6Lp9fQ3J+IrDianiEFWgh50j2+FogFRss7wq
-	tPcnmlcVDJGH5R7gHiRy0PD1pXByBUCIiYPc47fkmnUVY6HTpBLXdVVS2VB6fiSFW+DP0u
-	/kUkVH9Sy///MAlSUr+bV6y9t3wrcM4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daV7/Y03"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A35C4CEE2;
+	Fri, 11 Apr 2025 12:00:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744372853;
+	bh=3euX4DlHAJTsluPzite/+5LrBYmEck4I41EL+dvmm5A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=daV7/Y03ZcQr5lsv+iqnKU7Ck7kPGQevKiyNyPfZD7oElm6tLD/91cmENy+VqiIQm
+	 VmVHV2/GUBoTRJV25fDW6hmRCZ/WIUnrcDbP2zEX9GondGR8CqMPK33t1bU0kSPzC9
+	 ZgzqwVpfkxcgYgStLAJHEm06VFnf0mZAKA0qi3Ctqj1WuDdZ8JzlpFjTJJbnHxBZwf
+	 SAjzLu7ywZaCqHljh7IgTdK+WaqwIZXTlYbuaGS+yMTpfZnAtJJZr1PbGdm0l8HMq7
+	 FneqnLgSERNq6/bSEo173pfCRZXe3IoheClwrz/UBFOsdX1MHbSLHF8l9sdbuOPio2
+	 zDsCF7dCFAHCg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u3D3y-004YOL-J3;
+	Fri, 11 Apr 2025 13:00:50 +0100
+Date: Fri, 11 Apr 2025 13:00:50 +0100
+Message-ID: <86cydilxfx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 1/6] KVM: arm64: Fix MDCR_EL2.HPMN reset value
-Message-ID: <Z_gCLmb11eMYKFDv@linux.dev>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: EL2 PMU handling fixes
+In-Reply-To: <Z_bZI5GQh91Vm-6G@linux.dev>
 References: <20250409160106.6445-1-maz@kernel.org>
- <20250409160106.6445-2-maz@kernel.org>
- <Z_bWzRSgyom1_hvJ@linux.dev>
- <86ikncl20s.wl-maz@kernel.org>
+	<Z_bZI5GQh91Vm-6G@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ikncl20s.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Apr 10, 2025 at 11:54:59AM +0100, Marc Zyngier wrote:
-> On Wed, 09 Apr 2025 21:21:33 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
+On Wed, 09 Apr 2025 21:31:31 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, Apr 09, 2025 at 05:01:00PM +0100, Marc Zyngier wrote:
+> > Joey reports that some of his PMU tests do not behave quite as
+> > expected:
 > > 
-> > On Wed, Apr 09, 2025 at 05:01:01PM +0100, Marc Zyngier wrote:
-> > > The MDCR_EL2 documentation indicates that the HPMN field has
-> > > the following behaviour:
-> > > 
-> > > "On a Warm reset, this field resets to the expression NUM_PMU_COUNTERS."
-> > > 
-> > > However, it appears we reset it to zero, which is not very useful.
-> > > 
-> > > Add a reset helper for MDCR_EL2, and handle the case where userspace
-> > > changes the target PMU, which may force us to change HPMN again.
-> > > 
-> > > Reported-by: Joey Gouly <joey.gouly@arm.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/pmu-emul.c | 13 +++++++++++++
-> > >  arch/arm64/kvm/sys_regs.c |  8 +++++++-
-> > >  2 files changed, 20 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > index a1bc10d7116a5..4dc4f3a473c3f 100644
-> > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > @@ -1033,6 +1033,19 @@ static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-> > >  
-> > >  	kvm->arch.arm_pmu = arm_pmu;
-> > >  	kvm->arch.pmcr_n = kvm_arm_pmu_get_max_counters(kvm);
+> > - MDCR_EL2.HPMN is set to 0 out of reset
 > > 
-> > nit: Can we rename pmcr_n to nr_pmu_counters? The current name is misleading.
-> 
-> Fair enough.
-> 
-> > > +
-> > > +	/* Reset MDCR_EL2.HPMN behind the vcpus' back... */
-> > > +	if (test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features)) {
-> > > +		struct kvm_vcpu *vcpu;
-> > > +		unsigned long i;
-> > > +
-> > > +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> > > +			u64 val = __vcpu_sys_reg(vcpu, MDCR_EL2);
-> > > +			val &= ~MDCR_EL2_HPMN;
-> > > +			val |= FIELD_PREP(MDCR_EL2_HPMN, kvm->arch.pmcr_n);
-> > > +			__vcpu_sys_reg(vcpu, MDCR_EL2) = val;
-> > > +		}
+> > - PMCR_EL0.P should reset all the counters when written from EL2
 > > 
-> > Shouldn't we be taking the vCPU mutex(es) here?
+> > Oliver points out that setting PMCR_EL0.N from userspace by writing to
+> > the register is silly with NV, and that we need a new PMU attribute
+> > instead.
+> > 
+> > On top of that, I figured out that we had a number of little gotchas:
+> > 
+> > - It is possible for a guest to write an HPMN value that is out of
+> >   bound, and it seems valuable to limit it
+> > 
+> > - PMCR_EL0.N should be the maximum number of counters when read from
+> >   EL2, and MDCR_EL2.HPMN when read from EL0/EL1
+> > 
+> > - Prevent userspace from updating PMCR_EL0.N when EL2 is available
+> > 
+> > I haven't added any Cc stable, as NV is not functional upstream yet.
 > 
-> If we needed to, it shouldn't be here. We hold the config_lock at this
-> point, and taking a vcpu mutex would result in a locking inversion.
+> Similarly, I don't see a compelling reason for this to go in as a fix
+> for 6.15, especially since you're adding new UAPI. Do you mind grabbing
+> it for the next merge window?
 > 
-> One option is to punt this to a request, but that makes the updated
-> HPMN un-observable from userspace until the vcpu has run. This already
-> affects the default PMU, btw, since it is only assigned on first run.
+> With the comments addressed:
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Ah, right. Default PMU is set at KVM_ARM_VCPU_INIT, so any race that
-comes afterwards would be the fault of userspace.
+Thanks. I'll repost the whole thing next week and queue it for 6.16.
 
-Fine with it as is then.
+	M.
 
-Thanks,
-Oliver
+-- 
+Without deviation from the norm, progress is not possible.
