@@ -1,103 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DC9278E5E
-	for <kvmarm@lists.linux.dev>; Fri, 11 Apr 2025 12:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484ED2980C0
+	for <kvmarm@lists.linux.dev>; Mon, 14 Apr 2025 11:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744372853; cv=none; b=X1d/FlclNyx8xq65Co6a8t6V2rya0cgpWrbjRADeIStOIisTvQQZUdAaf18B5Fw+bvCHBKnPO1QQNFda9Mv48BVbBZGbszfPj52UqRpC/UvoEnQ5kQqOZWiLk0E+8iuLVOXH+QZ8WirZShoVTlxFD03ohh6p0cueSSZp9bBFbxg=
+	t=1744629342; cv=none; b=JvUrNzuL8OsVRuX5uaVrZ5vRoBpTxF7OIuGCUGF4S3N7w4QpUX/IxC5L+zNUnr/mZhJ30o6vEatw/wAmRiGGOh4OGdV92v5zudmCyElOYL54XlRIsIW8baTWVEADKKE/DIykKIIwilRhnlM+ab/RhSsC71flY6zrMcYqv4Uc8wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744372853; c=relaxed/simple;
-	bh=3euX4DlHAJTsluPzite/+5LrBYmEck4I41EL+dvmm5A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oCXK+EA8zZ2jqFKbOXE1FDagMFoVRda4LKCrKTIRlP7IqVMyxaCqO6IGgAokvBpALY2T+wgnKEMbqyrC9q3mFI6z8yKl+YtGE1NXQzdMqYPWE1hg7jHnN7JOMFX38tNYRNOROLdDWKWfF/WVP7Fcn0/xIAdocWZwTCtiWJVtG5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daV7/Y03; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744629342; c=relaxed/simple;
+	bh=SmifMpnLnySNZXsoTuOxoreD2ECShgsVY+a10tcxRLw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VdN13tn5xR8EZ8UkqAV1u7Vsdgl5P7cE/SNy6KcJz5fmuX8OUWgttlEwOiCdowtA2bkK/3+w/YtWFVAfA/k+VOPMfBVxkWDdf9aMkg25uvFgvWGQLhSJ3DH5vy/LqrxL3vNSKSqsqJ4Ne7Mo9VSjgGYIWYh5oLI2+P9VbuuSsuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nMQXe5f5; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daV7/Y03"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A35C4CEE2;
-	Fri, 11 Apr 2025 12:00:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744372853;
-	bh=3euX4DlHAJTsluPzite/+5LrBYmEck4I41EL+dvmm5A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=daV7/Y03ZcQr5lsv+iqnKU7Ck7kPGQevKiyNyPfZD7oElm6tLD/91cmENy+VqiIQm
-	 VmVHV2/GUBoTRJV25fDW6hmRCZ/WIUnrcDbP2zEX9GondGR8CqMPK33t1bU0kSPzC9
-	 ZgzqwVpfkxcgYgStLAJHEm06VFnf0mZAKA0qi3Ctqj1WuDdZ8JzlpFjTJJbnHxBZwf
-	 SAjzLu7ywZaCqHljh7IgTdK+WaqwIZXTlYbuaGS+yMTpfZnAtJJZr1PbGdm0l8HMq7
-	 FneqnLgSERNq6/bSEo173pfCRZXe3IoheClwrz/UBFOsdX1MHbSLHF8l9sdbuOPio2
-	 zDsCF7dCFAHCg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u3D3y-004YOL-J3;
-	Fri, 11 Apr 2025 13:00:50 +0100
-Date: Fri, 11 Apr 2025 13:00:50 +0100
-Message-ID: <86cydilxfx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/6] KVM: arm64: EL2 PMU handling fixes
-In-Reply-To: <Z_bZI5GQh91Vm-6G@linux.dev>
-References: <20250409160106.6445-1-maz@kernel.org>
-	<Z_bZI5GQh91Vm-6G@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nMQXe5f5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744629340; x=1776165340;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FvxpSXO+bFgB1St+7rEJp93C352vyZIr+mzbHjB7ijA=;
+  b=nMQXe5f5KdOVJccWtI01anpTiJcwadkky3L+E8SF9MYFp1Kyj3MCV/IF
+   j4vgC9k3GqIv/gG3JLmCcNmGS14N8zcTr5lxFBrvuvphlp5oTEKXdk0hl
+   rL73M5Uxq+XrlTvWtRYyg6/telgLIb8jdfKbCwIA39qmHyR4jKk3AOMIh
+   U=;
+X-IronPort-AV: E=Sophos;i="6.15,212,1739836800"; 
+   d="scan'208";a="815825200"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 11:15:34 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:44527]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.56:2525] with esmtp (Farcaster)
+ id fea6780a-9d42-46ff-ab79-6f921b6f0769; Mon, 14 Apr 2025 11:15:32 +0000 (UTC)
+X-Farcaster-Flow-ID: fea6780a-9d42-46ff-ab79-6f921b6f0769
+Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 14 Apr 2025 11:15:32 +0000
+Received: from u94b036d6357a55.ant.amazon.com.com (10.106.82.24) by
+ EX19D018EUA002.ant.amazon.com (10.252.50.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 14 Apr 2025 11:15:26 +0000
+From: Ilias Stamatis <ilstam@amazon.com>
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<eric.auger@redhat.com>, <andre.przywara@arm.com>, <will@kernel.org>,
+	<dwmw@amazon.co.uk>, <ilstam@amazon.com>, <jgrall@amazon.co.uk>,
+	<ugurus@amazon.co.uk>, <nh-open-source@amazon.com>
+Subject: [RFC] ARM vGIC-ITS tables serialization when running protected VMs
+Date: Mon, 14 Apr 2025 12:12:43 +0100
+Message-ID: <20250414111244.153528-1-ilstam@amazon.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
+ EX19D018EUA002.ant.amazon.com (10.252.50.146)
 
-On Wed, 09 Apr 2025 21:31:31 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Apr 09, 2025 at 05:01:00PM +0100, Marc Zyngier wrote:
-> > Joey reports that some of his PMU tests do not behave quite as
-> > expected:
-> > 
-> > - MDCR_EL2.HPMN is set to 0 out of reset
-> > 
-> > - PMCR_EL0.P should reset all the counters when written from EL2
-> > 
-> > Oliver points out that setting PMCR_EL0.N from userspace by writing to
-> > the register is silly with NV, and that we need a new PMU attribute
-> > instead.
-> > 
-> > On top of that, I figured out that we had a number of little gotchas:
-> > 
-> > - It is possible for a guest to write an HPMN value that is out of
-> >   bound, and it seems valuable to limit it
-> > 
-> > - PMCR_EL0.N should be the maximum number of counters when read from
-> >   EL2, and MDCR_EL2.HPMN when read from EL0/EL1
-> > 
-> > - Prevent userspace from updating PMCR_EL0.N when EL2 is available
-> > 
-> > I haven't added any Cc stable, as NV is not functional upstream yet.
-> 
-> Similarly, I don't see a compelling reason for this to go in as a fix
-> for 6.15, especially since you're adding new UAPI. Do you mind grabbing
-> it for the next merge window?
-> 
-> With the comments addressed:
-> 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+# The problem
 
-Thanks. I'll repost the whole thing next week and queue it for 6.16.
+KVM's ARM Virtual Interrupt Translation Service (ITS) interface supports the
+KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES operations.
+These operations save and restore a set of tables (Device Tables, Interrupt
+Translation Tables, Collection Table) to and from guest memory.
 
-	M.
+This can be a problem when running a protected VM on top of pKVM or another
+lowvisor since the host kernel (running at EL1) cannot access guest memory.
+
+# Page declassification and why ITTs are special
+
+The Collection and Device tables are page aligned and their sizes must be a
+multiple of page size. If the lowvisor knows where these tables live, it is
+possible to "declassify" the corresponding pages and configure the MMU such as
+that the EL1 host can write to guest memory directly.
+
+The ITTs (Interrupt Translation Tables) are different. They are NOT page
+aligned, they are 256 byte aligned and their size is variable. That means that
+the lowvisor can't declassify pages containing ITTs and configure the MMU
+giving the host direct access as above since those pages may contain unrelated
+data.
+
+If the lowvisor knows where the ITTs live in guest memory it could instead
+perform the guest memory accesses on behalf of the host. I.e. the EL1 host
+would attempt to save the ITTs to guest memory like it does today, that would
+generate a data abort, and then the EL2 lowvisor could perform the copy after
+validating that the faulty address belongs to an ITT in guest memory.
+
+One issue with the above is that the ITS save/restore happens at hypervisor
+live update which is a time sensitive operation and the extra traps (one per
+interrupt mapping?) can introduce significant additional overhead there.
+
+Another issue is that it's actually hard for the lowvisor to know where these
+tables live without trusting the EL1 host which virtualizes the ITS. It is
+especially hard knowing the locations of the ITTs (compared to
+Collection/Device tables) because that probably means having to parse the ITS
+command queue from EL2 which is complex and undesirable.
+
+# An alternative: Serializing ITTs into a userspace buffer
+
+Rather than writing the ITTs to guest memory, the EL1 host can serialize them
+into a buffer provided by userspace.
+
+The struct kvm_device_attr passed to KVM_DEV_ARM_ITS_{SAVE,RESTORE}_TABLES has
+a currently unused 'addr' field that can be used for the buffer address. The
+upper 32-bits of 'attr' from the struct could be used for the buffer size (even
+though that feels hacky). Also a flag in the 'flags' field can be used to
+determine whether the userspace buffer must be used or not.
+
+I'm attaching a not-so-pretty RFC patch that does just this. The format of the
+blob stored in the buffer is the following. There is a 64-bit ITT start marker
+which embeds the device ID owning the ITT. The start marker is followed by
+64-bit ITEs stored using the existing ITS Table ABI REV0 with the 'next' field
+being replaced by an 'event_id' field which stores the event ID rather than an
+offset. An end marker indicates the end of the ITT and is followed by the start
+marker for the ITT of the next device.
+
+Note that I haven't actually documented this new ABI in the patch yet, because
+it's unlikely to stay as it is. There are many different ways to achieve the
+same result.
+
+Also note that this patch treats the ITTs specially for the reasons mentioned
+in the previous section (harder to declassify), but there could be flags for
+choosing between storing all tables or just the ITTs in the userspace buffer.
+
+Finally, the patch is based on an older kernel tree at the moment but from a
+quick look it won't be too difficult to rebase on top of 6.15. However, I
+wanted some initial feedback to see whether this approach is something that
+maintainers would even consider before rebasing, adding tests and making this
+as robust as possible.
+
+# How can userspace calculate the size of the buffer?
+
+This is another big problem. Today the guest is responsible for allocating
+memory for the ITTs (and other tables) before passing it to the (v)GIC.
+However, if userspace is to provide the host kernel with a buffer it has to
+know how much memory to allocate for it.
+
+Userspace should probably account for the worst case where ITTs are fully
+populated. The theoritical maximum depends on the number of Device ID bits and
+Event ID bits that the ITS advertises. Today these values are fixed in KVM's
+vITS and set to 16 bits each. Therefore the theoritical maximum is a very large
+number (2^16 * 2^16 * 8 bytes per ITT entry = 32GiB per vITS) which is
+unrealistic.
+
+However, it should be possible to make the Device ID and Event ID bits
+configurable by userspace. That way by using smaller numbers there, the
+theoritical maximum for the ITTs can be reduced to more realistic sizes.
+
+# Please suggest something better
+
+I'm fully aware that this is not a great patch and feels hacky and potentially
+non-robust. However, I'm struggling to come up with anything better and this
+RFC is meant to start a discussion around this problem. Is storing the ITS
+tables in host memory something that makes sense or is there a better/simpler
+approach that would work for Confidential Computing?
+
+Thanks
+
+Ilias Stamatis (1):
+  KVM: arm64: vgic-its: Add flag for saving ITTs in userspace buffer
+
+ arch/arm64/include/uapi/asm/kvm.h |   5 +
+ arch/arm64/kvm/vgic/vgic-its.c    | 213 +++++++++++++++++++++++++++++-
+ arch/arm64/kvm/vgic/vgic.h        |   4 +
+ include/kvm/arm_vgic.h            |  11 ++
+ 4 files changed, 227 insertions(+), 6 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.1
+
