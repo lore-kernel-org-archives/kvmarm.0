@@ -1,45 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADE427FD5B
-	for <kvmarm@lists.linux.dev>; Mon, 14 Apr 2025 16:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5764526F445
+	for <kvmarm@lists.linux.dev>; Mon, 14 Apr 2025 16:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744648763; cv=none; b=TCRY9tNOZ0/b06P7eBk+BZg1A3Qoakg6n+IEp3FZJYj05dkCeM89X1ETeFtaestA5Oo1QbakWgOogBnWKMdvtw1DkR7uwuJZvlEk+8JJTq8A9cD3dRRIoYK4WLrj0U/SLsuridxFOt5sodyuylokpOyCfcsxTJuewyocvdO0KQA=
+	t=1744648780; cv=none; b=YF8SAkUQJPqJtejinnhgHQuuCileFp7dBf/SaJAhIPV4AfZHT78Bv80Je4YGJBH4RCTPvOymjcrsVmAObBBASILbJFE+RvHvdIevVrnUDJjOYAgYP1Jxw28rK23ywf4U//Ww8lT0woT52v3sZUEPo3+2jIzWlk004SiWPBvoI8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744648763; c=relaxed/simple;
-	bh=uR9a2Cp2AY6D+HuB8Sq+AsdWO5sC7EFgI/HSEPSbS64=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=YzYMjmjnTB+g0mk6K6DRZe1f2gS2u0i0lDFtR4uVHrrAOKG2HHCJEnnwNcacRY7q+N/4LNVV9xdfIXR70aBVYoqaGwVaQJJyAZclmY5Aa1ikd5UIvB+HP7PukoYBwL89UCWxYNUMWEY1/ldEFFH/jVmk2SQulVduDZqTih2At/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iR8SkmLf; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1744648780; c=relaxed/simple;
+	bh=FikzSu7gtSoISII2A5N2h/N1eIa12EarpEHYqbcH7Rs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-type; b=e/nZ8lqugnOSr7z7SUhWbcyG1uS+Mpq6mSiGzfIEsfWHzhh9dhczCam6AeUWkmZzd7gtLlA82Nidlhca2xgw7VUZiQ6TYvb9Mq7vx2JPU221Dl06kujSEKGFfqW3v5cO0tIOOONa6wZShYM5P/oY+no1kxgLQam8SDX07cv6dxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUtmsmW/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iR8SkmLf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eUtmsmW/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744648761;
+	s=mimecast20190719; t=1744648777;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MJ3tEqi3ZCbAiO+OZfOCuOpqRnEVT5qjZbMbDcAVLR4=;
-	b=iR8SkmLftM8+GCbmOYyKCPIOxXakcbpk6fARMtwisskTxRcyK4q4NPRXBdPxIKPAimXrO2
-	13iRNIKO/I2Z0bITSIEjbuDlo06Pqd6DKN6BaXNI//hIl48yvQXnHcn/iJINQo8EzTt3y2
-	6ggvkulsQM3mwFH64A7h8a1hKgJLz6I=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ST/Epdwc6K7kU2DxufZKND7JF8yJCWJgqDVNPy8cEvo=;
+	b=eUtmsmW/esMhFmdL4GghUIISk+WZrKQSlwRMg0hZ2P7WMyrITZtOOz7bOws3xll7f1YWDl
+	Pqo3q7pQLpk8Wyz0fCHe84ONJO/4ia+clqSlpw3abiEGuYA2BjSQPrzP71vosaqCd87wxf
+	R/h03GNq2lLr6uU+OsdR/4tA/l66lH4=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-RO9kshBMO-ywWWohjCR3sw-1; Mon,
- 14 Apr 2025 12:39:17 -0400
-X-MC-Unique: RO9kshBMO-ywWWohjCR3sw-1
-X-Mimecast-MFC-AGG-ID: RO9kshBMO-ywWWohjCR3sw_1744648755
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-20-amOgVnpCMKCnzCTnfgOphQ-1; Mon,
+ 14 Apr 2025 12:39:33 -0400
+X-MC-Unique: amOgVnpCMKCnzCTnfgOphQ-1
+X-Mimecast-MFC-AGG-ID: amOgVnpCMKCnzCTnfgOphQ_1744648771
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 73E46180AF4F;
-	Mon, 14 Apr 2025 16:39:13 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 164381956087;
+	Mon, 14 Apr 2025 16:39:30 +0000 (UTC)
 Received: from gondolin.redhat.com (unknown [10.67.24.14])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1977E180B487;
-	Mon, 14 Apr 2025 16:38:56 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9D4AD180AF7C;
+	Mon, 14 Apr 2025 16:39:14 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -63,9 +65,11 @@ Cc: agraf@csgraf.de,
 	philmd@linaro.org,
 	pbonzini@redhat.com,
 	Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v3 00/10] kvm/arm: Introduce a customizable aarch64 KVM host model
-Date: Mon, 14 Apr 2025 18:38:39 +0200
-Message-ID: <20250414163849.321857-1-cohuck@redhat.com>
+Subject: [PATCH v3 01/10] arm/cpu: Add infra to handle generated ID register definitions
+Date: Mon, 14 Apr 2025 18:38:40 +0200
+Message-ID: <20250414163849.321857-2-cohuck@redhat.com>
+In-Reply-To: <20250414163849.321857-1-cohuck@redhat.com>
+References: <20250414163849.321857-1-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,89 +80,174 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-[This is on top of v5 of the ID register storage rework:
-https://lore.kernel.org/qemu-devel/20250409144304.912325-1-cohuck@redhat.com/T/#t]
+From: Eric Auger <eric.auger@redhat.com>
 
-It's been a while, but here's finally a respin of the series to make ID
-registers configurable directly via the command line.
+The known ID regs are described in a new initialization function
+dubbed initialize_cpu_sysreg_properties(). That code will be
+automatically generated from linux arch/arm64/tools/sysreg. For the
+time being let's just describe a single id reg, CTR_EL0. In this
+description we only care about non RES/RAZ fields, ie. named fields.
 
-Major changes from v2 include:
-- split out the rework of ID register storage (see above) and rebased on top
-  of that
-- hopefully improved the documentation
-- fixed some bugs along the way (including output of the cpu model expansion
-  command, and compilation with HVF on)
+The registers are populated in an array indexed by ARMIDRegisterIdx
+and their fields are added in a sorted list.
 
-Decided against zeroing unknown registers; it's mostly a "dammed if you do,
-dammed if you don't" situation as one case or the other will not quite work
-as desired, even disregarding fields like AA64PFR1_EL1.MTE_frac where 0
-might indicate things we do not support. You'll need to be careful when
-doing kernel updates and be explicit with configuring fields.
-
-The current cpu properties stay as they are; we can work on converting them
-to compatibility props once we have support for configuring the ID register
-fields on the command line for the other accelerators (this is still KVM only.)
-
-The FEAT_xxx features only support a subset of what we need to configure in
-real life; for example, different AltraMax machines differ in CTR_EL0, which
-is not covered by any FEAT_. It might make sense to provide them as syntactic
-sugar on top.
-
-We still have to deal with MIDR/REVIDR/AIDR differences by exploiting
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=d300b0168ea8fd5022a1413bd37ab63f4e5a7d4d
-(in a different series.)
-
-I have not ignored the issue of named models on Arm, I just wanted to get the
-base infrastructure into place first :)
-
-Real world example (migration Graviton 3 -> 4, thx to Sebastian):
-
--cpu host,pauth=off,SYSREG_ID_AA64PFR0_EL1_SEL2=0,SYSREG_ID_AA64PFR0_EL1_EL0=1,
- SYSREG_ID_AA64ISAR0_EL1_TLB=0,SYSREG_ID_AA64ISAR0_EL1_TS=0,
- SYSREG_ID_AA64ISAR0_EL1_SM4=0,SYSREG_ID_AA64ISAR0_EL1_SM3=0,
- SYSREG_ID_AA64ISAR1_EL1_SPECRES=0,SYSREG_ID_AA64ISAR1_EL1_SB=0,
- SYSREG_ID_AA64ISAR1_EL1_FRINTTS=0,SYSREG_ID_AA64MMFR0_EL1_TGRAN4_2=1,
- SYSREG_ID_AA64MMFR0_EL1_TGRAN16_2=1,SYSREG_ID_AA64MMFR0_EL1_TGRAN64_2=1
-
-(not including handling MIDR differences, which is out of scope for this series)
-
-Code also available at
-https://gitlab.com/cohuck/qemu/-/tree/arm-cpu-model-rfcv3?ref_type=heads
-
-
-Cornelia Huck (5):
-  arm/cpu: Add generated sysreg properties
-  kvm: kvm_get_writable_id_regs
-  arm/cpu: accessors for writable id registers
-  arm-qmp-cmds: introspection for ID register props
-  arm/cpu-features: document ID reg properties
-
-Eric Auger (5):
-  arm/cpu: Add infra to handle generated ID register definitions
-  arm/cpu: Add sysreg properties generation
-  arm/kvm: Allow reading all the writable ID registers
-  arm/kvm: write back modified ID regs to KVM
-  arm/cpu: more customization for the kvm host cpu model
-
- docs/system/arm/cpu-features.rst      | 104 +++-
- scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++
- scripts/update-aarch64-sysreg-code.sh |   5 +-
- target/arm/arm-qmp-cmds.c             |  19 +
- target/arm/cpu-custom.h               |  60 +++
- target/arm/cpu-sysreg-properties.c    | 713 ++++++++++++++++++++++++++
- target/arm/cpu-sysregs.h              |   2 +
- target/arm/cpu.c                      |  12 +
- target/arm/cpu.h                      |  47 ++
- target/arm/cpu64.c                    |  24 +-
- target/arm/kvm.c                      | 289 ++++++++++-
- target/arm/kvm_arm.h                  |  26 +-
- target/arm/meson.build                |   1 +
- target/arm/trace-events               |   6 +
- 14 files changed, 1617 insertions(+), 16 deletions(-)
- create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+[CH: adapted to reworked register storage]
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/arm/cpu-custom.h            | 60 ++++++++++++++++++++++++++++++
+ target/arm/cpu-sysreg-properties.c | 41 ++++++++++++++++++++
+ target/arm/cpu64.c                 |  2 +
+ target/arm/meson.build             |  1 +
+ 4 files changed, 104 insertions(+)
  create mode 100644 target/arm/cpu-custom.h
  create mode 100644 target/arm/cpu-sysreg-properties.c
 
+diff --git a/target/arm/cpu-custom.h b/target/arm/cpu-custom.h
+new file mode 100644
+index 000000000000..615347376e56
+--- /dev/null
++++ b/target/arm/cpu-custom.h
+@@ -0,0 +1,60 @@
++/*
++ * handle ID registers and their fields
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef ARM_CPU_CUSTOM_H
++#define ARM_CPU_CUSTOM_H
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "cpu.h"
++#include "cpu-sysregs.h"
++
++typedef struct ARM64SysRegField {
++    const char *name; /* name of the field, for instance CTR_EL0_IDC */
++    int index;
++    int lower;
++    int upper;
++} ARM64SysRegField;
++
++typedef struct ARM64SysReg {
++    const char *name;   /* name of the sysreg, for instance CTR_EL0 */
++    ARMSysRegs sysreg;
++    int index;
++    GList *fields; /* list of named fields, excluding RES* */
++} ARM64SysReg;
++
++void initialize_cpu_sysreg_properties(void);
++
++/*
++ * List of exposed ID regs (automatically populated from linux
++ * arch/arm64/tools/sysreg)
++ */
++extern ARM64SysReg arm64_id_regs[NUM_ID_IDX];
++
++/* Allocate a new field and insert it at the head of the @reg list */
++static inline GList *arm64_sysreg_add_field(ARM64SysReg *reg, const char *name,
++                                     uint8_t min, uint8_t max) {
++
++     ARM64SysRegField *field = g_new0(ARM64SysRegField, 1);
++
++     field->name = name;
++     field->lower = min;
++     field->upper = max;
++     field->index = reg->index;
++
++     reg->fields = g_list_append(reg->fields, field);
++     return reg->fields;
++}
++
++static inline ARM64SysReg *arm64_sysreg_get(ARMIDRegisterIdx index)
++{
++        ARM64SysReg *reg = &arm64_id_regs[index];
++
++        reg->index = index;
++        reg->sysreg = id_register_sysreg[index];
++        return reg;
++}
++
++#endif
+diff --git a/target/arm/cpu-sysreg-properties.c b/target/arm/cpu-sysreg-properties.c
+new file mode 100644
+index 000000000000..8b7ef5badfb9
+--- /dev/null
++++ b/target/arm/cpu-sysreg-properties.c
+@@ -0,0 +1,41 @@
++/*
++ * QEMU ARM CPU SYSREG PROPERTIES
++ * to be generated from linux sysreg
++ *
++ * Copyright (c) Red Hat, Inc. 2024
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see
++ * <http://www.gnu.org/licenses/gpl-2.0.html>
++ */
++
++#include "cpu-custom.h"
++
++ARM64SysReg arm64_id_regs[NUM_ID_IDX];
++
++void initialize_cpu_sysreg_properties(void)
++{
++    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NUM_ID_IDX);
++    /* CTR_EL0 */
++    ARM64SysReg *CTR_EL0 = arm64_sysreg_get(CTR_EL0_IDX);
++    CTR_EL0->name = "CTR_EL0";
++    arm64_sysreg_add_field(CTR_EL0, "TminLine", 32, 37);
++    arm64_sysreg_add_field(CTR_EL0, "DIC", 29, 29);
++    arm64_sysreg_add_field(CTR_EL0, "IDC", 28, 28);
++    arm64_sysreg_add_field(CTR_EL0, "CWG", 24, 27);
++    arm64_sysreg_add_field(CTR_EL0, "ERG", 20, 23);
++    arm64_sysreg_add_field(CTR_EL0, "DminLine", 16, 19);
++    arm64_sysreg_add_field(CTR_EL0, "L1Ip", 14, 15);
++    arm64_sysreg_add_field(CTR_EL0, "IminLine", 0, 3);
++}
++
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 9769401a8585..839442745ea4 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -35,6 +35,7 @@
+ #include "internals.h"
+ #include "cpu-features.h"
+ #include "cpregs.h"
++#include "cpu-custom.h"
+ 
+ /* convert between <register>_IDX and SYS_<register> */
+ #define DEF(NAME, OP0, OP1, CRN, CRM, OP2)      \
+@@ -891,6 +892,7 @@ static void aarch64_cpu_register_types(void)
+ {
+     size_t i;
+ 
++    initialize_cpu_sysreg_properties();
+     type_register_static(&aarch64_cpu_type_info);
+ 
+     for (i = 0; i < ARRAY_SIZE(aarch64_cpus); ++i) {
+diff --git a/target/arm/meson.build b/target/arm/meson.build
+index 3065081d241d..1c97c1ef7580 100644
+--- a/target/arm/meson.build
++++ b/target/arm/meson.build
+@@ -14,6 +14,7 @@ arm_ss.add(when: 'CONFIG_HVF', if_true: files('hyp_gdbstub.c'))
+ arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
+   'cpu64.c',
+   'gdbstub64.c',
++  'cpu-sysreg-properties.c',
+ ))
+ 
+ arm_system_ss = ss.source_set()
 -- 
 2.49.0
 
