@@ -1,236 +1,157 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02olkn2024.outbound.protection.outlook.com [40.92.48.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D2F19E7D1
-	for <kvmarm@lists.linux.dev>; Mon, 14 Apr 2025 16:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744648925; cv=none; b=SumH7mnY4mRUE5vPN/1B8sU7avACUuKeSxhM1q+tKjFK7ZnQ+w3BDG3/gQyIOLGSrjZRiBqPmw93z7cy6GZDxRQtdFShD8T2JpjG4ZMu97zp/jQ3FYvd5MACIxvlpsRBxvm5g3UGW7ujp6+SZDN6vpg65zg604kJ2Lun9yMOrGE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744648925; c=relaxed/simple;
-	bh=LVj37C9w7zndVz7Xb9FVRxIBrNAe1Z9FKDvA0r9To6s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=Scyo+e5ON7+i3QjQqkUtySP0y5sJerhuiYj9fis+hypUvasSHXy9s8PHZ4hWHcOFc14CwRmkOl4+FQnKQ10f1Yxn/lBF9uS+hnhGzrSJC7HS7XEFMa94MqtMrT31HB82mjrdcrAmeo/tV5qJSr5txvpjFp4Fd6T7Nk6RBSm4lHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LfXWzWFh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C3C8633F
+	for <kvmarm@lists.linux.dev>; Mon, 14 Apr 2025 18:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.48.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744653771; cv=fail; b=r2kyjP04aAJeTg9T3XkgXsJLP0KwYNAsb+mofui4kkigyhejlqk4D20S1d7t2LRCnbAItufGqynH96RlEj5ePGTxpaxlcp0RWMIIa1PvswM9n6YT8fW9rg35XxHovNRyxRPlq13RuKqYCej7r5ljZcWBcqWh7fMhG2ezSCDz8/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744653771; c=relaxed/simple;
+	bh=d1vyeKJJ9usi4jKG/J1KJX3J9s1zADKaiIH11Cjxb24=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ED+QVzxao2oqiDll6lCp2CimmUk856Ah8BB0Ca7PbGnN6oMT6G4XBdMovFgl9CocoIAgTl57d6aysP24wTBWTgVOuLhP7RrUwoxvTlNjctT2KL0VX3E0b4j7aZ7LEKdZRGUHQdCbnkwpa3Oh2llU1nY5d0lIPetFCQUqigrv+ZQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=j5q8l1tP; arc=fail smtp.client-ip=40.92.48.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LfXWzWFh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744648922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B390/sGiKUxxsqMQTUSnAN+dnFWQp38rkY2hDGVFNa8=;
-	b=LfXWzWFh3yNpHfyFspof/NajuoynUhUkpZDN1RVfAoTZg/dca7X5t/Ps0bVGaJJ9Zn9uq2
-	tvbubOhm9RqpezAb5Xwg0b9MccM1CbBs+Ml++La/4/rLyV/u79dR6aNqdvavYAGpzf3AON
-	kNMuo29LHtvgT3DuzqNkib9e3k3UJ2I=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-JlfXRx6QO9WJYC8MlAVe0g-1; Mon,
- 14 Apr 2025 12:41:59 -0400
-X-MC-Unique: JlfXRx6QO9WJYC8MlAVe0g-1
-X-Mimecast-MFC-AGG-ID: JlfXRx6QO9WJYC8MlAVe0g_1744648917
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 34C011954B33;
-	Mon, 14 Apr 2025 16:41:57 +0000 (UTC)
-Received: from gondolin.redhat.com (unknown [10.67.24.14])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6910D180AF7C;
-	Mon, 14 Apr 2025 16:41:41 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	richard.henderson@linaro.org,
-	alex.bennee@linaro.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	sebott@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Cc: agraf@csgraf.de,
-	shahuang@redhat.com,
-	mark.rutland@arm.com,
-	philmd@linaro.org,
-	pbonzini@redhat.com,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v3 10/10] arm/cpu-features: document ID reg properties
-Date: Mon, 14 Apr 2025 18:38:49 +0200
-Message-ID: <20250414163849.321857-11-cohuck@redhat.com>
-In-Reply-To: <20250414163849.321857-1-cohuck@redhat.com>
-References: <20250414163849.321857-1-cohuck@redhat.com>
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="j5q8l1tP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HFx6jf1Fq3EWvGUn2T+KhssmzKzPONkYVulnb2uzfkGh4/aj9KvjNwwKYZjYJ6yxRLJSYcFaaIstHRmqr2cxSDSJnSEasuzVnbu+loLahOvMGlzR9/ed57N0OatdbUILxi55yt/QEuaRhOrhxMT0q8YNzI4AW7sHgGRga4T4VUJyA7M+XQ/qQspV7uR5/IgQGE6AU3aeJuVeTox2j7TSaqwwc0hDBmhRHNp+4dnShju1q9tTH8M+fLay6zfc1Uk4VTtDCwx2uTHBW+0vg4udv7nJgfH1cE45YPh2pXiCjJbWltHXwo+gtjIeyJCipiCKI04tQN9Nyf98ueqR92MJfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=joZQ2Ftc9Qb+laFF3JoipjWIWsGFFJqkf1UcseD/hgA=;
+ b=I+Bn2sH1fq1FrX7SOaGKOxf9wwyrN0frDEYLIxWKraSyaScGxUnUw8QSI+2sdPbBLdYq9d/7TFO0d37ESaPkiqJjtPpauerTlMCpQwMpyje+0VIIyLw30dAxf+6pw2I+RB+UxMQjPD2MeZQVOOx5zkMo/RTJ7fsSUBUyXhnGHhEcoUwiyl9uDQK4c0ymHDJMpKEsvdeCgXVInjnsqYyb24OkfU5HApQot2A/ERQZiJ7T8IU/qyPJIfnvFwCVmW8k53pBMJiJESrb+Q4C5srLs8p6uhvZncJFrqFSrIXGXVp0dPgGm3RbV1hxZKgpNSaLT8JKXDpKB3OUKACnCMUd/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=joZQ2Ftc9Qb+laFF3JoipjWIWsGFFJqkf1UcseD/hgA=;
+ b=j5q8l1tPRggiIeZVFRvtrYKVs/4w3WfpOhGk9+o5N1nbcUFED2xRc6Sp4u/HCmO9xGObU0TahRQzthNuKOhxoYUmHXofsxEHVw/07ud20wLRVOrd2HBo3QqshmwZmPvJ8p0bUiB9Wvb+8xVohBdjnciTbOIOLubiYKl/HLduSFqhVSBhsbeVSDkZRz03LqMtwrU6/xO/BgLE+h0Lnbo++dfdWl899f6rkokWSBrSo8zscHunQNVkKSO+sU8T3nsBEEyerxBegDjwxQMNguX9eyG7tA6H9egSR+t3d1nY6KWoeF6Os7bUugDeeOCo1IptG8OUTdF1GztYMwKUO6f/pA==
+Received: from AS8PR02MB10217.eurprd02.prod.outlook.com
+ (2603:10a6:20b:63e::17) by DU2PR02MB10087.eurprd02.prod.outlook.com
+ (2603:10a6:10:495::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.33; Mon, 14 Apr
+ 2025 18:02:46 +0000
+Received: from AS8PR02MB10217.eurprd02.prod.outlook.com
+ ([fe80::58c3:9b65:a6fb:b655]) by AS8PR02MB10217.eurprd02.prod.outlook.com
+ ([fe80::58c3:9b65:a6fb:b655%7]) with mapi id 15.20.8632.030; Mon, 14 Apr 2025
+ 18:02:45 +0000
+From: David Binderman <dcb314@hotmail.com>
+To: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"shuah@kernel.org" <shuah@kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: linux-6.15-rc2/tools/testing/selftests/kvm/lib/arm64/processor.c:107:
+ Possible int/long mixup ?
+Thread-Topic:
+ linux-6.15-rc2/tools/testing/selftests/kvm/lib/arm64/processor.c:107:
+ Possible int/long mixup ?
+Thread-Index: AQHbrWbpzJ8XBRC91E6shghw0PHUIA==
+Date: Mon, 14 Apr 2025 18:02:45 +0000
+Message-ID:
+ <AS8PR02MB10217FE659681FD584050156F9CB32@AS8PR02MB10217.eurprd02.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS8PR02MB10217:EE_|DU2PR02MB10087:EE_
+x-ms-office365-filtering-correlation-id: 2d8f44f3-18fd-465c-26c5-08dd7b7e8f59
+x-ms-exchange-slblob-mailprops:
+ Vs63Iqe4sQl3RqqletCEFdzMlpBSGXYPi6lbj6FC4cENAW+gcpc2W/QDewr6WglYpFk5vGotq4C0TCRgpE+BPXSWz/3ErsPC4jBtG2flLnN8yz+EMv0RL5rrs1XCwRQ3XBLS4PX+W0rFLtLvZzSvIC1WW+Vp6tBkQo186f0fIXR0mEZM/vP2mdxDSgMt6InNUwEUi+eurq6xDFG8s+RWkNX2DRDqxmF7gtAnxfEhiFbCmD9XlcfAm4VFyMAa1Ul+VxblrU2hwhbxfJGDccSfT9m/HxC+dF4MKKzJ7iQxOKin/QZr+byzFzQUf1EtyPoGtiXvPEhGKlwUMC6fd9tx6DrPPiC6ADvbxJpXt8bvs5uXFZ6jQl9VklGcuYu/0T8Hz2J+oW1aCEm9Sjm75v0rC/wUprK00hCGKKZ81+k5t/m1zvTxr/Q8I07mZvp8HPShYhzn3qvKD8AL+peLCb7iP3iOmBCznaSVXeEwSK2JKLNXUNmJU29/73bhTpNYMRRRnazsY1kcCiE8RkmGPAl/rJqpitmClxH3NeMe3eyQ/7S5IxpB5ZF2qMqXLNfv9v43L0ogvRQZEoT+t+mAxfWYOTDrECkvLVJN09gA8XV7qAj26mnVRPT3PDU0URrfvGX6RJLbVwl7lyZoup0Istr+JTojnkF4b9jgj6dT4xPTZgyZs/eKTQOEGjmc4D+wASw8PUwWNgYaZk9duAEKRBPDuYt3nlCzEcXEG5LWhlFny38=
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|8060799006|15080799006|7092599003|19110799003|461199028|15030799003|8062599003|440099028|3412199025|21999032|102099032|41001999003;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?i7zO7cMzx+DmbP+jMYnKZc96DCnHzZbJ2kBlczabDMP8gL0cH8bMxH1M0t?=
+ =?iso-8859-1?Q?NM8mw682AxrFEArYw+2iUZnUv+Ji0otTv849iSFBpd8FN7be7tUt5m4dB4?=
+ =?iso-8859-1?Q?Zngzc9WUDdxAE4WLCjY3vNg87X8s0OMOa8nOCTW+F9qlQ1XNJQZg8C0Y4Y?=
+ =?iso-8859-1?Q?7A84HHNmw3/a5V+v4H9SKt+ir/ny4002W3RNI+vpnZMGt14l690VLQF+M4?=
+ =?iso-8859-1?Q?NPV9xS+Bt7CDb4GNBvMNufjG6dOwEr+c4+YTpm8TtrqCwBVNbWDBkXlZ45?=
+ =?iso-8859-1?Q?P5Q92WqzpidcSVKOhi1v4lLkPMEeXNsNXejGvI8pGYknQ7uq6wvR3Xxdrb?=
+ =?iso-8859-1?Q?md2Aa5esVBGSMyRtUjCaLFfmRdf9DfbOgGk+TFApnCIKYc+7mP19DhTN/o?=
+ =?iso-8859-1?Q?vBgdDkLaeu5g0A0g4/9C2MG+Z+FGmu2Cmph0aF+xiYC6u01384LrEe5nzI?=
+ =?iso-8859-1?Q?5cDYvRGGquooAT+hxdqYiwyWe5HE/y1taeI81wOJusOjs+iZDyyYs3rCYv?=
+ =?iso-8859-1?Q?0IAu+rhI1mhohE2SRQ8veIhXsZEoPH2vVDPa46sH0aKklAl8xnrG0f6VlR?=
+ =?iso-8859-1?Q?2H10YtmoxctFap9JGq3m+ecC2R111yUBN8+exqszNxCaz6KIcEb4JAighj?=
+ =?iso-8859-1?Q?CxX/V+dz/kD+bm2ghts7mHPz1zQ0BbXJzgsz7PI6xOv1rkgsgn2jK7IR3U?=
+ =?iso-8859-1?Q?0WgjiX34eTz3ft6NnKrsDomy+Lb4g1yw6S3CJykCXWWZyq4PK/btOlSvRS?=
+ =?iso-8859-1?Q?2F177d4A8N6Nx+FzUQuYFBPQCm3VPHqgHNxMFC4W6Imt5sULTj6VFjoEEP?=
+ =?iso-8859-1?Q?rq7DPE/dKgUv/cgZN1Lhy25JixVfIurXmQM8xxpXRd7Sqnyo8r5nEAdbdV?=
+ =?iso-8859-1?Q?YkwG+tBehehT2vqahDYTu966TfLrlrsj/BRhH8KqWh4EJWLa9NO5a6JfDF?=
+ =?iso-8859-1?Q?QocxGk0AqTDYwcPfGZ320ykTQhqaOUUS0oDkQzjkbq/dEX3PLJOL1Qwowr?=
+ =?iso-8859-1?Q?iqb6m/k42186qY8s0Z6M/b8qLYpqzpqzIQFP57M2Qa2WFKVF3c4RaMMFuO?=
+ =?iso-8859-1?Q?bTbj8wAVgirBIV7mIQ+wRYZ0oNnVOXMFDIeiXAQLh7eJhb0pwuuUJsVrdL?=
+ =?iso-8859-1?Q?ixT/trd2dzKB/VmRcVLh9itB4Qb8/nx3s/+oOysKcGHUeu22/9+rwQZeC3?=
+ =?iso-8859-1?Q?qpdET9z0HBff6U/nPTVwclw7HLtjXaMrD+Q=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?0DVt8WQnhtdPcGkVNbGfWc42W0FUKVx1g7LHqr0HftFlojlmX95u25vVbg?=
+ =?iso-8859-1?Q?BpPjxHHA7iXJzyP2eecnZ0bTnN9GaSv5MtEVZE+NzyniMHIqVWsMdd8rbS?=
+ =?iso-8859-1?Q?DkaaFOP+QkO5vJy66yPBsoUx9+bgdnKyepKFfKPBoxbzHXw0BsIBDjriOC?=
+ =?iso-8859-1?Q?Hy3fRGH9DpM6oMDGjzi/fXbp9hIvlPo1o9+LAeZcummPZV52bCQksJJyHS?=
+ =?iso-8859-1?Q?GEBe4b5Ax0e1fvIZ8IF4sakHqYJjipH9aOg8kX3Ky1UDPK2PMxYIiKfr8w?=
+ =?iso-8859-1?Q?801xlbP30TLWGq3yYJRWOn5+FP8tB4m54r9tSHrabmNh1euT7z9baGqZHO?=
+ =?iso-8859-1?Q?m8KfEIhDT27PxvpIyDuNkIlDNZUUW8Z3C3oxrgw29QT+BMhbT8r2RWxe5f?=
+ =?iso-8859-1?Q?h2MVmJmo3lO1XyDz/lTreJ35W2JyLQk8iP2FOtf0++2SM2kj6lk+ahrKIh?=
+ =?iso-8859-1?Q?iF6Ssyb0XNYlQTZCQgGdieenzFPrclruVRFG3MshgnEcYc0OLMLrhoijNo?=
+ =?iso-8859-1?Q?pF3vZLpGyVVWVkIS+RIEgH1B2ffwfyzQxBWvgEliW8sdZuUzJjcbztf61R?=
+ =?iso-8859-1?Q?/q9fFCZjdEu3VtxfQSeigKOV8TL5GZwS8GmDb4jrUAmJHTPhcQRcI228VL?=
+ =?iso-8859-1?Q?FBYcKvW0ggqCWNZD3W+Mf65ANA4AJNK41t4khRcXmHdgw05u9mPh72f+qn?=
+ =?iso-8859-1?Q?SREo1SyN9nHwVP5doCKOSqrgqK5VlDIWZTLa4ArQ3l3r9vwvKFzP2WLZiV?=
+ =?iso-8859-1?Q?2A2cfSyhpX6BZfKV066H6f84pQJwvktwecxdwP7LjrkDpaNU8hUh5dw5n1?=
+ =?iso-8859-1?Q?fIiLoemeYbUY9YjhmyV32jzxMQdL4u8UtWOZyynwvbDOpSkUAhI2ximv7T?=
+ =?iso-8859-1?Q?zaJi0FOV3WpJ8+E4ognmAd4vZiUTBhA5+Fn92bDrtHCMz2S6ADuQE71gXK?=
+ =?iso-8859-1?Q?ip1goPYjLIopaCvBxn3dyI//+BR4SW8Rd4AbljxP1WFfXIP0tS4JyqcuKo?=
+ =?iso-8859-1?Q?vnvHou2emDZM2UhjSdij4z7aVExoAMhGEsah+GHQ9s6trmehJD7Qg2Jebw?=
+ =?iso-8859-1?Q?0MMCM4xj4cZkaQeGc78YBMHpIKCNeUlgvfWtQiQqadkpPPCsyynLBVaTeP?=
+ =?iso-8859-1?Q?YB61cFFFEPy+SvfwArkjM8KYVH7TDXQ8naNgCgs+OvyFEC2lATKFzsEfQo?=
+ =?iso-8859-1?Q?8rHmzmubhGMzRYxalaZOzdgHQQCNlQ1hrhaUVrIMOSB792LX6rXqo82+iS?=
+ =?iso-8859-1?Q?nB/XiDxNMX9BZlTKjkYA=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-ab7de.templateTenant
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB10217.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d8f44f3-18fd-465c-26c5-08dd7b7e8f59
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2025 18:02:45.7105
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR02MB10087
 
-Add some documentation for how individual ID registers can be
-configured with the host cpu model.
-
-[CH: adapt to removal of the 'custom' model, added some more
- explanations about using the ID register props]
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- docs/system/arm/cpu-features.rst | 104 ++++++++++++++++++++++++++++---
- 1 file changed, 96 insertions(+), 8 deletions(-)
-
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 37d5dfd15b34..22faefd76edd 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -2,7 +2,10 @@ Arm CPU Features
- ================
- 
- CPU features are optional features that a CPU of supporting type may
--choose to implement or not.  In QEMU, optional CPU features have
-+choose to implement or not.  QEMU provides two different mechanisms
-+to configure those features:
-+
-+1. For most CPU models, optional CPU features may have
- corresponding boolean CPU proprieties that, when enabled, indicate
- that the feature is implemented, and, conversely, when disabled,
- indicate that it is not implemented. An example of an Arm CPU feature
-@@ -29,6 +32,16 @@ supports the feature.  While ``aarch64`` currently only works with KVM,
- it could work with TCG.  CPU features that are specific to KVM are
- prefixed with "kvm-" and are described in "KVM VCPU Features".
- 
-+2. Additionally, the ``host`` CPU model on KVM allows to configure optional
-+CPU features via the corresponding ID registers. The host kernel allows
-+to write a subset of ID register fields. The host model exposes
-+properties for each writable ID register field. Those options are named
-+SYSREG_<IDREG>_<FIELD>. IDREG and FIELD names are those used in the
-+ARM ARM Reference Manual. They can also be found in the Linux
-+arch/arm64/tool/sysreg file which is used to automatically generate the
-+description for those registers and fields. This currently only has been
-+implemented for KVM.
-+
- CPU Feature Probing
- ===================
- 
-@@ -124,13 +137,20 @@ A note about CPU models and KVM
- 
- Named CPU models generally do not work with KVM.  There are a few cases
- that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
--seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
--used.  This means the guest is provided all the same CPU features as the
--host CPU type has.  And, for this reason, the ``host`` CPU type should
--enable all CPU features that the host has by default.  Indeed it's even
--a bit strange to allow disabling CPU features that the host has when using
--the ``host`` CPU type, but in the absence of CPU models it's the best we can
--do if we want to launch guests without all the host's CPU features enabled.
-+seattle host, but mostly if KVM is enabled, the ``host`` CPU model must be
-+used.
-+
-+Using the ``host`` type means the guest is provided all the same CPU
-+features as the host CPU type has.  And, for this reason, the ``host``
-+CPU type should enable all CPU features that the host has by default.
-+
-+In case some features need to be hidden to the guest, and the host kernel
-+supports it, the ``host`` model can be instructed to disable individual
-+ID register values. This is especially useful for migration purposes.
-+However, this interface will not allow configuring an arbitrary set of
-+features; the ID registers must describe a subset of the host's features,
-+and all differences to the host's configuration must actually be supported
-+by the kernel to be deconfigured.
- 
- Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
- affect is not only limited to specific features, as pointed out in example
-@@ -167,6 +187,13 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
- 
-+Additionally, if supported by KVM on the host kernel, the ``host`` CPU model
-+may be configured via individual ID register field properties, for example::
-+
-+  $ qemu-system-aarch64 -M virt -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
-+
-+This forces ID_AA64ISAR0_EL1 DP field to 0.
-+
- KVM VCPU Features
- =================
- 
-@@ -466,3 +493,64 @@ Legal values for ``S`` are 30, 34, 36, and 39; the default is 30.
- 
- As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
- removed in some future QEMU release.
-+
-+Configuring CPU features via ID register fields
-+===============================================
-+
-+Note that this is currently only supported under KVM, and with the
-+``host`` CPU model.
-+
-+Querying available ID register fields
-+-------------------------------------
-+
-+QEMU will create properties for all ID register fields that are
-+reported as being writable by the kernel, and that are known to the
-+QEMU instance. Therefore, the same QEMU binary may expose different
-+properties when run under a different kernel.
-+
-+To find out all available writable ID register fields, use the
-+``query-cpu-model-expansion`` QMP command::
-+
-+  (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-+  {"return": {
-+   "model": {"name": "host", "props": {
-+   "SYSREG_ID_AA64PFR0_EL1_EL3": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
-+   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
-+   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
-+   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1, "SYSREG_ID_DFR0_EL1_PerfMon": 4,
-+   "SYSREG_ID_AA64PFR0_EL1_DIT": 0, "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
-+   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0, "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
-+   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
-+   }}}}
-+
-+If a certain field in an ID register does not show up in this list, it
-+is not writable with the specific host kernel.
-+
-+A note on compatibility
-+-----------------------
-+
-+A common use case for providing a defined set of ID register values is
-+to be able to present a fixed set of features to a guest, often referred
-+to as "stable guest ABI". This may take the form of ironing out differences
-+between two similar CPUs with the intention of being able to migrate
-+between machines with those CPUs, or providing the same CPU across Linux
-+kernel updates on the host.
-+
-+Over the course of time, the Linux kernel is changing the set of ID register
-+fields that are writable by userspace. Newly introduced writable ID
-+registers should be initialized to 0 to ensure compatibility. However, ID
-+registers that have already been introduced that undergo a change as to
-+which fields are writable may introduce incompatibities that need to be
-+addressed on a case-by-case basis for the systems that you wish to migrate
-+inbetween.
-+
-+A note on Arm CPU features (FEAT_xxx)
-+-------------------------------------
-+
-+Configuring CPUs is done on a feature level on other architectures, and this
-+would imply configuring FEAT_xxx values on Arm. However, differences between
-+CPUs may not map to FEAT_xxx, but to differences in other registers in the
-+ID register range; for example, differences in the cache architecture exposed
-+via ``CTR_EL0``. We therefore cannot rely on configuration via FEAT_xxx. A
-+feature-based interface more similar to other architectures may be implemented
-+on top of the ID register interface in the future.
--- 
-2.49.0
-
+Hello there,=0A=
+=0A=
+Static analyser cppcheck says:=0A=
+=0A=
+linux-6.15-rc2/tools/testing/selftests/kvm/lib/arm64/processor.c:107:2: sty=
+le: int result is returned as long value. If the return value is long to av=
+oid loss of information, then you have loss of information. [truncLongCastR=
+eturn]=0A=
+=0A=
+Source code is=0A=
+=0A=
+   return 1 << (vm->va_bits - shift);=0A=
+=0A=
+Maybe better code:=0A=
+=0A=
+   return 1UL << (vm->va_bits - shift);=0A=
+=0A=
+Regards=0A=
+=0A=
+David Binderman=0A=
