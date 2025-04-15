@@ -1,85 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA7E20AF62
-	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 15:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96D82260C
+	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 16:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744732504; cv=none; b=JTuP4JEnIp9+6m1q6Aljjj+SlEwAuHunRL+ClIWoQbcaQOJJzxofgg+Khq73YssKH5qlVoRX6z8bx68MZN6FVL3uyIe7dFBH3aRA1vNDeBO6ZKjvGY8xcujF3mL+pUw2OuUqWzTuagktBzntFu/D55/d5XWauISDdCrE1AoiH7E=
+	t=1744735662; cv=none; b=I4wYJjNh9S1CUyYwVWTKi9yn4WIj0bg4X78LKbP5GEuMEOJCFjg3RanUoOtoqlaQHq86b3jVhBkG0+6QIpz1WSIznY0h/DjyokjbHEobmtrYzgMQeGrPzRb/1UZGjazdOzjygstopFtDvDVFIq1DXvG0t/CCrtmhua+lD8B5aEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744732504; c=relaxed/simple;
-	bh=nQOyz0LdTaX4VVRdt3j4Nh4bjWfbz57R986Vkga7Ab8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tG+J/eA9K491vo6oNGC7iPDFS1VvDhfMSCf0//7g+nOjqrqyclOoVl6syzXhIabVRvcdHCiuFOdzNuYwbGJXu3Tyf7zZL28mIdXMCRDFaZaAzt6fO/aXFD6uOTSX7LI5vOYzMUD8umWM7irlDflVmw01PY7bn2/EjGvDpkAcd4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 297E6C4CEEB;
-	Tue, 15 Apr 2025 15:55:00 +0000 (UTC)
-Date: Tue, 15 Apr 2025 16:54:58 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1744735662; c=relaxed/simple;
+	bh=JYZJzr7x+Atlm+fxY93DHOqC1gun/3AWa+eqzCQCrVc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QF482easAj4IHcObr6KPzztmZMPAvtPY8GcXrJEPyaSyN8LpouBqjsUuVERbfqPSVV68NZ4kHTlaVTPwt0YuqL0ntXNavR1rcw5yBOk47CWjmwCSfWnSA0uiC2dLpoFBHJocEHr0Y9BLonDh1NLdOTPNaWqM9e02vmnqBF4lQ7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FBCkaEqJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FBCkaEqJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5216AC4CEEB;
+	Tue, 15 Apr 2025 16:47:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744735662;
+	bh=JYZJzr7x+Atlm+fxY93DHOqC1gun/3AWa+eqzCQCrVc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FBCkaEqJjhqXWmSH+6Fp9cIhLQgWDGLX/1L+PLdWUmgkojwyMzb+Njwm8C7xSpsYj
+	 1O0BA6ypfhrXTXOjf2gWXZAWJjtNxiswOtfJiK3ArbPjlBqPNogbqc5h5x1wJBue7w
+	 9qX4V+xoanLsf5v02Sni+QuszVVpXNESmlXPj9eIg2go9na8tcOY/G7mHDY6H6OdX7
+	 Uq9WMQgTtL2Uo+eLg25e0C78qT/yRQg3oqUVvfDwOBJvKDdew7CmKCa1MkjMOTqJbI
+	 diPMiWOMkGj2GyjwNzs225eyntShpooAw/4A2DzLQIVeL0sUeRLajpGuKo6r7r2uDE
+	 7V8ksA7be1e9w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u4jRk-005kZx-3z;
+	Tue, 15 Apr 2025 17:47:40 +0100
+Date: Tue, 15 Apr 2025 17:47:39 +0100
+Message-ID: <864iypl6c4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Ada Couprie Diaz <ada.coupriediaz@arm.com>,
 	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org,
-	mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-	sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com,
-	jiangkunkun@huawei.com, jonathan.cameron@huawei.com,
-	anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	cohuck@redhat.com,
+	eric.auger@redhat.com,
+	sebott@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com,
+	anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
 	linuxarm@huawei.com
-Subject: Re: [BUG][PATCH v8 4/6] arm64: Make _midr_in_range_list() an
- exported function
-Message-ID: <Z_6BUgekb7YXOExu@arm.com>
+Subject: Re: [BUG][PATCH v8 4/6] arm64: Make _midr_in_range_list() an exported function
+In-Reply-To: <Z_6BUgekb7YXOExu@arm.com>
 References: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
- <20250221140229.12588-5-shameerali.kolothum.thodi@huawei.com>
- <3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com>
- <865xj5la2q.wl-maz@kernel.org>
+	<20250221140229.12588-5-shameerali.kolothum.thodi@huawei.com>
+	<3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com>
+	<865xj5la2q.wl-maz@kernel.org>
+	<Z_6BUgekb7YXOExu@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <865xj5la2q.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, ada.coupriediaz@arm.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com, sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Apr 15, 2025 at 04:26:53PM +0100, Marc Zyngier wrote:
-> On Tue, 15 Apr 2025 11:57:50 +0100,
-> Ada Couprie Diaz <ada.coupriediaz@arm.com> wrote:
-> > I discovered that this patch breaks boot for some CPUs when building
-> > the default defconfig plus KASAN. This is still the case in v6.15-rc1
-> > and rc2.
+On Tue, 15 Apr 2025 16:54:58 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Tue, Apr 15, 2025 at 04:26:53PM +0100, Marc Zyngier wrote:
+> > On Tue, 15 Apr 2025 11:57:50 +0100,
+> > Ada Couprie Diaz <ada.coupriediaz@arm.com> wrote:
+> > > I discovered that this patch breaks boot for some CPUs when building
+> > > the default defconfig plus KASAN. This is still the case in v6.15-rc1
+> > > and rc2.
+> > > 
+> > > This patch marks `is_midr_in_range_list` as position independent but
+> > > it isn't, breaking early boot when instrumented with KASAN and
+> > > `CONFIG_RANDOMIZE_BASE` enabled.
+> > > 
+> > > The breaking usage seems to be in `kaslr_requires_kpti()` called in
+> > > `early_map_kernel()`.
+> > > My testing on an AMD Seattle board does crash, but newer machines
+> > > implementing E0PD do not crash as they do not need to check MIDRs in
+> > > `kaslr_requires_kpti()`.
+> > > `is_mdr_in_range_list` did work in PI code previously because it was
+> > > `inline`, which this patch changes.
 > > 
-> > This patch marks `is_midr_in_range_list` as position independent but
-> > it isn't, breaking early boot when instrumented with KASAN and
-> > `CONFIG_RANDOMIZE_BASE` enabled.
+> > OK, this is much more of a pain than I thought.
 > > 
-> > The breaking usage seems to be in `kaslr_requires_kpti()` called in
-> > `early_map_kernel()`.
-> > My testing on an AMD Seattle board does crash, but newer machines
-> > implementing E0PD do not crash as they do not need to check MIDRs in
-> > `kaslr_requires_kpti()`.
-> > `is_mdr_in_range_list` did work in PI code previously because it was
-> > `inline`, which this patch changes.
+> > I tried bringing the various helpers into the PI section, but it ended
+> > up being extremely ugly.
+> > 
+> > More importantly, this is something that is pretty much at odds with
+> > the whole idea of the MIDR override -- it happens way earlier than we
+> > can populate the table.
+> > 
+> > The thing is, the only reason we need to do this is that we need to
+> > support the Cavium SEFAC (Sorry Excuse For A Computer) that cannot run
+> > with KPTI.
+> > 
+> > I can restore harmony with the following hack. But maybe we should
+> > just prune TX from the kernel and be done with this contraption.
 > 
-> OK, this is much more of a pain than I thought.
-> 
-> I tried bringing the various helpers into the PI section, but it ended
-> up being extremely ugly.
-> 
-> More importantly, this is something that is pretty much at odds with
-> the whole idea of the MIDR override -- it happens way earlier than we
-> can populate the table.
-> 
-> The thing is, the only reason we need to do this is that we need to
-> support the Cavium SEFAC (Sorry Excuse For A Computer) that cannot run
-> with KPTI.
-> 
-> I can restore harmony with the following hack. But maybe we should
-> just prune TX from the kernel and be done with this contraption.
+> That works for me. Well, we can still keep it around but panic on boot
+> if kpti is enabled on this platform. Just don't bother checking it via
+> early_map_kernel() from the PI code.
 
-That works for me. Well, we can still keep it around but panic on boot
-if kpti is enabled on this platform. Just don't bother checking it via
-early_map_kernel() from the PI code.
+early_map_kernel() immediately builds nG page tables, and that's a
+strong guarantee to catch fire on this machine.  Which means that
+distro kernels (which all have KPTI enabled by default) would explode.
+
+The only way to avoid it would be to mandate that users of these
+machines have nokaslr on the command-line. I'm happy to do so on my
+box, but I'm hardly representative of arm64 users...
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
