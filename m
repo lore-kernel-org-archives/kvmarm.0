@@ -1,164 +1,227 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD71158520
-	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 15:18:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6932DFA44
+	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 15:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744730331; cv=none; b=balNZ4e4YLZ9jck7t+TSa+0ReZbyEeGmQ80CUENnmPufqX+sOdMNlKryf3Y6Yjh9Jr5hGI4BN7QmEqaT56rr+NKiRJ5buvRtPks8XVCr7Z4Y1UvXLmvc+W5qMCpDkqm8U3Ns1g9ek7fgzbkZi/zHWLxgUOAn8YOpaUzwg4EgneA=
+	t=1744730817; cv=none; b=n/g7dSf2y2erzqOCgsWdT32MgjFN6WRAXBAtzFTcQEnsH3E16oM+wTObf6Ssdo7+Pm7xknzDXF6rNUmOBkS9CBGEPz4es5JeJKSH3Ifj9FAWUbcclKg2A4225H0eCoEfleHfTs0JDzPHHWiGvXUYafjF1Afs1TrnbEmnyUKMxVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744730331; c=relaxed/simple;
-	bh=hApQa/DD54ebOMxb+8NxmO7T6ZHG7apptUEUqS9JwRI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=atXdf4nHQlEiELQQ9YXliA0EQ79uFB8AlZydVDWhPxnMqXfRaTwU5ZGLrKokPBZLSJtbZWDChbTGkCRxpWlxfUFQ6ViFxyDSnHReAWSgfj4gvyaBChwAaz4S/bM8oarrF8it8UI+bmRAKB6Y3yl6oJioV5d+XN+x6V/GrEUvuZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZcSPg2bSGz6LD5V;
-	Tue, 15 Apr 2025 23:14:47 +0800 (CST)
-Received: from frapeml500007.china.huawei.com (unknown [7.182.85.172])
-	by mail.maildlp.com (Postfix) with ESMTPS id 08618140595;
-	Tue, 15 Apr 2025 23:18:45 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- frapeml500007.china.huawei.com (7.182.85.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 15 Apr 2025 17:18:44 +0200
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Tue, 15 Apr 2025 17:18:44 +0200
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Ada Couprie Diaz <ada.coupriediaz@arm.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>
-CC: "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org"
-	<will@kernel.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
-	<eric.auger@redhat.com>, "sebott@redhat.com" <sebott@redhat.com>, yuzenghui
-	<yuzenghui@huawei.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, jiangkunkun
-	<jiangkunkun@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Anthony Jebson <anthony.jebson@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>
-Subject: RE: [BUG][PATCH v8 4/6] arm64: Make _midr_in_range_list() an exported
- function
-Thread-Topic: [BUG][PATCH v8 4/6] arm64: Make _midr_in_range_list() an
- exported function
-Thread-Index: AQHbrfVHXSbWU++5M0m0QF57actFULOk1QzA
-Date: Tue, 15 Apr 2025 15:18:44 +0000
-Message-ID: <29e583fe8bbd4c5580649025f6b78521@huawei.com>
-References: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
- <20250221140229.12588-5-shameerali.kolothum.thodi@huawei.com>
- <3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com>
+	s=arc-20240116; t=1744730817; c=relaxed/simple;
+	bh=0OCFJS3E/Th2WG+ERLo1oYrZ1u0uOV4dVimjJHRegMM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=raUN4UMVPO/DLbDaDHGl47MisfKmCKhQwNA2EEvhbviPseQpDNOwdegTGRnZKdYktVMq6trVnFr4SXROMspaPstQfQ/qlHwW6hDLgWebZSOUVQJY2aNyCKT8JZQCzbFWl6upzris0/f4lcvrdm70L6I63A/TnMRl3t9fpLuvT4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMycN3Uu; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iMycN3Uu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A28BBC4CEEB;
+	Tue, 15 Apr 2025 15:26:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744730816;
+	bh=0OCFJS3E/Th2WG+ERLo1oYrZ1u0uOV4dVimjJHRegMM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iMycN3UuOciq/1+mQG94zsf/bPiykUjQx1Ybatab2cx99n1pv38gVM8rIq2cFdG04
+	 rW7rRmDrnJgtjZekWRQzKRWBbEqnDvoJlWLZ1wiy8R0LJq7fYqFNWM5vJ8zq77c3Sb
+	 AV3Cx2KKwBupv5yX474zvPPcWH6jjC75WfhKY3Nw/LshWWgtNZm5k3Y2AHwphWdI2N
+	 t8Kw1n4yJFy84D9V4W8i8ydKKMci2d8Plq7wp+wTgBV2fw46/pk/KRRJXwCDQD6t02
+	 KbEYDiPMsrsz3Q3ec1nlsJ2bBK1v/zl+UPQWvcfrBEWt956tjM9PIEBcIMgl73llAZ
+	 86D2g7f6ZZgpg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u4iBa-005iz5-7h;
+	Tue, 15 Apr 2025 16:26:54 +0100
+Date: Tue, 15 Apr 2025 16:26:53 +0100
+Message-ID: <865xj5la2q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ada Couprie Diaz <ada.coupriediaz@arm.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	cohuck@redhat.com,
+	eric.auger@redhat.com,
+	sebott@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	jiangkunkun@huawei.com,
+	jonathan.cameron@huawei.com,
+	anthony.jebson@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	linuxarm@huawei.com
+Subject: Re: [BUG][PATCH v8 4/6] arm64: Make _midr_in_range_list() an exported function
 In-Reply-To: <3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+References: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
+	<20250221140229.12588-5-shameerali.kolothum.thodi@huawei.com>
+	<3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ada.coupriediaz@arm.com, shameerali.kolothum.thodi@huawei.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, cohuck@redhat.com, eric.auger@redhat.com, sebott@redhat.com, yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com, jonathan.cameron@huawei.com, anthony.jebson@huawei.com, linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-SGksDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWRhIENvdXByaWUg
-RGlheiA8YWRhLmNvdXByaWVkaWF6QGFybS5jb20+DQo+IFNlbnQ6IFR1ZXNkYXksIEFwcmlsIDE1
-LCAyMDI1IDExOjU4IEFNDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpDQo+IDxzaGFt
-ZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+OyBrdm1hcm1AbGlzdHMubGludXguZGV2
-Ow0KPiBtYXpAa2VybmVsLm9yZzsgb2xpdmVyLnVwdG9uQGxpbnV4LmRldg0KPiBDYzogY2F0YWxp
-bi5tYXJpbmFzQGFybS5jb207IHdpbGxAa2VybmVsLm9yZzsgbWFyay5ydXRsYW5kQGFybS5jb207
-DQo+IGNvaHVja0ByZWRoYXQuY29tOyBlcmljLmF1Z2VyQHJlZGhhdC5jb207IHNlYm90dEByZWRo
-YXQuY29tOw0KPiB5dXplbmdodWkgPHl1emVuZ2h1aUBodWF3ZWkuY29tPjsgV2FuZ3pob3UgKEIp
-DQo+IDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IGppYW5na3Vua3VuIDxqaWFuZ2t1bmt1bkBo
-dWF3ZWkuY29tPjsNCj4gSm9uYXRoYW4gQ2FtZXJvbiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWku
-Y29tPjsgQW50aG9ueSBKZWJzb24NCj4gPGFudGhvbnkuamVic29uQGh1YXdlaS5jb20+OyBsaW51
-eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7DQo+IExpbnV4YXJtIDxsaW51eGFybUBo
-dWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW0JVR11bUEFUQ0ggdjggNC82XSBhcm02NDogTWFr
-ZSBfbWlkcl9pbl9yYW5nZV9saXN0KCkgYW4NCj4gZXhwb3J0ZWQgZnVuY3Rpb24NCj4gDQo+IEhl
-bGxvLA0KPiANCj4gSSBkaXNjb3ZlcmVkIHRoYXQgdGhpcyBwYXRjaCBicmVha3MgYm9vdCBmb3Ig
-c29tZSBDUFVzIHdoZW4gYnVpbGRpbmcgdGhlDQo+IGRlZmF1bHQgZGVmY29uZmlnIHBsdXMgS0FT
-QU4uIFRoaXMgaXMgc3RpbGwgdGhlIGNhc2UgaW4gdjYuMTUtcmMxIGFuZCByYzIuDQoNClRoYW5r
-cyBmb3IgdGVzdGluZyBhbmQgcmVwb3J0aW5nIHRoaXMuDQo+IA0KPiBUaGlzIHBhdGNoIG1hcmtz
-IGBpc19taWRyX2luX3JhbmdlX2xpc3RgIGFzIHBvc2l0aW9uIGluZGVwZW5kZW50IGJ1dCBpdA0K
-PiBpc24ndCwgYnJlYWtpbmcgZWFybHkgYm9vdCB3aGVuIGluc3RydW1lbnRlZCB3aXRoIEtBU0FO
-IGFuZA0KPiBgQ09ORklHX1JBTkRPTUlaRV9CQVNFYCBlbmFibGVkLg0KDQpJIGFtIG5vdCBzdXJl
-IHdoYXQgZWxzZSBpcyBuZWVkZWQgdG8gbWFrZSB0aGlzIHBvc2l0aW9uIGluZGVwZW5kZW50DQpv
-dGhlciB0aGFuLA0KDQpQUk9WSURFKF9fcGlfaXNfbWlkcl9pbl9yYW5nZV9saXN0CT0gaXNfbWlk
-cl9pbl9yYW5nZV9saXN0KTsNCg0KTWF5IGJlIHNpbmNlIHRoaXMgaXMgbm93IGEgdGV4dCBzZXNz
-aW9uIHRoYXQgd2UgYXJlIG1ha2luZyBQSSwgaXQgaXMgcHJvYmFibHkNCm1pc3Npbmcgc29tZSBv
-dGhlciBiaXRzLiBNeSB1bmRlcnN0YW5kaW5nIG9mIHRoYXQgcGFydCBvZiB0aGUgY29kZSBpcw0K
-dmVyeSBsaW1pdGVkLg0KDQpNYXJjL09saXZlciwNCg0KQW55IHRob3VnaHRzPw0KDQo+IA0KPiBU
-aGUgYnJlYWtpbmcgdXNhZ2Ugc2VlbXMgdG8gYmUgaW4gYGthc2xyX3JlcXVpcmVzX2twdGkoKWAg
-Y2FsbGVkIGluDQo+IGBlYXJseV9tYXBfa2VybmVsKClgLg0KPiBNeSB0ZXN0aW5nIG9uIGFuIEFN
-RCBTZWF0dGxlIGJvYXJkIGRvZXMgY3Jhc2gsIGJ1dCBuZXdlciBtYWNoaW5lcw0KPiBpbXBsZW1l
-bnRpbmcgRTBQRCBkbyBub3QgY3Jhc2ggYXMgdGhleSBkbyBub3QgbmVlZCB0byBjaGVjayBNSURS
-cyBpbg0KPiBga2FzbHJfcmVxdWlyZXNfa3B0aSgpYC4NCj4gYGlzX21kcl9pbl9yYW5nZV9saXN0
-YCBkaWQgd29yayBpbiBQSSBjb2RlIHByZXZpb3VzbHkgYmVjYXVzZSBpdCB3YXMNCj4gYGlubGlu
-ZWAsIHdoaWNoIHRoaXMgcGF0Y2ggY2hhbmdlcy4NCg0KWWVhaC4gVGhlIGNoYW5nZSBmcm9tIGlu
-bGluZSBoYXBwZW5lZCBhZnRlciB0aGUgdjdbMF0uIE1heSB3ZSBjb3VsZCBnbw0KYmFjayB0byB0
-aGF0IHNvIHRoYXQgb25seSBkYXRhIG5lZWRzIHRvIGJlIFBJIGlmIGZpeGluZyBhYm92ZSBpcyBp
-bnZhc2l2ZS4NCg0KSSBqdXN0IHRlc3RlZCB3aXRoIHRoZSB2NyB2ZXJzaW9uIGFuZCBpdCBib290
-cyB3aXRoIEtBU0FOIGFuZA0KQ09ORklHX1JBTkRPTUlaRV9CQVNFLg0KDQpUaGFua3MsDQpTaGFt
-ZWVyDQpbMF0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtYXJtLzA1NTdmMTkzNzU2ZjQ1ZGFh
-YzQzNDljMzBkOGYyZjhmQGh1YXdlaS5jb20vDQoNCg0KPiANCj4gQmVzdCByZWdhcmRzLA0KPiBB
-ZGEgQ291cHJpZSBEaWF6DQo+IA0KPiBPbiAyMS8wMi8yMDI1IDE0OjAyLCBTaGFtZWVyIEtvbG90
-aHVtIHdyb3RlOg0KPiA+IFN1YnNlcXVlbnQgcGF0Y2ggd2lsbCBhZGQgdGFyZ2V0IGltcGxlbWVu
-dGF0aW9uIENQVSBzdXBwb3J0IGFuZCB0aGF0DQo+ID4gd2lsbCByZXF1aXJlIF9taWRyX2luX3Jh
-bmdlX2xpc3QoKSB0byBhY2Nlc3MgbmV3IGRhdGEuIFRvIGF2b2lkDQo+ID4gZXhwb3J0aW5nIHRo
-ZSBkYXRhIG1ha2UgX21pZHJfaW5fcmFuZ2VfbGlzdCgpIGHCoG5vcm1hbCBmdW5jdGlvbiBhbmQN
-Cj4gPiBleHBvcnQgaXQuDQo+ID4NCj4gPiBObyBmdW5jdGlvbmFsIGNoYW5nZXMgaW50ZW5kZWQu
-DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTaGFtZWVyIEtvbG90aHVtDQo+IDxzaGFtZWVyYWxp
-LmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gICBhcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2NwdXR5cGUuaCB8IDE1ICstLS0tLS0tLS0tLS0tLQ0KPiA+ICAgYXJjaC9hcm02
-NC9rZXJuZWwvY3B1X2VycmF0YS5jICAgfCAxNSArKysrKysrKysrKysrKysNCj4gPiAgIGFyY2gv
-YXJtNjQva2VybmVsL2ltYWdlLXZhcnMuaCAgIHwgIDEgKw0KPiA+ICAgMyBmaWxlcyBjaGFuZ2Vk
-LCAxNyBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQg
-YS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdXR5cGUuaA0KPiBiL2FyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20vY3B1dHlwZS5oDQo+ID4gaW5kZXggMmE3NmYwZTMwMDA2Li5jY2I0YTE1NWQxMTggMTAw
-NjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHV0eXBlLmgNCj4gPiArKysg
-Yi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdXR5cGUuaA0KPiA+IEBAIC0yNzYsMjAgKzI3Niw3
-IEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBtaWRyX2lzX2NwdV9tb2RlbF9yYW5nZSh1MzINCj4gbWlk
-ciwgdTMyIG1vZGVsLCB1MzIgcnZfbWluLA0KPiA+ICAgCXJldHVybiBfbW9kZWwgPT0gbW9kZWwg
-JiYgcnYgPj0gcnZfbWluICYmIHJ2IDw9IHJ2X21heDsNCj4gPiAgIH0NCj4gPg0KPiA+IC1zdGF0
-aWMgaW5saW5lIGJvb2wgaXNfbWlkcl9pbl9yYW5nZShzdHJ1Y3QgbWlkcl9yYW5nZSBjb25zdCAq
-cmFuZ2UpDQo+ID4gLXsNCj4gPiAtCXJldHVybiBtaWRyX2lzX2NwdV9tb2RlbF9yYW5nZShyZWFk
-X2NwdWlkX2lkKCksIHJhbmdlLT5tb2RlbCwNCj4gPiAtCQkJCSAgICAgICByYW5nZS0+cnZfbWlu
-LCByYW5nZS0+cnZfbWF4KTsNCj4gPiAtfQ0KPiA+IC0NCj4gPiAtc3RhdGljIGlubGluZSBib29s
-DQo+ID4gLWlzX21pZHJfaW5fcmFuZ2VfbGlzdChzdHJ1Y3QgbWlkcl9yYW5nZSBjb25zdCAqcmFu
-Z2VzKQ0KPiA+IC17DQo+ID4gLQl3aGlsZSAocmFuZ2VzLT5tb2RlbCkNCj4gPiAtCQlpZiAoaXNf
-bWlkcl9pbl9yYW5nZShyYW5nZXMrKykpDQo+ID4gLQkJCXJldHVybiB0cnVlOw0KPiA+IC0JcmV0
-dXJuIGZhbHNlOw0KPiA+IC19DQo+ID4gK2Jvb2wgaXNfbWlkcl9pbl9yYW5nZV9saXN0KHN0cnVj
-dCBtaWRyX3JhbmdlIGNvbnN0ICpyYW5nZXMpOw0KPiA+DQo+ID4gICBzdGF0aWMgaW5saW5lIHU2
-NCBfX2F0dHJpYnV0ZV9jb25zdF9fIHJlYWRfY3B1aWRfbXBpZHIodm9pZCkNCj4gPiAgIHsNCj4g
-PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvY3B1X2VycmF0YS5jDQo+IGIvYXJjaC9h
-cm02NC9rZXJuZWwvY3B1X2VycmF0YS5jDQo+ID4gaW5kZXggOTliNTU4OTNmYzRlLi4xZjUxY2Y2
-Mzc4YzUgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvY3B1X2VycmF0YS5jDQo+
-ID4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvY3B1X2VycmF0YS5jDQo+ID4gQEAgLTE0LDYgKzE0
-LDIxIEBADQo+ID4gICAjaW5jbHVkZSA8YXNtL2t2bV9hc20uaD4NCj4gPiAgICNpbmNsdWRlIDxh
-c20vc21wX3BsYXQuaD4NCj4gPg0KPiA+ICtzdGF0aWMgaW5saW5lIGJvb2wgaXNfbWlkcl9pbl9y
-YW5nZShzdHJ1Y3QgbWlkcl9yYW5nZSBjb25zdCAqcmFuZ2UpDQo+ID4gK3sNCj4gPiArCXJldHVy
-biBtaWRyX2lzX2NwdV9tb2RlbF9yYW5nZShyZWFkX2NwdWlkX2lkKCksIHJhbmdlLT5tb2RlbCwN
-Cj4gPiArCQkJCSAgICAgICByYW5nZS0+cnZfbWluLCByYW5nZS0+cnZfbWF4KTsNCj4gPiArfQ0K
-PiA+ICsNCj4gPiArYm9vbCBpc19taWRyX2luX3JhbmdlX2xpc3Qoc3RydWN0IG1pZHJfcmFuZ2Ug
-Y29uc3QgKnJhbmdlcykNCj4gPiArew0KPiA+ICsJd2hpbGUgKHJhbmdlcy0+bW9kZWwpDQo+ID4g
-KwkJaWYgKGlzX21pZHJfaW5fcmFuZ2UocmFuZ2VzKyspKQ0KPiA+ICsJCQlyZXR1cm4gdHJ1ZTsN
-Cj4gPiArCXJldHVybiBmYWxzZTsNCj4gPiArfQ0KPiA+ICtFWFBPUlRfU1lNQk9MX0dQTChpc19t
-aWRyX2luX3JhbmdlX2xpc3QpOw0KPiA+ICsNCj4gPiAgIHN0YXRpYyBib29sIF9fbWF5YmVfdW51
-c2VkDQo+ID4gICBfX2lzX2FmZmVjdGVkX21pZHJfcmFuZ2UoY29uc3Qgc3RydWN0IGFybTY0X2Nw
-dV9jYXBhYmlsaXRpZXMgKmVudHJ5LA0KPiA+ICAgCQkJIHUzMiBtaWRyLCB1MzIgcmV2aWRyKQ0K
-PiA+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9pbWFnZS12YXJzLmggYi9hcmNoL2Fy
-bTY0L2tlcm5lbC9pbWFnZS0NCj4gdmFycy5oDQo+ID4gaW5kZXggZWYzYTY5Y2MzOThlLi5kZTNk
-MDgxZTVhNTcgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvaW1hZ2UtdmFycy5o
-DQo+ID4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvaW1hZ2UtdmFycy5oDQo+ID4gQEAgLTQ5LDYg
-KzQ5LDcgQEAgUFJPVklERShfX3BpX2FybTY0X3N3X2ZlYXR1cmVfb3ZlcnJpZGUJPQ0KPiBhcm02
-NF9zd19mZWF0dXJlX292ZXJyaWRlKTsNCj4gPiAgIFBST1ZJREUoX19waV9hcm02NF91c2Vfbmdf
-bWFwcGluZ3MJPSBhcm02NF91c2VfbmdfbWFwcGluZ3MpOw0KPiA+ICAgI2lmZGVmIENPTkZJR19D
-QVZJVU1fRVJSQVRVTV8yNzQ1Ng0KPiA+ICAgUFJPVklERShfX3BpX2Nhdml1bV9lcnJhdHVtXzI3
-NDU2X2NwdXMJPQ0KPiBjYXZpdW1fZXJyYXR1bV8yNzQ1Nl9jcHVzKTsNCj4gPiArUFJPVklERShf
-X3BpX2lzX21pZHJfaW5fcmFuZ2VfbGlzdAk9IGlzX21pZHJfaW5fcmFuZ2VfbGlzdCk7DQo+ID4g
-ICAjZW5kaWYNCj4gPiAgIFBST1ZJREUoX19waV9fY3R5cGUJCQk9IF9jdHlwZSk7DQo+ID4gICBQ
-Uk9WSURFKF9fcGlfbWVtc3RhcnRfb2Zmc2V0X3NlZWQJPSBtZW1zdGFydF9vZmZzZXRfc2VlZCk7
-DQoNCg==
+On Tue, 15 Apr 2025 11:57:50 +0100,
+Ada Couprie Diaz <ada.coupriediaz@arm.com> wrote:
+> 
+> Hello,
+> 
+> I discovered that this patch breaks boot for some CPUs when building
+> the default defconfig plus KASAN. This is still the case in v6.15-rc1
+> and rc2.
+> 
+> This patch marks `is_midr_in_range_list` as position independent but
+> it isn't, breaking early boot when instrumented with KASAN and
+> `CONFIG_RANDOMIZE_BASE` enabled.
+> 
+> The breaking usage seems to be in `kaslr_requires_kpti()` called in
+> `early_map_kernel()`.
+> My testing on an AMD Seattle board does crash, but newer machines
+> implementing E0PD do not crash as they do not need to check MIDRs in
+> `kaslr_requires_kpti()`.
+> `is_mdr_in_range_list` did work in PI code previously because it was
+> `inline`, which this patch changes.
+
+OK, this is much more of a pain than I thought.
+
+I tried bringing the various helpers into the PI section, but it ended
+up being extremely ugly.
+
+More importantly, this is something that is pretty much at odds with
+the whole idea of the MIDR override -- it happens way earlier than we
+can populate the table.
+
+The thing is, the only reason we need to do this is that we need to
+support the Cavium SEFAC (Sorry Excuse For A Computer) that cannot run
+with KPTI.
+
+I can restore harmony with the following hack. But maybe we should
+just prune TX from the kernel and be done with this contraption.
+
+	M.
+
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index d1cc0571798bf..bdfefca166baa 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -292,6 +292,20 @@ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
+ 	return _model == model && rv >= rv_min && rv <= rv_max;
+ }
+ 
++static inline bool __is_midr_in_range(struct midr_range const *range)
++{
++	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
++				       range->rv_min, range->rv_max);
++}
++
++static inline bool __is_midr_in_range_list(struct midr_range const *ranges)
++{
++	while (ranges->model)
++		if (__is_midr_in_range(ranges++))
++			return true;
++	return false;
++}
++
+ struct target_impl_cpu {
+ 	u64 midr;
+ 	u64 revidr;
+diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
+index 30a29e88994ba..e54a384826dc1 100644
+--- a/arch/arm64/include/asm/mmu.h
++++ b/arch/arm64/include/asm/mmu.h
+@@ -72,6 +72,17 @@ extern void create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
+ extern void *fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot);
+ extern void mark_linear_text_alias_ro(void);
+ 
++static inline bool cpu_has_e0pd(void)
++{
++	if (IS_ENABLED(CONFIG_ARM64_E0PD)) {
++		u64 mmfr2 = read_sysreg_s(SYS_ID_AA64MMFR2_EL1);
++		return (cpuid_feature_extract_unsigned_field(mmfr2,
++							     ID_AA64MMFR2_EL1_E0PD_SHIFT));
++	}
++
++	return false;
++}
++
+ /*
+  * This check is triggered during the early boot before the cpufeature
+  * is initialised. Checking the status on the local CPU allows the boot
+@@ -87,12 +98,8 @@ static inline bool kaslr_requires_kpti(void)
+ 	 * E0PD does a similar job to KPTI so can be used instead
+ 	 * where available.
+ 	 */
+-	if (IS_ENABLED(CONFIG_ARM64_E0PD)) {
+-		u64 mmfr2 = read_sysreg_s(SYS_ID_AA64MMFR2_EL1);
+-		if (cpuid_feature_extract_unsigned_field(mmfr2,
+-						ID_AA64MMFR2_EL1_E0PD_SHIFT))
+-			return false;
+-	}
++	if (cpu_has_e0pd())
++		return false;
+ 
+ 	/*
+ 	 * Systems affected by Cavium erratum 24756 are incompatible
+@@ -108,5 +115,21 @@ static inline bool kaslr_requires_kpti(void)
+ 	return true;
+ }
+ 
++/* Same as the above, but limited to the local CPU, ignoring the MIDR list */
++static inline bool __kaslr_requires_kpti(void)
++{
++	if (cpu_has_e0pd())
++		return false;
++
++	if (IS_ENABLED(CONFIG_CAVIUM_ERRATUM_27456)) {
++		extern const struct midr_range cavium_erratum_27456_cpus[];
++
++		if (__is_midr_in_range_list(cavium_erratum_27456_cpus))
++			return false;
++	}
++
++	return true;
++}
++
+ #endif	/* !__ASSEMBLY__ */
+ #endif
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index b55f5f7057502..ba8e05d640c7e 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -32,8 +32,7 @@ static inline bool is_midr_in_range(struct midr_range const *range)
+ 	int i;
+ 
+ 	if (!target_impl_cpu_num)
+-		return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+-					       range->rv_min, range->rv_max);
++		return __is_midr_in_range(range);
+ 
+ 	for (i = 0; i < target_impl_cpu_num; i++) {
+ 		if (midr_is_cpu_model_range(target_impl_cpus[i].midr,
+diff --git a/arch/arm64/kernel/pi/map_kernel.c b/arch/arm64/kernel/pi/map_kernel.c
+index e57b043f324b5..2df76d44a1072 100644
+--- a/arch/arm64/kernel/pi/map_kernel.c
++++ b/arch/arm64/kernel/pi/map_kernel.c
+@@ -245,7 +245,7 @@ asmlinkage void __init early_map_kernel(u64 boot_status, void *fdt)
+ 	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE)) {
+ 		u64 kaslr_seed = kaslr_early_init(fdt, chosen);
+ 
+-		if (kaslr_seed && kaslr_requires_kpti())
++		if (kaslr_seed && __kaslr_requires_kpti())
+ 			arm64_use_ng_mappings = true;
+ 
+ 		kaslr_offset |= kaslr_seed & ~(MIN_KIMG_ALIGN - 1);
+
+-- 
+Without deviation from the norm, progress is not possible.
