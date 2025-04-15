@@ -1,31 +1,31 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21092DFA4F
-	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 17:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47B521930D
+	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 17:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744736828; cv=none; b=D7a433RC6QFxWmM3sromHDW442tmq0Ut0nDCW2Ri4ca8deP3OY7tAXglUiwdpA/QCgfn1GF/yEcYQU48yTbh5TyZvzOBMAavlDvpDGjWC9J1kk0HmvOt7LP5xT+RhnfNil+hu59dFBHOIDQoy+opw7AYDJEkzbkHdej9Ui+prcg=
+	t=1744737156; cv=none; b=rGmbcEVeBhC5toArWNYk3GO0BJCP4C6lqI5XUk+qpgKvU1wkDjvJ7ycGyXlvQksWMvDcyD6eAytWisDzlWCKK/7x/i4M6qAqeqLGbpRP89CZmgFrzRb4XXjBywYglvEX3NmnIfup/D73qbKGme3M1en8Ua7egZiFKbcSFQihLAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744736828; c=relaxed/simple;
-	bh=SukwUDHYIRdmSk7/ML2jEOVgTI1uj6xl2M7cIlD5YiM=;
+	s=arc-20240116; t=1744737156; c=relaxed/simple;
+	bh=KsUegg4duEWHcNjxusZVDWGq165UXAWPP+T6hRPHNFw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bbJQSAfWt6QXgwedhAI/anvM3AE7uWUI+bSeXup9ZogN10xLAtr1Yh8rfcGQk2FClwFugjZWzflCNRYBHiLwW749edcQwctKiOZP4ljw9d7eUuqxJJqWQgzAy2ME+D2kINUB2SYhKLSb9EWcdCLNmsV9vE+qeb+a4wNV/9xMDYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t1kNm8gO; arc=none smtp.client-ip=95.215.58.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=KkKNbrh6agZg65PlBNvylyAEUOdVYcPKYS3hIVr6bfzslSVO7UN5kGMk/st3lIZtWRc7bWoeZZNcYtnTyy2ubxxfow2dOdsjzb7EgOFoKDwAQ74nbbvrUNZ1quLdIIsxLsufFGLBd0+gx94ieMOttNjkitJb52zg5V5tGeAyWBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YJA0Hd69; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t1kNm8gO"
-Date: Tue, 15 Apr 2025 10:06:50 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YJA0Hd69"
+Date: Tue, 15 Apr 2025 10:12:27 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744736821;
+	t=1744737152;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9c/jqs0ImTq23JWKqJ6pgYTsopt6CaO9c3noHLUB4W0=;
-	b=t1kNm8gOBoKSdP89u+A7EqbQrPcqmy3FSsr20RSggxMlDMceadc1SOwc3wxueBIeHEFgQb
-	1pUp4ktDIRycIBlsGuHyc8X+c29lVHjM5bUsiHKMcq4dLuWV4X6GDZqkFS1n7vHKBz90y7
-	+HXBR0DmYT9IVl99GPClah6fjMSTe9c=
+	bh=UZlxHE/PMbbkteqFpAZs5FG6AXCNdqDMrVPzocoft9A=;
+	b=YJA0Hd6969e9muOdARDfAIzNX7YV3lzqLiQMrcIJ8oQO07vov55VixBq+G81cQHzPMegxs
+	ZNg3GYzIgyjlqElFtCeT4NvRCuQLlou5VjBsntXSdZNvroYfj67Z2D+68kazZahR19ZZxG
+	TGhqLOI/EM0wX2e4tL9beWLl4ZEDSdw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: D Scott Phillips <scott@os.amperecomputing.com>
@@ -41,11 +41,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Yicong Yang <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] arm64: errata: Work around AmpereOne's erratum
- AC04_CPU_23
-Message-ID: <Z_6SKjdvje1Lpeo3@linux.dev>
+Subject: Re: [PATCH 1/2] arm64: errata: Work around AmpereOne's erratum
+ AC03_CPU_36
+Message-ID: <Z_6Te1TjMqyXChvQ@linux.dev>
 References: <20250415154711.1698544-1-scott@os.amperecomputing.com>
- <20250415154711.1698544-2-scott@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,77 +53,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250415154711.1698544-2-scott@os.amperecomputing.com>
+In-Reply-To: <20250415154711.1698544-1-scott@os.amperecomputing.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi,
-
-On Tue, Apr 15, 2025 at 08:47:11AM -0700, D Scott Phillips wrote:
-> Updates to HCR_EL2 can rarely corrupt simultaneous translations from
-> either earlier translations (back to the previous dsb) or later
-> translations (up to the next isb). Put a dsb before and isb after writes
-> to HCR_EL2.
+On Tue, Apr 15, 2025 at 08:47:10AM -0700, D Scott Phillips wrote:
+> AC03_CPU_36 can cause asynchronous exceptions to be routed to the wrong
+> exception level if an async exception coincides with an update to the
+> controls for the target exception level in HCR_EL2. On affected
+> machines, always do writes to HCR_EL2 with async exceptions blocked.
 > 
 > Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
 > ---
->  arch/arm64/Kconfig              | 13 +++++++++++++
->  arch/arm64/include/asm/sysreg.h |  7 +++++++
+>  arch/arm64/Kconfig              | 17 +++++++++++++++++
+>  arch/arm64/include/asm/sysreg.h | 18 ++++++++++++++++--
 >  arch/arm64/kernel/cpu_errata.c  | 14 ++++++++++++++
 >  arch/arm64/tools/cpucaps        |  1 +
->  4 files changed, 35 insertions(+)
+>  4 files changed, 48 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index e5fd87446a3b8..2a2e1c8de6a16 100644
+> index a182295e6f08b..e5fd87446a3b8 100644
 > --- a/arch/arm64/Kconfig
 > +++ b/arch/arm64/Kconfig
-> @@ -481,6 +481,19 @@ config AMPERE_ERRATUM_AC03_CPU_38
+> @@ -445,6 +445,23 @@ menu "Kernel Features"
 >  
->  	  If unsure, say Y.
+>  menu "ARM errata workarounds via the alternatives framework"
 >  
-> +config AMPERE_ERRATUM_AC04_CPU_23
-> +        bool "AmpereOne: AC04_CPU_23:  Failure to synchronize writes to HCR_EL2 may corrupt address translations."
+> +config AMPERE_ERRATUM_AC03_CPU_36
+> +        bool "AmpereOne: AC03_CPU_36: CPU can take an invalid exception, if an asynchronous exception to EL2 occurs while EL2 software is changing the EL2 exception controls."
 > +	default y
 > +	help
 > +	  This option adds an alternative code sequence to work around Ampere
-> +	  errata AC04_CPU_23 on AmpereOne.
+> +	  errata AC03_CPU_36 on AmpereOne.
 > +
-> +	  Updates to HCR_EL2 can rarely corrupt simultaneous translations from
-> +	  either earlier translations (back to the previous dsb) or later
-> +	  translations (up to the next isb).
+> +	  If an async exception happens at the same time as an update to the
+> +	  controls for the target EL for async exceptions, an exception can be
+> +	  delivered to the wrong EL. For example, an EL may be routed from EL2
+> +	  to EL1.
+> +
+> +	  The workaround masks all asynchronous exception types when writing
+> +	  to HCR_EL2.
 > +
 > +	  If unsure, say Y.
 > +
->  config ARM64_WORKAROUND_CLEAN_CACHE
->  	bool
->  
+>  config AMPERE_ERRATUM_AC03_CPU_38
+>          bool "AmpereOne: AC03_CPU_38: Certain bits in the Virtualization Translation Control Register and Translation Control Registers do not follow RES0 semantics"
+>  	default y
 > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index e7781f7e7f7a7..253de5bc68834 100644
+> index 2639d3633073d..e7781f7e7f7a7 100644
 > --- a/arch/arm64/include/asm/sysreg.h
 > +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1142,6 +1142,10 @@
->  	(IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC03_CPU_36) &&	\
->  	 __sysreg_is_hcr_el2(r) &&				\
->  	 alternative_has_cap_unlikely(ARM64_WORKAROUND_AMPERE_AC03_CPU_36))
-> +#define __hcr_el2_ac04_cpu_23(r)				\
-> +	(IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23) &&	\
-> +	 __sysreg_is_hcr_el2(r) &&				\
-> +	 alternative_has_cap_unlikely(ARM64_WORKAROUND_AMPERE_AC04_CPU_23))
+> @@ -1136,14 +1136,28 @@
+>  	__val;							\
+>  })
 >  
->  /*
->   * The "Z" constraint normally means a zero immediate, but when combined with
-> @@ -1154,6 +1158,9 @@
->  		asm volatile("mrs %0, daif; msr daifset, #0xf;"	\
->  			     "msr hcr_el2, %x1; msr daif, %0"	\
->  		: "=&r"(__daif) : "rZ" (__val));		\
-> +	} else if (__hcr_el2_ac04_cpu_23(r)) {			\
-> +		asm volatile("dsb nsh; msr hcr_el2, %x0; isb"	\
-> +			     : : "rZ" (__val));			\
+> +#define __sysreg_is_hcr_el2(r)					\
+> +	(__builtin_strcmp("hcr_el2", __stringify(r)) == 0)
 
-At least from your erratum description it isn't clear to me that this
-eliminates the problem and only narrows the window of opportunity.
-Couldn't the implementation speculatively fetch translations with an
-unsynchronized HCR up to the ISB? Do we know what translation regimes
-are affected by the erratum?
+This looks fragile. What about:
+
+	write_sysreg(hcr, HCR_EL2);
+
+or:
+
+	write_sysreg_s(hcr, SYS_HCR_EL2);
+
 
 Thanks,
 Oliver
