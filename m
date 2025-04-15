@@ -1,54 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8E320FAA9;
-	Tue, 15 Apr 2025 18:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9248A221545;
+	Tue, 15 Apr 2025 18:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744742003; cv=none; b=meJ9JtJpR5Deqalx4LjWYA9IT/5ayHKWF4v5JS21Cs8G6Ct/9fiYy02Rfj5Up1ARteyj3ElCYJl5oWodq8vGoNz6JeKQcq3nlmbYooLOFR+cgrgcIH5EDaYKZCGrqqK7HTNC2cJpTY3uE4OSMlCQkzaMFx+6QdrnaPRpIORJutQ=
+	t=1744742312; cv=none; b=P31R4+H1I3ysevBs4libIa/ZK7kCZpiAfaxftDHArRTl4PtvplxbSdaVxrKzYSjOmSkbdSnl3hPFJAcLGZ73uZ1cZganJe3wO0VDFwsTE6sKh23ssbJ1gH/1REYibDGW2gTmKfPCmKknUq1VDNY6c/3qMwG0Md71cMHntiQMsqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744742003; c=relaxed/simple;
-	bh=xElVJVESsbAJLuZAcsQnEEywNdvO8tPQ/vxvtd6rd7k=;
+	s=arc-20240116; t=1744742312; c=relaxed/simple;
+	bh=8sTrdGHxgk2UV7lZ8rQBn3TJV8+tH9FZocMeuFQMZWQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e972qRtnNNlOxAaXt3CCb4GLq0RVxEpH3Qspcu2XmzDPpJQB2xfxsHuT20FXA9CZ+1udfYd345yUComgrqluDX/3eVsARWF5ADd7ISjUO7liwBEs3b0hSiDLK/dk7kdxbIue+R6k93InuhK6MNsRVX039CgcDghIRRzsFRBCLnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtGnlnAv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=aHyuFmKoyr8dBDBUxscQWkqtT1Qfb3WbH0oSlVdyyWOXA5Fu8/+Nu/VqtC2lpRNBKqhA2y2R6gELrDpmvYGbNKEZb31JUDdIZAz4q2iyEdNEei1wW6SR0I5h5xIds3IkTpqt+LNnW0EFiSIM2mjIJm8YcMs/9WeexYjOb4uqgNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dsu+EDUA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtGnlnAv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C453C4CEE9;
-	Tue, 15 Apr 2025 18:33:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsu+EDUA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE9D9C4CEE9;
+	Tue, 15 Apr 2025 18:38:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744742003;
-	bh=xElVJVESsbAJLuZAcsQnEEywNdvO8tPQ/vxvtd6rd7k=;
+	s=k20201202; t=1744742312;
+	bh=8sTrdGHxgk2UV7lZ8rQBn3TJV8+tH9FZocMeuFQMZWQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WtGnlnAvI3tuTHiCKrLLalMgm3W3aNAjF0ckRuz97uxYAxOlRwNgZM3lal+61e1Ov
-	 qYumvuC/C2pEtg/QTfFmorwtyWsouoOtw0G46f8BzlLSBT9HGODIa3kbpKdzZXJmAt
-	 NaHBUpMzbRDfdNf/Hvr5mvgJoR8yDpD+zzBJpMK9q7TTLmuP5rU0L1MAR5nSX4Y+J7
-	 cTabiXFNcLC4MqN5TdW7VKlE32tS1a5ALs7nWp+C+AVcqNXmVPxEnVdLMJV5Wz6aRA
-	 4fjjVyqy05ORKU1cjm+L3dgsFHVX0I/2uw2/kYIsO46/H6fEvWhKdQnXQ+PJvEMZEQ
-	 8mHdiFddBGOLg==
+	b=dsu+EDUACmCA6zhAGLRHs3P1BUByWRnTU2Xouqnty5lyNEObmL7qY5kcphNN4kdrP
+	 oLsXHFpN4JD4OXuIeUVWz+9uU/TipEdVKfH5alE+5Qes8xNB2EabSm/qrtYMHTlXNp
+	 uv9WjbYaSUC/7roI7sgz8yAuGC9y38BaoCinjI/YPp5IFSyMeF9BVus34x4JBSGXba
+	 ESHAPtgk8vni8PmUKfwHFPdGPiZpLbnOyygWoiQF5rSUu5pkivHXmqJHSb5mS5dVQW
+	 vtDxmS7zln4sK7k4Ujv1Ztt+wtW8xtHc/xuaPjVTsvNvsP5gGx9d/ZrAfF72YC13cO
+	 0W7UhzCInAQXA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u4l60-005mPp-TI;
-	Tue, 15 Apr 2025 19:33:20 +0100
-Date: Tue, 15 Apr 2025 19:33:19 +0100
-Message-ID: <861pttl1g0.wl-maz@kernel.org>
+	id 1u4lAz-005mSe-Vh;
+	Tue, 15 Apr 2025 19:38:30 +0100
+Date: Tue, 15 Apr 2025 19:38:29 +0100
+Message-ID: <86zfghjmmy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: D Scott Phillips <scott@os.amperecomputing.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	Yicong Yang <yangyicong@hisilicon.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: Avoid blocking irqs when tlb flushing/ATing with HCR.TGE=0
-In-Reply-To: <20250415154656.1698522-2-scott@os.amperecomputing.com>
-References: <20250415154656.1698522-1-scott@os.amperecomputing.com>
-	<20250415154656.1698522-2-scott@os.amperecomputing.com>
+	linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH 2/2] arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
+In-Reply-To: <20250415154711.1698544-2-scott@os.amperecomputing.com>
+References: <20250415154711.1698544-1-scott@os.amperecomputing.com>
+	<20250415154711.1698544-2-scott@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,118 +67,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, joey.gouly@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 15 Apr 2025 16:46:56 +0100,
+On Tue, 15 Apr 2025 16:47:11 +0100,
 D Scott Phillips <scott@os.amperecomputing.com> wrote:
 > 
-> pNMIs are intended to be deliverable during operations like guest
-> tlb flushing or nested AT, however the setting of HCR_EL2 controls
-> are accidentally blocking async exceptions.
-> 
-> You can see this by doing:
-> 
->      # perf record -e cycles:Hk -g ./dirty_log_perf_test -m 3 \
->        -i 4 -s anonymous -b 4G -v 32
-> 
-> Where no samples will be collected in __kvm_tlb_flush_vmid_ipa_nsh()
-> between enter_vmid_context() and exit_vmid_context() then many
-> samples are collected right after the write to HCR_EL2 in
-> exit_vmid_context(), where pNMIs actually get unmasked.
-> 
-> Set HCR_EL2.IMO so that pNMIs are not blocked during guest tlb
-> flushing or nested AT.
->
-> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
-> ---
->  arch/arm64/include/asm/hardirq.h |  3 ++-
->  arch/arm64/kvm/at.c              |  4 +++-
->  arch/arm64/kvm/hyp/vhe/tlb.c     | 10 ++++++++++
->  3 files changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/hardirq.h b/arch/arm64/include/asm/hardirq.h
-> index cbfa7b6f2e098..6eb3f93851023 100644
-> --- a/arch/arm64/include/asm/hardirq.h
-> +++ b/arch/arm64/include/asm/hardirq.h
-> @@ -41,7 +41,8 @@ do {									\
->  									\
->  	___hcr = read_sysreg(hcr_el2);					\
->  	if (!(___hcr & HCR_TGE)) {					\
-> -		write_sysreg(___hcr | HCR_TGE, hcr_el2);		\
-> +		write_sysreg((___hcr & ~(HCR_AMO | HCR_IMO | HCR_FMO)) |\
-> +			     HCR_TGE, hcr_el2);				\
->  		isb();							\
->  	}								\
->  	/*								\
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index ff4b06ce661af..f31f0d78c5813 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -1269,7 +1269,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  
->  skip_mmu_switch:
->  	/* Clear TGE, enable S2 translation, we're rolling */
-> -	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
-> +	write_sysreg((config.hcr & ~HCR_TGE) |
-> +		     HCR_AMO | HCR_IMO | HCR_FMO | HCR_VM,
-> +		     hcr_el2);
->  	isb();
->  
->  	switch (op) {
-> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-> index 3d50a1bd2bdbc..ecb700bab3b8f 100644
-> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-> @@ -55,6 +55,15 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
->  	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
->  	 * let's flip TGE before executing the TLB operation.
->  	 *
-> +	 * One other fun complication to consider is the target EL for
-> +	 * asynchronous exceptions. We want to allow NMIs during tlb flushing,
-> +	 * so we need to ensure that the target EL for IRQs remains as EL2.
-> +	 * HCR_EL2.{E2H,TGE,IMO} = {1,0,0} would set the target EL for IRQs as
-> +	 * EL1, and IRQs at EL2 would be "C" (Interrupts not taken regardless
-> +	 * of the value of interrupt masks). So we need to set
-> +	 * HCR_EL2.{E2H,TGE,IMO} = {1,0,1} so that NMIs will still be
-> +	 * delivered.
-> +	 *
->  	 * ARM erratum 1165522 requires some special handling (again),
->  	 * as we need to make sure both stages of translation are in
->  	 * place before clearing TGE. __load_stage2() already
-> @@ -63,6 +72,7 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
->  	__load_stage2(mmu, mmu->arch);
->  	val = read_sysreg(hcr_el2);
->  	val &= ~HCR_TGE;
-> +	val |= HCR_AMO | HCR_IMO | HCR_FMO;
->  	write_sysreg(val, hcr_el2);
->  	isb();
->  }
+> Updates to HCR_EL2 can rarely corrupt simultaneous translations from
+> either earlier translations (back to the previous dsb) or later
+> translations (up to the next isb). Put a dsb before and isb after writes
+> to HCR_EL2.
 
-This seems terribly complicated for no good reasons. Why can't we run
-with HCR_xMO set at all times? i.e. like this:
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 974d72b5905b8..bba4b0e930915 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -100,7 +100,7 @@
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
--#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-+#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO)
- 
- #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
- #define MPAMHCR_HOST_FLAGS	0
-
-There should never be a case where we don't want physical interrupts
-to be taken at EL2 when running VHE, and we should never use these
-bits to mask interrupts. This has been relaxed in the architecture to
-have an IMPDEF behaviour anyway, as it cannot be implemented on NV.
-
-Thanks,
+If the write to HCR_EL2 can corrupt translations, what guarantees that
+such write placed on a page boundary (therefore requiring another TLB
+lookup to continue in sequence) will be able to get to the ISB?
 
 	M.
 
