@@ -1,65 +1,65 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED1F2B9B9
-	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 07:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567C6634
+	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 07:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744700591; cv=none; b=F+N5eHzZrZQX00dSbLjspIBy6/EkzfxZUEvKgCsn/5jx7xpIaBQ/UR7sYdVEPdyqjQ/c2GBVYmrNhWwTRM53vRuHLnQXWJStZki6ak0Om1RrV/Q+CUIy/dhJx7d71e2cYOgyVQHHlk5C587GlAik0X2wREW3k2dr4As1rhIE/xk=
+	t=1744700956; cv=none; b=RvRuG97K185lxC5JTWOyswp3qo/TFxkNTlsBbP7ZmraAkYZOSVub8V7DmuSnIpY5yyRrdITTpFiJ+pDH1o4GXTJk1F3wuJsIbcTviWNx1sYcOa7uiLZAIoQEvpOaufMzxYR2Jpp6CGUBA2//iGECPk/I/fhLVQHYcDxBrq6U5yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744700591; c=relaxed/simple;
-	bh=71phUSG+VBzdAtW3jTx7CrGNdH7ZAf05nMpXNyHHalI=;
+	s=arc-20240116; t=1744700956; c=relaxed/simple;
+	bh=yCA2/Oc2+/ll1GPvTsVKPXe9bVmUlSF5TsF8fzSMEzU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jk1FKOkoSbGqTaCUSa1VUoqeXOsHTK5sq6cYbokpptrRqkxSbCA46yVYQq63vilVBgM6gQxyhIcbtrqiDyWG+8+wjdRKY6Wet2rej1/nKTwb8T7kLVKWJfuJNPiYTnJf1Cx7pLrI/r1RUcY0UIh/tlX9PrGW6a4d8V6mPnAj8Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wOz561zE; arc=none smtp.client-ip=209.85.221.48
+	 In-Reply-To:Content-Type; b=svBg8/Td8qoK93UnMHmOXh0M4iSPljnGXZ+Xeyv5E52BH9ZT/Slyg7q6H3AtlEca2ccMKpIXQbsA82lANFzREHlXctZudEPZTDrLjaZ7njNtk1jK1SAgdM/lZgzI0ZiI7zXAfwVwng4zHyeTc8c8fXRQSZKRLJlt6PC8D05v+j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cK5QkwgC; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wOz561zE"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39c1ee0fd43so4987909f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 00:03:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cK5QkwgC"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43d0618746bso39877355e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 00:09:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744700588; x=1745305388; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1744700952; x=1745305752; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gQIZTL9G2c/6upLFkGLhEBR0xC+hQ/0nufe0kTqCXv8=;
-        b=wOz561zEXJae9y2IJ5hyph3Q+P1uG5loXTfBd34c6gYhMORtDI/pBf+TfTeoJzSWHK
-         H2Qe1Kbhu0TpvA1yIs6AYhXvboJF6sbOyugilHhxf0J7ntqAom2YV8mtQ42KT+aglo/g
-         sJr2trtV4Ou6c/90zuXywIHUIbllWaB69SDpoNrHESkx81/iQ40FndShxIuWZccMH0DR
-         m7mO/oNVLL1pEZmoJdssfhw8dUZ36oW/jLhn1TCv/ArROsc+1LVu6s4HCebHdSNAQxKp
-         vwlxkrZoghNsimI8PbofzMKnYd3S0JkPnaaAaC+oZPsNw/Nzd8Kjex55X+jituPmUZHj
-         s9Eg==
+        bh=HQorS3qs/9wF+hxqJeIyqNgmDflvogIXAEEo0HyX7cg=;
+        b=cK5QkwgCm+2XrT8rs9xuGEgRyBXxl2/xsgo/lYJzpS370niLd/8nRY+keGcgcih3js
+         6Wle9eHTCC6j3dwk13GCZ1wqKOGgy7g3p9s8kh+Tq8CbNfkp7mjdnPlFkUh+mXzyBCRK
+         Nmo+1Ud0XEYh3xY5UW4Apbn24wea82WBVlyjrExFGrF0RoWb6c7bHiuhen6jHsi8Punw
+         AdDAM1sY25kDNE5L4KfbtDWzQFMQZYe+hG0CuGdLyMzPd/zGfJ0tAMV2rxxiD9OFpq0P
+         kLY1yyIOvUvKLWZS6kT23lNIcYqtr71CAz/HyMFz1kcNt0j/8xIvIr+ZQC47hQWdLK98
+         uV1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744700588; x=1745305388;
+        d=1e100.net; s=20230601; t=1744700952; x=1745305752;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gQIZTL9G2c/6upLFkGLhEBR0xC+hQ/0nufe0kTqCXv8=;
-        b=CG2QYB7ppH2x6Sguf8b9yn7x4di5qntEoPjHSLezYulgpg1WfOnv4MORHa5Y9x8yHi
-         WSgXdOmf35vuCK9tB79d6jckYudV1+EzyIq7hVbg5iV1WBLTaW5I7mzuxIsKYRsRf3a7
-         t5e9FVHn7xsv1hEBAOxbIPbIhgBH5aNoc8OZiJT9HSVbeqvsfD48Ahmn3qWdODJ8hwGl
-         SsLRjPj50CUEOaKLtNt2hf9EhD6NKe0K3F91VWs4LYZklMsmwRBL3O8Mrdl+pj2ZHlxX
-         uimImayAmzVhfPDONg2V23DqwSQ18HDSAmnkb2lqwbtd9Rghdya6wgUzzH4miOALrmxw
-         tDBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNaHqxGdqbCN/zivLq3TlobKGhI+5Da53Kdrr+xlEaZXvk/j+tGoWC27RRqBd69fas/PjcE/k=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwIIpXiSk9xuLTFuAweYnQGhyVG12LZLliMzhPZmMUKUB2nOQG7
-	zu2TNmgPkrcHv/rMF7aJ/JQn3gz4j7RQQGnhYZcssmHAZswQrQDRriTFtjMAmb4=
-X-Gm-Gg: ASbGncvwAWyTJErir2wK6jvhhuOQYhqgdiqd/n+OP75TWO5+3Vyo8x0zcAarWXmPNRS
-	IP2Ot3NPfYVmVxdSiTfCk4kxu0ePsEnseJq+wZ4X8Sk8A0eMaAD8W5HDIuVYF2pJoN8tpCYLkgC
-	wyJV5HAZ+aeRdMmGaTbw4VS9kg62c417QrPRYZ6R62eZ5+Xcp0EoNSMQfSWVigr27H60Iw3l8ct
-	sPnFYDTF1dmKZMc1SoBQdAHvDhN7R4WGyBDpFBPVxRsF81fQp4NvJkHiBTMKBe74YcEGwjzf8Ul
-	jHWxDyejmZ6B3bLyABZDCjXZNgLcVwbjIfGxdewn3VadGA/Lxr/QKbM7yuOjnd3o2g5GfaYCJGx
-	X2/+bQ7xl
-X-Google-Smtp-Source: AGHT+IFdPTJ8LHSnf9kexPXg9Yw57XSpwMyM9HqLdnmKOqq/iid4dTW/LxIaw775eBPO7mzIdnTsQQ==
-X-Received: by 2002:a5d:588a:0:b0:39a:c9b3:e1d7 with SMTP id ffacd0b85a97d-39ea634bf9amr10517202f8f.29.1744700587920;
-        Tue, 15 Apr 2025 00:03:07 -0700 (PDT)
+        bh=HQorS3qs/9wF+hxqJeIyqNgmDflvogIXAEEo0HyX7cg=;
+        b=XV5By9SSTwGvUaIhCrDoDwSr4tfxN6tdg7+Ud5EyrZa913yrpVUJ+4poBV8Xmy0GQ+
+         iw+gQtyHRfBmgUaX52Lw5jLfShRbkz1JQ88vjGu7/Arx68YxL5obpXlutUb10yWEoBU0
+         +6SnWkEdBg1sWIGPbHSvOSTzNssoHAzTsv/DpSRT49pSjCHt4iDzgqTFbwlQm5HuUVue
+         3YqV5qjW/emfl+YDT2CCYj1GEeGZpnXaA8dhK/POuz82UuRsRViXfZle174AlrmRfWS1
+         U+HbAOI35YTkJLOsU3xYc+YgxQCtNufydZGGzGKlUxG9wsmkv/fQyBoRnw2/J/CLbh05
+         DsSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9NiAAJM8rVEbSSvvvlkDAiyQkihjhZsh9YnKySBdRr0EwJrMnLSbWJhnuNF+6vPW02Z4Z59U=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxI9oMOd8ZS9cdJUxwj0Qt3yyo/BvYM6EuA4+Pe730JHmwTrVCg
+	+RCtvSa4BpFniV7yVaPR3+u4D5o7o/AG3NC4pCh9zGJmeJJJFTTI3xNhaF/J0v4=
+X-Gm-Gg: ASbGncsDWiGWISq5HsGj2nYVub/JwCi3XT/1yIY0Rjz1dqFLpj1gqSydzS9YjqwouWE
+	Ompb0YcpNZ7KhKT/lipzb7AXrok3O90TThLCvCYqoKWlYIAdJWp/VYc5u9jXPcn8IScCaPnbe4W
+	NzO010bimoxvE33q283vRPL4CD/uWWek3TOdghIGBwe0aRiLBgDFPG2grvV5yQV1DnEFI6TWnH+
+	p0HMXD2zqQGfMQ8s40j2n0QvlT8PzxriTTBpUahVeKIk+Gzi5PHWcbdkbvKd9ZAXFIUtK1+1D1/
+	+J25j0tewRbtKa6l+XhnLKF19SNBwQkvzH5qSsqD8REUQTcIhYwWM0qZe72hV1QFlnL+/hZJ9K6
+	lTrlckJ4J
+X-Google-Smtp-Source: AGHT+IEBCb9hNiit5aB+Gor1TQBCisecLYyLH9/Q7InmyAKhQNWL89req9MQk6VcoCy7HxiIPVKtng==
+X-Received: by 2002:a05:600c:3acd:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-43f3a7d827emr146771465e9.0.1744700952548;
+        Tue, 15 Apr 2025 00:09:12 -0700 (PDT)
 Received: from [192.168.69.238] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf445315sm13165936f8f.82.2025.04.15.00.03.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f205ecc73sm201303415e9.8.2025.04.15.00.09.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 00:03:07 -0700 (PDT)
-Message-ID: <5f9a4bc5-5569-437f-8e8d-f386dd51e33a@linaro.org>
-Date: Tue, 15 Apr 2025 09:03:05 +0200
+        Tue, 15 Apr 2025 00:09:12 -0700 (PDT)
+Message-ID: <0fb4cd74-bcbf-4063-bc3b-0e8359d04117@linaro.org>
+Date: Tue, 15 Apr 2025 09:09:10 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/10] arm/kvm: write back modified ID regs to KVM
+Subject: Re: [PATCH v3 02/10] arm/cpu: Add sysreg properties generation
 To: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
  eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
  kvmarm@lists.linux.dev, peter.maydell@linaro.org,
@@ -78,53 +78,69 @@ To: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
 Cc: agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
  pbonzini@redhat.com
 References: <20250414163849.321857-1-cohuck@redhat.com>
- <20250414163849.321857-8-cohuck@redhat.com>
+ <20250414163849.321857-3-cohuck@redhat.com>
 Content-Language: en-US
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250414163849.321857-8-cohuck@redhat.com>
+In-Reply-To: <20250414163849.321857-3-cohuck@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 14/4/25 18:38, Cornelia Huck wrote:
 > From: Eric Auger <eric.auger@redhat.com>
 > 
-> We want to give a chance to override the value of host ID regs.
-> In a previous patch we made sure all their values could be fetched
-> through kvm_get_one_reg() calls before their modification. After
-> their potential modification we need to make sure we write back
-> the values through kvm_set_one_reg() calls.
+> Introduce a script that automates the generation of system register
+> properties definitions from a given linux source tree
+> arch/arm64/tools/sysreg.
 > 
-> Make sure the cpreg_list is modified with updated values and
-> transfer those values back to kvm.
+> Invocation of
+> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
+> in scripts directory additionally generates
+> target/arm/cpu-sysreg-properties.c containing definitions for
+> feature ID registers.
 > 
+> update-aarch64-sysreg-code.sh additionally calls
+> gen-cpu-sysreg-properties.awk which is inherited from kernel
+> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
+> the original author of this script.
+> 
+> [CH: split off from original patch adding both sysreg definitions
+>   and properties]
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->   target/arm/kvm.c        | 44 ++++++++++++++++++++++++++++++++++++++++-
->   target/arm/trace-events |  1 +
->   2 files changed, 44 insertions(+), 1 deletion(-)
+>   scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++++++++++++++++
+>   scripts/update-aarch64-sysreg-code.sh |   5 +-
+>   2 files changed, 329 insertions(+), 1 deletion(-)
+>   create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+> 
+> diff --git a/scripts/gen-cpu-sysreg-properties.awk b/scripts/gen-cpu-sysreg-properties.awk
+> new file mode 100755
+> index 000000000000..76c37938b168
+> --- /dev/null
+> +++ b/scripts/gen-cpu-sysreg-properties.awk
+> @@ -0,0 +1,325 @@
+> +#!/bin/awk -f
+> +# SPDX-License-Identifier: GPL-2.0
+> +# gen-cpu-sysreg-properties.awk: arm64 sysreg header generator
+> +#
+> +# Usage: awk -f gen-cpu-sysreg-properties.awk $LINUX_PATH/arch/arm64/tools/sysreg
 
 
->   void kvm_arm_reset_vcpu(ARMCPU *cpu)
->   {
->       int ret;
-> @@ -2050,7 +2083,16 @@ int kvm_arch_init_vcpu(CPUState *cs)
->       }
->       cpu->mp_affinity = mpidr & ARM64_AFFINITY_MASK;
->   
-> -    return kvm_arm_init_cpreg_list(cpu);
-> +    ret = kvm_arm_init_cpreg_list(cpu);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +    /* overwrite writable ID regs with their updated property values */
-> +    kvm_arm_writable_idregs_to_cpreg_list(cpu);
+> +BEGIN {
+
+         print "/* AUTOMATICALLY GENERATED, DO NOT MODIFY */\n"
+
+Should we keep copyright?
+
+> +	print "#include \"cpu-custom.h\""
+> +	print ""
+> +	print "ARM64SysReg arm64_id_regs[NUM_ID_IDX];"
+> +	print ""
+> +	print "void initialize_cpu_sysreg_properties(void)"
+> +	print "{"
+> +        print "    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NUM_ID_IDX);"
+> +        print ""
 > +
-> +    write_list_to_kvmstate(cpu, 3);
-
-s/3/KVM_PUT_FULL_STATE/?
-
-> +
-> +    return 0;
->   }
-
+> +	__current_block_depth = 0
+> +	__current_block[__current_block_depth] = "Root"
+> +}
