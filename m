@@ -1,122 +1,146 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC762918C2
-	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 09:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26921DE3C1
+	for <kvmarm@lists.linux.dev>; Tue, 15 Apr 2025 10:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744710897; cv=none; b=jp4JQbkFONW/Yzfs7XadUBx2G/Ppn+4xVzzmhf6veO3yebx78UvT1/urDvh+3Pc4bmrMc4Jq0zpjHcpRvxx+qtddRSpxRzvCxnKF++jkcPYwkWNGQpObO8RLciFEY7f5hT9fbSJOiO6Z49YV7Fo5EeTd+ooPMiW4pNt+pMsRNms=
+	t=1744714679; cv=none; b=hbpIIzWfdsjgo/W4wq0bRsa8cs1P1isDlRwxVgW3z86/nnG/MSZ40cGaJUrzpAacri+tE8PCbaKrr1WxRot4m9kV1ZMmiqWvD1fRLxDmw+itCnxaU8I46psG723J+e6BYdwmG/FAhD8Sd8o57azHHAfijiCe6m3w9GhgkmoV9b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744710897; c=relaxed/simple;
-	bh=WTRN9IN+JIRLK73X4xPWP7i1D9IMNTbPPMvn2Z2SbEo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gREBhGlZPto8HdtqJfjwHzUKIFeasG1tmohunBS6kMLKK8bDB57qywOmyzwvqkwFuzIQZAAhhcozRugZrSpj502yiP9YUIbS3XVZ6+S8ItltjSlJ2oCwcZ/8vIdWCtanuSpIIK+KXJ+kBcewyOzK1G/3MWnMsVqpTbQQWrENEYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N+Tgh7CC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+Tgh7CC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744710894;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zfu+55ya+LNp+fnrMbsION4V9pzLKLFVggb5s8FgwLA=;
-	b=N+Tgh7CCduJLWtobonyt6p18mv6mWTiJk4pC0dyY/8+DlIbVC+theIQg7WRHWgeW5Y3fak
-	LwMOZb3C9u9NarALRCI9QRFevkPbNqF1BC8fvHxLy9X9nv6jUWEh63P9NPs+KKPRSaPwRH
-	saniYHoJ83RNyrWIvdKLpTD8MtSdig8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-237-3fd-xUXcMnCxHSbgIPPQqA-1; Tue,
- 15 Apr 2025 05:54:51 -0400
-X-MC-Unique: 3fd-xUXcMnCxHSbgIPPQqA-1
-X-Mimecast-MFC-AGG-ID: 3fd-xUXcMnCxHSbgIPPQqA_1744710889
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DEC6D180035C;
-	Tue, 15 Apr 2025 09:54:48 +0000 (UTC)
-Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D564F19560AD;
-	Tue, 15 Apr 2025 09:54:46 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- eric.auger.pro@gmail.com,
- eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
- oliver.upton@linux.dev, sebott@redhat.com,
- shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
-Cc: agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
- pbonzini@redhat.com
-Subject: Re: [PATCH v3 07/10] arm/kvm: write back modified ID regs to KVM
-In-Reply-To: <5f9a4bc5-5569-437f-8e8d-f386dd51e33a@linaro.org>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20250414163849.321857-1-cohuck@redhat.com>
- <20250414163849.321857-8-cohuck@redhat.com>
- <5f9a4bc5-5569-437f-8e8d-f386dd51e33a@linaro.org>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Tue, 15 Apr 2025 11:54:44 +0200
-Message-ID: <87sem9sqaj.fsf@redhat.com>
+	s=arc-20240116; t=1744714679; c=relaxed/simple;
+	bh=236BGQ5I/lIE3n6FcNEcKeltCUL+TkbcW8hfK85y1vU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=je6GQs4LPF1wQIi0YIWpVIbZM2pIgXaz+gcs6xgd5kOKEMwTWUQcfOu7G2dUVJFvhdf/EgU74APFExQWIS+sSgSlRLFM7N42yq00SvB0t7ToG7x8LoKjZ6qT49Jw3jZqp0+Mn1wjd7BKMGwIfwBuvPV2DKsUPN9ChKA6BsAWObI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA31415A1;
+	Tue, 15 Apr 2025 03:57:53 -0700 (PDT)
+Received: from [10.1.33.173] (e137867.arm.com [10.1.33.173])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19D503F66E;
+	Tue, 15 Apr 2025 03:57:51 -0700 (PDT)
+Message-ID: <3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com>
+Date: Tue, 15 Apr 2025 11:57:50 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG][PATCH v8 4/6] arm64: Make _midr_in_range_list() an exported
+ function
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev
+Cc: catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com,
+ cohuck@redhat.com, eric.auger@redhat.com, sebott@redhat.com,
+ yuzenghui@huawei.com, wangzhou1@hisilicon.com, jiangkunkun@huawei.com,
+ jonathan.cameron@huawei.com, anthony.jebson@huawei.com,
+ linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com
+References: <20250221140229.12588-1-shameerali.kolothum.thodi@huawei.com>
+ <20250221140229.12588-5-shameerali.kolothum.thodi@huawei.com>
+From: Ada Couprie Diaz <ada.coupriediaz@arm.com>
+Content-Language: en-US
+Organization: Arm Ltd.
+In-Reply-To: <20250221140229.12588-5-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 15 2025, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
+Hello,
 
-> On 14/4/25 18:38, Cornelia Huck wrote:
->> From: Eric Auger <eric.auger@redhat.com>
->>=20
->> We want to give a chance to override the value of host ID regs.
->> In a previous patch we made sure all their values could be fetched
->> through kvm_get_one_reg() calls before their modification. After
->> their potential modification we need to make sure we write back
->> the values through kvm_set_one_reg() calls.
->>=20
->> Make sure the cpreg_list is modified with updated values and
->> transfer those values back to kvm.
->>=20
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>   target/arm/kvm.c        | 44 ++++++++++++++++++++++++++++++++++++++++-
->>   target/arm/trace-events |  1 +
->>   2 files changed, 44 insertions(+), 1 deletion(-)
+I discovered that this patch breaks boot for some CPUs when building the 
+default defconfig plus KASAN. This is still the case in v6.15-rc1 and rc2.
+
+This patch marks `is_midr_in_range_list` as position independent but it 
+isn't, breaking early boot when instrumented with KASAN and 
+`CONFIG_RANDOMIZE_BASE` enabled.
+
+The breaking usage seems to be in `kaslr_requires_kpti()` called in 
+`early_map_kernel()`.
+My testing on an AMD Seattle board does crash, but newer machines 
+implementing E0PD do not crash as they do not need to check MIDRs in 
+`kaslr_requires_kpti()`.
+`is_mdr_in_range_list` did work in PI code previously because it was 
+`inline`, which this patch changes.
+
+Best regards,
+Ada Couprie Diaz
+
+On 21/02/2025 14:02, Shameer Kolothum wrote:
+> Subsequent patch will add target implementation CPU support and that
+> will require _midr_in_range_list() to access new data. To avoid
+> exporting the data make _midr_in_range_list() a normal function and
+> export it.
 >
+> No functional changes intended.
 >
->>   void kvm_arm_reset_vcpu(ARMCPU *cpu)
->>   {
->>       int ret;
->> @@ -2050,7 +2083,16 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>       }
->>       cpu->mp_affinity =3D mpidr & ARM64_AFFINITY_MASK;
->>=20=20=20
->> -    return kvm_arm_init_cpreg_list(cpu);
->> +    ret =3D kvm_arm_init_cpreg_list(cpu);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +    /* overwrite writable ID regs with their updated property values */
->> +    kvm_arm_writable_idregs_to_cpreg_list(cpu);
->> +
->> +    write_list_to_kvmstate(cpu, 3);
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>   arch/arm64/include/asm/cputype.h | 15 +--------------
+>   arch/arm64/kernel/cpu_errata.c   | 15 +++++++++++++++
+>   arch/arm64/kernel/image-vars.h   |  1 +
+>   3 files changed, 17 insertions(+), 14 deletions(-)
 >
-> s/3/KVM_PUT_FULL_STATE/?
-
-Indeed, that's more obvious. Thanks!
-
+> diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+> index 2a76f0e30006..ccb4a155d118 100644
+> --- a/arch/arm64/include/asm/cputype.h
+> +++ b/arch/arm64/include/asm/cputype.h
+> @@ -276,20 +276,7 @@ static inline bool midr_is_cpu_model_range(u32 midr, u32 model, u32 rv_min,
+>   	return _model == model && rv >= rv_min && rv <= rv_max;
+>   }
+>   
+> -static inline bool is_midr_in_range(struct midr_range const *range)
+> -{
+> -	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> -				       range->rv_min, range->rv_max);
+> -}
+> -
+> -static inline bool
+> -is_midr_in_range_list(struct midr_range const *ranges)
+> -{
+> -	while (ranges->model)
+> -		if (is_midr_in_range(ranges++))
+> -			return true;
+> -	return false;
+> -}
+> +bool is_midr_in_range_list(struct midr_range const *ranges);
+>   
+>   static inline u64 __attribute_const__ read_cpuid_mpidr(void)
+>   {
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index 99b55893fc4e..1f51cf6378c5 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -14,6 +14,21 @@
+>   #include <asm/kvm_asm.h>
+>   #include <asm/smp_plat.h>
+>   
+> +static inline bool is_midr_in_range(struct midr_range const *range)
+> +{
+> +	return midr_is_cpu_model_range(read_cpuid_id(), range->model,
+> +				       range->rv_min, range->rv_max);
+> +}
+> +
+> +bool is_midr_in_range_list(struct midr_range const *ranges)
+> +{
+> +	while (ranges->model)
+> +		if (is_midr_in_range(ranges++))
+> +			return true;
+> +	return false;
+> +}
+> +EXPORT_SYMBOL_GPL(is_midr_in_range_list);
+> +
+>   static bool __maybe_unused
+>   __is_affected_midr_range(const struct arm64_cpu_capabilities *entry,
+>   			 u32 midr, u32 revidr)
+> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+> index ef3a69cc398e..de3d081e5a57 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -49,6 +49,7 @@ PROVIDE(__pi_arm64_sw_feature_override	= arm64_sw_feature_override);
+>   PROVIDE(__pi_arm64_use_ng_mappings	= arm64_use_ng_mappings);
+>   #ifdef CONFIG_CAVIUM_ERRATUM_27456
+>   PROVIDE(__pi_cavium_erratum_27456_cpus	= cavium_erratum_27456_cpus);
+> +PROVIDE(__pi_is_midr_in_range_list	= is_midr_in_range_list);
+>   #endif
+>   PROVIDE(__pi__ctype			= _ctype);
+>   PROVIDE(__pi_memstart_offset_seed	= memstart_offset_seed);
