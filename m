@@ -1,139 +1,121 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B188209F45
-	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 15:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E1E1ADC78
+	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 16:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744817230; cv=none; b=Rte8eXsqgMk+glgLagNjwhgquXlvfD0agt19icZ2rOrCLxtO1zFPqW5Av5xw85YOogw7g5D+C0MO9nLvSWo1HgA5NaqdykCjzQW92zNMdKOBcs7XWmvhVpx8Rj7AIrDyVed4YcG9q2XrMi3mvDNp8Uojp4HF5W9vvGK8+D+nLlc=
+	t=1744819746; cv=none; b=oYi4W6M7GuysH9DBY/meI7Iqvdgv6Tf5gbuoieTVXIbReO+YjzwNbKcdTpb/7tG3cTfjRtLrm8jVn4PrL8aKR7//AzWWtLaxPZtQFHiFJ+RKlt5SQLzRX3Puk5XCCUSmWtYxjXTKfqGRUiwN+zItcyLdWtyuJB2+aiEzEAH4hjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744817230; c=relaxed/simple;
-	bh=uu6A7iueq6DtipNuS6Phk5LGlAI7BCi/IestivOyyuk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Cq8tmAk2GYwOKqGyztGMiGcWiFU/5G2b2DFsLS/Dx2vvltpLDmviztBU6w/Wloz74MDV/jxFM0wjX//moxWDYlO9eKBnPk6A8f5CA+6Ug7UGm8cyJcC3fZM00In1WotSPJlqo5IXqFTlp0Q7/0OhJp241GC2gJqSOIBck5jMKrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Knv81exi; arc=none smtp.client-ip=209.85.218.74
+	s=arc-20240116; t=1744819746; c=relaxed/simple;
+	bh=cEBWMBZiaKzB6xZ/YB/x5oUExde+F/u2KrlqXnVNLOE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ku4bpiptSFvUYydwBq7g6j+oOyWwhwP9/G5NDAzjeQneKJil/8HVt7cz/Wdc0D8lI0FOe2g1QT9AzJczHlzapfwiX8YZjI0/WYlem1nrmyon7n+1CaOCdFGDKYvFQp7JOtk2WYUHP9qgcmJ+bhpYYnW9+8GY68tc0LdBIkjHgqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ucrbc3GZ; arc=none smtp.client-ip=209.85.208.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Knv81exi"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-ac28a2c7c48so80026666b.3
-        for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 08:27:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ucrbc3GZ"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5e5d9682f6eso5932340a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 09:09:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744817227; x=1745422027; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j+5woTKLEDxUzA3eOLn0hsAEJ5MJo4JdU/wMD9M47qc=;
-        b=Knv81exiQjXIue3A4voSHQG2CfK4x41F81IIZgJRdha7WKkFCnp12haPciRI+v2943
-         nY4oA+M4wSIvFffItrwKErW21at/HfBmK80sSXi6Lpf7wdRZVQh4VI1bweroabHE5GZe
-         4SIC358d0TIg0JxL60z60rJTA3p02NM0HWb9M90AKBr4lA2a8WPHnDgSJAzKC2NhvwEa
-         kNTBC+K+6GfiEeKaTSLJlizbXcAZCHqP6PJl6NDuH10QnRAnhxoXmqxcaaO0lCo/nPrm
-         VL3f9CSeWFDYmqV6omyzPC5ROtpIESHoz3ge2xXemFKbzce4HZcUM+FpHGlzGblyVUd6
-         tQeQ==
+        d=google.com; s=20230601; t=1744819743; x=1745424543; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mfba1GeK9GMLIuK10iqBPbEuuHDYdzYb65zyVJOFXLI=;
+        b=Ucrbc3GZ81mK/iSZqi7Jz0sFVehTJH/U0d44BSGDh85PYtbxc7zVXChybxuKrR0Jpd
+         RaT0bH9k3lfFCkJAWtq0piLZBgTR2jWkghXLk3CS647aFFTLVyqf/BsM7i59ADpQcRyx
+         VWwmHMynAiRFXDhGJpI+XWGxkgcfhiijRG4kjHv7wTBa80jr1UJW6wcAWm/DOtkeGwLm
+         9Xr2n9vc4dQCtqfuLlDTUL72NUAm0xxINGziy6+AGdFR/7v3fzsb6Z2Sk5J39PFm8+gD
+         xrUagh9Fw6qlng9DvUb3JYGZhE5iWgWvH7MAAjZPAEYvRBCvL+9bFnYXNc1KtSuiS6bj
+         q58g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744817227; x=1745422027;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j+5woTKLEDxUzA3eOLn0hsAEJ5MJo4JdU/wMD9M47qc=;
-        b=Yu9sZfHGj8UqbIo5ODkYoqHYDBuBWsHcy5fot9hE9fcVlwSPljBzWRKOBSChxOL0S0
-         l39NNUEcD0rkt4+1azLPUtrRcw30iM+BwC5E6l9FgCaDY2sD19Eb5UADXZfBip+1Hb5b
-         V6hFxvbw0msSwIywsbF7nEobqNi6fqMZm/SsyWGfi7JbPJEQks3z6whii0YforpevboC
-         tuV1052thffGbq0DVJYjL+27AlwPoLEdQ+qNlR8Wjjy1qzmJlSdkr5UlK+frFAKvcTOu
-         jSJ4p0apoXaCkgGZckiEmZhdHO3FbaJI+vgboGbx4nPVId1BAZj62YisVIBWzgKAqSM/
-         K26Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXGqP/YAzs9qMnznvRlyWb4anfijfLeg2WhxWC171eZ4UpIc48/z6g3IQdhvqWp5wAdEkYhH28=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy3dp7gB8EsVcVZq4GKHqzsaZr4y9wzpV2b4clFNwpOjjR77FhI
-	rcwa3dFJq+36xu0Xrx+KWlQwnVe6HaBDz1TqC4f2j/m06nhacdIvVA1ifeu50Ll8OU+FmgfePwR
-	2xLuBHA==
-X-Google-Smtp-Source: AGHT+IGCybzKX7dX809ygOrq+ajkf80dzTivmVZqG7Y0aKxNYJUDug4w5qsQZIOiGF/fQUZzevVuaJaQC1OG
-X-Received: from edqt19.prod.google.com ([2002:aa7:d713:0:b0:5e5:339d:60ab])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:42c5:b0:5eb:cc22:aa00
- with SMTP id 4fb4d7f45d1cf-5f4b748ff90mr1896967a12.19.1744817226898; Wed, 16
- Apr 2025 08:27:06 -0700 (PDT)
-Date: Wed, 16 Apr 2025 15:26:47 +0000
-In-Reply-To: <20250416152648.2982950-1-qperret@google.com>
+        d=1e100.net; s=20230601; t=1744819743; x=1745424543;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mfba1GeK9GMLIuK10iqBPbEuuHDYdzYb65zyVJOFXLI=;
+        b=SU7tceIiFAASsucHugEvN9ymgeiiFSzdO36c3NbwDrFIX+4t1VY5/1nRfqkK8vnPSD
+         Gl5KHNdsts9WnJq1v/7c4fYuxs+ZJ49WX4JrTyGIcd5Pyhci/Tnejsn3O9uXn4WO4cKi
+         5j8coBRKZdC9S4FwQzD8FlNNDmnWFPQzkoX/mz1v0725nSR53EfIoXFmzOBA7b4C2lQa
+         gtoCJgPl5V70/52Eo0j1mjqPpmxySGb7mXzdOJfF+B+if8YZllExRKebLTQbqASt3M06
+         cFwY2dR3oZAvwNsAS6lF1b+a9f3JLzbqji1pciXWw5HsGTs7VNOZoJRk71BVSAwfxT6T
+         YAuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW7qSQO7S30dr1zw4FseggsjnNj8FJ5TMU9FWchU4nRP/aFq4clSaKKBo46OkERbhMUkajySc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw7tFbbYqzhVywqlKr/eOnMiV6hwc6OUMKC4uHG1xi/7TJAkjaR
+	c9pFntQVzc5u/eUUTNed0uNxCmwAVZ9brL7jKmIpmMAmyKE3jJFTRxoYkuMiP0Fr1WX7xagjBQi
+	/npjwrA==
+X-Google-Smtp-Source: AGHT+IFrirfEQ7dHJWyLJg2ZMILHkZARW2nYQJNuhY9BP7hpLfrguWr31PwCDRv8rbgrpnP6p/6BoAlGjXT/
+X-Received: from edud12.prod.google.com ([2002:a05:6402:c:b0:5e4:d4fc:4841])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:27c9:b0:5e4:9726:7779
+ with SMTP id 4fb4d7f45d1cf-5f4b71ea77emr2046677a12.2.1744819742333; Wed, 16
+ Apr 2025 09:09:02 -0700 (PDT)
+Date: Wed, 16 Apr 2025 16:08:56 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250416152648.2982950-1-qperret@google.com>
 X-Mailer: git-send-email 2.49.0.604.gff1f9ca942-goog
-Message-ID: <20250416152648.2982950-8-qperret@google.com>
-Subject: [PATCH v2 7/7] KVM: arm64: Unconditionally cross check hyp state
+Message-ID: <20250416160900.3078417-1-qperret@google.com>
+Subject: [PATCH v3 0/4] Selftest for pKVM ownership transitions
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
 	Will Deacon <will@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <tabba@google.com>, 
-	Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org, 
+Cc: Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Now that the hypervisor's state is stored in the hyp_vmemmap, we no
-longer need an expensive page-table walk to read it. This means we can
-now afford to cross check the hyp-state during all memory ownership
-transitions where the hyp is involved unconditionally, hence avoiding
-problems such as [1].
+Hi all,
 
-[1] https://lore.kernel.org/kvmarm/20241128154406.602875-1-qperret@google.com/
+This is the v3 of the pKVM selftest series, v2 was here [1]. This series
+depends on [2] which moves the hyp tracking to the vmemmap. A full
+stack on top of v6.15-rc2 with everything applied is available here:
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 24 +++++++++---------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
+    https://android-kvm.googlesource.com/linux qperret/pkvm-selftest-v3
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 91b757e3fb4c..709d286999a1 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -702,11 +702,9 @@ int __pkvm_host_share_hyp(u64 pfn)
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (ret)
- 		goto unlock;
--	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
--		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
--		if (ret)
--			goto unlock;
--	}
-+	ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
- 
- 	__hyp_set_page_state_range(phys, size, PKVM_PAGE_SHARED_BORROWED);
- 	WARN_ON(__host_set_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED));
-@@ -762,11 +760,9 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (ret)
- 		goto unlock;
--	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
--		ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
--		if (ret)
--			goto unlock;
--	}
-+	ret = __hyp_check_page_state_range(phys, size, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
- 
- 	__hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
-@@ -792,11 +788,9 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- 	ret = __hyp_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (ret)
- 		goto unlock;
--	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
--		ret = __host_check_page_state_range(phys, size, PKVM_NOPAGE);
--		if (ret)
--			goto unlock;
--	}
-+	ret = __host_check_page_state_range(phys, size, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
- 
- 	__hyp_set_page_state_range(phys, size, PKVM_NOPAGE);
- 	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) != size);
+Changes since v2:
+ - rebased on top of v2 of the hyp-state-in-vmemmap series [2];
+ - thanks to above rebase, dropped the PKVM_SELFTEST kconfig option and
+   folded the selftest under the existing NVHE_EL2_DEBUG;
+ - fixed commit message of patch 02
+
+Changes since v1:
+ - added support for testing NP guest transitions;
+ - added .data section in pKVM to allow using non-zero globals (needed
+   for previous point);
+ - dropped superfluous WARN() from __pkvm_host_share_guest() which is a
+   pain for testing;
+ - updated assertions for hyp/host transitions according to the
+   discussion on v1.
+
+[1] https://lore.kernel.org/kvmarm/20250225015327.3708420-1-qperret@google.com/
+[2] https://lore.kernel.org/kvmarm/20250416152648.2982950-1-qperret@google.com/
+
+Thanks,
+Quentin
+
+David Brazdil (1):
+  KVM: arm64: Add .hyp.data section
+
+Quentin Perret (3):
+  KVM: arm64: Don't WARN from __pkvm_host_share_guest()
+  KVM: arm64: Selftest for pKVM transitions
+  KVM: arm64: Extend pKVM selftest for np-guests
+
+ arch/arm64/include/asm/kvm_pkvm.h             |   6 +
+ arch/arm64/include/asm/sections.h             |   1 +
+ arch/arm64/kernel/image-vars.h                |   2 +
+ arch/arm64/kernel/vmlinux.lds.S               |  18 +-
+ arch/arm64/kvm/arm.c                          |   7 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   6 +
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |   2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 198 +++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  12 ++
+ arch/arm64/kvm/pkvm.c                         |   2 +
+ 10 files changed, 250 insertions(+), 4 deletions(-)
+
 -- 
 2.49.0.604.gff1f9ca942-goog
 
