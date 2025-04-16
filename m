@@ -1,69 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EBD26296;
-	Wed, 16 Apr 2025 07:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54DA24B34;
+	Wed, 16 Apr 2025 07:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744787500; cv=none; b=tYlT0Zua33mqra1qIShytg/oKImbOEZm31F8rJdsHsMPggUdJo5AQlsQvbZR5NK1WOxca5Z31wt+gCtp+Pfmzo/7HM3G51cmMuIRH3SoVSba2gbmCiSOGdOvlFoY6wB5jaEh06Lz6gNz1h8InnOTt6G+I0gkgsxRkkPwZt2QGlc=
+	t=1744787975; cv=none; b=up9KdESU+dUKMt4Q9hT21515urYW010D7GhFwL4ucL+5kx+6075krOtSs6uyTntl4Q5UgEBLL8iwq3CRN1FXrS+VDM1VjSTuAT02wPG+zXoUaHTT9qfxVtBZ1isZ1Dx+8Cbxm/HyaWN+lKB8635sj/467BdIphWtREmudZUe1y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744787500; c=relaxed/simple;
-	bh=szqjAkZRW2FQzyNwPP2HrTZPgVMC0eK0PojCcr4EVeE=;
+	s=arc-20240116; t=1744787975; c=relaxed/simple;
+	bh=L1F0iz+mGjxASpELFwE+TVnNzquaENAnd+uAheImZyI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q5EHtlP21mrxvA0OPxplxxC9qLda6kpnU5o1c2mIxRsCafs9FrvCwN4ZyZfPFUnxscZvQ2yKQcSrY/o7m5KLdL1ZBb3bI3HSMN5sKzqPFpxHDv9gCPoEaX8JdESj9exOk3LRoHTOTzdQmLBqt/O+uf0Jim5FrEkkjeyQFm8xi44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5hlVazR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=HMdu4nb4wW2MX+GF6q+5rTtKkHmR7Sq7dSFvOVkQmzLxNQDA6Avp55xFLz5L2HD4uUdI9hE7mNyqTNI9QFNyvkVorDHkBzSUyyQAE43g6U+leSPmwqURKEF96gEbd7j9DfcBg0oEuY+ItCHw1QksGa1A7uZbzHlSi8oF5WztvAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIM+gkhj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5hlVazR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA0FCC4CEE2;
-	Wed, 16 Apr 2025 07:11:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIM+gkhj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35CFFC4CEE2;
+	Wed, 16 Apr 2025 07:19:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744787499;
-	bh=szqjAkZRW2FQzyNwPP2HrTZPgVMC0eK0PojCcr4EVeE=;
+	s=k20201202; t=1744787975;
+	bh=L1F0iz+mGjxASpELFwE+TVnNzquaENAnd+uAheImZyI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y5hlVazRgUt0P5iJmGiFXgqESJvp6duOYlAtmxhyV7VbEQcH6RqQlmtge8oz+Q9xF
-	 iG/vG9W94rLdVaKbE+dYrhp/VUJdlm7oJxbdLGo7YB+KO4rt0Xe88M/c+Bm23spN24
-	 XuI89yyD95/Y/6+p89b2ALbFhM7Ybt29JDGX+ESMGqjs//lQXYOSPBaJdkXGM2zwjv
-	 NpAqY8pYtHZCMe2lX5WJlwlvfMcyRoDbTDPRdUgv7+PhQ3U2iXlsPokgPMLVaV1BhK
-	 qvZaepMUX3zP1HtUWaQQYMbQFzAMn5TyTeEK/bPlNHB0CZ1giIX7OdfS9387apm1zV
-	 DmqTRqSf0x6Fw==
+	b=YIM+gkhjyg2/4XI5rQHG5SaZj/eHH3qjAJvtu59bFvDiJ5jOD4cVTw8xhKKgoM2n8
+	 mqU4j5lNhXhVaCootafp45UIFJJdKIi6u/Yw7NPVph2C9mjWY0RtUlTmZU/qHGC3jt
+	 8TiPsv6u1Nz6Is2jhMUMQYegEcXn6nyHUeBBHuDY6/w9V99lBiovQ40ADkzabqyCKE
+	 8wVJRCzd4RBWQuYWeaDLq8Mt/7KHJU0ZG3hdT94FoEsty4mSgLyGPIH4sCmUlW4+Wz
+	 SeVemhXMb75PioKUWRTJ81/kRdt+o3UO+VfOqzHudewXiEumpT0NdDNFdY/ldHFh27
+	 bw99kCoj38/lQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u4wvp-005wlp-Da;
-	Wed, 16 Apr 2025 08:11:37 +0100
-Date: Wed, 16 Apr 2025 08:11:36 +0100
-Message-ID: <86y0w0k2c7.wl-maz@kernel.org>
+	id 1u4x3U-005wvK-S8;
+	Wed, 16 Apr 2025 08:19:32 +0100
+Date: Wed, 16 Apr 2025 08:19:32 +0100
+Message-ID: <86wmbkk1yz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark
- <james.clark@linaro.org>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark <james.clark@linaro.org>,
 	James Morse <james.morse@arm.com>,
-	Joey Gouly
- <joey.gouly@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Mark Brown
- <broonie@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	"Rob Herring\
- (Arm)" <robh@kernel.org>,
-	Shameer Kolothum
- <shameerali.kolothum.thodi@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
 	Shiqi Liu <shiqiliu@hust.edu.cn>,
 	Will Deacon <will@kernel.org>,
 	Yicong Yang <yangyicong@hisilicon.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
-In-Reply-To: <864iypgjjc.fsf@scott-ph-mail.amperecomputing.com>
+	linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH 1/2] arm64: errata: Work around AmpereOne's erratum AC03_CPU_36
+In-Reply-To: <20250415154711.1698544-1-scott@os.amperecomputing.com>
 References: <20250415154711.1698544-1-scott@os.amperecomputing.com>
-	<20250415154711.1698544-2-scott@os.amperecomputing.com>
-	<Z_6SKjdvje1Lpeo3@linux.dev>
-	<864iypgjjc.fsf@scott-ph-mail.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,30 +65,52 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, oliver.upton@linux.dev, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, mark.rutland@arm.com, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 15 Apr 2025 23:13:43 +0100,
+On Tue, 15 Apr 2025 16:47:10 +0100,
 D Scott Phillips <scott@os.amperecomputing.com> wrote:
-> 
-> Marc Zyngier <maz@kernel.org> writes:
-> 
-> > On Tue, 15 Apr 2025 16:47:11 +0100,
-> > If the write to HCR_EL2 can corrupt translations, what guarantees that
-> > such write placed on a page boundary (therefore requiring another TLB
-> > lookup to continue in sequence) will be able to get to the ISB?
-> 
-> Hi Marc, I understand now from the core team that an ISB on another page
-> will be ok as the problem is on the data side only.
+>=20
+> AC03_CPU_36 can cause asynchronous exceptions to be routed to the wrong
+> exception level if an async exception coincides with an update to the
+> controls for the target exception level in HCR_EL2. On affected
+> machines, always do writes to HCR_EL2 with async exceptions blocked.
 
-Are you guaranteed that a younger data access can't be hoisted up and
-affect things similarly? I don't see anything that would prevent this.
+=46rom the actual errata document [1]:
+
+<quote>
+If an Asynchronous Exception to EL2 occurs, while EL2 software is
+changing the EL2 exception control bits from a configuration where
+asynchronous exceptions are routed to EL2 to a configuration where
+asynchronous exceptions are routed to EL1, the processor may exhibit
+the incorrect exception behavior of routing an interrupt taken at EL2
+to EL1.  The affected system register is HCR_EL2, which contains
+control bits for routing and enabling of EL2 exceptions.
+</quote>
+
+My reading is that things can go wrong when clearing the xMO bits.
+
+I don't think we need to touch the xMO bits at all when running
+VHE. So my preference would be to:
+
+- simply leave the xMO bits set at all times (nothing bad can happen
+  from that, can it?)
+
+- prevent these systems from using anything but VHE (and fail KVM init
+  otherwise)
+
+This would save a lot of maintenance hassle and the extreme ugliness
+of this patch.
 
 Thanks,
 
 	M.
 
--- 
+[1] https://amperecomputing.com/assets/AmpereOne_Developer_ER_v0_80_2024082=
+3_28945022f4.pdf
+
+--=20
 Without deviation from the norm, progress is not possible.
