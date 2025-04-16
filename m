@@ -1,55 +1,55 @@
 Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DF220FAAC
-	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 16:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A72C211A2A
+	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 16:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744819749; cv=none; b=pZ4mrPZlw/bK6uV5pg1yTb3nyKKPR1OC0NWVfi+aEjQYS7yFXZqBf/jw62fHeFUQaLTjusQ8EUF9HTJj4oc5gRsOY5VfhDnMMIwNyhwfvfpY8ige+EdwprYLXI3LyVQ8QHW1KSYuZuUD3lYmib2zYhDh7bjMPlWNcsZpoYb2cu4=
+	t=1744819753; cv=none; b=g9n23fyKYzbLAEz4t9Z9Slxv/doNCRCkA8g4wzB7s6uSBUzWDzdolbWjba9fZIysAxu5LFtTtuM669P9QwxiDOS2Oz2PRLe9kc+VvnzgLcf7aLOOvGfBVmB/hSVWcsaRowXQ3ElcZHZnUafAquUPeAfiI8WEirxjvEOmNWCRfQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744819749; c=relaxed/simple;
-	bh=Phj6Z8bd0z00tKtTpT2UJxiQehIZbjeTZC1Km0GG+JQ=;
+	s=arc-20240116; t=1744819753; c=relaxed/simple;
+	bh=hhevQAoaSXWNMR7psqWfCUWbj4Q7A3+E702C4036N/o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FceX3NL2TvHlH0IGNK8fCfxDix5WPtd5LzzaUwcPgMrPEt9sEUd5GhOv2dUkq83/anuIxXgTBrVstPJchALFvzddBQ1JiCAbjqN1w5ZV4ACMx5YH/E5FbMOS75irZ63OwwVXJo7R08adcTsa4lY8RNj9lUi77IHi+fxMYtvcmIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UkN5CPD1; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=doGvOI2uwo9qb6G9Z4uHJMtkfrU47yj/j65uW0U764Nt3+lSVArr1NCGxdNlUxKZ/s/ske2sb7MoyV5cVVsjjhFd+dr3Odo+TK9XneO6k/MxtqYWsbB1v/tyQHPKO6z6VTlXFvEbqZTcxim1QnQZnFIGCU2Y1gZX40evjxh4Hhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q/m4mJQM; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UkN5CPD1"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-ac293748694so664887766b.0
-        for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 09:09:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q/m4mJQM"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-ac737973c9bso422585666b.2
+        for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 09:09:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744819746; x=1745424546; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1744819749; x=1745424549; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qk46ikY00j+5+57DCaLJRftXVwdO91Q7aH3vc94jYB4=;
-        b=UkN5CPD1/wiIXI5tssUzC255jIsl1lYs6YPo6+Nd/KIEP4ULpmc7OcSo9u2NXavk8i
-         NremXoHnL6TcRvczqHYkd5wKcLQnwVnZzinz0osDEu+cjpElJ1RwFSkTIjQjRTZwwMHf
-         nLq7/nnFmdG0UN+oNY0J1uiM+wlt3B3FpeWVOz+irZ6zV9bYsXa87aSawwEuIGSdqLdv
-         xj4OGKA5PA8Yga7hiHUuMqf8YMQ0SwL0zvVF8ciSOjJF5J2EV1p3VhrhGTkR7CMyuo1X
-         I60uBYR68UXv5OqZhhzSOji4fNFgSNshP0kBXyZ8KI3SGWY/NlKhKOJztrUcnpAhudFF
-         VkiA==
+        bh=RtCepilI5OBYKPwI8IAZ8i1mwTcn2lnNiKdpddQ34xM=;
+        b=q/m4mJQMvseZjovXLKPjN/+yK0/DjefCfSkKXCjEMSZKIQuoLNq8+axASXu917aAa9
+         FnasoC4UYkYwtp8LoGOzMu4ScHoyrJ1GjJtaa++XpXyr4PPtjqLUrBx5g+KCIR7ttxxC
+         ZI6K3Xe1WRH1rEPsNXtecUI0Bp3pfLIa2ELaL9HN7Au2wG+UhSwClpk48f0Hy84ZqCaj
+         P+IramYmzBG5BTbSk6JU6ZS0jjyCU2x4h2WlM34P1Mvn1T7gsuy7oTGxYvr9V5DtGhMq
+         0w+FtH9QKdHD1dU4d/6ZxI9jYHLpjgZk2n1DZdFP8T7XVS4SBlfTGET1kAi4VmfgKTkE
+         t5tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744819746; x=1745424546;
+        d=1e100.net; s=20230601; t=1744819749; x=1745424549;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qk46ikY00j+5+57DCaLJRftXVwdO91Q7aH3vc94jYB4=;
-        b=cwGDQQmqClhMRSZScRGY084lFkvH7EIxwejyJIfIFY1IdsyXGrJFRZoGL1kmrsbUJD
-         Z6DGXilaCbSOuzfiyc67n2nc/vXT3Yjev14sDh1TrmcvX4WROdoWAJeLUbdnDeMT//JR
-         jRy9KQkd2kNx81SAOIr6RkFez7UiwRFKxwJFDnvN4QaiyzS+wcEkfFdGTO8wy5f41Uqs
-         o9+gTLGJWkStKdBQoSV2EH9QI7W/Gq4yEe1RRoPcgSX8u07+5jEnWZOy2VU0kqZg6nOt
-         PFLUOlWiFBTVq+ySAzwV9bh+fF8De6B9lLL0X0r2NR52ZKFdudlHhEZgO/g8zE7CNU6T
-         7K/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXpmFixsnr08TNCq7iMYq5GZuG5pztrDT+gDbUToxDeGbKfivG4adEMClR4/3JGmIxbObtcFoo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwAsDq2BJfJ5t81NabcjqAeancbajNYsQJO5goD+IuzUmbFLzBJ
-	GTOqS3uAWSjr2Jz9izyuoSEeLkei17VDVXwIN4HSk2ZIeEdr07HWH3TnNdm56mOlboKOEoO5irJ
-	C7PqKIQ==
-X-Google-Smtp-Source: AGHT+IF0Qgk4Z9REtBCKxe6tx7t27J9UAsPYpAOJnWiB4lAJ8d3qRn0XaVBtwgLkIydXHfh5DlnZK0uF0PD6
-X-Received: from edcf13.prod.google.com ([2002:a50:a6cd:0:b0:5ec:d8f6:4a7a])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:97c5:b0:ac6:f4c1:b797
- with SMTP id a640c23a62f3a-acb42987babmr251744266b.19.1744819745708; Wed, 16
- Apr 2025 09:09:05 -0700 (PDT)
-Date: Wed, 16 Apr 2025 16:08:57 +0000
+        bh=RtCepilI5OBYKPwI8IAZ8i1mwTcn2lnNiKdpddQ34xM=;
+        b=SB6zglvdlAp5QEahccy4OwUREW63G+WliLf0yMt9/+/Ck1NiJogx059BXM+1l7t+N6
+         xG66gLy/XScfZRTqaJjVIRGRS48bPWxGKLNm+EgTLWUaFbzB9OsnGEgTOjzCzXbpnwPM
+         ARsthDcFJeAk0fNVSnzNkZsHLUKuHLIiVuBWSpy2ixZHGxzwbHbiQ1BIinDcnPq9NP2E
+         FzLLBrQF7Tlt3CEcPbd4+5vsTuNcF189Vqnh6lp3/zCyWI9O1k3qyrUIugBDZLtruPWU
+         uGEqtrFeXfBsF/jKVoFeAeF6jzBuzxrkcdl3Ctgc2BbWuyyFFa0X3ghSlXJ15dUuVCVl
+         u/qA==
+X-Forwarded-Encrypted: i=1; AJvYcCULEDqzzX/3vpQ2JSEYVHkXIVTZbzcQ8fUlTgcp6bx/YWlMxPrtjyac5rETye0RC/n8+LIuDz0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxK5MAem+lveINUgBTOwHgO7hCK5Hc5hvIcRiZOaLVl+IbRcxz5
+	Wob6qLvNmRSlnRZj/tvuNCD5zaYSIpBdUBTxa5dGrx3IikcasocwDaLtIM19tHkC9gU0H5sbfHg
+	cn/gvag==
+X-Google-Smtp-Source: AGHT+IE8dk7jeA22VzWx81hj6NCNcV+aNpnoCWIVeIKMbzFyUD7FL3Q4EHx6osWargcZiCuELO7brSsBTvZK
+X-Received: from ejcl9.prod.google.com ([2002:a17:906:789:b0:aca:9c9f:6358])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:7203:b0:ac7:82b3:7ad
+ with SMTP id a640c23a62f3a-acb42b6bb71mr224251566b.46.1744819747999; Wed, 16
+ Apr 2025 09:09:07 -0700 (PDT)
+Date: Wed, 16 Apr 2025 16:08:58 +0000
 In-Reply-To: <20250416160900.3078417-1-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250416160900.3078417-1-qperret@google.com>
 X-Mailer: git-send-email 2.49.0.604.gff1f9ca942-goog
-Message-ID: <20250416160900.3078417-2-qperret@google.com>
-Subject: [PATCH v3 1/4] KVM: arm64: Add .hyp.data section
+Message-ID: <20250416160900.3078417-3-qperret@google.com>
+Subject: [PATCH v3 2/4] KVM: arm64: Don't WARN from __pkvm_host_share_guest()
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -70,164 +70,28 @@ Cc: Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-From: David Brazdil <dbrazdil@google.com>
+We currently WARN() if the host attempts to share a page that is not in
+an acceptable state with a guest. This isn't strictly necessary and
+makes testing much harder, so drop the WARN and make sure to propage the
+error code instead.
 
-The hypervisor has not needed its own .data section because all globals
-were either .rodata or .bss. To avoid having to initialize future
-data-structures at run-time, let's introduce add a .data section to the
-hypervisor.
-
-Signed-off-by: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/sections.h |  1 +
- arch/arm64/kernel/image-vars.h    |  2 ++
- arch/arm64/kernel/vmlinux.lds.S   | 18 +++++++++++++++---
- arch/arm64/kvm/arm.c              |  7 +++++++
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S |  2 ++
- arch/arm64/kvm/hyp/nvhe/setup.c   |  4 ++++
- arch/arm64/kvm/pkvm.c             |  1 +
- 7 files changed, 32 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-index 40971ac1303f..51b0d594239e 100644
---- a/arch/arm64/include/asm/sections.h
-+++ b/arch/arm64/include/asm/sections.h
-@@ -11,6 +11,7 @@ extern char __alt_instructions[], __alt_instructions_end[];
- extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
- extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
- extern char __hyp_text_start[], __hyp_text_end[];
-+extern char __hyp_data_start[], __hyp_data_end[];
- extern char __hyp_rodata_start[], __hyp_rodata_end[];
- extern char __hyp_reloc_begin[], __hyp_reloc_end[];
- extern char __hyp_bss_start[], __hyp_bss_end[];
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 5e3c4b58f279..9c5345f1ab66 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -131,6 +131,8 @@ KVM_NVHE_ALIAS(__hyp_text_start);
- KVM_NVHE_ALIAS(__hyp_text_end);
- KVM_NVHE_ALIAS(__hyp_bss_start);
- KVM_NVHE_ALIAS(__hyp_bss_end);
-+KVM_NVHE_ALIAS(__hyp_data_start);
-+KVM_NVHE_ALIAS(__hyp_data_end);
- KVM_NVHE_ALIAS(__hyp_rodata_start);
- KVM_NVHE_ALIAS(__hyp_rodata_end);
- 
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index e73326bd3ff7..7c770053f072 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -13,7 +13,7 @@
- 	*(__kvm_ex_table)					\
- 	__stop___kvm_ex_table = .;
- 
--#define HYPERVISOR_DATA_SECTIONS				\
-+#define HYPERVISOR_RODATA_SECTIONS				\
- 	HYP_SECTION_NAME(.rodata) : {				\
- 		. = ALIGN(PAGE_SIZE);				\
- 		__hyp_rodata_start = .;				\
-@@ -23,6 +23,15 @@
- 		__hyp_rodata_end = .;				\
- 	}
- 
-+#define HYPERVISOR_DATA_SECTION					\
-+	HYP_SECTION_NAME(.data) : {				\
-+		. = ALIGN(PAGE_SIZE);				\
-+		__hyp_data_start = .;				\
-+		*(HYP_SECTION_NAME(.data))			\
-+		. = ALIGN(PAGE_SIZE);				\
-+		__hyp_data_end = .;				\
-+	}
-+
- #define HYPERVISOR_PERCPU_SECTION				\
- 	. = ALIGN(PAGE_SIZE);					\
- 	HYP_SECTION_NAME(.data..percpu) : {			\
-@@ -51,7 +60,8 @@
- #define SBSS_ALIGN			PAGE_SIZE
- #else /* CONFIG_KVM */
- #define HYPERVISOR_EXTABLE
--#define HYPERVISOR_DATA_SECTIONS
-+#define HYPERVISOR_RODATA_SECTIONS
-+#define HYPERVISOR_DATA_SECTION
- #define HYPERVISOR_PERCPU_SECTION
- #define HYPERVISOR_RELOC_SECTION
- #define SBSS_ALIGN			0
-@@ -190,7 +200,7 @@ SECTIONS
- 	/* everything from this point to __init_begin will be marked RO NX */
- 	RO_DATA(PAGE_SIZE)
- 
--	HYPERVISOR_DATA_SECTIONS
-+	HYPERVISOR_RODATA_SECTIONS
- 
- 	.got : { *(.got) }
- 	/*
-@@ -295,6 +305,8 @@ SECTIONS
- 	_sdata = .;
- 	RW_DATA(L1_CACHE_BYTES, PAGE_SIZE, THREAD_ALIGN)
- 
-+	HYPERVISOR_DATA_SECTION
-+
- 	/*
- 	 * Data written with the MMU off but read with the MMU on requires
- 	 * cache lines to be invalidated, discarding up to a Cache Writeback
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 68fec8c95fee..58e8119f66bd 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2604,6 +2604,13 @@ static int __init init_hyp_mode(void)
- 		goto out_err;
- 	}
- 
-+	err = create_hyp_mappings(kvm_ksym_ref(__hyp_data_start),
-+				  kvm_ksym_ref(__hyp_data_end), PAGE_HYP);
-+	if (err) {
-+		kvm_err("Cannot map .hyp.data section\n");
-+		goto out_err;
-+	}
-+
- 	err = create_hyp_mappings(kvm_ksym_ref(__hyp_rodata_start),
- 				  kvm_ksym_ref(__hyp_rodata_end), PAGE_HYP_RO);
- 	if (err) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-index f4562f417d3f..d724f6d69302 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-@@ -25,5 +25,7 @@ SECTIONS {
- 	BEGIN_HYP_SECTION(.data..percpu)
- 		PERCPU_INPUT(L1_CACHE_BYTES)
- 	END_HYP_SECTION
-+
- 	HYP_SECTION(.bss)
-+	HYP_SECTION(.data)
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 955c431af5d0..2050bb5a6de7 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -119,6 +119,10 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- 	if (ret)
- 		return ret;
- 
-+	ret = pkvm_create_mappings(__hyp_data_start, __hyp_data_end, PAGE_HYP);
-+	if (ret)
-+		return ret;
-+
- 	ret = pkvm_create_mappings(__hyp_rodata_start, __hyp_rodata_end, PAGE_HYP_RO);
- 	if (ret)
- 		return ret;
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 0f89157d31fd..c462140e640a 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -262,6 +262,7 @@ static int __init finalize_pkvm(void)
- 	 * at, which would end badly once inaccessible.
- 	 */
- 	kmemleak_free_part(__hyp_bss_start, __hyp_bss_end - __hyp_bss_start);
-+	kmemleak_free_part(__hyp_data_start, __hyp_data_end - __hyp_data_start);
- 	kmemleak_free_part(__hyp_rodata_start, __hyp_rodata_end - __hyp_rodata_start);
- 	kmemleak_free_part_phys(hyp_mem_base, hyp_mem_size);
- 
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 709d286999a1..4a0f98943577 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -921,7 +921,6 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu,
+ 		if (page->host_share_guest_count)
+ 			break;
+ 		/* Only host to np-guest multi-sharing is tolerated */
+-		WARN_ON(1);
+ 		fallthrough;
+ 	default:
+ 		ret = -EPERM;
 -- 
 2.49.0.604.gff1f9ca942-goog
 
