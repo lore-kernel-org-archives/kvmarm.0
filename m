@@ -1,65 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53AB29B0
-	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 12:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B1B2DFA49
+	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 13:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744807931; cv=none; b=Ohg1ETodJHGBKdioQYXVChiV/FIGjesyrPDk6teWJ2Gdfr/AgPBlL6U5Sb2xBV/Fu2iVv2FxLWsPQMxS7Tkn+zw+GmiLWHaMyxVLq9TlkuN9XklAC0nhcOEGwlsTBtOh0YeKe3QroktcDehHNusuuc2IUK5pDLuHPoM4qUdNKVo=
+	t=1744808783; cv=none; b=Es71DyfbaZMo/i/VfcExW7zJk3BUOaBkqKrwYOciZCMt+zGVE0a3N1tpjjDFid2NIqMBL2Vn+DnAv1U1L1r2o9WKxfVwEiHkYXnP/op32AMan6SdNiQ7P1yotDveEOUqK1WhhLc6QlOFmZKX0rUhyP7kBASvUr+EIWtYdHLXBiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744807931; c=relaxed/simple;
-	bh=3kSX/OQFb4HV8HuQvNebltvPOcMaC+6CHpFP3ePlcQM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WO3MhyDWv44DqYppX7yt+SENcAkaLeNmP64+MdY/qyRfzDcrc7MmeTWHeg222wsXzgqfW6QM+IdqQxkqP+t89+IZDgRkJR/jatKkIkHNb7DWCp3g1wRz87cC27kPLLcDXS0zZOiSo60PCFuQRjVyZ7dz++C4mXjhW57geqAdOHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25A42C4CEE2;
-	Wed, 16 Apr 2025 12:52:09 +0000 (UTC)
-Date: Wed, 16 Apr 2025 13:52:07 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH] arm64: Remove checks for broken Cavium HW from the PI
- code
-Message-ID: <Z_-n92KXv38WCWWx@arm.com>
-References: <20250416123534.1108220-1-maz@kernel.org>
+	s=arc-20240116; t=1744808783; c=relaxed/simple;
+	bh=8wYm8UTHOfT5CbotW4lJEIJDAeRDZ93kTAruvLSO6Gs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YQk3OQh+oiPtVuufv8L8uBhkVy0xWz7VrYkVKzbOC2soVh2hfooiZeIE01HWryZh0Xgq0EPdnj9Qwd1nn/gLuIoQmruecB9M4sjL59PP+bfMLGwTidfuP3vjO8NIv879QzOwu4ElBeu7eMZFK5E3f7VOy1W/Ho92FYlfxa4BKdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FF9C1595;
+	Wed, 16 Apr 2025 06:06:17 -0700 (PDT)
+Received: from [10.57.43.31] (unknown [10.57.43.31])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 979713F694;
+	Wed, 16 Apr 2025 06:06:17 -0700 (PDT)
+Message-ID: <3690bbfd-a426-4fa7-b2ae-5a665c4d5c7a@arm.com>
+Date: Wed, 16 Apr 2025 14:05:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] arm64: Remove checks for broken Cavium HW from the PI
+ code
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Oliver Upton <oliver.upton@linux.dev>
+References: <20250416123534.1108220-1-maz@kernel.org>
+From: Ada Couprie Diaz <ada.coupriediaz@arm.com>
+Content-Language: en-US
+Organization: Arm Ltd.
 In-Reply-To: <20250416123534.1108220-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 16, 2025 at 01:35:34PM +0100, Marc Zyngier wrote:
+On 16/04/2025 13:35, Marc Zyngier wrote:
+
 > Calling into the MIDR checking framework from the PI code has recently
 > become much harder, due to the new fancy "multi-MIDR" support that
 > relies on tables being populated at boot time, but not that early that
 > they are available to the PI code. There are additional issues with
 > this framework, as the code really isn't position independend *at all*.
-> 
+>
 > This leads to some ugly breakages, as reported by Ada.
-> 
+>
 > It so appears that the only reason for the PI code to call into the
 > MIDR checking code is to cope with The Most Broken ARM64 System Ever,
 > aka Cavium ThunderX, which cannot deal with nG attributes that result
 > of the combination of KASLR and KPTI as a consequence of Erratum 27456.
-> 
+>
 > Rather than adding extra complexity for something that is actually
 > a very dead horse, let's simply drop that check. On my own machine,
 > the firmware doesn't provide a KASLR seed, preventing the pathological
 > case to show up.
-> 
+>
 > And if someone does have a broken box that passes a seed to the kernel,
 > "nokaslr" on the command-line is an easy enough workaround.
-> 
-> Fixes: c8c2647e69bed ("arm64: Make  _midr_in_range_list() an exported function")
+>
+> Fixes: c8c2647e69bed ("arm64: Make Â _midr_in_range_list() an exported function")
 > Reported-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > Link: https://lore.kernel.org/r/3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com
@@ -68,13 +74,13 @@ On Wed, Apr 16, 2025 at 01:35:34PM +0100, Marc Zyngier wrote:
 > Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > Cc: Oliver Upton <oliver.upton@linux.dev>
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Tested-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 
-The fixed commit went in via the KVM tree. Oliver, Marc, let me know if
-you'd like me to take this as a fix via the arm64 tree (either way is
-fine by me).
+Thanks for the fix ! I can confirm that it resolves all boot failures I 
+was observing previously.
+No instances of firmware seeding KASRL in the couple of machines I am 
+testing either.
 
-Thanks.
+Regards,
+Ada
 
--- 
-Catalin
