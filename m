@@ -1,345 +1,316 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F67212B2F
-	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 16:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40470207DFC
+	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 17:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744819756; cv=none; b=h7GfY2XObLUorUt3S3Su1gfsZI7/QFD/bWLr/ms3tlmJp1zehQSnXTxidK59owb2/Bvihucab1M5363y2pxcbw0YdlKgFU/YqwoFWUV9Ic+pCJ5cm9FBxqqi15FiE7Ju5fsOYhL+lfPn2YKFBNdLttL0eLAIbfVBYBE2fA3ok4M=
+	t=1744825693; cv=none; b=NjkBUxIXUoL8+2HcHRuDAh0RYZf0QPEgD1DOkPRMyMRD8lRXzql4kILx0qH91xkBhX89HhRrbx1ZuRRzgeIfSuSe5Gix129JqsSwITday52bQp+DRSdVZHRsPBi5cHgJ+B24ZtRQLSnDadWx2fLdQW287bbEdqBpfceCbHRR9tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744819756; c=relaxed/simple;
-	bh=fe2nMdzscGwLFIb9lWleR34iODAJvtXU+xcZ8COUBVI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ULrcfbeC570VFz2o0IeYludUWqaOlAvwQePQLHE/jWY03baetCs/x+QUohM+MPFHaYg71KE4el+4zJjCZ36ghDd/hDHhi8wjysVSBzHHB39tPWsnr3oZ7mgDRXsEDpGQJb8S4s7kftNOP9qJZQ0t+ex7bCHlLFebAwDtvG2n1gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=09w0eHh3; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
+	s=arc-20240116; t=1744825693; c=relaxed/simple;
+	bh=nDlzDHO7lG1CyoT8kHmoRds6M0Ktog63OmQxCqfcvkM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Msrx8SIX89LIW8g+/n5NuTRdFNcsnd7jEs69WfxBqPqp5fx8PMRiTZUw66rvfUsWVo96dCJPDPlUP4zy1sG5GS2gYufqL4DJ2aBsX400UkpNkX3yBimY+0rOTe4OUNQrS5JNkD861P5/LG3GlmCIX16WAKkzUvDVbecs19/UtQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hWL/PDX0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="09w0eHh3"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-ac28f255a36so551324866b.3
-        for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 09:09:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744819753; x=1745424553; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7DwcRfwYwPR3lOoszfjZJQ8USmI21/b/JDlDzaI3Rk=;
-        b=09w0eHh3eCPJjkwYGI+E+8/pjGT5CfnHKdzTRW/nsLGIWn2mWfalniJVwh10s+bp3Z
-         HXdafV2xfgNHhVjlVzrf7oqplXk9yOZLWMgwpDHW4Qi8WRN/yE5dbvI45nNjhiHFjROz
-         GtWbcx5z3oh0S83YCQwPI5RTbQGbc77WpmwKGivSLZm1rpWVaaqtfkEMAkmD7oJDCvUI
-         WRGkEBTtx8T5RSeqA7xsgim9dNf+OfRlzwV3EdhnCbCHBqItiPI2YvTV5vM6n76wZ41f
-         CdexZ7phe6jmsULcRBm7udWwjUCwenjIPMyC1Ob3ibXwpG5YqDIbM3yQNeYrJcqnK31v
-         Kb2w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWL/PDX0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744825689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/YUAN4imupbHgjWn5VTBZKruYuHjhfh3kj8IKp3Z0dY=;
+	b=hWL/PDX0+Mp6dqxanxwA+VKQki4be32Q/jaa1fBlKdK5V2v+oEBm2CCN1G5co9/gKc19qv
+	DpMAokwrf7aPYZmk/cANr4S6VCeRuUFDJ698BanR+K5AYjuGurEVtxxagZZG347c1FixYB
+	nRCEVctkiwQ7+1mevmN6znYA4u3eUcI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-319-27bZYCZTMY6LVVw6gXtuzg-1; Wed, 16 Apr 2025 13:48:07 -0400
+X-MC-Unique: 27bZYCZTMY6LVVw6gXtuzg-1
+X-Mimecast-MFC-AGG-ID: 27bZYCZTMY6LVVw6gXtuzg_1744825686
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d22c304adso4501905e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 10:48:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744819753; x=1745424553;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7DwcRfwYwPR3lOoszfjZJQ8USmI21/b/JDlDzaI3Rk=;
-        b=FjQz/pAQpRSiO1A030vrhBOBrV6lIroJB5HGXQP2LzmhipWTIYbG1D2/uimf08/Rmm
-         XFlbNneNPDq7mVrZjUnmX8zdE35EJQnmXNyjdLO+awLbVBaneKEGe46xCBhZ1SF132I0
-         wd6YF7faxpv3AWjetQmuIBdGDtZKFfOLgQ3i6ClOaCxanS+ITJH0B+aY1OW324Y9xO79
-         rpsBL8j7Np242b1fWFoQJM/5eu1Pm+0Qsh5me4NclHmLEs74HeRyEqClvRmZNdlRJxDg
-         XXYTW2+7lTosLVS+ctyW95238M3LR6SBePxsId3gmSwrVxek5xGhgsrfJfWjOpY24uEU
-         pqHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbdC7IStXrsya41mybWrM1n0jMFNUJJmgT47lz2a2qy1hpQXqUIhqDYmqt0MzJhaeJf4dIbj4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwFC4A6OqRKDvYmtCMJMQ41IwdLHyuzkLU/e4kuVc2P3dYQdDIc
-	Dc5i1Roichi+IBpu0QTIHpnbvEaTBsJJKrC8Mjo27Pd8vszokGyw0tZdqlYHJFDkGHemkZq8C9H
-	qI8kqhw==
-X-Google-Smtp-Source: AGHT+IEwA7qflYoiDn9H27dpBiFGe6SdivaSu7w3Um8NapHX8djDr1ytd9Hav23fIHauqobhXm8GW66CUx/Y
-X-Received: from ejbml21.prod.google.com ([2002:a17:906:cc15:b0:acb:205e:e0ad])
- (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:2da5:b0:ac2:e748:9f1c
- with SMTP id a640c23a62f3a-acb429e6f1cmr234278666b.33.1744819752696; Wed, 16
- Apr 2025 09:09:12 -0700 (PDT)
-Date: Wed, 16 Apr 2025 16:09:00 +0000
-In-Reply-To: <20250416160900.3078417-1-qperret@google.com>
+        d=1e100.net; s=20230601; t=1744825686; x=1745430486;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/YUAN4imupbHgjWn5VTBZKruYuHjhfh3kj8IKp3Z0dY=;
+        b=M6Bk63NPW9e9eecP2nznk5WlrinlJduAMAo6PN6UzbDMpS7cqxP/hSvVSIr07oJF1C
+         NITBkwrKP3QfsLRd47gnzvAQXSWb7IEWR6osQDVg3JXQJxZUtKecFXEFS5QuzIuWPGwx
+         BN2OkLopvlgxTD4tP6J30Q94x/E+GcDXiCRrs1Ip0iDSK32Nh301mv72QScZfbmnyBTw
+         kVYWnx4oGv3EoUp+dwpKpBIqIyqCOwaXgpptN/XI+Aco0tBxtKbNU4RfZbC60wp49cnw
+         jomxqEMLdOzw+ndfEw0n0xEDh2NZWtlbXNUy48te6T1I/0Tkeky8w0KheiI9PvQK2wri
+         2tmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOfZ7S9/rAgLyXEU2StSnFIzh34pCdyXuOonnSG5P66y3WpqtzRcxiLDgBwlhKhmYPfIYtmvc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzsVN3Y60ifdYmW2zaSWZ8qzCnA7W/q1bF9mBFFCggmp1Y7/jH2
+	O5dRdrEbEu4vzVWBgn0Ht2O1LvRtgMtwKIxe9irP/b6nHXRPnA1Te2uc3q0jVaSH/iwtG9jiFWq
+	wl8uT004EjSfbPSayhxg/THHBCSIlqR9njSvt9fQezKhRDp0MTViu2w==
+X-Gm-Gg: ASbGnctE3lyGWZxg7Jka36rfkc9SiolqkCloDjW0AqpnDN8oMCEJ5kJmJZ0y9bfHAjh
+	2irX8pguN/70aJOhrpig4oX2yJs5QC6x2ZbD2xQgMnmwYAnXqPZtykmFyeBsp78/MhN8qdG3uyc
+	cz9K3+sLgFoi3T/09hR5Acg5GLZOuEgsSW8EC9WaFm30w2KNKD5jDTorVSAFwPmRCnU4AUqmb6t
+	7WR+REpxefyFi2xZKd4gKFEElPtbHedoP0fZveMJ6ChLp9LpJGjuGbcnVZtOFf5+xuh7/MCZNgn
+	ZOOXhZDrphMt6L4A
+X-Received: by 2002:a5d:598d:0:b0:39c:266b:feec with SMTP id ffacd0b85a97d-39ee904afe3mr313553f8f.7.1744825685975;
+        Wed, 16 Apr 2025 10:48:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHd/Q9xU1Lv4kZ9t/WwJIPpluDO/OcIMcKulh4/sk/gvKDXTcl2daOqoE90IlBaQsWY9I2m/g==
+X-Received: by 2002:a5d:598d:0:b0:39c:266b:feec with SMTP id ffacd0b85a97d-39ee904afe3mr313534f8f.7.1744825685524;
+        Wed, 16 Apr 2025 10:48:05 -0700 (PDT)
+Received: from [192.168.10.48] ([176.206.109.83])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-39eae9640e3sm18034375f8f.12.2025.04.16.10.48.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Apr 2025 10:48:04 -0700 (PDT)
+Message-ID: <60b7607b-8ada-447d-9dcb-034d93b9abe8@redhat.com>
+Date: Wed, 16 Apr 2025 19:48:00 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250416160900.3078417-1-qperret@google.com>
-X-Mailer: git-send-email 2.49.0.604.gff1f9ca942-goog
-Message-ID: <20250416160900.3078417-5-qperret@google.com>
-Subject: [PATCH v3 4/4] KVM: arm64: Extend pKVM selftest for np-guests
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Cc: Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/4] KVM: x86: move sev_lock/unlock_vcpus_for_migration
+ to kvm_main.c
+To: Peter Zijlstra <peterz@infradead.org>,
+ Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ kvm-riscv@lists.infradead.org, Oliver Upton <oliver.upton@linux.dev>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Jing Zhang <jingzhangos@google.com>, Waiman Long <longman@redhat.com>,
+ x86@kernel.org, Kunkun Jiang <jiangkunkun@huawei.com>,
+ Boqun Feng <boqun.feng@gmail.com>, Anup Patel <anup@brainfault.org>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>,
+ Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>,
+ Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+ Sebastian Ott <sebott@redhat.com>, Atish Patra <atishp@atishpatra.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, linux-riscv@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Joey Gouly <joey.gouly@arm.com>, Ingo Molnar <mingo@redhat.com>,
+ Andre Przywara <andre.przywara@arm.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Sean Christopherson <seanjc@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Bjorn Helgaas <bhelgaas@google.com>
+References: <20250409014136.2816971-1-mlevitsk@redhat.com>
+ <20250409014136.2816971-3-mlevitsk@redhat.com>
+ <20250410081640.GX9833@noisy.programming.kicks-ass.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20250410081640.GX9833@noisy.programming.kicks-ass.net>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: VcJRfD1hpqg9b8zkstRBg7r6c1eFtKM9u0ngQdH_Bds_1744825686
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The pKVM selftest intends to test as many memory 'transitions' as
-possible, so extend it to cover sharing pages with non-protected guests,
-including in the case of multi-sharing.
+On 4/10/25 10:16, Peter Zijlstra wrote:
+> On Tue, Apr 08, 2025 at 09:41:34PM -0400, Maxim Levitsky wrote:
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 69782df3617f..71c0d8c35b4b 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -1368,6 +1368,77 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+>>   	return 0;
+>>   }
+>>   
+>> +
+>> +/*
+>> + * Lock all VM vCPUs.
+>> + * Can be used nested (to lock vCPUS of two VMs for example)
+>> + */
+>> +int kvm_lock_all_vcpus_nested(struct kvm *kvm, bool trylock, unsigned int role)
+>> +{
+>> +	struct kvm_vcpu *vcpu;
+>> +	unsigned long i, j;
+>> +
+>> +	lockdep_assert_held(&kvm->lock);
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +
+>> +		if (trylock && !mutex_trylock_nested(&vcpu->mutex, role))
+>> +			goto out_unlock;
+>> +		else if (!trylock && mutex_lock_killable_nested(&vcpu->mutex, role))
+>> +			goto out_unlock;
+>> +
+>> +#ifdef CONFIG_PROVE_LOCKING
+>> +		if (!i)
+>> +			/*
+>> +			 * Reset the role to one that avoids colliding with
+>> +			 * the role used for the first vcpu mutex.
+>> +			 */
+>> +			role = MAX_LOCK_DEPTH - 1;
+>> +		else
+>> +			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
+>> +#endif
+>> +	}
+> 
+> This code is all sorts of terrible.
+> 
+> Per the lockdep_assert_held() above, you serialize all these locks by
+> holding that lock, this means you can be using the _nest_lock()
+> annotation.
+> 
+> Also, the original code didn't have this trylock nonsense, and the
+> Changelog doesn't mention this -- in fact the Changelog claims no
+> change, which is patently false.
+> 
+> Anyway, please write like:
+> 
+> 	kvm_for_each_vcpu(i, vcpu, kvm) {
+> 		if (mutex_lock_killable_nest_lock(&vcpu->mutex, &kvm->lock))
+> 			goto unlock;
+> 	}
+> 
+> 	return 0;
+> 
+> unlock:
+> 
+> 	kvm_for_each_vcpu(j, vcpu, kvm) {
+> 		if (j == i)
+> 			break;
+> 
+> 		mutex_unlock(&vcpu->mutex);
+> 	}
+> 	return -EINTR;
+> 
+> And yes, you'll have to add mutex_lock_killable_nest_lock(), but that
+> should be trivial.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/include/asm/kvm_pkvm.h             |  6 ++
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  4 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 90 ++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/setup.c               |  8 +-
- arch/arm64/kvm/pkvm.c                         |  1 +
- 5 files changed, 104 insertions(+), 5 deletions(-)
+If I understand correctly, that would be actually
+_mutex_lock_killable_nest_lock() plus a wrapper macro.  But yes,
+that is easy so it sounds good.
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index abd693ce5b93..d91bfcf2db56 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -135,6 +135,12 @@ static inline unsigned long host_s2_pgtable_pages(void)
- 	return res;
- }
- 
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+static inline unsigned long pkvm_selftest_pages(void) { return 32; }
-+#else
-+static inline unsigned long pkvm_selftest_pages(void) { return 0; }
-+#endif
+For the ARM case, which is the actual buggy one (it was complaining
+about too high a depth) it still needs mutex_trylock_nest_lock();
+the nest_lock is needed to avoid bumping the depth on every
+mutex_trylock().
+
+It should be something like
+diff --git a/include/linux/mutex.h b/include/linux/mutex.h
+index 2143d05116be..328f573cab6d 100644
+--- a/include/linux/mutex.h
++++ b/include/linux/mutex.h
+@@ -174,6 +174,12 @@ do {									\
+  	_mutex_lock_nest_lock(lock, &(nest_lock)->dep_map);		\
+  } while (0)
+  
++#define mutex_trylock_nest_lock(lock, nest_lock)			\
++do {									\
++	typecheck(struct lockdep_map *, &(nest_lock)->dep_map);		\
++	_mutex_trylock_nest_lock(lock, &(nest_lock)->dep_map);		\
++} while (0)
 +
- #define KVM_FFA_MBOX_NR_PAGES	1
- 
- static inline unsigned long hyp_ffa_proxy_pages(void)
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 535722cd8417..26016eb9323f 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -69,8 +69,8 @@ static __always_inline void __load_host_stage2(void)
- }
- 
- #ifdef CONFIG_NVHE_EL2_DEBUG
--void pkvm_ownership_selftest(void);
-+void pkvm_ownership_selftest(void *base);
- #else
--static inline void pkvm_ownership_selftest(void) { }
-+static inline void pkvm_ownership_selftest(void *base) { }
- #endif
- #endif /* __KVM_NVHE_MEM_PROTECT__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 1912cc22c987..31173c694695 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -1097,16 +1097,60 @@ int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu)
- struct pkvm_expected_state {
- 	enum pkvm_page_state host;
- 	enum pkvm_page_state hyp;
-+	enum pkvm_page_state guest[2]; /* [ gfn, gfn + 1 ] */
- };
- 
- static struct pkvm_expected_state selftest_state;
- static struct hyp_page *selftest_page;
- 
-+static struct pkvm_hyp_vm selftest_vm = {
-+	.kvm = {
-+		.arch = {
-+			.mmu = {
-+				.arch = &selftest_vm.kvm.arch,
-+				.pgt = &selftest_vm.pgt,
-+			},
-+		},
-+	},
-+};
-+
-+static struct pkvm_hyp_vcpu selftest_vcpu = {
-+	.vcpu = {
-+		.arch = {
-+			.hw_mmu = &selftest_vm.kvm.arch.mmu,
-+		},
-+		.kvm = &selftest_vm.kvm,
-+	},
-+};
-+
-+static void init_selftest_vm(void *virt)
+  #else
+  extern void mutex_lock(struct mutex *lock);
+  extern int __must_check mutex_lock_interruptible(struct mutex *lock);
+@@ -185,6 +191,7 @@ extern void mutex_lock_io(struct mutex *lock);
+  # define mutex_lock_killable_nested(lock, subclass) mutex_lock_killable(lock)
+  # define mutex_lock_nest_lock(lock, nest_lock) mutex_lock(lock)
+  # define mutex_lock_io_nested(lock, subclass) mutex_lock_io(lock)
++# define mutex_trylock_nest_lock(lock, nest_lock) mutex_trylock(lock)
+  #endif
+  
+  /*
+@@ -193,9 +200,14 @@ extern void mutex_lock_io(struct mutex *lock);
+   *
+   * Returns 1 if the mutex has been acquired successfully, and 0 on contention.
+   */
+-extern int mutex_trylock(struct mutex *lock);
++extern int _mutex_trylock_nest_lock(struct mutex *lock, struct lockdep_map *nest_lock);
+  extern void mutex_unlock(struct mutex *lock);
+  
++static inline int mutex_trylock(struct mutex *lock)
 +{
-+	struct hyp_page *p = hyp_virt_to_page(virt);
-+	int i;
-+
-+	selftest_vm.kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
-+	WARN_ON(kvm_guest_prepare_stage2(&selftest_vm, virt));
-+
-+	for (i = 0; i < pkvm_selftest_pages(); i++) {
-+		if (p[i].refcount)
-+			continue;
-+		p[i].refcount = 1;
-+		hyp_put_page(&selftest_vm.pool, hyp_page_to_virt(&p[i]));
-+	}
++	return _mutex_trylock_nest_lock(lock, NULL);
 +}
 +
-+static u64 selftest_ipa(void)
-+{
-+	return BIT(selftest_vm.pgt.ia_bits - 1);
-+}
-+
- static void assert_page_state(void)
- {
- 	void *virt = hyp_page_to_virt(selftest_page);
- 	u64 size = PAGE_SIZE << selftest_page->order;
-+	struct pkvm_hyp_vcpu *vcpu = &selftest_vcpu;
- 	u64 phys = hyp_virt_to_phys(virt);
-+	u64 ipa[2] = { selftest_ipa(), selftest_ipa() + PAGE_SIZE };
- 
- 	host_lock_component();
- 	WARN_ON(__host_check_page_state_range(phys, size, selftest_state.host));
-@@ -1115,6 +1159,11 @@ static void assert_page_state(void)
- 	hyp_lock_component();
- 	WARN_ON(__hyp_check_page_state_range(phys, size, selftest_state.hyp));
- 	hyp_unlock_component();
-+
-+	guest_lock_component(&selftest_vm);
-+	WARN_ON(__guest_check_page_state_range(vcpu, ipa[0], size, selftest_state.guest[0]));
-+	WARN_ON(__guest_check_page_state_range(vcpu, ipa[1], size, selftest_state.guest[1]));
-+	guest_unlock_component(&selftest_vm);
- }
- 
- #define assert_transition_res(res, fn, ...)		\
-@@ -1123,21 +1172,27 @@ static void assert_page_state(void)
- 		assert_page_state();			\
- 	} while (0)
- 
--void pkvm_ownership_selftest(void)
-+void pkvm_ownership_selftest(void *base)
- {
-+	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_RWX;
- 	void *virt = hyp_alloc_pages(&host_s2_pool, 0);
--	u64 phys, size, pfn;
-+	struct pkvm_hyp_vcpu *vcpu = &selftest_vcpu;
-+	struct pkvm_hyp_vm *vm = &selftest_vm;
-+	u64 phys, size, pfn, gfn;
- 
- 	WARN_ON(!virt);
- 	selftest_page = hyp_virt_to_page(virt);
- 	selftest_page->refcount = 0;
-+	init_selftest_vm(base);
- 
- 	size = PAGE_SIZE << selftest_page->order;
- 	phys = hyp_virt_to_phys(virt);
- 	pfn = hyp_phys_to_pfn(phys);
-+	gfn = hyp_phys_to_pfn(selftest_ipa());
- 
- 	selftest_state.host = PKVM_NOPAGE;
- 	selftest_state.hyp = PKVM_PAGE_OWNED;
-+	selftest_state.guest[0] = selftest_state.guest[1] = PKVM_NOPAGE;
- 	assert_page_state();
- 	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-@@ -1145,6 +1200,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 
- 	selftest_state.host = PKVM_PAGE_OWNED;
- 	selftest_state.hyp = PKVM_NOPAGE;
-@@ -1152,6 +1209,7 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
- 
- 	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
-@@ -1161,6 +1219,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 
- 	assert_transition_res(0,	hyp_pin_shared_mem, virt, virt + size);
- 	assert_transition_res(0,	hyp_pin_shared_mem, virt, virt + size);
-@@ -1171,6 +1231,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 
- 	hyp_unpin_shared_mem(virt, virt + size);
- 	assert_page_state();
-@@ -1188,6 +1250,8 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
- 	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-ENOENT,	__pkvm_host_unshare_guest, gfn, vm);
- 	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
- 
- 	selftest_state.host = PKVM_PAGE_OWNED;
-@@ -1195,6 +1259,28 @@ void pkvm_ownership_selftest(void)
- 	assert_transition_res(0,	__pkvm_host_unshare_ffa, pfn, 1);
- 	assert_transition_res(-EPERM,	__pkvm_host_unshare_ffa, pfn, 1);
- 
-+	selftest_state.host = PKVM_PAGE_SHARED_OWNED;
-+	selftest_state.guest[0] = PKVM_PAGE_SHARED_BORROWED;
-+	assert_transition_res(0,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_guest, pfn, gfn, vcpu, prot);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_ffa, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_donate_hyp, pfn, 1);
-+	assert_transition_res(-EPERM,	__pkvm_host_share_hyp, pfn);
-+	assert_transition_res(-EPERM,	__pkvm_host_unshare_hyp, pfn);
-+	assert_transition_res(-EPERM,	__pkvm_hyp_donate_host, pfn, 1);
-+	assert_transition_res(-EPERM,	hyp_pin_shared_mem, virt, virt + size);
-+
-+	selftest_state.guest[1] = PKVM_PAGE_SHARED_BORROWED;
-+	assert_transition_res(0,	__pkvm_host_share_guest, pfn, gfn + 1, vcpu, prot);
-+	WARN_ON(hyp_virt_to_page(virt)->host_share_guest_count != 2);
-+
-+	selftest_state.guest[0] = PKVM_NOPAGE;
-+	assert_transition_res(0,	__pkvm_host_unshare_guest, gfn, vm);
-+
-+	selftest_state.guest[1] = PKVM_NOPAGE;
-+	selftest_state.host = PKVM_PAGE_OWNED;
-+	assert_transition_res(0,	__pkvm_host_unshare_guest, gfn + 1, vm);
-+
- 	selftest_state.host = PKVM_NOPAGE;
- 	selftest_state.hyp = PKVM_PAGE_OWNED;
- 	assert_transition_res(0,	__pkvm_host_donate_hyp, pfn, 1);
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 47294134cf1b..6d513a4b3763 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -28,6 +28,7 @@ static void *vmemmap_base;
- static void *vm_table_base;
- static void *hyp_pgt_base;
- static void *host_s2_pgt_base;
-+static void *selftest_base;
- static void *ffa_proxy_pages;
- static struct kvm_pgtable_mm_ops pkvm_pgtable_mm_ops;
- static struct hyp_pool hpool;
-@@ -38,6 +39,11 @@ static int divide_memory_pool(void *virt, unsigned long size)
- 
- 	hyp_early_alloc_init(virt, size);
- 
-+	nr_pages = pkvm_selftest_pages();
-+	selftest_base = hyp_early_alloc_contig(nr_pages);
-+	if (nr_pages && !selftest_base)
-+		return -ENOMEM;
-+
- 	nr_pages = hyp_vmemmap_pages(sizeof(struct hyp_page));
- 	vmemmap_base = hyp_early_alloc_contig(nr_pages);
- 	if (!vmemmap_base)
-@@ -313,7 +319,7 @@ void __noreturn __pkvm_init_finalise(void)
- 
- 	pkvm_hyp_vm_table_init(vm_table_base);
- 
--	pkvm_ownership_selftest();
-+	pkvm_ownership_selftest(selftest_base);
- out:
- 	/*
- 	 * We tail-called to here from handle___pkvm_init() and will not return,
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index c462140e640a..f4761a479280 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -79,6 +79,7 @@ void __init kvm_hyp_reserve(void)
- 	hyp_mem_pages += host_s2_pgtable_pages();
- 	hyp_mem_pages += hyp_vm_table_pages();
- 	hyp_mem_pages += hyp_vmemmap_pages(STRUCT_HYP_PAGE_SIZE);
-+	hyp_mem_pages += pkvm_selftest_pages();
- 	hyp_mem_pages += hyp_ffa_proxy_pages();
- 
- 	/*
--- 
-2.49.0.604.gff1f9ca942-goog
+  extern int atomic_dec_and_mutex_lock(atomic_t *cnt, struct mutex *lock);
+  
+  DEFINE_GUARD(mutex, struct mutex *, mutex_lock(_T), mutex_unlock(_T))
+diff --git a/kernel/locking/mutex.c b/kernel/locking/mutex.c
+index 555e2b3a665a..d5d1e79495fc 100644
+--- a/kernel/locking/mutex.c
++++ b/kernel/locking/mutex.c
+@@ -1063,8 +1063,10 @@ __ww_mutex_lock_interruptible_slowpath(struct ww_mutex *lock,
+  #endif
+  
+  /**
+- * mutex_trylock - try to acquire the mutex, without waiting
++ * _mutex_trylock_nest_lock - try to acquire the mutex, without waiting
+   * @lock: the mutex to be acquired
++ * @nest_lock: if not NULL, a mutex that is always taken whenever multiple
++ *   instances of @lock are
+   *
+   * Try to acquire the mutex atomically. Returns 1 if the mutex
+   * has been acquired successfully, and 0 on contention.
+@@ -1076,7 +1078,7 @@ __ww_mutex_lock_interruptible_slowpath(struct ww_mutex *lock,
+   * This function must not be used in interrupt context. The
+   * mutex must be released by the same task that acquired it.
+   */
+-int __sched mutex_trylock(struct mutex *lock)
++int __sched _mutex_trylock_nest_lock(struct mutex *lock, struct lockdep_map *nest_lock)
+  {
+  	bool locked;
+  
+@@ -1084,11 +1086,11 @@ int __sched mutex_trylock(struct mutex *lock)
+  
+  	locked = __mutex_trylock(lock);
+  	if (locked)
+-		mutex_acquire(&lock->dep_map, 0, 1, _RET_IP_);
++		mutex_acquire_nest(&lock->dep_map, 0, 1, nest_lock, _RET_IP_);
+  
+  	return locked;
+  }
+-EXPORT_SYMBOL(mutex_trylock);
++EXPORT_SYMBOL(_mutex_trylock_nest_lock);
+  
+  #ifndef CONFIG_DEBUG_LOCK_ALLOC
+  int __sched
+
+Does that seem sane?
+
+Paolo
 
