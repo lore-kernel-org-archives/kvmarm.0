@@ -1,190 +1,272 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2139.outbound.protection.outlook.com [40.107.101.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638B124C06E
-	for <kvmarm@lists.linux.dev>; Wed, 16 Apr 2025 23:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.139
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744847744; cv=fail; b=m6izHUMxQ21WN/nLiBFUeSAF5fjf+ODpRMZ61jJFXs6RtrstER4XZyFdYCWmjhVwPsnb9YDgv3n6a/pAwdEfDh7ECV6SROsmo9yhodHbtDf5LF9JAZ0Cd36Xn5uQug5tbIrN2HS/IJd8ewxhxJarvO42heXIIWdTqZuw8VBnX4I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744847744; c=relaxed/simple;
-	bh=7dMlz+xsFDXkCVX3yfDXhKx5xX6W0YVLI4vGlq9Gdhc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=fH/19DQ6TtqL7Goaeb7SJOPInWAVcsV11vqHfnjJPPaANLtLl+8FPjOnbl8ZM1rybVEOpKDW6WIXMehjn2OACH6bTsDnOV2w4dvQgbCdr3005dvKdmjiWHNdo0oEkwQ6Nayz/a7S8rJHXQIL0Q58/Ia/4ZfyPxWcnjk1V5/YneM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=lihBzNQs; arc=fail smtp.client-ip=40.107.101.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889C2322B;
+	Thu, 17 Apr 2025 00:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744849545; cv=none; b=s/sDJ3QapMke18CsKPzJE2iVVwSWZ9ACE/yO6/BV18DzxlcXjfXYC58QLPooPqJbPlX16JX/G4Pr0yybqh9g5G7paR+iCEGJucgNlCpNcl3NG3Hau40l8yHqlhUNe0VKja1c6++uC2LnPL2RL3CiZmvm/go2w6F/Efg2PCKL48w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744849545; c=relaxed/simple;
+	bh=GTwCDPN7IMzKSWiv9XW2UhCTpXRsMiXEa0YUZMB+/1M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FNpkTil5qo34ePJKgdfCS/AE5ZvfKJyRBaePMPMlW3eUjdk4U3D2LZo7FfnFyxrUUvLBjw+CJu3S3os73+B67HJ6ZfAeMHoxEZyw67FuDGiKUQ/IGQBEMLABfkykamjvrLotfquWGjF/Jj4Gw9uIHpARGZ0ftHfaG4vChAdJQsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dp/KDjvT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="lihBzNQs"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NxLntNhX9IazW1bPS85YaNVITSVSDCl1VpgXhcd5OQyK+vtf4CELtmb/W+xWslSTaW268MfVrZcSwOiyB0QcGm3g+Iy24H3FOxaHfBFRx5RaTJXOAzZR+p4Y16/1qFvwtrAQZ2u8alT1fhfQKfwj70k3LuykK0M5lsNNw0xBxgmP5oUN3tbVL6XPEeMuLgNPlb2OB++wk3l7j70XqCQF2N+TI+pWyT3YmDiu9i2qmPL+c2JaowD6RpYvgJcUQ/Z/WzA+mOW8EuFIl/+ENtRw/GL7sV6bE8AsKbl2OY40ZhgVt9V52DniFKRfz9XKJeZXXPkuUluHPERJARaCkYFymw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8W2ouzAQdxfH3Ey+cYZ63YMjl0+1FTi9opr/INz20Bc=;
- b=E1u35wlj1mwoW7TGhYR9WB4bhtHAU8MXqJ+QhBRutfTapxFCX7I8EDINavwnEyPJ2SPHKLIfOBXXxUPbSN4Kwp5BibhydcAn0Rv56VZ22vh0nysSMJq0E49xu7ENZ6cqM+GJWDXonCMggtIZlwMqli6lhvsCAPFPE4/iD6jqVWTqlb4uk5f4n/jBsDbrUEdDbqZb/hnS//cCEchwwiUT/xctk+RJzeSO0IhuhW1ZKleMyHRmY+mPu6q2KyEWxT6CuVPps/HE2Wg5u7rxfzK/qY/aKm5X1JfmDgauc44hpTWO8J7QNaTnz0k910Xcat2uHQZlyikvd8rU3XuVNpAolg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8W2ouzAQdxfH3Ey+cYZ63YMjl0+1FTi9opr/INz20Bc=;
- b=lihBzNQsblvnftoE7ngG/0P8FNS2QB08cOMd4fZRHqEVeq2B2kFFvuIHt7m47lOzhDzpoycYn7f1PfXvGq7T4LEl5mbFwH133udMz20cXoW8fKiJ8+pSbte6PTlTNWBmLzPr3Jw5L4KgquTTb4U2VRow7uq8C+vsb5vUp/IN0dw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from LV2PR01MB7792.prod.exchangelabs.com (2603:10b6:408:14f::10) by
- BL3PR01MB7196.prod.exchangelabs.com (2603:10b6:208:347::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8655.21; Wed, 16 Apr 2025 23:55:39 +0000
-Received: from LV2PR01MB7792.prod.exchangelabs.com
- ([fe80::2349:ebe6:2948:adb9]) by LV2PR01MB7792.prod.exchangelabs.com
- ([fe80::2349:ebe6:2948:adb9%5]) with mapi id 15.20.8655.022; Wed, 16 Apr 2025
- 23:55:39 +0000
-From: D Scott Phillips <scott@os.amperecomputing.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, James Clark
- <james.clark@linaro.org>, James Morse <james.morse@arm.com>, Joey Gouly
- <joey.gouly@arm.com>, Kevin Brodsky <kevin.brodsky@arm.com>, Mark Brown
- <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Oliver Upton
- <oliver.upton@linux.dev>, "Rob Herring (Arm)" <robh@kernel.org>, Shameer
- Kolothum <shameerali.kolothum.thodi@huawei.com>, Shiqi Liu
- <shiqiliu@hust.edu.cn>, Will Deacon <will@kernel.org>, Yicong Yang
- <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] arm64: errata: Work around AmpereOne's erratum
- AC03_CPU_36
-In-Reply-To: <86wmbkk1yz.wl-maz@kernel.org>
-References: <20250415154711.1698544-1-scott@os.amperecomputing.com>
- <86wmbkk1yz.wl-maz@kernel.org>
-Date: Wed, 16 Apr 2025 16:14:07 -0700
-Message-ID: <86jz7jya0w.fsf@scott-ph-mail.amperecomputing.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR07CA0048.namprd07.prod.outlook.com
- (2603:10b6:a03:60::25) To LV2PR01MB7792.prod.exchangelabs.com
- (2603:10b6:408:14f::10)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dp/KDjvT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7E7DC4CEE2;
+	Thu, 17 Apr 2025 00:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744849545;
+	bh=GTwCDPN7IMzKSWiv9XW2UhCTpXRsMiXEa0YUZMB+/1M=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Dp/KDjvTalL+Tg5ho5EHsbRBEyoxFi4ujluWKTHaYAKNAqAV1js8kXTOw1Dttqm/3
+	 gvVRssX1XkUNqwSk0TuLCYl6o6PRH+gwg4amTum7uREl9JmY9rNzRfQfaMrB9s9Bwt
+	 6bZ/JsSEtaq2bsTqJzoynJhUIzeDZLskl5CtT/6JIt5TM/DrMspwQsLuIUrwtLI37B
+	 QyVZS4qNBrk/pj6MyhyzMAT83juwZXas1xattKK8tlTIreLoMAhQZErXzLusLGiH7l
+	 okFWawRCATc4hu1tk7rVZRsYtFNjw4KWqgspfsi9wUcKXyrXHwxoo5EWt3o8D0plQD
+	 Vbn1vB50ONe8w==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v5 00/28] KVM: arm64: Implement support for SME
+Date: Thu, 17 Apr 2025 01:25:04 +0100
+Message-Id: <20250417-kvm-arm64-sme-v5-0-f469a2d5f574@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR01MB7792:EE_|BL3PR01MB7196:EE_
-X-MS-Office365-Filtering-Correlation-Id: bccac901-22e8-45b7-fcfc-08dd7d423090
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|52116014|376014|1800799024|7053199007|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rlX0uY1nUuHdLtEsv19ErnFGydQ99LUWPNZoNw4wHguwwI3R8e2Or+NrFvW7?=
- =?us-ascii?Q?llz9//que5Gxg/6uU64wvy0XzEBlJOAT1eaQrAdXHMfoj85xyCUpy+uEFUPA?=
- =?us-ascii?Q?/94mWLwoh/Ucuyfz8ljgiAqhuY6ZMxZ/IBR0fMWLTJ2Qd2wx3Vt9NSmZvTtS?=
- =?us-ascii?Q?fCiVdhFcIjnqqSxiVe+8nFBsn8e1URvUiNaKy8cDut/rrnZZIvpZe8FtiPYU?=
- =?us-ascii?Q?053tJTSr/uMpQNqD5tkXlkJSYehYjSUuPISpOPmmbZUT33Jl243UeNehDtJv?=
- =?us-ascii?Q?14PVqpxToGMcZpS+p+pGCUUeONW+hrUy51qwj5rs15zJqNksOq0oay1vCIcv?=
- =?us-ascii?Q?brV7y0yVVjkWMzp5R2H/0OpQ8J9kf0HEJEyYpH3WVIZnXbMGrfuBR3YHRVdk?=
- =?us-ascii?Q?OuF5OICFYXKsUrL1fqtRP66nMPuK1iFX0jljHmZOrrffpBu/357sCiZHuoGj?=
- =?us-ascii?Q?TdlcPm8uMDdsPEKBkXq6tqgIthVBZDpLpB6ilPSvzS9iEMh//NWr1jiHPXaM?=
- =?us-ascii?Q?KW0RhYk+ORzd1jq5TTWa4WgfHiNrT54O16NISnaZjY+5MMuAR5IrgPOSZRrC?=
- =?us-ascii?Q?/KhXVRnjmvDJEPGgV7fUPqxBvQn0LfrPaa0Aqj11U/3Hfc3IBN6Yl1vYsbVj?=
- =?us-ascii?Q?ivbrG11QO2NE8o4TKDNqKvjRJPJwjaQ9VtHDjMjYE1X/rvPqtBHn3nWeYNgY?=
- =?us-ascii?Q?vHgB0UB1gyTzQmMUSBDRXAxyoY07Nzbv9bvLB5skRLGET/NfnVqBKoG1hXGa?=
- =?us-ascii?Q?e7z9OgYGi9Qo6bDYEg5BX+NZeqi0Zy6OFBI3SkuFUMfaxkLeyqvwaTMPSAub?=
- =?us-ascii?Q?86e46L1a3dOYFt7BVylLfQj2yc/Z3ejjJ5m0d3s8gqr3gFmzUZzPfSV980cc?=
- =?us-ascii?Q?pFK8oc6f9of96SH5pdpbdGoZl1l09zK7r0aPdpWf8GXEiG/9aoALLGPntlYJ?=
- =?us-ascii?Q?8YiVhutSFxfFm/W7NzlTVvgjB+S1l8EoZqT23ZCAlLnA9WWIX2lwVbC40sZt?=
- =?us-ascii?Q?V4A0USSnAf1MZ+5xnKtZMRwwg0yNIwNJGFcEl7iUaC3E+pF2irTzCLpyn7Mr?=
- =?us-ascii?Q?gSyZC5jUmZYHQnVnPE3yJDycTMQKNiyipv2Spgrf29FOaYVaTL7YtC6DhHx5?=
- =?us-ascii?Q?hOYs3BYFmSemxpt62aoldnstUyPef1M+B3tMUTQdP83t4DOOCccl5geU6EQX?=
- =?us-ascii?Q?/3LI9/66fVAVtTpzkaNi5wjUUFN8bn0I2DqBJ7YDZBiPXXd5INiOjx4ZJzSW?=
- =?us-ascii?Q?53qMxHagha4Wj2U+lclZsyjvOySKNuDv9HkLkVnbfR9wE5hXo7KDxr/b9O9l?=
- =?us-ascii?Q?3E7YdSqz9suFqMKQVgKQdlvQu1vyMC71IpfN+TGZwl1pKNmna/wvCjf/CNKr?=
- =?us-ascii?Q?nC+unxBo5UfbhisyHSrO0IXIoaiU5IvOHEwgWnm53sXH+IaENAUBl98K2ARi?=
- =?us-ascii?Q?/h4Jynnftk7R6wULtKERgfPeK9X+7mkEHlUqWUZl+EXWsWzfQwIpvg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR01MB7792.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(52116014)(376014)(1800799024)(7053199007)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7cI0F6q+XnB3buBribZibugj4xOGK7xAn7/fM3jjfd6NTtaoA3TWxIaqkMxQ?=
- =?us-ascii?Q?XjKj9vbDypGW901zC2AmDTW8GqFT0eXHsSzMZqk+PAZL4139BX+q5PcR/0my?=
- =?us-ascii?Q?B6EHE5XGyFmvNp5koS4Lpw0KAj0nz57Y9LsFKGRC2MadHBxE/cOgkWRwu+X/?=
- =?us-ascii?Q?jcfrhGh7YI4ygvjCm9niY/E+0X4MJHcxVVnbN/KJ6L1E6A3WipZ2IVtw18Zt?=
- =?us-ascii?Q?Xdm9Xdt+hRv54I0VjeuHlMy+/5mM6YfmVcEDRPqhaQTgLHa7ehlITEf+EIv8?=
- =?us-ascii?Q?iahniNt8q90YodRa4QIE3ISHmB6mIH8KZcqC2GXnz31QYdTS64IVR+5X/pbd?=
- =?us-ascii?Q?vubvmEl7IwFMCRkkdBv79V23PdAFnaZsQxmWdN1xxAKErpE7UoHEfVjIIQr0?=
- =?us-ascii?Q?dlLkYDqOF2Qfncgokl6OIbTodREJshpBgqhD1d8Gw5qet3ePgtLsqUW9oA9k?=
- =?us-ascii?Q?hn7yqRET19On4yJonqN33iBqKS1hPKsL4j2mNI/mDbAnQxe69kqLl/FSlcd0?=
- =?us-ascii?Q?wUDR4oxTKsYeZyDe54lWbe/00L0ZLrmhArVv3iMVoFq0TRHhS6e3QrDmTaG6?=
- =?us-ascii?Q?FnBU5p9JNvwZEAYS4BHT+IxNBzpvy6YFY2S4X6JyLqnyMGFYVOX06MOyGh14?=
- =?us-ascii?Q?gNvNcyPdu1IOOWrJQi+oCPLvV/Ny2KJQfiVbVUAJlzIAjJQUiRy7JJsyFw5v?=
- =?us-ascii?Q?xSUWsjspT/kbIxilj2/372Ahmp6S1H7kEvfY2MNXfuEHcKyqTanbih9kx0XA?=
- =?us-ascii?Q?BMVZj4dreDq8MeeUmO5BS7y9uTjHX37k8MnKOkQWuFclzNekXPncfof3uK5D?=
- =?us-ascii?Q?OuR6zsyWWu68jZoaXCBgnAUtP9rNwpXGycBjFs9D0Gu5zjZiqziV84JbPKXq?=
- =?us-ascii?Q?s2qkiSEHsqBHND5vf5xweJJeNr4epFFC/0ycWH9HyXERvV/KgeIZhKQk8AZV?=
- =?us-ascii?Q?QRc6oTuORw4u9RnHYRQLNh9GhFIgx/oOSe4NZGribKxjDBfCQFQ0Ut5yrBhp?=
- =?us-ascii?Q?5vA/2hKgQYYF8GgCgUEalt8Rl0n7r4fIa/8OqsqJjz+1aeDMa7jMd2DdbTnT?=
- =?us-ascii?Q?RXgThFUyam+11tHNUcsEugHzO5MW+243gFqTeinqCthsX38wpxHcPJlNZyI0?=
- =?us-ascii?Q?ZtIY1EtVCcGuNz609RTHaCUWybDYDI14mSUi0eOg+JSWhc75Wq20218idBpx?=
- =?us-ascii?Q?hwf3nmob2N4UQ7ytEoCwK4lWero2IZcSCciJd7rzyiblVgA2qWde/Fhc2fFC?=
- =?us-ascii?Q?TbsnykiK763vSGKOmchAMcT4i2Ha/09nWyGuKYV56Q052WR7n4UziCVD5on5?=
- =?us-ascii?Q?2t+HCFiNn/Lp4gi/ksgk8LKRKHLH80WKDKedje3RrYgBOGpLQ2SuWNYDy2yF?=
- =?us-ascii?Q?pZqmoZFC9QPsCDf1k/I/3/gTATwMN/SbTI2EOADZoa60ZF4ZI+4S4we46cE2?=
- =?us-ascii?Q?x6ZdVEFDgmmtRGMX8esVQ+WLxXEXCb26FczOJkkZbTvribHKG2i0jnVJCxnf?=
- =?us-ascii?Q?X0yNdcR+pMv1N9OW9nBJAwCgSR4baJh58xyr9RjFrpcRyxYpAZOcUAUIgi18?=
- =?us-ascii?Q?BjD0iLNun6LNoyN8zqrnypzyqEOXuM7S4aWI0WFt3/XNLL+6/sBW731lf5PV?=
- =?us-ascii?Q?V6az5rdG2xgiPPRU+2AA5dA=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bccac901-22e8-45b7-fcfc-08dd7d423090
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR01MB7792.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2025 23:55:39.4225
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yNyYP9zWsQoAz4eOq/vMdm4pktc1F07KLcnpvdCpdyijReO9j1XFUz0Vz1tKPug/P6SZ8XY768+CXnjKi4wAg8CVm7XnijQZ/9LNVd9mZtU8F86CLDxjqPfGwillnE3Q
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR01MB7196
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGJKAGgC/2XRTW7CMBAF4KtEXtfRzNgxgRX3qLrwX8ACJ2CHq
+ BXi7nUSUamwnJG+edbznWWfgs9sV91Z8lPIYejL0HxUzB51f/A8uDIzAhIgAPlpilynqCTP0XN
+ QGkkqJ5RQrBijs+cm6d4eZzXGy7y9JN+F7yXl86vMx5DHIf0soRPO2/X+lujl/oQceNdh6zbS0
+ Na7/cmn3p/rIR3YfGqiP470zqlwp4mUNdiCMW9cPLksHF65KBwaA9ha7Dr/zuWTN0AoX7mc05X
+ UqkXtrKV//LEWk/z1Vlof13bWAu0QYxh31aRqbHiyOJcYfc56+Y9dtQRK2KKSgFAL2QJtkCOPO
+ p3qdBvPunf78pK6nCpRj1+nBpCV6AEAAA==
+X-Change-ID: 20230301-kvm-arm64-sme-06a1246d3636
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>, 
+ Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-c25d1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10594; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=GTwCDPN7IMzKSWiv9XW2UhCTpXRsMiXEa0YUZMB+/1M=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoAEpvh+YoQ7SipdxXsad+QAIWwlve8/0vYCL1fY6c
+ ieQx5Z2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaABKbwAKCRAk1otyXVSH0DvBCA
+ CEpCRJenMneAtWSrxarWRqSC+/QXNzPBS9Yaktz8uecqp6kYLtPrs4ScCF04nc8zLuHD7CBBl2GQXR
+ pnO2fp/poLbgaIhjZ8+vZFAokcx+prpd4nMTL5VINE9l06QCMy7+dgkbx6h8ZMU4mHcn3eXzATVxQt
+ ecdLFWp3lzfp+xZt7yDFYg5C2rOZ5RjEfWNy0SPWWkhZkVp0OrSl/JCx+N+V4aI/VJL4lNo/N68gIX
+ LPzdldgh7J+7RYWzZXak5H8SDQahSKJ1OhAFJwO14+PRFKavk4OSF3TRyQMvwUuPgo2pvCyFlSeoRi
+ 4SOzAU2zp4Ieegrydp5vagjROD4V5l
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Marc Zyngier <maz@kernel.org> writes:
+I've removed the RFC tag from this version of the series, but the items
+that I'm looking for feedback on remains the same:
 
-> On Tue, 15 Apr 2025 16:47:10 +0100,
-> D Scott Phillips <scott@os.amperecomputing.com> wrote:
->> 
->> AC03_CPU_36 can cause asynchronous exceptions to be routed to the wrong
->> exception level if an async exception coincides with an update to the
->> controls for the target exception level in HCR_EL2. On affected
->> machines, always do writes to HCR_EL2 with async exceptions blocked.
->
-> From the actual errata document [1]:
->
-> <quote>
-> If an Asynchronous Exception to EL2 occurs, while EL2 software is
-> changing the EL2 exception control bits from a configuration where
-> asynchronous exceptions are routed to EL2 to a configuration where
-> asynchronous exceptions are routed to EL1, the processor may exhibit
-> the incorrect exception behavior of routing an interrupt taken at EL2
-> to EL1.  The affected system register is HCR_EL2, which contains
-> control bits for routing and enabling of EL2 exceptions.
-> </quote>
->
-> My reading is that things can go wrong when clearing the xMO bits.
->
-> I don't think we need to touch the xMO bits at all when running
-> VHE. So my preference would be to:
->
-> - simply leave the xMO bits set at all times (nothing bad can happen
->   from that, can it?)
->
-> - prevent these systems from using anything but VHE (and fail KVM init
->   otherwise)
->
-> This would save a lot of maintenance hassle and the extreme ugliness
-> of this patch.
+ - The userspace ABI, in particular:
+  - The vector length used for the SVE registers, access to the SVE
+    registers and access to ZA and (if available) ZT0 depending on
+    the current state of PSTATE.{SM,ZA}.
+  - The use of a single finalisation for both SVE and SME.
 
-Yes that also matches my understanding, that having the physical IRQ
-routing permanently set to EL2 would avoid the erratum case. I'll take
-the approach of restricting to VHE mode in the next version, thanks very
-much Marc.
+ - The addition of control for enabling fine grained traps in a similar
+   manner to FGU but without the UNDEF, I'm not clear if this is desired
+   at all and at present this requires symmetric read and write traps like
+   FGU. That seemed like it might be desired from an implementation
+   point of view but we already have one case where we enable an
+   asymmetric trap (for ARM64_WORKAROUND_AMPERE_AC03_CPU_38) and it
+   seems generally useful to enable asymmetrically.
+
+This series implements support for SME use in non-protected KVM guests.
+Much of this is very similar to SVE, the main additional challenge that
+SME presents is that it introduces a new vector length similar to the
+SVE vector length and two new controls which change the registers seen
+by guests:
+
+ - PSTATE.ZA enables the ZA matrix register and, if SME2 is supported,
+   the ZT0 LUT register.
+ - PSTATE.SM enables streaming mode, a new floating point mode which
+   uses the SVE register set with the separately configured SME vector
+   length.  In streaming mode implementation of the FFR register is
+   optional.
+
+It is also permitted to build systems which support SME without SVE, in
+this case when not in streaming mode no SVE registers or instructions
+are available.  Further, there is no requirement that there be any
+overlap in the set of vector lengths supported by SVE and SME in a
+system, this is expected to be a common situation in practical systems.
+
+Since there is a new vector length to configure we introduce a new
+feature parallel to the existing SVE one with a new pseudo register for
+the streaming mode vector length.  Due to the overlap with SVE caused by
+streaming mode rather than finalising SME as a separate feature we use
+the existing SVE finalisation to also finalise SME, a new define
+KVM_ARM_VCPU_VEC is provided to help make user code clearer.  Finalising
+SVE and SME separately would introduce complication with register access
+since finalising SVE makes the SVE registers writeable by userspace and
+doing multiple finalisations results in an error being reported.
+Dealing with a state where the SVE registers are writeable due to one of
+SVE or SME being finalised but may have their VL changed by the other
+being finalised seems like needless complexity with minimal practical
+utility, it seems clearer to just express directly that only one
+finalisation can be done in the ABI.
+
+Access to the floating point registers follows the architecture:
+
+ - When both SVE and SME are present:
+   - If PSTATE.SM == 0 the vector length used for the Z and P registers
+     is the SVE vector length.
+   - If PSTATE.SM == 1 the vector length used for the Z and P registers
+     is the SME vector length.
+ - If only SME is present:
+   - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
+     floating point state accessed via the encodings for the V registers. 
+   - If PSTATE.SM == 1 the vector length used for the Z and P registers
+ - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
+
+The VMM must understand this, in particular when loading state SVCR
+should be configured before other state.  It should be noted that while
+the architecture refers to PSTATE.SM and PSTATE.ZA these PSTATE bits are
+not preserved in SPSR_ELx, they are only accessible via SVCR.
+
+There are a large number of subfeatures for SME, most of which only
+offer additional instructions but some of which (SME2 and FA64) add
+architectural state. These are configured via the ID registers as per
+usual.
+
+Protected KVM supported, with the implementation maintaining the
+existing restriction that the hypervisor will refuse to run if streaming
+mode or ZA is enabled.  This both simplfies the code and avoids the need
+to allocate storage for host ZA and ZT0 state, there seems to be little
+practical use case for supporting this and the memory usage would be
+non-trivial.
+
+The new KVM_ARM_VCPU_VEC feature and ZA and ZT0 registers have not been
+added to the get-reg-list selftest, the idea of supporting additional
+features there without restructuring the program to generate all
+possible feature combinations has been rejected.  I will post a separate
+series which does that restructuring.
+
+This series is based on Mark Rutland's SME fixes:
+
+   https://lore.kernel.org/r/20250409164010.3480271-1-mark.rutland@arm.com
+
+with a build dependency due to the first patch "arm64/fpsimd: Avoid RES0
+bits in the SME trap handler" which changes the defines for ESR decode,
+but also due to the assistance in testing.
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v5:
+- Rebase onto v6.15-rc2.
+- Add pKVM guest support.
+- Always restore SVCR.
+- Link to v4: https://lore.kernel.org/r/20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org
+
+Changes in v4:
+- Rebase onto v6.14-rc2 and Mark Rutland's fixes.
+- Expose SME to nested guests.
+- Additional cleanups and test fixes following on from the rebase.
+- Flush register state on VMM PSTATE.{SM,ZA}.
+- Link to v3: https://lore.kernel.org/r/20241220-kvm-arm64-sme-v3-0-05b018c1ffeb@kernel.org
+
+Changes in v3:
+- Rebase onto v6.12-rc2.
+- Link to v2: https://lore.kernel.org/r/20231222-kvm-arm64-sme-v2-0-da226cb180bb@kernel.org
+
+Changes in v2:
+- Rebase onto v6.7-rc3.
+- Configure subfeatures based on host system only.
+- Complete nVHE support.
+- There was some snafu with sending v1 out, it didn't make it to the
+  lists but in case it hit people's inboxes I'm sending as v2.
+
+---
+Mark Brown (28):
+      arm64/fpsimd: Update FA64 and ZT0 enables when loading SME state
+      arm64/fpsimd: Decide to save ZT0 and streaming mode FFR at bind time
+      arm64/fpsimd: Check enable bit for FA64 when saving EFI state
+      arm64/fpsimd: Determine maximum virtualisable SME vector length
+      KVM: arm64: Introduce non-UNDEF FGT control
+      KVM: arm64: Pay attention to FFR parameter in SVE save and load
+      KVM: arm64: Pull ctxt_has_ helpers to start of sysreg-sr.h
+      KVM: arm64: Move SVE state access macros after feature test macros
+      KVM: arm64: Rename SVE finalization constants to be more general
+      KVM: arm64: Document the KVM ABI for SME
+      KVM: arm64: Define internal features for SME
+      KVM: arm64: Rename sve_state_reg_region
+      KVM: arm64: Store vector lengths in an array
+      KVM: arm64: Implement SME vector length configuration
+      KVM: arm64: Support SME control registers
+      KVM: arm64: Support TPIDR2_EL0
+      KVM: arm64: Support SME identification registers for guests
+      KVM: arm64: Support SME priority registers
+      KVM: arm64: Provide assembly for SME register access
+      KVM: arm64: Support userspace access to streaming mode Z and P registers
+      KVM: arm64: Flush register state on writes to SVCR.SM and SVCR.ZA
+      KVM: arm64: Expose SME specific state to userspace
+      KVM: arm64: Context switch SME state for guests
+      KVM: arm64: Handle SME exceptions
+      KVM: arm64: Expose SME to nested guests
+      KVM: arm64: Provide interface for configuring and enabling SME for guests
+      KVM: arm64: selftests: Add SME system registers to get-reg-list
+      KVM: arm64: selftests: Add SME to set_id_regs test
+
+ Documentation/virt/kvm/api.rst                   | 117 +++++++----
+ arch/arm64/include/asm/fpsimd.h                  |  26 +++
+ arch/arm64/include/asm/kvm_emulate.h             |  12 +-
+ arch/arm64/include/asm/kvm_host.h                | 151 +++++++++++---
+ arch/arm64/include/asm/kvm_hyp.h                 |   5 +-
+ arch/arm64/include/asm/kvm_pkvm.h                |   2 +-
+ arch/arm64/include/asm/vncr_mapping.h            |   2 +
+ arch/arm64/include/uapi/asm/kvm.h                |  33 +++
+ arch/arm64/kernel/cpufeature.c                   |   2 -
+ arch/arm64/kernel/fpsimd.c                       |  89 ++++----
+ arch/arm64/kvm/arm.c                             |  10 +
+ arch/arm64/kvm/fpsimd.c                          |  19 +-
+ arch/arm64/kvm/guest.c                           | 252 ++++++++++++++++++++---
+ arch/arm64/kvm/handle_exit.c                     |  14 ++
+ arch/arm64/kvm/hyp/fpsimd.S                      |  28 ++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h          | 155 ++++++++++++--
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h       |  97 +++++----
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c               |  81 ++++++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                   |  20 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c                 |  40 +++-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c               |   6 +
+ arch/arm64/kvm/hyp/vhe/switch.c                  |  29 ++-
+ arch/arm64/kvm/nested.c                          |   3 +-
+ arch/arm64/kvm/reset.c                           | 156 ++++++++++----
+ arch/arm64/kvm/sys_regs.c                        | 147 +++++++++++--
+ include/uapi/linux/kvm.h                         |   1 +
+ tools/testing/selftests/kvm/arm64/get-reg-list.c |  32 ++-
+ tools/testing/selftests/kvm/arm64/set_id_regs.c  |  30 ++-
+ 28 files changed, 1260 insertions(+), 299 deletions(-)
+---
+base-commit: 64e9fdfc89a76fed38d8ddeed72d42ec71957ed9
+change-id: 20230301-kvm-arm64-sme-06a1246d3636
+prerequisite-message-id: 20250409164010.3480271-1-mark.rutland@arm.com
+prerequisite-patch-id: dfad1ae4ce049d1d736ca20aca50e0fb685cbae6
+prerequisite-patch-id: 21eadb700c14ee511b5bd1565ce30ce8c76f78ef
+prerequisite-patch-id: 6daeeb52bc56321d51b6a53fc865e3a7ee1a1bfa
+prerequisite-patch-id: d05d056d40b9058b75bf0ea16498992c678d20b8
+prerequisite-patch-id: f15e7a2251d9d7ea1a55d25c414848001a012d0d
+prerequisite-patch-id: 76df87bbb5c827562ba81c0520819f311d68f033
+prerequisite-patch-id: b9709a87d0be6b933481bfee8c07846d1425add3
+prerequisite-patch-id: ce17c8279c2aaf3e3bb5ffc951907c76c43c07e8
+prerequisite-patch-id: cdc6c6ab4fd899ba174cffc5b05ea5f0b76f80b5
+prerequisite-patch-id: 4918ab2934b5e08faabb1ef1d540c76dc9aaa404
+prerequisite-patch-id: f0455ba1dcd0dd0bb57413e68349a6547a0c8e47
+prerequisite-patch-id: 14afd1fc6c49b33c5de1768ecc81138a97bd7198
+prerequisite-patch-id: fbfa8e67d5ebaa2774daf8126bd8dfc7fce0fecc
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
