@@ -1,121 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251CE254B0A;
-	Thu, 17 Apr 2025 17:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E672566CE
+	for <kvmarm@lists.linux.dev>; Thu, 17 Apr 2025 18:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744911917; cv=none; b=jh6tuXRKv+I7xzF2Rz5j8l/2Go3T5and40kz0873xzuXU2kGmEegA0jHrKkJJ+HQ7vUqu7rhusVtkfmyKHulxZdk0g2t0mRWA4McLbWHxWjR6GaEBatJcrjuPVacL7Z50UlgxAFNj4q06h64P1q3QOUfYcAJ9QsICTeIQEub9eU=
+	t=1744913494; cv=none; b=WZ8fZVOtcseAokAtsLtTyto4NvSYmLBS+YfTTwpfoxeE4z4U1THNr63G4q/IrQ3wOrVn21ackjBQH32ZQTrg7xnR3hSxU4MjfgcsdvjYskljk83/bTFzZGEsQegdKYxROTGzoljqQsFP9naY7/UH2NTQiE2QFpgRK8+A8oZ0Dto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744911917; c=relaxed/simple;
-	bh=6HqrhZNro99W4hlfSawIZ3bq362Egs1uCP6Vd2PPZEo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OkbEq+zcM/xf1fh8GVq2ck5w8tNC/4wmvXtyecxTZwo8xP3SoaIRhCITRGhlfqRsd3yrTctczb/TSZp+cnOVXgHix11HYE8GvK4ChylLAkXUjPBPz/jsTF3tJFocvqG7UZDw+ZTuN80s5zS5mZ4YJF7EbnAKfZ4ZuN/ZkmrAlAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rg9yC7Ql; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744913494; c=relaxed/simple;
+	bh=Firc0cRgV1ArBlilPVIKy29fSByQMjw0rGUzbaoNpwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mcIroN3qtwHw2cpgzOfjTwiZm9umwGlhM3CVIsO5jN4MmdN2WQv6CY9/28o5rrg4laTrkuemYbAVb0ExoP3TygvShmFtFGW9DSFagTw5LNrAdcP0/sEggotAavRt6zgBDzHv1+UMYosX983r9ebnuPH6a9eMzHA+hiNxIND0DmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aInTtjNq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rg9yC7Ql"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87272C4CEE4;
-	Thu, 17 Apr 2025 17:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744911916;
-	bh=6HqrhZNro99W4hlfSawIZ3bq362Egs1uCP6Vd2PPZEo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rg9yC7QlGIMHPKQ7WEUGcSXGLVG9wxf2u/ZQSNnkgiCyTxtBSESRPGDe+sRSX9zqE
-	 Yr6zKteWNfT21eUPrDzH3townbAbp+JNZoqjO8E9Btki0TkxaaNjeqnOFomOXxGsY9
-	 npxcqlAvOCfIOhiGpE7+KHL4yZ17Ea7yhnR7iLd/LuMwKNgaMfatKUoXU++iSE+yc4
-	 bCUeuLNT8zmRwNmWOd81ph5gMXXeKiDDW6+RZvyzte4ueYT3Dt2CGTpkNowMW9fKmZ
-	 kSD+ATjwqop+j6mDFplMVngOWwDoWMPy9UNGDtf1OWVrt4ZVExz07i9a69OinfacJU
-	 FCAJM3b+Ersgw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u5TIY-006VUB-5A;
-	Thu, 17 Apr 2025 18:45:14 +0100
-Date: Thu, 17 Apr 2025 18:45:12 +0100
-Message-ID: <86mscek7h3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Luo Jie <quic_luoj@quicinc.com>,
-	Yury Norov <yury.norov@gmail.com>,
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aInTtjNq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VHYbpwLHuvljn8dVbt/fXb3LbUKc7Sc+NNW5fjMzCUU=; b=aInTtjNqwlrROOwNVA9D6/KOgb
+	tdljBolfEjvm5NfCpi86ZldFZoGJKfxFdNAWfSPV12YVSfK09E53mETYDb8yeJt35iNS4GKQ8YOBn
+	Lf76bylRCZiVU2F7O9DTElD+j2Z+yjB1zzBufle0HD92rcof6bd8zBhVqq9WAui1CgoRT14He4hTE
+	2psFzmGVL3CD4xG+2TMEmxat4si0N+Tl2jEWNzPZnYd4ho7pdp7eoOQVFrcPbazJDYG78qH77dVTm
+	eAYwTGT3BpdmHV/sudXjyVmeWr5caNNum07ficSULUB8L3u0tm1/R6Eq9z+nYS0KFN5EryidJ/Ten
+	VSUmjoBg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57866)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u5Thg-0007nk-0W;
+	Thu, 17 Apr 2025 19:11:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u5Tha-0002fW-1R;
+	Thu, 17 Apr 2025 19:11:06 +0100
+Date: Thu, 17 Apr 2025 19:11:06 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	Julia Lawall <Julia.Lawall@inria.fr>,
 	Nicolas Palix <nicolas.palix@imag.fr>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	cocci@inria.fr,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	quic_kkumarcs@quicinc.com,
-	quic_linchen@quicinc.com,
-	quic_leiwei@quicinc.com,
-	quic_suruchia@quicinc.com,
-	quic_pavir@quicinc.com
-Subject: Re: [PATCH v3 0/6] Add FIELD_MODIFY() helper
-In-Reply-To: <0c97c659-bd28-45e0-8537-d9be2637cb22@lunn.ch>
+	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org,
+	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, andrew@lunn.ch, quic_kkumarcs@quicinc.com,
+	quic_linchen@quicinc.com, quic_leiwei@quicinc.com,
+	quic_suruchia@quicinc.com, quic_pavir@quicinc.com
+Subject: Re: [PATCH v3 3/6] arm64: tlb: Convert the opencoded field modify
+Message-ID: <aAFEOr_PnZRH2ocR@shell.armlinux.org.uk>
 References: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com>
-	<86sem7jb5t.wl-maz@kernel.org>
-	<0c97c659-bd28-45e0-8537-d9be2637cb22@lunn.ch>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20250417-field_modify-v3-3-6f7992aafcb7@quicinc.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andrew@lunn.ch, quic_luoj@quicinc.com, yury.norov@gmail.com, linux@rasmusvillemoes.dk, Julia.Lawall@inria.fr, nicolas.palix@imag.fr, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, cocci@inria.fr, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com, quic_leiwei@quicinc.com, quic_suruchia@quicinc.com, quic_pavir@quicinc.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417-field_modify-v3-3-6f7992aafcb7@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 17 Apr 2025 18:22:29 +0100,
-Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Apr 17, 2025 at 06:47:10PM +0800, Luo Jie wrote:
+> Replaced below code with the wrapper FIELD_MODIFY(MASK, &reg, val)
+> - reg &= ~MASK;
+> - reg |= FIELD_PREP(MASK, val);
+> The semantic patch that makes this change is available
+> in scripts/coccinelle/misc/field_modify.cocci.
 > 
-> On Thu, Apr 17, 2025 at 12:10:54PM +0100, Marc Zyngier wrote:
-> > On Thu, 17 Apr 2025 11:47:07 +0100,
-> > Luo Jie <quic_luoj@quicinc.com> wrote:
-> > > 
-> > > Add the helper FIELD_MODIFY() to the FIELD_XXX family of bitfield
-> > > macros. It is functionally similar as xxx_replace_bits(), but adds
-> > > the compile time checking to catch incorrect parameter type errors.
-> > > 
-> > > This series also converts the four instances of opencoded FIELD_MODIFY()
-> > > that are found in the core kernel files, to instead use the new
-> > > FIELD_MODIFY() macro. This is achieved with Coccinelle, by adding
-> > > the script field_modify.cocci.
-> > > 
-> > > The changes are validated on IPQ9574 SoC which uses ARM64 architecture.
-> > 
-> > We already have the *_replace_bits() functions (see
-> > include/linux/bitfield.h).
-> > 
-> > Why do we need extra helpers?
+> More information about semantic patching is available at
+> https://coccinelle.gitlabpages.inria.fr/website
 > 
-> If you look at bitfield.h, the *_replace_bits() seem to be
-> undocumented internal macro magic, not something you are expected to
-> use. What you are expected to use in that file is however well
-> documented. The macro magic also means that cross referencing tools
-> don't find them.
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  arch/arm64/include/asm/tlbflush.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index eba1a98657f1..0d250ef4161c 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -112,8 +112,7 @@ static inline unsigned long get_trans_granule(void)
+>  	    level >= 0 && level <= 3) {					\
+>  		u64 ttl = level & 3;					\
+>  		ttl |= get_trans_granule() << 2;			\
+> -		arg &= ~TLBI_TTL_MASK;					\
+> -		arg |= FIELD_PREP(TLBI_TTL_MASK, ttl);			\
+> +		FIELD_MODIFY(TLBI_TTL_MASK, &arg, ttl);			\
 
-$ git grep _replace_bits|  wc -l
-1514
+This could equally be:
+		arg = u64_replace_bits(arg, ttl, TLBI_TTL_MASK);
 
-I think a bunch of people have found them, tooling notwithstanding.
-
-As for the documentation, the commit message in 00b0c9b82663ac would
-be advantageously promoted to full-fledged kernel-doc.
-
-Thanks,
-
-	M.
+which already exists, so doesn't require a new macro to be introduced.
 
 -- 
-Without deviation from the norm, progress is not possible.
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
