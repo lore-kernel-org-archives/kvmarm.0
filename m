@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3050C2356BB;
-	Thu, 17 Apr 2025 11:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2512323BCF6;
+	Thu, 17 Apr 2025 11:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744888259; cv=none; b=RLXtI+tpHioxFimnG4FyYCGw86XR4OaLlmLCkBDRruLRETK5N4pEaRn2cwJIx25ZaYRw+/73A2ZtNObkzvcnlIkiDekIxaXkoliosZpF0QCWYQkyhmj4zepSfFuRV94rbdUM5QobmR/dPPl2R+HeLmaOwQrL8CIAFmHyE7z/CeY=
+	t=1744888994; cv=none; b=nNXJJDBXTR2pfrH/aK3yZwc2HAjZ/LB7k+2AgsKx88l0QZIEByOKPSKzkiSZaP0IVNSrHA5mCT3XWvqcaPAiDc5+3dbkk39XnLTGpOy4hBxaInxmWdfljKcMkuQBA5fPp6OMVLHL5dsXwGcgIQdaolru4zChjj5GHDf1ccoVjY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744888259; c=relaxed/simple;
-	bh=fEBqhxlmx82BtM/AlDZZ5wzx7wCNw1G9R+pxLG8DyL8=;
+	s=arc-20240116; t=1744888994; c=relaxed/simple;
+	bh=7B70yJ4SRDrrXhm/q/EaJyQoxUqPWnLWl6ATh4yqNHg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SxesTiBJX3hP6wqo79tnKDBDMDSN+fJvDrglIhwxyVxrto98jpPHfMnoZkvZWMZSNM0FVVuFNQO1vtwKzBUMBcKD55fPYL7DHlaf16j7NMF24PUi4Nb5pAYsdeXldbEKPSClt8iBCVPWlo5QAQ6Mj4uedCHrPgr13wOTnBa1+Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zwe8MN7g; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=owsaPSDzXVQERLawtoAC7qM4obLrVfbpgHMN3/m3UpPKm+POHeCnYVIRmA2eMK5+jljtvF9w3PawcdWa/Op1RClHrGNKb8znRHwCS2NRsxIyEux76NXTd8yJg5biz79XTloyOxNeEK+75yKvKWagWbXR/XsLvFM3CByHOLsHt+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R0m/wNfL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zwe8MN7g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB080C4CEE7;
-	Thu, 17 Apr 2025 11:10:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R0m/wNfL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDB31C4CEE4;
+	Thu, 17 Apr 2025 11:23:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744888258;
-	bh=fEBqhxlmx82BtM/AlDZZ5wzx7wCNw1G9R+pxLG8DyL8=;
+	s=k20201202; t=1744888994;
+	bh=7B70yJ4SRDrrXhm/q/EaJyQoxUqPWnLWl6ATh4yqNHg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zwe8MN7gY9/fyNSI6M4egF4DqTK6cOa74cIgePtVm5SxlHrH+BFGILB3SU+THyiY4
-	 Y5zhBRJoX5lB6AJEvE2UyTUvrVAQQWJQpG5QB+/oxiv85AL6oeI7Ef3KZAX6LHi03p
-	 3UcOsaKtnGf6MlDb9qqcOJYbWNLKJYBOa6HGAuh149UD5wQrwIa7APBHfo57SolIPz
-	 iuEmJavhra38nemTtJ9MJyy41GvkjLD3zSJpPTiuWJA+/HCIrte5XzncA7QeFyTe12
-	 /LfO983iZHYkOPkerszOlBINL8FzDe75AdGD155w/tvxk8A1h12DUOJiYNKqGYoXsm
-	 S648FervPhCuA==
+	b=R0m/wNfLNfos3JG0Gq0YguHhHEbc6iV0N78lLqtliDi4TJjftl0F+8NzdKtM51Bly
+	 GLnWNv8W1PpDij5CZ8JuRVkZ96hhLCYPDuEAy/Mm1YL7qQEK6Vu1S4f8hXcSfZpzq4
+	 y2Qk/IsUhIw1tOjPF280+jrfoQETLD34nSNunLH87yUT3QvnN8SeNjzBf3N1LL5uxc
+	 zBqirpQcjS/mhyCUiQpwBpczn5LwlkYWVr2uGuv1JfW6CEJrICixBm5stTvnGBq8S+
+	 KtpuJfYn1bWjbXfbUJWQRnZqm3c4OAcAkEHUd/miRM1Eio0KdfMXeQArMjkpHehdRy
+	 LqjjO+Ycgllvw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u5N8y-006ONV-Cd;
-	Thu, 17 Apr 2025 12:10:56 +0100
-Date: Thu, 17 Apr 2025 12:10:54 +0100
-Message-ID: <86sem7jb5t.wl-maz@kernel.org>
+	id 1u5NKp-006Ohy-Fj;
+	Thu, 17 Apr 2025 12:23:11 +0100
+Date: Thu, 17 Apr 2025 12:23:10 +0100
+Message-ID: <86r01rjald.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Luo Jie <quic_luoj@quicinc.com>
 Cc: Yury Norov <yury.norov@gmail.com>,
@@ -60,9 +60,10 @@ Cc: Yury Norov <yury.norov@gmail.com>,
 	<quic_leiwei@quicinc.com>,
 	<quic_suruchia@quicinc.com>,
 	<quic_pavir@quicinc.com>
-Subject: Re: [PATCH v3 0/6] Add FIELD_MODIFY() helper
-In-Reply-To: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com>
+Subject: Re: [PATCH v3 4/6] arm64: nvhe: Convert the opencoded field modify
+In-Reply-To: <20250417-field_modify-v3-4-6f7992aafcb7@quicinc.com>
 References: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com>
+	<20250417-field_modify-v3-4-6f7992aafcb7@quicinc.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,24 +79,56 @@ X-SA-Exim-Rcpt-To: quic_luoj@quicinc.com, yury.norov@gmail.com, linux@rasmusvill
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 17 Apr 2025 11:47:07 +0100,
+On Thu, 17 Apr 2025 11:47:11 +0100,
 Luo Jie <quic_luoj@quicinc.com> wrote:
 > 
-> Add the helper FIELD_MODIFY() to the FIELD_XXX family of bitfield
-> macros. It is functionally similar as xxx_replace_bits(), but adds
-> the compile time checking to catch incorrect parameter type errors.
+> Replaced below code with the wrapper FIELD_MODIFY(MASK, &reg, val)
+> - reg &= ~MASK;
+> - reg |= FIELD_PREP(MASK, val);
+> The semantic patch that makes this change is available
+> in scripts/coccinelle/misc/field_modify.cocci.
 > 
-> This series also converts the four instances of opencoded FIELD_MODIFY()
-> that are found in the core kernel files, to instead use the new
-> FIELD_MODIFY() macro. This is achieved with Coccinelle, by adding
-> the script field_modify.cocci.
+> More information about semantic patching is available at
+> https://coccinelle.gitlabpages.inria.fr/website
 > 
-> The changes are validated on IPQ9574 SoC which uses ARM64 architecture.
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index 34233d586060..b2af748964d0 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -30,8 +30,7 @@ enum pkvm_page_state {
+>  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+>  						 enum pkvm_page_state state)
+>  {
+> -	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
+> -	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
+> +	FIELD_MODIFY(PKVM_PAGE_STATE_PROT_MASK, &prot, state);
+>  	return prot;
+>  }
 
-We already have the *_replace_bits() functions (see
-include/linux/bitfield.h).
+Following up on my suggestion to *not* add anything new, this patch
+could be written as:
 
-Why do we need extra helpers?
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index 34233d5860607..08cb6ba0e0716 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -30,9 +30,8 @@ enum pkvm_page_state {
+ static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+ 						 enum pkvm_page_state state)
+ {
+-	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
+-	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
+-	return prot;
++	u64 p = prot;
++	return u64_replace_bits(p, state, PKVM_PAGE_STATE_PROT_MASK);
+ }
+ 
+ static inline enum pkvm_page_state pkvm_getstate(enum kvm_pgtable_prot prot)
 
 	M.
 
