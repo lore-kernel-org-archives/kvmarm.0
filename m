@@ -1,147 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F21922E00A;
-	Thu, 17 Apr 2025 00:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4978E226527
+	for <kvmarm@lists.linux.dev>; Thu, 17 Apr 2025 09:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744849654; cv=none; b=idplwAkvxYVR2DhzCVyhDHSIKQZOgi7mXJRtql291clwR/fpznirTTm0sNUgZvn/n8MLtHLyqFq1TygRHciD9EIBTOOaD++DftM/pTjl6j9LYG4fdX788Y/DmPhMT6JHhcwLYN0gAzbJARBqh0kAQJSpnNc6YQt37Uck0Cj+JYQ=
+	t=1744883651; cv=none; b=lOQ3NeFqVCCshmKC/zynaNSyE2nozQAnMjqCu0EGE52OSKxdpo6a2tksTN/b2Fx6558LRclA9C8r04BgJLTmMefIObnWZNd+LTxQjlj2HxuztRKgJ/Togzool2sB50flmfyUD1znm2xxRR2VmKJ8tdwv9KnAdx/BgMW+HMs3NfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744849654; c=relaxed/simple;
-	bh=c22FTsDBl8on7JkOPsVEpDLeW97hqa6VyOk90f5/da4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=K5APvQ5iNSLXyy/PTM7gycOZHvHVTJfNXU3QUI1TfXDymJFMCqfYxs6jIR+wbPy59gFsZEVVjuXIotaDiPyDbs+hwELghW2r1+UXQO32CrLt+l7xHeSE9Q+di/3sfxevhbpUWQaIRgBmDh+1qn1Zk6qPsPbmuD/XyVbSvIz9TMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pdRpeEn7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744883651; c=relaxed/simple;
+	bh=3BhkDRy9UEw8pUROqk03rHaQpLsP1EoR2Hnqbktpafc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KweVVwWF1O2ErTp/9NXWi7XVyZwoijAeJpHQv47uiOVwZ2ssWzT8EWRzZvjuzoiUIDKPN59my180wsLzXUlvIf7ktRLhprKi6og+2vMIAw/O9G5g5/y2s+vLxcUPAu+Mw6qi1gmDFZx7hGTUolaiP8qpHWRHfxAnGY8kiZGscrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ID35VpLh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pdRpeEn7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A729C4CEED;
-	Thu, 17 Apr 2025 00:27:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744849654;
-	bh=c22FTsDBl8on7JkOPsVEpDLeW97hqa6VyOk90f5/da4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=pdRpeEn7CrcVPx+kUfDsoI5/OAvjUj7WFrbF4LkM3BYxCHjzqplZNqkJMkrUaTzuV
-	 c7my1t3zDLG8eWNQTgNcya0XNY9zCVVJB2htQNW5WV/9RzpmC86gmY4X1sjpCsDPx5
-	 ZisOkzq8p2/j69nPr1xnLvRJicSLEIHSGDVvdd3hZNuKn44zioZjnZzuZT+Qr/Pu1H
-	 xbGnvNP3pqhkZHUA6p3+i7j11Sp8t+8f5Te4Hs6CWoNgLg4hvgrJE1HdN9li+qKPVV
-	 frAjLJt8WYVZZLAlF4fGIROL7u0mf+Cdt9+gEQlK28A6q2/45GUcRa5Y6ORTcFrzye
-	 G0p7B2RoL+IhA==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 17 Apr 2025 01:25:32 +0100
-Subject: [PATCH v5 28/28] KVM: arm64: selftests: Add SME to set_id_regs
- test
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ID35VpLh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744883649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8frcNR3d7ivP4NC+vlhr7MJ2cYU39BpSTQEOAw1o4aU=;
+	b=ID35VpLhWpwaVM1r4/KrdZ43hdh212IgE1YbxcUtmx7YmqAS2Hk0S9ZqtAC8KIV9B5D0eC
+	4+5tdUXWAh0nWhidC4SFkNTfTMoiBp0o5CYeOIe+03Sw1eoFDwjFvEMVoq2q7+SBgkuCmy
+	8pUtK3bpXUtZBqmNB5cpvBvp1NLmtBU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-447-RUq27SiGPsajGblbZrewRQ-1; Thu, 17 Apr 2025 05:54:07 -0400
+X-MC-Unique: RUq27SiGPsajGblbZrewRQ-1
+X-Mimecast-MFC-AGG-ID: RUq27SiGPsajGblbZrewRQ_1744883646
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43ea256f039so4814975e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 17 Apr 2025 02:54:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744883646; x=1745488446;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8frcNR3d7ivP4NC+vlhr7MJ2cYU39BpSTQEOAw1o4aU=;
+        b=fzOSa8CZPQ3lPRgvZ/dT650ZmeOj63Tr8V6+r0SKSO5VpTp4A64VmgFDWfnpW3r4J2
+         sreGeyQh3EDnjamRTjIMeY9T8/Zevm55CNEQB009aXHo8zlS+V/LVGpsS5G10ftnXZlD
+         zcS9WWCokyPciMhPm0yAYVNDQ4tUc3hRsHlcleiw3efDmeEyNsbuTjDur2D0u1TgATeB
+         XuCphPwyKC93r/MhNR5NdXbaT+2sLWNVfTpXOpq2W5WJlO9s1T6P18KOaGN3d407kmin
+         xyn174VXTXuQz+7gXjCC2mF5cRHT49DXSRp0pcDoviVPnZy1SCGlyNTWBkPjYXJvTWYm
+         gjbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUre544KCOr7a2ZbrDIdKnhnZ9vjTY+k2LR1uw1MyU/1qZ8NxiIiAo25myc1fRdqUylWBAyNcU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwAHraiy5A1DRkPjPnF4UXv21kbHBC4NIz6eSl/Ul8OiPebeFiz
+	Q2lbq1wIGALaplYVeQFYh/IWWQq0svZ6Cdxef3yrnfoYc34ofCoH79AfTgt0yhY/7oelLgGN86B
+	3fd/E8bQHcf93cAOHoEHP5G3pKwQOzLd8zrrXnxA2NZX1xpZyEoSj6sAOBND3za1Zgi2EJvWflJ
+	61PFmSdVVRUw1vg+W205AOYJehZLij
+X-Gm-Gg: ASbGnct0LyICZ5c02wNrXRcwcYgmCzdLqaZneHW4DidD8SzJMMO0fs0dIUXo3el6u3k
+	eVPsbeXzdmB8diGernD7GyUTPNEXA0uCFvfAr//4tDtwWu4MLOsQ8SZ0kKoTLd4l1Z0uY9Q==
+X-Received: by 2002:a05:6000:40c7:b0:398:fd9b:b935 with SMTP id ffacd0b85a97d-39ee5b9ff8fmr4783292f8f.53.1744883646463;
+        Thu, 17 Apr 2025 02:54:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGaUAX5A8zAgw7el/T3YwRV3GZLvfWnuHeaTHfLO1ACdU3siatVem4dbx0XtRNKUnrmhQD+B5DLQ7edX2knUB0=
+X-Received: by 2002:a05:6000:40c7:b0:398:fd9b:b935 with SMTP id
+ ffacd0b85a97d-39ee5b9ff8fmr4783241f8f.53.1744883646039; Thu, 17 Apr 2025
+ 02:54:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250417-kvm-arm64-sme-v5-28-f469a2d5f574@kernel.org>
-References: <20250417-kvm-arm64-sme-v5-0-f469a2d5f574@kernel.org>
-In-Reply-To: <20250417-kvm-arm64-sme-v5-0-f469a2d5f574@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>, 
- Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-c25d1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3711; i=broonie@kernel.org;
- h=from:subject:message-id; bh=c22FTsDBl8on7JkOPsVEpDLeW97hqa6VyOk90f5/da4=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoAEqEPmF1UWC0EBNqc6FOONN5AgLp5u4ISmCdeQ3d
- +1tXd0qJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaABKhAAKCRAk1otyXVSH0Gh/B/
- 9HAFpSzIdzlDrDNhb9algwishiTaXUKWuASjSDPBm1wCg6xVIGVPOWp9/N83PHSqzHCeYjpo4X4K0u
- gyHfVWPM9eDHZ8m9XrAzvEVRLv7Zr+HE3obFad8s3tkORdQfil/0/vGWXhpXQwXUiMyUHJM8f9QcKo
- sSs5j37wkt+KRS4anKOc8HrgvRR7MaxEnREFXI7II9vJmqNVAmSuvZC4mYCeHR3uZs4HOudiOBLt4N
- C2RJwtqS9Q+PQliixkCFALO12w7K5QPcAfdORLnmXwdjDIT7OaeIRO91nDZfQpdXkKHVgn8d2W0G56
- s1Ln1aXjPH01uX1yqB7S2fjKUu+5Ej
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+References: <20250409014136.2816971-1-mlevitsk@redhat.com> <20250409014136.2816971-3-mlevitsk@redhat.com>
+ <20250410081640.GX9833@noisy.programming.kicks-ass.net> <60b7607b-8ada-447d-9dcb-034d93b9abe8@redhat.com>
+ <20250416185001.GA38216@noisy.programming.kicks-ass.net>
+In-Reply-To: <20250416185001.GA38216@noisy.programming.kicks-ass.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 17 Apr 2025 11:53:54 +0200
+X-Gm-Features: ATxdqUE3EOhyuH0suu9pJLVTpoJVqiaHW5bjmzNK_nqhnV7Z7kL2fl3XehvCGu8
+Message-ID: <CABgObfbH6JAh0Puu6gTKfkLd+e5uqSyHHP5i86W-=G6x5zr1wg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] KVM: x86: move sev_lock/unlock_vcpus_for_migration
+ to kvm_main.c
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	Alexander Potapenko <glider@google.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, kvm-riscv@lists.infradead.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Jing Zhang <jingzhangos@google.com>, Waiman Long <longman@redhat.com>, x86@kernel.org, 
+	Kunkun Jiang <jiangkunkun@huawei.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Anup Patel <anup@brainfault.org>, Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, 
+	Borislav Petkov <bp@alien8.de>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>, Sebastian Ott <sebott@redhat.com>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Randy Dunlap <rdunlap@infradead.org>, Will Deacon <will@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, linux-riscv@lists.infradead.org, 
+	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Ingo Molnar <mingo@redhat.com>, 
+	Andre Przywara <andre.przywara@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Sean Christopherson <seanjc@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: I87nI7COPbsTjYRneNJ8nciuYCxb3jr45kABSqRoyp0_1744883646
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add coverage of the SME ID registers to set_id_regs, ID_AA64PFR1_EL1.SME
-becomes writable and we add ID_AA64SMFR_EL1 and it's subfields.
+On Wed, Apr 16, 2025 at 8:50=E2=80=AFPM Peter Zijlstra <peterz@infradead.or=
+g> wrote:
+> > For the ARM case, which is the actual buggy one (it was complaining
+> > about too high a depth) it still needs mutex_trylock_nest_lock();
+> > the nest_lock is needed to avoid bumping the depth on every
+> > mutex_trylock().
+>
+> Got a link to the ARM code in question ?
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 30 +++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+lock_all_vcpus() in arch/arm64/kvm/arm.c:
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 322b9d3b0125..bcb00bb6be2d 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -138,6 +138,7 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 
- static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, CSV2_frac, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SME, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SSBS, ID_AA64PFR1_EL1_SSBS_NI),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
- 	REG_FTR_END,
-@@ -185,6 +186,28 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr2_el1[] = {
- 	REG_FTR_END,
- };
- 
-+static const struct reg_ftr_bits ftr_id_aa64smfr0_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, FA64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, LUTv2, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SMEver, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, I16I64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F64F64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, I16I32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, B16B16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F16F16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F8F16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F8F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, I8I32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F16F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, B16F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, BI32I32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F32F32, 0)
-+,	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SF8FMA, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SF8DP4, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SF8DP2, 0),
-+	REG_FTR_END,
-+};
-+
- static const struct reg_ftr_bits ftr_id_aa64zfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, F64MM, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, F32MM, 0),
-@@ -215,6 +238,7 @@ static struct test_feature_reg test_regs[] = {
- 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
- 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
-+	TEST_REG(SYS_ID_AA64SMFR0_EL1, ftr_id_aa64smfr0_el1),
- 	TEST_REG(SYS_ID_AA64ZFR0_EL1, ftr_id_aa64zfr0_el1),
- };
- 
-@@ -231,6 +255,7 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64SMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
- 	GUEST_REG_SYNC(SYS_CTR_EL0);
- 	GUEST_REG_SYNC(SYS_MIDR_EL1);
-@@ -700,8 +725,9 @@ int main(void)
- 		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64pfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1) +
--		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 3 +
--		   MPAM_IDREG_TEST;
-+
-+		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) + ARRAY_SIZE(ftr_id_aa64smfr0_el1) -
-+		   ARRAY_SIZE(test_regs) + 3 + MPAM_IDREG_TEST;
- 
- 	ksft_set_plan(test_cnt);
- 
+        lockdep_assert_held(&kvm->lock);
+        kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+                if (!mutex_trylock(&tmp_vcpu->mutex)) {
+                        unlock_vcpus(kvm, c - 1);
+                        return false;
+                }
+        }
 
--- 
-2.39.5
+> And I'm assuming you're talking about task_struct::lockdep_depth ?
+> The nest lock annotation does not in fact increment depth beyond
+> one of each type. It does a refcount like thing.
+
+Yes, exactly - mutex_trylock_nest_lock() is needed so that the
+code above counts per-lock instead of using the per-task depth.
+
+Paolo
 
