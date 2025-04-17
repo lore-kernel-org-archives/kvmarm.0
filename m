@@ -1,58 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F50D251785;
-	Thu, 17 Apr 2025 16:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851AA1D5CF8
+	for <kvmarm@lists.linux.dev>; Thu, 17 Apr 2025 16:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744906408; cv=none; b=da5CUv8WCY6zja8uFRCxvtSTKg16IaE64madOImRVe3vixSaRi9qmXJMOWkdP7PcVKxnncghUqCaiCj3XnHzVRP5MPTqP/ysR+8Y5zPgQsBLXvjD/IgVmrcBAM+HCugjl+6cGBHGJbSUMm+40rsqcflRZb4dL2fSu+3cmf5781Q=
+	t=1744909188; cv=none; b=tVR3eFBV/zONICrNHCohE8sY7qSfpCLYim+sjy9VkerUGRscF/lig96VIkKbvClngNSe3cgzu9y0kO5lQ3VadQbEdw+mOgPvBaJLq64mQbvUxiyF76YoImzrnQoCPgd9W8uo8P4wOoDDqfcfXxFeCYrXyP1DXAlI/Sju6Qtf0DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744906408; c=relaxed/simple;
-	bh=B2jx6RLRF1IkGKeilRDgu5BJ5hcrH20ogEfV5LNYn+4=;
+	s=arc-20240116; t=1744909188; c=relaxed/simple;
+	bh=4EslEBhr8QIjv8pIHyC/BwXiEvdXtt7Vn/sFJ18+xbk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PSFCa3R4zNjhybLsnZKwSNJsCCyf+qVovtQAZgUl7GNs3PD8ub2sUds/HTZeb3dYOClRwMKdIBeY83FBqcSgCiDYEjnkWkXaRsVTM2MufQINAN2akqdd7fn0137kY7BgEiqFqAuGpaBXEJEbQQr3wCHwzmb/lhu8D1Ic3Vhg20E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UxaLAkcp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=dmNQndBk547YM2ONg9tmnw1vJ2OQXsbXXNhit56zTtmghA3FqL4lg3oJS6w8cc2CzImnpAmVr1PJEYzRLn7qeGCEqWgEsHyUveL2+GzxcPUyg2rQnc1oxgPJCkwPmToxWNkvAKObWKV8f24e5mdf2Kaz3gGLGpOFU16UBIe9ZDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaOciruI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UxaLAkcp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F49BC4CEEA;
-	Thu, 17 Apr 2025 16:13:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaOciruI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEF3CC4CEE4;
+	Thu, 17 Apr 2025 16:59:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744906407;
-	bh=B2jx6RLRF1IkGKeilRDgu5BJ5hcrH20ogEfV5LNYn+4=;
+	s=k20201202; t=1744909188;
+	bh=4EslEBhr8QIjv8pIHyC/BwXiEvdXtt7Vn/sFJ18+xbk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UxaLAkcpBpFYZB41WTPpqXXc+KpvKi9sfsG8Kkr5Jo+QD+Hx1Fdmwh0HoerQYDcPb
-	 NWAWipXBTWmihgJkq+ZoTX/0cAaLO1TA3qFbauX1gGg3+O/Bi5X1hwHOk6uDxUuRLt
-	 +PVUOTq9eetFMY1WXx24MuNGjVPQt4dqhNeVgoSWYfIIwsU3ZQUmzTxILCw0NsQO8e
-	 2Q1q1D3uzTWpScVjJNwBPyYL4U5qUBQUpruZqpQgvAwiZKpbqsUH1vzx1woyO8xwSO
-	 xuP37ozwYvL3XxLuQ2Yx4W5rXRqEFiqitHwXV2gX+dmFv0b6CQj5Qn4GVaVUhv39XO
-	 hdKuUUh1/aOXA==
+	b=WaOciruIaaAOchpsY3VvZlsMrdxiEaI2RjCdIN2u/YjVu0WuN97jPjhpT6EhCtVZS
+	 CjW3eXn9ir+nw4qdcg9kM1pTfXZnqgojkylO9dusVt5pCUNLXZiXby+GJsBxbI3KIV
+	 MMmBJ/auzN/WX+5Vryhp9hMjlbMtAuyHof8VGyX5TzIzQ3NxrQgwWA2EMpPSyIJTOW
+	 iqAQjtv8EaE0WRQwpCLZP8k0lJAqlHjjmj0oj2blQEzlAwl6Arsm1ur3YY3dMzGiEH
+	 ZUbGgph/c0dZ20OYJYqM82UeLbufRLQx4kvtCeaj9Dud+EiU6n/DPlpmelRz6NzSic
+	 xINrDyYSZhfvA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u5Rrf-006Tml-PF;
-	Thu, 17 Apr 2025 17:13:24 +0100
-Date: Thu, 17 Apr 2025 17:13:23 +0100
-Message-ID: <86plhakbq4.wl-maz@kernel.org>
+	id 1u5SaX-006UXz-P9;
+	Thu, 17 Apr 2025 17:59:45 +0100
+Date: Thu, 17 Apr 2025 17:59:45 +0100
+Message-ID: <86o6wuk9ku.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly
- <joey.gouly@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K
- Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui
- Yu <yuzenghui@huawei.com>,
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: fix config.hcr used uninitialized in __kvm_at_s1e01_fast
-In-Reply-To: <86sem7yanc.fsf@scott-ph-mail.amperecomputing.com>
-References: <20250415154656.1698522-1-scott@os.amperecomputing.com>
-	<8634e9l1y8.wl-maz@kernel.org>
-	<86sem7yanc.fsf@scott-ph-mail.amperecomputing.com>
+	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH] arm64: Remove checks for broken Cavium HW from the PI code
+In-Reply-To: <20250417140147.GA13109@willie-the-truck>
+References: <20250416123534.1108220-1-maz@kernel.org>
+	<20250417140147.GA13109@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,166 +56,41 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, joey.gouly@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, ada.coupriediaz@arm.com, catalin.marinas@arm.com, shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 17 Apr 2025 00:00:39 +0100,
-D Scott Phillips <scott@os.amperecomputing.com> wrote:
->=20
-> Marc Zyngier <maz@kernel.org> writes:
->=20
-> > On Tue, 15 Apr 2025 16:46:55 +0100,
-> > D Scott Phillips <scott@os.amperecomputing.com> wrote:
-> >>=20
-> >> In the skip_mmu_switch case, config.hcr was used uninitialized. On my
-> >> machine that caused garbage to be written to HCR_EL2 and then the CPU
-> >> got stuck at the synchronous exception handler. Also, the restore of
-> >> HCR_EL2 was missing at the end of the function in the same case.
-> >
-> > Huh, how embarrassing. Thanks for spotting this one.
-> >
-> >>=20
-> >> In skip_mmu_switch case, initialize config.hcr with HCR_HOST_VHE_FLAGS.
-> >>=20
-> >> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
-> >> ---
-> >>  arch/arm64/kvm/at.c | 8 ++++++--
-> >>  1 file changed, 6 insertions(+), 2 deletions(-)
-> >>=20
-> >> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> >> index f74a66ce3064b..ff4b06ce661af 100644
-> >> --- a/arch/arm64/kvm/at.c
-> >> +++ b/arch/arm64/kvm/at.c
-> >> @@ -1233,8 +1233,10 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu =
-*vcpu, u32 op, u64 vaddr)
-> >>  	 * the right one (as we trapped from vEL2). If not, save the
-> >>  	 * full MMU context.
-> >>  	 */
-> >> -	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-> >> +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
-> >> +		config.hcr =3D read_sysreg(hcr_el2);
-> >>  		goto skip_mmu_switch;
-> >> +	}
-> >> =20
-> >>  	/*
-> >>  	 * Obtaining the S2 MMU for a L2 is horribly racy, and we may not
-> >> @@ -1299,7 +1301,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *=
-vcpu, u32 op, u64 vaddr)
-> >>  	if (!fail)
-> >>  		par =3D read_sysreg_par();
-> >> =20
-> >> -	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-> >> +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-> >> +		write_sysreg(config.hcr, hcr_el2);
-> >> +	else
-> >>  		__mmu_config_restore(&config);
-> >> =20
-> >>  	return par;
-> >
-> > I think the diff below should do the trick (and incidently matches
-> > your commit message).
->=20
-> Looks good Marc, thanks
->=20
-> Reviewed-by: D Scott Phillips <scott@os.amperecomputing.com>
+On Thu, 17 Apr 2025 15:01:48 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> Hmm, I'm not really sure about this as it seems to be punishing the poor
+> user of the box who really hasn't done anything wrong. The firmware might
+> not be passing a KASLR seed to the host, but what about guest VMs? It's
+> pretty easy for the VMM to stuff a seed into the DT, so if somebody was
+> running VMs on TX1 with kaslr before c8c2647e69bed ("arm64: Make
+> _midr_in_range_list() an exported function") and things worked, I don't
+> think we should be breaking that so that it crashes in weird ways.
 
-Actually, we can do much better, because the more I look at this, the
-more I find it silly. How about the patch below? It also fixes a
-latent issue where HCR_PTW was never set... I quickly tested it on my
-Q box, and nothing exploded. But at the same time, nothing exploded
-with the buggy code...
+That's a good point, and I should have thought of that.
+
+> Could we just read MIDR_EL1 (read_cpuid_id()) in the PI code to detect
+> ThunderX that way? I'm less fussed about the multi-MIDR code working on
+> this machine as it's a new feature (and we could disable the new
+> hypercalls here if we really cared).
+
+Yeah, probably. Let me have a play with this thing again.
+
+> Alternatively, we could properly rip out the TX1 support and fail to boot
+> if we detect it. At least that's deterministic and we could have a useful
+> error message about the thing being unsupported.
+
+That'd be the last resort, and I'd rather keep this machine alive as
+this is the only v8.0 box I have with 16kB page support.
 
 Thanks,
 
 	M.
 
-=46rom 0191a6dfbeb52b41b2c8aa81edf7812b56a3612f Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Thu, 17 Apr 2025 16:24:29 +0100
-Subject: [PATCH] KVM: arm64: Don't feed uninitialised data to HCR_EL2
-
-When the guest executes an AT S1E{0,1} from EL2, and that its
-HCR_EL2.{E2H,TGE}=3D=3D{1,1}, then this is a pure S1 translation
-that doesn't involve a guest-supplied S2, and the full S1
-context is already in place. This allows us to take a shortcut
-and avoid save/restoring a bunch of registers.
-
-However, we set HCR_EL2 to a value suitable for the use of AT
-in guest context. And we do so by using the value that we saved.
-Or not. In the case described above, we restore whatever junk
-was on the stack, and carry on with it until the next entry.
-
-Needless to say, this is completely broken.
-
-But this also triggers the realisation that saving HCR_EL2 is
-a bit pointless. We are always in host context at the point where
-reach this code, and what we program to enter the guest is a known
-value (vcpu->arch.hcr_el2).
-
-Drop the pointless save/restore, and wrap the AT operations with
-writes that switch between guest and host values for HCR_EL2.
-
-Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/at.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index ea497ffbd1b19..da5359668b9c9 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -464,7 +464,6 @@ struct mmu_config {
- 	u64	sctlr;
- 	u64	vttbr;
- 	u64	vtcr;
--	u64	hcr;
- };
-=20
- static void __mmu_config_save(struct mmu_config *config)
-@@ -487,13 +486,10 @@ static void __mmu_config_save(struct mmu_config *conf=
-ig)
- 	config->sctlr	=3D read_sysreg_el1(SYS_SCTLR);
- 	config->vttbr	=3D read_sysreg(vttbr_el2);
- 	config->vtcr	=3D read_sysreg(vtcr_el2);
--	config->hcr	=3D read_sysreg(hcr_el2);
- }
-=20
- static void __mmu_config_restore(struct mmu_config *config)
- {
--	write_sysreg(config->hcr,	hcr_el2);
--
- 	/*
- 	 * ARM errata 1165522 and 1530923 require TGE to be 1 before
- 	 * we update the guest state.
-@@ -1248,8 +1244,8 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu,=
- u32 op, u64 vaddr)
- 	__load_stage2(mmu, mmu->arch);
-=20
- skip_mmu_switch:
--	/* Clear TGE, enable S2 translation, we're rolling */
--	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
-+	/* Temporarily switch back to guest context */
-+	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
- 	isb();
-=20
- 	switch (op) {
-@@ -1281,6 +1277,8 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu,=
- u32 op, u64 vaddr)
- 	if (!fail)
- 		par =3D read_sysreg_par();
-=20
-+	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+
- 	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
- 		__mmu_config_restore(&config);
-=20
---=20
-2.39.2
-
-
---=20
+-- 
 Without deviation from the norm, progress is not possible.
