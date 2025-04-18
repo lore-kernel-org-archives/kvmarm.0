@@ -1,111 +1,126 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255D2270EAB
-	for <kvmarm@lists.linux.dev>; Fri, 18 Apr 2025 10:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C1B2749D7;
+	Fri, 18 Apr 2025 13:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744971817; cv=none; b=CnE8y6uGt751jqd48zN+9Ri5HOiOPcGOV08Vfct/VA7W+hb6eI5CeZRBfcH/sleLbFXYeajGlqR2DXxtb1k5rYyqcbdGGxBruSMialPQiWDyhiixy3hCMqU716/2p/YMR0MhpYaVPLBcjM/bSg6Lmzg9dE4ApnBwaLJjtSbCIsU=
+	t=1744981816; cv=none; b=RMpg7gABfFe3pEelFVIacxRI0Y6MC3hFdxjmJxpdm/CFGNziQ88K9CfyYMuRq1zCww3xfDoler+URg3f/N/Hw3FEo2JGCtMYuZq+vEmlgyqghIsFRAllKxYVNp0GyI9deTdAPDFqBXImQsUVoSqY/YB83SS4AIiPmuQ9xxcf7Jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744971817; c=relaxed/simple;
-	bh=pLoJ/wWOxF4hATPeF+S4+nCAv8GTTfh4Rs7e8Jmkcbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kQy/RbNjXfVKOeYiFq77Leywp408IbXHj7uwV5Yj+wFiMU23q4+TctiYmTLmDYK/4hKj1oK2E+813OWKLVLwDHUND8RYf01UaLKggM4AiD9ILfRolaLQ0DDITL88JHc37Y9l1AFNvbvcuUt+KfjAO2G/gSk0UVnTF4RHkhbinQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jd/zPRsI; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1744981816; c=relaxed/simple;
+	bh=LUwIz8oIu9xUE0rOVd4q9tz/WUXmYgPFjOKIDlZ74D8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OIO1TyWJFnCk+XOPdQcnMepgcfP0UnimE1Pzpg0u6BC37dTJJnTAjNGNCyXlZn3HnZh+sizB37rR91Vbk+dO+pewhePLD640EiyQ5/2eM+WuoALl12L1Z/Xo3pkbhilJkZ9+Yykm1PTCYRlmkQ92evQXmBg5s3f5B3gLkJBjsak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeBT0/vM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jd/zPRsI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=I2pfP
-	RHCfMx1686AqGSEqHuKYU80CCi4N80MO83xG7I=; b=jd/zPRsIE1TnNrVaNhTM3
-	kxcd/WDZo5qmtQApC/AuzVD8stjDK5bIc5qM73pEmuttirjVkRsB2l5B/FHaXf3f
-	1RfwQg+PvUXykIQDPNX0krnoA4YyKv2PWcw80fsxHCAv/0DrHKxyzdT9XnwiuoAp
-	stDuu4DnxfMpKe+tJXWgS4=
-Received: from node-1.domain.tld (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDX34b+JwJoXuTCAw--.12581S3;
-	Fri, 18 Apr 2025 18:22:58 +0800 (CST)
-From: Jiayuan Liang <ljykernel@163.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeBT0/vM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5D56C4CEEB;
+	Fri, 18 Apr 2025 13:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744981815;
+	bh=LUwIz8oIu9xUE0rOVd4q9tz/WUXmYgPFjOKIDlZ74D8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WeBT0/vMVbNcRplOOST+5Ywo6QdaFrdxfVR2LSNE6s00ZuWarFlBLjsZiH3HAyYKB
+	 tjSOHdewvgYfgveW4QcOuOuVyF9hllgu7PfauZirBRfnBvBM+jiWwXlgOKVwMIKS+Q
+	 GmfbgPKsrMXhQSbCta9B4CyBJce1bsWE+my0t9XFK+9AHIIZ/J4Z6vLfdZttpoturQ
+	 oqnBm7nat4DH6icCkWPPaVXGNTyvZ41kbftOXXmNjEExJLAant5gV+vnBUtirN2bmh
+	 +zAVEg/Tpibq1xySirpgzczkJByenekH4Ql+nAKFVnqKokjXPdouWyli9VCW27Ntxw
+	 fcSq4GfHkKtzw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u5lTx-006irK-6I;
+	Fri, 18 Apr 2025 14:10:13 +0100
+Date: Fri, 18 Apr 2025 14:10:19 +0100
+Message-ID: <87sem5y5s4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jiayuan Liang <ljykernel@163.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Jiayuan Liang <ljykernel@163.com>
-Subject: [RFC PATCH 1/1]     KVM: arm: Optimize cache flush by only flushing on vcpu0
-Date: Fri, 18 Apr 2025 18:22:44 +0800
-Message-ID: <20250418102244.2182975-2-ljykernel@163.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] KVM-arm: Optimize cache flush by only flushing on vcpu0
 In-Reply-To: <20250418102244.2182975-1-ljykernel@163.com>
 References: <20250418102244.2182975-1-ljykernel@163.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDX34b+JwJoXuTCAw--.12581S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Zry8Aw4UWrWrtF1xZr47Jwb_yoW8Cw4UpF
-	Z3Cw1kKw4kW34xGay7J395ur1rW395JFs8tF98Gw10vwn8Z34q9r9Yk34UAFWDGryxtF4f
-	tFWavF1UZrs8ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zic4S8UUUUU=
-X-CM-SenderInfo: 5om1yvhuqhzqqrwthudrp/1tbiYBAzbmgCJ0IXGAAAst
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ljykernel@163.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-    When toggling cache state in a multi-vCPU guest, we currently flush the VM's
-    stage2 page tables on every vCPU that transitions cache state. This leads to
-    redundant cache flushes during guest boot, as each vCPU performs the same
-    flush operation.
+On Fri, 18 Apr 2025 11:22:43 +0100,
+Jiayuan Liang <ljykernel@163.com> wrote:
+> 
+> This is an RFC patch to optimize cache flushing behavior in KVM/arm64.
+> 
+> When toggling cache state in a multi-vCPU guest, we currently flush the VM's
+> stage2 page tables on every vCPU that transitions cache state. This leads to
+> redundant cache flushes during guest boot, as each vCPU performs the same
+> flush operation.
+> 
+> In a typical guest boot sequence, vcpu0 is the first to enable caches, and
+> other vCPUs follow afterward. By the time secondary vCPUs enable their caches,
+> the flush performed by vcpu0 has already ensured cache coherency for the
+> entire VM.
 
-    In a typical guest boot sequence, vcpu0 is the first to enable caches, and
-    other vCPUs follow afterward. By the time secondary vCPUs enable their caches,
-    the flush performed by vcpu0 has already ensured cache coherency for the
-    entire VM.
+The most immediate issue I can spot is that vcpu0 is not special.
+There is nothing that says vcpu0 will be the first switching its MMU
+on, nor that vcpu0 will ever be running. I guess what you would want
+instead is that the *first* vcpu that enables its MMU performs the
+CMOs, while the others may not have to.
 
-    Optimize this by only performing the stage2_flush_vm() operation on vcpu0,
-    which is sufficient to maintain cache coherency while eliminating redundant
-    flushes on other vCPUs. This can improve performance during guest boot in
-    multi-vCPU configurations.
+But even then, this changes a behaviour some guests *may* be relying
+on, which is that what they have written while their MMU was off is
+visible with the MMU on, without the guest doing any CMO of its own.
 
-    Testing with a 64-core VM with 128GB memory using hugepages shows dramatic
-    performance improvements, reducing busybox boot time from 33s to 5s.
+A lot of this stuff comes from the days where we were mostly running
+32bit guests, some of which had (and still have) pretty bad
+assumptions (set/way operations being one of them).
 
-    Test command:
-    qemu-kvm \
-        -nographic \
-        -m 128G \
-        -mem-path /dev/hugepages \
-        -mem-prealloc \
-        -cpu host -M virt \
-        -smp 64 \
-        -kernel ./Image \
-        -append "root=/dev/ram earlycon=pl011,0x9000000 console=ttyAMA0 init=/linuxrc systemd.unified_cgroup_hierarchy=1 psi=1"
+64bit guests *should* be much better behaved, and I wonder whether we
+could actually drop the whole thing altogether for those. Something
+like the hack below.
 
-    Signed-off-by: Jiayuan Liang <ljykernel@163.com>
----
- arch/arm64/kvm/mmu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+But this requires testing and more thought than I'm prepared to on a
+day off... ;-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 754f2fe0cc67..fbc736657666 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2300,8 +2300,10 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
- 	 * If switching it off, need to clean the caches.
- 	 * Clean + invalidate does the trick always.
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index bd020fc28aa9c..9d05e65433916 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -85,9 +85,11 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
+ 	 * get set in SCTLR_EL1 such that we can detect when the guest
+ 	 * MMU gets turned on and do the necessary cache maintenance
+-	 * then.
++	 * then. Limit this dance to 32bit guests, assuming that 64bit
++	 * guests are reasonably behaved.
  	 */
--	if (now_enabled != was_enabled)
--		stage2_flush_vm(vcpu->kvm);
-+	if (now_enabled != was_enabled) {
-+		if (vcpu->vcpu_id == 0)
-+			stage2_flush_vm(vcpu->kvm);
-+	}
+-	if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
++	if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) &&
++	    vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 |= HCR_TVM;
+ }
  
- 	/* Caches are now on, stop trapping VM ops (until a S/W op) */
- 	if (now_enabled)
--- 
-2.43.0
 
+-- 
+Jazz isn't dead. It just smells funny.
