@@ -1,76 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC4221127E
-	for <kvmarm@lists.linux.dev>; Fri, 18 Apr 2025 20:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151542868B
+	for <kvmarm@lists.linux.dev>; Fri, 18 Apr 2025 21:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745009344; cv=none; b=HZTXPI0UN/pbsZQuycE0fxKoGVLl6s7VWoNR8e7XQuP8xCkA+Z7nSRTTsGHaVngmNONfreN1/7Ye7QOhcA2b1PrCT7jqlwWJcawMaBHCT4CrzXrrlLidDbBQ51AUmq+EXFajuNIwL62oUmDVbxF/CxsMH3HOjPmCdFJh+jfuzwA=
+	t=1745010156; cv=none; b=HB73ygWmfC17pCKYLj8IpRNcuN5mzHC/osp/nTb+kOBTZfZ6LB1IGWWQRtSiUyN/RbJlCGLEgZYEZUZo9JYqioeTjSPcr31P/Xybpg6E8P6s2Nnt735WJx2I8bxGqUmDv/u+JFmyz7fPmhkLgiA00of4nfdcnLWJhWSbHzEJJKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745009344; c=relaxed/simple;
-	bh=o6rWC2OdM2Kqh/YVF0TxD6ZhXq/Hm3vxJRNKeDi3SB0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRFPtCM1G+dD1tS6+oUHnP9lKUYZAnE2+N8khRowRcD/CD7tmUyLvTRyyDALzEeHwaHy10mNlsQrQT8w+4ZqXHyAamMzqX+JUpHPcgOVaMRjXVI3dtVCoNUcYvaDUxQlHIs1nCchaMzY+URrxpn9TjuzyX1dCQDTd47GnNGZ6sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E07CC4CEE2;
-	Fri, 18 Apr 2025 20:49:02 +0000 (UTC)
-Date: Fri, 18 Apr 2025 21:49:00 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2] arm64: Rework checks for broken Cavium HW in the PI
- code
-Message-ID: <aAK6vPL0pizysMtH@arm.com>
-References: <20250418093129.1755739-1-maz@kernel.org>
+	s=arc-20240116; t=1745010156; c=relaxed/simple;
+	bh=LBWkBaKQ7ZCDzItwIGLg/Ar8kkXWqEgSuHBi45M7dBU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=UIPFl1z+AaD4NYxQHkxsFVKVIT5xjnb2NhOH8XOz5WzIzUBs8KzbKjI8acQPXPogIS7ULhQKFswdseGlovmQCOGtYgdneLVzP/nRXLfE8jPQOgmKGyuRV5mPonepdY+kvAYuBr90AMMkAc3NYvu1BUWfefWTe+4yYiwzGzdSJhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wLgtC0hd; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wLgtC0hd"
+Date: Fri, 18 Apr 2025 14:01:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745010149;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=w+85ylRyrUIGs6mLVwkG3LiYjOpMIfTz1LLrItLJJQ4=;
+	b=wLgtC0hdw+vr786vQJOTO2QbvqEjxlCcTXLXZXEEVYgusptAWMJsmBUGSYHabyb9c2qlLp
+	aQaz1VRZbprquWTWiMACL0UZ++sQCsflEv7R7lmRUFVySNVccL+HJhK6mLD4hQZbU2q2Mk
+	u0E5kXiXNPy3fVd1gDjSW+OUHl3SVFk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>
+Subject: [GIT PULL] KVM/arm64 fixes for 6.15, round #2
+Message-ID: <aAK9xg9DMfCsCPux@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250418093129.1755739-1-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Apr 18, 2025 at 10:31:29AM +0100, Marc Zyngier wrote:
-> Calling into the MIDR checking framework from the PI code has recently
-> become much harder, due to the new fancy "multi-MIDR" support that
-> relies on tables being populated at boot time, but not that early that
-> they are available to the PI code. There are additional issues with
-> this framework, as the code really isn't position independend *at all*.
-> 
-> This leads to some ugly breakages, as reported by Ada.
-> 
-> It so appears that the only reason for the PI code to call into the
-> MIDR checking code is to cope with The Most Broken ARM64 System Ever,
-> aka Cavium ThunderX, which cannot deal with nG attributes that result
-> of the combination of KASLR and KPTI as a consequence of Erratum 27456.
-> 
-> Duplicate the check for the erratum in the PI code, removing the
-> dependency on the bulk of the MIDR checking framework. This allows
-> dropping that same check from kaslr_requires_kpti(), as the KPTI code
-> already relies on the ARM64_WORKAROUND_CAVIUM_27456 cap.
-> 
-> Fixes: c8c2647e69bed ("arm64: Make  _midr_in_range_list() an exported function")
-> Reported-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/3d97e45a-23cf-419b-9b6f-140b4d88de7b@arm.com
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
+Hi Paolo,
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Here's a single rather urgent fix for 6.15 that addresses boot failures
+from the PV MIDR infrastructure. Catalin has reviewed the patch and
+asked I grab it since it's the end of the working week for him.
 
-Oliver, if you are in a timezone where you are still working, please
-pick it up. I might not have time until Monday otherwise.
+Please pull.
 
-Thanks.
+Thanks,
+Oliver
 
--- 
-Catalin
+The following changes since commit a344e258acb0a7f0e7ed10a795c52d1baf705164:
+
+  KVM: arm64: Use acquire/release to communicate FF-A version negotiation (2025-04-07 15:03:34 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.15-2
+
+for you to fetch changes up to 117c3b21d3c79af56750f18a54f2c468f30c8a45:
+
+  arm64: Rework checks for broken Cavium HW in the PI code (2025-04-18 13:51:07 -0700)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.15, round #2
+
+ - Single fix for broken usage of 'multi-MIDR' infrastructure in PI
+   code, adding an open-coded erratum check for everyone's favorite pile
+   of sand: Cavium ThunderX
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      arm64: Rework checks for broken Cavium HW in the PI code
+
+ arch/arm64/include/asm/mmu.h      | 11 -----------
+ arch/arm64/kernel/cpu_errata.c    |  2 +-
+ arch/arm64/kernel/image-vars.h    |  4 ----
+ arch/arm64/kernel/pi/map_kernel.c | 25 ++++++++++++++++++++++++-
+ 4 files changed, 25 insertions(+), 17 deletions(-)
