@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C70F27C842
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15C827CCD3
 	for <kvmarm@lists.linux.dev>; Tue, 22 Apr 2025 12:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745324788; cv=none; b=MolTQGtWMNZnGj16h3DWLm1TnZsjr2h0/W+3gNaOprOdMvAu8XDH6Qp5qxIkqEdBWqri3A2jI5b1f2cm+nmoRpOJFkx8/9VAqHsj0OifwEjoRrvnfJve0ChFq9HP6VerFqIB7qo4yeBRCIQfeLISgP7v/7T8LEDMh3zwPgnBAL8=
+	t=1745324788; cv=none; b=lQ94FAAdZ2cugNBqHQXK/+LeHxJ7yjdKcwjoYfppM7SCYuD2Nqk4bHJeMg1NCKCskxLsu58yxRSVFuJ694GTZFqL5IarNO0CW2XFlWCSmCdTTtPvmVAkYWZ4Wh0CwVMhCVxarIOpcoOC/J9Hj3T0RkJGjG2wq9FyPlKwhb3VrNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745324788; c=relaxed/simple;
-	bh=8iK6D+BtFfPpXhilVCWkUQ+VCnMea81DFQeOw2KQ8nc=;
+	bh=GGji4VafCMD/lBXJA7bDwwGW/DF92Exp7RIZh0PkNss=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KaRR439/br50X6hJZrzln9q2Tt8Oi7v0u7rj/IO0n0woIVbBTXasLJJJodp8oy4kuOiHYB6jT2aDI0y7zSoW0YekKgGumfzbERY/M0Ky9qM7wAoN01vmQuANCgB+Vcf3U8gFxzuYFgMqnOXorox0wHLElE4IM8PrSDDXZ4/DXQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrFAWULe; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=i5cGrFz7UBG1rh8KBtF72JH1DwKX03o0Bv+JEJf7+jw8a4Xw+15UoSQeNQ+uQljJRkrSOqncn6ffalTCADclC5Ppicd3v2bIpnolyKHrsrwNOIX97vcz+gWpm9dhPUkzjCS5rxHpAhymTiueZwdtEyPyFW7eVUd+5GCon7l5HSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZaHbAp5G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DrFAWULe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F212C4CEEE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZaHbAp5G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0324C4CEF0;
 	Tue, 22 Apr 2025 12:26:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745324788;
-	bh=8iK6D+BtFfPpXhilVCWkUQ+VCnMea81DFQeOw2KQ8nc=;
+	bh=GGji4VafCMD/lBXJA7bDwwGW/DF92Exp7RIZh0PkNss=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DrFAWULe3zpVlqkkln/eMLp61v8DyREfh/ZmpESSy9xZUHxKrXFhKlvXWjoZQJL5o
-	 66x5YUOeacsJjaW7zVmxvcIZKri1TlD12MCG/mXt/iDgmofgAI+Q0giRGVWTHxIpiT
-	 nedwCl4o02LBsvBelNkKgDkxOZZz83JsigmFZ+a5R5fBJATUpiV/Pw6fFSjQCzaFt8
-	 RDFA5rpG3bEiGqC0A+AbUYeMKaEpbsI90lolGCrDIGdK+s0d3U4CPnxG2ZmUyB07cB
-	 r84+0/7GkzGK337WeuJNiTNWbpbyqsD6763FWoH+OXdoBiDzZJpXealwxMg5jYRgBa
-	 ssIqgqwjZKijw==
+	b=ZaHbAp5G2WiEZ+SHVfoAsnjnw+jihwof/Eb0h3ImSXj7YZpz3FGM7ISSjSV3jxxQ3
+	 LnhTsKzDihTY2wFsgC5/VJwGVfcjJVmhkhLJYPkd3NRJzeisb59YM/uPU5xjkQsKzX
+	 mkRAM7reWTAUsajPMduija7pZ2DNwrJ1PEIspg/Lm1RdxdgqXaZokd2ZT+F68wfn/p
+	 +L0uM3UiIMG4XpEr8lblQRwq/V58OAcLbzQMni2NKs6S/VqVpNRbnRMuSmaba2GE2H
+	 GCmE1/PXzu5kJJvixsXHr/94fkbxRiJ7LDQA6zpP5FL05wXDqk+bbjEm+DFkxtllNr
+	 2w6q+Hot8JiLw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u7Chl-007c9q-Rj;
-	Tue, 22 Apr 2025 13:26:25 +0100
+	id 1u7Chm-007c9q-Aa;
+	Tue, 22 Apr 2025 13:26:26 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: [PATCH 1/3] KVM: arm64: Fix PAR_EL1.{PTW,S} reporting on AT S1E*
-Date: Tue, 22 Apr 2025 13:26:10 +0100
-Message-Id: <20250422122612.2675672-2-maz@kernel.org>
+Subject: [PATCH 3/3] KVM: arm64: Don't feed uninitialised data to HCR_EL2
+Date: Tue, 22 Apr 2025 13:26:12 +0100
+Message-Id: <20250422122612.2675672-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250422122612.2675672-1-maz@kernel.org>
 References: <20250422122612.2675672-1-maz@kernel.org>
@@ -58,106 +58,79 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When an AT S1E* operation fails, we need to report whether the
-translation failed at S2, and whether this was during a S1 PTW.
+When the guest executes an AT S1E{0,1} from EL2, and that its
+HCR_EL2.{E2H,TGE}=={1,1}, then this is a pure S1 translation
+that doesn't involve a guest-supplied S2, and the full S1
+context is already in place. This allows us to take a shortcut
+and avoid save/restoring a bunch of registers.
 
-But these two bits are not independent. PAR_EL1.PTW can only be
-set of PAR_EL1.S is also set, and PAR_EL1.S can only be set on
-its own when the full S1 PTW has succeeded, but that the access
-itself is reporting a fault at S2.
+However, we set HCR_EL2 to a value suitable for the use of AT
+in guest context. And we do so by using the value that we saved.
+Or not. In the case described above, we restore whatever junk
+was on the stack, and carry on with it until the next entry.
 
-As a result, it makes no sense to carry both ptw and s2 as parameters
-to fail_s1_walk(), and they should be unified.
+Needless to say, this is completely broken.
 
-This fixes a number of cases where we were reporting PTW=1 *and*
-S=0, which makes no sense.
+But this also triggers the realisation that saving HCR_EL2 is
+a bit pointless. We are always in host context at the point where
+reach this code, and what we program to enter the guest is a known
+value (vcpu->arch.hcr_el2).
 
+Drop the pointless save/restore, and wrap the AT operations with
+writes that switch between guest and host values for HCR_EL2.
+
+Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/at.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index f74a66ce3064b..3a4568e2de910 100644
+index c40583edebc4f..7a5267f43b51f 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -60,11 +60,11 @@ struct s1_walk_result {
- 	bool	failed;
+@@ -492,7 +492,6 @@ struct mmu_config {
+ 	u64	sctlr;
+ 	u64	vttbr;
+ 	u64	vtcr;
+-	u64	hcr;
  };
  
--static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-+static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+ static void __mmu_config_save(struct mmu_config *config)
+@@ -515,13 +514,10 @@ static void __mmu_config_save(struct mmu_config *config)
+ 	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
+ 	config->vttbr	= read_sysreg(vttbr_el2);
+ 	config->vtcr	= read_sysreg(vtcr_el2);
+-	config->hcr	= read_sysreg(hcr_el2);
+ }
+ 
+ static void __mmu_config_restore(struct mmu_config *config)
  {
- 	wr->fst		= fst;
--	wr->ptw		= ptw;
--	wr->s2		= s2;
-+	wr->ptw		= s1ptw;
-+	wr->s2		= s1ptw;
- 	wr->failed	= true;
- }
+-	write_sysreg(config->hcr,	hcr_el2);
+-
+ 	/*
+ 	 * ARM errata 1165522 and 1530923 require TGE to be 1 before
+ 	 * we update the guest state.
+@@ -1271,8 +1267,8 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	__load_stage2(mmu, mmu->arch);
  
-@@ -345,11 +345,11 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 	return 0;
+ skip_mmu_switch:
+-	/* Clear TGE, enable S2 translation, we're rolling */
+-	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
++	/* Temporarily switch back to guest context */
++	write_sysreg(vcpu->arch.hcr_el2, hcr_el2);
+ 	isb();
  
- addrsz:				/* Address Size Fault level 0 */
--	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false, false);
-+	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false);
- 	return -EFAULT;
+ 	switch (op) {
+@@ -1304,6 +1300,8 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	if (!fail)
+ 		par = read_sysreg_par();
  
- transfault_l0:			/* Translation Fault level 0 */
--	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false, false);
-+	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false);
- 	return -EFAULT;
- }
++	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
++
+ 	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
+ 		__mmu_config_restore(&config);
  
-@@ -380,13 +380,13 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 			if (ret) {
- 				fail_s1_walk(wr,
- 					     (s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | level,
--					     true, true);
-+					     true);
- 				return ret;
- 			}
- 
- 			if (!kvm_s2_trans_readable(&s2_trans)) {
- 				fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level),
--					     true, true);
-+					     true);
- 
- 				return -EPERM;
- 			}
-@@ -396,8 +396,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 
- 		ret = kvm_read_guest(vcpu->kvm, ipa, &desc, sizeof(desc));
- 		if (ret) {
--			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level),
--				     true, false);
-+			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level), false);
- 			return ret;
- 		}
- 
-@@ -468,10 +467,10 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	return 0;
- 
- addrsz:
--	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(level), true, false);
-+	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(level), false);
- 	return -EINVAL;
- transfault:
--	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(level), true, false);
-+	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(level), false);
- 	return -ENOENT;
- }
- 
-@@ -1198,7 +1197,7 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	}
- 
- 	if (perm_fail)
--		fail_s1_walk(&wr, ESR_ELx_FSC_PERM_L(wr.level), false, false);
-+		fail_s1_walk(&wr, ESR_ELx_FSC_PERM_L(wr.level), false);
- 
- compute_par:
- 	return compute_par_s1(vcpu, &wr, wi.regime);
 -- 
 2.39.2
 
